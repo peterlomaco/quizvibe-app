@@ -168,12 +168,13 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     }
   }, [visible, initialStep]);
 
-  // Ladda invites varje gång användaren kliver in i invites-steget
+  // Ladda invites när modalen öppnas — vi behöver längden redan på chooser-steget
+  // för att kunna visa rätt enabled/disabled-läge på "Join Waiting Invites".
   useEffect(() => {
-    if (visible && step === 'invites') {
+    if (visible) {
       loadInvites().then(setInvites);
     }
-  }, [visible, step]);
+  }, [visible]);
 
   const handleAcceptInvite = async (invite: WaitingInvite) => {
     await removeInvite(invite.id);
@@ -185,7 +186,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
   };
 
   const handleJoinWithCode = () => {
-    if (code.length < 4) return;
+    if (code.length < ROOM_CODE_LENGTH) return;
     onClose();
     router.push({ pathname: '/(tabs)/lobby', params: { code, isHost: 'false' } });
   };
@@ -278,7 +279,17 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                   icon="📨"
                   label="Join Waiting Invites"
                   subtitle="See invites hosts have sent you"
-                  onPress={() => setStep('invites')}
+                  disabled={invites.length === 0}
+                  onPress={() => {
+                    if (invites.length === 0) {
+                      Alert.alert(
+                        'No Waiting Invites',
+                        "You don't have any pending invites yet. When a host sends you one, it will appear here.",
+                      );
+                      return;
+                    }
+                    setStep('invites');
+                  }}
                 />
                 {!hideGuest && (
                   <ChoiceRow
@@ -296,20 +307,48 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
             <>
               <Text style={modal.title}>Enter Room Code</Text>
               <Text style={modal.subtitle}>Ask the host for the code</Text>
-              <TextInput
-                style={modal.input}
-                placeholder="e.g. XJ82K"
-                placeholderTextColor={Colors.textDisabled}
-                value={code}
-                onChangeText={(t) => setCode(t.toUpperCase())}
-                autoCapitalize="characters"
-                maxLength={6}
-                autoFocus
-              />
+              {/* Samma 5-cell-layout som i guest-steget: 3 bokstäver + bindestreck + 2 siffror.
+                  Cell 1–3 visar bokstavstangentbord, 4–5 sifferkeypad.
+                  Auto-fokus hoppar framåt vid input och bakåt vid backspace. */}
+              <View style={modal.codeCellRow}>
+                {(() => {
+                  const nextEmpty = codeCells.findIndex((c) => !c);
+                  return codeCells.map((cell, i) => {
+                    const isLetterCell = i < ROOM_CODE_LETTERS;
+                    const isNextCell = i === nextEmpty;
+                    return (
+                      <React.Fragment key={i}>
+                        <TextInput
+                          ref={(ref) => { codeRefs.current[i] = ref; }}
+                          style={[
+                            modal.codeCell,
+                            !!cell && modal.codeCellFilled,
+                            isNextCell && !cell && modal.codeCellActive,
+                          ]}
+                          value={cell}
+                          onChangeText={(t) => handleCodeCellChange(i, t)}
+                          onKeyPress={(e) => handleCodeCellKeyPress(i, e.nativeEvent.key)}
+                          maxLength={1}
+                          keyboardType={isLetterCell ? 'default' : 'number-pad'}
+                          autoCapitalize={isLetterCell ? 'characters' : 'none'}
+                          selectTextOnFocus
+                          autoFocus={i === 0}
+                        />
+                        {i === ROOM_CODE_LETTERS - 1 && (
+                          <Text style={modal.codeDash}>–</Text>
+                        )}
+                      </React.Fragment>
+                    );
+                  });
+                })()}
+              </View>
               <TouchableOpacity
-                style={[modal.joinBtn, code.length < 4 && modal.joinBtnDisabled]}
+                style={[
+                  modal.joinBtn,
+                  code.length < ROOM_CODE_LENGTH && modal.joinBtnDisabled,
+                ]}
                 onPress={handleJoinWithCode}
-                disabled={code.length < 4}
+                disabled={code.length < ROOM_CODE_LENGTH}
               >
                 <Text style={modal.joinBtnText}>Join Game</Text>
               </TouchableOpacity>
@@ -602,16 +641,23 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
 }
 
 function ChoiceRow({
-  icon, label, subtitle, onPress,
-}: { icon: string; label: string; subtitle: string; onPress: () => void }) {
+  icon, label, subtitle, onPress, disabled = false,
+}: {
+  icon: string; label: string; subtitle: string;
+  onPress: () => void; disabled?: boolean;
+}) {
   return (
-    <TouchableOpacity style={modal.choiceRow} onPress={onPress} activeOpacity={0.7}>
-      <Text style={modal.choiceIcon}>{icon}</Text>
+    <TouchableOpacity
+      style={[modal.choiceRow, disabled && modal.choiceRowDisabled]}
+      onPress={onPress}
+      activeOpacity={0.7}
+    >
+      <Text style={[modal.choiceIcon, disabled && modal.choiceTextDisabled]}>{icon}</Text>
       <View style={{ flex: 1 }}>
-        <Text style={modal.choiceLabel}>{label}</Text>
-        <Text style={modal.choiceSubtitle}>{subtitle}</Text>
+        <Text style={[modal.choiceLabel, disabled && modal.choiceTextDisabled]}>{label}</Text>
+        <Text style={[modal.choiceSubtitle, disabled && modal.choiceTextDisabled]}>{subtitle}</Text>
       </View>
-      <Text style={modal.choiceArrow}>›</Text>
+      <Text style={[modal.choiceArrow, disabled && modal.choiceTextDisabled]}>›</Text>
     </TouchableOpacity>
   );
 }
@@ -930,9 +976,16 @@ export default function HomeScreen() {
             </TouchableOpacity>
           </Animated.View>
 
-          {/* Join Game — as guest (utgråad när inloggad — då används registered) */}
+          {/* Join Game — as guest (utgråad när inloggad — då används registered).
+              Döljs visuellt när Join-modalen är öppen så att modal-sheetens
+              rundade ovankant inte avslöjar knappen bakom. Layout-utrymmet
+              bevaras med opacity/pointerEvents så övriga knappar inte hoppar. */}
           <Animated.View
-            style={!isLoggedIn ? { transform: [{ scale: pulse }] } : undefined}
+            style={[
+              !isLoggedIn ? { transform: [{ scale: pulse }] } : undefined,
+              joinVisible && { opacity: 0 },
+            ]}
+            pointerEvents={joinVisible ? 'none' : 'auto'}
           >
             <TouchableOpacity
               style={[styles.gameBtn, isLoggedIn && styles.gameBtnDisabled]}
@@ -1731,6 +1784,11 @@ const modal = StyleSheet.create({
   choiceLabel: { fontSize: 15, fontWeight: '600', color: Colors.textPrimary },
   choiceSubtitle: { fontSize: 12, color: Colors.textSecondary, marginTop: 2 },
   choiceArrow: { fontSize: 22, color: Colors.textSecondary },
+  choiceRowDisabled: {
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderColor: 'rgba(255,255,255,0.06)',
+  },
+  choiceTextDisabled: { color: Colors.textDisabled },
 
   // Empty state (invites)
   emptyState: {
