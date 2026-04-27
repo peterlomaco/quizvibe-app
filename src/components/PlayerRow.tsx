@@ -16,8 +16,6 @@ export interface Player {
 interface PlayerRowProps {
   player: Player;
   index: number;
-  isMoving?: boolean;
-  onMovePress?: () => void;
   onMoveUp?: () => void;
   onMoveDown?: () => void;
   canMoveUp?: boolean;
@@ -25,8 +23,6 @@ interface PlayerRowProps {
   hcpComplete?: boolean;
   age?: number;
   skill?: SkillLevel;
-  onHcpPress?: () => void;
-  isHost?: boolean;
   isHostPlayer?: boolean;
   // När spelaren är gäst: visa "Guest HCP"-badge istället för räknad HCP.
   // Hur Guest HCP faktiskt räknas är inte definierat ännu.
@@ -43,8 +39,6 @@ interface PlayerRowProps {
 export function PlayerRow({
   player,
   index,
-  isMoving,
-  onMovePress,
   onMoveUp,
   onMoveDown,
   canMoveUp,
@@ -52,8 +46,6 @@ export function PlayerRow({
   hcpComplete,
   age,
   skill,
-  onHcpPress,
-  isHost,
   isHostPlayer,
   isGuest,
   turnNumber,
@@ -72,7 +64,6 @@ export function PlayerRow({
       <View
         style={[
           styles.card,
-          isMoving && styles.cardMoving,
           // Approved/waiting border-färg — gäller alla utom host (host
           // har sin egen guld-border via cardHost nedan).
           !isHostPlayer && approved === true && styles.cardApproved,
@@ -164,15 +155,6 @@ export function PlayerRow({
         </View>
       )}
 
-      {/* ── HCP Required ───────────────────────────────────── */}
-      {isHost && !hcpComplete && (
-        <Pressable style={styles.hcpRequired} onPress={onHcpPress}>
-          <Text style={styles.hcpRequiredIcon}>⚠️</Text>
-          <Text style={styles.hcpRequiredText}>HCP Required – tap to set</Text>
-          <Text style={styles.hcpRequiredArrow}>›</Text>
-        </Pressable>
-      )}
-
       </View>
 
       {/* ── HOST-tag som skär kantlinjen ──────────────────────── */}
@@ -215,11 +197,6 @@ const styles = StyleSheet.create({
   cardWaiting: {
     borderColor: Colors.error,
   },
-  cardMoving: {
-    borderColor: Colors.primaryBorder,
-    backgroundColor: Colors.primaryMuted,
-  },
-
   // HOST-tagg som sitter på kortets övre kantlinje
   hostBorderTag: {
     position: 'absolute',
@@ -371,28 +348,6 @@ const styles = StyleSheet.create({
   },
   hcpBadgeTextGuest: {
     color: Colors.textSecondary,
-  },
-
-  hcpRequired: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.sm,
-    backgroundColor: Colors.warningMuted,
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.sm,
-    borderTopWidth: 1,
-    borderTopColor: Colors.warningBorder,
-  },
-  hcpRequiredIcon: { fontSize: 12 },
-  hcpRequiredText: {
-    flex: 1,
-    fontSize: FontSize.xs,
-    color: Colors.warning,
-    fontWeight: FontWeight.medium,
-  },
-  hcpRequiredArrow: {
-    fontSize: 16,
-    color: Colors.warning,
   },
 
 });

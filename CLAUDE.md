@@ -43,6 +43,7 @@ All client-side via AsyncStorage. No server. Screens reload data on focus (`useF
 - Comments are often in Swedish. Keep that style when editing existing files; new files can be English.
 - Theme tokens, never raw hex. `Colors.background`, `Spacing.md`, etc.
 - Screens currently mix layout, modals, and domain logic in one file — when extending, prefer extracting sub-components into `src/components/`.
+- **Border-cutting badge pattern** for "tag" labels that overlap a card/button border (HOST/GUEST in `PlayerRow`, FREE on the Register button in `app/(tabs)/index.tsx`, FREE/PREMIUM on the Game Mode toggle in `LobbyScreen`). The badge is `position: 'absolute'` with `top: -8`, a matching `backgroundColor` to the parent border, and `paddingHorizontal: 8 / paddingVertical: 2`. The parent must be `position: 'relative'` and must NOT use `overflow: 'hidden'`, or the badge gets clipped.
 
 ## Scripts
 

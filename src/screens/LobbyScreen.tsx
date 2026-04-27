@@ -1,9 +1,8 @@
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Alert,
-  Animated,
   Keyboard,
   KeyboardAvoidingView,
   Modal,
@@ -18,9 +17,9 @@ import {
   View,
 } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
+import { ApproveToggle } from '../components/ApproveToggle';
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
-import { ApproveToggle } from '../components/ApproveToggle';
 import { Player, PlayerRow } from '../components/PlayerRow';
 import { Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';
 import { getAvatarEmojiById } from '../utils/avatars';
@@ -47,7 +46,7 @@ export interface LobbyPlayer extends Player {
 
 type GameMode = 'pass-the-phone' | 'individual-devices';
 
-// Year-of-birth gränser (samma som registreringsformuläret för gäster)
+// Year-of-birth gränser (samma som registreringsformuläret för gäster) ....
 const CURRENT_YEAR = new Date().getFullYear();
 const MIN_BIRTH_YEAR = 1930;
 const MAX_BIRTH_YEAR = CURRENT_YEAR - 5;
@@ -85,12 +84,6 @@ const SEED_PLAYERS: LobbyPlayer[] = [
   { id: '2', name: 'Sam L.',    emoji: '🎸', isReady: true,  type: 'registered', hcpComplete: true,  age: 28, skill: 'expert',                    approved: false },
   { id: '3', name: 'Jordan M.', emoji: '🤖', isReady: true,  type: 'guest',      hcpComplete: true,  age: 35, skill: 'intermediate',              approved: false },
   { id: '4', name: 'Casey P.',  emoji: '🐉', isReady: true,  type: 'registered', hcpComplete: true,  age: 41, skill: 'easy',                      approved: false },
-];
-
-const SKILL_OPTIONS: { label: string; value: 'easy' | 'intermediate' | 'expert' }[] = [
-  { label: 'Easy', value: 'easy' },
-  { label: 'Intermediate', value: 'intermediate' },
-  { label: 'Expert', value: 'expert' },
 ];
 
 const REGIONS = ['Sweden', 'Nordics', 'Europe', 'Global'] as const;
@@ -353,54 +346,6 @@ function AddPlayerModal({ visible, onClose, onAdd }: {
   );
 }
 
-// ─── HCP Modal ────────────────────────────────────────────────────────────────
-
-function HCPModal({ player, visible, onClose, onSave }: {
-  player: LobbyPlayer | null; visible: boolean; onClose: () => void;
-  onSave: (id: string, age: number, skill: 'easy' | 'intermediate' | 'expert') => void;
-}) {
-  const [age, setAge] = useState('');
-  const [skill, setSkill] = useState<'easy' | 'intermediate' | 'expert'>('intermediate');
-  const handleSave = () => {
-    if (!player || !age.trim()) return;
-    onSave(player.id, parseInt(age), skill);
-    setAge(''); setSkill('intermediate'); onClose();
-  };
-  return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <View style={modal.overlay}>
-        <View style={modal.container}>
-          <Text style={modal.title}>Set HCP for {player?.name}</Text>
-          <Text style={modal.subtitle}>Required to start the game</Text>
-          <View style={modal.fieldGroup}>
-            <Text style={modal.fieldLabel}>Age</Text>
-            <TextInput style={modal.input} placeholder="e.g. 34" placeholderTextColor={Colors.textDisabled} value={age} onChangeText={(t) => setAge(t.replace(/[^0-9]/g, ''))} keyboardType="number-pad" maxLength={3} autoFocus returnKeyType="done" />
-          </View>
-          <View style={modal.fieldGroup}>
-            <Text style={modal.fieldLabel}>Skill Level</Text>
-            <View style={modal.skillRow}>
-              {SKILL_OPTIONS.map((opt) => (
-                <TouchableOpacity key={opt.value} style={[modal.skillBtn, skill === opt.value && modal.skillBtnActive]} onPress={() => setSkill(opt.value)}>
-                  <Text style={[modal.skillBtnText, skill === opt.value && modal.skillBtnTextActive]}>{opt.label}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
-          {age.trim().length > 0 && (
-            <View style={modal.previewBox}>
-              <Text style={modal.previewText}>{player?.name} · {skill.charAt(0).toUpperCase() + skill.slice(1)} · Age {age}</Text>
-            </View>
-          )}
-          <Button label="Save HCP" onPress={handleSave} disabled={!age.trim()} variant="primary" />
-          <TouchableOpacity onPress={onClose} style={modal.cancelBtn}>
-            <Text style={modal.cancelText}>Cancel</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </Modal>
-  );
-}
-
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
 export default function LobbyScreen() {
@@ -484,9 +429,7 @@ export default function LobbyScreen() {
       };
     }, []),
   );
-  const [movingId, setMovingId] = useState<string | null>(null);
   const [addModalVisible, setAddModalVisible] = useState(false);
-  const [hcpPlayer, setHcpPlayer] = useState<LobbyPlayer | null>(null);
   const [eraValues, setEraValues] = useState([1980, 2010]);
   const [region, setRegion] = useState<Region>('Sweden');
   const [regionModalOpen, setRegionModalOpen] = useState(false);
@@ -504,16 +447,6 @@ export default function LobbyScreen() {
   const [gameMode, setGameMode] = useState<GameMode>('pass-the-phone');
   // TODO (Store integration): koppla till riktig köpstatus när Store-paketet är inkopplat.
   const hasMultiplayerPackage = false;
-  const modeSlide = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    Animated.spring(modeSlide, {
-      toValue: gameMode === 'pass-the-phone' ? 0 : 1,
-      useNativeDriver: false,
-      friction: 9,
-      tension: 70,
-    }).start();
-  }, [gameMode, modeSlide]);
 
   const handleSelectMode = (mode: GameMode) => {
     if (mode === gameMode) return;
@@ -581,16 +514,12 @@ export default function LobbyScreen() {
       },
     ]);
   };
-  const handleSaveHCP = (id: string, age: number, skill: 'easy' | 'intermediate' | 'expert') => {
-    setPlayers((prev) => prev.map((p) => p.id === id ? { ...p, age, skill, hcpComplete: true, isReady: true } : p));
-  };
   const handleSetApproved = (id: string, approved: boolean) => {
     setPlayers((prev) => prev.map((p) => p.id === id ? { ...p, approved } : p));
   };
   const handleApproveAll = () => {
     setPlayers((prev) => prev.map((p) => p.hcpComplete ? { ...p, approved: true } : p));
   };
-  const toggleMove = (id: string) => setMovingId((prev) => (prev === id ? null : id));
   const movePlayer = (id: string, dir: 'up' | 'down') => {
     setPlayers((prev) => {
       const idx = prev.findIndex((p) => p.id === id);
@@ -665,35 +594,45 @@ export default function LobbyScreen() {
           <Text style={styles.sectionLabel}>Game Mode</Text>
 
           <View style={styles.modeToggle}>
-            <Animated.View
-              pointerEvents="none"
-              style={[
-                styles.modePill,
-                {
-                  left: modeSlide.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: ['1%', '50%'],
-                  }),
-                },
-              ]}
-            />
+            {/* Pass-the-Phone — permanent inre ruta med grön kant + FREE-badge när aktiv */}
             <TouchableOpacity
-              style={styles.modeOption}
+              style={[
+                styles.modeOption,
+                gameMode === 'pass-the-phone' ? styles.modeOptionPassActive : styles.modeOptionInactive,
+              ]}
               onPress={() => handleSelectMode('pass-the-phone')}
               activeOpacity={0.7}
             >
-              <Text style={[styles.modeLabel, gameMode === 'pass-the-phone' && styles.modeLabelActive]}>
+              <Text style={[styles.modeLabel, gameMode === 'pass-the-phone' && styles.modeLabelActiveFree]}>
                 Pass-the-Phone
               </Text>
+              {gameMode === 'pass-the-phone' && (
+                <View style={styles.freeBadge} pointerEvents="none">
+                  <Text style={styles.freeBadgeText}>FREE</Text>
+                </View>
+              )}
             </TouchableOpacity>
+
+            {/* Individual Devices — premium-låst. Svag grå kant + guld PREMIUM-badge tills
+                användaren har paketet aktivt; då blå "lit" kant och ingen badge. */}
             <TouchableOpacity
-              style={styles.modeOption}
+              style={[
+                styles.modeOption,
+                gameMode === 'individual-devices' && hasMultiplayerPackage
+                  ? styles.modeOptionIndivActive
+                  : styles.modeOptionInactive,
+              ]}
               onPress={() => handleSelectMode('individual-devices')}
               activeOpacity={0.7}
             >
-              <Text style={[styles.modeLabel, gameMode === 'individual-devices' && styles.modeLabelActive]}>
-                {!hasMultiplayerPackage && '🔒 '}Individual Devices
+              <Text style={[styles.modeLabel, gameMode === 'individual-devices' && hasMultiplayerPackage && styles.modeLabelActive]}>
+                Individual Devices
               </Text>
+              {!(gameMode === 'individual-devices' && hasMultiplayerPackage) && (
+                <View style={styles.premiumBadge} pointerEvents="none">
+                  <Text style={styles.premiumBadgeText}>PREMIUM</Text>
+                </View>
+              )}
             </TouchableOpacity>
           </View>
 
@@ -732,8 +671,6 @@ export default function LobbyScreen() {
                 key={player.id}
                 player={player}
                 index={players.indexOf(player)}
-                isMoving={movingId === player.id}
-                onMovePress={() => toggleMove(player.id)}
                 onMoveUp={() => movePlayer(player.id, 'up')}
                 onMoveDown={() => movePlayer(player.id, 'down')}
                 canMoveUp={index > 0}
@@ -741,8 +678,6 @@ export default function LobbyScreen() {
                 hcpComplete={player.hcpComplete}
                 age={player.age}
                 skill={player.skill}
-                onHcpPress={() => setHcpPlayer(player)}
-                isHost={hostMode}
                 isHostPlayer={player.isHost}
                 isGuest={player.type === 'guest'}
                 turnNumber={gameMode === 'pass-the-phone' ? index + 1 : undefined}
@@ -761,7 +696,7 @@ export default function LobbyScreen() {
 
                 {/* Master "Approve All"-toggle — bara host ser/använder den.
                     Drar host till Yes godkänns alla aktuellt väntande spelare. */}
-                {hostMode && waitingForApproval.length > 1 && (
+                {hostMode && waitingForApproval.length > 0 && (
                   <View style={styles.approveAllRow}>
                     <ApproveToggle
                       label="Approve All"
@@ -787,7 +722,6 @@ export default function LobbyScreen() {
                     hcpComplete={player.hcpComplete}
                     age={player.age}
                     skill={player.skill}
-                    isHost={hostMode}
                     isHostPlayer={false}
                     isGuest={player.type === 'guest'}
                     showApproveToggle={hostMode}
@@ -861,7 +795,6 @@ export default function LobbyScreen() {
 
       {/* Alla modaler utanför ScrollView */}
       <AddPlayerModal visible={addModalVisible} onClose={() => setAddModalVisible(false)} onAdd={handleAddPlayer} />
-      <HCPModal player={hcpPlayer} visible={!!hcpPlayer} onClose={() => setHcpPlayer(null)} onSave={handleSaveHCP} />
       <RegionModal
         visible={regionModalOpen}
         value={region}
@@ -982,9 +915,9 @@ const styles = StyleSheet.create({
 
   section: { gap: Spacing.sm },
 
-  // Game Mode toggle (Pass-the-Phone vs Individual Devices)
+  // Game Mode toggle (Pass-the-Phone vs Individual Devices) — yttre container
+  // som håller två permanenta inre rutor side-by-side.
   modeToggle: {
-    position: 'relative',
     flexDirection: 'row',
     backgroundColor: Colors.background,
     borderRadius: Radius.md,
@@ -992,22 +925,70 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.border,
     height: 46,
+    gap: 4,
   },
-  modePill: {
-    position: 'absolute',
-    top: 3,
-    bottom: 3,
-    width: '49%',
-    backgroundColor: Colors.primaryMuted,
-    borderRadius: Radius.sm,
-    borderWidth: 1,
-    borderColor: Colors.primaryBorder,
-  },
+  // Bas-stil för båda inre rutorna. Konkret kant-/bg-färg sätts av varianterna nedan.
   modeOption: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    zIndex: 1,
+    borderRadius: Radius.sm,
+    borderWidth: 1,
+  },
+  // Inaktiv ruta — svag grå kantlinje, transparent bg. Används för båda alternativen
+  // när de inte är valda (samt för Individual Devices så länge premium saknas).
+  modeOptionInactive: {
+    borderColor: Colors.borderStrong,
+    backgroundColor: 'transparent',
+  },
+  // Pass-the-Phone aktiv (gratis-läge) — grön kant, muted bg.
+  modeOptionPassActive: {
+    borderColor: Colors.success,
+    backgroundColor: Colors.primaryMuted,
+  },
+  // Individual Devices aktiv MED premium — "lit" blå kant (samma som
+  // startskärmens primary-knappar), muted bg.
+  modeOptionIndivActive: {
+    borderColor: Colors.primary,
+    backgroundColor: Colors.primaryMuted,
+  },
+  // FREE-badge som skär den gröna kantlinjen — samma teknik som HOST-taggen i
+  // PlayerRow och Register-knappen i Profile-menyn.
+  freeBadge: {
+    position: 'absolute',
+    top: -8,
+    right: Spacing.sm,
+    backgroundColor: Colors.success,
+    borderRadius: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    zIndex: 10,
+    elevation: 4,
+  },
+  freeBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#000',
+    letterSpacing: 0.6,
+  },
+  // PREMIUM-badge i guld — markerar att Individual Devices kräver paketet.
+  // Försvinner när användaren har premium aktivt.
+  premiumBadge: {
+    position: 'absolute',
+    top: -8,
+    right: Spacing.sm,
+    backgroundColor: '#F5A623',
+    borderRadius: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    zIndex: 10,
+    elevation: 4,
+  },
+  premiumBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#000',
+    letterSpacing: 0.6,
   },
   modeLabel: {
     fontSize: FontSize.sm,
@@ -1016,6 +997,12 @@ const styles = StyleSheet.create({
   },
   modeLabelActive: {
     color: Colors.primary,
+    fontWeight: FontWeight.semibold,
+  },
+  // Aktiv label-stil för Pass-the-Phone när läget är gratis (grön pill).
+  // Vit text för bättre kontrast mot den muted bakgrunden + grön kantlinje.
+  modeLabelActiveFree: {
+    color: '#FFF',
     fontWeight: FontWeight.semibold,
   },
   modeDescription: {
