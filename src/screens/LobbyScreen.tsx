@@ -1,8 +1,9 @@
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Alert,
+  Animated,
   Keyboard,
   KeyboardAvoidingView,
   Modal,
@@ -18,6 +19,7 @@ import {
   View,
 } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
+import Svg, { Circle, Path } from 'react-native-svg';
 import { ApproveToggle } from '../components/ApproveToggle';
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
@@ -103,12 +105,11 @@ type Region = typeof REGIONS[number];
 interface MusicPackage {
   id: string;
   name: string;
-  emoji: string;
 }
 const PURCHASED_PACKAGES: MusicPackage[] = [
-  { id: 'pkg-80s', name: '80s Hits', emoji: '📻' },
-  { id: 'pkg-rock', name: 'Rock Classics', emoji: '🎸' },
-  { id: 'pkg-hiphop', name: 'Hip-Hop 2010s', emoji: '🎤' },
+  { id: 'pkg-hiphop', name: 'Hip Hop' },
+  { id: 'pkg-rock', name: 'Rock' },
+  { id: 'pkg-film-actors', name: 'Film & Actors' },
 ];
 
 const REGION_FLAGS: Record<Region, string> = {
@@ -394,6 +395,19 @@ export default function LobbyScreen() {
 
   const [players, setPlayers] = useState<LobbyPlayer[]>(SEED_PLAYERS);
 
+  // Pulserande Buy CTA — drar host:ens uppmärksamhet till QuizVibe Store-knappen.
+  // Samma loop-mönster (scale 1 → 1.03 → 1, 900ms per riktning) som
+  // Create Game-knappen på startskärmen.
+  const buyCtaPulse = useRef(new Animated.Value(1)).current;
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(buyCtaPulse, { toValue: 1.03, duration: 900, useNativeDriver: true }),
+        Animated.timing(buyCtaPulse, { toValue: 1, duration: 900, useNativeDriver: true }),
+      ]),
+    ).start();
+  }, [buyCtaPulse]);
+
   // Vid mount: kolla om det finns "pending players" från föregående spel
   // (sparat av quiz-skärmen när användaren valde "Yes, keep them" i Play Again-dialogen).
   // Om användaren kommer hit som gäst: lägg in dem som en guest-spelare överst
@@ -475,34 +489,27 @@ export default function LobbyScreen() {
   const [spotifyHostToggle, setSpotifyHostToggle] = useState(true);
   // Profiles and Places styrs helt av host-toggeln. Default = på.
   const [profilesEnabled, setProfilesEnabled] = useState(true);
-  // Use Packages — Basic är default på. Att välja minst ett extra-paket
-  // avaktiverar Basic; att åter-aktivera Basic avaktiverar alla extras.
-  // Knytningen mellan packages och room-code är implicit (lobby-state).
-  const [useBasicPackage, setUseBasicPackage] = useState(true);
+  // Use Packages — Basic-utbudet är alltid implicit aktivt (ingen UI). Hosten
+  // kan välja till extra-paket ovanpå. Knytningen mellan packages och
+  // room-code är implicit (lobby-state).
   const [selectedExtraPackages, setSelectedExtraPackages] = useState<string[]>([]);
 
-  const handleToggleBasic = () => {
-    if (useBasicPackage) {
-      setUseBasicPackage(false);
-    } else {
-      setUseBasicPackage(true);
-      setSelectedExtraPackages([]);
-    }
-  };
-
   const handleToggleExtraPackage = (id: string) => {
-    setSelectedExtraPackages((prev) => {
-      if (prev.includes(id)) {
-        const next = prev.filter((p) => p !== id);
-        // Om sista extra-paketet just avaktiverades — auto-aktivera Basic
-        // så det alltid finns minst en aktiv källa.
-        if (next.length === 0) setUseBasicPackage(true);
-        return next;
-      }
-      // Att markera ett extra-paket auto-avaktiverar Basic
-      setUseBasicPackage(false);
-      return [...prev, id];
-    });
+    setSelectedExtraPackages((prev) =>
+      prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id],
+    );
+  };
+  // "Select all"-toggle på rubrik-raden — låter host aktivera/avaktivera
+  // alla köpta paket med ett enda klick.
+  const isAllSelected =
+    PURCHASED_PACKAGES.length > 0 &&
+    selectedExtraPackages.length === PURCHASED_PACKAGES.length;
+  const handleToggleAll = () => {
+    if (isAllSelected) {
+      setSelectedExtraPackages([]);
+    } else {
+      setSelectedExtraPackages(PURCHASED_PACKAGES.map((p) => p.id));
+    }
   };
   // TODO (Store integration): koppla till riktig köpstatus när Store-paketet är inkopplat.
   const hasMultiplayerPackage = false;
@@ -556,9 +563,10 @@ export default function LobbyScreen() {
   const approvedPlayers = players.filter((p) => isPlayerApproved(p));
   const waitingForApproval = players.filter((p) => !isPlayerApproved(p));
   // Spotify-kravet beror på Game Mode:
-  //  • Pass-the-Phone — låtar spelas lokalt på en enda enhet, så Spotify
-  //    är alltid auto-Enabled i detta läge. Info-ikonen visas ändå med
-  //    kriterierna så användaren förstår förutsättningarna.
+  //  • Pass-the-Phone — bara en enhet skickas runt; en Spotify-låt skulle
+  //    tvinga öppna Spotify-appen och stjäla fokus från QuizVibe, vilket
+  //    bryter timern som tickar medan låten spelas. Spotify är därför
+  //    alltid auto-Disabled i detta läge.
   //  • Individual Devices — varje spelare streamar låtarna på sin egen
   //    telefon, så ALLA godkända spelare behöver ett Spotify-konto.
   // Host kan ovanpå auto-regeln manuellt slå av via spotifyHostToggle;
@@ -566,11 +574,29 @@ export default function LobbyScreen() {
   // lägena (enabled som disabled) med samma rules-text — så att användaren
   // alltid kan kontrollera vilket kriterium som gäller per Game Mode.
   const spotifyAutoEnabled =
-    gameMode === 'pass-the-phone'
-      ? true
-      : approvedPlayers.length > 0 &&
-        approvedPlayers.every((p) => p.spotifyConnected === true);
+    gameMode === 'individual-devices' &&
+    approvedPlayers.length > 0 &&
+    approvedPlayers.every((p) => p.spotifyConnected === true);
   const spotifyEnabled = spotifyAutoEnabled && spotifyHostToggle;
+  // Minst en Game Connection-källa måste vara aktiv — annars finns inget
+  // underlag att hämta frågor från. Räkna aktiva källor och blockera när
+  // användaren försöker stänga av den enda kvarvarande.
+  const enabledSourceCount =
+    (youtubeEnabled ? 1 : 0) + (spotifyEnabled ? 1 : 0) + (profilesEnabled ? 1 : 0);
+  const handleToggleSource = (
+    currentlyEnabled: boolean,
+    setter: (v: boolean) => void,
+    nextValue: boolean,
+  ) => {
+    if (!nextValue && currentlyEnabled && enabledSourceCount === 1) {
+      Alert.alert(
+        'Game connections',
+        'Minimum 1 Game connection source needs to be enabled.',
+      );
+      return;
+    }
+    setter(nextValue);
+  };
   const { from: clampedFrom, to: clampedTo, warning: eraWarning } = clampEraToPlayer(eraValues[0], eraValues[1], players);
 
   const handleAddPlayer = (name: string, age: number, skill: AddPlayerSkill) => {
@@ -674,8 +700,9 @@ export default function LobbyScreen() {
             döljs FREE/PREMIUM-badges (de är host-relevanta paketdetaljer) och
             det aktiva läget får istället den blå "lit" kanten — samma primary-
             färg som startskärmens knappar — så att det aktuella host-valet
-            tydligt sticker ut utan att se ut som en interaktiv toggle. */}
-        <View style={styles.section}>
+            tydligt sticker ut utan att se ut som en interaktiv toggle.
+            marginTop ger lite extra luft mellan kortets överkant och rubriken. */}
+        <View style={[styles.section, { marginTop: Spacing.xs }]}>
           <Text style={styles.sectionLabel}>
             Game Mode
             {!hostMode && <Text style={styles.sectionHint}> – defined by Host</Text>}
@@ -755,8 +782,9 @@ export default function LobbyScreen() {
         {/* ── Game Connections ─────────────────────────────────── */}
         {/* Visar vilka källor spelet drar frågor från. Vänsterjusterad lista
             med färgade brand-badges (samma mönster som Spotify-kortet på
-            Profile-sidan, fast i kompakt list-format). */}
-        <View style={styles.section}>
+            Profile-sidan, fast i kompakt list-format). marginTop ger lite
+            extra luft mellan Game Mode-beskrivningen och denna rubrik. */}
+        <View style={[styles.section, { marginTop: Spacing.sm }]}>
           <Text style={styles.sectionLabel}>Game Connections</Text>
           <View style={styles.connectionsList}>
             {/* YouTube — alltid tillgänglig, host kan toggla av/på manuellt.
@@ -772,21 +800,26 @@ export default function LobbyScreen() {
                 </View>
               </View>
               <Text style={styles.connectionLabel}>YouTube</Text>
-              {youtubeEnabled ? (
-                <View style={styles.youtubeEnabledPill}>
-                  <Text style={styles.youtubeEnabledText}>Enabled</Text>
-                  <View style={styles.freeBadgeSmall} pointerEvents="none">
-                    <Text style={styles.freeBadgeTextSmall}>FREE</Text>
-                  </View>
+              {/* FREE-badgen sitter alltid kvar — i Enabled-läge med grön bg
+                  och svart text, i Disabled-läge med grå bg och dämpad text
+                  så den signalerar "ingår gratis" utan att konkurrera med
+                  Disabled-pillens budskap. */}
+              <View style={youtubeEnabled ? styles.youtubeEnabledPill : styles.statusPillDisabled}>
+                <Text style={youtubeEnabled ? styles.youtubeEnabledText : styles.statusPillTextDisabled}>
+                  {youtubeEnabled ? 'Enabled' : 'Disabled'}
+                </Text>
+                <View
+                  style={[styles.freeBadgeSmall, !youtubeEnabled && styles.freeBadgeSmallGrey]}
+                  pointerEvents="none"
+                >
+                  <Text style={[styles.freeBadgeTextSmall, !youtubeEnabled && styles.freeBadgeSmallTextGrey]}>
+                    FREE
+                  </Text>
                 </View>
-              ) : (
-                <View style={styles.statusPillDisabled}>
-                  <Text style={styles.statusPillTextDisabled}>Disabled</Text>
-                </View>
-              )}
+              </View>
               <Switch
                 value={youtubeEnabled}
-                onValueChange={setYoutubeEnabled}
+                onValueChange={(v) => handleToggleSource(youtubeEnabled, setYoutubeEnabled, v)}
                 disabled={!hostMode}
                 trackColor={{ false: Colors.error, true: Colors.success }}
                 thumbColor="#FFF"
@@ -798,31 +831,38 @@ export default function LobbyScreen() {
               <View style={[styles.connectionIconWrap, styles.connectionIconSpotify]}>
                 <Text style={styles.connectionIconGlyph}>🎵</Text>
               </View>
-              <Text style={styles.connectionLabel}>Spotify</Text>
+              {/* Label + info-ikon paras ihop i en grupp som upptar samma
+                  minWidth (130) som vanlig connectionLabel — så pillen efter
+                  startar på exakt samma x-position som YouTubes och Profiles
+                  & Places-radens pillar, och switchen längst ut linjerar med
+                  de andra radernas switchar via marginLeft:'auto'. */}
+              <View style={styles.connectionLabelGroup}>
+                <Text style={[styles.connectionLabel, styles.connectionLabelInGroup]}>Spotify</Text>
+                {/* Info-ikonen visas alltid (oavsett mode och enabled/disabled-
+                    state) med samma rules-text. Sitter direkt efter "Spotify"
+                    så den läses som en del av labeln. */}
+                <TouchableOpacity
+                  style={styles.infoIconBtn}
+                  onPress={() =>
+                    Alert.alert(
+                      'Spotify requirements',
+                      'Pass-the-Phone — Spotify is unavailable in this mode.\n\nIndividual Devices — All approved players (incl. host) need a Spotify account activated in their Profile.',
+                    )
+                  }
+                  hitSlop={8}
+                  accessibilityLabel="Spotify requirements"
+                >
+                  <Text style={styles.infoIconText}>i</Text>
+                </TouchableOpacity>
+              </View>
               <View style={spotifyEnabled ? styles.statusPillEnabled : styles.statusPillDisabled}>
                 <Text style={spotifyEnabled ? styles.statusPillTextEnabled : styles.statusPillTextDisabled}>
                   {spotifyEnabled ? 'Enabled' : 'Disabled'}
                 </Text>
               </View>
-              {/* Info-ikonen visas alltid (oavsett mode och enabled/disabled-
-                  state) med samma rules-text. Användaren ska alltid kunna
-                  kontrollera kriterierna för båda Game Modes. */}
-              <TouchableOpacity
-                style={styles.infoIconBtn}
-                onPress={() =>
-                  Alert.alert(
-                    'Spotify requirements',
-                    'Pass-the-Phone — Host needs to have a Spotify account activated in Profile.\n\nIndividual Devices — All Players need to have a Spotify account activated in their Profiles.',
-                  )
-                }
-                hitSlop={8}
-                accessibilityLabel="Spotify requirements"
-              >
-                <Text style={styles.infoIconText}>i</Text>
-              </TouchableOpacity>
               <Switch
                 value={spotifyHostToggle}
-                onValueChange={setSpotifyHostToggle}
+                onValueChange={(v) => handleToggleSource(spotifyEnabled, setSpotifyHostToggle, v)}
                 // Locked för icke-host (read-only) ELLER när auto-regeln
                 // inte uppfylls (alla godkända måste ha Spotify-konto).
                 // Vid auto-disable visas en mörkgrå track och ljusgrå thumb
@@ -841,107 +881,166 @@ export default function LobbyScreen() {
               />
             </View>
 
-            {/* Use Packages — sub-block under Spotify för musikpaket-val.
-                Basic är gratis och alltid tillgängligt. Extra packages är
-                köpta paket från QuizVibe Store. Basic OCH extras är ömsesidigt
-                uteslutande: aktivera ett extra → Basic avaktiveras (FREE-badge
-                gråas); aktivera Basic igen → alla extras avaktiveras. För
-                icke-host visas allt read-only (disabled på TouchableOpacity). */}
-            <View style={styles.usePackagesBlock}>
-              <TouchableOpacity
-                style={[
-                  styles.packageChipBasic,
-                  useBasicPackage ? styles.packageChipBasicActive : styles.packageChipBasicInactive,
-                  !spotifyEnabled && styles.packageChipDimmed,
-                ]}
-                onPress={handleToggleBasic}
-                disabled={!hostMode || !spotifyEnabled}
-                activeOpacity={0.7}
-              >
-                <Text
-                  style={[
-                    styles.packageChipBasicText,
-                    !useBasicPackage && styles.packageChipBasicTextInactive,
-                  ]}
-                >
-                  Basic
+            {/* AI — mörkblå cirkel med blå primary-border och italiserad "AI"-text. */}
+            <View style={styles.connectionRow}>
+              <View style={styles.connectionIconWrap}>
+                {/* Q-figuren från startskärmens logga (utan omgivande kvadrater).
+                    "AI"-text överlagrad i mitten ersätter den lilla pricken. */}
+                <Svg width={28} height={28} viewBox="24 22 32 32" style={StyleSheet.absoluteFillObject}>
+                  <Circle cx="40" cy="38" r="13" fill="none" stroke={Colors.primary} strokeWidth="2.5" />
+                  <Path d="M49 47 L53 51" stroke={Colors.primary} strokeWidth="2.5" strokeLinecap="round" />
+                </Svg>
+                <Text style={styles.connectionIconAiText}>AI</Text>
+              </View>
+              <Text style={styles.connectionLabel}>Profiles & Places</Text>
+              {/* FREE-badgen sitter alltid kvar (samma mönster som YouTube) —
+                  grön i Enabled, grå i Disabled. */}
+              <View style={profilesEnabled ? styles.youtubeEnabledPill : styles.statusPillDisabled}>
+                <Text style={profilesEnabled ? styles.youtubeEnabledText : styles.statusPillTextDisabled}>
+                  {profilesEnabled ? 'Enabled' : 'Disabled'}
                 </Text>
                 <View
-                  style={[styles.freeBadge, !useBasicPackage && styles.packageFreeBadgeGrey]}
+                  style={[styles.freeBadgeSmall, !profilesEnabled && styles.freeBadgeSmallGrey]}
                   pointerEvents="none"
                 >
-                  <Text
-                    style={[styles.freeBadgeText, !useBasicPackage && styles.packageFreeBadgeTextGrey]}
-                  >
+                  <Text style={[styles.freeBadgeTextSmall, !profilesEnabled && styles.freeBadgeSmallTextGrey]}>
                     FREE
                   </Text>
                 </View>
-              </TouchableOpacity>
-
-              <Text style={styles.extraPackagesLabel}>Extra packages:</Text>
-
-              <View style={styles.extraPackagesGrid}>
-                {/* "Buy Extra packages" är alltid första chip i grid:en —
-                    oavsett om host köpt paket eller ej. Klick navigerar
-                    till QuizVibe Store. PREMIUM-badgen i grått markerar
-                    att paketen är köp-låsta. */}
-                <TouchableOpacity
-                  style={[
-                    styles.packageChip,
-                    styles.packageChipExtra,
-                    styles.packageChipInactive,
-                    !spotifyEnabled && styles.packageChipDimmed,
-                  ]}
-                  onPress={() => router.push('/(tabs)/store')}
-                  disabled={!hostMode || !spotifyEnabled}
-                  activeOpacity={0.7}
-                >
-                  <Text style={styles.packageChipText} numberOfLines={1}>
-                    Buy Extra packages
-                  </Text>
-                  <View style={styles.packagePremiumBadgeGrey} pointerEvents="none">
-                    <Text style={styles.packagePremiumBadgeGreyText}>PREMIUM</Text>
-                  </View>
-                </TouchableOpacity>
-                {PURCHASED_PACKAGES.map((pkg) => {
-                  const isSelected = selectedExtraPackages.includes(pkg.id);
-                  return (
-                    <TouchableOpacity
-                      key={pkg.id}
-                      style={[
-                        styles.packageChip,
-                        styles.packageChipExtra,
-                        isSelected ? styles.packageChipExtraActive : styles.packageChipInactive,
-                        !spotifyEnabled && styles.packageChipDimmed,
-                      ]}
-                      onPress={() => handleToggleExtraPackage(pkg.id)}
-                      disabled={!hostMode || !spotifyEnabled}
-                      activeOpacity={0.7}
-                    >
-                      <Text style={[styles.packageChipText, isSelected && styles.packageChipTextActive]}>
-                        {pkg.name}
-                      </Text>
-                    </TouchableOpacity>
-                  );
-                })}
               </View>
-            </View>
-
-            {/* AI — mörkblå cirkel med blå primary-border och italiserad "AI"-text. */}
-            <View style={styles.connectionRow}>
-              <View style={[styles.connectionIconWrap, styles.connectionIconAi]}>
-                <Text style={styles.connectionIconAiText}>AI</Text>
-              </View>
-              <Text style={styles.connectionLabel}>Profiles and Places</Text>
               <Switch
                 value={profilesEnabled}
-                onValueChange={setProfilesEnabled}
+                onValueChange={(v) => handleToggleSource(profilesEnabled, setProfilesEnabled, v)}
                 disabled={!hostMode}
                 trackColor={{ false: Colors.error, true: Colors.success }}
                 thumbColor="#FFF"
                 ios_backgroundColor={Colors.error}
                 style={styles.connectionSwitch}
               />
+            </View>
+
+            {/* Use Packages — sub-block sist i Game Connections för musikpaket-val.
+                Basic-utbudet är alltid implicit aktivt (ingen synlig chip);
+                hosten kan välja till köpta Extra packages ovanpå. För
+                icke-host visas allt read-only (disabled på TouchableOpacity). */}
+            <View style={styles.usePackagesBlock}>
+              <Text style={styles.sectionLabel}>Customized Host packages</Text>
+
+              {/* Yttre svart container som omsluter Buy CTA + paketlistan —
+                  speglar modeToggle:s padding (3), gap (4), borderRadius (md)
+                  och Colors.background-bakgrund. Det ger Buy CTA samma
+                  inre avstånd från ramen som Individual Devices har i
+                  Game Mode-toggeln. */}
+              <View style={styles.extraPackagesWrapper}>
+                {/* Sub-rubrik högst upp i wrappern som introducerar host:ens
+                    egna köpta paket. */}
+                <View style={styles.extraPackagesHeadingRow}>
+                  <Text style={styles.extraPackagesHeading}>
+                    Packages available for you:
+                  </Text>
+                  <View style={styles.selectAllGroup}>
+                    <Text style={styles.selectAllLabel}>Select all</Text>
+                    <Switch
+                      value={isAllSelected}
+                      onValueChange={handleToggleAll}
+                      disabled={!hostMode || PURCHASED_PACKAGES.length === 0}
+                      trackColor={{ false: Colors.error, true: Colors.success }}
+                      thumbColor="#FFF"
+                      ios_backgroundColor={Colors.error}
+                      style={styles.connectionSwitch}
+                    />
+                  </View>
+                </View>
+
+                {/* Köpta paket listas under varandra med en switch per paket.
+                    Switch:en blir disabled när Spotify självt är av — paketval
+                    är meningslöst då eftersom låtarna inte spelas. Texten
+                    förblir vit för att alltid vara lättläst; det är switchens
+                    disabled-state som visualiserar otillgängligheten. */}
+                {PURCHASED_PACKAGES.length === 0 && (
+                  <Text style={styles.noExtraPackagesText}>
+                    No Extra packages purchased
+                  </Text>
+                )}
+
+                {[...PURCHASED_PACKAGES]
+                  .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }))
+                  .map((pkg) => {
+                  const isSelected = selectedExtraPackages.includes(pkg.id);
+                  return (
+                    <View key={pkg.id} style={styles.purchasedPackageRow}>
+                      {/* Info-ikon centrerad mellan wrapper:s vänsterkant och
+                          paket-boxens vänsterkant. Tap visar en Alert med
+                          paketets namn som rubrik och en placeholder för
+                          informationstexten (kommer fyllas på från Store-
+                          integrationen senare). */}
+                      <TouchableOpacity
+                        style={styles.infoIconBtn}
+                        onPress={() =>
+                          Alert.alert(
+                            pkg.name,
+                            'Information about this package will be available later.',
+                          )
+                        }
+                        hitSlop={8}
+                        accessibilityLabel={`${pkg.name} info`}
+                      >
+                        <Text style={styles.infoIconText}>i</Text>
+                      </TouchableOpacity>
+                      {/* Bordered text-box omsluter ENDAST paketnamnet —
+                          switchen sitter utanför rutan, höger-justerad via
+                          marginLeft:'auto'. */}
+                      <View
+                        style={[
+                          styles.purchasedPackageBox,
+                          isSelected && styles.purchasedPackageBoxActive,
+                        ]}
+                      >
+                        <Text
+                          style={[
+                            styles.purchasedPackageName,
+                            isSelected && styles.purchasedPackageNameActive,
+                          ]}
+                          numberOfLines={1}
+                          ellipsizeMode="tail"
+                        >
+                          {pkg.name}
+                        </Text>
+                      </View>
+                      <Switch
+                        value={isSelected}
+                        onValueChange={() => handleToggleExtraPackage(pkg.id)}
+                        disabled={!hostMode}
+                        trackColor={{ false: Colors.error, true: Colors.success }}
+                        thumbColor="#FFF"
+                        ios_backgroundColor={Colors.error}
+                        style={styles.connectionSwitch}
+                      />
+                    </View>
+                  );
+                })}
+
+                {/* Buy Extra packages-CTA längst ner i wrappern — pulserande
+                    knapp som drar uppmärksamhet till QuizVibe Store. Alltid
+                    klickbar oavsett Spotify-status. */}
+                <Animated.View
+                  style={[styles.packageChipBuyCtaWrap, { transform: [{ scale: buyCtaPulse }] }]}
+                >
+                  <TouchableOpacity
+                    style={[styles.packageChip, styles.packageChipBuyCta]}
+                    onPress={() => router.push('/(tabs)/store')}
+                    disabled={!hostMode}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={styles.packageChipText}>
+                      + QuizVibe Store
+                    </Text>
+                    <View style={[styles.premiumBadge, styles.premiumBadgeGrey]} pointerEvents="none">
+                      <Text style={[styles.premiumBadgeText, styles.premiumBadgeTextGrey]}>PREMIUM</Text>
+                    </View>
+                  </TouchableOpacity>
+                </Animated.View>
+              </View>
             </View>
           </View>
         </View>
@@ -1352,6 +1451,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.sm,
+    // Höger-inset så att switcharna linjerar vertikalt med switcharna i
+    // paketlistan nedanför. Pillarna shiftas vänster med samma värde via
+    // en mindre connectionLabel.minWidth.
+    paddingRight: 18,
   },
   connectionIconWrap: {
     width: 28,
@@ -1405,6 +1508,16 @@ const styles = StyleSheet.create({
     color: '#000',
     letterSpacing: 0.5,
   },
+  // Grey overrides för freeBadgeSmall + freeBadgeTextSmall som appliceras när
+  // host stängt av en gratis-funktion (YouTube eller Profiles & Places). FREE-
+  // badgen behålls för att kommunicera "ingår utan kostnad", men dämpas till
+  // grått så pillen tydligt läses som Disabled.
+  freeBadgeSmallGrey: {
+    backgroundColor: '#6B7280',
+  },
+  freeBadgeSmallTextGrey: {
+    color: Colors.textSecondary,
+  },
   // Switchen är default ganska stor; krymp till 80% så den passar i list-raden.
   // marginLeft:'auto' pressar switchen till höger kant — övriga element
   // (ikon, label, ev. status-pill) hålls grupperade till vänster.
@@ -1436,18 +1549,19 @@ const styles = StyleSheet.create({
   // Spotify: brand-grön cirkel med 🎵 (samma färg som Profile-sidans icon-wrap).
   connectionIconSpotify: { backgroundColor: '#1DB954' },
   connectionIconGlyph: { fontSize: 14 },
-  // AI: mörk navy bakgrund (theme background) med primary-blå border + text.
-  connectionIconAi: {
-    backgroundColor: Colors.background,
-    borderWidth: 1.5,
-    borderColor: Colors.primary,
-  },
+  // AI: Q-figur från startskärmens logga (cirkel + svans i primary-blå),
+  // utan omgivande ram. "AI"-text överlagras i Q-cirkelns mitt — mindre
+  // fontSize än tidigare så texten ryms inuti cirkeln.
   connectionIconAiText: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '800',
     fontStyle: 'italic',
     color: Colors.primary,
     letterSpacing: 0.5,
+    // translateY -1 kompenserar för att Text:s default-line-box har
+    // descender-utrymme under baseline — utan det ligger glyferna något
+    // under Q-ringens visuella mitt trots att box-centret är linjerat.
+    transform: [{ translateY: -1 }],
   },
   // Status-pill för "Enabled"/"Disabled" bredvid en Game Connection.
   // Fast minWidth så Enabled/Disabled-pillar (och YouTubes Enabled-pill)
@@ -1475,6 +1589,9 @@ const styles = StyleSheet.create({
     marginLeft: Spacing.xs,
     minWidth: 80,
     alignItems: 'center',
+    // position:'relative' så att FREE-badgen (på YouTube- och Profiles &
+    // Places-raderna) kan sticka upp över kantlinjen även i Disabled-läget.
+    position: 'relative',
   },
   statusPillTextEnabled: {
     fontSize: FontSize.xs,
@@ -1497,140 +1614,164 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
     paddingTop: Spacing.xs,
     paddingBottom: Spacing.xs,
+    // Extra luft ovanför så "Customized Host packages"-rubriken inte
+    // hamnar för nära Profiles & Places-radens switch ovanför.
+    marginTop: Spacing.md,
   },
   usePackagesLabel: {
     fontSize: FontSize.sm,
     fontWeight: FontWeight.semibold,
     color: Colors.textPrimary,
   },
-  extraPackagesLabel: {
-    fontSize: FontSize.xs,
-    fontWeight: FontWeight.medium,
-    color: Colors.textSecondary,
-    marginTop: Spacing.xs,
-  },
-  // Chip-stil för Extra packages + Buy-CTA. Höjd och border-radius matchar
-  // Individual Devices-knappen i Game Mode-toggle:n (height 40, Radius.sm).
-  // Position:relative så att PREMIUM-badgen kan sticka upp över kantlinjen
-  // — samma teknik som badge:n på Individual Devices.
+  // Chip-stil för Buy-CTA. Auto-höjd + paddingVertical så texten kan rendras
+  // på två rader (rubrik + CTA-uppmaning) utan att klippas. border-radius
+  // matchar Individual Devices-knappen i Game Mode-toggle:n. Position:relative
+  // så att PREMIUM-badgen kan sticka upp över kantlinjen.
   packageChip: {
     alignSelf: 'flex-start',
-    height: 40,
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.xs,
     paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.lg,
     borderRadius: Radius.sm,
     borderWidth: 1,
     position: 'relative',
-  },
-  // Basic-chip — matchar Individual Devices-knappen och Extra-package-chipsen
-  // i höjd (40), borderRadius (Radius.sm), textstorlek (FontSize.sm) OCH
-  // bredd (48% — samma som chipsen i extraPackagesGrid).
-  // Position:relative så FREE-badgen kan sticka upp över kantlinjen.
-  packageChipBasic: {
-    width: '48%',
-    height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: Spacing.md,
-    borderRadius: Radius.sm,
-    borderWidth: 1,
-    position: 'relative',
-  },
-  // Basic aktiv = grön kantlinje (samma som Pass-the-Phone) + muted blå bg.
-  packageChipBasicActive: {
-    backgroundColor: Colors.primaryMuted,
-    borderColor: Colors.success,
-  },
-  // Basic inaktiv — matchar Spotifys Disabled-pill (faint white bg, border).
-  packageChipBasicInactive: {
-    backgroundColor: 'rgba(255,255,255,0.04)',
-    borderColor: Colors.border,
-  },
-  packageChipBasicText: {
-    fontSize: FontSize.sm,
-    fontWeight: FontWeight.semibold,
-    color: '#FFF',
-    letterSpacing: 0.4,
-    textAlign: 'center',
-  },
-  packageChipBasicTextInactive: {
-    color: Colors.textSecondary,
-  },
-  // Extra package aktiv = blå primary-kant (samma som Individual Devices).
-  packageChipExtraActive: {
-    backgroundColor: Colors.primaryMuted,
-    borderColor: Colors.primary,
-  },
-  packageChipInactive: {
-    backgroundColor: 'transparent',
-    borderColor: Colors.border,
-  },
-  // Utgråad chip — appliceras på alla package-chips (Basic, Buy, Extras)
-  // när Spotify självt är Disabled (auto-regeln ej uppfylld eller host-toggle
-  // av). Paketval är meningslöst i det läget eftersom låtarna inte spelas.
-  packageChipDimmed: {
-    opacity: 0.4,
   },
   packageChipText: {
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.semibold,
+    color: Colors.textPrimary,
+    textAlign: 'center',
+  },
+  // Wrapper kring Buy CTA — Animated.View som driver pulse-scaling. Positions-
+  // egenskaper (alignSelf, width, marginTop) sitter här så scale-transformen
+  // appliceras på rätt nivå utan att bryta wrapper-flödet.
+  packageChipBuyCtaWrap: {
+    alignSelf: 'center',
+    width: '70%',
+    marginTop: Spacing.xl,
+  },
+  // Container-färg för Buy Extra packages-CTA:n — matchar Create Game-knappen
+  // på startskärmen (Colors.cardElevated bg, Colors.primary blå border, vit
+  // text). alignSelf: 'stretch' override:ar packageChip.alignSelf: 'flex-start'
+  // så att knappen fyller hela wrap:ens (80%) bredd och därmed centreras
+  // korrekt via wrap:ens alignSelf: 'center'.
+  packageChipBuyCta: {
+    backgroundColor: Colors.cardElevated,
+    borderColor: Colors.primary,
+    alignSelf: 'stretch',
+    justifyContent: 'center',
+    paddingHorizontal: 8,
+  },
+  // Yttre wrapper kring sub-rubriken, paketlistan och Buy CTA. Geometrin
+  // (padding 3, gap 4, Radius.md, 1px Colors.border, Colors.background-bg)
+  // är identisk med modeToggle:n så att Buy CTA hamnar i samma inre avstånd
+  // från ramen som Individual Devices har, och så att svart-bakgrunden runt
+  // om har samma bredd som modeToggle ovanför.
+  extraPackagesWrapper: {
+    backgroundColor: Colors.background,
+    borderRadius: Radius.md,
+    paddingHorizontal: 3,
+    paddingTop: 3,
+    // Större bottom-padding ger extra luft mellan Buy CTA:ns underkant och
+    // wrappern:s nederkant — bryter med modeToggle:s symmetri här.
+    paddingBottom: Spacing.xl,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    gap: 4,
+  },
+  // Sub-rubrik högst upp i extraPackagesWrapper — matchar paket-namnens
+  // storlek och färg (FontSize.sm + Colors.textPrimary) så raden läses som
+  // en likvärdig introduktion till listan under den.
+  // Rubrik-rad: heading text på vänster, "Select all"-grupp på höger.
+  // paddingRight: 0 (mindre än paket-radernas 4) eftersom Switch:en sitter
+  // i en sub-grupp (selectAllGroup) som kompenserar layouten — utan denna
+  // justering hamnar Select all-switchen marginellt vänster om paket-switcharna.
+  extraPackagesHeadingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingLeft: Spacing.xs,
+    paddingRight: 0,
+    paddingTop: Spacing.md,
+    marginBottom: Spacing.sm,
+  },
+  extraPackagesHeading: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.medium,
+    color: Colors.textPrimary,
+    // translateY puttar rubrikens visuella glyfer uppåt så de linjerar med
+    // switchens visuella mitt.
+    transform: [{ translateY: -1 }],
+  },
+  // "Select all"-gruppen (label + switch) pushas till höger via marginLeft:'auto'.
+  selectAllGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+    marginLeft: 'auto',
+  },
+  selectAllLabel: {
+    fontSize: FontSize.xs,
+    fontStyle: 'italic',
+    color: Colors.textSecondary,
+  },
+  // Empty-state-text när hosten inte har köpt några extra-paket. Italic +
+  // dämpad färg signalerar att det är ett informativt placeholder, inte
+  // en aktiv lista. Buy CTA visas fortsatt nedanför så host kan köpa.
+  noExtraPackagesText: {
+    fontSize: FontSize.sm,
+    fontStyle: 'italic',
+    color: Colors.textSecondary,
+    textAlign: 'center',
+    paddingVertical: Spacing.sm,
+  },
+  // Layout-rad för ett köpt extra-paket: bordered text-box (vänster, indenterat
+  // så det startar vid Buy CTA:s vänsterkant) + Switch (höger via
+  // connectionSwitch.marginLeft:'auto'). Ingen border på själva raden —
+  // bara text-boxen är inramad.
+  purchasedPackageRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    // Layout per child från rad-vänster: paddingLeft 4 → info-ikon (width 20)
+    // → gap 8 → text-box → marginLeft:auto (på switch) → switch → paddingRight 4.
+    // Info-ikonens center hamnar vid rad x=14 (4 + 10) = absolut x=18 (mitt
+    // mellan wrapper-yttre-vänsterkant 0 och box-vänsterkant 36, där wrapper-
+    // inset 4 + paddingLeft 4 + ikon 20 + gap 8 = 36 = absolut x för box-left).
+    paddingLeft: 4,
+    paddingRight: 4,
+    gap: Spacing.sm,
+  },
+  // Inramad text-box: omsluter ENDAST paketnamnet (inte switchen). Default-
+  // state (toggle av): grå borderStrong-kant + transparent bg + dämpad text.
+  // Aktivt state (toggle på): blå primary-kant + Colors.cardElevated bg + vit
+  // text (matchar Buy CTA:s tema). Bredd 204 så höger-kanten linjerar med
+  // connection-radernas pill-höger (icon 28 + gap 8 + label.minWidth 112 +
+  // gap 8 + pill.marginLeft 4 + pill.minWidth 80 = 240, minus box.left 36
+  // = 204) — ger samma avstånd från box till switch som pill till switch.
+  purchasedPackageBox: {
+    width: 204,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.xs,
+    borderWidth: 1,
+    borderColor: Colors.borderStrong,
+    borderRadius: Radius.sm,
+  },
+  purchasedPackageBoxActive: {
+    borderColor: Colors.primary,
+    backgroundColor: Colors.cardElevated,
+  },
+  purchasedPackageName: {
     fontSize: FontSize.sm,
     fontWeight: FontWeight.medium,
     color: Colors.textSecondary,
   },
-  packageChipTextActive: {
-    color: '#FFF',
-    fontWeight: FontWeight.semibold,
+  purchasedPackageNameActive: {
+    color: Colors.textPrimary,
   },
-  packageChipEmoji: { fontSize: 14 },
-  // 2-kolumners grid för köpta extra packages. justifyContent:'space-between'
-  // på rad-nivå pressar vänster chip mot vänsterkanten och höger chip mot
-  // högerkanten; det horisontella mellanrummet bestäms av att chipsen är
-  // ~48% breda. rowGap ger vertikalt mellanrum vid wrap (3+ paket).
-  extraPackagesGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    rowGap: Spacing.sm,
-  },
-  // Extra-chip-modifier: överskuggar packageChip.alignSelf och låser bredden
-  // till 48% så två ryms per rad. Innehållet (paketnamnet) centreras.
-  packageChipExtra: {
-    alignSelf: 'auto',
-    width: '48%',
-    justifyContent: 'center',
-  },
-  // Basic-chipens FREE-badge använder freeBadgeSmall + freeBadgeTextSmall
-  // (samma som YouTubes Enabled-pill). När Basic är inaktivt appliceras
-  // dessa grå-overrides ovanpå för att signalera "host har valt extras".
-  packageFreeBadgeGrey: {
-    backgroundColor: '#6B7280',
-  },
-  packageFreeBadgeTextGrey: {
-    color: Colors.textSecondary,
-  },
-  // Grå PREMIUM-badge — markerar att paketen är köp-låsta. Skiljer sig
-  // från den guldgula premiumBadge ovan (som markerar Multiplayer-paketet).
-  packagePremiumBadgeGrey: {
-    position: 'absolute',
-    top: -8,
-    right: Spacing.sm,
-    backgroundColor: '#6B7280',
-    borderRadius: 4,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    zIndex: 10,
-    elevation: 4,
-  },
-  packagePremiumBadgeGreyText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: '#FFF',
-    letterSpacing: 0.6,
-  },
-
-  // Liten info-knapp ("i" i en cirkel) bredvid en Disabled-pill — tap visar
-  // en Alert med förklaringen istället för att alltid skriva ut texten.
+  // Liten info-knapp ("i" i en cirkel) som sitter direkt efter Spotify-labeln
+  // i connectionLabelGroup — tap visar en Alert med förklaringen istället för
+  // att alltid skriva ut texten. Avstånd till labeln styrs av gruppens gap.
   infoIconBtn: {
     width: 20,
     height: 20,
@@ -1639,7 +1780,6 @@ const styles = StyleSheet.create({
     borderColor: Colors.textSecondary,
     alignItems: 'center',
     justifyContent: 'center',
-    marginLeft: Spacing.xs,
   },
   infoIconText: {
     fontSize: 12,
@@ -1653,13 +1793,28 @@ const styles = StyleSheet.create({
     fontWeight: FontWeight.medium,
     color: Colors.textPrimary,
     // Reservera samma horisontella utrymme för alla labels så efterföljande
-    // status-pillar (YouTubes Enabled / Spotifys Disabled) linjerar exakt
-    // under varandra trots att t.ex. "YouTube" och "Spotify" har olika
-    // pixel-bredd i proportionell font. "Profiles and Places" är längre
-    // och bryter naturligt över denna minWidth — vilket är OK eftersom
-    // den raden inte har någon pill. Värdet är knappt över bredden på
-    // "YouTube"/"Spotify" så pillarna sitter tätt mot texten.
-    minWidth: 60,
+    // status-pillar (YouTubes Enabled / Spotifys Enabled-Disabled / Profiles
+    // & Places Enabled-Disabled) linjerar exakt under varandra trots att
+    // labels har olika pixel-bredd i proportionell font. Värdet måste rymma
+    // den bredaste labeln ("Profiles & Places") — annars trycks just den
+    // radens pill till höger och bryter linjeringen. Värdet är paret med
+    // connectionRow.paddingRight (18) så att pillarna och switcharna båda
+    // shiftas vänster med 18px och linjerar med paketlistans switchar.
+    minWidth: 112,
+  },
+  // Spotify-radens label + info-ikon ligger i en gemensam grupp som upptar
+  // samma minWidth (130) som plain connectionLabel — då stannar pillen och
+  // switchen i linje med YouTube- och Profiles & Places-radernas. Texten
+  // inuti måste få minWidth: 0 (via connectionLabelInGroup) för att inte
+  // själv ta hela 130px och skuffa info-ikonen utanför gruppens bredd.
+  connectionLabelGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+    minWidth: 112,
+  },
+  connectionLabelInGroup: {
+    minWidth: 0,
   },
 
   sectionRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: Spacing.xs },
