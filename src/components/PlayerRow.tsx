@@ -81,24 +81,26 @@ export function PlayerRow({
                 {turnNumber}
               </Text>
             </View>
-            <View style={styles.turnArrows}>
-              <Pressable
-                onPress={onMoveUp}
-                disabled={!canMoveUp}
-                hitSlop={4}
-                style={[styles.turnArrowBtn, !canMoveUp && styles.turnArrowBtnDisabled]}
-              >
-                <Text style={styles.turnArrowText}>↑</Text>
-              </Pressable>
-              <Pressable
-                onPress={onMoveDown}
-                disabled={!canMoveDown}
-                hitSlop={4}
-                style={[styles.turnArrowBtn, !canMoveDown && styles.turnArrowBtnDisabled]}
-              >
-                <Text style={styles.turnArrowText}>↓</Text>
-              </Pressable>
-            </View>
+            {(onMoveUp || onMoveDown) && (
+              <View style={styles.turnArrows}>
+                <Pressable
+                  onPress={onMoveUp}
+                  disabled={!canMoveUp}
+                  hitSlop={4}
+                  style={[styles.turnArrowBtn, !canMoveUp && styles.turnArrowBtnDisabled]}
+                >
+                  <Text style={styles.turnArrowText}>↑</Text>
+                </Pressable>
+                <Pressable
+                  onPress={onMoveDown}
+                  disabled={!canMoveDown}
+                  hitSlop={4}
+                  style={[styles.turnArrowBtn, !canMoveDown && styles.turnArrowBtnDisabled]}
+                >
+                  <Text style={styles.turnArrowText}>↓</Text>
+                </Pressable>
+              </View>
+            )}
           </View>
         )}
         <Avatar

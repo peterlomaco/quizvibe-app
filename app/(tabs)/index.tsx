@@ -1,7 +1,9 @@
+import { QuizVibeLogo } from '@/src/components/QuizVibeLogo';
+import { TopUserBanner } from '@/src/components/TopUserBanner';
 import { Colors, Radius, Spacing } from '@/src/theme';
 import { getAvatarEmojiById } from '@/src/utils/avatars';
 import { clearProfile, loadProfile, saveProfile, type ProfileData } from '@/src/utils/profileStorage';
-import { generateRoomCode, ROOM_CODE_LENGTH, ROOM_CODE_LETTERS } from '@/src/utils/roomCode';
+import { formatRoomCode, generateRoomCode, ROOM_CODE_LENGTH, ROOM_CODE_LETTERS } from '@/src/utils/roomCode';
 import { loadInvites, removeInvite, type WaitingInvite } from '@/src/utils/waitingInvites';
 import { Nunito_400Regular, Nunito_600SemiBold, Nunito_700Bold, useFonts } from '@expo-google-fonts/nunito';
 import { router, useFocusEffect } from 'expo-router';
@@ -21,50 +23,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import Svg, { Circle, Path, Rect } from 'react-native-svg';
-
-// ─── Logo ─────────────────────────────────────────────────────────────────────
-
-function QuizVibeLogo({ size = 80 }: { size?: number }) {
-  const s = size;
-  return (
-    <Svg width={s} height={s} viewBox="0 0 80 80">
-      {/* Bakre kvadrat – något roterad */}
-      <Rect
-        x="18" y="18" width="44" height="44" rx="12"
-        fill={Colors.primaryMuted}
-        stroke={Colors.primaryBorder}
-        strokeWidth="1.5"
-        transform="rotate(12 40 40)"
-      />
-      {/* Främre kvadrat */}
-      <Rect
-        x="16" y="16" width="44" height="44" rx="12"
-        fill={Colors.card}
-        stroke={Colors.primary}
-        strokeWidth="1.5"
-        transform="rotate(-6 40 40)"
-      />
-      {/* Q-form – stor cirkel */}
-      <Circle
-        cx="40" cy="38" r="13"
-        fill="none"
-        stroke={Colors.primary}
-        strokeWidth="3"
-      />
-      {/* Q-svans */}
-      <Path
-        d="M49 47 L55 53"
-        stroke={Colors.primary}
-        strokeWidth="3"
-        strokeLinecap="round"
-      />
-      {/* Liten prick i mitten */}
-      <Circle cx="40" cy="38" r="3" fill={Colors.primary} />
-    </Svg>
-  );
-}
-
 // ─── Join Modal ───────────────────────────────────────────────────────────────
 
 type JoinStep = 'choose' | 'code' | 'invites' | 'guest';
@@ -350,7 +308,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                 onPress={handleJoinWithCode}
                 disabled={code.length < ROOM_CODE_LENGTH}
               >
-                <Text style={modal.joinBtnText}>Join Game</Text>
+                <Text style={modal.joinBtnText}>Join Game Lobby</Text>
               </TouchableOpacity>
             </>
           )}
@@ -380,7 +338,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                     </Text>
                     <View style={{ flex: 1 }}>
                       <Text style={modal.inviteFrom}>{inv.fromNickname}</Text>
-                      <Text style={modal.inviteCode}>Room {inv.roomCode}</Text>
+                      <Text style={modal.inviteCode}>Room {formatRoomCode(inv.roomCode)}</Text>
                     </View>
                     <Text style={modal.inviteJoinText}>Join ›</Text>
                   </TouchableOpacity>
@@ -909,32 +867,13 @@ export default function HomeScreen() {
     <SafeAreaView style={styles.safe}>
 
       {/* ── Top board (login status) ─────────────────────────── */}
-      {/* Full-bredd-band som går från sida till sida med pill inuti */}
-      <View style={styles.topBoard}>
-        <TouchableOpacity
-          style={[styles.loginPill, isLoggedIn ? styles.loginPillActive : styles.loginPillMuted]}
-          activeOpacity={0.7}
-          onPress={() => setProfileMenuVisible(true)}
-        >
-          <Text style={styles.loginPillIcon}>
-            {isLoggedIn ? getAvatarEmojiById(profile?.selectedAvatarId) : '👤'}
-          </Text>
-          <Text
-            style={[styles.loginPillText, isLoggedIn ? styles.loginPillTextActive : styles.loginPillTextMuted]}
-            numberOfLines={1}
-          >
-            {isLoggedIn
-              ? (profile?.nickname?.trim() || 'Signed in')
-              : 'Register or Login'}
-          </Text>
-        </TouchableOpacity>
-      </View>
+      <TopUserBanner onPress={() => setProfileMenuVisible(true)} />
 
       <View style={styles.container}>
 
         {/* ── Brand ──────────────────────────────────────────── */}
         <View style={styles.brandSection}>
-          <QuizVibeLogo size={88} />
+          <QuizVibeLogo size={104} />
           <Text style={[styles.appName, { fontFamily: appNameFont }]}>
             QuizVibe
           </Text>
@@ -1640,55 +1579,6 @@ const styles = StyleSheet.create({
     paddingTop: Spacing.xxl,
     paddingBottom: Spacing.lg,
     justifyContent: 'space-between',
-  },
-
-  topBoard: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.sm + 2,
-    backgroundColor: Colors.card,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
-  },
-  loginPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    // Vänsterjustera innehållet så avatar/ikon alltid sitter mot vänster
-    // kant av pillen — då hamnar avatarbilden på samma position oavsett
-    // om man är inloggad eller utloggad.
-    justifyContent: 'flex-start',
-    gap: 6,
-    paddingHorizontal: Spacing.md,
-    paddingVertical: 6,
-    borderRadius: Radius.full,
-    borderWidth: 1,
-    // Fast minWidth motsvarar "Register or Login"-textens bredd så pillen
-    // håller samma storlek både utloggad och inloggad.
-    minWidth: 165,
-    maxWidth: 200,
-  },
-  loginPillActive: {
-    backgroundColor: Colors.primaryMuted,
-    borderColor: Colors.primaryBorder,
-  },
-  loginPillMuted: {
-    backgroundColor: Colors.cardElevated,
-    borderColor: Colors.border,
-  },
-  loginPillIcon: {
-    fontSize: 14,
-  },
-  loginPillText: {
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  loginPillTextActive: {
-    color: Colors.primary,
-  },
-  loginPillTextMuted: {
-    color: Colors.textSecondary,
   },
 
   brandSection: { alignItems: 'center', gap: Spacing.sm },

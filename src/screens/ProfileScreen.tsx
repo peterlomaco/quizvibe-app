@@ -17,6 +17,7 @@ import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { HCPShield } from '../components/HCPShield';
 import { PlayerHistorySection } from '../components/PlayerHistorySection';
+import { TopUserBanner } from '../components/TopUserBanner';
 import { Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';
 import type { ProfileScreenProps } from '../types/navigation';
 import { AVATARS, getAvatarEmojiById } from '../utils/avatars';
@@ -211,6 +212,10 @@ export default function ProfileScreen(_props: ProfileScreenProps) {
 
   return (
     <SafeAreaView style={styles.safe}>
+      {/* Top board (login status) — sticky utanför ScrollView. På Profile-
+          sidan är pillen icke-klickbar (ingen onPress) eftersom användaren
+          redan är på sin profilsida. */}
+      <TopUserBanner />
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.content}

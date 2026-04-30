@@ -24,12 +24,14 @@ import { ApproveToggle } from '../components/ApproveToggle';
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { Player, PlayerRow } from '../components/PlayerRow';
+import { QuizVibeLogo } from '../components/QuizVibeLogo';
+import { TopUserBanner } from '../components/TopUserBanner';
 import { Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';
 import { getAvatarEmojiById } from '../utils/avatars';
 import { loadFriends, type Friend } from '../utils/friendsStorage';
 import { consumePendingLobbyPlayers } from '../utils/pendingLobby';
 import { loadProfile, type ProfileData } from '../utils/profileStorage';
-import { generateRoomCode } from '../utils/roomCode';
+import { ROOM_CODE_LETTERS, formatRoomCode, generateRoomCode } from '../utils/roomCode';
 import { addInvite } from '../utils/waitingInvites';
 
 export interface LobbyPlayer extends Player {
@@ -413,7 +415,7 @@ export default function LobbyScreen() {
   // Om användaren kommer hit som gäst: lägg in dem som en guest-spelare överst
   // (efter host) så de syns som "you" i listan.
   useEffect(() => {
-    consumePendingLobbyPlayers().then((carriedOver) => {
+    consumePendingLobbyPlayers().then(async (carriedOver) => {
       if (carriedOver && carriedOver.length > 0) {
         setPlayers(carriedOver);
         return;
@@ -433,6 +435,9 @@ export default function LobbyScreen() {
           age,
           skill,
           hcpComplete: true,
+          // Explicit false så de hamnar i "To be Approved by Host"-listan
+          // direkt vid join, istället för att vänta på att host bjuder in.
+          approved: false,
         };
         // Sätt in gästen direkt efter host (index 1) så de syns högt upp.
         setPlayers((prev) => {
@@ -440,6 +445,38 @@ export default function LobbyScreen() {
           const insertAt = hostIdx === -1 ? 0 : hostIdx + 1;
           const next = [...prev];
           next.splice(insertAt, 0, guestPlayer);
+          return next;
+        });
+        return;
+      }
+      if (!hostMode) {
+        // Code-only join (ingen guest-form-data): användaren har redan en
+        // sparad profil från registreringen. Ladda profilen och lägg in
+        // dem som "to be approved by host" så de ser sig själva i lobbyn
+        // direkt — de behöver inte vänta på godkännande för att se rummet.
+        // Fallback till en generisk "Guest"-rad om profil saknas.
+        const profile = await loadProfile();
+        const currentYear = new Date().getFullYear();
+        const age = profile?.birthYear ? currentYear - profile.birthYear : undefined;
+        const skill = profile?.skill ?? undefined;
+        const hcpComplete = !!(skill && age !== undefined);
+        const joiner: LobbyPlayer = {
+          id: `joiner-${Date.now()}`,
+          name: profile?.nickname?.trim() || 'You',
+          emoji: profile ? getAvatarEmojiById(profile.selectedAvatarId) : '👤',
+          isReady: hcpComplete,
+          type: profile ? 'registered' : 'guest',
+          age,
+          skill,
+          hcpComplete,
+          spotifyConnected: profile?.spotifyConnected ?? false,
+          approved: false,
+        };
+        setPlayers((prev) => {
+          const hostIdx = prev.findIndex((p) => p.isHost);
+          const insertAt = hostIdx === -1 ? 0 : hostIdx + 1;
+          const next = [...prev];
+          next.splice(insertAt, 0, joiner);
           return next;
         });
       }
@@ -466,6 +503,7 @@ export default function LobbyScreen() {
     }, []),
   );
   const [addModalVisible, setAddModalVisible] = useState(false);
+  const ROOM_LOGO_SIZE = 104;
   const [eraValues, setEraValues] = useState([1980, 2010]);
   const [region, setRegion] = useState<Region>('Sweden');
   const [regionModalOpen, setRegionModalOpen] = useState(false);
@@ -660,7 +698,7 @@ export default function LobbyScreen() {
   const handleShareViaOS = async () => {
     setShareModalOpen(false);
     try {
-      await Share.share({ message: `Join my QuizVibe game! Room code: ${roomCode}` });
+      await Share.share({ message: `Join my QuizVibe game! Room code: ${formatRoomCode(roomCode)}` });
     } catch {
       // tyst — användaren avbröt
     }
@@ -668,6 +706,10 @@ export default function LobbyScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
+      {/* Top board (login status) — sticky utanför ScrollView så den följer
+          med när användaren scrollar i lobbyn. Tap navigerar till Profile-
+          tabben för att hantera profil/avatar. */}
+      <TopUserBanner onPress={() => router.push('/(tabs)/profile')} />
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.content}
@@ -679,9 +721,46 @@ export default function LobbyScreen() {
         </View>
 
         <Card style={styles.roomCard} padding={Spacing.xl}>
+          {/* Loggan är absolut-positionerad i Card:ens övre vänstra hörn med
+              en liten inset från kantlinjen. Card är default position:
+              relative i RN så absolute children pinnas mot Card:s padding-
+              edge. */}
+          <View style={styles.roomCodeLogoWrap}>
+            <QuizVibeLogo size={ROOM_LOGO_SIZE} />
+          </View>
+          {/* För guest renderas labeln absolut i Card:s övre del med
+              vertikal mitt direkt på loggans visuella mitt — ger ett
+              "label-genom-loggan"-uttryck som inte kan rubbas av flex-
+              layout-quirks. textAlign center + left/right: 0 håller
+              labeln horisontellt centrerad i kortet. */}
+          {!hostMode && (
+            <Text style={styles.roomLabelGuestAbsolute}>Room Code</Text>
+          )}
           {hostMode && <View style={styles.hostBadge}><Text style={styles.hostBadgeText}>👑 You are the host</Text></View>}
-          <Text style={styles.roomLabel}>Room Code</Text>
-          <Text style={styles.roomCode}>{roomCode}</Text>
+          <View style={[styles.roomCodeRow, !hostMode && styles.roomCodeRowGuestSpacing]}>
+            <View style={styles.roomCodeStack}>
+              {hostMode && (
+                <Text style={styles.roomLabel}>Room Code</Text>
+              )}
+              {/* Varje tecken i en bordered cell — samma look som "Enter Room
+                  Code"-inputen i Join-modalen i fyllt läge (Colors.primary
+                  border + Colors.primaryMuted bg). Bindestrecket renderas
+                  som ett separat textelement mellan bokstavs- och siffer-
+                  cellerna, identiskt med Join-modalens layout. */}
+              <View style={styles.roomCodeCellsRow}>
+                {roomCode.split('').map((ch, i) => (
+                  <React.Fragment key={i}>
+                    <View style={styles.roomCodeCell}>
+                      <Text style={styles.roomCodeCellText}>{ch}</Text>
+                    </View>
+                    {i === ROOM_CODE_LETTERS - 1 && (
+                      <Text style={styles.roomCodeCellDash}>–</Text>
+                    )}
+                  </React.Fragment>
+                ))}
+              </View>
+            </View>
+          </View>
           {/* Share invite är host-only — bara host bjuder in nya spelare */}
           {hostMode && (
             <TouchableOpacity onPress={handleOpenShareModal} style={styles.shareBtn}>
@@ -817,15 +896,16 @@ export default function LobbyScreen() {
                   </Text>
                 </View>
               </View>
-              <Switch
-                value={youtubeEnabled}
-                onValueChange={(v) => handleToggleSource(youtubeEnabled, setYoutubeEnabled, v)}
-                disabled={!hostMode}
-                trackColor={{ false: Colors.error, true: Colors.success }}
-                thumbColor="#FFF"
-                ios_backgroundColor={Colors.error}
-                style={styles.connectionSwitch}
-              />
+              {hostMode && (
+                <Switch
+                  value={youtubeEnabled}
+                  onValueChange={(v) => handleToggleSource(youtubeEnabled, setYoutubeEnabled, v)}
+                  trackColor={{ false: Colors.error, true: Colors.success }}
+                  thumbColor="#FFF"
+                  ios_backgroundColor={Colors.error}
+                  style={styles.connectionSwitch}
+                />
+              )}
             </View>
             <View style={styles.connectionRow}>
               <View style={[styles.connectionIconWrap, styles.connectionIconSpotify]}>
@@ -860,25 +940,25 @@ export default function LobbyScreen() {
                   {spotifyEnabled ? 'Enabled' : 'Disabled'}
                 </Text>
               </View>
-              <Switch
-                value={spotifyHostToggle}
-                onValueChange={(v) => handleToggleSource(spotifyEnabled, setSpotifyHostToggle, v)}
-                // Locked för icke-host (read-only) ELLER när auto-regeln
-                // inte uppfylls (alla godkända måste ha Spotify-konto).
-                // Vid auto-disable visas en mörkgrå track och ljusgrå thumb
-                // istället för röd/grön-paletten, för att tydligt signalera
-                // "ej tillgänglig". För icke-host med auto-enabled visas
-                // togglens färg matching host-valet — bara icke-interaktiv.
-                disabled={!hostMode || !spotifyAutoEnabled}
-                trackColor={
-                  spotifyAutoEnabled
-                    ? { false: Colors.error, true: Colors.success }
-                    : { false: '#3A3F4B', true: '#3A3F4B' }
-                }
-                thumbColor={spotifyAutoEnabled ? '#FFF' : '#9CA3AF'}
-                ios_backgroundColor={spotifyAutoEnabled ? Colors.error : '#3A3F4B'}
-                style={styles.connectionSwitch}
-              />
+              {hostMode && (
+                <Switch
+                  value={spotifyHostToggle}
+                  onValueChange={(v) => handleToggleSource(spotifyEnabled, setSpotifyHostToggle, v)}
+                  // Locked för host när auto-regeln inte uppfylls (alla godkända
+                  // måste ha Spotify-konto). Vid auto-disable visas en mörkgrå
+                  // track och ljusgrå thumb istället för röd/grön-paletten, för
+                  // att tydligt signalera "ej tillgänglig".
+                  disabled={!spotifyAutoEnabled}
+                  trackColor={
+                    spotifyAutoEnabled
+                      ? { false: Colors.error, true: Colors.success }
+                      : { false: '#3A3F4B', true: '#3A3F4B' }
+                  }
+                  thumbColor={spotifyAutoEnabled ? '#FFF' : '#9CA3AF'}
+                  ios_backgroundColor={spotifyAutoEnabled ? Colors.error : '#3A3F4B'}
+                  style={styles.connectionSwitch}
+                />
+              )}
             </View>
 
             {/* AI — mörkblå cirkel med blå primary-border och italiserad "AI"-text. */}
@@ -908,15 +988,16 @@ export default function LobbyScreen() {
                   </Text>
                 </View>
               </View>
-              <Switch
-                value={profilesEnabled}
-                onValueChange={(v) => handleToggleSource(profilesEnabled, setProfilesEnabled, v)}
-                disabled={!hostMode}
-                trackColor={{ false: Colors.error, true: Colors.success }}
-                thumbColor="#FFF"
-                ios_backgroundColor={Colors.error}
-                style={styles.connectionSwitch}
-              />
+              {hostMode && (
+                <Switch
+                  value={profilesEnabled}
+                  onValueChange={(v) => handleToggleSource(profilesEnabled, setProfilesEnabled, v)}
+                  trackColor={{ false: Colors.error, true: Colors.success }}
+                  thumbColor="#FFF"
+                  ios_backgroundColor={Colors.error}
+                  style={styles.connectionSwitch}
+                />
+              )}
             </View>
 
             {/* Use Packages — sub-block sist i Game Connections för musikpaket-val.
@@ -932,114 +1013,121 @@ export default function LobbyScreen() {
                   inre avstånd från ramen som Individual Devices har i
                   Game Mode-toggeln. */}
               <View style={styles.extraPackagesWrapper}>
-                {/* Sub-rubrik högst upp i wrappern som introducerar host:ens
-                    egna köpta paket. */}
+                {/* Sub-rubrik högst upp i wrappern. För host introducerar den
+                    de egna köpta paketen; för icke-host listas de paket hosten
+                    valt att aktivera i den här lobbyn. */}
                 <View style={styles.extraPackagesHeadingRow}>
                   <Text style={styles.extraPackagesHeading}>
-                    Packages available for you:
+                    {hostMode ? 'Packages available for you:' : 'Packages for this lobby selected by the Host:'}
                   </Text>
-                  <View style={styles.selectAllGroup}>
-                    <Text style={styles.selectAllLabel}>Select all</Text>
-                    <Switch
-                      value={isAllSelected}
-                      onValueChange={handleToggleAll}
-                      disabled={!hostMode || PURCHASED_PACKAGES.length === 0}
-                      trackColor={{ false: Colors.error, true: Colors.success }}
-                      thumbColor="#FFF"
-                      ios_backgroundColor={Colors.error}
-                      style={styles.connectionSwitch}
-                    />
-                  </View>
-                </View>
-
-                {/* Köpta paket listas under varandra med en switch per paket.
-                    Switch:en blir disabled när Spotify självt är av — paketval
-                    är meningslöst då eftersom låtarna inte spelas. Texten
-                    förblir vit för att alltid vara lättläst; det är switchens
-                    disabled-state som visualiserar otillgängligheten. */}
-                {PURCHASED_PACKAGES.length === 0 && (
-                  <Text style={styles.noExtraPackagesText}>
-                    No Extra packages purchased
-                  </Text>
-                )}
-
-                {[...PURCHASED_PACKAGES]
-                  .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }))
-                  .map((pkg) => {
-                  const isSelected = selectedExtraPackages.includes(pkg.id);
-                  return (
-                    <View key={pkg.id} style={styles.purchasedPackageRow}>
-                      {/* Info-ikon centrerad mellan wrapper:s vänsterkant och
-                          paket-boxens vänsterkant. Tap visar en Alert med
-                          paketets namn som rubrik och en placeholder för
-                          informationstexten (kommer fyllas på från Store-
-                          integrationen senare). */}
-                      <TouchableOpacity
-                        style={styles.infoIconBtn}
-                        onPress={() =>
-                          Alert.alert(
-                            pkg.name,
-                            'Information about this package will be available later.',
-                          )
-                        }
-                        hitSlop={8}
-                        accessibilityLabel={`${pkg.name} info`}
-                      >
-                        <Text style={styles.infoIconText}>i</Text>
-                      </TouchableOpacity>
-                      {/* Bordered text-box omsluter ENDAST paketnamnet —
-                          switchen sitter utanför rutan, höger-justerad via
-                          marginLeft:'auto'. */}
-                      <View
-                        style={[
-                          styles.purchasedPackageBox,
-                          isSelected && styles.purchasedPackageBoxActive,
-                        ]}
-                      >
-                        <Text
-                          style={[
-                            styles.purchasedPackageName,
-                            isSelected && styles.purchasedPackageNameActive,
-                          ]}
-                          numberOfLines={1}
-                          ellipsizeMode="tail"
-                        >
-                          {pkg.name}
-                        </Text>
-                      </View>
+                  {hostMode && (
+                    <View style={styles.selectAllGroup}>
+                      <Text style={styles.selectAllLabel}>Select all</Text>
                       <Switch
-                        value={isSelected}
-                        onValueChange={() => handleToggleExtraPackage(pkg.id)}
-                        disabled={!hostMode}
+                        value={isAllSelected}
+                        onValueChange={handleToggleAll}
+                        disabled={PURCHASED_PACKAGES.length === 0}
                         trackColor={{ false: Colors.error, true: Colors.success }}
                         thumbColor="#FFF"
                         ios_backgroundColor={Colors.error}
                         style={styles.connectionSwitch}
                       />
                     </View>
+                  )}
+                </View>
+
+                {/* Host ser hela köpta listan med switch per paket; icke-host
+                    ser endast paket som hosten aktiverat — alltid i active-
+                    style eftersom de per definition är "på" i denna lobby. */}
+                {(() => {
+                  const visiblePackages = hostMode
+                    ? [...PURCHASED_PACKAGES]
+                    : PURCHASED_PACKAGES.filter((pkg) => selectedExtraPackages.includes(pkg.id));
+                  const sorted = visiblePackages.sort((a, b) =>
+                    a.name.localeCompare(b.name, undefined, { numeric: true }),
                   );
-                })}
+
+                  if (sorted.length === 0) {
+                    return (
+                      <Text style={styles.noExtraPackagesText}>
+                        {hostMode ? 'No Extra packages purchased' : 'No extra packages active in this lobby'}
+                      </Text>
+                    );
+                  }
+
+                  return sorted.map((pkg) => {
+                    const isSelected = selectedExtraPackages.includes(pkg.id);
+                    // För icke-host är raden alltid "aktiv" (vi visar bara
+                    // valda paket), så active-stylen används oavsett.
+                    const showActive = hostMode ? isSelected : true;
+                    return (
+                      <View key={pkg.id} style={styles.purchasedPackageRow}>
+                        <TouchableOpacity
+                          style={styles.infoIconBtn}
+                          onPress={() =>
+                            Alert.alert(
+                              pkg.name,
+                              'Information about this package will be available later.',
+                            )
+                          }
+                          hitSlop={8}
+                          accessibilityLabel={`${pkg.name} info`}
+                        >
+                          <Text style={styles.infoIconText}>i</Text>
+                        </TouchableOpacity>
+                        <View
+                          style={[
+                            styles.purchasedPackageBox,
+                            showActive && styles.purchasedPackageBoxActive,
+                          ]}
+                        >
+                          <Text
+                            style={[
+                              styles.purchasedPackageName,
+                              showActive && styles.purchasedPackageNameActive,
+                            ]}
+                            numberOfLines={1}
+                            ellipsizeMode="tail"
+                          >
+                            {pkg.name}
+                          </Text>
+                        </View>
+                        {hostMode && (
+                          <Switch
+                            value={isSelected}
+                            onValueChange={() => handleToggleExtraPackage(pkg.id)}
+                            trackColor={{ false: Colors.error, true: Colors.success }}
+                            thumbColor="#FFF"
+                            ios_backgroundColor={Colors.error}
+                            style={styles.connectionSwitch}
+                          />
+                        )}
+                      </View>
+                    );
+                  });
+                })()}
 
                 {/* Buy Extra packages-CTA längst ner i wrappern — pulserande
-                    knapp som drar uppmärksamhet till QuizVibe Store. Alltid
-                    klickbar oavsett Spotify-status. */}
-                <Animated.View
-                  style={[styles.packageChipBuyCtaWrap, { transform: [{ scale: buyCtaPulse }] }]}
-                >
-                  <TouchableOpacity
-                    style={[styles.packageChip, styles.packageChipBuyCta]}
-                    onPress={() => router.push('/(tabs)/store')}
-                    disabled={!hostMode}
-                    activeOpacity={0.7}
+                    knapp som drar uppmärksamhet till QuizVibe Store. Visas
+                    enbart för host; köp är inte aktuellt för guests. */}
+                {hostMode && (
+                  <Animated.View
+                    style={[styles.packageChipBuyCtaWrap, { transform: [{ scale: buyCtaPulse }] }]}
                   >
-                    <Text style={styles.packageChipText}>
-                      + QuizVibe Store
-                    </Text>
-                    <View style={[styles.premiumBadge, styles.premiumBadgeGrey]} pointerEvents="none">
-                      <Text style={[styles.premiumBadgeText, styles.premiumBadgeTextGrey]}>PREMIUM</Text>
-                    </View>
-                  </TouchableOpacity>
-                </Animated.View>
+                    <TouchableOpacity
+                      style={[styles.packageChip, styles.packageChipBuyCta]}
+                      onPress={() => router.push('/(tabs)/store')}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={styles.packageChipText}>
+                        + QuizVibe Store
+                      </Text>
+                      <View style={[styles.premiumBadge, styles.premiumBadgeGrey]} pointerEvents="none">
+                        <Text style={[styles.premiumBadgeText, styles.premiumBadgeTextGrey]}>PREMIUM</Text>
+                      </View>
+                    </TouchableOpacity>
+                  </Animated.View>
+                )}
               </View>
             </View>
           </View>
@@ -1062,7 +1150,9 @@ export default function LobbyScreen() {
 
           {gameMode === 'pass-the-phone' && approvedPlayers.length > 0 && (
             <Text style={styles.turnOrderHint}>
-              Turn order — top plays first. Use ↑↓ to reorder.
+              {hostMode
+                ? 'Turn order — top plays first. Use ↑↓ to reorder.'
+                : 'Playing order — selected by Host'}
             </Text>
           )}
 
@@ -1074,10 +1164,10 @@ export default function LobbyScreen() {
                 key={player.id}
                 player={player}
                 index={players.indexOf(player)}
-                onMoveUp={() => movePlayer(player.id, 'up')}
-                onMoveDown={() => movePlayer(player.id, 'down')}
-                canMoveUp={index > 0}
-                canMoveDown={index < approvedPlayers.length - 1}
+                onMoveUp={hostMode ? () => movePlayer(player.id, 'up') : undefined}
+                onMoveDown={hostMode ? () => movePlayer(player.id, 'down') : undefined}
+                canMoveUp={hostMode && index > 0}
+                canMoveDown={hostMode && index < approvedPlayers.length - 1}
                 hcpComplete={player.hcpComplete}
                 age={player.age}
                 skill={player.skill}
@@ -1311,8 +1401,88 @@ const styles = StyleSheet.create({
   hostBadgeText: { fontSize: FontSize.xs, fontWeight: FontWeight.semibold, color: Colors.primary },
 
   roomCard: { alignItems: 'center' },
+  // Logga + Room Code-stack på en rad. Stacken har `flex: 1` och en
+  // matchande spacer på höger sida så Room Code-numret hamnar centrerat
+  // i kortet samtidigt som loggan ligger vänsterställd. width: '100%' så
+  // raden fyller hela inner-bredden av Card:en (overrides parent:s
+  // alignItems: 'center').
+  // Stacken centreras mot hela kortets bredd via justifyContent. Loggan
+  // ligger utanför raden (absolut i Card:s övre vänstra hörn) så raden
+  // behöver inte reservera flex-utrymme för den.
+  roomCodeRow: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  // För icke-host saknas host-badgen som annars knuffar ner cell-raden.
+  // Labeln är absolut-positionerad (roomLabelGuestAbsolute) med top: 29 +
+  // höjd ~24 → label-bottom vid y≈53. marginTop placerar cell-raden
+  // strax under labeln; värdet är empiriskt finjusterat så cellerna inte
+  // ligger för långt ner i kortet.
+  roomCodeRowGuestSpacing: { marginTop: 52 },
+  // Loggan pinnas i Card:s övre vänstra hörn. top/left: 0 = inkant av
+  // Card:s padding-edge (RN positionerar absolute children från padding-
+  // edge, inte content-edge). Negativa offsets drar in loggan i själva
+  // padding-zonen så den hamnar närmare Card:s rundade kant.
+  roomCodeLogoWrap: {
+    position: 'absolute',
+    top: -Spacing.sm,
+    left: -Spacing.sm,
+  },
+  roomCodeStack: { alignItems: 'center' },
   roomLabel: { ...Typography.overline, color: Colors.textSecondary, marginBottom: Spacing.sm },
-  roomCode: { ...Typography.display, color: Colors.textPrimary, fontVariant: ['tabular-nums'] },
+  // Guest-label position och utseende. Pinnas absolut i Card:ens övre del
+  // så vertikalpositionen blir helt deterministisk (oberoende av flex/
+  // line-height-quirks). top är beräknat så label-mitten landar på
+  // loggans visuella mitt:
+  //   • Loggan: top=-Spacing.sm=-8, höjd 104. SVG synlig center vid cy=38
+  //     i 80-unit viewBox → 38/80 × 104 = 49.4 från logg-topp.
+  //   • Logo center y i padded coords = -8 + 49.4 ≈ 41
+  //   • Label center y = top + halv label-höjd (~12 för fontSize 20)
+  //   • top ≈ 41 - 12 = 29
+  // left/right: 0 + textAlign center ger horisontell centrering över hela
+  // kortets bredd.
+  roomLabelGuestAbsolute: {
+    ...Typography.overline,
+    fontSize: FontSize.xxl,
+    letterSpacing: 1.2,
+    color: Colors.textSecondary,
+    position: 'absolute',
+    // top justerad ner från 29 → 27 så labelns nya större halv-höjd (~14
+    // för fontSize 24 / lineHeight ~28) fortfarande hamnar på loggans
+    // visuella mitt vid y≈41.
+    top: 27,
+    left: 0,
+    right: 0,
+    textAlign: 'center',
+  },
+  // Cell-rad för rumskoden — speglar Join-modalens "Enter Room Code"-cells
+  // i fyllt läge. Storleken (36×50) håller raden tillräckligt smal för att
+  // logga + cell-rad ska få plats sida vid sida i den centrerade stacken.
+  roomCodeCellsRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.xs },
+  roomCodeCell: {
+    width: 36,
+    height: 50,
+    borderRadius: Radius.md,
+    borderWidth: 1,
+    borderColor: Colors.primary,
+    backgroundColor: Colors.primaryMuted,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  roomCodeCellText: {
+    fontSize: FontSize.xxl,
+    fontWeight: FontWeight.bold,
+    color: Colors.textPrimary,
+    fontVariant: ['tabular-nums'],
+  },
+  roomCodeCellDash: {
+    fontSize: FontSize.xxl,
+    fontWeight: FontWeight.bold,
+    color: Colors.textSecondary,
+    marginHorizontal: 2,
+  },
   shareBtn: { marginTop: Spacing.md, paddingHorizontal: Spacing.lg, paddingVertical: Spacing.sm, borderRadius: Radius.full, backgroundColor: Colors.primaryMuted, borderWidth: 1, borderColor: Colors.primaryBorder },
   shareBtnText: { fontSize: FontSize.sm, fontWeight: FontWeight.semibold, color: Colors.primary },
 

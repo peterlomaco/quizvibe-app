@@ -23,3 +23,14 @@ export function generateRoomCode(): string {
 export function generateJoinUrl(code: string): string {
   return `https://quizvibe.app/join?code=${code}`;
 }
+
+/**
+ * Display-formaterar en rumkod genom att lägga in ett bindestreck mellan
+ * bokstavs- och siffer-delen, t.ex. "ABC23" → "ABC-23". Använd ENBART för
+ * visning; den kanoniska formen (utan bindestreck) ska sparas och
+ * jämföras som vanligt.
+ */
+export function formatRoomCode(code: string): string {
+  if (code.length <= ROOM_CODE_LETTERS) return code;
+  return `${code.slice(0, ROOM_CODE_LETTERS)}-${code.slice(ROOM_CODE_LETTERS)}`;
+}
