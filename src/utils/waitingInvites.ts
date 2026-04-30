@@ -19,7 +19,7 @@ const KEY = '@quizvibe/waitingInvites/v1';
 export interface WaitingInvite {
   id: string;
   roomCode: string;
-  fromNickname: string;
+  fromPlayerName: string;
   fromAvatarId?: string;
   // ms timestamp — används för att sortera nyaste först och visa "1m ago" etc.
   sentAt: number;
@@ -29,7 +29,17 @@ export async function loadInvites(): Promise<WaitingInvite[]> {
   try {
     const json = await AsyncStorage.getItem(KEY);
     if (!json) return [];
-    return JSON.parse(json) as WaitingInvite[];
+    const items = JSON.parse(json) as (Partial<WaitingInvite> & { fromNickname?: string })[];
+    // Migrera gamla items (skapade när fältet hette `fromNickname`) till
+    // nya schemat med `fromPlayerName`. Nästa saveInvites skriver bara
+    // nya fältet.
+    return items.map((i) => ({
+      id: i.id ?? `inv-${Date.now()}`,
+      roomCode: i.roomCode ?? '',
+      fromPlayerName: i.fromPlayerName ?? i.fromNickname ?? '',
+      fromAvatarId: i.fromAvatarId,
+      sentAt: i.sentAt ?? Date.now(),
+    }));
   } catch (err) {
     console.warn('[waitingInvites] load failed:', err);
     return [];
@@ -54,7 +64,7 @@ export async function addInvite(
   const dup = current.find(
     (i) =>
       i.roomCode === invite.roomCode &&
-      i.fromNickname.toLowerCase() === invite.fromNickname.toLowerCase(),
+      i.fromPlayerName.toLowerCase() === invite.fromPlayerName.toLowerCase(),
   );
   if (dup) return current;
   const next: WaitingInvite = {

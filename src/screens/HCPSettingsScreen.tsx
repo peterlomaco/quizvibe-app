@@ -13,7 +13,6 @@ import { RangeSlider } from '../components/RangeSlider';
 import { SegmentedControl, SegmentOption } from '../components/SegmentedControl';
 import { SliderInput } from '../components/SliderInput';
 import { Colors, FontSize, Spacing, Typography } from '../theme';
-import type { HCPSettingsScreenProps } from '../types/navigation';
  
 // ─── Data ─────────────────────────────────────────────────────────────────────
  
@@ -28,7 +27,7 @@ type Region = (typeof REGIONS)[number];
  
 // ─── Screen ───────────────────────────────────────────────────────────────────
  
-export default function HCPSettingsScreen(_props: HCPSettingsScreenProps) {
+export default function HCPSettingsScreen() {
   const [age, setAge] = useState(35);
   const [skill, setSkill] = useState('intermediate');
   const [region, setRegion] = useState<Region>('Sweden');

@@ -12,7 +12,7 @@ export type Region = 'sweden' | 'nordics' | 'global';
 export type AvatarSource = 'upload' | 'choose' | 'default';
 
 export interface ProfileData {
-  nickname: string;
+  playerName: string;
   // Email används vid registrering för att skicka aktiveringslänk.
   // Optional för bakåtkompatibilitet med profiler skapade innan fältet fanns.
   email?: string;
@@ -28,6 +28,18 @@ export interface ProfileData {
   // ad-free under quiz-rundor. Optional för bakåtkompatibilitet.
   // TODO (auth): byt till riktigt OAuth-flöde mot Spotify Web API.
   spotifyConnected?: boolean;
+  // Om användaren har kopplat sitt YouTube-konto för förbättrad
+  // video-uppspelning under quiz-rundor. Optional för bakåtkompatibilitet.
+  // TODO (auth): byt till YouTube Data API + Google OAuth.
+  youtubeConnected?: boolean;
+  // Hur länge spelarna har på sig att svara på en fråga (i sekunder).
+  // Skiljer sig från hur länge frågematerialet (låt/video/bild) spelas upp.
+  // Optional för bakåtkompatibilitet — defaultas till 30 i UI.
+  answerResponseSeconds?: 15 | 30 | 45 | 60;
+  // Game era — år-spann för frågor (host-default vid skapande av spel).
+  // Optional för bakåtkompatibilitet — defaultas till [1980, 2010] i UI.
+  gameEraFrom?: number;
+  gameEraTo?: number;
 }
 
 export async function saveProfile(data: ProfileData): Promise<void> {
@@ -43,7 +55,15 @@ export async function loadProfile(): Promise<ProfileData | null> {
   try {
     const json = await AsyncStorage.getItem(PROFILE_KEY);
     if (!json) return null;
-    return JSON.parse(json) as ProfileData;
+    const raw = JSON.parse(json) as Partial<ProfileData> & { nickname?: string };
+    // Migrera gamla profiler (skapade när fältet hette `nickname`) till
+    // nya schemat med `playerName`. Nästa saveProfile skriver bara nya
+    // fältet, så storage konvergerar passivt mot det nya schemat.
+    if (raw.playerName === undefined && typeof raw.nickname === 'string') {
+      raw.playerName = raw.nickname;
+      delete raw.nickname;
+    }
+    return raw as ProfileData;
   } catch (err) {
     console.warn('[profileStorage] Failed to load profile:', err);
     return null;

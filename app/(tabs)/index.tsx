@@ -1,7 +1,10 @@
 import { QuizVibeLogo } from '@/src/components/QuizVibeLogo';
 import { TopUserBanner } from '@/src/components/TopUserBanner';
 import { Colors, Radius, Spacing } from '@/src/theme';
+import { identify, resetIdentity, track } from '@/src/utils/analytics';
 import { getAvatarEmojiById } from '@/src/utils/avatars';
+import { generatePlayerName } from '@/src/utils/playerName';
+import { containsProfanity } from '@/src/utils/profanity';
 import { clearProfile, loadProfile, saveProfile, type ProfileData } from '@/src/utils/profileStorage';
 import { formatRoomCode, generateRoomCode, ROOM_CODE_LENGTH, ROOM_CODE_LETTERS } from '@/src/utils/roomCode';
 import { loadInvites, removeInvite, type WaitingInvite } from '@/src/utils/waitingInvites';
@@ -44,14 +47,24 @@ const GUEST_SKILL_OPTIONS: { id: GuestSkill; label: string }[] = [
   { id: 'expert',       label: 'Advanced' },
 ];
 
-// Mock-list över "redan tagna" nicknames så availability-checken har något
+// Mock-list över "redan tagna" playerNames så availability-checken har något
 // att faktiskt fela på. Lowercase för case-insensitive match.
-// TODO (backend): byt mot riktig nickname-uniqueness-check mot servern.
-const TAKEN_NICKNAMES = new Set([
+// TODO (backend): byt mot riktig playerName-uniqueness-check mot servern.
+const TAKEN_PLAYER_NAMES = new Set([
   'player one', 'anna', 'kalle', 'admin', 'test', 'guest', 'host', 'quizvibe',
 ]);
 
-type NicknameStatus = 'idle' | 'checking' | 'available' | 'taken';
+type PlayerNameStatus = 'idle' | 'checking' | 'available' | 'taken' | 'invalid';
+
+// Validerar ett manuellt inmatat Player Name. Profanity-check körs först
+// så att kränkande namn aldrig hamnar i taken-listan av misstag och så
+// användaren får ett mer specifikt felmeddelande.
+function validatePlayerName(name: string): 'available' | 'taken' | 'invalid' {
+  const trimmed = name.trim();
+  if (containsProfanity(trimmed)) return 'invalid';
+  if (TAKEN_PLAYER_NAMES.has(trimmed.toLowerCase())) return 'taken';
+  return 'available';
+}
 
 // Lös format-validering — tillräckligt för UI-feedback. Riktig validering
 // sker server-side via aktiverings-/recovery-mail.
@@ -78,13 +91,19 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
   const [code, setCode] = useState('');
   const [guestName, setGuestName] = useState('');
   const [guestBirthYearText, setGuestBirthYearText] = useState('');
-  const [guestSkill, setGuestSkill] = useState<GuestSkill | null>(null);
+  // Default-värde: användaren kan gå direkt till Room Code efter year of birth.
+  // Skill kan ändras via skill-knapparna men har förvalt 'intermediate'.
+  const [guestSkill, setGuestSkill] = useState<GuestSkill>('intermediate');
   const [yearPickerOpen, setYearPickerOpen] = useState(false);
-  const [nicknameStatus, setNicknameStatus] = useState<NicknameStatus>('idle');
+  const [playerNameStatus, setPlayerNameStatus] = useState<PlayerNameStatus>('idle');
   const [invites, setInvites] = useState<WaitingInvite[]>([]);
 
   // Refs till de 5 cells för rumkoden — för auto-fokus framåt och bakåt.
   const codeRefs = useRef<Array<TextInput | null>>([]);
+  // Spåra om föregående step var 'guest' så Player Name-autofill bara
+  // triggar vid transition INTO guest-steget (inte refill om användaren
+  // rensat fältet efter en autofill).
+  const prevGuestStepRef = useRef(false);
   // Avled cell-värdena från `code`-strängen så de alltid är i sync.
   const codeCells: string[] = Array.from({ length: ROOM_CODE_LENGTH }, (_, i) => code[i] ?? '');
 
@@ -107,22 +126,23 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     }
   };
 
-  // När modalen öppnas: börja på det step caller bad om.
-  // När den stängs: vänta på fade-out-animationen och nollställ allt
-  // så modalen är ren nästa gång den öppnas.
+  // När modalen öppnas: nollställ ALLT state och börja på det step caller
+  // bad om. Reset på öppning (inte stängning) så att state alltid är färskt
+  // även om användaren stänger och öppnar igen snabbt — under fade-out
+  // behåller modalen senaste UI-state, vilket är önskvärt visuellt.
+  // Reset:ar även prevGuestStepRef så Player Name-autofill alltid triggar
+  // vid nästa entry till guest-steget (oavsett om det sker via chooser
+  // eller initialStep='guest' direkt från Home-skärmens Join-as-Guest-knapp).
   useEffect(() => {
     if (visible) {
+      setCode('');
+      setGuestName('');
+      setGuestBirthYearText('');
+      setGuestSkill('intermediate');
+      setYearPickerOpen(false);
+      setPlayerNameStatus('idle');
       setStep(initialStep);
-    } else {
-      const t = setTimeout(() => {
-        setCode('');
-        setGuestName('');
-        setGuestBirthYearText('');
-        setGuestSkill(null);
-        setYearPickerOpen(false);
-        setNicknameStatus('idle');
-      }, 300);
-      return () => clearTimeout(t);
+      prevGuestStepRef.current = false;
     }
   }, [visible, initialStep]);
 
@@ -159,42 +179,61 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
   })();
 
   // Sekventiella låsnings-gates: varje fält låses upp först när föregående
-  // är klart. Nicknamet måste *valideras* (inte bara skrivas) innan year
+  // är klart. PlayerNamet måste *valideras* (inte bara skrivas) innan year
   // låses upp — det är hur vi visar progress mot lobbyn.
-  const yearUnlocked = nicknameStatus === 'available';
+  const yearUnlocked = playerNameStatus === 'available';
   const skillUnlocked = yearUnlocked && parsedBirthYear !== null;
-  const codeUnlocked = skillUnlocked && guestSkill !== null;
+  // Skill är default-ifylld, så code-låset följer skill-låset direkt.
+  const codeUnlocked = skillUnlocked;
 
   const isGuestFormValid =
-    nicknameStatus === 'available' &&
+    playerNameStatus === 'available' &&
     parsedBirthYear !== null &&
-    guestSkill !== null &&
     code.length === ROOM_CODE_LENGTH;
 
-  // Om användaren ändrar nicknamet efter en validering — återställ status.
+  // Om användaren ändrar playerNamet efter en validering — återställ status.
   // Year/skill/code-värden behålls men deras gates återstängs tills nick
   // är validerat igen.
   const handleGuestNameChange = (t: string) => {
     setGuestName(t);
-    if (nicknameStatus !== 'idle') setNicknameStatus('idle');
+    if (playerNameStatus !== 'idle') setPlayerNameStatus('idle');
   };
 
-  const handleCheckNickname = () => {
+  const handleCheckPlayerName = () => {
     const trimmed = guestName.trim();
     if (!trimmed) return;
     Keyboard.dismiss();
-    setNicknameStatus('checking');
+    setPlayerNameStatus('checking');
     // Mock-latens — byt mot riktigt API-anrop när backend finns.
     setTimeout(() => {
-      const taken = TAKEN_NICKNAMES.has(trimmed.toLowerCase());
-      setNicknameStatus(taken ? 'taken' : 'available');
+      setPlayerNameStatus(validatePlayerName(trimmed));
     }, 600);
   };
 
+  // Auto-fyll Player Name när användaren går in i guest-steget och fältet
+  // är tomt. Genererar ett unikt namn (verifierat mot mock TAKEN_PLAYER_NAMES)
+  // och markerar status som 'available' så användaren kan gå direkt till
+  // year of birth. Manuell ändring återställer status till 'idle' via
+  // handleGuestNameChange och kräver Check innan formuläret går vidare.
+  useEffect(() => {
+    const wasGuest = prevGuestStepRef.current;
+    prevGuestStepRef.current = step === 'guest';
+    if (step === 'guest' && !wasGuest && guestName === '') {
+      const generated = generatePlayerName(TAKEN_PLAYER_NAMES);
+      setGuestName(generated);
+      setPlayerNameStatus('available');
+    }
+  }, [step, guestName]);
+
   const handleJoinAsGuest = () => {
     if (!isGuestFormValid || parsedBirthYear === null || guestSkill === null) return;
-    // TODO (backend): validera att nicknamet är unikt mot QuizVibe-databasen
+    // TODO (backend): validera att playerNamet är unikt mot QuizVibe-databasen
     // och att rumkoden faktiskt existerar. Just nu litar vi på input.
+    // Autofill-detektion: matchar genererade namnens format
+    // ("PlayerName" + 5 siffror + "-" + 2 bokstäver). Om användaren
+    // ändrat namnet manuellt blir flaggan false.
+    const autofilled = /^PlayerName\d{5}-[A-Z]{2}$/.test(guestName.trim());
+    track('guest_name_created', { autofilled, skill: guestSkill });
     onClose();
     router.push({
       pathname: '/(tabs)/lobby',
@@ -217,7 +256,21 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
       >
         <View style={modal.sheet}>
           {step !== 'choose' && (
-            <TouchableOpacity onPress={() => setStep('choose')} style={modal.backBtn} hitSlop={10}>
+            <TouchableOpacity
+              onPress={() => {
+                // Guest-flödet är meant som en snabb-väg: chooser:s
+                // andra alternativ (Room Code / Waiting Invites) är inte
+                // relevanta för någon som valt guest. Back stänger
+                // modalen istället för att leda tillbaka till chooser:n.
+                if (step === 'guest') {
+                  onClose();
+                } else {
+                  setStep('choose');
+                }
+              }}
+              style={modal.backBtn}
+              hitSlop={10}
+            >
               <Text style={modal.backText}>← Back</Text>
             </TouchableOpacity>
           )}
@@ -253,7 +306,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                   <ChoiceRow
                     icon="👤"
                     label="Join as Guest"
-                    subtitle="No account — just pick a nickname"
+                    subtitle="No account — just pick a Player Name"
                     onPress={() => setStep('guest')}
                   />
                 )}
@@ -337,7 +390,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                       {getAvatarEmojiById(inv.fromAvatarId)}
                     </Text>
                     <View style={{ flex: 1 }}>
-                      <Text style={modal.inviteFrom}>{inv.fromNickname}</Text>
+                      <Text style={modal.inviteFrom}>{inv.fromPlayerName}</Text>
                       <Text style={modal.inviteCode}>Room {formatRoomCode(inv.roomCode)}</Text>
                     </View>
                     <Text style={modal.inviteJoinText}>Join ›</Text>
@@ -357,65 +410,70 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                 style={{ maxHeight: 420 }}
                 contentContainerStyle={{ gap: Spacing.md }}
               >
-                {/* Nickname — måste valideras mot DB innan nästa fält öppnas */}
+                {/* PlayerName — måste valideras mot DB innan nästa fält öppnas */}
                 <View style={modal.fieldGroup}>
-                  <Text style={modal.fieldLabel}>Nickname</Text>
-                  <View style={modal.nicknameRow}>
+                  <Text style={modal.fieldLabel}>Player Name</Text>
+                  <View style={modal.playerNameRow}>
                     <TextInput
                       style={[
                         modal.inputText,
-                        modal.nicknameInput,
-                        // Highlightad border medan nickname är aktivt steg
+                        modal.playerNameInput,
+                        // Highlightad border medan playerName är aktivt steg
                         // (inte validerat än) — samma färg som year-triggerns border.
-                        nicknameStatus !== 'available' && modal.nicknameInputActive,
+                        playerNameStatus !== 'available' && modal.playerNameInputActive,
                       ]}
-                      placeholder="Pick a unique nickname"
+                      placeholder="Pick a unique Player Name"
                       placeholderTextColor={Colors.textDisabled}
                       value={guestName}
                       onChangeText={handleGuestNameChange}
                       maxLength={20}
-                      editable={nicknameStatus !== 'checking'}
+                      editable={playerNameStatus !== 'checking'}
                       returnKeyType="done"
-                      onSubmitEditing={handleCheckNickname}
+                      onSubmitEditing={handleCheckPlayerName}
                     />
                     <TouchableOpacity
-                      onPress={handleCheckNickname}
-                      disabled={!guestName.trim() || nicknameStatus === 'checking' || nicknameStatus === 'available'}
+                      onPress={handleCheckPlayerName}
+                      disabled={!guestName.trim() || playerNameStatus === 'checking' || playerNameStatus === 'available'}
                       style={[
                         modal.checkBtn,
-                        (!guestName.trim() || nicknameStatus === 'checking') && modal.checkBtnDisabled,
-                        nicknameStatus === 'available' && modal.checkBtnDone,
+                        (!guestName.trim() || playerNameStatus === 'checking') && modal.checkBtnDisabled,
+                        playerNameStatus === 'available' && modal.checkBtnDone,
                       ]}
                     >
                       <Text
                         style={[
                           modal.checkBtnText,
-                          nicknameStatus === 'available' && modal.checkBtnTextDone,
+                          playerNameStatus === 'available' && modal.checkBtnTextDone,
                         ]}
                       >
-                        {nicknameStatus === 'checking' ? '…'
-                          : nicknameStatus === 'available' ? '✓'
+                        {playerNameStatus === 'checking' ? '…'
+                          : playerNameStatus === 'available' ? '✓'
                           : 'Check'}
                       </Text>
                     </TouchableOpacity>
                   </View>
                   {/* Status-rad */}
-                  {nicknameStatus === 'checking' && (
+                  {playerNameStatus === 'checking' && (
                     <Text style={modal.statusHint}>Checking availability…</Text>
                   )}
-                  {nicknameStatus === 'available' && (
+                  {playerNameStatus === 'available' && (
                     <Text style={[modal.statusHint, modal.statusHintOk]}>
-                      ✓ Nickname is available
+                      ✓ Player Name is available
                     </Text>
                   )}
-                  {nicknameStatus === 'taken' && (
+                  {playerNameStatus === 'taken' && (
                     <Text style={[modal.statusHint, modal.statusHintError]}>
-                      ✗ Nickname already taken — try another
+                      ✗ Player Name already taken — try another
+                    </Text>
+                  )}
+                  {playerNameStatus === 'invalid' && (
+                    <Text style={[modal.statusHint, modal.statusHintError]}>
+                      ✗ Player Name contains inappropriate language — try another
                     </Text>
                   )}
                 </View>
 
-                {/* Year of birth — drop-down picker (låst tills nickname validerat) */}
+                {/* Year of birth — drop-down picker (låst tills playerName validerat) */}
                 <View
                   style={[modal.fieldGroup, !yearUnlocked && modal.fieldGroupLocked]}
                   pointerEvents={yearUnlocked ? 'auto' : 'none'}
@@ -447,7 +505,16 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                   </TouchableOpacity>
                 </View>
 
-                {/* Skill level (låst tills year valt) */}
+                {/* Skill level (låst tills year valt). Default 'intermediate'
+                    är förvalt, så användaren kan gå direkt till Room Code. */}
+                <Text
+                  style={[
+                    modal.statusHint,
+                    !skillUnlocked && modal.fieldGroupLocked,
+                  ]}
+                >
+                  Use default or select prefered setup
+                </Text>
                 <View
                   style={[modal.fieldGroup, !skillUnlocked && modal.fieldGroupLocked]}
                   pointerEvents={skillUnlocked ? 'auto' : 'none'}
@@ -455,17 +522,12 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                   <Text style={modal.fieldLabel}>Skill Level</Text>
                   <View style={modal.skillRow}>
                     {GUEST_SKILL_OPTIONS.map((opt) => {
-                      // Highlight alla val medan skill är "nästa steg"
-                      // (upplåst men inget valt). När ett val gjorts tar
-                      // skillBtnActive över för bara det valda.
-                      const stepActive = skillUnlocked && !guestSkill;
                       const isSelected = guestSkill === opt.id;
                       return (
                         <TouchableOpacity
                           key={opt.id}
                           style={[
                             modal.skillBtn,
-                            stepActive && modal.skillBtnHighlight,
                             isSelected && modal.skillBtnActive,
                           ]}
                           onPress={() => setGuestSkill(opt.id)}
@@ -629,41 +691,48 @@ export default function HomeScreen() {
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [profileMenuVisible, setProfileMenuVisible] = useState(false);
   const [profileMenuStep, setProfileMenuStep] = useState<'menu' | 'login' | 'register' | 'forgot'>('menu');
-  const [loginNickname, setLoginNickname] = useState('');
+  const [loginPlayerName, setLoginPlayerName] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [forgotEmail, setForgotEmail] = useState('');
 
   // ── Register-form state (sekventiell upplåsning som guest-flödet) ──
   const [regEmail, setRegEmail] = useState('');
-  const [regNickname, setRegNickname] = useState('');
-  const [regNicknameStatus, setRegNicknameStatus] = useState<NicknameStatus>('idle');
+  const [regPlayerName, setRegPlayerName] = useState('');
+  const [regPlayerNameStatus, setRegPlayerNameStatus] = useState<PlayerNameStatus>('idle');
   const [regPassword, setRegPassword] = useState('');
   const [regPasswordConfirmed, setRegPasswordConfirmed] = useState(false);
   const [regBirthYearText, setRegBirthYearText] = useState('');
-  const [regSkill, setRegSkill] = useState<GuestSkill | null>(null);
-  const [regRegion, setRegRegion] = useState<RegRegion | null>(null);
+  // Default-värden: användaren kan registrera direkt efter year of birth.
+  // Skill och Region är förvalda men kan ändras via picker:erna.
+  const [regSkill, setRegSkill] = useState<GuestSkill>('intermediate');
+  const [regRegion, setRegRegion] = useState<RegRegion>('global');
   const [regYearPickerOpen, setRegYearPickerOpen] = useState(false);
   const [regSkillPickerOpen, setRegSkillPickerOpen] = useState(false);
   const [regRegionPickerOpen, setRegRegionPickerOpen] = useState(false);
 
   const pulse = useRef(new Animated.Value(1)).current;
 
+  // Spåra föregående regEmailValid så Player Name-autofill bara triggar
+  // vid email-becomes-valid-transition (inte refill om användaren rensat
+  // fältet efter en autofill).
+  const prevRegEmailValidRef = useRef(false);
+
   // Återställ menyns sub-step + alla form-fields när modalen stängs
   useEffect(() => {
     if (!profileMenuVisible) {
       const t = setTimeout(() => {
         setProfileMenuStep('menu');
-        setLoginNickname('');
+        setLoginPlayerName('');
         setLoginPassword('');
         setForgotEmail('');
         setRegEmail('');
-        setRegNickname('');
-        setRegNicknameStatus('idle');
+        setRegPlayerName('');
+        setRegPlayerNameStatus('idle');
         setRegPassword('');
         setRegPasswordConfirmed(false);
         setRegBirthYearText('');
-        setRegSkill(null);
-        setRegRegion(null);
+        setRegSkill('intermediate');
+        setRegRegion('global');
         setRegYearPickerOpen(false);
         setRegSkillPickerOpen(false);
         setRegRegionPickerOpen(false);
@@ -711,17 +780,27 @@ export default function HomeScreen() {
 
   const handleCreateGame = () => {
     const code = generateRoomCode();
+    track('room_code_created');
     router.push({ pathname: '/(tabs)/lobby', params: { code, isHost: 'true' } });
   };
 
-  // Mock-login: sparar en minimal profil med användarens nickname.
+  // Mock-login: sparar en minimal profil med användarens playerName.
   // Lösenordet valideras inte — det är bara UI-scaffolding.
-  // TODO (auth): byt till riktigt auth-API som validerar nickname/password
-  // mot backend och returnerar session-token.
+  // Identifier-fältet accepterar både Player Name OCH email. För Player
+  // Name lagrar vi som-är. För email finns ingen backend-uppslagning av
+  // motsvarande Player Name, så som mock härleder vi det från email-
+  // prefixet (delen före '@'). Bannern måste alltid visa ett Player
+  // Name, aldrig själva email-adressen.
+  // TODO (auth): byt till riktigt auth-API som validerar Player Name/
+  // email + password mot backend, returnerar session-token och hämtar
+  // hela profilen (inkl. det riktiga Player Name som hör till email:en).
   const handleLogin = async () => {
-    if (!loginNickname.trim() || !loginPassword.trim()) return;
+    const trimmed = loginPlayerName.trim();
+    if (!trimmed || !loginPassword.trim()) return;
+    const isEmail = trimmed.includes('@');
+    const playerName = isEmail ? trimmed.split('@')[0] : trimmed;
     const minimalProfile: ProfileData = {
-      nickname: loginNickname.trim(),
+      playerName: playerName,
       birthYear: null,
       skill: null,
       region: null,
@@ -730,6 +809,9 @@ export default function HomeScreen() {
     };
     await saveProfile(minimalProfile);
     setProfile(minimalProfile);
+    // TODO (auth): byt playerName mot riktig user-id (UUID från backend).
+    identify(playerName);
+    track('user_logged_in', { method: isEmail ? 'email' : 'player_name' });
     setProfileMenuVisible(false);
   };
 
@@ -739,7 +821,7 @@ export default function HomeScreen() {
     setProfileMenuStep('register');
   };
 
-  // Forgot password / nickname: skicka recovery-mail med nickname + nytt
+  // Forgot password / playerName: skicka recovery-mail med playerName + nytt
   // lösenord + aktiveringslänk. TODO (auth): byt mock mot riktigt API-anrop.
   const forgotEmailValid = REG_EMAIL_REGEX.test(forgotEmail.trim());
 
@@ -750,7 +832,7 @@ export default function HomeScreen() {
     setProfileMenuVisible(false);
     Alert.alert(
       'Recovery email sent',
-      `We've sent your nickname and a new password to ${trimmed}, along with an activation link.`,
+      `We've sent your Player Name and a new password to ${trimmed}, along with an activation link.`,
     );
   };
 
@@ -765,35 +847,48 @@ export default function HomeScreen() {
   // policy definieras (server-side). Användaren måste även explicit trycka
   // Confirm för att låsa lösenordet och låsa upp nästa fält.
   const regPasswordValid = regPassword.length >= 4;
-  // Sekventiella gates: email → nickname → password → year → skill → region
-  const regNicknameUnlocked = regEmailValid;
-  const regPasswordUnlocked = regNicknameUnlocked && regNicknameStatus === 'available';
+  // Sekventiella gates: email → playerName → password → year → skill → region
+  const regPlayerNameUnlocked = regEmailValid;
+  const regPasswordUnlocked = regPlayerNameUnlocked && regPlayerNameStatus === 'available';
   const regYearUnlocked = regPasswordUnlocked && regPasswordConfirmed;
   const regSkillUnlocked = regYearUnlocked && regParsedBirthYear !== null;
-  const regRegionUnlocked = regSkillUnlocked && regSkill !== null;
+  // Skill och Region är default-ifyllda, så region-låset följer skill-låset.
+  const regRegionUnlocked = regSkillUnlocked;
   const isRegisterFormValid =
     regEmailValid &&
-    regNicknameStatus === 'available' &&
+    regPlayerNameStatus === 'available' &&
     regPasswordConfirmed &&
-    regParsedBirthYear !== null &&
-    regSkill !== null &&
-    regRegion !== null;
+    regParsedBirthYear !== null;
 
-  const handleRegNicknameChange = (t: string) => {
-    setRegNickname(t);
-    if (regNicknameStatus !== 'idle') setRegNicknameStatus('idle');
+  const handleRegPlayerNameChange = (t: string) => {
+    setRegPlayerName(t);
+    if (regPlayerNameStatus !== 'idle') setRegPlayerNameStatus('idle');
   };
 
-  const handleRegCheckNickname = () => {
-    const trimmed = regNickname.trim();
+  const handleRegCheckPlayerName = () => {
+    const trimmed = regPlayerName.trim();
     if (!trimmed) return;
     Keyboard.dismiss();
-    setRegNicknameStatus('checking');
+    setRegPlayerNameStatus('checking');
     setTimeout(() => {
-      const taken = TAKEN_NICKNAMES.has(trimmed.toLowerCase());
-      setRegNicknameStatus(taken ? 'taken' : 'available');
+      setRegPlayerNameStatus(validatePlayerName(trimmed));
     }, 600);
   };
+
+  // Auto-fyll Player Name när email blir giltig (transition false → true)
+  // och fältet är tomt. Genererar ett unikt namn (verifierat mot mock
+  // TAKEN_PLAYER_NAMES) och markerar status som 'available' så användaren
+  // kan gå vidare direkt. Användaren kan ändå skriva över namnet → status
+  // faller tillbaka till 'idle' via handleRegPlayerNameChange och kräver Check.
+  useEffect(() => {
+    const wasValid = prevRegEmailValidRef.current;
+    prevRegEmailValidRef.current = regEmailValid;
+    if (regEmailValid && !wasValid && regPlayerName === '') {
+      const generated = generatePlayerName(TAKEN_PLAYER_NAMES);
+      setRegPlayerName(generated);
+      setRegPlayerNameStatus('available');
+    }
+  }, [regEmailValid, regPlayerName]);
 
   // Password — användaren måste explicit Confirm:a innan year låses upp.
   // Om de ändrar password efteråt återställs confirmed-state.
@@ -813,15 +908,10 @@ export default function HomeScreen() {
   // mock-alerten nedan. Profilen bör då markeras som "pending verification"
   // tills användaren klickat på länken.
   const handleRegisterSubmit = async () => {
-    if (
-      !isRegisterFormValid ||
-      regParsedBirthYear === null ||
-      regSkill === null ||
-      regRegion === null
-    ) return;
+    if (!isRegisterFormValid || regParsedBirthYear === null) return;
     const trimmedEmail = regEmail.trim();
     const newProfile: ProfileData = {
-      nickname: regNickname.trim(),
+      playerName: regPlayerName.trim(),
       email: trimmedEmail,
       birthYear: regParsedBirthYear,
       skill: regSkill,
@@ -831,6 +921,9 @@ export default function HomeScreen() {
     };
     await saveProfile(newProfile);
     setProfile(newProfile);
+    // TODO (auth): byt playerName mot riktig user-id (UUID från backend).
+    identify(newProfile.playerName, { skill: regSkill, region: regRegion });
+    track('user_registered', { skill: regSkill, region: regRegion });
     setProfileMenuVisible(false);
     Alert.alert(
       'Activation email sent',
@@ -853,6 +946,8 @@ export default function HomeScreen() {
           onPress: async () => {
             await clearProfile();
             setProfile(null);
+            track('user_logged_out');
+            resetIdentity();
             setProfileMenuVisible(false);
           },
         },
@@ -867,7 +962,7 @@ export default function HomeScreen() {
     <SafeAreaView style={styles.safe}>
 
       {/* ── Top board (login status) ─────────────────────────── */}
-      <TopUserBanner onPress={() => setProfileMenuVisible(true)} />
+      <TopUserBanner profile={profile} onPress={() => setProfileMenuVisible(true)} />
 
       <View style={styles.container}>
 
@@ -992,7 +1087,7 @@ export default function HomeScreen() {
 
       {/* ── Profile-meny ─────────────────────────────────────── */}
       {/* När utloggad: Register / Log in. När inloggad: Log out.
-          Login-steget visar nickname + password-form. */}
+          Login-steget visar playerName + password-form. */}
       <Modal
         visible={profileMenuVisible}
         transparent
@@ -1018,7 +1113,7 @@ export default function HomeScreen() {
                   </Text>
                   <View style={{ flex: 1 }}>
                     <Text style={profileMenu.headerName}>
-                      {profile?.nickname?.trim() || 'Signed in'}
+                      {profile?.playerName?.trim() || 'Signed in'}
                     </Text>
                     <Text style={profileMenu.headerStatus}>Logged in</Text>
                   </View>
@@ -1071,30 +1166,30 @@ export default function HomeScreen() {
                 </TouchableOpacity>
 
                 <Text style={profileMenu.title}>Log in</Text>
-                <Text style={profileMenu.subtitle}>Enter your nickname and password</Text>
+                <Text style={profileMenu.subtitle}>Enter your Player Name or email and password</Text>
 
-                {/* Sekventiell upplåsning: nickname först, sedan password.
+                {/* Sekventiell upplåsning: playerName först, sedan password.
                     Aktivt steg får primärblå border-highlight. */}
                 <TextInput
                   style={[
                     profileMenu.input,
-                    !loginNickname.trim() && profileMenu.inputActive,
+                    !loginPlayerName.trim() && profileMenu.inputActive,
                   ]}
-                  placeholder="Nickname"
+                  placeholder="Player Name or email"
                   placeholderTextColor={Colors.textDisabled}
-                  value={loginNickname}
-                  onChangeText={setLoginNickname}
+                  value={loginPlayerName}
+                  onChangeText={setLoginPlayerName}
                   maxLength={20}
                   returnKeyType="next"
                 />
                 <View
-                  pointerEvents={loginNickname.trim() ? 'auto' : 'none'}
-                  style={!loginNickname.trim() && { opacity: 0.4 }}
+                  pointerEvents={loginPlayerName.trim() ? 'auto' : 'none'}
+                  style={!loginPlayerName.trim() && { opacity: 0.4 }}
                 >
                   <TextInput
                     style={[
                       profileMenu.input,
-                      !!loginNickname.trim() && !loginPassword.trim() && profileMenu.inputActive,
+                      !!loginPlayerName.trim() && !loginPassword.trim() && profileMenu.inputActive,
                     ]}
                     placeholder="Password"
                     placeholderTextColor={Colors.textDisabled}
@@ -1113,24 +1208,24 @@ export default function HomeScreen() {
                   hitSlop={6}
                 >
                   <Text style={profileMenu.forgotLinkText}>
-                    Forgot your nickname or password?
+                    Forgot your Player Name or password?
                   </Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
                   style={[
                     profileMenu.primaryBtn,
-                    (!loginNickname.trim() || !loginPassword.trim()) && profileMenu.primaryBtnDisabled,
+                    (!loginPlayerName.trim() || !loginPassword.trim()) && profileMenu.primaryBtnDisabled,
                   ]}
                   onPress={handleLogin}
-                  disabled={!loginNickname.trim() || !loginPassword.trim()}
+                  disabled={!loginPlayerName.trim() || !loginPassword.trim()}
                 >
                   <Text style={profileMenu.primaryBtnText}>Log in</Text>
                 </TouchableOpacity>
               </>
             )}
 
-            {/* ── Forgot password / nickname ──────────────── */}
+            {/* ── Forgot password / playerName ──────────────── */}
             {!isLoggedIn && profileMenuStep === 'forgot' && (
               <>
                 <TouchableOpacity
@@ -1143,7 +1238,7 @@ export default function HomeScreen() {
 
                 <Text style={profileMenu.title}>Recover account</Text>
                 <Text style={profileMenu.subtitle}>
-                  Enter your email and we&apos;ll send your nickname, a new password
+                  Enter your email and we&apos;ll send your Player Name, a new password
                   and an activation link.
                 </Text>
 
@@ -1208,7 +1303,7 @@ export default function HomeScreen() {
                       style={[
                         modal.inputText,
                         // Highlight medan email är aktivt steg (ej giltigt än)
-                        !regEmailValid && modal.nicknameInputActive,
+                        !regEmailValid && modal.playerNameInputActive,
                       ]}
                       placeholder="you@example.com"
                       placeholderTextColor={Colors.textDisabled}
@@ -1225,83 +1320,88 @@ export default function HomeScreen() {
                     </Text>
                   </View>
 
-                  {/* Nickname (låst tills email är giltig) */}
+                  {/* PlayerName (låst tills email är giltig) */}
                   <View
-                    style={[modal.fieldGroup, !regNicknameUnlocked && modal.fieldGroupLocked]}
-                    pointerEvents={regNicknameUnlocked ? 'auto' : 'none'}
+                    style={[modal.fieldGroup, !regPlayerNameUnlocked && modal.fieldGroupLocked]}
+                    pointerEvents={regPlayerNameUnlocked ? 'auto' : 'none'}
                   >
-                    <Text style={modal.fieldLabel}>Nickname</Text>
-                    <View style={modal.nicknameRow}>
+                    <Text style={modal.fieldLabel}>Player Name</Text>
+                    <View style={modal.playerNameRow}>
                       <TextInput
                         style={[
                           modal.inputText,
-                          modal.nicknameInput,
-                          regNicknameUnlocked && regNicknameStatus !== 'available' && modal.nicknameInputActive,
+                          modal.playerNameInput,
+                          regPlayerNameUnlocked && regPlayerNameStatus !== 'available' && modal.playerNameInputActive,
                         ]}
-                        placeholder="Pick a unique nickname"
+                        placeholder="Pick a unique Player Name"
                         placeholderTextColor={Colors.textDisabled}
-                        value={regNickname}
-                        onChangeText={handleRegNicknameChange}
-                        maxLength={15}
-                        editable={regNicknameStatus !== 'checking'}
+                        value={regPlayerName}
+                        onChangeText={handleRegPlayerNameChange}
+                        maxLength={20}
+                        editable={regPlayerNameStatus !== 'checking'}
                         returnKeyType="done"
-                        onSubmitEditing={handleRegCheckNickname}
+                        onSubmitEditing={handleRegCheckPlayerName}
                       />
                       <TouchableOpacity
-                        onPress={handleRegCheckNickname}
-                        disabled={!regNickname.trim() || regNicknameStatus === 'checking' || regNicknameStatus === 'available'}
+                        onPress={handleRegCheckPlayerName}
+                        disabled={!regPlayerName.trim() || regPlayerNameStatus === 'checking' || regPlayerNameStatus === 'available'}
                         style={[
                           modal.checkBtn,
-                          (!regNickname.trim() || regNicknameStatus === 'checking') && modal.checkBtnDisabled,
-                          regNicknameStatus === 'available' && modal.checkBtnDone,
+                          (!regPlayerName.trim() || regPlayerNameStatus === 'checking') && modal.checkBtnDisabled,
+                          regPlayerNameStatus === 'available' && modal.checkBtnDone,
                         ]}
                       >
                         <Text
                           style={[
                             modal.checkBtnText,
-                            regNicknameStatus === 'available' && modal.checkBtnTextDone,
+                            regPlayerNameStatus === 'available' && modal.checkBtnTextDone,
                           ]}
                         >
-                          {regNicknameStatus === 'checking' ? '…'
-                            : regNicknameStatus === 'available' ? '✓'
+                          {regPlayerNameStatus === 'checking' ? '…'
+                            : regPlayerNameStatus === 'available' ? '✓'
                             : 'Check'}
                         </Text>
                       </TouchableOpacity>
                     </View>
                     {/* När inget status-meddelande visas — visa max-längd-info */}
-                    {regNicknameStatus === 'idle' && (
+                    {regPlayerNameStatus === 'idle' && (
                       <Text style={modal.statusHint}>
-                        Max 15 characters · {regNickname.length}/15
+                        Max 20 characters · {regPlayerName.length}/20
                       </Text>
                     )}
-                    {regNicknameStatus === 'checking' && (
+                    {regPlayerNameStatus === 'checking' && (
                       <Text style={modal.statusHint}>Checking availability…</Text>
                     )}
-                    {regNicknameStatus === 'available' && (
+                    {regPlayerNameStatus === 'available' && (
                       <Text style={[modal.statusHint, modal.statusHintOk]}>
-                        ✓ Nickname is available
+                        ✓ Player Name is available
                       </Text>
                     )}
-                    {regNicknameStatus === 'taken' && (
+                    {regPlayerNameStatus === 'taken' && (
                       <Text style={[modal.statusHint, modal.statusHintError]}>
-                        ✗ Nickname already taken — try another
+                        ✗ Player Name already taken — try another
+                      </Text>
+                    )}
+                    {regPlayerNameStatus === 'invalid' && (
+                      <Text style={[modal.statusHint, modal.statusHintError]}>
+                        ✗ Player Name contains inappropriate language — try another
                       </Text>
                     )}
                   </View>
 
-                  {/* Password (låst tills nickname är validerat).
+                  {/* Password (låst tills playerName är validerat).
                       Användaren måste trycka Confirm för att låsa upp Year. */}
                   <View
                     style={[modal.fieldGroup, !regPasswordUnlocked && modal.fieldGroupLocked]}
                     pointerEvents={regPasswordUnlocked ? 'auto' : 'none'}
                   >
                     <Text style={modal.fieldLabel}>Password</Text>
-                    <View style={modal.nicknameRow}>
+                    <View style={modal.playerNameRow}>
                       <TextInput
                         style={[
                           modal.inputText,
-                          modal.nicknameInput,
-                          regPasswordUnlocked && !regPasswordConfirmed && modal.nicknameInputActive,
+                          modal.playerNameInput,
+                          regPasswordUnlocked && !regPasswordConfirmed && modal.playerNameInputActive,
                         ]}
                         placeholder="At least 4 characters"
                         placeholderTextColor={Colors.textDisabled}
@@ -1363,7 +1463,17 @@ export default function HomeScreen() {
                     </TouchableOpacity>
                   </View>
 
-                  {/* Skill level + Region scope side by side, drop-down pickers */}
+                  {/* Skill level + Region scope side by side, drop-down pickers.
+                      Default-värden ('intermediate'/'global') är förvalda så
+                      användaren kan registrera direkt efter year of birth. */}
+                  <Text
+                    style={[
+                      modal.statusHint,
+                      !regSkillUnlocked && modal.fieldGroupLocked,
+                    ]}
+                  >
+                    Use default or select prefered setup
+                  </Text>
                   <View style={modal.fieldRow}>
                     {/* Skill level (vänster halva) */}
                     <View
@@ -1372,27 +1482,15 @@ export default function HomeScreen() {
                     >
                       <Text style={modal.fieldLabel}>Skill Level</Text>
                       <TouchableOpacity
-                        style={[
-                          modal.yearTrigger,
-                          regSkillUnlocked && !regSkill && modal.yearTriggerActive,
-                        ]}
+                        style={modal.yearTrigger}
                         activeOpacity={0.7}
                         onPress={() => {
                           Keyboard.dismiss();
                           setRegSkillPickerOpen(true);
                         }}
                       >
-                        <Text
-                          style={[
-                            modal.yearTriggerText,
-                            !regSkill && modal.yearTriggerPlaceholder,
-                            regSkillUnlocked && !regSkill && modal.yearTriggerPlaceholderActive,
-                          ]}
-                          numberOfLines={1}
-                        >
-                          {regSkill
-                            ? GUEST_SKILL_OPTIONS.find((o) => o.id === regSkill)?.label
-                            : 'Select level'}
+                        <Text style={modal.yearTriggerText} numberOfLines={1}>
+                          {GUEST_SKILL_OPTIONS.find((o) => o.id === regSkill)?.label}
                         </Text>
                         <Text style={modal.yearTriggerArrow}>›</Text>
                       </TouchableOpacity>
@@ -1405,27 +1503,15 @@ export default function HomeScreen() {
                     >
                       <Text style={modal.fieldLabel}>Region Scope</Text>
                       <TouchableOpacity
-                        style={[
-                          modal.yearTrigger,
-                          regRegionUnlocked && !regRegion && modal.yearTriggerActive,
-                        ]}
+                        style={modal.yearTrigger}
                         activeOpacity={0.7}
                         onPress={() => {
                           Keyboard.dismiss();
                           setRegRegionPickerOpen(true);
                         }}
                       >
-                        <Text
-                          style={[
-                            modal.yearTriggerText,
-                            !regRegion && modal.yearTriggerPlaceholder,
-                            regRegionUnlocked && !regRegion && modal.yearTriggerPlaceholderActive,
-                          ]}
-                          numberOfLines={1}
-                        >
-                          {regRegion
-                            ? REG_REGION_OPTIONS.find((o) => o.id === regRegion)?.label
-                            : 'Select region'}
+                        <Text style={modal.yearTriggerText} numberOfLines={1}>
+                          {REG_REGION_OPTIONS.find((o) => o.id === regRegion)?.label}
                         </Text>
                         <Text style={modal.yearTriggerArrow}>›</Text>
                       </TouchableOpacity>
@@ -1717,15 +1803,15 @@ const modal = StyleSheet.create({
     paddingHorizontal: Spacing.xs,
   },
 
-  // Nickname-rad: input + Check-knapp inline
-  nicknameRow: {
+  // PlayerName-rad: input + Check-knapp inline
+  playerNameRow: {
     flexDirection: 'row',
     gap: Spacing.sm,
   },
-  nicknameInput: {
+  playerNameInput: {
     flex: 1,
   },
-  nicknameInputActive: {
+  playerNameInputActive: {
     borderColor: Colors.primary,
   },
   checkBtn: {
@@ -1755,7 +1841,7 @@ const modal = StyleSheet.create({
     fontSize: 18,
   },
 
-  // Status-rad under nickname
+  // Status-rad under playerName
   statusHint: {
     fontSize: 12,
     color: Colors.textSecondary,
@@ -1785,17 +1871,13 @@ const modal = StyleSheet.create({
     backgroundColor: Colors.primaryMuted,
     borderColor: Colors.primaryBorder,
   },
-  // "Nästa steg"-highlight medan inget skill-val gjorts
-  skillBtnHighlight: {
-    borderColor: Colors.primary,
-  },
   skillBtnText: {
     fontSize: 14,
     color: Colors.textSecondary,
     fontWeight: '500',
   },
   skillBtnTextActive: {
-    color: Colors.primary,
+    color: Colors.textPrimary,
     fontWeight: '700',
   },
 

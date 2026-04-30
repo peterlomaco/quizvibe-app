@@ -1,5 +1,6 @@
+import MultiSlider from '@ptomasroos/react-native-multi-slider';
 import { router, useFocusEffect } from 'expo-router';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
     Alert,
     FlatList,
@@ -15,11 +16,11 @@ import {
 import { Avatar } from '../components/Avatar';
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
-import { HCPShield } from '../components/HCPShield';
 import { PlayerHistorySection } from '../components/PlayerHistorySection';
+import { QuizVibeFriendsLogo } from '../components/QuizVibeFriendsLogo';
 import { TopUserBanner } from '../components/TopUserBanner';
 import { Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';
-import type { ProfileScreenProps } from '../types/navigation';
+import { resetIdentity, track } from '../utils/analytics';
 import { AVATARS, getAvatarEmojiById } from '../utils/avatars';
 import {
     addFriend,
@@ -28,6 +29,7 @@ import {
     type Friend,
 } from '../utils/friendsStorage';
 import {
+    clearProfile,
     loadProfile,
     saveProfile,
     type AvatarSource,
@@ -70,49 +72,100 @@ const REGION_OPTIONS: { id: Region; label: string }[] = [
   { id: 'global',  label: 'Global'  },
 ];
 
+// Hur länge spelarna har på sig att svara på en fråga (skiljer sig från
+// hur länge själva frågematerialet — låt/video/bild — spelas upp).
+type AnswerResponse = 15 | 30 | 45 | 60;
+const ANSWER_RESPONSE_OPTIONS: { id: AnswerResponse; label: string }[] = [
+  { id: 15, label: '15 seconds' },
+  { id: 30, label: '30 seconds' },
+  { id: 45, label: '45 seconds' },
+  { id: 60, label: '60 seconds' },
+];
+
+// Game era — år-spann för frågor. Speglar Lobby-skärmens slider men utan
+// player-clamping (Profile är default-setup, inga spelare i kontext).
+const ERA_MIN = 1900;
+const ERA_MAX = new Date().getFullYear();
+const ERA_SLIDER_WIDTH = 280;
+
+function DecadeMarks() {
+  const decades = Array.from(
+    { length: Math.floor((ERA_MAX - ERA_MIN) / 10) + 1 },
+    (_, i) => ERA_MIN + i * 10,
+  );
+  return (
+    <View style={{ width: ERA_SLIDER_WIDTH, height: 50, marginTop: 6 }}>
+      {decades.map((year) => {
+        const position = ((year - ERA_MIN) / (ERA_MAX - ERA_MIN)) * ERA_SLIDER_WIDTH;
+        return (
+          <View key={year} style={{ position: 'absolute', left: position, alignItems: 'center', width: 1 }}>
+            <View style={{ width: 1, height: 5, backgroundColor: Colors.borderStrong }} />
+            <View style={{ width: 30, height: 10, marginTop: 12, transform: [{ rotate: '90deg' }] }}>
+              <Text style={{ fontSize: 8, color: Colors.textSecondary, textAlign: 'center', width: 30 }}>
+                {year}
+              </Text>
+            </View>
+          </View>
+        );
+      })}
+    </View>
+  );
+}
+
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
-export default function ProfileScreen(_props: ProfileScreenProps) {
+export default function ProfileScreen() {
   const [source, setSource]               = useState<AvatarSource>('choose');
   const [category, setCategory]           = useState<AvatarCategory>('All');
   const [selectedAvatarId, setSelectedId] = useState<string>('5');
   const [isSaved, setIsSaved]             = useState(false);
   const [pickerOpen, setPickerOpen]       = useState(false);
-  const [nickname, setNickname]           = useState('Player One');
+  const [playerName, setPlayerName]           = useState('Player One');
   const [birthYear, setBirthYear]         = useState<number | null>(null);
   const [skill, setSkill]                 = useState<Skill | null>(null);
   const [region, setRegion]               = useState<Region | null>(null);
   const [gameCredits, setGameCredits]     = useState<number>(0);
   const [spotifyConnected, setSpotifyConnected] = useState<boolean>(false);
+  const [youtubeConnected, setYoutubeConnected] = useState<boolean>(false);
   const [friends, setFriends] = useState<Friend[]>([]);
   const [friendsModalOpen, setFriendsModalOpen] = useState(false);
-  const [newFriendNickname, setNewFriendNickname] = useState('');
+  const [newFriendPlayerName, setNewFriendPlayerName] = useState('');
+  const [answerResponseSeconds, setAnswerResponseSeconds] = useState<AnswerResponse>(30);
+  const [eraValues, setEraValues] = useState<[number, number]>([1980, 2010]);
   const [yearPickerOpen, setYearPickerOpen]     = useState(false);
   const [skillPickerOpen, setSkillPickerOpen]   = useState(false);
   const [regionPickerOpen, setRegionPickerOpen] = useState(false);
+  const [answerResponsePickerOpen, setAnswerResponsePickerOpen] = useState(false);
+  const [logoutModalVisible, setLogoutModalVisible] = useState(false);
+  // Game connections-blocket (Spotify + YouTube + Friends) kan kollapsas
+  // för att minska scrollning. Default expanded så användaren ser
+  // alternativen direkt vid första besöket.
+  const [gameConnectionsExpanded, setGameConnectionsExpanded] = useState(true);
+  // Profile default settings-blocket (avatar + playerName + setup + Save)
+  // — samma kollapsbara mönster som Game connections och Player history.
+  const [profileDefaultsExpanded, setProfileDefaultsExpanded] = useState(true);
 
-  // Ladda sparad profil från AsyncStorage vid mount
-  useEffect(() => {
-    loadProfile().then((data) => {
-      if (!data) return;
-      setNickname(data.nickname);
-      setBirthYear(data.birthYear);
-      setSkill(data.skill);
-      setRegion(data.region);
-      setSource(data.avatarSource);
-      setSelectedId(data.selectedAvatarId);
-      setGameCredits(data.gameCredits ?? 0);
-      setSpotifyConnected(data.spotifyConnected ?? false);
-    });
-  }, []);
-
-  // Refresh game credits varje gång Profile får fokus — t.ex. när användaren
-  // kommer tillbaka från Store efter att ha köpt Extra Games.
+  // Ladda sparad profil från AsyncStorage varje gång Profile får fokus.
+  // Detta täcker både mount och senare scenarier — t.ex. ny registrering
+  // på Home medan Profile redan ligger mountad i tab-navigatorn, eller
+  // återkomst från Store efter Extra Games-köp. useFocusEffect re-fyrar
+  // vid varje focus så hela kortet alltid speglar senaste profilen.
   useFocusEffect(
     useCallback(() => {
       let active = true;
       loadProfile().then((data) => {
-        if (active && data) setGameCredits(data.gameCredits ?? 0);
+        if (!active || !data) return;
+        setPlayerName(data.playerName);
+        setBirthYear(data.birthYear);
+        setSkill(data.skill);
+        setRegion(data.region);
+        setSource(data.avatarSource);
+        setSelectedId(data.selectedAvatarId);
+        setGameCredits(data.gameCredits ?? 0);
+        setSpotifyConnected(data.spotifyConnected ?? false);
+        setYoutubeConnected(data.youtubeConnected ?? false);
+        setAnswerResponseSeconds(data.answerResponseSeconds ?? 30);
+        setEraValues([data.gameEraFrom ?? 1980, data.gameEraTo ?? 2010]);
       });
       loadFriends().then((list) => {
         if (active) setFriends(list);
@@ -122,10 +175,10 @@ export default function ProfileScreen(_props: ProfileScreenProps) {
   );
 
   const handleAddFriend = async () => {
-    if (!newFriendNickname.trim()) return;
-    const updated = await addFriend(newFriendNickname);
+    if (!newFriendPlayerName.trim()) return;
+    const updated = await addFriend(newFriendPlayerName);
     setFriends(updated);
-    setNewFriendNickname('');
+    setNewFriendPlayerName('');
   };
 
   const handleRemoveFriend = async (id: string) => {
@@ -137,11 +190,14 @@ export default function ProfileScreen(_props: ProfileScreenProps) {
   const age = birthYear !== null ? CURRENT_YEAR - birthYear : null;
   const skillLabel  = SKILL_OPTIONS.find((s) => s.id === skill)?.label;
   const regionLabel = REGION_OPTIONS.find((r) => r.id === region)?.label;
+  const answerResponseLabel = ANSWER_RESPONSE_OPTIONS.find(
+    (o) => o.id === answerResponseSeconds,
+  )?.label;
 
   const handleSave = async () => {
     try {
       await saveProfile({
-        nickname,
+        playerName,
         birthYear,
         skill,
         region,
@@ -149,6 +205,10 @@ export default function ProfileScreen(_props: ProfileScreenProps) {
         selectedAvatarId,
         gameCredits,
         spotifyConnected,
+        youtubeConnected,
+        answerResponseSeconds,
+        gameEraFrom: eraValues[0],
+        gameEraTo: eraValues[1],
       });
       setIsSaved(true);
       setTimeout(() => setIsSaved(false), 2000);
@@ -170,7 +230,7 @@ export default function ProfileScreen(_props: ProfileScreenProps) {
     try {
       const data = await loadProfile();
       const next = {
-        nickname: data?.nickname ?? nickname,
+        playerName: data?.playerName ?? playerName,
         birthYear: data?.birthYear ?? birthYear,
         skill: data?.skill ?? skill,
         region: data?.region ?? region,
@@ -210,12 +270,66 @@ export default function ProfileScreen(_props: ProfileScreenProps) {
     );
   };
 
+  // Mock YouTube connect — speglar Spotify-mönstret. För riktig integration
+  // används YouTube Data API + OAuth via Google sign-in.
+  // TODO (auth): implementera riktig YouTube OAuth.
+  const handleConnectYoutube = async () => {
+    setYoutubeConnected(true);
+    try {
+      const data = await loadProfile();
+      if (data) {
+        await saveProfile({ ...data, youtubeConnected: true });
+      }
+    } catch {
+      // tyst — UI:t har redan uppdaterats
+    }
+  };
+
+  const handleDisconnectYoutube = () => {
+    Alert.alert(
+      'Disconnect YouTube?',
+      'You will lose the enhanced video experience during games.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Disconnect',
+          style: 'destructive',
+          onPress: async () => {
+            setYoutubeConnected(false);
+            try {
+              const data = await loadProfile();
+              if (data) {
+                await saveProfile({ ...data, youtubeConnected: false });
+              }
+            } catch {
+              // tyst
+            }
+          },
+        },
+      ],
+    );
+  };
+
+  // Logout-flow via TopUserBanner-pillen. Speglar Home-skärmens
+  // profileMenu (header med avatar+playerName+"Logged in"-status, röd
+  // Log out-knapp, Cancel) — samma visuella behandling så användaren
+  // får konsistent UX oavsett varifrån de loggar ut.
+  const handleConfirmLogout = async () => {
+    await clearProfile();
+    track('user_logged_out');
+    resetIdentity();
+    setLogoutModalVisible(false);
+    router.replace('/');
+  };
+
   return (
     <SafeAreaView style={styles.safe}>
-      {/* Top board (login status) — sticky utanför ScrollView. På Profile-
-          sidan är pillen icke-klickbar (ingen onPress) eftersom användaren
-          redan är på sin profilsida. */}
-      <TopUserBanner />
+      {/* Top board (login status) — sticky utanför ScrollView. Klick på
+          pillen öppnar logout-modalen (samma visuella sheet som Home-
+          skärmens profileMenu). Bannern self-loadar profil via
+          useFocusEffect så den uppdateras när vi navigerar tillbaka efter
+          login/edit på andra skärmar. */}
+      <TopUserBanner onPress={() => setLogoutModalVisible(true)} />
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.content}
@@ -225,7 +339,7 @@ export default function ProfileScreen(_props: ProfileScreenProps) {
         <View style={styles.header}>
           <View style={styles.headerLeft}>
             <Text style={styles.screenTitle}>Profile</Text>
-            <Text style={styles.screenSubtitle}>Define your setup</Text>
+            <Text style={styles.screenSubtitle}>QuizVibe settings</Text>
           </View>
           <Pressable
             style={({ pressed }) => [
@@ -236,21 +350,41 @@ export default function ProfileScreen(_props: ProfileScreenProps) {
           >
             <Text style={styles.creditsLabel}>Game credits</Text>
             <View style={styles.creditsValueRow}>
-              <Text style={styles.creditsIcon}>🎟️</Text>
+              <Text style={styles.creditsIcon}>🎯</Text>
               <Text style={styles.creditsValue}>{gameCredits}</Text>
               <Text style={styles.creditsArrow}>›</Text>
             </View>
           </Pressable>
         </View>
 
-        {/* ── Profile card: avatar + nickname (vänster), competition setup (höger), Save längst ner */}
-        {/* TODO (backend): Nickname måste vara unikt i Quizvibe — lägg till
+        {/* ── Profile default settings (kollapsbar gruppering) ─── */}
+        <Pressable
+          onPress={() => setProfileDefaultsExpanded(!profileDefaultsExpanded)}
+          style={({ pressed }) => [
+            styles.gameConnectionsHeaderRow,
+            pressed && { opacity: 0.7 },
+          ]}
+          hitSlop={8}
+        >
+          <Text style={styles.gameConnectionsHeader}>Profile default settings</Text>
+          <View style={styles.gameConnectionsToggleBox}>
+            <Text style={styles.gameConnectionsChevron}>
+              {profileDefaultsExpanded ? '−' : '+'}
+            </Text>
+          </View>
+        </Pressable>
+        {!profileDefaultsExpanded && <View style={styles.sectionDivider} />}
+
+        {profileDefaultsExpanded && (
+        <>
+        {/* ── Profile card: avatar + playerName (vänster), competition setup (höger), Save längst ner */}
+        {/* TODO (backend): PlayerName måste vara unikt i Quizvibe — lägg till
             en check mot backend när användaren sparar (eller on-blur), så att
-            samma nickname inte kan registreras av flera profiler. Används
+            samma playerName inte kan registreras av flera profiler. Används
             senare för vän-sökning. */}
         <View style={styles.preview}>
           <View style={styles.columnsRow}>
-          {/* Vänsterkolumn: avatar + nickname under */}
+          {/* Vänsterkolumn: avatar + playerName under */}
           <View style={styles.leftColumn}>
             <Pressable
               onPress={() => setPickerOpen(true)}
@@ -268,28 +402,17 @@ export default function ProfileScreen(_props: ProfileScreenProps) {
               </View>
             </Pressable>
 
-            <TextInput
-              value={nickname}
-              onChangeText={setNickname}
-              maxLength={20}
-              placeholder="Nickname"
-              placeholderTextColor={Colors.textDisabled}
-              style={styles.nicknameInput}
-              returnKeyType="done"
-              textAlign="center"
-            />
-
-            {/* HCP-sköld – visuell indikator för spelarens ranking.
-                TODO (Fas 6): Värdet ska beräknas dynamiskt från spelade
-                rundor + skill-golv (Easy=66, Intermediate=33, Expert=1).
-                Just nu är 99 hårdkodat (standardvärde för ny spelare). */}
-            <HCPShield hcp={99} size={96} />
+            {/* Player Name är read-only i profil-kortet — sätts vid
+                registrering och kan inte redigeras härifrån. */}
+            <Text style={styles.playerNameDisplay} numberOfLines={1}>
+              {playerName}
+            </Text>
           </View>
 
           {/* Högerkolumn: competition setup */}
           <View style={styles.rightColumn}>
             <Text style={styles.setupHeader}>
-              Define competition default setup
+              User default settings
             </Text>
 
             {/* Competition Year of birth */}
@@ -314,19 +437,19 @@ export default function ProfileScreen(_props: ProfileScreenProps) {
               </Pressable>
             </View>
 
-            {/* Competition Age (auto-beräknad, icke-tappbar) */}
-            <View style={styles.field}>
+            {/* Competition Age (auto-beräknad, icke-tappbar). Värdet
+                visas inline till höger om labeln så raden inte tar mer
+                vertikal yta än gap-en till intilliggande fält. */}
+            <View style={styles.ageRow}>
               <Text style={styles.fieldLabel}>Competition Age</Text>
-              <View style={styles.readonlyValue}>
-                <Text
-                  style={[
-                    styles.selectorText,
-                    age === null && styles.selectorPlaceholder,
-                  ]}
-                >
-                  {age ?? '—'}
-                </Text>
-              </View>
+              <Text
+                style={[
+                  styles.ageValue,
+                  age === null && styles.selectorPlaceholder,
+                ]}
+              >
+                {age ?? '—'}
+              </Text>
             </View>
 
             {/* Skill level */}
@@ -351,9 +474,22 @@ export default function ProfileScreen(_props: ProfileScreenProps) {
               </Pressable>
             </View>
 
-            {/* Region */}
-            <View style={styles.field}>
-              <Text style={styles.fieldLabel}>Region</Text>
+          </View>
+          </View>
+
+          {/* ── Region scope (full kort-bredd, eget block) ───────
+              Sub-rubrik centrerad över hela kort-bredden så det blir
+              tydlig visuell separering mellan player-defaults (Year of
+              birth + Skill level i kolumnen ovan) och host-specifika
+              defaults (Region scope). */}
+          <Text style={styles.setupHeaderFullWidth}>
+            Host default settings
+          </Text>
+          {/* Region scope + Answer response — sida vid sida, halv bredd
+              vardera. */}
+          <View style={styles.fieldRow}>
+            <View style={[styles.field, styles.fieldHalf]}>
+              <Text style={styles.fieldLabel}>Region scope</Text>
               <Pressable
                 onPress={() => setRegionPickerOpen(true)}
                 style={({ pressed }) => [
@@ -366,13 +502,65 @@ export default function ProfileScreen(_props: ProfileScreenProps) {
                     styles.selectorText,
                     region === null && styles.selectorPlaceholder,
                   ]}
+                  numberOfLines={1}
                 >
                   {regionLabel ?? 'Select'}
                 </Text>
                 <Text style={styles.selectorChevron}>›</Text>
               </Pressable>
             </View>
+
+            {/* Answer response — hur lång tid spelarna har på sig att svara
+                på en fråga. Skiljer sig från hur länge själva frågematerialet
+                (låt/video/bild) spelas upp. */}
+            <View style={[styles.field, styles.fieldHalf]}>
+              <Text style={styles.fieldLabel}>Answer response time</Text>
+              <Pressable
+                onPress={() => setAnswerResponsePickerOpen(true)}
+                style={({ pressed }) => [
+                  styles.selector,
+                  pressed && styles.selectorPressed,
+                ]}
+              >
+                <Text style={styles.selectorText} numberOfLines={1}>
+                  {answerResponseLabel}
+                </Text>
+                <Text style={styles.selectorChevron}>›</Text>
+              </Pressable>
+            </View>
           </View>
+
+          {/* Game era — adjustable år-spann för frågor (samma slider-mönster
+              som Lobbyns Game Era). */}
+          <View style={styles.field}>
+            <Text style={styles.fieldLabel}>Game era</Text>
+            <View style={styles.eraDisplay}>
+              <Text style={styles.eraDisplayYear}>{eraValues[0]}</Text>
+              <Text style={styles.eraDisplayDash}>–</Text>
+              <Text style={styles.eraDisplayYear}>{eraValues[1]}</Text>
+            </View>
+            <View style={{ alignItems: 'center' }}>
+              <MultiSlider
+                values={eraValues}
+                min={ERA_MIN}
+                max={ERA_MAX}
+                step={1}
+                onValuesChange={(vals) => setEraValues([vals[0], vals[1]])}
+                selectedStyle={{ backgroundColor: Colors.primary }}
+                unselectedStyle={{ backgroundColor: Colors.border }}
+                markerStyle={{
+                  backgroundColor: Colors.primary,
+                  borderColor: Colors.background,
+                  borderWidth: 2,
+                  width: 22,
+                  height: 22,
+                }}
+                trackStyle={{ height: 4, borderRadius: 2 }}
+                containerStyle={{ alignSelf: 'center' }}
+                sliderLength={ERA_SLIDER_WIDTH}
+              />
+              <DecadeMarks />
+            </View>
           </View>
 
           {/* ── Save (inuti kortet) ─────────────────────────────── */}
@@ -382,9 +570,31 @@ export default function ProfileScreen(_props: ProfileScreenProps) {
             variant={isSaved ? 'secondary' : 'primary'}
           />
         </View>
+        </>
+        )}
 
-        {/* ── Spotify-koppling ──────────────────────────────────── */}
-        {/* Viktig integration: tillåter ad-free playback under quiz-rundor. */}
+        {/* ── Game connections (kollapsbar gruppering) ─────────── */}
+        <Pressable
+          onPress={() => setGameConnectionsExpanded(!gameConnectionsExpanded)}
+          style={({ pressed }) => [
+            styles.gameConnectionsHeaderRow,
+            pressed && { opacity: 0.7 },
+          ]}
+          hitSlop={8}
+        >
+          <Text style={styles.gameConnectionsHeader}>Game connections</Text>
+          <View style={styles.gameConnectionsToggleBox}>
+            <Text style={styles.gameConnectionsChevron}>
+              {gameConnectionsExpanded ? '−' : '+'}
+            </Text>
+          </View>
+        </Pressable>
+        {!gameConnectionsExpanded && <View style={styles.sectionDivider} />}
+
+        {gameConnectionsExpanded && (
+          <>
+        {/* Spotify-koppling: tillåter ad-free playback under quiz-rundor
+            och låser upp Spotify-källan i Lobbyns Game connections-blocket. */}
         <View style={styles.spotifyCard}>
           <View style={styles.spotifyHeader}>
             <View style={styles.spotifyIconWrap}>
@@ -397,7 +607,7 @@ export default function ProfileScreen(_props: ProfileScreenProps) {
               <Text style={styles.spotifySubtitle}>
                 {spotifyConnected
                   ? 'Songs play full-length with no Spotify ads.'
-                  : 'Play full songs ad-free during game rounds.'}
+                  : 'Pre-requisite to access Spotify when Game mode / Individual devices are activated.'}
               </Text>
             </View>
             {spotifyConnected && <Text style={styles.spotifyCheck}>✓</Text>}
@@ -415,25 +625,65 @@ export default function ProfileScreen(_props: ProfileScreenProps) {
               styles.spotifyBtnText,
               spotifyConnected && styles.spotifyBtnTextDisconnect,
             ]}>
-              {spotifyConnected ? 'Disconnect' : 'Connect Spotify'}
+              {spotifyConnected ? 'Disconnect' : 'Connect Spotify account'}
+            </Text>
+          </Pressable>
+        </View>
+
+        {/* ── YouTube-koppling ──────────────────────────────────── */}
+        {/* Speglar Spotify-kortets layout. Loggan är samma röda
+            rectangle-with-arrow-mönster som i Lobbyns Game Connections,
+            uppskalad till 44x44 så den matchar Spotify-ikonen här. */}
+        <View style={styles.youtubeCard}>
+          <View style={styles.spotifyHeader}>
+            <View style={styles.youtubeIconWrap}>
+              <View style={styles.youtubeIconRect}>
+                <View style={styles.youtubeIconArrow} />
+              </View>
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.spotifyTitle}>
+                {youtubeConnected ? 'YouTube connected' : 'Connect your YouTube account'}
+              </Text>
+              <Text style={styles.spotifySubtitle}>
+                {youtubeConnected
+                  ? 'Enhanced video playback during games.'
+                  : 'For better experience during game.'}
+              </Text>
+            </View>
+            {youtubeConnected && <Text style={styles.youtubeCheck}>✓</Text>}
+          </View>
+
+          <Pressable
+            onPress={youtubeConnected ? handleDisconnectYoutube : handleConnectYoutube}
+            style={({ pressed }) => [
+              styles.spotifyBtn,
+              youtubeConnected ? styles.youtubeBtnDisconnect : styles.youtubeBtnConnect,
+              pressed && { opacity: 0.85 },
+            ]}
+          >
+            <Text style={[
+              styles.spotifyBtnText,
+              youtubeConnected && styles.youtubeBtnTextDisconnect,
+            ]}>
+              {youtubeConnected ? 'Disconnect' : 'Connect YouTube account'}
             </Text>
           </Pressable>
         </View>
 
         {/* ── QuizVibe friends ─────────────────────────────────── */}
-        {/* Sparade nicknames används senare för direktinbjudningar via
+        {/* Sparade playerNames används senare för direktinbjudningar via
             Lobby's Share invite (visas hos vänner i Join Waiting Invites). */}
         <View style={styles.friendsCard}>
           <View style={styles.friendsHeader}>
             <View style={styles.friendsIconWrap}>
-              <Text style={styles.friendsIcon}>👥</Text>
+              <QuizVibeFriendsLogo size={48} />
             </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.friendsTitle}>QuizVibe friends</Text>
               <Text style={styles.friendsSubtitle}>
-                {friends.length === 0
-                  ? 'Add friends to invite them in one tap.'
-                  : `${friends.length} ${friends.length === 1 ? 'friend' : 'friends'} saved`}
+                Share game invitations easier to friends and follow
+                each other progression.
               </Text>
             </View>
             <View style={styles.friendsCount}>
@@ -451,6 +701,8 @@ export default function ProfileScreen(_props: ProfileScreenProps) {
             <Text style={styles.friendsBtnText}>+ Add QuizVibe Friends</Text>
           </Pressable>
         </View>
+          </>
+        )}
 
         {/* ── Player history (mockdata tills backend finns) ──────── */}
         <PlayerHistorySection />
@@ -492,27 +744,27 @@ export default function ProfileScreen(_props: ProfileScreenProps) {
             <View style={friendsModal.handle} />
             <Text style={friendsModal.title}>QuizVibe friends</Text>
             <Text style={friendsModal.subtitle}>
-              Save nicknames to invite friends with one tap from Lobby.
+              Save Player Names to invite friends with one tap from Lobby.
             </Text>
 
             {/* Add friend row */}
             <View style={friendsModal.addRow}>
               <TextInput
                 style={friendsModal.addInput}
-                placeholder="Add by nickname"
+                placeholder="Add by Player Name"
                 placeholderTextColor={Colors.textDisabled}
-                value={newFriendNickname}
-                onChangeText={setNewFriendNickname}
+                value={newFriendPlayerName}
+                onChangeText={setNewFriendPlayerName}
                 maxLength={20}
                 returnKeyType="done"
                 onSubmitEditing={handleAddFriend}
               />
               <Pressable
                 onPress={handleAddFriend}
-                disabled={!newFriendNickname.trim()}
+                disabled={!newFriendPlayerName.trim()}
                 style={({ pressed }) => [
                   friendsModal.addBtn,
-                  !newFriendNickname.trim() && friendsModal.addBtnDisabled,
+                  !newFriendPlayerName.trim() && friendsModal.addBtnDisabled,
                   pressed && { opacity: 0.85 },
                 ]}
               >
@@ -527,7 +779,7 @@ export default function ProfileScreen(_props: ProfileScreenProps) {
                   <Text style={friendsModal.emptyIcon}>🫥</Text>
                   <Text style={friendsModal.emptyText}>No friends yet</Text>
                   <Text style={friendsModal.emptySubtext}>
-                    Add a nickname above to start your list.
+                    Add a Player Name above to start your list.
                   </Text>
                 </View>
               ) : (
@@ -537,7 +789,7 @@ export default function ProfileScreen(_props: ProfileScreenProps) {
                       <Text style={friendsModal.friendEmoji}>
                         {getAvatarEmojiById(friend.avatarId)}
                       </Text>
-                      <Text style={friendsModal.friendName}>{friend.nickname}</Text>
+                      <Text style={friendsModal.friendName}>{friend.playerName}</Text>
                       <Pressable
                         onPress={() => handleRemoveFriend(friend.id)}
                         hitSlop={10}
@@ -744,6 +996,111 @@ export default function ProfileScreen(_props: ProfileScreenProps) {
           </Pressable>
         </Pressable>
       </Modal>
+
+      {/* ── Answer response picker modal ─────────────────────────── */}
+      <Modal
+        visible={answerResponsePickerOpen}
+        animationType="fade"
+        transparent
+        onRequestClose={() => setAnswerResponsePickerOpen(false)}
+      >
+        <Pressable
+          style={styles.pickerBackdrop}
+          onPress={() => setAnswerResponsePickerOpen(false)}
+        >
+          <Pressable style={styles.pickerCardShort} onPress={() => {}}>
+            <View style={styles.pickerHeader}>
+              <Text style={styles.pickerTitle}>Answer response time</Text>
+              <Pressable
+                onPress={() => setAnswerResponsePickerOpen(false)}
+                style={({ pressed }) => [
+                  styles.modalClose,
+                  pressed && { opacity: 0.6 },
+                ]}
+                hitSlop={10}
+              >
+                <Text style={styles.modalCloseText}>✕</Text>
+              </Pressable>
+            </View>
+            {ANSWER_RESPONSE_OPTIONS.map((opt) => {
+              const isSelected = answerResponseSeconds === opt.id;
+              return (
+                <Pressable
+                  key={opt.id}
+                  onPress={() => {
+                    setAnswerResponseSeconds(opt.id);
+                    setAnswerResponsePickerOpen(false);
+                  }}
+                  style={({ pressed }) => [
+                    styles.optionRow,
+                    isSelected && styles.optionRowSelected,
+                    pressed && styles.optionRowPressed,
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.optionText,
+                      isSelected && styles.optionTextSelected,
+                    ]}
+                  >
+                    {opt.label}
+                  </Text>
+                  {isSelected && <Text style={styles.optionCheck}>✓</Text>}
+                </Pressable>
+              );
+            })}
+          </Pressable>
+        </Pressable>
+      </Modal>
+
+      {/* ── Logout-modal ──────────────────────────────────────────
+          Bottom-sheet med samma layout som Home-skärmens profileMenu
+          för logged-in-läget (avatar + Player Name + "Logged in"-status,
+          röd Log out-knapp, Cancel). Användaren får konsistent UX
+          oavsett varifrån de väljer att logga ut. */}
+      <Modal
+        visible={logoutModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setLogoutModalVisible(false)}
+      >
+        <View style={styles.logoutOverlay}>
+          <Pressable
+            style={styles.logoutBackdrop}
+            onPress={() => setLogoutModalVisible(false)}
+          />
+          <View style={styles.logoutSheet}>
+            <View style={styles.logoutHeader}>
+              <Text style={styles.logoutHeaderEmoji}>
+                {getAvatarEmojiById(selectedAvatarId)}
+              </Text>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.logoutHeaderName}>
+                  {playerName.trim() || 'Signed in'}
+                </Text>
+                <Text style={styles.logoutHeaderStatus}>Logged in</Text>
+              </View>
+            </View>
+
+            <Pressable
+              style={({ pressed }) => [
+                styles.logoutBtn,
+                pressed && { opacity: 0.85 },
+              ]}
+              onPress={handleConfirmLogout}
+            >
+              <Text style={styles.logoutBtnText}>Log out</Text>
+            </Pressable>
+
+            <Pressable
+              style={styles.logoutCancelBtn}
+              onPress={() => setLogoutModalVisible(false)}
+            >
+              <Text style={styles.logoutCancelText}>Cancel</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -891,6 +1248,72 @@ function SourceRow({
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
+  // ── Logout-modal (speglar profileMenu från app/(tabs)/index.tsx
+  //     för konsistent UX när man loggar ut från Profile-pillen) ───
+  logoutOverlay: { flex: 1, justifyContent: 'flex-end' },
+  logoutBackdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  logoutSheet: {
+    backgroundColor: Colors.card,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    padding: Spacing.xl,
+    paddingBottom: Spacing.xxl,
+    gap: Spacing.md,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  logoutHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.md,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.sm,
+    backgroundColor: Colors.background,
+    borderRadius: Radius.md,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  logoutHeaderEmoji: {
+    fontSize: 28,
+    width: 40,
+    textAlign: 'center',
+  },
+  logoutHeaderName: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: Colors.textPrimary,
+  },
+  logoutHeaderStatus: {
+    fontSize: 12,
+    color: Colors.success,
+    marginTop: 2,
+  },
+  logoutBtn: {
+    height: 52,
+    borderRadius: Radius.md,
+    backgroundColor: 'rgba(255,107,107,0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,107,107,0.4)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logoutBtnText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.error,
+  },
+  logoutCancelBtn: {
+    alignItems: 'center',
+    paddingVertical: Spacing.sm,
+  },
+  logoutCancelText: {
+    fontSize: 14,
+    color: Colors.textSecondary,
+  },
+
   safe: { flex: 1, backgroundColor: Colors.background },
   scroll: { flex: 1 },
   content: {
@@ -943,6 +1366,51 @@ const styles = StyleSheet.create({
   },
   creditsArrow: { fontSize: 16, color: Colors.primary, marginLeft: 2 },
 
+  // Sektionsrubrik ovan Game connections-blocket. Rad-layout med
+  // chevron till höger så användaren ser att blocket är kollapsbart.
+  // Samma visuella vikt som "Player history"-rubriken i
+  // PlayerHistorySection för konsistent hierarki mellan
+  // ProfileScreen-sektionerna.
+  // Header-rad för Game connections-blocket. +/−-tecknet sitter
+  // tätt intill rubriken (inte högerjusterat) — radens children
+  // grupperas vänster med en liten gap.
+  gameConnectionsHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    marginTop: Spacing.sm,
+    marginBottom: -Spacing.sm,
+  },
+  gameConnectionsHeader: {
+    ...Typography.title,
+    color: Colors.textPrimary,
+    fontWeight: FontWeight.bold,
+  },
+  // Liten box runt +/−-tecknet så det får en tydlig "knapp"-känsla
+  // intill rubriken.
+  gameConnectionsToggleBox: {
+    width: 26,
+    height: 26,
+    borderRadius: Radius.sm,
+    borderWidth: 1,
+    borderColor: Colors.borderStrong,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  gameConnectionsChevron: {
+    fontSize: 18,
+    fontWeight: FontWeight.bold,
+    color: Colors.textSecondary,
+    lineHeight: 20,
+  },
+  // Tunn linje som visas under sektion-rubrikerna när de är kollapsade
+  // — ger visuell separation mellan stack:ade rubriker. Renderas inte
+  // i expanded state eftersom innehålls-korten ger separation där.
+  sectionDivider: {
+    height: 1,
+    backgroundColor: Colors.border,
+  },
+
   // Spotify connect-card (viktig integration — Spotify-grön accent)
   spotifyCard: {
     backgroundColor: 'rgba(29,185,84,0.08)',
@@ -954,7 +1422,7 @@ const styles = StyleSheet.create({
   },
   spotifyHeader: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     gap: Spacing.md,
   },
   spotifyIconWrap: {
@@ -1006,30 +1474,86 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
   },
 
+  // YouTube connect-card (speglar Spotify-mönstret — YouTube-röd accent).
+  youtubeCard: {
+    backgroundColor: 'rgba(255,0,0,0.06)',
+    borderRadius: Radius.lg,
+    borderWidth: 1.5,
+    borderColor: '#FF0000',
+    padding: Spacing.lg,
+    gap: Spacing.md,
+  },
+  // 44x44 vit cirkel som matchar Spotify-ikonens storlek på Profile-sidan
+  // (samma logo-mönster som Lobbyns YouTube-rad fast uppskalat).
+  youtubeIconWrap: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  youtubeIconRect: {
+    width: 28,
+    height: 20,
+    borderRadius: 5,
+    backgroundColor: '#FF0000',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  youtubeIconArrow: {
+    width: 0,
+    height: 0,
+    borderLeftWidth: 8,
+    borderTopWidth: 5.5,
+    borderBottomWidth: 5.5,
+    borderLeftColor: '#FFFFFF',
+    borderTopColor: 'transparent',
+    borderBottomColor: 'transparent',
+    marginLeft: 1.5,
+  },
+  youtubeCheck: {
+    fontSize: 22,
+    color: '#FF0000',
+    fontWeight: FontWeight.bold,
+  },
+  youtubeBtnConnect: {
+    backgroundColor: '#FF0000',
+  },
+  youtubeBtnDisconnect: {
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: Colors.borderStrong,
+  },
+  youtubeBtnTextDisconnect: {
+    color: Colors.textSecondary,
+  },
+
   // QuizVibe friends card (samma struktur som Spotify-kortet:
   // header upptill, full-bredd-knapp i underkant)
   friendsCard: {
     backgroundColor: Colors.card,
     borderRadius: Radius.lg,
-    borderWidth: 1,
-    borderColor: Colors.border,
+    borderWidth: 1.5,
+    borderColor: Colors.primary,
     padding: Spacing.lg,
     gap: Spacing.md,
   },
   friendsHeader: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     gap: Spacing.md,
   },
+  // Wrapper för QuizVibeFriendsLogo. Bredden matchar Spotify/YouTube-
+  // icon-wrapsen (44) så text-blocket börjar på samma x; SVG:n får
+  // rendera lite större (52) och tillåts overflow:a wrapper-bounds så
+  // ikonen visuellt blir större utan att skjuta titeln längre höger.
   friendsIconWrap: {
     width: 44,
     height: 44,
-    borderRadius: 22,
-    backgroundColor: Colors.cardElevated,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  friendsIcon: { fontSize: 22 },
   friendsTitle: {
     fontSize: FontSize.md,
     fontWeight: FontWeight.bold,
@@ -1058,10 +1582,15 @@ const styles = StyleSheet.create({
     color: Colors.primary,
     fontVariant: ['tabular-nums'],
   },
+  // Friends-knappen använder samma färgpalett som TopBanner-pillen och
+  // Game era year-display — primaryMuted bg + primaryBorder + primary
+  // text. Det ger en mörkblå-tonad yta istället för solid bright blue.
   friendsBtn: {
     height: 44,
     borderRadius: Radius.md,
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.primaryMuted,
+    borderWidth: 1,
+    borderColor: Colors.primaryBorder,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -1081,18 +1610,21 @@ const styles = StyleSheet.create({
     padding: Spacing.lg,
     gap: Spacing.lg,
   },
-  // Inre rad som håller vänster- och högerkolumnen sida vid sida
+  // Inre rad som håller vänster- och högerkolumnen sida vid sida.
+  // alignItems: 'center' centrerar avatar+playerName-kolumnen vertikalt
+  // i förhållande till den högre högerkolumnen.
   columnsRow: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     gap: Spacing.lg,
   },
 
-  // Left column: avatar + nickname under
+  // Left column: avatar + playerName under
   leftColumn: {
     alignItems: 'center',
+    justifyContent: 'center',
     gap: Spacing.md,
-    width: 104,
+    width: 140,
   },
   avatarButton: {
     width: 96,
@@ -1116,12 +1648,11 @@ const styles = StyleSheet.create({
     color: Colors.primary,
     letterSpacing: 0.3,
   },
-  nicknameInput: {
+  playerNameDisplay: {
     fontSize: FontSize.md,
     fontWeight: FontWeight.semibold,
     color: Colors.textPrimary,
-    padding: 0,
-    margin: 0,
+    textAlign: 'center',
     width: '100%',
   },
 
@@ -1136,8 +1667,61 @@ const styles = StyleSheet.create({
     color: Colors.textPrimary,
     marginBottom: Spacing.xs,
   },
+  // Sub-rubrik som spänner hela kort-bredden (placeras utanför
+  // columnsRow). Vänsterställd för att linjera med fältens labels nedanför.
+  setupHeaderFullWidth: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.semibold,
+    color: Colors.textPrimary,
+    textAlign: 'left',
+    marginTop: Spacing.md,
+    marginBottom: Spacing.xs,
+  },
   field: {
     gap: 4,
+  },
+  // Competition Age — inline-rad: label vänster, värde direkt till
+  // höger om labeln (liten gap istället för space-between så siffran
+  // sitter nära texten). Höjden matchar standard-fält så vertikalt
+  // avstånd till Year of birth/Skill level blir lika via rightColumn:s gap.
+  ageRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
+  ageValue: {
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.semibold,
+    color: Colors.textPrimary,
+    fontVariant: ['tabular-nums'],
+  },
+  // Rad för två side-by-side fält (Region scope + Answer response)
+  fieldRow: {
+    flexDirection: 'row',
+    gap: Spacing.md,
+  },
+  fieldHalf: {
+    flex: 1,
+  },
+  // Game era display + slider styling (matchar Lobby-skärmens mönster)
+  eraDisplay: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: Spacing.md,
+    marginTop: Spacing.xs,
+    marginBottom: Spacing.sm,
+  },
+  eraDisplayYear: {
+    fontSize: 28,
+    fontWeight: FontWeight.bold,
+    color: Colors.primary,
+    fontVariant: ['tabular-nums'],
+  },
+  eraDisplayDash: {
+    fontSize: 22,
+    fontWeight: '300',
+    color: Colors.textSecondary,
   },
   fieldLabel: {
     fontSize: 10,

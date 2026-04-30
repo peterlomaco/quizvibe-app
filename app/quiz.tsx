@@ -10,6 +10,7 @@ import {
 } from '@/src/components/RoundLeaderboard';
 import type { LobbyPlayer } from '@/src/screens/LobbyScreen';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '@/src/theme';
+import { track } from '@/src/utils/analytics';
 import { saveLatestResult, type GameResult, type RoundResult } from '@/src/utils/gameResults';
 import { clearPendingLobbyPlayers, savePendingLobbyPlayers } from '@/src/utils/pendingLobby';
 import { generateRoomCode } from '@/src/utils/roomCode';
@@ -472,6 +473,14 @@ export default function QuizScreen() {
   );
   const [playerHcpChanges, setPlayerHcpChanges] = useState<Record<string, HcpChange>>({});
 
+  // Spel-start: trackas en gång när QuizScreen mountas (router pushar
+  // hit från Lobby:s "Start Game"-flöde). Region/land sätts av
+  // analytics-vendor:n på dashboard-sidan, behöver inte skickas här.
+  useEffect(() => {
+    track('game_started', { skill });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // "YOU"-spelare (hostar spelet; använder params.skill/age)
   const youPlayer: LeaderboardPlayer = useMemo(
     () => ({
@@ -667,6 +676,11 @@ export default function QuizScreen() {
 
       setPlayerHcpChanges(changes);
       saveFinalGame();
+      track('game_completed', {
+        skill,
+        total_points: totalPoints,
+        rounds_played: rounds.length,
+      });
     }
   }, [phase, isLastQuestion]);
 

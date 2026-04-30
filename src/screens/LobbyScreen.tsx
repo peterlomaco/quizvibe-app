@@ -79,7 +79,7 @@ function mergeProfileIntoHost(existing: LobbyPlayer, profile: ProfileData): Lobb
   const hcpComplete = !!(profile.skill && age !== undefined);
   return {
     ...existing,
-    name: profile.nickname?.trim() || existing.name,
+    name: profile.playerName?.trim() || existing.name,
     emoji: getAvatarEmojiById(profile.selectedAvatarId),
     age,
     skill: profile.skill ?? undefined,
@@ -264,12 +264,12 @@ function AddPlayerModal({ visible, onClose, onAdd }: {
           <Text style={modal.title}>Add Player</Text>
           <Text style={modal.subtitle}>For local guests playing on this phone</Text>
 
-          {/* Nickname */}
+          {/* PlayerName */}
           <View style={modal.fieldGroup}>
-            <Text style={modal.fieldLabel}>Nickname</Text>
+            <Text style={modal.fieldLabel}>Player Name</Text>
             <TextInput
               style={modal.input}
-              placeholder="Pick a nickname"
+              placeholder="Pick a Player Name"
               placeholderTextColor={Colors.textDisabled}
               value={name}
               onChangeText={setName}
@@ -462,7 +462,7 @@ export default function LobbyScreen() {
         const hcpComplete = !!(skill && age !== undefined);
         const joiner: LobbyPlayer = {
           id: `joiner-${Date.now()}`,
-          name: profile?.nickname?.trim() || 'You',
+          name: profile?.playerName?.trim() || 'You',
           emoji: profile ? getAvatarEmojiById(profile.selectedAvatarId) : '👤',
           isReady: hcpComplete,
           type: profile ? 'registered' : 'guest',
@@ -486,7 +486,7 @@ export default function LobbyScreen() {
 
   // Varje gång Lobby får fokus (t.ex. man kommer tillbaka från Profile-tabben):
   // ladda sparad profil och uppdatera host-spelarkortet med profilens värden.
-  // Detta gör att ändringar i Profile (nickname, ålder, skill, avatar) slår
+  // Detta gör att ändringar i Profile (playerName, ålder, skill, avatar) slår
   // igenom direkt på host-kortet i Lobby.
   useFocusEffect(
     useCallback(() => {
@@ -678,13 +678,13 @@ export default function LobbyScreen() {
   };
 
   // Skickar invite in-app till en vän — sparas i deras Waiting Invites.
-  // Använder hostens profil-nickname/avatar som "from"-data.
+  // Använder hostens profil-playerName/avatar som "from"-data.
   const handleInviteFriend = async (friend: Friend) => {
     const profile = await loadProfile();
-    const fromNickname = profile?.nickname?.trim() || 'Host';
+    const fromPlayerName = profile?.playerName?.trim() || 'Host';
     await addInvite({
       roomCode,
-      fromNickname,
+      fromPlayerName,
       fromAvatarId: profile?.selectedAvatarId,
     });
     setInvitedFriendIds((prev) => {
@@ -1334,7 +1334,7 @@ export default function LobbyScreen() {
                         <Text style={shareSheet.friendEmoji}>
                           {getAvatarEmojiById(friend.avatarId)}
                         </Text>
-                        <Text style={shareSheet.friendName}>{friend.nickname}</Text>
+                        <Text style={shareSheet.friendName}>{friend.playerName}</Text>
                         <TouchableOpacity
                           onPress={() => handleInviteFriend(friend)}
                           disabled={invited}

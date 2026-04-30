@@ -13,37 +13,49 @@ interface Props {
    * istället för TouchableOpacity.
    */
   onPress?: () => void;
+  /**
+   * Optional kontrollerad profil. Skärmar med in-place-login (som Home,
+   * där pillen och login-modalen lever på samma skärm) måste passera
+   * sin profil här så bannern uppdateras direkt när profilen ändras —
+   * useFocusEffect-self-load triggar inte eftersom skärmen aldrig
+   * tappar focus. Skärmar som bara läser profilen (Lobby, Profile)
+   * kan utelämna proppen och låta bannern self-loada via useFocusEffect.
+   */
+  profile?: ProfileData | null;
 }
 
 /**
  * Full-bredd-band överst på en skärm med en login-pill i högra hörnet.
- * Pillen visar inloggad användares avatar + nickname (eller "Register or
- * Login" när profil saknas). Profilen läses via AsyncStorage på focus så
- * den uppdateras när användaren ändrar nickname/avatar i Profile-tabben
- * och sedan kommer tillbaka.
+ * Pillen visar inloggad användares avatar + playerName (eller "Register or
+ * Login" när profil saknas). När `profile`-proppen utelämnas läses den
+ * via AsyncStorage på focus så den uppdateras när användaren ändrar
+ * playerName/avatar i Profile-tabben och sedan kommer tillbaka.
  */
-export function TopUserBanner({ onPress }: Props) {
-  const [profile, setProfile] = useState<ProfileData | null>(null);
+export function TopUserBanner({ onPress, profile: profileProp }: Props) {
+  const [internalProfile, setInternalProfile] = useState<ProfileData | null>(null);
+  const isControlled = profileProp !== undefined;
 
   useFocusEffect(
     useCallback(() => {
+      if (isControlled) return;
       let active = true;
       loadProfile().then((data) => {
-        if (active) setProfile(data);
+        if (active) setInternalProfile(data);
       });
       return () => {
         active = false;
       };
-    }, []),
+    }, [isControlled]),
   );
 
+  const profile = isControlled ? profileProp : internalProfile;
   const isLoggedIn = !!profile;
   const pillStyle = [
     styles.loginPill,
     isLoggedIn ? styles.loginPillActive : styles.loginPillMuted,
   ];
   const iconText = isLoggedIn ? getAvatarEmojiById(profile?.selectedAvatarId) : '👤';
-  const labelText = isLoggedIn ? (profile?.nickname?.trim() || 'Signed in') : 'Register or Login';
+  const labelText = isLoggedIn ? (profile?.playerName?.trim() || 'Signed in') : 'Register or Login';
   const labelStyle = [
     styles.loginPillText,
     isLoggedIn ? styles.loginPillTextActive : styles.loginPillTextMuted,

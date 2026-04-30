@@ -1,7 +1,8 @@
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useState } from 'react';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Path, Rect } from 'react-native-svg';
 import { Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';
+import { HCPShield } from './HCPShield';
 
 // ─── Types & labels ───────────────────────────────────────────────────────────
 
@@ -72,23 +73,55 @@ export function PlayerHistorySection() {
   const bestScore    = byHighestScore[0]?.score ?? 0;
   const currentHcp   = byNewestFirst[0]?.hcpAfter ?? 99;
 
+  // Hela Player history-blocket är kollapsbart för att minska scrollning
+  // på Profile-skärmen. Default expanded så användaren ser sin historik
+  // direkt vid första besöket. Speglar Game connections-blockets
+  // expand/collapse-pattern i ProfileScreen.
+  const [expanded, setExpanded] = useState(true);
+
   return (
     <View style={styles.container}>
-      <Text style={styles.sectionTitle}>Player history</Text>
+      <Pressable
+        onPress={() => setExpanded(!expanded)}
+        style={({ pressed }) => [
+          styles.headerRow,
+          pressed && { opacity: 0.7 },
+        ]}
+        hitSlop={8}
+      >
+        <Text style={styles.sectionTitle}>Player history</Text>
+        <View style={styles.toggleBox}>
+          <Text style={styles.toggleText}>{expanded ? '−' : '+'}</Text>
+        </View>
+      </Pressable>
+      {!expanded && <View style={styles.sectionDivider} />}
 
-      <StatsOverview gamesPlayed={totalGames} bestScore={bestScore} currentHcp={currentHcp} />
+      {expanded && (
+        <>
+          {/* HCP-sköld i egen ruta direkt under sektionsrubriken — visuell
+              ranking-indikator (brons/silver/guld beroende på tier).
+              TODO (Fas 6): Värdet beräknas redan från senaste spelets hcpAfter
+              via byNewestFirst[0]; när backend kopplas in ska detta läsas
+              från riktig spelhistorik. */}
+          <View style={styles.hcpShieldCard}>
+            <HCPShield hcp={currentHcp} size={120} />
+          </View>
 
-      <HCPProgressionCard games={MOCK_GAMES} />
+          <StatsOverview gamesPlayed={totalGames} bestScore={bestScore} currentHcp={currentHcp} />
 
-      <ActivityCard games={MOCK_GAMES} />
+          <HCPProgressionCard games={MOCK_GAMES} />
 
-      <GameListCard title="Recent games"   games={byNewestFirst.slice(0, 5)} />
+          <ActivityCard games={MOCK_GAMES} />
 
-      <GameListCard title="Highest scores" games={byHighestScore.slice(0, 3)} highlight />
+          <GameListCard title="Recent games"   games={byNewestFirst.slice(0, 5)} />
 
-      <RankProgressionCard progressions={MOCK_RANK_PROGRESSION} />
+          <GameListCard title="Highest scores" games={byHighestScore.slice(0, 3)} highlight />
 
-      <RankingsCard rankings={MOCK_RANKINGS} />
+          <RankProgressionCard progressions={MOCK_RANK_PROGRESSION} />
+
+          <RankingsCard rankings={MOCK_RANKINGS} />
+        </>
+      )}
     </View>
   );
 }
@@ -365,11 +398,40 @@ function formatDate(date: Date): string {
 const styles = StyleSheet.create({
   container: { gap: Spacing.md },
 
+  // Rad-layout för rubriken + +/−-knapp så texten och knappen sitter
+  // tätt intill varandra. Speglar Game connections-headerns mönster i
+  // ProfileScreen.
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    marginTop: Spacing.sm,
+  },
   sectionTitle: {
     ...Typography.title,
     color: Colors.textPrimary,
     fontWeight: FontWeight.bold,
-    marginTop: Spacing.sm,
+  },
+  toggleBox: {
+    width: 26,
+    height: 26,
+    borderRadius: Radius.sm,
+    borderWidth: 1,
+    borderColor: Colors.borderStrong,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  toggleText: {
+    fontSize: 18,
+    fontWeight: FontWeight.bold,
+    color: Colors.textSecondary,
+    lineHeight: 20,
+  },
+  // Tunn linje som visas under rubriken när sektionen är kollapsad —
+  // matchar mönstret för Profile-skärmens kollapsbara sektioner.
+  sectionDivider: {
+    height: 1,
+    backgroundColor: Colors.border,
   },
 
   card: {
@@ -379,6 +441,14 @@ const styles = StyleSheet.create({
     borderColor: Colors.border,
     padding: Spacing.lg,
     gap: Spacing.md,
+  },
+  hcpShieldCard: {
+    backgroundColor: Colors.card,
+    borderRadius: Radius.lg,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    paddingVertical: Spacing.lg,
+    alignItems: 'center',
   },
   cardHeader: {
     flexDirection: 'row',
