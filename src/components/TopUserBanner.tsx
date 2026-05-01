@@ -22,6 +22,16 @@ interface Props {
    * kan utelämna proppen och låta bannern self-loada via useFocusEffect.
    */
   profile?: ProfileData | null;
+  /**
+   * Visa-namn för en gäst som joinat lobbyn via guest-formen. När
+   * `profile` saknas men `guestName` finns visar pillen 👤 + guestName
+   * i muted styling (samma look som "Register or Login"-fallback).
+   * Den default-silhouetten räcker som visuell guest-signal eftersom
+   * registrerade users alltid har en custom emoji-avatar — så vi
+   * behöver ingen separat "guest"-styling. Registrerade users (profile
+   * != null) har företräde — om båda finns visas profilen.
+   */
+  guestName?: string;
 }
 
 /**
@@ -31,7 +41,7 @@ interface Props {
  * via AsyncStorage på focus så den uppdateras när användaren ändrar
  * playerName/avatar i Profile-tabben och sedan kommer tillbaka.
  */
-export function TopUserBanner({ onPress, profile: profileProp }: Props) {
+export function TopUserBanner({ onPress, profile: profileProp, guestName }: Props) {
   const [internalProfile, setInternalProfile] = useState<ProfileData | null>(null);
   const isControlled = profileProp !== undefined;
 
@@ -50,12 +60,21 @@ export function TopUserBanner({ onPress, profile: profileProp }: Props) {
 
   const profile = isControlled ? profileProp : internalProfile;
   const isLoggedIn = !!profile;
+  // Gäster i lobbyn (joinade via guest-form) saknar sparad profil men har
+  // ett valt Player Name via URL-params. Visas i muted styling — registrerade
+  // users har företräde om båda råkar vara satta.
+  const trimmedGuestName = guestName?.trim() ?? '';
+  const isGuest = !isLoggedIn && trimmedGuestName.length > 0;
   const pillStyle = [
     styles.loginPill,
     isLoggedIn ? styles.loginPillActive : styles.loginPillMuted,
   ];
   const iconText = isLoggedIn ? getAvatarEmojiById(profile?.selectedAvatarId) : '👤';
-  const labelText = isLoggedIn ? (profile?.playerName?.trim() || 'Signed in') : 'Register or Login';
+  const labelText = isLoggedIn
+    ? (profile?.playerName?.trim() || 'Signed in')
+    : isGuest
+      ? trimmedGuestName
+      : 'Register or Login';
   const labelStyle = [
     styles.loginPillText,
     isLoggedIn ? styles.loginPillTextActive : styles.loginPillTextMuted,

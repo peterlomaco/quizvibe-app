@@ -29,6 +29,8 @@ import { TopUserBanner } from '../components/TopUserBanner';
 import { Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';
 import { getAvatarEmojiById } from '../utils/avatars';
 import { loadFriends, type Friend } from '../utils/friendsStorage';
+import { addLeftPlayer, getLeftPlayers } from '../utils/leftPlayers';
+import { deactivateRoom, isActiveRoom } from '../utils/mockActiveRooms';
 import { consumePendingLobbyPlayers } from '../utils/pendingLobby';
 import { loadProfile, type ProfileData } from '../utils/profileStorage';
 import { ROOM_CODE_LETTERS, formatRoomCode, generateRoomCode } from '../utils/roomCode';
@@ -53,6 +55,11 @@ export interface LobbyPlayer extends Player {
   // implementeras). Guests och manuellt tillagda spelare lämnas falsy —
   // de räknas alltid som "ej Spotify-kopplade".
   spotifyConnected?: boolean;
+  // True om spelaren har lämnat lobby:n via TopUserBanner → Leave Game Lobby-
+  // flödet. Persisteras per rumkod via src/utils/leftPlayers.ts och appliceras
+  // av LobbyScreen:s useFocusEffect. PlayerRow renderar då greyed-out text +
+  // "LEFT THIS GAME LOBBY"-label så övriga i lobby:n ser att spelaren gått.
+  hasLeft?: boolean;
 }
 
 type GameMode = 'pass-the-phone' | 'individual-devices';
@@ -371,6 +378,70 @@ function AddPlayerModal({ visible, onClose, onAdd }: {
   );
 }
 
+// ─── WaveDots ─────────────────────────────────────────────────────────────────
+
+/**
+ * Tre prickar som hoppar i sekvens (våg-effekt) — används som loading-
+ * indikator i deleting-lobby-overlay:n. Varje prick har en 900ms cykel
+ * (300ms upp+ner + 600ms vila) men startas med 150ms-offset så de ser
+ * ut att rulla som en våg från vänster till höger.
+ */
+function WaveDots() {
+  const dot1 = useRef(new Animated.Value(0)).current;
+  const dot2 = useRef(new Animated.Value(0)).current;
+  const dot3 = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    const cycleMs = 900;
+    const upMs = 150;
+    const downMs = 150;
+    const makeDot = (val: Animated.Value, offsetMs: number) =>
+      Animated.loop(
+        Animated.sequence([
+          Animated.delay(offsetMs),
+          Animated.timing(val, { toValue: -6, duration: upMs, useNativeDriver: true }),
+          Animated.timing(val, { toValue: 0, duration: downMs, useNativeDriver: true }),
+          Animated.delay(cycleMs - offsetMs - upMs - downMs),
+        ]),
+      );
+    const a1 = makeDot(dot1, 0);
+    const a2 = makeDot(dot2, 150);
+    const a3 = makeDot(dot3, 300);
+    a1.start();
+    a2.start();
+    a3.start();
+    return () => {
+      a1.stop();
+      a2.stop();
+      a3.stop();
+    };
+  }, [dot1, dot2, dot3]);
+
+  return (
+    <View style={waveDotsStyles.row}>
+      <Animated.Text style={[waveDotsStyles.dot, { transform: [{ translateY: dot1 }] }]}>.</Animated.Text>
+      <Animated.Text style={[waveDotsStyles.dot, { transform: [{ translateY: dot2 }] }]}>.</Animated.Text>
+      <Animated.Text style={[waveDotsStyles.dot, { transform: [{ translateY: dot3 }] }]}>.</Animated.Text>
+    </View>
+  );
+}
+
+const waveDotsStyles = StyleSheet.create({
+  row: {
+    flexDirection: 'row',
+    marginLeft: 4,
+  },
+  dot: {
+    fontSize: FontSize.lg,
+    fontWeight: FontWeight.bold,
+    color: Colors.textPrimary,
+    marginHorizontal: 1,
+    // lineHeight säkrar att translateY rörelsen inte klipps av container:s
+    // tighta vertikala mått runt textens baseline.
+    lineHeight: 20,
+  },
+});
+
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
 export default function LobbyScreen() {
@@ -394,6 +465,10 @@ export default function LobbyScreen() {
   const roomCode = useMemo(() => code ?? generateRoomCode(), [code]);
   const hostMode = isHost === 'true';
   const guestMode = asGuest === 'true';
+  // Sann när användaren joinat lobbyn via guest-formen *och* har ett namn
+  // i URL-params. Driver TopUserBanner:s guest-pill samt tap-handler-
+  // branchen som öppnar Leave-room-sheet:n istället för Profile-tabben.
+  const isGuestInRoom = guestMode && !!guestName?.trim();
 
   const [players, setPlayers] = useState<LobbyPlayer[]>(SEED_PLAYERS);
 
@@ -410,14 +485,29 @@ export default function LobbyScreen() {
     ).start();
   }, [buyCtaPulse]);
 
-  // Vid mount: kolla om det finns "pending players" från föregående spel
-  // (sparat av quiz-skärmen när användaren valde "Yes, keep them" i Play Again-dialogen).
-  // Om användaren kommer hit som gäst: lägg in dem som en guest-spelare överst
-  // (efter host) så de syns som "you" i listan.
+  // Eget player-id (host:s seed-id för host, eller den auto-tillagda
+  // guest/joiner-id:n för non-hosts). Används av leave-flödet för att
+  // markera rätt spelare som "left" i leftPlayers-storen så övriga ser
+  // status:en när de öppnar lobby:n.
+  const ownPlayerIdRef = useRef<string | null>(null);
+
+  // Vid mount OCH vid URL-params-ändring (när lobby-tabben återanvänds över
+  // host→guest-transitions inom samma tab-instans, t.ex. host som går home
+  // och sen joinar som guest med sin egen kod): kolla pending players från
+  // Play Again, annars auto-adda spelaren baserat på guest/non-host/host-flow.
+  // Reset:ar players till SEED_PLAYERS + nollar ownPlayerIdRef innan logiken
+  // körs så vi inte ärver state från en tidigare lobby-session i samma instans.
   useEffect(() => {
+    let cancelled = false;
+    setPlayers(SEED_PLAYERS);
+    ownPlayerIdRef.current = null;
     consumePendingLobbyPlayers().then(async (carriedOver) => {
+      if (cancelled) return;
       if (carriedOver && carriedOver.length > 0) {
         setPlayers(carriedOver);
+        // För host-flödet med carry-over: own player är hosten i listan.
+        const hostInCarry = carriedOver.find((p) => p.isHost);
+        if (hostInCarry) ownPlayerIdRef.current = hostInCarry.id;
         return;
       }
       if (guestMode && guestName) {
@@ -426,8 +516,10 @@ export default function LobbyScreen() {
         const skill = (guestSkill === 'easy' || guestSkill === 'intermediate' || guestSkill === 'expert')
           ? guestSkill
           : 'intermediate';
+        const guestPlayerId = `guest-${Date.now()}`;
+        ownPlayerIdRef.current = guestPlayerId;
         const guestPlayer: LobbyPlayer = {
-          id: `guest-${Date.now()}`,
+          id: guestPlayerId,
           name: guestName,
           emoji: '👤',
           isReady: true,
@@ -460,8 +552,10 @@ export default function LobbyScreen() {
         const age = profile?.birthYear ? currentYear - profile.birthYear : undefined;
         const skill = profile?.skill ?? undefined;
         const hcpComplete = !!(skill && age !== undefined);
+        const joinerId = `joiner-${Date.now()}`;
+        ownPlayerIdRef.current = joinerId;
         const joiner: LobbyPlayer = {
-          id: `joiner-${Date.now()}`,
+          id: joinerId,
           name: profile?.playerName?.trim() || 'You',
           emoji: profile ? getAvatarEmojiById(profile.selectedAvatarId) : '👤',
           isReady: hcpComplete,
@@ -479,28 +573,75 @@ export default function LobbyScreen() {
           next.splice(insertAt, 0, joiner);
           return next;
         });
+        return;
       }
+      // Host-flödet utan carry-over: hostens id är seed-värdet '1' (Alex K.).
+      // Sätts som own player så host:s leave-flow (om implementerat senare)
+      // kan referera till rätt spelare.
+      const seedHost = SEED_PLAYERS.find((p) => p.isHost);
+      if (seedHost) ownPlayerIdRef.current = seedHost.id;
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    return () => { cancelled = true; };
+  }, [code, guestMode, guestName, guestBirthYear, guestSkill, hostMode]);
 
   // Varje gång Lobby får fokus (t.ex. man kommer tillbaka från Profile-tabben):
   // ladda sparad profil och uppdatera host-spelarkortet med profilens värden.
   // Detta gör att ändringar i Profile (playerName, ålder, skill, avatar) slår
   // igenom direkt på host-kortet i Lobby.
+  // Samtidigt: ladda leftPlayers för rumkoden och markera matchande spelar-
+  // kort med hasLeft=true så PlayerRow renderar dem som "LEFT THIS GAME LOBBY".
   useFocusEffect(
     useCallback(() => {
       let active = true;
-      loadProfile().then((profile) => {
-        if (!active || !profile) return;
-        setPlayers((prev) =>
-          prev.map((p) => (p.isHost ? mergeProfileIntoHost(p, profile) : p)),
-        );
+      Promise.all([loadProfile(), getLeftPlayers(roomCode)]).then(([profile, leftSnapshots]) => {
+        if (!active) return;
+        setPlayers((prev) => {
+          const leftIds = leftSnapshots.map((s) => s.id);
+          // Steg 1: mappa över befintliga spelare och applicera hasLeft på de
+          // som matchar en snapshot. Host:en passerar utan hasLeft (host kan
+          // aldrig vara "left" — TopUserBanner-tap navigerar till Profile).
+          const mapped = prev.map((p) => {
+            // Merge:a bara profil in i seed-host:en när användaren FAKTISKT är
+            // host (hostMode=true). När man joinar via kod är man non-host →
+            // seed-hosten Alex K. ska visas med sina egna seed-värden, inte
+            // få den nuvarande user:s profil-data tilldelad — annars ser det
+            // ut som att joinaren är host eftersom HOST-badge:n + ens egen
+            // avatar/namn syns på det kortet.
+            const next = hostMode && profile && p.isHost ? mergeProfileIntoHost(p, profile) : p;
+            if (next.isHost) {
+              return next.hasLeft ? { ...next, hasLeft: false } : next;
+            }
+            const inLeft = leftIds.includes(next.id);
+            if (inLeft && !next.hasLeft) return { ...next, hasLeft: true };
+            if (!inLeft && next.hasLeft) return { ...next, hasLeft: false };
+            return next;
+          });
+          // Steg 2: injecta snapshot:s som INTE redan finns i listan. Händer
+          // när en ny user joinar samma rum efter en tidigare lämning — då
+          // finns inte den lämnade spelaren i nya user:s SEED-baseline, men
+          // vi vill ändå rendera kortet med "LEFT THIS GAME LOBBY"-styling.
+          const existingIds = new Set(mapped.map((p) => p.id));
+          const orphanSnapshots = leftSnapshots.filter((s) => !existingIds.has(s.id));
+          const orphanPlayers: LobbyPlayer[] = orphanSnapshots.map((s) => ({
+            id: s.id,
+            name: s.name,
+            emoji: s.emoji,
+            avatarUri: s.avatarUri,
+            isReady: false,
+            type: s.type ?? 'guest',
+            age: s.age,
+            skill: s.skill,
+            hcpComplete: s.hcpComplete ?? false,
+            approved: s.approved,
+            hasLeft: true,
+          }));
+          return [...mapped, ...orphanPlayers];
+        });
       });
       return () => {
         active = false;
       };
-    }, []),
+    }, [roomCode]),
   );
   const [addModalVisible, setAddModalVisible] = useState(false);
   const ROOM_LOGO_SIZE = 104;
@@ -512,6 +653,29 @@ export default function LobbyScreen() {
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [friends, setFriends] = useState<Friend[]>([]);
   const [invitedFriendIds, setInvitedFriendIds] = useState<Set<string>>(new Set());
+
+  // Guest leave-room sheet — bara aktiv när guestMode är på (gäster har ingen
+  // sparad profil och Profile-tabben är meningslös för dem). Tap på guest-
+  // pillen i TopUserBanner öppnar sheet:n; "Leave Game Lobby" → Alert-confirm →
+  // tillbaka till Home.
+  const [guestLeaveSheetVisible, setGuestLeaveSheetVisible] = useState(false);
+
+  // Host delete-lobby sheet — bara aktiv när hostMode är på. Tap på TopUserBanner-
+  // pillen öppnar sheet:n istället för att navigera till Profile (host:s
+  // profil hanteras via Profile-tabben i bottom nav). Sheet:n har en
+  // destruktiv "Delete this Game Lobby"-knapp + Cancel. Yes på Alert:en
+  // gör roomCode inaktiv via deactivateRoom() — kvarvarande non-hosts
+  // får då en deletion-popup via polling-detection längre ner.
+  const [hostDeleteSheetVisible, setHostDeleteSheetVisible] = useState(false);
+  // True när non-host har upptäckt att rummet blivit deaktiverat (host
+  // har raderat lobby:n). Triggar Alert:en "This Game Lobby has been
+  // deleted by Host" → OK-knappen tar dem till Home.
+  const [roomDeletedDetected, setRoomDeletedDetected] = useState(false);
+  // True under den korta processing-fasen mellan host:s Yes-konfirmation
+  // och navigation till Home. Visar en loading-overlay med "Please Wait —
+  // Deleting this Lobby..." + animerade våg-prickar så host:en känner att
+  // appen jobbar (undviker upplevelsen av instant-cut till Home).
+  const [deletingLobby, setDeletingLobby] = useState(false);
 
   // Master "Approve All"-state — återställs automatiskt till 'no' när
   // waiting-listan blivit tom (efter approve all eller när ingen väntar).
@@ -677,6 +841,127 @@ export default function LobbyScreen() {
     setFriends(list);
   };
 
+  // Två-stegs leave-flow för non-hosts (både gäster och registrerade
+  // spelare som joinat via kod):
+  // 1) Sheet:n stängs.
+  // 2) Native Alert konfirmerar destruktiv åtgärd.
+  // Yes → markera spelaren som left i leftPlayers-storen (så övriga i
+  //   lobby:n ser "LEFT THIS GAME LOBBY" på spelarkortet) → router.replace('/')
+  //   tar dem till Home. Lokal lobby-state + URL-params kasseras automatiskt
+  //   när komponenten unmountas.
+  const handleGuestLeaveRoom = () => {
+    setGuestLeaveSheetVisible(false);
+    Alert.alert(
+      'Leave this Game Lobby?',
+      'You will be directed to Home page and Guest Player data will be lost.',
+      [
+        { text: 'No', style: 'cancel' },
+        {
+          text: 'Yes',
+          style: 'destructive',
+          onPress: async () => {
+            const ownId = ownPlayerIdRef.current;
+            const ownPlayer = ownId ? players.find((p) => p.id === ownId) : undefined;
+            if (ownPlayer) {
+              // Spara hela snapshot:en av lämnande spelaren så nya joiners
+              // som kommer in i samma rum efter detta kan rendera kortet
+              // som "LEFT THIS GAME LOBBY" — inte bara id:t (då har de inte
+              // den lämnande spelaren i sin lokala SEED-baseline).
+              await addLeftPlayer(roomCode, {
+                id: ownPlayer.id,
+                name: ownPlayer.name,
+                emoji: ownPlayer.emoji,
+                avatarUri: ownPlayer.avatarUri,
+                type: ownPlayer.type,
+                age: ownPlayer.age,
+                skill: ownPlayer.skill,
+                hcpComplete: ownPlayer.hcpComplete,
+                approved: ownPlayer.approved,
+              });
+            }
+            router.replace('/');
+          },
+        },
+      ],
+    );
+  };
+
+  // Två-stegs delete-flow för host:en (motsvarighet till non-host:s
+  // leave-flow). Yes → deactivateRoom() tar bort koden från ACTIVE_ROOM_
+  // CODES, vilket gör att:
+  //   • Nya join-försök blockeras med "Room not found"-Alert via existing
+  //     isActiveRoom-check i handleJoinWithCode/handleJoinAsGuest.
+  //   • Kvarvarande non-hosts i lobby:n upptäcker det via polling-effekten
+  //     nedan och får "Game Lobby deleted by Host"-popup → OK → Home.
+  // Host själv navigeras till Home direkt efter deactivation. Lokal lobby-
+  // state kasseras automatiskt när komponenten unmountas.
+  const handleDeleteLobby = () => {
+    setHostDeleteSheetVisible(false);
+    Alert.alert(
+      'Delete this Game Lobby?',
+      'All players currently in this lobby will be notified and disconnected. The room code will become inactive.',
+      [
+        { text: 'No', style: 'cancel' },
+        {
+          text: 'Yes',
+          style: 'destructive',
+          onPress: () => {
+            // Deaktivera rummet direkt så non-hosts polling-detection
+            // upptäcker det inom ~2s (även medan host:s loading-overlay
+            // visas — det är realistiskt async-beteende).
+            deactivateRoom(roomCode);
+            // Visa loading-overlay i ~1.6s innan navigation. Ger host:en
+            // visuell feedback att appen processar och matchar real-
+            // backend-känsla där en DELETE-request tar några hundra ms.
+            // VIKTIGT: stäng overlay:n EXPLICIT innan navigation. Lobby
+            // ligger i (tabs)-gruppen och tab-navigatorn bevarar screen-
+            // state över route-replace — utan dismiss skulle Modal:en
+            // stå kvar synlig ovanpå Home-skärmen efter navigationen.
+            setDeletingLobby(true);
+            setTimeout(() => {
+              setDeletingLobby(false);
+              router.replace('/');
+            }, 1600);
+          },
+        },
+      ],
+    );
+  };
+
+  // Non-host detection: pollar isActiveRoom var 2:a sekund. När rummet
+  // blir inaktivt (host har deletat det) sätter vi roomDeletedDetected=true
+  // som triggar Alert:en nedanför. Polling istället för event-driven
+  // (som backend) eftersom mockstoren bara är in-memory utan event-bus.
+  // Host själv exkluderas — de som deletat ska inte få sin egen popup.
+  useEffect(() => {
+    if (hostMode) return;
+    // Initial check direkt vid mount så vi inte behöver vänta polling-
+    // intervallet om rummet redan är deletat när användaren landar.
+    if (!isActiveRoom(roomCode)) {
+      setRoomDeletedDetected(true);
+      return;
+    }
+    const interval = setInterval(() => {
+      if (!isActiveRoom(roomCode)) {
+        setRoomDeletedDetected(true);
+      }
+    }, 2000);
+    return () => clearInterval(interval);
+  }, [hostMode, roomCode]);
+
+  // När detection-state slår till: visa native Alert med OK-knapp som
+  // tar non-host:en till Home. cancelable:false så användaren inte kan
+  // tap:a runt om popup:en — de MÅSTE acknowledgea via OK.
+  useEffect(() => {
+    if (!roomDeletedDetected) return;
+    Alert.alert(
+      'Game Lobby deleted',
+      'This Game Lobby has been deleted by Host.',
+      [{ text: 'OK', onPress: () => router.replace('/') }],
+      { cancelable: false },
+    );
+  }, [roomDeletedDetected]);
+
   // Skickar invite in-app till en vän — sparas i deras Waiting Invites.
   // Använder hostens profil-playerName/avatar som "from"-data.
   const handleInviteFriend = async (friend: Friend) => {
@@ -707,9 +992,21 @@ export default function LobbyScreen() {
   return (
     <SafeAreaView style={styles.safe}>
       {/* Top board (login status) — sticky utanför ScrollView så den följer
-          med när användaren scrollar i lobbyn. Tap navigerar till Profile-
-          tabben för att hantera profil/avatar. */}
-      <TopUserBanner onPress={() => router.push('/(tabs)/profile')} />
+          med när användaren scrollar i lobbyn. Tap-beteendet är roll-
+          beroende:
+          • Host: öppnar Delete-this-Game-Lobby-sheet:n (host:s motsvarighet
+            till non-host:s leave-flow). Profile-hantering sker via Profile-
+            tabben i bottom nav.
+          • Non-host (både guest och registrerade): öppnar Leave Game Lobby-
+            sheet:n så de kan ta sig ur rummet utan att lämna appen. */}
+      <TopUserBanner
+        guestName={isGuestInRoom ? guestName : undefined}
+        onPress={
+          hostMode
+            ? () => setHostDeleteSheetVisible(true)
+            : () => setGuestLeaveSheetVisible(true)
+        }
+      />
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.content}
@@ -732,9 +1029,18 @@ export default function LobbyScreen() {
               vertikal mitt direkt på loggans visuella mitt — ger ett
               "label-genom-loggan"-uttryck som inte kan rubbas av flex-
               layout-quirks. textAlign center + left/right: 0 håller
-              labeln horisontellt centrerad i kortet. */}
+              labeln horisontellt centrerad i kortet. "You are invited"
+              läggs till ovanför som kontext-rad — gäller alla non-hosts
+              (både code-only joiners och guests anslutit via JoinModal). */}
           {!hostMode && (
-            <Text style={styles.roomLabelGuestAbsolute}>Room Code</Text>
+            <>
+              <View style={styles.guestInvitedBadgeWrap}>
+                <View style={styles.guestInvitedBadge}>
+                  <Text style={styles.guestInvitedBadgeText}>You are invited</Text>
+                </View>
+              </View>
+              <Text style={styles.roomLabelGuestAbsolute}>Room Code</Text>
+            </>
           )}
           {hostMode && <View style={styles.hostBadge}><Text style={styles.hostBadgeText}>👑 You are the host</Text></View>}
           <View style={[styles.roomCodeRow, !hostMode && styles.roomCodeRowGuestSpacing]}>
@@ -1164,8 +1470,8 @@ export default function LobbyScreen() {
                 key={player.id}
                 player={player}
                 index={players.indexOf(player)}
-                onMoveUp={hostMode ? () => movePlayer(player.id, 'up') : undefined}
-                onMoveDown={hostMode ? () => movePlayer(player.id, 'down') : undefined}
+                onMoveUp={hostMode && !player.hasLeft ? () => movePlayer(player.id, 'up') : undefined}
+                onMoveDown={hostMode && !player.hasLeft ? () => movePlayer(player.id, 'down') : undefined}
                 canMoveUp={hostMode && index > 0}
                 canMoveDown={hostMode && index < approvedPlayers.length - 1}
                 hcpComplete={player.hcpComplete}
@@ -1174,9 +1480,10 @@ export default function LobbyScreen() {
                 isHostPlayer={player.isHost}
                 isGuest={player.type === 'guest'}
                 turnNumber={gameMode === 'pass-the-phone' ? index + 1 : undefined}
-                showApproveToggle={hostMode && !player.isHost}
+                showApproveToggle={hostMode && !player.isHost && !player.hasLeft}
                 approved={true}
                 onApproveChange={(next) => handleSetApproved(player.id, next)}
+                hasLeft={player.hasLeft}
               />
             ))}
 
@@ -1217,9 +1524,10 @@ export default function LobbyScreen() {
                     skill={player.skill}
                     isHostPlayer={false}
                     isGuest={player.type === 'guest'}
-                    showApproveToggle={hostMode}
+                    showApproveToggle={hostMode && !player.hasLeft}
                     approved={false}
                     onApproveChange={(next) => handleSetApproved(player.id, next)}
+                    hasLeft={player.hasLeft}
                   />
                 ))}
               </View>
@@ -1383,6 +1691,137 @@ export default function LobbyScreen() {
         </View>
       </Modal>
 
+      {/* ── Guest leave-room sheet ───────────────────────────────────
+          Bottom-sheet som speglar Profile-skärmens logout-sheet (avatar +
+          namn + status, röd primär-knapp, Cancel). Visas bara när tap
+          sker på guest-pillen i TopUserBanner — gating sker via onPress-
+          branchen ovan, så själva Modal:en kan stå alltid mounted med
+          visible-flag. */}
+      <Modal
+        visible={guestLeaveSheetVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setGuestLeaveSheetVisible(false)}
+      >
+        <View style={styles.guestLeaveOverlay}>
+          <Pressable
+            style={styles.guestLeaveBackdrop}
+            onPress={() => setGuestLeaveSheetVisible(false)}
+          />
+          <View style={styles.guestLeaveSheet}>
+            {(() => {
+              // Visa-data hämtas från own-player i players[] (sätts av auto-add-
+              // useEffect:en via ownPlayerIdRef). Funkar identiskt för guest
+              // (👤 + guestName) som registrerad non-host (profile-emoji + playerName)
+              // — vi behöver inte greina på flow eftersom kortet bär datan.
+              const ownPlayer = players.find((p) => p.id === ownPlayerIdRef.current);
+              const displayEmoji = ownPlayer?.emoji ?? '👤';
+              const displayName = ownPlayer?.name ?? guestName?.trim() ?? 'You';
+              const displayStatus = ownPlayer?.type === 'guest' ? 'Guest' : 'Player';
+              return (
+                <View style={styles.guestLeaveHeader}>
+                  <Text style={styles.guestLeaveHeaderEmoji}>{displayEmoji}</Text>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.guestLeaveHeaderName}>{displayName}</Text>
+                    <Text style={styles.guestLeaveHeaderStatus}>{displayStatus}</Text>
+                  </View>
+                </View>
+              );
+            })()}
+
+            <Pressable
+              style={({ pressed }) => [
+                styles.guestLeaveBtn,
+                pressed && { opacity: 0.85 },
+              ]}
+              onPress={handleGuestLeaveRoom}
+            >
+              <Text style={styles.guestLeaveBtnText}>Leave Game Lobby — Go to Home</Text>
+            </Pressable>
+
+            <Pressable
+              style={styles.guestLeaveCancelBtn}
+              onPress={() => setGuestLeaveSheetVisible(false)}
+            >
+              <Text style={styles.guestLeaveCancelText}>Cancel</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+
+      {/* ── Host delete-lobby sheet ───────────────────────────────────
+          Speglar guest leave-sheet:s layout exakt — samma styling-
+          klasser återanvänds (guestLeave*) eftersom färg/form är
+          identiska, bara handler-knappen och status-texten skiljer.
+          Visas bara när tap sker på host:s TopUserBanner-pill. */}
+      <Modal
+        visible={hostDeleteSheetVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setHostDeleteSheetVisible(false)}
+      >
+        <View style={styles.guestLeaveOverlay}>
+          <Pressable
+            style={styles.guestLeaveBackdrop}
+            onPress={() => setHostDeleteSheetVisible(false)}
+          />
+          <View style={styles.guestLeaveSheet}>
+            {(() => {
+              // Host-spelarkortet (id '1' efter mergeProfileIntoHost) bär
+              // användarens profil-data. Hämtar därifrån för konsistens.
+              const hostPlayer = players.find((p) => p.isHost);
+              const displayEmoji = hostPlayer?.emoji ?? '👑';
+              const displayName = hostPlayer?.name ?? 'Host';
+              return (
+                <View style={styles.guestLeaveHeader}>
+                  <Text style={styles.guestLeaveHeaderEmoji}>{displayEmoji}</Text>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.guestLeaveHeaderName}>{displayName}</Text>
+                    <Text style={styles.guestLeaveHeaderStatus}>Host</Text>
+                  </View>
+                </View>
+              );
+            })()}
+
+            <Pressable
+              style={({ pressed }) => [
+                styles.guestLeaveBtn,
+                pressed && { opacity: 0.85 },
+              ]}
+              onPress={handleDeleteLobby}
+            >
+              <Text style={styles.guestLeaveBtnText}>Delete this Game Lobby</Text>
+            </Pressable>
+
+            <Pressable
+              style={styles.guestLeaveCancelBtn}
+              onPress={() => setHostDeleteSheetVisible(false)}
+            >
+              <Text style={styles.guestLeaveCancelText}>Cancel</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+
+      {/* ── Deleting-lobby loading-overlay ────────────────────────────
+          Visar processing-feedback under tiden mellan host:s Yes-
+          konfirmation och navigation till Home. cancelable:false så
+          host:en inte kan tap:a runt om — vänta tills den färdig. */}
+      <Modal
+        visible={deletingLobby}
+        transparent
+        animationType="fade"
+      >
+        <View style={styles.deletingOverlay}>
+          <View style={styles.deletingCard}>
+            <View style={styles.deletingTextRow}>
+              <Text style={styles.deletingText}>Please Wait — Deleting this Lobby</Text>
+              <WaveDots />
+            </View>
+          </View>
+        </View>
+      </Modal>
+
     </SafeAreaView>
   );
 }
@@ -1390,6 +1829,100 @@ export default function LobbyScreen() {
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
+  // ── Guest leave-room sheet (speglar ProfileScreen.logout-sheet —
+  //     samma shell/typografi/färgpalett. Status-texten är textSecondary
+  //     istället för Colors.success eftersom guest INTE är inloggad.) ─
+  guestLeaveOverlay: { flex: 1, justifyContent: 'flex-end' },
+  guestLeaveBackdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  guestLeaveSheet: {
+    backgroundColor: Colors.card,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    padding: Spacing.xl,
+    paddingBottom: Spacing.xxl,
+    gap: Spacing.md,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  guestLeaveHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.md,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.sm,
+    backgroundColor: Colors.background,
+    borderRadius: Radius.md,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  guestLeaveHeaderEmoji: {
+    fontSize: 28,
+    width: 40,
+    textAlign: 'center',
+  },
+  guestLeaveHeaderName: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: Colors.textPrimary,
+  },
+  guestLeaveHeaderStatus: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+    marginTop: 2,
+  },
+  guestLeaveBtn: {
+    height: 52,
+    borderRadius: Radius.md,
+    backgroundColor: 'rgba(255,107,107,0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,107,107,0.4)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  guestLeaveBtnText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.error,
+  },
+  guestLeaveCancelBtn: {
+    alignItems: 'center',
+    paddingVertical: Spacing.sm,
+  },
+  guestLeaveCancelText: {
+    fontSize: 14,
+    color: Colors.textSecondary,
+  },
+
+  // Deleting-lobby loading-overlay — täcker hela skärmen med dimmad
+  // backdrop, centrerar ett card med "Please Wait — Deleting this Lobby"
+  // + tre animerade våg-prickar.
+  deletingOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.65)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  deletingCard: {
+    backgroundColor: Colors.card,
+    paddingHorizontal: Spacing.xl,
+    paddingVertical: Spacing.lg,
+    borderRadius: Radius.md,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  deletingTextRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+  },
+  deletingText: {
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.medium,
+    color: Colors.textPrimary,
+  },
+
   safe: { flex: 1, backgroundColor: Colors.background },
   scroll: { flex: 1 },
   content: { paddingHorizontal: Spacing.lg, paddingTop: Spacing.xl, paddingBottom: Spacing.xxl, gap: Spacing.xl },
@@ -1420,7 +1953,10 @@ const styles = StyleSheet.create({
   // höjd ~24 → label-bottom vid y≈53. marginTop placerar cell-raden
   // strax under labeln; värdet är empiriskt finjusterat så cellerna inte
   // ligger för långt ner i kortet.
-  roomCodeRowGuestSpacing: { marginTop: 52 },
+  // marginTop justerad i takt med roomLabelGuestAbsolute.top så label-cells-
+  // gapet bevaras när hela block:et flyttas ned för att ge plats åt
+  // "You are invited"-badge:n ovanför.
+  roomCodeRowGuestSpacing: { marginTop: 64 },
   // Loggan pinnas i Card:s övre vänstra hörn. top/left: 0 = inkant av
   // Card:s padding-edge (RN positionerar absolute children från padding-
   // edge, inte content-edge). Negativa offsets drar in loggan i själva
@@ -1449,13 +1985,42 @@ const styles = StyleSheet.create({
     letterSpacing: 1.2,
     color: Colors.textSecondary,
     position: 'absolute',
-    // top justerad ner från 29 → 27 så labelns nya större halv-höjd (~14
-    // för fontSize 24 / lineHeight ~28) fortfarande hamnar på loggans
-    // visuella mitt vid y≈41.
-    top: 27,
+    // top justerad från 27 → 39 för att ge tydligt mellanrum mellan
+    // "You are invited"-badge:n (top ~6, bottom ~27) och denna label.
+    // Logo-mitt-alignment-constraint:en (tidigare y≈41) prioriteras
+    // numera lägre eftersom badge+label är primär visuell stack och
+    // läses som en grupp ovanför kod-cellerna.
+    top: 39,
     left: 0,
     right: 0,
     textAlign: 'center',
+  },
+  // Kontext-pill ovanför "Room Code" för non-hosts. Speglar hostBadge:s
+  // styling exakt (primaryMuted bg + primaryBorder kant + xs-font + primary-
+  // färg) så host- och guest-vyn känns visuellt "lika" på sin respektive
+  // identitets-rad. Wrap är absolut-positionerad och centrerar badge:n
+  // horisontellt via alignItems: 'center'; top: 6 placerar den direkt under
+  // card-padding-top:en utan att kollidera med loggans yta (loggan är
+  // vänsterställd så center-aligned content landar visuellt på dess höger).
+  guestInvitedBadgeWrap: {
+    position: 'absolute',
+    top: 6,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+  },
+  guestInvitedBadge: {
+    backgroundColor: Colors.primaryMuted,
+    borderRadius: Radius.full,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: 4,
+    borderWidth: 1,
+    borderColor: Colors.primaryBorder,
+  },
+  guestInvitedBadgeText: {
+    fontSize: FontSize.xs,
+    fontWeight: FontWeight.semibold,
+    color: Colors.primary,
   },
   // Cell-rad för rumskoden — speglar Join-modalens "Enter Room Code"-cells
   // i fyllt läge. Storleken (36×50) håller raden tillräckligt smal för att

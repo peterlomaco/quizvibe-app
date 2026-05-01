@@ -1,12 +1,15 @@
+import { CodeKeyboard } from '@/src/components/CodeKeyboard';
 import { QuizVibeLogo } from '@/src/components/QuizVibeLogo';
 import { TopUserBanner } from '@/src/components/TopUserBanner';
 import { Colors, Radius, Spacing } from '@/src/theme';
 import { identify, resetIdentity, track } from '@/src/utils/analytics';
 import { getAvatarEmojiById } from '@/src/utils/avatars';
+import { clearLeftPlayers } from '@/src/utils/leftPlayers';
+import { isActiveRoom, registerActiveRoom } from '@/src/utils/mockActiveRooms';
 import { generatePlayerName } from '@/src/utils/playerName';
 import { containsProfanity } from '@/src/utils/profanity';
 import { clearProfile, loadProfile, saveProfile, type ProfileData } from '@/src/utils/profileStorage';
-import { formatRoomCode, generateRoomCode, ROOM_CODE_LENGTH, ROOM_CODE_LETTERS } from '@/src/utils/roomCode';
+import { formatRoomCode, generateRoomCode, isBlockedLetterTriplet, isLetterCellIndex, ROOM_CODE_LENGTH, ROOM_CODE_LETTERS } from '@/src/utils/roomCode';
 import { loadInvites, removeInvite, type WaitingInvite } from '@/src/utils/waitingInvites';
 import { Nunito_400Regular, Nunito_600SemiBold, Nunito_700Bold, useFonts } from '@expo-google-fonts/nunito';
 import { router, useFocusEffect } from 'expo-router';
@@ -86,6 +89,17 @@ const BIRTH_YEARS = Array.from(
   (_, i) => MAX_BIRTH_YEAR - i,
 );
 
+/**
+ * Format-helper för Year-of-Birth-pickaren i Register- och Guest-formen.
+ * Den yngsta valbara årgången (`MAX_BIRTH_YEAR`) visas som "2021 or later"
+ * så bracket:en fungerar som catch-all för alla ≤5-åringar (även 0–4 år).
+ * Övriga år renderas oförändrat. Internt sparas alltid årtalet som siffra
+ * — etiketten är rent kosmetisk och påverkar inte ålders/HCP-beräkning.
+ */
+function formatBirthYear(year: number): string {
+  return year === MAX_BIRTH_YEAR ? `${year} or later` : String(year);
+}
+
 function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false }: JoinModalProps) {
   const [step, setStep] = useState<JoinStep>(initialStep);
   const [code, setCode] = useState('');
@@ -97,6 +111,11 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
   const [yearPickerOpen, setYearPickerOpen] = useState(false);
   const [playerNameStatus, setPlayerNameStatus] = useState<PlayerNameStatus>('idle');
   const [invites, setInvites] = useState<WaitingInvite[]>([]);
+  // Index på den code-cell som har fokus — driver vilken `mode` (letter/digit)
+  // CodeKeyboard renderar samt vilken cell tap-knapparna skriver in i. null =
+  // ingen code-cell fokuserad → custom keyboard döljs (system keyboard kan
+  // visas för andra fält som Player Name).
+  const [focusedCodeIdx, setFocusedCodeIdx] = useState<number | null>(null);
 
   // Refs till de 5 cells för rumkoden — för auto-fokus framåt och bakåt.
   const codeRefs = useRef<Array<TextInput | null>>([]);
@@ -108,12 +127,26 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
   const codeCells: string[] = Array.from({ length: ROOM_CODE_LENGTH }, (_, i) => code[i] ?? '');
 
   const handleCodeCellChange = (index: number, char: string) => {
-    // Per-cell-filter: cell 1–3 = A–Z, cell 4–5 = 0–9
-    const isLetterCell = index < ROOM_CODE_LETTERS;
+    // Per-cell-filter: bokstavs-celler (0–2 + 5) = A–Z, siffer-celler (3–4) = 0–9.
+    const isLetterCell = isLetterCellIndex(index);
     const allowed = isLetterCell ? /[^A-Z]/g : /[^0-9]/g;
     const clean = char.toUpperCase().replace(allowed, '').slice(0, 1);
     const arr = [...codeCells];
     arr[index] = clean;
+    // Stoppa manual entry av samma blockerade tripletset som
+    // generators-flödet aldrig delar ut. Validering körs varje gång
+    // alla 3 bokstavs-cellerna är fyllda — fångar både den vanliga
+    // typing-vägen (cell 2 låser tripleten) och edge-case:t där
+    // användaren går tillbaka och ändrar cell 0 eller 1 efteråt.
+    // På träff: ändringen avbryts (cellen behåller sitt gamla värde),
+    // ingen auto-focus-shift, och användaren får en native Alert.
+    if (isLetterCell && clean) {
+      const triplet = arr.slice(0, ROOM_CODE_LETTERS).join('');
+      if (triplet.length === ROOM_CODE_LETTERS && isBlockedLetterTriplet(triplet)) {
+        Alert.alert('Combination not compliant', 'Please re-enter');
+        return;
+      }
+    }
     setCode(arr.join(''));
     if (clean && index < ROOM_CODE_LENGTH - 1) {
       codeRefs.current[index + 1]?.focus();
@@ -123,6 +156,50 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
   const handleCodeCellKeyPress = (index: number, key: string) => {
     if (key === 'Backspace' && !codeCells[index] && index > 0) {
       codeRefs.current[index - 1]?.focus();
+    }
+  };
+
+  // Handlers för CodeKeyboard:s knappar. Återanvänder befintliga sanitize/
+  // auto-advance-flöden via handleCodeCellChange — så blocked-triplet-Alert
+  // och cell-tomning fungerar identiskt oavsett om input kommer från system-
+  // tangentbord (legacy-väg om showSoftInputOnFocus skulle aktiveras igen)
+  // eller vår custom keyboard.
+  const handleCustomCharPress = (char: string) => {
+    if (focusedCodeIdx === null) return;
+    handleCodeCellChange(focusedCodeIdx, char);
+  };
+
+  // Strikt sekventiell cell-fokus: cursor:n får bara stå i nästa-tomma cell
+  // (eller på sista cellen om alla är fyllda så backspace fungerar därifrån).
+  // Om användaren tappar en otillåten cell snäpper fokus tillbaka direkt —
+  // ingen "skutta över tomma celler"-trick. Forward = typ ett tecken,
+  // backward = backspace, ingen direkt-tap-navigation.
+  const handleCellFocus = (i: number) => {
+    const empty = codeCells.findIndex((c) => !c);
+    const allowed = empty === -1 ? ROOM_CODE_LENGTH - 1 : empty;
+    if (i !== allowed) {
+      // Redirect:a fokus till tillåten cell. Den cellens egna onFocus
+      // kör handleCellFocus igen (som passerar valideringen och sätter
+      // focusedCodeIdx) — så vi return:ar utan att uppdatera state här.
+      codeRefs.current[allowed]?.focus();
+      return;
+    }
+    setFocusedCodeIdx(i);
+  };
+
+  // Backspace-flow:
+  //   1) Cell:n innehåller något → töm den, stanna kvar (vanligt fall).
+  //   2) Cell:n är tom och inte första cellen → flytta fokus till föregående
+  //      cell och töm den (matchar iOS:s system-keyboard-backspace-beteende
+  //      som handleCodeCellKeyPress redan emulerar för system-tangentbordet).
+  const handleCustomBackspace = () => {
+    if (focusedCodeIdx === null) return;
+    if (codeCells[focusedCodeIdx]) {
+      handleCodeCellChange(focusedCodeIdx, '');
+    } else if (focusedCodeIdx > 0) {
+      const prevIdx = focusedCodeIdx - 1;
+      handleCodeCellChange(prevIdx, '');
+      codeRefs.current[prevIdx]?.focus();
     }
   };
 
@@ -142,6 +219,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
       setYearPickerOpen(false);
       setPlayerNameStatus('idle');
       setStep(initialStep);
+      setFocusedCodeIdx(null);
       prevGuestStepRef.current = false;
     }
   }, [visible, initialStep]);
@@ -165,6 +243,16 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
 
   const handleJoinWithCode = () => {
     if (code.length < ROOM_CODE_LENGTH) return;
+    // Mock-existence-check: i frånvaro av backend kollar vi mot
+    // sessionsbunden Set över koder hosts har registrerat. Saknas koden
+    // visar vi Alert och stannar i formuläret istället för att navigera.
+    if (!isActiveRoom(code)) {
+      Alert.alert(
+        'Room not found',
+        'There is no Room code activated with this combination',
+      );
+      return;
+    }
     onClose();
     router.push({ pathname: '/(tabs)/lobby', params: { code, isHost: 'false' } });
   };
@@ -219,7 +307,10 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     const wasGuest = prevGuestStepRef.current;
     prevGuestStepRef.current = step === 'guest';
     if (step === 'guest' && !wasGuest && guestName === '') {
-      const generated = generatePlayerName(TAKEN_PLAYER_NAMES);
+      // Guest-flödet använder "Guest"-prefixet (vs Register-formens
+      // "PlayerName") så default-namnet signalerar att användaren joinar
+      // utan registrering — t.ex. "Guest87321-KL".
+      const generated = generatePlayerName(TAKEN_PLAYER_NAMES, 'Guest');
       setGuestName(generated);
       setPlayerNameStatus('available');
     }
@@ -227,12 +318,21 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
 
   const handleJoinAsGuest = () => {
     if (!isGuestFormValid || parsedBirthYear === null || guestSkill === null) return;
-    // TODO (backend): validera att playerNamet är unikt mot QuizVibe-databasen
-    // och att rumkoden faktiskt existerar. Just nu litar vi på input.
-    // Autofill-detektion: matchar genererade namnens format
-    // ("PlayerName" + 5 siffror + "-" + 2 bokstäver). Om användaren
-    // ändrat namnet manuellt blir flaggan false.
-    const autofilled = /^PlayerName\d{5}-[A-Z]{2}$/.test(guestName.trim());
+    // Mock-existence-check (samma princip som handleJoinWithCode) — utan
+    // backend kan vi bara verifiera mot sessions-Set:n. När backend kopplas
+    // in ersätts isActiveRoom med ett API-call. PlayerName-uniqueness är
+    // fortsatt mockad mot TAKEN_PLAYER_NAMES via validatePlayerName.
+    if (!isActiveRoom(code)) {
+      Alert.alert(
+        'Room not found',
+        'There is no Room code activated with this combination',
+      );
+      return;
+    }
+    // Autofill-detektion: matchar Guest-flödets genererade format
+    // ("Guest" + 5 siffror + "-" + 2 bokstäver). Om användaren ändrat
+    // namnet manuellt blir flaggan false.
+    const autofilled = /^Guest\d{5}-[A-Z]{2}$/.test(guestName.trim());
     track('guest_name_created', { autofilled, skill: guestSkill });
     onClose();
     router.push({
@@ -318,14 +418,15 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
             <>
               <Text style={modal.title}>Enter Room Code</Text>
               <Text style={modal.subtitle}>Ask the host for the code</Text>
-              {/* Samma 5-cell-layout som i guest-steget: 3 bokstäver + bindestreck + 2 siffror.
-                  Cell 1–3 visar bokstavstangentbord, 4–5 sifferkeypad.
+              {/* Samma 6-cell-layout som i guest-steget: 3 bokstäver +
+                  bindestreck + 2 siffror + 1 trailing bokstav. Cell 0–2
+                  och 5 visar bokstavstangentbord, 3–4 sifferkeypad.
                   Auto-fokus hoppar framåt vid input och bakåt vid backspace. */}
               <View style={modal.codeCellRow}>
                 {(() => {
                   const nextEmpty = codeCells.findIndex((c) => !c);
                   return codeCells.map((cell, i) => {
-                    const isLetterCell = i < ROOM_CODE_LETTERS;
+                    const isLetterCell = isLetterCellIndex(i);
                     const isNextCell = i === nextEmpty;
                     return (
                       <React.Fragment key={i}>
@@ -340,8 +441,19 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                           onChangeText={(t) => handleCodeCellChange(i, t)}
                           onKeyPress={(e) => handleCodeCellKeyPress(i, e.nativeEvent.key)}
                           maxLength={1}
-                          keyboardType={isLetterCell ? 'default' : 'number-pad'}
+                          // System-tangentbord helt avstängt — CodeKeyboard
+                          // (custom in-app, render:as nedanför cellerna) är
+                          // input-mekanism. Garanterar strikt content (bara A–Z
+                          // i letter-celler, bara 0–9 i digit-celler) utan
+                          // 123/ABC-switchar, samt konstant höjd så modal-
+                          // layouten aldrig reflowar mellan letter↔digit-mode.
+                          showSoftInputOnFocus={false}
+                          // Sekventiell fokus — handleCellFocus snäpper tillbaka
+                          // till next-empty-cell om användaren tappar nån annan.
+                          onFocus={() => handleCellFocus(i)}
                           autoCapitalize={isLetterCell ? 'characters' : 'none'}
+                          autoCorrect={false}
+                          spellCheck={false}
                           selectTextOnFocus
                           autoFocus={i === 0}
                         />
@@ -353,6 +465,13 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                   });
                 })()}
               </View>
+              {focusedCodeIdx !== null && (
+                <CodeKeyboard
+                  mode={isLetterCellIndex(focusedCodeIdx) ? 'letter' : 'digit'}
+                  onPress={handleCustomCharPress}
+                  onBackspace={handleCustomBackspace}
+                />
+              )}
               <TouchableOpacity
                 style={[
                   modal.joinBtn,
@@ -430,6 +549,10 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                       editable={playerNameStatus !== 'checking'}
                       returnKeyType="done"
                       onSubmitEditing={handleCheckPlayerName}
+                      // Dölj custom CodeKeyboard när användaren går in i Player
+                      // Name-fältet — system-tangentbordet tar över för fri text-
+                      // input. Återaktiveras när nån code-cell får fokus igen.
+                      onFocus={() => setFocusedCodeIdx(null)}
                     />
                     <TouchableOpacity
                       onPress={handleCheckPlayerName}
@@ -489,6 +612,10 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                     activeOpacity={0.7}
                     onPress={() => {
                       Keyboard.dismiss();
+                      // Dölj custom CodeKeyboard om den var aktiv — vi öppnar
+                      // year-pickern över formen och vill inte ha keyboard:n
+                      // synlig under den.
+                      setFocusedCodeIdx(null);
                       setYearPickerOpen(true);
                     }}
                   >
@@ -499,7 +626,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                         yearUnlocked && !parsedBirthYear && modal.yearTriggerPlaceholderActive,
                       ]}
                     >
-                      {parsedBirthYear ?? 'Select year'}
+                      {parsedBirthYear ? formatBirthYear(parsedBirthYear) : 'Select year'}
                     </Text>
                     <Text style={modal.yearTriggerArrow}>›</Text>
                   </TouchableOpacity>
@@ -530,7 +657,12 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                             modal.skillBtn,
                             isSelected && modal.skillBtnActive,
                           ]}
-                          onPress={() => setGuestSkill(opt.id)}
+                          onPress={() => {
+                            // Dölj custom CodeKeyboard om aktiv — användaren
+                            // har lämnat code-cellerna för att klicka skill.
+                            setFocusedCodeIdx(null);
+                            setGuestSkill(opt.id);
+                          }}
                         >
                           <Text
                             style={[
@@ -546,8 +678,9 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                   </View>
                 </View>
 
-                {/* Room code — 3 bokstäver + bindestreck + 2 siffror.
-                    Cell 1–3 visar bokstavstangentbord, 4–5 sifferkeypad.
+                {/* Room code — 3 bokstäver + bindestreck + 2 siffror +
+                    1 trailing bokstav. Cell 0–2 och 5 visar bokstavs-
+                    tangentbord, 3–4 sifferkeypad.
                     Låst tills skill level är valt. */}
                 <View
                   style={[modal.fieldGroup, !codeUnlocked && modal.fieldGroupLocked]}
@@ -560,7 +693,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                       // användaren fyller i koden.
                       const nextEmpty = codeCells.findIndex((c) => !c);
                       return codeCells.map((cell, i) => {
-                        const isLetterCell = i < ROOM_CODE_LETTERS;
+                        const isLetterCell = isLetterCellIndex(i);
                         const isNextCell = codeUnlocked && i === nextEmpty;
                         return (
                           <React.Fragment key={i}>
@@ -575,8 +708,14 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                               onChangeText={(t) => handleCodeCellChange(i, t)}
                               onKeyPress={(e) => handleCodeCellKeyPress(i, e.nativeEvent.key)}
                               maxLength={1}
-                              keyboardType={isLetterCell ? 'default' : 'number-pad'}
+                              // Se Room Code-flödet ovan för rationale —
+                              // CodeKeyboard (custom in-app) sköter input,
+                              // handleCellFocus enforcar sekventiell fokus.
+                              showSoftInputOnFocus={false}
+                              onFocus={() => handleCellFocus(i)}
                               autoCapitalize={isLetterCell ? 'characters' : 'none'}
+                              autoCorrect={false}
+                              spellCheck={false}
                               selectTextOnFocus
                             />
                             {i === ROOM_CODE_LETTERS - 1 && (
@@ -590,6 +729,13 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                 </View>
               </ScrollView>
 
+              {focusedCodeIdx !== null && (
+                <CodeKeyboard
+                  mode={isLetterCellIndex(focusedCodeIdx) ? 'letter' : 'digit'}
+                  onPress={handleCustomCharPress}
+                  onBackspace={handleCustomBackspace}
+                />
+              )}
               <TouchableOpacity
                 style={[
                   modal.joinBtn,
@@ -639,7 +785,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                           selected && modal.yearItemTextSelected,
                         ]}
                       >
-                        {year}
+                        {formatBirthYear(year)}
                       </Text>
                       {selected && <Text style={modal.yearItemCheck}>✓</Text>}
                     </TouchableOpacity>
@@ -780,6 +926,15 @@ export default function HomeScreen() {
 
   const handleCreateGame = () => {
     const code = generateRoomCode();
+    // Registrera koden som "aktivt rum" så join-flödena (handleJoinWithCode,
+    // handleJoinAsGuest) kan validera mot den. Sessionsbundet i mockstoren —
+    // när backend är inkopplad ersätts detta med ett POST /rooms-call eller
+    // motsvarande som backenden registrerar i DB.
+    registerActiveRoom(code);
+    // Säkerställ att leftPlayers-storen är tom för den nya koden så
+    // ingen stale test-data smyger in i den färska lobby:n och felaktigt
+    // markerar nån som "LEFT THIS GAME LOBBY".
+    clearLeftPlayers(code);
     track('room_code_created');
     router.push({ pathname: '/(tabs)/lobby', params: { code, isHost: 'true' } });
   };
@@ -1457,7 +1612,7 @@ export default function HomeScreen() {
                           regYearUnlocked && !regParsedBirthYear && modal.yearTriggerPlaceholderActive,
                         ]}
                       >
-                        {regParsedBirthYear ?? 'Select year'}
+                        {regParsedBirthYear ? formatBirthYear(regParsedBirthYear) : 'Select year'}
                       </Text>
                       <Text style={modal.yearTriggerArrow}>›</Text>
                     </TouchableOpacity>
@@ -1564,7 +1719,7 @@ export default function HomeScreen() {
                         }}
                       >
                         <Text style={[modal.yearItemText, selected && modal.yearItemTextSelected]}>
-                          {year}
+                          {formatBirthYear(year)}
                         </Text>
                         {selected && <Text style={modal.yearItemCheck}>✓</Text>}
                       </TouchableOpacity>
@@ -1937,7 +2092,9 @@ const modal = StyleSheet.create({
   yearItemTextSelected: { color: Colors.primary, fontWeight: '700' },
   yearItemCheck: { fontSize: 16, color: Colors.primary, fontWeight: '700' },
 
-  // Room code cells (5 separata rutor med auto-focus)
+  // Room code cells (6 separata rutor med auto-focus): 3 bokstäver +
+  // 2 siffror + 1 trailing bokstav. flex:1 fördelar bredd jämnt över
+  // tillgänglig yta så cellerna krymper graciöst på smalare devices.
   codeCellRow: {
     flexDirection: 'row',
     gap: Spacing.sm,

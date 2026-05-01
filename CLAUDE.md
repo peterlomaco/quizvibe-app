@@ -17,7 +17,7 @@ Expo Router quiz app (React Native 0.81, React 19, Expo SDK 54). Dark-themed, mo
 - `screens/` — large screen files (Lobby, Profile, Leaderboards, Store, HCPSettings). HCPSettings har ingen route i `app/` än (planeras kopplas in framöver).
 - `components/` — shared UI (Button, Card, PlayerRow, RoundLeaderboard, etc.).
 - `theme/` — `Colors`, `Spacing`, `Radius`, `Typography`, `FontSize`, `FontWeight`. Import via `@/src/theme`.
-- `utils/` — AsyncStorage helpers (`profileStorage`, `friendsStorage`, `pendingLobby`, `waitingInvites`, `gameResults`), plus `avatars`, `hcp`, `roomCode`, `playerName`, `analytics`, `profanity`.
+- `utils/` — AsyncStorage helpers (`profileStorage`, `friendsStorage`, `pendingLobby`, `waitingInvites`, `gameResults`, `leftPlayers`), plus `avatars`, `hcp`, `roomCode`, `playerName`, `analytics`, `profanity`, `mockActiveRooms`.
 
 Path alias: `@/*` → repo root (e.g. `@/src/theme`, `@/src/components/Button`).
 
@@ -25,6 +25,7 @@ Path alias: `@/*` → repo root (e.g. `@/src/theme`, `@/src/components/Button`).
 
 - `LobbyPlayer` is exported from `src/screens/LobbyScreen.tsx` and imported by `app/quiz.tsx`. Don't move it without updating both.
 - `LobbyPlayer.spotifyConnected?: boolean` drives the Spotify auto-enable rule in Game Connections. Sourced from `profile.spotifyConnected` for the host (via `mergeProfileIntoHost`); guests and `+ Add Player` entries leave it falsy by design.
+- `LobbyPlayer.hasLeft?: boolean` triggers grayed-out "LEFT THIS GAME LOBBY"-rendering i `PlayerRow`. Sätts av Lobby:s `useFocusEffect` baserat på `getLeftPlayers(roomCode)` från `src/utils/leftPlayers.ts`. Host:en exkluderas alltid från denna check (host kan ej lämna sin egen lobby).
 - `RoundLeaderboard` re-exports several types (`LeaderboardPlayer`, `RoundScore`, `HcpChange`, mocks).
 
 ## Persistence
@@ -32,6 +33,10 @@ Path alias: `@/*` → repo root (e.g. `@/src/theme`, `@/src/components/Button`).
 All client-side via AsyncStorage. No server. Screens reload data on focus (`useFocusEffect` + `loadX()`), so writing through `src/utils/*Storage.ts` is the canonical pattern. No reactive store yet.
 
 **Field rename migration (dual-read)**: when renaming a persisted field (e.g. `nickname → playerName`), use passive dual-read in the load function — read the new field first, fall back to the old. Next save writes only the new shape so storage converges passively. See `profileStorage.ts`, `friendsStorage.ts`, `waitingInvites.ts`. The fallback can be dropped 2-3 release cycles after rename when most users have migrated.
+
+**Mock backend stores** (sessions/AsyncStorage stand-ins för kommande backend-API): konventionen är att exportera funktioner med samma signatur som API-anrop kommer att ha så att call-sites förblir oförändrade när impl byts ut. Två stores idag:
+- `src/utils/mockActiveRooms.ts` — **in-memory `Set<string>`** över aktiva rumkoder. `registerActiveRoom(code)` (vid Create Game/Play Again), `isActiveRoom(code)` (validation i `handleJoinWithCode`/`handleJoinAsGuest` — visar "Room not found"-Alert vid miss), `deactivateRoom(code)` (när host trycker Delete this Game Lobby). Sessions-bunden (förstörs vid app-reload). Test-seeds: `'ABC23X'`, `'TEST99Z'`.
+- `src/utils/leftPlayers.ts` — **AsyncStorage** per rumkod. Lagrar `LeftPlayerSnapshot[]` (inte bara id) så nya joiners som inte har lämnande spelaren i sin SEED-baseline kan rendera kortet med `hasLeft`-styling via orphan-injection (se "Lobby — TopUserBanner actions" nedan). `addLeftPlayer(roomCode, snapshot)`, `getLeftPlayers(roomCode)`, `clearLeftPlayers(roomCode)` (anropas av `handleCreateGame`/Play Again för fresh slate på återanvänd kod).
 
 ## Conventions
 
@@ -44,12 +49,14 @@ All client-side via AsyncStorage. No server. Screens reload data on focus (`useF
 
 ## Player Name (registration + validation)
 
-Auto-generated format: `PlayerName{5 digits}-{2 letters}` (e.g. `PlayerName87321-KL`) via `src/utils/playerName.ts → generatePlayerName(taken)`. Auto-filled in:
+Auto-generated via `src/utils/playerName.ts → generatePlayerName(taken, prefix?)`. Två varianter via `prefix`-arg:
 
-- **Register form** (`app/(tabs)/index.tsx`): on email-becomes-valid transition (tracked via `prevRegEmailValidRef`).
-- **Guest form** in JoinModal: on entry to guest step (tracked via `prevGuestStepRef`).
+- **Register form** (`app/(tabs)/index.tsx`): default-prefix `"PlayerName"` → t.ex. `PlayerName87321-KL`. Triggas på email-becomes-valid transition (tracked via `prevRegEmailValidRef`).
+- **Guest form** in JoinModal: prefix `"Guest"` → t.ex. `Guest87321-KL`. Triggas på entry to guest step (tracked via `prevGuestStepRef`). Annan prefix än Register-formen så default-namnet signalerar att användaren joinar utan registrering.
 
-Both use `useRef`-based transition detection so manual clear of the field doesn't trigger a refill.
+Both use `useRef`-based transition detection so manual clear of the field doesn't trigger a refill. Autofill-detektion i `handleJoinAsGuest` använder regex `^Guest\d{5}-[A-Z]{2}$` (matchar Guest-flödets format).
+
+**Suffix-blocklista** i `playerName.ts` filtrerar bort 2-bokstavskombinationer `{ 'CP', 'AS', 'KK' }` från det genererade `-XX`-suffixet (`randomLetterPair()` retry:ar tills paret är OK). Gäller båda flödena — inget auto-genererat namn ska behöva förklara dessa initialer. ~3 av 676 möjliga par blockas så miss-rate är försumbar.
 
 `validatePlayerName(name)` (module-level helper in `app/(tabs)/index.tsx`) returns `'available' | 'taken' | 'invalid'`. Profanity check (`src/utils/profanity.ts` — short blocklist of severe SE/EN terms with basic l33t-substitutions, conservative on false-positives) runs first, then uniqueness check against mock `TAKEN_PLAYER_NAMES`. UI status type: `PlayerNameStatus = 'idle' | 'checking' | 'available' | 'taken' | 'invalid'`.
 
@@ -119,36 +126,72 @@ Layouten under "Customized Host packages"-rubriken: en yttre `extraPackagesWrapp
 The room-code Card (`roomCard`) is laid out very differently for host vs guest. Both share the absolute-positioned QuizVibeLogo in the upper-left:
 
 - Logo: `<QuizVibeLogo size={104} />` wrapped in `roomCodeLogoWrap` with `position: 'absolute'`, `top: -Spacing.sm`, `left: -Spacing.sm` — pinned to the Card's padding-edge top-left corner. Same size as Home's brand logo.
-- Room code rendered as 5 cells (3 letters + 2 digits) using the **same filled-cell styling** as JoinModal's `codeCellFilled` (`Colors.primary` border + `Colors.primaryMuted` bg). Hyphen between letters and digits is a separate `<Text style={styles.roomCodeCellDash}>–</Text>`. Iterates raw `roomCode.split('')` — canonical form has no hyphen.
+- Room code rendered as 6 cells (3 letters + 2 digits + 1 trailing letter, e.g. `ABC23X`) using the **same filled-cell styling** as JoinModal's `codeCellFilled` (`Colors.primary` border + `Colors.primaryMuted` bg). Hyphen between the initial 3 letters and the rest is a separate `<Text style={styles.roomCodeCellDash}>–</Text>` (display: `ABC-23X`). Iterates raw `roomCode.split('')` — canonical form has no hyphen.
 
 **Host layout**: hostBadge ("👑 You are the host") at top, then "Room Code" label (small overline) + cell row in the row stack, then Share-invite button. Standard stacked layout in flow.
 
-**Guest layout** (non-trivial, empirically pixel-tuned):
+**Non-host layout** (gäller både guest och registrerad icke-host som joinat via kod) — empiriskt pixel-tuned:
 
-- "ROOM CODE" label uses `roomLabelGuestAbsolute` — `FontSize.xxl` (24), letterSpacing 1.2, **absolute-positioned** at `top: 27`, `left: 0`, `right: 0`, `textAlign: 'center'`. Absolute positioning bypasses flex/lineHeight quirks that made label-vs-logo alignment unpredictable. The label's vertical center (~y=41 in card padded coords) lines up with the logo's visible center (cy=38 in 80-unit viewBox → 49.4 from logo top → -8+49.4 ≈ 41 in padded coords).
+- **"You are invited"-badge** ovanför "Room Code" (`guestInvitedBadgeWrap` → `guestInvitedBadge` → `guestInvitedBadgeText`). Pill-styling speglar `hostBadge`/`hostBadgeText` exakt (primaryMuted bg + primaryBorder + xs-font + primary-färg) så host- och guest-vyn känns visuellt lika på sin identitets-rad. Wrap absolut-positionerad `top: 6`, `alignItems: 'center'` så pillen krymper till sitt textinnehåll.
+- "ROOM CODE" label uses `roomLabelGuestAbsolute` — `FontSize.xxl` (24), letterSpacing 1.2, **absolute-positioned** at `top: 39`, `left: 0`, `right: 0`, `textAlign: 'center'`. (Var tidigare `top: 27` aligned mot logo-mitt vid y≈41; flyttad ned till 39 för att skapa luft mellan badge och label, badge+label är nu primär visuell stack ovanför cellerna istället för att labelen "går genom" loggan.)
 - Label is **horizontally centered** in the card (textAlign center on full-width absolute Text) — NOT aligned with the logo's horizontal center. Earlier iteration tried that and Peter rejected it.
-- `roomCodeRowGuestSpacing: { marginTop: 52 }` on the row so the cell row clears the logo's lower portion. The 52 is empirical — gap between label-bottom and cells is intentionally tight (~−1px, cells start just where the label ends).
+- `roomCodeRowGuestSpacing: { marginTop: 64 }` on the row so the cell row clears the logo's lower portion. (Höjt från 52 i takt med label-flytten ovan så label↔cells-relationen bevaras.)
 - No "Share invite" button.
 
-`formatRoomCode(code)` from `src/utils/roomCode.ts` inserts a hyphen between letters and digits ("ABC23" → "ABC-23"). **Display-only** — storage (AsyncStorage invites, navigation params) and comparison still use the canonical 5-char form. Used by the OS share message and the Home Waiting-Invites list. The cell-based room-code display in Lobby splits the raw code char-by-char, so it doesn't call `formatRoomCode`.
+`formatRoomCode(code)` from `src/utils/roomCode.ts` inserts a hyphen between the initial 3 letters and the rest ("ABC23X" → "ABC-23X"). **Display-only** — storage (AsyncStorage invites, navigation params) and comparison still use the canonical 6-char form. Used by the OS share message and the Home Waiting-Invites list. The cell-based room-code display in Lobby splits the raw code char-by-char, so it doesn't call `formatRoomCode`.
+
+## Lobby — Code keyboard (custom in-app)
+
+JoinModal:s 6 code-cells använder en **custom in-app keyboard** (`src/components/CodeKeyboard.tsx`) istället för system-tangentbordet. iOS har ingen keyboardType som ger letter-only utan "123"-switch, ingen number-only med samma höjd som default-QWERTY → custom view är enda lösningen för strikt content + ingen layout-jump.
+
+- TextInputs på code-cellerna sätter `showSoftInputOnFocus={false}` — system-tangentbord kommer aldrig fram.
+- `CodeKeyboard` rendererar mode-baserat: `'letter'` = 24-knappars 4×6 grid (`LETTER_CHARSET`), `'digit'` = 10-knappars 2×5 grid (`DIGIT_CHARSET`, numpad-ordning "12345" / "67890"). Charsets exporteras från `roomCode.ts` så keyboard speglar exakt valid-chars.
+- Container är **fixed height** oavsett mode — digit-grid:en fyller samma höjd via `flex: 1` på rader → större tap-targets för färre keys + ingen reflow när focus flyttas mellan letter↔digit-celler.
+- **Sekventiell focus**: `handleCellFocus(i)` snäpper fokus till "next-empty cell" (eller sista cellen om alla fyllda så backspace fungerar därifrån). Användaren kan inte tap:a en disallowed cell — markören snäpper tillbaka. Forward = type tecken (auto-advance via `handleCodeCellChange`), backward = backspace (auto-retreat).
+- Backspace-knappen i CodeKeyboard:n: tom cell → flytta fokus + töm föregående; ifylld cell → töm sig själv.
+
+`roomCode.ts` exporterar `isLetterCellIndex(index)` (cell 0–2, 5 = letter; cell 3–4 = digit) som driver per-cell-sanitize och keyboard-mode. `isBlockedLetterTriplet(triplet)` används av `handleCodeCellChange` för att stoppa manual entry av samma triplets som `BLOCKED_LETTER_TRIPLETS`-genereringsfilter blockerar — visar Alert "Combination not compliant — Please re-enter" och avbryter ändringen (cell behåller tidigare värde, ingen auto-focus-shift). Triplet-check körs varje gång alla 3 letter-cellerna är fyllda så även edge-case:t där användaren går tillbaka och ändrar cell 0/1 efteråt fångas.
+
+**Room code blocklists** (gäller både generering OCH manual entry):
+- `BLOCKED_LETTER_TRIPLETS` — engelska + svenska + borderline (ASS, CUM, FAG, GAY, JEW, KKK, NAZ, SEX, FAP, KUK, NEG, FAN, NMR, SUG, APA, BAJ).
+- `BLOCKED_DIGIT_PAIRS` — 14, 18 (vit-supremacist-koder), 69, 88. 14/18 var tidigare omöjliga eftersom 1 saknades; nu inkluderat eftersom DIGIT_CHARSET utvidgats till fullt 0–9 (för CodeKeyboard).
+
+## Lobby — TopUserBanner actions (leave & delete)
+
+Bannern är roll-beroende i Lobby (`src/screens/LobbyScreen.tsx`):
+
+- **Host** (hostMode=true): tap → `hostDeleteSheetVisible` Modal med röd "Delete this Game Lobby"-knapp + Cancel. Knappen → Alert "Delete this Game Lobby?" → Yes anropar `deactivateRoom(roomCode)` (tar bort från `mockActiveRooms`), visar **loading-overlay** med "Please Wait — Deleting this Lobby" + animerade våg-prickar (`<WaveDots />`-komponent inline i samma fil) i 1.6s, sedan `router.replace('/')`. **Viktigt**: `setDeletingLobby(false)` MÅSTE anropas explicit innan navigation eftersom Lobby ligger i `(tabs)` och tab-navigatorn bevarar Modal-state över route-replace — annars hänger overlay:n kvar över Home.
+- **Non-host** (oavsett guest eller registrerad): tap → `guestLeaveSheetVisible` Modal med röd "Leave Game Lobby — Go to Home"-knapp + Cancel. Knappen → Alert "Leave this Game Lobby?" → Yes sparar **full snapshot** av spelaren via `addLeftPlayer(roomCode, snapshot)` (id, name, emoji, type, age, skill, hcpComplete, approved) → `router.replace('/')`. Sheet-headern visar dynamiskt avatar+namn+status från `players.find(p => p.id === ownPlayerIdRef.current)` — guest får "Guest", registrerad får "Player".
+- Profile-tabben i bottom nav är host:s väg till profil-hantering (banner-tappet är inte längre Profile-genvägen för någon i Lobby).
+
+**Non-host detection of room deletion**: useEffect:en (gating på `!hostMode`) initial-check + 2s polling-interval anropar `isActiveRoom(roomCode)`. När den blir false sätts `roomDeletedDetected=true` → separat useEffect triggar Alert "Game Lobby deleted / This Game Lobby has been deleted by Host" med `cancelable: false` → OK → `router.replace('/')`. Polling istället för event-driven eftersom mockstoren saknar event-bus; ersätts med WS/SSE-prenumeration när backend kommer in.
+
+**`hasLeft` orphan injection** (i `useFocusEffect`): efter att ha mappat över befintliga `players[]` och applicerat `hasLeft` på matchande id:n, läggs alla `LeftPlayerSnapshot` som INTE redan finns i listan till som nya `LobbyPlayer`-objekt med `hasLeft: true`. Detta krävs för att en NY user (t.ex. guest B) som joinar samma rum efter att en annan user (guest A) lämnat ska se A:s gråa "LEFT THIS GAME LOBBY"-kort — A finns inte i B:s SEED-baseline. Snapshot:en bär `approved`-flaggan så kortet hamnar i rätt sektion (Approved / To be Approved by Host).
 
 ## Lobby — Players in Lobby
 
 Non-host gets a **read-only view** of the player list:
 
 - Section hint changes by mode: "Turn order — top plays first. Use ↑↓ to reorder." (host) → "Playing order — selected by Host" (guest).
-- `PlayerRow`'s up/down arrow buttons (`turnArrows` block) are gated on **handler presence** — if neither `onMoveUp` nor `onMoveDown` is passed, the entire turnArrows block is hidden. `LobbyScreen` passes `undefined` for both handlers when `!hostMode`. The turn-number badge stays visible.
+- `PlayerRow`'s up/down arrow buttons (`turnArrows` block) are gated on **handler presence** — if neither `onMoveUp` nor `onMoveDown` is passed, the entire turnArrows block is hidden. `LobbyScreen` passes `undefined` for both handlers when `!hostMode` (and även för spelare med `hasLeft: true`). The turn-number badge stays visible.
 
-**Auto-add joining player** (mount useEffect in `LobbyScreen.tsx`): non-hosts are inserted into the players list immediately on lobby entry as `approved: false`, so they appear in the "To be Approved by Host" section right away — no separate waiting screen.
+**Auto-add joining player** (`useEffect` i `LobbyScreen.tsx`): non-hosts inserts into players list immediately on lobby entry as `approved: false`, så de syns i "To be Approved by Host"-sektionen direkt — no separate waiting screen.
 
-- `asGuest=true` + `guestName` (Guest-form path): inserts as `type: 'guest'` from form params.
-- `!hostMode` without guest-form params (code-only join): loads `loadProfile()` and inserts as `type: 'registered'` from profile (name, avatar, age, skill, spotifyConnected). Falls back to "You" / 👤 / `type: 'guest'` if no profile saved.
+- `asGuest=true` + `guestName` (Guest-form path): inserts as `type: 'guest'` from form params, `id = guest-${Date.now()}`.
+- `!hostMode` utan guest-form-params (code-only join): loads `loadProfile()` och inserts as `type: 'registered'` from profile (name, avatar, age, skill, spotifyConnected), `id = joiner-${Date.now()}`. Falls back to "You" / 👤 / `type: 'guest'` om profil saknas.
+
+**Deps på URL-params + state-reset (kritiskt)**: useEffect:en deps är `[code, guestMode, guestName, guestBirthYear, guestSkill, hostMode]` — INTE `[]`. Lobby ligger i `(tabs)` och tab-navigatorn återanvänder samma component-instans över transitions (t.ex. `host → home tab → join som guest`). Med `[]`-deps re-fyrade aldrig auto-add när params bytte → nya identiteten lades aldrig in. Effekten reset:ar även `setPlayers(SEED_PLAYERS)` + `ownPlayerIdRef.current = null` i början av varje run så ingen state ärver över.
+
+**`mergeProfileIntoHost` gating**: i `useFocusEffect` är merge:n gated på `hostMode && profile && p.isHost` — INTE bara `profile && p.isHost`. När non-host joinar ska seed-host:en Alex K. visas oförändrad, INTE få den nuvarande user:s profil-data tilldelad (annars ser det ut som att joinaren är host eftersom HOST-badge:n + ens egen avatar/namn syns på det kortet).
+
+**`PlayerRow.hasLeft` rendering**: när `hasLeft: true` får kortet neutral grå border (override:ar approved/waiting-färgerna), avatar dämpas, namn/HCP-rad i `textDisabled`, status-raden ersätts med "LEFT THIS GAME LOBBY"-text, approve-toggle och move-arrows döljs. Host-spelaren får ALDRIG `hasLeft` (defensiv guard i useFocusEffect — host kan inte lämna sin egen lobby).
 
 ## Shared visual components
 
 - `src/components/QuizVibeLogo.tsx` — brand SVG used on Home and Lobby room-card (both at `size={104}`). The Q-figure (ring + tail + wifi-fan in the center) is shifted **−3 in x, −1 in y** from the original (40, 38) center so the Q+tail bounding box (24-52, 24-52) is centered in the front rounded square (16-60, 16-60, center 38, 38). Wifi-fan replaces the old single dot — three concentric 90°-arcs (radii 3 / 5 / 7, `sweep-flag=1` so they bulge upward) + a 1.5px dot, all centered at (37, 37) (= Q ring center). 90° was chosen over 120° to match the iOS status-bar wifi icon's compactness — sweep-flag=0 produced inverted (frown) arcs, easy to flip back accidentally.
 - `src/components/QuizVibeFriendsLogo.tsx` — brand-mark variant for the QuizVibe friends card on Profile. Q-form + tail + rotated squares are identical to `QuizVibeLogo`, but the wifi-pattern inside the Q ring is replaced with two profile silhouettes (head circle + body rounded-rect side-by-side). ViewBox tightened to `"13 13 54 54"` (vs `"0 0 80 80"` in `QuizVibeLogo`) to crop the empty padding around the rotated squares so visible content fills the render area at small sizes (44-52px). Q is centered at **(38, 38)** to match the squares' pre-rotation visual center, NOT (40, 40) which is the viewBox geometric mid. Default `size=44` to match Spotify/YouTube icon-wraps on the same screen; rendered inside a `friendsIconWrap` (44×44 View) for layout-dimension safety.
-- `src/components/TopUserBanner.tsx` — full-width banner with a login pill (avatar + Player Name, or "Register or Login" when no profile) in the top-right corner. **Optional `onPress`**: when omitted the pill renders as a plain `<View>` instead of `<TouchableOpacity>` (used on Profile screen — user is already there, no destination); Home passes `setProfileMenuVisible(true)`; Lobby passes `router.push('/(tabs)/profile')`. **Optional `profile` prop (controlled mode)**: skärmar med in-place-login (Home — login-modalen lever på samma skärm som bannern) MÅSTE passera sin egen profile-state så bannern uppdateras direkt vid login/logout — useFocusEffect-self-load triggar inte eftersom skärmen aldrig tappar focus. Lobby/Profile utelämnar proppen och låter bannern self-loada via useFocusEffect (de re-renderas naturligt vid tab-byte). **Sticky-on-scroll pattern**: place as a direct child of `<SafeAreaView>`, **outside** the `<ScrollView>`, so it remains pinned at the top while content scrolls. Used on Home, Lobby, and Profile screens.
+- `src/components/TopUserBanner.tsx` — full-width banner with a login pill (avatar + Player Name, or "Register or Login" when no profile) in the top-right corner. **Optional `onPress`**: when omitted the pill renders as a plain `<View>` istället för `<TouchableOpacity>` (used on Profile screen — user is already there, no destination); Home passes `setProfileMenuVisible(true)`; Lobby passes role-baserad handler (host → delete-sheet, non-host → leave-sheet — se "Lobby — TopUserBanner actions"). **Optional `profile` prop (controlled mode)**: skärmar med in-place-login (Home — login-modalen lever på samma skärm som bannern) MÅSTE passera sin egen profile-state så bannern uppdateras direkt vid login/logout — useFocusEffect-self-load triggar inte eftersom skärmen aldrig tappar focus. Lobby/Profile utelämnar proppen och låter bannern self-loada via useFocusEffect (de re-renderas naturligt vid tab-byte). **Optional `guestName` prop**: när profile saknas men guestName finns visar pillen 👤 + guestName i muted styling (samma look som "Register or Login"-fallback) — driver display för gäster som joinat lobby:n via guest-form. Registrerade users (profile != null) har företräde om båda råkar vara satta. **Sticky-on-scroll pattern**: place as a direct child of `<SafeAreaView>`, **outside** the `<ScrollView>`, so it remains pinned at the top while content scrolls. Used on Home, Lobby, and Profile screens.
+- `src/components/CodeKeyboard.tsx` — custom in-app keyboard for JoinModal:s code-cells. Se "Lobby — Code keyboard" för rationale och design-detaljer (det är JoinModal:n som använder den, men implementationen är generic nog att eventuellt kunna återanvändas för andra struktured-input-fält i framtiden).
 
 ## Analytics
 

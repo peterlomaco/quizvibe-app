@@ -13,6 +13,8 @@ import { Colors, FontSize, FontWeight, Radius, Spacing } from '@/src/theme';
 import { track } from '@/src/utils/analytics';
 import { saveLatestResult, type GameResult, type RoundResult } from '@/src/utils/gameResults';
 import { clearPendingLobbyPlayers, savePendingLobbyPlayers } from '@/src/utils/pendingLobby';
+import { clearLeftPlayers } from '@/src/utils/leftPlayers';
+import { registerActiveRoom } from '@/src/utils/mockActiveRooms';
 import { generateRoomCode } from '@/src/utils/roomCode';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -716,6 +718,11 @@ export default function QuizScreen() {
       await savePendingLobbyPlayers(justHost);
     }
     const newCode = generateRoomCode();
+    // Registrera nya koden som aktivt rum så join-flödena kan validera
+    // mot den (samma princip som handleCreateGame på Home-skärmen).
+    registerActiveRoom(newCode);
+    // Färsk leftPlayers-store för nya koden — undviker stale test-data.
+    clearLeftPlayers(newCode);
     router.replace(`/(tabs)/lobby?code=${newCode}&isHost=true`);
   };
 

@@ -34,6 +34,12 @@ interface PlayerRowProps {
   showApproveToggle?: boolean;
   approved?: boolean;
   onApproveChange?: (next: boolean) => void;
+  // True om spelaren har lämnat lobby:n. Då renderas kortet i muted/grå
+  // styling och status-raden ersätts med "LEFT THIS GAME LOBBY". Override:ar
+  // approved/waiting-borderfärger (kortet får neutral grå border istället)
+  // och approve-toggeln döljs eftersom det inte längre är meningsfullt
+  // att godkänna en spelare som har gått.
+  hasLeft?: boolean;
 }
 
 export function PlayerRow({
@@ -52,6 +58,7 @@ export function PlayerRow({
   showApproveToggle,
   approved,
   onApproveChange,
+  hasLeft,
 }: PlayerRowProps) {
   const hcp = hcpComplete && age && skill
     ? calculateInitialHCP(age, skill)
@@ -66,9 +73,12 @@ export function PlayerRow({
           styles.card,
           // Approved/waiting border-färg — gäller alla utom host (host
           // har sin egen guld-border via cardHost nedan).
-          !isHostPlayer && approved === true && styles.cardApproved,
-          !isHostPlayer && approved === false && styles.cardWaiting,
-          isHostPlayer && styles.cardHost,
+          !isHostPlayer && !hasLeft && approved === true && styles.cardApproved,
+          !isHostPlayer && !hasLeft && approved === false && styles.cardWaiting,
+          isHostPlayer && !hasLeft && styles.cardHost,
+          // hasLeft override:ar alla border-färger till neutral grå för att
+          // visuellt nedprioritera kortet och signalera "ej längre aktiv".
+          hasLeft && styles.cardLeft,
         ]}
       >
 
@@ -76,12 +86,12 @@ export function PlayerRow({
       <View style={styles.row}>
         {turnNumber !== undefined && (
           <View style={styles.turnColumn}>
-            <View style={[styles.turnBadge, turnNumber === 1 && styles.turnBadgeFirst]}>
-              <Text style={[styles.turnBadgeText, turnNumber === 1 && styles.turnBadgeTextFirst]}>
+            <View style={[styles.turnBadge, turnNumber === 1 && !hasLeft && styles.turnBadgeFirst, hasLeft && styles.turnBadgeLeft]}>
+              <Text style={[styles.turnBadgeText, turnNumber === 1 && !hasLeft && styles.turnBadgeTextFirst, hasLeft && styles.textLeft]}>
                 {turnNumber}
               </Text>
             </View>
-            {(onMoveUp || onMoveDown) && (
+            {(onMoveUp || onMoveDown) && !hasLeft && (
               <View style={styles.turnArrows}>
                 <Pressable
                   onPress={onMoveUp}
@@ -103,28 +113,43 @@ export function PlayerRow({
             )}
           </View>
         )}
-        <Avatar
-          uri={player.avatarUri}
-          emoji={player.emoji}
-          name={player.name}
-          size={40}
-        />
+        <View style={hasLeft && styles.avatarLeft}>
+          <Avatar
+            uri={player.avatarUri}
+            emoji={player.emoji}
+            name={player.name}
+            size={40}
+          />
+        </View>
 
         <View style={styles.info}>
           <View style={styles.nameRow}>
-            <Text style={styles.name} numberOfLines={1}>{player.name}</Text>
+            <Text style={[styles.name, hasLeft && styles.textLeft]} numberOfLines={1}>{player.name}</Text>
           </View>
-          <View style={styles.statusRow}>
-            <View style={[styles.dot, player.isReady ? styles.dotReady : styles.dotPending]} />
-            <Text style={[styles.statusText, player.isReady ? styles.ready : styles.pending]}>
-              {player.isReady ? 'Ready' : 'Missing info'}
-            </Text>
-          </View>
+          {hasLeft ? (
+            // Replace status-row med "LEFT THIS GAME LOBBY"-text. Ingen dot
+            // (dot:en signalerar Ready/Missing-state som inte längre är
+            // relevant). Texten är samma muted-grå som övrig text i kortet.
+            <View style={styles.statusRow}>
+              <Text style={[styles.statusText, styles.textLeft, styles.leftLabel]} numberOfLines={1}>
+                LEFT THIS GAME LOBBY
+              </Text>
+            </View>
+          ) : (
+            <View style={styles.statusRow}>
+              <View style={[styles.dot, player.isReady ? styles.dotReady : styles.dotPending]} />
+              <Text style={[styles.statusText, player.isReady ? styles.ready : styles.pending]}>
+                {player.isReady ? 'Ready' : 'Missing info'}
+              </Text>
+            </View>
+          )}
         </View>
 
         {/* Approve-toggle inne i kortets header — bara host ser den.
-            Bidirektionell: drag Yes godkänner, drag No återkallar. */}
-        {showApproveToggle && (
+            Bidirektionell: drag Yes godkänner, drag No återkallar.
+            Döljs för left-spelare — det är inte längre meningsfullt att
+            godkänna en spelare som har gått. */}
+        {showApproveToggle && !hasLeft && (
           <ApproveToggle
             value={approved ? 'yes' : 'no'}
             onChange={(next) => onApproveChange?.(next === 'yes')}
@@ -133,7 +158,9 @@ export function PlayerRow({
       </View>
 
       {/* ── HCP-rad (färdig) ───────────────────────────────── */}
-      {hcpComplete && age && skill && (isGuest || hcp !== null) && (
+      {/* HCP-raden döljs helt för left-spelare — kortet ska kännas
+          minimalistiskt och signalera "borta", inte presentera spel-data. */}
+      {!hasLeft && hcpComplete && age && skill && (isGuest || hcp !== null) && (
         <View style={styles.hcpRow}>
           <Text style={styles.hcpMeta}>
             {skill.charAt(0).toUpperCase() + skill.slice(1)} · Age {age}
@@ -198,6 +225,37 @@ const styles = StyleSheet.create({
   },
   cardWaiting: {
     borderColor: Colors.error,
+  },
+  // hasLeft-stil: neutral grå border + dämpad bakgrund. Override:ar
+  // approved/waiting/host-borderfärger så kortet visuellt nedprioriteras
+  // jämfört med aktiva spelarkort.
+  cardLeft: {
+    borderColor: Colors.borderStrong,
+    backgroundColor: Colors.cardElevated,
+    opacity: 0.7,
+  },
+  // Text-färg som appliceras på alla text-element (namn, status,
+  // turn-badge-siffran) när hasLeft är true. Använder textDisabled så
+  // texten upplevs som "ljust grå" enligt user-request.
+  textLeft: {
+    color: Colors.textDisabled,
+  },
+  // Specialstilar för "LEFT THIS GAME LOBBY"-labeln: lite mer letterspacing
+  // + bold för att den ska läsas som ett distinkt status, inte vanlig text.
+  leftLabel: {
+    fontWeight: FontWeight.semibold,
+    letterSpacing: 0.5,
+  },
+  // Turn-badge när spelaren har left: bakgrunden blir muted (override:ar
+  // both turnBadge-default och turnBadgeFirst om aktiv).
+  turnBadgeLeft: {
+    backgroundColor: Colors.cardElevated,
+    borderColor: Colors.borderStrong,
+  },
+  // Avatar-wrapper när spelaren har left: dimmas via opacity så själva
+  // emoji/foto kvarstår men signalerar nedprioritet.
+  avatarLeft: {
+    opacity: 0.5,
   },
   // HOST-tagg som sitter på kortets övre kantlinje
   hostBorderTag: {
