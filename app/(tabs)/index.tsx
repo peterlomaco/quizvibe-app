@@ -1,5 +1,6 @@
 import { CodeKeyboard } from '@/src/components/CodeKeyboard';
 import { QuizVibeLogo } from '@/src/components/QuizVibeLogo';
+import { QuizVibeQAvatar } from '@/src/components/QuizVibeQAvatar';
 import { TopUserBanner } from '@/src/components/TopUserBanner';
 import { Colors, Radius, Spacing } from '@/src/theme';
 import { identify, resetIdentity, track } from '@/src/utils/analytics';
@@ -9,7 +10,7 @@ import { isActiveRoom, registerActiveRoom } from '@/src/utils/mockActiveRooms';
 import { generatePlayerName } from '@/src/utils/playerName';
 import { containsProfanity } from '@/src/utils/profanity';
 import { clearProfile, loadProfile, saveProfile, type ProfileData } from '@/src/utils/profileStorage';
-import { formatRoomCode, generateRoomCode, isBlockedLetterTriplet, isLetterCellIndex, ROOM_CODE_LENGTH, ROOM_CODE_LETTERS } from '@/src/utils/roomCode';
+import { formatRoomCode, generateRoomCode, isBlockedLetterPair, isLetterCellIndex, ROOM_CODE_DIGITS, ROOM_CODE_LEADING_LETTERS, ROOM_CODE_LENGTH, ROOM_CODE_TRAILING_LETTERS } from '@/src/utils/roomCode';
 import { loadInvites, removeInvite, type WaitingInvite } from '@/src/utils/waitingInvites';
 import { Nunito_400Regular, Nunito_600SemiBold, Nunito_700Bold, useFonts } from '@expo-google-fonts/nunito';
 import { router, useFocusEffect } from 'expo-router';
@@ -117,8 +118,16 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
   // visas för andra fält som Player Name).
   const [focusedCodeIdx, setFocusedCodeIdx] = useState<number | null>(null);
 
-  // Refs till de 5 cells för rumkoden — för auto-fokus framåt och bakåt.
+  // Refs till de 6 cells för rumkoden — för auto-fokus framåt och bakåt.
   const codeRefs = useRef<Array<TextInput | null>>([]);
+  // Ref till PlayerName-input så Remove-knappen kan refokusera fältet
+  // (custom keyboard pushar inte layouten så ingen jump-risk).
+  const playerNameInputRef = useRef<TextInput>(null);
+  // PlayerName använder samma CodeKeyboard som code-cellerna men med
+  // egen state — fri-text-fält behöver manuell mode-toggle (vs cell-typen
+  // som styr code-keyboardet automatiskt).
+  const [playerNameKbMode, setPlayerNameKbMode] = useState<'letter' | 'digit'>('letter');
+  const [playerNameFocused, setPlayerNameFocused] = useState(false);
   // Spåra om föregående step var 'guest' så Player Name-autofill bara
   // triggar vid transition INTO guest-steget (inte refill om användaren
   // rensat fältet efter en autofill).
@@ -127,24 +136,33 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
   const codeCells: string[] = Array.from({ length: ROOM_CODE_LENGTH }, (_, i) => code[i] ?? '');
 
   const handleCodeCellChange = (index: number, char: string) => {
-    // Per-cell-filter: bokstavs-celler (0–2 + 5) = A–Z, siffer-celler (3–4) = 0–9.
+    // Per-cell-filter: bokstavs-celler (0–1 + 4–5) = A–Z, siffer-celler (2–3) = 0–9.
     const isLetterCell = isLetterCellIndex(index);
     const allowed = isLetterCell ? /[^A-Z]/g : /[^0-9]/g;
     const clean = char.toUpperCase().replace(allowed, '').slice(0, 1);
     const arr = [...codeCells];
     arr[index] = clean;
-    // Stoppa manual entry av samma blockerade tripletset som
-    // generators-flödet aldrig delar ut. Validering körs varje gång
-    // alla 3 bokstavs-cellerna är fyllda — fångar både den vanliga
-    // typing-vägen (cell 2 låser tripleten) och edge-case:t där
-    // användaren går tillbaka och ändrar cell 0 eller 1 efteråt.
-    // På träff: ändringen avbryts (cellen behåller sitt gamla värde),
-    // ingen auto-focus-shift, och användaren får en native Alert.
+    // Stoppa manual entry av samma blockerade bokstavspar som
+    // genererings-flödet aldrig delar ut. Två oberoende checks beroende
+    // på vilket par som påverkades — leading-paret (cell 0–1) eller
+    // trailing-paret (cell 4–5). Validering körs när det relevanta paret
+    // är fullt fyllt; samma blocklista gäller båda paren. På träff:
+    // ändringen avbryts (cellen behåller sitt gamla värde), ingen
+    // auto-focus-shift, och användaren får en native Alert.
     if (isLetterCell && clean) {
-      const triplet = arr.slice(0, ROOM_CODE_LETTERS).join('');
-      if (triplet.length === ROOM_CODE_LETTERS && isBlockedLetterTriplet(triplet)) {
-        Alert.alert('Combination not compliant', 'Please re-enter');
-        return;
+      if (index < ROOM_CODE_LEADING_LETTERS) {
+        const leadingPair = arr.slice(0, ROOM_CODE_LEADING_LETTERS).join('');
+        if (leadingPair.length === ROOM_CODE_LEADING_LETTERS && isBlockedLetterPair(leadingPair)) {
+          Alert.alert('Combination not compliant', 'Please re-enter');
+          return;
+        }
+      } else {
+        const trailingStart = ROOM_CODE_LEADING_LETTERS + ROOM_CODE_DIGITS;
+        const trailingPair = arr.slice(trailingStart).join('');
+        if (trailingPair.length === ROOM_CODE_TRAILING_LETTERS && isBlockedLetterPair(trailingPair)) {
+          Alert.alert('Combination not compliant', 'Please re-enter');
+          return;
+        }
       }
     }
     setCode(arr.join(''));
@@ -298,6 +316,57 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     }, 600);
   };
 
+  // Rensa namnet och låt användaren skriva eget. Status faller till 'idle'
+  // så Year-låset stängs igen tills nytt namn validerats via Check.
+  // Refokuserar fältet så CodeKeyboard:n stannar uppe direkt — eftersom
+  // det är ett in-app-keyboard pushar inte layouten upp som system-keyb.
+  const handleGuestRemoveName = () => {
+    setGuestName('');
+    setPlayerNameStatus('idle');
+    playerNameInputRef.current?.focus();
+  };
+
+  // Generera nytt unikt namn på begäran. Anropar samma helper som
+  // auto-fill-effekten — namnet är förvaliderat mot TAKEN_PLAYER_NAMES så
+  // status går direkt till 'available' (ingen Check krävs).
+  // Keyboard.dismiss() blurrar input:en explicit eftersom ScrollView:n har
+  // keyboardShouldPersistTaps="handled" (för code-cell-keys), vilket annars
+  // håller kvar fokus när Auto-generate tappas → custom keyboard skulle
+  // stanna uppe och dölja Year-fältet under.
+  const handleGuestGenerateName = () => {
+    const generated = generatePlayerName(TAKEN_PLAYER_NAMES, 'Guest');
+    setGuestName(generated);
+    setPlayerNameStatus('available');
+    Keyboard.dismiss();
+  };
+
+  // CodeKeyboard skickar tecknet vidare hit. Letter-keys är versaler från
+  // charset:n men endast första bokstaven i namnet förblir versal — resten
+  // sänks till gemener för stilfullare lobbyn-display ("Anna" istället för
+  // "ANNA"). Digit-keys appendas oförändrat. Status nollställs så fältet
+  // måste validateras via Check innan year unlockas.
+  const handlePlayerNameKeyPress = (char: string) => {
+    setGuestName((prev) => {
+      if (prev.length >= 20) return prev;
+      let appended = char;
+      if (/[A-Z]/.test(char)) {
+        const hasLetter = /[A-Za-z]/.test(prev);
+        appended = hasLetter ? char.toLowerCase() : char;
+      }
+      return prev + appended;
+    });
+    if (playerNameStatus !== 'idle') setPlayerNameStatus('idle');
+  };
+
+  const handlePlayerNameBackspace = () => {
+    setGuestName((prev) => prev.slice(0, -1));
+    if (playerNameStatus !== 'idle') setPlayerNameStatus('idle');
+  };
+
+  const togglePlayerNameKbMode = () => {
+    setPlayerNameKbMode((m) => (m === 'letter' ? 'digit' : 'letter'));
+  };
+
   // Auto-fyll Player Name när användaren går in i guest-steget och fältet
   // är tomt. Genererar ett unikt namn (verifierat mot mock TAKEN_PLAYER_NAMES)
   // och markerar status som 'available' så användaren kan gå direkt till
@@ -418,10 +487,11 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
             <>
               <Text style={modal.title}>Enter Room Code</Text>
               <Text style={modal.subtitle}>Ask the host for the code</Text>
-              {/* Samma 6-cell-layout som i guest-steget: 3 bokstäver +
-                  bindestreck + 2 siffror + 1 trailing bokstav. Cell 0–2
-                  och 5 visar bokstavstangentbord, 3–4 sifferkeypad.
-                  Auto-fokus hoppar framåt vid input och bakåt vid backspace. */}
+              {/* Samma 6-cell-layout som i guest-steget: 2 bokstäver +
+                  bindestreck + 2 siffror + bindestreck + 2 trailing
+                  bokstäver. Cell 0–1 och 4–5 visar bokstavstangentbord,
+                  2–3 sifferkeypad. Auto-fokus hoppar framåt vid input
+                  och bakåt vid backspace. */}
               <View style={modal.codeCellRow}>
                 {(() => {
                   const nextEmpty = codeCells.findIndex((c) => !c);
@@ -457,7 +527,8 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                           selectTextOnFocus
                           autoFocus={i === 0}
                         />
-                        {i === ROOM_CODE_LETTERS - 1 && (
+                        {(i === ROOM_CODE_LEADING_LETTERS - 1 ||
+                          i === ROOM_CODE_LEADING_LETTERS + ROOM_CODE_DIGITS - 1) && (
                           <Text style={modal.codeDash}>–</Text>
                         )}
                       </React.Fragment>
@@ -526,7 +597,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
 
               <ScrollView
                 keyboardShouldPersistTaps="handled"
-                style={{ maxHeight: 420 }}
+                style={{ flexShrink: 1, maxHeight: 420 }}
                 contentContainerStyle={{ gap: Spacing.md }}
               >
                 {/* PlayerName — måste valideras mot DB innan nästa fält öppnas */}
@@ -534,6 +605,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                   <Text style={modal.fieldLabel}>Player Name</Text>
                   <View style={modal.playerNameRow}>
                     <TextInput
+                      ref={playerNameInputRef}
                       style={[
                         modal.inputText,
                         modal.playerNameInput,
@@ -547,12 +619,17 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                       onChangeText={handleGuestNameChange}
                       maxLength={20}
                       editable={playerNameStatus !== 'checking'}
-                      returnKeyType="done"
-                      onSubmitEditing={handleCheckPlayerName}
-                      // Dölj custom CodeKeyboard när användaren går in i Player
-                      // Name-fältet — system-tangentbordet tar över för fri text-
-                      // input. Återaktiveras när nån code-cell får fokus igen.
-                      onFocus={() => setFocusedCodeIdx(null)}
+                      // System-tangentbord undertrycks; vi visar custom CodeKeyboard
+                      // istället så modalen inte hoppar upp under tangentbordet.
+                      showSoftInputOnFocus={false}
+                      // Visa PlayerName-keyboardet och göm code-cell-keyboardet.
+                      // Default till letter-mode varje gång fältet får fokus.
+                      onFocus={() => {
+                        setFocusedCodeIdx(null);
+                        setPlayerNameKbMode('letter');
+                        setPlayerNameFocused(true);
+                      }}
+                      onBlur={() => setPlayerNameFocused(false)}
                     />
                     <TouchableOpacity
                       onPress={handleCheckPlayerName}
@@ -573,6 +650,35 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                           : playerNameStatus === 'available' ? '✓'
                           : 'Check'}
                       </Text>
+                    </TouchableOpacity>
+                  </View>
+                  {/* Sekundära åtgärder under namnfältet — Remove och
+                      Auto-generate växlar mutually-exclusive: när fältet har
+                      innehåll lyser Remove (Auto-generate dimmas), när fältet
+                      är tomt lyser Auto-generate (Remove dimmas). Båda
+                      renderas alltid för stabil layout. */}
+                  <View style={modal.playerNameActionRow}>
+                    <TouchableOpacity
+                      onPress={handleGuestRemoveName}
+                      disabled={guestName.length === 0 || playerNameStatus === 'checking'}
+                      style={[
+                        modal.nameActionBtn,
+                        (guestName.length === 0 || playerNameStatus === 'checking') &&
+                          modal.nameActionBtnDisabled,
+                      ]}
+                    >
+                      <Text style={modal.nameActionBtnText}>Remove</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={handleGuestGenerateName}
+                      disabled={guestName.length > 0 || playerNameStatus === 'checking'}
+                      style={[
+                        modal.nameActionBtn,
+                        (guestName.length > 0 || playerNameStatus === 'checking') &&
+                          modal.nameActionBtnDisabled,
+                      ]}
+                    >
+                      <Text style={modal.nameActionBtnText}>Auto-generate</Text>
                     </TouchableOpacity>
                   </View>
                   {/* Status-rad */}
@@ -718,7 +824,8 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                               spellCheck={false}
                               selectTextOnFocus
                             />
-                            {i === ROOM_CODE_LETTERS - 1 && (
+                            {(i === ROOM_CODE_LEADING_LETTERS - 1 ||
+                              i === ROOM_CODE_LEADING_LETTERS + ROOM_CODE_DIGITS - 1) && (
                               <Text style={modal.codeDash}>–</Text>
                             )}
                           </React.Fragment>
@@ -734,6 +841,17 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                   mode={isLetterCellIndex(focusedCodeIdx) ? 'letter' : 'digit'}
                   onPress={handleCustomCharPress}
                   onBackspace={handleCustomBackspace}
+                />
+              )}
+              {playerNameFocused && (
+                <CodeKeyboard
+                  mode={playerNameKbMode}
+                  // Fullt A–Z för fritext-input (vs Room Code:s 24-bokstavs
+                  // charset som exkluderar O/I för disambiguation).
+                  letterCharset="ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                  onPress={handlePlayerNameKeyPress}
+                  onBackspace={handlePlayerNameBackspace}
+                  onModeToggle={togglePlayerNameKbMode}
                 />
               )}
               <TouchableOpacity
@@ -862,6 +980,26 @@ export default function HomeScreen() {
   // vid email-becomes-valid-transition (inte refill om användaren rensat
   // fältet efter en autofill).
   const prevRegEmailValidRef = useRef(false);
+  // Ref + state för custom CodeKeyboard på Register-formens PlayerName-fält
+  // — speglar guest-formens setup (se JoinModal). Samma motivation:
+  // system-tangentbord pushar upp modalen och döljer fältet.
+  const regPlayerNameInputRef = useRef<TextInput>(null);
+  const [regPlayerNameKbMode, setRegPlayerNameKbMode] = useState<'letter' | 'digit'>('letter');
+  const [regPlayerNameFocused, setRegPlayerNameFocused] = useState(false);
+  // Refs för att kunna scrolla PlayerName-fältet till toppen av ScrollView:n
+  // när custom keyboardet öppnas — annars klipps fältet på mitten eftersom
+  // ScrollView:n krymper med flexShrink:1 och PlayerName ligger en bit ner.
+  // Password får samma behandling när system-tangentbordet öppnas så fältet
+  // inte hamnar bakom keyboardet (KAV-padding pushar sheet:en upp men
+  // Password ligger längre ned i ScrollView).
+  const regScrollRef = useRef<ScrollView>(null);
+  const regPlayerNameYRef = useRef(0);
+  const regPasswordYRef = useRef(0);
+  // Spårar om Password-fältet är fokuserat så Keyboard.addListener-effekten
+  // kan scrolla till rätt fält när tangentbordet är fullt synligt. Setas i
+  // onFocus/onBlur — keyboardDidShow är då en tillförlitlig trigger för
+  // scroll (vs onFocus + setTimeout som råkar köra mot stale layout).
+  const regPasswordFocusedRef = useRef(false);
 
   // Återställ menyns sub-step + alla form-fields när modalen stängs
   useEffect(() => {
@@ -882,10 +1020,90 @@ export default function HomeScreen() {
         setRegYearPickerOpen(false);
         setRegSkillPickerOpen(false);
         setRegRegionPickerOpen(false);
+        setRegPlayerNameFocused(false);
+        setRegPlayerNameKbMode('letter');
       }, 300);
       return () => clearTimeout(t);
     }
   }, [profileMenuVisible]);
+
+  // Scrolla Password-fältet till toppen av ScrollView:n när tangentbordet
+  // visats. keyboardDidShow är garanterat efter att layouten stabiliserats
+  // (KAV-padding applicerad) — onFocus + setTimeout var opålitligt.
+  // Vi scrollar endast EN gång per focus-session (didScrollRef) eftersom
+  // iOS:s autofill/QuickType-bar kan trigga keyboardDidShow flera gånger
+  // medan användaren skriver — om vi animerade scroll vid varje fire skulle
+  // ScrollView:n vara i konstant animation och Confirm-knappens hit-target
+  // hoppa under användarens tap.
+  useEffect(() => {
+    const didScrollRef = { current: false };
+    const showSub = Keyboard.addListener('keyboardDidShow', () => {
+      if (regPasswordFocusedRef.current && !didScrollRef.current) {
+        didScrollRef.current = true;
+        regScrollRef.current?.scrollTo({
+          y: regPasswordYRef.current,
+          animated: true,
+        });
+      }
+    });
+    const hideSub = Keyboard.addListener('keyboardDidHide', () => {
+      didScrollRef.current = false;
+    });
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
+
+  // Open-side reset — körs direkt när modalen öppnas. Garanterar färska
+  // fält oavsett om close-side-resetet (300ms timeout ovan) hann köra
+  // klart innan användaren öppnade modalen igen. Utan denna kunde t.ex.
+  // regEmail bli kvar om man tryckte Cancel + Register snabbt.
+  useEffect(() => {
+    if (profileMenuVisible) {
+      setProfileMenuStep('menu');
+      setLoginPlayerName('');
+      setLoginPassword('');
+      setForgotEmail('');
+      setRegEmail('');
+      setRegPlayerName('');
+      setRegPlayerNameStatus('idle');
+      setRegPassword('');
+      setRegPasswordConfirmed(false);
+      setRegBirthYearText('');
+      setRegSkill('intermediate');
+      setRegRegion('global');
+      setRegYearPickerOpen(false);
+      setRegSkillPickerOpen(false);
+      setRegRegionPickerOpen(false);
+      setRegPlayerNameFocused(false);
+      setRegPlayerNameKbMode('letter');
+    }
+  }, [profileMenuVisible]);
+
+  // Step-side reset — resetar register-fälten varje gång användaren
+  // navigerar in i 'register'-steget. Täcker fallet där modalen är öppen
+  // men användaren tryckt Back ner till menyn och sen Register igen
+  // (open-side resetet ovan körs inte eftersom profileMenuVisible är
+  // oförändrat true). Båda är defensiva — om en path missar är den andra
+  // backup.
+  useEffect(() => {
+    if (profileMenuStep === 'register') {
+      setRegEmail('');
+      setRegPlayerName('');
+      setRegPlayerNameStatus('idle');
+      setRegPassword('');
+      setRegPasswordConfirmed(false);
+      setRegBirthYearText('');
+      setRegSkill('intermediate');
+      setRegRegion('global');
+      setRegYearPickerOpen(false);
+      setRegSkillPickerOpen(false);
+      setRegRegionPickerOpen(false);
+      setRegPlayerNameFocused(false);
+      setRegPlayerNameKbMode('letter');
+    }
+  }, [profileMenuStep]);
 
   // TODO (auth): byt till riktig login-status när auth är inkopplad. Just nu
   // använder vi sparad profil i AsyncStorage som proxy för inloggad-state.
@@ -1028,6 +1246,49 @@ export default function HomeScreen() {
     setTimeout(() => {
       setRegPlayerNameStatus(validatePlayerName(trimmed));
     }, 600);
+  };
+
+  // Rensa namnet och låt användaren skriva eget. Status faller till 'idle'
+  // så Password-låset stängs igen tills nytt namn validerats via Check.
+  // Refokus → CodeKeyboard:n stannar uppe (custom keyboard pushar inte layout).
+  const handleRegRemoveName = () => {
+    setRegPlayerName('');
+    setRegPlayerNameStatus('idle');
+    regPlayerNameInputRef.current?.focus();
+  };
+
+  // Generera nytt unikt namn på begäran (samma anrop som auto-fill-effekten).
+  // Default-prefix 'PlayerName' används. Keyboard.dismiss() blurrar input:en
+  // så CodeKeyboard:n döljs och nästa fält (Password) blir synligt.
+  const handleRegGenerateName = () => {
+    const generated = generatePlayerName(TAKEN_PLAYER_NAMES);
+    setRegPlayerName(generated);
+    setRegPlayerNameStatus('available');
+    Keyboard.dismiss();
+  };
+
+  // CodeKeyboard skickar tecknet vidare hit. Letter-keys: första bokstaven
+  // versal, resten gemener (för stilfullare lobbyn-display). Digits as-is.
+  const handleRegPlayerNameKeyPress = (char: string) => {
+    setRegPlayerName((prev) => {
+      if (prev.length >= 20) return prev;
+      let appended = char;
+      if (/[A-Z]/.test(char)) {
+        const hasLetter = /[A-Za-z]/.test(prev);
+        appended = hasLetter ? char.toLowerCase() : char;
+      }
+      return prev + appended;
+    });
+    if (regPlayerNameStatus !== 'idle') setRegPlayerNameStatus('idle');
+  };
+
+  const handleRegPlayerNameBackspace = () => {
+    setRegPlayerName((prev) => prev.slice(0, -1));
+    if (regPlayerNameStatus !== 'idle') setRegPlayerNameStatus('idle');
+  };
+
+  const toggleRegPlayerNameKbMode = () => {
+    setRegPlayerNameKbMode((m) => (m === 'letter' ? 'digit' : 'letter'));
   };
 
   // Auto-fyll Player Name när email blir giltig (transition false → true)
@@ -1251,6 +1512,10 @@ export default function HomeScreen() {
       >
         <KeyboardAvoidingView
           style={profileMenu.overlay}
+          // behavior="padding" lägger till padding-bottom = tangentbordet:s
+          // höjd när det öppnas. Sheet:en pushas upp så bottom-knapparna
+          // hålls ovanför tangentbordet. Password-fältet scrollas separat
+          // till syn via Keyboard.addListener-eventet (se useEffect nedan).
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         >
           <TouchableOpacity
@@ -1263,14 +1528,22 @@ export default function HomeScreen() {
             {isLoggedIn && profileMenuStep === 'menu' && (
               <>
                 <View style={profileMenu.header}>
-                  <Text style={profileMenu.headerEmoji}>
-                    {getAvatarEmojiById(profile?.selectedAvatarId)}
-                  </Text>
+                  {profile?.selectedAvatarId ? (
+                    <Text style={profileMenu.headerEmoji}>
+                      {getAvatarEmojiById(profile?.selectedAvatarId)}
+                    </Text>
+                  ) : (
+                    <View style={profileMenu.headerBrandWrap}>
+                      <QuizVibeQAvatar size={32} />
+                    </View>
+                  )}
                   <View style={{ flex: 1 }}>
                     <Text style={profileMenu.headerName}>
                       {profile?.playerName?.trim() || 'Signed in'}
                     </Text>
-                    <Text style={profileMenu.headerStatus}>Logged in</Text>
+                    <Text style={profileMenu.headerStatus}>
+                      {profile?.email?.trim() || 'Logged in'}
+                    </Text>
                   </View>
                 </View>
 
@@ -1442,13 +1715,21 @@ export default function HomeScreen() {
                 <Text style={profileMenu.subtitle}>Set up your profile to start playing</Text>
 
                 <ScrollView
-                  keyboardShouldPersistTaps="handled"
-                  // automaticallyAdjustKeyboardInsets gör att iOS auto-scrollar
-                  // det fokuserade fältet till syn när tangentbordet öppnas.
-                  automaticallyAdjustKeyboardInsets
-                  // maxHeight begränsar formens höjd så hela sheet:en alltid
-                  // ryms ovanför tangentbordet (sheet chrome tar resten).
-                  style={{ maxHeight: 320 }}
+                  ref={regScrollRef}
+                  // "always" istället för "handled" — säkerställer att
+                  // Confirm/Check-knapparna definitivt får sin onPress
+                  // när tangentbordet är uppe. "handled" hade en edge-case
+                  // där tap blev konsumerat av keyboard-dismiss istället för
+                  // knappen.
+                  keyboardShouldPersistTaps="always"
+                  // automaticallyAdjustKeyboardInsets borttaget — den auto-
+                  // scrollade fokuserade fältet UNDER keyboardet (med inset)
+                  // samtidigt som vi manuellt scrollar via Keyboard-listener,
+                  // så de slogs och resultatet blev att Password klipptes bort.
+                  // flexShrink: 1 låter ScrollView:n krympa när PlayerName:s
+                  // custom CodeKeyboard tar plats nedanför; maxHeight 320 är
+                  // tak när keyboardet inte är uppe.
+                  style={{ flexShrink: 1, maxHeight: 320 }}
                   contentContainerStyle={{ gap: Spacing.md }}
                 >
                   {/* Email — först ut. Aktiveringslänk skickas hit efter Register. */}
@@ -1475,14 +1756,20 @@ export default function HomeScreen() {
                     </Text>
                   </View>
 
-                  {/* PlayerName (låst tills email är giltig) */}
+                  {/* PlayerName (låst tills email är giltig). onLayout
+                      sparar fältets y-position i ScrollView:n så onFocus
+                      kan scrolla det till toppen när custom keyboardet öppnas. */}
                   <View
                     style={[modal.fieldGroup, !regPlayerNameUnlocked && modal.fieldGroupLocked]}
                     pointerEvents={regPlayerNameUnlocked ? 'auto' : 'none'}
+                    onLayout={(e) => {
+                      regPlayerNameYRef.current = e.nativeEvent.layout.y;
+                    }}
                   >
                     <Text style={modal.fieldLabel}>Player Name</Text>
                     <View style={modal.playerNameRow}>
                       <TextInput
+                        ref={regPlayerNameInputRef}
                         style={[
                           modal.inputText,
                           modal.playerNameInput,
@@ -1494,8 +1781,25 @@ export default function HomeScreen() {
                         onChangeText={handleRegPlayerNameChange}
                         maxLength={20}
                         editable={regPlayerNameStatus !== 'checking'}
-                        returnKeyType="done"
-                        onSubmitEditing={handleRegCheckPlayerName}
+                        // Custom CodeKeyboard ersätter system-tangentbordet
+                        // för att undvika modal-jump (samma motivation som
+                        // guest-formen).
+                        showSoftInputOnFocus={false}
+                        onFocus={() => {
+                          setRegPlayerNameKbMode('letter');
+                          setRegPlayerNameFocused(true);
+                          // Scrolla PlayerName-fältet till toppen av ScrollView:n
+                          // så det inte klipps av custom keyboardet under.
+                          // requestAnimationFrame defererar tills next frame så
+                          // ScrollView:s shrink hunnit appliceras (state-flush).
+                          requestAnimationFrame(() => {
+                            regScrollRef.current?.scrollTo({
+                              y: regPlayerNameYRef.current,
+                              animated: true,
+                            });
+                          });
+                        }}
+                        onBlur={() => setRegPlayerNameFocused(false)}
                       />
                       <TouchableOpacity
                         onPress={handleRegCheckPlayerName}
@@ -1516,6 +1820,32 @@ export default function HomeScreen() {
                             : regPlayerNameStatus === 'available' ? '✓'
                             : 'Check'}
                         </Text>
+                      </TouchableOpacity>
+                    </View>
+                    {/* Sekundära åtgärder under namnfältet — se guest-formen
+                        ovan för rationale (mutually-exclusive enable). */}
+                    <View style={modal.playerNameActionRow}>
+                      <TouchableOpacity
+                        onPress={handleRegRemoveName}
+                        disabled={regPlayerName.length === 0 || regPlayerNameStatus === 'checking'}
+                        style={[
+                          modal.nameActionBtn,
+                          (regPlayerName.length === 0 || regPlayerNameStatus === 'checking') &&
+                            modal.nameActionBtnDisabled,
+                        ]}
+                      >
+                        <Text style={modal.nameActionBtnText}>Remove</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={handleRegGenerateName}
+                        disabled={regPlayerName.length > 0 || regPlayerNameStatus === 'checking'}
+                        style={[
+                          modal.nameActionBtn,
+                          (regPlayerName.length > 0 || regPlayerNameStatus === 'checking') &&
+                            modal.nameActionBtnDisabled,
+                        ]}
+                      >
+                        <Text style={modal.nameActionBtnText}>Auto-generate</Text>
                       </TouchableOpacity>
                     </View>
                     {/* När inget status-meddelande visas — visa max-längd-info */}
@@ -1545,10 +1875,15 @@ export default function HomeScreen() {
                   </View>
 
                   {/* Password (låst tills playerName är validerat).
-                      Användaren måste trycka Confirm för att låsa upp Year. */}
+                      Användaren måste trycka Confirm för att låsa upp Year.
+                      onLayout sparar fältets y-position så onFocus kan
+                      scrolla det till toppen när system-tangentbordet öppnas. */}
                   <View
                     style={[modal.fieldGroup, !regPasswordUnlocked && modal.fieldGroupLocked]}
                     pointerEvents={regPasswordUnlocked ? 'auto' : 'none'}
+                    onLayout={(e) => {
+                      regPasswordYRef.current = e.nativeEvent.layout.y;
+                    }}
                   >
                     <Text style={modal.fieldLabel}>Password</Text>
                     <View style={modal.playerNameRow}>
@@ -1566,6 +1901,16 @@ export default function HomeScreen() {
                         maxLength={50}
                         returnKeyType="done"
                         onSubmitEditing={handleRegConfirmPassword}
+                        onFocus={() => {
+                          // Markera fältet som fokuserat — den globala
+                          // keyboardDidShow-effekten plockar upp detta och
+                          // scrollar fältet till toppen när tangentbordet
+                          // är fullt synligt.
+                          regPasswordFocusedRef.current = true;
+                        }}
+                        onBlur={() => {
+                          regPasswordFocusedRef.current = false;
+                        }}
                       />
                       <TouchableOpacity
                         onPress={handleRegConfirmPassword}
@@ -1673,6 +2018,16 @@ export default function HomeScreen() {
                     </View>
                   </View>
                 </ScrollView>
+
+                {regPlayerNameFocused && (
+                  <CodeKeyboard
+                    mode={regPlayerNameKbMode}
+                    letterCharset="ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                    onPress={handleRegPlayerNameKeyPress}
+                    onBackspace={handleRegPlayerNameBackspace}
+                    onModeToggle={toggleRegPlayerNameKbMode}
+                  />
+                )}
 
                 <TouchableOpacity
                   style={[
@@ -1873,9 +2228,14 @@ const styles = StyleSheet.create({
 
 const modal = StyleSheet.create({
   overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'flex-end' },
+  // maxHeight: '90%' bounder sheet:en till viewport så toppen aldrig spiller
+  // över skärmen när PlayerName:s custom CodeKeyboard tar plats nedanför
+  // ScrollView:n. ScrollView:n inuti har flexShrink: 1 så den krymper
+  // när chrome+keyboard sammanlagt skulle överskrida sheet:s maxhöjd.
   sheet: {
     backgroundColor: Colors.card, borderTopLeftRadius: 24, borderTopRightRadius: 24,
     padding: Spacing.xl, gap: Spacing.md, borderWidth: 1, borderColor: Colors.border,
+    maxHeight: '90%',
   },
   title: { fontSize: 20, fontWeight: '700', color: Colors.textPrimary, textAlign: 'center' },
   subtitle: { fontSize: 14, color: Colors.textSecondary, textAlign: 'center' },
@@ -1994,6 +2354,33 @@ const modal = StyleSheet.create({
   checkBtnTextDone: {
     color: Colors.success,
     fontSize: 18,
+  },
+
+  // Sekundära åtgärds-rad under namnfältet (Remove + Auto-generate).
+  // Vänster-justerad — knapparna ligger under input:s vänsterkant.
+  playerNameActionRow: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+    marginTop: Spacing.xs,
+    alignSelf: 'flex-start',
+  },
+  nameActionBtn: {
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.xs,
+    borderRadius: Radius.md,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    backgroundColor: Colors.cardElevated,
+  },
+  // Opacity på hela knappen dimmer både text, border och bg så aktiv vs
+  // inaktiv kontrast blir tydlig (white text @ 100% vs ~40%).
+  nameActionBtnDisabled: {
+    opacity: 0.4,
+  },
+  nameActionBtnText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: Colors.textPrimary,
   },
 
   // Status-rad under playerName
@@ -2157,6 +2544,9 @@ const modal = StyleSheet.create({
 const profileMenu = StyleSheet.create({
   overlay: { flex: 1, justifyContent: 'flex-end' },
   backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.5)' },
+  // maxHeight: '90%' bounder sheet:en så toppen inte spiller ut när
+  // PlayerName:s custom CodeKeyboard tar plats — samma fix som
+  // modal.sheet (JoinModal). ScrollView:n inuti har flexShrink: 1.
   sheet: {
     backgroundColor: Colors.card,
     borderTopLeftRadius: 24,
@@ -2166,6 +2556,7 @@ const profileMenu = StyleSheet.create({
     gap: Spacing.md,
     borderWidth: 1,
     borderColor: Colors.border,
+    maxHeight: '90%',
   },
   header: {
     flexDirection: 'row',
@@ -2183,6 +2574,11 @@ const profileMenu = StyleSheet.create({
     width: 40,
     textAlign: 'center',
   },
+  headerBrandWrap: {
+    width: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   headerName: {
     fontSize: 16,
     fontWeight: '700',
@@ -2190,7 +2586,7 @@ const profileMenu = StyleSheet.create({
   },
   headerStatus: {
     fontSize: 12,
-    color: Colors.success,
+    color: Colors.textPrimary,
     marginTop: 2,
   },
   logoutBtn: {

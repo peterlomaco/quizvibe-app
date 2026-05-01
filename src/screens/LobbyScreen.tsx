@@ -33,7 +33,7 @@ import { addLeftPlayer, getLeftPlayers } from '../utils/leftPlayers';
 import { deactivateRoom, isActiveRoom } from '../utils/mockActiveRooms';
 import { consumePendingLobbyPlayers } from '../utils/pendingLobby';
 import { loadProfile, type ProfileData } from '../utils/profileStorage';
-import { ROOM_CODE_LETTERS, formatRoomCode, generateRoomCode } from '../utils/roomCode';
+import { ROOM_CODE_DIGITS, ROOM_CODE_LEADING_LETTERS, formatRoomCode, generateRoomCode } from '../utils/roomCode';
 import { addInvite } from '../utils/waitingInvites';
 
 export interface LobbyPlayer extends Player {
@@ -1050,16 +1050,18 @@ export default function LobbyScreen() {
               )}
               {/* Varje tecken i en bordered cell — samma look som "Enter Room
                   Code"-inputen i Join-modalen i fyllt läge (Colors.primary
-                  border + Colors.primaryMuted bg). Bindestrecket renderas
-                  som ett separat textelement mellan bokstavs- och siffer-
-                  cellerna, identiskt med Join-modalens layout. */}
+                  border + Colors.primaryMuted bg). Bindestreck renderas som
+                  separata textelement vid varje letter/digit-transition
+                  (efter cell 1 och efter cell 3), identiskt med Join-
+                  modalens layout. */}
               <View style={styles.roomCodeCellsRow}>
                 {roomCode.split('').map((ch, i) => (
                   <React.Fragment key={i}>
                     <View style={styles.roomCodeCell}>
                       <Text style={styles.roomCodeCellText}>{ch}</Text>
                     </View>
-                    {i === ROOM_CODE_LETTERS - 1 && (
+                    {(i === ROOM_CODE_LEADING_LETTERS - 1 ||
+                      i === ROOM_CODE_LEADING_LETTERS + ROOM_CODE_DIGITS - 1) && (
                       <Text style={styles.roomCodeCellDash}>–</Text>
                     )}
                   </React.Fragment>

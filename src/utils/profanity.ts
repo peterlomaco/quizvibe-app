@@ -52,7 +52,12 @@ function normalize(text: string): string {
     .toLowerCase()
     .split('')
     .map((c) => CHAR_SUBSTITUTIONS[c] ?? c)
-    .join('');
+    .join('')
+    // Strippa icke-bokstav/siffra-tecken så obfuscation som "f.u.c.k",
+    // "sh-it", "fa ggot" eller "n_e_g_e_r" fångas. \p{L} bevarar
+    // diacritics (ÅÄÖ etc.) så svenska blocklist-termer som "bög" inte
+    // blir trasiga av strippningen. \p{N} bevarar siffror.
+    .replace(/[^\p{L}\p{N}]/gu, '');
 }
 
 /**

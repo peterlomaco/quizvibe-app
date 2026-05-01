@@ -16,8 +16,8 @@
 
 const ACTIVE_ROOM_CODES = new Set<string>([
   // Dev/test-seeds — kan tas bort när backend är inkopplad.
-  'ABC23X',
-  'TEST99Z',
+  'AB23XY',
+  'QV45LV',
 ]);
 
 /**

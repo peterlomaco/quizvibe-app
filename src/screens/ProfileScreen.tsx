@@ -18,6 +18,7 @@ import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { PlayerHistorySection } from '../components/PlayerHistorySection';
 import { QuizVibeFriendsLogo } from '../components/QuizVibeFriendsLogo';
+import { QuizVibeQAvatar } from '../components/QuizVibeQAvatar';
 import { TopUserBanner } from '../components/TopUserBanner';
 import { Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';
 import { resetIdentity, track } from '../utils/analytics';
@@ -121,6 +122,7 @@ export default function ProfileScreen() {
   const [isSaved, setIsSaved]             = useState(false);
   const [pickerOpen, setPickerOpen]       = useState(false);
   const [playerName, setPlayerName]           = useState('Player One');
+  const [email, setEmail]                     = useState<string>('');
   const [birthYear, setBirthYear]         = useState<number | null>(null);
   const [skill, setSkill]                 = useState<Skill | null>(null);
   const [region, setRegion]               = useState<Region | null>(null);
@@ -156,6 +158,7 @@ export default function ProfileScreen() {
       loadProfile().then((data) => {
         if (!active || !data) return;
         setPlayerName(data.playerName);
+        setEmail(data.email ?? '');
         setBirthYear(data.birthYear);
         setSkill(data.skill);
         setRegion(data.region);
@@ -394,7 +397,8 @@ export default function ProfileScreen() {
               ]}
             >
               <Avatar
-                emoji={source === 'default' ? '😶' : selectedAvatar?.emoji}
+                emoji={source === 'default' ? undefined : selectedAvatar?.emoji}
+                useBrandFallback={source === 'default'}
                 size={96}
               />
               <View style={styles.changeBadge} pointerEvents="none">
@@ -1071,14 +1075,22 @@ export default function ProfileScreen() {
           />
           <View style={styles.logoutSheet}>
             <View style={styles.logoutHeader}>
-              <Text style={styles.logoutHeaderEmoji}>
-                {getAvatarEmojiById(selectedAvatarId)}
-              </Text>
+              {selectedAvatarId ? (
+                <Text style={styles.logoutHeaderEmoji}>
+                  {getAvatarEmojiById(selectedAvatarId)}
+                </Text>
+              ) : (
+                <View style={styles.logoutHeaderBrandWrap}>
+                  <QuizVibeQAvatar size={32} />
+                </View>
+              )}
               <View style={{ flex: 1 }}>
                 <Text style={styles.logoutHeaderName}>
                   {playerName.trim() || 'Signed in'}
                 </Text>
-                <Text style={styles.logoutHeaderStatus}>Logged in</Text>
+                <Text style={styles.logoutHeaderStatus}>
+                  {email.trim() || 'Logged in'}
+                </Text>
               </View>
             </View>
 
@@ -1276,6 +1288,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.border,
   },
+  logoutHeaderBrandWrap: {
+    width: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   logoutHeaderEmoji: {
     fontSize: 28,
     width: 40,
@@ -1288,7 +1305,7 @@ const styles = StyleSheet.create({
   },
   logoutHeaderStatus: {
     fontSize: 12,
-    color: Colors.success,
+    color: Colors.textPrimary,
     marginTop: 2,
   },
   logoutBtn: {

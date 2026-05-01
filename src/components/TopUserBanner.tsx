@@ -4,6 +4,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Colors, Radius, Spacing } from '../theme';
 import { getAvatarEmojiById } from '../utils/avatars';
 import { loadProfile, type ProfileData } from '../utils/profileStorage';
+import { QuizVibeQAvatar } from './QuizVibeQAvatar';
 
 interface Props {
   /**
@@ -69,6 +70,10 @@ export function TopUserBanner({ onPress, profile: profileProp, guestName }: Prop
     styles.loginPill,
     isLoggedIn ? styles.loginPillActive : styles.loginPillMuted,
   ];
+  // Inloggad utan vald emoji-avatar (selectedAvatarId tom efter registrering)
+  // → rendera QuizVibe Q-mark som default-avatar istället för 👤. Custom
+  // emoji-avatarer renderas oförändrat när användaren valt en.
+  const showBrandAvatar = isLoggedIn && !profile?.selectedAvatarId;
   const iconText = isLoggedIn ? getAvatarEmojiById(profile?.selectedAvatarId) : '👤';
   const labelText = isLoggedIn
     ? (profile?.playerName?.trim() || 'Signed in')
@@ -84,14 +89,22 @@ export function TopUserBanner({ onPress, profile: profileProp, guestName }: Prop
     <View style={styles.topBoard}>
       {onPress ? (
         <TouchableOpacity style={pillStyle} activeOpacity={0.7} onPress={onPress}>
-          <Text style={styles.loginPillIcon}>{iconText}</Text>
+          {showBrandAvatar ? (
+            <QuizVibeQAvatar size={16} />
+          ) : (
+            <Text style={styles.loginPillIcon}>{iconText}</Text>
+          )}
           <Text style={labelStyle} numberOfLines={1}>
             {labelText}
           </Text>
         </TouchableOpacity>
       ) : (
         <View style={pillStyle}>
-          <Text style={styles.loginPillIcon}>{iconText}</Text>
+          {showBrandAvatar ? (
+            <QuizVibeQAvatar size={16} />
+          ) : (
+            <Text style={styles.loginPillIcon}>{iconText}</Text>
+          )}
           <Text style={labelStyle} numberOfLines={1}>
             {labelText}
           </Text>

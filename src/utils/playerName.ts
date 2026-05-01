@@ -3,13 +3,23 @@
 //  • "Guest"      + 5 siffror + "-" + 2 bokstäver  → Guest-flödet (JoinModal)
 // Fullt A–Z och 0–9 (inga undantag för förväxlingsbara tecken som i roomCode).
 
+import { containsProfanity } from './profanity';
+
 const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
 // Två-bokstavs-kombinationer som filtreras bort från det genererade
-// suffixet eftersom de associeras med obehagliga förkortningar/grupper
-// (CP, AS, KK). Filtret gäller både Register- och Guest-flödet — ingen
-// auto-genererad användare ska behöva förklara bort dessa initialer.
-const BLOCKED_LETTER_SUFFIXES = new Set(['CP', 'AS', 'KK']);
+// suffixet. Synkad med `BLOCKED_LETTER_PAIRS` i roomCode.ts så samma
+// stötande pair blockas i alla genererade strängar (rumkoder OCH
+// playerName-suffix). Listan inkluderar:
+//   • Generella obscena/diskriminerande förkortningar: AS, CP, KK
+//   • Hat-symbol-förkortningar: SS, NS, AH, HH
+//   • Borderline: NB
+// Ingen auto-genererad användare ska behöva förklara bort dessa initialer.
+const BLOCKED_LETTER_SUFFIXES = new Set([
+  'AS', 'CP', 'KK',
+  'SS', 'NS', 'AH', 'HH',
+  'NB',
+]);
 
 function randomDigits(count: number): string {
   let s = '';
@@ -47,7 +57,13 @@ function randomLetterPair(): string {
 export function generatePlayerName(taken: Set<string>, prefix: string = 'PlayerName'): string {
   for (let i = 0; i < 50; i++) {
     const candidate = `${prefix}${randomDigits(5)}-${randomLetterPair()}`;
-    if (!taken.has(candidate.toLowerCase())) return candidate;
+    // Defense in depth: även om formatet (fast prefix + digits + bindestreck +
+    // filtrerat suffix) gör profanity i praktiken omöjlig, kör candidaten
+    // genom containsProfanity för att skydda mot framtida prefix-byten eller
+    // l33t-kombinationer i digit-segmentet. Skip kandidat och retry vid hit.
+    if (!taken.has(candidate.toLowerCase()) && !containsProfanity(candidate)) {
+      return candidate;
+    }
   }
   // Fallback (extremt osannolik): timestamp-baserat suffix.
   return `${prefix}${Date.now().toString().slice(-5)}-AA`;

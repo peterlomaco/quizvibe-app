@@ -119,6 +119,7 @@ export function PlayerRow({
             emoji={player.emoji}
             name={player.name}
             size={40}
+            useBrandFallback={!isGuest}
           />
         </View>
 

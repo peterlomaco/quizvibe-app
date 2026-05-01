@@ -4,41 +4,42 @@ import { Colors, Radius, Spacing } from '../theme';
 import { DIGIT_CHARSET, LETTER_CHARSET } from '../utils/roomCode';
 
 /**
- * In-app tangentbord för Room Code-cellerna i JoinModal. Renderas istället
- * för system-tangentbordet (TextInputs sätter `showSoftInputOnFocus={false}`)
- * så vi har full kontroll över:
+ * In-app tangentbord för Room Code-cellerna OCH PlayerName-fältet i
+ * JoinModal. Renderas istället för system-tangentbordet (TextInputs sätter
+ * `showSoftInputOnFocus={false}`) så vi har full kontroll över:
  *   • Innehåll: bara A–Z (letter-mode) eller 0–9 (digit-mode), exakt vad
- *     sanitize-regexet i `handleCodeCellChange` accepterar. Ingen 123/ABC-
- *     switch som iOS:s system-tangentbord påtvingar.
- *   • Höjd: container är fixed-height oavsett mode, så switch mellan letter-
- *     och digit-mode reflowar inte modal-layouten.
+ *     sanitize-regexet i call-site:n accepterar. Ingen 123/ABC-switch som
+ *     iOS:s system-tangentbord påtvingar (utom när explicit `onModeToggle`
+ *     skickas in — då renderas en mode-toggle-knapp i botten-raden).
+ *   • Höjd: container räknas ut från antal rader i `letterCharset` så vi
+ *     fortsatt har samma höjd när mode växlar mellan letter och digit
+ *     (digit-grid:en stretchas via flex:1 på rader till samma totalhöjd).
  *   • Tap-targets: digit-mode har färre keys → de stretchas större för att
- *     fylla samma höjd som letter-grid:en (4 rader vs 2 rader).
+ *     fylla samma container-höjd som letter-grid:en.
  *
- * Charsets importeras från roomCode.ts så keyboard:n alltid visar exakt
- * de chars som genererings-flödet och cell-sanitize-lagret tillåter.
+ * Charsets: default-letter charsetet är `LETTER_CHARSET` (24 bokstäver,
+ * exklusive O/I) som matchar Room Code-genereringens valid-chars. För
+ * fri-text-fält (PlayerName) skickas `letterCharset` = fullt A–Z (26).
+ * Digit-charsetet är alltid `DIGIT_CHARSET` (0–9).
  */
 const KEY_HEIGHT = 44;
 const KEY_GAP = 8;
 const VPADDING = 12;
 const HPADDING = 8;
-const LETTER_COLS = 6; // 24 letters / 6 cols = 4 rows
-const LETTER_ROWS = 4;
+const LETTER_COLS = 6;
 const DIGIT_COLS = 5;  // 10 digits / 5 cols = 2 rows ("12345" / "67890")
-// Total fixed height: 4 letter-rader + 3 gaps + paddings + backspace + 1 gap.
-// Digit-mode återanvänder samma höjd via flex:1 på rader (2 rader → 2x höjd
-// per row → större knappar, samma totala container-höjd).
-export const CODE_KEYBOARD_HEIGHT =
-  LETTER_ROWS * KEY_HEIGHT +
-  (LETTER_ROWS - 1) * KEY_GAP +
-  2 * VPADDING +
-  KEY_HEIGHT + // backspace
-  KEY_GAP;     // gap between grid and backspace
 
 interface Props {
   mode: 'letter' | 'digit';
   onPress: (char: string) => void;
   onBackspace: () => void;
+  /** Override default LETTER_CHARSET. När t.ex. ett fritext-fält (PlayerName)
+   *  behöver fullt A–Z istället för Room Code:s 24-bokstavs-uppsättning. */
+  letterCharset?: string;
+  /** När definierad renderas en mode-toggle-knapp ("123" / "ABC") bredvid
+   *  Backspace i botten-raden. Utan callback visas bara Backspace (default
+   *  för Room Code-cellerna där mode styrs av cell-typen). */
+  onModeToggle?: () => void;
 }
 
 function chunk(chars: string, cols: number): string[][] {
@@ -49,14 +50,32 @@ function chunk(chars: string, cols: number): string[][] {
   return rows;
 }
 
-export function CodeKeyboard({ mode, onPress, onBackspace }: Props) {
+export function CodeKeyboard({
+  mode,
+  onPress,
+  onBackspace,
+  letterCharset,
+  onModeToggle,
+}: Props) {
+  const activeLetterCharset = letterCharset ?? LETTER_CHARSET;
+  const letterRowCount = Math.ceil(activeLetterCharset.length / LETTER_COLS);
+  // Container-höjd baseras på antal rader i letter-mode så toggle till
+  // digit-mode behåller samma totalhöjd (rows har flex:1).
+  const containerHeight =
+    letterRowCount * KEY_HEIGHT +
+    (letterRowCount - 1) * KEY_GAP +
+    2 * VPADDING +
+    KEY_HEIGHT + // botten-rad (backspace + valfri toggle)
+    KEY_GAP;
+
   const rows =
     mode === 'letter'
-      ? chunk(LETTER_CHARSET, LETTER_COLS)
+      ? chunk(activeLetterCharset, LETTER_COLS)
       : chunk(DIGIT_CHARSET, DIGIT_COLS);
+  const cols = mode === 'letter' ? LETTER_COLS : DIGIT_COLS;
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { height: containerHeight }]}>
       <View style={styles.grid}>
         {rows.map((row, ri) => (
           <View key={ri} style={styles.row}>
@@ -72,25 +91,47 @@ export function CodeKeyboard({ mode, onPress, onBackspace }: Props) {
                 <Text style={styles.keyText}>{c}</Text>
               </Pressable>
             ))}
+            {/* Pad incomplete row med osynliga spacers så grid-justeringen
+                bevaras (t.ex. 26-letter charset → sista raden har bara 2
+                tecken; resterande 4 cell-bredder ska vara tomma, inte
+                stretcha tecknen). */}
+            {row.length < cols &&
+              Array.from({ length: cols - row.length }).map((_, i) => (
+                <View key={`spacer-${ri}-${i}`} style={styles.keySpacer} />
+              ))}
           </View>
         ))}
       </View>
-      <Pressable
-        onPress={onBackspace}
-        style={({ pressed }) => [
-          styles.backspaceBtn,
-          pressed && styles.keyPressed,
-        ]}
-      >
-        <Text style={styles.backspaceText}>⌫  Delete</Text>
-      </Pressable>
+      <View style={styles.bottomRow}>
+        {onModeToggle && (
+          <Pressable
+            onPress={onModeToggle}
+            style={({ pressed }) => [
+              styles.bottomBtn,
+              pressed && styles.keyPressed,
+            ]}
+          >
+            <Text style={styles.bottomBtnText}>
+              {mode === 'letter' ? '123' : 'ABC'}
+            </Text>
+          </Pressable>
+        )}
+        <Pressable
+          onPress={onBackspace}
+          style={({ pressed }) => [
+            styles.bottomBtn,
+            pressed && styles.keyPressed,
+          ]}
+        >
+          <Text style={styles.bottomBtnText}>⌫  Delete</Text>
+        </Pressable>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    height: CODE_KEYBOARD_HEIGHT,
     backgroundColor: Colors.cardElevated,
     paddingHorizontal: HPADDING,
     paddingVertical: VPADDING,
@@ -117,6 +158,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  keySpacer: {
+    flex: 1,
+    // Osynlig — tar samma flex-bredd som en knapp men ingen border/bg/press.
+  },
   keyPressed: {
     backgroundColor: Colors.primaryMuted,
     borderColor: Colors.primary,
@@ -126,9 +171,14 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: Colors.textPrimary,
   },
-  backspaceBtn: {
+  bottomRow: {
     marginTop: KEY_GAP,
     height: KEY_HEIGHT,
+    flexDirection: 'row',
+    gap: KEY_GAP,
+  },
+  bottomBtn: {
+    flex: 1,
     borderRadius: Radius.sm,
     backgroundColor: Colors.card,
     borderWidth: 1,
@@ -136,7 +186,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  backspaceText: {
+  bottomBtnText: {
     fontSize: 16,
     fontWeight: '500',
     color: Colors.textSecondary,
