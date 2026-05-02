@@ -989,6 +989,36 @@ export default function LobbyScreen() {
     }
   };
 
+  const handleStartGame = () => {
+    // Turordningen för Pass-the-phone bygger på array-ordningen i `players[]`
+    // (host alltid på index 0). Filtrera bort spelare som lämnat lobbyn —
+    // de kan inte vara på tur. Skicka en minimal player-payload så quiz.tsx
+    // kan rendera "Up next: <namn>" och rotera mellan rundor.
+    const turnOrder = approvedPlayers
+      .filter((p) => !p.hasLeft)
+      .map((p) => ({
+        id: p.id,
+        name: p.name,
+        emoji: p.emoji,
+        avatarUri: p.avatarUri,
+      }));
+
+    if (turnOrder.length === 0) {
+      Alert.alert('Cannot start', 'No approved players to start the game.');
+      return;
+    }
+
+    router.push({
+      pathname: '/quiz',
+      params: {
+        skill: 'intermediate',
+        age: '32',
+        gameMode,
+        players: JSON.stringify(turnOrder),
+      },
+    });
+  };
+
   return (
     <SafeAreaView style={styles.safe}>
       {/* Top board (login status) — sticky utanför ScrollView så den följer
@@ -1166,6 +1196,28 @@ export default function LobbyScreen() {
           </Text>
         </View>
 
+        {/* ── Region Scope ──────────────────────────────────────
+            Host-satt spelregel (vilken kulturell kontext frågorna
+            ska dras från). Visas för alla i lobbyn men kan bara
+            *ändras* av host — samma mönster som Game Mode ovanför. */}
+        <View style={[styles.section, { marginTop: Spacing.sm }]}>
+          <Text style={styles.sectionLabel}>
+            🌍 Region Scope
+            {!hostMode && <Text style={styles.sectionHint}> – defined by Host</Text>}
+          </Text>
+          <Text style={styles.cardSubtitle}>Sets the cultural context for questions</Text>
+          <TouchableOpacity
+            style={styles.regionTrigger}
+            activeOpacity={0.7}
+            disabled={!hostMode}
+            onPress={() => { if (hostMode) setRegionModalOpen(true); }}
+          >
+            <Text style={{ fontSize: 18 }}>{REGION_FLAGS[region]}</Text>
+            <Text style={styles.regionTriggerText}>{region}</Text>
+            {hostMode && <Text style={{ fontSize: 14, color: Colors.textSecondary }}>⌄</Text>}
+          </TouchableOpacity>
+        </View>
+
         {/* ── Game Connections ─────────────────────────────────── */}
         {/* Visar vilka källor spelet drar frågor från. Vänsterjusterad lista
             med färgade brand-badges (samma mönster som Spotify-kortet på
@@ -1178,13 +1230,12 @@ export default function LobbyScreen() {
                 Enabled-pillen får grön kantlinje + FREE-badge (samma border-
                 skärande badge-mönster som Pass-the-Phone-knappen). Switchen
                 till höger är host-only och får grön track när på, röd när av.
-                Pilen i YouTube-loggan är en CSS-triangel (border-trick) så
-                den alltid är vit oavsett emoji-rendering på iOS vs Android. */}
+                Loggan är en röd kvadrat med vit playpil (CSS-triangel via
+                border-trick) så pilen alltid är vit oavsett emoji-rendering
+                på iOS vs Android. */}
             <View style={styles.connectionRow}>
               <View style={[styles.connectionIconWrap, styles.connectionIconYoutube]}>
-                <View style={styles.connectionIconYoutubeRect}>
-                  <View style={styles.connectionIconYoutubeArrow} />
-                </View>
+                <View style={styles.connectionIconYoutubeArrow} />
               </View>
               <Text style={styles.connectionLabel}>YouTube</Text>
               {/* FREE-badgen sitter alltid kvar — i Enabled-läge med grön bg
@@ -1543,55 +1594,62 @@ export default function LobbyScreen() {
           <Text style={styles.sectionLabel}>Quiz Settings</Text>
 
           <Card padding={Spacing.lg}>
-            <Text style={styles.cardTitle}>🕐 Game Era</Text>
+            <Text style={styles.cardTitle}>
+              🕐 Game Era
+              {!hostMode && <Text style={styles.sectionHint}> – defined by Host</Text>}
+            </Text>
             <Text style={styles.cardSubtitle}>Set the time span for questions</Text>
-            <View style={styles.eraDisplay}>
-              <Text style={styles.eraDisplayYear}>{clampedFrom}</Text>
-              <Text style={styles.eraDisplayDash}>–</Text>
-              <Text style={styles.eraDisplayYear}>{clampedTo}</Text>
-            </View>
-            <View style={{ alignItems: 'center' }}>
-              <MultiSlider
-                values={eraValues}
-                min={ERA_MIN}
-                max={ERA_MAX}
-                step={1}
-                onValuesChange={(vals) => setEraValues(vals)}
-                selectedStyle={{ backgroundColor: Colors.primary }}
-                unselectedStyle={{ backgroundColor: Colors.border }}
-                markerStyle={{ backgroundColor: Colors.primary, borderColor: Colors.background, borderWidth: 2, width: 22, height: 22 }}
-                trackStyle={{ height: 4, borderRadius: 2 }}
-                containerStyle={{ alignSelf: 'center' }}
-                sliderLength={SLIDER_WIDTH}
-              />
-              <DecadeMarks />
-            </View>
+            {hostMode ? (
+              <>
+                <View style={styles.eraDisplay}>
+                  <Text style={styles.eraDisplayYear}>{clampedFrom}</Text>
+                  <Text style={styles.eraDisplayDash}>–</Text>
+                  <Text style={styles.eraDisplayYear}>{clampedTo}</Text>
+                </View>
+                <View style={{ alignItems: 'center' }}>
+                  <MultiSlider
+                    values={eraValues}
+                    min={ERA_MIN}
+                    max={ERA_MAX}
+                    step={1}
+                    onValuesChange={(vals) => setEraValues(vals)}
+                    selectedStyle={{ backgroundColor: Colors.primary }}
+                    unselectedStyle={{ backgroundColor: Colors.border }}
+                    markerStyle={{ backgroundColor: Colors.primary, borderColor: Colors.background, borderWidth: 2, width: 22, height: 22 }}
+                    trackStyle={{ height: 4, borderRadius: 2 }}
+                    containerStyle={{ alignSelf: 'center' }}
+                    sliderLength={SLIDER_WIDTH}
+                  />
+                  <DecadeMarks />
+                </View>
+              </>
+            ) : (
+              // Non-host: read-only "selector"-ruta i samma stil som spelets year-selector
+              // (gul kantlinje + gul fet text på mörk navy bg). Ingen årtalslinje — bara
+              // rutan, eftersom non-host ändå inte kan dra ett spann.
+              <View style={styles.eraGuestBoxWrap}>
+                <View style={styles.eraGuestBox}>
+                  <Text style={styles.eraGuestBoxText}>{clampedFrom} – {clampedTo}</Text>
+                </View>
+              </View>
+            )}
             {eraWarning && <View style={styles.eraWarning}><Text style={styles.eraWarningText}>⚠️ {eraWarning}</Text></View>}
           </Card>
-
-          <Card padding={Spacing.lg}>
-            <Text style={styles.cardTitle}>🌍 Region Scope</Text>
-            <Text style={styles.cardSubtitle}>Sets the cultural context for questions</Text>
-            <TouchableOpacity
-              style={styles.regionTrigger}
-              activeOpacity={0.7}
-              onPress={() => { if (hostMode) setRegionModalOpen(true); }}
-            >
-              <Text style={{ fontSize: 18 }}>{REGION_FLAGS[region]}</Text>
-              <Text style={styles.regionTriggerText}>{region}</Text>
-              <Text style={{ fontSize: 14, color: Colors.textSecondary }}>⌄</Text>
-            </TouchableOpacity>
-          </Card>
         </View>
 
-        {/* ── Start game ──────────────────────────────────────── */}
-        <View style={styles.startSection}>
-          <Button
-            label="Start Game"
-            onPress={() => router.push({ pathname: '/quiz', params: { skill: 'intermediate', age: '32' } })}
-            variant="primary"
-          />
-        </View>
+        {/* ── Start game ────────────────────────────────────────
+            Host-only — non-host kan inte trigga spelstart. När backend
+            kommer in pushas alla godkända spelare in i quizet via socket-
+            event som host:s Start Game-tap fyrar. */}
+        {hostMode && (
+          <View style={styles.startSection}>
+            <Button
+              label="Start Game"
+              onPress={handleStartGame}
+              variant="primary"
+            />
+          </View>
+        )}
 
         <View style={styles.bottomPad} />
       </ScrollView>
@@ -2262,26 +2320,23 @@ const styles = StyleSheet.create({
     transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }],
     marginLeft: 'auto',
   },
-  // YouTube: vit cirkel + röd rundad rektangel inuti + vit playpil (CSS-triangel).
-  connectionIconYoutube: { backgroundColor: '#FFFFFF' },
-  connectionIconYoutubeRect: {
-    width: 18,
-    height: 13,
-    borderRadius: 3,
+  // YouTube: röd rundad kvadrat med vit playpil (CSS-triangel) inuti.
+  // borderRadius:6 override:ar connectionIconWrap.borderRadius (14 = cirkel)
+  // så bara YouTube-raden får kvadrat-formen; Spotify/Profiles behåller cirkel.
+  connectionIconYoutube: {
     backgroundColor: '#FF0000',
-    alignItems: 'center',
-    justifyContent: 'center',
+    borderRadius: 6,
   },
   connectionIconYoutubeArrow: {
     width: 0,
     height: 0,
-    borderLeftWidth: 5,
-    borderTopWidth: 3.5,
-    borderBottomWidth: 3.5,
+    borderLeftWidth: 9,
+    borderTopWidth: 6,
+    borderBottomWidth: 6,
     borderLeftColor: '#FFFFFF',
     borderTopColor: 'transparent',
     borderBottomColor: 'transparent',
-    marginLeft: 1, // optisk centrering — pilen ser balanserad ut mot röd bg
+    marginLeft: 2, // optisk centrering — pilen ser balanserad ut mot röd bg
   },
   // Spotify: brand-grön cirkel med 🎵 (samma färg som Profile-sidans icon-wrap).
   connectionIconSpotify: { backgroundColor: '#1DB954' },
@@ -2611,6 +2666,31 @@ const styles = StyleSheet.create({
   eraDisplay: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: Spacing.md, marginBottom: Spacing.md },
   eraDisplayYear: { fontSize: 36, fontWeight: '700', color: Colors.primary, fontVariant: ['tabular-nums'] },
   eraDisplayDash: { fontSize: 28, fontWeight: '300', color: Colors.textSecondary },
+  // Non-host Game Era — speglar in-game year-selector-rutan från app/quiz.tsx
+  // (BOX_COLOR='#F5A623', BOX_BG='rgba(26,48,80,0.92)'). Ingen årtalslinje här.
+  eraGuestBoxWrap: { alignItems: 'center', paddingVertical: Spacing.sm },
+  eraGuestBox: {
+    paddingHorizontal: Spacing.xl,
+    paddingVertical: Spacing.md,
+    borderWidth: 3,
+    borderRadius: 10,
+    borderColor: '#F5A623',
+    backgroundColor: 'rgba(26,48,80,0.92)',
+    shadowColor: '#F5A623',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.85,
+    shadowRadius: 18,
+    elevation: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  eraGuestBoxText: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: '#F5A623',
+    fontVariant: ['tabular-nums'],
+    letterSpacing: -0.5,
+  },
   eraWarning: { backgroundColor: Colors.warningMuted, borderRadius: Radius.sm, padding: Spacing.sm, borderWidth: 1, borderColor: Colors.warningBorder, marginTop: Spacing.sm },
   eraWarningText: { fontSize: FontSize.xs, color: Colors.warning, lineHeight: 17 },
 

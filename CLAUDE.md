@@ -240,6 +240,27 @@ Non-host gets a **read-only view** of the player list:
 
 **`PlayerRow.hasLeft` rendering**: när `hasLeft: true` får kortet neutral grå border (override:ar approved/waiting-färgerna), avatar dämpas, namn/HCP-rad i `textDisabled`, status-raden ersätts med "LEFT THIS GAME LOBBY"-text, approve-toggle och move-arrows döljs. Host-spelaren får ALDRIG `hasLeft` (defensiv guard i useFocusEffect — host kan inte lämna sin egen lobby).
 
+## Quiz — Get Ready to Vibe intro screen
+
+Hand-off-skärmen mellan Lobby:s Start Game-tap och första quiz-frågan. [src/components/GetReadyIntro.tsx](src/components/GetReadyIntro.tsx) renderas av [app/quiz.tsx](app/quiz.tsx) som en ny `'intro'`-fas — initial fas vid spelstart i båda lägena, OCH mellan rundor i Pass-the-phone (telefon-överlämning).
+
+**Phase union i `quiz.tsx`**: `'intro' | 'question' | 'reveal' | 'leaderboard'`. Init = `'intro'` om `turnOrder.length > 0`, annars `'question'` (graceful degradation om payload saknas/parse-failar — skärmen fastnar aldrig på tom intro).
+
+**Turordning skickas från Lobby via expo-router params**: `LobbyScreen.handleStartGame` bygger `turnOrder = approvedPlayers.filter(!hasLeft).map(p => ({id, name, emoji, avatarUri}))` och pushar som `players: JSON.stringify(turnOrder)` + `gameMode`. `quiz.tsx` parsar med `try/catch` i `useMemo` så korrupt payload faller tillbaka till tom array. Defensiv `Alert` i `handleStartGame` blockar push om turnOrder är tom (host alltid index 0 i normalflöde, men `hasLeft`-filtret skyddar). Den minimala `TurnOrderPlayer`-shape:n är distinkt från `LobbyPlayer` — bara fälten quiz behöver för att rendera intro:n.
+
+**Mode-dependent fas-flöde i `handleAdvanceToNextRound`**:
+- **Pass-the-Phone**: rotera `currentPlayerIndex` (mod `turnOrder.length`) → sätt fas till `'intro'` så "Pass-the-Phone to: <namn>" visas innan nästa fråga.
+- **Individual Devices**: hoppa över intro mellan rundor (parallel play, ingen telefon-överlämning) → gå direkt till `'question'`. Vid spelstart visas intro:n dock även här (varje spelare på sin enhet behöver tap för att starta).
+
+**Timer-gate (kritisk)**: `useEffect` som anropar `startTimer()` MÅSTE vara gated på `phase === 'question'` — annars tickar timern under intro:n. `phase` ingår i deps så timern startar om när intro → question.
+
+**`queueNames`-beräkning** (i `quiz.tsx`): `[...turnOrder.slice(currentPlayerIndex+1), ...turnOrder.slice(0, currentPlayerIndex)].map(p => p.name)` — wrap-around så listan visar kommande tur i ordning även när vi cyklar tillbaka till början av turordningen.
+
+**Layout** ([GetReadyIntro.tsx](src/components/GetReadyIntro.tsx)): `justifyContent: 'space-between'` på container distribuerar tre block — hero (logo) överst, play-knapp visuellt centrerad på skärmen, Pass-the-Phone-blocket längst ner.
+- **Hero**: `<QuizVibeLogo size={Math.min(360, screenWidth - 32)} />` med absolut-positionerad text-overlay "GET READY / TO VIBE" (numeric `fontSize: 26`, bold, `letterSpacing: 1.2`) centrerad över loggan via `StyleSheet.absoluteFillObject`. `textShadow` (radius 6, `Colors.background`) håller texten läsbar över Q-figuren under. **Statisk — ingen pulse**.
+- **Play-knapp**: 120×120 kvadrat (`Radius.xl`), pulserande+glowande. Glow:en är **cross-platform** via en absolut halo-`View` runt knappen (22px-inset → 164×164, `Colors.primary` bg, animated `opacity 0.35 → 0.8`) PLUS statisk iOS-only shadow med `shadowColor: Colors.primary`. Skala (`1 → 1.06`, 800ms) och glow-opacity körs i två separata `Animated.Value`-loopar, båda native driver. På Android utan färg-shadow tar halo-View:n över glow-rollen.
+- **Pass-the-Phone-blocket**: "PASS-THE-PHONE TO:" overline + bred primary-bordered ruta (`primaryMuted` bg, `Radius.lg`) med current player:s namn i `FontSize.display` bold + liten primary `▶`-pil absolut-positionerad i rutans vänsterkant (wrap-View med `top: 0, bottom: 0, justifyContent: 'center'` så pilen är vertikalt centrerad utan att kantra namnets horisontella centrering). Under rutan: `ScrollView` med `maxHeight: 180` som listar resterande turordning i `Colors.textSecondary` (grå). Cap:en gör att 6+ spelare scrollar internt istället för att knuffa play-knappen utanför skärmen.
+
 ## Shared visual components
 
 - `src/components/QuizVibeLogo.tsx` — brand SVG used on Home and Lobby room-card (both at `size={104}`). The Q-figure (ring + tail + wifi-fan in the center) is shifted **−3 in x, −1 in y** from the original (40, 38) center so the Q+tail bounding box (24-52, 24-52) is centered in the front rounded square (16-60, 16-60, center 38, 38). Wifi-fan replaces the old single dot — three concentric 90°-arcs (radii 3 / 5 / 7, `sweep-flag=1` so they bulge upward) + a 1.5px dot, all centered at (37, 37) (= Q ring center). 90° was chosen over 120° to match the iOS status-bar wifi icon's compactness — sweep-flag=0 produced inverted (frown) arcs, easy to flip back accidentally.

@@ -1,3 +1,4 @@
+import { GetReadyIntro } from '@/src/components/GetReadyIntro';
 import {
     generateOpponentRoundScore,
     generateOpponentTimeUsed,
@@ -453,14 +454,48 @@ const rv = StyleSheet.create({
 
 // ─── Main Quiz Screen ─────────────────────────────────────────────────────────
 
+type TurnOrderPlayer = { id: string; name: string; emoji?: string; avatarUri?: string };
+
 export default function QuizScreen() {
-  const params = useLocalSearchParams<{ skill?: string; age?: string }>();
+  const params = useLocalSearchParams<{
+    skill?: string;
+    age?: string;
+    gameMode?: 'pass-the-phone' | 'individual-devices';
+    players?: string;
+  }>();
   const skill = (params.skill ?? 'intermediate') as SkillLevel;
   const age = parseInt(params.age ?? '30');
   const birthYear = new Date().getFullYear() - age;
+  const gameMode = params.gameMode ?? 'pass-the-phone';
+  // Turordningen levereras som JSON-sträng från Lobby:s handleStartGame.
+  // try/catch:en gör att en korrupt payload graceful degradar till tom lista
+  // → 'intro'-fasen hoppas över istället för att skärmen fastnar tom.
+  const turnOrder = useMemo<TurnOrderPlayer[]>(() => {
+    if (!params.players) return [];
+    try {
+      const parsed = JSON.parse(params.players);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }, [params.players]);
 
   const [questionIndex, setQuestionIndex] = useState(0);
-  const [phase, setPhase] = useState<'question' | 'reveal' | 'leaderboard'>('question');
+  const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
+  // Initial fas är 'intro' när vi har en turordning (gäller båda lägena vid
+  // spelstart). Faller tillbaka till 'question' om payload saknas/parse-failar.
+  const [phase, setPhase] = useState<'intro' | 'question' | 'reveal' | 'leaderboard'>(
+    turnOrder.length > 0 ? 'intro' : 'question',
+  );
+  // Spelare som kommer efter current i turordningen (med wrap-around till
+  // början). Drivs av Get-Ready-skärmens "Then: …"-rad så spelarna ser kön.
+  const queueNames = useMemo<string[]>(() => {
+    if (turnOrder.length <= 1) return [];
+    return [
+      ...turnOrder.slice(currentPlayerIndex + 1),
+      ...turnOrder.slice(0, currentPlayerIndex),
+    ].map((p) => p.name);
+  }, [turnOrder, currentPlayerIndex]);
   const [timeLeft, setTimeLeft] = useState(30);
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [totalPoints, setTotalPoints] = useState(0);
@@ -572,9 +607,13 @@ export default function QuizScreen() {
   };
 
   useEffect(() => {
+    // Timern ska bara ticka i question-fasen — under 'intro' (Get Ready to
+    // Vibe) får spelaren gott om tid att ta emot telefonen. `phase` i deps
+    // gör att timern (åter)startas när vi går från 'intro' → 'question'.
+    if (phase !== 'question') return;
     startTimer();
     return () => clearInterval(timerRef.current);
-  }, [questionIndex]);
+  }, [questionIndex, phase]);
 
   useEffect(() => {
     if (timeLeft <= 5 && phase === 'question') {
@@ -627,8 +666,17 @@ export default function QuizScreen() {
   // Från Reveal eller Leaderboard: hoppa direkt till nästa fråga
   const handleAdvanceToNextRound = () => {
     setQuestionIndex((prev) => prev + 1);
-    setPhase('question');
     setSelectedYear(null);
+    // Pass-the-phone: rotera till nästa spelare i turordningen och visa
+    // Get-Ready-skärmen så telefonen kan lämnas över. Individual Devices:
+    // varje spelare är på sin egen enhet — inget overlämnings-flöde behövs
+    // mellan rundor, gå direkt till nästa fråga.
+    if (gameMode === 'pass-the-phone' && turnOrder.length > 0) {
+      setCurrentPlayerIndex((prev) => (prev + 1) % turnOrder.length);
+      setPhase('intro');
+    } else {
+      setPhase('question');
+    }
   };
 
   // Spara det avslutade spelet till AsyncStorage (görs när final leaderboard visas).
@@ -744,6 +792,21 @@ export default function QuizScreen() {
 
   const timerColor = timeLeft > 10 ? Colors.primary : timeLeft > 5 ? Colors.warning : Colors.error;
   const timerBg = timeLeft > 10 ? Colors.primaryMuted : timeLeft > 5 ? Colors.warningMuted : Colors.errorMuted;
+
+  // Get-Ready-skärmen renderas före quiz-UI:t. Vid spelstart för båda lägena,
+  // och mellan rundor för Pass-the-phone (ej Individual Devices). Faller
+  // tillbaka till 'You' om turnOrder skulle vara tom (defensiv — initial
+  // phase-init filtrerar redan bort det fallet).
+  if (phase === 'intro') {
+    const currentPlayer = turnOrder[currentPlayerIndex];
+    return (
+      <GetReadyIntro
+        playerName={currentPlayer?.name ?? 'You'}
+        queueNames={queueNames}
+        onReady={() => setPhase('question')}
+      />
+    );
+  }
 
   return (
     <SafeAreaView style={styles.safe}>
