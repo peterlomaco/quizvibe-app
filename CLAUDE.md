@@ -280,6 +280,38 @@ Hand-off-skärmen mellan Lobby:s Start Game-tap och första quiz-frågan. [src/c
 
 **Kö-lista cap**: `ScrollView` med `maxHeight: 180`. Ej-i-budget-spelare (de som filtrerats bort av cap-filtret ovan) renderas inte alls — om alla kö-spelare är out-of-budget faller `{queueNames.length > 0 && (…)}`-gaten naturligt.
 
+## Quiz — Question screen (answering + reveal phases)
+
+Fråge-vyn i [app/quiz.tsx](app/quiz.tsx) är samma layout för `'question'`- och `'reveal'`-faserna — reveal-info renderas inline istället för i en separat skärm. Det betyder att mediakortet, timer-baren, fråge-kortet och TimelineSelector:n stannar synliga genom hela svars→reveal-cykeln, vilket simulerar att "media fortsätter spelas" efter Confirm tills användaren trycker Next Round.
+
+**Ingen Quit Game-bar under question/reveal**: Quit lever bara i GetReadyIntro. Användaren väntar ut timern eller svarar, trycker Next Round, hamnar i kö-listevyn (intro:n) och kan välja Quit därifrån. Konsekvens: i Individual Devices-läget (där intro:n hoppas över mellan rundor) finns idag ingen mid-game-quit-väg — det får återbesökas när Individual Devices särdesignas.
+
+**Timer-progress-bar**: row-layout med bar:en (flex 1) + sekund-räknaren (`{timeLeft}s`) till höger, inom samma `paddingHorizontal: Spacing.lg`-wrapper. Bar:en är 6px hög, `borderRadius: 3`, `Colors.border`-track + animated fill. Färg-trösklar: `>10s = primary`, `≤10s = warning`, `≤5s = error`. `pulseAnim` (Animated.Value) kör opacity 1 ↔ 0.55 i 250ms-loop när `timeLeft <= 5 && phase === 'question'`, annars stop + setValue(1). Sekund-räknaren använder samma `timerColor` + `pulseAnim`-opacity för synk. Sektionen har `marginTop: -Spacing.md` så den limmar mot mediakortets underkant istället för att flyta i ScrollView-content:s gap.
+
+**Action-knapp är fas-medveten** (i [quiz.tsx](app/quiz.tsx), inte i TimelineSelector):
+
+| phase     | isLastQuestion | label                  | bg-färg          | handler                   |
+|-----------|----------------|------------------------|------------------|---------------------------|
+| question  | n/a            | "Confirm"              | `skillColor`     | `handleConfirm(pendingYear)` |
+| reveal    | false          | "Next Round  →"        | `Colors.primary` | `handleAdvanceToNextRound`  |
+| reveal    | true           | "🏆  Final Leaderboard"| `Colors.primary` | `handleShowLeaderboard`     |
+
+`skillColor` = `Colors.success` (easy) / `Colors.primary` (intermediate) / `'#F5A623'` (expert) — matchar TimelineSelector:s assist-badge så Confirm-knappen visuellt hör ihop med tidslinjen. Disabled när `phase === 'question' && pendingYear === null` (defensiv — TimelineSelector:s `useEffect` på `selectedYear` notifierar parent direkt vid mount via middleYear, så pendingYear är typiskt aldrig null efter första rendret).
+
+**TimelineSelector — lift-out av Confirm**: Confirm-knappen är borttagen ur [TimelineSelector](app/quiz.tsx) — quiz.tsx äger en enda action-knapp som byter label/handler per fas (se ovan). TimelineSelector exponerar `onYearChange(year)` istället för det gamla `onConfirm(year)`. Implementation: en `useEffect` med deps `[selectedYear, onYearChange]` notifierar parent vid varje scroll-tick (inkl. initial mount via middleYear). Parent-state: `const [pendingYear, setPendingYear] = useState<number | null>(null)` — hanteras separat från `selectedYear` (det "låsta" året efter Confirm). pendingYear nollställs i `handleAdvanceToNextRound` så TimelineSelector startar fresh på nästa fråga.
+
+**`key={questionIndex}` på TimelineSelector** är kritiskt: tvingar remount mellan frågor så internal `selectedYear` reset:as till nya frågans `middleYear`. Utan det skulle stale-state från föregående fråga ärva in (TimelineSelector beräknar middleYear i mount men håller selectedYear i useState efter det). Remount bevarar också scroll-positions-init (`contentOffset={{ x: initialScrollOffset, y: 0 }}`) eftersom propet bara läses vid mount.
+
+**Subtil "Answering: {namn}"-rad**: i fråge-kortet, mellan `questionTop` och `questionText`. Endast Pass-the-Phone (`gameMode === 'pass-the-phone' && currentPlayerName && ...`) — Individual Devices har spelaren på egen enhet och vet redan vem de är. Styling: `FontSize.xs`, `Colors.textSecondary`, namnet i `Colors.textPrimary` + `FontWeight.semibold`. Skicka inte avatar/emoji här — Peter valde uttryckligen "subtilt utan avatar" framför "prominent med avatar".
+
+**Inline reveal-card** (renderas när `phase === 'reveal' && selectedYear !== null`): kompakt **horisontell** layout — år (vänster, 36px primary bold), label "Correct Answer" + hint (mitten, vertikal stack), `+X pts` (höger, primary bold). `paddingVertical: Spacing.md, paddingHorizontal: Spacing.lg` — höjden landar runt 70px (var ~140px med tidigare vertikala layout + ~70px till med separat result-row, totalt ~210px). Den kompakta höjden är ett **explicit krav från användaren** så Next Round-knappen ryms direkt i viewport efter Confirm utan scroll. **Result-row med rätt/fel-ikon + diff-text är medvetet borttagen** — användaren ser sitt val i den låsta TimelineSelector:n (med selector-rutan markerad) och rätt år i kortet, så jämförelsen är synlig utan en egen ruta. Spring-in-animation (`revealScale` 0.6→1, `revealOpacity` 0→1) triggas i en `useEffect` på `phase`-deps som re-set:ar värdena varje gång phase blir 'reveal' (annars körs animationen bara på första frågans reveal).
+
+**Time-out-flöde** (`useEffect` på `[timeLeft]` med gating `timeLeft === 0 && phase === 'question'`): registrerar ronden som missad med `defaultGuess = currentYear - 20` (**inte** pendingYear) och 0 poäng → `simulateOpponentRound(0, false, 30)` → `setPhase('reveal')`. defaultGuess är hårdkodad — användaren straffas med en generisk gissning för att inte ha tryckt Confirm. selectedYear sätts till defaultGuess i samma effect så reveal-renderingen har ett värde att jämföra mot.
+
+**Inga separata `RevealScreen`-komponenter** kvar — den tidigare standalone-komponenten med "View Leaderboard" + "Next Round"-knappar är borttagen. View Leaderboard mellan rundor är borttaget per användarens val: leaderboarden visas bara vid game-end (sista frågans Confirm/timeout → reveal → "🏆 Final Leaderboard"-knappen → `phase = 'leaderboard'` → RoundLeaderboard).
+
+**Mock-frågor cyklas via modulo** (`SEED_QUESTIONS[questionIndex % SEED_QUESTIONS.length]`) — när `totalRounds × playerCount > 5` återanvänds frågorna tills riktig fråge-bank kommer in. Mock-listan är 5 Music-timeline-frågor.
+
 ## Shared visual components
 
 - `src/components/QuizVibeLogo.tsx` — brand SVG used on Home and Lobby room-card (both at `size={104}`). The Q-figure (ring + tail + wifi-fan in the center) is shifted **−3 in x, −1 in y** from the original (40, 38) center so the Q+tail bounding box (24-52, 24-52) is centered in the front rounded square (16-60, 16-60, center 38, 38). Wifi-fan replaces the old single dot — three concentric 90°-arcs (radii 3 / 5 / 7, `sweep-flag=1` so they bulge upward) + a 1.5px dot, all centered at (37, 37) (= Q ring center). 90° was chosen over 120° to match the iOS status-bar wifi icon's compactness — sweep-flag=0 produced inverted (frown) arcs, easy to flip back accidentally.
