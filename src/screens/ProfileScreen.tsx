@@ -127,6 +127,7 @@ export default function ProfileScreen() {
   const [skill, setSkill]                 = useState<Skill | null>(null);
   const [region, setRegion]               = useState<Region | null>(null);
   const [gameCredits, setGameCredits]     = useState<number>(0);
+  const [freeGameCredits, setFreeGameCredits] = useState<number>(0);
   const [spotifyConnected, setSpotifyConnected] = useState<boolean>(false);
   const [youtubeConnected, setYoutubeConnected] = useState<boolean>(false);
   const [friends, setFriends] = useState<Friend[]>([]);
@@ -165,6 +166,7 @@ export default function ProfileScreen() {
         setSource(data.avatarSource);
         setSelectedId(data.selectedAvatarId);
         setGameCredits(data.gameCredits ?? 0);
+        setFreeGameCredits(data.freeGameCredits ?? 0);
         setSpotifyConnected(data.spotifyConnected ?? false);
         setYoutubeConnected(data.youtubeConnected ?? false);
         setAnswerResponseSeconds(data.answerResponseSeconds ?? 30);
@@ -207,6 +209,7 @@ export default function ProfileScreen() {
         avatarSource: source,
         selectedAvatarId,
         gameCredits,
+        freeGameCredits,
         spotifyConnected,
         youtubeConnected,
         answerResponseSeconds,
@@ -240,6 +243,7 @@ export default function ProfileScreen() {
         avatarSource: data?.avatarSource ?? source,
         selectedAvatarId: data?.selectedAvatarId ?? selectedAvatarId,
         gameCredits: data?.gameCredits ?? gameCredits,
+        freeGameCredits: data?.freeGameCredits ?? freeGameCredits,
         spotifyConnected: true,
       };
       await saveProfile(next);
@@ -332,7 +336,10 @@ export default function ProfileScreen() {
           skärmens profileMenu). Bannern self-loadar profil via
           useFocusEffect så den uppdateras när vi navigerar tillbaka efter
           login/edit på andra skärmar. */}
-      <TopUserBanner onPress={() => setLogoutModalVisible(true)} />
+      <TopUserBanner
+        onPress={() => setLogoutModalVisible(true)}
+        onBackPress={() => router.replace('/')}
+      />
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.content}
@@ -351,10 +358,12 @@ export default function ProfileScreen() {
             ]}
             onPress={() => router.push('/store')}
           >
-            <Text style={styles.creditsLabel}>Game credits</Text>
+            <Text style={styles.creditsLabel}>Host Game Credits</Text>
             <View style={styles.creditsValueRow}>
-              <Text style={styles.creditsIcon}>🎯</Text>
-              <Text style={styles.creditsValue}>{gameCredits}</Text>
+              <Text style={styles.creditsKey}>Free:</Text>
+              <Text style={[styles.creditsValue, styles.creditsValueFree]}>{freeGameCredits}</Text>
+              <Text style={styles.creditsKey}>Extras:</Text>
+              <Text style={[styles.creditsValue, styles.creditsValueExtras]}>{gameCredits}</Text>
               <Text style={styles.creditsArrow}>›</Text>
             </View>
           </Pressable>
@@ -601,8 +610,8 @@ export default function ProfileScreen() {
             och låser upp Spotify-källan i Lobbyns Game connections-blocket. */}
         <View style={styles.spotifyCard}>
           <View style={styles.spotifyHeader}>
-            <View style={styles.spotifyIconWrap}>
-              <Text style={styles.spotifyIcon}>🎵</Text>
+            <View style={[styles.spotifyIconWrap, !spotifyConnected && styles.iconWrapMuted]}>
+              <Text style={[styles.spotifyIcon, !spotifyConnected && styles.iconGlyphMuted]}>♫</Text>
             </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.spotifyTitle}>
@@ -635,24 +644,26 @@ export default function ProfileScreen() {
         </View>
 
         {/* ── YouTube-koppling ──────────────────────────────────── */}
-        {/* Speglar Spotify-kortets layout. Loggan är samma röda
-            rectangle-with-arrow-mönster som i Lobbyns Game Connections,
-            uppskalad till 44x44 så den matchar Spotify-ikonen här. */}
+        {/* Speglar Spotify-kortets layout. Loggan är en röd kvadrat
+            (44x44) med vit playpil centrerad — matchar Spotify-ikonens
+            storlek och Lobbyns YouTube-rad fast uppskalat. */}
         <View style={styles.youtubeCard}>
+          {/* "Partly Free"-badge som skär kortets röda kantlinje i
+              övre högre delen — samma border-skärande mönster som
+              FREE-badgen i Lobbyns Game Mode-toggle. */}
+          <View style={styles.partlyFreeBadge} pointerEvents="none">
+            <Text style={styles.partlyFreeBadgeText}>PARTLY FREE</Text>
+          </View>
           <View style={styles.spotifyHeader}>
-            <View style={styles.youtubeIconWrap}>
-              <View style={styles.youtubeIconRect}>
-                <View style={styles.youtubeIconArrow} />
-              </View>
+            <View style={[styles.youtubeIconWrap, !youtubeConnected && styles.youtubeIconWrapMuted]}>
+              <View style={[styles.youtubeIconArrow, !youtubeConnected && styles.youtubeIconArrowMuted]} />
             </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.spotifyTitle}>
                 {youtubeConnected ? 'YouTube connected' : 'Connect your YouTube account'}
               </Text>
               <Text style={styles.spotifySubtitle}>
-                {youtubeConnected
-                  ? 'Enhanced video playback during games.'
-                  : 'For better experience during game.'}
+                Use the most potential from YouTube. No connection will still use YouTube basic material for free.
               </Text>
             </View>
             {youtubeConnected && <Text style={styles.youtubeCheck}>✓</Text>}
@@ -1350,7 +1361,9 @@ const styles = StyleSheet.create({
   screenTitle: { ...Typography.screenTitle, color: Colors.textPrimary },
   screenSubtitle: { ...Typography.label, color: Colors.textSecondary },
 
-  // Game credits pill (top-right of Profile header)
+  // Host Game Credits pill (top-right of Profile header). Visar två siffror på
+  // samma rad: Free (gratis credits från Basic-planen) och Extras (köpta från
+  // Store). minWidth bumpat från 110 → 170 för att rymma dubbla key/value-par.
   creditsPill: {
     backgroundColor: Colors.cardElevated,
     borderRadius: Radius.md,
@@ -1360,7 +1373,7 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.xs + 2,
     alignItems: 'center',
     gap: 2,
-    minWidth: 110,
+    minWidth: 170,
   },
   creditsLabel: {
     fontSize: 10,
@@ -1374,12 +1387,27 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 4,
   },
-  creditsIcon: { fontSize: 14 },
+  // "Free:" / "Extras:" labels framför respektive siffra. Liten, dämpad text
+  // så själva siffran är den dominerande visuella vikten.
+  creditsKey: {
+    fontSize: 11,
+    fontWeight: FontWeight.semibold,
+    color: Colors.textSecondary,
+  },
   creditsValue: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: FontWeight.bold,
     color: Colors.primary,
     fontVariant: ['tabular-nums'],
+  },
+  // Färg-overrides för att skilja Free (grön = "ingår gratis") från Extras
+  // (guld = "köpt premium-resurs"). Gold matchar PREMIUM-badgen i Lobby
+  // och 1st-place-färgen i RoundLeaderboard för visuell konsistens.
+  creditsValueFree: {
+    color: Colors.success,
+  },
+  creditsValueExtras: {
+    color: '#F5A623',
   },
   creditsArrow: { fontSize: 16, color: Colors.primary, marginLeft: 2 },
 
@@ -1450,7 +1478,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  spotifyIcon: { fontSize: 22 },
+  // Unicode-text-glyph (♫, U+266B) istället för 🎵-emoji så color + fontWeight
+  // faktiskt appliceras — emoji ignorerar color-stylen och blir grön mot grön
+  // bg. Med text-glyfen får vi tydlig svart not.
+  spotifyIcon: {
+    fontSize: 26,
+    fontWeight: FontWeight.bold,
+    color: '#000000',
+  },
+  // Muted-varianter för ikon-wrap + glyph när användaren inte är connectead.
+  // Bg byts till neutral grå (samma palett som Lobbyns auto-disabled Spotify-
+  // switch) så ikonen "släcks". När användaren connectar lyser den upp
+  // tillbaka till sin brand-färg.
+  iconWrapMuted: {
+    backgroundColor: '#3A3F4B',
+  },
+  iconGlyphMuted: {
+    opacity: 0.45,
+  },
   spotifyTitle: {
     fontSize: FontSize.md,
     fontWeight: FontWeight.bold,
@@ -1492,7 +1537,10 @@ const styles = StyleSheet.create({
   },
 
   // YouTube connect-card (speglar Spotify-mönstret — YouTube-röd accent).
+  // position:'relative' så absolut-positionerad PARTLY FREE-badge kan skära
+  // kantlinjen utan att klippas (overflow får INTE vara hidden).
   youtubeCard: {
+    position: 'relative',
     backgroundColor: 'rgba(255,0,0,0.06)',
     borderRadius: Radius.lg,
     borderWidth: 1.5,
@@ -1500,34 +1548,57 @@ const styles = StyleSheet.create({
     padding: Spacing.lg,
     gap: Spacing.md,
   },
-  // 44x44 vit cirkel som matchar Spotify-ikonens storlek på Profile-sidan
+  // Border-skärande badge i övre högre hörnet — samma teknik som FREE-badgen
+  // i Lobbyns Game Mode-toggle. Bg matchar youtubeCard.borderColor (#FF0000)
+  // så den känns som en "tag" som överlappar kantlinjen. Vit text för kontrast.
+  partlyFreeBadge: {
+    position: 'absolute',
+    top: -8,
+    right: Spacing.md,
+    backgroundColor: '#FF0000',
+    borderRadius: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    zIndex: 10,
+    elevation: 4,
+  },
+  partlyFreeBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    letterSpacing: 0.6,
+  },
+  // 44x44 röd rundad kvadrat med vit playpil centrerad
   // (samma logo-mönster som Lobbyns YouTube-rad fast uppskalat).
+  // marginTop sänker ikonen optiskt mot subtitle-textens vertikala mitt.
   youtubeIconWrap: {
     width: 44,
     height: 44,
-    borderRadius: 22,
-    backgroundColor: '#FFFFFF',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  youtubeIconRect: {
-    width: 28,
-    height: 20,
-    borderRadius: 5,
+    borderRadius: 10,
     backgroundColor: '#FF0000',
     alignItems: 'center',
     justifyContent: 'center',
+    marginTop: 6,
   },
   youtubeIconArrow: {
     width: 0,
     height: 0,
-    borderLeftWidth: 8,
-    borderTopWidth: 5.5,
-    borderBottomWidth: 5.5,
+    borderLeftWidth: 14,
+    borderTopWidth: 9.5,
+    borderBottomWidth: 9.5,
     borderLeftColor: '#FFFFFF',
     borderTopColor: 'transparent',
     borderBottomColor: 'transparent',
-    marginLeft: 1.5,
+    marginLeft: 3,
+  },
+  // Muted-varianter för YouTube-ikonen när användaren inte är connectead.
+  // Bg byts till neutral grå (samma palett som Spotify-ikonens muted-state)
+  // och playpilen får ljusare grå färg så den fortfarande syns mot bg:n.
+  youtubeIconWrapMuted: {
+    backgroundColor: '#3A3F4B',
+  },
+  youtubeIconArrowMuted: {
+    borderLeftColor: '#9CA3AF',
   },
   youtubeCheck: {
     fontSize: 22,

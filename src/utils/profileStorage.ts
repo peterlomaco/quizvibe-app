@@ -21,9 +21,14 @@ export interface ProfileData {
   region: Region | null;
   avatarSource: AvatarSource;
   selectedAvatarId: string;
-  // Antal spel användaren har på sitt konto. Köps via Store (Extra Games).
-  // Optional för bakåtkompatibilitet med profiler sparade innan fältet fanns.
+  // Antal extra Host Game-credits användaren har kvar av sina KÖPTA paket
+  // (5/10/20-tiers från Store). Bumpas vid purchase, dras vid Create Game när
+  // freeGameCredits är slut. Optional för bakåtkompatibilitet.
   gameCredits?: number;
+  // Antal Host Game-credits användaren har kvar av de GRATIS som följer med
+  // Basic-planen / kampanj-bonus. Konsumeras före gameCredits vid Create Game.
+  // Optional för bakåtkompatibilitet — defaultas till 0 i UI.
+  freeGameCredits?: number;
   // Om användaren har kopplat sitt Spotify-konto. Används för att spela låtar
   // ad-free under quiz-rundor. Optional för bakåtkompatibilitet.
   // TODO (auth): byt till riktigt OAuth-flöde mot Spotify Web API.

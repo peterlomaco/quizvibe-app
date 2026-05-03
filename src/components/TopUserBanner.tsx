@@ -15,6 +15,15 @@ interface Props {
    */
   onPress?: () => void;
   /**
+   * Tap-handler för en "Back to Start"-länk i bannerns vänstra kant.
+   * När den är satt renderas QuizVibe Q-ikon + "Back to Start"-text
+   * till vänster i bannern, och topBoard:en byter till
+   * justifyContent:'space-between' så pillen stannar längst till höger.
+   * Lämna ofylld på skärmar där tillbaka-navigation inte är relevant
+   * (Home, Lobby).
+   */
+  onBackPress?: () => void;
+  /**
    * Optional kontrollerad profil. Skärmar med in-place-login (som Home,
    * där pillen och login-modalen lever på samma skärm) måste passera
    * sin profil här så bannern uppdateras direkt när profilen ändras —
@@ -42,7 +51,7 @@ interface Props {
  * via AsyncStorage på focus så den uppdateras när användaren ändrar
  * playerName/avatar i Profile-tabben och sedan kommer tillbaka.
  */
-export function TopUserBanner({ onPress, profile: profileProp, guestName }: Props) {
+export function TopUserBanner({ onPress, onBackPress, profile: profileProp, guestName }: Props) {
   const [internalProfile, setInternalProfile] = useState<ProfileData | null>(null);
   const isControlled = profileProp !== undefined;
 
@@ -86,7 +95,17 @@ export function TopUserBanner({ onPress, profile: profileProp, guestName }: Prop
   ];
 
   return (
-    <View style={styles.topBoard}>
+    <View style={[styles.topBoard, onBackPress && styles.topBoardWithBack]}>
+      {onBackPress && (
+        <TouchableOpacity
+          style={styles.backLink}
+          activeOpacity={0.7}
+          onPress={onBackPress}
+        >
+          <QuizVibeQAvatar size={20} />
+          <Text style={styles.backLinkText}>Back to Start</Text>
+        </TouchableOpacity>
+      )}
       {onPress ? (
         <TouchableOpacity style={pillStyle} activeOpacity={0.7} onPress={onPress}>
           {showBrandAvatar ? (
@@ -124,6 +143,23 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.card,
     borderBottomWidth: 1,
     borderBottomColor: Colors.border,
+  },
+  // När onBackPress är satt: byt till space-between så back-länken sitter
+  // till vänster och login-pillen till höger.
+  topBoardWithBack: {
+    justifyContent: 'space-between',
+  },
+  // "Back to Start"-länk: Q-mark + text + retur-pil. Tappable med samma
+  // visuella vikt som login-pillens text så de balanserar i banner-raden.
+  backLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  backLinkText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: Colors.textPrimary,
   },
   loginPill: {
     flexDirection: 'row',

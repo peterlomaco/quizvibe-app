@@ -15,7 +15,7 @@ import { track } from '@/src/utils/analytics';
 import { saveLatestResult, type GameResult, type RoundResult } from '@/src/utils/gameResults';
 import { clearPendingLobbyPlayers, savePendingLobbyPlayers } from '@/src/utils/pendingLobby';
 import { clearLeftPlayers } from '@/src/utils/leftPlayers';
-import { registerActiveRoom } from '@/src/utils/mockActiveRooms';
+import { deactivateRoom, registerActiveRoom } from '@/src/utils/mockActiveRooms';
 import { generateRoomCode } from '@/src/utils/roomCode';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -462,11 +462,18 @@ export default function QuizScreen() {
     age?: string;
     gameMode?: 'pass-the-phone' | 'individual-devices';
     players?: string;
+    roundsCount?: string;
+    roomCode?: string;
   }>();
   const skill = (params.skill ?? 'intermediate') as SkillLevel;
   const age = parseInt(params.age ?? '30');
   const birthYear = new Date().getFullYear() - age;
   const gameMode = params.gameMode ?? 'pass-the-phone';
+  // Antal rundor sätts av host i Lobby (slider 3–20, default 10). Fallback 5
+  // om param saknas — t.ex. direkt-nav till /quiz utan att gå via Lobby.
+  // SEED_QUESTIONS har 5 frågor i mock; för totalRounds > 5 cyklas listan via
+  // modulo nedan tills riktig fråge-bank finns på plats.
+  const totalRounds = Math.max(1, parseInt(String(params.roundsCount ?? '5'), 10));
   // Turordningen levereras som JSON-sträng från Lobby:s handleStartGame.
   // try/catch:en gör att en korrupt payload graceful degradar till tom lista
   // → 'intro'-fasen hoppas över istället för att skärmen fastnar tom.
@@ -479,6 +486,12 @@ export default function QuizScreen() {
       return [];
     }
   }, [params.players]);
+
+  // En "runda" = ett varv där alla spelare svarar en gång. Totalt antal frågor
+  // i spelomgången = rundor × spelare. Med 4 spelare × 4 rundor = 16 frågor.
+  // Math.max(1, ...) skyddar fallback-fallet då turnOrder är tom (direkt-nav
+  // till /quiz utan Lobby).
+  const totalQuestions = totalRounds * Math.max(1, turnOrder.length);
 
   const [questionIndex, setQuestionIndex] = useState(0);
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
@@ -539,8 +552,8 @@ export default function QuizScreen() {
   const timerRef = useRef<any>(null);
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
-  const question = SEED_QUESTIONS[questionIndex];
-  const isLastQuestion = questionIndex === SEED_QUESTIONS.length - 1;
+  const question = SEED_QUESTIONS[questionIndex % SEED_QUESTIONS.length];
+  const isLastQuestion = questionIndex === totalQuestions - 1;
 
   const startTimer = useCallback(() => {
     setTimeLeft(30);
@@ -561,7 +574,7 @@ export default function QuizScreen() {
       setRounds((prev) => [
         ...prev,
         {
-          questionNumber: question.questionNumber,
+          questionNumber: questionIndex + 1,
           category: question.category,
           question: question.question,
           correctYear: question.correctYear,
@@ -641,7 +654,7 @@ export default function QuizScreen() {
     setRounds((prev) => [
       ...prev,
       {
-        questionNumber: question.questionNumber,
+        questionNumber: questionIndex + 1,
         category: question.category,
         question: question.question,
         correctYear: question.correctYear,
@@ -790,6 +803,33 @@ export default function QuizScreen() {
     router.replace('/(tabs)');
   };
 
+  // Quit Game: avslutar pågående spel mitt i, river lobby:n och kastar ut
+  // host till Home. Speglar host-flödet "Delete this Game Lobby" från
+  // LobbyScreen — deactiverar rumkoden i mockActiveRooms (så ev. ifyllda
+  // join-koder börjar visa "Room not found") och rensar leftPlayers-store:n
+  // för koden så ingen stale-data ärver in när koden ev. återanvänds.
+  const handleQuitGame = () => {
+    Alert.alert(
+      'Quit game?',
+      'This will end the game and close the lobby for everyone. You will return to the start screen.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Quit game',
+          style: 'destructive',
+          onPress: () => {
+            const code = params.roomCode;
+            if (code) {
+              deactivateRoom(code);
+              clearLeftPlayers(code);
+            }
+            router.replace('/');
+          },
+        },
+      ],
+    );
+  };
+
   const timerColor = timeLeft > 10 ? Colors.primary : timeLeft > 5 ? Colors.warning : Colors.error;
   const timerBg = timeLeft > 10 ? Colors.primaryMuted : timeLeft > 5 ? Colors.warningMuted : Colors.errorMuted;
 
@@ -799,11 +839,42 @@ export default function QuizScreen() {
   // phase-init filtrerar redan bort det fallet).
   if (phase === 'intro') {
     const currentPlayer = turnOrder[currentPlayerIndex];
+    const playerCount = Math.max(1, turnOrder.length);
+    const currentRound = Math.floor(questionIndex / playerCount) + 1;
+    const currentQuestion = questionIndex + 1;
+    // Kö-spelarnas runda och fråge-nummer räknas på den absoluta
+    // question-positionen där just den spelaren faktiskt får sin tur
+    // (questionIndex + 1 + i, 0-baserat). Cap:a på totalQuestions så
+    // wrap-around-spelare i sista rundan som aldrig hinner spela försvinner
+    // från listan helt — annars hade vi visat siffror som overshootar.
+    // Alla tre arrays slicas parallellt så indexen håller ihop.
+    const queueWithCounts = queueNames
+      .map((name, i) => {
+        const absoluteQuestion0 = questionIndex + 1 + i; // 0-baserat
+        return {
+          name,
+          round: Math.floor(absoluteQuestion0 / playerCount) + 1,
+          question: absoluteQuestion0 + 1, // 1-baserat
+          withinBudget: absoluteQuestion0 < totalQuestions,
+        };
+      })
+      .filter((entry) => entry.withinBudget);
+    const introQueueNames = queueWithCounts.map((entry) => entry.name);
+    const queueRoundNumbers = queueWithCounts.map((entry) => entry.round);
+    const queueQuestionNumbers = queueWithCounts.map((entry) => entry.question);
     return (
       <GetReadyIntro
         playerName={currentPlayer?.name ?? 'You'}
-        queueNames={queueNames}
+        queueNames={introQueueNames}
+        queueRoundNumbers={queueRoundNumbers}
+        queueQuestionNumbers={queueQuestionNumbers}
+        currentRound={currentRound}
+        totalRounds={totalRounds}
+        currentQuestion={currentQuestion}
+        totalQuestions={totalQuestions}
+        playerCount={playerCount}
         onReady={() => setPhase('question')}
+        onQuit={handleQuitGame}
       />
     );
   }
@@ -835,16 +906,12 @@ export default function QuizScreen() {
               <Text style={styles.timerSec}>sec</Text>
             </Animated.View>
           )}
-
-          <TouchableOpacity style={styles.exitBtn} onPress={() => router.back()}>
-            <Text style={styles.exitText}>✕</Text>
-          </TouchableOpacity>
         </View>
 
         <View style={styles.questionCard}>
           <View style={styles.questionTop}>
             <Text style={styles.questionMeta}>
-              Question {question.questionNumber} of {question.totalQuestions}
+              Question {questionIndex + 1} of {totalQuestions}
             </Text>
             <View style={styles.typeBadge}>
               <Text style={styles.typeBadgeText}>Year</Text>
@@ -895,8 +962,8 @@ export default function QuizScreen() {
             players={allPlayers}
             roundScores={currentRoundScores}
             totalsByPlayerId={{ you: totalPoints, ...opponentTotals }}
-            roundNumber={question.questionNumber}
-            totalRounds={question.totalQuestions}
+            roundNumber={questionIndex + 1}
+            totalRounds={totalQuestions}
             onNextRound={handleAdvanceToNextRound}
             onPlayAgain={handlePlayAgain}
             onGoHome={handleGoHome}
@@ -931,13 +998,6 @@ const styles = StyleSheet.create({
   timerNum: { fontSize: 28, fontWeight: '700', fontVariant: ['tabular-nums'], lineHeight: 32 },
   timerSec: { fontSize: 9, color: Colors.textSecondary, letterSpacing: 0.5 },
 
-  exitBtn: {
-    position: 'absolute', top: Spacing.md, left: Spacing.md,
-    width: 32, height: 32, borderRadius: 16,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    alignItems: 'center', justifyContent: 'center',
-  },
-  exitText: { fontSize: 13, color: Colors.textSecondary },
 
   questionCard: {
     backgroundColor: Colors.card, borderRadius: Radius.lg,

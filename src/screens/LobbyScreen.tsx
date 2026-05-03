@@ -129,6 +129,18 @@ const ERA_MIN = 1900;
 const ERA_MAX = new Date().getFullYear();
 const SLIDER_WIDTH = 280;
 
+// Antal rundor:
+//   • Pass-the-Phone: 2–4 (telefonen rör sig fysiskt mellan spelare så
+//     speltiden växer snabbt med fler rundor).
+//   • Individual Devices: 2–20 (alla spelar parallellt → tål långa spel).
+//   • Stegrar i 2 så det alltid blir jämna lap-tal (varje runda = ett
+//     varv där alla spelare svarar en gång).
+const ROUNDS_MIN = 2;
+const ROUNDS_MAX_PASS = 4;
+const ROUNDS_MAX_INDIV = 20;
+const ROUNDS_STEP = 2;
+const ROUNDS_DEFAULT = 4;
+
 function clampEraToPlayer(fromYear: number, toYear: number, players: LobbyPlayer[]) {
   const currentYear = new Date().getFullYear();
   const ages = players.filter((p) => p.hcpComplete && p.age).map((p) => p.age as number);
@@ -140,6 +152,184 @@ function clampEraToPlayer(fromYear: number, toYear: number, players: LobbyPlayer
   }
   return { from: fromYear, to: toYear, warning: null };
 }
+
+/**
+ * Linjemätare för Number of Rounds — tunn horisontell linje över intervallet
+ * 2–20 med ett kort vertikalt streck per jämnt nummer som markerar tick-
+ * positionen. Under linjen står själva siffrorna utan ruta (bara text) i
+ * blå nyans för valbara värden, grå för locked (kräver Premium). Aktuellt
+ * val lyser upp i en solid blå box med vit text + glow. Locked-intervallet
+ * ramas in av en uppåt-öppen klammer med en klickbar "Premium"-knapp under
+ * som leder till Store.
+ */
+function RoundsRuler({ value, min, gameModeMax, onPremiumPress }: {
+  value: number;
+  min: number;
+  gameModeMax: number;
+  // Optional: utan callback renderas Premium-pillen som plain View (icke-
+  // klickbar för non-host). Visuellt identisk så icke-host ser samma info
+  // som host men kan inte navigera till Store härifrån.
+  onPremiumPress?: () => void;
+}) {
+  const RULER_MAX = ROUNDS_MAX_INDIV;
+  const ticks: number[] = [];
+  for (let n = min; n <= RULER_MAX; n += 2) ticks.push(n);
+  const range = RULER_MAX - min;
+  const fillWidth = ((value - min) / range) * SLIDER_WIDTH;
+  const hasLocked = gameModeMax < RULER_MAX;
+
+  // Klammer-positionering: spänner över alla locked-tickar (gameModeMax+2 → 20).
+  // Lite extra bredd så armarna omsluter siffrorna, inte sitter innanför dem.
+  const firstLocked = gameModeMax + ROUNDS_STEP;
+  const bracketLeft = ((firstLocked - min) / range) * SLIDER_WIDTH - 13;
+  const bracketRight = ((RULER_MAX - min) / range) * SLIDER_WIDTH + 13;
+  const bracketWidth = bracketRight - bracketLeft;
+
+  return (
+    <View style={{ width: SLIDER_WIDTH, marginTop: 6 }}>
+      {/* Tunn track-linje + filled-portion */}
+      <View style={{ height: 2, borderRadius: 1, backgroundColor: Colors.border }}>
+        <View style={{ height: 2, width: fillWidth, borderRadius: 1, backgroundColor: Colors.primary }} />
+      </View>
+      {/* Vertikala tick-streck på linjen + nummer-labels under */}
+      <View style={{ height: 32, marginTop: 0 }}>
+        {ticks.map((n) => {
+          const position = ((n - min) / range) * SLIDER_WIDTH;
+          const isCurrent = n === value;
+          const isLocked = n > gameModeMax;
+          return (
+            <View key={n} style={{ position: 'absolute', left: position - 13, width: 26, alignItems: 'center' }}>
+              <View style={{
+                width: 1.5,
+                height: 7,
+                marginTop: -4,
+                backgroundColor: isLocked ? Colors.borderStrong : Colors.primary,
+              }} />
+              {isCurrent ? (
+                <View style={roundsRulerStyles.tickBoxCurrent}>
+                  <Text style={roundsRulerStyles.tickBoxTextCurrent}>{n}</Text>
+                </View>
+              ) : (
+                <Text style={[
+                  roundsRulerStyles.tickText,
+                  isLocked && roundsRulerStyles.tickTextLocked,
+                ]}>
+                  {n}
+                </Text>
+              )}
+            </View>
+          );
+        })}
+      </View>
+      {hasLocked && (
+        // height tar plats för bracket (top 0, height 10) + premium-btn
+        // (top 14, ~22px hög) → ~36px. Båda barnen är absolutpositionerade
+        // så wrapper:n behöver explicit höjd för att inte kollapsa.
+        <View style={{ marginTop: 4, height: 38 }}>
+          <View style={[roundsRulerStyles.bracket, {
+            left: bracketLeft,
+            width: bracketWidth,
+          }]} />
+          {onPremiumPress ? (
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={onPremiumPress}
+              style={[roundsRulerStyles.premiumBtn, {
+                left: bracketLeft + bracketWidth / 2 - 50,
+              }]}
+            >
+              <Text style={roundsRulerStyles.premiumBtnText}>PREMIUM</Text>
+            </TouchableOpacity>
+          ) : (
+            <View
+              style={[roundsRulerStyles.premiumBtn, {
+                left: bracketLeft + bracketWidth / 2 - 50,
+              }]}
+              pointerEvents="none"
+            >
+              <Text style={roundsRulerStyles.premiumBtnText}>PREMIUM</Text>
+            </View>
+          )}
+        </View>
+      )}
+    </View>
+  );
+}
+
+const roundsRulerStyles = StyleSheet.create({
+  // "Lit"-state för aktuellt val — solid blå box med vit text + glow,
+  // matchar formatet på den stora roundsGuestBox men mindre.
+  tickBoxCurrent: {
+    width: 26,
+    height: 22,
+    borderRadius: 4,
+    borderWidth: 1.5,
+    borderColor: Colors.primary,
+    backgroundColor: Colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 4,
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.7,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  tickBoxTextCurrent: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    fontVariant: ['tabular-nums'],
+    letterSpacing: -0.3,
+    lineHeight: 14,
+  },
+  // Bara siffer-text (ingen ruta) för valbara icke-valda värden.
+  tickText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: Colors.primary,
+    fontVariant: ['tabular-nums'],
+    letterSpacing: -0.3,
+    marginTop: 9, // matchar tickBoxCurrent.marginTop + (height-fontSize)/2 så raden linjerar
+  },
+  tickTextLocked: {
+    color: Colors.textDisabled,
+  },
+  // Klammer (uppåt-öppen U) som ramar in locked-tickarna. borderTopWidth=0
+  // implicit; vänster/höger/botten-borders bildar U:t. Grå färg matchar
+  // premiumBadgeGrey-stilen på Individual Devices-knappen i Game Mode-toggle.
+  bracket: {
+    position: 'absolute',
+    top: 0,
+    height: 10,
+    borderLeftWidth: 1.5,
+    borderRightWidth: 1.5,
+    borderBottomWidth: 1.5,
+    borderColor: '#6B7280',
+    borderBottomLeftRadius: 4,
+    borderBottomRightRadius: 4,
+  },
+  // Premium-CTA — grå pill med vit text "PREMIUM" i versaler. Samma
+  // visuella språk som premiumBadgeGrey runt Individual Devices.
+  // Tap navigerar till Store. Fixed width 100px för matematisk centrering
+  // under klammern (left = bracketCenter - width/2).
+  premiumBtn: {
+    position: 'absolute',
+    top: 14,
+    width: 100,
+    paddingVertical: 4,
+    backgroundColor: '#6B7280',
+    borderRadius: Radius.full,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  premiumBtnText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    letterSpacing: 0.6,
+  },
+});
 
 function DecadeMarks() {
   const decades = Array.from(
@@ -442,6 +632,67 @@ const waveDotsStyles = StyleSheet.create({
   },
 });
 
+// ─── SequentialDots ───────────────────────────────────────────────────────────
+
+/**
+ * Tre prickar som tänds en och en med fade-in, sedan släcks alla samtidigt
+ * och cykeln börjar om. Används av "Waiting for Host to Start Game…"-rutan
+ * för icke-host så de visuellt ser att appen väntar/lever. Cykellängd 1600ms
+ * (0/400/800ms-stagger för ON, alla OFF vid 1200ms, 400ms blank-period).
+ */
+function SequentialDots() {
+  const dot1 = useRef(new Animated.Value(0)).current;
+  const dot2 = useRef(new Animated.Value(0)).current;
+  const dot3 = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    const fadeMs = 100;
+    const makeDot = (val: Animated.Value, onAt: number) =>
+      Animated.loop(
+        Animated.sequence([
+          Animated.delay(onAt),
+          Animated.timing(val, { toValue: 1, duration: fadeMs, useNativeDriver: true }),
+          Animated.delay(1200 - onAt - fadeMs),
+          Animated.timing(val, { toValue: 0, duration: fadeMs, useNativeDriver: true }),
+          Animated.delay(300),
+        ]),
+      );
+    const a1 = makeDot(dot1, 0);
+    const a2 = makeDot(dot2, 400);
+    const a3 = makeDot(dot3, 800);
+    a1.start();
+    a2.start();
+    a3.start();
+    return () => {
+      a1.stop();
+      a2.stop();
+      a3.stop();
+    };
+  }, [dot1, dot2, dot3]);
+
+  return (
+    <View style={sequentialDotsStyles.row}>
+      <Animated.Text style={[sequentialDotsStyles.dot, { opacity: dot1 }]}>.</Animated.Text>
+      <Animated.Text style={[sequentialDotsStyles.dot, { opacity: dot2 }]}>.</Animated.Text>
+      <Animated.Text style={[sequentialDotsStyles.dot, { opacity: dot3 }]}>.</Animated.Text>
+    </View>
+  );
+}
+
+const sequentialDotsStyles = StyleSheet.create({
+  row: {
+    flexDirection: 'row',
+    marginLeft: 2,
+  },
+  dot: {
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.semibold,
+    color: Colors.textPrimary,
+    marginHorizontal: 1,
+    lineHeight: 20,
+  },
+});
+
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
 export default function LobbyScreen() {
@@ -646,7 +897,9 @@ export default function LobbyScreen() {
   const [addModalVisible, setAddModalVisible] = useState(false);
   const ROOM_LOGO_SIZE = 104;
   const [eraValues, setEraValues] = useState([1980, 2010]);
+  const [roundsCount, setRoundsCount] = useState(ROUNDS_DEFAULT);
   const [region, setRegion] = useState<Region>('Sweden');
+  // gameMode-state declareras längre ner — se rad ~751.
   const [regionModalOpen, setRegionModalOpen] = useState(false);
 
   // Share invite modal
@@ -683,6 +936,21 @@ export default function LobbyScreen() {
 
   // Game mode toggle (Pass-the-Phone vs Multiplayer Individual Devices)
   const [gameMode, setGameMode] = useState<GameMode>('pass-the-phone');
+
+  // Max rundor beror på gameMode — Pass-the-Phone capas vid 4, Individual
+  // Devices vid 20. När host växlar läge clampas roundsCount automatiskt
+  // ner om det skulle hamna utanför nya max:t.
+  const roundsMax = gameMode === 'pass-the-phone' ? ROUNDS_MAX_PASS : ROUNDS_MAX_INDIV;
+  useEffect(() => {
+    setRoundsCount((prev) => Math.max(ROUNDS_MIN, Math.min(roundsMax, prev)));
+  }, [roundsMax]);
+
+  const handleDecrementRounds = useCallback(() => {
+    setRoundsCount((prev) => Math.max(ROUNDS_MIN, prev - ROUNDS_STEP));
+  }, []);
+  const handleIncrementRounds = useCallback(() => {
+    setRoundsCount((prev) => Math.min(roundsMax, prev + ROUNDS_STEP));
+  }, [roundsMax]);
   // YouTube är alltid tillgänglig som källa, men host kan slå av/på manuellt
   // via en toggle. Default = på. Skickas till alla via lobbyns state.
   const [youtubeEnabled, setYoutubeEnabled] = useState(true);
@@ -1015,6 +1283,10 @@ export default function LobbyScreen() {
         age: '32',
         gameMode,
         players: JSON.stringify(turnOrder),
+        roundsCount: String(roundsCount),
+        // Skickas så Quit Game-flödet i quiz.tsx kan deactivera rummet
+        // och rensa leftPlayers när host avslutar mitt i ett spel.
+        roomCode,
       },
     });
   };
@@ -1112,6 +1384,9 @@ export default function LobbyScreen() {
             container. Ger semantiskt en "vad spelet ska spelas som"-sektion
             som visuellt skiljer sig från Players in Lobby nedanför. */}
         <View style={styles.gameSettingsBorder}>
+        <View style={styles.definedByHostBadge} pointerEvents="none">
+          <Text style={styles.definedByHostBadgeText}>DEFINED BY HOST</Text>
+        </View>
         {/* ── Game Mode ─────────────────────────────────────────── */}
         {/* Visas för alla i lobbyn, men kan bara *ändras* av host. För icke-host
             döljs FREE/PREMIUM-badges (de är host-relevanta paketdetaljer) och
@@ -1120,10 +1395,7 @@ export default function LobbyScreen() {
             tydligt sticker ut utan att se ut som en interaktiv toggle.
             marginTop ger lite extra luft mellan kortets överkant och rubriken. */}
         <View style={[styles.section, { marginTop: Spacing.xs }]}>
-          <Text style={styles.sectionLabel}>
-            Game Mode
-            {!hostMode && <Text style={styles.sectionHint}> – defined by Host</Text>}
-          </Text>
+          <Text style={styles.sectionLabel}>Game Mode</Text>
 
           <View style={styles.modeToggle}>
             {/* Pass-the-Phone */}
@@ -1201,10 +1473,7 @@ export default function LobbyScreen() {
             ska dras från). Visas för alla i lobbyn men kan bara
             *ändras* av host — samma mönster som Game Mode ovanför. */}
         <View style={[styles.section, { marginTop: Spacing.sm }]}>
-          <Text style={styles.sectionLabel}>
-            🌍 Region Scope
-            {!hostMode && <Text style={styles.sectionHint}> – defined by Host</Text>}
-          </Text>
+          <Text style={styles.sectionLabel}>🌍 Region Scope</Text>
           <Text style={styles.cardSubtitle}>Sets the cultural context for questions</Text>
           <TouchableOpacity
             style={styles.regionTrigger}
@@ -1589,23 +1858,32 @@ export default function LobbyScreen() {
           </View>
         </View>
 
-        {/* ── Quiz Settings ───────────────────────────────────── */}
+        {/* ── Quiz Settings ─────────────────────────────────────
+            Game Era + Number of Rounds delar en gemensam ram
+            (quizSettingsBorder, samma stil som gameSettingsBorder).
+            "– defined by Host" visas på sektion-rubriken för icke-host,
+            inte per-block, så ramen visuellt klumpar host-kontrollerade
+            quiz-inställningar tillsammans. */}
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Quiz Settings</Text>
 
-          <Card padding={Spacing.lg}>
-            <Text style={styles.cardTitle}>
-              🕐 Game Era
-              {!hostMode && <Text style={styles.sectionHint}> – defined by Host</Text>}
-            </Text>
-            <Text style={styles.cardSubtitle}>Set the time span for questions</Text>
-            {hostMode ? (
-              <>
-                <View style={styles.eraDisplay}>
-                  <Text style={styles.eraDisplayYear}>{clampedFrom}</Text>
-                  <Text style={styles.eraDisplayDash}>–</Text>
-                  <Text style={styles.eraDisplayYear}>{clampedTo}</Text>
+          <View style={styles.quizSettingsBorder}>
+            <View style={styles.definedByHostBadge} pointerEvents="none">
+              <Text style={styles.definedByHostBadgeText}>DEFINED BY HOST</Text>
+            </View>
+            {/* Game Era */}
+            <View>
+              <Text style={styles.cardTitle}>🕐 Game Era</Text>
+              <Text style={styles.cardSubtitle}>Set the time span for questions</Text>
+              {/* Det valda årtalsintervallet visas i samma gul/glow-ruta för
+                  både host och non-host (in-game year-selector-paritet). Host
+                  får dessutom slidern + DecadeMarks under för att kunna dra. */}
+              <View style={styles.eraGuestBoxWrap}>
+                <View style={styles.eraGuestBox}>
+                  <Text style={styles.eraGuestBoxText}>{clampedFrom} – {clampedTo}</Text>
                 </View>
+              </View>
+              {hostMode && (
                 <View style={{ alignItems: 'center' }}>
                   <MultiSlider
                     values={eraValues}
@@ -1622,19 +1900,70 @@ export default function LobbyScreen() {
                   />
                   <DecadeMarks />
                 </View>
-              </>
-            ) : (
-              // Non-host: read-only "selector"-ruta i samma stil som spelets year-selector
-              // (gul kantlinje + gul fet text på mörk navy bg). Ingen årtalslinje — bara
-              // rutan, eftersom non-host ändå inte kan dra ett spann.
-              <View style={styles.eraGuestBoxWrap}>
-                <View style={styles.eraGuestBox}>
-                  <Text style={styles.eraGuestBoxText}>{clampedFrom} – {clampedTo}</Text>
-                </View>
-              </View>
-            )}
-            {eraWarning && <View style={styles.eraWarning}><Text style={styles.eraWarningText}>⚠️ {eraWarning}</Text></View>}
-          </Card>
+              )}
+              {eraWarning && <View style={styles.eraWarning}><Text style={styles.eraWarningText}>⚠️ {eraWarning}</Text></View>}
+            </View>
+
+            {/* Number of Rounds */}
+            <View>
+              <Text style={styles.cardTitle}>🎯 Number of Rounds</Text>
+              <Text style={styles.cardSubtitle}>How many rounds in this game</Text>
+              {/* Siffran ramas in i samma blå-bordred ruta för både host och
+                  non-host. Host får -/+ knappar på sidorna och RoundsRuler
+                  under för att stega och se intervallet. */}
+              {hostMode ? (
+                <>
+                  <View style={styles.roundsStepperRow}>
+                    <TouchableOpacity
+                      style={[styles.roundsStepperBtn, roundsCount <= ROUNDS_MIN && styles.roundsStepperBtnDisabled]}
+                      onPress={handleDecrementRounds}
+                      disabled={roundsCount <= ROUNDS_MIN}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={[styles.roundsStepperBtnText, roundsCount <= ROUNDS_MIN && styles.roundsStepperBtnTextDisabled]}>−</Text>
+                    </TouchableOpacity>
+                    <View style={styles.roundsGuestBox}>
+                      <Text style={styles.roundsGuestBoxText}>{roundsCount}</Text>
+                    </View>
+                    <TouchableOpacity
+                      style={[styles.roundsStepperBtn, roundsCount >= roundsMax && styles.roundsStepperBtnDisabled]}
+                      onPress={handleIncrementRounds}
+                      disabled={roundsCount >= roundsMax}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={[styles.roundsStepperBtnText, roundsCount >= roundsMax && styles.roundsStepperBtnTextDisabled]}>+</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={{ alignItems: 'center' }}>
+                    <RoundsRuler
+                      value={roundsCount}
+                      min={ROUNDS_MIN}
+                      gameModeMax={roundsMax}
+                      onPremiumPress={() => router.push('/store')}
+                    />
+                  </View>
+                </>
+              ) : (
+                // Non-host: samma rounds-display + ruler + klammer/Premium-
+                // pillar som host, men utan stepper-knappar och Premium är
+                // icke-klickbar (utelämnar onPremiumPress).
+                <>
+                  <View style={styles.roundsGuestBoxWrap}>
+                    <View style={styles.roundsGuestBox}>
+                      <Text style={styles.roundsGuestBoxText}>{roundsCount}</Text>
+                    </View>
+                  </View>
+                  <View style={{ alignItems: 'center' }}>
+                    <RoundsRuler
+                      value={roundsCount}
+                      min={ROUNDS_MIN}
+                      gameModeMax={roundsMax}
+                    />
+                  </View>
+                </>
+              )}
+            </View>
+          </View>
         </View>
 
         {/* ── Start game ────────────────────────────────────────
@@ -1648,6 +1977,18 @@ export default function LobbyScreen() {
               onPress={handleStartGame}
               variant="primary"
             />
+          </View>
+        )}
+
+        {/* Non-host: status-ruta i samma layout-position som host:s
+            Start Game-knapp. Sekventiella prickar signalerar att appen
+            lever och väntar på host:ens spelstart. */}
+        {!hostMode && (
+          <View style={styles.startSection}>
+            <View style={styles.waitingForHostBox}>
+              <Text style={styles.waitingForHostText}>Waiting for Host to Start Game</Text>
+              <SequentialDots />
+            </View>
           </View>
         )}
 
@@ -2116,14 +2457,53 @@ const styles = StyleSheet.create({
   // Wrapper-container runt Game Mode + Game Connections — markerar dem som
   // en sammanhängande "spelregler"-grupp. Använder samma kort-bakgrund
   // (Colors.card + diskret border) som playerBoard nedanför, så de två
-  // grupperingarna visuellt matchar varandra.
+  // grupperingarna visuellt matchar varandra. position:'relative' så
+  // definedByHostBadge:n förankras till ramen för icke-host.
   gameSettingsBorder: {
+    position: 'relative',
     backgroundColor: Colors.card,
     borderRadius: Radius.lg,
     borderWidth: 1,
     borderColor: Colors.border,
     padding: Spacing.lg,
     gap: Spacing.lg,
+  },
+
+  // Quiz Settings — speglar gameSettingsBorder. Game Era + Number of
+  // Rounds samlas i en gemensam ram så de visuellt läses som en grupp
+  // av host-kontrollerade quiz-inställningar. position:'relative' så
+  // border-cutting badge:n (definedByHostBadge) hamnar över ramens
+  // top-border när non-host.
+  quizSettingsBorder: {
+    position: 'relative',
+    backgroundColor: Colors.card,
+    borderRadius: Radius.lg,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    padding: Spacing.lg,
+    gap: Spacing.lg,
+  },
+
+  // "DEFINED BY HOST"-badge som skär gameSettingsBorder/quizSettingsBorder:s
+  // top-border — samma border-cutting-teknik som FREE/PREMIUM-badges i Game
+  // Mode. Solid brand-blå bg (Colors.primary) för att signalera host-kontroll
+  // tydligt. Ingen transparens.
+  definedByHostBadge: {
+    position: 'absolute',
+    top: -8,
+    right: Spacing.md,
+    backgroundColor: Colors.primary,
+    borderRadius: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    zIndex: 10,
+    elevation: 4,
+  },
+  definedByHostBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    letterSpacing: 0.6,
   },
 
   // Game Mode toggle (Pass-the-Phone vs Individual Devices) — yttre container
@@ -2691,6 +3071,63 @@ const styles = StyleSheet.create({
     fontVariant: ['tabular-nums'],
     letterSpacing: -0.5,
   },
+
+  // Non-host Number of Rounds — distinkt från era-rutans gula glow:
+  // solid blå kantlinje + svag blå bg + blå siffra. Ingen shadow/glow.
+  roundsGuestBoxWrap: { alignItems: 'center', paddingVertical: Spacing.sm },
+  roundsGuestBox: {
+    paddingHorizontal: Spacing.xl,
+    paddingVertical: Spacing.md,
+    borderWidth: 2,
+    borderRadius: 10,
+    borderColor: Colors.primary,
+    backgroundColor: Colors.primaryMuted,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 80,
+  },
+  roundsGuestBoxText: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: Colors.primary,
+    fontVariant: ['tabular-nums'],
+    letterSpacing: -0.5,
+  },
+
+  // Host-stepper för Number of Rounds — -/+ knappar flankerar rounds-rutan.
+  // Knapparna är 44x44 (Apple HIG min hit-target) med brand-blå border som
+  // matchar rutans border. paddingVertical ger samma vertikala luft som
+  // roundsGuestBoxWrap så raden står balanserat över RoundsRuler:n.
+  roundsStepperRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.md,
+    paddingVertical: Spacing.sm,
+  },
+  roundsStepperBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: Radius.md,
+    borderWidth: 2,
+    borderColor: Colors.primary,
+    backgroundColor: Colors.primaryMuted,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  roundsStepperBtnDisabled: {
+    borderColor: Colors.borderStrong,
+    backgroundColor: 'transparent',
+  },
+  roundsStepperBtnText: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: Colors.primary,
+    lineHeight: 26,
+  },
+  roundsStepperBtnTextDisabled: {
+    color: Colors.textDisabled,
+  },
   eraWarning: { backgroundColor: Colors.warningMuted, borderRadius: Radius.sm, padding: Spacing.sm, borderWidth: 1, borderColor: Colors.warningBorder, marginTop: Spacing.sm },
   eraWarningText: { fontSize: FontSize.xs, color: Colors.warning, lineHeight: 17 },
 
@@ -2698,6 +3135,29 @@ const styles = StyleSheet.create({
   regionTriggerText: { flex: 1, fontSize: FontSize.md, fontWeight: FontWeight.medium, color: Colors.textPrimary },
 
   startSection: { gap: Spacing.md },
+
+  // Waiting-ruta för non-host — speglar Button:s base-mått (52px höjd,
+  // Radius.md) men styls som en passiv status-pillar med subtila brand-
+  // toner: primaryMuted bg + primaryBorder kant + textPrimary text.
+  // Layouten är row så texten + SequentialDots står på samma rad.
+  waitingForHostBox: {
+    height: 52,
+    borderRadius: Radius.md,
+    backgroundColor: Colors.primaryMuted,
+    borderWidth: 1,
+    borderColor: Colors.primaryBorder,
+    alignSelf: 'stretch',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: Spacing.lg,
+  },
+  waitingForHostText: {
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.semibold,
+    color: Colors.textPrimary,
+    letterSpacing: 0.1,
+  },
   startHint: { fontSize: FontSize.xs, color: Colors.textSecondary, textAlign: 'center', lineHeight: 17 },
   bottomPad: { height: Spacing.xl },
 });
