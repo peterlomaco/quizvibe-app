@@ -101,10 +101,13 @@ const BOX_BG = 'rgba(26,48,80,0.92)'; // mörkare navy – tydligt distinkt mot 
 // ─── Timeline Selector ────────────────────────────────────────────────────────
 
 function TimelineSelector({
-  skill, correctYear, birthYear, onConfirm, disabled,
+  skill, correctYear, birthYear, onYearChange, disabled,
 }: {
   skill: SkillLevel; correctYear: number; birthYear: number;
-  onConfirm: (year: number) => void; disabled: boolean;
+  // Notifierar parent om vald-år-ändring vid varje scroll-tick. Confirm-knappen
+  // lyfts ut till quiz.tsx så samma knapp-yta kan byta label/handler beroende
+  // på fas (Confirm under question / Next Round under reveal).
+  onYearChange: (year: number) => void; disabled: boolean;
 }) {
   // Dynamisk celltätlhet per skill-nivå (smalare celler = fler år syns på skärmen)
   const ITEM_WIDTH =
@@ -122,6 +125,12 @@ function TimelineSelector({
   const { min, max } = getYearRange(correctYear);
   const middleYear = Math.round((min + max) / 2);
   const [selectedYear, setSelectedYear] = useState(middleYear);
+
+  // Notifiera parent vid varje vald-år-ändring (inkl. mount via middleYear) så
+  // quiz.tsx:s Confirm-knapp har det aktuella året när användaren trycker.
+  useEffect(() => {
+    onYearChange(selectedYear);
+  }, [selectedYear, onYearChange]);
 
   const years = Array.from({ length: max - min + 1 }, (_, i) => min + i);
   const half = Math.floor(interval / 2);
@@ -287,18 +296,10 @@ function TimelineSelector({
         </View>
       </View>
 
-      <Text style={[tl.hint, { color: Colors.textSecondary }]}>
-        Swipe to move
-      </Text>
-
       {!disabled && (
-        <TouchableOpacity
-          style={[tl.confirmBtn, { backgroundColor: skillColor }]}
-          onPress={() => onConfirm(selectedYear)}
-          activeOpacity={0.85}
-        >
-          <Text style={tl.confirmText}>Confirm</Text>
-        </TouchableOpacity>
+        <Text style={[tl.hint, { color: Colors.textSecondary }]}>
+          Swipe to move
+        </Text>
       )}
     </View>
   );
@@ -313,143 +314,6 @@ const tl = StyleSheet.create({
   assistDesc: { fontSize: 11, fontWeight: FontWeight.medium },
 
   hint: { textAlign: 'center', fontSize: 10, fontStyle: 'italic' },
-  confirmBtn: { height: 56, borderRadius: Radius.md, alignItems: 'center', justifyContent: 'center' },
-  confirmText: { fontSize: 17, fontWeight: '700', color: '#fff', letterSpacing: 0.5 },
-});
-
-// ─── Reveal Screen ────────────────────────────────────────────────────────────
-
-function RevealScreen({
-  question, selectedYear, skill, birthYear, points,
-  onNextRound, onViewLeaderboard, isLastQuestion,
-}: {
-  question: TimelineQuestion; selectedYear: number; skill: SkillLevel;
-  birthYear: number; points: number;
-  onNextRound: () => void;
-  onViewLeaderboard: () => void;
-  isLastQuestion: boolean;
-}) {
-  const interval = getIntervalForSkill(skill);
-  const correct = isCorrect(selectedYear, question.correctYear, interval);
-  const scale = useRef(new Animated.Value(0.6)).current;
-  const opacity = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    Animated.parallel([
-      Animated.spring(scale, { toValue: 1, tension: 50, friction: 7, useNativeDriver: true }),
-      Animated.timing(opacity, { toValue: 1, duration: 300, useNativeDriver: true }),
-    ]).start();
-  }, []);
-
-  return (
-    <View style={rv.container}>
-      <Animated.View style={[rv.answerCard, { transform: [{ scale }], opacity }]}>
-        <Text style={rv.answerLabel}>Correct Answer</Text>
-        <Text style={rv.answerYear}>{question.correctYear}</Text>
-        <Text style={rv.answerHint}>{question.hint}</Text>
-      </Animated.View>
-
-      <View style={[rv.resultRow, correct ? rv.correct : rv.wrong]}>
-        <Text style={rv.resultIcon}>{correct ? '✓' : '✗'}</Text>
-        <View style={{ flex: 1, gap: 2 }}>
-          <Text style={[rv.resultTitle, { color: correct ? Colors.success : Colors.error }]}>
-            {correct ? 'Correct!' : 'Not quite'}
-          </Text>
-          <Text style={rv.resultSub}>
-            {correct
-              ? `You were ${selectedYear === question.correctYear ? 'spot on!' : `within ${Math.abs(selectedYear - question.correctYear)} year${Math.abs(selectedYear - question.correctYear) !== 1 ? 's' : ''}`}`
-              : `The answer was ${question.correctYear}`}
-          </Text>
-        </View>
-        <View style={rv.pts}>
-          <Text style={rv.ptsNum}>+{points}</Text>
-          <Text style={rv.ptsLabel}>pts</Text>
-        </View>
-      </View>
-
-      {isLastQuestion ? (
-        <TouchableOpacity style={rv.nextBtn} onPress={onViewLeaderboard} activeOpacity={0.85}>
-          <Text style={rv.nextBtnText}>🏆  Final Leaderboard</Text>
-        </TouchableOpacity>
-      ) : (
-        <View style={rv.twoBtnRow}>
-          <TouchableOpacity
-            style={rv.secondaryBtn}
-            onPress={onViewLeaderboard}
-            activeOpacity={0.85}
-          >
-            <Text style={rv.secondaryBtnText}>View Leaderboard</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={rv.primaryBtn}
-            onPress={onNextRound}
-            activeOpacity={0.85}
-          >
-            <Text style={rv.primaryBtnText}>Next Round  →</Text>
-          </TouchableOpacity>
-        </View>
-      )}
-    </View>
-  );
-}
-
-const rv = StyleSheet.create({
-  container: { gap: Spacing.lg, paddingHorizontal: Spacing.lg },
-  answerCard: {
-    backgroundColor: Colors.card, borderRadius: Radius.lg,
-    borderWidth: 1, borderColor: Colors.primaryBorder,
-    padding: Spacing.xl, alignItems: 'center', gap: Spacing.sm,
-  },
-  answerLabel: { fontSize: FontSize.xs, color: Colors.textSecondary, textTransform: 'uppercase', letterSpacing: 1 },
-  answerYear: { fontSize: 64, fontWeight: '700', color: Colors.primary, fontVariant: ['tabular-nums'] },
-  answerHint: { fontSize: FontSize.sm, color: Colors.textSecondary },
-  resultRow: {
-    flexDirection: 'row', alignItems: 'center', gap: Spacing.md,
-    borderRadius: Radius.md, padding: Spacing.lg, borderWidth: 1,
-  },
-  correct: { backgroundColor: Colors.successMuted, borderColor: Colors.successBorder },
-  wrong: { backgroundColor: Colors.errorMuted, borderColor: Colors.error + '40' },
-  resultIcon: { fontSize: 24 },
-  resultTitle: { fontSize: FontSize.md, fontWeight: FontWeight.semibold },
-  resultSub: { fontSize: FontSize.xs, color: Colors.textSecondary },
-  pts: { alignItems: 'center' },
-  ptsNum: { fontSize: 22, fontWeight: '700', color: Colors.primary },
-  ptsLabel: { fontSize: FontSize.xs, color: Colors.textSecondary },
-  nextBtn: { height: 56, borderRadius: Radius.md, backgroundColor: Colors.primary, alignItems: 'center', justifyContent: 'center' },
-  nextBtnText: { fontSize: 17, fontWeight: '700', color: '#fff' },
-
-  // Två knappar sida vid sida (sekundär "View Leaderboard" + primär "Next Round")
-  twoBtnRow: { flexDirection: 'row', gap: Spacing.sm },
-  secondaryBtn: {
-    flex: 1,
-    height: 56,
-    borderRadius: Radius.md,
-    borderWidth: 1.5,
-    borderColor: Colors.primaryBorder,
-    backgroundColor: Colors.primaryMuted,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  secondaryBtnText: {
-    fontSize: FontSize.sm,
-    fontWeight: '600',
-    color: Colors.primary,
-    letterSpacing: 0.3,
-  },
-  primaryBtn: {
-    flex: 1,
-    height: 56,
-    borderRadius: Radius.md,
-    backgroundColor: Colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  primaryBtnText: {
-    fontSize: FontSize.md,
-    fontWeight: '700',
-    color: '#fff',
-    letterSpacing: 0.3,
-  },
 });
 
 // ─── Main Quiz Screen ─────────────────────────────────────────────────────────
@@ -511,6 +375,9 @@ export default function QuizScreen() {
   }, [turnOrder, currentPlayerIndex]);
   const [timeLeft, setTimeLeft] = useState(30);
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
+  // Senaste valda år från TimelineSelector (uppdateras vid varje scroll-tick).
+  // Quiz-skärmens egna Confirm-knapp läser detta när användaren trycker submit.
+  const [pendingYear, setPendingYear] = useState<number | null>(null);
   const [totalPoints, setTotalPoints] = useState(0);
   const [roundPoints, setRoundPoints] = useState(0);
   const [rounds, setRounds] = useState<RoundResult[]>([]);
@@ -550,10 +417,25 @@ export default function QuizScreen() {
   );
 
   const timerRef = useRef<any>(null);
+  // pulseAnim driver opacity:n på timer-progress-baren när tiden
+  // är kritisk (≤5s). Default 1 = full opacity, oscillerar mot 0.55 i loop.
   const pulseAnim = useRef(new Animated.Value(1)).current;
+  // Spring-in-animation för inline reveal-blocket (svar-card + result-row).
+  // Triggas när phase växlar till 'reveal' så användaren ser
+  // svaret poppa in. Kopierad logik från den borttagna RevealScreen-komponenten.
+  const revealScale = useRef(new Animated.Value(0.6)).current;
+  const revealOpacity = useRef(new Animated.Value(0)).current;
 
   const question = SEED_QUESTIONS[questionIndex % SEED_QUESTIONS.length];
   const isLastQuestion = questionIndex === totalQuestions - 1;
+  // Aktuell spelares namn i Pass-the-Phone-rotationen — visas subtilt i fråge-
+  // kortet ("Answering: {namn}"). Skip:as för Individual Devices (varje
+  // spelare är på sin egen enhet och vet redan vem de är).
+  const currentPlayerName = turnOrder[currentPlayerIndex]?.name;
+  // Skill-färg används som accent på Confirm-knappen så den visuellt matchar
+  // TimelineSelector:s assist-badge för samma skill-nivå. Reveal-fasens
+  // Next Round-/Final Leaderboard-knapp använder Colors.primary istället.
+  const skillColor = skill === 'easy' ? Colors.success : skill === 'expert' ? '#F5A623' : Colors.primary;
 
   const startTimer = useCallback(() => {
     setTimeLeft(30);
@@ -629,10 +511,13 @@ export default function QuizScreen() {
   }, [questionIndex, phase]);
 
   useEffect(() => {
+    // Pulsa progress-barens opacity (1 → 0.55 → 1) när ≤5s kvar för att
+    // signalera att tiden är kritisk. Native driver eftersom det är ren
+    // opacity-animation.
     if (timeLeft <= 5 && phase === 'question') {
       Animated.loop(
         Animated.sequence([
-          Animated.timing(pulseAnim, { toValue: 1.12, duration: 250, useNativeDriver: true }),
+          Animated.timing(pulseAnim, { toValue: 0.55, duration: 250, useNativeDriver: true }),
           Animated.timing(pulseAnim, { toValue: 1, duration: 250, useNativeDriver: true }),
         ])
       ).start();
@@ -641,6 +526,19 @@ export default function QuizScreen() {
       pulseAnim.setValue(1);
     }
   }, [timeLeft, phase]);
+
+  // Spring-in inline-reveal när phase växlar till 'reveal'. Reset:ar värdena
+  // varje gång så animationen körs på varje frågetransition (inte bara första).
+  useEffect(() => {
+    if (phase === 'reveal') {
+      revealScale.setValue(0.6);
+      revealOpacity.setValue(0);
+      Animated.parallel([
+        Animated.spring(revealScale, { toValue: 1, tension: 50, friction: 7, useNativeDriver: true }),
+        Animated.timing(revealOpacity, { toValue: 1, duration: 300, useNativeDriver: true }),
+      ]).start();
+    }
+  }, [phase, revealScale, revealOpacity]);
 
   const handleConfirm = (year: number) => {
     clearInterval(timerRef.current);
@@ -680,6 +578,7 @@ export default function QuizScreen() {
   const handleAdvanceToNextRound = () => {
     setQuestionIndex((prev) => prev + 1);
     setSelectedYear(null);
+    setPendingYear(null);
     // Pass-the-phone: rotera till nästa spelare i turordningen och visa
     // Get-Ready-skärmen så telefonen kan lämnas över. Individual Devices:
     // varje spelare är på sin egen enhet — inget overlämnings-flöde behövs
@@ -830,8 +729,12 @@ export default function QuizScreen() {
     );
   };
 
+  // Timer-progress-barens färg byter vid 10s (warning) och 5s (error).
   const timerColor = timeLeft > 10 ? Colors.primary : timeLeft > 5 ? Colors.warning : Colors.error;
-  const timerBg = timeLeft > 10 ? Colors.primaryMuted : timeLeft > 5 ? Colors.warningMuted : Colors.errorMuted;
+  // Klampa till [0, 1] så barens bredd aldrig overshootar/blir negativ vid
+  // edge-cases (t.ex. om timern hinner gå till 0 medan reveal-transitionen
+  // körs). 30s är hårdkodat tills answerResponseSeconds-paramet vävs in.
+  const timerProgress = Math.max(0, Math.min(1, timeLeft / 30));
 
   // Get-Ready-skärmen renderas före quiz-UI:t. Vid spelstart för båda lägena,
   // och mellan rundor för Pass-the-phone (ej Individual Devices). Faller
@@ -887,74 +790,150 @@ export default function QuizScreen() {
         keyboardShouldPersistTaps="handled"
       >
         {phase !== 'leaderboard' && (
-        <>
-        <View style={styles.mediaCard}>
-          <View style={styles.mediaInner}>
-            <Text style={styles.mediaIcon}>{question.category === 'Music' ? '🎵' : '🌍'}</Text>
-            <Text style={styles.mediaCategory}>{question.category}</Text>
-            <Text style={styles.mediaHint}>Video / Image coming soon</Text>
-          </View>
-
-          {phase === 'question' && (
-            <Animated.View style={[
-              styles.timerOverlay,
-              { backgroundColor: timerBg, transform: [{ scale: pulseAnim }] },
-            ]}>
-              <Text style={[styles.timerNum, { color: timerColor }]}>
-                {String(timeLeft).padStart(2, '0')}
-              </Text>
-              <Text style={styles.timerSec}>sec</Text>
-            </Animated.View>
-          )}
-        </View>
-
-        <View style={styles.questionCard}>
-          <View style={styles.questionTop}>
-            <Text style={styles.questionMeta}>
-              Question {questionIndex + 1} of {totalQuestions}
-            </Text>
-            <View style={styles.typeBadge}>
-              <Text style={styles.typeBadgeText}>Year</Text>
+          <>
+            {/* Mediakort — placeholder tills riktig YouTube/Spotify/AI-bild-
+                integration kopplas in. Spelas/visas oförändrat även under
+                reveal-fasen (användaren har bett om att uppspelningen ska
+                fortsätta tills "Next Round" trycks). */}
+            <View style={styles.mediaCard}>
+              <View style={styles.mediaInner}>
+                <Text style={styles.mediaIcon}>{question.category === 'Music' ? '🎵' : '🌍'}</Text>
+                <Text style={styles.mediaCategory}>{question.category}</Text>
+                <Text style={styles.mediaHint}>Video / Image coming soon</Text>
+              </View>
             </View>
-          </View>
-          <Text style={styles.questionText}>{question.question}</Text>
-          <View style={styles.scoreBadge}>
-            <Text style={styles.scoreNum}>{totalPoints}</Text>
-            <Text style={styles.scoreLabel}> pts total</Text>
-          </View>
-        </View>
-        </>
-        )}
 
-        {phase === 'question' && (
-          <View style={styles.speedRow}>
-            <View style={styles.speedLine} />
-            <Text style={styles.speedText}>SPEED COUNTS — CONFIRM FOR POINTS</Text>
-            <View style={styles.speedLine} />
-          </View>
-        )}
+            {/* Horisontell timer-progress-bar — krymper från 100% → 0% över
+                30s, byter färg vid 10s/5s, pulserar i opacity vid ≤5s. Fryses
+                vid sin sista bredd när phase=reveal (interval clear:as i
+                handleConfirm). Sekunderna kvar visas till höger som ett
+                tabular-nums-värde i samma färg som baren. */}
+            <View style={styles.timerSection}>
+              <View style={styles.timerTrack}>
+                <Animated.View
+                  style={[
+                    styles.timerFill,
+                    {
+                      width: `${timerProgress * 100}%`,
+                      backgroundColor: timerColor,
+                      opacity: pulseAnim,
+                    },
+                  ]}
+                />
+              </View>
+              <Animated.Text
+                style={[
+                  styles.timerLabel,
+                  { color: timerColor, opacity: pulseAnim },
+                ]}
+              >
+                {`${timeLeft}s`}
+              </Animated.Text>
+            </View>
 
-        {phase === 'question' && (
-          <TimelineSelector
-            skill={skill}
-            correctYear={question.correctYear}
-            birthYear={birthYear}
-            onConfirm={handleConfirm}
-            disabled={false}
-          />
-        )}
+            <View style={styles.questionCard}>
+              <View style={styles.questionTop}>
+                <Text style={styles.questionMeta}>
+                  Question {questionIndex + 1} of {totalQuestions}
+                </Text>
+                <View style={styles.typeBadge}>
+                  <Text style={styles.typeBadgeText}>Year</Text>
+                </View>
+              </View>
+              {/* Subtil player-rad — bara i Pass-the-Phone, så det är tydligt
+                  vems tur det är även när intro-skärmen är borta. Individual
+                  Devices: spelaren är på egen enhet, vet redan vem de är. */}
+              {gameMode === 'pass-the-phone' && currentPlayerName && (
+                <Text style={styles.answeringPlayer}>
+                  Answering:{' '}
+                  <Text style={styles.answeringPlayerName}>{currentPlayerName}</Text>
+                </Text>
+              )}
+              <Text style={styles.questionText}>{question.question}</Text>
+              <View style={styles.scoreBadge}>
+                <Text style={styles.scoreNum}>{totalPoints}</Text>
+                <Text style={styles.scoreLabel}> pts total</Text>
+              </View>
+            </View>
 
-        {phase === 'reveal' && (
-          <RevealScreen
-            question={question}
-            selectedYear={selectedYear ?? question.correctYear}
-            skill={skill}
-            birthYear={birthYear}
-            points={roundPoints}
-            onNextRound={handleAdvanceToNextRound}
-            onViewLeaderboard={handleShowLeaderboard}
-            isLastQuestion={isLastQuestion}
-          />
+            {phase === 'question' && (
+              <View style={styles.speedRow}>
+                <View style={styles.speedLine} />
+                <Text style={styles.speedText}>SPEED COUNTS — CONFIRM FOR POINTS</Text>
+                <View style={styles.speedLine} />
+              </View>
+            )}
+
+            {/* TimelineSelector renderas i båda faserna. key={questionIndex}
+                tvingar remount mellan frågor så internal selectedYear reset:as
+                till middleYear för nya frågans range. disabled när phase=reveal
+                så användaren ser sitt val låst. */}
+            <TimelineSelector
+              key={questionIndex}
+              skill={skill}
+              correctYear={question.correctYear}
+              birthYear={birthYear}
+              onYearChange={setPendingYear}
+              disabled={phase === 'reveal'}
+            />
+
+            {/* Inline reveal: kompakt svar-card. Result-row (rätt/fel + diff)
+                är borttagen — användaren ser sitt val i den (låsta) Timeline-
+                Selector:n och rätt år i kortet, så jämförelsen är synlig utan
+                en egen ruta. +pts-feedbacken sitter i högerkanten av samma
+                kort så den nya Next Round-knappen ryms i viewport utan scroll. */}
+            {phase === 'reveal' && selectedYear !== null && (
+              <View style={rv.container}>
+                <Animated.View
+                  style={[
+                    rv.answerCard,
+                    { transform: [{ scale: revealScale }], opacity: revealOpacity },
+                  ]}
+                >
+                  <Text style={rv.answerYear}>{question.correctYear}</Text>
+                  <View style={rv.answerInfo}>
+                    <Text style={rv.answerLabel}>Correct Answer</Text>
+                    <Text style={rv.answerHint}>{question.hint}</Text>
+                  </View>
+                  <View style={rv.answerPts}>
+                    <Text style={rv.answerPtsNum}>+{roundPoints}</Text>
+                    <Text style={rv.answerPtsLabel}>pts</Text>
+                  </View>
+                </Animated.View>
+              </View>
+            )}
+
+            {/* Fas-medveten action-knapp: Confirm under question, Next Round
+                under reveal, Final Leaderboard på sista frågans reveal. */}
+            <View style={styles.actionWrap}>
+              {phase === 'question' ? (
+                <TouchableOpacity
+                  style={[
+                    styles.actionBtn,
+                    { backgroundColor: skillColor },
+                    pendingYear === null && styles.actionBtnDisabled,
+                  ]}
+                  onPress={() => {
+                    if (pendingYear !== null) handleConfirm(pendingYear);
+                  }}
+                  disabled={pendingYear === null}
+                  activeOpacity={0.85}
+                >
+                  <Text style={styles.actionBtnText}>Confirm</Text>
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  style={[styles.actionBtn, { backgroundColor: Colors.primary }]}
+                  onPress={isLastQuestion ? handleShowLeaderboard : handleAdvanceToNextRound}
+                  activeOpacity={0.85}
+                >
+                  <Text style={styles.actionBtnText}>
+                    {isLastQuestion ? '🏆  Final Leaderboard' : 'Next Round  →'}
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          </>
         )}
 
         {phase === 'leaderboard' && (
@@ -983,21 +962,44 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
   content: { gap: Spacing.md, paddingBottom: Spacing.xxl },
 
-  mediaCard: { height: 200, backgroundColor: Colors.card, position: 'relative', overflow: 'hidden' },
+  mediaCard: { height: 200, backgroundColor: Colors.card },
   mediaInner: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: Spacing.sm },
   mediaIcon: { fontSize: 44 },
   mediaCategory: { fontSize: FontSize.md, fontWeight: FontWeight.semibold, color: Colors.textPrimary },
   mediaHint: { fontSize: FontSize.xs, color: Colors.textSecondary },
 
-  timerOverlay: {
-    position: 'absolute', top: Spacing.md, right: Spacing.md,
-    borderRadius: Radius.md, paddingHorizontal: Spacing.md, paddingVertical: Spacing.xs,
-    alignItems: 'center', minWidth: 56,
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',
+  // Timer-section — radlayout med bar:en (flex 1) + sekund-räknaren till
+  // höger. Sitter direkt under mediakortet (negativ marginTop -Spacing.md
+  // kompenserar för ScrollView-content:s gap så sektionen limmar mot
+  // mediakortets underkant istället för att flyta i tomrum). Horisontell
+  // padding matchar fråge-kortets margin så bar:en linjerar med kortets
+  // sidkanter istället för att vara edge-to-edge.
+  timerSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    paddingHorizontal: Spacing.lg,
+    marginTop: -Spacing.md,
   },
-  timerNum: { fontSize: 28, fontWeight: '700', fontVariant: ['tabular-nums'], lineHeight: 32 },
-  timerSec: { fontSize: 9, color: Colors.textSecondary, letterSpacing: 0.5 },
-
+  timerTrack: {
+    flex: 1,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: Colors.border,
+    overflow: 'hidden',
+  },
+  timerFill: {
+    height: '100%',
+    borderRadius: 3,
+  },
+  timerLabel: {
+    minWidth: 32,
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.semibold,
+    fontVariant: ['tabular-nums'],
+    textAlign: 'right',
+    letterSpacing: 0.3,
+  },
 
   questionCard: {
     backgroundColor: Colors.card, borderRadius: Radius.lg,
@@ -1013,6 +1015,18 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: Colors.primaryBorder,
   },
   typeBadgeText: { fontSize: FontSize.xs, color: Colors.primary, fontWeight: FontWeight.semibold },
+  // Subtil "Answering: {namn}"-rad — ärver xs-storleken från questionMeta-
+  // raden ovanför men markerar namnet i textPrimary + semibold så det syns
+  // utan att skrika.
+  answeringPlayer: {
+    fontSize: FontSize.xs,
+    color: Colors.textSecondary,
+    letterSpacing: 0.4,
+  },
+  answeringPlayerName: {
+    color: Colors.textPrimary,
+    fontWeight: FontWeight.semibold,
+  },
   questionText: { fontSize: 18, fontWeight: FontWeight.semibold, color: Colors.textPrimary, lineHeight: 26 },
   scoreBadge: { flexDirection: 'row', alignItems: 'baseline' },
   scoreNum: { fontSize: 16, fontWeight: '700', color: Colors.primary, fontVariant: ['tabular-nums'] },
@@ -1021,4 +1035,79 @@ const styles = StyleSheet.create({
   speedRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, paddingHorizontal: Spacing.lg },
   speedLine: { flex: 1, height: 1, backgroundColor: Colors.border },
   speedText: { fontSize: 9, color: Colors.textSecondary, letterSpacing: 0.8 },
+
+  // Action-knapp (Confirm / Next Round / Final Leaderboard) — paddningen
+  // matchar TimelineSelector:s wrapper så knappen står i samma kolumn.
+  actionWrap: {
+    paddingHorizontal: Spacing.lg,
+  },
+  actionBtn: {
+    height: 56,
+    borderRadius: Radius.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  actionBtnDisabled: {
+    opacity: 0.5,
+  },
+  actionBtnText: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: '#fff',
+    letterSpacing: 0.5,
+  },
+});
+
+// Inline reveal-block — kompakt horisontellt svar-card (year vänster, info
+// mitten, +pts höger). Animeras in via revealScale/revealOpacity. Resultatet
+// är en låg ruta så Next Round-knappen ryms direkt i viewport efter Confirm
+// utan att användaren behöver scrolla.
+const rv = StyleSheet.create({
+  container: { paddingHorizontal: Spacing.lg },
+  answerCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.md,
+    backgroundColor: Colors.card,
+    borderRadius: Radius.lg,
+    borderWidth: 1,
+    borderColor: Colors.primaryBorder,
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.lg,
+  },
+  answerYear: {
+    fontSize: 36,
+    fontWeight: '700',
+    color: Colors.primary,
+    fontVariant: ['tabular-nums'],
+    letterSpacing: -0.5,
+  },
+  answerInfo: { flex: 1, gap: 2 },
+  answerLabel: {
+    fontSize: 9,
+    color: Colors.textSecondary,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+    fontWeight: FontWeight.semibold,
+  },
+  answerHint: {
+    fontSize: FontSize.sm,
+    color: Colors.textPrimary,
+    fontWeight: FontWeight.medium,
+  },
+  answerPts: {
+    alignItems: 'center',
+    minWidth: 56,
+  },
+  answerPtsNum: {
+    fontSize: FontSize.xl,
+    fontWeight: '700',
+    color: Colors.primary,
+    fontVariant: ['tabular-nums'],
+  },
+  answerPtsLabel: {
+    fontSize: FontSize.xs,
+    color: Colors.textSecondary,
+    letterSpacing: 0.4,
+  },
 });
