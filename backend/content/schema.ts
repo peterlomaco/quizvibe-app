@@ -33,6 +33,31 @@ export type Sensitivity = z.infer<typeof SensitivitySchema>;
 export const AnswerMethodSchema = z.enum(['timeline', 'name-letters']);
 export type AnswerMethod = z.infer<typeof AnswerMethodSchema>;
 
+// Pre-curerat YouTube-klipp som kan användas som frågans media istället
+// för en bild. videoId är den 11-tecken långa YouTube-identifieraren
+// (t.ex. "dQw4w9WgXcQ"). startSec/endSec definierar utdraget som spelas
+// — typiskt 10–20s för låt-frågor. Klipp curera-väljs offline via
+// `npm run youtube-search <item-id>` och valideras med `npm run youtube-validate`.
+export const YoutubeClipSchema = z
+  .object({
+    videoId: z
+      .string()
+      .regex(
+        /^[A-Za-z0-9_-]{11}$/,
+        'videoId must be a 11-char YouTube id (A-Z, a-z, 0-9, _, -)',
+      ),
+    startSec: z.number().int().min(0),
+    endSec: z.number().int().min(1),
+    // Kanalnamn för audit ("Vevo", "BBC", verifierad artist-kanal).
+    channelTitle: z.string().optional(),
+    license: z.enum(['standard', 'creative-commons']).default('standard'),
+    notes: z.string().optional(),
+  })
+  .refine((d) => d.endSec > d.startSec, {
+    message: 'endSec must be greater than startSec',
+  });
+export type YoutubeClip = z.infer<typeof YoutubeClipSchema>;
+
 export const ContentItemSchema = z.object({
   id: z
     .string()
@@ -48,6 +73,11 @@ export const ContentItemSchema = z.object({
   wikimediaSearchHints: z.array(z.string().min(1)).min(1),
   // Vilka svarsmetoder som är giltiga för detta item.
   answerMethods: z.array(AnswerMethodSchema).min(1),
+  // Pre-curerade YouTube-klipp för det här item:t. Optional — items utan
+  // klipp faller tillbaka till bildbaserad fråga (Wikimedia). Items med
+  // minst ett klipp blir kandidater för YouTube-källade frågor när host
+  // har YouTube aktiverat i Lobby.
+  youtubeClips: z.array(YoutubeClipSchema).optional(),
   // 'sensitive' = motiv kräver extra omtanke vid bildval. Default-filtreras
   // bort av spel-API:t.
   sensitivity: SensitivitySchema.default('standard'),

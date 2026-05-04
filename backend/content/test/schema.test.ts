@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { loadCatalog, findItemsForAudience, findItemsById } from '../registry';
-import { ContentItemSchema, ContentFileSchema } from '../schema';
+import { ContentItemSchema, ContentFileSchema, YoutubeClipSchema } from '../schema';
 
 describe('content catalog', () => {
   it('loads all yaml files without validation errors', () => {
@@ -212,6 +212,154 @@ describe('schema rejection', () => {
           wikimediaSearchHints: ['b'],
           answerMethods: ['name-letters'],
         },
+      ],
+    });
+    expect(result.success).toBe(false);
+  });
+});
+
+describe('YoutubeClipSchema', () => {
+  it('accepts a minimal valid clip', () => {
+    const result = YoutubeClipSchema.safeParse({
+      videoId: 'dQw4w9WgXcQ',
+      startSec: 30,
+      endSec: 45,
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.license).toBe('standard');
+    }
+  });
+
+  it('accepts a fully populated clip with creative-commons license', () => {
+    const result = YoutubeClipSchema.safeParse({
+      videoId: 'abcDEF12345',
+      startSec: 0,
+      endSec: 15,
+      channelTitle: 'Vevo',
+      license: 'creative-commons',
+      notes: 'Official upload',
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('rejects videoId with wrong length', () => {
+    const tooShort = YoutubeClipSchema.safeParse({
+      videoId: 'short',
+      startSec: 0,
+      endSec: 10,
+    });
+    expect(tooShort.success).toBe(false);
+
+    const tooLong = YoutubeClipSchema.safeParse({
+      videoId: 'dQw4w9WgXcQXX',
+      startSec: 0,
+      endSec: 10,
+    });
+    expect(tooLong.success).toBe(false);
+  });
+
+  it('rejects videoId with invalid characters', () => {
+    const result = YoutubeClipSchema.safeParse({
+      videoId: 'has spaces!',
+      startSec: 0,
+      endSec: 10,
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects endSec equal to startSec', () => {
+    const result = YoutubeClipSchema.safeParse({
+      videoId: 'dQw4w9WgXcQ',
+      startSec: 30,
+      endSec: 30,
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects endSec less than startSec', () => {
+    const result = YoutubeClipSchema.safeParse({
+      videoId: 'dQw4w9WgXcQ',
+      startSec: 60,
+      endSec: 45,
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects negative startSec', () => {
+    const result = YoutubeClipSchema.safeParse({
+      videoId: 'dQw4w9WgXcQ',
+      startSec: -1,
+      endSec: 10,
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects non-integer seconds', () => {
+    const result = YoutubeClipSchema.safeParse({
+      videoId: 'dQw4w9WgXcQ',
+      startSec: 30.5,
+      endSec: 45,
+    });
+    expect(result.success).toBe(false);
+  });
+});
+
+describe('ContentItem with youtubeClips', () => {
+  it('accepts an item without youtubeClips (backwards compatible)', () => {
+    const result = ContentItemSchema.safeParse({
+      id: 'no-clips',
+      displayName: 'Plain Item',
+      correctYear: 1990,
+      probability: 50,
+      wikimediaSearchHints: ['x'],
+      answerMethods: ['timeline'],
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('accepts an item with one youtube clip', () => {
+    const result = ContentItemSchema.safeParse({
+      id: 'with-clip',
+      displayName: 'Clip Item',
+      correctYear: 1990,
+      probability: 50,
+      wikimediaSearchHints: ['x'],
+      answerMethods: ['timeline'],
+      youtubeClips: [
+        { videoId: 'dQw4w9WgXcQ', startSec: 30, endSec: 45 },
+      ],
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('accepts an item with multiple youtube clips', () => {
+    const result = ContentItemSchema.safeParse({
+      id: 'multi-clip',
+      displayName: 'Multi',
+      correctYear: 1990,
+      probability: 50,
+      wikimediaSearchHints: ['x'],
+      answerMethods: ['timeline'],
+      youtubeClips: [
+        { videoId: 'dQw4w9WgXcQ', startSec: 30, endSec: 45 },
+        { videoId: 'oHg5SJYRHA0', startSec: 0, endSec: 20, channelTitle: 'Vevo' },
+      ],
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('rejects an item where any youtube clip is invalid', () => {
+    const result = ContentItemSchema.safeParse({
+      id: 'bad-clip',
+      displayName: 'Bad',
+      correctYear: 1990,
+      probability: 50,
+      wikimediaSearchHints: ['x'],
+      answerMethods: ['timeline'],
+      youtubeClips: [
+        { videoId: 'dQw4w9WgXcQ', startSec: 30, endSec: 45 },
+        { videoId: 'invalid!', startSec: 0, endSec: 10 },
       ],
     });
     expect(result.success).toBe(false);
