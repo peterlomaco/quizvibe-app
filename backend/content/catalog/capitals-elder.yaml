@@ -1,0 +1,9 @@
+# Huvudstäder särskilt kända för elder-generationen (Silent + Baby Boomers).
+audience: ["elder"]
+category: capitals
+items:
+  - id: moscow
+    displayName: "Moscow"
+    probability: 95
+    wikimediaSearchHints: ["Moscow Red Square", "Moscow Kremlin"]
+    answerMethods: ["name-letters"]

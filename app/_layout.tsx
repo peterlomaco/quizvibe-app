@@ -10,6 +10,7 @@ export default function RootLayout() {
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="quiz" options={{ headerShown: false }} />
+        <Stack.Screen name="name-quiz-demo" options={{ headerShown: false }} />
       </Stack>
     </GestureHandlerRootView>
   );

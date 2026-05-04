@@ -1,0 +1,284 @@
+// Distractor-strategin för Namn-svarsmodellen.
+// Bygger Letter Grid-options (Steg 1) och Final Selection-options (Steg 2)
+// från content-katalogen. Pure functions — kan unit-testas isolerat.
+
+import { Category, ContentItem } from './schema';
+import { LoadedCatalog, findItemsForAudience } from './registry';
+import { Generation } from './generation';
+import { loadDistractorPool, poolNameToId } from './distractor-pool';
+
+/** Default antal options i både Steg 1 och Steg 2 (motsvarar 5×2-griden i mockup B). */
+export const DEFAULT_TOTAL_OPTIONS = 10;
+
+export interface PrefixOption {
+  prefix: string;
+  isCorrect: boolean;
+}
+
+export interface NameOption {
+  itemId: string;
+  displayName: string;
+  isCorrect: boolean;
+  /** 'catalog' = riktigt motiv från content-katalogen; 'pool' = fallback-distractor från distractor-pool.yaml. */
+  source: 'catalog' | 'pool';
+}
+
+/**
+ * Extrahera prefix från ett item:s displayName.
+ * - Behåller bara unicode-bokstäver (släpper bindestreck, punkter, mellanslag, siffror).
+ * - Diakriter (Å, Ä, Ö, Ć etc.) bevaras.
+ * - Returnerar uppercase.
+ *
+ * Exempel:
+ *   "ABBA", 2            → "AB"
+ *   "Mark Zuckerberg", 3 → "MAR"
+ *   "Spider-Man", 3      → "SPI"
+ *   "John F. Kennedy", 3 → "JOH"
+ *   "Björn Borg", 2      → "BJ"
+ */
+export function getPrefixForItem(displayName: string, length: number): string {
+  const letters = displayName.replace(/[^\p{L}]/gu, '');
+  return letters.slice(0, length).toUpperCase();
+}
+
+interface ShuffleableRng {
+  (): number;
+}
+
+function shuffle<T>(arr: T[], rng: ShuffleableRng): T[] {
+  const out = arr.slice();
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [out[i], out[j]] = [out[j], out[i]];
+  }
+  return out;
+}
+
+interface PoolItem {
+  filename: string;
+  item: ContentItem;
+}
+
+/**
+ * Hämta items i en specifik kategori som är relevanta för en spelar-generation.
+ * Items från `audience: 'all'`-filer kommer alltid med.
+ */
+function getCategoryPool(
+  catalog: LoadedCatalog,
+  category: Category,
+  playerGeneration: Generation,
+  excludeSensitive: boolean,
+): PoolItem[] {
+  return findItemsForAudience(catalog, playerGeneration, { excludeSensitive })
+    .filter((m) => catalog.files.get(m.filename)?.category === category);
+}
+
+/**
+ * Fallback-pool: alla items i kategorin oavsett audience. Används när
+ * primary pool är för liten för att fylla griden.
+ */
+function getCategoryFallbackPool(
+  catalog: LoadedCatalog,
+  category: Category,
+  excludeSensitive: boolean,
+): PoolItem[] {
+  const out: PoolItem[] = [];
+  for (const [filename, file] of catalog.files) {
+    if (file.category !== category) continue;
+    for (const item of file.items) {
+      if (excludeSensitive && item.sensitivity === 'sensitive') continue;
+      out.push({ filename, item });
+    }
+  }
+  return out;
+}
+
+export interface BuildLetterGridArgs {
+  catalog: LoadedCatalog;
+  category: Category;
+  playerGeneration: Generation;
+  correctItem: ContentItem;
+  prefixLength: number;
+  totalOptions?: number;
+  rng?: () => number;
+  excludeSensitive?: boolean;
+}
+
+/**
+ * Bygg Letter Grid (Steg 1).
+ * Returnerar `totalOptions` prefix-knappar — 1 rätt + (totalOptions-1) distractors.
+ * Alla prefix är unika. Resultatet är blandat (random ordning).
+ *
+ * Pool-strategi (lager för lager tills target nås):
+ *   1. Items i samma kategori som matchar spelarens generation
+ *   2. Items i hela kategorin (oavsett audience)
+ *   3. Påhittade namn från `distractor-pool.yaml` (mappade till prefixer)
+ *
+ * Layer 3 garanterar att vi nästan alltid kan fylla griden — även om rätt
+ * prefix är ovanligt och katalog-poolen har för få varierande prefixer.
+ */
+export function buildLetterGrid(args: BuildLetterGridArgs): PrefixOption[] {
+  const {
+    catalog,
+    category,
+    playerGeneration,
+    correctItem,
+    prefixLength,
+    totalOptions = DEFAULT_TOTAL_OPTIONS,
+    rng = Math.random,
+    excludeSensitive = true,
+  } = args;
+
+  const correctPrefix = getPrefixForItem(correctItem.displayName, prefixLength);
+  const seen = new Set<string>([correctPrefix]);
+  const distractors: string[] = [];
+
+  function pickFromPool(pool: PoolItem[]): void {
+    for (const { item } of shuffle(pool, rng)) {
+      if (item.id === correctItem.id) continue;
+      const prefix = getPrefixForItem(item.displayName, prefixLength);
+      if (!prefix) continue;
+      if (seen.has(prefix)) continue;
+      seen.add(prefix);
+      distractors.push(prefix);
+      if (distractors.length >= totalOptions - 1) return;
+    }
+  }
+
+  function pickFromDistractorPool(): void {
+    const pool = loadDistractorPool();
+    const names = pool.names[category];
+    for (const name of shuffle(names, rng)) {
+      const prefix = getPrefixForItem(name, prefixLength);
+      if (!prefix) continue;
+      if (seen.has(prefix)) continue;
+      seen.add(prefix);
+      distractors.push(prefix);
+      if (distractors.length >= totalOptions - 1) return;
+    }
+  }
+
+  pickFromPool(getCategoryPool(catalog, category, playerGeneration, excludeSensitive));
+
+  if (distractors.length < totalOptions - 1) {
+    pickFromPool(getCategoryFallbackPool(catalog, category, excludeSensitive));
+  }
+
+  if (distractors.length < totalOptions - 1) {
+    pickFromDistractorPool();
+  }
+
+  const all: PrefixOption[] = [
+    { prefix: correctPrefix, isCorrect: true },
+    ...distractors.map((p) => ({ prefix: p, isCorrect: false })),
+  ];
+  return shuffle(all, rng);
+}
+
+export interface BuildNameOptionsArgs {
+  catalog: LoadedCatalog;
+  category: Category;
+  playerGeneration: Generation;
+  correctItem: ContentItem;
+  selectedPrefix: string;
+  prefixLength: number;
+  totalOptions?: number;
+  rng?: () => number;
+  excludeSensitive?: boolean;
+}
+
+/**
+ * Bygg Final Selection (Steg 2) baserat på vilket prefix spelaren klickade.
+ *
+ * - Om selectedPrefix === correctPrefix: returnera (totalOptions-1) distractor-namn
+ *   med samma prefix + det rätta motivet, blandade.
+ * - Om selectedPrefix !== correctPrefix: returnera upp till totalOptions distractor-namn
+ *   med matching prefix. Inget av dem är rätt — spelaren har redan låst sig vid fel prefix.
+ *
+ * Pool-strategi (lager för lager tills target nås):
+ *   1. Items i samma kategori som matchar spelarens generation
+ *   2. Items i hela kategorin (oavsett audience)
+ *   3. Påhittade namn från `distractor-pool.yaml` med matching prefix
+ *
+ * Items dedupe:as på `id`; pool-namn dedupe:as på displayName (case-insensitive).
+ */
+export function buildNameOptions(args: BuildNameOptionsArgs): NameOption[] {
+  const {
+    catalog,
+    category,
+    playerGeneration,
+    correctItem,
+    selectedPrefix,
+    prefixLength,
+    totalOptions = DEFAULT_TOTAL_OPTIONS,
+    rng = Math.random,
+    excludeSensitive = true,
+  } = args;
+
+  const correctPrefix = getPrefixForItem(correctItem.displayName, prefixLength);
+  const isCorrectPrefix = selectedPrefix === correctPrefix;
+  const targetDistractorCount = isCorrectPrefix ? totalOptions - 1 : totalOptions;
+
+  const seenIds = new Set<string>([correctItem.id]);
+  const seenNamesLower = new Set<string>([correctItem.displayName.toLowerCase()]);
+  const distractors: NameOption[] = [];
+
+  function collectFromCatalog(pool: PoolItem[]): void {
+    for (const { item } of shuffle(pool, rng)) {
+      if (distractors.length >= targetDistractorCount) return;
+      if (seenIds.has(item.id)) continue;
+      const prefix = getPrefixForItem(item.displayName, prefixLength);
+      if (prefix !== selectedPrefix) continue;
+      seenIds.add(item.id);
+      seenNamesLower.add(item.displayName.toLowerCase());
+      distractors.push({
+        itemId: item.id,
+        displayName: item.displayName,
+        isCorrect: false,
+        source: 'catalog',
+      });
+    }
+  }
+
+  function collectFromDistractorPool(): void {
+    const pool = loadDistractorPool();
+    const names = pool.names[category];
+    for (const name of shuffle(names, rng)) {
+      if (distractors.length >= targetDistractorCount) return;
+      const lower = name.toLowerCase();
+      if (seenNamesLower.has(lower)) continue;
+      const prefix = getPrefixForItem(name, prefixLength);
+      if (prefix !== selectedPrefix) continue;
+      seenNamesLower.add(lower);
+      distractors.push({
+        itemId: poolNameToId(name),
+        displayName: name,
+        isCorrect: false,
+        source: 'pool',
+      });
+    }
+  }
+
+  collectFromCatalog(getCategoryPool(catalog, category, playerGeneration, excludeSensitive));
+
+  if (distractors.length < targetDistractorCount) {
+    collectFromCatalog(getCategoryFallbackPool(catalog, category, excludeSensitive));
+  }
+
+  if (distractors.length < targetDistractorCount) {
+    collectFromDistractorPool();
+  }
+
+  const options: NameOption[] = distractors.slice(0, targetDistractorCount);
+
+  if (isCorrectPrefix) {
+    options.push({
+      itemId: correctItem.id,
+      displayName: correctItem.displayName,
+      isCorrect: true,
+      source: 'catalog',
+    });
+  }
+
+  return shuffle(options, rng);
+}

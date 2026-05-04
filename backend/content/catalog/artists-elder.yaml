@@ -1,0 +1,25 @@
+# Musikartister kända för elder-generationen (Silent + Baby Boomers).
+# correctYear: solister = födelseår; band = formation-år.
+audience: ["elder"]
+category: artists
+items:
+  - id: elvis-presley
+    displayName: "Elvis Presley"
+    correctYear: 1935
+    probability: 98
+    wikimediaSearchHints: ["Elvis Presley"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: abba
+    displayName: "ABBA"
+    correctYear: 1972
+    probability: 98
+    wikimediaSearchHints: ["ABBA group"]
+    answerMethods: ["timeline", "name-letters"]
+    notes: "Grupp; correctYear = formation-år."
+  - id: the-beatles
+    displayName: "The Beatles"
+    correctYear: 1960
+    probability: 97
+    wikimediaSearchHints: ["The Beatles band"]
+    answerMethods: ["timeline", "name-letters"]
+    notes: "Grupp; correctYear = formation-år."

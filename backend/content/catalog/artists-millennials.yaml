@@ -1,0 +1,22 @@
+# Musikartister kända för Millennials.
+audience: ["millennials"]
+category: artists
+items:
+  - id: avicii
+    displayName: "Avicii"
+    correctYear: 1989
+    probability: 97
+    wikimediaSearchHints: ["Avicii", "Tim Bergling"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: rihanna
+    displayName: "Rihanna"
+    correctYear: 1988
+    probability: 95
+    wikimediaSearchHints: ["Rihanna"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: eminem
+    displayName: "Eminem"
+    correctYear: 1972
+    probability: 94
+    wikimediaSearchHints: ["Eminem rapper"]
+    answerMethods: ["timeline", "name-letters"]

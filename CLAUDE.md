@@ -1,23 +1,24 @@
 # QuizVibe
 
-Expo Router quiz app (React Native 0.81, React 19, Expo SDK 54). Dark-themed, mobile-first. Mock data only — no backend yet.
+Expo Router quiz app (React Native 0.81, React 19, Expo SDK 54). Dark-themed, mobile-first. Mock data on the client; en `backend/`-folder är påbörjad för content-katalog + bild-pipeline (ingen live-API ännu — se "Backend" nedan).
 
 ## Routing
 
 `"main": "expo-router/entry"` — file-based routes in `app/`.
 
-- `app/_layout.tsx` — root Stack: `(tabs)` and `quiz`.
+- `app/_layout.tsx` — root Stack: `(tabs)`, `quiz`, `name-quiz-demo`.
 - `app/(tabs)/_layout.tsx` — bottom tabs: Home, Profile, Lobby, Leaderboards, Store.
-- `app/(tabs)/index.tsx` — Home screen + JoinModal + Logo (2k+ lines, needs splitting).
+- `app/(tabs)/index.tsx` — Home screen + JoinModal + Logo (2k+ lines, needs splitting). Innehåller även en temporär "🧪 Try Name Quiz Demo"-knapp efter footer som navigerar till demo-routen.
 - `app/(tabs)/{lobby,profile,leaderboards,store}.tsx` — thin re-exports of `src/screens/*Screen.tsx`.
 - `app/quiz.tsx` — gameplay screen.
+- `app/name-quiz-demo.tsx` — fristående skiss-demo för Namn-svarsmodellen (Letter Grid + Final Selection + ProgressiveCover-mosaik). Använder hardcoded data från `src/utils/nameQuizDemo.ts` (auto-genererad via `cd backend && npm run export-demo`). Inte integrerad med befintlig quiz-flow ännu.
 
 ## Source layout (`src/`)
 
 - `screens/` — large screen files (Lobby, Profile, Leaderboards, Store, HCPSettings). HCPSettings har ingen route i `app/` än (planeras kopplas in framöver).
 - `components/` — shared UI (Button, Card, PlayerRow, RoundLeaderboard, etc.).
 - `theme/` — `Colors`, `Spacing`, `Radius`, `Typography`, `FontSize`, `FontWeight`. Import via `@/src/theme`.
-- `utils/` — AsyncStorage helpers (`profileStorage`, `friendsStorage`, `pendingLobby`, `waitingInvites`, `gameResults`, `leftPlayers`), plus `avatars`, `hcp`, `roomCode`, `playerName`, `analytics`, `profanity`, `mockActiveRooms`.
+- `utils/` — AsyncStorage helpers (`profileStorage`, `friendsStorage`, `pendingLobby`, `waitingInvites`, `gameResults`, `leftPlayers`), plus `avatars`, `hcp`, `roomCode`, `playerName`, `analytics`, `profanity`, `mockActiveRooms`, `revealCurve` (Namn-svarsmodellens reveal-kurva), `nameQuizDemo` (auto-genererad demo-data, gitignore:as inte men regenereras via `backend/scripts/export-demo.ts`).
 
 Path alias: `@/*` → repo root (e.g. `@/src/theme`, `@/src/components/Button`).
 
@@ -37,6 +38,43 @@ All client-side via AsyncStorage. No server. Screens reload data on focus (`useF
 **Mock backend stores** (sessions/AsyncStorage stand-ins för kommande backend-API): konventionen är att exportera funktioner med samma signatur som API-anrop kommer att ha så att call-sites förblir oförändrade när impl byts ut. Två stores idag:
 - `src/utils/mockActiveRooms.ts` — **in-memory `Set<string>`** över aktiva rumkoder. `registerActiveRoom(code)` (vid Create Game/Play Again), `isActiveRoom(code)` (validation i `handleJoinWithCode`/`handleJoinAsGuest` — visar "Room not found"-Alert vid miss), `deactivateRoom(code)` (när host trycker Delete this Game Lobby). Sessions-bunden (förstörs vid app-reload). Test-seeds: `'AB23XY'`, `'QV45LV'`.
 - `src/utils/leftPlayers.ts` — **AsyncStorage** per rumkod. Lagrar `LeftPlayerSnapshot[]` (inte bara id) så nya joiners som inte har lämnande spelaren i sin SEED-baseline kan rendera kortet med `hasLeft`-styling via orphan-injection (se "Lobby — TopUserBanner actions" nedan). `addLeftPlayer(roomCode, snapshot)`, `getLeftPlayers(roomCode)`, `clearLeftPlayers(roomCode)` (anropas av `handleCreateGame`/Play Again för fresh slate på återanvänd kod).
+
+## Backend (content catalog + image pipeline)
+
+`backend/` är ett separat Node-projekt med egen `package.json` (sharp, zod, js-yaml, vitest, tsx). 77 tester, alla gröna. Live-call-CLIs mot Wikipedia/Commons + mock data exportör för klient-demo. Ingen live HTTP-API ännu — Supabase-setup parkerad.
+
+**Struktur**:
+- `backend/content/catalog/*.yaml` — innehållslistor per generation × kategori. 5 generations-grupper: `elder` (Silent + Boomers, 1925-1964), `gen-x`, `millennials`, `gen-z`, `gen-alpha` + `'all'` (baseline). Items har: `id` (kebab-case), `displayName`, `correctYear`, `probability` (0-100), `wikimediaSearchHints[]`, `answerMethods: ('timeline'|'name-letters')[]`, `sensitivity: 'standard'|'sensitive'`. 71 items totalt över persons/capitals/artists.
+- `backend/content/schema.ts` — Zod-schema. Validation: items med `'timeline'` i answerMethods MÅSTE ha `correctYear`. Cross-audience-figurer (Zlatan, Cristiano, Messi, ABBA, Madonna, etc.) listas en gång per fil — registry tolererar dubblett-IDs över filer men kräver unika inom en fil.
+- `backend/content/registry.ts` — `loadCatalog`, `findItemsForAudience` (default `excludeSensitive: true` → Hitler/Stalin filtreras bort i spelutbud, admin sätter `excludeSensitive: false` för full vy), `findItemsById`.
+- `backend/content/generation.ts` — `birthYearToGeneration`, `generationDistance`, `getLetterGridConfig` (skill → prefix-längd: easy=3, intermediate=2, expert=1; specialregler: född 2016+ alltid hela namn; 2013-2015 hela namn om distance>1; övriga hela namn om distance>2 — Millennials har max-distance 2 så får alltid prefix).
+- `backend/content/distractors.ts` — `getPrefixForItem` (extraherar prefix, behåller diakriter, skipparar non-letters), `buildLetterGrid`, `buildNameOptions`. Pool-strategi: kategori+audience → kategori-fallback → `distractor-pool.yaml` med ~50 plausibla namn per kategori. `NameOption.source` = `'catalog'` eller `'pool'`.
+- `backend/wikimedia/client.ts` — Wikipedia pageimage-lookup (primär källa, kuraterade huvudbilder) + Commons text-search (fallback) + license/artist från Commons imageinfo. CLI: `npm run wikimedia-search <item-id>`.
+- `backend/wikimedia/processor.ts` + `process.ts` — `fetchImage` + sharp-pipeline (resize max 1280×720 med aspect ratio bevarat + WebP @ q85). CLI: `npm run wikimedia-process <item-id>`. Output till `backend/output/` (gitignore:ad).
+- `backend/scripts/export-demo.ts` — genererar `src/utils/nameQuizDemo.ts` med 3 förgenererade frågor (Astrid, Stockholm, Cristiano) inkl. Letter Grid + name-options per prefix. CLI: `npm run export-demo`.
+
+**Sharp-gotcha**: `sharp(input).resize(...).resize(...)` — den första `resize()` ignoreras tyst när två chainas. Måste köra som två separata `sharp()`-instanser med mellan-buffer:
+```ts
+const downscaled = await sharp(input).resize(w, h, { kernel: sharp.kernel.nearest }).png().toBuffer();
+const buffer = await sharp(downscaled).resize(upW, upH, { kernel: sharp.kernel.nearest }).jpeg().toBuffer();
+```
+
+**Wikimedia thumbnail URL-construction** (`buildWikimediaThumbnailUrl` i `client.ts`): använder ren strängmanipulation (inte `URL`-class) för att undvika att Node re-encodar `()` → `%28%29`. iOS expo-image kan ha problem med vissa percent-encoded thumbnail-URLer. För säker rendering: använd vanlig RN `Image` (inte `expo-image`) för data-URI/thumbnail-källor i demo-flow.
+
+**Image rendering iOS gotchas**:
+- `expo-image` har `transition`-prop som default fadar in nya source — kan blockera snabba source-byten via state-changes. Sätt `transition={0}` eller använd `<Image>` från `react-native`.
+- `cachePolicy="memory-disk"` cachar per source-uri. Vid frågebyte kan förra bilden visas under ny load. Lägg `key={questionIndex}` på `<Image>` för att tvinga remount, eller `cachePolicy="none"` för demo.
+- iOS native UIImageView interpolerar smooth vid upscale → "blurry → sharp" inte "blocky pixels". Äkta pixelation kräver pre-rendering serverside med `kernel: 'nearest'` + nedladdning som data-URI eller statisk fil.
+
+**Generation-mappning** (i `generation.ts`):
+| Värde | Födelseår |
+|---|---|
+| `elder` | 1925-1964 (Silent + Boomers) |
+| `gen-x` | 1965-1980 |
+| `millennials` | 1981-1996 |
+| `gen-z` | 1997-2012 |
+| `gen-alpha` | 2013-2028 |
+| `all` | baseline (alltid distance 0) |
 
 ## Conventions
 
@@ -332,6 +370,34 @@ Region/land skickas INTE i events — alla större vendors auto-fyller `country_
 
 Call-sites finns redan i: `handleRegisterSubmit`, `handleLogin`, `handleLogout`, `handleCreateGame`, `handleJoinAsGuest` ([app/(tabs)/index.tsx](app/(tabs)/index.tsx)) och `QuizScreen` (mount + final leaderboard) ([app/quiz.tsx](app/quiz.tsx)). `purchase_completed` saknar fortfarande call-site — instrumentera när Store-integrationen kopplas in.
 
+## Name-answer model — demo route
+
+`app/name-quiz-demo.tsx` är en fristående demo som visar två-stegs-svaret:
+
+1. **Letter Grid**: 10 prefix-knappar i 5×2-grid, alfabetiskt sorterade (`localeCompare(b, 'sv')` så Å/Ä/Ö hamnar rätt). Single-select.
+2. **Final Selection**: lista av fulla namn med matching prefix, alfabetiskt sorterade. Visar `catalog`/`pool`-tag per rad. "← Back" under "Selected: XX"-pillen.
+3. **Confirm-steg**: klick på namn highlightar (primary-blå border), Confirm-knappen syns. Klick på Confirm låser → grön "✓ Correct Answer" / röd "✗ Wrong Answer"-feedback med rätt svar.
+
+Demo-data (`src/utils/nameQuizDemo.ts`) genererad för Millennials (1990) + intermediate skill = 2-bokstavs prefix.
+
+**ProgressiveCover** ([src/components/ProgressiveCover.tsx](src/components/ProgressiveCover.tsx)) — mosaik-overlay som avslöjar bilden under sig:
+- 32×18 = 576 svarta block, 4 block tas bort per tick (~208ms per tick över 30s = totalt 144 ticks)
+- Random reveal-order (Fisher-Yates shuffle) regenererad per `resetKey`-byte
+- `<QuizVibeQuestionMarkLogo>` centrerad ovanpå mosaiken, opacity = `1 - revealedCount / TOTAL_BLOCKS`
+- `key={questionIndex}` på själva ProgressiveCover (i demo-route) — tvingar full remount vid frågebyte, säkerställer att alla block är svarta från första render utan blink av förra fråges state
+- React.memo på `<Block>`-komponenten — bara de 4 block som ändras per tick re-renderas, inte alla 576
+- `isRevealed=true` → snap till alla block borta (för Confirm-flow). I demon visas bilden direkt vid Confirm; i framtida quiz-integration ska mosaik fortsätta tills timer slut även efter Confirm (öppen design-fråga, dokumenterad i konversation).
+- Original-bilden under är ALDRIG pixlad — den är skarp hela tiden, bara skymd av cover-block som plockas bort. Bilden själv klipps inte — `mediaCard` har `overflow: 'hidden'` + `aspectRatio: 16/9`.
+
+**logoSize-tweaking** för QuizVibeQuestionMarkLogo i mediaCard: 320 är empiriskt lagom för 16:9 på iPhone (~390px wide × 220px tall). 360+ klipps av top/bottom. <280 ser för litet ut.
+
+## Shared visual components (sessions-tillägg)
+
+- [src/components/QuizVibeQuestionMarkLogo.tsx](src/components/QuizVibeQuestionMarkLogo.tsx) — variant av `QuizVibeLogo` med `?`-glyph (SVG `<Text>`) i Q-ringen istället för wifi-fan. Squares + Q-ring + Q-svans identiska. ViewBox 0-80 × 0-80, Q-ring center (37, 37). `?` placeras på y=43 så glyph-mitten hamnar runt y=37 (SvgText:s y refererar till baseline).
+- [src/components/ProgressiveCover.tsx](src/components/ProgressiveCover.tsx) — mosaik-reveal-cover (se "Name-answer model — demo route").
+
 ## Scripts
 
 `npm start` (Expo dev), `npm run ios` / `android` / `web`, `npm run lint` (`expo lint`). No tests, no CI.
+
+`backend/`-projektet har egna scripts: `npm test` (vitest, 77 tester), `npm run validate` (parsea katalog), `npm run export-demo` (regenerera demo-data), `npm run wikimedia-search <id>`, `npm run wikimedia-process <id>`, `npm run demo` (skriver ut Letter Grid-output i konsolen).

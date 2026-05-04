@@ -1,0 +1,14 @@
+# Huvudstäder särskilt kända för yngre generationer (Gen Z + Gen Alpha).
+audience: ["gen-z", "gen-alpha"]
+category: capitals
+items:
+  - id: seoul
+    displayName: "Seoul"
+    probability: 85
+    wikimediaSearchHints: ["Seoul skyline", "Seoul South Korea"]
+    answerMethods: ["name-letters"]
+  - id: dubai
+    displayName: "Dubai"
+    probability: 83
+    wikimediaSearchHints: ["Dubai Burj Khalifa", "Dubai skyline"]
+    answerMethods: ["name-letters"]

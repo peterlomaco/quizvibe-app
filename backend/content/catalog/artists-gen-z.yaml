@@ -1,0 +1,22 @@
+# Musikartister kända för Gen Z.
+audience: ["gen-z"]
+category: artists
+items:
+  - id: billie-eilish
+    displayName: "Billie Eilish"
+    correctYear: 2001
+    probability: 95
+    wikimediaSearchHints: ["Billie Eilish"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: taylor-swift
+    displayName: "Taylor Swift"
+    correctYear: 1989
+    probability: 95
+    wikimediaSearchHints: ["Taylor Swift"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: drake
+    displayName: "Drake"
+    correctYear: 1986
+    probability: 94
+    wikimediaSearchHints: ["Drake rapper"]
+    answerMethods: ["timeline", "name-letters"]

@@ -1492,6 +1492,25 @@ export default function HomeScreen() {
           <Text style={[styles.footerText, { fontFamily: taglineFont }]}>Help</Text>
         </View>
 
+        {/* DEV-länk till Name Quiz Demo (tas bort när demo inte längre behövs) */}
+        <TouchableOpacity
+          onPress={() => router.push('/name-quiz-demo')}
+          style={{
+            alignSelf: 'center',
+            marginTop: 12,
+            paddingHorizontal: 12,
+            paddingVertical: 6,
+            borderRadius: 8,
+            borderWidth: 1,
+            borderColor: Colors.primaryBorder,
+            backgroundColor: Colors.primaryMuted,
+          }}
+        >
+          <Text style={{ color: Colors.primary, fontSize: 13, fontWeight: '600' }}>
+            🧪 Try Name Quiz Demo
+          </Text>
+        </TouchableOpacity>
+
       </View>
 
       <JoinModal

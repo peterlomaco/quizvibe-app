@@ -1,0 +1,36 @@
+# Huvudstäder kända över alla generationer (baseline).
+# Capitals använder bara name-letters-svarsmodellen — ingen timeline-fråga
+# eftersom grundläggning/etablering ger otydliga årtal för dessa städer.
+audience: ["all"]
+category: capitals
+items:
+  - id: stockholm
+    displayName: "Stockholm"
+    probability: 99
+    wikimediaSearchHints: ["Stockholm panorama", "Stockholm Gamla Stan"]
+    answerMethods: ["name-letters"]
+  - id: london
+    displayName: "London"
+    probability: 98
+    wikimediaSearchHints: ["London skyline", "Big Ben London"]
+    answerMethods: ["name-letters"]
+  - id: paris
+    displayName: "Paris"
+    probability: 98
+    wikimediaSearchHints: ["Paris Eiffel Tower", "Paris skyline"]
+    answerMethods: ["name-letters"]
+  - id: berlin
+    displayName: "Berlin"
+    probability: 96
+    wikimediaSearchHints: ["Berlin Brandenburg Gate", "Berlin skyline"]
+    answerMethods: ["name-letters"]
+  - id: rome
+    displayName: "Rome"
+    probability: 95
+    wikimediaSearchHints: ["Rome Colosseum", "Rome skyline"]
+    answerMethods: ["name-letters"]
+  - id: washington-dc
+    displayName: "Washington, D.C."
+    probability: 94
+    wikimediaSearchHints: ["Washington DC Capitol", "Washington Monument"]
+    answerMethods: ["name-letters"]

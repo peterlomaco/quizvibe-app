@@ -1,0 +1,64 @@
+# Personer kända för Gen Z.
+audience: ["gen-z"]
+category: persons
+items:
+  - id: zlatan-ibrahimovic
+    displayName: "Zlatan Ibrahimović"
+    correctYear: 1981
+    probability: 98
+    wikimediaSearchHints: ["Zlatan Ibrahimović"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: cristiano-ronaldo
+    displayName: "Cristiano Ronaldo"
+    correctYear: 1985
+    probability: 97
+    wikimediaSearchHints: ["Cristiano Ronaldo"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: lionel-messi
+    displayName: "Lionel Messi"
+    correctYear: 1987
+    probability: 97
+    wikimediaSearchHints: ["Lionel Messi"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: mrbeast
+    displayName: "MrBeast"
+    correctYear: 1998
+    probability: 95
+    wikimediaSearchHints: ["MrBeast", "Jimmy Donaldson"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: greta-thunberg
+    displayName: "Greta Thunberg"
+    correctYear: 2003
+    probability: 94
+    wikimediaSearchHints: ["Greta Thunberg"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: billie-eilish
+    displayName: "Billie Eilish"
+    correctYear: 2001
+    probability: 93
+    wikimediaSearchHints: ["Billie Eilish"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: ariana-grande
+    displayName: "Ariana Grande"
+    correctYear: 1993
+    probability: 92
+    wikimediaSearchHints: ["Ariana Grande"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: kylie-jenner
+    displayName: "Kylie Jenner"
+    correctYear: 1997
+    probability: 90
+    wikimediaSearchHints: ["Kylie Jenner"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: travis-scott
+    displayName: "Travis Scott"
+    correctYear: 1991
+    probability: 88
+    wikimediaSearchHints: ["Travis Scott rapper"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: kim-kardashian
+    displayName: "Kim Kardashian"
+    correctYear: 1980
+    probability: 87
+    wikimediaSearchHints: ["Kim Kardashian"]
+    answerMethods: ["timeline", "name-letters"]
