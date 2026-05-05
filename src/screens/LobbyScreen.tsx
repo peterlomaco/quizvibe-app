@@ -937,6 +937,13 @@ export default function LobbyScreen() {
   // Game mode toggle (Pass-the-Phone vs Multiplayer Individual Devices)
   const [gameMode, setGameMode] = useState<GameMode>('pass-the-phone');
 
+  // Max antal spelare per spel — 4 = Basic (gratis), 12 = Premium.
+  // Lobby-local state; speglar Profile:s host-default-toggle.
+  const [maxPlayers, setMaxPlayers] = useState<4 | 12>(4);
+  // TODO (Store integration): byt mot riktig subscription-check när
+  // RevenueCat är inkopplad.
+  const hasPremium = false;
+
   // Max rundor beror på gameMode — Pass-the-Phone capas vid 4, Individual
   // Devices vid 20. När host växlar läge clampas roundsCount automatiskt
   // ner om det skulle hamna utanför nya max:t.
@@ -1022,6 +1029,24 @@ export default function LobbyScreen() {
       }
     }
     setGameMode(mode);
+  };
+
+  // Försök att välja Max 12 utan Premium → Store-omdirigering. Speglar
+  // handleSelectMode-pattern för Individual Devices utan paket.
+  const handleSelectMaxPlayers = (value: 4 | 12) => {
+    if (value === maxPlayers) return;
+    if (value === 12 && !hasPremium) {
+      Alert.alert(
+        'Premium feature',
+        'Hosting up to 12 players requires the Premium subscription. Get it in the Store?',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Go to Store', onPress: () => router.push('/store') },
+        ],
+      );
+      return;
+    }
+    setMaxPlayers(value);
   };
 
   // Approved spelare = i spelet, har turn-nummer, syns överst.
@@ -1469,6 +1494,72 @@ export default function LobbyScreen() {
               ? 'Players take turns answering on this single device. Free.'
               : 'Each player plays simultaneously on their own phone. Requires the Multiplayer Individual Devices package.'}
           </Text>
+
+          {/* ── Number of Players per Game ───────────────────────
+              Direkt under Game Mode-toggle:n. Speglar Profile:s host-
+              default-toggle: Max 4 (free, grön aktiv + FREE-badge) vs
+              Max 12 (premium, guld aktiv + PREMIUM-badge). Försök att
+              välja Max 12 utan Premium triggar Store-omdirigering. */}
+          <View style={{ marginTop: Spacing.md }}>
+            <Text style={styles.sectionLabel}>Number of Players per Game</Text>
+            <View style={[styles.modeToggle, { marginTop: Spacing.sm }]}>
+              <TouchableOpacity
+                style={[
+                  styles.modeOption,
+                  maxPlayers === 4 ? styles.modeOptionPassActive : styles.modeOptionInactive,
+                ]}
+                onPress={() => handleSelectMaxPlayers(4)}
+                disabled={!hostMode}
+                activeOpacity={0.7}
+              >
+                <Text
+                  style={[
+                    styles.modeLabel,
+                    maxPlayers === 4 && styles.modeLabelActiveFree,
+                  ]}
+                >
+                  Max 4 Players
+                </Text>
+                <View style={styles.freeBadge} pointerEvents="none">
+                  <Text style={styles.freeBadgeText}>FREE</Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.modeOption,
+                  maxPlayers === 12 ? styles.modeOptionPremiumActive : styles.modeOptionInactive,
+                ]}
+                onPress={() => handleSelectMaxPlayers(12)}
+                disabled={!hostMode}
+                activeOpacity={0.7}
+              >
+                <Text
+                  style={[
+                    styles.modeLabel,
+                    maxPlayers === 12 && styles.modeLabelActivePremium,
+                  ]}
+                >
+                  Max 12 Players
+                </Text>
+                <View
+                  style={[
+                    styles.premiumBadge,
+                    !(maxPlayers === 12 || hasPremium) && styles.premiumBadgeGrey,
+                  ]}
+                  pointerEvents="none"
+                >
+                  <Text
+                    style={[
+                      styles.premiumBadgeText,
+                      !(maxPlayers === 12 || hasPremium) && styles.premiumBadgeTextGrey,
+                    ]}
+                  >
+                    PREMIUM
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
 
         {/* ── Region Scope ──────────────────────────────────────
