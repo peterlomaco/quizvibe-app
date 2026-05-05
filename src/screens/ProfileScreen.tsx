@@ -548,83 +548,6 @@ export default function ProfileScreen() {
           <Text style={styles.setupHeaderFullWidth}>
             Host default settings
           </Text>
-          {/* Region scope + Answer response — sida vid sida, halv bredd
-              vardera. */}
-          <View style={styles.fieldRow}>
-            <View style={[styles.field, styles.fieldHalf]}>
-              <Text style={styles.fieldLabel}>Region scope</Text>
-              <Pressable
-                onPress={() => setRegionPickerOpen(true)}
-                style={({ pressed }) => [
-                  styles.selector,
-                  pressed && styles.selectorPressed,
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.selectorText,
-                    region === null && styles.selectorPlaceholder,
-                  ]}
-                  numberOfLines={1}
-                >
-                  {regionLabel ?? 'Select'}
-                </Text>
-                <Text style={styles.selectorChevron}>›</Text>
-              </Pressable>
-            </View>
-
-            {/* Answer response — hur lång tid spelarna har på sig att svara
-                på en fråga. Skiljer sig från hur länge själva frågematerialet
-                (låt/video/bild) spelas upp. */}
-            <View style={[styles.field, styles.fieldHalf]}>
-              <Text style={styles.fieldLabel}>Answer response time</Text>
-              <Pressable
-                onPress={() => setAnswerResponsePickerOpen(true)}
-                style={({ pressed }) => [
-                  styles.selector,
-                  pressed && styles.selectorPressed,
-                ]}
-              >
-                <Text style={styles.selectorText} numberOfLines={1}>
-                  {answerResponseLabel}
-                </Text>
-                <Text style={styles.selectorChevron}>›</Text>
-              </Pressable>
-            </View>
-          </View>
-
-          {/* Game era — adjustable år-spann för frågor (samma slider-mönster
-              som Lobbyns Game Era). */}
-          <View style={styles.field}>
-            <Text style={styles.fieldLabel}>Game era</Text>
-            <View style={styles.eraDisplay}>
-              <Text style={styles.eraDisplayYear}>{eraValues[0]}</Text>
-              <Text style={styles.eraDisplayDash}>–</Text>
-              <Text style={styles.eraDisplayYear}>{eraValues[1]}</Text>
-            </View>
-            <View style={{ alignItems: 'center' }}>
-              <MultiSlider
-                values={eraValues}
-                min={ERA_MIN}
-                max={ERA_MAX}
-                step={1}
-                onValuesChange={(vals) => setEraValues([vals[0], vals[1]])}
-                selectedStyle={{ backgroundColor: Colors.primary }}
-                unselectedStyle={{ backgroundColor: Colors.border }}
-                markerStyle={{
-                  backgroundColor: Colors.primary,
-                  borderColor: Colors.background,
-                  borderWidth: 2,
-                  width: 22,
-                  height: 22,
-                }}
-                trackStyle={{ height: 4, borderRadius: 2 }}
-                containerStyle={{ alignSelf: 'center' }}
-                sliderLength={ERA_SLIDER_WIDTH}
-              />
-              <DecadeMarks />
-            </View>
-          </View>
 
           {/* ── Game Mode (host-default) ─────────────────────────
               Pass-the-Phone (gratis) vs Individual Devices (Premium).
@@ -756,6 +679,84 @@ export default function ProfileScreen() {
                   </Text>
                 </View>
               </Pressable>
+            </View>
+          </View>
+
+          {/* Region scope + Answer response — sida vid sida, halv bredd
+              vardera. */}
+          <View style={styles.fieldRow}>
+            <View style={[styles.field, styles.fieldHalf]}>
+              <Text style={styles.fieldLabel}>Region scope</Text>
+              <Pressable
+                onPress={() => setRegionPickerOpen(true)}
+                style={({ pressed }) => [
+                  styles.selector,
+                  pressed && styles.selectorPressed,
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.selectorText,
+                    region === null && styles.selectorPlaceholder,
+                  ]}
+                  numberOfLines={1}
+                >
+                  {regionLabel ?? 'Select'}
+                </Text>
+                <Text style={styles.selectorChevron}>›</Text>
+              </Pressable>
+            </View>
+
+            {/* Answer response — hur lång tid spelarna har på sig att svara
+                på en fråga. Skiljer sig från hur länge själva frågematerialet
+                (låt/video/bild) spelas upp. */}
+            <View style={[styles.field, styles.fieldHalf]}>
+              <Text style={styles.fieldLabel}>Answer response time</Text>
+              <Pressable
+                onPress={() => setAnswerResponsePickerOpen(true)}
+                style={({ pressed }) => [
+                  styles.selector,
+                  pressed && styles.selectorPressed,
+                ]}
+              >
+                <Text style={styles.selectorText} numberOfLines={1}>
+                  {answerResponseLabel}
+                </Text>
+                <Text style={styles.selectorChevron}>›</Text>
+              </Pressable>
+            </View>
+          </View>
+
+          {/* Game era — adjustable år-spann för frågor (samma slider-mönster
+              som Lobbyns Game Era). */}
+          <View style={styles.field}>
+            <Text style={styles.fieldLabel}>Game era</Text>
+            <View style={styles.eraDisplay}>
+              <Text style={styles.eraDisplayYear}>{eraValues[0]}</Text>
+              <Text style={styles.eraDisplayDash}>–</Text>
+              <Text style={styles.eraDisplayYear}>{eraValues[1]}</Text>
+            </View>
+            <View style={{ alignItems: 'center' }}>
+              <MultiSlider
+                values={eraValues}
+                min={ERA_MIN}
+                max={ERA_MAX}
+                step={1}
+                onValuesChange={(vals) => setEraValues([vals[0], vals[1]])}
+                selectedStyle={{ backgroundColor: Colors.primary }}
+                unselectedStyle={{ backgroundColor: Colors.border }}
+                markerStyle={{
+                  backgroundColor: Colors.primary,
+                  borderColor: Colors.background,
+                  borderWidth: 2,
+                  width: 22,
+                  height: 22,
+                }}
+                trackStyle={{ height: 4, borderRadius: 2 }}
+                containerStyle={{ alignSelf: 'center' }}
+                sliderLength={ERA_SLIDER_WIDTH}
+              />
+              <DecadeMarks />
             </View>
           </View>
 
