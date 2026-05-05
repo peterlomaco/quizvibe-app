@@ -45,6 +45,10 @@ export interface ProfileData {
   // Optional för bakåtkompatibilitet — defaultas till [1980, 2010] i UI.
   gameEraFrom?: number;
   gameEraTo?: number;
+  // Max antal spelare per spel (host-default). 4 = gratis Basic-plan,
+  // 12 = kräver Premium-paket. Optional för bakåtkompatibilitet —
+  // defaultas till 4 i UI.
+  maxPlayers?: 4 | 12;
 }
 
 // Dual-read mapping för profiler skapade innan rename

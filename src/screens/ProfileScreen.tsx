@@ -136,6 +136,8 @@ export default function ProfileScreen() {
   const [newFriendPlayerName, setNewFriendPlayerName] = useState('');
   const [answerResponseSeconds, setAnswerResponseSeconds] = useState<AnswerResponse>(30);
   const [eraValues, setEraValues] = useState<[number, number]>([1980, 2010]);
+  // Max antal spelare per spel — 4 = Basic (gratis), 12 = Premium.
+  const [maxPlayers, setMaxPlayers] = useState<4 | 12>(4);
   const [yearPickerOpen, setYearPickerOpen]     = useState(false);
   const [assistancePickerOpen, setAssistancePickerOpen]   = useState(false);
   const [regionPickerOpen, setRegionPickerOpen] = useState(false);
@@ -172,6 +174,7 @@ export default function ProfileScreen() {
         setYoutubeConnected(data.youtubeConnected ?? false);
         setAnswerResponseSeconds(data.answerResponseSeconds ?? 30);
         setEraValues([data.gameEraFrom ?? 1980, data.gameEraTo ?? 2010]);
+        setMaxPlayers(data.maxPlayers ?? 4);
       });
       loadFriends().then((list) => {
         if (active) setFriends(list);
@@ -216,6 +219,7 @@ export default function ProfileScreen() {
         answerResponseSeconds,
         gameEraFrom: eraValues[0],
         gameEraTo: eraValues[1],
+        maxPlayers,
       });
       setIsSaved(true);
       setTimeout(() => setIsSaved(false), 2000);
@@ -574,6 +578,58 @@ export default function ProfileScreen() {
                 sliderLength={ERA_SLIDER_WIDTH}
               />
               <DecadeMarks />
+            </View>
+          </View>
+
+          {/* ── Number of Players per Game ──────────────────────────
+              Host-default: max 4 spelare (Basic / gratis) eller max 12
+              (Premium). Toggle:n speglar Lobby:s Game Mode-toggle:
+              grön aktiv för Max 4 (free-läge), blå aktiv för Max 12
+              (premium-läge) med PREMIUM-badge i guld som kantskärande
+              tag på den högra rutan. */}
+          <View style={styles.field}>
+            <Text style={styles.fieldLabel}>Number of Players per Game</Text>
+            <View style={styles.modeToggle}>
+              <Pressable
+                style={({ pressed }) => [
+                  styles.modeOption,
+                  maxPlayers === 4 ? styles.modeOptionPassActive : styles.modeOptionInactive,
+                  pressed && { opacity: 0.7 },
+                ]}
+                onPress={() => setMaxPlayers(4)}
+              >
+                <Text
+                  style={[
+                    styles.modeLabel,
+                    maxPlayers === 4 && styles.modeLabelActiveFree,
+                  ]}
+                >
+                  Max 4 Players
+                </Text>
+                <View style={styles.freeBadge} pointerEvents="none">
+                  <Text style={styles.freeBadgeText}>FREE</Text>
+                </View>
+              </Pressable>
+              <Pressable
+                style={({ pressed }) => [
+                  styles.modeOption,
+                  maxPlayers === 12 ? styles.modeOptionIndivActive : styles.modeOptionInactive,
+                  pressed && { opacity: 0.7 },
+                ]}
+                onPress={() => setMaxPlayers(12)}
+              >
+                <Text
+                  style={[
+                    styles.modeLabel,
+                    maxPlayers === 12 && styles.modeLabelActive,
+                  ]}
+                >
+                  Max 12 Players
+                </Text>
+                <View style={styles.premiumBadge} pointerEvents="none">
+                  <Text style={styles.premiumBadgeText}>PREMIUM</Text>
+                </View>
+              </Pressable>
             </View>
           </View>
 
@@ -1818,6 +1874,91 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     letterSpacing: 0.4,
     textTransform: 'uppercase',
+  },
+
+  // Number of Players per Game-toggle — speglar Lobby:s Game Mode-toggle
+  // (Pass-the-Phone vs Individual Devices) i form, mått och färg.
+  // Vänster ruta = Max 4 (free, grön aktiv), höger ruta = Max 12 (premium,
+  // blå aktiv) med kantskärande PREMIUM-badge i guld.
+  modeToggle: {
+    flexDirection: 'row',
+    backgroundColor: Colors.background,
+    borderRadius: Radius.md,
+    padding: 3,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    height: 46,
+    gap: 4,
+  },
+  modeOption: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: Radius.sm,
+    borderWidth: 1,
+  },
+  modeOptionInactive: {
+    borderColor: Colors.borderStrong,
+    backgroundColor: 'transparent',
+  },
+  modeOptionPassActive: {
+    borderColor: Colors.success,
+    backgroundColor: Colors.primaryMuted,
+  },
+  modeOptionIndivActive: {
+    borderColor: Colors.primary,
+    backgroundColor: Colors.primaryMuted,
+  },
+  modeLabel: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.medium,
+    color: Colors.textSecondary,
+  },
+  modeLabelActive: {
+    color: Colors.primary,
+    fontWeight: FontWeight.semibold,
+  },
+  modeLabelActiveFree: {
+    color: '#FFF',
+    fontWeight: FontWeight.semibold,
+  },
+  // FREE-badge — kantskärande tag (samma teknik som HOST-taggen i PlayerRow
+  // och Pass-the-Phone-knappen i Lobby:s Game Mode-toggle).
+  freeBadge: {
+    position: 'absolute',
+    top: -8,
+    right: Spacing.sm,
+    backgroundColor: Colors.success,
+    borderRadius: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    zIndex: 10,
+    elevation: 4,
+  },
+  freeBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#000',
+    letterSpacing: 0.6,
+  },
+  // PREMIUM-badge — guld-tag på Max 12-knappen (matchar Individual
+  // Devices-knappen i Lobby:s Game Mode-toggle).
+  premiumBadge: {
+    position: 'absolute',
+    top: -8,
+    right: Spacing.sm,
+    backgroundColor: '#F5A623',
+    borderRadius: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    zIndex: 10,
+    elevation: 4,
+  },
+  premiumBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#000',
+    letterSpacing: 0.6,
   },
   selector: {
     flexDirection: 'row',
