@@ -1423,13 +1423,16 @@ export default function LobbyScreen() {
               )}
             </TouchableOpacity>
 
-            {/* Individual Devices — premium-låst för host (paketkrav). För icke-host
-                visas blå "lit" kant när läget är aktivt, oavsett deras egna paket. */}
+            {/* Individual Devices — premium-låst för host (paketkrav). För host
+                med paket aktivt: kantlinjen, texten och PREMIUM-badge:n är guld
+                (samlat "premium-läge"-uttryck, samma mönster som Max 12 Players-
+                toggle:n i Profile). För icke-host visas blå "lit" kant när läget
+                är aktivt, oavsett deras egna paket. */}
             <TouchableOpacity
               style={[
                 styles.modeOption,
                 gameMode === 'individual-devices' && (hostMode ? hasMultiplayerPackage : true)
-                  ? styles.modeOptionIndivActive
+                  ? (hostMode ? styles.modeOptionPremiumActive : styles.modeOptionIndivActive)
                   : styles.modeOptionInactive,
               ]}
               onPress={() => handleSelectMode('individual-devices')}
@@ -1440,13 +1443,13 @@ export default function LobbyScreen() {
                 styles.modeLabel,
                 gameMode === 'individual-devices' && (
                   hostMode
-                    ? hasMultiplayerPackage && styles.modeLabelActive
+                    ? hasMultiplayerPackage && styles.modeLabelActivePremium
                     : styles.modeLabelActiveFree
                 ),
               ]}>
                 Individual Devices
               </Text>
-              {hostMode && !(gameMode === 'individual-devices' && hasMultiplayerPackage) && (
+              {hostMode && (
                 <View
                   style={[styles.premiumBadge, !hasMultiplayerPackage && styles.premiumBadgeGrey]}
                   pointerEvents="none"
@@ -2543,6 +2546,14 @@ const styles = StyleSheet.create({
     borderColor: Colors.primary,
     backgroundColor: Colors.primaryMuted,
   },
+  // Guld-tonad aktiv variant — Individual Devices för host med premium-paket.
+  // Speglar PREMIUM-badge:s guldfärg så toggle-rutan, badge:n och texten
+  // bildar ett samlat "premium-läge"-uttryck (samma mönster som Profile:s
+  // Max 12 Players-toggle).
+  modeOptionPremiumActive: {
+    borderColor: '#F5A623',
+    backgroundColor: Colors.primaryMuted,
+  },
   // FREE-badge som skär den gröna kantlinjen — samma teknik som HOST-taggen i
   // PlayerRow och Register-knappen i Profile-menyn.
   freeBadge: {
@@ -2596,6 +2607,11 @@ const styles = StyleSheet.create({
   },
   modeLabelActive: {
     color: Colors.primary,
+    fontWeight: FontWeight.semibold,
+  },
+  // Guld-tonad aktiv label — Individual Devices för host med premium-paket.
+  modeLabelActivePremium: {
+    color: '#F5A623',
     fontWeight: FontWeight.semibold,
   },
   // Aktiv label-stil för Pass-the-Phone när läget är gratis (grön pill).
