@@ -138,6 +138,10 @@ export default function ProfileScreen() {
   const [eraValues, setEraValues] = useState<[number, number]>([1980, 2010]);
   // Max antal spelare per spel — 4 = Basic (gratis), 12 = Premium.
   const [maxPlayers, setMaxPlayers] = useState<4 | 12>(4);
+  // Premium-status — styr om PREMIUM-badge på Max 12-toggle visas i guld
+  // (köpt) eller grått (inte köpt än). ProfileData saknar subscription-fält
+  // tills RevenueCat-integrationen kommer in, så håll false tills vidare.
+  const hasPremium = false;
   const [yearPickerOpen, setYearPickerOpen]     = useState(false);
   const [assistancePickerOpen, setAssistancePickerOpen]   = useState(false);
   const [regionPickerOpen, setRegionPickerOpen] = useState(false);
@@ -626,8 +630,15 @@ export default function ProfileScreen() {
                 >
                   Max 12 Players
                 </Text>
-                <View style={styles.premiumBadge} pointerEvents="none">
-                  <Text style={styles.premiumBadgeText}>PREMIUM</Text>
+                <View
+                  style={[styles.premiumBadge, !hasPremium && styles.premiumBadgeGrey]}
+                  pointerEvents="none"
+                >
+                  <Text
+                    style={[styles.premiumBadgeText, !hasPremium && styles.premiumBadgeTextGrey]}
+                  >
+                    PREMIUM
+                  </Text>
                 </View>
               </Pressable>
             </View>
@@ -1959,6 +1970,15 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#000',
     letterSpacing: 0.6,
+  },
+  // Grå variant av PREMIUM-badge — appliceras tills användaren köpt
+  // Premium-tjänsten. Guld signalerar "tillgängligt", grått signalerar
+  // "låst tills du köper" (samma mönster som Lobby:s Individual Devices).
+  premiumBadgeGrey: {
+    backgroundColor: '#6B7280',
+  },
+  premiumBadgeTextGrey: {
+    color: '#FFF',
   },
   selector: {
     flexDirection: 'row',
