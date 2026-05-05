@@ -7,7 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
  * matchande spelarkort när lobby:n läses in — OCH visa kortet även
  * för nya användare som joinar samma rum efter att personen lämnat.
  *
- * Vi sparar hela snapshot:en (namn, emoji, type, ålder, skill, m.m.)
+ * Vi sparar hela snapshot:en (namn, emoji, type, ålder, assistance, m.m.)
  * istället för bara id, så att nya joiners — som inte har den lämnande
  * spelaren i sin lokala SEED_PLAYERS-baseline — kan rendera kortet i
  * grå "left"-styling utifrån storage:n. Tidigare bara-id-impl räckte
@@ -29,7 +29,7 @@ export interface LeftPlayerSnapshot {
   avatarUri?: string;
   type?: 'registered' | 'guest' | 'manual';
   age?: number;
-  skill?: 'easy' | 'intermediate' | 'expert';
+  assistance?: 'minimal' | 'standard' | 'full';
   hcpComplete?: boolean;
   // Bevarar approved-state vid lämnings-tid så kortet hamnar i rätt
   // sektion (Approved / To be Approved by Host) när det renderas.

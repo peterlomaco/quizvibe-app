@@ -7,16 +7,16 @@
  * referens-implementationen som kapslar in nuvarande beslut.
  *
  * Kopplad till spelarens profil:
- * - `skill` styr huvudkurvan
+ * - `assistance` styr huvudkurvan
  * - `birthYear` är reserverat för framtida tweakar (t.ex. handicap för
  *   yngsta/äldsta spelarna)
  */
 
-export type SkillLevel = 'easy' | 'intermediate' | 'expert';
+export type AssistanceLevel = 'minimal' | 'standard' | 'full';
 
 export interface RevealProfile {
   birthYear: number;
-  skill: SkillLevel;
+  assistance: AssistanceLevel;
 }
 
 export interface RevealCurve {
@@ -27,7 +27,7 @@ export interface RevealCurve {
 }
 
 /**
- * @param profile      Spelarens profil (skill driver kurvan)
+ * @param profile      Spelarens profil (assistance driver kurvan)
  * @param totalSeconds Time-elapse-perioden i sekunder (30 / 45 / 60 enligt
  *                     `answerResponseSeconds`-profilinställning)
  */
@@ -37,18 +37,18 @@ export function getRevealCurve(
 ): RevealCurve {
   const totalMs = totalSeconds * 1000;
 
-  switch (profile.skill) {
-    case 'easy':
+  switch (profile.assistance) {
+    case 'full':
       // Snabb reveal: bilden helt synlig vid 60% av perioden.
       // Spelaren får 40% extra tid att fundera med skarp bild.
       return { duration: totalMs * 0.6, finalOpacity: 0 };
 
-    case 'expert':
+    case 'minimal':
       // Långsam reveal: cover stannar vid 0.15 — bilden blir aldrig helt
       // avslöjad under svarsfasen, vilket bibehåller utmaningen.
       return { duration: totalMs * 0.95, finalOpacity: 0.15 };
 
-    case 'intermediate':
+    case 'standard':
     default:
       // Linjär reveal över hela perioden — bilden helt synlig precis
       // när tiden tar slut.

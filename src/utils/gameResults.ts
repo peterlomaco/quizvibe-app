@@ -9,7 +9,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LATEST_KEY = '@quizvibe/latestResult/v1';
 
-export type SkillLevel = 'easy' | 'intermediate' | 'expert';
+export type AssistanceLevel = 'minimal' | 'standard' | 'full';
 
 export interface RoundResult {
   questionNumber: number;
@@ -27,10 +27,18 @@ export interface GameResult {
   date: string;            // ISO-datum
   totalPoints: number;
   rounds: RoundResult[];
-  skill: SkillLevel;
+  assistance: AssistanceLevel;
   hcpBefore: number;       // placeholder tills Fas 6 räknar riktigt
   hcpAfter: number;        // dito
 }
+
+// Dual-read mapping för results sparade innan rename
+// (skill: 'easy' | 'intermediate' | 'expert' → assistance: 'full' | 'standard' | 'minimal').
+const LEGACY_SKILL_TO_ASSISTANCE: Record<string, AssistanceLevel> = {
+  easy: 'full',
+  intermediate: 'standard',
+  expert: 'minimal',
+};
 
 export async function saveLatestResult(result: GameResult): Promise<void> {
   try {
@@ -45,7 +53,15 @@ export async function loadLatestResult(): Promise<GameResult | null> {
   try {
     const json = await AsyncStorage.getItem(LATEST_KEY);
     if (!json) return null;
-    return JSON.parse(json) as GameResult;
+    const raw = JSON.parse(json) as Partial<GameResult> & { skill?: string };
+    // Migrera result sparade när fältet hette `skill` med värdena
+    // easy/intermediate/expert → nya `assistance` med full/standard/minimal.
+    if (raw.assistance === undefined && typeof raw.skill === 'string') {
+      const mapped = LEGACY_SKILL_TO_ASSISTANCE[raw.skill];
+      if (mapped) raw.assistance = mapped;
+      delete raw.skill;
+    }
+    return raw as GameResult;
   } catch (err) {
     console.warn('[gameResults] Failed to load latest result:', err);
     return null;

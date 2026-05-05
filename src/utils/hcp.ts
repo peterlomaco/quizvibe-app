@@ -3,23 +3,25 @@
  * HCP-skalan går från 99 (nybörjare) till 1 (elit)
  */
 
-export type SkillLevel = 'easy' | 'intermediate' | 'expert';
+export type AssistanceLevel = 'minimal' | 'standard' | 'full';
 
-// ─── HCP Caps per skill level ─────────────────────────────────────────────────
+// ─── HCP Caps per assistance level ───────────────────────────────────────────
+// Mer assistans = nybörjare-spår (högre cap = sämre HCP tillåten).
+// Minimal assistans = elit-spår (cap 1).
 
-export const HCP_CAPS: Record<SkillLevel, number> = {
-  easy:         66,
-  intermediate: 33,
-  expert:        1,
+export const HCP_CAPS: Record<AssistanceLevel, number> = {
+  full:     66,
+  standard: 33,
+  minimal:   1,
 };
 
-// ─── Startvärde baserat på skill ─────────────────────────────────────────────
+// ─── Startvärde baserat på assistance ────────────────────────────────────────
 
-export function getStartingHCP(skill: SkillLevel): number {
-  switch (skill) {
-    case 'easy':         return 99;
-    case 'intermediate': return 75;
-    case 'expert':       return 50;
+export function getStartingHCP(assistance: AssistanceLevel): number {
+  switch (assistance) {
+    case 'full':     return 99;
+    case 'standard': return 75;
+    case 'minimal':  return 50;
   }
 }
 
@@ -30,19 +32,19 @@ export interface EraRange {
   to: number;
 }
 
-export function getEraRange(birthYear: number, skill: SkillLevel): EraRange {
+export function getEraRange(birthYear: number, assistance: AssistanceLevel): EraRange {
   const currentYear = new Date().getFullYear();
 
-  switch (skill) {
-    case 'easy':
+  switch (assistance) {
+    case 'full':
       // Strikt inom livstiden
       return { from: birthYear, to: currentYear };
 
-    case 'intermediate':
+    case 'standard':
       // Livstid + 10 år bakåt
       return { from: birthYear - 10, to: currentYear };
 
-    case 'expert':
+    case 'minimal':
       // Full historisk tillgång
       return { from: 1950, to: currentYear };
   }
@@ -53,9 +55,9 @@ export function getEraRange(birthYear: number, skill: SkillLevel): EraRange {
 export function calculateNewHCP(
   currentHCP: number,
   pointsEarned: number,
-  skill: SkillLevel
+  assistance: AssistanceLevel
 ): number {
-  const cap = HCP_CAPS[skill];
+  const cap = HCP_CAPS[assistance];
   const reduction = Math.floor(pointsEarned / 10);
   const newHCP = currentHCP - reduction;
   return Math.max(newHCP, cap);
@@ -73,26 +75,26 @@ export function applyAgePenalty(
   return Math.min(currentHCP + penalty, 99);
 }
 
-// ─── Beräkna HCP från ålder + skill (för nya spelare) ────────────────────────
+// ─── Beräkna HCP från ålder + assistance (för nya spelare) ────────────────────
 
-export function calculateInitialHCP(age: number, skill: SkillLevel): number {
-  let base = getStartingHCP(skill);
+export function calculateInitialHCP(age: number, assistance: AssistanceLevel): number {
+  let base = getStartingHCP(assistance);
 
   // Ålder påverkar startpoängen – äldre = bredare frågepool = högre HCP
   if (age >= 51)      base = Math.min(base + 10, 99);
   else if (age >= 36) base = Math.min(base + 5,  99);
   else if (age >= 21) base = base;
-  else                base = Math.max(base - 5,  HCP_CAPS[skill]);
+  else                base = Math.max(base - 5,  HCP_CAPS[assistance]);
 
   return base;
 }
 
-// ─── Färg baserat på HCP-tal ──────────────────────────────────────────────────
+// ─── Färg baserat på assistance level ────────────────────────────────────────
 
-export function getHCPColor(skill: SkillLevel): string {
-  switch (skill) {
-    case 'easy':         return '#52C87A'; // Grön
-    case 'intermediate': return '#4DA3FF'; // Blå
-    case 'expert':       return '#F5A623'; // Guld
+export function getHCPColor(assistance: AssistanceLevel): string {
+  switch (assistance) {
+    case 'full':     return '#52C87A'; // Grön
+    case 'standard': return '#4DA3FF'; // Blå
+    case 'minimal':  return '#F5A623'; // Guld
   }
 }

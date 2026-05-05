@@ -8,7 +8,7 @@ import {
 const catalog = loadCatalog();
 const avicii = findItemsById(catalog, 'avicii')[0].item;
 
-console.log('=== Exempel: Spelare = Millennials, intermediate skill ===');
+console.log('=== Exempel: Spelare = Millennials, standard assistance ===');
 console.log('Frågan: "Who is the Artist?"');
 console.log('Rätt svar: Avicii');
 console.log();

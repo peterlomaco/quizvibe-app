@@ -1,5 +1,5 @@
 // Auto-generated demo data. Regenerate with: cd backend && npm run export-demo
-// Player profile used: born 1990 (millennials), intermediate skill.
+// Player profile used: born 1990 (millennials), standard assistance.
 
 export interface DemoAttribution {
   source: 'wikimedia';

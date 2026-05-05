@@ -36,7 +36,7 @@ export type AnalyticsProps = Record<string, string | number | boolean | null>;
  * varje render eller state-change, det blir bara brus i dashboarden.
  *
  * Exempel:
- *   track('user_registered', { method: 'email', skill: 'intermediate', region: 'global' });
+ *   track('user_registered', { method: 'email', assistance: 'standard', region: 'global' });
  *   track('purchase_completed', { type: 'extra_package', product_id: 'hip_hop', price_amount: 29, price_currency: 'SEK' });
  */
 export function track(name: AnalyticsEventName, props?: AnalyticsProps): void {

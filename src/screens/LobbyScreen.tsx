@@ -39,7 +39,7 @@ import { addInvite } from '../utils/waitingInvites';
 export interface LobbyPlayer extends Player {
   type: 'registered' | 'guest' | 'manual';
   age?: number;
-  skill?: 'easy' | 'intermediate' | 'expert';
+  assistance?: 'minimal' | 'standard' | 'full';
   hcpComplete: boolean;
   isHost?: boolean;
   // Host godkänner spelare innan de tas in i spelet. Host själv är
@@ -75,21 +75,21 @@ const BIRTH_YEARS = Array.from(
 
 /**
  * Mergar sparad profildata in i host-spelarkortet. Behåller övriga fält
- * som id och isHost, men skriver över namn/avatar/age/skill med profilens
- * värden. Om profilen saknar required fält (skill eller birthYear) markeras
- * hcpComplete=false så host-kortet visar "HCP Required" på samma sätt som
- * andra spelare utan komplett HCP.
+ * som id och isHost, men skriver över namn/avatar/age/assistance med
+ * profilens värden. Om profilen saknar required fält (assistance eller
+ * birthYear) markeras hcpComplete=false så host-kortet visar
+ * "HCP Required" på samma sätt som andra spelare utan komplett HCP.
  */
 function mergeProfileIntoHost(existing: LobbyPlayer, profile: ProfileData): LobbyPlayer {
   const currentYear = new Date().getFullYear();
   const age = profile.birthYear ? currentYear - profile.birthYear : undefined;
-  const hcpComplete = !!(profile.skill && age !== undefined);
+  const hcpComplete = !!(profile.assistance && age !== undefined);
   return {
     ...existing,
     name: profile.playerName?.trim() || existing.name,
     emoji: getAvatarEmojiById(profile.selectedAvatarId),
     age,
-    skill: profile.skill ?? undefined,
+    assistance: profile.assistance ?? undefined,
     hcpComplete,
     isReady: hcpComplete,
     type: 'registered',
@@ -99,10 +99,10 @@ function mergeProfileIntoHost(existing: LobbyPlayer, profile: ProfileData): Lobb
 }
 
 const SEED_PLAYERS: LobbyPlayer[] = [
-  { id: '1', name: 'Alex K.',   emoji: '🦊', isReady: true,  type: 'registered', hcpComplete: true,  age: 32, skill: 'intermediate', isHost: true, approved: true,  spotifyConnected: true  },
-  { id: '2', name: 'Sam L.',    emoji: '🎸', isReady: true,  type: 'registered', hcpComplete: true,  age: 28, skill: 'expert',                    approved: false, spotifyConnected: true  },
-  { id: '3', name: 'Jordan M.', emoji: '🤖', isReady: true,  type: 'guest',      hcpComplete: true,  age: 35, skill: 'intermediate',              approved: false                          },
-  { id: '4', name: 'Casey P.',  emoji: '🐉', isReady: true,  type: 'registered', hcpComplete: true,  age: 41, skill: 'easy',                      approved: false, spotifyConnected: false },
+  { id: '1', name: 'Alex K.',   emoji: '🦊', isReady: true,  type: 'registered', hcpComplete: true,  age: 32, assistance: 'standard', isHost: true, approved: true,  spotifyConnected: true  },
+  { id: '2', name: 'Sam L.',    emoji: '🎸', isReady: true,  type: 'registered', hcpComplete: true,  age: 28, assistance: 'minimal',                approved: false, spotifyConnected: true  },
+  { id: '3', name: 'Jordan M.', emoji: '🤖', isReady: true,  type: 'guest',      hcpComplete: true,  age: 35, assistance: 'standard',               approved: false                          },
+  { id: '4', name: 'Casey P.',  emoji: '🐉', isReady: true,  type: 'registered', hcpComplete: true,  age: 41, assistance: 'full',                   approved: false, spotifyConnected: false },
 ];
 
 const REGIONS = ['Sweden', 'Nordics', 'Europe', 'Global'] as const;
@@ -412,21 +412,21 @@ const regionSheet = StyleSheet.create({
 
 // ─── Add Player Modal ─────────────────────────────────────────────────────────
 
-type AddPlayerSkill = 'easy' | 'intermediate' | 'expert';
-const ADD_PLAYER_SKILL_OPTIONS: { id: AddPlayerSkill; label: string }[] = [
-  { id: 'easy',         label: 'Easy' },
-  { id: 'intermediate', label: 'Intermediate' },
-  { id: 'expert',       label: 'Advanced' },
+type AddPlayerAssistance = 'minimal' | 'standard' | 'full';
+const ADD_PLAYER_ASSISTANCE_OPTIONS: { id: AddPlayerAssistance; label: string }[] = [
+  { id: 'full',     label: 'Full' },
+  { id: 'standard', label: 'Standard' },
+  { id: 'minimal',  label: 'Minimal' },
 ];
 
 function AddPlayerModal({ visible, onClose, onAdd }: {
   visible: boolean;
   onClose: () => void;
-  onAdd: (name: string, age: number, skill: AddPlayerSkill) => void;
+  onAdd: (name: string, age: number, assistance: AddPlayerAssistance) => void;
 }) {
   const [name, setName] = useState('');
   const [birthYear, setBirthYear] = useState<number | null>(null);
-  const [skill, setSkill] = useState<AddPlayerSkill | null>(null);
+  const [assistance, setAssistance] = useState<AddPlayerAssistance | null>(null);
   const [yearPickerOpen, setYearPickerOpen] = useState(false);
 
   // Återställ allt när modalen stängs (med liten delay för slide-animation)
@@ -435,19 +435,19 @@ function AddPlayerModal({ visible, onClose, onAdd }: {
       const t = setTimeout(() => {
         setName('');
         setBirthYear(null);
-        setSkill(null);
+        setAssistance(null);
         setYearPickerOpen(false);
       }, 250);
       return () => clearTimeout(t);
     }
   }, [visible]);
 
-  const isFormValid = !!name.trim() && birthYear !== null && skill !== null;
+  const isFormValid = !!name.trim() && birthYear !== null && assistance !== null;
 
   const handleAdd = () => {
-    if (!isFormValid || birthYear === null || skill === null) return;
+    if (!isFormValid || birthYear === null || assistance === null) return;
     const age = CURRENT_YEAR - birthYear;
-    onAdd(name.trim(), age, skill);
+    onAdd(name.trim(), age, assistance);
     onClose();
   };
 
@@ -498,17 +498,17 @@ function AddPlayerModal({ visible, onClose, onAdd }: {
             </TouchableOpacity>
           </View>
 
-          {/* Skill Level */}
+          {/* Assistance Level */}
           <View style={modal.fieldGroup}>
-            <Text style={modal.fieldLabel}>Skill Level</Text>
+            <Text style={modal.fieldLabel}>Assistance Level</Text>
             <View style={modal.skillRow}>
-              {ADD_PLAYER_SKILL_OPTIONS.map((opt) => (
+              {ADD_PLAYER_ASSISTANCE_OPTIONS.map((opt) => (
                 <TouchableOpacity
                   key={opt.id}
-                  style={[modal.skillBtn, skill === opt.id && modal.skillBtnActive]}
-                  onPress={() => setSkill(opt.id)}
+                  style={[modal.skillBtn, assistance === opt.id && modal.skillBtnActive]}
+                  onPress={() => setAssistance(opt.id)}
                 >
-                  <Text style={[modal.skillBtnText, skill === opt.id && modal.skillBtnTextActive]}>
+                  <Text style={[modal.skillBtnText, assistance === opt.id && modal.skillBtnTextActive]}>
                     {opt.label}
                   </Text>
                 </TouchableOpacity>
@@ -702,14 +702,14 @@ export default function LobbyScreen() {
     asGuest,
     guestName,
     guestBirthYear,
-    guestSkill,
+    guestAssistance,
   } = useLocalSearchParams<{
     code: string;
     isHost: string;
     asGuest?: string;
     guestName?: string;
     guestBirthYear?: string;
-    guestSkill?: string;
+    guestAssistance?: string;
   }>();
   // Om ingen kod skickas (t.ex. om man öppnar lobby-tabben direkt) genereras en.
   // useMemo ser till att koden är stabil över re-renders.
@@ -764,9 +764,9 @@ export default function LobbyScreen() {
       if (guestMode && guestName) {
         const currentYear = new Date().getFullYear();
         const age = guestBirthYear ? currentYear - parseInt(guestBirthYear, 10) : undefined;
-        const skill = (guestSkill === 'easy' || guestSkill === 'intermediate' || guestSkill === 'expert')
-          ? guestSkill
-          : 'intermediate';
+        const assistance = (guestAssistance === 'minimal' || guestAssistance === 'standard' || guestAssistance === 'full')
+          ? guestAssistance
+          : 'standard';
         const guestPlayerId = `guest-${Date.now()}`;
         ownPlayerIdRef.current = guestPlayerId;
         const guestPlayer: LobbyPlayer = {
@@ -776,7 +776,7 @@ export default function LobbyScreen() {
           isReady: true,
           type: 'guest',
           age,
-          skill,
+          assistance,
           hcpComplete: true,
           // Explicit false så de hamnar i "To be Approved by Host"-listan
           // direkt vid join, istället för att vänta på att host bjuder in.
@@ -801,8 +801,8 @@ export default function LobbyScreen() {
         const profile = await loadProfile();
         const currentYear = new Date().getFullYear();
         const age = profile?.birthYear ? currentYear - profile.birthYear : undefined;
-        const skill = profile?.skill ?? undefined;
-        const hcpComplete = !!(skill && age !== undefined);
+        const assistance = profile?.assistance ?? undefined;
+        const hcpComplete = !!(assistance && age !== undefined);
         const joinerId = `joiner-${Date.now()}`;
         ownPlayerIdRef.current = joinerId;
         const joiner: LobbyPlayer = {
@@ -812,7 +812,7 @@ export default function LobbyScreen() {
           isReady: hcpComplete,
           type: profile ? 'registered' : 'guest',
           age,
-          skill,
+          assistance,
           hcpComplete,
           spotifyConnected: profile?.spotifyConnected ?? false,
           approved: false,
@@ -833,11 +833,11 @@ export default function LobbyScreen() {
       if (seedHost) ownPlayerIdRef.current = seedHost.id;
     });
     return () => { cancelled = true; };
-  }, [code, guestMode, guestName, guestBirthYear, guestSkill, hostMode]);
+  }, [code, guestMode, guestName, guestBirthYear, guestAssistance, hostMode]);
 
   // Varje gång Lobby får fokus (t.ex. man kommer tillbaka från Profile-tabben):
   // ladda sparad profil och uppdatera host-spelarkortet med profilens värden.
-  // Detta gör att ändringar i Profile (playerName, ålder, skill, avatar) slår
+  // Detta gör att ändringar i Profile (playerName, ålder, assistance, avatar) slår
   // igenom direkt på host-kortet i Lobby.
   // Samtidigt: ladda leftPlayers för rumkoden och markera matchande spelar-
   // kort med hasLeft=true så PlayerRow renderar dem som "LEFT THIS GAME LOBBY".
@@ -881,7 +881,7 @@ export default function LobbyScreen() {
             isReady: false,
             type: s.type ?? 'guest',
             age: s.age,
-            skill: s.skill,
+            assistance: s.assistance,
             hcpComplete: s.hcpComplete ?? false,
             approved: s.approved,
             hasLeft: true,
@@ -1069,7 +1069,7 @@ export default function LobbyScreen() {
   };
   const { from: clampedFrom, to: clampedTo, warning: eraWarning } = clampEraToPlayer(eraValues[0], eraValues[1], players);
 
-  const handleAddPlayer = (name: string, age: number, skill: AddPlayerSkill) => {
+  const handleAddPlayer = (name: string, age: number, assistance: AddPlayerAssistance) => {
     setPlayers((prev) => [
       ...prev,
       {
@@ -1079,7 +1079,7 @@ export default function LobbyScreen() {
         isReady: true,
         type: 'guest',
         age,
-        skill,
+        assistance,
         hcpComplete: true,
         addedByHost: true,
       },
@@ -1142,7 +1142,7 @@ export default function LobbyScreen() {
                 avatarUri: ownPlayer.avatarUri,
                 type: ownPlayer.type,
                 age: ownPlayer.age,
-                skill: ownPlayer.skill,
+                assistance: ownPlayer.assistance,
                 hcpComplete: ownPlayer.hcpComplete,
                 approved: ownPlayer.approved,
               });
@@ -1279,7 +1279,7 @@ export default function LobbyScreen() {
     router.push({
       pathname: '/quiz',
       params: {
-        skill: 'intermediate',
+        assistance: 'standard',
         age: '32',
         gameMode,
         players: JSON.stringify(turnOrder),
@@ -1798,7 +1798,7 @@ export default function LobbyScreen() {
                 canMoveDown={hostMode && index < approvedPlayers.length - 1}
                 hcpComplete={player.hcpComplete}
                 age={player.age}
-                skill={player.skill}
+                assistance={player.assistance}
                 isHostPlayer={player.isHost}
                 isGuest={player.type === 'guest'}
                 turnNumber={gameMode === 'pass-the-phone' ? index + 1 : undefined}
@@ -1843,7 +1843,7 @@ export default function LobbyScreen() {
                     index={players.indexOf(player)}
                     hcpComplete={player.hcpComplete}
                     age={player.age}
-                    skill={player.skill}
+                    assistance={player.assistance}
                     isHostPlayer={false}
                     isGuest={player.type === 'guest'}
                     showApproveToggle={hostMode && !player.hasLeft}

@@ -1,7 +1,7 @@
 // Genererar src/utils/nameQuizDemo.ts med några förgenererade testfrågor
 // (Letter Grid + Final Selection per prefix-knapp + Wikipedia-bild-URL).
 //
-// Spelar-profil för demon: född 1990 (Millennials), intermediate skill.
+// Spelar-profil för demon: född 1990 (Millennials), standard assistance.
 //
 // Kör: npm run export-demo
 
@@ -10,7 +10,7 @@ import * as path from 'path';
 import sharp from 'sharp';
 import { loadCatalog, findItemsById } from '../content/registry';
 import { Category, ContentItem } from '../content/schema';
-import { getLetterGridConfig, SkillLevel } from '../content/generation';
+import { getLetterGridConfig, AssistanceLevel } from '../content/generation';
 import {
   buildLetterGrid,
   buildNameOptions,
@@ -30,7 +30,7 @@ const UPSCALE_WIDTH = 640;
 
 const EXAMPLE_PROFILE = {
   birthYear: 1990,
-  skill: 'intermediate' as SkillLevel,
+  assistance: 'standard' as AssistanceLevel,
   generation: 'millennials' as const,
 };
 
@@ -94,7 +94,7 @@ async function buildQuestion(
   const catalog = loadCatalog();
   const config = getLetterGridConfig({
     playerBirthYear: EXAMPLE_PROFILE.birthYear,
-    playerSkill: EXAMPLE_PROFILE.skill,
+    playerAssistance: EXAMPLE_PROFILE.assistance,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     itemAudience: fileAudience as any,
   });
@@ -173,7 +173,7 @@ async function buildQuestion(
 
 function renderTsModule(questions: DemoQuestion[]): string {
   return `// Auto-generated demo data. Regenerate with: cd backend && npm run export-demo
-// Player profile used: born ${EXAMPLE_PROFILE.birthYear} (${EXAMPLE_PROFILE.generation}), ${EXAMPLE_PROFILE.skill} skill.
+// Player profile used: born ${EXAMPLE_PROFILE.birthYear} (${EXAMPLE_PROFILE.generation}), ${EXAMPLE_PROFILE.assistance} assistance.
 
 export interface DemoAttribution {
   source: 'wikimedia';

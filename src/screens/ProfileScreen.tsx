@@ -33,9 +33,9 @@ import {
     clearProfile,
     loadProfile,
     saveProfile,
+    type AssistanceLevel,
     type AvatarSource,
     type Region,
-    type Skill,
 } from '../utils/profileStorage';
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
@@ -60,11 +60,12 @@ const SOURCE_OPTIONS: { id: AvatarSource; icon: string; label: string; subtitle:
 ];
 
 // ─── Competition defaults ─────────────────────────────────────────────────────
-// NOTE: skill-id matchar quiz.tsx ('expert') men visas som "Advanced" i UI
-const SKILL_OPTIONS: { id: Skill; label: string }[] = [
-  { id: 'easy',         label: 'Easy'         },
-  { id: 'intermediate', label: 'Intermediate' },
-  { id: 'expert',       label: 'Advanced'     },
+// Assistance level styr mängden hjälp i Letter Grid + reveal-kurvor:
+// full = mest hjälp (3-letter prefix), minimal = minst (1-letter prefix).
+const ASSISTANCE_OPTIONS: { id: AssistanceLevel; label: string }[] = [
+  { id: 'full',     label: 'Full'     },
+  { id: 'standard', label: 'Standard' },
+  { id: 'minimal',  label: 'Minimal'  },
 ];
 
 const REGION_OPTIONS: { id: Region; label: string }[] = [
@@ -124,7 +125,7 @@ export default function ProfileScreen() {
   const [playerName, setPlayerName]           = useState('Player One');
   const [email, setEmail]                     = useState<string>('');
   const [birthYear, setBirthYear]         = useState<number | null>(null);
-  const [skill, setSkill]                 = useState<Skill | null>(null);
+  const [assistance, setAssistance]       = useState<AssistanceLevel | null>(null);
   const [region, setRegion]               = useState<Region | null>(null);
   const [gameCredits, setGameCredits]     = useState<number>(0);
   const [freeGameCredits, setFreeGameCredits] = useState<number>(0);
@@ -136,7 +137,7 @@ export default function ProfileScreen() {
   const [answerResponseSeconds, setAnswerResponseSeconds] = useState<AnswerResponse>(30);
   const [eraValues, setEraValues] = useState<[number, number]>([1980, 2010]);
   const [yearPickerOpen, setYearPickerOpen]     = useState(false);
-  const [skillPickerOpen, setSkillPickerOpen]   = useState(false);
+  const [assistancePickerOpen, setAssistancePickerOpen]   = useState(false);
   const [regionPickerOpen, setRegionPickerOpen] = useState(false);
   const [answerResponsePickerOpen, setAnswerResponsePickerOpen] = useState(false);
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
@@ -161,7 +162,7 @@ export default function ProfileScreen() {
         setPlayerName(data.playerName);
         setEmail(data.email ?? '');
         setBirthYear(data.birthYear);
-        setSkill(data.skill);
+        setAssistance(data.assistance);
         setRegion(data.region);
         setSource(data.avatarSource);
         setSelectedId(data.selectedAvatarId);
@@ -193,7 +194,7 @@ export default function ProfileScreen() {
 
   const selectedAvatar = AVATARS.find((a) => a.id === selectedAvatarId);
   const age = birthYear !== null ? CURRENT_YEAR - birthYear : null;
-  const skillLabel  = SKILL_OPTIONS.find((s) => s.id === skill)?.label;
+  const assistanceLabel  = ASSISTANCE_OPTIONS.find((s) => s.id === assistance)?.label;
   const regionLabel = REGION_OPTIONS.find((r) => r.id === region)?.label;
   const answerResponseLabel = ANSWER_RESPONSE_OPTIONS.find(
     (o) => o.id === answerResponseSeconds,
@@ -204,7 +205,7 @@ export default function ProfileScreen() {
       await saveProfile({
         playerName,
         birthYear,
-        skill,
+        assistance,
         region,
         avatarSource: source,
         selectedAvatarId,
@@ -238,7 +239,7 @@ export default function ProfileScreen() {
       const next = {
         playerName: data?.playerName ?? playerName,
         birthYear: data?.birthYear ?? birthYear,
-        skill: data?.skill ?? skill,
+        assistance: data?.assistance ?? assistance,
         region: data?.region ?? region,
         avatarSource: data?.avatarSource ?? source,
         selectedAvatarId: data?.selectedAvatarId ?? selectedAvatarId,
@@ -465,11 +466,11 @@ export default function ProfileScreen() {
               </Text>
             </View>
 
-            {/* Skill level */}
+            {/* Assistance level */}
             <View style={styles.field}>
-              <Text style={styles.fieldLabel}>Skill level</Text>
+              <Text style={styles.fieldLabel}>Assistance level</Text>
               <Pressable
-                onPress={() => setSkillPickerOpen(true)}
+                onPress={() => setAssistancePickerOpen(true)}
                 style={({ pressed }) => [
                   styles.selector,
                   pressed && styles.selectorPressed,
@@ -478,10 +479,10 @@ export default function ProfileScreen() {
                 <Text
                   style={[
                     styles.selectorText,
-                    skill === null && styles.selectorPlaceholder,
+                    assistance === null && styles.selectorPlaceholder,
                   ]}
                 >
-                  {skillLabel ?? 'Select'}
+                  {assistanceLabel ?? 'Select'}
                 </Text>
                 <Text style={styles.selectorChevron}>›</Text>
               </Pressable>
@@ -493,7 +494,7 @@ export default function ProfileScreen() {
           {/* ── Region scope (full kort-bredd, eget block) ───────
               Sub-rubrik centrerad över hela kort-bredden så det blir
               tydlig visuell separering mellan player-defaults (Year of
-              birth + Skill level i kolumnen ovan) och host-specifika
+              birth + Assistance level i kolumnen ovan) och host-specifika
               defaults (Region scope). */}
           <Text style={styles.setupHeaderFullWidth}>
             Host default settings
@@ -900,22 +901,22 @@ export default function ProfileScreen() {
         </Pressable>
       </Modal>
 
-      {/* ── Skill picker modal ───────────────────────────────────── */}
+      {/* ── Assistance picker modal ──────────────────────────────── */}
       <Modal
-        visible={skillPickerOpen}
+        visible={assistancePickerOpen}
         animationType="fade"
         transparent
-        onRequestClose={() => setSkillPickerOpen(false)}
+        onRequestClose={() => setAssistancePickerOpen(false)}
       >
         <Pressable
           style={styles.pickerBackdrop}
-          onPress={() => setSkillPickerOpen(false)}
+          onPress={() => setAssistancePickerOpen(false)}
         >
           <Pressable style={styles.pickerCardShort} onPress={() => {}}>
             <View style={styles.pickerHeader}>
-              <Text style={styles.pickerTitle}>Skill level</Text>
+              <Text style={styles.pickerTitle}>Assistance level</Text>
               <Pressable
-                onPress={() => setSkillPickerOpen(false)}
+                onPress={() => setAssistancePickerOpen(false)}
                 style={({ pressed }) => [
                   styles.modalClose,
                   pressed && { opacity: 0.6 },
@@ -925,14 +926,14 @@ export default function ProfileScreen() {
                 <Text style={styles.modalCloseText}>✕</Text>
               </Pressable>
             </View>
-            {SKILL_OPTIONS.map((opt) => {
-              const isSelected = skill === opt.id;
+            {ASSISTANCE_OPTIONS.map((opt) => {
+              const isSelected = assistance === opt.id;
               return (
                 <Pressable
                   key={opt.id}
                   onPress={() => {
-                    setSkill(opt.id);
-                    setSkillPickerOpen(false);
+                    setAssistance(opt.id);
+                    setAssistancePickerOpen(false);
                   }}
                   style={({ pressed }) => [
                     styles.optionRow,
@@ -1771,7 +1772,7 @@ const styles = StyleSheet.create({
   // Competition Age — inline-rad: label vänster, värde direkt till
   // höger om labeln (liten gap istället för space-between så siffran
   // sitter nära texten). Höjden matchar standard-fält så vertikalt
-  // avstånd till Year of birth/Skill level blir lika via rightColumn:s gap.
+  // avstånd till Year of birth/Assistance level blir lika via rightColumn:s gap.
   ageRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -1850,7 +1851,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.sm + 2,
   },
 
-  // Option-rows in skill/region pickers
+  // Option-rows in assistance/region pickers
   optionRow: {
     flexDirection: 'row',
     alignItems: 'center',

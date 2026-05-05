@@ -46,7 +46,7 @@ npm test
 npm run demo
 ```
 
-Kör en exempel-fråga (Avicii som rätt svar för Millennials, intermediate skill) och skriver ut Letter Grid + Final Selection i konsolen.
+Kör en exempel-fråga (Avicii som rätt svar för Millennials, standard assistance) och skriver ut Letter Grid + Final Selection i konsolen.
 
 ## Hur lägger jag till en ny item?
 
@@ -118,14 +118,14 @@ som används baserat på fråge-design och spelares preferenser.
 
 - **`birthYearToGeneration(year)`** — mappar födelseår → generation.
 - **`generationDistance(player, audience)`** — minsta antal generationer mellan spelare och motiv. `'all'` i audience returnerar alltid 0.
-- **`getLetterGridConfig({ playerBirthYear, playerSkill, itemAudience })`** — avgör om Steg 1 visar hela namn eller prefix-bokstäver. Returnerar `{ mode: 'full-names' }` eller `{ mode: 'prefix', length: N }`.
+- **`getLetterGridConfig({ playerBirthYear, playerAssistance, itemAudience })`** — avgör om Steg 1 visar hela namn eller prefix-bokstäver. Returnerar `{ mode: 'full-names' }` eller `{ mode: 'prefix', length: N }`.
 
 **Reglerna som funktionen encodar**:
 
 1. Spelare född **2016+** → alltid hela namn (yngsta Gen Alpha kan inte hantera prefix).
 2. Spelare född **2013-2015** → prefix om generations-avstånd ≤ 1, annars hela namn.
 3. **Övriga** → prefix om generations-avstånd ≤ 2, annars hela namn. Millennials har max-avstånd 2 till alla generationer, så får alltid prefix.
-4. När prefix används styrs längden av skill level: easy = 3 bokstäver, intermediate = 2, expert (Advanced) = 1.
+4. När prefix används styrs längden av assistance level: full = 3 bokstäver (mest hjälp), standard = 2, minimal = 1 (minst hjälp).
 
 Helpers är pure functions utan beroenden — kan importeras direkt av spel-API:t eller kopieras till klienten.
 

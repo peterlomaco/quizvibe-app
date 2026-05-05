@@ -31,7 +31,7 @@ import {
 } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 
-type SkillLevel = 'easy' | 'intermediate' | 'expert';
+type AssistanceLevel = 'minimal' | 'standard' | 'full';
 
 interface TimelineQuestion {
   type: 'timeline';
@@ -52,10 +52,10 @@ const SEED_QUESTIONS: TimelineQuestion[] = [
   { type: 'timeline', id: '5', questionNumber: 5, totalQuestions: 5, category: 'Music', question: 'When was "Shape of You" by Ed Sheeran released?', correctYear: 2017, hint: 'Recent era' },
 ];
 
-function getIntervalForSkill(skill: SkillLevel): number {
-  if (skill === 'expert') return 0;
-  if (skill === 'intermediate') return 3;
-  return 5; // easy
+function getIntervalForAssistance(assistance: AssistanceLevel): number {
+  if (assistance === 'minimal') return 0;
+  if (assistance === 'standard') return 3;
+  return 5; // full
 }
 
 function getYearRange(correctYear: number): { min: number; max: number } {
@@ -78,8 +78,8 @@ function calculatePoints(timeLeft: number, correct: boolean): number {
 // ─── Mått ─────────────────────────────────────────────────────────────────────
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
-// ITEM_WIDTH (avstånd mellan ticks) sätts dynamiskt per skill-nivå inuti komponenten:
-// Easy: tät (≥10 år synliga), Intermediate: medium (≥8), Expert: gles (4–5 syns)
+// ITEM_WIDTH (avstånd mellan ticks) sätts dynamiskt per assistance-nivå inuti komponenten:
+// Full: tät (≥10 år synliga), Standard: medium (≥8), Minimal: gles (4–5 syns)
 
 // Tidslinjen – alla mått relativa till container-toppen
 const CONTAINER_HEIGHT = 108;
@@ -94,26 +94,26 @@ const SELECTOR_TOP = 34;      // 10px under tick-toppen
 const SELECTOR_BOTTOM = 76;   // 10px över tick-botten
 const SELECTOR_H = SELECTOR_BOTTOM - SELECTOR_TOP; // = 42px
 
-// Energisk färg för svarsrutan (används oavsett skill-nivå)
+// Energisk färg för svarsrutan (används oavsett assistance-nivå)
 const BOX_COLOR = '#F5A623';       // gyllene
 const BOX_BG = 'rgba(26,48,80,0.92)'; // mörkare navy – tydligt distinkt mot bakgrund #0B1220
 
 // ─── Timeline Selector ────────────────────────────────────────────────────────
 
 function TimelineSelector({
-  skill, correctYear, birthYear, onYearChange, disabled,
+  assistance, correctYear, birthYear, onYearChange, disabled,
 }: {
-  skill: SkillLevel; correctYear: number; birthYear: number;
+  assistance: AssistanceLevel; correctYear: number; birthYear: number;
   // Notifierar parent om vald-år-ändring vid varje scroll-tick. Confirm-knappen
   // lyfts ut till quiz.tsx så samma knapp-yta kan byta label/handler beroende
   // på fas (Confirm under question / Next Round under reveal).
   onYearChange: (year: number) => void; disabled: boolean;
 }) {
-  // Dynamisk celltätlhet per skill-nivå (smalare celler = fler år syns på skärmen)
+  // Dynamisk celltätlhet per assistance-nivå (smalare celler = fler år syns på skärmen)
   const ITEM_WIDTH =
-    skill === 'expert' ? 75 :
-    skill === 'intermediate' ? 40 :
-    32; // easy
+    assistance === 'minimal' ? 75 :
+    assistance === 'standard' ? 40 :
+    32; // full
 
   // Padding runt scroll-innehållet så min/max-ticks kan scrollas till tidslinjens mitt.
   // Tidslinjen är inuti wrapper-containern som har Spacing.lg padding på varje sida,
@@ -121,7 +121,7 @@ function TimelineSelector({
   const TIMELINE_WIDTH = SCREEN_WIDTH - Spacing.lg * 2;
   const SCROLL_PADDING = Math.max(40, TIMELINE_WIDTH / 2 - ITEM_WIDTH / 2);
 
-  const interval = getIntervalForSkill(skill);
+  const interval = getIntervalForAssistance(assistance);
   const { min, max } = getYearRange(correctYear);
   const middleYear = Math.round((min + max) / 2);
   const [selectedYear, setSelectedYear] = useState(middleYear);
@@ -138,11 +138,11 @@ function TimelineSelector({
   const rangeStart = interval === 0 ? selectedYear : Math.max(min, selectedYear - half);
   const rangeEnd = interval === 0 ? selectedYear : Math.min(max, selectedYear + half);
 
-  const skillColor = {
-    easy: Colors.success,
-    intermediate: Colors.primary,
-    expert: '#F5A623',
-  }[skill];
+  const assistanceColor = {
+    full: Colors.success,
+    standard: Colors.primary,
+    minimal: '#F5A623',
+  }[assistance];
 
   // Svarsrutan täcker HELA cellen för varje år i intervallet – så att både ticks OCH
   // årtalsetiketten under tidslinjen ligger inom rutan.
@@ -170,16 +170,16 @@ function TimelineSelector({
 
       {/* Assist label */}
       <View style={tl.assistRow}>
-        <View style={[tl.assistLine, { backgroundColor: skillColor + '50' }]} />
-        <View style={[tl.assistBadge, { backgroundColor: skillColor + '20', borderColor: skillColor + '50' }]}>
-          <Text style={[tl.assistText, { color: skillColor }]}>
-            {skill.toUpperCase()} ASSIST
+        <View style={[tl.assistLine, { backgroundColor: assistanceColor + '50' }]} />
+        <View style={[tl.assistBadge, { backgroundColor: assistanceColor + '20', borderColor: assistanceColor + '50' }]}>
+          <Text style={[tl.assistText, { color: assistanceColor }]}>
+            {assistance.toUpperCase()} ASSIST
           </Text>
         </View>
-        <Text style={[tl.assistDesc, { color: skillColor + 'bb' }]}>
+        <Text style={[tl.assistDesc, { color: assistanceColor + 'bb' }]}>
           {interval === 0 ? 'Pick the exact year' : `Select a ${interval}-year interval`}
         </Text>
-        <View style={[tl.assistLine, { backgroundColor: skillColor + '50' }]} />
+        <View style={[tl.assistLine, { backgroundColor: assistanceColor + '50' }]} />
       </View>
 
       {/* Timeline container */}
@@ -218,7 +218,7 @@ function TimelineSelector({
             const isInRange = interval > 0 && year >= rangeStart && year <= rangeEnd;
             const isSelected = year === selectedYear;
             const tickColor = isInRange || isSelected
-              ? skillColor
+              ? assistanceColor
               : Colors.primary + '44';
 
             return (
@@ -246,7 +246,7 @@ function TimelineSelector({
                   top: YEAR_TEXT_Y,
                   fontSize: 10,
                   color: isInRange || isSelected
-                    ? skillColor
+                    ? assistanceColor
                     : Colors.textSecondary + '88',
                   fontWeight: isInRange || isSelected ? '600' : '400',
                   textAlign: 'center',
@@ -322,14 +322,14 @@ type TurnOrderPlayer = { id: string; name: string; emoji?: string; avatarUri?: s
 
 export default function QuizScreen() {
   const params = useLocalSearchParams<{
-    skill?: string;
+    assistance?: string;
     age?: string;
     gameMode?: 'pass-the-phone' | 'individual-devices';
     players?: string;
     roundsCount?: string;
     roomCode?: string;
   }>();
-  const skill = (params.skill ?? 'intermediate') as SkillLevel;
+  const assistance = (params.assistance ?? 'standard') as AssistanceLevel;
   const age = parseInt(params.age ?? '30');
   const birthYear = new Date().getFullYear() - age;
   const gameMode = params.gameMode ?? 'pass-the-phone';
@@ -394,22 +394,22 @@ export default function QuizScreen() {
   // hit från Lobby:s "Start Game"-flöde). Region/land sätts av
   // analytics-vendor:n på dashboard-sidan, behöver inte skickas här.
   useEffect(() => {
-    track('game_started', { skill });
+    track('game_started', { assistance });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // "YOU"-spelare (hostar spelet; använder params.skill/age)
+  // "YOU"-spelare (hostar spelet; använder params.assistance/age)
   const youPlayer: LeaderboardPlayer = useMemo(
     () => ({
       id: 'you',
       name: 'You',
       emoji: '🎮',
-      skill,
+      assistance,
       age,
       isYou: true,
       isHost: true,
     }),
-    [skill, age],
+    [assistance, age],
   );
   const allPlayers: LeaderboardPlayer[] = useMemo(
     () => [youPlayer, ...MOCK_OPPONENTS],
@@ -432,10 +432,10 @@ export default function QuizScreen() {
   // kortet ("Answering: {namn}"). Skip:as för Individual Devices (varje
   // spelare är på sin egen enhet och vet redan vem de är).
   const currentPlayerName = turnOrder[currentPlayerIndex]?.name;
-  // Skill-färg används som accent på Confirm-knappen så den visuellt matchar
-  // TimelineSelector:s assist-badge för samma skill-nivå. Reveal-fasens
-  // Next Round-/Final Leaderboard-knapp använder Colors.primary istället.
-  const skillColor = skill === 'easy' ? Colors.success : skill === 'expert' ? '#F5A623' : Colors.primary;
+  // Assistance-färg används som accent på Confirm-knappen så den visuellt
+  // matchar TimelineSelector:s assist-badge för samma assistance-nivå.
+  // Reveal-fasens Next Round-/Final Leaderboard-knapp använder Colors.primary istället.
+  const assistanceColor = assistance === 'full' ? Colors.success : assistance === 'minimal' ? '#F5A623' : Colors.primary;
 
   const startTimer = useCallback(() => {
     setTimeLeft(30);
@@ -475,7 +475,7 @@ export default function QuizScreen() {
   // ── Mock-motspelare: generera poäng för denna runda ─────────────────────
   const simulateOpponentRound = (yourPoints: number, yourCorrect: boolean, yourTimeUsed: number) => {
     const opponentScores: RoundScore[] = MOCK_OPPONENTS.map((opp) => {
-      const gen = generateOpponentRoundScore(opp.skill);
+      const gen = generateOpponentRoundScore(opp.assistance);
       return {
         playerId: opp.id,
         points: gen.points,
@@ -542,7 +542,7 @@ export default function QuizScreen() {
 
   const handleConfirm = (year: number) => {
     clearInterval(timerRef.current);
-    const interval = getIntervalForSkill(skill);
+    const interval = getIntervalForAssistance(assistance);
     const correct = isCorrect(year, question.correctYear, interval);
     const pts = calculatePoints(timeLeft, correct);
     const timeUsed = 30 - timeLeft;
@@ -594,7 +594,7 @@ export default function QuizScreen() {
   // Spara det avslutade spelet till AsyncStorage (görs när final leaderboard visas).
   // Player history (i Fas 5) kan sedan hämta denna data.
   const saveFinalGame = async () => {
-    // TODO (Fas 6): beräkna riktig HCP-förändring från totalPoints + skill + ålder
+    // TODO (Fas 6): beräkna riktig HCP-förändring från totalPoints + assistance + ålder
     const hcpBefore = 99;
     const hcpDelta = Math.round(totalPoints / 500); // tillfällig: 1 HCP-poäng per 500 pts
     const hcpAfter = Math.max(1, hcpBefore - hcpDelta);
@@ -604,7 +604,7 @@ export default function QuizScreen() {
       date: new Date().toISOString(),
       totalPoints,
       rounds,
-      skill,
+      assistance,
       hcpBefore,
       hcpAfter,
     };
@@ -639,7 +639,7 @@ export default function QuizScreen() {
       setPlayerHcpChanges(changes);
       saveFinalGame();
       track('game_completed', {
-        skill,
+        assistance,
         total_points: totalPoints,
         rounds_played: rounds.length,
       });
@@ -657,7 +657,7 @@ export default function QuizScreen() {
         isReady: true,
         type: 'registered' as const,
         age: p.age,
-        skill: p.skill,
+        assistance: p.assistance,
         hcpComplete: true,
         isHost: p.isHost ?? false,
       }));
@@ -671,7 +671,7 @@ export default function QuizScreen() {
         isReady: true,
         type: 'registered',
         age,
-        skill,
+        assistance,
         hcpComplete: true,
         isHost: true,
       }];
@@ -870,7 +870,7 @@ export default function QuizScreen() {
                 så användaren ser sitt val låst. */}
             <TimelineSelector
               key={questionIndex}
-              skill={skill}
+              assistance={assistance}
               correctYear={question.correctYear}
               birthYear={birthYear}
               onYearChange={setPendingYear}
@@ -910,7 +910,7 @@ export default function QuizScreen() {
                 <TouchableOpacity
                   style={[
                     styles.actionBtn,
-                    { backgroundColor: skillColor },
+                    { backgroundColor: assistanceColor },
                     pendingYear === null && styles.actionBtnDisabled,
                   ]}
                   onPress={() => {

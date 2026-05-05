@@ -6,20 +6,20 @@ import { HCPShield } from './HCPShield';
 
 // ─── Types & labels ───────────────────────────────────────────────────────────
 
-type Skill  = 'easy' | 'intermediate' | 'expert';
+type AssistanceLevel = 'minimal' | 'standard' | 'full';
 type Region = 'sweden' | 'nordics' | 'global';
 
 interface GameResult {
   id: string;
   date: Date;
   score: number;
-  skill: Skill;
+  assistance: AssistanceLevel;
   region: Region;
   age: number;
   hcpAfter: number;
 }
 
-const SKILL_LABELS:  Record<Skill,  string> = { easy: 'Easy',   intermediate: 'Intermediate', expert: 'Advanced' };
+const ASSISTANCE_LABELS: Record<AssistanceLevel, string> = { full: 'Full', standard: 'Standard', minimal: 'Minimal' };
 const REGION_LABELS: Record<Region, string> = { sweden: 'Sweden', nordics: 'Nordics', global: 'Global' };
 
 // ─── Mock game history ────────────────────────────────────────────────────────
@@ -27,22 +27,22 @@ const REGION_LABELS: Record<Region, string> = { sweden: 'Sweden', nordics: 'Nord
 // AsyncStorage eller backend. Just nu visas scaffolding för UI:et.
 
 const MOCK_GAMES: GameResult[] = [
-  { id: 'g01', date: new Date(2026, 1, 25), score: 1120, skill: 'easy',         region: 'sweden',  age: 45, hcpAfter: 96 },
-  { id: 'g02', date: new Date(2026, 2, 1),  score: 1380, skill: 'easy',         region: 'sweden',  age: 45, hcpAfter: 93 },
-  { id: 'g03', date: new Date(2026, 2, 4),  score: 1540, skill: 'intermediate', region: 'sweden',  age: 45, hcpAfter: 91 },
-  { id: 'g04', date: new Date(2026, 2, 8),  score: 1810, skill: 'intermediate', region: 'nordics', age: 45, hcpAfter: 88 },
-  { id: 'g05', date: new Date(2026, 2, 10), score: 720,  skill: 'intermediate', region: 'sweden',  age: 45, hcpAfter: 90 },
-  { id: 'g06', date: new Date(2026, 2, 14), score: 2010, skill: 'intermediate', region: 'sweden',  age: 45, hcpAfter: 86 },
-  { id: 'g07', date: new Date(2026, 2, 18), score: 1950, skill: 'intermediate', region: 'sweden',  age: 45, hcpAfter: 83 },
-  { id: 'g08', date: new Date(2026, 2, 22), score: 2180, skill: 'intermediate', region: 'nordics', age: 45, hcpAfter: 80 },
-  { id: 'g09', date: new Date(2026, 2, 26), score: 2340, skill: 'intermediate', region: 'sweden',  age: 45, hcpAfter: 75 },
-  { id: 'g10', date: new Date(2026, 2, 30), score: 2090, skill: 'intermediate', region: 'sweden',  age: 45, hcpAfter: 71 },
-  { id: 'g11', date: new Date(2026, 3, 3),  score: 2450, skill: 'intermediate', region: 'sweden',  age: 45, hcpAfter: 68 },
-  { id: 'g12', date: new Date(2026, 3, 7),  score: 2620, skill: 'expert',       region: 'global',  age: 45, hcpAfter: 67 },
-  { id: 'g13', date: new Date(2026, 3, 10), score: 1480, skill: 'expert',       region: 'sweden',  age: 45, hcpAfter: 69 },
-  { id: 'g14', date: new Date(2026, 3, 14), score: 2780, skill: 'intermediate', region: 'sweden',  age: 45, hcpAfter: 62 },
-  { id: 'g15', date: new Date(2026, 3, 18), score: 2510, skill: 'expert',       region: 'nordics', age: 45, hcpAfter: 58 },
-  { id: 'g16', date: new Date(2026, 3, 22), score: 2690, skill: 'expert',       region: 'sweden',  age: 45, hcpAfter: 54 },
+  { id: 'g01', date: new Date(2026, 1, 25), score: 1120, assistance: 'full',     region: 'sweden',  age: 45, hcpAfter: 96 },
+  { id: 'g02', date: new Date(2026, 2, 1),  score: 1380, assistance: 'full',     region: 'sweden',  age: 45, hcpAfter: 93 },
+  { id: 'g03', date: new Date(2026, 2, 4),  score: 1540, assistance: 'standard', region: 'sweden',  age: 45, hcpAfter: 91 },
+  { id: 'g04', date: new Date(2026, 2, 8),  score: 1810, assistance: 'standard', region: 'nordics', age: 45, hcpAfter: 88 },
+  { id: 'g05', date: new Date(2026, 2, 10), score: 720,  assistance: 'standard', region: 'sweden',  age: 45, hcpAfter: 90 },
+  { id: 'g06', date: new Date(2026, 2, 14), score: 2010, assistance: 'standard', region: 'sweden',  age: 45, hcpAfter: 86 },
+  { id: 'g07', date: new Date(2026, 2, 18), score: 1950, assistance: 'standard', region: 'sweden',  age: 45, hcpAfter: 83 },
+  { id: 'g08', date: new Date(2026, 2, 22), score: 2180, assistance: 'standard', region: 'nordics', age: 45, hcpAfter: 80 },
+  { id: 'g09', date: new Date(2026, 2, 26), score: 2340, assistance: 'standard', region: 'sweden',  age: 45, hcpAfter: 75 },
+  { id: 'g10', date: new Date(2026, 2, 30), score: 2090, assistance: 'standard', region: 'sweden',  age: 45, hcpAfter: 71 },
+  { id: 'g11', date: new Date(2026, 3, 3),  score: 2450, assistance: 'standard', region: 'sweden',  age: 45, hcpAfter: 68 },
+  { id: 'g12', date: new Date(2026, 3, 7),  score: 2620, assistance: 'minimal',  region: 'global',  age: 45, hcpAfter: 67 },
+  { id: 'g13', date: new Date(2026, 3, 10), score: 1480, assistance: 'minimal',  region: 'sweden',  age: 45, hcpAfter: 69 },
+  { id: 'g14', date: new Date(2026, 3, 14), score: 2780, assistance: 'standard', region: 'sweden',  age: 45, hcpAfter: 62 },
+  { id: 'g15', date: new Date(2026, 3, 18), score: 2510, assistance: 'minimal',  region: 'nordics', age: 45, hcpAfter: 58 },
+  { id: 'g16', date: new Date(2026, 3, 22), score: 2690, assistance: 'minimal',  region: 'sweden',  age: 45, hcpAfter: 54 },
 ];
 
 // Placering (mock)
@@ -285,7 +285,7 @@ function GameRow({ game, rank }: { game: GameResult; rank?: number }) {
           <Text style={styles.gameDate}>{formatDate(game.date)}</Text>
         </View>
         <Text style={styles.gameMeta}>
-          {SKILL_LABELS[game.skill]} · {REGION_LABELS[game.region]} · Age {game.age}
+          {ASSISTANCE_LABELS[game.assistance]} · {REGION_LABELS[game.region]} · Age {game.age}
         </Text>
       </View>
     </View>

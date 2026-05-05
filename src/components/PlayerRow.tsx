@@ -1,7 +1,7 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
-import { calculateInitialHCP, getHCPColor, SkillLevel } from '../utils/hcp';
+import { calculateInitialHCP, getHCPColor, AssistanceLevel } from '../utils/hcp';
 import { ApproveToggle } from './ApproveToggle';
 import { Avatar } from './Avatar';
 
@@ -22,7 +22,7 @@ interface PlayerRowProps {
   canMoveDown?: boolean;
   hcpComplete?: boolean;
   age?: number;
-  skill?: SkillLevel;
+  assistance?: AssistanceLevel;
   isHostPlayer?: boolean;
   // När spelaren är gäst: visa "Guest HCP"-badge istället för räknad HCP.
   // Hur Guest HCP faktiskt räknas är inte definierat ännu.
@@ -51,7 +51,7 @@ export function PlayerRow({
   canMoveDown,
   hcpComplete,
   age,
-  skill,
+  assistance,
   isHostPlayer,
   isGuest,
   turnNumber,
@@ -60,11 +60,11 @@ export function PlayerRow({
   onApproveChange,
   hasLeft,
 }: PlayerRowProps) {
-  const hcp = hcpComplete && age && skill
-    ? calculateInitialHCP(age, skill)
+  const hcp = hcpComplete && age && assistance
+    ? calculateInitialHCP(age, assistance)
     : null;
 
-  const hcpColor = hcpComplete && skill ? getHCPColor(skill) : Colors.textSecondary;
+  const hcpColor = hcpComplete && assistance ? getHCPColor(assistance) : Colors.textSecondary;
 
   return (
     <View style={styles.cardWrapper}>
@@ -161,10 +161,10 @@ export function PlayerRow({
       {/* ── HCP-rad (färdig) ───────────────────────────────── */}
       {/* HCP-raden döljs helt för left-spelare — kortet ska kännas
           minimalistiskt och signalera "borta", inte presentera spel-data. */}
-      {!hasLeft && hcpComplete && age && skill && (isGuest || hcp !== null) && (
+      {!hasLeft && hcpComplete && age && assistance && (isGuest || hcp !== null) && (
         <View style={styles.hcpRow}>
           <Text style={styles.hcpMeta}>
-            {skill.charAt(0).toUpperCase() + skill.slice(1)} · Age {age}
+            {assistance.charAt(0).toUpperCase() + assistance.slice(1)} · Age {age}
           </Text>
           {isGuest ? (
             <View style={[styles.hcpBadge, styles.hcpBadgeGuest]}>

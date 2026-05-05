@@ -44,11 +44,11 @@ interface JoinModalProps {
   hideGuest?: boolean;
 }
 
-type GuestSkill = 'easy' | 'intermediate' | 'expert';
-const GUEST_SKILL_OPTIONS: { id: GuestSkill; label: string }[] = [
-  { id: 'easy',         label: 'Easy' },
-  { id: 'intermediate', label: 'Intermediate' },
-  { id: 'expert',       label: 'Advanced' },
+type AssistanceLevel = 'minimal' | 'standard' | 'full';
+const ASSISTANCE_OPTIONS: { id: AssistanceLevel; label: string }[] = [
+  { id: 'full',     label: 'Full' },
+  { id: 'standard', label: 'Standard' },
+  { id: 'minimal',  label: 'Minimal' },
 ];
 
 // Mock-list över "redan tagna" playerNames så availability-checken har något
@@ -107,8 +107,8 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
   const [guestName, setGuestName] = useState('');
   const [guestBirthYearText, setGuestBirthYearText] = useState('');
   // Default-värde: användaren kan gå direkt till Room Code efter year of birth.
-  // Skill kan ändras via skill-knapparna men har förvalt 'intermediate'.
-  const [guestSkill, setGuestSkill] = useState<GuestSkill>('intermediate');
+  // Assistance kan ändras via assistance-knapparna men har förvalt 'standard'.
+  const [guestAssistance, setGuestAssistance] = useState<AssistanceLevel>('standard');
   const [yearPickerOpen, setYearPickerOpen] = useState(false);
   const [playerNameStatus, setPlayerNameStatus] = useState<PlayerNameStatus>('idle');
   const [invites, setInvites] = useState<WaitingInvite[]>([]);
@@ -233,7 +233,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
       setCode('');
       setGuestName('');
       setGuestBirthYearText('');
-      setGuestSkill('intermediate');
+      setGuestAssistance('standard');
       setYearPickerOpen(false);
       setPlayerNameStatus('idle');
       setStep(initialStep);
@@ -288,9 +288,9 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
   // är klart. PlayerNamet måste *valideras* (inte bara skrivas) innan year
   // låses upp — det är hur vi visar progress mot lobbyn.
   const yearUnlocked = playerNameStatus === 'available';
-  const skillUnlocked = yearUnlocked && parsedBirthYear !== null;
-  // Skill är default-ifylld, så code-låset följer skill-låset direkt.
-  const codeUnlocked = skillUnlocked;
+  const assistanceUnlocked = yearUnlocked && parsedBirthYear !== null;
+  // Assistance är default-ifylld, så code-låset följer assistance-låset direkt.
+  const codeUnlocked = assistanceUnlocked;
 
   const isGuestFormValid =
     playerNameStatus === 'available' &&
@@ -298,7 +298,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     code.length === ROOM_CODE_LENGTH;
 
   // Om användaren ändrar playerNamet efter en validering — återställ status.
-  // Year/skill/code-värden behålls men deras gates återstängs tills nick
+  // Year/assistance/code-värden behålls men deras gates återstängs tills nick
   // är validerat igen.
   const handleGuestNameChange = (t: string) => {
     setGuestName(t);
@@ -386,7 +386,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
   }, [step, guestName]);
 
   const handleJoinAsGuest = () => {
-    if (!isGuestFormValid || parsedBirthYear === null || guestSkill === null) return;
+    if (!isGuestFormValid || parsedBirthYear === null || guestAssistance === null) return;
     // Mock-existence-check (samma princip som handleJoinWithCode) — utan
     // backend kan vi bara verifiera mot sessions-Set:n. När backend kopplas
     // in ersätts isActiveRoom med ett API-call. PlayerName-uniqueness är
@@ -402,7 +402,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     // ("Guest" + 5 siffror + "-" + 2 bokstäver). Om användaren ändrat
     // namnet manuellt blir flaggan false.
     const autofilled = /^Guest\d{5}-[A-Z]{2}$/.test(guestName.trim());
-    track('guest_name_created', { autofilled, skill: guestSkill });
+    track('guest_name_created', { autofilled, assistance: guestAssistance });
     onClose();
     router.push({
       pathname: '/(tabs)/lobby',
@@ -412,7 +412,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
         asGuest: 'true',
         guestName: guestName.trim(),
         guestBirthYear: String(parsedBirthYear),
-        guestSkill: guestSkill,
+        guestAssistance: guestAssistance,
       },
     });
   };
@@ -738,24 +738,24 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                   </TouchableOpacity>
                 </View>
 
-                {/* Skill level (låst tills year valt). Default 'intermediate'
+                {/* Assistance level (låst tills year valt). Default 'standard'
                     är förvalt, så användaren kan gå direkt till Room Code. */}
                 <Text
                   style={[
                     modal.statusHint,
-                    !skillUnlocked && modal.fieldGroupLocked,
+                    !assistanceUnlocked && modal.fieldGroupLocked,
                   ]}
                 >
                   Use default or select prefered setup
                 </Text>
                 <View
-                  style={[modal.fieldGroup, !skillUnlocked && modal.fieldGroupLocked]}
-                  pointerEvents={skillUnlocked ? 'auto' : 'none'}
+                  style={[modal.fieldGroup, !assistanceUnlocked && modal.fieldGroupLocked]}
+                  pointerEvents={assistanceUnlocked ? 'auto' : 'none'}
                 >
-                  <Text style={modal.fieldLabel}>Skill Level</Text>
+                  <Text style={modal.fieldLabel}>Assistance Level</Text>
                   <View style={modal.skillRow}>
-                    {GUEST_SKILL_OPTIONS.map((opt) => {
-                      const isSelected = guestSkill === opt.id;
+                    {ASSISTANCE_OPTIONS.map((opt) => {
+                      const isSelected = guestAssistance === opt.id;
                       return (
                         <TouchableOpacity
                           key={opt.id}
@@ -765,9 +765,9 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                           ]}
                           onPress={() => {
                             // Dölj custom CodeKeyboard om aktiv — användaren
-                            // har lämnat code-cellerna för att klicka skill.
+                            // har lämnat code-cellerna för att klicka assistance.
                             setFocusedCodeIdx(null);
-                            setGuestSkill(opt.id);
+                            setGuestAssistance(opt.id);
                           }}
                         >
                           <Text
@@ -787,7 +787,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                 {/* Room code — 3 bokstäver + bindestreck + 2 siffror +
                     1 trailing bokstav. Cell 0–2 och 5 visar bokstavs-
                     tangentbord, 3–4 sifferkeypad.
-                    Låst tills skill level är valt. */}
+                    Låst tills assistance level är valt. */}
                 <View
                   style={[modal.fieldGroup, !codeUnlocked && modal.fieldGroupLocked]}
                   pointerEvents={codeUnlocked ? 'auto' : 'none'}
@@ -967,11 +967,11 @@ export default function HomeScreen() {
   const [regPasswordConfirmed, setRegPasswordConfirmed] = useState(false);
   const [regBirthYearText, setRegBirthYearText] = useState('');
   // Default-värden: användaren kan registrera direkt efter year of birth.
-  // Skill och Region är förvalda men kan ändras via picker:erna.
-  const [regSkill, setRegSkill] = useState<GuestSkill>('intermediate');
+  // Assistance och Region är förvalda men kan ändras via picker:erna.
+  const [regAssistance, setRegAssistance] = useState<AssistanceLevel>('standard');
   const [regRegion, setRegRegion] = useState<RegRegion>('global');
   const [regYearPickerOpen, setRegYearPickerOpen] = useState(false);
-  const [regSkillPickerOpen, setRegSkillPickerOpen] = useState(false);
+  const [regAssistancePickerOpen, setRegAssistancePickerOpen] = useState(false);
   const [regRegionPickerOpen, setRegRegionPickerOpen] = useState(false);
 
   const pulse = useRef(new Animated.Value(1)).current;
@@ -1015,10 +1015,10 @@ export default function HomeScreen() {
         setRegPassword('');
         setRegPasswordConfirmed(false);
         setRegBirthYearText('');
-        setRegSkill('intermediate');
+        setRegAssistance('standard');
         setRegRegion('global');
         setRegYearPickerOpen(false);
-        setRegSkillPickerOpen(false);
+        setRegAssistancePickerOpen(false);
         setRegRegionPickerOpen(false);
         setRegPlayerNameFocused(false);
         setRegPlayerNameKbMode('letter');
@@ -1071,10 +1071,10 @@ export default function HomeScreen() {
       setRegPassword('');
       setRegPasswordConfirmed(false);
       setRegBirthYearText('');
-      setRegSkill('intermediate');
+      setRegAssistance('standard');
       setRegRegion('global');
       setRegYearPickerOpen(false);
-      setRegSkillPickerOpen(false);
+      setRegAssistancePickerOpen(false);
       setRegRegionPickerOpen(false);
       setRegPlayerNameFocused(false);
       setRegPlayerNameKbMode('letter');
@@ -1095,10 +1095,10 @@ export default function HomeScreen() {
       setRegPassword('');
       setRegPasswordConfirmed(false);
       setRegBirthYearText('');
-      setRegSkill('intermediate');
+      setRegAssistance('standard');
       setRegRegion('global');
       setRegYearPickerOpen(false);
-      setRegSkillPickerOpen(false);
+      setRegAssistancePickerOpen(false);
       setRegRegionPickerOpen(false);
       setRegPlayerNameFocused(false);
       setRegPlayerNameKbMode('letter');
@@ -1175,7 +1175,7 @@ export default function HomeScreen() {
     const minimalProfile: ProfileData = {
       playerName: playerName,
       birthYear: null,
-      skill: null,
+      assistance: null,
       region: null,
       avatarSource: 'default',
       selectedAvatarId: '',
@@ -1220,13 +1220,13 @@ export default function HomeScreen() {
   // policy definieras (server-side). Användaren måste även explicit trycka
   // Confirm för att låsa lösenordet och låsa upp nästa fält.
   const regPasswordValid = regPassword.length >= 4;
-  // Sekventiella gates: email → playerName → password → year → skill → region
+  // Sekventiella gates: email → playerName → password → year → assistance → region
   const regPlayerNameUnlocked = regEmailValid;
   const regPasswordUnlocked = regPlayerNameUnlocked && regPlayerNameStatus === 'available';
   const regYearUnlocked = regPasswordUnlocked && regPasswordConfirmed;
-  const regSkillUnlocked = regYearUnlocked && regParsedBirthYear !== null;
-  // Skill och Region är default-ifyllda, så region-låset följer skill-låset.
-  const regRegionUnlocked = regSkillUnlocked;
+  const regAssistanceUnlocked = regYearUnlocked && regParsedBirthYear !== null;
+  // Assistance och Region är default-ifyllda, så region-låset följer assistance-låset.
+  const regRegionUnlocked = regAssistanceUnlocked;
   const isRegisterFormValid =
     regEmailValid &&
     regPlayerNameStatus === 'available' &&
@@ -1330,7 +1330,7 @@ export default function HomeScreen() {
       playerName: regPlayerName.trim(),
       email: trimmedEmail,
       birthYear: regParsedBirthYear,
-      skill: regSkill,
+      assistance: regAssistance,
       region: regRegion,
       avatarSource: 'default',
       selectedAvatarId: '',
@@ -1338,8 +1338,8 @@ export default function HomeScreen() {
     await saveProfile(newProfile);
     setProfile(newProfile);
     // TODO (auth): byt playerName mot riktig user-id (UUID från backend).
-    identify(newProfile.playerName, { skill: regSkill, region: regRegion });
-    track('user_registered', { skill: regSkill, region: regRegion });
+    identify(newProfile.playerName, { assistance: regAssistance, region: regRegion });
+    track('user_registered', { assistance: regAssistance, region: regRegion });
     setProfileMenuVisible(false);
     Alert.alert(
       'Activation email sent',
@@ -1982,34 +1982,34 @@ export default function HomeScreen() {
                     </TouchableOpacity>
                   </View>
 
-                  {/* Skill level + Region scope side by side, drop-down pickers.
-                      Default-värden ('intermediate'/'global') är förvalda så
+                  {/* Assistance level + Region scope side by side, drop-down pickers.
+                      Default-värden ('standard'/'global') är förvalda så
                       användaren kan registrera direkt efter year of birth. */}
                   <Text
                     style={[
                       modal.statusHint,
-                      !regSkillUnlocked && modal.fieldGroupLocked,
+                      !regAssistanceUnlocked && modal.fieldGroupLocked,
                     ]}
                   >
                     Use default or select prefered setup
                   </Text>
                   <View style={modal.fieldRow}>
-                    {/* Skill level (vänster halva) */}
+                    {/* Assistance level (vänster halva) */}
                     <View
-                      style={[modal.fieldGroupHalf, !regSkillUnlocked && modal.fieldGroupLocked]}
-                      pointerEvents={regSkillUnlocked ? 'auto' : 'none'}
+                      style={[modal.fieldGroupHalf, !regAssistanceUnlocked && modal.fieldGroupLocked]}
+                      pointerEvents={regAssistanceUnlocked ? 'auto' : 'none'}
                     >
-                      <Text style={modal.fieldLabel}>Skill Level</Text>
+                      <Text style={modal.fieldLabel}>Assistance Level</Text>
                       <TouchableOpacity
                         style={modal.yearTrigger}
                         activeOpacity={0.7}
                         onPress={() => {
                           Keyboard.dismiss();
-                          setRegSkillPickerOpen(true);
+                          setRegAssistancePickerOpen(true);
                         }}
                       >
                         <Text style={modal.yearTriggerText} numberOfLines={1}>
-                          {GUEST_SKILL_OPTIONS.find((o) => o.id === regSkill)?.label}
+                          {ASSISTANCE_OPTIONS.find((o) => o.id === regAssistance)?.label}
                         </Text>
                         <Text style={modal.yearTriggerArrow}>›</Text>
                       </TouchableOpacity>
@@ -2107,26 +2107,26 @@ export default function HomeScreen() {
             </View>
           )}
 
-          {/* Skill picker overlay för register-formen */}
-          {regSkillPickerOpen && (
+          {/* Assistance picker overlay för register-formen */}
+          {regAssistancePickerOpen && (
             <View style={modal.yearPickerOverlay}>
               <TouchableOpacity
                 style={StyleSheet.absoluteFill}
                 activeOpacity={1}
-                onPress={() => setRegSkillPickerOpen(false)}
+                onPress={() => setRegAssistancePickerOpen(false)}
               />
               <View style={modal.yearPickerSheet}>
                 <View style={modal.yearPickerHandle} />
-                <Text style={modal.title}>Select Skill Level</Text>
-                {GUEST_SKILL_OPTIONS.map((opt) => {
-                  const selected = regSkill === opt.id;
+                <Text style={modal.title}>Select Assistance Level</Text>
+                {ASSISTANCE_OPTIONS.map((opt) => {
+                  const selected = regAssistance === opt.id;
                   return (
                     <TouchableOpacity
                       key={opt.id}
                       style={[modal.yearItem, selected && modal.yearItemSelected]}
                       onPress={() => {
-                        setRegSkill(opt.id);
-                        setRegSkillPickerOpen(false);
+                        setRegAssistance(opt.id);
+                        setRegAssistancePickerOpen(false);
                       }}
                     >
                       <Text style={[modal.yearItemText, selected && modal.yearItemTextSelected]}>
@@ -2136,7 +2136,7 @@ export default function HomeScreen() {
                     </TouchableOpacity>
                   );
                 })}
-                <TouchableOpacity onPress={() => setRegSkillPickerOpen(false)} style={modal.cancelBtn}>
+                <TouchableOpacity onPress={() => setRegAssistancePickerOpen(false)} style={modal.cancelBtn}>
                   <Text style={modal.cancelText}>Cancel</Text>
                 </TouchableOpacity>
               </View>
@@ -2319,7 +2319,7 @@ const modal = StyleSheet.create({
   // Guest-form fält
   fieldGroup: { gap: 6 },
   fieldGroupLocked: { opacity: 0.4 },
-  // Side-by-side fältlayout (skill + region i samma row)
+  // Side-by-side fältlayout (assistance + region i samma row)
   fieldRow: {
     flexDirection: 'row',
     gap: Spacing.md,

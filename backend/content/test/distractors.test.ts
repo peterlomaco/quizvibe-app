@@ -128,7 +128,7 @@ describe('buildLetterGrid', () => {
   it('excludes sensitive items by default', () => {
     const catalog = loadCatalog();
     // Welch Hitler skulle ge prefix "AD" (Adolf), Stalin "JO" (Josef).
-    // Vid expert (1 bokstav) skulle vi få "A" och "J" — lätt att verifiera frånvaro.
+    // Vid minimal assistance (1 bokstav) skulle vi få "A" och "J" — lätt att verifiera frånvaro.
     const correct = findItemsById(catalog, 'winston-churchill')[0].item;
     const grid = buildLetterGrid({
       catalog,

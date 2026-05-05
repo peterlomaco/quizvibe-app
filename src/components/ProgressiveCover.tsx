@@ -17,7 +17,7 @@ interface Props {
    * full täckning och reveal-animation startar om från början.
    */
   resetKey: string | number;
-  /** Spelarens profil — reserverat för framtida tweakar (t.ex. skill-baserad reveal-curve). */
+  /** Spelarens profil — reserverat för framtida tweakar (t.ex. assistance-baserad reveal-curve). */
   profile: RevealProfile;
   /** Time-elapse-perioden i sekunder (typiskt 30/45/60). */
   totalSeconds: number;

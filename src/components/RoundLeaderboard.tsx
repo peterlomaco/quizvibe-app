@@ -5,13 +5,13 @@ import { Avatar } from './Avatar';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-export type SkillLevel = 'easy' | 'intermediate' | 'expert';
+export type AssistanceLevel = 'minimal' | 'standard' | 'full';
 
 export interface LeaderboardPlayer {
   id: string;
   name: string;
   emoji: string;
-  skill: SkillLevel;
+  assistance: AssistanceLevel;
   age: number;
   isYou?: boolean;
   isHost?: boolean;
@@ -41,34 +41,35 @@ export interface RoundDetail {
 // Startpunkter för mock-motspelarnas HCP (lägre = bättre).
 // Används när HCP-förändring beräknas vid final leaderboard.
 export const MOCK_OPPONENT_HCP_BEFORE: Record<string, number> = {
-  sam:    25,  // expert/elite
-  jordan: 55,  // intermediate/mid
-  casey:  85,  // easy/casual
+  sam:    25,  // minimal assistance / elit
+  jordan: 55,  // standard assistance / mid
+  casey:  85,  // full assistance / casual
 };
 
 // ─── Mock opponents (matchar Lobby-skärmdumpen) ───────────────────────────────
 // "You" injiceras dynamiskt av quiz.tsx från profildata/URL-params.
 
 export const MOCK_OPPONENTS: LeaderboardPlayer[] = [
-  { id: 'sam',    name: 'Sam L.',    emoji: '🎸', skill: 'expert',       age: 28 },
-  { id: 'jordan', name: 'Jordan M.', emoji: '🤖', skill: 'intermediate', age: 20 },
-  { id: 'casey',  name: 'Casey P.',  emoji: '🐉', skill: 'easy',         age: 41 },
+  { id: 'sam',    name: 'Sam L.',    emoji: '🎸', assistance: 'minimal',  age: 28 },
+  { id: 'jordan', name: 'Jordan M.', emoji: '🤖', assistance: 'standard', age: 20 },
+  { id: 'casey',  name: 'Casey P.',  emoji: '🐉', assistance: 'full',     age: 41 },
 ];
 
 // ─── Opponent score generator (mock AI) ───────────────────────────────────────
 // Returnerar bara poäng+correct — timeUsed och playerId sätts av anroparen.
+// Mer assistans = lägre accuracy + lägre poäng-range (casual-spelare).
 
-export function generateOpponentRoundScore(skill: SkillLevel): { points: number; correct: boolean } {
-  const accuracy = { easy: 0.45, intermediate: 0.65, expert: 0.78 }[skill];
+export function generateOpponentRoundScore(assistance: AssistanceLevel): { points: number; correct: boolean } {
+  const accuracy = { full: 0.45, standard: 0.65, minimal: 0.78 }[assistance];
   const correct = Math.random() < accuracy;
   if (!correct) {
     return { points: 0, correct: false };
   }
   const range = {
-    easy:         [400, 1400],
-    intermediate: [800, 2200],
-    expert:       [1500, 2800],
-  }[skill];
+    full:     [400, 1400],
+    standard: [800, 2200],
+    minimal:  [1500, 2800],
+  }[assistance];
   const points = Math.round(range[0] + Math.random() * (range[1] - range[0]));
   return { points, correct: true };
 }
@@ -78,12 +79,12 @@ export function generateOpponentTimeUsed(): number {
   return Math.round(5 + Math.random() * 20);
 }
 
-// ─── Skill label helper ───────────────────────────────────────────────────────
+// ─── Assistance label helper ──────────────────────────────────────────────────
 
-const SKILL_LABELS: Record<SkillLevel, string> = {
-  easy:         'Easy',
-  intermediate: 'Intermediate',
-  expert:       'Advanced',
+const ASSISTANCE_LABELS: Record<AssistanceLevel, string> = {
+  full:     'Full',
+  standard: 'Standard',
+  minimal:  'Minimal',
 };
 
 // ─── Player row (visual style matches Lobby PlayerRow) ────────────────────────
@@ -182,10 +183,10 @@ function PlayerLeaderboardRow({
           )}
         </View>
 
-        {/* Bottom row: skill · age + total score */}
+        {/* Bottom row: assistance · age + total score */}
         <View style={styles.bottomRow}>
           <Text style={styles.meta}>
-            {SKILL_LABELS[player.skill]} · Age {player.age}
+            {ASSISTANCE_LABELS[player.assistance]} · Age {player.age}
           </Text>
           <View style={styles.totalPill}>
             <Text style={styles.totalPillText}>{totalScore.toLocaleString()} pts</Text>

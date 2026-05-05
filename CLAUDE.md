@@ -47,7 +47,7 @@ All client-side via AsyncStorage. No server. Screens reload data on focus (`useF
 - `backend/content/catalog/*.yaml` — innehållslistor per generation × kategori. 5 generations-grupper: `elder` (Silent + Boomers, 1925-1964), `gen-x`, `millennials`, `gen-z`, `gen-alpha` + `'all'` (baseline). Items har: `id` (kebab-case), `displayName`, `correctYear`, `probability` (0-100), `wikimediaSearchHints[]`, `answerMethods: ('timeline'|'name-letters')[]`, `sensitivity: 'standard'|'sensitive'`. 71 items totalt över persons/capitals/artists.
 - `backend/content/schema.ts` — Zod-schema. Validation: items med `'timeline'` i answerMethods MÅSTE ha `correctYear`. Cross-audience-figurer (Zlatan, Cristiano, Messi, ABBA, Madonna, etc.) listas en gång per fil — registry tolererar dubblett-IDs över filer men kräver unika inom en fil.
 - `backend/content/registry.ts` — `loadCatalog`, `findItemsForAudience` (default `excludeSensitive: true` → Hitler/Stalin filtreras bort i spelutbud, admin sätter `excludeSensitive: false` för full vy), `findItemsById`.
-- `backend/content/generation.ts` — `birthYearToGeneration`, `generationDistance`, `getLetterGridConfig` (skill → prefix-längd: easy=3, intermediate=2, expert=1; specialregler: född 2016+ alltid hela namn; 2013-2015 hela namn om distance>1; övriga hela namn om distance>2 — Millennials har max-distance 2 så får alltid prefix).
+- `backend/content/generation.ts` — `birthYearToGeneration`, `generationDistance`, `getLetterGridConfig` (assistance → prefix-längd: full=3, standard=2, minimal=1; specialregler: född 2016+ alltid hela namn; 2013-2015 hela namn om distance>1; övriga hela namn om distance>2 — Millennials har max-distance 2 så får alltid prefix).
 - `backend/content/distractors.ts` — `getPrefixForItem` (extraherar prefix, behåller diakriter, skipparar non-letters), `buildLetterGrid`, `buildNameOptions`. Pool-strategi: kategori+audience → kategori-fallback → `distractor-pool.yaml` med ~50 plausibla namn per kategori. `NameOption.source` = `'catalog'` eller `'pool'`.
 - `backend/wikimedia/client.ts` — Wikipedia pageimage-lookup (primär källa, kuraterade huvudbilder) + Commons text-search (fallback) + license/artist från Commons imageinfo. CLI: `npm run wikimedia-search <item-id>`.
 - `backend/wikimedia/processor.ts` + `process.ts` — `fetchImage` + sharp-pipeline (resize max 1280×720 med aspect ratio bevarat + WebP @ q85). CLI: `npm run wikimedia-process <item-id>`. Output till `backend/output/` (gitignore:ad).
@@ -114,7 +114,11 @@ Both use `useRef`-based transition detection so manual clear of the field doesn'
 
 `handleLogin` accepts **Player Name OR email** as identifier — if input contains `@`, the email-prefix is derived as the saved `playerName` (mock; real auth will resolve email → playerName via backend lookup).
 
-Default Skill='intermediate', Region='global' on the Register form so the user can submit immediately after Year of birth — both fields show under a "Use default or select prefered setup" hint.
+Default Assistance='standard', Region='global' on the Register form so the user can submit immediately after Year of birth — both fields show under a "Use default or select prefered setup" hint.
+
+**Assistance level** (`'minimal' | 'standard' | 'full'`, persisted as `ProfileData.assistance`) styr mängden hjälp i spelet — `full` = mest hjälp (3-letter prefix i Letter Grid, snabb reveal-curve), `standard` = 2-letter prefix + linjär reveal, `minimal` = 1-letter prefix + slow reveal som aldrig fullt avslöjar bilden. Tidigare hette fältet `skill` med värdena `easy/intermediate/expert`; båda `loadProfile` (i `profileStorage.ts`) och `loadLatestResult` (i `gameResults.ts`) gör dual-read av gammalt fält + värde-mappning så befintliga profiler/resultat migreras passivt vid nästa save. Mappning: `easy → full`, `intermediate → standard`, `expert → minimal`.
+
+**Stylesheet-keys medvetet kvar som `skillRow`/`skillBtn`/`skillBtnText`** i `app/(tabs)/index.tsx` och `LobbyScreen.tsx` även efter rename:n — det är privat CSS-vokabulär per fil (inte domän-koncept) och de exporteras inte. Att jaga dem skulle bara öka diff-ytan utan att förbättra läsbarhet. Skapa nya stylesheet-nycklar med `assistance*`-prefix om du behöver mer styling, men byt inte namn på de befintliga reflexmässigt.
 
 ## Register modal — keyboard handling
 
@@ -148,7 +152,7 @@ Alla tre kör samma reset-logic. Redundansen är medveten — om ett path missar
 
 Three top-level collapsible sections — all use the same tappable-header pattern with a `+/−`-toggle box (26×26, `borderColor: borderStrong`) next to the title (`Typography.title` + bold + `Colors.textPrimary`). When collapsed, a 1px `sectionDivider` line shows under the header for visual separation. Default expanded; state per section is local (not persisted across app restarts).
 
-1. **Profile default settings** — avatar + Player Name (read-only `Text`, set at registration, NOT editable from this screen), competition setup (Year of birth, auto Competition Age, Skill level), Host defaults block (Region scope + Answer response time half-width side-by-side, then Game era slider full-width), Save Profile button. The "Host default settings" sub-heading sits left-aligned at full card width as visual separator between user-defaults and host-defaults.
+1. **Profile default settings** — avatar + Player Name (read-only `Text`, set at registration, NOT editable from this screen), competition setup (Year of birth, auto Competition Age, Assistance level), Host defaults block (Region scope + Answer response time half-width side-by-side, then Game era slider full-width), Save Profile button. The "Host default settings" sub-heading sits left-aligned at full card width as visual separator between user-defaults and host-defaults.
 2. **Game connections** — Spotify card, YouTube card, QuizVibe friends card. All three share `spotifyHeader/spotifyTitle/spotifySubtitle/spotifyBtn`-styles for structural consistency; only accent colors and icon differ (Spotify green, YouTube red `#FF0000`, friends primary blue).
 3. **Player history** — `src/components/PlayerHistorySection.tsx` manages its own collapse state. HCP shield lives in a dedicated card directly under the section heading (was previously in the profile card).
 
@@ -253,7 +257,7 @@ Custom in-app keyboard som ersätter system-tangentbord på flera fält. iOS har
 Bannern är roll-beroende i Lobby (`src/screens/LobbyScreen.tsx`):
 
 - **Host** (hostMode=true): tap → `hostDeleteSheetVisible` Modal med röd "Delete this Game Lobby"-knapp + Cancel. Knappen → Alert "Delete this Game Lobby?" → Yes anropar `deactivateRoom(roomCode)` (tar bort från `mockActiveRooms`), visar **loading-overlay** med "Please Wait — Deleting this Lobby" + animerade våg-prickar (`<WaveDots />`-komponent inline i samma fil) i 1.6s, sedan `router.replace('/')`. **Viktigt**: `setDeletingLobby(false)` MÅSTE anropas explicit innan navigation eftersom Lobby ligger i `(tabs)` och tab-navigatorn bevarar Modal-state över route-replace — annars hänger overlay:n kvar över Home.
-- **Non-host** (oavsett guest eller registrerad): tap → `guestLeaveSheetVisible` Modal med röd "Leave Game Lobby — Go to Home"-knapp + Cancel. Knappen → Alert "Leave this Game Lobby?" → Yes sparar **full snapshot** av spelaren via `addLeftPlayer(roomCode, snapshot)` (id, name, emoji, type, age, skill, hcpComplete, approved) → `router.replace('/')`. Sheet-headern visar dynamiskt avatar+namn+status från `players.find(p => p.id === ownPlayerIdRef.current)` — guest får "Guest", registrerad får "Player".
+- **Non-host** (oavsett guest eller registrerad): tap → `guestLeaveSheetVisible` Modal med röd "Leave Game Lobby — Go to Home"-knapp + Cancel. Knappen → Alert "Leave this Game Lobby?" → Yes sparar **full snapshot** av spelaren via `addLeftPlayer(roomCode, snapshot)` (id, name, emoji, type, age, assistance, hcpComplete, approved) → `router.replace('/')`. Sheet-headern visar dynamiskt avatar+namn+status från `players.find(p => p.id === ownPlayerIdRef.current)` — guest får "Guest", registrerad får "Player".
 - Profile-tabben i bottom nav är host:s väg till profil-hantering (banner-tappet är inte längre Profile-genvägen för någon i Lobby).
 
 **Non-host detection of room deletion**: useEffect:en (gating på `!hostMode`) initial-check + 2s polling-interval anropar `isActiveRoom(roomCode)`. När den blir false sätts `roomDeletedDetected=true` → separat useEffect triggar Alert "Game Lobby deleted / This Game Lobby has been deleted by Host" med `cancelable: false` → OK → `router.replace('/')`. Polling istället för event-driven eftersom mockstoren saknar event-bus; ersätts med WS/SSE-prenumeration när backend kommer in.
@@ -270,9 +274,9 @@ Non-host gets a **read-only view** of the player list:
 **Auto-add joining player** (`useEffect` i `LobbyScreen.tsx`): non-hosts inserts into players list immediately on lobby entry as `approved: false`, så de syns i "To be Approved by Host"-sektionen direkt — no separate waiting screen.
 
 - `asGuest=true` + `guestName` (Guest-form path): inserts as `type: 'guest'` from form params, `id = guest-${Date.now()}`.
-- `!hostMode` utan guest-form-params (code-only join): loads `loadProfile()` och inserts as `type: 'registered'` from profile (name, avatar, age, skill, spotifyConnected), `id = joiner-${Date.now()}`. Falls back to "You" / 👤 / `type: 'guest'` om profil saknas.
+- `!hostMode` utan guest-form-params (code-only join): loads `loadProfile()` och inserts as `type: 'registered'` from profile (name, avatar, age, assistance, spotifyConnected), `id = joiner-${Date.now()}`. Falls back to "You" / 👤 / `type: 'guest'` om profil saknas.
 
-**Deps på URL-params + state-reset (kritiskt)**: useEffect:en deps är `[code, guestMode, guestName, guestBirthYear, guestSkill, hostMode]` — INTE `[]`. Lobby ligger i `(tabs)` och tab-navigatorn återanvänder samma component-instans över transitions (t.ex. `host → home tab → join som guest`). Med `[]`-deps re-fyrade aldrig auto-add när params bytte → nya identiteten lades aldrig in. Effekten reset:ar även `setPlayers(SEED_PLAYERS)` + `ownPlayerIdRef.current = null` i början av varje run så ingen state ärver över.
+**Deps på URL-params + state-reset (kritiskt)**: useEffect:en deps är `[code, guestMode, guestName, guestBirthYear, guestAssistance, hostMode]` — INTE `[]`. Lobby ligger i `(tabs)` och tab-navigatorn återanvänder samma component-instans över transitions (t.ex. `host → home tab → join som guest`). Med `[]`-deps re-fyrade aldrig auto-add när params bytte → nya identiteten lades aldrig in. Effekten reset:ar även `setPlayers(SEED_PLAYERS)` + `ownPlayerIdRef.current = null` i början av varje run så ingen state ärver över.
 
 **`mergeProfileIntoHost` gating**: i `useFocusEffect` är merge:n gated på `hostMode && profile && p.isHost` — INTE bara `profile && p.isHost`. När non-host joinar ska seed-host:en Alex K. visas oförändrad, INTE få den nuvarande user:s profil-data tilldelad (annars ser det ut som att joinaren är host eftersom HOST-badge:n + ens egen avatar/namn syns på det kortet).
 
@@ -330,11 +334,11 @@ Fråge-vyn i [app/quiz.tsx](app/quiz.tsx) är samma layout för `'question'`- oc
 
 | phase     | isLastQuestion | label                  | bg-färg          | handler                   |
 |-----------|----------------|------------------------|------------------|---------------------------|
-| question  | n/a            | "Confirm"              | `skillColor`     | `handleConfirm(pendingYear)` |
-| reveal    | false          | "Next Round  →"        | `Colors.primary` | `handleAdvanceToNextRound`  |
-| reveal    | true           | "🏆  Final Leaderboard"| `Colors.primary` | `handleShowLeaderboard`     |
+| question  | n/a            | "Confirm"              | `assistanceColor` | `handleConfirm(pendingYear)` |
+| reveal    | false          | "Next Round  →"        | `Colors.primary`  | `handleAdvanceToNextRound`  |
+| reveal    | true           | "🏆  Final Leaderboard"| `Colors.primary`  | `handleShowLeaderboard`     |
 
-`skillColor` = `Colors.success` (easy) / `Colors.primary` (intermediate) / `'#F5A623'` (expert) — matchar TimelineSelector:s assist-badge så Confirm-knappen visuellt hör ihop med tidslinjen. Disabled när `phase === 'question' && pendingYear === null` (defensiv — TimelineSelector:s `useEffect` på `selectedYear` notifierar parent direkt vid mount via middleYear, så pendingYear är typiskt aldrig null efter första rendret).
+`assistanceColor` = `Colors.success` (full) / `Colors.primary` (standard) / `'#F5A623'` (minimal) — matchar TimelineSelector:s assist-badge så Confirm-knappen visuellt hör ihop med tidslinjen. Disabled när `phase === 'question' && pendingYear === null` (defensiv — TimelineSelector:s `useEffect` på `selectedYear` notifierar parent direkt vid mount via middleYear, så pendingYear är typiskt aldrig null efter första rendret).
 
 **TimelineSelector — lift-out av Confirm**: Confirm-knappen är borttagen ur [TimelineSelector](app/quiz.tsx) — quiz.tsx äger en enda action-knapp som byter label/handler per fas (se ovan). TimelineSelector exponerar `onYearChange(year)` istället för det gamla `onConfirm(year)`. Implementation: en `useEffect` med deps `[selectedYear, onYearChange]` notifierar parent vid varje scroll-tick (inkl. initial mount via middleYear). Parent-state: `const [pendingYear, setPendingYear] = useState<number | null>(null)` — hanteras separat från `selectedYear` (det "låsta" året efter Confirm). pendingYear nollställs i `handleAdvanceToNextRound` så TimelineSelector startar fresh på nästa fråga.
 
@@ -378,7 +382,7 @@ Call-sites finns redan i: `handleRegisterSubmit`, `handleLogin`, `handleLogout`,
 2. **Final Selection**: lista av fulla namn med matching prefix, alfabetiskt sorterade. Visar `catalog`/`pool`-tag per rad. "← Back" under "Selected: XX"-pillen.
 3. **Confirm-steg**: klick på namn highlightar (primary-blå border), Confirm-knappen syns. Klick på Confirm låser → grön "✓ Correct Answer" / röd "✗ Wrong Answer"-feedback med rätt svar.
 
-Demo-data (`src/utils/nameQuizDemo.ts`) genererad för Millennials (1990) + intermediate skill = 2-bokstavs prefix.
+Demo-data (`src/utils/nameQuizDemo.ts`) genererad för Millennials (1990) + standard assistance = 2-bokstavs prefix.
 
 **ProgressiveCover** ([src/components/ProgressiveCover.tsx](src/components/ProgressiveCover.tsx)) — mosaik-overlay som avslöjar bilden under sig:
 - 32×18 = 576 svarta block, 4 block tas bort per tick (~208ms per tick över 30s = totalt 144 ticks)

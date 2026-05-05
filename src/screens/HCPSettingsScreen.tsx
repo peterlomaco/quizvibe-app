@@ -16,10 +16,10 @@ import { Colors, FontSize, Spacing, Typography } from '../theme';
  
 // ─── Data ─────────────────────────────────────────────────────────────────────
  
-const SKILL_OPTIONS: SegmentOption[] = [
-  { label: 'Easy', value: 'easy' },
-  { label: 'Intermediate', value: 'intermediate' },
-  { label: 'Expert', value: 'expert' },
+const ASSISTANCE_OPTIONS: SegmentOption[] = [
+  { label: 'Full', value: 'full' },
+  { label: 'Standard', value: 'standard' },
+  { label: 'Minimal', value: 'minimal' },
 ];
  
 const REGIONS = ['Sweden', 'Nordics', 'Europe', 'Global'] as const;
@@ -29,7 +29,7 @@ type Region = (typeof REGIONS)[number];
  
 export default function HCPSettingsScreen() {
   const [age, setAge] = useState(35);
-  const [skill, setSkill] = useState('intermediate');
+  const [assistance, setAssistance] = useState('standard');
   const [region, setRegion] = useState<Region>('Sweden');
   const [eraLow, setEraLow] = useState(1990);
   const [eraHigh, setEraHigh] = useState(2015);
@@ -60,12 +60,12 @@ export default function HCPSettingsScreen() {
           />
         </Section>
  
-        {/* ── Skill level ────────────────────────────────────────── */}
-        <Section label="Skill Level">
+        {/* ── Assistance level ───────────────────────────────────── */}
+        <Section label="Assistance Level">
           <SegmentedControl
-            options={SKILL_OPTIONS}
-            value={skill}
-            onChange={setSkill}
+            options={ASSISTANCE_OPTIONS}
+            value={assistance}
+            onChange={setAssistance}
           />
         </Section>
  

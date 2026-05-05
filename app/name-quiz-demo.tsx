@@ -4,7 +4,7 @@
  * från src/utils/nameQuizDemo.ts. Inga timer/poäng/leaderboard — bara:
  *   bild → frågetext → Letter Grid → Final Selection → Confirm → ✓/✗-feedback → next.
  *
- * Spelar-profilen som genererade datan: Millennials (1990), intermediate skill.
+ * Spelar-profilen som genererade datan: Millennials (1990), standard assistance.
  */
 import { router, Stack } from 'expo-router';
 import { useMemo, useState } from 'react';
@@ -35,7 +35,7 @@ import { RevealProfile } from '@/src/utils/revealCurve';
 // Demon kör med samma profil som datan genererades för.
 const DEMO_PROFILE: RevealProfile = {
   birthYear: 1990,
-  skill: 'intermediate',
+  assistance: 'standard',
 };
 const DEMO_TOTAL_SECONDS = 30;
 

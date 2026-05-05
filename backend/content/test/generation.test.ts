@@ -69,14 +69,14 @@ describe('getLetterGridConfig', () => {
     expect(
       getLetterGridConfig({
         playerBirthYear: 2016,
-        playerSkill: 'easy',
+        playerAssistance: 'full',
         itemAudience: ['gen-alpha'],
       }),
     ).toEqual({ mode: 'full-names' });
     expect(
       getLetterGridConfig({
         playerBirthYear: 2020,
-        playerSkill: 'expert',
+        playerAssistance: 'minimal',
         itemAudience: ['millennials'],
       }),
     ).toEqual({ mode: 'full-names' });
@@ -87,7 +87,7 @@ describe('getLetterGridConfig', () => {
     expect(
       getLetterGridConfig({
         playerBirthYear: 2014,
-        playerSkill: 'intermediate',
+        playerAssistance: 'standard',
         itemAudience: ['gen-x'],
       }),
     ).toEqual({ mode: 'full-names' });
@@ -98,7 +98,7 @@ describe('getLetterGridConfig', () => {
     expect(
       getLetterGridConfig({
         playerBirthYear: 2014,
-        playerSkill: 'intermediate',
+        playerAssistance: 'standard',
         itemAudience: ['gen-z'],
       }),
     ).toEqual({ mode: 'prefix', length: 2 });
@@ -109,7 +109,7 @@ describe('getLetterGridConfig', () => {
     expect(
       getLetterGridConfig({
         playerBirthYear: 1950,
-        playerSkill: 'easy',
+        playerAssistance: 'full',
         itemAudience: ['gen-alpha'],
       }),
     ).toEqual({ mode: 'full-names' });
@@ -120,7 +120,7 @@ describe('getLetterGridConfig', () => {
     expect(
       getLetterGridConfig({
         playerBirthYear: 1990,
-        playerSkill: 'intermediate',
+        playerAssistance: 'standard',
         itemAudience: ['elder'],
       }),
     ).toEqual({ mode: 'prefix', length: 2 });
@@ -132,26 +132,26 @@ describe('getLetterGridConfig', () => {
     for (const aud of generations) {
       const config = getLetterGridConfig({
         playerBirthYear: 1990,
-        playerSkill: 'intermediate',
+        playerAssistance: 'standard',
         itemAudience: [aud],
       });
       expect(config.mode, `Millennials vs ${aud}`).toBe('prefix');
     }
   });
 
-  it('skill level controls prefix length', () => {
+  it('assistance level controls prefix length', () => {
     const baseArgs = {
       playerBirthYear: 1990,
       itemAudience: ['millennials' as const],
     };
     expect(
-      getLetterGridConfig({ ...baseArgs, playerSkill: 'easy' }),
+      getLetterGridConfig({ ...baseArgs, playerAssistance: 'full' }),
     ).toEqual({ mode: 'prefix', length: 3 });
     expect(
-      getLetterGridConfig({ ...baseArgs, playerSkill: 'intermediate' }),
+      getLetterGridConfig({ ...baseArgs, playerAssistance: 'standard' }),
     ).toEqual({ mode: 'prefix', length: 2 });
     expect(
-      getLetterGridConfig({ ...baseArgs, playerSkill: 'expert' }),
+      getLetterGridConfig({ ...baseArgs, playerAssistance: 'minimal' }),
     ).toEqual({ mode: 'prefix', length: 1 });
   });
 
@@ -160,7 +160,7 @@ describe('getLetterGridConfig', () => {
     expect(
       getLetterGridConfig({
         playerBirthYear: 1950,
-        playerSkill: 'intermediate',
+        playerAssistance: 'standard',
         itemAudience: ['all'],
       }),
     ).toEqual({ mode: 'prefix', length: 2 });

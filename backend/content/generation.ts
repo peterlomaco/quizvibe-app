@@ -4,7 +4,7 @@
 
 import { Audience, Generation } from './schema';
 
-export type SkillLevel = 'easy' | 'intermediate' | 'expert';
+export type AssistanceLevel = 'minimal' | 'standard' | 'full';
 
 // Ordningsindex för generations-avstånds-beräkning.
 // 0 = elder, 4 = gen-alpha. Avstånd = |index_a - index_b|.
@@ -64,12 +64,12 @@ export function generationDistance(
   return minDist === Infinity ? GENERATION_ORDER.length : minDist;
 }
 
-// Prefix-längd per skill level för Letter Grid Steg 1.
-// Easy = 3 bokstäver; Intermediate = 2; Expert (Advanced) = 1.
-const PREFIX_LENGTH_BY_SKILL: Record<SkillLevel, number> = {
-  easy: 3,
-  intermediate: 2,
-  expert: 1,
+// Prefix-längd per assistance level för Letter Grid Steg 1.
+// Full = 3 bokstäver (mest hjälp); Standard = 2; Minimal = 1 (minst hjälp).
+const PREFIX_LENGTH_BY_ASSISTANCE: Record<AssistanceLevel, number> = {
+  full: 3,
+  standard: 2,
+  minimal: 1,
 };
 
 export type LetterGridConfig =
@@ -85,14 +85,14 @@ export type LetterGridConfig =
  * 3. Övriga → prefix om generations-avstånd ≤ 2, annars hela namn.
  *    (Millennials har max-avstånd 2 till alla generationer, så får alltid prefix.)
  *
- * När mode = 'prefix' bestäms längden av playerSkill.
+ * När mode = 'prefix' bestäms längden av playerAssistance.
  */
 export function getLetterGridConfig(args: {
   playerBirthYear: number;
-  playerSkill: SkillLevel;
+  playerAssistance: AssistanceLevel;
   itemAudience: Audience[];
 }): LetterGridConfig {
-  const { playerBirthYear, playerSkill, itemAudience } = args;
+  const { playerBirthYear, playerAssistance, itemAudience } = args;
 
   if (playerBirthYear >= 2016) {
     return { mode: 'full-names' };
@@ -108,5 +108,5 @@ export function getLetterGridConfig(args: {
     if (distance > 2) return { mode: 'full-names' };
   }
 
-  return { mode: 'prefix', length: PREFIX_LENGTH_BY_SKILL[playerSkill] };
+  return { mode: 'prefix', length: PREFIX_LENGTH_BY_ASSISTANCE[playerAssistance] };
 }

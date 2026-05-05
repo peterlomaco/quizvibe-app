@@ -7,7 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
  */
 const PROFILE_KEY = '@quizvibe/profile/v1';
 
-export type Skill  = 'easy' | 'intermediate' | 'expert';
+export type AssistanceLevel = 'minimal' | 'standard' | 'full';
 export type Region = 'sweden' | 'nordics' | 'global';
 export type AvatarSource = 'upload' | 'choose' | 'default';
 
@@ -17,7 +17,7 @@ export interface ProfileData {
   // Optional för bakåtkompatibilitet med profiler skapade innan fältet fanns.
   email?: string;
   birthYear: number | null;
-  skill: Skill | null;
+  assistance: AssistanceLevel | null;
   region: Region | null;
   avatarSource: AvatarSource;
   selectedAvatarId: string;
@@ -47,6 +47,15 @@ export interface ProfileData {
   gameEraTo?: number;
 }
 
+// Dual-read mapping för profiler skapade innan rename
+// (skill: 'easy' | 'intermediate' | 'expert' → assistance: 'full' | 'standard' | 'minimal').
+// Mer hjälp = full assistance; mindre hjälp = minimal assistance.
+const LEGACY_SKILL_TO_ASSISTANCE: Record<string, AssistanceLevel> = {
+  easy: 'full',
+  intermediate: 'standard',
+  expert: 'minimal',
+};
+
 export async function saveProfile(data: ProfileData): Promise<void> {
   try {
     await AsyncStorage.setItem(PROFILE_KEY, JSON.stringify(data));
@@ -60,13 +69,22 @@ export async function loadProfile(): Promise<ProfileData | null> {
   try {
     const json = await AsyncStorage.getItem(PROFILE_KEY);
     if (!json) return null;
-    const raw = JSON.parse(json) as Partial<ProfileData> & { nickname?: string };
+    const raw = JSON.parse(json) as Partial<ProfileData> & {
+      nickname?: string;
+      skill?: string;
+    };
     // Migrera gamla profiler (skapade när fältet hette `nickname`) till
     // nya schemat med `playerName`. Nästa saveProfile skriver bara nya
     // fältet, så storage konvergerar passivt mot det nya schemat.
     if (raw.playerName === undefined && typeof raw.nickname === 'string') {
       raw.playerName = raw.nickname;
       delete raw.nickname;
+    }
+    // Migrera profiler skapade när fältet hette `skill` med värdena
+    // easy/intermediate/expert → nya `assistance` med full/standard/minimal.
+    if (raw.assistance === undefined && typeof raw.skill === 'string') {
+      raw.assistance = LEGACY_SKILL_TO_ASSISTANCE[raw.skill] ?? null;
+      delete raw.skill;
     }
     return raw as ProfileData;
   } catch (err) {
