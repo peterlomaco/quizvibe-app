@@ -617,7 +617,7 @@ export default function ProfileScreen() {
               <Pressable
                 style={({ pressed }) => [
                   styles.modeOption,
-                  maxPlayers === 12 ? styles.modeOptionIndivActive : styles.modeOptionInactive,
+                  maxPlayers === 12 ? styles.modeOptionPremiumActive : styles.modeOptionInactive,
                   pressed && { opacity: 0.7 },
                 ]}
                 onPress={() => setMaxPlayers(12)}
@@ -625,17 +625,26 @@ export default function ProfileScreen() {
                 <Text
                   style={[
                     styles.modeLabel,
-                    maxPlayers === 12 && styles.modeLabelActive,
+                    maxPlayers === 12 && styles.modeLabelActivePremium,
                   ]}
                 >
                   Max 12 Players
                 </Text>
+                {/* PREMIUM-badge: guld när Max 12 är vald (visuell bekräftelse
+                    på premium-läge) eller när användaren har betalat. Grå
+                    annars — signalerar "låst tills du köper". */}
                 <View
-                  style={[styles.premiumBadge, !hasPremium && styles.premiumBadgeGrey]}
+                  style={[
+                    styles.premiumBadge,
+                    !(maxPlayers === 12 || hasPremium) && styles.premiumBadgeGrey,
+                  ]}
                   pointerEvents="none"
                 >
                   <Text
-                    style={[styles.premiumBadgeText, !hasPremium && styles.premiumBadgeTextGrey]}
+                    style={[
+                      styles.premiumBadgeText,
+                      !(maxPlayers === 12 || hasPremium) && styles.premiumBadgeTextGrey,
+                    ]}
                   >
                     PREMIUM
                   </Text>
@@ -1920,6 +1929,13 @@ const styles = StyleSheet.create({
     borderColor: Colors.primary,
     backgroundColor: Colors.primaryMuted,
   },
+  // Guld-tonad aktiv variant — Max 12 Players när det är valt. Speglar
+  // PREMIUM-badge:s guldfärg så toggle-rutan, badge:n och texten bildar
+  // ett samlat "premium-läge"-uttryck.
+  modeOptionPremiumActive: {
+    borderColor: '#F5A623',
+    backgroundColor: Colors.primaryMuted,
+  },
   modeLabel: {
     fontSize: FontSize.sm,
     fontWeight: FontWeight.medium,
@@ -1927,6 +1943,11 @@ const styles = StyleSheet.create({
   },
   modeLabelActive: {
     color: Colors.primary,
+    fontWeight: FontWeight.semibold,
+  },
+  // Guld-tonad aktiv label — Max 12 Players när det är valt.
+  modeLabelActivePremium: {
+    color: '#F5A623',
     fontWeight: FontWeight.semibold,
   },
   modeLabelActiveFree: {
