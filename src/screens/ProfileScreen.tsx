@@ -142,6 +142,23 @@ export default function ProfileScreen() {
   // (köpt) eller grått (inte köpt än). ProfileData saknar subscription-fält
   // tills RevenueCat-integrationen kommer in, så håll false tills vidare.
   const hasPremium = false;
+
+  // Försök att välja Max 12 utan Premium → Store-omdirigering. Speglar
+  // Lobby:s handleSelectMode-pattern för Individual Devices utan paket.
+  const handleSelectMaxPlayers = (value: 4 | 12) => {
+    if (value === 12 && !hasPremium) {
+      Alert.alert(
+        'Premium feature',
+        'Hosting up to 12 players requires the Premium subscription. Get it in the Store?',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Go to Store', onPress: () => router.push('/store') },
+        ],
+      );
+      return;
+    }
+    setMaxPlayers(value);
+  };
   const [yearPickerOpen, setYearPickerOpen]     = useState(false);
   const [assistancePickerOpen, setAssistancePickerOpen]   = useState(false);
   const [regionPickerOpen, setRegionPickerOpen] = useState(false);
@@ -600,7 +617,7 @@ export default function ProfileScreen() {
                   maxPlayers === 4 ? styles.modeOptionPassActive : styles.modeOptionInactive,
                   pressed && { opacity: 0.7 },
                 ]}
-                onPress={() => setMaxPlayers(4)}
+                onPress={() => handleSelectMaxPlayers(4)}
               >
                 <Text
                   style={[
@@ -620,7 +637,7 @@ export default function ProfileScreen() {
                   maxPlayers === 12 ? styles.modeOptionPremiumActive : styles.modeOptionInactive,
                   pressed && { opacity: 0.7 },
                 ]}
-                onPress={() => setMaxPlayers(12)}
+                onPress={() => handleSelectMaxPlayers(12)}
               >
                 <Text
                   style={[
