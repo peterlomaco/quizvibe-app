@@ -10,6 +10,7 @@ const PROFILE_KEY = '@quizvibe/profile/v1';
 export type AssistanceLevel = 'minimal' | 'standard' | 'full';
 export type Region = 'sweden' | 'nordics' | 'global';
 export type AvatarSource = 'upload' | 'choose' | 'default';
+export type GameMode = 'pass-the-phone' | 'individual-devices';
 
 export interface ProfileData {
   playerName: string;
@@ -49,6 +50,10 @@ export interface ProfileData {
   // 12 = kräver Premium-paket. Optional för bakåtkompatibilitet —
   // defaultas till 4 i UI.
   maxPlayers?: 4 | 12;
+  // Default game mode (host-default). 'pass-the-phone' = en delad enhet
+  // (gratis), 'individual-devices' = parallellt spel (kräver Premium).
+  // Optional för bakåtkompatibilitet — defaultas till 'pass-the-phone' i UI.
+  gameMode?: GameMode;
 }
 
 // Dual-read mapping för profiler skapade innan rename

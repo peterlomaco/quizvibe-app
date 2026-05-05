@@ -35,6 +35,7 @@ import {
     saveProfile,
     type AssistanceLevel,
     type AvatarSource,
+    type GameMode,
     type Region,
 } from '../utils/profileStorage';
 
@@ -138,10 +139,31 @@ export default function ProfileScreen() {
   const [eraValues, setEraValues] = useState<[number, number]>([1980, 2010]);
   // Max antal spelare per spel — 4 = Basic (gratis), 12 = Premium.
   const [maxPlayers, setMaxPlayers] = useState<4 | 12>(4);
+  // Default game mode (host-default) — 'pass-the-phone' (gratis) eller
+  // 'individual-devices' (Premium).
+  const [gameMode, setGameMode] = useState<GameMode>('pass-the-phone');
   // Premium-status — styr om PREMIUM-badge på Max 12-toggle visas i guld
   // (köpt) eller grått (inte köpt än). ProfileData saknar subscription-fält
   // tills RevenueCat-integrationen kommer in, så håll false tills vidare.
   const hasPremium = false;
+
+  // Försök att välja Individual Devices utan Premium → Store-omdirigering.
+  // Speglar Lobby:s handleSelectMode-pattern.
+  const handleSelectGameMode = (mode: GameMode) => {
+    if (mode === gameMode) return;
+    if (mode === 'individual-devices' && !hasPremium) {
+      Alert.alert(
+        'Premium feature',
+        'Multiplayer on individual devices requires the Premium subscription. Get it in the Store?',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Go to Store', onPress: () => router.push('/store') },
+        ],
+      );
+      return;
+    }
+    setGameMode(mode);
+  };
 
   // Försök att välja Max 12 utan Premium → Store-omdirigering. Speglar
   // Lobby:s handleSelectMode-pattern för Individual Devices utan paket.
@@ -196,6 +218,7 @@ export default function ProfileScreen() {
         setAnswerResponseSeconds(data.answerResponseSeconds ?? 30);
         setEraValues([data.gameEraFrom ?? 1980, data.gameEraTo ?? 2010]);
         setMaxPlayers(data.maxPlayers ?? 4);
+        setGameMode(data.gameMode ?? 'pass-the-phone');
       });
       loadFriends().then((list) => {
         if (active) setFriends(list);
@@ -241,6 +264,7 @@ export default function ProfileScreen() {
         gameEraFrom: eraValues[0],
         gameEraTo: eraValues[1],
         maxPlayers,
+        gameMode,
       });
       setIsSaved(true);
       setTimeout(() => setIsSaved(false), 2000);
@@ -599,6 +623,71 @@ export default function ProfileScreen() {
                 sliderLength={ERA_SLIDER_WIDTH}
               />
               <DecadeMarks />
+            </View>
+          </View>
+
+          {/* ── Game Mode (host-default) ─────────────────────────
+              Pass-the-Phone (gratis) vs Individual Devices (Premium).
+              Speglar Lobby:s Game Mode-toggle exakt — grön aktiv för
+              Pass-the-Phone (free), guld aktiv för Individual Devices
+              (premium-läge). Försök att välja Individual Devices utan
+              Premium triggar Store-omdirigering. */}
+          <View style={styles.field}>
+            <Text style={styles.fieldLabel}>Game Mode</Text>
+            <View style={styles.modeToggle}>
+              <Pressable
+                style={({ pressed }) => [
+                  styles.modeOption,
+                  gameMode === 'pass-the-phone' ? styles.modeOptionPassActive : styles.modeOptionInactive,
+                  pressed && { opacity: 0.7 },
+                ]}
+                onPress={() => handleSelectGameMode('pass-the-phone')}
+              >
+                <Text
+                  style={[
+                    styles.modeLabel,
+                    gameMode === 'pass-the-phone' && styles.modeLabelActiveFree,
+                  ]}
+                >
+                  Pass-the-Phone
+                </Text>
+                <View style={styles.freeBadge} pointerEvents="none">
+                  <Text style={styles.freeBadgeText}>FREE</Text>
+                </View>
+              </Pressable>
+              <Pressable
+                style={({ pressed }) => [
+                  styles.modeOption,
+                  gameMode === 'individual-devices' ? styles.modeOptionPremiumActive : styles.modeOptionInactive,
+                  pressed && { opacity: 0.7 },
+                ]}
+                onPress={() => handleSelectGameMode('individual-devices')}
+              >
+                <Text
+                  style={[
+                    styles.modeLabel,
+                    gameMode === 'individual-devices' && styles.modeLabelActivePremium,
+                  ]}
+                >
+                  Individual Devices
+                </Text>
+                <View
+                  style={[
+                    styles.premiumBadge,
+                    !(gameMode === 'individual-devices' || hasPremium) && styles.premiumBadgeGrey,
+                  ]}
+                  pointerEvents="none"
+                >
+                  <Text
+                    style={[
+                      styles.premiumBadgeText,
+                      !(gameMode === 'individual-devices' || hasPremium) && styles.premiumBadgeTextGrey,
+                    ]}
+                  >
+                    PREMIUM
+                  </Text>
+                </View>
+              </Pressable>
             </View>
           </View>
 
