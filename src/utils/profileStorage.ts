@@ -34,10 +34,6 @@ export interface ProfileData {
   // ad-free under quiz-rundor. Optional för bakåtkompatibilitet.
   // TODO (auth): byt till riktigt OAuth-flöde mot Spotify Web API.
   spotifyConnected?: boolean;
-  // Om användaren har kopplat sitt YouTube-konto för förbättrad
-  // video-uppspelning under quiz-rundor. Optional för bakåtkompatibilitet.
-  // TODO (auth): byt till YouTube Data API + Google OAuth.
-  youtubeConnected?: boolean;
   // Hur länge spelarna har på sig att svara på en fråga (i sekunder).
   // Skiljer sig från hur länge frågematerialet (låt/video/bild) spelas upp.
   // Optional för bakåtkompatibilitet — defaultas till 30 i UI.

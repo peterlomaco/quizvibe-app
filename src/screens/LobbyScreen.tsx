@@ -1,4 +1,5 @@
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
+import * as Haptics from 'expo-haptics';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
@@ -23,6 +24,7 @@ import Svg, { Circle, Path } from 'react-native-svg';
 import { ApproveToggle } from '../components/ApproveToggle';
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
+import { EraMarkerMinus, EraMarkerPlus } from '../components/EraSliderMarker';
 import { Player, PlayerRow } from '../components/PlayerRow';
 import { QuizVibeLogo } from '../components/QuizVibeLogo';
 import { TopUserBanner } from '../components/TopUserBanner';
@@ -125,9 +127,30 @@ const REGION_FLAGS: Record<Region, string> = {
   Sweden: '🇸🇪', Nordics: '🌐', Europe: '🇪🇺', Global: '🌍',
 };
 
-const ERA_MIN = 1900;
+// ERA_MIN = 1930 så slider-värdet matchar tidsaxelns vänsterkant ("<1930").
+// Tidigare gick slidern 1900..currentYear medan axeln visuellt började vid
+// "<1930" — det skapade en 30-års-förskjutning mellan thumb-position och
+// vad rutan ovan visade. Nu mappar 0 % → 1930 och 100 % → currentYear.
+const ERA_MIN = 1930;
 const ERA_MAX = new Date().getFullYear();
 const SLIDER_WIDTH = 280;
+// SLIDER_INSET = pixel-buffer på vardera sida så thumb-cirklarna (24px,
+// extends 12px från center) inte sticker ut förbi slider-trackens kanter
+// vid ERA_MIN/ERA_MAX. MultiSlider:s sliderLength sätts till INNER_WIDTH
+// och DecadeMarks-positionen offset:as med INSET så labels och thumbs
+// fortsatt aligns inom det inset:ade området. Resultat: vänster thumb
+// flyttas något åt höger och höger thumb något åt vänster relativt
+// slider-viewport:en, men matchar fortfarande sina år-labels exakt.
+const SLIDER_INSET = 12;
+const SLIDER_INNER_WIDTH = SLIDER_WIDTH - 2 * SLIDER_INSET;
+// Minsta tillåtna avstånd mellan from/to-markörerna på Game Era-slidern.
+// Ett 10-årigt fönster är minimum för att frågedatabasen ska kunna leverera
+// ett rimligt urval — kortare span blir för glest.
+const ERA_MIN_INTERVAL = 10;
+// MultiSlider:s minMarkerOverlapDistance är i pixel — räkna ut hur många
+// pixel 10 år motsvarar på SLIDER_INNER_WIDTH-skalan så lib:n håller
+// markörerna från att komma närmare än så. Ceil för att inte underskrida.
+const ERA_MIN_INTERVAL_PX = Math.ceil((ERA_MIN_INTERVAL / (ERA_MAX - ERA_MIN)) * SLIDER_INNER_WIDTH);
 
 // Antal rundor:
 //   • Pass-the-Phone: 2–4 (telefonen rör sig fysiskt mellan spelare så
@@ -332,20 +355,41 @@ const roundsRulerStyles = StyleSheet.create({
 });
 
 function DecadeMarks() {
-  const decades = Array.from(
-    { length: Math.floor((ERA_MAX - ERA_MIN) / 10) + 1 },
-    (_, i) => ERA_MIN + i * 10
-  );
+  // Tidsaxel — labels positionerade på faktiska års-värden, INTE jämnt
+  // fördelade. Det gör att thumben landar exakt på respektive label
+  // (eftersom slidern mappar ERA_MIN..ERA_MAX linjärt). Tidigare jämn-
+  // fördelning gav 1–5 års offset mellan thumb och label vilket såg
+  // omatchat ut. Nu: position = ((year - ERA_MIN) / (ERA_MAX - ERA_MIN))
+  // * SLIDER_WIDTH per label. Ledmellanrummet 2010 → ERA_MAX är något
+  // bredare än övriga eftersom det spannet är ~16 år istället för 10.
+  const labelEntries: { label: string; year: number }[] = [
+    { label: '<1930', year: ERA_MIN },
+    { label: '1940', year: 1940 },
+    { label: '1950', year: 1950 },
+    { label: '1960', year: 1960 },
+    { label: '1970', year: 1970 },
+    { label: '1980', year: 1980 },
+    { label: '1990', year: 1990 },
+    { label: '2000', year: 2000 },
+    { label: '2010', year: 2010 },
+    { label: '2020', year: 2020 },
+  ];
   return (
-    <View style={{ width: SLIDER_WIDTH, height: 50, marginTop: 6 }}>
-      {decades.map((year) => {
-        const position = ((year - ERA_MIN) / (ERA_MAX - ERA_MIN)) * SLIDER_WIDTH;
+    <View style={{ width: SLIDER_WIDTH, height: 75, marginTop: 6 }}>
+      {labelEntries.map(({ label, year }) => {
+        const position = SLIDER_INSET + ((year - ERA_MIN) / (ERA_MAX - ERA_MIN)) * SLIDER_INNER_WIDTH;
         return (
-          <View key={year} style={{ position: 'absolute', left: position, alignItems: 'center', width: 1 }}>
-            <View style={{ width: 1, height: 5, backgroundColor: Colors.borderStrong }} />
-            <View style={{ width: 30, height: 10, marginTop: 12, transform: [{ rotate: '90deg' }] }}>
-              <Text style={{ fontSize: 8, color: Colors.textSecondary, textAlign: 'center', width: 30 }}>
-                {year}
+          <View key={label} style={{ position: 'absolute', left: position, alignItems: 'center', width: 1 }}>
+            {/* Tick: marginTop:-10 + height:14 → ticken pokar 10px upp i
+                slider-zonen och fortsätter 4px ned i gapet under, så den
+                visuellt skär slider-tracken något. */}
+            <View style={{ width: 1, height: 14, backgroundColor: Colors.borderStrong, marginTop: -10 }} />
+            {/* Label-container: width 60 × height 20 (var 30×10) för att
+                rymma fördubblad text. fontSize 16 (var 8) ≈ 2× större per
+                användarens önskan. */}
+            <View style={{ width: 60, height: 20, marginTop: 14, transform: [{ rotate: '90deg' }] }}>
+              <Text style={{ fontSize: 16, color: Colors.textSecondary, textAlign: 'center', width: 60 }}>
+                {label}
               </Text>
             </View>
           </View>
@@ -1967,11 +2011,14 @@ export default function LobbyScreen() {
             </View>
             {/* Game Era */}
             <View>
-              <Text style={styles.cardTitle}>🕐 Game Era</Text>
+              <Text style={styles.cardTitle}>🕐 Game Era (min 10 year interval)</Text>
               <Text style={styles.cardSubtitle}>Set the time span for questions</Text>
               {/* Det valda årtalsintervallet visas i samma gul/glow-ruta för
                   både host och non-host (in-game year-selector-paritet). Host
-                  får dessutom slidern + DecadeMarks under för att kunna dra. */}
+                  får dessutom slidern + DecadeMarks under för att kunna dra.
+                  Slidern är guldtonad (Colors.warning = #F5A623) för att
+                  matcha rutans kantlinje + glow. minMarkerOverlapDistance
+                  hindrar markörerna från att komma närmare än 10 år. */}
               <View style={styles.eraGuestBoxWrap}>
                 <View style={styles.eraGuestBox}>
                   <Text style={styles.eraGuestBoxText}>{clampedFrom} – {clampedTo}</Text>
@@ -1984,13 +2031,40 @@ export default function LobbyScreen() {
                     min={ERA_MIN}
                     max={ERA_MAX}
                     step={1}
-                    onValuesChange={(vals) => setEraValues(vals)}
-                    selectedStyle={{ backgroundColor: Colors.primary }}
+                    onValuesChange={(vals) => {
+                      // Defensiv guard ifall lib:n släpper igenom värden under
+                      // 10 år trots minMarkerOverlapDistance — ignorera updates
+                      // som bryter regeln. UI:t snappar visuellt till senaste
+                      // giltiga state.
+                      if (vals[1] - vals[0] < ERA_MIN_INTERVAL) return;
+                      // Tick-haptic per år-ändring — selectionAsync är Apple:s
+                      // picker-tick (subtil tap-känsla på iOS, KEYBOARD_TAP-
+                      // feedback på Android som även producerar OS-klick-ljud).
+                      // No-op på web. Step=1 ⇒ exakt en haptic per år.
+                      void Haptics.selectionAsync();
+                      setEraValues(vals);
+                    }}
+                    minMarkerOverlapDistance={ERA_MIN_INTERVAL_PX}
+                    isMarkersSeparated
+                    customMarkerLeft={EraMarkerMinus}
+                    customMarkerRight={EraMarkerPlus}
+                    // markerOffsetY = trackStyle.height / 2 — centrerar
+                    // thumben på track-centerlinjen. Utan offsetten lägger
+                    // lib:n thumben med center vid fullTrack-top istället.
+                    markerOffsetY={3}
+                    selectedStyle={{
+                      backgroundColor: Colors.warning,
+                      borderRadius: 3,
+                      shadowColor: Colors.warning,
+                      shadowOffset: { width: 0, height: 0 },
+                      shadowOpacity: 0.85,
+                      shadowRadius: 8,
+                      elevation: 4,
+                    }}
                     unselectedStyle={{ backgroundColor: Colors.border }}
-                    markerStyle={{ backgroundColor: Colors.primary, borderColor: Colors.background, borderWidth: 2, width: 22, height: 22 }}
-                    trackStyle={{ height: 4, borderRadius: 2 }}
+                    trackStyle={{ height: 6 }}
                     containerStyle={{ alignSelf: 'center' }}
-                    sliderLength={SLIDER_WIDTH}
+                    sliderLength={SLIDER_INNER_WIDTH}
                   />
                   <DecadeMarks />
                 </View>

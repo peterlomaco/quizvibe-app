@@ -1,4 +1,5 @@
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
+import * as Haptics from 'expo-haptics';
 import { router, useFocusEffect } from 'expo-router';
 import React, { useCallback, useState } from 'react';
 import {
@@ -16,6 +17,7 @@ import {
 import { Avatar } from '../components/Avatar';
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
+import { EraMarkerMinus, EraMarkerPlus } from '../components/EraSliderMarker';
 import { PlayerHistorySection } from '../components/PlayerHistorySection';
 import { QuizVibeFriendsLogo } from '../components/QuizVibeFriendsLogo';
 import { QuizVibeQAvatar } from '../components/QuizVibeQAvatar';
@@ -87,25 +89,60 @@ const ANSWER_RESPONSE_OPTIONS: { id: AnswerResponse; label: string }[] = [
 
 // Game era — år-spann för frågor. Speglar Lobby-skärmens slider men utan
 // player-clamping (Profile är default-setup, inga spelare i kontext).
-const ERA_MIN = 1900;
+// ERA_MIN_INTERVAL = minsta tillåtna avstånd mellan from/to-markörer (10 år).
+// ERA_MIN_INTERVAL_PX räknar om det till slider-pixel för MultiSlider:s
+// minMarkerOverlapDistance-prop.
+// ERA_MIN = 1930 så slider-värdet matchar tidsaxelns vänsterkant ("<1930").
+// Tidigare gick slidern 1900..currentYear medan axeln visuellt började vid
+// "<1930" — det skapade en 30-års-förskjutning mellan thumb-position och
+// vad rutan ovan visade. Nu mappar 0 % → 1930 och 100 % → currentYear.
+const ERA_MIN = 1930;
 const ERA_MAX = new Date().getFullYear();
 const ERA_SLIDER_WIDTH = 280;
+// SLIDER_INSET = pixel-buffer på vardera sida så thumb-cirklarna inte
+// sticker ut förbi slider-trackens kanter. MultiSlider:s sliderLength
+// sätts till INNER_WIDTH och DecadeMarks-positionen offset:as med INSET.
+const ERA_SLIDER_INSET = 12;
+const ERA_SLIDER_INNER_WIDTH = ERA_SLIDER_WIDTH - 2 * ERA_SLIDER_INSET;
+const ERA_MIN_INTERVAL = 10;
+const ERA_MIN_INTERVAL_PX = Math.ceil((ERA_MIN_INTERVAL / (ERA_MAX - ERA_MIN)) * ERA_SLIDER_INNER_WIDTH);
 
 function DecadeMarks() {
-  const decades = Array.from(
-    { length: Math.floor((ERA_MAX - ERA_MIN) / 10) + 1 },
-    (_, i) => ERA_MIN + i * 10,
-  );
+  // Tidsaxel — labels positionerade på faktiska års-värden, INTE jämnt
+  // fördelade. Det gör att thumben landar exakt på respektive label
+  // (eftersom slidern mappar ERA_MIN..ERA_MAX linjärt). Tidigare jämn-
+  // fördelning gav 1–5 års offset mellan thumb och label vilket såg
+  // omatchat ut. Nu: position = ((year - ERA_MIN) / (ERA_MAX - ERA_MIN))
+  // * ERA_SLIDER_WIDTH per label. Ledmellanrummet 2010 → ERA_MAX är något
+  // bredare än övriga eftersom det spannet är ~16 år istället för 10.
+  const labelEntries: { label: string; year: number }[] = [
+    { label: '<1930', year: ERA_MIN },
+    { label: '1940', year: 1940 },
+    { label: '1950', year: 1950 },
+    { label: '1960', year: 1960 },
+    { label: '1970', year: 1970 },
+    { label: '1980', year: 1980 },
+    { label: '1990', year: 1990 },
+    { label: '2000', year: 2000 },
+    { label: '2010', year: 2010 },
+    { label: '2020', year: 2020 },
+  ];
   return (
-    <View style={{ width: ERA_SLIDER_WIDTH, height: 50, marginTop: 6 }}>
-      {decades.map((year) => {
-        const position = ((year - ERA_MIN) / (ERA_MAX - ERA_MIN)) * ERA_SLIDER_WIDTH;
+    <View style={{ width: ERA_SLIDER_WIDTH, height: 75, marginTop: 6 }}>
+      {labelEntries.map(({ label, year }) => {
+        const position = ERA_SLIDER_INSET + ((year - ERA_MIN) / (ERA_MAX - ERA_MIN)) * ERA_SLIDER_INNER_WIDTH;
         return (
-          <View key={year} style={{ position: 'absolute', left: position, alignItems: 'center', width: 1 }}>
-            <View style={{ width: 1, height: 5, backgroundColor: Colors.borderStrong }} />
-            <View style={{ width: 30, height: 10, marginTop: 12, transform: [{ rotate: '90deg' }] }}>
-              <Text style={{ fontSize: 8, color: Colors.textSecondary, textAlign: 'center', width: 30 }}>
-                {year}
+          <View key={label} style={{ position: 'absolute', left: position, alignItems: 'center', width: 1 }}>
+            {/* Tick: marginTop:-10 + height:14 → ticken pokar 10px upp i
+                slider-zonen och fortsätter 4px ned i gapet under, så den
+                visuellt skär slider-tracken något. */}
+            <View style={{ width: 1, height: 14, backgroundColor: Colors.borderStrong, marginTop: -10 }} />
+            {/* Label-container: width 60 × height 20 (var 30×10) för att
+                rymma fördubblad text. fontSize 16 (var 8) ≈ 2× större per
+                användarens önskan. */}
+            <View style={{ width: 60, height: 20, marginTop: 14, transform: [{ rotate: '90deg' }] }}>
+              <Text style={{ fontSize: 16, color: Colors.textSecondary, textAlign: 'center', width: 60 }}>
+                {label}
               </Text>
             </View>
           </View>
@@ -131,7 +168,6 @@ export default function ProfileScreen() {
   const [gameCredits, setGameCredits]     = useState<number>(0);
   const [freeGameCredits, setFreeGameCredits] = useState<number>(0);
   const [spotifyConnected, setSpotifyConnected] = useState<boolean>(false);
-  const [youtubeConnected, setYoutubeConnected] = useState<boolean>(false);
   const [friends, setFriends] = useState<Friend[]>([]);
   const [friendsModalOpen, setFriendsModalOpen] = useState(false);
   const [newFriendPlayerName, setNewFriendPlayerName] = useState('');
@@ -186,7 +222,7 @@ export default function ProfileScreen() {
   const [regionPickerOpen, setRegionPickerOpen] = useState(false);
   const [answerResponsePickerOpen, setAnswerResponsePickerOpen] = useState(false);
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
-  // Game connections-blocket (Spotify + YouTube + Friends) kan kollapsas
+  // Game connections-blocket (Spotify + Friends) kan kollapsas
   // för att minska scrollning. Default expanded så användaren ser
   // alternativen direkt vid första besöket.
   const [gameConnectionsExpanded, setGameConnectionsExpanded] = useState(true);
@@ -214,9 +250,14 @@ export default function ProfileScreen() {
         setGameCredits(data.gameCredits ?? 0);
         setFreeGameCredits(data.freeGameCredits ?? 0);
         setSpotifyConnected(data.spotifyConnected ?? false);
-        setYoutubeConnected(data.youtubeConnected ?? false);
         setAnswerResponseSeconds(data.answerResponseSeconds ?? 30);
-        setEraValues([data.gameEraFrom ?? 1980, data.gameEraTo ?? 2010]);
+        // Clamp till nuvarande slider-range — gamla profiler kan ha sparat
+        // gameEraFrom < 1930 från tiden då ERA_MIN var 1900. Utan clamp:n
+        // skulle box visa t.ex. "1925" medan thumben sitter på 1930.
+        setEraValues([
+          Math.max(ERA_MIN, data.gameEraFrom ?? 1980),
+          Math.min(ERA_MAX, data.gameEraTo ?? 2010),
+        ]);
         setMaxPlayers(data.maxPlayers ?? 4);
         setGameMode(data.gameMode ?? 'pass-the-phone');
       });
@@ -259,7 +300,6 @@ export default function ProfileScreen() {
         gameCredits,
         freeGameCredits,
         spotifyConnected,
-        youtubeConnected,
         answerResponseSeconds,
         gameEraFrom: eraValues[0],
         gameEraTo: eraValues[1],
@@ -317,46 +357,6 @@ export default function ProfileScreen() {
               const data = await loadProfile();
               if (data) {
                 await saveProfile({ ...data, spotifyConnected: false });
-              }
-            } catch {
-              // tyst
-            }
-          },
-        },
-      ],
-    );
-  };
-
-  // Mock YouTube connect — speglar Spotify-mönstret. För riktig integration
-  // används YouTube Data API + OAuth via Google sign-in.
-  // TODO (auth): implementera riktig YouTube OAuth.
-  const handleConnectYoutube = async () => {
-    setYoutubeConnected(true);
-    try {
-      const data = await loadProfile();
-      if (data) {
-        await saveProfile({ ...data, youtubeConnected: true });
-      }
-    } catch {
-      // tyst — UI:t har redan uppdaterats
-    }
-  };
-
-  const handleDisconnectYoutube = () => {
-    Alert.alert(
-      'Disconnect YouTube?',
-      'You will lose the enhanced video experience during games.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Disconnect',
-          style: 'destructive',
-          onPress: async () => {
-            setYoutubeConnected(false);
-            try {
-              const data = await loadProfile();
-              if (data) {
-                await saveProfile({ ...data, youtubeConnected: false });
               }
             } catch {
               // tyst
@@ -727,14 +727,18 @@ export default function ProfileScreen() {
             </View>
           </View>
 
-          {/* Game era — adjustable år-spann för frågor (samma slider-mönster
-              som Lobbyns Game Era). */}
+          {/* Game era — adjustable år-spann för frågor. Tidsjusteraren
+              kopierad från Lobbyns Game Era (gul-glödande year-range-ruta
+              + guld-tonad MultiSlider + DecadeMarks under). Ingen player-
+              clamping här — Profile är default-setup utan spelare i kontext.
+              minMarkerOverlapDistance hindrar markörerna från att komma
+              närmare än 10 år. */}
           <View style={styles.field}>
-            <Text style={styles.fieldLabel}>Game era</Text>
-            <View style={styles.eraDisplay}>
-              <Text style={styles.eraDisplayYear}>{eraValues[0]}</Text>
-              <Text style={styles.eraDisplayDash}>–</Text>
-              <Text style={styles.eraDisplayYear}>{eraValues[1]}</Text>
+            <Text style={styles.fieldLabel}>Game era (min 10 year interval)</Text>
+            <View style={styles.eraGuestBoxWrap}>
+              <View style={styles.eraGuestBox}>
+                <Text style={styles.eraGuestBoxText}>{eraValues[0]} – {eraValues[1]}</Text>
+              </View>
             </View>
             <View style={{ alignItems: 'center' }}>
               <MultiSlider
@@ -742,19 +746,38 @@ export default function ProfileScreen() {
                 min={ERA_MIN}
                 max={ERA_MAX}
                 step={1}
-                onValuesChange={(vals) => setEraValues([vals[0], vals[1]])}
-                selectedStyle={{ backgroundColor: Colors.primary }}
-                unselectedStyle={{ backgroundColor: Colors.border }}
-                markerStyle={{
-                  backgroundColor: Colors.primary,
-                  borderColor: Colors.background,
-                  borderWidth: 2,
-                  width: 22,
-                  height: 22,
+                onValuesChange={(vals) => {
+                  // Defensiv guard — ignorera updates som bryter 10-årsregeln
+                  // ifall lib:n släpper igenom värden trots minMarkerOverlap.
+                  if (vals[1] - vals[0] < ERA_MIN_INTERVAL) return;
+                  // Tick-haptic per år-ändring — selectionAsync är Apple:s
+                  // picker-tick (subtil tap-känsla på iOS, KEYBOARD_TAP-
+                  // feedback på Android som även producerar OS-klick-ljud).
+                  // No-op på web. Step=1 ⇒ exakt en haptic per år.
+                  void Haptics.selectionAsync();
+                  setEraValues([vals[0], vals[1]]);
                 }}
-                trackStyle={{ height: 4, borderRadius: 2 }}
+                minMarkerOverlapDistance={ERA_MIN_INTERVAL_PX}
+                isMarkersSeparated
+                customMarkerLeft={EraMarkerMinus}
+                customMarkerRight={EraMarkerPlus}
+                // markerOffsetY = trackStyle.height / 2 — centrerar
+                // thumben på track-centerlinjen. Utan offsetten lägger
+                // lib:n thumben med center vid fullTrack-top istället.
+                markerOffsetY={3}
+                selectedStyle={{
+                  backgroundColor: Colors.warning,
+                  borderRadius: 3,
+                  shadowColor: Colors.warning,
+                  shadowOffset: { width: 0, height: 0 },
+                  shadowOpacity: 0.85,
+                  shadowRadius: 8,
+                  elevation: 4,
+                }}
+                unselectedStyle={{ backgroundColor: Colors.border }}
+                trackStyle={{ height: 6 }}
                 containerStyle={{ alignSelf: 'center' }}
-                sliderLength={ERA_SLIDER_WIDTH}
+                sliderLength={ERA_SLIDER_INNER_WIDTH}
               />
               <DecadeMarks />
             </View>
@@ -823,49 +846,6 @@ export default function ProfileScreen() {
               spotifyConnected && styles.spotifyBtnTextDisconnect,
             ]}>
               {spotifyConnected ? 'Disconnect' : 'Connect Spotify account'}
-            </Text>
-          </Pressable>
-        </View>
-
-        {/* ── YouTube-koppling ──────────────────────────────────── */}
-        {/* Speglar Spotify-kortets layout. Loggan är en röd kvadrat
-            (44x44) med vit playpil centrerad — matchar Spotify-ikonens
-            storlek och Lobbyns YouTube-rad fast uppskalat. */}
-        <View style={styles.youtubeCard}>
-          {/* "Partly Free"-badge som skär kortets röda kantlinje i
-              övre högre delen — samma border-skärande mönster som
-              FREE-badgen i Lobbyns Game Mode-toggle. */}
-          <View style={styles.partlyFreeBadge} pointerEvents="none">
-            <Text style={styles.partlyFreeBadgeText}>PARTLY FREE</Text>
-          </View>
-          <View style={styles.spotifyHeader}>
-            <View style={[styles.youtubeIconWrap, !youtubeConnected && styles.youtubeIconWrapMuted]}>
-              <View style={[styles.youtubeIconArrow, !youtubeConnected && styles.youtubeIconArrowMuted]} />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.spotifyTitle}>
-                {youtubeConnected ? 'YouTube connected' : 'Connect your YouTube account'}
-              </Text>
-              <Text style={styles.spotifySubtitle}>
-                Use the most potential from YouTube. No connection will still use YouTube basic material for free.
-              </Text>
-            </View>
-            {youtubeConnected && <Text style={styles.youtubeCheck}>✓</Text>}
-          </View>
-
-          <Pressable
-            onPress={youtubeConnected ? handleDisconnectYoutube : handleConnectYoutube}
-            style={({ pressed }) => [
-              styles.spotifyBtn,
-              youtubeConnected ? styles.youtubeBtnDisconnect : styles.youtubeBtnConnect,
-              pressed && { opacity: 0.85 },
-            ]}
-          >
-            <Text style={[
-              styles.spotifyBtnText,
-              youtubeConnected && styles.youtubeBtnTextDisconnect,
-            ]}>
-              {youtubeConnected ? 'Disconnect' : 'Connect YouTube account'}
             </Text>
           </Pressable>
         </View>
@@ -1720,87 +1700,6 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
   },
 
-  // YouTube connect-card (speglar Spotify-mönstret — YouTube-röd accent).
-  // position:'relative' så absolut-positionerad PARTLY FREE-badge kan skära
-  // kantlinjen utan att klippas (overflow får INTE vara hidden).
-  youtubeCard: {
-    position: 'relative',
-    backgroundColor: 'rgba(255,0,0,0.06)',
-    borderRadius: Radius.lg,
-    borderWidth: 1.5,
-    borderColor: '#FF0000',
-    padding: Spacing.lg,
-    gap: Spacing.md,
-  },
-  // Border-skärande badge i övre högre hörnet — samma teknik som FREE-badgen
-  // i Lobbyns Game Mode-toggle. Bg matchar youtubeCard.borderColor (#FF0000)
-  // så den känns som en "tag" som överlappar kantlinjen. Vit text för kontrast.
-  partlyFreeBadge: {
-    position: 'absolute',
-    top: -8,
-    right: Spacing.md,
-    backgroundColor: '#FF0000',
-    borderRadius: 4,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    zIndex: 10,
-    elevation: 4,
-  },
-  partlyFreeBadgeText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    letterSpacing: 0.6,
-  },
-  // 44x44 röd rundad kvadrat med vit playpil centrerad
-  // (samma logo-mönster som Lobbyns YouTube-rad fast uppskalat).
-  // marginTop sänker ikonen optiskt mot subtitle-textens vertikala mitt.
-  youtubeIconWrap: {
-    width: 44,
-    height: 44,
-    borderRadius: 10,
-    backgroundColor: '#FF0000',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 6,
-  },
-  youtubeIconArrow: {
-    width: 0,
-    height: 0,
-    borderLeftWidth: 14,
-    borderTopWidth: 9.5,
-    borderBottomWidth: 9.5,
-    borderLeftColor: '#FFFFFF',
-    borderTopColor: 'transparent',
-    borderBottomColor: 'transparent',
-    marginLeft: 3,
-  },
-  // Muted-varianter för YouTube-ikonen när användaren inte är connectead.
-  // Bg byts till neutral grå (samma palett som Spotify-ikonens muted-state)
-  // och playpilen får ljusare grå färg så den fortfarande syns mot bg:n.
-  youtubeIconWrapMuted: {
-    backgroundColor: '#3A3F4B',
-  },
-  youtubeIconArrowMuted: {
-    borderLeftColor: '#9CA3AF',
-  },
-  youtubeCheck: {
-    fontSize: 22,
-    color: '#FF0000',
-    fontWeight: FontWeight.bold,
-  },
-  youtubeBtnConnect: {
-    backgroundColor: '#FF0000',
-  },
-  youtubeBtnDisconnect: {
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: Colors.borderStrong,
-  },
-  youtubeBtnTextDisconnect: {
-    color: Colors.textSecondary,
-  },
-
   // QuizVibe friends card (samma struktur som Spotify-kortet:
   // header upptill, full-bredd-knapp i underkant)
   friendsCard: {
@@ -1816,7 +1715,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     gap: Spacing.md,
   },
-  // Wrapper för QuizVibeFriendsLogo. Bredden matchar Spotify/YouTube-
+  // Wrapper för QuizVibeFriendsLogo. Bredden matchar Spotify-
   // icon-wrapsen (44) så text-blocket börjar på samma x; SVG:n får
   // rendera lite större (52) och tillåts overflow:a wrapper-bounds så
   // ikonen visuellt blir större utan att skjuta titeln längre höger.
@@ -1975,25 +1874,32 @@ const styles = StyleSheet.create({
   fieldHalf: {
     flex: 1,
   },
-  // Game era display + slider styling (matchar Lobby-skärmens mönster)
-  eraDisplay: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+  // Game era display — kopierad från Lobby (eraGuestBox-mönstret) så Profile
+  // använder exakt samma tidsjusterare som Lobbyn. Speglar in-game year-
+  // selector-rutan från app/quiz.tsx (BOX_COLOR='#F5A623', BOX_BG=
+  // 'rgba(26,48,80,0.92)') — gul kantlinje + gul glow + mörkblå fyllning.
+  eraGuestBoxWrap: { alignItems: 'center', paddingVertical: Spacing.sm },
+  eraGuestBox: {
+    paddingHorizontal: Spacing.xl,
+    paddingVertical: Spacing.md,
+    borderWidth: 3,
+    borderRadius: 10,
+    borderColor: '#F5A623',
+    backgroundColor: 'rgba(26,48,80,0.92)',
+    shadowColor: '#F5A623',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.85,
+    shadowRadius: 18,
+    elevation: 8,
     alignItems: 'center',
-    gap: Spacing.md,
-    marginTop: Spacing.xs,
-    marginBottom: Spacing.sm,
+    justifyContent: 'center',
   },
-  eraDisplayYear: {
+  eraGuestBoxText: {
     fontSize: 28,
-    fontWeight: FontWeight.bold,
-    color: Colors.primary,
+    fontWeight: '700',
+    color: '#F5A623',
     fontVariant: ['tabular-nums'],
-  },
-  eraDisplayDash: {
-    fontSize: 22,
-    fontWeight: '300',
-    color: Colors.textSecondary,
+    letterSpacing: -0.5,
   },
   fieldLabel: {
     fontSize: 10,
