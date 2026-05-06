@@ -6,7 +6,7 @@ import { Colors, Radius, Spacing } from '@/src/theme';
 import { identify, resetIdentity, track } from '@/src/utils/analytics';
 import { getAvatarEmojiById } from '@/src/utils/avatars';
 import { clearLeftPlayers } from '@/src/utils/leftPlayers';
-import { isActiveRoom, registerActiveRoom } from '@/src/utils/mockActiveRooms';
+import { getRoomMeta, isActiveRoom, isLobbyFull, isOwnLobby, registerActiveRoom } from '@/src/utils/mockActiveRooms';
 import { generatePlayerName } from '@/src/utils/playerName';
 import { containsProfanity } from '@/src/utils/profanity';
 import { clearProfile, loadProfile, saveProfile, type ProfileData } from '@/src/utils/profileStorage';
@@ -42,6 +42,11 @@ interface JoinModalProps {
   // modalen via "Join Game — as registered user"-knappen, eftersom
   // guest då är ett irrelevant val.
   hideGuest?: boolean;
+  // Inloggad users playerName från parent (HomeScreen). Används för
+  // own-lobby-detektion i join-handlers — om koden tillhör en lobby med
+  // samma playerName som host:s, blockas join (samma user försöker joina
+  // sin egen lobby från en andra enhet). null när ingen är inloggad.
+  currentPlayerName?: string | null;
 }
 
 type AssistanceLevel = 'minimal' | 'standard' | 'full';
@@ -103,7 +108,21 @@ function formatBirthYear(year: number): string {
   return String(year);
 }
 
-function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false }: JoinModalProps) {
+// Visar "Lobby is full"-Alert med text som beror på host:s subscription-
+// status. Free host får upgrade-CTA-formulering; Premium host får bara
+// "remove players"-versionen (inget upselling-meddelande). Returnerar true
+// om popup visades (= caller ska abortera vidare navigation), false annars.
+function checkLobbyCapacity(code: string): boolean {
+  if (!isLobbyFull(code)) return false;
+  const meta = getRoomMeta(code);
+  const message = meta?.hostIsPremium
+    ? 'Lobby is full. Host need to remove players from lobby for others to join'
+    : 'Lobby is full. Host either need to remove players from lobby or to upgrade';
+  Alert.alert('Lobby is full', message);
+  return true;
+}
+
+function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false, currentPlayerName }: JoinModalProps) {
   const [step, setStep] = useState<JoinStep>(initialStep);
   const [code, setCode] = useState('');
   const [guestName, setGuestName] = useState('');
@@ -264,7 +283,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
   const handleJoinWithCode = () => {
     if (code.length < ROOM_CODE_LENGTH) return;
     // Mock-existence-check: i frånvaro av backend kollar vi mot
-    // sessionsbunden Set över koder hosts har registrerat. Saknas koden
+    // sessionsbunden Map över koder hosts har registrerat. Saknas koden
     // visar vi Alert och stannar i formuläret istället för att navigera.
     if (!isActiveRoom(code)) {
       Alert.alert(
@@ -273,6 +292,16 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
       );
       return;
     }
+    // Own-lobby-check: samma user inloggad på två enheter och försöker joina
+    // sin egen lobby från device B. Måste komma före capacity-checken så
+    // användaren får det mer specifika felmeddelandet.
+    if (isOwnLobby(code, currentPlayerName)) {
+      Alert.alert('Already in lobby', 'User already exists in the lobby');
+      return;
+    }
+    // Capacity-check: om host:s lobby redan är full visar vi popup med text
+    // som beror på Free vs Premium-host. Användaren stannar i join-formuläret.
+    if (checkLobbyCapacity(code)) return;
     onClose();
     router.push({ pathname: '/(tabs)/lobby', params: { code, isHost: 'false' } });
   };
@@ -400,6 +429,22 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
       );
       return;
     }
+    // Own-lobby-check: jämför mot guestName (identiteten användaren joinar
+    // med via guest-formen) ELLER currentPlayerName (om inloggad). Fångar
+    // både den inloggade-på-två-enheter-fallen och den explicita "joina egen
+    // lobby som guest"-fallet om de råkar typa in sin egen playerName.
+    const guestIdentity = guestName.trim();
+    if (
+      isOwnLobby(code, currentPlayerName) ||
+      (guestIdentity && isOwnLobby(code, guestIdentity))
+    ) {
+      Alert.alert('Already in lobby', 'User already exists in the lobby');
+      return;
+    }
+    // Capacity-check: speglar handleJoinWithCode — full lobby visar popup
+    // istället för att skicka in gästen som ändå skulle få "lobby is full"
+    // när de hamnade i Lobby-vyn.
+    if (checkLobbyCapacity(code)) return;
     // Autofill-detektion: matchar Guest-flödets genererade format
     // ("Guest" + 5 siffror + "-" + 2 bokstäver). Om användaren ändrat
     // namnet manuellt blir flaggan false.
@@ -1146,11 +1191,20 @@ export default function HomeScreen() {
 
   const handleCreateGame = () => {
     const code = generateRoomCode();
-    // Registrera koden som "aktivt rum" så join-flödena (handleJoinWithCode,
-    // handleJoinAsGuest) kan validera mot den. Sessionsbundet i mockstoren —
-    // när backend är inkopplad ersätts detta med ett POST /rooms-call eller
-    // motsvarande som backenden registrerar i DB.
-    registerActiveRoom(code);
+    // Registrera koden som "aktivt rum" + lagra host:s metadata så join-
+    // flödena (handleJoinWithCode, handleJoinAsGuest) kan validera mot den
+    // OCH visa rätt "Lobby is full"-popup baserat på Premium-status.
+    // Sessionsbundet i mockstoren — när backend är inkopplad ersätts detta
+    // med ett POST /rooms-call eller motsvarande som backenden registrerar i DB.
+    // TODO (subscription): byt hardcoded `false` mot riktig profile.isPremium
+    // när RevenueCat/subscription-state är inkopplad. Speglar samma stub
+    // som `const hasPremium = false` i LobbyScreen.
+    registerActiveRoom(code, {
+      maxPlayers: profile?.maxPlayers ?? 4,
+      hostIsPremium: false,
+      currentPlayerCount: 1,
+      hostPlayerName: profile?.playerName ?? '',
+    });
     // Säkerställ att leftPlayers-storen är tom för den nya koden så
     // ingen stale test-data smyger in i den färska lobby:n och felaktigt
     // markerar nån som "LEFT THIS GAME LOBBY".
@@ -1520,6 +1574,7 @@ export default function HomeScreen() {
         onClose={() => setJoinVisible(false)}
         initialStep={joinInitialStep}
         hideGuest={joinHideGuest}
+        currentPlayerName={profile?.playerName ?? null}
       />
 
       {/* ── Profile-meny ─────────────────────────────────────── */}

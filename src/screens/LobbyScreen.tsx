@@ -40,7 +40,7 @@ import { Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../th
 import { getAvatarEmojiById } from '../utils/avatars';
 import { loadFriends, type Friend } from '../utils/friendsStorage';
 import { addLeftPlayer, getLeftPlayers } from '../utils/leftPlayers';
-import { deactivateRoom, isActiveRoom } from '../utils/mockActiveRooms';
+import { deactivateRoom, isActiveRoom, setRoomMaxPlayers, setRoomPlayerCount } from '../utils/mockActiveRooms';
 import { PURCHASED_PACKAGES } from '../utils/mockPurchasedPackages';
 import { consumePendingLobbyPlayers } from '../utils/pendingLobby';
 import { loadProfile, saveProfile, type ProfileData, type Region as ProfileRegion } from '../utils/profileStorage';
@@ -870,6 +870,24 @@ export default function LobbyScreen() {
   // TODO (Store integration): byt mot riktig subscription-check när
   // RevenueCat är inkopplad.
   const hasPremium = false;
+
+  // Sync lobby-state till mockActiveRooms-registry så join-flödet
+  // (handleJoinWithCode / handleJoinAsGuest i index.tsx) kan validera
+  // capacity i realtid. Två separata effects:
+  //  • players → currentPlayerCount (alla spelare exkl. de som lämnat)
+  //  • maxPlayers → host:s aktuella cap (bara host skriver — non-host:s
+  //    lokala state är default 4 och vi vill inte överskriva host:s 12)
+  // Båda är no-ops i registry om koden inte längre är registrerad
+  // (skydd mot stale skrivningar efter Delete this Game Lobby).
+  useEffect(() => {
+    if (!roomCode) return;
+    const activeCount = players.filter((p) => !p.hasLeft).length;
+    setRoomPlayerCount(roomCode, activeCount);
+  }, [players, roomCode]);
+  useEffect(() => {
+    if (!roomCode || !hostMode) return;
+    setRoomMaxPlayers(roomCode, maxPlayers);
+  }, [maxPlayers, roomCode, hostMode]);
 
   // Max rundor beror på gameMode — Pass-the-Phone capas vid 4, Individual
   // Devices vid 20. När host växlar läge clampas roundsCount automatiskt

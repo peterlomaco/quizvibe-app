@@ -16,6 +16,7 @@ import { saveLatestResult, type GameResult, type RoundResult } from '@/src/utils
 import { clearPendingLobbyPlayers, savePendingLobbyPlayers } from '@/src/utils/pendingLobby';
 import { clearLeftPlayers } from '@/src/utils/leftPlayers';
 import { deactivateRoom, registerActiveRoom } from '@/src/utils/mockActiveRooms';
+import { loadProfile } from '@/src/utils/profileStorage';
 import { generateRoomCode } from '@/src/utils/roomCode';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -678,9 +679,20 @@ export default function QuizScreen() {
       await savePendingLobbyPlayers(justHost);
     }
     const newCode = generateRoomCode();
-    // Registrera nya koden som aktivt rum så join-flödena kan validera
-    // mot den (samma princip som handleCreateGame på Home-skärmen).
-    registerActiveRoom(newCode);
+    // Registrera nya koden som aktivt rum + lagra host:s metadata (samma
+    // princip som handleCreateGame på Home-skärmen). currentPlayerCount
+    // räknas från carry-over-listan vid reusePlayers=true; annars startar
+    // den på 1 (bara host i nya lobbyn). LobbyScreen:s sync-effekter
+    // korrigerar countet om SEED_PLAYERS injiceras eller spelare flyttas.
+    // TODO (subscription): byt hardcoded `false` mot riktig profile.isPremium.
+    const profile = await loadProfile();
+    const initialCount = reusePlayers ? Math.max(1, allPlayers.length) : 1;
+    registerActiveRoom(newCode, {
+      maxPlayers: profile?.maxPlayers ?? 4,
+      hostIsPremium: false,
+      currentPlayerCount: initialCount,
+      hostPlayerName: profile?.playerName ?? '',
+    });
     // Färsk leftPlayers-store för nya koden — undviker stale test-data.
     clearLeftPlayers(newCode);
     router.replace(`/(tabs)/lobby?code=${newCode}&isHost=true`);
