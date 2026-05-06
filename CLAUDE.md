@@ -87,7 +87,7 @@ const buffer = await sharp(downscaled).resize(upW, upH, { kernel: sharp.kernel.n
 ## Conventions
 
 - Comments are often in Swedish. Keep that style when editing existing files; new files can be English.
-- Theme tokens, never raw hex. `Colors.background`, `Spacing.md`, etc.
+- Theme tokens, never raw hex. `Colors.background`, `Spacing.md`, etc. Brand-paletten har **två blå-nyanser**: `Colors.primary` (`#4DA3FF`, default brand) och `Colors.primaryDark` (`#114E91`, mörk variant — används för subtila accenter som single-player-checkboxens border).
 - Screens currently mix layout, modals, and domain logic in one file — when extending, prefer extracting sub-components into `src/components/`.
 - **Border-cutting badge pattern** for "tag" labels that overlap a card/button border (HOST/GUEST in `PlayerRow`, FREE on the Register button in `app/(tabs)/index.tsx`, FREE/PREMIUM on the Game Mode toggle in `LobbyScreen`). The badge is `position: 'absolute'` with `top: -8`, a matching `backgroundColor` to the parent border, and `paddingHorizontal: 8 / paddingVertical: 2`. The parent must be `position: 'relative'` and must NOT use `overflow: 'hidden'`, or the badge gets clipped.
 - **Host-vs-non-host settings pattern** (Game Mode buttons, mfl.): default är att alltid rendera kontrollen för alla i lobbyn så icke-host ser hostens val i real-tid, men passera `disabled={!hostMode}` så bara host kan ändra. Read-only state använder fortfarande brand-colors så hostens val är läsligt. Don't gate the JSX with `{hostMode && (…)}` for these — that's the wrong default.
@@ -375,6 +375,70 @@ Non-host gets a **read-only view** of the player list:
 **`mergeProfileIntoHost` gating**: i `useFocusEffect` är merge:n gated på `hostMode && profile && p.isHost` — INTE bara `profile && p.isHost`. När non-host joinar ska seed-host:en Alex K. visas oförändrad, INTE få den nuvarande user:s profil-data tilldelad (annars ser det ut som att joinaren är host eftersom HOST-badge:n + ens egen avatar/namn syns på det kortet).
 
 **`PlayerRow.hasLeft` rendering**: när `hasLeft: true` får kortet neutral grå border (override:ar approved/waiting-färgerna), avatar dämpas, namn/HCP-rad i `textDisabled`, status-raden ersätts med "LEFT THIS GAME LOBBY"-text, approve-toggle och move-arrows döljs. Host-spelaren får ALDRIG `hasLeft` (defensiv guard i useFocusEffect — host kan inte lämna sin egen lobby).
+
+**Section header**: räknaren renderas på två rader, högerställd i headern intill "+ Add Player"-knappen. Övre rad "Approved:" (textSecondary, `FontSize.xs`); undre "{x} of max {y}" (primary, `FontSize.sm`). x = `approvedPlayers.filter(p => !p.hasLeft).length` (host räknas alltid som approved via `isPlayerApproved` + lämnade spelare frigör platsen). y = `maxPlayers` (host:s 4/12-cap, inte `players.length`). Stack:n centreras gentemot varandra via `alignItems: 'center'`.
+
+**ApproveToggle använder standard React Native `Switch`** ([src/components/ApproveToggle.tsx](src/components/ApproveToggle.tsx)) med samma styling som Game Connections-raderna (röd/grön track, vit thumb, scale 0.8). Behåller `'no' | 'yes'`-API:t internt så call sites är oförändrade. Den tidigare custom Yes/No-svep-pillen är borttagen.
+
+**PlayerRow card layout** (host-vyn):
+- **Topp-rad**: turnColumn (Pass-the-Phone) + avatar + info (namn + ev. "Missing info"-status) + approve-toggle. Toggle:n pinnas mot kortets översta kant via `toggleSlot { alignSelf: 'flex-start' }` så den hamnar i övre högra hörnet och linjerar med "Approve All"-toggleln ovanför listan (samma right-padding via `row.paddingHorizontal: Spacing.lg`).
+- **Botten-rad** (`hcpRow`): tre flex-slottar — meta vänster (`hcpRowLeft, flex: 1`), HCP-badge centrerat (`hcpRowCenter`, intrinsic-bredd), trash höger (`hcpRowRight, flex: 1`). Lika-stora flex på sidorna garanterar matematisk centrering av badgen oavsett meta-textens bredd.
+- **Host:s eget kort** är specialfall i `hcpRow`: badge renderas i höger-slotten istället för center-slotten (höger-justerad), och ingen trash visas (host kan inte radera sig själv).
+- **"Ready"-status borttagen** för alla spelare. Endast `!player.isReady` (= "Missing info" warning) eller `hasLeft` (= "LEFT THIS GAME LOBBY") renderas — i alla andra fall är status-raden helt tom (en redo spelare är default-läget).
+
+**Papperskorgs-knapp** (host-only, `onDelete`-prop på PlayerRow): grå (`Colors.textSecondary`) trash-SVG i botten-radens höger-slot, visas bara på rader i waiting-listan. För approved-spelare måste host först toggla tillbaka till No så kortet hamnar i waiting-listan igen och papperskorgen syns. Tap → `Alert "Remove player — Are you sure you want to delete this Player from this Lobby?"` → confirm filtrerar bort spelaren ur `players[]`. Pressed-feedback `Colors.borderStrong` (subtil grå highlight). Hide:s när `hasLeft: true` — left-spelaren är redan borta som aktiv part.
+
+## Lobby — + Add Player
+
+[src/screens/LobbyScreen.tsx](src/screens/LobbyScreen.tsx)'s `AddPlayerModal` speglar Home-skärmens Join-as-Guest-flöde 1:1 minus Room Code-steget. Innehåller:
+
+- Player Name med custom `CodeKeyboard` (fullt A–Z + 0–9, mode-toggle), inline `Check`-knapp + `Remove`/`Auto-generate`-rad + status-meddelanden (✓ available / ✗ taken / ✗ inappropriate language). Auto-fill vid open via `generatePlayerName(TAKEN_PLAYER_NAMES_LOBBY, 'Guest')`.
+- Year of Birth (drop-down picker med "or earlier"/"or later"-suffix på endpoints) — låst tills Player Name validerat.
+- Assistance level (Full/Standard/Minimal-knapprad), default `'standard'` — låst tills Year valt. "Use default or select prefered setup"-hint ovanför.
+- Submit "Add to Lobby" enable:as bara när formuläret är giltigt (Player Name available + Year valt).
+
+**`TAKEN_PLAYER_NAMES_LOBBY`** är en lokal mock-Set (samma värden som hemskärmens `TAKEN_PLAYER_NAMES` i `app/(tabs)/index.tsx`). **Avsiktlig duplicering** tills riktig backend-uniqueness-check kommer in — call sites bryts ut då. Samma sak för `validateAddPlayerName`/`formatAddPlayerBirthYear`-helpers (lokala kopior av Home-skärmens motsvarigheter).
+
+**Capacity-check** sker i två lägen:
+- **Vid + Add Player-knappens onPress** (`handleOpenAddPlayer`): `isLobbyAtCapacity()` (= `players.filter(p => !p.hasLeft).length >= maxPlayers`) → om full visas Alert direkt och modalen öppnas inte. Skyddar host från att slösa tid på att fylla i formuläret.
+- **Vid Confirm i formuläret** (`handleAddPlayer`): samma check körs igen som race-condition-skydd om någon joinar via room code mellan knapp-tryck och confirm.
+
+Båda Alert:ar visar samma text: `Alert.alert('Lobby is full', 'Lobby is already full with waiting and approved players. Remove players if to add others')`.
+
+## Lobby — Player edit (host-only)
+
+Host kan redigera **Assistance level**, **Competition Year of Birth** och **HCP** på valfri spelare i lobbyn (inkl. sig själv). Tap-targets: HCP-meta-raden ("Standard · Age 32") OCH HCP-badgen — båda öppnar samma `playerEditSheet`-modal i [src/screens/LobbyScreen.tsx](src/screens/LobbyScreen.tsx). För guests är HCP-badgen istället ett tap-mål för en separat "Guest HCP cannot be changed"-popup (`onGuestHcpTap` på `PlayerRow`).
+
+**Lobby-lokal scope via `lobbyEdited`-flagga** (`LobbyPlayer.lobbyEdited?: boolean`): inga skrivningar går till `saveProfile()` från detta flöde — alla uppdateringar är `setPlayers(...)` mot lokal lobby-state. Skyddet mot att profil-merge clobbar lokala redigeringar:
+
+- `mergeProfileIntoHost` bailar tidigt om `existing.lobbyEdited === true` och uppdaterar bara avatar/playerName/spotifyConnected (fält som inte exponeras i edit-modalen). Annars skulle host:s redigeringar av sitt eget kort återställas vid varje `useFocusEffect`-merge när host återvänder till lobby-tabben.
+- För non-host registrerade spelare körs ingen merge alls (deras profil-data kommer från URL-params vid join), så `lobbyEdited` är där bara informativt.
+- Flaggan persisteras inte över sessions — när lobbyn lämnas/raderas är hela lobby-state borta.
+
+**Validation-regler** (alla med popup vid försök):
+
+1. **HCP** kan endast sänkas, inte höjas. Originalet hämtas från `target.hcpOverride ?? calculateInitialHCP(target.age, target.assistance)` (pre-edit-värde via `playerEditTarget` som inte muterats förrän Save). Vid `parsed > originalHcp` → `Alert "Cannot raise HCP — HCP can only be lowered, pick a value of {N} or less."` Stå-still tillåtet.
+2. **HCP-floor** = `MIN_HCP = 50` (export från [src/utils/hcp.ts](src/utils/hcp.ts)). Vid `parsed < MIN_HCP || parsed > 99` → `Alert "Invalid HCP — HCP must be a number between 50 and 99."`. Edge case: om en spelares `originalHcp < 50` (från progression) blir HCP de facto låst för host-edit — alla värden träffar antingen floor:n eller cannot-raise-regeln.
+3. **Assistance** följer ranking `full=2 → standard=1 → minimal=0` (lägre = svårare). Tillåtna transitions: stå still eller progress nedåt. `Minimal → annat` blockas explicit. Validering körs både **tap-tid** (`handleSelectEditAssistance`) OCH **save-tid** (belt + suspenders). Disallowed knappar dimmas via `skillBtnLocked` (opacity 0.4) men förblir tappbara så popupen kan informera. Popups: `"Cannot change Minimal — Once a player has Minimal assistance, it cannot be changed."` / `"Cannot raise assistance — Assistance can only progress in the order Full → Standard → Minimal."`
+4. **Age** kan endast höjas (= tidigare birth year). Vid `nextAge < originalAge` → `Alert "Cannot lower age — Age can only be raised, pick an earlier Year of Birth."`. Stå-still tillåtet. Year-pickern dim:as inte (för långt list); validation enbart vid Save.
+
+**Guest HCP** är aldrig direkt redigerbart (`hcpOverride` på guest:er sätts ALDRIG till ett konkret värde — sätts alltid till `undefined` i save-handlern). HCP-fältet göms i modal:en för guests och ersätts med info-texten `"Guest HCP is auto-calculated and cannot be edited."`. Assistance + Year är dock fritt redigerbara för guests via samma modal.
+
+## HCP utility ([src/utils/hcp.ts](src/utils/hcp.ts))
+
+- **`MIN_HCP = 50`** — universell floor. Gäller både guest-auto-derivering OCH host:s manuella redigering. Bättre nivåer (< 50) är reserverade för spelare som tjänar in dem genom progression via `calculateNewHCP`, inte för manuell justering.
+- **`roundHcp(value)`** — wrapper kring `Math.round` med kommentar om policyn (närmaste heltal, 0,5 uppåt). Singel-källa för avrundnings-regeln. Använd den i alla HCP-beräkningar som kan producera decimaler. JS:s `Math.round` följer regeln för positiva tal (HCP är alltid 1–99).
+- **`calculateNewHCP`** använder `roundHcp(pointsEarned / 10)` — så 5 poäng → 1 i reduktion (avrundat upp), 4 poäng → 0. Tidigare `Math.floor` ändrades till `roundHcp` när policy-regeln formaliserades.
+- **`getGuestHcpFromClosestAge(guestAge, registeredPlayers)`** — guest:s dolda HCP-värde:
+  - **>1 registrerad** → HCP hos den vars `age` ligger närmast guest:ens (tie-break på array-ordning, typiskt host eftersom host är index 0).
+  - **Endast en registrerad** (typiskt host ensam) → `roundHcp((refHcp + 100) / 2)`. Med en enda match-kandidat blir närmaste-age-algoritmen meningslös; midpoint mot 100 biasar guest:en mot nybörjar-änden istället.
+  - Resultat clampas till `[MIN_HCP, 99]` — guests får aldrig "för bra" HCP oavsett referens.
+  - Returnerar null om inga registrerade spelare alls.
+  - Visuellt visar guest-kort ALLTID "Guest HCP"-placeholder (utan siffra) — det härledda värdet är dolt för spelarna och konsumeras bara av spel-logik som behöver det.
+
+## Lobby — Share invite (friends-only)
+
+Share invite-modalen i [src/screens/LobbyScreen.tsx](src/screens/LobbyScreen.tsx) skickar **endast** invites in-app till QuizVibe friends. OS-share-fallback (SMS/WhatsApp/Messenger) är borttagen — användaren kan inte längre dela rumkoder externt. Modalen renderar bara friends-listan (med one-tap "Invite"/"✓ Invited"-knappar) eller empty-state ("No friends saved yet — Add friends in Profile to invite them with one tap.") + "Done"-knapp. `QuizVibeFriendsLogo` (size 28) renderas bredvid "QuizVibe friends"-section-labeln för visuell anchor — speglar Profile-skärmens friends-kort-ikon.
 
 ## Quiz — Get Ready to Vibe intro screen
 
