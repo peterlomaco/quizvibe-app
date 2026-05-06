@@ -2624,14 +2624,14 @@ const styles = StyleSheet.create({
     height: 20,
     borderRadius: 4,
     borderWidth: 1.5,
-    borderColor: Colors.primary,
+    borderColor: Colors.primaryDark,
     backgroundColor: 'transparent',
     alignItems: 'center',
     justifyContent: 'center',
   },
   singlePlayerCheckboxChecked: {
     backgroundColor: Colors.primary,
-    borderColor: Colors.primary,
+    borderColor: Colors.primaryDark,
   },
   singlePlayerCheckmark: {
     color: '#FFF',

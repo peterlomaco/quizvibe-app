@@ -11,7 +11,6 @@ import {
   Platform,
   Pressable,
   SafeAreaView,
-  Share,
   StyleSheet,
   Switch,
   Text,
@@ -24,8 +23,10 @@ import Svg, { Circle, Path } from 'react-native-svg';
 import { ApproveToggle } from '../components/ApproveToggle';
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
+import { CodeKeyboard } from '../components/CodeKeyboard';
 import { EraMarkerMinus, EraMarkerPlus } from '../components/EraSliderMarker';
 import { Player, PlayerRow } from '../components/PlayerRow';
+import { QuizVibeFriendsLogo } from '../components/QuizVibeFriendsLogo';
 import { QuizVibeLogo } from '../components/QuizVibeLogo';
 import {
     ROUNDS_DEFAULT,
@@ -39,10 +40,13 @@ import { TopUserBanner } from '../components/TopUserBanner';
 import { Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';
 import { getAvatarEmojiById } from '../utils/avatars';
 import { loadFriends, type Friend } from '../utils/friendsStorage';
+import { MIN_HCP, calculateInitialHCP } from '../utils/hcp';
 import { addLeftPlayer, getLeftPlayers } from '../utils/leftPlayers';
 import { deactivateRoom, isActiveRoom, setRoomMaxPlayers, setRoomPlayerCount } from '../utils/mockActiveRooms';
 import { PURCHASED_PACKAGES } from '../utils/mockPurchasedPackages';
 import { consumePendingLobbyPlayers } from '../utils/pendingLobby';
+import { generatePlayerName } from '../utils/playerName';
+import { containsProfanity } from '../utils/profanity';
 import { loadProfile, saveProfile, type ProfileData, type Region as ProfileRegion } from '../utils/profileStorage';
 import { ROOM_CODE_DIGITS, ROOM_CODE_LEADING_LETTERS, formatRoomCode, generateRoomCode } from '../utils/roomCode';
 import { addInvite } from '../utils/waitingInvites';
@@ -56,6 +60,17 @@ export interface LobbyPlayer extends Player {
   // Host godkänner spelare innan de tas in i spelet. Host själv är
   // alltid auto-approved (treats !!isHost as approved när approved saknas).
   approved?: boolean;
+  // Host kan tweaka HCP per spelare i lobbyn. Override:n bor i lobby-state
+  // och persisteras inte över sessions — det är en per-spel-justering.
+  // Saknas → använd beräkning från age+assistance som tidigare.
+  hcpOverride?: number;
+  // True om host har redigerat något av spelarens lobby-fält (age,
+  // assistance eller hcpOverride). Skyddar mot att profil-merge clobbrar
+  // lokala redigeringar när host återvänder till lobby-tabben (relevant
+  // för host:s eget kort eftersom mergeProfileIntoHost kör i useFocusEffect).
+  // Inga skrivningar går mot AsyncStorage så redigeringen är garanterat
+  // lobby-lokal — gäller bara för detta spel-instance.
+  lobbyEdited?: boolean;
   // True om host lade till spelaren manuellt via +Add Player. Dessa
   // spelare saknar egen mobil och måste tas bort om läget byts till
   // Individual Devices.
@@ -101,6 +116,19 @@ function randomBirthYear(): number {
 }
 
 function mergeProfileIntoHost(existing: LobbyPlayer, profile: ProfileData): LobbyPlayer {
+  // Om host:en har redigerat sitt eget kort lokalt i lobbyn ska re-merge:n
+  // INTE clobba de värdena. Profil-data är källan vid första entry, men
+  // efter en host-edit äger lobby-state datan tills lobbyn lämnas/raderas.
+  // Avatar/playerName uppdateras fortsatt från profil eftersom de inte
+  // exponeras i lobby-edit-modalen.
+  if (existing.lobbyEdited) {
+    return {
+      ...existing,
+      name: profile.playerName?.trim() || existing.name,
+      emoji: getAvatarEmojiById(profile.selectedAvatarId),
+      spotifyConnected: profile.spotifyConnected ?? existing.spotifyConnected,
+    };
+  }
   const currentYear = new Date().getFullYear();
   // Fallbacks om profil saknar fältet — slumpmässig birthYear + 'standard'
   // assistance så host alltid har komplett HCP vid lobby-start (annars
@@ -301,6 +329,31 @@ const ADD_PLAYER_ASSISTANCE_OPTIONS: { id: AddPlayerAssistance; label: string }[
   { id: 'minimal',  label: 'Minimal' },
 ];
 
+// Mock-list över "redan tagna" playerNames — synced med hemskärmens
+// motsvarande lista i app/(tabs)/index.tsx så Add Player-flödet känner
+// samma collisions som Join as Guest. TODO (backend): byt mot riktig
+// playerName-uniqueness-check.
+const TAKEN_PLAYER_NAMES_LOBBY = new Set([
+  'player one', 'anna', 'kalle', 'admin', 'test', 'guest', 'host', 'quizvibe',
+]);
+
+type AddPlayerNameStatus = 'idle' | 'checking' | 'available' | 'taken' | 'invalid';
+
+function validateAddPlayerName(name: string): 'available' | 'taken' | 'invalid' {
+  const trimmed = name.trim();
+  if (containsProfanity(trimmed)) return 'invalid';
+  if (TAKEN_PLAYER_NAMES_LOBBY.has(trimmed.toLowerCase())) return 'taken';
+  return 'available';
+}
+
+// Endpoints renderas med "or earlier"/"or later"-suffix eftersom de
+// representerar öppna intervall (samma framing som Profile/Register/Guest).
+function formatAddPlayerBirthYear(year: number): string {
+  if (year === MIN_BIRTH_YEAR) return `${year} or earlier`;
+  if (year === MAX_BIRTH_YEAR) return `${year} or later`;
+  return String(year);
+}
+
 function AddPlayerModal({ visible, onClose, onAdd }: {
   visible: boolean;
   onClose: () => void;
@@ -308,8 +361,17 @@ function AddPlayerModal({ visible, onClose, onAdd }: {
 }) {
   const [name, setName] = useState('');
   const [birthYear, setBirthYear] = useState<number | null>(null);
-  const [assistance, setAssistance] = useState<AddPlayerAssistance | null>(null);
+  // Default 'standard' så användaren kan submit:a direkt efter year-pick
+  // (samma framing som Join-as-Guest-formen — "Use default or select prefered setup").
+  const [assistance, setAssistance] = useState<AddPlayerAssistance>('standard');
   const [yearPickerOpen, setYearPickerOpen] = useState(false);
+  const [playerNameStatus, setPlayerNameStatus] = useState<AddPlayerNameStatus>('idle');
+  const [playerNameKbMode, setPlayerNameKbMode] = useState<'letter' | 'digit'>('letter');
+  const [playerNameFocused, setPlayerNameFocused] = useState(false);
+  const playerNameInputRef = useRef<TextInput>(null);
+  // Spårar visible-transition så Auto-fyll bara triggar vid open (inte vid
+  // re-render efter manuell rensning).
+  const prevVisibleRef = useRef(false);
 
   // Återställ allt när modalen stängs (med liten delay för slide-animation)
   useEffect(() => {
@@ -317,17 +379,92 @@ function AddPlayerModal({ visible, onClose, onAdd }: {
       const t = setTimeout(() => {
         setName('');
         setBirthYear(null);
-        setAssistance(null);
+        setAssistance('standard');
         setYearPickerOpen(false);
+        setPlayerNameStatus('idle');
+        setPlayerNameFocused(false);
+        setPlayerNameKbMode('letter');
+        prevVisibleRef.current = false;
       }, 250);
       return () => clearTimeout(t);
     }
   }, [visible]);
 
-  const isFormValid = !!name.trim() && birthYear !== null && assistance !== null;
+  // Auto-fyll Player Name vid öppning. Använder "Guest"-prefix precis som
+  // Join-as-Guest-flödet så namnet signalerar "lokal gäst" snarare än
+  // registrerad user. Manuell ändring återställer status till 'idle' och
+  // kräver Check innan fältet räknas validerat igen.
+  useEffect(() => {
+    const wasVisible = prevVisibleRef.current;
+    prevVisibleRef.current = visible;
+    if (visible && !wasVisible && name === '') {
+      const generated = generatePlayerName(TAKEN_PLAYER_NAMES_LOBBY, 'Guest');
+      setName(generated);
+      setPlayerNameStatus('available');
+    }
+  }, [visible, name]);
+
+  // Sekventiella låsnings-gates — speglar Join-as-Guest-formen exakt
+  // (utan code-steget).
+  const yearUnlocked = playerNameStatus === 'available';
+  const assistanceUnlocked = yearUnlocked && birthYear !== null;
+  const isFormValid = playerNameStatus === 'available' && birthYear !== null;
+
+  const handleNameChange = (t: string) => {
+    setName(t);
+    if (playerNameStatus !== 'idle') setPlayerNameStatus('idle');
+  };
+
+  const handleCheckPlayerName = () => {
+    const trimmed = name.trim();
+    if (!trimmed) return;
+    Keyboard.dismiss();
+    setPlayerNameStatus('checking');
+    // Mock-latens — byt mot riktigt API-anrop när backend finns.
+    setTimeout(() => {
+      setPlayerNameStatus(validateAddPlayerName(trimmed));
+    }, 600);
+  };
+
+  const handleRemoveName = () => {
+    setName('');
+    setPlayerNameStatus('idle');
+    playerNameInputRef.current?.focus();
+  };
+
+  const handleGenerateName = () => {
+    const generated = generatePlayerName(TAKEN_PLAYER_NAMES_LOBBY, 'Guest');
+    setName(generated);
+    setPlayerNameStatus('available');
+    Keyboard.dismiss();
+  };
+
+  // Custom CodeKeyboard skickar tecknet vidare hit. Första bokstaven
+  // versal, resten gemener — stilfullare lobbyn-display ("Anna" istf "ANNA").
+  const handlePlayerNameKeyPress = (char: string) => {
+    setName((prev) => {
+      if (prev.length >= 20) return prev;
+      let appended = char;
+      if (/[A-Z]/.test(char)) {
+        const hasLetter = /[A-Za-z]/.test(prev);
+        appended = hasLetter ? char.toLowerCase() : char;
+      }
+      return prev + appended;
+    });
+    if (playerNameStatus !== 'idle') setPlayerNameStatus('idle');
+  };
+
+  const handlePlayerNameBackspace = () => {
+    setName((prev) => prev.slice(0, -1));
+    if (playerNameStatus !== 'idle') setPlayerNameStatus('idle');
+  };
+
+  const togglePlayerNameKbMode = () => {
+    setPlayerNameKbMode((m) => (m === 'letter' ? 'digit' : 'letter'));
+  };
 
   const handleAdd = () => {
-    if (!isFormValid || birthYear === null || assistance === null) return;
+    if (!isFormValid || birthYear === null) return;
     const age = CURRENT_YEAR - birthYear;
     onAdd(name.trim(), age, assistance);
     onClose();
@@ -343,67 +480,187 @@ function AddPlayerModal({ visible, onClose, onAdd }: {
           <Text style={modal.title}>Add Player</Text>
           <Text style={modal.subtitle}>For local guests playing on this phone</Text>
 
-          {/* PlayerName */}
-          <View style={modal.fieldGroup}>
-            <Text style={modal.fieldLabel}>Player Name</Text>
-            <TextInput
-              style={modal.input}
-              placeholder="Pick a Player Name"
-              placeholderTextColor={Colors.textDisabled}
-              value={name}
-              onChangeText={setName}
-              maxLength={20}
-              returnKeyType="done"
-            />
-          </View>
-
-          {/* Year of Birth */}
-          <View style={modal.fieldGroup}>
-            <Text style={modal.fieldLabel}>Competition Year of Birth</Text>
-            <TouchableOpacity
-              style={modal.yearTrigger}
-              activeOpacity={0.7}
-              onPress={() => {
-                Keyboard.dismiss();
-                setYearPickerOpen(true);
-              }}
-            >
-              <Text
-                style={[
-                  modal.yearTriggerText,
-                  birthYear === null && modal.yearTriggerPlaceholder,
-                ]}
-              >
-                {birthYear ?? 'Select year'}
-              </Text>
-              <Text style={modal.yearTriggerArrow}>›</Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Assistance Level */}
-          <View style={modal.fieldGroup}>
-            <Text style={modal.fieldLabel}>Assistance Level</Text>
-            <View style={modal.skillRow}>
-              {ADD_PLAYER_ASSISTANCE_OPTIONS.map((opt) => (
+          <ScrollView
+            keyboardShouldPersistTaps="handled"
+            style={{ flexShrink: 1, maxHeight: 420 }}
+            contentContainerStyle={{ gap: Spacing.md }}
+          >
+            {/* PlayerName — måste valideras mot taken-list/profanity innan
+                Year låses upp. Speglar Join-as-Guest-flödet 1:1. */}
+            <View style={modal.fieldGroup}>
+              <Text style={modal.fieldLabel}>Player Name</Text>
+              <View style={modal.playerNameRow}>
+                <TextInput
+                  ref={playerNameInputRef}
+                  style={[
+                    modal.inputText,
+                    modal.playerNameInput,
+                    playerNameStatus !== 'available' && modal.playerNameInputActive,
+                  ]}
+                  placeholder="Pick a unique Player Name"
+                  placeholderTextColor={Colors.textDisabled}
+                  value={name}
+                  onChangeText={handleNameChange}
+                  maxLength={20}
+                  editable={playerNameStatus !== 'checking'}
+                  showSoftInputOnFocus={false}
+                  onFocus={() => {
+                    setPlayerNameKbMode('letter');
+                    setPlayerNameFocused(true);
+                  }}
+                  onBlur={() => setPlayerNameFocused(false)}
+                />
                 <TouchableOpacity
-                  key={opt.id}
-                  style={[modal.skillBtn, assistance === opt.id && modal.skillBtnActive]}
-                  onPress={() => setAssistance(opt.id)}
+                  onPress={handleCheckPlayerName}
+                  disabled={!name.trim() || playerNameStatus === 'checking' || playerNameStatus === 'available'}
+                  style={[
+                    modal.checkBtn,
+                    (!name.trim() || playerNameStatus === 'checking') && modal.checkBtnDisabled,
+                    playerNameStatus === 'available' && modal.checkBtnDone,
+                  ]}
                 >
-                  <Text style={[modal.skillBtnText, assistance === opt.id && modal.skillBtnTextActive]}>
-                    {opt.label}
+                  <Text
+                    style={[
+                      modal.checkBtnText,
+                      playerNameStatus === 'available' && modal.checkBtnTextDone,
+                    ]}
+                  >
+                    {playerNameStatus === 'checking' ? '…'
+                      : playerNameStatus === 'available' ? '✓'
+                      : 'Check'}
                   </Text>
                 </TouchableOpacity>
-              ))}
+              </View>
+              <View style={modal.playerNameActionRow}>
+                <TouchableOpacity
+                  onPress={handleRemoveName}
+                  disabled={name.length === 0 || playerNameStatus === 'checking'}
+                  style={[
+                    modal.nameActionBtn,
+                    (name.length === 0 || playerNameStatus === 'checking') &&
+                      modal.nameActionBtnDisabled,
+                  ]}
+                >
+                  <Text style={modal.nameActionBtnText}>Remove</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={handleGenerateName}
+                  disabled={name.length > 0 || playerNameStatus === 'checking'}
+                  style={[
+                    modal.nameActionBtn,
+                    (name.length > 0 || playerNameStatus === 'checking') &&
+                      modal.nameActionBtnDisabled,
+                  ]}
+                >
+                  <Text style={modal.nameActionBtnText}>Auto-generate</Text>
+                </TouchableOpacity>
+              </View>
+              {playerNameStatus === 'checking' && (
+                <Text style={modal.statusHint}>Checking availability…</Text>
+              )}
+              {playerNameStatus === 'available' && (
+                <Text style={[modal.statusHint, modal.statusHintOk]}>
+                  ✓ Player Name is available
+                </Text>
+              )}
+              {playerNameStatus === 'taken' && (
+                <Text style={[modal.statusHint, modal.statusHintError]}>
+                  ✗ Player Name already taken — try another
+                </Text>
+              )}
+              {playerNameStatus === 'invalid' && (
+                <Text style={[modal.statusHint, modal.statusHintError]}>
+                  ✗ Player Name contains inappropriate language — try another
+                </Text>
+              )}
             </View>
-          </View>
 
-          <Button
-            label="Add to Lobby"
+            {/* Year of birth — drop-down picker (låst tills playerName validerat) */}
+            <View
+              style={[modal.fieldGroup, !yearUnlocked && modal.fieldGroupLocked]}
+              pointerEvents={yearUnlocked ? 'auto' : 'none'}
+            >
+              <Text style={modal.fieldLabel}>Competition Year of Birth</Text>
+              <TouchableOpacity
+                style={[
+                  modal.yearTrigger,
+                  yearUnlocked && birthYear === null && modal.yearTriggerActive,
+                ]}
+                activeOpacity={0.7}
+                onPress={() => {
+                  Keyboard.dismiss();
+                  setYearPickerOpen(true);
+                }}
+              >
+                <Text
+                  style={[
+                    modal.yearTriggerText,
+                    birthYear === null && modal.yearTriggerPlaceholder,
+                    yearUnlocked && birthYear === null && modal.yearTriggerPlaceholderActive,
+                  ]}
+                >
+                  {birthYear === null ? 'Select year' : formatAddPlayerBirthYear(birthYear)}
+                </Text>
+                <Text style={modal.yearTriggerArrow}>›</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Assistance level (låst tills year valt). Default 'standard'
+                är förvalt så användaren kan submit:a direkt efter year-pick. */}
+            <Text
+              style={[
+                modal.statusHint,
+                !assistanceUnlocked && modal.fieldGroupLocked,
+              ]}
+            >
+              Use default or select prefered setup
+            </Text>
+            <View
+              style={[modal.fieldGroup, !assistanceUnlocked && modal.fieldGroupLocked]}
+              pointerEvents={assistanceUnlocked ? 'auto' : 'none'}
+            >
+              <Text style={modal.fieldLabel}>Assistance Level</Text>
+              <View style={modal.skillRow}>
+                {ADD_PLAYER_ASSISTANCE_OPTIONS.map((opt) => {
+                  const isSelected = assistance === opt.id;
+                  return (
+                    <TouchableOpacity
+                      key={opt.id}
+                      style={[modal.skillBtn, isSelected && modal.skillBtnActive]}
+                      onPress={() => setAssistance(opt.id)}
+                    >
+                      <Text
+                        style={[
+                          modal.skillBtnText,
+                          isSelected && modal.skillBtnTextActive,
+                        ]}
+                      >
+                        {opt.label}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            </View>
+          </ScrollView>
+
+          {playerNameFocused && (
+            <CodeKeyboard
+              mode={playerNameKbMode}
+              letterCharset="ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+              onPress={handlePlayerNameKeyPress}
+              onBackspace={handlePlayerNameBackspace}
+              onModeToggle={togglePlayerNameKbMode}
+            />
+          )}
+
+          <TouchableOpacity
+            style={[modal.joinBtn, !isFormValid && modal.joinBtnDisabled]}
             onPress={handleAdd}
             disabled={!isFormValid}
-            variant="primary"
-          />
+          >
+            <Text style={modal.joinBtnText}>Add to Lobby</Text>
+          </TouchableOpacity>
           <TouchableOpacity onPress={onClose} style={modal.cancelBtn}>
             <Text style={modal.cancelText}>Cancel</Text>
           </TouchableOpacity>
@@ -432,7 +689,7 @@ function AddPlayerModal({ visible, onClose, onAdd }: {
                       }}
                     >
                       <Text style={[modal.yearItemText, selected && modal.yearItemTextSelected]}>
-                        {year}
+                        {formatAddPlayerBirthYear(year)}
                       </Text>
                       {selected && <Text style={modal.yearItemCheck}>✓</Text>}
                     </TouchableOpacity>
@@ -1059,7 +1316,28 @@ export default function LobbyScreen() {
   };
   const { from: clampedFrom, to: clampedTo, warning: eraWarning } = clampEraToPlayer(eraValues[0], eraValues[1], players);
 
+  // Räkna aktiva spelare (exkl. hasLeft, vars plats är frigjord) — används
+  // som capacity-check både vid + Add Player-knappen och vid Confirm i
+  // formuläret. Defensiv dubbel-check skyddar mot race conditions där
+  // någon annan joinar via room code mellan knapp-tryck och confirm.
+  const isLobbyAtCapacity = () =>
+    players.filter((p) => !p.hasLeft).length >= maxPlayers;
+
+  // Tryck på "+ Add Player" — blockera redan här om lobbyn är full så
+  // host inte slösar tid på att fylla i formuläret.
+  const handleOpenAddPlayer = () => {
+    if (isLobbyAtCapacity()) {
+      Alert.alert('Lobby is full', 'Lobby is already full with waiting and approved players. Remove players if to add others');
+      return;
+    }
+    setAddModalVisible(true);
+  };
+
   const handleAddPlayer = (name: string, age: number, assistance: AddPlayerAssistance) => {
+    if (isLobbyAtCapacity()) {
+      Alert.alert('Lobby is full', 'Lobby is already full with waiting and approved players. Remove players if to add others');
+      return;
+    }
     setPlayers((prev) => [
       ...prev,
       {
@@ -1078,9 +1356,202 @@ export default function LobbyScreen() {
   const handleSetApproved = (id: string, approved: boolean) => {
     setPlayers((prev) => prev.map((p) => p.id === id ? { ...p, approved } : p));
   };
+
+  // Papperskorg-flow: bara host kan radera, bara på waiting-spelare.
+  // Visar confirm-popup; vid bekräftelse filtreras spelaren bort ur
+  // players[]. För approved-spelare måste host först toggla tillbaka
+  // till No så raden hamnar i waiting-listan igen och papperskorgen syns.
+  const handleDeletePlayer = (id: string) => {
+    Alert.alert(
+      'Remove player',
+      'Are you sure you want to delete this Player from this Lobby?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => {
+            setPlayers((prev) => prev.filter((p) => p.id !== id));
+          },
+        },
+      ],
+    );
+  };
   const handleApproveAll = () => {
     setPlayers((prev) => prev.map((p) => p.hcpComplete ? { ...p, approved: true } : p));
   };
+
+  // ── Player-edit modal (host-only) ────────────────────────────────
+  // Host kan redigera Assistance level, Competition Year of Birth och HCP
+  // för valfri spelare i lobbyn (inkl. sig själv). Guest:s HCP göms i
+  // formuläret eftersom det auto-deriveras från närmaste age-matched
+  // registrerade spelare. Alla skrivningar går bara till lokal players[]-
+  // state — saveProfile() kallas ALDRIG från detta flöde, så redigeringen
+  // är garanterat lobby-lokal och påverkar inte spelarens profil för
+  // framtida spel.
+  const [playerEditTargetId, setPlayerEditTargetId] = useState<string | null>(null);
+  const [editHcpValue, setEditHcpValue] = useState('');
+  const [editBirthYear, setEditBirthYear] = useState<number | null>(null);
+  const [editAssistance, setEditAssistance] = useState<'minimal' | 'standard' | 'full'>('standard');
+  const [editYearPickerOpen, setEditYearPickerOpen] = useState(false);
+
+  const playerEditTarget = playerEditTargetId
+    ? players.find((p) => p.id === playerEditTargetId) ?? null
+    : null;
+  const playerEditIsGuest = playerEditTarget?.type === 'guest';
+
+  const openPlayerEdit = (id: string) => {
+    const target = players.find((p) => p.id === id);
+    if (!target) return;
+    const currentYear = new Date().getFullYear();
+    // Förfyll med aktuella värden i lobby-state. age → birthYear via
+    // current-year-räkning (ev. dag-precision off-by-one är trivial
+    // jämfört med år-räkningens granularitet).
+    const seedBirthYear = target.age !== undefined ? currentYear - target.age : null;
+    const seedAssistance = target.assistance ?? 'standard';
+    const calcHcp =
+      target.hcpComplete && target.age && target.assistance
+        ? calculateInitialHCP(target.age, target.assistance)
+        : null;
+    const seedHcp = target.hcpOverride ?? calcHcp;
+    setEditBirthYear(seedBirthYear);
+    setEditAssistance(seedAssistance);
+    setEditHcpValue(seedHcp !== null && seedHcp !== undefined ? String(seedHcp) : '');
+    setEditYearPickerOpen(false);
+    setPlayerEditTargetId(id);
+  };
+
+  const closePlayerEdit = () => {
+    setPlayerEditTargetId(null);
+    setEditHcpValue('');
+    setEditBirthYear(null);
+    setEditAssistance('standard');
+    setEditYearPickerOpen(false);
+  };
+
+  // Assistance-progressions-ordning: lägre tal = svårare nivå. Host får
+  // bara flytta nedåt eller stå still — Full(2) → Standard(1) → Minimal(0).
+  // Minimal är låst (kan inte ändras alls).
+  const ASSISTANCE_RANK: Record<'minimal' | 'standard' | 'full', number> = {
+    full: 2,
+    standard: 1,
+    minimal: 0,
+  };
+
+  // Tap-tid-validering på Assistance-knappen — visar popup för disallowed
+  // transitions istället för att uppdatera state. Tillåtna: stå still
+  // (samma värde), eller progress nedåt i ranken. Disallowed: höja
+  // ranken eller röra Minimal alls.
+  const handleSelectEditAssistance = (next: 'minimal' | 'standard' | 'full') => {
+    const current = playerEditTarget?.assistance ?? 'standard';
+    if (current === 'minimal' && next !== 'minimal') {
+      Alert.alert(
+        'Cannot change Minimal',
+        'Once a player has Minimal assistance, it cannot be changed.',
+      );
+      return;
+    }
+    if (ASSISTANCE_RANK[next] > ASSISTANCE_RANK[current]) {
+      Alert.alert(
+        'Cannot raise assistance',
+        'Assistance can only progress in the order Full → Standard → Minimal.',
+      );
+      return;
+    }
+    setEditAssistance(next);
+  };
+
+  const handleSavePlayerEdit = () => {
+    if (!playerEditTargetId || !playerEditTarget) return;
+    if (editBirthYear === null) {
+      Alert.alert('Missing year', 'Pick a Competition Year of Birth.');
+      return;
+    }
+    const target = playerEditTarget;
+    const currentYear = new Date().getFullYear();
+    const nextAge = currentYear - editBirthYear;
+    const originalAge = target.age ?? nextAge;
+    const originalAssistance = target.assistance ?? 'standard';
+
+    // 1) Age får bara höjas (= tidigare birth year). Stå-still tillåtet.
+    if (nextAge < originalAge) {
+      Alert.alert(
+        'Cannot lower age',
+        'Age can only be raised — pick an earlier Year of Birth.',
+      );
+      return;
+    }
+
+    // 2) Assistance: dubbelkollar samma regler som tap-tid-checken (host
+    //    kan ha öppnat picker:n med disallowed seedAssistance från korrupt
+    //    state, eller om vi i framtiden tillåter direkt-input). Belt + suspenders.
+    if (originalAssistance === 'minimal' && editAssistance !== 'minimal') {
+      Alert.alert(
+        'Cannot change Minimal',
+        'Once a player has Minimal assistance, it cannot be changed.',
+      );
+      return;
+    }
+    if (ASSISTANCE_RANK[editAssistance] > ASSISTANCE_RANK[originalAssistance]) {
+      Alert.alert(
+        'Cannot raise assistance',
+        'Assistance can only progress in the order Full → Standard → Minimal.',
+      );
+      return;
+    }
+
+    // 3) HCP-validering bara för icke-guest (guest:ens HCP är auto-derived
+    //    och fältet är dolt). För registrerade kräver vi ett giltigt 1–99
+    //    OCH att värdet inte höjs jämfört med innan editen.
+    let nextHcpOverride: number | undefined;
+    if (!playerEditIsGuest) {
+      const trimmed = editHcpValue.trim();
+      const parsed = parseInt(trimmed, 10);
+      if (isNaN(parsed) || parsed < MIN_HCP || parsed > 99) {
+        Alert.alert('Invalid HCP', `HCP must be a number between ${MIN_HCP} and 99.`);
+        return;
+      }
+      const calcHcp =
+        target.hcpComplete && target.age && target.assistance
+          ? calculateInitialHCP(target.age, target.assistance)
+          : null;
+      const originalHcp = target.hcpOverride ?? calcHcp;
+      if (originalHcp !== null && parsed > originalHcp) {
+        Alert.alert(
+          'Cannot raise HCP',
+          `HCP can only be lowered — pick a value of ${originalHcp} or less.`,
+        );
+        return;
+      }
+      nextHcpOverride = parsed;
+    }
+
+    setPlayers((prev) =>
+      prev.map((p) =>
+        p.id === playerEditTargetId
+          ? {
+              ...p,
+              age: nextAge,
+              assistance: editAssistance,
+              // Guest:ens hcpOverride lämnas alltid undefined — getGuestHcp
+              // sköter beräkningen från registrerade spelare i lobbyn.
+              hcpOverride: playerEditIsGuest ? undefined : nextHcpOverride,
+              lobbyEdited: true,
+            }
+          : p,
+      ),
+    );
+    closePlayerEdit();
+  };
+
+  // Synka HCP-fältet med det beräknade värdet när host justerar age eller
+  // assistance i samma session — så fältet visar "vad HCP skulle bli" om
+  // host inte typar något manuellt. Trigger: när birthYear/assistance
+  // ändras OCH host inte själv pratat HCP-input fritt sedan.
+  // Implementation: bevara om host:s nuvarande HCP-input matchar tidigare
+  // beräkning; om de skrivit ett eget värde lämnar vi det orört.
+  // (Enklare alternativ: ingen auto-sync — host får skriva eget HCP eller
+  // använda Reset till default. Vi väljer just nu enkelhet.)
   const movePlayer = (id: string, dir: 'up' | 'down') => {
     setPlayers((prev) => {
       const idx = prev.findIndex((p) => p.id === id);
@@ -1235,16 +1706,6 @@ export default function LobbyScreen() {
       next.add(friend.id);
       return next;
     });
-  };
-
-  // Befintliga OS-level share-flödet (SMS/WhatsApp/Messenger osv).
-  const handleShareViaOS = async () => {
-    setShareModalOpen(false);
-    try {
-      await Share.share({ message: `Join my QuizVibe game! Room code: ${formatRoomCode(roomCode)}` });
-    } catch {
-      // tyst — användaren avbröt
-    }
   };
 
   const handleStartGame = async () => {
@@ -2136,9 +2597,14 @@ export default function LobbyScreen() {
           <View style={styles.sectionRow}>
             <Text style={styles.sectionLabel}>Players in Lobby</Text>
             <View style={styles.sectionRowRight}>
-              <Text style={styles.sectionMeta}>{approvedPlayers.length}/{players.length} approved</Text>
+              <View style={styles.sectionMetaStack}>
+                <Text style={styles.sectionMetaTop}>Approved:</Text>
+                <Text style={styles.sectionMeta}>
+                  {approvedPlayers.filter((p) => !p.hasLeft).length} of max {maxPlayers}
+                </Text>
+              </View>
               {hostMode && gameMode === 'pass-the-phone' && (
-                <TouchableOpacity style={styles.addBtn} onPress={() => setAddModalVisible(true)}>
+                <TouchableOpacity style={styles.addBtn} onPress={handleOpenAddPlayer}>
                   <Text style={styles.addBtnText}>+ Add Player</Text>
                 </TouchableOpacity>
               )}
@@ -2175,6 +2641,9 @@ export default function LobbyScreen() {
                 approved={true}
                 onApproveChange={(next) => handleSetApproved(player.id, next)}
                 hasLeft={player.hasLeft}
+                hcpOverride={player.hcpOverride}
+                onEditPlayer={hostMode && !player.hasLeft ? () => openPlayerEdit(player.id) : undefined}
+                onGuestHcpTap={hostMode && !player.hasLeft && player.type === 'guest' ? () => Alert.alert('Guest HCP', 'Guest HCP cannot be changed') : undefined}
               />
             ))}
 
@@ -2219,6 +2688,10 @@ export default function LobbyScreen() {
                     approved={false}
                     onApproveChange={(next) => handleSetApproved(player.id, next)}
                     hasLeft={player.hasLeft}
+                    onDelete={hostMode ? () => handleDeletePlayer(player.id) : undefined}
+                    hcpOverride={player.hcpOverride}
+                    onEditPlayer={hostMode && !player.hasLeft ? () => openPlayerEdit(player.id) : undefined}
+                    onGuestHcpTap={hostMode && !player.hasLeft && player.type === 'guest' ? () => Alert.alert('Guest HCP', 'Guest HCP cannot be changed') : undefined}
                   />
                 ))}
               </View>
@@ -2396,6 +2869,180 @@ export default function LobbyScreen() {
 
       {/* Alla modaler utanför ScrollView */}
       <AddPlayerModal visible={addModalVisible} onClose={() => setAddModalVisible(false)} onAdd={handleAddPlayer} />
+
+      {/* ── Player-edit-sheet (host-only) ──────────────────────────
+          Bottom-sheet där host kan redigera Assistance level, Competition
+          Year of Birth och HCP för en spelare. HCP-fältet göms för
+          guests (auto-deriveras från närmaste age-matched registrerade
+          spelare). Skrivningar är garanterat lobby-lokala — inget anrop
+          till saveProfile() från denna handler. */}
+      <Modal
+        visible={playerEditTargetId !== null}
+        transparent
+        animationType="slide"
+        onRequestClose={closePlayerEdit}
+      >
+        <KeyboardAvoidingView
+          style={playerEditSheet.overlay}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        >
+          <Pressable style={playerEditSheet.backdrop} onPress={closePlayerEdit} />
+          <View style={playerEditSheet.container}>
+            <View style={playerEditSheet.handle} />
+            <Text style={playerEditSheet.title}>Edit player</Text>
+            {playerEditTarget && (
+              <Text style={playerEditSheet.subtitle}>
+                {playerEditTarget.name} · changes apply to this lobby only
+              </Text>
+            )}
+
+            <ScrollView
+              keyboardShouldPersistTaps="handled"
+              style={{ flexShrink: 1, maxHeight: 360 }}
+              contentContainerStyle={{ gap: Spacing.md }}
+            >
+              {/* Competition Year of Birth */}
+              <View style={playerEditSheet.fieldGroup}>
+                <Text style={playerEditSheet.fieldLabel}>Competition Year of Birth</Text>
+                <TouchableOpacity
+                  style={playerEditSheet.yearTrigger}
+                  activeOpacity={0.7}
+                  onPress={() => {
+                    Keyboard.dismiss();
+                    setEditYearPickerOpen(true);
+                  }}
+                >
+                  <Text
+                    style={[
+                      playerEditSheet.yearTriggerText,
+                      editBirthYear === null && playerEditSheet.yearTriggerPlaceholder,
+                    ]}
+                  >
+                    {editBirthYear === null ? 'Select year' : (
+                      editBirthYear === MIN_BIRTH_YEAR ? `${editBirthYear} or earlier`
+                      : editBirthYear === MAX_BIRTH_YEAR ? `${editBirthYear} or later`
+                      : String(editBirthYear)
+                    )}
+                  </Text>
+                  <Text style={playerEditSheet.yearTriggerArrow}>›</Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Assistance level — Full→Standard→Minimal, en-väg.
+                  Disallowed transitions dimmas (men förblir tappbara så
+                  popup:en kan informera). Originalet bestäms av playerEdit-
+                  Target:s sparade värde, inte editAssistance — så host kan
+                  toggla mellan tillåtna alternativ utan att låsa sig. */}
+              <View style={playerEditSheet.fieldGroup}>
+                <Text style={playerEditSheet.fieldLabel}>Assistance Level</Text>
+                <View style={playerEditSheet.skillRow}>
+                  {(['full', 'standard', 'minimal'] as const).map((opt) => {
+                    const isSelected = editAssistance === opt;
+                    const originalAssistance = playerEditTarget?.assistance ?? 'standard';
+                    const isLocked =
+                      (originalAssistance === 'minimal' && opt !== 'minimal') ||
+                      ASSISTANCE_RANK[opt] > ASSISTANCE_RANK[originalAssistance];
+                    return (
+                      <TouchableOpacity
+                        key={opt}
+                        style={[
+                          playerEditSheet.skillBtn,
+                          isSelected && playerEditSheet.skillBtnActive,
+                          isLocked && playerEditSheet.skillBtnLocked,
+                        ]}
+                        onPress={() => handleSelectEditAssistance(opt)}
+                      >
+                        <Text
+                          style={[
+                            playerEditSheet.skillBtnText,
+                            isSelected && playerEditSheet.skillBtnTextActive,
+                            isLocked && playerEditSheet.skillBtnTextLocked,
+                          ]}
+                        >
+                          {opt.charAt(0).toUpperCase() + opt.slice(1)}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              </View>
+
+              {/* HCP — bara för registrerade spelare. Guest:s HCP
+                  auto-deriveras från närmaste age-matched registrerade
+                  spelare och kan inte editeras direkt. */}
+              {!playerEditIsGuest && (
+                <View style={playerEditSheet.fieldGroup}>
+                  <Text style={playerEditSheet.fieldLabel}>HCP ({MIN_HCP}–99)</Text>
+                  <TextInput
+                    style={playerEditSheet.hcpInput}
+                    value={editHcpValue}
+                    onChangeText={(t) => setEditHcpValue(t.replace(/[^0-9]/g, '').slice(0, 2))}
+                    keyboardType="number-pad"
+                    maxLength={2}
+                    placeholder="—"
+                    placeholderTextColor={Colors.textDisabled}
+                    returnKeyType="done"
+                    onSubmitEditing={handleSavePlayerEdit}
+                  />
+                </View>
+              )}
+              {playerEditIsGuest && (
+                <Text style={playerEditSheet.guestHcpNote}>
+                  Guest HCP is auto-calculated and cannot be edited.
+                </Text>
+              )}
+            </ScrollView>
+
+            <TouchableOpacity onPress={handleSavePlayerEdit} style={playerEditSheet.saveBtn}>
+              <Text style={playerEditSheet.saveBtnText}>Save</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={closePlayerEdit} style={playerEditSheet.cancelBtn}>
+              <Text style={playerEditSheet.cancelBtnText}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Year picker overlay (inom samma Modal — inga nested native-modals) */}
+          {editYearPickerOpen && (
+            <View style={playerEditSheet.yearPickerOverlay}>
+              <Pressable
+                style={StyleSheet.absoluteFill}
+                onPress={() => setEditYearPickerOpen(false)}
+              />
+              <View style={playerEditSheet.yearPickerSheet}>
+                <View style={playerEditSheet.yearPickerHandle} />
+                <Text style={playerEditSheet.title}>Select Year of Birth</Text>
+                <ScrollView style={{ maxHeight: 360 }}>
+                  {BIRTH_YEARS.map((year) => {
+                    const selected = editBirthYear === year;
+                    const label =
+                      year === MIN_BIRTH_YEAR ? `${year} or earlier`
+                      : year === MAX_BIRTH_YEAR ? `${year} or later`
+                      : String(year);
+                    return (
+                      <TouchableOpacity
+                        key={year}
+                        style={[playerEditSheet.yearItem, selected && playerEditSheet.yearItemSelected]}
+                        onPress={() => {
+                          setEditBirthYear(year);
+                          setEditYearPickerOpen(false);
+                        }}
+                      >
+                        <Text style={[playerEditSheet.yearItemText, selected && playerEditSheet.yearItemTextSelected]}>
+                          {label}
+                        </Text>
+                        {selected && <Text style={playerEditSheet.yearItemCheck}>✓</Text>}
+                      </TouchableOpacity>
+                    );
+                  })}
+                </ScrollView>
+                <TouchableOpacity onPress={() => setEditYearPickerOpen(false)} style={playerEditSheet.cancelBtn}>
+                  <Text style={playerEditSheet.cancelBtnText}>Cancel</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
+        </KeyboardAvoidingView>
+      </Modal>
       <RegionModal
         visible={regionModalOpen}
         value={region}
@@ -2420,11 +3067,14 @@ export default function LobbyScreen() {
             <View style={shareSheet.handle} />
             <Text style={shareSheet.title}>Share invite</Text>
             <Text style={shareSheet.subtitle}>
-              Send to QuizVibe friends or share by other means.
+              Send invites to your QuizVibe friends.
             </Text>
 
             {/* QuizVibe friends list */}
-            <Text style={shareSheet.sectionLabel}>QuizVibe friends</Text>
+            <View style={shareSheet.sectionLabelRow}>
+              <QuizVibeFriendsLogo size={28} />
+              <Text style={shareSheet.sectionLabel}>QuizVibe friends</Text>
+            </View>
             {friends.length === 0 ? (
               <View style={shareSheet.emptyState}>
                 <Text style={shareSheet.emptyText}>No friends saved yet</Text>
@@ -2467,19 +3117,6 @@ export default function LobbyScreen() {
                 })}
               </ScrollView>
             )}
-
-            {/* OS share fallback */}
-            <View style={shareSheet.divider} />
-            <TouchableOpacity onPress={handleShareViaOS} style={shareSheet.osShareRow}>
-              <Text style={shareSheet.osShareIcon}>📤</Text>
-              <View style={{ flex: 1 }}>
-                <Text style={shareSheet.osShareTitle}>Share via SMS, WhatsApp…</Text>
-                <Text style={shareSheet.osShareSubtitle}>
-                  Send the room code to anyone outside QuizVibe
-                </Text>
-              </View>
-              <Text style={shareSheet.osShareArrow}>›</Text>
-            </TouchableOpacity>
 
             <TouchableOpacity
               onPress={() => setShareModalOpen(false)}
@@ -3150,14 +3787,14 @@ const styles = StyleSheet.create({
     height: 20,
     borderRadius: 4,
     borderWidth: 1.5,
-    borderColor: Colors.primary,
+    borderColor: Colors.primaryDark,
     backgroundColor: 'transparent',
     alignItems: 'center',
     justifyContent: 'center',
   },
   singlePlayerCheckboxChecked: {
     backgroundColor: Colors.primary,
-    borderColor: Colors.primary,
+    borderColor: Colors.primaryDark,
   },
   singlePlayerCheckmark: {
     color: '#FFF',
@@ -3573,6 +4210,11 @@ const styles = StyleSheet.create({
   sectionLabel: { ...Typography.overline, color: Colors.textSecondary },
   sectionHint: { fontSize: FontSize.xs, color: Colors.textSecondary, fontStyle: 'italic' },
   sectionMeta: { fontSize: FontSize.sm, fontWeight: FontWeight.medium, color: Colors.primary },
+  // Stack:ar "Approved:"-labeln över räknar-raden för en två-rads-look.
+  // alignItems: 'center' så raderna centreras gentemot varandra (gemensam
+  // mittlinje istället för höger-justering).
+  sectionMetaStack: { alignItems: 'center' },
+  sectionMetaTop: { fontSize: FontSize.xs, fontWeight: FontWeight.medium, color: Colors.textSecondary },
   addBtn: { paddingHorizontal: Spacing.lg, paddingVertical: Spacing.sm, borderRadius: Radius.md, backgroundColor: Colors.primaryMuted, borderWidth: 1, borderColor: Colors.primaryBorder },
   addBtnText: { fontSize: FontSize.sm, fontWeight: FontWeight.semibold, color: Colors.primary },
 
@@ -3743,23 +4385,177 @@ const styles = StyleSheet.create({
 
 const modal = StyleSheet.create({
   overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'flex-end' },
-  container: { backgroundColor: Colors.card, borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: Spacing.xl, gap: Spacing.md, borderWidth: 1, borderColor: Colors.border },
+  // maxHeight: '90%' bounder sheet:en till viewport så toppen aldrig spiller
+  // över skärmen när PlayerName:s custom CodeKeyboard tar plats nedanför
+  // ScrollView:n. ScrollView:n inuti har flexShrink: 1 så den krymper
+  // när chrome+keyboard sammanlagt skulle överskrida sheet:s maxhöjd.
+  container: { backgroundColor: Colors.card, borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: Spacing.xl, gap: Spacing.md, borderWidth: 1, borderColor: Colors.border, maxHeight: '90%' },
   title: { fontSize: 20, fontWeight: '700', color: Colors.textPrimary, textAlign: 'center' },
   subtitle: { fontSize: 14, color: Colors.textSecondary, textAlign: 'center' },
   fieldGroup: { gap: Spacing.xs },
+  fieldGroupLocked: { opacity: 0.4 },
   fieldLabel: { fontSize: FontSize.sm, fontWeight: FontWeight.medium, color: Colors.textSecondary },
   input: { height: 52, borderRadius: Radius.md, backgroundColor: Colors.background, borderWidth: 1, borderColor: Colors.borderStrong, paddingHorizontal: Spacing.lg, fontSize: 16, color: Colors.textPrimary },
+  inputText: { height: 52, borderRadius: Radius.md, backgroundColor: Colors.background, borderWidth: 1, borderColor: Colors.borderStrong, paddingHorizontal: Spacing.lg, fontSize: 16, fontWeight: '500', color: Colors.textPrimary },
   skillRow: { flexDirection: 'row', gap: Spacing.sm },
-  skillBtn: { flex: 1, height: 40, borderRadius: Radius.md, borderWidth: 1, borderColor: Colors.border, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.background },
+  skillBtn: { flex: 1, height: 44, borderRadius: Radius.md, borderWidth: 1, borderColor: Colors.border, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.background },
   skillBtnActive: { backgroundColor: Colors.primaryMuted, borderColor: Colors.primaryBorder },
   skillBtnText: { fontSize: FontSize.sm, color: Colors.textSecondary, fontWeight: FontWeight.medium },
-  skillBtnTextActive: { color: Colors.primary },
+  skillBtnTextActive: { color: Colors.textPrimary, fontWeight: FontWeight.bold },
   previewBox: { backgroundColor: Colors.primaryMuted, borderRadius: Radius.md, padding: Spacing.md, borderWidth: 1, borderColor: Colors.primaryBorder, alignItems: 'center' },
   previewText: { fontSize: FontSize.sm, fontWeight: FontWeight.semibold, color: Colors.primary },
   cancelBtn: { alignItems: 'center', paddingVertical: Spacing.xs },
   cancelText: { fontSize: 14, color: Colors.textSecondary },
 
+  // PlayerName-rad: input + Check-knapp inline. Speglar Join-as-Guest-formen.
+  playerNameRow: { flexDirection: 'row', gap: Spacing.sm },
+  playerNameInput: { flex: 1 },
+  playerNameInputActive: { borderColor: Colors.primary },
+  checkBtn: {
+    minWidth: 72,
+    height: 52,
+    paddingHorizontal: Spacing.md,
+    borderRadius: Radius.md,
+    backgroundColor: Colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  checkBtnDisabled: { backgroundColor: 'rgba(255,255,255,0.06)' },
+  checkBtnDone: {
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: Colors.success,
+  },
+  checkBtnText: { fontSize: 14, fontWeight: '700', color: '#fff' },
+  checkBtnTextDone: { color: Colors.success, fontSize: 18 },
+
+  // Sekundära åtgärds-rad under namnfältet (Remove + Auto-generate).
+  playerNameActionRow: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+    marginTop: Spacing.xs,
+    alignSelf: 'flex-start',
+  },
+  nameActionBtn: {
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.xs,
+    borderRadius: Radius.md,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    backgroundColor: Colors.cardElevated,
+  },
+  nameActionBtnDisabled: { opacity: 0.4 },
+  nameActionBtnText: { fontSize: 13, fontWeight: '600', color: Colors.textPrimary },
+
+  // Status-rad under playerName
+  statusHint: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+    paddingHorizontal: Spacing.xs,
+    marginTop: 2,
+  },
+  statusHintOk: { color: Colors.success, fontWeight: '600' },
+  statusHintError: { color: Colors.error, fontWeight: '600' },
+
+  // Submit-knapp (Add to Lobby)
+  joinBtn: { height: 52, borderRadius: Radius.md, backgroundColor: Colors.primary, alignItems: 'center', justifyContent: 'center' },
+  joinBtnDisabled: { backgroundColor: 'rgba(255,255,255,0.06)' },
+  joinBtnText: { fontSize: 16, fontWeight: '600', color: '#fff' },
+
   // Year of birth — drop-down trigger (för Add Player)
+  yearTrigger: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    height: 52,
+    borderRadius: Radius.md,
+    backgroundColor: Colors.background,
+    borderWidth: 1,
+    borderColor: Colors.borderStrong,
+    paddingHorizontal: Spacing.lg,
+  },
+  // Active-state lyser triggern blå när den är "nästa steg" (yearUnlocked
+  // men inget år valt än) — speglar Join-as-Guest-formen.
+  yearTriggerActive: {
+    borderColor: Colors.primary,
+    backgroundColor: Colors.primaryMuted,
+  },
+  yearTriggerText: { fontSize: 16, fontWeight: '500', color: Colors.textPrimary },
+  yearTriggerPlaceholder: { color: Colors.textDisabled, fontWeight: '400' },
+  yearTriggerPlaceholderActive: { color: '#FFFFFF', fontWeight: '600' },
+  yearTriggerArrow: { fontSize: 18, color: Colors.textSecondary },
+
+  // Year picker som conditional overlay inuti samma Modal
+  yearPickerOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'flex-end',
+  },
+  yearPickerSheet: {
+    backgroundColor: Colors.card,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    padding: Spacing.xl,
+    paddingBottom: Spacing.xxl,
+    gap: Spacing.md,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  yearPickerHandle: {
+    width: 36, height: 4, borderRadius: 2,
+    backgroundColor: Colors.borderStrong,
+    alignSelf: 'center',
+    marginBottom: Spacing.sm,
+  },
+  yearItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.md,
+    borderRadius: Radius.md,
+  },
+  yearItemSelected: { backgroundColor: Colors.primaryMuted },
+  yearItemText: { fontSize: 17, color: Colors.textPrimary, fontVariant: ['tabular-nums'] },
+  yearItemTextSelected: { color: Colors.primary, fontWeight: '700' },
+  yearItemCheck: { fontSize: 16, color: Colors.primary, fontWeight: '700' },
+});
+
+const playerEditSheet = StyleSheet.create({
+  overlay: { flex: 1, justifyContent: 'flex-end' },
+  backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.5)' },
+  container: {
+    backgroundColor: Colors.card,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingHorizontal: Spacing.xl,
+    paddingTop: Spacing.md,
+    paddingBottom: Spacing.xxl,
+    gap: Spacing.md,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    maxHeight: '90%',
+  },
+  handle: {
+    width: 36, height: 4, borderRadius: 2,
+    backgroundColor: Colors.borderStrong,
+    alignSelf: 'center',
+    marginBottom: Spacing.sm,
+  },
+  title: { fontSize: 20, fontWeight: '700', color: Colors.textPrimary, textAlign: 'center' },
+  subtitle: { fontSize: 13, color: Colors.textSecondary, textAlign: 'center', marginBottom: Spacing.sm },
+
+  fieldGroup: { gap: Spacing.xs },
+  fieldLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: Colors.textSecondary,
+    letterSpacing: 0.4,
+    textTransform: 'uppercase',
+    paddingHorizontal: Spacing.xs,
+  },
+
+  // Year-trigger speglar AddPlayerModal:s yearTrigger för konsistens.
   yearTrigger: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -3775,7 +4571,52 @@ const modal = StyleSheet.create({
   yearTriggerPlaceholder: { color: Colors.textDisabled, fontWeight: '400' },
   yearTriggerArrow: { fontSize: 18, color: Colors.textSecondary },
 
-  // Year picker som conditional overlay inuti samma Modal
+  // Assistance-knapprad speglar AddPlayerModal:s skillRow.
+  skillRow: { flexDirection: 'row', gap: Spacing.sm },
+  skillBtn: {
+    flex: 1, height: 44, borderRadius: Radius.md, borderWidth: 1,
+    borderColor: Colors.border, alignItems: 'center', justifyContent: 'center',
+    backgroundColor: Colors.background,
+  },
+  skillBtnActive: { backgroundColor: Colors.primaryMuted, borderColor: Colors.primaryBorder },
+  // Disallowed assistance-transition — knappen är fortfarande tappbar så
+  // popup:en kan informera, men dimmas så host ser att det inte är ett
+  // giltigt val.
+  skillBtnLocked: { opacity: 0.4 },
+  skillBtnText: { fontSize: 14, color: Colors.textSecondary, fontWeight: '500' },
+  skillBtnTextActive: { color: Colors.textPrimary, fontWeight: '700' },
+  skillBtnTextLocked: { color: Colors.textDisabled },
+
+  // HCP-input — stort centrerat fält; samma form som tidigare hcpEditSheet.
+  hcpInput: {
+    height: 64,
+    borderRadius: Radius.md,
+    backgroundColor: Colors.background,
+    borderWidth: 1,
+    borderColor: Colors.borderStrong,
+    paddingHorizontal: Spacing.lg,
+    fontSize: 28,
+    fontWeight: '700',
+    color: Colors.textPrimary,
+    textAlign: 'center',
+    letterSpacing: 4,
+  },
+  // Info-text för guest-spelare där HCP-fältet är gömt.
+  guestHcpNote: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+    textAlign: 'center',
+    paddingHorizontal: Spacing.xs,
+    marginTop: 2,
+    fontStyle: 'italic',
+  },
+
+  saveBtn: { height: 52, borderRadius: Radius.md, backgroundColor: Colors.primary, alignItems: 'center', justifyContent: 'center' },
+  saveBtnText: { fontSize: 16, fontWeight: '600', color: '#fff' },
+  cancelBtn: { alignItems: 'center', paddingVertical: Spacing.xs },
+  cancelBtnText: { fontSize: 14, color: Colors.textSecondary },
+
+  // Year-picker overlay inom samma Modal (inga nested native-modals).
   yearPickerOverlay: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0,0,0,0.5)',
@@ -3834,10 +4675,17 @@ const shareSheet = StyleSheet.create({
   title: { fontSize: 20, fontWeight: '700', color: Colors.textPrimary, textAlign: 'center' },
   subtitle: { fontSize: 13, color: Colors.textSecondary, textAlign: 'center', marginBottom: Spacing.sm },
 
+  // Rad med QuizVibeFriendsLogo bredvid "QuizVibe friends"-labeln —
+  // samma ikon som på Profile-skärmens friends-kort.
+  sectionLabelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    paddingHorizontal: Spacing.xs,
+  },
   sectionLabel: {
     ...Typography.overline,
     color: Colors.textSecondary,
-    paddingHorizontal: Spacing.xs,
   },
 
   emptyState: {
@@ -3876,17 +4724,6 @@ const shareSheet = StyleSheet.create({
   inviteBtnTextDone: { color: Colors.success },
 
   divider: { height: 1, backgroundColor: Colors.separator },
-
-  osShareRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.md,
-    paddingVertical: Spacing.md,
-  },
-  osShareIcon: { fontSize: 22, width: 36, textAlign: 'center' },
-  osShareTitle: { fontSize: FontSize.md, fontWeight: FontWeight.semibold, color: Colors.textPrimary },
-  osShareSubtitle: { fontSize: FontSize.xs, color: Colors.textSecondary, marginTop: 2 },
-  osShareArrow: { fontSize: 20, color: Colors.textSecondary },
 
   closeBtn: {
     height: 48,

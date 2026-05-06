@@ -1,5 +1,6 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import Svg, { Path } from 'react-native-svg';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
 import { calculateInitialHCP, getHCPColor, AssistanceLevel } from '../utils/hcp';
 import { ApproveToggle } from './ApproveToggle';
@@ -40,6 +41,25 @@ interface PlayerRowProps {
   // och approve-toggeln döljs eftersom det inte längre är meningsfullt
   // att godkänna en spelare som har gått.
   hasLeft?: boolean;
+  // Papperskorgs-knapp (host-only). När definierad renderas en röd-tonad
+  // trash-ikon till höger om ApproveToggle. Används bara för spelare i
+  // "To be Approved by Host"-listan — för approved-spelare måste host
+  // först toggla tillbaka till No så raden hamnar i waiting-listan igen.
+  onDelete?: () => void;
+  // Host kan tweaka spelarens HCP per-lobby. Om satt visas detta värde
+  // istället för det beräknade. Gäller bara registrerade spelare —
+  // guest:s HCP-override sätts aldrig (auto-deriveras från närmaste
+  // age-matched registrerade spelare).
+  hcpOverride?: number;
+  // Tap-handler för player-edit (Assistance + Year of Birth + HCP).
+  // När definierad blir både hcpMeta-raden och HCP-badgen tryckbara
+  // (host-only) och öppnar samma edit-modal i parent. Guest:s HCP-badge
+  // skickas däremot till `onGuestHcpTap` istället (informativ popup).
+  onEditPlayer?: () => void;
+  // Tap-handler för guest:s "Guest HCP"-badge. När definierad gör badgen
+  // tryckbar enbart för att visa "cannot be changed"-popup — själva HCP:n
+  // auto-deriveras ändå från närmaste age-matched registrerade spelare.
+  onGuestHcpTap?: () => void;
 }
 
 export function PlayerRow({
@@ -59,12 +79,20 @@ export function PlayerRow({
   approved,
   onApproveChange,
   hasLeft,
+  onDelete,
+  hcpOverride,
+  onEditPlayer,
+  onGuestHcpTap,
 }: PlayerRowProps) {
-  const hcp = hcpComplete && age && assistance
+  const calculatedHcp = hcpComplete && age && assistance
     ? calculateInitialHCP(age, assistance)
     : null;
+  // Host:s override har företräde — speglas in i visuella badge:n direkt
+  // utan att förändra beräknings-helpers.
+  const hcp = hcpOverride ?? calculatedHcp;
+  const hasOverride = hcpOverride !== undefined;
 
-  const hcpColor = hcpComplete && assistance ? getHCPColor(assistance) : Colors.textSecondary;
+  const hcpColor = hcpComplete && assistance ? getHCPColor(assistance) : Colors.primary;
 
   return (
     <View style={styles.cardWrapper}>
@@ -136,25 +164,32 @@ export function PlayerRow({
                 LEFT THIS GAME LOBBY
               </Text>
             </View>
-          ) : (
+          ) : !player.isReady ? (
+            // "Ready"-status (med grön dot) renderas inte längre — det
+            // visuella standardläget för en spelare i lobby:n är att de
+            // är redo, så raden tillför inget. "Missing info" syns dock
+            // fortfarande som en warning eftersom den signalerar något
+            // som behöver åtgärdas.
             <View style={styles.statusRow}>
-              <View style={[styles.dot, player.isReady ? styles.dotReady : styles.dotPending]} />
-              <Text style={[styles.statusText, player.isReady ? styles.ready : styles.pending]}>
-                {player.isReady ? 'Ready' : 'Missing info'}
+              <View style={[styles.dot, styles.dotPending]} />
+              <Text style={[styles.statusText, styles.pending]}>
+                Missing info
               </Text>
             </View>
-          )}
+          ) : null}
         </View>
 
-        {/* Approve-toggle inne i kortets header — bara host ser den.
-            Bidirektionell: drag Yes godkänner, drag No återkallar.
-            Döljs för left-spelare — det är inte längre meningsfullt att
-            godkänna en spelare som har gått. */}
+        {/* Approve-toggle i övre högra hörnet av kortet. alignSelf:
+            'flex-start' pinnar wrappern mot kortets översta kant så
+            toggleln linjerar visuellt med "Approve All"-toggleln ovanför
+            listan (samma right-padding via row.paddingHorizontal). */}
         {showApproveToggle && !hasLeft && (
-          <ApproveToggle
-            value={approved ? 'yes' : 'no'}
-            onChange={(next) => onApproveChange?.(next === 'yes')}
-          />
+          <View style={styles.toggleSlot}>
+            <ApproveToggle
+              value={approved ? 'yes' : 'no'}
+              onChange={(next) => onApproveChange?.(next === 'yes')}
+            />
+          </View>
         )}
       </View>
 
@@ -163,25 +198,134 @@ export function PlayerRow({
           minimalistiskt och signalera "borta", inte presentera spel-data. */}
       {!hasLeft && hcpComplete && age && assistance && (isGuest || hcp !== null) && (
         <View style={styles.hcpRow}>
-          <Text style={styles.hcpMeta}>
-            {assistance.charAt(0).toUpperCase() + assistance.slice(1)} · Age {age}
-          </Text>
-          {isGuest ? (
-            <View style={[styles.hcpBadge, styles.hcpBadgeGuest]}>
-              <Text style={[styles.hcpBadgeText, styles.hcpBadgeTextGuest]}>
-                Guest HCP
+          {/* Vänster slot: meta-text "Assistance · Age". Tryckbar för
+              host så meta-raden själv kan öppna player-edit-modalen
+              (samma handler som HCP-badgen för registrerade spelare). */}
+          <View style={styles.hcpRowLeft}>
+            {onEditPlayer ? (
+              <Pressable
+                onPress={onEditPlayer}
+                hitSlop={6}
+                style={({ pressed }) => [pressed && styles.hcpMetaPressed]}
+                accessibilityRole="button"
+                accessibilityLabel="Edit player settings"
+              >
+                <Text style={styles.hcpMeta}>
+                  {assistance.charAt(0).toUpperCase() + assistance.slice(1)} · Age {age}
+                </Text>
+              </Pressable>
+            ) : (
+              <Text style={styles.hcpMeta}>
+                {assistance.charAt(0).toUpperCase() + assistance.slice(1)} · Age {age}
               </Text>
-            </View>
-          ) : (
-            <View style={[
-              styles.hcpBadge,
-              { borderColor: hcpColor + '60', backgroundColor: hcpColor + '25' }
-            ]}>
-              <Text style={[styles.hcpBadgeText, { color: hcpColor }]}>
-                HCP {hcp}
-              </Text>
-            </View>
-          )}
+            )}
+          </View>
+
+          {(() => {
+            const isGuestPlaceholder = isGuest;
+            const badgeContent = isGuestPlaceholder ? (
+              <View style={[styles.hcpBadge, styles.hcpBadgeGuest]}>
+                <Text style={[styles.hcpBadgeText, styles.hcpBadgeTextGuest]}>
+                  Guest HCP
+                </Text>
+              </View>
+            ) : (
+              <View style={[
+                styles.hcpBadge,
+                { borderColor: hcpColor + '60', backgroundColor: hcpColor + '25' },
+              ]}>
+                <Text style={[styles.hcpBadgeText, { color: hcpColor }]}>
+                  HCP {hcp}
+                  {hasOverride && <Text style={styles.hcpBadgeOverrideStar}> *</Text>}
+                </Text>
+              </View>
+            );
+            const wrappedBadge =
+              onEditPlayer && !isGuestPlaceholder ? (
+                <Pressable
+                  onPress={onEditPlayer}
+                  hitSlop={6}
+                  style={({ pressed }) => [pressed && styles.hcpBadgePressed]}
+                  accessibilityRole="button"
+                  accessibilityLabel="Edit player settings"
+                >
+                  {badgeContent}
+                </Pressable>
+              ) : isGuestPlaceholder && onGuestHcpTap ? (
+                <Pressable
+                  onPress={onGuestHcpTap}
+                  hitSlop={6}
+                  style={({ pressed }) => [pressed && styles.hcpBadgePressed]}
+                  accessibilityRole="button"
+                  accessibilityLabel="Guest HCP information"
+                >
+                  {badgeContent}
+                </Pressable>
+              ) : (
+                badgeContent
+              );
+
+            // Host:s eget kort: HCP-badge höger-justerad (ingen trash på
+            // host:s kort eftersom host inte kan radera sig själv).
+            // Övriga kort: badge centrerad, trash i höger-slot.
+            if (isHostPlayer) {
+              return (
+                <View style={styles.hcpRowRight}>
+                  {wrappedBadge}
+                </View>
+              );
+            }
+            return (
+              <>
+                {/* Center slot: HCP-badge. Guest:er visar ALLTID "Guest HCP"-
+                    placeholder utan siffervärde — det faktiska HCP:et auto-
+                    deriveras från närmaste age-matched registrerade spelare.
+                    Host:s HCP-edit gäller därför bara registrerade; guest:s
+                    badge fyrar onGuestHcpTap (popup) istället. */}
+                <View style={styles.hcpRowCenter}>{wrappedBadge}</View>
+
+                {/* Höger slot: papperskorgs-knapp i kortets nedre högra hörn.
+                    Host-only, blå-färgad. Visas bara på rader med onDelete
+                    (waiting-listan idag). */}
+                <View style={styles.hcpRowRight}>
+                  {onDelete && (
+                    <Pressable
+                      onPress={onDelete}
+                      hitSlop={6}
+                      style={({ pressed }) => [styles.deleteBtn, pressed && styles.deleteBtnPressed]}
+                      accessibilityRole="button"
+                      accessibilityLabel="Delete player from lobby"
+                    >
+                      <Svg width={20} height={20} viewBox="0 0 24 24">
+                        {/* Lock-stång */}
+                        <Path d="M3 6h18" stroke={Colors.textSecondary} strokeWidth={2} strokeLinecap="round" />
+                        {/* Handtag */}
+                        <Path
+                          d="M9 6V4.5A1.5 1.5 0 0 1 10.5 3h3A1.5 1.5 0 0 1 15 4.5V6"
+                          stroke={Colors.textSecondary}
+                          strokeWidth={2}
+                          fill="none"
+                          strokeLinecap="round"
+                        />
+                        {/* Korpkropp */}
+                        <Path
+                          d="M5.5 6l1 13.5A2 2 0 0 0 8.5 21h7a2 2 0 0 0 2-1.5L18.5 6"
+                          stroke={Colors.textSecondary}
+                          strokeWidth={2}
+                          fill="none"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        {/* Lodräta streck inuti korgen */}
+                        <Path d="M10 10v7" stroke={Colors.textSecondary} strokeWidth={2} strokeLinecap="round" />
+                        <Path d="M14 10v7" stroke={Colors.textSecondary} strokeWidth={2} strokeLinecap="round" />
+                      </Svg>
+                    </Pressable>
+                  )}
+                </View>
+              </>
+            );
+          })()}
         </View>
       )}
 
@@ -307,6 +451,14 @@ const styles = StyleSheet.create({
     gap: Spacing.md,
   },
 
+  // Wrapper kring approve-toggle. alignSelf: 'flex-start' pinnar toggleln
+  // mot kortets översta kant så den hamnar i övre högra hörnet och
+  // linjerar med "Approve All"-toggleln ovanför listan (samma right-
+  // padding via row.paddingHorizontal).
+  toggleSlot: {
+    alignSelf: 'flex-start',
+  },
+
   // Turn-order column (only shown in Pass-the-Phone mode):
   // numbered badge on top, ↑↓ reorder arrows directly underneath.
   turnColumn: {
@@ -381,12 +533,26 @@ const styles = StyleSheet.create({
   ready: { color: Colors.success },
   pending: { color: Colors.warning },
 
+  // HCP-rad: tre slottar — meta vänster, HCP-badge centrerad, trash höger.
+  // Lika-stora flex-slottar på vänster och höger så badgen alltid hamnar
+  // exakt i mitten oavsett text-bredd på meta.
   hcpRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     paddingHorizontal: Spacing.lg,
     paddingBottom: Spacing.md,
+  },
+  hcpRowLeft: {
+    flex: 1,
+    alignItems: 'flex-start',
+  },
+  hcpRowCenter: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  hcpRowRight: {
+    flex: 1,
+    alignItems: 'flex-end',
   },
   hcpMeta: {
     fontSize: FontSize.xs,
@@ -411,4 +577,34 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
   },
 
+  // Papperskorgs-knapp i kort-headern. Lättviktig hit-zon (tap-target ≥30px
+  // via padding+hitSlop) men visuellt minimal — bara ikonen är synlig.
+  deleteBtn: {
+    width: 30,
+    height: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: Radius.sm,
+  },
+  deleteBtnPressed: {
+    backgroundColor: Colors.borderStrong,
+  },
+
+  // HCP-badge tap-feedback (host edit-mode). Diskret opacity-dim så host
+  // ser att den är tryckbar utan att skrika om det.
+  hcpBadgePressed: {
+    opacity: 0.6,
+  },
+  // Samma diskreta opacity-dim på meta-raden när host tappar för att
+  // öppna edit-modalen. Visuellt bunden till badge-feedback för att
+  // signalera att båda tap-zonerna gör samma sak.
+  hcpMetaPressed: {
+    opacity: 0.6,
+  },
+  // Liten asterisk efter HCP-värdet när host har overridat default-räkningen.
+  // Signalerar "manuellt satt" utan att lägga ett extra ord på badge:n.
+  hcpBadgeOverrideStar: {
+    fontSize: FontSize.xs,
+    fontWeight: FontWeight.bold,
+  },
 });

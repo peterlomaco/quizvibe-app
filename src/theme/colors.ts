@@ -10,6 +10,7 @@ export const Colors = {
  
   // ── Brand ──────────────────────────────────────────────────────
   primary: '#4DA3FF',
+  primaryDark: '#114E91',
   primaryMuted: 'rgba(77,163,255,0.12)',
   primaryBorder: 'rgba(77,163,255,0.20)',
  
