@@ -83,7 +83,7 @@ const REG_REGION_OPTIONS: { id: RegRegion; label: string }[] = [
 
 const CURRENT_YEAR = new Date().getFullYear();
 const MIN_BIRTH_YEAR = 1930;
-const MAX_BIRTH_YEAR = CURRENT_YEAR - 5;
+const MAX_BIRTH_YEAR = 2020;
 // Lista, nyaste år först — samma ordning som ProfileScreens year picker.
 const BIRTH_YEARS = Array.from(
   { length: MAX_BIRTH_YEAR - MIN_BIRTH_YEAR + 1 },
@@ -92,13 +92,15 @@ const BIRTH_YEARS = Array.from(
 
 /**
  * Format-helper för Year-of-Birth-pickaren i Register- och Guest-formen.
- * Den yngsta valbara årgången (`MAX_BIRTH_YEAR`) visas som "2021 or later"
- * så bracket:en fungerar som catch-all för alla ≤5-åringar (även 0–4 år).
+ * Endpoints renderas med "or earlier"/"or later"-suffix eftersom de
+ * representerar öppna intervall (alla födda ≤1930 respektive ≥2020).
  * Övriga år renderas oförändrat. Internt sparas alltid årtalet som siffra
  * — etiketten är rent kosmetisk och påverkar inte ålders/HCP-beräkning.
  */
 function formatBirthYear(year: number): string {
-  return year === MAX_BIRTH_YEAR ? `${year} or later` : String(year);
+  if (year === MIN_BIRTH_YEAR) return `${year} or earlier`;
+  if (year === MAX_BIRTH_YEAR) return `${year} or later`;
+  return String(year);
 }
 
 function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false }: JoinModalProps) {

@@ -27,14 +27,23 @@ import { Card } from '../components/Card';
 import { EraMarkerMinus, EraMarkerPlus } from '../components/EraSliderMarker';
 import { Player, PlayerRow } from '../components/PlayerRow';
 import { QuizVibeLogo } from '../components/QuizVibeLogo';
+import {
+    ROUNDS_DEFAULT,
+    ROUNDS_MAX_INDIV,
+    ROUNDS_MAX_PASS,
+    ROUNDS_MIN,
+    ROUNDS_STEP,
+    RoundsRuler,
+} from '../components/RoundsRuler';
 import { TopUserBanner } from '../components/TopUserBanner';
 import { Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';
 import { getAvatarEmojiById } from '../utils/avatars';
 import { loadFriends, type Friend } from '../utils/friendsStorage';
 import { addLeftPlayer, getLeftPlayers } from '../utils/leftPlayers';
 import { deactivateRoom, isActiveRoom } from '../utils/mockActiveRooms';
+import { PURCHASED_PACKAGES } from '../utils/mockPurchasedPackages';
 import { consumePendingLobbyPlayers } from '../utils/pendingLobby';
-import { loadProfile, type ProfileData } from '../utils/profileStorage';
+import { loadProfile, saveProfile, type ProfileData, type Region as ProfileRegion } from '../utils/profileStorage';
 import { ROOM_CODE_DIGITS, ROOM_CODE_LEADING_LETTERS, formatRoomCode, generateRoomCode } from '../utils/roomCode';
 import { addInvite } from '../utils/waitingInvites';
 
@@ -82,18 +91,31 @@ const BIRTH_YEARS = Array.from(
  * birthYear) markeras hcpComplete=false så host-kortet visar
  * "HCP Required" på samma sätt som andra spelare utan komplett HCP.
  */
+// Generisk fallback för host-spelarens birthYear när profil saknar fältet —
+// random år i [1970, 2005] (ger 21–56 år gammal vuxen). Hellre rimlig
+// approximation än "no age" eftersom HCP-beräkningen kräver ett värde.
+function randomBirthYear(): number {
+  const min = 1970;
+  const max = 2005;
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 function mergeProfileIntoHost(existing: LobbyPlayer, profile: ProfileData): LobbyPlayer {
   const currentYear = new Date().getFullYear();
-  const age = profile.birthYear ? currentYear - profile.birthYear : undefined;
-  const hcpComplete = !!(profile.assistance && age !== undefined);
+  // Fallbacks om profil saknar fältet — slumpmässig birthYear + 'standard'
+  // assistance så host alltid har komplett HCP vid lobby-start (annars
+  // visas "HCP Required" och Start Game blir blockerad).
+  const effectiveBirthYear = profile.birthYear ?? randomBirthYear();
+  const effectiveAssistance = profile.assistance ?? 'standard';
+  const age = currentYear - effectiveBirthYear;
   return {
     ...existing,
     name: profile.playerName?.trim() || existing.name,
     emoji: getAvatarEmojiById(profile.selectedAvatarId),
     age,
-    assistance: profile.assistance ?? undefined,
-    hcpComplete,
-    isReady: hcpComplete,
+    assistance: effectiveAssistance,
+    hcpComplete: true,
+    isReady: true,
     type: 'registered',
     isHost: true,
     spotifyConnected: profile.spotifyConnected ?? false,
@@ -110,18 +132,20 @@ const SEED_PLAYERS: LobbyPlayer[] = [
 const REGIONS = ['Sweden', 'Nordics', 'Europe', 'Global'] as const;
 type Region = typeof REGIONS[number];
 
-// Music packages — extra paket host kan köpa via QuizVibe Store och välja
-// per room. Tom array = host har inga köpta paket → "Buy Extra packages"
-// CTA visas. Mockas här tills Store-integrationen är inkopplad.
-interface MusicPackage {
-  id: string;
-  name: string;
+// Profile-skärmen lagrar region som lowercase ('sweden' | 'nordics' | 'global')
+// medan Lobby:s Region-set är capitalized + inkluderar 'Europe'. Mappa över
+// vid seed; null = profile saknar region (eller har okänt värde) så caller
+// kan applicera generic 'Global'-fallback.
+function mapProfileRegion(r: ProfileRegion | null | undefined): Region | null {
+  if (r === 'sweden') return 'Sweden';
+  if (r === 'nordics') return 'Nordics';
+  if (r === 'global') return 'Global';
+  return null;
 }
-const PURCHASED_PACKAGES: MusicPackage[] = [
-  { id: 'pkg-hiphop', name: 'Hip Hop' },
-  { id: 'pkg-rock', name: 'Rock' },
-  { id: 'pkg-film-actors', name: 'Film & Actors' },
-];
+
+// (Music packages — extra paket host kan köpa via QuizVibe Store och välja
+// per room — har flyttats till `src/utils/mockPurchasedPackages.ts` så
+// Profile-vyn delar samma mock. Importen sker högst upp.)
 
 const REGION_FLAGS: Record<Region, string> = {
   Sweden: '🇸🇪', Nordics: '🌐', Europe: '🇪🇺', Global: '🌍',
@@ -152,17 +176,9 @@ const ERA_MIN_INTERVAL = 10;
 // markörerna från att komma närmare än så. Ceil för att inte underskrida.
 const ERA_MIN_INTERVAL_PX = Math.ceil((ERA_MIN_INTERVAL / (ERA_MAX - ERA_MIN)) * SLIDER_INNER_WIDTH);
 
-// Antal rundor:
-//   • Pass-the-Phone: 2–4 (telefonen rör sig fysiskt mellan spelare så
-//     speltiden växer snabbt med fler rundor).
-//   • Individual Devices: 2–20 (alla spelar parallellt → tål långa spel).
-//   • Stegrar i 2 så det alltid blir jämna lap-tal (varje runda = ett
-//     varv där alla spelare svarar en gång).
-const ROUNDS_MIN = 2;
-const ROUNDS_MAX_PASS = 4;
-const ROUNDS_MAX_INDIV = 20;
-const ROUNDS_STEP = 2;
-const ROUNDS_DEFAULT = 4;
+// (Antal rundor: konstanter + RoundsRuler-komponenten lever i shared
+// `src/components/RoundsRuler.tsx` så både Lobby och Profile delar samma
+// implementation. Importen sker högst upp i fil-huvudet.)
 
 function clampEraToPlayer(fromYear: number, toYear: number, players: LobbyPlayer[]) {
   const currentYear = new Date().getFullYear();
@@ -175,184 +191,6 @@ function clampEraToPlayer(fromYear: number, toYear: number, players: LobbyPlayer
   }
   return { from: fromYear, to: toYear, warning: null };
 }
-
-/**
- * Linjemätare för Number of Rounds — tunn horisontell linje över intervallet
- * 2–20 med ett kort vertikalt streck per jämnt nummer som markerar tick-
- * positionen. Under linjen står själva siffrorna utan ruta (bara text) i
- * blå nyans för valbara värden, grå för locked (kräver Premium). Aktuellt
- * val lyser upp i en solid blå box med vit text + glow. Locked-intervallet
- * ramas in av en uppåt-öppen klammer med en klickbar "Premium"-knapp under
- * som leder till Store.
- */
-function RoundsRuler({ value, min, gameModeMax, onPremiumPress }: {
-  value: number;
-  min: number;
-  gameModeMax: number;
-  // Optional: utan callback renderas Premium-pillen som plain View (icke-
-  // klickbar för non-host). Visuellt identisk så icke-host ser samma info
-  // som host men kan inte navigera till Store härifrån.
-  onPremiumPress?: () => void;
-}) {
-  const RULER_MAX = ROUNDS_MAX_INDIV;
-  const ticks: number[] = [];
-  for (let n = min; n <= RULER_MAX; n += 2) ticks.push(n);
-  const range = RULER_MAX - min;
-  const fillWidth = ((value - min) / range) * SLIDER_WIDTH;
-  const hasLocked = gameModeMax < RULER_MAX;
-
-  // Klammer-positionering: spänner över alla locked-tickar (gameModeMax+2 → 20).
-  // Lite extra bredd så armarna omsluter siffrorna, inte sitter innanför dem.
-  const firstLocked = gameModeMax + ROUNDS_STEP;
-  const bracketLeft = ((firstLocked - min) / range) * SLIDER_WIDTH - 13;
-  const bracketRight = ((RULER_MAX - min) / range) * SLIDER_WIDTH + 13;
-  const bracketWidth = bracketRight - bracketLeft;
-
-  return (
-    <View style={{ width: SLIDER_WIDTH, marginTop: 6 }}>
-      {/* Tunn track-linje + filled-portion */}
-      <View style={{ height: 2, borderRadius: 1, backgroundColor: Colors.border }}>
-        <View style={{ height: 2, width: fillWidth, borderRadius: 1, backgroundColor: Colors.primary }} />
-      </View>
-      {/* Vertikala tick-streck på linjen + nummer-labels under */}
-      <View style={{ height: 32, marginTop: 0 }}>
-        {ticks.map((n) => {
-          const position = ((n - min) / range) * SLIDER_WIDTH;
-          const isCurrent = n === value;
-          const isLocked = n > gameModeMax;
-          return (
-            <View key={n} style={{ position: 'absolute', left: position - 13, width: 26, alignItems: 'center' }}>
-              <View style={{
-                width: 1.5,
-                height: 7,
-                marginTop: -4,
-                backgroundColor: isLocked ? Colors.borderStrong : Colors.primary,
-              }} />
-              {isCurrent ? (
-                <View style={roundsRulerStyles.tickBoxCurrent}>
-                  <Text style={roundsRulerStyles.tickBoxTextCurrent}>{n}</Text>
-                </View>
-              ) : (
-                <Text style={[
-                  roundsRulerStyles.tickText,
-                  isLocked && roundsRulerStyles.tickTextLocked,
-                ]}>
-                  {n}
-                </Text>
-              )}
-            </View>
-          );
-        })}
-      </View>
-      {hasLocked && (
-        // height tar plats för bracket (top 0, height 10) + premium-btn
-        // (top 14, ~22px hög) → ~36px. Båda barnen är absolutpositionerade
-        // så wrapper:n behöver explicit höjd för att inte kollapsa.
-        <View style={{ marginTop: 4, height: 38 }}>
-          <View style={[roundsRulerStyles.bracket, {
-            left: bracketLeft,
-            width: bracketWidth,
-          }]} />
-          {onPremiumPress ? (
-            <TouchableOpacity
-              activeOpacity={0.7}
-              onPress={onPremiumPress}
-              style={[roundsRulerStyles.premiumBtn, {
-                left: bracketLeft + bracketWidth / 2 - 50,
-              }]}
-            >
-              <Text style={roundsRulerStyles.premiumBtnText}>PREMIUM</Text>
-            </TouchableOpacity>
-          ) : (
-            <View
-              style={[roundsRulerStyles.premiumBtn, {
-                left: bracketLeft + bracketWidth / 2 - 50,
-              }]}
-              pointerEvents="none"
-            >
-              <Text style={roundsRulerStyles.premiumBtnText}>PREMIUM</Text>
-            </View>
-          )}
-        </View>
-      )}
-    </View>
-  );
-}
-
-const roundsRulerStyles = StyleSheet.create({
-  // "Lit"-state för aktuellt val — solid blå box med vit text + glow,
-  // matchar formatet på den stora roundsGuestBox men mindre.
-  tickBoxCurrent: {
-    width: 26,
-    height: 22,
-    borderRadius: 4,
-    borderWidth: 1.5,
-    borderColor: Colors.primary,
-    backgroundColor: Colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 4,
-    shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.7,
-    shadowRadius: 6,
-    elevation: 4,
-  },
-  tickBoxTextCurrent: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    fontVariant: ['tabular-nums'],
-    letterSpacing: -0.3,
-    lineHeight: 14,
-  },
-  // Bara siffer-text (ingen ruta) för valbara icke-valda värden.
-  tickText: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: Colors.primary,
-    fontVariant: ['tabular-nums'],
-    letterSpacing: -0.3,
-    marginTop: 9, // matchar tickBoxCurrent.marginTop + (height-fontSize)/2 så raden linjerar
-  },
-  tickTextLocked: {
-    color: Colors.textDisabled,
-  },
-  // Klammer (uppåt-öppen U) som ramar in locked-tickarna. borderTopWidth=0
-  // implicit; vänster/höger/botten-borders bildar U:t. Grå färg matchar
-  // premiumBadgeGrey-stilen på Individual Devices-knappen i Game Mode-toggle.
-  bracket: {
-    position: 'absolute',
-    top: 0,
-    height: 10,
-    borderLeftWidth: 1.5,
-    borderRightWidth: 1.5,
-    borderBottomWidth: 1.5,
-    borderColor: '#6B7280',
-    borderBottomLeftRadius: 4,
-    borderBottomRightRadius: 4,
-  },
-  // Premium-CTA — grå pill med vit text "PREMIUM" i versaler. Samma
-  // visuella språk som premiumBadgeGrey runt Individual Devices.
-  // Tap navigerar till Store. Fixed width 100px för matematisk centrering
-  // under klammern (left = bracketCenter - width/2).
-  premiumBtn: {
-    position: 'absolute',
-    top: 14,
-    width: 100,
-    paddingVertical: 4,
-    backgroundColor: '#6B7280',
-    borderRadius: Radius.full,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  premiumBtnText: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    letterSpacing: 0.6,
-  },
-});
 
 function DecadeMarks() {
   // Tidsaxel — labels positionerade på faktiska års-värden, INTE jämnt
@@ -767,19 +605,6 @@ export default function LobbyScreen() {
 
   const [players, setPlayers] = useState<LobbyPlayer[]>(SEED_PLAYERS);
 
-  // Pulserande Buy CTA — drar host:ens uppmärksamhet till QuizVibe Store-knappen.
-  // Samma loop-mönster (scale 1 → 1.03 → 1, 900ms per riktning) som
-  // Create Game-knappen på startskärmen.
-  const buyCtaPulse = useRef(new Animated.Value(1)).current;
-  useEffect(() => {
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(buyCtaPulse, { toValue: 1.03, duration: 900, useNativeDriver: true }),
-        Animated.timing(buyCtaPulse, { toValue: 1, duration: 900, useNativeDriver: true }),
-      ]),
-    ).start();
-  }, [buyCtaPulse]);
-
   // Eget player-id (host:s seed-id för host, eller den auto-tillagda
   // guest/joiner-id:n för non-hosts). Används av leave-flödet för att
   // markera rätt spelare som "left" i leftPlayers-storen så övriga ser
@@ -796,6 +621,41 @@ export default function LobbyScreen() {
     let cancelled = false;
     setPlayers(SEED_PLAYERS);
     ownPlayerIdRef.current = null;
+    // Host: seed lobby-wide settings från profil (Profile:s "Host default
+    // settings"-block). Per-fält fallbacks följer den generiska spec:en
+    // (Pass-the-Phone, Max 4, Global, 1981→innevarande år, ROUNDS_DEFAULT, 30 sek)
+    // när profilen saknas eller fältet är otomt. Effekten triggar både
+    // vid första mount OCH vid Play Again-återinträde (component re-mountar).
+    if (hostMode) {
+      loadProfile().then((profile) => {
+        if (cancelled) return;
+        const profileGameMode = profile?.gameMode ?? 'pass-the-phone';
+        setGameMode(profileGameMode);
+        setMaxPlayers(profile?.maxPlayers ?? 4);
+        setSinglePlayerDefault(profile?.singlePlayerDefault ?? false);
+        setRegion(mapProfileRegion(profile?.region) ?? 'Global');
+        setAnswerResponseSeconds(profile?.answerResponseSeconds ?? 30);
+        const eraFrom = profile?.gameEraFrom ?? 1981;
+        const eraTo = profile?.gameEraTo ?? ERA_MAX;
+        setEraValues([
+          Math.max(ERA_MIN, eraFrom),
+          Math.min(ERA_MAX, eraTo),
+        ]);
+        // Clamp roundsCount mot gameMode:s tak (Pass-the-Phone capas vid 4,
+        // Individual Devices vid 20) så ett gammalt sparat värde inte
+        // hamnar utanför range:n.
+        const savedRounds = profile?.roundsDefault ?? ROUNDS_DEFAULT;
+        const initialMax = profileGameMode === 'pass-the-phone'
+          ? ROUNDS_MAX_PASS
+          : ROUNDS_MAX_INDIV;
+        setRoundsCount(Math.max(ROUNDS_MIN, Math.min(initialMax, savedRounds)));
+        // Filterlistan från Profile:s Customized Host packages-toggle.
+        // Default = alla köpta paket aktiverade om profilen saknar fältet.
+        setEnabledHostPackages(
+          profile?.enabledHostPackages ?? PURCHASED_PACKAGES.map((p) => p.id),
+        );
+      });
+    }
     consumePendingLobbyPlayers().then(async (carriedOver) => {
       if (cancelled) return;
       if (carriedOver && carriedOver.length > 0) {
@@ -890,6 +750,11 @@ export default function LobbyScreen() {
       let active = true;
       Promise.all([loadProfile(), getLeftPlayers(roomCode)]).then(([profile, leftSnapshots]) => {
         if (!active) return;
+        // Speglar Profile:s credits-pill — refresh-logiken i loadProfile
+        // top-up:ar `freeGameCredits` till FREE_CREDITS_DAILY_CAP vid första
+        // load efter midnatt CET, så lobbyn visar alltid aktuellt värde.
+        setFreeGameCredits(profile?.freeGameCredits ?? 0);
+        setGameCredits(profile?.gameCredits ?? 0);
         setPlayers((prev) => {
           const leftIds = leftSnapshots.map((s) => s.id);
           // Steg 1: mappa över befintliga spelare och applicera hasLeft på de
@@ -940,9 +805,16 @@ export default function LobbyScreen() {
   );
   const [addModalVisible, setAddModalVisible] = useState(false);
   const ROOM_LOGO_SIZE = 104;
-  const [eraValues, setEraValues] = useState([1980, 2010]);
+  // Lobby-wide settings — defaults speglar generic-fallback-spec (används
+  // bara innan profil-seed-effekten hinner köra). Profile:s host-default
+  // settings overridar dessa vid lobby-mount för host (se useEffect nedan).
+  const [eraValues, setEraValues] = useState([1981, ERA_MAX]);
   const [roundsCount, setRoundsCount] = useState(ROUNDS_DEFAULT);
-  const [region, setRegion] = useState<Region>('Sweden');
+  const [region, setRegion] = useState<Region>('Global');
+  // Hur länge spelarna har på sig att svara på en fråga (sekunder). Ingen
+  // Lobby-UI än — propageras vidare till quiz.tsx via handleStartGame så
+  // host:s profil-default följer med in i spelet.
+  const [answerResponseSeconds, setAnswerResponseSeconds] = useState<15 | 30 | 45 | 60>(30);
   // gameMode-state declareras längre ner — se rad ~751.
   const [regionModalOpen, setRegionModalOpen] = useState(false);
 
@@ -956,6 +828,13 @@ export default function LobbyScreen() {
   // pillen i TopUserBanner öppnar sheet:n; "Leave Game Lobby" → Alert-confirm →
   // tillbaka till Home.
   const [guestLeaveSheetVisible, setGuestLeaveSheetVisible] = useState(false);
+
+  // Host Game Credits — speglar Profile:s credits-pill exakt. Värdena läses
+  // från sparad profil i useFocusEffect:n nedan så lobbyn alltid visar
+  // samma siffra som Profile (och uppdateras direkt om användaren spenderat
+  // / fyllts på via daily refresh / shoppat extras i Store mellan tab-byten).
+  const [freeGameCredits, setFreeGameCredits] = useState<number>(0);
+  const [gameCredits, setGameCredits] = useState<number>(0);
 
   // Host delete-lobby sheet — bara aktiv när hostMode är på. Tap på TopUserBanner-
   // pillen öppnar sheet:n istället för att navigera till Profile (host:s
@@ -980,6 +859,10 @@ export default function LobbyScreen() {
 
   // Game mode toggle (Pass-the-Phone vs Multiplayer Individual Devices)
   const [gameMode, setGameMode] = useState<GameMode>('pass-the-phone');
+  // "Use single player mode as default" — när checkad dämpas Pass-the-Phone-
+  // rutan i toggle:n. Speglar Profile:s motsvarande checkbox; lokal lobby-
+  // state utan profil-pre-load (konsekvent med gameMode som också är lokal).
+  const [singlePlayerDefault, setSinglePlayerDefault] = useState(false);
 
   // Max antal spelare per spel — 4 = Basic (gratis), 12 = Premium.
   // Lobby-local state; speglar Profile:s host-default-toggle.
@@ -997,10 +880,20 @@ export default function LobbyScreen() {
   }, [roundsMax]);
 
   const handleDecrementRounds = useCallback(() => {
-    setRoundsCount((prev) => Math.max(ROUNDS_MIN, prev - ROUNDS_STEP));
+    setRoundsCount((prev) => {
+      const next = Math.max(ROUNDS_MIN, prev - ROUNDS_STEP);
+      // Haptic-klick bara när värdet faktiskt ändras (vid range-floor
+      // skulle annars en "tom" tap fyra haptik utan visuell respons).
+      if (next !== prev) void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      return next;
+    });
   }, []);
   const handleIncrementRounds = useCallback(() => {
-    setRoundsCount((prev) => Math.min(roundsMax, prev + ROUNDS_STEP));
+    setRoundsCount((prev) => {
+      const next = Math.min(roundsMax, prev + ROUNDS_STEP);
+      if (next !== prev) void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      return next;
+    });
   }, [roundsMax]);
   // YouTube är alltid tillgänglig som källa, men host kan slå av/på manuellt
   // via en toggle. Default = på. Skickas till alla via lobbyns state.
@@ -1014,6 +907,16 @@ export default function LobbyScreen() {
   // kan välja till extra-paket ovanpå. Knytningen mellan packages och
   // room-code är implicit (lobby-state).
   const [selectedExtraPackages, setSelectedExtraPackages] = useState<string[]>([]);
+  // Profil-styrd filterlista: bara paket som hosten aktiverat i sin
+  // Profile (Customized Host packages-toggle) visas i Lobby. Default =
+  // alla paket aktiverade så nyköpta dyker upp utan extra steg via Profile.
+  const [enabledHostPackages, setEnabledHostPackages] = useState<string[]>(
+    () => PURCHASED_PACKAGES.map((p) => p.id),
+  );
+  const availablePackages = useMemo(
+    () => PURCHASED_PACKAGES.filter((p) => enabledHostPackages.includes(p.id)),
+    [enabledHostPackages],
+  );
 
   const handleToggleExtraPackage = (id: string) => {
     setSelectedExtraPackages((prev) =>
@@ -1021,15 +924,15 @@ export default function LobbyScreen() {
     );
   };
   // "Select all"-toggle på rubrik-raden — låter host aktivera/avaktivera
-  // alla köpta paket med ett enda klick.
+  // alla synliga (profil-aktiverade) paket med ett enda klick.
   const isAllSelected =
-    PURCHASED_PACKAGES.length > 0 &&
-    selectedExtraPackages.length === PURCHASED_PACKAGES.length;
+    availablePackages.length > 0 &&
+    selectedExtraPackages.length === availablePackages.length;
   const handleToggleAll = () => {
     if (isAllSelected) {
       setSelectedExtraPackages([]);
     } else {
-      setSelectedExtraPackages(PURCHASED_PACKAGES.map((p) => p.id));
+      setSelectedExtraPackages(availablePackages.map((p) => p.id));
     }
   };
   // TODO (Store integration): koppla till riktig köpstatus när Store-paketet är inkopplat.
@@ -1326,7 +1229,7 @@ export default function LobbyScreen() {
     }
   };
 
-  const handleStartGame = () => {
+  const handleStartGame = async () => {
     // Turordningen för Pass-the-phone bygger på array-ordningen i `players[]`
     // (host alltid på index 0). Filtrera bort spelare som lämnat lobbyn —
     // de kan inte vara på tur. Skicka en minimal player-payload så quiz.tsx
@@ -1345,6 +1248,43 @@ export default function LobbyScreen() {
       return;
     }
 
+    // Konsumera 1 Host Game-credit per påbörjat spel — Free först, Extras
+    // sedan. Blockerar start om båda är 0 (visar Store-redirect-Alert).
+    // Persisterar tillbaka via saveProfile så Profile-pillen + nästa lobby-
+    // session ser den uppdaterade siffran. Spread:ar in tidigare profil-
+    // fields (...profile) så vi inte stripper andra sparade settings.
+    const profile = await loadProfile();
+    if (!profile) {
+      Alert.alert('Sign in required', 'Log in or register before starting a game.');
+      return;
+    }
+    const free = profile.freeGameCredits ?? 0;
+    const extras = profile.gameCredits ?? 0;
+    if (free === 0 && extras === 0) {
+      Alert.alert(
+        'Out of Host Game Credits',
+        'You have no credits left for today. Buy extra credits in Store, wait for the daily refresh at midnight CET, or upgrade to a QuizVibe membership for unlimited host games.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Go to Store', onPress: () => router.push('/(tabs)/store') },
+        ],
+      );
+      return;
+    }
+    const nextFree = free > 0 ? free - 1 : 0;
+    const nextExtras = free > 0 ? extras : extras - 1;
+    try {
+      await saveProfile({ ...profile, freeGameCredits: nextFree, gameCredits: nextExtras });
+      // Lokal state-sync så pillen i lobby-headern uppdateras direkt
+      // (annars hade den gamla siffran legat kvar tills nästa fokus-load).
+      setFreeGameCredits(nextFree);
+      setGameCredits(nextExtras);
+    } catch {
+      // Tyst — låt spelet börja även om persist-write skulle failla. Nästa
+      // load reflekterar då fortfarande gamla värdet, vilket är säkrare än
+      // att blockera spelstart helt på en AsyncStorage-glitch.
+    }
+
     router.push({
       pathname: '/quiz',
       params: {
@@ -1353,6 +1293,9 @@ export default function LobbyScreen() {
         gameMode,
         players: JSON.stringify(turnOrder),
         roundsCount: String(roundsCount),
+        // Tidsgränsen per fråga från host:s profil (default 30 sek). Quiz
+        // använder den för timer-bar:en + reveal-trigger.
+        answerResponseSeconds: String(answerResponseSeconds),
         // Skickas så Quit Game-flödet i quiz.tsx kan deactivera rummet
         // och rensa leftPlayers när host avslutar mitt i ett spel.
         roomCode,
@@ -1386,6 +1329,67 @@ export default function LobbyScreen() {
       >
         <View style={styles.header}>
           <Text style={styles.screenTitle}>Game Lobby</Text>
+          {/* Host Game Credits-pill — speglar Profile:s motsvarande pill
+              exakt (samma styling, samma värden via loadProfile-source).
+              Tap navigerar till Store. Värdena uppdateras vid varje fokus
+              på Lobby så de följer Profile:s state utan delay. */}
+          <Pressable
+            style={({ pressed }) => [
+              styles.creditsPill,
+              pressed && { opacity: 0.85 },
+            ]}
+            onPress={() => router.push('/(tabs)/store')}
+          >
+            <Text style={styles.creditsLabel}>Host Game Credits</Text>
+            <View style={styles.creditsValueRow}>
+              <Text style={styles.creditsKey}>Free:</Text>
+              <Text style={[styles.creditsValue, styles.creditsValueFree]}>{freeGameCredits}</Text>
+              <Pressable
+                style={({ pressed }) => [
+                  styles.creditsExtrasBox,
+                  gameCredits > 0
+                    ? styles.creditsExtrasBoxActive
+                    : styles.creditsExtrasBoxInactive,
+                  pressed && { opacity: 0.7 },
+                ]}
+                onPress={() =>
+                  Alert.alert(
+                    'Extra Host Game Credits',
+                    gameCredits > 0
+                      ? `You have ${gameCredits} extra credit${gameCredits === 1 ? '' : 's'}. Buy more in Store?`
+                      : 'You have no extra credits. Buy some in Store?',
+                    [
+                      { text: 'Cancel', style: 'cancel' },
+                      { text: 'Go to Store', onPress: () => router.push('/(tabs)/store') },
+                    ],
+                  )
+                }
+              >
+                <Text style={styles.creditsKey}>Extras:</Text>
+                <Text style={[styles.creditsValue, styles.creditsValueExtras]}>{gameCredits}</Text>
+                <View
+                  style={[
+                    styles.creditsExtrasPremiumBadge,
+                    gameCredits > 0
+                      ? styles.creditsExtrasPremiumBadgeActive
+                      : styles.creditsExtrasPremiumBadgeInactive,
+                  ]}
+                  pointerEvents="none"
+                >
+                  <Text
+                    style={[
+                      styles.creditsExtrasPremiumBadgeText,
+                      gameCredits > 0
+                        ? styles.creditsExtrasPremiumBadgeTextActive
+                        : styles.creditsExtrasPremiumBadgeTextInactive,
+                    ]}
+                  >
+                    PREMIUM
+                  </Text>
+                </View>
+              </Pressable>
+            </View>
+          </Pressable>
         </View>
 
         <Card style={styles.roomCard} padding={Spacing.xl}>
@@ -1466,28 +1470,91 @@ export default function LobbyScreen() {
         <View style={[styles.section, { marginTop: Spacing.xs }]}>
           <Text style={styles.sectionLabel}>Game Mode</Text>
 
+          {/* "Use single player mode as default" — sitter ovanför Game
+              Mode-toggle:n. När checkad dämpas BÅDA multiplayer-rutorna
+              (Pass-the-Phone + Individual Devices) eftersom single-player
+              inte använder någon av dem. När bocken tas bort defaultar
+              vi alltid till Pass-the-Phone (gratis-läget). Disabled för
+              non-host (read-only följer host:s val — samma mönster som
+              modeToggle nedan). */}
+          <TouchableOpacity
+            style={styles.singlePlayerRow}
+            activeOpacity={0.7}
+            onPress={() => {
+              setSinglePlayerDefault((v) => {
+                const next = !v;
+                if (!next) {
+                  // Uncheck → defaulta till gratis-läget på BÅDA
+                  // toggles (Pass-the-Phone + Max 4) så lobby:n hamnar
+                  // i ett konsekvent multiplayer-läge.
+                  setGameMode('pass-the-phone');
+                  setMaxPlayers(4);
+                }
+                return next;
+              });
+            }}
+            disabled={!hostMode}
+          >
+            <View
+              style={[
+                styles.singlePlayerCheckbox,
+                singlePlayerDefault && styles.singlePlayerCheckboxChecked,
+              ]}
+            >
+              {singlePlayerDefault && (
+                <Text style={styles.singlePlayerCheckmark}>✓</Text>
+              )}
+            </View>
+            <Text style={styles.singlePlayerLabel}>
+              Use single player mode as default
+            </Text>
+          </TouchableOpacity>
+
           <View style={styles.modeToggle}>
             {/* Pass-the-Phone */}
             <TouchableOpacity
               style={[
                 styles.modeOption,
-                gameMode === 'pass-the-phone'
-                  ? (hostMode ? styles.modeOptionPassActive : styles.modeOptionIndivActive)
-                  : styles.modeOptionInactive,
+                singlePlayerDefault
+                  ? styles.modeOptionDimmed
+                  : gameMode === 'pass-the-phone'
+                    ? (hostMode ? styles.modeOptionPassActive : styles.modeOptionIndivActive)
+                    : styles.modeOptionInactive,
               ]}
-              onPress={() => handleSelectMode('pass-the-phone')}
+              onPress={() => {
+                // Tap på dämpad ruta = bocka av single-player-defaulten
+                // OCH aktivera Pass-the-Phone i samma gest. Bara host:en
+                // (disabled-prop blockar non-host innan vi når hit).
+                if (singlePlayerDefault) {
+                  setSinglePlayerDefault(false);
+                  setGameMode('pass-the-phone');
+                  return;
+                }
+                handleSelectMode('pass-the-phone');
+              }}
               disabled={!hostMode}
               activeOpacity={0.7}
             >
               <Text style={[
                 styles.modeLabel,
-                gameMode === 'pass-the-phone' && styles.modeLabelActiveFree,
+                !singlePlayerDefault && gameMode === 'pass-the-phone' && styles.modeLabelActiveFree,
+                singlePlayerDefault && styles.modeLabelDimmed,
               ]}>
                 Pass-the-Phone
               </Text>
               {hostMode && gameMode === 'pass-the-phone' && (
-                <View style={styles.freeBadge} pointerEvents="none">
-                  <Text style={styles.freeBadgeText}>FREE</Text>
+                <View
+                  style={[styles.freeBadge, singlePlayerDefault && styles.freeBadgeDimmed]}
+                  pointerEvents="none"
+                >
+                  <Text
+                    style={[
+                      styles.freeBadgeText,
+                      singlePlayerDefault && styles.freeBadgeTextDimmed,
+                    ]}
+                  >
+                    FREE
+                  </Text>
                 </View>
               )}
             </TouchableOpacity>
@@ -1496,41 +1563,81 @@ export default function LobbyScreen() {
                 med paket aktivt: kantlinjen, texten och PREMIUM-badge:n är guld
                 (samlat "premium-läge"-uttryck, samma mönster som Max 12 Players-
                 toggle:n i Profile). För icke-host visas blå "lit" kant när läget
-                är aktivt, oavsett deras egna paket. */}
+                är aktivt, oavsett deras egna paket. När singlePlayerDefault är
+                checkad: rutan dämpas (samma look som Pass-the-Phone-dimming)
+                och tap bockar av defaulten + defaultar till Pass-the-Phone
+                (alltid Pass-the-Phone på uncheck). */}
             <TouchableOpacity
               style={[
                 styles.modeOption,
-                gameMode === 'individual-devices' && (hostMode ? hasMultiplayerPackage : true)
-                  ? (hostMode ? styles.modeOptionPremiumActive : styles.modeOptionIndivActive)
-                  : styles.modeOptionInactive,
+                singlePlayerDefault
+                  ? styles.modeOptionDimmed
+                  : gameMode === 'individual-devices' && (hostMode ? hasMultiplayerPackage : true)
+                    ? (hostMode ? styles.modeOptionPremiumActive : styles.modeOptionIndivActive)
+                    : styles.modeOptionInactive,
               ]}
-              onPress={() => handleSelectMode('individual-devices')}
+              onPress={() => {
+                // Tap på dämpad Individual Devices-ruta är Premium-gated:
+                //   • Med Multiplayer-paket → bocka av defaulten OCH aktivera
+                //     Individual Devices direkt (en gest för båda).
+                //   • Utan paket → låt handleSelectMode visa Premium-popup
+                //     (Store-redirect) UTAN att ändra state. Pass-the-Phone
+                //     tänds inte upp; användaren måste tappa Pass-the-Phone-
+                //     rutan eller bocka ur checkboxen för att lämna single-
+                //     player-läget.
+                if (singlePlayerDefault) {
+                  if (!hasMultiplayerPackage) {
+                    handleSelectMode('individual-devices');
+                    return;
+                  }
+                  setSinglePlayerDefault(false);
+                  setGameMode('individual-devices');
+                  return;
+                }
+                handleSelectMode('individual-devices');
+              }}
               disabled={!hostMode}
               activeOpacity={0.7}
             >
               <Text style={[
                 styles.modeLabel,
-                gameMode === 'individual-devices' && (
+                !singlePlayerDefault && gameMode === 'individual-devices' && (
                   hostMode
                     ? hasMultiplayerPackage && styles.modeLabelActivePremium
                     : styles.modeLabelActiveFree
                 ),
+                singlePlayerDefault && styles.modeLabelDimmed,
               ]}>
                 Individual Devices
               </Text>
               {hostMode && (
                 <View
-                  style={[styles.premiumBadge, !hasMultiplayerPackage && styles.premiumBadgeGrey]}
+                  style={[
+                    styles.premiumBadge,
+                    (singlePlayerDefault || !hasMultiplayerPackage) && styles.premiumBadgeGrey,
+                  ]}
                   pointerEvents="none"
                 >
                   <Text
-                    style={[styles.premiumBadgeText, !hasMultiplayerPackage && styles.premiumBadgeTextGrey]}
+                    style={[
+                      styles.premiumBadgeText,
+                      (singlePlayerDefault || !hasMultiplayerPackage) && styles.premiumBadgeTextGrey,
+                    ]}
                   >
                     PREMIUM
                   </Text>
                 </View>
               )}
             </TouchableOpacity>
+          </View>
+
+          {/* Klammer (uppåt-öppen U) under modeToggle:n med "Multiplayer
+              mode"-label centrerad. Speglar Profile:s motsvarande klammer
+              och Lobby:s Number of Rounds-bracket — samma #6B7280 grå,
+              1.5px borders, 10px höga ben med rundade botten-hörn. */}
+          <View style={styles.multiplayerBracketWrap}>
+            <View style={styles.multiplayerBracket} />
+            <Text style={styles.multiplayerBracketLabel}>Multiplayer mode</Text>
           </View>
 
           <Text style={styles.modeDescription}>
@@ -1543,44 +1650,86 @@ export default function LobbyScreen() {
               Direkt under Game Mode-toggle:n. Speglar Profile:s host-
               default-toggle: Max 4 (free, grön aktiv + FREE-badge) vs
               Max 12 (premium, guld aktiv + PREMIUM-badge). Försök att
-              välja Max 12 utan Premium triggar Store-omdirigering. */}
+              välja Max 12 utan Premium triggar Store-omdirigering. När
+              singlePlayerDefault är checkad dämpas BÅDA rutorna (samma
+              dimming-mönster som Game Mode-toggle:n ovan). */}
           <View style={{ marginTop: Spacing.md }}>
             <Text style={styles.sectionLabel}>Number of Players per Game</Text>
             <View style={[styles.modeToggle, { marginTop: Spacing.sm }]}>
               <TouchableOpacity
                 style={[
                   styles.modeOption,
-                  maxPlayers === 4 ? styles.modeOptionPassActive : styles.modeOptionInactive,
+                  singlePlayerDefault
+                    ? styles.modeOptionDimmed
+                    : maxPlayers === 4
+                      ? styles.modeOptionPassActive
+                      : styles.modeOptionInactive,
                 ]}
-                onPress={() => handleSelectMaxPlayers(4)}
+                onPress={() => {
+                  if (singlePlayerDefault) {
+                    setSinglePlayerDefault(false);
+                    setGameMode('pass-the-phone');
+                    setMaxPlayers(4);
+                    return;
+                  }
+                  handleSelectMaxPlayers(4);
+                }}
                 disabled={!hostMode}
                 activeOpacity={0.7}
               >
                 <Text
                   style={[
                     styles.modeLabel,
-                    maxPlayers === 4 && styles.modeLabelActiveFree,
+                    !singlePlayerDefault && maxPlayers === 4 && styles.modeLabelActiveFree,
+                    singlePlayerDefault && styles.modeLabelDimmed,
                   ]}
                 >
                   Max 4 Players
                 </Text>
-                <View style={styles.freeBadge} pointerEvents="none">
-                  <Text style={styles.freeBadgeText}>FREE</Text>
+                <View
+                  style={[styles.freeBadge, singlePlayerDefault && styles.freeBadgeDimmed]}
+                  pointerEvents="none"
+                >
+                  <Text
+                    style={[
+                      styles.freeBadgeText,
+                      singlePlayerDefault && styles.freeBadgeTextDimmed,
+                    ]}
+                  >
+                    FREE
+                  </Text>
                 </View>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[
                   styles.modeOption,
-                  maxPlayers === 12 ? styles.modeOptionPremiumActive : styles.modeOptionInactive,
+                  singlePlayerDefault
+                    ? styles.modeOptionDimmed
+                    : maxPlayers === 12
+                      ? styles.modeOptionPremiumActive
+                      : styles.modeOptionInactive,
                 ]}
-                onPress={() => handleSelectMaxPlayers(12)}
+                onPress={() => {
+                  if (singlePlayerDefault) {
+                    if (!hasPremium) {
+                      handleSelectMaxPlayers(12);
+                      return;
+                    }
+                    setSinglePlayerDefault(false);
+                    setGameMode('pass-the-phone');
+                    setMaxPlayers(12);
+                    return;
+                  }
+                  handleSelectMaxPlayers(12);
+                }}
                 disabled={!hostMode}
                 activeOpacity={0.7}
               >
                 <Text
                   style={[
                     styles.modeLabel,
-                    maxPlayers === 12 && styles.modeLabelActivePremium,
+                    !singlePlayerDefault && maxPlayers === 12 && styles.modeLabelActivePremium,
+                    singlePlayerDefault && styles.modeLabelDimmed,
                   ]}
                 >
                   Max 12 Players
@@ -1588,14 +1737,14 @@ export default function LobbyScreen() {
                 <View
                   style={[
                     styles.premiumBadge,
-                    !(maxPlayers === 12 || hasPremium) && styles.premiumBadgeGrey,
+                    (singlePlayerDefault || !(maxPlayers === 12 || hasPremium)) && styles.premiumBadgeGrey,
                   ]}
                   pointerEvents="none"
                 >
                   <Text
                     style={[
                       styles.premiumBadgeText,
-                      !(maxPlayers === 12 || hasPremium) && styles.premiumBadgeTextGrey,
+                      (singlePlayerDefault || !(maxPlayers === 12 || hasPremium)) && styles.premiumBadgeTextGrey,
                     ]}
                   >
                     PREMIUM
@@ -1773,6 +1922,89 @@ export default function LobbyScreen() {
             <View style={styles.usePackagesBlock}>
               <Text style={styles.sectionLabel}>Customized Host packages</Text>
 
+              {/* Två-knapps-rad direkt under rubriken — vänster: "Generic"-
+                  ruta med FREE-badge som signalerar att lobby:n kör basic
+                  innehåll utan extra-paket; höger: "+ Add host packages" som
+                  navigerar till Store. Båda halvbreda (flex: 1 + gap: 4 i
+                  raden). Generic lyser grön när inga extra-paket är valda
+                  ELLER när alla tillgängliga paket är valda; dämpas till grå
+                  vid partial selection. Host-only — guests ska varken se
+                  köp-knappen eller Generic-toggle:n. */}
+              {hostMode && (() => {
+                // Generic är aktiv (grön) när inga extra-paket är valda.
+                // Så fort minst ett paket är valt — inklusive Select all-
+                // läget — dämpas Generic till grå (paketen är nu i bruk
+                // istället för bara basic-utbudet).
+                const isGenericActive = selectedExtraPackages.length === 0;
+                const handleGenericPress = () => {
+                  if (isGenericActive) return;
+                  // Minst ett paket valt → fråga innan vi rensar selection.
+                  Alert.alert(
+                    'Switch to Generic?',
+                    'This will deactivate all selected packages and use only the generic content for this lobby.',
+                    [
+                      { text: 'Cancel', style: 'cancel' },
+                      {
+                        text: 'Switch',
+                        onPress: () => setSelectedExtraPackages([]),
+                      },
+                    ],
+                  );
+                };
+                return (
+                  <View style={styles.packageActionsRow}>
+                    <TouchableOpacity
+                      style={[
+                        styles.addPackageBtn,
+                        isGenericActive && styles.genericBtnActive,
+                      ]}
+                      onPress={handleGenericPress}
+                      activeOpacity={isGenericActive ? 1 : 0.7}
+                    >
+                      <Text
+                        style={[
+                          styles.modeLabel,
+                          isGenericActive && styles.modeLabelActiveFree,
+                        ]}
+                      >
+                        Generic
+                      </Text>
+                      <View
+                        style={[
+                          styles.freeBadge,
+                          !isGenericActive && styles.freeBadgeDimmed,
+                        ]}
+                        pointerEvents="none"
+                      >
+                        <Text
+                          style={[
+                            styles.freeBadgeText,
+                            !isGenericActive && styles.freeBadgeTextDimmed,
+                          ]}
+                        >
+                          FREE
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.addPackageBtn}
+                      onPress={() => router.push('/(tabs)/store')}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={styles.modeLabel}>+ Add host packages</Text>
+                      <View
+                        style={[styles.premiumBadge, styles.premiumBadgeGrey]}
+                        pointerEvents="none"
+                      >
+                        <Text style={[styles.premiumBadgeText, styles.premiumBadgeTextGrey]}>
+                          PREMIUM
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
+                  </View>
+                );
+              })()}
+
               {/* Yttre svart container som omsluter Buy CTA + paketlistan —
                   speglar modeToggle:s padding (3), gap (4), borderRadius (md)
                   och Colors.background-bakgrund. Det ger Buy CTA samma
@@ -1792,7 +2024,7 @@ export default function LobbyScreen() {
                       <Switch
                         value={isAllSelected}
                         onValueChange={handleToggleAll}
-                        disabled={PURCHASED_PACKAGES.length === 0}
+                        disabled={availablePackages.length === 0}
                         trackColor={{ false: Colors.error, true: Colors.success }}
                         thumbColor="#FFF"
                         ios_backgroundColor={Colors.error}
@@ -1802,13 +2034,15 @@ export default function LobbyScreen() {
                   )}
                 </View>
 
-                {/* Host ser hela köpta listan med switch per paket; icke-host
-                    ser endast paket som hosten aktiverat — alltid i active-
-                    style eftersom de per definition är "på" i denna lobby. */}
+                {/* Host ser sin profil-aktiverade paket-lista med switch per
+                    paket (paket disabled i Profile visas inte alls här);
+                    icke-host ser endast paket som hosten aktiverat för denna
+                    lobby — alltid i active-style eftersom de per definition
+                    är "på" i denna lobby. */}
                 {(() => {
                   const visiblePackages = hostMode
-                    ? [...PURCHASED_PACKAGES]
-                    : PURCHASED_PACKAGES.filter((pkg) => selectedExtraPackages.includes(pkg.id));
+                    ? [...availablePackages]
+                    : availablePackages.filter((pkg) => selectedExtraPackages.includes(pkg.id));
                   const sorted = visiblePackages.sort((a, b) =>
                     a.name.localeCompare(b.name, undefined, { numeric: true }),
                   );
@@ -1873,27 +2107,6 @@ export default function LobbyScreen() {
                   });
                 })()}
 
-                {/* Buy Extra packages-CTA längst ner i wrappern — pulserande
-                    knapp som drar uppmärksamhet till QuizVibe Store. Visas
-                    enbart för host; köp är inte aktuellt för guests. */}
-                {hostMode && (
-                  <Animated.View
-                    style={[styles.packageChipBuyCtaWrap, { transform: [{ scale: buyCtaPulse }] }]}
-                  >
-                    <TouchableOpacity
-                      style={[styles.packageChip, styles.packageChipBuyCta]}
-                      onPress={() => router.push('/(tabs)/store')}
-                      activeOpacity={0.7}
-                    >
-                      <Text style={styles.packageChipText}>
-                        + QuizVibe Store
-                      </Text>
-                      <View style={[styles.premiumBadge, styles.premiumBadgeGrey]} pointerEvents="none">
-                        <Text style={[styles.premiumBadgeText, styles.premiumBadgeTextGrey]}>PREMIUM</Text>
-                      </View>
-                    </TouchableOpacity>
-                  </Animated.View>
-                )}
               </View>
             </View>
           </View>
@@ -2496,7 +2709,107 @@ const styles = StyleSheet.create({
   scroll: { flex: 1 },
   content: { paddingHorizontal: Spacing.lg, paddingTop: Spacing.xl, paddingBottom: Spacing.xxl, gap: Spacing.xl },
 
-  header: { gap: 4 },
+  // Lobby-header — title vänster, Host Game Credits-pill höger.
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: Spacing.md,
+  },
+  // Speglar Profile:s creditsPill 1:1 (samma styling, samma layout) så
+  // pillen ser identisk ut i båda vyerna och användaren känner igen den.
+  creditsPill: {
+    backgroundColor: Colors.cardElevated,
+    borderRadius: Radius.md,
+    borderWidth: 1,
+    borderColor: Colors.primaryBorder,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.xs + 2,
+    alignItems: 'center',
+    // Större gap mellan label och values-row så Extras-boxens kant-
+    // skärande PREMIUM-badge (top:-7) inte överlappar "HOST GAME CREDITS"-
+    // texten ovanför.
+    gap: 8,
+    minWidth: 210,
+  },
+  creditsLabel: {
+    fontSize: 10,
+    fontWeight: FontWeight.semibold,
+    color: Colors.textSecondary,
+    letterSpacing: 0.6,
+    textTransform: 'uppercase',
+  },
+  creditsValueRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  creditsKey: {
+    fontSize: 11,
+    fontWeight: FontWeight.semibold,
+    color: Colors.textSecondary,
+  },
+  creditsValue: {
+    fontSize: 16,
+    fontWeight: FontWeight.bold,
+    color: Colors.primary,
+    fontVariant: ['tabular-nums'],
+  },
+  creditsValueFree: {
+    color: Colors.success,
+  },
+  creditsValueExtras: {
+    color: '#F5A623',
+  },
+  creditsArrow: { fontSize: 16, color: Colors.primary, marginLeft: 2 },
+  // Extras-ruta inom pillen — speglar Profile:s creditsExtrasBox 1:1.
+  creditsExtrasBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingHorizontal: 14,
+    paddingRight: 18,
+    paddingVertical: 2,
+    borderRadius: 4,
+    borderWidth: 1,
+    marginLeft: 6,
+    position: 'relative',
+  },
+  creditsExtrasBoxActive: {
+    borderColor: '#F5A623',
+  },
+  creditsExtrasBoxInactive: {
+    borderColor: '#6B7280',
+  },
+  // Kant-skärande PREMIUM-badge (top:-7) — speglar Profile:s motsvarande
+  // badge så de ser identiska ut i båda vyerna.
+  creditsExtrasPremiumBadge: {
+    position: 'absolute',
+    top: -7,
+    right: 4,
+    paddingHorizontal: 5,
+    paddingVertical: 1,
+    borderRadius: 3,
+    zIndex: 10,
+    elevation: 4,
+  },
+  creditsExtrasPremiumBadgeActive: {
+    backgroundColor: '#F5A623',
+  },
+  creditsExtrasPremiumBadgeInactive: {
+    backgroundColor: '#6B7280',
+  },
+  creditsExtrasPremiumBadgeText: {
+    fontSize: 7,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+  },
+  creditsExtrasPremiumBadgeTextActive: {
+    color: '#000',
+  },
+  creditsExtrasPremiumBadgeTextInactive: {
+    color: '#FFF',
+  },
   screenTitle: { fontSize: 24, fontWeight: '700', color: Colors.textPrimary },
 
   hostBadge: { backgroundColor: Colors.primaryMuted, borderRadius: Radius.full, paddingHorizontal: Spacing.md, paddingVertical: 4, marginBottom: Spacing.sm, borderWidth: 1, borderColor: Colors.primaryBorder },
@@ -2700,6 +3013,14 @@ const styles = StyleSheet.create({
     borderColor: Colors.borderStrong,
     backgroundColor: 'transparent',
   },
+  // Dämpad variant — appliceras på Pass-the-Phone-rutan när
+  // singlePlayerDefault-checkboxen är på. Matchar modeOptionInactive
+  // (samma grå border) så Pass-the-Phone i låst läge ser likadant ut
+  // som Individual Devices i sitt inaktiva läge.
+  modeOptionDimmed: {
+    borderColor: Colors.borderStrong,
+    backgroundColor: 'transparent',
+  },
   // Pass-the-Phone aktiv (gratis-läge) — grön kant, muted bg.
   modeOptionPassActive: {
     borderColor: Colors.success,
@@ -2737,6 +3058,15 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#000',
     letterSpacing: 0.6,
+  },
+  // Dämpad FREE-badge — appliceras tillsammans med modeOptionDimmed
+  // när singlePlayerDefault är på, så badgen signalerar "låst" istället
+  // för "tillgängligt gratis".
+  freeBadgeDimmed: {
+    backgroundColor: '#6B7280',
+  },
+  freeBadgeTextDimmed: {
+    color: '#FFF',
   },
   // PREMIUM-badge i guld — markerar att Individual Devices kräver paketet.
   // Försvinner när användaren har premium aktivt.
@@ -2784,6 +3114,68 @@ const styles = StyleSheet.create({
   modeLabelActiveFree: {
     color: '#FFF',
     fontWeight: FontWeight.semibold,
+  },
+  // Dämpad text-label på Pass-the-Phone när singlePlayerDefault är på.
+  modeLabelDimmed: {
+    color: Colors.textSecondary,
+  },
+  // "Use single player mode as default"-rad ovanför Game Mode-toggle:n.
+  singlePlayerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    marginBottom: Spacing.sm,
+    paddingVertical: Spacing.xs,
+  },
+  singlePlayerCheckbox: {
+    width: 20,
+    height: 20,
+    borderRadius: 4,
+    borderWidth: 1.5,
+    borderColor: Colors.primary,
+    backgroundColor: 'transparent',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  singlePlayerCheckboxChecked: {
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
+  },
+  singlePlayerCheckmark: {
+    color: '#FFF',
+    fontSize: 14,
+    fontWeight: '700',
+    lineHeight: 14,
+  },
+  singlePlayerLabel: {
+    fontSize: FontSize.sm,
+    color: Colors.textPrimary,
+    fontWeight: FontWeight.medium,
+  },
+  // "Multiplayer mode"-klammer under Game Mode-toggle:n. Speglar
+  // Profile:s motsvarande klammer och Lobby:s Number of Rounds-bracket
+  // (`roundsRulerStyles.bracket`) i form, mått och färg.
+  multiplayerBracketWrap: {
+    marginTop: 4,
+    alignItems: 'center',
+  },
+  multiplayerBracket: {
+    alignSelf: 'stretch',
+    height: 10,
+    borderLeftWidth: 1.5,
+    borderRightWidth: 1.5,
+    borderBottomWidth: 1.5,
+    borderColor: '#6B7280',
+    borderBottomLeftRadius: 4,
+    borderBottomRightRadius: 4,
+  },
+  multiplayerBracketLabel: {
+    marginTop: 6,
+    fontSize: 11,
+    fontWeight: '700',
+    color: Colors.textSecondary,
+    letterSpacing: 0.6,
+    textTransform: 'uppercase',
   },
   modeDescription: {
     fontSize: FontSize.xs,
@@ -2976,46 +3368,34 @@ const styles = StyleSheet.create({
     fontWeight: FontWeight.semibold,
     color: Colors.textPrimary,
   },
-  // Chip-stil för Buy-CTA. Auto-höjd + paddingVertical så texten kan rendras
-  // på två rader (rubrik + CTA-uppmaning) utan att klippas. border-radius
-  // matchar Individual Devices-knappen i Game Mode-toggle:n. Position:relative
-  // så att PREMIUM-badgen kan sticka upp över kantlinjen.
-  packageChip: {
-    alignSelf: 'flex-start',
+  // Två-knapps-rad: Generic (vänster) + Add host packages (höger). gap 4
+  // matchar modeToggle:s gap så de visuellt hör ihop. marginTop:'sm' ger
+  // luft mot rubriken ovanför.
+  packageActionsRow: {
     flexDirection: 'row',
+    gap: 4,
+    marginTop: Spacing.sm,
+  },
+  // Bas-look för båda knapparna i raden — flex: 1 ger 50/50 bredd, 46 px
+  // hög (matchar modeToggle), 1 px borderStrong + transparent bg.
+  // position:'relative' så FREE/PREMIUM-badge:n kan sticka upp över
+  // kantlinjen utan att klippas.
+  addPackageBtn: {
+    flex: 1,
+    height: 46,
     alignItems: 'center',
-    gap: Spacing.xs,
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.lg,
+    justifyContent: 'center',
     borderRadius: Radius.sm,
     borderWidth: 1,
+    borderColor: Colors.borderStrong,
+    backgroundColor: 'transparent',
     position: 'relative',
   },
-  packageChipText: {
-    fontSize: FontSize.md,
-    fontWeight: FontWeight.semibold,
-    color: Colors.textPrimary,
-    textAlign: 'center',
-  },
-  // Wrapper kring Buy CTA — Animated.View som driver pulse-scaling. Positions-
-  // egenskaper (alignSelf, width, marginTop) sitter här så scale-transformen
-  // appliceras på rätt nivå utan att bryta wrapper-flödet.
-  packageChipBuyCtaWrap: {
-    alignSelf: 'center',
-    width: '70%',
-    marginTop: Spacing.xl,
-  },
-  // Container-färg för Buy Extra packages-CTA:n — matchar Create Game-knappen
-  // på startskärmen (Colors.cardElevated bg, Colors.primary blå border, vit
-  // text). alignSelf: 'stretch' override:ar packageChip.alignSelf: 'flex-start'
-  // så att knappen fyller hela wrap:ens (80%) bredd och därmed centreras
-  // korrekt via wrap:ens alignSelf: 'center'.
-  packageChipBuyCta: {
-    backgroundColor: Colors.cardElevated,
-    borderColor: Colors.primary,
-    alignSelf: 'stretch',
-    justifyContent: 'center',
-    paddingHorizontal: 8,
+  // Aktiv-look för Generic — grön kantlinje + muted bg (samma palett
+  // som Pass-the-Phone aktiv i Game Mode-toggle:n).
+  genericBtnActive: {
+    borderColor: Colors.success,
+    backgroundColor: Colors.primaryMuted,
   },
   // Yttre wrapper kring sub-rubriken, paketlistan och Buy CTA. Geometrin
   // (padding 3, gap 4, Radius.md, 1px Colors.border, Colors.background-bg)

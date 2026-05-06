@@ -55,6 +55,46 @@ const CREDIT_TIERS: CreditTier[] = [
   },
 ];
 
+// Customized Host Packages — extra-content som hosten kan köpa per styck.
+// IDn matchar `PURCHASED_PACKAGES` i `src/utils/mockPurchasedPackages.ts`
+// så Profile/Lobby refererar till samma paket. Priser hardcodade tills IAP
+// är kopplad. Ikon-emoji väljs så raden känns igen visuellt.
+interface PackageTier {
+  id: string;
+  name: string;
+  icon: string;
+  description: string;
+  price: string;
+  priceAmount: number;
+}
+
+const PACKAGE_TIERS: PackageTier[] = [
+  {
+    id: 'pkg-hiphop',
+    name: 'Hip Hop',
+    icon: '🎤',
+    description: 'Extra music questions from hip hop, rap & R&B.',
+    price: '29 kr',
+    priceAmount: 29,
+  },
+  {
+    id: 'pkg-rock',
+    name: 'Rock',
+    icon: '🎸',
+    description: 'Extra music questions from rock classics across decades.',
+    price: '29 kr',
+    priceAmount: 29,
+  },
+  {
+    id: 'pkg-film-actors',
+    name: 'Film & Actors',
+    icon: '🎬',
+    description: 'Extra questions about cinema icons and famous actors.',
+    price: '29 kr',
+    priceAmount: 29,
+  },
+];
+
 interface SubscriptionTier {
   id: string;
   label: string;             // "1 month", "3 months", etc.
@@ -106,7 +146,7 @@ interface SubscriptionFeature {
 }
 
 const SUBSCRIPTION_FEATURES: SubscriptionFeature[] = [
-  { premium: 'Unlimited Host Games', basic: '2 games per week' },
+  { premium: 'Unlimited Host Games', basic: '4 games per day' },
   { premium: 'Max 10 rounds per game', basic: 'Max 3 rounds per game' },
   { premium: 'Invite up to 12 players per Game', basic: '4 players' },
   { premium: 'Individual Device Game mode', basic: 'Not available' },
@@ -153,6 +193,34 @@ export default function StoreScreen() {
     );
   };
 
+  // Mock-purchase av Customized Host Package. TODO (backend): byt till
+  // riktig IAP + uppdatera PURCHASED_PACKAGES (eller backend-lista) så
+  // paketet syns automatiskt i Profile/Lobby efter köp.
+  const handleBuyPackage = (tier: PackageTier) => {
+    Alert.alert(
+      'Confirm purchase',
+      `Buy "${tier.name}" package for ${tier.price}? It will be available in your Lobby host setup.`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Buy',
+          onPress: () => {
+            track('purchase_completed', {
+              type: 'package',
+              product_id: tier.id,
+              price_amount: tier.priceAmount,
+              price_currency: 'SEK',
+            });
+            Alert.alert(
+              'Purchase successful',
+              `"${tier.name}" added — open Profile or Lobby to use it.`,
+            );
+          },
+        },
+      ],
+    );
+  };
+
   // Mock-purchase av subscription. TODO (backend): RevenueCat hanterar
   // subscription-state via webhooks; lägg till `subscription`-fält på
   // ProfileData när det är relevant och uppdatera entitlements här.
@@ -190,9 +258,9 @@ export default function StoreScreen() {
       >
         {/* ── Screen header ────────────────────────────────────── */}
         <View style={styles.header}>
-          <Text style={styles.screenTitle}>Add Host Game Credits</Text>
+          <Text style={styles.screenTitle}>Add QuizVibe Premium</Text>
           <Text style={styles.screenSubtitle}>
-            Choose your plan — Basic, single packages or unlimited with subscription.
+            Choose extra packages, and Extra Host game credits or unlimited with QuizVibe membership plans
           </Text>
         </View>
 
@@ -205,9 +273,16 @@ export default function StoreScreen() {
             </View>
             <View style={styles.tierContent}>
               <View style={styles.tierLeft}>
-                <Text style={styles.tierHeadline}>2 Host Games per week</Text>
+                <Text
+                  style={styles.tierHeadline}
+                  numberOfLines={1}
+                  adjustsFontSizeToFit
+                  minimumFontScale={0.75}
+                >
+                  2 (+2 bonus) Host Games / day
+                </Text>
                 <Text style={styles.tierSubline}>+ Unlimited games as invited player</Text>
-                <Text style={styles.tierSubline}>Refreshes every Monday</Text>
+                <Text style={styles.tierSubline}>Refreshes every day at midnight CET</Text>
               </View>
               <View style={styles.activePill}>
                 <Text style={styles.activePillText}>ACTIVE</Text>
@@ -216,7 +291,24 @@ export default function StoreScreen() {
           </View>
         </View>
 
-        {/* ── Sektion 2: Credit packages (one-time purchase) ──── */}
+        {/* ── Sektion 2: Customized Host Packages (one-time purchase) ── */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Customized Host Packages</Text>
+          <Text style={styles.sectionSubtitle}>
+            One-time purchase. Adds extra question content to your Lobby host setup.
+          </Text>
+          <View style={styles.tierList}>
+            {PACKAGE_TIERS.map((tier) => (
+              <PackageTierCard
+                key={tier.id}
+                tier={tier}
+                onBuy={() => handleBuyPackage(tier)}
+              />
+            ))}
+          </View>
+        </View>
+
+        {/* ── Sektion 3: Credit packages (one-time purchase) ──── */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Credit packages</Text>
           <Text style={styles.sectionSubtitle}>
@@ -235,7 +327,7 @@ export default function StoreScreen() {
 
         {/* ── Sektion 3: QuizVibe Premium (subscription) ──────── */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>QuizVibe subscription</Text>
+          <Text style={styles.sectionTitle}>QuizVibe membership plans</Text>
           <Text style={styles.sectionSubtitle}>
             Unlimited host games + premium features.
           </Text>
@@ -277,6 +369,42 @@ export default function StoreScreen() {
 }
 
 // ─── Credit tier card ─────────────────────────────────────────────────────────
+
+// ─── Package tier card ────────────────────────────────────────────────────────
+
+function PackageTierCard({
+  tier,
+  onBuy,
+}: {
+  tier: PackageTier;
+  onBuy: () => void;
+}) {
+  return (
+    <View style={styles.tierCard}>
+      <View style={styles.tierContent}>
+        <View style={styles.tierLeft}>
+          <Text style={styles.tierHeadline}>
+            {tier.icon} {tier.name}
+          </Text>
+          <Text style={styles.tierSubline}>{tier.description}</Text>
+        </View>
+        <View style={styles.tierRight}>
+          <Text style={styles.tierPrice}>{tier.price}</Text>
+          <Pressable
+            onPress={onBuy}
+            style={({ pressed }) => [
+              styles.buyBtn,
+              { backgroundColor: Colors.primary },
+              pressed && { opacity: 0.85 },
+            ]}
+          >
+            <Text style={styles.buyBtnText}>Buy</Text>
+          </Pressable>
+        </View>
+      </View>
+    </View>
+  );
+}
 
 function CreditTierCard({
   tier,

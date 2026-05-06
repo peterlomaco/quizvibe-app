@@ -28,8 +28,15 @@ export interface ProfileData {
   gameCredits?: number;
   // Antal Host Game-credits användaren har kvar av de GRATIS som följer med
   // Basic-planen / kampanj-bonus. Konsumeras före gameCredits vid Create Game.
-  // Optional för bakåtkompatibilitet — defaultas till 0 i UI.
+  // Optional för bakåtkompatibilitet — defaultas till FREE_CREDITS_DAILY_CAP
+  // i UI och fylls på automatiskt till samma cap vid första profil-load efter
+  // midnatt CET (se refreshFreeCreditsIfNeeded).
   freeGameCredits?: number;
+  // ISO-datum (YYYY-MM-DD i Europe/Stockholm-tidszon) för senaste auto-
+  // refresh av freeGameCredits. Används av refreshFreeCreditsIfNeeded i
+  // loadProfile för att avgöra om vi ska fylla på till FREE_CREDITS_DAILY_CAP.
+  // Optional — saknas på profiler skapade innan refresh-logiken kom in.
+  lastFreeCreditsRefreshDate?: string;
   // Om användaren har kopplat sitt Spotify-konto. Används för att spela låtar
   // ad-free under quiz-rundor. Optional för bakåtkompatibilitet.
   // TODO (auth): byt till riktigt OAuth-flöde mot Spotify Web API.
@@ -50,6 +57,19 @@ export interface ProfileData {
   // (gratis), 'individual-devices' = parallellt spel (kräver Premium).
   // Optional för bakåtkompatibilitet — defaultas till 'pass-the-phone' i UI.
   gameMode?: GameMode;
+  // Om checkad låser host-default till Individual Devices och Pass-the-Phone
+  // visas dämpad/grå i Profile:s Game Mode-toggle. Optional för
+  // bakåtkompatibilitet — defaultas till false i UI.
+  singlePlayerDefault?: boolean;
+  // Default antal rundor per spel (host-default). Stegrar i 2 (jämn lap-tal),
+  // capas av gameMode i Lobby (Pass-the-Phone max 4, Individual Devices max
+  // 20). Optional för bakåtkompatibilitet — defaultas till ROUNDS_DEFAULT i UI.
+  roundsDefault?: number;
+  // Lista över paket-id:n som användaren har aktiverat i sin Profile för
+  // att vara valbara i Lobby (host-vyn). Paket som inte finns i denna lista
+  // visas inte alls i Lobby. Optional för bakåtkompat — defaultas till alla
+  // PURCHASED_PACKAGES-id:n (allt aktiverat) i UI.
+  enabledHostPackages?: string[];
 }
 
 // Dual-read mapping för profiler skapade innan rename
@@ -60,6 +80,51 @@ const LEGACY_SKILL_TO_ASSISTANCE: Record<string, AssistanceLevel> = {
   intermediate: 'standard',
   expert: 'minimal',
 };
+
+// Daily-cap för fria Host Games. 2 base + 2 bonus = 4 credits per dygn,
+// fylls på automatiskt vid midnatt CET via refreshFreeCreditsIfNeeded
+// (anropas i loadProfile). Konsumeras före gameCredits vid Create Game.
+export const FREE_CREDITS_DAILY_CAP = 4;
+
+/**
+ * Returnerar dagens datum i Europe/Stockholm-tidszon som "YYYY-MM-DD".
+ * `sv-SE`-locale ger redan ISO-likt format ("2026-05-06") så ingen
+ * extra parsing behövs. Stockholm-tidszonen hanterar DST automatiskt
+ * (CET vintertid, CEST sommartid — båda gångbara enligt user-spec
+ * "midnatt CET" eftersom DST styr när midnatt faktiskt inträffar).
+ */
+function todayCETDate(): string {
+  return new Intl.DateTimeFormat('sv-SE', {
+    timeZone: 'Europe/Stockholm',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(new Date());
+}
+
+/**
+ * Top up:ar `freeGameCredits` till `FREE_CREDITS_DAILY_CAP` om CET-datumet
+ * har passerat sedan senaste refresh. Returnerar `{ data, changed }` så
+ * loadProfile kan persistera tillbaka när top-up faktiskt skedde — annars
+ * regenererar vi inte storage-skrivning på varje läsning.
+ *
+ * Edge case: helt nya profiler (utan lastFreeCreditsRefreshDate) räknas
+ * som "ny dag" → får full daily cap direkt vid första load.
+ */
+function refreshFreeCreditsIfNeeded(data: ProfileData): { data: ProfileData; changed: boolean } {
+  const today = todayCETDate();
+  if (data.lastFreeCreditsRefreshDate === today) {
+    return { data, changed: false };
+  }
+  return {
+    data: {
+      ...data,
+      freeGameCredits: FREE_CREDITS_DAILY_CAP,
+      lastFreeCreditsRefreshDate: today,
+    },
+    changed: true,
+  };
+}
 
 export async function saveProfile(data: ProfileData): Promise<void> {
   try {
@@ -91,7 +156,17 @@ export async function loadProfile(): Promise<ProfileData | null> {
       raw.assistance = LEGACY_SKILL_TO_ASSISTANCE[raw.skill] ?? null;
       delete raw.skill;
     }
-    return raw as ProfileData;
+    // Auto-refresh fria credits vid första load efter midnatt CET. Skriv
+    // tillbaka direkt om top-up skedde så storage konvergerar (annars
+    // skulle vi top-up:a vid varje load tills användaren råkar trigga en
+    // annan saveProfile-write).
+    const { data: refreshed, changed } = refreshFreeCreditsIfNeeded(raw as ProfileData);
+    if (changed) {
+      AsyncStorage.setItem(PROFILE_KEY, JSON.stringify(refreshed)).catch((err) => {
+        console.warn('[profileStorage] Failed to persist daily-credits refresh:', err);
+      });
+    }
+    return refreshed;
   } catch (err) {
     console.warn('[profileStorage] Failed to load profile:', err);
     return null;

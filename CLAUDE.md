@@ -116,6 +116,8 @@ Both use `useRef`-based transition detection so manual clear of the field doesn'
 
 Default Assistance='standard', Region='global' on the Register form so the user can submit immediately after Year of birth — both fields show under a "Use default or select prefered setup" hint.
 
+**Year of birth-caps**: Profile, Register-form och Guest-form har gemensamma cap:ar `MIN_BIRTH_YEAR = 1930`, `MAX_BIRTH_YEAR = 2020`. Endpoints renderas via `formatBirthYear`-helper som lägger till "or earlier" på 1930 och "or later" på 2020 — representerar öppna intervall (alla födda ≤1930 / ≥2020). `formatBirthYear` används både i picker-listan och i selector-trigger-texten så framing är konsistent. Profile + Register + Guest delar samma `BIRTH_YEARS`-array och format-helper (Profile har egen kopia eftersom den lever i en annan fil — håll dem synkade vid framtida ändringar).
+
 **Assistance level** (`'minimal' | 'standard' | 'full'`, persisted as `ProfileData.assistance`) styr mängden hjälp i spelet — `full` = mest hjälp (3-letter prefix i Letter Grid, snabb reveal-curve), `standard` = 2-letter prefix + linjär reveal, `minimal` = 1-letter prefix + slow reveal som aldrig fullt avslöjar bilden. Tidigare hette fältet `skill` med värdena `easy/intermediate/expert`; båda `loadProfile` (i `profileStorage.ts`) och `loadLatestResult` (i `gameResults.ts`) gör dual-read av gammalt fält + värde-mappning så befintliga profiler/resultat migreras passivt vid nästa save. Mappning: `easy → full`, `intermediate → standard`, `expert → minimal`.
 
 **Stylesheet-keys medvetet kvar som `skillRow`/`skillBtn`/`skillBtnText`** i `app/(tabs)/index.tsx` och `LobbyScreen.tsx` även efter rename:n — det är privat CSS-vokabulär per fil (inte domän-koncept) och de exporteras inte. Att jaga dem skulle bara öka diff-ytan utan att förbättra läsbarhet. Skapa nya stylesheet-nycklar med `assistance*`-prefix om du behöver mer styling, men byt inte namn på de befintliga reflexmässigt.
@@ -150,11 +152,15 @@ Alla tre kör samma reset-logic. Redundansen är medveten — om ett path missar
 
 ## Profile screen
 
-Three top-level collapsible sections — all use the same tappable-header pattern with a `+/−`-toggle box (26×26, `borderColor: borderStrong`) next to the title (`Typography.title` + bold + `Colors.textPrimary`). When collapsed, a 1px `sectionDivider` line shows under the header for visual separation. Default expanded; state per section is local (not persisted across app restarts).
+Five top-level collapsible sections — all use the same tappable-header pattern with a `+/−`-toggle box (26×26, `borderColor: borderStrong`) next to the title (`Typography.title` + bold + `Colors.textPrimary`). When collapsed, a 1px `sectionDivider` line shows under the header for visual separation. Default expanded; state per section is local (not persisted across app restarts).
 
-1. **Profile default settings** — avatar + Player Name (read-only `Text`, set at registration, NOT editable from this screen), competition setup (Year of birth, auto Competition Age, Assistance level), Host defaults block (Region scope + Answer response time half-width side-by-side, then Game era slider full-width), Save Profile button. The "Host default settings" sub-heading sits left-aligned at full card width as visual separator between user-defaults and host-defaults.
-2. **Game connections** — Spotify card + QuizVibe friends card. Båda delar `spotifyHeader/spotifyTitle/spotifySubtitle/spotifyBtn`-styles för strukturell konsistens; bara accent-färger och ikon skiljer (Spotify green, friends primary blue). YouTube-membership-kortet plockades ut 2026-05-06 — användaren kommer tills vidare inte blanda in YouTube-konton i appen (YouTube finns kvar som content-source-toggle i Lobby:s Game Connections, men det är källflagga, inte konto-koppling).
-3. **Player history** — `src/components/PlayerHistorySection.tsx` manages its own collapse state. HCP shield lives in a dedicated card directly under the section heading (was previously in the profile card).
+1. **Profile default settings** — avatar + Player Name (read-only `Text`, set at registration, NOT editable from this screen), competition setup (Year of birth, auto Competition Age, Assistance level), Save Profile button. Innehåller bara user-defaults nu — host-defaults har lyfts ut till egen top-level sektion (#2).
+2. **Host default settings** — Game Mode (Pass-the-Phone vs Individual Devices), Number of Players per Game, Region scope + Answer response time, Game era, Number of Rounds, "Save Host settings"-knapp. Tidigare en sub-rubrik inom Profile defaults; lyftes ut 2026-05-06 till egen kollapsbar sektion för att hålla sektionerna semantiskt separerade.
+3. **Customized Host packages** — "+ Add host packages"-CTA + "Purchased and available when you are the Host:"-listrubrik + per-paket-toggles + "Select all"-toggle på egen rad + "Save settings"-knapp. Driver `enabledHostPackages` i ProfileData (se "Customized Host packages" nedan).
+4. **Game connections** — Spotify card + QuizVibe friends card. Båda delar `spotifyHeader/spotifyTitle/spotifySubtitle/spotifyBtn`-styles för strukturell konsistens; bara accent-färger och ikon skiljer (Spotify green, friends primary blue). YouTube-membership-kortet plockades ut 2026-05-06 — användaren kommer tills vidare inte blanda in YouTube-konton i appen (YouTube finns kvar som content-source-toggle i Lobby:s Game Connections, men det är källflagga, inte konto-koppling).
+5. **Player history** — `src/components/PlayerHistorySection.tsx` manages its own collapse state. HCP shield lives in a dedicated card directly under the section heading (was previously in the profile card).
+
+**Tre oberoende Save-knappar** (en per editable sektion: Profile defaults, Host defaults, Customized packages — `'defaults' | 'host' | 'packages'`). Driver av `savedSection`-state — när en knapp trycks visar bara den knappen "✓ Saved" i 2 s, övriga står kvar i sin label. Underliggande `handleSave(section)` persisterar hela profilen i ett svep oavsett knapp (en blob i AsyncStorage); det är bara den visuella bekräftelsen som är knapp-lokal.
 
 **Game era slider** mirrors Lobby's `MultiSlider` pattern (`ERA_MIN=1930`, `ERA_MAX=current year`, `SLIDER_WIDTH=280`, default `[1980, 2010]`). No player-clamping on Profile — it's host-default setup with no players in context. Persisted as `gameEraFrom`/`gameEraTo` on `ProfileData`. Loadning clampar from/to till nuvarande range eftersom äldre profiler (när ERA_MIN var 1900) kan ha sparat värden < 1930 — utan clamp:n skulle rutan ovan visa t.ex. "1925" medan thumben sitter låst på 1930.
 
@@ -174,21 +180,88 @@ Three top-level collapsible sections — all use the same tappable-header patter
 
 **TopUserBanner pill on Profile** opens a logout sheet via `logoutModalVisible` state — mirrors Home's `profileMenu` for the logged-in case (header with avatar emoji + Player Name + green "Logged in" status + red Log out button + Cancel). After logout: `clearProfile()` + analytics + `router.replace('/')` to Home.
 
+**`mergeProfileIntoHost`-fallbacks**: när host:s profil saknar `birthYear` eller `assistance` används fallbacks så host-spelarkortet i Lobby alltid har komplett HCP (annars blockas Start Game). `birthYear` saknas → `randomBirthYear()` ger random år 1970–2005 (vuxen 21–56); `assistance` saknas → `'standard'`. `hcpComplete`/`isReady` är alltid `true` på host:s kort eftersom host startar aldrig spelblockerad. En Profile-sida (`randomAdultBirthYear()`) gör motsvarande för Profile:s state-load — defensive auto-save kör om något fält saknas, så slumpvärden inte regenereras vid varje reload.
+
+**Profile auto-augment** i `loadProfile`-effekten: alla saknade fält fylls i med generic-fallback-spec (Pass-the-Phone, Max 4, Global, 1981→`ERA_MAX` (= current year), `ROUNDS_DEFAULT`, 30 sek, Standard assistance, alla paket aktiverade, `randomAdultBirthYear`-värde). Augmented-profilen beräknas EN gång per load så samma random-värde används för både setState och eventuell write-back. Om något fält var saknat persisteras augmented direkt via `saveProfile` i bakgrunden — one-shot defensive write så fallbacks inte regenereras nästa load (särskilt random birthYear).
+
+## singlePlayerDefault-toggle (Profile + Lobby)
+
+Checkbox **"Use single player mode as default"** ovanför Game Mode-toggle:n i både Profile (host-default) och Lobby (per-spel). Logik:
+
+- **Checked**: BÅDA multiplayer-rutorna dimmas — Pass-the-Phone OCH Individual Devices får `Colors.borderStrong`-grå border, transparent bg, dämpad text (`Colors.textSecondary`), grå badges. Speglar Individual Devices-rutans inaktiva look så låst läge är konsistent.
+- Number of Players-toggle:n följer samma dimming-mönster (Max 4 + Max 12 dimmas på samma sätt).
+- **Tap på dämpad Pass-the-Phone / Max 4** → uncheck + aktivera Pass-the-Phone + Max 4 i samma gest.
+- **Tap på dämpad Individual Devices / Max 12** är Premium-gated:
+  - Premium-användare → uncheck + aktivera den valda rutan direkt.
+  - Icke-Premium → samma "Premium feature — Go to Store"-popup som vanlig Individual Devices/Max 12-tap. **Ingen state-ändring** — Pass-the-Phone tänds inte upp; användaren måste tappa Pass-the-Phone-rutan eller bocka ur checkboxen för att lämna single-player-läget.
+- **Uncheck via checkbox** → alltid Pass-the-Phone + Max 4 (gratis-läget på båda toggles), oavsett vad som var aktivt innan check. Säkrar att en Premium-användare som hade Individual Devices inte hamnar kvar där efter uncheck.
+- **Tickbox-styling**: 20×20 kvadrat, `Colors.primary` border (alltid blå även i ocheckat läge), bockmarkering vit på primary-bg när checkad.
+- **"Multiplayer mode"-klammer** under Game Mode-toggle:n: uppåt-öppen U (1.5px border, `#6B7280` grå, 10 px höga ben, rundade botten-hörn) med "MULTIPLAYER MODE"-label centrerat under. Speglar Lobby:s Number of Rounds-bracket exakt — samma form/färg/mått.
+
+Persisteras som `singlePlayerDefault?: boolean` på `ProfileData`. Lobby:s state initialiseras lokalt (default false) och seeds från profil i host-mount-effekten.
+
+## Customized Host packages (Profile-toggle → Lobby-filter)
+
+Profile-toggle som filtrerar vilka köpta paket som syns i Lobby:n när användaren är host. State + flow:
+
+- **`enabledHostPackages?: string[]`** på `ProfileData` — lista över paket-id:n som är aktiverade. Default = alla `PURCHASED_PACKAGES`-id:n (allt aktiverat) så nyköpta paket dyker upp i Lobby utan extra steg via Profile.
+- **Profile-UI**: per-paket-toggle (samma `connectionSwitch`-styling som Lobby — röd/grön track + vit thumb + 0.8-skala) + "Select all"-toggle på egen rad ovanför listan, högerställd via `justifyContent: 'flex-end'` (egen `selectAllSwitch`-style utan `marginLeft: 'auto'` som per-paket-switcharna har, så label + switch hänger ihop som grupp i högerkant).
+- **Lobby-render**: `availablePackages = PURCHASED_PACKAGES.filter(p => enabledHostPackages.includes(p.id))` via `useMemo`. ALLA referenser till `PURCHASED_PACKAGES` i Lobby:s render bytta till `availablePackages` — paket avstängda i Profile **visas inte alls** i Lobby (varken för host eller övriga spelare). "Select all"-toggle räknar mot `availablePackages.length`.
+- **Seeding**: Lobby host-seed-effekten läser `profile.enabledHostPackages` och sätter state. Bara host får filterlistan (non-hosts ser endast paket som hosten faktiskt aktiverat för denna lobby).
+
+## Generic + Add host packages-rad (Lobby host-vyn)
+
+Två-knapps-rad direkt under "Customized Host packages"-rubriken i Lobby — host-only:
+
+- **Generic** (vänster, 50% bredd) — visuell indikator + tappbar. Lyser **grön** (`Colors.success` border + `Colors.primaryMuted` bg + grön FREE-badge med svart text) när `selectedExtraPackages.length === 0` (lobby:n kör utan extra-paket = bara basic). **Grå** (borderStrong + transparent bg + grå FREE-badge) så fort minst ett paket är valt — inklusive Select all-läget. Tap på dämpad Generic → Alert "Switch to Generic? This will deactivate all selected packages..." → Switch tömmer `selectedExtraPackages` (alla paket avaktiveras → Generic blir grön igen).
+- **+ Add host packages** (höger, 50% bredd) — egen `addPackageBtn`-styling (modeOption-baserad, transparent bg, borderStrong, `Radius.sm`, 46 px hög). Grå PREMIUM-badge i kantskärande position. Tap → `router.push('/(tabs)/store')`. Ersatte den tidigare pulserande "+ QuizVibe Store"-CTA längst ner i wrappern.
+- Layout `packageActionsRow`: `flexDirection: 'row'` + `gap: 4` (matchar `modeToggle`-gap) + `flex: 1` på båda → 50/50 bredd.
+
+## Host Game Credits (pill + daily refresh + deduktion)
+
+**Pill i headern** på både Profile (övre höger, "Profile"-titel vänster) och Lobby (övre höger, "Game Lobby"-titel vänster). Identisk styling i båda:
+
+- `creditsPill`: 1 px `Colors.primaryBorder`, `Colors.cardElevated` bg, `Radius.md`, `minWidth: 210`, `gap: 8` (extra rymd så Extras-boxens kant-skärande badge inte överlappar "HOST GAME CREDITS"-labeln).
+- **"Free: N"** — grön text (`Colors.success`), `fontVariant: 'tabular-nums'`.
+- **Extras-box** — egen Pressable inom pillen med 1 px border, `paddingHorizontal: 14` / `paddingRight: 18` / `paddingVertical: 2`, `Radius: 4`, `position: 'relative'`. Kant-skärande PREMIUM-badge i `position: 'absolute', top: -7, right: 4`:
+  - `gameCredits > 0` → gold border (`#F5A623`) + gold badge med svart text.
+  - `gameCredits === 0` → grey border (`#6B7280`) + grey badge med vit text.
+- **Tap på Extras-boxen** → Alert "Extra Host Game Credits" + dynamisk body + Cancel/Go to Store-knappar. Nested Pressable i RN konsumerar tap så outer pillens onPress (som också navigerar till Store) inte fyrar dubbel.
+- **Tap på övriga delar av pillen** → `router.push('/(tabs)/store')`.
+
+**Daily refresh** i `src/utils/profileStorage.ts`:
+
+- `FREE_CREDITS_DAILY_CAP = 4` styr top-up-cap.
+- `todayCETDate()` använder `Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm' })` så CET/CEST-DST hanteras automatiskt.
+- `refreshFreeCreditsIfNeeded` jämför sparat `lastFreeCreditsRefreshDate` mot dagens CET-datum. Vid skillnad (eller om datum saknas helt på nya/legacy-profiler) → `freeGameCredits = 4` + ny date, persisteras tillbaka till AsyncStorage one-shot.
+- Triggar i `loadProfile` så fort Profile/Lobby får fokus efter midnatt CET. **Caveat**: om appen ligger öppen ÖVER midnatt utan att Profile/Lobby får fokus, sker refresh först nästa fokus. För strikt "exakt midnatt"-refresh skulle en AppState-listener eller intervall-timer krävas.
+
+**Credit-deduktion på Start Game** (Lobby `handleStartGame`):
+
+- 1 credit konsumeras per påbörjat spel — **Free först, Extras sedan**: `nextFree = free > 0 ? free - 1 : 0`, `nextExtras = free > 0 ? extras : extras - 1`.
+- Om båda är 0 → blockad start med Alert "Out of Host Game Credits — buy more in Store, wait for daily refresh, or upgrade to membership" + Cancel/Go to Store-knappar.
+- Persisteras via `saveProfile({ ...profile, freeGameCredits: nextFree, gameCredits: nextExtras })` (spread:ar in alla andra profil-fält så ingen annan sparad setting strippas). Lokal `setFreeGameCredits/setGameCredits` så pill:en uppdateras direkt utan att vänta på nästa fokus-load.
+
+`lastFreeCreditsRefreshDate?: string` på `ProfileData` MÅSTE passeras genom alla `saveProfile`-anrop (handleSave + Spotify-flowen) — annars strippas datumet och refresh fyrar igen samma dag.
+
 ## Store screen
 
-Three sections in `src/screens/StoreScreen.tsx` under header "Add Host Game Credits":
+Four sections in `src/screens/StoreScreen.tsx` under header **"Add QuizVibe Premium"** (subtitle: "Choose extra packages, and Extra Host game credits or unlimited with QuizVibe membership plans"):
 
-1. **Basic plan** — single card with FREE badge (border-cutting pattern, green) + green ACTIVE pill in card-right. "+ Unlimited games as invited player" subline highlights the bonus.
-2. **Credit packages** — 3 one-time-purchase tiers (5/10/20 Host Games at 19/29/49 kr). Save% computed against the smallest tier; BEST VALUE badge on the 20-game tier.
-3. **QuizVibe subscription** — 5-feature comparison list (Premium left / Basic right per row) inside a feature card, then 4 subscription tiers (1mth/3mth/6mth/12mth at 79/199/279/399 kr). All auto-renewal (footnote: "Cancel anytime in your App Store or Google Play account."). BEST VALUE on annual (399 kr/12mth ≈ 33 kr/month, save 58% vs monthly).
+1. **Basic plan** — single card with FREE badge (border-cutting pattern, green) + green ACTIVE pill in card-right. Headline `"2 (+2 bonus) Host Games / day"` med `numberOfLines={1}` + `adjustsFontSizeToFit` + `minimumFontScale={0.75}` så texten inte wrap:as på smala skärmar. "+ Unlimited games as invited player" + "Refreshes every day at midnight CET" sublines.
+2. **Customized Host Packages** — 3 hardcoded paket (Hip Hop 🎤, Rock 🎸, Film & Actors 🎬) à 29 kr. ID:n matchar `PURCHASED_PACKAGES` i `src/utils/mockPurchasedPackages.ts` så Profile/Lobby refererar till samma paket. `PackageTierCard` speglar `CreditTierCard`:s struktur (icon + namn vänster + beskrivning, pris + Buy höger).
+3. **Credit packages** — 3 one-time-purchase tiers (5/10/20 Host Games at 19/29/49 kr). Save% computed against the smallest tier; BEST VALUE badge on the 20-game tier.
+4. **QuizVibe membership plans** — 5-feature comparison list (Premium left / Basic right per row) inside a feature card, then 4 subscription tiers (1mth/3mth/6mth/12mth at 79/199/279/399 kr). All auto-renewal (footnote: "Cancel anytime in your App Store or Google Play account."). BEST VALUE on annual (399 kr/12mth ≈ 33 kr/month, save 58% vs monthly).
 
-Shared `CreditTierCard` and `SubscriptionTierCard` mirror the same layout (left: headline + per-game/per-month subline + optional save%; right: price + Buy/Subscribe button).
+Shared `CreditTierCard`, `PackageTierCard` and `SubscriptionTierCard` mirror the same layout (left: headline + per-game/per-month subline + optional save%; right: price + Buy/Subscribe button).
 
 Mock IAP: credit purchases bump `gameCredits` on profile + emit `purchase_completed` event (`type: 'credits'`). Subscriptions emit same event (`type: 'subscription'`) but don't yet persist state (requires future `ProfileData.subscription` field + RevenueCat integration). Currency hardcoded to `'SEK'` until vendor SDK provides `localizedPrice`.
 
 ## Lobby — Game Settings card
 
 Game Mode and Game Connections share a single bordered card (`gameSettingsBorder` in `LobbyScreen.tsx`) — they're treated as one "spelregler"-grupp. Order inside Game Connections: YouTube → Spotify → Profiles & Places → "Customized Host packages" sub-block (`usePackagesBlock`).
+
+**Lobby host-seed-effekten** (i URL-params-deps useEffect:n) läser host:s profil vid varje lobby-mount och seeds lokala lobby-settings: `gameMode`, `maxPlayers`, `singlePlayerDefault`, `region` (mappas via `mapProfileRegion`-helper: `'sweden' → 'Sweden'`, `'nordics' → 'Nordics'`, `'global' → 'Global'`; null → `'Global'`-fallback eftersom Lobby:s Region-set inkluderar `'Europe'` som Profile saknar), `answerResponseSeconds`, `eraValues` (clamp:as till `[ERA_MIN, ERA_MAX]`), `roundsCount` (clamp:as mot `roundsMax`), `enabledHostPackages`. Generic-fallbacks per fält om profil saknar värdet — speglar Profile:s motsvarande spec (Pass-the-Phone, Max 4, Global, 1981→`ERA_MAX` (current year), `ROUNDS_DEFAULT`, 30 sek, alla paket aktiverade). Effekten triggar både vid första lobby-mount OCH vid Play Again-återinträde (component re-mountar då URL-params byter).
 
 **Profiles & Places icon** uses an inline SVG of the Q-figure (circle + tail in `Colors.primary`, no surrounding squares) with an "AI"-Text overlay centered in the Q ring. `viewBox="24 22 32 32"` centers the Q at icon coords (14, 14) which matches the wrap's flex center; AI text gets `transform: translateY(-1)` to compensate for glyph baseline offset. **Gotcha**: this inline SVG is **independent** from `QuizVibeLogo` and still uses the original Q coords (cx=40, cy=38, r=13). The shared `QuizVibeLogo` component shifted its Q to (37, 37) for box-centering — they're intentionally decoupled, so changing one doesn't affect the other.
 
@@ -200,14 +273,15 @@ Game Mode and Game Connections share a single bordered card (`gameSettingsBorder
 - Spotify-switchen renderas endast för host (Game Connections-undantaget); för host:en är den `disabled` när `!spotifyAutoEnabled`. Den dämpade gråa track/thumb-paletten (`#3A3F4B` / `#9CA3AF`) är reserverad för auto-disabled-fallet så det visuella signalerar "blocked by lobby rules" snarare än bara "off" — det täcker även Pass-the-Phone-fallet. Icke-host ser ingen switch alls, bara Enabled/Disabled-pillen.
 - The info `(i)` icon sits **directly after the "Spotify" label** (inside `connectionLabelGroup`, not after the pill) and is **always** visible. It shows the rule for both modes so users can check criteria regardless of current state. Placing the icon there frees the right-side flow so Spotify's switch lines up with YouTube's and Profiles & Places' switches via `marginLeft: 'auto'`.
 
-**Customized Host packages** (sub-block `usePackagesBlock` inside Game Connections): Basic-utbudet är alltid implicit aktivt (ingen synlig rad) — hosten kan välja till köpta extra-paket via `selectedExtraPackages[]` ovanpå. `PURCHASED_PACKAGES` är hardcodad mock (Hip Hop, Rock, Film & Actors — id, name only) tills Store-integrationen är inkopplad.
+**Customized Host packages** (sub-block `usePackagesBlock` inside Game Connections): Basic-utbudet är alltid implicit aktivt (ingen synlig rad) — hosten kan välja till köpta extra-paket via `selectedExtraPackages[]` ovanpå. `PURCHASED_PACKAGES` (i `src/utils/mockPurchasedPackages.ts`) är hardcodad mock filtrerad genom Profile:s `enabledHostPackages` → `availablePackages` (se "Customized Host packages (Profile-toggle → Lobby-filter)" ovan).
 
-Layouten under "Customized Host packages"-rubriken: en yttre `extraPackagesWrapper` (`Colors.background`-bg, padding 3 horisontellt + top, paddingBottom Spacing.xl, gap 4, Radius.md, 1px Colors.border — geometrin matchar `modeToggle` förutom asymmetrisk paddingBottom). Inuti, i ordning:
+Layouten under "Customized Host packages"-rubriken (i ordning):
 
-1. **Sub-rubrik-rad** (`extraPackagesHeadingRow`) med text på vänster + "Select all"-grupp (label + Switch via `marginLeft: 'auto'`) på höger. Heading-texten är "Packages available for you:" för host och "Packages for this lobby selected by the Host:" för icke-host. "Select all"-gruppen renderas **endast för host**; switchen kör `handleToggleAll` som sätter `selectedExtraPackages` till tom eller alla paket-id:n och är `disabled` när `PURCHASED_PACKAGES` är tom. Heading-Text:en har `transform: translateY(-1)` för att glyferna ska linjera med switchens visuella mitt.
-2. **Empty state** — host: om `PURCHASED_PACKAGES.length === 0` rendras `<Text>` "No Extra packages purchased". Icke-host: om hosten inte aktiverat något paket (filtrerade listan tom) rendras "No extra packages active in this lobby". Buy CTA visas fortsatt för host nedanför empty-state-texten.
-3. **Paket-rader** (`purchasedPackageRow`, sorterade alfabetiskt via `localeCompare` med `numeric: true`): host ser hela `PURCHASED_PACKAGES`-listan, icke-host ser endast paket vars id finns i `selectedExtraPackages` (filtrerade innan sort). Layout per rad: info-ikon (centrerad mellan wrapper-yttre-vänsterkant och box-vänsterkant via `paddingLeft: 4` + ikon-bredd 20 + `gap: Spacing.sm` = box-vänster vid 36 absolut) → bordered text-box (`purchasedPackageBox`, `width: 204` så höger-kanten linjerar med connection-radernas pill-höger) → Switch (host-only, höger via `marginLeft: 'auto'` + `paddingRight: 4` så den linjerar med YouTube/Spotify/Profiles-switcharna ovanför). Box off-state = grå `borderStrong` + transparent + `textSecondary` text. Box on-state = `Colors.primary` border + `Colors.cardElevated` bg + vit text (matchar Buy CTA). För icke-host används alltid on-state-stilen eftersom alla synliga rader per definition är aktiva. Info-ikonen visar `Alert.alert(pkg.name, '...')` även för guests.
-4. **Buy CTA** (`packageChipBuyCta` inuti `packageChipBuyCtaWrap` Animated.View) — host-only (gated av `{hostMode && (…)}`); icke-host ser ingen knapp. Pulserande knapp (`scale 1 → 1.03 → 1` loop, 900ms per riktning, samma mönster som Create Game-knappen på startskärmen). Wrap är `width: '70%'` centered, TouchableOpacity:n stretches till full wrap-bredd via `alignSelf: 'stretch'` (override:ar `packageChip.alignSelf: 'flex-start'`). Färgteman matchar Create Game: `Colors.cardElevated` bg + `Colors.primary` border + vit text. Texten är "+ QuizVibe Store" (oberoende av Spotify-status — Store-navigation alltid giltig).
+1. **Generic + Add host packages-rad** (`packageActionsRow`, host-only) — två-knapps-rad direkt under rubriken. Generic vänster (50% bredd, gold/grey beroende på selection), "+ Add host packages" höger (50% bredd, grå PREMIUM-badge). Se "Generic + Add host packages-rad" ovan för detaljerad logik. Ersatte tidigare pulserande "+ QuizVibe Store"-CTA längst ner i wrappern.
+2. **Yttre svart container** (`extraPackagesWrapper`, `Colors.background`-bg, padding 3 horisontellt + top, paddingBottom Spacing.xl, gap 4, Radius.md, 1px Colors.border — geometrin matchar `modeToggle` förutom asymmetrisk paddingBottom).
+3. **Sub-rubrik-rad** (`extraPackagesHeadingRow`) inom wrappern: text vänster + "Select all"-grupp höger. Heading-texten är "Packages available for you:" för host och "Packages for this lobby selected by the Host:" för icke-host. "Select all"-gruppen renderas **endast för host**; switchen kör `handleToggleAll` som sätter `selectedExtraPackages` till tom eller alla `availablePackages`-id:n.
+4. **Empty state** — host: om `availablePackages.length === 0` rendras `<Text>` "No Extra packages purchased". Icke-host: om hosten inte aktiverat något paket (filtrerade listan tom) rendras "No extra packages active in this lobby".
+5. **Paket-rader** (`purchasedPackageRow`, sorterade alfabetiskt via `localeCompare` med `numeric: true`): host ser hela `availablePackages`-listan, icke-host ser endast paket vars id finns i `selectedExtraPackages` (filtrerade innan sort). Layout per rad: info-ikon → bordered text-box (`purchasedPackageBox`, `width: 204`) → Switch (host-only, `marginLeft: 'auto'`). Box off-state = grå `borderStrong` + transparent + `textSecondary` text. Box on-state = `Colors.primary` border + `Colors.cardElevated` bg + vit text. För icke-host används alltid on-state-stilen.
 
 **Switch alignment math (empiriskt)**: `connectionRow` har `paddingRight: 18`; package row (`purchasedPackageRow`) har `paddingRight: 4`; `extraPackagesHeadingRow` har `paddingRight: 0`. Trots olika värden landar alla switchar på samma x-position visuellt — wrapper:s 4px border+padding-inset + box:ens egna paddings förskjuter saker så empirisk justering krävs (matematiken stämmer inte exakt).
 
@@ -372,6 +446,8 @@ Fråge-vyn i [app/quiz.tsx](app/quiz.tsx) är samma layout för `'question'`- oc
 - `src/components/QuizVibeFriendsLogo.tsx` — brand-mark variant for the QuizVibe friends card on Profile. Q-form + tail + rotated squares are identical to `QuizVibeLogo`, but the wifi-pattern inside the Q ring is replaced with two profile silhouettes (head circle + body rounded-rect side-by-side). ViewBox tightened to `"13 13 54 54"` (vs `"0 0 80 80"` in `QuizVibeLogo`) to crop the empty padding around the rotated squares so visible content fills the render area at small sizes (44-52px). Q is centered at **(38, 38)** to match the squares' pre-rotation visual center, NOT (40, 40) which is the viewBox geometric mid. Default `size=44` to match Spotify/YouTube icon-wraps on the same screen; rendered inside a `friendsIconWrap` (44×44 View) for layout-dimension safety.
 - `src/components/TopUserBanner.tsx` — full-width banner with a login pill (avatar + Player Name, or "Register or Login" when no profile) in the top-right corner. **Optional `onPress`**: when omitted the pill renders as a plain `<View>` istället för `<TouchableOpacity>` (used on Profile screen — user is already there, no destination); Home passes `setProfileMenuVisible(true)`; Lobby passes role-baserad handler (host → delete-sheet, non-host → leave-sheet — se "Lobby — TopUserBanner actions"). **Optional `profile` prop (controlled mode)**: skärmar med in-place-login (Home — login-modalen lever på samma skärm som bannern) MÅSTE passera sin egen profile-state så bannern uppdateras direkt vid login/logout — useFocusEffect-self-load triggar inte eftersom skärmen aldrig tappar focus. Lobby/Profile utelämnar proppen och låter bannern self-loada via useFocusEffect (de re-renderas naturligt vid tab-byte). **Optional `guestName` prop**: när profile saknas men guestName finns visar pillen 👤 + guestName i muted styling (samma look som "Register or Login"-fallback) — driver display för gäster som joinat lobby:n via guest-form. Registrerade users (profile != null) har företräde om båda råkar vara satta. **Sticky-on-scroll pattern**: place as a direct child of `<SafeAreaView>`, **outside** the `<ScrollView>`, so it remains pinned at the top while content scrolls. Used on Home, Lobby, and Profile screens.
 - `src/components/CodeKeyboard.tsx` — custom in-app keyboard som används av Room Code-cellerna i JoinModal OCH PlayerName-fältet i båda flödena (guest + register). Se "Custom CodeKeyboard" för props (`letterCharset`, `onModeToggle`), layout-detaljer och rationale.
+- [src/components/RoundsRuler.tsx](src/components/RoundsRuler.tsx) — linjemätare för Number of Rounds + alla `ROUNDS_*`-konstanter (`ROUNDS_MIN=2`, `ROUNDS_MAX_PASS=4`, `ROUNDS_MAX_INDIV=20`, `ROUNDS_STEP=2`, `ROUNDS_DEFAULT=4`). Delas mellan Lobby (host-vy + non-host read-only) och Profile (host-default-block). PREMIUM-pillen över locked-tickarna är rektangulär (`borderRadius: 4`, `paddingHorizontal: 8 / paddingVertical: 2`, `fontSize: 10`) — speglar Individual Devices PREMIUM-badgens form, INTE pill-formen som ursprunglig Buy CTA hade. Centreras under bracket-bredden via en absolutpositionerad wrapper med `alignItems: 'center'` så bredden auto-anpassar till "PREMIUM"-textens bredd (ingen fixed `width: 100` längre).
+- [src/utils/mockPurchasedPackages.ts](src/utils/mockPurchasedPackages.ts) — delad mock över köpta extra-paket (`MusicPackage[]`, default 3 paket: Hip Hop / Rock / Film & Actors). Profile (Customized Host packages-listan) + Lobby (Customized Host packages-block) + Store (PACKAGE_TIERS via shared id:n) refererar alla till denna lista. När Store-integrationen kopplas in ska mock:en bytas mot `loadPurchasedPackages()` mot riktigt backend; call-sites stannar oförändrade.
 
 ## Analytics
 

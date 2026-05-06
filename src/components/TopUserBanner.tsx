@@ -15,10 +15,10 @@ interface Props {
    */
   onPress?: () => void;
   /**
-   * Tap-handler för en "Back to Start"-länk i bannerns vänstra kant.
-   * När den är satt renderas QuizVibe Q-ikon + "Back to Start"-text
-   * till vänster i bannern, och topBoard:en byter till
-   * justifyContent:'space-between' så pillen stannar längst till höger.
+   * Tap-handler för en "Home"-länk i bannerns vänstra kant.
+   * När den är satt renderas QuizVibe Q-ikon med "Home"-text under
+   * (i Colors.primary) till vänster i bannern, och topBoard:en byter
+   * till justifyContent:'space-between' så pillen stannar längst till höger.
    * Lämna ofylld på skärmar där tillbaka-navigation inte är relevant
    * (Home, Lobby).
    */
@@ -103,7 +103,7 @@ export function TopUserBanner({ onPress, onBackPress, profile: profileProp, gues
           onPress={onBackPress}
         >
           <QuizVibeQAvatar size={20} />
-          <Text style={styles.backLinkText}>Back to Start</Text>
+          <Text style={styles.backLinkText}>Home</Text>
         </TouchableOpacity>
       )}
       {onPress ? (
@@ -149,17 +149,17 @@ const styles = StyleSheet.create({
   topBoardWithBack: {
     justifyContent: 'space-between',
   },
-  // "Back to Start"-länk: Q-mark + text + retur-pil. Tappable med samma
+  // "Home"-länk: Q-mark ovanpå "Home"-text (i blått). Tappable med samma
   // visuella vikt som login-pillens text så de balanserar i banner-raden.
   backLink: {
-    flexDirection: 'row',
+    flexDirection: 'column',
     alignItems: 'center',
-    gap: 6,
+    gap: 2,
   },
   backLinkText: {
-    fontSize: 13,
+    fontSize: 11,
     fontWeight: '600',
-    color: Colors.textPrimary,
+    color: Colors.primary,
   },
   loginPill: {
     flexDirection: 'row',
