@@ -1,7 +1,7 @@
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
 import * as Haptics from 'expo-haptics';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
     Alert,
     FlatList,
@@ -43,7 +43,11 @@ import {
     removeFriend,
     type Friend,
 } from '../utils/friendsStorage';
-import { PURCHASED_PACKAGES } from '../utils/mockPurchasedPackages';
+import {
+    PURCHASED_PACKAGES,
+    getFreeGenerationPackage,
+    syncGenerationPackageIds,
+} from '../utils/mockPurchasedPackages';
 import {
     clearProfile,
     loadProfile,
@@ -51,6 +55,7 @@ import {
     type AssistanceLevel,
     type AvatarSource,
     type GameMode,
+    type ProfileData,
     type Region,
 } from '../utils/profileStorage';
 
@@ -319,6 +324,7 @@ export default function ProfileScreen() {
   // Per-paket on/off — styr om paketet visas i Lobby:s Customized Host
   // packages-block (när användaren är host). Default = alla aktiverade så
   // nyköpta paket dyker upp i Lobby utan att man måste gå till Profile först.
+  // Free-gen-paket-id:t läggs in i loadProfile-effekten (kräver birthYear).
   const [enabledHostPackages, setEnabledHostPackages] = useState<string[]>(
     () => PURCHASED_PACKAGES.map((p) => p.id),
   );
@@ -327,14 +333,46 @@ export default function ProfileScreen() {
       prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id],
     );
   };
-  // "Select all"-state — true bara när alla köpta paket är aktiverade.
-  // Speglar Lobby:s isAllSelected-mönster.
+  // Gratis generations-paket utifrån user:s Competition Year of Birth.
+  // Byts automatiskt när birthYear ändras (effect:en nedanför löser
+  // syncen i enabledHostPackages); denna useMemo styr bara render-listan.
+  const freeGenerationPackage = useMemo(
+    () => getFreeGenerationPackage(birthYear),
+    [birthYear],
+  );
+  // Komplett paket-katalog som visas i Customized Host packages-listan.
+  // Gen-paket först (gratis), köpta paket sedan. När birthYear saknas
+  // visas bara köpta — registreringsflödet kräver dock birthYear så
+  // detta är defensivt.
+  const availablePackages = useMemo(
+    () => (freeGenerationPackage ? [freeGenerationPackage, ...PURCHASED_PACKAGES] : [...PURCHASED_PACKAGES]),
+    [freeGenerationPackage],
+  );
+  // "Select all"-state — true bara när alla synliga paket (gen + köpta)
+  // är aktiverade. Speglar Lobby:s isAllSelected-mönster.
   const isAllPackagesEnabled =
-    PURCHASED_PACKAGES.length > 0 &&
-    enabledHostPackages.length === PURCHASED_PACKAGES.length;
+    availablePackages.length > 0 &&
+    availablePackages.every((p) => enabledHostPackages.includes(p.id));
   const handleToggleAllPackages = () => {
-    setEnabledHostPackages(isAllPackagesEnabled ? [] : PURCHASED_PACKAGES.map((p) => p.id));
+    setEnabledHostPackages(isAllPackagesEnabled ? [] : availablePackages.map((p) => p.id));
   };
+  // Synca generations-paket-id i enabledHostPackages när birthYear byts.
+  // Strippar gamla gen-id:n och lägger till aktuell — köpta paket-id:n
+  // lämnas orörda. Idempotent så det är säkert att fyra på varje render
+  // där birthYear förändras.
+  useEffect(() => {
+    setEnabledHostPackages((prev) => {
+      const next = syncGenerationPackageIds(prev, birthYear);
+      // Bara skriv state om resultatet faktiskt skiljer sig — undviker
+      // onödig re-render när birthYear-ändringen råkar landa inom samma
+      // generation (eller bara löste in den förra renderens redan-correcta
+      // state).
+      if (next.length === prev.length && next.every((id, i) => id === prev[i])) {
+        return prev;
+      }
+      return next;
+    });
+  }, [birthYear]);
 
   // Ladda sparad profil från AsyncStorage varje gång Profile får fokus.
   // Detta täcker både mount och senare scenarier — t.ex. ny registrering
@@ -365,12 +403,28 @@ export default function ProfileScreen() {
           roundsDefault: data.roundsDefault ?? ROUNDS_DEFAULT,
           answerResponseSeconds: data.answerResponseSeconds ?? 30,
           // Default — alla köpta paket aktiverade så nyköpta dyker upp i
-          // Lobby utan extra steg via Profile.
+          // Lobby utan extra steg via Profile. Free gen-paket-id:t läggs
+          // in nedanför via syncGenerationPackageIds (kräver birthYear).
           enabledHostPackages: data.enabledHostPackages ?? PURCHASED_PACKAGES.map((p) => p.id),
         };
+        // Synca free gen-paket-id (utifrån augmented birthYear) — täcker
+        // både fresh profil och äldre profiler skapade innan free-gen-
+        // funktionen kom in. Idempotent så ingen-op om gen-id redan är rätt.
+        augmented.enabledHostPackages = syncGenerationPackageIds(
+          augmented.enabledHostPackages ?? [],
+          augmented.birthYear,
+        );
         // Om något fält saknades: persistera augmented-profilen tillbaka
         // direkt så fallback-värdena (särskilt random birthYear) inte
         // regenereras vid nästa reload. One-shot defensive write.
+        // Detect om syncGenerationPackageIds ändrade listan (gen-id saknades
+        // eller fel gen-id stod kvar efter birthYear-ändring i tidigare
+        // session). Då skriver vi också tillbaka.
+        const savedPackages = data.enabledHostPackages ?? null;
+        const packagesChanged =
+          savedPackages == null ||
+          savedPackages.length !== augmented.enabledHostPackages!.length ||
+          savedPackages.some((id, i) => id !== augmented.enabledHostPackages![i]);
         const wasIncomplete = (
           data.birthYear == null ||
           data.assistance == null ||
@@ -382,7 +436,7 @@ export default function ProfileScreen() {
           data.singlePlayerDefault == null ||
           data.roundsDefault == null ||
           data.answerResponseSeconds == null ||
-          data.enabledHostPackages == null
+          packagesChanged
         );
         if (wasIncomplete) {
           saveProfile(augmented).catch(() => { /* silent — vyn fungerar ändå */ });
@@ -845,7 +899,7 @@ export default function ProfileScreen() {
                 )}
               </View>
               <Text style={styles.singlePlayerLabel}>
-                Use single player mode as default
+                Single-player mode
               </Text>
             </Pressable>
             <View style={styles.modeToggle}>
@@ -1254,12 +1308,13 @@ export default function ProfileScreen() {
             {/* Sub-rubrik på egen rad. Select all-toggle hamnar på en
                 separat rad nedanför, högerställd så switchen linjerar
                 med per-paket-switcharna i listan. Empty state visar en
-                informativ text när PURCHASED_PACKAGES är tom. */}
+                informativ text när inga paket är tillgängliga (gen +
+                köpta tillsammans tomma — t.ex. inget birthYear). */}
             <View style={styles.field}>
               <Text style={styles.fieldLabel}>
                 Purchased and available when you are the Host:
               </Text>
-              {PURCHASED_PACKAGES.length > 0 && (
+              {availablePackages.length > 0 && (
                 <View style={styles.selectAllRow}>
                   <Text style={styles.selectAllLabel}>Select all</Text>
                   <Switch
@@ -1272,14 +1327,15 @@ export default function ProfileScreen() {
                   />
                 </View>
               )}
-              {PURCHASED_PACKAGES.length === 0 ? (
+              {availablePackages.length === 0 ? (
                 <Text style={styles.packagesEmptyText}>
                   No extra packages available
                 </Text>
               ) : (
                 <View style={styles.packagesList}>
-                  {PURCHASED_PACKAGES.map((pkg) => {
+                  {availablePackages.map((pkg) => {
                     const isEnabled = enabledHostPackages.includes(pkg.id);
+                    const isFree = !!pkg.free;
                     return (
                       <View key={pkg.id} style={styles.packageListRow}>
                         {/* Info-ikon — speglar Lobby:s purchasedPackageRow-
@@ -1293,7 +1349,9 @@ export default function ProfileScreen() {
                           onPress={() =>
                             Alert.alert(
                               pkg.name,
-                              'Information about this package will be available later.',
+                              isFree
+                                ? 'This Customized Host package is included for free based on your Competition Year of Birth. It changes automatically if you update your birth year.'
+                                : 'Information about this package will be available later.',
                             )
                           }
                           hitSlop={8}
@@ -1304,7 +1362,9 @@ export default function ProfileScreen() {
                         {/* Paketnamns-box: aktiv styling när enabled, dämpad
                             (grå border, transparent bg, dämpad text) när
                             disabled — speglar Lobby:s purchasedPackageBox /
-                            purchasedPackageBoxActive-mönster. */}
+                            purchasedPackageBoxActive-mönster. Free gen-paket
+                            får en kantskärande FREE-badge för att markera att
+                            paketet ingår gratis. */}
                         <View
                           style={[
                             styles.packageRow,
@@ -1319,6 +1379,18 @@ export default function ProfileScreen() {
                           >
                             {pkg.name}
                           </Text>
+                          {isFree && (
+                            <View
+                              style={[styles.packageFreeBadge, !isEnabled && styles.packageFreeBadgeMuted]}
+                              pointerEvents="none"
+                            >
+                              <Text
+                                style={[styles.packageFreeBadgeText, !isEnabled && styles.packageFreeBadgeTextMuted]}
+                              >
+                                FREE
+                              </Text>
+                            </View>
+                          )}
                         </View>
                         {/* On/off-toggle — styr om paketet visas i Lobby
                             när användaren är host. Samma röd/grön-track +
@@ -1373,7 +1445,7 @@ export default function ProfileScreen() {
           <>
         {/* Spotify-koppling: tillåter ad-free playback under quiz-rundor
             och låser upp Spotify-källan i Lobbyns Game connections-blocket. */}
-        <View style={styles.spotifyCard}>
+        <View style={[styles.spotifyCard, !spotifyConnected && styles.spotifyCardMuted]}>
           <View style={styles.spotifyHeader}>
             <View style={[styles.spotifyIconWrap, !spotifyConnected && styles.iconWrapMuted]}>
               <Text style={[styles.spotifyIcon, !spotifyConnected && styles.iconGlyphMuted]}>♫</Text>
@@ -2290,6 +2362,12 @@ const styles = StyleSheet.create({
     padding: Spacing.lg,
     gap: Spacing.md,
   },
+  // Muted-variant av kortet när Spotify inte är connectat: grå border (samma
+  // palett som iconWrapMuted) signalerar inactive-state. Bg lämnas grön-
+  // tonad så kortet fortfarande läses som "Spotify-block".
+  spotifyCardMuted: {
+    borderColor: '#3A3F4B',
+  },
   spotifyHeader: {
     flexDirection: 'row',
     alignItems: 'flex-start',
@@ -2814,6 +2892,36 @@ const styles = StyleSheet.create({
   },
   packageRowTextInactive: {
     color: Colors.textSecondary,
+  },
+  // Kantskärande FREE-badge — markerar gratis generations-paket som ingår
+  // utifrån user:s Competition Year of Birth. Speglar samma teknik som
+  // FREE-badgen på Game Mode-toggle:n (border-cutting på top, högerkant).
+  // Box:en måste vara position:relative (default i RN) och inte ha
+  // overflow:hidden — packageRow uppfyller båda.
+  packageFreeBadge: {
+    position: 'absolute',
+    top: -8,
+    right: 8,
+    backgroundColor: Colors.success,
+    borderRadius: 4,
+    paddingHorizontal: 6,
+    paddingVertical: 1,
+    zIndex: 10,
+    elevation: 4,
+  },
+  packageFreeBadgeText: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: '#000',
+    letterSpacing: 0.5,
+  },
+  // Dämpad variant när paketet är toggle:at OFF — signalerar "tillgängligt
+  // gratis men inaktiverat" istället för "aktivt".
+  packageFreeBadgeMuted: {
+    backgroundColor: '#6B7280',
+  },
+  packageFreeBadgeTextMuted: {
+    color: '#FFF',
   },
   // Switch-styling — speglar Lobby:s connectionSwitch (0.8-skala). Skicka
   // till höger via marginLeft:'auto' så switchen alltid landar mot

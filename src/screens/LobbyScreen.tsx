@@ -47,7 +47,12 @@ import { clearEjected, isEjected, markEjected } from '../utils/ejectedPlayers';
 import { clearLobbyPlayers, getLobbyPlayers, setLobbyPlayers } from '../utils/mockLobbyPlayers';
 import { clearLobbySettings, getLobbySettings, setLobbySettings } from '../utils/mockLobbySettings';
 import { clearGameStarted, isGameStarted, markGameStarted } from '../utils/mockStartedGames';
-import { PURCHASED_PACKAGES } from '../utils/mockPurchasedPackages';
+import {
+  GENERATION_PACKAGES,
+  PURCHASED_PACKAGES,
+  isGenerationPackageId,
+  type MusicPackage,
+} from '../utils/mockPurchasedPackages';
 import { consumePendingLobbyPlayers } from '../utils/pendingLobby';
 import {
   appendPlayerNameDigit,
@@ -1357,12 +1362,26 @@ export default function LobbyScreen() {
   // Profil-styrd filterlista: bara paket som hosten aktiverat i sin
   // Profile (Customized Host packages-toggle) visas i Lobby. Default =
   // alla paket aktiverade så nyköpta dyker upp utan extra steg via Profile.
+  // Free-gen-paket-id seedas in från host:s profil (host-seed-effekten).
   const [enabledHostPackages, setEnabledHostPackages] = useState<string[]>(
     () => PURCHASED_PACKAGES.map((p) => p.id),
   );
+  // Komplett katalog av möjliga paket: alla gen-paket + alla köpta. För
+  // host filtreras detta sedan via enabledHostPackages (host:s profil-
+  // val); för non-host returneras hela katalogen oförändrad eftersom
+  // selectedExtraPackages från host är vad som styr vad som faktiskt
+  // visas på non-host:s sida — non-host vet inte vilka paket host äger,
+  // bara vilka han aktiverat för denna lobby.
+  const allPackagesCatalog = useMemo<MusicPackage[]>(
+    () => [...Object.values(GENERATION_PACKAGES), ...PURCHASED_PACKAGES],
+    [],
+  );
   const availablePackages = useMemo(
-    () => PURCHASED_PACKAGES.filter((p) => enabledHostPackages.includes(p.id)),
-    [enabledHostPackages],
+    () =>
+      hostMode
+        ? allPackagesCatalog.filter((p) => enabledHostPackages.includes(p.id))
+        : allPackagesCatalog,
+    [allPackagesCatalog, enabledHostPackages, hostMode],
   );
 
   const handleToggleExtraPackage = (id: string) => {
@@ -2226,6 +2245,11 @@ export default function LobbyScreen() {
         // Tidsgränsen per fråga från host:s profil (default 30 sek). Quiz
         // använder den för timer-bar:en + reveal-trigger.
         answerResponseSeconds: String(answerResponseSeconds),
+        // Game era — clampedFrom/clampedTo är post-clamp (mot youngest
+        // player). Quiz filtrerar fråge-pool på correctYear ∈ [from, to]
+        // så frågorna håller sig inom det år-spann host valt.
+        eraFrom: String(clampedFrom),
+        eraTo: String(clampedTo),
         // Skickas så Quit Game-flödet i quiz.tsx kan deactivera rummet
         // och rensa leftPlayers när host avslutar mitt i ett spel.
         roomCode,
@@ -2459,7 +2483,7 @@ export default function LobbyScreen() {
                 )}
               </View>
               <Text style={styles.singlePlayerLabel}>
-                Use single player mode as default
+                Single-player mode
               </Text>
             </TouchableOpacity>
           )}
@@ -2734,10 +2758,10 @@ export default function LobbyScreen() {
             Host-satt spelregel (vilken kulturell kontext frågorna
             ska dras från). Visas för alla i lobbyn men kan bara
             *ändras* av host — samma mönster som Game Mode ovanför. */}
-        <View style={[styles.section, { marginTop: Spacing.sm }]}>
+        <View style={[styles.section, { marginTop: Spacing.sm, gap: Spacing.xs }]}>
           <Text style={styles.sectionLabel}>🌍 Region Scope</Text>
           {hostMode && (
-            <Text style={styles.cardSubtitle}>Sets the cultural context for questions</Text>
+            <Text style={[styles.cardSubtitle, { marginBottom: 0 }]}>Sets the cultural context for questions</Text>
           )}
           <TouchableOpacity
             style={styles.regionTrigger}
@@ -3037,6 +3061,7 @@ export default function LobbyScreen() {
                     // För icke-host är raden alltid "aktiv" (vi visar bara
                     // valda paket), så active-stylen används oavsett.
                     const showActive = hostMode ? isSelected : true;
+                    const isFree = !!pkg.free || isGenerationPackageId(pkg.id);
                     return (
                       <View key={pkg.id} style={styles.purchasedPackageRow}>
                         <TouchableOpacity
@@ -3044,7 +3069,9 @@ export default function LobbyScreen() {
                           onPress={() =>
                             Alert.alert(
                               pkg.name,
-                              'Information about this package will be available later.',
+                              isFree
+                                ? 'This Customized Host package is included for free based on the host’s Competition Year of Birth.'
+                                : 'Information about this package will be available later.',
                             )
                           }
                           hitSlop={8}
@@ -3068,6 +3095,18 @@ export default function LobbyScreen() {
                           >
                             {pkg.name}
                           </Text>
+                          {isFree && (
+                            <View
+                              style={[styles.packageRowFreeBadge, !showActive && styles.packageRowFreeBadgeMuted]}
+                              pointerEvents="none"
+                            >
+                              <Text
+                                style={[styles.packageRowFreeBadgeText, !showActive && styles.packageRowFreeBadgeTextMuted]}
+                              >
+                                FREE
+                              </Text>
+                            </View>
+                          )}
                         </View>
                         {hostMode && (
                           <Switch
@@ -4722,6 +4761,34 @@ const styles = StyleSheet.create({
   },
   purchasedPackageNameActive: {
     color: Colors.textPrimary,
+  },
+  // Kantskärande FREE-badge på paket-raden — markerar gratis generations-
+  // paket (auto-tilldelat utifrån host:s Competition Year of Birth).
+  // Speglar samma teknik som freeBadge på Game Mode-toggle:n.
+  packageRowFreeBadge: {
+    position: 'absolute',
+    top: -7,
+    right: 8,
+    backgroundColor: Colors.success,
+    borderRadius: 4,
+    paddingHorizontal: 6,
+    paddingVertical: 1,
+    zIndex: 10,
+    elevation: 4,
+  },
+  packageRowFreeBadgeText: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: '#000',
+    letterSpacing: 0.5,
+  },
+  // Dämpad variant när paketet är toggle:at OFF i lobby:n — signalerar
+  // "tillgängligt gratis men inte aktivt i denna lobby".
+  packageRowFreeBadgeMuted: {
+    backgroundColor: '#6B7280',
+  },
+  packageRowFreeBadgeTextMuted: {
+    color: '#FFF',
   },
   // Liten info-knapp ("i" i en cirkel) som sitter direkt efter Spotify-labeln
   // i connectionLabelGroup — tap visar en Alert med förklaringen istället för

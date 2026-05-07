@@ -333,6 +333,8 @@ export default function QuizScreen() {
     players?: string;
     roundsCount?: string;
     roomCode?: string;
+    eraFrom?: string;
+    eraTo?: string;
   }>();
   const assistance = (params.assistance ?? 'standard') as AssistanceLevel;
   const age = parseInt(params.age ?? '30');
@@ -343,6 +345,22 @@ export default function QuizScreen() {
   // SEED_QUESTIONS har 5 frågor i mock; för totalRounds > 5 cyklas listan via
   // modulo nedan tills riktig fråge-bank finns på plats.
   const totalRounds = Math.max(1, parseInt(String(params.roundsCount ?? '5'), 10));
+  // Game era — host:s valda år-spann i Lobby (post-clamp mot youngest player).
+  // Frågor filtreras på correctYear ∈ [eraFrom, eraTo] så bara perioderna
+  // host valt visas i spelet. Defaults till maximalt range om params saknas
+  // (t.ex. direkt-nav till /quiz utan Lobby).
+  const eraFrom = parseInt(String(params.eraFrom ?? '1900'), 10);
+  const eraTo = parseInt(String(params.eraTo ?? new Date().getFullYear()), 10);
+  // Filtrerade fråge-pool. Fallback till hela SEED_QUESTIONS om ingen fråga
+  // matchar valt era — händer i mock med 5 frågor om host valt en period
+  // utan träffar (t.ex. 1930–1960). När riktig fråge-bank kopplas in blir
+  // poolen stor nog att alltid ha matchande frågor.
+  const eraFilteredQuestions = useMemo(() => {
+    const inEra = SEED_QUESTIONS.filter(
+      (q) => q.correctYear >= eraFrom && q.correctYear <= eraTo,
+    );
+    return inEra.length > 0 ? inEra : SEED_QUESTIONS;
+  }, [eraFrom, eraTo]);
   // Turordningen levereras som JSON-sträng från Lobby:s handleStartGame.
   // try/catch:en gör att en korrupt payload graceful degradar till tom lista
   // → 'intro'-fasen hoppas över istället för att skärmen fastnar tom.
@@ -431,7 +449,7 @@ export default function QuizScreen() {
   const revealScale = useRef(new Animated.Value(0.6)).current;
   const revealOpacity = useRef(new Animated.Value(0)).current;
 
-  const question = SEED_QUESTIONS[questionIndex % SEED_QUESTIONS.length];
+  const question = eraFilteredQuestions[questionIndex % eraFilteredQuestions.length];
   const isLastQuestion = questionIndex === totalQuestions - 1;
   // Aktuell spelares namn i Pass-the-Phone-rotationen — visas subtilt i fråge-
   // kortet ("Answering: {namn}"). Skip:as för Individual Devices (varje
