@@ -40,6 +40,11 @@ interface Props {
    *  Backspace i botten-raden. Utan callback visas bara Backspace (default
    *  för Room Code-cellerna där mode styrs av cell-typen). */
   onModeToggle?: () => void;
+  /** När true dimmas mode-toggle-knappen och tap blir no-op. Används av
+   *  PlayerName-flöden där digit-sektionen är låst tills letter-sektionen
+   *  har minst 1 tecken — toggle-knappen renderas fortsatt för stabil
+   *  layout men signalerar visuellt att letters måste komma först. */
+  modeToggleDisabled?: boolean;
 }
 
 function chunk(chars: string, cols: number): string[][] {
@@ -56,6 +61,7 @@ export function CodeKeyboard({
   onBackspace,
   letterCharset,
   onModeToggle,
+  modeToggleDisabled = false,
 }: Props) {
   const activeLetterCharset = letterCharset ?? LETTER_CHARSET;
   const letterRowCount = Math.ceil(activeLetterCharset.length / LETTER_COLS);
@@ -105,13 +111,20 @@ export function CodeKeyboard({
       <View style={styles.bottomRow}>
         {onModeToggle && (
           <Pressable
-            onPress={onModeToggle}
+            onPress={modeToggleDisabled ? undefined : onModeToggle}
+            disabled={modeToggleDisabled}
             style={({ pressed }) => [
               styles.bottomBtn,
-              pressed && styles.keyPressed,
+              pressed && !modeToggleDisabled && styles.keyPressed,
+              modeToggleDisabled && styles.bottomBtnDisabled,
             ]}
           >
-            <Text style={styles.bottomBtnText}>
+            <Text
+              style={[
+                styles.bottomBtnText,
+                modeToggleDisabled && styles.bottomBtnTextDisabled,
+              ]}
+            >
               {mode === 'letter' ? '123' : 'ABC'}
             </Text>
           </Pressable>
@@ -190,5 +203,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
     color: Colors.textSecondary,
+  },
+  bottomBtnDisabled: {
+    opacity: 0.4,
+  },
+  bottomBtnTextDisabled: {
+    color: Colors.textDisabled,
   },
 });

@@ -49,6 +49,7 @@ All client-side via AsyncStorage. No server. Screens reload data on focus (`useF
 - `src/utils/mockLobbyPlayers.ts` — **in-memory `Map<string, LobbyPlayer[]>`** för host:s authoritative player-lista per rumkod. Host:s `useEffect` på `players[]` skriver hela arrayen via `setLobbyPlayers(code, players)`; non-host:s polling läser via `getLobbyPlayers(code)` och rebuilds lokal state. `clearLobbyPlayers(code)` rensar tillsammans med `deactivateRoom`/`clearLeftPlayers` på alla lifecycle-sites. Importerar `LobbyPlayer` som `import type` för att undvika runtime-circulär dep (LobbyScreen → utils → LobbyScreen).
 - `src/utils/mockLobbySettings.ts` — **in-memory `Map<string, LobbySettings>`** för host:s authoritative game-settings (gameMode, singlePlayerDefault, region, answerResponseSeconds, eraFrom/To, roundsCount, selectedExtraPackages, youtubeEnabled, spotifyHostToggle, profilesEnabled). Driver non-host:s vy av Game Mode-toggle, Region Scope, Game Era, Number of Rounds, Answer response time, Customized Host packages och Game Connections-pillar. `setLobbySettings`/`getLobbySettings`/`clearLobbySettings`. Skiljd från `mockLobbyPlayers` så ändringar i en sub-domän inte triggar onödig sync av den andra.
 - `src/utils/ejectedPlayers.ts` — **in-memory `Map<string, Set<string>>`** över spelare host har radat (trash) eller indirekt utkastat (single-player-default-toggle ON för alla non-hosts). `markEjected(code, playerId)`, `isEjected(code, playerId)`, `clearEjected(code)`. Non-host:s polling-effekt körs PRE-flight (innan settings/players-läsning) — om self är markerad → "User have been removed from this lobby"-popup + Home navigation, och resten av sync hoppas över.
+- `src/utils/mockStartedGames.ts` — **in-memory `Set<string>`** över rumkoder där host tryckt Start Game och navigerat till `/quiz`. `markGameStarted(code)` anropas i `handleStartGame` precis före `router.push('/quiz')`. Non-host:s polling-effekt kollar `isGameStarted(code)` PRE-flight efter eject-checken — träff + self är **inte** approved → "Game already started — Host started game without this user"-popup + Home navigation. Approved non-hosts hanteras INTE här ännu (separat gap: ingen real-time sync flyttar dem till /quiz mock-tiden ut). `clearGameStarted(code)` ingår i cleanup-bunten.
 
 **Per-user-namespacing** för friends + waitingInvites (för att undvika att User A:s data syns för User B vid logout/login på samma device):
 - AsyncStorage-nyckeln innehåller inloggade user:s playerName lowercase: `@quizvibe/friends/v1/<playerName>`, `@quizvibe/waitingInvites/v1/<recipient-playerName>`. Identifieras via `loadProfile()` inuti varje load/save i `friendsStorage.ts` resp. `waitingInvites.ts`. När backend kommer in byts detta mot user-id från auth-token.
@@ -104,30 +105,54 @@ const buffer = await sharp(downscaled).resize(upW, upH, { kernel: sharp.kernel.n
 
 ## Player Name (registration + validation)
 
-Auto-generated via `src/utils/playerName.ts → generatePlayerName(taken, prefix?)`. Två varianter via `prefix`-arg:
+**Format spec** (`src/utils/playerName.ts`): `[Letters]-[Digits]` där Letters = 1–10 A–Z (första versal, resten gemener) och Digits = 0–7 siffror. Dash är optional i lagrad form — om användaren inte typar några digits sparas namnet som `Anna` (inte `Anna-`). Exempel: `Anna`, `Anna-1234`, `GuestAbcde-1234567`.
 
-- **Register form** (`app/(tabs)/index.tsx`): default-prefix `"PlayerName"` → t.ex. `PlayerName87321-KL`. Triggas på email-becomes-valid transition (tracked via `prevRegEmailValidRef`).
-- **Guest form** in JoinModal: prefix `"Guest"` → t.ex. `Guest87321-KL`. Triggas på entry to guest step (tracked via `prevGuestStepRef`). Annan prefix än Register-formen så default-namnet signalerar att användaren joinar utan registrering.
+Helpers exporteras: `appendPlayerNameLetter`, `appendPlayerNameDigit`, `backspacePlayerNameLetters`, `backspacePlayerNameDigits`, `normalizePlayerName`, `isPlayerNameFormatValid`, `hasBlockedLetterLead`, `getPlayerNameLetters`, `getPlayerNameDigits`. Konstanter: `PLAYER_NAME_MAX_LETTERS = 10`, `PLAYER_NAME_MAX_DIGITS = 7`.
 
-Both use `useRef`-based transition detection so manual clear of the field doesn't trigger a refill. Autofill-detektion i `handleJoinAsGuest` använder regex `^Guest\d{5}-[A-Z]{2}$` (matchar Guest-flödets format).
+**`generatePlayerName(taken, options)`** tar `{ prefix?, keepLetters?, targetLetterLength? }`:
+- `prefix: 'Guest'` → `GuestAbcde-1234567`. Prefix normaliseras (G versal + rest gemener) och första random-bokstaven efter prefix capitaliseras (`A` i `Guestabcde`-position) så användaren visuellt ser var prefixet slutar; resten gemener. Total letter-section = 10 chars (prefix 5 + random 5). Plus 7 random digits.
+- Inget `prefix` (Register-default) → `Abcdefghi-1234567` (9 random letters + 7 digits, första versal, resten gemener).
+- `keepLetters: 'Anna'` → bevarar exakt typade letters, randomiserar bara digits. Används av "Try to keep PlayerName letters?"-promptens Yes-branch.
 
-**Suffix-blocklista** `BLOCKED_LETTER_SUFFIXES` i `playerName.ts` är synkad med `BLOCKED_LETTER_PAIRS` i `roomCode.ts` — full lista: `AS, CP, KK, SS, NS, AH, HH, NB`. Filtrerar bort par från det genererade `-XX`-suffixet (`randomLetterPair()` retry:ar tills paret är OK). Gäller båda flödena. Hat-symbol-förkortningar inkluderade så även playerName-suffix skyddas, inte bara rumkoder.
+**Format-regex** `PLAYER_NAME_FORMAT_RE = /^[A-Z][A-Za-z]{0,9}(-[0-9]{1,7})?$/` — tillåter internal uppercase efter första bokstaven (så `GuestAbcde` validerar) och dash + 1–7 digits är optional. Orphan trailing dash (`Anna-`) är invalid och strippas av `normalizePlayerName` innan validation/save. Manuell input via CodeKeyboard styrs av `appendPlayerNameLetter` som följer striktare regel (första versal/resten gemener); regex:n är därmed bara löst nog att inte underkänna giltiga auto-genererade kombinationer.
 
-`validatePlayerName(name)` (module-level helper in `app/(tabs)/index.tsx`) returns `'available' | 'taken' | 'invalid'`. Profanity check (`src/utils/profanity.ts`) runs first, then uniqueness check against mock `TAKEN_PLAYER_NAMES`. UI status type: `PlayerNameStatus = 'idle' | 'checking' | 'available' | 'taken' | 'invalid'`.
+**Filter aktiva både i auto-gen OCH manuell input**:
+- `BLOCKED_LETTER_LEAD_PAIRS` (`AS, CP, KK, SS, NS, AH, HH, NB`) — synkad med `BLOCKED_LETTER_PAIRS` i `roomCode.ts`. Filtrerar de första 2 bokstäverna. Auto-gen retry:ar; manuell input blockas via `hasBlockedLetterLead()` i `validatePlayerName`/`validateAddPlayerName`.
+- `containsProfanity()` (l33t-normalisering + obfuscation-strip) körs på alla auto-gen kandidater + alla manuella Check-tryck.
 
-**Profanity filter scope** (defense in depth — alla PlayerName-paths täcks):
-- `containsProfanity()` normaliserar text via lowercase + l33t-subs (`0→o, 1→i, 3→e, 4→a, 5→s, 7→t, @→a, $→s`) **+ strippar icke-bokstav/siffra-tecken via `\p{L}\p{N}` unicode-regex**. Sista steget fångar obfuscation som "F.u.c.k", "sh-it", "n_e_g_e_r". Diacritics (åäöé) bevaras så svenska blocklist-termer som "bög" matchar.
-- `generatePlayerName()` kör kandidaten genom `containsProfanity()` och retry:ar vid hit. Formatet (fast prefix + digits + bindestreck + filtrerat suffix) gör profanity i praktiken omöjlig, men checken skyddar mot framtida prefix-byten eller l33t-kombinationer i digit-segmentet.
-- Manuella namn (typade via custom keyboard eller register-formens system-keyboard) gated på `Check`-knapp-tryck → `validatePlayerName()` → status='available' krävs för submit. Status nollställs vid varje text-ändring så outchecked manuell text aldrig kan submittas.
+**`normalizePlayerName(value)`** strippar trailing dash så `Anna-` → `Anna`. Anropas på två platser:
+1. Check-handlers (innan validation) så statusen baseras på den slutgiltiga formen.
+2. Save-/navigation-sites (`handleRegisterSubmit`, `handleJoinAsGuest`, `AddPlayerModal.handleAdd`) som defensiv belt-and-suspenders så trailing dash garanterat inte läcker till persisted state.
 
-**Custom CodeKeyboard för PlayerName-fältet** (i BÅDA flödena — guest + register): TextInput sätter `showSoftInputOnFocus={false}` så system-tangentbordet aldrig kommer fram (undviker modal-jump). Custom `CodeKeyboard` renderas under ScrollView:n när fältet är fokuserat, med:
-- `letterCharset="ABCDEFGHIJKLMNOPQRSTUVWXYZ"` (fullt 26-letter A–Z, vs Room Code:s 24-letter charset som exkluderar O/I för disambiguation).
-- `onModeToggle` callback för att växla mellan letter ('123'-knapp) och digit ('ABC'-knapp) lägen — fri-text-fält behöver manuell mode-toggle vs Room Code-cellerna där cell-index styr mode automatiskt.
-- Charset:n innehåller INGEN bindestreck (`-`) — bindestreck används bara i auto-genererade namn, manuell input ska inte innehålla det.
+**Split-field UI** (i alla tre forms — JoinModal guest + Register + AddPlayerModal): två separata TextInputs `[Letters] – [Digits]` med fixed text-separator `–` mellan. State håller sammansatt sträng (`"Anna-1234"`) som single source of truth; fälten visar derived `getPlayerNameLetters(state)` / `getPlayerNameDigits(state)`. Letters-fältet är alltid editable; digits-fältet dimmas (`opacity 0.45`) + blir read-only tills letters har minst 1 tecken (digit-tap snäppar fokus tillbaka till letters om tomt). Backspace dispatchas per fokuserat fält:
+- `backspacePlayerNameLetters` tar bort sista letter; om letters töms helt clearas digits + dash också (orphan-prevention).
+- `backspacePlayerNameDigits` tar bort sista digit; om digits töms tas dashen bort så letter-fältet blir editable.
 
-**Case-logik vid manuell input** (för stilfullare lobbyn-display): `handlePlayerNameKeyPress` checkar om det redan finns en bokstav i namnet — första bokstaven blir versal, resterande gemener. Digits skickas as-is. Resultat: typade namn blir `Anna` (inte `ANNA` eller `anna`). Auto-genererade namn behåller sin CamelCase-prefix (`PlayerName...` / `Guest...`) som-är.
+**Field-styling** (`playerNameLettersInput` flex 7, `playerNameDigitsInput` flex 6, båda `paddingHorizontal: Spacing.sm` + `textAlign: 'center'`): empiriskt tunad ratio så `GuestAbcde` (10 chars) ryms i letters och alla 7 digits ryms i digit-fältet. Reducerad padding (8px vs default 16px) sparar 16px content-yta per fält. `playerNameSeparator` är fontSize 22, `Colors.textSecondary`, `paddingHorizontal: 2`.
 
-**Remove + Auto-generate-knappar under namnfältet**: mutually-exclusive enable — Remove är aktiv när fältet har innehåll (Auto-generate dimmas), Auto-generate är aktiv när fältet är tomt (Remove dimmas). Båda renderas alltid för stabil layout (gate inte med `value.length > 0 &&`). Båda dimmas under `status === 'checking'`. Vit text + `opacity: 0.4` när disabled. `Auto-generate` kallar `Keyboard.dismiss()` så nästa låst fält (Year/Password) blir synligt direkt; `Remove` refokuserar input via ref så CodeKeyboard:n stannar uppe (custom keyboard pushar inte layouten).
+**Cursor-låsning på alla 6 inputs** — `selection={{ start: value.length, end: value.length }}` håller cursor efter sista tecknet vid varje render, `selectTextOnFocus={false}` förhindrar select-all vid focus, `contextMenuHidden={true}` döljer Cut/Copy/Select All-context-menyn. Resultat: enda sättet att redigera är via CodeKeyboard:s Backspace som alltid tar sista tecknet i fokuserat fält.
+
+**Auto-generate prompt** "Try to keep PlayerName letters or not?" (Cancel / Replace all / Keep letters) visas när användaren tappar Auto-generate och letters-sektionen har innehåll. Tom field → genererar direkt utan prompt. Replace all = ny full random; Keep letters = behåller letters, randomiserar bara digits. Knappen är ALLTID enabled (förutom under `status === 'checking'`) — Remove är aktiv när field har innehåll.
+
+**Register-formen auto-fyller INTE PlayerName** (efter sessionsbeslut): fältet startar tomt. Användaren måste typa själv eller trycka Auto-generate. Guest-formen och AddPlayerModal auto-fyller fortfarande vid open via `prefix: 'Guest'`-pathen.
+
+**`validatePlayerName(name)` / `validateAddPlayerName(name)`** kontrollerar i ordning: (1) `isPlayerNameFormatValid`, (2) `hasBlockedLetterLead`, (3) `containsProfanity`, (4) uniqueness mot mock taken-lista. Returnerar `'available' | 'taken' | 'invalid'`. UI status-type: `PlayerNameStatus = 'idle' | 'checking' | 'available' | 'taken' | 'invalid'`.
+
+**Field-labels** (Register + JoinModal guest): "Player Name - Letter-digit format". **Format-hint under fältet** (alla tre forms): "Format: 1-{PLAYER_NAME_MAX_LETTERS} letters, 0-{PLAYER_NAME_MAX_DIGITS} digits" — deriveras från konstanterna så framtida ändringar slår igenom automatiskt.
+
+**Auto-fill-detektion-regex** i `handleJoinAsGuest` analytics: `/^Guest[A-Z][a-z]{4}-\d{7}$/` matchar Guest-prefix + capitalized first random + 4 lowercase random + 7 digits.
+
+`handleLogin` accepts **Player Name OR email** as identifier — if input contains `@`, the email-prefix is derived as the saved `playerName` (mock; real auth will resolve email → playerName via backend lookup).
+
+Default Assistance='standard', Region='global' on the Register form so the user can submit immediately after Year of birth — both fields show under a "Use default or select prefered setup" hint.
+
+**Year of birth-caps**: Profile, Register-form och Guest-form har gemensamma cap:ar `MIN_BIRTH_YEAR = 1930`, `MAX_BIRTH_YEAR = 2020`. Endpoints renderas via `formatBirthYear`-helper som lägger till "or earlier" på 1930 och "or later" på 2020 — representerar öppna intervall (alla födda ≤1930 / ≥2020). `formatBirthYear` används både i picker-listan och i selector-trigger-texten så framing är konsistent. Profile + Register + Guest delar samma `BIRTH_YEARS`-array och format-helper (Profile har egen kopia eftersom den lever i en annan fil — håll dem synkade vid framtida ändringar).
+
+**Password** (Register-form): `REG_PASSWORD_MIN_LENGTH = 6`, `REG_PASSWORD_MAX_LENGTH = 32`. Placeholder + maxLength + format-hint ("Format: min 6-32 characters") under fältet deriveras från konstanterna. Min 6 = NIST-baseline så användare inte tvingas migrera vid backend-integration. Max 32 = under bcrypt:s 72-byte-cap med marginal + täcker alla realistiska lösenord/passphrases utan att blåsa upp testytan.
+
+**Assistance level** (`'minimal' | 'standard' | 'full'`, persisted as `ProfileData.assistance`) styr mängden hjälp i spelet — `full` = mest hjälp (3-letter prefix i Letter Grid, snabb reveal-curve), `standard` = 2-letter prefix + linjär reveal, `minimal` = 1-letter prefix + slow reveal som aldrig fullt avslöjar bilden. Tidigare hette fältet `skill` med värdena `easy/intermediate/expert`; båda `loadProfile` (i `profileStorage.ts`) och `loadLatestResult` (i `gameResults.ts`) gör dual-read av gammalt fält + värde-mappning så befintliga profiler/resultat migreras passivt vid nästa save. Mappning: `easy → full`, `intermediate → standard`, `expert → minimal`.
+
+**Stylesheet-keys medvetet kvar som `skillRow`/`skillBtn`/`skillBtnText`** i `app/(tabs)/index.tsx` och `LobbyScreen.tsx` även efter rename:n — det är privat CSS-vokabulär per fil (inte domän-koncept) och de exporteras inte. Att jaga dem skulle bara öka diff-ytan utan att förbättra läsbarhet. Skapa nya stylesheet-nycklar med `assistance*`-prefix om du behöver mer styling, men byt inte namn på de befintliga reflexmässigt.
 
 `handleLogin` accepts **Player Name OR email** as identifier — if input contains `@`, the email-prefix is derived as the saved `playerName` (mock; real auth will resolve email → playerName via backend lookup).
 
@@ -396,6 +421,7 @@ Custom in-app keyboard som ersätter system-tangentbord på flera fält. iOS har
 - `onBackspace()` — backspace-tap.
 - `letterCharset?: string` — override default `LETTER_CHARSET`. För PlayerName: `"ABCDEFGHIJKLMNOPQRSTUVWXYZ"`.
 - `onModeToggle?: () => void` — om definierad, render mode-toggle-knapp i botten-raden bredvid Backspace. Utelämnad → bara Backspace.
+- `modeToggleDisabled?: boolean` — när true dimmas toggle-knappen och tap blir no-op. Används av PlayerName-flöden där digit-mode är låst tills letters-sektionen har minst 1 tecken — knappen renderas fortsatt för stabil layout men signalerar visuellt att letters måste komma först. PlayerName-formerna sätter även toggle-handler:n att flytta fokus till motsvarande TextInput (split-field UI: letters → letters-input, digits → digits-input).
 
 **Layout-detaljer**:
 - Container-höjd är dynamisk från antal letter-rader (`Math.ceil(letterCharset.length / LETTER_COLS)`) — så mode-toggle behåller samma totalhöjd när rader byter (digit-grid stretchas via `flex: 1` på rader). 26 letters i 6 cols → 5 rader (sista har Y/Z + 4 osynliga `keySpacer`-celler för grid-justering).
@@ -537,6 +563,7 @@ clearLeftPlayers(code);        // leftPlayers
 clearLobbyPlayers(code);       // mockLobbyPlayers
 clearLobbySettings(code);      // mockLobbySettings
 clearEjected(code);            // ejectedPlayers
+clearGameStarted(code);        // mockStartedGames
 ```
 
 Glöm inte lägga till nya stores här när de skapas — annars läcker stale data mellan sessions med återanvänd kod.
@@ -575,6 +602,10 @@ Glöm inte lägga till nya stores här när de skapas — annars läcker stale d
 **Single-player-toggle ON ejectar non-hosts** — när host bockar i singlePlayerDefault iterar handler:n `players` och anropar `markEjected(roomCode, p.id)` för varje `!p.isHost && !p.hasLeft`, sedan `setPlayers((prev) => prev.filter((p) => p.isHost))` så host:s vy tömmer non-hosts direkt. Non-host:s polling fyrar ejectpopup → Home. Uncheck:n "återanställer" inte ejectade — det är en envägs-action; flagga uncheck:n bara återställer Game Mode + Max Players till gratis-defaults.
 
 **Eject-detection PRE-sync** — `syncFromStore` i non-host:s player-poll kollar `isEjected(roomCode, ownPlayerIdRef.current)` ALLRA FÖRST. Träff → setPlayerEjectedDetected(true) + early-return. Resten av sync hoppas över så user inte ser approval-listan uppdateras strax innan popup.
+
+**Game-started-detection PRE-sync** — direkt efter eject-checken körs `isGameStarted(roomCode)` + check om self är approved (via `getLobbyPlayers`). Träff + self är **inte** approved → `setStartedWithoutMeDetected(true)` + early-return + popup "Game already started — Host started game without this user" → OK → Home. Approved non-hosts hanteras inte här (separat gap dokumenterad i koden).
+
+**Scroll-to-top vid lobby-entry** — `mainScrollRef` på lobby:s primär-ScrollView. URL-params-effekten (samma som hanterar fresh entry från host/guest/registered-flow) anropar `mainScrollRef.current?.scrollTo({ y: 0, animated: false })` i en `requestAnimationFrame`-wrapper vid varje fresh entry. Krävs eftersom tab-navigatorn kan återanvända samma route-instans och ärva tidigare scroll-position — utan denna landar guest-användare som joinar via Join Game mitt på sidan istället för vid headern.
 
 **Gold-glowing CTA-position** (Start Game / Waiting for Host) — båda renderas på samma plats i `startSection` och delar visuell vokabulär (gold halo + scale-pulse). Implementation:
 - En enda `Animated.Value`-pair (`startGlow`, `startPulse`) körs i `Animated.loop` utan `hostMode`-gating — bara en ruta renderas åt gången per role, så animationen är "billig dubbelproduktion" oavsett.

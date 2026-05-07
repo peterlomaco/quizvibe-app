@@ -19,6 +19,7 @@ import { deactivateRoom, registerActiveRoom } from '@/src/utils/mockActiveRooms'
 import { clearEjected } from '@/src/utils/ejectedPlayers';
 import { clearLobbyPlayers } from '@/src/utils/mockLobbyPlayers';
 import { clearLobbySettings } from '@/src/utils/mockLobbySettings';
+import { clearGameStarted } from '@/src/utils/mockStartedGames';
 import { loadProfile } from '@/src/utils/profileStorage';
 import { generateRoomCode } from '@/src/utils/roomCode';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -703,6 +704,7 @@ export default function QuizScreen() {
     clearLobbyPlayers(newCode);
     clearLobbySettings(newCode);
     clearEjected(newCode);
+    clearGameStarted(newCode);
     router.replace(`/(tabs)/lobby?code=${newCode}&isHost=true`);
   };
 
@@ -744,6 +746,7 @@ export default function QuizScreen() {
               clearLobbyPlayers(code);
               clearLobbySettings(code);
               clearEjected(code);
+              clearGameStarted(code);
             }
             router.replace('/');
           },

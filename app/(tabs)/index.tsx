@@ -10,8 +10,22 @@ import { clearLeftPlayers } from '@/src/utils/leftPlayers';
 import { clearEjected } from '@/src/utils/ejectedPlayers';
 import { clearLobbyPlayers } from '@/src/utils/mockLobbyPlayers';
 import { clearLobbySettings } from '@/src/utils/mockLobbySettings';
+import { clearGameStarted } from '@/src/utils/mockStartedGames';
 import { getRoomMeta, isActiveRoom, isLobbyFull, isOwnLobby, registerActiveRoom } from '@/src/utils/mockActiveRooms';
-import { generatePlayerName } from '@/src/utils/playerName';
+import {
+  appendPlayerNameDigit,
+  appendPlayerNameLetter,
+  backspacePlayerNameDigits,
+  backspacePlayerNameLetters,
+  generatePlayerName,
+  getPlayerNameDigits,
+  getPlayerNameLetters,
+  hasBlockedLetterLead,
+  isPlayerNameFormatValid,
+  normalizePlayerName,
+  PLAYER_NAME_MAX_DIGITS,
+  PLAYER_NAME_MAX_LETTERS,
+} from '@/src/utils/playerName';
 import { containsProfanity } from '@/src/utils/profanity';
 import { clearProfile, loadProfile, saveProfile, type ProfileData } from '@/src/utils/profileStorage';
 import { formatRoomCode, generateRoomCode, isBlockedLetterPair, isLetterCellIndex, ROOM_CODE_DIGITS, ROOM_CODE_LEADING_LETTERS, ROOM_CODE_LENGTH, ROOM_CODE_TRAILING_LETTERS } from '@/src/utils/roomCode';
@@ -69,11 +83,15 @@ const TAKEN_PLAYER_NAMES = new Set([
 
 type PlayerNameStatus = 'idle' | 'checking' | 'available' | 'taken' | 'invalid';
 
-// Validerar ett manuellt inmatat Player Name. Profanity-check körs först
-// så att kränkande namn aldrig hamnar i taken-listan av misstag och så
-// användaren får ett mer specifikt felmeddelande.
+// Validerar ett manuellt inmatat Player Name. Kontrollerar i ordning:
+//   1. Canonical format (Abcdef- eller Abcdef-1234567)
+//   2. Olämpligt ledande par (samma blocklist som auto-gen)
+//   3. Profanity
+//   4. Uniqueness mot mock-listan
 function validatePlayerName(name: string): 'available' | 'taken' | 'invalid' {
   const trimmed = name.trim();
+  if (!isPlayerNameFormatValid(trimmed)) return 'invalid';
+  if (hasBlockedLetterLead(trimmed)) return 'invalid';
   if (containsProfanity(trimmed)) return 'invalid';
   if (TAKEN_PLAYER_NAMES.has(trimmed.toLowerCase())) return 'taken';
   return 'available';
@@ -145,9 +163,11 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
 
   // Refs till de 6 cells för rumkoden — för auto-fokus framåt och bakåt.
   const codeRefs = useRef<Array<TextInput | null>>([]);
-  // Ref till PlayerName-input så Remove-knappen kan refokusera fältet
-  // (custom keyboard pushar inte layouten så ingen jump-risk).
-  const playerNameInputRef = useRef<TextInput>(null);
+  // Refs till PlayerName-fältens två separata TextInputs (split-field UI).
+  // Letter-fältet är default-fokus efter Remove; digit-fältet kan fokuseras
+  // bara när letter-sektionen har minst 1 tecken.
+  const playerNameLettersRef = useRef<TextInput>(null);
+  const playerNameDigitsRef = useRef<TextInput>(null);
   // PlayerName använder samma CodeKeyboard som code-cellerna men med
   // egen state — fri-text-fält behöver manuell mode-toggle (vs cell-typen
   // som styr code-keyboardet automatiskt).
@@ -351,22 +371,19 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     parsedBirthYear !== null &&
     code.length === ROOM_CODE_LENGTH;
 
-  // Om användaren ändrar playerNamet efter en validering — återställ status.
-  // Year/assistance/code-värden behålls men deras gates återstängs tills nick
-  // är validerat igen.
-  const handleGuestNameChange = (t: string) => {
-    setGuestName(t);
-    if (playerNameStatus !== 'idle') setPlayerNameStatus('idle');
-  };
-
   const handleCheckPlayerName = () => {
     const trimmed = guestName.trim();
     if (!trimmed) return;
+    // Auto-inserta dash om användaren bara typat letters innan Check —
+    // dashen är "fixed" i format-spec:en så användaren ska inte behöva
+    // tänka på den manuellt.
+    const normalized = normalizePlayerName(trimmed);
+    if (normalized !== guestName) setGuestName(normalized);
     Keyboard.dismiss();
     setPlayerNameStatus('checking');
     // Mock-latens — byt mot riktigt API-anrop när backend finns.
     setTimeout(() => {
-      setPlayerNameStatus(validatePlayerName(trimmed));
+      setPlayerNameStatus(validatePlayerName(normalized));
     }, 600);
   };
 
@@ -377,48 +394,81 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
   const handleGuestRemoveName = () => {
     setGuestName('');
     setPlayerNameStatus('idle');
-    playerNameInputRef.current?.focus();
+    setPlayerNameKbMode('letter');
+    playerNameLettersRef.current?.focus();
   };
 
-  // Generera nytt unikt namn på begäran. Anropar samma helper som
-  // auto-fill-effekten — namnet är förvaliderat mot TAKEN_PLAYER_NAMES så
-  // status går direkt till 'available' (ingen Check krävs).
-  // Keyboard.dismiss() blurrar input:en explicit eftersom ScrollView:n har
-  // keyboardShouldPersistTaps="handled" (för code-cell-keys), vilket annars
-  // håller kvar fokus när Auto-generate tappas → custom keyboard skulle
-  // stanna uppe och dölja Year-fältet under.
-  const handleGuestGenerateName = () => {
-    const generated = generatePlayerName(TAKEN_PLAYER_NAMES, 'Guest');
+  // Auto-generera-helper: skickar nya namnet till state + status='available'
+  // (förvaliderat mot TAKEN_PLAYER_NAMES + profanity i generatePlayerName).
+  const applyGenerated = (generated: string) => {
     setGuestName(generated);
     setPlayerNameStatus('available');
     Keyboard.dismiss();
   };
 
-  // CodeKeyboard skickar tecknet vidare hit. Letter-keys är versaler från
-  // charset:n men endast första bokstaven i namnet förblir versal — resten
-  // sänks till gemener för stilfullare lobbyn-display ("Anna" istället för
-  // "ANNA"). Digit-keys appendas oförändrat. Status nollställs så fältet
-  // måste validateras via Check innan year unlockas.
+  // Auto-generera Player Name. Två branches:
+  //   • Fältet tomt → generera direkt med "Guest"-prefix → "GuestAbcde-1234567".
+  //   • Användaren har redan typat letters → fråga "Try to keep PlayerName
+  //     letters or not?". Yes-branchen bevarar letters och randomiserar bara
+  //     digits; No-branchen genererar helt nytt med "Guest"-prefixet igen.
+  const handleGuestGenerateName = () => {
+    const trimmedLetters = getPlayerNameLetters(guestName.trim());
+    if (trimmedLetters.length > 0) {
+      Alert.alert(
+        'Auto-generate Player Name',
+        'Try to keep PlayerName letters or not?',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Replace all',
+            onPress: () => applyGenerated(generatePlayerName(TAKEN_PLAYER_NAMES, { prefix: 'Guest' })),
+          },
+          {
+            text: 'Keep letters',
+            onPress: () => applyGenerated(generatePlayerName(TAKEN_PLAYER_NAMES, { keepLetters: trimmedLetters })),
+          },
+        ],
+      );
+      return;
+    }
+    applyGenerated(generatePlayerName(TAKEN_PLAYER_NAMES, { prefix: 'Guest' }));
+  };
+
+  // CodeKeyboard skickar tecknet hit. Letter/digit dispatch:as via
+  // playerName-helpers så format-reglerna upprätthålls per tangenttryck:
+  //   • Letters: A–Z, första versal/resten gemener, max 10, låst när dash finns.
+  //   • Digits:  0–9, max 7, kräver minst 1 letter (auto-insertar dash).
   const handlePlayerNameKeyPress = (char: string) => {
-    setGuestName((prev) => {
-      if (prev.length >= 20) return prev;
-      let appended = char;
-      if (/[A-Z]/.test(char)) {
-        const hasLetter = /[A-Za-z]/.test(prev);
-        appended = hasLetter ? char.toLowerCase() : char;
-      }
-      return prev + appended;
-    });
+    setGuestName((prev) =>
+      playerNameKbMode === 'letter'
+        ? appendPlayerNameLetter(prev, char)
+        : appendPlayerNameDigit(prev, char),
+    );
     if (playerNameStatus !== 'idle') setPlayerNameStatus('idle');
   };
 
+  // Backspace dispatchas per fokuserat fält så letter-fältet aldrig
+  // muteras när digits finns (skyddar mot orphan-digits utan letters).
   const handlePlayerNameBackspace = () => {
-    setGuestName((prev) => prev.slice(0, -1));
+    setGuestName((prev) =>
+      playerNameKbMode === 'letter'
+        ? backspacePlayerNameLetters(prev)
+        : backspacePlayerNameDigits(prev),
+    );
     if (playerNameStatus !== 'idle') setPlayerNameStatus('idle');
   };
 
   const togglePlayerNameKbMode = () => {
-    setPlayerNameKbMode((m) => (m === 'letter' ? 'digit' : 'letter'));
+    // Digit-mode är låst tills letter-sektionen har minst 1 tecken — toggle
+    // är no-op i det läget (knappen renderas dimmad via modeToggleDisabled).
+    if (guestName.length === 0 && playerNameKbMode === 'letter') return;
+    if (playerNameKbMode === 'letter') {
+      setPlayerNameKbMode('digit');
+      playerNameDigitsRef.current?.focus();
+    } else {
+      setPlayerNameKbMode('letter');
+      playerNameLettersRef.current?.focus();
+    }
   };
 
   // Auto-fyll Player Name när användaren går in i guest-steget och fältet
@@ -430,10 +480,9 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     const wasGuest = prevGuestStepRef.current;
     prevGuestStepRef.current = step === 'guest';
     if (step === 'guest' && !wasGuest && guestName === '') {
-      // Guest-flödet använder "Guest"-prefixet (vs Register-formens
-      // "PlayerName") så default-namnet signalerar att användaren joinar
-      // utan registrering — t.ex. "Guest87321-KL".
-      const generated = generatePlayerName(TAKEN_PLAYER_NAMES, 'Guest');
+      // Guest-flödet använder "Guest"-prefixet → "GuestAbcde-1234567"
+      // (10 letters totalt: prefix 5 + random 5, sedan 7 random digits).
+      const generated = generatePlayerName(TAKEN_PLAYER_NAMES, { prefix: 'Guest' });
       setGuestName(generated);
       setPlayerNameStatus('available');
     }
@@ -471,7 +520,9 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     // Autofill-detektion: matchar Guest-flödets genererade format
     // ("Guest" + 5 siffror + "-" + 2 bokstäver). Om användaren ändrat
     // namnet manuellt blir flaggan false.
-    const autofilled = /^Guest\d{5}-[A-Z]{2}$/.test(guestName.trim());
+    // Auto-fill-detektion: format `GuestAbcde-1234567` — "Guest"-prefix +
+    // 1 versal random + 4 gemena random + dash + 7 digits.
+    const autofilled = /^Guest[A-Z][a-z]{4}-\d{7}$/.test(guestName.trim());
     track('guest_name_created', { autofilled, assistance: guestAssistance });
     onClose();
     router.push({
@@ -480,7 +531,9 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
         code,
         isHost: 'false',
         asGuest: 'true',
-        guestName: guestName.trim(),
+        // normalizePlayerName strippar ev. trailing dash så lobby visar
+        // "Anna" istället för "Anna-" när inga digits finns.
+        guestName: normalizePlayerName(guestName.trim()),
         guestBirthYear: String(parsedBirthYear),
         guestAssistance: guestAssistance,
       },
@@ -670,33 +723,74 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                 style={{ flexShrink: 1, maxHeight: 420 }}
                 contentContainerStyle={{ gap: Spacing.md }}
               >
-                {/* PlayerName — måste valideras mot DB innan nästa fält öppnas */}
+                {/* PlayerName — split-field: [Letters] – [Digits] [Check].
+                    Två separata TextInputs så användaren ser tydligt
+                    var letter-sektionen slutar och digit-sektionen börjar.
+                    State-värdet (`guestName`) håller sammansatt format
+                    "Abcd-123" som källa; fälten visar derived getters. */}
                 <View style={modal.fieldGroup}>
-                  <Text style={modal.fieldLabel}>Player Name</Text>
+                  <Text style={modal.fieldLabel}>Player Name - Letter-digit format</Text>
                   <View style={modal.playerNameRow}>
                     <TextInput
-                      ref={playerNameInputRef}
+                      ref={playerNameLettersRef}
                       style={[
                         modal.inputText,
-                        modal.playerNameInput,
-                        // Highlightad border medan playerName är aktivt steg
-                        // (inte validerat än) — samma färg som year-triggerns border.
-                        playerNameStatus !== 'available' && modal.playerNameInputActive,
+                        modal.playerNameLettersInput,
+                        playerNameKbMode === 'letter' && playerNameStatus !== 'available' && modal.playerNameInputActive,
                       ]}
-                      placeholder="Pick a unique Player Name"
+                      placeholder="Anna"
                       placeholderTextColor={Colors.textDisabled}
-                      value={guestName}
-                      onChangeText={handleGuestNameChange}
-                      maxLength={20}
+                      value={getPlayerNameLetters(guestName)}
+                      maxLength={PLAYER_NAME_MAX_LETTERS}
                       editable={playerNameStatus !== 'checking'}
-                      // System-tangentbord undertrycks; vi visar custom CodeKeyboard
-                      // istället så modalen inte hoppar upp under tangentbordet.
                       showSoftInputOnFocus={false}
-                      // Visa PlayerName-keyboardet och göm code-cell-keyboardet.
-                      // Default till letter-mode varje gång fältet får fokus.
+                      // Cursor låst efter sista tecknet — användaren kan inte
+                      // markera text eller flytta cursor in i mitten. Backspace
+                      // är enda sättet att radera och tar alltid sista tecknet.
+                      selection={{
+                        start: getPlayerNameLetters(guestName).length,
+                        end: getPlayerNameLetters(guestName).length,
+                      }}
+                      selectTextOnFocus={false}
+                      contextMenuHidden={true}
                       onFocus={() => {
                         setFocusedCodeIdx(null);
                         setPlayerNameKbMode('letter');
+                        setPlayerNameFocused(true);
+                      }}
+                      onBlur={() => setPlayerNameFocused(false)}
+                    />
+                    <Text style={modal.playerNameSeparator}>–</Text>
+                    <TextInput
+                      ref={playerNameDigitsRef}
+                      style={[
+                        modal.inputText,
+                        modal.playerNameDigitsInput,
+                        playerNameKbMode === 'digit' && playerNameStatus !== 'available' && modal.playerNameInputActive,
+                        getPlayerNameLetters(guestName).length === 0 && modal.playerNameInputDisabled,
+                      ]}
+                      placeholder="1234"
+                      placeholderTextColor={Colors.textDisabled}
+                      value={getPlayerNameDigits(guestName)}
+                      maxLength={PLAYER_NAME_MAX_DIGITS}
+                      editable={playerNameStatus !== 'checking' && getPlayerNameLetters(guestName).length > 0}
+                      showSoftInputOnFocus={false}
+                      selection={{
+                        start: getPlayerNameDigits(guestName).length,
+                        end: getPlayerNameDigits(guestName).length,
+                      }}
+                      selectTextOnFocus={false}
+                      contextMenuHidden={true}
+                      onFocus={() => {
+                        if (getPlayerNameLetters(guestName).length === 0) {
+                          // Prevent fokus om letter-fältet är tomt — flytta
+                          // tillbaka till letter-fältet så användaren typar
+                          // letters först.
+                          playerNameLettersRef.current?.focus();
+                          return;
+                        }
+                        setFocusedCodeIdx(null);
+                        setPlayerNameKbMode('digit');
                         setPlayerNameFocused(true);
                       }}
                       onBlur={() => setPlayerNameFocused(false)}
@@ -722,11 +816,11 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                       </Text>
                     </TouchableOpacity>
                   </View>
-                  {/* Sekundära åtgärder under namnfältet — Remove och
-                      Auto-generate växlar mutually-exclusive: när fältet har
-                      innehåll lyser Remove (Auto-generate dimmas), när fältet
-                      är tomt lyser Auto-generate (Remove dimmas). Båda
-                      renderas alltid för stabil layout. */}
+                  {/* Sekundära åtgärder under namnfältet — Remove är aktiv så
+                      fort fältet har innehåll. Auto-generate är ALLTID aktiv
+                      (förutom under checking) — när användaren har typat
+                      letters visas en "Try to keep PlayerName letters?"-prompt
+                      innan namnet genereras. */}
                   <View style={modal.playerNameActionRow}>
                     <TouchableOpacity
                       onPress={handleGuestRemoveName}
@@ -741,10 +835,10 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                     </TouchableOpacity>
                     <TouchableOpacity
                       onPress={handleGuestGenerateName}
-                      disabled={guestName.length > 0 || playerNameStatus === 'checking'}
+                      disabled={playerNameStatus === 'checking'}
                       style={[
                         modal.nameActionBtn,
-                        (guestName.length > 0 || playerNameStatus === 'checking') &&
+                        playerNameStatus === 'checking' &&
                           modal.nameActionBtnDisabled,
                       ]}
                     >
@@ -752,6 +846,11 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                     </TouchableOpacity>
                   </View>
                   {/* Status-rad */}
+                  {playerNameStatus === 'idle' && (
+                    <Text style={modal.statusHint}>
+                      Format: 1-{PLAYER_NAME_MAX_LETTERS} letters, 0-{PLAYER_NAME_MAX_DIGITS} digits
+                    </Text>
+                  )}
                   {playerNameStatus === 'checking' && (
                     <Text style={modal.statusHint}>Checking availability…</Text>
                   )}
@@ -767,7 +866,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                   )}
                   {playerNameStatus === 'invalid' && (
                     <Text style={[modal.statusHint, modal.statusHintError]}>
-                      ✗ Player Name contains inappropriate language — try another
+                      ✗ Player Name not allowed — must follow format and avoid blocked combinations
                     </Text>
                   )}
                 </View>
@@ -922,6 +1021,9 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                   onPress={handlePlayerNameKeyPress}
                   onBackspace={handlePlayerNameBackspace}
                   onModeToggle={togglePlayerNameKbMode}
+                  // Digit-mode kräver minst 1 letter — toggle-knappen dimmas
+                  // i letter-mode tills letter-sektionen har innehåll.
+                  modeToggleDisabled={playerNameKbMode === 'letter' && guestName.length === 0}
                 />
               )}
               <TouchableOpacity
@@ -1046,14 +1148,12 @@ export default function HomeScreen() {
 
   const pulse = useRef(new Animated.Value(1)).current;
 
-  // Spåra föregående regEmailValid så Player Name-autofill bara triggar
-  // vid email-becomes-valid-transition (inte refill om användaren rensat
-  // fältet efter en autofill).
-  const prevRegEmailValidRef = useRef(false);
   // Ref + state för custom CodeKeyboard på Register-formens PlayerName-fält
   // — speglar guest-formens setup (se JoinModal). Samma motivation:
   // system-tangentbord pushar upp modalen och döljer fältet.
-  const regPlayerNameInputRef = useRef<TextInput>(null);
+  // Split-field PlayerName: separat ref per fält (letter + digit).
+  const regPlayerNameLettersRef = useRef<TextInput>(null);
+  const regPlayerNameDigitsRef = useRef<TextInput>(null);
   const [regPlayerNameKbMode, setRegPlayerNameKbMode] = useState<'letter' | 'digit'>('letter');
   const [regPlayerNameFocused, setRegPlayerNameFocused] = useState(false);
   // Refs för att kunna scrolla PlayerName-fältet till toppen av ScrollView:n
@@ -1237,6 +1337,7 @@ export default function HomeScreen() {
     clearLobbyPlayers(code);
     clearLobbySettings(code);
     clearEjected(code);
+    clearGameStarted(code);
     track('room_code_created');
     router.push({ pathname: '/(tabs)/lobby', params: { code, isHost: 'true' } });
   };
@@ -1300,10 +1401,13 @@ export default function HomeScreen() {
     return n;
   })();
   const regEmailValid = REG_EMAIL_REGEX.test(regEmail.trim());
-  // Password måste ha minst 4 tecken — minimal validering tills riktig
-  // policy definieras (server-side). Användaren måste även explicit trycka
+  // Password måste ha minst 6 tecken — i linje med NIST-baseline-policy så
+  // användaren inte tvingas migrera från 1-2-tecken-lösenord när riktig
+  // backend-validering kopplas in. Användaren måste även explicit trycka
   // Confirm för att låsa lösenordet och låsa upp nästa fält.
-  const regPasswordValid = regPassword.length >= 4;
+  const REG_PASSWORD_MIN_LENGTH = 6;
+  const REG_PASSWORD_MAX_LENGTH = 32;
+  const regPasswordValid = regPassword.length >= REG_PASSWORD_MIN_LENGTH;
   // Sekventiella gates: email → playerName → password → year → assistance → region
   const regPlayerNameUnlocked = regEmailValid;
   const regPasswordUnlocked = regPlayerNameUnlocked && regPlayerNameStatus === 'available';
@@ -1317,18 +1421,17 @@ export default function HomeScreen() {
     regPasswordConfirmed &&
     regParsedBirthYear !== null;
 
-  const handleRegPlayerNameChange = (t: string) => {
-    setRegPlayerName(t);
-    if (regPlayerNameStatus !== 'idle') setRegPlayerNameStatus('idle');
-  };
-
   const handleRegCheckPlayerName = () => {
     const trimmed = regPlayerName.trim();
     if (!trimmed) return;
+    // Auto-inserta dash om användaren bara typat letters innan Check —
+    // dashen är "fixed" i format-spec:en.
+    const normalized = normalizePlayerName(trimmed);
+    if (normalized !== regPlayerName) setRegPlayerName(normalized);
     Keyboard.dismiss();
     setRegPlayerNameStatus('checking');
     setTimeout(() => {
-      setRegPlayerNameStatus(validatePlayerName(trimmed));
+      setRegPlayerNameStatus(validatePlayerName(normalized));
     }, 600);
   };
 
@@ -1338,57 +1441,78 @@ export default function HomeScreen() {
   const handleRegRemoveName = () => {
     setRegPlayerName('');
     setRegPlayerNameStatus('idle');
-    regPlayerNameInputRef.current?.focus();
+    setRegPlayerNameKbMode('letter');
+    regPlayerNameLettersRef.current?.focus();
   };
 
-  // Generera nytt unikt namn på begäran (samma anrop som auto-fill-effekten).
-  // Default-prefix 'PlayerName' används. Keyboard.dismiss() blurrar input:en
-  // så CodeKeyboard:n döljs och nästa fält (Password) blir synligt.
-  const handleRegGenerateName = () => {
-    const generated = generatePlayerName(TAKEN_PLAYER_NAMES);
+  const applyRegGenerated = (generated: string) => {
     setRegPlayerName(generated);
     setRegPlayerNameStatus('available');
     Keyboard.dismiss();
   };
 
-  // CodeKeyboard skickar tecknet vidare hit. Letter-keys: första bokstaven
-  // versal, resten gemener (för stilfullare lobbyn-display). Digits as-is.
+  // Auto-generera Player Name. Två branches:
+  //   • Fältet tomt → generera direkt (ingen prefix → "Abcdefghi-1234567").
+  //   • Användaren har redan typat letters → fråga "Try to keep PlayerName
+  //     letters or not?". Yes-branchen bevarar letters; No regenererar allt.
+  const handleRegGenerateName = () => {
+    const trimmedLetters = getPlayerNameLetters(regPlayerName.trim());
+    if (trimmedLetters.length > 0) {
+      Alert.alert(
+        'Auto-generate Player Name',
+        'Try to keep PlayerName letters or not?',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Replace all',
+            onPress: () => applyRegGenerated(generatePlayerName(TAKEN_PLAYER_NAMES)),
+          },
+          {
+            text: 'Keep letters',
+            onPress: () => applyRegGenerated(generatePlayerName(TAKEN_PLAYER_NAMES, { keepLetters: trimmedLetters })),
+          },
+        ],
+      );
+      return;
+    }
+    applyRegGenerated(generatePlayerName(TAKEN_PLAYER_NAMES));
+  };
+
+  // CodeKeyboard skickar tecknet hit. Helpers upprätthåller format per
+  // tangenttryck: letters först (max 10, första versal/resten gemener),
+  // dash auto-insertas vid första digit-tryck, max 7 digits.
   const handleRegPlayerNameKeyPress = (char: string) => {
-    setRegPlayerName((prev) => {
-      if (prev.length >= 20) return prev;
-      let appended = char;
-      if (/[A-Z]/.test(char)) {
-        const hasLetter = /[A-Za-z]/.test(prev);
-        appended = hasLetter ? char.toLowerCase() : char;
-      }
-      return prev + appended;
-    });
+    setRegPlayerName((prev) =>
+      regPlayerNameKbMode === 'letter'
+        ? appendPlayerNameLetter(prev, char)
+        : appendPlayerNameDigit(prev, char),
+    );
     if (regPlayerNameStatus !== 'idle') setRegPlayerNameStatus('idle');
   };
 
   const handleRegPlayerNameBackspace = () => {
-    setRegPlayerName((prev) => prev.slice(0, -1));
+    setRegPlayerName((prev) =>
+      regPlayerNameKbMode === 'letter'
+        ? backspacePlayerNameLetters(prev)
+        : backspacePlayerNameDigits(prev),
+    );
     if (regPlayerNameStatus !== 'idle') setRegPlayerNameStatus('idle');
   };
 
   const toggleRegPlayerNameKbMode = () => {
-    setRegPlayerNameKbMode((m) => (m === 'letter' ? 'digit' : 'letter'));
+    if (regPlayerName.length === 0 && regPlayerNameKbMode === 'letter') return;
+    if (regPlayerNameKbMode === 'letter') {
+      setRegPlayerNameKbMode('digit');
+      regPlayerNameDigitsRef.current?.focus();
+    } else {
+      setRegPlayerNameKbMode('letter');
+      regPlayerNameLettersRef.current?.focus();
+    }
   };
 
-  // Auto-fyll Player Name när email blir giltig (transition false → true)
-  // och fältet är tomt. Genererar ett unikt namn (verifierat mot mock
-  // TAKEN_PLAYER_NAMES) och markerar status som 'available' så användaren
-  // kan gå vidare direkt. Användaren kan ändå skriva över namnet → status
-  // faller tillbaka till 'idle' via handleRegPlayerNameChange och kräver Check.
-  useEffect(() => {
-    const wasValid = prevRegEmailValidRef.current;
-    prevRegEmailValidRef.current = regEmailValid;
-    if (regEmailValid && !wasValid && regPlayerName === '') {
-      const generated = generatePlayerName(TAKEN_PLAYER_NAMES);
-      setRegPlayerName(generated);
-      setRegPlayerNameStatus('available');
-    }
-  }, [regEmailValid, regPlayerName]);
+  // Player Name auto-fyll borttagen — användaren ska aktivt välja namn
+  // (typa eller trycka Auto-generate). Fältet startar tomt vid open och
+  // resets återgår alltid till tom enligt step/visible-effekterna ovan.
 
   // Password — användaren måste explicit Confirm:a innan year låses upp.
   // Om de ändrar password efteråt återställs confirmed-state.
@@ -1411,7 +1535,9 @@ export default function HomeScreen() {
     if (!isRegisterFormValid || regParsedBirthYear === null) return;
     const trimmedEmail = regEmail.trim();
     const newProfile: ProfileData = {
-      playerName: regPlayerName.trim(),
+      // Strippa ev. trailing dash så namn utan digits sparas som "Anna"
+      // (inte "Anna-") och visas konsistent i lobby/profile/leaderboard.
+      playerName: normalizePlayerName(regPlayerName.trim()),
       email: trimmedEmail,
       birthYear: regParsedBirthYear,
       assistance: regAssistance,
@@ -1906,32 +2032,67 @@ export default function HomeScreen() {
                       regPlayerNameYRef.current = e.nativeEvent.layout.y;
                     }}
                   >
-                    <Text style={modal.fieldLabel}>Player Name</Text>
+                    <Text style={modal.fieldLabel}>Player Name - Letter-digit format</Text>
                     <View style={modal.playerNameRow}>
                       <TextInput
-                        ref={regPlayerNameInputRef}
+                        ref={regPlayerNameLettersRef}
                         style={[
                           modal.inputText,
-                          modal.playerNameInput,
-                          regPlayerNameUnlocked && regPlayerNameStatus !== 'available' && modal.playerNameInputActive,
+                          modal.playerNameLettersInput,
+                          regPlayerNameUnlocked && regPlayerNameKbMode === 'letter' && regPlayerNameStatus !== 'available' && modal.playerNameInputActive,
                         ]}
-                        placeholder="Pick a unique Player Name"
+                        placeholder="Anna"
                         placeholderTextColor={Colors.textDisabled}
-                        value={regPlayerName}
-                        onChangeText={handleRegPlayerNameChange}
-                        maxLength={20}
+                        value={getPlayerNameLetters(regPlayerName)}
+                        maxLength={PLAYER_NAME_MAX_LETTERS}
                         editable={regPlayerNameStatus !== 'checking'}
-                        // Custom CodeKeyboard ersätter system-tangentbordet
-                        // för att undvika modal-jump (samma motivation som
-                        // guest-formen).
                         showSoftInputOnFocus={false}
+                        selection={{
+                          start: getPlayerNameLetters(regPlayerName).length,
+                          end: getPlayerNameLetters(regPlayerName).length,
+                        }}
+                        selectTextOnFocus={false}
+                        contextMenuHidden={true}
                         onFocus={() => {
                           setRegPlayerNameKbMode('letter');
                           setRegPlayerNameFocused(true);
-                          // Scrolla PlayerName-fältet till toppen av ScrollView:n
-                          // så det inte klipps av custom keyboardet under.
-                          // requestAnimationFrame defererar tills next frame så
-                          // ScrollView:s shrink hunnit appliceras (state-flush).
+                          requestAnimationFrame(() => {
+                            regScrollRef.current?.scrollTo({
+                              y: regPlayerNameYRef.current,
+                              animated: true,
+                            });
+                          });
+                        }}
+                        onBlur={() => setRegPlayerNameFocused(false)}
+                      />
+                      <Text style={modal.playerNameSeparator}>–</Text>
+                      <TextInput
+                        ref={regPlayerNameDigitsRef}
+                        style={[
+                          modal.inputText,
+                          modal.playerNameDigitsInput,
+                          regPlayerNameUnlocked && regPlayerNameKbMode === 'digit' && regPlayerNameStatus !== 'available' && modal.playerNameInputActive,
+                          getPlayerNameLetters(regPlayerName).length === 0 && modal.playerNameInputDisabled,
+                        ]}
+                        placeholder="1234"
+                        placeholderTextColor={Colors.textDisabled}
+                        value={getPlayerNameDigits(regPlayerName)}
+                        maxLength={PLAYER_NAME_MAX_DIGITS}
+                        editable={regPlayerNameStatus !== 'checking' && getPlayerNameLetters(regPlayerName).length > 0}
+                        showSoftInputOnFocus={false}
+                        selection={{
+                          start: getPlayerNameDigits(regPlayerName).length,
+                          end: getPlayerNameDigits(regPlayerName).length,
+                        }}
+                        selectTextOnFocus={false}
+                        contextMenuHidden={true}
+                        onFocus={() => {
+                          if (getPlayerNameLetters(regPlayerName).length === 0) {
+                            regPlayerNameLettersRef.current?.focus();
+                            return;
+                          }
+                          setRegPlayerNameKbMode('digit');
+                          setRegPlayerNameFocused(true);
                           requestAnimationFrame(() => {
                             regScrollRef.current?.scrollTo({
                               y: regPlayerNameYRef.current,
@@ -1978,20 +2139,20 @@ export default function HomeScreen() {
                       </TouchableOpacity>
                       <TouchableOpacity
                         onPress={handleRegGenerateName}
-                        disabled={regPlayerName.length > 0 || regPlayerNameStatus === 'checking'}
+                        disabled={regPlayerNameStatus === 'checking'}
                         style={[
                           modal.nameActionBtn,
-                          (regPlayerName.length > 0 || regPlayerNameStatus === 'checking') &&
+                          regPlayerNameStatus === 'checking' &&
                             modal.nameActionBtnDisabled,
                         ]}
                       >
                         <Text style={modal.nameActionBtnText}>Auto-generate</Text>
                       </TouchableOpacity>
                     </View>
-                    {/* När inget status-meddelande visas — visa max-längd-info */}
+                    {/* Status-rad — i idle visas format-hint istället för char-räknare. */}
                     {regPlayerNameStatus === 'idle' && (
                       <Text style={modal.statusHint}>
-                        Max 20 characters · {regPlayerName.length}/20
+                        Format: 1-{PLAYER_NAME_MAX_LETTERS} letters, 0-{PLAYER_NAME_MAX_DIGITS} digits
                       </Text>
                     )}
                     {regPlayerNameStatus === 'checking' && (
@@ -2009,7 +2170,7 @@ export default function HomeScreen() {
                     )}
                     {regPlayerNameStatus === 'invalid' && (
                       <Text style={[modal.statusHint, modal.statusHintError]}>
-                        ✗ Player Name contains inappropriate language — try another
+                        ✗ Player Name not allowed — must follow format and avoid blocked combinations
                       </Text>
                     )}
                   </View>
@@ -2033,12 +2194,12 @@ export default function HomeScreen() {
                           modal.playerNameInput,
                           regPasswordUnlocked && !regPasswordConfirmed && modal.playerNameInputActive,
                         ]}
-                        placeholder="At least 4 characters"
+                        placeholder={`At least ${REG_PASSWORD_MIN_LENGTH} characters`}
                         placeholderTextColor={Colors.textDisabled}
                         value={regPassword}
                         onChangeText={handleRegPasswordChange}
                         secureTextEntry
-                        maxLength={50}
+                        maxLength={REG_PASSWORD_MAX_LENGTH}
                         returnKeyType="done"
                         onSubmitEditing={handleRegConfirmPassword}
                         onFocus={() => {
@@ -2071,6 +2232,9 @@ export default function HomeScreen() {
                         </Text>
                       </TouchableOpacity>
                     </View>
+                    <Text style={modal.statusHint}>
+                      Format: min {REG_PASSWORD_MIN_LENGTH}-{REG_PASSWORD_MAX_LENGTH} characters
+                    </Text>
                   </View>
 
                   {/* Year of birth */}
@@ -2166,6 +2330,9 @@ export default function HomeScreen() {
                     onPress={handleRegPlayerNameKeyPress}
                     onBackspace={handleRegPlayerNameBackspace}
                     onModeToggle={toggleRegPlayerNameKbMode}
+                    // Digit-mode kräver minst 1 letter — toggle-knappen dimmas
+                    // i letter-mode tills letter-sektionen har innehåll.
+                    modeToggleDisabled={regPlayerNameKbMode === 'letter' && regPlayerName.length === 0}
                   />
                 )}
 
@@ -2462,9 +2629,37 @@ const modal = StyleSheet.create({
   playerNameRow: {
     flexDirection: 'row',
     gap: Spacing.sm,
+    alignItems: 'center',
   },
   playerNameInput: {
     flex: 1,
+  },
+  // Split-field PlayerName: letter-fält (vänster) + fixed dash + digit-fält
+  // (höger). Empiriskt tunad ratio 7:6 — letters behöver mer plats än
+  // digits eftersom "GuestAbcde" (10 chars) renderas bredare än "1234567"
+  // (7 narrower digits). paddingHorizontal sänkt till Spacing.sm = 8 (vs
+  // inputText:s default Spacing.lg = 16) — sparar 16px content-yta per
+  // fält så hela namnet + alla 7 siffror ryms.
+  playerNameLettersInput: {
+    flex: 7,
+    minWidth: 0,
+    paddingHorizontal: Spacing.sm,
+    textAlign: 'center',
+  },
+  playerNameDigitsInput: {
+    flex: 6,
+    minWidth: 0,
+    paddingHorizontal: Spacing.sm,
+    textAlign: 'center',
+  },
+  playerNameSeparator: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: Colors.textSecondary,
+    paddingHorizontal: 2,
+  },
+  playerNameInputDisabled: {
+    opacity: 0.45,
   },
   playerNameInputActive: {
     borderColor: Colors.primary,

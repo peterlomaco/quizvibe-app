@@ -46,9 +46,23 @@ import { deactivateRoom, getRoomMeta, isActiveRoom, setRoomMaxPlayers, setRoomPl
 import { clearEjected, isEjected, markEjected } from '../utils/ejectedPlayers';
 import { clearLobbyPlayers, getLobbyPlayers, setLobbyPlayers } from '../utils/mockLobbyPlayers';
 import { clearLobbySettings, getLobbySettings, setLobbySettings } from '../utils/mockLobbySettings';
+import { clearGameStarted, isGameStarted, markGameStarted } from '../utils/mockStartedGames';
 import { PURCHASED_PACKAGES } from '../utils/mockPurchasedPackages';
 import { consumePendingLobbyPlayers } from '../utils/pendingLobby';
-import { generatePlayerName } from '../utils/playerName';
+import {
+  appendPlayerNameDigit,
+  appendPlayerNameLetter,
+  backspacePlayerNameDigits,
+  backspacePlayerNameLetters,
+  generatePlayerName,
+  getPlayerNameDigits,
+  getPlayerNameLetters,
+  hasBlockedLetterLead,
+  isPlayerNameFormatValid,
+  normalizePlayerName,
+  PLAYER_NAME_MAX_DIGITS,
+  PLAYER_NAME_MAX_LETTERS,
+} from '../utils/playerName';
 import { containsProfanity } from '../utils/profanity';
 import { loadProfile, saveProfile, type ProfileData, type Region as ProfileRegion } from '../utils/profileStorage';
 import { ROOM_CODE_DIGITS, ROOM_CODE_LEADING_LETTERS, formatRoomCode, generateRoomCode } from '../utils/roomCode';
@@ -344,6 +358,10 @@ type AddPlayerNameStatus = 'idle' | 'checking' | 'available' | 'taken' | 'invali
 
 function validateAddPlayerName(name: string): 'available' | 'taken' | 'invalid' {
   const trimmed = name.trim();
+  // Format: Abcdef- eller Abcdef-1234567 (1-10 letters + dash + 0-7 digits).
+  if (!isPlayerNameFormatValid(trimmed)) return 'invalid';
+  // Olämpliga ledande par (synced med auto-gen-blocklistan).
+  if (hasBlockedLetterLead(trimmed)) return 'invalid';
   if (containsProfanity(trimmed)) return 'invalid';
   if (TAKEN_PLAYER_NAMES_LOBBY.has(trimmed.toLowerCase())) return 'taken';
   return 'available';
@@ -371,7 +389,9 @@ function AddPlayerModal({ visible, onClose, onAdd }: {
   const [playerNameStatus, setPlayerNameStatus] = useState<AddPlayerNameStatus>('idle');
   const [playerNameKbMode, setPlayerNameKbMode] = useState<'letter' | 'digit'>('letter');
   const [playerNameFocused, setPlayerNameFocused] = useState(false);
-  const playerNameInputRef = useRef<TextInput>(null);
+  // Split-field PlayerName: separat ref per fält (letter + digit).
+  const playerNameLettersRef = useRef<TextInput>(null);
+  const playerNameDigitsRef = useRef<TextInput>(null);
   // Spårar visible-transition så Auto-fyll bara triggar vid open (inte vid
   // re-render efter manuell rensning).
   const prevVisibleRef = useRef(false);
@@ -401,7 +421,8 @@ function AddPlayerModal({ visible, onClose, onAdd }: {
     const wasVisible = prevVisibleRef.current;
     prevVisibleRef.current = visible;
     if (visible && !wasVisible && name === '') {
-      const generated = generatePlayerName(TAKEN_PLAYER_NAMES_LOBBY, 'Guest');
+      // "Guest"-prefix → "GuestAbcde-1234567" (10 letters totalt + 7 digits).
+      const generated = generatePlayerName(TAKEN_PLAYER_NAMES_LOBBY, { prefix: 'Guest' });
       setName(generated);
       setPlayerNameStatus('available');
     }
@@ -413,63 +434,98 @@ function AddPlayerModal({ visible, onClose, onAdd }: {
   const assistanceUnlocked = yearUnlocked && birthYear !== null;
   const isFormValid = playerNameStatus === 'available' && birthYear !== null;
 
-  const handleNameChange = (t: string) => {
-    setName(t);
-    if (playerNameStatus !== 'idle') setPlayerNameStatus('idle');
-  };
-
   const handleCheckPlayerName = () => {
     const trimmed = name.trim();
     if (!trimmed) return;
+    // Auto-inserta dash om användaren bara typat letters innan Check.
+    const normalized = normalizePlayerName(trimmed);
+    if (normalized !== name) setName(normalized);
     Keyboard.dismiss();
     setPlayerNameStatus('checking');
     // Mock-latens — byt mot riktigt API-anrop när backend finns.
     setTimeout(() => {
-      setPlayerNameStatus(validateAddPlayerName(trimmed));
+      setPlayerNameStatus(validateAddPlayerName(normalized));
     }, 600);
   };
 
   const handleRemoveName = () => {
     setName('');
     setPlayerNameStatus('idle');
-    playerNameInputRef.current?.focus();
+    setPlayerNameKbMode('letter');
+    playerNameLettersRef.current?.focus();
   };
 
-  const handleGenerateName = () => {
-    const generated = generatePlayerName(TAKEN_PLAYER_NAMES_LOBBY, 'Guest');
+  const applyAddGenerated = (generated: string) => {
     setName(generated);
     setPlayerNameStatus('available');
     Keyboard.dismiss();
   };
 
-  // Custom CodeKeyboard skickar tecknet vidare hit. Första bokstaven
-  // versal, resten gemener — stilfullare lobbyn-display ("Anna" istf "ANNA").
+  // Auto-generera Player Name. Två branches:
+  //   • Fältet tomt → "Guest"-prefix → "GuestAbcde-1234567".
+  //   • Användaren har redan typat letters → fråga "Try to keep PlayerName
+  //     letters or not?".
+  const handleGenerateName = () => {
+    const trimmedLetters = getPlayerNameLetters(name.trim());
+    if (trimmedLetters.length > 0) {
+      Alert.alert(
+        'Auto-generate Player Name',
+        'Try to keep PlayerName letters or not?',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Replace all',
+            onPress: () => applyAddGenerated(generatePlayerName(TAKEN_PLAYER_NAMES_LOBBY, { prefix: 'Guest' })),
+          },
+          {
+            text: 'Keep letters',
+            onPress: () => applyAddGenerated(generatePlayerName(TAKEN_PLAYER_NAMES_LOBBY, { keepLetters: trimmedLetters })),
+          },
+        ],
+      );
+      return;
+    }
+    applyAddGenerated(generatePlayerName(TAKEN_PLAYER_NAMES_LOBBY, { prefix: 'Guest' }));
+  };
+
+  // CodeKeyboard skickar tecknet hit. Helpers upprätthåller format per
+  // tangenttryck: letters först (max 10, första versal/resten gemener),
+  // dash auto-insertas vid första digit-tryck, max 7 digits.
   const handlePlayerNameKeyPress = (char: string) => {
-    setName((prev) => {
-      if (prev.length >= 20) return prev;
-      let appended = char;
-      if (/[A-Z]/.test(char)) {
-        const hasLetter = /[A-Za-z]/.test(prev);
-        appended = hasLetter ? char.toLowerCase() : char;
-      }
-      return prev + appended;
-    });
+    setName((prev) =>
+      playerNameKbMode === 'letter'
+        ? appendPlayerNameLetter(prev, char)
+        : appendPlayerNameDigit(prev, char),
+    );
     if (playerNameStatus !== 'idle') setPlayerNameStatus('idle');
   };
 
   const handlePlayerNameBackspace = () => {
-    setName((prev) => prev.slice(0, -1));
+    setName((prev) =>
+      playerNameKbMode === 'letter'
+        ? backspacePlayerNameLetters(prev)
+        : backspacePlayerNameDigits(prev),
+    );
     if (playerNameStatus !== 'idle') setPlayerNameStatus('idle');
   };
 
   const togglePlayerNameKbMode = () => {
-    setPlayerNameKbMode((m) => (m === 'letter' ? 'digit' : 'letter'));
+    if (name.length === 0 && playerNameKbMode === 'letter') return;
+    if (playerNameKbMode === 'letter') {
+      setPlayerNameKbMode('digit');
+      playerNameDigitsRef.current?.focus();
+    } else {
+      setPlayerNameKbMode('letter');
+      playerNameLettersRef.current?.focus();
+    }
   };
 
   const handleAdd = () => {
     if (!isFormValid || birthYear === null) return;
     const age = CURRENT_YEAR - birthYear;
-    onAdd(name.trim(), age, assistance);
+    // Strippa ev. trailing dash så Lobby renderar "Anna" istället för "Anna-"
+    // när host la till en gäst utan digits.
+    onAdd(normalizePlayerName(name.trim()), age, assistance);
     onClose();
   };
 
@@ -494,21 +550,60 @@ function AddPlayerModal({ visible, onClose, onAdd }: {
               <Text style={modal.fieldLabel}>Player Name</Text>
               <View style={modal.playerNameRow}>
                 <TextInput
-                  ref={playerNameInputRef}
+                  ref={playerNameLettersRef}
                   style={[
                     modal.inputText,
-                    modal.playerNameInput,
-                    playerNameStatus !== 'available' && modal.playerNameInputActive,
+                    modal.playerNameLettersInput,
+                    playerNameKbMode === 'letter' && playerNameStatus !== 'available' && modal.playerNameInputActive,
                   ]}
-                  placeholder="Pick a unique Player Name"
+                  placeholder="Anna"
                   placeholderTextColor={Colors.textDisabled}
-                  value={name}
-                  onChangeText={handleNameChange}
-                  maxLength={20}
+                  value={getPlayerNameLetters(name)}
+                  maxLength={PLAYER_NAME_MAX_LETTERS}
                   editable={playerNameStatus !== 'checking'}
                   showSoftInputOnFocus={false}
+                  // Cursor låst efter sista tecknet — användaren kan inte
+                  // markera text eller flytta cursor in i mitten. Backspace
+                  // är enda sättet att radera och tar alltid sista tecknet.
+                  selection={{
+                    start: getPlayerNameLetters(name).length,
+                    end: getPlayerNameLetters(name).length,
+                  }}
+                  selectTextOnFocus={false}
+                  contextMenuHidden={true}
                   onFocus={() => {
                     setPlayerNameKbMode('letter');
+                    setPlayerNameFocused(true);
+                  }}
+                  onBlur={() => setPlayerNameFocused(false)}
+                />
+                <Text style={modal.playerNameSeparator}>–</Text>
+                <TextInput
+                  ref={playerNameDigitsRef}
+                  style={[
+                    modal.inputText,
+                    modal.playerNameDigitsInput,
+                    playerNameKbMode === 'digit' && playerNameStatus !== 'available' && modal.playerNameInputActive,
+                    getPlayerNameLetters(name).length === 0 && modal.playerNameInputDisabled,
+                  ]}
+                  placeholder="1234"
+                  placeholderTextColor={Colors.textDisabled}
+                  value={getPlayerNameDigits(name)}
+                  maxLength={PLAYER_NAME_MAX_DIGITS}
+                  editable={playerNameStatus !== 'checking' && getPlayerNameLetters(name).length > 0}
+                  showSoftInputOnFocus={false}
+                  selection={{
+                    start: getPlayerNameDigits(name).length,
+                    end: getPlayerNameDigits(name).length,
+                  }}
+                  selectTextOnFocus={false}
+                  contextMenuHidden={true}
+                  onFocus={() => {
+                    if (getPlayerNameLetters(name).length === 0) {
+                      playerNameLettersRef.current?.focus();
+                      return;
+                    }
+                    setPlayerNameKbMode('digit');
                     setPlayerNameFocused(true);
                   }}
                   onBlur={() => setPlayerNameFocused(false)}
@@ -548,16 +643,21 @@ function AddPlayerModal({ visible, onClose, onAdd }: {
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={handleGenerateName}
-                  disabled={name.length > 0 || playerNameStatus === 'checking'}
+                  disabled={playerNameStatus === 'checking'}
                   style={[
                     modal.nameActionBtn,
-                    (name.length > 0 || playerNameStatus === 'checking') &&
+                    playerNameStatus === 'checking' &&
                       modal.nameActionBtnDisabled,
                   ]}
                 >
                   <Text style={modal.nameActionBtnText}>Auto-generate</Text>
                 </TouchableOpacity>
               </View>
+              {playerNameStatus === 'idle' && (
+                <Text style={modal.statusHint}>
+                  Format: 1-{PLAYER_NAME_MAX_LETTERS} letters, 0-{PLAYER_NAME_MAX_DIGITS} digits
+                </Text>
+              )}
               {playerNameStatus === 'checking' && (
                 <Text style={modal.statusHint}>Checking availability…</Text>
               )}
@@ -573,7 +673,7 @@ function AddPlayerModal({ visible, onClose, onAdd }: {
               )}
               {playerNameStatus === 'invalid' && (
                 <Text style={[modal.statusHint, modal.statusHintError]}>
-                  ✗ Player Name contains inappropriate language — try another
+                  ✗ Player Name not allowed — must follow format and avoid blocked combinations
                 </Text>
               )}
             </View>
@@ -654,6 +754,9 @@ function AddPlayerModal({ visible, onClose, onAdd }: {
               onPress={handlePlayerNameKeyPress}
               onBackspace={handlePlayerNameBackspace}
               onModeToggle={togglePlayerNameKbMode}
+              // Digit-mode kräver minst 1 letter — toggle dimmas i letter-mode
+              // tills letter-sektionen har innehåll.
+              modeToggleDisabled={playerNameKbMode === 'letter' && name.length === 0}
             />
           )}
 
@@ -913,6 +1016,15 @@ export default function LobbyScreen() {
   // körs så vi inte ärver state från en tidigare lobby-session i samma instans.
   useEffect(() => {
     let cancelled = false;
+    // Snäpp scroll-position till toppen vid varje fresh entry. Tab-navigatorn
+    // kan annars återanvända samma route-instans och ärva tidigare scroll-
+    // position — guest-användare som joinar via Join Game hamnade då mitt
+    // på sidan istället för vid headern. requestAnimationFrame ger React
+    // chans att rendera en frame så scroll-targeten existerar innan vi
+    // anropar scrollTo.
+    requestAnimationFrame(() => {
+      mainScrollRef.current?.scrollTo({ y: 0, animated: false });
+    });
     // Host: starta med SEED_PLAYERS (testdata + Alex K. som host-platshållare).
     // Non-host: starta med tom lista — polling-effekten nedan fyller i host:s
     // authoritative spelar-lista (filtrerad till approved). Utan denna gating
@@ -1122,6 +1234,13 @@ export default function LobbyScreen() {
   const [friends, setFriends] = useState<Friend[]>([]);
   const [invitedFriendIds, setInvitedFriendIds] = useState<Set<string>>(new Set());
 
+  // Ref till lobby:s primär-ScrollView. Används för att snäppa scroll-position
+  // till toppen vid varje fresh entry (mount eller URL-params-byte) — utan
+  // detta ärver tab-navigatorn ev. tidigare scroll-position när samma route-
+  // instans återanvänds, så guest-användare som joinar hamnar mitt på sidan
+  // istället för vid headern.
+  const mainScrollRef = useRef<ScrollView | null>(null);
+
   // Guest leave-room sheet — bara aktiv när guestMode är på (gäster har ingen
   // sparad profil och Profile-tabben är meningslös för dem). Tap på guest-
   // pillen i TopUserBanner öppnar sheet:n; "Leave Game Lobby" → Alert-confirm →
@@ -1151,6 +1270,12 @@ export default function LobbyScreen() {
   // till Home. Skiljs från roomDeletedDetected eftersom endast en spelare
   // är drabbad, inte hela rummet.
   const [playerEjectedDetected, setPlayerEjectedDetected] = useState(false);
+  // True när non-host (typ ej approved) har upptäckt att host tryckt Start
+  // Game utan att approverat dem. Triggar info-popup "Host started game
+  // without this user" → OK tar dem till Home. Skiljs från
+  // playerEjectedDetected eftersom det rör en helt annan trigger (Start
+  // Game vs trash-knappen).
+  const [startedWithoutMeDetected, setStartedWithoutMeDetected] = useState(false);
   // True under den korta processing-fasen mellan host:s Yes-konfirmation
   // och navigation till Home. Visar en loading-overlay med "Please Wait —
   // Deleting this Lobby..." + animerade våg-prickar så host:en känner att
@@ -1703,6 +1828,7 @@ export default function LobbyScreen() {
             clearLobbyPlayers(roomCode);
             clearLobbySettings(roomCode);
             clearEjected(roomCode);
+            clearGameStarted(roomCode);
             // Visa loading-overlay i ~1.6s innan navigation. Ger host:en
             // visuell feedback att appen processar och matchar real-
             // backend-känsla där en DELETE-request tar några hundra ms.
@@ -1875,6 +2001,21 @@ export default function LobbyScreen() {
         if (!cancelled) setPlayerEjectedDetected(true);
         return;
       }
+      // Game-started-check: om host tryckt Start Game OCH den här spelaren
+      // inte är approved → "Host started game without this user"-popup +
+      // navigation till Home. Approved non-hosts hanteras inte här ännu
+      // (separat gap: ingen real-time sync flyttar dem till /quiz mock-
+      // tiden ut). Rendering av self-injected raden i player-listan ger
+      // approved-status — vi läser samma stored array som syncen nedan
+      // använder för att avgöra approval.
+      if (ownId && isGameStarted(roomCode)) {
+        const stored = getLobbyPlayers(roomCode);
+        const selfApproved = !!stored?.find((p) => p.id === ownId)?.approved;
+        if (!selfApproved) {
+          if (!cancelled) setStartedWithoutMeDetected(true);
+          return;
+        }
+      }
       const stored = getLobbyPlayers(roomCode);
       const leftSnapshots = await getLeftPlayers(roomCode);
       if (cancelled) return;
@@ -1980,6 +2121,18 @@ export default function LobbyScreen() {
     );
   }, [playerEjectedDetected]);
 
+  // Started-without-me-popup: när host tryckt Start Game utan att approverat
+  // den här spelaren. Speglar samma cancelable:false + OK→Home-mönster.
+  useEffect(() => {
+    if (!startedWithoutMeDetected) return;
+    Alert.alert(
+      'Game already started',
+      'Host started game without this user',
+      [{ text: 'OK', onPress: () => router.replace('/') }],
+      { cancelable: false },
+    );
+  }, [startedWithoutMeDetected]);
+
   // Skickar invite in-app till en vän — sparas i mottagarens per-user-
   // namespacade Waiting Invites-inbox (friend.playerName som nyckel).
   // Använder hostens profil-playerName/avatar som "from"-data.
@@ -2054,6 +2207,14 @@ export default function LobbyScreen() {
       // att blockera spelstart helt på en AsyncStorage-glitch.
     }
 
+    // Markera rumkoden som "game-started" innan navigation — non-host:s
+    // polling-effekt detekterar detta och visar "Host started game without
+    // this user"-popup till spelare som inte hunnit bli approved. Måste
+    // sättas FÖRE router.push så non-host:s nästa poll fångar det medan
+    // host:s component fortfarande är monterad (vid host:s blur clearas
+    // ingen state — markeringen lever till någon lifecycle-cleanup).
+    markGameStarted(roomCode);
+
     router.push({
       pathname: '/quiz',
       params: {
@@ -2091,6 +2252,7 @@ export default function LobbyScreen() {
         }
       />
       <ScrollView
+        ref={mainScrollRef}
         style={styles.scroll}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
@@ -4875,8 +5037,21 @@ const modal = StyleSheet.create({
   cancelText: { fontSize: 14, color: Colors.textSecondary },
 
   // PlayerName-rad: input + Check-knapp inline. Speglar Join-as-Guest-formen.
-  playerNameRow: { flexDirection: 'row', gap: Spacing.sm },
+  playerNameRow: { flexDirection: 'row', gap: Spacing.sm, alignItems: 'center' },
   playerNameInput: { flex: 1 },
+  // Split-field PlayerName: letters (vänster) + fixed dash + digits (höger).
+  // Empiriskt tunad ratio 7:6 — letters behöver mer plats än digits eftersom
+  // "GuestAbcde" (10 chars) är bredare än "1234567" (7 narrower digits).
+  // paddingHorizontal: Spacing.sm sparar content-yta så allt syns.
+  playerNameLettersInput: { flex: 7, minWidth: 0, paddingHorizontal: Spacing.sm, textAlign: 'center' as const },
+  playerNameDigitsInput: { flex: 6, minWidth: 0, paddingHorizontal: Spacing.sm, textAlign: 'center' as const },
+  playerNameSeparator: {
+    fontSize: 22,
+    fontWeight: '700' as const,
+    color: Colors.textSecondary,
+    paddingHorizontal: 2,
+  },
+  playerNameInputDisabled: { opacity: 0.45 },
   playerNameInputActive: { borderColor: Colors.primary },
   checkBtn: {
     minWidth: 72,
