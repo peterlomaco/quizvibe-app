@@ -33,13 +33,37 @@ const RULER_WIDTH = 280;
  * när host:en är Free (max 4 rounds) syns 6–20 grå även för non-host —
  * locked-color speglar host:s rättigheter, men non-host får ingen Premium-
  * CTA eftersom upgrade är host:s ansvar, inte deras.
+ *
+ * `hasSubscription` (host-vyn) styr färgsättningen i två separata grupper:
+ *   • Sub off — klammer GRÅ (#6B7280), tick-streck + siffror GRÅ
+ *     (textDisabled / borderStrong), PREMIUM-badge GRÅ.
+ *   • Sub on — klammer GULD (#F5A623, signalerar "premium territory du
+ *     äger"), tick-streck + siffror BLÅA (Colors.primary, signalerar
+ *     "tillgängliga"; locked-distinktionen försvinner visuellt eftersom
+ *     host har subscription), PREMIUM-badge GULD.
+ *
+ * Pass-the-Phone capar fortfarande rounds till 4 oavsett subscription —
+ * därav klammer + badge syns även med sub on. Skillnaden är att siffrorna
+ * inte ser låsta ut längre, bara att Game Mode begränsar valet just nu.
  */
-export function RoundsRuler({ value, min, gameModeMax, onPremiumPress }: {
+export function RoundsRuler({ value, min, gameModeMax, onPremiumPress, hasSubscription = false }: {
   value: number;
   min: number;
   gameModeMax: number;
   onPremiumPress?: () => void;
+  hasSubscription?: boolean;
 }) {
+  // Klammer-färg: signalerar premium-status (gold = ägd) ELLER låst (grey).
+  const klammerColor = hasSubscription ? '#F5A623' : '#6B7280';
+  // Tick-streck + siffror för locked-intervall: när sub är på får de samma
+  // blå färg som unlocked-tickar (alla siffror unifierade som "tillgängliga"),
+  // när sub är av är de dämpade grå.
+  const lockedTickColor = hasSubscription ? Colors.primary : Colors.borderStrong;
+  const lockedFigureColor = hasSubscription ? Colors.primary : Colors.textDisabled;
+  // PREMIUM-badge:s färgschema — guld med svart text (ägd) eller grå med
+  // vit text (locked).
+  const badgeBg = hasSubscription ? '#F5A623' : '#6B7280';
+  const badgeTextColor = hasSubscription ? '#000' : '#FFF';
   const RULER_MAX = ROUNDS_MAX_INDIV;
   const ticks: number[] = [];
   for (let n = min; n <= RULER_MAX; n += 2) ticks.push(n);
@@ -81,7 +105,7 @@ export function RoundsRuler({ value, min, gameModeMax, onPremiumPress }: {
                 width: 1.5,
                 height: 7,
                 marginTop: -4,
-                backgroundColor: isLocked ? Colors.borderStrong : Colors.primary,
+                backgroundColor: isLocked ? lockedTickColor : Colors.primary,
               }} />
               {isCurrent ? (
                 <View style={roundsRulerStyles.tickBoxCurrent}>
@@ -90,7 +114,7 @@ export function RoundsRuler({ value, min, gameModeMax, onPremiumPress }: {
               ) : (
                 <Text style={[
                   roundsRulerStyles.tickText,
-                  isLocked && roundsRulerStyles.tickTextLocked,
+                  isLocked && { color: lockedFigureColor },
                 ]}>
                   {n}
                 </Text>
@@ -109,6 +133,7 @@ export function RoundsRuler({ value, min, gameModeMax, onPremiumPress }: {
           <View style={[roundsRulerStyles.bracket, {
             left: bracketLeft,
             width: bracketWidth,
+            borderColor: klammerColor,
           }]} />
           <View
             style={{
@@ -121,13 +146,17 @@ export function RoundsRuler({ value, min, gameModeMax, onPremiumPress }: {
             pointerEvents="box-none"
           >
             {/* hasLocked => interactive => onPremiumPress definierad. Säkert
-                att rendera direkt utan onPremiumPress-presence-fallback. */}
+                att rendera direkt utan onPremiumPress-presence-fallback.
+                Badge:n följer subscription-status: guld + svart text när
+                hasSubscription, grå + vit text annars. */}
             <TouchableOpacity
               activeOpacity={0.7}
               onPress={onPremiumPress}
-              style={roundsRulerStyles.premiumBadge}
+              style={[roundsRulerStyles.premiumBadge, { backgroundColor: badgeBg }]}
             >
-              <Text style={roundsRulerStyles.premiumBadgeText}>PREMIUM</Text>
+              <Text style={[roundsRulerStyles.premiumBadgeText, { color: badgeTextColor }]}>
+                PREMIUM
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -172,12 +201,9 @@ const roundsRulerStyles = StyleSheet.create({
     letterSpacing: -0.3,
     marginTop: 9, // matchar tickBoxCurrent.marginTop + (height-fontSize)/2 så raden linjerar
   },
-  tickTextLocked: {
-    color: Colors.textDisabled,
-  },
   // Klammer (uppåt-öppen U) som ramar in locked-tickarna. borderTopWidth=0
-  // implicit; vänster/höger/botten-borders bildar U:t. Grå färg matchar
-  // premiumBadgeGrey-stilen på Individual Devices-knappen i Game Mode-toggle.
+  // implicit; vänster/höger/botten-borders bildar U:t. Färg sätts inline
+  // via `lockedColor` (grå utan subscription, guld med).
   bracket: {
     position: 'absolute',
     top: 0,
@@ -185,17 +211,16 @@ const roundsRulerStyles = StyleSheet.create({
     borderLeftWidth: 1.5,
     borderRightWidth: 1.5,
     borderBottomWidth: 1.5,
-    borderColor: '#6B7280',
     borderBottomLeftRadius: 4,
     borderBottomRightRadius: 4,
   },
-  // Premium-CTA — speglar Individual Devices PREMIUM-badge:n exakt
-  // (`premiumBadge` + `premiumBadgeGrey` i Lobby/Profile-stylesheet:s):
-  // borderRadius 4 (rektangulär tag, inte pill), grå bg #6B7280, vit
-  // text 10px med letterSpacing 0.6. Tap navigerar till Store. Centrering
-  // sköts av wrapper:n över bracket-bredden (alignItems: 'center').
+  // Premium-CTA — speglar Individual Devices PREMIUM-badge:n exakt:
+  // borderRadius 4 (rektangulär tag, inte pill), guld bg #F5A623, svart
+  // text 10px med letterSpacing 0.6. Alltid guld (oavsett hasSubscription).
+  // Tap navigerar till Store. Centrering sköts av wrapper:n över bracket-
+  // bredden (alignItems: 'center').
   premiumBadge: {
-    backgroundColor: '#6B7280',
+    backgroundColor: '#F5A623',
     borderRadius: 4,
     paddingHorizontal: 8,
     paddingVertical: 2,
@@ -203,7 +228,7 @@ const roundsRulerStyles = StyleSheet.create({
   premiumBadgeText: {
     fontSize: 10,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#000',
     letterSpacing: 0.6,
   },
 });

@@ -24,6 +24,7 @@ import { EraMarkerMinus, EraMarkerPlus } from '../components/EraSliderMarker';
 import { PlayerHistorySection } from '../components/PlayerHistorySection';
 import { QuizVibeFriendsLogo } from '../components/QuizVibeFriendsLogo';
 import { QuizVibeQAvatar } from '../components/QuizVibeQAvatar';
+import { ShoppingCartIcon } from '../components/ShoppingCartIcon';
 import {
     ROUNDS_DEFAULT,
     ROUNDS_MAX_INDIV,
@@ -271,7 +272,7 @@ export default function ProfileScreen() {
         'Multiplayer on individual devices requires the Premium subscription. Get it in the Store?',
         [
           { text: 'Cancel', style: 'cancel' },
-          { text: 'Go to Store', onPress: () => router.push('/store') },
+          { text: 'Go to Store', onPress: () => router.push('/store?focus=subscription&from=/profile') },
         ],
       );
       return;
@@ -288,7 +289,7 @@ export default function ProfileScreen() {
         'Hosting up to 12 players requires the Premium subscription. Get it in the Store?',
         [
           { text: 'Cancel', style: 'cancel' },
-          { text: 'Go to Store', onPress: () => router.push('/store') },
+          { text: 'Go to Store', onPress: () => router.push('/store?focus=subscription&from=/profile') },
         ],
       );
       return;
@@ -584,7 +585,7 @@ export default function ProfileScreen() {
               styles.creditsPill,
               pressed && { opacity: 0.85 },
             ]}
-            onPress={() => router.push('/store')}
+            onPress={() => router.push('/store?focus=credits&from=/profile')}
           >
             <Text style={styles.creditsLabel}>Host Game Credits</Text>
             <View style={styles.creditsValueRow}>
@@ -611,7 +612,7 @@ export default function ProfileScreen() {
                       : 'You have no extra credits. Buy some in Store?',
                     [
                       { text: 'Cancel', style: 'cancel' },
-                      { text: 'Go to Store', onPress: () => router.push('/store') },
+                      { text: 'Go to Store', onPress: () => router.push('/store?focus=credits&from=/profile') },
                     ],
                   )
                 }
@@ -1180,7 +1181,8 @@ export default function ProfileScreen() {
                 value={roundsCount}
                 min={ROUNDS_MIN}
                 gameModeMax={roundsMax}
-                onPremiumPress={() => router.push('/store')}
+                onPremiumPress={() => router.push('/store?focus=subscription&from=/profile')}
+                hasSubscription={hasPremium}
               />
             </View>
           </View>
@@ -1229,13 +1231,14 @@ export default function ProfileScreen() {
             {/* Add-knappen — modeOption-baserad styling så storlek + form
                 matchar Individual Devices-knappen. PREMIUM-badge i grå
                 (icke-köpt) variant tills Store-integrationen kan flagga
-                purchase-status; tap → router.push('/store'). */}
+                purchase-status; tap → Store med subscriptions överst (PREMIUM-
+                badge:n signalerar premium-feature). */}
             <Pressable
               style={({ pressed }) => [
                 styles.addPackageBtn,
                 pressed && { opacity: 0.7 },
               ]}
-              onPress={() => router.push('/store')}
+              onPress={() => router.push('/store?focus=packages&from=/profile')}
             >
               <Text style={styles.modeLabel}>+ Add host packages</Text>
               <View
@@ -1827,6 +1830,25 @@ export default function ProfileScreen() {
               </View>
             </View>
 
+            {/* Store-genväg — utan focus-param följer Store sin default-
+                ordning (Basic → Credits → Packages → Subscriptions),
+                samma som direkt tab-tryck på Store. */}
+            <Pressable
+              style={({ pressed }) => [
+                styles.logoutStoreBtn,
+                pressed && { opacity: 0.85 },
+              ]}
+              onPress={() => {
+                setLogoutModalVisible(false);
+                router.push('/store?from=/profile');
+              }}
+            >
+              <View style={styles.logoutStoreBtnInner}>
+                <ShoppingCartIcon size={22} />
+                <Text style={styles.logoutStoreBtnText}>Store</Text>
+              </View>
+            </Pressable>
+
             <Pressable
               style={({ pressed }) => [
                 styles.logoutBtn,
@@ -2040,6 +2062,32 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: Colors.textPrimary,
     marginTop: 2,
+  },
+  // Store-knapp ovanför Log out i logout-sheet:n. Speglar Home-skärmens
+  // profileMenu.secondaryBtn (blå-konturad, neutralt cardElevated bg) så
+  // CTA-hierarkin är: Store (neutral) → Log out (röd, destruktiv) →
+  // Cancel (text-only). Höjd matchar logoutBtn för visuell rytm.
+  logoutStoreBtn: {
+    height: 52,
+    borderRadius: Radius.md,
+    backgroundColor: Colors.cardElevated,
+    borderWidth: 1,
+    borderColor: Colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logoutStoreBtnText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.textPrimary,
+  },
+  // Row-layout för Store-knappen med leading cart-ikon. Knappens egen
+  // alignItems/justifyContent: 'center' centrerar wrapper:n så ikon +
+  // text grupperas centrerat.
+  logoutStoreBtnInner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
   },
   logoutBtn: {
     height: 52,

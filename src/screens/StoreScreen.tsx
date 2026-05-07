@@ -1,3 +1,4 @@
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import React from 'react';
 import {
   Alert,
@@ -8,6 +9,7 @@ import {
   Text,
   View,
 } from 'react-native';
+import { TopUserBanner } from '../components/TopUserBanner';
 import { Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';
 import { track } from '../utils/analytics';
 import { loadProfile, saveProfile } from '../utils/profileStorage';
@@ -159,6 +161,41 @@ const SUBSCRIPTION_FEATURES: SubscriptionFeature[] = [
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
 export default function StoreScreen() {
+  // `?focus=…` styr render-ordning. Tre lägen + default:
+  //   • subscription — Subscriptions överst, sedan Basic → Packages → Credits.
+  //     Sätts av PREMIUM-tap på Individual Devices, Max 12 Players och Rounds-
+  //     rulern (alla subscription-gated features).
+  //   • packages — Packages överst, sedan Basic, sedan "Other"-rubrik
+  //     följt av Credits → Subscriptions. Sätts av "+ Add host packages"-CTA
+  //     (Lobby Game Connections + Profile Customized Host packages).
+  //   • credits — Credits överst, sedan Basic, sedan "Other"-rubrik följt av
+  //     Subscriptions → Packages. Sätts av Host Game Credits-pillen,
+  //     Extras-rutans köp-popup och "Out of Host Game Credits"-popup.
+  //   • default (utan param) — Basic → Credits → Packages → Subscriptions.
+  const { focus, from } = useLocalSearchParams<{ focus?: string; from?: string }>();
+  const focusMode: 'subscription' | 'packages' | 'credits' | 'default' =
+    focus === 'subscription' || focus === 'packages' || focus === 'credits' ? focus : 'default';
+
+  const router = useRouter();
+  // Back-knappens beteende: alla push-callsiter skickar `?from=<path>` med
+  // ursprungsrouten (t.ex. /profile, /lobby, /). Vi router.replace:ar dit
+  // explicit. Det är nödvändigt eftersom tab-byten är laterala i expo-router
+  // och inte registreras i navigations-historiken — `router.back()` hade
+  // poppat förbi tab-byten och hamnat på fel skärm (t.ex. Home när user
+  // egentligen kom från Profile-tabben). Saknas `from` (typiskt direkt tab-
+  // tryck) faller vi tillbaka till canGoBack/back, sedan Home som sista utväg.
+  const handleBack = () => {
+    if (from && typeof from === 'string') {
+      router.replace(from as any);
+      return;
+    }
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace('/(tabs)');
+    }
+  };
+
   // Mock-purchase av credit-paket: bekräfta + öka gameCredits i sparad profil.
   // TODO (backend): byt mot riktig IAP-flow (expo-iap eller RevenueCat).
   const handleBuyCredits = (tier: CreditTier) => {
@@ -249,8 +286,121 @@ export default function StoreScreen() {
     );
   };
 
+  // Sektionerna deklareras som JSX-konstanter så ordningen kan flippas
+  // utan duplicering. `focusMode` styr ordningen + "Other"-rubrik-position.
+  const otherHeading = (
+    <View style={styles.otherHeadingWrap}>
+      <Text style={styles.otherHeading}>Other</Text>
+    </View>
+  );
+
+  const basicSection = (
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>Basic plan</Text>
+      <View style={[styles.tierCard, styles.tierCardActive]}>
+        <View style={styles.freeBadge}>
+          <Text style={styles.freeBadgeText}>FREE</Text>
+        </View>
+        <View style={styles.tierContent}>
+          <View style={styles.tierLeft}>
+            <Text
+              style={styles.tierHeadline}
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.75}
+            >
+              2 (+2 bonus) Host Games / day
+            </Text>
+            <Text style={styles.tierSubline}>+ Unlimited games as invited player</Text>
+            <Text style={styles.tierSubline}>Refreshes every day at midnight CET</Text>
+          </View>
+          <View style={styles.activePill}>
+            <Text style={styles.activePillText}>ACTIVE</Text>
+          </View>
+        </View>
+      </View>
+    </View>
+  );
+
+  const packagesSection = (
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>Customized Host Packages</Text>
+      <Text style={styles.sectionSubtitle}>
+        One-time purchase. Adds extra question content to your Lobby host setup.
+      </Text>
+      <View style={styles.tierList}>
+        {PACKAGE_TIERS.map((tier) => (
+          <PackageTierCard
+            key={tier.id}
+            tier={tier}
+            onBuy={() => handleBuyPackage(tier)}
+          />
+        ))}
+      </View>
+    </View>
+  );
+
+  const creditsSection = (
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>Credit packages</Text>
+      <Text style={styles.sectionSubtitle}>
+        One-time purchase. Credits never expire.
+      </Text>
+      <View style={styles.tierList}>
+        {CREDIT_TIERS.map((tier) => (
+          <CreditTierCard
+            key={tier.id}
+            tier={tier}
+            onBuy={() => handleBuyCredits(tier)}
+          />
+        ))}
+      </View>
+    </View>
+  );
+
+  const subscriptionSection = (
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>QuizVibe membership plans</Text>
+      <Text style={styles.sectionSubtitle}>
+        Unlimited host games + premium features.
+      </Text>
+
+      {/* Feature-lista med Premium-vs-Basic-jämförelse per rad. */}
+      <View style={styles.featureList}>
+        {SUBSCRIPTION_FEATURES.map((feature) => (
+          <View key={feature.premium} style={styles.featureRow}>
+            <Text style={styles.featureCheck}>✓</Text>
+            <View style={styles.featureTextWrap}>
+              <Text style={styles.featurePremium}>{feature.premium}</Text>
+              <Text style={styles.featureBasic}>Basic: {feature.basic}</Text>
+            </View>
+          </View>
+        ))}
+      </View>
+
+      {/* Pris-tiers */}
+      <View style={styles.tierList}>
+        {SUBSCRIPTION_TIERS.map((tier) => (
+          <SubscriptionTierCard
+            key={tier.id}
+            tier={tier}
+            onBuy={() => handleBuySubscription(tier)}
+          />
+        ))}
+      </View>
+
+      <Text style={styles.autoRenewNote}>
+        All subscriptions auto-renew. Cancel anytime in your App Store
+        or Google Play account.
+      </Text>
+    </View>
+  );
+
   return (
     <SafeAreaView style={styles.safe}>
+      {/* Sticky TopUserBanner med ← Back vänster + login-pillen höger.
+          Back kör handleBack ovan (router.back() med Home-tab-fallback). */}
+      <TopUserBanner onBackPress={handleBack} backLabel="Back" />
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.content}
@@ -264,103 +414,40 @@ export default function StoreScreen() {
           </Text>
         </View>
 
-        {/* ── Sektion 1: Basic plan (Free, alltid aktiv) ──────── */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Basic plan</Text>
-          <View style={[styles.tierCard, styles.tierCardActive]}>
-            <View style={styles.freeBadge}>
-              <Text style={styles.freeBadgeText}>FREE</Text>
-            </View>
-            <View style={styles.tierContent}>
-              <View style={styles.tierLeft}>
-                <Text
-                  style={styles.tierHeadline}
-                  numberOfLines={1}
-                  adjustsFontSizeToFit
-                  minimumFontScale={0.75}
-                >
-                  2 (+2 bonus) Host Games / day
-                </Text>
-                <Text style={styles.tierSubline}>+ Unlimited games as invited player</Text>
-                <Text style={styles.tierSubline}>Refreshes every day at midnight CET</Text>
-              </View>
-              <View style={styles.activePill}>
-                <Text style={styles.activePillText}>ACTIVE</Text>
-              </View>
-            </View>
-          </View>
-        </View>
-
-        {/* ── Sektion 2: Customized Host Packages (one-time purchase) ── */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Customized Host Packages</Text>
-          <Text style={styles.sectionSubtitle}>
-            One-time purchase. Adds extra question content to your Lobby host setup.
-          </Text>
-          <View style={styles.tierList}>
-            {PACKAGE_TIERS.map((tier) => (
-              <PackageTierCard
-                key={tier.id}
-                tier={tier}
-                onBuy={() => handleBuyPackage(tier)}
-              />
-            ))}
-          </View>
-        </View>
-
-        {/* ── Sektion 3: Credit packages (one-time purchase) ──── */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Credit packages</Text>
-          <Text style={styles.sectionSubtitle}>
-            One-time purchase. Credits never expire.
-          </Text>
-          <View style={styles.tierList}>
-            {CREDIT_TIERS.map((tier) => (
-              <CreditTierCard
-                key={tier.id}
-                tier={tier}
-                onBuy={() => handleBuyCredits(tier)}
-              />
-            ))}
-          </View>
-        </View>
-
-        {/* ── Sektion 3: QuizVibe Premium (subscription) ──────── */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>QuizVibe membership plans</Text>
-          <Text style={styles.sectionSubtitle}>
-            Unlimited host games + premium features.
-          </Text>
-
-          {/* Feature-lista med Premium-vs-Basic-jämförelse per rad. */}
-          <View style={styles.featureList}>
-            {SUBSCRIPTION_FEATURES.map((feature) => (
-              <View key={feature.premium} style={styles.featureRow}>
-                <Text style={styles.featureCheck}>✓</Text>
-                <View style={styles.featureTextWrap}>
-                  <Text style={styles.featurePremium}>{feature.premium}</Text>
-                  <Text style={styles.featureBasic}>Basic: {feature.basic}</Text>
-                </View>
-              </View>
-            ))}
-          </View>
-
-          {/* Pris-tiers */}
-          <View style={styles.tierList}>
-            {SUBSCRIPTION_TIERS.map((tier) => (
-              <SubscriptionTierCard
-                key={tier.id}
-                tier={tier}
-                onBuy={() => handleBuySubscription(tier)}
-              />
-            ))}
-          </View>
-
-          <Text style={styles.autoRenewNote}>
-            All subscriptions auto-renew. Cancel anytime in your App Store
-            or Google Play account.
-          </Text>
-        </View>
+        {focusMode === 'subscription' && (
+          <>
+            {subscriptionSection}
+            {basicSection}
+            {packagesSection}
+            {creditsSection}
+          </>
+        )}
+        {focusMode === 'packages' && (
+          <>
+            {packagesSection}
+            {basicSection}
+            {otherHeading}
+            {creditsSection}
+            {subscriptionSection}
+          </>
+        )}
+        {focusMode === 'credits' && (
+          <>
+            {creditsSection}
+            {basicSection}
+            {otherHeading}
+            {subscriptionSection}
+            {packagesSection}
+          </>
+        )}
+        {focusMode === 'default' && (
+          <>
+            {basicSection}
+            {creditsSection}
+            {packagesSection}
+            {subscriptionSection}
+          </>
+        )}
 
         <View style={styles.bottomPad} />
       </ScrollView>
@@ -529,6 +616,22 @@ const styles = StyleSheet.create({
     fontSize: FontSize.sm,
     color: Colors.textSecondary,
     marginBottom: Spacing.xs,
+  },
+  // "Other"-rubrik som separerar primära fokus-sektioner (focus=packages
+  // eller focus=credits) från resten av Store-utbudet. Subtilt: tunn
+  // top-border + Typography.overline-stil för att signalera "härnedan
+  // ligger sekundära alternativ" utan att ta över synfältet.
+  otherHeadingWrap: {
+    paddingTop: Spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: Colors.border,
+  },
+  otherHeading: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.bold,
+    color: Colors.textSecondary,
+    letterSpacing: 1.2,
+    textTransform: 'uppercase',
   },
 
   // Feature list (subscription)

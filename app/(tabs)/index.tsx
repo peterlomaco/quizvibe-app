@@ -1,6 +1,7 @@
 import { CodeKeyboard } from '@/src/components/CodeKeyboard';
 import { QuizVibeLogo } from '@/src/components/QuizVibeLogo';
 import { QuizVibeQAvatar } from '@/src/components/QuizVibeQAvatar';
+import { ShoppingCartIcon } from '@/src/components/ShoppingCartIcon';
 import { TopUserBanner } from '@/src/components/TopUserBanner';
 import { Colors, Radius, Spacing } from '@/src/theme';
 import { identify, resetIdentity, track } from '@/src/utils/analytics';
@@ -1663,7 +1664,27 @@ export default function HomeScreen() {
                     });
                   }}
                 >
-                  <Text style={profileMenu.secondaryBtnText}>Profile settings</Text>
+                  <View style={profileMenu.secondaryBtnInner}>
+                    <QuizVibeQAvatar size={26} />
+                    <Text style={profileMenu.secondaryBtnText}>Profile settings</Text>
+                  </View>
+                </TouchableOpacity>
+
+                {/* Store-genväg — utan focus-param följer Store sin default-
+                    ordning (Basic → Credits → Packages → Subscriptions),
+                    samma som direkt tab-tryck på Store. `from=/` så Store:s
+                    Back-knapp tar användaren tillbaka till Home. */}
+                <TouchableOpacity
+                  style={profileMenu.secondaryBtn}
+                  onPress={() => {
+                    setProfileMenuVisible(false);
+                    router.push('/(tabs)/store?from=/');
+                  }}
+                >
+                  <View style={profileMenu.secondaryBtnInner}>
+                    <ShoppingCartIcon size={22} />
+                    <Text style={profileMenu.secondaryBtnText}>Store</Text>
+                  </View>
                 </TouchableOpacity>
 
                 <TouchableOpacity style={profileMenu.logoutBtn} onPress={handleLogout}>
@@ -2773,6 +2794,14 @@ const profileMenu = StyleSheet.create({
     fontSize: 17,
     fontWeight: '600',
     color: Colors.textPrimary,
+  },
+  // Row-layout för secondaryBtn:s med leading-ikon (Profile settings, Store).
+  // Knappens egen alignItems/justifyContent: 'center' centrerar denna inner-
+  // wrapper i sin tur, så ikon + text hamnar centrerat som grupp.
+  secondaryBtnInner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
   },
   // Override för Register: grön kantlinje som matchar FREE-badgen och
   // signalerar "gratis / new-user-friendly".

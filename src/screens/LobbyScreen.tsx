@@ -1268,7 +1268,7 @@ export default function LobbyScreen() {
         'Multiplayer on individual devices requires the "Multiplayer Individual Devices" package. Get it in the Store?',
         [
           { text: 'Cancel', style: 'cancel' },
-          { text: 'Go to Store', onPress: () => router.push('/store') },
+          { text: 'Go to Store', onPress: () => router.push('/store?focus=subscription&from=/lobby') },
         ],
       );
       return;
@@ -1310,7 +1310,7 @@ export default function LobbyScreen() {
         'Hosting up to 12 players requires the Premium subscription. Get it in the Store?',
         [
           { text: 'Cancel', style: 'cancel' },
-          { text: 'Go to Store', onPress: () => router.push('/store') },
+          { text: 'Go to Store', onPress: () => router.push('/store?focus=subscription&from=/lobby') },
         ],
       );
       return;
@@ -2035,7 +2035,7 @@ export default function LobbyScreen() {
         'You have no credits left for today. Buy extra credits in Store, wait for the daily refresh at midnight CET, or upgrade to a QuizVibe membership for unlimited host games.',
         [
           { text: 'Cancel', style: 'cancel' },
-          { text: 'Go to Store', onPress: () => router.push('/(tabs)/store') },
+          { text: 'Go to Store', onPress: () => router.push('/(tabs)/store?focus=credits&from=/lobby') },
         ],
       );
       return;
@@ -2109,7 +2109,7 @@ export default function LobbyScreen() {
                 styles.creditsPill,
                 pressed && { opacity: 0.85 },
               ]}
-              onPress={() => router.push('/(tabs)/store')}
+              onPress={() => router.push('/(tabs)/store?focus=credits&from=/lobby')}
             >
               <Text style={styles.creditsLabel}>Host Game Credits</Text>
               <View style={styles.creditsValueRow}>
@@ -2131,7 +2131,7 @@ export default function LobbyScreen() {
                         : 'You have no extra credits. Buy some in Store?',
                       [
                         { text: 'Cancel', style: 'cancel' },
-                        { text: 'Go to Store', onPress: () => router.push('/(tabs)/store') },
+                        { text: 'Go to Store', onPress: () => router.push('/(tabs)/store?focus=credits&from=/lobby') },
                       ],
                     )
                   }
@@ -2351,22 +2351,33 @@ export default function LobbyScreen() {
               )}
             </TouchableOpacity>
 
-            {/* Individual Devices — premium-låst för host (paketkrav). För host
-                med paket aktivt: kantlinjen, texten och PREMIUM-badge:n är guld
-                (samlat "premium-läge"-uttryck, samma mönster som Max 12 Players-
-                toggle:n i Profile). För icke-host visas blå "lit" kant när läget
-                är aktivt, oavsett deras egna paket. När singlePlayerDefault är
-                checkad: rutan dämpas (samma look som Pass-the-Phone-dimming)
-                och tap bockar av defaulten + defaultar till Pass-the-Phone
-                (alltid Pass-the-Phone på uncheck). */}
+            {/* Individual Devices — premium-låst för host (paketkrav). Host-regel:
+                  • Sub off: grå frame, GRÅ PREMIUM-badge.
+                  • Sub on + Pass-the-Phone eller Single player vald: grå frame
+                    (host har subscription men har valt att INTE köra IndDev),
+                    GULD badge.
+                  • Sub on + IndDev vald: guld frame + muted bg (active premium),
+                    guld badge.
+                Frame är guld endast när IndDev är aktivt valt — host kan ha
+                Premium och ändå föredra Pass-the-Phone eller Single Play. Badgen
+                signalerar däremot subscription-status oavsett vilket läge som
+                är valt (guld = unlocked, grå = locked). För icke-host visas blå
+                "lit" kant när läget är aktivt, oavsett deras egna paket. När
+                singlePlayerDefault är checkad: rutan dämpas (samma look som
+                Pass-the-Phone-dimming) och tap bockar av defaulten + defaultar
+                till Pass-the-Phone (alltid Pass-the-Phone på uncheck). */}
             <TouchableOpacity
               style={[
                 styles.modeOption,
                 singlePlayerDefault
                   ? styles.modeOptionDimmed
-                  : gameMode === 'individual-devices' && (hostMode ? hasMultiplayerPackage : true)
-                    ? (hostMode ? styles.modeOptionPremiumActive : styles.modeOptionIndivActive)
-                    : styles.modeOptionInactive,
+                  : hostMode
+                    ? hasMultiplayerPackage && gameMode === 'individual-devices'
+                      ? styles.modeOptionPremiumActive
+                      : styles.modeOptionInactive
+                    : gameMode === 'individual-devices'
+                      ? styles.modeOptionIndivActive
+                      : styles.modeOptionInactive,
               ]}
               onPress={() => {
                 // Tap på dämpad Individual Devices-ruta är Premium-gated:
@@ -2792,7 +2803,7 @@ export default function LobbyScreen() {
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={styles.addPackageBtn}
-                      onPress={() => router.push('/(tabs)/store')}
+                      onPress={() => router.push('/(tabs)/store?focus=packages&from=/lobby')}
                       activeOpacity={0.7}
                     >
                       <Text style={styles.modeLabel}>+ Add host packages</Text>
@@ -3142,7 +3153,8 @@ export default function LobbyScreen() {
                       value={roundsCount}
                       min={ROUNDS_MIN}
                       gameModeMax={roundsMax}
-                      onPremiumPress={() => router.push('/store')}
+                      onPremiumPress={() => router.push('/store?focus=subscription&from=/lobby')}
+                      hasSubscription={hasMultiplayerPackage}
                     />
                   </View>
                 </>
@@ -4078,10 +4090,11 @@ const styles = StyleSheet.create({
     borderColor: Colors.primary,
     backgroundColor: Colors.primaryMuted,
   },
-  // Guld-tonad aktiv variant — Individual Devices för host med premium-paket.
-  // Speglar PREMIUM-badge:s guldfärg så toggle-rutan, badge:n och texten
-  // bildar ett samlat "premium-läge"-uttryck (samma mönster som Profile:s
-  // Max 12 Players-toggle).
+  // Guld-tonad aktiv variant — Individual Devices för host med premium-paket
+  // OCH läget är aktivt valt. Speglar PREMIUM-badge:s guldfärg så toggle-
+  // rutan, badge:n och texten bildar ett samlat "premium-läge"-uttryck.
+  // Host kan ha Premium men ändå köra Pass-the-Phone eller Single Play —
+  // i de fallen renderas IndDev-rutan grå (modeOptionInactive) trots Premium.
   modeOptionPremiumActive: {
     borderColor: '#F5A623',
     backgroundColor: Colors.primaryMuted,

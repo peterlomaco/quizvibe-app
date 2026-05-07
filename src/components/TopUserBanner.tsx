@@ -15,14 +15,20 @@ interface Props {
    */
   onPress?: () => void;
   /**
-   * Tap-handler för en "Home"-länk i bannerns vänstra kant.
-   * När den är satt renderas QuizVibe Q-ikon med "Home"-text under
-   * (i Colors.primary) till vänster i bannern, och topBoard:en byter
-   * till justifyContent:'space-between' så pillen stannar längst till höger.
-   * Lämna ofylld på skärmar där tillbaka-navigation inte är relevant
-   * (Home, Lobby).
+   * Tap-handler för en tillbaka-länk i bannerns vänstra kant.
+   * När den är satt renderas en leading-ikon (QuizVibe Q vid 'Home',
+   * vänster-chevron vid 'Back') med text under i Colors.primary, och
+   * topBoard:en byter till justifyContent:'space-between' så pillen stannar
+   * längst till höger. Lämna ofylld på skärmar där tillbaka-navigation
+   * inte är relevant (Home, Lobby).
    */
   onBackPress?: () => void;
+  /**
+   * Label för tillbaka-länken. Default 'Home' (visar Q-ikon, navigerar
+   * till startskärmen). Sätt 'Back' i Store för att visa vänster-chevron
+   * + 'Back'-text i stället, och låt onBackPress göra `router.back()`.
+   */
+  backLabel?: 'Home' | 'Back';
   /**
    * Optional kontrollerad profil. Skärmar med in-place-login (som Home,
    * där pillen och login-modalen lever på samma skärm) måste passera
@@ -51,7 +57,7 @@ interface Props {
  * via AsyncStorage på focus så den uppdateras när användaren ändrar
  * playerName/avatar i Profile-tabben och sedan kommer tillbaka.
  */
-export function TopUserBanner({ onPress, onBackPress, profile: profileProp, guestName }: Props) {
+export function TopUserBanner({ onPress, onBackPress, backLabel = 'Home', profile: profileProp, guestName }: Props) {
   const [internalProfile, setInternalProfile] = useState<ProfileData | null>(null);
   const isControlled = profileProp !== undefined;
 
@@ -96,16 +102,29 @@ export function TopUserBanner({ onPress, onBackPress, profile: profileProp, gues
 
   return (
     <View style={[styles.topBoard, onBackPress && styles.topBoardWithBack]}>
-      {onBackPress && (
+      {onBackPress && (backLabel === 'Back' ? (
+        // Plain "← Back" text — speglar Join-as-guest-modalens backBtn-stil:
+        // textSecondary, fontWeight 500, ingen icon-stack. Lättviktigt och
+        // signalerar "stänger denna vy" snarare än "går till en specifik
+        // destination" som Q-iconen gör för 'Home'.
+        <TouchableOpacity
+          style={styles.backLinkSimple}
+          activeOpacity={0.7}
+          onPress={onBackPress}
+          hitSlop={10}
+        >
+          <Text style={styles.backLinkSimpleText}>← Back</Text>
+        </TouchableOpacity>
+      ) : (
         <TouchableOpacity
           style={styles.backLink}
           activeOpacity={0.7}
           onPress={onBackPress}
         >
           <QuizVibeQAvatar size={20} />
-          <Text style={styles.backLinkText}>Home</Text>
+          <Text style={styles.backLinkText}>{backLabel}</Text>
         </TouchableOpacity>
-      )}
+      ))}
       {onPress ? (
         <TouchableOpacity style={pillStyle} activeOpacity={0.7} onPress={onPress}>
           {showBrandAvatar ? (
@@ -160,6 +179,18 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '600',
     color: Colors.primary,
+  },
+  // Join-as-guest-modalens backBtn-style — plain "← Back"-text, ingen icon-
+  // stack. Används i Store där Back betyder "stäng denna vy och gå tillbaka
+  // till föregående route" (router.back()) snarare än hard-coded "Home".
+  backLinkSimple: {
+    paddingVertical: 4,
+    paddingRight: Spacing.md,
+  },
+  backLinkSimpleText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: Colors.textSecondary,
   },
   loginPill: {
     flexDirection: 'row',

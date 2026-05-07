@@ -199,6 +199,11 @@ Five top-level collapsible sections — all use the same tappable-header pattern
 
 **"Profile settings" från Home:s TopUserBanner** (logged-in profil-meny): blå-konturad `secondaryBtn` ovanför röda "Log out"-knappen. Tap stänger menyn och `router.push({ pathname: '/(tabs)/profile', params: { scrollToTop: '1' } })`. Profile-skärmen läser `scrollToTop` via `useLocalSearchParams` och anropar `scrollRef.current?.scrollTo({ y: 0, animated: false })` i en `useFocusEffect` med deps `[localParams.scrollToTop]`, sedan `router.setParams({ scrollToTop: undefined })` för att rensa paramen — annars skulle framtida tab-byten utan param också (felaktigt) snäppa till toppen. Tab-navigatorn bevarar annars senaste scroll-position mellan tab-byten.
 
+**Store-knappar i user-login-modaler** (logged-in läget):
+- **Home `profileMenu`** — `Profile settings` (med leading `<QuizVibeQAvatar size={26} />`) och `Store` (med leading `<ShoppingCartIcon size={22} />`). Båda i `secondaryBtn`-stil. Innehållet wrappas i `secondaryBtnInner` (`flexDirection: 'row'` + `gap: Spacing.sm`); knappens egen `alignItems/justifyContent: 'center'` centrerar wrapper:n så ikon + text grupperas centrerat.
+- **Profile `logoutSheet`** — bara `Store` (med leading `<ShoppingCartIcon size={22} />`) ovanför Log out. Egen `logoutStoreBtn`/`logoutStoreBtnInner`-stilar speglar Home:s `secondaryBtn` (blå-konturad, höjd 52, `Colors.cardElevated` bg).
+- **Båda** kör `router.push('/store?from=/<source>')` utan focus-param → default-ordning (Basic → Credits → Packages → Subscriptions). `from`-paramet säkrar att Store:s ← Back tar tillbaka till exakt rätt ursprungstab (Profile från Profile, Home från Home).
+
 **Friends modal (Profile)** — KeyboardAvoidingView wrap:ar `friendsModal.overlay` med `behavior={Platform.OS === 'ios' ? 'padding' : undefined}` så input-fältet "Add by Player Name" inte täcks av tangentbordet. Android sköter det via systemet automatiskt. Speglar samma KAV-mönster som Register modal — sheet:en pushas uppåt vid keyboard-show.
 
 **`mergeProfileIntoHost`-fallbacks**: när host:s profil saknar `birthYear` eller `assistance` används fallbacks så host-spelarkortet i Lobby alltid har komplett HCP (annars blockas Start Game). `birthYear` saknas → `randomBirthYear()` ger random år 1970–2005 (vuxen 21–56); `assistance` saknas → `'standard'`. `hcpComplete`/`isReady` är alltid `true` på host:s kort eftersom host startar aldrig spelblockerad. En Profile-sida (`randomAdultBirthYear()`) gör motsvarande för Profile:s state-load — defensive auto-save kör om något fält saknas, så slumpvärden inte regenereras vid varje reload.
@@ -235,7 +240,7 @@ Profile-toggle som filtrerar vilka köpta paket som syns i Lobby:n när använda
 Två-knapps-rad direkt under "Customized Host packages"-rubriken i Lobby — host-only:
 
 - **Generic** (vänster, 50% bredd) — visuell indikator + tappbar. Lyser **grön** (`Colors.success` border + `Colors.primaryMuted` bg + grön FREE-badge med svart text) när `selectedExtraPackages.length === 0` (lobby:n kör utan extra-paket = bara basic). **Grå** (borderStrong + transparent bg + grå FREE-badge) så fort minst ett paket är valt — inklusive Select all-läget. Tap på dämpad Generic → Alert "Switch to Generic? This will deactivate all selected packages..." → Switch tömmer `selectedExtraPackages` (alla paket avaktiveras → Generic blir grön igen).
-- **+ Add host packages** (höger, 50% bredd) — egen `addPackageBtn`-styling (modeOption-baserad, transparent bg, borderStrong, `Radius.sm`, 46 px hög). Grå PREMIUM-badge i kantskärande position. Tap → `router.push('/(tabs)/store')`. Ersatte den tidigare pulserande "+ QuizVibe Store"-CTA längst ner i wrappern.
+- **+ Add host packages** (höger, 50% bredd) — egen `addPackageBtn`-styling (modeOption-baserad, transparent bg, borderStrong, `Radius.sm`, 46 px hög). Grå PREMIUM-badge i kantskärande position. Tap → `router.push('/(tabs)/store?focus=packages&from=/lobby')` — Store renderar Packages överst, Back tar tillbaka till Lobby. Ersatte den tidigare pulserande "+ QuizVibe Store"-CTA längst ner i wrappern.
 - Layout `packageActionsRow`: `flexDirection: 'row'` + `gap: 4` (matchar `modeToggle`-gap) + `flex: 1` på båda → 50/50 bredd.
 
 ## Host Game Credits (pill + daily refresh + deduktion)
@@ -248,7 +253,7 @@ Två-knapps-rad direkt under "Customized Host packages"-rubriken i Lobby — hos
   - `gameCredits > 0` → gold border (`#F5A623`) + gold badge med svart text.
   - `gameCredits === 0` → grey border (`#6B7280`) + grey badge med vit text.
 - **Tap på Extras-boxen** → Alert "Extra Host Game Credits" + dynamisk body + Cancel/Go to Store-knappar. Nested Pressable i RN konsumerar tap så outer pillens onPress (som också navigerar till Store) inte fyrar dubbel.
-- **Tap på övriga delar av pillen** → `router.push('/(tabs)/store')`.
+- **Tap på övriga delar av pillen** → `router.push('/(tabs)/store?focus=credits&from=/lobby')` (eller `from=/profile` på Profile-skärmen) — Store renderar Credits överst, Back returnerar till källan.
 
 **Daily refresh** i `src/utils/profileStorage.ts`:
 
@@ -277,6 +282,51 @@ Four sections in `src/screens/StoreScreen.tsx` under header **"Add QuizVibe Prem
 Shared `CreditTierCard`, `PackageTierCard` and `SubscriptionTierCard` mirror the same layout (left: headline + per-game/per-month subline + optional save%; right: price + Buy/Subscribe button).
 
 Mock IAP: credit purchases bump `gameCredits` on profile + emit `purchase_completed` event (`type: 'credits'`). Subscriptions emit same event (`type: 'subscription'`) but don't yet persist state (requires future `ProfileData.subscription` field + RevenueCat integration). Currency hardcoded to `'SEK'` until vendor SDK provides `localizedPrice`.
+
+**Sticky TopUserBanner**: Store har samma sticky-banner som Home/Lobby/Profile, placerad direkt under `<SafeAreaView>` utanför `<ScrollView>`. Använder `TopUserBanner`:s nya `backLabel="Back"`-läge (plain `← Back`-text i textSecondary, speglar Join-as-guest-modalens backBtn-style) istället för default Q + "Home"-stilen. Login-pillen i högra hörnet renderas read-only (ingen `onPress`) — Store-användare ändrar inte profil härifrån.
+
+**`?focus=…`-paramet styr render-ordning** — fyra lägen + default. Sektionerna deklareras som JSX-konstanter (`basicSection`, `packagesSection`, `creditsSection`, `subscriptionSection`) och placeras sedan i ordning beroende på `focusMode`:
+
+| `?focus` | Ordning | Triggas av |
+|---|---|---|
+| `subscription` | Subscription → Basic → Packages → Credits | Individual Devices Premium-popup, Max 12 Players Premium-popup, Rounds-rulerns guld PREMIUM-badge (Lobby + Profile) |
+| `packages` | Packages → Basic → **[Other heading]** → Credits → Subscriptions | "+ Add host packages"-CTA (Lobby Game Connections + Profile Customized Host packages-blocket) |
+| `credits` | Credits → Basic → **[Other heading]** → Subscriptions → Packages | Host Game Credits-pillen, Extras-rutans köp-popup, "Out of Host Game Credits"-popup vid Start Game (Lobby + Profile) |
+| (ingen) | Basic → Credits → Packages → Subscriptions | Direkt tab-tryck OCH user-login-modalens Store-knappar (Home + Profile) |
+
+"Other"-rubriken (`otherHeadingWrap` + `otherHeading`) är en tunn 1px top-border + uppercase overline-stil (textSecondary, letterSpacing 1.2) som visuellt separerar primär-fokus-sektionerna från resten. Renderas bara i `packages`/`credits`-läget — `subscription`-läget och default-läget har ingen Other-rubrik (Subscription-läget är redan top-positionerat och default är "naturlig" ordning).
+
+**`?from=<path>`-paramet styr Back-knappens destination** (kritiskt för korrekt UX):
+
+- Alla push-callsiter skickar `&from=<source-path>`: `/lobby`, `/profile`, eller `/`.
+- Store:s `handleBack` läser `from` och kör `router.replace(from)` — explicit destination istället för `router.back()`.
+- **Varför**: tab-byten är laterala i expo-router och registreras INTE i navigations-historiken. `router.back()` hade poppat förbi tab-byten och hamnat på en irrelevant skärm (t.ex. Home när user egentligen kom från Profile-tabben via tab-tryck → login-pill → Store).
+- Saknas `from` (typiskt direkt tab-tryck på Store) faller `handleBack` tillbaka till `router.canGoBack() → router.back()`, sedan `router.replace('/(tabs)')` (Home) som sista utväg så användaren alltid har en utväg.
+
+## Subscription-styling (host-vyn) — IndDev + Rounds of Game
+
+Två separata color-regler i Lobby:s host-vy som speglar host:s subscription-status. Båda gated på `hasMultiplayerPackage` (Lobby) eller `hasPremium` (Profile, för Rounds-rulern i host-defaults-blocket) — båda hardcoded `false` tills Store-integrationen kopplas in.
+
+**Individual Devices-rutan** (Game Mode-toggle):
+
+| Sub | Vald | Frame | Badge |
+|---|---|---|---|
+| off | nej | grey | grey |
+| on | **ja** (IndDev aktivt) | gold | gold |
+| on | nej (Pass-the-Phone eller Single Play vald) | grey | gold |
+
+Frame är guld **endast** när IndDev faktiskt är vald — host kan ha Premium men ändå föredra Pass-the-Phone eller Single Play. Badgen signalerar däremot ren subscription-status oavsett vilket läge som är valt: guld = unlocked, grey = locked. `singlePlayerDefault`-checkboxen dämpar fortfarande hela rutan oförändrat (grey + grey badge). Implementation: `modeOptionPremiumActive`-stilen appliceras endast när `hasMultiplayerPackage && gameMode === 'individual-devices'`; annars `modeOptionInactive` (grey).
+
+**Rounds of Game-rulern** (`RoundsRuler`-komponenten via `hasSubscription`-prop):
+
+| Sub | Klammer | Tick-streck + Siffror | Badge |
+|---|---|---|---|
+| off | grey #6B7280 | grey (`borderStrong` / `textDisabled`) | grey #6B7280 + vit text |
+| on | gold #F5A623 | **blue** (`Colors.primary`) | gold #F5A623 + svart text |
+
+Två separata färggrupper — klammer + badge växlar grey↔gold (premium-status), tick-streck + siffror växlar grey↔blue (availability). När sub är på blir alla siffror på nummeraxeln blåa (samma som unlocked-tickar) → locked-distinktionen försvinner visuellt eftersom host *äger* dem; klammern + badge stannar dock kvar för att markera att Pass-the-Phone fortsatt capar valet till 4. Lokala variabler i komponenten: `klammerColor`, `lockedTickColor`, `lockedFigureColor`, `badgeBg`, `badgeTextColor` — alla deriverade från `hasSubscription` så call-sites bara passerar bool:en.
+
+Non-host-vyn använder fortfarande default `hasSubscription={false}` → grå styling oavsett host:s subscription-status (klammer + badge döljs ändå när `onPremiumPress` saknas, så bara siffer-färgningen är synlig).
 
 ## Lobby — Game Settings card
 
@@ -608,7 +658,8 @@ Fråge-vyn i [app/quiz.tsx](app/quiz.tsx) är samma layout för `'question'`- oc
 
 - `src/components/QuizVibeLogo.tsx` — brand SVG used on Home and Lobby room-card (both at `size={104}`). The Q-figure (ring + tail + wifi-fan in the center) is shifted **−3 in x, −1 in y** from the original (40, 38) center so the Q+tail bounding box (24-52, 24-52) is centered in the front rounded square (16-60, 16-60, center 38, 38). Wifi-fan replaces the old single dot — three concentric 90°-arcs (radii 3 / 5 / 7, `sweep-flag=1` so they bulge upward) + a 1.5px dot, all centered at (37, 37) (= Q ring center). 90° was chosen over 120° to match the iOS status-bar wifi icon's compactness — sweep-flag=0 produced inverted (frown) arcs, easy to flip back accidentally.
 - `src/components/QuizVibeFriendsLogo.tsx` — brand-mark variant for the QuizVibe friends card on Profile. Q-form + tail + rotated squares are identical to `QuizVibeLogo`, but the wifi-pattern inside the Q ring is replaced with two profile silhouettes (head circle + body rounded-rect side-by-side). ViewBox tightened to `"13 13 54 54"` (vs `"0 0 80 80"` in `QuizVibeLogo`) to crop the empty padding around the rotated squares so visible content fills the render area at small sizes (44-52px). Q is centered at **(38, 38)** to match the squares' pre-rotation visual center, NOT (40, 40) which is the viewBox geometric mid. Default `size=44` to match Spotify/YouTube icon-wraps on the same screen; rendered inside a `friendsIconWrap` (44×44 View) for layout-dimension safety.
-- `src/components/TopUserBanner.tsx` — full-width banner with a login pill (avatar + Player Name, or "Register or Login" when no profile) in the top-right corner. **Optional `onPress`**: when omitted the pill renders as a plain `<View>` istället för `<TouchableOpacity>` (used on Profile screen — user is already there, no destination); Home passes `setProfileMenuVisible(true)`; Lobby passes role-baserad handler (host → delete-sheet, non-host → leave-sheet — se "Lobby — TopUserBanner actions"). **Optional `profile` prop (controlled mode)**: skärmar med in-place-login (Home — login-modalen lever på samma skärm som bannern) MÅSTE passera sin egen profile-state så bannern uppdateras direkt vid login/logout — useFocusEffect-self-load triggar inte eftersom skärmen aldrig tappar focus. Lobby/Profile utelämnar proppen och låter bannern self-loada via useFocusEffect (de re-renderas naturligt vid tab-byte). **Optional `guestName` prop**: när profile saknas men guestName finns visar pillen 👤 + guestName i muted styling (samma look som "Register or Login"-fallback) — driver display för gäster som joinat lobby:n via guest-form. Registrerade users (profile != null) har företräde om båda råkar vara satta. **Sticky-on-scroll pattern**: place as a direct child of `<SafeAreaView>`, **outside** the `<ScrollView>`, so it remains pinned at the top while content scrolls. Used on Home, Lobby, and Profile screens.
+- `src/components/TopUserBanner.tsx` — full-width banner with a login pill (avatar + Player Name, or "Register or Login" when no profile) in the top-right corner. **Optional `onPress`**: when omitted the pill renders as a plain `<View>` istället för `<TouchableOpacity>` (used on Profile screen — user is already there, no destination); Home passes `setProfileMenuVisible(true)`; Lobby passes role-baserad handler (host → delete-sheet, non-host → leave-sheet — se "Lobby — TopUserBanner actions"). **Optional `profile` prop (controlled mode)**: skärmar med in-place-login (Home — login-modalen lever på samma skärm som bannern) MÅSTE passera sin egen profile-state så bannern uppdateras direkt vid login/logout — useFocusEffect-self-load triggar inte eftersom skärmen aldrig tappar focus. Lobby/Profile utelämnar proppen och låter bannern self-loada via useFocusEffect (de re-renderas naturligt vid tab-byte). **Optional `guestName` prop**: när profile saknas men guestName finns visar pillen 👤 + guestName i muted styling (samma look som "Register or Login"-fallback) — driver display för gäster som joinat lobby:n via guest-form. Registrerade users (profile != null) har företräde om båda råkar vara satta. **Optional `onBackPress` + `backLabel?: 'Home' | 'Back'`**: när `onBackPress` är satt renderas en tillbaka-länk i bannerns vänstra kant och `topBoard` byter till `justifyContent: 'space-between'`. `backLabel='Home'` (default) visar Q-avatar + "Home"-text i column-stack (Colors.primary). `backLabel='Back'` visar plain `← Back`-text (Colors.textSecondary, fontWeight 500) som speglar Join-as-guest-modalens backBtn-style — används i Store. **Sticky-on-scroll pattern**: place as a direct child of `<SafeAreaView>`, **outside** the `<ScrollView>`, so it remains pinned at the top while content scrolls. Used on Home, Lobby, Profile, and Store screens.
+- [src/components/ShoppingCartIcon.tsx](src/components/ShoppingCartIcon.tsx) — minimal SVG-ikon (basket-kontur + två hjul i Path/Circle) som leading-ikon på Store-knappar i user-login-modalerna (Home `profileMenu` + Profile `logoutSheet`). Default `size=22`, `color=Colors.textPrimary` så den smälter in i knapptexten istället för att dra fokus.
 - `src/components/CodeKeyboard.tsx` — custom in-app keyboard som används av Room Code-cellerna i JoinModal OCH PlayerName-fältet i båda flödena (guest + register). Se "Custom CodeKeyboard" för props (`letterCharset`, `onModeToggle`), layout-detaljer och rationale.
 - [src/components/RoundsRuler.tsx](src/components/RoundsRuler.tsx) — linjemätare för Number of Rounds + alla `ROUNDS_*`-konstanter (`ROUNDS_MIN=2`, `ROUNDS_MAX_PASS=4`, `ROUNDS_MAX_INDIV=20`, `ROUNDS_STEP=2`, `ROUNDS_DEFAULT=4`). Delas mellan Lobby (host-vy + non-host read-only) och Profile (host-default-block). PREMIUM-pillen över locked-tickarna är rektangulär (`borderRadius: 4`, `paddingHorizontal: 8 / paddingVertical: 2`, `fontSize: 10`) — speglar Individual Devices PREMIUM-badgens form, INTE pill-formen som ursprunglig Buy CTA hade. Centreras under bracket-bredden via en absolutpositionerad wrapper med `alignItems: 'center'` så bredden auto-anpassar till "PREMIUM"-textens bredd (ingen fixed `width: 100` längre).
 - [src/utils/mockPurchasedPackages.ts](src/utils/mockPurchasedPackages.ts) — delad mock över köpta extra-paket (`MusicPackage[]`, default 3 paket: Hip Hop / Rock / Film & Actors). Profile (Customized Host packages-listan) + Lobby (Customized Host packages-block) + Store (PACKAGE_TIERS via shared id:n) refererar alla till denna lista. När Store-integrationen kopplas in ska mock:en bytas mot `loadPurchasedPackages()` mot riktigt backend; call-sites stannar oförändrade.
