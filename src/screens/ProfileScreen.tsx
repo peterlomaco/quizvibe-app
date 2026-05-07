@@ -1,11 +1,13 @@
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
 import * as Haptics from 'expo-haptics';
-import { router, useFocusEffect } from 'expo-router';
-import React, { useCallback, useEffect, useState } from 'react';
+import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
     Alert,
     FlatList,
+    KeyboardAvoidingView,
     Modal,
+    Platform,
     Pressable,
     SafeAreaView,
     ScrollView,
@@ -182,6 +184,13 @@ function DecadeMarks() {
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
 export default function ProfileScreen() {
+  // ScrollView-ref för programmatisk scroll-to-top när man entrar via Home:s
+  // "Profile settings"-knapp (som pushar med scrollToTop=1 i routen-paramen).
+  // Tab-navigatorn bevarar scroll-position mellan tab-byten, så utan denna
+  // hamnar man kvar där man var senast.
+  const scrollRef = useRef<ScrollView>(null);
+  const localParams = useLocalSearchParams<{ scrollToTop?: string }>();
+
   const [source, setSource]               = useState<AvatarSource>('choose');
   const [category, setCategory]           = useState<AvatarCategory>('All');
   const [selectedAvatarId, setSelectedId] = useState<string>('5');
@@ -416,6 +425,19 @@ export default function ProfileScreen() {
     }, []),
   );
 
+  // Scroll till toppen när skärmen entras med scrollToTop=1 i route-paramen
+  // (t.ex. via Home:s TopUserBanner → "Profile settings"-knapp). Tab-navigatorn
+  // bevarar annars senaste scroll-position. router.setParams rensar paramen
+  // efter scroll så efterföljande tab-byten utan param inte trigggar scroll.
+  useFocusEffect(
+    useCallback(() => {
+      if (localParams.scrollToTop === '1') {
+        scrollRef.current?.scrollTo({ y: 0, animated: false });
+        router.setParams({ scrollToTop: undefined });
+      }
+    }, [localParams.scrollToTop]),
+  );
+
   const handleAddFriend = async () => {
     if (!newFriendPlayerName.trim()) return;
     const updated = await addFriend(newFriendPlayerName);
@@ -546,6 +568,7 @@ export default function ProfileScreen() {
         onBackPress={() => router.replace('/')}
       />
       <ScrollView
+        ref={scrollRef}
         style={styles.scroll}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
@@ -1446,7 +1469,10 @@ export default function ProfileScreen() {
         animationType="slide"
         onRequestClose={() => setFriendsModalOpen(false)}
       >
-        <View style={friendsModal.overlay}>
+        <KeyboardAvoidingView
+          style={friendsModal.overlay}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        >
           <Pressable
             style={friendsModal.backdrop}
             onPress={() => setFriendsModalOpen(false)}
@@ -1522,7 +1548,7 @@ export default function ProfileScreen() {
               <Text style={friendsModal.closeBtnText}>Done</Text>
             </Pressable>
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </Modal>
 
       {/* ── Birth year picker modal ──────────────────────────────── */}

@@ -6,6 +6,9 @@ import { Colors, Radius, Spacing } from '@/src/theme';
 import { identify, resetIdentity, track } from '@/src/utils/analytics';
 import { getAvatarEmojiById } from '@/src/utils/avatars';
 import { clearLeftPlayers } from '@/src/utils/leftPlayers';
+import { clearEjected } from '@/src/utils/ejectedPlayers';
+import { clearLobbyPlayers } from '@/src/utils/mockLobbyPlayers';
+import { clearLobbySettings } from '@/src/utils/mockLobbySettings';
 import { getRoomMeta, isActiveRoom, isLobbyFull, isOwnLobby, registerActiveRoom } from '@/src/utils/mockActiveRooms';
 import { generatePlayerName } from '@/src/utils/playerName';
 import { containsProfanity } from '@/src/utils/profanity';
@@ -272,6 +275,25 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
   }, [visible]);
 
   const handleAcceptInvite = async (invite: WaitingInvite) => {
+    // Active-room-check: host kan ha raderat lobby:n mellan att invite
+    // skickades och usern hann confirma. Visa tydlig "Lobby no longer
+    // available"-popup och rensa bort den stale inviten ur listan så user
+    // inte kan tap:a den igen. removeInvite anropas FÖRE Alert eftersom
+    // listan ska vara aktuell direkt vid OK — annars hänger den döda
+    // posten kvar tills nästa modal-open.
+    if (!isActiveRoom(invite.roomCode)) {
+      const updated = await removeInvite(invite.id);
+      setInvites(updated);
+      Alert.alert(
+        'Lobby no longer available',
+        'This lobby has been deleted by the Host.',
+      );
+      return;
+    }
+    // Capacity-check FÖRE removeInvite: om lobby:n är full ska usern få
+    // popup och inviten ligga kvar i listan, så de kan försöka igen om
+    // någon lämnar. Speglar samma check som handleJoinWithCode kör.
+    if (checkLobbyCapacity(invite.roomCode)) return;
     await removeInvite(invite.id);
     onClose();
     router.push({
@@ -1207,8 +1229,13 @@ export default function HomeScreen() {
     });
     // Säkerställ att leftPlayers-storen är tom för den nya koden så
     // ingen stale test-data smyger in i den färska lobby:n och felaktigt
-    // markerar nån som "LEFT THIS GAME LOBBY".
+    // markerar nån som "LEFT THIS GAME LOBBY". Samma princip för mock-
+    // lobbyPlayers-storen — fresh slate så non-host:s polling inte plockar
+    // upp stale spelar-data från en tidigare session med samma kod.
     clearLeftPlayers(code);
+    clearLobbyPlayers(code);
+    clearLobbySettings(code);
+    clearEjected(code);
     track('room_code_created');
     router.push({ pathname: '/(tabs)/lobby', params: { code, isHost: 'true' } });
   };
@@ -1622,6 +1649,22 @@ export default function HomeScreen() {
                     </Text>
                   </View>
                 </View>
+
+                <TouchableOpacity
+                  style={profileMenu.secondaryBtn}
+                  onPress={() => {
+                    setProfileMenuVisible(false);
+                    // scrollToTop=1 så Profile:s useFocusEffect snäpper
+                    // ScrollView:n till toppen — tab-navigatorn bevarar
+                    // annars senaste scroll-position mellan tab-byten.
+                    router.push({
+                      pathname: '/(tabs)/profile',
+                      params: { scrollToTop: '1' },
+                    });
+                  }}
+                >
+                  <Text style={profileMenu.secondaryBtnText}>Profile settings</Text>
+                </TouchableOpacity>
 
                 <TouchableOpacity style={profileMenu.logoutBtn} onPress={handleLogout}>
                   <Text style={profileMenu.logoutText}>Log out</Text>

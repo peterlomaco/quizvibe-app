@@ -60,6 +60,12 @@ interface PlayerRowProps {
   // tryckbar enbart för att visa "cannot be changed"-popup — själva HCP:n
   // auto-deriveras ändå från närmaste age-matched registrerade spelare.
   onGuestHcpTap?: () => void;
+  // När true placeras HCP-badgen i hcpRow:s höger-slot istället för
+  // center-slot. Driver non-host-vyn där varken approve-toggle eller trash-
+  // ikon renderas → höger-slot är tom och badgen flyter snyggare som
+  // bottom-right-element. Default false → host-layouten behålls (badge
+  // centrerad mellan meta-text vänster och approve/trash höger).
+  hcpAlignRight?: boolean;
 }
 
 export function PlayerRow({
@@ -83,6 +89,7 @@ export function PlayerRow({
   hcpOverride,
   onEditPlayer,
   onGuestHcpTap,
+  hcpAlignRight,
 }: PlayerRowProps) {
   const calculatedHcp = hcpComplete && age && assistance
     ? calculateInitialHCP(age, assistance)
@@ -265,10 +272,14 @@ export function PlayerRow({
                 badgeContent
               );
 
-            // Host:s eget kort: HCP-badge höger-justerad (ingen trash på
-            // host:s kort eftersom host inte kan radera sig själv).
-            // Övriga kort: badge centrerad, trash i höger-slot.
-            if (isHostPlayer) {
+            // Host:s eget kort + non-host:s vy (hcpAlignRight): HCP-badge
+            // höger-justerad. För host:s eget kort eftersom host inte kan
+            // radera sig själv (ingen trash). För non-host:s vy eftersom
+            // varken approve-toggle eller trash-ikon renderas → badge flyter
+            // snyggare i höger-slot än mitten.
+            // Övriga kort (host-vy av andra spelare): badge centrerad,
+            // trash i höger-slot.
+            if (isHostPlayer || hcpAlignRight) {
               return (
                 <View style={styles.hcpRowRight}>
                   {wrappedBadge}

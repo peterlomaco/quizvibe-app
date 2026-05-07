@@ -42,7 +42,10 @@ import { getAvatarEmojiById } from '../utils/avatars';
 import { loadFriends, type Friend } from '../utils/friendsStorage';
 import { MIN_HCP, calculateInitialHCP } from '../utils/hcp';
 import { addLeftPlayer, getLeftPlayers } from '../utils/leftPlayers';
-import { deactivateRoom, isActiveRoom, setRoomMaxPlayers, setRoomPlayerCount } from '../utils/mockActiveRooms';
+import { deactivateRoom, getRoomMeta, isActiveRoom, setRoomMaxPlayers, setRoomPlayerCount } from '../utils/mockActiveRooms';
+import { clearEjected, isEjected, markEjected } from '../utils/ejectedPlayers';
+import { clearLobbyPlayers, getLobbyPlayers, setLobbyPlayers } from '../utils/mockLobbyPlayers';
+import { clearLobbySettings, getLobbySettings, setLobbySettings } from '../utils/mockLobbySettings';
 import { PURCHASED_PACKAGES } from '../utils/mockPurchasedPackages';
 import { consumePendingLobbyPlayers } from '../utils/pendingLobby';
 import { generatePlayerName } from '../utils/playerName';
@@ -779,7 +782,7 @@ const waveDotsStyles = StyleSheet.create({
  * för icke-host så de visuellt ser att appen väntar/lever. Cykellängd 1600ms
  * (0/400/800ms-stagger för ON, alla OFF vid 1200ms, 400ms blank-period).
  */
-function SequentialDots() {
+function SequentialDots({ color }: { color?: string } = {}) {
   const dot1 = useRef(new Animated.Value(0)).current;
   const dot2 = useRef(new Animated.Value(0)).current;
   const dot3 = useRef(new Animated.Value(0)).current;
@@ -809,11 +812,12 @@ function SequentialDots() {
     };
   }, [dot1, dot2, dot3]);
 
+  const dotStyle = color ? [sequentialDotsStyles.dot, { color }] : sequentialDotsStyles.dot;
   return (
     <View style={sequentialDotsStyles.row}>
-      <Animated.Text style={[sequentialDotsStyles.dot, { opacity: dot1 }]}>.</Animated.Text>
-      <Animated.Text style={[sequentialDotsStyles.dot, { opacity: dot2 }]}>.</Animated.Text>
-      <Animated.Text style={[sequentialDotsStyles.dot, { opacity: dot3 }]}>.</Animated.Text>
+      <Animated.Text style={[dotStyle, { opacity: dot1 }]}>.</Animated.Text>
+      <Animated.Text style={[dotStyle, { opacity: dot2 }]}>.</Animated.Text>
+      <Animated.Text style={[dotStyle, { opacity: dot3 }]}>.</Animated.Text>
     </View>
   );
 }
@@ -868,6 +872,39 @@ export default function LobbyScreen() {
   // status:en när de öppnar lobby:n.
   const ownPlayerIdRef = useRef<string | null>(null);
 
+  // Gold-glow-animation för host:s Start Game-knapp. Två native-driver-loops
+  // som "andas" tillsammans: halo-opacity (0.4 ↔ 0.85) + subtil scale-pulse
+  // (1 ↔ 1.03). Subtil pulse — knappen är CTA, inte distraherande hopp-effekt.
+  // Loopen startas/stoppas via useEffect-deps på hostMode så non-host:s aldrig
+  // kör onödig animation.
+  const startGlow = useRef(new Animated.Value(0.4)).current;
+  const startPulse = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    // Animationen körs för båda host (Start Game-knappen) och non-host
+    // (Waiting for Host-statusrutan) — båda har gold-glowing pulse-effekt
+    // i samma layout-position. Värdena delas via samma Animated.Value-pair
+    // eftersom bara en av rutorna renderas åt gången per role.
+    const glowLoop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(startGlow, { toValue: 0.85, duration: 1100, useNativeDriver: true }),
+        Animated.timing(startGlow, { toValue: 0.4, duration: 1100, useNativeDriver: true }),
+      ]),
+    );
+    const pulseLoop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(startPulse, { toValue: 1.03, duration: 1100, useNativeDriver: true }),
+        Animated.timing(startPulse, { toValue: 1, duration: 1100, useNativeDriver: true }),
+      ]),
+    );
+    glowLoop.start();
+    pulseLoop.start();
+    return () => {
+      glowLoop.stop();
+      pulseLoop.stop();
+    };
+  }, [startGlow, startPulse]);
+
   // Vid mount OCH vid URL-params-ändring (när lobby-tabben återanvänds över
   // host→guest-transitions inom samma tab-instans, t.ex. host som går home
   // och sen joinar som guest med sin egen kod): kolla pending players från
@@ -876,7 +913,12 @@ export default function LobbyScreen() {
   // körs så vi inte ärver state från en tidigare lobby-session i samma instans.
   useEffect(() => {
     let cancelled = false;
-    setPlayers(SEED_PLAYERS);
+    // Host: starta med SEED_PLAYERS (testdata + Alex K. som host-platshållare).
+    // Non-host: starta med tom lista — polling-effekten nedan fyller i host:s
+    // authoritative spelar-lista (filtrerad till approved). Utan denna gating
+    // skulle non-host se hardcoded fake-spelare i sin vy även om host inte har
+    // godkänt dem.
+    setPlayers(hostMode ? SEED_PLAYERS : []);
     ownPlayerIdRef.current = null;
     // Host: seed lobby-wide settings från profil (Profile:s "Host default
     // settings"-block). Per-fält fallbacks följer den generiska spec:en
@@ -1104,6 +1146,11 @@ export default function LobbyScreen() {
   // har raderat lobby:n). Triggar Alert:en "This Game Lobby has been
   // deleted by Host" → OK-knappen tar dem till Home.
   const [roomDeletedDetected, setRoomDeletedDetected] = useState(false);
+  // True när non-host har upptäckt att host har radat dem ur lobby:n
+  // (trash-action på deras spelar-rad). Triggar info-popup → OK tar dem
+  // till Home. Skiljs från roomDeletedDetected eftersom endast en spelare
+  // är drabbad, inte hela rummet.
+  const [playerEjectedDetected, setPlayerEjectedDetected] = useState(false);
   // True under den korta processing-fasen mellan host:s Yes-konfirmation
   // och navigation till Home. Visar en loading-overlay med "Please Wait —
   // Deleting this Lobby..." + animerade våg-prickar så host:en känner att
@@ -1279,6 +1326,14 @@ export default function LobbyScreen() {
   const isPlayerApproved = (p: LobbyPlayer) => !!p.approved || !!p.isHost;
   const approvedPlayers = players.filter((p) => isPlayerApproved(p));
   const waitingForApproval = players.filter((p) => !isPlayerApproved(p));
+  // Driver "Waiting for approval"-mellansteget för non-host. När host inte
+  // har godkänt mig än ska jag inte se lobby:n överhuvudtaget — bara en
+  // status-skärm. Polling-effekten ovan plockar upp host:s approve-toggle
+  // inom ~2s och då kan jag äntligen se hela lobby:n.
+  const isApprovedByHost =
+    !hostMode &&
+    !!ownPlayerIdRef.current &&
+    players.some((p) => p.id === ownPlayerIdRef.current && !!p.approved);
   // Spotify-kravet beror på Game Mode:
   //  • Pass-the-Phone — bara en enhet skickas runt; en Spotify-låt skulle
   //    tvinga öppna Spotify-appen och stjäla fokus från QuizVibe, vilket
@@ -1371,6 +1426,12 @@ export default function LobbyScreen() {
           text: 'Delete',
           style: 'destructive',
           onPress: () => {
+            // Markera spelaren som ejected i mock-storen FÖRE filter:n så
+            // non-host:s polling-detektion (i samma player-poll-effekt nedan)
+            // kan trigga "User have been removed from this lobby"-popupen.
+            // Inverkar inte host:s flöde — host filtrerar bort raden lokalt
+            // som tidigare.
+            markEjected(roomCode, id);
             setPlayers((prev) => prev.filter((p) => p.id !== id));
           },
         },
@@ -1639,6 +1700,9 @@ export default function LobbyScreen() {
             // upptäcker det inom ~2s (även medan host:s loading-overlay
             // visas — det är realistiskt async-beteende).
             deactivateRoom(roomCode);
+            clearLobbyPlayers(roomCode);
+            clearLobbySettings(roomCode);
+            clearEjected(roomCode);
             // Visa loading-overlay i ~1.6s innan navigation. Ger host:en
             // visuell feedback att appen processar och matchar real-
             // backend-känsla där en DELETE-request tar några hundra ms.
@@ -1678,6 +1742,217 @@ export default function LobbyScreen() {
     return () => clearInterval(interval);
   }, [hostMode, roomCode]);
 
+  // Sync maxPlayers från host:s rummeta för non-host. Speglar room-deletion-
+  // polling-mönstret ovan (initial check + 2s-interval) eftersom mockstoren
+  // saknar event-bus. Utan denna effekt stannar non-host:s lokala maxPlayers
+  // på sin default (4) och Lobby:s "Number of Players"-toggle visar fel
+  // aktiv ruta när host har valt Max 12. Ersätts med WS/SSE-prenumeration
+  // när backend kommer in.
+  useEffect(() => {
+    if (hostMode) return;
+    const syncFromMeta = () => {
+      const meta = getRoomMeta(roomCode);
+      if (meta && meta.maxPlayers !== maxPlayers) {
+        setMaxPlayers(meta.maxPlayers);
+      }
+    };
+    syncFromMeta();
+    const interval = setInterval(syncFromMeta, 2000);
+    return () => clearInterval(interval);
+  }, [hostMode, roomCode, maxPlayers]);
+
+  // Host: skriv players[]-state till mockLobbyPlayers-storen vid varje
+  // ändring så non-hosts kan poll:a och spegla host:s authoritative lista.
+  // Gated på hostMode så non-hosts aldrig skriver tillbaka över host:s
+  // snapshot. När backend kommer in ersätts detta med WS-broadcast från
+  // host:s mutation till alla anslutna non-hosts.
+  useEffect(() => {
+    if (!hostMode) return;
+    setLobbyPlayers(roomCode, players);
+  }, [hostMode, roomCode, players]);
+
+  // Host: skriv host-settings (gameMode, region, era, rounds, response time,
+  // packages, Game Connections-toggles) till mockLobbySettings-storen vid
+  // varje ändring. Speglar samma write-pattern som players-storen ovan.
+  // Non-host:s poll-effekt nedan plockar upp och syncar lokal state.
+  useEffect(() => {
+    if (!hostMode) return;
+    setLobbySettings(roomCode, {
+      gameMode,
+      singlePlayerDefault,
+      region,
+      answerResponseSeconds,
+      eraFrom: eraValues[0],
+      eraTo: eraValues[1],
+      roundsCount,
+      selectedExtraPackages,
+      youtubeEnabled,
+      spotifyHostToggle,
+      profilesEnabled,
+    });
+  }, [
+    hostMode,
+    roomCode,
+    gameMode,
+    singlePlayerDefault,
+    region,
+    answerResponseSeconds,
+    eraValues,
+    roundsCount,
+    selectedExtraPackages,
+    youtubeEnabled,
+    spotifyHostToggle,
+    profilesEnabled,
+  ]);
+
+  // Non-host: poll:a host-settings var 2:a sekund och spegla värden lokalt
+  // så icke-host:s vy alltid stämmer med host:s val (Game Mode, Region,
+  // Game Era, Number of Rounds, Answer response time, Packages, Game
+  // Connections-toggles). Samma 2s-mönster som maxPlayers/players-pollarna.
+  useEffect(() => {
+    if (hostMode) return;
+    const syncFromStore = () => {
+      const stored = getLobbySettings(roomCode);
+      if (!stored) return;
+      setGameMode(stored.gameMode);
+      setSinglePlayerDefault(stored.singlePlayerDefault);
+      setRegion(stored.region);
+      setAnswerResponseSeconds(stored.answerResponseSeconds);
+      setEraValues((prev) =>
+        prev[0] === stored.eraFrom && prev[1] === stored.eraTo
+          ? prev
+          : [stored.eraFrom, stored.eraTo],
+      );
+      setRoundsCount(stored.roundsCount);
+      setSelectedExtraPackages((prev) => {
+        if (
+          prev.length === stored.selectedExtraPackages.length &&
+          prev.every((id, i) => id === stored.selectedExtraPackages[i])
+        ) {
+          return prev;
+        }
+        return stored.selectedExtraPackages;
+      });
+      setYoutubeEnabled(stored.youtubeEnabled);
+      setSpotifyHostToggle(stored.spotifyHostToggle);
+      setProfilesEnabled(stored.profilesEnabled);
+    };
+    syncFromStore();
+    const interval = setInterval(syncFromStore, 2000);
+    return () => clearInterval(interval);
+  }, [hostMode, roomCode]);
+
+  // Non-host: poll:a host:s player-lista var 2:a sekund och rebuild local
+  // players[] från storen.
+  //
+  // Renderingsregler för non-host:
+  //   • Bara approved-spelare (eller host) från host:s lista syns. Trash-
+  //     borttagna spelare är redan ute ur host:s lista (host filtrerar bort
+  //     dem vid radering) → de syns inte heller här.
+  //   • Host-rad ALLTID synlig: även om storen är tom (host har inte hunnit
+  //     skriva) eller saknar isHost-rad, syntheseras en minimal host-rad
+  //     från RoomMeta.hostPlayerName så non-host ser vem de förväntas spela
+  //     med direkt vid join, INNAN host:s första write hunnit propagera.
+  //     Synthen ersätts av real host-data vid nästa poll så fort store har
+  //     fyllts på.
+  //   • Self-injection: om non-host:s ownPlayerIdRef inte finns i host:s
+  //     approved-lista injectas den lokala self-raden så användaren ser sin
+  //     egen status under "To be Approved" tills host approverar.
+  //   • hasLeft-overlay: appliceras inline här (inte via useFocusEffect)
+  //     eftersom polling överskriver players[] varannan sekund — utan
+  //     inline-applicering skulle hasLeft blinka av/på.
+  //   • Orphan-left-spelare (lämnade men inte i host:s lista) injectas så
+  //     non-host ser samma "LEFT THIS GAME LOBBY"-kort som host.
+  useEffect(() => {
+    if (hostMode) return;
+    let cancelled = false;
+    const syncFromStore = async () => {
+      // Eject-check FÖRST: om host har trashat den här spelaren visar vi
+      // popup och avbryter sync:en (player-listan ska inte uppdateras vidare
+      // när användaren ändå snart kastas ut till Home).
+      const ownId = ownPlayerIdRef.current;
+      if (ownId && isEjected(roomCode, ownId)) {
+        if (!cancelled) setPlayerEjectedDetected(true);
+        return;
+      }
+      const stored = getLobbyPlayers(roomCode);
+      const leftSnapshots = await getLeftPlayers(roomCode);
+      if (cancelled) return;
+      const leftIds = new Set(leftSnapshots.map((s) => s.id));
+      let approvedFromHost: LobbyPlayer[] = stored
+        ? stored
+            .filter((p) => !!p.approved || !!p.isHost)
+            .map((p) => {
+              if (p.isHost) return { ...p, hasLeft: false };
+              return { ...p, hasLeft: leftIds.has(p.id) };
+            })
+        : [];
+      // Synthesera host-placeholder från RoomMeta om host saknas i listan
+      // (mock-only — non-host joinar via test-seed-kod eller fresh kod där
+      // host ännu inte hunnit skriva). Använder en stabil ålder (35) +
+      // 'standard' assistance så Assistance · Age · HCP-raden alltid
+      // renderas — utan flicker varannan poll (random skulle ge ny ålder
+      // varje 2s). Real host-data ersätter raden vid nästa poll efter
+      // att host:s write har körts.
+      const hasHost = approvedFromHost.some((p) => p.isHost);
+      if (!hasHost) {
+        const meta = getRoomMeta(roomCode);
+        if (meta?.hostPlayerName) {
+          const syntheticHost: LobbyPlayer = {
+            id: 'synthetic-host',
+            name: meta.hostPlayerName,
+            emoji: '👑',
+            isReady: true,
+            type: 'registered',
+            age: 35,
+            assistance: 'standard',
+            hcpComplete: true,
+            isHost: true,
+            approved: true,
+          };
+          approvedFromHost = [syntheticHost, ...approvedFromHost];
+        }
+      }
+      setPlayers((prev) => {
+        const ownId = ownPlayerIdRef.current;
+        const selfInHostList = ownId
+          ? approvedFromHost.some((p) => p.id === ownId)
+          : false;
+        let next: LobbyPlayer[] = approvedFromHost;
+        if (ownId && !selfInHostList) {
+          const selfRow = prev.find((p) => p.id === ownId);
+          if (selfRow) next = [...next, selfRow];
+        }
+        // Orphan-left: snapshot:s som inte längre finns i host:s lista men
+        // som har lämnat — visa kortet med hasLeft=true så non-host ser
+        // samma history som host.
+        const existingIds = new Set(next.map((p) => p.id));
+        const orphans: LobbyPlayer[] = leftSnapshots
+          .filter((s) => !existingIds.has(s.id))
+          .map((s) => ({
+            id: s.id,
+            name: s.name,
+            emoji: s.emoji,
+            avatarUri: s.avatarUri,
+            isReady: false,
+            type: s.type ?? 'guest',
+            age: s.age,
+            assistance: s.assistance,
+            hcpComplete: s.hcpComplete ?? false,
+            approved: s.approved,
+            hasLeft: true,
+          }));
+        return [...next, ...orphans];
+      });
+    };
+    void syncFromStore();
+    const interval = setInterval(() => { void syncFromStore(); }, 2000);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [hostMode, roomCode]);
+
   // När detection-state slår till: visa native Alert med OK-knapp som
   // tar non-host:en till Home. cancelable:false så användaren inte kan
   // tap:a runt om popup:en — de MÅSTE acknowledgea via OK.
@@ -1691,12 +1966,27 @@ export default function LobbyScreen() {
     );
   }, [roomDeletedDetected]);
 
-  // Skickar invite in-app till en vän — sparas i deras Waiting Invites.
+  // Player-ejected-popup: när host har trashat just denna spelare. Speglar
+  // room-deletion-popupen ovan (cancelable:false + OK→Home) men ramad som
+  // info istället för "deleted lobby" eftersom det rör en enskild spelare,
+  // inte hela rummet.
+  useEffect(() => {
+    if (!playerEjectedDetected) return;
+    Alert.alert(
+      'Removed from lobby',
+      'User have been removed from this lobby',
+      [{ text: 'OK', onPress: () => router.replace('/') }],
+      { cancelable: false },
+    );
+  }, [playerEjectedDetected]);
+
+  // Skickar invite in-app till en vän — sparas i mottagarens per-user-
+  // namespacade Waiting Invites-inbox (friend.playerName som nyckel).
   // Använder hostens profil-playerName/avatar som "from"-data.
   const handleInviteFriend = async (friend: Friend) => {
     const profile = await loadProfile();
     const fromPlayerName = profile?.playerName?.trim() || 'Host';
-    await addInvite({
+    await addInvite(friend.playerName, {
       roomCode,
       fromPlayerName,
       fromAvatarId: profile?.selectedAvatarId,
@@ -1808,67 +2098,70 @@ export default function LobbyScreen() {
       >
         <View style={styles.header}>
           <Text style={styles.screenTitle}>Game Lobby</Text>
-          {/* Host Game Credits-pill — speglar Profile:s motsvarande pill
-              exakt (samma styling, samma värden via loadProfile-source).
+          {/* Host Game Credits-pill — host-only. Speglar Profile:s motsvarande
+              pill exakt (samma styling, samma värden via loadProfile-source).
               Tap navigerar till Store. Värdena uppdateras vid varje fokus
-              på Lobby så de följer Profile:s state utan delay. */}
-          <Pressable
-            style={({ pressed }) => [
-              styles.creditsPill,
-              pressed && { opacity: 0.85 },
-            ]}
-            onPress={() => router.push('/(tabs)/store')}
-          >
-            <Text style={styles.creditsLabel}>Host Game Credits</Text>
-            <View style={styles.creditsValueRow}>
-              <Text style={styles.creditsKey}>Free:</Text>
-              <Text style={[styles.creditsValue, styles.creditsValueFree]}>{freeGameCredits}</Text>
-              <Pressable
-                style={({ pressed }) => [
-                  styles.creditsExtrasBox,
-                  gameCredits > 0
-                    ? styles.creditsExtrasBoxActive
-                    : styles.creditsExtrasBoxInactive,
-                  pressed && { opacity: 0.7 },
-                ]}
-                onPress={() =>
-                  Alert.alert(
-                    'Extra Host Game Credits',
+              på Lobby så de följer Profile:s state utan delay. Renderas inte
+              för non-host (de är inte host i detta spel → credits irrelevanta). */}
+          {hostMode && (
+            <Pressable
+              style={({ pressed }) => [
+                styles.creditsPill,
+                pressed && { opacity: 0.85 },
+              ]}
+              onPress={() => router.push('/(tabs)/store')}
+            >
+              <Text style={styles.creditsLabel}>Host Game Credits</Text>
+              <View style={styles.creditsValueRow}>
+                <Text style={styles.creditsKey}>Free:</Text>
+                <Text style={[styles.creditsValue, styles.creditsValueFree]}>{freeGameCredits}</Text>
+                <Pressable
+                  style={({ pressed }) => [
+                    styles.creditsExtrasBox,
                     gameCredits > 0
-                      ? `You have ${gameCredits} extra credit${gameCredits === 1 ? '' : 's'}. Buy more in Store?`
-                      : 'You have no extra credits. Buy some in Store?',
-                    [
-                      { text: 'Cancel', style: 'cancel' },
-                      { text: 'Go to Store', onPress: () => router.push('/(tabs)/store') },
-                    ],
-                  )
-                }
-              >
-                <Text style={styles.creditsKey}>Extras:</Text>
-                <Text style={[styles.creditsValue, styles.creditsValueExtras]}>{gameCredits}</Text>
-                <View
-                  style={[
-                    styles.creditsExtrasPremiumBadge,
-                    gameCredits > 0
-                      ? styles.creditsExtrasPremiumBadgeActive
-                      : styles.creditsExtrasPremiumBadgeInactive,
+                      ? styles.creditsExtrasBoxActive
+                      : styles.creditsExtrasBoxInactive,
+                    pressed && { opacity: 0.7 },
                   ]}
-                  pointerEvents="none"
-                >
-                  <Text
-                    style={[
-                      styles.creditsExtrasPremiumBadgeText,
+                  onPress={() =>
+                    Alert.alert(
+                      'Extra Host Game Credits',
                       gameCredits > 0
-                        ? styles.creditsExtrasPremiumBadgeTextActive
-                        : styles.creditsExtrasPremiumBadgeTextInactive,
+                        ? `You have ${gameCredits} extra credit${gameCredits === 1 ? '' : 's'}. Buy more in Store?`
+                        : 'You have no extra credits. Buy some in Store?',
+                      [
+                        { text: 'Cancel', style: 'cancel' },
+                        { text: 'Go to Store', onPress: () => router.push('/(tabs)/store') },
+                      ],
+                    )
+                  }
+                >
+                  <Text style={styles.creditsKey}>Extras:</Text>
+                  <Text style={[styles.creditsValue, styles.creditsValueExtras]}>{gameCredits}</Text>
+                  <View
+                    style={[
+                      styles.creditsExtrasPremiumBadge,
+                      gameCredits > 0
+                        ? styles.creditsExtrasPremiumBadgeActive
+                        : styles.creditsExtrasPremiumBadgeInactive,
                     ]}
+                    pointerEvents="none"
                   >
-                    PREMIUM
-                  </Text>
-                </View>
-              </Pressable>
-            </View>
-          </Pressable>
+                    <Text
+                      style={[
+                        styles.creditsExtrasPremiumBadgeText,
+                        gameCredits > 0
+                          ? styles.creditsExtrasPremiumBadgeTextActive
+                          : styles.creditsExtrasPremiumBadgeTextInactive,
+                      ]}
+                    >
+                      PREMIUM
+                    </Text>
+                  </View>
+                </Pressable>
+              </View>
+            </Pressable>
+          )}
         </View>
 
         <Card style={styles.roomCard} padding={Spacing.xl}>
@@ -1947,47 +2240,67 @@ export default function LobbyScreen() {
             tydligt sticker ut utan att se ut som en interaktiv toggle.
             marginTop ger lite extra luft mellan kortets överkant och rubriken. */}
         <View style={[styles.section, { marginTop: Spacing.xs }]}>
-          <Text style={styles.sectionLabel}>Game Mode</Text>
+          {/* Non-host: skriv "GAME MODE - MULTIPLAYER" inline istället för
+              klammer + label under toggle:n nedan. Båda delar samma
+              sectionLabel-style → Typography.overline:s textTransform
+              uppercasar hela strängen automatiskt. */}
+          <Text style={styles.sectionLabel}>
+            {hostMode ? 'Game Mode' : 'Game Mode - Multiplayer'}
+          </Text>
 
           {/* "Use single player mode as default" — sitter ovanför Game
               Mode-toggle:n. När checkad dämpas BÅDA multiplayer-rutorna
               (Pass-the-Phone + Individual Devices) eftersom single-player
               inte använder någon av dem. När bocken tas bort defaultar
-              vi alltid till Pass-the-Phone (gratis-läget). Disabled för
-              non-host (read-only följer host:s val — samma mönster som
-              modeToggle nedan). */}
-          <TouchableOpacity
-            style={styles.singlePlayerRow}
-            activeOpacity={0.7}
-            onPress={() => {
-              setSinglePlayerDefault((v) => {
-                const next = !v;
-                if (!next) {
-                  // Uncheck → defaulta till gratis-läget på BÅDA
-                  // toggles (Pass-the-Phone + Max 4) så lobby:n hamnar
-                  // i ett konsekvent multiplayer-läge.
-                  setGameMode('pass-the-phone');
-                  setMaxPlayers(4);
-                }
-                return next;
-              });
-            }}
-            disabled={!hostMode}
-          >
-            <View
-              style={[
-                styles.singlePlayerCheckbox,
-                singlePlayerDefault && styles.singlePlayerCheckboxChecked,
-              ]}
+              vi alltid till Pass-the-Phone (gratis-läget). Renderas bara
+              för host — non-host ser bara host:s aktuella Game Mode-val
+              via modeToggle nedan, inte single-player-default-inställningen. */}
+          {hostMode && (
+            <TouchableOpacity
+              style={styles.singlePlayerRow}
+              activeOpacity={0.7}
+              onPress={() => {
+                setSinglePlayerDefault((v) => {
+                  const next = !v;
+                  if (next) {
+                    // Toggle ON: lobby:n växlar till single-player → kasta
+                    // ut alla non-host-spelare. Mark dem som ejected i
+                    // mock-storen så deras polling triggar samma "User have
+                    // been removed from this lobby"-popup → OK → Home, som
+                    // host:s trash-action gör. Filtrera bort dem direkt ur
+                    // host:s lokal state så host:s vy visar bara host:en kvar.
+                    // hasLeft-spelare lämnas orörda — de är redan borta och
+                    // behöver inte markeras igen.
+                    players.forEach((p) => {
+                      if (!p.isHost && !p.hasLeft) markEjected(roomCode, p.id);
+                    });
+                    setPlayers((prev) => prev.filter((p) => p.isHost));
+                  } else {
+                    // Uncheck → defaulta till gratis-läget på BÅDA
+                    // toggles (Pass-the-Phone + Max 4) så lobby:n hamnar
+                    // i ett konsekvent multiplayer-läge.
+                    setGameMode('pass-the-phone');
+                    setMaxPlayers(4);
+                  }
+                  return next;
+                });
+              }}
             >
-              {singlePlayerDefault && (
-                <Text style={styles.singlePlayerCheckmark}>✓</Text>
-              )}
-            </View>
-            <Text style={styles.singlePlayerLabel}>
-              Use single player mode as default
-            </Text>
-          </TouchableOpacity>
+              <View
+                style={[
+                  styles.singlePlayerCheckbox,
+                  singlePlayerDefault && styles.singlePlayerCheckboxChecked,
+                ]}
+              >
+                {singlePlayerDefault && (
+                  <Text style={styles.singlePlayerCheckmark}>✓</Text>
+                )}
+              </View>
+              <Text style={styles.singlePlayerLabel}>
+                Use single player mode as default
+              </Text>
+            </TouchableOpacity>
+          )}
 
           <View style={styles.modeToggle}>
             {/* Pass-the-Phone */}
@@ -2113,17 +2426,23 @@ export default function LobbyScreen() {
           {/* Klammer (uppåt-öppen U) under modeToggle:n med "Multiplayer
               mode"-label centrerad. Speglar Profile:s motsvarande klammer
               och Lobby:s Number of Rounds-bracket — samma #6B7280 grå,
-              1.5px borders, 10px höga ben med rundade botten-hörn. */}
-          <View style={styles.multiplayerBracketWrap}>
-            <View style={styles.multiplayerBracket} />
-            <Text style={styles.multiplayerBracketLabel}>Multiplayer mode</Text>
-          </View>
+              1.5px borders, 10px höga ben med rundade botten-hörn. Bara
+              för host — non-host får istället "Multiplayer" inline efter
+              "Game Mode"-rubriken (se ovan). */}
+          {hostMode && (
+            <View style={styles.multiplayerBracketWrap}>
+              <View style={styles.multiplayerBracket} />
+              <Text style={styles.multiplayerBracketLabel}>Multiplayer mode</Text>
+            </View>
+          )}
 
-          <Text style={styles.modeDescription}>
-            {gameMode === 'pass-the-phone'
-              ? 'Players take turns answering on this single device. Free.'
-              : 'Each player plays simultaneously on their own phone. Requires the Multiplayer Individual Devices package.'}
-          </Text>
+          {hostMode && (
+            <Text style={styles.modeDescription}>
+              {gameMode === 'pass-the-phone'
+                ? 'Players take turns answering on this single device. Free.'
+                : 'Each player plays simultaneously on their own phone. Requires the Multiplayer Individual Devices package.'}
+            </Text>
+          )}
 
           {/* ── Number of Players per Game ───────────────────────
               Direkt under Game Mode-toggle:n. Speglar Profile:s host-
@@ -2141,7 +2460,7 @@ export default function LobbyScreen() {
                   singlePlayerDefault
                     ? styles.modeOptionDimmed
                     : maxPlayers === 4
-                      ? styles.modeOptionPassActive
+                      ? (hostMode ? styles.modeOptionPassActive : styles.modeOptionIndivActive)
                       : styles.modeOptionInactive,
                 ]}
                 onPress={() => {
@@ -2165,19 +2484,21 @@ export default function LobbyScreen() {
                 >
                   Max 4 Players
                 </Text>
-                <View
-                  style={[styles.freeBadge, singlePlayerDefault && styles.freeBadgeDimmed]}
-                  pointerEvents="none"
-                >
-                  <Text
-                    style={[
-                      styles.freeBadgeText,
-                      singlePlayerDefault && styles.freeBadgeTextDimmed,
-                    ]}
+                {hostMode && (
+                  <View
+                    style={[styles.freeBadge, singlePlayerDefault && styles.freeBadgeDimmed]}
+                    pointerEvents="none"
                   >
-                    FREE
-                  </Text>
-                </View>
+                    <Text
+                      style={[
+                        styles.freeBadgeText,
+                        singlePlayerDefault && styles.freeBadgeTextDimmed,
+                      ]}
+                    >
+                      FREE
+                    </Text>
+                  </View>
+                )}
               </TouchableOpacity>
               <TouchableOpacity
                 style={[
@@ -2185,7 +2506,7 @@ export default function LobbyScreen() {
                   singlePlayerDefault
                     ? styles.modeOptionDimmed
                     : maxPlayers === 12
-                      ? styles.modeOptionPremiumActive
+                      ? (hostMode ? styles.modeOptionPremiumActive : styles.modeOptionIndivActive)
                       : styles.modeOptionInactive,
                 ]}
                 onPress={() => {
@@ -2207,28 +2528,30 @@ export default function LobbyScreen() {
                 <Text
                   style={[
                     styles.modeLabel,
-                    !singlePlayerDefault && maxPlayers === 12 && styles.modeLabelActivePremium,
+                    !singlePlayerDefault && maxPlayers === 12 && (hostMode ? styles.modeLabelActivePremium : styles.modeLabelActiveFree),
                     singlePlayerDefault && styles.modeLabelDimmed,
                   ]}
                 >
                   Max 12 Players
                 </Text>
-                <View
-                  style={[
-                    styles.premiumBadge,
-                    (singlePlayerDefault || !(maxPlayers === 12 || hasPremium)) && styles.premiumBadgeGrey,
-                  ]}
-                  pointerEvents="none"
-                >
-                  <Text
+                {hostMode && (
+                  <View
                     style={[
-                      styles.premiumBadgeText,
-                      (singlePlayerDefault || !(maxPlayers === 12 || hasPremium)) && styles.premiumBadgeTextGrey,
+                      styles.premiumBadge,
+                      (singlePlayerDefault || !(maxPlayers === 12 || hasPremium)) && styles.premiumBadgeGrey,
                     ]}
+                    pointerEvents="none"
                   >
-                    PREMIUM
-                  </Text>
-                </View>
+                    <Text
+                      style={[
+                        styles.premiumBadgeText,
+                        (singlePlayerDefault || !(maxPlayers === 12 || hasPremium)) && styles.premiumBadgeTextGrey,
+                      ]}
+                    >
+                      PREMIUM
+                    </Text>
+                  </View>
+                )}
               </TouchableOpacity>
             </View>
           </View>
@@ -2240,7 +2563,9 @@ export default function LobbyScreen() {
             *ändras* av host — samma mönster som Game Mode ovanför. */}
         <View style={[styles.section, { marginTop: Spacing.sm }]}>
           <Text style={styles.sectionLabel}>🌍 Region Scope</Text>
-          <Text style={styles.cardSubtitle}>Sets the cultural context for questions</Text>
+          {hostMode && (
+            <Text style={styles.cardSubtitle}>Sets the cultural context for questions</Text>
+          )}
           <TouchableOpacity
             style={styles.regionTrigger}
             activeOpacity={0.7}
@@ -2644,6 +2969,7 @@ export default function LobbyScreen() {
                 hcpOverride={player.hcpOverride}
                 onEditPlayer={hostMode && !player.hasLeft ? () => openPlayerEdit(player.id) : undefined}
                 onGuestHcpTap={hostMode && !player.hasLeft && player.type === 'guest' ? () => Alert.alert('Guest HCP', 'Guest HCP cannot be changed') : undefined}
+                hcpAlignRight={!hostMode}
               />
             ))}
 
@@ -2692,6 +3018,7 @@ export default function LobbyScreen() {
                     hcpOverride={player.hcpOverride}
                     onEditPlayer={hostMode && !player.hasLeft ? () => openPlayerEdit(player.id) : undefined}
                     onGuestHcpTap={hostMode && !player.hasLeft && player.type === 'guest' ? () => Alert.alert('Guest HCP', 'Guest HCP cannot be changed') : undefined}
+                    hcpAlignRight={!hostMode}
                   />
                 ))}
               </View>
@@ -2716,7 +3043,9 @@ export default function LobbyScreen() {
             {/* Game Era */}
             <View>
               <Text style={styles.cardTitle}>🕐 Game Era (min 10 year interval)</Text>
-              <Text style={styles.cardSubtitle}>Set the time span for questions</Text>
+              {hostMode && (
+                <Text style={styles.cardSubtitle}>Set the time span for questions</Text>
+              )}
               {/* Det valda årtalsintervallet visas i samma gul/glow-ruta för
                   både host och non-host (in-game year-selector-paritet). Host
                   får dessutom slidern + DecadeMarks under för att kunna dra.
@@ -2779,7 +3108,9 @@ export default function LobbyScreen() {
             {/* Number of Rounds */}
             <View>
               <Text style={styles.cardTitle}>🎯 Number of Rounds</Text>
-              <Text style={styles.cardSubtitle}>How many rounds in this game</Text>
+              {hostMode && (
+                <Text style={styles.cardSubtitle}>How many rounds in this game</Text>
+              )}
               {/* Siffran ramas in i samma blå-bordred ruta för både host och
                   non-host. Host får -/+ knappar på sidorna och RoundsRuler
                   under för att stega och se intervallet. */}
@@ -2835,6 +3166,40 @@ export default function LobbyScreen() {
                 </>
               )}
             </View>
+
+            {/* Answer response time */}
+            <View>
+              <Text style={styles.cardTitle}>⏱️ Answer response time</Text>
+              <Text style={styles.cardSubtitle}>Seconds players have to answer each question</Text>
+              {/* 4-knapps-rad (15/30/45/60). Renderas för alla i lobbyn så
+                  non-host ser host:s val i real-tid; bara host kan ändra
+                  (disabled={!hostMode}). Default-värdet seeds från host:s
+                  profil via host-seed-effekten ovan. */}
+              <View style={styles.responseRow}>
+                {([15, 30, 45, 60] as const).map((sec) => {
+                  const isActive = answerResponseSeconds === sec;
+                  return (
+                    <Pressable
+                      key={sec}
+                      onPress={() => setAnswerResponseSeconds(sec)}
+                      disabled={!hostMode}
+                      style={({ pressed }) => [
+                        styles.responseBtn,
+                        isActive ? styles.responseBtnActive : styles.responseBtnInactive,
+                        pressed && hostMode && { opacity: 0.85 },
+                      ]}
+                    >
+                      <Text style={[
+                        styles.responseBtnText,
+                        isActive && styles.responseBtnTextActive,
+                      ]}>
+                        {sec}s
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+            </View>
           </View>
         </View>
 
@@ -2844,23 +3209,49 @@ export default function LobbyScreen() {
             event som host:s Start Game-tap fyrar. */}
         {hostMode && (
           <View style={styles.startSection}>
-            <Button
-              label="Start Game"
-              onPress={handleStartGame}
-              variant="primary"
-            />
+            {/* Gold-glowing CTA. Animated halo-View + iOS gold-shadow ger
+                cross-platform glow (Android har ingen shadowColor-support, då
+                bär halo:n hela glow-effekten). Mörk text mot gold-bg matchar
+                era-slider-thumb-mönstret (Colors.background-glyph på guld). */}
+            <Animated.View
+              style={[styles.startGameWrap, { transform: [{ scale: startPulse }] }]}
+            >
+              <Animated.View
+                style={[styles.startGameHalo, { opacity: startGlow }]}
+                pointerEvents="none"
+              />
+              <Pressable
+                onPress={handleStartGame}
+                style={({ pressed }) => [
+                  styles.startGameButton,
+                  pressed && { opacity: 0.85 },
+                ]}
+              >
+                <Text style={styles.startGameLabel}>Start Game</Text>
+              </Pressable>
+            </Animated.View>
           </View>
         )}
 
         {/* Non-host: status-ruta i samma layout-position som host:s
             Start Game-knapp. Sekventiella prickar signalerar att appen
-            lever och väntar på host:ens spelstart. */}
+            lever och väntar på host:ens spelstart. Gold-glowing visuellt
+            språk speglar host:s Start Game-knapp så båda roller har samma
+            "ready"-vibe i CTA-positionen. */}
         {!hostMode && (
           <View style={styles.startSection}>
-            <View style={styles.waitingForHostBox}>
-              <Text style={styles.waitingForHostText}>Waiting for Host to Start Game</Text>
-              <SequentialDots />
-            </View>
+            <Animated.View
+              style={[styles.startGameWrap, { transform: [{ scale: startPulse }] }]}
+            >
+              <Animated.View
+                style={[styles.startGameHalo, { opacity: startGlow }]}
+                pointerEvents="none"
+              />
+              <View style={[styles.startGameButton, styles.waitingForHostBox]}>
+                <Text style={styles.waitingForHostText}>Waiting for Host to Start Game</Text>
+                <SequentialDots color={Colors.background} />
+              </View>
+            </Animated.View>
           </View>
         )}
 
@@ -4269,7 +4660,7 @@ const styles = StyleSheet.create({
   eraDisplayDash: { fontSize: 28, fontWeight: '300', color: Colors.textSecondary },
   // Non-host Game Era — speglar in-game year-selector-rutan från app/quiz.tsx
   // (BOX_COLOR='#F5A623', BOX_BG='rgba(26,48,80,0.92)'). Ingen årtalslinje här.
-  eraGuestBoxWrap: { alignItems: 'center', paddingVertical: Spacing.sm },
+  eraGuestBoxWrap: { alignItems: 'center', paddingTop: Spacing.xl, paddingBottom: Spacing.sm },
   eraGuestBox: {
     paddingHorizontal: Spacing.xl,
     paddingVertical: Spacing.md,
@@ -4356,28 +4747,91 @@ const styles = StyleSheet.create({
   regionTriggerText: { flex: 1, fontSize: FontSize.md, fontWeight: FontWeight.medium, color: Colors.textPrimary },
 
   startSection: { gap: Spacing.md },
+  // Answer response time-rad: 4 knappar (15/30/45/60s) på en rad. Active-
+  // varianten speglar Number of Rounds:s blå-bordred ruta (primaryBorder +
+  // primaryMuted bg) så Quiz Settings-blocket har konsekvent färgvokabulär.
+  responseRow: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+  },
+  responseBtn: {
+    flex: 1,
+    height: 44,
+    borderRadius: Radius.md,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  responseBtnActive: {
+    borderColor: Colors.primaryBorder,
+    backgroundColor: Colors.primaryMuted,
+  },
+  responseBtnInactive: {
+    borderColor: Colors.borderStrong,
+    backgroundColor: 'transparent',
+  },
+  responseBtnText: {
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.semibold,
+    color: Colors.textSecondary,
+  },
+  responseBtnTextActive: {
+    color: Colors.textPrimary,
+    fontWeight: FontWeight.bold,
+  },
+  // Gold-glowing Start Game-knapp (host-only). Wrap håller position-context
+  // för halo:n; halo är absolut-positionerad ruta som extender utanför
+  // knappens kanter och får opacity-pulserad bakgrundsfärg så glow:en lyser
+  // genom utan att klippas av knappens egen border-radius.
+  startGameWrap: {
+    position: 'relative',
+    alignSelf: 'stretch',
+  },
+  startGameHalo: {
+    position: 'absolute',
+    top: -8,
+    left: -8,
+    right: -8,
+    bottom: -8,
+    borderRadius: Radius.md + 4,
+    backgroundColor: Colors.warning,
+  },
+  startGameButton: {
+    height: 52,
+    borderRadius: Radius.md,
+    backgroundColor: Colors.warning,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: Spacing.xl,
+    shadowColor: Colors.warning,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.85,
+    shadowRadius: 18,
+    elevation: 12,
+  },
+  startGameLabel: {
+    fontSize: FontSize.xl,
+    fontWeight: FontWeight.bold,
+    color: Colors.background,
+    letterSpacing: 0.6,
+  },
 
   // Waiting-ruta för non-host — speglar Button:s base-mått (52px höjd,
   // Radius.md) men styls som en passiv status-pillar med subtila brand-
   // toner: primaryMuted bg + primaryBorder kant + textPrimary text.
   // Layouten är row så texten + SequentialDots står på samma rad.
+  // Override på startGameButton för Waiting-rutan: byt till row-layout så
+  // text + SequentialDots står sida vid sida. Bg/glow/storlek ärvs från
+  // startGameButton (gold-bg + iOS shadow). Kombineras via stil-array i
+  // render: [styles.startGameButton, styles.waitingForHostBox].
   waitingForHostBox: {
-    height: 52,
-    borderRadius: Radius.md,
-    backgroundColor: Colors.primaryMuted,
-    borderWidth: 1,
-    borderColor: Colors.primaryBorder,
-    alignSelf: 'stretch',
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: Spacing.lg,
   },
   waitingForHostText: {
     fontSize: FontSize.md,
-    fontWeight: FontWeight.semibold,
-    color: Colors.textPrimary,
-    letterSpacing: 0.1,
+    fontWeight: FontWeight.bold,
+    color: Colors.background,
+    letterSpacing: 0.4,
   },
   startHint: { fontSize: FontSize.xs, color: Colors.textSecondary, textAlign: 'center', lineHeight: 17 },
   bottomPad: { height: Spacing.xl },

@@ -26,14 +26,18 @@ const RULER_WIDTH = 280;
  * ramas in av en uppåt-öppen klammer med en klickbar "Premium"-knapp under
  * som leder till Store. Delas mellan Lobby:s host-vy och Profile:s host-
  * default-block.
+ *
+ * `onPremiumPress` saknas → read-only-läge: klammer + PREMIUM-badge döljs
+ * helt. Locked-tickarna (n > gameModeMax) renderas dock fortsatt i grått
+ * så non-host ser korrekt vilka rounds-värden host *kan* välja. Det betyder:
+ * när host:en är Free (max 4 rounds) syns 6–20 grå även för non-host —
+ * locked-color speglar host:s rättigheter, men non-host får ingen Premium-
+ * CTA eftersom upgrade är host:s ansvar, inte deras.
  */
 export function RoundsRuler({ value, min, gameModeMax, onPremiumPress }: {
   value: number;
   min: number;
   gameModeMax: number;
-  // Optional: utan callback renderas Premium-pillen som plain View (icke-
-  // klickbar för non-host). Visuellt identisk så icke-host ser samma info
-  // som host men kan inte navigera till Store härifrån.
   onPremiumPress?: () => void;
 }) {
   const RULER_MAX = ROUNDS_MAX_INDIV;
@@ -41,7 +45,11 @@ export function RoundsRuler({ value, min, gameModeMax, onPremiumPress }: {
   for (let n = min; n <= RULER_MAX; n += 2) ticks.push(n);
   const range = RULER_MAX - min;
   const fillWidth = ((value - min) / range) * RULER_WIDTH;
-  const hasLocked = gameModeMax < RULER_MAX;
+  // Read-only-vyn (non-host i Lobby) tar bort allt locked-vokabulär. Klammern
+  // visas bara när komponenten är interaktiv (onPremiumPress definierad) OCH
+  // det faktiskt finns locked-tickar.
+  const interactive = !!onPremiumPress;
+  const hasLocked = interactive && gameModeMax < RULER_MAX;
 
   // Klammer-positionering: spänner över alla locked-tickar (gameModeMax+2 → 20).
   // Lite extra bredd så armarna omsluter siffrorna, inte sitter innanför dem.
@@ -61,6 +69,11 @@ export function RoundsRuler({ value, min, gameModeMax, onPremiumPress }: {
         {ticks.map((n) => {
           const position = ((n - min) / range) * RULER_WIDTH;
           const isCurrent = n === value;
+          // Locked-tick = utanför host:s nuvarande gameMode-max. Gäller både
+          // host-vyn (visualiserar Premium-tier-låsning) och non-host-vyn
+          // (speglar host:s rättigheter — om host inte har Premium så är
+          // 6–20 grå även för non-host). Det är BARA klammer + PREMIUM-
+          // badge som hides i read-only-läget, inte själva locked-stylingen.
           const isLocked = n > gameModeMax;
           return (
             <View key={n} style={{ position: 'absolute', left: position - 13, width: 26, alignItems: 'center' }}>
@@ -107,19 +120,15 @@ export function RoundsRuler({ value, min, gameModeMax, onPremiumPress }: {
             }}
             pointerEvents="box-none"
           >
-            {onPremiumPress ? (
-              <TouchableOpacity
-                activeOpacity={0.7}
-                onPress={onPremiumPress}
-                style={roundsRulerStyles.premiumBadge}
-              >
-                <Text style={roundsRulerStyles.premiumBadgeText}>PREMIUM</Text>
-              </TouchableOpacity>
-            ) : (
-              <View style={roundsRulerStyles.premiumBadge} pointerEvents="none">
-                <Text style={roundsRulerStyles.premiumBadgeText}>PREMIUM</Text>
-              </View>
-            )}
+            {/* hasLocked => interactive => onPremiumPress definierad. Säkert
+                att rendera direkt utan onPremiumPress-presence-fallback. */}
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={onPremiumPress}
+              style={roundsRulerStyles.premiumBadge}
+            >
+              <Text style={roundsRulerStyles.premiumBadgeText}>PREMIUM</Text>
+            </TouchableOpacity>
           </View>
         </View>
       )}

@@ -16,6 +16,9 @@ import { saveLatestResult, type GameResult, type RoundResult } from '@/src/utils
 import { clearPendingLobbyPlayers, savePendingLobbyPlayers } from '@/src/utils/pendingLobby';
 import { clearLeftPlayers } from '@/src/utils/leftPlayers';
 import { deactivateRoom, registerActiveRoom } from '@/src/utils/mockActiveRooms';
+import { clearEjected } from '@/src/utils/ejectedPlayers';
+import { clearLobbyPlayers } from '@/src/utils/mockLobbyPlayers';
+import { clearLobbySettings } from '@/src/utils/mockLobbySettings';
 import { loadProfile } from '@/src/utils/profileStorage';
 import { generateRoomCode } from '@/src/utils/roomCode';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -693,8 +696,13 @@ export default function QuizScreen() {
       currentPlayerCount: initialCount,
       hostPlayerName: profile?.playerName ?? '',
     });
-    // Färsk leftPlayers-store för nya koden — undviker stale test-data.
+    // Färsk leftPlayers-store + lobbyPlayers-store + ejected-store för nya
+    // koden — undviker stale test-data och garanterar att non-host:s polling
+    // startar tomt utan eject-status från en tidigare session.
     clearLeftPlayers(newCode);
+    clearLobbyPlayers(newCode);
+    clearLobbySettings(newCode);
+    clearEjected(newCode);
     router.replace(`/(tabs)/lobby?code=${newCode}&isHost=true`);
   };
 
@@ -733,6 +741,9 @@ export default function QuizScreen() {
             if (code) {
               deactivateRoom(code);
               clearLeftPlayers(code);
+              clearLobbyPlayers(code);
+              clearLobbySettings(code);
+              clearEjected(code);
             }
             router.replace('/');
           },

@@ -46,6 +46,15 @@ All client-side via AsyncStorage. No server. Screens reload data on focus (`useF
   - **Capacity-popup-helper** `checkLobbyCapacity(code)` i [app/(tabs)/index.tsx](app/(tabs)/index.tsx) anropas från båda join-handlers efter `isActiveRoom`-checken. Returnerar `true` om popup visades (= caller abortar). Free host: "Lobby is full. Host either need to remove players from lobby or to upgrade". Premium host: "Lobby is full. Host need to remove players from lobby for others to join".
   - **Own-lobby-check** via `isOwnLobby(code, playerName)` körs i båda join-handlers FÖRE capacity-check (mer specifikt felmeddelande först). `JoinModal` får `currentPlayerName` som prop från HomeScreen (`profile?.playerName ?? null`). `handleJoinWithCode` jämför mot `currentPlayerName`; `handleJoinAsGuest` jämför mot BÅDA `currentPlayerName` OCH `guestName.trim()` så identitet både via inloggning och guest-form-input fångas. Popup: "User already exists in the lobby". Use case: samma user inloggad på två enheter försöker använda Join Game från device B med koden från device A.
 - `src/utils/leftPlayers.ts` — **AsyncStorage** per rumkod. Lagrar `LeftPlayerSnapshot[]` (inte bara id) så nya joiners som inte har lämnande spelaren i sin SEED-baseline kan rendera kortet med `hasLeft`-styling via orphan-injection (se "Lobby — TopUserBanner actions" nedan). `addLeftPlayer(roomCode, snapshot)`, `getLeftPlayers(roomCode)`, `clearLeftPlayers(roomCode)` (anropas av `handleCreateGame`/Play Again för fresh slate på återanvänd kod).
+- `src/utils/mockLobbyPlayers.ts` — **in-memory `Map<string, LobbyPlayer[]>`** för host:s authoritative player-lista per rumkod. Host:s `useEffect` på `players[]` skriver hela arrayen via `setLobbyPlayers(code, players)`; non-host:s polling läser via `getLobbyPlayers(code)` och rebuilds lokal state. `clearLobbyPlayers(code)` rensar tillsammans med `deactivateRoom`/`clearLeftPlayers` på alla lifecycle-sites. Importerar `LobbyPlayer` som `import type` för att undvika runtime-circulär dep (LobbyScreen → utils → LobbyScreen).
+- `src/utils/mockLobbySettings.ts` — **in-memory `Map<string, LobbySettings>`** för host:s authoritative game-settings (gameMode, singlePlayerDefault, region, answerResponseSeconds, eraFrom/To, roundsCount, selectedExtraPackages, youtubeEnabled, spotifyHostToggle, profilesEnabled). Driver non-host:s vy av Game Mode-toggle, Region Scope, Game Era, Number of Rounds, Answer response time, Customized Host packages och Game Connections-pillar. `setLobbySettings`/`getLobbySettings`/`clearLobbySettings`. Skiljd från `mockLobbyPlayers` så ändringar i en sub-domän inte triggar onödig sync av den andra.
+- `src/utils/ejectedPlayers.ts` — **in-memory `Map<string, Set<string>>`** över spelare host har radat (trash) eller indirekt utkastat (single-player-default-toggle ON för alla non-hosts). `markEjected(code, playerId)`, `isEjected(code, playerId)`, `clearEjected(code)`. Non-host:s polling-effekt körs PRE-flight (innan settings/players-läsning) — om self är markerad → "User have been removed from this lobby"-popup + Home navigation, och resten av sync hoppas över.
+
+**Per-user-namespacing** för friends + waitingInvites (för att undvika att User A:s data syns för User B vid logout/login på samma device):
+- AsyncStorage-nyckeln innehåller inloggade user:s playerName lowercase: `@quizvibe/friends/v1/<playerName>`, `@quizvibe/waitingInvites/v1/<recipient-playerName>`. Identifieras via `loadProfile()` inuti varje load/save i `friendsStorage.ts` resp. `waitingInvites.ts`. När backend kommer in byts detta mot user-id från auth-token.
+- `addInvite(toPlayerName, invite)` tar mottagarens playerName som **explicit första-arg** eftersom invites är cross-user — kan inte härledas från inloggad profil (= avsändaren). Lobby:s `handleInviteFriend` passar `friend.playerName`. `loadInvites`/`removeInvite` opererar däremot på inloggade user:s inbox.
+- **One-shot reset** vid första load efter migrationen: `ensureFriendsReset` / `ensureInvitesReset` läser `getAllKeys()`, filtrerar `@quizvibe/friends/v1*` resp. `@quizvibe/waitingInvites/v1*`, `multiRemove`:ar alla, sätter en migrations-flagga (`@quizvibe/migration/friendsReset/v1` etc.) så reset:n bara körs en gång. Alla startar tomma — undviker att stale legacy-data ärvs av "första-bästa user efter fix" (bug i en tidigare migrationsversion).
+- **Ej namespacad** ännu: `gameResults.ts` (samma globala-nyckel-bugg, parkerad).
 
 ## Backend (content catalog + image pipeline)
 
@@ -188,6 +197,10 @@ Five top-level collapsible sections — all use the same tappable-header pattern
 
 **TopUserBanner pill on Profile** opens a logout sheet via `logoutModalVisible` state — mirrors Home's `profileMenu` for the logged-in case (header with avatar emoji + Player Name + green "Logged in" status + red Log out button + Cancel). After logout: `clearProfile()` + analytics + `router.replace('/')` to Home.
 
+**"Profile settings" från Home:s TopUserBanner** (logged-in profil-meny): blå-konturad `secondaryBtn` ovanför röda "Log out"-knappen. Tap stänger menyn och `router.push({ pathname: '/(tabs)/profile', params: { scrollToTop: '1' } })`. Profile-skärmen läser `scrollToTop` via `useLocalSearchParams` och anropar `scrollRef.current?.scrollTo({ y: 0, animated: false })` i en `useFocusEffect` med deps `[localParams.scrollToTop]`, sedan `router.setParams({ scrollToTop: undefined })` för att rensa paramen — annars skulle framtida tab-byten utan param också (felaktigt) snäppa till toppen. Tab-navigatorn bevarar annars senaste scroll-position mellan tab-byten.
+
+**Friends modal (Profile)** — KeyboardAvoidingView wrap:ar `friendsModal.overlay` med `behavior={Platform.OS === 'ios' ? 'padding' : undefined}` så input-fältet "Add by Player Name" inte täcks av tangentbordet. Android sköter det via systemet automatiskt. Speglar samma KAV-mönster som Register modal — sheet:en pushas uppåt vid keyboard-show.
+
 **`mergeProfileIntoHost`-fallbacks**: när host:s profil saknar `birthYear` eller `assistance` används fallbacks så host-spelarkortet i Lobby alltid har komplett HCP (annars blockas Start Game). `birthYear` saknas → `randomBirthYear()` ger random år 1970–2005 (vuxen 21–56); `assistance` saknas → `'standard'`. `hcpComplete`/`isReady` är alltid `true` på host:s kort eftersom host startar aldrig spelblockerad. En Profile-sida (`randomAdultBirthYear()`) gör motsvarande för Profile:s state-load — defensive auto-save kör om något fält saknas, så slumpvärden inte regenereras vid varje reload.
 
 **Profile auto-augment** i `loadProfile`-effekten: alla saknade fält fylls i med generic-fallback-spec (Pass-the-Phone, Max 4, Global, 1981→`ERA_MAX` (= current year), `ROUNDS_DEFAULT`, 30 sek, Standard assistance, alla paket aktiverade, `randomAdultBirthYear`-värde). Augmented-profilen beräknas EN gång per load så samma random-värde används för både setState och eventuell write-back. Om något fält var saknat persisteras augmented direkt via `saveProfile` i bakgrunden — one-shot defensive write så fallbacks inte regenereras nästa load (särskilt random birthYear).
@@ -270,6 +283,8 @@ Mock IAP: credit purchases bump `gameCredits` on profile + emit `purchase_comple
 Game Mode and Game Connections share a single bordered card (`gameSettingsBorder` in `LobbyScreen.tsx`) — they're treated as one "spelregler"-grupp. Order inside Game Connections: YouTube → Spotify → Profiles & Places → "Customized Host packages" sub-block (`usePackagesBlock`).
 
 **Lobby host-seed-effekten** (i URL-params-deps useEffect:n) läser host:s profil vid varje lobby-mount och seeds lokala lobby-settings: `gameMode`, `maxPlayers`, `singlePlayerDefault`, `region` (mappas via `mapProfileRegion`-helper: `'sweden' → 'Sweden'`, `'nordics' → 'Nordics'`, `'global' → 'Global'`; null → `'Global'`-fallback eftersom Lobby:s Region-set inkluderar `'Europe'` som Profile saknar), `answerResponseSeconds`, `eraValues` (clamp:as till `[ERA_MIN, ERA_MAX]`), `roundsCount` (clamp:as mot `roundsMax`), `enabledHostPackages`. Generic-fallbacks per fält om profil saknar värdet — speglar Profile:s motsvarande spec (Pass-the-Phone, Max 4, Global, 1981→`ERA_MAX` (current year), `ROUNDS_DEFAULT`, 30 sek, alla paket aktiverade). Effekten triggar både vid första lobby-mount OCH vid Play Again-återinträde (component re-mountar då URL-params byter).
+
+**Answer response time-rad** (under Number of Rounds, inom samma `quizSettingsBorder`): 4-knapps-rad (15s/30s/45s/60s) med aktiv ruta i `primaryBorder` + `primaryMuted`-bg, label-text bold + textPrimary i aktivt läge. Renderas för alla i lobbyn men `disabled={!hostMode}` så bara host kan ändra (samma "render-for-all-but-disable-for-non-host"-mönster som Game Mode och Region scope). Default seedas från host:s profil via `setAnswerResponseSeconds(profile?.answerResponseSeconds ?? 30)` i host-seed-effekten ovan; non-host syncar via `mockLobbySettings`-polling.
 
 **Profiles & Places icon** uses an inline SVG of the Q-figure (circle + tail in `Colors.primary`, no surrounding squares) with an "AI"-Text overlay centered in the Q ring. `viewBox="24 22 32 32"` centers the Q at icon coords (14, 14) which matches the wrap's flex center; AI text gets `transform: translateY(-1)` to compensate for glyph baseline offset. **Gotcha**: this inline SVG is **independent** from `QuizVibeLogo` and still uses the original Q coords (cx=40, cy=38, r=13). The shared `QuizVibeLogo` component shifted its Q to (37, 37) for box-centering — they're intentionally decoupled, so changing one doesn't affect the other.
 
@@ -386,7 +401,9 @@ Non-host gets a **read-only view** of the player list:
 - **Host:s eget kort** är specialfall i `hcpRow`: badge renderas i höger-slotten istället för center-slotten (höger-justerad), och ingen trash visas (host kan inte radera sig själv).
 - **"Ready"-status borttagen** för alla spelare. Endast `!player.isReady` (= "Missing info" warning) eller `hasLeft` (= "LEFT THIS GAME LOBBY") renderas — i alla andra fall är status-raden helt tom (en redo spelare är default-läget).
 
-**Papperskorgs-knapp** (host-only, `onDelete`-prop på PlayerRow): grå (`Colors.textSecondary`) trash-SVG i botten-radens höger-slot, visas bara på rader i waiting-listan. För approved-spelare måste host först toggla tillbaka till No så kortet hamnar i waiting-listan igen och papperskorgen syns. Tap → `Alert "Remove player — Are you sure you want to delete this Player from this Lobby?"` → confirm filtrerar bort spelaren ur `players[]`. Pressed-feedback `Colors.borderStrong` (subtil grå highlight). Hide:s när `hasLeft: true` — left-spelaren är redan borta som aktiv part.
+**Papperskorgs-knapp** (host-only, `onDelete`-prop på PlayerRow): grå (`Colors.textSecondary`) trash-SVG i botten-radens höger-slot, visas bara på rader i waiting-listan. För approved-spelare måste host först toggla tillbaka till No så kortet hamnar i waiting-listan igen och papperskorgen syns. Tap → `Alert "Remove player — Are you sure you want to delete this Player from this Lobby?"` → confirm filtrerar bort spelaren ur `players[]` OCH anropar `markEjected(roomCode, id)` så non-host:s polling triggar "User have been removed from this lobby"-popup → Home navigation. Pressed-feedback `Colors.borderStrong` (subtil grå highlight). Hide:s när `hasLeft: true` — left-spelaren är redan borta som aktiv part.
+
+**`PlayerRow.hcpAlignRight`** (prop): driver var HCP-badgen renderas i `hcpRow`. `false` (default, host-vyn) → badge i `hcpRowCenter` med trash i höger-slot. `true` (non-host:s vy via `hcpAlignRight={!hostMode}`) → badge i `hcpRowRight` (höger-justerad), eftersom non-host saknar approve-toggle och trash → tom höger-slot annars. Host:s eget kort använder samma höger-slot-gren (via `isHostPlayer || hcpAlignRight`-kondition).
 
 ## Lobby — + Add Player
 
@@ -439,6 +456,81 @@ Host kan redigera **Assistance level**, **Competition Year of Birth** och **HCP*
 ## Lobby — Share invite (friends-only)
 
 Share invite-modalen i [src/screens/LobbyScreen.tsx](src/screens/LobbyScreen.tsx) skickar **endast** invites in-app till QuizVibe friends. OS-share-fallback (SMS/WhatsApp/Messenger) är borttagen — användaren kan inte längre dela rumkoder externt. Modalen renderar bara friends-listan (med one-tap "Invite"/"✓ Invited"-knappar) eller empty-state ("No friends saved yet — Add friends in Profile to invite them with one tap.") + "Done"-knapp. `QuizVibeFriendsLogo` (size 28) renderas bredvid "QuizVibe friends"-section-labeln för visuell anchor — speglar Profile-skärmens friends-kort-ikon.
+
+**`handleAcceptInvite` guards** (i Home:s `JoinModal`, [app/(tabs)/index.tsx](app/(tabs)/index.tsx)) — körs i ordning innan navigation:
+1. **`isActiveRoom(invite.roomCode)`** — om host raderat lobby:n efter att invite skickades: ta bort invite ur listan (`removeInvite` + `setInvites`) + Alert "Lobby no longer available — This lobby has been deleted by the Host." Cleanup först eftersom inviten inte längre är actionable.
+2. **`checkLobbyCapacity(invite.roomCode)`** — om lobby:n är full: BEHÅLL invite (transient — kan frigöras), Alert med Free vs Premium-host-copy. Skiljs medvetet från active-room-fallet i cleanup-semantik.
+3. Annars: `removeInvite` + navigate.
+
+## Lobby — Non-host visibility & host→non-host sync
+
+Non-host:s vy ska spegla EXAKT vad host har valt för den specifika lobbyn. Architecture i avsaknad av backend: 3 mock-stores + polling-pattern.
+
+**Polling-arkitektur (2s-interval)** — Lobby-state-mocks saknar event-bus, så non-host:s `useEffect`-baserade syncar kör `setInterval(..., 2000)` med initial sync direkt vid mount. Samma mönster delas av:
+- Room-deletion-detection (`isActiveRoom`) → "Game Lobby deleted"-popup → Home.
+- Player-eject-detection (`isEjected`) → "User have been removed from this lobby"-popup → Home.
+- maxPlayers-sync från `RoomMeta`.
+- Player-list-sync från `mockLobbyPlayers`.
+- Settings-sync från `mockLobbySettings`.
+
+Host:s sida skriver via `useEffect`-deps på relevant state (gated på `hostMode`). Ingen sync sker andra hållet.
+
+**Cleanup-paritet** — alla 4 lifecycle-cleanup-sites anropar samma cleanup-bunt:
+- Lobby:s "Delete this Game Lobby" (host)
+- Quiz:s `handleQuitGame` (host mid-game)
+- Quiz:s Play Again (`goToNewLobby` med ny kod)
+- Home:s `handleCreateGame`
+
+```ts
+deactivateRoom(code);          // mockActiveRooms
+clearLeftPlayers(code);        // leftPlayers
+clearLobbyPlayers(code);       // mockLobbyPlayers
+clearLobbySettings(code);      // mockLobbySettings
+clearEjected(code);            // ejectedPlayers
+```
+
+Glöm inte lägga till nya stores här när de skapas — annars läcker stale data mellan sessions med återanvänd kod.
+
+**Synkat per non-host UI-element** (alla deriverade från host-driven state):
+
+| UI | Source-store | Non-host läser |
+|---|---|---|
+| Number of Players (Max 4/12) | `mockActiveRooms.RoomMeta.maxPlayers` | `getRoomMeta().maxPlayers` |
+| Approved players list | `mockLobbyPlayers` | `getLobbyPlayers()` (filtrerad till approved/isHost) |
+| Game Mode toggle | `mockLobbySettings.gameMode` | `getLobbySettings()` |
+| Region Scope | `mockLobbySettings.region` | ↑ |
+| Game Era | `mockLobbySettings.eraFrom/To` | ↑ |
+| Number of Rounds | `mockLobbySettings.roundsCount` | ↑ |
+| Answer response time | `mockLobbySettings.answerResponseSeconds` | ↑ |
+| Customized Host packages | `mockLobbySettings.selectedExtraPackages` | ↑ |
+| Game Connections-pillar | `mockLobbySettings.{youtubeEnabled,spotifyHostToggle,profilesEnabled}` | ↑ |
+
+**Synthetic-host fallback** ([src/screens/LobbyScreen.tsx](src/screens/LobbyScreen.tsx) i non-host:s player-poll): om host saknas i `getLobbyPlayers`-resultatet (test-seed-kod eller fresh kod där host inte hunnit skriva ännu), syntheserar polling en placeholder-rad från `RoomMeta.hostPlayerName`:
+- `id: 'synthetic-host'`, `emoji: '👑'`, `type: 'registered'`, `isHost: true`, `approved: true`.
+- **`age: 35` (fixed) + `assistance: 'standard'` + `hcpComplete: true`** — fixed (inte random) så HCP-raden inte flickrar varannan poll. Real host-data ersätter raden vid nästa poll efter att host:s write körts.
+- Säkerställer att `Assistance · Age · HCP`-raden alltid renderas på host:s kort i non-host:s vy oavsett tajming.
+
+**Initial state för non-host** är `setPlayers([])` (inte `SEED_PLAYERS`). Polling fyller listan från host:s authoritative data + self-injection. Utan denna gating skulle non-host se hardcodade fake-spelare (Sam L., Jordan M., Casey P.) som host inte ens approverat.
+
+**Non-host UI-strip** — host-only-element döljs explicit:
+- Header credits-pill (Host Game Credits) — gated på `hostMode`.
+- "Use single player mode as default"-checkbox — gated på `hostMode`.
+- Bracket + "MULTIPLAYER MODE"-label under Game Mode-toggle:n — non-host får istället `"Game Mode - Multiplayer"` inline i sectionLabel (Typography.overline auto-uppercasar).
+- Subtitlar under Region/Game Era/Number of Rounds/Game Connections — gated.
+- modeDescription ("Players take turns…" / "Each player plays…") — gated.
+- Approve-toggle, trash-knapp, edit-handlers — gated på `hostMode`.
+- RoundsRuler:s klammer + PREMIUM-badge — gated på `onPremiumPress`-prop (saknas för non-host = read-only-läge), MEN locked-tickarnas grå-styling behålls så non-host ser host:s rätts-cap.
+- Number of Players Max 4/12: aktiva rutan får `modeOptionIndivActive` (blå border) + vit text + INGA badges för non-host (host får grön/guld + FREE/PREMIUM-badges).
+
+**Single-player-toggle ON ejectar non-hosts** — när host bockar i singlePlayerDefault iterar handler:n `players` och anropar `markEjected(roomCode, p.id)` för varje `!p.isHost && !p.hasLeft`, sedan `setPlayers((prev) => prev.filter((p) => p.isHost))` så host:s vy tömmer non-hosts direkt. Non-host:s polling fyrar ejectpopup → Home. Uncheck:n "återanställer" inte ejectade — det är en envägs-action; flagga uncheck:n bara återställer Game Mode + Max Players till gratis-defaults.
+
+**Eject-detection PRE-sync** — `syncFromStore` i non-host:s player-poll kollar `isEjected(roomCode, ownPlayerIdRef.current)` ALLRA FÖRST. Träff → setPlayerEjectedDetected(true) + early-return. Resten av sync hoppas över så user inte ser approval-listan uppdateras strax innan popup.
+
+**Gold-glowing CTA-position** (Start Game / Waiting for Host) — båda renderas på samma plats i `startSection` och delar visuell vokabulär (gold halo + scale-pulse). Implementation:
+- En enda `Animated.Value`-pair (`startGlow`, `startPulse`) körs i `Animated.loop` utan `hostMode`-gating — bara en ruta renderas åt gången per role, så animationen är "billig dubbelproduktion" oavsett.
+- Host: `Pressable` med "Start Game"-text i `Colors.background` (mörk på guld).
+- Non-host: `View` med "Waiting for Host to Start Game" + `<SequentialDots color={Colors.background} />`.
+- Båda ärver styling från `startGameWrap` + `startGameHalo` + `startGameButton`. Waiting-rutan override:ar bara `flexDirection: 'row'` via `waitingForHostBox`-stilen.
 
 ## Quiz — Get Ready to Vibe intro screen
 
