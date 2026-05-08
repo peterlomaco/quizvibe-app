@@ -22,6 +22,7 @@ import { clearEjected } from '@/src/utils/ejectedPlayers';
 import { clearLobbyPlayers } from '@/src/utils/mockLobbyPlayers';
 import { clearLobbySettings } from '@/src/utils/mockLobbySettings';
 import { clearGameStarted } from '@/src/utils/mockStartedGames';
+import { getAvatarEmojiById } from '@/src/utils/avatars';
 import { loadProfile } from '@/src/utils/profileStorage';
 import { generateRoomCode } from '@/src/utils/roomCode';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -673,6 +674,8 @@ export default function QuizScreen() {
         playerId: p.id,
         name: p.name,
         emoji: p.emoji,
+        age: p.age,
+        assistance: p.assistance,
         points: totalsMap[p.id] ?? 0,
         playedRounds: playerScores.length,
         correctAnswers,
@@ -964,10 +967,11 @@ export default function QuizScreen() {
     const interval = getIntervalForAssistance(currentAssistance);
     const correct = isCorrect(year, question.correctYear, interval, eraFrom, eraTo);
     const pts = calculatePoints(timeLeft, correct, responseSeconds);
-    const timeUsed = responseSeconds - timeLeft;
     // 2-decimals svarstid via Date.now()-diff (questionStartMsRef sätts i
     // startTimer). Cap:as till responseSeconds så ev. clock drift inte ger
-    // > totalSeconds.
+    // > totalSeconds. Används både till stopwatch-display, reveal-card och
+    // leaderboard-aggregat — heltals-derived `responseSeconds - timeLeft`
+    // undviks medvetet eftersom den ger "x.00" i AVG/LAST-kolumnerna.
     const totalMs = responseSeconds * 1000;
     const exactElapsedMs = Math.max(0, Date.now() - questionStartMsRef.current);
     const exactElapsedSec = Math.min(responseSeconds, exactElapsedMs / 1000);
@@ -992,12 +996,13 @@ export default function QuizScreen() {
         selectedYear: year,
         correct,
         points: pts,
-        timeUsed,
+        timeUsed: exactElapsedSec,
       },
     ]);
     // Registrera score:n för aktuell spelare (och i direkt-nav-fallet
-    // även mock-motspelarnas auto-genererade poäng).
-    recordRoundScore(pts, correct, timeUsed);
+    // även mock-motspelarnas auto-genererade poäng). Skickar 2-decimals-
+    // exakt elapsed så leaderboardens AVG/LAST-kolumner visar variation.
+    recordRoundScore(pts, correct, exactElapsedSec);
     setPhase('awaiting');
   };
 
@@ -1085,12 +1090,18 @@ export default function QuizScreen() {
   //   senare kan fylla i deras profil-värden vid mount.
   // - Guests: defaults till standard/30 så host får redigera om i Lobby.
   const goToNewLobby = async (reusePlayers: boolean, keepSettings: boolean = true) => {
+    // Ladda host-profilen FÖRE players-listan byggs så host:s riktiga
+    // playerName + avatar bär in i carry-over (annars hade host:s rad i
+    // nya lobby:n stått som 'You'/🎮 tills mergeProfileIntoHost hann fyra).
+    const profile = await loadProfile();
+    const hostName = profile?.playerName?.trim() || 'You';
+    const hostEmoji = profile ? getAvatarEmojiById(profile.selectedAvatarId) : '🎮';
     if (reusePlayers) {
       // Behåll alla spelare från detta spel
       const lobbyPlayers: LobbyPlayer[] = allPlayers.map((p) => ({
         id: p.id,
-        name: p.isYou ? 'You' : p.name,
-        emoji: p.emoji,
+        name: p.isYou ? hostName : p.name,
+        emoji: p.isYou ? hostEmoji : p.emoji,
         isReady: true,
         type: 'registered' as const,
         age: keepSettings || p.isYou ? p.age : 30,
@@ -1100,11 +1111,11 @@ export default function QuizScreen() {
       }));
       await savePendingLobbyPlayers(lobbyPlayers);
     } else {
-      // Tom lobby förutom YOU som host
+      // Tom lobby förutom host
       const justHost: LobbyPlayer[] = [{
         id: 'you',
-        name: 'You',
-        emoji: '🎮',
+        name: hostName,
+        emoji: hostEmoji,
         isReady: true,
         type: 'registered',
         age,
@@ -1121,7 +1132,6 @@ export default function QuizScreen() {
     // den på 1 (bara host i nya lobbyn). LobbyScreen:s sync-effekter
     // korrigerar countet om SEED_PLAYERS injiceras eller spelare flyttas.
     // TODO (subscription): byt hardcoded `false` mot riktig profile.isPremium.
-    const profile = await loadProfile();
     const initialCount = reusePlayers ? Math.max(1, allPlayers.length) : 1;
     registerActiveRoom(newCode, {
       maxPlayers: profile?.maxPlayers ?? 4,
@@ -1171,7 +1181,12 @@ export default function QuizScreen() {
         'You have no credits left for today. Buy extra credits in Store, wait for the daily refresh at midnight CET, or upgrade to a QuizVibe membership for unlimited host games.',
         [
           { text: 'Cancel', style: 'cancel' },
-          { text: 'Go to Store', onPress: () => router.push('/(tabs)/store?focus=credits&from=/') },
+          // Pushar Store UTAN `from=...`-paramet så Store:s Back-knapp fall:er
+          // till `router.back()` istället för `router.replace(from)`. Det
+          // bevarar /quiz på root Stack:en med Final Leaderboard-state intakt
+          // — annars hade replace:n unmountat Quiz-komponenten och spelaren
+          // skulle landa på en tom /quiz-vy efter köpet.
+          { text: 'Go to Store', onPress: () => router.push('/(tabs)/store?focus=credits') },
         ],
       );
       return;
@@ -1300,15 +1315,40 @@ export default function QuizScreen() {
   }
 
   // 3-2-1-nedräkning mellan tap på play-knappen i intro:n och fråge-vyn.
-  // playerName från turordningen så Pass-the-Phone-mode anchorar nedräkningen
-  // till rätt spelare även medan telefonen lämnas över.
+  // playerName + playerEmoji från turordningen så Pass-the-Phone-mode
+  // anchorar nedräkningen till rätt spelare även medan telefonen lämnas över.
   if (phase === 'countdown') {
     const countdownPlayer = turnOrder[currentPlayerIndex];
     return (
       <CountdownIntro
         playerName={countdownPlayer?.name}
+        playerEmoji={countdownPlayer?.emoji}
         onComplete={() => setPhase('question')}
       />
+    );
+  }
+
+  // Leaderboard renderas UTANFÖR den övergripande ScrollView:n så dess sticky
+  // footer (Home + Play Again) kan pinnas vid skärmens nederkant via flex —
+  // läggs den inuti parent-scroll:n följer footer:n med upp när användaren
+  // scrollar och blir inte längre alltid synlig.
+  if (phase === 'leaderboard') {
+    return (
+      <SafeAreaView style={styles.safe}>
+        <RoundLeaderboard
+          players={gamePlayers}
+          roundScores={currentRoundScores}
+          totalsByPlayerId={gameTotals}
+          roundNumber={questionIndex + 1}
+          totalRounds={totalQuestions}
+          onNextRound={handleAdvanceToNextRound}
+          onPlayAgain={handlePlayAgain}
+          onGoHome={handleGoHome}
+          isLastRound={isLastQuestion}
+          allRoundScoresHistory={allRoundScoresHistory}
+          hcpChanges={isLastQuestion ? playerHcpChanges : undefined}
+        />
+      </SafeAreaView>
     );
   }
 
@@ -1319,8 +1359,9 @@ export default function QuizScreen() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        {phase !== 'leaderboard' && (
-          <>
+        {/* phase är här narrowed till 'question' | 'awaiting' | 'reveal'
+            (leaderboard fångas av early-return ovan), så ingen extra
+            phase-check behövs runt question UI. */}
             {/* Mediakort — placeholder tills riktig YouTube/Spotify/AI-bild-
                 integration kopplas in. Spelas/visas oförändrat även under
                 reveal-fasen (användaren har bett om att uppspelningen ska
@@ -1462,10 +1503,12 @@ export default function QuizScreen() {
                   Question {questionIndex + 1} of {totalQuestions}
                 </Text>
                 {gameMode === 'pass-the-phone' && currentPlayerName && (
-                  <Text style={styles.answeringPlayer}>
-                    Answering:{' '}
-                    <Text style={styles.answeringPlayerName}>{currentPlayerName}</Text>
-                  </Text>
+                  <View style={styles.answeringStack}>
+                    <Text style={styles.answeringLabel}>Answering:</Text>
+                    <Text style={styles.answeringPlayerName} numberOfLines={1}>
+                      {currentPlayerName}
+                    </Text>
+                  </View>
                 )}
               </View>
               <View style={styles.questionTextWrap}>
@@ -1533,12 +1576,31 @@ export default function QuizScreen() {
                     >
                       {wasCorrect ? '✓ Correct Answer' : '✗ Wrong Answer'}
                     </Text>
-                    <Text style={rv.feedbackCorrectYear}>
-                      Correct year:{' '}
-                      <Text style={rv.feedbackCorrectYearBold}>
-                        {question.correctYear}
+                    {/* Correct-year-rad och Next-tab delar samma rad så
+                        tab:ens underkant linjerar med correct-year-textens
+                        underkant (alignItems:'flex-end' bottom-anchorar
+                        båda mot rad-baseline). Tab:en sitter höger-justerad
+                        via marginLeft:'auto'. */}
+                    <View style={rv.feedbackYearRow}>
+                      <Text style={rv.feedbackCorrectYear}>
+                        Correct year:{' '}
+                        <Text style={rv.feedbackCorrectYearBold}>
+                          {question.correctYear}
+                        </Text>
                       </Text>
-                    </Text>
+                      <TouchableOpacity
+                        style={[
+                          rv.nextTab,
+                          wasCorrect ? rv.nextTabCorrect : rv.nextTabWrong,
+                        ]}
+                        onPress={isLastQuestion ? handleShowLeaderboard : handleAdvanceToNextRound}
+                        activeOpacity={0.85}
+                      >
+                        <Text style={rv.nextTabText}>
+                          {isLastQuestion ? '🏆  Final Leaderboard' : 'Next  →'}
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
                     {wasCorrect && confirmedTimeUsed !== null && (
                       <Text style={rv.feedbackAnswerTime}>
                         Answer time:{' '}
@@ -1547,22 +1609,6 @@ export default function QuizScreen() {
                         </Text>
                       </Text>
                     )}
-                    {/* Next-tab inuti feedback-kortet — ersätter den tidigare
-                        action-knappen i botten av skärmen. Tab:ens färg ärvs
-                        från feedback-statusen (success/error) så den hör
-                        visuellt ihop med kortet. */}
-                    <TouchableOpacity
-                      style={[
-                        rv.nextTab,
-                        wasCorrect ? rv.nextTabCorrect : rv.nextTabWrong,
-                      ]}
-                      onPress={isLastQuestion ? handleShowLeaderboard : handleAdvanceToNextRound}
-                      activeOpacity={0.85}
-                    >
-                      <Text style={rv.nextTabText}>
-                        {isLastQuestion ? '🏆  Final Leaderboard' : 'Next  →'}
-                      </Text>
-                    </TouchableOpacity>
                   </Animated.View>
                 </View>
               );
@@ -1611,24 +1657,6 @@ export default function QuizScreen() {
                 )}
               </View>
             )}
-          </>
-        )}
-
-        {phase === 'leaderboard' && (
-          <RoundLeaderboard
-            players={gamePlayers}
-            roundScores={currentRoundScores}
-            totalsByPlayerId={gameTotals}
-            roundNumber={questionIndex + 1}
-            totalRounds={totalQuestions}
-            onNextRound={handleAdvanceToNextRound}
-            onPlayAgain={handlePlayAgain}
-            onGoHome={handleGoHome}
-            isLastRound={isLastQuestion}
-            allRoundScoresHistory={allRoundScoresHistory}
-            hcpChanges={isLastQuestion ? playerHcpChanges : undefined}
-          />
-        )}
 
         <View style={{ height: Spacing.xxl }} />
       </ScrollView>
@@ -1750,17 +1778,19 @@ const styles = StyleSheet.create({
   },
 
   // Wrap runt 2-decimal countdown — håller halo + box. Centrerad
-  // horisontellt; tight paddingTop håller boxen nära timer-bar:en.
+  // horisontellt. Negativ marginTop drar boxen nära timer-bar:en (ScrollView-
+  // content-gap pushar annars ned med Spacing.md = 16 px); -10 lämnar bara
+  // ~6 px luft mellan bar:ens nedkant och stopwatch-boxens överkant.
   decimalTimerWrap: {
     alignSelf: 'center',
     position: 'relative',
-    paddingTop: Spacing.xs,
+    marginTop: -10,
   },
   // Halo bakom boxen — pulserar i opacity via timerRingGlow så glöden
   // matchar ringen runt sekund-räknaren ovanför.
   decimalTimerHalo: {
     position: 'absolute',
-    top: Spacing.xs - 4,
+    top: -4,
     left: -4,
     right: -4,
     bottom: -4,
@@ -1810,10 +1840,12 @@ const styles = StyleSheet.create({
     minHeight: 140,
   },
   // Top-rad pinnas mot kortets överkant så frågan kan flex-centreras under.
+  // alignItems:'flex-start' gör att höger Answering-stack:en kan vara två rader
+  // tall utan att skjuta question-räknaren neråt; båda anchorar mot top-edge.
   questionTopRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     gap: Spacing.sm,
   },
   // Wrap runt frågetexten så den kan flex-centreras lodrätt mellan top-raden
@@ -1827,17 +1859,27 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   questionMeta: { fontSize: FontSize.sm, fontWeight: FontWeight.medium, color: Colors.textSecondary },
-  // Subtil "Answering: {namn}"-rad — ärver xs-storleken från questionMeta-
-  // raden ovanför men markerar namnet i textPrimary + semibold så det syns
-  // utan att skrika.
-  answeringPlayer: {
+  // "Answering"-stack — label ovanpå PlayerName, höger-justerat. Två rader
+  // ger plats åt långa Player Names utan att kollidera med question-räknaren
+  // i vänster kolumn. alignItems:'flex-end' så båda raderna är högerställda
+  // (textAlign på Text-elementen behövs inte när container redan är höger-
+  // anchored).
+  answeringStack: {
+    flexDirection: 'column',
+    alignItems: 'flex-end',
+    gap: 1,
+  },
+  answeringLabel: {
     fontSize: FontSize.xs,
     color: Colors.textSecondary,
     letterSpacing: 0.4,
   },
   answeringPlayerName: {
+    fontSize: FontSize.sm,
     color: Colors.textPrimary,
     fontWeight: FontWeight.semibold,
+    letterSpacing: 0.2,
+    maxWidth: 180,
   },
   // Headline för split-formatet (rad 1) — markant större än sub-raden så
   // ögat fastnar på "Which year" först, sedan läser fortsättningen.
@@ -1925,12 +1967,15 @@ const rv = StyleSheet.create({
     paddingHorizontal: Spacing.sm,
     gap: 2,
   },
+  // Båda statusarna delar bg-färg (Colors.card) som matchar question-kortet
+  // ovanför så reveal-vyn känns som en seamless förlängning av frågan istället
+  // för en "alarm-ruta". Status-färgen bärs på badge + border.
   feedbackCorrect: {
-    backgroundColor: Colors.successMuted,
+    backgroundColor: Colors.card,
     borderColor: Colors.success,
   },
   feedbackWrong: {
-    backgroundColor: Colors.errorMuted,
+    backgroundColor: Colors.card,
     borderColor: Colors.error,
   },
   feedbackBadge: {
@@ -1977,12 +2022,21 @@ const rv = StyleSheet.create({
   feedbackBold: {
     fontWeight: FontWeight.bold,
   },
-  // Next-tab inuti feedback-kortet — ersätter den tidigare action-knappen
-  // i botten av skärmen. Höger-justerad, kompakt; bg-färg ärvs av status
-  // (success vid rätt, error vid fel) så tab:en hör visuellt ihop med kortet.
+  // Row som håller correct-year-text + Next-tab på samma rad. alignItems:
+  // 'flex-end' bottom-anchorar båda så tab:ens underkant linjerar med
+  // correct-year-textens underkant (per Peter:s spec). justifyContent:
+  // 'space-between' separerar texten (vänster) från tab:en (höger).
+  feedbackYearRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+    gap: Spacing.sm,
+  },
+  // Next-tab inuti feedback-kortet — sitter på samma rad som correct-year-
+  // texten (alignItems:'flex-end' i feedbackYearRow bottom-anchorar tab:en
+  // mot textens baseline). Kompakt; bg-färg ärvs från nextTabCorrect/Wrong
+  // (båda primary, så tab:en alltid signalerar "fortsätt" oavsett status).
   nextTab: {
-    alignSelf: 'flex-end',
-    marginTop: 2,
     paddingHorizontal: Spacing.md,
     paddingVertical: 6,
     borderRadius: Radius.sm,

@@ -35,6 +35,10 @@ export interface LeaderboardLiveEntry {
   playerId: string;
   name: string;
   emoji?: string;
+  /** Spelarens ålder — visas som subtext under namnet ("Standard · Age 32"). */
+  age?: number;
+  /** Spelarens assistance level — visas som subtext under namnet. */
+  assistance?: 'minimal' | 'standard' | 'full';
   points: number;
   playedRounds: number;
   correctAnswers: number;
@@ -47,6 +51,12 @@ export interface LeaderboardLiveEntry {
    *  Tomt array om inga ronder spelade ännu. */
   lastFiveResults: boolean[];
 }
+
+const ASSISTANCE_LABEL: Record<'minimal' | 'standard' | 'full', string> = {
+  minimal: 'Minimal',
+  standard: 'Standard',
+  full: 'Full',
+};
 
 interface Props {
   /** Spelaren som ska börja sin runda — visas i Pass-the-Phone-rutan. */
@@ -314,18 +324,31 @@ export function GetReadyIntro({
                   <View style={[styles.lbCell, styles.lbHeaderCell, styles.lbLeftCell]}>
                     <Text style={styles.lbHeaderText}>Player</Text>
                   </View>
-                  {leaderboard.map((entry, index) => (
-                    <View
-                      key={entry.playerId}
-                      style={[styles.lbCell, styles.lbLeftCell]}
-                    >
-                      <Text style={styles.lbPos}>{index + 1}</Text>
-                      <Text style={styles.lbName} numberOfLines={1}>
-                        {entry.emoji ? `${entry.emoji} ` : ''}
-                        {entry.name}
-                      </Text>
-                    </View>
-                  ))}
+                  {leaderboard.map((entry, index) => {
+                    const meta = [
+                      entry.assistance ? ASSISTANCE_LABEL[entry.assistance] : null,
+                      typeof entry.age === 'number' ? `Age ${entry.age}` : null,
+                    ].filter(Boolean).join(' · ');
+                    return (
+                      <View
+                        key={entry.playerId}
+                        style={[styles.lbCell, styles.lbLeftCell]}
+                      >
+                        <Text style={styles.lbPos}>{index + 1}</Text>
+                        <View style={styles.lbNameStack}>
+                          <Text style={styles.lbName} numberOfLines={1}>
+                            {entry.emoji ? `${entry.emoji} ` : ''}
+                            {entry.name}
+                          </Text>
+                          {meta.length > 0 && (
+                            <Text style={styles.lbNameMeta} numberOfLines={1}>
+                              {meta}
+                            </Text>
+                          )}
+                        </View>
+                      </View>
+                    );
+                  })}
                 </View>
 
                 {/* Mitt scroll:bar kolumn — alla detail-celler */}
@@ -810,7 +833,7 @@ const styles = StyleSheet.create({
   // Generisk cell — fixed höjd så header + alla spelar-rader linjerar
   // mellan kolumnerna.
   lbCell: {
-    height: 36,
+    height: 52,
     flexDirection: 'row',
     alignItems: 'center',
     borderBottomWidth: 1,
@@ -828,15 +851,17 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
 
-  // Vänster fixed kolumn — Pos + Namn med trim/numberOfLines.
+  // Vänster fixed kolumn — Pos + Namn med trim/numberOfLines. Bredare än
+  // standard så meta-raden ("Standard · Age 32") får plats på en rad utan
+  // att truncatas. Mid-scroll tar tillgängligt resterande utrymme.
   lbLeftCol: {
-    minWidth: 130,
-    maxWidth: 180,
+    minWidth: 170,
+    maxWidth: 220,
   },
   lbLeftCell: {
-    paddingLeft: Spacing.md,
-    paddingRight: Spacing.sm,
-    gap: 6,
+    paddingLeft: Spacing.sm,
+    paddingRight: 4,
+    gap: 4,
   },
   lbPos: {
     fontSize: FontSize.sm,
@@ -845,11 +870,24 @@ const styles = StyleSheet.create({
     fontVariant: ['tabular-nums'],
     width: 16,
   },
-  lbName: {
+  // Stack:ar namn ovanpå meta-rad (assistance + ålder) — namnet i textPrimary,
+  // meta i textSecondary mindre storlek så det läses som en sub-info-rad.
+  lbNameStack: {
     flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'center',
+    gap: 2,
+  },
+  lbName: {
     fontSize: FontSize.sm,
     fontWeight: FontWeight.semibold,
     color: Colors.textPrimary,
+  },
+  lbNameMeta: {
+    fontSize: FontSize.xs,
+    fontWeight: FontWeight.medium,
+    color: Colors.textSecondary,
+    letterSpacing: 0,
   },
 
   // Mitt scrollbar kolumn — innehåller alla detail-celler.
@@ -857,7 +895,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   lbMidRow: {
-    height: 36,
+    height: 52,
     flexDirection: 'row',
     alignItems: 'center',
     borderBottomWidth: 1,

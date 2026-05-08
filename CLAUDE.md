@@ -293,9 +293,9 @@ Två-knapps-rad direkt under "Customized Host packages"-rubriken i Lobby — hos
 
 **Daily refresh** i `src/utils/profileStorage.ts`:
 
-- `FREE_CREDITS_DAILY_CAP = 4` styr top-up-cap.
+- `FREE_CREDITS_DAILY_CAP = 2` styr top-up-cap.
 - `todayCETDate()` använder `Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm' })` så CET/CEST-DST hanteras automatiskt.
-- `refreshFreeCreditsIfNeeded` jämför sparat `lastFreeCreditsRefreshDate` mot dagens CET-datum. Vid skillnad (eller om datum saknas helt på nya/legacy-profiler) → `freeGameCredits = 4` + ny date, persisteras tillbaka till AsyncStorage one-shot.
+- `refreshFreeCreditsIfNeeded` är **icke-destruktiv top-up**: jämför sparat `lastFreeCreditsRefreshDate` mot dagens CET-datum, och om dagen passerat sätts `freeGameCredits = Math.max(currentFree, FREE_CREDITS_DAILY_CAP)` + ny date. Saldo redan ≥ cap → lämnas orört. Saldo < cap → bumpas upp till cap. `gameCredits` (Extras) är ALLTID orört av denna funktion — bara Free påverkas vid midnatt.
 - Triggar i `loadProfile` så fort Profile/Lobby får fokus efter midnatt CET. **Caveat**: om appen ligger öppen ÖVER midnatt utan att Profile/Lobby får fokus, sker refresh först nästa fokus. För strikt "exakt midnatt"-refresh skulle en AppState-listener eller intervall-timer krävas.
 
 **Credit-deduktion på Start Game** (Lobby `handleStartGame`):
@@ -649,6 +649,8 @@ Glöm inte lägga till nya stores här när de skapas — annars läcker stale d
 - `gameTotals: Record<string, number>` — per-spelare-totals aggregerade direkt från `allRoundScoresHistory`. Replacerar tidigare `{ you: totalPoints, ...opponentTotals }`-uppdelning. `totalPoints` är derived = `gameTotals[hostId] ?? 0` (host:s id = `turnOrder[0]?.id`).
 - `youPlayer` läser `name`/`emoji`/`age` från `turnOrder[0]` så leaderboarden visar host:s riktiga avatar/namn istället för hardcoded `'You'` / `'🎮'`.
 
+**Play Again carry-over** (`goToNewLobby` i [app/quiz.tsx](app/quiz.tsx)): laddar `loadProfile()` FÖRST, sedan bygger `lobbyPlayers`-arrayn till `savePendingLobbyPlayers`. Host:s rad får `name: profile?.playerName ?? 'You'` och `emoji: getAvatarEmojiById(profile.selectedAvatarId)` — INTE hardcoded `'You'` / `'🎮'` som tidigare. Annars hade host:s namn synts som "You" i nästa lobby + nästa spel:s leaderboard tills `mergeProfileIntoHost` hann fyra (vilket är efter mount). Gäller både "keep players" och "fresh"-grenarna i goToNewLobby.
+
 **Score per fråga går till EN spelare** — `recordRoundScore(pts, correct, timeUsed)` (tidigare `simulateOpponentRound`):
 - I Pass-the-Phone (turnOrder satt) skapas endast en post per fråga med `playerId = turnOrder[currentPlayerIndex].id`. Mock-opponents auto-genererar **inte** poäng eftersom alla riktiga spelare delar enheten.
 - Vid direkt-nav (turnOrder tom) bibehålls mock-opponent-flödet för gameplay-testning.
@@ -687,22 +689,35 @@ Hand-off-skärmen mellan Lobby:s Start Game-tap och första quiz-frågan. [src/c
 
 Sport-tabell-layout som driver både GetReadyIntro:s utfällbara leaderboard OCH final-leaderboarden i [src/components/RoundLeaderboard.tsx](src/components/RoundLeaderboard.tsx). Identisk struktur så användaren ser samma data-vy under hela spelet och vid game-end.
 
-**3-kolumn**: fixed Player (Pos + Namn) | scrollable middle (`Q | ✓ | ✗ | AVG | LAST | Last 5`) | fixed PTS:
-- **Vänster fixed**: position (1-based) + emoji + namn. Namnet trim:as via `numberOfLines={1}`. Min-width 130 / max 180 px.
-- **Mitten scrollbar horisontellt**: ScrollView som spänner över ALLA rader (header + spelare) så de scrollar synkat. Cell-höjd 36-40 px konstant så kolumnerna alignar.
+**3-kolumn**: fixed Player (Pos + Namn + meta-rad) | scrollable middle (`Q | ✓ | ✗ | AVG | LAST | Last 5`) | fixed PTS:
+- **Vänster fixed**: position (1-based) + namn-stack (emoji+namn ovanpå "Standard · Age 32"-meta-rad i textSecondary). Namn + meta trim:as via `numberOfLines={1}`. Min-width 170 / max 220 px (bumpat från 130/180 så meta-raden får plats utan trunkering — tar utrymme från mid-scroll-kolumnen som scrollar horisontellt vid behov). `lbNameStack` är column-flex med gap 2; `lbName` (FontSize.sm semibold textPrimary) ovanpå `lbNameMeta` (FontSize.xs medium textSecondary, letterSpacing 0).
+- **Mitten scrollbar horisontellt**: ScrollView som spänner över ALLA rader (header + spelare) så de scrollar synkat. Cell-höjd 52-56 px konstant så namn+meta-stacken får plats och kolumnerna alignar.
   - **Q** = antal frågor spelaren faktiskt svarat på (= playedRounds; "Q" är användaren-vänligare än "R" i sport-tabell-formatet).
   - **✓** (grön) / **✗** (röd) — räknare för rätt/fel.
-  - **AVG** / **LAST** — svarstid med **2 decimaler** (t.ex. `7.48s`). `LAST` = senaste avslutade fråga.
+  - **AVG** / **LAST** — svarstid med **2 decimaler** (t.ex. `7.48s`). `LAST` = senaste avslutade fråga. Decimal-precisionen kommer från `handleConfirm` som skickar `exactElapsedSec` (Date.now-diff) till `recordRoundScore`, INTE heltals-derived `responseSeconds - timeLeft` — det senare gav alltid `x.00` i dessa kolumner. Mock-opponent `generateOpponentTimeUsed` har på samma sätt `Math.round((5 + Math.random()*20) * 100) / 100` så även auto-genererade svarstider visar variation.
   - **Last 5** — 5 färgade dotts (grön ✓ / röd ✗ / grå tom plats för ej-spelade-ronder), höger-justerade så de senaste 5 alltid pekar mot listans slut.
 - **Höger fixed**: PTS — total points i primary blå bold, höger-justerad. Min-width 56 px, alltid synlig.
 
 **Sortering**: poäng desc → avg response time asc (ties brutna av snabbast genomsnitt).
 
-**Aggregering**: `tableEntries` deriveras direkt från `allRoundScoresHistory` per spelare-id. `playedRounds` = antal scores för spelaren, `correctAnswers` = filter på `correct=true`, `avgResponseSeconds` = mean av `timeUsed`, `lastResponseSeconds` = sista entry:s `timeUsed`, `lastFiveResults: boolean[]` = `playerScores.slice(-5).map(s => s.correct)`. När färre än 5 ronder spelats padd:as resten med grå tomma platser.
+**Aggregering**: `tableEntries` deriveras direkt från `allRoundScoresHistory` per spelare-id. `playedRounds` = antal scores för spelaren, `correctAnswers` = filter på `correct=true`, `avgResponseSeconds` = mean av `timeUsed`, `lastResponseSeconds` = sista entry:s `timeUsed`, `lastFiveResults: boolean[]` = `playerScores.slice(-5).map(s => s.correct)`. När färre än 5 ronder spelats padd:as resten med grå tomma platser. `age` + `assistance` per spelare bärs in från `LeaderboardPlayer`-shape:n och driver meta-raden i Player-kolumnen via `ASSISTANCE_LABEL`-mapping.
 
-**Final leaderboard-knappar** (när `isLastRound`):
-- **Home**-knapp (vänster, transparent bg + tunn border): `<QuizVibeQAvatar size={28} />` + texten "Home" (primary färg). Samma Q-brand-mark som Profile-skärmens topbanner använder upptill till vänster.
-- **Play Again**-knapp (höger): `Colors.warning` (gold #F5A623) bg + `Colors.background` (svart) text + iOS shadow + Android elevation. Premium-CTA-vokabulär (samma som Lobby:s Start Game).
+## Final Leaderboard-vyn — layout
+
+[src/components/RoundLeaderboard.tsx](src/components/RoundLeaderboard.tsx) renderar Final Leaderboard som en **flex column med intern ScrollView + sticky footer**:
+- Outer View `flex: 1` fyller hela SafeAreaView:n.
+- ScrollView (header + tabell) tar resterande höjd via `flex: 1`. Scrollar internt när tabellen är längre än skärmen.
+- `stickyFooter` (Home + Play Again) pinnas naturligt vid skärmens nederkant via flex-layouten — ingen `position: 'absolute'` behövs. `borderTop` + `Colors.background`-bg ger visuell separation från den scrollande tabellen ovanför.
+
+**Renderas UTANFÖR quiz.tsx:s parent ScrollView** via en early-return i renderingen (`if (phase === 'leaderboard') return <SafeAreaView><RoundLeaderboard.../></SafeAreaView>`). Annars hade RoundLeaderboard:s sticky footer följt med uppåt vid scroll i parent och inte längre alltid varit synlig.
+
+**Header**: `headerTitle` = `fontSize: 24, fontWeight: '700'` (matchar Lobby:s screenTitle exakt). `headerSubtitle` ("Round X of Y") renderas BARA när `!isLastRound` — Final-vyn visar enbart huvudrubriken. Tidigare "Final result"-undertitel borttagen för minimalistisk layout.
+
+**Final leaderboard-knappar** (när `isLastRound`, i sticky footer):
+- **Home** (vänster, `flex: 1`): `<QuizVibeQAvatar size={32} />` + "Home"-text i `flexDirection: 'row'` + `gap: Spacing.sm`. Bg `Colors.card`, border `Colors.border` (1.5 px), `Colors.primary`-text. Speglar TopUserBanner:s "Home"-backlink men på en row-layout istället för column.
+- **Play Again** (höger, `flex: 1`): bg `Colors.card`, border `Colors.border` (1.5 px), `Colors.primary`-text "Play Again". Knappens hela perimeter omgärdad av små grå (`Colors.textSecondary`) SVG-pilar i klockvis flöde — **3 per långsida (top + bottom) + 1 per kortsida (left + right) = 8 totalt**: top→ / right↓ / bottom← / left↑. Pilarna är 14×10, absolut-positionerade med center på border-linjen så de "skär igenom" ramen. Procent-positioner derived via `buildArrowOffsets(N)` (N+1 jämn fördelning) — 3 långsida → 25/50/75 %, 1 kortsida → 50 %. SVG-fill cast:as till `${number}%` template-typ för RN:s `DimensionValue`-typer. Visuellt signalerar rotations-loop:en "play again / restart" utan en ikon inuti knappen.
+
+Båda knappar `flex: 1` så footer-raden fylls 50/50 med Spacing.sm gap mellan; `gap` + `flexDirection: 'row'` på `finalActions`-container.
 
 ## Quiz — Question screen (question + awaiting + reveal phases)
 
@@ -741,7 +756,7 @@ const stopwatchColor = phase === 'question' ? timerColor : '#8CC1FF';
    - Hela rutan har `borderWidth: 2 / borderColor: stopwatchColor` + halo bakom (`backgroundColor: stopwatchColor` + animated `opacity: timerRingGlow` — synkat med ringens pulse).
    - Display **fryses** vid Confirm via `setDecimalElapsedMs(elapsedAtConfirm)` i handleConfirm, sedan stopp på 20 Hz-tick:en när phase blir `'awaiting'`.
 4. **Fråge-kort** (`minHeight: 140`):
-   - Top-rad: `Question N of M` (vänster) + `Answering: {playerName}` (höger, bara Pass-the-Phone). `flexDirection: 'row'` + `justifyContent: 'space-between'`.
+   - Top-rad: `Question N of M` (vänster) + `Answering`-stack (höger, bara Pass-the-Phone). Stack:en är `flexDirection: 'column'` + `alignItems: 'flex-end'` + `gap: 1` så "Answering:"-label sitter ovanpå PlayerName i två högerställda rader istället för en lång rad. `questionTopRow` har `alignItems: 'flex-start'` så stack:en kan vara två rader utan att skuffa question-räknaren neråt.
    - Frågetext (`flex: 1`, vertikalt centrerad). **Music-frågor split:as i två rader**: `<Text style={questionTextHeadline}>Which year</Text>` (32 px bold) + `<Text style={questionText}>was this song released?</Text>` (18 px semibold). Övriga kategorier (kommande Capitals/Persons) renderar `question.question` som single-text.
 5. **TimelineSelector** med pulserande gold-pilar utanför svarsruta-edges:
    - `‹` / `›`-glyfer (38 px bold, `BOX_COLOR` + textShadow för glow), absolut-positionerade vid `right: '50%' + marginRight: selectorWidth/2 + 6` (vänster) respektive `left: '50%' + marginLeft: selectorWidth/2 + 6` (höger). Loop:ar opacity 0.35 ↔ 1 + scale 1 ↔ 1.18 över 700 ms (native driver). Stoppas när `disabled`.
@@ -752,18 +767,18 @@ const stopwatchColor = phase === 'question' ? timerColor : '#8CC1FF';
    - `'reveal'`: ingen action-knapp i actionWrap — Next-tab sitter INUTI feedback-kortet istället.
 7. **Feedback-kort** (visas BARA i `'reveal'`, inte i `'awaiting'` — se nedan):
    - `borderWidth: 2`, kompakt padding (`paddingVertical: xs / paddingHorizontal: sm / gap: 2`).
-   - Grön (`successMuted` + `success` border) vid rätt, röd (`errorMuted` + `error` border) vid fel.
+   - **Båda statusarna delar bg-färg `Colors.card`** (samma som question-kortet ovanför) så reveal-vyn känns som en seamless förlängning av frågan istället för en "alarm-ruta". Status-färgen bärs enbart på badge + border: grön border (`Colors.success`) vid rätt, röd border (`Colors.error`) vid fel.
    - **Badge**: `✓ Correct Answer` (success) eller `✗ Wrong Answer` (error) i top-vänster.
-   - **Correct year**: `Correct year: {N}` (label FontSize.lg medium + siffra FontSize.xxl bold tabular-nums).
-   - **Answer time** (bara vid rätt svar): `Answer time: {X.YY}s` i FontSize.xs `textSecondary` + `marginTop: -2`.
-   - **Next-tab** (höger-justerad sista raden): `Next →` eller `🏆 Final Leaderboard`. **Bg = `Colors.primary` (blå)** för båda fallen oavsett rätt/fel — Card:ens border + badge bär status-färgen, tab:en signalerar bara "fortsätt".
+   - **`feedbackYearRow`** (row + `alignItems: 'flex-end'` + `justifyContent: 'space-between'`): "Correct year: {N}" vänster + Next-tab höger på SAMMA rad. `alignItems: 'flex-end'` bottom-anchorar båda så Next-tab:ens underkant linjerar med correct-year-textens underkant — driver tab:ens vertikala position så den läser som en logisk fortsättning på årsraden istället för en separat botten-knapp.
+   - **Answer time** (bara vid rätt svar): `Answer time: {X.YY}s` i FontSize.xs `textSecondary` + `marginTop: -2`. Renderas UNDER feedbackYearRow.
+   - **Next-tab** (i feedbackYearRow): `Next →` eller `🏆 Final Leaderboard`. **Bg = `Colors.primary` (blå)** för båda fallen oavsett rätt/fel — Card:ens border + badge bär status-färgen, tab:en signalerar bara "fortsätt".
 
 ### Confirm + awaiting + reveal-flödet
 
 **`handleConfirm(year)`**:
-1. Räknar exakt elapsed via `Date.now() - questionStartMsRef`.
-2. `recordRoundScore(pts, correct, timeUsed)` registrerar score:n under **active player's id** (`turnOrder[currentPlayerIndex]?.id ?? 'you'`). I Pass-the-Phone genereras inga mock-opponent-poäng — endast aktiva spelaren får en post. `allRoundScoresHistory` uppdateras.
-3. Sätter `confirmedTimeUsed`, `decimalElapsedMs` (frys), `selectedYear`, `setRounds`-historik.
+1. Räknar exakt elapsed via `Date.now() - questionStartMsRef` → `exactElapsedSec` (cap:as till `responseSeconds`).
+2. `recordRoundScore(pts, correct, exactElapsedSec)` registrerar score:n under **active player's id** (`turnOrder[currentPlayerIndex]?.id ?? 'you'`). **Skickar `exactElapsedSec` (2-decimaler) — INTE heltals-derived `responseSeconds - timeLeft`** — annars hade leaderboardens AVG/LAST-kolumner alltid visat `x.00`. Samma värde sparas i `setRounds`-historiken som `timeUsed`. I Pass-the-Phone genereras inga mock-opponent-poäng — endast aktiva spelaren får en post. `allRoundScoresHistory` uppdateras.
+3. Sätter `confirmedTimeUsed`, `decimalElapsedMs` (frys), `selectedYear`.
 4. Stoppar **inte** timer:n. Sätter `phase = 'awaiting'`.
 
 **Awaiting-fasen**:
@@ -844,20 +859,20 @@ Demo-data (`src/utils/nameQuizDemo.ts`) genererad för Millennials (1990) + stan
 
 - [src/components/QuizVibeQuestionMarkLogo.tsx](src/components/QuizVibeQuestionMarkLogo.tsx) — variant av `QuizVibeLogo` med `?`-glyph (SVG `<Text>`) i Q-ringen istället för wifi-fan. Squares + Q-ring + Q-svans identiska. ViewBox 0-80 × 0-80, Q-ring center (37, 37). `?` placeras på y=43 så glyph-mitten hamnar runt y=37 (SvgText:s y refererar till baseline).
 - [src/components/QuizVibePlayLogo.tsx](src/components/QuizVibePlayLogo.tsx) — variant med play-triangel inuti Q-ringen istället för wifi-fan/?. Tar `color`-prop (default `Colors.primary`) som styr alla brand-färgade element (Q-ring, svans, play-triangel, squares-kanter). Bakre kvadratens muted-fyllning härleds som `color + '30'` (~19% opacity hex-alpha) så hela loggan toner mot color-värdet — i GetReady passas `Colors.warning` så loggan blir gold för att matcha gold-glow-halo:n runt den.
-- [src/components/CountdownIntro.tsx](src/components/CountdownIntro.tsx) — 3-2-1-nedräkning mellan tap på play-knappen i intro:n och fråge-vyn. Stor `QuizVibeQuestionMarkLogo` centrerad (size 360 px); siffran (3, 2, 1) pop:as in i Q-ringen via overlay-Animated.Text med spring-scale 1.4 → 1 + opacity 0 → 1. När count går 1 → 0 byts siffran ut mot den statiska `?`-glyphen. Total tid ~4 s. PlayerName visas ovan loggan (`Pass-the-Phone to: {namn}` i display-storlek).
+- [src/components/CountdownIntro.tsx](src/components/CountdownIntro.tsx) — 3-2-1-nedräkning mellan tap på play-knappen i intro:n och fråge-vyn. Stor `CountdownQLogo` centrerad (size 360 px på fullbreds-skärmar). Siffran (3, 2, 1) och `?`-glyfen pop:as in i Q-ringen via overlay-Animated.Text med spring-scale 1.4 → 1 + opacity 0 → 1, **följt av en kontinuerlig zoom-puls 1 ↔ 1.18 (350 ms varje håll, ~1.4 puls/sek)** tills siffran byts. Loop:n stoppas i useEffect cleanup vid count-byte så nästa siffrans pop-in inte krockar med den gamla loopen. Total tid ~4 s. **Q-loggan shift:as `LOGO_SIZE * 0.0375` åt höger** via en absolute-positionerad wrap-View så Q-ringens center (SVG-koord (37, 37) = 46.25 % av LOGO_SIZE) hamnar exakt på 50 % horisontellt under glyph-overlay:ns centrerade siffra/?. **PlayerName-block ovan loggan**: `Pass-the-Phone to:`-label + framed box (`primaryMuted` bg + `Colors.primary` border + Radius.md, padding sm/lg) som matchar GetReadyIntro:s `currentPlayerBox` 1:1 — avatar (40×40 cirkel) + namn (FontSize.xxl bold) i row-layout. `playerEmoji?: string`-prop skickas in från quiz.tsx via `turnOrder[currentPlayerIndex]?.emoji`. `playerBlock.gap = Spacing.xl` ger luftig separation mellan label-rad och box.
 - [src/components/StopwatchIcon.tsx](src/components/StopwatchIcon.tsx) — modern sport-stopwatch SVG (rund kropp, top crown-knapp, sido-knapp diagonal, tick-mark vid 12-position, visare mot 1-2-positionen, center-pivot). `color`-prop styr alla element. ViewBox 24×24, default size 24. Används i quiz-skärmens decimal-stopwatch under timer-bar:en — ersätter den tidigare ⏱-emojin som rendereades inkonsekvent över plattformar.
 - [src/components/ProgressiveCover.tsx](src/components/ProgressiveCover.tsx) — mosaik-reveal-cover (se "Name-answer model — demo route"). Tar `assistance`-prop som styr reveal-fraktion: `full=0.25`, `standard=0.5`, `minimal=0.75` av `totalSeconds` (mer assistance = snabbare reveal). Q-loggan fadar oberoende av mosaiken — alltid helt borta efter 3 s via separat tick-loop.
 
 ## Host Game Credits — gate på Create Game + Play Again
 
-[`refreshFreeCreditsIfNeeded` i src/utils/profileStorage.ts](src/utils/profileStorage.ts) top-up:ar `freeGameCredits` till `FREE_CREDITS_DAILY_CAP = 4` vid första `loadProfile()` efter midnatt CET. Det innebär att flödet `loadProfile() → kontrollera saldo` alltid jämför mot färska värden inkl. dagens refresh.
+[`refreshFreeCreditsIfNeeded` i src/utils/profileStorage.ts](src/utils/profileStorage.ts) top-up:ar `freeGameCredits` upp till `FREE_CREDITS_DAILY_CAP = 2` vid första `loadProfile()` efter midnatt CET (icke-destruktiv: saldo ≥ cap lämnas orört). Det innebär att flödet `loadProfile() → kontrollera saldo` alltid jämför mot färska värden inkl. dagens refresh.
 
 **Tre gates som blockerar host:s spelstart vid 0/0-saldo** (samma copy + Store-deeplink för konsistent UX):
 1. **Home — `handleCreateGame`** ([app/(tabs)/index.tsx](app/(tabs)/index.tsx)): async, läser fresh `loadProfile()`, blockerar med `Out of Host Game Credits`-Alert (Cancel + Go to Store → `/store?focus=credits&from=/`) om både `freeGameCredits === 0 && gameCredits === 0`. Fångar tom-saldo INNAN lobby skapas.
-2. **Lobby — `handleStartGame`** ([src/screens/LobbyScreen.tsx](src/screens/LobbyScreen.tsx)): samma gate vid Start Game-tap (existerande). Backup om host kommit förbi Home-gaten via Play Again eller direkt-nav.
-3. **Quiz — `handlePlayAgain`** ([app/quiz.tsx](app/quiz.tsx)): async, läser fresh `loadProfile()` FÖRE re-use-players-prompten så user inte fyller i alerts först och sedan blockas i Lobby:n.
+2. **Lobby — `handleStartGame`** ([src/screens/LobbyScreen.tsx](src/screens/LobbyScreen.tsx)): samma gate vid Start Game-tap. Detta är där credit-deduktionen FAKTISKT sker (1 credit konsumeras, Free först sedan Extras). Backup-gate om host kommit förbi Home-gaten via Play Again eller direkt-nav.
+3. **Quiz — `handlePlayAgain`** ([app/quiz.tsx](app/quiz.tsx)): async, läser fresh `loadProfile()` FÖRE re-use-players-prompten så user inte fyller i alerts först och sedan blockas i Lobby:n. **Verifierar** bara saldot — drar INGA credits här. Deduktionen sker först när host trycker Start Game i Lobby (samma flöde som Home → Create Game → Lobby → Start Game).
 
-Alla tre använder identisk Alert-copy + same Store-deeplink. Lobby:s eget gate är fortfarande bibehållet som backup men ska sällan trigga eftersom Home/Play Again-gates fångar fallet tidigare.
+Alla tre använder identisk Alert-copy + same Store-deeplink. `handlePlayAgain` pushar Store **utan** `from=...`-paramet så Store:s Back-knapp faller till `router.back()` istället för `router.replace(from)` — det bevarar /quiz på root Stack:en med Final Leaderboard-state intakt även efter köp + auto-back via `handleBack`-callback i success-Alert:en (StoreScreen.handleBuyCredits).
 
 ## Scripts
 

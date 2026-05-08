@@ -81,10 +81,11 @@ const LEGACY_SKILL_TO_ASSISTANCE: Record<string, AssistanceLevel> = {
   expert: 'minimal',
 };
 
-// Daily-cap för fria Host Games. 2 base + 2 bonus = 4 credits per dygn,
-// fylls på automatiskt vid midnatt CET via refreshFreeCreditsIfNeeded
-// (anropas i loadProfile). Konsumeras före gameCredits vid Create Game.
-export const FREE_CREDITS_DAILY_CAP = 4;
+// Daily-cap för fria Host Games. Top-up till MAX 2 vid midnatt CET via
+// refreshFreeCreditsIfNeeded (anropas i loadProfile). Topp-up:en är aldrig
+// destruktiv — om saldot redan är ≥ 2 (t.ex. efter en kampanj-bonus) lämnas
+// det orört. Konsumeras före gameCredits vid Create Game.
+export const FREE_CREDITS_DAILY_CAP = 2;
 
 /**
  * Returnerar dagens datum i Europe/Stockholm-tidszon som "YYYY-MM-DD".
@@ -103,23 +104,30 @@ function todayCETDate(): string {
 }
 
 /**
- * Top up:ar `freeGameCredits` till `FREE_CREDITS_DAILY_CAP` om CET-datumet
- * har passerat sedan senaste refresh. Returnerar `{ data, changed }` så
- * loadProfile kan persistera tillbaka när top-up faktiskt skedde — annars
- * regenererar vi inte storage-skrivning på varje läsning.
+ * Top up:ar `freeGameCredits` upp till `FREE_CREDITS_DAILY_CAP` om CET-datumet
+ * har passerat sedan senaste refresh. Top-up:en är **icke-destruktiv**:
+ *   • saldo ≥ cap → lämnas orört (ingen reduktion).
+ *   • saldo < cap → bumpas upp till cap (skillnaden adderas).
+ *   • undefined   → behandlas som 0 → bumpas upp till cap.
+ * Extras (`gameCredits`) är ALLTID orört av denna funktion — bara Free
+ * påverkas vid midnatt. Returnerar `{ data, changed }` så loadProfile bara
+ * persisterar om något faktiskt ändrades (inkl. första-läget då datum saknas
+ * på legacy-profil men saldo råkar redan vara på cap).
  *
- * Edge case: helt nya profiler (utan lastFreeCreditsRefreshDate) räknas
- * som "ny dag" → får full daily cap direkt vid första load.
+ * Edge case: helt nya profiler (utan lastFreeCreditsRefreshDate) räknas som
+ * "ny dag" → får cap direkt vid första load.
  */
 function refreshFreeCreditsIfNeeded(data: ProfileData): { data: ProfileData; changed: boolean } {
   const today = todayCETDate();
   if (data.lastFreeCreditsRefreshDate === today) {
     return { data, changed: false };
   }
+  const currentFree = data.freeGameCredits ?? 0;
+  const nextFree = Math.max(currentFree, FREE_CREDITS_DAILY_CAP);
   return {
     data: {
       ...data,
-      freeGameCredits: FREE_CREDITS_DAILY_CAP,
+      freeGameCredits: nextFree,
       lastFreeCreditsRefreshDate: today,
     },
     changed: true,

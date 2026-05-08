@@ -1,7 +1,50 @@
 import React, { useMemo } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import Svg, { Path } from 'react-native-svg';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
 import { QuizVibeQAvatar } from './QuizVibeQAvatar';
+
+/**
+ * Liten SVG-pil som placeras längs Play Again-knappens kant. Många små
+ * pilar i klockvis flöde runt hela perimetern signalerar "play again /
+ * restart" via en visuell rotations-loop kring knappen.
+ *
+ * Bas-arrow:n är ritad pekande HÖGER i viewBoxen; rotation:en roteras
+ * för andra riktningar via parent-View:s transform.
+ */
+const PLAY_AGAIN_ARROW_W = 14;
+const PLAY_AGAIN_ARROW_H = 10;
+// Knappens långsida (top/bottom) får 3 pilar; kortsidan (left/right) får 1
+// pil — proportionellt mot sidans längd så den visuella tätheten håller sig
+// jämn runt hela perimetern.
+const PLAY_AGAIN_ARROWS_LONG = 3;
+const PLAY_AGAIN_ARROWS_SHORT = 1;
+
+function PlayAgainEdgeArrow({ rotation }: { rotation: 0 | 90 | 180 | 270 }) {
+  return (
+    <View style={{ transform: [{ rotate: `${rotation}deg` }] }}>
+      <Svg width={PLAY_AGAIN_ARROW_W} height={PLAY_AGAIN_ARROW_H} viewBox="0 0 14 10">
+        <Path
+          d="M 0 4 L 8 4 L 8 1 L 14 5 L 8 9 L 8 6 L 0 6 Z"
+          fill={Colors.textSecondary}
+        />
+      </Svg>
+    </View>
+  );
+}
+
+// Jämnt fördelade procent-positioner längs en sida — N pilar mellan
+// 1/(N+1) och N/(N+1) av sidans längd. Cast till DimensionValue-template
+// (`${number}%`) så RN:s ViewStyle-typer accepterar dem som left/top.
+type PercentValue = `${number}%`;
+function buildArrowOffsets(count: number): PercentValue[] {
+  return Array.from(
+    { length: count },
+    (_, i) => `${((100 / (count + 1)) * (i + 1)).toFixed(2)}%` as PercentValue,
+  );
+}
+const PLAY_AGAIN_LONG_OFFSETS = buildArrowOffsets(PLAY_AGAIN_ARROWS_LONG);
+const PLAY_AGAIN_SHORT_OFFSETS = buildArrowOffsets(PLAY_AGAIN_ARROWS_SHORT);
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -65,10 +108,17 @@ export function generateOpponentRoundScore(assistance: AssistanceLevel): { point
   return { points, correct: true };
 }
 
-// Mock svarstid för en motspelare (5–25 sekunder).
+// Mock svarstid för en motspelare (5–25 sekunder, 2-decimals-precision så
+// AVG/LAST-kolumnen i leaderboarden visar variation istället för "x.00").
 export function generateOpponentTimeUsed(): number {
-  return Math.round(5 + Math.random() * 20);
+  return Math.round((5 + Math.random() * 20) * 100) / 100;
 }
+
+const ASSISTANCE_LABEL: Record<AssistanceLevel, string> = {
+  minimal: 'Minimal',
+  standard: 'Standard',
+  full: 'Full',
+};
 
 // ─── Main leaderboard component ───────────────────────────────────────────────
 
@@ -121,6 +171,8 @@ export function RoundLeaderboard({
         playerId: p.id,
         name: p.name,
         emoji: p.emoji,
+        age: p.age,
+        assistance: p.assistance,
         points: totalsByPlayerId[p.id] ?? 0,
         playedRounds: playerScores.length,
         correctAnswers,
@@ -137,37 +189,59 @@ export function RoundLeaderboard({
   }, [players, allRoundScoresHistory, totalsByPlayerId]);
 
   return (
-    <View style={styles.container}>
-      <View style={styles.headerRow}>
-        <Text style={styles.headerTitle}>
-          {isLastRound ? 'Final Leaderboard' : 'Leaderboard'}
-        </Text>
-        <Text style={styles.headerSubtitle}>
-          {isLastRound ? 'Final result' : `Round ${roundNumber} of ${totalRounds}`}
-        </Text>
-      </View>
+    <View style={styles.outer}>
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.headerRow}>
+          <Text style={styles.headerTitle}>
+            {isLastRound ? 'Final Leaderboard' : 'Leaderboard'}
+          </Text>
+          {/* Round X of Y-undertitel renderas bara vid icke-sista ronder.
+              Final-vyn döljer den helt så bara huvudrubriken syns längst upp. */}
+          {!isLastRound && (
+            <Text style={styles.headerSubtitle}>
+              Round {roundNumber} of {totalRounds}
+            </Text>
+          )}
+        </View>
 
-      {/* Sport-tabell-layout — speglar GetReadyIntro:s leaderboard:
-          fixed Player-kolumn vänster, scroll:bar middle med detail-stats,
-          fixed PTS-kolumn höger. */}
-      <View style={styles.lbTable}>
+        {/* Sport-tabell-layout — speglar GetReadyIntro:s leaderboard:
+            fixed Player-kolumn vänster, scroll:bar middle med detail-stats,
+            fixed PTS-kolumn höger. */}
+        <View style={styles.lbTable}>
         {/* Vänster fixed kolumn: Position + Namn */}
         <View style={styles.lbLeftCol}>
           <View style={[styles.lbCell, styles.lbHeaderCell, styles.lbLeftCell]}>
             <Text style={styles.lbHeaderText}>Player</Text>
           </View>
-          {tableEntries.map((entry, index) => (
-            <View
-              key={entry.playerId}
-              style={[styles.lbCell, styles.lbLeftCell]}
-            >
-              <Text style={styles.lbPos}>{index + 1}</Text>
-              <Text style={styles.lbName} numberOfLines={1}>
-                {entry.emoji ? `${entry.emoji} ` : ''}
-                {entry.name}
-              </Text>
-            </View>
-          ))}
+          {tableEntries.map((entry, index) => {
+            const meta = [
+              entry.assistance ? ASSISTANCE_LABEL[entry.assistance] : null,
+              typeof entry.age === 'number' ? `Age ${entry.age}` : null,
+            ].filter(Boolean).join(' · ');
+            return (
+              <View
+                key={entry.playerId}
+                style={[styles.lbCell, styles.lbLeftCell]}
+              >
+                <Text style={styles.lbPos}>{index + 1}</Text>
+                <View style={styles.lbNameStack}>
+                  <Text style={styles.lbName} numberOfLines={1}>
+                    {entry.emoji ? `${entry.emoji} ` : ''}
+                    {entry.name}
+                  </Text>
+                  {meta.length > 0 && (
+                    <Text style={styles.lbNameMeta} numberOfLines={1}>
+                      {meta}
+                    </Text>
+                  )}
+                </View>
+              </View>
+            );
+          })}
         </View>
 
         {/* Mitt scroll:bar kolumn — alla detail-celler */}
@@ -261,24 +335,99 @@ export function RoundLeaderboard({
           ))}
         </View>
       </View>
+      </ScrollView>
 
+      {/* Sticky footer-rad — flex-baserad pinning vid skärmens nederkant så
+          knapparna alltid syns även när tabellen scrollar. justifyContent:
+          'flex-end' höger-ställer Home + Play Again i ändan av raden. */}
+      <View style={styles.stickyFooter}>
       {isLastRound ? (
         <View style={styles.finalActions}>
-          {/* Home-knapp = QuizVibe Q-logo (= samma brand-mark som
-              TopUserBanner i Profile-skärmens övre vänstra hörn). */}
+          {/* Home-knapp = QuizVibe Q-logo + "Home"-text i column-stack —
+              speglar TopUserBanner:s "Home"-länk i Profile-skärmens övre
+              vänstra hörn (samma Q-mark, samma stack-layout, samma textstil). */}
           <Pressable
             onPress={onGoHome}
             style={({ pressed }) => [styles.finalHomeBtn, pressed && { opacity: 0.7 }]}
           >
-            <QuizVibeQAvatar size={28} />
+            <QuizVibeQAvatar size={32} />
             <Text style={styles.finalHomeBtnText}>Home</Text>
           </Pressable>
-          {/* Play Again = golden bg + svart text för premium-känsla. */}
+          {/* Play Again — knappen omgärdad av små pilar i klockvis flöde
+              (3 per långsida, 1 per kortsida = 8 totalt: top→ / right↓ /
+              bottom← / left↑) som visuellt signalerar "play again / restart"
+              via en rotations-loop kring hela perimetern. Pilarna är absolut-
+              positionerade med center på border-linjen så de "skär igenom"
+              ramen. */}
           <Pressable
             onPress={onPlayAgain}
             style={({ pressed }) => [styles.finalPlayAgainBtn, pressed && { opacity: 0.85 }]}
           >
-            <Text style={styles.finalPlayAgainText}>🔁 Play Again</Text>
+            <Text style={styles.finalPlayAgainText}>Play Again</Text>
+            {PLAY_AGAIN_LONG_OFFSETS.map((pct, i) => (
+              <View
+                key={`top-${i}`}
+                style={[
+                  styles.playAgainEdgeArrow,
+                  {
+                    top: -PLAY_AGAIN_ARROW_H / 2,
+                    left: pct,
+                    marginLeft: -PLAY_AGAIN_ARROW_W / 2,
+                  },
+                ]}
+                pointerEvents="none"
+              >
+                <PlayAgainEdgeArrow rotation={0} />
+              </View>
+            ))}
+            {PLAY_AGAIN_SHORT_OFFSETS.map((pct, i) => (
+              <View
+                key={`right-${i}`}
+                style={[
+                  styles.playAgainEdgeArrow,
+                  {
+                    right: -PLAY_AGAIN_ARROW_W / 2,
+                    top: pct,
+                    marginTop: -PLAY_AGAIN_ARROW_H / 2,
+                  },
+                ]}
+                pointerEvents="none"
+              >
+                <PlayAgainEdgeArrow rotation={90} />
+              </View>
+            ))}
+            {PLAY_AGAIN_LONG_OFFSETS.map((pct, i) => (
+              <View
+                key={`bottom-${i}`}
+                style={[
+                  styles.playAgainEdgeArrow,
+                  {
+                    bottom: -PLAY_AGAIN_ARROW_H / 2,
+                    left: pct,
+                    marginLeft: -PLAY_AGAIN_ARROW_W / 2,
+                  },
+                ]}
+                pointerEvents="none"
+              >
+                <PlayAgainEdgeArrow rotation={180} />
+              </View>
+            ))}
+            {PLAY_AGAIN_SHORT_OFFSETS.map((pct, i) => (
+              <View
+                key={`left-${i}`}
+                style={[
+                  styles.playAgainEdgeArrow,
+                  {
+                    left: -PLAY_AGAIN_ARROW_W / 2,
+                    top: pct,
+                    marginTop: -PLAY_AGAIN_ARROW_H / 2,
+                  },
+                ]}
+                pointerEvents="none"
+              >
+                <PlayAgainEdgeArrow rotation={270} />
+              </View>
+            ))}
           </Pressable>
         </View>
       ) : (
@@ -289,6 +438,7 @@ export function RoundLeaderboard({
           <Text style={styles.nextBtnText}>Next Round  →</Text>
         </Pressable>
       )}
+      </View>
     </View>
   );
 }
@@ -296,9 +446,30 @@ export function RoundLeaderboard({
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
-  container: {
+  // Outer container — flex column som fyller hela SafeAreaView. Scroll:n tar
+  // tillgängligt utrymme; sticky footer pinnas naturligt vid bottom via
+  // flex-layout (ingen absolute-positioning behövs).
+  outer: {
+    flex: 1,
+  },
+  scroll: {
+    flex: 1,
+  },
+  scrollContent: {
     gap: Spacing.md,
     paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.lg,
+    paddingBottom: Spacing.md,
+  },
+  // Sticky footer — naturligt placerad efter ScrollView i flex-layouten.
+  // borderTop ger visuell separation från scrollande tabell-content.
+  stickyFooter: {
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.md,
+    paddingBottom: Spacing.lg,
+    borderTopWidth: 1,
+    borderTopColor: Colors.border,
+    backgroundColor: Colors.background,
   },
 
   headerRow: {
@@ -306,9 +477,11 @@ const styles = StyleSheet.create({
     alignItems: 'baseline',
     justifyContent: 'space-between',
   },
+  // Matchar Lobby:s screenTitle (24 / 700) så Final Leaderboard-rubriken
+  // läser i samma vikt och hierarki som "Game Lobby" i lobby-vyn.
   headerTitle: {
-    fontSize: 20,
-    fontWeight: FontWeight.bold,
+    fontSize: 24,
+    fontWeight: '700',
     color: Colors.textPrimary,
   },
   headerSubtitle: {
@@ -327,7 +500,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   lbCell: {
-    height: 40,
+    height: 56,
     flexDirection: 'row',
     alignItems: 'center',
     borderBottomWidth: 1,
@@ -343,14 +516,17 @@ const styles = StyleSheet.create({
     letterSpacing: 0.6,
     textTransform: 'uppercase',
   },
+  // Bredare än tidigare (180 → 220) så meta-raden ("Standard · Age 32") får
+  // plats på en rad utan att truncatas till bara "Age...". Tar utrymme från
+  // mid-scroll-kolumnen som redan scrollar horisontellt vid behov.
   lbLeftCol: {
-    minWidth: 130,
-    maxWidth: 180,
+    minWidth: 170,
+    maxWidth: 220,
   },
   lbLeftCell: {
-    paddingLeft: Spacing.md,
-    paddingRight: Spacing.sm,
-    gap: 6,
+    paddingLeft: Spacing.sm,
+    paddingRight: 4,
+    gap: 4,
   },
   lbPos: {
     fontSize: FontSize.sm,
@@ -359,17 +535,30 @@ const styles = StyleSheet.create({
     fontVariant: ['tabular-nums'],
     width: 16,
   },
-  lbName: {
+  // Stack:ar namn ovanpå meta-rad (assistance + ålder) under sig så namnet
+  // står i top-anchored position mens metadata sitter i textSecondary under.
+  lbNameStack: {
     flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'center',
+    gap: 2,
+  },
+  lbName: {
     fontSize: FontSize.sm,
     fontWeight: FontWeight.semibold,
     color: Colors.textPrimary,
+  },
+  lbNameMeta: {
+    fontSize: FontSize.xs,
+    fontWeight: FontWeight.medium,
+    color: Colors.textSecondary,
+    letterSpacing: 0,
   },
   lbMidScroll: {
     flex: 1,
   },
   lbMidRow: {
-    height: 40,
+    height: 56,
     flexDirection: 'row',
     alignItems: 'center',
     borderBottomWidth: 1,
@@ -455,20 +644,24 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
 
+  // Action-row i sticky footer — Home (flex:1) på vänster halva, Play Again
+  // (flex:1) på höger halva med Spacing.sm gap mellan. Knapparna stretchar
+  // över hela bredden så footer:n känns full istället för att lämna tomrum
+  // i mitten.
   finalActions: {
     flexDirection: 'row',
     gap: Spacing.sm,
-    marginTop: Spacing.sm,
   },
-  // Home-knapp: Q-logo + "Home"-text, transparent bg + tunn border (matchar
-  // Profile:s topbanner-stil där samma Q-avatar används som "Home"-länk).
+  // Home-knapp: Q-logo VÄNSTER om "Home"-text på samma rad. Bg matchar
+  // leaderboard-tabellens dataradsbg (Colors.card) så knappen visuellt knyter
+  // an till leaderboardens nedre del.
   finalHomeBtn: {
     flex: 1,
     height: 56,
     borderRadius: Radius.md,
     borderWidth: 1.5,
     borderColor: Colors.border,
-    backgroundColor: 'transparent',
+    backgroundColor: Colors.card,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -480,25 +673,32 @@ const styles = StyleSheet.create({
     color: Colors.primary,
     letterSpacing: 0.3,
   },
-  // Play Again: gold bg + svart text — premium-CTA-vokabulär (samma som
-  // Lobby:s Start Game-knapp). Skuggor + elevation lyfter knappen visuellt.
+  // Play Again — gul rundad rektangel med tjock blå border. Pilar
+  // (PlayAgainEdgeArrow) absolut-positioneras runt border:n för
+  // rotations-loop-effekt. Shadow + elevation matchar tidigare premium-känsla.
+  // overflow: 'visible' så pilarnas spetsar som sticker ut utanför border:n
+  // inte klipps.
   finalPlayAgainBtn: {
     flex: 1,
     height: 56,
     borderRadius: Radius.md,
-    backgroundColor: Colors.warning,
+    borderWidth: 1.5,
+    borderColor: Colors.border,
+    backgroundColor: Colors.card,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: Colors.warning,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.5,
-    shadowRadius: 12,
-    elevation: 8,
+    overflow: 'visible',
   },
   finalPlayAgainText: {
     fontSize: FontSize.md,
     fontWeight: FontWeight.bold,
-    color: Colors.background,
+    color: Colors.primary,
     letterSpacing: 0.3,
+  },
+  // Bas-stil för pilar runt Play Again-knappens kant — top/left/bottom/right
+  // + marginLeft/marginTop sätts inline per pil för att jämnt fördela 4 st
+  // per sida (PLAY_AGAIN_ARROW_OFFSETS).
+  playAgainEdgeArrow: {
+    position: 'absolute',
   },
 });

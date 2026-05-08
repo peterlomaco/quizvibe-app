@@ -220,9 +220,14 @@ export default function StoreScreen() {
               price_amount: tier.priceAmount,
               price_currency: 'SEK',
             });
+            // Efter success-alertet OK:as tar vi automatiskt användaren
+            // tillbaka till källan via handleBack — annars stannar de kvar på
+            // Store-skärmen och måste manuellt tappa Back för att fortsätta
+            // sitt flöde (t.ex. Play Again från Final Leaderboard).
             Alert.alert(
               'Purchase successful',
               `${tier.games} Host Games added — you now have ${newCredits} credits.`,
+              [{ text: 'OK', onPress: handleBack }],
             );
           },
         },

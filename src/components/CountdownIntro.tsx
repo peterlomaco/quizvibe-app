@@ -8,7 +8,7 @@ import {
   View,
 } from 'react-native';
 import Svg, { Circle, Path, Rect } from 'react-native-svg';
-import { Colors, FontSize, FontWeight, Spacing } from '../theme';
+import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
 
 interface Props {
   /** Anropas när nedräkningen passerat 1 → 0 OCH "?" har visats. */
@@ -18,6 +18,9 @@ interface Props {
   /** Namn på spelaren som ska börja sin runda — visas ovan Q-loggan så
    *  spelarna ser vems tur det är även när nedräkningen körs. */
   playerName?: string;
+  /** Avatar-emoji för spelaren — renderas i playerName-boxen som visuellt
+   *  matchar GetReadyIntro:s currentPlayerBox (avatar + namn på rad). */
+  playerEmoji?: string;
 }
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -39,7 +42,7 @@ const GLYPH_FONT_SIZE = LOGO_SIZE * 0.28;
  * att "?" visats i ~1 s fyras `onComplete` så parent kan växla fas till
  * `'question'`.
  */
-export function CountdownIntro({ onComplete, startFrom = 3, playerName }: Props) {
+export function CountdownIntro({ onComplete, startFrom = 3, playerName, playerEmoji }: Props) {
   const [count, setCount] = useState(startFrom);
   // Två separata pop-animationer så siffran och "?" kan röra sig oberoende.
   const numberScale = useRef(new Animated.Value(1.4)).current;
@@ -69,12 +72,17 @@ export function CountdownIntro({ onComplete, startFrom = 3, playerName }: Props)
     return () => clearInterval(id);
   }, [startFrom]);
 
-  // Pop-animation per siffer-byte (3, 2, 1). Skala 1.4 → 1, opacity 0 → 1
-  // över 250 ms.
+  // Pop-in per siffer-byte (3, 2, 1) följt av kontinuerlig zoom-puls
+  // (1.0 ↔ 1.18) tills siffran byts. Pop-in:n körs som spring 1.4 → 1 +
+  // opacity 0 → 1 över ~250 ms; därefter fyras puls-loopen som scale-
+  // sekvens 1 → 1.18 → 1 (350 ms varje håll = ~1.4 puls per sekund).
+  // loopRef håller referens till loop-CompositeAnim:en så cleanup vid
+  // count-change kan stoppa den innan nästa cykel.
   useEffect(() => {
     if (count <= 0) return;
     numberScale.setValue(1.4);
     numberOpacity.setValue(0);
+    let loopAnim: Animated.CompositeAnimation | null = null;
     Animated.parallel([
       Animated.spring(numberScale, {
         toValue: 1,
@@ -87,16 +95,39 @@ export function CountdownIntro({ onComplete, startFrom = 3, playerName }: Props)
         duration: 250,
         useNativeDriver: true,
       }),
-    ]).start();
+    ]).start(({ finished }) => {
+      // Bara starta puls-loopen om pop-in:n hann avslutas innan effekten
+      // teardown:as (vid snabb count-change kan finished=false).
+      if (!finished) return;
+      loopAnim = Animated.loop(
+        Animated.sequence([
+          Animated.timing(numberScale, {
+            toValue: 1.18,
+            duration: 350,
+            useNativeDriver: true,
+          }),
+          Animated.timing(numberScale, {
+            toValue: 1,
+            duration: 350,
+            useNativeDriver: true,
+          }),
+        ]),
+      );
+      loopAnim.start();
+    });
+    return () => {
+      loopAnim?.stop();
+    };
   }, [count, numberScale, numberOpacity]);
 
-  // "?" pop:as in när count går 1 → 0 (efter 1:ans 1-sekund). Samma feel
-  // som siffer-poppen men på en separat Animated.Value så vi kan rendera
-  // båda elementen samtidigt och låta dem fadea in/ut oberoende.
+  // "?" pop:as in när count går 1 → 0 + samma puls-loop som siffrorna ovan.
+  // Separat Animated.Value så vi kan rendera båda elementen samtidigt under
+  // korta överlapp och låta dem fadea in/ut oberoende.
   useEffect(() => {
     if (count !== 0) return;
     qmarkScale.setValue(1.4);
     qmarkOpacity.setValue(0);
+    let loopAnim: Animated.CompositeAnimation | null = null;
     Animated.parallel([
       Animated.spring(qmarkScale, {
         toValue: 1,
@@ -109,28 +140,68 @@ export function CountdownIntro({ onComplete, startFrom = 3, playerName }: Props)
         duration: 250,
         useNativeDriver: true,
       }),
-    ]).start();
+    ]).start(({ finished }) => {
+      if (!finished) return;
+      loopAnim = Animated.loop(
+        Animated.sequence([
+          Animated.timing(qmarkScale, {
+            toValue: 1.18,
+            duration: 350,
+            useNativeDriver: true,
+          }),
+          Animated.timing(qmarkScale, {
+            toValue: 1,
+            duration: 350,
+            useNativeDriver: true,
+          }),
+        ]),
+      );
+      loopAnim.start();
+    });
+    return () => {
+      loopAnim?.stop();
+    };
   }, [count, qmarkScale, qmarkOpacity]);
 
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.container}>
-        {/* PlayerName ovan loggan — anchorar nedräkningen till rätt spelare
-            (Pass-the-Phone-mode kan lämna telefonen i 1–3 sek innan svar). */}
+        {/* PlayerName ovan loggan — primary-bordered box med avatar + namn,
+            speglar GetReadyIntro:s currentPlayerBox-stil så Pass-the-Phone-
+            spelaren känns konsistent från turn-passing-skärmen. Label sitter
+            i en separat rad ovanför boxen med extra spacing nedåt. */}
         {playerName ? (
-          <View style={styles.playerWrap}>
+          <View style={styles.playerBlock}>
             <Text style={styles.playerLabel}>Pass-the-Phone to:</Text>
-            <Text style={styles.playerName} numberOfLines={1}>
-              {playerName}
-            </Text>
+            <View style={styles.playerBox}>
+              {playerEmoji ? (
+                <View style={styles.playerEmojiWrap}>
+                  <Text style={styles.playerEmoji}>{playerEmoji}</Text>
+                </View>
+              ) : null}
+              <Text style={styles.playerName} numberOfLines={1}>
+                {playerName}
+              </Text>
+            </View>
           </View>
         ) : null}
         <View style={styles.logoStack}>
-          <CountdownQLogo size={LOGO_SIZE} />
-          {/* Glyph-overlay centrerad på Q-ringens center. Q-ringen ligger
-              vid SVG-koord (37, 37) av 80×80-viewBox = 46.25 % av LOGO_SIZE.
-              50/50-flex-centrering räcker här — sista ~3.75 % offset från
-              exakt visuell mitt är inte värd komplexiteten på den här skalan. */}
+          {/* Q-loggan shift:as RIGHT med 3.75 % av LOGO_SIZE så Q-ringens
+              center (SVG-koord (37, 37) = 46.25 % från vänster) hamnar på
+              50 % horisontellt — exakt under/i mitten av glyph-overlay:s
+              centrerade siffra/?. Glyph-overlay:n flyttas INTE eftersom dess
+              flex-centrering redan ankrar mot logoStack-mitten. */}
+          <View
+            style={[
+              StyleSheet.absoluteFillObject,
+              { transform: [{ translateX: LOGO_SIZE * 0.0375 }] },
+            ]}
+            pointerEvents="none"
+          >
+            <CountdownQLogo size={LOGO_SIZE} />
+          </View>
+          {/* Glyph-overlay centrerad i logoStack — samverkar med ovanstående
+              Q-shift så siffran/? landar exakt i Q-ringens visuella center. */}
           <View pointerEvents="none" style={styles.glyphOverlay}>
             {count > 0 ? (
               <Animated.Text
@@ -213,11 +284,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: Spacing.lg,
   },
-  // PlayerName-block ovan loggan: liten label + stort namn så användaren
-  // omedelbart förstår vem nedräkningen riktar sig till.
-  playerWrap: {
+  // PlayerName-block ovan loggan: label + framed box. Spacing.xl mellan
+  // label och box ger luftig separation (per Peter:s spec).
+  playerBlock: {
     alignItems: 'center',
-    gap: 2,
+    gap: Spacing.xl,
   },
   playerLabel: {
     fontSize: FontSize.sm,
@@ -225,11 +296,40 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     letterSpacing: 0.4,
   },
+  // Framed box runt avatar + namn — speglar GetReadyIntro:s currentPlayerBox
+  // (primary-border + primaryMuted bg + Radius.md) så Pass-the-Phone-spelaren
+  // visuellt kontinueras från turn-passing-skärmen genom nedräkningen.
+  playerBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.md,
+    backgroundColor: Colors.primaryMuted,
+    borderColor: Colors.primary,
+    borderWidth: 1.5,
+    borderRadius: Radius.md,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.lg,
+  },
+  playerEmojiWrap: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: Colors.cardElevated,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  playerEmoji: {
+    fontSize: 26,
+    textAlign: 'center',
+  },
   playerName: {
-    fontSize: FontSize.display,
+    flexShrink: 1,
+    fontSize: FontSize.xxl,
     fontWeight: FontWeight.bold,
     color: Colors.textPrimary,
-    letterSpacing: 0.5,
+    letterSpacing: 0.4,
   },
   logoStack: {
     width: LOGO_SIZE,
