@@ -3,6 +3,8 @@ import { StyleSheet, View } from 'react-native';
 import { QuizVibeQuestionMarkLogo } from './QuizVibeQuestionMarkLogo';
 import { RevealProfile } from '../utils/revealCurve';
 
+type AssistanceLevel = 'minimal' | 'standard' | 'full';
+
 // Mosaik-grid: 32 kolumner × 18 rader = 576 block. Matchar mediaCard:s 16:9-ratio
 // så blocken är ungefär kvadratiska. Vi tar bort BLOCKS_PER_TICK block per tick
 // så reveal-hastigheten är samma som vid mindre grid — bara finare granularitet.
@@ -10,6 +12,21 @@ const COLS = 32;
 const ROWS = 18;
 const TOTAL_BLOCKS = COLS * ROWS;
 const BLOCKS_PER_TICK = 4;
+
+// Assistance-driven reveal-fraktion: anger hur stor del av Answer Response Time
+// som mosaiken tar på sig att försvinna. Lägre = snabbare reveal = mer hjälp.
+// Full assistance avslöjar bilden snabbast (25 % av tiden); minimal håller
+// den dold längst (75 %) så bilden kommer fram först precis innan tiden är ute.
+const ASSISTANCE_REVEAL_FRACTION: Record<AssistanceLevel, number> = {
+  full: 0.25,
+  standard: 0.5,
+  minimal: 0.75,
+};
+
+// Q-loggan fadar oberoende av mosaiken — alltid helt borta efter 3 sek så
+// den inte sitter kvar och konkurrerar med bilden under hela response-time:n.
+const LOGO_FADE_DURATION_MS = 3000;
+const LOGO_FADE_TICK_MS = 50;
 
 interface Props {
   /**
@@ -19,8 +36,11 @@ interface Props {
   resetKey: string | number;
   /** Spelarens profil — reserverat för framtida tweakar (t.ex. assistance-baserad reveal-curve). */
   profile: RevealProfile;
-  /** Time-elapse-perioden i sekunder (typiskt 30/45/60). */
+  /** Time-elapse-perioden i sekunder (typiskt 30/45/60) — Answer Response Time. */
   totalSeconds: number;
+  /** Spelarens assistance-nivå — driver hur snabbt mosaiken försvinner.
+   *  Defaults till 'standard' om utelämnat. */
+  assistance?: AssistanceLevel;
   /**
    * När `true` snap:ar cover omedelbart till helt revealed (alla block
    * borta + logga osynlig). Sätt vid Confirm-tryck så bilden blir helt
@@ -45,10 +65,15 @@ interface Props {
 export function ProgressiveCover({
   resetKey,
   totalSeconds,
+  assistance = 'standard',
   isRevealed = false,
   logoSize = 180,
 }: Props) {
   const [revealedCount, setRevealedCount] = useState(0);
+  // Q-loggans opacity drivs av en separat 3-sekunds-fade istället för av
+  // reveal-progress — så att den alltid är helt borta efter 3 sek oavsett
+  // hur långsamt mosaiken plockas bort på minimal/standard-assistance.
+  const [logoOpacity, setLogoOpacity] = useState(1);
 
   // Generera random reveal-order vid varje resetKey-byte. Indexet i denna
   // array bestämmer vilken block försvinner vid n:te tick.
@@ -63,13 +88,17 @@ export function ProgressiveCover({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resetKey]);
 
-  // Reset + start timer vid resetKey-byte.
+  // Reset + start mosaik-timer vid resetKey/assistance-byte. Hela reveal:n
+  // körs över `fraction × totalSeconds` så att t.ex. minimal assistance håller
+  // bilden dold tills 75 % av response time gått, medan full snabbavslöjar.
   useEffect(() => {
     setRevealedCount(0);
     if (isRevealed) return; // hanteras av nästa effect
 
+    const fraction = ASSISTANCE_REVEAL_FRACTION[assistance] ?? 0.5;
+    const revealDurationMs = Math.max(500, totalSeconds * fraction * 1000);
     const ticks = Math.ceil(TOTAL_BLOCKS / BLOCKS_PER_TICK);
-    const intervalMs = Math.max(30, (totalSeconds * 1000) / ticks);
+    const intervalMs = Math.max(20, revealDurationMs / ticks);
     const id = setInterval(() => {
       setRevealedCount((c) => {
         const next = Math.min(c + BLOCKS_PER_TICK, TOTAL_BLOCKS);
@@ -79,14 +108,31 @@ export function ProgressiveCover({
     }, intervalMs);
     return () => clearInterval(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resetKey, assistance, totalSeconds]);
+
+  // Q-logga: linjär fade från 1 → 0 över 3 sek. Egen timer så fade-tiden
+  // inte hänger på mosaik-speed (på minimal skulle reveal-driven opacity
+  // hänga kvar långt över halva response-time:n).
+  useEffect(() => {
+    setLogoOpacity(1);
+    if (isRevealed) return;
+    const startTime = Date.now();
+    const id = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const next = Math.max(0, 1 - elapsed / LOGO_FADE_DURATION_MS);
+      setLogoOpacity(next);
+      if (next <= 0) clearInterval(id);
+    }, LOGO_FADE_TICK_MS);
+    return () => clearInterval(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resetKey]);
 
-  // Snap till alla block borta vid Confirm.
+  // Snap till alla block borta + logga osynlig vid Confirm.
   useEffect(() => {
     if (isRevealed) {
       setRevealedCount(TOTAL_BLOCKS);
+      setLogoOpacity(0);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isRevealed]);
 
   // Set av block-index som är borttagna (transparenta).
@@ -97,9 +143,6 @@ export function ProgressiveCover({
     }
     return s;
   }, [revealedCount, revealOrder]);
-
-  // Q-logga fadar linjärt med reveal-progress.
-  const logoOpacity = 1 - revealedCount / TOTAL_BLOCKS;
 
   return (
     <View style={StyleSheet.absoluteFill} pointerEvents="none">

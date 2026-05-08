@@ -624,79 +624,177 @@ Glöm inte lägga till nya stores här när de skapas — annars läcker stale d
 - Non-host: `View` med "Waiting for Host to Start Game" + `<SequentialDots color={Colors.background} />`.
 - Båda ärver styling från `startGameWrap` + `startGameHalo` + `startGameButton`. Waiting-rutan override:ar bara `flexDirection: 'row'` via `waitingForHostBox`-stilen.
 
+## Quiz — phase machinery
+
+`quiz.tsx`-skärmen kör en linjär state-maskin per fråga:
+
+```
+'intro' → 'countdown' → 'question' → 'awaiting' → 'reveal' → ('leaderboard' | nästa fråga)
+```
+
+| Phase | Visas | Vad händer |
+|---|---|---|
+| `intro` | GetReadyIntro | Pass-the-phone: telefon-överlämning till nästa spelare. Visas också vid spelstart i båda lägena. Tap på Q-play-logo → `countdown`. |
+| `countdown` | CountdownIntro | 3-2-1-nedräkning i Q-logga, sedan "?" pop:as in i samma Q-ring efter 1:an försvinner. När hela sekvensen är klar (~4 s) → `question`. |
+| `question` | Question UI (timer-bar + media + fråge-kort + TimelineSelector + Confirm-knapp) | Timer tickar, spelaren svipar tidslinje + tappar Confirm. |
+| `awaiting` | Samma UI som `question`, TimelineSelector låst | Reveal döljs tills timer:n går till 0. Säkerställer att alla spelare får samma tidsbudget oavsett när de bekräftade — kritiskt för kommande Individual-Devices-flöde där flera spelare svarar parallellt. |
+| `reveal` | Question UI + feedback-kort (✓/✗ + Correct year + ev. Answer time + Next-tab) | Visas när timeLeft hits 0. Tap på Next-tab inom kortet → nästa fråga (eller `leaderboard` på sista). |
+| `leaderboard` | RoundLeaderboard | Final scores + Home/Play Again-knappar. |
+
+**Turordning skickas från Lobby via expo-router params**: `LobbyScreen.handleStartGame` bygger `turnOrder = approvedPlayers.filter(!hasLeft).map(p => ({id, name, emoji, avatarUri, assistance, age}))` och pushar som `players: JSON.stringify(turnOrder)` + `gameMode` + `roundsCount` + `roomCode` + `eraFrom`/`eraTo` + `answerResponseSeconds`. `quiz.tsx` parsar `players` med `try/catch` i `useMemo` så korrupt payload faller tillbaka till tom array. Den minimala `TurnOrderPlayer`-shape:n inkluderar `assistance` och `age` per spelare så quiz-skärmen kan applicera per-spelare-svarsruta-intervall i Pass-the-Phone.
+
+**Per-spelare-state derivation från turnOrder**:
+- `currentAssistance: AssistanceLevel = turnOrder[currentPlayerIndex]?.assistance ?? fallbackAssistance` — driver TimelineSelector:s svarsruta-intervall (full=5 år, standard=3 år, minimal=exakt) per rond. URL-paramets `assistance` används bara som fallback.
+- `gamePlayers = turnOrder.length > 0 ? turnOrder.map(...) : [youPlayer, ...MOCK_OPPONENTS]` — den faktiska spelarlistan i spelet, replacerar tidigare hardcoded `[you + mocks]`. Pass-the-Phone visar de riktiga spelarna i leaderboarden istället för mocks.
+- `gameTotals: Record<string, number>` — per-spelare-totals aggregerade direkt från `allRoundScoresHistory`. Replacerar tidigare `{ you: totalPoints, ...opponentTotals }`-uppdelning. `totalPoints` är derived = `gameTotals[hostId] ?? 0` (host:s id = `turnOrder[0]?.id`).
+- `youPlayer` läser `name`/`emoji`/`age` från `turnOrder[0]` så leaderboarden visar host:s riktiga avatar/namn istället för hardcoded `'You'` / `'🎮'`.
+
+**Score per fråga går till EN spelare** — `recordRoundScore(pts, correct, timeUsed)` (tidigare `simulateOpponentRound`):
+- I Pass-the-Phone (turnOrder satt) skapas endast en post per fråga med `playerId = turnOrder[currentPlayerIndex].id`. Mock-opponents auto-genererar **inte** poäng eftersom alla riktiga spelare delar enheten.
+- Vid direkt-nav (turnOrder tom) bibehålls mock-opponent-flödet för gameplay-testning.
+- `currentRoundScores` + `allRoundScoresHistory` uppdateras med exakt en post per fråga i pass-the-phone — så leaderboarden bara räknar upp Q-kolumnen för spelaren som faktiskt svarat.
+
 ## Quiz — Get Ready to Vibe intro screen
 
-Hand-off-skärmen mellan Lobby:s Start Game-tap och första quiz-frågan. [src/components/GetReadyIntro.tsx](src/components/GetReadyIntro.tsx) renderas av [app/quiz.tsx](app/quiz.tsx) som en ny `'intro'`-fas — initial fas vid spelstart i båda lägena, OCH mellan rundor i Pass-the-phone (telefon-överlämning).
-
-**Phase union i `quiz.tsx`**: `'intro' | 'question' | 'reveal' | 'leaderboard'`. Init = `'intro'` om `turnOrder.length > 0`, annars `'question'` (graceful degradation om payload saknas/parse-failar — skärmen fastnar aldrig på tom intro).
-
-**Turordning skickas från Lobby via expo-router params**: `LobbyScreen.handleStartGame` bygger `turnOrder = approvedPlayers.filter(!hasLeft).map(p => ({id, name, emoji, avatarUri}))` och pushar som `players: JSON.stringify(turnOrder)` + `gameMode` + `roundsCount` + `roomCode`. `roomCode`-paramet behövs av Quit Game-flödet i quiz.tsx (deactivera rum + clearLeftPlayers vid mid-game-quit). `quiz.tsx` parsar `players` med `try/catch` i `useMemo` så korrupt payload faller tillbaka till tom array. Defensiv `Alert` i `handleStartGame` blockar push om turnOrder är tom (host alltid index 0 i normalflöde, men `hasLeft`-filtret skyddar). Den minimala `TurnOrderPlayer`-shape:n är distinkt från `LobbyPlayer` — bara fälten quiz behöver för att rendera intro:n.
+Hand-off-skärmen mellan Lobby:s Start Game-tap och första quiz-frågan. [src/components/GetReadyIntro.tsx](src/components/GetReadyIntro.tsx) renderas av [app/quiz.tsx](app/quiz.tsx) som `'intro'`-fas — initial fas vid spelstart i båda lägena, OCH mellan rundor i Pass-the-phone (telefon-överlämning). Tap på Q-play-logo i intro:n → `'countdown'`-fas (3-2-1) → `'question'`-fas.
 
 **Mode-dependent fas-flöde i `handleAdvanceToNextRound`**:
 - **Pass-the-Phone**: rotera `currentPlayerIndex` (mod `turnOrder.length`) → sätt fas till `'intro'` så "Pass-the-Phone to: <namn>" visas innan nästa fråga.
 - **Individual Devices**: hoppa över intro mellan rundor (parallel play, ingen telefon-överlämning) → gå direkt till `'question'`. Vid spelstart visas intro:n dock även här (varje spelare på sin enhet behöver tap för att starta).
 
-**Timer-gate (kritisk)**: `useEffect` som anropar `startTimer()` MÅSTE vara gated på `phase === 'question'` — annars tickar timern under intro:n. `phase` ingår i deps så timern startar om när intro → question.
+**Timer-gate**: `useEffect` som anropar `startTimer()` är gated på `phase === 'question'` (entry från countdown). Cleanup i den effekten klippper INTE intervallet vid `question → awaiting`-transition — kritiskt så timer:n fortsätter ticka oberoende av phase-byte. Self-clearing sker i `setInterval`-handler:n när `timeLeft = 0`. Separat unmount-only useEffect cleanup:ar timer:n vid Quit Game.
 
-**`queueNames`-beräkning** (i `quiz.tsx`): `[...turnOrder.slice(currentPlayerIndex+1), ...turnOrder.slice(0, currentPlayerIndex)].map(p => p.name)` — wrap-around så listan visar kommande tur i ordning även när vi cyklar tillbaka till början av turordningen.
+**Layout** ([GetReadyIntro.tsx](src/components/GetReadyIntro.tsx)) — i SafeAreaView från topp till botten:
 
-**Round/question-progress prop:ar till `<GetReadyIntro>`** (beräknas i `quiz.tsx:if (phase === 'intro')`-grenen):
-- `currentRound = Math.floor(questionIndex / playerCount) + 1` — Härledd; `questionIndex` är redan inkrementerat av `handleAdvanceToNextRound` INNAN fasen växlas till `'intro'`, så `questionIndex` pekar alltid på den **kommande** frågan (inte den just-besvarade). Vid spelstart är `questionIndex=0` → currentRound=1.
-- `currentQuestion = questionIndex + 1` (1-baserat löpande nummer över hela spelomgången)
-- `totalQuestions = totalRounds × playerCount` (redan beräknat i quiz.tsx)
-- `playerCount = Math.max(1, turnOrder.length)`
-- `queueRoundNumbers[i]` / `queueQuestionNumbers[i]` — parallella arrays till `queueNames`. För kö-position `i` (0-baserat) är spelarens absoluta fråge-position `questionIndex + 1 + i` (1-baserat = `currentQuestion + 1 + i`); ronden = `Math.floor((questionIndex + 1 + i) / playerCount) + 1`.
-- **Cap-filter**: kö-spelare vars `absoluteQuestion >= totalQuestions` filtreras bort från BÅDA name- och number-arrayerna parallellt. Skyddar mot wrap-around i sista rundan där en spelare som "kommer på tur" enligt rotationen aldrig faktiskt får sin tur (game ends först). Utan filter skulle UI:t visa rond/fråge-siffror som overshootar `totalRounds`/`totalQuestions`.
+1. **Top banner med Quit Game** (banner-styling: full-bredd-band med `Colors.card` bg + `borderBottom`, `paddingHorizontal: lg / paddingVertical: sm + 2` — samma vokabulär som `TopUserBanner`). Quit Game-pillen vänsterställd via `flexDirection: 'row'` + `justifyContent: 'flex-start'`. Tap → Alert → `deactivateRoom(roomCode)` + `clearLeftPlayers(roomCode)` + `router.replace('/')`.
+2. **Game settings-block** (centrerad row med Q-logo + settings-text till höger, `gap: Spacing.sm`). Innehåller:
+   - `<QuizVibeLogo size={96} />` (utan tidigare "GET READY TO VIBE"-overlay).
+   - **"Game settings"**-rubrik (FontSize.lg, bold).
+   - **Game era**: `{eraFrom} – {eraTo}` (host:s val från Lobby, fixt under hela spelet).
+   - **Answer response time**: dropdown-trigger på samma rad som rubriken — visar `{N}s ▼` (`{N}s 🔒` när låst). Tap → Modal med 4 options (15s/30s/45s/60s). Quiz.tsx håller `responseSeconds` som state och passar `onAnswerResponseSecondsChange` så användaren kan justera mellan ronder.
+   - **Locked-state i Pass-the-Phone**: `responseSecondsLocked = gameMode === 'pass-the-phone' && currentPlayerIndex !== 0`. När låst → tap visar info-Alert ("response time can only be changed at the start of a new round — when all players have answered the same number of questions"). Trigger:s border + text dimmas + ▼ byts till 🔒.
+3. **Current Leaderboard (utfällbar)** mellan settings och play. Default **collapsed** vid varje GetReadyIntro-mount. Tap på header → expand. Body är `position: 'absolute'` med `top: '100%'` + `zIndex: 100` + `elevation: 10` → **OVERLAY:ar** play + turordningstabellen istället för att skjuta dem nedåt. Innehållet bakom stannar på sin plats men göms tills body collapses igen. Layout: 3-kolumns sport-tabell (se "Leaderboard table" nedan).
+4. **Play-knapp** (centrerad): `<QuizVibePlayLogo size={140} color={Colors.warning} />` — Q-logo med play-triangel inuti Q-ringen (ersätter den gamla blå rektangulära knappen). **Gold glow** runt logon: `playLogoHalo` (absolut-positionerad bakom, `Colors.warning` bg + animated opacity 0.35 → 0.8) + iOS-only shadow med `shadowColor: Colors.warning`. Scale-pulse 1 → 1.06 över 800ms.
+5. **Turordningstabell** under play-knappen — fixed-höjd 3-kolumns-grid:
+   - **Header**: `R: | Q: | Pass-the-Phone to:` (textSecondary, semibold, uppercase via Typography.overline-mönster).
+   - **Current player-rad**: R/Q-värden i vanliga celler; Player-cellen wrap:ar avatar + namn i en primary-bordered box (`primaryMuted` bg).
+   - **Kö-rader**: avatar (32×32) + namn i textSecondary-tonad text. Tabellen scrollar internt vid lång kö (maxHeight 180).
+   - **`Round X`-separator** infogas mellan två kö-rader när rondnumret förändras (jämfört med föregående rad eller current player). `paddingVertical: 4`, `Colors.primaryMuted` bg, `primaryBorder` top+bottom, FontSize.xs bold uppercase primary text. Hjälper till att markera round-bytena visuellt utöver den befintliga R-kolumnens siffra.
+   - **Slutmarkör** under tabellen: `🏁 End of Game` om sista kö-frågan = totalQuestions, annars `🔁 + more questions` (kompakt en-rad).
+   - **Footer**: `Round X of Y · Question N of M · K players` — diskret total-räknare under markören.
 
-**Layout** ([GetReadyIntro.tsx](src/components/GetReadyIntro.tsx)) — fyra delar i SafeAreaView:
-1. **Quit Game-bar** (top-left, sticky utanför container): röd-tonad pill (`Colors.errorMuted`-border, `rgba(255,107,107,0.08)`-bg, `Colors.error`-text). `onPress` → Alert med destructive-bekräftelse → `deactivateRoom(roomCode)` + `clearLeftPlayers(roomCode)` + `router.replace('/')`. Renderas bara när parent passerar in `onQuit`-handler. Speglar `handleQuitGame` i quiz.tsx — samma effekt som "Delete this Game Lobby" från Lobby.
-2. **Logo corner-accent** (top-right, absolut-positionerad utanför container-flödet): `<QuizVibeLogo size={Math.min(140, SCREEN_WIDTH - 96)} />` med "GET READY / TO VIBE"-text-overlay (`fontSize: 18`, bold). `top: Spacing.xxl, right: 0` placerar den runda kvadratens överkant ungefär i linje med Quit Game-knappens överkant (SVG har transparent padding så elementets bounding-box-överkant är ~26px ovanför visible Q). Pekar inte (`pointerEvents="none"`).
-3. **Container** (`flex: 1`, `justifyContent: 'center'`, `alignItems: 'center'`, `paddingBottom: Spacing.xxxl * 2`, `gap: Spacing.xxxl`): Centrerar play+upNext som grupp; den stora paddingBottom biasar centrum uppåt så play landar i övre tredjedelen istället för exakt screen-mitt. Gap:n styr avståndet mellan play och upNext-blocket.
-4. **Play-knapp**: 120×120 kvadrat (`Radius.xl`), pulserande+glowande. Glow:en är **cross-platform** via en absolut halo-`View` runt knappen (22px-inset → 164×164, `Colors.primary` bg, animated `opacity 0.35 → 0.8`) PLUS statisk iOS-only shadow med `shadowColor: Colors.primary`. Skala (`1 → 1.06`, 800ms) och glow-opacity körs i två separata `Animated.Value`-loopar, båda native driver.
-5. **upNext-blocket**: tre under-block — header-rad, current-player-ruta, kö-lista. Detaljer i nästa avsnitt.
+## Quiz — Leaderboard table (delas av GetReady + final RoundLeaderboard)
 
-**Round/Question/#Players-räkneverk i upNext-blocket** — gemensamt visuellt språk: 2-rads staplad ruta (rond X på topp, fråga N på botten) med horisontell delar-linje. Cell-modifiers `counterCellTop` (rundade top-corners + `borderBottomWidth: 0.75`) och `counterCellBottom` (rundade bottom-corners + `borderTopWidth: 0.75`) delar borderkant mellan cellerna utan dubbel-border. Tre storlekar:
-- **Header-räkneverk** (liten, övre rad): två rader `[Round] [cell-X] of Y` / `[Question] [cell-N] of M` vänsterställt, plus `#Players: N` högerställt på samma rad-höjd via `headerRow` (`flexDirection: 'row'`, `justifyContent: 'space-between'`, `alignItems: 'center'`). `Round`/`Question`/`#Players:`-labels alla i `Colors.textSecondary` semibold, siffrorna i `Colors.primary` bold. `headerCounterLabel.minWidth: 72` så `Question` får plats men räkneverket sitter tätt intill texten.
-- **Stort räkneverk** i nästa-på-tur-rutan (`bigCounter`, width 56, två 38px-höga celler): primary border + `Colors.background`-bg så cellerna sticker fram mot rutans `primaryMuted`-fyllning. Spelarens namn sitter höger om det, `flex: 1` för centrering med subline `Pass-the-Phone to:` i grått ovanför namnet.
-- **Mini-räkneverk** per kö-rad (`miniCounter`, width 56 SLOT med inner cells width 36 centered via `alignItems: 'center'`, två 22px-höga celler): tunnare border (`primaryBorder`), `primaryMuted`-bg, primary text. Slot-bredden matchar bigCounter så centerlinjerna linjerar lodrätt över raderna.
+Sport-tabell-layout som driver både GetReadyIntro:s utfällbara leaderboard OCH final-leaderboarden i [src/components/RoundLeaderboard.tsx](src/components/RoundLeaderboard.tsx). Identisk struktur så användaren ser samma data-vy under hela spelet och vid game-end.
 
-**Kö-lista alignment-detalj** (`queueListContent.paddingHorizontal: Spacing.lg + 1.5`): kompenserar för `upNextBox.borderWidth: 1.5` så kö-radernas slot-vänsterkant linjerar med big-counter-vänsterkanten inuti rutan. Med `miniCounter`-slot:en width 56 (samma som `bigCounter`) + samma gap-till-namn (`Spacing.lg`) = både counter-centerlinjerna OCH spelarnamnen ligger i samma kolumn över rutan och alla kö-rader.
+**3-kolumn**: fixed Player (Pos + Namn) | scrollable middle (`Q | ✓ | ✗ | AVG | LAST | Last 5`) | fixed PTS:
+- **Vänster fixed**: position (1-based) + emoji + namn. Namnet trim:as via `numberOfLines={1}`. Min-width 130 / max 180 px.
+- **Mitten scrollbar horisontellt**: ScrollView som spänner över ALLA rader (header + spelare) så de scrollar synkat. Cell-höjd 36-40 px konstant så kolumnerna alignar.
+  - **Q** = antal frågor spelaren faktiskt svarat på (= playedRounds; "Q" är användaren-vänligare än "R" i sport-tabell-formatet).
+  - **✓** (grön) / **✗** (röd) — räknare för rätt/fel.
+  - **AVG** / **LAST** — svarstid med **2 decimaler** (t.ex. `7.48s`). `LAST` = senaste avslutade fråga.
+  - **Last 5** — 5 färgade dotts (grön ✓ / röd ✗ / grå tom plats för ej-spelade-ronder), höger-justerade så de senaste 5 alltid pekar mot listans slut.
+- **Höger fixed**: PTS — total points i primary blå bold, höger-justerad. Min-width 56 px, alltid synlig.
 
-**Kö-lista cap**: `ScrollView` med `maxHeight: 180`. Ej-i-budget-spelare (de som filtrerats bort av cap-filtret ovan) renderas inte alls — om alla kö-spelare är out-of-budget faller `{queueNames.length > 0 && (…)}`-gaten naturligt.
+**Sortering**: poäng desc → avg response time asc (ties brutna av snabbast genomsnitt).
 
-## Quiz — Question screen (answering + reveal phases)
+**Aggregering**: `tableEntries` deriveras direkt från `allRoundScoresHistory` per spelare-id. `playedRounds` = antal scores för spelaren, `correctAnswers` = filter på `correct=true`, `avgResponseSeconds` = mean av `timeUsed`, `lastResponseSeconds` = sista entry:s `timeUsed`, `lastFiveResults: boolean[]` = `playerScores.slice(-5).map(s => s.correct)`. När färre än 5 ronder spelats padd:as resten med grå tomma platser.
 
-Fråge-vyn i [app/quiz.tsx](app/quiz.tsx) är samma layout för `'question'`- och `'reveal'`-faserna — reveal-info renderas inline istället för i en separat skärm. Det betyder att mediakortet, timer-baren, fråge-kortet och TimelineSelector:n stannar synliga genom hela svars→reveal-cykeln, vilket simulerar att "media fortsätter spelas" efter Confirm tills användaren trycker Next Round.
+**Final leaderboard-knappar** (när `isLastRound`):
+- **Home**-knapp (vänster, transparent bg + tunn border): `<QuizVibeQAvatar size={28} />` + texten "Home" (primary färg). Samma Q-brand-mark som Profile-skärmens topbanner använder upptill till vänster.
+- **Play Again**-knapp (höger): `Colors.warning` (gold #F5A623) bg + `Colors.background` (svart) text + iOS shadow + Android elevation. Premium-CTA-vokabulär (samma som Lobby:s Start Game).
 
-**Ingen Quit Game-bar under question/reveal**: Quit lever bara i GetReadyIntro. Användaren väntar ut timern eller svarar, trycker Next Round, hamnar i kö-listevyn (intro:n) och kan välja Quit därifrån. Konsekvens: i Individual Devices-läget (där intro:n hoppas över mellan rundor) finns idag ingen mid-game-quit-väg — det får återbesökas när Individual Devices särdesignas.
+## Quiz — Question screen (question + awaiting + reveal phases)
 
-**Timer-progress-bar**: row-layout med bar:en (flex 1) + sekund-räknaren (`{timeLeft}s`) till höger, inom samma `paddingHorizontal: Spacing.lg`-wrapper. Bar:en är 6px hög, `borderRadius: 3`, `Colors.border`-track + animated fill. Färg-trösklar: `>10s = primary`, `≤10s = warning`, `≤5s = error`. `pulseAnim` (Animated.Value) kör opacity 1 ↔ 0.55 i 250ms-loop när `timeLeft <= 5 && phase === 'question'`, annars stop + setValue(1). Sekund-räknaren använder samma `timerColor` + `pulseAnim`-opacity för synk. Sektionen har `marginTop: -Spacing.md` så den limmar mot mediakortets underkant istället för att flyta i ScrollView-content:s gap.
+Fråge-vyn i [app/quiz.tsx](app/quiz.tsx) är samma layout för `'question'`-, `'awaiting'`- och `'reveal'`-faserna — reveal-feedbacken renderas inline istället för i en separat skärm. Mediakortet, timer-baren, stopwatch:n, fråge-kortet och TimelineSelector:n stannar synliga genom hela cykeln; bara feedback-kortet läggs till vid `'reveal'`.
 
-**Action-knapp är fas-medveten** (i [quiz.tsx](app/quiz.tsx), inte i TimelineSelector):
+**Quit Game**: bor bara i GetReadyIntro:s top-banner. Question/awaiting/reveal har ingen Quit-knapp — användaren får vänta ut timern, sedan tappar Next-tab inom feedback-kortet → nästa intro där Quit är tillgänglig.
 
-| phase     | isLastQuestion | label                  | bg-färg          | handler                   |
-|-----------|----------------|------------------------|------------------|---------------------------|
-| question  | n/a            | "Confirm"              | `assistanceColor` | `handleConfirm(pendingYear)` |
-| reveal    | false          | "Next Round  →"        | `Colors.primary`  | `handleAdvanceToNextRound`  |
-| reveal    | true           | "🏆  Final Leaderboard"| `Colors.primary`  | `handleShowLeaderboard`     |
+### Timer-arkitektur (smooth + drift-fri)
 
-`assistanceColor` = `Colors.success` (full) / `Colors.primary` (standard) / `'#F5A623'` (minimal) — matchar TimelineSelector:s assist-badge så Confirm-knappen visuellt hör ihop med tidslinjen. Disabled när `phase === 'question' && pendingYear === null` (defensiv — TimelineSelector:s `useEffect` på `selectedYear` notifierar parent direkt vid mount via middleYear, så pendingYear är typiskt aldrig null efter första rendret).
+Tre parallella mekanismer driver tidsvisningen oberoende av varandra:
 
-**TimelineSelector — lift-out av Confirm**: Confirm-knappen är borttagen ur [TimelineSelector](app/quiz.tsx) — quiz.tsx äger en enda action-knapp som byter label/handler per fas (se ovan). TimelineSelector exponerar `onYearChange(year)` istället för det gamla `onConfirm(year)`. Implementation: en `useEffect` med deps `[selectedYear, onYearChange]` notifierar parent vid varje scroll-tick (inkl. initial mount via middleYear). Parent-state: `const [pendingYear, setPendingYear] = useState<number | null>(null)` — hanteras separat från `selectedYear` (det "låsta" året efter Confirm). pendingYear nollställs i `handleAdvanceToNextRound` så TimelineSelector startar fresh på nästa fråga.
+1. **`timerProgressAnim`** (Animated.Value, RAF-driven) — bar:ens BREDD interpoleras från `0 → 1` mappat till `'0%' → '100%'`. Animated.timing kör `1 → 0` med `Easing.linear` över `responseSeconds * 1000` ms. **useNativeDriver: false** (procent-width kräver JS-driver), men RAF-schemaläggningen gör att bar:en uppdateras varje frame oberoende av setInterval, setStates eller Confirm-handlerns batch. Kritiskt så bar:en aldrig "fryser" eller stepar — ger upplevelsen att tiden flyter på även medan flera spelare confirmar parallellt (kommande Individual-Devices-flöde).
+2. **`timerRef.current`** (setInterval 1 Hz) — driver heltals-`timeLeft`-state för "23s"-räknaren och scoring/time-out-logiken (jobbar i hela sekunder). Self-clearas i sin handler vid `timeLeft = 0`.
+3. **`decimalElapsedMs`** (setInterval 20 Hz, beräknar mot `Date.now()`-diff) — driver stopwatch:ns 2-decimals-display under timer-bar:en. Räknar UPPÅT från `00.00` mot `responseSeconds`. Gateas på `phase === 'question'` så tick:en stoppar vid Confirm; senaste värdet fryses tills nästa fråga.
 
-**`key={questionIndex}` på TimelineSelector** är kritiskt: tvingar remount mellan frågor så internal `selectedYear` reset:as till nya frågans `middleYear`. Utan det skulle stale-state från föregående fråga ärva in (TimelineSelector beräknar middleYear i mount men håller selectedYear i useState efter det). Remount bevarar också scroll-positions-init (`contentOffset={{ x: initialScrollOffset, y: 0 }}`) eftersom propet bara läses vid mount.
+**Native/JS-driver-konflikt**: opacity (native) och width (JS) får INTE applicieras på samma `Animated.View`-nod (kraschar med "Attempting to run JS driven animation on animated node that has been moved to native"). Lösning: `timerFillPulseWrap` (yttre, opacity = pulseAnim, native) wrap:ar `timerFill` (inre, width-interpolation, JS). Två separata noder.
 
-**Subtil "Answering: {namn}"-rad**: i fråge-kortet, mellan `questionTop` och `questionText`. Endast Pass-the-Phone (`gameMode === 'pass-the-phone' && currentPlayerName && ...`) — Individual Devices har spelaren på egen enhet och vet redan vem de är. Styling: `FontSize.xs`, `Colors.textSecondary`, namnet i `Colors.textPrimary` + `FontWeight.semibold`. Skicka inte avatar/emoji här — Peter valde uttryckligen "subtilt utan avatar" framför "prominent med avatar".
+**Color-trösklar för `timerColor`** (drives bar:ens fill-färg + ring-border + integer-color):
+- `timeLeft > 10` → `Colors.primary` (blå)
+- `timeLeft > 5` → `Colors.warning` (gul)
+- `timeLeft <= 5` → `Colors.error` (röd)
 
-**Inline reveal-card** (renderas när `phase === 'reveal' && selectedYear !== null`): kompakt **horisontell** layout — år (vänster, 36px primary bold), label "Correct Answer" + hint (mitten, vertikal stack), `+X pts` (höger, primary bold). `paddingVertical: Spacing.md, paddingHorizontal: Spacing.lg` — höjden landar runt 70px (var ~140px med tidigare vertikala layout + ~70px till med separat result-row, totalt ~210px). Den kompakta höjden är ett **explicit krav från användaren** så Next Round-knappen ryms direkt i viewport efter Confirm utan scroll. **Result-row med rätt/fel-ikon + diff-text är medvetet borttagen** — användaren ser sitt val i den låsta TimelineSelector:n (med selector-rutan markerad) och rätt år i kortet, så jämförelsen är synlig utan en egen ruta. Spring-in-animation (`revealScale` 0.6→1, `revealOpacity` 0→1) triggas i en `useEffect` på `phase`-deps som re-set:ar värdena varje gång phase blir 'reveal' (annars körs animationen bara på första frågans reveal).
+**`stopwatchColor`** (decimal-rutans border + integer-color) följer EJ timerColor i awaiting/reveal — då skiftar den till en lugn ljusblå (`#8CC1FF`) för att signalera "du har confirmat — vänta på reveal" istället för att fortsätta varna i gult/rött:
+```ts
+const stopwatchColor = phase === 'question' ? timerColor : '#8CC1FF';
+```
 
-**Time-out-flöde** (`useEffect` på `[timeLeft]` med gating `timeLeft === 0 && phase === 'question'`): registrerar ronden som missad med `defaultGuess = currentYear - 20` (**inte** pendingYear) och 0 poäng → `simulateOpponentRound(0, false, 30)` → `setPhase('reveal')`. defaultGuess är hårdkodad — användaren straffas med en generisk gissning för att inte ha tryckt Confirm. selectedYear sätts till defaultGuess i samma effect så reveal-renderingen har ett värde att jämföra mot.
+### Layout (sekvens uppifrån)
 
-**Inga separata `RevealScreen`-komponenter** kvar — den tidigare standalone-komponenten med "View Leaderboard" + "Next Round"-knappar är borttagen. View Leaderboard mellan rundor är borttaget per användarens val: leaderboarden visas bara vid game-end (sista frågans Confirm/timeout → reveal → "🏆 Final Leaderboard"-knappen → `phase = 'leaderboard'` → RoundLeaderboard).
+1. **Mediakort** (placeholder-card med 🎵 + "Music" + "Video / Image coming soon" tills riktig YouTube/Spotify/AI-bild-integration kopplas in).
+2. **Timer-section** (row): timer-bar (flex 1) + **pulserande ring runt sekund-räknaren**. Ringen är 56×56 cirkel med dynamisk `borderColor: timerColor`, halo-View bakom (samma färg, `opacity` pulserar 0.3 → 0.7 över 700 ms native), och scale-pulse 1 → 1.08. Sekund-siffran (24 px bold tabular-nums) sitter inuti ringen.
+   - **Avatar-markör på timer-bar:en** vid bekräftad svarstid: 28×28 gold-bordered avatar (URI-bild eller emoji-fallback) absolut-positionerad inom timerTrack med `left: ${((responseSeconds − confirmedTimeUsed) / responseSeconds) * 100}%` — sitter exakt på fillens högra kant vid Confirm-momentet. När timer:n fortsätter krymper fillen FÖRBI avataren så användaren ser "tiden har passerat ditt svarsmoment".
+3. **Stopwatch-rutan** (centrerad under bar:en) — räknar UPPÅT med 2 decimaler:
+   - `<StopwatchIcon size={32} color={stopwatchColor} />` ([src/components/StopwatchIcon.tsx](src/components/StopwatchIcon.tsx)) — modern SVG-ikon (rund kropp, top crown-knapp, sido-knapp, visare som pekar mot 1-2-positionen). Wrap-View med height 40 (= integer-textens lineHeight) centrerar SVG:n vertikalt med stora siffran.
+   - Integer "07" (38 px bold, `stopwatchColor`) + decimal ".48" (22 px semibold, `Colors.textSecondary`).
+   - Hela rutan har `borderWidth: 2 / borderColor: stopwatchColor` + halo bakom (`backgroundColor: stopwatchColor` + animated `opacity: timerRingGlow` — synkat med ringens pulse).
+   - Display **fryses** vid Confirm via `setDecimalElapsedMs(elapsedAtConfirm)` i handleConfirm, sedan stopp på 20 Hz-tick:en när phase blir `'awaiting'`.
+4. **Fråge-kort** (`minHeight: 140`):
+   - Top-rad: `Question N of M` (vänster) + `Answering: {playerName}` (höger, bara Pass-the-Phone). `flexDirection: 'row'` + `justifyContent: 'space-between'`.
+   - Frågetext (`flex: 1`, vertikalt centrerad). **Music-frågor split:as i två rader**: `<Text style={questionTextHeadline}>Which year</Text>` (32 px bold) + `<Text style={questionText}>was this song released?</Text>` (18 px semibold). Övriga kategorier (kommande Capitals/Persons) renderar `question.question` som single-text.
+5. **TimelineSelector** med pulserande gold-pilar utanför svarsruta-edges:
+   - `‹` / `›`-glyfer (38 px bold, `BOX_COLOR` + textShadow för glow), absolut-positionerade vid `right: '50%' + marginRight: selectorWidth/2 + 6` (vänster) respektive `left: '50%' + marginLeft: selectorWidth/2 + 6` (höger). Loop:ar opacity 0.35 ↔ 1 + scale 1 ↔ 1.18 över 700 ms (native driver). Stoppas när `disabled`.
+   - **Era-låst tidslinje**: `min = eraFrom`, `max = eraTo` (via props från quiz.tsx). Spelaren kan inte scrolla utanför Game Era. **`getAnswerRange(selectedYear, interval, min, max)`** shiftar fönstret in i intervallet vid kanterna istället för att klippa det — så full=5 kollapsar inte till 3 år vid edge. `isCorrect` använder samma helper så scoring synkar med visuella fönstret.
+6. **Action-knapp / pillar** (fas-medveten):
+   - `'question'`: **Confirm**-knapp i `Colors.primary` med pulsande blue glow (halo-View bakom, opacity 0.35 ↔ 0.8 + scale 1 ↔ 1.04). Loops stoppas när `pendingYear === null` (disabled-knapp pulserar inte).
+   - `'awaiting'`: passiv pillar `✓ Confirmed — waiting for time` (primaryMuted bg + primaryBorder, textSecondary text, ingen tap).
+   - `'reveal'`: ingen action-knapp i actionWrap — Next-tab sitter INUTI feedback-kortet istället.
+7. **Feedback-kort** (visas BARA i `'reveal'`, inte i `'awaiting'` — se nedan):
+   - `borderWidth: 2`, kompakt padding (`paddingVertical: xs / paddingHorizontal: sm / gap: 2`).
+   - Grön (`successMuted` + `success` border) vid rätt, röd (`errorMuted` + `error` border) vid fel.
+   - **Badge**: `✓ Correct Answer` (success) eller `✗ Wrong Answer` (error) i top-vänster.
+   - **Correct year**: `Correct year: {N}` (label FontSize.lg medium + siffra FontSize.xxl bold tabular-nums).
+   - **Answer time** (bara vid rätt svar): `Answer time: {X.YY}s` i FontSize.xs `textSecondary` + `marginTop: -2`.
+   - **Next-tab** (höger-justerad sista raden): `Next →` eller `🏆 Final Leaderboard`. **Bg = `Colors.primary` (blå)** för båda fallen oavsett rätt/fel — Card:ens border + badge bär status-färgen, tab:en signalerar bara "fortsätt".
 
-**Mock-frågor cyklas via modulo** (`eraFilteredQuestions[questionIndex % eraFilteredQuestions.length]`) — när `totalRounds × playerCount > eraFilteredQuestions.length` återanvänds frågorna tills riktig fråge-bank kommer in. Mock-listan är 5 Music-timeline-frågor.
+### Confirm + awaiting + reveal-flödet
 
-**Game era → fråge-filter** (Lobby → /quiz passthrough): Lobby:s `handleStartGame` skickar `eraFrom`/`eraTo` som router-params (post-clamp via `clampEraToPlayer`, dvs. samma värden som visas i `eraGuestBox` ovanför slidern). Quiz läser dem (defaults `1900`/`currentYear` om params saknas — direkt-nav utan Lobby) och bygger `eraFilteredQuestions = SEED_QUESTIONS.filter(q => q.correctYear ∈ [eraFrom, eraTo])` via `useMemo`. **Fallback**: om filtret returnerar tom lista (t.ex. mock-pool 1975/1976/1991/2010/2017 mot era 1930–1960) faller den tillbaka till hela `SEED_QUESTIONS` så spelet inte fastnar. Med riktig fråge-bank blir poolen stor nog att fallback-grenen blir tyst no-op. TimelineSelector:s `getYearRange(correctYear)` (±30 år) påverkas inte av filtret — den ger fortfarande breda axeln runt korrekt år så spelaren har scroll-utrymme även när host valt smal era.
+**`handleConfirm(year)`**:
+1. Räknar exakt elapsed via `Date.now() - questionStartMsRef`.
+2. `recordRoundScore(pts, correct, timeUsed)` registrerar score:n under **active player's id** (`turnOrder[currentPlayerIndex]?.id ?? 'you'`). I Pass-the-Phone genereras inga mock-opponent-poäng — endast aktiva spelaren får en post. `allRoundScoresHistory` uppdateras.
+3. Sätter `confirmedTimeUsed`, `decimalElapsedMs` (frys), `selectedYear`, `setRounds`-historik.
+4. Stoppar **inte** timer:n. Sätter `phase = 'awaiting'`.
+
+**Awaiting-fasen**:
+- TimelineSelector låst (`disabled`), feedback-kortet INTE renderat ännu.
+- Stopwatch:n fryser på exakt confirm-värdet.
+- Timer-bar:en + sekund-räknaren tickar VIDARE oberoende → ringen pulserar fortsatt i timerColor (gul/röd när tiden tar slut), stopwatch:n står still i ljusblå.
+- När `timeLeft === 0` (eller `timeLeft <= 0` clamp:as) → `setPhase('reveal')` triggas av useEffect på `[timeLeft]`. Round redan registrerad i handleConfirm så ingen dubbelregistrering.
+
+**Time-out utan Confirm** (`phase === 'question' && timeLeft === 0`):
+- Default-guess = `currentYear - 20`, 0 poäng. `recordRoundScore(0, false, responseSeconds)` registrerar miss. `setPhase('reveal')`.
+
+**Spring-in-animation** för feedback-kortet (`revealScale: 0.6 → 1` + `revealOpacity: 0 → 1`) triggas i useEffect på `phase`-deps varje gång phase blir 'reveal'.
+
+### Music question + answer mock data
+
+**`MUSIC_QUESTION_TEXT = 'Which year was this song released?'`** — alla mock-frågor delar denna text (själva låten är frågan via Spotify/YouTube). `correctYear` + `hint` (era) per fråga är fortfarande unika så reveal-vyn varierar i hint-texten även om frågetexten är generisk.
+
+**`calculatePoints(timeLeft, correct, totalSeconds)`** — max 1000 pts vid omedelbart svar (`Math.round(1000 * (timeLeft / totalSeconds))`). totalSeconds-paramet skalar scoring så 30s/15s/45s/60s response time alla ger samma max.
+
+**Answer response time** (`responseSeconds: 15 | 30 | 45 | 60`) är dynamisk state i quiz.tsx, justerbar via GetReadyIntro:s dropdown. Används överallt där 30 tidigare var hardcoded:
+- `startTimer`: `setTimeLeft(responseSeconds)` + `Animated.timing.duration: responseSeconds * 1000`.
+- `decimalElapsedMs`-tick + cap: `responseSeconds * 1000`.
+- `handleConfirm`: `responseSeconds - timeLeft` för timeUsed; `calculatePoints(..., responseSeconds)`.
+- Avatar-marker: `((responseSeconds − confirmedTimeUsed) / responseSeconds) * 100%`.
+- Color-trösklar (warning ≤10s, error ≤5s, pulse ≤5s) bevarade som **absoluta sekunder** — universell "lite tid kvar"-perception.
+
+**Game era → fråge-filter + tidslinje-cap**: Lobby:s `handleStartGame` skickar `eraFrom`/`eraTo` som router-params (post-clamp via `clampEraToPlayer`). Quiz använder dem för:
+- `eraFilteredQuestions = SEED_QUESTIONS.filter(q => q.correctYear ∈ [eraFrom, eraTo])`. Fallback till hela `SEED_QUESTIONS` om filtret tomt.
+- `<TimelineSelector eraFrom={eraFrom} eraTo={eraTo} />` — tidslinjens `min`/`max` är exakt era-spannet. Spelaren kan inte scrolla utanför.
+
+**Mock-frågor cyklas via modulo** (`eraFilteredQuestions[questionIndex % length]`) tills riktig fråge-bank kommer in.
 
 ## Shared visual components
 
@@ -732,9 +830,9 @@ Call-sites finns redan i: `handleRegisterSubmit`, `handleLogin`, `handleLogout`,
 Demo-data (`src/utils/nameQuizDemo.ts`) genererad för Millennials (1990) + standard assistance = 2-bokstavs prefix.
 
 **ProgressiveCover** ([src/components/ProgressiveCover.tsx](src/components/ProgressiveCover.tsx)) — mosaik-overlay som avslöjar bilden under sig:
-- 32×18 = 576 svarta block, 4 block tas bort per tick (~208ms per tick över 30s = totalt 144 ticks)
+- 32×18 = 576 svarta block, 4 block tas bort per tick. Total reveal-tid styrs av `assistance`-propen: `full=0.25 × totalSeconds`, `standard=0.5 × totalSeconds`, `minimal=0.75 × totalSeconds` (mer assistance = snabbare reveal, så Full-spelaren ser bilden tydligt långt innan time-out medan Minimal-spelaren får facit först precis innan tiden tar slut)
 - Random reveal-order (Fisher-Yates shuffle) regenererad per `resetKey`-byte
-- `<QuizVibeQuestionMarkLogo>` centrerad ovanpå mosaiken, opacity = `1 - revealedCount / TOTAL_BLOCKS`
+- `<QuizVibeQuestionMarkLogo>` centrerad ovanpå mosaiken, fadar 1 → 0 över exakt 3 sekunder via separat tick-loop (oberoende av mosaik-speed) — så loggan inte hänger kvar och konkurrerar med bilden under hela response-time:n vid minimal/standard-assistance
 - `key={questionIndex}` på själva ProgressiveCover (i demo-route) — tvingar full remount vid frågebyte, säkerställer att alla block är svarta från första render utan blink av förra fråges state
 - React.memo på `<Block>`-komponenten — bara de 4 block som ändras per tick re-renderas, inte alla 576
 - `isRevealed=true` → snap till alla block borta (för Confirm-flow). I demon visas bilden direkt vid Confirm; i framtida quiz-integration ska mosaik fortsätta tills timer slut även efter Confirm (öppen design-fråga, dokumenterad i konversation).
@@ -745,7 +843,21 @@ Demo-data (`src/utils/nameQuizDemo.ts`) genererad för Millennials (1990) + stan
 ## Shared visual components (sessions-tillägg)
 
 - [src/components/QuizVibeQuestionMarkLogo.tsx](src/components/QuizVibeQuestionMarkLogo.tsx) — variant av `QuizVibeLogo` med `?`-glyph (SVG `<Text>`) i Q-ringen istället för wifi-fan. Squares + Q-ring + Q-svans identiska. ViewBox 0-80 × 0-80, Q-ring center (37, 37). `?` placeras på y=43 så glyph-mitten hamnar runt y=37 (SvgText:s y refererar till baseline).
-- [src/components/ProgressiveCover.tsx](src/components/ProgressiveCover.tsx) — mosaik-reveal-cover (se "Name-answer model — demo route").
+- [src/components/QuizVibePlayLogo.tsx](src/components/QuizVibePlayLogo.tsx) — variant med play-triangel inuti Q-ringen istället för wifi-fan/?. Tar `color`-prop (default `Colors.primary`) som styr alla brand-färgade element (Q-ring, svans, play-triangel, squares-kanter). Bakre kvadratens muted-fyllning härleds som `color + '30'` (~19% opacity hex-alpha) så hela loggan toner mot color-värdet — i GetReady passas `Colors.warning` så loggan blir gold för att matcha gold-glow-halo:n runt den.
+- [src/components/CountdownIntro.tsx](src/components/CountdownIntro.tsx) — 3-2-1-nedräkning mellan tap på play-knappen i intro:n och fråge-vyn. Stor `QuizVibeQuestionMarkLogo` centrerad (size 360 px); siffran (3, 2, 1) pop:as in i Q-ringen via overlay-Animated.Text med spring-scale 1.4 → 1 + opacity 0 → 1. När count går 1 → 0 byts siffran ut mot den statiska `?`-glyphen. Total tid ~4 s. PlayerName visas ovan loggan (`Pass-the-Phone to: {namn}` i display-storlek).
+- [src/components/StopwatchIcon.tsx](src/components/StopwatchIcon.tsx) — modern sport-stopwatch SVG (rund kropp, top crown-knapp, sido-knapp diagonal, tick-mark vid 12-position, visare mot 1-2-positionen, center-pivot). `color`-prop styr alla element. ViewBox 24×24, default size 24. Används i quiz-skärmens decimal-stopwatch under timer-bar:en — ersätter den tidigare ⏱-emojin som rendereades inkonsekvent över plattformar.
+- [src/components/ProgressiveCover.tsx](src/components/ProgressiveCover.tsx) — mosaik-reveal-cover (se "Name-answer model — demo route"). Tar `assistance`-prop som styr reveal-fraktion: `full=0.25`, `standard=0.5`, `minimal=0.75` av `totalSeconds` (mer assistance = snabbare reveal). Q-loggan fadar oberoende av mosaiken — alltid helt borta efter 3 s via separat tick-loop.
+
+## Host Game Credits — gate på Create Game + Play Again
+
+[`refreshFreeCreditsIfNeeded` i src/utils/profileStorage.ts](src/utils/profileStorage.ts) top-up:ar `freeGameCredits` till `FREE_CREDITS_DAILY_CAP = 4` vid första `loadProfile()` efter midnatt CET. Det innebär att flödet `loadProfile() → kontrollera saldo` alltid jämför mot färska värden inkl. dagens refresh.
+
+**Tre gates som blockerar host:s spelstart vid 0/0-saldo** (samma copy + Store-deeplink för konsistent UX):
+1. **Home — `handleCreateGame`** ([app/(tabs)/index.tsx](app/(tabs)/index.tsx)): async, läser fresh `loadProfile()`, blockerar med `Out of Host Game Credits`-Alert (Cancel + Go to Store → `/store?focus=credits&from=/`) om både `freeGameCredits === 0 && gameCredits === 0`. Fångar tom-saldo INNAN lobby skapas.
+2. **Lobby — `handleStartGame`** ([src/screens/LobbyScreen.tsx](src/screens/LobbyScreen.tsx)): samma gate vid Start Game-tap (existerande). Backup om host kommit förbi Home-gaten via Play Again eller direkt-nav.
+3. **Quiz — `handlePlayAgain`** ([app/quiz.tsx](app/quiz.tsx)): async, läser fresh `loadProfile()` FÖRE re-use-players-prompten så user inte fyller i alerts först och sedan blockas i Lobby:n.
+
+Alla tre använder identisk Alert-copy + same Store-deeplink. Lobby:s eget gate är fortfarande bibehållet som backup men ska sällan trigga eftersom Home/Play Again-gates fångar fallet tidigare.
 
 ## Scripts
 

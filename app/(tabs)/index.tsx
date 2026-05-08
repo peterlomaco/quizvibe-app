@@ -1312,7 +1312,28 @@ export default function HomeScreen() {
     ).start();
   }, []);
 
-  const handleCreateGame = () => {
+  const handleCreateGame = async () => {
+    // Host Game Credits-gate: blockera Create Game om både Free och Extras
+    // är 0. loadProfile() top-up:ar Free-saldot vid första load efter
+    // midnatt CET (refreshFreeCreditsIfNeeded), så vi alltid jämför mot
+    // aktuellt värde. Speglar samma blockad i LobbyScreen.handleStartGame —
+    // skillnaden här är att vi gateas ut REDAN på Home så användaren inte
+    // ens hinner skapa en lobby de inte kan starta.
+    const freshProfile = await loadProfile();
+    const free = freshProfile?.freeGameCredits ?? 0;
+    const extras = freshProfile?.gameCredits ?? 0;
+    if (free === 0 && extras === 0) {
+      Alert.alert(
+        'Out of Host Game Credits',
+        'You have no credits left for today. Buy extra credits in Store, wait for the daily refresh at midnight CET, or upgrade to a QuizVibe membership for unlimited host games.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Go to Store', onPress: () => router.push('/(tabs)/store?focus=credits&from=/') },
+        ],
+      );
+      return;
+    }
+
     const code = generateRoomCode();
     // Registrera koden som "aktivt rum" + lagra host:s metadata så join-
     // flödena (handleJoinWithCode, handleJoinAsGuest) kan validera mot den
@@ -1323,10 +1344,10 @@ export default function HomeScreen() {
     // när RevenueCat/subscription-state är inkopplad. Speglar samma stub
     // som `const hasPremium = false` i LobbyScreen.
     registerActiveRoom(code, {
-      maxPlayers: profile?.maxPlayers ?? 4,
+      maxPlayers: freshProfile?.maxPlayers ?? profile?.maxPlayers ?? 4,
       hostIsPremium: false,
       currentPlayerCount: 1,
-      hostPlayerName: profile?.playerName ?? '',
+      hostPlayerName: freshProfile?.playerName ?? profile?.playerName ?? '',
     });
     // Säkerställ att leftPlayers-storen är tom för den nya koden så
     // ingen stale test-data smyger in i den färska lobby:n och felaktigt

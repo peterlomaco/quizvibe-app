@@ -127,6 +127,7 @@ export default function NameQuizDemoScreen() {
               key={questionIndex}
               resetKey={questionIndex}
               profile={DEMO_PROFILE}
+              assistance={DEMO_PROFILE.assistance}
               totalSeconds={DEMO_TOTAL_SECONDS}
               isRevealed={!!confirmedName}
               logoSize={320}

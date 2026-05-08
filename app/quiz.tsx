@@ -1,4 +1,6 @@
+import { CountdownIntro } from '@/src/components/CountdownIntro';
 import { GetReadyIntro } from '@/src/components/GetReadyIntro';
+import { StopwatchIcon } from '@/src/components/StopwatchIcon';
 import {
     generateOpponentRoundScore,
     generateOpponentTimeUsed,
@@ -28,6 +30,8 @@ import {
   Alert,
   Animated,
   Dimensions,
+  Easing,
+  Image,
   SafeAreaView,
   StyleSheet,
   Text,
@@ -49,12 +53,17 @@ interface TimelineQuestion {
   hint: string;
 }
 
+// Spelet ställer endast Music-frågor (YouTube delvis, Spotify alltid). Själva
+// låten spelas upp via media-pipen — frågetexten är därmed alltid samma
+// generic "Which year was this song released?". `hint` används bara internt
+// i reveal-vyn ("Disco era") så den behålls för smak.
+const MUSIC_QUESTION_TEXT = 'Which year was this song released?';
 const SEED_QUESTIONS: TimelineQuestion[] = [
-  { type: 'timeline', id: '1', questionNumber: 1, totalQuestions: 5, category: 'Music', question: 'When was "Bohemian Rhapsody" by Queen released?', correctYear: 1975, hint: 'Classic rock era' },
-  { type: 'timeline', id: '2', questionNumber: 2, totalQuestions: 5, category: 'Music', question: 'When did ABBA release "Dancing Queen"?', correctYear: 1976, hint: 'Disco era' },
-  { type: 'timeline', id: '3', questionNumber: 3, totalQuestions: 5, category: 'Music', question: 'When was "Smells Like Teen Spirit" by Nirvana released?', correctYear: 1991, hint: 'Grunge era' },
-  { type: 'timeline', id: '4', questionNumber: 4, totalQuestions: 5, category: 'Music', question: 'When did Adele release "Rolling in the Deep"?', correctYear: 2010, hint: 'Modern era' },
-  { type: 'timeline', id: '5', questionNumber: 5, totalQuestions: 5, category: 'Music', question: 'When was "Shape of You" by Ed Sheeran released?', correctYear: 2017, hint: 'Recent era' },
+  { type: 'timeline', id: '1', questionNumber: 1, totalQuestions: 5, category: 'Music', question: MUSIC_QUESTION_TEXT, correctYear: 1975, hint: 'Classic rock era' },
+  { type: 'timeline', id: '2', questionNumber: 2, totalQuestions: 5, category: 'Music', question: MUSIC_QUESTION_TEXT, correctYear: 1976, hint: 'Disco era' },
+  { type: 'timeline', id: '3', questionNumber: 3, totalQuestions: 5, category: 'Music', question: MUSIC_QUESTION_TEXT, correctYear: 1991, hint: 'Grunge era' },
+  { type: 'timeline', id: '4', questionNumber: 4, totalQuestions: 5, category: 'Music', question: MUSIC_QUESTION_TEXT, correctYear: 2010, hint: 'Modern era' },
+  { type: 'timeline', id: '5', questionNumber: 5, totalQuestions: 5, category: 'Music', question: MUSIC_QUESTION_TEXT, correctYear: 2017, hint: 'Recent era' },
 ];
 
 function getIntervalForAssistance(assistance: AssistanceLevel): number {
@@ -63,21 +72,52 @@ function getIntervalForAssistance(assistance: AssistanceLevel): number {
   return 5; // full
 }
 
-function getYearRange(correctYear: number): { min: number; max: number } {
-  return {
-    min: Math.max(1900, correctYear - 30),
-    max: Math.min(new Date().getFullYear(), correctYear + 30),
-  };
+/**
+ * Beräknar svarsruta-fönstret runt selectedYear så att FULL bredd alltid
+ * preserveras — även när selected ligger nära era-min eller era-max.
+ * Vid edge shiftas fönstret in i intervallet istället för att klippas
+ * (annars skulle full=5 år kollapsa till 3 år vid kanterna).
+ */
+function getAnswerRange(
+  selectedYear: number,
+  interval: number,
+  min: number,
+  max: number,
+): { start: number; end: number } {
+  if (interval === 0) {
+    return { start: selectedYear, end: selectedYear };
+  }
+  const half = Math.floor(interval / 2);
+  let start = selectedYear - half;
+  let end = selectedYear + half;
+  if (start < min) {
+    end += min - start;
+    start = min;
+  }
+  if (end > max) {
+    start -= end - max;
+    end = max;
+  }
+  // Final clamp om hela era-spannet är smalare än interval (mycket smal era)
+  start = Math.max(min, start);
+  end = Math.min(max, end);
+  return { start, end };
 }
 
-function isCorrect(selectedYear: number, correctYear: number, interval: number): boolean {
-  if (interval === 0) return selectedYear === correctYear;
-  return Math.abs(selectedYear - correctYear) <= Math.floor(interval / 2);
+function isCorrect(
+  selectedYear: number,
+  correctYear: number,
+  interval: number,
+  eraMin: number,
+  eraMax: number,
+): boolean {
+  const range = getAnswerRange(selectedYear, interval, eraMin, eraMax);
+  return correctYear >= range.start && correctYear <= range.end;
 }
 
-function calculatePoints(timeLeft: number, correct: boolean): number {
+function calculatePoints(timeLeft: number, correct: boolean, totalSeconds: number): number {
   if (!correct) return 0;
-  return Math.round(1000 * (timeLeft / 30));
+  return Math.round(1000 * (timeLeft / totalSeconds));
 }
 
 // ─── Mått ─────────────────────────────────────────────────────────────────────
@@ -106,13 +146,16 @@ const BOX_BG = 'rgba(26,48,80,0.92)'; // mörkare navy – tydligt distinkt mot 
 // ─── Timeline Selector ────────────────────────────────────────────────────────
 
 function TimelineSelector({
-  assistance, correctYear, birthYear, onYearChange, disabled,
+  assistance, onYearChange, disabled, eraFrom, eraTo,
 }: {
-  assistance: AssistanceLevel; correctYear: number; birthYear: number;
+  assistance: AssistanceLevel;
   // Notifierar parent om vald-år-ändring vid varje scroll-tick. Confirm-knappen
   // lyfts ut till quiz.tsx så samma knapp-yta kan byta label/handler beroende
   // på fas (Confirm under question / Next Round under reveal).
   onYearChange: (year: number) => void; disabled: boolean;
+  // Game Era från Lobby — låser tidslinjens span exakt till det årsspann
+  // host valde. Spelaren kan inte scrolla till år utanför era-perioden.
+  eraFrom: number; eraTo: number;
 }) {
   // Dynamisk celltätlhet per assistance-nivå (smalare celler = fler år syns på skärmen)
   const ITEM_WIDTH =
@@ -127,7 +170,11 @@ function TimelineSelector({
   const SCROLL_PADDING = Math.max(40, TIMELINE_WIDTH / 2 - ITEM_WIDTH / 2);
 
   const interval = getIntervalForAssistance(assistance);
-  const { min, max } = getYearRange(correctYear);
+  // Tidslinjens span = host:s valda Game Era. Spelarens scroll-räckvidd
+  // capas mot eraFrom/eraTo så även selector-rutan (year-interval) håller
+  // sig inom perioden via existerande Math.max/min-clamps nedan.
+  const min = eraFrom;
+  const max = eraTo;
   const middleYear = Math.round((min + max) / 2);
   const [selectedYear, setSelectedYear] = useState(middleYear);
 
@@ -137,11 +184,50 @@ function TimelineSelector({
     onYearChange(selectedYear);
   }, [selectedYear, onYearChange]);
 
+  // Pulserande swipe-affordance: två gold-pilar utanför selector-rutans
+  // vänster/höger-kant. Loop:as i opacity + scale så de "dunkar" tills
+  // användaren scrollar (timeline:n disablar arrows när phase=reveal).
+  const arrowPulse = useRef(new Animated.Value(0.35)).current;
+  const arrowScale = useRef(new Animated.Value(1)).current;
+  useEffect(() => {
+    if (disabled) {
+      arrowPulse.stopAnimation();
+      arrowPulse.setValue(0);
+      arrowScale.stopAnimation();
+      arrowScale.setValue(1);
+      return;
+    }
+    const opacityLoop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(arrowPulse, { toValue: 1, duration: 700, useNativeDriver: true }),
+        Animated.timing(arrowPulse, { toValue: 0.35, duration: 700, useNativeDriver: true }),
+      ]),
+    );
+    const scaleLoop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(arrowScale, { toValue: 1.18, duration: 700, useNativeDriver: true }),
+        Animated.timing(arrowScale, { toValue: 1, duration: 700, useNativeDriver: true }),
+      ]),
+    );
+    opacityLoop.start();
+    scaleLoop.start();
+    return () => {
+      opacityLoop.stop();
+      scaleLoop.stop();
+    };
+  }, [disabled, arrowPulse, arrowScale]);
+
   const years = Array.from({ length: max - min + 1 }, (_, i) => min + i);
   const half = Math.floor(interval / 2);
-  // Klampa det VISADE intervallet till [min, max] – förhindrar att rutan visar år som inte finns på tidslinjen
-  const rangeStart = interval === 0 ? selectedYear : Math.max(min, selectedYear - half);
-  const rangeEnd = interval === 0 ? selectedYear : Math.min(max, selectedYear + half);
+  // Använd getAnswerRange-helper:n så fönstret behåller FULL bredd även vid
+  // era-kanterna (shiftar inåt istället för att klippa). Annars skulle t.ex.
+  // full=5 kollapsa till 3 år vid edge.
+  const { start: rangeStart, end: rangeEnd } = getAnswerRange(
+    selectedYear,
+    interval,
+    min,
+    max,
+  );
 
   const assistanceColor = {
     full: Colors.success,
@@ -298,6 +384,40 @@ function TimelineSelector({
               {interval === 0 ? `${selectedYear}` : `${rangeStart} – ${rangeEnd}`}
             </Text>
           </View>
+
+          {/* Vänster swipe-pil — pulserande gold-glyph utanför rutans
+              vänsterkant. right: '50%' anchorar på timeline-mitten,
+              marginRight skiftar till vänster om rutan. */}
+          <Animated.View style={{
+            position: 'absolute',
+            top: SELECTOR_TOP + (SELECTOR_H - 36) / 2,
+            right: '50%',
+            marginRight: selectorWidth / 2 + 6,
+            width: 36,
+            height: 36,
+            alignItems: 'center',
+            justifyContent: 'center',
+            opacity: arrowPulse,
+            transform: [{ scale: arrowScale }],
+          }}>
+            <Text style={tl.swipeArrow}>‹</Text>
+          </Animated.View>
+
+          {/* Höger swipe-pil — speglar vänster, left: '50%' + marginLeft */}
+          <Animated.View style={{
+            position: 'absolute',
+            top: SELECTOR_TOP + (SELECTOR_H - 36) / 2,
+            left: '50%',
+            marginLeft: selectorWidth / 2 + 6,
+            width: 36,
+            height: 36,
+            alignItems: 'center',
+            justifyContent: 'center',
+            opacity: arrowPulse,
+            transform: [{ scale: arrowScale }],
+          }}>
+            <Text style={tl.swipeArrow}>›</Text>
+          </Animated.View>
         </View>
       </View>
 
@@ -319,11 +439,31 @@ const tl = StyleSheet.create({
   assistDesc: { fontSize: 11, fontWeight: FontWeight.medium },
 
   hint: { textAlign: 'center', fontSize: 10, fontStyle: 'italic' },
+  // Pulserande gold-pilar utanför selector-rutan. textShadow ger en mjuk
+  // glow som matchar rutans gold-shadow så elementen hör visuellt ihop.
+  swipeArrow: {
+    fontSize: 38,
+    fontWeight: '900',
+    color: BOX_COLOR,
+    lineHeight: 38,
+    textShadowColor: BOX_COLOR,
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 8,
+  },
 });
 
 // ─── Main Quiz Screen ─────────────────────────────────────────────────────────
 
-type TurnOrderPlayer = { id: string; name: string; emoji?: string; avatarUri?: string };
+type TurnOrderPlayer = {
+  id: string;
+  name: string;
+  emoji?: string;
+  avatarUri?: string;
+  // Per-player assistance — driver TimelineSelector:s svarsruta-intervall
+  // (full=5 år, standard=3 år, minimal=1 år) när det är spelarens tur.
+  assistance?: AssistanceLevel;
+  age?: number;
+};
 
 export default function QuizScreen() {
   const params = useLocalSearchParams<{
@@ -335,11 +475,25 @@ export default function QuizScreen() {
     roomCode?: string;
     eraFrom?: string;
     eraTo?: string;
+    answerResponseSeconds?: string;
   }>();
-  const assistance = (params.assistance ?? 'standard') as AssistanceLevel;
+  // Default assistance från URL-param — fallback om turnOrder-spelaren
+  // saknar egen assistance-flagga. Per-player-värdet från turnOrder:n
+  // har företräde när det är satt (= bygg-tid sätts av Lobby).
+  const fallbackAssistance = (params.assistance ?? 'standard') as AssistanceLevel;
   const age = parseInt(params.age ?? '30');
-  const birthYear = new Date().getFullYear() - age;
   const gameMode = params.gameMode ?? 'pass-the-phone';
+  // Initial answerResponseSeconds från Lobby-param. Spelaren kan justera
+  // mellan ronder via GetReadyIntro:s settings-block, så vi håller värdet
+  // som state istället för konst. Endast 15/30/45/60 är giltiga (= host:s
+  // val i Lobby), default 30 om paramet saknas vid direkt-nav.
+  const initialResponseSeconds = (() => {
+    const parsed = parseInt(String(params.answerResponseSeconds ?? '30'), 10);
+    return [15, 30, 45, 60].includes(parsed) ? (parsed as 15 | 30 | 45 | 60) : 30;
+  })();
+  const [responseSeconds, setResponseSeconds] = useState<15 | 30 | 45 | 60>(
+    initialResponseSeconds,
+  );
   // Antal rundor sätts av host i Lobby (slider 3–20, default 10). Fallback 5
   // om param saknas — t.ex. direkt-nav till /quiz utan att gå via Lobby.
   // SEED_QUESTIONS har 5 frågor i mock; för totalRounds > 5 cyklas listan via
@@ -382,62 +536,157 @@ export default function QuizScreen() {
 
   const [questionIndex, setQuestionIndex] = useState(0);
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
+  // Aktuell spelares assistance — driver svarsruta-intervallet (full=5 år,
+  // standard=3 år, minimal=1 år) per rond. Faller tillbaka till fallback-
+  // Assistance om turnOrder-payload saknar fältet (legacy-data).
+  const currentAssistance: AssistanceLevel =
+    turnOrder[currentPlayerIndex]?.assistance ?? fallbackAssistance;
   // Initial fas är 'intro' när vi har en turordning (gäller båda lägena vid
   // spelstart). Faller tillbaka till 'question' om payload saknas/parse-failar.
-  const [phase, setPhase] = useState<'intro' | 'question' | 'reveal' | 'leaderboard'>(
+  // 'countdown' fas:as in efter intro:n när användaren tappar play-knappen —
+  // visar 3-2-1-nedräkning i en stor Q-logga innan question-vyn dyker upp.
+  // 'awaiting' fas:as in efter Confirm — TimelineSelector låses men reveal-
+  // feedbacken döljs tills timer:n går till 0. Det ger alla spelare samma
+  // tidsbudget oavsett om de svarar tidigt eller sent.
+  const [phase, setPhase] = useState<'intro' | 'countdown' | 'question' | 'awaiting' | 'reveal' | 'leaderboard'>(
     turnOrder.length > 0 ? 'intro' : 'question',
   );
   // Spelare som kommer efter current i turordningen (med wrap-around till
   // början). Drivs av Get-Ready-skärmens "Then: …"-rad så spelarna ser kön.
-  const queueNames = useMemo<string[]>(() => {
+  const queue = useMemo<TurnOrderPlayer[]>(() => {
     if (turnOrder.length <= 1) return [];
     return [
       ...turnOrder.slice(currentPlayerIndex + 1),
       ...turnOrder.slice(0, currentPlayerIndex),
-    ].map((p) => p.name);
+    ];
   }, [turnOrder, currentPlayerIndex]);
   const [timeLeft, setTimeLeft] = useState(30);
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   // Senaste valda år från TimelineSelector (uppdateras vid varje scroll-tick).
   // Quiz-skärmens egna Confirm-knapp läser detta när användaren trycker submit.
   const [pendingYear, setPendingYear] = useState<number | null>(null);
-  const [totalPoints, setTotalPoints] = useState(0);
-  const [roundPoints, setRoundPoints] = useState(0);
   const [rounds, setRounds] = useState<RoundResult[]>([]);
+  // Bekräftad svarstid i sekunder med 2-decimals-precision. Sätts via
+  // Date.now()-diff i handleConfirm — setInterval ger bara sekund-precision
+  // så vi behöver tidsstämpla separat. Driver:
+  //   • avatar-markören på timer-bar:en (placerad vid elapsed/30 av bredden)
+  //   • "Answer time: X.YYs"-raden i feedback-kortet vid rätt svar
+  const [confirmedTimeUsed, setConfirmedTimeUsed] = useState<number | null>(null);
 
-  // ── Multiplayer state (mock-motspelare genererade per runda) ──────────────
+  // ── Multiplayer state ──────────────────────────────────────────────────
+  // Per-runda-poäng (= scores för senaste avslutade fråga). Aggregerade
+  // per-spelare-totals härleds från allRoundScoresHistory via gameTotals.
   const [currentRoundScores, setCurrentRoundScores] = useState<RoundScore[]>([]);
   const [allRoundScoresHistory, setAllRoundScoresHistory] = useState<RoundScore[][]>([]);
-  const [opponentTotals, setOpponentTotals] = useState<Record<string, number>>(
-    Object.fromEntries(MOCK_OPPONENTS.map((o) => [o.id, 0])),
-  );
   const [playerHcpChanges, setPlayerHcpChanges] = useState<Record<string, HcpChange>>({});
 
   // Spel-start: trackas en gång när QuizScreen mountas (router pushar
   // hit från Lobby:s "Start Game"-flöde). Region/land sätts av
   // analytics-vendor:n på dashboard-sidan, behöver inte skickas här.
   useEffect(() => {
-    track('game_started', { assistance });
+    track('game_started', { assistance: fallbackAssistance });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // "YOU"-spelare (hostar spelet; använder params.assistance/age)
+  // "YOU"-spelare (hostar spelet). Läser namn + emoji från turnOrder[0]
+  // (= host i mock-setupen) så leaderboarden visar host:s riktiga avatar/
+  // namn istället för hardcoded "You" / 🎮. Faller tillbaka till generic
+  // "You" / 🎮 om turnOrder är tom (defensiv vid direkt-nav till /quiz
+  // utan Lobby).
+  const hostFromTurn = turnOrder[0];
   const youPlayer: LeaderboardPlayer = useMemo(
     () => ({
       id: 'you',
-      name: 'You',
-      emoji: '🎮',
-      assistance,
-      age,
+      name: hostFromTurn?.name ?? 'You',
+      emoji: hostFromTurn?.emoji ?? '🎮',
+      assistance: fallbackAssistance,
+      age: hostFromTurn?.age ?? age,
       isYou: true,
       isHost: true,
     }),
-    [assistance, age],
+    [hostFromTurn?.name, hostFromTurn?.emoji, hostFromTurn?.age, fallbackAssistance, age],
   );
-  const allPlayers: LeaderboardPlayer[] = useMemo(
-    () => [youPlayer, ...MOCK_OPPONENTS],
-    [youPlayer],
-  );
+  // gamePlayers = den faktiska spelarlistan i detta spel.
+  // Pass-the-Phone: alla spelare finns i turnOrder. Visa dem i leaderboarden
+  // istället för MOCK_OPPONENTS (som inte spelar i pass-the-phone).
+  // Direkt-nav (turnOrder tom) faller tillbaka till [you + mocks].
+  const gamePlayers: LeaderboardPlayer[] = useMemo(() => {
+    if (turnOrder.length > 0) {
+      return turnOrder.map((p, i) => ({
+        id: p.id,
+        name: p.name,
+        emoji: p.emoji ?? '👤',
+        assistance: p.assistance ?? fallbackAssistance,
+        age: p.age ?? age,
+        isYou: i === 0,
+        isHost: i === 0,
+      }));
+    }
+    return [youPlayer, ...MOCK_OPPONENTS];
+  }, [turnOrder, youPlayer, fallbackAssistance, age]);
+
+  // Aggregera per-spelare-totals direkt från allRoundScoresHistory så
+  // leaderboarden alltid speglar exakt vilka som faktiskt har scoreats —
+  // ingen mock-spelare räknas upp om de inte har en post i history.
+  const gameTotals: Record<string, number> = useMemo(() => {
+    const totals: Record<string, number> = {};
+    allRoundScoresHistory.forEach((round) => {
+      round.forEach((s) => {
+        totals[s.playerId] = (totals[s.playerId] ?? 0) + s.points;
+      });
+    });
+    return totals;
+  }, [allRoundScoresHistory]);
+
+  const allPlayers: LeaderboardPlayer[] = gamePlayers;
+
+  // Host:s id (= "your" perspektiv från denna enhet). Pass-the-phone:
+  // turnOrder[0]; direkt-nav fallback: 'you'.
+  const hostId = turnOrder[0]?.id ?? 'you';
+  // Derived host-total — ersätter den tidigare totalPoints-state:n. Räknas
+  // alltid mot host:s id i gameTotals så host:s "your" total reflekterar
+  // bara sina egna scoreade ronder, inte andras (kritiskt i pass-the-phone).
+  const totalPoints = gameTotals[hostId] ?? 0;
+
+  // Live-leaderboard till GetReadyIntro:s utfällbara block. Aggregerar
+  // allRoundScoresHistory per spelare till position/poäng/rounds/correct/
+  // avg/last response. Sortering: poäng desc → avg response asc (ties bryts
+  // av snabbast genomsnitt).
+  const liveLeaderboard = useMemo(() => {
+    const totalsMap: Record<string, number> = gameTotals;
+    const entries = gamePlayers.map((p) => {
+      const playerScores: RoundScore[] = allRoundScoresHistory.flatMap((round) =>
+        round.filter((s) => s.playerId === p.id),
+      );
+      const correctAnswers = playerScores.filter((s) => s.correct).length;
+      const incorrectAnswers = playerScores.length - correctAnswers;
+      const avgResponseSeconds = playerScores.length > 0
+        ? playerScores.reduce((sum, s) => sum + s.timeUsed, 0) / playerScores.length
+        : 0;
+      const lastResponseSeconds = playerScores.length > 0
+        ? playerScores[playerScores.length - 1].timeUsed
+        : null;
+      // Senaste 5 utfallen, äldst → nyast (slice tar upp till 5 sista i
+      // historik-ordning). Renderas som färgade dotts/glyphs i leaderboard.
+      const lastFiveResults = playerScores.slice(-5).map((s) => s.correct);
+      return {
+        playerId: p.id,
+        name: p.name,
+        emoji: p.emoji,
+        points: totalsMap[p.id] ?? 0,
+        playedRounds: playerScores.length,
+        correctAnswers,
+        incorrectAnswers,
+        avgResponseSeconds,
+        lastResponseSeconds,
+        lastFiveResults,
+      };
+    });
+    return entries.sort((a, b) => {
+      if (b.points !== a.points) return b.points - a.points;
+      return a.avgResponseSeconds - b.avgResponseSeconds;
+    });
+  }, [gamePlayers, gameTotals, allRoundScoresHistory]);
 
   const timerRef = useRef<any>(null);
   // pulseAnim driver opacity:n på timer-progress-baren när tiden
@@ -448,6 +697,21 @@ export default function QuizScreen() {
   // svaret poppa in. Kopierad logik från den borttagna RevealScreen-komponenten.
   const revealScale = useRef(new Animated.Value(0.6)).current;
   const revealOpacity = useRef(new Animated.Value(0)).current;
+  // Confirm-knappens blue glow + scale-pulse — körs i loop medan question-
+  // fasen är aktiv och pendingYear är giltig (knappen är tappbar). Speglar
+  // Lobby:s Start Game-CTA + GetReady:s play-knapp.
+  const confirmPulse = useRef(new Animated.Value(1)).current;
+  const confirmGlow = useRef(new Animated.Value(0.35)).current;
+  // Pulserande ring runt sekund-räknaren till höger om timer-bar:en. Färgen
+  // ärvs från timerColor (primary → warning → error). Två separata loops:
+  // scale (subtil "andning") + halo-opacity (glow-effekten bakom ringen).
+  const timerRingPulse = useRef(new Animated.Value(1)).current;
+  const timerRingGlow = useRef(new Animated.Value(0.3)).current;
+  // Förfluten tid med 2-decimals-precision (ms) — driver stopwatch-displayen
+  // under timer-bar:en (räknar UPPÅT från 00.00 mot responseSeconds). Drivs
+  // av en 20 Hz tick som läser Date.now()-diff så värdet är drift-fritt.
+  // Initialiseras till 0 — visas som "00.00" innan timer:n startar.
+  const [decimalElapsedMs, setDecimalElapsedMs] = useState<number>(0);
 
   const question = eraFilteredQuestions[questionIndex % eraFilteredQuestions.length];
   const isLastQuestion = questionIndex === totalQuestions - 1;
@@ -455,27 +719,67 @@ export default function QuizScreen() {
   // kortet ("Answering: {namn}"). Skip:as för Individual Devices (varje
   // spelare är på sin egen enhet och vet redan vem de är).
   const currentPlayerName = turnOrder[currentPlayerIndex]?.name;
-  // Assistance-färg används som accent på Confirm-knappen så den visuellt
-  // matchar TimelineSelector:s assist-badge för samma assistance-nivå.
-  // Reveal-fasens Next Round-/Final Leaderboard-knapp använder Colors.primary istället.
-  const assistanceColor = assistance === 'full' ? Colors.success : assistance === 'minimal' ? '#F5A623' : Colors.primary;
+
+  // Ref för exakt question-start-tidpunkt (ms) — används för att räkna ut
+  // svarstiden med 2 decimaler vid Confirm. setInterval ger bara sekund-
+  // precision så vi måste timestampa separat med Date.now().
+  const questionStartMsRef = useRef<number>(0);
+  // Smooth bar-progress 1 → 0 över exakt 30 s, animerad via Animated.timing
+  // med RAF (requestAnimationFrame). Körs OBEROENDE av setInterval-baserade
+  // sekund-räknaren så bar:en aldrig "fryser" eller stepar — kritiskt för
+  // upplevelsen att tiden flyter på även medan handleConfirm batchar
+  // setStates och React re-renderar action-knappen. Krävs för Individual-
+  // Devices-flödet där flera spelare confirmar vid olika tidpunkter.
+  const timerProgressAnim = useRef(new Animated.Value(1)).current;
 
   const startTimer = useCallback(() => {
-    setTimeLeft(30);
+    if (timerRef.current) clearInterval(timerRef.current);
+    setTimeLeft(responseSeconds);
+    questionStartMsRef.current = Date.now();
+    // Native-driver kan inte hantera procentuell width, så useNativeDriver:
+    // false. Animated.timing schemaläggs ändå via RAF så bar:en uppdateras
+    // varje frame oberoende av setInterval-tick:n eller övriga JS-händelser.
+    timerProgressAnim.stopAnimation();
+    timerProgressAnim.setValue(1);
+    Animated.timing(timerProgressAnim, {
+      toValue: 0,
+      duration: responseSeconds * 1000,
+      easing: Easing.linear,
+      useNativeDriver: false,
+    }).start();
+    // Sekund-räknaren (1 Hz) driver bara den siffer-baserade "23s"-labeln +
+    // existing scoring/time-out-logik som jobbar i hela sekunder. Bar:en
+    // styrs separat av Animated.Value ovan.
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) { clearInterval(timerRef.current); return 0; }
         return prev - 1;
       });
     }, 1000);
-  }, [questionIndex]);
+  }, [questionIndex, timerProgressAnim, responseSeconds]);
+
+  // Unmount-cleanup så timern inte läcker om component unmounts (t.ex.
+  // Quit Game mid-question). Lever utanför phase-baserade effects.
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+      timerProgressAnim.stopAnimation();
+    };
+  }, [timerProgressAnim]);
 
   useEffect(() => {
-    if (timeLeft === 0 && phase === 'question') {
-      // Time ran out – registrera ronden som missad (0 poäng, inget giltigt svar)
+    if (timeLeft !== 0) return;
+    if (phase === 'awaiting') {
+      // Användaren har redan confirmat — runda + poäng är redan registrerade
+      // i handleConfirm. Bara visa reveal-feedbacken när tiden går ut.
+      setPhase('reveal');
+      return;
+    }
+    if (phase === 'question') {
+      // Time ran out utan Confirm — registrera ronden som missad (0 poäng,
+      // inget giltigt svar) och gå direkt till reveal.
       const defaultGuess = new Date().getFullYear() - 20;
       setSelectedYear(defaultGuess);
-      setRoundPoints(0);
       setRounds((prev) => [
         ...prev,
         {
@@ -486,58 +790,62 @@ export default function QuizScreen() {
           selectedYear: defaultGuess,
           correct: false,
           points: 0,
-          timeUsed: 30,
+          timeUsed: responseSeconds,
         },
       ]);
-      // Generera motspelarnas rond-poäng och uppdatera totals
-      simulateOpponentRound(0, false, 30);
+      recordRoundScore(0, false, responseSeconds);
       setPhase('reveal');
     }
   }, [timeLeft]);
 
-  // ── Mock-motspelare: generera poäng för denna runda ─────────────────────
-  const simulateOpponentRound = (yourPoints: number, yourCorrect: boolean, yourTimeUsed: number) => {
-    const opponentScores: RoundScore[] = MOCK_OPPONENTS.map((opp) => {
-      const gen = generateOpponentRoundScore(opp.assistance);
-      return {
-        playerId: opp.id,
-        points: gen.points,
-        correct: gen.correct,
-        timeUsed: generateOpponentTimeUsed(),
-      };
-    });
+  // Registrera score:n för en avslutad fråga. I Pass-the-Phone (eller när
+  // turnOrder är satt) skapar vi en post för ENDAST den aktiva spelaren —
+  // mock-motspelare auto-genereras inte eftersom alla spelare är riktiga
+  // och delar denna enhet (en spelare i taget). Direkt-nav till /quiz utan
+  // turnOrder simulerar fortfarande mock-motspelare för gameplay-testning.
+  const recordRoundScore = (yourPoints: number, yourCorrect: boolean, yourTimeUsed: number) => {
+    const activePlayerId = turnOrder[currentPlayerIndex]?.id ?? 'you';
     const yourScore: RoundScore = {
-      playerId: 'you',
+      playerId: activePlayerId,
       points: yourPoints,
       correct: yourCorrect,
       timeUsed: yourTimeUsed,
     };
-    const allScores = [yourScore, ...opponentScores];
+    let allScores: RoundScore[] = [yourScore];
+    // Mock-motspelare genereras BARA vid direkt-nav (tom turnOrder).
+    if (turnOrder.length === 0) {
+      const opponentScores: RoundScore[] = MOCK_OPPONENTS.map((opp) => {
+        const gen = generateOpponentRoundScore(opp.assistance);
+        return {
+          playerId: opp.id,
+          points: gen.points,
+          correct: gen.correct,
+          timeUsed: generateOpponentTimeUsed(),
+        };
+      });
+      allScores = [yourScore, ...opponentScores];
+    }
     setCurrentRoundScores(allScores);
     setAllRoundScoresHistory((prev) => [...prev, allScores]);
-    setOpponentTotals((prev) => {
-      const next = { ...prev };
-      opponentScores.forEach((s) => {
-        next[s.playerId] = (next[s.playerId] ?? 0) + s.points;
-      });
-      return next;
-    });
   };
 
   useEffect(() => {
-    // Timern ska bara ticka i question-fasen — under 'intro' (Get Ready to
-    // Vibe) får spelaren gott om tid att ta emot telefonen. `phase` i deps
-    // gör att timern (åter)startas när vi går från 'intro' → 'question'.
+    // Timern startas vid 'question'-entry (efter intro/countdown). När
+    // användaren bekräftar svaret går phase → 'awaiting' men timern ska
+    // FORTSÄTTA ticka — alla spelare får samma tidsbudget oavsett när de
+    // bekräftade. Därför ingen cleanup här som klipper intervallet vid
+    // phase-byte; intervallet self-clearas när timeLeft hits 0 (eller via
+    // unmount-cleanup ovan).
     if (phase !== 'question') return;
     startTimer();
-    return () => clearInterval(timerRef.current);
   }, [questionIndex, phase]);
 
   useEffect(() => {
     // Pulsa progress-barens opacity (1 → 0.55 → 1) när ≤5s kvar för att
     // signalera att tiden är kritisk. Native driver eftersom det är ren
-    // opacity-animation.
-    if (timeLeft <= 5 && phase === 'question') {
+    // opacity-animation. Gäller både question OCH awaiting (timer:n tickar
+    // ned till 0 i båda faserna).
+    if (timeLeft <= 5 && (phase === 'question' || phase === 'awaiting')) {
       Animated.loop(
         Animated.sequence([
           Animated.timing(pulseAnim, { toValue: 0.55, duration: 250, useNativeDriver: true }),
@@ -563,15 +871,117 @@ export default function QuizScreen() {
     }
   }, [phase, revealScale, revealOpacity]);
 
+  // Pulserande ring + glow runt sekund-räknaren — körs i alla aktiva timer-
+  // faser ('question' + 'awaiting'). Stoppas i intro/countdown/reveal/
+  // leaderboard så ringen står still när timern inte tickar.
+  useEffect(() => {
+    const isActive = phase === 'question' || phase === 'awaiting';
+    if (!isActive) {
+      timerRingPulse.stopAnimation();
+      timerRingPulse.setValue(1);
+      timerRingGlow.stopAnimation();
+      timerRingGlow.setValue(0.3);
+      return;
+    }
+    const scaleLoop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(timerRingPulse, { toValue: 1.08, duration: 700, useNativeDriver: true }),
+        Animated.timing(timerRingPulse, { toValue: 1, duration: 700, useNativeDriver: true }),
+      ]),
+    );
+    const glowLoop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(timerRingGlow, { toValue: 0.7, duration: 700, useNativeDriver: true }),
+        Animated.timing(timerRingGlow, { toValue: 0.3, duration: 700, useNativeDriver: true }),
+      ]),
+    );
+    scaleLoop.start();
+    glowLoop.start();
+    return () => {
+      scaleLoop.stop();
+      glowLoop.stop();
+    };
+  }, [phase, timerRingPulse, timerRingGlow]);
+
+  // 2-decimal countdown-tick (20 Hz). Körs ENDAST i 'question'-fasen — så
+  // fort spelaren confirmar (phase → 'awaiting') stoppas tick:n och displayen
+  // fryses på exakt confirm-värdet (sätts explicit i handleConfirm). I
+  // intro/countdown/reveal/leaderboard återställs till "30.00".
+  useEffect(() => {
+    const totalMs = responseSeconds * 1000;
+    if (phase !== 'question') {
+      if (phase === 'intro' || phase === 'countdown') {
+        setDecimalElapsedMs(0);
+      }
+      return;
+    }
+    const tick = () => {
+      const elapsedMs = Date.now() - questionStartMsRef.current;
+      const clamped = Math.min(totalMs, Math.max(0, elapsedMs));
+      setDecimalElapsedMs(clamped);
+    };
+    tick();
+    const id = setInterval(tick, 50);
+    return () => clearInterval(id);
+  }, [phase, questionIndex, responseSeconds]);
+
+  // Confirm-knappens scale + glow-loop. Körs medan phase === 'question' OCH
+  // pendingYear är giltig (knappen är tappbar). Stoppas i andra faser så
+  // disabled-knappen står still — pulserande disabled-knapp läses som "klick-
+  // bar men inte". Båda loops använder native driver (transform/opacity).
+  useEffect(() => {
+    if (phase !== 'question' || pendingYear === null) {
+      confirmPulse.stopAnimation();
+      confirmPulse.setValue(1);
+      confirmGlow.stopAnimation();
+      confirmGlow.setValue(0.35);
+      return;
+    }
+    const scaleLoop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(confirmPulse, { toValue: 1.04, duration: 800, useNativeDriver: true }),
+        Animated.timing(confirmPulse, { toValue: 1, duration: 800, useNativeDriver: true }),
+      ]),
+    );
+    const glowLoop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(confirmGlow, { toValue: 0.8, duration: 800, useNativeDriver: true }),
+        Animated.timing(confirmGlow, { toValue: 0.35, duration: 800, useNativeDriver: true }),
+      ]),
+    );
+    scaleLoop.start();
+    glowLoop.start();
+    return () => {
+      scaleLoop.stop();
+      glowLoop.stop();
+    };
+  }, [phase, pendingYear, confirmPulse, confirmGlow]);
+
   const handleConfirm = (year: number) => {
-    clearInterval(timerRef.current);
-    const interval = getIntervalForAssistance(assistance);
-    const correct = isCorrect(year, question.correctYear, interval);
-    const pts = calculatePoints(timeLeft, correct);
-    const timeUsed = 30 - timeLeft;
+    // Timer:n stoppas INTE — alla spelare får samma tidsbudget oavsett när
+    // de bekräftade. Reveal-feedbacken visas först när timer:n går till 0
+    // (i useEffect:en på timeLeft nedan).
+    const interval = getIntervalForAssistance(currentAssistance);
+    const correct = isCorrect(year, question.correctYear, interval, eraFrom, eraTo);
+    const pts = calculatePoints(timeLeft, correct, responseSeconds);
+    const timeUsed = responseSeconds - timeLeft;
+    // 2-decimals svarstid via Date.now()-diff (questionStartMsRef sätts i
+    // startTimer). Cap:as till responseSeconds så ev. clock drift inte ger
+    // > totalSeconds.
+    const totalMs = responseSeconds * 1000;
+    const exactElapsedMs = Math.max(0, Date.now() - questionStartMsRef.current);
+    const exactElapsedSec = Math.min(responseSeconds, exactElapsedMs / 1000);
+    setConfirmedTimeUsed(exactElapsedSec);
+    // Frys stopwatch-displayen på EXAKT confirm-värdet. Tick-effekten ovan
+    // stoppar (phase blir 'awaiting' direkt efter), men det senast tickade
+    // värdet kan vara upp till 50 ms före confirm. Genom att skriva exakt
+    // elapsed här matchar displayen confirmed time + avatar-markörens
+    // x-position på timer-bar:en.
+    const elapsedAtConfirm = Math.min(totalMs, Math.max(0, exactElapsedMs));
+    setDecimalElapsedMs(elapsedAtConfirm);
     setSelectedYear(year);
-    setRoundPoints(pts);
-    setTotalPoints((prev) => prev + pts);
+    // totalPoints uppdateras automatiskt via gameTotals (deriveras från
+    // history när recordRoundScore tillsätter en post nedan).
     setRounds((prev) => [
       ...prev,
       {
@@ -585,9 +995,10 @@ export default function QuizScreen() {
         timeUsed,
       },
     ]);
-    // Generera motspelarnas rond-poäng och uppdatera totals
-    simulateOpponentRound(pts, correct, timeUsed);
-    setPhase('reveal');
+    // Registrera score:n för aktuell spelare (och i direkt-nav-fallet
+    // även mock-motspelarnas auto-genererade poäng).
+    recordRoundScore(pts, correct, timeUsed);
+    setPhase('awaiting');
   };
 
   // ── Navigations-handlers ────────────────────────────────────────────────
@@ -602,6 +1013,7 @@ export default function QuizScreen() {
     setQuestionIndex((prev) => prev + 1);
     setSelectedYear(null);
     setPendingYear(null);
+    setConfirmedTimeUsed(null);
     // Pass-the-phone: rotera till nästa spelare i turordningen och visa
     // Get-Ready-skärmen så telefonen kan lämnas över. Individual Devices:
     // varje spelare är på sin egen enhet — inget overlämnings-flöde behövs
@@ -627,7 +1039,7 @@ export default function QuizScreen() {
       date: new Date().toISOString(),
       totalPoints,
       rounds,
-      assistance,
+      assistance: fallbackAssistance,
       hcpBefore,
       hcpAfter,
     };
@@ -646,31 +1058,33 @@ export default function QuizScreen() {
       // Formel (placeholder till Fas 6): delta = round(totalPoints / 500)
       const changes: Record<string, HcpChange> = {};
 
-      // YOU
-      const yourBefore = 99;
-      const yourDelta = Math.round(totalPoints / 500);
-      changes.you = { before: yourBefore, after: Math.max(1, yourBefore - yourDelta) };
-
-      // Motspelare
-      MOCK_OPPONENTS.forEach((opp) => {
-        const oppTotal = opponentTotals[opp.id] ?? 0;
-        const oppDelta = Math.round(oppTotal / 500);
-        const before = MOCK_OPPONENT_HCP_BEFORE[opp.id] ?? 99;
-        changes[opp.id] = { before, after: Math.max(1, before - oppDelta) };
+      // Iterera över alla gamePlayers (turnOrder i pass-the-phone, mocks
+      // vid direkt-nav). gameTotals har redan per-id summorna från history.
+      gamePlayers.forEach((p) => {
+        const total = gameTotals[p.id] ?? 0;
+        const delta = Math.round(total / 500);
+        const before = p.isHost ? 99 : MOCK_OPPONENT_HCP_BEFORE[p.id] ?? 99;
+        changes[p.id] = { before, after: Math.max(1, before - delta) };
       });
 
       setPlayerHcpChanges(changes);
       saveFinalGame();
       track('game_completed', {
-        assistance,
+        assistance: fallbackAssistance,
         total_points: totalPoints,
         rounds_played: rounds.length,
       });
     }
   }, [phase, isLastQuestion]);
 
-  // Sista rundans actions: starta nytt rum i Lobby (ev. med samma spelare) eller gå hem
-  const goToNewLobby = async (reusePlayers: boolean) => {
+  // Sista rundans actions: starta nytt rum i Lobby (ev. med samma spelare) eller gå hem.
+  // `keepSettings` styr om per-spelare-settings (age/assistance) bärs över från
+  // detta spel — settings kan ha redigerats av host i Lobby:n. När false:
+  // - Host (you): behåller egen profil-baserad age/assistance (kommer från params).
+  // - Övriga registrerade: defaults till standard/30 så Lobby:s profile-merge
+  //   senare kan fylla i deras profil-värden vid mount.
+  // - Guests: defaults till standard/30 så host får redigera om i Lobby.
+  const goToNewLobby = async (reusePlayers: boolean, keepSettings: boolean = true) => {
     if (reusePlayers) {
       // Behåll alla spelare från detta spel
       const lobbyPlayers: LobbyPlayer[] = allPlayers.map((p) => ({
@@ -679,8 +1093,8 @@ export default function QuizScreen() {
         emoji: p.emoji,
         isReady: true,
         type: 'registered' as const,
-        age: p.age,
-        assistance: p.assistance,
+        age: keepSettings || p.isYou ? p.age : 30,
+        assistance: keepSettings || p.isYou ? p.assistance : 'standard',
         hcpComplete: true,
         isHost: p.isHost ?? false,
       }));
@@ -694,7 +1108,7 @@ export default function QuizScreen() {
         isReady: true,
         type: 'registered',
         age,
-        assistance,
+        assistance: fallbackAssistance,
         hcpComplete: true,
         isHost: true,
       }];
@@ -726,14 +1140,50 @@ export default function QuizScreen() {
     router.replace(`/(tabs)/lobby?code=${newCode}&isHost=true`);
   };
 
-  const handlePlayAgain = () => {
+  // Sekventiell Alert-flow: först fråga om spelarna ska följa med, sedan
+  // (om ja) en uppföljning om per-spelare-settings ska bevaras eftersom de
+  // kan ha redigerats av host under spelet/i Lobby:n. iOS Alert har max 3
+  // knappar utan radbryt — därav två steg istället för 4-vägs-prompt.
+  const askKeepSettingsThenGo = () => {
+    Alert.alert(
+      'Keep same settings per player?',
+      'Settings (assistance level + age) may have been edited during this game. Keep them or reset to defaults?',
+      [
+        { text: 'Reset', onPress: () => goToNewLobby(true, false) },
+        { text: 'Keep settings', onPress: () => goToNewLobby(true, true) },
+      ],
+    );
+  };
+
+  const handlePlayAgain = async () => {
+    // Host Game Credits-gate (samma som Home:s Create Game + Lobby:s Start
+    // Game): blockera Play Again om både Free och Extras är 0. loadProfile()
+    // refreshar Free-saldot vid första load efter midnatt CET så vi alltid
+    // jämför mot aktuellt värde. Bättre att fånga det här innan vi visar
+    // re-use-players-prompten — annars fyller man i 2 alerts och får sedan
+    // blockaden i Lobby:n vid Start Game.
+    const freshProfile = await loadProfile();
+    const free = freshProfile?.freeGameCredits ?? 0;
+    const extras = freshProfile?.gameCredits ?? 0;
+    if (free === 0 && extras === 0) {
+      Alert.alert(
+        'Out of Host Game Credits',
+        'You have no credits left for today. Buy extra credits in Store, wait for the daily refresh at midnight CET, or upgrade to a QuizVibe membership for unlimited host games.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Go to Store', onPress: () => router.push('/(tabs)/store?focus=credits&from=/') },
+        ],
+      );
+      return;
+    }
+
     Alert.alert(
       'Re-use all players?',
       'Start the next room with the same players, or begin fresh?',
       [
         { text: 'Cancel', style: 'cancel' },
         { text: 'Start fresh', onPress: () => goToNewLobby(false) },
-        { text: 'Yes, keep them', onPress: () => goToNewLobby(true) },
+        { text: 'Yes, keep them', onPress: askKeepSettingsThenGo },
       ],
     );
   };
@@ -774,18 +1224,28 @@ export default function QuizScreen() {
   };
 
   // Timer-progress-barens färg byter vid 10s (warning) och 5s (error).
+  // Bar:ens BREDD drivs av timerProgressAnim (Animated.Value, RAF-driven).
+  // Färgen styrs fortfarande av sekund-räknaren timeLeft eftersom färg-
+  // tröskeln är vid hela sekunder.
   const timerColor = timeLeft > 10 ? Colors.primary : timeLeft > 5 ? Colors.warning : Colors.error;
-  // Klampa till [0, 1] så barens bredd aldrig overshootar/blir negativ vid
-  // edge-cases (t.ex. om timern hinner gå till 0 medan reveal-transitionen
-  // körs). 30s är hårdkodat tills answerResponseSeconds-paramet vävs in.
-  const timerProgress = Math.max(0, Math.min(1, timeLeft / 30));
+  // Stopwatch:n (decimal-rutan) byter till en lugnare ljusblå ton så fort
+  // användaren confirmat (awaiting) OCH stannar blå genom reveal-fasen så
+  // den inte byter till varnings-röd när tiden går ut. Question-fasen
+  // använder vanlig timerColor så användaren ser tidens-status normalt.
+  const STOPWATCH_AWAITING_COLOR = '#8CC1FF';
+  const stopwatchColor =
+    phase === 'question' ? timerColor : STOPWATCH_AWAITING_COLOR;
 
   // Get-Ready-skärmen renderas före quiz-UI:t. Vid spelstart för båda lägena,
   // och mellan rundor för Pass-the-phone (ej Individual Devices). Faller
   // tillbaka till 'You' om turnOrder skulle vara tom (defensiv — initial
   // phase-init filtrerar redan bort det fallet).
   if (phase === 'intro') {
-    const currentPlayer = turnOrder[currentPlayerIndex];
+    const currentPlayer = turnOrder[currentPlayerIndex] ?? {
+      id: 'you',
+      name: 'You',
+      emoji: '🎮',
+    };
     const playerCount = Math.max(1, turnOrder.length);
     const currentRound = Math.floor(questionIndex / playerCount) + 1;
     const currentQuestion = questionIndex + 1;
@@ -795,24 +1255,31 @@ export default function QuizScreen() {
     // wrap-around-spelare i sista rundan som aldrig hinner spela försvinner
     // från listan helt — annars hade vi visat siffror som overshootar.
     // Alla tre arrays slicas parallellt så indexen håller ihop.
-    const queueWithCounts = queueNames
-      .map((name, i) => {
+    const queueWithCounts = queue
+      .map((p, i) => {
         const absoluteQuestion0 = questionIndex + 1 + i; // 0-baserat
         return {
-          name,
+          player: p,
           round: Math.floor(absoluteQuestion0 / playerCount) + 1,
           question: absoluteQuestion0 + 1, // 1-baserat
           withinBudget: absoluteQuestion0 < totalQuestions,
         };
       })
       .filter((entry) => entry.withinBudget);
-    const introQueueNames = queueWithCounts.map((entry) => entry.name);
+    const introQueue = queueWithCounts.map((entry) => entry.player);
     const queueRoundNumbers = queueWithCounts.map((entry) => entry.round);
     const queueQuestionNumbers = queueWithCounts.map((entry) => entry.question);
+    // Answer response time får BARA ändras vid round-boundary i Pass-the-
+    // Phone-läget — dvs när nästa spelare = första i turordningen
+    // (currentPlayerIndex === 0 = alla har svarat lika många gånger).
+    // Individual Devices skippar intro mellan ronder så där är det alltid
+    // adjustable när intro visas (typiskt bara vid game start).
+    const responseSecondsLocked =
+      gameMode === 'pass-the-phone' && currentPlayerIndex !== 0;
     return (
       <GetReadyIntro
-        playerName={currentPlayer?.name ?? 'You'}
-        queueNames={introQueueNames}
+        currentPlayer={currentPlayer}
+        queue={introQueue}
         queueRoundNumbers={queueRoundNumbers}
         queueQuestionNumbers={queueQuestionNumbers}
         currentRound={currentRound}
@@ -820,8 +1287,27 @@ export default function QuizScreen() {
         currentQuestion={currentQuestion}
         totalQuestions={totalQuestions}
         playerCount={playerCount}
-        onReady={() => setPhase('question')}
+        eraFrom={eraFrom}
+        eraTo={eraTo}
+        answerResponseSeconds={responseSeconds}
+        onAnswerResponseSecondsChange={setResponseSeconds}
+        responseSecondsLocked={responseSecondsLocked}
+        leaderboard={liveLeaderboard}
+        onReady={() => setPhase('countdown')}
         onQuit={handleQuitGame}
+      />
+    );
+  }
+
+  // 3-2-1-nedräkning mellan tap på play-knappen i intro:n och fråge-vyn.
+  // playerName från turordningen så Pass-the-Phone-mode anchorar nedräkningen
+  // till rätt spelare även medan telefonen lämnas över.
+  if (phase === 'countdown') {
+    const countdownPlayer = turnOrder[currentPlayerIndex];
+    return (
+      <CountdownIntro
+        playerName={countdownPlayer?.name}
+        onComplete={() => setPhase('question')}
       />
     );
   }
@@ -854,137 +1340,285 @@ export default function QuizScreen() {
                 tabular-nums-värde i samma färg som baren. */}
             <View style={styles.timerSection}>
               <View style={styles.timerTrack}>
+                {/* Yttre pulse-wrapper håller opacity (native driver). Inre
+                    fill håller width (JS driver). Måste separeras på olika
+                    Animated.Views — annars markerar native driver noden
+                    som "owned" och JS-driver-uppdatering av width kraschar
+                    med "Attempting to run JS driven animation on animated
+                    node that has been moved to native". */}
                 <Animated.View
-                  style={[
-                    styles.timerFill,
-                    {
-                      width: `${timerProgress * 100}%`,
-                      backgroundColor: timerColor,
-                      opacity: pulseAnim,
-                    },
-                  ]}
-                />
+                  style={[styles.timerFillPulseWrap, { opacity: pulseAnim }]}
+                >
+                  <Animated.View
+                    style={[
+                      styles.timerFill,
+                      {
+                        // Bredden interpoleras från Animated.Value (0 → 1) till
+                        // procent (0 % → 100 %) — RAF-driven, så bar:en rör sig
+                        // smooth varje frame även när JS-tråden är upptagen med
+                        // Confirm-handlerns batch av setStates.
+                        width: timerProgressAnim.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: ['0%', '100%'],
+                        }),
+                        backgroundColor: timerColor,
+                      },
+                    ]}
+                  />
+                </Animated.View>
+                {/* Avatar-markör vid bekräftad svarstid. timerFill krymper
+                    från höger mot vänster (left-anchored fill med width
+                    = timeLeft/30). Avataren ska sitta vid fillens HÖGRA
+                    kant vid confirm-momentet = (timeLeft/30) av bredden
+                    från vänster, dvs (1 − elapsed/30) × 100 %. När timer:n
+                    fortsätter ticka krymper fillen förbi avataren. */}
+                {confirmedTimeUsed !== null && (
+                  <View
+                    pointerEvents="none"
+                    style={[
+                      styles.timerMarker,
+                      { left: `${((responseSeconds - confirmedTimeUsed) / responseSeconds) * 100}%` },
+                    ]}
+                  >
+                    {turnOrder[currentPlayerIndex]?.avatarUri ? (
+                      <Image
+                        source={{ uri: turnOrder[currentPlayerIndex].avatarUri }}
+                        style={styles.timerMarkerAvatar}
+                      />
+                    ) : (
+                      <View style={styles.timerMarkerFallback}>
+                        <Text style={styles.timerMarkerEmoji}>
+                          {turnOrder[currentPlayerIndex]?.emoji ?? '👤'}
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+                )}
               </View>
-              <Animated.Text
+              {/* Höger-siffran sitter i en pulserande ring vars border-färg
+                  ärvs från timerColor. Halo:n bakom ger glow på Android som
+                  saknar shadowColor-stöd; iOS får dessutom shadow via
+                  timerRingHalo:s skugga. */}
+              <Animated.View
                 style={[
-                  styles.timerLabel,
-                  { color: timerColor, opacity: pulseAnim },
+                  styles.timerRingWrap,
+                  { transform: [{ scale: timerRingPulse }] },
                 ]}
               >
-                {`${timeLeft}s`}
-              </Animated.Text>
+                <Animated.View
+                  pointerEvents="none"
+                  style={[
+                    styles.timerRingHalo,
+                    { backgroundColor: timerColor, opacity: timerRingGlow },
+                  ]}
+                />
+                <View style={[styles.timerRing, { borderColor: timerColor }]}>
+                  <Animated.Text
+                    style={[
+                      styles.timerRingNum,
+                      { color: timerColor, opacity: pulseAnim },
+                    ]}
+                  >
+                    {timeLeft}
+                  </Animated.Text>
+                </View>
+              </Animated.View>
+            </View>
+
+            {/* 2-decimal countdown under timer-bar:en. Sitter i en glowing
+                box vars border + halo färgas av timerColor (primary → warning
+                → error). Halo:n pulserar i opacity för cross-platform glow.
+                Integer i timerColor (huvudvärde), decimal i textSecondary
+                (finish) så hierarkin är tydlig. */}
+            <View style={styles.decimalTimerWrap}>
+              <Animated.View
+                pointerEvents="none"
+                style={[
+                  styles.decimalTimerHalo,
+                  { backgroundColor: timerColor, opacity: timerRingGlow },
+                ]}
+              />
+              <View style={[styles.decimalTimerBox, { borderColor: stopwatchColor }]}>
+                {/* Wrap-View med integer-höjd centrerar SVG:n vertikalt
+                    relativt den stora sekund-siffran (38 px lineHeight). */}
+                <View style={styles.decimalTimerIconWrap}>
+                  <StopwatchIcon size={32} color={stopwatchColor} />
+                </View>
+                <Text style={[styles.decimalTimerInt, { color: stopwatchColor }]}>
+                  {String(Math.floor(decimalElapsedMs / 1000)).padStart(2, '0')}
+                </Text>
+                <Text style={[styles.decimalTimerDec, { color: Colors.textSecondary }]}>
+                  .{String(Math.floor((decimalElapsedMs % 1000) / 10)).padStart(2, '0')}
+                </Text>
+              </View>
             </View>
 
             <View style={styles.questionCard}>
-              <View style={styles.questionTop}>
+              {/* Top-rad: Question-räkneverk vänster + Answering-pillen höger.
+                  Pass-the-Phone-only — Individual Devices har spelaren på
+                  egen enhet och vet redan vem de är. */}
+              <View style={styles.questionTopRow}>
                 <Text style={styles.questionMeta}>
                   Question {questionIndex + 1} of {totalQuestions}
                 </Text>
-                <View style={styles.typeBadge}>
-                  <Text style={styles.typeBadgeText}>Year</Text>
-                </View>
+                {gameMode === 'pass-the-phone' && currentPlayerName && (
+                  <Text style={styles.answeringPlayer}>
+                    Answering:{' '}
+                    <Text style={styles.answeringPlayerName}>{currentPlayerName}</Text>
+                  </Text>
+                )}
               </View>
-              {/* Subtil player-rad — bara i Pass-the-Phone, så det är tydligt
-                  vems tur det är även när intro-skärmen är borta. Individual
-                  Devices: spelaren är på egen enhet, vet redan vem de är. */}
-              {gameMode === 'pass-the-phone' && currentPlayerName && (
-                <Text style={styles.answeringPlayer}>
-                  Answering:{' '}
-                  <Text style={styles.answeringPlayerName}>{currentPlayerName}</Text>
-                </Text>
-              )}
-              <Text style={styles.questionText}>{question.question}</Text>
-              <View style={styles.scoreBadge}>
-                <Text style={styles.scoreNum}>{totalPoints}</Text>
-                <Text style={styles.scoreLabel}> pts total</Text>
+              <View style={styles.questionTextWrap}>
+                {/* Music-frågor split:as i två rader: stor headline "Which
+                    year" + bevarad sub-rad "was this song released?". Övriga
+                    kategorier (kommande Capitals/Persons etc.) renderar
+                    questiontexten som en enda rad. */}
+                {question.category === 'Music' ? (
+                  <>
+                    <Text style={styles.questionTextHeadline}>Which year</Text>
+                    <Text style={styles.questionText}>
+                      was this song released?
+                    </Text>
+                  </>
+                ) : (
+                  <Text style={styles.questionText}>{question.question}</Text>
+                )}
               </View>
             </View>
 
-            {phase === 'question' && (
-              <View style={styles.speedRow}>
-                <View style={styles.speedLine} />
-                <Text style={styles.speedText}>SPEED COUNTS — CONFIRM FOR POINTS</Text>
-                <View style={styles.speedLine} />
-              </View>
-            )}
-
-            {/* TimelineSelector renderas i båda faserna. key={questionIndex}
-                tvingar remount mellan frågor så internal selectedYear reset:as
-                till middleYear för nya frågans range. disabled när phase=reveal
-                så användaren ser sitt val låst. */}
+            {/* TimelineSelector renderas i alla faser efter intro. Disabled
+                i awaiting + reveal — efter Confirm är svaret låst, men
+                feedbacken döljs tills timer:n går till 0. eraFrom/eraTo
+                låser tidslinjens span till host:s valda Game Era. assistance
+                är PER-spelare (currentAssistance) så svarsruta-intervallet
+                växlar med turordningen i Pass-the-Phone. */}
             <TimelineSelector
-              key={questionIndex}
-              assistance={assistance}
-              correctYear={question.correctYear}
-              birthYear={birthYear}
+              key={`${questionIndex}-${currentAssistance}`}
+              assistance={currentAssistance}
+              eraFrom={eraFrom}
+              eraTo={eraTo}
               onYearChange={setPendingYear}
-              disabled={phase === 'reveal'}
+              disabled={phase === 'awaiting' || phase === 'reveal'}
             />
 
-            {/* Inline reveal: kompakt svar-card. Result-row (rätt/fel + diff)
-                är borttagen — användaren ser sitt val i den (låsta) Timeline-
-                Selector:n och rätt år i kortet, så jämförelsen är synlig utan
-                en egen ruta. +pts-feedbacken sitter i högerkanten av samma
-                kort så den nya Next Round-knappen ryms i viewport utan scroll. */}
-            {phase === 'reveal' && selectedYear !== null && (
-              <View style={rv.container}>
-                <Animated.View
-                  style={[
-                    rv.answerCard,
-                    { transform: [{ scale: revealScale }], opacity: revealOpacity },
-                  ]}
-                >
-                  <Text style={rv.answerYear}>{question.correctYear}</Text>
-                  <View style={rv.answerInfo}>
-                    <Text style={rv.answerLabel}>Correct Answer</Text>
-                    <Text style={rv.answerHint}>{question.hint}</Text>
+            {/* Inline reveal-feedback: green vid rätt, red vid fel. Visas
+                ENDAST i 'reveal'-fasen (= efter timer hit 0) — under awaiting
+                hålls feedbacken dold trots att svaret redan är låst, så
+                tidiga svarare inte får facit före sena. Användarens valda år
+                syns i den låsta TimelineSelector:n så vi behöver bara visa
+                "Correct year: xxxx" här. */}
+            {phase === 'reveal' && selectedYear !== null && (() => {
+              const interval = getIntervalForAssistance(currentAssistance);
+              const wasCorrect = isCorrect(
+                selectedYear,
+                question.correctYear,
+                interval,
+                eraFrom,
+                eraTo,
+              );
+              return (
+                <View style={rv.container}>
+                  <Animated.View
+                    style={[
+                      rv.feedbackCard,
+                      wasCorrect ? rv.feedbackCorrect : rv.feedbackWrong,
+                      { transform: [{ scale: revealScale }], opacity: revealOpacity },
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        rv.feedbackBadge,
+                        wasCorrect ? rv.feedbackBadgeCorrect : rv.feedbackBadgeWrong,
+                      ]}
+                    >
+                      {wasCorrect ? '✓ Correct Answer' : '✗ Wrong Answer'}
+                    </Text>
+                    <Text style={rv.feedbackCorrectYear}>
+                      Correct year:{' '}
+                      <Text style={rv.feedbackCorrectYearBold}>
+                        {question.correctYear}
+                      </Text>
+                    </Text>
+                    {wasCorrect && confirmedTimeUsed !== null && (
+                      <Text style={rv.feedbackAnswerTime}>
+                        Answer time:{' '}
+                        <Text style={rv.feedbackBold}>
+                          {confirmedTimeUsed.toFixed(2)}s
+                        </Text>
+                      </Text>
+                    )}
+                    {/* Next-tab inuti feedback-kortet — ersätter den tidigare
+                        action-knappen i botten av skärmen. Tab:ens färg ärvs
+                        från feedback-statusen (success/error) så den hör
+                        visuellt ihop med kortet. */}
+                    <TouchableOpacity
+                      style={[
+                        rv.nextTab,
+                        wasCorrect ? rv.nextTabCorrect : rv.nextTabWrong,
+                      ]}
+                      onPress={isLastQuestion ? handleShowLeaderboard : handleAdvanceToNextRound}
+                      activeOpacity={0.85}
+                    >
+                      <Text style={rv.nextTabText}>
+                        {isLastQuestion ? '🏆  Final Leaderboard' : 'Next  →'}
+                      </Text>
+                    </TouchableOpacity>
+                  </Animated.View>
+                </View>
+              );
+            })()}
+
+            {/* Fas-medveten action-knapp:
+                  • question  → Confirm (blå glow + pulse)
+                  • awaiting  → låst "Confirmed — waiting for time"
+                  • reveal    → ingenting; Next/Final Leaderboard sitter
+                    inuti feedback-kortet ovan */}
+            {phase !== 'reveal' && (
+              <View style={styles.actionWrap}>
+                {phase === 'question' && (
+                  <Animated.View
+                    style={[
+                      styles.confirmWrap,
+                      { transform: [{ scale: confirmPulse }] },
+                    ]}
+                  >
+                    <Animated.View
+                      style={[styles.confirmHalo, { opacity: confirmGlow }]}
+                      pointerEvents="none"
+                    />
+                    <TouchableOpacity
+                      style={[
+                        styles.actionBtn,
+                        styles.actionBtnConfirm,
+                        pendingYear === null && styles.actionBtnDisabled,
+                      ]}
+                      onPress={() => {
+                        if (pendingYear !== null) handleConfirm(pendingYear);
+                      }}
+                      disabled={pendingYear === null}
+                      activeOpacity={0.85}
+                    >
+                      <Text style={styles.actionBtnText}>Confirm</Text>
+                    </TouchableOpacity>
+                  </Animated.View>
+                )}
+                {phase === 'awaiting' && (
+                  <View style={[styles.actionBtn, styles.actionBtnAwaiting]}>
+                    <Text style={styles.actionBtnAwaitingText}>
+                      ✓ Confirmed — waiting for time
+                    </Text>
                   </View>
-                  <View style={rv.answerPts}>
-                    <Text style={rv.answerPtsNum}>+{roundPoints}</Text>
-                    <Text style={rv.answerPtsLabel}>pts</Text>
-                  </View>
-                </Animated.View>
+                )}
               </View>
             )}
-
-            {/* Fas-medveten action-knapp: Confirm under question, Next Round
-                under reveal, Final Leaderboard på sista frågans reveal. */}
-            <View style={styles.actionWrap}>
-              {phase === 'question' ? (
-                <TouchableOpacity
-                  style={[
-                    styles.actionBtn,
-                    { backgroundColor: assistanceColor },
-                    pendingYear === null && styles.actionBtnDisabled,
-                  ]}
-                  onPress={() => {
-                    if (pendingYear !== null) handleConfirm(pendingYear);
-                  }}
-                  disabled={pendingYear === null}
-                  activeOpacity={0.85}
-                >
-                  <Text style={styles.actionBtnText}>Confirm</Text>
-                </TouchableOpacity>
-              ) : (
-                <TouchableOpacity
-                  style={[styles.actionBtn, { backgroundColor: Colors.primary }]}
-                  onPress={isLastQuestion ? handleShowLeaderboard : handleAdvanceToNextRound}
-                  activeOpacity={0.85}
-                >
-                  <Text style={styles.actionBtnText}>
-                    {isLastQuestion ? '🏆  Final Leaderboard' : 'Next Round  →'}
-                  </Text>
-                </TouchableOpacity>
-              )}
-            </View>
           </>
         )}
 
         {phase === 'leaderboard' && (
           <RoundLeaderboard
-            players={allPlayers}
+            players={gamePlayers}
             roundScores={currentRoundScores}
-            totalsByPlayerId={{ you: totalPoints, ...opponentTotals }}
+            totalsByPlayerId={gameTotals}
             roundNumber={questionIndex + 1}
             totalRounds={totalQuestions}
             onNextRound={handleAdvanceToNextRound}
@@ -1030,19 +1664,142 @@ const styles = StyleSheet.create({
     height: 6,
     borderRadius: 3,
     backgroundColor: Colors.border,
-    overflow: 'hidden',
+    // Ingen overflow:hidden — avatar-markören (timerMarker) extenderar långt
+    // utanför 6 px bar-höjden. timerFill har egen borderRadius:3 så fillen
+    // ser fortsatt rundad ut vid edges utan klippning.
+    position: 'relative',
+  },
+  timerFillPulseWrap: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
   timerFill: {
     height: '100%',
     borderRadius: 3,
   },
-  timerLabel: {
-    minWidth: 32,
-    fontSize: FontSize.sm,
+  // Avatar-markör som sitter på timer-bar:en vid den x-position som motsvarar
+  // tiden då spelaren bekräftade. left: ${elapsed/30 * 100}% — track:s
+  // egen position:relative gör att percentagen räknas mot den.
+  // marginLeft -14 centrerar 28-wide avataren på den exakta x-pixeln.
+  // top: bar-center (3) - avatar-radie (14) = -11.
+  timerMarker: {
+    position: 'absolute',
+    top: -11,
+    marginLeft: -14,
+    width: 28,
+    height: 28,
+    zIndex: 10,
+  },
+  timerMarkerAvatar: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    borderWidth: 2,
+    borderColor: Colors.warning,
+    backgroundColor: Colors.cardElevated,
+  },
+  timerMarkerFallback: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    borderWidth: 2,
+    borderColor: Colors.warning,
+    backgroundColor: Colors.cardElevated,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  timerMarkerEmoji: {
+    fontSize: 16,
+  },
+  // Pulserande ring runt sekund-räknaren till höger om timer-bar:en. Cirkel-
+  // form via lika width/height + borderRadius:50% (= halv av storleken).
+  // timerRingHalo ligger absolut inset utanför ringen och pulserar i
+  // opacity för cross-platform glow.
+  timerRingWrap: {
+    position: 'relative',
+    width: 56,
+    height: 56,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  timerRingHalo: {
+    position: 'absolute',
+    top: -4,
+    left: -4,
+    right: -4,
+    bottom: -4,
+    borderRadius: 32,
+  },
+  timerRing: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    borderWidth: 2,
+    backgroundColor: Colors.cardElevated,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  timerRingNum: {
+    fontSize: 24,
+    fontWeight: FontWeight.bold,
+    fontVariant: ['tabular-nums'],
+    letterSpacing: 0.2,
+  },
+
+  // Wrap runt 2-decimal countdown — håller halo + box. Centrerad
+  // horisontellt; tight paddingTop håller boxen nära timer-bar:en.
+  decimalTimerWrap: {
+    alignSelf: 'center',
+    position: 'relative',
+    paddingTop: Spacing.xs,
+  },
+  // Halo bakom boxen — pulserar i opacity via timerRingGlow så glöden
+  // matchar ringen runt sekund-räknaren ovanför.
+  decimalTimerHalo: {
+    position: 'absolute',
+    top: Spacing.xs - 4,
+    left: -4,
+    right: -4,
+    bottom: -4,
+    borderRadius: Radius.lg + 4,
+  },
+  // Själva boxen runt stopwatch-ikon + tal. Border-färgen ärvs från
+  // stopwatchColor (sätts dynamiskt i render). Bakgrund Colors.cardElevated
+  // så texten har kontrast mot halo:n bakom. alignItems:'center' centrerar
+  // ikonen + decimal-delen vertikalt med den stora integer-siffran (38 px).
+  decimalTimerBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.sm,
+    borderRadius: Radius.lg,
+    borderWidth: 2,
+    backgroundColor: Colors.cardElevated,
+  },
+  // Wrap runt SVG-ikonen — höjden matchar integer-textens lineHeight (40)
+  // så ikonens visuella mitt linjerar exakt med siffrans visuella mitt.
+  decimalTimerIconWrap: {
+    width: 32,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  decimalTimerInt: {
+    fontSize: 38,
+    fontWeight: FontWeight.bold,
+    fontVariant: ['tabular-nums'],
+    letterSpacing: -0.5,
+    lineHeight: 40,
+  },
+  decimalTimerDec: {
+    fontSize: 22,
     fontWeight: FontWeight.semibold,
     fontVariant: ['tabular-nums'],
-    textAlign: 'right',
-    letterSpacing: 0.3,
+    letterSpacing: -0.3,
   },
 
   questionCard: {
@@ -1050,15 +1807,26 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: Colors.border,
     padding: Spacing.lg, gap: Spacing.sm,
     marginHorizontal: Spacing.lg,
+    minHeight: 140,
   },
-  questionTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  // Top-rad pinnas mot kortets överkant så frågan kan flex-centreras under.
+  questionTopRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
+  // Wrap runt frågetexten så den kan flex-centreras lodrätt mellan top-raden
+  // och kortets nederkant. gap: 2 ger tight spacing mellan headline och
+  // sub-rad så de läses som en sammanhängande fråga.
+  questionTextWrap: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: Spacing.xs,
+    gap: 2,
+  },
   questionMeta: { fontSize: FontSize.sm, fontWeight: FontWeight.medium, color: Colors.textSecondary },
-  typeBadge: {
-    backgroundColor: Colors.primaryMuted, borderRadius: Radius.full,
-    paddingHorizontal: Spacing.md, paddingVertical: 3,
-    borderWidth: 1, borderColor: Colors.primaryBorder,
-  },
-  typeBadgeText: { fontSize: FontSize.xs, color: Colors.primary, fontWeight: FontWeight.semibold },
   // Subtil "Answering: {namn}"-rad — ärver xs-storleken från questionMeta-
   // raden ovanför men markerar namnet i textPrimary + semibold så det syns
   // utan att skrika.
@@ -1071,14 +1839,17 @@ const styles = StyleSheet.create({
     color: Colors.textPrimary,
     fontWeight: FontWeight.semibold,
   },
-  questionText: { fontSize: 18, fontWeight: FontWeight.semibold, color: Colors.textPrimary, lineHeight: 26 },
-  scoreBadge: { flexDirection: 'row', alignItems: 'baseline' },
-  scoreNum: { fontSize: 16, fontWeight: '700', color: Colors.primary, fontVariant: ['tabular-nums'] },
-  scoreLabel: { fontSize: FontSize.xs, color: Colors.textSecondary },
-
-  speedRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, paddingHorizontal: Spacing.lg },
-  speedLine: { flex: 1, height: 1, backgroundColor: Colors.border },
-  speedText: { fontSize: 9, color: Colors.textSecondary, letterSpacing: 0.8 },
+  // Headline för split-formatet (rad 1) — markant större än sub-raden så
+  // ögat fastnar på "Which year" först, sedan läser fortsättningen.
+  questionTextHeadline: {
+    fontSize: 32,
+    fontWeight: FontWeight.bold,
+    color: Colors.textPrimary,
+    lineHeight: 38,
+    textAlign: 'center',
+    letterSpacing: 0.3,
+  },
+  questionText: { fontSize: 18, fontWeight: FontWeight.semibold, color: Colors.textPrimary, lineHeight: 26, textAlign: 'center' },
 
   // Action-knapp (Confirm / Next Round / Final Leaderboard) — paddningen
   // matchar TimelineSelector:s wrapper så knappen står i samma kolumn.
@@ -1091,8 +1862,47 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  // Confirm-knappens stil: blue + iOS shadow för glow-effekten. Halo:n bakom
+  // (confirmHalo) ger cross-platform glow på Android som saknar shadow-color.
+  actionBtnConfirm: {
+    backgroundColor: Colors.primary,
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.85,
+    shadowRadius: 18,
+    elevation: 12,
+  },
+  // Wrap runt Confirm-knappen för scale-pulse + halo-positionering.
+  // position: relative så confirmHalo (absolute) ankrars hit istället för
+  // mot ScrollView:n. Speglar Lobby:s startGameWrap-mönster.
+  confirmWrap: {
+    position: 'relative',
+  },
+  confirmHalo: {
+    position: 'absolute',
+    top: -8,
+    left: -8,
+    right: -8,
+    bottom: -8,
+    borderRadius: Radius.md + 4,
+    backgroundColor: Colors.primary,
+  },
   actionBtnDisabled: {
     opacity: 0.5,
+  },
+  // Awaiting-state-knapp: passiv pillar med subtila brand-toner — signalerar
+  // "låst, vänta på tiden" utan att se klickbar ut. Speglar Lobby:s
+  // waitingForHostBox-styling (primaryMuted bg + primaryBorder).
+  actionBtnAwaiting: {
+    backgroundColor: Colors.primaryMuted,
+    borderWidth: 1,
+    borderColor: Colors.primaryBorder,
+  },
+  actionBtnAwaitingText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: Colors.textSecondary,
+    letterSpacing: 0.4,
   },
   actionBtnText: {
     fontSize: 17,
@@ -1102,56 +1912,94 @@ const styles = StyleSheet.create({
   },
 });
 
-// Inline reveal-block — kompakt horisontellt svar-card (year vänster, info
-// mitten, +pts höger). Animeras in via revealScale/revealOpacity. Resultatet
-// är en låg ruta så Next Round-knappen ryms direkt i viewport efter Confirm
-// utan att användaren behöver scrolla.
+// Inline reveal-feedback — green/red-bordered card med ✓/✗ badge i övre
+// vänstra hörnet, "You chose: X" och (vid fel) "Correct answer: Y". Speglar
+// name-quiz-demo:s feedback-mönster så reveal-vyn ser likadan ut oavsett
+// fråge-typ. Pts-räknaren sitter i övre högra hörnet på samma rad som badgen.
 const rv = StyleSheet.create({
   container: { paddingHorizontal: Spacing.lg },
-  answerCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.md,
-    backgroundColor: Colors.card,
+  feedbackCard: {
     borderRadius: Radius.lg,
-    borderWidth: 1,
-    borderColor: Colors.primaryBorder,
-    paddingVertical: Spacing.md,
-    paddingHorizontal: Spacing.lg,
+    borderWidth: 2,
+    paddingVertical: Spacing.xs,
+    paddingHorizontal: Spacing.sm,
+    gap: 2,
   },
-  answerYear: {
-    fontSize: 36,
-    fontWeight: '700',
-    color: Colors.primary,
-    fontVariant: ['tabular-nums'],
-    letterSpacing: -0.5,
+  feedbackCorrect: {
+    backgroundColor: Colors.successMuted,
+    borderColor: Colors.success,
   },
-  answerInfo: { flex: 1, gap: 2 },
-  answerLabel: {
-    fontSize: 9,
-    color: Colors.textSecondary,
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-    fontWeight: FontWeight.semibold,
+  feedbackWrong: {
+    backgroundColor: Colors.errorMuted,
+    borderColor: Colors.error,
   },
-  answerHint: {
-    fontSize: FontSize.sm,
-    color: Colors.textPrimary,
+  feedbackBadge: {
+    alignSelf: 'flex-start',
+    fontSize: FontSize.xs,
+    fontWeight: FontWeight.bold,
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: 2,
+    borderRadius: Radius.sm,
+    overflow: 'hidden',
+  },
+  feedbackBadgeCorrect: {
+    color: Colors.success,
+    backgroundColor: 'rgba(82,200,122,0.18)',
+  },
+  feedbackBadgeWrong: {
+    color: Colors.error,
+    backgroundColor: 'rgba(255,107,107,0.18)',
+  },
+  // "Correct year: 1980" — fortfarande primärt fokus i reveal-vyn men
+  // krympt så hela kortet håller låg höjd oavsett assistance-nivå (kortet
+  // ska bara vara så högt att badge + correct-year-raden får plats).
+  feedbackCorrectYear: {
+    fontSize: FontSize.md,
     fontWeight: FontWeight.medium,
+    color: Colors.textPrimary,
+    letterSpacing: 0.3,
   },
-  answerPts: {
-    alignItems: 'center',
-    minWidth: 56,
-  },
-  answerPtsNum: {
+  feedbackCorrectYearBold: {
     fontSize: FontSize.xl,
-    fontWeight: '700',
-    color: Colors.primary,
+    fontWeight: FontWeight.bold,
+    color: Colors.textPrimary,
     fontVariant: ['tabular-nums'],
+    letterSpacing: -0.3,
   },
-  answerPtsLabel: {
+  // Subtilare än Correct year så hierarkin är tydlig. Krympt + negativ
+  // marginTop för att rätt-svars-kortet inte ska bli onödigt högt — den
+  // är en sekundär info-rad som bara visas vid rätt svar.
+  feedbackAnswerTime: {
     fontSize: FontSize.xs,
     color: Colors.textSecondary,
+    marginTop: -2,
+  },
+  feedbackBold: {
+    fontWeight: FontWeight.bold,
+  },
+  // Next-tab inuti feedback-kortet — ersätter den tidigare action-knappen
+  // i botten av skärmen. Höger-justerad, kompakt; bg-färg ärvs av status
+  // (success vid rätt, error vid fel) så tab:en hör visuellt ihop med kortet.
+  nextTab: {
+    alignSelf: 'flex-end',
+    marginTop: 2,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: 6,
+    borderRadius: Radius.sm,
+  },
+  // Båda statusarna använder primary-blå så Next-tab:en alltid signalerar
+  // "fortsätt"-action. Card:ens border + badge bär status-färgen (grön vid
+  // rätt, röd vid fel) — tab:en behöver inte upprepa den.
+  nextTabCorrect: {
+    backgroundColor: Colors.primary,
+  },
+  nextTabWrong: {
+    backgroundColor: Colors.primary,
+  },
+  nextTabText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#fff',
     letterSpacing: 0.4,
   },
 });

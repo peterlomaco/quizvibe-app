@@ -2182,6 +2182,11 @@ export default function LobbyScreen() {
         name: p.name,
         emoji: p.emoji,
         avatarUri: p.avatarUri,
+        // Per-player assistance så quiz.tsx kan applicera rätt svarsruta-
+        // intervall (full=5 år, standard=3 år, minimal=1 år) per spelare
+        // när det är deras tur. Default 'standard' om saknas.
+        assistance: p.assistance ?? 'standard',
+        age: p.age,
       }));
 
     if (turnOrder.length === 0) {
