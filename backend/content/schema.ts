@@ -19,7 +19,7 @@ export const AudienceSchema = z.union([
 ]);
 export type Audience = z.infer<typeof AudienceSchema>;
 
-export const CategorySchema = z.enum(['persons', 'capitals', 'artists']);
+export const CategorySchema = z.enum(['persons', 'capitals', 'artists', 'songs']);
 export type Category = z.infer<typeof CategorySchema>;
 
 export const SensitivitySchema = z.enum(['standard', 'sensitive']);

@@ -1,0 +1,68 @@
+# Välkända låtar — universell audience (alla generationer kan associera).
+# correctYear = året låten släpptes (single eller album).
+# wikimediaSearchHints behålls trots att songs-pipelinen är YouTube-driven —
+# schemat kräver minst en hint, och sökorden gör double-duty om vi senare
+# vill plocka bild från Wikimedia (artistporträtt, albumcover) som fallback.
+audience: ["all"]
+category: songs
+items:
+  - id: dancing-queen
+    displayName: "Dancing Queen — ABBA"
+    correctYear: 1976
+    probability: 92
+    wikimediaSearchHints: ["Dancing Queen ABBA"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "YkLLcIKhJ64"
+        startSec: 30
+        endSec: 45
+        channelTitle: "ABBA - Topic"
+        notes: "Refräng 'You can dance, you can jive...'"
+  - id: thriller
+    displayName: "Thriller — Michael Jackson"
+    correctYear: 1982
+    probability: 90
+    wikimediaSearchHints: ["Thriller Michael Jackson"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "Z85lxckrtzg"
+        startSec: 60
+        endSec: 75
+        channelTitle: "Michael Jackson - Topic"
+        notes: "Efter intro/Vincent Price-monolog, första vers"
+  - id: smells-like-teen-spirit
+    displayName: "Smells Like Teen Spirit — Nirvana"
+    correctYear: 1991
+    probability: 85
+    wikimediaSearchHints: ["Smells Like Teen Spirit Nirvana"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "7TDeBi34OtE"
+        startSec: 0
+        endSec: 15
+        channelTitle: "Nirvana - Topic"
+        notes: "Ikonisk riff-intro"
+  - id: baby-one-more-time
+    displayName: "...Baby One More Time — Britney Spears"
+    correctYear: 1998
+    probability: 88
+    wikimediaSearchHints: ["Baby One More Time Britney Spears"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "fEfvTTJNeAY"
+        startSec: 0
+        endSec: 15
+        channelTitle: "Britney Spears - Topic"
+        notes: "'Oh baby baby' + första vers"
+  - id: shape-of-you
+    displayName: "Shape of You — Ed Sheeran"
+    correctYear: 2017
+    probability: 95
+    wikimediaSearchHints: ["Shape of You Ed Sheeran"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "JGwWNGJdvx8"
+        startSec: 25
+        endSec: 40
+        channelTitle: "Ed Sheeran"
+        notes: "Dropp vid refräng"

@@ -1,5 +1,6 @@
 import { CountdownIntro } from '@/src/components/CountdownIntro';
 import { GetReadyIntro } from '@/src/components/GetReadyIntro';
+import { MediaPlayer } from '@/src/components/MediaPlayer';
 import { StopwatchIcon } from '@/src/components/StopwatchIcon';
 import {
     generateOpponentRoundScore,
@@ -22,6 +23,8 @@ import { clearEjected } from '@/src/utils/ejectedPlayers';
 import { clearLobbyPlayers } from '@/src/utils/mockLobbyPlayers';
 import { clearLobbySettings } from '@/src/utils/mockLobbySettings';
 import { clearGameStarted } from '@/src/utils/mockStartedGames';
+import { pickMediaSource, type YoutubeClip } from '@/src/utils/mediaSource';
+import { MUSIC_QUESTIONS } from '@/src/utils/musicQuestions';
 import { getAvatarEmojiById } from '@/src/utils/avatars';
 import { loadProfile } from '@/src/utils/profileStorage';
 import { generateRoomCode } from '@/src/utils/roomCode';
@@ -52,6 +55,11 @@ interface TimelineQuestion {
   question: string;
   correctYear: number;
   hint: string;
+  // Pre-curerade YouTube-klipp för frågan. Optional — items utan klipp
+  // renderar `NoSourcePlayer`-placeholder via pickMediaSource. Real katalog
+  // (Phase 4 → riktig fråge-bank) kommer ha clips fyllda från
+  // backend/content/catalog/*.yaml.
+  youtubeClips?: YoutubeClip[];
 }
 
 // Spelet ställer endast Music-frågor (YouTube delvis, Spotify alltid). Själva
@@ -59,13 +67,22 @@ interface TimelineQuestion {
 // generic "Which year was this song released?". `hint` används bara internt
 // i reveal-vyn ("Disco era") så den behålls för smak.
 const MUSIC_QUESTION_TEXT = 'Which year was this song released?';
-const SEED_QUESTIONS: TimelineQuestion[] = [
-  { type: 'timeline', id: '1', questionNumber: 1, totalQuestions: 5, category: 'Music', question: MUSIC_QUESTION_TEXT, correctYear: 1975, hint: 'Classic rock era' },
-  { type: 'timeline', id: '2', questionNumber: 2, totalQuestions: 5, category: 'Music', question: MUSIC_QUESTION_TEXT, correctYear: 1976, hint: 'Disco era' },
-  { type: 'timeline', id: '3', questionNumber: 3, totalQuestions: 5, category: 'Music', question: MUSIC_QUESTION_TEXT, correctYear: 1991, hint: 'Grunge era' },
-  { type: 'timeline', id: '4', questionNumber: 4, totalQuestions: 5, category: 'Music', question: MUSIC_QUESTION_TEXT, correctYear: 2010, hint: 'Modern era' },
-  { type: 'timeline', id: '5', questionNumber: 5, totalQuestions: 5, category: 'Music', question: MUSIC_QUESTION_TEXT, correctYear: 2017, hint: 'Recent era' },
-];
+
+// Frågorna kommer från backend-curerad katalog (backend/content/catalog/songs-*.yaml).
+// Regenerera src/utils/musicQuestions.ts efter katalog-ändringar med:
+//   cd backend && npm run export-music-questions
+// Items utan youtubeClips filtreras bort av export-scriptet.
+const SEED_QUESTIONS: TimelineQuestion[] = MUSIC_QUESTIONS.map((q, i) => ({
+  type: 'timeline',
+  id: q.id,
+  questionNumber: i + 1,
+  totalQuestions: MUSIC_QUESTIONS.length,
+  category: 'Music',
+  question: MUSIC_QUESTION_TEXT,
+  correctYear: q.correctYear,
+  hint: q.displayName,
+  youtubeClips: q.youtubeClips,
+}));
 
 function getIntervalForAssistance(assistance: AssistanceLevel): number {
   if (assistance === 'minimal') return 0;
@@ -477,6 +494,8 @@ export default function QuizScreen() {
     eraFrom?: string;
     eraTo?: string;
     answerResponseSeconds?: string;
+    youtubeEnabled?: string;
+    spotifyEnabled?: string;
   }>();
   // Default assistance från URL-param — fallback om turnOrder-spelaren
   // saknar egen assistance-flagga. Per-player-värdet från turnOrder:n
@@ -506,6 +525,12 @@ export default function QuizScreen() {
   // (t.ex. direkt-nav till /quiz utan Lobby).
   const eraFrom = parseInt(String(params.eraFrom ?? '1900'), 10);
   const eraTo = parseInt(String(params.eraTo ?? new Date().getFullYear()), 10);
+  // Game Connections-källor från Lobby. Default till YouTube=on, Spotify=off
+  // vid direkt-nav (utan Lobby) så MediaPlayer-stuben renderar klipp för
+  // mock-frågor med youtubeClips. Stränga 'true'-jämförelser så ev. tomma
+  // params inte falskt aktiverar Spotify.
+  const youtubeEnabled = (params.youtubeEnabled ?? 'true') === 'true';
+  const spotifyEnabled = params.spotifyEnabled === 'true';
   // Filtrerade fråge-pool. Fallback till hela SEED_QUESTIONS om ingen fråga
   // matchar valt era — händer i mock med 5 frågor om host valt en period
   // utan träffar (t.ex. 1930–1960). När riktig fråge-bank kopplas in blir
@@ -718,6 +743,19 @@ export default function QuizScreen() {
 
   const question = eraFilteredQuestions[questionIndex % eraFilteredQuestions.length];
   const isLastQuestion = questionIndex === totalQuestions - 1;
+  // Aktiv media-källa för aktuell fråga. Returneras `kind: 'none'` om
+  // host stängt av alla källor eller frågan saknar curerade klipp —
+  // MediaPlayer renderar då NoSourcePlayer-placeholder istället för att
+  // krascha. Memoiseras på question-id + lobby-toggles så pickMediaSource
+  // inte körs varje render-cykel under en pågående fråga.
+  const mediaSource = useMemo(
+    () =>
+      pickMediaSource(
+        { youtubeClips: question.youtubeClips },
+        { youtubeEnabled, spotifyEnabled, gameMode },
+      ),
+    [question.id, question.youtubeClips, youtubeEnabled, spotifyEnabled, gameMode],
+  );
   // Aktuell spelares namn i Pass-the-Phone-rotationen — visas subtilt i fråge-
   // kortet ("Answering: {namn}"). Skip:as för Individual Devices (varje
   // spelare är på sin egen enhet och vet redan vem de är).
@@ -1362,17 +1400,24 @@ export default function QuizScreen() {
         {/* phase är här narrowed till 'question' | 'awaiting' | 'reveal'
             (leaderboard fångas av early-return ovan), så ingen extra
             phase-check behövs runt question UI. */}
-            {/* Mediakort — placeholder tills riktig YouTube/Spotify/AI-bild-
-                integration kopplas in. Spelas/visas oförändrat även under
-                reveal-fasen (användaren har bett om att uppspelningen ska
-                fortsätta tills "Next Round" trycks). */}
-            <View style={styles.mediaCard}>
-              <View style={styles.mediaInner}>
-                <Text style={styles.mediaIcon}>{question.category === 'Music' ? '🎵' : '🌍'}</Text>
-                <Text style={styles.mediaCategory}>{question.category}</Text>
-                <Text style={styles.mediaHint}>Video / Image coming soon</Text>
-              </View>
-            </View>
+            {/* MediaPlayer — provider-agnostisk dispatcher som väljer rätt
+                impl (YouTube/Spotify/None) baserat på pickMediaSource. Stuben
+                i Expo Go visar thumbnail + clip-meta; Phase 4 byter den mot
+                en riktig WebView-baserad player utan att röra detta call-
+                site. isPlaying håller på genom hela question→awaiting→reveal-
+                cykeln (uppspelningen fortsätter tills Next-tab trycks per
+                tidigare UX-spec). showVideo gömmer video-frame:n under
+                question/awaiting (annars ger thumbnail visuella ledtrådar
+                till svaret) och visar den vid reveal. */}
+            <MediaPlayer
+              source={mediaSource}
+              isPlaying={
+                phase === 'question' ||
+                phase === 'awaiting' ||
+                phase === 'reveal'
+              }
+              showVideo={phase === 'reveal'}
+            />
 
             {/* Horisontell timer-progress-bar — krymper från 100% → 0% över
                 30s, byter färg vid 10s/5s, pulserar i opacity vid ≤5s. Fryses
@@ -1668,11 +1713,6 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
   content: { gap: Spacing.md, paddingBottom: Spacing.xxl },
 
-  mediaCard: { height: 200, backgroundColor: Colors.card },
-  mediaInner: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: Spacing.sm },
-  mediaIcon: { fontSize: 44 },
-  mediaCategory: { fontSize: FontSize.md, fontWeight: FontWeight.semibold, color: Colors.textPrimary },
-  mediaHint: { fontSize: FontSize.xs, color: Colors.textSecondary },
 
   // Timer-section — radlayout med bar:en (flex 1) + sekund-räknaren till
   // höger. Sitter direkt under mediakortet (negativ marginTop -Spacing.md

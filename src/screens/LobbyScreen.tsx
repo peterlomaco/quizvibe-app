@@ -2255,6 +2255,11 @@ export default function LobbyScreen() {
         // så frågorna håller sig inom det år-spann host valt.
         eraFrom: String(clampedFrom),
         eraTo: String(clampedTo),
+        // Game Connections-källor — quiz.tsx:s pickMediaSource väljer rätt
+        // media-provider per fråga utifrån vilka som är på. Spotify räknas
+        // som "aktiv källa" först när auto-regeln + host-toggeln båda är på.
+        youtubeEnabled: String(youtubeEnabled),
+        spotifyEnabled: String(spotifyEnabled),
         // Skickas så Quit Game-flödet i quiz.tsx kan deactivera rummet
         // och rensa leftPlayers när host avslutar mitt i ett spel.
         roomCode,

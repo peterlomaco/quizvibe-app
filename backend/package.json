@@ -10,7 +10,10 @@
     "demo": "tsx demo.ts",
     "wikimedia-search": "tsx wikimedia/suggest.ts",
     "wikimedia-process": "tsx wikimedia/process.ts",
+    "youtube-search": "tsx --env-file=.env.local youtube/suggest.ts",
+    "youtube-validate": "tsx --env-file=.env.local youtube/validate.ts",
     "export-demo": "tsx scripts/export-demo.ts",
+    "export-music-questions": "tsx scripts/export-music-questions.ts",
     "build": "tsc"
   },
   "dependencies": {
