@@ -1,0 +1,220 @@
+# Låtar 1930-1964 — primär audience är "elder" (Silent + Boomers, födda 1925-1964).
+# 1 låt per år enligt content-katalogens scope-plan.
+# Mix av amerikansk/brittisk pop, jazz, fransk chanson, country.
+# media-fältet lämnas off-katalog tills `npm run youtube-search <item-id>`
+# har körts och en specifik videoId + start/endSec är vald.
+# probability: 95 = ikoniskt (Over the Rainbow, Heartbreak Hotel),
+#              85 = välkänt över decennier, 75-80 = era-specifikt.
+audience: ["elder"]
+category: songs
+items:
+  - id: louis-armstrong-body-and-soul
+    displayName: "Body and Soul — Louis Armstrong"
+    correctYear: 1930
+    probability: 75
+    wikimediaSearchHints: ["Louis Armstrong Body and Soul"]
+    answerMethods: ["timeline"]
+  - id: cab-calloway-minnie-the-moocher
+    displayName: "Minnie the Moocher — Cab Calloway"
+    correctYear: 1931
+    probability: 80
+    wikimediaSearchHints: ["Cab Calloway Minnie the Moocher"]
+    answerMethods: ["timeline"]
+  - id: fred-astaire-night-and-day
+    displayName: "Night and Day — Fred Astaire"
+    correctYear: 1932
+    probability: 78
+    wikimediaSearchHints: ["Fred Astaire Night and Day Cole Porter"]
+    answerMethods: ["timeline"]
+  - id: ethel-waters-stormy-weather
+    displayName: "Stormy Weather — Ethel Waters"
+    correctYear: 1933
+    probability: 78
+    wikimediaSearchHints: ["Ethel Waters Stormy Weather 1933"]
+    answerMethods: ["timeline"]
+  - id: cole-porter-anything-goes
+    displayName: "Anything Goes — Cole Porter"
+    correctYear: 1934
+    probability: 75
+    wikimediaSearchHints: ["Anything Goes Cole Porter 1934"]
+    answerMethods: ["timeline"]
+  - id: fred-astaire-cheek-to-cheek
+    displayName: "Cheek to Cheek — Fred Astaire"
+    correctYear: 1935
+    probability: 82
+    wikimediaSearchHints: ["Fred Astaire Cheek to Cheek Top Hat"]
+    answerMethods: ["timeline"]
+  - id: bing-crosby-pennies-from-heaven
+    displayName: "Pennies from Heaven — Bing Crosby"
+    correctYear: 1936
+    probability: 78
+    wikimediaSearchHints: ["Bing Crosby Pennies from Heaven 1936"]
+    answerMethods: ["timeline"]
+  - id: duke-ellington-caravan
+    displayName: "Caravan — Duke Ellington"
+    correctYear: 1937
+    probability: 80
+    wikimediaSearchHints: ["Duke Ellington Caravan 1937"]
+    answerMethods: ["timeline"]
+  - id: ella-fitzgerald-a-tisket-a-tasket
+    displayName: "A-Tisket, A-Tasket — Ella Fitzgerald"
+    correctYear: 1938
+    probability: 80
+    wikimediaSearchHints: ["Ella Fitzgerald A-Tisket A-Tasket"]
+    answerMethods: ["timeline"]
+  - id: judy-garland-over-the-rainbow
+    displayName: "Over the Rainbow — Judy Garland"
+    correctYear: 1939
+    probability: 95
+    wikimediaSearchHints: ["Judy Garland Over the Rainbow Wizard of Oz"]
+    answerMethods: ["timeline"]
+  - id: glenn-miller-in-the-mood
+    displayName: "In the Mood — Glenn Miller"
+    correctYear: 1940
+    probability: 90
+    wikimediaSearchHints: ["Glenn Miller In the Mood 1940"]
+    answerMethods: ["timeline"]
+  - id: glenn-miller-chattanooga-choo-choo
+    displayName: "Chattanooga Choo Choo — Glenn Miller"
+    correctYear: 1941
+    probability: 82
+    wikimediaSearchHints: ["Glenn Miller Chattanooga Choo Choo"]
+    answerMethods: ["timeline"]
+  - id: bing-crosby-white-christmas
+    displayName: "White Christmas — Bing Crosby"
+    correctYear: 1942
+    probability: 95
+    wikimediaSearchHints: ["Bing Crosby White Christmas"]
+    answerMethods: ["timeline"]
+  - id: dooley-wilson-as-time-goes-by
+    displayName: "As Time Goes By — Dooley Wilson"
+    correctYear: 1943
+    probability: 85
+    wikimediaSearchHints: ["As Time Goes By Casablanca Dooley Wilson"]
+    answerMethods: ["timeline"]
+  - id: bing-crosby-swinging-on-a-star
+    displayName: "Swinging on a Star — Bing Crosby"
+    correctYear: 1944
+    probability: 78
+    wikimediaSearchHints: ["Bing Crosby Swinging on a Star Going My Way"]
+    answerMethods: ["timeline"]
+  - id: doris-day-sentimental-journey
+    displayName: "Sentimental Journey — Doris Day"
+    correctYear: 1945
+    probability: 80
+    wikimediaSearchHints: ["Doris Day Sentimental Journey Les Brown"]
+    answerMethods: ["timeline"]
+  - id: nat-king-cole-the-christmas-song
+    displayName: "The Christmas Song — Nat King Cole"
+    correctYear: 1946
+    probability: 90
+    wikimediaSearchHints: ["Nat King Cole Christmas Song chestnuts"]
+    answerMethods: ["timeline"]
+  - id: frank-sinatra-almost-like-being-in-love
+    displayName: "Almost Like Being in Love — Frank Sinatra"
+    correctYear: 1947
+    probability: 75
+    wikimediaSearchHints: ["Frank Sinatra Almost Like Being in Love Brigadoon"]
+    answerMethods: ["timeline"]
+  - id: nat-king-cole-nature-boy
+    displayName: "Nature Boy — Nat King Cole"
+    correctYear: 1948
+    probability: 82
+    wikimediaSearchHints: ["Nat King Cole Nature Boy 1948"]
+    answerMethods: ["timeline"]
+  - id: perry-como-some-enchanted-evening
+    displayName: "Some Enchanted Evening — Perry Como"
+    correctYear: 1949
+    probability: 78
+    wikimediaSearchHints: ["Perry Como Some Enchanted Evening South Pacific"]
+    answerMethods: ["timeline"]
+  - id: nat-king-cole-mona-lisa
+    displayName: "Mona Lisa — Nat King Cole"
+    correctYear: 1950
+    probability: 88
+    wikimediaSearchHints: ["Nat King Cole Mona Lisa 1950"]
+    answerMethods: ["timeline"]
+  - id: johnnie-ray-cry
+    displayName: "Cry — Johnnie Ray"
+    correctYear: 1951
+    probability: 75
+    wikimediaSearchHints: ["Johnnie Ray Cry 1951"]
+    answerMethods: ["timeline"]
+  - id: jo-stafford-you-belong-to-me
+    displayName: "You Belong to Me — Jo Stafford"
+    correctYear: 1952
+    probability: 78
+    wikimediaSearchHints: ["Jo Stafford You Belong to Me 1952"]
+    answerMethods: ["timeline"]
+  - id: patti-page-doggie-in-the-window
+    displayName: "(How Much Is) That Doggie in the Window — Patti Page"
+    correctYear: 1953
+    probability: 82
+    wikimediaSearchHints: ["Patti Page Doggie in the Window 1953"]
+    answerMethods: ["timeline"]
+  - id: bill-haley-rock-around-the-clock
+    displayName: "Rock Around the Clock — Bill Haley & His Comets"
+    correctYear: 1954
+    probability: 92
+    wikimediaSearchHints: ["Bill Haley Rock Around the Clock"]
+    answerMethods: ["timeline"]
+  - id: chuck-berry-maybellene
+    displayName: "Maybellene — Chuck Berry"
+    correctYear: 1955
+    probability: 82
+    wikimediaSearchHints: ["Chuck Berry Maybellene 1955"]
+    answerMethods: ["timeline"]
+  - id: elvis-presley-heartbreak-hotel
+    displayName: "Heartbreak Hotel — Elvis Presley"
+    correctYear: 1956
+    probability: 95
+    wikimediaSearchHints: ["Elvis Presley Heartbreak Hotel"]
+    answerMethods: ["timeline"]
+  - id: elvis-presley-jailhouse-rock
+    displayName: "Jailhouse Rock — Elvis Presley"
+    correctYear: 1957
+    probability: 95
+    wikimediaSearchHints: ["Elvis Presley Jailhouse Rock"]
+    answerMethods: ["timeline"]
+  - id: chuck-berry-johnny-b-goode
+    displayName: "Johnny B. Goode — Chuck Berry"
+    correctYear: 1958
+    probability: 92
+    wikimediaSearchHints: ["Chuck Berry Johnny B Goode"]
+    answerMethods: ["timeline"]
+  - id: ray-charles-whatd-i-say
+    displayName: "What'd I Say — Ray Charles"
+    correctYear: 1959
+    probability: 88
+    wikimediaSearchHints: ["Ray Charles What'd I Say"]
+    answerMethods: ["timeline"]
+  - id: everly-brothers-cathys-clown
+    displayName: "Cathy's Clown — The Everly Brothers"
+    correctYear: 1960
+    probability: 80
+    wikimediaSearchHints: ["Everly Brothers Cathy's Clown"]
+    answerMethods: ["timeline"]
+  - id: ben-e-king-stand-by-me
+    displayName: "Stand by Me — Ben E. King"
+    correctYear: 1961
+    probability: 92
+    wikimediaSearchHints: ["Ben E King Stand by Me 1961"]
+    answerMethods: ["timeline"]
+  - id: beach-boys-surfin-safari
+    displayName: "Surfin' Safari — The Beach Boys"
+    correctYear: 1962
+    probability: 80
+    wikimediaSearchHints: ["Beach Boys Surfin Safari 1962"]
+    answerMethods: ["timeline"]
+  - id: beatles-she-loves-you
+    displayName: "She Loves You — The Beatles"
+    correctYear: 1963
+    probability: 92
+    wikimediaSearchHints: ["The Beatles She Loves You"]
+    answerMethods: ["timeline"]
+  - id: beatles-a-hard-days-night
+    displayName: "A Hard Day's Night — The Beatles"
+    correctYear: 1964
+    probability: 92
+    wikimediaSearchHints: ["The Beatles A Hard Day's Night"]
+    answerMethods: ["timeline"]

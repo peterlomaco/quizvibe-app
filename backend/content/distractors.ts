@@ -25,20 +25,36 @@ export interface NameOption {
 
 /**
  * Extrahera prefix från ett item:s displayName.
- * - Behåller bara unicode-bokstäver (släpper bindestreck, punkter, mellanslag, siffror).
- * - Diakriter (Å, Ä, Ö, Ć etc.) bevaras.
- * - Returnerar uppercase.
+ *
+ * Multi-name-regel: splittar på whitespace och tar första `length` bokstäver
+ * av varje del, joinade med space. Bindestreck inom en del räknas som
+ * bokstavs-skiljare men splittar inte (Spider-Man = ett ord). Diakriter
+ * (Å, Ä, Ö, Ć etc.) bevaras. Resultatet är uppercase.
+ *
+ * Konsekvens: multi-name items får längre/striktare prefix vid full assistance,
+ * vilket smalnar Step 2-poolen kraftigt — ofta till 1-2 alternativ. Det är
+ * by design: Full assistance ska göra svaret nästan givet, Standard/Minimal
+ * får bredare pool eftersom kortare prefix per del = fler matchningar.
  *
  * Exempel:
- *   "ABBA", 2            → "AB"
- *   "Mark Zuckerberg", 3 → "MAR"
- *   "Spider-Man", 3      → "SPI"
- *   "John F. Kennedy", 3 → "JOH"
- *   "Björn Borg", 2      → "BJ"
+ *   "ABBA", 2              → "AB"
+ *   "Madonna", 3           → "MAD"
+ *   "Mark Zuckerberg", 2   → "MA ZU"
+ *   "Mark Zuckerberg", 3   → "MAR ZUC"
+ *   "Cristiano Ronaldo", 3 → "CRI RON"
+ *   "Spider-Man", 3        → "SPI"          (bindestreck = ett ord)
+ *   "John F. Kennedy", 3   → "JOH F KEN"    (initial behålls som egen del)
+ *   "Björn Borg", 2        → "BJ BO"
+ *   "Washington, D.C.", 4  → "WASH DC"
  */
 export function getPrefixForItem(displayName: string, length: number): string {
-  const letters = displayName.replace(/[^\p{L}]/gu, '');
-  return letters.slice(0, length).toUpperCase();
+  return displayName
+    .split(/\s+/)
+    .map((part) =>
+      part.replace(/[^\p{L}]/gu, '').slice(0, length).toUpperCase(),
+    )
+    .filter((p) => p.length > 0)
+    .join(' ');
 }
 
 interface ShuffleableRng {

@@ -1,0 +1,217 @@
+# Låtar 1981-1996 — primär audience millennials (1981-1996), gen-x lyssnade
+# samtidigt så audience inkluderar båda. 2 låtar per år enligt scope-plan.
+# Val: 2 av 3 från Peters lista per år, undviker dubbletter med songs-all.yaml
+# (Thriller 1982, Smells Like Teen Spirit 1991 ligger där och rörs ej).
+# media-fältet lämnas off-katalog tills `npm run youtube-search <item-id>`
+# har körts och en specifik videoId + start/endSec är vald.
+audience: ["millennials", "gen-x"]
+category: songs
+items:
+  # 1981
+  - id: soft-cell-tainted-love
+    displayName: "Tainted Love — Soft Cell"
+    correctYear: 1981
+    probability: 88
+    wikimediaSearchHints: ["Soft Cell Tainted Love"]
+    answerMethods: ["timeline"]
+  - id: kim-carnes-bette-davis-eyes
+    displayName: "Bette Davis Eyes — Kim Carnes"
+    correctYear: 1981
+    probability: 80
+    wikimediaSearchHints: ["Kim Carnes Bette Davis Eyes"]
+    answerMethods: ["timeline"]
+  # 1982
+  - id: michael-jackson-billie-jean
+    displayName: "Billie Jean — Michael Jackson"
+    correctYear: 1982
+    probability: 95
+    wikimediaSearchHints: ["Michael Jackson Billie Jean"]
+    answerMethods: ["timeline"]
+  - id: survivor-eye-of-the-tiger
+    displayName: "Eye of the Tiger — Survivor"
+    correctYear: 1982
+    probability: 92
+    wikimediaSearchHints: ["Survivor Eye of the Tiger Rocky"]
+    answerMethods: ["timeline"]
+  # 1983
+  - id: police-every-breath-you-take
+    displayName: "Every Breath You Take — The Police"
+    correctYear: 1983
+    probability: 92
+    wikimediaSearchHints: ["The Police Every Breath You Take"]
+    answerMethods: ["timeline"]
+  - id: irene-cara-flashdance-what-a-feeling
+    displayName: "Flashdance... What a Feeling — Irene Cara"
+    correctYear: 1983
+    probability: 82
+    wikimediaSearchHints: ["Irene Cara Flashdance What a Feeling"]
+    answerMethods: ["timeline"]
+  # 1984
+  - id: madonna-like-a-virgin
+    displayName: "Like a Virgin — Madonna"
+    correctYear: 1984
+    probability: 92
+    wikimediaSearchHints: ["Madonna Like a Virgin"]
+    answerMethods: ["timeline"]
+  - id: wham-wake-me-up-before-you-go-go
+    displayName: "Wake Me Up Before You Go-Go — Wham!"
+    correctYear: 1984
+    probability: 88
+    wikimediaSearchHints: ["Wham Wake Me Up Before You Go-Go"]
+    answerMethods: ["timeline"]
+  # 1985
+  - id: a-ha-take-on-me
+    displayName: "Take on Me — a-ha"
+    correctYear: 1985
+    probability: 92
+    wikimediaSearchHints: ["a-ha Take on Me 1985"]
+    answerMethods: ["timeline"]
+  - id: usa-for-africa-we-are-the-world
+    displayName: "We Are the World — USA for Africa"
+    correctYear: 1985
+    probability: 88
+    wikimediaSearchHints: ["USA for Africa We Are the World"]
+    answerMethods: ["timeline"]
+  # 1986
+  - id: europe-the-final-countdown
+    displayName: "The Final Countdown — Europe"
+    correctYear: 1986
+    probability: 92
+    wikimediaSearchHints: ["Europe The Final Countdown"]
+    answerMethods: ["timeline"]
+  - id: bon-jovi-livin-on-a-prayer
+    displayName: "Livin' on a Prayer — Bon Jovi"
+    correctYear: 1986
+    probability: 90
+    wikimediaSearchHints: ["Bon Jovi Livin on a Prayer"]
+    answerMethods: ["timeline"]
+  # 1987
+  - id: guns-n-roses-sweet-child-o-mine
+    displayName: "Sweet Child O' Mine — Guns N' Roses"
+    correctYear: 1987
+    probability: 92
+    wikimediaSearchHints: ["Guns N Roses Sweet Child O Mine"]
+    answerMethods: ["timeline"]
+  - id: rick-astley-never-gonna-give-you-up
+    displayName: "Never Gonna Give You Up — Rick Astley"
+    correctYear: 1987
+    probability: 90
+    wikimediaSearchHints: ["Rick Astley Never Gonna Give You Up"]
+    answerMethods: ["timeline"]
+  # 1988
+  - id: bobby-mcferrin-dont-worry-be-happy
+    displayName: "Don't Worry, Be Happy — Bobby McFerrin"
+    correctYear: 1988
+    probability: 88
+    wikimediaSearchHints: ["Bobby McFerrin Don't Worry Be Happy"]
+    answerMethods: ["timeline"]
+  - id: tracy-chapman-fast-car
+    displayName: "Fast Car — Tracy Chapman"
+    correctYear: 1988
+    probability: 82
+    wikimediaSearchHints: ["Tracy Chapman Fast Car"]
+    answerMethods: ["timeline"]
+  # 1989
+  - id: madonna-like-a-prayer
+    displayName: "Like a Prayer — Madonna"
+    correctYear: 1989
+    probability: 92
+    wikimediaSearchHints: ["Madonna Like a Prayer"]
+    answerMethods: ["timeline"]
+  - id: phil-collins-another-day-in-paradise
+    displayName: "Another Day in Paradise — Phil Collins"
+    correctYear: 1989
+    probability: 82
+    wikimediaSearchHints: ["Phil Collins Another Day in Paradise"]
+    answerMethods: ["timeline"]
+  # 1990
+  - id: sinead-oconnor-nothing-compares-2-u
+    displayName: "Nothing Compares 2 U — Sinéad O'Connor"
+    correctYear: 1990
+    probability: 90
+    wikimediaSearchHints: ["Sinead O'Connor Nothing Compares 2 U"]
+    answerMethods: ["timeline"]
+  - id: madonna-vogue
+    displayName: "Vogue — Madonna"
+    correctYear: 1990
+    probability: 88
+    wikimediaSearchHints: ["Madonna Vogue"]
+    answerMethods: ["timeline"]
+  # 1991
+  - id: bryan-adams-everything-i-do
+    displayName: "(Everything I Do) I Do It for You — Bryan Adams"
+    correctYear: 1991
+    probability: 88
+    wikimediaSearchHints: ["Bryan Adams Everything I Do I Do It for You Robin Hood"]
+    answerMethods: ["timeline"]
+  - id: michael-jackson-black-or-white
+    displayName: "Black or White — Michael Jackson"
+    correctYear: 1991
+    probability: 90
+    wikimediaSearchHints: ["Michael Jackson Black or White"]
+    answerMethods: ["timeline"]
+  # 1992
+  - id: snap-rhythm-is-a-dancer
+    displayName: "Rhythm Is a Dancer — Snap!"
+    correctYear: 1992
+    probability: 85
+    wikimediaSearchHints: ["Snap Rhythm Is a Dancer"]
+    answerMethods: ["timeline"]
+  - id: boyz-ii-men-end-of-the-road
+    displayName: "End of the Road — Boyz II Men"
+    correctYear: 1992
+    probability: 82
+    wikimediaSearchHints: ["Boyz II Men End of the Road"]
+    answerMethods: ["timeline"]
+  # 1993
+  - id: whitney-houston-i-will-always-love-you
+    displayName: "I Will Always Love You — Whitney Houston"
+    correctYear: 1993
+    probability: 95
+    wikimediaSearchHints: ["Whitney Houston I Will Always Love You Bodyguard"]
+    answerMethods: ["timeline"]
+  - id: 4-non-blondes-whats-up
+    displayName: "What's Up? — 4 Non Blondes"
+    correctYear: 1993
+    probability: 85
+    wikimediaSearchHints: ["4 Non Blondes What's Up"]
+    answerMethods: ["timeline"]
+  # 1994
+  - id: ace-of-base-the-sign
+    displayName: "The Sign — Ace of Base"
+    correctYear: 1994
+    probability: 92
+    wikimediaSearchHints: ["Ace of Base The Sign"]
+    answerMethods: ["timeline"]
+  - id: cranberries-zombie
+    displayName: "Zombie — The Cranberries"
+    correctYear: 1994
+    probability: 88
+    wikimediaSearchHints: ["The Cranberries Zombie"]
+    answerMethods: ["timeline"]
+  # 1995
+  - id: oasis-wonderwall
+    displayName: "Wonderwall — Oasis"
+    correctYear: 1995
+    probability: 92
+    wikimediaSearchHints: ["Oasis Wonderwall"]
+    answerMethods: ["timeline"]
+  - id: coolio-gangstas-paradise
+    displayName: "Gangsta's Paradise — Coolio"
+    correctYear: 1995
+    probability: 88
+    wikimediaSearchHints: ["Coolio Gangsta's Paradise Dangerous Minds"]
+    answerMethods: ["timeline"]
+  # 1996
+  - id: spice-girls-wannabe
+    displayName: "Wannabe — Spice Girls"
+    correctYear: 1996
+    probability: 90
+    wikimediaSearchHints: ["Spice Girls Wannabe"]
+    answerMethods: ["timeline"]
+  - id: los-del-rio-macarena
+    displayName: "Macarena — Los del Río"
+    correctYear: 1996
+    probability: 88
+    wikimediaSearchHints: ["Los del Rio Macarena Bayside Boys"]
+    answerMethods: ["timeline"]

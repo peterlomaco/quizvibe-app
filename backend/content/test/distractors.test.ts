@@ -26,23 +26,24 @@ describe('getPrefixForItem', () => {
     expect(getPrefixForItem('Eminem', 1)).toBe('E');
   });
 
-  it('skips spaces and takes letters from full name', () => {
-    expect(getPrefixForItem('Mark Zuckerberg', 2)).toBe('MA');
-    expect(getPrefixForItem('Mark Zuckerberg', 3)).toBe('MAR');
-    expect(getPrefixForItem('Olof Palme', 3)).toBe('OLO');
+  it('splits on whitespace and prefixes each name part separately', () => {
+    expect(getPrefixForItem('Mark Zuckerberg', 2)).toBe('MA ZU');
+    expect(getPrefixForItem('Mark Zuckerberg', 3)).toBe('MAR ZUC');
+    expect(getPrefixForItem('Olof Palme', 3)).toBe('OLO PAL');
+    expect(getPrefixForItem('Cristiano Ronaldo', 3)).toBe('CRI RON');
   });
 
-  it('skips punctuation and special characters', () => {
+  it('treats hyphens within a part as a single word, keeps initials as own part', () => {
     expect(getPrefixForItem('Spider-Man', 3)).toBe('SPI');
-    expect(getPrefixForItem('John F. Kennedy', 3)).toBe('JOH');
-    expect(getPrefixForItem('Washington, D.C.', 4)).toBe('WASH');
+    expect(getPrefixForItem('John F. Kennedy', 3)).toBe('JOH F KEN');
+    expect(getPrefixForItem('Washington, D.C.', 4)).toBe('WASH DC');
   });
 
   it('preserves diacritics', () => {
-    expect(getPrefixForItem('Björn Borg', 2)).toBe('BJ');
-    expect(getPrefixForItem('Carola Häggkvist', 3)).toBe('CAR');
-    expect(getPrefixForItem('Lasse Åberg', 3)).toBe('LAS');
-    expect(getPrefixForItem('Zlatan Ibrahimović', 2)).toBe('ZL');
+    expect(getPrefixForItem('Björn Borg', 2)).toBe('BJ BO');
+    expect(getPrefixForItem('Carola Häggkvist', 3)).toBe('CAR HÄG');
+    expect(getPrefixForItem('Lasse Åberg', 3)).toBe('LAS ÅBE');
+    expect(getPrefixForItem('Zlatan Ibrahimović', 2)).toBe('ZL IB');
   });
 
   it('returns full available letters when length exceeds name', () => {
@@ -70,7 +71,7 @@ describe('buildLetterGrid', () => {
 
     const correctOptions = grid.filter((o) => o.isCorrect);
     expect(correctOptions).toHaveLength(1);
-    expect(correctOptions[0].prefix).toBe('CR');
+    expect(correctOptions[0].prefix).toBe('CR RO');
   });
 
   it('returns up to totalOptions unique prefixes', () => {
@@ -184,7 +185,7 @@ describe('buildNameOptions', () => {
       category: 'persons',
       playerGeneration: 'millennials',
       correctItem: correct,
-      selectedPrefix: 'LI',
+      selectedPrefix: 'LI ME',
       prefixLength: 2,
       rng: seededRng(5),
     });
@@ -217,12 +218,12 @@ describe('buildNameOptions', () => {
       category: 'persons',
       playerGeneration: 'gen-z',
       correctItem: correct,
-      selectedPrefix: 'CR',
+      selectedPrefix: 'CR RO',
       prefixLength: 2,
       rng: seededRng(11),
     });
     for (const opt of options) {
-      expect(getPrefixForItem(opt.displayName, 2)).toBe('CR');
+      expect(getPrefixForItem(opt.displayName, 2)).toBe('CR RO');
     }
   });
 
@@ -236,7 +237,7 @@ describe('buildNameOptions', () => {
       category: 'persons',
       playerGeneration: 'gen-z',
       correctItem: correct,
-      selectedPrefix: 'ZL',
+      selectedPrefix: 'ZL IB',
       prefixLength: 2,
       rng: seededRng(17),
     });
@@ -285,7 +286,7 @@ describe('buildNameOptions', () => {
       category: 'persons',
       playerGeneration: 'elder',
       correctItem: correct,
-      selectedPrefix: 'AS',
+      selectedPrefix: 'AS LI',
       prefixLength: 2,
       rng: seededRng(99),
     });
@@ -295,9 +296,9 @@ describe('buildNameOptions', () => {
   });
 
   it('fills with pool-distractors when catalog has too few matching prefix', () => {
-    // For "AS"-prefixed Millennials persons, catalogen har bara Astrid Lindgren
-    // (i elder, inte millennials) → millennials-pool har inga "AS"-personer.
-    // Pool-fallback ska ge oss namn som börjar med "AS".
+    // distractor-pool.yaml innehåller "Anna Bergström" → multi-name prefix 'AN BE'.
+    // För Millennials-spelare (där Avicii är correct, prefix 'AV') simulerar vi
+    // att spelaren tappar fel prefix 'AN BE' — pool-fallback ska returnera Anna.
     const catalog = loadCatalog();
     const correct = findItemsById(catalog, 'avicii')[0].item;
     const options = buildNameOptions({
@@ -305,14 +306,14 @@ describe('buildNameOptions', () => {
       category: 'persons',
       playerGeneration: 'millennials',
       correctItem: correct,
-      selectedPrefix: 'AN', // "Anna ..." finns i pool
+      selectedPrefix: 'AN BE',
       prefixLength: 2,
       rng: seededRng(42),
     });
     // Förvänta att åtminstone några options finns (från pool om inte katalog)
     expect(options.length).toBeGreaterThan(0);
     for (const opt of options) {
-      expect(getPrefixForItem(opt.displayName, 2)).toBe('AN');
+      expect(getPrefixForItem(opt.displayName, 2)).toBe('AN BE');
     }
   });
 
@@ -324,7 +325,7 @@ describe('buildNameOptions', () => {
       category: 'persons',
       playerGeneration: 'millennials',
       correctItem: correct,
-      selectedPrefix: 'AN',
+      selectedPrefix: 'AN BE',
       prefixLength: 2,
       rng: seededRng(42),
     });

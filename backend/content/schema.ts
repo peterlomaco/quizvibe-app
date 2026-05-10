@@ -58,6 +58,61 @@ export const YoutubeClipSchema = z
   });
 export type YoutubeClip = z.infer<typeof YoutubeClipSchema>;
 
+// Media-källa per item — discriminerad union på `kind`.
+// En källa per item: om "samma låt" finns på både YouTube och Spotify
+// modelleras de som TVÅ separata items (inte ett item med flera sources).
+// Förenklar deduplikation, lobby-filter och URL-validering — men spelaren
+// kan se samma låt två gånger om båda källorna är aktiverade i en lobby.
+const YoutubeMediaSchema = z.object({
+  kind: z.literal('youtube'),
+  videoId: z
+    .string()
+    .regex(
+      /^[A-Za-z0-9_-]{11}$/,
+      'videoId must be a 11-char YouTube id (A-Z, a-z, 0-9, _, -)',
+    ),
+  startSec: z.number().int().min(0),
+  endSec: z.number().int().min(1),
+  channelTitle: z.string().optional(),
+  license: z.enum(['standard', 'creative-commons']).default('standard'),
+  notes: z.string().optional(),
+});
+
+const SpotifyMediaSchema = z.object({
+  kind: z.literal('spotify'),
+  // Spotify track ID (22 base62-chars), från track-URI:n
+  // (spotify:track:6rqhFgbbKwnb9MLmUQDhG6 → "6rqhFgbbKwnb9MLmUQDhG6").
+  trackId: z
+    .string()
+    .regex(
+      /^[A-Za-z0-9]{22}$/,
+      'spotify trackId must be 22 base62 chars',
+    ),
+  // Optional klipp-fönster i millisekunder (Spotify Web Playback använder ms).
+  // Om utelämnat spelas låten från 0 till antingen previewens slut (30s) eller
+  // slut av track beroende på SDK-läge.
+  startMs: z.number().int().min(0).optional(),
+  endMs: z.number().int().min(1).optional(),
+  notes: z.string().optional(),
+});
+
+const AiImageMediaSchema = z.object({
+  kind: z.literal('ai-image'),
+  // Slut-URL till hostad AI-genererad bild (CDN/objekt-storage).
+  imageUrl: z.string().url(),
+  // Pekare till prompt/seed/job-id för regenerering. Format öppet —
+  // landar troligen som "<provider>:<job-id>" när AI-pipelinen kopplas in.
+  promptId: z.string().optional(),
+  notes: z.string().optional(),
+});
+
+export const MediaSourceSchema = z.discriminatedUnion('kind', [
+  YoutubeMediaSchema,
+  SpotifyMediaSchema,
+  AiImageMediaSchema,
+]);
+export type MediaSource = z.infer<typeof MediaSourceSchema>;
+
 export const ContentItemSchema = z.object({
   id: z
     .string()
@@ -73,16 +128,58 @@ export const ContentItemSchema = z.object({
   wikimediaSearchHints: z.array(z.string().min(1)).min(1),
   // Vilka svarsmetoder som är giltiga för detta item.
   answerMethods: z.array(AnswerMethodSchema).min(1),
-  // Pre-curerade YouTube-klipp för det här item:t. Optional — items utan
-  // klipp faller tillbaka till bildbaserad fråga (Wikimedia). Items med
-  // minst ett klipp blir kandidater för YouTube-källade frågor när host
-  // har YouTube aktiverat i Lobby.
+  // Media-källa för item:t. Vid launch: YouTube + Spotify för musik (year-frågor),
+  // ai-image för personer/platser (letter-frågor). Optional tills katalogen
+  // migrerats — items utan media faller tillbaka till Wikimedia-pipeline.
+  media: MediaSourceSchema.optional(),
+  // @deprecated Använd `media` med `kind: 'youtube'` istället. Behålls
+  // tills befintliga YAML-filer migrerats till nya media-formatet.
+  // Refine längre ner blockerar kombinationen `media` + `youtubeClips`
+  // så vi inte råkar ha båda samtidigt under transition-perioden.
   youtubeClips: z.array(YoutubeClipSchema).optional(),
+  // Peak-recognition-fönster: åren då item:t var som mest känt. Driver
+  // recognition-decay-funktionen tillsammans med `audience` (= generation).
+  // - Musik: typiskt peakFrom = peakTo = produktionsåret (= correctYear).
+  // - Personer: ett intervall (Cristiano Ronaldo: peakFrom=2008, peakTo=2018).
+  // - Images (städer t.ex.): båda null — recognition är inte tids-bunden.
+  peakFrom: z.number().int().min(-3000).max(2100).optional(),
+  peakTo: z.number().int().min(-3000).max(2100).optional(),
   // 'sensitive' = motiv kräver extra omtanke vid bildval. Default-filtreras
   // bort av spel-API:t.
   sensitivity: SensitivitySchema.default('standard'),
   notes: z.string().optional(),
-});
+})
+  .refine(
+    (item) => !(item.media && item.youtubeClips),
+    {
+      message:
+        'item cannot have both `media` and `youtubeClips` (legacy). Migrate the YAML to `media`.',
+    },
+  )
+  .refine(
+    (item) =>
+      item.peakFrom === undefined ||
+      item.peakTo === undefined ||
+      item.peakTo >= item.peakFrom,
+    { message: 'peakTo must be >= peakFrom' },
+  )
+  .refine(
+    (item) => {
+      if (item.media?.kind !== 'spotify') return true;
+      if (item.media.startMs === undefined || item.media.endMs === undefined) {
+        return true;
+      }
+      return item.media.endMs > item.media.startMs;
+    },
+    { message: 'spotify media endMs must be > startMs when both are set' },
+  )
+  .refine(
+    (item) => {
+      if (item.media?.kind !== 'youtube') return true;
+      return item.media.endSec > item.media.startSec;
+    },
+    { message: 'youtube media endSec must be > startSec' },
+  );
 export type ContentItem = z.infer<typeof ContentItemSchema>;
 
 export const ContentFileSchema = z
