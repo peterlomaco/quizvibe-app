@@ -42,7 +42,7 @@ import { getAvatarEmojiById } from '../utils/avatars';
 import { loadFriends, type Friend } from '../utils/friendsStorage';
 import { MIN_HCP, calculateInitialHCP } from '../utils/hcp';
 import { addLeftPlayer, getLeftPlayers } from '../utils/leftPlayers';
-import { deactivateRoom, getRoomMeta, isActiveRoom, setRoomMaxPlayers, setRoomPlayerCount } from '../utils/mockActiveRooms';
+import { deactivateRoom, getRoomMeta, markRoomGameStarted, roomExists, setRoomMaxPlayers, setRoomPlayerCount } from '../utils/mockActiveRooms';
 import { clearEjected, isEjected, markEjected } from '../utils/ejectedPlayers';
 import { clearLobbyPlayers, getLobbyPlayers, setLobbyPlayers } from '../utils/mockLobbyPlayers';
 import { clearLobbySettings, getLobbySettings, setLobbySettings } from '../utils/mockLobbySettings';
@@ -1316,11 +1316,12 @@ export default function LobbyScreen() {
   useEffect(() => {
     if (!roomCode) return;
     const activeCount = players.filter((p) => !p.hasLeft).length;
-    setRoomPlayerCount(roomCode, activeCount);
+    // Fire-and-forget — UI:t behöver inte vänta på roundtrip:en till DB.
+    setRoomPlayerCount(roomCode, activeCount).catch(() => { /* loggas i mockActiveRooms */ });
   }, [players, roomCode]);
   useEffect(() => {
     if (!roomCode || !hostMode) return;
-    setRoomMaxPlayers(roomCode, maxPlayers);
+    setRoomMaxPlayers(roomCode, maxPlayers).catch(() => { /* loggas i mockActiveRooms */ });
   }, [maxPlayers, roomCode, hostMode]);
 
   // Max rundor beror på gameMode — Pass-the-Phone capas vid 4, Individual
@@ -1839,11 +1840,11 @@ export default function LobbyScreen() {
         {
           text: 'Yes',
           style: 'destructive',
-          onPress: () => {
+          onPress: async () => {
             // Deaktivera rummet direkt så non-hosts polling-detection
             // upptäcker det inom ~2s (även medan host:s loading-overlay
             // visas — det är realistiskt async-beteende).
-            deactivateRoom(roomCode);
+            await deactivateRoom(roomCode);
             clearLobbyPlayers(roomCode);
             clearLobbySettings(roomCode);
             clearEjected(roomCode);
@@ -1866,44 +1867,49 @@ export default function LobbyScreen() {
     );
   };
 
-  // Non-host detection: pollar isActiveRoom var 2:a sekund. När rummet
-  // blir inaktivt (host har deletat det) sätter vi roomDeletedDetected=true
-  // som triggar Alert:en nedanför. Polling istället för event-driven
-  // (som backend) eftersom mockstoren bara är in-memory utan event-bus.
+  // Non-host detection: pollar roomExists var 2:a sekund. När rummet
+  // blir borta (host har deletat det) sätter vi roomDeletedDetected=true
+  // som triggar Alert:en nedanför. Polling istället för Realtime —
+  // ersätts med supabase.channel('postgres_changes').on(...) i Slice 3B.
   // Host själv exkluderas — de som deletat ska inte få sin egen popup.
+  // Noterat att vi använder roomExists (ej isActiveRoom) — game_started
+  // ska inte trigga "deleted by host"-popupen; non-hosts som hamnar i
+  // detta läge sköts av mockStartedGames-polling separat.
   useEffect(() => {
     if (hostMode) return;
-    // Initial check direkt vid mount så vi inte behöver vänta polling-
-    // intervallet om rummet redan är deletat när användaren landar.
-    if (!isActiveRoom(roomCode)) {
-      setRoomDeletedDetected(true);
-      return;
-    }
-    const interval = setInterval(() => {
-      if (!isActiveRoom(roomCode)) {
-        setRoomDeletedDetected(true);
-      }
-    }, 2000);
-    return () => clearInterval(interval);
+    let cancelled = false;
+    const check = async () => {
+      const exists = await roomExists(roomCode);
+      if (cancelled) return;
+      if (!exists) setRoomDeletedDetected(true);
+    };
+    check();
+    const interval = setInterval(check, 2000);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
   }, [hostMode, roomCode]);
 
-  // Sync maxPlayers från host:s rummeta för non-host. Speglar room-deletion-
-  // polling-mönstret ovan (initial check + 2s-interval) eftersom mockstoren
-  // saknar event-bus. Utan denna effekt stannar non-host:s lokala maxPlayers
-  // på sin default (4) och Lobby:s "Number of Players"-toggle visar fel
-  // aktiv ruta när host har valt Max 12. Ersätts med WS/SSE-prenumeration
-  // när backend kommer in.
+  // Sync maxPlayers från host:s rummeta för non-host. Polling-mönstret
+  // speglar room-deletion-detection ovan. Ersätts med Realtime-
+  // subscription på rooms-tabellen i Slice 3B.
   useEffect(() => {
     if (hostMode) return;
-    const syncFromMeta = () => {
-      const meta = getRoomMeta(roomCode);
+    let cancelled = false;
+    const syncFromMeta = async () => {
+      const meta = await getRoomMeta(roomCode);
+      if (cancelled) return;
       if (meta && meta.maxPlayers !== maxPlayers) {
         setMaxPlayers(meta.maxPlayers);
       }
     };
     syncFromMeta();
     const interval = setInterval(syncFromMeta, 2000);
-    return () => clearInterval(interval);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
   }, [hostMode, roomCode, maxPlayers]);
 
   // Host: skriv players[]-state till mockLobbyPlayers-storen vid varje
@@ -2056,7 +2062,8 @@ export default function LobbyScreen() {
       // att host:s write har körts.
       const hasHost = approvedFromHost.some((p) => p.isHost);
       if (!hasHost) {
-        const meta = getRoomMeta(roomCode);
+        const meta = await getRoomMeta(roomCode);
+        if (cancelled) return;
         if (meta?.hostPlayerName) {
           const syntheticHost: LobbyPlayer = {
             id: 'synthetic-host',
@@ -2238,6 +2245,10 @@ export default function LobbyScreen() {
     // host:s component fortfarande är monterad (vid host:s blur clearas
     // ingen state — markeringen lever till någon lifecycle-cleanup).
     markGameStarted(roomCode);
+    // Server-side flagga: rooms.game_started=true så isActiveRoom returnerar
+    // false för nya joiners (rummet är inte längre joinbart). Fire-and-forget
+    // — UI:t fortsätter inte vänta på DB-roundtrip.
+    markRoomGameStarted(roomCode).catch(() => { /* loggas i mockActiveRooms */ });
 
     router.push({
       pathname: '/quiz',

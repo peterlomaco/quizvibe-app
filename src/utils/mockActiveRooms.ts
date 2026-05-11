@@ -1,25 +1,28 @@
-// Mock-store för "aktivt registrerade rum" — sessionsbunden Map i minnet
-// (förstörs vid app-reload). Används för att kunna ge realistisk feedback
-// i join-flöden ("There is no Room code activated with this combination" +
-// "Lobby is full ...") utan backend.
+// Aktivt rum-registry — Fas 3 Slice A.
+//
+// Tidigare en sessionsbunden Map i minnet (mock); från Slice 3A backas detta
+// av Supabase `rooms`-tabellen så room codes funkar cross-device. Filnamnet
+// behålls som `mockActiveRooms.ts` tills resten av lobby-mock-stores
+// (mockLobbyPlayers, mockLobbySettings, mockStartedGames) också är portade
+// i Slice 3B/3C — då döper vi om hela bunten i ett svep.
 //
 // Lifecycle:
-//   • Host skapar en Game (Create Game / Play Again) → registerActiveRoom(code, meta)
+//   • Host skapar en Game → registerActiveRoom(code, meta) INSERT:ar i rooms
+//   • Auto-expiry: 24h efter creation (expires_at) ELLER när host trycker
+//     Start Game (game_started=true). isActiveRoom filtrerar bort båda.
 //   • Lobby-state syncar count/maxPlayers tillbaka via setRoomPlayerCount /
-//     setRoomMaxPlayers när players ändras eller host togglar Max 4/12
+//     setRoomMaxPlayers → UPDATE i rooms
 //   • Guest/registrerad user joinar → isActiveRoom + isLobbyFull i join-flödet
 //
-// När backend kopplas in ersätts detta med API-calls (`GET /rooms/:code`
-// returnerar både existence och meta i samma round-trip). Call-sites
-// (handleCreateGame, handleJoinWithCode, handleJoinAsGuest, LobbyScreen
-// useEffect:s) byter implementation utan att ändra signatur.
+// API:t är nu async (returnerar Promises). Call-sites måste await:a.
 //
-// Test-seed-koder finns för manuell QA — joinar du med dessa funkar det
-// alltid även utan att ha skapat ett rum först.
+// Test-seeds finns kvar som in-memory fallback för dev/QA — joinar du med
+// dessa funkar det alltid, även utan att skapa rum mot DB:n.
+
+import { supabase } from './supabase';
 
 export interface RoomMeta {
   // Host:s valda max-spelare-cap (4 = Basic/Free, 12 = Premium-tier).
-  // Lobby:n syncar tillbaka när host togglar Max 4/12 i UI:t.
   maxPlayers: 4 | 12;
   // Avgör popup-meddelandet när lobbyn är full. Free → "or to upgrade"-CTA,
   // Premium → "remove players"-only. Hardcodad till false från Create Game
@@ -35,94 +38,239 @@ export interface RoomMeta {
   hostPlayerName: string;
 }
 
-const ACTIVE_ROOMS = new Map<string, RoomMeta>([
-  // Dev/test-seeds — joinable (gott om kapacitet kvar). hostPlayerName
-  // satt till syntetiska värden som inte matchar några real-user-namn så
-  // isOwnLobby aldrig fyrar mot seeds.
+// Dev/test-seeds som lagras lokalt i minnet (inte i DB) så de alltid är
+// joinable för manuell QA. Tar fortsatt syntetiska hostPlayerName-värden
+// som inte kolliderar med real-user-namn så isOwnLobby aldrig fyrar.
+//
+// Lookup-ordning: DB först (riktiga rum), sedan dessa seeds.
+const TEST_ROOM_SEEDS = new Map<string, RoomMeta>([
   ['AB23XY', { maxPlayers: 4, hostIsPremium: false, currentPlayerCount: 1, hostPlayerName: 'TestSeedHost1' }],
   ['QV45LV', { maxPlayers: 12, hostIsPremium: true, currentPlayerCount: 1, hostPlayerName: 'TestSeedHost2' }],
-  // Dev/test-seeds — FULLA, för att verifiera lobby-full-popups:
-  //   AB99FF → Free host, max 4, count 4 → "or to upgrade"-meddelande
-  //   QV99FF → Premium host, max 12, count 12 → "remove players"-meddelande
   ['AB99FF', { maxPlayers: 4, hostIsPremium: false, currentPlayerCount: 4, hostPlayerName: 'TestSeedHost3' }],
   ['QV99FF', { maxPlayers: 12, hostIsPremium: true, currentPlayerCount: 12, hostPlayerName: 'TestSeedHost4' }],
 ]);
 
-/**
- * Registrerar en kod som aktiv i sessionen + lagrar host:s metadata. Kallas
- * av host-flow:n när ett nytt rum skapas. Re-registrera samma kod skriver
- * över meta:n (defensivt — Play Again borde alltid generera ny kod, men
- * idempotensen skadar inte).
- */
-export function registerActiveRoom(code: string, meta: RoomMeta): void {
-  ACTIVE_ROOMS.set(code.toUpperCase(), meta);
+// DB row-shape (snake_case). Mappar till RoomMeta via rowToMeta nedan.
+interface RoomRow {
+  code: string;
+  host_user_id: string;
+  host_player_name: string;
+  max_players: 4 | 12;
+  host_is_premium: boolean;
+  current_player_count: number;
+  game_started: boolean;
+  expires_at: string;
+}
+
+function rowToMeta(row: RoomRow): RoomMeta {
+  return {
+    maxPlayers: row.max_players,
+    hostIsPremium: row.host_is_premium,
+    currentPlayerCount: row.current_player_count,
+    hostPlayerName: row.host_player_name,
+  };
+}
+
+function normalizeCode(code: string): string {
+  return code.toUpperCase();
 }
 
 /**
- * True om koden är registrerad som aktivt rum. Case-insensitive.
- * Tomma strängar returnerar false.
- */
-export function isActiveRoom(code: string): boolean {
-  if (!code) return false;
-  return ACTIVE_ROOMS.has(code.toUpperCase());
-}
-
-/**
- * Tar bort koden från aktiva rum. Kallas av host-flow:n när host väljer
- * "Delete this Game Lobby" via TopUserBanner. Efter detta returnerar
- * isActiveRoom(code) false → join-flöden visar "Room not found"-Alert
- * och kvarvarande non-hosts i lobby:n får en deletion-popup via
- * polling-detection i LobbyScreen.
+ * Registrerar en kod som aktivt rum i Supabase + host-metadata. Anropas
+ * av host-flow:n (handleCreateGame, Play Again). Användaren måste vara
+ * inloggad — INSERT går mot rooms-tabellen där RLS kräver host_user_id =
+ * auth.uid(). Re-registrera samma kod (sällsynt — Play Again ska alltid
+ * generera ny kod) skriver över via upsert.
  *
- * Idempotent — deactivate på okänd kod är no-op.
+ * Returnerar void; caster loggar ev. errors. Idempotent.
  */
-export function deactivateRoom(code: string): void {
-  if (!code) return;
-  ACTIVE_ROOMS.delete(code.toUpperCase());
+export async function registerActiveRoom(code: string, meta: RoomMeta): Promise<void> {
+  const normalized = normalizeCode(code);
+  const { data: userResp } = await supabase.auth.getUser();
+  const user = userResp.user;
+  if (!user) {
+    console.warn('[activeRooms] registerActiveRoom called without session — host must be signed in.');
+    return;
+  }
+  const { error } = await supabase.from('rooms').upsert({
+    code: normalized,
+    host_user_id: user.id,
+    host_player_name: meta.hostPlayerName,
+    max_players: meta.maxPlayers,
+    host_is_premium: meta.hostIsPremium,
+    current_player_count: meta.currentPlayerCount,
+    game_started: false,
+    expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+  });
+  if (error) {
+    console.warn('[activeRooms] registerActiveRoom failed:', error.message);
+  }
 }
 
 /**
- * Returnerar lagrad metadata för rummet (max-spelare, host-Premium-status,
- * aktuell spelar-count). Undefined om koden inte är registrerad — caller
- * bör först köra isActiveRoom innan getRoomMeta för tydligare felmeddelanden.
+ * True om koden är registrerad SOM JOINBAR — dvs DB-rad finns OCH inte
+ * expired OCH game_started=false. Test-seeds returnerar alltid true.
+ *
+ * Används av join-flöden (handleJoinWithCode, handleJoinAsGuest,
+ * handleAcceptInvite) som vill blockera join på döda/expired rum.
+ * För polling-detection ("rummet finns fortfarande?") använd roomExists
+ * istället så non-hosts inte felaktigt kickas när host startar spelet.
  */
-export function getRoomMeta(code: string): RoomMeta | undefined {
+export async function isActiveRoom(code: string): Promise<boolean> {
+  if (!code) return false;
+  const normalized = normalizeCode(code);
+  if (TEST_ROOM_SEEDS.has(normalized)) return true;
+  const { data, error } = await supabase
+    .from('rooms')
+    .select('code')
+    .eq('code', normalized)
+    .eq('game_started', false)
+    .gt('expires_at', new Date().toISOString())
+    .maybeSingle();
+  if (error) {
+    console.warn('[activeRooms] isActiveRoom query failed:', error.message);
+    return false;
+  }
+  return !!data;
+}
+
+/**
+ * True om DB-raden FINNS (oavsett game_started). Används av Lobby:s 2s-
+ * polling för att detektera host-deletion utan att felaktigt trigga
+ * "lobby deleted"-popupen när host startar spelet (då finns raden kvar
+ * men game_started=true). 24h-expiry filtreras fortfarande.
+ */
+export async function roomExists(code: string): Promise<boolean> {
+  if (!code) return false;
+  const normalized = normalizeCode(code);
+  if (TEST_ROOM_SEEDS.has(normalized)) return true;
+  const { data, error } = await supabase
+    .from('rooms')
+    .select('code')
+    .eq('code', normalized)
+    .gt('expires_at', new Date().toISOString())
+    .maybeSingle();
+  if (error) {
+    console.warn('[activeRooms] roomExists query failed:', error.message);
+    return false;
+  }
+  return !!data;
+}
+
+/**
+ * Tar bort rummet från DB. Anropas av host vid "Delete this Game Lobby"
+ * via TopUserBanner. Efter detta returnerar isActiveRoom/roomExists false
+ * → join-flöden visar "Room not found", kvarvarande non-hosts i lobby:n
+ * får deletion-popup via polling-detection.
+ *
+ * Idempotent — delete på okänd kod är no-op. Test-seeds påverkas inte
+ * (de finns bara i minnet, inte i DB).
+ */
+export async function deactivateRoom(code: string): Promise<void> {
+  if (!code) return;
+  const normalized = normalizeCode(code);
+  const { error } = await supabase.from('rooms').delete().eq('code', normalized);
+  if (error) {
+    console.warn('[activeRooms] deactivateRoom failed:', error.message);
+  }
+}
+
+/**
+ * Markerar att host startat spelet. Sätter game_started=true så rummet
+ * räknas som "inaktivt" för join-flöden (isActiveRoom). Vi rör INTE
+ * expires_at — rummet behöver fortsatt "exist" så non-hosts som ev.
+ * inte hunnit navigera till /quiz inte fellaktigt kickas av Lobby:s
+ * room-deletion-polling (som använder roomExists, inte isActiveRoom).
+ * pg_cron-cleanup tar bort raden efter 24h:s naturliga expiry.
+ *
+ * Anropas av handleStartGame i LobbyScreen + Play Again-flödet.
+ * Test-seeds påverkas inte (in-memory).
+ */
+export async function markRoomGameStarted(code: string): Promise<void> {
+  if (!code) return;
+  const normalized = normalizeCode(code);
+  if (TEST_ROOM_SEEDS.has(normalized)) return;
+  const { error } = await supabase
+    .from('rooms')
+    .update({ game_started: true })
+    .eq('code', normalized);
+  if (error) {
+    console.warn('[activeRooms] markRoomGameStarted failed:', error.message);
+  }
+}
+
+/**
+ * Returnerar lagrad metadata för rummet (oavsett game_started — så Lobby
+ * kan fortsatt visa host-info även efter game start). 24h-expiry filtreras
+ * fortfarande bort.
+ *
+ * Test-seeds returneras från in-memory om koden matchar; annars DB-query.
+ * Undefined om inget hittas — caller bör först köra isActiveRoom innan
+ * getRoomMeta för tydligare felmeddelanden.
+ */
+export async function getRoomMeta(code: string): Promise<RoomMeta | undefined> {
   if (!code) return undefined;
-  return ACTIVE_ROOMS.get(code.toUpperCase());
+  const normalized = normalizeCode(code);
+  const seed = TEST_ROOM_SEEDS.get(normalized);
+  if (seed) return seed;
+  const { data, error } = await supabase
+    .from('rooms')
+    .select('*')
+    .eq('code', normalized)
+    .gt('expires_at', new Date().toISOString())
+    .maybeSingle();
+  if (error) {
+    console.warn('[activeRooms] getRoomMeta query failed:', error.message);
+    return undefined;
+  }
+  return data ? rowToMeta(data as RoomRow) : undefined;
 }
 
 /**
  * True om rummet är registrerat OCH currentPlayerCount >= maxPlayers.
- * Fail-open: returnerar false om rummet saknar meta (vilket inte borde
- * hända i normalfall — registreras alltid via registerActiveRoom).
+ * Fail-open: returnerar false om rummet saknar meta. Anropas av
+ * checkLobbyCapacity i join-handlers.
  */
-export function isLobbyFull(code: string): boolean {
-  const meta = getRoomMeta(code);
+export async function isLobbyFull(code: string): Promise<boolean> {
+  const meta = await getRoomMeta(code);
   if (!meta) return false;
   return meta.currentPlayerCount >= meta.maxPlayers;
 }
 
 /**
- * Skriver count till registry. Anropas från LobbyScreen:s useEffect på
- * `players` så registry alltid speglar lobby:s aktuella spelar-antal.
- * No-op om koden inte är registrerad (skydd mot stale syncs efter att
- * host har raderat rummet).
+ * Skriver count till DB. Anropas från LobbyScreen:s useEffect på `players`
+ * så DB alltid speglar lobby:s aktuella spelar-antal. No-op på test-seeds
+ * (in-memory snapshot förändras inte) och på okända koder.
  */
-export function setRoomPlayerCount(code: string, count: number): void {
-  const meta = getRoomMeta(code);
-  if (!meta) return;
-  ACTIVE_ROOMS.set(code.toUpperCase(), { ...meta, currentPlayerCount: count });
+export async function setRoomPlayerCount(code: string, count: number): Promise<void> {
+  if (!code) return;
+  const normalized = normalizeCode(code);
+  if (TEST_ROOM_SEEDS.has(normalized)) return;
+  const { error } = await supabase
+    .from('rooms')
+    .update({ current_player_count: count })
+    .eq('code', normalized);
+  if (error) {
+    console.warn('[activeRooms] setRoomPlayerCount failed:', error.message);
+  }
 }
 
 /**
- * Skriver maxPlayers till registry när host togglar Max 4/12 i Lobby:s
- * Number of Players-toggle. Speglar host:s aktuella val så join-flödets
- * full-check baseras på samma cap som UI:t visar. No-op vid okänd kod.
+ * Skriver maxPlayers till DB när host togglar Max 4/12 i Number of Players-
+ * toggle. Speglar host:s aktuella val så join-flödets full-check baseras på
+ * samma cap som UI:t visar. No-op på test-seeds och okända koder.
  */
-export function setRoomMaxPlayers(code: string, maxPlayers: 4 | 12): void {
-  const meta = getRoomMeta(code);
-  if (!meta) return;
-  ACTIVE_ROOMS.set(code.toUpperCase(), { ...meta, maxPlayers });
+export async function setRoomMaxPlayers(code: string, maxPlayers: 4 | 12): Promise<void> {
+  if (!code) return;
+  const normalized = normalizeCode(code);
+  if (TEST_ROOM_SEEDS.has(normalized)) return;
+  const { error } = await supabase
+    .from('rooms')
+    .update({ max_players: maxPlayers })
+    .eq('code', normalized);
+  if (error) {
+    console.warn('[activeRooms] setRoomMaxPlayers failed:', error.message);
+  }
 }
 
 /**
@@ -132,9 +280,9 @@ export function setRoomMaxPlayers(code: string, maxPlayers: 4 | 12): void {
  * Returnerar false om koden saknar meta eller playerName är tomt — fail-open
  * så join-flödet inte oavsiktligt blockerar nya users.
  */
-export function isOwnLobby(code: string, playerName: string | null | undefined): boolean {
+export async function isOwnLobby(code: string, playerName: string | null | undefined): Promise<boolean> {
   if (!playerName) return false;
-  const meta = getRoomMeta(code);
+  const meta = await getRoomMeta(code);
   if (!meta) return false;
   return meta.hostPlayerName.trim().toLowerCase() === playerName.trim().toLowerCase();
 }

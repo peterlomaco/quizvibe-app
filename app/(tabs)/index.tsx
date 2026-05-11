@@ -135,9 +135,9 @@ function formatBirthYear(year: number): string {
 // status. Free host får upgrade-CTA-formulering; Premium host får bara
 // "remove players"-versionen (inget upselling-meddelande). Returnerar true
 // om popup visades (= caller ska abortera vidare navigation), false annars.
-function checkLobbyCapacity(code: string): boolean {
-  if (!isLobbyFull(code)) return false;
-  const meta = getRoomMeta(code);
+async function checkLobbyCapacity(code: string): Promise<boolean> {
+  if (!(await isLobbyFull(code))) return false;
+  const meta = await getRoomMeta(code);
   const message = meta?.hostIsPremium
     ? 'Lobby is full. Host need to remove players from lobby for others to join'
     : 'Lobby is full. Host either need to remove players from lobby or to upgrade';
@@ -303,7 +303,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     // inte kan tap:a den igen. removeInvite anropas FÖRE Alert eftersom
     // listan ska vara aktuell direkt vid OK — annars hänger den döda
     // posten kvar tills nästa modal-open.
-    if (!isActiveRoom(invite.roomCode)) {
+    if (!(await isActiveRoom(invite.roomCode))) {
       const updated = await removeInvite(invite.id);
       setInvites(updated);
       Alert.alert(
@@ -315,7 +315,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     // Capacity-check FÖRE removeInvite: om lobby:n är full ska usern få
     // popup och inviten ligga kvar i listan, så de kan försöka igen om
     // någon lämnar. Speglar samma check som handleJoinWithCode kör.
-    if (checkLobbyCapacity(invite.roomCode)) return;
+    if (await checkLobbyCapacity(invite.roomCode)) return;
     await removeInvite(invite.id);
     onClose();
     router.push({
@@ -324,12 +324,12 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     });
   };
 
-  const handleJoinWithCode = () => {
+  const handleJoinWithCode = async () => {
     if (code.length < ROOM_CODE_LENGTH) return;
-    // Mock-existence-check: i frånvaro av backend kollar vi mot
-    // sessionsbunden Map över koder hosts har registrerat. Saknas koden
-    // visar vi Alert och stannar i formuläret istället för att navigera.
-    if (!isActiveRoom(code)) {
+    // Existence-check mot Supabase rooms-tabellen. Saknas koden (eller är
+    // den expired/game-started) visar vi Alert och stannar i formuläret
+    // istället för att navigera.
+    if (!(await isActiveRoom(code))) {
       Alert.alert(
         'Room not found',
         'There is no Room code activated with this combination',
@@ -339,13 +339,13 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     // Own-lobby-check: samma user inloggad på två enheter och försöker joina
     // sin egen lobby från device B. Måste komma före capacity-checken så
     // användaren får det mer specifika felmeddelandet.
-    if (isOwnLobby(code, currentPlayerName)) {
+    if (await isOwnLobby(code, currentPlayerName)) {
       Alert.alert('Already in lobby', 'User already exists in the lobby');
       return;
     }
     // Capacity-check: om host:s lobby redan är full visar vi popup med text
     // som beror på Free vs Premium-host. Användaren stannar i join-formuläret.
-    if (checkLobbyCapacity(code)) return;
+    if (await checkLobbyCapacity(code)) return;
     onClose();
     router.push({ pathname: '/(tabs)/lobby', params: { code, isHost: 'false' } });
   };
@@ -489,13 +489,12 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     }
   }, [step, guestName]);
 
-  const handleJoinAsGuest = () => {
+  const handleJoinAsGuest = async () => {
     if (!isGuestFormValid || parsedBirthYear === null || guestAssistance === null) return;
-    // Mock-existence-check (samma princip som handleJoinWithCode) — utan
-    // backend kan vi bara verifiera mot sessions-Set:n. När backend kopplas
-    // in ersätts isActiveRoom med ett API-call. PlayerName-uniqueness är
-    // fortsatt mockad mot TAKEN_PLAYER_NAMES via validatePlayerName.
-    if (!isActiveRoom(code)) {
+    // Existence-check mot Supabase rooms-tabellen. PlayerName-uniqueness är
+    // fortsatt mockad mot TAKEN_PLAYER_NAMES via validatePlayerName (separat
+    // store, ej i scope för Slice 3A).
+    if (!(await isActiveRoom(code))) {
       Alert.alert(
         'Room not found',
         'There is no Room code activated with this combination',
@@ -507,17 +506,16 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     // både den inloggade-på-två-enheter-fallen och den explicita "joina egen
     // lobby som guest"-fallet om de råkar typa in sin egen playerName.
     const guestIdentity = guestName.trim();
-    if (
-      isOwnLobby(code, currentPlayerName) ||
-      (guestIdentity && isOwnLobby(code, guestIdentity))
-    ) {
+    const ownByLogin = await isOwnLobby(code, currentPlayerName);
+    const ownByGuest = guestIdentity ? await isOwnLobby(code, guestIdentity) : false;
+    if (ownByLogin || ownByGuest) {
       Alert.alert('Already in lobby', 'User already exists in the lobby');
       return;
     }
     // Capacity-check: speglar handleJoinWithCode — full lobby visar popup
     // istället för att skicka in gästen som ändå skulle få "lobby is full"
     // när de hamnade i Lobby-vyn.
-    if (checkLobbyCapacity(code)) return;
+    if (await checkLobbyCapacity(code)) return;
     // Autofill-detektion: matchar Guest-flödets genererade format
     // ("Guest" + 5 siffror + "-" + 2 bokstäver). Om användaren ändrat
     // namnet manuellt blir flaggan false.
@@ -1373,15 +1371,14 @@ export default function HomeScreen() {
     }
 
     const code = generateRoomCode();
-    // Registrera koden som "aktivt rum" + lagra host:s metadata så join-
-    // flödena (handleJoinWithCode, handleJoinAsGuest) kan validera mot den
-    // OCH visa rätt "Lobby is full"-popup baserat på Premium-status.
-    // Sessionsbundet i mockstoren — när backend är inkopplad ersätts detta
-    // med ett POST /rooms-call eller motsvarande som backenden registrerar i DB.
+    // Registrera koden i Supabase rooms-tabellen + lagra host:s metadata så
+    // join-flödena (handleJoinWithCode, handleJoinAsGuest) kan validera mot
+    // den OCH visa rätt "Lobby is full"-popup baserat på Premium-status.
+    // Auto-expirar efter 24h eller när host trycker Start Game.
     // TODO (subscription): byt hardcoded `false` mot riktig profile.isPremium
     // när RevenueCat/subscription-state är inkopplad. Speglar samma stub
     // som `const hasPremium = false` i LobbyScreen.
-    registerActiveRoom(code, {
+    await registerActiveRoom(code, {
       maxPlayers: freshProfile?.maxPlayers ?? profile?.maxPlayers ?? 4,
       hostIsPremium: false,
       currentPlayerCount: 1,

@@ -1337,7 +1337,7 @@ export default function QuizScreen() {
     // korrigerar countet om SEED_PLAYERS injiceras eller spelare flyttas.
     // TODO (subscription): byt hardcoded `false` mot riktig profile.isPremium.
     const initialCount = reusePlayers ? Math.max(1, allPlayers.length) : 1;
-    registerActiveRoom(newCode, {
+    await registerActiveRoom(newCode, {
       maxPlayers: profile?.maxPlayers ?? 4,
       hostIsPremium: false,
       currentPlayerCount: initialCount,
@@ -1425,10 +1425,10 @@ export default function QuizScreen() {
         {
           text: 'Quit game',
           style: 'destructive',
-          onPress: () => {
+          onPress: async () => {
             const code = params.roomCode;
             if (code) {
-              deactivateRoom(code);
+              await deactivateRoom(code);
               clearLeftPlayers(code);
               clearLobbyPlayers(code);
               clearLobbySettings(code);
