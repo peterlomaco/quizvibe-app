@@ -1,82 +1,154 @@
-// Mock-store för host:s authoritative lobby-settings per rumkod. Sessions-
-// bunden in-memory Map (förstörs vid app-reload).
+// Lobby-settings-registry — Fas 3 Slice B.
 //
-// Lifecycle:
-//   • Host:s LobbyScreen skriver settings-state till storen via useEffect på
-//     varje ändring (setLobbySettings).
-//   • Non-host:s LobbyScreen poll:ar storen var 2:a sekund och syncar lokal
-//     state med host:s val. Gör att icke-host:s vy alltid speglar host:s
-//     aktuella inställningar utan event-bus.
-//   • host:s "Delete this Game Lobby" + handleQuitGame + handleCreateGame /
-//     Play Again rensar storen via clearLobbySettings för fresh slate.
+// Tidigare en sessionsbunden Map (mock); från Slice 3B backas detta av
+// Supabase `lobby_settings`-tabellen så host:s val syncas cross-device via
+// Realtime-broadcasts. Filnamnet behålls tills hela bunten är portad.
 //
-// Settings-blob:en täcker EXAKT det non-host visuellt konsumerar i Lobby:s
-// renderingstree. Lägg till nya fält här i takt med att fler host-set
-// kontroller exponeras för non-host. När backend kommer in ersätts detta
-// med en server-cache (REST/WS).
+// Skriv-mönster: bara host (RLS "host manages lobby settings" enforce:as
+// server-side via JOIN mot rooms.host_user_id = auth.uid()).
+// Läs-mönster: anyone — non-host:s LobbyScreen prenumererar via Realtime
+// + initial-load via getLobbySettings.
+
+import { supabase } from './supabase';
 
 export type LobbyGameMode = 'pass-the-phone' | 'individual-devices';
+// UI använder capitalized strings; DB lagrar lowercase enligt CHECK-
+// constraint. Adapter-funktionerna nedan översätter mellan.
 export type LobbyRegion = 'Sweden' | 'Nordics' | 'Europe' | 'Global';
+type DbRegion = 'sweden' | 'nordics' | 'europe' | 'global';
 export type LobbyAnswerResponse = 15 | 30 | 45 | 60;
 
 export interface LobbySettings {
   gameMode: LobbyGameMode;
-  // True om host har valt single-player-default; driver dimming/eject-flödet.
-  // Non-host kan inte längre vara kvar när detta blir true (de ejectas via
-  // markEjected) men host:s vy använder fortsatt fältet för dimming.
   singlePlayerDefault: boolean;
   region: LobbyRegion;
-  // Svar-tid i sekunder per fråga (driver Answer response time-radens highlight).
   answerResponseSeconds: LobbyAnswerResponse;
-  // Game Era — år-spann [from, to] som visas i den gula eraGuestBox-rutan.
   eraFrom: number;
   eraTo: number;
-  // Antal rundor — visas i den blå-bordred rutan + RoundsRuler:s aktiva tick.
   roundsCount: number;
-  // Lista över paket-id:n host har aktivt valt för denna lobby (ovanpå
-  // basic-utbudet). Driver Customized Host packages-blockets aktiva rader
-  // för non-host (filtrerad lista, read-only).
   selectedExtraPackages: string[];
-  // Game Connections — host:s on/off-toggles per källa. Non-host ser dem
-  // som Enabled/Disabled-pillar.
   youtubeEnabled: boolean;
   spotifyHostToggle: boolean;
   profilesEnabled: boolean;
 }
 
-const LOBBY_SETTINGS = new Map<string, LobbySettings>();
+interface LobbySettingsRow {
+  room_code: string;
+  game_mode: LobbyGameMode;
+  single_player_default: boolean;
+  region: DbRegion;
+  answer_response_seconds: LobbyAnswerResponse;
+  era_from: number;
+  era_to: number;
+  rounds_count: number;
+  selected_extra_packages: string[];
+  youtube_enabled: boolean;
+  spotify_host_toggle: boolean;
+  profiles_enabled: boolean;
+}
 
-/**
- * Skriver host:s settings-blob till storen. No-op vid tom rumkod. Shallow-
- * copy:ar `selectedExtraPackages` så host:s state-mutationer inte påverkar
- * non-host:s snapshot.
- */
-export function setLobbySettings(code: string, settings: LobbySettings): void {
-  if (!code) return;
-  LOBBY_SETTINGS.set(code.toUpperCase(), {
-    ...settings,
-    selectedExtraPackages: [...settings.selectedExtraPackages],
-  });
+const UI_TO_DB_REGION: Record<LobbyRegion, DbRegion> = {
+  Sweden: 'sweden',
+  Nordics: 'nordics',
+  Europe: 'europe',
+  Global: 'global',
+};
+const DB_TO_UI_REGION: Record<DbRegion, LobbyRegion> = {
+  sweden: 'Sweden',
+  nordics: 'Nordics',
+  europe: 'Europe',
+  global: 'Global',
+};
+
+function rowToSettings(row: LobbySettingsRow): LobbySettings {
+  return {
+    gameMode: row.game_mode,
+    singlePlayerDefault: row.single_player_default,
+    region: DB_TO_UI_REGION[row.region],
+    answerResponseSeconds: row.answer_response_seconds,
+    eraFrom: row.era_from,
+    eraTo: row.era_to,
+    roundsCount: row.rounds_count,
+    selectedExtraPackages: row.selected_extra_packages,
+    youtubeEnabled: row.youtube_enabled,
+    spotifyHostToggle: row.spotify_host_toggle,
+    profilesEnabled: row.profiles_enabled,
+  };
+}
+
+function settingsToRow(code: string, s: LobbySettings): LobbySettingsRow {
+  return {
+    room_code: code,
+    game_mode: s.gameMode,
+    single_player_default: s.singlePlayerDefault,
+    region: UI_TO_DB_REGION[s.region],
+    answer_response_seconds: s.answerResponseSeconds,
+    era_from: s.eraFrom,
+    era_to: s.eraTo,
+    rounds_count: s.roundsCount,
+    selected_extra_packages: [...s.selectedExtraPackages],
+    youtube_enabled: s.youtubeEnabled,
+    spotify_host_toggle: s.spotifyHostToggle,
+    profiles_enabled: s.profilesEnabled,
+  };
+}
+
+function normalizeCode(code: string): string {
+  return code.toUpperCase();
 }
 
 /**
- * Returnerar host:s aktuella settings-blob. undefined om host:en aldrig har
- * skrivit till storen — non-host:s polling tolkar då som "behåll lokal state"
- * (mock-only edge case när non-host joinar utan aktiv host).
+ * Host: UPSERT host-settings till lobby_settings (1:1 mot rooms via PK).
+ * Anropas av useEffect på alla settings-state-deps, gated på hostMode.
+ *
+ * RLS-policy "host manages lobby settings" enforce:as server-side så bara
+ * host:s session får skriva — UI:t måste oavsett gate:a anropet på
+ * hostMode för att undvika onödiga rejected writes.
  */
-export function getLobbySettings(code: string): LobbySettings | undefined {
+export async function setLobbySettings(code: string, settings: LobbySettings): Promise<void> {
+  if (!code) return;
+  const normalized = normalizeCode(code);
+  const row = settingsToRow(normalized, settings);
+  const { error } = await supabase
+    .from('lobby_settings')
+    .upsert(row, { onConflict: 'room_code' });
+  if (error) {
+    console.warn('[lobbySettings] setLobbySettings upsert failed:', error.message);
+  }
+}
+
+/**
+ * Returnerar host:s aktuella settings-blob för rummet. undefined om host
+ * ännu inte har skrivit (typiskt: non-host joinar via test-seed-kod eller
+ * fresh kod där host inte hunnit första-write:a settings).
+ */
+export async function getLobbySettings(code: string): Promise<LobbySettings | undefined> {
   if (!code) return undefined;
-  const stored = LOBBY_SETTINGS.get(code.toUpperCase());
-  return stored
-    ? { ...stored, selectedExtraPackages: [...stored.selectedExtraPackages] }
-    : undefined;
+  const normalized = normalizeCode(code);
+  const { data, error } = await supabase
+    .from('lobby_settings')
+    .select('*')
+    .eq('room_code', normalized)
+    .maybeSingle();
+  if (error) {
+    console.warn('[lobbySettings] getLobbySettings query failed:', error.message);
+    return undefined;
+  }
+  return data ? rowToSettings(data as LobbySettingsRow) : undefined;
 }
 
 /**
- * Rensar storen för en rumkod. Kallas vid lobby-radering och vid skapande/
- * återanvändande av kod så stale settings inte ärvs. Idempotent.
+ * Rensar storen för en rumkod. Anropas av host:s "Delete this Game Lobby"
+ * + handleCreateGame / Play Again-flödena. CASCADE från rooms tar bort
+ * rader automatiskt, men explicit DELETE som belt-and-suspenders.
+ *
+ * Idempotent — clear på okänd kod är no-op.
  */
-export function clearLobbySettings(code: string): void {
+export async function clearLobbySettings(code: string): Promise<void> {
   if (!code) return;
-  LOBBY_SETTINGS.delete(code.toUpperCase());
+  const normalized = normalizeCode(code);
+  const { error } = await supabase.from('lobby_settings').delete().eq('room_code', normalized);
+  if (error) {
+    console.warn('[lobbySettings] clearLobbySettings failed:', error.message);
+  }
 }

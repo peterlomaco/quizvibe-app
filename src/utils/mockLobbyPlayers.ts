@@ -1,55 +1,188 @@
-// Mock-store för host:s authoritative player-lista per rumkod. Sessionsbunden
-// in-memory Map (förstörs vid app-reload).
+// Lobby-players-registry — Fas 3 Slice B.
 //
-// Lifecycle:
-//   • Host:s LobbyScreen skriver players[]-state till storen via useEffect på
-//     varje ändring (setLobbyPlayers).
-//   • Non-host:s LobbyScreen poll:ar storen var 2:a sekund och syncar lokal
-//     player-state med host:s lista (filtrerad till approved + self).
-//   • host:s "Delete this Game Lobby"-flöde anropar clearLobbyPlayers så
-//     storen rensas tillsammans med room-meta:n.
+// Tidigare en sessionsbunden Map (mock); från Slice 3B backas detta av
+// Supabase `lobby_players`-tabellen så player-listan syncas cross-device
+// via Realtime-broadcasts. Filnamnet behålls som `mockLobbyPlayers.ts`
+// tills resten av lobby-mock-stores också är portade.
 //
-// När backend kopplas in ersätts detta med en server-cache (REST/WS) — call-
-// sites byter implementation utan signatur-ändringar.
+// Skriv-mönster:
+//   • Host: setLobbyPlayers UPSERT:ar hela lokala players[]-state vid varje
+//     ändring. Inga DELETEs i denna funktion — borttagningar (eject) sköts
+//     av separat per-row-delete-flöde (Slice 3C). RLS-policy "host manages
+//     lobby players" tillåter UPDATE av alla rader i rummet.
+//   • Non-host: upsertOwnLobbyPlayer INSERT:ar/UPDATE:ar egen rad vid join
+//     (own user_id matchar auth.uid() så RLS "authenticated can join lobby"
+//     släpper INSERT, "player can update own row" släpper UPDATE).
 //
-// Viktigt: importerar `LobbyPlayer` som type-only för att undvika runtime-
-// circulär importrelation (LobbyScreen → utils → LobbyScreen). Endast typen
-// används vid kompilering, inte koden.
+// Läs-mönster:
+//   • Båda sidor läser via getLobbyPlayers (SELECT alla rader, ORDER BY
+//     turn_order). I LobbyScreen byts 2s-polling mot Realtime-subscription
+//     på lobby_players-tabellen — getLobbyPlayers används initialt och som
+//     fallback om Realtime-channel skulle drop:as.
 
+import { supabase } from './supabase';
 import type { LobbyPlayer } from '../screens/LobbyScreen';
 
-const LOBBY_PLAYERS = new Map<string, LobbyPlayer[]>();
+// DB row-shape (snake_case). Mappar till LobbyPlayer via rowToPlayer.
+// Type-enum matchar LobbyPlayer:s 'registered' | 'guest' | 'manual'
+// ('manual' = host-added via + Add Player, ej en real account).
+interface LobbyPlayerRow {
+  id: string;
+  room_code: string;
+  player_id: string;
+  user_id: string | null;
+  name: string;
+  emoji: string;
+  avatar_uri: string | null;
+  type: 'manual' | 'guest' | 'registered';
+  age: number | null;
+  assistance: 'minimal' | 'standard' | 'full' | null;
+  hcp_override: number | null;
+  hcp_complete: boolean;
+  is_host: boolean;
+  is_ready: boolean;
+  approved: boolean;
+  turn_order: number;
+  spotify_connected: boolean;
+  lobby_edited: boolean;
+}
 
-/**
- * Skriver host:s player-lista till storen. Kallas av host:s LobbyScreen-
- * useEffect på varje ändring av players[]. Shallow-copy:ar varje spelare
- * så efterföljande mutationer i host:s state inte påverkar non-host:s
- * snapshot. No-op vid tom rumkod.
- */
-export function setLobbyPlayers(code: string, players: LobbyPlayer[]): void {
-  if (!code) return;
-  LOBBY_PLAYERS.set(code.toUpperCase(), players.map((p) => ({ ...p })));
+function rowToPlayer(row: LobbyPlayerRow): LobbyPlayer {
+  return {
+    id: row.player_id,
+    name: row.name,
+    emoji: row.emoji,
+    avatarUri: row.avatar_uri ?? undefined,
+    type: row.type,
+    age: row.age ?? undefined,
+    assistance: row.assistance ?? undefined,
+    hcpOverride: row.hcp_override ?? undefined,
+    hcpComplete: row.hcp_complete,
+    isHost: row.is_host,
+    isReady: row.is_ready,
+    approved: row.approved,
+    spotifyConnected: row.spotify_connected,
+    lobbyEdited: row.lobby_edited,
+  };
+}
+
+function playerToRow(
+  code: string,
+  player: LobbyPlayer,
+  index: number,
+  userId: string | null,
+): Omit<LobbyPlayerRow, 'id'> {
+  return {
+    room_code: code,
+    player_id: player.id,
+    user_id: userId,
+    name: player.name,
+    // LobbyPlayer.emoji är optional på Player-basen — fallback till
+    // generisk avatar-emoji så CHECK NOT NULL inte tripp:as.
+    emoji: player.emoji ?? '👤',
+    avatar_uri: player.avatarUri ?? null,
+    type: player.type ?? 'registered',
+    age: player.age ?? null,
+    assistance: player.assistance ?? null,
+    hcp_override: player.hcpOverride ?? null,
+    hcp_complete: player.hcpComplete ?? false,
+    is_host: player.isHost ?? false,
+    is_ready: player.isReady ?? false,
+    approved: player.approved ?? false,
+    turn_order: index,
+    spotify_connected: player.spotifyConnected ?? false,
+    lobby_edited: player.lobbyEdited ?? false,
+  };
+}
+
+function normalizeCode(code: string): string {
+  return code.toUpperCase();
 }
 
 /**
- * Returnerar host:s aktuella player-lista. undefined om host:en aldrig har
- * skrivit till storen (typiskt: non-host joinade via kod på device där host
- * inte är aktiv — mock-only edge case). Non-host:s LobbyScreen tolkar
- * undefined som "behåll nuvarande lokal state" så användaren inte ser sin
- * egen player-rad försvinna mellan polls.
+ * Host: skriv hela lokala players[]-state till DB:n (UPSERT på (room_code,
+ * player_id)-unique-constraint). turn_order härleds från array-index så
+ * läsning kan återställa samma ordning via ORDER BY turn_order.
+ *
+ * Ingen DELETE här — rader som tagits bort lokalt (host:s eject-flöde)
+ * behöver explicit per-row-delete i ejected-flödet (Slice 3C). Detta är
+ * medvetet konservativt så host:s state-overwrites inte råkar wipe:a en
+ * just-inserterad joiner som ännu inte syncats in i host:s local state.
+ *
+ * Anropas av useEffect på [players, roomCode] gated på hostMode.
  */
-export function getLobbyPlayers(code: string): LobbyPlayer[] | undefined {
+export async function setLobbyPlayers(code: string, players: LobbyPlayer[]): Promise<void> {
+  if (!code || players.length === 0) return;
+  const normalized = normalizeCode(code);
+  const { data: userResp } = await supabase.auth.getUser();
+  const hostUserId = userResp.user?.id ?? null;
+  const rows = players.map((p, i) =>
+    playerToRow(normalized, p, i, p.isHost ? hostUserId : null),
+  );
+  const { error } = await supabase
+    .from('lobby_players')
+    .upsert(rows, { onConflict: 'room_code,player_id' });
+  if (error) {
+    console.warn('[lobbyPlayers] setLobbyPlayers upsert failed:', error.message);
+  }
+}
+
+/**
+ * Non-host: INSERT (eller UPDATE) egen rad vid join. user_id = auth.uid()
+ * så RLS-policy "authenticated can join lobby" + "player can update own row"
+ * släpper igenom. Idempotent — re-join (component re-mount) uppdaterar
+ * raden istället för att skapa duplikat (UPSERT på unique-constraint).
+ *
+ * Använder turn_order = 999 som "queued"-placeholder; host:s setLobbyPlayers
+ * kommer skriva över till rätt index när joinaren syncas in i host:s state.
+ */
+export async function upsertOwnLobbyPlayer(code: string, player: LobbyPlayer): Promise<void> {
+  if (!code) return;
+  const normalized = normalizeCode(code);
+  const { data: userResp } = await supabase.auth.getUser();
+  const userId = userResp.user?.id ?? null;
+  const row = playerToRow(normalized, player, 999, userId);
+  const { error } = await supabase
+    .from('lobby_players')
+    .upsert(row, { onConflict: 'room_code,player_id' });
+  if (error) {
+    console.warn('[lobbyPlayers] upsertOwnLobbyPlayer failed:', error.message);
+  }
+}
+
+/**
+ * Returnerar alla spelare i rummet, ORDER BY turn_order. undefined om
+ * inget hittas (matchar tidigare mock-semantik så LobbyScreen:s polling
+ * tolkar "ingen host har skrivit än" som "behåll lokal state").
+ */
+export async function getLobbyPlayers(code: string): Promise<LobbyPlayer[] | undefined> {
   if (!code) return undefined;
-  const stored = LOBBY_PLAYERS.get(code.toUpperCase());
-  return stored ? stored.map((p) => ({ ...p })) : undefined;
+  const normalized = normalizeCode(code);
+  const { data, error } = await supabase
+    .from('lobby_players')
+    .select('*')
+    .eq('room_code', normalized)
+    .order('turn_order', { ascending: true });
+  if (error) {
+    console.warn('[lobbyPlayers] getLobbyPlayers query failed:', error.message);
+    return undefined;
+  }
+  return data && data.length > 0 ? (data as LobbyPlayerRow[]).map(rowToPlayer) : undefined;
 }
 
 /**
- * Rensar storen för en rumkod. Kallas av host:s "Delete this Game Lobby"-
- * flöde tillsammans med deactivateRoom. Idempotent — clear på okänd kod
- * är no-op.
+ * Rensar storen för en rumkod. Anropas av host:s "Delete this Game Lobby"-
+ * flöde — DELETE CASCADE på rooms tar bort rader också, men explicit
+ * DELETE här som belt-and-suspenders om host kallar clearLobbyPlayers
+ * utan att också deactivateRoom (t.ex. Quit Game från quiz.tsx).
+ *
+ * Idempotent — clear på okänd kod är no-op.
  */
-export function clearLobbyPlayers(code: string): void {
+export async function clearLobbyPlayers(code: string): Promise<void> {
   if (!code) return;
-  LOBBY_PLAYERS.delete(code.toUpperCase());
+  const normalized = normalizeCode(code);
+  const { error } = await supabase.from('lobby_players').delete().eq('room_code', normalized);
+  if (error) {
+    console.warn('[lobbyPlayers] clearLobbyPlayers failed:', error.message);
+  }
 }

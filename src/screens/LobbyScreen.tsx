@@ -44,8 +44,9 @@ import { MIN_HCP, calculateInitialHCP } from '../utils/hcp';
 import { addLeftPlayer, getLeftPlayers } from '../utils/leftPlayers';
 import { deactivateRoom, getRoomMeta, markRoomGameStarted, roomExists, setRoomMaxPlayers, setRoomPlayerCount } from '../utils/mockActiveRooms';
 import { clearEjected, isEjected, markEjected } from '../utils/ejectedPlayers';
-import { clearLobbyPlayers, getLobbyPlayers, setLobbyPlayers } from '../utils/mockLobbyPlayers';
+import { clearLobbyPlayers, getLobbyPlayers, setLobbyPlayers, upsertOwnLobbyPlayer } from '../utils/mockLobbyPlayers';
 import { clearLobbySettings, getLobbySettings, setLobbySettings } from '../utils/mockLobbySettings';
+import { supabase } from '../utils/supabase';
 import { clearGameStarted, isGameStarted, markGameStarted } from '../utils/mockStartedGames';
 import {
   GENERATION_PACKAGES,
@@ -972,13 +973,24 @@ export default function LobbyScreen() {
   // branchen som öppnar Leave-room-sheet:n istället för Profile-tabben.
   const isGuestInRoom = guestMode && !!guestName?.trim();
 
-  const [players, setPlayers] = useState<LobbyPlayer[]>(SEED_PLAYERS);
+  // Initial = tom; mount-useEffect på [code, guestMode, ..., hostMode] sätter
+  // till [SEED_PLAYERS[0]] för host eller [] för non-host. SEED_PLAYERS som
+  // initial-värde skrev tidigare 4 mock-rader till DB innan mount-effect:n
+  // hann clamp:a → 3 mock-rader stannade i DB och host:s Realtime-fetchNewJoiners
+  // ärvde in dem igen vid varje fresh lobby-entry.
+  const [players, setPlayers] = useState<LobbyPlayer[]>([]);
 
   // Eget player-id (host:s seed-id för host, eller den auto-tillagda
   // guest/joiner-id:n för non-hosts). Används av leave-flödet för att
   // markera rätt spelare som "left" i leftPlayers-storen så övriga ser
   // status:en när de öppnar lobby:n.
   const ownPlayerIdRef = useRef<string | null>(null);
+  // Markeras true när self-rad först ses i stored från DB. Används av
+  // syncFromStore för att skilja "vår INSERT har inte propagerat än"
+  // (false → injecta från prev) från "host har raderat oss via DB DELETE"
+  // (true men nu missing → trigga eject-popup). Resetas vid rumkods-byte
+  // i mount-useEffect:n.
+  const selfEverInStoredRef = useRef(false);
 
   // Gold-glow-animation för host:s Start Game-knapp. Två native-driver-loops
   // som "andas" tillsammans: halo-opacity (0.4 ↔ 0.85) + subtil scale-pulse
@@ -1030,13 +1042,16 @@ export default function LobbyScreen() {
     requestAnimationFrame(() => {
       mainScrollRef.current?.scrollTo({ y: 0, animated: false });
     });
-    // Host: starta med SEED_PLAYERS (testdata + Alex K. som host-platshållare).
-    // Non-host: starta med tom lista — polling-effekten nedan fyller i host:s
-    // authoritative spelar-lista (filtrerad till approved). Utan denna gating
-    // skulle non-host se hardcoded fake-spelare i sin vy även om host inte har
-    // godkänt dem.
-    setPlayers(hostMode ? SEED_PLAYERS : []);
+    // Host: starta med BARA host-platshållaren (Alex K. som sedan merge:as
+    // med profilens playerName/avatar via mergeProfileIntoHost). Tidigare
+    // seedades alla 4 SEED_PLAYERS men det skickar current_player_count=4
+    // till rooms-tabellen → joiners ser "Lobby is full" direkt. Mock-spelarna
+    // (Sam L./Jordan M./Casey P.) lämnas i SEED_PLAYERS-konstanten för
+    // ev. framtida QA-användning men injiceras inte längre automatiskt.
+    // Non-host: starta med tom lista — polling/Realtime fyller i host:s lista.
+    setPlayers(hostMode ? [SEED_PLAYERS[0]] : []);
     ownPlayerIdRef.current = null;
+    selfEverInStoredRef.current = false;
     // Host: seed lobby-wide settings från profil (Profile:s "Host default
     // settings"-block). Per-fält fallbacks följer den generiska spec:en
     // (Pass-the-Phone, Max 4, Global, 1981→innevarande år, ROUNDS_DEFAULT, 30 sek)
@@ -1110,6 +1125,9 @@ export default function LobbyScreen() {
           next.splice(insertAt, 0, guestPlayer);
           return next;
         });
+        // Publicera egen rad till lobby_players så host:s Realtime-channel
+        // får broadcast och hen ser den nya spelaren direkt i sin vy.
+        upsertOwnLobbyPlayer(roomCode, guestPlayer).catch(() => { /* loggas i lobbyPlayers */ });
         return;
       }
       if (!hostMode) {
@@ -1144,6 +1162,9 @@ export default function LobbyScreen() {
           next.splice(insertAt, 0, joiner);
           return next;
         });
+        // Publicera egen rad till lobby_players så host:s Realtime-channel
+        // får broadcast och hen ser den nya spelaren direkt i sin vy.
+        upsertOwnLobbyPlayer(roomCode, joiner).catch(() => { /* loggas i lobbyPlayers */ });
         return;
       }
       // Host-flödet utan carry-over: hostens id är seed-värdet '1' (Alex K.).
@@ -1571,13 +1592,23 @@ export default function LobbyScreen() {
           text: 'Delete',
           style: 'destructive',
           onPress: () => {
-            // Markera spelaren som ejected i mock-storen FÖRE filter:n så
-            // non-host:s polling-detektion (i samma player-poll-effekt nedan)
-            // kan trigga "User have been removed from this lobby"-popupen.
-            // Inverkar inte host:s flöde — host filtrerar bort raden lokalt
-            // som tidigare.
+            // 1. Markera ejected i in-memory store så non-host:s lokala
+            //    polling-detektion fortfarande triggar popupen (för spelare
+            //    på SAMMA device, t.ex. simulator-multi-instance-test).
             markEjected(roomCode, id);
+            // 2. Filter bort raden från host:s local state.
             setPlayers((prev) => prev.filter((p) => p.id !== id));
+            // 3. DELETE raden från lobby_players-DB:n. Realtime DELETE-event
+            //    broadcastas till non-host:s subscription → triggar Device B:s
+            //    eject-popup cross-device. Fire-and-forget.
+            supabase
+              .from('lobby_players')
+              .delete()
+              .eq('room_code', roomCode)
+              .eq('player_id', id)
+              .then(({ error }) => {
+                if (error) console.warn('[lobbyPlayers] eject delete failed:', error.message);
+              });
           },
         },
       ],
@@ -1912,35 +1943,42 @@ export default function LobbyScreen() {
     };
   }, [hostMode, roomCode, maxPlayers]);
 
-  // Host: skriv players[]-state till mockLobbyPlayers-storen vid varje
-  // ändring så non-hosts kan poll:a och spegla host:s authoritative lista.
-  // Gated på hostMode så non-hosts aldrig skriver tillbaka över host:s
-  // snapshot. När backend kommer in ersätts detta med WS-broadcast från
-  // host:s mutation till alla anslutna non-hosts.
+  // Host: skriv players[]-state till lobby_players-tabellen vid varje
+  // ändring så non-hosts (via Realtime-subscription) får authoritative
+  // listan direkt. Gated på hostMode så non-hosts aldrig skriver tillbaka
+  // över host:s snapshot. Fire-and-forget — UI:t väntar inte på roundtrip.
   useEffect(() => {
     if (!hostMode) return;
-    setLobbyPlayers(roomCode, players);
+    setLobbyPlayers(roomCode, players).catch(() => { /* loggas i mockLobbyPlayers */ });
   }, [hostMode, roomCode, players]);
 
   // Host: skriv host-settings (gameMode, region, era, rounds, response time,
   // packages, Game Connections-toggles) till mockLobbySettings-storen vid
   // varje ändring. Speglar samma write-pattern som players-storen ovan.
   // Non-host:s poll-effekt nedan plockar upp och syncar lokal state.
+  // Debounce-write: snabba ändringar (era-slider-drag, multi-toggle) kan
+  // generera N upserts per sekund. Utan debounce ger det Realtime-thrashing
+  // + risk att in-flight responses arriverar i fel ordning → DB hamnar
+  // i fel sluttillstånd. 300ms idle räknas som "användaren stoppade" →
+  // sista state-snapshot:en skrivs då.
   useEffect(() => {
     if (!hostMode) return;
-    setLobbySettings(roomCode, {
-      gameMode,
-      singlePlayerDefault,
-      region,
-      answerResponseSeconds,
-      eraFrom: eraValues[0],
-      eraTo: eraValues[1],
-      roundsCount,
-      selectedExtraPackages,
-      youtubeEnabled,
-      spotifyHostToggle,
-      profilesEnabled,
-    });
+    const handle = setTimeout(() => {
+      setLobbySettings(roomCode, {
+        gameMode,
+        singlePlayerDefault,
+        region,
+        answerResponseSeconds,
+        eraFrom: eraValues[0],
+        eraTo: eraValues[1],
+        roundsCount,
+        selectedExtraPackages,
+        youtubeEnabled,
+        spotifyHostToggle,
+        profilesEnabled,
+      }).catch(() => { /* loggas i mockLobbySettings */ });
+    }, 300);
+    return () => clearTimeout(handle);
   }, [
     hostMode,
     roomCode,
@@ -1956,15 +1994,22 @@ export default function LobbyScreen() {
     profilesEnabled,
   ]);
 
-  // Non-host: poll:a host-settings var 2:a sekund och spegla värden lokalt
-  // så icke-host:s vy alltid stämmer med host:s val (Game Mode, Region,
-  // Game Era, Number of Rounds, Answer response time, Packages, Game
-  // Connections-toggles). Samma 2s-mönster som maxPlayers/players-pollarna.
+  // Realtime-tick: bumpas av lobby_players + lobby_settings-channel-
+  // subscriptions nedan. Settings- och players-syncningseffekterna har
+  // den i sina deps så de re-fetchar direkt vid varje broadcast — ~200ms
+  // istället för 2s polling-fallback.
+  const [realtimeTick, setRealtimeTick] = useState(0);
+
+  // Non-host: spegla host-settings (Game Mode, Region, Game Era, Number
+  // of Rounds, Answer response time, Packages, Game Connections-toggles).
+  // Initial-fetch + 2s polling som fallback om Realtime droppar; realtime-
+  // tick i deps triggar omedelbar re-fetch vid broadcast.
   useEffect(() => {
     if (hostMode) return;
-    const syncFromStore = () => {
-      const stored = getLobbySettings(roomCode);
-      if (!stored) return;
+    let cancelled = false;
+    const syncFromStore = async () => {
+      const stored = await getLobbySettings(roomCode);
+      if (cancelled || !stored) return;
       setGameMode(stored.gameMode);
       setSinglePlayerDefault(stored.singlePlayerDefault);
       setRegion(stored.region);
@@ -1990,7 +2035,76 @@ export default function LobbyScreen() {
     };
     syncFromStore();
     const interval = setInterval(syncFromStore, 2000);
-    return () => clearInterval(interval);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [hostMode, roomCode, realtimeTick]);
+
+  // Realtime-channel (non-host): prenumererar på lobby_players + lobby_settings
+  // postgres_changes-events filtrerade på vårt roomCode. Vid varje event
+  // bumpar vi realtimeTick som triggar settings/players-syncningseffekterna
+  // att re-fetcha.
+  useEffect(() => {
+    if (hostMode || !roomCode) return;
+    const channel = supabase
+      .channel(`lobby:${roomCode}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'lobby_players', filter: `room_code=eq.${roomCode}` },
+        () => setRealtimeTick((t) => t + 1),
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'lobby_settings', filter: `room_code=eq.${roomCode}` },
+        () => setRealtimeTick((t) => t + 1),
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [hostMode, roomCode]);
+
+  // Realtime-channel (host): detekterar nya joiners via INSERT-event på
+  // lobby_players. När en joiner INSERT:ar sin rad fyrar Realtime → host
+  // re-fetchar listan och merge:ar in joiners som ännu inte finns i lokala
+  // players[]-state. Host bevarar sina lokala modifications (approve, age-
+  // edit etc.) genom att INTE överskriva existerande rader.
+  useEffect(() => {
+    if (!hostMode || !roomCode) return;
+    let cancelled = false;
+    const fetchNewJoiners = async () => {
+      const stored = await getLobbyPlayers(roomCode);
+      if (cancelled || !stored) return;
+      setPlayers((prev) => {
+        const localIds = new Set(prev.map((p) => p.id));
+        // Hoppa över rader som är host-typade (host:s eget kort hanteras
+        // separat via mergeProfileIntoHost) — vi vill bara plocka in nya
+        // joiners (registered/guest/manual som ännu inte är i lokal state).
+        const newJoiners = stored.filter((p) => !p.isHost && !localIds.has(p.id));
+        if (newJoiners.length === 0) return prev;
+        const hostIdx = prev.findIndex((p) => p.isHost);
+        const insertAt = hostIdx === -1 ? prev.length : hostIdx + 1;
+        const next = [...prev];
+        next.splice(insertAt, 0, ...newJoiners);
+        return next;
+      });
+    };
+    // Initial check direkt vid mount så ev. joiners som hunnit INSERT:a
+    // innan host:s subscription var aktiv kommer in i listan.
+    fetchNewJoiners();
+    const channel = supabase
+      .channel(`lobby_host:${roomCode}`)
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'lobby_players', filter: `room_code=eq.${roomCode}` },
+        () => fetchNewJoiners(),
+      )
+      .subscribe();
+    return () => {
+      cancelled = true;
+      supabase.removeChannel(channel);
+    };
   }, [hostMode, roomCode]);
 
   // Non-host: poll:a host:s player-lista var 2:a sekund och rebuild local
@@ -2034,14 +2148,33 @@ export default function LobbyScreen() {
       // approved-status — vi läser samma stored array som syncen nedan
       // använder för att avgöra approval.
       if (ownId && isGameStarted(roomCode)) {
-        const stored = getLobbyPlayers(roomCode);
+        const stored = await getLobbyPlayers(roomCode);
+        if (cancelled) return;
         const selfApproved = !!stored?.find((p) => p.id === ownId)?.approved;
         if (!selfApproved) {
           if (!cancelled) setStartedWithoutMeDetected(true);
           return;
         }
       }
-      const stored = getLobbyPlayers(roomCode);
+      const stored = await getLobbyPlayers(roomCode);
+      if (cancelled) return;
+      // DB-eject-detection: om self-rad TIDIGARE syntes i stored men nu är
+      // borta → host har raderat oss via lobby_players DELETE. Triggar
+      // samma popup som in-memory-baserad markEjected. Guard:as på
+      // selfEverInStoredRef så vi inte felaktigt fyrar innan vår egen
+      // INSERT hunnit propagera till första stored-läsning.
+      if (ownId && stored && selfEverInStoredRef.current) {
+        const selfStillThere = stored.some((p) => p.id === ownId);
+        if (!selfStillThere) {
+          if (!cancelled) setPlayerEjectedDetected(true);
+          return;
+        }
+      }
+      // Markera när self först syns i stored så framtida frånvaro räknas
+      // som faktisk ejection (inte bara att vår INSERT inte hunnit än).
+      if (ownId && stored?.some((p) => p.id === ownId)) {
+        selfEverInStoredRef.current = true;
+      }
       const leftSnapshots = await getLeftPlayers(roomCode);
       if (cancelled) return;
       const leftIds = new Set(leftSnapshots.map((s) => s.id));
@@ -2087,8 +2220,17 @@ export default function LobbyScreen() {
           : false;
         let next: LobbyPlayer[] = approvedFromHost;
         if (ownId && !selfInHostList) {
-          const selfRow = prev.find((p) => p.id === ownId);
-          if (selfRow) next = [...next, selfRow];
+          // Hämta senaste self-data från DB-stored (inte prev local state)
+          // så approved/age/etc. reflekterar host:s nyligen synkade ändringar.
+          // Annars skulle host:s "unapprove" slå igenom på övriga vyer men
+          // self-rad fortsätter visa stale approved=true.
+          const selfRow = stored?.find((p) => p.id === ownId)
+            ?? prev.find((p) => p.id === ownId);
+          if (selfRow) {
+            // Applicera hasLeft från left-snapshots även på self-rad
+            const hasLeft = leftIds.has(selfRow.id);
+            next = [...next, { ...selfRow, hasLeft }];
+          }
         }
         // Orphan-left: snapshot:s som inte längre finns i host:s lista men
         // som har lämnat — visa kortet med hasLeft=true så non-host ser
@@ -2118,7 +2260,7 @@ export default function LobbyScreen() {
       cancelled = true;
       clearInterval(interval);
     };
-  }, [hostMode, roomCode]);
+  }, [hostMode, roomCode, realtimeTick]);
 
   // När detection-state slår till: visa native Alert med OK-knapp som
   // tar non-host:en till Home. cancelable:false så användaren inte kan
@@ -2467,30 +2609,52 @@ export default function LobbyScreen() {
               style={styles.singlePlayerRow}
               activeOpacity={0.7}
               onPress={() => {
-                setSinglePlayerDefault((v) => {
-                  const next = !v;
-                  if (next) {
-                    // Toggle ON: lobby:n växlar till single-player → kasta
-                    // ut alla non-host-spelare. Mark dem som ejected i
-                    // mock-storen så deras polling triggar samma "User have
-                    // been removed from this lobby"-popup → OK → Home, som
-                    // host:s trash-action gör. Filtrera bort dem direkt ur
-                    // host:s lokal state så host:s vy visar bara host:en kvar.
-                    // hasLeft-spelare lämnas orörda — de är redan borta och
-                    // behöver inte markeras igen.
-                    players.forEach((p) => {
-                      if (!p.isHost && !p.hasLeft) markEjected(roomCode, p.id);
-                    });
-                    setPlayers((prev) => prev.filter((p) => p.isHost));
-                  } else {
-                    // Uncheck → defaulta till gratis-läget på BÅDA
-                    // toggles (Pass-the-Phone + Max 4) så lobby:n hamnar
-                    // i ett konsekvent multiplayer-läge.
-                    setGameMode('pass-the-phone');
-                    setMaxPlayers(4);
+                if (!singlePlayerDefault) {
+                  // Försöker toggla ON → confirmation-popup först om det
+                  // finns non-host-spelare som kommer ejectas. Endast host
+                  // som är ensam i lobbyn slipper popupen (inget att radera).
+                  const ejectables = players.filter((p) => !p.isHost && !p.hasLeft);
+                  if (ejectables.length === 0) {
+                    setSinglePlayerDefault(true);
+                    return;
                   }
-                  return next;
-                });
+                  Alert.alert(
+                    'Switch to single-player mode?',
+                    'Play single player mode will delete players in lobby. Still want to play single player?',
+                    [
+                      { text: 'No', style: 'cancel' },
+                      {
+                        text: 'Yes',
+                        style: 'destructive',
+                        onPress: () => {
+                          // Mark in-memory (för same-device polling-test) +
+                          // DELETE från lobby_players-DB:n så Realtime-event
+                          // når non-host:s subscription → eject-popup.
+                          ejectables.forEach((p) => {
+                            markEjected(roomCode, p.id);
+                            supabase
+                              .from('lobby_players')
+                              .delete()
+                              .eq('room_code', roomCode)
+                              .eq('player_id', p.id)
+                              .then(({ error }) => {
+                                if (error) console.warn('[lobbyPlayers] single-player eject failed:', error.message);
+                              });
+                          });
+                          setPlayers((prev) => prev.filter((p) => p.isHost));
+                          setSinglePlayerDefault(true);
+                        },
+                      },
+                    ],
+                  );
+                } else {
+                  // Toggle OFF → defaulta till gratis-läget på BÅDA
+                  // toggles (Pass-the-Phone + Max 4) så lobby:n hamnar
+                  // i ett konsekvent multiplayer-läge.
+                  setGameMode('pass-the-phone');
+                  setMaxPlayers(4);
+                  setSinglePlayerDefault(false);
+                }
               }}
             >
               <View
