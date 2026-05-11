@@ -1,4 +1,14 @@
 # Musikartister kända för Millennials.
+#
+# Music question tagging (V1):
+# - Items utan explicita inBaseCatalog/genrePackages-fält faller på default
+#   inBaseCatalog=true + genrePackages=[] (= pure base, alla hostar får).
+# - Eminem visas som exempel på genre-tagging: med både inBaseCatalog=true
+#   OCH genrePackages=["pkg-hiphop"] hamnar han i base-poolen + extra-pool för
+#   hostar som aktiverat Hip Hop-paketet. För genre-only sätt inBaseCatalog=false.
+# - Genre-paket-id:n MÅSTE matcha src/utils/mockPurchasedPackages.ts
+#   (pkg-hiphop, pkg-rock idag). Andra strängar gör att items aldrig surfar
+#   eftersom inget paket aktiverar dem.
 audience: ["millennials"]
 category: artists
 items:
@@ -20,3 +30,5 @@ items:
     probability: 94
     wikimediaSearchHints: ["Eminem rapper"]
     answerMethods: ["timeline", "name-letters"]
+    inBaseCatalog: true
+    genrePackages: ["pkg-hiphop"]

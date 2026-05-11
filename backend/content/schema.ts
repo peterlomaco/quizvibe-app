@@ -147,6 +147,20 @@ export const ContentItemSchema = z.object({
   // 'sensitive' = motiv kräver extra omtanke vid bildval. Default-filtreras
   // bort av spel-API:t.
   sensitivity: SensitivitySchema.default('standard'),
+  // Music question tagging (V1 launch — endast musik-items är aktiva).
+  // Varje item måste signalera om det hör hemma i base-utbudet (alla
+  // hostar får oavsett köpta paket) och/eller är knutet till ett eller
+  // flera genre-Host-paket. Defaulten 'inBaseCatalog=true + genrePackages=[]'
+  // = bakåt-kompatibel (alla existerande items hamnar i base utan att
+  // någon YAML behöver röras). När en host aktiverar ett genre-paket
+  // (t.ex. pkg-hiphop) ska items med matchande genrePackages[] addera
+  // ovanpå base-poolen — items kan vara i båda eller bara genre.
+  // OBS: generations-paket (pkg-gen-millennials etc.) använder INTE detta
+  // fält — där härleds tillhörighet ur fil-nivåns `audience`-fält. Endast
+  // genre-paket (pkg-hiphop, pkg-rock m.fl.) listas i `genrePackages`.
+  // Se memory/project_music_question_tagging.md för fullständig spec.
+  inBaseCatalog: z.boolean().default(true),
+  genrePackages: z.array(z.string().min(1)).default([]),
   notes: z.string().optional(),
 })
   .refine(
@@ -179,6 +193,13 @@ export const ContentItemSchema = z.object({
       return item.media.endSec > item.media.startSec;
     },
     { message: 'youtube media endSec must be > startSec' },
+  )
+  .refine(
+    (item) => item.inBaseCatalog || item.genrePackages.length > 0,
+    {
+      message:
+        'item must be in base catalog (inBaseCatalog=true) and/or tagged with at least one genrePackages entry; orphan items (both empty) are not allowed',
+    },
   );
 export type ContentItem = z.infer<typeof ContentItemSchema>;
 

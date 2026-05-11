@@ -7,14 +7,26 @@ describe('content catalog', () => {
     expect(() => loadCatalog()).not.toThrow();
   });
 
-  it('contains at least one persons, capitals, and artists file', () => {
+  it('default load contains music-only categories (V1 launch scope)', () => {
     const { files } = loadCatalog();
+    const categories = new Set(
+      Array.from(files.values()).map((f) => f.category),
+    );
+    expect(categories.has('artists')).toBe(true);
+    expect(categories.has('songs')).toBe(true);
+    // persons + capitals flyttade till deferred/ — inte aktiva i V1.
+    expect(categories.has('persons')).toBe(false);
+    expect(categories.has('capitals')).toBe(false);
+  });
+
+  it('deferred catalog still validates against schema when opted-in', () => {
+    expect(() => loadCatalog(undefined, { includeDeferred: true })).not.toThrow();
+    const { files } = loadCatalog(undefined, { includeDeferred: true });
     const categories = new Set(
       Array.from(files.values()).map((f) => f.category),
     );
     expect(categories.has('persons')).toBe(true);
     expect(categories.has('capitals')).toBe(true);
-    expect(categories.has('artists')).toBe(true);
   });
 
   it('every item has at least one wikimedia search hint', () => {
@@ -73,22 +85,25 @@ describe('content catalog', () => {
     }
   });
 
-  it('findItemsForAudience returns expected matches', () => {
+  it('findItemsForAudience returns expected music matches', () => {
     const catalog = loadCatalog();
     const millennials = findItemsForAudience(catalog, 'millennials');
     expect(millennials.length).toBeGreaterThan(0);
-    // Capitals med audience='all' ska komma med också
+    // Songs med audience='all' ska komma med också (universella låtar).
     const allCategories = new Set(
       millennials.map((m) => {
         const file = catalog.files.get(m.filename);
         return file?.category;
       }),
     );
-    expect(allCategories.has('capitals')).toBe(true);
+    expect(allCategories.has('songs')).toBe(true);
   });
 
-  it('findItemsForAudience excludes sensitive items by default', () => {
-    const catalog = loadCatalog();
+  it('findItemsForAudience excludes sensitive items by default (deferred opt-in)', () => {
+    // Sensitive items (Hitler/Stalin) ligger i persons-* som flyttats till
+    // deferred/. Vi måste opt-in:a för att se dem alls; default-vyn har redan
+    // ingen exponering av dessa.
+    const catalog = loadCatalog(undefined, { includeDeferred: true });
     const elder = findItemsForAudience(catalog, 'elder');
     const ids = elder.map((m) => m.item.id);
     expect(ids).not.toContain('adolf-hitler');
@@ -96,7 +111,7 @@ describe('content catalog', () => {
   });
 
   it('findItemsForAudience includes sensitive items when explicitly requested', () => {
-    const catalog = loadCatalog();
+    const catalog = loadCatalog(undefined, { includeDeferred: true });
     const elder = findItemsForAudience(catalog, 'elder', {
       excludeSensitive: false,
     });
@@ -105,9 +120,10 @@ describe('content catalog', () => {
     expect(ids).toContain('josef-stalin');
   });
 
-  it('findItemsById finds known cross-audience figures', () => {
-    const catalog = loadCatalog();
-    // Zlatan finns i Peters listor under millennials OCH gen-z
+  it('findItemsById finds known cross-audience figures in deferred catalog', () => {
+    // Zlatan finns i Peters listor under millennials OCH gen-z (båda i persons-*
+    // som ligger i deferred/ — post-V1-release).
+    const catalog = loadCatalog(undefined, { includeDeferred: true });
     const zlatan = findItemsById(catalog, 'zlatan-ibrahimovic');
     expect(zlatan.length).toBeGreaterThanOrEqual(2);
   });
@@ -191,6 +207,64 @@ describe('schema rejection', () => {
       ],
     });
     expect(result.success).toBe(true);
+  });
+
+  it('defaults inBaseCatalog=true and genrePackages=[] when fields omitted', () => {
+    const result = ContentItemSchema.safeParse({
+      id: 'untagged',
+      displayName: 'Untagged',
+      correctYear: 1990,
+      probability: 50,
+      wikimediaSearchHints: ['x'],
+      answerMethods: ['timeline'],
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.inBaseCatalog).toBe(true);
+      expect(result.data.genrePackages).toEqual([]);
+    }
+  });
+
+  it('accepts item tagged with a genre package and base=true (cross-tagged)', () => {
+    const result = ContentItemSchema.safeParse({
+      id: 'eminem-like',
+      displayName: 'Eminem-like',
+      correctYear: 1972,
+      probability: 90,
+      wikimediaSearchHints: ['x'],
+      answerMethods: ['timeline'],
+      inBaseCatalog: true,
+      genrePackages: ['pkg-hiphop'],
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('accepts item that is genre-only (not in base)', () => {
+    const result = ContentItemSchema.safeParse({
+      id: 'genre-only',
+      displayName: 'Genre Only',
+      correctYear: 1995,
+      probability: 80,
+      wikimediaSearchHints: ['x'],
+      answerMethods: ['timeline'],
+      inBaseCatalog: false,
+      genrePackages: ['pkg-rock'],
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('rejects orphan item (not in base and no genre packages)', () => {
+    const result = ContentItemSchema.safeParse({
+      id: 'orphan',
+      displayName: 'Orphan',
+      correctYear: 1990,
+      probability: 50,
+      wikimediaSearchHints: ['x'],
+      answerMethods: ['timeline'],
+      inBaseCatalog: false,
+      genrePackages: [],
+    });
+    expect(result.success).toBe(false);
   });
 
   it('rejects duplicate item ids in a file', () => {

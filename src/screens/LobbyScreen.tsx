@@ -2898,7 +2898,7 @@ export default function LobbyScreen() {
                 </Svg>
                 <Text style={styles.connectionIconAiText}>AI</Text>
               </View>
-              <Text style={styles.connectionLabel}>Profiles & Places</Text>
+              <Text style={styles.connectionLabel}>Images</Text>
               {/* FREE-badgen sitter alltid kvar (samma mönster som YouTube) —
                   grön i Enabled, grå i Disabled. */}
               <View style={profilesEnabled ? styles.youtubeEnabledPill : styles.statusPillDisabled}>
@@ -4527,7 +4527,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   // Grey overrides för freeBadgeSmall + freeBadgeTextSmall som appliceras när
-  // host stängt av en gratis-funktion (YouTube eller Profiles & Places). FREE-
+  // host stängt av en gratis-funktion (YouTube eller Images). FREE-
   // badgen behålls för att kommunicera "ingår utan kostnad", men dämpas till
   // grått så pillen tydligt läses som Disabled.
   freeBadgeSmallGrey: {
@@ -4630,7 +4630,7 @@ const styles = StyleSheet.create({
     paddingTop: Spacing.xs,
     paddingBottom: Spacing.xs,
     // Extra luft ovanför så "Customized Host packages"-rubriken inte
-    // hamnar för nära Profiles & Places-radens switch ovanför.
+    // hamnar för nära Images-radens switch ovanför.
     marginTop: Spacing.md,
   },
   usePackagesLabel: {
@@ -4824,18 +4824,19 @@ const styles = StyleSheet.create({
     fontWeight: FontWeight.medium,
     color: Colors.textPrimary,
     // Reservera samma horisontella utrymme för alla labels så efterföljande
-    // status-pillar (YouTubes Enabled / Spotifys Enabled-Disabled / Profiles
-    // & Places Enabled-Disabled) linjerar exakt under varandra trots att
-    // labels har olika pixel-bredd i proportionell font. Värdet måste rymma
-    // den bredaste labeln ("Profiles & Places") — annars trycks just den
-    // radens pill till höger och bryter linjeringen. Värdet är paret med
-    // connectionRow.paddingRight (18) så att pillarna och switcharna båda
-    // shiftas vänster med 18px och linjerar med paketlistans switchar.
+    // status-pillar (YouTubes Enabled / Spotifys Enabled-Disabled / Images
+    // Enabled-Disabled) linjerar exakt under varandra trots att labels har
+    // olika pixel-bredd i proportionell font. Värdet rymmer den bredaste
+    // labeln (idag "YouTube" / "Spotify" / "Images" — alla under 100 px) med
+    // marginal — annars trycks just den radens pill till höger och bryter
+    // linjeringen. Värdet är paret med connectionRow.paddingRight (18) så
+    // att pillarna och switcharna båda shiftas vänster med 18px och linjerar
+    // med paketlistans switchar.
     minWidth: 112,
   },
   // Spotify-radens label + info-ikon ligger i en gemensam grupp som upptar
   // samma minWidth (130) som plain connectionLabel — då stannar pillen och
-  // switchen i linje med YouTube- och Profiles & Places-radernas. Texten
+  // switchen i linje med YouTube- och Images-radernas. Texten
   // inuti måste få minWidth: 0 (via connectionLabelInGroup) för att inte
   // själv ta hela 130px och skuffa info-ikonen utanför gruppens bredd.
   connectionLabelGroup: {

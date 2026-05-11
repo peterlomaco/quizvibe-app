@@ -20,4 +20,6 @@ items:
     probability: 92
     wikimediaSearchHints: ["Metallica band"]
     answerMethods: ["timeline", "name-letters"]
+    inBaseCatalog: true
+    genrePackages: ["pkg-rock"]
     notes: "Grupp; correctYear = formation-år."

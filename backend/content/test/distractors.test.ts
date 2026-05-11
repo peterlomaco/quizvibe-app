@@ -58,7 +58,7 @@ describe('getPrefixForItem', () => {
 
 describe('buildLetterGrid', () => {
   it('includes the correct prefix exactly once', () => {
-    const catalog = loadCatalog();
+    const catalog = loadCatalog(undefined, { includeDeferred: true });
     const correct = findItemsById(catalog, 'cristiano-ronaldo')[0].item;
     const grid = buildLetterGrid({
       catalog,
@@ -75,7 +75,7 @@ describe('buildLetterGrid', () => {
   });
 
   it('returns up to totalOptions unique prefixes', () => {
-    const catalog = loadCatalog();
+    const catalog = loadCatalog(undefined, { includeDeferred: true });
     const correct = findItemsById(catalog, 'abba')[0].item;
     const grid = buildLetterGrid({
       catalog,
@@ -92,7 +92,7 @@ describe('buildLetterGrid', () => {
   });
 
   it('respects totalOptions parameter', () => {
-    const catalog = loadCatalog();
+    const catalog = loadCatalog(undefined, { includeDeferred: true });
     const correct = findItemsById(catalog, 'astrid-lindgren')[0].item;
     const grid = buildLetterGrid({
       catalog,
@@ -109,7 +109,7 @@ describe('buildLetterGrid', () => {
   it('falls back to broader pool when audience-pool is too small', () => {
     // capitals-elder.yaml har bara 1 item (Moscow). För Moscow ska vi
     // hämta distractor-prefixer från övriga capitals-filer (London, Paris...).
-    const catalog = loadCatalog();
+    const catalog = loadCatalog(undefined, { includeDeferred: true });
     const correct = findItemsById(catalog, 'moscow')[0].item;
     const grid = buildLetterGrid({
       catalog,
@@ -127,7 +127,7 @@ describe('buildLetterGrid', () => {
   });
 
   it('excludes sensitive items by default', () => {
-    const catalog = loadCatalog();
+    const catalog = loadCatalog(undefined, { includeDeferred: true });
     // Welch Hitler skulle ge prefix "AD" (Adolf), Stalin "JO" (Josef).
     // Vid minimal assistance (1 bokstav) skulle vi få "A" och "J" — lätt att verifiera frånvaro.
     const correct = findItemsById(catalog, 'winston-churchill')[0].item;
@@ -145,7 +145,7 @@ describe('buildLetterGrid', () => {
   });
 
   it('produces deterministic output with the same seed', () => {
-    const catalog = loadCatalog();
+    const catalog = loadCatalog(undefined, { includeDeferred: true });
     const correct = findItemsById(catalog, 'avicii')[0].item;
     const args = {
       catalog,
@@ -162,7 +162,7 @@ describe('buildLetterGrid', () => {
   it('fills to totalOptions even for capitals where catalog is tiny (uses distractor-pool)', () => {
     // capitals-elder.yaml har bara 1 item (Moscow). capitals totalt = 9.
     // Med distractor-pool fallback ska vi alltid kunna fylla 10 unika prefixer.
-    const catalog = loadCatalog();
+    const catalog = loadCatalog(undefined, { includeDeferred: true });
     const correct = findItemsById(catalog, 'moscow')[0].item;
     const grid = buildLetterGrid({
       catalog,
@@ -178,7 +178,7 @@ describe('buildLetterGrid', () => {
 
 describe('buildNameOptions', () => {
   it('includes correct item when correct prefix is selected', () => {
-    const catalog = loadCatalog();
+    const catalog = loadCatalog(undefined, { includeDeferred: true });
     const correct = findItemsById(catalog, 'lionel-messi')[0].item;
     const options = buildNameOptions({
       catalog,
@@ -194,7 +194,7 @@ describe('buildNameOptions', () => {
   });
 
   it('does NOT include correct item when wrong prefix is selected', () => {
-    const catalog = loadCatalog();
+    const catalog = loadCatalog(undefined, { includeDeferred: true });
     const correct = findItemsById(catalog, 'lionel-messi')[0].item;
     // Spelaren valde "ZL" (Zlatan), men rätt motiv är Messi (LI). Inget rätt-svar i listan.
     const options = buildNameOptions({
@@ -211,7 +211,7 @@ describe('buildNameOptions', () => {
   });
 
   it('all options have the same prefix as selectedPrefix', () => {
-    const catalog = loadCatalog();
+    const catalog = loadCatalog(undefined, { includeDeferred: true });
     const correct = findItemsById(catalog, 'cristiano-ronaldo')[0].item;
     const options = buildNameOptions({
       catalog,
@@ -230,7 +230,7 @@ describe('buildNameOptions', () => {
   it('dedupes items that appear in multiple files (cross-audience)', () => {
     // Zlatan finns i både millennials och gen-z. Han ska bara dyka upp en gång
     // även om audience-pool inkluderar båda filerna.
-    const catalog = loadCatalog();
+    const catalog = loadCatalog(undefined, { includeDeferred: true });
     const correct = findItemsById(catalog, 'zlatan-ibrahimovic')[0].item;
     const options = buildNameOptions({
       catalog,
@@ -247,7 +247,7 @@ describe('buildNameOptions', () => {
   });
 
   it('produces deterministic output with the same seed', () => {
-    const catalog = loadCatalog();
+    const catalog = loadCatalog(undefined, { includeDeferred: true });
     const correct = findItemsById(catalog, 'mrbeast')[0].item;
     const args = {
       catalog,
@@ -263,7 +263,7 @@ describe('buildNameOptions', () => {
   });
 
   it('returns at most totalOptions when wrong prefix is selected', () => {
-    const catalog = loadCatalog();
+    const catalog = loadCatalog(undefined, { includeDeferred: true });
     const correct = findItemsById(catalog, 'lionel-messi')[0].item;
     const options = buildNameOptions({
       catalog,
@@ -279,7 +279,7 @@ describe('buildNameOptions', () => {
   });
 
   it('all options have source field set to catalog or pool', () => {
-    const catalog = loadCatalog();
+    const catalog = loadCatalog(undefined, { includeDeferred: true });
     const correct = findItemsById(catalog, 'astrid-lindgren')[0].item;
     const options = buildNameOptions({
       catalog,
@@ -299,7 +299,7 @@ describe('buildNameOptions', () => {
     // distractor-pool.yaml innehåller "Anna Bergström" → multi-name prefix 'AN BE'.
     // För Millennials-spelare (där Avicii är correct, prefix 'AV') simulerar vi
     // att spelaren tappar fel prefix 'AN BE' — pool-fallback ska returnera Anna.
-    const catalog = loadCatalog();
+    const catalog = loadCatalog(undefined, { includeDeferred: true });
     const correct = findItemsById(catalog, 'avicii')[0].item;
     const options = buildNameOptions({
       catalog,
@@ -318,7 +318,7 @@ describe('buildNameOptions', () => {
   });
 
   it('pool-options have itemId starting with "pool:"', () => {
-    const catalog = loadCatalog();
+    const catalog = loadCatalog(undefined, { includeDeferred: true });
     const correct = findItemsById(catalog, 'avicii')[0].item;
     const options = buildNameOptions({
       catalog,

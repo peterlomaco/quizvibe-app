@@ -28,6 +28,7 @@ import {
 } from '@/src/utils/playerName';
 import { containsProfanity } from '@/src/utils/profanity';
 import { clearProfile, loadProfile, saveProfile, type ProfileData } from '@/src/utils/profileStorage';
+import { supabase } from '@/src/utils/supabase';
 import { formatRoomCode, generateRoomCode, isBlockedLetterPair, isLetterCellIndex, ROOM_CODE_DIGITS, ROOM_CODE_LEADING_LETTERS, ROOM_CODE_LENGTH, ROOM_CODE_TRAILING_LETTERS } from '@/src/utils/roomCode';
 import { loadInvites, removeInvite, type WaitingInvite } from '@/src/utils/waitingInvites';
 import { Nunito_400Regular, Nunito_600SemiBold, Nunito_700Bold, useFonts } from '@expo-google-fonts/nunito';
@@ -1377,20 +1378,61 @@ export default function HomeScreen() {
     const trimmed = loginPlayerName.trim();
     if (!trimmed || !loginPassword.trim()) return;
     const isEmail = trimmed.includes('@');
-    const playerName = isEmail ? trimmed.split('@')[0] : trimmed;
-    const minimalProfile: ProfileData = {
-      playerName: playerName,
-      birthYear: null,
-      assistance: null,
-      region: null,
-      avatarSource: 'default',
-      selectedAvatarId: '',
-    };
-    await saveProfile(minimalProfile);
-    setProfile(minimalProfile);
-    // TODO (auth): byt playerName mot riktig user-id (UUID från backend).
-    identify(playerName);
-    track('user_logged_in', { method: isEmail ? 'email' : 'player_name' });
+    // Fas 1 — Supabase auth kräver email. PlayerName-only-login kräver en
+    // playerName→email-lookup mot profiles-tabellen som tillkommer i Fas 2.
+    if (!isEmail) {
+      Alert.alert(
+        'Use email to log in',
+        'Player Name login is coming soon. Please log in with the email address you registered with.',
+      );
+      return;
+    }
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: trimmed,
+      password: loginPassword,
+    });
+    if (error) {
+      Alert.alert('Login failed', error.message);
+      return;
+    }
+    if (!data.user) {
+      Alert.alert('Login failed', 'Could not sign in. Please try again.');
+      return;
+    }
+    // Försök läsa AsyncStorage-profilen (cache från senaste registrering på
+    // denna enhet). Om den tillhör en annan email (= annan user loggade in
+    // på samma enhet) byggs en minimal profil från user_metadata.
+    const cached = await loadProfile();
+    const meta = (data.user.user_metadata ?? {}) as Record<string, unknown>;
+    const metaPlayerName = typeof meta.playerName === 'string' ? meta.playerName : null;
+    const metaBirthYear = typeof meta.birthYear === 'number' ? meta.birthYear : null;
+    const metaAssistance =
+      meta.assistance === 'minimal' || meta.assistance === 'standard' || meta.assistance === 'full'
+        ? (meta.assistance as ProfileData['assistance'])
+        : null;
+    const metaRegion =
+      meta.region === 'sweden' || meta.region === 'nordics' || meta.region === 'global'
+        ? (meta.region as ProfileData['region'])
+        : null;
+    const useCached = cached && cached.email === trimmed;
+    const nextProfile: ProfileData = useCached
+      ? cached
+      : {
+          playerName: metaPlayerName ?? trimmed.split('@')[0],
+          email: trimmed,
+          birthYear: metaBirthYear,
+          assistance: metaAssistance,
+          region: metaRegion,
+          avatarSource: 'default',
+          selectedAvatarId: '',
+        };
+    await saveProfile(nextProfile);
+    setProfile(nextProfile);
+    const traits: Record<string, string | number | boolean | null> = {};
+    if (nextProfile.assistance) traits.assistance = nextProfile.assistance;
+    if (nextProfile.region) traits.region = nextProfile.region;
+    identify(data.user.id, traits);
+    track('user_logged_in', { method: 'email' });
     setProfileMenuVisible(false);
   };
 
@@ -1555,10 +1597,34 @@ export default function HomeScreen() {
   const handleRegisterSubmit = async () => {
     if (!isRegisterFormValid || regParsedBirthYear === null) return;
     const trimmedEmail = regEmail.trim();
+    const normalizedPlayerName = normalizePlayerName(regPlayerName.trim());
+    // Fas 1 — Supabase auth (email + password). Profil-fält (playerName,
+    // birthYear, assistance, region) skickas som user_metadata så de
+    // sparas server-side direkt, men AsyncStorage-profilen behålls som
+    // local cache så övriga skärmar fungerar oförändrat tills Fas 2 byter
+    // dem mot Supabase profiles-tabellen.
+    const { data, error } = await supabase.auth.signUp({
+      email: trimmedEmail,
+      password: regPassword,
+      options: {
+        data: {
+          playerName: normalizedPlayerName,
+          birthYear: regParsedBirthYear,
+          assistance: regAssistance,
+          region: regRegion,
+        },
+      },
+    });
+    if (error) {
+      Alert.alert('Registration failed', error.message);
+      return;
+    }
+    if (!data.user) {
+      Alert.alert('Registration failed', 'Could not create account. Please try again.');
+      return;
+    }
     const newProfile: ProfileData = {
-      // Strippa ev. trailing dash så namn utan digits sparas som "Anna"
-      // (inte "Anna-") och visas konsistent i lobby/profile/leaderboard.
-      playerName: normalizePlayerName(regPlayerName.trim()),
+      playerName: normalizedPlayerName,
       email: trimmedEmail,
       birthYear: regParsedBirthYear,
       assistance: regAssistance,
@@ -1568,19 +1634,12 @@ export default function HomeScreen() {
     };
     await saveProfile(newProfile);
     setProfile(newProfile);
-    // TODO (auth): byt playerName mot riktig user-id (UUID från backend).
-    identify(newProfile.playerName, { assistance: regAssistance, region: regRegion });
+    identify(data.user.id, { assistance: regAssistance, region: regRegion });
     track('user_registered', { assistance: regAssistance, region: regRegion });
     setProfileMenuVisible(false);
-    Alert.alert(
-      'Activation email sent',
-      `We've sent an activation link to ${trimmedEmail}. Tap the link to verify your account.`,
-    );
   };
 
-  // Bekräftar och loggar ut. "Logout" rensar profilen från AsyncStorage.
-  // TODO (auth): när riktig auth finns ska detta också rensa session/token,
-  // inte själva profildatan.
+  // Bekräftar och loggar ut. Rensar Supabase-sessionen + AsyncStorage-cachen.
   const handleLogout = () => {
     Alert.alert(
       'Log out?',
@@ -1591,6 +1650,12 @@ export default function HomeScreen() {
           text: 'Log out',
           style: 'destructive',
           onPress: async () => {
+            const { error } = await supabase.auth.signOut();
+            if (error) {
+              // Forsätt med lokal cleanup ändå — session kan ha gått ut server-side
+              // utan att klienten vet. Logga för diagnostik.
+              console.warn('supabase signOut error:', error.message);
+            }
             await clearProfile();
             setProfile(null);
             track('user_logged_out');
