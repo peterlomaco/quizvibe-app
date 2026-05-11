@@ -36,6 +36,10 @@ export interface RoomMeta {
   // använda Join Game från device B med koden från device A). Lowercase-
   // jämförelse i isOwnLobby så case-mismatch inte slipper igenom.
   hostPlayerName: string;
+  // True när host tryckt Start Game (markRoomGameStarted satte rooms.game_started=true).
+  // Non-host:s Realtime-subscription på rooms-tabellen läser detta för att
+  // navigera approved spelare till /quiz när host startar (Slice 3C-i).
+  gameStarted: boolean;
 }
 
 // Dev/test-seeds som lagras lokalt i minnet (inte i DB) så de alltid är
@@ -44,10 +48,10 @@ export interface RoomMeta {
 //
 // Lookup-ordning: DB först (riktiga rum), sedan dessa seeds.
 const TEST_ROOM_SEEDS = new Map<string, RoomMeta>([
-  ['AB23XY', { maxPlayers: 4, hostIsPremium: false, currentPlayerCount: 1, hostPlayerName: 'TestSeedHost1' }],
-  ['QV45LV', { maxPlayers: 12, hostIsPremium: true, currentPlayerCount: 1, hostPlayerName: 'TestSeedHost2' }],
-  ['AB99FF', { maxPlayers: 4, hostIsPremium: false, currentPlayerCount: 4, hostPlayerName: 'TestSeedHost3' }],
-  ['QV99FF', { maxPlayers: 12, hostIsPremium: true, currentPlayerCount: 12, hostPlayerName: 'TestSeedHost4' }],
+  ['AB23XY', { maxPlayers: 4, hostIsPremium: false, currentPlayerCount: 1, hostPlayerName: 'TestSeedHost1', gameStarted: false }],
+  ['QV45LV', { maxPlayers: 12, hostIsPremium: true, currentPlayerCount: 1, hostPlayerName: 'TestSeedHost2', gameStarted: false }],
+  ['AB99FF', { maxPlayers: 4, hostIsPremium: false, currentPlayerCount: 4, hostPlayerName: 'TestSeedHost3', gameStarted: false }],
+  ['QV99FF', { maxPlayers: 12, hostIsPremium: true, currentPlayerCount: 12, hostPlayerName: 'TestSeedHost4', gameStarted: false }],
 ]);
 
 // DB row-shape (snake_case). Mappar till RoomMeta via rowToMeta nedan.
@@ -68,6 +72,7 @@ function rowToMeta(row: RoomRow): RoomMeta {
     hostIsPremium: row.host_is_premium,
     currentPlayerCount: row.current_player_count,
     hostPlayerName: row.host_player_name,
+    gameStarted: row.game_started,
   };
 }
 

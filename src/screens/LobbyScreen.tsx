@@ -991,6 +991,10 @@ export default function LobbyScreen() {
   // (true men nu missing → trigga eject-popup). Resetas vid rumkods-byte
   // i mount-useEffect:n.
   const selfEverInStoredRef = useRef(false);
+  // Guard mot dubbel-navigation till /quiz när game_started detekteras.
+  // Polling-effekten fyrar både via Realtime-tick OCH 2s-interval — utan
+  // denna ref skulle vi anropa router.push flera gånger innan unmount.
+  const navigatedToQuizRef = useRef(false);
 
   // Gold-glow-animation för host:s Start Game-knapp. Två native-driver-loops
   // som "andas" tillsammans: halo-opacity (0.4 ↔ 0.85) + subtil scale-pulse
@@ -1052,6 +1056,7 @@ export default function LobbyScreen() {
     setPlayers(hostMode ? [SEED_PLAYERS[0]] : []);
     ownPlayerIdRef.current = null;
     selfEverInStoredRef.current = false;
+    navigatedToQuizRef.current = false;
     // Host: seed lobby-wide settings från profil (Profile:s "Host default
     // settings"-block). Per-fält fallbacks följer den generiska spec:en
     // (Pass-the-Phone, Max 4, Global, 1981→innevarande år, ROUNDS_DEFAULT, 30 sek)
@@ -1302,6 +1307,11 @@ export default function LobbyScreen() {
   // playerEjectedDetected eftersom det rör en helt annan trigger (Start
   // Game vs trash-knappen).
   const [startedWithoutMeDetected, setStartedWithoutMeDetected] = useState(false);
+  // Approved non-host i Pass-the-Phone-lobby: host startar → bara host
+  // spelar på sin telefon. Non-host får informativ popup ("använd host-
+  // device:n"). Skiljs från startedWithoutMeDetected (oapprovaderad)
+  // eftersom messaging:en är olika.
+  const [passThePhoneStartedDetected, setPassThePhoneStartedDetected] = useState(false);
   // True under den korta processing-fasen mellan host:s Yes-konfirmation
   // och navigation till Home. Visar en loading-overlay med "Please Wait —
   // Deleting this Lobby..." + animerade våg-prickar så host:en känner att
@@ -2059,6 +2069,15 @@ export default function LobbyScreen() {
         { event: '*', schema: 'public', table: 'lobby_settings', filter: `room_code=eq.${roomCode}` },
         () => setRealtimeTick((t) => t + 1),
       )
+      // rooms-changes: när host sätter game_started=true (3A markRoomGameStarted)
+      // bumpas tick:en och player-poll-effekten re-fetchar → detekterar via
+      // getRoomMeta().gameStarted att host startat → approved spelare navigerar
+      // till /quiz, oapproverade spelare får "started without me"-popup.
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'rooms', filter: `code=eq.${roomCode}` },
+        () => setRealtimeTick((t) => t + 1),
+      )
       .subscribe();
     return () => {
       supabase.removeChannel(channel);
@@ -2140,21 +2159,60 @@ export default function LobbyScreen() {
         if (!cancelled) setPlayerEjectedDetected(true);
         return;
       }
-      // Game-started-check: om host tryckt Start Game OCH den här spelaren
-      // inte är approved → "Host started game without this user"-popup +
-      // navigation till Home. Approved non-hosts hanteras inte här ännu
-      // (separat gap: ingen real-time sync flyttar dem till /quiz mock-
-      // tiden ut). Rendering av self-injected raden i player-listan ger
-      // approved-status — vi läser samma stored array som syncen nedan
-      // använder för att avgöra approval.
-      if (ownId && isGameStarted(roomCode)) {
-        const stored = await getLobbyPlayers(roomCode);
+      // Game-started-check (Slice 3C-i): läs både in-memory mockStartedGames
+      // (samma-device QA) OCH cross-device från rooms.game_started via meta.
+      // Om host startat:
+      //  • Approved spelare → navigera till /quiz med turnOrder från lobby_players
+      //  • Oapprovaderade  → "Host started game without this user"-popup → Home
+      const meta = await getRoomMeta(roomCode);
+      if (cancelled) return;
+      const remoteGameStarted = !!meta?.gameStarted;
+      const localGameStarted = ownId ? isGameStarted(roomCode) : false;
+      if (ownId && (remoteGameStarted || localGameStarted)) {
+        const playersStored = await getLobbyPlayers(roomCode);
         if (cancelled) return;
-        const selfApproved = !!stored?.find((p) => p.id === ownId)?.approved;
+        const selfApproved = !!playersStored?.find((p) => p.id === ownId)?.approved;
         if (!selfApproved) {
           if (!cancelled) setStartedWithoutMeDetected(true);
           return;
         }
+        // Approved spelare: nästa steg beror på gameMode.
+        // - Pass-the-Phone: bara host spelar på sin telefon → vänligare
+        //   popup "Host has started... use the Host device".
+        // - Individual Devices: alla approved spelare spelar på sin egen
+        //   enhet → navigera till /quiz med derived turnOrder.
+        if (gameMode === 'pass-the-phone') {
+          if (!cancelled) setPassThePhoneStartedDetected(true);
+          return;
+        }
+        if (!navigatedToQuizRef.current && !cancelled) {
+          navigatedToQuizRef.current = true;
+          const turnOrder = (playersStored ?? [])
+            .filter((p) => !!p.approved || !!p.isHost)
+            .map((p) => ({
+              id: p.id,
+              name: p.name,
+              emoji: p.emoji,
+              avatarUri: p.avatarUri,
+              assistance: p.assistance ?? 'standard',
+              age: p.age,
+            }));
+          router.replace({
+            pathname: '/quiz',
+            params: {
+              assistance: 'standard',
+              age: '32',
+              gameMode,
+              players: JSON.stringify(turnOrder),
+              roundsCount: String(roundsCount),
+              answerResponseSeconds: String(answerResponseSeconds),
+              eraFrom: String(eraValues[0]),
+              eraTo: String(eraValues[1]),
+              roomCode,
+            },
+          });
+        }
+        return;
       }
       const stored = await getLobbyPlayers(roomCode);
       if (cancelled) return;
@@ -2300,6 +2358,19 @@ export default function LobbyScreen() {
       { cancelable: false },
     );
   }, [startedWithoutMeDetected]);
+
+  // Pass-the-Phone-popup: approved non-host i en Pass-the-Phone-lobby kan
+  // inte själv navigera till /quiz — host:s telefon är den enda enhet som
+  // spelar. Visa informativ popup med Back to Home-knapp.
+  useEffect(() => {
+    if (!passThePhoneStartedDetected) return;
+    Alert.alert(
+      'Host has started the game',
+      'Please use the Host device (Pass-the-Phone game mode).',
+      [{ text: 'Back to Home', onPress: () => router.replace('/') }],
+      { cancelable: false },
+    );
+  }, [passThePhoneStartedDetected]);
 
   // Skickar invite in-app till en vän — sparas i mottagarens per-user-
   // namespacade Waiting Invites-inbox (friend.playerName som nyckel).

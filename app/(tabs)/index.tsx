@@ -1383,6 +1383,7 @@ export default function HomeScreen() {
       hostIsPremium: false,
       currentPlayerCount: 1,
       hostPlayerName: freshProfile?.playerName ?? profile?.playerName ?? '',
+      gameStarted: false,
     });
     // Säkerställ att leftPlayers-storen är tom för den nya koden så
     // ingen stale test-data smyger in i den färska lobby:n och felaktigt

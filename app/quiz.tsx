@@ -1342,6 +1342,7 @@ export default function QuizScreen() {
       hostIsPremium: false,
       currentPlayerCount: initialCount,
       hostPlayerName: profile?.playerName ?? '',
+      gameStarted: false,
     });
     // Färsk leftPlayers-store + lobbyPlayers-store + ejected-store för nya
     // koden — undviker stale test-data och garanterar att non-host:s polling
