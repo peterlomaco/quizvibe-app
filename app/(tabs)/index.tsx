@@ -1136,6 +1136,14 @@ export default function HomeScreen() {
   // handleLogin kollar mode för att veta om PlayerName→email-lookup behövs.
   const [loginMode, setLoginMode] = useState<'playerName' | 'email'>('playerName');
   const [forgotEmail, setForgotEmail] = useState('');
+  // Forgot-flödet har två sub-steps: ange email → ange 6-siffrig OTP-kod
+  // (mottagen via Supabase-recovery-email) + nytt lösenord. Splittas så
+  // user inte ser kod-fält innan email skickats, och så att Back-knappen
+  // i kod-steget tar tillbaka till email-steget (inte hela vägen ut).
+  const [forgotStep, setForgotStep] = useState<'email' | 'code'>('email');
+  const [forgotCode, setForgotCode] = useState('');
+  const [forgotNewPassword, setForgotNewPassword] = useState('');
+  const [forgotSending, setForgotSending] = useState(false);
 
   // Login-formens custom CodeKeyboard för PlayerName-fältet (samma mönster
   // som Register + guest-form). Letter-fältet är fokuserat default; digit
@@ -1197,6 +1205,10 @@ export default function HomeScreen() {
         setLoginPlayerNameKbMode('letter');
         setLoginPassword('');
         setForgotEmail('');
+        setForgotStep('email');
+        setForgotCode('');
+        setForgotNewPassword('');
+        setForgotSending(false);
         setRegEmail('');
         setRegPlayerName('');
         setRegPlayerNameStatus('idle');
@@ -1257,6 +1269,10 @@ export default function HomeScreen() {
       setLoginPlayerNameKbMode('letter');
       setLoginPassword('');
       setForgotEmail('');
+      setForgotStep('email');
+      setForgotCode('');
+      setForgotNewPassword('');
+      setForgotSending(false);
       setRegEmail('');
       setRegPlayerName('');
       setRegPlayerNameStatus('idle');
@@ -1476,19 +1492,60 @@ export default function HomeScreen() {
     setProfileMenuStep('register');
   };
 
-  // Forgot password / playerName: skicka recovery-mail med playerName + nytt
-  // lösenord + aktiveringslänk. TODO (auth): byt mock mot riktigt API-anrop.
+  // Forgot password: 2-stegs OTP-flow via Supabase.
+  // Steg 1: user anger email → resetPasswordForEmail() skickar 6-siffrig
+  //         kod via email-templaten (kräver att template:t inkluderar
+  //         {{ .Token }} — se supabase/migrations/notes).
+  // Steg 2: user matar in kod + nytt lösenord → verifyOtp + updateUser.
   const forgotEmailValid = REG_EMAIL_REGEX.test(forgotEmail.trim());
+  // Supabase OTP-token är typiskt 6–8 siffror beroende på projekt-config.
+  // Accept:erar hela spannet så vi inte bryter mot framtida förändringar.
+  const forgotCodeValid = /^\d{6,8}$/.test(forgotCode);
+  const forgotNewPasswordValid = forgotNewPassword.length >= 6 && forgotNewPassword.length <= 32;
 
-  const handleForgotSubmit = () => {
-    if (!forgotEmailValid) return;
+  const handleSendRecoveryCode = async () => {
+    if (!forgotEmailValid || forgotSending) return;
     const trimmed = forgotEmail.trim();
+    setForgotSending(true);
     Keyboard.dismiss();
+    const { error } = await supabase.auth.resetPasswordForEmail(trimmed);
+    setForgotSending(false);
+    if (error) {
+      Alert.alert('Could not send code', error.message);
+      return;
+    }
+    setForgotStep('code');
+  };
+
+  const handleResetPassword = async () => {
+    if (!forgotCodeValid || !forgotNewPasswordValid || forgotSending) return;
+    const trimmed = forgotEmail.trim();
+    setForgotSending(true);
+    Keyboard.dismiss();
+    // verifyOtp med type:'recovery' valideras koden mot Supabase och
+    // returnerar en session som ger oss rätt att updateUser.
+    const { error: verifyErr } = await supabase.auth.verifyOtp({
+      email: trimmed,
+      token: forgotCode,
+      type: 'recovery',
+    });
+    if (verifyErr) {
+      setForgotSending(false);
+      Alert.alert('Invalid code', 'The code is incorrect or has expired. Request a new one.');
+      return;
+    }
+    const { error: updateErr } = await supabase.auth.updateUser({ password: forgotNewPassword });
+    setForgotSending(false);
+    if (updateErr) {
+      Alert.alert('Could not reset password', updateErr.message);
+      return;
+    }
+    // Password uppdaterat — user är inloggad via recovery-sessionen.
+    // Hämta profil och stäng modalen så HomeScreen renderar logged-in-läget.
+    const profile = await loadProfile();
+    if (profile) setProfile(profile);
     setProfileMenuVisible(false);
-    Alert.alert(
-      'Recovery email sent',
-      `We've sent your Player Name and a new password to ${trimmed}, along with an activation link.`,
-    );
+    Alert.alert('Password updated', 'You are now signed in with your new password.');
   };
 
   // ── Register-form: parsa year, gates, och submit ──────────────────
@@ -2170,50 +2227,128 @@ export default function HomeScreen() {
               </>
             )}
 
-            {/* ── Forgot password / playerName ──────────────── */}
+            {/* ── Forgot password — 2-stegs OTP-flow ────────── */}
             {!isLoggedIn && profileMenuStep === 'forgot' && (
               <>
                 <TouchableOpacity
-                  onPress={() => setProfileMenuStep('login')}
+                  onPress={() => {
+                    if (forgotStep === 'code') {
+                      setForgotStep('email');
+                    } else {
+                      setProfileMenuStep('login');
+                    }
+                  }}
                   style={profileMenu.backBtn}
                   hitSlop={10}
                 >
                   <Text style={profileMenu.backText}>← Back</Text>
                 </TouchableOpacity>
 
-                <Text style={profileMenu.title}>Recover account</Text>
-                <Text style={profileMenu.subtitle}>
-                  Enter your email and we&apos;ll send your Player Name, a new password
-                  and an activation link.
-                </Text>
+                {forgotStep === 'email' ? (
+                  <>
+                    <Text style={profileMenu.title}>Reset password</Text>
+                    <Text style={profileMenu.subtitle}>
+                      Enter the email you registered with. We&apos;ll send you a verification code.
+                    </Text>
 
-                <TextInput
-                  style={[
-                    profileMenu.input,
-                    !forgotEmailValid && profileMenu.inputActive,
-                  ]}
-                  placeholder="you@example.com"
-                  placeholderTextColor={Colors.textDisabled}
-                  value={forgotEmail}
-                  onChangeText={setForgotEmail}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  maxLength={60}
-                  returnKeyType="send"
-                  onSubmitEditing={handleForgotSubmit}
-                />
+                    <TextInput
+                      style={[
+                        profileMenu.input,
+                        !forgotEmailValid && profileMenu.inputActive,
+                      ]}
+                      placeholder="you@example.com"
+                      placeholderTextColor={Colors.textDisabled}
+                      value={forgotEmail}
+                      onChangeText={setForgotEmail}
+                      keyboardType="email-address"
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                      maxLength={60}
+                      returnKeyType="send"
+                      onSubmitEditing={handleSendRecoveryCode}
+                    />
 
-                <TouchableOpacity
-                  style={[
-                    profileMenu.primaryBtn,
-                    !forgotEmailValid && profileMenu.primaryBtnDisabled,
-                  ]}
-                  onPress={handleForgotSubmit}
-                  disabled={!forgotEmailValid}
-                >
-                  <Text style={profileMenu.primaryBtnText}>Send recovery email</Text>
-                </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[
+                        profileMenu.primaryBtn,
+                        (!forgotEmailValid || forgotSending) && profileMenu.primaryBtnDisabled,
+                      ]}
+                      onPress={handleSendRecoveryCode}
+                      disabled={!forgotEmailValid || forgotSending}
+                    >
+                      <Text style={profileMenu.primaryBtnText}>
+                        {forgotSending ? 'Sending…' : 'Send code'}
+                      </Text>
+                    </TouchableOpacity>
+                  </>
+                ) : (
+                  <>
+                    <Text style={profileMenu.title}>Enter code</Text>
+                    <Text style={profileMenu.subtitle}>
+                      We sent a verification code to {forgotEmail.trim()}. Enter it below
+                      along with your new password.
+                    </Text>
+
+                    <TextInput
+                      style={[
+                        profileMenu.input,
+                        !forgotCodeValid && profileMenu.inputActive,
+                      ]}
+                      placeholder="Verification code"
+                      placeholderTextColor={Colors.textDisabled}
+                      value={forgotCode}
+                      onChangeText={(t) => setForgotCode(t.replace(/\D/g, '').slice(0, 8))}
+                      keyboardType="number-pad"
+                      maxLength={8}
+                      returnKeyType="next"
+                    />
+
+                    <View
+                      pointerEvents={forgotCodeValid ? 'auto' : 'none'}
+                      style={!forgotCodeValid && { opacity: 0.4 }}
+                    >
+                      <TextInput
+                        style={[
+                          profileMenu.input,
+                          forgotCodeValid && !forgotNewPasswordValid && profileMenu.inputActive,
+                        ]}
+                        placeholder="New password (min 6 chars)"
+                        placeholderTextColor={Colors.textDisabled}
+                        value={forgotNewPassword}
+                        onChangeText={setForgotNewPassword}
+                        secureTextEntry
+                        maxLength={32}
+                        returnKeyType="done"
+                        onSubmitEditing={handleResetPassword}
+                      />
+                    </View>
+
+                    <TouchableOpacity
+                      style={[
+                        profileMenu.primaryBtn,
+                        (!forgotCodeValid || !forgotNewPasswordValid || forgotSending) &&
+                          profileMenu.primaryBtnDisabled,
+                      ]}
+                      onPress={handleResetPassword}
+                      disabled={!forgotCodeValid || !forgotNewPasswordValid || forgotSending}
+                    >
+                      <Text style={profileMenu.primaryBtnText}>
+                        {forgotSending ? 'Resetting…' : 'Reset password'}
+                      </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      onPress={handleSendRecoveryCode}
+                      style={profileMenu.forgotLinkWrap}
+                      hitSlop={6}
+                      disabled={forgotSending}
+                    >
+                      <Text style={profileMenu.forgotLinkText}>
+                        Didn&apos;t get the code? Send again
+                      </Text>
+                    </TouchableOpacity>
+                  </>
+                )}
               </>
             )}
 
