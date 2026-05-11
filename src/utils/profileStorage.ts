@@ -1,9 +1,15 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { supabase } from './supabase';
 
 /**
- * Lokal lagring av spelarens profil via AsyncStorage.
- * Nyckeln versioneras (v1) så att vi kan migrera fältschemat senare om behovet
- * uppstår (t.ex. när backend kopplas in i Fas 4+).
+ * Profil-lagring — dual-läge sedan Fas 2:
+ * - **Med session**: source of truth är Supabase `profiles`-tabellen.
+ *   AsyncStorage används som lokal cache så UI:t renderas direkt utan
+ *   nätverks-roundtrip vid skärm-byten.
+ * - **Utan session** (pre-login): bara AsyncStorage. Gäller t.ex. guest-
+ *   spelare som joinar lobby utan att vara registrerade.
+ *
+ * AsyncStorage-nyckeln versioneras (v1) för framtida schema-migrationer.
  */
 const PROFILE_KEY = '@quizvibe/profile/v1';
 
@@ -134,16 +140,171 @@ function refreshFreeCreditsIfNeeded(data: ProfileData): { data: ProfileData; cha
   };
 }
 
+// ── Supabase row-shape (snake_case som det lagras i DB) ────────────────
+// Speglar profiles-tabellen från migrationen i Fas 2. Hålls intern — call-
+// sites använder ProfileData-shapen via adapter-funktionerna nedan.
+interface ProfileRow {
+  id: string;
+  email: string;
+  player_name: string;
+  birth_year: number | null;
+  assistance: AssistanceLevel | null;
+  region: Region | null;
+  avatar_source: AvatarSource;
+  selected_avatar_id: string;
+  game_credits: number;
+  free_game_credits: number;
+  last_free_credits_refresh_date: string | null;
+  spotify_connected: boolean;
+  answer_response_seconds: 15 | 30 | 45 | 60;
+  game_era_from: number | null;
+  game_era_to: number | null;
+  max_players: 4 | 12;
+  game_mode: GameMode;
+  single_player_default: boolean;
+  enabled_host_packages: string[];
+  rounds_count: number;
+}
+
+function rowToProfile(row: ProfileRow): ProfileData {
+  return {
+    playerName: row.player_name,
+    email: row.email,
+    birthYear: row.birth_year,
+    assistance: row.assistance,
+    region: row.region,
+    avatarSource: row.avatar_source,
+    selectedAvatarId: row.selected_avatar_id,
+    gameCredits: row.game_credits,
+    freeGameCredits: row.free_game_credits,
+    lastFreeCreditsRefreshDate: row.last_free_credits_refresh_date ?? undefined,
+    spotifyConnected: row.spotify_connected,
+    answerResponseSeconds: row.answer_response_seconds,
+    gameEraFrom: row.game_era_from ?? undefined,
+    gameEraTo: row.game_era_to ?? undefined,
+    maxPlayers: row.max_players,
+    gameMode: row.game_mode,
+    singlePlayerDefault: row.single_player_default,
+    enabledHostPackages: row.enabled_host_packages,
+    roundsDefault: row.rounds_count,
+  };
+}
+
+// Konvertera ProfileData → DB-row för upsert. Defaults appliceras här så
+// optionella TS-fält aldrig blir NULL i DB:n om de inte är meningsfulla
+// där (t.ex. game_mode måste vara satt enligt CHECK-constraint).
+function profileToRow(userId: string, email: string, p: ProfileData): ProfileRow {
+  return {
+    id: userId,
+    email: p.email ?? email,
+    player_name: p.playerName,
+    birth_year: p.birthYear,
+    assistance: p.assistance,
+    region: p.region,
+    avatar_source: p.avatarSource,
+    selected_avatar_id: p.selectedAvatarId,
+    game_credits: p.gameCredits ?? 0,
+    free_game_credits: p.freeGameCredits ?? FREE_CREDITS_DAILY_CAP,
+    last_free_credits_refresh_date: p.lastFreeCreditsRefreshDate ?? null,
+    spotify_connected: p.spotifyConnected ?? false,
+    answer_response_seconds: p.answerResponseSeconds ?? 30,
+    game_era_from: p.gameEraFrom ?? null,
+    game_era_to: p.gameEraTo ?? null,
+    max_players: p.maxPlayers ?? 4,
+    game_mode: p.gameMode ?? 'pass-the-phone',
+    single_player_default: p.singlePlayerDefault ?? false,
+    enabled_host_packages: p.enabledHostPackages ?? [],
+    rounds_count: p.roundsDefault ?? 4,
+  };
+}
+
+// Hämtar current session.user. null = ingen session (= guest/pre-login).
+async function getCurrentUser() {
+  const { data } = await supabase.auth.getUser();
+  return data.user;
+}
+
+/**
+ * Skriver profilen lokalt + (om session finns) till Supabase. AsyncStorage
+ * skrivs alltid först som optimistisk cache så UI-läsare ser uppdateringen
+ * direkt även innan nätverks-roundtrip:en klarar sig.
+ *
+ * Supabase-upsert:en är best-effort: om den failar (offline, RLS-violation,
+ * etc.) loggas det men funktionen kastar inte — appen fortsätter funka med
+ * lokal cache och nästa save försöker igen.
+ */
 export async function saveProfile(data: ProfileData): Promise<void> {
   try {
     await AsyncStorage.setItem(PROFILE_KEY, JSON.stringify(data));
   } catch (err) {
-    console.warn('[profileStorage] Failed to save profile:', err);
+    console.warn('[profileStorage] Failed to save profile to AsyncStorage:', err);
     throw err;
+  }
+  const user = await getCurrentUser();
+  if (!user) return;
+  const row = profileToRow(user.id, user.email ?? '', data);
+  const { error } = await supabase.from('profiles').upsert(row);
+  if (error) {
+    console.warn('[profileStorage] Failed to upsert profile to Supabase:', error.message);
   }
 }
 
+/**
+ * Laddar profilen — Supabase först (när session finns), AsyncStorage som
+ * fallback/cache. Daglig free-credits-refresh körs alltid efter load så
+ * top-up:en triggar oavsett källa.
+ *
+ * Edge case "session men ingen profiles-rad" (pre-Fas-2-användare som
+ * registrerade sig innan tabellen fanns, eller insert som failade vid
+ * signUp): backfilla från user_metadata + AsyncStorage-cache, INSERT
+ * raden, returnera.
+ */
 export async function loadProfile(): Promise<ProfileData | null> {
+  const user = await getCurrentUser();
+
+  // Pre-login: bara AsyncStorage (guest-mode/legacy).
+  if (!user) {
+    if (__DEV__) console.log('[profileStorage] loadProfile: no session, falling back to AsyncStorage');
+    return loadFromAsyncStorage();
+  }
+
+  if (__DEV__) console.log('[profileStorage] loadProfile: session user.id=', user.id);
+
+  // Logged in: försök Supabase först.
+  const { data: row, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  if (error) {
+    console.warn('[profileStorage] Failed to fetch profile from Supabase:', error.message, error);
+    // Fall through to AsyncStorage cache; nätet kan vara nere men user ska
+    // fortfarande kunna använda appen.
+    return loadFromAsyncStorage();
+  }
+
+  if (row) {
+    if (__DEV__) console.log('[profileStorage] loadProfile: found profiles row');
+    const profile = rowToProfile(row as ProfileRow);
+    const { data: refreshed, changed } = refreshFreeCreditsIfNeeded(profile);
+    // Cache till AsyncStorage så efterföljande loads har varm fallback.
+    AsyncStorage.setItem(PROFILE_KEY, JSON.stringify(refreshed)).catch((err) => {
+      console.warn('[profileStorage] Failed to cache profile after Supabase fetch:', err);
+    });
+    if (changed) {
+      // Daily-refresh ändrade saldot — persistera mot Supabase också.
+      saveProfile(refreshed).catch(() => { /* loggas redan i saveProfile */ });
+    }
+    return refreshed;
+  }
+
+  // Ingen rad i profiles — backfill från user_metadata + ev. AsyncStorage-cache.
+  if (__DEV__) console.log('[profileStorage] loadProfile: no row found, running backfill');
+  return await backfillProfileFromSession(user);
+}
+
+async function loadFromAsyncStorage(): Promise<ProfileData | null> {
   try {
     const json = await AsyncStorage.getItem(PROFILE_KEY);
     if (!json) return null;
@@ -165,9 +326,7 @@ export async function loadProfile(): Promise<ProfileData | null> {
       delete raw.skill;
     }
     // Auto-refresh fria credits vid första load efter midnatt CET. Skriv
-    // tillbaka direkt om top-up skedde så storage konvergerar (annars
-    // skulle vi top-up:a vid varje load tills användaren råkar trigga en
-    // annan saveProfile-write).
+    // tillbaka direkt om top-up skedde så storage konvergerar.
     const { data: refreshed, changed } = refreshFreeCreditsIfNeeded(raw as ProfileData);
     if (changed) {
       AsyncStorage.setItem(PROFILE_KEY, JSON.stringify(refreshed)).catch((err) => {
@@ -176,15 +335,98 @@ export async function loadProfile(): Promise<ProfileData | null> {
     }
     return refreshed;
   } catch (err) {
-    console.warn('[profileStorage] Failed to load profile:', err);
+    console.warn('[profileStorage] Failed to load profile from AsyncStorage:', err);
     return null;
   }
 }
 
+/**
+ * Backfill när session finns men profiles-tabellen saknar raden (pre-Fas-2-
+ * registrering eller misslyckad insert). Bygger en minimal profil från
+ * user_metadata + ev. AsyncStorage-cache, persisterar mot Supabase + cache.
+ */
+async function backfillProfileFromSession(user: { id: string; email?: string; user_metadata?: Record<string, unknown> }): Promise<ProfileData | null> {
+  const cache = await loadFromAsyncStorage();
+  const meta = (user.user_metadata ?? {}) as Record<string, unknown>;
+  const metaPlayerName = typeof meta.playerName === 'string' ? meta.playerName : null;
+  const metaBirthYear = typeof meta.birthYear === 'number' ? meta.birthYear : null;
+  const metaAssistance: AssistanceLevel | null =
+    meta.assistance === 'minimal' || meta.assistance === 'standard' || meta.assistance === 'full'
+      ? (meta.assistance as AssistanceLevel)
+      : null;
+  const metaRegion: Region | null =
+    meta.region === 'sweden' || meta.region === 'nordics' || meta.region === 'global'
+      ? (meta.region as Region)
+      : null;
+
+  // Prio: cache > metadata > fallback. Cache vinner eftersom user kan ha
+  // hunnit redigera lokalt innan profiles-raden skapas.
+  const profile: ProfileData = {
+    playerName: cache?.playerName ?? metaPlayerName ?? (user.email?.split('@')[0] ?? ''),
+    email: user.email,
+    birthYear: cache?.birthYear ?? metaBirthYear,
+    assistance: cache?.assistance ?? metaAssistance,
+    region: cache?.region ?? metaRegion,
+    avatarSource: cache?.avatarSource ?? 'default',
+    selectedAvatarId: cache?.selectedAvatarId ?? '',
+    gameCredits: cache?.gameCredits,
+    freeGameCredits: cache?.freeGameCredits,
+    lastFreeCreditsRefreshDate: cache?.lastFreeCreditsRefreshDate,
+    spotifyConnected: cache?.spotifyConnected,
+    answerResponseSeconds: cache?.answerResponseSeconds,
+    gameEraFrom: cache?.gameEraFrom,
+    gameEraTo: cache?.gameEraTo,
+    maxPlayers: cache?.maxPlayers,
+    gameMode: cache?.gameMode,
+    singlePlayerDefault: cache?.singlePlayerDefault,
+    roundsDefault: cache?.roundsDefault,
+    enabledHostPackages: cache?.enabledHostPackages,
+  };
+
+  // Persistera mot Supabase. Vi använder upsert eftersom raden kan ha
+  // skapats av en parallell flöde (t.ex. signUp insert som råkar landa
+  // samtidigt). RLS-policyn enforcar att id matchar auth.uid().
+  const row = profileToRow(user.id, user.email ?? '', profile);
+  const { error } = await supabase.from('profiles').upsert(row);
+  if (error) {
+    console.warn('[profileStorage] Failed to backfill profile to Supabase:', error.message);
+  }
+
+  // Cache to AsyncStorage too.
+  AsyncStorage.setItem(PROFILE_KEY, JSON.stringify(profile)).catch(() => { /* best-effort */ });
+  return profile;
+}
+
+/**
+ * Rensar LOKAL profil-cache. Server-side data (profiles-rad i Supabase)
+ * lämnas orörd — den behövs för att kunna logga in igen från denna eller
+ * annan enhet. Anropas typiskt av logout-flödet efter supabase.auth.signOut.
+ */
 export async function clearProfile(): Promise<void> {
   try {
     await AsyncStorage.removeItem(PROFILE_KEY);
   } catch (err) {
-    console.warn('[profileStorage] Failed to clear profile:', err);
+    console.warn('[profileStorage] Failed to clear profile from AsyncStorage:', err);
   }
+}
+
+/**
+ * Slår upp email för ett givet playerName via Supabase RPC. Används av
+ * login-flödet när user skriver in PlayerName istället för email — vi
+ * översätter det till email på serversidan och kallar sedan
+ * signInWithPassword som vanligt.
+ *
+ * Returnerar null om playerName inte finns. RPC:n är `security definer`
+ * så anonyma klienter får kalla den utan att kunna SELECT:a profiles-
+ * tabellen direkt (vilket skulle leaka data).
+ */
+export async function lookupEmailByPlayerName(playerName: string): Promise<string | null> {
+  const { data, error } = await supabase.rpc('lookup_email_by_player_name', {
+    p_name: playerName,
+  });
+  if (error) {
+    console.warn('[profileStorage] lookup_email_by_player_name failed:', error.message);
+    return null;
+  }
+  return typeof data === 'string' ? data : null;
 }

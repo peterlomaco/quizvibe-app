@@ -27,7 +27,7 @@ import {
   PLAYER_NAME_MAX_LETTERS,
 } from '@/src/utils/playerName';
 import { containsProfanity } from '@/src/utils/profanity';
-import { clearProfile, loadProfile, saveProfile, type ProfileData } from '@/src/utils/profileStorage';
+import { clearProfile, loadProfile, lookupEmailByPlayerName, saveProfile, type ProfileData } from '@/src/utils/profileStorage';
 import { supabase } from '@/src/utils/supabase';
 import { formatRoomCode, generateRoomCode, isBlockedLetterPair, isLetterCellIndex, ROOM_CODE_DIGITS, ROOM_CODE_LEADING_LETTERS, ROOM_CODE_LENGTH, ROOM_CODE_TRAILING_LETTERS } from '@/src/utils/roomCode';
 import { loadInvites, removeInvite, type WaitingInvite } from '@/src/utils/waitingInvites';
@@ -1129,8 +1129,21 @@ export default function HomeScreen() {
   const [profileMenuVisible, setProfileMenuVisible] = useState(false);
   const [profileMenuStep, setProfileMenuStep] = useState<'menu' | 'login' | 'register' | 'forgot'>('menu');
   const [loginPlayerName, setLoginPlayerName] = useState('');
+  const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
+  // 'playerName' (default) renderar split-field [Letters]–[Digits] med custom
+  // CodeKeyboard. 'email' renderar en single TextInput med system-keyboard.
+  // handleLogin kollar mode för att veta om PlayerName→email-lookup behövs.
+  const [loginMode, setLoginMode] = useState<'playerName' | 'email'>('playerName');
   const [forgotEmail, setForgotEmail] = useState('');
+
+  // Login-formens custom CodeKeyboard för PlayerName-fältet (samma mönster
+  // som Register + guest-form). Letter-fältet är fokuserat default; digit
+  // låses upp när minst 1 letter typats.
+  const loginPlayerNameLettersRef = useRef<TextInput>(null);
+  const loginPlayerNameDigitsRef = useRef<TextInput>(null);
+  const [loginPlayerNameKbMode, setLoginPlayerNameKbMode] = useState<'letter' | 'digit'>('letter');
+  const [loginPlayerNameFocused, setLoginPlayerNameFocused] = useState(false);
 
   // ── Register-form state (sekventiell upplåsning som guest-flödet) ──
   const [regEmail, setRegEmail] = useState('');
@@ -1178,6 +1191,10 @@ export default function HomeScreen() {
       const t = setTimeout(() => {
         setProfileMenuStep('menu');
         setLoginPlayerName('');
+        setLoginEmail('');
+        setLoginMode('playerName');
+        setLoginPlayerNameFocused(false);
+        setLoginPlayerNameKbMode('letter');
         setLoginPassword('');
         setForgotEmail('');
         setRegEmail('');
@@ -1234,6 +1251,10 @@ export default function HomeScreen() {
     if (profileMenuVisible) {
       setProfileMenuStep('menu');
       setLoginPlayerName('');
+      setLoginEmail('');
+      setLoginMode('playerName');
+      setLoginPlayerNameFocused(false);
+      setLoginPlayerNameKbMode('letter');
       setLoginPassword('');
       setForgotEmail('');
       setRegEmail('');
@@ -1374,65 +1395,78 @@ export default function HomeScreen() {
   // TODO (auth): byt till riktigt auth-API som validerar Player Name/
   // email + password mot backend, returnerar session-token och hämtar
   // hela profilen (inkl. det riktiga Player Name som hör till email:en).
+  // CodeKeyboard-handlers för Login:s PlayerName-split-field. Speglar
+  // Register-formens handlers exakt — bara state-varianten skiljer.
+  const handleLoginPlayerNameKeyPress = (char: string) => {
+    setLoginPlayerName((prev) =>
+      loginPlayerNameKbMode === 'letter'
+        ? appendPlayerNameLetter(prev, char)
+        : appendPlayerNameDigit(prev, char),
+    );
+  };
+  const handleLoginPlayerNameBackspace = () => {
+    setLoginPlayerName((prev) =>
+      loginPlayerNameKbMode === 'letter'
+        ? backspacePlayerNameLetters(prev)
+        : backspacePlayerNameDigits(prev),
+    );
+  };
+  const toggleLoginPlayerNameKbMode = () => {
+    if (loginPlayerName.length === 0 && loginPlayerNameKbMode === 'letter') return;
+    if (loginPlayerNameKbMode === 'letter') {
+      setLoginPlayerNameKbMode('digit');
+      loginPlayerNameDigitsRef.current?.focus();
+    } else {
+      setLoginPlayerNameKbMode('letter');
+      loginPlayerNameLettersRef.current?.focus();
+    }
+  };
+
   const handleLogin = async () => {
-    const trimmed = loginPlayerName.trim();
+    // Identifier depends on aktuell mode. PlayerName-läget normaliseras
+    // (strippar trailing dash) så "Anna-" och "Anna" lookup:as identiskt.
+    const identifierRaw = loginMode === 'playerName' ? loginPlayerName : loginEmail;
+    const trimmed = identifierRaw.trim();
     if (!trimmed || !loginPassword.trim()) return;
-    const isEmail = trimmed.includes('@');
-    // Fas 1 — Supabase auth kräver email. PlayerName-only-login kräver en
-    // playerName→email-lookup mot profiles-tabellen som tillkommer i Fas 2.
-    if (!isEmail) {
-      Alert.alert(
-        'Use email to log in',
-        'Player Name login is coming soon. Please log in with the email address you registered with.',
-      );
-      return;
+    let email = trimmed;
+    let identifierMethod: 'email' | 'player_name' = 'email';
+    if (loginMode === 'playerName') {
+      const normalized = normalizePlayerName(trimmed);
+      const looked = await lookupEmailByPlayerName(normalized);
+      if (!looked) {
+        Alert.alert(
+          'Login failed',
+          `No account found for Player Name "${normalized}". Check the spelling, or switch to Email mode and use the email you registered with.`,
+        );
+        return;
+      }
+      email = looked;
+      identifierMethod = 'player_name';
     }
     const { data, error } = await supabase.auth.signInWithPassword({
-      email: trimmed,
+      email,
       password: loginPassword,
     });
     if (error) {
-      Alert.alert('Login failed', error.message);
+      Alert.alert('Login failed', 'Invalid PlayerName/Email or password. Please check');
       return;
     }
     if (!data.user) {
       Alert.alert('Login failed', 'Could not sign in. Please try again.');
       return;
     }
-    // Försök läsa AsyncStorage-profilen (cache från senaste registrering på
-    // denna enhet). Om den tillhör en annan email (= annan user loggade in
-    // på samma enhet) byggs en minimal profil från user_metadata.
-    const cached = await loadProfile();
-    const meta = (data.user.user_metadata ?? {}) as Record<string, unknown>;
-    const metaPlayerName = typeof meta.playerName === 'string' ? meta.playerName : null;
-    const metaBirthYear = typeof meta.birthYear === 'number' ? meta.birthYear : null;
-    const metaAssistance =
-      meta.assistance === 'minimal' || meta.assistance === 'standard' || meta.assistance === 'full'
-        ? (meta.assistance as ProfileData['assistance'])
-        : null;
-    const metaRegion =
-      meta.region === 'sweden' || meta.region === 'nordics' || meta.region === 'global'
-        ? (meta.region as ProfileData['region'])
-        : null;
-    const useCached = cached && cached.email === trimmed;
-    const nextProfile: ProfileData = useCached
-      ? cached
-      : {
-          playerName: metaPlayerName ?? trimmed.split('@')[0],
-          email: trimmed,
-          birthYear: metaBirthYear,
-          assistance: metaAssistance,
-          region: metaRegion,
-          avatarSource: 'default',
-          selectedAvatarId: '',
-        };
-    await saveProfile(nextProfile);
-    setProfile(nextProfile);
+    // Profilen läses nu från Supabase (eller backfillas från user_metadata
+    // om profiles-raden saknas — pre-Fas-2-user). loadProfile sköter dual-
+    // read internt.
+    const profile = await loadProfile();
+    if (profile) {
+      setProfile(profile);
+    }
     const traits: Record<string, string | number | boolean | null> = {};
-    if (nextProfile.assistance) traits.assistance = nextProfile.assistance;
-    if (nextProfile.region) traits.region = nextProfile.region;
+    if (profile?.assistance) traits.assistance = profile.assistance;
+    if (profile?.region) traits.region = profile.region;
     identify(data.user.id, traits);
-    track('user_logged_in', { method: 'email' });
+    track('user_logged_in', { method: identifierMethod });
     setProfileMenuVisible(false);
   };
 
@@ -1946,40 +1980,154 @@ export default function HomeScreen() {
                 </TouchableOpacity>
 
                 <Text style={profileMenu.title}>Log in</Text>
-                <Text style={profileMenu.subtitle}>Enter your Player Name or email and password</Text>
+                <Text style={profileMenu.subtitle}>Choose login method</Text>
 
-                {/* Sekventiell upplåsning: playerName först, sedan password.
-                    Aktivt steg får primärblå border-highlight. */}
-                <TextInput
-                  style={[
-                    profileMenu.input,
-                    !loginPlayerName.trim() && profileMenu.inputActive,
-                  ]}
-                  placeholder="Player Name or email"
-                  placeholderTextColor={Colors.textDisabled}
-                  value={loginPlayerName}
-                  onChangeText={setLoginPlayerName}
-                  maxLength={20}
-                  returnKeyType="next"
-                />
-                <View
-                  pointerEvents={loginPlayerName.trim() ? 'auto' : 'none'}
-                  style={!loginPlayerName.trim() && { opacity: 0.4 }}
-                >
+                {/* Mode-toggle: PlayerName (split-field) vs Email (single field).
+                    Speglar Lobby:s Game Mode-toggle visuellt — aktiv ruta får
+                    primärblå border, inaktiv är dämpad. */}
+                <View style={profileMenu.loginModeRow}>
+                  <TouchableOpacity
+                    style={[
+                      profileMenu.loginModeBtn,
+                      loginMode === 'playerName' && profileMenu.loginModeBtnActive,
+                    ]}
+                    onPress={() => {
+                      setLoginMode('playerName');
+                      setLoginPlayerNameFocused(false);
+                    }}
+                  >
+                    <Text
+                      style={[
+                        profileMenu.loginModeText,
+                        loginMode === 'playerName' && profileMenu.loginModeTextActive,
+                      ]}
+                    >
+                      Player Name
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[
+                      profileMenu.loginModeBtn,
+                      loginMode === 'email' && profileMenu.loginModeBtnActive,
+                    ]}
+                    onPress={() => {
+                      setLoginMode('email');
+                      setLoginPlayerNameFocused(false);
+                    }}
+                  >
+                    <Text
+                      style={[
+                        profileMenu.loginModeText,
+                        loginMode === 'email' && profileMenu.loginModeTextActive,
+                      ]}
+                    >
+                      Email
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+
+                {loginMode === 'playerName' ? (
+                  <View style={modal.fieldGroup}>
+                    <Text style={modal.fieldLabel}>Player Name - Letter-digit format</Text>
+                    <View style={modal.playerNameRow}>
+                      <TextInput
+                        ref={loginPlayerNameLettersRef}
+                        style={[
+                          modal.inputText,
+                          modal.playerNameLettersInput,
+                          loginPlayerNameKbMode === 'letter' && modal.playerNameInputActive,
+                        ]}
+                        placeholder="Anna"
+                        placeholderTextColor={Colors.textDisabled}
+                        value={getPlayerNameLetters(loginPlayerName)}
+                        maxLength={PLAYER_NAME_MAX_LETTERS}
+                        showSoftInputOnFocus={false}
+                        selection={{
+                          start: getPlayerNameLetters(loginPlayerName).length,
+                          end: getPlayerNameLetters(loginPlayerName).length,
+                        }}
+                        selectTextOnFocus={false}
+                        contextMenuHidden={true}
+                        onFocus={() => {
+                          setLoginPlayerNameKbMode('letter');
+                          setLoginPlayerNameFocused(true);
+                        }}
+                        onBlur={() => setLoginPlayerNameFocused(false)}
+                      />
+                      <Text style={modal.playerNameSeparator}>–</Text>
+                      <TextInput
+                        ref={loginPlayerNameDigitsRef}
+                        style={[
+                          modal.inputText,
+                          modal.playerNameDigitsInput,
+                          loginPlayerNameKbMode === 'digit' && modal.playerNameInputActive,
+                          getPlayerNameLetters(loginPlayerName).length === 0 && modal.playerNameInputDisabled,
+                        ]}
+                        placeholder="1234"
+                        placeholderTextColor={Colors.textDisabled}
+                        value={getPlayerNameDigits(loginPlayerName)}
+                        maxLength={PLAYER_NAME_MAX_DIGITS}
+                        editable={getPlayerNameLetters(loginPlayerName).length > 0}
+                        showSoftInputOnFocus={false}
+                        selection={{
+                          start: getPlayerNameDigits(loginPlayerName).length,
+                          end: getPlayerNameDigits(loginPlayerName).length,
+                        }}
+                        selectTextOnFocus={false}
+                        contextMenuHidden={true}
+                        onFocus={() => {
+                          if (getPlayerNameLetters(loginPlayerName).length === 0) {
+                            loginPlayerNameLettersRef.current?.focus();
+                            return;
+                          }
+                          setLoginPlayerNameKbMode('digit');
+                          setLoginPlayerNameFocused(true);
+                        }}
+                        onBlur={() => setLoginPlayerNameFocused(false)}
+                      />
+                    </View>
+                  </View>
+                ) : (
                   <TextInput
                     style={[
                       profileMenu.input,
-                      !!loginPlayerName.trim() && !loginPassword.trim() && profileMenu.inputActive,
+                      !loginEmail.trim() && profileMenu.inputActive,
                     ]}
-                    placeholder="Password"
+                    placeholder="Email"
                     placeholderTextColor={Colors.textDisabled}
-                    value={loginPassword}
-                    onChangeText={setLoginPassword}
-                    secureTextEntry
-                    returnKeyType="done"
-                    onSubmitEditing={handleLogin}
+                    value={loginEmail}
+                    onChangeText={setLoginEmail}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    returnKeyType="next"
                   />
-                </View>
+                )}
+
+                {(() => {
+                  const identifier = (loginMode === 'playerName' ? loginPlayerName : loginEmail).trim();
+                  const pwUnlocked = identifier.length > 0;
+                  return (
+                    <View
+                      pointerEvents={pwUnlocked ? 'auto' : 'none'}
+                      style={!pwUnlocked && { opacity: 0.4 }}
+                    >
+                      <TextInput
+                        style={[
+                          profileMenu.input,
+                          pwUnlocked && !loginPassword.trim() && profileMenu.inputActive,
+                        ]}
+                        placeholder="Password"
+                        placeholderTextColor={Colors.textDisabled}
+                        value={loginPassword}
+                        onChangeText={setLoginPassword}
+                        secureTextEntry
+                        returnKeyType="done"
+                        onSubmitEditing={handleLogin}
+                      />
+                    </View>
+                  );
+                })()}
 
                 {/* Forgot-länk — leder till recovery-flow via email */}
                 <TouchableOpacity
@@ -1992,16 +2140,33 @@ export default function HomeScreen() {
                   </Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity
-                  style={[
-                    profileMenu.primaryBtn,
-                    (!loginPlayerName.trim() || !loginPassword.trim()) && profileMenu.primaryBtnDisabled,
-                  ]}
-                  onPress={handleLogin}
-                  disabled={!loginPlayerName.trim() || !loginPassword.trim()}
-                >
-                  <Text style={profileMenu.primaryBtnText}>Log in</Text>
-                </TouchableOpacity>
+                {(() => {
+                  const identifier = (loginMode === 'playerName' ? loginPlayerName : loginEmail).trim();
+                  const canSubmit = identifier.length > 0 && loginPassword.trim().length > 0;
+                  return (
+                    <TouchableOpacity
+                      style={[
+                        profileMenu.primaryBtn,
+                        !canSubmit && profileMenu.primaryBtnDisabled,
+                      ]}
+                      onPress={handleLogin}
+                      disabled={!canSubmit}
+                    >
+                      <Text style={profileMenu.primaryBtnText}>Log in</Text>
+                    </TouchableOpacity>
+                  );
+                })()}
+
+                {loginPlayerNameFocused && loginMode === 'playerName' && (
+                  <CodeKeyboard
+                    mode={loginPlayerNameKbMode}
+                    letterCharset="ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                    onPress={handleLoginPlayerNameKeyPress}
+                    onBackspace={handleLoginPlayerNameBackspace}
+                    onModeToggle={toggleLoginPlayerNameKbMode}
+                    modeToggleDisabled={loginPlayerNameKbMode === 'letter' && loginPlayerName.length === 0}
+                  />
+                )}
               </>
             )}
 
@@ -3044,6 +3209,36 @@ const profileMenu = StyleSheet.create({
     fontSize: 14,
     color: Colors.textSecondary,
     textAlign: 'center',
+  },
+  // Login-mode-toggle ([Player Name] / [Email]). Visuellt mönster:
+  // Lobby:s Game Mode-toggle 1:1 — borderStrong + bg-transparent default,
+  // primary-border + primaryMuted-bg när aktiv.
+  loginModeRow: {
+    flexDirection: 'row',
+    gap: 4,
+  },
+  loginModeBtn: {
+    flex: 1,
+    height: 44,
+    borderRadius: Radius.sm,
+    borderWidth: 1,
+    borderColor: Colors.borderStrong,
+    backgroundColor: 'transparent',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  loginModeBtnActive: {
+    borderColor: Colors.primary,
+    backgroundColor: Colors.primaryMuted,
+  },
+  loginModeText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: Colors.textSecondary,
+  },
+  loginModeTextActive: {
+    color: Colors.textPrimary,
+    fontWeight: '700',
   },
   primaryBtn: {
     height: 52,
