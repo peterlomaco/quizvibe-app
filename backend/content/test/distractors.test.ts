@@ -248,13 +248,13 @@ describe('buildNameOptions', () => {
 
   it('produces deterministic output with the same seed', () => {
     const catalog = loadCatalog();
-    const correct = findItemsById(catalog, 'mario')[0].item;
+    const correct = findItemsById(catalog, 'mrbeast')[0].item;
     const args = {
       catalog,
       category: 'persons' as const,
       playerGeneration: 'gen-alpha' as const,
       correctItem: correct,
-      selectedPrefix: 'MA',
+      selectedPrefix: 'MR',
       prefixLength: 2,
     };
     const a = buildNameOptions({ ...args, rng: seededRng(2024) });

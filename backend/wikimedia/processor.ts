@@ -1,5 +1,5 @@
 // Bildhämtnings + WebP-konverterings-pipeline.
-// Tar URL → laddar ner → resize till max 1280×720 (behåller aspect ratio)
+// Tar URL → laddar ner → resize till max 1920×1080 (behåller aspect ratio)
 // → WebP @ q85. Pure async funktioner; CLI-orchestration ligger i process.ts.
 
 import * as fs from 'fs';
@@ -9,9 +9,9 @@ import sharp from 'sharp';
 const USER_AGENT = 'QuizVibeBackend/0.1 (development; mailto:dev@quizvibe.local)';
 
 export interface ProcessOptions {
-  /** Max bredd i pixlar. Default 1280. */
+  /** Max bredd i pixlar. Default 1920. */
   maxWidth?: number;
-  /** Max höjd i pixlar. Default 720. */
+  /** Max höjd i pixlar. Default 1080. */
   maxHeight?: number;
   /** WebP-kvalitet 0-100. Default 85. */
   quality?: number;
@@ -50,7 +50,7 @@ export async function fetchImage(
 
 /**
  * Konvertera en input-bild (vilket format som helst som sharp stödjer) till
- * WebP @ q85 och resize till max maxWidth×maxHeight (default 1280×720).
+ * WebP @ q85 och resize till max maxWidth×maxHeight (default 1920×1080).
  *
  * Aspect ratio bevaras (`fit: 'inside'`) — bilder som är 1:1 letterboxas
  * av klienten enligt plan, inte här.
@@ -62,7 +62,7 @@ export async function processImage(
   input: Buffer,
   options: ProcessOptions = {},
 ): Promise<ProcessResult> {
-  const { maxWidth = 1280, maxHeight = 720, quality = 85 } = options;
+  const { maxWidth = 1920, maxHeight = 1080, quality = 85 } = options;
 
   const originalMeta = await sharp(input).metadata();
 

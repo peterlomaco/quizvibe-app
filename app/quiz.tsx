@@ -1,6 +1,8 @@
 import { CountdownIntro } from '@/src/components/CountdownIntro';
 import { GetReadyIntro } from '@/src/components/GetReadyIntro';
+import { ImageAnswerBlock } from '@/src/components/ImageAnswerBlock';
 import { MediaPlayer } from '@/src/components/MediaPlayer';
+import { ProgressiveCover } from '@/src/components/ProgressiveCover';
 import { StopwatchIcon } from '@/src/components/StopwatchIcon';
 import {
     generateOpponentRoundScore,
@@ -25,6 +27,13 @@ import { clearLobbySettings } from '@/src/utils/mockLobbySettings';
 import { clearGameStarted } from '@/src/utils/mockStartedGames';
 import { pickMediaSource, type YoutubeClip } from '@/src/utils/mediaSource';
 import { MUSIC_QUESTIONS } from '@/src/utils/musicQuestions';
+import {
+  IMAGE_QUIZ_QUESTIONS,
+  type ImageNameOption,
+  type ImageQuestionVariant,
+  type ImageVariantKey,
+} from '@/src/utils/quizImageQuestions';
+import { getQuizImage } from '@/src/utils/quizImages';
 import { getAvatarEmojiById } from '@/src/utils/avatars';
 import { loadProfile } from '@/src/utils/profileStorage';
 import { generateRoomCode } from '@/src/utils/roomCode';
@@ -62,6 +71,22 @@ interface TimelineQuestion {
   youtubeClips?: YoutubeClip[];
 }
 
+interface ImageQuestion {
+  type: 'image';
+  id: string;
+  questionNumber: number;
+  totalQuestions: number;
+  category: string;
+  question: string;
+  /** Rätt svar — visas i reveal-feedback. */
+  displayName: string;
+  /** Pre-baked Letter Grid + name-options per prefix-längd. Klienten väljer
+   *  variant runtime via `pickImageQuestionVariant(q, assistance)`. */
+  variants: Record<ImageVariantKey, ImageQuestionVariant>;
+}
+
+type QuizQuestion = TimelineQuestion | ImageQuestion;
+
 // Spelet ställer endast Music-frågor (YouTube delvis, Spotify alltid). Själva
 // låten spelas upp via media-pipen — frågetexten är därmed alltid samma
 // generic "Which year was this song released?". `hint` används bara internt
@@ -83,6 +108,21 @@ const SEED_QUESTIONS: TimelineQuestion[] = MUSIC_QUESTIONS.map((q, i) => ({
   hint: q.displayName,
   youtubeClips: q.youtubeClips,
 }));
+
+// Bild-frågor (Letter Grid → Final Selection-svar). category='Image' triggar
+// per-typ-rendering i question-card / mediaCard / answer-block / reveal-block.
+const IMAGE_SEED_QUESTIONS: ImageQuestion[] = IMAGE_QUIZ_QUESTIONS.map(
+  (q, i) => ({
+    type: 'image',
+    id: q.id,
+    questionNumber: i + 1,
+    totalQuestions: IMAGE_QUIZ_QUESTIONS.length,
+    category: 'Image',
+    question: q.questionText,
+    displayName: q.displayName,
+    variants: q.variants,
+  }),
+);
 
 function getIntervalForAssistance(assistance: AssistanceLevel): number {
   if (assistance === 'minimal') return 0;
@@ -531,16 +571,6 @@ export default function QuizScreen() {
   // params inte falskt aktiverar Spotify.
   const youtubeEnabled = (params.youtubeEnabled ?? 'true') === 'true';
   const spotifyEnabled = params.spotifyEnabled === 'true';
-  // Filtrerade fråge-pool. Fallback till hela SEED_QUESTIONS om ingen fråga
-  // matchar valt era — händer i mock med 5 frågor om host valt en period
-  // utan träffar (t.ex. 1930–1960). När riktig fråge-bank kopplas in blir
-  // poolen stor nog att alltid ha matchande frågor.
-  const eraFilteredQuestions = useMemo(() => {
-    const inEra = SEED_QUESTIONS.filter(
-      (q) => q.correctYear >= eraFrom && q.correctYear <= eraTo,
-    );
-    return inEra.length > 0 ? inEra : SEED_QUESTIONS;
-  }, [eraFrom, eraTo]);
   // Turordningen levereras som JSON-sträng från Lobby:s handleStartGame.
   // try/catch:en gör att en korrupt payload graceful degradar till tom lista
   // → 'intro'-fasen hoppas över istället för att skärmen fastnar tom.
@@ -559,6 +589,61 @@ export default function QuizScreen() {
   // Math.max(1, ...) skyddar fallback-fallet då turnOrder är tom (direkt-nav
   // till /quiz utan Lobby).
   const totalQuestions = totalRounds * Math.max(1, turnOrder.length);
+
+  // Pool av frågor för spelet, organiserad i ROUND-BLOCKS:
+  //
+  //   Pass-the-Phone-regel: alla spelare i samma rond ska få samma fråge-TYP
+  //   (alla får musik, eller alla får bild) men olika ITEMS. Mellan ronder
+  //   växlar typen.
+  //
+  //   Pool-struktur (med 4 spelare per rond, alternerande typ):
+  //     Round 0 (block 0, type=music): music[0], music[1], music[2], music[3]
+  //     Round 1 (block 1, type=image): image[0], image[1], image[2], image[3]
+  //     Round 2 (block 2, type=music): music[4], music[5], music[0], music[1] (cykling)
+  //     Round 3 (block 3, type=image): image[4], image[5], image[6], image[7]
+  //
+  //   Individual Devices (parallel play): alla spelare svarar samma fråga
+  //   samtidigt — round-block-strukturen är inte semantiskt nödvändig där men
+  //   bryter ingenting heller. Kommer behöva omdesignas separat när Individual
+  //   Devices flödet kopplas in (parkerad per Peter 2026-05-11).
+  //
+  // MÅSTE deklareras EFTER `turnOrder` — annars TDZ-error eftersom deps
+  // läser turnOrder.length innan const är initialiserad.
+  const gameQuestions = useMemo<QuizQuestion[]>(() => {
+    const inEra = SEED_QUESTIONS.filter(
+      (q) => q.correctYear >= eraFrom && q.correctYear <= eraTo,
+    );
+    const musicPool: QuizQuestion[] = inEra.length > 0 ? inEra : SEED_QUESTIONS;
+    const imagePool: QuizQuestion[] = IMAGE_SEED_QUESTIONS;
+
+    const playerCount = Math.max(1, turnOrder.length);
+    const hasMusic = musicPool.length > 0;
+    const hasImage = imagePool.length > 0;
+
+    // Edge cases: om en pool är tom, kör bara den andra. Om båda tomma →
+    // fallback till SEED_QUESTIONS (vilket är musik som hardcoded mock).
+    if (!hasMusic && !hasImage) return SEED_QUESTIONS;
+
+    // Bygg pool täckande hela spelet utan modulo-cykling i UI-laget.
+    // questionIndex stiger till totalRounds × playerCount; vi bygger N block
+    // där N = totalRounds.
+    const mixed: QuizQuestion[] = [];
+    for (let block = 0; block < totalRounds; block++) {
+      // Alternera musik ↔ bild per block. Om bara en typ finns, använd alltid den.
+      const isMusicBlock = hasMusic && hasImage
+        ? block % 2 === 0
+        : hasMusic;
+      const pool = isMusicBlock ? musicPool : imagePool;
+      // Cyklisk indexering inom poolen — items kan upprepas om pool < block*players,
+      // men varje block:s spelare får olika items (det är det viktiga för
+      // round-paritet).
+      for (let q = 0; q < playerCount; q++) {
+        const idx = (block * playerCount + q) % pool.length;
+        mixed.push(pool[idx]);
+      }
+    }
+    return mixed.length > 0 ? mixed : SEED_QUESTIONS;
+  }, [eraFrom, eraTo, turnOrder.length, totalRounds]);
 
   const [questionIndex, setQuestionIndex] = useState(0);
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
@@ -598,6 +683,16 @@ export default function QuizScreen() {
   //   • avatar-markören på timer-bar:en (placerad vid elapsed/30 av bredden)
   //   • "Answer time: X.YYs"-raden i feedback-kortet vid rätt svar
   const [confirmedTimeUsed, setConfirmedTimeUsed] = useState<number | null>(null);
+
+  // ── Bild-fråge-state ───────────────────────────────────────────────────
+  // Förlik state med musik-flödet:
+  //   • pendingNameOption = motsvarighet till pendingYear (preliminärt val
+  //     i Final Selection, kan ändras tills Confirm tryckts).
+  //   • confirmedNameOption = motsvarighet till selectedYear post-Confirm
+  //     (låst, driver reveal-feedbacken). Null vid time-out → reveal visar
+  //     ✗ + "Correct: X" utan "You chose"-rad.
+  const [pendingNameOption, setPendingNameOption] = useState<ImageNameOption | null>(null);
+  const [confirmedNameOption, setConfirmedNameOption] = useState<ImageNameOption | null>(null);
 
   // ── Multiplayer state ──────────────────────────────────────────────────
   // Per-runda-poäng (= scores för senaste avslutade fråga). Aggregerade
@@ -741,7 +836,8 @@ export default function QuizScreen() {
   // Initialiseras till 0 — visas som "00.00" innan timer:n startar.
   const [decimalElapsedMs, setDecimalElapsedMs] = useState<number>(0);
 
-  const question = eraFilteredQuestions[questionIndex % eraFilteredQuestions.length];
+  const question: QuizQuestion = gameQuestions[questionIndex % gameQuestions.length];
+  const isImageQuestion = question.type === 'image';
   const isLastQuestion = questionIndex === totalQuestions - 1;
   // Aktiv media-källa för aktuell fråga. Returneras `kind: 'none'` om
   // host stängt av alla källor eller frågan saknar curerade klipp —
@@ -751,10 +847,15 @@ export default function QuizScreen() {
   const mediaSource = useMemo(
     () =>
       pickMediaSource(
-        { youtubeClips: question.youtubeClips },
+        {
+          // Image-frågor har inga YouTube-klipp; pickMediaSource returnerar
+          // då 'none' och MediaPlayer renderas inte (image-grenen ovan).
+          youtubeClips:
+            question.type === 'timeline' ? question.youtubeClips : undefined,
+        },
         { youtubeEnabled, spotifyEnabled, gameMode },
       ),
-    [question.id, question.youtubeClips, youtubeEnabled, spotifyEnabled, gameMode],
+    [question, youtubeEnabled, spotifyEnabled, gameMode],
   );
   // Aktuell spelares namn i Pass-the-Phone-rotationen — visas subtilt i fråge-
   // kortet ("Answering: {namn}"). Skip:as för Individual Devices (varje
@@ -818,22 +919,42 @@ export default function QuizScreen() {
     }
     if (phase === 'question') {
       // Time ran out utan Confirm — registrera ronden som missad (0 poäng,
-      // inget giltigt svar) och gå direkt till reveal.
-      const defaultGuess = new Date().getFullYear() - 20;
-      setSelectedYear(defaultGuess);
-      setRounds((prev) => [
-        ...prev,
-        {
-          questionNumber: questionIndex + 1,
-          category: question.category,
-          question: question.question,
-          correctYear: question.correctYear,
-          selectedYear: defaultGuess,
-          correct: false,
-          points: 0,
-          timeUsed: responseSeconds,
-        },
-      ]);
+      // inget giltigt svar) och gå direkt till reveal. För image-frågor
+      // sätts correctYear/selectedYear=0 (RoundResult-shapen är musik-
+      // formad; year-fälten ignoreras i image-reveal-rendering).
+      if (question.type === 'timeline') {
+        const defaultGuess = new Date().getFullYear() - 20;
+        setSelectedYear(defaultGuess);
+        setRounds((prev) => [
+          ...prev,
+          {
+            questionNumber: questionIndex + 1,
+            category: question.category,
+            question: question.question,
+            correctYear: question.correctYear,
+            selectedYear: defaultGuess,
+            correct: false,
+            points: 0,
+            timeUsed: responseSeconds,
+          },
+        ]);
+      } else {
+        // Image time-out: confirmedNameOption förblir null, reveal visar
+        // ✗ Wrong Answer + "Correct: {displayName}".
+        setRounds((prev) => [
+          ...prev,
+          {
+            questionNumber: questionIndex + 1,
+            category: question.category,
+            question: question.question,
+            correctYear: 0,
+            selectedYear: 0,
+            correct: false,
+            points: 0,
+            timeUsed: responseSeconds,
+          },
+        ]);
+      }
       recordRoundScore(0, false, responseSeconds);
       setPhase('reveal');
     }
@@ -966,12 +1087,18 @@ export default function QuizScreen() {
     return () => clearInterval(id);
   }, [phase, questionIndex, responseSeconds]);
 
+  // "Kan användaren confirma just nu?" — discriminerad-union-helper.
+  // Musik: pendingYear satt. Bild: pendingNameOption satt.
+  const canConfirm = isImageQuestion
+    ? pendingNameOption !== null
+    : pendingYear !== null;
+
   // Confirm-knappens scale + glow-loop. Körs medan phase === 'question' OCH
-  // pendingYear är giltig (knappen är tappbar). Stoppas i andra faser så
+  // ett svar är preliminärt valt (knappen är tappbar). Stoppas i andra faser så
   // disabled-knappen står still — pulserande disabled-knapp läses som "klick-
   // bar men inte". Båda loops använder native driver (transform/opacity).
   useEffect(() => {
-    if (phase !== 'question' || pendingYear === null) {
+    if (phase !== 'question' || !canConfirm) {
       confirmPulse.stopAnimation();
       confirmPulse.setValue(1);
       confirmGlow.stopAnimation();
@@ -996,9 +1123,12 @@ export default function QuizScreen() {
       scaleLoop.stop();
       glowLoop.stop();
     };
-  }, [phase, pendingYear, confirmPulse, confirmGlow]);
+  }, [phase, canConfirm, confirmPulse, confirmGlow]);
 
   const handleConfirm = (year: number) => {
+    // Defensiv guard: handleConfirm är musik-specifik (year-baserad). Image-
+    // frågor anropar handleConfirmName istället. Skydd mot fel-binding i UI.
+    if (question.type !== 'timeline') return;
     // Timer:n stoppas INTE — alla spelare får samma tidsbudget oavsett när
     // de bekräftade. Reveal-feedbacken visas först när timer:n går till 0
     // (i useEffect:en på timeLeft nedan).
@@ -1044,6 +1174,39 @@ export default function QuizScreen() {
     setPhase('awaiting');
   };
 
+  // Image-fråge-Confirm: speglar handleConfirm men för name-svar.
+  // correct = opt.isCorrect (pre-baked från distractor-builderns rätt-flagga).
+  const handleConfirmName = (opt: ImageNameOption) => {
+    if (question.type !== 'image') return;
+    const correct = opt.isCorrect;
+    const pts = calculatePoints(timeLeft, correct, responseSeconds);
+    const totalMs = responseSeconds * 1000;
+    const exactElapsedMs = Math.max(0, Date.now() - questionStartMsRef.current);
+    const exactElapsedSec = Math.min(responseSeconds, exactElapsedMs / 1000);
+    setConfirmedTimeUsed(exactElapsedSec);
+    const elapsedAtConfirm = Math.min(totalMs, Math.max(0, exactElapsedMs));
+    setDecimalElapsedMs(elapsedAtConfirm);
+    setConfirmedNameOption(opt);
+    // RoundResult-shapen är musik-formad (correctYear/selectedYear som number).
+    // Image-rundor sätter 0 för year-fälten — reveal-renderingen läser
+    // displayName från question istället för selectedYear/correctYear.
+    setRounds((prev) => [
+      ...prev,
+      {
+        questionNumber: questionIndex + 1,
+        category: question.category,
+        question: question.question,
+        correctYear: 0,
+        selectedYear: 0,
+        correct,
+        points: pts,
+        timeUsed: exactElapsedSec,
+      },
+    ]);
+    recordRoundScore(pts, correct, exactElapsedSec);
+    setPhase('awaiting');
+  };
+
   // ── Navigations-handlers ────────────────────────────────────────────────
 
   // Från Reveal: visa leaderboard
@@ -1057,6 +1220,9 @@ export default function QuizScreen() {
     setSelectedYear(null);
     setPendingYear(null);
     setConfirmedTimeUsed(null);
+    // Reset image-fråge-state så nästa fråga (oavsett typ) startar rent.
+    setPendingNameOption(null);
+    setConfirmedNameOption(null);
     // Pass-the-phone: rotera till nästa spelare i turordningen och visa
     // Get-Ready-skärmen så telefonen kan lämnas över. Individual Devices:
     // varje spelare är på sin egen enhet — inget overlämnings-flöde behövs
@@ -1409,15 +1575,42 @@ export default function QuizScreen() {
                 tidigare UX-spec). showVideo gömmer video-frame:n under
                 question/awaiting (annars ger thumbnail visuella ledtrådar
                 till svaret) och visar den vid reveal. */}
-            <MediaPlayer
-              source={mediaSource}
-              isPlaying={
-                phase === 'question' ||
-                phase === 'awaiting' ||
-                phase === 'reveal'
-              }
-              showVideo={phase === 'reveal'}
-            />
+            {isImageQuestion ? (
+              <View style={styles.imageMediaCard}>
+                {getQuizImage(question.id) ? (
+                  <Image
+                    key={question.id}
+                    source={getQuizImage(question.id)!}
+                    style={styles.imageMediaImage}
+                    resizeMode="cover"
+                  />
+                ) : (
+                  // Defensiv fallback om assets-mappen saknar förväntad
+                  // bild — borde inte hända eftersom quizImageQuestions
+                  // genereras från samma fil-lista.
+                  <View style={styles.imageMediaPlaceholder} />
+                )}
+                <ProgressiveCover
+                  key={questionIndex}
+                  resetKey={questionIndex}
+                  profile={{ birthYear: 1990, assistance: currentAssistance }}
+                  assistance={currentAssistance}
+                  totalSeconds={responseSeconds}
+                  isRevealed={phase === 'awaiting' || phase === 'reveal'}
+                  logoSize={220}
+                />
+              </View>
+            ) : (
+              <MediaPlayer
+                source={mediaSource}
+                isPlaying={
+                  phase === 'question' ||
+                  phase === 'awaiting' ||
+                  phase === 'reveal'
+                }
+                showVideo={phase === 'reveal'}
+              />
+            )}
 
             {/* Horisontell timer-progress-bar — krymper från 100% → 0% över
                 30s, byter färg vid 10s/5s, pulserar i opacity vid ≤5s. Fryses
@@ -1574,36 +1767,73 @@ export default function QuizScreen() {
               </View>
             </View>
 
-            {/* TimelineSelector renderas i alla faser efter intro. Disabled
-                i awaiting + reveal — efter Confirm är svaret låst, men
-                feedbacken döljs tills timer:n går till 0. eraFrom/eraTo
-                låser tidslinjens span till host:s valda Game Era. assistance
-                är PER-spelare (currentAssistance) så svarsruta-intervallet
-                växlar med turordningen i Pass-the-Phone. */}
-            <TimelineSelector
-              key={`${questionIndex}-${currentAssistance}`}
-              assistance={currentAssistance}
-              eraFrom={eraFrom}
-              eraTo={eraTo}
-              onYearChange={setPendingYear}
-              disabled={phase === 'awaiting' || phase === 'reveal'}
-            />
+            {/* Svarsmetod beror på fråge-typ:
+                • timeline → TimelineSelector (år-svar)
+                • image    → ImageAnswerBlock (Letter Grid → Final Selection)
+                Disabled-states följer phase: båda låsta i awaiting + reveal
+                så svar inte kan ändras efter Confirm. */}
+            {question.type === 'timeline' ? (
+              <TimelineSelector
+                key={`${questionIndex}-${currentAssistance}`}
+                assistance={currentAssistance}
+                eraFrom={eraFrom}
+                eraTo={eraTo}
+                onYearChange={setPendingYear}
+                disabled={phase === 'awaiting' || phase === 'reveal'}
+              />
+            ) : (() => {
+              // Per-spelare-variant baserat på assistance:
+              //   full → prefix-3 / standard → prefix-2 / minimal → prefix-1
+              const variantKey: ImageVariantKey =
+                currentAssistance === 'full'
+                  ? 'prefix-3'
+                  : currentAssistance === 'minimal'
+                    ? 'prefix-1'
+                    : 'prefix-2';
+              const variant = question.variants[variantKey];
+              return (
+                <ImageAnswerBlock
+                  question={variant}
+                  phase={phase}
+                  pendingName={pendingNameOption}
+                  confirmedName={confirmedNameOption}
+                  isTimedOut={phase === 'reveal' && confirmedNameOption === null}
+                  onNameSelect={setPendingNameOption}
+                  resetKey={`${questionIndex}-${currentAssistance}`}
+                />
+              );
+            })()}
 
             {/* Inline reveal-feedback: green vid rätt, red vid fel. Visas
                 ENDAST i 'reveal'-fasen (= efter timer hit 0) — under awaiting
                 hålls feedbacken dold trots att svaret redan är låst, så
-                tidiga svarare inte får facit före sena. Användarens valda år
-                syns i den låsta TimelineSelector:n så vi behöver bara visa
-                "Correct year: xxxx" här. */}
-            {phase === 'reveal' && selectedYear !== null && (() => {
-              const interval = getIntervalForAssistance(currentAssistance);
-              const wasCorrect = isCorrect(
-                selectedYear,
-                question.correctYear,
-                interval,
-                eraFrom,
-                eraTo,
-              );
+                tidiga svarare inte får facit före sena.
+                  • timeline: "Correct year: xxxx" — användarens val syns i låst TimelineSelector.
+                  • image:    "Correct: <Name>" — användarens val (om något) syns inte separat.
+                Båda grenar delar samma badge / next-tab / answer-time-row. */}
+            {phase === 'reveal' && (() => {
+              let wasCorrect: boolean;
+              let correctLabel: string;
+              let correctValue: string;
+              if (question.type === 'timeline') {
+                if (selectedYear === null) return null;
+                const interval = getIntervalForAssistance(currentAssistance);
+                wasCorrect = isCorrect(
+                  selectedYear,
+                  question.correctYear,
+                  interval,
+                  eraFrom,
+                  eraTo,
+                );
+                correctLabel = 'Correct year:';
+                correctValue = String(question.correctYear);
+              } else {
+                // Image — wasCorrect = confirmedNameOption.isCorrect, eller
+                // false vid time-out (confirmedNameOption === null).
+                wasCorrect = confirmedNameOption?.isCorrect ?? false;
+                correctLabel = 'Correct:';
+                correctValue = question.displayName;
+              }
               return (
                 <View style={rv.container}>
                   <Animated.View
@@ -1621,16 +1851,13 @@ export default function QuizScreen() {
                     >
                       {wasCorrect ? '✓ Correct Answer' : '✗ Wrong Answer'}
                     </Text>
-                    {/* Correct-year-rad och Next-tab delar samma rad så
-                        tab:ens underkant linjerar med correct-year-textens
-                        underkant (alignItems:'flex-end' bottom-anchorar
-                        båda mot rad-baseline). Tab:en sitter höger-justerad
-                        via marginLeft:'auto'. */}
+                    {/* Correct-rad och Next-tab delar samma rad så
+                        tab:ens underkant linjerar med textens underkant. */}
                     <View style={rv.feedbackYearRow}>
                       <Text style={rv.feedbackCorrectYear}>
-                        Correct year:{' '}
+                        {correctLabel}{' '}
                         <Text style={rv.feedbackCorrectYearBold}>
-                          {question.correctYear}
+                          {correctValue}
                         </Text>
                       </Text>
                       <TouchableOpacity
@@ -1681,12 +1908,17 @@ export default function QuizScreen() {
                       style={[
                         styles.actionBtn,
                         styles.actionBtnConfirm,
-                        pendingYear === null && styles.actionBtnDisabled,
+                        !canConfirm && styles.actionBtnDisabled,
                       ]}
                       onPress={() => {
-                        if (pendingYear !== null) handleConfirm(pendingYear);
+                        if (!canConfirm) return;
+                        if (question.type === 'image' && pendingNameOption) {
+                          handleConfirmName(pendingNameOption);
+                        } else if (question.type === 'timeline' && pendingYear !== null) {
+                          handleConfirm(pendingYear);
+                        }
                       }}
-                      disabled={pendingYear === null}
+                      disabled={!canConfirm}
                       activeOpacity={0.85}
                     >
                       <Text style={styles.actionBtnText}>Confirm</Text>
@@ -1712,6 +1944,25 @@ export default function QuizScreen() {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
   content: { gap: Spacing.md, paddingBottom: Spacing.xxl },
+
+  // Image-fråge-mediaCard: 16:9-ram för bilden + ProgressiveCover-overlay.
+  // Letterbox:as automatiskt om källan är porträtt (t.ex. paris.webp).
+  imageMediaCard: {
+    aspectRatio: 16 / 9,
+    backgroundColor: Colors.card,
+    overflow: 'hidden',
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+  },
+  imageMediaImage: {
+    width: '100%',
+    height: '100%',
+  },
+  imageMediaPlaceholder: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: Colors.cardElevated,
+  },
 
 
   // Timer-section — radlayout med bar:en (flex 1) + sekund-räknaren till

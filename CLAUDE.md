@@ -62,14 +62,15 @@ All client-side via AsyncStorage. No server. Screens reload data on focus (`useF
 `backend/` är ett separat Node-projekt med egen `package.json` (sharp, zod, js-yaml, vitest, tsx). 77 tester, alla gröna. Live-call-CLIs mot Wikipedia/Commons + mock data exportör för klient-demo. Ingen live HTTP-API ännu — Supabase-setup parkerad.
 
 **Struktur**:
-- `backend/content/catalog/*.yaml` — innehållslistor per generation × kategori. 5 generations-grupper: `elder` (Silent + Boomers, 1925-1964), `gen-x`, `millennials`, `gen-z`, `gen-alpha` + `'all'` (baseline). Items har: `id` (kebab-case), `displayName`, `correctYear`, `probability` (0-100), `wikimediaSearchHints[]`, `answerMethods: ('timeline'|'name-letters')[]`, `sensitivity: 'standard'|'sensitive'`. 71 items totalt över persons/capitals/artists.
+- `backend/content/catalog/*.yaml` — innehållslistor per generation × kategori. 5 generations-grupper: `elder` (Silent + Boomers, 1925-1964), `gen-x`, `millennials`, `gen-z`, `gen-alpha` + `'all'` (baseline). Items har: `id` (kebab-case), `displayName`, `correctYear`, `probability` (0-100), `wikimediaSearchHints[]`, `answerMethods: ('timeline'|'name-letters')[]`, `sensitivity: 'standard'|'sensitive'`. 64 items totalt över persons/capitals/artists. **Fiktiva karaktärer (Elsa, Spider-Man, Mario, Sonic, Peppa Pig, Bluey, Wednesday Addams) togs bort 2026-05-10** — officiella karaktärs-illustrationer är upphovsrättsskyddade och kan inte användas i kommersiell quiz-app utan licens. Återinför ev. via skaparen (Miyamoto → Mario, Idina Menzel → Elsa).
 - `backend/content/schema.ts` — Zod-schema. Validation: items med `'timeline'` i answerMethods MÅSTE ha `correctYear`. Cross-audience-figurer (Zlatan, Cristiano, Messi, ABBA, Madonna, etc.) listas en gång per fil — registry tolererar dubblett-IDs över filer men kräver unika inom en fil.
 - `backend/content/registry.ts` — `loadCatalog`, `findItemsForAudience` (default `excludeSensitive: true` → Hitler/Stalin filtreras bort i spelutbud, admin sätter `excludeSensitive: false` för full vy), `findItemsById`.
 - `backend/content/generation.ts` — `birthYearToGeneration`, `generationDistance`, `getLetterGridConfig` (assistance → prefix-längd: full=3, standard=2, minimal=1; specialregler: född 2016+ alltid hela namn; 2013-2015 hela namn om distance>1; övriga hela namn om distance>2 — Millennials har max-distance 2 så får alltid prefix).
 - `backend/content/distractors.ts` — `getPrefixForItem` (extraherar prefix, behåller diakriter, skipparar non-letters), `buildLetterGrid`, `buildNameOptions`. Pool-strategi: kategori+audience → kategori-fallback → `distractor-pool.yaml` med ~50 plausibla namn per kategori. `NameOption.source` = `'catalog'` eller `'pool'`.
 - `backend/wikimedia/client.ts` — Wikipedia pageimage-lookup (primär källa, kuraterade huvudbilder) + Commons text-search (fallback) + license/artist från Commons imageinfo. CLI: `npm run wikimedia-search <item-id>`.
-- `backend/wikimedia/processor.ts` + `process.ts` — `fetchImage` + sharp-pipeline (resize max 1280×720 med aspect ratio bevarat + WebP @ q85). CLI: `npm run wikimedia-process <item-id>`. Output till `backend/output/` (gitignore:ad).
+- `backend/wikimedia/processor.ts` + `process.ts` — `fetchImage` + sharp-pipeline (resize max 1920×1080 med aspect ratio bevarat + WebP @ q85). CLI: `npm run wikimedia-process <item-id>`. Output till `backend/output/` (gitignore:ad).
 - `backend/scripts/export-demo.ts` — genererar `src/utils/nameQuizDemo.ts` med 3 förgenererade frågor (Astrid, Stockholm, Cristiano) inkl. Letter Grid + name-options per prefix. CLI: `npm run export-demo`.
+- `backend/scripts/export-image-questions.ts` — genererar `src/utils/quizImageQuestions.ts` med Letter Grid + distractor-options för alla items i `assets/quiz-images/`. Pre-bakas för Millennials/standard-profilen (prefix-length=2). CLI: `npm run export-image-questions`. Regenerera efter att nya bilder lagts till.
 
 **Sharp-gotcha**: `sharp(input).resize(...).resize(...)` — den första `resize()` ignoreras tyst när två chainas. Måste köra som två separata `sharp()`-instanser med mellan-buffer:
 ```ts
@@ -624,6 +625,61 @@ Glöm inte lägga till nya stores här när de skapas — annars läcker stale d
 - Non-host: `View` med "Waiting for Host to Start Game" + `<SequentialDots color={Colors.background} />`.
 - Båda ärver styling från `startGameWrap` + `startGameHalo` + `startGameButton`. Waiting-rutan override:ar bara `flexDirection: 'row'` via `waitingForHostBox`-stilen.
 
+## Quiz — frågetyper (discriminerad union)
+
+`quiz.tsx` håller frågorna i en **discriminerad union** `QuizQuestion = TimelineQuestion | ImageQuestion` (diskriminator: `type: 'timeline' | 'image'`):
+
+- **TimelineQuestion** — musik-fråga. `correctYear`, `youtubeClips?`. Svar via `TimelineSelector` (year-scroll), scoring via `isCorrect(year, correctYear, interval, eraFrom, eraTo)`. Mediakort = `MediaPlayer` (YouTube/Spotify).
+- **ImageQuestion** — bild-fråga. `displayName`, `letterGrid`, `optionsByPrefix`, `correctPrefix`, `prefixLength`. Svar via `ImageAnswerBlock` (Letter Grid → Final Selection), scoring via `pendingNameOption.isCorrect`. Mediakort = bild + `ProgressiveCover`.
+
+**Pool-blandning** (`gameQuestions`) — **round-block-struktur** för Pass-the-Phone-paritet: alla spelare i samma rond ska få samma fråge-TYP (men olika ITEMS); typen växlar mellan ronder. Block-storlek = `turnOrder.length` (= antal spelare per rond). Per block: alternering musik ↔ bild (block 0=music, block 1=image, block 2=music, ...). Inom block: items från relevanta pool (era-filtrerad musik / IMAGE_SEED_QUESTIONS) via cyklisk indexering `(block * playerCount + q) % pool.length` så alla spelare i ronden får olika items även om poolen är mindre än spelarantalet. Pool byggs för exakt `totalRounds` block — `questionIndex` stiger linjärt utan modulo-cykling.
+
+Edge cases:
+- En pool tom (t.ex. era utan musik-träffar): kör enbart andra typen alla ronder.
+- Båda pooler tomma: fallback till `SEED_QUESTIONS` (musik-hardcoded).
+- **Individual Devices** (parallel play, alla samtidigt på samma fråga): round-block-strukturen är inte semantiskt nödvändig där men bryter inget. Omdesign parkerad till separat session (2026-05-11).
+
+**State-paritet musik ↔ bild**:
+| musik | bild | beskrivning |
+|---|---|---|
+| `pendingYear` | `pendingNameOption` | Preliminärt val pre-Confirm |
+| `selectedYear` | `confirmedNameOption` | Låst val post-Confirm (driver reveal) |
+| `handleConfirm(year)` | `handleConfirmName(opt)` | Phase → 'awaiting' + recordRoundScore |
+
+`canConfirm`-derived: `isImageQuestion ? pendingNameOption !== null : pendingYear !== null`. Driver Confirm-knappens disabled-state och pulse-loop.
+
+**RoundResult-shapen är musik-formad** (`correctYear` + `selectedYear` som number). Image-frågor sätter båda = 0; reveal-renderingen läser `question.displayName` istället för selectedYear/correctYear för image. Player History som visar selectedYear (idag i `src/components/PlayerHistorySection.tsx`) kan behöva discriminator-anpassning innan den används för image-rundor.
+
+**Per-spelare prefix-length** (implementerad): backend pre-bakar tre varianter per item (`prefix-1` / `prefix-2` / `prefix-3`). Klienten väljer variant runtime via inline-mapping i quiz.tsx: `full → prefix-3`, `standard → prefix-2`, `minimal → prefix-1`. `resetKey` på `ImageAnswerBlock` inkluderar `currentAssistance` så Letter Grid reset:as när spelaren byts i Pass-the-Phone (annars fastnar förra spelarens prefix-state). **Full-names-mode (Gen Alpha 2016+)** är fortfarande inte implementerat — annorlunda UI-shape (ingen prefix-knapp, direkt full-name-lista) kräver separat refactor av ImageAnswerBlock.
+
+**Letter Grid-filter** (klient, `ImageAnswerBlock.sortedGrid` — i ordning):
+1. **Längd-filter**: prefixens första ord måste ha ≥ variantens `prefixLength`. Skydd mot edge case där distractor-pool-namn med kort displayName ger kortare prefix än target.
+2. **Word-count-filter**: alla prefix-knappar måste matcha rätta svarets ord-count. Om rätt svar är "Astrid Lindgren" (2 ord, "AS LI") visas bara 2-ord-distractors — 1-ord items som "Avicii" filtreras bort. Garanterar visuell konsistens i grid:n.
+3. **Dedupering**: max EN prefix-knapp per begynnelsebokstav (vid "MA" och "MR" → båda börjar med 'M' behålls bara EN). Prio: prefix som matchar rätt svar; annars alfabetiskt först.
+
+Edge case för word-count-filter: om kategorin har för få items med samma ord-count som rätt svar kan grid:n bli mindre än 10 knappar. Acceptabelt MVP-trade-off; pool är generellt stor nog.
+
+**Inline Final Selection** (klient): Letter Grid + Final Selection är HOPSLAGNA i samma vy — varje prefix-rad har prefix-knapp till vänster (smal, 96 px) och, när vald, det fullständiga namn-kortet till höger (`flex: 1`). Tap på annan prefix-knapp flyttar namn-kortet till den nya raden. Inget separat "Step 2"-flöde, ingen Back-knapp. Pending-name sätts direkt vid prefix-tap så Confirm-knappen i quiz.tsx blir aktiv så snart en rad valts.
+
+Namnet som visas (`pickNameForPrefix`): det rätta namnet om prefix matchar `correctPrefix`, annars alfabetiskt första distractor-namnet. Backend-datan (`optionsByPrefix`) lagrar fortfarande full pool så filtreringen är ren UI-tweak.
+
+**audience-filter inte gjord (MVP)**: `audiences[]` på `ImageQuizQuestion` är inkluderad i datan men quiz.tsx filtrerar inte poolen baserat på host:s/aktiva spelarens generation. Alla 17 items visas oberoende av spelarprofil.
+
+## Image questions (MVP)
+
+Bild-pipelinen från backend till in-game-rendering:
+
+1. **Wikimedia-pipeline** (`backend/wikimedia/`): `wikimedia-search` föreslår källor → `wikimedia-process <id>` laddar ner + sharp-resize (max 1920×1080 / WebP q85) → `backend/output/<id>.webp`.
+2. **Asset-kopiering** till klient: webp-filer ligger i `assets/quiz-images/` (kopierade manuellt från `backend/output/`).
+3. **Require-map** ([src/utils/quizImages.ts](src/utils/quizImages.ts)): static `Record<itemId, ImageSourcePropType>` med `require()`-statements (Metro/RN kräver statiska require:s — kan inte loop:as). Lägg till en rad när nya items processas. `getQuizImage(id)` returnerar `ImageSourcePropType | null`.
+4. **Pre-baked fråga-data** ([src/utils/quizImageQuestions.ts](src/utils/quizImageQuestions.ts)): auto-genererad av `cd backend && npm run export-image-questions` ([backend/scripts/export-image-questions.ts](backend/scripts/export-image-questions.ts)). Scannar `assets/quiz-images/*.webp`, slår upp i katalog (`findItemsById`), genererar Letter Grid + distractor-options per item (för Millennials/standard-profilen). Exporterar `IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[]` + `getImageQuestionsForGeneration(gen)`-helper.
+5. **In-game-rendering** i quiz.tsx (`question.type === 'image'`-grenen):
+   - Mediakort: `<View imageMediaCard>` (16:9) med `<Image>` (`getQuizImage(question.id)`) + `<ProgressiveCover>` overlay. ProgressiveCover återanvänds som-är: `resetKey={questionIndex}`, `profile={{ birthYear: 1990, assistance: currentAssistance }}` (birthYear placeholder), `assistance={currentAssistance}` (driver reveal-fraktionen full=0.25/standard=0.5/minimal=0.75), `totalSeconds={responseSeconds}`, `isRevealed={phase === 'awaiting' || phase === 'reveal'}` (bilden snappas till revealed vid Confirm OCH bibehålls genom reveal-fasen tills Next-tap).
+   - Svarsmetod: `<ImageAnswerBlock>` ([src/components/ImageAnswerBlock.tsx](src/components/ImageAnswerBlock.tsx)) — speglar mekanik från `app/name-quiz-demo.tsx` men anpassad för phase-machinery. Intern state för `selectedPrefix` (Letter Grid → Final Selection toggle), reset:as via `resetKey={questionIndex}`-prop. Pending/confirmed-namn-state lyfts till parent (quiz.tsx) för paritet med musik-flödets pendingYear/selectedYear.
+   - Reveal-feedback: samma kort som musik-frågor men `correctLabel: 'Correct:'` + `correctValue: question.displayName` istället för year-rad.
+
+**Bild-kvalitet (MVP-fakta)**: höjt tak från 1280×720 → 1920×1080 (Q85 oförändrat) gav märkbar förbättring bara för källor med >1280px upplösning (Stockholm 1631×1080 / London 1620×1080 / Berlin 1620×1080 / Madonna 675×1080 / Messi 808×1080 etc.). Wikipedia pageimage för Astrid (402×570), Cristiano (566×650), Zlatan (332×480) och Björn Borg (622×934) är källbegränsade — för bättre kvalitet på dessa krävs explicit Commons-URL via `wikimedia-process <id> <url>`. Paris-bilden är porträtt (648×1080, Eiffeltornet stående) och **letterbox:as i 16:9 mediaCard** — accepterat MVP-trade-off.
+
 ## Quiz — phase machinery
 
 `quiz.tsx`-skärmen kör en linjär state-maskin per fråga:
@@ -747,7 +803,7 @@ const stopwatchColor = phase === 'question' ? timerColor : '#8CC1FF';
 
 ### Layout (sekvens uppifrån)
 
-1. **Mediakort** (placeholder-card med 🎵 + "Music" + "Video / Image coming soon" tills riktig YouTube/Spotify/AI-bild-integration kopplas in).
+1. **Mediakort** — för `question.type === 'timeline'` (musik) renderas `MediaPlayer` (YouTube/Spotify/none). För `question.type === 'image'` renderas `imageMediaCard` (16:9 wrap, `aspectRatio: 16/9`, `overflow: 'hidden'`) med `<Image source={getQuizImage(question.id)!} resizeMode="cover">` + `<ProgressiveCover>` overlay (se "Image questions (MVP)" nedan).
 2. **Timer-section** (row): timer-bar (flex 1) + **pulserande ring runt sekund-räknaren**. Ringen är 56×56 cirkel med dynamisk `borderColor: timerColor`, halo-View bakom (samma färg, `opacity` pulserar 0.3 → 0.7 över 700 ms native), och scale-pulse 1 → 1.08. Sekund-siffran (24 px bold tabular-nums) sitter inuti ringen.
    - **Avatar-markör på timer-bar:en** vid bekräftad svarstid: 28×28 gold-bordered avatar (URI-bild eller emoji-fallback) absolut-positionerad inom timerTrack med `left: ${((responseSeconds − confirmedTimeUsed) / responseSeconds) * 100}%` — sitter exakt på fillens högra kant vid Confirm-momentet. När timer:n fortsätter krymper fillen FÖRBI avataren så användaren ser "tiden har passerat ditt svarsmoment".
 3. **Stopwatch-rutan** (centrerad under bar:en) — räknar UPPÅT med 2 decimaler:

@@ -154,7 +154,7 @@ Output är console-baserad; ingen download eller upload sker här. Admin granska
 
 CLI: `npm run wikimedia-process <item-id> [<url>]`
 
-Hämtar en bild från en URL, resize:ar till max 1280×720 (behåller aspect ratio, ingen uppskalning av små bilder), konverterar till WebP @ q85, och sparar till `backend/output/<item-id>.webp`.
+Hämtar en bild från en URL, resize:ar till max 1920×1080 (behåller aspect ratio, ingen uppskalning av små bilder), konverterar till WebP @ q85, och sparar till `backend/output/<item-id>.webp`.
 
 ```bash
 # Auto-pick: tar första Wikipedia-pageimage automatiskt

@@ -28,15 +28,15 @@ describe('processImage', () => {
     expect(result.buffer.subarray(8, 12).toString()).toBe('WEBP');
   });
 
-  it('resizes large images to fit within 1280×720 by default', async () => {
-    const input = await makeTestImage(2400, 1800);
+  it('resizes large images to fit within 1920×1080 by default', async () => {
+    const input = await makeTestImage(3000, 2250);
     const result = await processImage(input);
-    expect(result.width).toBeLessThanOrEqual(1280);
-    expect(result.height).toBeLessThanOrEqual(720);
+    expect(result.width).toBeLessThanOrEqual(1920);
+    expect(result.height).toBeLessThanOrEqual(1080);
   });
 
   it('preserves aspect ratio after resize', async () => {
-    const input = await makeTestImage(2400, 1800); // 4:3
+    const input = await makeTestImage(3000, 2250); // 4:3
     const result = await processImage(input);
     const ratio = result.width / result.height;
     expect(ratio).toBeCloseTo(4 / 3, 2);

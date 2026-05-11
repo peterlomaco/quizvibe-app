@@ -1,5 +1,8 @@
-# Personer / karaktärer kända för Gen Alpha.
-# Fictional characters: correctYear = debutår (film/TV/spel) — välj per fråga.
+# Personer kända för Gen Alpha.
+# Fiktiva karaktärer (Elsa, Spider-Man, Mario, Sonic, Peppa Pig, Bluey, Wednesday
+# Addams) togs bort 2026-05-10 — officiella karaktärs-illustrationer är
+# upphovsrättsskyddade och kan inte användas i kommersiell quiz-app utan licens.
+# Återinför ev. via skaparen (t.ex. Miyamoto → Mario, Idina Menzel → Elsa).
 audience: ["gen-alpha"]
 category: persons
 items:
@@ -21,52 +24,3 @@ items:
     probability: 95
     wikimediaSearchHints: ["Lionel Messi"]
     answerMethods: ["timeline", "name-letters"]
-  - id: elsa-frozen
-    displayName: "Elsa (Frozen)"
-    correctYear: 2013
-    probability: 94
-    wikimediaSearchHints: ["Frozen Elsa Disney"]
-    answerMethods: ["timeline", "name-letters"]
-    notes: "Fiktiv karaktär; correctYear = filmens release-år."
-  - id: spider-man
-    displayName: "Spider-Man"
-    correctYear: 1962
-    probability: 93
-    wikimediaSearchHints: ["Spider-Man Marvel"]
-    answerMethods: ["timeline", "name-letters"]
-    notes: "Fiktiv karaktär; correctYear = comics debut (Amazing Fantasy #15)."
-  - id: peppa-pig
-    displayName: "Peppa Pig"
-    correctYear: 2004
-    probability: 92
-    wikimediaSearchHints: ["Peppa Pig"]
-    answerMethods: ["timeline", "name-letters"]
-    notes: "Fiktiv karaktär; correctYear = TV-seriens premiärår."
-  - id: bluey
-    displayName: "Bluey"
-    correctYear: 2018
-    probability: 91
-    wikimediaSearchHints: ["Bluey TV series"]
-    answerMethods: ["timeline", "name-letters"]
-    notes: "Fiktiv karaktär; correctYear = TV-seriens premiärår."
-  - id: mario
-    displayName: "Mario"
-    correctYear: 1981
-    probability: 90
-    wikimediaSearchHints: ["Super Mario Nintendo"]
-    answerMethods: ["timeline", "name-letters"]
-    notes: "Fiktiv karaktär; correctYear = debut i Donkey Kong-arcadespel."
-  - id: sonic-the-hedgehog
-    displayName: "Sonic the Hedgehog"
-    correctYear: 1991
-    probability: 88
-    wikimediaSearchHints: ["Sonic the Hedgehog Sega"]
-    answerMethods: ["timeline", "name-letters"]
-    notes: "Fiktiv karaktär; correctYear = debut på Sega Genesis."
-  - id: wednesday-addams
-    displayName: "Wednesday Addams"
-    correctYear: 2022
-    probability: 85
-    wikimediaSearchHints: ["Wednesday Netflix series"]
-    answerMethods: ["timeline", "name-letters"]
-    notes: "Karaktär från 1938; för Gen Alpha-relevans används Netflix-seriens premiärår."

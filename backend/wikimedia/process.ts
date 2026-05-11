@@ -4,7 +4,7 @@
 //   npx tsx wikimedia/process.ts <item-id>             # auto-pick: första Wikipedia pageimage
 //   npx tsx wikimedia/process.ts <item-id> <url>       # explicit URL
 //
-// Output sparas till backend/output/<item-id>.webp.
+// Output sparas till backend/output/<item-id>.webp. Default-tak: 1920×1080.
 
 import * as path from 'path';
 import { loadCatalog, findItemsById } from '../content/registry';
@@ -60,7 +60,7 @@ async function main(): Promise<void> {
   const inputBuffer = await fetchImage(url);
   console.log(`Downloaded: ${(inputBuffer.length / 1024).toFixed(1)} KB`);
 
-  console.log('Processing (resize to max 1280×720, WebP @ q85)…');
+  console.log('Processing (resize to max 1920×1080, WebP @ q85)…');
   const result = await processImage(inputBuffer);
 
   console.log(
