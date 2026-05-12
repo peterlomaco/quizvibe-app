@@ -3,6 +3,7 @@ import { GetReadyIntro, type QuestionMediaType } from '@/src/components/GetReady
 import { ImageAnswerBlock } from '@/src/components/ImageAnswerBlock';
 import { MediaPlayer } from '@/src/components/MediaPlayer';
 import { ProgressiveCover } from '@/src/components/ProgressiveCover';
+import { SequentialDots } from '@/src/components/SequentialDots';
 import { StopwatchIcon } from '@/src/components/StopwatchIcon';
 import {
     generateOpponentRoundScore,
@@ -27,6 +28,7 @@ import { clearLobbySettings } from '@/src/utils/mockLobbySettings';
 import { clearGameStarted } from '@/src/utils/mockStartedGames';
 import { pickMediaSource, type YoutubeClip } from '@/src/utils/mediaSource';
 import { supabase } from '@/src/utils/supabase';
+import { subscribeSyncChannel, type SyncChannel } from '@/src/lib/realtime/syncChannel';
 import { MUSIC_QUESTIONS } from '@/src/utils/musicQuestions';
 import {
   IMAGE_QUIZ_QUESTIONS,
@@ -530,6 +532,7 @@ export default function QuizScreen() {
     age?: string;
     gameMode?: 'pass-the-phone' | 'individual-devices';
     isHost?: string;
+    selfPlayerId?: string;
     players?: string;
     roundsCount?: string;
     roomCode?: string;
@@ -550,6 +553,11 @@ export default function QuizScreen() {
   // 'true' så direkt-nav (utan Lobby) behåller host-beteende (Quit Game-
   // knapp etc.) — speglar tidigare implicit-host-antagande.
   const isHost = (params.isHost ?? 'true') === 'true';
+  // Det egna player_id:t (= lobby_players.player_id) som Lobby skickade.
+  // Används av non-host:s Leave-flöde för att broadcasta `player_left` så
+  // host:s skärm kan visa popup + markera spelaren som hasLeft i leader-
+  // boarden. Faller tillbaka till tom sträng vid direkt-nav (utan Lobby).
+  const selfPlayerId = params.selfPlayerId ?? '';
   // Initial answerResponseSeconds från Lobby-param. Spelaren kan justera
   // mellan ronder via GetReadyIntro:s settings-block, så vi håller värdet
   // som state istället för konst. Endast 15/30/45/60 är giltiga (= host:s
@@ -725,6 +733,16 @@ export default function QuizScreen() {
   const [currentRoundScores, setCurrentRoundScores] = useState<RoundScore[]>([]);
   const [allRoundScoresHistory, setAllRoundScoresHistory] = useState<RoundScore[][]>([]);
   const [playerHcpChanges, setPlayerHcpChanges] = useState<Record<string, HcpChange>>({});
+  // Set över player_id:n som lämnat spelet via Leave Game (non-host).
+  // Driver "Has left the game"-rendering i leaderboard:erna (både live i
+  // GetReadyIntro och final i RoundLeaderboard). Alla approved klienter
+  // (inkl. host) håller samma state — sync via `player_left`-broadcast.
+  const [leftPlayerIds, setLeftPlayerIds] = useState<Set<string>>(new Set());
+  // Per-spelare confirm-time för PÅGÅENDE fråga. Nyckel = lobby_players.player_id,
+  // värde = sekunder från fråge-start till confirm. Driver avatar-markörer på
+  // timer-bar:en i Individual Devices — confirmade spelares avatar fryses vid
+  // sin position, ej-confirmade rör sig med timern. Reset:as vid frågebyte.
+  const [playerConfirms, setPlayerConfirms] = useState<Record<string, number>>({});
 
   // Spel-start: trackas en gång när QuizScreen mountas (router pushar
   // hit från Lobby:s "Start Game"-flöde). Region/land sätts av
@@ -766,10 +784,11 @@ export default function QuizScreen() {
         age: p.age ?? age,
         isYou: i === 0,
         isHost: i === 0,
+        hasLeft: leftPlayerIds.has(p.id),
       }));
     }
     return [youPlayer, ...MOCK_OPPONENTS];
-  }, [turnOrder, youPlayer, fallbackAssistance, age]);
+  }, [turnOrder, youPlayer, fallbackAssistance, age, leftPlayerIds]);
 
   // Aggregera per-spelare-totals direkt från allRoundScoresHistory så
   // leaderboarden alltid speglar exakt vilka som faktiskt har scoreats —
@@ -828,13 +847,14 @@ export default function QuizScreen() {
         avgResponseSeconds,
         lastResponseSeconds,
         lastFiveResults,
+        hasLeft: leftPlayerIds.has(p.id),
       };
     });
     return entries.sort((a, b) => {
       if (b.points !== a.points) return b.points - a.points;
       return a.avgResponseSeconds - b.avgResponseSeconds;
     });
-  }, [gamePlayers, gameTotals, allRoundScoresHistory]);
+  }, [gamePlayers, gameTotals, allRoundScoresHistory, leftPlayerIds]);
 
   const timerRef = useRef<any>(null);
   // pulseAnim driver opacity:n på timer-progress-baren när tiden
@@ -1196,6 +1216,20 @@ export default function QuizScreen() {
     // även mock-motspelarnas auto-genererade poäng). Skickar 2-decimals-
     // exakt elapsed så leaderboardens AVG/LAST-kolumner visar variation.
     recordRoundScore(pts, correct, exactElapsedSec);
+    // Markera own confirm lokalt + broadcast till andra devices så deras
+    // timer-bar uppdaterar avatar-positionen för denna spelare. Gated på
+    // IndDev — i Pass-the-Phone delar alla samma enhet/markör.
+    if (gameMode === 'individual-devices' && selfPlayerId) {
+      setPlayerConfirms((prev) => ({ ...prev, [selfPlayerId]: exactElapsedSec }));
+      if (syncChannelRef.current) {
+        syncChannelRef.current
+          .broadcastPlayerAnswerConfirmed({
+            player_id: selfPlayerId,
+            time_used: exactElapsedSec,
+          })
+          .catch(() => {});
+      }
+    }
     setPhase('awaiting');
   };
 
@@ -1229,6 +1263,17 @@ export default function QuizScreen() {
       },
     ]);
     recordRoundScore(pts, correct, exactElapsedSec);
+    if (gameMode === 'individual-devices' && selfPlayerId) {
+      setPlayerConfirms((prev) => ({ ...prev, [selfPlayerId]: exactElapsedSec }));
+      if (syncChannelRef.current) {
+        syncChannelRef.current
+          .broadcastPlayerAnswerConfirmed({
+            player_id: selfPlayerId,
+            time_used: exactElapsedSec,
+          })
+          .catch(() => {});
+      }
+    }
     setPhase('awaiting');
   };
 
@@ -1248,17 +1293,107 @@ export default function QuizScreen() {
     // Reset image-fråge-state så nästa fråga (oavsett typ) startar rent.
     setPendingNameOption(null);
     setConfirmedNameOption(null);
-    // Pass-the-phone: rotera till nästa spelare i turordningen och visa
-    // Get-Ready-skärmen så telefonen kan lämnas över. Individual Devices:
-    // varje spelare är på sin egen enhet — inget overlämnings-flöde behövs
-    // mellan rundor, gå direkt till nästa fråga.
+    // Reset per-spelare-confirm-mappen så nästa frågas avatar-markörer
+    // börjar från höger kant igen. hasLeft-flag:n påverkas inte.
+    setPlayerConfirms({});
+    // Båda lägen återgår till GetReady (intro-fasen) mellan frågor:
+    // - Pass-the-Phone: telefonen lämnas över till nästa spelare;
+    //   currentPlayerIndex roterar.
+    // - Individual Devices: host kontrollerar speltempot — Play-tap i
+    //   GetReady startar nästa fråga och broadcastar till non-host:s
+    //   enheter. Ingen player-rotation (alla på egna devices).
     if (gameMode === 'pass-the-phone' && turnOrder.length > 0) {
       setCurrentPlayerIndex((prev) => (prev + 1) % turnOrder.length);
-      setPhase('intro');
-    } else {
-      setPhase('question');
+    }
+    setPhase('intro');
+  };
+
+  // ── IndDev host-broadcast-wrappers ───────────────────────────────────────
+  // Host:s Play-tap: trigga lokal transition + broadcast så non-host:s
+  // /quiz-skärm också flyttar från GetReady → countdown.
+  const handleHostStartFromGetReady = () => {
+    setPhase('countdown');
+    if (gameMode === 'individual-devices' && syncChannelRef.current) {
+      syncChannelRef.current
+        .broadcastPlayCommand({ question_index: questionIndex })
+        .catch(() => {
+          // Broadcast fail = non-host fastnar på GetReady. Logga men blocka
+          // inte host:s eget spel. Full retry-handling sker i D-vi.
+        });
     }
   };
+  // Host:s Next-tap i reveal: trigga lokal handleAdvance + broadcast.
+  // isLastQuestion-fallet broadcastar next_question_index=null så non-host
+  // går till leaderboard, men host själv kör handleShowLeaderboard via
+  // existing Next-tab-callback (denna funktion täcker bara non-last-fallet).
+  const handleHostAdvanceFromReveal = () => {
+    handleAdvanceToNextRound();
+    if (gameMode === 'individual-devices' && syncChannelRef.current) {
+      syncChannelRef.current
+        .broadcastQuestionAdvance({ next_question_index: questionIndex + 1 })
+        .catch(() => {});
+    }
+  };
+  // Host:s Final Leaderboard-tap.
+  const handleHostShowLeaderboard = () => {
+    handleShowLeaderboard();
+    if (gameMode === 'individual-devices' && syncChannelRef.current) {
+      syncChannelRef.current
+        .broadcastQuestionAdvance({ next_question_index: null })
+        .catch(() => {});
+    }
+  };
+
+  // ── Broadcast-listener-refs ──────────────────────────────────────────────
+  // Skriv färska handlers in i refs varje render så subscription-callback:n
+  // (etablerad en gång på mount) alltid kallar latest logic. Non-host kör
+  // samma transition-funktioner som host (lokalt) — de är idempotenta.
+  useEffect(() => {
+    playCommandHandlerRef.current = () => {
+      // Defensiv: bara från intro-phase tillåts countdown-transition.
+      // Skyddar mot late-arriving broadcasts efter att non-host redan
+      // advancerat (t.ex. via reconnect i D-vi senare).
+      setPhase((current) => (current === 'intro' ? 'countdown' : current));
+    };
+    questionAdvanceHandlerRef.current = (nextIdx) => {
+      if (nextIdx === null) {
+        handleShowLeaderboard();
+      } else {
+        handleAdvanceToNextRound();
+      }
+    };
+    // Mottagare av player_left: alla klienter (inkl. host) markerar
+    // spelaren som hasLeft. Host visar dessutom en Alert-popup. Spelaren
+    // själv har redan navigerat till '/' innan broadcast skickas, så de
+    // ser aldrig sin egen "Has left"-rad.
+    playerLeftHandlerRef.current = (playerId, playerName) => {
+      setLeftPlayerIds((prev) => {
+        if (prev.has(playerId)) return prev;
+        const next = new Set(prev);
+        next.add(playerId);
+        return next;
+      });
+      if (isHost) {
+        Alert.alert(`${playerName} has left`, undefined, [{ text: 'OK' }]);
+      }
+    };
+    // Mottagare av player_answer_confirmed: uppdatera per-spelare-confirm-
+    // mappen så timer-bar:ens avatar-markörer fryses vid sin position på
+    // alla devices. Self-confirms hanteras lokalt i handleConfirm; denna
+    // listener fyrar bara för andra spelares confirms.
+    playerAnswerConfirmedHandlerRef.current = (playerId, timeUsed) => {
+      setPlayerConfirms((prev) => {
+        if (prev[playerId] !== undefined) return prev;
+        return { ...prev, [playerId]: timeUsed };
+      });
+    };
+    // Mottagare av response_seconds_changed: host ändrade Answer response
+    // time i GetReady mellan ronder. Non-host:s read-only-display + timer-
+    // budgeten nästa fråga uppdateras till host:s nya värde.
+    responseSecondsChangedHandlerRef.current = (seconds) => {
+      setResponseSeconds(seconds);
+    };
+  });
 
   // Spara det avslutade spelet till AsyncStorage (görs när final leaderboard visas).
   // Player history (i Fas 5) kan sedan hämta denna data.
@@ -1470,9 +1605,11 @@ export default function QuizScreen() {
 
   // Leave Game: non-host:s motsvarighet till Quit Game. Spelet och lobby:n
   // lever vidare för övriga; bara den här spelaren lämnar och navigerar Home.
-  // Ingen DB-cleanup eftersom rummet ska finnas kvar — bara has_left-flag på
-  // egen lobby_players-rad (D-ii kommer wire:a in det; för D-i är detta en
-  // ren navigation tillbaka).
+  // Innan navigation broadcastar vi `player_left` till alla andra approved
+  // enheter så host får popup + leaderboarden uppdateras med "Has left the
+  // game" för spelaren. Fire-and-forget — om broadcast fail:ar (network
+  // ned) blir host:s vy out-of-sync tills senare reconnect-flow, men user:s
+  // navigation hem ska aldrig blockas.
   const handleLeaveGame = () => {
     Alert.alert(
       'Leave game?',
@@ -1482,7 +1619,23 @@ export default function QuizScreen() {
         {
           text: 'Leave game',
           style: 'destructive',
-          onPress: () => router.replace('/'),
+          onPress: () => {
+            if (
+              gameMode === 'individual-devices' &&
+              syncChannelRef.current &&
+              selfPlayerId
+            ) {
+              const selfName =
+                turnOrder.find((p) => p.id === selfPlayerId)?.name ?? 'Player';
+              syncChannelRef.current
+                .broadcastPlayerLeft({
+                  player_id: selfPlayerId,
+                  player_name: selfName,
+                })
+                .catch(() => {});
+            }
+            router.replace('/');
+          },
         },
       ],
     );
@@ -1525,6 +1678,49 @@ export default function QuizScreen() {
       { cancelable: false },
     );
   }, [hostDeletedDetected]);
+
+  // ── Individual Devices sync ──────────────────────────────────────────────
+  // Host:s Play- och Next-tap broadcast:as till alla approved enheter via
+  // Realtime broadcast-channel `quiz_sync:<roomCode>`. Speglar D-ii-spec:n
+  // i docs/individual-devices-spec.md — minimal version utan readiness-
+  // handshake/preload/clock-sync, bara screen-transition-events.
+  //
+  // Båda host och non-host subscribe:ar; default `broadcast.self: false` i
+  // Supabase Realtime hindrar host från att eka tillbaka sina egna events.
+  // Pass-the-Phone behöver inte sync — alla på samma enhet.
+  const syncChannelRef = useRef<SyncChannel | null>(null);
+  // Refs så broadcast-listenern alltid pekar på senaste handlern (annars
+  // skulle subscription:n captura stale closures vid mount).
+  const playCommandHandlerRef = useRef<() => void>(() => {});
+  const questionAdvanceHandlerRef = useRef<(nextIdx: number | null) => void>(() => {});
+  const playerLeftHandlerRef = useRef<(playerId: string, playerName: string) => void>(
+    () => {},
+  );
+  const playerAnswerConfirmedHandlerRef = useRef<
+    (playerId: string, timeUsed: number) => void
+  >(() => {});
+  const responseSecondsChangedHandlerRef = useRef<(seconds: 15 | 30 | 45 | 60) => void>(
+    () => {},
+  );
+  useEffect(() => {
+    if (gameMode !== 'individual-devices' || !params.roomCode) return;
+    const sync = subscribeSyncChannel(params.roomCode, {
+      onPlayCommand: () => playCommandHandlerRef.current(),
+      onQuestionAdvance: (payload) =>
+        questionAdvanceHandlerRef.current(payload.next_question_index),
+      onPlayerLeft: (payload) =>
+        playerLeftHandlerRef.current(payload.player_id, payload.player_name),
+      onPlayerAnswerConfirmed: (payload) =>
+        playerAnswerConfirmedHandlerRef.current(payload.player_id, payload.time_used),
+      onResponseSecondsChanged: (payload) =>
+        responseSecondsChangedHandlerRef.current(payload.seconds),
+    });
+    syncChannelRef.current = sync;
+    return () => {
+      sync.unsubscribe();
+      syncChannelRef.current = null;
+    };
+  }, [gameMode, params.roomCode]);
 
   // Timer-progress-barens färg byter vid 10s (warning) och 5s (error).
   // Bar:ens BREDD drivs av timerProgressAnim (Animated.Value, RAF-driven).
@@ -1595,10 +1791,29 @@ export default function QuizScreen() {
         eraFrom={eraFrom}
         eraTo={eraTo}
         answerResponseSeconds={responseSeconds}
-        onAnswerResponseSecondsChange={setResponseSeconds}
+        onAnswerResponseSecondsChange={(seconds) => {
+          setResponseSeconds(seconds);
+          // I IndDev broadcastar host:s ändring så non-host:s read-only-
+          // display + nästa frågas timer-budget syncas. Pass-the-Phone
+          // delar device → ingen broadcast behövs.
+          if (
+            gameMode === 'individual-devices' &&
+            isHost &&
+            syncChannelRef.current
+          ) {
+            syncChannelRef.current
+              .broadcastResponseSecondsChanged({ seconds })
+              .catch(() => {});
+          }
+        }}
         responseSecondsLocked={responseSecondsLocked}
         leaderboard={liveLeaderboard}
-        onReady={() => setPhase('countdown')}
+        // I IndDev wrappar vi onReady så host:s tap också broadcastar
+        // play_command till non-host:s enheter. Pass-the-Phone behöver
+        // ingen wrapping (alla på samma enhet). Non-host i IndDev får
+        // ändå inte tryck — knappen är dold via isHost-prop nedan.
+        onReady={handleHostStartFromGetReady}
+        isHost={isHost}
         // Host får Quit Game (river rummet); non-host får Leave Game
         // (lämnar bara egen plats). Båda går ALDRIG via samma codepath
         // för cleanup eftersom non-host inte ska avsluta spelet för andra.
@@ -1736,34 +1951,104 @@ export default function QuizScreen() {
                     ]}
                   />
                 </Animated.View>
-                {/* Avatar-markör vid bekräftad svarstid. timerFill krymper
-                    från höger mot vänster (left-anchored fill med width
-                    = timeLeft/30). Avataren ska sitta vid fillens HÖGRA
-                    kant vid confirm-momentet = (timeLeft/30) av bredden
-                    från vänster, dvs (1 − elapsed/30) × 100 %. När timer:n
-                    fortsätter ticka krymper fillen förbi avataren. */}
-                {confirmedTimeUsed !== null && (
-                  <View
-                    pointerEvents="none"
-                    style={[
-                      styles.timerMarker,
-                      { left: `${((responseSeconds - confirmedTimeUsed) / responseSeconds) * 100}%` },
-                    ]}
-                  >
-                    {turnOrder[currentPlayerIndex]?.avatarUri ? (
-                      <Image
-                        source={{ uri: turnOrder[currentPlayerIndex].avatarUri }}
-                        style={styles.timerMarkerAvatar}
-                      />
-                    ) : (
-                      <View style={styles.timerMarkerFallback}>
-                        <Text style={styles.timerMarkerEmoji}>
-                          {turnOrder[currentPlayerIndex]?.emoji ?? '👤'}
-                        </Text>
+                {/* Timer-bar avatar-markörer.
+                    - Pass-the-Phone: en markör för current player vid
+                      sin confirm-position (timerFill krymper bakom).
+                    - Individual Devices: en markör per turnOrder-spelare.
+                      Confirmade spelare har fast left% baserat på sin
+                      time_used; ej-confirmade rör sig med timerProgressAnim
+                      (rätta kanten av krympande fyllningen). Spelare som
+                      lämnat (hasLeft) döljs. Vertikal stagger per index så
+                      ej-confirmade avatarer som ligger på samma x ändå syns. */}
+                {gameMode === 'pass-the-phone'
+                  ? confirmedTimeUsed !== null && (
+                      <View
+                        pointerEvents="none"
+                        style={[
+                          styles.timerMarker,
+                          {
+                            left: `${
+                              ((responseSeconds - confirmedTimeUsed) /
+                                responseSeconds) *
+                              100
+                            }%`,
+                          },
+                        ]}
+                      >
+                        {turnOrder[currentPlayerIndex]?.avatarUri ? (
+                          <Image
+                            source={{
+                              uri: turnOrder[currentPlayerIndex].avatarUri,
+                            }}
+                            style={styles.timerMarkerAvatar}
+                          />
+                        ) : (
+                          <View style={styles.timerMarkerFallback}>
+                            <Text style={styles.timerMarkerEmoji}>
+                              {turnOrder[currentPlayerIndex]?.emoji ?? '👤'}
+                            </Text>
+                          </View>
+                        )}
                       </View>
-                    )}
-                  </View>
-                )}
+                    )
+                  : turnOrder
+                      .filter((p) => !leftPlayerIds.has(p.id))
+                      .map((p, idx) => {
+                        const used = playerConfirms[p.id];
+                        const isConfirmed = used !== undefined;
+                        const topOffset = -11 + idx * 4;
+                        const avatarNode = p.avatarUri ? (
+                          <Image
+                            source={{ uri: p.avatarUri }}
+                            style={styles.timerMarkerAvatar}
+                          />
+                        ) : (
+                          <View style={styles.timerMarkerFallback}>
+                            <Text style={styles.timerMarkerEmoji}>
+                              {p.emoji ?? '👤'}
+                            </Text>
+                          </View>
+                        );
+                        if (isConfirmed) {
+                          return (
+                            <View
+                              key={p.id}
+                              pointerEvents="none"
+                              style={[
+                                styles.timerMarker,
+                                {
+                                  top: topOffset,
+                                  left: `${
+                                    ((responseSeconds - used) /
+                                      responseSeconds) *
+                                    100
+                                  }%`,
+                                },
+                              ]}
+                            >
+                              {avatarNode}
+                            </View>
+                          );
+                        }
+                        return (
+                          <Animated.View
+                            key={p.id}
+                            pointerEvents="none"
+                            style={[
+                              styles.timerMarker,
+                              {
+                                top: topOffset,
+                                left: timerProgressAnim.interpolate({
+                                  inputRange: [0, 1],
+                                  outputRange: ['0%', '100%'],
+                                }),
+                              },
+                            ]}
+                          >
+                            {avatarNode}
+                          </Animated.View>
+                        );
+                      })}
               </View>
               {/* Höger-siffran sitter i en pulserande ring vars border-färg
                   ärvs från timerColor. Halo:n bakom ger glow på Android som
@@ -1951,18 +2236,37 @@ export default function QuizScreen() {
                           {correctValue}
                         </Text>
                       </Text>
-                      <TouchableOpacity
-                        style={[
-                          rv.nextTab,
-                          wasCorrect ? rv.nextTabCorrect : rv.nextTabWrong,
-                        ]}
-                        onPress={isLastQuestion ? handleShowLeaderboard : handleAdvanceToNextRound}
-                        activeOpacity={0.85}
-                      >
-                        <Text style={rv.nextTabText}>
-                          {isLastQuestion ? '🏆  Final Leaderboard' : 'Next  →'}
-                        </Text>
-                      </TouchableOpacity>
+                      {/* I IndDev kontrollerar host speltempot — non-host
+                          ser en passiv "Waiting for host…"-pill istället för
+                          Next-tab. När host tappar Next broadcastar vi
+                          question_advance → non-host advancar via listener.
+                          Pass-the-Phone har alla på samma enhet → vanlig
+                          Next-tab för båda roller. */}
+                      {gameMode === 'individual-devices' && !isHost ? (
+                        <View style={rv.waitingForHostPill}>
+                          <Text style={rv.waitingForHostPillText}>
+                            Waiting for host
+                          </Text>
+                          <SequentialDots color={Colors.textSecondary} />
+                        </View>
+                      ) : (
+                        <TouchableOpacity
+                          style={[
+                            rv.nextTab,
+                            wasCorrect ? rv.nextTabCorrect : rv.nextTabWrong,
+                          ]}
+                          onPress={
+                            isLastQuestion
+                              ? handleHostShowLeaderboard
+                              : handleHostAdvanceFromReveal
+                          }
+                          activeOpacity={0.85}
+                        >
+                          <Text style={rv.nextTabText}>
+                            {isLastQuestion ? '🏆  Final Leaderboard' : 'Next  →'}
+                          </Text>
+                        </TouchableOpacity>
+                      )}
                     </View>
                     {wasCorrect && confirmedTimeUsed !== null && (
                       <Text style={rv.feedbackAnswerTime}>
@@ -2437,5 +2741,25 @@ const rv = StyleSheet.create({
     fontWeight: '700',
     color: '#fff',
     letterSpacing: 0.4,
+  },
+  // Non-host:s "Waiting for host…"-pill i IndDev — sitter i samma position
+  // som Next-tab skulle. Dämpad styling (textSecondary + borderStrong)
+  // signalerar passiv vänte-state istället för aktion.
+  waitingForHostPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: Spacing.md,
+    paddingVertical: 6,
+    borderRadius: Radius.sm,
+    borderWidth: 1,
+    borderColor: Colors.borderStrong,
+    backgroundColor: 'transparent',
+    gap: 4,
+  },
+  waitingForHostPillText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: Colors.textSecondary,
+    letterSpacing: 0.3,
   },
 });

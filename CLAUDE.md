@@ -715,11 +715,11 @@ Bild-pipelinen från backend till in-game-rendering:
 
 ## Quiz — Get Ready to Vibe intro screen
 
-Hand-off-skärmen mellan Lobby:s Start Game-tap och första quiz-frågan. [src/components/GetReadyIntro.tsx](src/components/GetReadyIntro.tsx) renderas av [app/quiz.tsx](app/quiz.tsx) som `'intro'`-fas — initial fas vid spelstart i båda lägena, OCH mellan rundor i Pass-the-phone (telefon-överlämning). Tap på Q-play-logo i intro:n → `'countdown'`-fas (3-2-1) → `'question'`-fas.
+Hand-off-skärmen mellan Lobby:s Start Game-tap och första quiz-frågan. [src/components/GetReadyIntro.tsx](src/components/GetReadyIntro.tsx) renderas av [app/quiz.tsx](app/quiz.tsx) som `'intro'`-fas — initial fas vid spelstart i båda lägena, OCH mellan rundor i båda lägena. Tap på Q-play-logo i intro:n → `'countdown'`-fas (3-2-1) → `'question'`-fas.
 
 **Mode-dependent fas-flöde i `handleAdvanceToNextRound`**:
 - **Pass-the-Phone**: rotera `currentPlayerIndex` (mod `turnOrder.length`) → sätt fas till `'intro'` så "Pass-the-Phone to: <namn>" visas innan nästa fråga.
-- **Individual Devices**: hoppa över intro mellan rundor (parallel play, ingen telefon-överlämning) → gå direkt till `'question'`. Vid spelstart visas intro:n dock även här (varje spelare på sin enhet behöver tap för att starta).
+- **Individual Devices**: ingen player-rotation (alla på egna devices) → sätt fas till `'intro'` så host får ny Play-tap som kontrollerar speltempot för nästa fråga. Non-host ser passiv "Waiting for Host to start quiz"-ruta i intro:n via `GetReadyIntro`:s `isHost`-prop; host:s Play-tap broadcastar `play_command` via `quiz_sync:<roomCode>`-channel ([src/lib/realtime/syncChannel.ts](src/lib/realtime/syncChannel.ts)) så non-host:s phase också går till countdown. Host:s Next-tap i reveal broadcastar motsvarande `question_advance` så alla devices återgår till intro samtidigt.
 
 **Timer-gate**: `useEffect` som anropar `startTimer()` är gated på `phase === 'question'` (entry från countdown). Cleanup i den effekten klippper INTE intervallet vid `question → awaiting`-transition — kritiskt så timer:n fortsätter ticka oberoende av phase-byte. Self-clearing sker i `setInterval`-handler:n när `timeLeft = 0`. Separat unmount-only useEffect cleanup:ar timer:n vid Quit Game.
 

@@ -14,8 +14,10 @@ import {
   View,
 } from 'react-native';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
+import { MediaSourceIcon } from './MediaSourceIcon';
 import { QuizVibeLogo } from './QuizVibeLogo';
 import { QuizVibePlayLogo } from './QuizVibePlayLogo';
+import { SequentialDots } from './SequentialDots';
 
 /** Minimal player-shape som GetReadyIntro behöver för att rendera namn + avatar.
  *  Speglar TurnOrderPlayer i quiz.tsx. */
@@ -50,6 +52,9 @@ export interface LeaderboardLiveEntry {
   /** Senaste 5 frågornas utfall, ÄLDST → NYAST. true = rätt, false = fel.
    *  Tomt array om inga ronder spelade ännu. */
   lastFiveResults: boolean[];
+  /** Spelaren har lämnat spelet via Leave Game. Mid-row-stats ersätts av
+   *  "Has left the game"-text och PTS-kolumnen visar streck. */
+  hasLeft?: boolean;
 }
 
 const ASSISTANCE_LABEL: Record<'minimal' | 'standard' | 'full', string> = {
@@ -109,6 +114,11 @@ interface Props {
   /** Optional: visar Leave Game-knappen längst upp för non-host (IndDev).
    *  Renderas BARA om onQuit inte är satt. */
   onLeave?: () => void;
+  /** Är användaren host? Styr om Play-knappen renderas (host i båda lägen +
+   *  alla i Pass-the-Phone) eller om "Waiting for Host to start quiz"-rutan
+   *  visas i Play-knappens position (non-host i Individual Devices).
+   *  Default true — befintliga call-sites påverkas inte. */
+  isHost?: boolean;
 }
 
 /** Liten avatar-cell som visas före spelarnamnet — uri-bild om finns, annars
@@ -196,9 +206,56 @@ export function GetReadyIntro({
   onReady,
   onQuit,
   onLeave,
+  isHost = true,
 }: Props) {
   const isIndDev = mode === 'individual-devices';
   const playerName = currentPlayer.name;
+  // I Pass-the-Phone betraktas alla som "den som ska starta" (telefonen lämnas
+  // runt; vem som än håller den får trycka). I Individual Devices är det bara
+  // host som kan starta — non-host ser en passiv "Waiting for Host"-ruta i
+  // samma position som Play-knappen skulle suttit.
+  const canStartGame = mode === 'pass-the-phone' || isHost;
+  // Answer response time-fältet är read-only för non-host i Individual
+  // Devices (host bestämmer värdet i Lobby OCH justerar det här mellan
+  // ronder). PtP-läget har alltid alla på samma device, så där spelar
+  // isHost ingen roll — där styrs editability istället av responseSecondsLocked
+  // (mid-round = låst).
+  const responseSecondsReadOnly = mode === 'individual-devices' && !isHost;
+
+  // Dot-bar progress: rad-rektangulära pillar i två rader vid >10 dots,
+  // en rad vid ≤10. total alltid jämn (Lobby:s ROUNDS_STEP=2 × heltal
+  // players), så splitten blir alltid total/2 + total/2.
+  const renderDotBar = (total: number, filled: number, label: string) => {
+    const halfSplit = total > 10;
+    const topCount = halfSplit ? total / 2 : total;
+    const bottomCount = halfSplit ? total / 2 : 0;
+    const renderDot = (globalIdx: number) => (
+      <View
+        key={`pdot-${label}-${globalIdx}`}
+        style={[
+          styles.progressDot,
+          globalIdx < filled && styles.progressDotFilled,
+        ]}
+      />
+    );
+    return (
+      <View style={styles.progressBarBlock}>
+        <Text style={styles.progressBarLabel}>{label}</Text>
+        <View style={styles.progressBarRowsWrap}>
+          <View style={styles.progressBarRow}>
+            {Array.from({ length: topCount }).map((_, i) => renderDot(i))}
+          </View>
+          {bottomCount > 0 && (
+            <View style={styles.progressBarRow}>
+              {Array.from({ length: bottomCount }).map((_, i) =>
+                renderDot(topCount + i),
+              )}
+            </View>
+          )}
+        </View>
+      </View>
+    );
+  };
   // Dropdown för Answer response time. Stängs efter val eller tap utanför.
   const [responseDropdownOpen, setResponseDropdownOpen] = useState(false);
   // Utfällbar leaderboard — default COLLAPSED vid första entry från Lobby
@@ -291,31 +348,39 @@ export function GetReadyIntro({
           </Text>
           <View style={styles.responseDropdownRow}>
             <Text style={styles.settingsRow}>Answer response time:</Text>
-            <TouchableOpacity
-              style={[
-                styles.responseDropdownTrigger,
-                responseSecondsLocked && styles.responseDropdownTriggerLocked,
-              ]}
-              onPress={handleResponseTriggerPress}
-              activeOpacity={0.7}
-            >
-              <Text
-                style={[
-                  styles.responseDropdownTriggerText,
-                  responseSecondsLocked && styles.responseDropdownTriggerTextLocked,
-                ]}
-              >
+            {responseSecondsReadOnly ? (
+              // Non-host i IndDev: bara värdet som ren text. Inget tap-mål,
+              // ingen chevron, ingen 🔒. Host bestämmer värdet.
+              <Text style={styles.responseDropdownReadOnlyText}>
                 {answerResponseSeconds}s
               </Text>
-              <Text
+            ) : (
+              <TouchableOpacity
                 style={[
-                  styles.responseDropdownChevron,
-                  responseSecondsLocked && styles.responseDropdownTriggerTextLocked,
+                  styles.responseDropdownTrigger,
+                  responseSecondsLocked && styles.responseDropdownTriggerLocked,
                 ]}
+                onPress={handleResponseTriggerPress}
+                activeOpacity={0.7}
               >
-                {responseSecondsLocked ? '🔒' : '▼'}
-              </Text>
-            </TouchableOpacity>
+                <Text
+                  style={[
+                    styles.responseDropdownTriggerText,
+                    responseSecondsLocked && styles.responseDropdownTriggerTextLocked,
+                  ]}
+                >
+                  {answerResponseSeconds}s
+                </Text>
+                <Text
+                  style={[
+                    styles.responseDropdownChevron,
+                    responseSecondsLocked && styles.responseDropdownTriggerTextLocked,
+                  ]}
+                >
+                  {responseSecondsLocked ? '🔒' : '▼'}
+                </Text>
+              </TouchableOpacity>
+            )}
           </View>
         </View>
       </View>
@@ -399,73 +464,88 @@ export function GetReadyIntro({
                         Last 5
                       </Text>
                     </View>
-                    {/* Spelar-rader */}
-                    {leaderboard.map((entry) => (
-                      <View key={entry.playerId} style={styles.lbMidRow}>
-                        <Text style={[styles.lbMidCell, styles.lbColR]}>
-                          {entry.playedRounds}
-                        </Text>
-                        <Text
-                          style={[
-                            styles.lbMidCell,
-                            styles.lbColCheck,
-                            styles.lbCorrectText,
-                          ]}
+                    {/* Spelar-rader. Spelare som lämnat spelet (`hasLeft`)
+                        renderar bara en centrerad "Has left the game"-text
+                        som spänner hela detail-bredden istället för Q/✓/✗/
+                        AVG/LAST/Last-5-cellerna. */}
+                    {leaderboard.map((entry) =>
+                      entry.hasLeft ? (
+                        <View
+                          key={entry.playerId}
+                          style={[styles.lbMidRow, styles.lbHasLeftRow]}
                         >
-                          {entry.correctAnswers}
-                        </Text>
-                        <Text
-                          style={[
-                            styles.lbMidCell,
-                            styles.lbColCheck,
-                            styles.lbWrongText,
-                          ]}
-                        >
-                          {entry.incorrectAnswers}
-                        </Text>
-                        <Text style={[styles.lbMidCell, styles.lbColTime]}>
-                          {entry.playedRounds > 0
-                            ? `${entry.avgResponseSeconds.toFixed(2)}s`
-                            : '—'}
-                        </Text>
-                        <Text style={[styles.lbMidCell, styles.lbColTime]}>
-                          {entry.lastResponseSeconds !== null
-                            ? `${entry.lastResponseSeconds.toFixed(2)}s`
-                            : '—'}
-                        </Text>
-                        <View style={[styles.lbColLast5, styles.lbLast5Wrap]}>
-                          {/* Visa exakt 5 dotts: padda med tomma platser
-                              vänster om färre än 5 spelats. */}
-                          {Array.from({ length: 5 }).map((_, i) => {
-                            const offset = entry.lastFiveResults.length - 5 + i;
-                            const result =
-                              offset >= 0 ? entry.lastFiveResults[offset] : undefined;
-                            if (result === undefined) {
-                              return (
-                                <View key={i} style={styles.lbDotEmpty} />
-                              );
-                            }
-                            return (
-                              <View
-                                key={i}
-                                style={[
-                                  styles.lbDot,
-                                  result ? styles.lbDotCorrect : styles.lbDotWrong,
-                                ]}
-                              >
-                                <Text style={styles.lbDotGlyph}>
-                                  {result ? '✓' : '✗'}
-                                </Text>
-                              </View>
-                            );
-                          })}
+                          <Text style={styles.lbHasLeftText} numberOfLines={1}>
+                            Has left the game
+                          </Text>
                         </View>
-                      </View>
-                    ))}
+                      ) : (
+                        <View key={entry.playerId} style={styles.lbMidRow}>
+                          <Text style={[styles.lbMidCell, styles.lbColR]}>
+                            {entry.playedRounds}
+                          </Text>
+                          <Text
+                            style={[
+                              styles.lbMidCell,
+                              styles.lbColCheck,
+                              styles.lbCorrectText,
+                            ]}
+                          >
+                            {entry.correctAnswers}
+                          </Text>
+                          <Text
+                            style={[
+                              styles.lbMidCell,
+                              styles.lbColCheck,
+                              styles.lbWrongText,
+                            ]}
+                          >
+                            {entry.incorrectAnswers}
+                          </Text>
+                          <Text style={[styles.lbMidCell, styles.lbColTime]}>
+                            {entry.playedRounds > 0
+                              ? `${entry.avgResponseSeconds.toFixed(2)}s`
+                              : '—'}
+                          </Text>
+                          <Text style={[styles.lbMidCell, styles.lbColTime]}>
+                            {entry.lastResponseSeconds !== null
+                              ? `${entry.lastResponseSeconds.toFixed(2)}s`
+                              : '—'}
+                          </Text>
+                          <View style={[styles.lbColLast5, styles.lbLast5Wrap]}>
+                            {/* Visa exakt 5 dotts: padda med tomma platser
+                                vänster om färre än 5 spelats. */}
+                            {Array.from({ length: 5 }).map((_, i) => {
+                              const offset = entry.lastFiveResults.length - 5 + i;
+                              const result =
+                                offset >= 0 ? entry.lastFiveResults[offset] : undefined;
+                              if (result === undefined) {
+                                return (
+                                  <View key={i} style={styles.lbDotEmpty} />
+                                );
+                              }
+                              return (
+                                <View
+                                  key={i}
+                                  style={[
+                                    styles.lbDot,
+                                    result ? styles.lbDotCorrect : styles.lbDotWrong,
+                                  ]}
+                                >
+                                  <Text style={styles.lbDotGlyph}>
+                                    {result ? '✓' : '✗'}
+                                  </Text>
+                                </View>
+                              );
+                            })}
+                          </View>
+                        </View>
+                      ),
+                    )}
                   </View>
                 </ScrollView>
 
-                {/* Höger fixed kolumn: PTS */}
+                {/* Höger fixed kolumn: PTS. hasLeft-spelare visar — istället
+                    för siffror (mid-row redan har "Has left the game"-text). */}
                 <View style={styles.lbRightCol}>
                   <View style={[styles.lbCell, styles.lbHeaderCell, styles.lbRightCell]}>
                     <Text style={styles.lbHeaderText}>PTS</Text>
@@ -475,7 +555,9 @@ export function GetReadyIntro({
                       key={entry.playerId}
                       style={[styles.lbCell, styles.lbRightCell]}
                     >
-                      <Text style={styles.lbPoints}>{entry.points}</Text>
+                      <Text style={styles.lbPoints}>
+                        {entry.hasLeft ? '—' : entry.points}
+                      </Text>
                     </View>
                   ))}
                 </View>
@@ -535,52 +617,77 @@ export function GetReadyIntro({
         {/* ── Play: QuizVibe Q-logga med play-triangel istället för wifi-fan.
             Pulserar via scale-loop på wrappen och har en mjuk primary-färgad
             halo bakom (cross-platform glow — iOS har också shadow-stöd via
-            playLogoShadow). ── */}
+            playLogoShadow). Non-host i Individual Devices ser istället en
+            passiv "Waiting for Host to start quiz"-ruta i samma position;
+            samma halo + scale-pulse så den visuella rytmen behålls. ── */}
         <View style={styles.playBlock}>
-          <Animated.View
-            style={[styles.playLogoWrap, { transform: [{ scale: playPulse }] }]}
-          >
+          {canStartGame ? (
             <Animated.View
-              style={[styles.playLogoHalo, { opacity: playGlow }]}
-              pointerEvents="none"
-            />
-            <TouchableOpacity
-              activeOpacity={0.85}
-              onPress={onReady}
-              accessibilityLabel={`${playerName} press to start your turn`}
-              style={styles.playLogoTouchable}
+              style={[styles.playLogoWrap, { transform: [{ scale: playPulse }] }]}
             >
-              <QuizVibePlayLogo size={PLAY_BUTTON_SIZE} color={Colors.warning} />
-            </TouchableOpacity>
-          </Animated.View>
+              <Animated.View
+                style={[styles.playLogoHalo, { opacity: playGlow }]}
+                pointerEvents="none"
+              />
+              <TouchableOpacity
+                activeOpacity={0.85}
+                onPress={onReady}
+                accessibilityLabel={`${playerName} press to start your turn`}
+                style={styles.playLogoTouchable}
+              >
+                <QuizVibePlayLogo size={PLAY_BUTTON_SIZE} color={Colors.warning} />
+              </TouchableOpacity>
+            </Animated.View>
+          ) : (
+            // Same gold-halo Q-play-logo som host, men non-tappable + text
+            // under loggan. Inget tap-target — host kontrollerar speltempot.
+            <View style={styles.waitingForHostBlock}>
+              <Animated.View
+                style={[styles.playLogoWrap, { transform: [{ scale: playPulse }] }]}
+              >
+                <Animated.View
+                  style={[styles.playLogoHalo, { opacity: playGlow }]}
+                  pointerEvents="none"
+                />
+                <View style={styles.playLogoTouchable} pointerEvents="none">
+                  <QuizVibePlayLogo size={PLAY_BUTTON_SIZE} color={Colors.warning} />
+                </View>
+              </Animated.View>
+              <View style={styles.waitingForHostLabel}>
+                <Text style={styles.waitingForHostText}>
+                  Waiting - Host will start quiz
+                </Text>
+                <SequentialDots color={Colors.warning} />
+              </View>
+            </View>
+          )}
         </View>
 
         {isIndDev ? (
-          // ── IndDev: media-source-kö istället för spelarkö ─────────────
-          // Kolumner: Q: (Question #) | Media (ikon för YT/Spotify/Image/❓).
-          // Ingen R-kolumn (varje fråga = egen runda i IndDev). Current question
-          // får primary-bordered box i Media-cellen så användaren ser var de
-          // är i listan. Footer: "Question N of M · K players" (ingen Round).
+          // ── IndDev: dot-bar progress + media-source-kö ───────────────
+          // Q-kolumnen är borttagen — overall progress visas istället som
+          // en dot-bar ovanför listan (totalQuestions dots, currentQuestion
+          // filled). Kö-tabellen är single-column (Media source) och
+          // visar bara icon + label per fråga.
           <View style={styles.tableBlock}>
+            {/* IndDev: bara Question-bar (ingen Round-uppdelning — varje
+                fråga = egen runda). */}
+            {renderDotBar(totalQuestions, currentQuestion, 'Question')}
+
             <View style={[styles.tableRow, styles.tableHeaderRow]}>
-              <View style={[styles.colQ, styles.cellHeader]}>
-                <Text style={styles.headerCellText}>Q:</Text>
-              </View>
               <View style={[styles.colPlayer, styles.cellHeader]}>
-                <Text style={styles.headerCellText}>Media source:</Text>
+                <Text style={styles.headerCellText}>Next:</Text>
               </View>
             </View>
 
             {/* Current question-rad — primary-bordered box runt media-ikonen. */}
             <View style={styles.tableRow}>
-              <View style={styles.colQ}>
-                <Text style={styles.numText}>{currentQuestion}</Text>
-              </View>
               <View style={[styles.colPlayer, styles.colPlayerCurrentWrap]}>
                 <View style={styles.currentMediaBox}>
-                  <Text style={styles.mediaIcon}>
-                    {mediaSourceIcon(mediaSourceByQuestion?.[currentQuestion - 1])}
-                  </Text>
+                  <MediaSourceIcon
+                    source={mediaSourceByQuestion?.[currentQuestion - 1]}
+                    size={28}
+                  />
                   <Text style={styles.mediaLabel} numberOfLines={1}>
                     {mediaSourceLabel(mediaSourceByQuestion?.[currentQuestion - 1])}
                   </Text>
@@ -608,13 +715,11 @@ export function GetReadyIntro({
                         isLast && styles.tableRowNoBorder,
                       ]}
                     >
-                      <View style={styles.colQ}>
-                        <Text style={styles.numText}>{q}</Text>
-                      </View>
                       <View style={styles.colPlayer}>
-                        <Text style={styles.mediaIcon}>
-                          {mediaSourceIcon(mediaSourceByQuestion?.[q - 1])}
-                        </Text>
+                        <MediaSourceIcon
+                          source={mediaSourceByQuestion?.[q - 1]}
+                          size={24}
+                        />
                         <Text style={styles.mediaQueueLabel} numberOfLines={1}>
                           {mediaSourceLabel(mediaSourceByQuestion?.[q - 1])}
                         </Text>
@@ -634,34 +739,25 @@ export function GetReadyIntro({
             </Text>
           </View>
         ) : (
-          // ── Pass-the-Phone: turordningstabell ─────────────────────────
-          // En enhetlig tabell med kolumnerna R: (Round) | Q: (Question) |
-          // Pass-the-Phone to:. Header-raden står först, sedan current player
-          // som en highlighted box i sista kolumnen, sedan kö-spelarna utan
-          // box. Slutmarkör (🔁 + more questions / 🏁 End of Game) under kön.
+          // ── Pass-the-Phone: dot-bars (Rounds + Question) + spelarkö ──
+          // R- och Q-kolumnerna är borttagna; progress visas istället som
+          // två dot-bars ovanför kö-tabellen. Kö-tabellen är single-column
+          // (Pass-the-Phone to:) och visar bara avatar + namn. Round-
+          // separator-raden i kön behålls eftersom det är enda visuella
+          // signal för round-byten i listan nu.
           <View style={styles.tableBlock}>
+            {renderDotBar(totalRounds, currentRound, 'Rounds')}
+            {renderDotBar(totalQuestions, currentQuestion, 'Question')}
+
             <View style={[styles.tableRow, styles.tableHeaderRow]}>
-              <View style={[styles.colR, styles.cellHeader]}>
-                <Text style={styles.headerCellText}>R:</Text>
-              </View>
-              <View style={[styles.colQ, styles.cellHeader]}>
-                <Text style={styles.headerCellText}>Q:</Text>
-              </View>
               <View style={[styles.colPlayer, styles.cellHeader]}>
                 <Text style={styles.headerCellText}>Pass-the-Phone to:</Text>
               </View>
             </View>
 
-            {/* Current player-rad — R/Q-cellerna ser ut som vanliga rad-celler,
-                men Player-cellen får en primary-bordered box runt avatar+namn
-                så det är tydligt vem som är näst på tur. */}
+            {/* Current player-rad — Player-cellen får en primary-bordered
+                box runt avatar+namn så det är tydligt vem som är näst på tur. */}
             <View style={styles.tableRow}>
-              <View style={styles.colR}>
-                <Text style={styles.numText}>{currentRound}</Text>
-              </View>
-              <View style={styles.colQ}>
-                <Text style={styles.numText}>{currentQuestion}</Text>
-              </View>
               <View style={[styles.colPlayer, styles.colPlayerCurrentWrap]}>
                 <View style={styles.currentPlayerBox}>
                   <PlayerAvatar player={currentPlayer} size={QUEUE_AVATAR_SIZE} />
@@ -672,12 +768,9 @@ export function GetReadyIntro({
               </View>
             </View>
 
-            {/* Kö-rader (scrollar internt om kön är lång). Sista raden får
-                ingen botten-divider så slutmarkören sitter direkt under den.
-                "Round X"-separator infogas mellan två kö-rader när rondnumret
-                förändras (jämfört med föregående rad eller current player) —
-                redundant info mot R-kolumnen men gör round-bytena tydligare
-                vid en snabb blick på listan. */}
+            {/* Kö-rader (scrollar internt om kön är lång). "Round X"-separator
+                infogas mellan kö-rader när rondnumret förändras — visuell
+                signal för round-byten i listan när R-kolumnen är borta. */}
             {queue.length > 0 && (
               <ScrollView
                 style={styles.queueScroll}
@@ -702,12 +795,6 @@ export function GetReadyIntro({
                           i === queue.length - 1 && styles.tableRowNoBorder,
                         ]}
                       >
-                        <View style={styles.colR}>
-                          <Text style={styles.numText}>{round}</Text>
-                        </View>
-                        <View style={styles.colQ}>
-                          <Text style={styles.numText}>{queueQuestionNumbers[i]}</Text>
-                        </View>
                         <View style={styles.colPlayer}>
                           <PlayerAvatar player={p} size={QUEUE_AVATAR_SIZE} />
                           <Text style={styles.playerName} numberOfLines={1}>
@@ -747,17 +834,6 @@ export function GetReadyIntro({
       </View>
     </SafeAreaView>
   );
-}
-
-/** Emoji-mappning för media-källa. Tillfälliga emoji-glyfer tills riktiga
- *  SVG-ikoner per source kommer (D-vii eller senare). */
-function mediaSourceIcon(source: QuestionMediaType | undefined): string {
-  switch (source) {
-    case 'youtube': return '▶️';
-    case 'spotify': return '🎵';
-    case 'image': return '🖼️';
-    default: return '❓';
-  }
 }
 
 function mediaSourceLabel(source: QuestionMediaType | undefined): string {
@@ -886,6 +962,16 @@ const styles = StyleSheet.create({
   responseDropdownChevron: {
     fontSize: 10,
     color: Colors.primary,
+  },
+  // Non-host:s read-only-rendering av Answer response time. Bara värdet
+  // som primary-fet text — ingen border/bg/chevron/lock-ikon. Speglar
+  // settingsValue-stilen för Game era så de två settings-raderna ser
+  // visuellt konsistenta ut för non-host.
+  responseDropdownReadOnlyText: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.bold,
+    color: Colors.primary,
+    letterSpacing: 0.3,
   },
   // ── Current Leaderboard ──────────────────────────────────────────────
   // Wrapper sitter i normal-flow mellan settings och play. position:
@@ -1050,6 +1136,20 @@ const styles = StyleSheet.create({
   lbColLast5: { width: 96 },
   lbCorrectText: { color: Colors.success, fontWeight: FontWeight.semibold },
   lbWrongText: { color: Colors.error, fontWeight: FontWeight.semibold },
+
+  // "Has left the game"-rad ersätter mid-row-statistik för spelare som
+  // gjort Leave Game. Spänner hela detail-kolumnens bredd för läsbarhet.
+  lbHasLeftRow: {
+    paddingHorizontal: Spacing.sm,
+    justifyContent: 'flex-start',
+  },
+  lbHasLeftText: {
+    fontSize: FontSize.sm,
+    fontStyle: 'italic',
+    fontWeight: FontWeight.medium,
+    color: Colors.textSecondary,
+    letterSpacing: 0.3,
+  },
 
   // Last-5-dot-rad: 5 cirklar med ✓/✗ glyph. Höger-justerad så de "sista 5"
   // alltid pekar mot nuvarande slut.
@@ -1266,11 +1366,6 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.sm,
     paddingHorizontal: Spacing.md,
   },
-  mediaIcon: {
-    fontSize: 24,
-    textAlign: 'center',
-    width: 32,
-  },
   mediaLabel: {
     flexShrink: 1,
     fontSize: FontSize.lg,
@@ -1290,6 +1385,50 @@ const styles = StyleSheet.create({
   queueScroll: {
     width: '100%',
     maxHeight: 180,
+  },
+
+  // ── Dot-bar progress (IndDev) ──────────────────────────────────────────
+  // Ersätter Q-kolumnen i kö-tabellen. Render:as ovanför "Media source:"-
+  // raden. totalQuestions dots fördelade left-to-right, wrap:ar vid 10 per
+  // rad (= 10+10 vid max 20 ronder). Filled = currentQuestion st (gjorda
+  // + näst-på-tur), empty = resten. Speglar exemplet Peter delade.
+  progressBarBlock: {
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.md,
+    gap: 6,
+  },
+  // Samma dämpade overline-stil som "Next:"-header-cellen så de två
+  // sub-rubrikerna i IndDev-blocket läses som en visuell grupp.
+  progressBarLabel: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.semibold,
+    color: Colors.textSecondary,
+    letterSpacing: 0.5,
+  },
+  // Vertikal stack av 1-2 rader dots. >10 frågor splittas jämnt så raderna
+  // får liknande bredd istället för en full + en kort rad.
+  progressBarRowsWrap: {
+    flexDirection: 'column',
+    gap: 4,
+  },
+  progressBarRow: {
+    flexDirection: 'row',
+    gap: 4,
+  },
+  // Rektangulär pill — speglar exempel-bilden Peter delade. 28×16 ger en
+  // mjuk avlång form som tydligt skiljer fyllda från ofyllda. Border-color
+  // är dämpad textPrimary så ofyllda syns mot dark-bg utan att skrika.
+  progressDot: {
+    width: 28,
+    height: 16,
+    borderRadius: 4,
+    borderWidth: 1.5,
+    borderColor: Colors.textPrimary,
+    backgroundColor: 'transparent',
+  },
+  progressDotFilled: {
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
   },
 
   // "Round X"-separator infogas mellan kö-rader vid varje rondbyte. Spänner
@@ -1375,5 +1514,24 @@ const styles = StyleSheet.create({
     height: PLAY_BUTTON_SIZE,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  // Non-host:s waiting-vy i Individual Devices: samma gold-halo'd Q-play-logo
+  // som host, plus en text-rad under loggan med "Waiting - Host will start
+  // quiz" + animerade dots. Loggan är non-tappable; text:n förklarar varför.
+  waitingForHostBlock: {
+    alignItems: 'center',
+    gap: Spacing.md,
+  },
+  waitingForHostLabel: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  waitingForHostText: {
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.bold,
+    color: Colors.warning,
+    textAlign: 'center',
+    letterSpacing: 0.3,
   },
 });

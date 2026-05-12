@@ -58,6 +58,10 @@ export interface LeaderboardPlayer {
   age: number;
   isYou?: boolean;
   isHost?: boolean;
+  /** Spelaren har lämnat spelet via Leave Game (non-host i Individual
+   *  Devices). Mid-row-stats ersätts av "Has left the game"-text och
+   *  PTS-kolumnen visar streck. */
+  hasLeft?: boolean;
 }
 
 export interface RoundScore {
@@ -180,6 +184,7 @@ export function RoundLeaderboard({
         avgResponseSeconds,
         lastResponseSeconds,
         lastFiveResults,
+        hasLeft: !!p.hasLeft,
       };
     });
     return entries.sort((a, b) => {
@@ -259,64 +264,75 @@ export function RoundLeaderboard({
               <Text style={[styles.lbMidHeader, styles.lbColTime]}>LAST</Text>
               <Text style={[styles.lbMidHeader, styles.lbColLast5]}>Last 5</Text>
             </View>
-            {tableEntries.map((entry) => (
-              <View key={entry.playerId} style={styles.lbMidRow}>
-                <Text style={[styles.lbMidCell, styles.lbColR]}>
-                  {entry.playedRounds}
-                </Text>
-                <Text
-                  style={[
-                    styles.lbMidCell,
-                    styles.lbColCheck,
-                    styles.lbCorrectText,
-                  ]}
+            {tableEntries.map((entry) =>
+              entry.hasLeft ? (
+                <View
+                  key={entry.playerId}
+                  style={[styles.lbMidRow, styles.lbHasLeftRow]}
                 >
-                  {entry.correctAnswers}
-                </Text>
-                <Text
-                  style={[
-                    styles.lbMidCell,
-                    styles.lbColCheck,
-                    styles.lbWrongText,
-                  ]}
-                >
-                  {entry.incorrectAnswers}
-                </Text>
-                <Text style={[styles.lbMidCell, styles.lbColTime]}>
-                  {entry.playedRounds > 0
-                    ? `${entry.avgResponseSeconds.toFixed(2)}s`
-                    : '—'}
-                </Text>
-                <Text style={[styles.lbMidCell, styles.lbColTime]}>
-                  {entry.lastResponseSeconds !== null
-                    ? `${entry.lastResponseSeconds.toFixed(2)}s`
-                    : '—'}
-                </Text>
-                <View style={[styles.lbColLast5, styles.lbLast5Wrap]}>
-                  {Array.from({ length: 5 }).map((_, i) => {
-                    const offset = entry.lastFiveResults.length - 5 + i;
-                    const result =
-                      offset >= 0 ? entry.lastFiveResults[offset] : undefined;
-                    if (result === undefined) {
-                      return <View key={i} style={styles.lbDotEmpty} />;
-                    }
-                    return (
-                      <View
-                        key={i}
-                        style={[
-                          styles.lbDot,
-                          result ? styles.lbDotCorrect : styles.lbDotWrong,
-                        ]}
-                      >
-                        <Text style={styles.lbDotGlyph}>
-                          {result ? '✓' : '✗'}
-                        </Text>
-                      </View>
-                    );
-                  })}
+                  <Text style={styles.lbHasLeftText} numberOfLines={1}>
+                    Has left the game
+                  </Text>
                 </View>
-              </View>
-            ))}
+              ) : (
+                <View key={entry.playerId} style={styles.lbMidRow}>
+                  <Text style={[styles.lbMidCell, styles.lbColR]}>
+                    {entry.playedRounds}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.lbMidCell,
+                      styles.lbColCheck,
+                      styles.lbCorrectText,
+                    ]}
+                  >
+                    {entry.correctAnswers}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.lbMidCell,
+                      styles.lbColCheck,
+                      styles.lbWrongText,
+                    ]}
+                  >
+                    {entry.incorrectAnswers}
+                  </Text>
+                  <Text style={[styles.lbMidCell, styles.lbColTime]}>
+                    {entry.playedRounds > 0
+                      ? `${entry.avgResponseSeconds.toFixed(2)}s`
+                      : '—'}
+                  </Text>
+                  <Text style={[styles.lbMidCell, styles.lbColTime]}>
+                    {entry.lastResponseSeconds !== null
+                      ? `${entry.lastResponseSeconds.toFixed(2)}s`
+                      : '—'}
+                  </Text>
+                  <View style={[styles.lbColLast5, styles.lbLast5Wrap]}>
+                    {Array.from({ length: 5 }).map((_, i) => {
+                      const offset = entry.lastFiveResults.length - 5 + i;
+                      const result =
+                        offset >= 0 ? entry.lastFiveResults[offset] : undefined;
+                      if (result === undefined) {
+                        return <View key={i} style={styles.lbDotEmpty} />;
+                      }
+                      return (
+                        <View
+                          key={i}
+                          style={[
+                            styles.lbDot,
+                            result ? styles.lbDotCorrect : styles.lbDotWrong,
+                          ]}
+                        >
+                          <Text style={styles.lbDotGlyph}>
+                            {result ? '✓' : '✗'}
+                          </Text>
+                        </View>
+                      );
+                    })}
+                  </View>
+                </View>
+              ),
+            )}
           </View>
         </ScrollView>
 
@@ -330,7 +346,9 @@ export function RoundLeaderboard({
               key={entry.playerId}
               style={[styles.lbCell, styles.lbRightCell]}
             >
-              <Text style={styles.lbPoints}>{entry.points}</Text>
+              <Text style={styles.lbPoints}>
+                {entry.hasLeft ? '—' : entry.points}
+              </Text>
             </View>
           ))}
         </View>
@@ -584,6 +602,20 @@ const styles = StyleSheet.create({
   lbColLast5: { width: 96 },
   lbCorrectText: { color: Colors.success, fontWeight: FontWeight.semibold },
   lbWrongText: { color: Colors.error, fontWeight: FontWeight.semibold },
+  // "Has left the game"-rad ersätter Q/✓/✗/AVG/LAST/Last-5 för spelare som
+  // gjort Leave Game. Spänner mid-row-bredden istället för att fördela
+  // cellerna; PTS-kolumnen visar streck i samma rad.
+  lbHasLeftRow: {
+    paddingHorizontal: Spacing.sm,
+    justifyContent: 'flex-start',
+  },
+  lbHasLeftText: {
+    fontSize: FontSize.sm,
+    fontStyle: 'italic',
+    fontWeight: FontWeight.medium,
+    color: Colors.textSecondary,
+    letterSpacing: 0.3,
+  },
   lbLast5Wrap: {
     flexDirection: 'row',
     alignItems: 'center',

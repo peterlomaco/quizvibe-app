@@ -28,6 +28,7 @@ import { EraMarkerMinus, EraMarkerPlus } from '../components/EraSliderMarker';
 import { Player, PlayerRow } from '../components/PlayerRow';
 import { QuizVibeFriendsLogo } from '../components/QuizVibeFriendsLogo';
 import { QuizVibeLogo } from '../components/QuizVibeLogo';
+import { SequentialDots } from '../components/SequentialDots';
 import {
     ROUNDS_DEFAULT,
     ROUNDS_MAX_INDIV,
@@ -884,67 +885,9 @@ const waveDotsStyles = StyleSheet.create({
   },
 });
 
-// ─── SequentialDots ───────────────────────────────────────────────────────────
+// SequentialDots flyttat till src/components/SequentialDots.tsx för delning
+// med GetReadyIntro (icke-host:s "Waiting for Host to start quiz"-ruta).
 
-/**
- * Tre prickar som tänds en och en med fade-in, sedan släcks alla samtidigt
- * och cykeln börjar om. Används av "Waiting for Host to Start Game…"-rutan
- * för icke-host så de visuellt ser att appen väntar/lever. Cykellängd 1600ms
- * (0/400/800ms-stagger för ON, alla OFF vid 1200ms, 400ms blank-period).
- */
-function SequentialDots({ color }: { color?: string } = {}) {
-  const dot1 = useRef(new Animated.Value(0)).current;
-  const dot2 = useRef(new Animated.Value(0)).current;
-  const dot3 = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    const fadeMs = 100;
-    const makeDot = (val: Animated.Value, onAt: number) =>
-      Animated.loop(
-        Animated.sequence([
-          Animated.delay(onAt),
-          Animated.timing(val, { toValue: 1, duration: fadeMs, useNativeDriver: true }),
-          Animated.delay(1200 - onAt - fadeMs),
-          Animated.timing(val, { toValue: 0, duration: fadeMs, useNativeDriver: true }),
-          Animated.delay(300),
-        ]),
-      );
-    const a1 = makeDot(dot1, 0);
-    const a2 = makeDot(dot2, 400);
-    const a3 = makeDot(dot3, 800);
-    a1.start();
-    a2.start();
-    a3.start();
-    return () => {
-      a1.stop();
-      a2.stop();
-      a3.stop();
-    };
-  }, [dot1, dot2, dot3]);
-
-  const dotStyle = color ? [sequentialDotsStyles.dot, { color }] : sequentialDotsStyles.dot;
-  return (
-    <View style={sequentialDotsStyles.row}>
-      <Animated.Text style={[dotStyle, { opacity: dot1 }]}>.</Animated.Text>
-      <Animated.Text style={[dotStyle, { opacity: dot2 }]}>.</Animated.Text>
-      <Animated.Text style={[dotStyle, { opacity: dot3 }]}>.</Animated.Text>
-    </View>
-  );
-}
-
-const sequentialDotsStyles = StyleSheet.create({
-  row: {
-    flexDirection: 'row',
-    marginLeft: 2,
-  },
-  dot: {
-    fontSize: FontSize.md,
-    fontWeight: FontWeight.semibold,
-    color: Colors.textPrimary,
-    marginHorizontal: 1,
-    lineHeight: 20,
-  },
-});
 
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
@@ -2240,19 +2183,35 @@ export default function LobbyScreen() {
       const remoteGameStarted = !!meta?.gameStarted;
       const localGameStarted = ownId ? isGameStarted(roomCode) : false;
       if (ownId && (remoteGameStarted || localGameStarted)) {
-        const playersStored = await getLobbyPlayers(roomCode);
+        // Fetch authoritative lobby_settings inline — non-host:s lokala
+        // state (gameMode, answerResponseSeconds, etc.) kan vara stale om
+        // host ändrade en setting strax innan Start Game och Realtime/
+        // polling inte hunnit propagera än. settings här är canonical
+        // (samma DB-rad som host skrev till).
+        const [playersStored, settingsStored] = await Promise.all([
+          getLobbyPlayers(roomCode),
+          getLobbySettings(roomCode),
+        ]);
         if (cancelled) return;
         const selfApproved = !!playersStored?.find((p) => p.id === ownId)?.approved;
         if (!selfApproved) {
           if (!cancelled) setStartedWithoutMeDetected(true);
           return;
         }
+        // Använd settings från store där det finns; fall tillbaka till
+        // local state för fält som inte syncas via lobby_settings än.
+        const effectiveGameMode = settingsStored?.gameMode ?? gameMode;
+        const effectiveAnswerResponseSeconds =
+          settingsStored?.answerResponseSeconds ?? answerResponseSeconds;
+        const effectiveEraFrom = settingsStored?.eraFrom ?? eraValues[0];
+        const effectiveEraTo = settingsStored?.eraTo ?? eraValues[1];
+        const effectiveRoundsCount = settingsStored?.roundsCount ?? roundsCount;
         // Approved spelare: nästa steg beror på gameMode.
         // - Pass-the-Phone: bara host spelar på sin telefon → vänligare
         //   popup "Host has started... use the Host device".
         // - Individual Devices: alla approved spelare spelar på sin egen
         //   enhet → navigera till /quiz med derived turnOrder.
-        if (gameMode === 'pass-the-phone') {
+        if (effectiveGameMode === 'pass-the-phone') {
           if (!cancelled) setPassThePhoneStartedDetected(true);
           return;
         }
@@ -2273,16 +2232,20 @@ export default function LobbyScreen() {
             params: {
               assistance: 'standard',
               age: '32',
-              gameMode,
+              gameMode: effectiveGameMode,
               // Non-host-vägen från Realtime-driven game-started-detection.
               // quiz.tsx använder isHost för att rendera Leave Game-knapp
               // istället för Quit Game-knapp i GetReadyIntro/CountdownIntro.
               isHost: 'false',
+              // Non-host:s egna player_id — används av Leave-flödet för att
+              // broadcasta `player_left` så host:s skärm får popup + markerar
+              // spelaren som hasLeft i leaderboarden.
+              selfPlayerId: ownId ?? '',
               players: JSON.stringify(turnOrder),
-              roundsCount: String(roundsCount),
-              answerResponseSeconds: String(answerResponseSeconds),
-              eraFrom: String(eraValues[0]),
-              eraTo: String(eraValues[1]),
+              roundsCount: String(effectiveRoundsCount),
+              answerResponseSeconds: String(effectiveAnswerResponseSeconds),
+              eraFrom: String(effectiveEraFrom),
+              eraTo: String(effectiveEraTo),
               roomCode,
             },
           });
@@ -2553,6 +2516,11 @@ export default function LobbyScreen() {
         // rendera Quit Game-knapp (river hela rummet) istället för Leave
         // Game-knapp (bara non-host:s egen utväg).
         isHost: 'true',
+        // Host:s egna player_id — speglar non-host-paths selfPlayerId.
+        // Inte använt för broadcast (host kan inte Leave Game, bara Quit)
+        // men inkluderat för symmetri så framtida features kan referensa
+        // ownId utan att behöva ändra Lobby:n.
+        selfPlayerId: ownPlayerIdRef.current ?? turnOrder[0]?.id ?? '',
         players: JSON.stringify(turnOrder),
         roundsCount: String(roundsCount),
         // Tidsgränsen per fråga från host:s profil (default 30 sek). Quiz
