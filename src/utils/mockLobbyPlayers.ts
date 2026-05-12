@@ -20,6 +20,7 @@
 //     på lobby_players-tabellen — getLobbyPlayers används initialt och som
 //     fallback om Realtime-channel skulle drop:as.
 
+import { ensureAuthSession } from './auth';
 import { supabase } from './supabase';
 import type { LobbyPlayer } from '../screens/LobbyScreen';
 
@@ -45,6 +46,11 @@ interface LobbyPlayerRow {
   turn_order: number;
   spotify_connected: boolean;
   lobby_edited: boolean;
+  // True när spelaren själv tryckt "Leave Game Lobby" → markOwnPlayerLeft
+  // UPDATE:ar denna kolumn så övriga klienter ser kortet med grå "LEFT
+  // THIS GAME LOBBY"-styling via Realtime-broadcast (Slice 3C-ii). Raden
+  // tas inte bort — vi behåller den så övriga klienter renderar kortet.
+  has_left: boolean;
 }
 
 function rowToPlayer(row: LobbyPlayerRow): LobbyPlayer {
@@ -63,15 +69,19 @@ function rowToPlayer(row: LobbyPlayerRow): LobbyPlayer {
     approved: row.approved,
     spotifyConnected: row.spotify_connected,
     lobbyEdited: row.lobby_edited,
+    hasLeft: row.has_left,
   };
 }
 
+// has_left utelämnas medvetet från UPSERT-payload — den kolumnen ägs av
+// markOwnPlayerLeft och får inte clobbas av host:s bulk-UPSERT. INSERT:n
+// får DB-default (false); UPDATE rör inte oprefererade kolumner.
 function playerToRow(
   code: string,
   player: LobbyPlayer,
   index: number,
   userId: string | null,
-): Omit<LobbyPlayerRow, 'id'> {
+): Omit<LobbyPlayerRow, 'id' | 'has_left'> {
   return {
     room_code: code,
     player_id: player.id,
@@ -139,6 +149,13 @@ export async function setLobbyPlayers(code: string, players: LobbyPlayer[]): Pro
 export async function upsertOwnLobbyPlayer(code: string, player: LobbyPlayer): Promise<void> {
   if (!code) return;
   const normalized = normalizeCode(code);
+  // Guests saknar registrerat konto men RLS kräver authenticated-rollen för
+  // INSERT/UPDATE. ensureAuthSession() signar dem in anonymt vid behov så
+  // user_id = auth.uid() matchar policies för own-row-write. Registrerade
+  // users har redan en session — då är detta en no-op (returnerar befintlig
+  // user direkt). Måste köras FÖRE getUser() — annars läser vi null-user
+  // direkt efter en helt fresh app-launch.
+  await ensureAuthSession();
   const { data: userResp } = await supabase.auth.getUser();
   const userId = userResp.user?.id ?? null;
   const row = playerToRow(normalized, player, 999, userId);
@@ -147,6 +164,45 @@ export async function upsertOwnLobbyPlayer(code: string, player: LobbyPlayer): P
     .upsert(row, { onConflict: 'room_code,player_id' });
   if (error) {
     console.warn('[lobbyPlayers] upsertOwnLobbyPlayer failed:', error.message);
+  }
+}
+
+/**
+ * Markerar att egen spelare lämnat lobbyn (Slice 3C-ii cross-device).
+ * UPDATE:ar bara has_left=true på raden där user_id = auth.uid() — RLS
+ * "player can update own row" tillåter detta. Realtime-publikationen
+ * broadcastar UPDATE-eventet → övriga klienter ser kortet renderat med
+ * "LEFT THIS GAME LOBBY"-styling.
+ *
+ * Anropas av handleGuestLeaveRoom parallellt med AsyncStorage-baserade
+ * addLeftPlayer (offline-fallback + test-seed-rum). Idempotent —
+ * upprepat anrop är no-op på serverside.
+ *
+ * Guests utan session faller tillbaka till ensureAuthSession som signar
+ * in dem anonymt. Registrerade users har redan en session.
+ */
+export async function markOwnPlayerLeft(code: string, playerId: string): Promise<void> {
+  if (!code || !playerId) return;
+  const normalized = normalizeCode(code);
+  await ensureAuthSession();
+  const { data: userResp } = await supabase.auth.getUser();
+  const userId = userResp.user?.id;
+  if (!userId) {
+    console.warn('[lobbyPlayers] markOwnPlayerLeft: no auth session, skipping');
+    return;
+  }
+  // Eq på både room_code + player_id + user_id ger belt-and-suspenders:
+  // även om RLS skulle vara felkonfigurerad träffar UPDATE:n bara raden
+  // som verkligen är vår egen. RLS gör samma check men dubbel-säkring
+  // kostar inget.
+  const { error } = await supabase
+    .from('lobby_players')
+    .update({ has_left: true })
+    .eq('room_code', normalized)
+    .eq('player_id', playerId)
+    .eq('user_id', userId);
+  if (error) {
+    console.warn('[lobbyPlayers] markOwnPlayerLeft failed:', error.message);
   }
 }
 

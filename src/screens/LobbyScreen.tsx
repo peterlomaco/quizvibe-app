@@ -44,7 +44,7 @@ import { MIN_HCP, calculateInitialHCP } from '../utils/hcp';
 import { addLeftPlayer, getLeftPlayers } from '../utils/leftPlayers';
 import { deactivateRoom, getRoomMeta, markRoomGameStarted, roomExists, setRoomMaxPlayers, setRoomPlayerCount } from '../utils/mockActiveRooms';
 import { clearEjected, isEjected, markEjected } from '../utils/ejectedPlayers';
-import { clearLobbyPlayers, getLobbyPlayers, setLobbyPlayers, upsertOwnLobbyPlayer } from '../utils/mockLobbyPlayers';
+import { clearLobbyPlayers, getLobbyPlayers, markOwnPlayerLeft, setLobbyPlayers, upsertOwnLobbyPlayer } from '../utils/mockLobbyPlayers';
 import { clearLobbySettings, getLobbySettings, setLobbySettings } from '../utils/mockLobbySettings';
 import { supabase } from '../utils/supabase';
 import { clearGameStarted, isGameStarted, markGameStarted } from '../utils/mockStartedGames';
@@ -1190,7 +1190,7 @@ export default function LobbyScreen() {
   useFocusEffect(
     useCallback(() => {
       let active = true;
-      Promise.all([loadProfile(), getLeftPlayers(roomCode)]).then(([profile, leftSnapshots]) => {
+      Promise.all([loadProfile(), getLeftPlayers(roomCode), getLobbyPlayers(roomCode)]).then(([profile, leftSnapshots, stored]) => {
         if (!active) return;
         // Speglar Profile:s credits-pill — refresh-logiken i loadProfile
         // top-up:ar `freeGameCredits` till FREE_CREDITS_DAILY_CAP vid första
@@ -1199,6 +1199,12 @@ export default function LobbyScreen() {
         setGameCredits(profile?.gameCredits ?? 0);
         setPlayers((prev) => {
           const leftIds = leftSnapshots.map((s) => s.id);
+          // DB has_left-set (Slice 3C-ii cross-device). OR:as med AsyncStorage-
+          // baserade leftIds så cross-device-broadcast slår igenom även när
+          // AsyncStorage saknar entry (annan device markerade left).
+          const dbLeftIds = new Set(
+            (stored ?? []).filter((p) => !!p.hasLeft).map((p) => p.id),
+          );
           // Steg 1: mappa över befintliga spelare och applicera hasLeft på de
           // som matchar en snapshot. Host:en passerar utan hasLeft (host kan
           // aldrig vara "left" — TopUserBanner-tap navigerar till Profile).
@@ -1213,7 +1219,7 @@ export default function LobbyScreen() {
             if (next.isHost) {
               return next.hasLeft ? { ...next, hasLeft: false } : next;
             }
-            const inLeft = leftIds.includes(next.id);
+            const inLeft = leftIds.includes(next.id) || dbLeftIds.has(next.id);
             if (inLeft && !next.hasLeft) return { ...next, hasLeft: true };
             if (!inLeft && next.hasLeft) return { ...next, hasLeft: false };
             return next;
@@ -1839,21 +1845,28 @@ export default function LobbyScreen() {
             const ownId = ownPlayerIdRef.current;
             const ownPlayer = ownId ? players.find((p) => p.id === ownId) : undefined;
             if (ownPlayer) {
-              // Spara hela snapshot:en av lämnande spelaren så nya joiners
-              // som kommer in i samma rum efter detta kan rendera kortet
-              // som "LEFT THIS GAME LOBBY" — inte bara id:t (då har de inte
-              // den lämnande spelaren i sin lokala SEED-baseline).
-              await addLeftPlayer(roomCode, {
-                id: ownPlayer.id,
-                name: ownPlayer.name,
-                emoji: ownPlayer.emoji,
-                avatarUri: ownPlayer.avatarUri,
-                type: ownPlayer.type,
-                age: ownPlayer.age,
-                assistance: ownPlayer.assistance,
-                hcpComplete: ownPlayer.hcpComplete,
-                approved: ownPlayer.approved,
-              });
+              // Cross-device-sync (Slice 3C-ii): UPDATE:a egen rad i
+              // lobby_players med has_left=true så övriga klienter får
+              // Realtime-broadcast → ser kortet renderat med grå "LEFT
+              // THIS GAME LOBBY"-styling utan att vänta på polling.
+              // Parallellt med AsyncStorage-snapshot:en (legacy + offline-
+              // fallback för test-seed-rum). Båda körs i parallel — DB
+              // failar tyst om guests saknar anon-session, AsyncStorage
+              // funkar alltid lokalt.
+              await Promise.all([
+                markOwnPlayerLeft(roomCode, ownPlayer.id),
+                addLeftPlayer(roomCode, {
+                  id: ownPlayer.id,
+                  name: ownPlayer.name,
+                  emoji: ownPlayer.emoji,
+                  avatarUri: ownPlayer.avatarUri,
+                  type: ownPlayer.type,
+                  age: ownPlayer.age,
+                  assistance: ownPlayer.assistance,
+                  hcpComplete: ownPlayer.hcpComplete,
+                  approved: ownPlayer.approved,
+                }),
+              ]);
             }
             router.replace('/');
           },
@@ -2089,6 +2102,11 @@ export default function LobbyScreen() {
   // re-fetchar listan och merge:ar in joiners som ännu inte finns i lokala
   // players[]-state. Host bevarar sina lokala modifications (approve, age-
   // edit etc.) genom att INTE överskriva existerande rader.
+  //
+  // UPDATE-events hanteras parallellt med en separat sync som BARA
+  // uppdaterar has_left-flaggan på existerande rader (Slice 3C-ii). Detta
+  // är medvetet konservativt — vi vill inte överskriva host:s lokala
+  // edits (approve, age, lobbyEdited) som inte är källa-of-truth i DB.
   useEffect(() => {
     if (!hostMode || !roomCode) return;
     let cancelled = false;
@@ -2109,6 +2127,23 @@ export default function LobbyScreen() {
         return next;
       });
     };
+    const syncHasLeft = async () => {
+      const stored = await getLobbyPlayers(roomCode);
+      if (cancelled || !stored) return;
+      setPlayers((prev) => {
+        let changed = false;
+        const next = prev.map((p) => {
+          if (p.isHost) return p; // host kan inte vara left
+          const updated = stored.find((s) => s.id === p.id);
+          if (!updated) return p;
+          const nextHasLeft = !!updated.hasLeft;
+          if (!!p.hasLeft === nextHasLeft) return p;
+          changed = true;
+          return { ...p, hasLeft: nextHasLeft };
+        });
+        return changed ? next : prev;
+      });
+    };
     // Initial check direkt vid mount så ev. joiners som hunnit INSERT:a
     // innan host:s subscription var aktiv kommer in i listan.
     fetchNewJoiners();
@@ -2118,6 +2153,11 @@ export default function LobbyScreen() {
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'lobby_players', filter: `room_code=eq.${roomCode}` },
         () => fetchNewJoiners(),
+      )
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'lobby_players', filter: `room_code=eq.${roomCode}` },
+        () => syncHasLeft(),
       )
       .subscribe();
     return () => {
@@ -2236,12 +2276,16 @@ export default function LobbyScreen() {
       const leftSnapshots = await getLeftPlayers(roomCode);
       if (cancelled) return;
       const leftIds = new Set(leftSnapshots.map((s) => s.id));
+      // hasLeft kommer från TVÅ källor: (a) DB:s has_left-kolumn (cross-
+      // device Slice 3C-ii) via rowToPlayer-mapping, (b) AsyncStorage-
+      // snapshot:s (legacy + offline-fallback). OR:as så cross-device-
+      // broadcasts slår igenom även när AsyncStorage inte hunnit synka.
       let approvedFromHost: LobbyPlayer[] = stored
         ? stored
             .filter((p) => !!p.approved || !!p.isHost)
             .map((p) => {
               if (p.isHost) return { ...p, hasLeft: false };
-              return { ...p, hasLeft: leftIds.has(p.id) };
+              return { ...p, hasLeft: !!p.hasLeft || leftIds.has(p.id) };
             })
         : [];
       // Synthesera host-placeholder från RoomMeta om host saknas i listan
@@ -2285,8 +2329,9 @@ export default function LobbyScreen() {
           const selfRow = stored?.find((p) => p.id === ownId)
             ?? prev.find((p) => p.id === ownId);
           if (selfRow) {
-            // Applicera hasLeft från left-snapshots även på self-rad
-            const hasLeft = leftIds.has(selfRow.id);
+            // Applicera hasLeft från BÅDA källor (DB has_left + AsyncStorage)
+            // även på self-rad så cross-device-broadcast slår igenom.
+            const hasLeft = !!selfRow.hasLeft || leftIds.has(selfRow.id);
             next = [...next, { ...selfRow, hasLeft }];
           }
         }
