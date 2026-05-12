@@ -25,10 +25,18 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <StatusBar style="light" backgroundColor={Colors.background} />
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="quiz" options={{ headerShown: false }} />
-        <Stack.Screen name="name-quiz-demo" options={{ headerShown: false }} />
+      <Stack screenOptions={{ headerShown: false }}>
+        {/* Bottom tab-bar borttagen (D-0 2026-05-12). Alla skärmar ligger
+            som plain Stack-routes; navigation mellan dem sker explicit via
+            TopUserBanner, in-screen-knappar och router.push/replace med
+            `from`-param för Back-routing. */}
+        <Stack.Screen name="index" />
+        <Stack.Screen name="profile" />
+        <Stack.Screen name="lobby" />
+        <Stack.Screen name="leaderboards" />
+        <Stack.Screen name="store" />
+        <Stack.Screen name="quiz" />
+        <Stack.Screen name="name-quiz-demo" />
       </Stack>
     </GestureHandlerRootView>
   );

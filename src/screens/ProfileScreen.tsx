@@ -2087,7 +2087,7 @@ function SourceRow({
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
-  // ── Logout-modal (speglar profileMenu från app/(tabs)/index.tsx
+  // ── Logout-modal (speglar profileMenu från app/index.tsx
   //     för konsistent UX när man loggar ut från Profile-pillen) ───
   logoutOverlay: { flex: 1, justifyContent: 'flex-end' },
   logoutBackdrop: {

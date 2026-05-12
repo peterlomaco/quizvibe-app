@@ -353,7 +353,7 @@ const ADD_PLAYER_ASSISTANCE_OPTIONS: { id: AddPlayerAssistance; label: string }[
 ];
 
 // Mock-list över "redan tagna" playerNames — synced med hemskärmens
-// motsvarande lista i app/(tabs)/index.tsx så Add Player-flödet känner
+// motsvarande lista i app/index.tsx så Add Player-flödet känner
 // samma collisions som Join as Guest. TODO (backend): byt mot riktig
 // playerName-uniqueness-check.
 const TAKEN_PLAYER_NAMES_LOBBY = new Set([
@@ -1906,10 +1906,10 @@ export default function LobbyScreen() {
             // Visa loading-overlay i ~1.6s innan navigation. Ger host:en
             // visuell feedback att appen processar och matchar real-
             // backend-känsla där en DELETE-request tar några hundra ms.
-            // VIKTIGT: stäng overlay:n EXPLICIT innan navigation. Lobby
-            // ligger i (tabs)-gruppen och tab-navigatorn bevarar screen-
-            // state över route-replace — utan dismiss skulle Modal:en
-            // stå kvar synlig ovanpå Home-skärmen efter navigationen.
+            // VIKTIGT: stäng overlay:n EXPLICIT innan navigation. Stack-
+            // navigatorn kan bevara Modal-state över route-replace —
+            // utan dismiss skulle Modal:en stå kvar synlig ovanpå Home-
+            // skärmen efter navigationen.
             setDeletingLobby(true);
             setTimeout(() => {
               setDeletingLobby(false);
@@ -2477,7 +2477,7 @@ export default function LobbyScreen() {
         'You have no credits left for today. Buy extra credits in Store, wait for the daily refresh at midnight CET, or upgrade to a QuizVibe membership for unlimited host games.',
         [
           { text: 'Cancel', style: 'cancel' },
-          { text: 'Go to Store', onPress: () => router.push('/(tabs)/store?focus=credits&from=/lobby') },
+          { text: 'Go to Store', onPress: () => router.push('/store?focus=credits&from=/lobby') },
         ],
       );
       return;
@@ -2574,7 +2574,7 @@ export default function LobbyScreen() {
                 styles.creditsPill,
                 pressed && { opacity: 0.85 },
               ]}
-              onPress={() => router.push('/(tabs)/store?focus=credits&from=/lobby')}
+              onPress={() => router.push('/store?focus=credits&from=/lobby')}
             >
               <Text style={styles.creditsLabel}>Host Game Credits</Text>
               <View style={styles.creditsValueRow}>
@@ -2596,7 +2596,7 @@ export default function LobbyScreen() {
                         : 'You have no extra credits. Buy some in Store?',
                       [
                         { text: 'Cancel', style: 'cancel' },
-                        { text: 'Go to Store', onPress: () => router.push('/(tabs)/store?focus=credits&from=/lobby') },
+                        { text: 'Go to Store', onPress: () => router.push('/store?focus=credits&from=/lobby') },
                       ],
                     )
                   }
@@ -3290,7 +3290,7 @@ export default function LobbyScreen() {
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={styles.addPackageBtn}
-                      onPress={() => router.push('/(tabs)/store?focus=packages&from=/lobby')}
+                      onPress={() => router.push('/store?focus=packages&from=/lobby')}
                       activeOpacity={0.7}
                     >
                       <Text style={styles.modeLabel}>+ Add host packages</Text>

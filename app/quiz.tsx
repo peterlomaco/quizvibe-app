@@ -1352,7 +1352,7 @@ export default function QuizScreen() {
     clearLobbySettings(newCode);
     clearEjected(newCode);
     clearGameStarted(newCode);
-    router.replace(`/(tabs)/lobby?code=${newCode}&isHost=true`);
+    router.replace(`/lobby?code=${newCode}&isHost=true`);
   };
 
   // Sekventiell Alert-flow: först fråga om spelarna ska följa med, sedan
@@ -1391,7 +1391,7 @@ export default function QuizScreen() {
           // bevarar /quiz på root Stack:en med Final Leaderboard-state intakt
           // — annars hade replace:n unmountat Quiz-komponenten och spelaren
           // skulle landa på en tom /quiz-vy efter köpet.
-          { text: 'Go to Store', onPress: () => router.push('/(tabs)/store?focus=credits') },
+          { text: 'Go to Store', onPress: () => router.push('/store?focus=credits') },
         ],
       );
       return;
@@ -1409,7 +1409,7 @@ export default function QuizScreen() {
   };
 
   const handleGoHome = () => {
-    router.replace('/(tabs)');
+    router.replace('/');
   };
 
   // Quit Game: avslutar pågående spel mitt i, river lobby:n och kastar ut
