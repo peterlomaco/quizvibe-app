@@ -71,6 +71,7 @@ import {
 } from '../utils/playerName';
 import { containsProfanity } from '../utils/profanity';
 import { loadProfile, saveProfile, type ProfileData, type Region as ProfileRegion } from '../utils/profileStorage';
+import { hasPremiumSubscription } from '../utils/subscriptionStorage';
 import { ROOM_CODE_DIGITS, ROOM_CODE_LEADING_LETTERS, formatRoomCode, generateRoomCode } from '../utils/roomCode';
 import { addInvite } from '../utils/waitingInvites';
 
@@ -1190,8 +1191,17 @@ export default function LobbyScreen() {
   useFocusEffect(
     useCallback(() => {
       let active = true;
-      Promise.all([loadProfile(), getLeftPlayers(roomCode), getLobbyPlayers(roomCode)]).then(([profile, leftSnapshots, stored]) => {
+      // hasPremium från subscriptionStorage parallellt med profil-load.
+      // Refreshas vid varje focus så återkomst från Store (efter purchase)
+      // direkt unlockar Individual Devices + Max 12 utan extra refresh.
+      Promise.all([
+        loadProfile(),
+        getLeftPlayers(roomCode),
+        getLobbyPlayers(roomCode),
+        hasPremiumSubscription(),
+      ]).then(([profile, leftSnapshots, stored, premium]) => {
         if (!active) return;
+        setHasPremium(premium);
         // Speglar Profile:s credits-pill — refresh-logiken i loadProfile
         // top-up:ar `freeGameCredits` till FREE_CREDITS_DAILY_CAP vid första
         // load efter midnatt CET, så lobbyn visar alltid aktuellt värde.
@@ -1338,9 +1348,11 @@ export default function LobbyScreen() {
   // Max antal spelare per spel — 4 = Basic (gratis), 12 = Premium.
   // Lobby-local state; speglar Profile:s host-default-toggle.
   const [maxPlayers, setMaxPlayers] = useState<4 | 12>(4);
-  // TODO (Store integration): byt mot riktig subscription-check när
-  // RevenueCat är inkopplad.
-  const hasPremium = false;
+  // Premium-state laddas från subscriptionStorage i useFocusEffect så vi
+  // re-checkar efter återkomst från Store (mock-purchase aktiverar flaggan).
+  // Driver BÅDA Individual Devices-unlock OCH Max 12-unlock. TODO (Store
+  // integration): byt subscriptionStorage mot RevenueCat entitlement-check.
+  const [hasPremium, setHasPremium] = useState(false);
 
   // Sync lobby-state till mockActiveRooms-registry så join-flödet
   // (handleJoinWithCode / handleJoinAsGuest i index.tsx) kan validera
@@ -1439,8 +1451,11 @@ export default function LobbyScreen() {
       setSelectedExtraPackages(availablePackages.map((p) => p.id));
     }
   };
-  // TODO (Store integration): koppla till riktig köpstatus när Store-paketet är inkopplat.
-  const hasMultiplayerPackage = false;
+  // hasMultiplayerPackage = Individual Devices-unlock. Tidigare separat
+  // hårdkodad flagga; nu unified med hasPremium (samma Premium-tier
+  // unlockar både IndDev + Max 12). När real subscription-tiers introduceras
+  // (t.ex. olika tier per feature) kan vi splita dem igen.
+  const hasMultiplayerPackage = hasPremium;
 
   const handleSelectMode = (mode: GameMode) => {
     if (mode === gameMode) return;
@@ -1450,7 +1465,7 @@ export default function LobbyScreen() {
         'Multiplayer on individual devices requires the "Multiplayer Individual Devices" package. Get it in the Store?',
         [
           { text: 'Cancel', style: 'cancel' },
-          { text: 'Go to Store', onPress: () => router.push('/store?focus=subscription&from=/lobby') },
+          { text: 'Go to Store', onPress: () => router.push({ pathname: '/store' as const, params: { focus: 'subscription', from: '/lobby', fromCode: roomCode } }) },
         ],
       );
       return;
@@ -1492,7 +1507,7 @@ export default function LobbyScreen() {
         'Hosting up to 12 players requires the Premium subscription. Get it in the Store?',
         [
           { text: 'Cancel', style: 'cancel' },
-          { text: 'Go to Store', onPress: () => router.push('/store?focus=subscription&from=/lobby') },
+          { text: 'Go to Store', onPress: () => router.push({ pathname: '/store' as const, params: { focus: 'subscription', from: '/lobby', fromCode: roomCode } }) },
         ],
       );
       return;
@@ -2070,6 +2085,15 @@ export default function LobbyScreen() {
   // att re-fetcha.
   useEffect(() => {
     if (hostMode || !roomCode) return;
+    // Defensiv: supabase.channel(name) returnerar BEFINTLIG channel om
+    // topic matchar (per RealtimeClient.ts), så om föregående cleanup inte
+    // hunnit klart innan effekten re-körs får vi tillbaka en subscribed
+    // channel → .on() därpå kraschar med "cannot add postgres_changes
+    // callbacks after subscribe()". Rensa stale först.
+    const topic = `realtime:lobby:${roomCode}`;
+    supabase.getChannels()
+      .filter((c) => c.topic === topic)
+      .forEach((c) => supabase.removeChannel(c));
     const channel = supabase
       .channel(`lobby:${roomCode}`)
       .on(
@@ -2147,6 +2171,13 @@ export default function LobbyScreen() {
     // Initial check direkt vid mount så ev. joiners som hunnit INSERT:a
     // innan host:s subscription var aktiv kommer in i listan.
     fetchNewJoiners();
+    // Defensiv channel-cleanup (samma som non-host channel:n ovan) —
+    // supabase.channel(name) återanvänder existerande topic, så stale
+    // subscribed channels från remount måste rensas innan vi addar .on().
+    const hostTopic = `realtime:lobby_host:${roomCode}`;
+    supabase.getChannels()
+      .filter((c) => c.topic === hostTopic)
+      .forEach((c) => supabase.removeChannel(c));
     const channel = supabase
       .channel(`lobby_host:${roomCode}`)
       .on(
@@ -2243,6 +2274,10 @@ export default function LobbyScreen() {
               assistance: 'standard',
               age: '32',
               gameMode,
+              // Non-host-vägen från Realtime-driven game-started-detection.
+              // quiz.tsx använder isHost för att rendera Leave Game-knapp
+              // istället för Quit Game-knapp i GetReadyIntro/CountdownIntro.
+              isHost: 'false',
               players: JSON.stringify(turnOrder),
               roundsCount: String(roundsCount),
               answerResponseSeconds: String(answerResponseSeconds),
@@ -2477,7 +2512,7 @@ export default function LobbyScreen() {
         'You have no credits left for today. Buy extra credits in Store, wait for the daily refresh at midnight CET, or upgrade to a QuizVibe membership for unlimited host games.',
         [
           { text: 'Cancel', style: 'cancel' },
-          { text: 'Go to Store', onPress: () => router.push('/store?focus=credits&from=/lobby') },
+          { text: 'Go to Store', onPress: () => router.push({ pathname: '/store' as const, params: { focus: 'credits', from: '/lobby', fromCode: roomCode } }) },
         ],
       );
       return;
@@ -2514,6 +2549,10 @@ export default function LobbyScreen() {
         assistance: 'standard',
         age: '32',
         gameMode,
+        // Host-vägen från Start Game-tap. quiz.tsx använder detta för att
+        // rendera Quit Game-knapp (river hela rummet) istället för Leave
+        // Game-knapp (bara non-host:s egen utväg).
+        isHost: 'true',
         players: JSON.stringify(turnOrder),
         roundsCount: String(roundsCount),
         // Tidsgränsen per fråga från host:s profil (default 30 sek). Quiz
@@ -2574,7 +2613,7 @@ export default function LobbyScreen() {
                 styles.creditsPill,
                 pressed && { opacity: 0.85 },
               ]}
-              onPress={() => router.push('/store?focus=credits&from=/lobby')}
+              onPress={() => router.push({ pathname: '/store' as const, params: { focus: 'credits', from: '/lobby', fromCode: roomCode } })}
             >
               <Text style={styles.creditsLabel}>Host Game Credits</Text>
               <View style={styles.creditsValueRow}>
@@ -2596,7 +2635,7 @@ export default function LobbyScreen() {
                         : 'You have no extra credits. Buy some in Store?',
                       [
                         { text: 'Cancel', style: 'cancel' },
-                        { text: 'Go to Store', onPress: () => router.push('/store?focus=credits&from=/lobby') },
+                        { text: 'Go to Store', onPress: () => router.push({ pathname: '/store' as const, params: { focus: 'credits', from: '/lobby', fromCode: roomCode } }) },
                       ],
                     )
                   }
@@ -3290,7 +3329,7 @@ export default function LobbyScreen() {
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={styles.addPackageBtn}
-                      onPress={() => router.push('/store?focus=packages&from=/lobby')}
+                      onPress={() => router.push({ pathname: '/store' as const, params: { focus: 'packages', from: '/lobby', fromCode: roomCode } })}
                       activeOpacity={0.7}
                     >
                       <Text style={styles.modeLabel}>+ Add host packages</Text>
@@ -3655,7 +3694,7 @@ export default function LobbyScreen() {
                       value={roundsCount}
                       min={ROUNDS_MIN}
                       gameModeMax={roundsMax}
-                      onPremiumPress={() => router.push('/store?focus=subscription&from=/lobby')}
+                      onPremiumPress={() => router.push({ pathname: '/store' as const, params: { focus: 'subscription', from: '/lobby', fromCode: roomCode } })}
                       hasSubscription={hasMultiplayerPackage}
                     />
                   </View>

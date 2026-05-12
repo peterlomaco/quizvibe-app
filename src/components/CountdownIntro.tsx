@@ -15,11 +15,16 @@ interface Props {
   onComplete: () => void;
   /** Sekunder att räkna ner från (default 3). */
   startFrom?: number;
-  /** Namn på spelaren som ska börja sin runda — visas ovan Q-loggan så
-   *  spelarna ser vems tur det är även när nedräkningen körs. */
+  /** Game mode — styr texten ovan Q-loggan. Pass-the-Phone visar
+   *  "Pass-the-Phone to: <playerName>" med avatar-box; IndDev visar bara
+   *  "Get Ready to Vibe" (ingen spelar-specifik info). */
+  mode?: 'pass-the-phone' | 'individual-devices';
+  /** Namn på spelaren som ska börja sin runda — visas ovan Q-loggan i PtP
+   *  så spelarna ser vems tur det är även när nedräkningen körs. Ignoreras
+   *  i IndDev. */
   playerName?: string;
   /** Avatar-emoji för spelaren — renderas i playerName-boxen som visuellt
-   *  matchar GetReadyIntro:s currentPlayerBox (avatar + namn på rad). */
+   *  matchar GetReadyIntro:s currentPlayerBox (avatar + namn på rad). PtP-only. */
   playerEmoji?: string;
 }
 
@@ -42,7 +47,8 @@ const GLYPH_FONT_SIZE = LOGO_SIZE * 0.28;
  * att "?" visats i ~1 s fyras `onComplete` så parent kan växla fas till
  * `'question'`.
  */
-export function CountdownIntro({ onComplete, startFrom = 3, playerName, playerEmoji }: Props) {
+export function CountdownIntro({ onComplete, startFrom = 3, mode = 'pass-the-phone', playerName, playerEmoji }: Props) {
+  const isIndDev = mode === 'individual-devices';
   const [count, setCount] = useState(startFrom);
   // Två separata pop-animationer så siffran och "?" kan röra sig oberoende.
   const numberScale = useRef(new Animated.Value(1.4)).current;
@@ -166,11 +172,16 @@ export function CountdownIntro({ onComplete, startFrom = 3, playerName, playerEm
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.container}>
-        {/* PlayerName ovan loggan — primary-bordered box med avatar + namn,
-            speglar GetReadyIntro:s currentPlayerBox-stil så Pass-the-Phone-
-            spelaren känns konsistent från turn-passing-skärmen. Label sitter
-            i en separat rad ovanför boxen med extra spacing nedåt. */}
-        {playerName ? (
+        {/* Pre-countdown-headline ovan loggan. PtP: "Pass-the-Phone to:" +
+            spelar-box (avatar + namn) så användaren vet vems tur det är
+            även under nedräkningen. IndDev: bara texten "Get Ready to
+            Vibe" (alla spelare på sina egna enheter; ingen specifik spelare
+            att namnge). */}
+        {isIndDev ? (
+          <View style={styles.playerBlock}>
+            <Text style={styles.getReadyHeadline}>Get Ready to Vibe</Text>
+          </View>
+        ) : playerName ? (
           <View style={styles.playerBlock}>
             <Text style={styles.playerLabel}>Pass-the-Phone to:</Text>
             <View style={styles.playerBox}>
@@ -295,6 +306,16 @@ const styles = StyleSheet.create({
     fontWeight: FontWeight.medium,
     color: Colors.textSecondary,
     letterSpacing: 0.4,
+  },
+  // IndDev-headline: stor och bold, ersätter både "Pass-the-Phone to:"-label
+  // och playerBox. Storleksmässigt motsvarar playerName-fontSize så
+  // visuell vikt över loggan blir likadan i båda lägena.
+  getReadyHeadline: {
+    fontSize: FontSize.xxl,
+    fontWeight: FontWeight.bold,
+    color: Colors.textPrimary,
+    letterSpacing: 0.4,
+    textAlign: 'center',
   },
   // Framed box runt avatar + namn — speglar GetReadyIntro:s currentPlayerBox
   // (primary-border + primaryMuted bg + Radius.md) så Pass-the-Phone-spelaren

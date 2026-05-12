@@ -1,5 +1,5 @@
 import { CountdownIntro } from '@/src/components/CountdownIntro';
-import { GetReadyIntro } from '@/src/components/GetReadyIntro';
+import { GetReadyIntro, type QuestionMediaType } from '@/src/components/GetReadyIntro';
 import { ImageAnswerBlock } from '@/src/components/ImageAnswerBlock';
 import { MediaPlayer } from '@/src/components/MediaPlayer';
 import { ProgressiveCover } from '@/src/components/ProgressiveCover';
@@ -26,6 +26,7 @@ import { clearLobbyPlayers } from '@/src/utils/mockLobbyPlayers';
 import { clearLobbySettings } from '@/src/utils/mockLobbySettings';
 import { clearGameStarted } from '@/src/utils/mockStartedGames';
 import { pickMediaSource, type YoutubeClip } from '@/src/utils/mediaSource';
+import { supabase } from '@/src/utils/supabase';
 import { MUSIC_QUESTIONS } from '@/src/utils/musicQuestions';
 import {
   IMAGE_QUIZ_QUESTIONS,
@@ -528,6 +529,7 @@ export default function QuizScreen() {
     assistance?: string;
     age?: string;
     gameMode?: 'pass-the-phone' | 'individual-devices';
+    isHost?: string;
     players?: string;
     roundsCount?: string;
     roomCode?: string;
@@ -543,6 +545,11 @@ export default function QuizScreen() {
   const fallbackAssistance = (params.assistance ?? 'standard') as AssistanceLevel;
   const age = parseInt(params.age ?? '30');
   const gameMode = params.gameMode ?? 'pass-the-phone';
+  // True om enheten kör host:s vy. Sätts av Lobby:s handleStartGame ('true')
+  // resp. non-host:s Realtime-driven navigation ('false'). Defaultas till
+  // 'true' så direkt-nav (utan Lobby) behåller host-beteende (Quit Game-
+  // knapp etc.) — speglar tidigare implicit-host-antagande.
+  const isHost = (params.isHost ?? 'true') === 'true';
   // Initial answerResponseSeconds från Lobby-param. Spelaren kan justera
   // mellan ronder via GetReadyIntro:s settings-block, så vi håller värdet
   // som state istället för konst. Endast 15/30/45/60 är giltiga (= host:s
@@ -644,6 +651,24 @@ export default function QuizScreen() {
     }
     return mixed.length > 0 ? mixed : SEED_QUESTIONS;
   }, [eraFrom, eraTo, turnOrder.length, totalRounds]);
+
+  // Media-källa per fråga (driver GetReadyIntro:s IndDev media-kö).
+  // Bilder → 'image'; musik → kör pickMediaSource för att se om YouTube
+  // eller Spotify är aktiv för just den frågan givet host:s toggles.
+  // Memoiseras parallellt med gameQuestions så ingen tomt-laddning sker i
+  // render-loop.
+  const mediaSourceByQuestion = useMemo<QuestionMediaType[]>(() => {
+    return gameQuestions.map((q) => {
+      if (q.type === 'image') return 'image';
+      const picked = pickMediaSource(
+        { youtubeClips: q.youtubeClips },
+        { youtubeEnabled, spotifyEnabled, gameMode },
+      );
+      if (picked.kind === 'youtube') return 'youtube';
+      if (picked.kind === 'spotify') return 'spotify';
+      return 'none';
+    });
+  }, [gameQuestions, youtubeEnabled, spotifyEnabled, gameMode]);
 
   const [questionIndex, setQuestionIndex] = useState(0);
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
@@ -1443,6 +1468,64 @@ export default function QuizScreen() {
     );
   };
 
+  // Leave Game: non-host:s motsvarighet till Quit Game. Spelet och lobby:n
+  // lever vidare för övriga; bara den här spelaren lämnar och navigerar Home.
+  // Ingen DB-cleanup eftersom rummet ska finnas kvar — bara has_left-flag på
+  // egen lobby_players-rad (D-ii kommer wire:a in det; för D-i är detta en
+  // ren navigation tillbaka).
+  const handleLeaveGame = () => {
+    Alert.alert(
+      'Leave game?',
+      'You will return to the start screen. The game continues for the other players.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Leave game',
+          style: 'destructive',
+          onPress: () => router.replace('/'),
+        },
+      ],
+    );
+  };
+
+  // Cross-device-detection (Slice D-i): när host raderar rummet via Quit
+  // Game ska non-host:s /quiz-skärm få samma "Game has been deleted by
+  // Host"-popup som LobbyScreen visar. Realtime-DELETE-event på rooms-
+  // tabellen är canonical-signalen. Gated på !isHost — host:en initierade
+  // delete:n och navigerar bort själv, så vi behöver inte poppa något åt
+  // dem. Samma defensive channel-cleanup-pattern som LobbyScreen så
+  // remount inte racear med stale-subscribed-channels.
+  const [hostDeletedDetected, setHostDeletedDetected] = useState(false);
+  useEffect(() => {
+    if (isHost || !params.roomCode) return;
+    const code = params.roomCode;
+    const topic = `realtime:quiz_room:${code}`;
+    supabase.getChannels()
+      .filter((c) => c.topic === topic)
+      .forEach((c) => supabase.removeChannel(c));
+    const channel = supabase
+      .channel(`quiz_room:${code}`)
+      .on(
+        'postgres_changes',
+        { event: 'DELETE', schema: 'public', table: 'rooms', filter: `code=eq.${code}` },
+        () => setHostDeletedDetected(true),
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [isHost, params.roomCode]);
+
+  useEffect(() => {
+    if (!hostDeletedDetected) return;
+    Alert.alert(
+      'Game ended',
+      'Game has been deleted by Host.',
+      [{ text: 'OK', onPress: () => router.replace('/') }],
+      { cancelable: false },
+    );
+  }, [hostDeletedDetected]);
+
   // Timer-progress-barens färg byter vid 10s (warning) och 5s (error).
   // Bar:ens BREDD drivs av timerProgressAnim (Animated.Value, RAF-driven).
   // Färgen styrs fortfarande av sekund-räknaren timeLeft eftersom färg-
@@ -1498,6 +1581,7 @@ export default function QuizScreen() {
       gameMode === 'pass-the-phone' && currentPlayerIndex !== 0;
     return (
       <GetReadyIntro
+        mode={gameMode}
         currentPlayer={currentPlayer}
         queue={introQueue}
         queueRoundNumbers={queueRoundNumbers}
@@ -1507,6 +1591,7 @@ export default function QuizScreen() {
         currentQuestion={currentQuestion}
         totalQuestions={totalQuestions}
         playerCount={playerCount}
+        mediaSourceByQuestion={mediaSourceByQuestion}
         eraFrom={eraFrom}
         eraTo={eraTo}
         answerResponseSeconds={responseSeconds}
@@ -1514,7 +1599,11 @@ export default function QuizScreen() {
         responseSecondsLocked={responseSecondsLocked}
         leaderboard={liveLeaderboard}
         onReady={() => setPhase('countdown')}
-        onQuit={handleQuitGame}
+        // Host får Quit Game (river rummet); non-host får Leave Game
+        // (lämnar bara egen plats). Båda går ALDRIG via samma codepath
+        // för cleanup eftersom non-host inte ska avsluta spelet för andra.
+        onQuit={isHost ? handleQuitGame : undefined}
+        onLeave={!isHost ? handleLeaveGame : undefined}
       />
     );
   }
@@ -1526,6 +1615,7 @@ export default function QuizScreen() {
     const countdownPlayer = turnOrder[currentPlayerIndex];
     return (
       <CountdownIntro
+        mode={gameMode}
         playerName={countdownPlayer?.name}
         playerEmoji={countdownPlayer?.emoji}
         onComplete={() => setPhase('question')}

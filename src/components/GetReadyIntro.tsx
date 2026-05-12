@@ -58,19 +58,27 @@ const ASSISTANCE_LABEL: Record<'minimal' | 'standard' | 'full', string> = {
   full: 'Full',
 };
 
+/** Media-källa per fråga, för IndDev:s media-source-kö. 'none' renderas som
+ *  ❓ när varken YouTube eller Spotify är aktiv för frågan. */
+export type QuestionMediaType = 'youtube' | 'spotify' | 'image' | 'none';
+
 interface Props {
-  /** Spelaren som ska börja sin runda — visas i Pass-the-Phone-rutan. */
+  /** Game mode — styr vilken vy av kö-tabellen som renderas + ev. UI-text. */
+  mode?: 'pass-the-phone' | 'individual-devices';
+  /** Spelaren som ska börja sin runda — visas i Pass-the-Phone-rutan.
+   *  I IndDev döljs current-player-raden helt; bara queue-tabellen renderas. */
   currentPlayer: IntroPlayer;
   /** Spelare som kommer på tur EFTER current — i ordning, med ev. wrap-around.
-   *  Capade i quiz.tsx så endast spelare som faktiskt hinner spela ingår. */
+   *  Capade i quiz.tsx så endast spelare som faktiskt hinner spela ingår.
+   *  Används bara i Pass-the-Phone — i IndDev ignoreras detta fält. */
   queue: IntroPlayer[];
-  /** Rond-nummer per kö-spelare (1-baserat, parallell till queue). */
+  /** Rond-nummer per kö-spelare (1-baserat, parallell till queue). Bara PtP. */
   queueRoundNumbers: number[];
-  /** Fråge-nummer per kö-spelare (1-baserat, parallell till queue). */
+  /** Fråge-nummer per kö-spelare (1-baserat, parallell till queue). Bara PtP. */
   queueQuestionNumbers: number[];
-  /** Aktuell runda för den som ska svara (1-baserad). */
+  /** Aktuell runda för den som ska svara (1-baserad). Bara PtP. */
   currentRound: number;
-  /** Totalt antal rundor — visas bara i header-räkneverket ovanför rutan. */
+  /** Totalt antal rundor — visas bara i header-räkneverket ovanför rutan. Bara PtP. */
   totalRounds: number;
   /** Aktuellt frågenummer för den som ska svara (1-baserat, löpande över hela spelomgången). */
   currentQuestion: number;
@@ -78,6 +86,9 @@ interface Props {
   totalQuestions: number;
   /** Antal spelare i spelomgången — visas högerställt i header-raden. */
   playerCount: number;
+  /** Media-källa per fråga (0-baserat). KRÄVS i IndDev. Längd = totalQuestions
+   *  (eller kortare; saknade index renderar som 'none'/❓). */
+  mediaSourceByQuestion?: QuestionMediaType[];
   /** Game era från Lobby — visas i Game settings-blocket. */
   eraFrom: number;
   eraTo: number;
@@ -93,8 +104,11 @@ interface Props {
    *  renderas inte leaderboard-blocket. */
   leaderboard?: LeaderboardLiveEntry[];
   onReady: () => void;
-  /** Optional: visar Quit Game-knappen längst upp som river lobby:n. */
+  /** Optional: visar Quit Game-knappen längst upp som river lobby:n. Host-only. */
   onQuit?: () => void;
+  /** Optional: visar Leave Game-knappen längst upp för non-host (IndDev).
+   *  Renderas BARA om onQuit inte är satt. */
+  onLeave?: () => void;
 }
 
 /** Liten avatar-cell som visas före spelarnamnet — uri-bild om finns, annars
@@ -162,6 +176,7 @@ const QUEUE_AVATAR_SIZE = 32;
  *      knappen står "<namn> – press play when ready".
  */
 export function GetReadyIntro({
+  mode = 'pass-the-phone',
   currentPlayer,
   queue,
   queueRoundNumbers,
@@ -171,6 +186,7 @@ export function GetReadyIntro({
   currentQuestion,
   totalQuestions,
   playerCount,
+  mediaSourceByQuestion,
   eraFrom,
   eraTo,
   answerResponseSeconds,
@@ -179,7 +195,9 @@ export function GetReadyIntro({
   leaderboard,
   onReady,
   onQuit,
+  onLeave,
 }: Props) {
+  const isIndDev = mode === 'individual-devices';
   const playerName = currentPlayer.name;
   // Dropdown för Answer response time. Stängs efter val eller tap utanför.
   const [responseDropdownOpen, setResponseDropdownOpen] = useState(false);
@@ -232,10 +250,11 @@ export function GetReadyIntro({
 
   return (
     <SafeAreaView style={styles.safe}>
-      {/* Quit Game-bar längst upp — körs via Alert-bekräftelse i quiz.tsx
-          (deactiverar rummet och kastar ut host till Home). Renderas bara när
-          parent passerar in onQuit-handler:n. */}
-      {onQuit && (
+      {/* Top-bar längst upp — Quit Game för host (river hela lobbyn) eller
+          Leave Game för non-host i IndDev (lämnar bara egen plats, går till
+          Home). Båda speglar TopUserBanner:s vokabulär (Colors.card bg +
+          borderBottom). onQuit har företräde om båda är satta. */}
+      {onQuit ? (
         <View style={styles.quitBar}>
           <TouchableOpacity
             style={styles.quitBtn}
@@ -245,7 +264,17 @@ export function GetReadyIntro({
             <Text style={styles.quitBtnText}>Quit Game</Text>
           </TouchableOpacity>
         </View>
-      )}
+      ) : onLeave ? (
+        <View style={styles.quitBar}>
+          <TouchableOpacity
+            style={styles.quitBtn}
+            onPress={onLeave}
+            accessibilityLabel="Leave Game"
+          >
+            <Text style={styles.quitBtnText}>Leave Game</Text>
+          </TouchableOpacity>
+        </View>
+      ) : null}
 
       {/* ── Game settings-block: centrerad logo + settings-info till höger.
           Visar Game era (host:s val i Lobby, fixt under hela spelet) och
@@ -526,119 +555,218 @@ export function GetReadyIntro({
           </Animated.View>
         </View>
 
-        {/* ── Turordningstabell ──────────────────────────────────────────
-            En enhetlig tabell med kolumnerna R: (Round) | Q: (Question) |
-            Pass-the-Phone to:. Header-raden står först, sedan current player
-            som en highlighted box i sista kolumnen, sedan kö-spelarna utan
-            box. Slutmarkör (🔁 + more questions / 🏁 End of Game) under kön. */}
-        <View style={styles.tableBlock}>
-          {/* Header-rad */}
-          <View style={[styles.tableRow, styles.tableHeaderRow]}>
-            <View style={[styles.colR, styles.cellHeader]}>
-              <Text style={styles.headerCellText}>R:</Text>
-            </View>
-            <View style={[styles.colQ, styles.cellHeader]}>
-              <Text style={styles.headerCellText}>Q:</Text>
-            </View>
-            <View style={[styles.colPlayer, styles.cellHeader]}>
-              <Text style={styles.headerCellText}>Pass-the-Phone to:</Text>
-            </View>
-          </View>
-
-          {/* Current player-rad — R/Q-cellerna ser ut som vanliga rad-celler,
-              men Player-cellen får en primary-bordered box runt avatar+namn
-              så det är tydligt vem som är näst på tur. */}
-          <View style={styles.tableRow}>
-            <View style={styles.colR}>
-              <Text style={styles.numText}>{currentRound}</Text>
-            </View>
-            <View style={styles.colQ}>
-              <Text style={styles.numText}>{currentQuestion}</Text>
-            </View>
-            <View style={[styles.colPlayer, styles.colPlayerCurrentWrap]}>
-              <View style={styles.currentPlayerBox}>
-                <PlayerAvatar player={currentPlayer} size={QUEUE_AVATAR_SIZE} />
-                <Text style={styles.currentPlayerName} numberOfLines={1}>
-                  {playerName}
-                </Text>
+        {isIndDev ? (
+          // ── IndDev: media-source-kö istället för spelarkö ─────────────
+          // Kolumner: Q: (Question #) | Media (ikon för YT/Spotify/Image/❓).
+          // Ingen R-kolumn (varje fråga = egen runda i IndDev). Current question
+          // får primary-bordered box i Media-cellen så användaren ser var de
+          // är i listan. Footer: "Question N of M · K players" (ingen Round).
+          <View style={styles.tableBlock}>
+            <View style={[styles.tableRow, styles.tableHeaderRow]}>
+              <View style={[styles.colQ, styles.cellHeader]}>
+                <Text style={styles.headerCellText}>Q:</Text>
+              </View>
+              <View style={[styles.colPlayer, styles.cellHeader]}>
+                <Text style={styles.headerCellText}>Media source:</Text>
               </View>
             </View>
-          </View>
 
-          {/* Kö-rader (scrollar internt om kön är lång). Sista raden får
-              ingen botten-divider så slutmarkören sitter direkt under den.
-              "Round X"-separator infogas mellan två kö-rader när rondnumret
-              förändras (jämfört med föregående rad eller current player) —
-              redundant info mot R-kolumnen men gör round-bytena tydligare
-              vid en snabb blick på listan. */}
-          {queue.length > 0 && (
-            <ScrollView
-              style={styles.queueScroll}
-              showsVerticalScrollIndicator={false}
-            >
-              {queue.map((p, i) => {
-                const round = queueRoundNumbers[i];
-                const prevRound = i === 0 ? currentRound : queueRoundNumbers[i - 1];
-                const isNewRound = round !== prevRound;
-                return (
-                  <React.Fragment key={`${i}-${p.id}`}>
-                    {isNewRound && (
-                      <View style={styles.roundSeparator}>
-                        <Text style={styles.roundSeparatorText}>
-                          Round {round}
-                        </Text>
-                      </View>
-                    )}
+            {/* Current question-rad — primary-bordered box runt media-ikonen. */}
+            <View style={styles.tableRow}>
+              <View style={styles.colQ}>
+                <Text style={styles.numText}>{currentQuestion}</Text>
+              </View>
+              <View style={[styles.colPlayer, styles.colPlayerCurrentWrap]}>
+                <View style={styles.currentMediaBox}>
+                  <Text style={styles.mediaIcon}>
+                    {mediaSourceIcon(mediaSourceByQuestion?.[currentQuestion - 1])}
+                  </Text>
+                  <Text style={styles.mediaLabel} numberOfLines={1}>
+                    {mediaSourceLabel(mediaSourceByQuestion?.[currentQuestion - 1])}
+                  </Text>
+                </View>
+              </View>
+            </View>
+
+            {/* Kö-rader: fråge-nummer currentQuestion+1..totalQuestions med
+                respektive media-källa. Scrollar internt om många frågor. */}
+            {currentQuestion < totalQuestions && (
+              <ScrollView
+                style={styles.queueScroll}
+                showsVerticalScrollIndicator={false}
+              >
+                {Array.from({
+                  length: totalQuestions - currentQuestion,
+                }).map((_, i) => {
+                  const q = currentQuestion + i + 1; // 1-baserat
+                  const isLast = i === totalQuestions - currentQuestion - 1;
+                  return (
                     <View
+                      key={`indq-${q}`}
                       style={[
                         styles.tableRow,
-                        i === queue.length - 1 && styles.tableRowNoBorder,
+                        isLast && styles.tableRowNoBorder,
                       ]}
                     >
-                      <View style={styles.colR}>
-                        <Text style={styles.numText}>{round}</Text>
-                      </View>
                       <View style={styles.colQ}>
-                        <Text style={styles.numText}>{queueQuestionNumbers[i]}</Text>
+                        <Text style={styles.numText}>{q}</Text>
                       </View>
                       <View style={styles.colPlayer}>
-                        <PlayerAvatar player={p} size={QUEUE_AVATAR_SIZE} />
-                        <Text style={styles.playerName} numberOfLines={1}>
-                          {p.name}
+                        <Text style={styles.mediaIcon}>
+                          {mediaSourceIcon(mediaSourceByQuestion?.[q - 1])}
+                        </Text>
+                        <Text style={styles.mediaQueueLabel} numberOfLines={1}>
+                          {mediaSourceLabel(mediaSourceByQuestion?.[q - 1])}
                         </Text>
                       </View>
                     </View>
-                  </React.Fragment>
-                );
-              })}
-            </ScrollView>
-          )}
+                  );
+                })}
+              </ScrollView>
+            )}
 
-          {/* Slutmarkör — 🏁 End of Game om sista kö-frågan = totalQuestions,
-              annars 🔁 + more questions. */}
-          {(() => {
-            const lastQ =
-              queueQuestionNumbers[queueQuestionNumbers.length - 1] ?? currentQuestion;
-            const isEndOfGame = totalQuestions - lastQ <= 0;
-            return (
-              <View style={styles.endOfGameRow}>
-                <Text style={styles.endOfGameText}>
-                  {isEndOfGame ? '🏁  End of Game' : '🔁  + more questions'}
-                </Text>
+            <View style={styles.endOfGameRow}>
+              <Text style={styles.endOfGameText}>🏁  End of Game</Text>
+            </View>
+
+            <Text style={styles.tableFooter}>
+              {`Question ${currentQuestion} of ${totalQuestions} · ${playerCount} players`}
+            </Text>
+          </View>
+        ) : (
+          // ── Pass-the-Phone: turordningstabell ─────────────────────────
+          // En enhetlig tabell med kolumnerna R: (Round) | Q: (Question) |
+          // Pass-the-Phone to:. Header-raden står först, sedan current player
+          // som en highlighted box i sista kolumnen, sedan kö-spelarna utan
+          // box. Slutmarkör (🔁 + more questions / 🏁 End of Game) under kön.
+          <View style={styles.tableBlock}>
+            <View style={[styles.tableRow, styles.tableHeaderRow]}>
+              <View style={[styles.colR, styles.cellHeader]}>
+                <Text style={styles.headerCellText}>R:</Text>
               </View>
-            );
-          })()}
+              <View style={[styles.colQ, styles.cellHeader]}>
+                <Text style={styles.headerCellText}>Q:</Text>
+              </View>
+              <View style={[styles.colPlayer, styles.cellHeader]}>
+                <Text style={styles.headerCellText}>Pass-the-Phone to:</Text>
+              </View>
+            </View>
 
-          {/* Footer: total-räknare + #Players som diskret subtitle under
-              tabellen. Bevarar information som tidigare fanns i header-
-              räkneverket men tar mycket mindre plats. */}
-          <Text style={styles.tableFooter}>
-            {`Round ${currentRound} of ${totalRounds} · Question ${currentQuestion} of ${totalQuestions} · ${playerCount} players`}
-          </Text>
-        </View>
+            {/* Current player-rad — R/Q-cellerna ser ut som vanliga rad-celler,
+                men Player-cellen får en primary-bordered box runt avatar+namn
+                så det är tydligt vem som är näst på tur. */}
+            <View style={styles.tableRow}>
+              <View style={styles.colR}>
+                <Text style={styles.numText}>{currentRound}</Text>
+              </View>
+              <View style={styles.colQ}>
+                <Text style={styles.numText}>{currentQuestion}</Text>
+              </View>
+              <View style={[styles.colPlayer, styles.colPlayerCurrentWrap]}>
+                <View style={styles.currentPlayerBox}>
+                  <PlayerAvatar player={currentPlayer} size={QUEUE_AVATAR_SIZE} />
+                  <Text style={styles.currentPlayerName} numberOfLines={1}>
+                    {playerName}
+                  </Text>
+                </View>
+              </View>
+            </View>
+
+            {/* Kö-rader (scrollar internt om kön är lång). Sista raden får
+                ingen botten-divider så slutmarkören sitter direkt under den.
+                "Round X"-separator infogas mellan två kö-rader när rondnumret
+                förändras (jämfört med föregående rad eller current player) —
+                redundant info mot R-kolumnen men gör round-bytena tydligare
+                vid en snabb blick på listan. */}
+            {queue.length > 0 && (
+              <ScrollView
+                style={styles.queueScroll}
+                showsVerticalScrollIndicator={false}
+              >
+                {queue.map((p, i) => {
+                  const round = queueRoundNumbers[i];
+                  const prevRound = i === 0 ? currentRound : queueRoundNumbers[i - 1];
+                  const isNewRound = round !== prevRound;
+                  return (
+                    <React.Fragment key={`${i}-${p.id}`}>
+                      {isNewRound && (
+                        <View style={styles.roundSeparator}>
+                          <Text style={styles.roundSeparatorText}>
+                            Round {round}
+                          </Text>
+                        </View>
+                      )}
+                      <View
+                        style={[
+                          styles.tableRow,
+                          i === queue.length - 1 && styles.tableRowNoBorder,
+                        ]}
+                      >
+                        <View style={styles.colR}>
+                          <Text style={styles.numText}>{round}</Text>
+                        </View>
+                        <View style={styles.colQ}>
+                          <Text style={styles.numText}>{queueQuestionNumbers[i]}</Text>
+                        </View>
+                        <View style={styles.colPlayer}>
+                          <PlayerAvatar player={p} size={QUEUE_AVATAR_SIZE} />
+                          <Text style={styles.playerName} numberOfLines={1}>
+                            {p.name}
+                          </Text>
+                        </View>
+                      </View>
+                    </React.Fragment>
+                  );
+                })}
+              </ScrollView>
+            )}
+
+            {/* Slutmarkör — 🏁 End of Game om sista kö-frågan = totalQuestions,
+                annars 🔁 + more questions. */}
+            {(() => {
+              const lastQ =
+                queueQuestionNumbers[queueQuestionNumbers.length - 1] ?? currentQuestion;
+              const isEndOfGame = totalQuestions - lastQ <= 0;
+              return (
+                <View style={styles.endOfGameRow}>
+                  <Text style={styles.endOfGameText}>
+                    {isEndOfGame ? '🏁  End of Game' : '🔁  + more questions'}
+                  </Text>
+                </View>
+              );
+            })()}
+
+            {/* Footer: total-räknare + #Players som diskret subtitle under
+                tabellen. Bevarar information som tidigare fanns i header-
+                räkneverket men tar mycket mindre plats. */}
+            <Text style={styles.tableFooter}>
+              {`Round ${currentRound} of ${totalRounds} · Question ${currentQuestion} of ${totalQuestions} · ${playerCount} players`}
+            </Text>
+          </View>
+        )}
       </View>
     </SafeAreaView>
   );
+}
+
+/** Emoji-mappning för media-källa. Tillfälliga emoji-glyfer tills riktiga
+ *  SVG-ikoner per source kommer (D-vii eller senare). */
+function mediaSourceIcon(source: QuestionMediaType | undefined): string {
+  switch (source) {
+    case 'youtube': return '▶️';
+    case 'spotify': return '🎵';
+    case 'image': return '🖼️';
+    default: return '❓';
+  }
+}
+
+function mediaSourceLabel(source: QuestionMediaType | undefined): string {
+  switch (source) {
+    case 'youtube': return 'YouTube';
+    case 'spotify': return 'Spotify';
+    case 'image': return 'Image';
+    default: return 'Unknown';
+  }
 }
 
 const styles = StyleSheet.create({
@@ -1118,6 +1246,39 @@ const styles = StyleSheet.create({
     letterSpacing: 0.3,
   },
   playerName: {
+    flex: 1,
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.medium,
+    color: Colors.textSecondary,
+  },
+  // ── IndDev media-source-celler ───────────────────────────────────────
+  // currentMediaBox speglar currentPlayerBox (primary-bordered + primary-
+  // muted fyllning) så current-question-raden ser likadan ut visuellt.
+  currentMediaBox: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.md,
+    backgroundColor: Colors.primaryMuted,
+    borderColor: Colors.primary,
+    borderWidth: 1.5,
+    borderRadius: Radius.md,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.md,
+  },
+  mediaIcon: {
+    fontSize: 24,
+    textAlign: 'center',
+    width: 32,
+  },
+  mediaLabel: {
+    flexShrink: 1,
+    fontSize: FontSize.lg,
+    fontWeight: FontWeight.bold,
+    color: Colors.textPrimary,
+    letterSpacing: 0.3,
+  },
+  mediaQueueLabel: {
     flex: 1,
     fontSize: FontSize.md,
     fontWeight: FontWeight.medium,

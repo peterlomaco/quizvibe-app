@@ -13,6 +13,7 @@ import { TopUserBanner } from '../components/TopUserBanner';
 import { Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';
 import { track } from '../utils/analytics';
 import { loadProfile, saveProfile } from '../utils/profileStorage';
+import { setPremiumActive } from '../utils/subscriptionStorage';
 
 // ─── Tier-data (mock tills IAP finns) ─────────────────────────────────────────
 // TODO (backend): Priser, paket-IDn och köpstatus hämtas från App Store /
@@ -172,29 +173,55 @@ export default function StoreScreen() {
   //     Subscriptions → Packages. Sätts av Host Game Credits-pillen,
   //     Extras-rutans köp-popup och "Out of Host Game Credits"-popup.
   //   • default (utan param) — Basic → Credits → Packages → Subscriptions.
-  const { focus, from } = useLocalSearchParams<{ focus?: string; from?: string }>();
+  const { focus, from, fromCode } = useLocalSearchParams<{
+    focus?: string;
+    from?: string;
+    fromCode?: string;
+  }>();
   const focusMode: 'subscription' | 'packages' | 'credits' | 'default' =
     focus === 'subscription' || focus === 'packages' || focus === 'credits' ? focus : 'default';
 
   const router = useRouter();
-  // Back-knappens beteende: alla push-callsiter skickar `?from=<path>` med
-  // ursprungsrouten (t.ex. /profile, /lobby, /). Vi router.replace:ar dit
-  // explicit. Det är nödvändigt eftersom tab-byten är laterala i expo-router
-  // och inte registreras i navigations-historiken — `router.back()` hade
-  // poppat förbi tab-byten och hamnat på fel skärm (t.ex. Home när user
-  // egentligen kom från Profile-tabben). Saknas `from` (typiskt direkt tab-
-  // tryck) faller vi tillbaka till canGoBack/back, sedan Home som sista utväg.
+  // Back-knappens beteende: föredra router.back() när vi har navigation-
+  // history. Det returnerar till den BEFINTLIGA föregående-screen-instansen
+  // (Lobby:s React-state + Supabase Realtime-channels intakta) istället för
+  // att router.replace skulle skapa en ny /lobby-instans ovanpå den gamla,
+  // remounta LobbyScreen och racea med Realtime-channel-cleanup → krash
+  // "cannot add postgres_changes callbacks after subscribe()".
+  //
+  // Fallback med `from`-paramen används bara när router.canGoBack() är false
+  // (typiskt vid deep-link direkt in till Store utan föregående screen). Då
+  // rekonstruerar vi /lobby?code=<fromCode>&isHost=true så Lobby:s polling
+  // har rätt kontext (annars triggar "Lobby deleted by Host"-popupen).
+  // Lobby-Store-länkar är alltid host-actions så isHost: 'true' är säkert.
   const handleBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+      return;
+    }
+    if (from === '/lobby' && fromCode) {
+      router.replace({
+        pathname: '/lobby',
+        params: { code: fromCode, isHost: 'true' },
+      });
+      return;
+    }
     if (from && typeof from === 'string') {
       router.replace(from as any);
       return;
     }
-    if (router.canGoBack()) {
-      router.back();
-    } else {
-      router.replace('/');
-    }
+    router.replace('/');
   };
+
+  // Success-popup-copy + nav efter köp. Vid besök från lobby:n vill vi
+  // signalera "tillbaka till spelet" och navigera direkt; annars visar vi
+  // produktspecifik bekräftelse och ger användaren möjlighet att fortsätta
+  // shoppa eller gå tillbaka.
+  const fromLobby = from === '/lobby';
+  const successCopy = (defaultBody: string) =>
+    fromLobby
+      ? { title: 'Successfully added to your account', body: 'Back to game' }
+      : { title: 'Purchase successful', body: defaultBody };
 
   // Mock-purchase av credit-paket: bekräfta + öka gameCredits i sparad profil.
   // TODO (backend): byt mot riktig IAP-flow (expo-iap eller RevenueCat).
@@ -224,11 +251,10 @@ export default function StoreScreen() {
             // tillbaka till källan via handleBack — annars stannar de kvar på
             // Store-skärmen och måste manuellt tappa Back för att fortsätta
             // sitt flöde (t.ex. Play Again från Final Leaderboard).
-            Alert.alert(
-              'Purchase successful',
+            const { title, body } = successCopy(
               `${tier.games} Host Games added — you now have ${newCredits} credits.`,
-              [{ text: 'OK', onPress: handleBack }],
             );
+            Alert.alert(title, body, [{ text: 'OK', onPress: handleBack }]);
           },
         },
       ],
@@ -253,10 +279,10 @@ export default function StoreScreen() {
               price_amount: tier.priceAmount,
               price_currency: 'SEK',
             });
-            Alert.alert(
-              'Purchase successful',
+            const { title, body } = successCopy(
               `"${tier.name}" added — open Profile or Lobby to use it.`,
             );
+            Alert.alert(title, body, [{ text: 'OK', onPress: handleBack }]);
           },
         },
       ],
@@ -274,16 +300,24 @@ export default function StoreScreen() {
         { text: 'Cancel', style: 'cancel' },
         {
           text: 'Subscribe',
-          onPress: () => {
+          onPress: async () => {
+            // Mock-aktivera Premium-flag lokalt så Lobby:s hasPremium-
+            // derivering omedelbart unlockar Individual Devices + Max 12.
+            // Byts mot RevenueCat entitlement-check vid backend-integration.
+            await setPremiumActive(true);
             track('purchase_completed', {
               type: 'subscription',
               product_id: tier.id,
               price_amount: tier.priceAmount,
               price_currency: 'SEK',
             });
-            Alert.alert(
-              'Subscription activated',
+            const { title, body } = successCopy(
               'QuizVibe Premium is now active. Enjoy unlimited host games!',
+            );
+            Alert.alert(
+              fromLobby ? title : 'Subscription activated',
+              body,
+              [{ text: 'OK', onPress: handleBack }],
             );
           },
         },
