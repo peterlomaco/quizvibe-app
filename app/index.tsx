@@ -319,7 +319,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     await removeInvite(invite.id);
     onClose();
     router.push({
-      pathname: '/(tabs)/lobby',
+      pathname: '/lobby',
       params: { code: invite.roomCode, isHost: 'false' },
     });
   };
@@ -347,7 +347,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     // som beror på Free vs Premium-host. Användaren stannar i join-formuläret.
     if (await checkLobbyCapacity(code)) return;
     onClose();
-    router.push({ pathname: '/(tabs)/lobby', params: { code, isHost: 'false' } });
+    router.push({ pathname: '/lobby', params: { code, isHost: 'false' } });
   };
 
   // Parsea och validera birth year. Returnerar null om input inte är ett
@@ -525,7 +525,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     track('guest_name_created', { autofilled, assistance: guestAssistance });
     onClose();
     router.push({
-      pathname: '/(tabs)/lobby',
+      pathname: '/lobby',
       params: {
         code,
         isHost: 'false',
@@ -1364,7 +1364,7 @@ export default function HomeScreen() {
         'You have no credits left for today. Buy extra credits in Store, wait for the daily refresh at midnight CET, or upgrade to a QuizVibe membership for unlimited host games.',
         [
           { text: 'Cancel', style: 'cancel' },
-          { text: 'Go to Store', onPress: () => router.push('/(tabs)/store?focus=credits&from=/') },
+          { text: 'Go to Store', onPress: () => router.push('/store?focus=credits&from=/') },
         ],
       );
       return;
@@ -1396,7 +1396,7 @@ export default function HomeScreen() {
     clearEjected(code);
     clearGameStarted(code);
     track('room_code_created');
-    router.push({ pathname: '/(tabs)/lobby', params: { code, isHost: 'true' } });
+    router.push({ pathname: '/lobby', params: { code, isHost: 'true' } });
   };
 
   // Mock-login: sparar en minimal profil med användarens playerName.
@@ -1960,7 +1960,7 @@ export default function HomeScreen() {
                     // ScrollView:n till toppen — tab-navigatorn bevarar
                     // annars senaste scroll-position mellan tab-byten.
                     router.push({
-                      pathname: '/(tabs)/profile',
+                      pathname: '/profile',
                       params: { scrollToTop: '1' },
                     });
                   }}
@@ -1979,7 +1979,7 @@ export default function HomeScreen() {
                   style={profileMenu.secondaryBtn}
                   onPress={() => {
                     setProfileMenuVisible(false);
-                    router.push('/(tabs)/store?from=/');
+                    router.push('/store?from=/');
                   }}
                 >
                   <View style={profileMenu.secondaryBtnInner}>
