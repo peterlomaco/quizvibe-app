@@ -2526,11 +2526,18 @@ export default function LobbyScreen() {
         // Tidsgränsen per fråga från host:s profil (default 30 sek). Quiz
         // använder den för timer-bar:en + reveal-trigger.
         answerResponseSeconds: String(answerResponseSeconds),
-        // Game era — clampedFrom/clampedTo är post-clamp (mot youngest
-        // player). Quiz filtrerar fråge-pool på correctYear ∈ [from, to]
-        // så frågorna håller sig inom det år-spann host valt.
-        eraFrom: String(clampedFrom),
-        eraTo: String(clampedTo),
+        // Game era — passa RAW eraValues (samma värde som lobbySettings-
+        // store håller och som non-host:s navigation läser via
+        // settingsStored). Critical för IndDev: båda enheter MÅSTE bygga
+        // identiskt gameQuestions-pool (samma `inEra`-filter). Tidigare
+        // skickade host clampedFrom/To (post-clamp mot youngest player)
+        // medan non-host fick raw eraValues → olika era → olika
+        // questions på A vs B. ClampEraToPlayer fungerar fortfarande
+        // för host:s Lobby-display + warning men appliceras inte längre
+        // på fråge-poolen. Re-introduce vid behov genom att skriva
+        // clamped till lobbySettings (single source of truth).
+        eraFrom: String(eraValues[0]),
+        eraTo: String(eraValues[1]),
         // Game Connections-källor — quiz.tsx:s pickMediaSource väljer rätt
         // media-provider per fråga utifrån vilka som är på. Spotify räknas
         // som "aktiv källa" först när auto-regeln + host-toggeln båda är på.

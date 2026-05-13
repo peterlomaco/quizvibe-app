@@ -11,7 +11,7 @@ Varje slice får egen sektion när den specas. När en slice är implementerad u
 | D-0 | ✅ Implemented (2026-05-12) | Bottom tab-bar borttagen, alla skärmar plain Stack-routes |
 | D-i | 🟡 Partial — GetReady/Countdown IndDev-variant landad; Premium-mock + host-deleted broadcast | Se commit `92006cc` |
 | D-ii | 📋 Spec'd (this doc) — not implemented | [§ D-ii](#d-ii--synkad-media-start) |
-| D-iii | 📋 Spec'd (this doc) — not implemented | [§ D-iii](#d-iii--bad-connection-detection) |
+| D-iii | 🟡 Partial (2026-05-13) — heartbeat-only signal lager landad; media-buffering-signal kräver D-ii media-adapters (ej byggda än) | [§ D-iii](#d-iii--bad-connection-detection) |
 | D-iv | ⏳ Pending | — |
 | D-v | ⏳ Pending | — |
 | D-vi | ⏳ Pending | — |
@@ -322,6 +322,19 @@ Eftersom Supabase Realtime är externt beroende går det inte att enhetstesta ch
 ## D-iii — Bad-connection detection
 
 **Mål**: detektera när en spelares enhet inte kan delta i synkat spel pga nätverk eller media-buffering, och rendera en greyed-out UI med popup `"Connection unstable. Please verify"` som auto-dismissar vid recovery. Detektions-lagret är delad infrastruktur som D-vi (full disconnect) och D-vii (Lobby-status) återanvänder.
+
+### Implementation-status (2026-05-13)
+
+Landat (🟡 partial):
+- `src/lib/network/connectionMonitor.ts` — singleton + `useConnectionStatus`-hook, 2s hysteresis, dubbel-signal-OR (media + realtime), reset-API för cleanup.
+- `src/lib/realtime/syncChannel.ts` — `network_heartbeat`-event (10s broadcast), 15s watchdog som rapporterar `heartbeat-drop` om inga events alls tagits emot, channel-state-callback som rapporterar `CHANNEL_ERROR`/`TIMED_OUT`/`CLOSED` som error. Watchdog skippar detection tills första event mottagits (undviker false-positive vid solo-channel).
+- `src/components/ConnectionUnstableOverlay.tsx` — fullscreen Modal med error-bordered Card, signal-lost-SVG-ikon, error-färgade SequentialDots. Auto-dismiss via `visible`-prop bunden till monitor:s status.
+- `app/quiz.tsx` — `useConnectionStatus` + overlay mountad i `question/awaiting/reveal`-render. `TimelineSelector` får `disabled` via OR med `isConnectionUnstable`; `ImageAnswerBlock` wrappad i `pointerEvents='none'`-View (komponenten saknar egen disabled-prop). Confirm + Next-tab disabled vid unstable.
+- `src/components/GetReadyIntro.tsx` — overlay mountad oavsett intro-state när `mode='individual-devices'`.
+
+Inte landat (kräver D-ii media-adapters som ej byggda än):
+- `reportMediaStatus` är klar i monitor:n men inga consumers wire:ar in — YouTube/Spotify/Image-adapters saknas.
+- **Konsekvens**: D-iii MVP fångar nätverks-bortfall (signal 2) men INTE media-buffering utan nätverks-fel (signal 1). När D-ii:s preloadPool/adapters landar wire:as deras buffering-events till `connectionMonitor.reportMediaStatus()` utan ändringar i monitor:ns API.
 
 ### Scope-avgränsning mot D-vi och D-vii
 

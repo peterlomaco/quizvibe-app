@@ -29,6 +29,8 @@ import { clearGameStarted } from '@/src/utils/mockStartedGames';
 import { pickMediaSource, type YoutubeClip } from '@/src/utils/mediaSource';
 import { supabase } from '@/src/utils/supabase';
 import { subscribeSyncChannel, type SyncChannel } from '@/src/lib/realtime/syncChannel';
+import { useConnectionStatus } from '@/src/lib/network/connectionMonitor';
+import { ConnectionUnstableOverlay } from '@/src/components/ConnectionUnstableOverlay';
 import { MUSIC_QUESTIONS } from '@/src/utils/musicQuestions';
 import {
   IMAGE_QUIZ_QUESTIONS,
@@ -569,6 +571,27 @@ export default function QuizScreen() {
   const [responseSeconds, setResponseSeconds] = useState<15 | 30 | 45 | 60>(
     initialResponseSeconds,
   );
+  // D-iii: bad-connection-detection. Övervakas via connectionMonitor som får
+  // signaler från syncChannel:s state-events. Gating på
+  // gameMode='individual-devices' sker per call-site (overlay + disabled-
+  // props) — hooken är säker att anropa i båda lägen, monitor:n bara
+  // rapporterar något i IndDev där syncChannel:n är aktiv.
+  const connection = useConnectionStatus();
+  const isConnectionUnstable =
+    gameMode === 'individual-devices' && connection.status === 'unstable';
+  // Sticky-latch: när unstable fyrar förblir overlay:n + input-låsningen
+  // kvar tills spelaren explicit tappar Retry. ENDAST för non-host —
+  // host:s monitor-recovery clearar overlay:n direkt eftersom host driver
+  // broadcast-flödet och kan inte bail:a mid-game (det skulle frysa alla
+  // andra devices i reveal). Host:s blip är därför rent live-state-driven.
+  const [stickyUnstableForQuestion, setStickyUnstableForQuestion] = useState(false);
+  useEffect(() => {
+    if (isConnectionUnstable && !isHost) setStickyUnstableForQuestion(true);
+  }, [isConnectionUnstable, isHost]);
+  // Derived: drivs av OR mellan live-state och sticky-latch. Allt UI-disable
+  // + overlay-mount använder denna istället för raw `isConnectionUnstable`.
+  const shouldLockForUnstable =
+    isConnectionUnstable || stickyUnstableForQuestion;
   // Antal rundor sätts av host i Lobby (slider 3–20, default 10). Fallback 5
   // om param saknas — t.ex. direkt-nav till /quiz utan att gå via Lobby.
   // SEED_QUESTIONS har 5 frågor i mock; för totalRounds > 5 cyklas listan via
@@ -695,6 +718,13 @@ export default function QuizScreen() {
   const [phase, setPhase] = useState<'intro' | 'countdown' | 'question' | 'awaiting' | 'reveal' | 'leaderboard'>(
     turnOrder.length > 0 ? 'intro' : 'question',
   );
+  // Sticky-unstable-latchen rensas ENDAST av handleRetryFromUnstable
+  // (= explicit Retry-tap). Tidigare auto-reset på phase=intro/countdown
+  // togs bort (D-iii follow-up): per design är retry ända vägen tillbaka
+  // för att aktivera spelaren igen + flippa A:s leaderboard från
+  // "Connection unstable" till connected. question_advance fortsätter
+  // bumpa questionIndex i bakgrunden (B håller sig synkad), men
+  // play_command ignoreras tills sticky är rensad.
   // Spelare som kommer efter current i turordningen (med wrap-around till
   // början). Drivs av Get-Ready-skärmens "Then: …"-rad så spelarna ser kön.
   const queue = useMemo<TurnOrderPlayer[]>(() => {
@@ -1284,9 +1314,43 @@ export default function QuizScreen() {
     setPhase('leaderboard');
   };
 
-  // Från Reveal eller Leaderboard: hoppa direkt till nästa fråga
-  const handleAdvanceToNextRound = () => {
-    setQuestionIndex((prev) => prev + 1);
+  // D-iii: non-host:s Retry-knapp i ConnectionUnstableOverlay. Rensar
+  // sticky-latch + pending-answer-state + routar till intro + broadcastar
+  // player_rejoined så A:s leaderboard flippar oss från 'disconnected'
+  // tillbaka till connected (heartbeat ENSAM gör inte det per design).
+  // När host sedan broadcastar play_command kör B:s playCommandHandler
+  // som vanligt (sticky är nu false → ingen ignore).
+  const handleRetryFromUnstable = () => {
+    setPendingYear(null);
+    setSelectedYear(null);
+    setPendingNameOption(null);
+    setConfirmedNameOption(null);
+    setConfirmedTimeUsed(null);
+    setStickyUnstableForQuestion(false);
+    setPhase('intro');
+    if (selfPlayerId && syncChannelRef.current) {
+      syncChannelRef.current
+        .broadcastPlayerRejoined({ sender_id: selfPlayerId })
+        .catch(() => {
+          // Fire-and-forget. Om broadcast fail:ar (t.ex. flapping connection)
+          // sitter A med stale 'disconnected'-flag. Acceptabelt MVP — B kan
+          // försöka tapa Retry igen vid nästa stable-moment.
+        });
+    }
+  };
+
+  // Från Reveal eller Leaderboard: hoppa direkt till nästa fråga.
+  // `explicitNextIndex` används av non-host:s questionAdvanceHandler för
+  // att synka till broadcast:ens canonical-värde — om B missade tidigare
+  // question_advance medan offline skulle +1 ge stale index. Host:s
+  // lokala Next-tap kallar utan arg → faller tillbaka till +1 (host är
+  // alltid canonical så drift kan inte uppstå).
+  const handleAdvanceToNextRound = (explicitNextIndex?: number) => {
+    if (explicitNextIndex !== undefined) {
+      setQuestionIndex(explicitNextIndex);
+    } else {
+      setQuestionIndex((prev) => prev + 1);
+    }
     setSelectedYear(null);
     setPendingYear(null);
     setConfirmedTimeUsed(null);
@@ -1349,7 +1413,33 @@ export default function QuizScreen() {
   // (etablerad en gång på mount) alltid kallar latest logic. Non-host kör
   // samma transition-funktioner som host (lokalt) — de är idempotenta.
   useEffect(() => {
-    playCommandHandlerRef.current = () => {
+    playCommandHandlerRef.current = (qIdx) => {
+      // D-iii sticky-gate: om spelaren är låst i unstable-overlay (sticky
+      // ELLER live-unstable) → IGNORERA play_command. Spelaren kvarstår i
+      // sin nuvarande fas + overlay tills de explicit tappar Retry. Detta
+      // är central design-regel: B kan inte hoppa in i ny fråga utan att
+      // ha bekräftat sig som "tillbaka" via Retry → broadcast player_rejoined.
+      // questionIndex hålls synkad via question_advance (som processas
+      // oavsett sticky), så när B sedan retry:ar är de redo för nästa
+      // play_command direkt.
+      if (stickyUnstableForQuestion || isConnectionUnstable) {
+        return;
+      }
+      // Sync questionIndex från broadcast — kritiskt för reconnect-fallet:
+      // om B var offline under host:s tidigare question_advance kan B:s
+      // lokala questionIndex vara stale (peka på en gammal fråga). Host:s
+      // play_command bär canonical question_index → vi alignar B direkt.
+      // setQuestionIndex är idempotent när qIdx === questionIndex, så
+      // normalfallet (B var online och redan synkad) är no-op.
+      setQuestionIndex(qIdx);
+      // Reset answer-state så B inte ärver pending-svar från förra fråga
+      // (kan finnas kvar om B retry:ade i sticky-låst tillstånd och inte
+      // nådde nästa rondens normalt-rensa-path via handleAdvanceToNextRound).
+      setPendingYear(null);
+      setSelectedYear(null);
+      setPendingNameOption(null);
+      setConfirmedNameOption(null);
+      setConfirmedTimeUsed(null);
       // Defensiv: bara från intro-phase tillåts countdown-transition.
       // Skyddar mot late-arriving broadcasts efter att non-host redan
       // advancerat (t.ex. via reconnect i D-vi senare).
@@ -1359,7 +1449,11 @@ export default function QuizScreen() {
       if (nextIdx === null) {
         handleShowLeaderboard();
       } else {
-        handleAdvanceToNextRound();
+        // Passa canonical-indexet från broadcast så B alignar även när
+        // tidigare advances missats (offline-fönster). Utan denna sync
+        // skulle dot-bar:ens currentQuestion-räknare stanna kvar bakom
+        // host i en eller flera frågor.
+        handleAdvanceToNextRound(nextIdx);
       }
     };
     // Mottagare av player_left: alla klienter (inkl. host) markerar
@@ -1691,7 +1785,7 @@ export default function QuizScreen() {
   const syncChannelRef = useRef<SyncChannel | null>(null);
   // Refs så broadcast-listenern alltid pekar på senaste handlern (annars
   // skulle subscription:n captura stale closures vid mount).
-  const playCommandHandlerRef = useRef<() => void>(() => {});
+  const playCommandHandlerRef = useRef<(qIdx: number) => void>(() => {});
   const questionAdvanceHandlerRef = useRef<(nextIdx: number | null) => void>(() => {});
   const playerLeftHandlerRef = useRef<(playerId: string, playerName: string) => void>(
     () => {},
@@ -1702,10 +1796,19 @@ export default function QuizScreen() {
   const responseSecondsChangedHandlerRef = useRef<(seconds: 15 | 30 | 45 | 60) => void>(
     () => {},
   );
+  // D-iii: per-peer connection-status. Drivs av två separata signaler:
+  //   - watchdog (15s silence från remote sender) → 'disconnected'
+  //   - player_rejoined-event (sender:s explicit Retry-tap) → 'connected'
+  // Heartbeat-receipt ENSAM räcker INTE för att flippa tillbaka — sender
+  // måste eksplicit broadcasta player_rejoined för att A:s leaderboard ska
+  // markera dem som åter aktiva. Egen player_id är aldrig nyckel här.
+  const [playerConnectionStatus, setPlayerConnectionStatus] = useState<
+    Record<string, 'connected' | 'disconnected'>
+  >({});
   useEffect(() => {
     if (gameMode !== 'individual-devices' || !params.roomCode) return;
-    const sync = subscribeSyncChannel(params.roomCode, {
-      onPlayCommand: () => playCommandHandlerRef.current(),
+    const sync = subscribeSyncChannel(params.roomCode, selfPlayerId, {
+      onPlayCommand: (payload) => playCommandHandlerRef.current(payload.question_index),
       onQuestionAdvance: (payload) =>
         questionAdvanceHandlerRef.current(payload.next_question_index),
       onPlayerLeft: (payload) =>
@@ -1714,13 +1817,77 @@ export default function QuizScreen() {
         playerAnswerConfirmedHandlerRef.current(payload.player_id, payload.time_used),
       onResponseSecondsChanged: (payload) =>
         responseSecondsChangedHandlerRef.current(payload.seconds),
+      onPlayerConnectionChange: (playerId, status) => {
+        setPlayerConnectionStatus((prev) => ({ ...prev, [playerId]: status }));
+      },
+      onPlayerRejoined: (playerId) => {
+        // Explicit Retry-tap från remote spelare → flippa till 'connected'.
+        // Detta är ENDA vägen tillbaka (heartbeat-receipt räcker inte).
+        setPlayerConnectionStatus((prev) => ({ ...prev, [playerId]: 'connected' }));
+      },
     });
     syncChannelRef.current = sync;
     return () => {
       sync.unsubscribe();
       syncChannelRef.current = null;
     };
-  }, [gameMode, params.roomCode]);
+  }, [gameMode, params.roomCode, selfPlayerId]);
+
+  // D-iii: när lokal monitor återgår från unstable → ok, rensa peer-
+  // tracking-state. Allt vi har om andra spelare från perioden vi var
+  // offline är potentiellt stale (vi tappade DERAS heartbeats medan VI
+  // var offline). Utan reset skulle GetReady visa stale "Connection
+  // unstable"-rader för spelare som faktiskt aldrig var disconnected,
+  // tills nästa heartbeat från varje peer hinner fram (upp till 10s
+  // flicker). Reset:n täcker både UI-map:en + syncChannel:s interna
+  // lastSeen/lastReported så watchdog:n inte fyrar gammal disconnect-
+  // status igen.
+  const prevConnectionStatusRef = useRef<'ok' | 'unstable'>('ok');
+  useEffect(() => {
+    const wasUnstable = prevConnectionStatusRef.current === 'unstable';
+    const isOk = connection.status === 'ok';
+    if (wasUnstable && isOk) {
+      setPlayerConnectionStatus({});
+      syncChannelRef.current?.resetPeerTracking();
+    }
+    prevConnectionStatusRef.current = connection.status;
+  }, [connection.status]);
+
+  // D-iii: host-popup vid edge-transition 0→≥1 disconnected peer:s. Bara
+  // host (host driver speltempot — non-host behöver inte aware:nessa om
+  // andra peers, deras egna overlay räcker). Popup:en får BARA fyra när
+  // host är i GetReady (phase='intro') — aldrig mid-quiz. Disconnects
+  // som inträffar under question/awaiting/reveal köas via pendingAlertRef
+  // och fyrar när host återvänder till intro. Re-armas när alla
+  // återansluts (count → 0) så nästa nya disconnect-våg ger nytt popup.
+  // Non-IndDev: ingen popup (map:en hålls tom där).
+  const prevDisconnectedCountRef = useRef(0);
+  const pendingDisconnectAlertRef = useRef(false);
+  useEffect(() => {
+    if (!isHost || gameMode !== 'individual-devices') return;
+    const disconnectedCount = Object.values(playerConnectionStatus).filter(
+      (s) => s === 'disconnected',
+    ).length;
+    // Edge 0→≥1: markera pending. Coalescerar flera disconnects till en
+    // popup — ytterligare disconnects mellan edge och fire ger inte extra
+    // popups.
+    if (disconnectedCount >= 1 && prevDisconnectedCountRef.current === 0) {
+      pendingDisconnectAlertRef.current = true;
+    }
+    // Edge ≥1→0: alla återanslutna (via player_rejoined). Pending blir
+    // inaktuellt → rensa så situationen inte rapporteras i efterhand.
+    if (disconnectedCount === 0) {
+      pendingDisconnectAlertRef.current = false;
+    }
+    prevDisconnectedCountRef.current = disconnectedCount;
+    // Fire-gate: bara i intro-phase. Effekten triggas på phase-byten
+    // (phase är i deps) så pending som sattes mid-quiz fyrar automatiskt
+    // när host kommer till nästa GetReady.
+    if (pendingDisconnectAlertRef.current && phase === 'intro') {
+      pendingDisconnectAlertRef.current = false;
+      Alert.alert('Please note', 'Some players connection unstable.');
+    }
+  }, [playerConnectionStatus, isHost, gameMode, phase]);
 
   // Timer-progress-barens färg byter vid 10s (warning) och 5s (error).
   // Bar:ens BREDD drivs av timerProgressAnim (Animated.Value, RAF-driven).
@@ -1775,7 +1942,17 @@ export default function QuizScreen() {
     // adjustable när intro visas (typiskt bara vid game start).
     const responseSecondsLocked =
       gameMode === 'pass-the-phone' && currentPlayerIndex !== 0;
+    // Pre-decode kommande image-fråga genom att mounta osynlig <Image>
+    // redan i intro-fasen. iOS UIImageView avkodar 1920×1080 WebP
+    // asynkront (typiskt 100–500 ms första gången) — utan pre-decode
+    // visas pure-svart innan ProgressiveCover-mosaiken hinner reveal:a
+    // tillräckligt för att bild bakom syns. Genom att rendera Image
+    // tidigare (oavsett storlek) börjar RN:s image-cache decode-jobbet
+    // direkt; samma source-require:t i question-fasen återanvänder
+    // cachat bitmap. 1×1 px + opacity 0 → ingen visuell påverkan, men
+    // räcker för att trigga decode-pipeline:n.
     return (
+      <>
       <GetReadyIntro
         mode={gameMode}
         currentPlayer={currentPlayer}
@@ -1808,6 +1985,16 @@ export default function QuizScreen() {
         }}
         responseSecondsLocked={responseSecondsLocked}
         leaderboard={liveLeaderboard}
+        // D-iii: per-peer connection-status driver disconnect-ikon framför
+        // namnet i live-leaderboard. Tom map = ingen indikator.
+        playerConnectionStatus={playerConnectionStatus}
+        // D-iii: unstable-overlay i intro-fasen styrs av sticky-latch +
+        // live-monitor, så B fastnar i overlay genom alla phase-byten
+        // tills Retry trycks. Bara non-host får Retry-knappen (host kan
+        // inte bail:a mid-game eftersom det river broadcast-flödet).
+        unstableLocked={shouldLockForUnstable}
+        unstableCanRetry={!isConnectionUnstable && stickyUnstableForQuestion}
+        onUnstableRetry={!isHost ? handleRetryFromUnstable : undefined}
         // I IndDev wrappar vi onReady så host:s tap också broadcastar
         // play_command till non-host:s enheter. Pass-the-Phone behöver
         // ingen wrapping (alla på samma enhet). Non-host i IndDev får
@@ -1820,6 +2007,24 @@ export default function QuizScreen() {
         onQuit={isHost ? handleQuitGame : undefined}
         onLeave={!isHost ? handleLeaveGame : undefined}
       />
+      {isImageQuestion && getQuizImage(question.id) && (
+        // Absolute-positionerad ovanpå GetReadyIntro med opacity 0 + 1×1
+        // storlek — hamnar visuellt utanför skärmen. iOS startar decode-
+        // pipeline:n så fort source-prop:n resolveras; cachat bitmap
+        // återanvänds när Image mount:as för riktig storlek i question-
+        // fasen. pointerEvents flyttad in i style (RN Image-prop:n
+        // accepterar inte top-level pointerEvents).
+        <Image
+          source={getQuizImage(question.id)!}
+          style={{
+            position: 'absolute',
+            width: 1,
+            height: 1,
+            opacity: 0,
+          }}
+        />
+      )}
+      </>
     );
   }
 
@@ -1829,12 +2034,28 @@ export default function QuizScreen() {
   if (phase === 'countdown') {
     const countdownPlayer = turnOrder[currentPlayerIndex];
     return (
+      <>
       <CountdownIntro
         mode={gameMode}
         playerName={countdownPlayer?.name}
         playerEmoji={countdownPlayer?.emoji}
         onComplete={() => setPhase('question')}
       />
+      {/* Pre-decode forts. (se kommentar i intro-grenen). Två mount-platser
+          ger maximal tids-marginal: host som tappar Play snabbt får decode
+          via countdown-fasen; långsam tap → decode hinner via intro. */}
+      {isImageQuestion && getQuizImage(question.id) && (
+        <Image
+          source={getQuizImage(question.id)!}
+          style={{
+            position: 'absolute',
+            width: 1,
+            height: 1,
+            opacity: 0,
+          }}
+        />
+      )}
+      </>
     );
   }
 
@@ -2155,7 +2376,13 @@ export default function QuizScreen() {
                 eraFrom={eraFrom}
                 eraTo={eraTo}
                 onYearChange={setPendingYear}
-                disabled={phase === 'awaiting' || phase === 'reveal'}
+                // D-iii: vid unstable spelaren får inte avge svar. Reuse
+                // existerande disabled-prop:s phase-gating + OR:a in
+                // connection-status så låsningen sker både post-Confirm
+                // OCH vid network-blip.
+                disabled={
+                  phase === 'awaiting' || phase === 'reveal' || shouldLockForUnstable
+                }
               />
             ) : (() => {
               // Per-spelare-variant baserat på assistance:
@@ -2167,16 +2394,25 @@ export default function QuizScreen() {
                     ? 'prefix-1'
                     : 'prefix-2';
               const variant = question.variants[variantKey];
+              // D-iii: ImageAnswerBlock har ingen egen disabled-prop —
+              // wrappa i View med pointerEvents='none' + dimmad opacity
+              // när connection är unstable. Komponenten själv behåller
+              // sin phase-baserade låsning oförändrat.
               return (
-                <ImageAnswerBlock
-                  question={variant}
-                  phase={phase}
-                  pendingName={pendingNameOption}
-                  confirmedName={confirmedNameOption}
-                  isTimedOut={phase === 'reveal' && confirmedNameOption === null}
-                  onNameSelect={setPendingNameOption}
-                  resetKey={`${questionIndex}-${currentAssistance}`}
-                />
+                <View
+                  pointerEvents={shouldLockForUnstable ? 'none' : 'auto'}
+                  style={shouldLockForUnstable ? { opacity: 0.4 } : undefined}
+                >
+                  <ImageAnswerBlock
+                    question={variant}
+                    phase={phase}
+                    pendingName={pendingNameOption}
+                    confirmedName={confirmedNameOption}
+                    isTimedOut={phase === 'reveal' && confirmedNameOption === null}
+                    onNameSelect={setPendingNameOption}
+                    resetKey={`${questionIndex}-${currentAssistance}`}
+                  />
+                </View>
               );
             })()}
 
@@ -2254,6 +2490,10 @@ export default function QuizScreen() {
                           style={[
                             rv.nextTab,
                             wasCorrect ? rv.nextTabCorrect : rv.nextTabWrong,
+                            // D-iii: Next-tab disabled vid unstable så host
+                            // inte advancar medan host:s egen sync är död.
+                            // Vid recovery enables tab:en automatiskt.
+                            shouldLockForUnstable && { opacity: 0.4 },
                           ]}
                           onPress={
                             isLastQuestion
@@ -2261,6 +2501,7 @@ export default function QuizScreen() {
                               : handleHostAdvanceFromReveal
                           }
                           activeOpacity={0.85}
+                          disabled={shouldLockForUnstable}
                         >
                           <Text style={rv.nextTabText}>
                             {isLastQuestion ? '🏆  Final Leaderboard' : 'Next  →'}
@@ -2303,17 +2544,18 @@ export default function QuizScreen() {
                       style={[
                         styles.actionBtn,
                         styles.actionBtnConfirm,
-                        !canConfirm && styles.actionBtnDisabled,
+                        (!canConfirm || shouldLockForUnstable) &&
+                          styles.actionBtnDisabled,
                       ]}
                       onPress={() => {
-                        if (!canConfirm) return;
+                        if (!canConfirm || shouldLockForUnstable) return;
                         if (question.type === 'image' && pendingNameOption) {
                           handleConfirmName(pendingNameOption);
                         } else if (question.type === 'timeline' && pendingYear !== null) {
                           handleConfirm(pendingYear);
                         }
                       }}
-                      disabled={!canConfirm}
+                      disabled={!canConfirm || shouldLockForUnstable}
                       activeOpacity={0.85}
                     >
                       <Text style={styles.actionBtnText}>Confirm</Text>
@@ -2332,6 +2574,25 @@ export default function QuizScreen() {
 
         <View style={{ height: Spacing.xxl }} />
       </ScrollView>
+      {/* D-iii: bad-connection-overlay. Modal:n hanterar sin egen fullscreen-
+          rendering med high zIndex, så den ligger ovanpå ScrollView:n utan
+          extra wrapping. Bara aktiv i IndDev (gated via shouldLockForUnstable
+          — Pass-the-Phone får aldrig unstable-state eftersom syncChannel
+          inte subscribar:as där). Använder sticky-latch så overlay:n står
+          kvar ända till nästa rondens GetReady även om uppkopplingen
+          återkommer mid-question.
+
+          Retry-knapp passas BARA för non-host. Host:s retry skulle riva
+          host:s authoritative-driver-roll mid-question (broadcasts skulle
+          inte gå ut, andra devices fastnar i reveal) — host måste vänta
+          ut sin runda. canRetry = sticky-latched MEN connection åter OK.
+          När fortfarande live-unstable visas grå "Waiting for connection…"-
+          text istället. */}
+      <ConnectionUnstableOverlay
+        visible={shouldLockForUnstable}
+        onRetry={!isHost ? handleRetryFromUnstable : undefined}
+        canRetry={!isConnectionUnstable && stickyUnstableForQuestion}
+      />
     </SafeAreaView>
   );
 }

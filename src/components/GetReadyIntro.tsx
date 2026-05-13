@@ -18,6 +18,9 @@ import { MediaSourceIcon } from './MediaSourceIcon';
 import { QuizVibeLogo } from './QuizVibeLogo';
 import { QuizVibePlayLogo } from './QuizVibePlayLogo';
 import { SequentialDots } from './SequentialDots';
+import { ConnectionUnstableOverlay } from './ConnectionUnstableOverlay';
+import { useConnectionStatus } from '../lib/network/connectionMonitor';
+import { WifiFanIcon } from './WifiFanIcon';
 
 /** Minimal player-shape som GetReadyIntro behöver för att rendera namn + avatar.
  *  Speglar TurnOrderPlayer i quiz.tsx. */
@@ -119,6 +122,20 @@ interface Props {
    *  visas i Play-knappens position (non-host i Individual Devices).
    *  Default true — befintliga call-sites påverkas inte. */
   isHost?: boolean;
+  /** D-iii: per-peer connection-status. När en spelares status är
+   *  `'disconnected'` renderas en disconnect-ikon framför namnet i
+   *  live-leaderboard. Map:en kan vara tom (alla connected) eller saknas
+   *  helt (Pass-the-Phone-läget bryr sig inte om detta). */
+  playerConnectionStatus?: Record<string, 'connected' | 'disconnected'>;
+  /** D-iii: parent (quiz.tsx) styr unstable-overlay i intro-fasen så
+   *  sticky-låsningen kan följa över phase-byten. När `unstableLocked`
+   *  är true mountas overlay:n med Retry-knapp; `unstableCanRetry`
+   *  styr aktiv/disabled-state; `onUnstableRetry` är callback. När
+   *  utelämnad fallback till internt connection-monitor-state
+   *  (= övriga skärmar som inte behöver sticky-semantik). */
+  unstableLocked?: boolean;
+  unstableCanRetry?: boolean;
+  onUnstableRetry?: () => void;
 }
 
 /** Liten avatar-cell som visas före spelarnamnet — uri-bild om finns, annars
@@ -207,8 +224,23 @@ export function GetReadyIntro({
   onQuit,
   onLeave,
   isHost = true,
+  playerConnectionStatus,
+  unstableLocked,
+  unstableCanRetry,
+  onUnstableRetry,
 }: Props) {
   const isIndDev = mode === 'individual-devices';
+  // D-iii: bad-connection-overlay. Visning styrs av parent (quiz.tsx) via
+  // `unstableLocked`-prop när satt — det inkluderar sticky-latch-logiken
+  // som persisterar genom phase-byten tills Retry trycks. När prop:en är
+  // utelämnad fallback:ar vi till intern monitor-state (för standalone-
+  // användning). Pass-the-Phone har aldrig overlay (saknar syncChannel).
+  const connection = useConnectionStatus();
+  const overlayVisible =
+    isIndDev &&
+    (unstableLocked !== undefined
+      ? unstableLocked
+      : connection.status === 'unstable');
   const playerName = currentPlayer.name;
   // I Pass-the-Phone betraktas alla som "den som ska starta" (telefonen lämnas
   // runt; vem som än håller den får trycka). I Individual Devices är det bara
@@ -407,7 +439,17 @@ export function GetReadyIntro({
               {leaderboardOpen ? '▾' : '▸'}
             </Text>
           </TouchableOpacity>
-          {leaderboardOpen && (
+          {leaderboardOpen && (() => {
+            // D-iii: dela upp i två sektioner. Disconnected (men inte hasLeft)
+            // hamnar längst ner utan placering, under en "Connection unstable"-
+            // separator. hasLeft-spelare stannar i den vanliga listan med sin
+            // poäng + "Has left the game"-mid-row (existerande beteende).
+            const isDisco = (e: LeaderboardLiveEntry) =>
+              playerConnectionStatus?.[e.playerId] === 'disconnected' && !e.hasLeft;
+            const connectedEntries = leaderboard.filter((e) => !isDisco(e));
+            const disconnectedEntries = leaderboard.filter(isDisco);
+            const showDisconnectedSection = disconnectedEntries.length > 0;
+            return (
             <View style={styles.leaderboardBodyOverlay}>
               {/* Sport-tabell-layout: fixed Klubb-kolumn vänster, horisontellt
                   scroll:bar middle med detail-kolumner, fixed PTS-kolumn
@@ -418,7 +460,7 @@ export function GetReadyIntro({
                   <View style={[styles.lbCell, styles.lbHeaderCell, styles.lbLeftCell]}>
                     <Text style={styles.lbHeaderText}>Player</Text>
                   </View>
-                  {leaderboard.map((entry, index) => {
+                  {connectedEntries.map((entry, index) => {
                     const meta = [
                       entry.assistance ? ASSISTANCE_LABEL[entry.assistance] : null,
                       typeof entry.age === 'number' ? `Age ${entry.age}` : null,
@@ -443,6 +485,52 @@ export function GetReadyIntro({
                       </View>
                     );
                   })}
+                  {/* Section-separator + disconnected-rader. Rendereras BARA
+                      när minst en spelare är offline. Separator visar grå
+                      WiFi-ikon + "Connection unstable"-text; disconnect-
+                      rader har ingen placering, grå WiFi-ikon framför namn
+                      och dämpad text-färg. */}
+                  {showDisconnectedSection && (
+                    <>
+                      <View style={[styles.lbCell, styles.lbDisconnectedSeparator]}>
+                        <WifiFanIcon size={14} color={Colors.textSecondary} />
+                        <Text style={styles.lbDisconnectedSeparatorText} numberOfLines={1}>
+                          Connection unstable
+                        </Text>
+                      </View>
+                      {disconnectedEntries.map((entry) => {
+                        const meta = [
+                          entry.assistance ? ASSISTANCE_LABEL[entry.assistance] : null,
+                          typeof entry.age === 'number' ? `Age ${entry.age}` : null,
+                        ].filter(Boolean).join(' · ');
+                        return (
+                          <View
+                            key={entry.playerId}
+                            style={[styles.lbCell, styles.lbLeftCell, styles.lbDisconnectedRow]}
+                          >
+                            {/* Ingen placering — WiFi-ikon istället. */}
+                            <View style={styles.lbDisconnectedIconSlot}>
+                              <WifiFanIcon size={14} color={Colors.textSecondary} />
+                            </View>
+                            <View style={styles.lbNameStack}>
+                              <Text
+                                style={[styles.lbName, styles.lbDisconnectedNameText]}
+                                numberOfLines={1}
+                              >
+                                {entry.emoji ? `${entry.emoji} ` : ''}
+                                {entry.name}
+                              </Text>
+                              {meta.length > 0 && (
+                                <Text style={styles.lbNameMeta} numberOfLines={1}>
+                                  {meta}
+                                </Text>
+                              )}
+                            </View>
+                          </View>
+                        );
+                      })}
+                    </>
+                  )}
                 </View>
 
                 {/* Mitt scroll:bar kolumn — alla detail-celler */}
@@ -464,21 +552,26 @@ export function GetReadyIntro({
                         Last 5
                       </Text>
                     </View>
-                    {/* Spelar-rader. Spelare som lämnat spelet (`hasLeft`)
-                        renderar bara en centrerad "Has left the game"-text
-                        som spänner hela detail-bredden istället för Q/✓/✗/
-                        AVG/LAST/Last-5-cellerna. */}
-                    {leaderboard.map((entry) =>
-                      entry.hasLeft ? (
-                        <View
-                          key={entry.playerId}
-                          style={[styles.lbMidRow, styles.lbHasLeftRow]}
-                        >
-                          <Text style={styles.lbHasLeftText} numberOfLines={1}>
-                            Has left the game
-                          </Text>
-                        </View>
-                      ) : (
+                    {/* Spelar-rader. Två fall i connected-sektionen:
+                        - `hasLeft`: centrerad "Has left the game"-text
+                          ersätter hela stats-bredden.
+                        - default: vanlig Q/✓/✗/AVG/LAST/Last-5-rad.
+                        Disconnected spelare hamnar i egen sektion längst
+                        ner och passerar inte detta map. */}
+                    {connectedEntries.map((entry) => {
+                      if (entry.hasLeft) {
+                        return (
+                          <View
+                            key={entry.playerId}
+                            style={[styles.lbMidRow, styles.lbHasLeftRow]}
+                          >
+                            <Text style={styles.lbHasLeftText} numberOfLines={1}>
+                              Has left the game
+                            </Text>
+                          </View>
+                        );
+                      }
+                      return (
                         <View key={entry.playerId} style={styles.lbMidRow}>
                           <Text style={[styles.lbMidCell, styles.lbColR]}>
                             {entry.playedRounds}
@@ -539,18 +632,37 @@ export function GetReadyIntro({
                             })}
                           </View>
                         </View>
-                      ),
+                      );
+                    })}
+                    {/* Disconnected-sektion: separator-rad + tomma rader så
+                        höjden alignar med vänster kolumnens disconnected-
+                        rader. Inga stats renderas — sektionens text bor
+                        i vänster kolumn (Connection unstable + namn).
+                        Separator-raden delar bg + border med vänster
+                        kolumnens lbDisconnectedSeparator så hela raden
+                        ser ut som ett enhetligt band tvärs alla kolumner. */}
+                    {showDisconnectedSection && (
+                      <>
+                        <View style={[styles.lbMidRow, styles.lbDisconnectedSeparatorBand]} />
+                        {disconnectedEntries.map((entry) => (
+                          <View
+                            key={entry.playerId}
+                            style={[styles.lbMidRow, styles.lbDisconnectedDataRow]}
+                          />
+                        ))}
+                      </>
                     )}
                   </View>
                 </ScrollView>
 
                 {/* Höger fixed kolumn: PTS. hasLeft-spelare visar — istället
-                    för siffror (mid-row redan har "Has left the game"-text). */}
+                    för siffror (mid-row redan har "Has left the game"-text).
+                    Disconnected-spelare renderas i egen sektion utan poäng. */}
                 <View style={styles.lbRightCol}>
                   <View style={[styles.lbCell, styles.lbHeaderCell, styles.lbRightCell]}>
                     <Text style={styles.lbHeaderText}>PTS</Text>
                   </View>
-                  {leaderboard.map((entry) => (
+                  {connectedEntries.map((entry) => (
                     <View
                       key={entry.playerId}
                       style={[styles.lbCell, styles.lbRightCell]}
@@ -560,10 +672,24 @@ export function GetReadyIntro({
                       </Text>
                     </View>
                   ))}
+                  {showDisconnectedSection && (
+                    <>
+                      <View style={[styles.lbCell, styles.lbRightCell, styles.lbDisconnectedSeparatorBand]} />
+                      {disconnectedEntries.map((entry) => (
+                        <View
+                          key={entry.playerId}
+                          style={[styles.lbCell, styles.lbRightCell, styles.lbDisconnectedDataRow]}
+                        >
+                          <Text style={[styles.lbPoints, styles.lbDisconnectedPointsText]}>—</Text>
+                        </View>
+                      ))}
+                    </>
+                  )}
                 </View>
               </View>
             </View>
-          )}
+            );
+          })()}
         </View>
       )}
 
@@ -832,6 +958,17 @@ export function GetReadyIntro({
           </View>
         )}
       </View>
+      {/* D-iii: bad-connection-overlay. Modal renderar fullscreen ovanpå allt
+          (inkl. play-knappen + quit-bar), så användaren kan inte starta
+          spelet eller ändra response time medan kanalen är unstable.
+          Retry-knapp ärvs från parent (quiz.tsx) när sticky-latchen är
+          aktiv — annars saknas onUnstableRetry och overlay:n auto-
+          dismissar bara vid recovery. */}
+      <ConnectionUnstableOverlay
+        visible={overlayVisible}
+        onRetry={onUnstableRetry}
+        canRetry={unstableCanRetry}
+      />
     </SafeAreaView>
   );
 }
@@ -1149,6 +1286,61 @@ const styles = StyleSheet.create({
     fontWeight: FontWeight.medium,
     color: Colors.textSecondary,
     letterSpacing: 0.3,
+  },
+  // D-iii: separator-rad + disconnect-rader längst ner i leaderboarden.
+  // Visar grå WiFi-ikon + "Connection unstable"-rubrik i vänster kolumn;
+  // spelar-rader nedanför har ingen placering, grå WiFi-ikon istället för
+  // siffra, och dämpad text-färg. Middle/right kolumn renderar spacer-
+  // rader med matchande höjd för layout-alignment.
+  lbDisconnectedSeparator: {
+    paddingLeft: Spacing.sm,
+    paddingRight: 4,
+    gap: 6,
+    borderTopWidth: 1,
+    borderTopColor: Colors.border,
+    backgroundColor: Colors.cardElevated,
+  },
+  lbDisconnectedSeparatorText: {
+    fontSize: FontSize.xs,
+    fontWeight: FontWeight.bold,
+    color: Colors.textSecondary,
+    letterSpacing: 0.6,
+    textTransform: 'uppercase',
+    flexShrink: 1,
+  },
+  lbDisconnectedRow: {
+    opacity: 0.7,
+  },
+  // Slot där position-siffran skulle suttit — håller WiFi-ikon istället.
+  // Samma bredd (16) som lbPos så namn-stacken börjar på samma x-position.
+  lbDisconnectedIconSlot: {
+    width: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  lbDisconnectedNameText: {
+    color: Colors.textSecondary,
+    fontStyle: 'italic',
+  },
+  // Separator-band i middle + right kolumnerna — speglar
+  // lbDisconnectedSeparator:s bg + topp-border så raden ser ut som EN
+  // enhetlig sektion-rubrik tvärs alla tre kolumner. Innehållet (WiFi-
+  // ikon + text) ligger bara i vänster kolumn; middle/right är tomma
+  // band i samma färg.
+  lbDisconnectedSeparatorBand: {
+    borderTopWidth: 1,
+    borderTopColor: Colors.border,
+    backgroundColor: Colors.cardElevated,
+  },
+  // Data-rad-spacer i middle/right kolumn för layout-alignment med
+  // vänster kolumnens disconnect-rader. Ingen text — bara höjd + samma
+  // opacity-dimming som vänster kolumnens lbDisconnectedRow så hela raden
+  // läses som "inactive".
+  lbDisconnectedDataRow: {
+    opacity: 0.7,
+  },
+  lbDisconnectedPointsText: {
+    color: Colors.textSecondary,
   },
 
   // Last-5-dot-rad: 5 cirklar med ✓/✗ glyph. Höger-justerad så de "sista 5"
