@@ -772,9 +772,76 @@ Sport-tabell-layout som driver både GetReadyIntro:s utfällbara leaderboard OCH
 
 **Final leaderboard-knappar** (när `isLastRound`, i sticky footer):
 - **Home** (vänster, `flex: 1`): `<QuizVibeQAvatar size={32} />` + "Home"-text i `flexDirection: 'row'` + `gap: Spacing.sm`. Bg `Colors.card`, border `Colors.border` (1.5 px), `Colors.primary`-text. Speglar TopUserBanner:s "Home"-backlink men på en row-layout istället för column.
-- **Play Again** (höger, `flex: 1`): bg `Colors.card`, border `Colors.border` (1.5 px), `Colors.primary`-text "Play Again". Knappens hela perimeter omgärdad av små grå (`Colors.textSecondary`) SVG-pilar i klockvis flöde — **3 per långsida (top + bottom) + 1 per kortsida (left + right) = 8 totalt**: top→ / right↓ / bottom← / left↑. Pilarna är 14×10, absolut-positionerade med center på border-linjen så de "skär igenom" ramen. Procent-positioner derived via `buildArrowOffsets(N)` (N+1 jämn fördelning) — 3 långsida → 25/50/75 %, 1 kortsida → 50 %. SVG-fill cast:as till `${number}%` template-typ för RN:s `DimensionValue`-typer. Visuellt signalerar rotations-loop:en "play again / restart" utan en ikon inuti knappen.
+- **Play Again** (höger, `flex: 1`): renderas av `PlayAgainButton` (intern komponent i [RoundLeaderboard.tsx](src/components/RoundLeaderboard.tsx)). Pressable:n är transparent — den synliga formen är 100% SVG (`PlayAgainLoopBorder`):
+  - **Bakgrundsfyllning** (`bgPath`): stängd rounded rectangle, fill `Colors.card` (matchar Home:s interiör). Renderas FÖRST så outline + chevron ligger ovanpå.
+  - **Outline** (`rectPath`): samma rounded rectangle MEN med en gap i bottenkantens mitten (`gapRightX`/`leftEdgeResumeX`). Höger del slutar EXAKT vid triangelns top-hörn (CONNECTED på höger sida); vänster del återupptas väl till vänster om spetsen → synligt mellanrum mellan spets och vänster bottenkant. Ingen `Z` — path:en avslutas öppen där den startade (strokeLinecap-round täcker sömlöst utan att rita oönskad diagonal-closure).
+  - **Chevron** (`chevronPath`): stängd ◁-triangel som hänger ner från bottenkanten — top-hörnet på bottenkant-nivå, vertikal höger-sida, diagonal upper-left arm till spetsen (16 px till vänster, på halv höjd), diagonal upper-right arm tillbaka till top via `Z`. Filled + strokad i samma `color` så formen läses som solid vänster-pekande pil. Spetsen sitter på `triangleTipY = bottom` (= mitten av triangelns vertikala span); triangelns BOTTOM-corner landar på `y = height` (= button-bottom).
+- **Tre färg-/state-varianter** för Play Again-knappen via `color`-prop:
+  1. **Host** (eller Pass-the-Phone): `Colors.primary` (blå) — alltid aktiv, lines = `['Play again']` (single-line).
+  2. **Non-host efter host:s tap** (`hostInitiatedPlayAgain === true`): `Colors.warning` (guld) — aktiv "Approve / Play again", lyser upp för att signalera "actionable" och skilja från host:s blå.
+  3. **Non-host innan host tappat**: `Colors.textSecondary` (dämpat grå) — disabled, ingen `onPress`, plus kant-skärande **"ACTIVATED BY HOST"-badge** i top-position (`playAgainBadge`, guld bg + svart text).
+- **Two-line text för non-host** (`finalPlayAgainTextSmall`): FontSize.sm + lineHeight 16, letterSpacing 0.2, textAlign center. Stackar "Approve" / "Play again" vertikalt så de ryms inom button-bredden utan trunkering. Host:s single-line "Play again" använder större `finalPlayAgainText` (FontSize.md). Text är title-case (P + A i versal, "again" gemener) — INGEN `textTransform: 'uppercase'`.
+- **Dynamiska höjder** (alignering med Home):
+  - HOST: `PLAY_AGAIN_BUTTON_HEIGHT_COMPACT = 56`. Båda knapparna 56 px. Rektangelns bottenkant + chevron-spets på `y = 56` (= button-bottom = Home-bottom). Chevron extends 7 px UNDER Pressable:n; SVG-höjden bumpas till `max(buttonHeight, bottomY + TRIANGLE_HALF_H + 1)` = 64 så strokeLinejoin-round ryms. SVG positioneras med `{ position: 'absolute', top: 0, left: 0 }` (INTE absoluteFillObject) så den kan extends utanför Pressable-bounds (parent har `overflow: 'visible'`).
+  - NON-HOST: `PLAY_AGAIN_BUTTON_HEIGHT_EXPANDED = 64`. Play Again Pressable 64 px (rymmer two-line text + chevron), Home 57 px (= `bottomY` = `playAgainHeight - TRIANGLE_HALF_H`). Båda top-aligned via `alignItems: 'flex-start'` på `finalActions` — Home:s underkant linjerar med rektangel-outlinens bottenkant + chevron-spetsen, INTE med chevron:s bottom-corner.
 
-Båda knappar `flex: 1` så footer-raden fylls 50/50 med Spacing.sm gap mellan; `gap` + `flexDirection: 'row'` på `finalActions`-container.
+Båda knappar `flex: 1` så footer-raden fylls 50/50 med Spacing.sm gap mellan; `gap` + `flexDirection: 'row'` + `alignItems: 'flex-start'` på `finalActions`-container. Sticky footer-padding är slimmad (`paddingTop: Spacing.sm`, `paddingBottom: Spacing.md`) för kompakt höjd.
+
+## Play Again approval flow (Individual Devices)
+
+**Pass-the-Phone** använder direkt `Alert.alert("Re-use all players?", …)`-flödet med Cancel/Start fresh/Yes, keep them (alla på samma enhet — inget att vänta in). **Individual Devices** kör en custom modal istället så host:s "Yes, keep them"-knapp kan vara visuellt utgråad tills alla non-hosts har broadcastat sin Approve-signal.
+
+**Sync-events** ([syncChannel.ts](src/lib/realtime/syncChannel.ts)):
+- `play_again_initiated` (host → alla): broadcastas när host tappar Play Again-knappen, omedelbart innan modalen öppnas. Non-host:s "Approve Play again"-knapp flippar från dämpad till aktiv guld-styling (`hostInitiatedPlayAgain=true`).
+- `player_approved_play_again` (non-host → host): broadcastas när non-host tappar sin Approve-knapp. Host adder `player_id` till `playAgainApprovals: Set<string>` (idempotent).
+- `play_again_lobby_ready` (host → alla): broadcastas DIREKT efter `registerActiveRoom` + `setLobbyPlayers` + `setLobbySettings` men INNAN `router.replace`. Bär nya rumkoden.
+
+**Host-side modal** ([app/quiz.tsx](app/quiz.tsx)):
+- Visas via `setPlayAgainModalVisible(true)` efter credit-gate-check (samma pre-conditions som handleStartGame).
+- Tre knappar:
+  - **Cancel** — stäng modal, ingen action.
+  - **Start fresh** — alltid aktiv. `setPlayAgainModalVisible(false); goToNewLobby(false)`.
+  - **Yes, keep them** — utgråad (`Colors.borderStrong` border + `Colors.textDisabled` text + ingen `onPress`) tills `allApproved`. När alla godkänt: blå primary-styling + `askKeepSettingsThenGo`-prompt.
+- Status-rad ovanför knapparna:
+  - `playAgainApprovals.size < totalNonHosts` → `"Waiting for X of Y players to approve"` + `<SequentialDots />`.
+  - Alla godkänt → `"✓ All players have approved"` (Colors.success).
+- `totalNonHosts = Math.max(0, turnOrder.length - 1)`; 0 non-hosts → `allApproved` är trivially true (Pass-the-Phone-fall som inte borde hit på modalen ändå).
+
+**Non-host approve-tap** broadcastar `broadcastPlayerApprovedPlayAgain({ player_id: selfPlayerId })` + sätter `awaitingNewLobby=true` → lock-overlay "Please Wait — Host is creating new game" visas tills `nextLobbyCode` ankommer.
+
+**Race-safe lobby-ready-handler**: `awaitingNewLobbyRef` är en synkron mirror av state (uppdateras vid varje render utan useEffect) så handler:n kan läsa AKTUELLA värdet vid event-ankomst utan att vara beroende av useEffect-closure-uppdatering. Skyddar mot millisekund-race där non-host:s Approve-tap och host:s broadcast ankommer i samma React-batch.
+
+**"Host has already started a new Game"-popup**: när non-host tar emot `play_again_lobby_ready` utan att ha tappat Approve (= `awaitingNewLobbyRef.current === false`), visas info-popup med `cancelable: false` → OK → `router.replace('/')`. Triggas av "Yes, keep them"-vägen är gated på alla approvals, så detta händer ENDAST via Start fresh där host kan bypassa väntan. `hostStartedWithoutMeAlertedRef` guarder mot dubblettpopups om broadcast skulle skickas flera gånger.
+
+## Lobby — settings + players carry-over på Play Again
+
+**`goToNewLobby(reusePlayers, keepSettings)`** ([app/quiz.tsx](app/quiz.tsx)) skriver carry-over till BÅDA AsyncStorage (per-device för host:s LobbyScreen-mount) OCH Supabase-tabellerna `lobby_players`/`lobby_settings` (cross-device för non-host:s rejoin). Den senare är KRITISK för att non-host ska se rätt pre-seeded lista när de navigerar in via `play_again_lobby_ready`-broadcasten.
+
+**Player carry-over** (när `reusePlayers=true`):
+- `carryOverPlayers = allPlayers.map(...)` byggs och sparas via `savePendingLobbyPlayers` (AsyncStorage) + `setLobbyPlayers(newCode, carryOverPlayers)` (Supabase). Båda anropas INNAN broadcast så non-host:s `getLobbyPlayers` alltid hittar pre-seeded raden vid ankomst.
+- **`approved: !!p.isHost`** — host själv är alltid approved; non-hosts får `approved: false` så de hamnar i "To be approved by Host"-listan i nya lobbyn. Host måste re-approva fresh varje gång.
+- Variabeln måste lyftas ur `if (reusePlayers)`-blocket så den är åtkomlig efter clear-bunten (`clearLobbyPlayers(newCode)` osv.) — annars scope-fel.
+
+**Settings carry-over** (när `keepSettings=true`):
+- Läser `getLobbySettings(params.roomCode)` (= OLD room) och `setLobbySettings(newCode, { ...oldSettings, answerResponseSeconds: responseSeconds })`. responseSeconds override:as eftersom host kan ha justerat mid-game via GetReadyIntro:s dropdown.
+- Alla andra fält (`gameMode`, `singlePlayerDefault`, `region`, `eraFrom/To`, `roundsCount`, `selectedExtraPackages`, `youtubeEnabled`, `spotifyHostToggle`, `profilesEnabled`) bärs över oförändrade från gamla rummet.
+- Vid `keepSettings=false` (Start fresh): ingen `setLobbySettings`-skrivning → LobbyScreen:s host-seed-effekt fyller med profil-defaults vid mount.
+
+**LobbyScreen host-seed-effekten** prefererar nu `getLobbySettings(roomCode)` över profil-defaults: laddar BÅDA via `Promise.all([loadProfile(), getLobbySettings(roomCode)])` och använder per-fält fallback-chain `stored ?? profile ?? hardcoded`. Detta gör att host som ankommer till nya rummet efter "Play again + Keep settings" ser de carry-over:ade värdena istället för profil-defaults. Den debounced `setLobbySettings`-effekten skriver sedan tillbaka samma värden (no-op) så non-host:s `syncFromStore`-pollen också ser dem.
+
+## Non-host code-only-join — dup-detection på rejoin
+
+När non-host loggar in via Room Code (= ej guest-form-path) sker en check mot `lobby_players` för att undvika duplicate-rader om non-host:s playerName redan finns pre-seedad i lobbyn (typiskt scenario: host körde "Play again + Keep players" och carry-over:ade non-host:en in i nya lobbyn, sedan blev non-host skickad Home utan att approva → de loggar nu in igen via koden från Home).
+
+**Match-logik** ([LobbyScreen.tsx](src/screens/LobbyScreen.tsx) code-only-join-grenen):
+- Efter `loadProfile()`: `myPlayerName = profile?.playerName?.trim() || 'You'`.
+- `existingPlayers = await getLobbyPlayers(roomCode)` läser authoritativa listan.
+- `existingMatch = existingPlayers?.find(p => !p.isHost && p.name.trim().toLowerCase() === myPlayerName.toLowerCase())`.
+- `joinerId = existingMatch?.id ?? `joiner-${Date.now()}`` — ÄRV id:t om match, annars nytt timestamp-id.
+- `approved: existingMatch?.approved ?? false` — bevara host:s tidigare approval-state vid ärvt id; nya joiners är alltid false (måste approvas).
+- `upsertOwnLobbyPlayer(roomCode, joiner)` blir då en UPDATE (samma room_code + player_id → unique-constraint hits) istället för INSERT.
+
+**Dedupe i `setPlayers`-callback:n**: race mellan `syncFromStore`-pollen (som kan pull:a in carry-over-raden parallellt) och code-only-join:s lokala `splice` kan annars ge två lokala objekt med samma id i prev. Fix: `filtered = prev.filter(p => p.id !== joinerId)` innan splice — säkrar exakt en rad oavsett vilken effect som kör först.
 
 ## Quiz — Question screen (question + awaiting + reveal phases)
 

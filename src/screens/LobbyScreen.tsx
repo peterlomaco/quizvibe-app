@@ -1001,40 +1001,68 @@ export default function LobbyScreen() {
     ownPlayerIdRef.current = null;
     selfEverInStoredRef.current = false;
     navigatedToQuizRef.current = false;
-    // Host: seed lobby-wide settings från profil (Profile:s "Host default
-    // settings"-block). Per-fält fallbacks följer den generiska spec:en
-    // (Pass-the-Phone, Max 4, Global, 1981→innevarande år, ROUNDS_DEFAULT, 30 sek)
-    // när profilen saknas eller fältet är otomt. Effekten triggar både
-    // vid första mount OCH vid Play Again-återinträde (component re-mountar).
+    // Host: seed lobby-wide settings. Prio-ordning:
+    //   1. lobby_settings (`stored`) — finns redan i DB om host nyss kom
+    //      via "Play again + Keep settings"-flowet (quiz.tsx skrev över
+    //      settings till nya rumkoden innan navigation).
+    //   2. Profilens "Host default settings"-block (= fallback för fresh
+    //      lobbies där ingen lobby_settings-rad ännu finns).
+    //   3. Generisk spec (Pass-the-Phone, Max 4, Global, 1981→innevarande
+    //      år, ROUNDS_DEFAULT, 30 sek) som hard-baseline.
+    // Effekten triggar både vid första mount OCH vid Play Again-återinträde
+    // (component re-mountar).
     if (hostMode) {
-      loadProfile().then((profile) => {
-        if (cancelled) return;
-        const profileGameMode = profile?.gameMode ?? 'pass-the-phone';
-        setGameMode(profileGameMode);
-        setMaxPlayers(profile?.maxPlayers ?? 4);
-        setSinglePlayerDefault(profile?.singlePlayerDefault ?? false);
-        setRegion(mapProfileRegion(profile?.region) ?? 'Global');
-        setAnswerResponseSeconds(profile?.answerResponseSeconds ?? 30);
-        const eraFrom = profile?.gameEraFrom ?? 1981;
-        const eraTo = profile?.gameEraTo ?? ERA_MAX;
-        setEraValues([
-          Math.max(ERA_MIN, eraFrom),
-          Math.min(ERA_MAX, eraTo),
-        ]);
-        // Clamp roundsCount mot gameMode:s tak (Pass-the-Phone capas vid 4,
-        // Individual Devices vid 20) så ett gammalt sparat värde inte
-        // hamnar utanför range:n.
-        const savedRounds = profile?.roundsDefault ?? ROUNDS_DEFAULT;
-        const initialMax = profileGameMode === 'pass-the-phone'
-          ? ROUNDS_MAX_PASS
-          : ROUNDS_MAX_INDIV;
-        setRoundsCount(Math.max(ROUNDS_MIN, Math.min(initialMax, savedRounds)));
-        // Filterlistan från Profile:s Customized Host packages-toggle.
-        // Default = alla köpta paket aktiverade om profilen saknar fältet.
-        setEnabledHostPackages(
-          profile?.enabledHostPackages ?? PURCHASED_PACKAGES.map((p) => p.id),
-        );
-      });
+      Promise.all([loadProfile(), getLobbySettings(roomCode)]).then(
+        ([profile, stored]) => {
+          if (cancelled) return;
+          const seedGameMode =
+            stored?.gameMode ?? profile?.gameMode ?? 'pass-the-phone';
+          setGameMode(seedGameMode);
+          setMaxPlayers(profile?.maxPlayers ?? 4);
+          setSinglePlayerDefault(
+            stored?.singlePlayerDefault ??
+              profile?.singlePlayerDefault ??
+              false,
+          );
+          setRegion(
+            stored?.region ?? mapProfileRegion(profile?.region) ?? 'Global',
+          );
+          setAnswerResponseSeconds(
+            stored?.answerResponseSeconds ??
+              profile?.answerResponseSeconds ??
+              30,
+          );
+          const eraFrom = stored?.eraFrom ?? profile?.gameEraFrom ?? 1981;
+          const eraTo = stored?.eraTo ?? profile?.gameEraTo ?? ERA_MAX;
+          setEraValues([
+            Math.max(ERA_MIN, eraFrom),
+            Math.min(ERA_MAX, eraTo),
+          ]);
+          // Clamp roundsCount mot gameMode:s tak (Pass-the-Phone capas vid 4,
+          // Individual Devices vid 20) så ett gammalt sparat värde inte
+          // hamnar utanför range:n.
+          const savedRounds =
+            stored?.roundsCount ?? profile?.roundsDefault ?? ROUNDS_DEFAULT;
+          const initialMax =
+            seedGameMode === 'pass-the-phone'
+              ? ROUNDS_MAX_PASS
+              : ROUNDS_MAX_INDIV;
+          setRoundsCount(
+            Math.max(ROUNDS_MIN, Math.min(initialMax, savedRounds)),
+          );
+          // Game Connections-toggles + extra-paket från stored om finns,
+          // annars profil-default (= alla paket aktiverade).
+          if (stored) {
+            setSelectedExtraPackages(stored.selectedExtraPackages);
+            setYoutubeEnabled(stored.youtubeEnabled);
+            setSpotifyHostToggle(stored.spotifyHostToggle);
+            setProfilesEnabled(stored.profilesEnabled);
+          }
+          setEnabledHostPackages(
+            profile?.enabledHostPackages ?? PURCHASED_PACKAGES.map((p) => p.id),
+          );
+        },
+      );
     }
     consumePendingLobbyPlayers().then(async (carriedOver) => {
       if (cancelled) return;
@@ -1090,11 +1118,27 @@ export default function LobbyScreen() {
         const age = profile?.birthYear ? currentYear - profile.birthYear : undefined;
         const assistance = profile?.assistance ?? undefined;
         const hcpComplete = !!(assistance && age !== undefined);
-        const joinerId = `joiner-${Date.now()}`;
+        const myPlayerName = profile?.playerName?.trim() || 'You';
+        // Anti-duplicate: om lobby_players redan har en non-host-rad med
+        // SAMMA playerName (case-insensitive), ÄRV den raden:s id istället
+        // för att generera ett nytt. Detta händer t.ex. när host kört
+        // "Play again + Keep settings" och carry-over:at non-host:en in i
+        // den nya lobbyn — om non-host sedan har skickats till Home (för
+        // att de inte hann tappa Approve) och loggar in via Room Code,
+        // skulle ett färskt joinerId annars skapa en TVÅA-rad i host:s vy.
+        // Genom att återanvända id:t blir upsertOwnLobbyPlayer en UPDATE
+        // av den befintliga raden istället för en INSERT.
+        const existingPlayers = await getLobbyPlayers(roomCode);
+        const existingMatch = existingPlayers?.find(
+          (p) =>
+            !p.isHost &&
+            p.name.trim().toLowerCase() === myPlayerName.toLowerCase(),
+        );
+        const joinerId = existingMatch?.id ?? `joiner-${Date.now()}`;
         ownPlayerIdRef.current = joinerId;
         const joiner: LobbyPlayer = {
           id: joinerId,
-          name: profile?.playerName?.trim() || 'You',
+          name: myPlayerName,
           emoji: profile ? getAvatarEmojiById(profile.selectedAvatarId) : '👤',
           isReady: hcpComplete,
           type: profile ? 'registered' : 'guest',
@@ -1102,17 +1146,29 @@ export default function LobbyScreen() {
           assistance,
           hcpComplete,
           spotifyConnected: profile?.spotifyConnected ?? false,
-          approved: false,
+          // Vid ärvt id: bevara approved-status från existing rad (host
+          // kan redan ha approvat spelaren i föregående lobby-session).
+          // Vid nytt id: alltid false (måste approvas av host innan start).
+          approved: existingMatch?.approved ?? false,
         };
         setPlayers((prev) => {
-          const hostIdx = prev.findIndex((p) => p.isHost);
+          // Dedupe på id: om syncFromStore-pollen redan har dragit in
+          // carry-over-raden (med samma id efter dup-detection-fixet) så
+          // ersätt den med vår lokala joiner-payload istället för att
+          // insert:a en TVÅA-rad. Annars race-fall: poll:en plockar in
+          // raden → vi insert:ar → två rader med samma id syns kort tills
+          // nästa poll skriver över local state.
+          const filtered = prev.filter((p) => p.id !== joinerId);
+          const hostIdx = filtered.findIndex((p) => p.isHost);
           const insertAt = hostIdx === -1 ? 0 : hostIdx + 1;
-          const next = [...prev];
+          const next = [...filtered];
           next.splice(insertAt, 0, joiner);
           return next;
         });
         // Publicera egen rad till lobby_players så host:s Realtime-channel
-        // får broadcast och hen ser den nya spelaren direkt i sin vy.
+        // får broadcast och hen ser den nya spelaren direkt i sin vy. När
+        // joinerId redan finns i tabellen blir det en UPDATE (samma id,
+        // ny payload) — inget ny rad skapas.
         upsertOwnLobbyPlayer(roomCode, joiner).catch(() => { /* loggas i lobbyPlayers */ });
         return;
       }
@@ -1210,6 +1266,13 @@ export default function LobbyScreen() {
   // bara innan profil-seed-effekten hinner köra). Profile:s host-default
   // settings overridar dessa vid lobby-mount för host (se useEffect nedan).
   const [eraValues, setEraValues] = useState([1981, ERA_MAX]);
+  // Drag-tracking för era-slidern: håll non-active thumb fast vid sitt
+  // start-värde medan host drar den aktiva. Utan detta puttar
+  // minMarkerOverlapDistance den passiva thumben framför sig så fort den
+  // aktiva nuddar 10-års-gränsen — vilket gör att även det år host INTE
+  // försöker ändra åker med.
+  const draggingEraThumbRef = useRef<0 | 1 | null>(null);
+  const eraDragStartValuesRef = useRef<number[]>([1981, ERA_MAX]);
   const [roundsCount, setRoundsCount] = useState(ROUNDS_DEFAULT);
   const [region, setRegion] = useState<Region>('Global');
   // Hur länge spelarna har på sig att svara på en fråga (sekunder). Ingen
@@ -2469,29 +2532,34 @@ export default function LobbyScreen() {
     }
     const free = profile.freeGameCredits ?? 0;
     const extras = profile.gameCredits ?? 0;
-    if (free === 0 && extras === 0) {
-      Alert.alert(
-        'Out of Host Game Credits',
-        'You have no credits left for today. Buy extra credits in Store, wait for the daily refresh at midnight CET, or upgrade to a QuizVibe membership for unlimited host games.',
-        [
-          { text: 'Cancel', style: 'cancel' },
-          { text: 'Go to Store', onPress: () => router.push({ pathname: '/store' as const, params: { focus: 'credits', from: '/lobby', fromCode: roomCode } }) },
-        ],
-      );
-      return;
-    }
-    const nextFree = free > 0 ? free - 1 : 0;
-    const nextExtras = free > 0 ? extras : extras - 1;
-    try {
-      await saveProfile({ ...profile, freeGameCredits: nextFree, gameCredits: nextExtras });
-      // Lokal state-sync så pillen i lobby-headern uppdateras direkt
-      // (annars hade den gamla siffran legat kvar tills nästa fokus-load).
-      setFreeGameCredits(nextFree);
-      setGameCredits(nextExtras);
-    } catch {
-      // Tyst — låt spelet börja även om persist-write skulle failla. Nästa
-      // load reflekterar då fortfarande gamla värdet, vilket är säkrare än
-      // att blockera spelstart helt på en AsyncStorage-glitch.
+    // Membership = obegränsade host-spel; ingen gate, ingen deduktion.
+    // Free + Extras lämnas helt orörda så pillen behåller sina värden om
+    // membership skulle gå ut senare och behovet av credits återuppstår.
+    if (!hasPremium) {
+      if (free === 0 && extras === 0) {
+        Alert.alert(
+          'Out of Host Game Credits',
+          'You have no credits left for today. Buy extra credits in Store, wait for the daily refresh at midnight CET, or upgrade to a QuizVibe membership for unlimited host games.',
+          [
+            { text: 'Cancel', style: 'cancel' },
+            { text: 'Go to Store', onPress: () => router.push({ pathname: '/store' as const, params: { focus: 'credits', from: '/lobby', fromCode: roomCode } }) },
+          ],
+        );
+        return;
+      }
+      const nextFree = free > 0 ? free - 1 : 0;
+      const nextExtras = free > 0 ? extras : extras - 1;
+      try {
+        await saveProfile({ ...profile, freeGameCredits: nextFree, gameCredits: nextExtras });
+        // Lokal state-sync så pillen i lobby-headern uppdateras direkt
+        // (annars hade den gamla siffran legat kvar tills nästa fokus-load).
+        setFreeGameCredits(nextFree);
+        setGameCredits(nextExtras);
+      } catch {
+        // Tyst — låt spelet börja även om persist-write skulle failla. Nästa
+        // load reflekterar då fortfarande gamla värdet, vilket är säkrare än
+        // att blockera spelstart helt på en AsyncStorage-glitch.
+      }
     }
 
     // Markera rumkoden som "game-started" innan navigation — non-host:s
@@ -2586,10 +2654,18 @@ export default function LobbyScreen() {
             <Pressable
               style={({ pressed }) => [
                 styles.creditsPill,
+                hasPremium && styles.creditsPillMembership,
                 pressed && { opacity: 0.85 },
               ]}
               onPress={() => router.push({ pathname: '/store' as const, params: { focus: 'credits', from: '/lobby', fromCode: roomCode } })}
             >
+              {hasPremium && (
+                <View style={styles.creditsMembershipBadgeWrap} pointerEvents="none">
+                  <View style={styles.creditsMembershipBadge}>
+                    <Text style={styles.creditsMembershipBadgeText}>Unlimited</Text>
+                  </View>
+                </View>
+              )}
               <Text style={styles.creditsLabel}>Host Game Credits</Text>
               <View style={styles.creditsValueRow}>
                 <Text style={styles.creditsKey}>Free:</Text>
@@ -3591,18 +3667,61 @@ export default function LobbyScreen() {
                     min={ERA_MIN}
                     max={ERA_MAX}
                     step={1}
+                    onValuesChangeStart={() => {
+                      // Snapshot start-värden så vi kan låsa den passiva
+                      // thumben. Active thumb detekteras på första onValuesChange.
+                      eraDragStartValuesRef.current = [eraValues[0], eraValues[1]];
+                      draggingEraThumbRef.current = null;
+                    }}
                     onValuesChange={(vals) => {
+                      const start = eraDragStartValuesRef.current;
+                      // Detektera vilken thumb host drar baserat på första
+                      // diff:en mot start-värdet. Om bara en ändrats är det
+                      // den aktiva; om båda ändrats (push-scenario vid snabb
+                      // dragning över 10-års-gränsen) tar vi den med störst
+                      // absolut diff som aktiv.
+                      if (draggingEraThumbRef.current === null) {
+                        const d0 = vals[0] - start[0];
+                        const d1 = vals[1] - start[1];
+                        if (d0 !== 0 && d1 === 0) draggingEraThumbRef.current = 0;
+                        else if (d1 !== 0 && d0 === 0) draggingEraThumbRef.current = 1;
+                        else if (d0 !== 0 && d1 !== 0) {
+                          draggingEraThumbRef.current = Math.abs(d0) >= Math.abs(d1) ? 0 : 1;
+                        }
+                      }
+
+                      let next: number[] = vals;
+                      if (draggingEraThumbRef.current === 0) {
+                        // Vänster thumb (äldre år) dras; lås höger till start
+                        // och clampa vänster så min-intervallet hålls.
+                        const lockedRight = start[1];
+                        const clampedLeft = Math.min(vals[0], lockedRight - ERA_MIN_INTERVAL);
+                        next = [clampedLeft, lockedRight];
+                      } else if (draggingEraThumbRef.current === 1) {
+                        // Höger thumb (yngre år) dras; lås vänster till start
+                        // och clampa höger så min-intervallet hålls.
+                        const lockedLeft = start[0];
+                        const clampedRight = Math.max(vals[1], lockedLeft + ERA_MIN_INTERVAL);
+                        next = [lockedLeft, clampedRight];
+                      }
+
                       // Defensiv guard ifall lib:n släpper igenom värden under
                       // 10 år trots minMarkerOverlapDistance — ignorera updates
                       // som bryter regeln. UI:t snappar visuellt till senaste
                       // giltiga state.
-                      if (vals[1] - vals[0] < ERA_MIN_INTERVAL) return;
+                      if (next[1] - next[0] < ERA_MIN_INTERVAL) return;
+                      // Hoppa över haptic + setState om värdet inte ändrades
+                      // (kan hända när clampLeft/clampRight gör no-op).
+                      if (next[0] === eraValues[0] && next[1] === eraValues[1]) return;
                       // Tick-haptic per år-ändring — selectionAsync är Apple:s
                       // picker-tick (subtil tap-känsla på iOS, KEYBOARD_TAP-
                       // feedback på Android som även producerar OS-klick-ljud).
                       // No-op på web. Step=1 ⇒ exakt en haptic per år.
                       void Haptics.selectionAsync();
-                      setEraValues(vals);
+                      setEraValues(next);
+                    }}
+                    onValuesChangeFinish={() => {
+                      draggingEraThumbRef.current = null;
                     }}
                     minMarkerOverlapDistance={ERA_MIN_INTERVAL_PX}
                     isMarkersSeparated
@@ -4305,6 +4424,40 @@ const styles = StyleSheet.create({
     // texten ovanför.
     gap: 8,
     minWidth: 210,
+    position: 'relative',
+  },
+  // Gold-framed-variant av pillen när host har aktiv membership-prenu-
+  // meration. Border + kantskärande MEMBERSHIP-badge signalerar att
+  // credits inte räknas ner (handleStartGame skippar deduktionen).
+  // Border-färgen byts till gold (samma `#F5A623` som premium-badges
+  // använder); border-bredden bumpas till 2 så ramen syns tydligare.
+  creditsPillMembership: {
+    borderWidth: 2,
+    borderColor: '#F5A623',
+  },
+  // Wrap för MEMBERSHIP-badgen — absolut-positionerad ovanför pillens
+  // topp-border (top: -8). Höger-anchorad (right: 12) istället för
+  // centrerad så badgen inte krockar med "HOST GAME CREDITS"-labeln.
+  // pointerEvents: 'none' så outer pillens onPress (Store) fortfarande
+  // fyrar när användaren tappar i badge-zonen.
+  creditsMembershipBadgeWrap: {
+    position: 'absolute',
+    top: -8,
+    right: 12,
+    zIndex: 10,
+    elevation: 4,
+  },
+  creditsMembershipBadge: {
+    backgroundColor: '#F5A623',
+    paddingHorizontal: 6,
+    paddingVertical: 1,
+    borderRadius: 3,
+  },
+  creditsMembershipBadgeText: {
+    fontSize: 7,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+    color: '#000',
   },
   creditsLabel: {
     fontSize: 10,
@@ -4707,14 +4860,14 @@ const styles = StyleSheet.create({
     height: 20,
     borderRadius: 4,
     borderWidth: 1.5,
-    borderColor: Colors.primaryDark,
+    borderColor: Colors.borderStrong,
     backgroundColor: 'transparent',
     alignItems: 'center',
     justifyContent: 'center',
   },
   singlePlayerCheckboxChecked: {
-    backgroundColor: Colors.primary,
-    borderColor: Colors.primaryDark,
+    backgroundColor: Colors.borderStrong,
+    borderColor: Colors.borderStrong,
   },
   singlePlayerCheckmark: {
     color: '#FFF',

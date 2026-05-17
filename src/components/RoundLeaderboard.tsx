@@ -5,46 +5,235 @@ import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
 import { QuizVibeQAvatar } from './QuizVibeQAvatar';
 
 /**
- * Liten SVG-pil som placeras längs Play Again-knappens kant. Många små
- * pilar i klockvis flöde runt hela perimetern signalerar "play again /
- * restart" via en visuell rotations-loop kring knappen.
- *
- * Bas-arrow:n är ritad pekande HÖGER i viewBoxen; rotation:en roteras
- * för andra riktningar via parent-View:s transform.
+ * Looped-arrow-BORDER som fyller hela Play Again-knappens yta och
+ * fungerar som button:s synliga kantlinje (Pressable:n själv har ingen
+ * borderWidth). En enda Path tracer en stängd rundad rektangel CCW
+ * med en INTEGRERAD chevron-notch i botten-kanten nära vänstra hörnet —
+ * notchen dippar ner i en V-form som visuellt fungerar som pilspets
+ * nedåt och fortsätter sedan tillbaka upp i bottenkanten. Hela formen
+ * ryms innanför width × height (= button-bounds) så ingen overflow
+ * klipps av sticky footer eller safe area.
  */
-const PLAY_AGAIN_ARROW_W = 14;
-const PLAY_AGAIN_ARROW_H = 10;
-// Knappens långsida (top/bottom) får 3 pilar; kortsidan (left/right) får 1
-// pil — proportionellt mot sidans längd så den visuella tätheten håller sig
-// jämn runt hela perimetern.
-const PLAY_AGAIN_ARROWS_LONG = 3;
-const PLAY_AGAIN_ARROWS_SHORT = 1;
+function PlayAgainLoopBorder({
+  width,
+  buttonHeight,
+  bottomY,
+  color,
+  strokeWidth = 2,
+}: {
+  width: number;
+  /** Pressable:s höjd (touchable area). SVG positioneras absolute med
+   *  top: 0, så denna styr alignering med Pressable. */
+  buttonHeight: number;
+  /** Y-koordinaten där rektangelns bottenkant + chevron-spetsen ligger
+   *  (= Home-knappens bottom-edge). För host: = buttonHeight; för
+   *  non-host: = buttonHeight - TRIANGLE_HALF_H. Chevron spänner
+   *  bottomY±TRIANGLE_HALF_H så host:s chevron extends under Pressable:n. */
+  bottomY: number;
+  color: string;
+  strokeWidth?: number;
+}) {
+  const cornerR = 14;
+  const inset = strokeWidth / 2 + 1.5;
+  const TRIANGLE_HEIGHT = 14;     // total vertikal spann (halv-ovan + halv-under bottenkant)
+  const TRIANGLE_REACH = 16;      // hur långt vänster spetsen extends
+  const TRIANGLE_LEFT_GAP = 5;    // luft mellan spetsen och vänster bottenkant
+  const TRIANGLE_HALF_H = TRIANGLE_HEIGHT / 2;
+  const left = inset;
+  const right = width - inset;
+  const top = inset;
+  // bottom = rektangelns nedre kant = chevron-spetsens y = Home-bottom y
+  const bottom = bottomY;
+  // SVG-höjden måste rymma chevron-botten (= bottom + TRIANGLE_HALF_H)
+  // plus en liten marginal för strokeLinejoin-round. Om SVG-höjden >
+  // buttonHeight extends SVG:n under Pressable:n (overflow: visible på
+  // parent tillåter det).
+  const svgHeight = Math.max(buttonHeight, bottom + TRIANGLE_HALF_H + 1);
+  // Triangelns top-hörn — OVAN bottenkanten med halv-höjd
+  const triangleTopX = width / 2 + 4; // svagt höger om mitten för visuell balans
+  const triangleTopY = bottom - TRIANGLE_HALF_H;
+  // Triangelns bottom-hörn (samma x, UNDER bottenkanten med halv-höjd)
+  const triangleBottomX = triangleTopX;
+  const triangleBottomY = bottom + TRIANGLE_HALF_H;
+  // Triangelns spets pekar vänster, EXAKT på bottenkantens y
+  const triangleTipX = triangleTopX - TRIANGLE_REACH;
+  const triangleTipY = bottom;
+  // Var vänster bottenkant återupptas — strax vänster om spetsen
+  const leftEdgeResumeX = triangleTipX - TRIANGLE_LEFT_GAP;
 
-function PlayAgainEdgeArrow({ rotation }: { rotation: 0 | 90 | 180 | 270 }) {
+  // Bakgrunds-fyllning — STÄNGD rounded rectangle (utan gap) som fylls
+  // med Colors.card så button:s interiör matchar Home-knappens utseende.
+  // Renderas FÖRE outline:n nedan så outline-stroken och chevron-triangeln
+  // sitter ovanpå. Bgens shape matchar outline:s yttre bounds exakt.
+  const bgPath = [
+    `M ${left + cornerR} ${top}`,
+    `L ${right - cornerR} ${top}`,
+    `Q ${right} ${top} ${right} ${top + cornerR}`,
+    `L ${right} ${bottom - cornerR}`,
+    `Q ${right} ${bottom} ${right - cornerR} ${bottom}`,
+    `L ${left + cornerR} ${bottom}`,
+    `Q ${left} ${bottom} ${left} ${bottom - cornerR}`,
+    `L ${left} ${top + cornerR}`,
+    `Q ${left} ${top} ${left + cornerR} ${top}`,
+    'Z',
+  ].join(' ');
+
+  // Rektangelns outline med gap i bottenkanten. Höger bottenkant slutar
+  // EXAKT vid triangelns top-hörn (CONNECTED på höger sida). Vänster
+  // bottenkant återupptas vid leftEdgeResumeX (= LÄNGRE VÄNSTER än
+  // triangelns spets) → synligt gap mellan spetsen och vänster
+  // bottenkant. Ingen `Z` — path:en avslutas öppen där den startade
+  // för att undvika oönskad diagonal-closure genom rektangeln.
+  const rectPath = [
+    `M ${left + cornerR} ${top}`,
+    `L ${right - cornerR} ${top}`,
+    `Q ${right} ${top} ${right} ${top + cornerR}`,
+    `L ${right} ${bottom - cornerR}`,
+    `Q ${right} ${bottom} ${right - cornerR} ${bottom}`,
+    // Höger bottenkant — slutar EXAKT vid triangelns top-hörn (connected)
+    `L ${triangleTopX} ${bottom}`,
+    // MOVE över gapet — vänster bottenkant återupptas väl till vänster
+    // om triangelns spets
+    `M ${leftEdgeResumeX} ${bottom}`,
+    `L ${left + cornerR} ${bottom}`,
+    `Q ${left} ${bottom} ${left} ${bottom - cornerR}`,
+    `L ${left} ${top + cornerR}`,
+    `Q ${left} ${top} ${left + cornerR} ${top}`,
+  ].join(' ');
+
+  // ◁-triangel som hänger ner under bottenkanten. Top-hörnet sitter på
+  // bottenkant-nivå (= där höger bottenkant slutar → CONNECTED).
+  // Path-ordning: top → bottom (vertikal höger-sida) → tip (diagonal
+  // UP-LEFT) → Z stänger tillbaka till top (diagonal UP-RIGHT = top-arm).
+  const chevronPath = [
+    `M ${triangleTopX} ${triangleTopY}`,
+    `L ${triangleBottomX} ${triangleBottomY}`,
+    `L ${triangleTipX} ${triangleTipY}`,
+    'Z',
+  ].join(' ');
+
   return (
-    <View style={{ transform: [{ rotate: `${rotation}deg` }] }}>
-      <Svg width={PLAY_AGAIN_ARROW_W} height={PLAY_AGAIN_ARROW_H} viewBox="0 0 14 10">
-        <Path
-          d="M 0 4 L 8 4 L 8 1 L 14 5 L 8 9 L 8 6 L 0 6 Z"
-          fill={Colors.textSecondary}
-        />
-      </Svg>
-    </View>
+    <Svg
+      width={width}
+      height={svgHeight}
+      viewBox={`0 0 ${width} ${svgHeight}`}
+      style={{ position: 'absolute', top: 0, left: 0 }}
+      pointerEvents="none"
+    >
+      {/* Bg-fill FÖRST så den ligger bakom outline + chevron */}
+      <Path d={bgPath} fill={Colors.card} stroke="none" />
+      <Path
+        d={rectPath}
+        stroke={color}
+        strokeWidth={strokeWidth}
+        fill="none"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <Path
+        d={chevronPath}
+        stroke={color}
+        strokeWidth={strokeWidth}
+        fill={color}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </Svg>
   );
 }
 
-// Jämnt fördelade procent-positioner längs en sida — N pilar mellan
-// 1/(N+1) och N/(N+1) av sidans längd. Cast till DimensionValue-template
-// (`${number}%`) så RN:s ViewStyle-typer accepterar dem som left/top.
-type PercentValue = `${number}%`;
-function buildArrowOffsets(count: number): PercentValue[] {
-  return Array.from(
-    { length: count },
-    (_, i) => `${((100 / (count + 1)) * (i + 1)).toFixed(2)}%` as PercentValue,
+// Play Again matchar Home-knappens dimensioner exakt — ingen overflow
+// utanför button-bounds, ingen tail-extension. Loop-symbolik bärs av en
+// inline-ikon till vänster om "PLAY AGAIN"-texten (samma layout-mönster
+// som Home:s Q-logo + "Home"-text).
+//
+// Två höjd-varianter:
+// - HOST (single-line "PLAY AGAIN"): 56 px räcker — chevron landar
+//   ~1.5 px under texten utan överlapp.
+// - NON-HOST (two-line "Approve / Play Again"): texten är ~32 px tall
+//   så den skulle överlappa chevron i en 56-px-button. Vi använder 74 px
+//   istället — bottenkanten + chevron skiftas ner ~18 px, vilket ger
+//   ~4-5 px luft mellan text-botten och chevron-toppen.
+const PLAY_AGAIN_BUTTON_HEIGHT_COMPACT = 56;
+const PLAY_AGAIN_BUTTON_HEIGHT_EXPANDED = 64;
+
+/**
+ * Final Leaderboard:s Play Again-knapp. Loop-SVG i bakgrunden + text
+ * centrerad ovanpå + valfri kant-skärande badge i top-position.
+ *
+ * `color` styr både SVG-loopens stroke och textens färg. `disabled` mörkar
+ * texten och ignorerar tap. `badge` (om satt) renderas absolut-positionerad
+ * vid loopens topp-kant så den "skär igenom" loopens streckade ram (samma
+ * mönster som FREE/PREMIUM-badges på Game Mode-toggle:n).
+ */
+function PlayAgainButton({
+  lines,
+  color,
+  onPress,
+  disabled,
+  badge,
+  buttonHeight,
+  bottomY,
+}: {
+  /** Etiketten är title-case strings ("Play again", "Approve") som
+   *  renderas as-is utan textTransform. Two-line varianten stackar
+   *  raderna vertikalt med mindre fontsize. */
+  lines: string[];
+  color: string;
+  onPress?: () => void;
+  disabled: boolean;
+  badge?: string;
+  /** Pressable:s höjd (touchable area). */
+  buttonHeight: number;
+  /** Y-koordinaten där rektangelns bottenkant + chevron-spetsen ligger
+   *  (= där Home-knappens bottom-edge ska linjera). */
+  bottomY: number;
+}) {
+  const [width, setWidth] = React.useState(0);
+  const twoLine = lines.length > 1;
+  return (
+    <Pressable
+      onPress={disabled ? undefined : onPress}
+      onLayout={(e) => setWidth(e.nativeEvent.layout.width)}
+      style={({ pressed }) => [
+        styles.finalPlayAgainBtn,
+        { height: buttonHeight },
+        !disabled && pressed && { opacity: 0.85 },
+      ]}
+    >
+      {width > 0 && (
+        <PlayAgainLoopBorder
+          width={width}
+          buttonHeight={buttonHeight}
+          bottomY={bottomY}
+          color={color}
+          strokeWidth={2}
+        />
+      )}
+      <View style={[styles.finalPlayAgainTextWrap, { height: buttonHeight }]}>
+        {lines.map((line, idx) => (
+          <Text
+            key={idx}
+            style={[
+              twoLine ? styles.finalPlayAgainTextSmall : styles.finalPlayAgainText,
+              { color },
+            ]}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.7}
+          >
+            {line}
+          </Text>
+        ))}
+      </View>
+      {badge && (
+        <View style={styles.playAgainBadge} pointerEvents="none">
+          <Text style={styles.playAgainBadgeText}>{badge}</Text>
+        </View>
+      )}
+    </Pressable>
   );
 }
-const PLAY_AGAIN_LONG_OFFSETS = buildArrowOffsets(PLAY_AGAIN_ARROWS_LONG);
-const PLAY_AGAIN_SHORT_OFFSETS = buildArrowOffsets(PLAY_AGAIN_ARROWS_SHORT);
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -134,7 +323,10 @@ export function RoundLeaderboard({
   onNextRound,
   onPlayAgain,
   onGoHome,
+  onApprovePlayAgain,
   isLastRound,
+  isHost = true,
+  hostInitiatedPlayAgain = false,
   allRoundScoresHistory,
 }: {
   players: LeaderboardPlayer[];
@@ -146,9 +338,21 @@ export function RoundLeaderboard({
   roundNumber: number;
   totalRounds: number;
   onNextRound?: () => void;
+  /** Host:s Play Again-tap (eller PtP där isHost alltid är true). */
   onPlayAgain?: () => void;
   onGoHome?: () => void;
+  /** Non-host:s Approve Play Again-tap. Endast aktiv när
+   *  hostInitiatedPlayAgain === true. */
+  onApprovePlayAgain?: () => void;
   isLastRound: boolean;
+  /** Driver vilken final-knapp som visas: host får "Play Again",
+   *  non-host får "Approve Play Again" med dimmed/active-läge baserat
+   *  på hostInitiatedPlayAgain. Default true (= Pass-the-Phone-fallet
+   *  + bakåt-kompat för befintliga call-sites). */
+  isHost?: boolean;
+  /** Non-host: host har tappat Play Again → button lights up. Ignored
+   *  för host. */
+  hostInitiatedPlayAgain?: boolean;
   allRoundScoresHistory: RoundScore[][];
   hcpChanges?: Record<string, HcpChange>;
 }) {
@@ -360,94 +564,83 @@ export function RoundLeaderboard({
           'flex-end' höger-ställer Home + Play Again i ändan av raden. */}
       <View style={styles.stickyFooter}>
       {isLastRound ? (
-        <View style={styles.finalActions}>
-          {/* Home-knapp = QuizVibe Q-logo + "Home"-text i column-stack —
-              speglar TopUserBanner:s "Home"-länk i Profile-skärmens övre
-              vänstra hörn (samma Q-mark, samma stack-layout, samma textstil). */}
-          <Pressable
-            onPress={onGoHome}
-            style={({ pressed }) => [styles.finalHomeBtn, pressed && { opacity: 0.7 }]}
-          >
-            <QuizVibeQAvatar size={32} />
-            <Text style={styles.finalHomeBtnText}>Home</Text>
-          </Pressable>
-          {/* Play Again — knappen omgärdad av små pilar i klockvis flöde
-              (3 per långsida, 1 per kortsida = 8 totalt: top→ / right↓ /
-              bottom← / left↑) som visuellt signalerar "play again / restart"
-              via en rotations-loop kring hela perimetern. Pilarna är absolut-
-              positionerade med center på border-linjen så de "skär igenom"
-              ramen. */}
-          <Pressable
-            onPress={onPlayAgain}
-            style={({ pressed }) => [styles.finalPlayAgainBtn, pressed && { opacity: 0.85 }]}
-          >
-            <Text style={styles.finalPlayAgainText}>Play Again</Text>
-            {PLAY_AGAIN_LONG_OFFSETS.map((pct, i) => (
-              <View
-                key={`top-${i}`}
-                style={[
-                  styles.playAgainEdgeArrow,
-                  {
-                    top: -PLAY_AGAIN_ARROW_H / 2,
-                    left: pct,
-                    marginLeft: -PLAY_AGAIN_ARROW_W / 2,
-                  },
+        (() => {
+          // Två separata höjd-värden:
+          //   playAgainHeight = Pressable:s touchable area
+          //   bottomY = rektangel-outline-botten + chevron-spets y
+          //           (= där Home:s underkant ska linjera)
+          //
+          // HOST: playAgain = 56, bottomY = 56 (= playAgain). Chevron
+          //       extends 7 px UNDER Pressable. Home matchar bottomY (56).
+          // NON-HOST: playAgain = 74, bottomY = 67 (= playAgain - 7).
+          //       Chevron ryms HELT inom Pressable (bottom-corner vid 74).
+          //       Home matchar bottomY (67) — KORTARE än Play Again så
+          //       finalActions kräver alignItems: 'flex-start' för top-align.
+          const TRIANGLE_HALF_H = 7;
+          const playAgainHeight = isHost
+            ? PLAY_AGAIN_BUTTON_HEIGHT_COMPACT
+            : PLAY_AGAIN_BUTTON_HEIGHT_EXPANDED;
+          const bottomY = isHost
+            ? playAgainHeight
+            : playAgainHeight - TRIANGLE_HALF_H;
+          const homeHeight = bottomY;
+          return (
+            <View style={styles.finalActions}>
+              {/* Home-knapp — höjden = bottomY så Home:s underkant linjerar
+                  exakt med rektangel-outline-botten + chevron-spetsens y i
+                  Play Again-knappen. */}
+              <Pressable
+                onPress={onGoHome}
+                style={({ pressed }) => [
+                  styles.finalHomeBtn,
+                  { height: homeHeight },
+                  pressed && { opacity: 0.7 },
                 ]}
-                pointerEvents="none"
               >
-                <PlayAgainEdgeArrow rotation={0} />
-              </View>
-            ))}
-            {PLAY_AGAIN_SHORT_OFFSETS.map((pct, i) => (
-              <View
-                key={`right-${i}`}
-                style={[
-                  styles.playAgainEdgeArrow,
-                  {
-                    right: -PLAY_AGAIN_ARROW_W / 2,
-                    top: pct,
-                    marginTop: -PLAY_AGAIN_ARROW_H / 2,
-                  },
-                ]}
-                pointerEvents="none"
-              >
-                <PlayAgainEdgeArrow rotation={90} />
-              </View>
-            ))}
-            {PLAY_AGAIN_LONG_OFFSETS.map((pct, i) => (
-              <View
-                key={`bottom-${i}`}
-                style={[
-                  styles.playAgainEdgeArrow,
-                  {
-                    bottom: -PLAY_AGAIN_ARROW_H / 2,
-                    left: pct,
-                    marginLeft: -PLAY_AGAIN_ARROW_W / 2,
-                  },
-                ]}
-                pointerEvents="none"
-              >
-                <PlayAgainEdgeArrow rotation={180} />
-              </View>
-            ))}
-            {PLAY_AGAIN_SHORT_OFFSETS.map((pct, i) => (
-              <View
-                key={`left-${i}`}
-                style={[
-                  styles.playAgainEdgeArrow,
-                  {
-                    left: -PLAY_AGAIN_ARROW_W / 2,
-                    top: pct,
-                    marginTop: -PLAY_AGAIN_ARROW_H / 2,
-                  },
-                ]}
-                pointerEvents="none"
-              >
-                <PlayAgainEdgeArrow rotation={270} />
-              </View>
-            ))}
-          </Pressable>
-        </View>
+                <QuizVibeQAvatar size={32} />
+                <Text style={styles.finalHomeBtnText}>Home</Text>
+              </Pressable>
+              {isHost ? (
+                /* Host (eller Pass-the-Phone): Play again-knapp aktiv direkt.
+                   Loop-border + integrerad arrow-chevron längs nedre kanten. */
+                <PlayAgainButton
+                  lines={['Play again']}
+                  color={Colors.primary}
+                  onPress={onPlayAgain}
+                  disabled={false}
+                  buttonHeight={playAgainHeight}
+                  bottomY={bottomY}
+                />
+              ) : hostInitiatedPlayAgain ? (
+                /* Non-host efter host:s tap: "Approve" / "Play again" på två
+                   rader så texten ryms inom button-bredden. Aktiv styling i
+                   GULD — host har "öppnat upp" knappen, så den lyser i
+                   warning/premium-färgen för att signalera "actionable" och
+                   skilja från host:s vanliga blå Play again. */
+                <PlayAgainButton
+                  lines={['Approve', 'Play again']}
+                  color={Colors.warning}
+                  onPress={onApprovePlayAgain}
+                  disabled={false}
+                  buttonHeight={playAgainHeight}
+                  bottomY={bottomY}
+                />
+              ) : (
+                /* Non-host innan host tappat: dämpad two-line + "Activated by
+                    Host"-badge kant-skärande i top-position. */
+                <PlayAgainButton
+                  lines={['Approve', 'Play again']}
+                  color={Colors.textSecondary}
+                  onPress={undefined}
+                  disabled={true}
+                  badge="Activated by Host"
+                  buttonHeight={playAgainHeight}
+                  bottomY={bottomY}
+                />
+              )}
+            </View>
+          );
+        })()
       ) : (
         <Pressable
           onPress={onNextRound}
@@ -481,10 +674,13 @@ const styles = StyleSheet.create({
   },
   // Sticky footer — naturligt placerad efter ScrollView i flex-layouten.
   // borderTop ger visuell separation från scrollande tabell-content.
+  // Slimmad padding: top sm (8), bottom md (12) ger kompakt footer-höjd
+  // utan att kollidera med iPhone:s home-indikator (SafeAreaView ovan
+  // hanterar inset på riktiga enheter).
   stickyFooter: {
     paddingHorizontal: Spacing.lg,
-    paddingTop: Spacing.md,
-    paddingBottom: Spacing.lg,
+    paddingTop: Spacing.sm,
+    paddingBottom: Spacing.md,
     borderTopWidth: 1,
     borderTopColor: Colors.border,
     backgroundColor: Colors.background,
@@ -676,20 +872,25 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
 
-  // Action-row i sticky footer — Home (flex:1) på vänster halva, Play Again
-  // (flex:1) på höger halva med Spacing.sm gap mellan. Knapparna stretchar
-  // över hela bredden så footer:n känns full istället för att lämna tomrum
-  // i mitten.
+  // Action-row i sticky footer — Home (flex:1) på vänster halva, Play
+  // again (flex:1) på höger halva med Spacing.sm gap mellan. För
+  // non-host är Home (67px) kortare än Play again (74px), så vi
+  // top-alignar med 'flex-start' — Home:s underkant landar vid
+  // bottomY (= chevron-spets) istället för stretching till hela höjden.
+  // För host är båda 56px och top-align ger samma visuella resultat
+  // som default-stretch.
   finalActions: {
     flexDirection: 'row',
     gap: Spacing.sm,
+    alignItems: 'flex-start',
   },
   // Home-knapp: Q-logo VÄNSTER om "Home"-text på samma rad. Bg matchar
   // leaderboard-tabellens dataradsbg (Colors.card) så knappen visuellt knyter
   // an till leaderboardens nedre del.
   finalHomeBtn: {
     flex: 1,
-    height: 56,
+    // height sätts inline från RoundLeaderboard:s `buttonHeight` (varierar
+    // mellan host:s 56 px och non-host:s 74 px så raden förblir alignad).
     borderRadius: Radius.md,
     borderWidth: 1.5,
     borderColor: Colors.border,
@@ -705,32 +906,68 @@ const styles = StyleSheet.create({
     color: Colors.primary,
     letterSpacing: 0.3,
   },
-  // Play Again — gul rundad rektangel med tjock blå border. Pilar
-  // (PlayAgainEdgeArrow) absolut-positioneras runt border:n för
-  // rotations-loop-effekt. Shadow + elevation matchar tidigare premium-känsla.
-  // overflow: 'visible' så pilarnas spetsar som sticker ut utanför border:n
-  // inte klipps.
+  // Play Again — same height as Home men ingen egen border eller bg;
+  // PlayAgainLoopBorder-SVG:n absolut-positioneras innanför och fungerar
+  // som button:s synliga kantlinje (loop med integrerad pil i nedre
+  // kanten). overflow: 'visible' så badgens kant-skärande top-position
+  // inte klipps; loop-pilen själv ryms innanför button-bounds.
   finalPlayAgainBtn: {
     flex: 1,
-    height: 56,
-    borderRadius: Radius.md,
-    borderWidth: 1.5,
-    borderColor: Colors.border,
-    backgroundColor: Colors.card,
+    // height sätts inline från PlayAgainButton:s `buttonHeight` prop
+    backgroundColor: 'transparent',
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'visible',
+    position: 'relative',
   },
+  // Text-wrap: column-stack så två-rads-varianten (Approve/Play Again)
+  // stackar vertikalt. Padding-horizontal lämnar lite marginal till
+  // loop-border:s vänster + höger sida så texten aldrig touchar SVG-
+  // strecken vid smala button-bredder.
+  finalPlayAgainTextWrap: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.xs,
+  },
+  // Title-case text utan textTransform — använder string-casen direkt
+  // ("Play again", "Approve") så bara begynnelsebokstaven är versal i
+  // varje ord vi vill markera, resten gemener.
   finalPlayAgainText: {
     fontSize: FontSize.md,
     fontWeight: FontWeight.bold,
-    color: Colors.primary,
     letterSpacing: 0.3,
+    textAlign: 'center',
   },
-  // Bas-stil för pilar runt Play Again-knappens kant — top/left/bottom/right
-  // + marginLeft/marginTop sätts inline per pil för att jämnt fördela 4 st
-  // per sida (PLAY_AGAIN_ARROW_OFFSETS).
-  playAgainEdgeArrow: {
+  // Two-line varianten används av non-host:s "Approve / Play again".
+  // Mindre fontsize (sm) så båda raderna ryms bekvämt inom button-bredden
+  // tillsammans (även när badge:n är ovanför).
+  finalPlayAgainTextSmall: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.bold,
+    letterSpacing: 0.2,
+    textAlign: 'center',
+    lineHeight: 16,
+  },
+  // Kant-skärande badge "Activated by Host" i top-position på loop-frame:n
+  // (signal: knappen aktiveras först när host tryckt Play Again). Speglar
+  // FREE/PREMIUM-badge-mönstret: små letters + gold-bg + svart text, top:
+  // negativ så den klipper SVG-linjen ovanför button-text-arean.
+  playAgainBadge: {
     position: 'absolute',
+    top: -8,
+    alignSelf: 'center',
+    backgroundColor: Colors.warning,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  playAgainBadgeText: {
+    fontSize: 10,
+    fontWeight: '900',
+    color: Colors.background,
+    letterSpacing: 0.4,
+    textTransform: 'uppercase',
   },
 });

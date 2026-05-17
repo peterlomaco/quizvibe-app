@@ -227,6 +227,11 @@ export default function ProfileScreen() {
   // via ERA_MAX) — Profile:s loadProfile-effect overridar med profilens
   // sparade värde om det finns.
   const [eraValues, setEraValues] = useState<[number, number]>([1981, ERA_MAX]);
+  // Drag-tracking för era-slidern: håll non-active thumb fast vid sitt
+  // start-värde medan host drar den aktiva (spegelt Lobby:s slider). Utan
+  // detta puttar minMarkerOverlapDistance den passiva thumben framför sig.
+  const draggingEraThumbRef = useRef<0 | 1 | null>(null);
+  const eraDragStartValuesRef = useRef<[number, number]>([1981, ERA_MAX]);
   // Max antal spelare per spel — 4 = Basic (gratis), 12 = Premium.
   const [maxPlayers, setMaxPlayers] = useState<4 | 12>(4);
   // Default game mode (host-default) — 'pass-the-phone' (gratis) eller
@@ -1158,10 +1163,40 @@ export default function ProfileScreen() {
                 min={ERA_MIN}
                 max={ERA_MAX}
                 step={1}
+                onValuesChangeStart={() => {
+                  eraDragStartValuesRef.current = [eraValues[0], eraValues[1]];
+                  draggingEraThumbRef.current = null;
+                }}
                 onValuesChange={(vals) => {
-                  if (vals[1] - vals[0] < ERA_MIN_INTERVAL) return;
+                  const start = eraDragStartValuesRef.current;
+                  if (draggingEraThumbRef.current === null) {
+                    const d0 = vals[0] - start[0];
+                    const d1 = vals[1] - start[1];
+                    if (d0 !== 0 && d1 === 0) draggingEraThumbRef.current = 0;
+                    else if (d1 !== 0 && d0 === 0) draggingEraThumbRef.current = 1;
+                    else if (d0 !== 0 && d1 !== 0) {
+                      draggingEraThumbRef.current = Math.abs(d0) >= Math.abs(d1) ? 0 : 1;
+                    }
+                  }
+
+                  let next: [number, number] = [vals[0], vals[1]];
+                  if (draggingEraThumbRef.current === 0) {
+                    const lockedRight = start[1];
+                    const clampedLeft = Math.min(vals[0], lockedRight - ERA_MIN_INTERVAL);
+                    next = [clampedLeft, lockedRight];
+                  } else if (draggingEraThumbRef.current === 1) {
+                    const lockedLeft = start[0];
+                    const clampedRight = Math.max(vals[1], lockedLeft + ERA_MIN_INTERVAL);
+                    next = [lockedLeft, clampedRight];
+                  }
+
+                  if (next[1] - next[0] < ERA_MIN_INTERVAL) return;
+                  if (next[0] === eraValues[0] && next[1] === eraValues[1]) return;
                   void Haptics.selectionAsync();
-                  setEraValues([vals[0], vals[1]]);
+                  setEraValues(next);
+                }}
+                onValuesChangeFinish={() => {
+                  draggingEraThumbRef.current = null;
                 }}
                 minMarkerOverlapDistance={ERA_MIN_INTERVAL_PX}
                 isMarkersSeparated
@@ -2776,14 +2811,14 @@ const styles = StyleSheet.create({
     height: 20,
     borderRadius: 4,
     borderWidth: 1.5,
-    borderColor: Colors.primaryDark,
+    borderColor: Colors.borderStrong,
     backgroundColor: 'transparent',
     alignItems: 'center',
     justifyContent: 'center',
   },
   singlePlayerCheckboxChecked: {
-    backgroundColor: Colors.primary,
-    borderColor: Colors.primaryDark,
+    backgroundColor: Colors.borderStrong,
+    borderColor: Colors.borderStrong,
   },
   singlePlayerCheckmark: {
     color: '#FFF',

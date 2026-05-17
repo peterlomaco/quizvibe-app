@@ -28,6 +28,7 @@ import {
 } from '@/src/utils/playerName';
 import { containsProfanity } from '@/src/utils/profanity';
 import { clearProfile, loadProfile, lookupEmailByPlayerName, saveProfile, type ProfileData } from '@/src/utils/profileStorage';
+import { hasPremiumSubscription } from '@/src/utils/subscriptionStorage';
 import { supabase } from '@/src/utils/supabase';
 import { formatRoomCode, generateRoomCode, isBlockedLetterPair, isLetterCellIndex, ROOM_CODE_DIGITS, ROOM_CODE_LEADING_LETTERS, ROOM_CODE_LENGTH, ROOM_CODE_TRAILING_LETTERS } from '@/src/utils/roomCode';
 import { loadInvites, removeInvite, type WaitingInvite } from '@/src/utils/waitingInvites';
@@ -1355,19 +1356,26 @@ export default function HomeScreen() {
     // aktuellt värde. Speglar samma blockad i LobbyScreen.handleStartGame —
     // skillnaden här är att vi gateas ut REDAN på Home så användaren inte
     // ens hinner skapa en lobby de inte kan starta.
-    const freshProfile = await loadProfile();
-    const free = freshProfile?.freeGameCredits ?? 0;
-    const extras = freshProfile?.gameCredits ?? 0;
-    if (free === 0 && extras === 0) {
-      Alert.alert(
-        'Out of Host Game Credits',
-        'You have no credits left for today. Buy extra credits in Store, wait for the daily refresh at midnight CET, or upgrade to a QuizVibe membership for unlimited host games.',
-        [
-          { text: 'Cancel', style: 'cancel' },
-          { text: 'Go to Store', onPress: () => router.push('/store?focus=credits&from=/') },
-        ],
-      );
-      return;
+    const [freshProfile, hasPremium] = await Promise.all([
+      loadProfile(),
+      hasPremiumSubscription(),
+    ]);
+    // Membership = obegränsade host-spel; ingen gate. Lobby:s handleStartGame
+    // skippar också deduktionen så Free/Extras-saldon förblir orörda.
+    if (!hasPremium) {
+      const free = freshProfile?.freeGameCredits ?? 0;
+      const extras = freshProfile?.gameCredits ?? 0;
+      if (free === 0 && extras === 0) {
+        Alert.alert(
+          'Out of Host Game Credits',
+          'You have no credits left for today. Buy extra credits in Store, wait for the daily refresh at midnight CET, or upgrade to a QuizVibe membership for unlimited host games.',
+          [
+            { text: 'Cancel', style: 'cancel' },
+            { text: 'Go to Store', onPress: () => router.push('/store?focus=credits&from=/') },
+          ],
+        );
+        return;
+      }
     }
 
     const code = generateRoomCode();
@@ -1375,12 +1383,12 @@ export default function HomeScreen() {
     // join-flödena (handleJoinWithCode, handleJoinAsGuest) kan validera mot
     // den OCH visa rätt "Lobby is full"-popup baserat på Premium-status.
     // Auto-expirar efter 24h eller när host trycker Start Game.
-    // TODO (subscription): byt hardcoded `false` mot riktig profile.isPremium
-    // när RevenueCat/subscription-state är inkopplad. Speglar samma stub
-    // som `const hasPremium = false` i LobbyScreen.
+    // hostIsPremium driver lobby-capacity-popupens text (Free host: "or to
+    // upgrade", Premium host: "Host need to remove players"). Använder
+    // subscriptionStorage:s flagga som loadProfile-effekten precis läste in.
     await registerActiveRoom(code, {
       maxPlayers: freshProfile?.maxPlayers ?? profile?.maxPlayers ?? 4,
-      hostIsPremium: false,
+      hostIsPremium: hasPremium,
       currentPlayerCount: 1,
       hostPlayerName: freshProfile?.playerName ?? profile?.playerName ?? '',
       gameStarted: false,

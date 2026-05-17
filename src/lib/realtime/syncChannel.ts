@@ -47,6 +47,40 @@ export interface ResponseSecondsChangedPayload {
 }
 
 /**
+ * Host signalerar att de tappat Play Again på Final Leaderboard. Non-host:s
+ * "Approve Play Again"-knapp aktiveras (= flippar från muted till primary
+ * styling). Sker INNAN host visar re-use-players Alert:en så non-host:s
+ * knapp lyser så snart host:s intent registrerats — long-tail-händelser i
+ * Alert-flödet (host pausar/avbryter) håller knappen aktiv tills antingen
+ * host-completion (lobby_ready) eller spelaren själv lämnar.
+ */
+export interface PlayAgainInitiatedPayload {
+  /** Tom payload-stub. Hålls med fält för framtida utökning utan att
+   *  ändra broadcast-formen. */
+  sender_id: string;
+}
+
+/**
+ * Host har skapat nytt rum och är på väg att navigera till /lobby. Skickas
+ * direkt efter `registerActiveRoom` och INNAN `router.replace` så
+ * non-host:s syncChannel hinner ta emot innan host:s channel rivs.
+ */
+export interface PlayAgainLobbyReadyPayload {
+  /** Den nya rumkoden non-host ska navigera till. */
+  room_code: string;
+}
+
+/**
+ * Non-host signalerar att de tappat "Approve Play again" på sin enhet.
+ * Host använder detta för att räkna approvals och låsa upp "Yes, keep
+ * them"-knappen när alla non-hosts har godkänt.
+ */
+export interface PlayerApprovedPlayAgainPayload {
+  /** Non-host:s lobby_players.player_id som tappat Approve. */
+  player_id: string;
+}
+
+/**
  * Lättviktigt heartbeat-event som varje klient broadcastar var 10:e sekund.
  * Driver per-sender disconnect-detection: om vi inte hör från en specifik
  * sender på >15s markeras DEN spelaren som disconnected (NOT vi själva).
@@ -79,6 +113,14 @@ export interface SyncChannelHandlers {
   onPlayerLeft?: (payload: PlayerLeftPayload) => void;
   onPlayerAnswerConfirmed?: (payload: PlayerAnswerConfirmedPayload) => void;
   onResponseSecondsChanged?: (payload: ResponseSecondsChangedPayload) => void;
+  /** Host tappade Play Again — non-host:s knapp ska aktiveras. */
+  onPlayAgainInitiated?: (payload: PlayAgainInitiatedPayload) => void;
+  /** Host har skapat nya lobby:n — non-host som tappat Approve ska
+   *  navigera dit. */
+  onPlayAgainLobbyReady?: (payload: PlayAgainLobbyReadyPayload) => void;
+  /** En non-host har tappat "Approve Play again" — host använder för att
+   *  räkna approvals och låsa upp "Yes, keep them"-knappen. */
+  onPlayerApprovedPlayAgain?: (payload: PlayerApprovedPlayAgainPayload) => void;
   /**
    * Fyrar när en remote spelares heartbeat-state övergår till
    * 'disconnected' (= vi har inte hört från sender:n på >15s, efter att
@@ -108,6 +150,15 @@ export interface SyncChannel {
   ) => Promise<void>;
   broadcastResponseSecondsChanged: (
     payload: ResponseSecondsChangedPayload,
+  ) => Promise<void>;
+  broadcastPlayAgainInitiated: (
+    payload: PlayAgainInitiatedPayload,
+  ) => Promise<void>;
+  broadcastPlayAgainLobbyReady: (
+    payload: PlayAgainLobbyReadyPayload,
+  ) => Promise<void>;
+  broadcastPlayerApprovedPlayAgain: (
+    payload: PlayerApprovedPlayAgainPayload,
   ) => Promise<void>;
   /**
    * Broadcasta "jag är tillbaka"-signal när Retry trycks i
@@ -214,6 +265,21 @@ export function subscribeSyncChannel(
       handlers.onResponseSecondsChanged!(payload as ResponseSecondsChangedPayload);
     });
   }
+  if (handlers.onPlayAgainInitiated) {
+    channel.on('broadcast', { event: 'play_again_initiated' }, ({ payload }) => {
+      handlers.onPlayAgainInitiated!(payload as PlayAgainInitiatedPayload);
+    });
+  }
+  if (handlers.onPlayAgainLobbyReady) {
+    channel.on('broadcast', { event: 'play_again_lobby_ready' }, ({ payload }) => {
+      handlers.onPlayAgainLobbyReady!(payload as PlayAgainLobbyReadyPayload);
+    });
+  }
+  if (handlers.onPlayerApprovedPlayAgain) {
+    channel.on('broadcast', { event: 'player_approved_play_again' }, ({ payload }) => {
+      handlers.onPlayerApprovedPlayAgain!(payload as PlayerApprovedPlayAgainPayload);
+    });
+  }
   // Heartbeat-receiver: per-sender-tracking. Markera bara lastSeen —
   // INGEN auto-'connected'-callback ens om sender:n tidigare var
   // disconnected. Per design (D-iii): återanslutning kräver explicit
@@ -318,6 +384,27 @@ export function subscribeSyncChannel(
       await channel.send({
         type: 'broadcast',
         event: 'response_seconds_changed',
+        payload,
+      });
+    },
+    broadcastPlayAgainInitiated: async (payload) => {
+      await channel.send({
+        type: 'broadcast',
+        event: 'play_again_initiated',
+        payload,
+      });
+    },
+    broadcastPlayAgainLobbyReady: async (payload) => {
+      await channel.send({
+        type: 'broadcast',
+        event: 'play_again_lobby_ready',
+        payload,
+      });
+    },
+    broadcastPlayerApprovedPlayAgain: async (payload) => {
+      await channel.send({
+        type: 'broadcast',
+        event: 'player_approved_play_again',
         payload,
       });
     },

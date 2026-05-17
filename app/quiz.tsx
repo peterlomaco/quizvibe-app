@@ -23,8 +23,12 @@ import { clearPendingLobbyPlayers, savePendingLobbyPlayers } from '@/src/utils/p
 import { clearLeftPlayers } from '@/src/utils/leftPlayers';
 import { deactivateRoom, registerActiveRoom } from '@/src/utils/mockActiveRooms';
 import { clearEjected } from '@/src/utils/ejectedPlayers';
-import { clearLobbyPlayers } from '@/src/utils/mockLobbyPlayers';
-import { clearLobbySettings } from '@/src/utils/mockLobbySettings';
+import { clearLobbyPlayers, setLobbyPlayers } from '@/src/utils/mockLobbyPlayers';
+import {
+  clearLobbySettings,
+  getLobbySettings,
+  setLobbySettings,
+} from '@/src/utils/mockLobbySettings';
 import { clearGameStarted } from '@/src/utils/mockStartedGames';
 import { pickMediaSource, type YoutubeClip } from '@/src/utils/mediaSource';
 import { supabase } from '@/src/utils/supabase';
@@ -41,6 +45,7 @@ import {
 import { getQuizImage } from '@/src/utils/quizImages';
 import { getAvatarEmojiById } from '@/src/utils/avatars';
 import { loadProfile } from '@/src/utils/profileStorage';
+import { hasPremiumSubscription } from '@/src/utils/subscriptionStorage';
 import { generateRoomCode } from '@/src/utils/roomCode';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -50,6 +55,8 @@ import {
   Dimensions,
   Easing,
   Image,
+  Modal,
+  Pressable,
   SafeAreaView,
   StyleSheet,
   Text,
@@ -1554,9 +1561,18 @@ export default function QuizScreen() {
     const profile = await loadProfile();
     const hostName = profile?.playerName?.trim() || 'You';
     const hostEmoji = profile ? getAvatarEmojiById(profile.selectedAvatarId) : '🎮';
+    // Bygg carry-over-listan UTANFÖR if/else så vi kan referera den senare
+    // för att skriva direkt till lobby_players-tabellen (innan broadcast)
+    // — annars hinner inte host:s LobbyScreen mounta + skriva via useEffect
+    // innan non-host:s LobbyScreen:s `getLobbyPlayers` läser för att hitta
+    // ev. pre-seeded matchande rad → race ger duplicate-row.
+    let carryOverPlayers: LobbyPlayer[];
     if (reusePlayers) {
-      // Behåll alla spelare från detta spel
-      const lobbyPlayers: LobbyPlayer[] = allPlayers.map((p) => ({
+      // Behåll alla spelare från detta spel. Non-hosts får `approved:
+      // false` så de hamnar i "To be approved by Host"-listan i nya
+      // lobbyn — host måste re-approva dem innan nästa Start Game.
+      // Host själv är alltid implicit approved.
+      carryOverPlayers = allPlayers.map((p) => ({
         id: p.id,
         name: p.isYou ? hostName : p.name,
         emoji: p.isYou ? hostEmoji : p.emoji,
@@ -1566,11 +1582,12 @@ export default function QuizScreen() {
         assistance: keepSettings || p.isYou ? p.assistance : 'standard',
         hcpComplete: true,
         isHost: p.isHost ?? false,
+        approved: !!p.isHost,
       }));
-      await savePendingLobbyPlayers(lobbyPlayers);
+      await savePendingLobbyPlayers(carryOverPlayers);
     } else {
       // Tom lobby förutom host
-      const justHost: LobbyPlayer[] = [{
+      carryOverPlayers = [{
         id: 'you',
         name: hostName,
         emoji: hostEmoji,
@@ -1581,7 +1598,7 @@ export default function QuizScreen() {
         hcpComplete: true,
         isHost: true,
       }];
-      await savePendingLobbyPlayers(justHost);
+      await savePendingLobbyPlayers(carryOverPlayers);
     }
     const newCode = generateRoomCode();
     // Registrera nya koden som aktivt rum + lagra host:s metadata (samma
@@ -1606,6 +1623,58 @@ export default function QuizScreen() {
     clearLobbySettings(newCode);
     clearEjected(newCode);
     clearGameStarted(newCode);
+    // KRITISKT race-fix: skriv carry-over-listan DIREKT till lobby_players
+    // (innan broadcastPlayAgainLobbyReady nedan). Annars hinner inte host:s
+    // LobbyScreen mounta + skriva via useEffect innan non-host:s LobbyScreen
+    // ankommer och läser `getLobbyPlayers` för dup-detection — non-host
+    // skulle då inte hitta sin pre-seeded rad och skapa ett nytt joiner-id,
+    // vilket resulterar i två rader med samma playerName.
+    if (reusePlayers && params.roomCode && carryOverPlayers.length > 0) {
+      // Re-mappa id:t med rumkoden i prefixet så lobby_players-rader inte
+      // krockar med det gamla rummet (vi behåller bara namn/age/assistance/
+      // approved-data; id:t är rumspecifikt). Faktiskt — vi vill BEHÅLLA
+      // id:t exakt så non-host:s ownPlayerId från quiz-sessionen mappar
+      // direkt till sin rad i nya rummet via dup-detection-fixet.
+      await setLobbyPlayers(newCode, carryOverPlayers).catch(() => {
+        // Tyst — vid fail fall:er host:s LobbyScreen-useEffect tillbaka
+        // till sin egen write, så nya lobbyn fungerar ändå (dock med
+        // potentiell race för non-host).
+      });
+    }
+    // Carry-over av game-settings när host valt "Yes, keep them" + "Keep
+    // settings". Läser föregående rums lobby_settings-rad och upsert:ar
+    // den på nya rumkoden — bevarar gameMode (PtP/IndDev),
+    // singlePlayerDefault (= single-player-läget), roundsCount, eraFrom,
+    // eraTo, region, samt media-toggles. answerResponseSeconds override:as
+    // med host:s AKTUELLA quiz-state (kan ha justerats mid-game via
+    // GetReadyIntro:s dropdown). Vid keepSettings=false (Start fresh)
+    // lämnar vi nya rummet utan settings-rad så LobbyScreen:s host-seed
+    // -effekt fyller den från profilens host-defaults.
+    if (keepSettings && params.roomCode) {
+      const oldSettings = await getLobbySettings(params.roomCode);
+      if (oldSettings) {
+        await setLobbySettings(newCode, {
+          ...oldSettings,
+          answerResponseSeconds: responseSeconds,
+        }).catch(() => {
+          // Tyst — om upsert fail:ar fall:er nya lobbyn bara tillbaka till
+          // host-profil-defaults, vilket är OK degradation istället för att
+          // blockera Play Again-flödet.
+        });
+      }
+    }
+    // Broadcasta nya rumkoden till non-host:s syncChannel INNAN navigation —
+    // när host:s component unmountar rivs sync:n så non-host slutar lyssna.
+    // Non-host:s leaderboard har själv en aktiv syncChannel som tar emot
+    // detta event och routar dem till nya lobbyn (förutsatt att de tappat
+    // Approve Play Again). Fire-and-forget; om send fail:ar (rara race)
+    // hänger non-host kvar på lock-overlay tills timeout/manual exit, men
+    // host:s egna nav-flow får aldrig blockas.
+    if (gameMode === 'individual-devices' && syncChannelRef.current) {
+      await syncChannelRef.current
+        .broadcastPlayAgainLobbyReady({ room_code: newCode })
+        .catch(() => {});
+    }
     router.replace(`/lobby?code=${newCode}&isHost=true`);
   };
 
@@ -1625,46 +1694,185 @@ export default function QuizScreen() {
   };
 
   const handlePlayAgain = async () => {
+    // Broadcasta intent IMMEDIATELY innan vi öppnar dialogerna — non-host:s
+    // "Approve Play Again"-knapp ska lysa upp så snart host tappat, oavsett
+    // hur lång tid host tar på sig i credit-gate-popupen eller re-use-
+    // players-alerten. Om host avbryter (Cancel i credit-gate eller re-use-
+    // dialog) håller knappen kvar aktiv tills antingen non-host själva
+    // lämnar eller host trycker Play Again igen + slutför flödet.
+    if (gameMode === 'individual-devices' && syncChannelRef.current) {
+      syncChannelRef.current
+        .broadcastPlayAgainInitiated({ sender_id: selfPlayerId })
+        .catch(() => {});
+    }
+
     // Host Game Credits-gate (samma som Home:s Create Game + Lobby:s Start
     // Game): blockera Play Again om både Free och Extras är 0. loadProfile()
     // refreshar Free-saldot vid första load efter midnatt CET så vi alltid
     // jämför mot aktuellt värde. Bättre att fånga det här innan vi visar
     // re-use-players-prompten — annars fyller man i 2 alerts och får sedan
     // blockaden i Lobby:n vid Start Game.
-    const freshProfile = await loadProfile();
-    const free = freshProfile?.freeGameCredits ?? 0;
-    const extras = freshProfile?.gameCredits ?? 0;
-    if (free === 0 && extras === 0) {
-      Alert.alert(
-        'Out of Host Game Credits',
-        'You have no credits left for today. Buy extra credits in Store, wait for the daily refresh at midnight CET, or upgrade to a QuizVibe membership for unlimited host games.',
-        [
-          { text: 'Cancel', style: 'cancel' },
-          // Pushar Store UTAN `from=...`-paramet så Store:s Back-knapp fall:er
-          // till `router.back()` istället för `router.replace(from)`. Det
-          // bevarar /quiz på root Stack:en med Final Leaderboard-state intakt
-          // — annars hade replace:n unmountat Quiz-komponenten och spelaren
-          // skulle landa på en tom /quiz-vy efter köpet.
-          { text: 'Go to Store', onPress: () => router.push('/store?focus=credits') },
-        ],
-      );
-      return;
+    const [freshProfile, hasPremium] = await Promise.all([
+      loadProfile(),
+      hasPremiumSubscription(),
+    ]);
+    // Membership = obegränsade host-spel; ingen gate. Lobby:s handleStartGame
+    // skippar också deduktionen så Free/Extras-saldon förblir orörda.
+    if (!hasPremium) {
+      const free = freshProfile?.freeGameCredits ?? 0;
+      const extras = freshProfile?.gameCredits ?? 0;
+      if (free === 0 && extras === 0) {
+        Alert.alert(
+          'Out of Host Game Credits',
+          'You have no credits left for today. Buy extra credits in Store, wait for the daily refresh at midnight CET, or upgrade to a QuizVibe membership for unlimited host games.',
+          [
+            { text: 'Cancel', style: 'cancel' },
+            // Pushar Store UTAN `from=...`-paramet så Store:s Back-knapp fall:er
+            // till `router.back()` istället för `router.replace(from)`. Det
+            // bevarar /quiz på root Stack:en med Final Leaderboard-state intakt
+            // — annars hade replace:n unmountat Quiz-komponenten och spelaren
+            // skulle landa på en tom /quiz-vy efter köpet.
+            { text: 'Go to Store', onPress: () => router.push('/store?focus=credits') },
+          ],
+        );
+        return;
+      }
     }
 
-    Alert.alert(
-      'Re-use all players?',
-      'Start the next room with the same players, or begin fresh?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Start fresh', onPress: () => goToNewLobby(false) },
-        { text: 'Yes, keep them', onPress: askKeepSettingsThenGo },
-      ],
-    );
+    // För Pass-the-Phone (= alla på samma enhet) finns inga non-hosts att
+    // vänta in → använd vanlig Alert direkt. För Individual Devices visar
+    // vi custom modal istället så vi kan rendera "Yes, keep them"-knappen
+    // som utgråad tills alla non-hosts broadcastat sin Approve-signal.
+    if (gameMode === 'pass-the-phone') {
+      Alert.alert(
+        'Re-use all players?',
+        'Start the next room with the same players, or begin fresh?',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Start fresh', onPress: () => goToNewLobby(false) },
+          { text: 'Yes, keep them', onPress: askKeepSettingsThenGo },
+        ],
+      );
+    } else {
+      // Reset approvals så host kan trycka Play Again igen vid behov
+      // (t.ex. efter Cancel) utan att gamla approvals lever kvar.
+      setPlayAgainApprovals(new Set());
+      setPlayAgainModalVisible(true);
+    }
   };
 
   const handleGoHome = () => {
     router.replace('/');
   };
+
+  // ── Non-host Play Again-flöde ───────────────────────────────────────────
+  // Två oberoende state-bits driver knappens läge på Final Leaderboard:
+  // - `hostInitiatedPlayAgain`: host har tappat Play Again-knappen (sin
+  //   sida). Flippar Approve-knappen från dimmed → active.
+  // - `nextLobbyCode`: host har skapat nytt rum + broadcastat koden.
+  //   Driver auto-navigation till nya lobbyn så snart non-host tappat
+  //   Approve.
+  // - `awaitingNewLobby`: non-host har själv tappat Approve. Lås
+  //   skärmen med overlay tills nextLobbyCode kommer in.
+  //
+  // Race-fall: om nextLobbyCode kommer FÖRE non-host tappat Approve
+  // (host plöjde snabbt genom alerts), state hålls kvar tills tap. Tap
+  // → useEffect:en nedanför ser båda värdena satta + navigerar.
+  // Om non-host valt Home INNAN host:s tap → component unmountar →
+  // syncChannel rivs → events tas inte emot → de stannar på Home.
+  const [hostInitiatedPlayAgain, setHostInitiatedPlayAgain] = useState(false);
+  const [nextLobbyCode, setNextLobbyCode] = useState<string | null>(null);
+  const [awaitingNewLobby, setAwaitingNewLobby] = useState(false);
+
+  // Host-side state: vilka non-hosts har broadcastat sin Approve-tap.
+  // `playAgainApprovals` är en Set av player_id:n. När size === antal
+  // non-hosts i turnOrder, är "Yes, keep them"-knappen i modal:en
+  // upplyst (innan dess är den utgråad).
+  const [playAgainApprovals, setPlayAgainApprovals] = useState<Set<string>>(
+    () => new Set(),
+  );
+  // Host-side modal: visas istället för Alert.alert efter host:s
+  // Play Again-tap så vi kan rendera disabled state visuellt.
+  const [playAgainModalVisible, setPlayAgainModalVisible] = useState(false);
+
+  const handleApprovePlayAgain = () => {
+    if (!hostInitiatedPlayAgain) return; // belt-and-suspenders mot disabled tap
+    setAwaitingNewLobby(true);
+    // Broadcasta approval-signal till host:s syncChannel så host:s
+    // counter triggas och "Yes, keep them"-knappen kan låsas upp när
+    // alla non-hosts godkänt.
+    if (
+      gameMode === 'individual-devices' &&
+      syncChannelRef.current &&
+      selfPlayerId
+    ) {
+      syncChannelRef.current
+        .broadcastPlayerApprovedPlayAgain({ player_id: selfPlayerId })
+        .catch(() => {});
+    }
+  };
+
+  // När båda non-host:s approval OCH host:s nya-lobby-event ankommit:
+  // navigera till nya lobbyn. router.replace ersätter /quiz på Stack:n så
+  // Back-knapp inte tar tillbaka till Final Leaderboard.
+  useEffect(() => {
+    if (awaitingNewLobby && nextLobbyCode) {
+      router.replace(`/lobby?code=${nextLobbyCode}&isHost=false`);
+    }
+  }, [awaitingNewLobby, nextLobbyCode]);
+
+  // Refs för broadcast-handlers — captureras av syncChannel-subscribe:n.
+  const playAgainInitiatedHandlerRef = useRef<() => void>(() => {});
+  const playAgainLobbyReadyHandlerRef = useRef<(code: string) => void>(() => {});
+  const playerApprovedPlayAgainHandlerRef = useRef<(playerId: string) => void>(
+    () => {},
+  );
+  // Synkron mirror av awaitingNewLobby så lobby-ready-handler:n kan
+  // läsa den AKTUELLA värden vid event-ankomst utan att vara beroende
+  // av att useEffect:en hunnit uppdatera handler-closure:n. Skyddar mot
+  // millisekund-race där non-host tappar Approve "samtidigt" som host:s
+  // lobby-ready-event ankommer.
+  const awaitingNewLobbyRef = useRef(awaitingNewLobby);
+  awaitingNewLobbyRef.current = awaitingNewLobby;
+  // Guard så popup:en "Host has already started"-inte fyrar flera
+  // gånger om host av någon anledning broadcastar lobby_ready upprepade
+  // gånger.
+  const hostStartedWithoutMeAlertedRef = useRef(false);
+  useEffect(() => {
+    playAgainInitiatedHandlerRef.current = () => {
+      if (!isHost) setHostInitiatedPlayAgain(true);
+    };
+    playAgainLobbyReadyHandlerRef.current = (code: string) => {
+      if (isHost) return;
+      if (awaitingNewLobbyRef.current) {
+        // Non-host har tappat Approve och väntar med lock-overlay —
+        // sätt koden så useEffect:en navigerar oss till nya lobbyn.
+        setNextLobbyCode(code);
+      } else if (!hostStartedWithoutMeAlertedRef.current) {
+        // Non-host har INTE hunnit tappa Approve men host startar redan
+        // nytt spel (= Start fresh-vägen, eftersom "Yes, keep them" är
+        // utgråad tills alla approvat). Visa info-popup + skicka non-host
+        // till startskärmen.
+        hostStartedWithoutMeAlertedRef.current = true;
+        Alert.alert(
+          'Host has already started a new Game',
+          '',
+          [{ text: 'OK', onPress: () => router.replace('/') }],
+          { cancelable: false },
+        );
+      }
+    };
+    playerApprovedPlayAgainHandlerRef.current = (playerId: string) => {
+      // Bara host:s sida räknar approvals; non-hosts ignorerar
+      if (!isHost) return;
+      setPlayAgainApprovals((prev) => {
+        if (prev.has(playerId)) return prev;
+        const next = new Set(prev);
+        next.add(playerId);
+        return next;
+      });
+    };
+  }, [isHost]);
 
   // Quit Game: avslutar pågående spel mitt i, river lobby:n och kastar ut
   // host till Home. Speglar host-flödet "Delete this Game Lobby" från
@@ -1817,6 +2025,11 @@ export default function QuizScreen() {
         playerAnswerConfirmedHandlerRef.current(payload.player_id, payload.time_used),
       onResponseSecondsChanged: (payload) =>
         responseSecondsChangedHandlerRef.current(payload.seconds),
+      onPlayAgainInitiated: () => playAgainInitiatedHandlerRef.current(),
+      onPlayAgainLobbyReady: (payload) =>
+        playAgainLobbyReadyHandlerRef.current(payload.room_code),
+      onPlayerApprovedPlayAgain: (payload) =>
+        playerApprovedPlayAgainHandlerRef.current(payload.player_id),
       onPlayerConnectionChange: (playerId, status) => {
         setPlayerConnectionStatus((prev) => ({ ...prev, [playerId]: status }));
       },
@@ -2075,10 +2288,137 @@ export default function QuizScreen() {
           onNextRound={handleAdvanceToNextRound}
           onPlayAgain={handlePlayAgain}
           onGoHome={handleGoHome}
+          onApprovePlayAgain={handleApprovePlayAgain}
           isLastRound={isLastQuestion}
+          isHost={isHost}
+          hostInitiatedPlayAgain={hostInitiatedPlayAgain}
           allRoundScoresHistory={allRoundScoresHistory}
           hcpChanges={isLastQuestion ? playerHcpChanges : undefined}
         />
+        {/* Lock-overlay för non-host som tappat Approve Play Again men där
+            host ännu inte hunnit skapa nya lobbyn. cancelable: false →
+            ingen tap utanför card:en kan stänga; non-host väntar tills
+            nextLobbyCode kommer in via syncChannel → useEffect navigerar
+            dem automatiskt. Speglar LobbyScreen:s "Please Wait — Deleting
+            this Lobby"-overlay i form och färgpalett. */}
+        <Modal
+          visible={awaitingNewLobby}
+          transparent
+          animationType="fade"
+        >
+          <View style={styles.waitingLobbyOverlay}>
+            <View style={styles.waitingLobbyCard}>
+              <View style={styles.waitingLobbyTextRow}>
+                <Text style={styles.waitingLobbyText}>
+                  Please Wait — Host is creating new game
+                </Text>
+                <SequentialDots />
+              </View>
+            </View>
+          </View>
+        </Modal>
+
+        {/* Re-use-players-modal för host (Individual Devices) — ersätter
+            Alert.alert så vi kan rendera "Yes, keep them" som utgråad
+            tills alla non-hosts har broadcastat sin Approve-signal.
+            totalNonHosts = turnOrder.length - 1 (host vid index 0).
+            allApproved = alla non-hosts har broadcastat in. */}
+        {(() => {
+          const totalNonHosts = Math.max(0, turnOrder.length - 1);
+          const approvedCount = playAgainApprovals.size;
+          const allApproved = totalNonHosts === 0 || approvedCount >= totalNonHosts;
+          const waitingPlayers = totalNonHosts - approvedCount;
+          return (
+            <Modal
+              visible={playAgainModalVisible}
+              transparent
+              animationType="fade"
+              onRequestClose={() => setPlayAgainModalVisible(false)}
+            >
+              <View style={styles.playAgainModalOverlay}>
+                <View style={styles.playAgainModalCard}>
+                  <Text style={styles.playAgainModalTitle}>
+                    Re-use all players?
+                  </Text>
+                  <Text style={styles.playAgainModalBody}>
+                    Start the next room with the same players, or begin fresh?
+                  </Text>
+                  {totalNonHosts > 0 && (
+                    <View style={styles.playAgainModalStatus}>
+                      {allApproved ? (
+                        <Text style={styles.playAgainModalStatusReadyText}>
+                          ✓ All players have approved
+                        </Text>
+                      ) : (
+                        <View style={styles.playAgainModalStatusWaitingRow}>
+                          <Text style={styles.playAgainModalStatusWaitingText}>
+                            Waiting for {waitingPlayers} of {totalNonHosts}{' '}
+                            {totalNonHosts === 1 ? 'player' : 'players'} to approve
+                          </Text>
+                          <SequentialDots color={Colors.textSecondary} />
+                        </View>
+                      )}
+                    </View>
+                  )}
+                  <View style={styles.playAgainModalActions}>
+                    <Pressable
+                      onPress={() => setPlayAgainModalVisible(false)}
+                      style={({ pressed }) => [
+                        styles.playAgainModalBtn,
+                        styles.playAgainModalBtnCancel,
+                        pressed && { opacity: 0.7 },
+                      ]}
+                    >
+                      <Text style={styles.playAgainModalBtnTextCancel}>Cancel</Text>
+                    </Pressable>
+                    <Pressable
+                      onPress={() => {
+                        setPlayAgainModalVisible(false);
+                        goToNewLobby(false);
+                      }}
+                      style={({ pressed }) => [
+                        styles.playAgainModalBtn,
+                        styles.playAgainModalBtnSecondary,
+                        pressed && { opacity: 0.7 },
+                      ]}
+                    >
+                      <Text style={styles.playAgainModalBtnTextSecondary}>
+                        Start fresh
+                      </Text>
+                    </Pressable>
+                    <Pressable
+                      onPress={
+                        allApproved
+                          ? () => {
+                              setPlayAgainModalVisible(false);
+                              askKeepSettingsThenGo();
+                            }
+                          : undefined
+                      }
+                      style={({ pressed }) => [
+                        styles.playAgainModalBtn,
+                        allApproved
+                          ? styles.playAgainModalBtnPrimary
+                          : styles.playAgainModalBtnDisabled,
+                        allApproved && pressed && { opacity: 0.85 },
+                      ]}
+                    >
+                      <Text
+                        style={
+                          allApproved
+                            ? styles.playAgainModalBtnTextPrimary
+                            : styles.playAgainModalBtnTextDisabled
+                        }
+                      >
+                        Yes, keep them
+                      </Text>
+                    </Pressable>
+                  </View>
+                </View>
+              </View>
+            </Modal>
+          );
+        })()}
       </SafeAreaView>
     );
   }
@@ -2600,6 +2940,137 @@ export default function QuizScreen() {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
   content: { gap: Spacing.md, paddingBottom: Spacing.xxl },
+
+  // Lock-overlay för non-host som tappat Approve Play Again men väntar
+  // på host:s lobby-ready-event. Mörk backdrop + centrerat card med
+  // statustext + animerade dots. Speglar LobbyScreen:s deletingOverlay
+  // 1:1 (form, padding, färgpalett, dots-position).
+  waitingLobbyOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.65)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  waitingLobbyCard: {
+    backgroundColor: Colors.card,
+    paddingHorizontal: Spacing.xl,
+    paddingVertical: Spacing.lg,
+    borderRadius: Radius.md,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  waitingLobbyTextRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+  },
+  waitingLobbyText: {
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.medium,
+    color: Colors.textPrimary,
+  },
+
+  // Re-use-players-modal för host (Individual Devices). Speglar
+  // alert-formen men har en disabled-state på "Yes, keep them" som låses
+  // upp först när alla non-hosts broadcastat sin Approve-signal.
+  playAgainModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.65)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: Spacing.lg,
+  },
+  playAgainModalCard: {
+    backgroundColor: Colors.card,
+    borderRadius: Radius.md,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.lg,
+    paddingBottom: Spacing.md,
+    width: '100%',
+    maxWidth: 360,
+    gap: Spacing.md,
+  },
+  playAgainModalTitle: {
+    fontSize: 18,
+    fontWeight: FontWeight.bold,
+    color: Colors.textPrimary,
+  },
+  playAgainModalBody: {
+    fontSize: FontSize.sm,
+    color: Colors.textSecondary,
+    lineHeight: 20,
+  },
+  playAgainModalStatus: {
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.md,
+    backgroundColor: Colors.background,
+    borderRadius: Radius.sm,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  playAgainModalStatusWaitingRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+  },
+  playAgainModalStatusWaitingText: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.medium,
+    color: Colors.textSecondary,
+  },
+  playAgainModalStatusReadyText: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.semibold,
+    color: Colors.success,
+  },
+  playAgainModalActions: {
+    flexDirection: 'column',
+    gap: Spacing.sm,
+    marginTop: Spacing.sm,
+  },
+  playAgainModalBtn: {
+    height: 48,
+    borderRadius: Radius.sm,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1.5,
+  },
+  playAgainModalBtnCancel: {
+    backgroundColor: 'transparent',
+    borderColor: Colors.border,
+  },
+  playAgainModalBtnTextCancel: {
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.medium,
+    color: Colors.textSecondary,
+  },
+  playAgainModalBtnSecondary: {
+    backgroundColor: 'transparent',
+    borderColor: Colors.primary,
+  },
+  playAgainModalBtnTextSecondary: {
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.semibold,
+    color: Colors.primary,
+  },
+  playAgainModalBtnPrimary: {
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
+  },
+  playAgainModalBtnTextPrimary: {
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.bold,
+    color: '#fff',
+  },
+  playAgainModalBtnDisabled: {
+    backgroundColor: 'transparent',
+    borderColor: Colors.borderStrong,
+  },
+  playAgainModalBtnTextDisabled: {
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.semibold,
+    color: Colors.textDisabled,
+  },
 
   // Image-fråge-mediaCard: 16:9-ram för bilden + ProgressiveCover-overlay.
   // Letterbox:as automatiskt om källan är porträtt (t.ex. paris.webp).
