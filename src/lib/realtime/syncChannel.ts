@@ -105,12 +105,22 @@ export interface PlayerAudioStateChangedPayload {
  * till Home. Force-quit och iOS-30s-background-suspend ser identiska
  * ut från mottagar-sidan (inga pings = inactivity).
  *
+ * D-vi-utökning: payloaden bär även host:s aktuella `question_index` så
+ * non-host som missat broadcasts under offline-fönster (Realtime replay:ar
+ * inte missade events) kan sync:a sin lokala questionIndex vid nästa
+ * mottagna ping. Utan denna fix kvarstår non-host med stale questionIndex
+ * tills nästa play_command — vilket gör GetReady-dot-bar:en felräknad
+ * direkt efter reconnect.
+ *
  * Non-host får ALDRIG broadcasta detta event — bara host-sidans signal.
  */
 export interface HostActivePingPayload {
   /** Host:s lobby_players.player_id. För log/debug; mottagar-flödet
    *  bryr sig bara om event-mottagning, inte sender-identitet. */
   sender_id: string;
+  /** Host:s aktuella questionIndex (0-baserat). Mottagare alignar lokal
+   *  state mot detta värde — idempotent när redan synkad. */
+  question_index: number;
 }
 
 /**

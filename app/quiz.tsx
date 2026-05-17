@@ -605,6 +605,16 @@ export default function QuizScreen() {
   // 9 min, ingen banner.
   const [inactivityCountdownSec, setInactivityCountdownSec] =
     useState<number | null>(null);
+  // D-vi: host-disconnect grace. När non-host:s peer-tracker markerar host
+  // som disconnected i reveal-fas → 10-sek grace innan auto-route till
+  // GetReady. graceActive driver tick:en, graceCountdownSec är null första
+  // 7 sek (frozen reveal-UI) sen 3/2/1 sista 3 sek (visas som big-number-
+  // overlay). graceStartRef håller starttiden lokalt så Date.now-diff är
+  // drift-fri jämfört med en räknande state-variabel.
+  const [hostDisconnectGraceActive, setHostDisconnectGraceActive] = useState(false);
+  const [hostDisconnectGraceCountdownSec, setHostDisconnectGraceCountdownSec] =
+    useState<number | null>(null);
+  const hostDisconnectGraceStartRef = useRef<number | null>(null);
   // D-iii: bad-connection-detection. Övervakas via connectionMonitor som får
   // signaler från syncChannel:s state-events. Gating på
   // gameMode='individual-devices' sker per call-site (overlay + disabled-
@@ -1493,9 +1503,14 @@ export default function QuizScreen() {
     if (now - lastPingEmittedRef.current < 5000) return;
     lastPingEmittedRef.current = now;
     syncChannelRef.current
-      ?.broadcastHostActivePing({ sender_id: selfPlayerId })
+      ?.broadcastHostActivePing({
+        sender_id: selfPlayerId,
+        // D-vi: bär questionIndex så non-host som missat broadcasts under
+        // offline kan sync:a vid nästa mottagna ping (heal-on-reconnect).
+        question_index: questionIndex,
+      })
       .catch(() => {});
-  }, [gameMode, isHost, selfPlayerId]);
+  }, [gameMode, isHost, selfPlayerId, questionIndex]);
 
   // D-v: shutdown vid 10 min host-inaktivitet. Host river rummet
   // (deactivateRoom + clear all stores) så stale data inte ärver in
@@ -1972,8 +1987,11 @@ export default function QuizScreen() {
   >(() => {});
   // D-v: handler för host-active-ping. Non-host:s receiver resetar
   // lastHostActivityRef när host bevisar liv. Host själv får aldrig
-  // detta event (Realtime undertrycker self-echo).
-  const hostActivePingHandlerRef = useRef<() => void>(() => {});
+  // detta event (Realtime undertrycker self-echo). D-vi-utökning:
+  // signaturen tar host:s questionIndex för heal-on-reconnect-sync.
+  const hostActivePingHandlerRef = useRef<(questionIndex: number) => void>(
+    () => {},
+  );
   // Synkron mirror av awaitingNewLobby så lobby-ready-handler:n kan
   // läsa den AKTUELLA värden vid event-ankomst utan att vara beroende
   // av att useEffect:en hunnit uppdatera handler-closure:n. Skyddar mot
@@ -2026,12 +2044,19 @@ export default function QuizScreen() {
       // eras nästa render via useMemo-deps.
       setPlayerAudioOverridesState((prev) => ({ ...prev, [playerId]: audioOn }));
     };
-    hostActivePingHandlerRef.current = () => {
+    hostActivePingHandlerRef.current = (hostQuestionIndex: number) => {
       // Host:s broadcast bekräftar liv → non-host resetar gap-tracker.
       // Detta är den ENDA vägen lastHostActivityRef uppdateras på
       // non-host-sidan; idle non-host:s tap dock påverkar inte ref:en
       // (vi spårar host:s aktivitet, inte vår egen).
       lastHostActivityRef.current = Date.now();
+      // D-vi heal-on-reconnect: sync questionIndex mot host:s canonical
+      // värde. Idempotent när redan synkad. Skyddar mot stale-index efter
+      // offline-fönster där missade play_command/question_advance inte
+      // replayas av Supabase Realtime.
+      setQuestionIndex((prev) =>
+        prev === hostQuestionIndex ? prev : hostQuestionIndex,
+      );
     };
   }, [isHost]);
 
@@ -2193,7 +2218,8 @@ export default function QuizScreen() {
         playerApprovedPlayAgainHandlerRef.current(payload.player_id),
       onPlayerAudioStateChanged: (payload) =>
         playerAudioStateChangedHandlerRef.current(payload.player_id, payload.audio_on),
-      onHostActivePing: () => hostActivePingHandlerRef.current(),
+      onHostActivePing: (payload) =>
+        hostActivePingHandlerRef.current(payload.question_index),
       onPlayerConnectionChange: (playerId, status) => {
         setPlayerConnectionStatus((prev) => ({ ...prev, [playerId]: status }));
       },
@@ -2283,6 +2309,68 @@ export default function QuizScreen() {
       Alert.alert('Please note', 'Some players connection unstable.');
     }
   }, [playerConnectionStatus, isHost, gameMode, phase]);
+
+  // D-vi: detect-effect för host-disconnect-grace. Triggar grace när
+  // non-host är i reveal-fas och host är markerad som disconnected i
+  // peer-tracker. Cancel:s när antingen host återansluts ELLER phase
+  // byter (= host:s question_advance kommit fram, normalt flow återupp-
+  // taget). Pass-the-Phone bryr sig inte (gameMode-gate).
+  useEffect(() => {
+    if (isHost || gameMode !== 'individual-devices') return;
+    const hostId = turnOrder[0]?.id;
+    if (!hostId) return;
+    const isHostDisconnected = playerConnectionStatus[hostId] === 'disconnected';
+    const inReveal = phase === 'reveal';
+    if (isHostDisconnected && inReveal && !hostDisconnectGraceActive) {
+      hostDisconnectGraceStartRef.current = Date.now();
+      setHostDisconnectGraceActive(true);
+    } else if (
+      (!isHostDisconnected || !inReveal) &&
+      hostDisconnectGraceActive
+    ) {
+      hostDisconnectGraceStartRef.current = null;
+      setHostDisconnectGraceActive(false);
+      setHostDisconnectGraceCountdownSec(null);
+    }
+  }, [
+    isHost,
+    gameMode,
+    turnOrder,
+    playerConnectionStatus,
+    phase,
+    hostDisconnectGraceActive,
+  ]);
+
+  // D-vi: tick-effect — kör ENDAST när grace är aktiv. Var 250ms räknas
+  // remaining; första 7 sek (>3s kvar) håller countdownSec null så bara
+  // normal reveal-UI syns ("frozen reveal-state med feedback synlig"
+  // per spec). Sista 3 sek (≤3s kvar) sätter countdownSec till 3/2/1
+  // som driver big-number-overlay. Vid 0 sek → setPhase('intro') routar
+  // till GetReady; cancel-grenen i detect-effect:en ovan rensar sedan
+  // graceActive eftersom phase ändras.
+  useEffect(() => {
+    if (!hostDisconnectGraceActive) return;
+    const interval = setInterval(() => {
+      const start = hostDisconnectGraceStartRef.current;
+      if (start === null) return;
+      const elapsed = Date.now() - start;
+      const remaining = Math.max(0, 10_000 - elapsed);
+      if (remaining <= 0) {
+        hostDisconnectGraceStartRef.current = null;
+        setHostDisconnectGraceActive(false);
+        setHostDisconnectGraceCountdownSec(null);
+        setPhase('intro');
+      } else if (remaining <= 3_000) {
+        setHostDisconnectGraceCountdownSec(Math.ceil(remaining / 1000));
+      } else {
+        // >3s kvar: ingen visuell countdown än, bara frozen reveal-UI.
+        setHostDisconnectGraceCountdownSec((prev) =>
+          prev === null ? prev : null,
+        );
+      }
+    }, 250);
+    return () => clearInterval(interval);
+  }, [hostDisconnectGraceActive]);
 
   // Timer-progress-barens färg byter vid 10s (warning) och 5s (error).
   // Bar:ens BREDD drivs av timerProgressAnim (Animated.Value, RAF-driven).
@@ -2625,6 +2713,23 @@ export default function QuizScreen() {
     <SafeAreaView style={styles.safe} onTouchStart={signalHostActivity}>
       {inactivityCountdownSec !== null && (
         <InactivityCountdownBanner secondsLeft={inactivityCountdownSec} />
+      )}
+      {/* D-vi: 3-2-1-countdown-overlay sista 3 sek av host-disconnect-grace
+          (sec 7-10 efter reveal-start, när host inte svarat på question_
+          advance). pointerEvents='none' så reveal-UI:t bakom fortsatt
+          interaktivt — användaren kan inte avbryta countdown:n (host
+          måste reconnecta + advance:a, eller låta countdown:n nå 0). */}
+      {hostDisconnectGraceCountdownSec !== null && (
+        <View style={styles.graceCountdownOverlay} pointerEvents="none">
+          <View style={styles.graceCountdownCard}>
+            <Text style={styles.graceCountdownLabel}>
+              Host disconnected — returning to lobby in
+            </Text>
+            <Text style={styles.graceCountdownNumber}>
+              {hostDisconnectGraceCountdownSec}
+            </Text>
+          </View>
+        </View>
       )}
       <ScrollView
         contentContainerStyle={styles.content}
@@ -3145,6 +3250,46 @@ const styles = StyleSheet.create({
   // så onTouchStart kan registrera host:s activity utan att claim:a
   // responder från SafeAreaView/GetReadyIntro inuti.
   touchWrap: { flex: 1 },
+  // D-vi: 3-2-1-countdown vid host-disconnect i reveal-fas. Center-
+  // positionerad så den dominerar visuellt under sista 3 sek innan
+  // auto-route till GetReady. pointerEvents='none' sätts på View:n
+  // i JSX (inte här) eftersom det är en runtime-prop, inte style.
+  graceCountdownOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 9998,
+    elevation: 25,
+  },
+  graceCountdownCard: {
+    backgroundColor: 'rgba(0,0,0,0.85)',
+    borderWidth: 2,
+    borderColor: Colors.warning,
+    borderRadius: 16,
+    paddingVertical: 24,
+    paddingHorizontal: 32,
+    alignItems: 'center',
+    gap: 8,
+    minWidth: 240,
+  },
+  graceCountdownLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#FFFFFF',
+    letterSpacing: 0.3,
+    textAlign: 'center',
+  },
+  graceCountdownNumber: {
+    fontSize: 80,
+    fontWeight: '900',
+    color: Colors.warning,
+    fontVariant: ['tabular-nums'],
+    lineHeight: 88,
+  },
   content: { gap: Spacing.md, paddingBottom: Spacing.xxl },
 
   // Lock-overlay för non-host som tappat Approve Play Again men väntar

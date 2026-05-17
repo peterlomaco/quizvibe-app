@@ -1800,19 +1800,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 4,
   },
-  // Rektangulär pill — speglar exempel-bilden Peter delade. 28×16 ger en
-  // mjuk avlång form som tydligt skiljer fyllda från ofyllda. Border-color
-  // är dämpad textPrimary så ofyllda syns mot dark-bg utan att skrika.
+  // Rektangulär pill — 28×16 form skiljer fyllda från ofyllda. Fyllda
+  // dots delar färgtema med currentPlayerBox/currentMediaBox ("Next:"-
+  // rad nedanför): primaryMuted bg + primary border. Det binder ihop
+  // progressen visuellt med "var du är nu just nu"-indikatorn istället
+  // för två konkurrerande primary-toner. Ofyllda får en muted border
+  // så de håller layout-utrymmet utan att skrika.
   progressDot: {
     width: 28,
     height: 16,
     borderRadius: 4,
     borderWidth: 1.5,
-    borderColor: Colors.textPrimary,
+    borderColor: Colors.borderStrong,
     backgroundColor: 'transparent',
   },
   progressDotFilled: {
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.primaryMuted,
     borderColor: Colors.primary,
   },
 

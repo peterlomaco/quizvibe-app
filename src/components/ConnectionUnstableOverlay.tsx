@@ -31,18 +31,21 @@ interface Props {
  *
  * Vanlig mode (ingen `onRetry`-prop): auto-dismissar när monitor:n går
  * tillbaka till `ok` (2s hysteresis-fönster mot flapping). Används i
- * GetReadyIntro där sticky-låsning saknas.
+ * GetReadyIntro:s mid-game-reload-fall där sticky-låsning saknas.
  *
- * Retry-mode (`onRetry` passad): visar en knapp i bottenkant. Disabled
+ * OK-mode (`onRetry` passad): visar en knapp i bottenkant. Disabled
  * tills `canRetry` blir true (= connection återkommit). Pressed →
- * `onRetry()` (consumer rensar sticky-latch + routar till intro).
- * Används i quiz.tsx:s question/awaiting/reveal-faser där sticky-
- * latchen håller overlay:n uppe även efter recovery.
+ * `onRetry()` (consumer rensar sticky-latch + routar till intro +
+ * broadcastar player_rejoined). Används i quiz.tsx:s question/
+ * awaiting/reveal-faser där sticky-latchen håller overlay:n uppe
+ * även efter recovery.
  *
- * D-vi (≥15s disconnect-eskalering) ersätter denna overlay med en
- * non-cancelable `"Reconnecting..."`-popup + OK-knapp som routar till
- * GetReady. Den koden landar i sin egen slice; denna komponent är ren
- * transient-feedback.
+ * D-vi-text-update: title bytt från "Connection unstable" → "Reconnecting..."
+ * och button-label från "Retry" → "OK" så framing speglar att tapet
+ * INTE försöker resume:a aktuell fråga utan acknowledgar disconnect:n
+ * och routar till GetReady. Beteendet är oförändrat (gating på
+ * canRetry kvar — undviker meningslös cycle om connection inte är
+ * tillbaka när användaren tappar).
  */
 export function ConnectionUnstableOverlay({ visible, onRetry, canRetry }: Props) {
   return (
@@ -63,8 +66,11 @@ export function ConnectionUnstableOverlay({ visible, onRetry, canRetry }: Props)
           <View style={styles.iconWrap}>
             <SignalLostIcon />
           </View>
-          <Text style={styles.title}>Connection unstable</Text>
-          <Text style={styles.body}>Please verify your network connection.</Text>
+          <Text style={styles.title}>Reconnecting…</Text>
+          <Text style={styles.body}>
+            Please verify your network connection. You can rejoin the next
+            question once connection is restored.
+          </Text>
           <View style={styles.dotsRow}>
             <SequentialDots color={Colors.error} />
           </View>
@@ -80,12 +86,12 @@ export function ConnectionUnstableOverlay({ visible, onRetry, canRetry }: Props)
               }}
               disabled={!canRetry}
               accessibilityRole="button"
-              accessibilityLabel={canRetry ? 'Retry' : 'Waiting for connection'}
+              accessibilityLabel={canRetry ? 'OK' : 'Waiting for connection'}
             >
               <Text
                 style={[styles.retryBtnText, !canRetry && styles.retryBtnTextDisabled]}
               >
-                {canRetry ? 'Retry' : 'Waiting for connection…'}
+                {canRetry ? 'OK' : 'Waiting for connection…'}
               </Text>
             </Pressable>
           )}
