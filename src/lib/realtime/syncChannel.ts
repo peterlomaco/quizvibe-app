@@ -97,6 +97,23 @@ export interface PlayerAudioStateChangedPayload {
 }
 
 /**
+ * D-v: host signalerar att de fortfarande är aktiva (= app i foreground,
+ * tar emot user-interactions). Throttlat till max 1 broadcast per 5s
+ * på sender-sidan. Mottagare uppdaterar sin lokala `lastHostActivityAt`-
+ * ref. Om gapet växer > 9 min utan ny ping → 60-sek-countdown startar
+ * på alla devices. 10 min total utan ping → game ends via Alert + nav
+ * till Home. Force-quit och iOS-30s-background-suspend ser identiska
+ * ut från mottagar-sidan (inga pings = inactivity).
+ *
+ * Non-host får ALDRIG broadcasta detta event — bara host-sidans signal.
+ */
+export interface HostActivePingPayload {
+  /** Host:s lobby_players.player_id. För log/debug; mottagar-flödet
+   *  bryr sig bara om event-mottagning, inte sender-identitet. */
+  sender_id: string;
+}
+
+/**
  * Lättviktigt heartbeat-event som varje klient broadcastar var 10:e sekund.
  * Driver per-sender disconnect-detection: om vi inte hör från en specifik
  * sender på >15s markeras DEN spelaren som disconnected (NOT vi själva).
@@ -141,6 +158,11 @@ export interface SyncChannelHandlers {
    *  sin playerAudioOverrides-map; den drabbade spelarens device mute:as/
    *  unmute:as i MediaPlayer. */
   onPlayerAudioStateChanged?: (payload: PlayerAudioStateChangedPayload) => void;
+  /** D-v: host:s aktivitets-heartbeat (throttlad till 1/5s på sender-
+   *  sidan). Mottagar-callback fyrar för varje mottaget event;
+   *  klienten resetar sin lastHostActivityAt-ref och eventuell pågående
+   *  inactivity-countdown avbryts. */
+  onHostActivePing?: (payload: HostActivePingPayload) => void;
   /**
    * Fyrar när en remote spelares heartbeat-state övergår till
    * 'disconnected' (= vi har inte hört från sender:n på >15s, efter att
@@ -184,6 +206,9 @@ export interface SyncChannel {
   broadcastPlayerAudioStateChanged: (
     payload: PlayerAudioStateChangedPayload,
   ) => Promise<void>;
+  /** D-v: host broadcastar "jag är aktiv". Bara host-sidan kallar
+   *  denna; call-site i quiz.tsx throttlar till max 1/5s. */
+  broadcastHostActivePing: (payload: HostActivePingPayload) => Promise<void>;
   /**
    * Broadcasta "jag är tillbaka"-signal när Retry trycks i
    * ConnectionUnstableOverlay. Andra klienter flippar oss från
@@ -307,6 +332,11 @@ export function subscribeSyncChannel(
   if (handlers.onPlayerAudioStateChanged) {
     channel.on('broadcast', { event: 'player_audio_state_changed' }, ({ payload }) => {
       handlers.onPlayerAudioStateChanged!(payload as PlayerAudioStateChangedPayload);
+    });
+  }
+  if (handlers.onHostActivePing) {
+    channel.on('broadcast', { event: 'host_active_ping' }, ({ payload }) => {
+      handlers.onHostActivePing!(payload as HostActivePingPayload);
     });
   }
   // Heartbeat-receiver: per-sender-tracking. Markera bara lastSeen —
@@ -441,6 +471,13 @@ export function subscribeSyncChannel(
       await channel.send({
         type: 'broadcast',
         event: 'player_audio_state_changed',
+        payload,
+      });
+    },
+    broadcastHostActivePing: async (payload) => {
+      await channel.send({
+        type: 'broadcast',
+        event: 'host_active_ping',
         payload,
       });
     },

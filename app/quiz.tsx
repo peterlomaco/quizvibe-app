@@ -1,28 +1,33 @@
+import { ConnectionUnstableOverlay } from '@/src/components/ConnectionUnstableOverlay';
 import { CountdownIntro } from '@/src/components/CountdownIntro';
 import { GetReadyIntro, type QuestionMediaType } from '@/src/components/GetReadyIntro';
 import { ImageAnswerBlock } from '@/src/components/ImageAnswerBlock';
+import { InactivityCountdownBanner } from '@/src/components/InactivityCountdownBanner';
 import { MediaPlayer } from '@/src/components/MediaPlayer';
 import { ProgressiveCover } from '@/src/components/ProgressiveCover';
+import {
+  generateOpponentRoundScore,
+  generateOpponentTimeUsed,
+  MOCK_OPPONENT_HCP_BEFORE,
+  MOCK_OPPONENTS,
+  RoundLeaderboard,
+  type HcpChange,
+  type LeaderboardPlayer,
+  type RoundScore,
+} from '@/src/components/RoundLeaderboard';
 import { SequentialDots } from '@/src/components/SequentialDots';
 import { StopwatchIcon } from '@/src/components/StopwatchIcon';
-import {
-    generateOpponentRoundScore,
-    generateOpponentTimeUsed,
-    MOCK_OPPONENT_HCP_BEFORE,
-    MOCK_OPPONENTS,
-    RoundLeaderboard,
-    type HcpChange,
-    type LeaderboardPlayer,
-    type RoundScore,
-} from '@/src/components/RoundLeaderboard';
+import { useConnectionStatus } from '@/src/lib/network/connectionMonitor';
+import { subscribeSyncChannel, type SyncChannel } from '@/src/lib/realtime/syncChannel';
 import type { LobbyPlayer } from '@/src/screens/LobbyScreen';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '@/src/theme';
 import { track } from '@/src/utils/analytics';
-import { saveLatestResult, type GameResult, type RoundResult } from '@/src/utils/gameResults';
-import { clearPendingLobbyPlayers, savePendingLobbyPlayers } from '@/src/utils/pendingLobby';
-import { clearLeftPlayers } from '@/src/utils/leftPlayers';
-import { deactivateRoom, registerActiveRoom } from '@/src/utils/mockActiveRooms';
+import { getAvatarEmojiById } from '@/src/utils/avatars';
 import { clearEjected } from '@/src/utils/ejectedPlayers';
+import { saveLatestResult, type GameResult, type RoundResult } from '@/src/utils/gameResults';
+import { clearLeftPlayers } from '@/src/utils/leftPlayers';
+import { pickMediaSource, type YoutubeClip } from '@/src/utils/mediaSource';
+import { deactivateRoom, registerActiveRoom } from '@/src/utils/mockActiveRooms';
 import { clearLobbyPlayers, setLobbyPlayers } from '@/src/utils/mockLobbyPlayers';
 import {
   clearLobbySettings,
@@ -33,12 +38,9 @@ import {
   type PlayerAudioOverrides,
 } from '@/src/utils/mockLobbySettings';
 import { clearGameStarted } from '@/src/utils/mockStartedGames';
-import { pickMediaSource, type YoutubeClip } from '@/src/utils/mediaSource';
-import { supabase } from '@/src/utils/supabase';
-import { subscribeSyncChannel, type SyncChannel } from '@/src/lib/realtime/syncChannel';
-import { useConnectionStatus } from '@/src/lib/network/connectionMonitor';
-import { ConnectionUnstableOverlay } from '@/src/components/ConnectionUnstableOverlay';
 import { MUSIC_QUESTIONS } from '@/src/utils/musicQuestions';
+import { savePendingLobbyPlayers } from '@/src/utils/pendingLobby';
+import { loadProfile } from '@/src/utils/profileStorage';
 import {
   IMAGE_QUIZ_QUESTIONS,
   type ImageNameOption,
@@ -46,10 +48,9 @@ import {
   type ImageVariantKey,
 } from '@/src/utils/quizImageQuestions';
 import { getQuizImage } from '@/src/utils/quizImages';
-import { getAvatarEmojiById } from '@/src/utils/avatars';
-import { loadProfile } from '@/src/utils/profileStorage';
-import { hasPremiumSubscription } from '@/src/utils/subscriptionStorage';
 import { generateRoomCode } from '@/src/utils/roomCode';
+import { hasPremiumSubscription } from '@/src/utils/subscriptionStorage';
+import { supabase } from '@/src/utils/supabase';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
@@ -588,6 +589,22 @@ export default function QuizScreen() {
   // isAudioMutedForSelf-compute:n längre ner kan läsa state utan TDZ.
   const [playerAudioOverrides, setPlayerAudioOverridesState] =
     useState<PlayerAudioOverrides>({});
+  // D-v: host-inactivity-watchdog. lastHostActivityRef speglar (a) host:s
+  // egna tap-tid när isHost=true eller (b) senast mottagna host_active_ping
+  // när isHost=false. Båda håller fönstret på "9 min utan host-aktivitet
+  // = countdown startar; 10 min = shutdown". Init till mount-tid så timern
+  // börjar tickande från quiz-entry istället för 1970-epoch.
+  const lastHostActivityRef = useRef<number>(Date.now());
+  // Throttle-skydd för host:s ping-broadcast (max 1 per 5s).
+  const lastPingEmittedRef = useRef<number>(0);
+  // Sätts true av shutdown-handler:n så den bara fyrar en gång även om
+  // interval-tick:en gör flera överskridanden innan navigation-replace
+  // hinner unmounta /quiz.
+  const inactivityShutdownTriggeredRef = useRef(false);
+  // Visar countdown-banner när non-null (60→0). null = host aktiv inom
+  // 9 min, ingen banner.
+  const [inactivityCountdownSec, setInactivityCountdownSec] =
+    useState<number | null>(null);
   // D-iii: bad-connection-detection. Övervakas via connectionMonitor som får
   // signaler från syncChannel:s state-events. Gating på
   // gameMode='individual-devices' sker per call-site (overlay + disabled-
@@ -1464,6 +1481,77 @@ export default function QuizScreen() {
     [params.roomCode, gameMode],
   );
 
+  // D-v: host:s tap-signal. Anropas av onTouchStart-wrapper på alla
+  // return-paths. Resetar host:s egen lastHostActivityRef + broadcastar
+  // host_active_ping (throttlat till max 1/5s — fortsatta taps inom
+  // fönstret skippar broadcast men resetar fortfarande egna ref:en så
+  // host:s lokala countdown inte triggar oönskat).
+  const signalHostActivity = useCallback(() => {
+    if (gameMode !== 'individual-devices' || !isHost) return;
+    const now = Date.now();
+    lastHostActivityRef.current = now;
+    if (now - lastPingEmittedRef.current < 5000) return;
+    lastPingEmittedRef.current = now;
+    syncChannelRef.current
+      ?.broadcastHostActivePing({ sender_id: selfPlayerId })
+      .catch(() => {});
+  }, [gameMode, isHost, selfPlayerId]);
+
+  // D-v: shutdown vid 10 min host-inaktivitet. Host river rummet
+  // (deactivateRoom + clear all stores) så stale data inte ärver in
+  // i nästa session. Non-host hoppar över cleanup — det är host:s
+  // ansvar; pg_cron tar hand om force-quit-fallet via 24h-expiry på
+  // rooms-tabellen. Båda får samma Alert + Home-nav.
+  const handleInactivityShutdown = useCallback(async () => {
+    if (inactivityShutdownTriggeredRef.current) return;
+    inactivityShutdownTriggeredRef.current = true;
+    if (isHost && params.roomCode) {
+      try {
+        await deactivateRoom(params.roomCode);
+      } catch {
+        /* fortsätt även om cleanup fail:ar */
+      }
+      clearLeftPlayers(params.roomCode);
+      clearLobbyPlayers(params.roomCode);
+      clearLobbySettings(params.roomCode);
+      clearEjected(params.roomCode);
+      clearGameStarted(params.roomCode);
+    }
+    Alert.alert(
+      'Game ended',
+      'Game ended due to host inactivity.',
+      [{ text: 'OK', onPress: () => router.replace('/') }],
+      { cancelable: false },
+    );
+  }, [isHost, params.roomCode]);
+
+  // D-v: 1-sek interval som driver banner-countdown + shutdown-trigger.
+  // Värdet räknas alltid från lastHostActivityRef (host-egen aktivitet
+  // eller mottagen ping) så host + non-host konvergerar på samma
+  // shutdown-tid utan att behöva broadcasta nedräkningen i sig.
+  // Trigger-trösklar: 59 min = banner startar; 60 min = shutdown
+  // (= 60-sek-countdown). Total tolerans = 1 timme utan host-aktivitet.
+  useEffect(() => {
+    if (gameMode !== 'individual-devices') return;
+    const INACTIVITY_BANNER_MS = 59 * 60 * 1000;
+    const INACTIVITY_SHUTDOWN_MS = 60 * 60 * 1000;
+    const interval = setInterval(() => {
+      const gap = Date.now() - lastHostActivityRef.current;
+      if (gap >= INACTIVITY_SHUTDOWN_MS) {
+        handleInactivityShutdown();
+      } else if (gap >= INACTIVITY_BANNER_MS) {
+        const remaining = Math.max(
+          0,
+          Math.ceil((INACTIVITY_SHUTDOWN_MS - gap) / 1000),
+        );
+        setInactivityCountdownSec(remaining);
+      } else {
+        setInactivityCountdownSec((prev) => (prev === null ? prev : null));
+      }
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [gameMode, handleInactivityShutdown]);
+
   // ── Broadcast-listener-refs ──────────────────────────────────────────────
   // Skriv färska handlers in i refs varje render så subscription-callback:n
   // (etablerad en gång på mount) alltid kallar latest logic. Non-host kör
@@ -1882,6 +1970,10 @@ export default function QuizScreen() {
   const playerAudioStateChangedHandlerRef = useRef<
     (playerId: string, audioOn: boolean) => void
   >(() => {});
+  // D-v: handler för host-active-ping. Non-host:s receiver resetar
+  // lastHostActivityRef när host bevisar liv. Host själv får aldrig
+  // detta event (Realtime undertrycker self-echo).
+  const hostActivePingHandlerRef = useRef<() => void>(() => {});
   // Synkron mirror av awaitingNewLobby så lobby-ready-handler:n kan
   // läsa den AKTUELLA värden vid event-ankomst utan att vara beroende
   // av att useEffect:en hunnit uppdatera handler-closure:n. Skyddar mot
@@ -1933,6 +2025,13 @@ export default function QuizScreen() {
       // egen kopia av overrides-mappen. MediaPlayer:s isMuted re-evalu-
       // eras nästa render via useMemo-deps.
       setPlayerAudioOverridesState((prev) => ({ ...prev, [playerId]: audioOn }));
+    };
+    hostActivePingHandlerRef.current = () => {
+      // Host:s broadcast bekräftar liv → non-host resetar gap-tracker.
+      // Detta är den ENDA vägen lastHostActivityRef uppdateras på
+      // non-host-sidan; idle non-host:s tap dock påverkar inte ref:en
+      // (vi spårar host:s aktivitet, inte vår egen).
+      lastHostActivityRef.current = Date.now();
     };
   }, [isHost]);
 
@@ -2094,6 +2193,7 @@ export default function QuizScreen() {
         playerApprovedPlayAgainHandlerRef.current(payload.player_id),
       onPlayerAudioStateChanged: (payload) =>
         playerAudioStateChangedHandlerRef.current(payload.player_id, payload.audio_on),
+      onHostActivePing: () => hostActivePingHandlerRef.current(),
       onPlayerConnectionChange: (playerId, status) => {
         setPlayerConnectionStatus((prev) => ({ ...prev, [playerId]: status }));
       },
@@ -2247,7 +2347,7 @@ export default function QuizScreen() {
     // cachat bitmap. 1×1 px + opacity 0 → ingen visuell påverkan, men
     // räcker för att trigga decode-pipeline:n.
     return (
-      <>
+      <View style={styles.touchWrap} onTouchStart={signalHostActivity}>
       <GetReadyIntro
         mode={gameMode}
         currentPlayer={currentPlayer}
@@ -2326,7 +2426,10 @@ export default function QuizScreen() {
           }}
         />
       )}
-      </>
+      {inactivityCountdownSec !== null && (
+        <InactivityCountdownBanner secondsLeft={inactivityCountdownSec} />
+      )}
+      </View>
     );
   }
 
@@ -2336,7 +2439,7 @@ export default function QuizScreen() {
   if (phase === 'countdown') {
     const countdownPlayer = turnOrder[currentPlayerIndex];
     return (
-      <>
+      <View style={styles.touchWrap} onTouchStart={signalHostActivity}>
       <CountdownIntro
         mode={gameMode}
         playerName={countdownPlayer?.name}
@@ -2357,7 +2460,10 @@ export default function QuizScreen() {
           }}
         />
       )}
-      </>
+      {inactivityCountdownSec !== null && (
+        <InactivityCountdownBanner secondsLeft={inactivityCountdownSec} />
+      )}
+      </View>
     );
   }
 
@@ -2367,7 +2473,10 @@ export default function QuizScreen() {
   // scrollar och blir inte längre alltid synlig.
   if (phase === 'leaderboard') {
     return (
-      <SafeAreaView style={styles.safe}>
+      <SafeAreaView style={styles.safe} onTouchStart={signalHostActivity}>
+        {inactivityCountdownSec !== null && (
+          <InactivityCountdownBanner secondsLeft={inactivityCountdownSec} />
+        )}
         <RoundLeaderboard
           players={gamePlayers}
           roundScores={currentRoundScores}
@@ -2513,7 +2622,10 @@ export default function QuizScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={styles.safe} onTouchStart={signalHostActivity}>
+      {inactivityCountdownSec !== null && (
+        <InactivityCountdownBanner secondsLeft={inactivityCountdownSec} />
+      )}
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
@@ -3029,6 +3141,10 @@ export default function QuizScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
+  // D-v: outer wrapper för fragment-baserade return-paths (intro/countdown)
+  // så onTouchStart kan registrera host:s activity utan att claim:a
+  // responder från SafeAreaView/GetReadyIntro inuti.
+  touchWrap: { flex: 1 },
   content: { gap: Spacing.md, paddingBottom: Spacing.xxl },
 
   // Lock-overlay för non-host som tappat Approve Play Again men väntar
