@@ -152,3 +152,61 @@ export async function clearLobbySettings(code: string): Promise<void> {
     console.warn('[lobbySettings] clearLobbySettings failed:', error.message);
   }
 }
+
+// ── D-iv: host-styrt per-spelare audio i Individual Devices ──────────
+//
+// Storas som en jsonb-map på lobby_settings.player_audio_overrides
+// (column tillagd i migration 0007). Egen helper-yta separat från
+// setLobbySettings så LobbyScreen:s debounced settings-save inte rör
+// kolumnen — den modifieras bara av quiz.tsx:s audio-toggle-callback.
+// Schema: { [lobby_players.player_id]: boolean }, where true = audio på.
+
+export type PlayerAudioOverrides = Record<string, boolean>;
+
+/**
+ * Läser nuvarande audio-overrides-map för rummet. Tom map om kolumnen
+ * är default-värdet eller om rummet saknas i lobby_settings.
+ */
+export async function getPlayerAudioOverrides(code: string): Promise<PlayerAudioOverrides> {
+  if (!code) return {};
+  const normalized = normalizeCode(code);
+  const { data, error } = await supabase
+    .from('lobby_settings')
+    .select('player_audio_overrides')
+    .eq('room_code', normalized)
+    .maybeSingle();
+  if (error) {
+    console.warn('[lobbySettings] getPlayerAudioOverrides failed:', error.message);
+    return {};
+  }
+  return (data?.player_audio_overrides as PlayerAudioOverrides | null) ?? {};
+}
+
+/**
+ * Sätter audio-state för EN spelare i rummet. Atomisk read-modify-write
+ * via direct UPDATE på jsonb-kolumnen — bara denna kolumn rörs så
+ * LobbyScreen:s konkurrerande setLobbySettings-upsert inte kan
+ * krocka. RLS "host manages lobby settings" gör att bara host:s
+ * session får skriva (call-sites ska oavsett gate:a på hostMode).
+ *
+ * Inkrementell broadcast (player_audio_state_changed) sker SEPARAT
+ * från denna helper — call-site i quiz.tsx anropar både db-skrivning
+ * och syncChannel.broadcastPlayerAudioStateChanged efter varandra.
+ */
+export async function setPlayerAudioOverride(
+  code: string,
+  playerId: string,
+  audioOn: boolean,
+): Promise<void> {
+  if (!code || !playerId) return;
+  const normalized = normalizeCode(code);
+  const current = await getPlayerAudioOverrides(normalized);
+  const next: PlayerAudioOverrides = { ...current, [playerId]: audioOn };
+  const { error } = await supabase
+    .from('lobby_settings')
+    .update({ player_audio_overrides: next })
+    .eq('room_code', normalized);
+  if (error) {
+    console.warn('[lobbySettings] setPlayerAudioOverride failed:', error.message);
+  }
+}

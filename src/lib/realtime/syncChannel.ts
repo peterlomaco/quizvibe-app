@@ -81,6 +81,22 @@ export interface PlayerApprovedPlayAgainPayload {
 }
 
 /**
+ * D-iv: host justerade audio för en specifik spelare i GetReady-vyn.
+ * Incremental update — bara den ändrade spelaren broadcastas, inte hela
+ * map:en. Mottagare uppdaterar sin lokala `playerAudioOverrides[player_id]`
+ * och flippar MediaPlayer:s mute-state om det är dem själva.
+ *
+ * Source of truth är lobby_settings.player_audio_overrides; broadcasten
+ * är fast-path. Initial state läses från getLobbySettings vid game-mount.
+ */
+export interface PlayerAudioStateChangedPayload {
+  /** Spelaren vars audio host justerat. */
+  player_id: string;
+  /** Nytt värde: true = audio på på den enheten, false = mute. */
+  audio_on: boolean;
+}
+
+/**
  * Lättviktigt heartbeat-event som varje klient broadcastar var 10:e sekund.
  * Driver per-sender disconnect-detection: om vi inte hör från en specifik
  * sender på >15s markeras DEN spelaren som disconnected (NOT vi själva).
@@ -121,6 +137,10 @@ export interface SyncChannelHandlers {
   /** En non-host har tappat "Approve Play again" — host använder för att
    *  räkna approvals och låsa upp "Yes, keep them"-knappen. */
   onPlayerApprovedPlayAgain?: (payload: PlayerApprovedPlayAgainPayload) => void;
+  /** D-iv: host justerade audio för en spelare. Alla mottagare uppdaterar
+   *  sin playerAudioOverrides-map; den drabbade spelarens device mute:as/
+   *  unmute:as i MediaPlayer. */
+  onPlayerAudioStateChanged?: (payload: PlayerAudioStateChangedPayload) => void;
   /**
    * Fyrar när en remote spelares heartbeat-state övergår till
    * 'disconnected' (= vi har inte hört från sender:n på >15s, efter att
@@ -159,6 +179,10 @@ export interface SyncChannel {
   ) => Promise<void>;
   broadcastPlayerApprovedPlayAgain: (
     payload: PlayerApprovedPlayAgainPayload,
+  ) => Promise<void>;
+  /** D-iv: host broadcastar ny audio-state för en specifik spelare. */
+  broadcastPlayerAudioStateChanged: (
+    payload: PlayerAudioStateChangedPayload,
   ) => Promise<void>;
   /**
    * Broadcasta "jag är tillbaka"-signal när Retry trycks i
@@ -278,6 +302,11 @@ export function subscribeSyncChannel(
   if (handlers.onPlayerApprovedPlayAgain) {
     channel.on('broadcast', { event: 'player_approved_play_again' }, ({ payload }) => {
       handlers.onPlayerApprovedPlayAgain!(payload as PlayerApprovedPlayAgainPayload);
+    });
+  }
+  if (handlers.onPlayerAudioStateChanged) {
+    channel.on('broadcast', { event: 'player_audio_state_changed' }, ({ payload }) => {
+      handlers.onPlayerAudioStateChanged!(payload as PlayerAudioStateChangedPayload);
     });
   }
   // Heartbeat-receiver: per-sender-tracking. Markera bara lastSeen —
@@ -405,6 +434,13 @@ export function subscribeSyncChannel(
       await channel.send({
         type: 'broadcast',
         event: 'player_approved_play_again',
+        payload,
+      });
+    },
+    broadcastPlayerAudioStateChanged: async (payload) => {
+      await channel.send({
+        type: 'broadcast',
+        event: 'player_audio_state_changed',
         payload,
       });
     },

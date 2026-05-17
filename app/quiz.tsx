@@ -27,7 +27,10 @@ import { clearLobbyPlayers, setLobbyPlayers } from '@/src/utils/mockLobbyPlayers
 import {
   clearLobbySettings,
   getLobbySettings,
+  getPlayerAudioOverrides,
   setLobbySettings,
+  setPlayerAudioOverride,
+  type PlayerAudioOverrides,
 } from '@/src/utils/mockLobbySettings';
 import { clearGameStarted } from '@/src/utils/mockStartedGames';
 import { pickMediaSource, type YoutubeClip } from '@/src/utils/mediaSource';
@@ -578,6 +581,13 @@ export default function QuizScreen() {
   const [responseSeconds, setResponseSeconds] = useState<15 | 30 | 45 | 60>(
     initialResponseSeconds,
   );
+  // D-iv: host-styrt per-spelare audio (IndDev). Saknad key i mappen
+  // tolkas client-side: host=on, övriga=off. Initial-fetch sker vid
+  // mount (se separat useEffect nedan); incremental updates kommer via
+  // player_audio_state_changed-broadcast. Deklareras tidigt så
+  // isAudioMutedForSelf-compute:n längre ner kan läsa state utan TDZ.
+  const [playerAudioOverrides, setPlayerAudioOverridesState] =
+    useState<PlayerAudioOverrides>({});
   // D-iii: bad-connection-detection. Övervakas via connectionMonitor som får
   // signaler från syncChannel:s state-events. Gating på
   // gameMode='individual-devices' sker per call-site (overlay + disabled-
@@ -939,6 +949,24 @@ export default function QuizScreen() {
       ),
     [question, youtubeEnabled, spotifyEnabled, gameMode],
   );
+
+  // D-iv: host:s player_id är alltid turnOrder[0] (Lobby-handleStartGame
+  // bygger arrayen med host först). Används för default-audio-policyn
+  // (host = on när override saknas) + GetReadyIntro:s "Host"-tagg på
+  // audio-modal-raden.
+  const hostPlayerId = turnOrder[0]?.id;
+  // D-iv: ska denna enhet vara mute:ad under uppspelning? Pass-the-Phone
+  // delar device → alltid ljud på. Vid direkt-nav utan selfPlayerId →
+  // fallback till audio på så musiken hörs i mock-mode. I IndDev läses
+  // overrides-mappen; default-policyn kickar in vid saknad key.
+  const isAudioMutedForSelf = useMemo(() => {
+    if (gameMode === 'pass-the-phone') return false;
+    if (!selfPlayerId) return false;
+    if (Object.prototype.hasOwnProperty.call(playerAudioOverrides, selfPlayerId)) {
+      return !playerAudioOverrides[selfPlayerId];
+    }
+    return !isHost;
+  }, [gameMode, selfPlayerId, playerAudioOverrides, isHost]);
   // Aktuell spelares namn i Pass-the-Phone-rotationen — visas subtilt i fråge-
   // kortet ("Answering: {namn}"). Skip:as för Individual Devices (varje
   // spelare är på sin egen enhet och vet redan vem de är).
@@ -1414,6 +1442,27 @@ export default function QuizScreen() {
         .catch(() => {});
     }
   };
+  // D-iv: host togglar audio för en spelare via GetReady-modalen.
+  // Trippelt parallellt: optimistisk lokal state (UI uppdateras direkt),
+  // Supabase-persist (cross-device durability) + broadcast (fast-path så
+  // den drabbade spelarens device mute:as inom <100ms istället för att
+  // vänta på Realtime-postgres-changes). Body:n är fire-and-forget; om
+  // Supabase-write fail:ar fortsätter broadcast:en så lokal session inte
+  // blockas av nätverks-glitch.
+  const handlePlayerAudioChange = useCallback(
+    (playerId: string, audioOn: boolean) => {
+      setPlayerAudioOverridesState((prev) => ({ ...prev, [playerId]: audioOn }));
+      if (params.roomCode) {
+        setPlayerAudioOverride(params.roomCode, playerId, audioOn).catch(() => {});
+      }
+      if (gameMode === 'individual-devices' && syncChannelRef.current) {
+        syncChannelRef.current
+          .broadcastPlayerAudioStateChanged({ player_id: playerId, audio_on: audioOn })
+          .catch(() => {});
+      }
+    },
+    [params.roomCode, gameMode],
+  );
 
   // ── Broadcast-listener-refs ──────────────────────────────────────────────
   // Skriv färska handlers in i refs varje render så subscription-callback:n
@@ -1827,6 +1876,12 @@ export default function QuizScreen() {
   const playerApprovedPlayAgainHandlerRef = useRef<(playerId: string) => void>(
     () => {},
   );
+  // D-iv: handler för per-spelare audio-state-broadcast från host.
+  // Alla klienter uppdaterar sin lokala overrides-map; den drabbade
+  // spelarens device flippar mute via isMuted-prop till MediaPlayer.
+  const playerAudioStateChangedHandlerRef = useRef<
+    (playerId: string, audioOn: boolean) => void
+  >(() => {});
   // Synkron mirror av awaitingNewLobby så lobby-ready-handler:n kan
   // läsa den AKTUELLA värden vid event-ankomst utan att vara beroende
   // av att useEffect:en hunnit uppdatera handler-closure:n. Skyddar mot
@@ -1871,6 +1926,13 @@ export default function QuizScreen() {
         next.add(playerId);
         return next;
       });
+    };
+    playerAudioStateChangedHandlerRef.current = (playerId, audioOn) => {
+      // Speglar host:s ändring i lokal state — varje klient (inkl. host
+      // själv om de skulle få eko, vilket Realtime undertrycker) håller
+      // egen kopia av overrides-mappen. MediaPlayer:s isMuted re-evalu-
+      // eras nästa render via useMemo-deps.
+      setPlayerAudioOverridesState((prev) => ({ ...prev, [playerId]: audioOn }));
     };
   }, [isHost]);
 
@@ -2030,6 +2092,8 @@ export default function QuizScreen() {
         playAgainLobbyReadyHandlerRef.current(payload.room_code),
       onPlayerApprovedPlayAgain: (payload) =>
         playerApprovedPlayAgainHandlerRef.current(payload.player_id),
+      onPlayerAudioStateChanged: (payload) =>
+        playerAudioStateChangedHandlerRef.current(payload.player_id, payload.audio_on),
       onPlayerConnectionChange: (playerId, status) => {
         setPlayerConnectionStatus((prev) => ({ ...prev, [playerId]: status }));
       },
@@ -2045,6 +2109,24 @@ export default function QuizScreen() {
       syncChannelRef.current = null;
     };
   }, [gameMode, params.roomCode, selfPlayerId]);
+
+  // D-iv: initial-fetch av audio-overrides-mappen från lobby_settings
+  // vid mount. Krävs för non-host som joinar mid-session — broadcasten
+  // är fast-path för LIVE-ändringar men ger ingen state-snapshot vid
+  // late-join. Host kör samma fetch (idempotent) så pre-existing
+  // overrides från carry-over (Play Again) återställs i lokal state.
+  useEffect(() => {
+    if (gameMode !== 'individual-devices' || !params.roomCode) return;
+    let cancelled = false;
+    getPlayerAudioOverrides(params.roomCode)
+      .then((map) => {
+        if (!cancelled) setPlayerAudioOverridesState(map);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [gameMode, params.roomCode]);
 
   // D-iii: när lokal monitor återgår från unstable → ok, rensa peer-
   // tracking-state. Allt vi har om andra spelare från perioden vi var
@@ -2208,6 +2290,13 @@ export default function QuizScreen() {
         unstableLocked={shouldLockForUnstable}
         unstableCanRetry={!isConnectionUnstable && stickyUnstableForQuestion}
         onUnstableRetry={!isHost ? handleRetryFromUnstable : undefined}
+        // D-iv: audio-toggle-block. Renderas bara för host i IndDev
+        // (showAudioTrigger-gate i GetReadyIntro). Pass-the-Phone får
+        // tom allPlayers via gating så trigger:n döljs där.
+        allPlayers={gameMode === 'individual-devices' ? turnOrder : undefined}
+        hostPlayerId={hostPlayerId}
+        playerAudioOverrides={playerAudioOverrides}
+        onPlayerAudioChange={handlePlayerAudioChange}
         // I IndDev wrappar vi onReady så host:s tap också broadcastar
         // play_command till non-host:s enheter. Pass-the-Phone behöver
         // ingen wrapping (alla på samma enhet). Non-host i IndDev får
@@ -2476,6 +2565,7 @@ export default function QuizScreen() {
                   phase === 'reveal'
                 }
                 showVideo={phase === 'reveal'}
+                isMuted={isAudioMutedForSelf}
               />
             )}
 

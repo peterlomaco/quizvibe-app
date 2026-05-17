@@ -14,9 +14,12 @@ import type { SpotifyTrack } from '@/src/utils/mediaSource';
 interface Props {
   track: SpotifyTrack;
   isPlaying: boolean;
+  /** D-iv: mute-flagga. Placeholdern ignorerar den; SDK-impl:n kommer
+   *  använda den när D-viii landar. */
+  isMuted?: boolean;
 }
 
-export function SpotifyMediaPlayer({ track, isPlaying }: Props) {
+export function SpotifyMediaPlayer({ track, isPlaying, isMuted: _isMuted = false }: Props) {
   return (
     <View style={styles.card}>
       <Text style={styles.icon}>🎧</Text>

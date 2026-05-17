@@ -28,6 +28,9 @@ interface Props {
   clip: YoutubeClip;
   isPlaying: boolean;
   showVideo: boolean;
+  /** D-iv: mute ljudet utan att pausa. Drivs av host:s per-spelare audio-
+   *  overrides i Individual Devices. Default false. */
+  isMuted?: boolean;
   onReady?: () => void;
   onEnded?: () => void;
   onError?: (error: Error) => void;
@@ -43,6 +46,7 @@ export function YouTubeMediaPlayer({
   clip,
   isPlaying,
   showVideo,
+  isMuted = false,
   onReady,
   onEnded,
   onError,
@@ -53,6 +57,14 @@ export function YouTubeMediaPlayer({
   // Driver tap-prompt-rendering. Sätts true av timeout om autoplay inte
   // hunnit starta inom AUTOPLAY_TIMEOUT_MS efter mount.
   const [showTapPrompt, setShowTapPrompt] = useState(false);
+  // D-iv: gatekeeper för mute+volume-postMessages. react-native-youtube-
+  // iframe:s useEffect skickar player.mute()/setVolume() omedelbart vid
+  // prop-ändring — om det sker INNAN onReady fyrat så finns ingen
+  // YT-player-instans i WebView:n och kommandot tyst-fail:ar. Vi håller
+  // därför mute=false + volume=100 (= "no-op") tills onReady, sedan
+  // flippar till önskat värde så useEffect fires med player redo att
+  // ta emot. Reset:as per clip-byte så ny iframe-mount börjar gated.
+  const [isPlayerReady, setIsPlayerReady] = useState(false);
 
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -60,6 +72,7 @@ export function YouTubeMediaPlayer({
   useEffect(() => {
     setHasStartedPlayback(false);
     setShowTapPrompt(false);
+    setIsPlayerReady(false);
   }, [clip.videoId]);
 
   // Schemalägg tap-prompt om autoplay inte startat
@@ -98,6 +111,11 @@ export function YouTubeMediaPlayer({
   );
 
   const handleReady = useCallback(() => {
+    // D-iv: flagga player som redo så mute/volume-prop:arna släpps från
+    // false/100-låsningen till deras "riktiga" värden. Lib:ns useEffect
+    // för mute+volume firear då med player.mute()/setVolume()-postMessage
+    // som faktiskt landar i en initialiserad iframe.
+    setIsPlayerReady(true);
     onReady?.();
   }, [onReady]);
 
@@ -116,6 +134,15 @@ export function YouTubeMediaPlayer({
         key={clip.videoId}
         height={PLAYER_HEIGHT}
         play={isPlaying}
+        // D-iv: dubbel tystnad gated på isPlayerReady så postMessage:en
+        // inte tappas innan YT.Player-instansen existerar i WebView:n.
+        // Före onReady: mute=false, volume=100 (no-op). Efter onReady:
+        // flip till riktigt värde → lib:ns useEffect ser ändring → skickar
+        // player.mute()/setVolume() i ETT initialiserat fönster. Reaktiv
+        // efter den initiala gaten så host:s toggle mid-question fortfarande
+        // propagerar direkt.
+        mute={isPlayerReady ? isMuted : false}
+        volume={isPlayerReady ? (isMuted ? 0 : 100) : 100}
         videoId={clip.videoId}
         onChangeState={handleStateChange}
         onReady={handleReady}

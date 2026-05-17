@@ -9,6 +9,7 @@ import {
   SafeAreaView,
   ScrollView,
   StyleSheet,
+  Switch,
   Text,
   TouchableOpacity,
   View,
@@ -136,6 +137,20 @@ interface Props {
   unstableLocked?: boolean;
   unstableCanRetry?: boolean;
   onUnstableRetry?: () => void;
+  /** D-iv: alla spelare i spelet (host + non-hosts). Driver audio-toggle-
+   *  listan i IndDev:s Game Settings-block. När utelämnad eller tom array
+   *  döljs audio-trigger:n (= ingen att toggla). Pass-the-Phone bryr sig
+   *  inte om detta (single device = alltid ljud på). */
+  allPlayers?: IntroPlayer[];
+  /** D-iv: host:s player_id, används för default-audio-policyn (saknad
+   *  key i playerAudioOverrides → host=on, övriga=off). */
+  hostPlayerId?: string;
+  /** D-iv: aktuell map över host:s audio-overrides per spelar-id.
+   *  Saknad key tolkas via default-policyn (se hostPlayerId). */
+  playerAudioOverrides?: Record<string, boolean>;
+  /** D-iv: callback när host togglar audio för en spelare. Parent skriver
+   *  till lobby_settings + broadcastar via syncChannel. */
+  onPlayerAudioChange?: (playerId: string, audioOn: boolean) => void;
 }
 
 /** Liten avatar-cell som visas före spelarnamnet — uri-bild om finns, annars
@@ -228,8 +243,31 @@ export function GetReadyIntro({
   unstableLocked,
   unstableCanRetry,
   onUnstableRetry,
+  allPlayers,
+  hostPlayerId,
+  playerAudioOverrides,
+  onPlayerAudioChange,
 }: Props) {
   const isIndDev = mode === 'individual-devices';
+  // D-iv: audio-trigger visas bara för host i IndDev och bara om vi har
+  // en spelarlista att visa toggles för. Pass-the-Phone har gemensam
+  // enhet → alltid ljud på → ingen trigger.
+  const showAudioTrigger =
+    isIndDev && isHost && !!allPlayers && allPlayers.length > 0;
+  // Helper: vad är effektiv audio-state för en spelare just nu? Saknad
+  // key i overrides-mappen → default-policy: host on, övriga off.
+  const audioOnForPlayer = (playerId: string): boolean => {
+    if (playerAudioOverrides && Object.prototype.hasOwnProperty.call(playerAudioOverrides, playerId)) {
+      return playerAudioOverrides[playerId];
+    }
+    return playerId === hostPlayerId;
+  };
+  // Räkna hur många som har audio på (för "N on"-summering i trigger).
+  const audioOnCount = (allPlayers ?? []).reduce(
+    (acc, p) => acc + (audioOnForPlayer(p.id) ? 1 : 0),
+    0,
+  );
+  const [audioModalOpen, setAudioModalOpen] = useState(false);
   // D-iii: bad-connection-overlay. Visning styrs av parent (quiz.tsx) via
   // `unstableLocked`-prop när satt — det inkluderar sticky-latch-logiken
   // som persisterar genom phase-byten tills Retry trycks. När prop:en är
@@ -414,6 +452,25 @@ export function GetReadyIntro({
               </TouchableOpacity>
             )}
           </View>
+          {/* D-iv: audio-trigger — bara host i IndDev. Tap öppnar modal
+              med per-spelare on/off-toggle. Trigger-texten visar live-
+              summering "N on" så host kan snabbt se status utan att
+              öppna modalen. */}
+          {showAudioTrigger && (
+            <View style={styles.responseDropdownRow}>
+              <Text style={styles.settingsRow}>🔊 Audio per player:</Text>
+              <TouchableOpacity
+                style={styles.responseDropdownTrigger}
+                onPress={() => setAudioModalOpen(true)}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.responseDropdownTriggerText}>
+                  {audioOnCount} on
+                </Text>
+                <Text style={styles.responseDropdownChevron}>▼</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
       </View>
 
@@ -692,6 +749,67 @@ export function GetReadyIntro({
           })()}
         </View>
       )}
+
+      {/* D-iv: audio-per-spelare-modal. Tap utanför panel:n stänger;
+          varje rad har en Switch som direkt anropar onPlayerAudioChange.
+          Host kan justera audio mellan ronder; mid-question är audio
+          låst (host är då i question/awaiting/reveal-fas, inte intro). */}
+      <Modal
+        visible={audioModalOpen}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setAudioModalOpen(false)}
+      >
+        <Pressable
+          style={styles.dropdownBackdrop}
+          onPress={() => setAudioModalOpen(false)}
+        >
+          <Pressable
+            style={styles.audioPanel}
+            onPress={(e) => e.stopPropagation()}
+          >
+            <Text style={styles.dropdownTitle}>Audio per player</Text>
+            <Text style={styles.audioHint}>
+              Toggle which devices play audio. Default: host on, others muted.
+            </Text>
+            <ScrollView style={styles.audioList} showsVerticalScrollIndicator={false}>
+              {(allPlayers ?? []).map((player) => {
+                const audioOn = audioOnForPlayer(player.id);
+                const isHostRow = player.id === hostPlayerId;
+                return (
+                  <View key={player.id} style={styles.audioRow}>
+                    <View style={styles.audioRowLeft}>
+                      <PlayerAvatar player={player} size={32} />
+                      <View style={styles.audioRowNameStack}>
+                        <Text style={styles.audioRowName} numberOfLines={1}>
+                          {player.name}
+                        </Text>
+                        {isHostRow && (
+                          <Text style={styles.audioRowHostTag}>Host</Text>
+                        )}
+                      </View>
+                    </View>
+                    <Switch
+                      value={audioOn}
+                      onValueChange={(v) => onPlayerAudioChange?.(player.id, v)}
+                      trackColor={{ false: Colors.borderStrong, true: Colors.success }}
+                      thumbColor="#FFFFFF"
+                      ios_backgroundColor={Colors.borderStrong}
+                    />
+                  </View>
+                );
+              })}
+            </ScrollView>
+            <TouchableOpacity
+              style={styles.audioDoneBtn}
+              onPress={() => setAudioModalOpen(false)}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.audioDoneBtnText}>Done</Text>
+            </TouchableOpacity>
+          </Pressable>
+        </Pressable>
+      </Modal>
 
       {/* Dropdown-modal för Answer response time-val. Tap utanför listan
           (semi-transparent backdrop) stänger; varje option-rad anropar
@@ -1442,6 +1560,81 @@ const styles = StyleSheet.create({
     fontSize: FontSize.lg,
     fontWeight: FontWeight.bold,
     color: Colors.primary,
+  },
+
+  // ── D-iv: Audio per player-modal ─────────────────────────────────────
+  // Bredare panel än response-time-dropdown:n eftersom varje rad har
+  // avatar + namn + Switch (mer horisontellt content). Delar dropdown-
+  // Backdrop + dropdownTitle med response-time-modalen för enhetlig
+  // visuell vokabulär.
+  audioPanel: {
+    width: 320,
+    maxWidth: '90%',
+    maxHeight: '70%',
+    backgroundColor: Colors.cardElevated,
+    borderRadius: Radius.lg,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.sm,
+  },
+  audioHint: {
+    fontSize: FontSize.xs,
+    color: Colors.textSecondary,
+    paddingHorizontal: Spacing.sm,
+    paddingBottom: Spacing.sm,
+    lineHeight: 16,
+  },
+  audioList: {
+    flexGrow: 0,
+  },
+  audioRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: Spacing.xs,
+    borderTopWidth: 1,
+    borderTopColor: Colors.border,
+  },
+  audioRowLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    flex: 1,
+  },
+  audioRowNameStack: {
+    flexDirection: 'column',
+    flex: 1,
+    gap: 1,
+  },
+  audioRowName: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.semibold,
+    color: Colors.textPrimary,
+  },
+  audioRowHostTag: {
+    fontSize: FontSize.xs,
+    color: Colors.primary,
+    fontWeight: FontWeight.semibold,
+    letterSpacing: 0.3,
+    textTransform: 'uppercase',
+  },
+  audioDoneBtn: {
+    marginTop: Spacing.sm,
+    alignSelf: 'center',
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.xs + 2,
+    borderRadius: Radius.sm,
+    backgroundColor: Colors.primaryMuted,
+    borderWidth: 1,
+    borderColor: Colors.primary,
+  },
+  audioDoneBtnText: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.semibold,
+    color: Colors.primary,
+    letterSpacing: 0.3,
   },
 
   // ── Turordningstabell ────────────────────────────────────────────────

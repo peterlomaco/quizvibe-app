@@ -11,7 +11,7 @@ import { YouTubeMediaPlayer } from './YouTubeMediaPlayer';
 export type { MediaPlayerProps } from './types';
 
 export function MediaPlayer(props: MediaPlayerProps) {
-  const { source, isPlaying, showVideo } = props;
+  const { source, isPlaying, showVideo, isMuted = false } = props;
 
   switch (source.kind) {
     case 'youtube':
@@ -20,11 +20,16 @@ export function MediaPlayer(props: MediaPlayerProps) {
           clip={source.clip}
           isPlaying={isPlaying}
           showVideo={showVideo}
+          isMuted={isMuted}
         />
       );
     case 'spotify':
       return (
-        <SpotifyMediaPlayer track={source.track} isPlaying={isPlaying} />
+        <SpotifyMediaPlayer
+          track={source.track}
+          isPlaying={isPlaying}
+          isMuted={isMuted}
+        />
       );
     case 'none':
       return <NoSourcePlayer reason={source.reason} />;

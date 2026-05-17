@@ -24,6 +24,14 @@ export interface MediaPlayerProps {
    * ledtrådar), `true` vid reveal.
    */
   showVideo: boolean;
+  /**
+   * D-iv: tysta ljudet på denna enhet utan att pausa uppspelningen. Drivs av
+   * host:s per-spelare audio-overrides i Individual Devices — host väljer
+   * vilka enheter som hörs (default host on, alla andra off). Pass-the-Phone
+   * passar alltid `false` (single device = alltid ljud på).
+   * Default `false` om utelämnad (= ljud på, bakåtkompatibelt).
+   */
+  isMuted?: boolean;
   /** Fyrar när media-källan har laddats och är redo att spela. */
   onReady?: () => void;
   /** Fyrar när uppspelningen nått clip-slutet (endSec) eller media slutat. */
