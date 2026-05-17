@@ -144,6 +144,13 @@ export async function isActiveRoom(code: string): Promise<boolean> {
  * polling för att detektera host-deletion utan att felaktigt trigga
  * "lobby deleted"-popupen när host startar spelet (då finns raden kvar
  * men game_started=true). 24h-expiry filtreras fortfarande.
+ *
+ * **Network-error semantics**: returnerar `true` vid Supabase-fel
+ * (nätverks-glitch, RLS-denial, etc.) eftersom call-site:n (non-host:s
+ * 2s-deletion-polling) triggar "lobby deleted"-Alert vid `false`.
+ * Network-error ≠ deletion — nästa poll med uppkoppling tillbaka ger
+ * den riktiga statusen. Utan denna fail-open-semantik kickades
+ * non-hosts felaktigt när deras egen connection blev unstable.
  */
 export async function roomExists(code: string): Promise<boolean> {
   if (!code) return false;
@@ -157,7 +164,10 @@ export async function roomExists(code: string): Promise<boolean> {
     .maybeSingle();
   if (error) {
     console.warn('[activeRooms] roomExists query failed:', error.message);
-    return false;
+    // Fail-open: behåll antagandet att rummet finns. Polling-loopen
+    // försöker igen om 2s — om host faktiskt deletat rummet detekteras
+    // det så fort uppkopplingen är tillbaka.
+    return true;
   }
   return !!data;
 }

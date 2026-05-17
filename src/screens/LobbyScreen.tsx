@@ -25,6 +25,7 @@ import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { CodeKeyboard } from '../components/CodeKeyboard';
 import { EraMarkerMinus, EraMarkerPlus } from '../components/EraSliderMarker';
+import { useLobbyPeerHealth } from '../lib/realtime/lobbyHealthChannel';
 import { Player, PlayerRow } from '../components/PlayerRow';
 import { QuizVibeFriendsLogo } from '../components/QuizVibeFriendsLogo';
 import { QuizVibeLogo } from '../components/QuizVibeLogo';
@@ -1346,6 +1347,19 @@ export default function LobbyScreen() {
 
   // Game mode toggle (Pass-the-Phone vs Multiplayer Individual Devices)
   const [gameMode, setGameMode] = useState<GameMode>('pass-the-phone');
+
+  // D-vii: per-peer connection-health via `lobby_health:<roomCode>`-
+  // channel. Heartbeats var 5s, 3-tier-tier computed lokalt (ok < 7s,
+  // slow 7-12s, unstable > 12s). Bara Individual Devices — Pass-the-
+  // Phone delar device. Hook:en filtrerar bort self från returnerade
+  // map:en; LobbyScreen passar `'self'` literal till PlayerRow för
+  // egna kortet så grön dot ändå syns. Deklareras tidigt så
+  // handleSetApproved + auto-un-approve-effect kan läsa state utan TDZ.
+  const lobbyPeerHealth = useLobbyPeerHealth(
+    roomCode,
+    ownPlayerIdRef.current ?? '',
+    gameMode === 'individual-devices',
+  );
   // "Use single player mode as default" — när checkad dämpas Pass-the-Phone-
   // rutan i toggle:n. Speglar Profile:s motsvarande checkbox; lokal lobby-
   // state utan profil-pre-load (konsekvent med gameMode som också är lokal).
@@ -1612,8 +1626,37 @@ export default function LobbyScreen() {
     ]);
   };
   const handleSetApproved = (id: string, approved: boolean) => {
+    // D-vii block: host kan inte approva en spelare med röd connection-
+    // status. Approve toggle:n är redan disabled visuellt i UI:t men vi
+    // validerar även här som belt-and-suspenders (race conditions där
+    // status flippade röd just som host tappade).
+    if (approved && lobbyPeerHealth[id] === 'unstable') {
+      Alert.alert(
+        'Connection unstable',
+        'This player has an unstable connection. Wait for it to stabilize before approving them.',
+      );
+      return;
+    }
     setPlayers((prev) => prev.map((p) => p.id === id ? { ...p, approved } : p));
   };
+
+  // D-vii auto-un-approve: när en non-host:s peerHealth transitionerar
+  // till 'unstable' OCH de är approved, kasta dem tillbaka till waiting
+  // automatiskt. Host måste manuellt re-approva när uppkopplingen är
+  // stable igen. Effekt:en gateas på hostMode + IndDev — non-hosts har
+  // inte approval-power, Pass-the-Phone delar device → ingen peer-health.
+  useEffect(() => {
+    if (!hostMode || gameMode !== 'individual-devices') return;
+    Object.entries(lobbyPeerHealth).forEach(([playerId, health]) => {
+      if (health !== 'unstable') return;
+      const player = players.find((p) => p.id === playerId);
+      if (!player || player.isHost || !player.approved) return;
+      // Idempotent: setPlayers no-op:ar när raden redan är unapproved.
+      setPlayers((prev) =>
+        prev.map((p) => (p.id === playerId ? { ...p, approved: false } : p)),
+      );
+    });
+  }, [lobbyPeerHealth, hostMode, gameMode, players]);
 
   // Papperskorg-flow: bara host kan radera, bara på waiting-spelare.
   // Visar confirm-popup; vid bekräftelse filtreras spelaren bort ur
@@ -2044,6 +2087,7 @@ export default function LobbyScreen() {
   // istället för 2s polling-fallback.
   const [realtimeTick, setRealtimeTick] = useState(0);
 
+
   // Non-host: spegla host-settings (Game Mode, Region, Game Era, Number
   // of Rounds, Answer response time, Packages, Game Connections-toggles).
   // Initial-fetch + 2s polling som fallback om Realtime droppar; realtime-
@@ -2317,6 +2361,11 @@ export default function LobbyScreen() {
       }
       const stored = await getLobbyPlayers(roomCode);
       if (cancelled) return;
+      // D-vii bugfix: `null` = Supabase-query failade (network-glitch).
+      // Skippa hela sync:en så local players-state inte clearas — host
+      // skulle annars försvinna från non-host:s vy vid varje connection-
+      // hicka. Polling-loopen försöker igen om 2s med fresh connection.
+      if (stored === null) return;
       // DB-eject-detection: om self-rad TIDIGARE syntes i stored men nu är
       // borta → host har raderat oss via lobby_players DELETE. Triggar
       // samma popup som in-memory-baserad markEjected. Guard:as på
@@ -2518,6 +2567,23 @@ export default function LobbyScreen() {
     if (turnOrder.length === 0) {
       Alert.alert('Cannot start', 'No approved players to start the game.');
       return;
+    }
+
+    // D-vii: blockera start om någon approved non-host har röd peer-
+    // health. Pass-the-Phone delar device → ingen peer-health-koncept
+    // där, gateas bort. Host:s egen status är aldrig 'unstable' i
+    // map:en (self exkluderas från useLobbyPeerHealth-returvärdet).
+    if (gameMode === 'individual-devices') {
+      const unstablePlayer = approvedPlayers.find(
+        (p) => !p.isHost && !p.hasLeft && lobbyPeerHealth[p.id] === 'unstable',
+      );
+      if (unstablePlayer) {
+        Alert.alert(
+          'Connection unstable',
+          `${unstablePlayer.name} has an unstable connection. Wait for it to stabilize, or remove them from the lobby before starting.`,
+        );
+        return;
+      }
     }
 
     // Konsumera 1 Host Game-credit per påbörjat spel — Free först, Extras
@@ -3573,6 +3639,13 @@ export default function LobbyScreen() {
                 onEditPlayer={hostMode && !player.hasLeft ? () => openPlayerEdit(player.id) : undefined}
                 onGuestHcpTap={hostMode && !player.hasLeft && player.type === 'guest' ? () => Alert.alert('Guest HCP', 'Guest HCP cannot be changed') : undefined}
                 hcpAlignRight={!hostMode}
+                peerHealth={
+                  gameMode === 'individual-devices'
+                    ? player.id === ownPlayerIdRef.current
+                      ? 'self'
+                      : lobbyPeerHealth[player.id]
+                    : undefined
+                }
               />
             ))}
 
@@ -3622,6 +3695,13 @@ export default function LobbyScreen() {
                     onEditPlayer={hostMode && !player.hasLeft ? () => openPlayerEdit(player.id) : undefined}
                     onGuestHcpTap={hostMode && !player.hasLeft && player.type === 'guest' ? () => Alert.alert('Guest HCP', 'Guest HCP cannot be changed') : undefined}
                     hcpAlignRight={!hostMode}
+                    peerHealth={
+                      gameMode === 'individual-devices'
+                        ? player.id === ownPlayerIdRef.current
+                          ? 'self'
+                          : lobbyPeerHealth[player.id]
+                        : undefined
+                    }
                   />
                 ))}
               </View>

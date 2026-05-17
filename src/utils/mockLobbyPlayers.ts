@@ -207,11 +207,23 @@ export async function markOwnPlayerLeft(code: string, playerId: string): Promise
 }
 
 /**
- * Returnerar alla spelare i rummet, ORDER BY turn_order. undefined om
- * inget hittas (matchar tidigare mock-semantik så LobbyScreen:s polling
- * tolkar "ingen host har skrivit än" som "behåll lokal state").
+ * Returnerar alla spelare i rummet, ORDER BY turn_order.
+ *
+ * Tristate return semantics (D-vii bugfix):
+ *   • `null`      → Supabase query failed (network/RLS-error).
+ *                   Caller bör behålla local state istället för att
+ *                   tolka tomheten som "host hasn't written yet".
+ *   • `undefined` → Query succeeded men ingen rad finns (matchar tidigare
+ *                   mock-semantik så LobbyScreen:s polling tolkar
+ *                   "ingen host har skrivit än" som "behåll lokal state").
+ *   • `LobbyPlayer[]` → Has rows (kan vara []) — caller använder direkt.
+ *
+ * Före fix:n returnerade båda fallen `undefined`, vilket gjorde att
+ * non-host:s lobby-sync clearade lokala players-listan när non-host:s
+ * egen connection blev unstable (Supabase-query failade tyst). Resultat:
+ * host försvann från non-host:s view tills connection kom tillbaka.
  */
-export async function getLobbyPlayers(code: string): Promise<LobbyPlayer[] | undefined> {
+export async function getLobbyPlayers(code: string): Promise<LobbyPlayer[] | undefined | null> {
   if (!code) return undefined;
   const normalized = normalizeCode(code);
   const { data, error } = await supabase
@@ -221,7 +233,7 @@ export async function getLobbyPlayers(code: string): Promise<LobbyPlayer[] | und
     .order('turn_order', { ascending: true });
   if (error) {
     console.warn('[lobbyPlayers] getLobbyPlayers query failed:', error.message);
-    return undefined;
+    return null;
   }
   return data && data.length > 0 ? (data as LobbyPlayerRow[]).map(rowToPlayer) : undefined;
 }

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
+import type { PeerHealth } from '../lib/realtime/lobbyHealthChannel';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
 import { calculateInitialHCP, getHCPColor, AssistanceLevel } from '../utils/hcp';
 import { ApproveToggle } from './ApproveToggle';
@@ -66,6 +67,12 @@ interface PlayerRowProps {
   // bottom-right-element. Default false → host-layouten behålls (badge
   // centrerad mellan meta-text vänster och approve/trash höger).
   hcpAlignRight?: boolean;
+  // D-vii: connection-health-tier från lobby-peer-tracker. Renderas som
+  // liten färgad dot (green/yellow/red) i bottom-right på avataren.
+  // Endast Individual Devices-läget — Pass-the-Phone delar device.
+  // Utelämnad → ingen dot renderas (= Pass-the-Phone eller hasLeft).
+  // 'self' = visa hardcoded grön dot (vi rendererar = vi är alive).
+  peerHealth?: PeerHealth | 'self';
 }
 
 export function PlayerRow({
@@ -90,6 +97,7 @@ export function PlayerRow({
   onEditPlayer,
   onGuestHcpTap,
   hcpAlignRight,
+  peerHealth,
 }: PlayerRowProps) {
   const calculatedHcp = hcpComplete && age && assistance
     ? calculateInitialHCP(age, assistance)
@@ -148,7 +156,7 @@ export function PlayerRow({
             )}
           </View>
         )}
-        <View style={hasLeft && styles.avatarLeft}>
+        <View style={[styles.avatarWrap, hasLeft && styles.avatarLeft]}>
           <Avatar
             uri={player.avatarUri}
             emoji={player.emoji}
@@ -156,6 +164,20 @@ export function PlayerRow({
             size={40}
             useBrandFallback={!isGuest}
           />
+          {/* D-vii: connection-health-dot. Endast IndDev-läget passar
+              peerHealth-prop:n; hasLeft-spelare slipper indikator
+              eftersom de redan signaleras som "borta" via grå styling. */}
+          {peerHealth !== undefined && !hasLeft && (
+            <View
+              style={[
+                styles.healthDot,
+                (peerHealth === 'ok' || peerHealth === 'self') &&
+                  styles.healthDotOk,
+                peerHealth === 'slow' && styles.healthDotSlow,
+                peerHealth === 'unstable' && styles.healthDotUnstable,
+              ]}
+            />
+          )}
         </View>
 
         <View style={styles.info}>
@@ -195,6 +217,11 @@ export function PlayerRow({
             <ApproveToggle
               value={approved ? 'yes' : 'no'}
               onChange={(next) => onApproveChange?.(next === 'yes')}
+              // D-vii: blockera approve när spelaren har röd connection-
+              // status. Host måste vänta på stabilare uppkoppling — auto-
+              // un-approve-effekten i LobbyScreen håller dem i waiting
+              // tills health återgår till ok/slow.
+              disabled={peerHealth === 'unstable'}
             />
           </View>
         )}
@@ -408,10 +435,39 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.cardElevated,
     borderColor: Colors.borderStrong,
   },
+  // Avatar-wrapper bär `position: 'relative'` så D-vii health-dot kan
+  // absolute-positioneras i bottom-right utan att påverka övrig
+  // avatar-layout.
+  avatarWrap: {
+    position: 'relative',
+  },
   // Avatar-wrapper när spelaren har left: dimmas via opacity så själva
   // emoji/foto kvarstår men signalerar nedprioritet.
   avatarLeft: {
     opacity: 0.5,
+  },
+  // D-vii: 12×12 dot i avataren:s bottom-right-hörn. White border ger
+  // separation mot avatar-bg så dot:en syns även vid mörk/färgglad
+  // avatar. Färgen sätts via en av tre additivt-tillämpade styles
+  // (healthDotOk/Slow/Unstable) baserat på peerHealth-prop:n.
+  healthDot: {
+    position: 'absolute',
+    bottom: -2,
+    right: -2,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    borderWidth: 1.5,
+    borderColor: Colors.card,
+  },
+  healthDotOk: {
+    backgroundColor: Colors.success,
+  },
+  healthDotSlow: {
+    backgroundColor: Colors.warning,
+  },
+  healthDotUnstable: {
+    backgroundColor: Colors.error,
   },
   // HOST-tagg som sitter på kortets övre kantlinje
   hostBorderTag: {
