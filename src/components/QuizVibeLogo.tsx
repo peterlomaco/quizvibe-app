@@ -1,5 +1,5 @@
 import React from 'react';
-import Svg, { Circle, Path, Rect } from 'react-native-svg';
+import Svg, { Circle, G, Path, Rect } from 'react-native-svg';
 import { Colors } from '../theme';
 
 interface Props {
@@ -50,31 +50,51 @@ export function QuizVibeLogo({ size = 80 }: Props) {
         strokeWidth="3"
         strokeLinecap="round"
       />
-      {/* Wifi-symbol centrerad på Q-ringens nya center (37, 37) —
-          pricken delar mittpunkt med Q-cirkeln, och bågarna är
-          koncentriska. 90°-bågar med radier 3/5/7. */}
-      <Path
-        d="M 32.05 32.05 A 7 7 0 0 1 41.95 32.05"
-        fill="none"
-        stroke={Colors.primary}
-        strokeWidth="1.8"
-        strokeLinecap="round"
-      />
-      <Path
-        d="M 33.46 33.46 A 5 5 0 0 1 40.54 33.46"
-        fill="none"
-        stroke={Colors.primary}
-        strokeWidth="1.8"
-        strokeLinecap="round"
-      />
-      <Path
-        d="M 34.88 34.88 A 3 3 0 0 1 39.12 34.88"
-        fill="none"
-        stroke={Colors.primary}
-        strokeWidth="1.8"
-        strokeLinecap="round"
-      />
-      <Circle cx="37" cy="37" r="1.5" fill={Colors.primary} />
+      {/* Spotify-style ljudvågs-bågar — 3 staplade bågar med upward-bulge
+          (frown-orientering, ⌒). Bredd avtagande topp-till-botten så de
+          läser som "ljudvågor som emanerar". 2 av 3 är inne i Q-ringen
+          (radius 13 från (37, 37)), den översta (största) extends utanför
+          ringens topp-kant.
+
+          Wrappade i en <G> med rotate(25 37 37) så bågarna lutar (vänster
+          endpoint högre, höger lägre) precis som Spotify-loggans bågar.
+          25° är empiriskt tunat — tydlig Spotify-style snedställning.
+          Rotationen bevarar avstånd från Q-center så inside/outside-
+          fördelningen är oförändrad. */}
+      <G transform="rotate(25 37 37)">
+        {/* Topp-båge (UTANFÖR Q-ringen). Endpoints (29, 23) & (45, 23),
+            bredd 16 (var 22 → kortare per användarens önskan), R 12,
+            midpoint (37, ~20.9). Endpoints dist ≈16 från Q-center, mid
+            ≈17 — utanför ring-radius 13 med synlig clearance till
+            Q-ringens kantlinje. */}
+        <Path
+          d="M 29 23 A 12 12 0 0 1 45 23"
+          fill="none"
+          stroke={Colors.primary}
+          strokeWidth="1.8"
+          strokeLinecap="round"
+        />
+        {/* Mitten-båge (INNE i Q-ringen). Endpoints (31, 30) & (43, 30),
+            bredd 12, R 9, midpoint (37, ~27.7). Flyttad ner mot Q-centrum
+            (y=30 var 28) per användarens önskan om mer centrerad placering. */}
+        <Path
+          d="M 31 30 A 9 9 0 0 1 43 30"
+          fill="none"
+          stroke={Colors.primary}
+          strokeWidth="1.8"
+          strokeLinecap="round"
+        />
+        {/* Botten-båge (INNE i Q-ringen). Endpoints (33, 34) & (41, 34),
+            bredd 8, R 6, midpoint (37, ~32.5). Flyttad ner mot Q-centrum
+            (y=34 var 32) i tandem med mitten-bågen. */}
+        <Path
+          d="M 33 34 A 6 6 0 0 1 41 34"
+          fill="none"
+          stroke={Colors.primary}
+          strokeWidth="1.8"
+          strokeLinecap="round"
+        />
+      </G>
     </Svg>
   );
 }

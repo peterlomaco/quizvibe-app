@@ -17,6 +17,7 @@ import {
   appendPlayerNameLetter,
   backspacePlayerNameDigits,
   backspacePlayerNameLetters,
+  containsBlockedLetterSubstring,
   generatePlayerName,
   getPlayerNameDigits,
   getPlayerNameLetters,
@@ -33,7 +34,7 @@ import { supabase } from '@/src/utils/supabase';
 import { formatRoomCode, generateRoomCode, isBlockedLetterPair, isLetterCellIndex, ROOM_CODE_DIGITS, ROOM_CODE_LEADING_LETTERS, ROOM_CODE_LENGTH, ROOM_CODE_TRAILING_LETTERS } from '@/src/utils/roomCode';
 import { loadInvites, removeInvite, type WaitingInvite } from '@/src/utils/waitingInvites';
 import { Nunito_400Regular, Nunito_600SemiBold, Nunito_700Bold, useFonts } from '@expo-google-fonts/nunito';
-import { router, useFocusEffect } from 'expo-router';
+import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Alert,
@@ -95,6 +96,10 @@ function validatePlayerName(name: string): 'available' | 'taken' | 'invalid' {
   if (!isPlayerNameFormatValid(trimmed)) return 'invalid';
   if (hasBlockedLetterLead(trimmed)) return 'invalid';
   if (containsProfanity(trimmed)) return 'invalid';
+  // Reserverat: brand-namnet "quizvibe" (case-insensitive) får inte ingå
+  // som substring i letters-sektionen — skyddar mot "QuizVibe", "Myquizvibe",
+  // etc. Synkad med playerName.ts:s auto-gen-blocklist.
+  if (containsBlockedLetterSubstring(trimmed)) return 'invalid';
   if (TAKEN_PLAYER_NAMES.has(trimmed.toLowerCase())) return 'taken';
   return 'available';
 }
@@ -104,10 +109,10 @@ function validatePlayerName(name: string): 'available' | 'taken' | 'invalid' {
 const REG_EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 type RegRegion = 'sweden' | 'nordics' | 'global';
+// V1: bara Sweden — type:n stannar bred för bakåtkompat (profileStorage:s
+// Region-typ är identisk) men Register-formens picker exponerar bara Sweden.
 const REG_REGION_OPTIONS: { id: RegRegion; label: string }[] = [
-  { id: 'sweden',  label: 'Sweden'  },
-  { id: 'nordics', label: 'Nordics' },
-  { id: 'global',  label: 'Global'  },
+  { id: 'sweden', label: 'Sweden' },
 ];
 
 const CURRENT_YEAR = new Date().getFullYear();
@@ -1334,6 +1339,21 @@ export default function HomeScreen() {
     setJoinVisible(true);
   };
 
+  // Auto-open JoinModal när Home entras med `?openJoinRegistered=1` i routen.
+  // Används av Profile-skärmens "Join Game"-knapp i logout-sheet:n så
+  // användaren landar direkt på registered-user join-flödet (hideGuest:true)
+  // utan att se Home flicker. router.setParams clearar paramen efter open
+  // så framtida fokus utan param inte trigggar modalen igen.
+  const localParams = useLocalSearchParams<{ openJoinRegistered?: string }>();
+  useFocusEffect(
+    useCallback(() => {
+      if (localParams.openJoinRegistered === '1') {
+        openJoin('choose', { hideGuest: true });
+        router.setParams({ openJoinRegistered: undefined });
+      }
+    }, [localParams.openJoinRegistered]),
+  );
+
   const [fontsLoaded] = useFonts({
     Nunito_700Bold,
     Nunito_400Regular,
@@ -1884,26 +1904,6 @@ export default function HomeScreen() {
           <Text style={[styles.footerDot, { fontFamily: taglineFont }]}>·</Text>
           <Text style={[styles.footerText, { fontFamily: taglineFont }]}>Help</Text>
         </View>
-
-        {/* DEV-länk till Name Quiz Demo (tas bort när demo inte längre behövs) */}
-        <TouchableOpacity
-          onPress={() => router.push('/name-quiz-demo')}
-          style={{
-            alignSelf: 'center',
-            marginTop: 12,
-            paddingHorizontal: 12,
-            paddingVertical: 6,
-            borderRadius: 8,
-            borderWidth: 1,
-            borderColor: Colors.primaryBorder,
-            backgroundColor: Colors.primaryMuted,
-          }}
-        >
-          <Text style={{ color: Colors.primary, fontSize: 13, fontWeight: '600' }}>
-            🧪 Try Name Quiz Demo
-          </Text>
-        </TouchableOpacity>
-
       </View>
 
       <JoinModal

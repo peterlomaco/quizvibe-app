@@ -17,11 +17,7 @@ export interface MusicPackage {
   free?: boolean;
 }
 
-export const PURCHASED_PACKAGES: MusicPackage[] = [
-  { id: 'pkg-hiphop', name: 'Hip Hop' },
-  { id: 'pkg-rock', name: 'Rock' },
-  { id: 'pkg-film-actors', name: 'Film & Actors' },
-];
+export const PURCHASED_PACKAGES: MusicPackage[] = [];
 
 // ─── Generations-paket ────────────────────────────────────────────────
 // Varje user får automatiskt ETT gratis Customized Host Package kopplat

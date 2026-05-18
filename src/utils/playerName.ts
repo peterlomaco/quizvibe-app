@@ -46,6 +46,21 @@ const BLOCKED_LETTER_LEAD_PAIRS = new Set([
   'NB',
 ]);
 
+// Substrings som inte får finnas (case-insensitive) i letter-sektionen.
+// "quizvibe" reserverar brand-namnet — användare ska inte kunna registrera
+// sig som "QuizVibe", "Quizvibedude", "MyQuizVibe", etc. Endast letters-
+// sektionen kollas (digits filtreras inte). Auto-gen retry:ar om kandidaten
+// råkar innehålla strängen.
+const BLOCKED_LETTER_SUBSTRINGS = ['quizvibe'];
+
+// Returnerar true om letter-sektionen innehåller någon av de reserverade
+// substringen (case-insensitive). Exporteras för validatePlayerName-vägen.
+export function containsBlockedLetterSubstring(value: string): boolean {
+  const letters = getPlayerNameLetters(value).toLowerCase();
+  if (letters.length === 0) return false;
+  return BLOCKED_LETTER_SUBSTRINGS.some((sub) => letters.includes(sub));
+}
+
 function randomDigits(count: number): string {
   let s = '';
   for (let i = 0; i < count; i++) {
@@ -274,7 +289,11 @@ export function generatePlayerName(
     const letters = buildLetters();
     const digits = randomDigits(PLAYER_NAME_MAX_DIGITS);
     const candidate = `${letters}-${digits}`;
-    if (!taken.has(candidate.toLowerCase()) && !containsProfanity(candidate)) {
+    if (
+      !taken.has(candidate.toLowerCase()) &&
+      !containsProfanity(candidate) &&
+      !containsBlockedLetterSubstring(candidate)
+    ) {
       return candidate;
     }
   }

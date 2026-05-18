@@ -4,10 +4,21 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
  * Lokal lagring av spelresultat.
  * - "latestResult" innehåller ALLTID det senast avslutade spelet
  *   (används av Results-skärmen direkt efter quiz).
- * - I Fas 5 utökar vi med en full history-array för Player History-sektionen.
+ * - "history" är en append-only-lista av minimala HistoryEntry-poster
+ *   (datum/totalpoäng/snitt-poäng-per-fråga/snitt-svarstid) som driver
+ *   Player history-sektionen på Profile.
+ *
+ * 2026-05-18: Player history förenklades till bara dessa fyra fält
+ *   (tidigare visades HCP-progression, ranking, "highest scores" etc.
+ *   som ingen riktig data fanns för). Migration-flaggan `HISTORY_RESET_KEY`
+ *   wipe:ar historiken EN gång vid första load efter förenklingen så
+ *   ingen ärvd stale-data ligger kvar från ev. tidigare history-pipelines
+ *   som experimenterade med fler fält.
  */
 
 const LATEST_KEY = '@quizvibe/latestResult/v1';
+const HISTORY_KEY = '@quizvibe/gameHistory/v1';
+const HISTORY_RESET_KEY = '@quizvibe/migration/historyReset/v1';
 
 export type AssistanceLevel = 'minimal' | 'standard' | 'full';
 
@@ -73,5 +84,72 @@ export async function clearLatestResult(): Promise<void> {
     await AsyncStorage.removeItem(LATEST_KEY);
   } catch (err) {
     console.warn('[gameResults] Failed to clear latest result:', err);
+  }
+}
+
+// ─── Game history (Player history-sektionen) ─────────────────────────────────
+
+/**
+ * En minimal post per avslutat spel. Bara de fält som visas i Player
+ * history-sektionen idag — datum, totalpoäng, snittpoäng/fråga, snitt-svarstid.
+ * Avsiktligt liten så framtida tillägg blir explicita (lägg till ett fält
+ * när Player history visar det, inte tvärtom).
+ */
+export interface HistoryEntry {
+  id: string;
+  date: string;             // ISO-datum-sträng (UTC)
+  totalPoints: number;
+  avgPointsPerQuestion: number;   // totalPoints / antal frågor
+  avgResponseSeconds: number;     // mean av timeUsed över alla rundor
+}
+
+/**
+ * One-shot migration: vid första load efter förenklingen (2026-05-18) wipe:ar
+ * vi hela history-arrayen. Skyddar mot ärvd stale-data om någon tidigare
+ * pipeline experimenterade med fler fält. Idempotent — `HISTORY_RESET_KEY`
+ * sätts till '1' efter första körningen så reset:n bara körs en gång per
+ * device. När backend-history kommer in kan denna helper tas bort.
+ */
+async function ensureHistoryReset(): Promise<void> {
+  try {
+    const flag = await AsyncStorage.getItem(HISTORY_RESET_KEY);
+    if (flag === '1') return;
+    await AsyncStorage.removeItem(HISTORY_KEY);
+    await AsyncStorage.setItem(HISTORY_RESET_KEY, '1');
+  } catch (err) {
+    console.warn('[gameResults] history reset failed:', err);
+  }
+}
+
+export async function loadGameHistory(): Promise<HistoryEntry[]> {
+  await ensureHistoryReset();
+  try {
+    const json = await AsyncStorage.getItem(HISTORY_KEY);
+    if (!json) return [];
+    const parsed = JSON.parse(json);
+    if (!Array.isArray(parsed)) return [];
+    return parsed as HistoryEntry[];
+  } catch (err) {
+    console.warn('[gameResults] Failed to load history:', err);
+    return [];
+  }
+}
+
+export async function appendGameHistoryEntry(entry: HistoryEntry): Promise<void> {
+  await ensureHistoryReset();
+  try {
+    const existing = await loadGameHistory();
+    const next = [...existing, entry];
+    await AsyncStorage.setItem(HISTORY_KEY, JSON.stringify(next));
+  } catch (err) {
+    console.warn('[gameResults] Failed to append history entry:', err);
+  }
+}
+
+export async function clearGameHistory(): Promise<void> {
+  try {
+    await AsyncStorage.removeItem(HISTORY_KEY);
+  } catch (err) {
+    console.warn('[gameResults] Failed to clear history:', err);
   }
 }

@@ -24,7 +24,7 @@ import { Colors, FontSize, FontWeight, Radius, Spacing } from '@/src/theme';
 import { track } from '@/src/utils/analytics';
 import { getAvatarEmojiById } from '@/src/utils/avatars';
 import { clearEjected } from '@/src/utils/ejectedPlayers';
-import { saveLatestResult, type GameResult, type RoundResult } from '@/src/utils/gameResults';
+import { appendGameHistoryEntry, saveLatestResult, type GameResult, type HistoryEntry, type RoundResult } from '@/src/utils/gameResults';
 import { clearLeftPlayers } from '@/src/utils/leftPlayers';
 import { pickMediaSource, type YoutubeClip } from '@/src/utils/mediaSource';
 import { deactivateRoom, registerActiveRoom } from '@/src/utils/mockActiveRooms';
@@ -1666,6 +1666,27 @@ export default function QuizScreen() {
       await saveLatestResult(result);
     } catch {
       // Om sparning misslyckas – leaderboarden visas ändå
+    }
+
+    // Append:a minimal HistoryEntry till Player history-listan. Räkna
+    // snitt-svarstid från rounds[]:s timeUsed (i sekunder, 2 decimaler).
+    // Tom rounds-array (shouldn't happen men defensiv) → skippa append:n
+    // så vi inte spammar 0/NaN-entries.
+    if (rounds.length > 0) {
+      const totalTime = rounds.reduce((sum, r) => sum + (r.timeUsed ?? 0), 0);
+      const entry: HistoryEntry = {
+        id: result.id,
+        date: result.date,
+        totalPoints,
+        avgPointsPerQuestion: totalPoints / rounds.length,
+        avgResponseSeconds: totalTime / rounds.length,
+      };
+      try {
+        await appendGameHistoryEntry(entry);
+      } catch {
+        // Profile history kan visa stale-state utan denna append — inget
+        // som ska blockera leaderboard-rendering.
+      }
     }
   };
 

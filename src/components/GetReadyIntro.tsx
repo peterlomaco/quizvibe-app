@@ -794,7 +794,9 @@ export function GetReadyIntro({
                       onValueChange={(v) => onPlayerAudioChange?.(player.id, v)}
                       trackColor={{ false: Colors.borderStrong, true: Colors.success }}
                       thumbColor="#FFFFFF"
-                      ios_backgroundColor={Colors.borderStrong}
+                      // Synca ios_backgroundColor med aktiv track-färg så
+                      // ingen grå flärd läcker igenom när toggle är ON.
+                      ios_backgroundColor={audioOn ? Colors.success : Colors.borderStrong}
                     />
                   </View>
                 );

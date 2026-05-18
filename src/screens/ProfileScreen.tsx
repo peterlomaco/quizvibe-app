@@ -58,12 +58,22 @@ import {
     type ProfileData,
     type Region,
 } from '../utils/profileStorage';
+import { hasPremiumSubscription } from '../utils/subscriptionStorage';
+// Create Game-flödet (samma som Home:s handleCreateGame). När fler skärmar
+// får denna entry-punkt: lyft till en delad utility i src/utils/.
+import { clearEjected } from '../utils/ejectedPlayers';
+import { clearLeftPlayers } from '../utils/leftPlayers';
+import { registerActiveRoom } from '../utils/mockActiveRooms';
+import { clearLobbyPlayers } from '../utils/mockLobbyPlayers';
+import { clearLobbySettings } from '../utils/mockLobbySettings';
+import { clearGameStarted } from '../utils/mockStartedGames';
+import { generateRoomCode } from '../utils/roomCode';
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
-type AvatarCategory = 'All' | 'Retro' | 'Music' | 'Tech' | 'Fun';
+type AvatarCategory = 'All' | 'Basic' | 'Retro' | 'Music' | 'Tech' | 'Fun';
 
-const CATEGORIES: AvatarCategory[] = ['All', 'Retro', 'Music', 'Tech', 'Fun'];
+const CATEGORIES: AvatarCategory[] = ['All', 'Basic', 'Retro', 'Music', 'Tech', 'Fun'];
 
 // ─── Birth year options (descending, newest first) ────────────────────────────
 const CURRENT_YEAR = new Date().getFullYear();
@@ -91,10 +101,16 @@ const formatBirthYear = (y: number): string =>
       ? `${MAX_BIRTH_YEAR} or later`
       : String(y);
 
+// Default Image-raden använder QuizVibe Q-brand som visuell ikon (rendereras
+// i SourceRow nedan via icon='Q'-sentineln). Tidigare emoji '😶' (anonym
+// silhouette) flyttades 2026-05-18 till Choose Avatar-urvalet (kategorin
+// 'Basic') så användaren kan plocka silhouetten explicit istället för att
+// gå via Default Image-raden. Default Image-raden fortsätter att rendera
+// QuizVibe Q-marken som faktisk avatar (useBrandFallback i Avatar.tsx).
 const SOURCE_OPTIONS: { id: AvatarSource; icon: string; label: string; subtitle: string }[] = [
   { id: 'upload',  icon: '📤', label: 'Upload Photo',   subtitle: 'Use a photo from your library' },
   { id: 'choose',  icon: '✨', label: 'Choose Avatar',  subtitle: 'Pick from our collection'      },
-  { id: 'default', icon: '😶', label: 'Default Image',  subtitle: 'Anonymous silhouette'          },
+  { id: 'default', icon: 'Q',  label: 'Default Image',  subtitle: 'QuizVibe brand mark'           },
 ];
 
 // ─── Competition defaults ─────────────────────────────────────────────────────
@@ -106,10 +122,12 @@ const ASSISTANCE_OPTIONS: { id: AssistanceLevel; label: string }[] = [
   { id: 'minimal',  label: 'Minimal'  },
 ];
 
+// V1-launch: enbart Sweden som val. Type:n i profileStorage stannar bred
+// ('sweden' | 'nordics' | 'global') så befintliga sparade profiler kan
+// läsas in utan migrationspipeline, men UI:t exponerar bara Sweden och
+// load-effekten coerce:ar non-sweden till 'sweden' så det blir konsekvent.
 const REGION_OPTIONS: { id: Region; label: string }[] = [
-  { id: 'sweden',  label: 'Sweden'  },
-  { id: 'nordics', label: 'Nordics' },
-  { id: 'global',  label: 'Global'  },
+  { id: 'sweden', label: 'Sweden' },
 ];
 
 // Hur länge spelarna har på sig att svara på en fråga (skiljer sig från
@@ -267,9 +285,13 @@ export default function ProfileScreen() {
     setRoundsCount((prev) => Math.max(ROUNDS_MIN, Math.min(roundsMax, prev)));
   }, [roundsMax]);
   // Premium-status — styr om PREMIUM-badge på Max 12-toggle visas i guld
-  // (köpt) eller grått (inte köpt än). ProfileData saknar subscription-fält
-  // tills RevenueCat-integrationen kommer in, så håll false tills vidare.
-  const hasPremium = false;
+  // (köpt) eller grått (inte köpt än), om Individual Devices är unlocked,
+  // om Rounds-rulern visar gold-bracket + blå-tickade siffror, och om
+  // Host Game Credits-pillen får gold-bordred + "Unlimited"-badge. Synced
+  // med Lobby:s motsvarande hasPremium-state via samma subscriptionStorage-
+  // helper. Load:as i useFocusEffect nedan så Profile speglar köp som
+  // gjorts i Store utan delay.
+  const [hasPremium, setHasPremium] = useState(false);
 
   // Försök att välja Individual Devices utan Premium → Store-omdirigering.
   // Speglar Lobby:s handleSelectMode-pattern.
@@ -398,7 +420,11 @@ export default function ProfileScreen() {
           ...data,
           birthYear: data.birthYear ?? randomAdultBirthYear(),
           assistance: data.assistance ?? 'standard',
-          region: data.region ?? 'global',
+          // V1: bara Sweden. Coerce sparad 'nordics'/'global' (från innan
+          // v1-launch-scopet) till 'sweden' så UI:t och persisterad state
+          // alltid stämmer. wasIncomplete-checken nedan upptäcker att fältet
+          // ändrades och persisterar via defensive write.
+          region: 'sweden',
           gameEraFrom: data.gameEraFrom ?? 1981,
           gameEraTo: data.gameEraTo ?? ERA_MAX,
           maxPlayers: data.maxPlayers ?? 4,
@@ -432,7 +458,8 @@ export default function ProfileScreen() {
         const wasIncomplete = (
           data.birthYear == null ||
           data.assistance == null ||
-          data.region == null ||
+          // null ELLER non-sweden → coerce-write krävs (v1 Sweden-only)
+          data.region !== 'sweden' ||
           data.gameEraFrom == null ||
           data.gameEraTo == null ||
           data.maxPlayers == null ||
@@ -478,6 +505,12 @@ export default function ProfileScreen() {
       });
       loadFriends().then((list) => {
         if (active) setFriends(list);
+      });
+      // Subscription-status — speglar Lobby:s hasPremium-source. Load:as på
+      // focus så Store-köp (subscription / unsubscribe) reflektar direkt
+      // i Profile utan delay.
+      hasPremiumSubscription().then((value) => {
+        if (active) setHasPremium(value);
       });
       return () => { active = false; };
     }, []),
@@ -563,6 +596,51 @@ export default function ProfileScreen() {
     router.replace('/');
   };
 
+  // Create Game-genväg från logout-sheet:n. Identisk logik som Home-
+  // skärmens handleCreateGame — credit-gate först (Out of Host Game
+  // Credits-popup om Free + Extras = 0 och user inte har Premium), sedan
+  // generera kod, registrera rum, rensa stale mock-stores, tracka event
+  // och navigera till /lobby. Inlinad här istället för delad utility
+  // tills en tredje call-site dyker upp (då lyfter vi till en delad
+  // helper i src/utils/).
+  const handleCreateGame = async () => {
+    const [freshProfile, freshHasPremium] = await Promise.all([
+      loadProfile(),
+      hasPremiumSubscription(),
+    ]);
+    if (!freshHasPremium) {
+      const free = freshProfile?.freeGameCredits ?? 0;
+      const extras = freshProfile?.gameCredits ?? 0;
+      if (free === 0 && extras === 0) {
+        Alert.alert(
+          'Out of Host Game Credits',
+          'You have no credits left for today. Buy extra credits in Store, wait for the daily refresh at midnight CET, or upgrade to a QuizVibe membership for unlimited host games.',
+          [
+            { text: 'Cancel', style: 'cancel' },
+            { text: 'Go to Store', onPress: () => router.push('/store?focus=credits&from=/profile') },
+          ],
+        );
+        return;
+      }
+    }
+    const code = generateRoomCode();
+    await registerActiveRoom(code, {
+      maxPlayers: freshProfile?.maxPlayers ?? 4,
+      hostIsPremium: freshHasPremium,
+      currentPlayerCount: 1,
+      hostPlayerName: freshProfile?.playerName ?? '',
+      gameStarted: false,
+    });
+    clearLeftPlayers(code);
+    clearLobbyPlayers(code);
+    clearLobbySettings(code);
+    clearEjected(code);
+    clearGameStarted(code);
+    track('room_code_created');
+    setLogoutModalVisible(false);
+    router.push({ pathname: '/lobby', params: { code, isHost: 'true' } });
+  };
+
   return (
     <SafeAreaView style={styles.safe}>
       {/* Top board (login status) — sticky utanför ScrollView. Klick på
@@ -589,10 +667,18 @@ export default function ProfileScreen() {
           <Pressable
             style={({ pressed }) => [
               styles.creditsPill,
+              hasPremium && styles.creditsPillMembership,
               pressed && { opacity: 0.85 },
             ]}
             onPress={() => router.push('/store?focus=credits&from=/profile')}
           >
+            {hasPremium && (
+              <View style={styles.creditsMembershipBadgeWrap} pointerEvents="none">
+                <View style={styles.creditsMembershipBadge}>
+                  <Text style={styles.creditsMembershipBadgeText}>Unlimited</Text>
+                </View>
+              </View>
+            )}
             <Text style={styles.creditsLabel}>Host Game Credits</Text>
             <View style={styles.creditsValueRow}>
               <Text style={styles.creditsKey}>Free:</Text>
@@ -659,6 +745,9 @@ export default function ProfileScreen() {
           ]}
           hitSlop={8}
         >
+          <View style={styles.sectionHeaderIcon}>
+            <QuizVibeQAvatar size={28} />
+          </View>
           <Text style={styles.gameConnectionsHeader}>Profile default settings</Text>
           <View style={styles.gameConnectionsToggleBox}>
             <Text style={styles.gameConnectionsChevron}>
@@ -795,6 +884,7 @@ export default function ProfileScreen() {
           ]}
           hitSlop={8}
         >
+          <Text style={styles.sectionHeaderEmoji}>👑</Text>
           <Text style={styles.gameConnectionsHeader}>Host default settings</Text>
           <View style={styles.gameConnectionsToggleBox}>
             <Text style={styles.gameConnectionsChevron}>
@@ -1253,6 +1343,7 @@ export default function ProfileScreen() {
           ]}
           hitSlop={8}
         >
+          <Text style={styles.sectionHeaderEmoji}>🎁</Text>
           <Text style={styles.gameConnectionsHeader}>Customized Host packages</Text>
           <View style={styles.gameConnectionsToggleBox}>
             <Text style={styles.gameConnectionsChevron}>
@@ -1276,7 +1367,7 @@ export default function ProfileScreen() {
               ]}
               onPress={() => router.push('/store?focus=packages&from=/profile')}
             >
-              <Text style={styles.modeLabel}>+ Add host packages</Text>
+              <Text style={styles.modeLabel}>+ Add Host packages</Text>
               <View
                 style={[styles.premiumBadge, styles.premiumBadgeGrey]}
                 pointerEvents="none"
@@ -1304,7 +1395,12 @@ export default function ProfileScreen() {
                     onValueChange={handleToggleAllPackages}
                     trackColor={{ false: Colors.error, true: Colors.success }}
                     thumbColor="#FFF"
-                    ios_backgroundColor={Colors.error}
+                    // iOS Switch:s native track är något smalare än outer
+                    // pill, så `ios_backgroundColor` läcker igenom som en
+                    // tunn röd flärd vid kanterna även när toggle är ON.
+                    // Synca färgen med aktiv track-färg så ingen röd flärd
+                    // syns när toggle är aktiverad.
+                    ios_backgroundColor={isAllPackagesEnabled ? Colors.success : Colors.error}
                     style={styles.selectAllSwitch}
                   />
                 </View>
@@ -1382,7 +1478,9 @@ export default function ProfileScreen() {
                           onValueChange={() => handleToggleHostPackage(pkg.id)}
                           trackColor={{ false: Colors.error, true: Colors.success }}
                           thumbColor="#FFF"
-                          ios_backgroundColor={Colors.error}
+                          // Synca ios_backgroundColor med aktiv track-färg —
+                          // se Select all-switchen ovan för rationale.
+                          ios_backgroundColor={isEnabled ? Colors.success : Colors.error}
                           style={styles.packageSwitch}
                         />
                       </View>
@@ -1414,6 +1512,7 @@ export default function ProfileScreen() {
           ]}
           hitSlop={8}
         >
+          <Text style={styles.sectionHeaderEmoji}>🔗</Text>
           <Text style={styles.gameConnectionsHeader}>Game connections</Text>
           <View style={styles.gameConnectionsToggleBox}>
             <Text style={styles.gameConnectionsChevron}>
@@ -1847,6 +1946,39 @@ export default function ProfileScreen() {
               </View>
             </View>
 
+            {/* Create Game-genväg — gateas av credits-popupen i
+                handleCreateGame. Speglar Home:s primary "Create Game"-
+                knapp så användaren kan starta ett spel utan att gå
+                tillbaka till Home först. Primary-styling (blå bg + vit
+                text) så den läser som den tydliga CTA:n i menyn. */}
+            <Pressable
+              style={({ pressed }) => [
+                styles.logoutCreateGameBtn,
+                pressed && { opacity: 0.85 },
+              ]}
+              onPress={handleCreateGame}
+            >
+              <Text style={styles.logoutCreateGameBtnText}>Create Game</Text>
+            </Pressable>
+
+            {/* Join Game — as registered user. Navigerar till Home med
+                ?openJoinRegistered=1 så Home auto-öppnar JoinModal i
+                'choose'-step med hideGuest:true (samma flöde som
+                "Join Game — as registered user"-knappen på Home). Speglar
+                Create Game-stylen så de visuellt grupperas som spel-CTAs. */}
+            <Pressable
+              style={({ pressed }) => [
+                styles.logoutCreateGameBtn,
+                pressed && { opacity: 0.85 },
+              ]}
+              onPress={() => {
+                setLogoutModalVisible(false);
+                router.push('/?openJoinRegistered=1');
+              }}
+            >
+              <Text style={styles.logoutCreateGameBtnText}>Join Game</Text>
+            </Pressable>
+
             {/* Store-genväg — utan focus-param följer Store sin default-
                 ordning (Basic → Credits → Packages → Subscriptions),
                 samma som direkt tab-tryck på Store. */}
@@ -2014,7 +2146,14 @@ function SourceRow({
       ]}
     >
       <View style={[styles.sourceIcon, selected && styles.sourceIconSelected]}>
-        <Text style={styles.sourceIconText}>{icon}</Text>
+        {/* icon='Q' är en sentinel för Default Image-raden — rendera
+            QuizVibe Q-brand-SVG istället för en text-emoji så raden
+            visuellt speglar den faktiska avataren som blir resultatet. */}
+        {icon === 'Q' ? (
+          <QuizVibeQAvatar size={28} />
+        ) : (
+          <Text style={styles.sourceIconText}>{icon}</Text>
+        )}
       </View>
       <View style={styles.sourceInfo}>
         <Text style={[styles.sourceLabel, selected && styles.sourceLabelSelected]}>
@@ -2079,6 +2218,25 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: Colors.textPrimary,
     marginTop: 2,
+  },
+  // Create Game + Join Game-knappar i logout-sheet:n. Speglar Store-
+  // knappens styling exakt (blå-konturad, cardElevated bg, textPrimary
+  // text) så alla tre genvägar visuellt grupperas. CTA-hierarkin är:
+  // Create Game / Join Game / Store (alla neutrala) → Log out (röd,
+  // destruktiv) → Cancel (text-only).
+  logoutCreateGameBtn: {
+    height: 52,
+    borderRadius: Radius.md,
+    backgroundColor: Colors.cardElevated,
+    borderWidth: 1,
+    borderColor: Colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logoutCreateGameBtnText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.textPrimary,
   },
   // Store-knapp ovanför Log out i logout-sheet:n. Speglar Home-skärmens
   // profileMenu.secondaryBtn (blå-konturad, neutralt cardElevated bg) så
@@ -2164,6 +2322,40 @@ const styles = StyleSheet.create({
     // texten ovanför.
     gap: 8,
     minWidth: 210,
+    // position:relative + overflow:visible krävs så absoluta Unlimited-
+    // badgen (creditsMembershipBadgeWrap, top:-8) kan sticka upp över
+    // top-bordern utan att klippas. Speglar Lobby:s pill exakt.
+    position: 'relative',
+  },
+  // Membership-state — synced med Lobby:s creditsPillMembership-styling.
+  // 2 px gold border (var 1 px primaryBorder) signalerar att pillen
+  // är "premium-tier". Renderas additativt ovanpå creditsPill när
+  // hasPremium=true.
+  creditsPillMembership: {
+    borderWidth: 2,
+    borderColor: '#F5A623',
+  },
+  // Wrap för "Unlimited"-badgen (gold pillen-skärande lapp i top-right).
+  // pointerEvents:none så outer pillens onPress fortfarande fyrar när
+  // användaren tappar i badge-zonen. Synced med Lobby:s motsvarande styles.
+  creditsMembershipBadgeWrap: {
+    position: 'absolute',
+    top: -8,
+    right: 12,
+    zIndex: 10,
+    elevation: 4,
+  },
+  creditsMembershipBadge: {
+    backgroundColor: '#F5A623',
+    paddingHorizontal: 6,
+    paddingVertical: 1,
+    borderRadius: 3,
+  },
+  creditsMembershipBadgeText: {
+    fontSize: 7,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+    color: '#000',
   },
   creditsLabel: {
     fontSize: 10,
@@ -2272,6 +2464,20 @@ const styles = StyleSheet.create({
     ...Typography.title,
     color: Colors.textPrimary,
     fontWeight: FontWeight.bold,
+  },
+  // Ledande ikon/emoji framför sektionsrubriken. Två varianter:
+  // sectionHeaderIcon (för Q-avatar SVG, behöver wrap-View) och
+  // sectionHeaderEmoji (för text-emoji). Båda är dimensionerade så
+  // de visuellt linjerar med rubrikens baseline.
+  sectionHeaderIcon: {
+    width: 28,
+    height: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sectionHeaderEmoji: {
+    fontSize: 22,
+    lineHeight: 26,
   },
   // Liten box runt +/−-tecknet så det får en tydlig "knapp"-känsla
   // intill rubriken.
@@ -2690,7 +2896,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: Radius.sm,
-    borderWidth: 1,
+    // Tjockare kantlinje (3 px → bumpat från 2 → ursprungligen 1) så
+    // Add-knappen sticker ut tydligt mot listan över aktiverade paket
+    // nedanför, som har 1 px-borders.
+    borderWidth: 3,
     borderColor: Colors.borderStrong,
     backgroundColor: 'transparent',
     position: 'relative',

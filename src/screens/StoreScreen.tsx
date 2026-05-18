@@ -71,32 +71,7 @@ interface PackageTier {
   priceAmount: number;
 }
 
-const PACKAGE_TIERS: PackageTier[] = [
-  {
-    id: 'pkg-hiphop',
-    name: 'Hip Hop',
-    icon: '🎤',
-    description: 'Extra music questions from hip hop, rap & R&B.',
-    price: '29 kr',
-    priceAmount: 29,
-  },
-  {
-    id: 'pkg-rock',
-    name: 'Rock',
-    icon: '🎸',
-    description: 'Extra music questions from rock classics across decades.',
-    price: '29 kr',
-    priceAmount: 29,
-  },
-  {
-    id: 'pkg-film-actors',
-    name: 'Film & Actors',
-    icon: '🎬',
-    description: 'Extra questions about cinema icons and famous actors.',
-    price: '29 kr',
-    priceAmount: 29,
-  },
-];
+const PACKAGE_TIERS: PackageTier[] = [];
 
 interface SubscriptionTier {
   id: string;
@@ -357,7 +332,10 @@ export default function StoreScreen() {
     </View>
   );
 
-  const packagesSection = (
+  // Customized Host Packages-sektionen göms helt när PACKAGE_TIERS är tom
+  // (= inget köpbart paket i v1). När paketen läggs in igen ska sektionen
+  // visa sig automatiskt — renderingen nedan är oförändrad utöver guarden.
+  const packagesSection = PACKAGE_TIERS.length === 0 ? null : (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>Customized Host Packages</Text>
       <Text style={styles.sectionSubtitle}>

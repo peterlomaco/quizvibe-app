@@ -4,7 +4,7 @@
  * visar samma emoji som valts i profilen).
  */
 
-export type AvatarCategory = 'Retro' | 'Music' | 'Tech' | 'Fun';
+export type AvatarCategory = 'Basic' | 'Retro' | 'Music' | 'Tech' | 'Fun';
 
 export interface AvatarItem {
   id: string;
@@ -13,6 +13,10 @@ export interface AvatarItem {
 }
 
 export const AVATARS: AvatarItem[] = [
+  // Anonym-silhouette flyttad hit från "Default Image"-source-raden (2026-05-18).
+  // Egen 'Basic'-kategori så raden hamnar först + är lätt att hitta för
+  // användare som vill ha den neutrala silhouetten utan att gå via Default Image.
+  { id: '17', emoji: '😶', category: 'Basic' },
   { id: '1',  emoji: '🎮', category: 'Retro' },
   { id: '2',  emoji: '👾', category: 'Retro' },
   { id: '3',  emoji: '🕹️', category: 'Retro' },

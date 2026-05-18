@@ -62,6 +62,7 @@ import {
   appendPlayerNameLetter,
   backspacePlayerNameDigits,
   backspacePlayerNameLetters,
+  containsBlockedLetterSubstring,
   generatePlayerName,
   getPlayerNameDigits,
   getPlayerNameLetters,
@@ -175,17 +176,17 @@ const SEED_PLAYERS: LobbyPlayer[] = [
   { id: '4', name: 'Casey P.',  emoji: '🐉', isReady: true,  type: 'registered', hcpComplete: true,  age: 41, assistance: 'full',                   approved: false },
 ];
 
-const REGIONS = ['Sweden', 'Nordics', 'Europe', 'Global'] as const;
+// V1-launch: Region scope visar bara Sweden i Lobby. Tidigare hade vi
+// Nordics/Europe/Global också men de är borttagna tills content-katalogen
+// täcker fler länder. Listan stannar som as const-array (fortfarande
+// "set"-form) så framtida tillägg bara behöver utöka arrayen + flagg-mapen.
+const REGIONS = ['Sweden'] as const;
 type Region = typeof REGIONS[number];
 
 // Profile-skärmen lagrar region som lowercase ('sweden' | 'nordics' | 'global')
-// medan Lobby:s Region-set är capitalized + inkluderar 'Europe'. Mappa över
-// vid seed; null = profile saknar region (eller har okänt värde) så caller
-// kan applicera generic 'Global'-fallback.
+// men UI:t exponerar bara Sweden i v1; mappa ner non-sweden till Sweden.
 function mapProfileRegion(r: ProfileRegion | null | undefined): Region | null {
   if (r === 'sweden') return 'Sweden';
-  if (r === 'nordics') return 'Nordics';
-  if (r === 'global') return 'Global';
   return null;
 }
 
@@ -194,7 +195,7 @@ function mapProfileRegion(r: ProfileRegion | null | undefined): Region | null {
 // Profile-vyn delar samma mock. Importen sker högst upp.)
 
 const REGION_FLAGS: Record<Region, string> = {
-  Sweden: '🇸🇪', Nordics: '🌐', Europe: '🇪🇺', Global: '🌍',
+  Sweden: '🇸🇪',
 };
 
 // ERA_MIN = 1930 så slider-värdet matchar tidsaxelns vänsterkant ("<1930").
@@ -364,6 +365,8 @@ function validateAddPlayerName(name: string): 'available' | 'taken' | 'invalid' 
   // Olämpliga ledande par (synced med auto-gen-blocklistan).
   if (hasBlockedLetterLead(trimmed)) return 'invalid';
   if (containsProfanity(trimmed)) return 'invalid';
+  // Reserverat: brand-namnet "quizvibe" (case-insensitive) får inte ingå.
+  if (containsBlockedLetterSubstring(trimmed)) return 'invalid';
   if (TAKEN_PLAYER_NAMES_LOBBY.has(trimmed.toLowerCase())) return 'taken';
   return 'available';
 }
@@ -1017,9 +1020,9 @@ export default function LobbyScreen() {
               profile?.singlePlayerDefault ??
               false,
           );
-          setRegion(
-            stored?.region ?? mapProfileRegion(profile?.region) ?? 'Global',
-          );
+          // V1: bara Sweden — eventuella stored/profile-värden som inte är
+          // Sweden ignoreras (legacy från Nordics/Europe/Global-tiden).
+          setRegion('Sweden');
           setAnswerResponseSeconds(
             stored?.answerResponseSeconds ??
               profile?.answerResponseSeconds ??
@@ -1265,7 +1268,7 @@ export default function LobbyScreen() {
   const draggingEraThumbRef = useRef<0 | 1 | null>(null);
   const eraDragStartValuesRef = useRef<number[]>([1981, ERA_MAX]);
   const [roundsCount, setRoundsCount] = useState(ROUNDS_DEFAULT);
-  const [region, setRegion] = useState<Region>('Global');
+  const [region, setRegion] = useState<Region>('Sweden');
   // Hur länge spelarna har på sig att svara på en fråga (sekunder). Ingen
   // Lobby-UI än — propageras vidare till quiz.tsx via handleStartGame så
   // host:s profil-default följer med in i spelet.
@@ -2069,7 +2072,9 @@ export default function LobbyScreen() {
       if (cancelled || !stored) return;
       setGameMode(stored.gameMode);
       setSinglePlayerDefault(stored.singlePlayerDefault);
-      setRegion(stored.region);
+      // V1: Region är låst till 'Sweden'. Stored.region kan vara legacy
+      // (Nordics/Europe/Global) — ignorera den och stå kvar på Sweden.
+      setRegion('Sweden');
       setAnswerResponseSeconds(stored.answerResponseSeconds);
       setEraValues((prev) =>
         prev[0] === stored.eraFrom && prev[1] === stored.eraTo
@@ -3240,7 +3245,11 @@ export default function LobbyScreen() {
                   onValueChange={(v) => handleToggleSource(youtubeEnabled, setYoutubeEnabled, v)}
                   trackColor={{ false: Colors.error, true: Colors.success }}
                   thumbColor="#FFF"
-                  ios_backgroundColor={Colors.error}
+                  // iOS native Switch:s track-fill är något smalare än outer
+                  // pill, så `ios_backgroundColor` läcker som en tunn röd
+                  // flärd vid kanterna även när toggle är ON. Synca med
+                  // aktiv track-färg så ingen röd flärd syns när aktiverad.
+                  ios_backgroundColor={youtubeEnabled ? Colors.success : Colors.error}
                   style={styles.connectionSwitch}
                 />
               )}
@@ -3278,7 +3287,9 @@ export default function LobbyScreen() {
                   onValueChange={(v) => handleToggleSource(profilesEnabled, setProfilesEnabled, v)}
                   trackColor={{ false: Colors.error, true: Colors.success }}
                   thumbColor="#FFF"
-                  ios_backgroundColor={Colors.error}
+                  // Synca ios_backgroundColor med aktiv track-färg — se
+                  // YouTube-switchen ovan för rationale.
+                  ios_backgroundColor={profilesEnabled ? Colors.success : Colors.error}
                   style={styles.connectionSwitch}
                 />
               )}
@@ -3360,7 +3371,7 @@ export default function LobbyScreen() {
                       onPress={() => router.push({ pathname: '/store' as const, params: { focus: 'packages', from: '/lobby', fromCode: roomCode } })}
                       activeOpacity={0.7}
                     >
-                      <Text style={styles.modeLabel}>+ Add host packages</Text>
+                      <Text style={styles.modeLabel}>+ Add Host packages</Text>
                       <View
                         style={[styles.premiumBadge, styles.premiumBadgeGrey]}
                         pointerEvents="none"
@@ -3396,7 +3407,9 @@ export default function LobbyScreen() {
                         disabled={availablePackages.length === 0}
                         trackColor={{ false: Colors.error, true: Colors.success }}
                         thumbColor="#FFF"
-                        ios_backgroundColor={Colors.error}
+                        // Synca ios_backgroundColor med aktiv track-färg —
+                        // se YouTube-switchen ovan för rationale.
+                        ios_backgroundColor={isAllSelected ? Colors.success : Colors.error}
                         style={styles.connectionSwitch}
                       />
                     </View>
@@ -3482,7 +3495,9 @@ export default function LobbyScreen() {
                             onValueChange={() => handleToggleExtraPackage(pkg.id)}
                             trackColor={{ false: Colors.error, true: Colors.success }}
                             thumbColor="#FFF"
-                            ios_backgroundColor={Colors.error}
+                            // Synca ios_backgroundColor med aktiv track-färg
+                            // — se YouTube-switchen ovan för rationale.
+                            ios_backgroundColor={isSelected ? Colors.success : Colors.error}
                             style={styles.connectionSwitch}
                           />
                         )}
@@ -5102,7 +5117,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: Radius.sm,
-    borderWidth: 1,
+    // Tjockare kantlinje (3 px → bumpat från 2 → ursprungligen 1) så
+    // knappen sticker ut tydligt mot omgivande paket-rader (1 px-borders).
+    // Synkat med Profile-vyns addPackageBtn.
+    borderWidth: 3,
     borderColor: Colors.borderStrong,
     backgroundColor: 'transparent',
     position: 'relative',

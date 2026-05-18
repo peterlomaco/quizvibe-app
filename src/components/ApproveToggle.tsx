@@ -29,7 +29,11 @@ export function ApproveToggle({ value, onChange, label, disabled }: ApproveToggl
         onValueChange={(v) => onChange(v ? 'yes' : 'no')}
         trackColor={{ false: Colors.error, true: Colors.success }}
         thumbColor="#FFF"
-        ios_backgroundColor={Colors.error}
+        // iOS native Switch:s track-fill är något smalare än outer pill —
+        // utan synced bakgrund läcker `ios_backgroundColor` igenom som en
+        // tunn röd flärd i kanterna även när toggle är ON. Synca med
+        // aktiv track-färg så ingen röd flärd syns när aktiverad.
+        ios_backgroundColor={value === 'yes' ? Colors.success : Colors.error}
         disabled={disabled}
         style={styles.switch}
       />
