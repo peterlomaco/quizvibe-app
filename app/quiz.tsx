@@ -96,6 +96,14 @@ interface ImageQuestion {
   question: string;
   /** Rätt svar — visas i reveal-feedback. */
   displayName: string;
+  /** "Rätt svar"-året (för artister = födelseår; band = formation-år).
+   *  Används som FALLBACK i era-filtret när peak saknas. */
+  correctYear: number;
+  /** Peak-recognition-fönster (åren item:t var som mest känt). När båda
+   *  definierade använder era-filtret interval-overlap mot host:s era-
+   *  spann (semantiskt rättare än correctYear för artister). */
+  peakFrom?: number;
+  peakTo?: number;
   /** Pre-baked Letter Grid + name-options per prefix-längd. Klienten väljer
    *  variant runtime via `pickImageQuestionVariant(q, assistance)`. */
   variants: Record<ImageVariantKey, ImageQuestionVariant>;
@@ -136,6 +144,9 @@ const IMAGE_SEED_QUESTIONS: ImageQuestion[] = IMAGE_QUIZ_QUESTIONS.map(
     category: 'Image',
     question: q.questionText,
     displayName: q.displayName,
+    correctYear: q.correctYear,
+    peakFrom: q.peakFrom,
+    peakTo: q.peakTo,
     variants: q.variants,
   }),
 );
@@ -553,6 +564,7 @@ export default function QuizScreen() {
     eraTo?: string;
     answerResponseSeconds?: string;
     youtubeEnabled?: string;
+    imagesEnabled?: string;
   }>();
   // Default assistance från URL-param — fallback om turnOrder-spelaren
   // saknar egen assistance-flagga. Per-player-värdet från turnOrder:n
@@ -646,10 +658,12 @@ export default function QuizScreen() {
   // (t.ex. direkt-nav till /quiz utan Lobby).
   const eraFrom = parseInt(String(params.eraFrom ?? '1900'), 10);
   const eraTo = parseInt(String(params.eraTo ?? new Date().getFullYear()), 10);
-  // Game Connections-källor från Lobby. Default till YouTube=on vid direkt-
-  // nav (utan Lobby) så MediaPlayer-stuben renderar klipp för mock-frågor
-  // med youtubeClips.
+  // Game Connections-källor från Lobby. Default båda=on vid direkt-nav
+  // (utan Lobby) så MediaPlayer-stuben renderar klipp för mock-frågor och
+  // image-items också kommer in i poolen. youtubeEnabled gatar items med
+  // youtubeClips (= today's music-pool); imagesEnabled gatar image-items.
   const youtubeEnabled = (params.youtubeEnabled ?? 'true') === 'true';
+  const imagesEnabled = (params.imagesEnabled ?? 'true') === 'true';
   // Turordningen levereras som JSON-sträng från Lobby:s handleStartGame.
   // try/catch:en gör att en korrupt payload graceful degradar till tom lista
   // → 'intro'-fasen hoppas över istället för att skärmen fastnar tom.
@@ -672,14 +686,19 @@ export default function QuizScreen() {
   // Pool av frågor för spelet, organiserad i ROUND-BLOCKS:
   //
   //   Pass-the-Phone-regel: alla spelare i samma rond ska få samma fråge-TYP
-  //   (alla får musik, eller alla får bild) men olika ITEMS. Mellan ronder
-  //   växlar typen.
+  //   (alla får YouTube-content, eller alla får image) men olika ITEMS.
+  //   Mellan ronder växlar typen.
   //
   //   Pool-struktur (med 4 spelare per rond, alternerande typ):
-  //     Round 0 (block 0, type=music): music[0], music[1], music[2], music[3]
-  //     Round 1 (block 1, type=image): image[0], image[1], image[2], image[3]
-  //     Round 2 (block 2, type=music): music[4], music[5], music[0], music[1] (cykling)
-  //     Round 3 (block 3, type=image): image[4], image[5], image[6], image[7]
+  //     Round 0 (block 0, type=youtube): yt[0], yt[1], yt[2], yt[3]
+  //     Round 1 (block 1, type=image):   img[0], img[1], img[2], img[3]
+  //     Round 2 (block 2, type=youtube): yt[4], yt[5], yt[0], yt[1] (cykling)
+  //     Round 3 (block 3, type=image):   img[4], img[5], img[6], img[7]
+  //
+  //   YouTube-poolen idag = enbart musik-items via SEED_QUESTIONS (= items
+  //   med youtubeClips). Designad så att framtida non-music YouTube-content
+  //   (sport, tal, comedy) kan addas till samma pool utan kod-ändring —
+  //   gating + filter är källagnostiskt.
   //
   //   Individual Devices (parallel play): alla spelare svarar samma fråga
   //   samtidigt — round-block-strukturen är inte semantiskt nödvändig där men
@@ -689,30 +708,65 @@ export default function QuizScreen() {
   // MÅSTE deklareras EFTER `turnOrder` — annars TDZ-error eftersom deps
   // läser turnOrder.length innan const är initialiserad.
   const gameQuestions = useMemo<QuizQuestion[]>(() => {
-    const inEra = SEED_QUESTIONS.filter(
-      (q) => q.correctYear >= eraFrom && q.correctYear <= eraTo,
-    );
-    const musicPool: QuizQuestion[] = inEra.length > 0 ? inEra : SEED_QUESTIONS;
-    const imagePool: QuizQuestion[] = IMAGE_SEED_QUESTIONS;
+    // Gate på host:s media-source-toggles innan era-filter. Host som stängt
+    // av YouTube ska inte få några items med youtubeClips i spelet, även
+    // om eran skulle ha matchat. Lobby blockar avstängning av sista källan,
+    // så minst en pool är garanterat på här.
+    const inEra = youtubeEnabled
+      ? SEED_QUESTIONS.filter(
+          (q) => q.correctYear >= eraFrom && q.correctYear <= eraTo,
+        )
+      : [];
+    // YouTube-pool fallback: era-tom → hela SEED_QUESTIONS (bara aktiverad
+    // när source-toggle är på, så vi inte oavsiktligt återupplivar
+    // avstängda källor via fallback).
+    const youtubePool: QuizQuestion[] =
+      inEra.length > 0
+        ? inEra
+        : youtubeEnabled
+          ? SEED_QUESTIONS
+          : [];
+    // Image-pool: peak-recognition-fönster när det finns (artister var
+    // sällan kända det år de föddes — peak speglar host:s intent bättre).
+    // Fallback till correctYear när peak saknas. Era-tom → hela IMAGE_
+    // SEED_QUESTIONS-poolen (samma fallback-strategi som YouTube-poolen),
+    // men bara när source-toggle är på.
+    const inEraImages = imagesEnabled
+      ? IMAGE_SEED_QUESTIONS.filter((q) => {
+          if (q.peakFrom !== undefined && q.peakTo !== undefined) {
+            // Interval-overlap: [eraFrom, eraTo] ∩ [peakFrom, peakTo] ≠ ∅
+            return eraFrom <= q.peakTo && eraTo >= q.peakFrom;
+          }
+          return q.correctYear >= eraFrom && q.correctYear <= eraTo;
+        })
+      : [];
+    const imagePool: QuizQuestion[] =
+      inEraImages.length > 0
+        ? inEraImages
+        : imagesEnabled
+          ? IMAGE_SEED_QUESTIONS
+          : [];
 
     const playerCount = Math.max(1, turnOrder.length);
-    const hasMusic = musicPool.length > 0;
+    const hasYoutube = youtubePool.length > 0;
     const hasImage = imagePool.length > 0;
 
     // Edge cases: om en pool är tom, kör bara den andra. Om båda tomma →
-    // fallback till SEED_QUESTIONS (vilket är musik som hardcoded mock).
-    if (!hasMusic && !hasImage) return SEED_QUESTIONS;
+    // sista-utvägs-fallback till SEED_QUESTIONS (hardcoded mock). Lobby
+    // blockar normalt detta läge ("Minimum 1 Game connection source") så
+    // i praktiken ska vi aldrig hamna här.
+    if (!hasYoutube && !hasImage) return SEED_QUESTIONS;
 
     // Bygg pool täckande hela spelet utan modulo-cykling i UI-laget.
     // questionIndex stiger till totalRounds × playerCount; vi bygger N block
     // där N = totalRounds.
     const mixed: QuizQuestion[] = [];
     for (let block = 0; block < totalRounds; block++) {
-      // Alternera musik ↔ bild per block. Om bara en typ finns, använd alltid den.
-      const isMusicBlock = hasMusic && hasImage
+      // Alternera YouTube ↔ image per block. Om bara en typ finns, använd alltid den.
+      const isYoutubeBlock = hasYoutube && hasImage
         ? block % 2 === 0
-        : hasMusic;
-      const pool = isMusicBlock ? musicPool : imagePool;
+        : hasYoutube;
+      const pool = isYoutubeBlock ? youtubePool : imagePool;
       // Cyklisk indexering inom poolen — items kan upprepas om pool < block*players,
       // men varje block:s spelare får olika items (det är det viktiga för
       // round-paritet).
@@ -722,11 +776,13 @@ export default function QuizScreen() {
       }
     }
     return mixed.length > 0 ? mixed : SEED_QUESTIONS;
-  }, [eraFrom, eraTo, turnOrder.length, totalRounds]);
+  }, [eraFrom, eraTo, turnOrder.length, totalRounds, youtubeEnabled, imagesEnabled]);
 
   // Media-källa per fråga (driver GetReadyIntro:s IndDev media-kö).
-  // Bilder → 'image'; musik → kör pickMediaSource för att se om YouTube
-  // är aktiv för just den frågan givet host:s toggles.
+  // Image-frågor → 'image'; timeline-frågor (YouTube-content idag, men
+  // pickMediaSource är källagnostisk så future YouTube-non-music kommer
+  // hit oförändrat) → kör pickMediaSource för att se om YouTube är aktiv
+  // för just den frågan givet host:s toggles.
   // Memoiseras parallellt med gameQuestions så ingen tomt-laddning sker i
   // render-loop.
   const mediaSourceByQuestion = useMemo<QuestionMediaType[]>(() => {
@@ -788,7 +844,7 @@ export default function QuizScreen() {
   const [confirmedTimeUsed, setConfirmedTimeUsed] = useState<number | null>(null);
 
   // ── Bild-fråge-state ───────────────────────────────────────────────────
-  // Förlik state med musik-flödet:
+  // Förlik state med timeline-flödet:
   //   • pendingNameOption = motsvarighet till pendingYear (preliminärt val
   //     i Final Selection, kan ändras tills Confirm tryckts).
   //   • confirmedNameOption = motsvarighet till selectedYear post-Confirm
@@ -980,7 +1036,7 @@ export default function QuizScreen() {
   const hostPlayerId = turnOrder[0]?.id;
   // D-iv: ska denna enhet vara mute:ad under uppspelning? Pass-the-Phone
   // delar device → alltid ljud på. Vid direkt-nav utan selfPlayerId →
-  // fallback till audio på så musiken hörs i mock-mode. I IndDev läses
+  // fallback till audio på så ljudet hörs i mock-mode. I IndDev läses
   // overrides-mappen; default-policyn kickar in vid saknad key.
   const isAudioMutedForSelf = useMemo(() => {
     if (gameMode === 'pass-the-phone') return false;
@@ -1053,7 +1109,7 @@ export default function QuizScreen() {
     if (phase === 'question') {
       // Time ran out utan Confirm — registrera ronden som missad (0 poäng,
       // inget giltigt svar) och gå direkt till reveal. För image-frågor
-      // sätts correctYear/selectedYear=0 (RoundResult-shapen är musik-
+      // sätts correctYear/selectedYear=0 (RoundResult-shapen är timeline-
       // formad; year-fälten ignoreras i image-reveal-rendering).
       if (question.type === 'timeline') {
         const defaultGuess = new Date().getFullYear() - 20;
@@ -1259,8 +1315,8 @@ export default function QuizScreen() {
   }, [phase, canConfirm, confirmPulse, confirmGlow]);
 
   const handleConfirm = (year: number) => {
-    // Defensiv guard: handleConfirm är musik-specifik (year-baserad). Image-
-    // frågor anropar handleConfirmName istället. Skydd mot fel-binding i UI.
+    // Defensiv guard: handleConfirm är timeline-specifik (year-baserad).
+    // Image-frågor anropar handleConfirmName istället. Skydd mot fel-binding i UI.
     if (question.type !== 'timeline') return;
     // Timer:n stoppas INTE — alla spelare får samma tidsbudget oavsett när
     // de bekräftade. Reveal-feedbacken visas först när timer:n går till 0
@@ -1334,7 +1390,7 @@ export default function QuizScreen() {
     const elapsedAtConfirm = Math.min(totalMs, Math.max(0, exactElapsedMs));
     setDecimalElapsedMs(elapsedAtConfirm);
     setConfirmedNameOption(opt);
-    // RoundResult-shapen är musik-formad (correctYear/selectedYear som number).
+    // RoundResult-shapen är timeline-formad (correctYear/selectedYear som number).
     // Image-rundor sätter 0 för year-fälten — reveal-renderingen läser
     // displayName från question istället för selectedYear/correctYear.
     setRounds((prev) => [

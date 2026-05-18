@@ -5,12 +5,16 @@ items:
   - id: michael-jackson
     displayName: "Michael Jackson"
     correctYear: 1958
+    peakFrom: 1979
+    peakTo: 2009
     probability: 98
     wikimediaSearchHints: ["Michael Jackson"]
     answerMethods: ["timeline", "name-letters"]
   - id: madonna
     displayName: "Madonna"
     correctYear: 1958
+    peakFrom: 1984
+    peakTo: 2007
     probability: 96
     wikimediaSearchHints: ["Madonna singer"]
     answerMethods: ["timeline", "name-letters"]

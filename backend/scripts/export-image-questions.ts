@@ -57,6 +57,17 @@ interface ExportedQuestion {
   id: string;
   displayName: string;
   category: Category;
+  /** Året som "rätt svar" — för fallback-era-filtrering när peak saknas
+   *  och som svar i timeline-frågor. För artister = födelseår; för
+   *  band = formation-år; för musik-spår = utgivningsår. */
+  correctYear: number;
+  /** Peak-recognition-fönster (åren item:t var som mest känt). När
+   *  båda är definierade använder quiz.tsx interval-overlap mot host:s
+   *  era-spann (semantiskt rättare än correctYear för artister, vars
+   *  födelseår sällan är när de var populära). Saknas → correctYear-
+   *  fallback. */
+  peakFrom?: number;
+  peakTo?: number;
   /** Vilka generationer item:t passar för (driver per-spelare-pool på klienten). */
   audiences: Audience[];
   questionText: string;
@@ -140,6 +151,15 @@ function buildExportedQuestion(
 
   const item = matches[0].item;
 
+  // Era-filtreringen i quiz.tsx kräver correctYear — items utan blir
+  // omöjliga att inkludera i pool-byggandet eftersom det aldrig kan
+  // matcha host:s eraFrom/eraTo. Skippa hellre än att bryta klientens
+  // type-kontrakt.
+  if (item.correctYear === undefined) {
+    console.warn(`  Item ${itemId} missing correctYear — skipping`);
+    return null;
+  }
+
   const variants = {} as Record<VariantKey, ExportedVariant>;
   for (const len of VARIANT_PREFIX_LENGTHS) {
     variants[`prefix-${len}` as VariantKey] = buildVariant(
@@ -154,6 +174,12 @@ function buildExportedQuestion(
     id: item.id,
     displayName: item.displayName,
     category,
+    // Garanterat definierat efter skip-check ovan.
+    correctYear: item.correctYear!,
+    // peak-fälten är optional i schema — utelämna helt ur exporten när
+    // de saknas så generated JSON inte växer med null-rader.
+    ...(item.peakFrom !== undefined ? { peakFrom: item.peakFrom } : {}),
+    ...(item.peakTo !== undefined ? { peakTo: item.peakTo } : {}),
     audiences: Array.from(audiencesSet),
     questionText: questionTextFor(category),
     variants,
@@ -201,6 +227,15 @@ export interface ImageQuizQuestion {
   id: string;
   displayName: string;
   category: 'persons' | 'capitals' | 'artists' | 'songs';
+  /** Året som "rätt svar" — driver fallback-era-filtrering när peak
+   *  saknas och visas i timeline-frågors reveal. För artister = födelseår;
+   *  band = formation-år; musik-spår = utgivningsår. */
+  correctYear: number;
+  /** Peak-recognition-fönster (åren item:t var som mest känt). När
+   *  båda definierade använder era-filtret interval-overlap mot host:s
+   *  era-spann. Saknas → correctYear-fallback. */
+  peakFrom?: number;
+  peakTo?: number;
   audiences: ImageQuestionAudience[];
   questionText: string;
   variants: Record<ImageVariantKey, ImageQuestionVariant>;

@@ -28,7 +28,7 @@ export interface LobbySettings {
   roundsCount: number;
   selectedExtraPackages: string[];
   youtubeEnabled: boolean;
-  profilesEnabled: boolean;
+  imagesEnabled: boolean;
 }
 
 interface LobbySettingsRow {
@@ -42,7 +42,7 @@ interface LobbySettingsRow {
   rounds_count: number;
   selected_extra_packages: string[];
   youtube_enabled: boolean;
-  profiles_enabled: boolean;
+  images_enabled: boolean;
 }
 
 const UI_TO_DB_REGION: Record<LobbyRegion, DbRegion> = {
@@ -69,7 +69,7 @@ function rowToSettings(row: LobbySettingsRow): LobbySettings {
     roundsCount: row.rounds_count,
     selectedExtraPackages: row.selected_extra_packages,
     youtubeEnabled: row.youtube_enabled,
-    profilesEnabled: row.profiles_enabled,
+    imagesEnabled: row.images_enabled,
   };
 }
 
@@ -85,7 +85,7 @@ function settingsToRow(code: string, s: LobbySettings): LobbySettingsRow {
     rounds_count: s.roundsCount,
     selected_extra_packages: [...s.selectedExtraPackages],
     youtube_enabled: s.youtubeEnabled,
-    profiles_enabled: s.profilesEnabled,
+    images_enabled: s.imagesEnabled,
   };
 }
 

@@ -227,16 +227,21 @@ const ERA_MIN_INTERVAL_PX = Math.ceil((ERA_MIN_INTERVAL / (ERA_MAX - ERA_MIN)) *
 // `src/components/RoundsRuler.tsx` så både Lobby och Profile delar samma
 // implementation. Importen sker högst upp i fil-huvudet.)
 
-function clampEraToPlayer(fromYear: number, toYear: number, players: LobbyPlayer[]) {
+// Returnerar en informativ warning om host:s valda era inte intersekta:r
+// yngsta spelarens livstid — vi clampa:r INTE displayen längre eftersom
+// det skapade en illusion att slider:n flyttade undre thumben automatiskt
+// när host drog övre under youngestBirth (boxens "from"-värde ändrades
+// men slider-thumben gjorde det inte). Host får nu se exakt vad de valt
+// + en gul warning om eran exkluderar någon.
+function checkEraAgainstPlayer(toYear: number, players: LobbyPlayer[]) {
   const currentYear = new Date().getFullYear();
   const ages = players.filter((p) => p.hcpComplete && p.age).map((p) => p.age as number);
-  if (ages.length === 0) return { from: fromYear, to: toYear, warning: null };
+  if (ages.length === 0) return { warning: null };
   const youngestBirth = currentYear - Math.min(...ages);
   if (toYear < youngestBirth) {
-    const adjustedFrom = Math.max(ERA_MIN, toYear - 10);
-    return { from: adjustedFrom, to: toYear, warning: `Youngest player born ${youngestBirth}. Showing: ${adjustedFrom}–${toYear}.` };
+    return { warning: `Youngest player born ${youngestBirth}. Selected era ends ${youngestBirth - toYear} year${youngestBirth - toYear === 1 ? '' : 's'} before they were born.` };
   }
-  return { from: fromYear, to: toYear, warning: null };
+  return { warning: null };
 }
 
 function DecadeMarks() {
@@ -1051,7 +1056,7 @@ export default function LobbyScreen() {
           if (stored) {
             setSelectedExtraPackages(stored.selectedExtraPackages);
             setYoutubeEnabled(stored.youtubeEnabled);
-            setProfilesEnabled(stored.profilesEnabled);
+            setImagesEnabled(stored.imagesEnabled);
           }
           setEnabledHostPackages(
             profile?.enabledHostPackages ?? PURCHASED_PACKAGES.map((p) => p.id),
@@ -1260,13 +1265,19 @@ export default function LobbyScreen() {
   // bara innan profil-seed-effekten hinner köra). Profile:s host-default
   // settings overridar dessa vid lobby-mount för host (se useEffect nedan).
   const [eraValues, setEraValues] = useState([1981, ERA_MAX]);
-  // Drag-tracking för era-slidern: håll non-active thumb fast vid sitt
-  // start-värde medan host drar den aktiva. Utan detta puttar
-  // minMarkerOverlapDistance den passiva thumben framför sig så fort den
-  // aktiva nuddar 10-års-gränsen — vilket gör att även det år host INTE
-  // försöker ändra åker med.
-  const draggingEraThumbRef = useRef<0 | 1 | null>(null);
-  const eraDragStartValuesRef = useRef<number[]>([1981, ERA_MAX]);
+  // Era-slidern körs i en delvis okontrollerad-läge under drag: vi
+  // uppdaterar INTE values-propen mid-drag eftersom MultiSlider:s
+  // componentDidUpdate då återställer pastOne/pastTwo, vilket bryter
+  // gestureDx-mattan (= cumulative från drag-start) och får aktiv thumb
+  // att drifta visuellt från sin year-label. Lib:ns moveOne/moveTwo
+  // blockar redan inaktiv thumb mot minMarkerOverlapDistance, så vi
+  // behöver inte heller egen låsning. dragEraValues håller realtids-
+  // värdet för box-display + warning; eraValues commitas först i
+  // onValuesChangeFinish. dragEraValuesRef speglar state synkront så
+  // Finish-handlern alltid läser det senaste värdet utan att vara
+  // beroende av render-ordning mellan sista onValuesChange och Finish.
+  const [dragEraValues, setDragEraValues] = useState<number[] | null>(null);
+  const dragEraValuesRef = useRef<number[] | null>(null);
   const [roundsCount, setRoundsCount] = useState(ROUNDS_DEFAULT);
   const [region, setRegion] = useState<Region>('Sweden');
   // Hur länge spelarna har på sig att svara på en fråga (sekunder). Ingen
@@ -1414,7 +1425,7 @@ export default function LobbyScreen() {
   // via en toggle. Default = på. Skickas till alla via lobbyns state.
   const [youtubeEnabled, setYoutubeEnabled] = useState(true);
   // Profiles and Places styrs helt av host-toggeln. Default = på.
-  const [profilesEnabled, setProfilesEnabled] = useState(true);
+  const [imagesEnabled, setImagesEnabled] = useState(true);
   // Use Packages — Basic-utbudet är alltid implicit aktivt (ingen UI). Hosten
   // kan välja till extra-paket ovanpå. Knytningen mellan packages och
   // room-code är implicit (lobby-state).
@@ -1545,7 +1556,7 @@ export default function LobbyScreen() {
   // underlag att hämta frågor från. Räkna aktiva källor och blockera när
   // användaren försöker stänga av den enda kvarvarande.
   const enabledSourceCount =
-    (youtubeEnabled ? 1 : 0) + (profilesEnabled ? 1 : 0);
+    (youtubeEnabled ? 1 : 0) + (imagesEnabled ? 1 : 0);
   const handleToggleSource = (
     currentlyEnabled: boolean,
     setter: (v: boolean) => void,
@@ -1560,7 +1571,11 @@ export default function LobbyScreen() {
     }
     setter(nextValue);
   };
-  const { from: clampedFrom, to: clampedTo, warning: eraWarning } = clampEraToPlayer(eraValues[0], eraValues[1], players);
+  // displayEra speglar realtids-värdet under drag och commitat värde
+  // däremellan — så box "1990 – 2020" + youngest-player-warning uppdateras
+  // live medan host drar utan att vi behöver toucha lib:ns prop.
+  const displayEra = dragEraValues ?? eraValues;
+  const { warning: eraWarning } = checkEraAgainstPlayer(displayEra[1], players);
 
   // Räkna aktiva spelare (exkl. hasLeft, vars plats är frigjord) — används
   // som capacity-check både vid + Add Player-knappen och vid Confirm i
@@ -2035,7 +2050,7 @@ export default function LobbyScreen() {
         roundsCount,
         selectedExtraPackages,
         youtubeEnabled,
-        profilesEnabled,
+        imagesEnabled,
       }).catch(() => { /* loggas i mockLobbySettings */ });
     }, 300);
     return () => clearTimeout(handle);
@@ -2050,7 +2065,7 @@ export default function LobbyScreen() {
     roundsCount,
     selectedExtraPackages,
     youtubeEnabled,
-    profilesEnabled,
+    imagesEnabled,
   ]);
 
   // Realtime-tick: bumpas av lobby_players + lobby_settings-channel-
@@ -2092,7 +2107,7 @@ export default function LobbyScreen() {
         return stored.selectedExtraPackages;
       });
       setYoutubeEnabled(stored.youtubeEnabled);
-      setProfilesEnabled(stored.profilesEnabled);
+      setImagesEnabled(stored.imagesEnabled);
     };
     syncFromStore();
     const interval = setInterval(syncFromStore, 2000);
@@ -2286,6 +2301,14 @@ export default function LobbyScreen() {
         const effectiveEraFrom = settingsStored?.eraFrom ?? eraValues[0];
         const effectiveEraTo = settingsStored?.eraTo ?? eraValues[1];
         const effectiveRoundsCount = settingsStored?.roundsCount ?? roundsCount;
+        // Game Connections-källor — KRITISKT att non-host får samma värden
+        // som host så båda enheter bygger identisk gameQuestions-pool.
+        // Annars ser host bara YouTube-frågor medan non-host får
+        // alternerande mix → desync på spelets fråge-typ.
+        const effectiveYoutubeEnabled =
+          settingsStored?.youtubeEnabled ?? youtubeEnabled;
+        const effectiveProfilesEnabled =
+          settingsStored?.imagesEnabled ?? imagesEnabled;
         // Approved spelare: nästa steg beror på gameMode.
         // - Pass-the-Phone: bara host spelar på sin telefon → vänligare
         //   popup "Host has started... use the Host device".
@@ -2326,6 +2349,8 @@ export default function LobbyScreen() {
               answerResponseSeconds: String(effectiveAnswerResponseSeconds),
               eraFrom: String(effectiveEraFrom),
               eraTo: String(effectiveEraTo),
+              youtubeEnabled: String(effectiveYoutubeEnabled),
+              imagesEnabled: String(effectiveProfilesEnabled),
               roomCode,
             },
           });
@@ -2636,18 +2661,20 @@ export default function LobbyScreen() {
         // Game era — passa RAW eraValues (samma värde som lobbySettings-
         // store håller och som non-host:s navigation läser via
         // settingsStored). Critical för IndDev: båda enheter MÅSTE bygga
-        // identiskt gameQuestions-pool (samma `inEra`-filter). Tidigare
-        // skickade host clampedFrom/To (post-clamp mot youngest player)
-        // medan non-host fick raw eraValues → olika era → olika
-        // questions på A vs B. ClampEraToPlayer fungerar fortfarande
-        // för host:s Lobby-display + warning men appliceras inte längre
-        // på fråge-poolen. Re-introduce vid behov genom att skriva
-        // clamped till lobbySettings (single source of truth).
+        // identiskt gameQuestions-pool (samma `inEra`-filter).
+        // checkEraAgainstPlayer ger bara en informativ warning idag
+        // (ingen auto-clamp av display) — så host:s exakta val är det
+        // som går till fråge-poolen. Re-introduce clamping vid behov
+        // genom att skriva clamped till lobbySettings.
         eraFrom: String(eraValues[0]),
         eraTo: String(eraValues[1]),
-        // Game Connections-källor — quiz.tsx:s pickMediaSource väljer rätt
-        // media-provider per fråga utifrån vilka som är på.
+        // Game Connections-källor — quiz.tsx gatar fråge-poolen på dessa
+        // (YouTube off → items med youtubeClips faller bort; Profiles off
+        // → image-items faller bort). Minst en MÅSTE vara på (Lobby
+        // blockar avstängning av sista källan), så båda-off-fallet är
+        // skyddat upstream.
         youtubeEnabled: String(youtubeEnabled),
+        imagesEnabled: String(imagesEnabled),
         // Skickas så Quit Game-flödet i quiz.tsx kan deactivera rummet
         // och rensa leftPlayers när host avslutar mitt i ett spel.
         roomCode,
@@ -3268,28 +3295,28 @@ export default function LobbyScreen() {
               <Text style={styles.connectionLabel}>Images</Text>
               {/* FREE-badgen sitter alltid kvar (samma mönster som YouTube) —
                   grön i Enabled, grå i Disabled. */}
-              <View style={profilesEnabled ? styles.youtubeEnabledPill : styles.statusPillDisabled}>
-                <Text style={profilesEnabled ? styles.youtubeEnabledText : styles.statusPillTextDisabled}>
-                  {profilesEnabled ? 'Enabled' : 'Disabled'}
+              <View style={imagesEnabled ? styles.youtubeEnabledPill : styles.statusPillDisabled}>
+                <Text style={imagesEnabled ? styles.youtubeEnabledText : styles.statusPillTextDisabled}>
+                  {imagesEnabled ? 'Enabled' : 'Disabled'}
                 </Text>
                 <View
-                  style={[styles.freeBadgeSmall, !profilesEnabled && styles.freeBadgeSmallGrey]}
+                  style={[styles.freeBadgeSmall, !imagesEnabled && styles.freeBadgeSmallGrey]}
                   pointerEvents="none"
                 >
-                  <Text style={[styles.freeBadgeTextSmall, !profilesEnabled && styles.freeBadgeSmallTextGrey]}>
+                  <Text style={[styles.freeBadgeTextSmall, !imagesEnabled && styles.freeBadgeSmallTextGrey]}>
                     FREE
                   </Text>
                 </View>
               </View>
               {hostMode && (
                 <Switch
-                  value={profilesEnabled}
-                  onValueChange={(v) => handleToggleSource(profilesEnabled, setProfilesEnabled, v)}
+                  value={imagesEnabled}
+                  onValueChange={(v) => handleToggleSource(imagesEnabled, setImagesEnabled, v)}
                   trackColor={{ false: Colors.error, true: Colors.success }}
                   thumbColor="#FFF"
                   // Synca ios_backgroundColor med aktiv track-färg — se
                   // YouTube-switchen ovan för rationale.
-                  ios_backgroundColor={profilesEnabled ? Colors.success : Colors.error}
+                  ios_backgroundColor={imagesEnabled ? Colors.success : Colors.error}
                   style={styles.connectionSwitch}
                 />
               )}
@@ -3561,10 +3588,7 @@ export default function LobbyScreen() {
                 approved={true}
                 onApproveChange={(next) => handleSetApproved(player.id, next)}
                 hasLeft={player.hasLeft}
-                hcpOverride={player.hcpOverride}
                 onEditPlayer={hostMode && !player.hasLeft ? () => openPlayerEdit(player.id) : undefined}
-                onGuestHcpTap={hostMode && !player.hasLeft && player.type === 'guest' ? () => Alert.alert('Guest HCP', 'Guest HCP cannot be changed') : undefined}
-                hcpAlignRight={!hostMode}
                 peerHealth={
                   gameMode === 'individual-devices'
                     ? player.id === ownPlayerIdRef.current
@@ -3617,10 +3641,7 @@ export default function LobbyScreen() {
                     onApproveChange={(next) => handleSetApproved(player.id, next)}
                     hasLeft={player.hasLeft}
                     onDelete={hostMode ? () => handleDeletePlayer(player.id) : undefined}
-                    hcpOverride={player.hcpOverride}
                     onEditPlayer={hostMode && !player.hasLeft ? () => openPlayerEdit(player.id) : undefined}
-                    onGuestHcpTap={hostMode && !player.hasLeft && player.type === 'guest' ? () => Alert.alert('Guest HCP', 'Guest HCP cannot be changed') : undefined}
-                    hcpAlignRight={!hostMode}
                     peerHealth={
                       gameMode === 'individual-devices'
                         ? player.id === ownPlayerIdRef.current
@@ -3663,71 +3684,57 @@ export default function LobbyScreen() {
                   hindrar markörerna från att komma närmare än 10 år. */}
               <View style={styles.eraGuestBoxWrap}>
                 <View style={styles.eraGuestBox}>
-                  <Text style={styles.eraGuestBoxText}>{clampedFrom} – {clampedTo}</Text>
+                  <Text style={styles.eraGuestBoxText}>{displayEra[0]} – {displayEra[1]}</Text>
                 </View>
               </View>
               {hostMode && (
-                <View style={{ alignItems: 'center' }}>
+                <View style={{ alignItems: 'center', position: 'relative', width: SLIDER_WIDTH }}>
                   <MultiSlider
+                    // values-propen hålls STABIL under drag (= committed
+                    // eraValues). MultiSlider:s componentDidUpdate skulle
+                    // annars återställa pastOne/pastTwo varje gång vi
+                    // ekade onValuesChange tillbaka, vilket dubbel-räknar
+                    // gestureDx och får aktiv thumb att drifta från sin
+                    // year-label. Vi skriver till dragEraValues för
+                    // realtids-display istället; commit på Finish.
                     values={eraValues}
                     min={ERA_MIN}
                     max={ERA_MAX}
                     step={1}
                     onValuesChangeStart={() => {
-                      // Snapshot start-värden så vi kan låsa den passiva
-                      // thumben. Active thumb detekteras på första onValuesChange.
-                      eraDragStartValuesRef.current = [eraValues[0], eraValues[1]];
-                      draggingEraThumbRef.current = null;
+                      const snapshot: [number, number] = [eraValues[0], eraValues[1]];
+                      dragEraValuesRef.current = snapshot;
+                      setDragEraValues(snapshot);
                     }}
                     onValuesChange={(vals) => {
-                      const start = eraDragStartValuesRef.current;
-                      // Detektera vilken thumb host drar baserat på första
-                      // diff:en mot start-värdet. Om bara en ändrats är det
-                      // den aktiva; om båda ändrats (push-scenario vid snabb
-                      // dragning över 10-års-gränsen) tar vi den med störst
-                      // absolut diff som aktiv.
-                      if (draggingEraThumbRef.current === null) {
-                        const d0 = vals[0] - start[0];
-                        const d1 = vals[1] - start[1];
-                        if (d0 !== 0 && d1 === 0) draggingEraThumbRef.current = 0;
-                        else if (d1 !== 0 && d0 === 0) draggingEraThumbRef.current = 1;
-                        else if (d0 !== 0 && d1 !== 0) {
-                          draggingEraThumbRef.current = Math.abs(d0) >= Math.abs(d1) ? 0 : 1;
-                        }
-                      }
-
-                      let next: number[] = vals;
-                      if (draggingEraThumbRef.current === 0) {
-                        // Vänster thumb (äldre år) dras; lås höger till start
-                        // och clampa vänster så min-intervallet hålls.
-                        const lockedRight = start[1];
-                        const clampedLeft = Math.min(vals[0], lockedRight - ERA_MIN_INTERVAL);
-                        next = [clampedLeft, lockedRight];
-                      } else if (draggingEraThumbRef.current === 1) {
-                        // Höger thumb (yngre år) dras; lås vänster till start
-                        // och clampa höger så min-intervallet hålls.
-                        const lockedLeft = start[0];
-                        const clampedRight = Math.max(vals[1], lockedLeft + ERA_MIN_INTERVAL);
-                        next = [lockedLeft, clampedRight];
-                      }
-
-                      // Defensiv guard ifall lib:n släpper igenom värden under
-                      // 10 år trots minMarkerOverlapDistance — ignorera updates
-                      // som bryter regeln. UI:t snappar visuellt till senaste
-                      // giltiga state.
-                      if (next[1] - next[0] < ERA_MIN_INTERVAL) return;
-                      // Hoppa över haptic + setState om värdet inte ändrades
-                      // (kan hända när clampLeft/clampRight gör no-op).
-                      if (next[0] === eraValues[0] && next[1] === eraValues[1]) return;
-                      // Tick-haptic per år-ändring — selectionAsync är Apple:s
-                      // picker-tick (subtil tap-känsla på iOS, KEYBOARD_TAP-
-                      // feedback på Android som även producerar OS-klick-ljud).
-                      // No-op på web. Step=1 ⇒ exakt en haptic per år.
+                      // Lib:n blockar redan inaktiv thumb mot
+                      // minMarkerOverlapDistance, så vals reflekterar bara
+                      // den aktiva thumben — vi behöver ingen egen
+                      // detektion/låsning. Defensiv guard ifall lib:n
+                      // släpper igenom värden under 10 år.
+                      if (vals[1] - vals[0] < ERA_MIN_INTERVAL) return;
+                      const prev = dragEraValuesRef.current;
+                      if (prev && prev[0] === vals[0] && prev[1] === vals[1]) return;
+                      const next: [number, number] = [vals[0], vals[1]];
+                      dragEraValuesRef.current = next;
+                      // Tick-haptic per år-ändring — selectionAsync är
+                      // Apple:s picker-tick på iOS, KEYBOARD_TAP på
+                      // Android. No-op på web. Step=1 ⇒ exakt en
+                      // haptic per år.
                       void Haptics.selectionAsync();
-                      setEraValues(next);
+                      setDragEraValues(next);
                     }}
                     onValuesChangeFinish={() => {
-                      draggingEraThumbRef.current = null;
+                      // Commit drag-värdet till eraValues — först nu
+                      // ändras lib:ns values-prop, vilket triggar
+                      // componentDidUpdate:s pastOne/pastTwo-reset till
+                      // korrekta positioner för nästa drag. Läser via
+                      // ref så vi alltid får senaste värdet oavsett
+                      // render-ordning.
+                      const final = dragEraValuesRef.current;
+                      if (final) setEraValues([final[0], final[1]]);
+                      dragEraValuesRef.current = null;
+                      setDragEraValues(null);
                     }}
                     minMarkerOverlapDistance={ERA_MIN_INTERVAL_PX}
                     isMarkersSeparated
@@ -3751,6 +3758,44 @@ export default function LobbyScreen() {
                     containerStyle={{ alignSelf: 'center' }}
                     sliderLength={SLIDER_INNER_WIDTH}
                   />
+                  {/* Blocka fill-bar-touches (= mellan thumbs) så lib:ns
+                      _panResponderBetween inte triggar moveOne+moveTwo
+                      parallellt och drar hela spannet samtidigt. Cover
+                      sitter 25 px (= lib:s default touchDimensions.width
+                      / 2) innanför vardera thumb-center så thumb-touch-
+                      zonerna förblir oberörda. Renderas bara när span
+                      är bred nog att exponera fill-bar mellan thumb-
+                      zonerna (≤ ~19 år ⇒ ingen synlig fill-bar att
+                      blocka). y=22/h=6 = lib:ns fullTrack-position
+                      vertikalt centrerad i den 50 px höga slider-
+                      containern med trackStyle.height=6. */}
+                  {(() => {
+                    const yearToSliderX = (year: number) =>
+                      ((year - ERA_MIN) / (ERA_MAX - ERA_MIN)) * SLIDER_INNER_WIDTH;
+                    const THUMB_TOUCH_HALF = 25;
+                    const sliderX0 = yearToSliderX(displayEra[0]);
+                    const sliderX1 = yearToSliderX(displayEra[1]);
+                    const coverWidth = sliderX1 - sliderX0 - 2 * THUMB_TOUCH_HALF;
+                    if (coverWidth <= 0) return null;
+                    return (
+                      <View
+                        onStartShouldSetResponder={() => true}
+                        onStartShouldSetResponderCapture={() => true}
+                        onResponderTerminationRequest={() => false}
+                        onResponderGrant={() => { /* swallow */ }}
+                        onResponderMove={() => { /* swallow */ }}
+                        onResponderRelease={() => { /* swallow */ }}
+                        style={{
+                          position: 'absolute',
+                          left: SLIDER_INSET + sliderX0 + THUMB_TOUCH_HALF,
+                          width: coverWidth,
+                          top: 22,
+                          height: 6,
+                          backgroundColor: 'transparent',
+                        }}
+                      />
+                    );
+                  })()}
                   <DecadeMarks />
                 </View>
               )}
@@ -5006,12 +5051,15 @@ const styles = StyleSheet.create({
     transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }],
     marginLeft: 'auto',
   },
-  // YouTube: röd rundad kvadrat med vit playpil (CSS-triangel) inuti.
-  // borderRadius:6 override:ar connectionIconWrap.borderRadius (14 = cirkel)
-  // så bara YouTube-raden får kvadrat-formen; Profiles behåller cirkel.
+  // Media-källikon: cirkulär primary-fylld bg med vit play-triangel inuti.
+  // GENERIC play-symbol — INTE YouTube:s officiella varumärkeslogga. YouTube:s
+  // Brand Guidelines kräver wider-than-tall rounded rectangle + #FF0000 +
+  // klickbar länk till YouTube-content. Vi undviker hela compliance-ytan
+  // genom att använda en neutral play-glyf i brand-tema; YouTube refereras
+  // via "YouTube"-text på samma rad. Cirkeln matchar dessutom Profiles &
+  // Places-ikonen på raden under för visuell konsistens.
   connectionIconYoutube: {
-    backgroundColor: '#FF0000',
-    borderRadius: 6,
+    backgroundColor: Colors.primary,
   },
   connectionIconYoutubeArrow: {
     width: 0,
@@ -5022,7 +5070,7 @@ const styles = StyleSheet.create({
     borderLeftColor: '#FFFFFF',
     borderTopColor: 'transparent',
     borderBottomColor: 'transparent',
-    marginLeft: 2, // optisk centrering — pilen ser balanserad ut mot röd bg
+    marginLeft: 2, // optisk centrering — pilen ser balanserad ut mot fylld cirkel
   },
   connectionIconGlyph: { fontSize: 14 },
   // AI: Q-figur från startskärmens logga (cirkel + svans i primary-blå),

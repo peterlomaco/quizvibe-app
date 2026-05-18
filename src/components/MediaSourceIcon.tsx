@@ -4,8 +4,10 @@ import Svg, { Circle, Path } from 'react-native-svg';
 import { Colors, FontWeight } from '../theme';
 
 /** Media-källa per fråga, för IndDev:s media-source-kö i GetReadyIntro.
- *  Samma symbolik som Lobby:s Game Connections-rad (röd YouTube-ruta,
- *  Q+AI för Images) så de två skärmarna känns visuellt konsistenta. */
+ *  Samma symbolik som Lobby:s Game Connections-rad (generisk play-cirkel
+ *  för YouTube-källan, Q+AI för Images) så de två skärmarna känns
+ *  visuellt konsistenta. Vi använder INTE YouTube:s officiella varumärke
+ *  — se LobbyScreen connectionIconYoutube-stilen för rationale. */
 export type MediaSourceType = 'youtube' | 'image' | 'none';
 
 interface Props {
@@ -17,7 +19,8 @@ interface Props {
 /**
  * Renderar en av media-källikonerna i en cirkulär wrap. Speglar Lobby:s
  * Game Connections-rad:
- *   • youtube  — röd rundad ruta med vit CSS-triangel-play
+ *   • youtube  — primary-blå cirkel med vit CSS-triangel-play (generic media-
+ *                icon, INTE YouTube:s varumärke)
  *   • image    — Q-figur (cirkel + svans) i primary-blå med "AI"-text överlagrad
  *   • none/?   — grå cirkel med ❓
  */
@@ -40,6 +43,7 @@ export function MediaSourceIcon({ source, size = 28 }: Props) {
               borderLeftWidth: size * 0.32,
               borderTopWidth: size * 0.21,
               borderBottomWidth: size * 0.21,
+              marginLeft: size * 0.07,
             },
           ]}
         />
@@ -85,9 +89,12 @@ export function MediaSourceIcon({ source, size = 28 }: Props) {
 }
 
 const styles = StyleSheet.create({
+  // Generic media-icon: primary-blå cirkel + vit play-triangel.
+  // Cirkulär form ärvs från wrapStyle.borderRadius (= size/2) i runtime.
+  // Vi använder INTE YouTube:s varumärke (röd kvadrat + #FF0000) här —
+  // se LobbyScreen connectionIconYoutube-stilen för rationale.
   youtubeBg: {
-    backgroundColor: '#FF0000',
-    borderRadius: 6,
+    backgroundColor: Colors.primary,
   },
   youtubeArrow: {
     width: 0,
@@ -95,7 +102,6 @@ const styles = StyleSheet.create({
     borderLeftColor: '#FFFFFF',
     borderTopColor: 'transparent',
     borderBottomColor: 'transparent',
-    marginLeft: 2,
   },
   glyph: {
     textAlign: 'center',

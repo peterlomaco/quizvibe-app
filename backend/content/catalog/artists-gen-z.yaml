@@ -11,6 +11,8 @@ items:
   - id: taylor-swift
     displayName: "Taylor Swift"
     correctYear: 1989
+    peakFrom: 2008
+    peakTo: 2026
     probability: 95
     wikimediaSearchHints: ["Taylor Swift"]
     answerMethods: ["timeline", "name-letters"]

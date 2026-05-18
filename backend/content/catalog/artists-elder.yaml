@@ -6,6 +6,8 @@ items:
   - id: elvis-presley
     displayName: "Elvis Presley"
     correctYear: 1935
+    peakFrom: 1956
+    peakTo: 1977
     probability: 98
     wikimediaSearchHints: ["Elvis Presley"]
     answerMethods: ["timeline", "name-letters"]
