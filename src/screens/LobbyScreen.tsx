@@ -101,12 +101,6 @@ export interface LobbyPlayer extends Player {
   // spelare saknar egen mobil och måste tas bort om läget byts till
   // Individual Devices.
   addedByHost?: boolean;
-  // Driver "Spotify enabled/disabled"-statusen i Game Connections-sektionen.
-  // Sätts från profile.spotifyConnected för registrerade spelare (host via
-  // mergeProfileIntoHost, room-code-joiners via deras profil när det flödet
-  // implementeras). Guests och manuellt tillagda spelare lämnas falsy —
-  // de räknas alltid som "ej Spotify-kopplade".
-  spotifyConnected?: boolean;
   // True om spelaren har lämnat lobby:n via TopUserBanner → Leave Game Lobby-
   // flödet. Persisteras per rumkod via src/utils/leftPlayers.ts och appliceras
   // av LobbyScreen:s useFocusEffect. PlayerRow renderar då greyed-out text +
@@ -152,7 +146,6 @@ function mergeProfileIntoHost(existing: LobbyPlayer, profile: ProfileData): Lobb
       ...existing,
       name: profile.playerName?.trim() || existing.name,
       emoji: getAvatarEmojiById(profile.selectedAvatarId),
-      spotifyConnected: profile.spotifyConnected ?? existing.spotifyConnected,
     };
   }
   const currentYear = new Date().getFullYear();
@@ -172,15 +165,14 @@ function mergeProfileIntoHost(existing: LobbyPlayer, profile: ProfileData): Lobb
     isReady: true,
     type: 'registered',
     isHost: true,
-    spotifyConnected: profile.spotifyConnected ?? false,
   };
 }
 
 const SEED_PLAYERS: LobbyPlayer[] = [
-  { id: '1', name: 'Alex K.',   emoji: '🦊', isReady: true,  type: 'registered', hcpComplete: true,  age: 32, assistance: 'standard', isHost: true, approved: true,  spotifyConnected: true  },
-  { id: '2', name: 'Sam L.',    emoji: '🎸', isReady: true,  type: 'registered', hcpComplete: true,  age: 28, assistance: 'minimal',                approved: false, spotifyConnected: true  },
-  { id: '3', name: 'Jordan M.', emoji: '🤖', isReady: true,  type: 'guest',      hcpComplete: true,  age: 35, assistance: 'standard',               approved: false                          },
-  { id: '4', name: 'Casey P.',  emoji: '🐉', isReady: true,  type: 'registered', hcpComplete: true,  age: 41, assistance: 'full',                   approved: false, spotifyConnected: false },
+  { id: '1', name: 'Alex K.',   emoji: '🦊', isReady: true,  type: 'registered', hcpComplete: true,  age: 32, assistance: 'standard', isHost: true, approved: true  },
+  { id: '2', name: 'Sam L.',    emoji: '🎸', isReady: true,  type: 'registered', hcpComplete: true,  age: 28, assistance: 'minimal',                approved: false },
+  { id: '3', name: 'Jordan M.', emoji: '🤖', isReady: true,  type: 'guest',      hcpComplete: true,  age: 35, assistance: 'standard',               approved: false },
+  { id: '4', name: 'Casey P.',  emoji: '🐉', isReady: true,  type: 'registered', hcpComplete: true,  age: 41, assistance: 'full',                   approved: false },
 ];
 
 const REGIONS = ['Sweden', 'Nordics', 'Europe', 'Global'] as const;
@@ -1056,7 +1048,6 @@ export default function LobbyScreen() {
           if (stored) {
             setSelectedExtraPackages(stored.selectedExtraPackages);
             setYoutubeEnabled(stored.youtubeEnabled);
-            setSpotifyHostToggle(stored.spotifyHostToggle);
             setProfilesEnabled(stored.profilesEnabled);
           }
           setEnabledHostPackages(
@@ -1146,7 +1137,6 @@ export default function LobbyScreen() {
           age,
           assistance,
           hcpComplete,
-          spotifyConnected: profile?.spotifyConnected ?? false,
           // Vid ärvt id: bevara approved-status från existing rad (host
           // kan redan ha approvat spelaren i föregående lobby-session).
           // Vid nytt id: alltid false (måste approvas av host innan start).
@@ -1420,9 +1410,6 @@ export default function LobbyScreen() {
   // YouTube är alltid tillgänglig som källa, men host kan slå av/på manuellt
   // via en toggle. Default = på. Skickas till alla via lobbyns state.
   const [youtubeEnabled, setYoutubeEnabled] = useState(true);
-  // Host-override för Spotify ovanpå auto-regeln (alla spelare måste ha
-  // Spotify-konto). Spotify visas som Enabled bara om både auto OCH toggle är på.
-  const [spotifyHostToggle, setSpotifyHostToggle] = useState(true);
   // Profiles and Places styrs helt av host-toggeln. Default = på.
   const [profilesEnabled, setProfilesEnabled] = useState(true);
   // Use Packages — Basic-utbudet är alltid implicit aktivt (ingen UI). Hosten
@@ -1551,27 +1538,11 @@ export default function LobbyScreen() {
     !hostMode &&
     !!ownPlayerIdRef.current &&
     players.some((p) => p.id === ownPlayerIdRef.current && !!p.approved);
-  // Spotify-kravet beror på Game Mode:
-  //  • Pass-the-Phone — bara en enhet skickas runt; en Spotify-låt skulle
-  //    tvinga öppna Spotify-appen och stjäla fokus från QuizVibe, vilket
-  //    bryter timern som tickar medan låten spelas. Spotify är därför
-  //    alltid auto-Disabled i detta läge.
-  //  • Individual Devices — varje spelare streamar låtarna på sin egen
-  //    telefon, så ALLA godkända spelare behöver ett Spotify-konto.
-  // Host kan ovanpå auto-regeln manuellt slå av via spotifyHostToggle;
-  // visad status = auto AND host-toggle. Info-ikonen visas alltid i båda
-  // lägena (enabled som disabled) med samma rules-text — så att användaren
-  // alltid kan kontrollera vilket kriterium som gäller per Game Mode.
-  const spotifyAutoEnabled =
-    gameMode === 'individual-devices' &&
-    approvedPlayers.length > 0 &&
-    approvedPlayers.every((p) => p.spotifyConnected === true);
-  const spotifyEnabled = spotifyAutoEnabled && spotifyHostToggle;
   // Minst en Game Connection-källa måste vara aktiv — annars finns inget
   // underlag att hämta frågor från. Räkna aktiva källor och blockera när
   // användaren försöker stänga av den enda kvarvarande.
   const enabledSourceCount =
-    (youtubeEnabled ? 1 : 0) + (spotifyEnabled ? 1 : 0) + (profilesEnabled ? 1 : 0);
+    (youtubeEnabled ? 1 : 0) + (profilesEnabled ? 1 : 0);
   const handleToggleSource = (
     currentlyEnabled: boolean,
     setter: (v: boolean) => void,
@@ -2061,7 +2032,6 @@ export default function LobbyScreen() {
         roundsCount,
         selectedExtraPackages,
         youtubeEnabled,
-        spotifyHostToggle,
         profilesEnabled,
       }).catch(() => { /* loggas i mockLobbySettings */ });
     }, 300);
@@ -2077,7 +2047,6 @@ export default function LobbyScreen() {
     roundsCount,
     selectedExtraPackages,
     youtubeEnabled,
-    spotifyHostToggle,
     profilesEnabled,
   ]);
 
@@ -2118,7 +2087,6 @@ export default function LobbyScreen() {
         return stored.selectedExtraPackages;
       });
       setYoutubeEnabled(stored.youtubeEnabled);
-      setSpotifyHostToggle(stored.spotifyHostToggle);
       setProfilesEnabled(stored.profilesEnabled);
     };
     syncFromStore();
@@ -2673,10 +2641,8 @@ export default function LobbyScreen() {
         eraFrom: String(eraValues[0]),
         eraTo: String(eraValues[1]),
         // Game Connections-källor — quiz.tsx:s pickMediaSource väljer rätt
-        // media-provider per fråga utifrån vilka som är på. Spotify räknas
-        // som "aktiv källa" först när auto-regeln + host-toggeln båda är på.
+        // media-provider per fråga utifrån vilka som är på.
         youtubeEnabled: String(youtubeEnabled),
-        spotifyEnabled: String(spotifyEnabled),
         // Skickas så Quit Game-flödet i quiz.tsx kan deactivera rummet
         // och rensa leftPlayers när host avslutar mitt i ett spel.
         roomCode,
@@ -3234,8 +3200,7 @@ export default function LobbyScreen() {
 
         {/* ── Game Connections ─────────────────────────────────── */}
         {/* Visar vilka källor spelet drar frågor från. Vänsterjusterad lista
-            med färgade brand-badges (samma mönster som Spotify-kortet på
-            Profile-sidan, fast i kompakt list-format). marginTop ger lite
+            med färgade brand-badges (kompakt list-format). marginTop ger lite
             extra luft mellan Game Mode-beskrivningen och denna rubrik. */}
         <View style={[styles.section, { marginTop: Spacing.sm }]}>
           <Text style={styles.sectionLabel}>Game Connections</Text>
@@ -3280,60 +3245,6 @@ export default function LobbyScreen() {
                 />
               )}
             </View>
-            <View style={styles.connectionRow}>
-              <View style={[styles.connectionIconWrap, styles.connectionIconSpotify]}>
-                <Text style={styles.connectionIconGlyph}>🎵</Text>
-              </View>
-              {/* Label + info-ikon paras ihop i en grupp som upptar samma
-                  minWidth (130) som vanlig connectionLabel — så pillen efter
-                  startar på exakt samma x-position som YouTubes och Profiles
-                  & Places-radens pillar, och switchen längst ut linjerar med
-                  de andra radernas switchar via marginLeft:'auto'. */}
-              <View style={styles.connectionLabelGroup}>
-                <Text style={[styles.connectionLabel, styles.connectionLabelInGroup]}>Spotify</Text>
-                {/* Info-ikonen visas alltid (oavsett mode och enabled/disabled-
-                    state) med samma rules-text. Sitter direkt efter "Spotify"
-                    så den läses som en del av labeln. */}
-                <TouchableOpacity
-                  style={styles.infoIconBtn}
-                  onPress={() =>
-                    Alert.alert(
-                      'Spotify requirements',
-                      'Pass-the-Phone — Spotify is unavailable in this mode.\n\nIndividual Devices — All approved players (incl. host) need a Spotify account activated in their Profile.',
-                    )
-                  }
-                  hitSlop={8}
-                  accessibilityLabel="Spotify requirements"
-                >
-                  <Text style={styles.infoIconText}>i</Text>
-                </TouchableOpacity>
-              </View>
-              <View style={spotifyEnabled ? styles.statusPillEnabled : styles.statusPillDisabled}>
-                <Text style={spotifyEnabled ? styles.statusPillTextEnabled : styles.statusPillTextDisabled}>
-                  {spotifyEnabled ? 'Enabled' : 'Disabled'}
-                </Text>
-              </View>
-              {hostMode && (
-                <Switch
-                  value={spotifyHostToggle}
-                  onValueChange={(v) => handleToggleSource(spotifyEnabled, setSpotifyHostToggle, v)}
-                  // Locked för host när auto-regeln inte uppfylls (alla godkända
-                  // måste ha Spotify-konto). Vid auto-disable visas en mörkgrå
-                  // track och ljusgrå thumb istället för röd/grön-paletten, för
-                  // att tydligt signalera "ej tillgänglig".
-                  disabled={!spotifyAutoEnabled}
-                  trackColor={
-                    spotifyAutoEnabled
-                      ? { false: Colors.error, true: Colors.success }
-                      : { false: '#3A3F4B', true: '#3A3F4B' }
-                  }
-                  thumbColor={spotifyAutoEnabled ? '#FFF' : '#9CA3AF'}
-                  ios_backgroundColor={spotifyAutoEnabled ? Colors.error : '#3A3F4B'}
-                  style={styles.connectionSwitch}
-                />
-              )}
-            </View>
-
             {/* AI — mörkblå cirkel med blå primary-border och italiserad "AI"-text. */}
             <View style={styles.connectionRow}>
               <View style={styles.connectionIconWrap}>
@@ -4992,10 +4903,9 @@ const styles = StyleSheet.create({
     lineHeight: 17,
   },
 
-  // Game Connections — vänsterjusterad lista över källor (YouTube/Spotify/AI VIBE).
-  // Varje rad har en färgad brand-badge (samma mönster som Profile-sidans
-  // Spotify-ikon: rundad, brand-färgad bakgrund med emoji centrerad inuti)
-  // i kompakt list-format.
+  // Game Connections — vänsterjusterad lista över källor (YouTube/AI VIBE).
+  // Varje rad har en färgad brand-badge (rundad, brand-färgad bakgrund med
+  // emoji centrerad inuti) i kompakt list-format.
   connectionsList: {
     // Stretch så varje rad fyller hela bredden — gör att switchar kan
     // höger-justeras med marginLeft:'auto'.
@@ -5083,7 +4993,7 @@ const styles = StyleSheet.create({
   },
   // YouTube: röd rundad kvadrat med vit playpil (CSS-triangel) inuti.
   // borderRadius:6 override:ar connectionIconWrap.borderRadius (14 = cirkel)
-  // så bara YouTube-raden får kvadrat-formen; Spotify/Profiles behåller cirkel.
+  // så bara YouTube-raden får kvadrat-formen; Profiles behåller cirkel.
   connectionIconYoutube: {
     backgroundColor: '#FF0000',
     borderRadius: 6,
@@ -5099,8 +5009,6 @@ const styles = StyleSheet.create({
     borderBottomColor: 'transparent',
     marginLeft: 2, // optisk centrering — pilen ser balanserad ut mot röd bg
   },
-  // Spotify: brand-grön cirkel med 🎵 (samma färg som Profile-sidans icon-wrap).
-  connectionIconSpotify: { backgroundColor: '#1DB954' },
   connectionIconGlyph: { fontSize: 14 },
   // AI: Q-figur från startskärmens logga (cirkel + svans i primary-blå),
   // utan omgivande ram. "AI"-text överlagras i Q-cirkelns mitt — mindre
@@ -5160,9 +5068,9 @@ const styles = StyleSheet.create({
     letterSpacing: 0.4,
     textAlign: 'center',
   },
-  // Use Packages — sub-block under Spotify för musikpaket-val. Vänsterställt
-  // mot connectionsList-kanten så "Extra packages:"-labeln och chipsen börjar
-  // på samma x-position som ikonerna på YouTube/Spotify-raderna ovanför.
+  // Use Packages — sub-block för musikpaket-val. Vänsterställt mot
+  // connectionsList-kanten så "Extra packages:"-labeln och chipsen börjar
+  // på samma x-position som ikonerna på YouTube-/Images-raderna ovanför.
   usePackagesBlock: {
     gap: Spacing.sm,
     paddingTop: Spacing.xs,
@@ -5338,9 +5246,9 @@ const styles = StyleSheet.create({
   packageRowFreeBadgeTextMuted: {
     color: '#FFF',
   },
-  // Liten info-knapp ("i" i en cirkel) som sitter direkt efter Spotify-labeln
-  // i connectionLabelGroup — tap visar en Alert med förklaringen istället för
-  // att alltid skriva ut texten. Avstånd till labeln styrs av gruppens gap.
+  // Liten info-knapp ("i" i en cirkel) som används av paket-raderna i
+  // Customized Host packages-listan — tap visar en Alert med förklaringen
+  // istället för att alltid skriva ut texten.
   infoIconBtn: {
     width: 20,
     height: 20,
@@ -5362,29 +5270,14 @@ const styles = StyleSheet.create({
     fontWeight: FontWeight.medium,
     color: Colors.textPrimary,
     // Reservera samma horisontella utrymme för alla labels så efterföljande
-    // status-pillar (YouTubes Enabled / Spotifys Enabled-Disabled / Images
-    // Enabled-Disabled) linjerar exakt under varandra trots att labels har
-    // olika pixel-bredd i proportionell font. Värdet rymmer den bredaste
-    // labeln (idag "YouTube" / "Spotify" / "Images" — alla under 100 px) med
-    // marginal — annars trycks just den radens pill till höger och bryter
-    // linjeringen. Värdet är paret med connectionRow.paddingRight (18) så
-    // att pillarna och switcharna båda shiftas vänster med 18px och linjerar
-    // med paketlistans switchar.
+    // status-pillar (YouTubes Enabled / Images Enabled-Disabled) linjerar
+    // exakt under varandra trots att labels har olika pixel-bredd i
+    // proportionell font. Värdet rymmer den bredaste labeln (idag "YouTube"
+    // / "Images" — båda under 100 px) med marginal — annars trycks just den
+    // radens pill till höger och bryter linjeringen. Värdet är paret med
+    // connectionRow.paddingRight (18) så att pillarna och switcharna båda
+    // shiftas vänster med 18px och linjerar med paketlistans switchar.
     minWidth: 112,
-  },
-  // Spotify-radens label + info-ikon ligger i en gemensam grupp som upptar
-  // samma minWidth (130) som plain connectionLabel — då stannar pillen och
-  // switchen i linje med YouTube- och Images-radernas. Texten
-  // inuti måste få minWidth: 0 (via connectionLabelInGroup) för att inte
-  // själv ta hela 130px och skuffa info-ikonen utanför gruppens bredd.
-  connectionLabelGroup: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.xs,
-    minWidth: 112,
-  },
-  connectionLabelInGroup: {
-    minWidth: 0,
   },
 
   sectionRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: Spacing.xs },

@@ -153,10 +153,6 @@ const SUBSCRIPTION_FEATURES: SubscriptionFeature[] = [
   { premium: 'Max 10 rounds per game', basic: 'Max 3 rounds per game' },
   { premium: 'Invite up to 12 players per Game', basic: '4 players' },
   { premium: 'Individual Device Game mode', basic: 'Not available' },
-  {
-    premium: 'Spotify access (still requires all players in the same Game to have Spotify account connected)',
-    basic: 'Not available',
-  },
 ];
 
 // ─── Screen ───────────────────────────────────────────────────────────────────

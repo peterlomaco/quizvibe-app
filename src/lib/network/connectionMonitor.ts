@@ -3,7 +3,7 @@
 //
 // Module-singleton som aggregerar två oberoende signaler:
 //
-//   1) Media-buffering — rapporterad av YT/Spotify/Image-adapters via
+//   1) Media-buffering — rapporterad av YT/Image-adapters via
 //      reportMediaStatus(). Inte trådad in i D-iii MVP (adapters finns inte
 //      än); metoden lämnas som ready stub så framtida slice kan wire:a in
 //      utan call-site-ändringar.
@@ -59,7 +59,7 @@ class ConnectionMonitor {
   private clearUnstableTimer: ReturnType<typeof setTimeout> | null = null;
 
   /**
-   * Rapporteras av media-adapters (YT/Spotify/Image) när deras buffering-
+   * Rapporteras av media-adapters (YT/Image) när deras buffering-
    * eller load-state ändras. D-iii MVP wire:ar inte in detta — adapters
    * finns inte än — men metoden är klar för framtida slice.
    */

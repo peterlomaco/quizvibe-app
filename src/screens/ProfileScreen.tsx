@@ -218,7 +218,6 @@ export default function ProfileScreen() {
   // top-up till FREE_CREDITS_DAILY_CAP behövs vid nästa load. Saknas på
   // gamla profiler — då räknas första load som "ny dag" och fyller på.
   const [lastFreeCreditsRefreshDate, setLastFreeCreditsRefreshDate] = useState<string | undefined>(undefined);
-  const [spotifyConnected, setSpotifyConnected] = useState<boolean>(false);
   const [friends, setFriends] = useState<Friend[]>([]);
   const [friendsModalOpen, setFriendsModalOpen] = useState(false);
   const [newFriendPlayerName, setNewFriendPlayerName] = useState('');
@@ -311,7 +310,7 @@ export default function ProfileScreen() {
   const [regionPickerOpen, setRegionPickerOpen] = useState(false);
   const [answerResponsePickerOpen, setAnswerResponsePickerOpen] = useState(false);
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
-  // Game connections-blocket (Spotify + Friends) kan kollapsas
+  // Game connections-blocket (Friends) kan kollapsas
   // för att minska scrollning. Default expanded så användaren ser
   // alternativen direkt vid första besöket.
   const [gameConnectionsExpanded, setGameConnectionsExpanded] = useState(true);
@@ -456,7 +455,6 @@ export default function ProfileScreen() {
         setGameCredits(augmented.gameCredits ?? 0);
         setFreeGameCredits(augmented.freeGameCredits ?? 0);
         setLastFreeCreditsRefreshDate(augmented.lastFreeCreditsRefreshDate);
-        setSpotifyConnected(augmented.spotifyConnected ?? false);
         setAnswerResponseSeconds(augmented.answerResponseSeconds ?? 30);
         // Clamp till nuvarande slider-range — gamla profiler kan ha sparat
         // gameEraFrom < 1930 från tiden då ERA_MIN var 1900. Utan clamp:n
@@ -532,7 +530,6 @@ export default function ProfileScreen() {
         // Bevara senaste refresh-datum så loadProfile inte top-up:ar
         // freeGameCredits till FREE_CREDITS_DAILY_CAP en gång till samma dag.
         lastFreeCreditsRefreshDate,
-        spotifyConnected,
         answerResponseSeconds,
         gameEraFrom: eraValues[0],
         gameEraTo: eraValues[1],
@@ -553,56 +550,6 @@ export default function ProfileScreen() {
     source === 'upload'  ? 'Custom photo'
     : source === 'default' ? 'Default image'
     : `${selectedAvatar?.category ?? ''} avatar`;
-
-  // Mock Spotify connect: för riktig integration används OAuth via Spotify
-  // Web API + expo-auth-session. Just nu togglas bara state + spara på profil.
-  // TODO (auth): implementera riktig Spotify OAuth.
-  const handleConnectSpotify = async () => {
-    setSpotifyConnected(true);
-    try {
-      const data = await loadProfile();
-      const next = {
-        playerName: data?.playerName ?? playerName,
-        birthYear: data?.birthYear ?? birthYear,
-        assistance: data?.assistance ?? assistance,
-        region: data?.region ?? region,
-        avatarSource: data?.avatarSource ?? source,
-        selectedAvatarId: data?.selectedAvatarId ?? selectedAvatarId,
-        gameCredits: data?.gameCredits ?? gameCredits,
-        freeGameCredits: data?.freeGameCredits ?? freeGameCredits,
-        lastFreeCreditsRefreshDate: data?.lastFreeCreditsRefreshDate ?? lastFreeCreditsRefreshDate,
-        spotifyConnected: true,
-      };
-      await saveProfile(next);
-    } catch {
-      // tyst — UI:t har redan uppdaterats
-    }
-  };
-
-  const handleDisconnectSpotify = () => {
-    Alert.alert(
-      'Disconnect Spotify?',
-      'Songs during games will play with Spotify ads.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Disconnect',
-          style: 'destructive',
-          onPress: async () => {
-            setSpotifyConnected(false);
-            try {
-              const data = await loadProfile();
-              if (data) {
-                await saveProfile({ ...data, spotifyConnected: false });
-              }
-            } catch {
-              // tyst
-            }
-          },
-        },
-      ],
-    );
-  };
 
   // Logout-flow via TopUserBanner-pillen. Speglar Home-skärmens
   // profileMenu (header med avatar+playerName+"Logged in"-status, röd
@@ -1478,43 +1425,6 @@ export default function ProfileScreen() {
 
         {gameConnectionsExpanded && (
           <>
-        {/* Spotify-koppling: tillåter ad-free playback under quiz-rundor
-            och låser upp Spotify-källan i Lobbyns Game connections-blocket. */}
-        <View style={[styles.spotifyCard, !spotifyConnected && styles.spotifyCardMuted]}>
-          <View style={styles.spotifyHeader}>
-            <View style={[styles.spotifyIconWrap, !spotifyConnected && styles.iconWrapMuted]}>
-              <Text style={[styles.spotifyIcon, !spotifyConnected && styles.iconGlyphMuted]}>♫</Text>
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.spotifyTitle}>
-                {spotifyConnected ? 'Spotify connected' : 'Connect your Spotify account'}
-              </Text>
-              <Text style={styles.spotifySubtitle}>
-                {spotifyConnected
-                  ? 'Songs play full-length with no Spotify ads.'
-                  : 'Pre-requisite to access Spotify when Game mode / Individual devices are activated.'}
-              </Text>
-            </View>
-            {spotifyConnected && <Text style={styles.spotifyCheck}>✓</Text>}
-          </View>
-
-          <Pressable
-            onPress={spotifyConnected ? handleDisconnectSpotify : handleConnectSpotify}
-            style={({ pressed }) => [
-              styles.spotifyBtn,
-              spotifyConnected ? styles.spotifyBtnDisconnect : styles.spotifyBtnConnect,
-              pressed && { opacity: 0.85 },
-            ]}
-          >
-            <Text style={[
-              styles.spotifyBtnText,
-              spotifyConnected && styles.spotifyBtnTextDisconnect,
-            ]}>
-              {spotifyConnected ? 'Disconnect' : 'Connect Spotify account'}
-            </Text>
-          </Pressable>
-        </View>
-
         {/* ── QuizVibe friends ─────────────────────────────────── */}
         {/* Sparade playerNames används senare för direktinbjudningar via
             Lobby's Share invite (visas hos vänner i Join Waiting Invites). */}
@@ -2388,94 +2298,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.border,
   },
 
-  // Spotify connect-card (viktig integration — Spotify-grön accent)
-  spotifyCard: {
-    backgroundColor: 'rgba(29,185,84,0.08)',
-    borderRadius: Radius.lg,
-    borderWidth: 1.5,
-    borderColor: '#1DB954',
-    padding: Spacing.lg,
-    gap: Spacing.md,
-  },
-  // Muted-variant av kortet när Spotify inte är connectat: grå border (samma
-  // palett som iconWrapMuted) signalerar inactive-state. Bg lämnas grön-
-  // tonad så kortet fortfarande läses som "Spotify-block".
-  spotifyCardMuted: {
-    borderColor: '#3A3F4B',
-  },
-  spotifyHeader: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: Spacing.md,
-  },
-  spotifyIconWrap: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#1DB954',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  // Unicode-text-glyph (♫, U+266B) istället för 🎵-emoji så color + fontWeight
-  // faktiskt appliceras — emoji ignorerar color-stylen och blir grön mot grön
-  // bg. Med text-glyfen får vi tydlig svart not.
-  spotifyIcon: {
-    fontSize: 26,
-    fontWeight: FontWeight.bold,
-    color: '#000000',
-  },
-  // Muted-varianter för ikon-wrap + glyph när användaren inte är connectead.
-  // Bg byts till neutral grå (samma palett som Lobbyns auto-disabled Spotify-
-  // switch) så ikonen "släcks". När användaren connectar lyser den upp
-  // tillbaka till sin brand-färg.
-  iconWrapMuted: {
-    backgroundColor: '#3A3F4B',
-  },
-  iconGlyphMuted: {
-    opacity: 0.45,
-  },
-  spotifyTitle: {
-    fontSize: FontSize.md,
-    fontWeight: FontWeight.bold,
-    color: Colors.textPrimary,
-  },
-  spotifySubtitle: {
-    fontSize: FontSize.xs,
-    color: Colors.textSecondary,
-    marginTop: 2,
-    lineHeight: 17,
-  },
-  spotifyCheck: {
-    fontSize: 22,
-    color: '#1DB954',
-    fontWeight: FontWeight.bold,
-  },
-  spotifyBtn: {
-    height: 44,
-    borderRadius: Radius.md,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  spotifyBtnConnect: {
-    backgroundColor: '#1DB954',
-  },
-  spotifyBtnDisconnect: {
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: Colors.borderStrong,
-  },
-  spotifyBtnText: {
-    fontSize: FontSize.sm,
-    fontWeight: FontWeight.bold,
-    color: '#FFFFFF',
-    letterSpacing: 0.3,
-  },
-  spotifyBtnTextDisconnect: {
-    color: Colors.textSecondary,
-  },
-
-  // QuizVibe friends card (samma struktur som Spotify-kortet:
-  // header upptill, full-bredd-knapp i underkant)
+  // QuizVibe friends card (header upptill, full-bredd-knapp i underkant)
   friendsCard: {
     backgroundColor: Colors.card,
     borderRadius: Radius.lg,
@@ -2489,8 +2312,8 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     gap: Spacing.md,
   },
-  // Wrapper för QuizVibeFriendsLogo. Bredden matchar Spotify-
-  // icon-wrapsen (44) så text-blocket börjar på samma x; SVG:n får
+  // Wrapper för QuizVibeFriendsLogo. Bredden (44) matchar paddingen i
+  // andra header-ikoner så text-blocket börjar på samma x; SVG:n får
   // rendera lite större (52) och tillåts overflow:a wrapper-bounds så
   // ikonen visuellt blir större utan att skjuta titeln längre höger.
   friendsIconWrap: {

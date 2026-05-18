@@ -1,5 +1,5 @@
-// Uniform interface som alla provider-implementationer (YouTube, Spotify,
-// framtida) konsumerar. State-driven istället för imperativt — föräldern
+// Uniform interface som alla provider-implementationer (YouTube + framtida)
+// konsumerar. State-driven istället för imperativt — föräldern
 // (typiskt quiz.tsx) äger phase-state och MediaPlayer translaterar
 // `isPlaying`/`showVideo`-prop:ar till provider-specifika kommandon.
 //

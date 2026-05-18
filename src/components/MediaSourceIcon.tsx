@@ -4,10 +4,9 @@ import Svg, { Circle, Path } from 'react-native-svg';
 import { Colors, FontWeight } from '../theme';
 
 /** Media-källa per fråga, för IndDev:s media-source-kö i GetReadyIntro.
- *  Samma symbolik som Lobby:s Game Connections-rad (röd YouTube-ruta, grön
- *  Spotify-ruta, Q+AI för Images) så de två skärmarna känns visuellt
- *  konsistenta. */
-export type MediaSourceType = 'youtube' | 'spotify' | 'image' | 'none';
+ *  Samma symbolik som Lobby:s Game Connections-rad (röd YouTube-ruta,
+ *  Q+AI för Images) så de två skärmarna känns visuellt konsistenta. */
+export type MediaSourceType = 'youtube' | 'image' | 'none';
 
 interface Props {
   source: MediaSourceType | undefined;
@@ -16,10 +15,9 @@ interface Props {
 }
 
 /**
- * Renderar en av tre media-källikoner i en cirkulär wrap. Speglar Lobby:s
+ * Renderar en av media-källikonerna i en cirkulär wrap. Speglar Lobby:s
  * Game Connections-rad:
  *   • youtube  — röd rundad ruta med vit CSS-triangel-play
- *   • spotify  — grön cirkel med 🎵-emoji
  *   • image    — Q-figur (cirkel + svans) i primary-blå med "AI"-text överlagrad
  *   • none/?   — grå cirkel med ❓
  */
@@ -45,13 +43,6 @@ export function MediaSourceIcon({ source, size = 28 }: Props) {
             },
           ]}
         />
-      </View>
-    );
-  }
-  if (source === 'spotify') {
-    return (
-      <View style={[wrapStyle, styles.spotifyBg]}>
-        <Text style={[styles.glyph, { fontSize: size * 0.5 }]}>🎵</Text>
       </View>
     );
   }
@@ -105,9 +96,6 @@ const styles = StyleSheet.create({
     borderTopColor: 'transparent',
     borderBottomColor: 'transparent',
     marginLeft: 2,
-  },
-  spotifyBg: {
-    backgroundColor: '#1DB954',
   },
   glyph: {
     textAlign: 'center',

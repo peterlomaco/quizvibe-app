@@ -18,8 +18,8 @@ interface Props {
  * ViewBox är tight (13 13 54 54) — croppar bort den tomma padding som
  * QuizVibeLogo har runt det synliga innehållet, så friends-loggan
  * fyller hela render-arean. Det gör att vänsterkanten av synligt
- * innehåll alignar med Spotify/YouTube-ikonens vänsterkant när alla
- * tre står med samma left-padding i sina cards.
+ * innehåll alignar med andra header-ikoners vänsterkant när de står
+ * med samma left-padding i sina cards.
  */
 export function QuizVibeFriendsLogo({ size = 44 }: Props) {
   return (

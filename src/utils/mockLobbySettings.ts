@@ -28,7 +28,6 @@ export interface LobbySettings {
   roundsCount: number;
   selectedExtraPackages: string[];
   youtubeEnabled: boolean;
-  spotifyHostToggle: boolean;
   profilesEnabled: boolean;
 }
 
@@ -43,7 +42,6 @@ interface LobbySettingsRow {
   rounds_count: number;
   selected_extra_packages: string[];
   youtube_enabled: boolean;
-  spotify_host_toggle: boolean;
   profiles_enabled: boolean;
 }
 
@@ -71,7 +69,6 @@ function rowToSettings(row: LobbySettingsRow): LobbySettings {
     roundsCount: row.rounds_count,
     selectedExtraPackages: row.selected_extra_packages,
     youtubeEnabled: row.youtube_enabled,
-    spotifyHostToggle: row.spotify_host_toggle,
     profilesEnabled: row.profiles_enabled,
   };
 }
@@ -88,7 +85,6 @@ function settingsToRow(code: string, s: LobbySettings): LobbySettingsRow {
     rounds_count: s.roundsCount,
     selected_extra_packages: [...s.selectedExtraPackages],
     youtube_enabled: s.youtubeEnabled,
-    spotify_host_toggle: s.spotifyHostToggle,
     profiles_enabled: s.profilesEnabled,
   };
 }

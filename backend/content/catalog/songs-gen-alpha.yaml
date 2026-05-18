@@ -27,7 +27,7 @@
 #   - taylor-swift-anti-hero
 #   - billie-eilish-birds-of-a-feather
 #   - rose-bruno-mars-apt
-# Väntar på Spotify-pipelinen (egen licens, inga embed-restrictions för previews).
+# Parkerade tills alternativ källa hittas eller licensiering ordnas.
 audience: ["gen-alpha", "gen-z"]
 category: songs
 items:
@@ -290,7 +290,7 @@ items:
     probability: 90
     wikimediaSearchHints: ["Taylor Swift Anti-Hero Midnights"]
     answerMethods: ["timeline"]
-    notes: "UTAN MEDIA: alla 10 YouTube-träffar UMG-blocked i SE/EU. Väntar på Spotify-pipelinen."
+    notes: "UTAN MEDIA: alla 10 YouTube-träffar UMG-blocked i SE/EU. Parkerat tills alternativ källa hittas."
   # 2023
   - id: miley-cyrus-flowers
     displayName: "Flowers — Miley Cyrus"
@@ -335,7 +335,7 @@ items:
     probability: 88
     wikimediaSearchHints: ["Billie Eilish Birds of a Feather Hit Me Hard and Soft"]
     answerMethods: ["timeline"]
-    notes: "UTAN MEDIA: alla studio-versioner UMG-blocked i SE/EU. Live-versioner ratade per policy. Väntar på Spotify-pipelinen."
+    notes: "UTAN MEDIA: alla studio-versioner UMG-blocked i SE/EU. Live-versioner ratade per policy. Parkerat tills alternativ källa hittas."
   - id: lady-gaga-bruno-mars-die-with-a-smile
     displayName: "Die With a Smile — Lady Gaga & Bruno Mars"
     correctYear: 2024
@@ -355,4 +355,4 @@ items:
     probability: 88
     wikimediaSearchHints: ["ROSE Bruno Mars APT 2024"]
     answerMethods: ["timeline"]
-    notes: "UTAN MEDIA: alla studio-versioner UMG-blocked i SE/EU. Singel-release 18 okt 2024; toppade chartsen 2025. Väntar på Spotify-pipelinen."
+    notes: "UTAN MEDIA: alla studio-versioner UMG-blocked i SE/EU. Singel-release 18 okt 2024; toppade chartsen 2025. Parkerat tills alternativ källa hittas."

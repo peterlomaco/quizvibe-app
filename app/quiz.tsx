@@ -103,7 +103,7 @@ interface ImageQuestion {
 
 type QuizQuestion = TimelineQuestion | ImageQuestion;
 
-// Spelet ställer endast Music-frågor (YouTube delvis, Spotify alltid). Själva
+// Spelet ställer endast Music-frågor (YouTube). Själva
 // låten spelas upp via media-pipen — frågetexten är därmed alltid samma
 // generic "Which year was this song released?". `hint` används bara internt
 // i reveal-vyn ("Disco era") så den behålls för smak.
@@ -553,7 +553,6 @@ export default function QuizScreen() {
     eraTo?: string;
     answerResponseSeconds?: string;
     youtubeEnabled?: string;
-    spotifyEnabled?: string;
   }>();
   // Default assistance från URL-param — fallback om turnOrder-spelaren
   // saknar egen assistance-flagga. Per-player-värdet från turnOrder:n
@@ -647,12 +646,10 @@ export default function QuizScreen() {
   // (t.ex. direkt-nav till /quiz utan Lobby).
   const eraFrom = parseInt(String(params.eraFrom ?? '1900'), 10);
   const eraTo = parseInt(String(params.eraTo ?? new Date().getFullYear()), 10);
-  // Game Connections-källor från Lobby. Default till YouTube=on, Spotify=off
-  // vid direkt-nav (utan Lobby) så MediaPlayer-stuben renderar klipp för
-  // mock-frågor med youtubeClips. Stränga 'true'-jämförelser så ev. tomma
-  // params inte falskt aktiverar Spotify.
+  // Game Connections-källor från Lobby. Default till YouTube=on vid direkt-
+  // nav (utan Lobby) så MediaPlayer-stuben renderar klipp för mock-frågor
+  // med youtubeClips.
   const youtubeEnabled = (params.youtubeEnabled ?? 'true') === 'true';
-  const spotifyEnabled = params.spotifyEnabled === 'true';
   // Turordningen levereras som JSON-sträng från Lobby:s handleStartGame.
   // try/catch:en gör att en korrupt payload graceful degradar till tom lista
   // → 'intro'-fasen hoppas över istället för att skärmen fastnar tom.
@@ -729,7 +726,7 @@ export default function QuizScreen() {
 
   // Media-källa per fråga (driver GetReadyIntro:s IndDev media-kö).
   // Bilder → 'image'; musik → kör pickMediaSource för att se om YouTube
-  // eller Spotify är aktiv för just den frågan givet host:s toggles.
+  // är aktiv för just den frågan givet host:s toggles.
   // Memoiseras parallellt med gameQuestions så ingen tomt-laddning sker i
   // render-loop.
   const mediaSourceByQuestion = useMemo<QuestionMediaType[]>(() => {
@@ -737,13 +734,12 @@ export default function QuizScreen() {
       if (q.type === 'image') return 'image';
       const picked = pickMediaSource(
         { youtubeClips: q.youtubeClips },
-        { youtubeEnabled, spotifyEnabled, gameMode },
+        { youtubeEnabled, gameMode },
       );
       if (picked.kind === 'youtube') return 'youtube';
-      if (picked.kind === 'spotify') return 'spotify';
       return 'none';
     });
-  }, [gameQuestions, youtubeEnabled, spotifyEnabled, gameMode]);
+  }, [gameQuestions, youtubeEnabled, gameMode]);
 
   const [questionIndex, setQuestionIndex] = useState(0);
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
@@ -972,9 +968,9 @@ export default function QuizScreen() {
           youtubeClips:
             question.type === 'timeline' ? question.youtubeClips : undefined,
         },
-        { youtubeEnabled, spotifyEnabled, gameMode },
+        { youtubeEnabled, gameMode },
       ),
-    [question, youtubeEnabled, spotifyEnabled, gameMode],
+    [question, youtubeEnabled, gameMode],
   );
 
   // D-iv: host:s player_id är alltid turnOrder[0] (Lobby-handleStartGame
@@ -2740,7 +2736,7 @@ export default function QuizScreen() {
             (leaderboard fångas av early-return ovan), så ingen extra
             phase-check behövs runt question UI. */}
             {/* MediaPlayer — provider-agnostisk dispatcher som väljer rätt
-                impl (YouTube/Spotify/None) baserat på pickMediaSource. Stuben
+                impl (YouTube/None) baserat på pickMediaSource. Stuben
                 i Expo Go visar thumbnail + clip-meta; Phase 4 byter den mot
                 en riktig WebView-baserad player utan att röra detta call-
                 site. isPlaying håller på genom hela question→awaiting→reveal-

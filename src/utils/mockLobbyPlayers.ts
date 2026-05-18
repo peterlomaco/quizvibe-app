@@ -44,7 +44,6 @@ interface LobbyPlayerRow {
   is_ready: boolean;
   approved: boolean;
   turn_order: number;
-  spotify_connected: boolean;
   lobby_edited: boolean;
   // True när spelaren själv tryckt "Leave Game Lobby" → markOwnPlayerLeft
   // UPDATE:ar denna kolumn så övriga klienter ser kortet med grå "LEFT
@@ -67,7 +66,6 @@ function rowToPlayer(row: LobbyPlayerRow): LobbyPlayer {
     isHost: row.is_host,
     isReady: row.is_ready,
     approved: row.approved,
-    spotifyConnected: row.spotify_connected,
     lobbyEdited: row.lobby_edited,
     hasLeft: row.has_left,
   };
@@ -100,7 +98,6 @@ function playerToRow(
     is_ready: player.isReady ?? false,
     approved: player.approved ?? false,
     turn_order: index,
-    spotify_connected: player.spotifyConnected ?? false,
     lobby_edited: player.lobbyEdited ?? false,
   };
 }

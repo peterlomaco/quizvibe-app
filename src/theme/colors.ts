@@ -1,6 +1,6 @@
 /**
  * Design-system color tokens
- * Navy / blue dark palette — Spotify / Apple dark-mode aesthetic
+ * Navy / blue dark palette — Apple dark-mode aesthetic
  */
 export const Colors = {
   // ── Backgrounds ────────────────────────────────────────────────

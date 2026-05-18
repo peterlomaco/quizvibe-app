@@ -1,5 +1,8 @@
 # Individual Devices — implementation spec
 
+> **⚠️ Spotify-referenser parkerade (2026-05-18)**
+> Spotify-integration (D-viii) avbröts efter SDK-research — ingen maintained React Native + Expo native module finns för Spotify playback. Alla `spotify`/`Spotify`/`spotifyAdapter`-referenser i denna doc är **historiska** och ska tolkas som "om vi någon gång återupptar". UI-strippet kördes 2026-05-18 — se memory/project_spotify_dashboard.md för full kontext. Övrig D-spec (D-i till D-vii) är oförändrad.
+
 Detaljerad implementation-spec för D-fasen (Individual Devices-läget). Kompletterar [`project_individual_devices_flow.md`](../../.claude/projects/C--Users-46725-quizvibe-app/memory/project_individual_devices_flow.md) i auto-memory:n — memory:n håller **decisions** (vad), denna doc håller **implementation** (hur).
 
 Varje slice får egen sektion när den specas. När en slice är implementerad uppdateras sektionen med status `✅ Implemented` + ev. avvikelser från ursprungsspec.

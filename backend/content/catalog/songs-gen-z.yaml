@@ -13,7 +13,7 @@
 #
 # 1 item utan media — inga OK studio-versioner i YouTube-sök:
 #   - beyonce-crazy-in-love (top-1 BLOCKED, top-2 är live, top-3 är Fifty
-#     Shades-remix). Väntar på Spotify-pipelinen.
+#     Shades-remix). Parkerat tills alternativ källa hittas.
 audience: ["gen-z", "millennials"]
 category: songs
 items:
@@ -186,7 +186,7 @@ items:
     probability: 92
     wikimediaSearchHints: ["Beyonce Crazy in Love Jay-Z"]
     answerMethods: ["timeline"]
-    notes: "UTAN MEDIA: top-1 BLOCKED i 1 region, top-2 är live, top-3 är Fifty Shades-remix (ej original). Väntar på Spotify-pipelinen."
+    notes: "UTAN MEDIA: top-1 BLOCKED i 1 region, top-2 är live, top-3 är Fifty Shades-remix (ej original). Parkerat tills alternativ källa hittas."
   # 2004
   - id: usher-yeah
     displayName: "Yeah! — Usher"

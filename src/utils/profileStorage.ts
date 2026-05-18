@@ -43,10 +43,6 @@ export interface ProfileData {
   // loadProfile för att avgöra om vi ska fylla på till FREE_CREDITS_DAILY_CAP.
   // Optional — saknas på profiler skapade innan refresh-logiken kom in.
   lastFreeCreditsRefreshDate?: string;
-  // Om användaren har kopplat sitt Spotify-konto. Används för att spela låtar
-  // ad-free under quiz-rundor. Optional för bakåtkompatibilitet.
-  // TODO (auth): byt till riktigt OAuth-flöde mot Spotify Web API.
-  spotifyConnected?: boolean;
   // Hur länge spelarna har på sig att svara på en fråga (i sekunder).
   // Skiljer sig från hur länge frågematerialet (låt/video/bild) spelas upp.
   // Optional för bakåtkompatibilitet — defaultas till 30 i UI.
@@ -155,7 +151,6 @@ interface ProfileRow {
   game_credits: number;
   free_game_credits: number;
   last_free_credits_refresh_date: string | null;
-  spotify_connected: boolean;
   answer_response_seconds: 15 | 30 | 45 | 60;
   game_era_from: number | null;
   game_era_to: number | null;
@@ -178,7 +173,6 @@ function rowToProfile(row: ProfileRow): ProfileData {
     gameCredits: row.game_credits,
     freeGameCredits: row.free_game_credits,
     lastFreeCreditsRefreshDate: row.last_free_credits_refresh_date ?? undefined,
-    spotifyConnected: row.spotify_connected,
     answerResponseSeconds: row.answer_response_seconds,
     gameEraFrom: row.game_era_from ?? undefined,
     gameEraTo: row.game_era_to ?? undefined,
@@ -206,7 +200,6 @@ function profileToRow(userId: string, email: string, p: ProfileData): ProfileRow
     game_credits: p.gameCredits ?? 0,
     free_game_credits: p.freeGameCredits ?? FREE_CREDITS_DAILY_CAP,
     last_free_credits_refresh_date: p.lastFreeCreditsRefreshDate ?? null,
-    spotify_connected: p.spotifyConnected ?? false,
     answer_response_seconds: p.answerResponseSeconds ?? 30,
     game_era_from: p.gameEraFrom ?? null,
     game_era_to: p.gameEraTo ?? null,
@@ -372,7 +365,6 @@ async function backfillProfileFromSession(user: { id: string; email?: string; us
     gameCredits: cache?.gameCredits,
     freeGameCredits: cache?.freeGameCredits,
     lastFreeCreditsRefreshDate: cache?.lastFreeCreditsRefreshDate,
-    spotifyConnected: cache?.spotifyConnected,
     answerResponseSeconds: cache?.answerResponseSeconds,
     gameEraFrom: cache?.gameEraFrom,
     gameEraTo: cache?.gameEraTo,
