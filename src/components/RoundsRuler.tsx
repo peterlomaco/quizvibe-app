@@ -42,9 +42,11 @@ const RULER_WIDTH = 280;
  *     "tillgängliga"; locked-distinktionen försvinner visuellt eftersom
  *     host har subscription), PREMIUM-badge GULD.
  *
- * Pass-the-Phone capar fortfarande rounds till 4 oavsett subscription —
- * därav klammer + badge syns även med sub on. Skillnaden är att siffrorna
- * inte ser låsta ut längre, bara att Game Mode begränsar valet just nu.
+ * Premium-host får 20 rundor oavsett gameMode (subscription unlock:ar långa
+ * spel även i Pass-the-Phone och single-player). Free-host i Pass-the-Phone
+ * capas fortfarande vid 4 — telefonen rör sig fysiskt mellan spelare så
+ * speltiden växer snabbt med fler rundor. Locked-vokabulär (klammer + badge)
+ * syns bara när host saknar subscription OCH `gameModeMax < ROUNDS_MAX_INDIV`.
  */
 export function RoundsRuler({ value, min, gameModeMax, onPremiumPress, hasSubscription = false }: {
   value: number;

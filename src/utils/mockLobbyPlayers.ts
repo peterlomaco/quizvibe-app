@@ -116,6 +116,17 @@ function normalizeCode(code: string): string {
  * medvetet konservativt så host:s state-overwrites inte råkar wipe:a en
  * just-inserterad joiner som ännu inte syncats in i host:s local state.
  *
+ * **user_id-bevarande**: host:s UPSERT splittas i två batches — host:s
+ * egen rad (med `user_id = hostUserId`) och non-host-rader (UTAN `user_id`-
+ * fältet i payload:en). Detta för att non-host:s egen UPSERT av sin rad
+ * satte `user_id = auth.uid()` så RLS-policyn "player can update own row"
+ * släpper igenom deras egna UPDATE:s (t.ex. markOwnPlayerLeft). Om host:s
+ * bulk-UPSERT skulle inkludera `user_id = null` för non-host-raderna
+ * skulle Postgres' EXCLUDED.user_id sätta DB:s user_id till null →
+ * non-host kan inte längre UPDATE:a sin egen rad → has_left-broadcast:s
+ * från Leave Game tappas (UPDATE matchar inga rader). Genom att inte
+ * inkludera `user_id` i non-host-payload:en bevaras DB:s befintliga värde.
+ *
  * Anropas av useEffect på [players, roomCode] gated på hostMode.
  */
 export async function setLobbyPlayers(code: string, players: LobbyPlayer[]): Promise<void> {
@@ -123,14 +134,40 @@ export async function setLobbyPlayers(code: string, players: LobbyPlayer[]): Pro
   const normalized = normalizeCode(code);
   const { data: userResp } = await supabase.auth.getUser();
   const hostUserId = userResp.user?.id ?? null;
-  const rows = players.map((p, i) =>
-    playerToRow(normalized, p, i, p.isHost ? hostUserId : null),
-  );
-  const { error } = await supabase
-    .from('lobby_players')
-    .upsert(rows, { onConflict: 'room_code,player_id' });
-  if (error) {
-    console.warn('[lobbyPlayers] setLobbyPlayers upsert failed:', error.message);
+
+  // Host:s egen rad — med user_id så host kan UPDATE:a (RLS gates).
+  const hostRows = players
+    .map((p, i) => ({ p, i }))
+    .filter(({ p }) => !!p.isHost)
+    .map(({ p, i }) => playerToRow(normalized, p, i, hostUserId));
+
+  // Non-host-rader — strippa user_id ur payload:en så befintligt värde i
+  // DB (satt av non-host:ens upsertOwnLobbyPlayer) bevaras. Använder rest-
+  // spread istället för att modifiera playerToRow så funktionen kan
+  // återanvändas av upsertOwnLobbyPlayer som behöver user_id-fältet.
+  const nonHostRows = players
+    .map((p, i) => ({ p, i }))
+    .filter(({ p }) => !p.isHost)
+    .map(({ p, i }) => {
+      const { user_id: _omitUserId, ...rest } = playerToRow(normalized, p, i, null);
+      return rest;
+    });
+
+  if (hostRows.length > 0) {
+    const { error } = await supabase
+      .from('lobby_players')
+      .upsert(hostRows, { onConflict: 'room_code,player_id' });
+    if (error) {
+      console.warn('[lobbyPlayers] setLobbyPlayers host upsert failed:', error.message);
+    }
+  }
+  if (nonHostRows.length > 0) {
+    const { error } = await supabase
+      .from('lobby_players')
+      .upsert(nonHostRows, { onConflict: 'room_code,player_id' });
+    if (error) {
+      console.warn('[lobbyPlayers] setLobbyPlayers non-host upsert failed:', error.message);
+    }
   }
 }
 
@@ -155,7 +192,19 @@ export async function upsertOwnLobbyPlayer(code: string, player: LobbyPlayer): P
   await ensureAuthSession();
   const { data: userResp } = await supabase.auth.getUser();
   const userId = userResp.user?.id ?? null;
-  const row = playerToRow(normalized, player, 999, userId);
+  // Explicit `has_left: false` i payload:en så re-join efter en tidigare
+  // Leave Game alltid resetar flaggan. Två fall den fångar:
+  //   (a) Code-only-join där dup-detection ÄRVER det gamla player_id:t —
+  //       UPSERT träffar då befintlig rad där has_left=true ligger kvar
+  //       sedan tidigare markOwnPlayerLeft. Utan denna reset skulle
+  //       LobbyScreen:s render-filter (`!p.hasLeft`) fortsätta exkludera
+  //       spelaren och re-join skulle vara osynlig för både self och host.
+  //   (b) Guest-join där en NY player_id genereras — INSERT får default
+  //       false ändå, men explicit-set:n håller koden symmetrisk med (a).
+  // Skiljs medvetet från setLobbyPlayers (host:s bulk-UPSERT) som
+  // FORTSATT omittar has_left ur payload:en — host får inte clobba
+  // has_left för non-host:s rader vid varje state-sync.
+  const row = { ...playerToRow(normalized, player, 999, userId), has_left: false };
   const { error } = await supabase
     .from('lobby_players')
     .upsert(row, { onConflict: 'room_code,player_id' });

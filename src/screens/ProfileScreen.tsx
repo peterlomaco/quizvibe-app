@@ -107,8 +107,13 @@ const formatBirthYear = (y: number): string =>
 // 'Basic') så användaren kan plocka silhouetten explicit istället för att
 // gå via Default Image-raden. Default Image-raden fortsätter att rendera
 // QuizVibe Q-marken som faktisk avatar (useBrandFallback i Avatar.tsx).
+// 'upload' tas medvetet bort ur menyn 2026-05-19 — Upload Photo-flödet
+// avvecklas (kräver image-picker + storage-bucket som inte är aktiverat,
+// och Choose Avatar + Default Image täcker MVP-behovet). AvatarSource-
+// typen behåller 'upload' som värde så profiles som tidigare valt det
+// fortsatt loadar utan migrations-error; previewCaption har en fallback
+// för 'Custom photo'-strängen.
 const SOURCE_OPTIONS: { id: AvatarSource; icon: string; label: string; subtitle: string }[] = [
-  { id: 'upload',  icon: '📤', label: 'Upload Photo',   subtitle: 'Use a photo from your library' },
   { id: 'choose',  icon: '✨', label: 'Choose Avatar',  subtitle: 'Pick from our collection'      },
   { id: 'default', icon: 'Q',  label: 'Default Image',  subtitle: 'QuizVibe brand mark'           },
 ];
@@ -257,11 +262,31 @@ export default function ProfileScreen() {
   // "Use single player mode as default" — när checkad låses host-default till
   // Individual Devices och Pass-the-Phone-rutan visas dämpad/grå i toggle:n.
   const [singlePlayerDefault, setSinglePlayerDefault] = useState(false);
+  // Premium-status — styr om PREMIUM-badge på Max 12-toggle visas i guld
+  // (köpt) eller grått (inte köpt än), om Individual Devices är unlocked,
+  // om Rounds-rulern visar gold-bracket + blå-tickade siffror, och om
+  // Host Game Credits-pillen får gold-bordred + "Unlimited"-badge. Synced
+  // med Lobby:s motsvarande hasPremium-state via samma subscriptionStorage-
+  // helper. Load:as i useFocusEffect nedan så Profile speglar köp som
+  // gjorts i Store utan delay.
+  const [hasPremium, setHasPremium] = useState(false);
   // Default antal rundor (host-default). Speglar Lobby:s rounds-stepper +
-  // RoundsRuler. Capas av gameMode — Pass-the-Phone max 4, Individual Devices
-  // max 20. Vid byte av gameMode clampas värdet automatiskt ner.
+  // RoundsRuler. Capas av gameMode + subscription — Free + Pass-the-Phone
+  // (eller single-player ovanpå Pass-the-Phone) max 4; Premium-host får 20
+  // oavsett mode; Individual Devices alltid 20 (redan Premium-gated). Vid
+  // byte av gameMode clampas värdet automatiskt ner om det skulle hamna
+  // utanför nya max:t.
   const [roundsCount, setRoundsCount] = useState<number>(ROUNDS_DEFAULT);
-  const roundsMax = gameMode === 'pass-the-phone' ? ROUNDS_MAX_PASS : ROUNDS_MAX_INDIV;
+  const roundsMax = hasPremium || gameMode === 'individual-devices' ? ROUNDS_MAX_INDIV : ROUNDS_MAX_PASS;
+  // Auto-sync maxPlayers ↔ gameMode: Pass-the-Phone capas alltid vid 4
+  // (PtP med 12 spelare × 20 rundor = orimligt långt spel), Individual
+  // Devices defaulta:r till 12 så host får full multiplayer-cap direkt.
+  // Speglar Lobby:s motsvarande auto-sync så host-defaults och in-lobby-
+  // state håller samma policy.
+  useEffect(() => {
+    const targetMax: 4 | 12 = gameMode === 'pass-the-phone' ? 4 : 12;
+    setMaxPlayers((prev) => (prev === targetMax ? prev : targetMax));
+  }, [gameMode]);
   const handleDecrementRounds = () => {
     setRoundsCount((prev) => {
       const next = Math.max(ROUNDS_MIN, prev - ROUNDS_STEP);
@@ -284,14 +309,6 @@ export default function ProfileScreen() {
   useEffect(() => {
     setRoundsCount((prev) => Math.max(ROUNDS_MIN, Math.min(roundsMax, prev)));
   }, [roundsMax]);
-  // Premium-status — styr om PREMIUM-badge på Max 12-toggle visas i guld
-  // (köpt) eller grått (inte köpt än), om Individual Devices är unlocked,
-  // om Rounds-rulern visar gold-bracket + blå-tickade siffror, och om
-  // Host Game Credits-pillen får gold-bordred + "Unlimited"-badge. Synced
-  // med Lobby:s motsvarande hasPremium-state via samma subscriptionStorage-
-  // helper. Load:as i useFocusEffect nedan så Profile speglar köp som
-  // gjorts i Store utan delay.
-  const [hasPremium, setHasPremium] = useState(false);
 
   // Försök att välja Individual Devices utan Premium → Store-omdirigering.
   // Speglar Lobby:s handleSelectMode-pattern.
@@ -326,6 +343,12 @@ export default function ProfileScreen() {
       return;
     }
     setMaxPlayers(value);
+    // Max 12 är meningsfullt bara i Individual Devices (PtP capas vid 4
+    // pga orimlig speltid). Snäpper gameMode automatiskt till IndDev när
+    // host väljer Max 12 från PtP — speglar Lobby:s motsvarande logik.
+    if (value === 12 && gameMode === 'pass-the-phone') {
+      setGameMode('individual-devices');
+    }
   };
   const [yearPickerOpen, setYearPickerOpen]     = useState(false);
   const [assistancePickerOpen, setAssistancePickerOpen]   = useState(false);
@@ -675,7 +698,7 @@ export default function ProfileScreen() {
             {hasPremium && (
               <View style={styles.creditsMembershipBadgeWrap} pointerEvents="none">
                 <View style={styles.creditsMembershipBadge}>
-                  <Text style={styles.creditsMembershipBadgeText}>Unlimited</Text>
+                  <Text style={styles.creditsMembershipBadgeText}>UNLIMITED</Text>
                 </View>
               </View>
             )}

@@ -41,9 +41,9 @@ import {
 import { TopUserBanner } from '../components/TopUserBanner';
 import { Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';
 import { getAvatarEmojiById } from '../utils/avatars';
-import { loadFriends, type Friend } from '../utils/friendsStorage';
+import { addFriend, loadFriends, type Friend } from '../utils/friendsStorage';
 import { MIN_HCP, calculateInitialHCP } from '../utils/hcp';
-import { addLeftPlayer, getLeftPlayers } from '../utils/leftPlayers';
+import { addLeftPlayer, getLeftPlayers, removeLeftPlayer } from '../utils/leftPlayers';
 import { deactivateRoom, getRoomMeta, markRoomGameStarted, roomExists, setRoomMaxPlayers, setRoomPlayerCount } from '../utils/mockActiveRooms';
 import { clearEjected, isEjected, markEjected } from '../utils/ejectedPlayers';
 import { clearLobbyPlayers, getLobbyPlayers, markOwnPlayerLeft, setLobbyPlayers, upsertOwnLobbyPlayer } from '../utils/mockLobbyPlayers';
@@ -76,7 +76,7 @@ import { containsProfanity } from '../utils/profanity';
 import { loadProfile, saveProfile, type ProfileData, type Region as ProfileRegion } from '../utils/profileStorage';
 import { hasPremiumSubscription } from '../utils/subscriptionStorage';
 import { ROOM_CODE_DIGITS, ROOM_CODE_LEADING_LETTERS, formatRoomCode, generateRoomCode } from '../utils/roomCode';
-import { addInvite } from '../utils/waitingInvites';
+import { addInvite, clearWaitingInvitesForRoom } from '../utils/waitingInvites';
 
 export interface LobbyPlayer extends Player {
   type: 'registered' | 'guest' | 'manual';
@@ -545,7 +545,7 @@ function AddPlayerModal({ visible, onClose, onAdd }: {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <View style={modal.container}>
-          <Text style={modal.title}>Add Player</Text>
+          <Text style={modal.title}>Add Guest</Text>
           <Text style={modal.subtitle}>For local guests playing on this phone</Text>
 
           <ScrollView
@@ -1105,6 +1105,10 @@ export default function LobbyScreen() {
         // Publicera egen rad till lobby_players så host:s Realtime-channel
         // får broadcast och hen ser den nya spelaren direkt i sin vy.
         upsertOwnLobbyPlayer(roomCode, guestPlayer).catch(() => { /* loggas i lobbyPlayers */ });
+        // Rensa ev. stale leftPlayers-snapshot för det här player_id:t. Guest
+        // får alltid fresh id så normalt finns inget att rensa, men anropet
+        // är idempotent och håller koden symmetrisk med code-only-pathen.
+        removeLeftPlayer(roomCode, guestPlayerId).catch(() => { /* loggas i leftPlayers */ });
         return;
       }
       if (!hostMode) {
@@ -1145,10 +1149,12 @@ export default function LobbyScreen() {
           age,
           assistance,
           hcpComplete,
-          // Vid ärvt id: bevara approved-status från existing rad (host
-          // kan redan ha approvat spelaren i föregående lobby-session).
-          // Vid nytt id: alltid false (måste approvas av host innan start).
-          approved: existingMatch?.approved ?? false,
+          // ALLTID false — non-host måste re-approvas av host vid varje
+          // join, även om de varit approved i en tidigare session och nu
+          // re-joinar via dup-detection (ärvt player_id). upsertOwnLobbyPlayer
+          // skriver approved=false till DB:n så host:s vy får raden i "To
+          // be Approved by Host"-listan och kan välja att approva på nytt.
+          approved: false,
         };
         setPlayers((prev) => {
           // Dedupe på id: om syncFromStore-pollen redan har dragit in
@@ -1169,6 +1175,14 @@ export default function LobbyScreen() {
         // joinerId redan finns i tabellen blir det en UPDATE (samma id,
         // ny payload) — inget ny rad skapas.
         upsertOwnLobbyPlayer(roomCode, joiner).catch(() => { /* loggas i lobbyPlayers */ });
+        // Rensa ev. stale leftPlayers-snapshot för det ärvda player_id:t.
+        // Kritiskt när dup-detection ovan har ärvt OLD-id:t från en tidigare
+        // Leave Game: AsyncStorage:s leftIds får annars syncFromStore:s
+        // self-injection att felaktigt sätta hasLeft=true trots att DB:s
+        // has_left nu är false (via upsertOwnLobbyPlayer:s explicit-set).
+        // Resultat utan denna rad: re-join via invite/code → spelaren
+        // renderas inte (vårt hasLeft-filter exkluderar dem).
+        removeLeftPlayer(roomCode, joinerId).catch(() => { /* loggas i leftPlayers */ });
         return;
       }
       // Host-flödet utan carry-over: hostens id är seed-värdet '1' (Alex K.).
@@ -1291,6 +1305,11 @@ export default function LobbyScreen() {
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [friends, setFriends] = useState<Friend[]>([]);
   const [invitedFriendIds, setInvitedFriendIds] = useState<Set<string>>(new Set());
+  // Input för "Add by Player Name"-raden i Share invite — speglar Profile:s
+  // friends-modal så host kan lägga till en QuizVibe friend direkt från lobby
+  // utan att behöva navigera till Profile först. Nyligen tillagd friend
+  // dyker upp i listan med en Invite-knapp redo att tappas.
+  const [newFriendPlayerName, setNewFriendPlayerName] = useState('');
 
   // Ref till lobby:s primär-ScrollView. Används för att snäppa scroll-position
   // till toppen vid varje fresh entry (mount eller URL-params-byte) — utan
@@ -1397,10 +1416,24 @@ export default function LobbyScreen() {
     setRoomMaxPlayers(roomCode, maxPlayers).catch(() => { /* loggas i mockActiveRooms */ });
   }, [maxPlayers, roomCode, hostMode]);
 
-  // Max rundor beror på gameMode — Pass-the-Phone capas vid 4, Individual
-  // Devices vid 20. När host växlar läge clampas roundsCount automatiskt
-  // ner om det skulle hamna utanför nya max:t.
-  const roundsMax = gameMode === 'pass-the-phone' ? ROUNDS_MAX_PASS : ROUNDS_MAX_INDIV;
+  // Auto-sync maxPlayers ↔ gameMode (host-only): Pass-the-Phone capas alltid
+  // vid 4 spelare (PtP med 12 spelare × 20 rundor = orimligt långt spel),
+  // Individual Devices defaulta:r till 12 så host får full multiplayer-cap
+  // direkt utan extra knapptryck. Non-host syncar maxPlayers via room-meta-
+  // pollen ovan, så de behöver inte auto-set:as här.
+  useEffect(() => {
+    if (!hostMode) return;
+    const targetMax: 4 | 12 = gameMode === 'pass-the-phone' ? 4 : 12;
+    setMaxPlayers((prev) => (prev === targetMax ? prev : targetMax));
+  }, [gameMode, hostMode]);
+
+  // Max rundor beror på gameMode + subscription. Free host i Pass-the-Phone
+  // (eller single-player ovanpå Pass-the-Phone) capas vid 4 — speltiden växer
+  // snabbt när telefonen rör sig fysiskt mellan spelare. Premium-host får
+  // 20 oavsett mode (subscription unlock:ar långa spel även i Pass-the-Phone
+  // och single-player). Individual Devices är redan Premium-gated och får
+  // 20 ändå.
+  const roundsMax = hasPremium || gameMode === 'individual-devices' ? ROUNDS_MAX_INDIV : ROUNDS_MAX_PASS;
   useEffect(() => {
     setRoundsCount((prev) => Math.max(ROUNDS_MIN, Math.min(roundsMax, prev)));
   }, [roundsMax]);
@@ -1534,6 +1567,14 @@ export default function LobbyScreen() {
       return;
     }
     setMaxPlayers(value);
+    // Max 12 är meningsfullt bara i Individual Devices (PtP capas vid 4
+    // pga orimlig speltid). Om host väljer Max 12 från PtP-läget snäpper
+    // gameMode automatiskt till Individual Devices. Gameplay-loop med
+    // 12 spelare runt EN telefon × 20 rundor = 240 frågor är inte ett
+    // realistiskt scenario.
+    if (value === 12 && gameMode === 'pass-the-phone') {
+      setGameMode('individual-devices');
+    }
   };
 
   // Approved spelare = i spelet, har turn-nummer, syns överst.
@@ -1541,9 +1582,18 @@ export default function LobbyScreen() {
   // Alla spelare som hamnar i lobbyn har komplett HCP (sätts vid Join as
   // Guest eller importeras automatiskt för registrerade användare) — så
   // det finns ingen "missing info"-grupp längre.
+  //
+  // **hasLeft-filter**: spelare som lämnat lobbyn (egen Leave-action eller
+  // host:s trash) ska försvinna helt från BÅDA listorna i BÅDA vyer (host
+  // OCH non-host). Tidigare visades de som grå "LEFT THIS GAME LOBBY"-kort
+  // via orphan-injection, men det skapade förvirring — usern ska tolka
+  // listan som "spelare just nu i rummet". Data-modell-wise lever raden
+  // kvar i lobby_players med has_left=true (för audit/debug) men render-
+  // pathen exkluderar dem. handleStartGame:s turnOrder-bygge filtrerar
+  // redan oberoende så ingen risk att hasLeft hamnar i turn-order.
   const isPlayerApproved = (p: LobbyPlayer) => !!p.approved || !!p.isHost;
-  const approvedPlayers = players.filter((p) => isPlayerApproved(p));
-  const waitingForApproval = players.filter((p) => !isPlayerApproved(p));
+  const approvedPlayers = players.filter((p) => isPlayerApproved(p) && !p.hasLeft);
+  const waitingForApproval = players.filter((p) => !isPlayerApproved(p) && !p.hasLeft);
   // Driver "Waiting for approval"-mellansteget för non-host. När host inte
   // har godkänt mig än ska jag inte se lobby:n överhuvudtaget — bara en
   // status-skärm. Polling-effekten ovan plockar upp host:s approve-toggle
@@ -1871,9 +1921,22 @@ export default function LobbyScreen() {
   // Öppnar Share invite-modalen och laddar in den senaste friends-listan.
   const handleOpenShareModal = async () => {
     setInvitedFriendIds(new Set());
+    setNewFriendPlayerName('');
     setShareModalOpen(true);
     const list = await loadFriends();
     setFriends(list);
+  };
+
+  // Lägg till en QuizVibe friend direkt från Share invite-modalen. Speglar
+  // Profile:s handleAddFriend exakt — addFriend dedupar case-insensitive på
+  // playerName så dubbel-add är säkert. Efter tillagd friend syns hen i
+  // listan med en Invite-knapp; host kan välja att invite:a direkt eller
+  // bara behålla för senare spel.
+  const handleAddFriendFromShare = async () => {
+    if (!newFriendPlayerName.trim()) return;
+    const updated = await addFriend(newFriendPlayerName);
+    setFriends(updated);
+    setNewFriendPlayerName('');
   };
 
   // Två-stegs leave-flow för non-hosts (både gäster och registrerade
@@ -2189,23 +2252,41 @@ export default function LobbyScreen() {
         return next;
       });
     };
-    const syncHasLeft = async () => {
+    // Syncar non-host-fält som non-host:en själv kan skriva via sin egen
+    // upsertOwnLobbyPlayer: `hasLeft` (markOwnPlayerLeft + reset vid re-join)
+    // OCH `approved` (re-join resetar till false så host måste re-approva).
+    //
+    // Utan approved-sync skulle host:s useEffect [players]-trigger (från
+    // hasLeft-ändringen) köra setLobbyPlayers som bulk-UPSERT:ar lokala
+    // state — och eftersom host:s lokala `approved` ligger kvar som true
+    // från en tidigare approval skulle bulk-UPSERT:en clobba DB:s freshly-
+    // set approved=false tillbaka till true. Resultatet: non-host som
+    // re-joinar via Share invite eller code skulle auto-approvas av host
+    // utan att host gjort något — fel beteende.
+    //
+    // Genom att pulla approved från DB:n in i lokala state INNAN useEffect
+    // fyrar, blir bulk-UPSERT:ens payload `approved=false` (i sync med DB)
+    // och ingen clobber sker.
+    const syncNonHostFields = async () => {
       const stored = await getLobbyPlayers(roomCode);
       if (cancelled || !stored) return;
       setPlayers((prev) => {
         let changed = false;
         const next = prev.map((p) => {
-          if (p.isHost) return p; // host kan inte vara left
+          if (p.isHost) return p; // host:s fält ägs lokalt (mergeProfileIntoHost)
           const updated = stored.find((s) => s.id === p.id);
           if (!updated) return p;
           const nextHasLeft = !!updated.hasLeft;
-          if (!!p.hasLeft === nextHasLeft) return p;
+          const nextApproved = !!updated.approved;
+          if (!!p.hasLeft === nextHasLeft && !!p.approved === nextApproved) return p;
           changed = true;
-          return { ...p, hasLeft: nextHasLeft };
+          return { ...p, hasLeft: nextHasLeft, approved: nextApproved };
         });
         return changed ? next : prev;
       });
     };
+    // Bakåtkompat-alias för call-sites nedan som fortsatt heter syncHasLeft.
+    const syncHasLeft = syncNonHostFields;
     // Initial check direkt vid mount så ev. joiners som hunnit INSERT:a
     // innan host:s subscription var aktiv kommer in i listan.
     fetchNewJoiners();
@@ -2637,6 +2718,12 @@ export default function LobbyScreen() {
     // false för nya joiners (rummet är inte längre joinbart). Fire-and-forget
     // — UI:t fortsätter inte vänta på DB-roundtrip.
     markRoomGameStarted(roomCode).catch(() => { /* loggas i mockActiveRooms */ });
+    // Rensa pending invites för det här rummet — host startar spelet, så
+    // alla mottagare som ännu inte accepterat ska INTE längre se inviten
+    // som ett valbart alternativ på Home. Game-start raderar inte rooms-
+    // raden så ON DELETE CASCADE fyrar inte — explicit cleanup behövs.
+    // Realtime DELETE-events propageras till mottagarnas JoinModal-sub:ar.
+    clearWaitingInvitesForRoom(roomCode).catch(() => { /* loggas i waitingInvites */ });
 
     router.push({
       pathname: '/quiz',
@@ -2726,7 +2813,7 @@ export default function LobbyScreen() {
               {hasPremium && (
                 <View style={styles.creditsMembershipBadgeWrap} pointerEvents="none">
                   <View style={styles.creditsMembershipBadge}>
-                    <Text style={styles.creditsMembershipBadgeText}>Unlimited</Text>
+                    <Text style={styles.creditsMembershipBadgeText}>UNLIMITED</Text>
                   </View>
                 </View>
               )}
@@ -3552,7 +3639,7 @@ export default function LobbyScreen() {
               </View>
               {hostMode && gameMode === 'pass-the-phone' && (
                 <TouchableOpacity style={styles.addBtn} onPress={handleOpenAddPlayer}>
-                  <Text style={styles.addBtnText}>+ Add Player</Text>
+                  <Text style={styles.addBtnText}>+ Add Guest</Text>
                 </TouchableOpacity>
               )}
             </View>
@@ -4146,7 +4233,10 @@ export default function LobbyScreen() {
         animationType="slide"
         onRequestClose={() => setShareModalOpen(false)}
       >
-        <View style={shareSheet.overlay}>
+        <KeyboardAvoidingView
+          style={shareSheet.overlay}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        >
           <TouchableOpacity
             style={shareSheet.backdrop}
             activeOpacity={1}
@@ -4156,23 +4246,52 @@ export default function LobbyScreen() {
             <View style={shareSheet.handle} />
             <Text style={shareSheet.title}>Share invite</Text>
             <Text style={shareSheet.subtitle}>
-              Send invites to your QuizVibe friends.
+              Add a QuizVibe friend or invite an existing one to this lobby.
             </Text>
 
-            {/* QuizVibe friends list */}
+            {/* QuizVibe friends section label */}
             <View style={shareSheet.sectionLabelRow}>
               <QuizVibeFriendsLogo size={28} />
               <Text style={shareSheet.sectionLabel}>QuizVibe friends</Text>
             </View>
+
+            {/* Add by Player Name — speglar Profile:s friends-modal så host
+                kan lägga till en friend direkt från lobby utan att hoppa
+                till Profile. Efter Add hamnar friend:en i listan nedan med
+                en Invite-knapp redo att tappas. */}
+            <View style={shareSheet.addRow}>
+              <TextInput
+                style={shareSheet.addInput}
+                placeholder="Add by Player Name"
+                placeholderTextColor={Colors.textDisabled}
+                value={newFriendPlayerName}
+                onChangeText={setNewFriendPlayerName}
+                maxLength={20}
+                returnKeyType="done"
+                onSubmitEditing={handleAddFriendFromShare}
+              />
+              <Pressable
+                onPress={handleAddFriendFromShare}
+                disabled={!newFriendPlayerName.trim()}
+                style={({ pressed }) => [
+                  shareSheet.addBtn,
+                  !newFriendPlayerName.trim() && shareSheet.addBtnDisabled,
+                  pressed && { opacity: 0.85 },
+                ]}
+              >
+                <Text style={shareSheet.addBtnText}>Add</Text>
+              </Pressable>
+            </View>
+
             {friends.length === 0 ? (
               <View style={shareSheet.emptyState}>
                 <Text style={shareSheet.emptyText}>No friends saved yet</Text>
                 <Text style={shareSheet.emptySubtext}>
-                  Add friends in Profile to invite them with one tap.
+                  Add a Player Name above to invite them with one tap.
                 </Text>
               </View>
             ) : (
-              <ScrollView style={{ maxHeight: 260 }}>
+              <ScrollView style={{ maxHeight: 260 }} keyboardShouldPersistTaps="handled">
                 {friends.map((friend, i) => {
                   const invited = invitedFriendIds.has(friend.id);
                   return (
@@ -4214,7 +4333,7 @@ export default function LobbyScreen() {
               <Text style={shareSheet.closeBtnText}>Done</Text>
             </TouchableOpacity>
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </Modal>
 
       {/* ── Guest leave-room sheet ───────────────────────────────────
@@ -5903,6 +6022,38 @@ const shareSheet = StyleSheet.create({
   sectionLabel: {
     ...Typography.overline,
     color: Colors.textSecondary,
+  },
+
+  // Add-by-Player-Name-rad — speglar Profile:s friendsModal.addRow exakt så
+  // visual-vokabulär förblir konsistent mellan Profile och Lobby.
+  addRow: {
+    gap: Spacing.sm,
+  },
+  addInput: {
+    height: 48,
+    borderRadius: Radius.md,
+    backgroundColor: Colors.background,
+    borderWidth: 1,
+    borderColor: Colors.borderStrong,
+    paddingHorizontal: Spacing.lg,
+    fontSize: 15,
+    color: Colors.textPrimary,
+  },
+  addBtn: {
+    height: 44,
+    borderRadius: Radius.md,
+    backgroundColor: Colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  addBtnDisabled: {
+    backgroundColor: 'rgba(255,255,255,0.06)',
+  },
+  addBtnText: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.bold,
+    color: '#fff',
+    letterSpacing: 0.3,
   },
 
   emptyState: {

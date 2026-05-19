@@ -69,3 +69,33 @@ export async function clearLeftPlayers(roomCode: string): Promise<void> {
     console.warn('[leftPlayers] Failed to clear:', err);
   }
 }
+
+/**
+ * Tar bort EN specifik spelar-snapshot från leftPlayers-storen. Anropas
+ * av non-host:s auto-add useEffect vid re-join — om dup-detection har
+ * ärvt det gamla player_id:t (samma playerName i lobby_players) skulle
+ * AsyncStorage-snapshot:n från föregående Leave annars få selfRow:s
+ * hasLeft-derivering i syncFromStore att felaktigt sätta hasLeft=true
+ * (`!!selfRow.hasLeft || leftIds.has(selfRow.id)`) trots att DB:s
+ * has_left nu är false. Resultat: spelaren skulle inte rendera trots
+ * att re-join lyckats.
+ *
+ * Idempotent — no-op om ingen snapshot matchar.
+ */
+export async function removeLeftPlayer(
+  roomCode: string,
+  playerId: string,
+): Promise<void> {
+  try {
+    const existing = await getLeftPlayers(roomCode);
+    const filtered = existing.filter((p) => p.id !== playerId);
+    if (filtered.length === existing.length) return;
+    if (filtered.length === 0) {
+      await AsyncStorage.removeItem(KEY(roomCode));
+    } else {
+      await AsyncStorage.setItem(KEY(roomCode), JSON.stringify(filtered));
+    }
+  } catch (err) {
+    console.warn('[leftPlayers] Failed to remove:', err);
+  }
+}

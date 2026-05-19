@@ -302,6 +302,61 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     }
   }, [visible]);
 
+  // Realtime push av invites medan modalen är öppen. Lyssnar på BÅDA INSERT
+  // (ny host-skickad invite med to_user_id som matchar oss — backfillas av
+  // set_invite_to_user_id-triggern via profiles.player_name) OCH DELETE
+  // (host raderar lobby:n eller startar spelet → CASCADE/explicit cleanup
+  // tar bort raden). Bägge events triggar en full re-load så stale invites
+  // försvinner live utan att user behöver stänga/öppna modal:en.
+  //
+  // Subscription är gated på `visible` så vi inte håller en idle channel
+  // öppen när modalen är stängd. Defensiv channel-cleanup speglar
+  // LobbyScreen:s pattern — supabase.channel(name) återanvänder befintlig
+  // topic så stale subscribed channels från remount måste rensas innan
+  // .on() registreras (annars kraschar med "cannot add postgres_changes
+  // callbacks after subscribe()").
+  //
+  // DELETE-events har en quirk: filter på to_user_id=eq.<userId> matchar
+  // bara om raden hade exakt to_user_id satt vid radering (vilket den har
+  // efter trigger:n). CASCADE-deletes från rooms-deletion bär samma
+  // to_user_id så filtret träffar korrekt.
+  useEffect(() => {
+    if (!visible) return;
+    let cancelled = false;
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+    (async () => {
+      const { data: userResp } = await supabase.auth.getUser();
+      const userId = userResp.user?.id;
+      if (!userId || cancelled) return;
+      const topic = `realtime:waiting_invites:${userId}`;
+      supabase.getChannels()
+        .filter((c) => c.topic === topic)
+        .forEach((c) => supabase.removeChannel(c));
+      const reload = () => {
+        loadInvites().then((updated) => {
+          if (!cancelled) setInvites(updated);
+        });
+      };
+      channel = supabase
+        .channel(`waiting_invites:${userId}`)
+        .on(
+          'postgres_changes',
+          { event: 'INSERT', schema: 'public', table: 'waiting_invites', filter: `to_user_id=eq.${userId}` },
+          reload,
+        )
+        .on(
+          'postgres_changes',
+          { event: 'DELETE', schema: 'public', table: 'waiting_invites', filter: `to_user_id=eq.${userId}` },
+          reload,
+        )
+        .subscribe();
+    })();
+    return () => {
+      cancelled = true;
+      if (channel) supabase.removeChannel(channel);
+    };
+  }, [visible]);
+
   const handleAcceptInvite = async (invite: WaitingInvite) => {
     // Active-room-check: host kan ha raderat lobby:n mellan att invite
     // skickades och usern hann confirma. Visa tydlig "Lobby no longer
