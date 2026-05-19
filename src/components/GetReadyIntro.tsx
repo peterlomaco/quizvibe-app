@@ -454,10 +454,14 @@ export function GetReadyIntro({
         <QuizVibeLogo size={LOGO_SIZE} />
         <View style={styles.settingsTextWrap}>
           <Text style={styles.settingsTitle}>Game settings</Text>
-          <Text style={styles.settingsRow}>
-            Game era:{' '}
-            <Text style={styles.settingsValue}>{eraFrom} – {eraTo}</Text>
-          </Text>
+          <View style={styles.responseDropdownRow}>
+            <Text style={styles.settingsRow}>Game era:</Text>
+            <View style={styles.settingsValueBox}>
+              <Text style={styles.settingsValueBoxText}>
+                {eraFrom} – {eraTo}
+              </Text>
+            </View>
+          </View>
           <View style={styles.responseDropdownRow}>
             <Text style={styles.settingsRow}>Answer response time:</Text>
             {responseSecondsReadOnly ? (
@@ -500,7 +504,7 @@ export function GetReadyIntro({
               öppna modalen. */}
           {showAudioTrigger && (
             <View style={styles.responseDropdownRow}>
-              <Text style={styles.settingsRow}>🔊 Audio per player:</Text>
+              <Text style={styles.settingsRow}>Audio per player:</Text>
               <TouchableOpacity
                 style={styles.responseDropdownTrigger}
                 onPress={() => setAudioModalOpen(true)}
@@ -972,6 +976,7 @@ export function GetReadyIntro({
             <View style={styles.tableRow}>
               <View style={[styles.colPlayer, styles.colPlayerCurrentWrap]}>
                 <View style={styles.currentMediaBox}>
+                  <Text style={styles.currentMediaNumber}>{currentQuestion}</Text>
                   <MediaSourceIcon
                     source={mediaSourceByQuestion?.[currentQuestion - 1]}
                     size={28}
@@ -983,44 +988,59 @@ export function GetReadyIntro({
               </View>
             </View>
 
-            {/* Kö-rader: fråge-nummer currentQuestion+1..totalQuestions med
-                respektive media-källa. Scrollar internt om många frågor. */}
-            {currentQuestion < totalQuestions && (
-              <ScrollView
-                style={styles.queueScroll}
-                showsVerticalScrollIndicator={false}
-              >
-                {Array.from({
-                  length: totalQuestions - currentQuestion,
-                }).map((_, i) => {
-                  const q = currentQuestion + i + 1; // 1-baserat
-                  const isLast = i === totalQuestions - currentQuestion - 1;
-                  return (
-                    <View
-                      key={`indq-${q}`}
-                      style={[
-                        styles.tableRow,
-                        isLast && styles.tableRowNoBorder,
-                      ]}
-                    >
-                      <View style={styles.colPlayer}>
-                        <MediaSourceIcon
-                          source={mediaSourceByQuestion?.[q - 1]}
-                          size={24}
-                        />
-                        <Text style={styles.mediaQueueLabel} numberOfLines={1}>
-                          {mediaSourceLabel(mediaSourceByQuestion?.[q - 1])}
-                        </Text>
-                      </View>
+            {/* Kö-chips (upp till 9 kommande frågor) — vänster-packade så
+                chips sitter tight intill varandra. flexWrap låter chips
+                gå till nya rader när alla 9 inte ryms på en rad (~3 chips
+                per rad vid 110pt width → 9 chips ≈ 3 rader). Cap är 9 så
+                att Next-rutan + chip-kön tillsammans visar max 10 frågor.
+                  - End of Game-fallet (sista chip = totalQuestions) renderas
+                    inline efter chips med 🏁-ikon — följer kön visuellt.
+                  - + more questions-fallet (queue överstiger 9 chips) renderas
+                    centrerat på egen rad UTAN ikon — separation gör att längre
+                    text inte tvingar oönskad wrap inom chip-raden. */}
+            {currentQuestion < totalQuestions ? (() => {
+              const queueQuestions = Array.from({
+                length: Math.min(9, totalQuestions - currentQuestion),
+              }).map((_, i) => currentQuestion + i + 1);
+              const lastChipQ = queueQuestions[queueQuestions.length - 1];
+              const isEndOfGame = lastChipQ === totalQuestions;
+              return (
+                <>
+                  <View style={styles.mediaQueueChipsRow}>
+                    {queueQuestions.map((q, i) => {
+                      const source = mediaSourceByQuestion?.[q - 1];
+                      return (
+                        <View key={`mchip-${i}`} style={styles.queueChip}>
+                          <Text style={styles.queueChipNumber}>{q}</Text>
+                          <MediaSourceIcon source={source} size={16} />
+                          <Text
+                            style={styles.queueChipName}
+                            numberOfLines={1}
+                            ellipsizeMode="tail"
+                          >
+                            {mediaSourceLabel(source)}
+                          </Text>
+                        </View>
+                      );
+                    })}
+                    {isEndOfGame && (
+                      <Text style={styles.endOfGameInline}>
+                        🏁  End of Game
+                      </Text>
+                    )}
+                  </View>
+                  {!isEndOfGame && (
+                    <View style={styles.endOfGameRow}>
+                      <Text style={styles.endOfGameText}>+ more questions</Text>
                     </View>
-                  );
-                })}
-              </ScrollView>
+                  )}
+                </>
+              );
+            })() : (
+              <View style={styles.endOfGameRow}>
+                <Text style={styles.endOfGameText}>🏁  End of Game</Text>
+              </View>
             )}
-
-            <View style={styles.endOfGameRow}>
-              <Text style={styles.endOfGameText}>🏁  End of Game</Text>
-            </View>
           </View>
         ) : (
           // ── Pass-the-Phone: dot-bars (Rounds + Question) + spelarkö ──
@@ -1044,6 +1064,7 @@ export function GetReadyIntro({
             <View style={styles.tableRow}>
               <View style={[styles.colPlayer, styles.colPlayerCurrentWrap]}>
                 <View style={styles.currentPlayerBox}>
+                  <Text style={styles.currentMediaNumber}>{currentQuestion}</Text>
                   <PlayerAvatar player={currentPlayer} size={QUEUE_AVATAR_SIZE} />
                   <Text style={styles.currentPlayerName} numberOfLines={1}>
                     {playerName}
@@ -1055,54 +1076,56 @@ export function GetReadyIntro({
             {/* Kö-rader (scrollar internt om kön är lång). "Round X"-separator
                 infogas mellan kö-rader när rondnumret förändras — visuell
                 signal för round-byten i listan när R-kolumnen är borta. */}
-            {/* Plats 2-4 i kön: två-grupp-layout med justifyContent:
-                'space-between' så plats 2 förankras vänster och plats
-                3+4 grupperas tight till höger. Inga Round-dividers i
-                chip-raden (max 3 kommande spelare visas; ev. rond-byten
-                framgår av frågenumren). */}
+            {/* Kö-chips (upp till 9 kommande spelare) — vänster-packade med
+                flexWrap, samma layout som IndDev:s media-kö. Cap är 9 så att
+                Next-rutan + chip-kön tillsammans visar max 10 frågor. Inga
+                Round-dividers i chip-raden — ev. rond-byten framgår av
+                frågenumren. End of Game inline efter sista chip när kön
+                slutar exakt vid totalQuestions; annars + more questions
+                centrerat på egen rad. */}
             {queue.length > 0 && (() => {
-              const renderChip = (p: IntroPlayer, qNum: number, key: string) => (
-                <View key={key} style={styles.queueChip}>
-                  <Text style={styles.queueChipNumber}>{qNum}</Text>
-                  <Text
-                    style={styles.queueChipName}
-                    numberOfLines={1}
-                    ellipsizeMode="tail"
-                  >
-                    {p.name}
-                  </Text>
-                </View>
-              );
+              const visibleQueue = queue.slice(0, 9);
+              const lastChipQ =
+                queueQuestionNumbers[visibleQueue.length - 1] ?? currentQuestion;
+              const isEndOfGame = totalQuestions - lastChipQ <= 0;
               return (
-                <View style={styles.queueChipsRow}>
-                  {/* Vänster: plats 2 */}
-                  {renderChip(queue[0], queueQuestionNumbers[0], 'chip-0')}
-                  {/* Höger: plats 3 + plats 4 grupperade */}
-                  <View style={styles.queueChipsRightGroup}>
-                    {queue.length > 1 &&
-                      renderChip(queue[1], queueQuestionNumbers[1], 'chip-1')}
-                    {queue.length > 2 &&
-                      renderChip(queue[2], queueQuestionNumbers[2], 'chip-2')}
+                <>
+                  <View style={styles.mediaQueueChipsRow}>
+                    {visibleQueue.map((p, i) => (
+                      <View key={`chip-${i}`} style={styles.queueChip}>
+                        <Text style={styles.queueChipNumber}>
+                          {queueQuestionNumbers[i]}
+                        </Text>
+                        <Text
+                          style={styles.queueChipName}
+                          numberOfLines={1}
+                          ellipsizeMode="tail"
+                        >
+                          {p.name}
+                        </Text>
+                      </View>
+                    ))}
+                    {isEndOfGame && (
+                      <Text style={styles.endOfGameInline}>
+                        🏁  End of Game
+                      </Text>
+                    )}
                   </View>
-                </View>
+                  {!isEndOfGame && (
+                    <View style={styles.endOfGameRow}>
+                      <Text style={styles.endOfGameText}>+ more questions</Text>
+                    </View>
+                  )}
+                </>
               );
             })()}
 
-            {/* Slutmarkör — 🏁 End of Game om sista chip = totalQuestions,
-                annars 🔁 + more questions. Plats 6+ visas inte längre i
-                en separat ScrollView (Peter: bara plats 2-5 syns i chip-
-                raden); slutmarkören räcker som hint om att fler finns. */}
-            {(() => {
-              const lastChipQ = queueQuestionNumbers[Math.min(3, queue.length - 1)] ?? currentQuestion;
-              const isEndOfGame = totalQuestions - lastChipQ <= 0;
-              return (
-                <View style={styles.endOfGameRow}>
-                  <Text style={styles.endOfGameText}>
-                    {isEndOfGame ? '🏁  End of Game' : '🔁  + more questions'}
-                  </Text>
-                </View>
-              );
-            })()}
+            {/* Empty-queue-fallback — sista spelarens vy där kön är tom. */}
+            {queue.length === 0 && (
+              <View style={styles.endOfGameRow}>
+                <Text style={styles.endOfGameText}>🏁  End of Game</Text>
+              </View>
+            )}
 
           </View>
         )}
@@ -1193,6 +1216,10 @@ const styles = StyleSheet.create({
   },
   settingsTextWrap: {
     gap: 2,
+    // Fast minWidth så justifyContent:'space-between' i varje settings-rad
+    // har utrymme att skjuta value-boxen åt höger. Räcker för "Answer
+    // response time:"-labeln (~140pt) + 90pt value-box + Spacing.sm gap.
+    minWidth: 240,
   },
   settingsTitle: {
     fontSize: FontSize.lg,
@@ -1207,26 +1234,47 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     letterSpacing: 0.3,
   },
-  settingsValue: {
-    color: Colors.textPrimary,
-    fontWeight: FontWeight.semibold,
-  },
-  // Row-wrapper så "Answer response time:"-rubriken och dropdown-trigger:n
-  // sitter på samma rad istället för att stapelas vertikalt.
+  // Row-wrapper för alla tre settings-rader (Game era, Answer response time,
+  // Audio per player). justifyContent:'space-between' höger-anchorar
+  // value-cellen så Game era:s plain-text-box + de två dropdown-trigger:na
+  // alla startar på samma x-position. Kräver att parent (settingsTextWrap)
+  // har minWidth — annars kollapsar raden till content-bredd.
   responseDropdownRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: Spacing.sm,
+    justifyContent: 'space-between',
     marginTop: 2,
+  },
+  // Plain-text value-box för Game era (read-only). Speglar trigger:ns
+  // minWidth + padding så de tre value-cellerna är lika breda. Ingen
+  // border/bg eftersom det inte är ett tap-mål — bara visuell alignment
+  // med dropdown-trigger:na.
+  settingsValueBox: {
+    minWidth: 66,
+    paddingHorizontal: 4,
+    paddingVertical: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  settingsValueBoxText: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.bold,
+    color: Colors.textPrimary,
+    letterSpacing: 0.3,
   },
   // Dropdown-trigger för Answer response time. Visar nuvarande värde + ▼.
   // Locked-state (mid-round i Pass-the-Phone) byter chevron till 🔒 och
   // dimmar texten — tap visar info-Alert istället för att öppna dropdown:n.
+  // minWidth + justifyContent:'center' säkrar att Audio- och Response-
+  // trigger:na alltid är lika breda oavsett inner-content-skillnader
+  // ("15s ▼" vs "1 on ▼"). Värdet matchar settingsValueBox.minWidth.
   responseDropdownTrigger: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     gap: 6,
-    paddingHorizontal: Spacing.sm,
+    minWidth: 66,
+    paddingHorizontal: 4,
     paddingVertical: 4,
     borderRadius: Radius.sm,
     borderWidth: 1,
@@ -1251,9 +1299,7 @@ const styles = StyleSheet.create({
     color: Colors.primary,
   },
   // Non-host:s read-only-rendering av Answer response time. Bara värdet
-  // som primary-fet text — ingen border/bg/chevron/lock-ikon. Speglar
-  // settingsValue-stilen för Game era så de två settings-raderna ser
-  // visuellt konsistenta ut för non-host.
+  // som primary-fet text — ingen border/bg/chevron/lock-ikon.
   responseDropdownReadOnlyText: {
     fontSize: FontSize.sm,
     fontWeight: FontWeight.bold,
@@ -1748,6 +1794,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     gap: Spacing.md,
     backgroundColor: Colors.primaryMuted,
     borderColor: Colors.primary,
@@ -1755,6 +1802,7 @@ const styles = StyleSheet.create({
     borderRadius: Radius.md,
     paddingVertical: Spacing.sm,
     paddingHorizontal: Spacing.md,
+    position: 'relative',
   },
   currentPlayerName: {
     flexShrink: 1,
@@ -1776,6 +1824,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     gap: Spacing.md,
     backgroundColor: Colors.primaryMuted,
     borderColor: Colors.primary,
@@ -1783,65 +1832,67 @@ const styles = StyleSheet.create({
     borderRadius: Radius.md,
     paddingVertical: Spacing.sm,
     paddingHorizontal: Spacing.md,
+    position: 'relative',
   },
+  // Fråge-sekvensnummer i box:ens vänsterkant. Absolut-positionerad så
+  // ikon+label kan vara CENTRERAT i boxen oavsett siffrans bredd —
+  // annars hade nummret skuffat det centrerade innehållet åt höger.
+  // Speglar queueChipNumber:s typografi men större (FontSize.lg) för
+  // visuell hierarki mellan current-box och queue-chips.
+  currentMediaNumber: {
+    position: 'absolute',
+    left: Spacing.md,
+    fontSize: FontSize.lg,
+    fontWeight: '700',
+    color: Colors.primary,
+    fontVariant: ['tabular-nums'],
+  },
+  // Tar inte flex:1 — då skulle texten sträcka sig över hela bredden och
+  // pusha ikonen åt vänster trots justifyContent:center. flexShrink:1
+  // räcker för att lång text trunkeras med ellipsen.
   mediaLabel: {
     flexShrink: 1,
     fontSize: FontSize.lg,
     fontWeight: FontWeight.bold,
     color: Colors.textPrimary,
     letterSpacing: 0.3,
+    textAlign: 'center',
   },
-  mediaQueueLabel: {
-    flex: 1,
-    fontSize: FontSize.md,
-    fontWeight: FontWeight.medium,
-    color: Colors.textSecondary,
-  },
-
-  // Kö-listan scrollar internt om många rader; cap:as så slutmarkör + footer
-  // alltid syns under den.
-  queueScroll: {
-    width: '100%',
-    // 100px ≈ 1.7 rader — plats 2-5 visas redan som chips ovanför, så
-    // ScrollView:n behöver bara rymma de få plats 6+ raderna utan att
-    // klippa hela tableBlock vid skärmens nedre kant.
-    maxHeight: 100,
-  },
-
-  // ── Kö-chips (plats 2-5 i kön) ──────────────────────────────────────
-  // Horisontell rad direkt under currentPlayerBox. Visar nästa 4 spelare
-  // i kön som kompakta chips med [frågenummer + namn]. Bevarar tabellens
-  // border-bottom-vokabulär (samma divider som andra rader) men packar 4
-  // spelare på samma höjd som tidigare hade 1 spelare per rad.
-  // Tre-grupp-layout: plats 2 vänster, Round-divider center, plats 3+4
-  // höger som grupp. justifyContent: 'space-between' fördelar dem över
-  // bredden så centern alltid har symmetrisk luft runt sig.
-  queueChipsRow: {
+  // ── Kö-chips-rad (delas av IndDev + PtP) ─────────────────────────────
+  // Vänster-packad rad: chips med 4pt gap mellan, slutmarkören inline efter
+  // sista chip:en (flexWrap låter den gå till ny rad om bredden inte räcker).
+  // Båda lägen visar upp till 9 chips → 3 chips per rad vid 110pt width
+  // = max 3 rader. Cap 9 så Next-rutan + chip-kön visar max 10 frågor.
+  mediaQueueChipsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
+    flexWrap: 'wrap',
+    gap: 4,
     paddingHorizontal: Spacing.sm,
     paddingVertical: Spacing.sm,
     borderBottomWidth: 1,
     borderBottomColor: Colors.border,
   },
-  // Höger-gruppen håller plats 3 + 4 tight ihop (small gap mellan dem)
-  // medan de som helhet förankras i höger kant via space-between i parent.
-  queueChipsRightGroup: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
+  // Slutmarkör inline efter sista chip:en — speglar endOfGameText:s
+  // typografi men kompaktare (xs istället för sm) så den ryms efter
+  // chip:en utan att tvinga radbryt vid 3 chips. flexShrink:0 hindrar
+  // texten från att kompressera om utrymmet blir trångt — då wrap:ar
+  // hela texten till ny rad istället via flexWrap på parent.
+  endOfGameInline: {
+    flexShrink: 0,
+    fontSize: FontSize.xs,
+    fontWeight: FontWeight.semibold,
+    color: Colors.textSecondary,
+    letterSpacing: 0.6,
+    textTransform: 'uppercase',
+    paddingHorizontal: 4,
   },
-  // Spacer renderas om ingen rond-byte sker mellan plats 2 och 3 — håller
-  // 3-grupp-strukturen intakt så plats 3+4 alltid förankras höger.
-  queueChipsSpacer: {
-    flex: 0,
-    width: 0,
-  },
+
   queueChip: {
-    // Fast width 110pt: 3 chips × 110 + 4pt intra-grupp-gap = 334pt
-    // av ~342pt tillgänglig bredd → minimalt space-between glapp mellan
-    // plats 2 och höger-gruppen så chips visuellt sitter tätare.
+    // Fast width 110pt: 3 chips × 110 + 4pt gap = 334pt av ~342pt tillgänglig
+    // bredd → ~3 chips per rad. flexWrap på mediaQueueChipsRow rader:ar
+    // resterande chips automatiskt (9 chips ≈ 3 rader).
     width: 110,
     overflow: 'hidden',
     flexDirection: 'row',
@@ -1853,26 +1904,6 @@ const styles = StyleSheet.create({
     borderColor: Colors.borderStrong,
     borderRadius: Radius.sm,
     backgroundColor: Colors.background,
-  },
-  // Kompakt "R<round>"-pill som infogas inline mellan chips vid rond-byte.
-  // flexShrink:0 + intrinsic width → tar bara sin text-bredd, chips delar
-  // resten. Kortare label "R2" istället för "Round 2" så raden inte
-  // sprängs vid 3 chips + 2 dividers.
-  queueRoundDivider: {
-    flexShrink: 0,
-    flexGrow: 0,
-    paddingHorizontal: 6,
-    paddingVertical: 4,
-    backgroundColor: Colors.primaryMuted,
-    borderRadius: 4,
-    borderWidth: 1,
-    borderColor: Colors.primaryBorder,
-  },
-  queueRoundDividerText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: Colors.primary,
-    letterSpacing: 0.3,
   },
   // Siffran är frågenumret (queueQuestionNumbers[i]) — primary-blå för
   // att linka visuellt till Question-dot-bar:ens siffror ovan.
@@ -1982,7 +2013,7 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
 
-  // Slutmarkör (🔁 + more questions / 🏁 End of Game) under tabellen.
+  // Slutmarkör (+ more questions / 🏁 End of Game) under tabellen.
   endOfGameRow: {
     paddingVertical: Spacing.sm,
     alignItems: 'center',

@@ -29,41 +29,41 @@ const RULER_WIDTH = 280;
  *
  * `onPremiumPress` saknas → read-only-läge: klammer + PREMIUM-badge döljs
  * helt. Locked-tickarna (n > gameModeMax) renderas dock fortsatt i grått
- * så non-host ser korrekt vilka rounds-värden host *kan* välja. Det betyder:
- * när host:en är Free (max 4 rounds) syns 6–20 grå även för non-host —
- * locked-color speglar host:s rättigheter, men non-host får ingen Premium-
- * CTA eftersom upgrade är host:s ansvar, inte deras.
+ * så non-host ser korrekt vilka rounds-värden host *kan* välja.
  *
- * `hasSubscription` (host-vyn) styr färgsättningen i två separata grupper:
- *   • Sub off — klammer GRÅ (#6B7280), tick-streck + siffror GRÅ
- *     (textDisabled / borderStrong), PREMIUM-badge GRÅ.
- *   • Sub on — klammer GULD (#F5A623, signalerar "premium territory du
- *     äger"), tick-streck + siffror BLÅA (Colors.primary, signalerar
- *     "tillgängliga"; locked-distinktionen försvinner visuellt eftersom
- *     host har subscription), PREMIUM-badge GULD.
+ * Två separata color-axlar:
+ *   • `hasSubscription` — äger user premium? Driver enbart PREMIUM-badge:s
+ *     färg (gold + svart text om true, grå + vit text om false).
+ *   • `applicable` (default true) — är feature unlocked i nuvarande mode?
+ *     Driver klammer + tick-färger. När false (typiskt PtP där premium inte
+ *     unlock:ar långa spel) renderas alla locked-elementen som "icke-
+ *     tillgängliga" oavsett premium-status, och en explainer-text
+ *     "Applicable for Individual device mode" visas ovanför klammern.
  *
- * Premium-host får 20 rundor oavsett gameMode (subscription unlock:ar långa
- * spel även i Pass-the-Phone och single-player). Free-host i Pass-the-Phone
- * capas fortfarande vid 4 — telefonen rör sig fysiskt mellan spelare så
- * speltiden växer snabbt med fler rundor. Locked-vokabulär (klammer + badge)
- * syns bara när host saknar subscription OCH `gameModeMax < ROUNDS_MAX_INDIV`.
+ * Resultat: Premium-host i PtP ser gold PREMIUM-badge (de äger feature:n)
+ * men grå klammer + grå locked-tickar + explainer (feature gäller inte
+ * här). Free host i PtP ser allt grått (vanlig upsell). Premium-host i
+ * IndDev ser allt guld/blå (feature unlocked). Free host i IndDev ser
+ * också allt unlocked eftersom IndDev:s rounds-cap är 20 och locked-zonen
+ * inte renderas.
  */
-export function RoundsRuler({ value, min, gameModeMax, onPremiumPress, hasSubscription = false }: {
+export function RoundsRuler({ value, min, gameModeMax, onPremiumPress, hasSubscription = false, applicable = true }: {
   value: number;
   min: number;
   gameModeMax: number;
   onPremiumPress?: () => void;
   hasSubscription?: boolean;
+  applicable?: boolean;
 }) {
-  // Klammer-färg: signalerar premium-status (gold = ägd) ELLER låst (grey).
-  const klammerColor = hasSubscription ? '#F5A623' : '#6B7280';
-  // Tick-streck + siffror för locked-intervall: när sub är på får de samma
-  // blå färg som unlocked-tickar (alla siffror unifierade som "tillgängliga"),
-  // när sub är av är de dämpade grå.
-  const lockedTickColor = hasSubscription ? Colors.primary : Colors.borderStrong;
-  const lockedFigureColor = hasSubscription ? Colors.primary : Colors.textDisabled;
-  // PREMIUM-badge:s färgschema — guld med svart text (ägd) eller grå med
-  // vit text (locked).
+  // Klammer + ticks visas "unlocked" bara när BÅDA villkoren stämmer:
+  // user äger premium OCH feature:n gäller i nuvarande mode. Annars grå.
+  const featureUnlocked = hasSubscription && applicable;
+  const klammerColor = featureUnlocked ? '#F5A623' : '#6B7280';
+  const lockedTickColor = featureUnlocked ? Colors.primary : Colors.borderStrong;
+  const lockedFigureColor = featureUnlocked ? Colors.primary : Colors.textDisabled;
+  // PREMIUM-badge:s färgschema följer ENDAST hasSubscription (ownership-
+  // signal). Premium-host får guld även när feature:n inte gäller här —
+  // klammern + texten ovanför signalerar att den inte är applicable.
   const badgeBg = hasSubscription ? '#F5A623' : '#6B7280';
   const badgeTextColor = hasSubscription ? '#000' : '#FFF';
   const RULER_MAX = ROUNDS_MAX_INDIV;
@@ -71,15 +71,20 @@ export function RoundsRuler({ value, min, gameModeMax, onPremiumPress, hasSubscr
   for (let n = min; n <= RULER_MAX; n += 2) ticks.push(n);
   const range = RULER_MAX - min;
   const fillWidth = ((value - min) / range) * RULER_WIDTH;
-  // Read-only-vyn (non-host i Lobby) tar bort allt locked-vokabulär. Klammern
-  // visas bara när komponenten är interaktiv (onPremiumPress definierad) OCH
-  // det faktiskt finns locked-tickar.
+  // Read-only-vyn (non-host i Lobby) tar bort klammern. När host:en är
+  // interaktiv visas klammern i BÅDA mode:n (PtP visar locked-tier-upsell,
+  // IndDev visar premium-tier ownership-indikator). Tidigare gating på
+  // `gameModeMax < RULER_MAX` gömde klammern i IndDev — nu vill vi att
+  // premium-host ser guld-klammer även där för att signalera att de äger
+  // funktionen.
   const interactive = !!onPremiumPress;
-  const hasLocked = interactive && gameModeMax < RULER_MAX;
+  const hasBracket = interactive;
 
-  // Klammer-positionering: spänner över alla locked-tickar (gameModeMax+2 → 20).
-  // Lite extra bredd så armarna omsluter siffrorna, inte sitter innanför dem.
-  const firstLocked = gameModeMax + ROUNDS_STEP;
+  // Klammer-positionering: spänner ALLTID över premium-tier-rangen
+  // (ROUNDS_MAX_PASS+2 → 20), oavsett gameMode. Detta gör att bracket-
+  // span är konsekvent mellan PtP och IndDev — bara färg/text-styling
+  // ändras med mode. Variabelnamnet behålls för minimal diff.
+  const firstLocked = ROUNDS_MAX_PASS + ROUNDS_STEP;
   const bracketLeft = ((firstLocked - min) / range) * RULER_WIDTH - 13;
   const bracketRight = ((RULER_MAX - min) / range) * RULER_WIDTH + 13;
   const bracketWidth = bracketRight - bracketLeft;
@@ -125,43 +130,69 @@ export function RoundsRuler({ value, min, gameModeMax, onPremiumPress, hasSubscr
           );
         })}
       </View>
-      {hasLocked && (
-        // height tar plats för bracket (top 0, height 10) + premium-badge
-        // (top 14, ~18px hög) → ~32px. Bracket är absolutpositionerad så
-        // wrapper:n behöver explicit höjd för att inte kollapsa. Badgen
-        // sitter i en absolutpositionerad centrerad wrapper över samma
-        // bracket-bredd så den auto-centrerar oavsett innehållsbredd.
-        <View style={{ marginTop: 4, height: 34 }}>
-          <View style={[roundsRulerStyles.bracket, {
-            left: bracketLeft,
-            width: bracketWidth,
-            borderColor: klammerColor,
-          }]} />
-          <View
-            style={{
-              position: 'absolute',
-              top: 14,
+      {hasBracket && (
+        <>
+          {/* Explainer-text ovanför klammern — renderas bara när feature:n
+              inte gäller i nuvarande mode (typiskt PtP där premium inte
+              unlock:ar långa spel). Talar om vilket mode som faktiskt
+              använder funktionen. Wrap:en är absolutpositionerad över
+              klammerns horisontella span (bracketLeft → bracketWidth) så
+              texten centreras EXAKT ovanför klammern, inte mitt på hela
+              ruler-bredden. height + marginTop reserverar layout-platsen
+              som flow-element så bracket-blocket hamnar under texten. */}
+          {!applicable && (
+            <View style={{ marginTop: 4, height: 16, position: 'relative' }}>
+              <View
+                style={{
+                  position: 'absolute',
+                  left: bracketLeft,
+                  width: bracketWidth,
+                  alignItems: 'center',
+                }}
+              >
+                <Text style={roundsRulerStyles.applicableHint}>
+                  Applicable for Individual device mode
+                </Text>
+              </View>
+            </View>
+          )}
+          {/* height tar plats för bracket (top 0, height 10) + premium-badge
+              (top 14, ~18px hög) → ~32px. Bracket är absolutpositionerad så
+              wrapper:n behöver explicit höjd för att inte kollapsa. Badgen
+              sitter i en absolutpositionerad centrerad wrapper över samma
+              bracket-bredd så den auto-centrerar oavsett innehållsbredd. */}
+          <View style={{ marginTop: 4, height: 34 }}>
+            <View style={[roundsRulerStyles.bracket, {
               left: bracketLeft,
               width: bracketWidth,
-              alignItems: 'center',
-            }}
-            pointerEvents="box-none"
-          >
-            {/* hasLocked => interactive => onPremiumPress definierad. Säkert
-                att rendera direkt utan onPremiumPress-presence-fallback.
-                Badge:n följer subscription-status: guld + svart text när
-                hasSubscription, grå + vit text annars. */}
-            <TouchableOpacity
-              activeOpacity={0.7}
-              onPress={onPremiumPress}
-              style={[roundsRulerStyles.premiumBadge, { backgroundColor: badgeBg }]}
+              borderColor: klammerColor,
+            }]} />
+            <View
+              style={{
+                position: 'absolute',
+                top: 14,
+                left: bracketLeft,
+                width: bracketWidth,
+                alignItems: 'center',
+              }}
+              pointerEvents="box-none"
             >
-              <Text style={[roundsRulerStyles.premiumBadgeText, { color: badgeTextColor }]}>
-                PREMIUM
-              </Text>
-            </TouchableOpacity>
+              {/* hasBracket => interactive => onPremiumPress definierad. Säkert
+                  att rendera direkt utan onPremiumPress-presence-fallback.
+                  Badge:n följer subscription-status: guld + svart text när
+                  hasSubscription, grå + vit text annars. */}
+              <TouchableOpacity
+                activeOpacity={0.7}
+                onPress={onPremiumPress}
+                style={[roundsRulerStyles.premiumBadge, { backgroundColor: badgeBg }]}
+              >
+                <Text style={[roundsRulerStyles.premiumBadgeText, { color: badgeTextColor }]}>
+                  PREMIUM
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
+        </>
       )}
     </View>
   );
@@ -232,5 +263,15 @@ const roundsRulerStyles = StyleSheet.create({
     fontWeight: '700',
     color: '#000',
     letterSpacing: 0.6,
+  },
+  // Explainer-text ovanför klammern när feature:n inte gäller här. Diskret
+  // textSecondary, samma typografi som RoundsRuler:s tick-text för
+  // visuell sammanhållning.
+  applicableHint: {
+    fontSize: 11,
+    fontWeight: '500',
+    color: Colors.textSecondary,
+    letterSpacing: 0.3,
+    textAlign: 'center',
   },
 });

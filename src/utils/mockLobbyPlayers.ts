@@ -68,6 +68,14 @@ function rowToPlayer(row: LobbyPlayerRow): LobbyPlayer {
     approved: row.approved,
     lobbyEdited: row.lobby_edited,
     hasLeft: row.has_left,
+    // Host-added guests har user_id=null i DB eftersom host saknar deras
+    // auth-session vid upsert (setLobbyPlayers strippar dessutom user_id ur
+    // non-host-payload:en). Self-joined guests sätter user_id=auth.uid() via
+    // upsertOwnLobbyPlayer. Heuristiken `type='guest' && user_id IS NULL`
+    // skiljer dem så Max 12-/IndDev-switchen kan hitta + radera host-added
+    // guests även efter lobby-remount (där state-flaggan annars går förlorad
+    // — addedByHost finns inte som DB-kolumn).
+    addedByHost: row.type === 'guest' && row.user_id === null,
   };
 }
 

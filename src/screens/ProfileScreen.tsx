@@ -271,13 +271,12 @@ export default function ProfileScreen() {
   // gjorts i Store utan delay.
   const [hasPremium, setHasPremium] = useState(false);
   // Default antal rundor (host-default). Speglar Lobby:s rounds-stepper +
-  // RoundsRuler. Capas av gameMode + subscription — Free + Pass-the-Phone
-  // (eller single-player ovanpå Pass-the-Phone) max 4; Premium-host får 20
-  // oavsett mode; Individual Devices alltid 20 (redan Premium-gated). Vid
-  // byte av gameMode clampas värdet automatiskt ner om det skulle hamna
-  // utanför nya max:t.
+  // RoundsRuler. Capas av gameMode — Pass-the-Phone (inkl. single-player
+  // ovanpå PtP) är ALLTID max 4 oavsett subscription; Individual Devices
+  // (Premium-gated) får 20. Vid byte av gameMode clampas värdet automatiskt
+  // ner om det skulle hamna utanför nya max:t.
   const [roundsCount, setRoundsCount] = useState<number>(ROUNDS_DEFAULT);
-  const roundsMax = hasPremium || gameMode === 'individual-devices' ? ROUNDS_MAX_INDIV : ROUNDS_MAX_PASS;
+  const roundsMax = gameMode === 'individual-devices' ? ROUNDS_MAX_INDIV : ROUNDS_MAX_PASS;
   // Auto-sync maxPlayers ↔ gameMode: Pass-the-Phone capas alltid vid 4
   // (PtP med 12 spelare × 20 rundor = orimligt långt spel), Individual
   // Devices defaulta:r till 12 så host får full multiplayer-cap direkt.
@@ -1332,6 +1331,7 @@ export default function ProfileScreen() {
                 gameModeMax={roundsMax}
                 onPremiumPress={() => router.push('/store?focus=subscription&from=/profile')}
                 hasSubscription={hasPremium}
+                applicable={gameMode === 'individual-devices'}
               />
             </View>
           </View>

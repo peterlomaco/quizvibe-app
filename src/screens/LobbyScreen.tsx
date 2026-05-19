@@ -1427,13 +1427,11 @@ export default function LobbyScreen() {
     setMaxPlayers((prev) => (prev === targetMax ? prev : targetMax));
   }, [gameMode, hostMode]);
 
-  // Max rundor beror på gameMode + subscription. Free host i Pass-the-Phone
-  // (eller single-player ovanpå Pass-the-Phone) capas vid 4 — speltiden växer
-  // snabbt när telefonen rör sig fysiskt mellan spelare. Premium-host får
-  // 20 oavsett mode (subscription unlock:ar långa spel även i Pass-the-Phone
-  // och single-player). Individual Devices är redan Premium-gated och får
-  // 20 ändå.
-  const roundsMax = hasPremium || gameMode === 'individual-devices' ? ROUNDS_MAX_INDIV : ROUNDS_MAX_PASS;
+  // Max rundor beror på gameMode. Pass-the-Phone (inkl. single-player ovanpå
+  // PtP) är ALLTID capad vid 4 — speltiden växer snabbt när telefonen rör sig
+  // fysiskt mellan spelare, och Premium-subscription unlock:ar inte längre
+  // 20-rundor i PtP. Individual Devices (Premium-gated) får 20.
+  const roundsMax = gameMode === 'individual-devices' ? ROUNDS_MAX_INDIV : ROUNDS_MAX_PASS;
   useEffect(() => {
     setRoundsCount((prev) => Math.max(ROUNDS_MIN, Math.min(roundsMax, prev)));
   }, [roundsMax]);
@@ -1511,6 +1509,52 @@ export default function LobbyScreen() {
   // (t.ex. olika tier per feature) kan vi splita dem igen.
   const hasMultiplayerPackage = hasPremium;
 
+  // Switch som kräver att host:s manuellt tillagda guests försvinner (de
+  // saknar egen mobil och kan inte spela på individual devices). Visar Alert
+  // om sådana finns, raderar dem lokalt + i lobby_players-DB:n vid confirm,
+  // och kör `applySwitch` när alla raderingar är schemalagda. Om inga guests
+  // finns körs `applySwitch` direkt utan prompt. Delas av handleSelectMode
+  // (PtP→IndDev) och handleSelectMaxPlayers (Max 4→12 som auto-snäpper till
+  // IndDev). DB DELETE krävs — utan det skulle host:s fetchNewJoiners-sync
+  // re-injektera guests nästa state-ändring (setLobbyPlayers är UPSERT-only).
+  const confirmAndRemoveManualGuests = (title: string, applySwitch: () => void) => {
+    const manualPlayers = players.filter((p) => p.addedByHost);
+    if (manualPlayers.length === 0) {
+      applySwitch();
+      return;
+    }
+    Alert.alert(
+      title,
+      'Guest players will be removed — ask them to join with their own device.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Switch & remove',
+          style: 'destructive',
+          onPress: () => {
+            setPlayers((prev) => prev.filter((p) => !p.addedByHost));
+            applySwitch();
+            manualPlayers.forEach((p) => {
+              supabase
+                .from('lobby_players')
+                .delete()
+                .eq('room_code', roomCode)
+                .eq('player_id', p.id)
+                .then(({ error }) => {
+                  if (error) {
+                    console.warn(
+                      '[lobbyPlayers] manual-guest delete on mode switch failed:',
+                      error.message,
+                    );
+                  }
+                });
+            });
+          },
+        },
+      ],
+    );
+  };
+
   const handleSelectMode = (mode: GameMode) => {
     if (mode === gameMode) return;
     if (mode === 'individual-devices' && !hasMultiplayerPackage) {
@@ -1528,25 +1572,10 @@ export default function LobbyScreen() {
     // spelare. De saknar egen mobil och måste tas bort när alla ska spela
     // från sina egna enheter.
     if (mode === 'individual-devices') {
-      const manualPlayers = players.filter((p) => p.addedByHost);
-      if (manualPlayers.length > 0) {
-        Alert.alert(
-          'Switch to Individual Devices?',
-          'Manual added players will be removed — ask them to join with their own device.',
-          [
-            { text: 'Cancel', style: 'cancel' },
-            {
-              text: 'Switch & remove',
-              style: 'destructive',
-              onPress: () => {
-                setPlayers((prev) => prev.filter((p) => !p.addedByHost));
-                setGameMode(mode);
-              },
-            },
-          ],
-        );
-        return;
-      }
+      confirmAndRemoveManualGuests('Switch to Individual Devices?', () =>
+        setGameMode(mode),
+      );
+      return;
     }
     setGameMode(mode);
   };
@@ -1566,15 +1595,44 @@ export default function LobbyScreen() {
       );
       return;
     }
-    setMaxPlayers(value);
     // Max 12 är meningsfullt bara i Individual Devices (PtP capas vid 4
     // pga orimlig speltid). Om host väljer Max 12 från PtP-läget snäpper
     // gameMode automatiskt till Individual Devices. Gameplay-loop med
     // 12 spelare runt EN telefon × 20 rundor = 240 frågor är inte ett
     // realistiskt scenario.
+    //
+    // Eftersom mode-bytet sker implicit härifrån måste samma guest-
+    // borttagnings-prompt fyras som från handleSelectMode (manuella
+    // guests saknar egen mobil → kan inte spela individual devices).
     if (value === 12 && gameMode === 'pass-the-phone') {
-      setGameMode('individual-devices');
+      confirmAndRemoveManualGuests('Switch to Max 12 players?', () => {
+        setMaxPlayers(value);
+        setGameMode('individual-devices');
+      });
+      return;
     }
+    // Inverse: Max 12 → Max 4 medan host kör Individual Devices. Max 4 är
+    // den enda Player-cap som är meningsfull i Pass-the-Phone (12 spelare ×
+    // 20 rundor runt EN telefon = orimligt) så bekräfta dubbel-bytet
+    // explicit istället för att tyst lämna host i IndDev med Max 4.
+    if (value === 4 && gameMode === 'individual-devices') {
+      Alert.alert(
+        'Switch to Max 4 players?',
+        'Do you want to change to Max 4 players and Pass-the-Phone mode?',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Yes',
+            onPress: () => {
+              setMaxPlayers(value);
+              setGameMode('pass-the-phone');
+            },
+          },
+        ],
+      );
+      return;
+    }
+    setMaxPlayers(value);
   };
 
   // Approved spelare = i spelet, har turn-nummer, syns överst.
@@ -3928,6 +3986,7 @@ export default function LobbyScreen() {
                       gameModeMax={roundsMax}
                       onPremiumPress={() => router.push({ pathname: '/store' as const, params: { focus: 'subscription', from: '/lobby', fromCode: roomCode } })}
                       hasSubscription={hasMultiplayerPackage}
+                      applicable={gameMode === 'individual-devices'}
                     />
                   </View>
                 </>

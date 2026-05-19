@@ -677,11 +677,17 @@ export default function QuizScreen() {
     }
   }, [params.players]);
 
-  // En "runda" = ett varv där alla spelare svarar en gång. Totalt antal frågor
-  // i spelomgången = rundor × spelare. Med 4 spelare × 4 rundor = 16 frågor.
+  // En "runda" = ett varv där alla spelare svarar en gång.
+  //   Pass-the-Phone: spelarna turas om på samma enhet → 1 fråga per spelare
+  //     per runda → totalQuestions = rundor × spelare. 4×4 = 16 frågor.
+  //   Individual Devices: alla spelare svarar på SAMMA fråga samtidigt på
+  //     egna enheter → 1 fråga per runda totalt → totalQuestions = rundor.
   // Math.max(1, ...) skyddar fallback-fallet då turnOrder är tom (direkt-nav
   // till /quiz utan Lobby).
-  const totalQuestions = totalRounds * Math.max(1, turnOrder.length);
+  const totalQuestions =
+    gameMode === 'individual-devices'
+      ? totalRounds
+      : totalRounds * Math.max(1, turnOrder.length);
 
   // Pool av frågor för spelet, organiserad i ROUND-BLOCKS:
   //
@@ -758,8 +764,12 @@ export default function QuizScreen() {
     if (!hasYoutube && !hasImage) return SEED_QUESTIONS;
 
     // Bygg pool täckande hela spelet utan modulo-cykling i UI-laget.
-    // questionIndex stiger till totalRounds × playerCount; vi bygger N block
-    // där N = totalRounds.
+    //   Pass-the-Phone: questionsPerBlock = playerCount (alla spelare i ronden
+    //     får varsin item av samma typ).
+    //   Individual Devices: questionsPerBlock = 1 (alla spelare svarar på
+    //     samma fråga samtidigt → 1 item per rond totalt).
+    const questionsPerBlock =
+      gameMode === 'individual-devices' ? 1 : playerCount;
     const mixed: QuizQuestion[] = [];
     for (let block = 0; block < totalRounds; block++) {
       // Alternera YouTube ↔ image per block. Om bara en typ finns, använd alltid den.
@@ -770,13 +780,13 @@ export default function QuizScreen() {
       // Cyklisk indexering inom poolen — items kan upprepas om pool < block*players,
       // men varje block:s spelare får olika items (det är det viktiga för
       // round-paritet).
-      for (let q = 0; q < playerCount; q++) {
-        const idx = (block * playerCount + q) % pool.length;
+      for (let q = 0; q < questionsPerBlock; q++) {
+        const idx = (block * questionsPerBlock + q) % pool.length;
         mixed.push(pool[idx]);
       }
     }
     return mixed.length > 0 ? mixed : SEED_QUESTIONS;
-  }, [eraFrom, eraTo, turnOrder.length, totalRounds, youtubeEnabled, imagesEnabled]);
+  }, [eraFrom, eraTo, turnOrder.length, totalRounds, youtubeEnabled, imagesEnabled, gameMode]);
 
   // Media-källa per fråga (driver GetReadyIntro:s IndDev media-kö).
   // Image-frågor → 'image'; timeline-frågor (YouTube-content idag, men
