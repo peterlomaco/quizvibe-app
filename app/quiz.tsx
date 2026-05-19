@@ -821,15 +821,21 @@ export default function QuizScreen() {
   // "Connection unstable" till connected. question_advance fortsätter
   // bumpa questionIndex i bakgrunden (B håller sig synkad), men
   // play_command ignoreras tills sticky är rensad.
-  // Spelare som kommer efter current i turordningen (med wrap-around till
-  // början). Drivs av Get-Ready-skärmens "Then: …"-rad så spelarna ser kön.
+  // Spelare som kommer efter current i turordningen — cyklar genom hela
+  // turnOrder så queue.length matchar antalet återstående frågor (inte
+  // bara nästa rond). För 2 spelare × 4 rondor vid Q1: queue blir 7
+  // element (P2, P1, P2, P1, P2, P1, P2 → Q2..Q8). Drivs av GetReady:s
+  // chip-rad så plats 3+ visas även när turnOrder är kort.
   const queue = useMemo<TurnOrderPlayer[]>(() => {
     if (turnOrder.length <= 1) return [];
-    return [
-      ...turnOrder.slice(currentPlayerIndex + 1),
-      ...turnOrder.slice(0, currentPlayerIndex),
-    ];
-  }, [turnOrder, currentPlayerIndex]);
+    const remaining = Math.max(0, totalQuestions - questionIndex - 1);
+    const result: TurnOrderPlayer[] = [];
+    for (let i = 0; i < remaining; i++) {
+      const playerIdx = (currentPlayerIndex + 1 + i) % turnOrder.length;
+      result.push(turnOrder[playerIdx]);
+    }
+    return result;
+  }, [turnOrder, currentPlayerIndex, totalQuestions, questionIndex]);
   const [timeLeft, setTimeLeft] = useState(30);
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   // Senaste valda år från TimelineSelector (uppdateras vid varje scroll-tick).

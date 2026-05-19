@@ -249,6 +249,12 @@ export function GetReadyIntro({
   onPlayerAudioChange,
 }: Props) {
   const isIndDev = mode === 'individual-devices';
+  // Single Player körs som Pass-the-Phone med exakt 1 spelare. I den vyn är
+  // round-konceptet meningslöst (1 spelare ⇒ rounds = questions), så
+  // Rounds-dotbar, Round-separators i kö och Round-del i footer-texten
+  // gömms. Blink-pulsen på "nästa fråga"-rutan gäller alla tre lägen
+  // (Single, PtP, IndDev) — den lever utanför denna gating.
+  const isSinglePlayer = !isIndDev && playerCount === 1;
   // D-iv: audio-trigger visas bara för host i IndDev och bara om vi har
   // en spelarlista att visa toggles för. Pass-the-Phone har gemensam
   // enhet → alltid ljud på → ingen trigger.
@@ -299,15 +305,38 @@ export function GetReadyIntro({
     const halfSplit = total > 10;
     const topCount = halfSplit ? total / 2 : total;
     const bottomCount = halfSplit ? total / 2 : 0;
-    const renderDot = (globalIdx: number) => (
-      <View
-        key={`pdot-${label}-${globalIdx}`}
-        style={[
-          styles.progressDot,
-          globalIdx < filled && styles.progressDotFilled,
-        ]}
-      />
-    );
+    // Aktuella frågans dot pulserar (opacity 1 ↔ 0.4) i Question-baren för
+    // att signalera "näst på tur att besvara". Övriga dots renderas som
+    // vanliga View:er. Rounds-baren har ingen pulse (Peter: bara Questions).
+    // Varje dot innehåller sin 1-baserade siffra (blå text) så användaren
+    // ser exakt vilken runda/fråga som syns och har klarats av — ersätter
+    // den tidigare footer-raden "Round X of Y · Question N of M".
+    const renderDot = (globalIdx: number) => {
+      const isFilled = globalIdx < filled;
+      const isCurrent = label === 'Question' && globalIdx === filled - 1;
+      const style = [
+        styles.progressDot,
+        isFilled && styles.progressDotFilled,
+      ];
+      const numberLabel = (
+        <Text style={styles.progressDotNumber}>{globalIdx + 1}</Text>
+      );
+      if (isCurrent) {
+        return (
+          <Animated.View
+            key={`pdot-${label}-${globalIdx}`}
+            style={[style, { opacity: nextBlink }]}
+          >
+            {numberLabel}
+          </Animated.View>
+        );
+      }
+      return (
+        <View key={`pdot-${label}-${globalIdx}`} style={style}>
+          {numberLabel}
+        </View>
+      );
+    };
     return (
       <View style={styles.progressBarBlock}>
         <Text style={styles.progressBarLabel}>{label}</Text>
@@ -353,6 +382,11 @@ export function GetReadyIntro({
   // opacity på halo:n så det "andas" tillsammans med skalningen.
   const playPulse = useRef(new Animated.Value(1)).current;
   const playGlow = useRef(new Animated.Value(0.35)).current;
+  // Opacity-pulse på "nästa fråga"-rutan (currentPlayerBox i PtP/Single,
+  // currentMediaBox i IndDev). Signalerar visuellt vilken ruta som är näst
+  // på tur att besvaras. Native driver så bar:en aldrig laggar trots övrig
+  // JS-driven layout (dot-bars, dropdowns).
+  const nextBlink = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     const scaleLoop = Animated.loop(
@@ -367,13 +401,21 @@ export function GetReadyIntro({
         Animated.timing(playGlow, { toValue: 0.35, duration: 800, useNativeDriver: true }),
       ]),
     );
+    const blinkLoop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(nextBlink, { toValue: 0.4, duration: 700, useNativeDriver: true }),
+        Animated.timing(nextBlink, { toValue: 1, duration: 700, useNativeDriver: true }),
+      ]),
+    );
     scaleLoop.start();
     glowLoop.start();
+    blinkLoop.start();
     return () => {
       scaleLoop.stop();
       glowLoop.stop();
+      blinkLoop.stop();
     };
-  }, [playPulse, playGlow]);
+  }, [playPulse, playGlow, nextBlink]);
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -490,7 +532,7 @@ export function GetReadyIntro({
             activeOpacity={0.7}
           >
             <Text style={styles.leaderboardHeaderTitle}>
-              🏆  Current Leaderboard
+              {`🏆  Current Leaderboard - ${playerCount} ${playerCount === 1 ? 'Player' : 'Players'}`}
             </Text>
             <Text style={styles.leaderboardHeaderChevron}>
               {leaderboardOpen ? '▾' : '▸'}
@@ -979,10 +1021,6 @@ export function GetReadyIntro({
             <View style={styles.endOfGameRow}>
               <Text style={styles.endOfGameText}>🏁  End of Game</Text>
             </View>
-
-            <Text style={styles.tableFooter}>
-              {`Question ${currentQuestion} of ${totalQuestions} · ${playerCount} players`}
-            </Text>
           </View>
         ) : (
           // ── Pass-the-Phone: dot-bars (Rounds + Question) + spelarkö ──
@@ -992,7 +1030,7 @@ export function GetReadyIntro({
           // separator-raden i kön behålls eftersom det är enda visuella
           // signal för round-byten i listan nu.
           <View style={styles.tableBlock}>
-            {renderDotBar(totalRounds, currentRound, 'Rounds')}
+            {!isSinglePlayer && renderDotBar(totalRounds, currentRound, 'Rounds')}
             {renderDotBar(totalQuestions, currentQuestion, 'Question')}
 
             <View style={[styles.tableRow, styles.tableHeaderRow]}>
@@ -1017,49 +1055,46 @@ export function GetReadyIntro({
             {/* Kö-rader (scrollar internt om kön är lång). "Round X"-separator
                 infogas mellan kö-rader när rondnumret förändras — visuell
                 signal för round-byten i listan när R-kolumnen är borta. */}
-            {queue.length > 0 && (
-              <ScrollView
-                style={styles.queueScroll}
-                showsVerticalScrollIndicator={false}
-              >
-                {queue.map((p, i) => {
-                  const round = queueRoundNumbers[i];
-                  const prevRound = i === 0 ? currentRound : queueRoundNumbers[i - 1];
-                  const isNewRound = round !== prevRound;
-                  return (
-                    <React.Fragment key={`${i}-${p.id}`}>
-                      {isNewRound && (
-                        <View style={styles.roundSeparator}>
-                          <Text style={styles.roundSeparatorText}>
-                            Round {round}
-                          </Text>
-                        </View>
-                      )}
-                      <View
-                        style={[
-                          styles.tableRow,
-                          i === queue.length - 1 && styles.tableRowNoBorder,
-                        ]}
-                      >
-                        <View style={styles.colPlayer}>
-                          <PlayerAvatar player={p} size={QUEUE_AVATAR_SIZE} />
-                          <Text style={styles.playerName} numberOfLines={1}>
-                            {p.name}
-                          </Text>
-                        </View>
-                      </View>
-                    </React.Fragment>
-                  );
-                })}
-              </ScrollView>
-            )}
+            {/* Plats 2-4 i kön: två-grupp-layout med justifyContent:
+                'space-between' så plats 2 förankras vänster och plats
+                3+4 grupperas tight till höger. Inga Round-dividers i
+                chip-raden (max 3 kommande spelare visas; ev. rond-byten
+                framgår av frågenumren). */}
+            {queue.length > 0 && (() => {
+              const renderChip = (p: IntroPlayer, qNum: number, key: string) => (
+                <View key={key} style={styles.queueChip}>
+                  <Text style={styles.queueChipNumber}>{qNum}</Text>
+                  <Text
+                    style={styles.queueChipName}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
+                    {p.name}
+                  </Text>
+                </View>
+              );
+              return (
+                <View style={styles.queueChipsRow}>
+                  {/* Vänster: plats 2 */}
+                  {renderChip(queue[0], queueQuestionNumbers[0], 'chip-0')}
+                  {/* Höger: plats 3 + plats 4 grupperade */}
+                  <View style={styles.queueChipsRightGroup}>
+                    {queue.length > 1 &&
+                      renderChip(queue[1], queueQuestionNumbers[1], 'chip-1')}
+                    {queue.length > 2 &&
+                      renderChip(queue[2], queueQuestionNumbers[2], 'chip-2')}
+                  </View>
+                </View>
+              );
+            })()}
 
-            {/* Slutmarkör — 🏁 End of Game om sista kö-frågan = totalQuestions,
-                annars 🔁 + more questions. */}
+            {/* Slutmarkör — 🏁 End of Game om sista chip = totalQuestions,
+                annars 🔁 + more questions. Plats 6+ visas inte längre i
+                en separat ScrollView (Peter: bara plats 2-5 syns i chip-
+                raden); slutmarkören räcker som hint om att fler finns. */}
             {(() => {
-              const lastQ =
-                queueQuestionNumbers[queueQuestionNumbers.length - 1] ?? currentQuestion;
-              const isEndOfGame = totalQuestions - lastQ <= 0;
+              const lastChipQ = queueQuestionNumbers[Math.min(3, queue.length - 1)] ?? currentQuestion;
+              const isEndOfGame = totalQuestions - lastChipQ <= 0;
               return (
                 <View style={styles.endOfGameRow}>
                   <Text style={styles.endOfGameText}>
@@ -1069,12 +1104,6 @@ export function GetReadyIntro({
               );
             })()}
 
-            {/* Footer: total-räknare + #Players som diskret subtitle under
-                tabellen. Bevarar information som tidigare fanns i header-
-                räkneverket men tar mycket mindre plats. */}
-            <Text style={styles.tableFooter}>
-              {`Round ${currentRound} of ${totalRounds} · Question ${currentQuestion} of ${totalQuestions} · ${playerCount} players`}
-            </Text>
           </View>
         )}
       </View>
@@ -1137,15 +1166,17 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    // Vertikal-centrerad grupp av play+upNext. paddingTop > paddingBottom
-    // biasar centreringen NEDÅT så hela gruppen sitter lägre i bild — ger
-    // luft mellan QuitBar/corner-logo och play-knappen.
-    justifyContent: 'center',
+    // Vertikal-centrerad grupp av play+tableBlock. paddingTop nu 0
+    // eftersom tableBlock vuxit avsevärt (dot-bars + chip-rad med
+    // divider) och chip-raden + endOfGameRow tidigare klipptes under
+    // skärmens nedre kant. gap mellan play och tableBlock ger luft
+    // så Rounds-baren inte sitter klistrad direkt under play-knappen.
+    justifyContent: 'flex-start',
     alignItems: 'center',
     paddingHorizontal: Spacing.lg,
     paddingTop: Spacing.xxxl * 2,
-    paddingBottom: Spacing.xl,
-    gap: Spacing.xxxl,
+    paddingBottom: Spacing.sm,
+    gap: Spacing.xxl,
   },
 
   // ── Game settings-block ────────────────────────────────────────────────
@@ -1656,6 +1687,7 @@ const styles = StyleSheet.create({
   },
   tableHeaderRow: {
     minHeight: 36,
+    marginTop: Spacing.lg,
   },
   tableRowNoBorder: {
     borderBottomWidth: 0,
@@ -1770,7 +1802,98 @@ const styles = StyleSheet.create({
   // alltid syns under den.
   queueScroll: {
     width: '100%',
-    maxHeight: 180,
+    // 100px ≈ 1.7 rader — plats 2-5 visas redan som chips ovanför, så
+    // ScrollView:n behöver bara rymma de få plats 6+ raderna utan att
+    // klippa hela tableBlock vid skärmens nedre kant.
+    maxHeight: 100,
+  },
+
+  // ── Kö-chips (plats 2-5 i kön) ──────────────────────────────────────
+  // Horisontell rad direkt under currentPlayerBox. Visar nästa 4 spelare
+  // i kön som kompakta chips med [frågenummer + namn]. Bevarar tabellens
+  // border-bottom-vokabulär (samma divider som andra rader) men packar 4
+  // spelare på samma höjd som tidigare hade 1 spelare per rad.
+  // Tre-grupp-layout: plats 2 vänster, Round-divider center, plats 3+4
+  // höger som grupp. justifyContent: 'space-between' fördelar dem över
+  // bredden så centern alltid har symmetrisk luft runt sig.
+  queueChipsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: Spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+  },
+  // Höger-gruppen håller plats 3 + 4 tight ihop (small gap mellan dem)
+  // medan de som helhet förankras i höger kant via space-between i parent.
+  queueChipsRightGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  // Spacer renderas om ingen rond-byte sker mellan plats 2 och 3 — håller
+  // 3-grupp-strukturen intakt så plats 3+4 alltid förankras höger.
+  queueChipsSpacer: {
+    flex: 0,
+    width: 0,
+  },
+  queueChip: {
+    // Fast width 110pt: 3 chips × 110 + 4pt intra-grupp-gap = 334pt
+    // av ~342pt tillgänglig bredd → minimalt space-between glapp mellan
+    // plats 2 och höger-gruppen så chips visuellt sitter tätare.
+    width: 110,
+    overflow: 'hidden',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 6,
+    paddingVertical: 4,
+    borderWidth: 1,
+    borderColor: Colors.borderStrong,
+    borderRadius: Radius.sm,
+    backgroundColor: Colors.background,
+  },
+  // Kompakt "R<round>"-pill som infogas inline mellan chips vid rond-byte.
+  // flexShrink:0 + intrinsic width → tar bara sin text-bredd, chips delar
+  // resten. Kortare label "R2" istället för "Round 2" så raden inte
+  // sprängs vid 3 chips + 2 dividers.
+  queueRoundDivider: {
+    flexShrink: 0,
+    flexGrow: 0,
+    paddingHorizontal: 6,
+    paddingVertical: 4,
+    backgroundColor: Colors.primaryMuted,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: Colors.primaryBorder,
+  },
+  queueRoundDividerText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: Colors.primary,
+    letterSpacing: 0.3,
+  },
+  // Siffran är frågenumret (queueQuestionNumbers[i]) — primary-blå för
+  // att linka visuellt till Question-dot-bar:ens siffror ovan.
+  queueChipNumber: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: Colors.primary,
+    minWidth: 12,
+    textAlign: 'center',
+  },
+  // Mindre text + tighter letterSpacing så fler chars ryms innan ellipsen.
+  // ellipsizeMode="tail" på <Text> ger "Guest..." för långa namn.
+  // flexShrink + minWidth speglar chip-stylen så ellipsen fyrar istället
+  // för att texten driver chip-bredden över sitt fair share.
+  queueChipName: {
+    flex: 1,
+    minWidth: 0,
+    fontSize: 11,
+    fontWeight: '500',
+    color: Colors.textSecondary,
+    letterSpacing: -0.2,
   },
 
   // ── Dot-bar progress (IndDev) ──────────────────────────────────────────
@@ -1779,45 +1902,63 @@ const styles = StyleSheet.create({
   // rad (= 10+10 vid max 20 ronder). Filled = currentQuestion st (gjorda
   // + näst-på-tur), empty = resten. Speglar exemplet Peter delade.
   progressBarBlock: {
-    paddingVertical: Spacing.sm,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: Spacing.md,
+    paddingVertical: Spacing.xs,
     paddingHorizontal: Spacing.md,
-    gap: 6,
   },
-  // Samma dämpade overline-stil som "Next:"-header-cellen så de två
-  // sub-rubrikerna i IndDev-blocket läses som en visuell grupp.
+  // Label sitter VÄNSTER om dot-raden med fast bredd så Rounds + Question
+  // labels alignerar vertikalt och båda dot-raderna startar på samma x.
+  // lineHeight: 24 matchar dot-höjden så labeln vertikalt centreras mot
+  // dot-raden vid 1-rad fall — och vid 2-rad fall (Question max 16 dots)
+  // top-alignar labeln mot första raden istället för att hamna i gapet.
   progressBarLabel: {
+    width: 70,
     fontSize: FontSize.sm,
     fontWeight: FontWeight.semibold,
     color: Colors.textSecondary,
     letterSpacing: 0.5,
+    lineHeight: 24,
   },
-  // Vertikal stack av 1-2 rader dots. >10 frågor splittas jämnt så raderna
-  // får liknande bredd istället för en full + en kort rad.
+  // Dots-wrap tar resten av bredden (flex:1). Vertikal stack vid >10 dots.
   progressBarRowsWrap: {
+    flex: 1,
     flexDirection: 'column',
     gap: 4,
   },
+  // Dots-raden fyller hela rowsWrap-bredden — dots flex-distribuerade så
+  // Rounds (4 dots) automatiskt blir bredare per styck än Question (8 dots).
   progressBarRow: {
     flexDirection: 'row',
     gap: 4,
   },
-  // Rektangulär pill — 28×16 form skiljer fyllda från ofyllda. Fyllda
-  // dots delar färgtema med currentPlayerBox/currentMediaBox ("Next:"-
-  // rad nedanför): primaryMuted bg + primary border. Det binder ihop
-  // progressen visuellt med "var du är nu just nu"-indikatorn istället
-  // för två konkurrerande primary-toner. Ofyllda får en muted border
-  // så de håller layout-utrymmet utan att skrika.
+  // Rektangulär pill — fyllda dots delar färgtema med currentPlayerBox
+  // (primaryMuted bg + primary border). flex:1 så dots delar bredden lika
+  // inom progressBarRow — antal dots styr deras individuella bredd.
   progressDot: {
-    width: 28,
-    height: 16,
+    flex: 1,
+    height: 24,
     borderRadius: 4,
     borderWidth: 1.5,
     borderColor: Colors.borderStrong,
     backgroundColor: 'transparent',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   progressDotFilled: {
     backgroundColor: Colors.primaryMuted,
     borderColor: Colors.primary,
+  },
+  // Siffra inuti varje dot (1-baserad globalIdx). Blå-tonad så den läses
+  // mot både unfilled (transparent bg) och filled (primaryMuted bg) — primary
+  // mot primaryMuted ger dämpad-men-läsbar kontrast utan att skrika.
+  progressDotNumber: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: Colors.primary,
+    lineHeight: 13,
+    includeFontPadding: false,
   },
 
   // "Round X"-separator infogas mellan kö-rader vid varje rondbyte. Spänner

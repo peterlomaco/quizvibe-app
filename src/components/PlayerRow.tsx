@@ -6,6 +6,7 @@ import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
 import type { AssistanceLevel } from '../utils/hcp';
 import { ApproveToggle } from './ApproveToggle';
 import { Avatar } from './Avatar';
+import { WifiFanIcon } from './WifiFanIcon';
 
 export interface Player {
   id: string;
@@ -135,26 +136,30 @@ export function PlayerRow({
             size={40}
             useBrandFallback={!isGuest}
           />
-          {/* D-vii: connection-health-dot. Endast IndDev-läget passar
-              peerHealth-prop:n; hasLeft-spelare slipper indikator
-              eftersom de redan signaleras som "borta" via grå styling. */}
-          {peerHealth !== undefined && !hasLeft && (
-            <View
-              style={[
-                styles.healthDot,
-                (peerHealth === 'ok' || peerHealth === 'self') &&
-                  styles.healthDotOk,
-                peerHealth === 'slow' && styles.healthDotSlow,
-                peerHealth === 'unstable' && styles.healthDotUnstable,
-              ]}
-            />
-          )}
         </View>
 
         <View style={styles.info}>
           <View style={styles.nameRow}>
             <Text style={[styles.name, hasLeft && styles.textLeft]} numberOfLines={1}>{player.name}</Text>
           </View>
+          {/* Wifi-ikon direkt under playername — connection-health-indikator
+              för Individual Devices. Färg: grön (ok/self), gul (slow), röd
+              (unstable). hasLeft-spelare slipper indikator (de signaleras
+              som "borta" via grå styling). */}
+          {peerHealth !== undefined && !hasLeft && (
+            <View style={styles.healthIconRow}>
+              <WifiFanIcon
+                size={16}
+                color={
+                  peerHealth === 'ok' || peerHealth === 'self'
+                    ? Colors.success
+                    : peerHealth === 'slow'
+                      ? Colors.warning
+                      : Colors.error
+                }
+              />
+            </View>
+          )}
           {hasLeft ? (
             // Replace status-row med "LEFT THIS GAME LOBBY"-text. Ingen dot
             // (dot:en signalerar Ready/Missing-state som inte längre är
@@ -482,6 +487,13 @@ const styles = StyleSheet.create({
   },
 
   info: { flex: 1, minWidth: 0 },
+  // Wifi-ikon-rad direkt under playername. marginTop bara tillräckligt
+  // för subtil separation från namnet utan att skapa stor luftig gap.
+  healthIconRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 2,
+  },
   nameRow: {
     flexDirection: 'row',
     alignItems: 'center',
