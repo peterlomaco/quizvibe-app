@@ -3426,16 +3426,17 @@ export default function LobbyScreen() {
                 />
               )}
             </View>
-            {/* AI — mörkblå cirkel med blå primary-border och italiserad "AI"-text. */}
+            {/* Images — Q-cirkel med blå primary-border och "?"-glyph centrerad. */}
             <View style={styles.connectionRow}>
               <View style={styles.connectionIconWrap}>
                 {/* Q-figuren från startskärmens logga (utan omgivande kvadrater).
-                    "AI"-text överlagrad i mitten ersätter den lilla pricken. */}
+                    "?"-glyph överlagrad i mitten ersätter den lilla pricken —
+                    speglar QuizVibeQuestionMarkLogo:s symbolik. */}
                 <Svg width={28} height={28} viewBox="24 22 32 32" style={StyleSheet.absoluteFillObject}>
                   <Circle cx="40" cy="38" r="13" fill="none" stroke={Colors.primary} strokeWidth="2.5" />
                   <Path d="M49 47 L53 51" stroke={Colors.primary} strokeWidth="2.5" strokeLinecap="round" />
                 </Svg>
-                <Text style={styles.connectionIconAiText}>AI</Text>
+                <Text style={styles.connectionIconAiText}>?</Text>
               </View>
               <Text style={styles.connectionLabel}>Images</Text>
               {/* FREE-badgen sitter alltid kvar (samma mönster som YouTube) —
@@ -3817,7 +3818,7 @@ export default function LobbyScreen() {
             </View>
             {/* Game Era */}
             <View>
-              <Text style={styles.cardTitle}>🕐 Game Era (min 10 year interval)</Text>
+              <Text style={styles.cardTitle}>Game Era (min 10 year interval)</Text>
               {hostMode && (
                 <Text style={styles.cardSubtitle}>Set the time span for questions</Text>
               )}
@@ -3949,7 +3950,7 @@ export default function LobbyScreen() {
 
             {/* Number of Rounds */}
             <View>
-              <Text style={styles.cardTitle}>🎯 Number of Rounds</Text>
+              <Text style={styles.cardTitle}>Number of Rounds</Text>
               {hostMode && (
                 <Text style={styles.cardSubtitle}>How many rounds in this game</Text>
               )}
@@ -3984,7 +3985,31 @@ export default function LobbyScreen() {
                       value={roundsCount}
                       min={ROUNDS_MIN}
                       gameModeMax={roundsMax}
-                      onPremiumPress={() => router.push({ pathname: '/store' as const, params: { focus: 'subscription', from: '/lobby', fromCode: roomCode } })}
+                      onPremiumPress={() => {
+                        // Premium-host i PtP: subscription:n unlock:ar fler rondor
+                        // bara i IndDev. Skicka dem INTE till Store (de äger redan
+                        // paketet) — guida dem istället till mode-bytet med en
+                        // confirm. Free host (utan subscription) behåller den gamla
+                        // Store-upsell-routingen.
+                        if (hasMultiplayerPackage && gameMode === 'pass-the-phone') {
+                          Alert.alert(
+                            'Switch to Individual Devices mode?',
+                            'Switch to Individual Devices mode to expand number of rounds up to 20.',
+                            [
+                              { text: 'Cancel', style: 'cancel' },
+                              {
+                                text: 'Switch',
+                                onPress: () =>
+                                  confirmAndRemoveManualGuests('Switch to Individual Devices?', () =>
+                                    setGameMode('individual-devices'),
+                                  ),
+                              },
+                            ],
+                          );
+                          return;
+                        }
+                        router.push({ pathname: '/store' as const, params: { focus: 'subscription', from: '/lobby', fromCode: roomCode } });
+                      }}
                       hasSubscription={hasMultiplayerPackage}
                       applicable={gameMode === 'individual-devices'}
                     />
@@ -4013,7 +4038,7 @@ export default function LobbyScreen() {
 
             {/* Answer response time */}
             <View>
-              <Text style={styles.cardTitle}>⏱️ Answer response time</Text>
+              <Text style={styles.cardTitle}>Answer response time</Text>
               <Text style={styles.cardSubtitle}>Seconds players have to answer each question</Text>
               {/* 4-knapps-rad (15/30/45/60). Renderas för alla i lobbyn så
                   non-host ser host:s val i real-tid; bara host kan ändra
@@ -5251,17 +5276,17 @@ const styles = StyleSheet.create({
     marginLeft: 2, // optisk centrering — pilen ser balanserad ut mot fylld cirkel
   },
   connectionIconGlyph: { fontSize: 14 },
-  // AI: Q-figur från startskärmens logga (cirkel + svans i primary-blå),
-  // utan omgivande ram. "AI"-text överlagras i Q-cirkelns mitt — mindre
-  // fontSize än tidigare så texten ryms inuti cirkeln.
+  // Images: Q-figur från startskärmens logga (cirkel + svans i primary-blå),
+  // utan omgivande ram. "?"-glyph överlagras i Q-cirkelns mitt — speglar
+  // QuizVibeQuestionMarkLogo:s symbolik (bold + ej italic, eftersom italic
+  // på ett ensamt "?" dubbel-lutar glyfen). Style-key behålls (`...AiText`)
+  // som privat CSS-vokabulär — minimal diff.
   connectionIconAiText: {
-    fontSize: 10,
+    fontSize: 14,
     fontWeight: '800',
-    fontStyle: 'italic',
     color: Colors.primary,
-    letterSpacing: 0.5,
     // translateY -1 kompenserar för att Text:s default-line-box har
-    // descender-utrymme under baseline — utan det ligger glyferna något
+    // descender-utrymme under baseline — utan det ligger glyfen något
     // under Q-ringens visuella mitt trots att box-centret är linjerat.
     transform: [{ translateY: -1 }],
   },
@@ -5333,13 +5358,14 @@ const styles = StyleSheet.create({
     gap: 4,
     marginTop: Spacing.sm,
   },
-  // Bas-look för båda knapparna i raden — flex: 1 ger 50/50 bredd, 46 px
-  // hög (matchar modeToggle), 1 px borderStrong + transparent bg.
+  // Bas-look för båda knapparna i raden — flex: 1 ger 50/50 bredd, 38 px
+  // hög (matchar PtP/IndDev-boxarnas VISUELLA inner-höjd i modeToggle:
+  // modeToggle är 46 px outer med 3 px padding + 1 px border → inner ≈ 38 px).
   // position:'relative' så FREE/PREMIUM-badge:n kan sticka upp över
   // kantlinjen utan att klippas.
   addPackageBtn: {
     flex: 1,
-    height: 46,
+    height: 38,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: Radius.sm,

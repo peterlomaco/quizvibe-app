@@ -68,10 +68,12 @@ export function calculateNewHCP(
   assistance: AssistanceLevel
 ): number {
   const cap = HCP_CAPS[assistance];
-  // Avrundning enligt projekt-policy (roundHcp) — 5 poäng → 1 i reduktion,
-  // 4 poäng → 0. Tidigare var detta Math.floor; bytet gör att 0,5 nu
-  // räknas uppåt så halv-progress räknas till spelarens fördel.
-  const reduction = roundHcp(pointsEarned / 10);
+  // Avrundning enligt projekt-policy (roundHcp) — 2 poäng → 1 i reduktion,
+  // 1 poäng → 1 (0.5 rundas uppåt till spelarens fördel). Skalan följer
+  // nya scoring-modellen där 1 rätt svar = 1 poäng (calculatePoints i
+  // app/quiz.tsx). Tidigare var divisorn 10 från då varje fråga gav 0-1000
+  // pts; binär 0/1-modell kräver mycket smalare proportion.
+  const reduction = roundHcp(pointsEarned / 2);
   const newHCP = currentHCP - reduction;
   return Math.max(newHCP, cap);
 }

@@ -68,6 +68,7 @@ import {
   View,
 } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
+import Svg, { Circle, Path } from 'react-native-svg';
 
 type AssistanceLevel = 'minimal' | 'standard' | 'full';
 
@@ -200,10 +201,19 @@ function isCorrect(
   return correctYear >= range.start && correctYear <= range.end;
 }
 
-function calculatePoints(timeLeft: number, correct: boolean, totalSeconds: number): number {
-  if (!correct) return 0;
-  return Math.round(1000 * (timeLeft / totalSeconds));
+// Poäng-modell: rätt svar = 1 poäng, fel = 0. Tie-break på leaderboarden
+// hanteras av sorteringen (poäng desc → avgResponseSeconds asc) — så två
+// spelare med samma antal rätt rankas efter lägst genomsnittlig svarstid.
+function calculatePoints(correct: boolean): number {
+  return correct ? 1 : 0;
 }
+
+// Quiz-lokal klarröd som ersätter den globala Colors.error i tre intentional
+// quiz-kontexter (timer-bar/ring/integer vid <5s, Wrong Answer-badge bg,
+// Wrong-feedback-kortets border). Den globala Colors.error är medvetet
+// mjukare/rosa-tonad så Lobby:s toggle-off-state, papperskorgs-pressed osv.
+// inte skriker. Quiz-vyn vill däremot ha en distinkt urgency-röd.
+const QUIZ_ERROR_RED = '#FF3B30';
 
 // ─── Mått ─────────────────────────────────────────────────────────────────────
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -1011,7 +1021,21 @@ export default function QuizScreen() {
   // fasen är aktiv och pendingYear är giltig (knappen är tappbar). Speglar
   // Lobby:s Start Game-CTA + GetReady:s play-knapp.
   const confirmPulse = useRef(new Animated.Value(1)).current;
-  const confirmGlow = useRef(new Animated.Value(0.35)).current;
+  const confirmGlow = useRef(new Animated.Value(0.4)).current;
+  // Next-tab:ens scale-pulse på reveal-vyn. Speglar startskärmens primary-
+  // CTA-pulse (1 ↔ 1.03 over 900ms). Körs kontinuerligt — vid mount och
+  // framåt — eftersom tab:en bara renderas i reveal-fasen ändå.
+  const nextTabPulse = useRef(new Animated.Value(1)).current;
+  // Blinkande "scroll for more"-indicator i botten på image-frågor. Prefix-
+  // gridens 10 rader + Confirm-knappen ryms inte på en skärm — pilen
+  // signalerar till spelaren att fortsätta scrolla. Opacity-loop 1 ↔ 0.3
+  // (faster cadence än övriga pulses för att grab attention).
+  const scrollHintOpacity = useRef(new Animated.Value(1)).current;
+  // True när användaren scrollat tillräckligt nära botten att Confirm-knappen
+  // är synlig — pilen göms då (annars blinkar den onödigt över Confirm).
+  // Reset:as till false vid varje frågebyte så pilen återkommer på nästa
+  // image-fråga oavsett föregående scroll-position.
+  const [scrolledToBottom, setScrolledToBottom] = useState(false);
   // Pulserande ring runt sekund-räknaren till höger om timer-bar:en. Färgen
   // ärvs från timerColor (primary → warning → error). Två separata loops:
   // scale (subtil "andning") + halo-opacity (glow-effekten bakom ringen).
@@ -1270,6 +1294,57 @@ export default function QuizScreen() {
     };
   }, [phase, timerRingPulse, timerRingGlow]);
 
+  // Next-tab:ens kontinuerliga scale-pulse (1 ↔ 1.03 over 900ms each way) —
+  // speglar startskärmens primary-CTA-pulse exakt. Körs på mount och framåt
+  // utan phase-gating; tab:en är ändå bara monterad i reveal-fasen.
+  useEffect(() => {
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(nextTabPulse, { toValue: 1.03, duration: 900, useNativeDriver: true }),
+        Animated.timing(nextTabPulse, { toValue: 1, duration: 900, useNativeDriver: true }),
+      ]),
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [nextTabPulse]);
+
+  // Scroll-hint-pulse på image-frågor (1 ↔ 0.3 opacity, 600ms varje håll).
+  // Snabbare cadence än övriga pulses så down-chevronen blinkar tydligare och
+  // grabbar attention. Körs kontinuerligt — pilen är ändå bara monterad när
+  // phase + question-typ matchar.
+  useEffect(() => {
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(scrollHintOpacity, { toValue: 0.3, duration: 600, useNativeDriver: true }),
+        Animated.timing(scrollHintOpacity, { toValue: 1, duration: 600, useNativeDriver: true }),
+      ]),
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [scrollHintOpacity]);
+
+  // Reset scroll-hint-synlighet vid varje frågebyte — pilen ska återkomma
+  // på nästa image-fråga oavsett om spelaren scrollat ner i föregående fråga.
+  useEffect(() => {
+    setScrolledToBottom(false);
+  }, [questionIndex]);
+
+  // ScrollView:s onScroll → räkna avstånd från content-botten. När < 24 px
+  // kvar (≈ Confirm-knappen är fully visible) → setScrolledToBottom(true) →
+  // pilen göms via gate i JSX. useCallback för att inte re-skapa handler:n
+  // per render (ScrollView re-mountar då).
+  const handleScrollHintScroll = useCallback((e: {
+    nativeEvent: {
+      contentOffset: { y: number };
+      layoutMeasurement: { height: number };
+      contentSize: { height: number };
+    };
+  }) => {
+    const { contentOffset, layoutMeasurement, contentSize } = e.nativeEvent;
+    const distanceFromBottom = contentSize.height - (contentOffset.y + layoutMeasurement.height);
+    setScrolledToBottom(distanceFromBottom <= 24);
+  }, []);
+
   // 2-decimal countdown-tick (20 Hz). Körs ENDAST i 'question'-fasen — så
   // fort spelaren confirmar (phase → 'awaiting') stoppas tick:n och displayen
   // fryses på exakt confirm-värdet (sätts explicit i handleConfirm). I
@@ -1307,19 +1382,22 @@ export default function QuizScreen() {
       confirmPulse.stopAnimation();
       confirmPulse.setValue(1);
       confirmGlow.stopAnimation();
-      confirmGlow.setValue(0.35);
+      confirmGlow.setValue(0.4);
       return;
     }
+    // Cadensen (1.03 scale + 0.4↔0.85 opacity, 1100ms varje håll) speglar
+    // Lobby:s Start Game-CTA exakt så de två "go-action"-knapparna i
+    // host-flödet andas i samma rytm.
     const scaleLoop = Animated.loop(
       Animated.sequence([
-        Animated.timing(confirmPulse, { toValue: 1.04, duration: 800, useNativeDriver: true }),
-        Animated.timing(confirmPulse, { toValue: 1, duration: 800, useNativeDriver: true }),
+        Animated.timing(confirmPulse, { toValue: 1.03, duration: 1100, useNativeDriver: true }),
+        Animated.timing(confirmPulse, { toValue: 1, duration: 1100, useNativeDriver: true }),
       ]),
     );
     const glowLoop = Animated.loop(
       Animated.sequence([
-        Animated.timing(confirmGlow, { toValue: 0.8, duration: 800, useNativeDriver: true }),
-        Animated.timing(confirmGlow, { toValue: 0.35, duration: 800, useNativeDriver: true }),
+        Animated.timing(confirmGlow, { toValue: 0.85, duration: 1100, useNativeDriver: true }),
+        Animated.timing(confirmGlow, { toValue: 0.4, duration: 1100, useNativeDriver: true }),
       ]),
     );
     scaleLoop.start();
@@ -1339,7 +1417,7 @@ export default function QuizScreen() {
     // (i useEffect:en på timeLeft nedan).
     const interval = getIntervalForAssistance(currentAssistance);
     const correct = isCorrect(year, question.correctYear, interval, eraFrom, eraTo);
-    const pts = calculatePoints(timeLeft, correct, responseSeconds);
+    const pts = calculatePoints(correct);
     // 2-decimals svarstid via Date.now()-diff (questionStartMsRef sätts i
     // startTimer). Cap:as till responseSeconds så ev. clock drift inte ger
     // > totalSeconds. Används både till stopwatch-display, reveal-card och
@@ -1398,7 +1476,7 @@ export default function QuizScreen() {
   const handleConfirmName = (opt: ImageNameOption) => {
     if (question.type !== 'image') return;
     const correct = opt.isCorrect;
-    const pts = calculatePoints(timeLeft, correct, responseSeconds);
+    const pts = calculatePoints(correct);
     const totalMs = responseSeconds * 1000;
     const exactElapsedMs = Math.max(0, Date.now() - questionStartMsRef.current);
     const exactElapsedSec = Math.min(responseSeconds, exactElapsedMs / 1000);
@@ -2465,7 +2543,7 @@ export default function QuizScreen() {
   // Bar:ens BREDD drivs av timerProgressAnim (Animated.Value, RAF-driven).
   // Färgen styrs fortfarande av sekund-räknaren timeLeft eftersom färg-
   // tröskeln är vid hela sekunder.
-  const timerColor = timeLeft > 10 ? Colors.primary : timeLeft > 5 ? Colors.warning : Colors.error;
+  const timerColor = timeLeft > 10 ? Colors.primary : timeLeft > 5 ? Colors.warning : QUIZ_ERROR_RED;
   // Stopwatch:n (decimal-rutan) byter till en lugnare ljusblå ton så fort
   // användaren confirmat (awaiting) OCH stannar blå genom reveal-fasen så
   // den inte byter till varnings-röd när tiden går ut. Question-fasen
@@ -2824,6 +2902,8 @@ export default function QuizScreen() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
+        onScroll={handleScrollHintScroll}
+        scrollEventThrottle={32}
       >
         {/* phase är här narrowed till 'question' | 'awaiting' | 'reveal'
             (leaderboard fångas av early-return ovan), så ingen extra
@@ -3199,36 +3279,37 @@ export default function QuizScreen() {
                     >
                       {wasCorrect ? '✓ Correct Answer' : '✗ Wrong Answer'}
                     </Text>
-                    {/* Correct-rad och Next-tab delar samma rad så
-                        tab:ens underkant linjerar med textens underkant. */}
-                    <View style={rv.feedbackYearRow}>
-                      <Text style={rv.feedbackCorrectYear}>
-                        {correctLabel}{' '}
-                        <Text style={rv.feedbackCorrectYearBold}>
-                          {correctValue}
-                        </Text>
+                    <Text style={rv.feedbackCorrectYear}>
+                      {correctLabel}{' '}
+                      <Text style={rv.feedbackCorrectYearBold}>
+                        {correctValue}
                       </Text>
-                      {/* I IndDev kontrollerar host speltempot — non-host
-                          ser en passiv "Waiting for host…"-pill istället för
-                          Next-tab. När host tappar Next broadcastar vi
-                          question_advance → non-host advancar via listener.
-                          Pass-the-Phone har alla på samma enhet → vanlig
-                          Next-tab för båda roller. */}
-                      {gameMode === 'individual-devices' && !isHost ? (
-                        <View style={rv.waitingForHostPill}>
-                          <Text style={rv.waitingForHostPillText}>
-                            Waiting for host
-                          </Text>
-                          <SequentialDots color={Colors.textSecondary} />
-                        </View>
-                      ) : (
+                    </Text>
+                  </Animated.View>
+                  {/* Next-tab / Waiting-for-host-pill ligger UTANFÖR feedback-
+                      kortet — right-aligned i botten på reveal-vyn så
+                      användaren fokuserar på resultatet i kortet och CTA:n
+                      sitter separat. I IndDev kontrollerar host speltempot;
+                      non-host ser en passiv pill istället för tab. */}
+                  <View style={rv.revealNextWrap}>
+                    {gameMode === 'individual-devices' && !isHost ? (
+                      <View style={rv.waitingForHostPill}>
+                        <Text style={rv.waitingForHostPillText}>
+                          Waiting for host
+                        </Text>
+                        <SequentialDots color={Colors.textSecondary} />
+                      </View>
+                    ) : (
+                      <Animated.View
+                        style={{
+                          width: '50%',
+                          alignSelf: 'flex-end',
+                          transform: [{ scale: nextTabPulse }],
+                        }}
+                      >
                         <TouchableOpacity
                           style={[
                             rv.nextTab,
-                            wasCorrect ? rv.nextTabCorrect : rv.nextTabWrong,
-                            // D-iii: Next-tab disabled vid unstable så host
-                            // inte advancar medan host:s egen sync är död.
-                            // Vid recovery enables tab:en automatiskt.
                             shouldLockForUnstable && { opacity: 0.4 },
                           ]}
                           onPress={
@@ -3243,17 +3324,9 @@ export default function QuizScreen() {
                             {isLastQuestion ? '🏆  Final Leaderboard' : 'Next  →'}
                           </Text>
                         </TouchableOpacity>
-                      )}
-                    </View>
-                    {wasCorrect && confirmedTimeUsed !== null && (
-                      <Text style={rv.feedbackAnswerTime}>
-                        Answer time:{' '}
-                        <Text style={rv.feedbackBold}>
-                          {confirmedTimeUsed.toFixed(2)}s
-                        </Text>
-                      </Text>
+                      </Animated.View>
                     )}
-                  </Animated.View>
+                  </View>
                 </View>
               );
             })()}
@@ -3294,7 +3367,18 @@ export default function QuizScreen() {
                       disabled={!canConfirm || shouldLockForUnstable}
                       activeOpacity={0.85}
                     >
-                      <Text style={styles.actionBtnText}>Confirm</Text>
+                      {/* Q-glyph (ring + tail från QuizVibe-loggan) ersätter
+                          ett typografiskt C så ordet läses som "Qonfirm" med
+                          QuizVibe:s brand-Q. Samma vit-stroke som omgivande
+                          text. Tight viewBox + minimal gap så Q och "onfirm"
+                          sitter ihop som en sammanhängande glyph-rad. */}
+                      <View style={styles.actionBtnContent}>
+                        <Svg width={22} height={22} viewBox="24 22 30 32">
+                          <Circle cx="40" cy="38" r="13" fill="none" stroke="#fff" strokeWidth="4.5" />
+                          <Path d="M49 47 L53 51" stroke="#fff" strokeWidth="4.5" strokeLinecap="round" />
+                        </Svg>
+                        <Text style={styles.actionBtnText}>onfirm</Text>
+                      </View>
                     </TouchableOpacity>
                   </Animated.View>
                 )}
@@ -3310,6 +3394,20 @@ export default function QuizScreen() {
 
         <View style={{ height: Spacing.xxl }} />
       </ScrollView>
+      {/* Scroll-hint pil — blinkar i botten av skärmen på image-frågor för att
+          signalera att fler prefix-knappar + Confirm-knappen finns längre ned.
+          Pinnad ovanför safe-area:n via SafeAreaView:s flex-tree; absolute
+          positioning. pointerEvents='none' så taps under den når Confirm/grid. */}
+      {question.type === 'image' && (phase === 'question' || phase === 'awaiting') && !scrolledToBottom && (
+        <Animated.View
+          style={[scrollHintStyles.wrap, { opacity: scrollHintOpacity }]}
+          pointerEvents="none"
+        >
+          <View style={scrollHintStyles.pill}>
+            <Text style={scrollHintStyles.chevron}>⌄</Text>
+          </View>
+        </Animated.View>
+      )}
       {/* D-iii: bad-connection-overlay. Modal:n hanterar sin egen fullscreen-
           rendering med high zIndex, så den ligger ovanpå ScrollView:n utan
           extra wrapping. Bara aktiv i IndDev (gated via shouldLockForUnstable
@@ -3762,6 +3860,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  // Row-wrap för Q-glyph + "onfirm"-text inuti Confirm-knappen. Tight gap
+  // så Q och bokstäverna läses som ett sammanhängande ord. alignItems:
+  // 'center' baseline-justerar Q-SVG:n mot text-mitten.
+  actionBtnContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+  },
   // Confirm-knappens stil: blue + iOS shadow för glow-effekten. Halo:n bakom
   // (confirmHalo) ger cross-platform glow på Android som saknar shadow-color.
   actionBtnConfirm: {
@@ -3824,6 +3930,9 @@ const rv = StyleSheet.create({
     paddingVertical: Spacing.xs,
     paddingHorizontal: Spacing.sm,
     gap: 2,
+    // marginTop ger badgen (top: -8, border-cutting) andrum att protruda
+    // uppåt utan att krocka med fråge-kortet ovanför.
+    marginTop: Spacing.sm,
   },
   // Båda statusarna delar bg-färg (Colors.card) som matchar question-kortet
   // ovanför så reveal-vyn känns som en seamless förlängning av frågan istället
@@ -3834,24 +3943,32 @@ const rv = StyleSheet.create({
   },
   feedbackWrong: {
     backgroundColor: Colors.card,
-    borderColor: Colors.error,
+    borderColor: QUIZ_ERROR_RED,
   },
+  // Border-cutting badge: sitter på kortets övre kantlinje (top: -8) istället
+  // för inuti kortet. Speglar HOST/GUEST-taggen på PlayerRow och FREE/PREMIUM-
+  // badgen på Game Mode-toggle:n. Solid bg matchar kortets borderColor så
+  // taggen visuellt "är en del av" ramen. Vit text för kontrast mot grön/röd.
   feedbackBadge: {
-    alignSelf: 'flex-start',
+    position: 'absolute',
+    top: -8,
+    right: Spacing.lg,
     fontSize: FontSize.xs,
     fontWeight: FontWeight.bold,
-    paddingHorizontal: Spacing.sm,
+    paddingHorizontal: 8,
     paddingVertical: 2,
-    borderRadius: Radius.sm,
+    borderRadius: 4,
     overflow: 'hidden',
+    color: '#FFFFFF',
+    letterSpacing: 0.5,
+    zIndex: 10,
+    elevation: 4,
   },
   feedbackBadgeCorrect: {
-    color: Colors.success,
-    backgroundColor: 'rgba(82,200,122,0.18)',
+    backgroundColor: Colors.success,
   },
   feedbackBadgeWrong: {
-    color: Colors.error,
-    backgroundColor: 'rgba(255,107,107,0.18)',
+    backgroundColor: QUIZ_ERROR_RED,
   },
   // "Correct year: 1980" — fortfarande primärt fokus i reveal-vyn men
   // krympt så hela kortet håller låg höjd oavsett assistance-nivå (kortet
@@ -3869,50 +3986,33 @@ const rv = StyleSheet.create({
     fontVariant: ['tabular-nums'],
     letterSpacing: -0.3,
   },
-  // Subtilare än Correct year så hierarkin är tydlig. Krympt + negativ
-  // marginTop för att rätt-svars-kortet inte ska bli onödigt högt — den
-  // är en sekundär info-rad som bara visas vid rätt svar.
-  feedbackAnswerTime: {
-    fontSize: FontSize.xs,
-    color: Colors.textSecondary,
-    marginTop: -2,
+  // Wrapper för Next-tab UTANFÖR feedback-kortet — sträcker sig full bredd
+  // i container:n (paddingHorizontal: Spacing.lg från rv.container ger
+  // konsekvent högra/vänstra marginal mot skärmkanten). marginTop ger luft
+  // mot kortets underkant. Default alignItems (stretch) gör att Animated.View-
+  // wrappern och TouchableOpacity inom fyller bredden.
+  revealNextWrap: {
+    marginTop: Spacing.md,
   },
-  feedbackBold: {
-    fontWeight: FontWeight.bold,
-  },
-  // Row som håller correct-year-text + Next-tab på samma rad. alignItems:
-  // 'flex-end' bottom-anchorar båda så tab:ens underkant linjerar med
-  // correct-year-textens underkant (per Peter:s spec). justifyContent:
-  // 'space-between' separerar texten (vänster) från tab:en (höger).
-  feedbackYearRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-end',
-    gap: Spacing.sm,
-  },
-  // Next-tab inuti feedback-kortet — sitter på samma rad som correct-year-
-  // texten (alignItems:'flex-end' i feedbackYearRow bottom-anchorar tab:en
-  // mot textens baseline). Kompakt; bg-färg ärvs från nextTabCorrect/Wrong
-  // (båda primary, så tab:en alltid signalerar "fortsätt" oavsett status).
+  // Next-tab — speglar startskärmens pulserande Join/Create-CTA:er (`gameBtn`
+  // i app/index.tsx) i visuell vokabulär: höjd 56, Colors.cardElevated bg,
+  // 1px Colors.primary border, Radius.md. Reveal-kortets border + badge bär
+  // status-färgen (grön/röd), tab:en är en neutral "fortsätt"-CTA.
   nextTab: {
-    paddingHorizontal: Spacing.md,
-    paddingVertical: 6,
-    borderRadius: Radius.sm,
-  },
-  // Båda statusarna använder primary-blå så Next-tab:en alltid signalerar
-  // "fortsätt"-action. Card:ens border + badge bär status-färgen (grön vid
-  // rätt, röd vid fel) — tab:en behöver inte upprepa den.
-  nextTabCorrect: {
-    backgroundColor: Colors.primary,
-  },
-  nextTabWrong: {
-    backgroundColor: Colors.primary,
+    height: 56,
+    paddingHorizontal: Spacing.lg,
+    borderRadius: Radius.md,
+    borderWidth: 1,
+    borderColor: Colors.primary,
+    backgroundColor: Colors.cardElevated,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   nextTabText: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#fff',
-    letterSpacing: 0.4,
+    fontSize: 17,
+    fontWeight: '600',
+    color: Colors.textPrimary,
+    letterSpacing: 0.3,
   },
   // Non-host:s "Waiting for host…"-pill i IndDev — sitter i samma position
   // som Next-tab skulle. Dämpad styling (textSecondary + borderStrong)
@@ -3933,5 +4033,44 @@ const rv = StyleSheet.create({
     fontWeight: '600',
     color: Colors.textSecondary,
     letterSpacing: 0.3,
+  },
+});
+
+// Scroll-hint-pil i botten på image-frågor. Eget StyleSheet så `styles` och
+// `rv` namespacen inte blir röriga med fler keys. Solid Colors.primary-pill +
+// elevation/shadow för att garantera synlighet över både Colors.card-grid:n
+// och ev. media-card-bilder. zIndex + elevation behövs båda (iOS + Android).
+const scrollHintStyles = StyleSheet.create({
+  wrap: {
+    position: 'absolute',
+    bottom: Spacing.lg,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    zIndex: 50,
+    elevation: 50,
+  },
+  pill: {
+    minWidth: 64,
+    height: 36,
+    paddingHorizontal: Spacing.lg,
+    borderRadius: 999,
+    backgroundColor: Colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.4,
+    shadowRadius: 6,
+  },
+  chevron: {
+    fontSize: 32,
+    lineHeight: 32,
+    color: '#FFFFFF',
+    fontWeight: '900',
+    // Negative marginTop kompenserar för Text:s default line-box som har
+    // ascent-utrymme ovanför glyfen — utan det ligger ⌄ visuellt under
+    // pillens vertikala center.
+    marginTop: -10,
   },
 });

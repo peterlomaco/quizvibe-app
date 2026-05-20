@@ -286,19 +286,13 @@ export const MOCK_OPPONENTS: LeaderboardPlayer[] = [
 // Returnerar bara poäng+correct — timeUsed och playerId sätts av anroparen.
 // Mer assistans = lägre accuracy + lägre poäng-range (casual-spelare).
 
+// Mock-opponent-score: rätt = 1 pt, fel = 0 (samma modell som calculatePoints
+// i quiz.tsx). Assistance driver fortfarande träffsäkerhet (minimal-spelare
+// modelleras som mer skickliga i mock:en) men poäng-utfallet är binärt.
 export function generateOpponentRoundScore(assistance: AssistanceLevel): { points: number; correct: boolean } {
   const accuracy = { full: 0.45, standard: 0.65, minimal: 0.78 }[assistance];
   const correct = Math.random() < accuracy;
-  if (!correct) {
-    return { points: 0, correct: false };
-  }
-  const range = {
-    full:     [400, 1400],
-    standard: [800, 2200],
-    minimal:  [1500, 2800],
-  }[assistance];
-  const points = Math.round(range[0] + Math.random() * (range[1] - range[0]));
-  return { points, correct: true };
+  return { points: correct ? 1 : 0, correct };
 }
 
 // Mock svarstid för en motspelare (5–25 sekunder, 2-decimals-precision så

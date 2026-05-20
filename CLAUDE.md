@@ -212,7 +212,7 @@ Five top-level collapsible sections — all use the same tappable-header pattern
 **Game era slider** mirrors Lobby's `MultiSlider` pattern (`ERA_MIN=1930`, `ERA_MAX=current year`, `SLIDER_WIDTH=280`, default `[1980, 2010]`). No player-clamping on Profile — it's host-default setup with no players in context. Persisted as `gameEraFrom`/`gameEraTo` on `ProfileData`. Loadning clampar from/to till nuvarande range eftersom äldre profiler (när ERA_MIN var 1900) kan ha sparat värden < 1930 — utan clamp:n skulle rutan ovan visa t.ex. "1925" medan thumben sitter låst på 1930.
 
 **Game era — shared spec mellan Profile och Lobby** (host-vyn):
-- Titel: "🕐 Game Era (min 10 year interval)" (Lobby) / "Game era (min 10 year interval)" (Profile-fieldLabel).
+- Titel: "Game Era (min 10 year interval)" (Lobby + Profile, identisk text — ikon-prefixet `🕐` togs bort 2026-05-20 tillsammans med `🎯 Number of Rounds` och `⏱️ Answer response time` så Quiz settings-blockets rubriker är clean typography).
 - Year-range-ruta: gul-glödande `eraGuestBox` (border `#F5A623` = `Colors.warning`, bg `rgba(26,48,80,0.92)`) — visar `{from} – {to}` i samma stil som in-game year-selector i `app/quiz.tsx`. Profile har en privat copy av styles (`eraGuestBoxWrap` / `eraGuestBox` / `eraGuestBoxText`) som speglar Lobby-versionen 1:1.
 - Slider-linje: tunn 6 px hög ruta (`trackStyle.height: 6`) som extends/shrinks i bredd. `selectedStyle` = guld-fylld glödande pill (`backgroundColor: Colors.warning`, `shadowColor: Colors.warning`, `shadowOpacity: 0.85`, `shadowRadius: 8`, `elevation: 4`, `borderRadius: 3`). Ingen border (gold-on-gold = onödig). `unselectedStyle.backgroundColor: Colors.border` ger subtil grå bakgrunds-track så slider-räckvidden syns.
 - **Custom markers** ([src/components/EraSliderMarker.tsx](src/components/EraSliderMarker.tsx), delas av Lobby + Profile): `customMarkerLeft={EraMarkerMinus}` + `customMarkerRight={EraMarkerPlus}` (kräver `isMarkersSeparated`) renderar 24×24 solid-guld cirklar med "−" / "+"-glyph (Colors.background-färg, fontSize 18, weight 900) — växer till 28×28 vid drag. `markerOffsetY={3}` är **kritiskt** — utan det lägger MultiSlider thumben med center vid fullTrack-top istället för track-centerline (= track-höjd / 2 = 3 på en 6 px-track). Tidigare hidden-marker-mönster (`customMarker={() => null}`) testades men användarna hittade inte drag-zonerna och slidern kändes "fastnad" — synliga thumbs är nödvändiga för att förmedla extend/shrink-affordance.
@@ -281,7 +281,7 @@ Profile-toggle som filtrerar vilka paket som syns i Lobby:n när användaren är
 Två-knapps-rad direkt under "Customized Host packages"-rubriken i Lobby — host-only:
 
 - **Generic** (vänster, 50% bredd) — visuell indikator + tappbar. Lyser **grön** (`Colors.success` border + `Colors.primaryMuted` bg + grön FREE-badge med svart text) när `selectedExtraPackages.length === 0` (lobby:n kör utan extra-paket = bara basic). **Grå** (borderStrong + transparent bg + grå FREE-badge) så fort minst ett paket är valt — inklusive Select all-läget. Tap på dämpad Generic → Alert "Switch to Generic? This will deactivate all selected packages..." → Switch tömmer `selectedExtraPackages` (alla paket avaktiveras → Generic blir grön igen).
-- **+ Add host packages** (höger, 50% bredd) — egen `addPackageBtn`-styling (modeOption-baserad, transparent bg, borderStrong, `Radius.sm`, 46 px hög). Grå PREMIUM-badge i kantskärande position. Tap → `router.push('/store?focus=packages&from=/lobby')` — Store renderar Packages överst, Back tar tillbaka till Lobby. Ersatte den tidigare pulserande "+ QuizVibe Store"-CTA längst ner i wrappern.
+- **+ Add host packages** (höger, 50% bredd) — egen `addPackageBtn`-styling (modeOption-baserad, transparent bg, borderStrong, `Radius.sm`, **38 px hög** så den matchar PtP/IndDev-boxarnas visuella inner-höjd i `modeToggle`-containern; var tidigare 46 men då såg den taller ut än Game Mode-rutorna ovanför). Grå PREMIUM-badge i kantskärande position. Tap → `router.push('/store?focus=packages&from=/lobby')` — Store renderar Packages överst, Back tar tillbaka till Lobby.
 - Layout `packageActionsRow`: `flexDirection: 'row'` + `gap: 4` (matchar `modeToggle`-gap) + `flex: 1` på båda → 50/50 bredd.
 
 ## Host Game Credits (pill + daily refresh + deduktion)
@@ -369,6 +369,11 @@ Två separata färggrupper — klammer + badge växlar grey↔gold (premium-stat
 
 Non-host-vyn använder fortfarande default `hasSubscription={false}` → grå styling oavsett host:s subscription-status (klammer + badge döljs ändå när `onPremiumPress` saknas, så bara siffer-färgningen är synlig).
 
+**PREMIUM-tap-flöde är split baserat på subscription** (`onPremiumPress`-callback i LobbyScreen):
+- **Premium-host i PtP**: visar Alert "Switch to Individual Devices mode?" / "Switch to Individual Devices mode to expand number of rounds up to 20." med Cancel + Switch. Switch routar via `confirmAndRemoveManualGuests` (för att cleana ev. manuellt tillagda guests) → `setGameMode('individual-devices')`. Hostar äger redan paketet, så Store-deeplinken är inte rätt destination — guida dem till mode-bytet istället.
+- **Free host**: bevarar default Store-upsell-routing (`/store?focus=subscription&from=/lobby&fromCode={roomCode}`).
+- **Premium-host i IndDev**: bracket + PREMIUM-badge döljs (`gameModeMax === ROUNDS_MAX_INDIV` → ingen locked-zone att rendera).
+
 ## Lobby — Game Settings card
 
 Game Mode and Game Connections share a single bordered card (`gameSettingsBorder` in `LobbyScreen.tsx`) — they're treated as one "spelregler"-grupp. Order inside Game Connections: YouTube → Profiles & Places → "Customized Host packages" sub-block (`usePackagesBlock`).
@@ -377,7 +382,7 @@ Game Mode and Game Connections share a single bordered card (`gameSettingsBorder
 
 **Answer response time-rad** (under Number of Rounds, inom samma `quizSettingsBorder`): 4-knapps-rad (15s/30s/45s/60s) med aktiv ruta i `primaryBorder` + `primaryMuted`-bg, label-text bold + textPrimary i aktivt läge. Renderas för alla i lobbyn men `disabled={!hostMode}` så bara host kan ändra (samma "render-for-all-but-disable-for-non-host"-mönster som Game Mode och Region scope). Default seedas från host:s profil via `setAnswerResponseSeconds(profile?.answerResponseSeconds ?? 30)` i host-seed-effekten ovan; non-host syncar via `mockLobbySettings`-polling.
 
-**Profiles & Places icon** uses an inline SVG of the Q-figure (circle + tail in `Colors.primary`, no surrounding squares) with an "AI"-Text overlay centered in the Q ring. `viewBox="24 22 32 32"` centers the Q at icon coords (14, 14) which matches the wrap's flex center; AI text gets `transform: translateY(-1)` to compensate for glyph baseline offset. **Gotcha**: this inline SVG is **independent** from `QuizVibeLogo` and still uses the original Q coords (cx=40, cy=38, r=13). The shared `QuizVibeLogo` component shifted its Q to (37, 37) for box-centering — they're intentionally decoupled, so changing one doesn't affect the other.
+**Images icon** (raden heter "Images" i Game Connections — tidigare "Profiles & Places") uses an inline SVG of the Q-figure (circle + tail in `Colors.primary`, no surrounding squares) with a **"?"-glyph overlay** centered in the Q ring (speglar `QuizVibeQuestionMarkLogo`:s symbolik — tidigare var det italicized "AI"-text, bytt 2026-05-20 eftersom AI inte längre är rätt mental modell för image-frågorna). Style-key `connectionIconAiText` behållen som privat CSS-vokabulär (icke-domän-semantisk, minimal-diff). Glyfen är fontSize 14 fontWeight 800 primary-blå, italic borttagen eftersom italic på ett ensamt "?" dubbel-lutar glyfen. `viewBox="24 22 32 32"` centers the Q at icon coords (14, 14). **Gotcha**: this inline SVG is **independent** from `QuizVibeLogo` och använder fortfarande de ursprungliga Q-coorderna (cx=40, cy=38, r=13). Shared `QuizVibeLogo`-komponenten shiftade sin Q till (37, 37) för box-centering — they're intentionally decoupled.
 
 **Customized Host packages** (sub-block `usePackagesBlock` inside Game Connections): Basic-utbudet är alltid implicit aktivt (ingen synlig rad) — hosten kan välja till köpta extra-paket via `selectedExtraPackages[]` ovanpå. `PURCHASED_PACKAGES` (i `src/utils/mockPurchasedPackages.ts`) är hardcodad mock filtrerad genom Profile:s `enabledHostPackages` → `availablePackages` (se "Customized Host packages (Profile-toggle → Lobby-filter)" ovan).
 
@@ -881,16 +886,29 @@ const stopwatchColor = phase === 'question' ? timerColor : '#8CC1FF';
    - `‹` / `›`-glyfer (38 px bold, `BOX_COLOR` + textShadow för glow), absolut-positionerade vid `right: '50%' + marginRight: selectorWidth/2 + 6` (vänster) respektive `left: '50%' + marginLeft: selectorWidth/2 + 6` (höger). Loop:ar opacity 0.35 ↔ 1 + scale 1 ↔ 1.18 över 700 ms (native driver). Stoppas när `disabled`.
    - **Era-låst tidslinje**: `min = eraFrom`, `max = eraTo` (via props från quiz.tsx). Spelaren kan inte scrolla utanför Game Era. **`getAnswerRange(selectedYear, interval, min, max)`** shiftar fönstret in i intervallet vid kanterna istället för att klippa det — så full=5 kollapsar inte till 3 år vid edge. `isCorrect` använder samma helper så scoring synkar med visuella fönstret.
 6. **Action-knapp / pillar** (fas-medveten):
-   - `'question'`: **Confirm**-knapp i `Colors.primary` med pulsande blue glow (halo-View bakom, opacity 0.35 ↔ 0.8 + scale 1 ↔ 1.04). Loops stoppas när `pendingYear === null` (disabled-knapp pulserar inte).
+   - `'question'`: **Confirm**-knapp i `Colors.primary` med pulsande blue glow (halo-View bakom, opacity 0.4 ↔ 0.85 + scale 1 ↔ 1.03 over 1100ms — matchar Lobby:s Start Game-CTA-cadens). Loops stoppas när `canConfirm === false` (disabled-knapp pulserar inte). **Knapp-text är inte ren "Confirm" utan en row med Q-glyph + "onfirm"** — SVG-Q (ring + tail från QuizVibe-loggan, strokeWidth 4.5 vit) följt av lowercase "onfirm" i FontSize 17 / weight 700 / vit. Läses som ordet **"Qonfirm"** med brand-Q som versal. `actionBtnContent` row-wrap har `gap: 3` så Q och bokstäverna sitter tight ihop som en sammanhängande glyph-rad.
    - `'awaiting'`: passiv pillar `✓ Confirmed — waiting for time` (primaryMuted bg + primaryBorder, textSecondary text, ingen tap).
-   - `'reveal'`: ingen action-knapp i actionWrap — Next-tab sitter INUTI feedback-kortet istället.
-7. **Feedback-kort** (visas BARA i `'reveal'`, inte i `'awaiting'` — se nedan):
-   - `borderWidth: 2`, kompakt padding (`paddingVertical: xs / paddingHorizontal: sm / gap: 2`).
-   - **Båda statusarna delar bg-färg `Colors.card`** (samma som question-kortet ovanför) så reveal-vyn känns som en seamless förlängning av frågan istället för en "alarm-ruta". Status-färgen bärs enbart på badge + border: grön border (`Colors.success`) vid rätt, röd border (`Colors.error`) vid fel.
-   - **Badge**: `✓ Correct Answer` (success) eller `✗ Wrong Answer` (error) i top-vänster.
-   - **`feedbackYearRow`** (row + `alignItems: 'flex-end'` + `justifyContent: 'space-between'`): "Correct year: {N}" vänster + Next-tab höger på SAMMA rad. `alignItems: 'flex-end'` bottom-anchorar båda så Next-tab:ens underkant linjerar med correct-year-textens underkant — driver tab:ens vertikala position så den läser som en logisk fortsättning på årsraden istället för en separat botten-knapp.
-   - **Answer time** (bara vid rätt svar): `Answer time: {X.YY}s` i FontSize.xs `textSecondary` + `marginTop: -2`. Renderas UNDER feedbackYearRow.
-   - **Next-tab** (i feedbackYearRow): `Next →` eller `🏆 Final Leaderboard`. **Bg = `Colors.primary` (blå)** för båda fallen oavsett rätt/fel — Card:ens border + badge bär status-färgen, tab:en signalerar bara "fortsätt".
+   - `'reveal'`: ingen action-knapp i actionWrap. Next-tab har lyfts UT ur feedback-kortet — se "Reveal Next-tab" nedan.
+7. **Feedback-kort** (visas BARA i `'reveal'`, inte i `'awaiting'`):
+   - `borderWidth: 2`, kompakt padding, `marginTop: Spacing.sm` så border-cutting-badgen (top: -8) inte krockar med fråge-kortet ovanför.
+   - **Båda statusarna delar bg-färg `Colors.card`** (samma som question-kortet) så reveal-vyn känns som en seamless förlängning av frågan. Status-färgen bärs på badge + border: grön (`Colors.success`) vid rätt, röd (`QUIZ_ERROR_RED` = `#FF3B30` — se "Quiz error red" nedan) vid fel.
+   - **Border-cutting badge** (top-right corner via `position: 'absolute', top: -8, right: Spacing.lg`): `✓ Correct Answer` (success-grön bg + vit text) eller `✗ Wrong Answer` (`QUIZ_ERROR_RED` bg + vit text). Solid bg matchar kortets borderColor så taggen visuellt "är en del av" ramen. Speglar HOST/GUEST-taggen på PlayerRow + FREE/PREMIUM-badgen på Game Mode-toggle:n.
+   - **Correct-rad**: "Correct year: {N}" (timeline) eller "Correct: {namn}" (image) i feedbackCorrectYear-stil. Tidigare fanns en "Answer time: X.YYs"-rad under vid rätt svar — borttagen 2026-05-21 eftersom svarstiden redan syns på den frusna stopwatch:n ovanför, så två renderingar var redundant.
+
+### Reveal Next-tab (lyft UT ur feedback-kortet)
+
+Next-tab / Final Leaderboard-CTA sitter UTANFÖR feedback-kortet i `revealNextWrap` (egen View i `rv.container`-trädet, under kortet). Layout-mässigt right-aligned + half-width — `Animated.View`-wrappern har inline `width: '50%' + alignSelf: 'flex-end'`. `marginTop: Spacing.md` på wrap ger luft mellan kortets underkant och knappen.
+
+**Visuell vokabulär matchar startskärmens `gameBtn`** (pulserande Join/Create-CTA:er i [app/index.tsx](app/index.tsx)) — inte Final Leaderboard:s `finalHomeBtn` som tidigare:
+- `height: 56`, `borderRadius: Radius.md`
+- `backgroundColor: Colors.cardElevated` + `borderWidth: 1` `borderColor: Colors.primary`
+- Text: `fontSize: 17`, `fontWeight: '600'`, `color: Colors.textPrimary`, `letterSpacing: 0.3`
+
+**Pulse**: scale 1 ↔ 1.03 over 900ms (samma cadens som startskärmens `pulse` Animated.Value). Loop:en körs kontinuerligt på mount — tab:en är ändå bara monterad i reveal-fasen så ingen phase-gating behövs.
+
+**Non-host i IndDev** ser istället en passiv `waitingForHostPill` med "Waiting for host" + SequentialDots (textSecondary + borderStrong-bg) — ingen pulse, ingen tap. Host:s tap på Next broadcastar `question_advance` så non-host:s phase också advance:as via listener.
+
+**`nextTabCorrect`/`nextTabWrong` style-keys borttagna** — color-tema är samma oavsett rätt/fel (kortets border + badge bär status-färgen, tab:en är neutral "fortsätt"-CTA). Förhindrar att framtida edits återinförsätter status-baserad tab-styling.
 
 ### Confirm + awaiting + reveal-flödet
 
@@ -911,16 +929,38 @@ const stopwatchColor = phase === 'question' ? timerColor : '#8CC1FF';
 
 **Spring-in-animation** för feedback-kortet (`revealScale: 0.6 → 1` + `revealOpacity: 0 → 1`) triggas i useEffect på `phase`-deps varje gång phase blir 'reveal'.
 
+### Quiz error red (lokal scope)
+
+`Colors.error = '#FF6B6B'` är medvetet mjuk coral i hela appen (Lobby toggle-off-state, papperskorgs-pressed, Leave/Logout-knappar, ApproveToggle disabled-track, etc.). Quiz-vyn vill däremot ha en distinkt urgency-röd för timer-countdown + Wrong Answer-feedback. Lösning: module-level konstant `QUIZ_ERROR_RED = '#FF3B30'` (Apple iOS system red) i [app/quiz.tsx](app/quiz.tsx), använd på tre platser:
+- `timerColor`-grenen vid `timeLeft ≤ 5` (driver timer-bar, ring, sekund-räknaren, stopwatch border via timerColor-derivat)
+- `feedbackWrong.borderColor` (Wrong Answer-kortets röda kantlinje)
+- `feedbackBadgeWrong.backgroundColor` (badge:n)
+
+Princip: när framtida quiz-specifik röd-användning dyker upp, använd `QUIZ_ERROR_RED`. För all annan röd i appen → `Colors.error`. Inga ytterligare callsites för `QUIZ_ERROR_RED` utanför quiz.tsx.
+
+### Image questions — scroll-hint pil
+
+Image-frågor har 10 prefix-knappar i ImageAnswerBlock — på små skärmar ryms inte alla + Confirm-knappen i en vy. Pilen i [app/quiz.tsx](app/quiz.tsx) (`scrollHintStyles`) signalerar till spelaren att fortsätta scrolla:
+- **Position**: `position: 'absolute'` i SafeAreaView (utanför ScrollView), `bottom: Spacing.lg`, centered. `zIndex: 50 + elevation: 50` så pillen ligger ovanpå allt annat.
+- **Visual**: rounded pill (minWidth 64 × height 36) med solid `Colors.primary` bg + drop-shadow, innehållandes Text-glyph `⌄` (fontSize 32 vit fet, marginTop -10 för vertikal centrering). Använder Text-glyph istället för SVG för max plattformskompatibilitet.
+- **Blink-pulse**: opacity 1 ↔ 0.3 över 600ms (snabbare cadens än övriga pulses för att grab attention). `scrollHintOpacity` Animated.Value körs i Animated.loop på mount; `useNativeDriver: true`.
+- **Auto-hide nära botten**: ScrollView:s `onScroll` (throttle 32ms) räknar `contentSize.height - (contentOffset.y + layoutMeasurement.height)`. När < 24px till botten → `setScrolledToBottom(true)` → pilen göms via JSX-gate.
+- **Reset per fråga**: useEffect på `[questionIndex]` återställer `scrolledToBottom = false` så pilen återkommer på nästa image-fråga oavsett tidigare scroll-position.
+- **Gating**: `question.type === 'image' && (phase === 'question' || phase === 'awaiting') && !scrolledToBottom`. Renderas INTE på timeline-frågor (year selector + Confirm ryms typiskt utan scroll), inte under reveal/intro/countdown/leaderboard.
+- **`pointerEvents: 'none'`** på Animated.View-wrappern så pilen inte blockar taps på Confirm/grid under den.
+
 ### Music question + answer mock data
 
 **`MUSIC_QUESTION_TEXT = 'Which year was this song released?'`** — alla mock-frågor delar denna text (själva låten är frågan via YouTube). `correctYear` + `hint` (era) per fråga är fortfarande unika så reveal-vyn varierar i hint-texten även om frågetexten är generisk.
 
-**`calculatePoints(timeLeft, correct, totalSeconds)`** — max 1000 pts vid omedelbart svar (`Math.round(1000 * (timeLeft / totalSeconds))`). totalSeconds-paramet skalar scoring så 30s/15s/45s/60s response time alla ger samma max.
+**`calculatePoints(correct)`** — binär scoring: **1 poäng vid rätt, 0 vid fel**. Tidigare var pts time-baserad (0-1000 per fråga via `1000 × (timeLeft / totalSeconds)`); modellen förenklades 2026-05-21 så pts-kolumnen visar antal rätt över spelet. **Tie-break**: spelare med samma pts rankas på lägst genomsnittlig svarstid (`avgResponseSeconds asc`). Sortering hanteras både i quiz.tsx:s `tableEntries`-derivation (för GetReadyIntro:s live-leaderboard) och i RoundLeaderboard:s `entries.sort` (för final-leaderboarden). Mock-opponent-funktionen `generateOpponentRoundScore` i [src/components/RoundLeaderboard.tsx](src/components/RoundLeaderboard.tsx) följer samma 1/0-modell (accuracy-sannolikheten per assistance behålls för att simulera olika skicklighet i testdata).
+
+**HCP-progression skalar mot binära scoring**: `calculateNewHCP` i [src/utils/hcp.ts](src/utils/hcp.ts) använder `roundHcp(pointsEarned / 2)` — så 2 rätt sänker HCP med 1, 1 rätt också 1 (0.5 rundas upp till spelarens fördel), 4 rätt med 2, etc. Tidigare divisor var 10 (matchade gamla 0-1000-modellen). HCP är ute ur launch-scope men formeln är skalad korrekt så feature:n kan återupplivas utan ytterligare beräknings-pass.
 
 **Answer response time** (`responseSeconds: 15 | 30 | 45 | 60`) är dynamisk state i quiz.tsx, justerbar via GetReadyIntro:s dropdown. Används överallt där 30 tidigare var hardcoded:
 - `startTimer`: `setTimeLeft(responseSeconds)` + `Animated.timing.duration: responseSeconds * 1000`.
 - `decimalElapsedMs`-tick + cap: `responseSeconds * 1000`.
-- `handleConfirm`: `responseSeconds - timeLeft` för timeUsed; `calculatePoints(..., responseSeconds)`.
+- `handleConfirm`: `responseSeconds - timeLeft` för timeUsed (loggas i RoundResult för leaderboard-AVG/LAST-kolumner; påverkar INTE pts-räkningen längre).
 - Avatar-marker: `((responseSeconds − confirmedTimeUsed) / responseSeconds) * 100%`.
 - Color-trösklar (warning ≤10s, error ≤5s, pulse ≤5s) bevarade som **absoluta sekunder** — universell "lite tid kvar"-perception.
 

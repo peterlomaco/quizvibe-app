@@ -1024,7 +1024,12 @@ export function GetReadyIntro({
                       );
                     })}
                     {isEndOfGame && (
-                      <Text style={styles.endOfGameInline}>
+                      <Text
+                        style={styles.endOfGameInline}
+                        numberOfLines={1}
+                        adjustsFontSizeToFit
+                        minimumFontScale={0.8}
+                      >
                         🏁  End of Game
                       </Text>
                     )}
@@ -1106,7 +1111,12 @@ export function GetReadyIntro({
                       </View>
                     ))}
                     {isEndOfGame && (
-                      <Text style={styles.endOfGameInline}>
+                      <Text
+                        style={styles.endOfGameInline}
+                        numberOfLines={1}
+                        adjustsFontSizeToFit
+                        minimumFontScale={0.8}
+                      >
                         🏁  End of Game
                       </Text>
                     )}
@@ -1733,7 +1743,10 @@ const styles = StyleSheet.create({
   },
   tableHeaderRow: {
     minHeight: 36,
-    marginTop: Spacing.lg,
+    // Tight marginTop så "Pass-the-Phone to:"-rubriken sitter nära dot-bars
+    // ovanför — frigör vertikal yta så "+ more questions"-raden under chip-
+    // grid:n inte trycks under skärmkanten vid 4 rondor × 3+ spelare.
+    marginTop: Spacing.xs,
   },
   tableRowNoBorder: {
     borderBottomWidth: 0,
@@ -1870,7 +1883,10 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: 4,
     paddingHorizontal: Spacing.sm,
-    paddingVertical: Spacing.sm,
+    // Tight paddingVertical så chip-grid:n sitter närmare current-player-
+    // boxen ovanför, vilket gör att "+ more questions"-raden under syns
+    // även vid 4 rondor × 3+ spelare (chip-grid:n wrappar då till flera rader).
+    paddingVertical: Spacing.xs,
     borderBottomWidth: 1,
     borderBottomColor: Colors.border,
   },
@@ -1880,13 +1896,20 @@ const styles = StyleSheet.create({
   // texten från att kompressera om utrymmet blir trångt — då wrap:ar
   // hela texten till ny rad istället via flexWrap på parent.
   endOfGameInline: {
+    // Bredd matchar queueChip (110pt) så End of Game-pillen ryms i samma
+    // visuella slot som ett chip — den hakar med på samma rad som sista
+    // spelar-chippet när sista raden i grid:n inte är full (1–2 chips kvar).
+    // Tighter font + letterSpacing + horizontal padding så "🏁 End of Game"
+    // ryms inom slot-bredden vid default-skalning.
+    width: 110,
     flexShrink: 0,
-    fontSize: FontSize.xs,
+    fontSize: 10,
     fontWeight: FontWeight.semibold,
     color: Colors.textSecondary,
-    letterSpacing: 0.6,
+    letterSpacing: 0.3,
     textTransform: 'uppercase',
-    paddingHorizontal: 4,
+    paddingHorizontal: 2,
+    textAlign: 'center',
   },
 
   queueChip: {
