@@ -81,6 +81,24 @@ export interface PlayerApprovedPlayAgainPayload {
 }
 
 /**
+ * Host har lämnat post-game-flödet via "Home"-knappen på Final Leaderboard.
+ * Lobby:n är permanent stängd (deactivateRoom + cleanup-stores). Non-hosts
+ * som fortfarande sitter på Final Leaderboard (inklusive de som tryckt
+ * Approve Play Again och väntar på "Please Wait..."-overlay) ska få en
+ * informativ popup + auto-navigera till Home.
+ *
+ * Skickas direkt efter `deactivateRoom`/cleanup men INNAN host:s
+ * `router.replace('/')` så non-host:s syncChannel hinner ta emot innan
+ * host:s channel rivs vid component-unmount.
+ */
+export interface LobbyDeletedPayload {
+  /** Rumkoden som just stängts. Bara informativt — non-host vet redan
+   *  vilken kod de är i; vi skickar koden för parity med övriga
+   *  lobby-events och möjlig framtida debugging. */
+  room_code: string;
+}
+
+/**
  * D-iv: host justerade audio för en specifik spelare i GetReady-vyn.
  * Incremental update — bara den ändrade spelaren broadcastas, inte hela
  * map:en. Mottagare uppdaterar sin lokala `playerAudioOverrides[player_id]`
@@ -164,6 +182,9 @@ export interface SyncChannelHandlers {
   /** En non-host har tappat "Approve Play again" — host använder för att
    *  räkna approvals och låsa upp "Yes, keep them"-knappen. */
   onPlayerApprovedPlayAgain?: (payload: PlayerApprovedPlayAgainPayload) => void;
+  /** Host har lämnat Final Leaderboard via Home → lobby permanent stängd.
+   *  Non-host visar "Host has deleted this lobby"-popup + auto-nav Home. */
+  onLobbyDeleted?: (payload: LobbyDeletedPayload) => void;
   /** D-iv: host justerade audio för en spelare. Alla mottagare uppdaterar
    *  sin playerAudioOverrides-map; den drabbade spelarens device mute:as/
    *  unmute:as i MediaPlayer. */
@@ -212,6 +233,7 @@ export interface SyncChannel {
   broadcastPlayerApprovedPlayAgain: (
     payload: PlayerApprovedPlayAgainPayload,
   ) => Promise<void>;
+  broadcastLobbyDeleted: (payload: LobbyDeletedPayload) => Promise<void>;
   /** D-iv: host broadcastar ny audio-state för en specifik spelare. */
   broadcastPlayerAudioStateChanged: (
     payload: PlayerAudioStateChangedPayload,
@@ -337,6 +359,11 @@ export function subscribeSyncChannel(
   if (handlers.onPlayerApprovedPlayAgain) {
     channel.on('broadcast', { event: 'player_approved_play_again' }, ({ payload }) => {
       handlers.onPlayerApprovedPlayAgain!(payload as PlayerApprovedPlayAgainPayload);
+    });
+  }
+  if (handlers.onLobbyDeleted) {
+    channel.on('broadcast', { event: 'lobby_deleted' }, ({ payload }) => {
+      handlers.onLobbyDeleted!(payload as LobbyDeletedPayload);
     });
   }
   if (handlers.onPlayerAudioStateChanged) {
@@ -474,6 +501,13 @@ export function subscribeSyncChannel(
       await channel.send({
         type: 'broadcast',
         event: 'player_approved_play_again',
+        payload,
+      });
+    },
+    broadcastLobbyDeleted: async (payload) => {
+      await channel.send({
+        type: 'broadcast',
+        event: 'lobby_deleted',
         payload,
       });
     },

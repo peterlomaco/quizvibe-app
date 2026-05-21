@@ -1003,7 +1003,16 @@ export default function QuizScreen() {
       };
     });
     return entries.sort((a, b) => {
+      // 1. Pts desc — flest poäng vinner
       if (b.points !== a.points) return b.points - a.points;
+      // 2. Spelare med 0 spelade ronder får avgResponseSeconds=0 vilket
+      //    annars skulle leapfrogga ALLA spelare med faktisk data (0 < deras
+      //    avg). Garantera att tom-data alltid sorteras sist.
+      if (a.playedRounds === 0 && b.playedRounds > 0) return 1;
+      if (b.playedRounds === 0 && a.playedRounds > 0) return -1;
+      // 3. Avg response time asc — snabbare avg vinner vid pts-tie. Spelare
+      //    som timeoutat alla frågor har avg=max-tiden; en spelare som hann
+      //    svara (även fel) har lägre avg och ska därför ranka högre.
       return a.avgResponseSeconds - b.avgResponseSeconds;
     });
   }, [gamePlayers, gameTotals, allRoundScoresHistory, leftPlayerIds]);
@@ -1195,7 +1204,20 @@ export default function QuizScreen() {
   // och delar denna enhet (en spelare i taget). Direkt-nav till /quiz utan
   // turnOrder simulerar fortfarande mock-motspelare för gameplay-testning.
   const recordRoundScore = (yourPoints: number, yourCorrect: boolean, yourTimeUsed: number) => {
-    const activePlayerId = turnOrder[currentPlayerIndex]?.id ?? 'you';
+    // Vilken spelare attribueras score:n till?
+    //   • Pass-the-Phone: turnOrder[currentPlayerIndex] — aktiv spelare
+    //     roterar mellan ronder, alla scoreposter går till "current"-rad:n.
+    //   • Individual Devices: selfPlayerId — varje enhet är EN spelare.
+    //     currentPlayerIndex stannar på 0 i IndDev (ingen rotation), så om
+    //     vi också använde turnOrder[currentPlayerIndex] skulle ALLA scores
+    //     på non-host:s enhet attribueras till host (turnOrder[0]) — vilket
+    //     gjorde att non-host:s egen rad visade 0 i played rounds/correct/
+    //     avg/pts genom hela spelet.
+    //   • Direkt-nav utan turnOrder: 'you' som sista fallback.
+    const activePlayerId =
+      gameMode === 'individual-devices' && selfPlayerId
+        ? selfPlayerId
+        : (turnOrder[currentPlayerIndex]?.id ?? 'you');
     const yourScore: RoundScore = {
       playerId: activePlayerId,
       points: yourPoints,
@@ -1905,9 +1927,20 @@ export default function QuizScreen() {
       }));
       await savePendingLobbyPlayers(carryOverPlayers);
     } else {
-      // Tom lobby förutom host
+      // Tom lobby förutom host. **KRITISKT**: host:s id MÅSTE vara `'1'`
+      // (= SEED_PLAYERS[0].id i LobbyScreen) eftersom LobbyScreen:s mount-
+      // sekvens först sätter `players = [SEED_PLAYERS[0]]` (id='1') och
+      // useEffect på `[players]` skriver den raden till lobby_players-
+      // tabellen INNAN consumePendingLobbyPlayers() hinner ersätta state
+      // med carry-over:n. Om carry-over:s host-id skiljer sig (t.ex. 'you')
+      // skapar consumePendingLobbyPlayers + nästa useEffect-write en ANDRA
+      // host-rad i DB:n — setLobbyPlayers UPSERT:ar utan att DELETE:a stale
+      // rader, så Alex K-raden (id='1') överlever och visas för non-host
+      // som en tredje (fantom) spelare i leaderboard + timeline-banner
+      // under quiz. Genom att matcha id='1' träffar carry-over-skrivningen
+      // SAMMA DB-rad → bara name/emoji uppdateras, ingen extra host-rad.
       carryOverPlayers = [{
-        id: 'you',
+        id: '1',
         name: hostName,
         emoji: hostEmoji,
         isReady: true,
@@ -2001,14 +2034,34 @@ export default function QuizScreen() {
   // (om ja) en uppföljning om per-spelare-settings ska bevaras eftersom de
   // kan ha redigerats av host under spelet/i Lobby:n. iOS Alert har max 3
   // knappar utan radbryt — därav två steg istället för 4-vägs-prompt.
-  const askKeepSettingsThenGo = () => {
+  //
+  // `withCancel`-flaggan inkluderar en extra Cancel-knapp (3 totalt).
+  // Används av single-player-Play-Again-flödet där "Re-use all players?"-
+  // alerten skippas helt och denna popup blir det enda Play Again-steget
+  // — host måste då ha en utväg utan att tvingas välja Reset eller Keep.
+  // Vid multi-player anrop:as den utan flagga (= 2 knappar) eftersom den
+  // föregående "Yes, keep them"-tap:en redan motsvarade en Cancel-möjlighet.
+  const askKeepSettingsThenGo = (withCancel = false) => {
+    // Title växlar beroende på single-player (withCancel=true) vs multi-
+    // player: single-player har bara en spelare = host så "per player"-
+    // formuleringen är missvisande; använd "for lobby" istället för att
+    // signalera att det är lobby-wide settings som diskuteras.
+    const title = withCancel
+      ? 'Keep same setting for lobby'
+      : 'Keep same settings per player?';
     Alert.alert(
-      'Keep same settings per player?',
+      title,
       'Settings (assistance level + age) may have been edited during this game. Keep them or reset to defaults?',
-      [
-        { text: 'Reset', onPress: () => goToNewLobby(true, false) },
-        { text: 'Keep settings', onPress: () => goToNewLobby(true, true) },
-      ],
+      withCancel
+        ? [
+            { text: 'Cancel', style: 'cancel' },
+            { text: 'Reset', onPress: () => goToNewLobby(true, false) },
+            { text: 'Keep settings', onPress: () => goToNewLobby(true, true) },
+          ]
+        : [
+            { text: 'Reset', onPress: () => goToNewLobby(true, false) },
+            { text: 'Keep settings', onPress: () => goToNewLobby(true, true) },
+          ],
     );
   };
 
@@ -2062,25 +2115,76 @@ export default function QuizScreen() {
     // vänta in → använd vanlig Alert direkt. För Individual Devices visar
     // vi custom modal istället så vi kan rendera "Yes, keep them"-knappen
     // som utgråad tills alla non-hosts broadcastat sin Approve-signal.
+    //
+    // Single-player (= PtP med exakt 1 spelare i turnOrder) skippar
+    // "Re-use all players?"-frågan helt — det finns ingen att "behålla"
+    // utöver host själv. Istället hoppar vi direkt till "Keep same
+    // settings?"-popupen med extra Cancel-knapp så host har en utväg
+    // tillbaka till Final Leaderboard utan att tvingas till Reset/Keep.
     if (gameMode === 'pass-the-phone') {
-      Alert.alert(
-        'Re-use all players?',
-        'Start the next room with the same players, or begin fresh?',
-        [
-          { text: 'Cancel', style: 'cancel' },
-          { text: 'Start fresh', onPress: () => goToNewLobby(false) },
-          { text: 'Yes, keep them', onPress: askKeepSettingsThenGo },
-        ],
-      );
+      const isSinglePlayer = turnOrder.length === 1;
+      if (isSinglePlayer) {
+        askKeepSettingsThenGo(true);
+      } else {
+        Alert.alert(
+          'Re-use all players?',
+          'Start the next room with the same players, or begin fresh?',
+          [
+            { text: 'Cancel', style: 'cancel' },
+            { text: 'Start fresh', onPress: () => goToNewLobby(false) },
+            { text: 'Yes, keep them', onPress: () => askKeepSettingsThenGo() },
+          ],
+        );
+      }
     } else {
-      // Reset approvals så host kan trycka Play Again igen vid behov
-      // (t.ex. efter Cancel) utan att gamla approvals lever kvar.
-      setPlayAgainApprovals(new Set());
+      // BEHÅLL existerande approvals när host re-tappar Play Again efter
+      // Cancel. Non-host:s "Please Wait..."-overlay tas inte ner vid host:s
+      // Cancel (deras awaitingNewLobby state lever vidare) så de re-broadcastar
+      // inte sin Approve vid host:s andra Play Again-tap. Om vi reset:ade
+      // approvals här hade "Yes, keep them"-knappen varit utgråad trots
+      // att non-host redan tidigare godkänt — host skulle behöva nå non-host
+      // via annan kanal för att be dem trycka Approve på nytt, vilket inte
+      // funkar eftersom "Please Wait..."-overlay:n blockar tap. Att behålla
+      // approvals löser det: host:s nästa Play Again-tap öppnar modal:en med
+      // "Yes, keep them" redan upplåst om alla redan approvat.
       setPlayAgainModalVisible(true);
     }
   };
 
-  const handleGoHome = () => {
+  const handleGoHome = async () => {
+    // När host trycker Home från Final Leaderboard är lobby:n effektivt
+    // stängd — Play Again-flödet är övergivet. Notifiera non-host:s
+    // syncChannel + cleanup alla per-rum-stores så de inte fastnar på
+    // "Please Wait..."-overlay:n (efter att de tappat Approve) eller
+    // stannar passivt på Final Leaderboard. Gated på IndDev + host
+    // eftersom Pass-the-Phone bara har en device.
+    if (
+      isHost &&
+      gameMode === 'individual-devices' &&
+      params.roomCode &&
+      syncChannelRef.current
+    ) {
+      // Fire FÖRE deactivateRoom/clear så non-host:s syncChannel hinner
+      // ta emot innan vi rivs vid component-unmount. Fire-and-forget —
+      // ev. send-fail blockar inte host:s nav-flow.
+      syncChannelRef.current
+        .broadcastLobbyDeleted({ room_code: params.roomCode })
+        .catch(() => {});
+    }
+    if (isHost && params.roomCode) {
+      // Cleanup-bunten speglar Quit Game-flödet — stänger rummet i Supabase
+      // (server-side flagga + RLS-stäng) och rensar alla per-rum-mock-stores.
+      try {
+        await deactivateRoom(params.roomCode);
+      } catch {
+        // Tyst — låt navigation gå igenom även om DB-roundtrip skulle failla.
+      }
+      clearLeftPlayers(params.roomCode);
+      clearLobbyPlayers(params.roomCode);
+      clearLobbySettings(params.roomCode);
+      clearEjected(params.roomCode);
+      clearGameStarted(params.roomCode);
+    }
     router.replace('/');
   };
 
@@ -2170,6 +2274,11 @@ export default function QuizScreen() {
   // gånger om host av någon anledning broadcastar lobby_ready upprepade
   // gånger.
   const hostStartedWithoutMeAlertedRef = useRef(false);
+  // Guard så lobby-deleted-popup:en inte fyrar dubbelt om host:s broadcast
+  // skulle nå non-host flera gånger (race vid edge-case-disconnect).
+  const lobbyDeletedAlertedRef = useRef(false);
+  // Ref för broadcast-handler av lobby-deleted-event.
+  const lobbyDeletedHandlerRef = useRef<() => void>(() => {});
   useEffect(() => {
     playAgainInitiatedHandlerRef.current = () => {
       if (!isHost) setHostInitiatedPlayAgain(true);
@@ -2210,6 +2319,25 @@ export default function QuizScreen() {
       // egen kopia av overrides-mappen. MediaPlayer:s isMuted re-evalu-
       // eras nästa render via useMemo-deps.
       setPlayerAudioOverridesState((prev) => ({ ...prev, [playerId]: audioOn }));
+    };
+    lobbyDeletedHandlerRef.current = () => {
+      // Host har tappat Home från Final Leaderboard — lobby:n är stängd.
+      // Bara non-host:s sida bryr sig (host själv broadcastar och navigerar
+      // omedelbart). Visar info-Alert + auto-nav till startskärmen. Guard
+      // mot dubbelfyrning via lobbyDeletedAlertedRef. Resetar
+      // awaitingNewLobby så ev. "Please Wait..."-overlay släpps innan
+      // popupen visas (Alert renderas över overlay:n, men cleanup gör
+      // state-tree:t konsistent vid nav).
+      if (isHost) return;
+      if (lobbyDeletedAlertedRef.current) return;
+      lobbyDeletedAlertedRef.current = true;
+      setAwaitingNewLobby(false);
+      Alert.alert(
+        'Host has deleted this lobby',
+        '',
+        [{ text: 'OK', onPress: () => router.replace('/') }],
+        { cancelable: false },
+      );
     };
     hostActivePingHandlerRef.current = (hostQuestionIndex: number) => {
       // Host:s broadcast bekräftar liv → non-host resetar gap-tracker.
@@ -2383,6 +2511,7 @@ export default function QuizScreen() {
         playAgainLobbyReadyHandlerRef.current(payload.room_code),
       onPlayerApprovedPlayAgain: (payload) =>
         playerApprovedPlayAgainHandlerRef.current(payload.player_id),
+      onLobbyDeleted: () => lobbyDeletedHandlerRef.current(),
       onPlayerAudioStateChanged: (payload) =>
         playerAudioStateChangedHandlerRef.current(payload.player_id, payload.audio_on),
       onHostActivePing: (payload) =>
@@ -3186,8 +3315,7 @@ export default function QuizScreen() {
                   if (nameMatch) {
                     return (
                       <>
-                        <Text style={styles.questionText}>What is</Text>
-                        <Text style={styles.questionTextHeadline}>the Name</Text>
+                        <Text style={styles.questionTextHeadline}>What is the Name</Text>
                         <Text style={styles.questionText}>{nameMatch[1]}</Text>
                       </>
                     );

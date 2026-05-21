@@ -1,3 +1,4 @@
+import { Nunito_700Bold, useFonts } from '@expo-google-fonts/nunito';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   Animated,
@@ -49,6 +50,11 @@ const GLYPH_FONT_SIZE = LOGO_SIZE * 0.28;
  */
 export function CountdownIntro({ onComplete, startFrom = 3, mode = 'pass-the-phone', playerName, playerEmoji }: Props) {
   const isIndDev = mode === 'individual-devices';
+  // Nunito 700 Bold för "QuizVibe"-brandraden — matchar startskärmens
+  // appName-textformat 1:1. Faller tillbaka till systemfont under font-
+  // load (kort flicker, acceptabel kostnad för att slippa block:a render).
+  const [fontsLoaded] = useFonts({ Nunito_700Bold });
+  const brandFont = fontsLoaded ? 'Nunito_700Bold' : undefined;
   const [count, setCount] = useState(startFrom);
   // Två separata pop-animationer så siffran och "?" kan röra sig oberoende.
   const numberScale = useRef(new Animated.Value(1.4)).current;
@@ -174,12 +180,15 @@ export function CountdownIntro({ onComplete, startFrom = 3, mode = 'pass-the-pho
       <View style={styles.container}>
         {/* Pre-countdown-headline ovan loggan. PtP: "Pass-the-Phone to:" +
             spelar-box (avatar + namn) så användaren vet vems tur det är
-            även under nedräkningen. IndDev: bara texten "Get Ready to
-            Vibe" (alla spelare på sina egna enheter; ingen specifik spelare
-            att namnge). */}
+            även under nedräkningen. IndDev: "Get Ready to" / "QuizVibe"
+            stackat på två rader så brand-namnet får visuellt fokus på rad 2.
+            Alla spelare på sina egna enheter — ingen specifik spelare att namnge. */}
         {isIndDev ? (
           <View style={styles.playerBlock}>
-            <Text style={styles.getReadyHeadline}>Get Ready to Vibe</Text>
+            <Text style={styles.getReadyHeadline}>Get Ready to</Text>
+            <Text style={[styles.getReadyBrandHeadline, brandFont && { fontFamily: brandFont }]}>
+              QuizVibe
+            </Text>
           </View>
         ) : playerName ? (
           <View style={styles.playerBlock}>
@@ -315,6 +324,18 @@ const styles = StyleSheet.create({
     fontWeight: FontWeight.bold,
     color: Colors.textPrimary,
     letterSpacing: 0.4,
+    textAlign: 'center',
+  },
+  // Brand-rad ("QuizVibe") under "Get Ready to" — matchar startskärmens
+  // appName-textformat exakt (fontSize 38, weight 700, letterSpacing -0.5,
+  // Nunito_700Bold via brandFont-prop:en på Text-elementet). Inlagd
+  // fontFamily-override krävs på själva Text-elementet eftersom StyleSheet
+  // inte kan villkorat applicera font-name baserat på fonts-loaded-state.
+  getReadyBrandHeadline: {
+    fontSize: 38,
+    fontWeight: '700',
+    color: Colors.textPrimary,
+    letterSpacing: -0.5,
     textAlign: 'center',
   },
   // Framed box runt avatar + namn — speglar GetReadyIntro:s currentPlayerBox

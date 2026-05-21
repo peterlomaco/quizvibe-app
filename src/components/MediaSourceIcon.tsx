@@ -5,7 +5,7 @@ import { Colors, FontWeight } from '../theme';
 
 /** Media-källa per fråga, för IndDev:s media-source-kö i GetReadyIntro.
  *  Samma symbolik som Lobby:s Game Connections-rad (generisk play-cirkel
- *  för YouTube-källan, Q+AI för Images) så de två skärmarna känns
+ *  för YouTube-källan, Q+"?" för Images) så de två skärmarna känns
  *  visuellt konsistenta. Vi använder INTE YouTube:s officiella varumärke
  *  — se LobbyScreen connectionIconYoutube-stilen för rationale. */
 export type MediaSourceType = 'youtube' | 'image' | 'none';
@@ -21,7 +21,9 @@ interface Props {
  * Game Connections-rad:
  *   • youtube  — primary-blå cirkel med vit CSS-triangel-play (generic media-
  *                icon, INTE YouTube:s varumärke)
- *   • image    — Q-figur (cirkel + svans) i primary-blå med "AI"-text överlagrad
+ *   • image    — Q-figur (cirkel + svans) i primary-blå med "?"-glyph överlagrad
+ *                (matchar Lobby:s "Images"-rad-ikon + QuizVibeQuestionMarkLogo-
+ *                symboliken; tidigare italicized "AI"-text, bytt 2026-05-23)
  *   • none/?   — grå cirkel med ❓
  */
 export function MediaSourceIcon({ source, size = 28 }: Props) {
@@ -76,7 +78,7 @@ export function MediaSourceIcon({ source, size = 28 }: Props) {
             strokeLinecap="round"
           />
         </Svg>
-        <Text style={[styles.aiText, { fontSize: size * 0.36 }]}>AI</Text>
+        <Text style={[styles.questionGlyph, { fontSize: size * 0.55 }]}>?</Text>
       </View>
     );
   }
@@ -106,11 +108,13 @@ const styles = StyleSheet.create({
   glyph: {
     textAlign: 'center',
   },
-  aiText: {
+  // "?"-glyph centrerad inom Q-ringen (cx=40, cy=38 i viewBox). Upprät
+  // (ingen italic) — italic på ett ensamt "?" dubbel-lutar glyfen och
+  // läses inte cleant. translateY -1 finjusterar vertikal centrering så
+  // glyfens visuella mitt landar exakt på Q-ring-mitt.
+  questionGlyph: {
     fontWeight: FontWeight.bold,
-    fontStyle: 'italic',
     color: Colors.primary,
-    letterSpacing: 0.5,
     transform: [{ translateY: -1 }],
   },
 });

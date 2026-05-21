@@ -1,8 +1,19 @@
 import React, { useMemo } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import Svg, { Path } from 'react-native-svg';
+import { Dimensions, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import Svg, { Circle, G, Path } from 'react-native-svg';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
 import { QuizVibeQAvatar } from './QuizVibeQAvatar';
+
+// Final Leaderboard bakgrunds-Q + pokal. Q-SVG:n är ~90% av skärmbredden så
+// figuren dominerar mid-screen-arean utan att överlappa Home/Play Again-
+// knapparna i botten. Pokal-emojin är ~40% av Q-storleken så den fyller
+// Q-ringen tydligt utan att svämma över kantlinjen.
+// viewBox "19 19 36 36" centrerar Q-ringen (cx=37, cy=37) EXAKT i SVG-
+// render-boxen så pokal-emojin (centrerad i wrap:ern) hamnar precis i
+// mitten av Q-ringen. Q-koordinater matchar QuizVibeLogo:s Q exakt
+// (cx=37, cy=37, r=13, svans M46→L52, strokeWidth 3).
+const BG_Q_SIZE = Math.round(Dimensions.get('window').width * 0.9);
+const BG_TROPHY_SIZE = Math.round(BG_Q_SIZE * 0.4);
 
 /**
  * Looped-arrow-BORDER som fyller hela Play Again-knappens yta och
@@ -227,7 +238,10 @@ function PlayAgainButton({
         ))}
       </View>
       {badge && (
-        <View style={styles.playAgainBadge} pointerEvents="none">
+        <View
+          style={[styles.playAgainBadge, { backgroundColor: color }]}
+          pointerEvents="none"
+        >
           <Text style={styles.playAgainBadgeText}>{badge}</Text>
         </View>
       )}
@@ -386,7 +400,16 @@ export function RoundLeaderboard({
       };
     });
     return entries.sort((a, b) => {
+      // 1. Pts desc — flest poäng vinner
       if (b.points !== a.points) return b.points - a.points;
+      // 2. Spelare med 0 spelade ronder får avgResponseSeconds=0 vilket
+      //    annars skulle leapfrogga ALLA spelare med faktisk data (0 < deras
+      //    avg). Garantera att tom-data alltid sorteras sist.
+      if (a.playedRounds === 0 && b.playedRounds > 0) return 1;
+      if (b.playedRounds === 0 && a.playedRounds > 0) return -1;
+      // 3. Avg response time asc — snabbare avg vinner vid pts-tie. Spelare
+      //    som timeoutat alla frågor har avg=max-tiden; en spelare som hann
+      //    svara (även fel) har lägre avg och ska därför ranka högre.
       return a.avgResponseSeconds - b.avgResponseSeconds;
     });
   }, [players, allRoundScoresHistory, totalsByPlayerId]);
@@ -553,6 +576,52 @@ export function RoundLeaderboard({
       </View>
       </ScrollView>
 
+      {/* Bakgrunds-Q med pokal-ikon som transparent vattenstämpel ÖVER
+          leaderboard-tabellen. Renderas EFTER ScrollView i JSX så den ligger
+          ovanpå tabellen i z-order (men UNDER sticky footer som renderas
+          efter denna). pointerEvents='none' så taps på underliggande tabell-
+          rader/Pressables inte blockas. Q+trophy är centrerade i wrap:erns
+          flex-layout och låg opacity (G opacity={0.22}, trophy opacity 0.22)
+          säkerställer att leaderboard-text + statistik förblir läsbara genom
+          vattenstämpeln. */}
+      {isLastRound && (
+        <View style={styles.bgFinalWrap} pointerEvents="none">
+          <Svg
+            width={BG_Q_SIZE}
+            height={BG_Q_SIZE}
+            viewBox="19 19 36 36"
+          >
+            {/* G-wrap med opacity istället för per-element opacity — där
+                Q-ringen och svansen tangerar varandra ackumuleras annars
+                stroke-opacity vid overlap och området får en tydligt
+                mörkare nyans. Med opacity på G-nivå komponeras gruppen
+                som en enhet efter att stroke-pixlarna ritats → enhetlig
+                ton över hela Q-formen. Färgsatt i Colors.warning (gold)
+                för att signalera "vinnar-skärm" passande för Final
+                Leaderboard. */}
+            <G opacity={0.22}>
+              <Circle
+                cx={37}
+                cy={37}
+                r={13}
+                fill="none"
+                stroke={Colors.warning}
+                strokeWidth={3}
+              />
+              <Path
+                d="M46 46 L52 52"
+                stroke={Colors.warning}
+                strokeWidth={3}
+                strokeLinecap="round"
+              />
+            </G>
+          </Svg>
+          <Text style={styles.bgFinalTrophy} numberOfLines={1}>
+            🏆
+          </Text>
+        </View>
+      )}
+
       {/* Sticky footer-rad — flex-baserad pinning vid skärmens nederkant så
           knapparna alltid syns även när tabellen scrollar. justifyContent:
           'flex-end' höger-ställer Home + Play Again i ändan av raden. */}
@@ -656,6 +725,32 @@ const styles = StyleSheet.create({
   // flex-layout (ingen absolute-positioning behövs).
   outer: {
     flex: 1,
+  },
+  // Bakgrunds-Q wrapper — absolute-positionerad i mitten av skärmen, BAKOM
+  // ScrollView:n. Q-SVG:n och pokal-emojin centreras inom wrappern.
+  // pointerEvents='none' sätts på View:n i JSX (runtime-prop) så taps når
+  // ScrollView:s rader och Play Again-knappen utan att blockas.
+  bgFinalWrap: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  // Pokal-emoji centrerad ovanpå Q-SVG:n. position: 'absolute' så storleken
+  // inte påverkar wrap:erns flex-layout — Q och pokal staplas konceptuellt.
+  // FontSize matchar ~halv Q-storlek så pokalen sitter inuti Q-ringen.
+  // opacity låg så bakgrunden inte konkurrerar med leaderboard-innehållet.
+  bgFinalTrophy: {
+    position: 'absolute',
+    fontSize: BG_TROPHY_SIZE,
+    opacity: 0.22,
+    // textAlignVertical Android-quirk + lineHeight = exakt fontSize på iOS
+    // håller emojin pixel-centrerad inom sin Text-box.
+    lineHeight: BG_TROPHY_SIZE,
+    textAlign: 'center',
   },
   scroll: {
     flex: 1,
@@ -946,13 +1041,17 @@ const styles = StyleSheet.create({
   },
   // Kant-skärande badge "Activated by Host" i top-position på loop-frame:n
   // (signal: knappen aktiveras först när host tryckt Play Again). Speglar
-  // FREE/PREMIUM-badge-mönstret: små letters + gold-bg + svart text, top:
-  // negativ så den klipper SVG-linjen ovanför button-text-arean.
+  // FREE/PREMIUM-badge-mönstret: små letters + bg matchande knappens
+  // border-färg (driven av PlayAgainButton:s `color`-prop via inline-style)
+  // + svart text, top: negativ så badgen klipper SVG-linjen ovanför
+  // button-text-arean. Den dämpade (pre-host-tap) varianten får grå badge
+  // så texten OCH badgen samtidigt signalerar "inaktiv" tills host trycker
+  // Play Again. Background-värdet sätts inline i komponenten — denna
+  // stylesheet-entry definierar bara layout/storlek.
   playAgainBadge: {
     position: 'absolute',
     top: -8,
     alignSelf: 'center',
-    backgroundColor: Colors.warning,
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 4,

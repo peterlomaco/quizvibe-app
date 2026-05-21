@@ -2682,7 +2682,7 @@ export default function LobbyScreen() {
     });
   };
 
-  const handleStartGame = async () => {
+  const handleStartGame = async (ptpConfirmed = false) => {
     // Turordningen för Pass-the-phone bygger på array-ordningen i `players[]`
     // (host alltid på index 0). Filtrera bort spelare som lämnat lobbyn —
     // de kan inte vara på tur. Skicka en minimal player-payload så quiz.tsx
@@ -2703,6 +2703,55 @@ export default function LobbyScreen() {
 
     if (turnOrder.length === 0) {
       Alert.alert('Cannot start', 'No approved players to start the game.');
+      return;
+    }
+
+    // Guard: i multiplayer-läge (PtP eller IndDev = singlePlayerDefault är
+    // false) MÅSTE det finnas minst en approved non-host. turnOrder är
+    // typiskt {host}-only när inga andra approvats — det är ett giltigt
+    // spel-tillstånd bara i single-player-läge. Ge användaren två tydliga
+    // val: approva fler spelare (avbryt) eller växla till single-player-
+    // läge (då blir host:s solo-start meningsfull).
+    const approvedNonHosts = turnOrder.filter(
+      (p) => p.id !== (players.find((pp) => pp.isHost)?.id ?? ''),
+    );
+    if (!singlePlayerDefault && approvedNonHosts.length === 0) {
+      Alert.alert(
+        'No approved players',
+        'You have not approved any other players. Either approve players or switch to single player mode.',
+        [
+          { text: 'Approve players', style: 'cancel' },
+          {
+            text: 'Switch to single player',
+            onPress: () => setSinglePlayerDefault(true),
+          },
+        ],
+      );
+      return;
+    }
+
+    // Guard: Pass-the-Phone-bekräftelse innan host startar spel där alla
+    // spelare delar denna enhet. Förhindrar att host:s game-credit dras för
+    // ett spel som var tänkt med Individual Devices men där PtP-toggle:n
+    // glömts bort. Hoppar guarden i single-player-läge (irrelevant att
+    // fråga "är alla här?" när det bara är host) och i IndDev (varje
+    // spelare på egen enhet). `ptpConfirmed`-flaggan på rekursivt
+    // handleStartGame(true)-anrop hoppar guarden så Yes-grenen inte
+    // re-triggar samma popup.
+    if (
+      gameMode === 'pass-the-phone' &&
+      !singlePlayerDefault &&
+      approvedNonHosts.length > 0 &&
+      !ptpConfirmed
+    ) {
+      Alert.alert(
+        'Pass-the-Phone mode',
+        'Are all players in the same room so you can share this device?',
+        [
+          { text: 'No', style: 'cancel' },
+          { text: 'Yes', onPress: () => handleStartGame(true) },
+        ],
+      );
       return;
     }
 
@@ -4090,7 +4139,7 @@ export default function LobbyScreen() {
                 pointerEvents="none"
               />
               <Pressable
-                onPress={handleStartGame}
+                onPress={() => handleStartGame()}
                 style={({ pressed }) => [
                   styles.startGameButton,
                   pressed && { opacity: 0.85 },

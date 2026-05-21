@@ -955,20 +955,28 @@ export function GetReadyIntro({
           )}
         </View>
 
-        {isIndDev ? (
-          // ── IndDev: dot-bar progress + media-source-kö ───────────────
+        {isIndDev || isSinglePlayer ? (
+          // ── IndDev / Single Player: dot-bar progress + media-source-kö ───
           // Q-kolumnen är borttagen — overall progress visas istället som
           // en dot-bar ovanför listan (totalQuestions dots, currentQuestion
           // filled). Kö-tabellen är single-column (Media source) och
-          // visar bara icon + label per fråga.
+          // visar bara icon + label per fråga. Single Player delar layout
+          // med IndDev eftersom rond-konceptet är meningslöst med en spelare
+          // (questions = rounds) — bara header-labeln skiljer sig: IndDev
+          // visar "Next:", Single Player visar "Player name: {playerName}".
           <View style={styles.tableBlock}>
-            {/* IndDev: bara Question-bar (ingen Round-uppdelning — varje
-                fråga = egen runda). */}
+            {/* Bara Question-bar (ingen Round-uppdelning — varje fråga är
+                egen runda i IndDev, och i Single Player finns bara en
+                spelare så Rounds = Questions). */}
             {renderDotBar(totalQuestions, currentQuestion, 'Question')}
 
             <View style={[styles.tableRow, styles.tableHeaderRow]}>
               <View style={[styles.colPlayer, styles.cellHeader]}>
-                <Text style={styles.headerCellText}>Next:</Text>
+                <Text style={styles.headerCellText}>
+                  {isSinglePlayer
+                    ? `Player name: ${playerName}`
+                    : 'Next:'}
+                </Text>
               </View>
             </View>
 
