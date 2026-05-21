@@ -82,19 +82,24 @@ export function PlayerHistorySection() {
   );
 }
 
-// Per-spel-rad: två-rad-layout. Topp = datum + totalpoäng (highlighted).
-// Botten = snittpoäng/fråga + snitt-svarstid (textSecondary).
+// Per-spel-rad: två-rad-layout.
+// Topp = datum + korrekthet ("3/4 (75%)", highlighted i primary blå).
+// Botten = snitt-svarstid (textSecondary). Korrekthetsgrad visar hur
+// många rätta svar av totalen — mer meningsfullt än råpoäng för spelaren.
 function GameHistoryRow({ entry }: { entry: HistoryEntry }) {
+  const pct =
+    entry.totalQuestions > 0
+      ? Math.round((entry.correctAnswers / entry.totalQuestions) * 100)
+      : 0;
   return (
     <View style={styles.gameRow}>
       <View style={styles.gameTopRow}>
         <Text style={styles.gameDate}>{formatDate(entry.date)}</Text>
-        <Text style={styles.gameScore}>{entry.totalPoints.toLocaleString()}</Text>
+        <Text style={styles.gameScore}>
+          {entry.correctAnswers}/{entry.totalQuestions} ({pct}%)
+        </Text>
       </View>
       <View style={styles.gameMetaRow}>
-        <Text style={styles.gameMeta}>
-          Avg / question: {Math.round(entry.avgPointsPerQuestion).toLocaleString()}
-        </Text>
         <Text style={styles.gameMeta}>
           Avg response: {entry.avgResponseSeconds.toFixed(2)}s
         </Text>

@@ -1854,16 +1854,18 @@ export default function QuizScreen() {
     }
 
     // Append:a minimal HistoryEntry till Player history-listan. Räkna
-    // snitt-svarstid från rounds[]:s timeUsed (i sekunder, 2 decimaler).
-    // Tom rounds-array (shouldn't happen men defensiv) → skippa append:n
-    // så vi inte spammar 0/NaN-entries.
+    // korrekthetsgrad (correctAnswers/totalQuestions) + snitt-svarstid
+    // från rounds[]:s timeUsed (sekunder, 2 decimaler). Tom rounds-array
+    // (shouldn't happen men defensiv) → skippa append:n så vi inte spammar
+    // 0/NaN-entries.
     if (rounds.length > 0) {
       const totalTime = rounds.reduce((sum, r) => sum + (r.timeUsed ?? 0), 0);
+      const correctAnswers = rounds.filter((r) => r.correct).length;
       const entry: HistoryEntry = {
         id: result.id,
         date: result.date,
-        totalPoints,
-        avgPointsPerQuestion: totalPoints / rounds.length,
+        correctAnswers,
+        totalQuestions: rounds.length,
         avgResponseSeconds: totalTime / rounds.length,
       };
       try {

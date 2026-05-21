@@ -1852,7 +1852,7 @@ export default function HomeScreen() {
 
         {/* ── Brand ──────────────────────────────────────────── */}
         <View style={styles.brandSection}>
-          <QuizVibeLogo size={104} />
+          <QuizVibeLogo size={140} />
           <Text style={[styles.appName, { fontFamily: appNameFont }]}>
             QuizVibe
           </Text>

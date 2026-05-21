@@ -34,6 +34,9 @@ const HISTORY_KEY_PREFIX = '@quizvibe/gameHistory/v1/';
 const HISTORY_LEGACY_GLOBAL_KEY = '@quizvibe/gameHistory/v1';
 const HISTORY_RESET_KEY = '@quizvibe/migration/historyReset/v1';
 const HISTORY_PER_USER_RESET_KEY = '@quizvibe/migration/historyPerUserReset/v1';
+// V2-reset: wipe:ar gamla totalPoints/avgPointsPerQuestion-entries vid
+// första load efter shape-bytet 2026-05-22 (correctAnswers/totalQuestions).
+const HISTORY_V2_RESET_KEY = '@quizvibe/migration/historyV2Reset/v1';
 
 export type AssistanceLevel = 'minimal' | 'standard' | 'full';
 
@@ -106,15 +109,20 @@ export async function clearLatestResult(): Promise<void> {
 
 /**
  * En minimal post per avslutat spel. Bara de fält som visas i Player
- * history-sektionen idag — datum, totalpoäng, snittpoäng/fråga, snitt-svarstid.
- * Avsiktligt liten så framtida tillägg blir explicita (lägg till ett fält
- * när Player history visar det, inte tvärtom).
+ * history-sektionen idag — datum, korrekthet (rätt/total + procent),
+ * snitt-svarstid. Avsiktligt liten så framtida tillägg blir explicita
+ * (lägg till ett fält när Player history visar det, inte tvärtom).
+ *
+ * 2026-05-22: bytte från totalPoints/avgPointsPerQuestion till
+ * correctAnswers/totalQuestions — korrekthetsgrad ("3/4 (75%)") är mer
+ * meningsfullt för spelaren än råpoäng. `HISTORY_V2_RESET_KEY` wipe:ar
+ * gamla v1-shape-entries vid första load post-fix.
  */
 export interface HistoryEntry {
   id: string;
   date: string;             // ISO-datum-sträng (UTC)
-  totalPoints: number;
-  avgPointsPerQuestion: number;   // totalPoints / antal frågor
+  correctAnswers: number;   // antal rätta svar
+  totalQuestions: number;   // totala frågor i spelet (rounds.length)
   avgResponseSeconds: number;     // mean av timeUsed över alla rundor
 }
 
@@ -142,8 +150,12 @@ async function resolveHistoryKey(): Promise<string | null> {
  */
 async function ensureHistoryReset(): Promise<void> {
   try {
-    const flag = await AsyncStorage.getItem(HISTORY_PER_USER_RESET_KEY);
-    if (flag === '1') return;
+    // Båda reset-flaggor måste vara satta — annars wipe:a och sätt båda.
+    // V2-reset (HISTORY_V2_RESET_KEY) gäller shape-bytet och måste fyra
+    // även för users som redan passerade per-user-namespacing-reset:n.
+    const perUserFlag = await AsyncStorage.getItem(HISTORY_PER_USER_RESET_KEY);
+    const v2Flag = await AsyncStorage.getItem(HISTORY_V2_RESET_KEY);
+    if (perUserFlag === '1' && v2Flag === '1') return;
     const allKeys = await AsyncStorage.getAllKeys();
     const historyKeys = allKeys.filter(
       (k) =>
@@ -154,6 +166,7 @@ async function ensureHistoryReset(): Promise<void> {
       await AsyncStorage.multiRemove(historyKeys);
     }
     await AsyncStorage.setItem(HISTORY_PER_USER_RESET_KEY, '1');
+    await AsyncStorage.setItem(HISTORY_V2_RESET_KEY, '1');
     // Sätt även den äldre reset-flaggan så ensureHistoryReset i den
     // tidigare pre-namespacing-versionen aldrig fyrar igen om koden
     // skulle rullas tillbaka.
