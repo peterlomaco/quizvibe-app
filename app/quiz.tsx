@@ -3073,7 +3073,6 @@ export default function QuizScreen() {
                   profile={{ birthYear: 1990, assistance: currentAssistance }}
                   assistance={currentAssistance}
                   totalSeconds={responseSeconds}
-                  isRevealed={phase === 'awaiting' || phase === 'reveal'}
                   logoSize={220}
                 />
               </View>
