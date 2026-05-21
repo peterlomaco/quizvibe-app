@@ -112,10 +112,17 @@ function FullNamesView({
             name.itemId === correctName.itemId &&
             !isPlayerRow;
 
+          // Wrong-reveal-row: spelaren har inte svarat (time-out) OCH den
+          // här raden är inte rätt namn → markera röd kantlinje + ✗-badge
+          // så hela "wrong-landscape" är synlig.
+          const isWrongRevealRow =
+            isRevealing && !confirmedName && !isCorrectRevealRow;
+
           // Border-styling:
           //   • pending (question, player)        → blå border
           //   • confirmed (awaiting/reveal, player) → gold border
           //   • correctReveal (separate correct)  → grön border
+          //   • wrongReveal (time-out, alla felaktiga) → röd border
           //   • default                            → grå (cardElevated-style)
           let cardStyle: ViewStyle;
           let textStyle: TextStyle;
@@ -128,6 +135,9 @@ function FullNamesView({
           } else if (isCorrectRevealRow) {
             cardStyle = styles.nameCardCorrect;
             textStyle = styles.fullNameTextActive;
+          } else if (isWrongRevealRow) {
+            cardStyle = styles.nameCardWrong;
+            textStyle = styles.fullNameTextActive;
           } else {
             cardStyle = styles.fullNameCardDefault;
             textStyle = styles.fullNameTextDefault;
@@ -137,19 +147,24 @@ function FullNamesView({
           //   • Spelaren rätt:  green Correct-badge på spelarens rad
           //   • Spelaren fel:   red Wrong-badge på spelarens rad +
           //                     green Correct-badge på rätta raden
-          //   • Time-out:       green Correct-badge på rätta raden
-          let badgeType: 'correct' | 'wrong' | null = null;
+          //   • Time-out:       green Correct-badge på rätta raden +
+          //                     röd ✗-badge på ALLA andra (wrong-reveal)
+          let badgeType: 'correct' | 'wrong' | 'wrongReveal' | null = null;
           if (isRevealing) {
             if (isPlayerRow && confirmedName) {
               badgeType = wasPlayerCorrect ? 'correct' : 'wrong';
             } else if (isCorrectRevealRow) {
               badgeType = 'correct';
+            } else if (isWrongRevealRow) {
+              badgeType = 'wrongReveal';
             }
           }
 
-          // Dimma rader som varken är spelarens val eller rätta svaret.
+          // Dimma rader som varken är spelarens val, rätta svaret ELLER
+          // wrong-reveal — wrong-reveal-text behålls läsbar (röd border
+          // + ✗-badge bär statusen, ingen extra dim:ning behövs).
           const isDimmed =
-            isRevealing && !isPlayerRow && !isCorrectRevealRow;
+            isRevealing && !isPlayerRow && !isCorrectRevealRow && !isWrongRevealRow;
 
           return (
             <Pressable
@@ -180,6 +195,11 @@ function FullNamesView({
               {badgeType === 'wrong' && (
                 <Text style={[styles.revealBadge, styles.revealBadgeWrong]}>
                   Wrong
+                </Text>
+              )}
+              {badgeType === 'wrongReveal' && (
+                <Text style={[styles.revealBadge, styles.revealBadgeWrong]}>
+                  ✗
                 </Text>
               )}
             </Pressable>
@@ -327,6 +347,16 @@ function PrefixView({
             nameOpt = pickNameForPrefix(opt.prefix);
           }
 
+          // Wrong-reveal-row: spelaren har inte svarat (time-out) OCH den
+          // här raden är inte rätt prefix → markera röd kantlinje + ✗-badge
+          // så hela "wrong-landscape" är synlig: alla 9 felaktiga rader får
+          // rött, den korrekta får grönt. Triggar enbart vid time-out
+          // (confirmedName=null + reveal-fas); om spelaren faktiskt
+          // svarade fel behåller deras egen rad gold/Wrong-treatment
+          // medan övriga rader dimmas (oförändrat beteende).
+          const isWrongRevealRow =
+            isRevealing && !confirmedName && !isCorrectRevealRow;
+
           // Border-styling-state per kort:
           //   • pending (question, player) → blå border
           //   • confirmed (awaiting/reveal, player) → gold border
@@ -345,27 +375,31 @@ function PrefixView({
           //   • Spelaren rätt:  green "Correct"-badge på spelarens rad
           //   • Spelaren fel:   red "Wrong"-badge på spelarens rad +
           //                     green "Correct"-badge på rätta raden
-          //   • Time-out:       green "Correct"-badge på rätta raden
-          let badgeType: 'correct' | 'wrong' | null = null;
+          //   • Time-out:       green "Correct"-badge på rätta raden +
+          //                     röd "✗"-badge på ALLA andra (wrong-reveal)
+          let badgeType: 'correct' | 'wrong' | 'wrongReveal' | null = null;
           if (isRevealing) {
             if (isPlayerRow && confirmedName) {
               badgeType = wasPlayerCorrect ? 'correct' : 'wrong';
             } else if (isCorrectRevealRow) {
               badgeType = 'correct';
+            } else if (isWrongRevealRow) {
+              badgeType = 'wrongReveal';
             }
           }
 
           // Prefix-knapp-styling — selected-state följer playerExpandedPrefix
           // oavsett fas så spelarens val syns visuellt även när raden är låst.
           // Correct-reveal-raden får grön styling för visuell konsistens med
-          // det gröna namn-kortet bredvid. Under reveal dimmas text på alla
-          // rader som varken är spelarens val eller rätta svaret så fokus
-          // ligger på de relevanta valen.
+          // det gröna namn-kortet bredvid. Wrong-reveal-rader (time-out)
+          // får röd border. Under reveal dimmas text på alla rader som
+          // varken är spelarens val, rätta svaret ELLER wrong-reveal —
+          // wrong-reveal-text behålls läsbar (red border bär statusen).
           const isPrefixSelected = isPlayerRow;
           const isPrefixCorrectReveal = isCorrectRevealRow;
           const isPrefixLocked = isLocked || isTimedOut;
           const isPrefixDimmed =
-            isRevealing && !isPlayerRow && !isCorrectRevealRow;
+            isRevealing && !isPlayerRow && !isCorrectRevealRow && !isWrongRevealRow;
 
           return (
             <View key={opt.prefix} style={styles.prefixRow}>
@@ -377,6 +411,7 @@ function PrefixView({
                   isPrefixSelected && !isLocked && styles.prefixButtonActive,
                   isPrefixSelected && isLocked && styles.prefixButtonLocked,
                   isPrefixCorrectReveal && styles.prefixButtonCorrectReveal,
+                  isWrongRevealRow && styles.prefixButtonWrongReveal,
                   pressed && styles.prefixButtonPressed,
                 ]}
               >
@@ -386,11 +421,18 @@ function PrefixView({
                     isPrefixSelected && !isLocked && styles.prefixTextActive,
                     isPrefixSelected && isLocked && styles.prefixTextLocked,
                     isPrefixCorrectReveal && styles.prefixTextCorrectReveal,
+                    isWrongRevealRow && styles.prefixTextWrongReveal,
                     isPrefixDimmed && styles.prefixTextDimmed,
                   ]}
                 >
                   {opt.prefix}
                 </Text>
+                {/* ✗-badge på prefix-knappen själv (inget nameCard renderas
+                    för wrong-reveal-rader i prefix-mode). Border-cutting via
+                    top:-8/right:-6 så badgen sitter på knappens hörn. */}
+                {badgeType === 'wrongReveal' && (
+                  <Text style={styles.prefixBadgeWrong}>✗</Text>
+                )}
               </Pressable>
               {nameOpt && (
                 <View style={[styles.nameCard, nameCardStyle]}>
@@ -473,6 +515,16 @@ const styles = StyleSheet.create({
     borderColor: Colors.success,
     borderWidth: 2,
   },
+  // Wrong-reveal (time-out, alla felaktiga prefix-rutor) — röd border + ✗.
+  // Visuellt parallell till correctReveal:s grön så hela landscape:n läses
+  // som "9 röda fel + 1 grön rätt" vid time-out. Position: relative så ✗-
+  // badgens absolute-position anchorar till knappen.
+  prefixButtonWrongReveal: {
+    backgroundColor: Colors.primaryMuted,
+    borderColor: QUIZ_ERROR_RED,
+    borderWidth: 2,
+    position: 'relative',
+  },
   prefixButtonPressed: {
     opacity: 0.85,
   },
@@ -493,6 +545,9 @@ const styles = StyleSheet.create({
     color: Colors.primary,
   },
   prefixTextCorrectReveal: {
+    color: Colors.primary,
+  },
+  prefixTextWrongReveal: {
     color: Colors.primary,
   },
   // Reveal — dimma text på irrelevanta prefix-knappar (alla utom spelarens
@@ -527,6 +582,13 @@ const styles = StyleSheet.create({
   nameCardCorrect: {
     backgroundColor: Colors.primaryMuted,
     borderColor: Colors.success,
+  },
+  // Wrong-reveal (time-out, fullnames-mode) — röd border + primaryMuted bg.
+  // Speglar nameCardCorrect men i QUIZ_ERROR_RED. Visar tydligt vilka
+  // alternativ som var felaktiga när spelaren inte hann svara.
+  nameCardWrong: {
+    backgroundColor: Colors.primaryMuted,
+    borderColor: QUIZ_ERROR_RED,
   },
   // Text-färgen är konstant blå över alla tillstånd — bara kantlinjen
   // signalerar state (per redesign-direktivet "bara kantlinje" 2026-05-21).
@@ -564,6 +626,28 @@ const styles = StyleSheet.create({
   },
   revealBadgeWrong: {
     backgroundColor: QUIZ_ERROR_RED,
+  },
+  // Kompakt ✗-badge på prefix-knappen själv (prefix-mode wrong-reveal).
+  // Eftersom prefix-knappen är smal (96 px) använder vi en cirkulär badge
+  // istället för en "Wrong"-text-pill: minWidth 20, samma minHeight, ✗ i
+  // mitten. Position absolute med top:-8/right:-6 så den skär knapphörnet.
+  // Parent prefixButtonWrongReveal har position:'relative' så anchor:n
+  // hamnar rätt.
+  prefixBadgeWrong: {
+    position: 'absolute',
+    top: -8,
+    right: -6,
+    minWidth: 20,
+    minHeight: 20,
+    paddingHorizontal: 4,
+    borderRadius: 10,
+    backgroundColor: QUIZ_ERROR_RED,
+    color: '#fff',
+    fontSize: 13,
+    fontWeight: FontWeight.bold,
+    textAlign: 'center',
+    lineHeight: 20,
+    overflow: 'hidden',
   },
   // ---------------------------------------------------------------------------
   // Full-names-läge: vertikal lista där varje rad är ett fullnamn-kort.
