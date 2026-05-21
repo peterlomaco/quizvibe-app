@@ -3040,13 +3040,12 @@ export default function QuizScreen() {
           </View>
         </View>
       )}
-      <ScrollView
-        contentContainerStyle={styles.content}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-        onScroll={handleScrollHintScroll}
-        scrollEventThrottle={32}
-      >
+      {/* Fixed-top zone — media + timer + question card är ALLTID synliga.
+          Tidigare låg alla element i en enda ScrollView vilket lät spelaren
+          scrolla bort media+timer när de letade bland prefix-knappar.
+          Layout nu: [fixed-top: media+timer+question] + [ScrollView: bara
+          answer-block + reveal-feedback] + [sticky-bottom: Confirm-bar]. */}
+      <View style={styles.fixedTopZone}>
         {/* phase är här narrowed till 'question' | 'awaiting' | 'reveal'
             (leaderboard fångas av early-return ovan), så ingen extra
             phase-check behövs runt question UI. */}
@@ -3334,7 +3333,18 @@ export default function QuizScreen() {
                 })()}
               </View>
             </View>
-
+      </View>
+      {/* Scroll-zone — wrappar BARA svar-blocket (TimelineSelector eller
+          ImageAnswerBlock) + reveal-feedback. ScrollView:s flex: 1 låter den
+          ta resterande höjd mellan fixed-top och sticky-Confirm-bar. */}
+      <ScrollView
+        style={styles.scrollZone}
+        contentContainerStyle={styles.scrollZoneContent}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        onScroll={handleScrollHintScroll}
+        scrollEventThrottle={32}
+      >
             {/* Svarsmetod beror på fråge-typ:
                 • timeline → TimelineSelector (år-svar)
                 • image    → ImageAnswerBlock (Letter Grid → Final Selection)
@@ -3656,6 +3666,22 @@ const styles = StyleSheet.create({
     lineHeight: 88,
   },
   content: { gap: Spacing.md, paddingBottom: Spacing.xxl },
+  // Fixed-top-zonen — media + timer + question card hålls alltid i toppen
+  // (utanför ScrollView). gap: md ger samma luftiga avstånd mellan elementen
+  // som tidigare ScrollView.contentContainerStyle.content.
+  fixedTopZone: {
+    gap: Spacing.md,
+  },
+  // Scroll-zonen — wrappar bara svar-block + ev. reveal-feedback. flex: 1 så
+  // den expanderar till resterande höjd mellan fixed-top och sticky-Confirm.
+  scrollZone: {
+    flex: 1,
+  },
+  scrollZoneContent: {
+    gap: Spacing.md,
+    paddingTop: Spacing.md,
+    paddingBottom: Spacing.md,
+  },
 
   // Lock-overlay för non-host som tappat Approve Play Again men väntar
   // på host:s lobby-ready-event. Mörk backdrop + centrerat card med

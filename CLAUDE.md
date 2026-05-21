@@ -992,6 +992,13 @@ const stopwatchColor = phase === 'question' ? timerColor : '#8CC1FF';
 
 ### Layout (sekvens uppifrån)
 
+**Tre-zons-arkitektur** (`SafeAreaView` → fixed-top + scroll + sticky-bottom):
+- **Fixed-top zone** (`styles.fixedTopZone`, syskon till ScrollView): media + timer + stopwatch + question-card. Alltid synliga genom hela frågan; scrollar inte.
+- **Scroll zone** (`ScrollView` med `flex: 1`): bara svar-block (TimelineSelector / ImageAnswerBlock) + ev. reveal-feedback-card. Det enda som scrollar när prefix-/fullnamn-listan är lång.
+- **Sticky-bottom zone** (`styles.stickyConfirmBar`, syskon efter ScrollView): Confirm/Awaiting-knappen. Alltid synlig i question/awaiting; gömd i reveal (Next-tab tar över via absolute-position).
+
+Detta ersatte tidigare enda-ScrollView-strukturen där spelaren kunde scrolla bort media+timer när de letade bland prefix-knappar. Nu fokuserar scroll-gestures enbart på svarsalternativen.
+
 1. **Mediakort** — för `question.type === 'timeline'` (musik/film/sport/etc) renderas `MediaPlayer` (YouTube/none) — höjd `PLAYER_HEIGHT = 220`, video synlig hela tiden, QuizVibe-logo-overlay efter `state === 'ended'`. Detaljer i "YouTube playback & curation"-sektionen ovan. För `question.type === 'image'` renderas `imageMediaCard` (16:9 wrap, `aspectRatio: 16/9`, `overflow: 'hidden'`) med `<Image source={getQuizImage(question.id)!} resizeMode="cover">` + `<ProgressiveCover>` overlay (se "Image questions (MVP)" nedan).
 2. **Timer-section** (row): timer-bar (flex 1) + **pulserande ring runt sekund-räknaren**. Ringen är 56×56 cirkel med dynamisk `borderColor: timerColor`, halo-View bakom (samma färg, `opacity` pulserar 0.3 → 0.7 över 700 ms native), och scale-pulse 1 → 1.08. Sekund-siffran (24 px bold tabular-nums) sitter inuti ringen.
    - **Avatar-markör på timer-bar:en** vid bekräftad svarstid: 28×28 gold-bordered avatar (URI-bild eller emoji-fallback) absolut-positionerad inom timerTrack med `left: ${((responseSeconds − confirmedTimeUsed) / responseSeconds) * 100}%` — sitter exakt på fillens högra kant vid Confirm-momentet. När timer:n fortsätter krymper fillen FÖRBI avataren så användaren ser "tiden har passerat ditt svarsmoment".

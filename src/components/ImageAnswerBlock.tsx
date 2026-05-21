@@ -102,10 +102,6 @@ function FullNamesView({
 
   return (
     <View style={styles.card}>
-      <Text style={styles.stepHeading}>Choose the matching name</Text>
-      <Text style={styles.stepSubtitle}>
-        Tap the name that matches the picture
-      </Text>
       <View style={styles.gridWrap}>
         {variant.nameList.map((name) => {
           const isPlayerRow =
@@ -313,10 +309,6 @@ function PrefixView({
 
   return (
     <View style={styles.card}>
-      <Text style={styles.stepHeading}>Choose the matching prefix</Text>
-      <Text style={styles.stepSubtitle}>
-        Tap a prefix — the full name appears next to it
-      </Text>
       <View style={styles.gridWrap}>
         {sortedGrid.map((opt) => {
           const isPlayerRow = opt.prefix === playerExpandedPrefix;
@@ -432,22 +424,14 @@ const styles = StyleSheet.create({
     padding: Spacing.md,
     borderWidth: 1,
     borderColor: Colors.border,
-    gap: Spacing.sm,
     marginHorizontal: Spacing.lg,
   },
-  stepHeading: {
-    color: Colors.textPrimary,
-    fontSize: FontSize.md,
-    fontWeight: FontWeight.bold,
-  },
-  stepSubtitle: {
-    color: Colors.textSecondary,
-    fontSize: FontSize.sm,
-  },
+  // stepHeading/stepSubtitle borttagna 2026-05-22 — heading + subtitle
+  // var redundanta (frågetexten ovanför + tap-tap-affordance i sig
+  // räcker som instruktion). Frigjorde ~50 px vertikal yta för svarsrader.
   gridWrap: {
     flexDirection: 'column',
     gap: Spacing.sm,
-    marginTop: Spacing.sm,
   },
   // Varje rad: prefix-knapp vänster (smal) + ev. namn-kort höger (fyller resten).
   // alignItems: 'stretch' håller prefix-knappen och namn-kortet på samma höjd.
