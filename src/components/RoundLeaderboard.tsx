@@ -1,3 +1,4 @@
+import { Nunito_700Bold, useFonts } from '@expo-google-fonts/nunito';
 import React, { useMemo } from 'react';
 import { Dimensions, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, G, Path } from 'react-native-svg';
@@ -364,6 +365,11 @@ export function RoundLeaderboard({
   allRoundScoresHistory: RoundScore[][];
   hcpChanges?: Record<string, HcpChange>;
 }) {
+  // Nunito 700 Bold för Final Leaderboard:s "QuizVibe"-vattenstämpel-text
+  // under Q+pokal-loggan. Matchar startskärmens appName-textformat 1:1.
+  // Faller tillbaka till systemfont under font-load.
+  const [fontsLoaded] = useFonts({ Nunito_700Bold });
+  const brandFont = fontsLoaded ? 'Nunito_700Bold' : undefined;
   // Aggregera per-spelare-statistik (samma struktur som GetReadyIntro:s
   // live-leaderboard så det är lätt att jämföra). Sortering: poäng desc →
   // avg response asc (ties brutna av snabbaste genomsnitt).
@@ -619,6 +625,17 @@ export function RoundLeaderboard({
           <Text style={styles.bgFinalTrophy} numberOfLines={1}>
             🏆
           </Text>
+          {/* "QuizVibe"-brand-text under Q+pokal-loggan. Naturligt flöde
+              under SVG:n (trophy är absolute så påverkar inte). Matchar
+              startskärmens appName-typografi (fontSize 38, weight 700,
+              letterSpacing -0.5, Nunito_700Bold) men i gold och med samma
+              transparens som Q+pokal (opacity 0.22). */}
+          <Text
+            style={[styles.bgFinalBrand, brandFont && { fontFamily: brandFont }]}
+            numberOfLines={1}
+          >
+            QuizVibe
+          </Text>
         </View>
       )}
 
@@ -751,6 +768,27 @@ const styles = StyleSheet.create({
     // håller emojin pixel-centrerad inom sin Text-box.
     lineHeight: BG_TROPHY_SIZE,
     textAlign: 'center',
+  },
+  // "QuizVibe"-brand-text under Q+pokal — naturligt flow under SVG:n (inte
+  // absolute) så wrap:erns column-flex stackar dem vertikalt centrerat.
+  // fontFamily appliceras inline i JSX via brandFont-ref (kräver useFonts-
+  // load). Textformat matchar app/index.tsx:s `appName`-stil i övrigt
+  // (weight, letterSpacing, fontFamily) men fontSize bumpad till 52 för
+  // att brand-texten ska få visuell pondus som vattenstämpel under den
+  // stora Q-loggan. Gold (Colors.warning) + opacity 0.22 håller texten
+  // som vattenstämpel utan att konkurrera med leaderboard-innehållet.
+  bgFinalBrand: {
+    fontSize: 52,
+    fontWeight: '700',
+    color: Colors.warning,
+    letterSpacing: -0.5,
+    textAlign: 'center',
+    opacity: 0.22,
+    // Negativ marginTop drar texten närmare Q:et. Q-SVG:n har ~3 viewBox-
+    // units (= ~30 px på vanlig telefon-bredd) tom plats under Q-svansen
+    // innan SVG:s underkant. -Spacing.xxl klämmer ihop det gapet så texten
+    // sitter precis intill svansens visuella slut.
+    marginTop: -Spacing.xxl,
   },
   scroll: {
     flex: 1,
