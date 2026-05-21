@@ -3319,10 +3319,16 @@ export default function QuizScreen() {
                   );
                   if (match) {
                     const [, before, keyword, after] = match;
+                    // Tvinga versal begynnelsebokstav på keyword oavsett hur det
+                    // står i FIXED_QUESTION_TEXT (city/country är lowercase i
+                    // matrisen men ska visuellt vara "City"/"Country" som
+                    // semantisk titel).
+                    const capitalized =
+                      keyword.charAt(0).toUpperCase() + keyword.slice(1).toLowerCase();
                     return (
                       <Text style={styles.questionText}>
                         {before}
-                        <Text style={styles.questionTextHeadline}>{keyword}</Text>
+                        <Text style={styles.questionTextHeadline}>{capitalized}</Text>
                         {after}
                       </Text>
                     );
