@@ -54,9 +54,12 @@ interface Props {
 // fortfarande ser kramad ut på enheter med annan DPR.
 const PLAYER_HEIGHT = 220;
 // Hur länge vi väntar på att autoplay ska starta innan vi visar tap-prompt.
-// För kort = prompt blinkar onödigt på iOS-versioner som tillåter autoplay.
-// För långt = användare som behöver tappa väntar för länge.
-const AUTOPLAY_TIMEOUT_MS = 1500;
+// För kort = prompt blinkar onödigt på iOS-versioner som tillåter autoplay
+// (YouTube-state-events kommer typiskt unstarted → buffering → playing och
+// buffering→playing-fönstret kan vara 1-2s). För långt = användare som
+// behöver tappa väntar för länge. 2500ms är empirisk balans efter att
+// timeout=1500ms gjorde prompt synlig under buffering-fönstret.
+const AUTOPLAY_TIMEOUT_MS = 2500;
 
 export function YouTubeMediaPlayer({
   clip,
@@ -127,7 +130,13 @@ export function YouTubeMediaPlayer({
 
   const handleStateChange = useCallback(
     (state: string) => {
-      if (state === 'playing') {
+      // BÅDA 'playing' OCH 'buffering' = player-engine:n är aktiv och
+      // försöker spela. Bufferingen kan vara 1-2s före faktisk playback,
+      // och om vi bara gated på 'playing' hann timeout (2500ms) fyra under
+      // bufferingen → tap-prompt blinkade upp och försvann när 'playing'
+      // till slut firade. Att kvitta fallback:en redan vid buffering ger
+      // ren autoplay-UX utan visuella artefakter.
+      if (state === 'playing' || state === 'buffering') {
         setHasStartedPlayback(true);
         setShowTapPrompt(false);
       }
