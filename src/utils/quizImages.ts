@@ -8,9 +8,7 @@
 import type { ImageSourcePropType } from 'react-native';
 
 export const QUIZ_IMAGES: Record<string, ImageSourcePropType> = {
-  'astrid-lindgren': require('../../assets/quiz-images/astrid-lindgren.webp'),
   'avicii': require('../../assets/quiz-images/avicii.webp'),
-  'barack-obama': require('../../assets/quiz-images/barack-obama.webp'),
   'berlin': require('../../assets/quiz-images/berlin.webp'),
   'bjorn-borg': require('../../assets/quiz-images/bjorn-borg.webp'),
   'cristiano-ronaldo': require('../../assets/quiz-images/cristiano-ronaldo.webp'),
@@ -19,11 +17,9 @@ export const QUIZ_IMAGES: Record<string, ImageSourcePropType> = {
   'london': require('../../assets/quiz-images/london.webp'),
   'madonna': require('../../assets/quiz-images/madonna.webp'),
   'michael-jackson': require('../../assets/quiz-images/michael-jackson.webp'),
-  'mrbeast': require('../../assets/quiz-images/mrbeast.webp'),
   'paris': require('../../assets/quiz-images/paris.webp'),
   'stockholm': require('../../assets/quiz-images/stockholm.webp'),
   'taylor-swift': require('../../assets/quiz-images/taylor-swift.webp'),
-  'winston-churchill': require('../../assets/quiz-images/winston-churchill.webp'),
   'zlatan-ibrahimovic': require('../../assets/quiz-images/zlatan-ibrahimovic.webp'),
 };
 

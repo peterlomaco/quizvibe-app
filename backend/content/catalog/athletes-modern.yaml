@@ -1,0 +1,25 @@
+# Idrottare kända över Millennials, Gen Z och Gen Alpha (samtida fotbollsstjärnor).
+# correctYear = födelseår.
+audience: ["millennials", "gen-z", "gen-alpha"]
+category: athletes
+contentForm: image
+contentSubject: athlete
+items:
+  - id: zlatan-ibrahimovic
+    displayName: "Zlatan Ibrahimović"
+    correctYear: 1981
+    probability: 98
+    wikimediaSearchHints: ["Zlatan Ibrahimović"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: cristiano-ronaldo
+    displayName: "Cristiano Ronaldo"
+    correctYear: 1985
+    probability: 97
+    wikimediaSearchHints: ["Cristiano Ronaldo"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: lionel-messi
+    displayName: "Lionel Messi"
+    correctYear: 1987
+    probability: 97
+    wikimediaSearchHints: ["Lionel Messi"]
+    answerMethods: ["timeline", "name-letters"]

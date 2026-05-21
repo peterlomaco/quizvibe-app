@@ -163,7 +163,7 @@ export function buildLetterGrid(args: BuildLetterGridArgs): PrefixOption[] {
 
   function pickFromDistractorPool(): void {
     const pool = loadDistractorPool();
-    const names = pool.names[category];
+    const names = pool.names[category] ?? [];
     for (const name of shuffle(names, rng)) {
       const prefix = getPrefixForItem(name, prefixLength);
       if (!prefix) continue;
@@ -244,7 +244,7 @@ export function buildFullNamesList(args: BuildFullNamesListArgs): NameOption[] {
 
   function collectFromDistractorPool(): void {
     const pool = loadDistractorPool();
-    const names = pool.names[category];
+    const names = pool.names[category] ?? [];
     for (const name of shuffle(names, rng)) {
       if (distractors.length >= targetDistractorCount) return;
       const lower = name.toLowerCase();
@@ -346,7 +346,7 @@ export function buildNameOptions(args: BuildNameOptionsArgs): NameOption[] {
 
   function collectFromDistractorPool(): void {
     const pool = loadDistractorPool();
-    const names = pool.names[category];
+    const names = pool.names[category] ?? [];
     for (const name of shuffle(names, rng)) {
       if (distractors.length >= targetDistractorCount) return;
       const lower = name.toLowerCase();

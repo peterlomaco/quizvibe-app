@@ -29,3 +29,15 @@ items:
     inBaseCatalog: true
     genrePackages: ["pkg-rock"]
     notes: "Grupp; correctYear = formation-år."
+  - id: carola-haggkvist
+    displayName: "Carola Häggkvist"
+    correctYear: 1966
+    probability: 88
+    wikimediaSearchHints: ["Carola Häggkvist", "Carola singer Sweden"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: kurt-cobain
+    displayName: "Kurt Cobain"
+    correctYear: 1967
+    probability: 85
+    wikimediaSearchHints: ["Kurt Cobain Nirvana"]
+    answerMethods: ["timeline", "name-letters"]

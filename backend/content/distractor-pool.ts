@@ -14,11 +14,17 @@ const PoolSchema = z.object({
     persons: z.array(z.string().min(1)).min(1),
     capitals: z.array(z.string().min(1)).min(1),
     artists: z.array(z.string().min(1)).min(1),
+    // Nya buckets — optional eftersom de inte funnits historiskt. Items i
+    // dessa kategorier får tom distractor-pool tills buckets fylls; pool-
+    // fallback skippas via null-guard i distractors.ts.
+    songs: z.array(z.string().min(1)).optional(),
+    actors: z.array(z.string().min(1)).optional(),
+    athletes: z.array(z.string().min(1)).optional(),
   }),
 });
 
 export interface DistractorPool {
-  names: Record<Category, string[]>;
+  names: Partial<Record<Category, string[]>>;
 }
 
 let cached: DistractorPool | null = null;

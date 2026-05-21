@@ -1,0 +1,19 @@
+# Skådespelare kända för Gen X.
+# correctYear = födelseår.
+audience: ["gen-x"]
+category: actors
+contentForm: image
+contentSubject: actor
+items:
+  - id: arnold-schwarzenegger
+    displayName: "Arnold Schwarzenegger"
+    correctYear: 1947
+    probability: 89
+    wikimediaSearchHints: ["Arnold Schwarzenegger"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: lasse-aberg
+    displayName: "Lasse Åberg"
+    correctYear: 1940
+    probability: 84
+    wikimediaSearchHints: ["Lasse Åberg"]
+    answerMethods: ["timeline", "name-letters"]

@@ -24,3 +24,15 @@ items:
     probability: 94
     wikimediaSearchHints: ["Drake rapper"]
     answerMethods: ["timeline", "name-letters"]
+  - id: ariana-grande
+    displayName: "Ariana Grande"
+    correctYear: 1993
+    probability: 92
+    wikimediaSearchHints: ["Ariana Grande"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: travis-scott
+    displayName: "Travis Scott"
+    correctYear: 1991
+    probability: 88
+    wikimediaSearchHints: ["Travis Scott rapper"]
+    answerMethods: ["timeline", "name-letters"]

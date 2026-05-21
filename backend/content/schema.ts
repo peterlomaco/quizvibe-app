@@ -19,7 +19,15 @@ export const AudienceSchema = z.union([
 ]);
 export type Audience = z.infer<typeof AudienceSchema>;
 
-export const CategorySchema = z.enum(['persons', 'capitals', 'artists', 'songs']);
+export const CategorySchema = z.enum([
+  'persons',   // @deprecated — kvar för bakåtkompabilitet; nya filer ska
+               // använda 'actors'/'athletes'/'artists' beroende på subject.
+  'capitals',
+  'artists',
+  'songs',
+  'actors',    // Skådespelare (image, subject=actor).
+  'athletes',  // Idrottare (image, subject=athlete).
+]);
 export type Category = z.infer<typeof CategorySchema>;
 
 // Två-axel-modell från matrisen i `Mediekällor, kategorier och år.xlsx`

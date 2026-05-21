@@ -273,7 +273,7 @@ export type ImageContentSubject =
 export interface ImageQuizQuestion {
   id: string;
   displayName: string;
-  category: 'persons' | 'capitals' | 'artists' | 'songs';
+  category: 'persons' | 'capitals' | 'artists' | 'songs' | 'actors' | 'athletes';
   contentSubject: ImageContentSubject;
   /** Året som "rätt svar" — driver fallback-era-filtrering när peak
    *  saknas. För artister = födelseår; band = formation-år; musik-spår =

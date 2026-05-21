@@ -1,0 +1,13 @@
+# Skådespelare kända för Millennials.
+# correctYear = födelseår.
+audience: ["millennials"]
+category: actors
+contentForm: image
+contentSubject: actor
+items:
+  - id: jennifer-aniston
+    displayName: "Jennifer Aniston"
+    correctYear: 1969
+    probability: 87
+    wikimediaSearchHints: ["Jennifer Aniston"]
+    answerMethods: ["timeline", "name-letters"]

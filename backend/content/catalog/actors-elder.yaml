@@ -1,0 +1,19 @@
+# Skådespelare kända för elder-generationen (Silent + Baby Boomers).
+# correctYear = födelseår.
+audience: ["elder"]
+category: actors
+contentForm: image
+contentSubject: actor
+items:
+  - id: ingrid-bergman
+    displayName: "Ingrid Bergman"
+    correctYear: 1915
+    probability: 85
+    wikimediaSearchHints: ["Ingrid Bergman actress"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: marilyn-monroe
+    displayName: "Marilyn Monroe"
+    correctYear: 1926
+    probability: 82
+    wikimediaSearchHints: ["Marilyn Monroe"]
+    answerMethods: ["timeline", "name-letters"]

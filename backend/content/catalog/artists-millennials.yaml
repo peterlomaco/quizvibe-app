@@ -36,3 +36,9 @@ items:
     answerMethods: ["timeline", "name-letters"]
     inBaseCatalog: true
     genrePackages: ["pkg-hiphop"]
+  - id: beyonce
+    displayName: "Beyoncé"
+    correctYear: 1981
+    probability: 90
+    wikimediaSearchHints: ["Beyoncé"]
+    answerMethods: ["timeline", "name-letters"]

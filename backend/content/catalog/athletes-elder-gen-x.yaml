@@ -1,0 +1,13 @@
+# Idrottare kända för elder + Gen X.
+# correctYear = födelseår.
+audience: ["elder", "gen-x"]
+category: athletes
+contentForm: image
+contentSubject: athlete
+items:
+  - id: bjorn-borg
+    displayName: "Björn Borg"
+    correctYear: 1956
+    probability: 97
+    wikimediaSearchHints: ["Björn Borg tennis"]
+    answerMethods: ["timeline", "name-letters"]
