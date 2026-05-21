@@ -15,6 +15,7 @@
     "export-demo": "tsx scripts/export-demo.ts",
     "export-music-questions": "tsx scripts/export-music-questions.ts",
     "export-image-questions": "tsx scripts/export-image-questions.ts",
+    "measure-images": "tsx scripts/measure-images.ts",
     "build": "tsc"
   },
   "dependencies": {

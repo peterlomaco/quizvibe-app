@@ -3059,7 +3059,7 @@ export default function QuizScreen() {
                     key={question.id}
                     source={getQuizImage(question.id)!}
                     style={styles.imageMediaImage}
-                    resizeMode="cover"
+                    resizeMode="contain"
                   />
                 ) : (
                   // Defensiv fallback om assets-mappen saknar förväntad
@@ -3074,7 +3074,7 @@ export default function QuizScreen() {
                   assistance={currentAssistance}
                   totalSeconds={responseSeconds}
                   isRevealed={phase === 'awaiting' || phase === 'reveal'}
-                  logoSize={220}
+                  logoSize={280}
                 />
               </View>
             ) : (
@@ -3787,10 +3787,14 @@ const styles = StyleSheet.create({
     color: Colors.textDisabled,
   },
 
-  // Image-fråge-mediaCard: 16:9-ram för bilden + ProgressiveCover-overlay.
-  // Letterbox:as automatiskt om källan är porträtt (t.ex. paris.webp).
+  // Image-fråge-mediaCard: 4:5-ram (porträtt-vänlig) eftersom 14 av 17 bilder
+  // i poolen är porträtt (AR 0.6–0.87). Med 16:9-cover klipptes huvuden/topp
+  // av kraftigt; nu contain-mode → inget klipps. Median porträttbild får
+  // ~12-20% letterbox på sidorna; landscape (cities) får ~30% topp+botten.
+  // ProgressiveCover-mosaiken anpassar sig till container-storleken via
+  // absoluteFill; block-AR avviker lätt från kvadrat (~0.7) men acceptabelt.
   imageMediaCard: {
-    aspectRatio: 16 / 9,
+    aspectRatio: 4 / 5,
     backgroundColor: Colors.card,
     overflow: 'hidden',
     borderBottomWidth: 1,
