@@ -16,12 +16,21 @@ import {
   YoutubeSearchResult,
   YoutubeVideoDetails,
 } from './client';
+import { scoreSuggestion } from './scoring';
 
 interface SuggestionRow {
   search: YoutubeSearchResult;
   details?: YoutubeVideoDetails;
   blockReasons: string[];
+  /** Heuristisk score (högre = bättre kandidat). Driver sortering så de
+   *  mest sannolika "official video + HD"-kandidaterna ploppar överst,
+   *  och lyric-/audio-only-/topic-kanaler hamnar längst ner. */
+  score: number;
+  /** Mänskligt-läsbar breakdown av scoren — visas i CLI-output bredvid
+   *  score-värdet så curatorn kan kalibrera bedömningen. */
+  scoreNotes: string[];
 }
+
 
 async function suggestForQuery(
   query: string,
@@ -36,14 +45,17 @@ async function suggestForQuery(
   });
   const detailsByid = new Map(detailsList.map((d) => [d.videoId, d]));
 
-  return hits.map((search) => {
+  const rows: SuggestionRow[] = hits.map((search) => {
     const details = detailsByid.get(search.videoId);
-    return {
-      search,
-      details,
-      blockReasons: details ? getClipBlockReasons(details) : ['details missing'],
-    };
+    const blockReasons = details ? getClipBlockReasons(details) : ['details missing'];
+    const { score, notes } = scoreSuggestion(search, details, blockReasons);
+    return { search, details, blockReasons, score, scoreNotes: notes };
   });
+
+  // Sortera så bästa kandidater visas först — curatorn behöver oftast
+  // bara titta på top 1-3 istället för att scrolla genom alla 10.
+  rows.sort((a, b) => b.score - a.score);
+  return rows;
 }
 
 function formatDuration(sec: number): string {
@@ -63,15 +75,23 @@ function printSuggestion(label: string, rows: SuggestionRow[]): void {
     return;
   }
   rows.forEach((row, i) => {
-    const { search, details, blockReasons } = row;
+    const { search, details, blockReasons, score, scoreNotes } = row;
     const status =
       blockReasons.length === 0
         ? 'OK'
         : `BLOCKED (${blockReasons.join(', ')})`;
     const dur = details ? formatDuration(details.durationSec) : '?:??';
     const channel = details?.channelTitle ?? search.channelTitle;
+    const def = details?.definition === 'hd'
+      ? 'HD'
+      : details?.definition === 'sd'
+      ? 'SD'
+      : '??';
+    // Score-prefix gör att curatorn ser ranking-positionen direkt.
+    // "+18" / "-12" är typisk range; tecken alltid synligt.
+    const scoreLabel = score >= 0 ? `+${score}` : `${score}`;
     console.log(
-      `  ${i + 1}. ${status}  ${dur}  ${search.videoId}  "${search.title}"`,
+      `  ${i + 1}. [${scoreLabel}] ${status}  ${dur} ${def}  ${search.videoId}  "${search.title}"`,
     );
     console.log(`     channel: ${channel}`);
     if (details) {
@@ -79,6 +99,9 @@ function printSuggestion(label: string, rows: SuggestionRow[]): void {
       console.log(
         `     license: ${lic}   published: ${details.publishedAt.slice(0, 10)}`,
       );
+    }
+    if (scoreNotes.length > 0) {
+      console.log(`     score: ${scoreNotes.join('  ')}`);
     }
     console.log(`     https://www.youtube.com/watch?v=${search.videoId}`);
   });

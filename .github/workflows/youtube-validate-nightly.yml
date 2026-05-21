@@ -1,0 +1,57 @@
+# Nightly validation av YouTube-klippen i backend/content/catalog/*.yaml
+# mot YouTube Data API v3. Fångar klipp som blivit:
+#   - missing (videoId borttagen / privat)
+#   - blocked (region-restriction adderad, age-gate, embeddable=false,
+#     definition nedgraderad till SD)
+#
+# Re-uploads (MASTER RJ, prod. ovr, SLAYERO MUSIC, thelanoz video Comeback)
+# är inte original-rättsinnehavarens uppladdningar — kan tas ner via
+# copyright-claim utan förvarning. Nightly cron ger oss tidig signal innan
+# en användare träffar ett brutet klipp i appen.
+#
+# Pre-launch krav:
+#   1. YOUTUBE_API_KEY adderas som repo secret
+#      (Settings → Secrets and variables → Actions → New repository secret)
+#   2. Verifiera att första körningen lyckas — kolla Actions-fliken
+#   3. Failure-notifikationer: GitHub mejlar repo owner by default. Lägg
+#      ev. till Slack/Discord-webhook senare om vi vill ha mer aggressiv
+#      notifiering.
+
+name: youtube-validate-nightly
+
+on:
+  schedule:
+    # 06:00 UTC = 07:00 CET / 08:00 CEST. Innan användare börjar spela
+    # på morgonen så vi har tid att fixa eventuella brutna klipp.
+    - cron: '0 6 * * *'
+  # Manuell trigger via Actions-UI:t för att kunna köra ad-hoc utan att
+  # vänta på nästa schemalagda körning (t.ex. efter manuell katalog-edit).
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install backend deps
+        working-directory: backend
+        run: npm ci
+
+      - name: Run youtube-validate
+        working-directory: backend
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+        # CLI:n exit:ar med kod 1 om något klipp är blocked/missing, vilket
+        # markerar hela jobbet rött i Actions-UI:t och triggar GitHub:s
+        # default-failure-mejl till repo owner.
+        run: npx tsx youtube/validate.ts --all

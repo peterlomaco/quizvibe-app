@@ -16,6 +16,9 @@ const API_BASE = 'https://www.googleapis.com/youtube/v3';
 
 export type PrivacyStatus = 'public' | 'unlisted' | 'private';
 export type ClipLicense = 'youtube' | 'creativeCommon';
+// `contentDetails.definition` returns 'hd' eller 'sd' från Data API.
+// 'unknown' representerar att fältet saknades i svaret (= defensive parse).
+export type VideoDefinition = 'hd' | 'sd' | 'unknown';
 
 export interface YoutubeSearchResult {
   videoId: string;
@@ -42,6 +45,11 @@ export interface YoutubeVideoDetails {
   allowedRegions: string[] | null;  // null = ingen allowed-restriction
   license: ClipLicense;
   madeForKids: boolean;
+  // Bild-kvalitet — 'hd' = upplöst i HD (≥720p), 'sd' = standard
+  // definition (oftast 360-480p, märks tydligt på 220px-spelaren),
+  // 'unknown' = fältet saknades i API-svaret (defensiv). Driver
+  // HD-gate i getClipBlockReasons.
+  definition: VideoDefinition;
 }
 
 export interface SearchOptions {
@@ -155,6 +163,9 @@ export async function getVideoDetails(
 
 function parseVideoItem(v: YoutubeVideoItem): YoutubeVideoDetails {
   const reg = v.contentDetails?.regionRestriction;
+  const rawDef = v.contentDetails?.definition;
+  const definition: VideoDefinition =
+    rawDef === 'hd' || rawDef === 'sd' ? rawDef : 'unknown';
   return {
     videoId: v.id,
     title: v.snippet?.title ?? '',
@@ -171,6 +182,7 @@ function parseVideoItem(v: YoutubeVideoItem): YoutubeVideoDetails {
     allowedRegions: reg?.allowed ?? null,
     license: (v.status?.license as ClipLicense) ?? 'youtube',
     madeForKids: v.status?.madeForKids ?? false,
+    definition,
   };
 }
 
@@ -211,6 +223,10 @@ export function getClipBlockReasons(
   if (details.blockedRegions && details.blockedRegions.length > 0) {
     reasons.push(`blocked in ${details.blockedRegions.length} region(s)`);
   }
+  // HD-gate: SD-källor är 360-480p på YouTube och syns tydligt pixliga
+  // i 220px-spelaren. 'unknown' blockas INTE — vi vill inte regressa
+  // existerande klipp om API-svaret saknar fältet (defensiv).
+  if (details.definition === 'sd') reasons.push('SD resolution');
   return reasons;
 }
 
@@ -260,6 +276,7 @@ interface YoutubeVideoItem {
   };
   contentDetails?: {
     duration?: string;
+    definition?: string; // 'hd' | 'sd' (Data API v3 string-enum)
     regionRestriction?: {
       allowed?: string[];
       blocked?: string[];

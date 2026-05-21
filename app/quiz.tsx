@@ -221,17 +221,20 @@ const SCREEN_WIDTH = Dimensions.get('window').width;
 // ITEM_WIDTH (avstånd mellan ticks) sätts dynamiskt per assistance-nivå inuti komponenten:
 // Full: tät (≥10 år synliga), Standard: medium (≥8), Minimal: gles (4–5 syns)
 
-// Tidslinjen – alla mått relativa till container-toppen
-const CONTAINER_HEIGHT = 108;
-const TRACK_Y = 55;           // horisontell linje (mitten av svarsrutan)
-const TICK_TOP = 24;          // ticks börjar ovanför svarsrutan
-const TICK_BOTTOM = 86;       // ticks slutar under svarsrutan
+// Tidslinjen – alla mått relativa till container-toppen.
+// Hela layouten skiftad UPP 12 px från tidigare värden (CONTAINER_HEIGHT
+// 108→96, TICK_TOP 24→12, etc.) — frigör vertikal yta så reveal-feedback-
+// rutan inte längre överlappar Next-knappen i nedre högra hörnet.
+const CONTAINER_HEIGHT = 96;
+const TRACK_Y = 43;           // horisontell linje (mitten av svarsrutan)
+const TICK_TOP = 12;          // ticks börjar ovanför svarsrutan
+const TICK_BOTTOM = 74;       // ticks slutar under svarsrutan
 const TICK_TOTAL = TICK_BOTTOM - TICK_TOP; // = 62px total tick-höjd
-const YEAR_TEXT_Y = 90;       // årstext direkt under tickarna
+const YEAR_TEXT_Y = 78;       // årstext direkt under tickarna
 
 // Svarsruta – kortare ram som tickarna tydligt skär genom
-const SELECTOR_TOP = 34;      // 10px under tick-toppen
-const SELECTOR_BOTTOM = 76;   // 10px över tick-botten
+const SELECTOR_TOP = 22;      // 10px under tick-toppen
+const SELECTOR_BOTTOM = 64;   // 10px över tick-botten
 const SELECTOR_H = SELECTOR_BOTTOM - SELECTOR_TOP; // = 42px
 
 // Energisk färg för svarsrutan (används oavsett assistance-nivå)
@@ -526,7 +529,11 @@ function TimelineSelector({
 }
 
 const tl = StyleSheet.create({
-  wrapper: { gap: Spacing.md, paddingHorizontal: Spacing.lg },
+  // gap tidigare Spacing.md (16 px) — minskat till 0 så assist-headern
+  // sitter precis ovanför timeline-containern. Tillsammans med
+  // CONTAINER_HEIGHT-kompressionen (108→96) sparar detta 28 px vertikalt
+  // så reveal-feedbackrutan inte överlappar Next-knappen.
+  wrapper: { gap: 0, paddingHorizontal: Spacing.lg },
   assistRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
   assistLine: { flex: 1, height: 1 },
   assistBadge: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6, borderWidth: 1 },
@@ -3810,7 +3817,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: Spacing.sm,
     paddingHorizontal: Spacing.lg,
-    marginTop: -Spacing.md,
+    // Tidigare marginTop: -Spacing.md drog upp raden 16 px in i medie-
+    // kortet — ringen (56×56) + halon (+4 px topp) krockade då med
+    // YouTube-spelarens nedre högra hörn. Borttagen så `content.gap`
+    // (Spacing.md) ger normalt avstånd och halon klarar sig själv.
   },
   timerTrack: {
     flex: 1,

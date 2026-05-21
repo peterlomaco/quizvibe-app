@@ -245,6 +245,7 @@ describe('getVideoDetails', () => {
             },
             contentDetails: {
               duration: 'PT3M21S',
+              definition: 'hd',
               regionRestriction: { blocked: ['DE', 'CN'] },
               contentRating: {},
             },
@@ -276,7 +277,42 @@ describe('getVideoDetails', () => {
       blockedRegions: ['DE', 'CN'],
       allowedRegions: null,
       license: 'youtube',
+      definition: 'hd',
     });
+  });
+
+  it('parses definition=sd correctly', async () => {
+    const fetchFn = vi.fn<typeof fetch>().mockResolvedValueOnce(
+      okResponse({
+        items: [
+          {
+            id: 'sdVideo123',
+            snippet: { title: 'Old', channelTitle: '', channelId: '', description: '', publishedAt: '2010-01-01' },
+            contentDetails: { duration: 'PT2M', definition: 'sd' },
+            status: { embeddable: true, privacyStatus: 'public', license: 'youtube', madeForKids: false },
+          },
+        ],
+      }),
+    );
+    const [d] = await getVideoDetails({ videoIds: ['sdVideo123'], fetchFn });
+    expect(d.definition).toBe('sd');
+  });
+
+  it('falls back to definition=unknown when API omits the field', async () => {
+    const fetchFn = vi.fn<typeof fetch>().mockResolvedValueOnce(
+      okResponse({
+        items: [
+          {
+            id: 'noDefVideo',
+            snippet: { title: '', channelTitle: '', channelId: '', description: '', publishedAt: '' },
+            contentDetails: { duration: 'PT1M' }, // ingen definition
+            status: { embeddable: true, privacyStatus: 'public', license: 'youtube', madeForKids: false },
+          },
+        ],
+      }),
+    );
+    const [d] = await getVideoDetails({ videoIds: ['noDefVideo'], fetchFn });
+    expect(d.definition).toBe('unknown');
   });
 
   it('flags age-restricted videos', async () => {
@@ -356,6 +392,7 @@ describe('getClipBlockReasons', () => {
       allowedRegions: null,
       license: 'youtube',
       madeForKids: false,
+      definition: 'hd',
       ...overrides,
     };
   }
@@ -390,5 +427,17 @@ describe('getClipBlockReasons', () => {
       baseDetails({ blockedRegions: ['DE', 'CN', 'RU'] }),
     );
     expect(reasons.some((r) => r.includes('3 region'))).toBe(true);
+  });
+
+  it('flags SD resolution', () => {
+    expect(getClipBlockReasons(baseDetails({ definition: 'sd' }))).toContain(
+      'SD resolution',
+    );
+  });
+
+  it('does not flag unknown definition (defensive — no API field)', () => {
+    expect(
+      getClipBlockReasons(baseDetails({ definition: 'unknown' })),
+    ).toEqual([]);
   });
 });

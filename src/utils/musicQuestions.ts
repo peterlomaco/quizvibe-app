@@ -19,12 +19,12 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1976,
     "youtubeClips": [
       {
-        "videoId": "YkLLcIKhJ64",
+        "videoId": "TJLAJWSEd6U",
         "startSec": 30,
         "endSec": 45,
-        "channelTitle": "ABBA - Topic",
+        "channelTitle": "MASTER RJ",
         "license": "standard",
-        "notes": "Refräng 'You can dance, you can jive...'"
+        "notes": "Official Video Remaster — rörlig MV med dans/scen. Refrängområde."
       }
     ]
   },
@@ -34,12 +34,12 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1982,
     "youtubeClips": [
       {
-        "videoId": "Z85lxckrtzg",
+        "videoId": "fK6tf6opIg0",
         "startSec": 60,
         "endSec": 75,
-        "channelTitle": "Michael Jackson - Topic",
+        "channelTitle": "prod. ovr",
         "license": "standard",
-        "notes": "Efter intro/Vincent Price-monolog, första vers"
+        "notes": "Official Shortened 4K Video — rörlig MV (zombiedans). Mid-song."
       }
     ]
   },
@@ -49,12 +49,12 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1991,
     "youtubeClips": [
       {
-        "videoId": "7TDeBi34OtE",
+        "videoId": "V7f03mfxN4I",
         "startSec": 0,
         "endSec": 15,
-        "channelTitle": "Nirvana - Topic",
+        "channelTitle": "SLAYERO MUSIC",
         "license": "standard",
-        "notes": "Ikonisk riff-intro"
+        "notes": "4K Remastered 60FPS — rörlig MV (cheerleaders/gymnastiksal). Ikonisk riff-intro."
       }
     ]
   },
@@ -64,12 +64,12 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1998,
     "youtubeClips": [
       {
-        "videoId": "fEfvTTJNeAY",
+        "videoId": "1dfhNimhwNM",
         "startSec": 0,
         "endSec": 15,
-        "channelTitle": "Britney Spears - Topic",
+        "channelTitle": "thelanoz video Comeback",
         "license": "standard",
-        "notes": "'Oh baby baby' + första vers"
+        "notes": "Official 4K 60FPS Video — rörlig MV (skoluniform-scen). 'Oh baby baby' + första vers."
       }
     ]
   },

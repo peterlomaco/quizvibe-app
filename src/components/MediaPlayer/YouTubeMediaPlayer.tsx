@@ -16,11 +16,22 @@
 //      postMessage INOM gesture-context → iOS accepterar.
 //
 // Layout: iframe renderas alltid i full storlek så uppspelning inte avbryts.
-// När `showVideo === false` täcks frame:n av en svart audio-overlay.
+// Video-frame:n är alltid synlig under uppspelning så användaren ser
+// rörligt bildmaterial (showVideo-prop:n bevarad i API:t men no-op idag).
+//
+// Slutet av klippet: iframe:n körs UTAN `end`-cap → YouTube spelar
+// videon i sin helhet (kan vara musik, filmscen, sporthändelse, etc).
+// När YT firar state='ended' (eller manuellt finish från användaren)
+// ersätter vi iframe:n med en QuizVibe-logga så ingen YouTube-branding
+// visas på en idle player. YouTube-ToS: branding måste vara synlig
+// UNDER uppspelning (iframe visar logo + bottom-bar); EFTER playback-end
+// får appen ta över UI:t — vilket är vad vi gör.
 
+import { Nunito_700Bold, useFonts } from '@expo-google-fonts/nunito';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import YoutubePlayer from 'react-native-youtube-iframe';
+import { QuizVibeLogo } from '@/src/components/QuizVibeLogo';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '@/src/theme';
 import type { YoutubeClip } from '@/src/utils/mediaSource';
 
@@ -36,7 +47,12 @@ interface Props {
   onError?: (error: Error) => void;
 }
 
-const PLAYER_HEIGHT = 200;
+// 220 (var 200) — YouTube-iframe:s bottenrow (share-knapp, YouTube-logo,
+// "related video"-thumbnail som dyker upp vid pause) klipptes av kortets
+// overflow:hidden vid 200. 220 ger bottenchrome:n breathing room utan att
+// rubba 16:9-känslan för själva video-frame:n. Justera om bottom-rowen
+// fortfarande ser kramad ut på enheter med annan DPR.
+const PLAYER_HEIGHT = 220;
 // Hur länge vi väntar på att autoplay ska starta innan vi visar tap-prompt.
 // För kort = prompt blinkar onödigt på iOS-versioner som tillåter autoplay.
 // För långt = användare som behöver tappa väntar för länge.
@@ -57,6 +73,10 @@ export function YouTubeMediaPlayer({
   // Driver tap-prompt-rendering. Sätts true av timeout om autoplay inte
   // hunnit starta inom AUTOPLAY_TIMEOUT_MS efter mount.
   const [showTapPrompt, setShowTapPrompt] = useState(false);
+  // True när YouTube firar state='ended' (klippet är slut). Triggar
+  // QuizVibe-logo-overlay som ersätter iframe:n så ingen YouTube-
+  // branding visas på en idle player. Reset:as per clip-byte.
+  const [hasEnded, setHasEnded] = useState(false);
   // D-iv: gatekeeper för mute+volume-postMessages. react-native-youtube-
   // iframe:s useEffect skickar player.mute()/setVolume() omedelbart vid
   // prop-ändring — om det sker INNAN onReady fyrat så finns ingen
@@ -66,6 +86,13 @@ export function YouTubeMediaPlayer({
   // ta emot. Reset:as per clip-byte så ny iframe-mount börjar gated.
   const [isPlayerReady, setIsPlayerReady] = useState(false);
 
+  // Nunito_700Bold-fonten — matchar startskärmens appName-styling så
+  // "QuizVibe"-texten under end-of-clip-loggan ser identisk ut med
+  // brand-marken på Home. Fallback till systemfont under load (kort
+  // flicker första gången fonten cachas).
+  const [fontsLoaded] = useFonts({ Nunito_700Bold });
+  const brandFont = fontsLoaded ? 'Nunito_700Bold' : undefined;
+
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Reset vid clip-byte (nya videon → ny autoplay-attempt)
@@ -73,6 +100,7 @@ export function YouTubeMediaPlayer({
     setHasStartedPlayback(false);
     setShowTapPrompt(false);
     setIsPlayerReady(false);
+    setHasEnded(false);
   }, [clip.videoId]);
 
   // Schemalägg tap-prompt om autoplay inte startat
@@ -104,6 +132,7 @@ export function YouTubeMediaPlayer({
         setShowTapPrompt(false);
       }
       if (state === 'ended') {
+        setHasEnded(true);
         onEnded?.();
       }
     },
@@ -152,22 +181,26 @@ export function YouTubeMediaPlayer({
           controls: false,
           rel: false,
           start: clip.startSec,
-          end: clip.endSec,
+          // `end` medvetet utelämnat — klippet (musik / filmscen /
+          // sportklipp / etc) ska spela klart utan att klippas vid
+          // svarstidens slut. Curerade endSec ignoreras i runtime;
+          // behållen i datan för framtida flexibilitet.
         }}
         webViewProps={{
           allowsInlineMediaPlayback: true,
           mediaPlaybackRequiresUserAction: false,
         }}
       />
-      {/* Music-playing-overlay visas BARA efter att uppspelning faktiskt
-          startat. Före dess är iframen synlig så användaren kan tappa
-          YouTube-play-knappen direkt om autoplay misslyckats. */}
-      {!showVideo && hasStartedPlayback && (
-        <View style={styles.audioOverlay} pointerEvents="none">
-          <Text style={styles.audioIcon}>🎵</Text>
-          <Text style={styles.audioLabel}>Music playing...</Text>
-          <Text style={styles.clipMeta}>
-            {clip.startSec}s – {clip.endSec}s clip
+      {/* End-of-clip overlay — täcker iframe:n helt så ingen YouTube-
+          branding (logo / pause-skärm / "more videos") visas på en idle
+          player. Renderas EFTER playback ended (YouTube ToS: branding
+          måste vara synlig UNDER playback; efter end får appen ta över).
+          QuizVibe-loggan här matchar startskärmens brand-mark exakt. */}
+      {hasEnded && (
+        <View style={styles.endedOverlay} pointerEvents="none">
+          <QuizVibeLogo size={140} />
+          <Text style={[styles.endedBrandName, { fontFamily: brandFont }]}>
+            QuizVibe
           </Text>
         </View>
       )}
@@ -175,7 +208,7 @@ export function YouTubeMediaPlayer({
           pointerEvents="none" så tap GENOM overlay:n når iframen direkt
           — iOS WebView kräver att user-gesture registreras på själva
           iframe-elementet (cross-origin gesture-policy). */}
-      {showTapPrompt && !hasStartedPlayback && (
+      {showTapPrompt && !hasStartedPlayback && !hasEnded && (
         <View style={styles.tapPromptOverlay} pointerEvents="none">
           <Text style={styles.tapPromptHint}>👆 Tap the play button</Text>
         </View>
@@ -192,25 +225,29 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     position: 'relative',
   },
-  audioOverlay: {
+  // Heltäckande end-of-clip overlay som ersätter iframe-frame:n när
+  // playback ended. Bakgrunds-färg matchar mediakortets card-färg så
+  // ingen YouTube-pixel "läcker" igenom. Centrerar QuizVibe-loggan +
+  // "QuizVibe"-texten under den.
+  endedOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: Colors.cardElevated,
+    backgroundColor: Colors.card,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: Spacing.xs,
   },
-  audioIcon: {
-    fontSize: 40,
-  },
-  audioLabel: {
-    fontSize: FontSize.lg,
-    fontWeight: FontWeight.medium,
+  // Identisk styling med startskärmens `appName` (app/index.tsx) så
+  // brand-marken läses likadant överallt. Nunito_700Bold via brandFont-
+  // prop:en på Text-elementet. marginTop är NEGATIV här (vs +8 på Home)
+  // — QuizVibeLogo:s SVG har naturlig tom-yta i botten av viewBox:n som
+  // vid size=140 motsvarar ~28 px, så +8 hade gett ~36 px synligt gap.
+  // -16 drar texten tillbaka över viewBox-bottnen så visuell distans
+  // till logga blir ~12 px. Tweaka empiriskt om annan storlek på loggan.
+  endedBrandName: {
+    fontSize: 38,
+    fontWeight: '700',
     color: Colors.textPrimary,
-  },
-  clipMeta: {
-    fontSize: FontSize.xs,
-    color: Colors.textSecondary,
-    fontVariant: ['tabular-nums'],
+    letterSpacing: -0.5,
+    marginTop: -Spacing.lg,
   },
   // Bara visuell hint — pointerEvents="none" så taps når iframen under.
   // Lägg ej position absolute som täcker hela frame:n för att inte skymma
