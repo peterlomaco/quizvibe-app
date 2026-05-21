@@ -82,7 +82,27 @@ describe('getLetterGridConfig', () => {
     ).toEqual({ mode: 'full-names' });
   });
 
-  it('born 2013-2015: full-names if distance > 1', () => {
+  it('Full assistance: alltid full-names (oavsett ålder/distans)', () => {
+    // Millennial spelare på Millennial item — närmast tänkbara distans (0).
+    // Före Full=full-names-regeln hade detta gett prefix length 3.
+    expect(
+      getLetterGridConfig({
+        playerBirthYear: 1990,
+        playerAssistance: 'full',
+        itemAudience: ['millennials'],
+      }),
+    ).toEqual({ mode: 'full-names' });
+    // Elder spelare på Elder item — också närmast tänkbara distans.
+    expect(
+      getLetterGridConfig({
+        playerBirthYear: 1950,
+        playerAssistance: 'full',
+        itemAudience: ['elder'],
+      }),
+    ).toEqual({ mode: 'full-names' });
+  });
+
+  it('born 2013-2015: standard + distance > 1 → full-names', () => {
     // Distance från gen-alpha till gen-x är 3 → full-names
     expect(
       getLetterGridConfig({
@@ -93,7 +113,7 @@ describe('getLetterGridConfig', () => {
     ).toEqual({ mode: 'full-names' });
   });
 
-  it('born 2013-2015: prefix if distance ≤ 1', () => {
+  it('born 2013-2015: standard + distance ≤ 1 → prefix', () => {
     // Distance från gen-alpha till gen-z är 1 → prefix
     expect(
       getLetterGridConfig({
@@ -104,18 +124,26 @@ describe('getLetterGridConfig', () => {
     ).toEqual({ mode: 'prefix', length: 2 });
   });
 
-  it('non-Alpha player: full-names if distance > 2', () => {
+  it('non-Alpha + standard/minimal: full-names if distance > 2', () => {
     // Elder spelare, item kända för Gen Alpha → distance 4 → full-names
+    // (även med Standard — distance-overriden promovar Standard→full-names)
     expect(
       getLetterGridConfig({
         playerBirthYear: 1950,
-        playerAssistance: 'full',
+        playerAssistance: 'standard',
+        itemAudience: ['gen-alpha'],
+      }),
+    ).toEqual({ mode: 'full-names' });
+    expect(
+      getLetterGridConfig({
+        playerBirthYear: 1950,
+        playerAssistance: 'minimal',
         itemAudience: ['gen-alpha'],
       }),
     ).toEqual({ mode: 'full-names' });
   });
 
-  it('non-Alpha player: prefix if distance ≤ 2', () => {
+  it('non-Alpha + standard/minimal: prefix if distance ≤ 2', () => {
     // Millennial spelare, item kända för Elder → distance 2 → prefix
     expect(
       getLetterGridConfig({
@@ -124,29 +152,42 @@ describe('getLetterGridConfig', () => {
         itemAudience: ['elder'],
       }),
     ).toEqual({ mode: 'prefix', length: 2 });
+    expect(
+      getLetterGridConfig({
+        playerBirthYear: 1990,
+        playerAssistance: 'minimal',
+        itemAudience: ['elder'],
+      }),
+    ).toEqual({ mode: 'prefix', length: 1 });
   });
 
-  it('Millennials always gets prefix (distance ≤ 2 to all generations)', () => {
-    // Verify Peters logik: Millennials får aldrig full-names utlöst av distance
+  it('Millennials på Standard/Minimal: alltid prefix (distance ≤ 2 till alla generationer)', () => {
+    // Verify Peters logik: Millennials får aldrig full-names utlöst av distance.
+    // Gäller Standard + Minimal — Full är full-names oavsett.
     const generations = ['elder', 'gen-x', 'millennials', 'gen-z', 'gen-alpha'] as const;
     for (const aud of generations) {
-      const config = getLetterGridConfig({
-        playerBirthYear: 1990,
-        playerAssistance: 'standard',
-        itemAudience: [aud],
-      });
-      expect(config.mode, `Millennials vs ${aud}`).toBe('prefix');
+      for (const assistance of ['standard', 'minimal'] as const) {
+        const config = getLetterGridConfig({
+          playerBirthYear: 1990,
+          playerAssistance: assistance,
+          itemAudience: [aud],
+        });
+        expect(
+          config.mode,
+          `Millennials/${assistance} vs ${aud}`,
+        ).toBe('prefix');
+      }
     }
   });
 
-  it('assistance level controls prefix length', () => {
+  it('assistance → mode mapping (Standard=2, Minimal=1, Full=full-names)', () => {
     const baseArgs = {
       playerBirthYear: 1990,
       itemAudience: ['millennials' as const],
     };
     expect(
       getLetterGridConfig({ ...baseArgs, playerAssistance: 'full' }),
-    ).toEqual({ mode: 'prefix', length: 3 });
+    ).toEqual({ mode: 'full-names' });
     expect(
       getLetterGridConfig({ ...baseArgs, playerAssistance: 'standard' }),
     ).toEqual({ mode: 'prefix', length: 2 });
@@ -156,7 +197,7 @@ describe('getLetterGridConfig', () => {
   });
 
   it('audience "all" always gives distance 0', () => {
-    // Capitals audience=all → alla spelare får prefix oavsett ålder
+    // Capitals audience=all → Standard/Minimal-spelare får prefix oavsett ålder
     expect(
       getLetterGridConfig({
         playerBirthYear: 1950,
@@ -164,5 +205,12 @@ describe('getLetterGridConfig', () => {
         itemAudience: ['all'],
       }),
     ).toEqual({ mode: 'prefix', length: 2 });
+    expect(
+      getLetterGridConfig({
+        playerBirthYear: 1950,
+        playerAssistance: 'minimal',
+        itemAudience: ['all'],
+      }),
+    ).toEqual({ mode: 'prefix', length: 1 });
   });
 });

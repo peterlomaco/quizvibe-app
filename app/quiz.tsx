@@ -43,6 +43,7 @@ import { savePendingLobbyPlayers } from '@/src/utils/pendingLobby';
 import { loadProfile } from '@/src/utils/profileStorage';
 import {
   IMAGE_QUIZ_QUESTIONS,
+  pickImageQuestionVariant,
   type ImageNameOption,
   type ImageQuestionVariant,
   type ImageVariantKey,
@@ -3358,14 +3359,12 @@ export default function QuizScreen() {
               />
             ) : (() => {
               // Per-spelare-variant baserat på assistance:
-              //   full → prefix-3 / standard → prefix-2 / minimal → prefix-1
-              const variantKey: ImageVariantKey =
-                currentAssistance === 'full'
-                  ? 'prefix-3'
-                  : currentAssistance === 'minimal'
-                    ? 'prefix-1'
-                    : 'prefix-2';
-              const variant = question.variants[variantKey];
+              //   full → full-names (mest hjälp = se hela namnet)
+              //   standard → prefix-2
+              //   minimal → prefix-1
+              // pickImageQuestionVariant kapslar mappningen så call-sites slipper
+              // duplicera switchen.
+              const variant = pickImageQuestionVariant(question.variants, currentAssistance);
               // D-iii: ImageAnswerBlock har ingen egen disabled-prop —
               // wrappa i View med pointerEvents='none' + dimmad opacity
               // när connection är unstable. Komponenten själv behåller

@@ -64,10 +64,11 @@ export function generationDistance(
   return minDist === Infinity ? GENERATION_ORDER.length : minDist;
 }
 
-// Prefix-längd per assistance level för Letter Grid Steg 1.
-// Full = 3 bokstäver (mest hjälp); Standard = 2; Minimal = 1 (minst hjälp).
-const PREFIX_LENGTH_BY_ASSISTANCE: Record<AssistanceLevel, number> = {
-  full: 3,
+// Prefix-längd för Letter Grid Steg 1 — enbart Standard/Minimal når denna
+// mapping. Full assistance returnerar full-names direkt (mest hjälp = se
+// hela namnet) innan vi kommer hit. Att utelämna 'full' ur record:en gör
+// att TS fångar accidental reuse om någon framtid pre-prefix-grenen kör.
+const PREFIX_LENGTH_BY_ASSISTANCE: Record<'standard' | 'minimal', number> = {
   standard: 2,
   minimal: 1,
 };
@@ -80,12 +81,17 @@ export type LetterGridConfig =
  * Avgör hur Steg 1 (Letter Grid) ska visas för en spelare på ett item.
  *
  * Reglerna (i prioritetsordning):
- * 1. Född 2016+ → alltid hela namn (yngsta gen Alpha kan inte hantera prefix).
- * 2. Född 2013-2015 → prefix om generations-avstånd ≤ 1, annars hela namn.
- * 3. Övriga → prefix om generations-avstånd ≤ 2, annars hela namn.
- *    (Millennials har max-avstånd 2 till alla generationer, så får alltid prefix.)
+ * 1. Full assistance → alltid full-names. Mest hjälp = se hela namnet, inget
+ *    prefix-pussel.
+ * 2. Född 2016+ → alltid full-names (yngsta gen Alpha kan inte läsa prefix
+ *    oavsett assistance).
+ * 3. Standard/Minimal + född 2013-2015 → full-names om generations-avstånd > 1,
+ *    annars prefix.
+ * 4. Standard/Minimal + övriga → full-names om generations-avstånd > 2,
+ *    annars prefix. (Millennials har max-avstånd 2 till alla generationer,
+ *    så får alltid prefix när de kör Standard/Minimal.)
  *
- * När mode = 'prefix' bestäms längden av playerAssistance.
+ * När mode = 'prefix' bestäms längden av playerAssistance (Standard=2, Minimal=1).
  */
 export function getLetterGridConfig(args: {
   playerBirthYear: number;
@@ -94,6 +100,12 @@ export function getLetterGridConfig(args: {
 }): LetterGridConfig {
   const { playerBirthYear, playerAssistance, itemAudience } = args;
 
+  // Regel 1: Full → full-names (oavsett ålder/distans).
+  if (playerAssistance === 'full') {
+    return { mode: 'full-names' };
+  }
+
+  // Regel 2: Född 2016+ → full-names (forcing-override för småbarn).
   if (playerBirthYear >= 2016) {
     return { mode: 'full-names' };
   }
@@ -101,7 +113,7 @@ export function getLetterGridConfig(args: {
   const player = birthYearToGeneration(playerBirthYear);
   const distance = generationDistance(player, itemAudience);
 
-  // Specialregel för äldre Gen Alpha (födda 2013-2015): tröskeln är >1, inte >2.
+  // Regel 3/4: distans-promote för Standard/Minimal.
   if (playerBirthYear >= 2013 && playerBirthYear <= 2015) {
     if (distance > 1) return { mode: 'full-names' };
   } else {

@@ -1,18 +1,17 @@
 // Genererar src/utils/quizImageQuestions.ts med pre-baked Letter Grid +
 // name-options för alla items vi har en lokal bild för (assets/quiz-images/*).
 //
-// Per-spelare-config (assistance-baserad prefix-length): tre varianter
-// genereras per item (prefix-1 / prefix-2 / prefix-3). Klienten väljer rätt
-// variant runtime baserat på aktuell spelares assistance:
-//   • full      → prefix-3 (mest hjälp, smal pool)
-//   • standard  → prefix-2
-//   • minimal   → prefix-1 (minst hjälp, bred pool)
+// Per-spelare-variant baserat på assistance:
+//   • full      → full-names (mest hjälp = se hela namnet, ingen prefix)
+//   • standard  → prefix-2  (2-bokstavs prefix)
+//   • minimal   → prefix-1  (1-bokstavs prefix, bredast prefix-pool)
 //
 // MVP-förenklingar:
 //   • Distractor-pool genereras med Millennials som playerGeneration. Klienten
 //     ser samma items oavsett egen generation (audience-filter inte aktivt).
-//   • Full-names-mode (Gen Alpha 2016+) skippad — annorlunda UI-shape kräver
-//     separat refactor av ImageAnswerBlock.
+//   • Ålder-baserad full-names-override (born 2016+ → forced full-names) körs
+//     INTE klient-side ännu — kräver att getLetterGridConfig anropas i quiz.tsx
+//     vid variant-val.
 //
 // Kör: cd backend && npx tsx scripts/export-image-questions.ts
 
@@ -28,6 +27,7 @@ import {
 import {
   buildLetterGrid,
   buildNameOptions,
+  buildFullNamesList,
   getPrefixForItem,
   PrefixOption,
   NameOption,
@@ -38,8 +38,9 @@ import {
 // effekten är mild — utvidga vid riktig audience-filter-implementering.
 const BASELINE_GENERATION = 'millennials' as const;
 
-const VARIANT_PREFIX_LENGTHS = [1, 2, 3] as const;
-type VariantKey = `prefix-${(typeof VARIANT_PREFIX_LENGTHS)[number]}`;
+const PREFIX_LENGTHS = [1, 2] as const;
+type PrefixVariantKey = `prefix-${(typeof PREFIX_LENGTHS)[number]}`;
+type VariantKey = PrefixVariantKey | 'full-names';
 
 const ASSETS_DIR = path.join(__dirname, '..', '..', 'assets', 'quiz-images');
 const OUTPUT_PATH = path.join(
@@ -51,12 +52,21 @@ const OUTPUT_PATH = path.join(
   'quizImageQuestions.ts',
 );
 
-interface ExportedVariant {
+interface ExportedPrefixVariant {
+  mode: 'prefix';
   prefixLength: number;
   letterGrid: PrefixOption[];
   optionsByPrefix: Record<string, NameOption[]>;
   correctPrefix: string;
 }
+
+interface ExportedFullNamesVariant {
+  mode: 'full-names';
+  /** ~10 namn med exakt en isCorrect=true; ordning slumpad vid export. */
+  nameList: NameOption[];
+}
+
+type ExportedVariant = ExportedPrefixVariant | ExportedFullNamesVariant;
 
 interface ExportedQuestion {
   id: string;
@@ -92,12 +102,12 @@ function listLocalImageIds(): string[] {
     .sort();
 }
 
-function buildVariant(
+function buildPrefixVariant(
   catalog: ReturnType<typeof loadCatalog>,
   category: Category,
   item: ReturnType<typeof findItemsById>[number]['item'],
   prefixLength: number,
-): ExportedVariant {
+): ExportedPrefixVariant {
   const letterGrid = buildLetterGrid({
     catalog,
     category,
@@ -117,7 +127,27 @@ function buildVariant(
       prefixLength,
     });
   }
-  return { prefixLength, letterGrid, optionsByPrefix, correctPrefix };
+  return {
+    mode: 'prefix',
+    prefixLength,
+    letterGrid,
+    optionsByPrefix,
+    correctPrefix,
+  };
+}
+
+function buildFullNamesVariant(
+  catalog: ReturnType<typeof loadCatalog>,
+  category: Category,
+  item: ReturnType<typeof findItemsById>[number]['item'],
+): ExportedFullNamesVariant {
+  const nameList = buildFullNamesList({
+    catalog,
+    category,
+    playerGeneration: BASELINE_GENERATION,
+    correctItem: item,
+  });
+  return { mode: 'full-names', nameList };
 }
 
 function buildExportedQuestion(
@@ -157,14 +187,15 @@ function buildExportedQuestion(
   }
 
   const variants = {} as Record<VariantKey, ExportedVariant>;
-  for (const len of VARIANT_PREFIX_LENGTHS) {
-    variants[`prefix-${len}` as VariantKey] = buildVariant(
+  for (const len of PREFIX_LENGTHS) {
+    variants[`prefix-${len}` as PrefixVariantKey] = buildPrefixVariant(
       catalog,
       category,
       item,
       len,
     );
   }
+  variants['full-names'] = buildFullNamesVariant(catalog, category, item);
 
   return {
     id: item.id,
@@ -186,10 +217,11 @@ function buildExportedQuestion(
 function renderTsModule(questions: ExportedQuestion[]): string {
   return `// Auto-generated. Regenerate with: cd backend && npx tsx scripts/export-image-questions.ts
 //
-// Pre-baked image-frågor för quiz-flow. Varje item har tre varianter pre-bakade
-// för olika assistance-nivåer: prefix-1 (minimal) / prefix-2 (standard) /
-// prefix-3 (full). Klienten väljer variant runtime via
-// pickImageQuestionVariant(question, assistance).
+// Pre-baked image-frågor för quiz-flow. Tre varianter per item:
+//   prefix-1   → Minimal assistance (1-bokstavs prefix-läge)
+//   prefix-2   → Standard assistance (2-bokstavs prefix-läge)
+//   full-names → Full assistance (ingen prefix; visa hela namnet direkt)
+// Klienten väljer variant runtime via pickImageQuestionVariant(question, assistance).
 
 export type ImageQuestionAudience =
   | 'elder'
@@ -211,14 +243,23 @@ export interface ImageNameOption {
   source: 'catalog' | 'pool';
 }
 
-export interface ImageQuestionVariant {
+export interface ImagePrefixVariant {
+  mode: 'prefix';
   prefixLength: number;
   letterGrid: ImagePrefixOption[];
   optionsByPrefix: Record<string, ImageNameOption[]>;
   correctPrefix: string;
 }
 
-export type ImageVariantKey = 'prefix-1' | 'prefix-2' | 'prefix-3';
+export interface ImageFullNamesVariant {
+  mode: 'full-names';
+  /** ~10 namn med exakt en isCorrect=true; ordning slumpad vid export. */
+  nameList: ImageNameOption[];
+}
+
+export type ImageQuestionVariant = ImagePrefixVariant | ImageFullNamesVariant;
+
+export type ImageVariantKey = 'prefix-1' | 'prefix-2' | 'full-names';
 
 export type ImageContentSubject =
   | 'artist'
@@ -253,18 +294,26 @@ export interface ImageQuizQuestion {
 
 export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = ${JSON.stringify(questions, null, 2)};
 
-/** Mappa spelarens assistance till rätt pre-baked variant. */
+/** Mappa spelarens assistance till rätt pre-baked variant.
+ *  Full → full-names (mest hjälp = se hela namnet, ingen prefix-pussel).
+ *  Standard → prefix-2 (2-bokstavs prefix-läge).
+ *  Minimal → prefix-1 (1-bokstavs prefix-läge).
+ *
+ *  Tar bara \`question.variants\` (Record) som arg så call-sites kan passera
+ *  egna domän-typer (quiz.tsx:s lokala \`ImageQuestion\`-shape) utan att
+ *  strukturellt matcha hela ImageQuizQuestion.
+ */
 export function pickImageQuestionVariant(
-  question: ImageQuizQuestion,
+  variants: Record<ImageVariantKey, ImageQuestionVariant>,
   assistance: 'minimal' | 'standard' | 'full',
 ): ImageQuestionVariant {
   const key: ImageVariantKey =
     assistance === 'full'
-      ? 'prefix-3'
+      ? 'full-names'
       : assistance === 'minimal'
         ? 'prefix-1'
         : 'prefix-2';
-  return question.variants[key];
+  return variants[key];
 }
 
 /** Filtrera frågor som passar en specifik spelar-generation. */

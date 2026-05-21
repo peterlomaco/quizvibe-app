@@ -191,6 +191,94 @@ export function buildLetterGrid(args: BuildLetterGridArgs): PrefixOption[] {
   return shuffle(all, rng);
 }
 
+export interface BuildFullNamesListArgs {
+  catalog: LoadedCatalog;
+  category: Category;
+  playerGeneration: Generation;
+  correctItem: ContentItem;
+  totalOptions?: number;
+  rng?: () => number;
+  excludeSensitive?: boolean;
+}
+
+/**
+ * Bygg fullnamn-lista för Full assistance-läget (= ingen prefix-knapp; spelaren
+ * ser N fullnamn under varandra och väljer direkt). Mestadels samma pool-strategi
+ * som `buildNameOptions` men UTAN prefix-filtrering — vilket fullnamn som helst
+ * från katalog/pool är giltig distractor så länge id/name inte krockar med
+ * rätt svar eller redan vald distractor.
+ *
+ * Returnerar `totalOptions` namn (default 10) — 1 rätt + (totalOptions-1)
+ * distractors, blandade.
+ */
+export function buildFullNamesList(args: BuildFullNamesListArgs): NameOption[] {
+  const {
+    catalog,
+    category,
+    playerGeneration,
+    correctItem,
+    totalOptions = DEFAULT_TOTAL_OPTIONS,
+    rng = Math.random,
+    excludeSensitive = true,
+  } = args;
+
+  const targetDistractorCount = totalOptions - 1;
+  const seenIds = new Set<string>([correctItem.id]);
+  const seenNamesLower = new Set<string>([correctItem.displayName.toLowerCase()]);
+  const distractors: NameOption[] = [];
+
+  function collectFromCatalog(pool: PoolItem[]): void {
+    for (const { item } of shuffle(pool, rng)) {
+      if (distractors.length >= targetDistractorCount) return;
+      if (seenIds.has(item.id)) continue;
+      seenIds.add(item.id);
+      seenNamesLower.add(item.displayName.toLowerCase());
+      distractors.push({
+        itemId: item.id,
+        displayName: item.displayName,
+        isCorrect: false,
+        source: 'catalog',
+      });
+    }
+  }
+
+  function collectFromDistractorPool(): void {
+    const pool = loadDistractorPool();
+    const names = pool.names[category];
+    for (const name of shuffle(names, rng)) {
+      if (distractors.length >= targetDistractorCount) return;
+      const lower = name.toLowerCase();
+      if (seenNamesLower.has(lower)) continue;
+      seenNamesLower.add(lower);
+      distractors.push({
+        itemId: poolNameToId(name),
+        displayName: name,
+        isCorrect: false,
+        source: 'pool',
+      });
+    }
+  }
+
+  collectFromCatalog(getCategoryPool(catalog, category, playerGeneration, excludeSensitive));
+  if (distractors.length < targetDistractorCount) {
+    collectFromCatalog(getCategoryFallbackPool(catalog, category, excludeSensitive));
+  }
+  if (distractors.length < targetDistractorCount) {
+    collectFromDistractorPool();
+  }
+
+  const options: NameOption[] = [
+    {
+      itemId: correctItem.id,
+      displayName: correctItem.displayName,
+      isCorrect: true,
+      source: 'catalog',
+    },
+    ...distractors,
+  ];
+  return shuffle(options, rng);
+}
+
 export interface BuildNameOptionsArgs {
   catalog: LoadedCatalog;
   category: Category;

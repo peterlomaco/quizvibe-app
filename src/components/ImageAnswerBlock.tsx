@@ -1,21 +1,25 @@
-// Letter Grid + inline Final Selection-svar för bild-frågor i quiz.tsx.
+// Inline svar för bild-frågor i quiz.tsx. Dispatch:ar på variant.mode:
+//   • mode='prefix'      → Letter Grid + inline Final Selection (Standard/Minimal).
+//     Vertikal lista, varje rad = prefix-knapp + (vid val/reveal) namn-kort.
+//   • mode='full-names'  → vertikal lista av N fullnamn (Full assistance).
+//     Spelaren tappar direkt på rätt namn — ingen prefix-pussel.
 //
-// Layout: vertikal lista där varje rad = en prefix-knapp till vänster + (när
-// raden är vald eller vid reveal) det fullständiga namn-alternativet till
-// höger. Spelaren växlar mellan rader genom att tappa annan prefix-knapp.
-//
-// Fasbeteende:
-//   • question  → alla prefix-knappar tappbara. Vald prefix får blå border
-//     + namn-kort med blå border (pending).
-//   • awaiting  → låst. Spelarens confirmed prefix får gold border + gold-
-//     bordered namn-kort. Övriga prefix syns men är inaktiva.
-//   • reveal    → låst. Spelarens namn-kort får Correct (grön) eller Wrong
-//     (röd) badge i top-right. Om spelaren svarade fel ELLER tiden tog slut
-//     utan svar, renderas ÄVEN rätta prefix:ens namn-kort utfällt med grön
-//     border + Correct-badge så spelaren ser facit i samma vy.
+// Båda lägena delar reveal-vokabulär:
+//   • question  → spelarens val får blå border (pending)
+//   • awaiting  → låst. Spelarens val får gold border (confirmed)
+//   • reveal    → spelarens kort får Correct (grön) eller Wrong (röd) badge.
+//                 Vid fel/time-out renderas dessutom rätta namnet separat med
+//                 grön border + Correct-badge så facit syns inline.
 
 import { useEffect, useMemo, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  TextStyle,
+  View,
+  ViewStyle,
+} from 'react-native';
 import {
   Colors,
   FontSize,
@@ -24,8 +28,10 @@ import {
   Spacing,
 } from '@/src/theme';
 import {
+  ImageFullNamesVariant,
   ImageNameOption,
   ImagePrefixOption,
+  ImagePrefixVariant,
 } from '@/src/utils/quizImageQuestions';
 
 type Phase = 'intro' | 'countdown' | 'question' | 'awaiting' | 'reveal' | 'leaderboard';
@@ -36,22 +42,10 @@ type Phase = 'intro' | 'countdown' | 'question' | 'awaiting' | 'reveal' | 'leade
 // konstant så ImageAnswerBlock inte behöver kräna in quiz-screen-state.
 const QUIZ_ERROR_RED = '#FF3B30';
 
-// Minimal subset av en image-fråga som ImageAnswerBlock behöver — tillåter
-// både `ImageQuizQuestion` (auto-genererad från katalogen) och quiz.tsx:s
-// interna `ImageQuestion`-shape.
-interface ImageAnswerQuestion {
-  letterGrid: ImagePrefixOption[];
-  optionsByPrefix: Record<string, ImageNameOption[]>;
-  /** Antal letters per ord — filtrerar bort prefix som blivit kortare än
-   *  detta (t.ex. items med kort displayName efter non-letter-strippning). */
-  prefixLength: number;
-  /** Den korrekta prefixens nyckel — driver reveal-fasens green-Correct-
-   *  expansion när spelaren svarade fel eller tiden tog slut. */
-  correctPrefix: string;
-}
+type Variant = ImagePrefixVariant | ImageFullNamesVariant;
 
 interface Props {
-  question: ImageAnswerQuestion;
+  question: Variant;
   phase: Phase;
   pendingName: ImageNameOption | null;
   confirmedName: ImageNameOption | null;
@@ -63,15 +57,156 @@ interface Props {
   resetKey: string | number;
 }
 
-export function ImageAnswerBlock({
-  question,
+export function ImageAnswerBlock(props: Props) {
+  if (props.question.mode === 'full-names') {
+    return <FullNamesView {...props} variant={props.question} />;
+  }
+  return <PrefixView {...props} variant={props.question} />;
+}
+
+// =============================================================================
+// FULL-NAMES MODE (Full assistance)
+// =============================================================================
+
+function FullNamesView({
+  variant,
+  phase,
+  pendingName,
+  confirmedName,
+  isTimedOut,
+  onNameSelect,
+}: Omit<Props, 'question'> & { variant: ImageFullNamesVariant }) {
+  const isLocked = phase === 'awaiting' || phase === 'reveal';
+  const isRevealing = phase === 'reveal';
+  const wasPlayerCorrect = confirmedName?.isCorrect === true;
+  const correctName = useMemo(
+    () => variant.nameList.find((n) => n.isCorrect) ?? null,
+    [variant.nameList],
+  );
+
+  // Vid awaiting/reveal: pendingName fryses som confirmedName-ekvivalent.
+  // Pre-confirm: pendingName styr highlight. Post-confirm: confirmedName.
+  const selectedName = confirmedName ?? pendingName;
+
+  function handleNamePress(name: ImageNameOption): void {
+    if (confirmedName || isTimedOut || phase !== 'question') return;
+    onNameSelect(name);
+  }
+
+  // showSeparateCorrect = sant under reveal när spelaren INTE fick rätt
+  // (= fel svar ELLER time-out). Rätta namnet renderas då med green border
+  // + Correct-badge så facit syns inline. När spelaren fick rätt syns
+  // Correct-badgen redan på deras rad — ingen separat rendering behövs.
+  const showSeparateCorrect =
+    isRevealing && (!confirmedName || !wasPlayerCorrect);
+
+  return (
+    <View style={styles.card}>
+      <Text style={styles.stepHeading}>Choose the matching name</Text>
+      <Text style={styles.stepSubtitle}>
+        Tap the name that matches the picture
+      </Text>
+      <View style={styles.gridWrap}>
+        {variant.nameList.map((name) => {
+          const isPlayerRow =
+            !!selectedName && name.itemId === selectedName.itemId;
+          const isCorrectRevealRow =
+            showSeparateCorrect &&
+            !!correctName &&
+            name.itemId === correctName.itemId &&
+            !isPlayerRow;
+
+          // Border-styling:
+          //   • pending (question, player)        → blå border
+          //   • confirmed (awaiting/reveal, player) → gold border
+          //   • correctReveal (separate correct)  → grön border
+          //   • default                            → grå (cardElevated-style)
+          let cardStyle: ViewStyle;
+          let textStyle: TextStyle;
+          if (isPlayerRow && !isLocked) {
+            cardStyle = styles.nameCardPending;
+            textStyle = styles.fullNameTextActive;
+          } else if (isPlayerRow && isLocked) {
+            cardStyle = styles.nameCardConfirmed;
+            textStyle = styles.fullNameTextActive;
+          } else if (isCorrectRevealRow) {
+            cardStyle = styles.nameCardCorrect;
+            textStyle = styles.fullNameTextActive;
+          } else {
+            cardStyle = styles.fullNameCardDefault;
+            textStyle = styles.fullNameTextDefault;
+          }
+
+          // Badge — visas BARA i reveal-fas:
+          //   • Spelaren rätt:  green Correct-badge på spelarens rad
+          //   • Spelaren fel:   red Wrong-badge på spelarens rad +
+          //                     green Correct-badge på rätta raden
+          //   • Time-out:       green Correct-badge på rätta raden
+          let badgeType: 'correct' | 'wrong' | null = null;
+          if (isRevealing) {
+            if (isPlayerRow && confirmedName) {
+              badgeType = wasPlayerCorrect ? 'correct' : 'wrong';
+            } else if (isCorrectRevealRow) {
+              badgeType = 'correct';
+            }
+          }
+
+          // Dimma rader som varken är spelarens val eller rätta svaret.
+          const isDimmed =
+            isRevealing && !isPlayerRow && !isCorrectRevealRow;
+
+          return (
+            <Pressable
+              key={name.itemId}
+              onPress={() => handleNamePress(name)}
+              disabled={isLocked || isTimedOut}
+              style={({ pressed }) => [
+                styles.fullNameCard,
+                cardStyle,
+                pressed && !isLocked && styles.fullNameCardPressed,
+              ]}
+            >
+              <Text
+                style={[
+                  styles.fullNameText,
+                  textStyle,
+                  isDimmed && styles.fullNameTextDimmed,
+                ]}
+                numberOfLines={1}
+              >
+                {name.displayName}
+              </Text>
+              {badgeType === 'correct' && (
+                <Text style={[styles.revealBadge, styles.revealBadgeCorrect]}>
+                  Correct
+                </Text>
+              )}
+              {badgeType === 'wrong' && (
+                <Text style={[styles.revealBadge, styles.revealBadgeWrong]}>
+                  Wrong
+                </Text>
+              )}
+            </Pressable>
+          );
+        })}
+      </View>
+    </View>
+  );
+}
+
+// =============================================================================
+// PREFIX MODE (Standard / Minimal assistance)
+// =============================================================================
+
+function PrefixView({
+  variant,
   phase,
   pendingName,
   confirmedName,
   isTimedOut,
   onNameSelect,
   resetKey,
-}: Props) {
+}: Omit<Props, 'question'> & { variant: ImagePrefixVariant }) {
   const [selectedPrefix, setSelectedPrefix] = useState<string | null>(null);
 
   // Reset:a prefix-state vid fråge-byte. Annars hänger förra fråges prefix
@@ -93,13 +228,13 @@ export function ImageAnswerBlock({
   //
   // Resultatet sorteras alfabetiskt så spelaren kan lokalisera prefix snabbt.
   const sortedGrid = useMemo(() => {
-    const expectedLen = question.prefixLength;
-    const correctOpt = question.letterGrid.find((p) => p.isCorrect);
+    const expectedLen = variant.prefixLength;
+    const correctOpt = variant.letterGrid.find((p) => p.isCorrect);
     const correctWordCount = correctOpt
       ? correctOpt.prefix.split(' ').length
       : null;
 
-    const validOptions = question.letterGrid.filter((opt) => {
+    const validOptions = variant.letterGrid.filter((opt) => {
       const words = opt.prefix.split(' ');
       if (words[0].length < expectedLen) return false;
       if (correctWordCount !== null && words.length !== correctWordCount) {
@@ -124,7 +259,7 @@ export function ImageAnswerBlock({
     return Object.values(byFirstLetter).sort((a, b) =>
       a.prefix.localeCompare(b.prefix, 'sv'),
     );
-  }, [question]);
+  }, [variant]);
 
   // Plocka ETT namn per prefix:
   //   • För spelarens prefix: rätt namn om prefix matchar correctPrefix,
@@ -133,7 +268,7 @@ export function ImageAnswerBlock({
   //   • För correctPrefix vid reveal: alltid det rätta namnet (oavsett
   //     position i optionsByPrefix[correctPrefix]-arrayen).
   function pickNameForPrefix(prefix: string): ImageNameOption | null {
-    const opts = question.optionsByPrefix[prefix] ?? [];
+    const opts = variant.optionsByPrefix[prefix] ?? [];
     if (opts.length === 0) return null;
     const correct = opts.find((o) => o.isCorrect);
     if (correct) return correct;
@@ -174,7 +309,7 @@ export function ImageAnswerBlock({
   const showSeparateCorrect =
     isRevealing &&
     (!confirmedName || !wasPlayerCorrect) &&
-    question.correctPrefix !== playerExpandedPrefix;
+    variant.correctPrefix !== playerExpandedPrefix;
 
   return (
     <View style={styles.card}>
@@ -186,7 +321,7 @@ export function ImageAnswerBlock({
         {sortedGrid.map((opt) => {
           const isPlayerRow = opt.prefix === playerExpandedPrefix;
           const isCorrectRevealRow =
-            showSeparateCorrect && opt.prefix === question.correctPrefix;
+            showSeparateCorrect && opt.prefix === variant.correctPrefix;
 
           // Vilket namn-kort ska renderas på denna rad?
           //   • Spelarens rad: spelarens valda namn (pickNameForPrefix:s
@@ -204,8 +339,8 @@ export function ImageAnswerBlock({
           //   • pending (question, player) → blå border
           //   • confirmed (awaiting/reveal, player) → gold border
           //   • correctReveal (reveal, separate correct) → grön border
-          let nameCardStyle = styles.nameCardPending;
-          let nameTextStyle = styles.nameTextPending;
+          let nameCardStyle: ViewStyle = styles.nameCardPending;
+          let nameTextStyle: TextStyle = styles.nameTextPending;
           if (isPlayerRow && isLocked) {
             nameCardStyle = styles.nameCardConfirmed;
             nameTextStyle = styles.nameTextConfirmed;
@@ -422,10 +557,11 @@ const styles = StyleSheet.create({
   nameTextPending: {},
   nameTextConfirmed: {},
   nameTextCorrect: {},
-  // Border-cutting badge — sitter på namn-kortets övre kantlinje (top: -8)
+  // Border-cutting badge — sitter på namn-kortets övre kantlinje (top: -10)
   // istället för inuti kortet. Solid bg matchar borderColor så taggen
   // visuellt "är en del av" ramen. Speglar HOST/GUEST-taggen på PlayerRow
-  // + ✓/✗-badgen på quiz:s reveal-feedback-kort.
+  // + ✓/✗-badgen på quiz:s reveal-feedback-kort. Delas mellan prefix- och
+  // full-names-läget — samma stil, samma top-position.
   revealBadge: {
     position: 'absolute',
     top: -10,
@@ -444,5 +580,49 @@ const styles = StyleSheet.create({
   },
   revealBadgeWrong: {
     backgroundColor: QUIZ_ERROR_RED,
+  },
+  // ---------------------------------------------------------------------------
+  // Full-names-läge: vertikal lista där varje rad är ett fullnamn-kort.
+  // Layouten speglar prefix-lägets nameCard (samma height/padding/border/
+  // bg-vokabulär) så de två lägena känns visuellt besläktade. Skillnaden är
+  // att kortet nu fyller full bredd (ingen prefix-knapp bredvid) och är
+  // pressable självt — vid tap blir det selected.
+  // ---------------------------------------------------------------------------
+  fullNameCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: Radius.md,
+    borderWidth: 2,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.md,
+    position: 'relative',
+  },
+  // Default-läge (oselected): cardElevated-bg + primaryBorder (tunn). Speglar
+  // prefix-knappens default-styling så listraderna känns lika "tappbara".
+  fullNameCardDefault: {
+    backgroundColor: Colors.cardElevated,
+    borderColor: Colors.primaryBorder,
+    borderWidth: 1.5,
+  },
+  fullNameCardPressed: {
+    opacity: 0.85,
+  },
+  fullNameText: {
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.semibold,
+    flex: 1,
+  },
+  // Default-text på oselectade rader: textPrimary (vit) så de är läsbara
+  // men inte konkurrerar med spelarens valda rad (blå).
+  fullNameTextDefault: {
+    color: Colors.textPrimary,
+  },
+  // Active-text (pending/confirmed/correctReveal) = blå primary. Samma
+  // som prefix-lägets nameText så spelarens val ser ut likadant i båda lägena.
+  fullNameTextActive: {
+    color: Colors.primary,
+  },
+  fullNameTextDimmed: {
+    color: Colors.textDisabled,
   },
 });
