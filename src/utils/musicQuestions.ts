@@ -9,6 +9,8 @@ export interface MusicQuestion {
   id: string;
   displayName: string;
   correctYear: number;
+  contentSubject: 'song';
+  questionText: string;
   youtubeClips: YoutubeClip[];
 }
 
@@ -17,6 +19,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "id": "dancing-queen",
     "displayName": "Dancing Queen — ABBA",
     "correctYear": 1976,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
     "youtubeClips": [
       {
         "videoId": "TJLAJWSEd6U",
@@ -32,6 +36,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "id": "thriller",
     "displayName": "Thriller — Michael Jackson",
     "correctYear": 1982,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
     "youtubeClips": [
       {
         "videoId": "fK6tf6opIg0",
@@ -47,6 +53,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "id": "smells-like-teen-spirit",
     "displayName": "Smells Like Teen Spirit — Nirvana",
     "correctYear": 1991,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
     "youtubeClips": [
       {
         "videoId": "V7f03mfxN4I",
@@ -62,6 +70,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "id": "baby-one-more-time",
     "displayName": "...Baby One More Time — Britney Spears",
     "correctYear": 1998,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
     "youtubeClips": [
       {
         "videoId": "1dfhNimhwNM",
@@ -77,6 +87,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "id": "shape-of-you",
     "displayName": "Shape of You — Ed Sheeran",
     "correctYear": 2017,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
     "youtubeClips": [
       {
         "videoId": "JGwWNGJdvx8",

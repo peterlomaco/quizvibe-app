@@ -112,23 +112,21 @@ interface ImageQuestion {
 
 type QuizQuestion = TimelineQuestion | ImageQuestion;
 
-// Spelet ställer endast Music-frågor (YouTube). Själva
-// låten spelas upp via media-pipen — frågetexten är därmed alltid samma
-// generic "Which year was this song released?". `hint` används bara internt
-// i reveal-vyn ("Disco era") så den behålls för smak.
-const MUSIC_QUESTION_TEXT = 'Which year was this song released?';
-
 // Frågorna kommer från backend-curerad katalog (backend/content/catalog/songs-*.yaml).
 // Regenerera src/utils/musicQuestions.ts efter katalog-ändringar med:
 //   cd backend && npm run export-music-questions
 // Items utan youtubeClips filtreras bort av export-scriptet.
+// `questionText` bakas in i exporten via backend-schemats FIXED_QUESTION_TEXT-
+// map (matrisens "Fixed Question text"-kolumn) så frågetexten är härledd ur
+// `contentSubject`, inte hårdkodad här. `hint` används bara internt
+// i reveal-vyn ("Disco era") så den behålls för smak.
 const SEED_QUESTIONS: TimelineQuestion[] = MUSIC_QUESTIONS.map((q, i) => ({
   type: 'timeline',
   id: q.id,
   questionNumber: i + 1,
   totalQuestions: MUSIC_QUESTIONS.length,
   category: 'Music',
-  question: MUSIC_QUESTION_TEXT,
+  question: q.questionText,
   correctYear: q.correctYear,
   hint: q.displayName,
   youtubeClips: q.youtubeClips,
@@ -3299,20 +3297,24 @@ export default function QuizScreen() {
                 )}
               </View>
               <View style={styles.questionTextWrap}>
-                {/* Music-frågor split:as i två rader: stor headline "Which
-                    year" + bevarad sub-rad "was this song released?".
-                    Image-frågor med "What is the name of this X?"-mönster
-                    split:as i tre rader: "What is" / "the Name" (stor
-                    headline) / "of this X?" — visuell fokus på namn-konceptet.
-                    Övriga kategorier/format renderas som enda rad. */}
+                {/* Frågetexten kommer från backend-schemats FIXED_QUESTION_TEXT
+                    (matrisens "Fixed Question text"-kolumn) och split:as här
+                    för visuell fokus på huvudbegreppet:
+                    • "Which Year ..." (song/movie/sport-event) → 2 rader,
+                      "Which Year" som stor headline + resten som sub-rad.
+                    • "What is the Name ..." (artist/actor/character/athlete/
+                      cultural-person/celebrity/building/place) → 3 rader,
+                      "What is" / "the Name" headline / "of this X?".
+                    • Övriga ("Which city/country is this?") → enda rad. */}
                 {(() => {
-                  if (question.category === 'Music') {
+                  const yearMatch = question.question.match(
+                    /^Which Year\s+(.+)$/,
+                  );
+                  if (yearMatch) {
                     return (
                       <>
-                        <Text style={styles.questionTextHeadline}>Which year</Text>
-                        <Text style={styles.questionText}>
-                          was this song released?
-                        </Text>
+                        <Text style={styles.questionTextHeadline}>Which Year</Text>
+                        <Text style={styles.questionText}>{yearMatch[1]}</Text>
                       </>
                     );
                   }

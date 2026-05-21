@@ -7,6 +7,8 @@
 #              85 = välkänt över decennier, 75-80 = era-specifikt.
 audience: ["elder"]
 category: songs
+contentForm: youtube
+contentSubject: song
 items:
   - id: louis-armstrong-body-and-soul
     displayName: "Body and Soul — Louis Armstrong"

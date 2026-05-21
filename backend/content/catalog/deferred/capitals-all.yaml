@@ -3,6 +3,8 @@
 # eftersom grundläggning/etablering ger otydliga årtal för dessa städer.
 audience: ["all"]
 category: capitals
+contentForm: image
+contentSubject: city
 items:
   - id: stockholm
     displayName: "Stockholm"

@@ -1,6 +1,8 @@
 # Huvudstäder särskilt kända för yngre generationer (Gen Z + Gen Alpha).
 audience: ["gen-z", "gen-alpha"]
 category: capitals
+contentForm: image
+contentSubject: city
 items:
   - id: seoul
     displayName: "Seoul"

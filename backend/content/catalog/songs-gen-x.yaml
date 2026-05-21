@@ -6,6 +6,8 @@
 # har körts och en specifik videoId + start/endSec är vald.
 audience: ["gen-x", "elder"]
 category: songs
+contentForm: youtube
+contentSubject: song
 items:
   - id: rolling-stones-satisfaction
     displayName: "(I Can't Get No) Satisfaction — The Rolling Stones"

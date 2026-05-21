@@ -2,6 +2,8 @@
 # correctYear: solister = födelseår; band = formation-år.
 audience: ["elder"]
 category: artists
+contentForm: image
+contentSubject: artist
 items:
   - id: elvis-presley
     displayName: "Elvis Presley"

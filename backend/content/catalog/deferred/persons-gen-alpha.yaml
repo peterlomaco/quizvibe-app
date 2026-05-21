@@ -5,6 +5,8 @@
 # Återinför ev. via skaparen (t.ex. Miyamoto → Mario, Idina Menzel → Elsa).
 audience: ["gen-alpha"]
 category: persons
+contentForm: image
+contentSubject: celebrity
 items:
   - id: mrbeast
     displayName: "MrBeast"

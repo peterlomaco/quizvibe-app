@@ -178,6 +178,8 @@ describe('schema rejection', () => {
     const result = ContentFileSchema.safeParse({
       audience: ['millennials'],
       category: 'persons',
+      contentForm: 'image',
+      contentSubject: 'cultural-person',
       items: [
         {
           id: 'no-year',
@@ -196,6 +198,8 @@ describe('schema rejection', () => {
     const result = ContentFileSchema.safeParse({
       audience: ['all'],
       category: 'capitals',
+      contentForm: 'image',
+      contentSubject: 'city',
       items: [
         {
           id: 'somewhere',
@@ -271,6 +275,8 @@ describe('schema rejection', () => {
     const result = ContentFileSchema.safeParse({
       audience: ['millennials'],
       category: 'persons',
+      contentForm: 'image',
+      contentSubject: 'cultural-person',
       items: [
         {
           id: 'dup',
@@ -289,6 +295,65 @@ describe('schema rejection', () => {
       ],
     });
     expect(result.success).toBe(false);
+  });
+
+  it('rejects file where contentSubject does not belong to contentForm', () => {
+    // 'song' är ett youtube-subject — kombineras det med form='image' ska
+    // refinen från matrisen avvisa filen.
+    const result = ContentFileSchema.safeParse({
+      audience: ['all'],
+      category: 'songs',
+      contentForm: 'image',
+      contentSubject: 'song',
+      items: [
+        {
+          id: 'test',
+          displayName: 'Test',
+          probability: 50,
+          wikimediaSearchHints: ['x'],
+          answerMethods: ['name-letters'],
+        },
+      ],
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('accepts all matrix-valid form/subject pairs', () => {
+    // Spegla SUBJECTS_BY_FORM från schema.ts så testet failar om någon
+    // ny subject läggs till utan att matrisen uppdateras parallellt.
+    const validPairs: Array<{ form: 'youtube' | 'image'; subject: string }> = [
+      { form: 'youtube', subject: 'song' },
+      { form: 'youtube', subject: 'movie' },
+      { form: 'youtube', subject: 'sport-event' },
+      { form: 'image', subject: 'artist' },
+      { form: 'image', subject: 'actor' },
+      { form: 'image', subject: 'character' },
+      { form: 'image', subject: 'athlete' },
+      { form: 'image', subject: 'cultural-person' },
+      { form: 'image', subject: 'celebrity' },
+      { form: 'image', subject: 'city' },
+      { form: 'image', subject: 'country' },
+      { form: 'image', subject: 'building' },
+      { form: 'image', subject: 'place' },
+    ];
+    for (const { form, subject } of validPairs) {
+      const result = ContentFileSchema.safeParse({
+        audience: ['all'],
+        category: 'persons',
+        contentForm: form,
+        contentSubject: subject,
+        items: [
+          {
+            id: `test-${subject}`,
+            displayName: 'Test',
+            probability: 50,
+            wikimediaSearchHints: ['x'],
+            answerMethods: ['name-letters'],
+          },
+        ],
+      });
+      expect(result.success, `${form}/${subject} should be valid`).toBe(true);
+    }
   });
 });
 

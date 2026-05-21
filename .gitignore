@@ -47,3 +47,9 @@ app-example
 # generated native folders
 /ios
 /android
+
+# Levande Excel-källor — produktions-mallar och curation-worklists som
+# Peter redigerar i Excel utanför repo. Repos schema (content/schema.ts +
+# FIXED_QUESTION_TEXT) speglar matrisens innehåll så vi inte beror på filen.
+*.xlsx
+~$*.xlsx

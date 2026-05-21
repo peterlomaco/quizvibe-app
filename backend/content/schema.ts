@@ -22,6 +22,71 @@ export type Audience = z.infer<typeof AudienceSchema>;
 export const CategorySchema = z.enum(['persons', 'capitals', 'artists', 'songs']);
 export type Category = z.infer<typeof CategorySchema>;
 
+// Två-axel-modell från matrisen i `Mediekällor, kategorier och år.xlsx`
+// (flik 1 "Mediekällor"). Skiljer media-form (YouTube vs Image) från
+// innehålls-subject (13 buckets). Paren är fasta — varje form mappar mot
+// en delmängd av subjects (se SUBJECTS_BY_FORM nedan). Driver curation-
+// balansen: alla 13 subject-buckets ska fyllas både i base-katalogen och
+// i Host packages för jämn fördelning av material-typer.
+export const ContentFormSchema = z.enum(['youtube', 'image']);
+export type ContentForm = z.infer<typeof ContentFormSchema>;
+
+export const ContentSubjectSchema = z.enum([
+  // form='youtube' → svarsläge "Year"
+  'song',
+  'movie',
+  'sport-event',
+  // form='image' → svarsläge "Text/Name"
+  'artist',
+  'actor',
+  'character',
+  'athlete',
+  'cultural-person',
+  'celebrity',
+  'city',
+  'country',
+  'building',
+  'place',
+]);
+export type ContentSubject = z.infer<typeof ContentSubjectSchema>;
+
+// Vilka subjects som hör till respektive media-form. Speglar matrisens
+// "Yes"-celler 1:1.
+export const SUBJECTS_BY_FORM: Record<ContentForm, readonly ContentSubject[]> = {
+  youtube: ['song', 'movie', 'sport-event'],
+  image: [
+    'artist',
+    'actor',
+    'character',
+    'athlete',
+    'cultural-person',
+    'celebrity',
+    'city',
+    'country',
+    'building',
+    'place',
+  ],
+};
+
+// Fasta frågetexter per subject — från matrisens "Fixed Question text"-
+// kolumn (R8-R32 i flik "Mediekällor"). Klienten väljer text via lookup
+// på item:s contentSubject istället för hårdkodad sträng i quiz.tsx.
+export const FIXED_QUESTION_TEXT: Record<ContentSubject, string> = {
+  song: 'Which Year was this song released?',
+  movie: 'Which Year was this Movie launched?',
+  'sport-event': 'Which Year did this happen?',
+  artist: 'What is the Name of this Artist?',
+  actor: 'What is the Name of this actor?',
+  character: 'What is the Name of this character?',
+  athlete: 'What is the Name of this athlete?',
+  'cultural-person': 'What is the Name of this person?',
+  celebrity: 'What is the Name of this person?',
+  city: 'Which city is this?',
+  country: 'Which country is this?',
+  building: 'What is the Name of this building?',
+  place: 'What is the Name of this place?',
+};
+
 export const SensitivitySchema = z.enum(['standard', 'sensitive']);
 export type Sensitivity = z.infer<typeof SensitivitySchema>;
 
@@ -174,8 +239,23 @@ export const ContentFileSchema = z
   .object({
     audience: z.array(AudienceSchema).min(1),
     category: CategorySchema,
+    // contentForm + contentSubject = två-axel-modellen från matrisen.
+    // Fil-nivå eftersom V1-katalogen är homogen per fil (alla items i
+    // songs-*.yaml är form=youtube subject=song osv.). Om vi senare vill
+    // mixa subjects i samma fil (t.ex. cultural-person + celebrity i
+    // persons-*.yaml) flyttar vi fälten till item-nivå.
+    contentForm: ContentFormSchema,
+    contentSubject: ContentSubjectSchema,
     items: z.array(ContentItemSchema).min(1),
   })
+  .refine(
+    (data) => SUBJECTS_BY_FORM[data.contentForm].includes(data.contentSubject),
+    {
+      message:
+        'contentSubject must belong to contentForm per matrix (youtube→{song,movie,sport-event}; image→all name-subjects)',
+      path: ['contentSubject'],
+    },
+  )
   .refine(
     (data) => {
       const ids = data.items.map((i) => i.id);

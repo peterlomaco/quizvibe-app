@@ -5,6 +5,8 @@
 # vill plocka bild från Wikimedia (artistporträtt, albumcover) som fallback.
 audience: ["all"]
 category: songs
+contentForm: youtube
+contentSubject: song
 items:
   - id: dancing-queen
     displayName: "Dancing Queen — ABBA"

@@ -8,7 +8,11 @@
 // manuellt och klipper in `youtubeClips`-entries i katalog-YAML:erna.
 
 import { loadCatalog, findItemsById } from '../content/registry';
-import { ContentItem } from '../content/schema';
+import {
+  ContentItem,
+  ContentSubject,
+  FIXED_QUESTION_TEXT,
+} from '../content/schema';
 import {
   searchVideos,
   getVideoDetails,
@@ -65,11 +69,22 @@ function formatDuration(sec: number): string {
   return `${m}:${String(s).padStart(2, '0')}`;
 }
 
-function printSuggestion(label: string, rows: SuggestionRow[]): void {
+function printSuggestion(
+  label: string,
+  rows: SuggestionRow[],
+  context?: { subject: ContentSubject },
+): void {
   console.log(
     '\n──────────────────────────────────────────────────────────────',
   );
   console.log(`Query: ${label}`);
+  if (context) {
+    // Påminn curatorn vilken frågetext klippet ska besvara — gör det
+    // lättare att avgöra om en kandidat är semantiskt rätt (en song-
+    // release vs en konsertversion vs cover osv.).
+    console.log(`Subject: ${context.subject}`);
+    console.log(`Question text: "${FIXED_QUESTION_TEXT[context.subject]}"`);
+  }
   if (rows.length === 0) {
     console.log('  (no results)');
     return;
@@ -159,7 +174,7 @@ async function main(): Promise<void> {
   }
 
   const catalog = loadCatalog();
-  const itemsToProcess: ContentItem[] = [];
+  const itemsToProcess: Array<{ item: ContentItem; subject: ContentSubject }> = [];
   const seenIds = new Set<string>();
 
   if (all) {
@@ -167,7 +182,7 @@ async function main(): Promise<void> {
       for (const item of file.items) {
         if (seenIds.has(item.id)) continue;
         seenIds.add(item.id);
-        itemsToProcess.push(item);
+        itemsToProcess.push({ item, subject: file.contentSubject });
       }
     }
   } else {
@@ -179,7 +194,12 @@ async function main(): Promise<void> {
       }
       if (!seenIds.has(id)) {
         seenIds.add(id);
-        itemsToProcess.push(matches[0].item);
+        const file = catalog.files.get(matches[0].filename);
+        if (!file) {
+          console.error(`Internal: catalog missing file for ${id}`);
+          process.exit(1);
+        }
+        itemsToProcess.push({ item: matches[0].item, subject: file.contentSubject });
       }
     }
   }
@@ -189,10 +209,10 @@ async function main(): Promise<void> {
       `(limit ${limit} per query, ~${itemsToProcess.length * 101} quota units)`,
   );
 
-  for (const item of itemsToProcess) {
+  for (const { item, subject } of itemsToProcess) {
     const q = `${item.displayName}`;
     const rows = await suggestForQuery(q, limit);
-    printSuggestion(`${item.id} → "${q}"`, rows);
+    printSuggestion(`${item.id} → "${q}"`, rows, { subject });
     // Throttla något så vi inte får rate-limit vid --all
     await sleep(150);
   }

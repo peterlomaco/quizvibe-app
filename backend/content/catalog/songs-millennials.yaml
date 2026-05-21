@@ -6,6 +6,8 @@
 # har körts och en specifik videoId + start/endSec är vald.
 audience: ["millennials", "gen-x"]
 category: songs
+contentForm: youtube
+contentSubject: song
 items:
   # 1981
   - id: soft-cell-tainted-love

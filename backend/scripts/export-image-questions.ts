@@ -19,7 +19,12 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { loadCatalog, findItemsById } from '../content/registry';
-import { Audience, Category } from '../content/schema';
+import {
+  Audience,
+  Category,
+  ContentSubject,
+  FIXED_QUESTION_TEXT,
+} from '../content/schema';
 import {
   buildLetterGrid,
   buildNameOptions,
@@ -57,6 +62,8 @@ interface ExportedQuestion {
   id: string;
   displayName: string;
   category: Category;
+  /** Subject från katalogens contentSubject — driver frågetext-lookup. */
+  contentSubject: ContentSubject;
   /** Året som "rätt svar" — för fallback-era-filtrering när peak saknas
    *  och som svar i timeline-frågor. För artister = födelseår; för
    *  band = formation-år; för musik-spår = utgivningsår. */
@@ -72,19 +79,6 @@ interface ExportedQuestion {
   audiences: Audience[];
   questionText: string;
   variants: Record<VariantKey, ExportedVariant>;
-}
-
-function questionTextFor(category: Category): string {
-  switch (category) {
-    case 'persons':
-      return 'What is the name of this person?';
-    case 'capitals':
-      return 'What is the name of this place?';
-    case 'artists':
-      return 'What is the name of this artist?';
-    case 'songs':
-      return 'What is the name of this song?';
-  }
 }
 
 function listLocalImageIds(): string[] {
@@ -137,17 +131,19 @@ function buildExportedQuestion(
   }
 
   // Items kan finnas i flera filer (t.ex. Cristiano i både gen-z och gen-alpha).
-  // Samla unionen av audiences från alla träffar och plocka category från
-  // första träffen (alltid samma per item-id om duplicerad).
+  // Samla unionen av audiences från alla träffar och plocka category +
+  // contentSubject från första träffen (alltid samma per item-id om duplicerad).
   const audiencesSet = new Set<Audience>();
   let category: Category | null = null;
+  let contentSubject: ContentSubject | null = null;
   for (const match of matches) {
     const file = catalog.files.get(match.filename);
     if (!file) continue;
     if (!category) category = file.category;
+    if (!contentSubject) contentSubject = file.contentSubject;
     for (const a of file.audience) audiencesSet.add(a);
   }
-  if (!category) return null;
+  if (!category || !contentSubject) return null;
 
   const item = matches[0].item;
 
@@ -174,6 +170,7 @@ function buildExportedQuestion(
     id: item.id,
     displayName: item.displayName,
     category,
+    contentSubject,
     // Garanterat definierat efter skip-check ovan.
     correctYear: item.correctYear!,
     // peak-fälten är optional i schema — utelämna helt ur exporten när
@@ -181,7 +178,7 @@ function buildExportedQuestion(
     ...(item.peakFrom !== undefined ? { peakFrom: item.peakFrom } : {}),
     ...(item.peakTo !== undefined ? { peakTo: item.peakTo } : {}),
     audiences: Array.from(audiencesSet),
-    questionText: questionTextFor(category),
+    questionText: FIXED_QUESTION_TEXT[contentSubject],
     variants,
   };
 }
@@ -223,10 +220,23 @@ export interface ImageQuestionVariant {
 
 export type ImageVariantKey = 'prefix-1' | 'prefix-2' | 'prefix-3';
 
+export type ImageContentSubject =
+  | 'artist'
+  | 'actor'
+  | 'character'
+  | 'athlete'
+  | 'cultural-person'
+  | 'celebrity'
+  | 'city'
+  | 'country'
+  | 'building'
+  | 'place';
+
 export interface ImageQuizQuestion {
   id: string;
   displayName: string;
   category: 'persons' | 'capitals' | 'artists' | 'songs';
+  contentSubject: ImageContentSubject;
   /** Året som "rätt svar" — driver fallback-era-filtrering när peak
    *  saknas och visas i timeline-frågors reveal. För artister = födelseår;
    *  band = formation-år; musik-spår = utgivningsår. */

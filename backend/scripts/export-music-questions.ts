@@ -8,6 +8,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { loadCatalog } from '../content/registry';
+import { FIXED_QUESTION_TEXT } from '../content/schema';
 
 interface ExportedYoutubeClip {
   videoId: string;
@@ -22,6 +23,11 @@ interface ExportedMusicQuestion {
   id: string;
   displayName: string;
   correctYear: number;
+  /** Subject från katalogens contentSubject — driver frågetext-lookup på klienten. */
+  contentSubject: 'song';
+  /** Frågetext från FIXED_QUESTION_TEXT[contentSubject]. Inline:as i exporten
+   *  så klienten slipper rebakad lookup-tabell. */
+  questionText: string;
   youtubeClips: ExportedYoutubeClip[];
 }
 
@@ -37,6 +43,8 @@ export interface MusicQuestion {
   id: string;
   displayName: string;
   correctYear: number;
+  contentSubject: 'song';
+  questionText: string;
   youtubeClips: YoutubeClip[];
 }
 
@@ -64,6 +72,8 @@ async function main(): Promise<void> {
         id: item.id,
         displayName: item.displayName,
         correctYear: item.correctYear,
+        contentSubject: 'song',
+        questionText: FIXED_QUESTION_TEXT.song,
         youtubeClips: item.youtubeClips.map((c) => ({
           videoId: c.videoId,
           startSec: c.startSec,

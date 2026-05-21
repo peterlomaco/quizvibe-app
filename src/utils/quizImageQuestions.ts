@@ -34,10 +34,23 @@ export interface ImageQuestionVariant {
 
 export type ImageVariantKey = 'prefix-1' | 'prefix-2' | 'prefix-3';
 
+export type ImageContentSubject =
+  | 'artist'
+  | 'actor'
+  | 'character'
+  | 'athlete'
+  | 'cultural-person'
+  | 'celebrity'
+  | 'city'
+  | 'country'
+  | 'building'
+  | 'place';
+
 export interface ImageQuizQuestion {
   id: string;
   displayName: string;
   category: 'persons' | 'capitals' | 'artists' | 'songs';
+  contentSubject: ImageContentSubject;
   /** Året som "rätt svar" — driver fallback-era-filtrering när peak
    *  saknas och visas i timeline-frågors reveal. För artister = födelseår;
    *  band = formation-år; musik-spår = utgivningsår. */
@@ -57,19 +70,20 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "id": "avicii",
     "displayName": "Avicii",
     "category": "artists",
+    "contentSubject": "artist",
     "correctYear": 1989,
     "peakFrom": 2011,
     "peakTo": 2018,
     "audiences": [
       "millennials"
     ],
-    "questionText": "What is the name of this artist?",
+    "questionText": "What is the Name of this Artist?",
     "variants": {
       "prefix-1": {
         "prefixLength": 1,
         "letterGrid": [
           {
-            "prefix": "D",
+            "prefix": "R",
             "isCorrect": false
           },
           {
@@ -77,19 +91,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
             "isCorrect": false
           },
           {
-            "prefix": "A",
-            "isCorrect": true
+            "prefix": "M J",
+            "isCorrect": false
           },
           {
             "prefix": "B E",
-            "isCorrect": false
-          },
-          {
-            "prefix": "E P",
-            "isCorrect": false
-          },
-          {
-            "prefix": "T B",
             "isCorrect": false
           },
           {
@@ -97,12 +103,20 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
             "isCorrect": false
           },
           {
-            "prefix": "M J",
+            "prefix": "E P",
             "isCorrect": false
           },
           {
-            "prefix": "R",
+            "prefix": "D",
             "isCorrect": false
+          },
+          {
+            "prefix": "T B",
+            "isCorrect": false
+          },
+          {
+            "prefix": "A",
+            "isCorrect": true
           },
           {
             "prefix": "T S",
@@ -110,6 +124,66 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
           }
         ],
         "optionsByPrefix": {
+          "R": [
+            {
+              "itemId": "rihanna",
+              "displayName": "Rihanna",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "E": [
+            {
+              "itemId": "eminem",
+              "displayName": "Eminem",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "M J": [
+            {
+              "itemId": "michael-jackson",
+              "displayName": "Michael Jackson",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "B E": [
+            {
+              "itemId": "billie-eilish",
+              "displayName": "Billie Eilish",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "M": [
+            {
+              "itemId": "pool:marshmello",
+              "displayName": "Marshmello",
+              "isCorrect": false,
+              "source": "pool"
+            },
+            {
+              "itemId": "metallica",
+              "displayName": "Metallica",
+              "isCorrect": false,
+              "source": "catalog"
+            },
+            {
+              "itemId": "madonna",
+              "displayName": "Madonna",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "E P": [
+            {
+              "itemId": "elvis-presley",
+              "displayName": "Elvis Presley",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
           "D": [
             {
               "itemId": "drake",
@@ -124,7 +198,165 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
               "source": "pool"
             }
           ],
-          "E": [
+          "T B": [
+            {
+              "itemId": "the-beatles",
+              "displayName": "The Beatles",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "A": [
+            {
+              "itemId": "pool:ac-dc",
+              "displayName": "AC/DC",
+              "isCorrect": false,
+              "source": "pool"
+            },
+            {
+              "itemId": "pool:adele",
+              "displayName": "Adele",
+              "isCorrect": false,
+              "source": "pool"
+            },
+            {
+              "itemId": "avicii",
+              "displayName": "Avicii",
+              "isCorrect": true,
+              "source": "catalog"
+            },
+            {
+              "itemId": "pool:aerosmith",
+              "displayName": "Aerosmith",
+              "isCorrect": false,
+              "source": "pool"
+            },
+            {
+              "itemId": "abba",
+              "displayName": "ABBA",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "T S": [
+            {
+              "itemId": "taylor-swift",
+              "displayName": "Taylor Swift",
+              "isCorrect": false,
+              "source": "catalog"
+            },
+            {
+              "itemId": "pool:the-strokes",
+              "displayName": "The Strokes",
+              "isCorrect": false,
+              "source": "pool"
+            }
+          ]
+        },
+        "correctPrefix": "A"
+      },
+      "prefix-2": {
+        "prefixLength": 2,
+        "letterGrid": [
+          {
+            "prefix": "BI EI",
+            "isCorrect": false
+          },
+          {
+            "prefix": "TA SW",
+            "isCorrect": false
+          },
+          {
+            "prefix": "AV",
+            "isCorrect": true
+          },
+          {
+            "prefix": "DR",
+            "isCorrect": false
+          },
+          {
+            "prefix": "ME",
+            "isCorrect": false
+          },
+          {
+            "prefix": "RI",
+            "isCorrect": false
+          },
+          {
+            "prefix": "AB",
+            "isCorrect": false
+          },
+          {
+            "prefix": "EM",
+            "isCorrect": false
+          },
+          {
+            "prefix": "MI JA",
+            "isCorrect": false
+          },
+          {
+            "prefix": "TH BE",
+            "isCorrect": false
+          }
+        ],
+        "optionsByPrefix": {
+          "BI EI": [
+            {
+              "itemId": "billie-eilish",
+              "displayName": "Billie Eilish",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "TA SW": [
+            {
+              "itemId": "taylor-swift",
+              "displayName": "Taylor Swift",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "AV": [
+            {
+              "itemId": "avicii",
+              "displayName": "Avicii",
+              "isCorrect": true,
+              "source": "catalog"
+            }
+          ],
+          "DR": [
+            {
+              "itemId": "drake",
+              "displayName": "Drake",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "ME": [
+            {
+              "itemId": "metallica",
+              "displayName": "Metallica",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "RI": [
+            {
+              "itemId": "rihanna",
+              "displayName": "Rihanna",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "AB": [
+            {
+              "itemId": "abba",
+              "displayName": "ABBA",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "EM": [
             {
               "itemId": "eminem",
               "displayName": "Eminem",
@@ -132,12 +364,235 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
               "source": "catalog"
             }
           ],
-          "A": [
+          "MI JA": [
+            {
+              "itemId": "michael-jackson",
+              "displayName": "Michael Jackson",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "TH BE": [
+            {
+              "itemId": "the-beatles",
+              "displayName": "The Beatles",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ]
+        },
+        "correctPrefix": "AV"
+      },
+      "prefix-3": {
+        "prefixLength": 3,
+        "letterGrid": [
+          {
+            "prefix": "BIL EIL",
+            "isCorrect": false
+          },
+          {
+            "prefix": "RIH",
+            "isCorrect": false
+          },
+          {
+            "prefix": "MET",
+            "isCorrect": false
+          },
+          {
+            "prefix": "MAD",
+            "isCorrect": false
+          },
+          {
+            "prefix": "EMI",
+            "isCorrect": false
+          },
+          {
+            "prefix": "MIC JAC",
+            "isCorrect": false
+          },
+          {
+            "prefix": "TAY SWI",
+            "isCorrect": false
+          },
+          {
+            "prefix": "THE BEA",
+            "isCorrect": false
+          },
+          {
+            "prefix": "AVI",
+            "isCorrect": true
+          },
+          {
+            "prefix": "ELV PRE",
+            "isCorrect": false
+          }
+        ],
+        "optionsByPrefix": {
+          "BIL EIL": [
+            {
+              "itemId": "billie-eilish",
+              "displayName": "Billie Eilish",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "RIH": [
+            {
+              "itemId": "rihanna",
+              "displayName": "Rihanna",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "MET": [
+            {
+              "itemId": "metallica",
+              "displayName": "Metallica",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "MAD": [
+            {
+              "itemId": "madonna",
+              "displayName": "Madonna",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "EMI": [
+            {
+              "itemId": "eminem",
+              "displayName": "Eminem",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "MIC JAC": [
+            {
+              "itemId": "michael-jackson",
+              "displayName": "Michael Jackson",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "TAY SWI": [
+            {
+              "itemId": "taylor-swift",
+              "displayName": "Taylor Swift",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "THE BEA": [
+            {
+              "itemId": "the-beatles",
+              "displayName": "The Beatles",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "AVI": [
             {
               "itemId": "avicii",
               "displayName": "Avicii",
               "isCorrect": true,
               "source": "catalog"
+            }
+          ],
+          "ELV PRE": [
+            {
+              "itemId": "elvis-presley",
+              "displayName": "Elvis Presley",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ]
+        },
+        "correctPrefix": "AVI"
+      }
+    }
+  },
+  {
+    "id": "elvis-presley",
+    "displayName": "Elvis Presley",
+    "category": "artists",
+    "contentSubject": "artist",
+    "correctYear": 1935,
+    "peakFrom": 1956,
+    "peakTo": 1977,
+    "audiences": [
+      "elder"
+    ],
+    "questionText": "What is the Name of this Artist?",
+    "variants": {
+      "prefix-1": {
+        "prefixLength": 1,
+        "letterGrid": [
+          {
+            "prefix": "B E",
+            "isCorrect": false
+          },
+          {
+            "prefix": "E P",
+            "isCorrect": true
+          },
+          {
+            "prefix": "A",
+            "isCorrect": false
+          },
+          {
+            "prefix": "M",
+            "isCorrect": false
+          },
+          {
+            "prefix": "E",
+            "isCorrect": false
+          },
+          {
+            "prefix": "M J",
+            "isCorrect": false
+          },
+          {
+            "prefix": "T S",
+            "isCorrect": false
+          },
+          {
+            "prefix": "R",
+            "isCorrect": false
+          },
+          {
+            "prefix": "T B",
+            "isCorrect": false
+          },
+          {
+            "prefix": "D",
+            "isCorrect": false
+          }
+        ],
+        "optionsByPrefix": {
+          "B E": [
+            {
+              "itemId": "billie-eilish",
+              "displayName": "Billie Eilish",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "E P": [
+            {
+              "itemId": "elvis-presley",
+              "displayName": "Elvis Presley",
+              "isCorrect": true,
+              "source": "catalog"
+            }
+          ],
+          "A": [
+            {
+              "itemId": "pool:adele",
+              "displayName": "Adele",
+              "isCorrect": false,
+              "source": "pool"
             },
             {
               "itemId": "abba",
@@ -158,24 +613,66 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
               "source": "pool"
             },
             {
-              "itemId": "pool:adele",
-              "displayName": "Adele",
-              "isCorrect": false,
-              "source": "pool"
-            }
-          ],
-          "B E": [
-            {
-              "itemId": "billie-eilish",
-              "displayName": "Billie Eilish",
+              "itemId": "avicii",
+              "displayName": "Avicii",
               "isCorrect": false,
               "source": "catalog"
             }
           ],
-          "E P": [
+          "M": [
             {
-              "itemId": "elvis-presley",
-              "displayName": "Elvis Presley",
+              "itemId": "pool:marshmello",
+              "displayName": "Marshmello",
+              "isCorrect": false,
+              "source": "pool"
+            },
+            {
+              "itemId": "metallica",
+              "displayName": "Metallica",
+              "isCorrect": false,
+              "source": "catalog"
+            },
+            {
+              "itemId": "madonna",
+              "displayName": "Madonna",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "E": [
+            {
+              "itemId": "eminem",
+              "displayName": "Eminem",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "M J": [
+            {
+              "itemId": "michael-jackson",
+              "displayName": "Michael Jackson",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "T S": [
+            {
+              "itemId": "taylor-swift",
+              "displayName": "Taylor Swift",
+              "isCorrect": false,
+              "source": "catalog"
+            },
+            {
+              "itemId": "pool:the-strokes",
+              "displayName": "The Strokes",
+              "isCorrect": false,
+              "source": "pool"
+            }
+          ],
+          "R": [
+            {
+              "itemId": "rihanna",
+              "displayName": "Rihanna",
               "isCorrect": false,
               "source": "catalog"
             }
@@ -188,62 +685,38 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
               "source": "catalog"
             }
           ],
-          "M": [
+          "D": [
             {
-              "itemId": "madonna",
-              "displayName": "Madonna",
-              "isCorrect": false,
-              "source": "catalog"
-            },
-            {
-              "itemId": "metallica",
-              "displayName": "Metallica",
-              "isCorrect": false,
-              "source": "catalog"
-            },
-            {
-              "itemId": "pool:marshmello",
-              "displayName": "Marshmello",
-              "isCorrect": false,
-              "source": "pool"
-            }
-          ],
-          "M J": [
-            {
-              "itemId": "michael-jackson",
-              "displayName": "Michael Jackson",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "R": [
-            {
-              "itemId": "rihanna",
-              "displayName": "Rihanna",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "T S": [
-            {
-              "itemId": "pool:the-strokes",
-              "displayName": "The Strokes",
+              "itemId": "pool:diplo",
+              "displayName": "Diplo",
               "isCorrect": false,
               "source": "pool"
             },
             {
-              "itemId": "taylor-swift",
-              "displayName": "Taylor Swift",
+              "itemId": "drake",
+              "displayName": "Drake",
               "isCorrect": false,
               "source": "catalog"
             }
           ]
         },
-        "correctPrefix": "A"
+        "correctPrefix": "E P"
       },
       "prefix-2": {
         "prefixLength": 2,
         "letterGrid": [
+          {
+            "prefix": "EL PR",
+            "isCorrect": true
+          },
+          {
+            "prefix": "EM",
+            "isCorrect": false
+          },
+          {
+            "prefix": "RI",
+            "isCorrect": false
+          },
           {
             "prefix": "TH BE",
             "isCorrect": false
@@ -253,23 +726,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
             "isCorrect": false
           },
           {
-            "prefix": "EL PR",
-            "isCorrect": false
-          },
-          {
             "prefix": "DR",
-            "isCorrect": false
-          },
-          {
-            "prefix": "RI",
-            "isCorrect": false
-          },
-          {
-            "prefix": "AV",
-            "isCorrect": true
-          },
-          {
-            "prefix": "EM",
             "isCorrect": false
           },
           {
@@ -277,15 +734,43 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
             "isCorrect": false
           },
           {
-            "prefix": "TA SW",
+            "prefix": "AV",
             "isCorrect": false
           },
           {
             "prefix": "MA",
             "isCorrect": false
+          },
+          {
+            "prefix": "MI JA",
+            "isCorrect": false
           }
         ],
         "optionsByPrefix": {
+          "EL PR": [
+            {
+              "itemId": "elvis-presley",
+              "displayName": "Elvis Presley",
+              "isCorrect": true,
+              "source": "catalog"
+            }
+          ],
+          "EM": [
+            {
+              "itemId": "eminem",
+              "displayName": "Eminem",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "RI": [
+            {
+              "itemId": "rihanna",
+              "displayName": "Rihanna",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
           "TH BE": [
             {
               "itemId": "the-beatles",
@@ -302,442 +787,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
               "source": "catalog"
             }
           ],
-          "EL PR": [
-            {
-              "itemId": "elvis-presley",
-              "displayName": "Elvis Presley",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "DR": [
-            {
-              "itemId": "drake",
-              "displayName": "Drake",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "RI": [
-            {
-              "itemId": "rihanna",
-              "displayName": "Rihanna",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "AV": [
-            {
-              "itemId": "avicii",
-              "displayName": "Avicii",
-              "isCorrect": true,
-              "source": "catalog"
-            }
-          ],
-          "EM": [
-            {
-              "itemId": "eminem",
-              "displayName": "Eminem",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "ME": [
-            {
-              "itemId": "metallica",
-              "displayName": "Metallica",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "TA SW": [
-            {
-              "itemId": "taylor-swift",
-              "displayName": "Taylor Swift",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "MA": [
-            {
-              "itemId": "madonna",
-              "displayName": "Madonna",
-              "isCorrect": false,
-              "source": "catalog"
-            },
-            {
-              "itemId": "pool:marshmello",
-              "displayName": "Marshmello",
-              "isCorrect": false,
-              "source": "pool"
-            }
-          ]
-        },
-        "correctPrefix": "AV"
-      },
-      "prefix-3": {
-        "prefixLength": 3,
-        "letterGrid": [
-          {
-            "prefix": "TAY SWI",
-            "isCorrect": false
-          },
-          {
-            "prefix": "MIC JAC",
-            "isCorrect": false
-          },
-          {
-            "prefix": "AVI",
-            "isCorrect": true
-          },
-          {
-            "prefix": "BIL EIL",
-            "isCorrect": false
-          },
-          {
-            "prefix": "EMI",
-            "isCorrect": false
-          },
-          {
-            "prefix": "THE BEA",
-            "isCorrect": false
-          },
-          {
-            "prefix": "ELV PRE",
-            "isCorrect": false
-          },
-          {
-            "prefix": "MET",
-            "isCorrect": false
-          },
-          {
-            "prefix": "ABB",
-            "isCorrect": false
-          },
-          {
-            "prefix": "RIH",
-            "isCorrect": false
-          }
-        ],
-        "optionsByPrefix": {
-          "TAY SWI": [
-            {
-              "itemId": "taylor-swift",
-              "displayName": "Taylor Swift",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "MIC JAC": [
-            {
-              "itemId": "michael-jackson",
-              "displayName": "Michael Jackson",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "AVI": [
-            {
-              "itemId": "avicii",
-              "displayName": "Avicii",
-              "isCorrect": true,
-              "source": "catalog"
-            }
-          ],
-          "BIL EIL": [
-            {
-              "itemId": "billie-eilish",
-              "displayName": "Billie Eilish",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "EMI": [
-            {
-              "itemId": "eminem",
-              "displayName": "Eminem",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "THE BEA": [
-            {
-              "itemId": "the-beatles",
-              "displayName": "The Beatles",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "ELV PRE": [
-            {
-              "itemId": "elvis-presley",
-              "displayName": "Elvis Presley",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "MET": [
-            {
-              "itemId": "metallica",
-              "displayName": "Metallica",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "ABB": [
-            {
-              "itemId": "abba",
-              "displayName": "ABBA",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "RIH": [
-            {
-              "itemId": "rihanna",
-              "displayName": "Rihanna",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ]
-        },
-        "correctPrefix": "AVI"
-      }
-    }
-  },
-  {
-    "id": "elvis-presley",
-    "displayName": "Elvis Presley",
-    "category": "artists",
-    "correctYear": 1935,
-    "peakFrom": 1956,
-    "peakTo": 1977,
-    "audiences": [
-      "elder"
-    ],
-    "questionText": "What is the name of this artist?",
-    "variants": {
-      "prefix-1": {
-        "prefixLength": 1,
-        "letterGrid": [
-          {
-            "prefix": "M",
-            "isCorrect": false
-          },
-          {
-            "prefix": "T B",
-            "isCorrect": false
-          },
-          {
-            "prefix": "E",
-            "isCorrect": false
-          },
-          {
-            "prefix": "E P",
-            "isCorrect": true
-          },
-          {
-            "prefix": "A",
-            "isCorrect": false
-          },
-          {
-            "prefix": "D",
-            "isCorrect": false
-          },
-          {
-            "prefix": "T S",
-            "isCorrect": false
-          },
-          {
-            "prefix": "B E",
-            "isCorrect": false
-          },
-          {
-            "prefix": "R",
-            "isCorrect": false
-          },
-          {
-            "prefix": "M J",
-            "isCorrect": false
-          }
-        ],
-        "optionsByPrefix": {
-          "M": [
-            {
-              "itemId": "madonna",
-              "displayName": "Madonna",
-              "isCorrect": false,
-              "source": "catalog"
-            },
-            {
-              "itemId": "pool:marshmello",
-              "displayName": "Marshmello",
-              "isCorrect": false,
-              "source": "pool"
-            },
-            {
-              "itemId": "metallica",
-              "displayName": "Metallica",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "T B": [
-            {
-              "itemId": "the-beatles",
-              "displayName": "The Beatles",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "E": [
-            {
-              "itemId": "eminem",
-              "displayName": "Eminem",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "E P": [
-            {
-              "itemId": "elvis-presley",
-              "displayName": "Elvis Presley",
-              "isCorrect": true,
-              "source": "catalog"
-            }
-          ],
-          "A": [
-            {
-              "itemId": "pool:ac-dc",
-              "displayName": "AC/DC",
-              "isCorrect": false,
-              "source": "pool"
-            },
-            {
-              "itemId": "abba",
-              "displayName": "ABBA",
-              "isCorrect": false,
-              "source": "catalog"
-            },
-            {
-              "itemId": "pool:adele",
-              "displayName": "Adele",
-              "isCorrect": false,
-              "source": "pool"
-            },
-            {
-              "itemId": "pool:aerosmith",
-              "displayName": "Aerosmith",
-              "isCorrect": false,
-              "source": "pool"
-            },
-            {
-              "itemId": "avicii",
-              "displayName": "Avicii",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "D": [
-            {
-              "itemId": "drake",
-              "displayName": "Drake",
-              "isCorrect": false,
-              "source": "catalog"
-            },
-            {
-              "itemId": "pool:diplo",
-              "displayName": "Diplo",
-              "isCorrect": false,
-              "source": "pool"
-            }
-          ],
-          "T S": [
-            {
-              "itemId": "taylor-swift",
-              "displayName": "Taylor Swift",
-              "isCorrect": false,
-              "source": "catalog"
-            },
-            {
-              "itemId": "pool:the-strokes",
-              "displayName": "The Strokes",
-              "isCorrect": false,
-              "source": "pool"
-            }
-          ],
-          "B E": [
-            {
-              "itemId": "billie-eilish",
-              "displayName": "Billie Eilish",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "R": [
-            {
-              "itemId": "rihanna",
-              "displayName": "Rihanna",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "M J": [
-            {
-              "itemId": "michael-jackson",
-              "displayName": "Michael Jackson",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ]
-        },
-        "correctPrefix": "E P"
-      },
-      "prefix-2": {
-        "prefixLength": 2,
-        "letterGrid": [
-          {
-            "prefix": "DR",
-            "isCorrect": false
-          },
-          {
-            "prefix": "ME",
-            "isCorrect": false
-          },
-          {
-            "prefix": "EM",
-            "isCorrect": false
-          },
-          {
-            "prefix": "RI",
-            "isCorrect": false
-          },
-          {
-            "prefix": "TH BE",
-            "isCorrect": false
-          },
-          {
-            "prefix": "TA SW",
-            "isCorrect": false
-          },
-          {
-            "prefix": "BI EI",
-            "isCorrect": false
-          },
-          {
-            "prefix": "EL PR",
-            "isCorrect": true
-          },
-          {
-            "prefix": "AV",
-            "isCorrect": false
-          },
-          {
-            "prefix": "MA",
-            "isCorrect": false
-          }
-        ],
-        "optionsByPrefix": {
           "DR": [
             {
               "itemId": "drake",
@@ -751,54 +800,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
               "itemId": "metallica",
               "displayName": "Metallica",
               "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "EM": [
-            {
-              "itemId": "eminem",
-              "displayName": "Eminem",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "RI": [
-            {
-              "itemId": "rihanna",
-              "displayName": "Rihanna",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "TH BE": [
-            {
-              "itemId": "the-beatles",
-              "displayName": "The Beatles",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "TA SW": [
-            {
-              "itemId": "taylor-swift",
-              "displayName": "Taylor Swift",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "BI EI": [
-            {
-              "itemId": "billie-eilish",
-              "displayName": "Billie Eilish",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "EL PR": [
-            {
-              "itemId": "elvis-presley",
-              "displayName": "Elvis Presley",
-              "isCorrect": true,
               "source": "catalog"
             }
           ],
@@ -820,6 +821,14 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
             {
               "itemId": "madonna",
               "displayName": "Madonna",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "MI JA": [
+            {
+              "itemId": "michael-jackson",
+              "displayName": "Michael Jackson",
               "isCorrect": false,
               "source": "catalog"
             }
@@ -835,482 +844,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
             "isCorrect": false
           },
           {
-            "prefix": "ELV PRE",
-            "isCorrect": true
-          },
-          {
-            "prefix": "AVI",
-            "isCorrect": false
-          },
-          {
-            "prefix": "BIL EIL",
-            "isCorrect": false
-          },
-          {
-            "prefix": "RIH",
-            "isCorrect": false
-          },
-          {
-            "prefix": "MAD",
-            "isCorrect": false
-          },
-          {
-            "prefix": "MIC JAC",
-            "isCorrect": false
-          },
-          {
-            "prefix": "TAY SWI",
-            "isCorrect": false
-          },
-          {
-            "prefix": "MET",
-            "isCorrect": false
-          },
-          {
-            "prefix": "DRA",
-            "isCorrect": false
-          }
-        ],
-        "optionsByPrefix": {
-          "EMI": [
-            {
-              "itemId": "eminem",
-              "displayName": "Eminem",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "ELV PRE": [
-            {
-              "itemId": "elvis-presley",
-              "displayName": "Elvis Presley",
-              "isCorrect": true,
-              "source": "catalog"
-            }
-          ],
-          "AVI": [
-            {
-              "itemId": "avicii",
-              "displayName": "Avicii",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "BIL EIL": [
-            {
-              "itemId": "billie-eilish",
-              "displayName": "Billie Eilish",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "RIH": [
-            {
-              "itemId": "rihanna",
-              "displayName": "Rihanna",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "MAD": [
-            {
-              "itemId": "madonna",
-              "displayName": "Madonna",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "MIC JAC": [
-            {
-              "itemId": "michael-jackson",
-              "displayName": "Michael Jackson",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "TAY SWI": [
-            {
-              "itemId": "taylor-swift",
-              "displayName": "Taylor Swift",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "MET": [
-            {
-              "itemId": "metallica",
-              "displayName": "Metallica",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "DRA": [
-            {
-              "itemId": "drake",
-              "displayName": "Drake",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ]
-        },
-        "correctPrefix": "ELV PRE"
-      }
-    }
-  },
-  {
-    "id": "madonna",
-    "displayName": "Madonna",
-    "category": "artists",
-    "correctYear": 1958,
-    "peakFrom": 1984,
-    "peakTo": 2007,
-    "audiences": [
-      "gen-x"
-    ],
-    "questionText": "What is the name of this artist?",
-    "variants": {
-      "prefix-1": {
-        "prefixLength": 1,
-        "letterGrid": [
-          {
-            "prefix": "B E",
-            "isCorrect": false
-          },
-          {
-            "prefix": "A",
-            "isCorrect": false
-          },
-          {
-            "prefix": "E",
-            "isCorrect": false
-          },
-          {
-            "prefix": "M",
-            "isCorrect": true
-          },
-          {
-            "prefix": "D",
-            "isCorrect": false
-          },
-          {
-            "prefix": "R",
-            "isCorrect": false
-          },
-          {
-            "prefix": "M J",
-            "isCorrect": false
-          },
-          {
-            "prefix": "T S",
-            "isCorrect": false
-          },
-          {
-            "prefix": "T B",
-            "isCorrect": false
-          },
-          {
-            "prefix": "E P",
-            "isCorrect": false
-          }
-        ],
-        "optionsByPrefix": {
-          "B E": [
-            {
-              "itemId": "billie-eilish",
-              "displayName": "Billie Eilish",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "A": [
-            {
-              "itemId": "pool:ac-dc",
-              "displayName": "AC/DC",
-              "isCorrect": false,
-              "source": "pool"
-            },
-            {
-              "itemId": "avicii",
-              "displayName": "Avicii",
-              "isCorrect": false,
-              "source": "catalog"
-            },
-            {
-              "itemId": "pool:adele",
-              "displayName": "Adele",
-              "isCorrect": false,
-              "source": "pool"
-            },
-            {
-              "itemId": "abba",
-              "displayName": "ABBA",
-              "isCorrect": false,
-              "source": "catalog"
-            },
-            {
-              "itemId": "pool:aerosmith",
-              "displayName": "Aerosmith",
-              "isCorrect": false,
-              "source": "pool"
-            }
-          ],
-          "E": [
-            {
-              "itemId": "eminem",
-              "displayName": "Eminem",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "M": [
-            {
-              "itemId": "metallica",
-              "displayName": "Metallica",
-              "isCorrect": false,
-              "source": "catalog"
-            },
-            {
-              "itemId": "madonna",
-              "displayName": "Madonna",
-              "isCorrect": true,
-              "source": "catalog"
-            },
-            {
-              "itemId": "pool:marshmello",
-              "displayName": "Marshmello",
-              "isCorrect": false,
-              "source": "pool"
-            }
-          ],
-          "D": [
-            {
-              "itemId": "pool:diplo",
-              "displayName": "Diplo",
-              "isCorrect": false,
-              "source": "pool"
-            },
-            {
-              "itemId": "drake",
-              "displayName": "Drake",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "R": [
-            {
-              "itemId": "rihanna",
-              "displayName": "Rihanna",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "M J": [
-            {
-              "itemId": "michael-jackson",
-              "displayName": "Michael Jackson",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "T S": [
-            {
-              "itemId": "pool:the-strokes",
-              "displayName": "The Strokes",
-              "isCorrect": false,
-              "source": "pool"
-            },
-            {
-              "itemId": "taylor-swift",
-              "displayName": "Taylor Swift",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "T B": [
-            {
-              "itemId": "the-beatles",
-              "displayName": "The Beatles",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "E P": [
-            {
-              "itemId": "elvis-presley",
-              "displayName": "Elvis Presley",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ]
-        },
-        "correctPrefix": "M"
-      },
-      "prefix-2": {
-        "prefixLength": 2,
-        "letterGrid": [
-          {
-            "prefix": "RI",
-            "isCorrect": false
-          },
-          {
-            "prefix": "EM",
-            "isCorrect": false
-          },
-          {
-            "prefix": "ME",
-            "isCorrect": false
-          },
-          {
-            "prefix": "MI JA",
-            "isCorrect": false
-          },
-          {
-            "prefix": "MA",
-            "isCorrect": true
-          },
-          {
-            "prefix": "AV",
-            "isCorrect": false
-          },
-          {
-            "prefix": "TH BE",
-            "isCorrect": false
-          },
-          {
-            "prefix": "EL PR",
-            "isCorrect": false
-          },
-          {
-            "prefix": "BI EI",
-            "isCorrect": false
-          },
-          {
-            "prefix": "DR",
-            "isCorrect": false
-          }
-        ],
-        "optionsByPrefix": {
-          "RI": [
-            {
-              "itemId": "rihanna",
-              "displayName": "Rihanna",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "EM": [
-            {
-              "itemId": "eminem",
-              "displayName": "Eminem",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "ME": [
-            {
-              "itemId": "metallica",
-              "displayName": "Metallica",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "MI JA": [
-            {
-              "itemId": "michael-jackson",
-              "displayName": "Michael Jackson",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "MA": [
-            {
-              "itemId": "madonna",
-              "displayName": "Madonna",
-              "isCorrect": true,
-              "source": "catalog"
-            },
-            {
-              "itemId": "pool:marshmello",
-              "displayName": "Marshmello",
-              "isCorrect": false,
-              "source": "pool"
-            }
-          ],
-          "AV": [
-            {
-              "itemId": "avicii",
-              "displayName": "Avicii",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "TH BE": [
-            {
-              "itemId": "the-beatles",
-              "displayName": "The Beatles",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "EL PR": [
-            {
-              "itemId": "elvis-presley",
-              "displayName": "Elvis Presley",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "BI EI": [
-            {
-              "itemId": "billie-eilish",
-              "displayName": "Billie Eilish",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "DR": [
-            {
-              "itemId": "drake",
-              "displayName": "Drake",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ]
-        },
-        "correctPrefix": "MA"
-      },
-      "prefix-3": {
-        "prefixLength": 3,
-        "letterGrid": [
-          {
-            "prefix": "ABB",
-            "isCorrect": false
-          },
-          {
-            "prefix": "AVI",
-            "isCorrect": false
-          },
-          {
-            "prefix": "TAY SWI",
-            "isCorrect": false
-          },
-          {
-            "prefix": "EMI",
-            "isCorrect": false
-          },
-          {
-            "prefix": "RIH",
-            "isCorrect": false
-          },
-          {
-            "prefix": "MAD",
-            "isCorrect": true
-          },
-          {
-            "prefix": "MIC JAC",
-            "isCorrect": false
-          },
-          {
             "prefix": "MET",
             "isCorrect": false
           },
@@ -1319,63 +852,39 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
             "isCorrect": false
           },
           {
-            "prefix": "BIL EIL",
+            "prefix": "ELV PRE",
+            "isCorrect": true
+          },
+          {
+            "prefix": "AVI",
+            "isCorrect": false
+          },
+          {
+            "prefix": "ABB",
+            "isCorrect": false
+          },
+          {
+            "prefix": "MIC JAC",
+            "isCorrect": false
+          },
+          {
+            "prefix": "TAY SWI",
+            "isCorrect": false
+          },
+          {
+            "prefix": "MAD",
+            "isCorrect": false
+          },
+          {
+            "prefix": "RIH",
             "isCorrect": false
           }
         ],
         "optionsByPrefix": {
-          "ABB": [
-            {
-              "itemId": "abba",
-              "displayName": "ABBA",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "AVI": [
-            {
-              "itemId": "avicii",
-              "displayName": "Avicii",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "TAY SWI": [
-            {
-              "itemId": "taylor-swift",
-              "displayName": "Taylor Swift",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
           "EMI": [
             {
               "itemId": "eminem",
               "displayName": "Eminem",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "RIH": [
-            {
-              "itemId": "rihanna",
-              "displayName": "Rihanna",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "MAD": [
-            {
-              "itemId": "madonna",
-              "displayName": "Madonna",
-              "isCorrect": true,
-              "source": "catalog"
-            }
-          ],
-          "MIC JAC": [
-            {
-              "itemId": "michael-jackson",
-              "displayName": "Michael Jackson",
               "isCorrect": false,
               "source": "catalog"
             }
@@ -1396,101 +905,15 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
               "source": "catalog"
             }
           ],
-          "BIL EIL": [
+          "ELV PRE": [
             {
-              "itemId": "billie-eilish",
-              "displayName": "Billie Eilish",
-              "isCorrect": false,
+              "itemId": "elvis-presley",
+              "displayName": "Elvis Presley",
+              "isCorrect": true,
               "source": "catalog"
             }
-          ]
-        },
-        "correctPrefix": "MAD"
-      }
-    }
-  },
-  {
-    "id": "michael-jackson",
-    "displayName": "Michael Jackson",
-    "category": "artists",
-    "correctYear": 1958,
-    "peakFrom": 1979,
-    "peakTo": 2009,
-    "audiences": [
-      "gen-x"
-    ],
-    "questionText": "What is the name of this artist?",
-    "variants": {
-      "prefix-1": {
-        "prefixLength": 1,
-        "letterGrid": [
-          {
-            "prefix": "A",
-            "isCorrect": false
-          },
-          {
-            "prefix": "B E",
-            "isCorrect": false
-          },
-          {
-            "prefix": "E P",
-            "isCorrect": false
-          },
-          {
-            "prefix": "R",
-            "isCorrect": false
-          },
-          {
-            "prefix": "M J",
-            "isCorrect": true
-          },
-          {
-            "prefix": "D",
-            "isCorrect": false
-          },
-          {
-            "prefix": "M",
-            "isCorrect": false
-          },
-          {
-            "prefix": "T S",
-            "isCorrect": false
-          },
-          {
-            "prefix": "T B",
-            "isCorrect": false
-          },
-          {
-            "prefix": "E",
-            "isCorrect": false
-          }
-        ],
-        "optionsByPrefix": {
-          "A": [
-            {
-              "itemId": "pool:aerosmith",
-              "displayName": "Aerosmith",
-              "isCorrect": false,
-              "source": "pool"
-            },
-            {
-              "itemId": "pool:ac-dc",
-              "displayName": "AC/DC",
-              "isCorrect": false,
-              "source": "pool"
-            },
-            {
-              "itemId": "abba",
-              "displayName": "ABBA",
-              "isCorrect": false,
-              "source": "catalog"
-            },
-            {
-              "itemId": "pool:adele",
-              "displayName": "Adele",
-              "isCorrect": false,
-              "source": "pool"
-            },
+          ],
+          "AVI": [
             {
               "itemId": "avicii",
               "displayName": "Avicii",
@@ -1498,14 +921,109 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
               "source": "catalog"
             }
           ],
-          "B E": [
+          "ABB": [
             {
-              "itemId": "billie-eilish",
-              "displayName": "Billie Eilish",
+              "itemId": "abba",
+              "displayName": "ABBA",
               "isCorrect": false,
               "source": "catalog"
             }
           ],
+          "MIC JAC": [
+            {
+              "itemId": "michael-jackson",
+              "displayName": "Michael Jackson",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "TAY SWI": [
+            {
+              "itemId": "taylor-swift",
+              "displayName": "Taylor Swift",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "MAD": [
+            {
+              "itemId": "madonna",
+              "displayName": "Madonna",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "RIH": [
+            {
+              "itemId": "rihanna",
+              "displayName": "Rihanna",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ]
+        },
+        "correctPrefix": "ELV PRE"
+      }
+    }
+  },
+  {
+    "id": "madonna",
+    "displayName": "Madonna",
+    "category": "artists",
+    "contentSubject": "artist",
+    "correctYear": 1958,
+    "peakFrom": 1984,
+    "peakTo": 2007,
+    "audiences": [
+      "gen-x"
+    ],
+    "questionText": "What is the Name of this Artist?",
+    "variants": {
+      "prefix-1": {
+        "prefixLength": 1,
+        "letterGrid": [
+          {
+            "prefix": "E P",
+            "isCorrect": false
+          },
+          {
+            "prefix": "M J",
+            "isCorrect": false
+          },
+          {
+            "prefix": "D",
+            "isCorrect": false
+          },
+          {
+            "prefix": "B E",
+            "isCorrect": false
+          },
+          {
+            "prefix": "T S",
+            "isCorrect": false
+          },
+          {
+            "prefix": "M",
+            "isCorrect": true
+          },
+          {
+            "prefix": "A",
+            "isCorrect": false
+          },
+          {
+            "prefix": "E",
+            "isCorrect": false
+          },
+          {
+            "prefix": "T B",
+            "isCorrect": false
+          },
+          {
+            "prefix": "R",
+            "isCorrect": false
+          }
+        ],
+        "optionsByPrefix": {
           "E P": [
             {
               "itemId": "elvis-presley",
@@ -1514,19 +1032,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
               "source": "catalog"
             }
           ],
-          "R": [
-            {
-              "itemId": "rihanna",
-              "displayName": "Rihanna",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
           "M J": [
             {
               "itemId": "michael-jackson",
               "displayName": "Michael Jackson",
-              "isCorrect": true,
+              "isCorrect": false,
               "source": "catalog"
             }
           ],
@@ -1544,22 +1054,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
               "source": "catalog"
             }
           ],
-          "M": [
+          "B E": [
             {
-              "itemId": "pool:marshmello",
-              "displayName": "Marshmello",
-              "isCorrect": false,
-              "source": "pool"
-            },
-            {
-              "itemId": "madonna",
-              "displayName": "Madonna",
-              "isCorrect": false,
-              "source": "catalog"
-            },
-            {
-              "itemId": "metallica",
-              "displayName": "Metallica",
+              "itemId": "billie-eilish",
+              "displayName": "Billie Eilish",
               "isCorrect": false,
               "source": "catalog"
             }
@@ -1578,10 +1076,54 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
               "source": "catalog"
             }
           ],
-          "T B": [
+          "M": [
             {
-              "itemId": "the-beatles",
-              "displayName": "The Beatles",
+              "itemId": "pool:marshmello",
+              "displayName": "Marshmello",
+              "isCorrect": false,
+              "source": "pool"
+            },
+            {
+              "itemId": "madonna",
+              "displayName": "Madonna",
+              "isCorrect": true,
+              "source": "catalog"
+            },
+            {
+              "itemId": "metallica",
+              "displayName": "Metallica",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "A": [
+            {
+              "itemId": "pool:aerosmith",
+              "displayName": "Aerosmith",
+              "isCorrect": false,
+              "source": "pool"
+            },
+            {
+              "itemId": "pool:adele",
+              "displayName": "Adele",
+              "isCorrect": false,
+              "source": "pool"
+            },
+            {
+              "itemId": "avicii",
+              "displayName": "Avicii",
+              "isCorrect": false,
+              "source": "catalog"
+            },
+            {
+              "itemId": "pool:ac-dc",
+              "displayName": "AC/DC",
+              "isCorrect": false,
+              "source": "pool"
+            },
+            {
+              "itemId": "abba",
+              "displayName": "ABBA",
               "isCorrect": false,
               "source": "catalog"
             }
@@ -1590,6 +1132,475 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
             {
               "itemId": "eminem",
               "displayName": "Eminem",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "T B": [
+            {
+              "itemId": "the-beatles",
+              "displayName": "The Beatles",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "R": [
+            {
+              "itemId": "rihanna",
+              "displayName": "Rihanna",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ]
+        },
+        "correctPrefix": "M"
+      },
+      "prefix-2": {
+        "prefixLength": 2,
+        "letterGrid": [
+          {
+            "prefix": "AB",
+            "isCorrect": false
+          },
+          {
+            "prefix": "AV",
+            "isCorrect": false
+          },
+          {
+            "prefix": "RI",
+            "isCorrect": false
+          },
+          {
+            "prefix": "ME",
+            "isCorrect": false
+          },
+          {
+            "prefix": "EL PR",
+            "isCorrect": false
+          },
+          {
+            "prefix": "MA",
+            "isCorrect": true
+          },
+          {
+            "prefix": "EM",
+            "isCorrect": false
+          },
+          {
+            "prefix": "DR",
+            "isCorrect": false
+          },
+          {
+            "prefix": "BI EI",
+            "isCorrect": false
+          },
+          {
+            "prefix": "MI JA",
+            "isCorrect": false
+          }
+        ],
+        "optionsByPrefix": {
+          "AB": [
+            {
+              "itemId": "abba",
+              "displayName": "ABBA",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "AV": [
+            {
+              "itemId": "avicii",
+              "displayName": "Avicii",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "RI": [
+            {
+              "itemId": "rihanna",
+              "displayName": "Rihanna",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "ME": [
+            {
+              "itemId": "metallica",
+              "displayName": "Metallica",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "EL PR": [
+            {
+              "itemId": "elvis-presley",
+              "displayName": "Elvis Presley",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "MA": [
+            {
+              "itemId": "madonna",
+              "displayName": "Madonna",
+              "isCorrect": true,
+              "source": "catalog"
+            },
+            {
+              "itemId": "pool:marshmello",
+              "displayName": "Marshmello",
+              "isCorrect": false,
+              "source": "pool"
+            }
+          ],
+          "EM": [
+            {
+              "itemId": "eminem",
+              "displayName": "Eminem",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "DR": [
+            {
+              "itemId": "drake",
+              "displayName": "Drake",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "BI EI": [
+            {
+              "itemId": "billie-eilish",
+              "displayName": "Billie Eilish",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "MI JA": [
+            {
+              "itemId": "michael-jackson",
+              "displayName": "Michael Jackson",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ]
+        },
+        "correctPrefix": "MA"
+      },
+      "prefix-3": {
+        "prefixLength": 3,
+        "letterGrid": [
+          {
+            "prefix": "MIC JAC",
+            "isCorrect": false
+          },
+          {
+            "prefix": "ABB",
+            "isCorrect": false
+          },
+          {
+            "prefix": "TAY SWI",
+            "isCorrect": false
+          },
+          {
+            "prefix": "BIL EIL",
+            "isCorrect": false
+          },
+          {
+            "prefix": "AVI",
+            "isCorrect": false
+          },
+          {
+            "prefix": "RIH",
+            "isCorrect": false
+          },
+          {
+            "prefix": "MET",
+            "isCorrect": false
+          },
+          {
+            "prefix": "EMI",
+            "isCorrect": false
+          },
+          {
+            "prefix": "DRA",
+            "isCorrect": false
+          },
+          {
+            "prefix": "MAD",
+            "isCorrect": true
+          }
+        ],
+        "optionsByPrefix": {
+          "MIC JAC": [
+            {
+              "itemId": "michael-jackson",
+              "displayName": "Michael Jackson",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "ABB": [
+            {
+              "itemId": "abba",
+              "displayName": "ABBA",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "TAY SWI": [
+            {
+              "itemId": "taylor-swift",
+              "displayName": "Taylor Swift",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "BIL EIL": [
+            {
+              "itemId": "billie-eilish",
+              "displayName": "Billie Eilish",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "AVI": [
+            {
+              "itemId": "avicii",
+              "displayName": "Avicii",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "RIH": [
+            {
+              "itemId": "rihanna",
+              "displayName": "Rihanna",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "MET": [
+            {
+              "itemId": "metallica",
+              "displayName": "Metallica",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "EMI": [
+            {
+              "itemId": "eminem",
+              "displayName": "Eminem",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "DRA": [
+            {
+              "itemId": "drake",
+              "displayName": "Drake",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "MAD": [
+            {
+              "itemId": "madonna",
+              "displayName": "Madonna",
+              "isCorrect": true,
+              "source": "catalog"
+            }
+          ]
+        },
+        "correctPrefix": "MAD"
+      }
+    }
+  },
+  {
+    "id": "michael-jackson",
+    "displayName": "Michael Jackson",
+    "category": "artists",
+    "contentSubject": "artist",
+    "correctYear": 1958,
+    "peakFrom": 1979,
+    "peakTo": 2009,
+    "audiences": [
+      "gen-x"
+    ],
+    "questionText": "What is the Name of this Artist?",
+    "variants": {
+      "prefix-1": {
+        "prefixLength": 1,
+        "letterGrid": [
+          {
+            "prefix": "E",
+            "isCorrect": false
+          },
+          {
+            "prefix": "A",
+            "isCorrect": false
+          },
+          {
+            "prefix": "D",
+            "isCorrect": false
+          },
+          {
+            "prefix": "R",
+            "isCorrect": false
+          },
+          {
+            "prefix": "M",
+            "isCorrect": false
+          },
+          {
+            "prefix": "M J",
+            "isCorrect": true
+          },
+          {
+            "prefix": "T B",
+            "isCorrect": false
+          },
+          {
+            "prefix": "B E",
+            "isCorrect": false
+          },
+          {
+            "prefix": "T S",
+            "isCorrect": false
+          },
+          {
+            "prefix": "E P",
+            "isCorrect": false
+          }
+        ],
+        "optionsByPrefix": {
+          "E": [
+            {
+              "itemId": "eminem",
+              "displayName": "Eminem",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "A": [
+            {
+              "itemId": "pool:aerosmith",
+              "displayName": "Aerosmith",
+              "isCorrect": false,
+              "source": "pool"
+            },
+            {
+              "itemId": "abba",
+              "displayName": "ABBA",
+              "isCorrect": false,
+              "source": "catalog"
+            },
+            {
+              "itemId": "pool:ac-dc",
+              "displayName": "AC/DC",
+              "isCorrect": false,
+              "source": "pool"
+            },
+            {
+              "itemId": "avicii",
+              "displayName": "Avicii",
+              "isCorrect": false,
+              "source": "catalog"
+            },
+            {
+              "itemId": "pool:adele",
+              "displayName": "Adele",
+              "isCorrect": false,
+              "source": "pool"
+            }
+          ],
+          "D": [
+            {
+              "itemId": "pool:diplo",
+              "displayName": "Diplo",
+              "isCorrect": false,
+              "source": "pool"
+            },
+            {
+              "itemId": "drake",
+              "displayName": "Drake",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "R": [
+            {
+              "itemId": "rihanna",
+              "displayName": "Rihanna",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "M": [
+            {
+              "itemId": "pool:marshmello",
+              "displayName": "Marshmello",
+              "isCorrect": false,
+              "source": "pool"
+            },
+            {
+              "itemId": "metallica",
+              "displayName": "Metallica",
+              "isCorrect": false,
+              "source": "catalog"
+            },
+            {
+              "itemId": "madonna",
+              "displayName": "Madonna",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "M J": [
+            {
+              "itemId": "michael-jackson",
+              "displayName": "Michael Jackson",
+              "isCorrect": true,
+              "source": "catalog"
+            }
+          ],
+          "T B": [
+            {
+              "itemId": "the-beatles",
+              "displayName": "The Beatles",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "B E": [
+            {
+              "itemId": "billie-eilish",
+              "displayName": "Billie Eilish",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "T S": [
+            {
+              "itemId": "taylor-swift",
+              "displayName": "Taylor Swift",
+              "isCorrect": false,
+              "source": "catalog"
+            },
+            {
+              "itemId": "pool:the-strokes",
+              "displayName": "The Strokes",
+              "isCorrect": false,
+              "source": "pool"
+            }
+          ],
+          "E P": [
+            {
+              "itemId": "elvis-presley",
+              "displayName": "Elvis Presley",
               "isCorrect": false,
               "source": "catalog"
             }
@@ -1605,27 +1616,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
             "isCorrect": false
           },
           {
-            "prefix": "RI",
-            "isCorrect": false
-          },
-          {
-            "prefix": "AV",
-            "isCorrect": false
-          },
-          {
-            "prefix": "BI EI",
-            "isCorrect": false
-          },
-          {
             "prefix": "TA SW",
-            "isCorrect": false
-          },
-          {
-            "prefix": "MA",
-            "isCorrect": false
-          },
-          {
-            "prefix": "AB",
             "isCorrect": false
           },
           {
@@ -1633,11 +1624,31 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
             "isCorrect": false
           },
           {
+            "prefix": "AV",
+            "isCorrect": false
+          },
+          {
+            "prefix": "TH BE",
+            "isCorrect": false
+          },
+          {
+            "prefix": "MA",
+            "isCorrect": false
+          },
+          {
             "prefix": "MI JA",
             "isCorrect": true
           },
           {
-            "prefix": "EL PR",
+            "prefix": "AB",
+            "isCorrect": false
+          },
+          {
+            "prefix": "BI EI",
+            "isCorrect": false
+          },
+          {
+            "prefix": "RI",
             "isCorrect": false
           }
         ],
@@ -1650,56 +1661,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
               "source": "catalog"
             }
           ],
-          "RI": [
-            {
-              "itemId": "rihanna",
-              "displayName": "Rihanna",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "AV": [
-            {
-              "itemId": "avicii",
-              "displayName": "Avicii",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "BI EI": [
-            {
-              "itemId": "billie-eilish",
-              "displayName": "Billie Eilish",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
           "TA SW": [
             {
               "itemId": "taylor-swift",
               "displayName": "Taylor Swift",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "MA": [
-            {
-              "itemId": "madonna",
-              "displayName": "Madonna",
-              "isCorrect": false,
-              "source": "catalog"
-            },
-            {
-              "itemId": "pool:marshmello",
-              "displayName": "Marshmello",
-              "isCorrect": false,
-              "source": "pool"
-            }
-          ],
-          "AB": [
-            {
-              "itemId": "abba",
-              "displayName": "ABBA",
               "isCorrect": false,
               "source": "catalog"
             }
@@ -1712,6 +1677,36 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
               "source": "catalog"
             }
           ],
+          "AV": [
+            {
+              "itemId": "avicii",
+              "displayName": "Avicii",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "TH BE": [
+            {
+              "itemId": "the-beatles",
+              "displayName": "The Beatles",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "MA": [
+            {
+              "itemId": "pool:marshmello",
+              "displayName": "Marshmello",
+              "isCorrect": false,
+              "source": "pool"
+            },
+            {
+              "itemId": "madonna",
+              "displayName": "Madonna",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
           "MI JA": [
             {
               "itemId": "michael-jackson",
@@ -1720,10 +1715,26 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
               "source": "catalog"
             }
           ],
-          "EL PR": [
+          "AB": [
             {
-              "itemId": "elvis-presley",
-              "displayName": "Elvis Presley",
+              "itemId": "abba",
+              "displayName": "ABBA",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "BI EI": [
+            {
+              "itemId": "billie-eilish",
+              "displayName": "Billie Eilish",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "RI": [
+            {
+              "itemId": "rihanna",
+              "displayName": "Rihanna",
               "isCorrect": false,
               "source": "catalog"
             }
@@ -1735,6 +1746,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
         "prefixLength": 3,
         "letterGrid": [
           {
+            "prefix": "MAD",
+            "isCorrect": false
+          },
+          {
             "prefix": "DRA",
             "isCorrect": false
           },
@@ -1743,7 +1758,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
             "isCorrect": true
           },
           {
-            "prefix": "MAD",
+            "prefix": "ELV PRE",
             "isCorrect": false
           },
           {
@@ -1751,11 +1766,15 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
             "isCorrect": false
           },
           {
-            "prefix": "THE BEA",
+            "prefix": "AVI",
             "isCorrect": false
           },
           {
-            "prefix": "BIL EIL",
+            "prefix": "MET",
+            "isCorrect": false
+          },
+          {
+            "prefix": "ABB",
             "isCorrect": false
           },
           {
@@ -1763,19 +1782,19 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
             "isCorrect": false
           },
           {
-            "prefix": "AVI",
-            "isCorrect": false
-          },
-          {
-            "prefix": "ELV PRE",
-            "isCorrect": false
-          },
-          {
-            "prefix": "TAY SWI",
+            "prefix": "BIL EIL",
             "isCorrect": false
           }
         ],
         "optionsByPrefix": {
+          "MAD": [
+            {
+              "itemId": "madonna",
+              "displayName": "Madonna",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
           "DRA": [
             {
               "itemId": "drake",
@@ -1792,10 +1811,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
               "source": "catalog"
             }
           ],
-          "MAD": [
+          "ELV PRE": [
             {
-              "itemId": "madonna",
-              "displayName": "Madonna",
+              "itemId": "elvis-presley",
+              "displayName": "Elvis Presley",
               "isCorrect": false,
               "source": "catalog"
             }
@@ -1808,18 +1827,26 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
               "source": "catalog"
             }
           ],
-          "THE BEA": [
+          "AVI": [
             {
-              "itemId": "the-beatles",
-              "displayName": "The Beatles",
+              "itemId": "avicii",
+              "displayName": "Avicii",
               "isCorrect": false,
               "source": "catalog"
             }
           ],
-          "BIL EIL": [
+          "MET": [
             {
-              "itemId": "billie-eilish",
-              "displayName": "Billie Eilish",
+              "itemId": "metallica",
+              "displayName": "Metallica",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "ABB": [
+            {
+              "itemId": "abba",
+              "displayName": "ABBA",
               "isCorrect": false,
               "source": "catalog"
             }
@@ -1832,26 +1859,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
               "source": "catalog"
             }
           ],
-          "AVI": [
+          "BIL EIL": [
             {
-              "itemId": "avicii",
-              "displayName": "Avicii",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "ELV PRE": [
-            {
-              "itemId": "elvis-presley",
-              "displayName": "Elvis Presley",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "TAY SWI": [
-            {
-              "itemId": "taylor-swift",
-              "displayName": "Taylor Swift",
+              "itemId": "billie-eilish",
+              "displayName": "Billie Eilish",
               "isCorrect": false,
               "source": "catalog"
             }
@@ -1865,23 +1876,20 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "id": "taylor-swift",
     "displayName": "Taylor Swift",
     "category": "artists",
+    "contentSubject": "artist",
     "correctYear": 1989,
     "peakFrom": 2008,
     "peakTo": 2026,
     "audiences": [
       "gen-z"
     ],
-    "questionText": "What is the name of this artist?",
+    "questionText": "What is the Name of this Artist?",
     "variants": {
       "prefix-1": {
         "prefixLength": 1,
         "letterGrid": [
           {
-            "prefix": "E P",
-            "isCorrect": false
-          },
-          {
-            "prefix": "D",
+            "prefix": "M",
             "isCorrect": false
           },
           {
@@ -1889,7 +1897,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
             "isCorrect": false
           },
           {
-            "prefix": "M J",
+            "prefix": "E P",
+            "isCorrect": false
+          },
+          {
+            "prefix": "D",
             "isCorrect": false
           },
           {
@@ -1901,15 +1913,15 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
             "isCorrect": false
           },
           {
-            "prefix": "T B",
-            "isCorrect": false
-          },
-          {
             "prefix": "E",
             "isCorrect": false
           },
           {
-            "prefix": "M",
+            "prefix": "T B",
+            "isCorrect": false
+          },
+          {
+            "prefix": "M J",
             "isCorrect": false
           },
           {
@@ -1918,26 +1930,24 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
           }
         ],
         "optionsByPrefix": {
-          "E P": [
+          "M": [
             {
-              "itemId": "elvis-presley",
-              "displayName": "Elvis Presley",
+              "itemId": "metallica",
+              "displayName": "Metallica",
               "isCorrect": false,
               "source": "catalog"
-            }
-          ],
-          "D": [
-            {
-              "itemId": "pool:diplo",
-              "displayName": "Diplo",
-              "isCorrect": false,
-              "source": "pool"
             },
             {
-              "itemId": "drake",
-              "displayName": "Drake",
+              "itemId": "madonna",
+              "displayName": "Madonna",
               "isCorrect": false,
               "source": "catalog"
+            },
+            {
+              "itemId": "pool:marshmello",
+              "displayName": "Marshmello",
+              "isCorrect": false,
+              "source": "pool"
             }
           ],
           "B E": [
@@ -1948,12 +1958,26 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
               "source": "catalog"
             }
           ],
-          "M J": [
+          "E P": [
             {
-              "itemId": "michael-jackson",
-              "displayName": "Michael Jackson",
+              "itemId": "elvis-presley",
+              "displayName": "Elvis Presley",
               "isCorrect": false,
               "source": "catalog"
+            }
+          ],
+          "D": [
+            {
+              "itemId": "drake",
+              "displayName": "Drake",
+              "isCorrect": false,
+              "source": "catalog"
+            },
+            {
+              "itemId": "pool:diplo",
+              "displayName": "Diplo",
+              "isCorrect": false,
+              "source": "pool"
             }
           ],
           "T S": [
@@ -1978,14 +2002,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
               "source": "catalog"
             }
           ],
-          "T B": [
-            {
-              "itemId": "the-beatles",
-              "displayName": "The Beatles",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
           "E": [
             {
               "itemId": "eminem",
@@ -1994,27 +2010,35 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
               "source": "catalog"
             }
           ],
-          "M": [
+          "T B": [
             {
-              "itemId": "madonna",
-              "displayName": "Madonna",
+              "itemId": "the-beatles",
+              "displayName": "The Beatles",
               "isCorrect": false,
               "source": "catalog"
-            },
+            }
+          ],
+          "M J": [
             {
-              "itemId": "pool:marshmello",
-              "displayName": "Marshmello",
-              "isCorrect": false,
-              "source": "pool"
-            },
-            {
-              "itemId": "metallica",
-              "displayName": "Metallica",
+              "itemId": "michael-jackson",
+              "displayName": "Michael Jackson",
               "isCorrect": false,
               "source": "catalog"
             }
           ],
           "A": [
+            {
+              "itemId": "pool:ac-dc",
+              "displayName": "AC/DC",
+              "isCorrect": false,
+              "source": "pool"
+            },
+            {
+              "itemId": "pool:adele",
+              "displayName": "Adele",
+              "isCorrect": false,
+              "source": "pool"
+            },
             {
               "itemId": "avicii",
               "displayName": "Avicii",
@@ -2032,18 +2056,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
               "displayName": "Aerosmith",
               "isCorrect": false,
               "source": "pool"
-            },
-            {
-              "itemId": "pool:adele",
-              "displayName": "Adele",
-              "isCorrect": false,
-              "source": "pool"
-            },
-            {
-              "itemId": "pool:ac-dc",
-              "displayName": "AC/DC",
-              "isCorrect": false,
-              "source": "pool"
             }
           ]
         },
@@ -2053,15 +2065,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
         "prefixLength": 2,
         "letterGrid": [
           {
-            "prefix": "MA",
+            "prefix": "RI",
             "isCorrect": false
           },
           {
-            "prefix": "TH BE",
-            "isCorrect": false
-          },
-          {
-            "prefix": "AV",
+            "prefix": "AB",
             "isCorrect": false
           },
           {
@@ -2069,19 +2077,19 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
             "isCorrect": false
           },
           {
-            "prefix": "TA SW",
-            "isCorrect": true
+            "prefix": "AV",
+            "isCorrect": false
+          },
+          {
+            "prefix": "TH BE",
+            "isCorrect": false
+          },
+          {
+            "prefix": "DR",
+            "isCorrect": false
           },
           {
             "prefix": "EM",
-            "isCorrect": false
-          },
-          {
-            "prefix": "RI",
-            "isCorrect": false
-          },
-          {
-            "prefix": "BI EI",
             "isCorrect": false
           },
           {
@@ -2089,37 +2097,27 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
             "isCorrect": false
           },
           {
-            "prefix": "MI JA",
+            "prefix": "BI EI",
             "isCorrect": false
+          },
+          {
+            "prefix": "TA SW",
+            "isCorrect": true
           }
         ],
         "optionsByPrefix": {
-          "MA": [
+          "RI": [
             {
-              "itemId": "pool:marshmello",
-              "displayName": "Marshmello",
-              "isCorrect": false,
-              "source": "pool"
-            },
-            {
-              "itemId": "madonna",
-              "displayName": "Madonna",
+              "itemId": "rihanna",
+              "displayName": "Rihanna",
               "isCorrect": false,
               "source": "catalog"
             }
           ],
-          "TH BE": [
+          "AB": [
             {
-              "itemId": "the-beatles",
-              "displayName": "The Beatles",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "AV": [
-            {
-              "itemId": "avicii",
-              "displayName": "Avicii",
+              "itemId": "abba",
+              "displayName": "ABBA",
               "isCorrect": false,
               "source": "catalog"
             }
@@ -2132,11 +2130,27 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
               "source": "catalog"
             }
           ],
-          "TA SW": [
+          "AV": [
             {
-              "itemId": "taylor-swift",
-              "displayName": "Taylor Swift",
-              "isCorrect": true,
+              "itemId": "avicii",
+              "displayName": "Avicii",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "TH BE": [
+            {
+              "itemId": "the-beatles",
+              "displayName": "The Beatles",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "DR": [
+            {
+              "itemId": "drake",
+              "displayName": "Drake",
+              "isCorrect": false,
               "source": "catalog"
             }
           ],
@@ -2144,22 +2158,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
             {
               "itemId": "eminem",
               "displayName": "Eminem",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "RI": [
-            {
-              "itemId": "rihanna",
-              "displayName": "Rihanna",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "BI EI": [
-            {
-              "itemId": "billie-eilish",
-              "displayName": "Billie Eilish",
               "isCorrect": false,
               "source": "catalog"
             }
@@ -2172,11 +2170,19 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
               "source": "catalog"
             }
           ],
-          "MI JA": [
+          "BI EI": [
             {
-              "itemId": "michael-jackson",
-              "displayName": "Michael Jackson",
+              "itemId": "billie-eilish",
+              "displayName": "Billie Eilish",
               "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "TA SW": [
+            {
+              "itemId": "taylor-swift",
+              "displayName": "Taylor Swift",
+              "isCorrect": true,
               "source": "catalog"
             }
           ]
@@ -2187,11 +2193,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
         "prefixLength": 3,
         "letterGrid": [
           {
-            "prefix": "MET",
-            "isCorrect": false
-          },
-          {
-            "prefix": "AVI",
+            "prefix": "ABB",
             "isCorrect": false
           },
           {
@@ -2199,23 +2201,19 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
             "isCorrect": false
           },
           {
-            "prefix": "EMI",
-            "isCorrect": false
-          },
-          {
             "prefix": "TAY SWI",
             "isCorrect": true
           },
           {
-            "prefix": "ELV PRE",
-            "isCorrect": false
-          },
-          {
-            "prefix": "RIH",
-            "isCorrect": false
-          },
-          {
             "prefix": "BIL EIL",
+            "isCorrect": false
+          },
+          {
+            "prefix": "AVI",
+            "isCorrect": false
+          },
+          {
+            "prefix": "MET",
             "isCorrect": false
           },
           {
@@ -2225,21 +2223,21 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
           {
             "prefix": "MIC JAC",
             "isCorrect": false
+          },
+          {
+            "prefix": "EMI",
+            "isCorrect": false
+          },
+          {
+            "prefix": "RIH",
+            "isCorrect": false
           }
         ],
         "optionsByPrefix": {
-          "MET": [
+          "ABB": [
             {
-              "itemId": "metallica",
-              "displayName": "Metallica",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "AVI": [
-            {
-              "itemId": "avicii",
-              "displayName": "Avicii",
+              "itemId": "abba",
+              "displayName": "ABBA",
               "isCorrect": false,
               "source": "catalog"
             }
@@ -2252,14 +2250,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
               "source": "catalog"
             }
           ],
-          "EMI": [
-            {
-              "itemId": "eminem",
-              "displayName": "Eminem",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
           "TAY SWI": [
             {
               "itemId": "taylor-swift",
@@ -2268,26 +2258,26 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
               "source": "catalog"
             }
           ],
-          "ELV PRE": [
-            {
-              "itemId": "elvis-presley",
-              "displayName": "Elvis Presley",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
-          "RIH": [
-            {
-              "itemId": "rihanna",
-              "displayName": "Rihanna",
-              "isCorrect": false,
-              "source": "catalog"
-            }
-          ],
           "BIL EIL": [
             {
               "itemId": "billie-eilish",
               "displayName": "Billie Eilish",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "AVI": [
+            {
+              "itemId": "avicii",
+              "displayName": "Avicii",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "MET": [
+            {
+              "itemId": "metallica",
+              "displayName": "Metallica",
               "isCorrect": false,
               "source": "catalog"
             }
@@ -2304,6 +2294,22 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
             {
               "itemId": "michael-jackson",
               "displayName": "Michael Jackson",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "EMI": [
+            {
+              "itemId": "eminem",
+              "displayName": "Eminem",
+              "isCorrect": false,
+              "source": "catalog"
+            }
+          ],
+          "RIH": [
+            {
+              "itemId": "rihanna",
+              "displayName": "Rihanna",
               "isCorrect": false,
               "source": "catalog"
             }

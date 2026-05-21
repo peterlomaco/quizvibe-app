@@ -1,6 +1,8 @@
 # Musikartister kända för Gen X.
 audience: ["gen-x"]
 category: artists
+contentForm: image
+contentSubject: artist
 items:
   - id: michael-jackson
     displayName: "Michael Jackson"

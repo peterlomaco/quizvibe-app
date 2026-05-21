@@ -1,6 +1,12 @@
 # Personer kända för Baby Boomers (elder) och Gen X.
 audience: ["elder", "gen-x"]
 category: persons
+# Deferred-fil — innehåller mest celebriteter (artister/idrottsmän/skådespelare)
+# + några cultural-figurer (Bergman). Tag:as som celebrity som file-level-
+# placeholder; vid V2-aktivering splittas items mellan celebrity och
+# cultural-person enligt curation-balance-rationalen.
+contentForm: image
+contentSubject: celebrity
 items:
   - id: bjorn-borg
     displayName: "Björn Borg"

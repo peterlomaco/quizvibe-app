@@ -1,6 +1,8 @@
 # Personer kända för Gen Z.
 audience: ["gen-z"]
 category: persons
+contentForm: image
+contentSubject: celebrity
 items:
   - id: zlatan-ibrahimovic
     displayName: "Zlatan Ibrahimović"

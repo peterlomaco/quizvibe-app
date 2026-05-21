@@ -11,6 +11,8 @@
 #   eftersom inget paket aktiverar dem.
 audience: ["millennials"]
 category: artists
+contentForm: image
+contentSubject: artist
 items:
   - id: avicii
     displayName: "Avicii"

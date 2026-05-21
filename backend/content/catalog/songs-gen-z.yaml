@@ -16,6 +16,8 @@
 #     Shades-remix). Parkerat tills alternativ källa hittas.
 audience: ["gen-z", "millennials"]
 category: songs
+contentForm: youtube
+contentSubject: song
 items:
   # 1997
   - id: aqua-barbie-girl

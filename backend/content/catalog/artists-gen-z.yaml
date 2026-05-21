@@ -1,6 +1,8 @@
 # Musikartister kända för Gen Z.
 audience: ["gen-z"]
 category: artists
+contentForm: image
+contentSubject: artist
 items:
   - id: billie-eilish
     displayName: "Billie Eilish"

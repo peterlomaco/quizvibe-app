@@ -1,6 +1,8 @@
 # Huvudstäder särskilt kända för elder-generationen (Silent + Baby Boomers).
 audience: ["elder"]
 category: capitals
+contentForm: image
+contentSubject: city
 items:
   - id: moscow
     displayName: "Moscow"

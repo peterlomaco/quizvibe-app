@@ -30,6 +30,8 @@
 # Parkerade tills alternativ källa hittas eller licensiering ordnas.
 audience: ["gen-alpha", "gen-z"]
 category: songs
+contentForm: youtube
+contentSubject: song
 items:
   # 2013
   - id: avicii-wake-me-up
