@@ -63,7 +63,7 @@ All client-side via AsyncStorage. No server. Screens reload data on focus (`useF
 
 ## Backend (content catalog + image pipeline)
 
-`backend/` är ett separat Node-projekt med egen `package.json` (sharp, zod, js-yaml, vitest, tsx). 77 tester, alla gröna. Live-call-CLIs mot Wikipedia/Commons + mock data exportör för klient-demo. Ingen live HTTP-API ännu — Supabase-setup parkerad.
+`backend/` är ett separat Node-projekt med egen `package.json` (sharp, zod, js-yaml, vitest, tsx). 131 tester, alla gröna. Live-call-CLIs mot Wikipedia/Commons + YouTube Data API + mock data exportör för klient-demo. Ingen live HTTP-API ännu — Supabase-setup parkerad. YouTube-curation-tooling beskrivs i sin egen sektion "YouTube playback & curation" nedan.
 
 **Struktur**:
 - `backend/content/catalog/*.yaml` — innehållslistor per generation × kategori. 5 generations-grupper: `elder` (Silent + Boomers, 1925-1964), `gen-x`, `millennials`, `gen-z`, `gen-alpha` + `'all'` (baseline). Items har: `id` (kebab-case), `displayName`, `correctYear`, `probability` (0-100), `wikimediaSearchHints[]`, `answerMethods: ('timeline'|'name-letters')[]`, `sensitivity: 'standard'|'sensitive'`. 64 items totalt över persons/capitals/artists. **Fiktiva karaktärer (Elsa, Spider-Man, Mario, Sonic, Peppa Pig, Bluey, Wednesday Addams) togs bort 2026-05-10** — officiella karaktärs-illustrationer är upphovsrättsskyddade och kan inte användas i kommersiell quiz-app utan licens. Återinför ev. via skaparen (Miyamoto → Mario, Idina Menzel → Elsa).
@@ -703,6 +703,30 @@ Bild-pipelinen från backend till in-game-rendering:
 
 **Bild-kvalitet (MVP-fakta)**: höjt tak från 1280×720 → 1920×1080 (Q85 oförändrat) gav märkbar förbättring bara för källor med >1280px upplösning (Stockholm 1631×1080 / London 1620×1080 / Berlin 1620×1080 / Madonna 675×1080 / Messi 808×1080 etc.). Wikipedia pageimage för Astrid (402×570), Cristiano (566×650), Zlatan (332×480) och Björn Borg (622×934) är källbegränsade — för bättre kvalitet på dessa krävs explicit Commons-URL via `wikimedia-process <id> <url>`. Paris-bilden är porträtt (648×1080, Eiffeltornet stående) och **letterbox:as i 16:9 mediaCard** — accepterat MVP-trade-off.
 
+## YouTube playback & curation
+
+YouTube-klippen är NOTERAT INTE bara musik — kan vara filmscener, sporthändelser, historiska/kulturella klipp. Använd generiska termer ("klippet"/"videon") i nya kommentarer; rename-passet (MUSIC_QUESTIONS → generiskt, "song"-frågetext → per-content-type, songs-katalog → media-katalog, song-meta-rad → content-type-aware) är **bundlat med detta YouTube-färdigställande-passet** — plocka inte isär.
+
+**MediaPlayer-uppspelning** ([src/components/MediaPlayer/YouTubeMediaPlayer.tsx](src/components/MediaPlayer/YouTubeMediaPlayer.tsx)):
+- `PLAYER_HEIGHT = 220` (bumpat från 200 — YouTube-iframe:s bottenrow (share-knapp, YouTube-logo, related-video-thumbnail vid pause) klipptes vid 200).
+- `end: clip.endSec` är INTE satt i `initialPlayerParams` — videon spelar i sin helhet, klipps inte vid svarstidens slut. Curerade `endSec` ignoreras runtime; behållen i datan för framtida flexibilitet.
+- Ingen audio-overlay — iframe:n är fullt synlig under uppspelning så rörlig bild syns hela tiden. `showVideo`-propen finns kvar i API:t (no-op idag) för bakåtkompatibilitet.
+- `hasEnded`-state sätts av YouTube:s `state === 'ended'`. Triggar end-of-clip overlay som heltäckande ersätter iframe:n: `<QuizVibeLogo size={140} />` + "QuizVibe"-text i `Nunito_700Bold` (fontSize 38, weight 700, letterSpacing -0.5, marginTop -Spacing.lg). Textens negativa marginTop kompenserar för QuizVibeLogo:s naturliga tom-yta i botten av viewBox:n (vid size 140 motsvarar ~28 px). Reset:as per `clip.videoId`-byte.
+- **YouTube ToS-compliance**: branding (logo + bottom-bar) är synlig UNDER hela playback (krav från API Services TOS). EFTER playback-end får appen ta över UI:t — vilket är vad logo-overlay:n gör. Trigga ALDRIG `hasEnded` baserat på vår timer eller manuellt; bara YT:s native `'ended'`-state.
+- iOS-autoplay funkar via `patches/react-native-youtube-iframe+2.4.1.patch` (auto-applied via npm postinstall) — bypass:ar lib:ns broken `postMessage`-path med `injectJavaScript`. Bumpas lib eller WebView, re-verifiera att patchen applies.
+
+**Backend-tooling** ([backend/youtube/](backend/youtube/)):
+- `client.ts` — YouTube Data API v3-klient. `searchVideos` (100 quota-enheter/call, server-side embeddable+syndicated-filter), `getVideoDetails` (1 quota-enhet för upp till 50 videoIds). `YoutubeVideoDetails.definition: 'hd' | 'sd' | 'unknown'` (defensiv parse, `'unknown'` om API utelämnar fältet).
+- `getClipBlockReasons` returnerar reason-array. **HD-gate**: `definition === 'sd'` → `'SD resolution'` (`'unknown'` blockas INTE — defensiv mot framtida API-svar utan fältet).
+- `scoring.ts` — heuristisk ranking av suggest-kandidater. Egen modul (NOT i suggest.ts) så scoringen kan unit-testas utan att CLI:ns top-level `main()` triggar vid import. Signal-vikter: HD +10 / SD -10 / blocked -100 (botten-prio) / VEVO-kanal +6 / Topic-kanal -8 (auto-uploaded statisk album-art) / titel "official video" +8 / "music video" +5 / "lyric/audio/static" -10. Sista beslut alltid hos curatorn — heuristiken får ner antalet kandidater att titta på från 10 till 1-3.
+- `suggest.ts` — CLI `npm run youtube-search -- <item-id>` eller `--query "..."`. Sorterar rader desc på score. Output: `[+score]  STATUS  duration  HD/SD  videoId  "title"` + score-notes per kandidat.
+- `validate.ts` — CLI `npm run youtube-validate` (default `--all`). Validerar varje `youtubeClips`-entry mot Data API. Exit-kod 1 om något klipp är blocked/missing — driver nightly cron-failure-signaling.
+- Tester: `backend/youtube/test/{client,scoring}.test.ts` (37 youtube-tests). Vitest-suite totalt **131 tester gröna** (var 118 innan quality-gates-passet).
+
+**Nightly cron** ([.github/workflows/youtube-validate-nightly.yml](.github/workflows/youtube-validate-nightly.yml)): kör validate.ts --all kl 06:00 UTC, fångar klipp som tagits ner via copyright-claim eller nedgraderats till SD/blocked. Kritiskt eftersom re-uploads (MASTER RJ, prod. ovr, SLAYERO MUSIC, thelanoz video Comeback i [songs-all.yaml](backend/content/catalog/songs-all.yaml)) inte är original-rättsinnehavarens uppladdningar och kan tas ner utan förvarning. Pre-launch krav: lägg `YOUTUBE_API_KEY` som repo secret + verifiera första körningen.
+
+**Katalog-schema-diskrepans (parkerad)**: [songs-all.yaml](backend/content/catalog/songs-all.yaml) använder `youtubeClips: [...]`-format. [songs-gen-alpha.yaml](backend/content/catalog/songs-gen-alpha.yaml), [songs-gen-z.yaml](backend/content/catalog/songs-gen-z.yaml), [songs-gen-x.yaml](backend/content/catalog/songs-gen-x.yaml), [songs-elder.yaml](backend/content/catalog/songs-elder.yaml), [songs-millennials.yaml](backend/content/catalog/songs-millennials.yaml) använder `clips: [{kind: youtube, videoId, ...}]`-format. Schema-läsaren ([backend/content/schema.ts](backend/content/schema.ts)) känner bara igen den första → 142 items i gen-*-filerna är effektivt död data (kommer som "no youtubeClips"-skip i `export-music-questions`-output). Två angreppssätt vid unify (parkerade till separat session): (a) konvertera `clips:` → `youtubeClips:` i alla fem songs-gen-*-filer, eller (b) lär schema-läsaren båda formaten och normalisera vid load.
+
 ## Quiz — phase machinery
 
 `quiz.tsx`-skärmen kör en linjär state-maskin per fråga:
@@ -927,7 +951,7 @@ const stopwatchColor = phase === 'question' ? timerColor : '#8CC1FF';
 
 ### Layout (sekvens uppifrån)
 
-1. **Mediakort** — för `question.type === 'timeline'` (musik) renderas `MediaPlayer` (YouTube/none). För `question.type === 'image'` renderas `imageMediaCard` (16:9 wrap, `aspectRatio: 16/9`, `overflow: 'hidden'`) med `<Image source={getQuizImage(question.id)!} resizeMode="cover">` + `<ProgressiveCover>` overlay (se "Image questions (MVP)" nedan).
+1. **Mediakort** — för `question.type === 'timeline'` (musik/film/sport/etc) renderas `MediaPlayer` (YouTube/none) — höjd `PLAYER_HEIGHT = 220`, video synlig hela tiden, QuizVibe-logo-overlay efter `state === 'ended'`. Detaljer i "YouTube playback & curation"-sektionen ovan. För `question.type === 'image'` renderas `imageMediaCard` (16:9 wrap, `aspectRatio: 16/9`, `overflow: 'hidden'`) med `<Image source={getQuizImage(question.id)!} resizeMode="cover">` + `<ProgressiveCover>` overlay (se "Image questions (MVP)" nedan).
 2. **Timer-section** (row): timer-bar (flex 1) + **pulserande ring runt sekund-räknaren**. Ringen är 56×56 cirkel med dynamisk `borderColor: timerColor`, halo-View bakom (samma färg, `opacity` pulserar 0.3 → 0.7 över 700 ms native), och scale-pulse 1 → 1.08. Sekund-siffran (24 px bold tabular-nums) sitter inuti ringen.
    - **Avatar-markör på timer-bar:en** vid bekräftad svarstid: 28×28 gold-bordered avatar (URI-bild eller emoji-fallback) absolut-positionerad inom timerTrack med `left: ${((responseSeconds − confirmedTimeUsed) / responseSeconds) * 100}%` — sitter exakt på fillens högra kant vid Confirm-momentet. När timer:n fortsätter krymper fillen FÖRBI avataren så användaren ser "tiden har passerat ditt svarsmoment".
 3. **Stopwatch-rutan** (centrerad under bar:en) — räknar UPPÅT med 2 decimaler:
@@ -1096,4 +1120,4 @@ Alla tre använder identisk Alert-copy + same Store-deeplink. `handlePlayAgain` 
 
 `npm start` (Expo dev), `npm run ios` / `android` / `web`, `npm run lint` (`expo lint`). No tests, no CI.
 
-`backend/`-projektet har egna scripts: `npm test` (vitest, 77 tester), `npm run validate` (parsea katalog), `npm run export-demo` (regenerera demo-data), `npm run wikimedia-search <id>`, `npm run wikimedia-process <id>`, `npm run demo` (skriver ut Letter Grid-output i konsolen).
+`backend/`-projektet har egna scripts: `npm test` (vitest, 131 tester), `npm run validate` (parsea katalog), `npm run export-demo` (regenerera demo-data för Name-quiz), `npm run export-music-questions` (regenererar [src/utils/musicQuestions.ts](src/utils/musicQuestions.ts) från `songs-*.yaml`), `npm run export-image-questions`, `npm run wikimedia-search <id>`, `npm run wikimedia-process <id>`, `npm run youtube-search <id>` / `-- --query "..."` (curator-suggest med scoring), `npm run youtube-validate` (validerar alla `youtubeClips` mot Data API — kör även nightly via GitHub Actions), `npm run demo` (skriver ut Letter Grid-output i konsolen).
