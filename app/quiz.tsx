@@ -3074,7 +3074,7 @@ export default function QuizScreen() {
                   assistance={currentAssistance}
                   totalSeconds={responseSeconds}
                   isRevealed={phase === 'awaiting' || phase === 'reveal'}
-                  logoSize={280}
+                  logoSize={220}
                 />
               </View>
             ) : (
@@ -3787,14 +3787,15 @@ const styles = StyleSheet.create({
     color: Colors.textDisabled,
   },
 
-  // Image-fråge-mediaCard: 4:5-ram (porträtt-vänlig) eftersom 14 av 17 bilder
-  // i poolen är porträtt (AR 0.6–0.87). Med 16:9-cover klipptes huvuden/topp
-  // av kraftigt; nu contain-mode → inget klipps. Median porträttbild får
-  // ~12-20% letterbox på sidorna; landscape (cities) får ~30% topp+botten.
-  // ProgressiveCover-mosaiken anpassar sig till container-storleken via
-  // absoluteFill; block-AR avviker lätt från kvadrat (~0.7) men acceptabelt.
+  // Image-fråge-mediaCard: 16:9-ram med `resizeMode='contain'`. Container-
+  // storleken är fix (matchar timeline-frågors media-area så layout är
+  // konsistent mellan fråge-typer). Bilden anpassas inom ramen — inget
+  // klipps men porträtt-bilder (14 av 17 i poolen) får letterbox vänster+
+  // höger i `Colors.card`-färg. Landscape-bilder (städer) fyller bredden
+  // med liten letterbox topp+botten. ProgressiveCover-mosaiken täcker hela
+  // containern via absoluteFill.
   imageMediaCard: {
-    aspectRatio: 4 / 5,
+    aspectRatio: 16 / 9,
     backgroundColor: Colors.card,
     overflow: 'hidden',
     borderBottomWidth: 1,
