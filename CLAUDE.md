@@ -2,6 +2,28 @@
 
 Expo Router quiz app (React Native 0.81, React 19, Expo SDK 54). Dark-themed, mobile-first. Mock data on the client; en `backend/`-folder är påbörjad för content-katalog + bild-pipeline (ingen live-API ännu — se "Backend" nedan).
 
+## Aktiv roadmap (uppdaterad 2026-05-22)
+
+Status mot den 4-stegs-plan vi följer för content-bygge inför launch:
+
+| Steg | Status | Anteckning |
+|---|---|---|
+| 1. Bild-format-fix | ✅ Klart | 16:9 container + `resizeMode='contain'` (commit `4ab2ac9`) |
+| 2. Audience-filter på bild-frågor | ⏸️ Parkerat | Kräver pool 30+ items innan filter blir meningsfullt utan att krympa poolen för mycket |
+| 3. Content build-out | 🟡 Pågående | Fas A klar (5→17→13 live image-items efter politiker-purge). Fortsätt med Fas C (curation) |
+| 4. Pre-launch-items | ⏸️ Ej påbörjat | Captcha, YouTube ToS-audit, nightly cron, FAQ — se `project_pre_launch_checklist.md` |
+
+**Föreslagna nästa steg (när session återupptas):**
+
+1. **Processa de 5 nya actor-bilderna** via `npm run wikimedia-process <id>` (ingrid-bergman, marilyn-monroe, arnold-schwarzenegger, lasse-aberg, jennifer-aniston) så de hamnar i live-poolen. Bilderna är YAML-curerade i `actors-*.yaml` men saknar webp + require-rad i `quizImages.ts`. Snabb vinst: 13 → 18 live items. ~30-45 min.
+2. **Bygg ut nya subjects** — speciellt:
+   - **Athletes utöver de 4 fotbollsstjärnorna** (Björn Borg, Zlatan, Cristiano, Messi). Lägg till tennisstjärnor, NBA-spelare, OS-medaljörer per generation.
+   - **Movies** (YouTube + sport-event) — schema-redo, 0 items idag. Använd `npm run youtube-search` för clip-curation.
+   - **Country, building, place** — 0 items, kräver Wikipedia-curation per subject.
+3. **Steg 2 audience-filter** — när pool är 30+ items kör filter-implementation utan att krympa poolen omotiverat.
+
+Se `memory/project_roadmap_phases.md` för bredare fas-status (Fas 4 backlog → Pre-launch → Launch).
+
 ## Routing
 
 `"main": "expo-router/entry"` — file-based routes in `app/`.
