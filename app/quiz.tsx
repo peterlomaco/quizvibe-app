@@ -68,7 +68,7 @@ import {
   View,
 } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import Svg, { Circle, Path } from 'react-native-svg';
+import Svg, { Circle, G, Path } from 'react-native-svg';
 
 type AssistanceLevel = 'minimal' | 'standard' | 'full';
 
@@ -3164,19 +3164,38 @@ export default function QuizScreen() {
               </View>
               <View style={styles.questionTextWrap}>
                 {/* Music-frågor split:as i två rader: stor headline "Which
-                    year" + bevarad sub-rad "was this song released?". Övriga
-                    kategorier (kommande Capitals/Persons etc.) renderar
-                    questiontexten som en enda rad. */}
-                {question.category === 'Music' ? (
-                  <>
-                    <Text style={styles.questionTextHeadline}>Which year</Text>
-                    <Text style={styles.questionText}>
-                      was this song released?
-                    </Text>
-                  </>
-                ) : (
-                  <Text style={styles.questionText}>{question.question}</Text>
-                )}
+                    year" + bevarad sub-rad "was this song released?".
+                    Image-frågor med "What is the name of this X?"-mönster
+                    split:as i tre rader: "What is" / "the Name" (stor
+                    headline) / "of this X?" — visuell fokus på namn-konceptet.
+                    Övriga kategorier/format renderas som enda rad. */}
+                {(() => {
+                  if (question.category === 'Music') {
+                    return (
+                      <>
+                        <Text style={styles.questionTextHeadline}>Which year</Text>
+                        <Text style={styles.questionText}>
+                          was this song released?
+                        </Text>
+                      </>
+                    );
+                  }
+                  const nameMatch = question.question.match(
+                    /^What is\s+the [Nn]ame\s+(.+)$/,
+                  );
+                  if (nameMatch) {
+                    return (
+                      <>
+                        <Text style={styles.questionText}>What is</Text>
+                        <Text style={styles.questionTextHeadline}>the Name</Text>
+                        <Text style={styles.questionText}>{nameMatch[1]}</Text>
+                      </>
+                    );
+                  }
+                  return (
+                    <Text style={styles.questionText}>{question.question}</Text>
+                  );
+                })()}
               </View>
             </View>
 
@@ -3237,31 +3256,21 @@ export default function QuizScreen() {
                 hålls feedbacken dold trots att svaret redan är låst, så
                 tidiga svarare inte får facit före sena.
                   • timeline: "Correct year: xxxx" — användarens val syns i låst TimelineSelector.
-                  • image:    "Correct: <Name>" — användarens val (om något) syns inte separat.
-                Båda grenar delar samma badge / next-tab / answer-time-row. */}
-            {phase === 'reveal' && (() => {
-              let wasCorrect: boolean;
-              let correctLabel: string;
-              let correctValue: string;
-              if (question.type === 'timeline') {
-                if (selectedYear === null) return null;
-                const interval = getIntervalForAssistance(currentAssistance);
-                wasCorrect = isCorrect(
-                  selectedYear,
-                  question.correctYear,
-                  interval,
-                  eraFrom,
-                  eraTo,
-                );
-                correctLabel = 'Correct year:';
-                correctValue = String(question.correctYear);
-              } else {
-                // Image — wasCorrect = confirmedNameOption.isCorrect, eller
-                // false vid time-out (confirmedNameOption === null).
-                wasCorrect = confirmedNameOption?.isCorrect ?? false;
-                correctLabel = 'Correct:';
-                correctValue = question.displayName;
-              }
+                  • image:    SKIPPAS — ImageAnswerBlock renderar Correct/Wrong-
+                    badges direkt på spelarens (och rätta) namn-kort istället
+                    så reveal-state syns inline i svarsrutan. */}
+            {phase === 'reveal' && question.type === 'timeline' && (() => {
+              if (selectedYear === null) return null;
+              const interval = getIntervalForAssistance(currentAssistance);
+              const wasCorrect = isCorrect(
+                selectedYear,
+                question.correctYear,
+                interval,
+                eraFrom,
+                eraTo,
+              );
+              const correctLabel = 'Correct year:';
+              const correctValue = String(question.correctYear);
               return (
                 <View style={rv.container}>
                   <Animated.View
@@ -3285,48 +3294,22 @@ export default function QuizScreen() {
                         {correctValue}
                       </Text>
                     </Text>
-                  </Animated.View>
-                  {/* Next-tab / Waiting-for-host-pill ligger UTANFÖR feedback-
-                      kortet — right-aligned i botten på reveal-vyn så
-                      användaren fokuserar på resultatet i kortet och CTA:n
-                      sitter separat. I IndDev kontrollerar host speltempot;
-                      non-host ser en passiv pill istället för tab. */}
-                  <View style={rv.revealNextWrap}>
-                    {gameMode === 'individual-devices' && !isHost ? (
-                      <View style={rv.waitingForHostPill}>
-                        <Text style={rv.waitingForHostPillText}>
-                          Waiting for host
-                        </Text>
-                        <SequentialDots color={Colors.textSecondary} />
-                      </View>
-                    ) : (
-                      <Animated.View
-                        style={{
-                          width: '50%',
-                          alignSelf: 'flex-end',
-                          transform: [{ scale: nextTabPulse }],
-                        }}
+                    {/* Låt-titel + artist från question.hint (format
+                        "Title — Artist" från MUSIC_QUESTIONS.displayName).
+                        FontSize.xs + tight lineHeight håller raden kompakt
+                        så feedback-kortet inte växer märkbart. numberOfLines=1
+                        + ellipsizeMode='tail' skyddar mot långa titlar som
+                        annars skulle wrappa och pusha kortet längre ner. */}
+                    {question.hint && (
+                      <Text
+                        style={rv.feedbackSongMeta}
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
                       >
-                        <TouchableOpacity
-                          style={[
-                            rv.nextTab,
-                            shouldLockForUnstable && { opacity: 0.4 },
-                          ]}
-                          onPress={
-                            isLastQuestion
-                              ? handleHostShowLeaderboard
-                              : handleHostAdvanceFromReveal
-                          }
-                          activeOpacity={0.85}
-                          disabled={shouldLockForUnstable}
-                        >
-                          <Text style={rv.nextTabText}>
-                            {isLastQuestion ? '🏆  Final Leaderboard' : 'Next  →'}
-                          </Text>
-                        </TouchableOpacity>
-                      </Animated.View>
+                        {question.hint}
+                      </Text>
                     )}
-                  </View>
+                  </Animated.View>
                 </View>
               );
             })()}
@@ -3334,70 +3317,128 @@ export default function QuizScreen() {
             {/* Fas-medveten action-knapp:
                   • question  → Confirm (blå glow + pulse)
                   • awaiting  → låst "Confirmed — waiting for time"
-                  • reveal    → ingenting; Next/Final Leaderboard sitter
-                    inuti feedback-kortet ovan */}
-            {phase !== 'reveal' && (
-              <View style={styles.actionWrap}>
-                {phase === 'question' && (
+                  • reveal    → inget; Next-tab ligger absolute-positionerad
+                    i nedre högra hörnet av SafeAreaView:n för båda timeline
+                    och image. */}
+            <View style={styles.actionWrap}>
+              {phase === 'question' && (
+                <Animated.View
+                  style={[
+                    styles.confirmWrap,
+                    { transform: [{ scale: confirmPulse }] },
+                  ]}
+                >
                   <Animated.View
+                    style={[styles.confirmHalo, { opacity: confirmGlow }]}
+                    pointerEvents="none"
+                  />
+                  <TouchableOpacity
                     style={[
-                      styles.confirmWrap,
-                      { transform: [{ scale: confirmPulse }] },
+                      styles.actionBtn,
+                      styles.actionBtnConfirm,
+                      (!canConfirm || shouldLockForUnstable) &&
+                        styles.actionBtnDisabled,
                     ]}
+                    onPress={() => {
+                      if (!canConfirm || shouldLockForUnstable) return;
+                      if (question.type === 'image' && pendingNameOption) {
+                        handleConfirmName(pendingNameOption);
+                      } else if (question.type === 'timeline' && pendingYear !== null) {
+                        handleConfirm(pendingYear);
+                      }
+                    }}
+                    disabled={!canConfirm || shouldLockForUnstable}
+                    activeOpacity={0.85}
                   >
-                    <Animated.View
-                      style={[styles.confirmHalo, { opacity: confirmGlow }]}
-                      pointerEvents="none"
-                    />
-                    <TouchableOpacity
-                      style={[
-                        styles.actionBtn,
-                        styles.actionBtnConfirm,
-                        (!canConfirm || shouldLockForUnstable) &&
-                          styles.actionBtnDisabled,
-                      ]}
-                      onPress={() => {
-                        if (!canConfirm || shouldLockForUnstable) return;
-                        if (question.type === 'image' && pendingNameOption) {
-                          handleConfirmName(pendingNameOption);
-                        } else if (question.type === 'timeline' && pendingYear !== null) {
-                          handleConfirm(pendingYear);
-                        }
-                      }}
-                      disabled={!canConfirm || shouldLockForUnstable}
-                      activeOpacity={0.85}
-                    >
-                      {/* Q-glyph (ring + tail från QuizVibe-loggan) ersätter
-                          ett typografiskt C så ordet läses som "Qonfirm" med
-                          QuizVibe:s brand-Q. Samma vit-stroke som omgivande
-                          text. Tight viewBox + minimal gap så Q och "onfirm"
-                          sitter ihop som en sammanhängande glyph-rad. */}
-                      <View style={styles.actionBtnContent}>
-                        <Svg width={22} height={22} viewBox="24 22 30 32">
-                          <Circle cx="40" cy="38" r="13" fill="none" stroke="#fff" strokeWidth="4.5" />
-                          <Path d="M49 47 L53 51" stroke="#fff" strokeWidth="4.5" strokeLinecap="round" />
-                        </Svg>
-                        <Text style={styles.actionBtnText}>onfirm</Text>
-                      </View>
-                    </TouchableOpacity>
-                  </Animated.View>
-                )}
-                {phase === 'awaiting' && (
-                  <View style={[styles.actionBtn, styles.actionBtnAwaiting]}>
-                    <Text style={styles.actionBtnAwaitingText}>
-                      ✓ Confirmed — waiting for time
-                    </Text>
-                  </View>
-                )}
-              </View>
-            )}
+                    {/* Q-glyph (ring + tail + 3 ljudvågs-bågar från QuizVibe-
+                        loggan) ersätter ett typografiskt C så ordet läses som
+                        "Qonfirm" med QuizVibe:s brand-Q. Färgas i Colors.warning
+                        (gold) för att framhäva brand-glyfen mot den vita
+                        "onfirm"-texten. Bågarna är arc-koordinater från
+                        QuizVibeLogo, translerade +3x/+1y eftersom Q-center
+                        sitter på (40,38) här istället för loggans (37,37).
+                        Rotation 25° kring Q-center matchar loggans snedställning.
+                        strokeWidth 1.6 på bågarna = klart smalare än Q-ringens
+                        6.5 så de läses som "ljudvågor" inom ringen. */}
+                    <View style={styles.actionBtnContent}>
+                      {/* viewBox expanderad till "23 18 34 37" (från "24 22 30
+                          32") för att rymma Q-ringens tjockare 6.5-stroke utan
+                          klippning på vänster kant, samt den breddade topp-
+                          bågens rotation-bbox. SVG-dimensionerna bumpade till
+                          24 för att kompensera så Q-glyfens visuella storlek
+                          är ungefär densamma som tidigare. */}
+                      <Svg width={24} height={24} viewBox="23 18 34 37">
+                        <Circle cx="40" cy="38" r="13" fill="none" stroke={Colors.warning} strokeWidth="6.5" />
+                        <Path d="M49 47 L53 51" stroke={Colors.warning} strokeWidth="6.5" strokeLinecap="round" />
+                        <G transform="rotate(25 40 38)">
+                          {/* Topp-båge (utanför Q-ringens topp-kant) — chord 20,
+                              radius bumpad från 12 → 16 så bågen är flatare
+                              och mer parallell med Q-ringens kantlinje. Mindre
+                              sagitta minskar också rotation-bbox så bågen inte
+                              klipps av viewBox:s topp efter 25°-rotationen. */}
+                          <Path d="M 30 22 A 16 16 0 0 1 50 22" fill="none" stroke={Colors.warning} strokeWidth="1.6" strokeLinecap="round" />
+                          {/* Mitten-båge (inne i Q-ringen) */}
+                          <Path d="M 34 33 A 9 9 0 0 1 46 33" fill="none" stroke={Colors.warning} strokeWidth="1.6" strokeLinecap="round" />
+                          {/* Botten-båge (inne i Q-ringen) */}
+                          <Path d="M 36 35 A 6 6 0 0 1 44 35" fill="none" stroke={Colors.warning} strokeWidth="1.6" strokeLinecap="round" />
+                        </G>
+                      </Svg>
+                      <Text style={styles.actionBtnText}>onfirm</Text>
+                    </View>
+                  </TouchableOpacity>
+                </Animated.View>
+              )}
+              {phase === 'awaiting' && (
+                <View style={[styles.actionBtn, styles.actionBtnAwaiting]}>
+                  <Text style={styles.actionBtnAwaitingText}>
+                    ✓ Confirmed — waiting for time
+                  </Text>
+                </View>
+              )}
+            </View>
 
         <View style={{ height: Spacing.xxl }} />
       </ScrollView>
+      {/* Next-tab / Waiting-for-host-pill — absolute-positionerad i nedre
+          högra hörnet av SafeAreaView:n så CTA:n alltid är synlig oavsett
+          ScrollView:s scroll-position. Visas i reveal-fas för BÅDA timeline-
+          och image-frågor (identisk placering och storlek så hörnet är den
+          permanenta Next-positionen oavsett fråge-typ). I IndDev kontrollerar
+          host speltempot; non-host ser en passiv "Waiting for host"-pill
+          istället för Next-tab. */}
+      {phase === 'reveal' && (
+        <View style={rv.revealNextAbsolute} pointerEvents="box-none">
+          {gameMode === 'individual-devices' && !isHost ? (
+            <View style={rv.waitingForHostPill}>
+              <Text style={rv.waitingForHostPillText}>Waiting for host</Text>
+              <SequentialDots color={Colors.textSecondary} />
+            </View>
+          ) : (
+            <Animated.View style={{ transform: [{ scale: nextTabPulse }] }}>
+              <TouchableOpacity
+                style={[rv.nextTab, shouldLockForUnstable && { opacity: 0.4 }]}
+                onPress={
+                  isLastQuestion
+                    ? handleHostShowLeaderboard
+                    : handleHostAdvanceFromReveal
+                }
+                activeOpacity={0.85}
+                disabled={shouldLockForUnstable}
+              >
+                <Text style={rv.nextTabText}>
+                  {isLastQuestion ? '🏆  Final Leaderboard' : 'Next  →'}
+                </Text>
+              </TouchableOpacity>
+            </Animated.View>
+          )}
+        </View>
+      )}
       {/* Scroll-hint pil — blinkar i botten av skärmen på image-frågor för att
           signalera att fler prefix-knappar + Confirm-knappen finns längre ned.
-          Pinnad ovanför safe-area:n via SafeAreaView:s flex-tree; absolute
-          positioning. pointerEvents='none' så taps under den når Confirm/grid. */}
+          Gäller question/awaiting; under reveal sitter Next-tab i bottom-right
+          som permanent CTA så scroll-hint behövs inte där. Pinnad ovanför
+          safe-area:n via SafeAreaView:s flex-tree; absolute positioning.
+          pointerEvents='none' så taps under den når Confirm/grid. */}
       {question.type === 'image' && (phase === 'question' || phase === 'awaiting') && !scrolledToBottom && (
         <Animated.View
           style={[scrollHintStyles.wrap, { opacity: scrollHintOpacity }]}
@@ -3870,13 +3911,14 @@ const styles = StyleSheet.create({
   },
   // Confirm-knappens stil: blue + iOS shadow för glow-effekten. Halo:n bakom
   // (confirmHalo) ger cross-platform glow på Android som saknar shadow-color.
+  // Confirm-knappen delar färgschema med rv.nextTab (outline blå border på
+  // Colors.cardElevated-bg). Den separata confirmHalo-View:n bakom knappen
+  // bär fortfarande den pulserande blå glow:en — så Confirm har samma fyll-
+  // färger som Next, men extra glow för CTA-fokus.
   actionBtnConfirm: {
-    backgroundColor: Colors.primary,
-    shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.85,
-    shadowRadius: 18,
-    elevation: 12,
+    backgroundColor: Colors.cardElevated,
+    borderWidth: 1,
+    borderColor: Colors.primary,
   },
   // Wrap runt Confirm-knappen för scale-pulse + halo-positionering.
   // position: relative så confirmHalo (absolute) ankrars hit istället för
@@ -3913,7 +3955,7 @@ const styles = StyleSheet.create({
   actionBtnText: {
     fontSize: 17,
     fontWeight: '700',
-    color: '#fff',
+    color: Colors.warning,
     letterSpacing: 0.5,
   },
 });
@@ -3979,6 +4021,17 @@ const rv = StyleSheet.create({
     color: Colors.textPrimary,
     letterSpacing: 0.3,
   },
+  // Låt-titel + artist under "Correct year"-raden i timeline-reveal:
+  // FontSize.xs (11) + tight lineHeight 13 ger en kompakt rad som bara
+  // adderar ~2-3px till kort-höjden. textSecondary för att inte konkurrera
+  // visuellt med "Correct year"-värdet ovanför.
+  feedbackSongMeta: {
+    fontSize: FontSize.xs,
+    fontWeight: FontWeight.medium,
+    color: Colors.textSecondary,
+    lineHeight: 13,
+    letterSpacing: 0.2,
+  },
   feedbackCorrectYearBold: {
     fontSize: FontSize.xl,
     fontWeight: FontWeight.bold,
@@ -3993,6 +4046,20 @@ const rv = StyleSheet.create({
   // wrappern och TouchableOpacity inom fyller bredden.
   revealNextWrap: {
     marginTop: Spacing.md,
+  },
+  // Next-tab / Waiting-pill positionerad absolut i nedre högra hörnet av
+  // SafeAreaView:n. Sibling till ScrollView så den alltid syns oavsett
+  // scroll-position. zIndex + elevation behövs för iOS + Android stacking
+  // över ScrollView-innehåll. pointerEvents='box-none' på wrappern så taps
+  // utanför själva knappen når underliggande ScrollView (knappen själv
+  // fångar sina taps via TouchableOpacity).
+  revealNextAbsolute: {
+    position: 'absolute',
+    bottom: Spacing.lg,
+    right: Spacing.lg,
+    zIndex: 60,
+    elevation: 60,
+    alignItems: 'flex-end',
   },
   // Next-tab — speglar startskärmens pulserande Join/Create-CTA:er (`gameBtn`
   // i app/index.tsx) i visuell vokabulär: höjd 56, Colors.cardElevated bg,
