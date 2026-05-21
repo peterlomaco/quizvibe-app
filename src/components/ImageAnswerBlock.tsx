@@ -198,8 +198,8 @@ function FullNamesView({
                 </Text>
               )}
               {badgeType === 'wrongReveal' && (
-                <Text style={[styles.revealBadge, styles.revealBadgeWrong]}>
-                  ✗
+                <Text style={[styles.wrongIconBadge, styles.wrongIconBadgeFullName]}>
+                  ×
                 </Text>
               )}
             </Pressable>
@@ -427,11 +427,13 @@ function PrefixView({
                 >
                   {opt.prefix}
                 </Text>
-                {/* ✗-badge på prefix-knappen själv (inget nameCard renderas
+                {/* ×-badge på prefix-knappen själv (inget nameCard renderas
                     för wrong-reveal-rader i prefix-mode). Border-cutting via
                     top:-8/right:-6 så badgen sitter på knappens hörn. */}
                 {badgeType === 'wrongReveal' && (
-                  <Text style={styles.prefixBadgeWrong}>✗</Text>
+                  <Text style={[styles.wrongIconBadge, styles.wrongIconBadgePrefix]}>
+                    ×
+                  </Text>
                 )}
               </Pressable>
               {nameOpt && (
@@ -627,27 +629,32 @@ const styles = StyleSheet.create({
   revealBadgeWrong: {
     backgroundColor: QUIZ_ERROR_RED,
   },
-  // Kompakt ✗-badge på prefix-knappen själv (prefix-mode wrong-reveal).
-  // Eftersom prefix-knappen är smal (96 px) använder vi en cirkulär badge
-  // istället för en "Wrong"-text-pill: minWidth 20, samma minHeight, ✗ i
-  // mitten. Position absolute med top:-8/right:-6 så den skär knapphörnet.
-  // Parent prefixButtonWrongReveal har position:'relative' så anchor:n
-  // hamnar rätt.
-  prefixBadgeWrong: {
+  // Square ×-badge — vitt kryss på röd bakgrund. Bara X + bg, inga
+  // extra dekorationer (rundningar, padding-pillen el. dyl.). Används
+  // både i prefix-mode (på prefix-knappen själv) och i fullnames-mode
+  // (på nameCard). Fix 22×22 så X är tydligt centrerat utan att skala
+  // efter content. borderRadius 3 = nästan-square med lätt avrundning.
+  // Position-props kommer från call-site (top/right per mode).
+  wrongIconBadge: {
     position: 'absolute',
-    top: -8,
-    right: -6,
-    minWidth: 20,
-    minHeight: 20,
-    paddingHorizontal: 4,
-    borderRadius: 10,
+    width: 22,
+    height: 22,
     backgroundColor: QUIZ_ERROR_RED,
     color: '#fff',
-    fontSize: 13,
+    fontSize: 16,
     fontWeight: FontWeight.bold,
     textAlign: 'center',
-    lineHeight: 20,
+    lineHeight: 22,
+    borderRadius: 3,
     overflow: 'hidden',
+  },
+  wrongIconBadgePrefix: {
+    top: -8,
+    right: -6,
+  },
+  wrongIconBadgeFullName: {
+    top: -10,
+    right: Spacing.md,
   },
   // ---------------------------------------------------------------------------
   // Full-names-läge: vertikal lista där varje rad är ett fullnamn-kort.
