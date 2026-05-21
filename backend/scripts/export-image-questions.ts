@@ -74,10 +74,12 @@ interface ExportedQuestion {
   category: Category;
   /** Subject från katalogens contentSubject — driver frågetext-lookup. */
   contentSubject: ContentSubject;
-  /** Året som "rätt svar" — för fallback-era-filtrering när peak saknas
-   *  och som svar i timeline-frågor. För artister = födelseår; för
-   *  band = formation-år; för musik-spår = utgivningsår. */
-  correctYear: number;
+  /** Året som "rätt svar" — för fallback-era-filtrering när peak saknas.
+   *  För artister = födelseår; för band = formation-år; för musik-spår
+   *  = utgivningsår. **Optional** — items utan både correctYear OCH
+   *  peakFrom/peakTo (t.ex. capitals) är era-agnostiska och inkluderas
+   *  i alla eras. */
+  correctYear?: number;
   /** Peak-recognition-fönster (åren item:t var som mest känt). När
    *  båda är definierade använder quiz.tsx interval-overlap mot host:s
    *  era-spann (semantiskt rättare än correctYear för artister, vars
@@ -177,14 +179,10 @@ function buildExportedQuestion(
 
   const item = matches[0].item;
 
-  // Era-filtreringen i quiz.tsx kräver correctYear — items utan blir
-  // omöjliga att inkludera i pool-byggandet eftersom det aldrig kan
-  // matcha host:s eraFrom/eraTo. Skippa hellre än att bryta klientens
-  // type-kontrakt.
-  if (item.correctYear === undefined) {
-    console.warn(`  Item ${itemId} missing correctYear — skipping`);
-    return null;
-  }
+  // correctYear är optional för image-frågor. Items utan correctYear OCH utan
+  // peakFrom/peakTo (t.ex. capitals) är era-agnostiska — runtime-filtret
+  // i quiz.tsx inkluderar dem i alla eras. Items med endast peak räknar
+  // overlap mot host:s era utan att behöva correctYear.
 
   const variants = {} as Record<VariantKey, ExportedVariant>;
   for (const len of PREFIX_LENGTHS) {
@@ -202,10 +200,9 @@ function buildExportedQuestion(
     displayName: item.displayName,
     category,
     contentSubject,
-    // Garanterat definierat efter skip-check ovan.
-    correctYear: item.correctYear!,
-    // peak-fälten är optional i schema — utelämna helt ur exporten när
-    // de saknas så generated JSON inte växer med null-rader.
+    // Utelämna optional-fält helt när de saknas så generated JSON
+    // inte växer med null-rader.
+    ...(item.correctYear !== undefined ? { correctYear: item.correctYear } : {}),
     ...(item.peakFrom !== undefined ? { peakFrom: item.peakFrom } : {}),
     ...(item.peakTo !== undefined ? { peakTo: item.peakTo } : {}),
     audiences: Array.from(audiencesSet),
@@ -279,12 +276,14 @@ export interface ImageQuizQuestion {
   category: 'persons' | 'capitals' | 'artists' | 'songs';
   contentSubject: ImageContentSubject;
   /** Året som "rätt svar" — driver fallback-era-filtrering när peak
-   *  saknas och visas i timeline-frågors reveal. För artister = födelseår;
-   *  band = formation-år; musik-spår = utgivningsår. */
-  correctYear: number;
+   *  saknas. För artister = födelseår; band = formation-år; musik-spår =
+   *  utgivningsår. **Optional** — items utan både correctYear OCH peak
+   *  (t.ex. capitals/städer) är era-agnostiska och inkluderas i alla eras. */
+  correctYear?: number;
   /** Peak-recognition-fönster (åren item:t var som mest känt). När
    *  båda definierade använder era-filtret interval-overlap mot host:s
-   *  era-spann. Saknas → correctYear-fallback. */
+   *  era-spann. Saknas → correctYear-fallback (eller era-agnostiskt om
+   *  båda saknas). */
   peakFrom?: number;
   peakTo?: number;
   audiences: ImageQuestionAudience[];

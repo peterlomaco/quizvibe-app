@@ -81,7 +81,7 @@ All client-side via AsyncStorage. No server. Screens reload data on focus (`useF
 **Sportevent + YouTube** är aktiverad i matrisen ("Which Year did this happen?") men har inga YAML-filer ännu — `subject: 'sport-event'` är schema-redo, men `quiz.tsx`-renderingens "Which Year"-regex hanterar det automatiskt så fort items läggs till. Movie-subject ditto.
 
 **Struktur**:
-- `backend/content/catalog/*.yaml` — innehållslistor per generation × kategori. 5 generations-grupper: `elder` (Silent + Boomers, 1925-1964), `gen-x`, `millennials`, `gen-z`, `gen-alpha` + `'all'` (baseline). Fil-headern är `audience + category + contentForm + contentSubject + items`. Items har: `id` (kebab-case), `displayName`, `correctYear`, `probability` (0-100), `wikimediaSearchHints[]`, `answerMethods: ('timeline'|'name-letters')[]`, `sensitivity: 'standard'|'sensitive'`. Live-katalogen: 10 filer / 159 items (artists × 4 gen + songs × 5 gen + songs-all). Deferred (`catalog/deferred/`): 8 filer / 52 items (capitals × 3 + persons × 5). **Fiktiva karaktärer (Elsa, Spider-Man, Mario, Sonic, Peppa Pig, Bluey, Wednesday Addams) togs bort 2026-05-10** — officiella karaktärs-illustrationer är upphovsrättsskyddade och kan inte användas i kommersiell quiz-app utan licens. Återinför ev. via skaparen (Miyamoto → Mario, Idina Menzel → Elsa).
+- `backend/content/catalog/*.yaml` — innehållslistor per generation × kategori. 5 generations-grupper: `elder` (Silent + Boomers, 1925-1964), `gen-x`, `millennials`, `gen-z`, `gen-alpha` + `'all'` (baseline). Fil-headern är `audience + category + contentForm + contentSubject + items`. Items har: `id` (kebab-case), `displayName`, `correctYear?` (optional för image-frågor; required om answerMethods inkluderar `'timeline'`), `probability` (0-100), `wikimediaSearchHints[]`, `answerMethods: ('timeline'|'name-letters')[]`, `sensitivity: 'standard'|'sensitive'`. **Live-katalogen efter Fas A (2026-05-21): 18 filer / 211 items** (artists × 4 gen + songs × 5 gen + songs-all + capitals × 3 + persons × 5). Deferred-mappen (`catalog/deferred/`) är nu tom men bevaras som plats för framtida items som vill ligga vilande innan release. **Fiktiva karaktärer (Elsa, Spider-Man, Mario, Sonic, Peppa Pig, Bluey, Wednesday Addams) togs bort 2026-05-10** — officiella karaktärs-illustrationer är upphovsrättsskyddade och kan inte användas i kommersiell quiz-app utan licens. Återinför ev. via skaparen (Miyamoto → Mario, Idina Menzel → Elsa).
 - `backend/content/schema.ts` — Zod-schema. Definierar `ContentFormSchema`, `ContentSubjectSchema`, `SUBJECTS_BY_FORM`, `FIXED_QUESTION_TEXT` + refines som låser matrix-parens. Validation: items med `'timeline'` i answerMethods MÅSTE ha `correctYear`. Cross-audience-figurer (Zlatan, Cristiano, Messi, ABBA, Madonna, etc.) listas en gång per fil — registry tolererar dubblett-IDs över filer men kräver unika inom en fil.
 - `backend/content/registry.ts` — `loadCatalog`, `findItemsForAudience` (default `excludeSensitive: true` → Hitler/Stalin filtreras bort i spelutbud, admin sätter `excludeSensitive: false` för full vy), `findItemsById`.
 - `backend/content/generation.ts` — `birthYearToGeneration`, `generationDistance`, `getLetterGridConfig` (assistance → mode: **full → full-names** (mest hjälp = se hela namnet, ingen prefix-pussel); **standard → prefix-2** (2-bokstavs prefix); **minimal → prefix-1** (1-bokstavs prefix). Forcing-override för småbarn: född 2016+ → full-names oavsett assistance. Distans-promote för Standard/Minimal: född 2013-2015 + distance > 1 → full-names; övriga + distance > 2 → full-names. Millennials har max-distance 2 till alla generationer, så på Standard/Minimal får de alltid prefix.).
@@ -113,6 +113,30 @@ const buffer = await sharp(downscaled).resize(upW, upH, { kernel: sharp.kernel.n
 | `gen-z` | 1997-2012 |
 | `gen-alpha` | 2013-2028 |
 | `all` | baseline (alltid distance 0) |
+
+**Lägga till ett nytt contentSubject** (checklista — använd när du startar curation för t.ex. `movie`, `sport-event`, `actor`, `athlete`, `country`, `building`, `place` som idag har 0 items):
+
+1. **Schema (om `Category`-enum behöver utvidgas)** — `CategorySchema` i [schema.ts](backend/content/schema.ts) har idag bara 4 värden (`persons | capitals | artists | songs`). Subjects som mappar semantiskt mot dessa (t.ex. `actor`, `athlete` → `persons`; `country`, `building`, `place` → `capitals`) kan återanvända befintliga values. Subjects som INTE passar (t.ex. `movie`, `sport-event` — de är `youtube`-form men inte musik) behöver antingen (a) lägga till nytt värde i `CategorySchema`, eller (b) återanvända `songs` som approximation (`category` är på utdöende — `contentForm × contentSubject` är ny source of truth).
+2. **Distractor-pool-bucket** — `distractor-pool.yaml` har idag bara 4 buckets (`persons/capitals/artists/songs`). Om det nya subjectet använder en NY category (steg 1a), lägg till motsvarande bucket med ~50 plausibla distraktor-namn. Om det återanvänder en befintlig category är ingen åtgärd nödvändig (pool ärvs).
+3. **YAML-fil** — skapa `backend/content/catalog/<subject>-<audience>.yaml` med header:
+   ```yaml
+   audience: ["<generation>"]   # eller flera: ["millennials", "gen-z"]
+   category: <category>          # från steg 1
+   contentForm: <youtube|image>  # från matrisen
+   contentSubject: <subject>     # från matrisen
+   items:
+     - id: <kebab-case-id>
+       displayName: "<Display Name>"
+       correctYear: <year>       # optional för image-frågor som är era-agnostiska (t.ex. capitals)
+       probability: <0-100>
+       wikimediaSearchHints: ["<search term>"]
+       answerMethods: ["name-letters"]  # eller ["timeline"] för YT-year-frågor
+   ```
+4. **Items** — använd `npm run wikimedia-search <id>` (bildkällor) eller `npm run youtube-search <id>` (YT-klipp) för curation-stöd.
+5. **Image-items**: processa via `npm run wikimedia-process <id>` → kopiera webp från `backend/output/` till `assets/quiz-images/` → lägg till `require()`-rad i [quizImages.ts](src/utils/quizImages.ts).
+6. **Validera** — `npm run validate` (= `npx tsx content/registry.ts`) + `npm test` (ska fortfarande vara gröna).
+7. **Regenerera klient-data** — `npm run export-image-questions` eller `npm run export-music-questions`. Verifiera diff på `src/utils/quizImageQuestions.ts` / `src/utils/musicQuestions.ts`.
+8. **Klient-uppdateringar** — om nytt subject kräver special-rendering (t.ex. `movie` skulle behöva film-poster-aspect-ratio): justera `quiz.tsx` `imageMediaCard`-styles per behov. Default 16:9-container + contain-mode hanterar alla bildtyper.
 
 ## Conventions
 

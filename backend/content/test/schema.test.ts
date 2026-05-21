@@ -7,26 +7,20 @@ describe('content catalog', () => {
     expect(() => loadCatalog()).not.toThrow();
   });
 
-  it('default load contains music-only categories (V1 launch scope)', () => {
+  it('default load contains all 4 active categories (post-Fas-A scope)', () => {
     const { files } = loadCatalog();
     const categories = new Set(
       Array.from(files.values()).map((f) => f.category),
     );
     expect(categories.has('artists')).toBe(true);
     expect(categories.has('songs')).toBe(true);
-    // persons + capitals flyttade till deferred/ — inte aktiva i V1.
-    expect(categories.has('persons')).toBe(false);
-    expect(categories.has('capitals')).toBe(false);
-  });
-
-  it('deferred catalog still validates against schema when opted-in', () => {
-    expect(() => loadCatalog(undefined, { includeDeferred: true })).not.toThrow();
-    const { files } = loadCatalog(undefined, { includeDeferred: true });
-    const categories = new Set(
-      Array.from(files.values()).map((f) => f.category),
-    );
+    // persons + capitals flyttade från deferred/ → live i Fas A (2026-05-21).
     expect(categories.has('persons')).toBe(true);
     expect(categories.has('capitals')).toBe(true);
+  });
+
+  it('deferred catalog opt-in flag fortfarande funktionellt (för framtida items)', () => {
+    expect(() => loadCatalog(undefined, { includeDeferred: true })).not.toThrow();
   });
 
   it('every item has at least one wikimedia search hint', () => {

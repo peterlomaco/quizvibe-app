@@ -99,8 +99,10 @@ interface ImageQuestion {
   /** Rätt svar — visas i reveal-feedback. */
   displayName: string;
   /** "Rätt svar"-året (för artister = födelseår; band = formation-år).
-   *  Används som FALLBACK i era-filtret när peak saknas. */
-  correctYear: number;
+   *  Används som FALLBACK i era-filtret när peak saknas. **Optional** —
+   *  items utan correctYear OCH utan peak (t.ex. capitals) är era-
+   *  agnostiska och inkluderas i alla eras. */
+  correctYear?: number;
   /** Peak-recognition-fönster (åren item:t var som mest känt). När båda
    *  definierade använder era-filtret interval-overlap mot host:s era-
    *  spann (semantiskt rättare än correctYear för artister). */
@@ -750,16 +752,21 @@ export default function QuizScreen() {
           : [];
     // Image-pool: peak-recognition-fönster när det finns (artister var
     // sällan kända det år de föddes — peak speglar host:s intent bättre).
-    // Fallback till correctYear när peak saknas. Era-tom → hela IMAGE_
-    // SEED_QUESTIONS-poolen (samma fallback-strategi som YouTube-poolen),
-    // men bara när source-toggle är på.
+    // Fallback till correctYear när peak saknas. Items utan både peak OCH
+    // correctYear (t.ex. capitals/städer) är era-agnostiska och inkluderas
+    // i alla eras. Era-tom → hela IMAGE_SEED_QUESTIONS-poolen (samma
+    // fallback-strategi som YouTube-poolen), men bara när source-toggle är på.
     const inEraImages = imagesEnabled
       ? IMAGE_SEED_QUESTIONS.filter((q) => {
           if (q.peakFrom !== undefined && q.peakTo !== undefined) {
             // Interval-overlap: [eraFrom, eraTo] ∩ [peakFrom, peakTo] ≠ ∅
             return eraFrom <= q.peakTo && eraTo >= q.peakFrom;
           }
-          return q.correctYear >= eraFrom && q.correctYear <= eraTo;
+          if (q.correctYear !== undefined) {
+            return q.correctYear >= eraFrom && q.correctYear <= eraTo;
+          }
+          // Era-agnostisk — alltid inkluderad.
+          return true;
         })
       : [];
     const imagePool: QuizQuestion[] =
