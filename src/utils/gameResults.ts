@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { loadProfile } from './profileStorage';
 
 /**
  * Lokal lagring av spelresultat.
@@ -14,11 +15,25 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
  *   wipe:ar historiken EN gång vid första load efter förenklingen så
  *   ingen ärvd stale-data ligger kvar från ev. tidigare history-pipelines
  *   som experimenterade med fler fält.
+ *
+ * 2026-05-22: **Per-user-namespacing** för history-nyckeln (samma mönster
+ *   som friendsStorage/waitingInvites). Tidigare var `gameHistory/v1` en
+ *   global nyckel → User A:s spel-historik syntes för User B vid logout/
+ *   login på samma device. Nu lagras per `<playerName>` (lowercase):
+ *   `@quizvibe/gameHistory/v1/<playerName>`. När backend kommer in byts
+ *   detta mot user-id från auth-token. LATEST_KEY är fortsatt global —
+ *   används bara direkt efter att en user just spelat, så scope-issue:n
+ *   är begränsad till history-visningen.
+ *   `HISTORY_PER_USER_RESET_KEY` wipe:ar all v1-history (legacy global +
+ *   ev. per-user) vid första load post-fix så stale cross-user-data
+ *   inte ärvs in i namespaced-strukturen.
  */
 
 const LATEST_KEY = '@quizvibe/latestResult/v1';
-const HISTORY_KEY = '@quizvibe/gameHistory/v1';
+const HISTORY_KEY_PREFIX = '@quizvibe/gameHistory/v1/';
+const HISTORY_LEGACY_GLOBAL_KEY = '@quizvibe/gameHistory/v1';
 const HISTORY_RESET_KEY = '@quizvibe/migration/historyReset/v1';
+const HISTORY_PER_USER_RESET_KEY = '@quizvibe/migration/historyPerUserReset/v1';
 
 export type AssistanceLevel = 'minimal' | 'standard' | 'full';
 
@@ -104,17 +119,44 @@ export interface HistoryEntry {
 }
 
 /**
- * One-shot migration: vid första load efter förenklingen (2026-05-18) wipe:ar
- * vi hela history-arrayen. Skyddar mot ärvd stale-data om någon tidigare
- * pipeline experimenterade med fler fält. Idempotent — `HISTORY_RESET_KEY`
- * sätts till '1' efter första körningen så reset:n bara körs en gång per
- * device. När backend-history kommer in kan denna helper tas bort.
+ * Returnerar AsyncStorage-nyckeln för inloggade user:s history.
+ * null = ingen profil laddad → caller bör returnera tom lista / no-op:a save.
+ */
+async function resolveHistoryKey(): Promise<string | null> {
+  const profile = await loadProfile();
+  if (!profile?.playerName) return null;
+  return `${HISTORY_KEY_PREFIX}${profile.playerName.toLowerCase()}`;
+}
+
+/**
+ * One-shot reset av all v1-history-data. Wipe:ar BÅDE legacy global key
+ * (pre-per-user-namespacing) OCH alla per-user-keys (i fall någon tidigare
+ * implementering claim:ade legacy global → first-user-on-device). Sätter
+ * `HISTORY_PER_USER_RESET_KEY` så reset:en bara körs en gång per device.
+ * Alla startar tomma — användarna får börja om history från noll.
+ * Idempotent — säkert att anropa flera gånger.
+ *
+ * (Legacy `HISTORY_RESET_KEY` från 2026-05-18-förenklingen lämnas orörd —
+ * den var per-device-wipe under den globala-nyckel-eran och är inte
+ * relevant för per-user-namespacing-migrationen.)
  */
 async function ensureHistoryReset(): Promise<void> {
   try {
-    const flag = await AsyncStorage.getItem(HISTORY_RESET_KEY);
+    const flag = await AsyncStorage.getItem(HISTORY_PER_USER_RESET_KEY);
     if (flag === '1') return;
-    await AsyncStorage.removeItem(HISTORY_KEY);
+    const allKeys = await AsyncStorage.getAllKeys();
+    const historyKeys = allKeys.filter(
+      (k) =>
+        k === HISTORY_LEGACY_GLOBAL_KEY ||
+        k.startsWith(HISTORY_KEY_PREFIX),
+    );
+    if (historyKeys.length > 0) {
+      await AsyncStorage.multiRemove(historyKeys);
+    }
+    await AsyncStorage.setItem(HISTORY_PER_USER_RESET_KEY, '1');
+    // Sätt även den äldre reset-flaggan så ensureHistoryReset i den
+    // tidigare pre-namespacing-versionen aldrig fyrar igen om koden
+    // skulle rullas tillbaka.
     await AsyncStorage.setItem(HISTORY_RESET_KEY, '1');
   } catch (err) {
     console.warn('[gameResults] history reset failed:', err);
@@ -124,7 +166,9 @@ async function ensureHistoryReset(): Promise<void> {
 export async function loadGameHistory(): Promise<HistoryEntry[]> {
   await ensureHistoryReset();
   try {
-    const json = await AsyncStorage.getItem(HISTORY_KEY);
+    const key = await resolveHistoryKey();
+    if (!key) return [];
+    const json = await AsyncStorage.getItem(key);
     if (!json) return [];
     const parsed = JSON.parse(json);
     if (!Array.isArray(parsed)) return [];
@@ -138,9 +182,14 @@ export async function loadGameHistory(): Promise<HistoryEntry[]> {
 export async function appendGameHistoryEntry(entry: HistoryEntry): Promise<void> {
   await ensureHistoryReset();
   try {
+    const key = await resolveHistoryKey();
+    if (!key) {
+      console.warn('[gameResults] appendGameHistoryEntry called without active profile — no-op');
+      return;
+    }
     const existing = await loadGameHistory();
     const next = [...existing, entry];
-    await AsyncStorage.setItem(HISTORY_KEY, JSON.stringify(next));
+    await AsyncStorage.setItem(key, JSON.stringify(next));
   } catch (err) {
     console.warn('[gameResults] Failed to append history entry:', err);
   }
@@ -148,7 +197,9 @@ export async function appendGameHistoryEntry(entry: HistoryEntry): Promise<void>
 
 export async function clearGameHistory(): Promise<void> {
   try {
-    await AsyncStorage.removeItem(HISTORY_KEY);
+    const key = await resolveHistoryKey();
+    if (!key) return;
+    await AsyncStorage.removeItem(key);
   } catch (err) {
     console.warn('[gameResults] Failed to clear history:', err);
   }
