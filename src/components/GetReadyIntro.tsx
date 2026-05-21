@@ -2085,7 +2085,10 @@ const styles = StyleSheet.create({
   // visuella vokabulär signalerar "premium action moment".
   playBlock: {
     alignItems: 'center',
-    gap: Spacing.lg,
+    // gap: Spacing.sm (var Spacing.lg) — tightare spacing mellan "Tap Here"-
+    // texten och Play-loggan. Påverkar bara host-branchen; non-host:s
+    // waitingForHostBlock är en enskild child så gap:n har ingen effekt där.
+    gap: Spacing.sm,
   },
   tapHereText: {
     color: Colors.warning,
