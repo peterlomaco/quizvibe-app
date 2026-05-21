@@ -914,22 +914,29 @@ export function GetReadyIntro({
             samma halo + scale-pulse så den visuella rytmen behålls. ── */}
         <View style={styles.playBlock}>
           {canStartGame ? (
-            <Animated.View
-              style={[styles.playLogoWrap, { transform: [{ scale: playPulse }] }]}
-            >
+            <>
+              {/* "Tap Here"-affordance — gold text ovanför play-loggan så
+                  spelaren direkt ser att Q-play-logon är ett tap-target
+                  (loggan i sig saknar typisk button-affordance som border/
+                  bg). Renderas bara för host som kan tappa. */}
+              <Text style={styles.tapHereText}>Tap Here</Text>
               <Animated.View
-                style={[styles.playLogoHalo, { opacity: playGlow }]}
-                pointerEvents="none"
-              />
-              <TouchableOpacity
-                activeOpacity={0.85}
-                onPress={onReady}
-                accessibilityLabel={`${playerName} press to start your turn`}
-                style={styles.playLogoTouchable}
+                style={[styles.playLogoWrap, { transform: [{ scale: playPulse }] }]}
               >
-                <QuizVibePlayLogo size={PLAY_BUTTON_SIZE} color={Colors.warning} />
-              </TouchableOpacity>
-            </Animated.View>
+                <Animated.View
+                  style={[styles.playLogoHalo, { opacity: playGlow }]}
+                  pointerEvents="none"
+                />
+                <TouchableOpacity
+                  activeOpacity={0.85}
+                  onPress={onReady}
+                  accessibilityLabel={`${playerName} press to start your turn`}
+                  style={styles.playLogoTouchable}
+                >
+                  <QuizVibePlayLogo size={PLAY_BUTTON_SIZE} color={Colors.warning} />
+                </TouchableOpacity>
+              </Animated.View>
+            </>
           ) : (
             // Same gold-halo Q-play-logo som host, men non-tappable + text
             // under loggan. Inget tap-target — host kontrollerar speltempot.
@@ -2079,6 +2086,12 @@ const styles = StyleSheet.create({
   playBlock: {
     alignItems: 'center',
     gap: Spacing.lg,
+  },
+  tapHereText: {
+    color: Colors.warning,
+    fontSize: 22,
+    fontWeight: FontWeight.bold,
+    letterSpacing: 0.5,
   },
   playLogoWrap: {
     position: 'relative',
