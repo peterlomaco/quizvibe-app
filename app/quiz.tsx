@@ -1853,20 +1853,31 @@ export default function QuizScreen() {
       // Om sparning misslyckas – leaderboarden visas ändå
     }
 
-    // Append:a minimal HistoryEntry till Player history-listan. Räkna
-    // korrekthetsgrad (correctAnswers/totalQuestions) + snitt-svarstid
-    // från rounds[]:s timeUsed (sekunder, 2 decimaler). Tom rounds-array
-    // (shouldn't happen men defensiv) → skippa append:n så vi inte spammar
-    // 0/NaN-entries.
+    // Append:a HistoryEntry till Player history-listan med game-time-
+    // settings frozna (age, assistance, era). Age beräknas från
+    // profilen:s birthYear vid speltillfället. assistance/era läses
+    // från quiz-state vid kall-tiden (= värden som faktiskt användes
+    // i spelet). Tom rounds-array (shouldn't happen men defensiv) →
+    // skippa append:n så vi inte spammar 0/NaN-entries.
     if (rounds.length > 0) {
       const totalTime = rounds.reduce((sum, r) => sum + (r.timeUsed ?? 0), 0);
       const correctAnswers = rounds.filter((r) => r.correct).length;
+      const profile = await loadProfile();
+      const birthYear = profile?.birthYear;
+      const age =
+        typeof birthYear === 'number'
+          ? new Date().getFullYear() - birthYear
+          : 0;
       const entry: HistoryEntry = {
         id: result.id,
         date: result.date,
         correctAnswers,
         totalQuestions: rounds.length,
         avgResponseSeconds: totalTime / rounds.length,
+        age,
+        assistance: fallbackAssistance,
+        eraFrom,
+        eraTo,
       };
       try {
         await appendGameHistoryEntry(entry);

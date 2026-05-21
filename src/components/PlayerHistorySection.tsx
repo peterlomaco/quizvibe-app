@@ -82,10 +82,19 @@ export function PlayerHistorySection() {
   );
 }
 
-// Per-spel-rad: två-rad-layout.
-// Topp = datum + korrekthet ("3/4 (75%)", highlighted i primary blå).
-// Botten = snitt-svarstid (textSecondary). Korrekthetsgrad visar hur
-// många rätta svar av totalen — mer meningsfullt än råpoäng för spelaren.
+// Per-spel-rad: tre-rad-layout.
+// 1. Datum + korrekthet ("3/4 (75%)", highlighted i primary blå)
+// 2. Game-time-settings: ålder, assistance-level, era-spann
+// 3. Avg response time
+// Settings-raden visar inställningar som faktiskt användes vid speltill-
+// fället (frozen i HistoryEntry) — viktigt för att tolka resultat över
+// tid när profilens defaults kan ha ändrats.
+const ASSISTANCE_LABEL: Record<HistoryEntry['assistance'], string> = {
+  full: 'Full',
+  standard: 'Standard',
+  minimal: 'Minimal',
+};
+
 function GameHistoryRow({ entry }: { entry: HistoryEntry }) {
   const pct =
     entry.totalQuestions > 0
@@ -97,6 +106,11 @@ function GameHistoryRow({ entry }: { entry: HistoryEntry }) {
         <Text style={styles.gameDate}>{formatDate(entry.date)}</Text>
         <Text style={styles.gameScore}>
           {entry.correctAnswers}/{entry.totalQuestions} ({pct}%)
+        </Text>
+      </View>
+      <View style={styles.gameMetaRow}>
+        <Text style={styles.gameMeta}>
+          Age {entry.age} · {ASSISTANCE_LABEL[entry.assistance]} · Era {entry.eraFrom}-{entry.eraTo}
         </Text>
       </View>
       <View style={styles.gameMetaRow}>
