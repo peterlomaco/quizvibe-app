@@ -459,7 +459,7 @@ const styles = StyleSheet.create({
   },
   prefixButton: {
     width: 96,
-    paddingVertical: Spacing.md,
+    paddingVertical: Spacing.sm,
     paddingHorizontal: Spacing.sm,
     backgroundColor: Colors.cardElevated,
     borderRadius: Radius.md,
@@ -525,7 +525,7 @@ const styles = StyleSheet.create({
     borderRadius: Radius.md,
     borderWidth: 2,
     paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.sm,
+    paddingVertical: Spacing.xs,
     position: 'relative',
   },
   // Alla tre name-card-tillstånd delar samma primaryMuted (blå) bakgrund —
@@ -594,7 +594,7 @@ const styles = StyleSheet.create({
     borderRadius: Radius.md,
     borderWidth: 2,
     paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.md,
+    paddingVertical: Spacing.sm,
     position: 'relative',
   },
   // Default-läge (oselected): cardElevated-bg + primaryBorder (tunn). Speglar

@@ -1222,7 +1222,7 @@ export default function HomeScreen() {
   // Default-värden: användaren kan registrera direkt efter year of birth.
   // Assistance och Region är förvalda men kan ändras via picker:erna.
   const [regAssistance, setRegAssistance] = useState<AssistanceLevel>('standard');
-  const [regRegion, setRegRegion] = useState<RegRegion>('global');
+  const [regRegion, setRegRegion] = useState<RegRegion>('sweden');
   const [regYearPickerOpen, setRegYearPickerOpen] = useState(false);
   const [regAssistancePickerOpen, setRegAssistancePickerOpen] = useState(false);
   const [regRegionPickerOpen, setRegRegionPickerOpen] = useState(false);
@@ -1275,7 +1275,7 @@ export default function HomeScreen() {
         setRegPasswordConfirmed(false);
         setRegBirthYearText('');
         setRegAssistance('standard');
-        setRegRegion('global');
+        setRegRegion('sweden');
         setRegYearPickerOpen(false);
         setRegAssistancePickerOpen(false);
         setRegRegionPickerOpen(false);
@@ -1339,7 +1339,7 @@ export default function HomeScreen() {
       setRegPasswordConfirmed(false);
       setRegBirthYearText('');
       setRegAssistance('standard');
-      setRegRegion('global');
+      setRegRegion('sweden');
       setRegYearPickerOpen(false);
       setRegAssistancePickerOpen(false);
       setRegRegionPickerOpen(false);
@@ -1363,7 +1363,7 @@ export default function HomeScreen() {
       setRegPasswordConfirmed(false);
       setRegBirthYearText('');
       setRegAssistance('standard');
-      setRegRegion('global');
+      setRegRegion('sweden');
       setRegYearPickerOpen(false);
       setRegAssistancePickerOpen(false);
       setRegRegionPickerOpen(false);

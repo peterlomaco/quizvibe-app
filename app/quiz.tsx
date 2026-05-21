@@ -3304,36 +3304,28 @@ export default function QuizScreen() {
                 )}
               </View>
               <View style={styles.questionTextWrap}>
-                {/* Frågetexten kommer från backend-schemats FIXED_QUESTION_TEXT
-                    (matrisens "Fixed Question text"-kolumn) och split:as här
-                    för visuell fokus på huvudbegreppet:
-                    • "Which Year ..." (song/movie/sport-event) → 2 rader,
-                      "Which Year" som stor headline + resten som sub-rad.
-                    • "What is the Name ..." (artist/actor/character/athlete/
-                      cultural-person/celebrity/building/place) → 3 rader,
-                      "What is" / "the Name" headline / "of this X?".
-                    • Övriga ("Which city/country is this?") → enda rad. */}
+                {/* Frågetexten renderas som ett enskilt Text-element med
+                    inline-highlight på nyckelordet (Year/Name/City/Country)
+                    via nested Text-styling. Bara nyckelordet är stort; resten
+                    är vanlig läs-storlek. Detta håller frågekortet kompakt
+                    (1-2 rader istället för tidigare 2-3-rader-split) och styr
+                    blicken direkt till frågans semantiska anker.
+                    Regex är case-insensitive + \b-ordsgränser så vi inte
+                    matchar substrings (t.ex. "Yearly"). Första matchen
+                    highlightas; resterande förekomster (sällsynt) lämnas
+                    orörda. */}
                 {(() => {
-                  const yearMatch = question.question.match(
-                    /^Which Year\s+(.+)$/,
+                  const match = question.question.match(
+                    /^(.*?)\b(Year|Name|City|Country)\b(.*)$/i,
                   );
-                  if (yearMatch) {
+                  if (match) {
+                    const [, before, keyword, after] = match;
                     return (
-                      <>
-                        <Text style={styles.questionTextHeadline}>Which Year</Text>
-                        <Text style={styles.questionText}>{yearMatch[1]}</Text>
-                      </>
-                    );
-                  }
-                  const nameMatch = question.question.match(
-                    /^What is\s+the [Nn]ame\s+(.+)$/,
-                  );
-                  if (nameMatch) {
-                    return (
-                      <>
-                        <Text style={styles.questionTextHeadline}>What is the Name</Text>
-                        <Text style={styles.questionText}>{nameMatch[1]}</Text>
-                      </>
+                      <Text style={styles.questionText}>
+                        {before}
+                        <Text style={styles.questionTextHeadline}>{keyword}</Text>
+                        {after}
+                      </Text>
                     );
                   }
                   return (
@@ -3456,91 +3448,94 @@ export default function QuizScreen() {
               );
             })()}
 
-            {/* Fas-medveten action-knapp:
-                  • question  → Confirm (blå glow + pulse)
-                  • awaiting  → låst "Confirmed — waiting for time"
-                  • reveal    → inget; Next-tab ligger absolute-positionerad
-                    i nedre högra hörnet av SafeAreaView:n för båda timeline
-                    och image. */}
-            <View style={styles.actionWrap}>
-              {phase === 'question' && (
-                <Animated.View
-                  style={[
-                    styles.confirmWrap,
-                    { transform: [{ scale: confirmPulse }] },
-                  ]}
-                >
-                  <Animated.View
-                    style={[styles.confirmHalo, { opacity: confirmGlow }]}
-                    pointerEvents="none"
-                  />
-                  <TouchableOpacity
-                    style={[
-                      styles.actionBtn,
-                      styles.actionBtnConfirm,
-                      (!canConfirm || shouldLockForUnstable) &&
-                        styles.actionBtnDisabled,
-                    ]}
-                    onPress={() => {
-                      if (!canConfirm || shouldLockForUnstable) return;
-                      if (question.type === 'image' && pendingNameOption) {
-                        handleConfirmName(pendingNameOption);
-                      } else if (question.type === 'timeline' && pendingYear !== null) {
-                        handleConfirm(pendingYear);
-                      }
-                    }}
-                    disabled={!canConfirm || shouldLockForUnstable}
-                    activeOpacity={0.85}
-                  >
-                    {/* Q-glyph (ring + tail + 3 ljudvågs-bågar från QuizVibe-
-                        loggan) ersätter ett typografiskt C så ordet läses som
-                        "Qonfirm" med QuizVibe:s brand-Q. Färgas i Colors.warning
-                        (gold) för att framhäva brand-glyfen mot den vita
-                        "onfirm"-texten. Bågarna är arc-koordinater från
-                        QuizVibeLogo, translerade +3x/+1y eftersom Q-center
-                        sitter på (40,38) här istället för loggans (37,37).
-                        Rotation 25° kring Q-center matchar loggans snedställning.
-                        strokeWidth 1.6 på bågarna = klart smalare än Q-ringens
-                        6.5 så de läses som "ljudvågor" inom ringen. */}
-                    <View style={styles.actionBtnContent}>
-                      {/* viewBox expanderad till "23 18 34 37" (från "24 22 30
-                          32") för att rymma Q-ringens tjockare 6.5-stroke utan
-                          klippning på vänster kant, samt den breddade topp-
-                          bågens rotation-bbox. SVG-dimensionerna bumpade till
-                          24 för att kompensera så Q-glyfens visuella storlek
-                          är ungefär densamma som tidigare. */}
-                      <Svg width={24} height={24} viewBox="23 18 34 37">
-                        <Circle cx="40" cy="38" r="13" fill="none" stroke={Colors.warning} strokeWidth="6.5" />
-                        <Path d="M49 47 L53 51" stroke={Colors.warning} strokeWidth="6.5" strokeLinecap="round" />
-                        <G transform="rotate(25 40 38)">
-                          {/* Topp-båge (utanför Q-ringens topp-kant) — chord 20,
-                              radius bumpad från 12 → 16 så bågen är flatare
-                              och mer parallell med Q-ringens kantlinje. Mindre
-                              sagitta minskar också rotation-bbox så bågen inte
-                              klipps av viewBox:s topp efter 25°-rotationen. */}
-                          <Path d="M 30 22 A 16 16 0 0 1 50 22" fill="none" stroke={Colors.warning} strokeWidth="1.6" strokeLinecap="round" />
-                          {/* Mitten-båge (inne i Q-ringen) */}
-                          <Path d="M 34 33 A 9 9 0 0 1 46 33" fill="none" stroke={Colors.warning} strokeWidth="1.6" strokeLinecap="round" />
-                          {/* Botten-båge (inne i Q-ringen) */}
-                          <Path d="M 36 35 A 6 6 0 0 1 44 35" fill="none" stroke={Colors.warning} strokeWidth="1.6" strokeLinecap="round" />
-                        </G>
-                      </Svg>
-                      <Text style={styles.actionBtnText}>onfirm</Text>
-                    </View>
-                  </TouchableOpacity>
-                </Animated.View>
-              )}
-              {phase === 'awaiting' && (
-                <View style={[styles.actionBtn, styles.actionBtnAwaiting]}>
-                  <Text style={styles.actionBtnAwaitingText}>
-                    ✓ Confirmed — waiting for time
-                  </Text>
-                </View>
-              )}
-            </View>
-
-        <View style={{ height: Spacing.xxl }} />
       </ScrollView>
+      {/* Sticky Confirm/Awaiting-bar — ligger UTANFÖR ScrollView så Confirm-
+          knappen alltid är synlig oavsett hur långt spelaren scrollat bland
+          prefix/fullnamn-alternativen. Tidigare låg blocket inuti ScrollView
+          vilket tvingade spelaren scrolla till slutet av answer-listan för
+          att nå Confirm. Renderas bara i question/awaiting; reveal har sin
+          egen Next-tab i bottom-right (absolute-positionerad nedan).
+          Fas-medveten action-knapp:
+            • question  → Confirm (blå glow + pulse)
+            • awaiting  → låst "Confirmed — waiting for time" */}
+      {(phase === 'question' || phase === 'awaiting') && (
+        <View style={styles.stickyConfirmBar}>
+          {phase === 'question' && (
+            <Animated.View
+              style={[
+                styles.confirmWrap,
+                { transform: [{ scale: confirmPulse }] },
+              ]}
+            >
+              <Animated.View
+                style={[styles.confirmHalo, { opacity: confirmGlow }]}
+                pointerEvents="none"
+              />
+              <TouchableOpacity
+                style={[
+                  styles.actionBtn,
+                  styles.actionBtnConfirm,
+                  (!canConfirm || shouldLockForUnstable) &&
+                    styles.actionBtnDisabled,
+                ]}
+                onPress={() => {
+                  if (!canConfirm || shouldLockForUnstable) return;
+                  if (question.type === 'image' && pendingNameOption) {
+                    handleConfirmName(pendingNameOption);
+                  } else if (question.type === 'timeline' && pendingYear !== null) {
+                    handleConfirm(pendingYear);
+                  }
+                }}
+                disabled={!canConfirm || shouldLockForUnstable}
+                activeOpacity={0.85}
+              >
+                {/* Q-glyph (ring + tail + 3 ljudvågs-bågar från QuizVibe-
+                    loggan) ersätter ett typografiskt C så ordet läses som
+                    "Qonfirm" med QuizVibe:s brand-Q. Färgas i Colors.warning
+                    (gold) för att framhäva brand-glyfen mot den vita
+                    "onfirm"-texten. Bågarna är arc-koordinater från
+                    QuizVibeLogo, translerade +3x/+1y eftersom Q-center
+                    sitter på (40,38) här istället för loggans (37,37).
+                    Rotation 25° kring Q-center matchar loggans snedställning.
+                    strokeWidth 1.6 på bågarna = klart smalare än Q-ringens
+                    6.5 så de läses som "ljudvågor" inom ringen. */}
+                <View style={styles.actionBtnContent}>
+                  {/* viewBox expanderad till "23 18 34 37" (från "24 22 30
+                      32") för att rymma Q-ringens tjockare 6.5-stroke utan
+                      klippning på vänster kant, samt den breddade topp-
+                      bågens rotation-bbox. SVG-dimensionerna bumpade till
+                      24 för att kompensera så Q-glyfens visuella storlek
+                      är ungefär densamma som tidigare. */}
+                  <Svg width={24} height={24} viewBox="23 18 34 37">
+                    <Circle cx="40" cy="38" r="13" fill="none" stroke={Colors.warning} strokeWidth="6.5" />
+                    <Path d="M49 47 L53 51" stroke={Colors.warning} strokeWidth="6.5" strokeLinecap="round" />
+                    <G transform="rotate(25 40 38)">
+                      {/* Topp-båge (utanför Q-ringens topp-kant) — chord 20,
+                          radius bumpad från 12 → 16 så bågen är flatare
+                          och mer parallell med Q-ringens kantlinje. Mindre
+                          sagitta minskar också rotation-bbox så bågen inte
+                          klipps av viewBox:s topp efter 25°-rotationen. */}
+                      <Path d="M 30 22 A 16 16 0 0 1 50 22" fill="none" stroke={Colors.warning} strokeWidth="1.6" strokeLinecap="round" />
+                      {/* Mitten-båge (inne i Q-ringen) */}
+                      <Path d="M 34 33 A 9 9 0 0 1 46 33" fill="none" stroke={Colors.warning} strokeWidth="1.6" strokeLinecap="round" />
+                      {/* Botten-båge (inne i Q-ringen) */}
+                      <Path d="M 36 35 A 6 6 0 0 1 44 35" fill="none" stroke={Colors.warning} strokeWidth="1.6" strokeLinecap="round" />
+                    </G>
+                  </Svg>
+                  <Text style={styles.actionBtnText}>onfirm</Text>
+                </View>
+              </TouchableOpacity>
+            </Animated.View>
+          )}
+          {phase === 'awaiting' && (
+            <View style={[styles.actionBtn, styles.actionBtnAwaiting]}>
+              <Text style={styles.actionBtnAwaitingText}>
+                ✓ Confirmed — waiting for time
+              </Text>
+            </View>
+          )}
+        </View>
+      )}
       {/* Next-tab / Waiting-for-host-pill — absolute-positionerad i nedre
           högra hörnet av SafeAreaView:n så CTA:n alltid är synlig oavsett
           ScrollView:s scroll-position. Visas i reveal-fas för BÅDA timeline-
@@ -3982,9 +3977,10 @@ const styles = StyleSheet.create({
   questionCard: {
     backgroundColor: Colors.card, borderRadius: Radius.lg,
     borderWidth: 1, borderColor: Colors.border,
-    padding: Spacing.lg, gap: Spacing.sm,
+    paddingHorizontal: Spacing.lg, paddingVertical: Spacing.md, gap: Spacing.xs,
     marginHorizontal: Spacing.lg,
-    minHeight: 140,
+    // minHeight borttagen — keyword-highlight ger naturlig 1-2-rads-höjd
+    // (~70-90px) istället för tidigare fixed 140px.
   },
   // Top-rad pinnas mot kortets överkant så frågan kan flex-centreras under.
   // alignItems:'flex-start' gör att höger Answering-stack:en kan vara två rader
@@ -3995,15 +3991,13 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     gap: Spacing.sm,
   },
-  // Wrap runt frågetexten så den kan flex-centreras lodrätt mellan top-raden
-  // och kortets nederkant. gap: 2 ger tight spacing mellan headline och
-  // sub-rad så de läses som en sammanhängande fråga.
+  // Wrap runt frågetexten — kompakt vertikal yta eftersom keyword-highlight
+  // ryms på 1-2 rader istället för tidigare 2-3-rad-split. Liten padding så
+  // frågekortet blir totalhöjd ~80px istället för ~140px.
   questionTextWrap: {
-    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: Spacing.xs,
-    gap: 2,
   },
   questionMeta: { fontSize: FontSize.sm, fontWeight: FontWeight.medium, color: Colors.textSecondary },
   // "Answering"-stack — label ovanpå PlayerName, höger-justerat. Två rader
@@ -4028,22 +4022,34 @@ const styles = StyleSheet.create({
     letterSpacing: 0.2,
     maxWidth: 180,
   },
-  // Headline för split-formatet (rad 1) — markant större än sub-raden så
-  // ögat fastnar på "Which year" först, sedan läser fortsättningen.
+  // Inline keyword-highlight (nested inom questionText). Markant större +
+  // bold så ögat fastnar på frågans semantiska anker (Year/Name/City/
+  // Country). Renderas via <Text> nested i parent <Text>, så text-flowet
+  // håller orden tillsammans på samma rad/wrap-ningsformat.
   questionTextHeadline: {
-    fontSize: 32,
+    fontSize: 30,
     fontWeight: FontWeight.bold,
     color: Colors.textPrimary,
-    lineHeight: 38,
-    textAlign: 'center',
     letterSpacing: 0.3,
   },
-  questionText: { fontSize: 18, fontWeight: FontWeight.semibold, color: Colors.textPrimary, lineHeight: 26, textAlign: 'center' },
+  questionText: { fontSize: 18, fontWeight: FontWeight.semibold, color: Colors.textPrimary, lineHeight: 30, textAlign: 'center' },
 
   // Action-knapp (Confirm / Next Round / Final Leaderboard) — paddningen
   // matchar TimelineSelector:s wrapper så knappen står i samma kolumn.
   actionWrap: {
     paddingHorizontal: Spacing.lg,
+  },
+  // Sticky Confirm-bar — sitter UTANFÖR ScrollView som sibling i SafeArea-
+  // tree:n så Confirm-knappen alltid är synlig medan spelaren scrollar bland
+  // prefix/fullnamn-alternativen. Bg + border-top markerar den som en
+  // visuellt separat zone från scroll-innehållet ovanför. paddingVertical
+  // ger luft runt knappen så den inte limmar mot border-top:en.
+  stickyConfirmBar: {
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.md,
+    backgroundColor: Colors.background,
+    borderTopWidth: 1,
+    borderTopColor: Colors.border,
   },
   actionBtn: {
     height: 56,
@@ -4260,7 +4266,10 @@ const rv = StyleSheet.create({
 const scrollHintStyles = StyleSheet.create({
   wrap: {
     position: 'absolute',
-    bottom: Spacing.lg,
+    // Bottom: sitter ovanför sticky Confirm-bar:n (~88px hög: 56 button + 32
+    // paddingVertical). Tidigare Spacing.lg räckte när Confirm var inuti
+    // ScrollView, men nu skulle pilen krocka med sticky-bar:n.
+    bottom: 96,
     left: 0,
     right: 0,
     alignItems: 'center',
