@@ -37,6 +37,7 @@ import {
   setPlayerAudioOverride,
   type PlayerAudioOverrides,
 } from '@/src/utils/mockLobbySettings';
+import { buildAudienceSet, filterByAudience } from '@/src/utils/audienceFilter';
 import { clearGameStarted } from '@/src/utils/mockStartedGames';
 import { MUSIC_QUESTIONS } from '@/src/utils/musicQuestions';
 import { savePendingLobbyPlayers } from '@/src/utils/pendingLobby';
@@ -750,31 +751,50 @@ export default function QuizScreen() {
         : youtubeEnabled
           ? SEED_QUESTIONS
           : [];
+    // Audience-filter: union av aktiva spelares generationer från turnOrder.
+    // Items vars audiences innehåller minst en spelares gen ELLER 'all' är
+    // kvalificerade. Tom audience-set (= ingen spelare med age-info) bypassar
+    // filtret. Steg 2 audience-filter unlock:ades när pool nådde 31 items
+    // (2026-05-22). Använder IMAGE_QUIZ_QUESTIONS som har audiences-prop;
+    // IMAGE_SEED_QUESTIONS-mappen droppar fältet, så vi filtrerar mot
+    // id-set:en istället.
+    const audienceSet = buildAudienceSet(turnOrder);
+    const audienceAllowedIds = new Set(
+      filterByAudience(IMAGE_QUIZ_QUESTIONS, audienceSet).map((q) => q.id),
+    );
+    const audienceFilteredImages = imagesEnabled
+      ? IMAGE_SEED_QUESTIONS.filter((q) => audienceAllowedIds.has(q.id))
+      : [];
     // Image-pool: peak-recognition-fönster när det finns (artister var
     // sällan kända det år de föddes — peak speglar host:s intent bättre).
     // Fallback till correctYear när peak saknas. Items utan både peak OCH
     // correctYear (t.ex. capitals/städer) är era-agnostiska och inkluderas
-    // i alla eras. Era-tom → hela IMAGE_SEED_QUESTIONS-poolen (samma
-    // fallback-strategi som YouTube-poolen), men bara när source-toggle är på.
-    const inEraImages = imagesEnabled
-      ? IMAGE_SEED_QUESTIONS.filter((q) => {
-          if (q.peakFrom !== undefined && q.peakTo !== undefined) {
-            // Interval-overlap: [eraFrom, eraTo] ∩ [peakFrom, peakTo] ≠ ∅
-            return eraFrom <= q.peakTo && eraTo >= q.peakFrom;
-          }
-          if (q.correctYear !== undefined) {
-            return q.correctYear >= eraFrom && q.correctYear <= eraTo;
-          }
-          // Era-agnostisk — alltid inkluderad.
-          return true;
-        })
-      : [];
+    // i alla eras. Era-tom → fallback-chain (audience-filtrerad utan era →
+    // hela poolen) så spelet alltid har content.
+    const inEraImages = audienceFilteredImages.filter((q) => {
+      if (q.peakFrom !== undefined && q.peakTo !== undefined) {
+        // Interval-overlap: [eraFrom, eraTo] ∩ [peakFrom, peakTo] ≠ ∅
+        return eraFrom <= q.peakTo && eraTo >= q.peakFrom;
+      }
+      if (q.correctYear !== undefined) {
+        return q.correctYear >= eraFrom && q.correctYear <= eraTo;
+      }
+      // Era-agnostisk — alltid inkluderad.
+      return true;
+    });
+    // Fallback-chain:
+    //   1. era + audience-filtrerad → använd
+    //   2. audience-filtrerad utan era → använd (era strippas)
+    //   3. alla items (om imagesEnabled) → använd (både filter strippas)
+    //   4. tom (= imagesEnabled=false)
     const imagePool: QuizQuestion[] =
       inEraImages.length > 0
         ? inEraImages
-        : imagesEnabled
-          ? IMAGE_SEED_QUESTIONS
-          : [];
+        : audienceFilteredImages.length > 0
+          ? audienceFilteredImages
+          : imagesEnabled
+            ? IMAGE_SEED_QUESTIONS
+            : [];
 
     const playerCount = Math.max(1, turnOrder.length);
     const hasYoutube = youtubePool.length > 0;
@@ -809,7 +829,11 @@ export default function QuizScreen() {
       }
     }
     return mixed.length > 0 ? mixed : SEED_QUESTIONS;
-  }, [eraFrom, eraTo, turnOrder.length, totalRounds, youtubeEnabled, imagesEnabled, gameMode]);
+    // turnOrder (inte bara .length) i deps eftersom audience-set härleds från
+    // varje spelares age — byten av spelare inom samma längd ska re-bygga
+    // poolen. turnOrder är själv ett useMemo så objektidentiteten ändras bara
+    // när URL-params (players-json) faktiskt ändras.
+  }, [eraFrom, eraTo, turnOrder, totalRounds, youtubeEnabled, imagesEnabled, gameMode]);
 
   // Media-källa per fråga (driver GetReadyIntro:s IndDev media-kö).
   // Image-frågor → 'image'; timeline-frågor (YouTube-content idag, men

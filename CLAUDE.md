@@ -9,7 +9,7 @@ Status mot den 4-stegs-plan vi följer för content-bygge inför launch:
 | Steg | Status | Anteckning |
 |---|---|---|
 | 1. Bild-format-fix | ✅ Klart | 16:9 container + `resizeMode='contain'` (commit `4ab2ac9`) |
-| 2. Audience-filter på bild-frågor | 🟢 Klar för impl | Pool idag = 31 items (över 30-targetet). Kör filter-implementation. |
+| 2. Audience-filter på bild-frågor | ✅ Klart | Pool-nivå union-filter (`audienceFilter.ts`) — items matchar minst en spelares gen ELLER `'all'`. Fallback-chain om filter tomt. Se "Image questions (MVP)". |
 | 3. Content build-out | 🟡 Pågående | Fas A klar (5→17→13→18→**31 live image-items** efter athletes-utbyggnad 2026-05-22). Fortsätt med fler actors + country/place/movie. |
 | 4. Pre-launch-items | ⏸️ Ej påbörjat | Captcha, YouTube ToS-audit, nightly cron, FAQ — se `project_pre_launch_checklist.md` |
 
@@ -23,13 +23,12 @@ Status mot den 4-stegs-plan vi följer för content-bygge inför launch:
 
 **Föreslagna nästa steg (när session återupptas):**
 
-1. **Steg 2 audience-filter** (HÖGSTA PRIO — pool nu 31 items, target 30+ uppnått): implementera audience-baserad fråge-filtrering så spelare främst får frågor relevanta för sin egen generation. Driver `birthYearToGeneration` + `audience`-matchning från katalogen.
-2. **Fortsätt content build-out** mot 50+ pool:
+1. **Fortsätt content build-out** mot 50+ pool:
    - **Fler actors** — gen-z saknar helt (0 items). Lägg till zendaya, timothée-chalamet, jacob-elordi (gen-z) + tom-hanks, audrey-hepburn (elder).
    - **Movies** (YouTube + sport-event) — schema-redo, 0 items. Använd `npm run youtube-search` för clip-curation.
    - **Country, place** — 0 items, kräver Wikipedia-curation per subject. Byggnads-bilder hanteras via city/country-frågor (`building`-subjekt togs bort 2026-05-22).
    - **Whitelist `region: Global`** för en delmängd av V1-katalogen som har global reach (t.ex. Madonna, Michael Jackson, Pelé, Muhammad Ali, Berlin, Paris). Default är Sverige-only — Global är opt-in per item. Release 2-task.
-3. **Pre-launch-items** — Captcha, YouTube ToS-audit, nightly cron, FAQ (se `project_pre_launch_checklist.md`).
+2. **Pre-launch-items** — Captcha, YouTube ToS-audit, nightly cron, FAQ (se `project_pre_launch_checklist.md`).
 
 Se `memory/project_roadmap_phases.md` för bredare fas-status (Fas 4 backlog → Pre-launch → Launch).
 
@@ -767,7 +766,16 @@ Edge case för word-count-filter: om kategorin har för få items med samma ord-
 
 Namnet som visas (`pickNameForPrefix`): det rätta namnet om prefix matchar `correctPrefix`, annars alfabetiskt första distractor-namnet. Backend-datan (`optionsByPrefix`) lagrar fortfarande full pool så filtreringen är ren UI-tweak.
 
-**audience-filter inte gjord (MVP)**: `audiences[]` på `ImageQuizQuestion` är inkluderad i datan men quiz.tsx filtrerar inte poolen baserat på host:s/aktiva spelarens generation. Alla 17 items visas oberoende av spelarprofil.
+**Audience-filter** ([src/utils/audienceFilter.ts](src/utils/audienceFilter.ts)) — implementerad 2026-05-22 när image-pool nådde 31 items. Pool-nivå-filter (V1):
+- **Modell**: union av aktiva spelares generationer från `turnOrder`. Items vars `audiences` innehåller minst en spelares gen ELLER `'all'` är kvalificerade.
+- **Generation-mapping**: `ageToGeneration(age)` → `getGenerationKeyFromBirthYear(currentYear - age)` (samma 5-bands-definition som backend/`birthYearToGeneration`).
+- **Fallback-chain** i quiz.tsx:s `gameQuestions`-useMemo:
+  1. era + audience-filtrerad pool → använd
+  2. audience-filtrerad utan era → använd (era strippas)
+  3. alla `IMAGE_SEED_QUESTIONS` (om imagesEnabled) → använd (både filter strippas)
+  4. tom (= source-toggle off)
+- **Edge cases**: tom audience-set (alla spelare saknar age-info) bypassar filtret helt. Spelare utan age bidrar inte men blockerar inte heller.
+- **Per-spelare-filter (V2)** kan ersätta union-modellen om Peter vill — kräver per-tur-pick i round-block-loopen istället för pool-nivå-filter. Aktuellt pragmatiskt val: union-filter håller round-block-strukturen intakt och fungerar för både Pass-the-Phone och Individual Devices.
 
 ## Image questions (MVP)
 
