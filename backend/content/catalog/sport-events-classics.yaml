@@ -1,0 +1,88 @@
+# Iconic sport-händelser — alla 5 generationer i Sverige känner igen
+# dem som "WHEN-momenter" via TV-replays, sport-dokumentärer, Olympic
+# Channel, klassiska VM-finaler. audience: ['all'] reflekterar cross-gen-
+# recognition i V1-svensk-målgrupp.
+#
+# correctYear = året händelsen ägde rum (VM-/OS-året).
+#
+# Frågetext: "Which Year did this happen?" (från FIXED_QUESTION_TEXT['sport-event']).
+#
+# Notera: 'songs'-category som approximation eftersom CategorySchema saknar
+# 'sport'. Distractor-pool är irrelevant för timeline-frågor.
+audience: ["all"]
+category: songs
+contentForm: youtube
+contentSubject: sport-event
+items:
+  - id: pele-1958-world-cup
+    displayName: "Pelé 17-årig vinner sin första VM"
+    correctYear: 1958
+    probability: 88
+    wikimediaSearchHints: ["Pelé 1958 World Cup Sweden final"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "TYNsrKtV6Mc"
+        startSec: 0
+        endSec: 15
+        channelTitle: "FIFA"
+        notes: "FIFA official channel — Pelé:s mål i Brasilien-Sverige-finalen 1958."
+  - id: spitz-1972-munich-olympics
+    displayName: "Mark Spitz tar 7 OS-guld i München"
+    correctYear: 1972
+    probability: 85
+    wikimediaSearchHints: ["Mark Spitz 1972 Munich Olympics seven gold"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "TyXhi5I-TWs"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Olympics"
+        notes: "Olympics official channel — Spitz 7 OS-guld München 1972."
+  - id: miracle-on-ice-1980
+    displayName: "Miracle on Ice — USA besegrar Sovjet"
+    correctYear: 1980
+    probability: 85
+    wikimediaSearchHints: ["Miracle on Ice 1980 Lake Placid USA USSR hockey"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "1ylQX7H_W_Q"
+        startSec: 60
+        endSec: 75
+        channelTitle: "MCB Highlights"
+        notes: "Miracle on Ice 1980 — USA-USSR hockey highlights. Mid-game action."
+  - id: maradona-hand-of-god
+    displayName: "Maradona Hand of God"
+    correctYear: 1986
+    probability: 95
+    wikimediaSearchHints: ["Maradona Hand of God 1986 World Cup England"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "XegYZ8y3xMY"
+        startSec: 0
+        endSec: 15
+        channelTitle: "FIFA"
+        notes: "FIFA official channel — Maradona Top 5 Goals (Hand of God + Goal of the Century 1986)."
+  - id: dream-team-1992-barcelona
+    displayName: "Dream Team — Barcelona OS basket"
+    correctYear: 1992
+    probability: 90
+    wikimediaSearchHints: ["Dream Team 1992 Barcelona Olympics basketball"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "JTNIWbGmzGU"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Olympics"
+        notes: "Olympics official channel — Best of Dream Team Barcelona 1992. Jordan/Magic/Bird."
+  - id: bolt-100m-world-record-2009
+    displayName: "Usain Bolt slår 100m-VR (9.58s)"
+    correctYear: 2009
+    probability: 92
+    wikimediaSearchHints: ["Usain Bolt 100m world record Berlin 2009"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "DiJKCQSkjOw"
+        startSec: 60
+        endSec: 75
+        channelTitle: "World Athletics"
+        notes: "World Athletics official channel — Berlin 2009 100m WR 9.58s."

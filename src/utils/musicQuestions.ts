@@ -147,6 +147,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "pele-1958-world-cup",
+    "displayName": "Pelé 17-årig vinner sin första VM",
+    "correctYear": 1958,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "TYNsrKtV6Mc",
+        "startSec": 0,
+        "endSec": 15,
+        "channelTitle": "FIFA",
+        "license": "standard",
+        "notes": "FIFA official channel — Pelé:s mål i Brasilien-Sverige-finalen 1958."
+      }
+    ]
+  },
+  {
     "id": "beatles-she-loves-you",
     "displayName": "She Loves You — The Beatles",
     "correctYear": 1963,
@@ -226,6 +246,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "John Lennon - Topic",
         "license": "standard",
         "notes": "Officiell album-audio via YouTube Topic (Ultimate Mix). Mid-song."
+      }
+    ]
+  },
+  {
+    "id": "spitz-1972-munich-olympics",
+    "displayName": "Mark Spitz tar 7 OS-guld i München",
+    "correctYear": 1972,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "TyXhi5I-TWs",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Olympics",
+        "license": "standard",
+        "notes": "Olympics official channel — Spitz 7 OS-guld München 1972."
       }
     ]
   },
@@ -368,6 +408,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "PINK FLOYD - Topic",
         "license": "standard",
         "notes": "Officiell album-audio via YouTube Topic. 'We don't need no education'-vers."
+      }
+    ]
+  },
+  {
+    "id": "miracle-on-ice-1980",
+    "displayName": "Miracle on Ice — USA besegrar Sovjet",
+    "correctYear": 1980,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "1ylQX7H_W_Q",
+        "startSec": 60,
+        "endSec": 75,
+        "channelTitle": "MCB Highlights",
+        "license": "standard",
+        "notes": "Miracle on Ice 1980 — USA-USSR hockey highlights. Mid-game action."
       }
     ]
   },
@@ -557,6 +617,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "maradona-hand-of-god",
+    "displayName": "Maradona Hand of God",
+    "correctYear": 1986,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "XegYZ8y3xMY",
+        "startSec": 0,
+        "endSec": 15,
+        "channelTitle": "FIFA",
+        "license": "standard",
+        "notes": "FIFA official channel — Maradona Top 5 Goals (Hand of God + Goal of the Century 1986)."
+      }
+    ]
+  },
+  {
     "id": "guns-n-roses-sweet-child-o-mine",
     "displayName": "Sweet Child O' Mine — Guns N' Roses",
     "correctYear": 1987,
@@ -657,6 +737,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "SLAYERO MUSIC",
         "license": "standard",
         "notes": "4K Remastered 60FPS — rörlig MV (cheerleaders/gymnastiksal). Ikonisk riff-intro."
+      }
+    ]
+  },
+  {
+    "id": "dream-team-1992-barcelona",
+    "displayName": "Dream Team — Barcelona OS basket",
+    "correctYear": 1992,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "JTNIWbGmzGU",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Olympics",
+        "license": "standard",
+        "notes": "Olympics official channel — Best of Dream Team Barcelona 1992. Jordan/Magic/Bird."
       }
     ]
   },
@@ -1279,6 +1379,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 290,
         "channelTitle": "Black Eyed Peas - Topic",
         "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "bolt-100m-world-record-2009",
+    "displayName": "Usain Bolt slår 100m-VR (9.58s)",
+    "correctYear": 2009,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "DiJKCQSkjOw",
+        "startSec": 60,
+        "endSec": 75,
+        "channelTitle": "World Athletics",
+        "license": "standard",
+        "notes": "World Athletics official channel — Berlin 2009 100m WR 9.58s."
       }
     ]
   },
