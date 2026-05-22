@@ -83,6 +83,12 @@ items:
     probability: 95
     wikimediaSearchHints: ["Bing Crosby White Christmas"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "w7mz91nTF40"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Bing Crosby - Topic"
+        notes: "Officiell album-audio via YouTube Topic. Refrängområde."
   - id: dooley-wilson-as-time-goes-by
     displayName: "As Time Goes By — Dooley Wilson"
     correctYear: 1943
@@ -168,6 +174,12 @@ items:
     probability: 95
     wikimediaSearchHints: ["Elvis Presley Jailhouse Rock"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "ppMZxuZ1lLg"
+        startSec: 15
+        endSec: 30
+        channelTitle: "Elvis Presley - Topic"
+        notes: "Officiell album-audio via YouTube Topic. Refrängområde."
   - id: chuck-berry-johnny-b-goode
     displayName: "Johnny B. Goode — Chuck Berry"
     correctYear: 1958
@@ -204,6 +216,12 @@ items:
     probability: 92
     wikimediaSearchHints: ["The Beatles She Loves You"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "nGbWU8S3vzs"
+        startSec: 10
+        endSec: 25
+        channelTitle: "The Beatles - Topic"
+        notes: "Officiell album-audio via YouTube Topic (Remastered 2009). 'Yeah yeah yeah'-hook."
   - id: beatles-a-hard-days-night
     displayName: "A Hard Day's Night — The Beatles"
     correctYear: 1964

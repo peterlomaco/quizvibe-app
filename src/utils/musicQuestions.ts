@@ -45,6 +45,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "bing-crosby-white-christmas",
+    "displayName": "White Christmas — Bing Crosby",
+    "correctYear": 1942,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "w7mz91nTF40",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Bing Crosby - Topic",
+        "license": "standard",
+        "notes": "Officiell album-audio via YouTube Topic. Refrängområde."
+      }
+    ]
+  },
+  {
     "id": "elvis-presley-heartbreak-hotel",
     "displayName": "Heartbreak Hotel — Elvis Presley",
     "correctYear": 1956,
@@ -61,6 +81,109 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Elvis Presley - Topic",
         "license": "standard",
         "notes": "Officiell album-audio via YouTube Topic. Refrängområde."
+      }
+    ]
+  },
+  {
+    "id": "elvis-presley-jailhouse-rock",
+    "displayName": "Jailhouse Rock — Elvis Presley",
+    "correctYear": 1957,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "ppMZxuZ1lLg",
+        "startSec": 15,
+        "endSec": 30,
+        "channelTitle": "Elvis Presley - Topic",
+        "license": "standard",
+        "notes": "Officiell album-audio via YouTube Topic. Refrängområde."
+      }
+    ]
+  },
+  {
+    "id": "beatles-she-loves-you",
+    "displayName": "She Loves You — The Beatles",
+    "correctYear": 1963,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "nGbWU8S3vzs",
+        "startSec": 10,
+        "endSec": 25,
+        "channelTitle": "The Beatles - Topic",
+        "license": "standard",
+        "notes": "Officiell album-audio via YouTube Topic (Remastered 2009). 'Yeah yeah yeah'-hook."
+      }
+    ]
+  },
+  {
+    "id": "beatles-hey-jude",
+    "displayName": "Hey Jude — The Beatles",
+    "correctYear": 1968,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "mQER0A0ej0M",
+        "startSec": 15,
+        "endSec": 30,
+        "channelTitle": "The Beatles - Topic",
+        "license": "standard",
+        "notes": "Officiell album-audio via YouTube Topic (Remastered 2015). Opening 'Hey Jude'-hook."
+      }
+    ]
+  },
+  {
+    "id": "john-lennon-imagine",
+    "displayName": "Imagine — John Lennon",
+    "correctYear": 1971,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "zHxobd1WLno",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "John Lennon - Topic",
+        "license": "standard",
+        "notes": "Officiell album-audio via YouTube Topic (Ultimate Mix). Mid-song."
+      }
+    ]
+  },
+  {
+    "id": "abba-waterloo",
+    "displayName": "Waterloo — ABBA",
+    "correctYear": 1974,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "9y-8ZiAJiQo",
+        "startSec": 15,
+        "endSec": 30,
+        "channelTitle": "ABBA - Topic",
+        "license": "standard",
+        "notes": "Officiell album-audio via YouTube Topic. Eurovision-låten."
       }
     ]
   },
@@ -145,6 +268,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "survivor-eye-of-the-tiger",
+    "displayName": "Eye of the Tiger — Survivor",
+    "correctYear": 1982,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "YKXTSOf5SA0",
+        "startSec": 0,
+        "endSec": 15,
+        "channelTitle": "Survivor - Topic",
+        "license": "standard",
+        "notes": "Officiell album-audio via YouTube Topic. Iconic Rocky-tema intro."
+      }
+    ]
+  },
+  {
     "id": "thriller",
     "displayName": "Thriller — Michael Jackson",
     "correctYear": 1982,
@@ -161,6 +305,69 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "prod. ovr",
         "license": "standard",
         "notes": "Official Shortened 4K Video — rörlig MV (zombiedans). Mid-song."
+      }
+    ]
+  },
+  {
+    "id": "a-ha-take-on-me",
+    "displayName": "Take on Me — a-ha",
+    "correctYear": 1985,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "MIgK3zOk0zg",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "a-ha - Topic",
+        "license": "standard",
+        "notes": "Officiell album-audio via YouTube Topic. Iconic synth-hook."
+      }
+    ]
+  },
+  {
+    "id": "guns-n-roses-sweet-child-o-mine",
+    "displayName": "Sweet Child O' Mine — Guns N' Roses",
+    "correctYear": 1987,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "oMfMUfgjiLg",
+        "startSec": 0,
+        "endSec": 15,
+        "channelTitle": "Guns N' Roses - Topic",
+        "license": "standard",
+        "notes": "Officiell album-audio via YouTube Topic. Iconic guitar-intro."
+      }
+    ]
+  },
+  {
+    "id": "madonna-like-a-prayer",
+    "displayName": "Like a Prayer — Madonna",
+    "correctYear": 1989,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "IaHQYTm14Kc",
+        "startSec": 45,
+        "endSec": 60,
+        "channelTitle": "Madonna - Topic",
+        "license": "standard",
+        "notes": "Officiell album-audio via YouTube Topic. Refrängområde."
       }
     ]
   },

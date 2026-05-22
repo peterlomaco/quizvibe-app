@@ -30,6 +30,12 @@ items:
     probability: 92
     wikimediaSearchHints: ["Survivor Eye of the Tiger Rocky"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "YKXTSOf5SA0"
+        startSec: 0
+        endSec: 15
+        channelTitle: "Survivor - Topic"
+        notes: "Officiell album-audio via YouTube Topic. Iconic Rocky-tema intro."
   # 1983
   - id: police-every-breath-you-take
     displayName: "Every Breath You Take — The Police"
@@ -63,6 +69,12 @@ items:
     probability: 92
     wikimediaSearchHints: ["a-ha Take on Me 1985"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "MIgK3zOk0zg"
+        startSec: 30
+        endSec: 45
+        channelTitle: "a-ha - Topic"
+        notes: "Officiell album-audio via YouTube Topic. Iconic synth-hook."
   - id: usa-for-africa-we-are-the-world
     displayName: "We Are the World — USA for Africa"
     correctYear: 1985
@@ -89,6 +101,12 @@ items:
     probability: 92
     wikimediaSearchHints: ["Guns N Roses Sweet Child O Mine"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "oMfMUfgjiLg"
+        startSec: 0
+        endSec: 15
+        channelTitle: "Guns N' Roses - Topic"
+        notes: "Officiell album-audio via YouTube Topic. Iconic guitar-intro."
   - id: rick-astley-never-gonna-give-you-up
     displayName: "Never Gonna Give You Up — Rick Astley"
     correctYear: 1987
@@ -115,6 +133,12 @@ items:
     probability: 92
     wikimediaSearchHints: ["Madonna Like a Prayer"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "IaHQYTm14Kc"
+        startSec: 45
+        endSec: 60
+        channelTitle: "Madonna - Topic"
+        notes: "Officiell album-audio via YouTube Topic. Refrängområde."
   - id: phil-collins-another-day-in-paradise
     displayName: "Another Day in Paradise — Phil Collins"
     correctYear: 1989

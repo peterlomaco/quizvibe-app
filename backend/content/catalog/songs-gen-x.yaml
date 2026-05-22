@@ -33,6 +33,12 @@ items:
     probability: 95
     wikimediaSearchHints: ["The Beatles Hey Jude"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "mQER0A0ej0M"
+        startSec: 15
+        endSec: 30
+        channelTitle: "The Beatles - Topic"
+        notes: "Officiell album-audio via YouTube Topic (Remastered 2015). Opening 'Hey Jude'-hook."
   - id: elvis-presley-suspicious-minds
     displayName: "Suspicious Minds — Elvis Presley"
     correctYear: 1969
@@ -51,6 +57,12 @@ items:
     probability: 95
     wikimediaSearchHints: ["John Lennon Imagine 1971"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "zHxobd1WLno"
+        startSec: 30
+        endSec: 45
+        channelTitle: "John Lennon - Topic"
+        notes: "Officiell album-audio via YouTube Topic (Ultimate Mix). Mid-song."
   - id: bill-withers-lean-on-me
     displayName: "Lean on Me — Bill Withers"
     correctYear: 1972
@@ -69,6 +81,12 @@ items:
     probability: 92
     wikimediaSearchHints: ["ABBA Waterloo Eurovision 1974"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "9y-8ZiAJiQo"
+        startSec: 15
+        endSec: 30
+        channelTitle: "ABBA - Topic"
+        notes: "Officiell album-audio via YouTube Topic. Eurovision-låten."
   # Bohemian Rhapsody flyttad till songs-all.yaml (cross-gen-iconic) 2026-05-22.
   # Hotel California flyttad till songs-all.yaml (cross-gen-iconic) 2026-05-22.
   - id: bee-gees-stayin-alive
