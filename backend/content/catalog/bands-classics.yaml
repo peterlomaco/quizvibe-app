@@ -1,0 +1,58 @@
+# Globalt cross-gen-iconic band — alla 5 generationer i Sverige känner igen
+# dem direkt (klassiker-revivals, vinyl-comeback, Bohemian Rhapsody-film
+# 2018, ABBA Voyage 2022, Spotify-streaming, etc.). audience: ['all']
+# reflekterar denna cross-gen-recognition i V1-svensk-målgrupp.
+# correctYear = bildnings-år (formation year).
+audience: ["all"]
+category: artists
+contentForm: image
+contentSubject: band
+items:
+  - id: abba
+    displayName: "ABBA"
+    correctYear: 1972
+    probability: 98
+    wikimediaSearchHints: ["ABBA band Sweden"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: beatles
+    displayName: "The Beatles"
+    correctYear: 1960
+    probability: 98
+    wikimediaSearchHints: ["The Beatles band"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: queen
+    displayName: "Queen"
+    correctYear: 1970
+    probability: 96
+    wikimediaSearchHints: ["Queen rock band Freddie Mercury"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: nirvana
+    displayName: "Nirvana"
+    correctYear: 1987
+    probability: 88
+    wikimediaSearchHints: ["Nirvana band Kurt Cobain"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: pink-floyd
+    displayName: "Pink Floyd"
+    correctYear: 1965
+    probability: 90
+    wikimediaSearchHints: ["Pink Floyd band"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: rolling-stones
+    displayName: "The Rolling Stones"
+    correctYear: 1962
+    probability: 92
+    wikimediaSearchHints: ["The Rolling Stones band Mick Jagger"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: led-zeppelin
+    displayName: "Led Zeppelin"
+    correctYear: 1968
+    probability: 85
+    wikimediaSearchHints: ["Led Zeppelin band"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: acdc
+    displayName: "AC/DC"
+    correctYear: 1973
+    probability: 90
+    wikimediaSearchHints: ["AC/DC band rock"]
+    answerMethods: ["timeline", "name-letters"]
