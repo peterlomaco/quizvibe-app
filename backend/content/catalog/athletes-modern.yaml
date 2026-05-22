@@ -1,4 +1,6 @@
-# Idrottare kända över Millennials, Gen Z och Gen Alpha (samtida fotbollsstjärnor).
+# Idrottare kända över Millennials, Gen Z och Gen Alpha — samtida globala
+# ikoner från fotboll, tennis, friidrott och stavhopp. Alla har stark
+# igenkänningsfaktor i Sverige + global reach (V1-katalogens principlinje).
 # correctYear = födelseår.
 audience: ["millennials", "gen-z", "gen-alpha"]
 category: athletes
@@ -22,4 +24,28 @@ items:
     correctYear: 1987
     probability: 97
     wikimediaSearchHints: ["Lionel Messi"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: serena-williams
+    displayName: "Serena Williams"
+    correctYear: 1981
+    probability: 96
+    wikimediaSearchHints: ["Serena Williams tennis"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: usain-bolt
+    displayName: "Usain Bolt"
+    correctYear: 1986
+    probability: 97
+    wikimediaSearchHints: ["Usain Bolt sprinter"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: roger-federer
+    displayName: "Roger Federer"
+    correctYear: 1981
+    probability: 96
+    wikimediaSearchHints: ["Roger Federer tennis"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: armand-duplantis
+    displayName: "Armand Duplantis"
+    correctYear: 1999
+    probability: 88
+    wikimediaSearchHints: ["Armand Duplantis pole vault"]
     answerMethods: ["timeline", "name-letters"]

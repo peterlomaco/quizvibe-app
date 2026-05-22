@@ -9,24 +9,26 @@ Status mot den 4-stegs-plan vi följer för content-bygge inför launch:
 | Steg | Status | Anteckning |
 |---|---|---|
 | 1. Bild-format-fix | ✅ Klart | 16:9 container + `resizeMode='contain'` (commit `4ab2ac9`) |
-| 2. Audience-filter på bild-frågor | ⏸️ Parkerat | Kräver pool 30+ items innan filter blir meningsfullt utan att krympa poolen för mycket. Pool idag = 18 (närmare målet men ej där) |
-| 3. Content build-out | 🟡 Pågående | Fas A klar (5→17→13→**18 live image-items** efter actor-processing 2026-05-22). Fortsätt med Fas C (curation) |
+| 2. Audience-filter på bild-frågor | 🟢 Klar för impl | Pool idag = 31 items (över 30-targetet). Kör filter-implementation. |
+| 3. Content build-out | 🟡 Pågående | Fas A klar (5→17→13→18→**31 live image-items** efter athletes-utbyggnad 2026-05-22). Fortsätt med fler actors + country/place/movie. |
 | 4. Pre-launch-items | ⏸️ Ej påbörjat | Captcha, YouTube ToS-audit, nightly cron, FAQ — se `project_pre_launch_checklist.md` |
 
-**Pool-status idag (18 live image-items)**:
-- **Actors (5)**: ingrid-bergman, marilyn-monroe (elder), arnold-schwarzenegger, lasse-aberg (gen-x), jennifer-aniston (millennials) — processade 2026-05-22.
+**Pool-status idag (31 live image-items)** — V1-curering utifrån svensk igenkänning (global reach inte ett krav i V1; Release 2 whitelistar en delmängd med `region: Global` där lämpligt):
+- **Actors (5)**: ingrid-bergman, marilyn-monroe (elder), arnold-schwarzenegger, lasse-aberg (gen-x), jennifer-aniston (millennials).
 - **Artists (5)**: avicii, madonna, michael-jackson, taylor-swift, elvis-presley.
-- **Athletes (4)**: bjorn-borg, zlatan-ibrahimovic, cristiano-ronaldo, lionel-messi.
+- **Athletes (17)** — utbyggt från 4 till 17 (2026-05-22):
+  - Elder/Gen-x (10): bjorn-borg, muhammad-ali, mark-spitz, pele, diego-maradona, magic-johnson, michael-jordan, carl-lewis, steffi-graf, peter-forsberg.
+  - Millennials/Gen-z/Gen-alpha (7): zlatan-ibrahimovic, cristiano-ronaldo, lionel-messi, serena-williams, usain-bolt, roger-federer, armand-duplantis.
 - **Capitals/cities (4)**: berlin, london, paris, stockholm.
 
 **Föreslagna nästa steg (när session återupptas):**
 
-1. **Bygg ut nya subjects** mot 30+ pool för att unlock:a steg 2 audience-filter:
-   - **Athletes utöver de 4 fotbollsstjärnorna** (Björn Borg, Zlatan, Cristiano, Messi). Lägg till tennisstjärnor, NBA-spelare, OS-medaljörer per generation. Mest impact eftersom poolen redan har YAML-schema och `athletes-*.yaml`-mönstret.
-   - **Fler actors** — ingrid-bergman/marilyn-monroe är de enda elder-actor-items idag (2 st), gen-z saknar helt (0 items). Lägg till t.ex. tom-hanks, audrey-hepburn (elder), julia-roberts (gen-x), zendaya, timothée-chalamet (gen-z).
-   - **Movies** (YouTube + sport-event) — schema-redo, 0 items idag. Använd `npm run youtube-search` för clip-curation.
-   - **Country, place** — 0 items, kräver Wikipedia-curation per subject. Byggnads-bilder (Eiffeltornet, Operahuset, etc.) hanteras via city/country-frågor istället ("Which city is this?" på en bild av Eiffeltornet) — `building`-subjektet togs bort 2026-05-22.
-2. **Steg 2 audience-filter** — när pool är 30+ items kör filter-implementation utan att krympa poolen omotiverat.
+1. **Steg 2 audience-filter** (HÖGSTA PRIO — pool nu 31 items, target 30+ uppnått): implementera audience-baserad fråge-filtrering så spelare främst får frågor relevanta för sin egen generation. Driver `birthYearToGeneration` + `audience`-matchning från katalogen.
+2. **Fortsätt content build-out** mot 50+ pool:
+   - **Fler actors** — gen-z saknar helt (0 items). Lägg till zendaya, timothée-chalamet, jacob-elordi (gen-z) + tom-hanks, audrey-hepburn (elder).
+   - **Movies** (YouTube + sport-event) — schema-redo, 0 items. Använd `npm run youtube-search` för clip-curation.
+   - **Country, place** — 0 items, kräver Wikipedia-curation per subject. Byggnads-bilder hanteras via city/country-frågor (`building`-subjekt togs bort 2026-05-22).
+   - **Whitelist `region: Global`** för en delmängd av V1-katalogen som har global reach (t.ex. Madonna, Michael Jackson, Pelé, Muhammad Ali, Berlin, Paris). Default är Sverige-only — Global är opt-in per item. Release 2-task.
 3. **Pre-launch-items** — Captcha, YouTube ToS-audit, nightly cron, FAQ (se `project_pre_launch_checklist.md`).
 
 Se `memory/project_roadmap_phases.md` för bredare fas-status (Fas 4 backlog → Pre-launch → Launch).

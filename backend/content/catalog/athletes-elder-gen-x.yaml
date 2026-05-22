@@ -1,4 +1,6 @@
-# Idrottare kända för elder + Gen X.
+# Idrottare kända för elder + Gen X. Globala ikoner (NBA, boxning, fotboll,
+# tennis, friidrott, hockey) som har stark igenkänningsfaktor i Sverige
+# OCH globalt — V1-katalogen utgår från svensk recognition + global reach.
 # correctYear = födelseår.
 audience: ["elder", "gen-x"]
 category: athletes
@@ -10,4 +12,58 @@ items:
     correctYear: 1956
     probability: 97
     wikimediaSearchHints: ["Björn Borg tennis"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: muhammad-ali
+    displayName: "Muhammad Ali"
+    correctYear: 1942
+    probability: 98
+    wikimediaSearchHints: ["Muhammad Ali boxer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: mark-spitz
+    displayName: "Mark Spitz"
+    correctYear: 1950
+    probability: 80
+    wikimediaSearchHints: ["Mark Spitz swimmer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: pele
+    displayName: "Pelé"
+    correctYear: 1940
+    probability: 98
+    wikimediaSearchHints: ["Pelé footballer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: diego-maradona
+    displayName: "Diego Maradona"
+    correctYear: 1960
+    probability: 96
+    wikimediaSearchHints: ["Diego Maradona"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: magic-johnson
+    displayName: "Magic Johnson"
+    correctYear: 1959
+    probability: 90
+    wikimediaSearchHints: ["Magic Johnson basketball"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: michael-jordan
+    displayName: "Michael Jordan"
+    correctYear: 1963
+    probability: 99
+    wikimediaSearchHints: ["Michael Jordan basketball"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: carl-lewis
+    displayName: "Carl Lewis"
+    correctYear: 1961
+    probability: 85
+    wikimediaSearchHints: ["Carl Lewis athlete"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: steffi-graf
+    displayName: "Steffi Graf"
+    correctYear: 1969
+    probability: 88
+    wikimediaSearchHints: ["Steffi Graf tennis"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: peter-forsberg
+    displayName: "Peter Forsberg"
+    correctYear: 1973
+    probability: 92
+    wikimediaSearchHints: ["Peter Forsberg ice hockey"]
     answerMethods: ["timeline", "name-letters"]
