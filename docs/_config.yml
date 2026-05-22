@@ -1,0 +1,14 @@
+# Jekyll-config för GitHub Pages-rendering av docs/-mappen.
+# Aktiveras via repo Settings → Pages → Source: master branch, /docs folder.
+
+title: QuizVibe
+description: Mobile quiz app — privacy, terms, and app review documentation.
+theme: jekyll-theme-minimal
+
+# Använd "pretty" URL:er (/legal/privacy/ istället för /legal/privacy.html).
+permalink: pretty
+
+# Exkludera filer som inte ska publiceras (de finns i docs/ för annan användning).
+exclude:
+  - APP_REVIEW_RESPONSES.md
+  - individual-devices-spec.md

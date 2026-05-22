@@ -118,7 +118,9 @@ const REG_REGION_OPTIONS: { id: RegRegion; label: string }[] = [
 
 const CURRENT_YEAR = new Date().getFullYear();
 const MIN_BIRTH_YEAR = 1930;
-const MAX_BIRTH_YEAR = 2020;
+// 13+ minimum age requirement (App Store / GDPR compliance). Dynamisk så
+// minimum-året följer current year — 2026: max 2013, 2027: max 2014, osv.
+const MAX_BIRTH_YEAR = CURRENT_YEAR - 13;
 // Lista, nyaste år först — samma ordning som ProfileScreens year picker.
 const BIRTH_YEARS = Array.from(
   { length: MAX_BIRTH_YEAR - MIN_BIRTH_YEAR + 1 },
