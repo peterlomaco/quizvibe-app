@@ -71,6 +71,12 @@ items:
     probability: 90
     wikimediaSearchHints: ["Glenn Miller In the Mood 1940"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "7vMTZBVBkPU"
+        startSec: 5
+        endSec: 20
+        channelTitle: "Glenn Miller Orchestra - Topic"
+        notes: "Officiell album-audio via YouTube Topic. Iconic swing-intro."
   - id: glenn-miller-chattanooga-choo-choo
     displayName: "Chattanooga Choo Choo — Glenn Miller"
     correctYear: 1941
@@ -113,6 +119,12 @@ items:
     probability: 90
     wikimediaSearchHints: ["Nat King Cole Christmas Song chestnuts"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "1Jp3XIqTR2w"
+        startSec: 20
+        endSec: 35
+        channelTitle: "Nat King Cole - Topic"
+        notes: "Officiell album-audio via YouTube Topic. 'Chestnuts roasting'-vers."
   - id: frank-sinatra-almost-like-being-in-love
     displayName: "Almost Like Being in Love — Frank Sinatra"
     correctYear: 1947

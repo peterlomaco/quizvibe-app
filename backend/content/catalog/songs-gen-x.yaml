@@ -51,6 +51,12 @@ items:
     probability: 90
     wikimediaSearchHints: ["Simon Garfunkel Bridge Over Troubled Water"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "nvF5imxSaLI"
+        startSec: 60
+        endSec: 75
+        channelTitle: "Simon & Garfunkel - Topic"
+        notes: "Officiell album-audio via YouTube Topic. Chorus area."
   - id: john-lennon-imagine
     displayName: "Imagine — John Lennon"
     correctYear: 1971
@@ -107,9 +113,21 @@ items:
     probability: 90
     wikimediaSearchHints: ["Pink Floyd Another Brick in the Wall The Wall"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "A6iqfDrQ0_o"
+        startSec: 45
+        endSec: 60
+        channelTitle: "PINK FLOYD - Topic"
+        notes: "Officiell album-audio via YouTube Topic. 'We don't need no education'-vers."
   - id: queen-another-one-bites-the-dust
     displayName: "Another One Bites the Dust — Queen"
     correctYear: 1980
     probability: 90
     wikimediaSearchHints: ["Queen Another One Bites the Dust"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "x3SlTBOfMww"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Queen Official"
+        notes: "Live at Montreal Forum 1981 (Remastered) — official Queen-kanal. Iconic bassline."

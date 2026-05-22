@@ -43,6 +43,12 @@ items:
     probability: 92
     wikimediaSearchHints: ["The Police Every Breath You Take"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "6cucosmPj-A"
+        startSec: 0
+        endSec: 15
+        channelTitle: "The Police - Topic"
+        notes: "Officiell album-audio via YouTube Topic. Iconic guitar-arpeggio-intro."
   - id: irene-cara-flashdance-what-a-feeling
     displayName: "Flashdance... What a Feeling — Irene Cara"
     correctYear: 1983
@@ -94,6 +100,12 @@ items:
     probability: 90
     wikimediaSearchHints: ["Bon Jovi Livin on a Prayer"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "YBdyc1WDlBQ"
+        startSec: 45
+        endSec: 60
+        channelTitle: "Jon Bon Jovi - Topic"
+        notes: "Officiell album-audio via YouTube Topic. 'Whoaa, we're halfway there'-refräng."
   # 1987
   - id: guns-n-roses-sweet-child-o-mine
     displayName: "Sweet Child O' Mine — Guns N' Roses"
@@ -113,6 +125,12 @@ items:
     probability: 90
     wikimediaSearchHints: ["Rick Astley Never Gonna Give You Up"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "3BFTio5296w"
+        startSec: 15
+        endSec: 30
+        channelTitle: "Rick Astley - Topic"
+        notes: "Officiell album-audio via YouTube Topic (2022 Remaster). Iconic 'Never gonna give you up'-hook."
   # 1988
   - id: bobby-mcferrin-dont-worry-be-happy
     displayName: "Don't Worry, Be Happy — Bobby McFerrin"
@@ -171,6 +189,12 @@ items:
     probability: 90
     wikimediaSearchHints: ["Michael Jackson Black or White"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "m-y_IxPcx8U"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Michael Jackson - Topic"
+        notes: "Officiell album-audio via YouTube Topic. Iconic guitar-riff."
   # 1992
   - id: snap-rhythm-is-a-dancer
     displayName: "Rhythm Is a Dancer — Snap!"
@@ -225,6 +249,12 @@ items:
     probability: 90
     wikimediaSearchHints: ["Spice Girls Wannabe"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "tscL_I2v7pU"
+        startSec: 5
+        endSec: 20
+        channelTitle: "Spice Girls - Topic"
+        notes: "Officiell album-audio via YouTube Topic. Iconic 'I'll tell you what I want'-intro."
   - id: los-del-rio-macarena
     displayName: "Macarena — Los del Río"
     correctYear: 1996

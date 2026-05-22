@@ -45,6 +45,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "glenn-miller-in-the-mood",
+    "displayName": "In the Mood — Glenn Miller",
+    "correctYear": 1940,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "7vMTZBVBkPU",
+        "startSec": 5,
+        "endSec": 20,
+        "channelTitle": "Glenn Miller Orchestra - Topic",
+        "license": "standard",
+        "notes": "Officiell album-audio via YouTube Topic. Iconic swing-intro."
+      }
+    ]
+  },
+  {
     "id": "bing-crosby-white-christmas",
     "displayName": "White Christmas — Bing Crosby",
     "correctYear": 1942,
@@ -61,6 +81,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Bing Crosby - Topic",
         "license": "standard",
         "notes": "Officiell album-audio via YouTube Topic. Refrängområde."
+      }
+    ]
+  },
+  {
+    "id": "nat-king-cole-the-christmas-song",
+    "displayName": "The Christmas Song — Nat King Cole",
+    "correctYear": 1946,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "1Jp3XIqTR2w",
+        "startSec": 20,
+        "endSec": 35,
+        "channelTitle": "Nat King Cole - Topic",
+        "license": "standard",
+        "notes": "Officiell album-audio via YouTube Topic. 'Chestnuts roasting'-vers."
       }
     ]
   },
@@ -142,6 +182,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "The Beatles - Topic",
         "license": "standard",
         "notes": "Officiell album-audio via YouTube Topic (Remastered 2015). Opening 'Hey Jude'-hook."
+      }
+    ]
+  },
+  {
+    "id": "simon-garfunkel-bridge-over-troubled-water",
+    "displayName": "Bridge Over Troubled Water — Simon & Garfunkel",
+    "correctYear": 1970,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "nvF5imxSaLI",
+        "startSec": 60,
+        "endSec": 75,
+        "channelTitle": "Simon & Garfunkel - Topic",
+        "license": "standard",
+        "notes": "Officiell album-audio via YouTube Topic. Chorus area."
       }
     ]
   },
@@ -248,6 +309,48 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "pink-floyd-another-brick-in-the-wall",
+    "displayName": "Another Brick in the Wall, Part 2 — Pink Floyd",
+    "correctYear": 1979,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "A6iqfDrQ0_o",
+        "startSec": 45,
+        "endSec": 60,
+        "channelTitle": "PINK FLOYD - Topic",
+        "license": "standard",
+        "notes": "Officiell album-audio via YouTube Topic. 'We don't need no education'-vers."
+      }
+    ]
+  },
+  {
+    "id": "queen-another-one-bites-the-dust",
+    "displayName": "Another One Bites the Dust — Queen",
+    "correctYear": 1980,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "x3SlTBOfMww",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Queen Official",
+        "license": "standard",
+        "notes": "Live at Montreal Forum 1981 (Remastered) — official Queen-kanal. Iconic bassline."
+      }
+    ]
+  },
+  {
     "id": "michael-jackson-billie-jean",
     "displayName": "Billie Jean — Michael Jackson",
     "correctYear": 1982,
@@ -309,6 +412,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "police-every-breath-you-take",
+    "displayName": "Every Breath You Take — The Police",
+    "correctYear": 1983,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "6cucosmPj-A",
+        "startSec": 0,
+        "endSec": 15,
+        "channelTitle": "The Police - Topic",
+        "license": "standard",
+        "notes": "Officiell album-audio via YouTube Topic. Iconic guitar-arpeggio-intro."
+      }
+    ]
+  },
+  {
     "id": "a-ha-take-on-me",
     "displayName": "Take on Me — a-ha",
     "correctYear": 1985,
@@ -326,6 +450,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "a-ha - Topic",
         "license": "standard",
         "notes": "Officiell album-audio via YouTube Topic. Iconic synth-hook."
+      }
+    ]
+  },
+  {
+    "id": "bon-jovi-livin-on-a-prayer",
+    "displayName": "Livin' on a Prayer — Bon Jovi",
+    "correctYear": 1986,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "YBdyc1WDlBQ",
+        "startSec": 45,
+        "endSec": 60,
+        "channelTitle": "Jon Bon Jovi - Topic",
+        "license": "standard",
+        "notes": "Officiell album-audio via YouTube Topic. 'Whoaa, we're halfway there'-refräng."
       }
     ]
   },
@@ -351,6 +496,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "rick-astley-never-gonna-give-you-up",
+    "displayName": "Never Gonna Give You Up — Rick Astley",
+    "correctYear": 1987,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "3BFTio5296w",
+        "startSec": 15,
+        "endSec": 30,
+        "channelTitle": "Rick Astley - Topic",
+        "license": "standard",
+        "notes": "Officiell album-audio via YouTube Topic (2022 Remaster). Iconic 'Never gonna give you up'-hook."
+      }
+    ]
+  },
+  {
     "id": "madonna-like-a-prayer",
     "displayName": "Like a Prayer — Madonna",
     "correctYear": 1989,
@@ -368,6 +534,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Madonna - Topic",
         "license": "standard",
         "notes": "Officiell album-audio via YouTube Topic. Refrängområde."
+      }
+    ]
+  },
+  {
+    "id": "michael-jackson-black-or-white",
+    "displayName": "Black or White — Michael Jackson",
+    "correctYear": 1991,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "m-y_IxPcx8U",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Michael Jackson - Topic",
+        "license": "standard",
+        "notes": "Officiell album-audio via YouTube Topic. Iconic guitar-riff."
       }
     ]
   },
@@ -408,6 +595,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "roelofjan1986",
         "license": "standard",
         "notes": "World Music Awards 1994 — iconic high-note chorus."
+      }
+    ]
+  },
+  {
+    "id": "spice-girls-wannabe",
+    "displayName": "Wannabe — Spice Girls",
+    "correctYear": 1996,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "tscL_I2v7pU",
+        "startSec": 5,
+        "endSec": 20,
+        "channelTitle": "Spice Girls - Topic",
+        "license": "standard",
+        "notes": "Officiell album-audio via YouTube Topic. Iconic 'I'll tell you what I want'-intro."
       }
     ]
   },
