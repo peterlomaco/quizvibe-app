@@ -831,11 +831,12 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "youtubeClips": [
       {
-        "videoId": "puKhmJEIw3I",
-        "startSec": 0,
-        "endSec": 273,
-        "channelTitle": "eMCeeHead",
-        "license": "standard"
+        "videoId": "YMv3EGB9Uaw",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "MUSIC EVOLUTION",
+        "license": "standard",
+        "notes": "Official Video 4K 60fps remaster — HD-fix av tidigare SD-klipp 2026-05-22. Refrängområde."
       }
     ]
   },

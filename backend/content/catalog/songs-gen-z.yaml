@@ -109,10 +109,11 @@ items:
     wikimediaSearchHints: ["Lady Marmalade Moulin Rouge Christina Aguilera"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "puKhmJEIw3I"
-        startSec: 0
-        endSec: 273
-        channelTitle: "eMCeeHead"
+      - videoId: "YMv3EGB9Uaw"
+        startSec: 30
+        endSec: 45
+        channelTitle: "MUSIC EVOLUTION"
+        notes: "Official Video 4K 60fps remaster — HD-fix av tidigare SD-klipp 2026-05-22. Refrängområde."
   - id: alicia-keys-fallin
     displayName: "Fallin' — Alicia Keys"
     correctYear: 2001
