@@ -8,14 +8,19 @@
 import type { ImageSourcePropType } from 'react-native';
 
 export const QUIZ_IMAGES: Record<string, ImageSourcePropType> = {
+  'arnold-schwarzenegger': require('../../assets/quiz-images/arnold-schwarzenegger.webp'),
   'avicii': require('../../assets/quiz-images/avicii.webp'),
   'berlin': require('../../assets/quiz-images/berlin.webp'),
   'bjorn-borg': require('../../assets/quiz-images/bjorn-borg.webp'),
   'cristiano-ronaldo': require('../../assets/quiz-images/cristiano-ronaldo.webp'),
   'elvis-presley': require('../../assets/quiz-images/elvis-presley.webp'),
+  'ingrid-bergman': require('../../assets/quiz-images/ingrid-bergman.webp'),
+  'jennifer-aniston': require('../../assets/quiz-images/jennifer-aniston.webp'),
+  'lasse-aberg': require('../../assets/quiz-images/lasse-aberg.webp'),
   'lionel-messi': require('../../assets/quiz-images/lionel-messi.webp'),
   'london': require('../../assets/quiz-images/london.webp'),
   'madonna': require('../../assets/quiz-images/madonna.webp'),
+  'marilyn-monroe': require('../../assets/quiz-images/marilyn-monroe.webp'),
   'michael-jackson': require('../../assets/quiz-images/michael-jackson.webp'),
   'paris': require('../../assets/quiz-images/paris.webp'),
   'stockholm': require('../../assets/quiz-images/stockholm.webp'),

@@ -9,18 +9,25 @@ Status mot den 4-stegs-plan vi följer för content-bygge inför launch:
 | Steg | Status | Anteckning |
 |---|---|---|
 | 1. Bild-format-fix | ✅ Klart | 16:9 container + `resizeMode='contain'` (commit `4ab2ac9`) |
-| 2. Audience-filter på bild-frågor | ⏸️ Parkerat | Kräver pool 30+ items innan filter blir meningsfullt utan att krympa poolen för mycket |
-| 3. Content build-out | 🟡 Pågående | Fas A klar (5→17→13 live image-items efter politiker-purge). Fortsätt med Fas C (curation) |
+| 2. Audience-filter på bild-frågor | ⏸️ Parkerat | Kräver pool 30+ items innan filter blir meningsfullt utan att krympa poolen för mycket. Pool idag = 18 (närmare målet men ej där) |
+| 3. Content build-out | 🟡 Pågående | Fas A klar (5→17→13→**18 live image-items** efter actor-processing 2026-05-22). Fortsätt med Fas C (curation) |
 | 4. Pre-launch-items | ⏸️ Ej påbörjat | Captcha, YouTube ToS-audit, nightly cron, FAQ — se `project_pre_launch_checklist.md` |
+
+**Pool-status idag (18 live image-items)**:
+- **Actors (5)**: ingrid-bergman, marilyn-monroe (elder), arnold-schwarzenegger, lasse-aberg (gen-x), jennifer-aniston (millennials) — processade 2026-05-22.
+- **Artists (5)**: avicii, madonna, michael-jackson, taylor-swift, elvis-presley.
+- **Athletes (4)**: bjorn-borg, zlatan-ibrahimovic, cristiano-ronaldo, lionel-messi.
+- **Capitals/cities (4)**: berlin, london, paris, stockholm.
 
 **Föreslagna nästa steg (när session återupptas):**
 
-1. **Processa de 5 nya actor-bilderna** via `npm run wikimedia-process <id>` (ingrid-bergman, marilyn-monroe, arnold-schwarzenegger, lasse-aberg, jennifer-aniston) så de hamnar i live-poolen. Bilderna är YAML-curerade i `actors-*.yaml` men saknar webp + require-rad i `quizImages.ts`. Snabb vinst: 13 → 18 live items. ~30-45 min.
-2. **Bygg ut nya subjects** — speciellt:
-   - **Athletes utöver de 4 fotbollsstjärnorna** (Björn Borg, Zlatan, Cristiano, Messi). Lägg till tennisstjärnor, NBA-spelare, OS-medaljörer per generation.
+1. **Bygg ut nya subjects** mot 30+ pool för att unlock:a steg 2 audience-filter:
+   - **Athletes utöver de 4 fotbollsstjärnorna** (Björn Borg, Zlatan, Cristiano, Messi). Lägg till tennisstjärnor, NBA-spelare, OS-medaljörer per generation. Mest impact eftersom poolen redan har YAML-schema och `athletes-*.yaml`-mönstret.
+   - **Fler actors** — ingrid-bergman/marilyn-monroe är de enda elder-actor-items idag (2 st), gen-z saknar helt (0 items). Lägg till t.ex. tom-hanks, audrey-hepburn (elder), julia-roberts (gen-x), zendaya, timothée-chalamet (gen-z).
    - **Movies** (YouTube + sport-event) — schema-redo, 0 items idag. Använd `npm run youtube-search` för clip-curation.
    - **Country, building, place** — 0 items, kräver Wikipedia-curation per subject.
-3. **Steg 2 audience-filter** — när pool är 30+ items kör filter-implementation utan att krympa poolen omotiverat.
+2. **Steg 2 audience-filter** — när pool är 30+ items kör filter-implementation utan att krympa poolen omotiverat.
+3. **Pre-launch-items** — Captcha, YouTube ToS-audit, nightly cron, FAQ (se `project_pre_launch_checklist.md`).
 
 Se `memory/project_roadmap_phases.md` för bredare fas-status (Fas 4 backlog → Pre-launch → Launch).
 
