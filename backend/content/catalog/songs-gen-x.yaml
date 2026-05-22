@@ -69,18 +69,8 @@ items:
     probability: 92
     wikimediaSearchHints: ["ABBA Waterloo Eurovision 1974"]
     answerMethods: ["timeline"]
-  - id: queen-bohemian-rhapsody
-    displayName: "Bohemian Rhapsody — Queen"
-    correctYear: 1975
-    probability: 95
-    wikimediaSearchHints: ["Queen Bohemian Rhapsody"]
-    answerMethods: ["timeline"]
-  - id: eagles-hotel-california
-    displayName: "Hotel California — Eagles"
-    correctYear: 1976
-    probability: 95
-    wikimediaSearchHints: ["Eagles Hotel California"]
-    answerMethods: ["timeline"]
+  # Bohemian Rhapsody flyttad till songs-all.yaml (cross-gen-iconic) 2026-05-22.
+  # Hotel California flyttad till songs-all.yaml (cross-gen-iconic) 2026-05-22.
   - id: bee-gees-stayin-alive
     displayName: "Stayin' Alive — Bee Gees"
     correctYear: 1977

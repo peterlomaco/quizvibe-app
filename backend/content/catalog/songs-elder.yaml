@@ -64,12 +64,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Ella Fitzgerald A-Tisket A-Tasket"]
     answerMethods: ["timeline"]
-  - id: judy-garland-over-the-rainbow
-    displayName: "Over the Rainbow — Judy Garland"
-    correctYear: 1939
-    probability: 95
-    wikimediaSearchHints: ["Judy Garland Over the Rainbow Wizard of Oz"]
-    answerMethods: ["timeline"]
+  # Over the Rainbow flyttad till songs-all.yaml (cross-gen-iconic) 2026-05-22.
   - id: glenn-miller-in-the-mood
     displayName: "In the Mood — Glenn Miller"
     correctYear: 1940
@@ -166,12 +161,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Chuck Berry Maybellene 1955"]
     answerMethods: ["timeline"]
-  - id: elvis-presley-heartbreak-hotel
-    displayName: "Heartbreak Hotel — Elvis Presley"
-    correctYear: 1956
-    probability: 95
-    wikimediaSearchHints: ["Elvis Presley Heartbreak Hotel"]
-    answerMethods: ["timeline"]
+  # Heartbreak Hotel flyttad till songs-all.yaml (cross-gen-iconic) 2026-05-22.
   - id: elvis-presley-jailhouse-rock
     displayName: "Jailhouse Rock — Elvis Presley"
     correctYear: 1957

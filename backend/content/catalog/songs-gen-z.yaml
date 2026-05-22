@@ -26,24 +26,12 @@ items:
     probability: 92
     wikimediaSearchHints: ["Aqua Barbie Girl 1997"]
     answerMethods: ["timeline"]
-    media:
-      kind: youtube
-      videoId: "77zog6Up_Yg"
-      startSec: 0
-      endSec: 198
-      channelTitle: "Aqua - Topic"
-  - id: celine-dion-my-heart-will-go-on
-    displayName: "My Heart Will Go On — Celine Dion"
-    correctYear: 1997
-    probability: 95
-    wikimediaSearchHints: ["Celine Dion My Heart Will Go On Titanic"]
-    answerMethods: ["timeline"]
-    media:
-      kind: youtube
-      videoId: "p79GmLNLMrY"
-      startSec: 0
-      endSec: 276
-      channelTitle: "7clouds"
+    youtubeClips:
+      - videoId: "77zog6Up_Yg"
+        startSec: 0
+        endSec: 198
+        channelTitle: "Aqua - Topic"
+  # My Heart Will Go On flyttad till songs-all.yaml (cross-gen-iconic) 2026-05-22.
   # 1998
   - id: cher-believe
     displayName: "Believe — Cher"
@@ -51,24 +39,22 @@ items:
     probability: 90
     wikimediaSearchHints: ["Cher Believe 1998"]
     answerMethods: ["timeline"]
-    media:
-      kind: youtube
-      videoId: "nZXRV4MezEw"
-      startSec: 0
-      endSec: 237
-      channelTitle: "Cher"
+    youtubeClips:
+      - videoId: "nZXRV4MezEw"
+        startSec: 0
+        endSec: 237
+        channelTitle: "Cher"
   - id: madonna-frozen
     displayName: "Frozen — Madonna"
     correctYear: 1998
     probability: 78
     wikimediaSearchHints: ["Madonna Frozen Ray of Light"]
     answerMethods: ["timeline"]
-    media:
-      kind: youtube
-      videoId: "XS088Opj9o0"
-      startSec: 0
-      endSec: 329
-      channelTitle: "Madonna"
+    youtubeClips:
+      - videoId: "XS088Opj9o0"
+        startSec: 0
+        endSec: 329
+        channelTitle: "Madonna"
   # 1999
   - id: lou-bega-mambo-no-5
     displayName: "Mambo No. 5 — Lou Bega"
@@ -76,24 +62,22 @@ items:
     probability: 85
     wikimediaSearchHints: ["Lou Bega Mambo No 5"]
     answerMethods: ["timeline"]
-    media:
-      kind: youtube
-      videoId: "is6AYSCWwKM"
-      startSec: 0
-      endSec: 221
-      channelTitle: "Lou Bega Official"
+    youtubeClips:
+      - videoId: "is6AYSCWwKM"
+        startSec: 0
+        endSec: 221
+        channelTitle: "Lou Bega Official"
   - id: eiffel-65-blue
     displayName: "Blue (Da Ba Dee) — Eiffel 65"
     correctYear: 1999
     probability: 85
     wikimediaSearchHints: ["Eiffel 65 Blue Da Ba Dee"]
     answerMethods: ["timeline"]
-    media:
-      kind: youtube
-      videoId: "kyzIQKuSqBs"
-      startSec: 0
-      endSec: 220
-      channelTitle: "Eiffel 65 - Topic"
+    youtubeClips:
+      - videoId: "kyzIQKuSqBs"
+        startSec: 0
+        endSec: 220
+        channelTitle: "Eiffel 65 - Topic"
   # 2000
   - id: britney-spears-oops-i-did-it-again
     displayName: "Oops!... I Did It Again — Britney Spears"
@@ -101,24 +85,22 @@ items:
     probability: 92
     wikimediaSearchHints: ["Britney Spears Oops I Did It Again"]
     answerMethods: ["timeline"]
-    media:
-      kind: youtube
-      videoId: "gmWlNI4Zl2s"
-      startSec: 0
-      endSec: 211
-      channelTitle: "Unique Sound"
+    youtubeClips:
+      - videoId: "gmWlNI4Zl2s"
+        startSec: 0
+        endSec: 211
+        channelTitle: "Unique Sound"
   - id: coldplay-yellow
     displayName: "Yellow — Coldplay"
     correctYear: 2000
     probability: 88
     wikimediaSearchHints: ["Coldplay Yellow Parachutes"]
     answerMethods: ["timeline"]
-    media:
-      kind: youtube
-      videoId: "yKNxeF4KMsY"
-      startSec: 0
-      endSec: 273
-      channelTitle: "Coldplay"
+    youtubeClips:
+      - videoId: "yKNxeF4KMsY"
+        startSec: 0
+        endSec: 273
+        channelTitle: "Coldplay"
   # 2001
   - id: lady-marmalade-2001
     displayName: "Lady Marmalade — Christina Aguilera, Lil' Kim, Mýa & Pink"
@@ -126,24 +108,22 @@ items:
     probability: 85
     wikimediaSearchHints: ["Lady Marmalade Moulin Rouge Christina Aguilera"]
     answerMethods: ["timeline"]
-    media:
-      kind: youtube
-      videoId: "puKhmJEIw3I"
-      startSec: 0
-      endSec: 273
-      channelTitle: "eMCeeHead"
+    youtubeClips:
+      - videoId: "puKhmJEIw3I"
+        startSec: 0
+        endSec: 273
+        channelTitle: "eMCeeHead"
   - id: alicia-keys-fallin
     displayName: "Fallin' — Alicia Keys"
     correctYear: 2001
     probability: 82
     wikimediaSearchHints: ["Alicia Keys Fallin Songs in A Minor"]
     answerMethods: ["timeline"]
-    media:
-      kind: youtube
-      videoId: "abcZMQASXF8"
-      startSec: 0
-      endSec: 211
-      channelTitle: "Bussin"
+    youtubeClips:
+      - videoId: "abcZMQASXF8"
+        startSec: 0
+        endSec: 211
+        channelTitle: "Bussin"
   # 2002
   - id: eminem-without-me
     displayName: "Without Me — Eminem"
@@ -151,24 +131,22 @@ items:
     probability: 92
     wikimediaSearchHints: ["Eminem Without Me Eminem Show"]
     answerMethods: ["timeline"]
-    media:
-      kind: youtube
-      videoId: "N9KSvSBfFYA"
-      startSec: 0
-      endSec: 291
-      channelTitle: "Solitude Songs"
+    youtubeClips:
+      - videoId: "N9KSvSBfFYA"
+        startSec: 0
+        endSec: 291
+        channelTitle: "Solitude Songs"
   - id: avril-lavigne-complicated
     displayName: "Complicated — Avril Lavigne"
     correctYear: 2002
     probability: 88
     wikimediaSearchHints: ["Avril Lavigne Complicated Let Go"]
     answerMethods: ["timeline"]
-    media:
-      kind: youtube
-      videoId: "5eGbnVlRcRg"
-      startSec: 0
-      endSec: 244
-      channelTitle: "7clouds"
+    youtubeClips:
+      - videoId: "5eGbnVlRcRg"
+        startSec: 0
+        endSec: 244
+        channelTitle: "7clouds"
   # 2003
   - id: 50-cent-in-da-club
     displayName: "In da Club — 50 Cent"
@@ -176,12 +154,11 @@ items:
     probability: 90
     wikimediaSearchHints: ["50 Cent In da Club Get Rich or Die Tryin"]
     answerMethods: ["timeline"]
-    media:
-      kind: youtube
-      videoId: "_VXUiAJi5KY"
-      startSec: 0
-      endSec: 194
-      channelTitle: "50 Cent - Topic"
+    youtubeClips:
+      - videoId: "_VXUiAJi5KY"
+        startSec: 0
+        endSec: 194
+        channelTitle: "50 Cent - Topic"
   - id: beyonce-crazy-in-love
     displayName: "Crazy in Love — Beyoncé"
     correctYear: 2003
@@ -196,24 +173,22 @@ items:
     probability: 90
     wikimediaSearchHints: ["Usher Yeah Lil Jon Ludacris"]
     answerMethods: ["timeline"]
-    media:
-      kind: youtube
-      videoId: "iCL04cxeMOE"
-      startSec: 0
-      endSec: 251
-      channelTitle: "7clouds"
+    youtubeClips:
+      - videoId: "iCL04cxeMOE"
+        startSec: 0
+        endSec: 251
+        channelTitle: "7clouds"
   - id: o-zone-dragostea-din-tei
     displayName: "Dragostea Din Tei — O-Zone"
     correctYear: 2004
     probability: 85
     wikimediaSearchHints: ["O-Zone Dragostea Din Tei Numa Numa"]
     answerMethods: ["timeline"]
-    media:
-      kind: youtube
-      videoId: "3xx0s147Xj4"
-      startSec: 0
-      endSec: 224
-      channelTitle: "Lyrixa"
+    youtubeClips:
+      - videoId: "3xx0s147Xj4"
+        startSec: 0
+        endSec: 224
+        channelTitle: "Lyrixa"
   # 2005
   - id: madonna-hung-up
     displayName: "Hung Up — Madonna"
@@ -221,24 +196,22 @@ items:
     probability: 85
     wikimediaSearchHints: ["Madonna Hung Up Confessions on a Dance Floor"]
     answerMethods: ["timeline"]
-    media:
-      kind: youtube
-      videoId: "EDwb9jOVRtU"
-      startSec: 0
-      endSec: 334
-      channelTitle: "Madonna"
+    youtubeClips:
+      - videoId: "EDwb9jOVRtU"
+        startSec: 0
+        endSec: 334
+        channelTitle: "Madonna"
   - id: gorillaz-feel-good-inc
     displayName: "Feel Good Inc. — Gorillaz"
     correctYear: 2005
     probability: 88
     wikimediaSearchHints: ["Gorillaz Feel Good Inc Demon Days"]
     answerMethods: ["timeline"]
-    media:
-      kind: youtube
-      videoId: "HyHNuVaZJ-k"
-      startSec: 0
-      endSec: 255
-      channelTitle: "Gorillaz"
+    youtubeClips:
+      - videoId: "HyHNuVaZJ-k"
+        startSec: 0
+        endSec: 255
+        channelTitle: "Gorillaz"
   # 2006
   - id: gnarls-barkley-crazy
     displayName: "Crazy — Gnarls Barkley"
@@ -246,24 +219,22 @@ items:
     probability: 85
     wikimediaSearchHints: ["Gnarls Barkley Crazy 2006"]
     answerMethods: ["timeline"]
-    media:
-      kind: youtube
-      videoId: "-N4jf6rtyuw"
-      startSec: 0
-      endSec: 181
-      channelTitle: "Gnarls Barkley Official"
+    youtubeClips:
+      - videoId: "-N4jf6rtyuw"
+        startSec: 0
+        endSec: 181
+        channelTitle: "Gnarls Barkley Official"
   - id: shakira-hips-dont-lie
     displayName: "Hips Don't Lie — Shakira"
     correctYear: 2006
     probability: 92
     wikimediaSearchHints: ["Shakira Hips Don't Lie Wyclef Jean"]
     answerMethods: ["timeline"]
-    media:
-      kind: youtube
-      videoId: "fNRXD393cfs"
-      startSec: 0
-      endSec: 219
-      channelTitle: "7clouds"
+    youtubeClips:
+      - videoId: "fNRXD393cfs"
+        startSec: 0
+        endSec: 219
+        channelTitle: "7clouds"
   # 2007
   - id: rihanna-umbrella
     displayName: "Umbrella — Rihanna"
@@ -271,24 +242,22 @@ items:
     probability: 92
     wikimediaSearchHints: ["Rihanna Umbrella Jay-Z"]
     answerMethods: ["timeline"]
-    media:
-      kind: youtube
-      videoId: "HuQ0ni6AlrU"
-      startSec: 0
-      endSec: 267
-      channelTitle: "Pillow"
+    youtubeClips:
+      - videoId: "HuQ0ni6AlrU"
+        startSec: 0
+        endSec: 267
+        channelTitle: "Pillow"
   - id: timbaland-onerepublic-apologize
     displayName: "Apologize — Timbaland & OneRepublic"
     correctYear: 2007
     probability: 88
     wikimediaSearchHints: ["Timbaland OneRepublic Apologize"]
     answerMethods: ["timeline"]
-    media:
-      kind: youtube
-      videoId: "xTjwTbnX_EA"
-      startSec: 0
-      endSec: 186
-      channelTitle: "Lost Panda"
+    youtubeClips:
+      - videoId: "xTjwTbnX_EA"
+        startSec: 0
+        endSec: 186
+        channelTitle: "Lost Panda"
   # 2008
   - id: coldplay-viva-la-vida
     displayName: "Viva la Vida — Coldplay"
@@ -296,24 +265,22 @@ items:
     probability: 92
     wikimediaSearchHints: ["Coldplay Viva la Vida 2008"]
     answerMethods: ["timeline"]
-    media:
-      kind: youtube
-      videoId: "dvgZkm1xWPE"
-      startSec: 0
-      endSec: 243
-      channelTitle: "Coldplay"
+    youtubeClips:
+      - videoId: "dvgZkm1xWPE"
+        startSec: 0
+        endSec: 243
+        channelTitle: "Coldplay"
   - id: katy-perry-i-kissed-a-girl
     displayName: "I Kissed a Girl — Katy Perry"
     correctYear: 2008
     probability: 88
     wikimediaSearchHints: ["Katy Perry I Kissed a Girl One of the Boys"]
     answerMethods: ["timeline"]
-    media:
-      kind: youtube
-      videoId: "usvTbqTHwyw"
-      startSec: 0
-      endSec: 180
-      channelTitle: "Katy Perry - Topic"
+    youtubeClips:
+      - videoId: "usvTbqTHwyw"
+        startSec: 0
+        endSec: 180
+        channelTitle: "Katy Perry - Topic"
   # 2009
   - id: lady-gaga-bad-romance
     displayName: "Bad Romance — Lady Gaga"
@@ -321,24 +288,22 @@ items:
     probability: 92
     wikimediaSearchHints: ["Lady Gaga Bad Romance The Fame Monster"]
     answerMethods: ["timeline"]
-    media:
-      kind: youtube
-      videoId: "TTOPBQhrvtQ"
-      startSec: 0
-      endSec: 293
-      channelTitle: "7clouds"
+    youtubeClips:
+      - videoId: "TTOPBQhrvtQ"
+        startSec: 0
+        endSec: 293
+        channelTitle: "7clouds"
   - id: black-eyed-peas-i-gotta-feeling
     displayName: "I Gotta Feeling — The Black Eyed Peas"
     correctYear: 2009
     probability: 88
     wikimediaSearchHints: ["Black Eyed Peas I Gotta Feeling The E.N.D."]
     answerMethods: ["timeline"]
-    media:
-      kind: youtube
-      videoId: "OIPmhkzN2ug"
-      startSec: 0
-      endSec: 290
-      channelTitle: "Black Eyed Peas - Topic"
+    youtubeClips:
+      - videoId: "OIPmhkzN2ug"
+        startSec: 0
+        endSec: 290
+        channelTitle: "Black Eyed Peas - Topic"
   # 2010
   - id: shakira-waka-waka
     displayName: "Waka Waka (This Time for Africa) — Shakira"
@@ -346,49 +311,35 @@ items:
     probability: 92
     wikimediaSearchHints: ["Shakira Waka Waka FIFA World Cup 2010"]
     answerMethods: ["timeline"]
-    media:
-      kind: youtube
-      videoId: "czWcyZRAMtk"
-      startSec: 0
-      endSec: 202
-      channelTitle: "7clouds"
+    youtubeClips:
+      - videoId: "czWcyZRAMtk"
+        startSec: 0
+        endSec: 202
+        channelTitle: "7clouds"
   - id: eminem-rihanna-love-the-way-you-lie
     displayName: "Love the Way You Lie — Eminem & Rihanna"
     correctYear: 2010
     probability: 90
     wikimediaSearchHints: ["Eminem Rihanna Love the Way You Lie Recovery"]
     answerMethods: ["timeline"]
-    media:
-      kind: youtube
-      videoId: "RnkShwdXfyc"
-      startSec: 0
-      endSec: 264
-      channelTitle: "Eminem - Topic"
+    youtubeClips:
+      - videoId: "RnkShwdXfyc"
+        startSec: 0
+        endSec: 264
+        channelTitle: "Eminem - Topic"
   # 2011
-  - id: adele-someone-like-you
-    displayName: "Someone Like You — Adele"
-    correctYear: 2011
-    probability: 95
-    wikimediaSearchHints: ["Adele Someone Like You 21"]
-    answerMethods: ["timeline"]
-    media:
-      kind: youtube
-      videoId: "hLQl3WQQoQ0"
-      startSec: 0
-      endSec: 285
-      channelTitle: "Adele"
+  # Someone Like You flyttad till songs-all.yaml (cross-gen-iconic) 2026-05-22.
   - id: avicii-levels
     displayName: "Levels — Avicii"
     correctYear: 2011
     probability: 92
     wikimediaSearchHints: ["Avicii Levels 2011"]
     answerMethods: ["timeline"]
-    media:
-      kind: youtube
-      videoId: "yMsKK0zNT_4"
-      startSec: 0
-      endSec: 203
-      channelTitle: "Kontor.TV"
+    youtubeClips:
+      - videoId: "yMsKK0zNT_4"
+        startSec: 0
+        endSec: 203
+        channelTitle: "Kontor.TV"
   # 2012
   - id: psy-gangnam-style
     displayName: "Gangnam Style — PSY"
@@ -396,21 +347,19 @@ items:
     probability: 95
     wikimediaSearchHints: ["PSY Gangnam Style"]
     answerMethods: ["timeline"]
-    media:
-      kind: youtube
-      videoId: "9bZkp7q19f0"
-      startSec: 0
-      endSec: 253
-      channelTitle: "officialpsy"
+    youtubeClips:
+      - videoId: "9bZkp7q19f0"
+        startSec: 0
+        endSec: 253
+        channelTitle: "officialpsy"
   - id: carly-rae-jepsen-call-me-maybe
     displayName: "Call Me Maybe — Carly Rae Jepsen"
     correctYear: 2012
     probability: 92
     wikimediaSearchHints: ["Carly Rae Jepsen Call Me Maybe"]
     answerMethods: ["timeline"]
-    media:
-      kind: youtube
-      videoId: "47EG91_XHic"
-      startSec: 0
-      endSec: 210
-      channelTitle: "Unique Vibes"
+    youtubeClips:
+      - videoId: "47EG91_XHic"
+        startSec: 0
+        endSec: 210
+        channelTitle: "Unique Vibes"

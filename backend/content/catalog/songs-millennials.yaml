@@ -23,12 +23,7 @@ items:
     wikimediaSearchHints: ["Kim Carnes Bette Davis Eyes"]
     answerMethods: ["timeline"]
   # 1982
-  - id: michael-jackson-billie-jean
-    displayName: "Billie Jean — Michael Jackson"
-    correctYear: 1982
-    probability: 95
-    wikimediaSearchHints: ["Michael Jackson Billie Jean"]
-    answerMethods: ["timeline"]
+  # Billie Jean flyttad till songs-all.yaml (cross-gen-iconic) 2026-05-22.
   - id: survivor-eye-of-the-tiger
     displayName: "Eye of the Tiger — Survivor"
     correctYear: 1982
@@ -166,12 +161,7 @@ items:
     wikimediaSearchHints: ["Boyz II Men End of the Road"]
     answerMethods: ["timeline"]
   # 1993
-  - id: whitney-houston-i-will-always-love-you
-    displayName: "I Will Always Love You — Whitney Houston"
-    correctYear: 1993
-    probability: 95
-    wikimediaSearchHints: ["Whitney Houston I Will Always Love You Bodyguard"]
-    answerMethods: ["timeline"]
+  # I Will Always Love You flyttad till songs-all.yaml (cross-gen-iconic) 2026-05-22.
   - id: 4-non-blondes-whats-up
     displayName: "What's Up? — 4 Non Blondes"
     correctYear: 1993

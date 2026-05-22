@@ -34,30 +34,18 @@ contentForm: youtube
 contentSubject: song
 items:
   # 2013
-  - id: avicii-wake-me-up
-    displayName: "Wake Me Up — Avicii"
-    correctYear: 2013
-    probability: 95
-    wikimediaSearchHints: ["Avicii Wake Me Up True"]
-    answerMethods: ["timeline"]
-    media:
-      kind: youtube
-      videoId: "SsYXnH9lzCY"
-      startSec: 0
-      endSec: 275
-      channelTitle: "7clouds"
+  # Wake Me Up flyttad till songs-all.yaml (cross-gen-iconic) 2026-05-22.
   - id: daft-punk-get-lucky
     displayName: "Get Lucky — Daft Punk"
     correctYear: 2013
     probability: 90
     wikimediaSearchHints: ["Daft Punk Get Lucky Pharrell Williams Random Access Memories"]
     answerMethods: ["timeline"]
-    media:
-      kind: youtube
-      videoId: "5glDAaCaazc"
-      startSec: 0
-      endSec: 246
-      channelTitle: "7clouds"
+    youtubeClips:
+      - videoId: "5glDAaCaazc"
+        startSec: 0
+        endSec: 246
+        channelTitle: "7clouds"
   # 2014
   - id: pharrell-williams-happy
     displayName: "Happy — Pharrell Williams"
@@ -65,24 +53,22 @@ items:
     probability: 92
     wikimediaSearchHints: ["Pharrell Williams Happy Despicable Me 2"]
     answerMethods: ["timeline"]
-    media:
-      kind: youtube
-      videoId: "jv-pYB0Qw9A"
-      startSec: 0
-      endSec: 238
-      channelTitle: "AnimeOracle"
+    youtubeClips:
+      - videoId: "jv-pYB0Qw9A"
+        startSec: 0
+        endSec: 238
+        channelTitle: "AnimeOracle"
   - id: taylor-swift-shake-it-off
     displayName: "Shake It Off — Taylor Swift"
     correctYear: 2014
     probability: 92
     wikimediaSearchHints: ["Taylor Swift Shake It Off 1989"]
     answerMethods: ["timeline"]
-    media:
-      kind: youtube
-      videoId: "nfWlot6h_JM"
-      startSec: 0
-      endSec: 242
-      channelTitle: "Taylor Swift"
+    youtubeClips:
+      - videoId: "nfWlot6h_JM"
+        startSec: 0
+        endSec: 242
+        channelTitle: "Taylor Swift"
   # 2015
   - id: adele-hello
     displayName: "Hello — Adele"
@@ -90,24 +76,22 @@ items:
     probability: 95
     wikimediaSearchHints: ["Adele Hello 25"]
     answerMethods: ["timeline"]
-    media:
-      kind: youtube
-      videoId: "YQHsXMglC9A"
-      startSec: 0
-      endSec: 367
-      channelTitle: "Adele"
+    youtubeClips:
+      - videoId: "YQHsXMglC9A"
+        startSec: 0
+        endSec: 367
+        channelTitle: "Adele"
   - id: wiz-khalifa-charlie-puth-see-you-again
     displayName: "See You Again — Wiz Khalifa & Charlie Puth"
     correctYear: 2015
     probability: 90
     wikimediaSearchHints: ["Wiz Khalifa See You Again Furious 7"]
     answerMethods: ["timeline"]
-    media:
-      kind: youtube
-      videoId: "RgKAFK5djSk"
-      startSec: 0
-      endSec: 238
-      channelTitle: "Wiz Khalifa Music"
+    youtubeClips:
+      - videoId: "RgKAFK5djSk"
+        startSec: 0
+        endSec: 238
+        channelTitle: "Wiz Khalifa Music"
   # 2016
   - id: drake-one-dance
     displayName: "One Dance — Drake"
@@ -115,24 +99,22 @@ items:
     probability: 90
     wikimediaSearchHints: ["Drake One Dance Views"]
     answerMethods: ["timeline"]
-    media:
-      kind: youtube
-      videoId: "ki0Ocze98U8"
-      startSec: 0
-      endSec: 175
-      channelTitle: "Billion Stars"
+    youtubeClips:
+      - videoId: "ki0Ocze98U8"
+        startSec: 0
+        endSec: 175
+        channelTitle: "Billion Stars"
   - id: chainsmokers-closer
     displayName: "Closer — The Chainsmokers"
     correctYear: 2016
     probability: 88
     wikimediaSearchHints: ["The Chainsmokers Closer Halsey"]
     answerMethods: ["timeline"]
-    media:
-      kind: youtube
-      videoId: "OGP499ko5EQ"
-      startSec: 0
-      endSec: 244
-      channelTitle: "7clouds Rock"
+    youtubeClips:
+      - videoId: "OGP499ko5EQ"
+        startSec: 0
+        endSec: 244
+        channelTitle: "7clouds Rock"
   # 2017
   - id: luis-fonsi-despacito
     displayName: "Despacito — Luis Fonsi & Daddy Yankee"
@@ -140,24 +122,22 @@ items:
     probability: 95
     wikimediaSearchHints: ["Luis Fonsi Despacito Daddy Yankee"]
     answerMethods: ["timeline"]
-    media:
-      kind: youtube
-      videoId: "TfkP5ubz1z4"
-      startSec: 0
-      endSec: 231
-      channelTitle: "7clouds"
+    youtubeClips:
+      - videoId: "TfkP5ubz1z4"
+        startSec: 0
+        endSec: 231
+        channelTitle: "7clouds"
   - id: post-malone-rockstar
     displayName: "Rockstar — Post Malone"
     correctYear: 2017
     probability: 88
     wikimediaSearchHints: ["Post Malone Rockstar 21 Savage"]
     answerMethods: ["timeline"]
-    media:
-      kind: youtube
-      videoId: "4GFAZBKZVJY"
-      startSec: 0
-      endSec: 218
-      channelTitle: "Republic Records"
+    youtubeClips:
+      - videoId: "4GFAZBKZVJY"
+        startSec: 0
+        endSec: 218
+        channelTitle: "Republic Records"
   # 2018
   - id: lady-gaga-bradley-cooper-shallow
     displayName: "Shallow — Lady Gaga & Bradley Cooper"
@@ -165,24 +145,22 @@ items:
     probability: 92
     wikimediaSearchHints: ["Lady Gaga Bradley Cooper Shallow A Star Is Born"]
     answerMethods: ["timeline"]
-    media:
-      kind: youtube
-      videoId: "aU_bj9SxvdU"
-      startSec: 0
-      endSec: 216
-      channelTitle: "7clouds"
+    youtubeClips:
+      - videoId: "aU_bj9SxvdU"
+        startSec: 0
+        endSec: 216
+        channelTitle: "7clouds"
   - id: drake-gods-plan
     displayName: "God's Plan — Drake"
     correctYear: 2018
     probability: 88
     wikimediaSearchHints: ["Drake God's Plan Scorpion"]
     answerMethods: ["timeline"]
-    media:
-      kind: youtube
-      videoId: "m1a_GqJf02M"
-      startSec: 0
-      endSec: 199
-      channelTitle: "Drake - Topic"
+    youtubeClips:
+      - videoId: "m1a_GqJf02M"
+        startSec: 0
+        endSec: 199
+        channelTitle: "Drake - Topic"
   - id: lil-nas-x-old-town-road
     displayName: "Old Town Road — Lil Nas X"
     correctYear: 2018
@@ -190,12 +168,11 @@ items:
     wikimediaSearchHints: ["Lil Nas X Old Town Road Billy Ray Cyrus"]
     answerMethods: ["timeline"]
     notes: "Original-release dec 2018; mainstream-version med Cyrus-remix 2019."
-    media:
-      kind: youtube
-      videoId: "7UGOIMoJtB4"
-      startSec: 0
-      endSec: 155
-      channelTitle: "Golden Network"
+    youtubeClips:
+      - videoId: "7UGOIMoJtB4"
+        startSec: 0
+        endSec: 155
+        channelTitle: "Golden Network"
   # 2019
   - id: billie-eilish-bad-guy
     displayName: "Bad Guy — Billie Eilish"
@@ -203,25 +180,12 @@ items:
     probability: 92
     wikimediaSearchHints: ["Billie Eilish Bad Guy When We All Fall Asleep"]
     answerMethods: ["timeline"]
-    media:
-      kind: youtube
-      videoId: "4-TbQnONe_w"
-      startSec: 0
-      endSec: 195
-      channelTitle: "7clouds"
-  - id: weeknd-blinding-lights
-    displayName: "Blinding Lights — The Weeknd"
-    correctYear: 2019
-    probability: 95
-    wikimediaSearchHints: ["The Weeknd Blinding Lights After Hours"]
-    answerMethods: ["timeline"]
-    notes: "Singel-release 29 nov 2019; peakade Billboard 2020."
-    media:
-      kind: youtube
-      videoId: "XwxLwG2_Sxk"
-      startSec: 0
-      endSec: 200
-      channelTitle: "7clouds"
+    youtubeClips:
+      - videoId: "4-TbQnONe_w"
+        startSec: 0
+        endSec: 195
+        channelTitle: "7clouds"
+  # Blinding Lights flyttad till songs-all.yaml (cross-gen-iconic) 2026-05-22.
   # 2020
   - id: harry-styles-watermelon-sugar
     displayName: "Watermelon Sugar — Harry Styles"
@@ -230,24 +194,22 @@ items:
     wikimediaSearchHints: ["Harry Styles Watermelon Sugar Fine Line"]
     answerMethods: ["timeline"]
     notes: "Singel-release maj 2020 (album Fine Line låg ute redan dec 2019)."
-    media:
-      kind: youtube
-      videoId: "dZwffaluIgg"
-      startSec: 0
-      endSec: 178
-      channelTitle: "Dan Music"
+    youtubeClips:
+      - videoId: "dZwffaluIgg"
+        startSec: 0
+        endSec: 178
+        channelTitle: "Dan Music"
   - id: bts-dynamite
     displayName: "Dynamite — BTS"
     correctYear: 2020
     probability: 88
     wikimediaSearchHints: ["BTS Dynamite 2020"]
     answerMethods: ["timeline"]
-    media:
-      kind: youtube
-      videoId: "kK29Q_LpVUw"
-      startSec: 0
-      endSec: 206
-      channelTitle: "7clouds K-pop"
+    youtubeClips:
+      - videoId: "kK29Q_LpVUw"
+        startSec: 0
+        endSec: 206
+        channelTitle: "7clouds K-pop"
   # 2021
   - id: kid-laroi-justin-bieber-stay
     displayName: "Stay — The Kid LAROI & Justin Bieber"
@@ -255,24 +217,22 @@ items:
     probability: 90
     wikimediaSearchHints: ["The Kid LAROI Justin Bieber Stay"]
     answerMethods: ["timeline"]
-    media:
-      kind: youtube
-      videoId: "yWHrYNP6j4k"
-      startSec: 0
-      endSec: 140
-      channelTitle: "7clouds"
+    youtubeClips:
+      - videoId: "yWHrYNP6j4k"
+        startSec: 0
+        endSec: 140
+        channelTitle: "7clouds"
   - id: olivia-rodrigo-drivers-license
     displayName: "Drivers License — Olivia Rodrigo"
     correctYear: 2021
     probability: 90
     wikimediaSearchHints: ["Olivia Rodrigo Drivers License Sour"]
     answerMethods: ["timeline"]
-    media:
-      kind: youtube
-      videoId: "ttRz03c208g"
-      startSec: 0
-      endSec: 248
-      channelTitle: "Rap Samurai"
+    youtubeClips:
+      - videoId: "ttRz03c208g"
+        startSec: 0
+        endSec: 248
+        channelTitle: "Rap Samurai"
   # 2022
   - id: harry-styles-as-it-was
     displayName: "As It Was — Harry Styles"
@@ -280,12 +240,11 @@ items:
     probability: 92
     wikimediaSearchHints: ["Harry Styles As It Was Harry's House"]
     answerMethods: ["timeline"]
-    media:
-      kind: youtube
-      videoId: "EsY5kRIBM8Y"
-      startSec: 0
-      endSec: 165
-      channelTitle: "7clouds"
+    youtubeClips:
+      - videoId: "EsY5kRIBM8Y"
+        startSec: 0
+        endSec: 165
+        channelTitle: "7clouds"
   - id: taylor-swift-anti-hero
     displayName: "Anti-Hero — Taylor Swift"
     correctYear: 2022
@@ -300,24 +259,22 @@ items:
     probability: 92
     wikimediaSearchHints: ["Miley Cyrus Flowers Endless Summer Vacation"]
     answerMethods: ["timeline"]
-    media:
-      kind: youtube
-      videoId: "iawgB2CDCrw"
-      startSec: 0
-      endSec: 198
-      channelTitle: "7clouds"
+    youtubeClips:
+      - videoId: "iawgB2CDCrw"
+        startSec: 0
+        endSec: 198
+        channelTitle: "7clouds"
   - id: doja-cat-paint-the-town-red
     displayName: "Paint the Town Red — Doja Cat"
     correctYear: 2023
     probability: 85
     wikimediaSearchHints: ["Doja Cat Paint the Town Red Scarlet"]
     answerMethods: ["timeline"]
-    media:
-      kind: youtube
-      videoId: "EiAMmYbr3vA"
-      startSec: 0
-      endSec: 232
-      channelTitle: "7clouds"
+    youtubeClips:
+      - videoId: "EiAMmYbr3vA"
+        startSec: 0
+        endSec: 232
+        channelTitle: "7clouds"
   # 2024
   - id: sabrina-carpenter-espresso
     displayName: "Espresso — Sabrina Carpenter"
@@ -325,12 +282,11 @@ items:
     probability: 90
     wikimediaSearchHints: ["Sabrina Carpenter Espresso Short n' Sweet"]
     answerMethods: ["timeline"]
-    media:
-      kind: youtube
-      videoId: "YnguM4ED3bw"
-      startSec: 0
-      endSec: 171
-      channelTitle: "7cloudsnation"
+    youtubeClips:
+      - videoId: "YnguM4ED3bw"
+        startSec: 0
+        endSec: 171
+        channelTitle: "7cloudsnation"
   - id: billie-eilish-birds-of-a-feather
     displayName: "Birds of a Feather — Billie Eilish"
     correctYear: 2024
@@ -345,12 +301,11 @@ items:
     wikimediaSearchHints: ["Lady Gaga Bruno Mars Die With a Smile"]
     answerMethods: ["timeline"]
     notes: "Singel-release 16 aug 2024; toppade Billboard 2025."
-    media:
-      kind: youtube
-      videoId: "sQtWPcAyL6g"
-      startSec: 0
-      endSec: 248
-      channelTitle: "7cloudsnation"
+    youtubeClips:
+      - videoId: "sQtWPcAyL6g"
+        startSec: 0
+        endSec: 248
+        channelTitle: "7cloudsnation"
   - id: rose-bruno-mars-apt
     displayName: "APT. — ROSÉ & Bruno Mars"
     correctYear: 2024
