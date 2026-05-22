@@ -8,7 +8,7 @@ import { identify, resetIdentity, track } from '@/src/utils/analytics';
 import { getAvatarEmojiById } from '@/src/utils/avatars';
 import { clearLeftPlayers } from '@/src/utils/leftPlayers';
 import { clearEjected } from '@/src/utils/ejectedPlayers';
-import { clearLobbyPlayers } from '@/src/utils/mockLobbyPlayers';
+import { clearLobbyPlayers, getLobbyPlayers } from '@/src/utils/mockLobbyPlayers';
 import { clearLobbySettings } from '@/src/utils/mockLobbySettings';
 import { clearGameStarted } from '@/src/utils/mockStartedGames';
 import { getRoomMeta, isActiveRoom, isLobbyFull, isOwnLobby, registerActiveRoom } from '@/src/utils/mockActiveRooms';
@@ -18,6 +18,7 @@ import {
   backspacePlayerNameDigits,
   backspacePlayerNameLetters,
   containsBlockedLetterSubstring,
+  extractTakenGuestLetters,
   generatePlayerName,
   getPlayerNameDigits,
   getPlayerNameLetters,
@@ -469,12 +470,20 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
   };
 
   // Auto-generera Player Name. Två branches:
-  //   • Fältet tomt → generera direkt med "Guest"-prefix → "GuestAbcde-1234567".
+  //   • Fältet tomt → generera direkt med "Guest"-prefix → "GuestA-1234567".
   //   • Användaren har redan typat letters → fråga "Try to keep PlayerName
   //     letters or not?". Yes-branchen bevarar letters och randomiserar bara
   //     digits; No-branchen genererar helt nytt med "Guest"-prefixet igen.
-  const handleGuestGenerateName = () => {
+  // excludeLetters härleds från lobbyns nuvarande spelar-lista så två
+  // guests inte får samma identifierar-bokstav (GuestA + GuestB istället
+  // för GuestA + GuestA). Async lookup mot mockLobbyPlayers; om koden
+  // saknar lobby-data faller setet tillbaka till tom (= ingen exclusion).
+  const handleGuestGenerateName = async () => {
     const trimmedLetters = getPlayerNameLetters(guestName.trim());
+    const lobbyPlayers = await getLobbyPlayers(code).catch(() => null);
+    const excludeLetters = extractTakenGuestLetters(
+      (lobbyPlayers ?? []).map((p) => p.name),
+    );
     if (trimmedLetters.length > 0) {
       Alert.alert(
         'Auto-generate Player Name',
@@ -483,7 +492,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
           { text: 'Cancel', style: 'cancel' },
           {
             text: 'Replace all',
-            onPress: () => applyGenerated(generatePlayerName(TAKEN_PLAYER_NAMES, { prefix: 'Guest' })),
+            onPress: () => applyGenerated(generatePlayerName(TAKEN_PLAYER_NAMES, { prefix: 'Guest', excludeLetters })),
           },
           {
             text: 'Keep letters',
@@ -493,7 +502,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
       );
       return;
     }
-    applyGenerated(generatePlayerName(TAKEN_PLAYER_NAMES, { prefix: 'Guest' }));
+    applyGenerated(generatePlayerName(TAKEN_PLAYER_NAMES, { prefix: 'Guest', excludeLetters }));
   };
 
   // CodeKeyboard skickar tecknet hit. Letter/digit dispatch:as via
@@ -536,19 +545,35 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
   // Auto-fyll Player Name när användaren går in i guest-steget och fältet
   // är tomt. Genererar ett unikt namn (verifierat mot mock TAKEN_PLAYER_NAMES)
   // och markerar status som 'available' så användaren kan gå direkt till
-  // year of birth. Manuell ändring återställer status till 'idle' via
-  // handleGuestNameChange och kräver Check innan formuläret går vidare.
+  // year of birth. excludeLetters härleds från lobbyns spelar-lista via
+  // async lookup (getLobbyPlayers är Promise-baserad) så två guests inte
+  // får samma identifierar-bokstav. Manuell ändring återställer status till
+  // 'idle' via handleGuestNameChange och kräver Check innan formuläret går vidare.
   useEffect(() => {
     const wasGuest = prevGuestStepRef.current;
     prevGuestStepRef.current = step === 'guest';
     if (step === 'guest' && !wasGuest && guestName === '') {
-      // Guest-flödet använder "Guest"-prefixet → "GuestAbcde-1234567"
-      // (10 letters totalt: prefix 5 + random 5, sedan 7 random digits).
-      const generated = generatePlayerName(TAKEN_PLAYER_NAMES, { prefix: 'Guest' });
-      setGuestName(generated);
-      setPlayerNameStatus('available');
+      let cancelled = false;
+      (async () => {
+        const lobbyPlayers = await getLobbyPlayers(code).catch(() => null);
+        if (cancelled) return;
+        const excludeLetters = extractTakenGuestLetters(
+          (lobbyPlayers ?? []).map((p) => p.name),
+        );
+        // Guest-flödet använder "Guest"-prefixet → "GuestA-1234567"
+        // (6 letters: "Guest" + 1 versal random, sedan 7 random digits).
+        const generated = generatePlayerName(TAKEN_PLAYER_NAMES, {
+          prefix: 'Guest',
+          excludeLetters,
+        });
+        setGuestName(generated);
+        setPlayerNameStatus('available');
+      })();
+      return () => {
+        cancelled = true;
+      };
     }
-  }, [step, guestName]);
+  }, [step, guestName, code]);
 
   const handleJoinAsGuest = async () => {
     if (!isGuestFormValid || parsedBirthYear === null || guestAssistance === null) return;
@@ -577,12 +602,10 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     // istället för att skicka in gästen som ändå skulle få "lobby is full"
     // när de hamnade i Lobby-vyn.
     if (await checkLobbyCapacity(code)) return;
-    // Autofill-detektion: matchar Guest-flödets genererade format
-    // ("Guest" + 5 siffror + "-" + 2 bokstäver). Om användaren ändrat
-    // namnet manuellt blir flaggan false.
-    // Auto-fill-detektion: format `GuestAbcde-1234567` — "Guest"-prefix +
-    // 1 versal random + 4 gemena random + dash + 7 digits.
-    const autofilled = /^Guest[A-Z][a-z]{4}-\d{7}$/.test(guestName.trim());
+    // Auto-fill-detektion: format `GuestA-1234567` — "Guest"-prefix + 1
+    // versal random + dash + 7 digits. Om användaren ändrat namnet
+    // manuellt blir flaggan false.
+    const autofilled = /^Guest[A-Z]-\d{7}$/.test(guestName.trim());
     track('guest_name_created', { autofilled, assistance: guestAssistance });
     onClose();
     router.push({

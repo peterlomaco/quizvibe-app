@@ -318,6 +318,7 @@ describe('schema rejection', () => {
       { form: 'youtube', subject: 'movie' },
       { form: 'youtube', subject: 'sport-event' },
       { form: 'image', subject: 'artist' },
+      { form: 'image', subject: 'band' },
       { form: 'image', subject: 'actor' },
       { form: 'image', subject: 'character' },
       { form: 'image', subject: 'athlete' },
@@ -325,7 +326,6 @@ describe('schema rejection', () => {
       { form: 'image', subject: 'celebrity' },
       { form: 'image', subject: 'city' },
       { form: 'image', subject: 'country' },
-      { form: 'image', subject: 'building' },
       { form: 'image', subject: 'place' },
     ];
     for (const { form, subject } of validPairs) {

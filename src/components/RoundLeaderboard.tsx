@@ -919,8 +919,11 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     textAlign: 'center',
   },
-  lbColR: { width: 32 },
-  lbColCheck: { width: 32 },
+  // Q + ✓ + ✗ komprimerade till 22 px vardera (var 32) så AVG-kolumnen
+  // ryms inom initial mid-scroll-vyn utan horisontell scroll. Synkat
+  // med GetReadyIntro:s lb-tabell — håll dem identiska.
+  lbColR: { width: 22 },
+  lbColCheck: { width: 22 },
   lbColTime: { width: 60 },
   lbColLast5: { width: 96 },
   lbCorrectText: { color: Colors.success, fontWeight: FontWeight.semibold },

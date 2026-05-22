@@ -260,6 +260,7 @@ export type ImageVariantKey = 'prefix-1' | 'prefix-2' | 'full-names';
 
 export type ImageContentSubject =
   | 'artist'
+  | 'band'
   | 'actor'
   | 'character'
   | 'athlete'
@@ -267,7 +268,6 @@ export type ImageContentSubject =
   | 'celebrity'
   | 'city'
   | 'country'
-  | 'building'
   | 'place';
 
 export interface ImageQuizQuestion {

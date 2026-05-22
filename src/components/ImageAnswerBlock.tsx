@@ -137,7 +137,10 @@ function FullNamesView({
             textStyle = styles.fullNameTextActive;
           } else if (isWrongRevealRow) {
             cardStyle = styles.nameCardWrong;
-            textStyle = styles.fullNameTextActive;
+            // Grå text (textDisabled) — speglar prefix-mode:s dämpning.
+            // Röd border + ✗-badge bär status:en visuellt; text:en behöver
+            // inte tävla med correct-revealens blå.
+            textStyle = styles.fullNameTextDimmed;
           } else {
             cardStyle = styles.fullNameCardDefault;
             textStyle = styles.fullNameTextDefault;
@@ -549,8 +552,13 @@ const styles = StyleSheet.create({
   prefixTextCorrectReveal: {
     color: Colors.primary,
   },
+  // Wrong-reveal-text vid time-out — dämpad grå (textDisabled), samma färg
+  // som irrelevanta rader får vid rätt-svar-fallet (`prefixTextDimmed`).
+  // Röd border + ✗-badge bär status:en visuellt; text:en behöver inte
+  // konkurrera om uppmärksamhet. Tidigare blå primary gav "läs mig"-intryck
+  // som tävlade med correct-revealen.
   prefixTextWrongReveal: {
-    color: Colors.primary,
+    color: Colors.textDisabled,
   },
   // Reveal — dimma text på irrelevanta prefix-knappar (alla utom spelarens
   // val + rätta svaret) så fokus ligger på de två relevanta raderna.

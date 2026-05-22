@@ -46,6 +46,7 @@ export const ContentSubjectSchema = z.enum([
   'sport-event',
   // form='image' → svarsläge "Text/Name"
   'artist',
+  'band',
   'actor',
   'character',
   'athlete',
@@ -53,8 +54,13 @@ export const ContentSubjectSchema = z.enum([
   'celebrity',
   'city',
   'country',
-  'building',
   'place',
+  // `band` parallellt med `artist` (2026-05-22) — curator-val per item:
+  // solo-musiker (Madonna, MJ, Taylor Swift) = `artist`, grupp-musiker
+  // (ABBA, Beatles, Queen) = `band`. Frågetexten anpassas automatiskt.
+  // `building` borttaget 2026-05-22 — byggnads-bilder kommer hanteras via
+  // city/country-frågor istället ("Which city is this?" på en bild av
+  // Eiffeltornet snarare än "What is the Name of this building?").
 ]);
 export type ContentSubject = z.infer<typeof ContentSubjectSchema>;
 
@@ -64,6 +70,7 @@ export const SUBJECTS_BY_FORM: Record<ContentForm, readonly ContentSubject[]> = 
   youtube: ['song', 'movie', 'sport-event'],
   image: [
     'artist',
+    'band',
     'actor',
     'character',
     'athlete',
@@ -71,7 +78,6 @@ export const SUBJECTS_BY_FORM: Record<ContentForm, readonly ContentSubject[]> = 
     'celebrity',
     'city',
     'country',
-    'building',
     'place',
   ],
 };
@@ -84,6 +90,7 @@ export const FIXED_QUESTION_TEXT: Record<ContentSubject, string> = {
   movie: 'Which Year was this Movie launched?',
   'sport-event': 'Which Year did this happen?',
   artist: 'What is the Name of this Artist?',
+  band: 'What is the Name of this band?',
   actor: 'What is the Name of this actor?',
   character: 'What is the Name of this character?',
   athlete: 'What is the Name of this athlete?',
@@ -91,7 +98,6 @@ export const FIXED_QUESTION_TEXT: Record<ContentSubject, string> = {
   celebrity: 'What is the Name of this person?',
   city: 'Which city is this?',
   country: 'Which country is this?',
-  building: 'What is the Name of this building?',
   place: 'What is the Name of this place?',
 };
 

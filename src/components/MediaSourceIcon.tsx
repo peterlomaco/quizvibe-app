@@ -2,12 +2,13 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
 import { Colors, FontWeight } from '../theme';
+import { YouTubeBrandIcon } from './YouTubeBrandIcon';
 
 /** Media-källa per fråga, för IndDev:s media-source-kö i GetReadyIntro.
- *  Samma symbolik som Lobby:s Game Connections-rad (generisk play-cirkel
- *  för YouTube-källan, Q+"?" för Images) så de två skärmarna känns
- *  visuellt konsistenta. Vi använder INTE YouTube:s officiella varumärke
- *  — se LobbyScreen connectionIconYoutube-stilen för rationale. */
+ *  YouTube-källor renderas med YouTube:s officiella play-button-ikon
+ *  (röd rounded-rect + vit triangel) per deras Branding Guidelines —
+ *  signalerar tydligt att klippet kommer från YouTube. Images renderas
+ *  med Q+"?" som matchar Lobby:s "Images"-rad-ikon. */
 export type MediaSourceType = 'youtube' | 'image' | 'none';
 
 interface Props {
@@ -17,10 +18,11 @@ interface Props {
 }
 
 /**
- * Renderar en av media-källikonerna i en cirkulär wrap. Speglar Lobby:s
- * Game Connections-rad:
- *   • youtube  — primary-blå cirkel med vit CSS-triangel-play (generic media-
- *                icon, INTE YouTube:s varumärke)
+ * Renderar en av media-källikonerna. Speglar Lobby:s Game Connections-rad:
+ *   • youtube  — YouTube:s officiella play-button (röd rounded-rect + vit
+ *                triangel) per deras Branding Guidelines. Bevarar aspect-
+ *                ratio så ikonen är wider-than-tall i en transparent
+ *                size×size-wrap (centrerad).
  *   • image    — Q-figur (cirkel + svans) i primary-blå med "?"-glyph överlagrad
  *                (matchar Lobby:s "Images"-rad-ikon + QuizVibeQuestionMarkLogo-
  *                symboliken; tidigare italicized "AI"-text, bytt 2026-05-23)
@@ -36,19 +38,11 @@ export function MediaSourceIcon({ source, size = 28 }: Props) {
   };
 
   if (source === 'youtube') {
+    // YouTube-loggan är wider-than-tall (≈ 1.43:1). Centrerad i transparent
+    // size×size-wrap så raderna fortsätter linjera lodrätt med andra ikoner.
     return (
-      <View style={[wrapStyle, styles.youtubeBg]}>
-        <View
-          style={[
-            styles.youtubeArrow,
-            {
-              borderLeftWidth: size * 0.32,
-              borderTopWidth: size * 0.21,
-              borderBottomWidth: size * 0.21,
-              marginLeft: size * 0.07,
-            },
-          ]}
-        />
+      <View style={wrapStyle}>
+        <YouTubeBrandIcon size={size} />
       </View>
     );
   }
@@ -91,20 +85,6 @@ export function MediaSourceIcon({ source, size = 28 }: Props) {
 }
 
 const styles = StyleSheet.create({
-  // Generic media-icon: primary-blå cirkel + vit play-triangel.
-  // Cirkulär form ärvs från wrapStyle.borderRadius (= size/2) i runtime.
-  // Vi använder INTE YouTube:s varumärke (röd kvadrat + #FF0000) här —
-  // se LobbyScreen connectionIconYoutube-stilen för rationale.
-  youtubeBg: {
-    backgroundColor: Colors.primary,
-  },
-  youtubeArrow: {
-    width: 0,
-    height: 0,
-    borderLeftColor: '#FFFFFF',
-    borderTopColor: 'transparent',
-    borderBottomColor: 'transparent',
-  },
   glyph: {
     textAlign: 'center',
   },

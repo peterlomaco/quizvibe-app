@@ -29,6 +29,7 @@ import { useLobbyPeerHealth } from '../lib/realtime/lobbyHealthChannel';
 import { Player, PlayerRow } from '../components/PlayerRow';
 import { QuizVibeFriendsLogo } from '../components/QuizVibeFriendsLogo';
 import { QuizVibeLogo } from '../components/QuizVibeLogo';
+import { YouTubeBrandIcon } from '../components/YouTubeBrandIcon';
 import { SequentialDots } from '../components/SequentialDots';
 import {
     ROUNDS_DEFAULT,
@@ -63,6 +64,7 @@ import {
   backspacePlayerNameDigits,
   backspacePlayerNameLetters,
   containsBlockedLetterSubstring,
+  extractTakenGuestLetters,
   generatePlayerName,
   getPlayerNameDigits,
   getPlayerNameLetters,
@@ -384,10 +386,14 @@ function formatAddPlayerBirthYear(year: number): string {
   return String(year);
 }
 
-function AddPlayerModal({ visible, onClose, onAdd }: {
+function AddPlayerModal({ visible, onClose, onAdd, takenGuestLetters }: {
   visible: boolean;
   onClose: () => void;
   onAdd: (name: string, age: number, assistance: AddPlayerAssistance) => void;
+  /** Bokstäver som redan används som identifierar-suffix på Guest-spelare
+   *  i lobbyn (t.ex. {'A', 'C'} om GuestA + GuestC redan finns). Filtreras
+   *  bort vid auto-genereringen så två guests inte får samma versal-bokstav. */
+  takenGuestLetters?: Set<string>;
 }) {
   const [name, setName] = useState('');
   const [birthYear, setBirthYear] = useState<number | null>(null);
@@ -424,18 +430,23 @@ function AddPlayerModal({ visible, onClose, onAdd }: {
 
   // Auto-fyll Player Name vid öppning. Använder "Guest"-prefix precis som
   // Join-as-Guest-flödet så namnet signalerar "lokal gäst" snarare än
-  // registrerad user. Manuell ändring återställer status till 'idle' och
+  // registrerad user. excludeLetters skickas in så två guests i samma lobby
+  // inte får samma identifierar-bokstav (GuestA + GuestB istället för
+  // GuestA + GuestA). Manuell ändring återställer status till 'idle' och
   // kräver Check innan fältet räknas validerat igen.
   useEffect(() => {
     const wasVisible = prevVisibleRef.current;
     prevVisibleRef.current = visible;
     if (visible && !wasVisible && name === '') {
-      // "Guest"-prefix → "GuestAbcde-1234567" (10 letters totalt + 7 digits).
-      const generated = generatePlayerName(TAKEN_PLAYER_NAMES_LOBBY, { prefix: 'Guest' });
+      // "Guest"-prefix → "GuestA-1234567" (6 letters totalt + 7 digits).
+      const generated = generatePlayerName(TAKEN_PLAYER_NAMES_LOBBY, {
+        prefix: 'Guest',
+        excludeLetters: takenGuestLetters,
+      });
       setName(generated);
       setPlayerNameStatus('available');
     }
-  }, [visible, name]);
+  }, [visible, name, takenGuestLetters]);
 
   // Sekventiella låsnings-gates — speglar Join-as-Guest-formen exakt
   // (utan code-steget).
@@ -471,9 +482,12 @@ function AddPlayerModal({ visible, onClose, onAdd }: {
   };
 
   // Auto-generera Player Name. Två branches:
-  //   • Fältet tomt → "Guest"-prefix → "GuestAbcde-1234567".
+  //   • Fältet tomt → "Guest"-prefix → "GuestA-1234567".
   //   • Användaren har redan typat letters → fråga "Try to keep PlayerName
   //     letters or not?".
+  // excludeLetters: takenGuestLetters skickas till Guest-prefix-grenarna så
+  // genereringen aldrig kollar på en bokstav som redan används av en annan
+  // guest i lobbyn.
   const handleGenerateName = () => {
     const trimmedLetters = getPlayerNameLetters(name.trim());
     if (trimmedLetters.length > 0) {
@@ -484,7 +498,7 @@ function AddPlayerModal({ visible, onClose, onAdd }: {
           { text: 'Cancel', style: 'cancel' },
           {
             text: 'Replace all',
-            onPress: () => applyAddGenerated(generatePlayerName(TAKEN_PLAYER_NAMES_LOBBY, { prefix: 'Guest' })),
+            onPress: () => applyAddGenerated(generatePlayerName(TAKEN_PLAYER_NAMES_LOBBY, { prefix: 'Guest', excludeLetters: takenGuestLetters })),
           },
           {
             text: 'Keep letters',
@@ -494,7 +508,7 @@ function AddPlayerModal({ visible, onClose, onAdd }: {
       );
       return;
     }
-    applyAddGenerated(generatePlayerName(TAKEN_PLAYER_NAMES_LOBBY, { prefix: 'Guest' }));
+    applyAddGenerated(generatePlayerName(TAKEN_PLAYER_NAMES_LOBBY, { prefix: 'Guest', excludeLetters: takenGuestLetters }));
   };
 
   // CodeKeyboard skickar tecknet hit. Helpers upprätthåller format per
@@ -1651,6 +1665,13 @@ export default function LobbyScreen() {
   // redan oberoende så ingen risk att hasLeft hamnar i turn-order.
   const isPlayerApproved = (p: LobbyPlayer) => !!p.approved || !!p.isHost;
   const approvedPlayers = players.filter((p) => isPlayerApproved(p) && !p.hasLeft);
+  // Bokstäver som redan används som identifierar-suffix på Guest-spelare i
+  // lobbyn. hasLeft-spelare exkluderas — deras letter frigörs. Skickas till
+  // AddPlayerModal:s auto-gen så två guests inte får samma bokstav.
+  const takenGuestLetters = useMemo(
+    () => extractTakenGuestLetters(players.filter((p) => !p.hasLeft).map((p) => p.name)),
+    [players],
+  );
   const waitingForApproval = players.filter((p) => !isPlayerApproved(p) && !p.hasLeft);
   // Driver "Waiting for approval"-mellansteget för non-host. När host inte
   // har godkänt mig än ska jag inte se lobby:n överhuvudtaget — bara en
@@ -3435,12 +3456,12 @@ export default function LobbyScreen() {
                 Enabled-pillen får grön kantlinje + FREE-badge (samma border-
                 skärande badge-mönster som Pass-the-Phone-knappen). Switchen
                 till höger är host-only och får grön track när på, röd när av.
-                Loggan är en röd kvadrat med vit playpil (CSS-triangel via
-                border-trick) så pilen alltid är vit oavsett emoji-rendering
-                på iOS vs Android. */}
+                Ikonen är YouTube:s officiella play-button (röd rounded-rect
+                + vit triangel) per deras Branding Guidelines — signalerar
+                tydligt att klippen kommer från YouTube. */}
             <View style={styles.connectionRow}>
-              <View style={[styles.connectionIconWrap, styles.connectionIconYoutube]}>
-                <View style={styles.connectionIconYoutubeArrow} />
+              <View style={styles.connectionIconWrap}>
+                <YouTubeBrandIcon size={28} />
               </View>
               <Text style={styles.connectionLabel}>YouTube</Text>
               {/* FREE-badgen sitter alltid kvar — i Enabled-läge med grön bg
@@ -4177,7 +4198,7 @@ export default function LobbyScreen() {
       </ScrollView>
 
       {/* Alla modaler utanför ScrollView */}
-      <AddPlayerModal visible={addModalVisible} onClose={() => setAddModalVisible(false)} onAdd={handleAddPlayer} />
+      <AddPlayerModal visible={addModalVisible} onClose={() => setAddModalVisible(false)} onAdd={handleAddPlayer} takenGuestLetters={takenGuestLetters} />
 
       {/* ── Player-edit-sheet (host-only) ──────────────────────────
           Bottom-sheet där host kan redigera Assistance level, Competition
@@ -5303,27 +5324,13 @@ const styles = StyleSheet.create({
     transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }],
     marginLeft: 'auto',
   },
-  // Media-källikon: cirkulär primary-fylld bg med vit play-triangel inuti.
-  // GENERIC play-symbol — INTE YouTube:s officiella varumärkeslogga. YouTube:s
-  // Brand Guidelines kräver wider-than-tall rounded rectangle + #FF0000 +
-  // klickbar länk till YouTube-content. Vi undviker hela compliance-ytan
-  // genom att använda en neutral play-glyf i brand-tema; YouTube refereras
-  // via "YouTube"-text på samma rad. Cirkeln matchar dessutom Profiles &
-  // Places-ikonen på raden under för visuell konsistens.
-  connectionIconYoutube: {
-    backgroundColor: Colors.primary,
-  },
-  connectionIconYoutubeArrow: {
-    width: 0,
-    height: 0,
-    borderLeftWidth: 9,
-    borderTopWidth: 6,
-    borderBottomWidth: 6,
-    borderLeftColor: '#FFFFFF',
-    borderTopColor: 'transparent',
-    borderBottomColor: 'transparent',
-    marginLeft: 2, // optisk centrering — pilen ser balanserad ut mot fylld cirkel
-  },
+  // YouTube-källan använder nu YouTube:s officiella play-button-ikon
+  // (`YouTubeBrandIcon`-komponenten) per deras Branding Guidelines —
+  // röd rounded-rect + vit triangel, oförändrad färg/proportion. Den
+  // gamla generiska blå-cirkel + vit-play-triangel-stilen är borttagen
+  // 2026-05-22. `connectionIconWrap` (28×28) återanvänds som container
+  // för layout-paritet med Images-raden på raden under; bg är transparent
+  // (YouTube-ikonen har egen röd bg).
   connectionIconGlyph: { fontSize: 14 },
   // Images: Q-figur från startskärmens logga (cirkel + svans i primary-blå),
   // utan omgivande ram. "?"-glyph överlagras i Q-cirkelns mitt — speglar

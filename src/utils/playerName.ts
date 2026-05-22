@@ -7,7 +7,8 @@
 //
 // Auto-genererade namn använder full max för digits (7 siffror) för att
 // minimera kollisionsrisk. Letter-sektionen varierar:
-//   • prefix='Guest' → "Guest" + 5 random gemener = 10 letters totalt.
+//   • prefix='Guest' → "Guest" + 1 versal random = "GuestA" (6 letters).
+//                      Med 7 digits = 26 × 10⁷ = 260M unika ID:n — mer än nog.
 //   • inget prefix   → 9 random letters (matchar Abcdefghi-exemplet).
 //   • keepLetters    → bevarar exakt typade bokstäver, randomiserar bara
 //                      digits (används från "Try to keep PlayerName
@@ -228,12 +229,21 @@ export function isPlayerNameIntermediateValid(value: string): boolean {
 
 export interface GeneratePlayerNameOptions {
   /**
-   * Förinställd start på letter-sektionen, t.ex. "Guest" → "GuestAbcde".
-   * Random gemena bokstäver appendas tills letter-sektionen når 10 tecken
-   * (eller `targetLetterLength` om angivet). Prefixet normaliseras enligt
+   * Förinställd start på letter-sektionen, t.ex. "Guest" → "GuestA".
+   * Exakt EN versal random-bokstav appendas efter prefix (se "Player Name
+   * (registration + validation)" i CLAUDE.md). Prefixet normaliseras enligt
    * format-reglerna (första versal, resten gemener).
    */
   prefix?: string;
+  /**
+   * Bokstäver som ska UNDVIKAS i versal-positionen efter prefix. Används
+   * av Guest-flödet så att två guests i samma lobby inte får samma
+   * identifierar-bokstav (GuestA + GuestB istället för GuestA + GuestA).
+   * Bara meningsfullt när `prefix` är satt; ignoreras annars. Om alla 26
+   * bokstäver är excluded faller helpern tillbaka till en helt random
+   * bokstav (statistiskt omöjligt edge case i en lobby med max 12 guests).
+   */
+  excludeLetters?: Set<string>;
   /**
    * Bevarar exakt dessa bokstäver utan att randomisera dem. Endast digit-
    * sektionen blir slumpad. Typiskt användning: "Try to keep PlayerName
@@ -246,6 +256,24 @@ export interface GeneratePlayerNameOptions {
    * keepLetters anges. Default = 9 (matchar "Abcdefghi"-exemplet).
    */
   targetLetterLength?: number;
+}
+
+/**
+ * Returnerar Set:en av bokstäver som redan används som identifierar-
+ * suffix på Guest-spelare i en lista av spelarnamn. Mönster:
+ * `/^Guest([A-Z])/` matchar både kanoniska auto-genererade Guest-namn
+ * ("GuestA-1234567") och edge case där användaren typat egen Guest-
+ * prefix. Renamed-guests (t.ex. "PlayerXYZ") bidrar inte; deras letter
+ * blir frigjord. Anropare ansvarar för att filtrera bort `hasLeft`-
+ * spelare innan namn-listan skickas in.
+ */
+export function extractTakenGuestLetters(names: string[]): Set<string> {
+  const letters = new Set<string>();
+  for (const name of names) {
+    const m = /^Guest([A-Z])/.exec(name);
+    if (m) letters.add(m[1]);
+  }
+  return letters;
 }
 
 /**
@@ -271,16 +299,28 @@ export function generatePlayerName(
   const buildLetters = (): string => {
     if (normalizedKeep.length > 0) return normalizedKeep;
     if (normalizedPrefix.length > 0) {
-      // Fyll på med random bokstäver tills max-längden nås. Första bokstaven
-      // i suffixet blir versal så Guest-namn renderas som "GuestAbcde"
-      // (visuellt tydligt var prefixet slutar och random-delen börjar);
-      // resten gemener. Om fillCount=0 returneras prefixet ensamt.
-      const fillCount = Math.max(0, PLAYER_NAME_MAX_LETTERS - normalizedPrefix.length);
-      let suffix = '';
-      for (let i = 0; i < fillCount; i++) {
-        suffix += i === 0 ? randomUpperLetter() : randomLowerLetter();
+      // Lägg på exakt EN versal random-bokstav efter prefix (var tidigare
+      // upp till MAX_LETTERS = 5 random tecken för "Guest"-prefixet). Versal
+      // gör visuellt tydligt var prefixet slutar och random-delen börjar:
+      // "Guest" + "A" = "GuestA". Defensiv cap mot MAX_LETTERS om prefix
+      // redan är maxat (då returneras prefix ensamt).
+      if (normalizedPrefix.length >= PLAYER_NAME_MAX_LETTERS) return normalizedPrefix;
+      // excludeLetters filtrerar bort bokstäver som redan används av andra
+      // guests i lobbyn så två guests inte får samma identifierar-suffix.
+      // Bygg available-listan från LETTERS minus excluded. Tom available
+      // (alla 26 excluded) → fallback till helt random.
+      const excluded = options.excludeLetters;
+      if (excluded && excluded.size > 0) {
+        const available: string[] = [];
+        for (const c of LETTERS) {
+          if (!excluded.has(c)) available.push(c);
+        }
+        if (available.length > 0) {
+          const pick = available[Math.floor(Math.random() * available.length)];
+          return normalizedPrefix + pick;
+        }
       }
-      return normalizedPrefix + suffix;
+      return normalizedPrefix + randomUpperLetter();
     }
     return randomLetters(Math.min(PLAYER_NAME_MAX_LETTERS, Math.max(1, targetLetterLength)));
   };

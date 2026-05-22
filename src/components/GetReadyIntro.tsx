@@ -1214,15 +1214,18 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    // Vertikal-centrerad grupp av play+tableBlock. paddingTop nu 0
-    // eftersom tableBlock vuxit avsevärt (dot-bars + chip-rad med
-    // divider) och chip-raden + endOfGameRow tidigare klipptes under
-    // skärmens nedre kant. gap mellan play och tableBlock ger luft
-    // så Rounds-baren inte sitter klistrad direkt under play-knappen.
+    // Tight paddingTop (var Spacing.xxxl * 2 = 96px) så play-knappen +
+    // tableBlock + chip-grid + "+ more questions"-raden ryms inom
+    // skärmens höjd även vid lång kö (4 rondor × 3+ spelare → chip-grid
+    // wrappar till 3 rader). Settings-block + leaderboard-block ovanför
+    // har egen paddingTop/marginTop så naturlig separation behålls utan
+    // ytterligare container-padding. gap mellan play och tableBlock
+    // (Spacing.xxl) ger luft så Rounds-baren inte sitter klistrad
+    // direkt under play-knappen.
     justifyContent: 'flex-start',
     alignItems: 'center',
     paddingHorizontal: Spacing.lg,
-    paddingTop: Spacing.xxxl * 2,
+    paddingTop: 40,
     paddingBottom: Spacing.sm,
     gap: Spacing.xxl,
   },
@@ -1488,8 +1491,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   // Per-kolumn-bredder så header + cells alignar lodrätt.
-  lbColR: { width: 32 },
-  lbColCheck: { width: 32 },
+  // Q + ✓ + ✗ komprimerade till 22 px vardera (var 32) så AVG-kolumnen
+  // ryms inom initial mid-scroll-vyn på iPhone-bredd utan horisontell
+  // scroll. 22 räcker för 2-siffriga värden (max ~20 questions/correct/wrong)
+  // i tabular-nums + xs-header.
+  lbColR: { width: 22 },
+  lbColCheck: { width: 22 },
   lbColTime: { width: 60 },
   lbColLast5: { width: 96 },
   lbCorrectText: { color: Colors.success, fontWeight: FontWeight.semibold },
