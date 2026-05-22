@@ -1,5 +1,7 @@
-# Musikartister kända för elder-generationen (Silent + Baby Boomers).
-# correctYear: solister = födelseår; band = formation-år.
+# Musikartister (solo) kända för elder-generationen (Silent + Baby Boomers).
+# correctYear = födelseår. Grupp-musiker (ABBA, Beatles m.fl.) finns i
+# bands-classics.yaml med audience: ['all'] istället — så solo-artister
+# och band hålls separata med distinkta frågetext ("artist" vs "band").
 audience: ["elder"]
 category: artists
 contentForm: image
@@ -13,17 +15,3 @@ items:
     probability: 98
     wikimediaSearchHints: ["Elvis Presley"]
     answerMethods: ["timeline", "name-letters"]
-  - id: abba
-    displayName: "ABBA"
-    correctYear: 1972
-    probability: 98
-    wikimediaSearchHints: ["ABBA group"]
-    answerMethods: ["timeline", "name-letters"]
-    notes: "Grupp; correctYear = formation-år."
-  - id: the-beatles
-    displayName: "The Beatles"
-    correctYear: 1960
-    probability: 97
-    wikimediaSearchHints: ["The Beatles band"]
-    answerMethods: ["timeline", "name-letters"]
-    notes: "Grupp; correctYear = formation-år."

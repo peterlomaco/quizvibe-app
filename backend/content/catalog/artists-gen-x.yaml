@@ -20,15 +20,8 @@ items:
     probability: 96
     wikimediaSearchHints: ["Madonna singer"]
     answerMethods: ["timeline", "name-letters"]
-  - id: metallica
-    displayName: "Metallica"
-    correctYear: 1981
-    probability: 92
-    wikimediaSearchHints: ["Metallica band"]
-    answerMethods: ["timeline", "name-letters"]
-    inBaseCatalog: true
-    genrePackages: ["pkg-rock"]
-    notes: "Grupp; correctYear = formation-år."
+  # Metallica (band) flyttad till framtida bands-classics-utbyggnad (band-subject)
+  # — solo-artist-filen ska bara ha solister.
   - id: carola-haggkvist
     displayName: "Carola Häggkvist"
     correctYear: 1966
