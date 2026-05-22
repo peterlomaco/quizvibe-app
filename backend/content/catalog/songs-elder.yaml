@@ -72,7 +72,7 @@ items:
     wikimediaSearchHints: ["Glenn Miller In the Mood 1940"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "INVALID_TEST"
+      - videoId: "7vMTZBVBkPU"
         startSec: 5
         endSec: 20
         channelTitle: "Glenn Miller Orchestra - Topic"
