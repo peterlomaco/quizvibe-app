@@ -19,19 +19,21 @@ interface ExportedYoutubeClip {
   notes?: string;
 }
 
+type YoutubeContentSubject = 'song' | 'movie' | 'sport-event';
+
 interface ExportedMusicQuestion {
   id: string;
   displayName: string;
   correctYear: number;
-  /** Subject från katalogens contentSubject — driver frågetext-lookup på klienten. */
-  contentSubject: 'song';
+  /** Subject från katalogens contentSubject — driver frågetext-lookup på klienten.
+   *  'song' för musik (songs-*.yaml), 'movie' för film (movies-*.yaml),
+   *  'sport-event' för sporthändelser. Alla 3 är youtube-form. */
+  contentSubject: YoutubeContentSubject;
   /** Frågetext från FIXED_QUESTION_TEXT[contentSubject]. Inline:as i exporten
    *  så klienten slipper rebakad lookup-tabell. */
   questionText: string;
-  /** Generationer som låten är curerad för — kopieras från file-header
-   *  audience. Driver klient-side audience-filtret så en låt från 60-talet
-   *  prioriteras för elder/gen-x medan en låt från 2020 prioriteras för
-   *  gen-z/gen-alpha. 'all'-taggade items är alltid kvalificerade. */
+  /** Generationer som item:et är curerat för — kopieras från file-header
+   *  audience eller item-override. Driver klient-side audience-filtret. */
   audiences: Audience[];
   youtubeClips: ExportedYoutubeClip[];
 }
@@ -52,11 +54,13 @@ export type MusicQuestionAudience =
   | 'gen-alpha'
   | 'all';
 
+export type YoutubeContentSubject = 'song' | 'movie' | 'sport-event';
+
 export interface MusicQuestion {
   id: string;
   displayName: string;
   correctYear: number;
-  contentSubject: 'song';
+  contentSubject: YoutubeContentSubject;
   questionText: string;
   audiences: MusicQuestionAudience[];
   youtubeClips: YoutubeClip[];
@@ -72,7 +76,10 @@ async function main(): Promise<void> {
   const skipped: string[] = [];
 
   for (const file of catalog.files.values()) {
-    if (file.category !== 'songs') continue;
+    // YouTube-pool: alla youtube-form items oavsett kategori. file.category
+    // är 'songs' även för movies-classics.yaml (approximation eftersom
+    // CategorySchema saknar 'movies'). Filtrera istället på contentForm.
+    if (file.contentForm !== 'youtube') continue;
     for (const item of file.items) {
       if (!item.youtubeClips || item.youtubeClips.length === 0) {
         skipped.push(`${item.id} (no youtubeClips)`);
@@ -82,12 +89,16 @@ async function main(): Promise<void> {
         skipped.push(`${item.id} (no correctYear)`);
         continue;
       }
+      // contentSubject + questionText från fil-header (file-level i V1).
+      // Type-cast pga TS-narrowing — schema garanterar att youtube-form
+      // bara har 'song' | 'movie' | 'sport-event'.
+      const subject = file.contentSubject as 'song' | 'movie' | 'sport-event';
       songs.push({
         id: item.id,
         displayName: item.displayName,
         correctYear: item.correctYear,
-        contentSubject: 'song',
-        questionText: FIXED_QUESTION_TEXT.song,
+        contentSubject: subject,
+        questionText: FIXED_QUESTION_TEXT[subject],
         // Item-level audience-override har företräde över file-header. Edge-
         // case: ny dansband-låt 2026 i songs-gen-alpha (file.audience =
         // ['gen-alpha', 'gen-z']) kan bära item.audience = ['elder', 'gen-x',

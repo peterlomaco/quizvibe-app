@@ -13,11 +13,13 @@ export type MusicQuestionAudience =
   | 'gen-alpha'
   | 'all';
 
+export type YoutubeContentSubject = 'song' | 'movie' | 'sport-event';
+
 export interface MusicQuestion {
   id: string;
   displayName: string;
   correctYear: number;
-  contentSubject: 'song';
+  contentSubject: YoutubeContentSubject;
   questionText: string;
   audiences: MusicQuestionAudience[];
   youtubeClips: YoutubeClip[];
@@ -249,6 +251,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "jaws",
+    "displayName": "Jaws",
+    "correctYear": 1975,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "qCzncv0ISaE",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Universal Pictures",
+        "license": "standard",
+        "notes": "Official Universal Pictures-klipp — 'Bigger Boat'-scenen i 4K HDR."
+      }
+    ]
+  },
+  {
     "id": "queen-bohemian-rhapsody",
     "displayName": "Bohemian Rhapsody — Queen",
     "correctYear": 1975,
@@ -309,6 +331,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "star-wars-new-hope",
+    "displayName": "Star Wars: A New Hope",
+    "correctYear": 1977,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "vZ734NWnAHA",
+        "startSec": 0,
+        "endSec": 15,
+        "channelTitle": "Star Wars",
+        "license": "standard",
+        "notes": "Official Star Wars channel — A New Hope trailer. John Williams theme."
+      }
+    ]
+  },
+  {
     "id": "pink-floyd-another-brick-in-the-wall",
     "displayName": "Another Brick in the Wall, Part 2 — Pink Floyd",
     "correctYear": 1979,
@@ -347,6 +389,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Queen Official",
         "license": "standard",
         "notes": "Live at Montreal Forum 1981 (Remastered) — official Queen-kanal. Iconic bassline."
+      }
+    ]
+  },
+  {
+    "id": "indiana-jones-raiders",
+    "displayName": "Indiana Jones: Raiders of the Lost Ark",
+    "correctYear": 1981,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "0xQSIdSRlAk",
+        "startSec": 5,
+        "endSec": 20,
+        "channelTitle": "Paramount Movies",
+        "license": "standard",
+        "notes": "Official Paramount Movies trailer. Raiders March-theme + boulder-scen."
       }
     ]
   },
@@ -450,6 +512,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "a-ha - Topic",
         "license": "standard",
         "notes": "Officiell album-audio via YouTube Topic. Iconic synth-hook."
+      }
+    ]
+  },
+  {
+    "id": "back-to-the-future",
+    "displayName": "Back to the Future",
+    "correctYear": 1985,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "T_WSXXPQYeY",
+        "startSec": 0,
+        "endSec": 15,
+        "channelTitle": "Universal Pictures",
+        "license": "standard",
+        "notes": "Official Universal Pictures-klipp — Johnny B. Goode-scenen."
       }
     ]
   },
@@ -579,6 +661,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "jurassic-park",
+    "displayName": "Jurassic Park",
+    "correctYear": 1993,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "VzZN9AVBS1I",
+        "startSec": 60,
+        "endSec": 75,
+        "channelTitle": "Universal Pictures At Home",
+        "license": "standard",
+        "notes": "Official Universal Pictures-klipp 4K — iconic theme + dinosaur-reveal."
+      }
+    ]
+  },
+  {
     "id": "whitney-houston-i-will-always-love-you",
     "displayName": "I Will Always Love You — Whitney Houston",
     "correctYear": 1993,
@@ -595,6 +697,46 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "roelofjan1986",
         "license": "standard",
         "notes": "World Music Awards 1994 — iconic high-note chorus."
+      }
+    ]
+  },
+  {
+    "id": "forrest-gump",
+    "displayName": "Forrest Gump",
+    "correctYear": 1994,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "bSMxl1V8FSg",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Movieclips",
+        "license": "standard",
+        "notes": "Movieclips 'Run, Forrest, Run!'-scenen — iconic moment + theme."
+      }
+    ]
+  },
+  {
+    "id": "pulp-fiction",
+    "displayName": "Pulp Fiction",
+    "correctYear": 1994,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "s7EdQ4FqbhY",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Movieclips",
+        "license": "standard",
+        "notes": "Official trailer (Movieclips) — iconic surf-rock soundtrack + ensemble-shots."
       }
     ]
   },
@@ -656,6 +798,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "CelineDionOfficialTV",
         "license": "standard",
         "notes": "Official Music Video — Titanic-soundtrack. Chorus area."
+      }
+    ]
+  },
+  {
+    "id": "titanic",
+    "displayName": "Titanic",
+    "correctYear": 1997,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "I7c1etV7D7g",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "20th Century Studios",
+        "license": "standard",
+        "notes": "Official 25th Anniversary trailer — Celine Dion theme + iconic scenes."
       }
     ]
   },

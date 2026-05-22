@@ -10,7 +10,7 @@ Status mot den 4-stegs-plan vi följer för content-bygge inför launch:
 |---|---|---|
 | 1. Bild-format-fix | ✅ Klart | 16:9 container + `resizeMode='contain'` (commit `4ab2ac9`) |
 | 2. Audience-filter på bild- + musik-frågor | ✅ Klart | Pool-nivå union-filter (`audienceFilter.ts`) på BÅDA pools — items matchar minst en spelares gen ELLER `'all'`. Fallback-chain om filter tomt. Se "Image questions (MVP)". |
-| 3. Content build-out | 🟡 Pågående | **45 image-items + 86 music-questions** efter capitals+countries parkat till V2 (deferred/) 2026-05-22. Fortsätt med movie/sport-events + 61 items utan YouTube-data i songs-elder/gen-x/millennials. |
+| 3. Content build-out | 🟡 Pågående | **45 image + 94 youtube-items** (86 songs + 8 movies) efter movies-classics 2026-05-22. Total 139 V1-playable. Fortsätt med sport-events + 61 items utan YouTube-data i songs-elder/gen-x/millennials. |
 | 4. Pre-launch-items | ⏸️ Ej påbörjat | Captcha, YouTube ToS-audit, nightly cron, FAQ — se `project_pre_launch_checklist.md` |
 
 **Pool-status idag (41 live image-items)** — V1-curering utifrån svensk igenkänning (global reach inte ett krav i V1; Release 2 whitelistar en delmängd med `region: Global` där lämpligt):

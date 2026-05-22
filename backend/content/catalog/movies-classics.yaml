@@ -1,0 +1,111 @@
+# Globalt cross-gen-iconic filmer — alla 5 generationer i Sverige känner
+# igen dem via theme-music, iconic-scen eller mainstream-revival (re-runs,
+# Disney+, klassiker-listor). audience: ['all'] reflekterar cross-gen-
+# recognition i V1-svensk-målgrupp. correctYear = ursprunglig release-år.
+#
+# Kategori 'songs' används som approximation eftersom CategorySchema saknar
+# 'movies'-värde — distractor-pool är irrelevant för timeline-frågor (year-
+# picker använder inga text-options).
+#
+# Frågetext: "Which Year was this Movie launched?" (från FIXED_QUESTION_TEXT).
+audience: ["all"]
+category: songs
+contentForm: youtube
+contentSubject: movie
+items:
+  - id: jaws
+    displayName: "Jaws"
+    correctYear: 1975
+    probability: 90
+    wikimediaSearchHints: ["Jaws 1975 film"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "qCzncv0ISaE"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Universal Pictures"
+        notes: "Official Universal Pictures-klipp — 'Bigger Boat'-scenen i 4K HDR."
+  - id: star-wars-new-hope
+    displayName: "Star Wars: A New Hope"
+    correctYear: 1977
+    probability: 95
+    wikimediaSearchHints: ["Star Wars A New Hope 1977"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "vZ734NWnAHA"
+        startSec: 0
+        endSec: 15
+        channelTitle: "Star Wars"
+        notes: "Official Star Wars channel — A New Hope trailer. John Williams theme."
+  - id: indiana-jones-raiders
+    displayName: "Indiana Jones: Raiders of the Lost Ark"
+    correctYear: 1981
+    probability: 92
+    wikimediaSearchHints: ["Raiders of the Lost Ark 1981 Indiana Jones"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "0xQSIdSRlAk"
+        startSec: 5
+        endSec: 20
+        channelTitle: "Paramount Movies"
+        notes: "Official Paramount Movies trailer. Raiders March-theme + boulder-scen."
+  - id: back-to-the-future
+    displayName: "Back to the Future"
+    correctYear: 1985
+    probability: 95
+    wikimediaSearchHints: ["Back to the Future 1985"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "T_WSXXPQYeY"
+        startSec: 0
+        endSec: 15
+        channelTitle: "Universal Pictures"
+        notes: "Official Universal Pictures-klipp — Johnny B. Goode-scenen."
+  - id: jurassic-park
+    displayName: "Jurassic Park"
+    correctYear: 1993
+    probability: 95
+    wikimediaSearchHints: ["Jurassic Park 1993 film"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "VzZN9AVBS1I"
+        startSec: 60
+        endSec: 75
+        channelTitle: "Universal Pictures At Home"
+        notes: "Official Universal Pictures-klipp 4K — iconic theme + dinosaur-reveal."
+  - id: pulp-fiction
+    displayName: "Pulp Fiction"
+    correctYear: 1994
+    probability: 88
+    wikimediaSearchHints: ["Pulp Fiction 1994 Tarantino"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "s7EdQ4FqbhY"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Movieclips"
+        notes: "Official trailer (Movieclips) — iconic surf-rock soundtrack + ensemble-shots."
+  - id: forrest-gump
+    displayName: "Forrest Gump"
+    correctYear: 1994
+    probability: 93
+    wikimediaSearchHints: ["Forrest Gump 1994 Tom Hanks"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "bSMxl1V8FSg"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Movieclips"
+        notes: "Movieclips 'Run, Forrest, Run!'-scenen — iconic moment + theme."
+  - id: titanic
+    displayName: "Titanic"
+    correctYear: 1997
+    probability: 95
+    wikimediaSearchHints: ["Titanic 1997 Cameron film"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "I7c1etV7D7g"
+        startSec: 30
+        endSec: 45
+        channelTitle: "20th Century Studios"
+        notes: "Official 25th Anniversary trailer — Celine Dion theme + iconic scenes."
