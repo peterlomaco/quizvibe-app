@@ -9,12 +9,16 @@ Status mot den 4-stegs-plan vi följer för content-bygge inför launch:
 | Steg | Status | Anteckning |
 |---|---|---|
 | 1. Bild-format-fix | ✅ Klart | 16:9 container + `resizeMode='contain'` (commit `4ab2ac9`) |
-| 2. Audience-filter på bild-frågor | ✅ Klart | Pool-nivå union-filter (`audienceFilter.ts`) — items matchar minst en spelares gen ELLER `'all'`. Fallback-chain om filter tomt. Se "Image questions (MVP)". |
-| 3. Content build-out | 🟡 Pågående | Fas A klar (5→17→13→18→**31 live image-items** efter athletes-utbyggnad 2026-05-22). Fortsätt med fler actors + country/place/movie. |
+| 2. Audience-filter på bild- + musik-frågor | ✅ Klart | Pool-nivå union-filter (`audienceFilter.ts`) på BÅDA pools — items matchar minst en spelares gen ELLER `'all'`. Fallback-chain om filter tomt. Se "Image questions (MVP)". |
+| 3. Content build-out | 🟡 Pågående | Fas A klar (5→17→13→18→31→**41 live image-items** efter actors v2 2026-05-22). Fortsätt med band/country/place/movie. |
 | 4. Pre-launch-items | ⏸️ Ej påbörjat | Captcha, YouTube ToS-audit, nightly cron, FAQ — se `project_pre_launch_checklist.md` |
 
-**Pool-status idag (31 live image-items)** — V1-curering utifrån svensk igenkänning (global reach inte ett krav i V1; Release 2 whitelistar en delmängd med `region: Global` där lämpligt):
-- **Actors (5)**: ingrid-bergman, marilyn-monroe (elder), arnold-schwarzenegger, lasse-aberg (gen-x), jennifer-aniston (millennials).
+**Pool-status idag (41 live image-items)** — V1-curering utifrån svensk igenkänning (global reach inte ett krav i V1; Release 2 whitelistar en delmängd med `region: Global` där lämpligt):
+- **Actors (15)** — utbyggt från 5 till 15 (2026-05-22, actor build-out v2):
+  - Elder (4): ingrid-bergman, marilyn-monroe, tom-hanks, audrey-hepburn.
+  - Gen-x (4): arnold-schwarzenegger, lasse-aberg, julia-roberts, leonardo-dicaprio.
+  - Millennials + Gen-z (5, audience-utökad): jennifer-aniston, margot-robbie, emma-stone, tom-holland, florence-pugh. Files audience-tag = `[millennials, gen-z]` så modern-era stars (Friends-reruns, Spider-Man, Barbie) följs av båda gens.
+  - Gen-z-only (2): millie-bobby-brown, jenna-ortega — streaming-era stars (Stranger Things, Wednesday).
 - **Artists (5)**: avicii, madonna, michael-jackson, taylor-swift, elvis-presley.
 - **Athletes (17)** — utbyggt från 4 till 17 (2026-05-22):
   - Elder/Gen-x (10): bjorn-borg, muhammad-ali, mark-spitz, pele, diego-maradona, magic-johnson, michael-jordan, carl-lewis, steffi-graf, peter-forsberg.
@@ -24,9 +28,10 @@ Status mot den 4-stegs-plan vi följer för content-bygge inför launch:
 **Föreslagna nästa steg (när session återupptas):**
 
 1. **Fortsätt content build-out** mot 50+ pool:
-   - **Fler actors** — gen-z saknar helt (0 items). Lägg till zendaya, timothée-chalamet, jacob-elordi (gen-z) + tom-hanks, audrey-hepburn (elder).
-   - **Movies** (YouTube + sport-event) — schema-redo, 0 items. Använd `npm run youtube-search` för clip-curation.
    - **Country, place** — 0 items, kräver Wikipedia-curation per subject. Byggnads-bilder hanteras via city/country-frågor (`building`-subjekt togs bort 2026-05-22).
+   - **Band** — 0 items än trots schema-stöd. Lägg till ABBA, The Beatles, Queen, Nirvana etc.
+   - **Movies** (YouTube + sport-event) — schema-redo, 0 items. Använd `npm run youtube-search` för clip-curation.
+   - **Music YouTube-clips** — många items i `songs-{generation}.yaml` saknar `youtubeClips` (skip:as i export). Lägg till klipp för fler items för att bredda music-poolen.
    - **Whitelist `region: Global`** för en delmängd av V1-katalogen som har global reach (t.ex. Madonna, Michael Jackson, Pelé, Muhammad Ali, Berlin, Paris). Default är Sverige-only — Global är opt-in per item. Release 2-task.
 2. **Pre-launch-items** — Captcha, YouTube ToS-audit, nightly cron, FAQ (se `project_pre_launch_checklist.md`).
 
@@ -766,15 +771,25 @@ Edge case för word-count-filter: om kategorin har för få items med samma ord-
 
 Namnet som visas (`pickNameForPrefix`): det rätta namnet om prefix matchar `correctPrefix`, annars alfabetiskt första distractor-namnet. Backend-datan (`optionsByPrefix`) lagrar fortfarande full pool så filtreringen är ren UI-tweak.
 
-**Audience-filter** ([src/utils/audienceFilter.ts](src/utils/audienceFilter.ts)) — implementerad 2026-05-22 när image-pool nådde 31 items. Pool-nivå-filter (V1):
+**Audience-filter** ([src/utils/audienceFilter.ts](src/utils/audienceFilter.ts)) — implementerad 2026-05-22 när image-pool nådde 31 items. Pool-nivå-filter (V1) på **BÅDA pools** (music + image):
+- **Filter-hierarki** (i ordning, hård → mjuk):
+  1. **Source-toggle** (youtubeEnabled / imagesEnabled) — HÅRD. Host:s val.
+  2. **Era** (correctYear ∈ [eraFrom, eraTo], eller peakFrom/To-overlap för image-items med peak) — HÅRD. Host:s val.
+  3. **Audience** (union av spelares generationer) — PREFERENS. Relaxas när era+audience yields 0; era stannar alltid.
+- **Rationale**: era är en explicit host-väljning. En 80-talsspel ska ALDRIG visa 2020-låtar även om alla spelare är gen-z — det skulle bryta host:s intent. Däremot OK att visa 80-talslåt med `audiences=['elder']` till en gen-z-spelare när det är enda alternativet inom 80-talsfönstret.
 - **Modell**: union av aktiva spelares generationer från `turnOrder`. Items vars `audiences` innehåller minst en spelares gen ELLER `'all'` är kvalificerade.
+- **Music-side**: `MUSIC_QUESTIONS[i].audiences` kopieras från file-header `audience` via `backend/scripts/export-music-questions.ts`. En låt från 60-talet (i `songs-elder.yaml`) får `audiences: ['elder']`; `songs-all.yaml`-items får `audiences: ['all']`.
+- **Image-side**: `ImageQuizQuestion.audiences` kopieras från file-header (`actors-elder.yaml`, `athletes-modern.yaml` etc.). `IMAGE_SEED_QUESTIONS` + `SEED_QUESTIONS`-mappingen i quiz.tsx droppar fältet, så vi filtrerar mot id-set:en från `MUSIC_QUESTIONS` / `IMAGE_QUIZ_QUESTIONS` istället.
+- **Helper-signatur**: `filterByAudience<T extends { audiences: readonly string[] }>` — generic över båda typer.
 - **Generation-mapping**: `ageToGeneration(age)` → `getGenerationKeyFromBirthYear(currentYear - age)` (samma 5-bands-definition som backend/`birthYearToGeneration`).
-- **Fallback-chain** i quiz.tsx:s `gameQuestions`-useMemo:
-  1. era + audience-filtrerad pool → använd
-  2. audience-filtrerad utan era → använd (era strippas)
-  3. alla `IMAGE_SEED_QUESTIONS` (om imagesEnabled) → använd (både filter strippas)
-  4. tom (= source-toggle off)
+- **Fallback-chain** (per pool i quiz.tsx:s `gameQuestions`-useMemo):
+  1. era + audience → preferred path
+  2. era-only (audience relaxas, era HÅRD) → fallback om (1) tom
+  3. tom (= source-toggle off eller era-fönster utan items)
+- **Inget fallback strippar era** — host:s era-intent respekteras alltid. Tidigare implementation (innan 2026-05-22-fixet) hade fallback som tillät audience-only utan era, vilket var en bug.
 - **Edge cases**: tom audience-set (alla spelare saknar age-info) bypassar filtret helt. Spelare utan age bidrar inte men blockerar inte heller.
+- **`audienceSet` byggs en gång** per useMemo-körning och delas mellan music + image — gemensam generations-union.
+- **Emergency fallback** kvarstår på `if (!hasYoutube && !hasImage) return SEED_QUESTIONS` (rad 816 nedan) — fires endast när BÅDA pools är utterly tomma (typ source-toggle off på båda, men Lobby:s "min 1 source"-gate förhindrar normalt). Strippar era som sista utväg så spelet kan starta.
 - **Per-spelare-filter (V2)** kan ersätta union-modellen om Peter vill — kräver per-tur-pick i round-block-loopen istället för pool-nivå-filter. Aktuellt pragmatiskt val: union-filter håller round-block-strukturen intakt och fungerar för både Pass-the-Phone och Individual Devices.
 
 ## Image questions (MVP)

@@ -17,3 +17,15 @@ items:
     probability: 82
     wikimediaSearchHints: ["Marilyn Monroe"]
     answerMethods: ["timeline", "name-letters"]
+  - id: tom-hanks
+    displayName: "Tom Hanks"
+    correctYear: 1956
+    probability: 95
+    wikimediaSearchHints: ["Tom Hanks actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: audrey-hepburn
+    displayName: "Audrey Hepburn"
+    correctYear: 1929
+    probability: 90
+    wikimediaSearchHints: ["Audrey Hepburn"]
+    answerMethods: ["timeline", "name-letters"]

@@ -17,3 +17,15 @@ items:
     probability: 84
     wikimediaSearchHints: ["Lasse Åberg"]
     answerMethods: ["timeline", "name-letters"]
+  - id: julia-roberts
+    displayName: "Julia Roberts"
+    correctYear: 1967
+    probability: 92
+    wikimediaSearchHints: ["Julia Roberts actress"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: leonardo-dicaprio
+    displayName: "Leonardo DiCaprio"
+    correctYear: 1974
+    probability: 96
+    wikimediaSearchHints: ["Leonardo DiCaprio"]
+    answerMethods: ["timeline", "name-letters"]

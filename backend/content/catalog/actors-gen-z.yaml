@@ -1,0 +1,21 @@
+# Skådespelare som är primärt kända för Gen Z — streaming-era stars som
+# slog igenom via Netflix/Disney+. Skapad 2026-05-22 för att fylla
+# gen-z-actor-luckan i poolen (var 0 items innan).
+# correctYear = födelseår.
+audience: ["gen-z"]
+category: actors
+contentForm: image
+contentSubject: actor
+items:
+  - id: millie-bobby-brown
+    displayName: "Millie Bobby Brown"
+    correctYear: 2004
+    probability: 85
+    wikimediaSearchHints: ["Millie Bobby Brown actress"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: jenna-ortega
+    displayName: "Jenna Ortega"
+    correctYear: 2002
+    probability: 80
+    wikimediaSearchHints: ["Jenna Ortega actress"]
+    answerMethods: ["timeline", "name-letters"]

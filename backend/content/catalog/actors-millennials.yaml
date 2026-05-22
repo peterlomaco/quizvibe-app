@@ -1,6 +1,8 @@
-# Skådespelare kända för Millennials.
-# correctYear = födelseår.
-audience: ["millennials"]
+# Skådespelare kända för Millennials + Gen Z. Audience utökad 2026-05-22
+# från ["millennials"] till ["millennials", "gen-z"] — modern-era stars
+# (Friends-reruns på Netflix, Spider-Man-trilogi, Barbie etc.) följs av
+# båda generationer parallellt. correctYear = födelseår.
+audience: ["millennials", "gen-z"]
 category: actors
 contentForm: image
 contentSubject: actor
@@ -10,4 +12,28 @@ items:
     correctYear: 1969
     probability: 87
     wikimediaSearchHints: ["Jennifer Aniston"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: margot-robbie
+    displayName: "Margot Robbie"
+    correctYear: 1990
+    probability: 90
+    wikimediaSearchHints: ["Margot Robbie actress"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: emma-stone
+    displayName: "Emma Stone"
+    correctYear: 1988
+    probability: 88
+    wikimediaSearchHints: ["Emma Stone actress"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: tom-holland
+    displayName: "Tom Holland"
+    correctYear: 1996
+    probability: 90
+    wikimediaSearchHints: ["Tom Holland actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: florence-pugh
+    displayName: "Florence Pugh"
+    correctYear: 1996
+    probability: 80
+    wikimediaSearchHints: ["Florence Pugh actress"]
     answerMethods: ["timeline", "name-letters"]
