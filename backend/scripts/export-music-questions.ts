@@ -8,7 +8,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { loadCatalog } from '../content/registry';
-import { FIXED_QUESTION_TEXT } from '../content/schema';
+import { Audience, FIXED_QUESTION_TEXT } from '../content/schema';
 
 interface ExportedYoutubeClip {
   videoId: string;
@@ -28,6 +28,11 @@ interface ExportedMusicQuestion {
   /** Frågetext från FIXED_QUESTION_TEXT[contentSubject]. Inline:as i exporten
    *  så klienten slipper rebakad lookup-tabell. */
   questionText: string;
+  /** Generationer som låten är curerad för — kopieras från file-header
+   *  audience. Driver klient-side audience-filtret så en låt från 60-talet
+   *  prioriteras för elder/gen-x medan en låt från 2020 prioriteras för
+   *  gen-z/gen-alpha. 'all'-taggade items är alltid kvalificerade. */
+  audiences: Audience[];
   youtubeClips: ExportedYoutubeClip[];
 }
 
@@ -39,12 +44,21 @@ function renderTsModule(questions: ExportedMusicQuestion[]): string {
 
 import type { YoutubeClip } from './mediaSource';
 
+export type MusicQuestionAudience =
+  | 'elder'
+  | 'gen-x'
+  | 'millennials'
+  | 'gen-z'
+  | 'gen-alpha'
+  | 'all';
+
 export interface MusicQuestion {
   id: string;
   displayName: string;
   correctYear: number;
   contentSubject: 'song';
   questionText: string;
+  audiences: MusicQuestionAudience[];
   youtubeClips: YoutubeClip[];
 }
 
@@ -74,6 +88,9 @@ async function main(): Promise<void> {
         correctYear: item.correctYear,
         contentSubject: 'song',
         questionText: FIXED_QUESTION_TEXT.song,
+        // Kopierar file-header audience till varje item så klient-filtret
+        // kan jobba på item-nivå utan att behöva fil-kontexten.
+        audiences: file.audience,
         youtubeClips: item.youtubeClips.map((c) => ({
           videoId: c.videoId,
           startSec: c.startSec,

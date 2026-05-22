@@ -1,4 +1,4 @@
-// Audience-filter för image-frågor — V1-implementation.
+// Audience-filter — V1-implementation. Gäller BÅDA image- och music-pools.
 //
 // Modell: union av aktiva spelares generationer. Items behålls om deras
 // `audiences`-tag innehåller MINST EN spelares generation, ELLER om de är
@@ -21,7 +21,6 @@ import {
   GenerationKey,
   getGenerationKeyFromBirthYear,
 } from './mockPurchasedPackages';
-import type { ImageQuestionAudience } from './quizImageQuestions';
 
 const CURRENT_YEAR = new Date().getFullYear();
 
@@ -57,7 +56,7 @@ export function buildAudienceSet(
  * returnera items oförändrade. Detta är "ingen filter"-fallet, inte "tomt
  * resultat"-fallet.
  */
-export function filterByAudience<T extends { audiences: ImageQuestionAudience[] }>(
+export function filterByAudience<T extends { audiences: readonly string[] }>(
   items: T[],
   audiences: Set<GenerationKey>,
 ): T[] {

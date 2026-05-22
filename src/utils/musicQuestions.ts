@@ -5,12 +5,21 @@
 
 import type { YoutubeClip } from './mediaSource';
 
+export type MusicQuestionAudience =
+  | 'elder'
+  | 'gen-x'
+  | 'millennials'
+  | 'gen-z'
+  | 'gen-alpha'
+  | 'all';
+
 export interface MusicQuestion {
   id: string;
   displayName: string;
   correctYear: number;
   contentSubject: 'song';
   questionText: string;
+  audiences: MusicQuestionAudience[];
   youtubeClips: YoutubeClip[];
 }
 
@@ -21,6 +30,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1976,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "audiences": [
+      "all"
+    ],
     "youtubeClips": [
       {
         "videoId": "TJLAJWSEd6U",
@@ -38,6 +50,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1982,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "audiences": [
+      "all"
+    ],
     "youtubeClips": [
       {
         "videoId": "fK6tf6opIg0",
@@ -55,6 +70,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1991,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "audiences": [
+      "all"
+    ],
     "youtubeClips": [
       {
         "videoId": "V7f03mfxN4I",
@@ -72,6 +90,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1998,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "audiences": [
+      "all"
+    ],
     "youtubeClips": [
       {
         "videoId": "1dfhNimhwNM",
@@ -89,6 +110,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2017,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "audiences": [
+      "all"
+    ],
     "youtubeClips": [
       {
         "videoId": "JGwWNGJdvx8",

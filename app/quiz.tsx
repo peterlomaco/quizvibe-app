@@ -733,68 +733,72 @@ export default function QuizScreen() {
   // MÅSTE deklareras EFTER `turnOrder` — annars TDZ-error eftersom deps
   // läser turnOrder.length innan const är initialiserad.
   const gameQuestions = useMemo<QuizQuestion[]>(() => {
-    // Gate på host:s media-source-toggles innan era-filter. Host som stängt
-    // av YouTube ska inte få några items med youtubeClips i spelet, även
-    // om eran skulle ha matchat. Lobby blockar avstängning av sista källan,
-    // så minst en pool är garanterat på här.
-    const inEra = youtubeEnabled
+    // Filter-hierarki (i ordning, från hård → mjuk):
+    //   1. Source-toggle (youtubeEnabled / imagesEnabled) — HÅRD. Host:s val.
+    //   2. Era (correctYear ∈ [eraFrom, eraTo]) — HÅRD. Host:s val.
+    //   3. Audience (union av spelares generationer) — PREFERENS. Relaxbar
+    //      när era+audience är tom; era stannar alltid.
+    //
+    // Rationale: era är en explicit host-väljning ("spel om 80-talet"). En
+    // 80-talsspel ska ALDRIG visa låtar/items från 2020 även om alla spelare
+    // är gen-z — det skulle bryta host:s era-intent. Däremot OK att visa
+    // 80-talslåt med audiences=['elder'] till en gen-z-spelare när det är
+    // enda alternativet inom 80-talsfönstret.
+    //
+    // Audience-set byggs en gång och delas mellan båda pools.
+    const audienceSet = buildAudienceSet(turnOrder);
+
+    // ── Music-pool ────────────────────────────────────────────────────
+    // Era HÅRD: filtrera SEED_QUESTIONS på correctYear ∈ [eraFrom, eraTo].
+    const inEraMusic = youtubeEnabled
       ? SEED_QUESTIONS.filter(
           (q) => q.correctYear >= eraFrom && q.correctYear <= eraTo,
         )
       : [];
-    // YouTube-pool fallback: era-tom → hela SEED_QUESTIONS (bara aktiverad
-    // när source-toggle är på, så vi inte oavsiktligt återupplivar
-    // avstängda källor via fallback).
+    // Audience MJUK: filtrera era-träffarna ytterligare. MUSIC_QUESTIONS har
+    // `audiences`-prop; SEED_QUESTIONS-mappen droppar fältet, så vi filtrerar
+    // mot id-set:en från MUSIC_QUESTIONS.
+    const audienceAllowedMusicIds = new Set(
+      filterByAudience(MUSIC_QUESTIONS, audienceSet).map((q) => q.id),
+    );
+    const inEraAudienceMusic = inEraMusic.filter((q) =>
+      audienceAllowedMusicIds.has(q.id),
+    );
+    // Fallback: era + audience → era-only (audience relaxas, era HÅRD).
+    // Tom era-only-array → pool tom (youtubeEnabled=false eller era-fönster
+    // utan items). Inga fallbacks som strippar era — host:s era-intent
+    // respekteras alltid.
     const youtubePool: QuizQuestion[] =
-      inEra.length > 0
-        ? inEra
-        : youtubeEnabled
-          ? SEED_QUESTIONS
-          : [];
-    // Audience-filter: union av aktiva spelares generationer från turnOrder.
-    // Items vars audiences innehåller minst en spelares gen ELLER 'all' är
-    // kvalificerade. Tom audience-set (= ingen spelare med age-info) bypassar
-    // filtret. Steg 2 audience-filter unlock:ades när pool nådde 31 items
-    // (2026-05-22). Använder IMAGE_QUIZ_QUESTIONS som har audiences-prop;
-    // IMAGE_SEED_QUESTIONS-mappen droppar fältet, så vi filtrerar mot
-    // id-set:en istället.
-    const audienceSet = buildAudienceSet(turnOrder);
-    const audienceAllowedIds = new Set(
+      inEraAudienceMusic.length > 0 ? inEraAudienceMusic : inEraMusic;
+    // ── Image-pool ────────────────────────────────────────────────────
+    // Era HÅRD: peak-recognition-fönster när det finns (artister var sällan
+    // kända det år de föddes — peak speglar host:s intent bättre). Fallback
+    // till correctYear när peak saknas. Items utan både peak OCH correctYear
+    // (t.ex. capitals/städer) är era-agnostiska och inkluderas i alla eras.
+    const inEraImages = imagesEnabled
+      ? IMAGE_SEED_QUESTIONS.filter((q) => {
+          if (q.peakFrom !== undefined && q.peakTo !== undefined) {
+            // Interval-overlap: [eraFrom, eraTo] ∩ [peakFrom, peakTo] ≠ ∅
+            return eraFrom <= q.peakTo && eraTo >= q.peakFrom;
+          }
+          if (q.correctYear !== undefined) {
+            return q.correctYear >= eraFrom && q.correctYear <= eraTo;
+          }
+          // Era-agnostisk — alltid inkluderad.
+          return true;
+        })
+      : [];
+    // Audience MJUK: filtrera era-träffarna ytterligare. Samma pattern som
+    // music — IMAGE_SEED_QUESTIONS droppar `audiences`, filtrera mot id-set.
+    const audienceAllowedImageIds = new Set(
       filterByAudience(IMAGE_QUIZ_QUESTIONS, audienceSet).map((q) => q.id),
     );
-    const audienceFilteredImages = imagesEnabled
-      ? IMAGE_SEED_QUESTIONS.filter((q) => audienceAllowedIds.has(q.id))
-      : [];
-    // Image-pool: peak-recognition-fönster när det finns (artister var
-    // sällan kända det år de föddes — peak speglar host:s intent bättre).
-    // Fallback till correctYear när peak saknas. Items utan både peak OCH
-    // correctYear (t.ex. capitals/städer) är era-agnostiska och inkluderas
-    // i alla eras. Era-tom → fallback-chain (audience-filtrerad utan era →
-    // hela poolen) så spelet alltid har content.
-    const inEraImages = audienceFilteredImages.filter((q) => {
-      if (q.peakFrom !== undefined && q.peakTo !== undefined) {
-        // Interval-overlap: [eraFrom, eraTo] ∩ [peakFrom, peakTo] ≠ ∅
-        return eraFrom <= q.peakTo && eraTo >= q.peakFrom;
-      }
-      if (q.correctYear !== undefined) {
-        return q.correctYear >= eraFrom && q.correctYear <= eraTo;
-      }
-      // Era-agnostisk — alltid inkluderad.
-      return true;
-    });
-    // Fallback-chain:
-    //   1. era + audience-filtrerad → använd
-    //   2. audience-filtrerad utan era → använd (era strippas)
-    //   3. alla items (om imagesEnabled) → använd (både filter strippas)
-    //   4. tom (= imagesEnabled=false)
+    const inEraAudienceImages = inEraImages.filter((q) =>
+      audienceAllowedImageIds.has(q.id),
+    );
+    // Fallback: era + audience → era-only. Era HÅRD.
     const imagePool: QuizQuestion[] =
-      inEraImages.length > 0
-        ? inEraImages
-        : audienceFilteredImages.length > 0
-          ? audienceFilteredImages
-          : imagesEnabled
-            ? IMAGE_SEED_QUESTIONS
-            : [];
+      inEraAudienceImages.length > 0 ? inEraAudienceImages : inEraImages;
 
     const playerCount = Math.max(1, turnOrder.length);
     const hasYoutube = youtubePool.length > 0;
