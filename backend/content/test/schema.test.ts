@@ -7,19 +7,21 @@ describe('content catalog', () => {
     expect(() => loadCatalog()).not.toThrow();
   });
 
-  it('default load contains active categories post-politiker-purge', () => {
+  it('default load contains active V1-categories post-purge + V2-parking', () => {
     const { files } = loadCatalog();
     const categories = new Set(
       Array.from(files.values()).map((f) => f.category),
     );
     expect(categories.has('artists')).toBe(true);
     expect(categories.has('songs')).toBe(true);
-    expect(categories.has('capitals')).toBe(true);
     expect(categories.has('actors')).toBe(true);
     expect(categories.has('athletes')).toBe(true);
     // persons-* raderade vid politiker-purge:n (2026-05-21) — items
     // omkategoriserade till artists/actors/athletes eller strikna.
     expect(categories.has('persons')).toBe(false);
+    // capitals (städer + länder) parkerade till deferred/ 2026-05-22 —
+    // svår att definiera vilken generation som faktiskt kan dem. V2-task.
+    expect(categories.has('capitals')).toBe(false);
   });
 
   it('deferred catalog opt-in flag fortfarande funktionellt (för framtida items)', () => {
