@@ -10,7 +10,7 @@ description: How QuizVibe collects, uses, and protects your information.
 
 This Privacy Policy explains how **QuizVibe** ("we", "us", "the app") collects, uses, and protects your information when you use our mobile application. We've tried to write it in plain English with the legal anchor points clearly marked.
 
-QuizVibe is operated by **Peter Björklund**, an individual residing in Sweden. For any privacy-related questions or requests, contact us at: **peter.lomaco@gmail.com**.
+QuizVibe is operated by **Peter Björklund**, an individual residing in Sweden. For any privacy-related questions or requests, contact us at: **infoquizvibe@gmail.com**.
 
 ---
 
@@ -19,7 +19,7 @@ QuizVibe is operated by **Peter Björklund**, an individual residing in Sweden. 
 - We collect the **minimum information needed** to make the app work: your player name, avatar choice, birth year, region preference, and game scores.
 - We use **Supabase** (EU-hosted in Ireland) as our backend database, and **YouTube IFrame Player** to play video clips inside the app.
 - We **do not sell your data**, **do not show ads**, and **do not track you across other apps or websites**.
-- You can **delete your account at any time** by emailing peter.lomaco@gmail.com.
+- You can **delete your account at any time** by emailing infoquizvibe@gmail.com.
 - The app is intended for users **13 years or older**.
 
 The rest of this document is the full version.
@@ -31,13 +31,13 @@ The rest of this document is the full version.
 | | |
 |---|---|
 | **Operator** | Peter Björklund, individual residing in Sweden |
-| **Contact email** | peter.lomaco@gmail.com |
+| **Contact email** | infoquizvibe@gmail.com |
 | **App name** | QuizVibe |
 | **Platforms** | Apple App Store (iOS) |
 
 We are not a registered company; QuizVibe is currently operated as a personal project. If this changes, we will update this policy and notify users via the app.
 
-For data protection requests, complaints, or questions about how we handle your information, email us at peter.lomaco@gmail.com. We aim to respond within 30 days as required by GDPR Article 12.
+For data protection requests, complaints, or questions about how we handle your information, email us at infoquizvibe@gmail.com. We aim to respond within 30 days as required by GDPR Article 12.
 
 ---
 
@@ -134,7 +134,7 @@ GitHub's Privacy Policy: https://docs.github.com/en/site-policy/privacy-policies
 
 | Data type | Retention period |
 |---|---|
-| Registered user account (profile, history) | Until you delete it. Email peter.lomaco@gmail.com to request deletion. |
+| Registered user account (profile, history) | Until you delete it. Email infoquizvibe@gmail.com to request deletion. |
 | Guest anonymous session | Until you leave the game (immediate) or 30 days of inactivity. |
 | Lobby state (room codes, player list) | Auto-deleted 24 hours after the lobby was created. |
 | Analytics events (anonymized) | 90 days, then aggregated and de-identified for long-term retention. |
@@ -156,7 +156,7 @@ If you are in the EU, EEA, or UK, you have the following rights regarding your p
 - **Right to object** — object to processing based on legitimate interest.
 - **Right to withdraw consent** — where we rely on consent (currently we don't, but if that changes you can withdraw).
 
-To exercise any of these rights, email **peter.lomaco@gmail.com** with the subject "GDPR Request" and describe what you want. We will respond within 30 days.
+To exercise any of these rights, email **infoquizvibe@gmail.com** with the subject "GDPR Request" and describe what you want. We will respond within 30 days.
 
 You also have the right to **lodge a complaint** with a supervisory authority. In Sweden, that's the Integritetsskyddsmyndigheten (IMY): https://www.imy.se
 
@@ -168,7 +168,7 @@ You also have the right to **lodge a complaint** with a supervisory authority. I
 
 The app enforces this by limiting the birth-year picker in registration to dates corresponding to a minimum age of 13. Users cannot register or play as a guest with a birth year that would make them younger than 13 at the time of registration.
 
-We do not knowingly collect personal information from children under 13. If you are a parent or guardian and believe your child under 13 has somehow registered (e.g., by misrepresenting their age), contact peter.lomaco@gmail.com and we will delete their account and associated data.
+We do not knowingly collect personal information from children under 13. If you are a parent or guardian and believe your child under 13 has somehow registered (e.g., by misrepresenting their age), contact infoquizvibe@gmail.com and we will delete their account and associated data.
 
 For users between 13 and 16 in the EU: under GDPR Article 8 (and Swedish implementation), processing of personal data based on consent for users under 16 requires parental authorization. QuizVibe currently relies on Contract and Legitimate Interest as legal bases (Article 6(1)(b) and (f)) — not Consent — for its core processing. This means parental authorization is not strictly required to use the app's normal features. However, we still recommend that parents are aware of and approve of their teenager's app usage.
 
@@ -232,7 +232,7 @@ If you have a dispute with us about privacy that we cannot resolve through email
 
 For all privacy-related inquiries:
 
-**Email:** peter.lomaco@gmail.com
+**Email:** infoquizvibe@gmail.com
 **Subject line:** Please prefix with "Privacy:" for faster routing (e.g., "Privacy: data export request")
 
 For non-privacy support (gameplay questions, bug reports, feature requests), the same email works — just use a different subject line.

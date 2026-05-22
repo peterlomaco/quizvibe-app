@@ -14,7 +14,7 @@ A music + culture quiz app for iOS. This page hosts our public legal documents a
 
 ## Contact
 
-For all questions, requests, or feedback: **peter.lomaco@gmail.com**
+For all questions, requests, or feedback: **infoquizvibe@gmail.com**
 
 ---
 
