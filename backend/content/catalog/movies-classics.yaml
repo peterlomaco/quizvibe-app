@@ -97,6 +97,54 @@ items:
         endSec: 45
         channelTitle: "Movieclips"
         notes: "Movieclips 'Run, Forrest, Run!'-scenen — iconic moment + theme."
+  - id: the-godfather
+    displayName: "The Godfather"
+    correctYear: 1972
+    probability: 92
+    wikimediaSearchHints: ["The Godfather 1972 Coppola"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "UaVTIH8mujA"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Paramount Pictures"
+        notes: "Paramount Pictures 50th Anniversary trailer — Nino Rota theme + iconic scener."
+  - id: rocky
+    displayName: "Rocky"
+    correctYear: 1976
+    probability: 92
+    wikimediaSearchHints: ["Rocky 1976 Stallone"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "-Hk-LYcavrw"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Amazon MGM Studios"
+        notes: "MGM Official trailer — Bill Conti's Gonna Fly Now-tema + training-montage."
+  - id: e-t-the-extra-terrestrial
+    displayName: "E.T. the Extra-Terrestrial"
+    correctYear: 1982
+    probability: 92
+    wikimediaSearchHints: ["E.T. the Extra-Terrestrial 1982 Spielberg"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "2tK7AMgLvv0"
+        startSec: 15
+        endSec: 30
+        channelTitle: "IMAX"
+        notes: "IMAX official trailer — John Williams theme + iconic bicycle/moon-scen."
+  - id: top-gun
+    displayName: "Top Gun"
+    correctYear: 1986
+    probability: 90
+    wikimediaSearchHints: ["Top Gun 1986 Tom Cruise"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "xa_z57UatDY"
+        startSec: 15
+        endSec: 30
+        channelTitle: "Rotten Tomatoes Classic Trailers"
+        notes: "Official 1986-trailer — Danger Zone-tema + jet-action."
   - id: titanic
     displayName: "Titanic"
     correctYear: 1997
@@ -109,3 +157,27 @@ items:
         endSec: 45
         channelTitle: "20th Century Studios"
         notes: "Official 25th Anniversary trailer — Celine Dion theme + iconic scenes."
+  - id: the-matrix
+    displayName: "The Matrix"
+    correctYear: 1999
+    probability: 93
+    wikimediaSearchHints: ["The Matrix 1999 Wachowski"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "vKQi3bBA1y8"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Rotten Tomatoes Classic Trailers"
+        notes: "Official 1999-trailer — bullet-time + Neo/Trinity-scener."
+  - id: avatar
+    displayName: "Avatar"
+    correctYear: 2009
+    probability: 93
+    wikimediaSearchHints: ["Avatar 2009 James Cameron"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "5PSNL1qE6VY"
+        startSec: 60
+        endSec: 75
+        channelTitle: "20th Century Studios"
+        notes: "20th Century Studios official 2009-trailer — Pandora-värld, Na'vi-action."

@@ -270,6 +270,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "the-godfather",
+    "displayName": "The Godfather",
+    "correctYear": 1972,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "UaVTIH8mujA",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Paramount Pictures",
+        "license": "standard",
+        "notes": "Paramount Pictures 50th Anniversary trailer — Nino Rota theme + iconic scener."
+      }
+    ]
+  },
+  {
     "id": "abba-waterloo",
     "displayName": "Waterloo — ABBA",
     "correctYear": 1974,
@@ -371,6 +391,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "rocky",
+    "displayName": "Rocky",
+    "correctYear": 1976,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "-Hk-LYcavrw",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Amazon MGM Studios",
+        "license": "standard",
+        "notes": "MGM Official trailer — Bill Conti's Gonna Fly Now-tema + training-montage."
+      }
+    ]
+  },
+  {
     "id": "star-wars-new-hope",
     "displayName": "Star Wars: A New Hope",
     "correctYear": 1977,
@@ -408,6 +448,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "PINK FLOYD - Topic",
         "license": "standard",
         "notes": "Officiell album-audio via YouTube Topic. 'We don't need no education'-vers."
+      }
+    ]
+  },
+  {
+    "id": "borg-mcenroe-wimbledon-1980",
+    "displayName": "Borg-McEnroe Wimbledon-final",
+    "correctYear": 1980,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "UnwYdF8a5ws",
+        "startSec": 300,
+        "endSec": 315,
+        "channelTitle": "Wimbledon",
+        "license": "standard",
+        "notes": "Wimbledon official channel — 1980 tie-break i fjärde set (18-16 till McEnroe). Mid-tiebreak."
       }
     ]
   },
@@ -469,6 +529,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Paramount Movies",
         "license": "standard",
         "notes": "Official Paramount Movies trailer. Raiders March-theme + boulder-scen."
+      }
+    ]
+  },
+  {
+    "id": "e-t-the-extra-terrestrial",
+    "displayName": "E.T. the Extra-Terrestrial",
+    "correctYear": 1982,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "2tK7AMgLvv0",
+        "startSec": 15,
+        "endSec": 30,
+        "channelTitle": "IMAX",
+        "license": "standard",
+        "notes": "IMAX official trailer — John Williams theme + iconic bicycle/moon-scen."
       }
     ]
   },
@@ -555,6 +635,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "carl-lewis-1984-la-olympics",
+    "displayName": "Carl Lewis 4 OS-guld i LA",
+    "correctYear": 1984,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "s6lS_EcuUdY",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Olympics",
+        "license": "standard",
+        "notes": "Olympics official channel — Carl Lewis long jump-guld LA 1984."
+      }
+    ]
+  },
+  {
     "id": "a-ha-take-on-me",
     "displayName": "Take on Me — a-ha",
     "correctYear": 1985,
@@ -633,6 +733,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "FIFA",
         "license": "standard",
         "notes": "FIFA official channel — Maradona Top 5 Goals (Hand of God + Goal of the Century 1986)."
+      }
+    ]
+  },
+  {
+    "id": "top-gun",
+    "displayName": "Top Gun",
+    "correctYear": 1986,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "xa_z57UatDY",
+        "startSec": 15,
+        "endSec": 30,
+        "channelTitle": "Rotten Tomatoes Classic Trailers",
+        "license": "standard",
+        "notes": "Official 1986-trailer — Danger Zone-tema + jet-action."
       }
     ]
   },
@@ -1022,6 +1142,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "the-matrix",
+    "displayName": "The Matrix",
+    "correctYear": 1999,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "vKQi3bBA1y8",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Rotten Tomatoes Classic Trailers",
+        "license": "standard",
+        "notes": "Official 1999-trailer — bullet-time + Neo/Trinity-scener."
+      }
+    ]
+  },
+  {
     "id": "britney-spears-oops-i-did-it-again",
     "displayName": "Oops!... I Did It Again — Britney Spears",
     "correctYear": 2000,
@@ -1343,6 +1483,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "federer-nadal-wimbledon-2008",
+    "displayName": "Federer-Nadal Wimbledon-final ('greatest match')",
+    "correctYear": 2008,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "U5Af1jGgYqA",
+        "startSec": 60,
+        "endSec": 75,
+        "channelTitle": "Wimbledon",
+        "license": "standard",
+        "notes": "Wimbledon official channel — 2008 'greatest match'-finalen Best Rallies."
+      }
+    ]
+  },
+  {
     "id": "katy-perry-i-kissed-a-girl",
     "displayName": "I Kissed a Girl — Katy Perry",
     "correctYear": 2008,
@@ -1359,6 +1519,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 180,
         "channelTitle": "Katy Perry - Topic",
         "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "avatar",
+    "displayName": "Avatar",
+    "correctYear": 2009,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "5PSNL1qE6VY",
+        "startSec": 60,
+        "endSec": 75,
+        "channelTitle": "20th Century Studios",
+        "license": "standard",
+        "notes": "20th Century Studios official 2009-trailer — Pandora-värld, Na'vi-action."
       }
     ]
   },
@@ -1439,6 +1619,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 264,
         "channelTitle": "Eminem - Topic",
         "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "iniesta-world-cup-final-goal-2010",
+    "displayName": "Iniesta gör VM-finalmålet",
+    "correctYear": 2010,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "3pCPQDxZzfY",
+        "startSec": 0,
+        "endSec": 15,
+        "channelTitle": "FIFA",
+        "license": "standard",
+        "notes": "FIFA official channel — Iniesta's målgörande Spanien-Holland 2010 från alla vinklar."
       }
     ]
   },
