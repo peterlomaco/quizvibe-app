@@ -165,6 +165,9 @@ function buildExportedQuestion(
   // Items kan finnas i flera filer (t.ex. Cristiano i både gen-z och gen-alpha).
   // Samla unionen av audiences från alla träffar och plocka category +
   // contentSubject från första träffen (alltid samma per item-id om duplicerad).
+  // Item-level audience-override per fil-träff har företräde — om item bär
+  // eget audience-fält används det istället för fil-headern för just den
+  // träffen (edge-case-fix för items med recognition utanför fil-buckets).
   const audiencesSet = new Set<Audience>();
   let category: Category | null = null;
   let contentSubject: ContentSubject | null = null;
@@ -173,7 +176,8 @@ function buildExportedQuestion(
     if (!file) continue;
     if (!category) category = file.category;
     if (!contentSubject) contentSubject = file.contentSubject;
-    for (const a of file.audience) audiencesSet.add(a);
+    const effectiveAudience = match.item.audience ?? file.audience;
+    for (const a of effectiveAudience) audiencesSet.add(a);
   }
   if (!category || !contentSubject) return null;
 

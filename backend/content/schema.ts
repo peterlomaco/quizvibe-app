@@ -217,6 +217,13 @@ export const ContentItemSchema = z.object({
   // Se memory/project_music_question_tagging.md för fullständig spec.
   inBaseCatalog: z.boolean().default(true),
   genrePackages: z.array(z.string().min(1)).default([]),
+  // Item-level audience-override. När satt overrider den fil-headerns
+  // audience-tag för detta specifika item. Edge-case-fix när item-recognition
+  // inte sammanfaller med fil-buckets (t.ex. ny dansband-låt 2026 i
+  // songs-gen-alpha.yaml som faktiskt är ['elder', 'gen-x', 'millennials']-
+  // recognized). Saknar item:et `audience` används fil-audience som tidigare.
+  // Se memory/project_audience_tagging.md för curator-checklista.
+  audience: z.array(AudienceSchema).min(1).optional(),
   notes: z.string().optional(),
 })
   .refine(

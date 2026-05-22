@@ -88,9 +88,12 @@ async function main(): Promise<void> {
         correctYear: item.correctYear,
         contentSubject: 'song',
         questionText: FIXED_QUESTION_TEXT.song,
-        // Kopierar file-header audience till varje item så klient-filtret
-        // kan jobba på item-nivå utan att behöva fil-kontexten.
-        audiences: file.audience,
+        // Item-level audience-override har företräde över file-header. Edge-
+        // case: ny dansband-låt 2026 i songs-gen-alpha (file.audience =
+        // ['gen-alpha', 'gen-z']) kan bära item.audience = ['elder', 'gen-x',
+        // 'millennials'] för korrekt cross-gen-recognition. Saknas item-tag
+        // används file-tag som tidigare.
+        audiences: item.audience ?? file.audience,
         youtubeClips: item.youtubeClips.map((c) => ({
           videoId: c.videoId,
           startSec: c.startSec,

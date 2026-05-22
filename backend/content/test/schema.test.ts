@@ -249,6 +249,66 @@ describe('schema rejection', () => {
     expect(result.success).toBe(true);
   });
 
+  it('accepts item with audience-override (single audience)', () => {
+    const result = ContentItemSchema.safeParse({
+      id: 'drifters-2026',
+      displayName: 'Drifters 2026',
+      correctYear: 2026,
+      probability: 75,
+      wikimediaSearchHints: ['Drifters dansband 2026'],
+      answerMethods: ['timeline'],
+      audience: ['elder'],
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.audience).toEqual(['elder']);
+    }
+  });
+
+  it('accepts item with audience-override (multi-gen)', () => {
+    const result = ContentItemSchema.safeParse({
+      id: 'drifters-cross-gen',
+      displayName: 'Cross-gen dansband',
+      correctYear: 2026,
+      probability: 80,
+      wikimediaSearchHints: ['dansband'],
+      answerMethods: ['timeline'],
+      audience: ['elder', 'gen-x', 'millennials'],
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.audience).toEqual(['elder', 'gen-x', 'millennials']);
+    }
+  });
+
+  it('audience is undefined when omitted (fil-fallback)', () => {
+    const result = ContentItemSchema.safeParse({
+      id: 'no-override',
+      displayName: 'Inherits from file',
+      correctYear: 1990,
+      probability: 60,
+      wikimediaSearchHints: ['x'],
+      answerMethods: ['timeline'],
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.audience).toBeUndefined();
+    }
+  });
+
+  it('rejects empty audience-override array', () => {
+    const result = ContentItemSchema.safeParse({
+      id: 'empty-aud',
+      displayName: 'Empty',
+      correctYear: 1990,
+      probability: 50,
+      wikimediaSearchHints: ['x'],
+      answerMethods: ['timeline'],
+      audience: [],
+    });
+    expect(result.success).toBe(false);
+  });
+
   it('rejects orphan item (not in base and no genre packages)', () => {
     const result = ContentItemSchema.safeParse({
       id: 'orphan',
