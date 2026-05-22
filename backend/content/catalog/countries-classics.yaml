@@ -1,0 +1,51 @@
+# Länder kända över alla generationer — flagg-baserade items.
+# Frågetext "Which country is this?". Visuellt särskild från capitals
+# (städer visar skyline/landmärken; länder visar flaggor) så ingen
+# semantic-overlap mellan question-typer.
+# Country-items är era-agnostiska (samma som capitals) — ingen correctYear,
+# endast name-letters-svarsmodell.
+audience: ["all"]
+category: capitals
+contentForm: image
+contentSubject: country
+items:
+  - id: sweden
+    displayName: "Sweden"
+    probability: 99
+    wikimediaSearchHints: ["Flag of Sweden"]
+    answerMethods: ["name-letters"]
+  - id: norway
+    displayName: "Norway"
+    probability: 95
+    wikimediaSearchHints: ["Flag of Norway"]
+    answerMethods: ["name-letters"]
+  - id: denmark
+    displayName: "Denmark"
+    probability: 95
+    wikimediaSearchHints: ["Flag of Denmark"]
+    answerMethods: ["name-letters"]
+  - id: united-states
+    displayName: "United States"
+    probability: 99
+    wikimediaSearchHints: ["Flag of the United States"]
+    answerMethods: ["name-letters"]
+  - id: germany
+    displayName: "Germany"
+    probability: 95
+    wikimediaSearchHints: ["Flag of Germany"]
+    answerMethods: ["name-letters"]
+  - id: france
+    displayName: "France"
+    probability: 95
+    wikimediaSearchHints: ["Flag of France"]
+    answerMethods: ["name-letters"]
+  - id: italy
+    displayName: "Italy"
+    probability: 95
+    wikimediaSearchHints: ["Flag of Italy"]
+    answerMethods: ["name-letters"]
+  - id: japan
+    displayName: "Japan"
+    probability: 98
+    wikimediaSearchHints: ["Flag of Japan"]
+    answerMethods: ["name-letters"]
