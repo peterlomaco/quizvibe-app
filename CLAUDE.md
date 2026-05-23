@@ -321,7 +321,7 @@ Five top-level collapsible sections — all use the same tappable-header pattern
   2. Blockar `is_anonymous: true`-users (guests har inget konto att radera).
   3. Anropar `admin.auth.admin.deleteUser(user_id)` med service-role-key.
   4. Postgres-CASCADE rensar resten automatiskt: `profiles` (FK `profiles.id → auth.users(id) ON DELETE CASCADE`), `rooms` där user var host (FK `rooms.host_user_id → CASCADE`), `waiting_invites` till/från user (FK `to_user_id → CASCADE`). `lobby_players.user_id → NULL` (SET NULL — raderna lever kvar anonymiserade tills rooms-CASCADE eller 24h-expiry tar dem).
-  5. **Verify JWT-toggle i Dashboard MÅSTE vara PÅ** för denna function — motsats till `anon-signup` där den måste vara AV. Skillnaden: anon-signup signar IN en ny user (har ingen JWT än), delete-account autentiserar en redan inloggad user.
+  5. **Verify JWT with legacy secret-toggle i Dashboard MÅSTE vara AV** — samma config som anon-signup. Med moderna `sb_publishable_*`-keys (vad vi använder i `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY`) avvisar gateway:n requests med `UNAUTHORIZED_INVALID_JWT_FORMAT` när toggle:n är PÅ — publishable-keys är inte legacy-secret-signed. Vår function har egen JWT-validation via `admin.auth.getUser(token)` så gateway-level validation behövs inte. Supabase's egen rekommendation: "OFF with JWT and custom auth logic in your function code".
 - **Client helper** `deleteAccount()` i [src/utils/auth.ts](src/utils/auth.ts):
   1. Anropar Edge Function.
   2. Vid success: nuke:ar ALL lokal AsyncStorage under `@quizvibe/*`-prefixet (profile-cache, friends, waiting-invites-cache, gameHistory, etc.).

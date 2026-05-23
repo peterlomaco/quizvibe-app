@@ -22,9 +22,11 @@
 //   - SUPABASE_SERVICE_ROLE_KEY
 // Inga manuella secrets behövs.
 //
-// Verify JWT-toggle i Dashboard MÅSTE vara PÅ för denna function — vi
-// behöver att Supabase auto-validerar Bearer-token:en innan vår kod kör
-// så obehöriga anrop avvisas på edge-nivå.
+// Verify JWT with legacy secret-toggle i Dashboard MÅSTE vara AV — samma
+// config som anon-signup. Med moderna sb_publishable_*-keys avvisar
+// gateway:n requests med UNAUTHORIZED_INVALID_JWT_FORMAT när toggle:n
+// är PÅ (publishable-keys är inte legacy-secret-signed). Vi har egen
+// JWT-validation via admin.auth.getUser(token) nedan.
 // ─────────────────────────────────────────────────────────────────────
 
 import { createClient } from 'jsr:@supabase/supabase-js@2';
