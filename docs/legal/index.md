@@ -6,6 +6,6 @@ description: Privacy Policy and Terms of Service for QuizVibe.
 # Legal — QuizVibe
 
 - [Privacy Policy](privacy/)
-- ~~Terms of Service~~ — coming soon
+- [Terms of Service](terms/)
 
 [← Back to QuizVibe homepage](../)
