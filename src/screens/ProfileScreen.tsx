@@ -1481,9 +1481,13 @@ export default function ProfileScreen() {
                 köpta tillsammans tomma — t.ex. inget birthYear). */}
             <View style={styles.field}>
               <Text style={styles.fieldLabel}>
-                Purchased and available when you are the Host:
+                Available when you are the Host:
               </Text>
-              {availablePackages.length > 0 && (
+              {/* Select all-toggle göms när bara 1 paket finns — då blir
+                  den redundant (single packagets egen toggle gör samma
+                  jobb). I v1 har vi bara gen-paketet; återinförs när
+                  themed packages aktiveras i framtida release. */}
+              {availablePackages.length > 1 && (
                 <View style={styles.selectAllRow}>
                   <Text style={styles.selectAllLabel}>Select all</Text>
                   <Switch
@@ -1503,7 +1507,7 @@ export default function ProfileScreen() {
               )}
               {availablePackages.length === 0 ? (
                 <Text style={styles.packagesEmptyText}>
-                  No extra packages available
+                  No host packages available
                 </Text>
               ) : (
                 <View style={styles.packagesList}>

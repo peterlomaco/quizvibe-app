@@ -40,16 +40,15 @@ const ANDROID_API_KEY = process.env.EXPO_PUBLIC_REVENUECAT_ANDROID_KEY;
 // Dashboard (Project → Entitlements). Ändra ALDRIG dessa strings utan att
 // uppdatera RC-dashboarden samtidigt — entitlement-lookup använder dem
 // som keys.
+//
+// V1 har BARA premium-entitlement. Themed packages (Hip Hop / Rock /
+// Film & Actors) är parkerade till v1.1+; för v1 har user bara det gratis
+// gen-paketet som inte mappar mot RC-entitlement (helt klient-driven via
+// getFreeGenerationPackage(birthYear)).
 export const ENTITLEMENTS = {
   /** Auto-renewable subscription (Premium membership) — unlocks Individual
       Devices, Max 12 players, Rounds up to 20, m.fl. */
   PREMIUM: 'premium',
-  /** Non-consumable themed package — Hip Hop. */
-  PACKAGE_HIPHOP: 'package_hiphop',
-  /** Non-consumable themed package — Rock. */
-  PACKAGE_ROCK: 'package_rock',
-  /** Non-consumable themed package — Film & Actors. */
-  PACKAGE_FILM_ACTORS: 'package_film_actors',
 } as const;
 
 export type EntitlementKey = (typeof ENTITLEMENTS)[keyof typeof ENTITLEMENTS];

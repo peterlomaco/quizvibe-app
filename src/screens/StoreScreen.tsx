@@ -423,7 +423,7 @@ export default function StoreScreen() {
         <View style={styles.header}>
           <Text style={styles.screenTitle}>Add QuizVibe Premium</Text>
           <Text style={styles.screenSubtitle}>
-            Choose extra packages, and Extra Host game credits or unlimited with QuizVibe membership plans
+            Extra Host Game credits, or unlimited Host games with QuizVibe membership plans
           </Text>
         </View>
 

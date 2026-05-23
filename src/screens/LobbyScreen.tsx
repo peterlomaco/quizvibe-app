@@ -3643,7 +3643,11 @@ export default function LobbyScreen() {
                   <Text style={styles.extraPackagesHeading}>
                     {hostMode ? 'Packages available for you:' : 'Packages for this lobby selected by the Host:'}
                   </Text>
-                  {hostMode && (
+                  {/* Select all-toggle göms när bara 1 paket finns — då
+                      blir den redundant (single packagets egen toggle gör
+                      samma jobb). I v1 har vi bara gen-paketet; återinförs
+                      när themed packages aktiveras i framtida release. */}
+                  {hostMode && availablePackages.length > 1 && (
                     <View style={styles.selectAllGroup}>
                       <Text style={styles.selectAllLabel}>Select all</Text>
                       <Switch
