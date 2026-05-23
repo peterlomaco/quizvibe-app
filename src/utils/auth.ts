@@ -27,6 +27,7 @@
 // "guest kommer tillbaka senare och ser sina egna left-rader" och för
 // att inte spamma auth.users med ny rad varje gång appen öppnas.
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from './supabase';
 
@@ -100,4 +101,72 @@ export async function ensureAuthSession(): Promise<User | null> {
     }
   })();
   return pendingAuthPromise;
+}
+
+/**
+ * Permanent radering av inloggad user — driver "Delete Account"-knappen
+ * i Profile-skärmens logout-sheet. Krav från Apple App Store Guideline
+ * 5.1.1(v): apps med kontoflow måste erbjuda in-app deletion.
+ *
+ * Flöde:
+ *   1. Anropar Edge Function 'delete-account' som validerar JWT:n och
+ *      kör admin.auth.admin.deleteUser(user_id). CASCADE-policies på
+ *      profiles + rooms + waiting_invites rensar resten automatiskt
+ *      server-side. lobby_players.user_id → NULL (SET NULL).
+ *   2. Nuke:ar ALL lokal AsyncStorage under `@quizvibe/*`-prefixet —
+ *      profile-cache, friends, waiting-invites-cache, gameHistory osv.
+ *      User har explicit bett om permanent deletion så ingen anledning
+ *      att behålla per-user-data lokalt.
+ *   3. Kör supabase.auth.signOut() för att rensa session-token.
+ *
+ * Returnerar `{ ok: true }` vid success, `{ ok: false, reason }` annars.
+ * Call-site:s ansvar att visa lämpligt felmeddelande + analytics. Lokal
+ * AsyncStorage rensas BARA om server-deletion lyckades — annars hamnar
+ * vi i ett inconsistent state där lokala data är borta men user:n
+ * fortfarande finns i Supabase.
+ */
+export async function deleteAccount(): Promise<
+  { ok: true } | { ok: false; reason: string }
+> {
+  try {
+    const { data, error } = await supabase.functions.invoke<{
+      ok?: boolean;
+      error?: string;
+      message?: string;
+    }>('delete-account', { method: 'POST' });
+
+    if (error) {
+      return { ok: false, reason: error.message ?? 'invoke_failed' };
+    }
+    if (!data?.ok) {
+      return { ok: false, reason: data?.error ?? 'unknown_error' };
+    }
+
+    // Server-deletion lyckades — rensa lokal storage.
+    try {
+      const allKeys = await AsyncStorage.getAllKeys();
+      const quizvibeKeys = allKeys.filter((k) => k.startsWith('@quizvibe/'));
+      if (quizvibeKeys.length > 0) {
+        await AsyncStorage.multiRemove(quizvibeKeys);
+      }
+    } catch (storageErr) {
+      // Logga men bryt inte success-pathen — server-side är redan klart,
+      // local storage kan rensas senare via reinstall om det skulle behövas.
+      console.warn('[auth] AsyncStorage cleanup failed after delete:', storageErr);
+    }
+
+    // Rensa Supabase session-token. signOut är best-effort — om den
+    // failar har user fortfarande en stale token lokalt men auth-user:n
+    // är raderad server-side så token:en är oanvändbar i praktiken.
+    try {
+      await supabase.auth.signOut();
+    } catch (signOutErr) {
+      console.warn('[auth] signOut after delete failed:', signOutErr);
+    }
+
+    return { ok: true };
+  } catch (err) {
+    console.warn('[auth] deleteAccount threw:', err);
+    return { ok: false, reason: 'network_error' };
+  }
 }

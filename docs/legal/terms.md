@@ -284,7 +284,7 @@ When your account is terminated:
 
 ### 12.3 You can terminate at any time
 
-You can stop using the app and delete your account at any time by emailing **infoquizvibe@gmail.com** with the subject "Account deletion request". See our [Privacy Policy, Section 6](../privacy/#6-your-rights-under-gdpr) for details on data deletion.
+You can stop using the app and delete your account at any time, directly in-app: open **Profile → tap your name in the top-right → Delete Account**. Server-side data is removed automatically. If you need help, email **infoquizvibe@gmail.com** with the subject "Account deletion request". See our [Privacy Policy, Section 6](../privacy/#6-your-rights-under-gdpr) for what gets deleted.
 
 ---
 

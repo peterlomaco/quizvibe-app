@@ -37,6 +37,7 @@ import {
 import { TopUserBanner } from '../components/TopUserBanner';
 import { Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';
 import { resetIdentity, track } from '../utils/analytics';
+import { deleteAccount } from '../utils/auth';
 import { AVATARS, getAvatarEmojiById } from '../utils/avatars';
 import {
     addFriend,
@@ -357,6 +358,10 @@ export default function ProfileScreen() {
   const [regionPickerOpen, setRegionPickerOpen] = useState(false);
   const [answerResponsePickerOpen, setAnswerResponsePickerOpen] = useState(false);
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
+  // Loading-state under server-anropet i handleConfirmDeleteAccount. Blockar
+  // dubbel-tap på Delete Account-knappen + dimmer UI:t i sheet:en så user
+  // ser att något händer.
+  const [deletingAccount, setDeletingAccount] = useState(false);
   // Game connections-blocket (Friends) kan kollapsas
   // för att minska scrollning. Default expanded så användaren ser
   // alternativen direkt vid första besöket.
@@ -623,6 +628,56 @@ export default function ProfileScreen() {
     resetIdentity();
     setLogoutModalVisible(false);
     router.replace('/');
+  };
+
+  // Permanent account deletion — Apple App Store Guideline 5.1.1(v)
+  // kräver in-app deletion för apps med kontoflow. Två-stegs confirmation
+  // för att skydda mot oavsiktlig deletion (knapp + Alert).
+  //
+  // deleteAccount() i utils/auth.ts:
+  //   1. Anropar Edge Function 'delete-account' → CASCADE rensar
+  //      profiles + rooms + waiting_invites server-side.
+  //   2. Nuke:ar lokal AsyncStorage under @quizvibe/*-prefix.
+  //   3. supabase.auth.signOut() rensar session-token.
+  //
+  // Vid success: analytics + navigation hem. Vid fel: visa felmeddelande,
+  // user kan försöka igen (state är intakt, deletion är idempotent
+  // server-side eftersom CASCADE bara körs om user faktiskt fanns).
+  const handleConfirmDeleteAccount = async () => {
+    setDeletingAccount(true);
+    const result = await deleteAccount();
+    setDeletingAccount(false);
+
+    if (!result.ok) {
+      Alert.alert(
+        'Could not delete account',
+        `Something went wrong (${result.reason}). Please try again, or email infoquizvibe@gmail.com if the problem persists.`,
+      );
+      return;
+    }
+
+    track('user_account_deleted');
+    resetIdentity();
+    setLogoutModalVisible(false);
+    router.replace('/');
+  };
+
+  // Wrapper som visar två-stegs confirmation FÖRE deletion. Tydlig copy
+  // om irreversibilitet — Apple-review tittar specifikt efter att flödet
+  // inte är "oavsiktligt destruktivt".
+  const handleRequestDeleteAccount = () => {
+    Alert.alert(
+      'Delete Account?',
+      'This will permanently delete your QuizVibe account and all associated data — profile, game history, friends, and any active subscriptions. This cannot be undone.\n\nAre you sure?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete Account',
+          style: 'destructive',
+          onPress: handleConfirmDeleteAccount,
+        },
+      ],
+    );
   };
 
   // Create Game-genväg från logout-sheet:n. Identisk logik som Home-
@@ -2095,13 +2150,35 @@ export default function ProfileScreen() {
                 pressed && { opacity: 0.85 },
               ]}
               onPress={handleConfirmLogout}
+              disabled={deletingAccount}
             >
               <Text style={styles.logoutBtnText}>Log out</Text>
+            </Pressable>
+
+            {/* Delete Account — separat från Log out, tydligt destruktiv
+                styling (röd outline + röd text). Apple App Store
+                Guideline 5.1.1(v) kräver in-app deletion för apps med
+                kontoflow. Två-stegs confirmation via Alert i
+                handleRequestDeleteAccount så user inte triggar deletion
+                av misstag. */}
+            <Pressable
+              style={({ pressed }) => [
+                styles.deleteAccountBtn,
+                pressed && { opacity: 0.85 },
+                deletingAccount && { opacity: 0.5 },
+              ]}
+              onPress={handleRequestDeleteAccount}
+              disabled={deletingAccount}
+            >
+              <Text style={styles.deleteAccountBtnText}>
+                {deletingAccount ? 'Deleting…' : 'Delete Account'}
+              </Text>
             </Pressable>
 
             <Pressable
               style={styles.logoutCancelBtn}
               onPress={() => setLogoutModalVisible(false)}
+              disabled={deletingAccount}
             >
               <Text style={styles.logoutCancelText}>Cancel</Text>
             </Pressable>
@@ -2376,6 +2453,24 @@ const styles = StyleSheet.create({
   logoutCancelText: {
     fontSize: 14,
     color: Colors.textSecondary,
+  },
+  // Delete Account — destruktiv outline-styling. Tunnare/mindre visuell
+  // vikt än Log out (som har soft red bg) för att signalera "rare,
+  // dangerous action" snarare än "frequent CTA". Solid red outline +
+  // transparent bg + röd text följer iOS HIG för destructive buttons.
+  deleteAccountBtn: {
+    height: 44,
+    borderRadius: Radius.md,
+    backgroundColor: 'transparent',
+    borderWidth: 1.5,
+    borderColor: Colors.error,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  deleteAccountBtnText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: Colors.error,
   },
 
   safe: { flex: 1, backgroundColor: Colors.background },

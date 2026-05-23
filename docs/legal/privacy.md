@@ -5,7 +5,7 @@ description: How QuizVibe collects, uses, and protects your information.
 
 # Privacy Policy
 
-**Last updated:** 2026-05-22
+**Last updated:** 2026-05-23
 **Effective date:** Upon app launch on the Apple App Store
 
 This Privacy Policy explains how **QuizVibe** ("we", "us", "the app") collects, uses, and protects your information when you use our mobile application. We've tried to write it in plain English with the legal anchor points clearly marked.
@@ -19,7 +19,7 @@ QuizVibe is operated by **Peter Björklund**, an individual residing in Sweden. 
 - We collect the **minimum information needed** to make the app work: your player name, avatar choice, birth year, region preference, and game scores.
 - We use **Supabase** (EU-hosted in Ireland) as our backend database, and **YouTube IFrame Player** to play video clips inside the app.
 - We **do not sell your data**, **do not show ads**, and **do not track you across other apps or websites**.
-- You can **delete your account at any time** by emailing infoquizvibe@gmail.com.
+- You can **delete your account at any time** directly in the app (Profile → tap your name in the top-right → Delete Account).
 - The app is intended for users **13 years or older**.
 
 The rest of this document is the full version.
@@ -134,7 +134,7 @@ GitHub's Privacy Policy: https://docs.github.com/en/site-policy/privacy-policies
 
 | Data type | Retention period |
 |---|---|
-| Registered user account (profile, history) | Until you delete it. Email infoquizvibe@gmail.com to request deletion. |
+| Registered user account (profile, history) | Until you delete it. Delete in-app via Profile → tap your name → Delete Account. Email infoquizvibe@gmail.com if you need help. |
 | Guest anonymous session | Until you leave the game (immediate) or 30 days of inactivity. |
 | Lobby state (room codes, player list) | Auto-deleted 24 hours after the lobby was created. |
 | Analytics events (anonymized) | 90 days, then aggregated and de-identified for long-term retention. |
@@ -150,7 +150,7 @@ If you are in the EU, EEA, or UK, you have the following rights regarding your p
 
 - **Right to access** — request a copy of all data we hold about you.
 - **Right to rectification** — correct inaccurate data.
-- **Right to erasure** ("right to be forgotten") — delete your account and associated data.
+- **Right to erasure** ("right to be forgotten") — delete your account and associated data. You can do this yourself in-app: Profile → tap your name in the top-right → Delete Account. Server-side data is removed automatically. Email infoquizvibe@gmail.com if you need help.
 - **Right to restrict processing** — pause our use of your data.
 - **Right to data portability** — get your data in a machine-readable format (JSON export).
 - **Right to object** — object to processing based on legitimate interest.

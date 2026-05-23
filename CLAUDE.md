@@ -310,7 +310,26 @@ Five top-level collapsible sections — all use the same tappable-header pattern
 
 **Answer response time** (`answerResponseSeconds: 15 | 30 | 45 | 60`, default 30) = how long players have to answer a question. Distinct from how long question media (song/video/image) plays.
 
-**TopUserBanner pill on Profile** opens a logout sheet via `logoutModalVisible` state — mirrors Home's `profileMenu` for the logged-in case (header with avatar emoji + Player Name + green "Logged in" status + red Log out button + Cancel). After logout: `clearProfile()` + analytics + `router.replace('/')` to Home.
+**TopUserBanner pill on Profile** opens a logout sheet via `logoutModalVisible` state — mirrors Home's `profileMenu` for the logged-in case (header with avatar emoji + Player Name + green "Logged in" status + Create Game + Join Game + Store + Log out + **Delete Account** + Cancel). After logout: `clearProfile()` + analytics + `router.replace('/')` to Home.
+
+**Delete Account-flöde** (Apple App Store Guideline 5.1.1(v) — kräver in-app account deletion för apps med kontoflow):
+- **UI** ([ProfileScreen.tsx](src/screens/ProfileScreen.tsx) `logoutSheet`): röd outline-knapp under "Log out", separat från Log out så användaren inte triggar deletion av misstag. Tunnare/mindre visuell vikt (`deleteAccountBtn` height 44 + transparent bg + 1.5px `Colors.error` outline) än Log out (52 + soft red bg) för att signalera "rare, dangerous action".
+- **Two-step confirmation**: `handleRequestDeleteAccount` visar Alert med tydlig copy om irreversibilitet. Apple-review tittar specifikt efter att flödet inte är "oavsiktligt destruktivt".
+- **Loading state**: `deletingAccount`-state dimmer knappen och blockar dubbel-tap. Log out + Cancel + Delete Account får alla `disabled={deletingAccount}` så user inte kan kombinera actions under deletion-flowen.
+- **Server-side cleanup via Edge Function** ([supabase/functions/delete-account/index.ts](supabase/functions/delete-account/index.ts)):
+  1. Validerar JWT via `admin.auth.getUser(token)`.
+  2. Blockar `is_anonymous: true`-users (guests har inget konto att radera).
+  3. Anropar `admin.auth.admin.deleteUser(user_id)` med service-role-key.
+  4. Postgres-CASCADE rensar resten automatiskt: `profiles` (FK `profiles.id → auth.users(id) ON DELETE CASCADE`), `rooms` där user var host (FK `rooms.host_user_id → CASCADE`), `waiting_invites` till/från user (FK `to_user_id → CASCADE`). `lobby_players.user_id → NULL` (SET NULL — raderna lever kvar anonymiserade tills rooms-CASCADE eller 24h-expiry tar dem).
+  5. **Verify JWT-toggle i Dashboard MÅSTE vara PÅ** för denna function — motsats till `anon-signup` där den måste vara AV. Skillnaden: anon-signup signar IN en ny user (har ingen JWT än), delete-account autentiserar en redan inloggad user.
+- **Client helper** `deleteAccount()` i [src/utils/auth.ts](src/utils/auth.ts):
+  1. Anropar Edge Function.
+  2. Vid success: nuke:ar ALL lokal AsyncStorage under `@quizvibe/*`-prefixet (profile-cache, friends, waiting-invites-cache, gameHistory, etc.).
+  3. `supabase.auth.signOut()` rensar session-token.
+  4. Returnerar `{ ok: true }` eller `{ ok: false, reason }`.
+- **Order matters**: lokal storage rensas BARA om server-deletion lyckades — annars hamnar vi i inconsistent state där lokala data är borta men user:n fortfarande finns i Supabase. Felflödet visar Alert "Could not delete account ({reason})" och låter user försöka igen (deletion är idempotent server-side eftersom CASCADE bara körs om user faktiskt fanns).
+- **Analytics**: `track('user_account_deleted')` + `resetIdentity()` efter success, före `router.replace('/')`.
+- **Privacy Policy + ToS** (docs/legal/{privacy,terms}.md) uppdaterade 2026-05-23 för att hänvisa till in-app deletion istället för email-only — email-only räcker inte enligt Apple-review.
 
 **"Profile settings" från Home:s TopUserBanner** (logged-in profil-meny): blå-konturad `secondaryBtn` ovanför röda "Log out"-knappen. Tap stänger menyn och `router.push({ pathname: '/profile', params: { scrollToTop: '1' } })`. Profile-skärmen läser `scrollToTop` via `useLocalSearchParams` och anropar `scrollRef.current?.scrollTo({ y: 0, animated: false })` i en `useFocusEffect` med deps `[localParams.scrollToTop]`, sedan `router.setParams({ scrollToTop: undefined })` för att rensa paramen — annars skulle framtida besök utan param också (felaktigt) snäppa till toppen.
 

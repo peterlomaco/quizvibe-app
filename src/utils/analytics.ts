@@ -19,6 +19,7 @@ export type AnalyticsEventName =
   | 'user_registered'
   | 'user_logged_in'
   | 'user_logged_out'
+  | 'user_account_deleted'
 
   // Game flow
   | 'guest_name_created'
