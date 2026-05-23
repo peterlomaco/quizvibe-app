@@ -38,6 +38,7 @@ import { TopUserBanner } from '../components/TopUserBanner';
 import { Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';
 import { resetIdentity, track } from '../utils/analytics';
 import { deleteAccount } from '../utils/auth';
+import { supabase } from '../utils/supabase';
 import { AVATARS, getAvatarEmojiById } from '../utils/avatars';
 import {
     addFriend,
@@ -623,6 +624,16 @@ export default function ProfileScreen() {
   // Log out-knapp, Cancel) — samma visuella behandling så användaren
   // får konsistent UX oavsett varifrån de loggar ut.
   const handleConfirmLogout = async () => {
+    // supabase.auth.signOut() MÅSTE köras innan clearProfile() — annars
+    // lever Supabase-sessionen vidare i AsyncStorage även när profil-cachen
+    // är borta. Konsekvensen är att efterföljande supabase.functions.invoke()
+    // skickar en stale JWT (förmodlig orsak till delete-account-bugen som
+    // dök upp 2026-05-23). Speglar Home-skärmens handleLogout-pattern.
+    try {
+      await supabase.auth.signOut();
+    } catch (err) {
+      console.warn('[ProfileScreen] supabase.auth.signOut failed:', err);
+    }
     await clearProfile();
     track('user_logged_out');
     resetIdentity();
