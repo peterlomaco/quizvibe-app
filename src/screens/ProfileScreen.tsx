@@ -1,6 +1,7 @@
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
 import * as Haptics from 'expo-haptics';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
+import * as WebBrowser from 'expo-web-browser';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
     Alert,
@@ -371,6 +372,10 @@ export default function ProfileScreen() {
   // och Game connections. Listar PURCHASED_PACKAGES (mock tills Store-
   // integrationen är inkopplad) + Add-knapp som leder till Store.
   const [customizedPackagesExpanded, setCustomizedPackagesExpanded] = useState(true);
+  // Legal-sektionen — Privacy Policy + Terms of Service. Default collapsed
+  // eftersom användare sällan behöver öppna dokumenten; vid behov hittar
+  // de fram via +-toggleln.
+  const [legalExpanded, setLegalExpanded] = useState(false);
   // Per-paket on/off — styr om paketet visas i Lobby:s Customized Host
   // packages-block (när användaren är host). Default = alla aktiverade så
   // nyköpta paket dyker upp i Lobby utan att man måste gå till Profile först.
@@ -1585,6 +1590,67 @@ export default function ProfileScreen() {
         {/* ── Player history (mockdata tills backend finns) ──────── */}
         <PlayerHistorySection />
 
+        {/* ── Legal (Privacy Policy + Terms of Service) ───────────── */}
+        {/* Default collapsed — användare sällan behöver dokumenten,
+            men de måste vara accessible för App Store-compliance och
+            GDPR. Länkarna öppnas in-app via expo-web-browser så
+            användaren stannar i appens kontext. */}
+        <Pressable
+          onPress={() => setLegalExpanded(!legalExpanded)}
+          style={({ pressed }) => [
+            styles.gameConnectionsHeaderRow,
+            pressed && { opacity: 0.7 },
+          ]}
+          hitSlop={8}
+        >
+          <Text style={styles.sectionHeaderEmoji}>📄</Text>
+          <Text style={styles.gameConnectionsHeader}>Legal</Text>
+          <View style={styles.gameConnectionsToggleBox}>
+            <Text style={styles.gameConnectionsChevron}>
+              {legalExpanded ? '−' : '+'}
+            </Text>
+          </View>
+        </Pressable>
+        {!legalExpanded && <View style={styles.sectionDivider} />}
+
+        {legalExpanded && (
+          <View style={styles.legalCard}>
+            <Pressable
+              onPress={() =>
+                WebBrowser.openBrowserAsync(
+                  'https://peterlomaco.github.io/quizvibe-app/legal/privacy/',
+                )
+              }
+              style={({ pressed }) => [
+                styles.legalRow,
+                pressed && { opacity: 0.7 },
+              ]}
+            >
+              <Text style={styles.legalRowText}>Privacy Policy</Text>
+              <Text style={styles.legalRowChevron}>›</Text>
+            </Pressable>
+            <View style={styles.legalRowDivider} />
+            <Pressable
+              onPress={() =>
+                WebBrowser.openBrowserAsync(
+                  'https://peterlomaco.github.io/quizvibe-app/legal/terms/',
+                )
+              }
+              style={({ pressed }) => [
+                styles.legalRow,
+                pressed && { opacity: 0.7 },
+              ]}
+            >
+              <Text style={styles.legalRowText}>Terms of Service</Text>
+              <Text style={styles.legalRowChevron}>›</Text>
+            </Pressable>
+            <Text style={styles.legalFootnote}>
+              Opens in a secure in-app browser. Both documents are also
+              available at peterlomaco.github.io/quizvibe-app/legal/.
+            </Text>
+          </View>
+        )}
+
         <View style={styles.bottomPad} />
       </ScrollView>
 
@@ -2527,6 +2593,45 @@ const styles = StyleSheet.create({
   sectionDivider: {
     height: 1,
     backgroundColor: Colors.border,
+  },
+
+  // Legal-sektionens kort (Privacy Policy + Terms of Service-rader).
+  // Sparsam styling — sektionen är sällan-besökt och ska kännas som
+  // en lista, inte ett feature-kort.
+  legalCard: {
+    backgroundColor: Colors.card,
+    borderRadius: Radius.lg,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    marginTop: Spacing.md,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.sm,
+  },
+  legalRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: Spacing.md,
+  },
+  legalRowText: {
+    ...Typography.body,
+    color: Colors.textPrimary,
+    fontWeight: FontWeight.semibold,
+  },
+  legalRowChevron: {
+    fontSize: 22,
+    color: Colors.textSecondary,
+    lineHeight: 22,
+  },
+  legalRowDivider: {
+    height: 1,
+    backgroundColor: Colors.border,
+  },
+  legalFootnote: {
+    ...Typography.caption,
+    color: Colors.textSecondary,
+    marginTop: Spacing.sm,
+    marginBottom: Spacing.xs,
   },
 
   // QuizVibe friends card (header upptill, full-bredd-knapp i underkant)
