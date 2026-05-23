@@ -1,6 +1,7 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
+  ActivityIndicator,
   Alert,
   Pressable,
   SafeAreaView,
@@ -9,23 +10,38 @@ import {
   Text,
   View,
 } from 'react-native';
+import type { PurchasesOffering, PurchasesPackage } from 'react-native-purchases';
 import { TopUserBanner } from '../components/TopUserBanner';
+import {
+  CREDIT_PRODUCT_AMOUNTS,
+  ENTITLEMENTS,
+  hasEntitlement,
+  loadOfferings,
+  purchasePackage,
+  restorePurchases,
+} from '../lib/iap';
 import { Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';
 import { track } from '../utils/analytics';
 import { loadProfile, saveProfile } from '../utils/profileStorage';
 import { setPremiumActive } from '../utils/subscriptionStorage';
 
-// ─── Tier-data (mock tills IAP finns) ─────────────────────────────────────────
-// TODO (backend): Priser, paket-IDn och köpstatus hämtas från App Store /
-// Play Store-IAP via expo-iap eller RevenueCat. Just nu mock — vid "köp"
-// av credits ökar bara local gameCredits i AsyncStorage; subscription
-// markerar inget state (kräver att ProfileData får ett subscription-fält).
+// ─── Tier-data ────────────────────────────────────────────────────────────────
+// Tier-konstanter mappar mot App Store Connect-products via `productId`.
+// Vid mount laddar vi RC-offering:n och letar upp varje tier:s package via
+// productId — då får vi `localizedPriceString` från Apple (lokal valuta +
+// region-anpassat pris) som visas istället för hardcoded fallback-priserna.
+//
+// `price` + `priceAmount` är fallback-värden som visas (a) i dev-läge utan
+// RC-key, (b) under första render innan offerings hunnit ladda, (c) om
+// offering-load failar (network, RC misconfig). Synk med ASC-priserna så
+// fallback alltid är realistisk.
 
 interface CreditTier {
   id: string;
+  productId: string;       // App Store Connect product ID (för RC-lookup)
   games: number;
-  price: string;
-  priceAmount: number;     // för analytics (numeriskt belopp)
+  price: string;           // fallback-display ("19 kr")
+  priceAmount: number;     // för analytics
   pricePerGame: string;
   badge?: string;
   savePct?: number;
@@ -34,6 +50,7 @@ interface CreditTier {
 const CREDIT_TIERS: CreditTier[] = [
   {
     id: 'credits-5',
+    productId: 'pkg_credits_5',
     games: 5,
     price: '19 kr',
     priceAmount: 19,
@@ -41,6 +58,7 @@ const CREDIT_TIERS: CreditTier[] = [
   },
   {
     id: 'credits-10',
+    productId: 'pkg_credits_10',
     games: 10,
     price: '29 kr',
     priceAmount: 29,
@@ -49,6 +67,7 @@ const CREDIT_TIERS: CreditTier[] = [
   },
   {
     id: 'credits-20',
+    productId: 'pkg_credits_20',
     games: 20,
     price: '49 kr',
     priceAmount: 49,
@@ -75,8 +94,9 @@ const PACKAGE_TIERS: PackageTier[] = [];
 
 interface SubscriptionTier {
   id: string;
+  productId: string;         // App Store Connect product ID (för RC-lookup)
   label: string;             // "1 month", "3 months", etc.
-  price: string;             // "79 kr"
+  price: string;             // fallback-display
   priceAmount: number;       // för analytics
   pricePerMonth: string;     // "79 kr / month" eller "~66 kr / month"
   badge?: string;
@@ -86,6 +106,7 @@ interface SubscriptionTier {
 const SUBSCRIPTION_TIERS: SubscriptionTier[] = [
   {
     id: 'sub-1mth',
+    productId: 'pkg_sub_monthly',
     label: '1 month',
     price: '79 kr',
     priceAmount: 79,
@@ -93,6 +114,7 @@ const SUBSCRIPTION_TIERS: SubscriptionTier[] = [
   },
   {
     id: 'sub-3mth',
+    productId: 'pkg_sub_quarterly_v2',
     label: '3 months',
     price: '199 kr',
     priceAmount: 199,
@@ -101,6 +123,7 @@ const SUBSCRIPTION_TIERS: SubscriptionTier[] = [
   },
   {
     id: 'sub-6mth',
+    productId: 'pkg_sub_halfyear',
     label: '6 months',
     price: '279 kr',
     priceAmount: 279,
@@ -109,6 +132,7 @@ const SUBSCRIPTION_TIERS: SubscriptionTier[] = [
   },
   {
     id: 'sub-year',
+    productId: 'pkg_sub_yearly',
     label: '12 months',
     price: '399 kr',
     priceAmount: 399,
@@ -194,106 +218,172 @@ export default function StoreScreen() {
       ? { title: 'Successfully added to your account', body: 'Back to game' }
       : { title: 'Purchase successful', body: defaultBody };
 
-  // Mock-purchase av credit-paket: bekräfta + öka gameCredits i sparad profil.
-  // TODO (backend): byt mot riktig IAP-flow (expo-iap eller RevenueCat).
-  const handleBuyCredits = (tier: CreditTier) => {
+  // ─── RevenueCat offerings + purchase state ────────────────────────────
+  // offering laddas vid mount via useEffect nedan. När laddat används
+  // RC:s localizedPriceString (region-anpassat pris från App Store) istället
+  // för hardcoded fallback-värden i CREDIT_TIERS/SUBSCRIPTION_TIERS.
+  //
+  // purchasing-state håller tier:s id under pågående purchase så vi kan
+  // dimma + disable knappen + visa spinner. Också blockar andra Buy-knappar
+  // så user inte kan trigga parallella purchases samtidigt.
+  const [offering, setOffering] = useState<PurchasesOffering | null>(null);
+  const [purchasing, setPurchasing] = useState<string | null>(null);
+  const [restoring, setRestoring] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    loadOfferings().then((current) => {
+      if (!cancelled) setOffering(current);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // Lookup-tabell product-ID → RC PurchasesPackage. När RC har laddat
+  // offerings:n låter vi det vara source of truth för pris-display. Innan
+  // load (eller om RC-key saknas i .env) faller call-sites tillbaka till
+  // hardcoded tier.price.
+  const packageByProductId = useMemo(() => {
+    const map: Record<string, PurchasesPackage> = {};
+    if (!offering) return map;
+    offering.availablePackages.forEach((pkg) => {
+      map[pkg.product.identifier] = pkg;
+    });
+    return map;
+  }, [offering]);
+
+  // Helper: returnerar RC:s localizedPriceString för product-ID:t om
+  // tillgänglig, annars fallback. Visar exakt vad Apple kommer debitera
+  // user i deras lokala valuta — undviker discrepancy mellan vad vi visar
+  // och vad Apple's purchase-modal visar.
+  const getDisplayPrice = (productId: string, fallback: string): string => {
+    const pkg = packageByProductId[productId];
+    return pkg?.product.priceString ?? fallback;
+  };
+
+  // ─── Buy-handlers — riktiga RC-purchases ──────────────────────────────
+  // Apple's native purchase-modal visas direkt utan vår egen "Confirm
+  // purchase"-Alert (Apple's modal är confirmation:en). Vi triggar bara
+  // purchasePackage() → väntar på resultat → bumpar lokala state.
+  const handleBuyCredits = async (tier: CreditTier) => {
+    const pkg = packageByProductId[tier.productId];
+    if (!pkg) {
+      Alert.alert(
+        'Store unavailable',
+        'Could not load this product right now. Please try again in a moment.',
+      );
+      return;
+    }
+    const profile = await loadProfile();
+    if (!profile) {
+      Alert.alert('Sign in required', 'Log in or register before buying credits.');
+      return;
+    }
+
+    setPurchasing(tier.id);
+    const result = await purchasePackage(pkg);
+    setPurchasing(null);
+
+    if (result.kind === 'cancelled') return; // tyst — user trycka Cancel
+    if (result.kind === 'error') {
+      Alert.alert('Purchase failed', result.reason);
+      return;
+    }
+
+    // Success — bumpa lokal gameCredits-count via product-amount-tabellen
+    // i iap.ts. RC själv spårar inte consumable-balanser; det är vårt ansvar.
+    const amount = CREDIT_PRODUCT_AMOUNTS[result.productIdentifier] ?? tier.games;
+    const newCredits = (profile.gameCredits ?? 0) + amount;
+    await saveProfile({ ...profile, gameCredits: newCredits });
+    track('purchase_completed', {
+      type: 'credits',
+      product_id: tier.id,
+      price_amount: tier.priceAmount,
+      price_currency: 'SEK',
+    });
+    const { title, body } = successCopy(
+      `${amount} Host Games added — you now have ${newCredits} credits.`,
+    );
+    Alert.alert(title, body, [{ text: 'OK', onPress: handleBack }]);
+  };
+
+  // Themed packages (Hip Hop / Rock / Film & Actors) är parkerade till
+  // v1.1+ men PackageTierCard-render-koden finns kvar för enkel re-
+  // aktivering. När items läggs tillbaka i PACKAGE_TIERS måste denna
+  // funktion uppdateras till en riktig RC purchasePackage()-flow
+  // motsvarande handleBuyCredits/handleBuySubscription nedan.
+  const handleBuyPackage = (_tier: PackageTier) => {
+    Alert.alert('Coming soon', 'Themed packages are not yet available.');
+  };
+
+  const handleBuySubscription = async (tier: SubscriptionTier) => {
+    const pkg = packageByProductId[tier.productId];
+    if (!pkg) {
+      Alert.alert(
+        'Store unavailable',
+        'Could not load this subscription right now. Please try again in a moment.',
+      );
+      return;
+    }
+
+    setPurchasing(tier.id);
+    const result = await purchasePackage(pkg);
+    setPurchasing(null);
+
+    if (result.kind === 'cancelled') return;
+    if (result.kind === 'error') {
+      Alert.alert('Subscription failed', result.reason);
+      return;
+    }
+
+    // Success — RC:s customerInfo har nu premium-entitlement aktiv.
+    // Lokal hasPremium-flag (subscriptionStorage) speglas via
+    // _layout.tsx:s customer-info-listener, men sätt direkt här också
+    // så Lobby/Profile uppdateras omedelbart utan att vänta på listener.
+    if (hasEntitlement(result.customerInfo, ENTITLEMENTS.PREMIUM)) {
+      await setPremiumActive(true);
+    }
+    track('purchase_completed', {
+      type: 'subscription',
+      product_id: tier.id,
+      price_amount: tier.priceAmount,
+      price_currency: 'SEK',
+    });
+    const { title, body } = successCopy(
+      'QuizVibe Premium is now active. Enjoy unlimited host games!',
+    );
     Alert.alert(
-      'Confirm purchase',
-      `Buy ${tier.games} Host Games for ${tier.price}?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Buy',
-          onPress: async () => {
-            const profile = await loadProfile();
-            if (!profile) {
-              Alert.alert('Sign in required', 'Log in or register before buying credits.');
-              return;
-            }
-            const newCredits = (profile.gameCredits ?? 0) + tier.games;
-            await saveProfile({ ...profile, gameCredits: newCredits });
-            track('purchase_completed', {
-              type: 'credits',
-              product_id: tier.id,
-              price_amount: tier.priceAmount,
-              price_currency: 'SEK',
-            });
-            // Efter success-alertet OK:as tar vi automatiskt användaren
-            // tillbaka till källan via handleBack — annars stannar de kvar på
-            // Store-skärmen och måste manuellt tappa Back för att fortsätta
-            // sitt flöde (t.ex. Play Again från Final Leaderboard).
-            const { title, body } = successCopy(
-              `${tier.games} Host Games added — you now have ${newCredits} credits.`,
-            );
-            Alert.alert(title, body, [{ text: 'OK', onPress: handleBack }]);
-          },
-        },
-      ],
+      fromLobby ? title : 'Subscription activated',
+      body,
+      [{ text: 'OK', onPress: handleBack }],
     );
   };
 
-  // Mock-purchase av Customized Host Package. TODO (backend): byt till
-  // riktig IAP + uppdatera PURCHASED_PACKAGES (eller backend-lista) så
-  // paketet syns automatiskt i Profile/Lobby efter köp.
-  const handleBuyPackage = (tier: PackageTier) => {
-    Alert.alert(
-      'Confirm purchase',
-      `Buy "${tier.name}" package for ${tier.price}? It will be available in your Lobby host setup.`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Buy',
-          onPress: () => {
-            track('purchase_completed', {
-              type: 'package',
-              product_id: tier.id,
-              price_amount: tier.priceAmount,
-              price_currency: 'SEK',
-            });
-            const { title, body } = successCopy(
-              `"${tier.name}" added — open Profile or Lobby to use it.`,
-            );
-            Alert.alert(title, body, [{ text: 'OK', onPress: handleBack }]);
-          },
-        },
-      ],
-    );
-  };
+  // Restore Purchases — Apple App Store krav för apps med non-consumables
+  // eller subscriptions. Användare som installerade om appen / bytte device
+  // kan återställa tidigare köp via en knapp. Consumables återställs INTE
+  // (förbrukad = förbrukad).
+  const handleRestorePurchases = async () => {
+    setRestoring(true);
+    const result = await restorePurchases();
+    setRestoring(false);
 
-  // Mock-purchase av subscription. TODO (backend): RevenueCat hanterar
-  // subscription-state via webhooks; lägg till `subscription`-fält på
-  // ProfileData när det är relevant och uppdatera entitlements här.
-  const handleBuySubscription = (tier: SubscriptionTier) => {
-    Alert.alert(
-      'Start subscription',
-      `Subscribe to QuizVibe Premium for ${tier.price} (${tier.label}). Auto-renews until cancelled.`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Subscribe',
-          onPress: async () => {
-            // Mock-aktivera Premium-flag lokalt så Lobby:s hasPremium-
-            // derivering omedelbart unlockar Individual Devices + Max 12.
-            // Byts mot RevenueCat entitlement-check vid backend-integration.
-            await setPremiumActive(true);
-            track('purchase_completed', {
-              type: 'subscription',
-              product_id: tier.id,
-              price_amount: tier.priceAmount,
-              price_currency: 'SEK',
-            });
-            const { title, body } = successCopy(
-              'QuizVibe Premium is now active. Enjoy unlimited host games!',
-            );
-            Alert.alert(
-              fromLobby ? title : 'Subscription activated',
-              body,
-              [{ text: 'OK', onPress: handleBack }],
-            );
-          },
-        },
-      ],
-    );
+    if (result.kind === 'error') {
+      Alert.alert('Restore failed', result.reason);
+      return;
+    }
+
+    const hasPremium = hasEntitlement(result.customerInfo, ENTITLEMENTS.PREMIUM);
+    if (hasPremium) {
+      await setPremiumActive(true);
+      Alert.alert('Purchases restored', 'Your QuizVibe Premium membership is active.');
+    } else {
+      Alert.alert(
+        'Nothing to restore',
+        'No active purchases found for this Apple ID. If you believe this is an error, email infoquizvibe@gmail.com.',
+      );
+    }
   };
 
   // Sektionerna deklareras som JSX-konstanter så ordningen kan flippas
@@ -364,6 +454,9 @@ export default function StoreScreen() {
           <CreditTierCard
             key={tier.id}
             tier={tier}
+            displayPrice={getDisplayPrice(tier.productId, tier.price)}
+            isPurchasing={purchasing === tier.id}
+            disabled={purchasing !== null}
             onBuy={() => handleBuyCredits(tier)}
           />
         ))}
@@ -397,6 +490,9 @@ export default function StoreScreen() {
           <SubscriptionTierCard
             key={tier.id}
             tier={tier}
+            displayPrice={getDisplayPrice(tier.productId, tier.price)}
+            isPurchasing={purchasing === tier.id}
+            disabled={purchasing !== null}
             onBuy={() => handleBuySubscription(tier)}
           />
         ))}
@@ -406,6 +502,26 @@ export default function StoreScreen() {
         All subscriptions auto-renew. Cancel anytime in your App Store
         or Google Play account.
       </Text>
+
+      {/* Restore Purchases — Apple App Store-krav. Användare som
+          installerade om appen eller bytte device kan återställa tidigare
+          subscriptions här. Discrete styling så det inte konkurrerar
+          med köp-CTA:erna — bara en länk-stil-text under sub-tiers. */}
+      <Pressable
+        onPress={handleRestorePurchases}
+        disabled={restoring || purchasing !== null}
+        style={({ pressed }) => [
+          styles.restoreBtn,
+          pressed && { opacity: 0.7 },
+          (restoring || purchasing !== null) && { opacity: 0.5 },
+        ]}
+      >
+        {restoring ? (
+          <ActivityIndicator size="small" color={Colors.primary} />
+        ) : (
+          <Text style={styles.restoreBtnText}>Restore Purchases</Text>
+        )}
+      </Pressable>
     </View>
   );
 
@@ -508,9 +624,15 @@ function PackageTierCard({
 
 function CreditTierCard({
   tier,
+  displayPrice,
+  isPurchasing,
+  disabled,
   onBuy,
 }: {
   tier: CreditTier;
+  displayPrice: string;
+  isPurchasing: boolean;
+  disabled: boolean;
   onBuy: () => void;
 }) {
   const isHighlight = tier.badge === 'BEST VALUE';
@@ -537,16 +659,22 @@ function CreditTierCard({
           )}
         </View>
         <View style={styles.tierRight}>
-          <Text style={styles.tierPrice}>{tier.price}</Text>
+          <Text style={styles.tierPrice}>{displayPrice}</Text>
           <Pressable
             onPress={onBuy}
+            disabled={disabled}
             style={({ pressed }) => [
               styles.buyBtn,
               { backgroundColor: accent },
               pressed && { opacity: 0.85 },
+              disabled && { opacity: 0.5 },
             ]}
           >
-            <Text style={styles.buyBtnText}>Buy</Text>
+            {isPurchasing ? (
+              <ActivityIndicator size="small" color="#FFF" />
+            ) : (
+              <Text style={styles.buyBtnText}>Buy</Text>
+            )}
           </Pressable>
         </View>
       </View>
@@ -558,9 +686,15 @@ function CreditTierCard({
 
 function SubscriptionTierCard({
   tier,
+  displayPrice,
+  isPurchasing,
+  disabled,
   onBuy,
 }: {
   tier: SubscriptionTier;
+  displayPrice: string;
+  isPurchasing: boolean;
+  disabled: boolean;
   onBuy: () => void;
 }) {
   const isHighlight = tier.badge === 'BEST VALUE';
@@ -584,16 +718,22 @@ function SubscriptionTierCard({
           )}
         </View>
         <View style={styles.tierRight}>
-          <Text style={styles.tierPrice}>{tier.price}</Text>
+          <Text style={styles.tierPrice}>{displayPrice}</Text>
           <Pressable
             onPress={onBuy}
+            disabled={disabled}
             style={({ pressed }) => [
               styles.buyBtn,
               { backgroundColor: accent },
               pressed && { opacity: 0.85 },
+              disabled && { opacity: 0.5 },
             ]}
           >
-            <Text style={styles.buyBtnText}>Subscribe</Text>
+            {isPurchasing ? (
+              <ActivityIndicator size="small" color="#FFF" />
+            ) : (
+              <Text style={styles.buyBtnText}>Subscribe</Text>
+            )}
           </Pressable>
         </View>
       </View>
@@ -812,6 +952,22 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: Spacing.sm,
     lineHeight: 16,
+  },
+  // Restore Purchases — Apple-krav. Discrete link-style så det inte
+  // konkurrerar med köp-CTA:erna. Centerar text + minimal padding så
+  // hela raden är tappbar utan att se ut som en stor knapp.
+  restoreBtn: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: Spacing.md,
+    marginTop: Spacing.sm,
+    minHeight: 40,
+  },
+  restoreBtnText: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.semibold,
+    color: Colors.primary,
+    textDecorationLine: 'underline',
   },
 
   bottomPad: { height: Spacing.xl },

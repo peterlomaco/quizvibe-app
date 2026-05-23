@@ -1,5 +1,13 @@
-import { configurePurchases, logOutPurchases } from '@/src/lib/iap';
+import {
+  addCustomerInfoListener,
+  configurePurchases,
+  ENTITLEMENTS,
+  getCustomerInfo,
+  hasEntitlement,
+  logOutPurchases,
+} from '@/src/lib/iap';
 import { Colors } from '@/src/theme';
+import { setPremiumActive } from '@/src/utils/subscriptionStorage';
 import { supabase } from '@/src/utils/supabase';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -12,8 +20,33 @@ export default function RootLayout() {
   // tills Peter satt upp RC-projektet. configurePurchases är idempotent.
   // userId-arg:t passas in via auth-state-change-listener nedan när en session
   // dyker upp så purchases följer med user över devices.
+  //
+  // Efter init:n syncar vi customerInfo → lokal hasPremium-flag (driven av
+  // subscriptionStorage som Lobby/Profile läser). Plus en listener för
+  // entitlement-uppdateringar (subscription renew/expire, restore-flow,
+  // cross-device-sync). Det säkrar att en subscription som expirerar
+  // tystnar Premium-features i appen utan att kräva manual refresh.
   useEffect(() => {
-    void configurePurchases();
+    let cancelled = false;
+    (async () => {
+      await configurePurchases();
+      if (cancelled) return;
+
+      const info = await getCustomerInfo();
+      if (cancelled) return;
+      await setPremiumActive(hasEntitlement(info, ENTITLEMENTS.PREMIUM));
+    })();
+
+    const removeListener = addCustomerInfoListener((info) => {
+      // Best-effort — om sync misslyckas (rare disk-write-fel) återhämtar
+      // sig nästa app-launch via init-syncen ovan.
+      void setPremiumActive(hasEntitlement(info, ENTITLEMENTS.PREMIUM));
+    });
+
+    return () => {
+      cancelled = true;
+      removeListener();
+    };
   }, []);
 
   // Lyssna på auth-events globalt så vi kan reagera vid TOKEN_REFRESHED /
