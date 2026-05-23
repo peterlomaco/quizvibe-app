@@ -33,8 +33,20 @@ import { createClient } from 'jsr:@supabase/supabase-js@2';
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+const ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY')!;
 
+// Admin-client (service-role) används BARA för admin.deleteUser. Att anropa
+// auth.getUser(token) på en service-role-client triggar en intern SDK-bug
+// där supabase-js försöker parsa en tom HTTP-body från auth-endpointen och
+// kraschar med "SyntaxError: Unexpected end of JSON input".
 const admin = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
+  auth: { autoRefreshToken: false, persistSession: false },
+});
+
+// User-client (anon-key) används för att validera caller:ens JWT. Samma
+// pattern som anon-signup för konsistens. autoRefreshToken/persistSession
+// false eftersom Edge Functions är stateless per-invocation.
+const userClient = createClient(SUPABASE_URL, ANON_KEY, {
   auth: { autoRefreshToken: false, persistSession: false },
 });
 
@@ -51,9 +63,9 @@ Deno.serve(async (req: Request) => {
     return json({ error: 'missing_token' }, 401);
   }
 
-  // Verifiera token:en och hämta user-id. admin.auth.getUser tar token
-  // som argument och validerar mot Supabase auth-service.
-  const { data: userData, error: userError } = await admin.auth.getUser(token);
+  // Verifiera token:en via user-client (NOT admin-client — se kommentar
+  // ovan om SDK-bug:en).
+  const { data: userData, error: userError } = await userClient.auth.getUser(token);
   if (userError || !userData?.user) {
     return json({ error: 'invalid_token', message: userError?.message }, 401);
   }
