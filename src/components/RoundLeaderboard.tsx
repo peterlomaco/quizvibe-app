@@ -677,7 +677,7 @@ export function RoundLeaderboard({
                   pressed && { opacity: 0.7 },
                 ]}
               >
-                <QuizVibeQAvatar size={32} />
+                <QuizVibeQAvatar size={32} variant="wifi" />
                 <Text style={styles.finalHomeBtnText}>Home</Text>
               </Pressable>
               {isHost ? (

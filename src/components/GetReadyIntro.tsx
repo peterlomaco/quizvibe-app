@@ -71,6 +71,11 @@ const ASSISTANCE_LABEL: Record<'minimal' | 'standard' | 'full', string> = {
  *  ❓ när YouTube inte är aktiv för frågan. */
 export type QuestionMediaType = 'youtube' | 'image' | 'none';
 
+/** V1-huvudkategori för en fråga — driver kant-skärande badge på första
+ *  kö-rutan så spelaren ser i förväg vilken typ av fråga som kommer
+ *  härnäst. null när subjectet inte mappar till någon V1-kategori. */
+export type MainCategory = 'Music' | 'Film' | 'Sport';
+
 interface Props {
   /** Game mode — styr vilken vy av kö-tabellen som renderas + ev. UI-text. */
   mode?: 'pass-the-phone' | 'individual-devices';
@@ -98,6 +103,12 @@ interface Props {
   /** Media-källa per fråga (0-baserat). KRÄVS i IndDev. Längd = totalQuestions
    *  (eller kortare; saknade index renderar som 'none'/❓). */
   mediaSourceByQuestion?: QuestionMediaType[];
+  /** V1-huvudkategori per fråga (0-baserat). Driver kant-skärande badge på
+   *  första kö-rutan i båda lägen (PtP + IndDev). Längd = totalQuestions
+   *  (eller kortare; saknade index → ingen badge renderas). null-värden
+   *  inom arrayn renderar heller ingen badge (t.ex. capital-frågor som
+   *  inte mappar till V1-huvudkategori). */
+  categoryByQuestion?: (MainCategory | null)[];
   /** Game era från Lobby — visas i Game settings-blocket. */
   eraFrom: number;
   eraTo: number;
@@ -223,6 +234,7 @@ export function GetReadyIntro({
   queue,
   queueRoundNumbers,
   queueQuestionNumbers,
+  categoryByQuestion,
   currentRound,
   totalRounds,
   currentQuestion,
@@ -286,6 +298,11 @@ export function GetReadyIntro({
       ? unstableLocked
       : connection.status === 'unstable');
   const playerName = currentPlayer.name;
+  // V1-huvudkategori för nästa fråga (den som currentQuestion pekar på).
+  // Driver kant-skärande badge på currentPlayerBox (PtP/Single) och
+  // currentMediaBox (IndDev) så spelaren ser i förväg vilken typ av
+  // fråga som kommer härnäst. null → ingen badge renderas (t.ex. capital).
+  const currentCategory = categoryByQuestion?.[currentQuestion - 1] ?? null;
   // I Pass-the-Phone betraktas alla som "den som ska starta" (telefonen lämnas
   // runt; vem som än håller den får trycka). I Individual Devices är det bara
   // host som kan starta — non-host ser en passiv "Waiting for Host"-ruta i
@@ -987,7 +1004,11 @@ export function GetReadyIntro({
               </View>
             </View>
 
-            {/* Current question-rad — primary-bordered box runt media-ikonen. */}
+            {/* Current question-rad — primary-bordered box runt media-ikonen.
+                Kant-skärande kategori-badge ovanpå boxen visar V1-kategori
+                (Music/Film/Sport) för nästa fråga så spelaren vet vad som
+                kommer. Badge:n är `pointerEvents: 'none'` så den inte stör
+                tap-handling i boxen. */}
             <View style={styles.tableRow}>
               <View style={[styles.colPlayer, styles.colPlayerCurrentWrap]}>
                 <View style={styles.currentMediaBox}>
@@ -999,6 +1020,11 @@ export function GetReadyIntro({
                   <Text style={styles.mediaLabel} numberOfLines={1}>
                     {mediaSourceLabel(mediaSourceByQuestion?.[currentQuestion - 1])}
                   </Text>
+                  {currentCategory && (
+                    <View style={styles.categoryBadge} pointerEvents="none">
+                      <Text style={styles.categoryBadgeText}>{currentCategory}</Text>
+                    </View>
+                  )}
                 </View>
               </View>
             </View>
@@ -1080,7 +1106,10 @@ export function GetReadyIntro({
             </View>
 
             {/* Current player-rad — Player-cellen får en primary-bordered
-                box runt avatar+namn så det är tydligt vem som är näst på tur. */}
+                box runt avatar+namn så det är tydligt vem som är näst på tur.
+                Kant-skärande kategori-badge ovanpå boxen visar V1-kategori
+                (Music/Film/Sport) för nästa fråga så spelaren vet vad som
+                kommer. */}
             <View style={styles.tableRow}>
               <View style={[styles.colPlayer, styles.colPlayerCurrentWrap]}>
                 <View style={styles.currentPlayerBox}>
@@ -1089,6 +1118,11 @@ export function GetReadyIntro({
                   <Text style={styles.currentPlayerName} numberOfLines={1}>
                     {playerName}
                   </Text>
+                  {currentCategory && (
+                    <View style={styles.categoryBadge} pointerEvents="none">
+                      <Text style={styles.categoryBadgeText}>{currentCategory}</Text>
+                    </View>
+                  )}
                 </View>
               </View>
             </View>
@@ -1932,6 +1966,31 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     paddingHorizontal: 2,
     textAlign: 'center',
+  },
+
+  // Kant-skärande kategori-badge ovanpå currentPlayerBox (PtP/Single) och
+  // currentMediaBox (IndDev). Speglar PREMIUM-badge-mönstret från
+  // Lobby/Profile (top:-9, paddingHorizontal:8, borderRadius:4). Alla
+  // V1-kategorier (Music/Film/Sport) delar samma guld bg + svart text för
+  // visuell konsistens — per-kategori-färgning testades men gav splittrad
+  // känsla; enhetlig "info-badge" läser tydligare.
+  categoryBadge: {
+    position: 'absolute',
+    top: -9,
+    right: Spacing.md,
+    backgroundColor: Colors.warning,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 4,
+    zIndex: 10,
+    elevation: 4,
+  },
+  categoryBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 0.6,
+    color: '#000',
+    textTransform: 'uppercase',
   },
 
   queueChip: {

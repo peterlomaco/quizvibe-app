@@ -3,7 +3,8 @@
 // Lokal AsyncStorage-flagga som speglar "user har en aktiv Premium-prenu-
 // meration". Sätts av StoreScreen:s handleBuySubscription (mock-purchase),
 // läses av LobbyScreen:s `hasPremium`-derivering för att unlock:a Individual
-// Devices + Max 12 Players-toggles utan Store-deeplink.
+// Devices-toggle (vilket implicit ger 12-spelar-cap via gameMode-deriverad
+// maxPlayers) utan Store-deeplink.
 //
 // För launch (pre-launch-checklist): byt mot RevenueCat (eller motsvarande
 // IAP-vendor) entitlement-check. Call-sites stannar oförändrade när

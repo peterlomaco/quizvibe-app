@@ -74,12 +74,31 @@ import Svg, { Circle, G, Path } from 'react-native-svg';
 
 type AssistanceLevel = 'minimal' | 'standard' | 'full';
 
+// V1-huvudkategorier som visas som badge på GetReadyIntro:s första
+// queue-card. Mappning från backend:s `contentSubject` görs i
+// `subjectToMainCategory` nedan. null när subjectet inte mappar till någon
+// V1-huvudkategori (t.ex. city/country/capital — era-agnostiska items som
+// inte är relevanta för Music/Film/Sport-badge).
+export type MainCategory = 'Music' | 'Film' | 'Sport';
+
+function subjectToMainCategory(subject: string | undefined): MainCategory | null {
+  if (!subject) return null;
+  if (subject === 'song' || subject === 'artist' || subject === 'band') return 'Music';
+  if (subject === 'movie' || subject === 'actor' || subject === 'character') return 'Film';
+  if (subject === 'sport-event' || subject === 'athlete') return 'Sport';
+  return null;
+}
+
 interface TimelineQuestion {
   type: 'timeline';
   id: string;
   questionNumber: number;
   totalQuestions: number;
   category: string;
+  /** V1-huvudkategori härledd från backend:s contentSubject — driver
+   *  GetReadyIntro:s badge på första kö-rutan. null om subjectet inte
+   *  mappar (t.ex. capital). */
+  mainCategory: MainCategory | null;
   question: string;
   correctYear: number;
   hint: string;
@@ -96,6 +115,10 @@ interface ImageQuestion {
   questionNumber: number;
   totalQuestions: number;
   category: string;
+  /** V1-huvudkategori härledd från backend:s contentSubject — driver
+   *  GetReadyIntro:s badge på första kö-rutan. null om subjectet inte
+   *  mappar (t.ex. capital). */
+  mainCategory: MainCategory | null;
   question: string;
   /** Rätt svar — visas i reveal-feedback. */
   displayName: string;
@@ -130,6 +153,7 @@ const SEED_QUESTIONS: TimelineQuestion[] = MUSIC_QUESTIONS.map((q, i) => ({
   questionNumber: i + 1,
   totalQuestions: MUSIC_QUESTIONS.length,
   category: 'Music',
+  mainCategory: subjectToMainCategory(q.contentSubject),
   question: q.questionText,
   correctYear: q.correctYear,
   hint: q.displayName,
@@ -145,6 +169,7 @@ const IMAGE_SEED_QUESTIONS: ImageQuestion[] = IMAGE_QUIZ_QUESTIONS.map(
     questionNumber: i + 1,
     totalQuestions: IMAGE_QUIZ_QUESTIONS.length,
     category: 'Image',
+    mainCategory: subjectToMainCategory(q.contentSubject),
     question: q.questionText,
     displayName: q.displayName,
     correctYear: q.correctYear,
@@ -584,6 +609,9 @@ export default function QuizScreen() {
     answerResponseSeconds?: string;
     youtubeEnabled?: string;
     imagesEnabled?: string;
+    /** JSON-stringifierad array av theme package-IDs aktiva vid spelstart.
+     *  Tom array = Generic. Used för att frysa in i HistoryEntry. */
+    selectedExtraPackages?: string;
   }>();
   // Default assistance från URL-param — fallback om turnOrder-spelaren
   // saknar egen assistance-flagga. Per-player-värdet från turnOrder:n
@@ -683,6 +711,19 @@ export default function QuizScreen() {
   // youtubeClips (= today's music-pool); imagesEnabled gatar image-items.
   const youtubeEnabled = (params.youtubeEnabled ?? 'true') === 'true';
   const imagesEnabled = (params.imagesEnabled ?? 'true') === 'true';
+  // Theme packages aktiva vid spelstart (host:s lobby-val, JSON-stringifierad
+  // array av paket-IDs). Tom array = Generic. Default tom vid direkt-nav
+  // utan Lobby. Behövs i HistoryEntry vid game-completion så Player history
+  // visar vilket paket spelet kördes med.
+  const selectedExtraPackages = useMemo<string[]>(() => {
+    if (!params.selectedExtraPackages) return [];
+    try {
+      const parsed = JSON.parse(params.selectedExtraPackages);
+      return Array.isArray(parsed) ? parsed.filter((s): s is string => typeof s === 'string') : [];
+    } catch {
+      return [];
+    }
+  }, [params.selectedExtraPackages]);
   // Turordningen levereras som JSON-sträng från Lobby:s handleStartGame.
   // try/catch:en gör att en korrupt payload graceful degradar till tom lista
   // → 'intro'-fasen hoppas över istället för att skärmen fastnar tom.
@@ -857,6 +898,15 @@ export default function QuizScreen() {
       return 'none';
     });
   }, [gameQuestions, youtubeEnabled, gameMode]);
+
+  // V1-huvudkategori per fråga (Music/Film/Sport). Driver GetReadyIntro:s
+  // kant-skärande badge på första kö-rutan så spelaren ser i förväg vilken
+  // typ av fråga som kommer härnäst. Härleds från backend:s contentSubject
+  // (lagras på QuizQuestion.mainCategory vid SEED-konvertering); null om
+  // subject inte mappar till någon V1-kategori (t.ex. capital).
+  const categoryByQuestion = useMemo<(MainCategory | null)[]>(() => {
+    return gameQuestions.map((q) => q.mainCategory);
+  }, [gameQuestions]);
 
   const [questionIndex, setQuestionIndex] = useState(0);
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
@@ -1906,6 +1956,9 @@ export default function QuizScreen() {
         assistance: fallbackAssistance,
         eraFrom,
         eraTo,
+        selectedExtraPackages,
+        youtubeEnabled,
+        imagesEnabled,
       };
       try {
         await appendGameHistoryEntry(entry);
@@ -2798,6 +2851,7 @@ export default function QuizScreen() {
         totalQuestions={totalQuestions}
         playerCount={playerCount}
         mediaSourceByQuestion={mediaSourceByQuestion}
+        categoryByQuestion={categoryByQuestion}
         eraFrom={eraFrom}
         eraTo={eraTo}
         answerResponseSeconds={responseSeconds}

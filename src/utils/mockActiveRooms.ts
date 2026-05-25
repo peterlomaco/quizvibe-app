@@ -271,9 +271,10 @@ export async function setRoomPlayerCount(code: string, count: number): Promise<v
 }
 
 /**
- * Skriver maxPlayers till DB när host togglar Max 4/12 i Number of Players-
- * toggle. Speglar host:s aktuella val så join-flödets full-check baseras på
- * samma cap som UI:t visar. No-op på test-seeds och okända koder.
+ * Skriver maxPlayers till DB när host byter Game Mode (PtP=4, IndDev=12 —
+ * deriverat automatiskt från gameMode sedan 2026-05-25). Speglar host:s
+ * aktuella val så join-flödets full-check baseras på samma cap som UI:t
+ * visar. No-op på test-seeds och okända koder.
  */
 export async function setRoomMaxPlayers(code: string, maxPlayers: 4 | 12): Promise<void> {
   if (!code) return;

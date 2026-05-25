@@ -184,11 +184,13 @@ export function PlayerRow({
           ) : null}
         </View>
 
-        {/* Approve-toggle i övre högra hörnet av kortet. alignSelf:
-            'flex-start' pinnar wrappern mot kortets översta kant så
-            toggleln linjerar visuellt med "Approve All"-toggleln ovanför
-            listan (samma right-padding via row.paddingHorizontal). */}
-        {showApproveToggle && !hasLeft && (
+        {/* Approve-toggle i övre högra hörnet av kortet — visas BARA
+            för waiting-cards (approved=false). För approved non-host
+            flyttas toggleln till hcpRowRight i meta-raden så övre raden
+            kan ge mer horisontellt utrymme åt PlayerName-texten (man
+            ser mer av långa namn innan ellipsering). alignSelf:
+            'flex-start' pinnar wrappern mot kortets översta kant. */}
+        {showApproveToggle && !hasLeft && !approved && (
           <View style={styles.toggleSlot}>
             <ApproveToggle
               value={approved ? 'yes' : 'no'}
@@ -210,8 +212,11 @@ export function PlayerRow({
           synlig representation på spelarkortet. */}
       {!hasLeft && hcpComplete && age && assistance && (
         <View style={styles.hcpRow}>
-          {/* Vänster slot: meta-text "Assistance · Age". Tryckbar för
-              host så raden öppnar player-edit-modalen i parent. */}
+          {/* Vänster slot: två blå-bordered pillar för Assistance Level
+              och Age — signalerar att de är valbara för editering (host
+              tappar någonstans i pill-raden → öppnar player-edit-modal i
+              parent). När onEditPlayer saknas (non-host-vy) renderas
+              pillarna utan Pressable så de bara visar info. */}
           <View style={styles.hcpRowLeft}>
             {onEditPlayer ? (
               <Pressable
@@ -221,21 +226,44 @@ export function PlayerRow({
                 accessibilityRole="button"
                 accessibilityLabel="Edit player settings"
               >
-                <Text style={styles.hcpMeta}>
-                  {assistance.charAt(0).toUpperCase() + assistance.slice(1)} · Age {age}
-                </Text>
+                <View style={styles.hcpPillRow}>
+                  <View style={styles.hcpPill}>
+                    <Text style={styles.hcpPillText}>
+                      {assistance.charAt(0).toUpperCase() + assistance.slice(1)}
+                    </Text>
+                  </View>
+                  <View style={styles.hcpPill}>
+                    <Text style={styles.hcpPillText}>Age {age}</Text>
+                  </View>
+                </View>
               </Pressable>
             ) : (
-              <Text style={styles.hcpMeta}>
-                {assistance.charAt(0).toUpperCase() + assistance.slice(1)} · Age {age}
-              </Text>
+              <View style={styles.hcpPillRow}>
+                <View style={styles.hcpPill}>
+                  <Text style={styles.hcpPillText}>
+                    {assistance.charAt(0).toUpperCase() + assistance.slice(1)}
+                  </Text>
+                </View>
+                <View style={styles.hcpPill}>
+                  <Text style={styles.hcpPillText}>Age {age}</Text>
+                </View>
+              </View>
             )}
           </View>
 
-          {/* Höger slot: papperskorgs-knapp i kortets nedre högra hörn.
-              Host-only, grå-färgad. Visas bara på rader med onDelete
-              (waiting-listan idag) och inte på host:s eget kort. */}
+          {/* Höger slot: antingen approve-toggle (för approved non-host —
+              flyttad ner från övre raden för att frigöra utrymme åt
+              PlayerName) ELLER papperskorgs-knapp (för waiting-cards).
+              Aldrig båda eftersom delete bara renderas på waiting-rader
+              och approve-toggle i nedre slot bara på approved-rader. */}
           <View style={styles.hcpRowRight}>
+            {showApproveToggle && !isHostPlayer && approved && (
+              <ApproveToggle
+                value={approved ? 'yes' : 'no'}
+                onChange={(next) => onApproveChange?.(next === 'yes')}
+                disabled={peerHealth === 'unstable'}
+              />
+            )}
             {!isHostPlayer && onDelete && (
               <Pressable
                 onPress={onDelete}
@@ -532,6 +560,27 @@ const styles = StyleSheet.create({
   hcpMeta: {
     fontSize: FontSize.xs,
     color: Colors.textSecondary,
+  },
+  // Pill-rad för Assistance Level + Age — två blå-bordered "chips" som
+  // signalerar att fälten är valbara för editering. Sittande på samma
+  // rad i hcpRowLeft. Tap-zon delas av båda pillarna via parent
+  // Pressable (onEditPlayer) — användaren öppnar edit-modalen oavsett
+  // vilken pill som tappas.
+  hcpPillRow: {
+    flexDirection: 'row',
+    gap: Spacing.xs,
+  },
+  hcpPill: {
+    borderWidth: 1,
+    borderColor: Colors.primary,
+    borderRadius: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+  },
+  hcpPillText: {
+    fontSize: FontSize.xs,
+    color: Colors.textSecondary,
+    fontWeight: FontWeight.medium,
   },
   // Diskret opacity-dim på meta-raden när host tappar för att öppna
   // edit-modalen — signalerar tryckbar utan att skrika.

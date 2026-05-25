@@ -148,8 +148,8 @@ interface SubscriptionFeature {
 }
 
 const SUBSCRIPTION_FEATURES: SubscriptionFeature[] = [
-  { premium: 'Unlimited Host Games', basic: '4 games per day' },
-  { premium: 'Max 10 rounds per game', basic: 'Max 3 rounds per game' },
+  { premium: 'Unlimited Host Games', basic: '2 + 2 launch bonus games per day' },
+  { premium: 'Max 20 rounds per game', basic: 'Max 4 rounds per game' },
   { premium: 'Invite up to 12 players per Game', basic: '4 players' },
   { premium: 'Individual Device Game mode', basic: 'Not available' },
 ];
@@ -159,8 +159,9 @@ const SUBSCRIPTION_FEATURES: SubscriptionFeature[] = [
 export default function StoreScreen() {
   // `?focus=…` styr render-ordning. Tre lägen + default:
   //   • subscription — Subscriptions överst, sedan Basic → Packages → Credits.
-  //     Sätts av PREMIUM-tap på Individual Devices, Max 12 Players och Rounds-
-  //     rulern (alla subscription-gated features).
+  //     Sätts av PREMIUM-tap på Individual Devices och Rounds-rulern (båda
+  //     subscription-gated features). Individual Devices unlock:ar implicit
+  //     12-spelar-cap via gameMode-deriverad maxPlayers sedan 2026-05-25.
   //   • packages — Packages överst, sedan Basic, sedan "Other"-rubrik
   //     följt av Credits → Subscriptions. Sätts av "+ Add host packages"-CTA
   //     (Lobby Game Connections + Profile Customized Host packages).

@@ -287,10 +287,12 @@ Alla tre kör samma reset-logic. Redundansen är medveten — om ett path missar
 Five top-level collapsible sections — all use the same tappable-header pattern with a `+/−`-toggle box (26×26, `borderColor: borderStrong`) next to the title (`Typography.title` + bold + `Colors.textPrimary`). When collapsed, a 1px `sectionDivider` line shows under the header for visual separation. Default expanded; state per section is local (not persisted across app restarts).
 
 1. **Profile default settings** — avatar + Player Name (read-only `Text`, set at registration, NOT editable from this screen), competition setup (Year of birth, auto Competition Age, Assistance level), Save Profile button. Innehåller bara user-defaults nu — host-defaults har lyfts ut till egen top-level sektion (#2).
-2. **Host default settings** — Game Mode (Pass-the-Phone vs Individual Devices), Number of Players per Game, Region scope + Answer response time, Game era, Number of Rounds, "Save Host settings"-knapp. Tidigare en sub-rubrik inom Profile defaults; lyftes ut 2026-05-06 till egen kollapsbar sektion för att hålla sektionerna semantiskt separerade.
+2. **Host default settings** — Game Mode (Pass-the-Phone vs Individual Devices), Region scope + Answer response time, Game era, Number of Rounds, "Save Host settings"-knapp. Tidigare en sub-rubrik inom Profile defaults; lyftes ut 2026-05-06 till egen kollapsbar sektion för att hålla sektionerna semantiskt separerade. Number of Players-toggle togs bort 2026-05-25 — `maxPlayers` deriveras nu automatiskt från `gameMode` (PtP=4, IndDev=12) via auto-sync useEffect, eftersom de två settings:n var starkt kopplade och separat UI bara skapade redundant tap-yta.
 3. **Customized Host packages** — "+ Add host packages"-CTA + "Purchased and available when you are the Host:"-listrubrik + per-paket-toggles + "Select all"-toggle på egen rad + "Save settings"-knapp. Driver `enabledHostPackages` i ProfileData (se "Customized Host packages" nedan).
 4. **Game connections** — QuizVibe friends card. YouTube-membership-kortet plockades ut 2026-05-06 — användaren kommer tills vidare inte blanda in YouTube-konton i appen (YouTube finns kvar som content-source-toggle i Lobby:s Game Connections, men det är källflagga, inte konto-koppling). Spotify-kortet togs bort 2026-05-18 — se memory/project_spotify_dashboard.md för varför (Spotify-integration parkerad).
-5. **Player history** — `src/components/PlayerHistorySection.tsx` manages its own collapse state. HCP shield lives in a dedicated card directly under the section heading (was previously in the profile card).
+5. **Player history** — `src/components/PlayerHistorySection.tsx` manages its own collapse state. **Månads-grupperade entries (2026-05-25):** spel grupperas per kalender-månad (YYYY-MM-key) via `groupByMonth()`-helper. Varje månad renderas som collapsible sub-block med header `{label} · {N games} · {avgPct}% avg`. Senaste månaden default-expanded vid första load (via `didInitMonthExpansionRef`-flagga som bara fyrar EN gång — subsequent re-focuses respekterar user:s explicita toggle). Inom månad används samma `GameHistoryRow`-komponent som tidigare flat-list. HCP shield togs bort 2026-05-18 (introduceras i v2 när HCP-progression byggs ut med riktig data).
+
+   **HistoryEntry-shape (v4, 2026-05-25)**: utöver tidigare `correctAnswers/totalQuestions/avgResponseSeconds/age/assistance/eraFrom/eraTo` lagras nu också `selectedExtraPackages: string[]` (tom = Generic; framtida theme-package-IDs när v1.1+), `youtubeEnabled: boolean`, `imagesEnabled: boolean`. `HISTORY_V4_RESET_KEY` wipe:ar pre-shape entries vid första load post-fix. GameHistoryRow renderar ny meta-rad `Package: Generic · Sources: YouTube + Images`. Theme-packages och source-toggle överförs som URL-params från LobbyScreen:s `handleStartGame` (BÅDA host-path + non-host realtime-path) till quiz.tsx som parsar JSON-array och inkluderar i HistoryEntry vid `appendGameHistoryEntry`.
 
 **Tre oberoende Save-knappar** (en per editable sektion: Profile defaults, Host defaults, Customized packages — `'defaults' | 'host' | 'packages'`). Driver av `savedSection`-state — när en knapp trycks visar bara den knappen "✓ Saved" i 2 s, övriga står kvar i sin label. Underliggande `handleSave(section)` persisterar hela profilen i ett svep oavsett knapp (en blob i AsyncStorage); det är bara den visuella bekräftelsen som är knapp-lokal.
 
@@ -349,12 +351,11 @@ Five top-level collapsible sections — all use the same tappable-header pattern
 Checkbox **"Use single player mode as default"** ovanför Game Mode-toggle:n i både Profile (host-default) och Lobby (per-spel). Logik:
 
 - **Checked**: BÅDA multiplayer-rutorna dimmas — Pass-the-Phone OCH Individual Devices får `Colors.borderStrong`-grå border, transparent bg, dämpad text (`Colors.textSecondary`), grå badges. Speglar Individual Devices-rutans inaktiva look så låst läge är konsistent.
-- Number of Players-toggle:n följer samma dimming-mönster (Max 4 + Max 12 dimmas på samma sätt).
-- **Tap på dämpad Pass-the-Phone / Max 4** → uncheck + aktivera Pass-the-Phone + Max 4 i samma gest.
-- **Tap på dämpad Individual Devices / Max 12** är Premium-gated:
-  - Premium-användare → uncheck + aktivera den valda rutan direkt.
-  - Icke-Premium → samma "Premium feature — Go to Store"-popup som vanlig Individual Devices/Max 12-tap. **Ingen state-ändring** — Pass-the-Phone tänds inte upp; användaren måste tappa Pass-the-Phone-rutan eller bocka ur checkboxen för att lämna single-player-läget.
-- **Uncheck via checkbox** → alltid Pass-the-Phone + Max 4 (gratis-läget på båda toggles), oavsett vad som var aktivt innan check. Säkrar att en Premium-användare som hade Individual Devices inte hamnar kvar där efter uncheck.
+- **Tap på dämpad Pass-the-Phone** → uncheck + aktivera Pass-the-Phone i samma gest.
+- **Tap på dämpad Individual Devices** är Premium-gated:
+  - Premium-användare → uncheck + aktivera Individual Devices direkt.
+  - Icke-Premium → "Premium feature — Go to Store"-popup. **Ingen state-ändring** — Pass-the-Phone tänds inte upp; användaren måste tappa Pass-the-Phone-rutan eller bocka ur checkboxen för att lämna single-player-läget.
+- **Uncheck via checkbox** → alltid Pass-the-Phone (gratis-läget), oavsett vad som var aktivt innan check. Säkrar att en Premium-användare som hade Individual Devices inte hamnar kvar där efter uncheck. `maxPlayers` följer med automatiskt via gameMode-deriverings-useEffect:en (PtP=4).
 - **Tickbox-styling**: 20×20 kvadrat, `Colors.primary` border (alltid blå även i ocheckat läge), bockmarkering vit på primary-bg när checkad.
 - **"Multiplayer mode"-klammer** under Game Mode-toggle:n: uppåt-öppen U (1.5px border, `#6B7280` grå, 10 px höga ben, rundade botten-hörn) med "MULTIPLAYER MODE"-label centrerat under. Speglar Lobby:s Number of Rounds-bracket exakt — samma form/färg/mått.
 
@@ -443,7 +444,7 @@ Shared `CreditTierCard`, `PackageTierCard` and `SubscriptionTierCard` mirror the
 
 | `?focus` | Ordning | Triggas av |
 |---|---|---|
-| `subscription` | Subscription → Basic → Packages → Credits | Individual Devices Premium-popup, Max 12 Players Premium-popup, Rounds-rulerns guld PREMIUM-badge (Lobby + Profile) |
+| `subscription` | Subscription → Basic → Packages → Credits | Individual Devices Premium-popup, Rounds-rulerns guld PREMIUM-badge (Lobby + Profile) |
 | `packages` | Packages → Basic → **[Other heading]** → Credits → Subscriptions | "+ Add host packages"-CTA (Lobby Game Connections + Profile Customized Host packages-blocket) |
 | `credits` | Credits → Basic → **[Other heading]** → Subscriptions → Packages | Host Game Credits-pillen, Extras-rutans köp-popup, "Out of Host Game Credits"-popup vid Start Game (Lobby + Profile) |
 | (ingen) | Basic → Credits → Packages → Subscriptions | User-login-modalens Store-knappar (Home + Profile) |
@@ -597,15 +598,18 @@ Non-host gets a **read-only view** of the player list:
 
 **ApproveToggle använder standard React Native `Switch`** ([src/components/ApproveToggle.tsx](src/components/ApproveToggle.tsx)) med samma styling som Game Connections-raderna (röd/grön track, vit thumb, scale 0.8). Behåller `'no' | 'yes'`-API:t internt så call sites är oförändrade. Den tidigare custom Yes/No-svep-pillen är borttagen.
 
-**PlayerRow card layout** (host-vyn):
-- **Topp-rad**: turnColumn (Pass-the-Phone) + avatar + info (namn + ev. "Missing info"-status) + approve-toggle. Toggle:n pinnas mot kortets översta kant via `toggleSlot { alignSelf: 'flex-start' }` så den hamnar i övre högra hörnet och linjerar med "Approve All"-toggleln ovanför listan (samma right-padding via `row.paddingHorizontal: Spacing.lg`).
-- **Botten-rad** (`hcpRow`): tre flex-slottar — meta vänster (`hcpRowLeft, flex: 1`), HCP-badge centrerat (`hcpRowCenter`, intrinsic-bredd), trash höger (`hcpRowRight, flex: 1`). Lika-stora flex på sidorna garanterar matematisk centrering av badgen oavsett meta-textens bredd.
-- **Host:s eget kort** är specialfall i `hcpRow`: badge renderas i höger-slotten istället för center-slotten (höger-justerad), och ingen trash visas (host kan inte radera sig själv).
+**PlayerRow card layout** (host-vyn, uppdaterad 2026-05-25):
+- **Topp-rad**: turnColumn (Pass-the-Phone) + avatar + info (namn + ev. "Missing info"-status) + approve-toggle (BARA för waiting-cards = `!approved`). Toggle:n pinnas mot kortets översta kant via `toggleSlot { alignSelf: 'flex-start' }` så den hamnar i övre högra hörnet. För approved non-host är toppe-raden ren från toggle — frigör hela övre raden så PlayerName-texten har mer horisontellt utrymme innan ellipsering.
+- **Botten-rad** (`hcpRow`): två flex-slottar — meta vänster (`hcpRowLeft, flex: 1`) med editability-pillar, trash/toggle höger (`hcpRowRight, flex: 1`).
+- **Meta-pillar** (vänster slot): "Assistance Level" och "Age N" renderas som två separata blå-bordered pillar via `hcpPillRow` + `hcpPill`-styles (`Colors.primary` border + 8/2 padding + radius 4). Tappable via parent Pressable som öppnar samma player-edit-modal som tidigare. Signalerar editability-affordance jämfört med tidigare plain-text-version.
+- **Höger slot** är mutually-exclusive mellan trash och toggle:
+  - **Waiting non-host** (approved=false): delete-trash visas i höger slot. Toggle finns uppe.
+  - **Approved non-host** (approved=true): approve-toggle visas i höger slot istället (delete renderas inte för approved). Ingen toggle uppe.
+  - **Host:s eget kort**: tom höger slot — host kan varken radera sig själv eller approva sig själv.
+- **HCP-badge borttagen** från PlayerRow-rendering helt (2026-05-21) — HCP-värdet används fortsatt internt (scoring + edit-modal var fram till V1-launch) men har ingen synlig representation på spelarkortet. `hcpAlignRight`-propen lever kvar i typ-signaturen men är effektivt no-op nu.
 - **"Ready"-status borttagen** för alla spelare. Endast `!player.isReady` (= "Missing info" warning) eller `hasLeft` (= "LEFT THIS GAME LOBBY") renderas — i alla andra fall är status-raden helt tom (en redo spelare är default-läget).
 
-**Papperskorgs-knapp** (host-only, `onDelete`-prop på PlayerRow): grå (`Colors.textSecondary`) trash-SVG i botten-radens höger-slot, visas bara på rader i waiting-listan. För approved-spelare måste host först toggla tillbaka till No så kortet hamnar i waiting-listan igen och papperskorgen syns. Tap → `Alert "Remove player — Are you sure you want to delete this Player from this Lobby?"` → confirm filtrerar bort spelaren ur `players[]` OCH anropar `markEjected(roomCode, id)` så non-host:s polling triggar "User have been removed from this lobby"-popup → Home navigation. Pressed-feedback `Colors.borderStrong` (subtil grå highlight). Hide:s när `hasLeft: true` — left-spelaren är redan borta som aktiv part.
-
-**`PlayerRow.hcpAlignRight`** (prop): driver var HCP-badgen renderas i `hcpRow`. `false` (default, host-vyn) → badge i `hcpRowCenter` med trash i höger-slot. `true` (non-host:s vy via `hcpAlignRight={!hostMode}`) → badge i `hcpRowRight` (höger-justerad), eftersom non-host saknar approve-toggle och trash → tom höger-slot annars. Host:s eget kort använder samma höger-slot-gren (via `isHostPlayer || hcpAlignRight`-kondition).
+**Papperskorgs-knapp** (host-only, `onDelete`-prop på PlayerRow): grå (`Colors.textSecondary`) trash-SVG i botten-radens höger-slot, visas bara på rader i waiting-listan (mutually exclusive med approve-toggle i samma slot för approved-cards). För approved-spelare måste host först toggla tillbaka till No så kortet hamnar i waiting-listan igen och papperskorgen syns. Tap → `Alert "Remove player — Are you sure you want to delete this Player from this Lobby?"` → confirm filtrerar bort spelaren ur `players[]` OCH anropar `markEjected(roomCode, id)` så non-host:s polling triggar "User have been removed from this lobby"-popup → Home navigation. Pressed-feedback `Colors.borderStrong` (subtil grå highlight). Hide:s när `hasLeft: true` — left-spelaren är redan borta som aktiv part.
 
 ## Lobby — + Add Player
 
@@ -641,7 +645,9 @@ Host kan redigera **Assistance level**, **Competition Year of Birth** och **HCP*
 3. **Assistance** följer ranking `full=2 → standard=1 → minimal=0` (lägre = svårare). Tillåtna transitions: stå still eller progress nedåt. `Minimal → annat` blockas explicit. Validering körs både **tap-tid** (`handleSelectEditAssistance`) OCH **save-tid** (belt + suspenders). Disallowed knappar dimmas via `skillBtnLocked` (opacity 0.4) men förblir tappbara så popupen kan informera. Popups: `"Cannot change Minimal — Once a player has Minimal assistance, it cannot be changed."` / `"Cannot raise assistance — Assistance can only progress in the order Full → Standard → Minimal."`
 4. **Age** kan endast höjas (= tidigare birth year). Vid `nextAge < originalAge` → `Alert "Cannot lower age — Age can only be raised, pick an earlier Year of Birth."`. Stå-still tillåtet. Year-pickern dim:as inte (för långt list); validation enbart vid Save.
 
-**Guest HCP** är aldrig direkt redigerbart (`hcpOverride` på guest:er sätts ALDRIG till ett konkret värde — sätts alltid till `undefined` i save-handlern). HCP-fältet göms i modal:en för guests och ersätts med info-texten `"Guest HCP is auto-calculated and cannot be edited."`. Assistance + Year är dock fritt redigerbara för guests via samma modal.
+**Guest HCP** är aldrig direkt redigerbart (`hcpOverride` på guest:er sätts ALDRIG till ett konkret värde — sätts alltid till `undefined` i save-handlern). Assistance + Year är fritt redigerbara för guests via samma modal.
+
+**HCP UI parkerat för V1-launch (2026-05-25):** både HCP TextInput-fältet (för icke-guests) OCH "Guest HCP is auto-calculated..."-noten har tagits bort från player-edit-modalen. Edit-modalen visar nu bara Year of Birth + Assistance Level. handleSavePlayerEdit:s HCP-validering (rad ~1885-1920), `editHcpValue`-state och `MIN_HCP`-import lämnas kvar som dead code för enkel v2-reaktivering utan ny implementation — när HCP-progression byggs ut kan UI:t återinföras genom att un-comment:a TextInput-blocket.
 
 ## HCP utility ([src/utils/hcp.ts](src/utils/hcp.ts))
 
@@ -698,9 +704,8 @@ Glöm inte lägga till nya stores här när de skapas — annars läcker stale d
 
 | UI | Source-store | Non-host läser |
 |---|---|---|
-| Number of Players (Max 4/12) | `mockActiveRooms.RoomMeta.maxPlayers` | `getRoomMeta().maxPlayers` |
 | Approved players list | `mockLobbyPlayers` | `getLobbyPlayers()` (filtrerad till approved/isHost) |
-| Game Mode toggle | `mockLobbySettings.gameMode` | `getLobbySettings()` |
+| Game Mode toggle (deriverar maxPlayers PtP=4/IndDev=12) | `mockLobbySettings.gameMode` + `mockActiveRooms.RoomMeta.maxPlayers` | `getLobbySettings()` + `getRoomMeta().maxPlayers` |
 | Region Scope | `mockLobbySettings.region` | ↑ |
 | Game Era | `mockLobbySettings.eraFrom/To` | ↑ |
 | Number of Rounds | `mockLobbySettings.roundsCount` | ↑ |
@@ -723,9 +728,8 @@ Glöm inte lägga till nya stores här när de skapas — annars läcker stale d
 - modeDescription ("Players take turns…" / "Each player plays…") — gated.
 - Approve-toggle, trash-knapp, edit-handlers — gated på `hostMode`.
 - RoundsRuler:s klammer + PREMIUM-badge — gated på `onPremiumPress`-prop (saknas för non-host = read-only-läge), MEN locked-tickarnas grå-styling behålls så non-host ser host:s rätts-cap.
-- Number of Players Max 4/12: aktiva rutan får `modeOptionIndivActive` (blå border) + vit text + INGA badges för non-host (host får grön/guld + FREE/PREMIUM-badges).
 
-**Single-player-toggle ON ejectar non-hosts** — när host bockar i singlePlayerDefault iterar handler:n `players` och anropar `markEjected(roomCode, p.id)` för varje `!p.isHost && !p.hasLeft`, sedan `setPlayers((prev) => prev.filter((p) => p.isHost))` så host:s vy tömmer non-hosts direkt. Non-host:s polling fyrar ejectpopup → Home. Uncheck:n "återanställer" inte ejectade — det är en envägs-action; flagga uncheck:n bara återställer Game Mode + Max Players till gratis-defaults.
+**Single-player-toggle ON ejectar non-hosts** — när host bockar i singlePlayerDefault iterar handler:n `players` och anropar `markEjected(roomCode, p.id)` för varje `!p.isHost && !p.hasLeft`, sedan `setPlayers((prev) => prev.filter((p) => p.isHost))` så host:s vy tömmer non-hosts direkt. Non-host:s polling fyrar ejectpopup → Home. Uncheck:n "återanställer" inte ejectade — det är en envägs-action; uncheck:n bara återställer Game Mode till Pass-the-Phone (maxPlayers auto-syncar till 4 via gameMode-deriverings-effekten).
 
 **Eject-detection PRE-sync** — `syncFromStore` i non-host:s player-poll kollar `isEjected(roomCode, ownPlayerIdRef.current)` ALLRA FÖRST. Träff → setPlayerEjectedDetected(true) + early-return. Resten av sync hoppas över så user inte ser approval-listan uppdateras strax innan popup.
 
@@ -745,6 +749,16 @@ Glöm inte lägga till nya stores här när de skapas — annars läcker stale d
 
 - **TimelineQuestion** — musik-fråga. `correctYear`, `youtubeClips?`. Svar via `TimelineSelector` (year-scroll), scoring via `isCorrect(year, correctYear, interval, eraFrom, eraTo)`. Mediakort = `MediaPlayer` (YouTube).
 - **ImageQuestion** — bild-fråga. `displayName`, `letterGrid`, `optionsByPrefix`, `correctPrefix`, `prefixLength`. Svar via `ImageAnswerBlock` (Letter Grid → Final Selection), scoring via `pendingNameOption.isCorrect`. Mediakort = bild + `ProgressiveCover`.
+
+**MainCategory-tagging** (2026-05-25): båda typer bär ett `mainCategory: MainCategory | null`-fält där `MainCategory = 'Music' | 'Film' | 'Sport'`. Härleds vid SEED-conversion via `subjectToMainCategory(contentSubject)`-helpern i quiz.tsx:
+- `song / artist / band` → **Music**
+- `movie / actor / character` → **Film**
+- `sport-event / athlete` → **Sport**
+- Andra subjects (capital, country, place, etc.) → `null`
+
+Driver två konsumenter idag:
+1. **GetReadyIntro:s kategori-badge** (se "Quiz — Get Ready to Vibe intro screen" nedan). Härleds som `categoryByQuestion: (MainCategory | null)[]` useMemo parallellt med `mediaSourceByQuestion`, passas som prop.
+2. **Framtida theme-package-roadmap** — när någon kategori passerar 1000-frågor-tröskeln blir den säljbar som themed package i Store (se `memory/project_theme_package_roadmap.md`).
 
 **Pool-blandning** (`gameQuestions`) — **round-block-struktur** för Pass-the-Phone-paritet: alla spelare i samma rond ska få samma fråge-TYP (men olika ITEMS); typen växlar mellan ronder. Block-storlek = `turnOrder.length` (= antal spelare per rond). Per block: alternering musik ↔ bild (block 0=music, block 1=image, block 2=music, ...). Inom block: items från relevanta pool (era-filtrerad musik / IMAGE_SEED_QUESTIONS) via cyklisk indexering `(block * playerCount + q) % pool.length` så alla spelare i ronden får olika items även om poolen är mindre än spelarantalet. Pool byggs för exakt `totalRounds` block — `questionIndex` stiger linjärt utan modulo-cykling.
 
@@ -829,6 +843,13 @@ Bild-pipelinen från backend till in-game-rendering:
 
 **Bild-kvalitet (MVP-fakta)**: höjt tak från 1280×720 → 1920×1080 (Q85 oförändrat) gav märkbar förbättring bara för källor med >1280px upplösning (Stockholm 1631×1080 / London 1620×1080 / Berlin 1620×1080 / Madonna 675×1080 / Messi 808×1080 etc.). Wikipedia pageimage för Astrid (402×570), Cristiano (566×650), Zlatan (332×480) och Björn Borg (622×934) är källbegränsade — för bättre kvalitet på dessa krävs explicit Commons-URL via `wikimedia-process <id> <url>`. **Aktuell pool-orientering** (mätt med `npm run measure-images`): 14 av 17 bilder är porträtt (AR 0.60–0.87, alla personer + Paris), 3 är landscape (AR 1.50, städer Berlin/London/Stockholm). MediaCard är `aspectRatio: 16/9 + resizeMode='contain'` — container-storleken matchar timeline-frågors media-area för konsistent layout mellan fråge-typer, inget klipps. Porträtt-bilder får dock signifikant letterbox vänster+höger (~60% av container-bredden) eftersom 16:9 är wider än portrait-AR; om det blir för "fattig" UX kan container framtidsbytas till en portrait-vänligare form (4:5 eller 1:1) på bekostnad av högre container.
 
+**Bild-motiv-policy (2026-05-25)**: alla bilder ska visa personen i sin professionella kontext — handlings-bild, inte civilklätt porträtt:
+- **Idrottare** → från match/tävling, i tävlingsdräkt, mitt i utövandet
+- **Musiker / artister / band** → från live-uppträdande, på scen med instrument/mikrofon, i artist-look
+- **Skådespelare** → från en film de spelat i (i karaktären, i scen, i kostym)
+
+Wikipedia-pageimage (default `npm run wikimedia-search <id>`) returnerar ofta porträtt-headshot — det duger oftast INTE. För att hitta en handlings-bild: scrolla artikelns övriga bilder via Commons text-search-resultaten, eller besök Wikipedia-artikeln + Commons-kategori manuellt. Använd sedan `npm run wikimedia-process <id> <url>` med explicit Commons-URL för att override:a default. **Befintliga ~17 items i `assets/quiz-images/`** curades innan policyn formaliserades — audit + ev. ersättning ska göras separat session. Se [memory/feedback_image_professional_context.md](../.claude/projects/C--Users-46725-quizvibe-app/memory/feedback_image_professional_context.md) för full motivation.
+
 ## YouTube playback & curation
 
 YouTube-klippen är NOTERAT INTE bara musik — kan vara filmscener, sporthändelser, historiska/kulturella klipp. Använd generiska termer ("klippet"/"videon") i nya kommentarer; rename-passet (MUSIC_QUESTIONS → generiskt, "song"-frågetext → per-content-type, songs-katalog → media-katalog, song-meta-rad → content-type-aware) är **bundlat med detta YouTube-färdigställande-passet** — plocka inte isär.
@@ -908,6 +929,8 @@ Hand-off-skärmen mellan Lobby:s Start Game-tap och första quiz-frågan. [src/c
    - **Locked-state i Pass-the-Phone**: `responseSecondsLocked = gameMode === 'pass-the-phone' && currentPlayerIndex !== 0`. När låst → tap visar info-Alert ("response time can only be changed at the start of a new round — when all players have answered the same number of questions"). Trigger:s border + text dimmas + ▼ byts till 🔒.
 3. **Current Leaderboard (utfällbar)** mellan settings och play. Default **collapsed** vid varje GetReadyIntro-mount. Tap på header → expand. Body är `position: 'absolute'` med `top: '100%'` + `zIndex: 100` + `elevation: 10` → **OVERLAY:ar** play + turordningstabellen istället för att skjuta dem nedåt. Innehållet bakom stannar på sin plats men göms tills body collapses igen. Layout: 3-kolumns sport-tabell (se "Leaderboard table" nedan).
 4. **Play-knapp** (centrerad): `<QuizVibePlayLogo size={140} color={Colors.warning} />` — Q-logo med play-triangel inuti Q-ringen (ersätter den gamla blå rektangulära knappen). **Gold glow** runt logon: `playLogoHalo` (absolut-positionerad bakom, `Colors.warning` bg + animated opacity 0.35 → 0.8) + iOS-only shadow med `shadowColor: Colors.warning`. Scale-pulse 1 → 1.06 över 800ms.
+
+**Kategori-badge på current-box** (2026-05-25): kant-skärande badge ovanpå `currentMediaBox` (IndDev) och `currentPlayerBox` (PtP/Single) — visar V1-huvudkategori (Music/Film/Sport) för frågan som spelas härnäst. Drivs av ny prop `categoryByQuestion: (MainCategory | null)[]` som passas från quiz.tsx. Visar `categoryByQuestion[currentQuestion - 1]` (frågan som currentQuestion pekar på = "först på tur"). Alla kategorier delar **enhetlig gold-styling** (`Colors.warning` bg + svart text, samma vokabulär som PREMIUM-badge) — per-kategori-färgning testades men gav splittrad känsla. ViewBox-position: `top: -9, right: Spacing.md` så badgen sticker ut över top-kanten på boxen utan att krocka med innehållet. null-värde i arrayn → ingen badge renderas (t.ex. capital-fråga, framtida edge case).
 5. **Turordningstabell** under play-knappen — fixed-höjd 3-kolumns-grid:
    - **Header**: `R: | Q: | Pass-the-Phone to:` (textSecondary, semibold, uppercase via Typography.overline-mönster).
    - **Current player-rad**: R/Q-värden i vanliga celler; Player-cellen wrap:ar avatar + namn i en primary-bordered box (`primaryMuted` bg).
@@ -1238,6 +1261,19 @@ Demo-data (`src/utils/nameQuizDemo.ts`) genererad för Millennials (1990) + stan
 - [src/components/CountdownIntro.tsx](src/components/CountdownIntro.tsx) — 3-2-1-nedräkning mellan tap på play-knappen i intro:n och fråge-vyn. Stor `CountdownQLogo` centrerad (size 360 px på fullbreds-skärmar). Siffran (3, 2, 1) och `?`-glyfen pop:as in i Q-ringen via overlay-Animated.Text med spring-scale 1.4 → 1 + opacity 0 → 1, **följt av en kontinuerlig zoom-puls 1 ↔ 1.18 (350 ms varje håll, ~1.4 puls/sek)** tills siffran byts. Loop:n stoppas i useEffect cleanup vid count-byte så nästa siffrans pop-in inte krockar med den gamla loopen. Total tid ~4 s. **Q-loggan shift:as `LOGO_SIZE * 0.0375` åt höger** via en absolute-positionerad wrap-View så Q-ringens center (SVG-koord (37, 37) = 46.25 % av LOGO_SIZE) hamnar exakt på 50 % horisontellt under glyph-overlay:ns centrerade siffra/?. **PlayerName-block ovan loggan**: `Pass-the-Phone to:`-label + framed box (`primaryMuted` bg + `Colors.primary` border + Radius.md, padding sm/lg) som matchar GetReadyIntro:s `currentPlayerBox` 1:1 — avatar (40×40 cirkel) + namn (FontSize.xxl bold) i row-layout. `playerEmoji?: string`-prop skickas in från quiz.tsx via `turnOrder[currentPlayerIndex]?.emoji`. `playerBlock.gap = Spacing.xl` ger luftig separation mellan label-rad och box.
 - [src/components/StopwatchIcon.tsx](src/components/StopwatchIcon.tsx) — modern sport-stopwatch SVG (rund kropp, top crown-knapp, sido-knapp diagonal, tick-mark vid 12-position, visare mot 1-2-positionen, center-pivot). `color`-prop styr alla element. ViewBox 24×24, default size 24. Används i quiz-skärmens decimal-stopwatch under timer-bar:en — ersätter den tidigare ⏱-emojin som rendereades inkonsekvent över plattformar.
 - [src/components/ProgressiveCover.tsx](src/components/ProgressiveCover.tsx) — mosaik-reveal-cover (se "Name-answer model — demo route"). Tar `assistance`-prop som styr reveal-fraktion: `full=0.25`, `standard=0.5`, `minimal=0.75` av `totalSeconds` (mer assistance = snabbare reveal). Q-loggan fadar oberoende av mosaiken — alltid helt borta efter 3 s via separat tick-loop.
+- [src/components/QuizVibeQAvatar.tsx](src/components/QuizVibeQAvatar.tsx) — Q-only brand-mark (utan rounded-square-bakgrunder) med valbart innehåll. `variant: 'smile' | 'wifi'` (default `'smile'`): smile = ögon + glad mun (default i TopUserBanner, Profile, Home, Avatar-fallback); wifi = Spotify-stilade sound-wave-arcs (3 koncentriska arcs roterade 25°, samma som QuizVibeLogo). ViewBox expanderas för wifi (`"21 21 36 36"`) så top-arc inte klipps. Används i Final Leaderboard:s Home-knapp där wifi-varianten valdes för brand-konsistens med start-skärmens logga.
+
+## Home — pulserande tagline
+
+Tre taglines som cross-fadar under brand-loggan på Home-skärmen ([app/index.tsx](app/index.tsx)): `"Challenge yourself. Play together."` → `"Invite Friends. Socialize."` → `"Music. Film. Sport."`. Module-level `TAGLINES`-array driver array av per-text Animated.Value (initierad så index 0 startar på opacity 1). Cycle var 6000ms: parallell `Animated.parallel`-fade där nuvarande text fadar till 0 och nästa till 1, duration 2600ms med `Easing.bezier(0.4, 0, 0.2, 1)` (Material Design standard ease — mjuk accel/decel). useNativeDriver: true så opacity körs på native-tråden. Render: alla TAGLINES alltid renderade i samma wrap (`alignSelf: 'stretch'` + `position: 'relative'`), index 0 i flow definierar wrap-höjden, index 1+ är absolut-positionerade ovanpå via `taglineOverlay` så de delar exakt samma position. Cycle-loop använder `taglineIdxRef` för att spåra current index över React-renders utan att triggera re-renders.
+
+## FAQ — Profile + Home-länk
+
+[src/screens/FAQScreen.tsx](src/screens/FAQScreen.tsx) renderar en dubbel-nestad accordion (8 kategorier × 3-5 Q&As totalt ~33 entries) på engelska: Getting started, Game modes, Connection & Individual Devices, Generations & content, Host Game Credits, Premium subscription, Account & privacy, Region. Båda toggle-nivåer default-kollapsade — user tappar kategori → ser Q-lista → tappar Q → ser A. State: `expandedCategories: Set<string>` + `expandedQuestions: Set<string>`. Back-routing via `?from=`-param speglar Store-screens mönster (router.canGoBack() först, sedan explicit replace mot from-path, sista utväg Home).
+
+[app/faq.tsx](app/faq.tsx) är thin re-export. Två entry-points till FAQ:n:
+- **Profile → Legal-sektionen** ([ProfileScreen.tsx:1716](src/screens/ProfileScreen.tsx#L1716)): tredje länk-rad efter Privacy Policy + Terms of Service, navigerar via `router.push('/faq?from=/profile')`.
+- **Home footer** ([app/index.tsx:1985](app/index.tsx#L1985)): plain "Help" → bytt till tappbar "FAQ"-länk (underlined, textPrimary), navigerar via `router.push('/faq?from=/')`. Säkerställer att logged-out users också når FAQ:n innan de registrerar sig.
 
 ## Host Game Credits — gate på Create Game + Play Again
 

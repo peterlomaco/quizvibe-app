@@ -332,28 +332,6 @@ export default function ProfileScreen() {
     setGameMode(mode);
   };
 
-  // Försök att välja Max 12 utan Premium → Store-omdirigering. Speglar
-  // Lobby:s handleSelectMode-pattern för Individual Devices utan paket.
-  const handleSelectMaxPlayers = (value: 4 | 12) => {
-    if (value === 12 && !hasPremium) {
-      Alert.alert(
-        'Premium feature',
-        'Hosting up to 12 players requires the Premium subscription. Get it in the Store?',
-        [
-          { text: 'Cancel', style: 'cancel' },
-          { text: 'Go to Store', onPress: () => router.push('/store?focus=subscription&from=/profile') },
-        ],
-      );
-      return;
-    }
-    setMaxPlayers(value);
-    // Max 12 är meningsfullt bara i Individual Devices (PtP capas vid 4
-    // pga orimlig speltid). Snäpper gameMode automatiskt till IndDev när
-    // host väljer Max 12 från PtP — speglar Lobby:s motsvarande logik.
-    if (value === 12 && gameMode === 'pass-the-phone') {
-      setGameMode('individual-devices');
-    }
-  };
   const [yearPickerOpen, setYearPickerOpen]     = useState(false);
   const [assistancePickerOpen, setAssistancePickerOpen]   = useState(false);
   const [regionPickerOpen, setRegionPickerOpen] = useState(false);
@@ -966,10 +944,12 @@ export default function ProfileScreen() {
         )}
 
         {/* ── Host default settings (kollapsbar gruppering) ─────
-            Game Mode → Number of Players → Region scope + Answer
-            response → Game era → Number of Rounds. Egen top-level
-            sektion mellan Profile defaults och Game connections;
-            samma kollapsbara mönster (+/− toggle, sectionDivider när
+            Game Mode → Region scope + Answer response → Game era →
+            Number of Rounds. Number of Players-toggle:n togs bort
+            2026-05-25 — maxPlayers deriveras nu från gameMode (PtP=4,
+            IndDev=12) via auto-sync useEffect. Egen top-level sektion
+            mellan Profile defaults och Game connections; samma
+            kollapsbara mönster (+/− toggle, sectionDivider när
             kollapsad) som de övriga top-level rubrikerna. */}
         <Pressable
           onPress={() => setHostDefaultsExpanded(!hostDefaultsExpanded)}
@@ -1138,106 +1118,13 @@ export default function ProfileScreen() {
               <View style={styles.multiplayerBracket} />
               <Text style={styles.multiplayerBracketLabel}>Multiplayer mode</Text>
             </View>
-          </View>
-
-          {/* ── Number of Players per Game ────────────────────── */}
-          <View style={styles.field}>
-            <Text style={styles.fieldLabel}>Number of Players per Game</Text>
-            <View style={styles.modeToggle}>
-              <Pressable
-                style={({ pressed }) => [
-                  styles.modeOption,
-                  singlePlayerDefault
-                    ? styles.modeOptionDimmed
-                    : maxPlayers === 4
-                      ? styles.modeOptionPassActive
-                      : styles.modeOptionInactive,
-                  pressed && { opacity: 0.7 },
-                ]}
-                onPress={() => {
-                  if (singlePlayerDefault) {
-                    setSinglePlayerDefault(false);
-                    setGameMode('pass-the-phone');
-                    setMaxPlayers(4);
-                    return;
-                  }
-                  handleSelectMaxPlayers(4);
-                }}
-              >
-                <Text
-                  style={[
-                    styles.modeLabel,
-                    !singlePlayerDefault && maxPlayers === 4 && styles.modeLabelActiveFree,
-                    singlePlayerDefault && styles.modeLabelDimmed,
-                  ]}
-                >
-                  Max 4 Players
-                </Text>
-                <View
-                  style={[styles.freeBadge, singlePlayerDefault && styles.freeBadgeDimmed]}
-                  pointerEvents="none"
-                >
-                  <Text
-                    style={[
-                      styles.freeBadgeText,
-                      singlePlayerDefault && styles.freeBadgeTextDimmed,
-                    ]}
-                  >
-                    FREE
-                  </Text>
-                </View>
-              </Pressable>
-              <Pressable
-                style={({ pressed }) => [
-                  styles.modeOption,
-                  singlePlayerDefault
-                    ? styles.modeOptionDimmed
-                    : maxPlayers === 12
-                      ? styles.modeOptionPremiumActive
-                      : styles.modeOptionInactive,
-                  pressed && { opacity: 0.7 },
-                ]}
-                onPress={() => {
-                  if (singlePlayerDefault) {
-                    if (!hasPremium) {
-                      handleSelectMaxPlayers(12);
-                      return;
-                    }
-                    setSinglePlayerDefault(false);
-                    setGameMode('pass-the-phone');
-                    setMaxPlayers(12);
-                    return;
-                  }
-                  handleSelectMaxPlayers(12);
-                }}
-              >
-                <Text
-                  style={[
-                    styles.modeLabel,
-                    !singlePlayerDefault && maxPlayers === 12 && styles.modeLabelActivePremium,
-                    singlePlayerDefault && styles.modeLabelDimmed,
-                  ]}
-                >
-                  Max 12 Players
-                </Text>
-                <View
-                  style={[
-                    styles.premiumBadge,
-                    (singlePlayerDefault || !(maxPlayers === 12 || hasPremium)) && styles.premiumBadgeGrey,
-                  ]}
-                  pointerEvents="none"
-                >
-                  <Text
-                    style={[
-                      styles.premiumBadgeText,
-                      (singlePlayerDefault || !(maxPlayers === 12 || hasPremium)) && styles.premiumBadgeTextGrey,
-                    ]}
-                  >
-                    PREMIUM
-                  </Text>
-                </View>
-              </Pressable>
-            </View>
+            {/* Mode-beskrivning under Multiplayer-bracket — speglar
+                Lobby:s modeDescription för konsistent host-default-vy. */}
+            <Text style={styles.modeDescription}>
+              {gameMode === 'pass-the-phone'
+                ? 'Use one single device. Max 4 players.'
+                : 'Each player plays on their own device. Max 12 players.'}
+            </Text>
           </View>
 
           {/* Region scope + Answer response — sida vid sida, halv bredd
@@ -1714,9 +1601,20 @@ export default function ProfileScreen() {
               <Text style={styles.legalRowText}>Terms of Service</Text>
               <Text style={styles.legalRowChevron}>›</Text>
             </Pressable>
+            <View style={styles.legalRowDivider} />
+            <Pressable
+              onPress={() => router.push('/faq?from=/profile')}
+              style={({ pressed }) => [
+                styles.legalRow,
+                pressed && { opacity: 0.7 },
+              ]}
+            >
+              <Text style={styles.legalRowText}>FAQ</Text>
+              <Text style={styles.legalRowChevron}>›</Text>
+            </Pressable>
             <Text style={styles.legalFootnote}>
-              Opens in a secure in-app browser. Both documents are also
-              available at peterlomaco.github.io/quizvibe-app/legal/.
+              Privacy Policy and Terms open in a secure in-app browser.
+              FAQ is handled inside the app.
             </Text>
           </View>
         )}
@@ -2942,10 +2840,11 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
 
-  // Number of Players per Game-toggle — speglar Lobby:s Game Mode-toggle
-  // (Pass-the-Phone vs Individual Devices) i form, mått och färg.
-  // Vänster ruta = Max 4 (free, grön aktiv), höger ruta = Max 12 (premium,
-  // blå aktiv) med kantskärande PREMIUM-badge i guld.
+  // Game Mode-toggle — speglar Lobby:s motsvarande toggle i form, mått och
+  // färg. Vänster ruta = Pass-the-Phone (free, grön aktiv), höger ruta =
+  // Individual Devices (premium, blå/guld aktiv beroende på subscription)
+  // med kantskärande PREMIUM-badge i guld. Number of Players-toggle:n togs
+  // bort 2026-05-25 men styles delas fortfarande av Game Mode.
   modeToggle: {
     flexDirection: 'row',
     backgroundColor: Colors.background,
@@ -2983,9 +2882,9 @@ const styles = StyleSheet.create({
     borderColor: Colors.primary,
     backgroundColor: Colors.primaryMuted,
   },
-  // Guld-tonad aktiv variant — Max 12 Players när det är valt. Speglar
-  // PREMIUM-badge:s guldfärg så toggle-rutan, badge:n och texten bildar
-  // ett samlat "premium-läge"-uttryck.
+  // Guld-tonad aktiv variant — Individual Devices när det är valt och
+  // host har Premium. Speglar PREMIUM-badge:s guldfärg så toggle-rutan,
+  // badge:n och texten bildar ett samlat "premium-läge"-uttryck.
   modeOptionPremiumActive: {
     borderColor: '#F5A623',
     backgroundColor: Colors.primaryMuted,
@@ -2999,7 +2898,7 @@ const styles = StyleSheet.create({
     color: Colors.primary,
     fontWeight: FontWeight.semibold,
   },
-  // Guld-tonad aktiv label — Max 12 Players när det är valt.
+  // Guld-tonad aktiv label — Individual Devices när det är valt (Premium).
   modeLabelActivePremium: {
     color: '#F5A623',
     fontWeight: FontWeight.semibold,
@@ -3100,6 +2999,18 @@ const styles = StyleSheet.create({
     color: Colors.textPrimary,
     fontWeight: FontWeight.medium,
   },
+  // Mode-beskrivning under Multiplayer-bracket — speglar Lobby:s
+  // modeDescription (fontSize.xs, textSecondary, generös lineHeight)
+  // för konsistent host-default-vy mellan Profile och Lobby.
+  modeDescription: {
+    fontSize: FontSize.xs,
+    color: Colors.textSecondary,
+    paddingHorizontal: Spacing.xs,
+    lineHeight: 17,
+    marginTop: Spacing.xs,
+    textAlign: 'center',
+  },
+
   // "Multiplayer mode"-klammer under Game Mode-toggle:n. Speglar
   // Lobby:s Number of Rounds-bracket (`roundsRulerStyles.bracket`) i
   // form, mått och färg så de upplevs som samma visuella språk.

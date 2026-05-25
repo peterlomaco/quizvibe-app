@@ -41,6 +41,10 @@ const HISTORY_V2_RESET_KEY = '@quizvibe/migration/historyV2Reset/v1';
 // shape-utökningen 2026-05-22 (samma dag som v2 men annan flagga så
 // migrationen är distinkt).
 const HISTORY_V3_RESET_KEY = '@quizvibe/migration/historyV3Reset/v1';
+// V4-reset: wipe:ar pre-packages/sources-entries vid första load efter
+// shape-utökningen 2026-05-25 (selectedExtraPackages + youtubeEnabled +
+// imagesEnabled). Distinkt flagga så migrationen kan rullas oberoende.
+const HISTORY_V4_RESET_KEY = '@quizvibe/migration/historyV4Reset/v1';
 
 export type AssistanceLevel = 'minimal' | 'standard' | 'full';
 
@@ -122,6 +126,10 @@ export async function clearLatestResult(): Promise<void> {
  *   time så history visar de faktiska inställningarna vid speltillfället,
  *   inte aktuella profil-värden). `HISTORY_V3_RESET_KEY` wipe:ar
  *   pre-shape-entries vid första load post-fix.
+ * 2026-05-25 v4: lade till selectedExtraPackages/youtubeEnabled/imagesEnabled
+ *   så Player history visar vilket paket (Generic eller themed) spelet
+ *   kördes med + vilka mediekällor (YouTube/Images) som var aktiva.
+ *   `HISTORY_V4_RESET_KEY` wipe:ar pre-shape-entries.
  */
 export interface HistoryEntry {
   id: string;
@@ -133,6 +141,14 @@ export interface HistoryEntry {
   assistance: AssistanceLevel;    // assistance vid speltillfället
   eraFrom: number;          // Game Era from (host:s val vid speltillfället)
   eraTo: number;            // Game Era to (host:s val vid speltillfället)
+  /** Theme package-IDs som host hade aktiverade vid speltillfället. Tom
+   *  array = Generic (inga extra paket). När themed packages aktiveras i
+   *  v1.1+ kommer detta innehålla ID:n från PURCHASED_PACKAGES. */
+  selectedExtraPackages: string[];
+  /** YouTube-källan aktiv vid speltillfället (host:s Game Connections-val). */
+  youtubeEnabled: boolean;
+  /** Images-källan aktiv vid speltillfället (host:s Game Connections-val). */
+  imagesEnabled: boolean;
 }
 
 /**
@@ -159,13 +175,14 @@ async function resolveHistoryKey(): Promise<string | null> {
  */
 async function ensureHistoryReset(): Promise<void> {
   try {
-    // ALLA reset-flaggor (per-user, v2, v3) måste vara satta — annars
+    // ALLA reset-flaggor (per-user, v2, v3, v4) måste vara satta — annars
     // wipe:a och sätt samtliga. Multi-flag-check så successiva shape-
     // ändringar var sin triggar wipe utan att räkningarna kollideras.
     const perUserFlag = await AsyncStorage.getItem(HISTORY_PER_USER_RESET_KEY);
     const v2Flag = await AsyncStorage.getItem(HISTORY_V2_RESET_KEY);
     const v3Flag = await AsyncStorage.getItem(HISTORY_V3_RESET_KEY);
-    if (perUserFlag === '1' && v2Flag === '1' && v3Flag === '1') return;
+    const v4Flag = await AsyncStorage.getItem(HISTORY_V4_RESET_KEY);
+    if (perUserFlag === '1' && v2Flag === '1' && v3Flag === '1' && v4Flag === '1') return;
     const allKeys = await AsyncStorage.getAllKeys();
     const historyKeys = allKeys.filter(
       (k) =>
@@ -178,6 +195,7 @@ async function ensureHistoryReset(): Promise<void> {
     await AsyncStorage.setItem(HISTORY_PER_USER_RESET_KEY, '1');
     await AsyncStorage.setItem(HISTORY_V2_RESET_KEY, '1');
     await AsyncStorage.setItem(HISTORY_V3_RESET_KEY, '1');
+    await AsyncStorage.setItem(HISTORY_V4_RESET_KEY, '1');
     // Sätt även den äldre reset-flaggan så ensureHistoryReset i den
     // tidigare pre-namespacing-versionen aldrig fyrar igen om koden
     // skulle rullas tillbaka.

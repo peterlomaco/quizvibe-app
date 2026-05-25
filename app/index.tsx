@@ -40,10 +40,12 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Alert,
   Animated,
+  Easing,
   Keyboard,
   KeyboardAvoidingView,
   Modal,
   Platform,
+  Pressable,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -1205,6 +1207,16 @@ function ChoiceRow({
 
 // ─── Home Screen ──────────────────────────────────────────────────────────────
 
+// Pulserande tagline-array. Renderingen växlar mellan dessa tre strängar
+// med en cross-fade (se taglineFade-effekten nedan). Module-level för
+// att undvika re-allokering per render. Behöver inte i18n:as här eftersom
+// hela appen är engelska för V1-launchen.
+const TAGLINES = [
+  'Challenge yourself. Play together.',
+  'Invite Friends. Socialize.',
+  'Music. Film. Sport.',
+];
+
 export default function HomeScreen() {
   const [joinVisible, setJoinVisible] = useState(false);
   const [joinInitialStep, setJoinInitialStep] = useState<JoinStep>('choose');
@@ -1253,6 +1265,54 @@ export default function HomeScreen() {
   const [regRegionPickerOpen, setRegRegionPickerOpen] = useState(false);
 
   const pulse = useRef(new Animated.Value(1)).current;
+
+  // Pulserande tagline-byte via TRUE cross-fade — alla tre texterna är
+  // alltid renderade (TAGLINES[0] i flow definierar wrap-höjden,
+  // TAGLINES[1+] är absolut-positionerade ovanpå), var och en med egen
+  // Animated.Value för opacity. Vid varje cycle körs två parallella
+  // timings: nuvarande text fadar till 0 + nästa fadar till 1, båda
+  // samtidigt = ingen blank-moment och en mjuk korsande övergång.
+  //
+  // Duration 2600ms + 6000ms mellan cykler = ~3.4s fullt synlig per
+  // tagline + 2600ms cross-fade. Långsam fade ger lugnt tempo på
+  // själva övergången utan att förlänga totaltiden per cykel.
+  // Bezier(0.4, 0, 0.2, 1) är Material:s "standard ease" — accelererar
+  // mjukt i början, decelererar mjukt i slutet, ingen plötslig
+  // start/slut-känsla.
+  //
+  // useNativeDriver: true → opacity körs på native-tråden så animationen
+  // stannar smooth även när JS-bridgen är upptagen (modal-öppningar,
+  // focus-effects, etc.).
+  const taglineOpacity0 = useRef(new Animated.Value(1)).current;
+  const taglineOpacity1 = useRef(new Animated.Value(0)).current;
+  const taglineOpacity2 = useRef(new Animated.Value(0)).current;
+  const taglineActiveIdxRef = useRef(0);
+  useEffect(() => {
+    const opacities = [taglineOpacity0, taglineOpacity1, taglineOpacity2];
+    const easing = Easing.bezier(0.4, 0, 0.2, 1);
+    const cycle = () => {
+      const current = taglineActiveIdxRef.current;
+      const next = (current + 1) % opacities.length;
+      Animated.parallel([
+        Animated.timing(opacities[current], {
+          toValue: 0,
+          duration: 2600,
+          easing,
+          useNativeDriver: true,
+        }),
+        Animated.timing(opacities[next], {
+          toValue: 1,
+          duration: 2600,
+          easing,
+          useNativeDriver: true,
+        }),
+      ]).start();
+      taglineActiveIdxRef.current = next;
+    };
+    const interval = setInterval(cycle, 6000);
+    return () => clearInterval(interval);
+  }, [taglineOpacity0, taglineOpacity1, taglineOpacity2]);
+  const taglineOpacities = [taglineOpacity0, taglineOpacity1, taglineOpacity2];
 
   // Ref + state för custom CodeKeyboard på Register-formens PlayerName-fält
   // — speglar guest-formens setup (se JoinModal). Samma motivation:
@@ -1881,9 +1941,28 @@ export default function HomeScreen() {
           <Text style={[styles.appName, { fontFamily: appNameFont }]}>
             QuizVibe
           </Text>
-          <Text style={[styles.tagline, { fontFamily: taglineFont }]}>
-            Be fast. Be right. Be legendary.
-          </Text>
+          {/* Cross-fade tagline-wrap. Första texten i flow definierar
+              höjden; index 1+ är absolut-positionerade ovanpå och fadar
+              i/ur via egna taglineOpacities[i]. `alignSelf: stretch` så
+              wrappen tar full brandSection-bredd och texterna kan
+              centreras via textAlign utan att kämpa om intrinsisk
+              bredd. Alla TAGLINES måste passa på en rad i samma
+              fontSize/lineHeight för att höjden ska kännas stabil. */}
+          <View style={styles.taglineWrap}>
+            {TAGLINES.map((text, i) => (
+              <Animated.Text
+                key={i}
+                style={[
+                  styles.tagline,
+                  styles.taglineCentered,
+                  i > 0 && styles.taglineOverlay,
+                  { fontFamily: taglineFont, opacity: taglineOpacities[i] },
+                ]}
+              >
+                {text}
+              </Animated.Text>
+            ))}
+          </View>
         </View>
 
         {/* ── Primary actions (Join + Create) ───────────────── */}
@@ -1979,10 +2058,31 @@ export default function HomeScreen() {
         </View>
 
         {/* ── Footer ─────────────────────────────────────────── */}
+        {/* "FAQ" är tappbar Pressable som öppnar /faq?from=/. About- och
+            ·-texterna är fortsatt plain Text (placeholder för framtida
+            About-skärm). Tappbar styling: aktiv färg (textPrimary) +
+            underline så det syns att raden är en länk även för logged-out
+            users som är skärmens primära FAQ-målgrupp. */}
         <View style={styles.footer}>
           <Text style={[styles.footerText, { fontFamily: taglineFont }]}>About QuizVibe</Text>
           <Text style={[styles.footerDot, { fontFamily: taglineFont }]}>·</Text>
-          <Text style={[styles.footerText, { fontFamily: taglineFont }]}>Help</Text>
+          <Pressable
+            onPress={() => router.push('/faq?from=/')}
+            hitSlop={8}
+          >
+            {({ pressed }) => (
+              <Text
+                style={[
+                  styles.footerText,
+                  styles.footerLink,
+                  { fontFamily: taglineFont },
+                  pressed && { opacity: 0.6 },
+                ]}
+              >
+                FAQ
+              </Text>
+            )}
+          </Pressable>
         </View>
       </View>
 
@@ -2969,6 +3069,26 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     letterSpacing: 0.2,
   },
+  // Wrap för cross-fade tagline. Stretches across full brandSection-bredd
+  // (annars skulle alignItems: center krympa wrappen till första textens
+  // intrinsiska bredd och den absolut-positionerade andra texten skulle
+  // sticka ut eller wrappa). position: 'relative' behövs för att
+  // taglineOverlay:s absolute-positioning ska anchor:as här.
+  taglineWrap: {
+    alignSelf: 'stretch',
+    position: 'relative',
+  },
+  taglineCentered: {
+    textAlign: 'center',
+  },
+  // Andra taglinen overlay:as ovanpå den första — fyller wrappens
+  // bounds så texten centreras i samma område som första texten.
+  taglineOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+  },
 
   actionsSection: { gap: Spacing.md },
   gameBtn: {
@@ -3000,9 +3120,13 @@ const styles = StyleSheet.create({
     marginTop: -Spacing.sm,
     fontStyle: 'italic',
   },
-  footer: { flexDirection: 'row', justifyContent: 'center', gap: Spacing.sm, paddingTop: Spacing.sm },
+  footer: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: Spacing.sm, paddingTop: Spacing.sm },
   footerText: { fontSize: 12, color: Colors.textSecondary },
   footerDot: { fontSize: 12, color: Colors.textSecondary },
+  // Tappbar variant av footerText. Lite mer framträdande färg
+  // (textPrimary) + underline så det syns att raden är en länk även för
+  // logged-out users som är skärmens primära FAQ-målgrupp.
+  footerLink: { color: Colors.textPrimary, textDecorationLine: 'underline' },
 });
 
 const modal = StyleSheet.create({

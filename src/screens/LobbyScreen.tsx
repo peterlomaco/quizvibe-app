@@ -1529,10 +1529,10 @@ export default function LobbyScreen() {
   // saknar egen mobil och kan inte spela på individual devices). Visar Alert
   // om sådana finns, raderar dem lokalt + i lobby_players-DB:n vid confirm,
   // och kör `applySwitch` när alla raderingar är schemalagda. Om inga guests
-  // finns körs `applySwitch` direkt utan prompt. Delas av handleSelectMode
-  // (PtP→IndDev) och handleSelectMaxPlayers (Max 4→12 som auto-snäpper till
-  // IndDev). DB DELETE krävs — utan det skulle host:s fetchNewJoiners-sync
-  // re-injektera guests nästa state-ändring (setLobbyPlayers är UPSERT-only).
+  // finns körs `applySwitch` direkt utan prompt. Används av handleSelectMode
+  // (PtP→IndDev). DB DELETE krävs — utan det skulle host:s fetchNewJoiners-
+  // sync re-injektera guests nästa state-ändring (setLobbyPlayers är
+  // UPSERT-only).
   const confirmAndRemoveManualGuests = (title: string, applySwitch: () => void) => {
     const manualPlayers = players.filter((p) => p.addedByHost);
     if (manualPlayers.length === 0) {
@@ -1594,61 +1594,6 @@ export default function LobbyScreen() {
       return;
     }
     setGameMode(mode);
-  };
-
-  // Försök att välja Max 12 utan Premium → Store-omdirigering. Speglar
-  // handleSelectMode-pattern för Individual Devices utan paket.
-  const handleSelectMaxPlayers = (value: 4 | 12) => {
-    if (value === maxPlayers) return;
-    if (value === 12 && !hasPremium) {
-      Alert.alert(
-        'Premium feature',
-        'Hosting up to 12 players requires the Premium subscription. Get it in the Store?',
-        [
-          { text: 'Cancel', style: 'cancel' },
-          { text: 'Go to Store', onPress: () => router.push({ pathname: '/store' as const, params: { focus: 'subscription', from: '/lobby', fromCode: roomCode } }) },
-        ],
-      );
-      return;
-    }
-    // Max 12 är meningsfullt bara i Individual Devices (PtP capas vid 4
-    // pga orimlig speltid). Om host väljer Max 12 från PtP-läget snäpper
-    // gameMode automatiskt till Individual Devices. Gameplay-loop med
-    // 12 spelare runt EN telefon × 20 rundor = 240 frågor är inte ett
-    // realistiskt scenario.
-    //
-    // Eftersom mode-bytet sker implicit härifrån måste samma guest-
-    // borttagnings-prompt fyras som från handleSelectMode (manuella
-    // guests saknar egen mobil → kan inte spela individual devices).
-    if (value === 12 && gameMode === 'pass-the-phone') {
-      confirmAndRemoveManualGuests('Switch to Max 12 players?', () => {
-        setMaxPlayers(value);
-        setGameMode('individual-devices');
-      });
-      return;
-    }
-    // Inverse: Max 12 → Max 4 medan host kör Individual Devices. Max 4 är
-    // den enda Player-cap som är meningsfull i Pass-the-Phone (12 spelare ×
-    // 20 rundor runt EN telefon = orimligt) så bekräfta dubbel-bytet
-    // explicit istället för att tyst lämna host i IndDev med Max 4.
-    if (value === 4 && gameMode === 'individual-devices') {
-      Alert.alert(
-        'Switch to Max 4 players?',
-        'Do you want to change to Max 4 players and Pass-the-Phone mode?',
-        [
-          { text: 'Cancel', style: 'cancel' },
-          {
-            text: 'Yes',
-            onPress: () => {
-              setMaxPlayers(value);
-              setGameMode('pass-the-phone');
-            },
-          },
-        ],
-      );
-      return;
-    }
-    setMaxPlayers(value);
   };
 
   // Approved spelare = i spelet, har turn-nummer, syns överst.
@@ -2513,6 +2458,11 @@ export default function LobbyScreen() {
               eraTo: String(effectiveEraTo),
               youtubeEnabled: String(effectiveYoutubeEnabled),
               imagesEnabled: String(effectiveProfilesEnabled),
+              // Theme packages aktiva i lobby:n vid speltillfället (non-host
+              // path — efter Realtime-detection av game-started). Speglar
+              // host-path:en så HistoryEntry får samma data oavsett vilken
+              // enhet som triggade navigation till /quiz.
+              selectedExtraPackages: JSON.stringify(settingsStored?.selectedExtraPackages ?? []),
               roomCode,
             },
           });
@@ -2892,6 +2842,11 @@ export default function LobbyScreen() {
         // skyddat upstream.
         youtubeEnabled: String(youtubeEnabled),
         imagesEnabled: String(imagesEnabled),
+        // Theme packages aktiva i lobby:n vid speltillfället. JSON-stringifierad
+        // array av paket-IDs (tom array = Generic). quiz.tsx läser detta för
+        // att frysa in i HistoryEntry så Player history visar vilket paket
+        // spelet kördes med.
+        selectedExtraPackages: JSON.stringify(selectedExtraPackages),
         // Skickas så Quit Game-flödet i quiz.tsx kan deactivera rummet
         // och rensa leftPlayers när host avslutar mitt i ett spel.
         roomCode,
@@ -3135,11 +3090,10 @@ export default function LobbyScreen() {
                     ],
                   );
                 } else {
-                  // Toggle OFF → defaulta till gratis-läget på BÅDA
-                  // toggles (Pass-the-Phone + Max 4) så lobby:n hamnar
-                  // i ett konsekvent multiplayer-läge.
+                  // Toggle OFF → defaulta till Pass-the-Phone så lobby:n
+                  // hamnar i ett konsekvent multiplayer-läge. maxPlayers
+                  // auto-syncar till 4 via gameMode-deriverings-effekten.
                   setGameMode('pass-the-phone');
-                  setMaxPlayers(4);
                   setSinglePlayerDefault(false);
                 }
               }}
@@ -3308,122 +3262,11 @@ export default function LobbyScreen() {
           {hostMode && (
             <Text style={styles.modeDescription}>
               {gameMode === 'pass-the-phone'
-                ? 'Players take turns answering on this single device. Free.'
-                : 'Each player plays simultaneously on their own phone. Requires the Multiplayer Individual Devices package.'}
+                ? 'Use one single device. Max 4 players.'
+                : 'Each player plays on their own device. Max 12 players.'}
             </Text>
           )}
 
-          {/* ── Number of Players per Game ───────────────────────
-              Direkt under Game Mode-toggle:n. Speglar Profile:s host-
-              default-toggle: Max 4 (free, grön aktiv + FREE-badge) vs
-              Max 12 (premium, guld aktiv + PREMIUM-badge). Försök att
-              välja Max 12 utan Premium triggar Store-omdirigering. När
-              singlePlayerDefault är checkad dämpas BÅDA rutorna (samma
-              dimming-mönster som Game Mode-toggle:n ovan). */}
-          <View style={{ marginTop: Spacing.md }}>
-            <Text style={styles.sectionLabel}>Number of Players per Game</Text>
-            <View style={[styles.modeToggle, { marginTop: Spacing.sm }]}>
-              <TouchableOpacity
-                style={[
-                  styles.modeOption,
-                  singlePlayerDefault
-                    ? styles.modeOptionDimmed
-                    : maxPlayers === 4
-                      ? (hostMode ? styles.modeOptionPassActive : styles.modeOptionIndivActive)
-                      : styles.modeOptionInactive,
-                ]}
-                onPress={() => {
-                  if (singlePlayerDefault) {
-                    setSinglePlayerDefault(false);
-                    setGameMode('pass-the-phone');
-                    setMaxPlayers(4);
-                    return;
-                  }
-                  handleSelectMaxPlayers(4);
-                }}
-                disabled={!hostMode}
-                activeOpacity={0.7}
-              >
-                <Text
-                  style={[
-                    styles.modeLabel,
-                    !singlePlayerDefault && maxPlayers === 4 && styles.modeLabelActiveFree,
-                    singlePlayerDefault && styles.modeLabelDimmed,
-                  ]}
-                >
-                  Max 4 Players
-                </Text>
-                {hostMode && (
-                  <View
-                    style={[styles.freeBadge, singlePlayerDefault && styles.freeBadgeDimmed]}
-                    pointerEvents="none"
-                  >
-                    <Text
-                      style={[
-                        styles.freeBadgeText,
-                        singlePlayerDefault && styles.freeBadgeTextDimmed,
-                      ]}
-                    >
-                      FREE
-                    </Text>
-                  </View>
-                )}
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.modeOption,
-                  singlePlayerDefault
-                    ? styles.modeOptionDimmed
-                    : maxPlayers === 12
-                      ? (hostMode ? styles.modeOptionPremiumActive : styles.modeOptionIndivActive)
-                      : styles.modeOptionInactive,
-                ]}
-                onPress={() => {
-                  if (singlePlayerDefault) {
-                    if (!hasPremium) {
-                      handleSelectMaxPlayers(12);
-                      return;
-                    }
-                    setSinglePlayerDefault(false);
-                    setGameMode('pass-the-phone');
-                    setMaxPlayers(12);
-                    return;
-                  }
-                  handleSelectMaxPlayers(12);
-                }}
-                disabled={!hostMode}
-                activeOpacity={0.7}
-              >
-                <Text
-                  style={[
-                    styles.modeLabel,
-                    !singlePlayerDefault && maxPlayers === 12 && (hostMode ? styles.modeLabelActivePremium : styles.modeLabelActiveFree),
-                    singlePlayerDefault && styles.modeLabelDimmed,
-                  ]}
-                >
-                  Max 12 Players
-                </Text>
-                {hostMode && (
-                  <View
-                    style={[
-                      styles.premiumBadge,
-                      (singlePlayerDefault || !(maxPlayers === 12 || hasPremium)) && styles.premiumBadgeGrey,
-                    ]}
-                    pointerEvents="none"
-                  >
-                    <Text
-                      style={[
-                        styles.premiumBadgeText,
-                        (singlePlayerDefault || !(maxPlayers === 12 || hasPremium)) && styles.premiumBadgeTextGrey,
-                      ]}
-                    >
-                      PREMIUM
-                    </Text>
-                  </View>
-                )}
-              </TouchableOpacity>
-            </View>
-          </View>
         </View>
 
         {/* ── Region Scope ──────────────────────────────────────
@@ -4306,27 +4149,11 @@ export default function LobbyScreen() {
               {/* HCP — bara för registrerade spelare. Guest:s HCP
                   auto-deriveras från närmaste age-matched registrerade
                   spelare och kan inte editeras direkt. */}
-              {!playerEditIsGuest && (
-                <View style={playerEditSheet.fieldGroup}>
-                  <Text style={playerEditSheet.fieldLabel}>HCP ({MIN_HCP}–99)</Text>
-                  <TextInput
-                    style={playerEditSheet.hcpInput}
-                    value={editHcpValue}
-                    onChangeText={(t) => setEditHcpValue(t.replace(/[^0-9]/g, '').slice(0, 2))}
-                    keyboardType="number-pad"
-                    maxLength={2}
-                    placeholder="—"
-                    placeholderTextColor={Colors.textDisabled}
-                    returnKeyType="done"
-                    onSubmitEditing={handleSavePlayerEdit}
-                  />
-                </View>
-              )}
-              {playerEditIsGuest && (
-                <Text style={playerEditSheet.guestHcpNote}>
-                  Guest HCP is auto-calculated and cannot be edited.
-                </Text>
-              )}
+              {/* HCP-fält + Guest HCP-not borttagna 2026-05-25 — HCP är
+                  inte en del av V1 release. handleSavePlayerEdit:s
+                  HCP-validering är död kod tills v2 reaktiverar feature:n.
+                  editHcpValue-state samt MIN_HCP-import lämnas kvar för
+                  enkel reaktivering. */}
             </ScrollView>
 
             <TouchableOpacity onPress={handleSavePlayerEdit} style={playerEditSheet.saveBtn}>
