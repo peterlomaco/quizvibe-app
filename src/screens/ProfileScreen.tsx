@@ -1575,7 +1575,7 @@ export default function ProfileScreen() {
             <Pressable
               onPress={() =>
                 WebBrowser.openBrowserAsync(
-                  'https://peterlomaco.github.io/quizvibe-app/legal/privacy/',
+                  'https://legal.quizvibe.se/legal/privacy/',
                 )
               }
               style={({ pressed }) => [
@@ -1590,7 +1590,7 @@ export default function ProfileScreen() {
             <Pressable
               onPress={() =>
                 WebBrowser.openBrowserAsync(
-                  'https://peterlomaco.github.io/quizvibe-app/legal/terms/',
+                  'https://legal.quizvibe.se/legal/terms/',
                 )
               }
               style={({ pressed }) => [

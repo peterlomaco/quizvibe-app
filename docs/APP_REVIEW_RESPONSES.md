@@ -103,7 +103,7 @@ Senast verifierad: 2026-05-22 mot YouTube API Services ToS + Required Minimum Fu
 > - Game history (scores, dates, settings used)
 > - Lobby state (active rooms, player memberships) — auto-deleted after 24h via scheduled cleanup.
 >
-> Privacy Policy: https://peterlomaco.github.io/quizvibe-app/legal/privacy/
+> Privacy Policy: https://legal.quizvibe.se/legal/privacy/
 
 ---
 
