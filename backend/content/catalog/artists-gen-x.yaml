@@ -266,3 +266,131 @@ items:
     probability: 72
     wikimediaSearchHints: ["Belinda Carlisle Go-Gos"]
     answerMethods: ["timeline", "name-letters"]
+  - id: tom-petty
+    displayName: "Tom Petty"
+    correctYear: 1950
+    peakFrom: 1976
+    peakTo: 2017
+    probability: 82
+    wikimediaSearchHints: ["Tom Petty musician Heartbreakers"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: stevie-nicks
+    displayName: "Stevie Nicks"
+    correctYear: 1948
+    peakFrom: 1975
+    peakTo: 2024
+    probability: 82
+    wikimediaSearchHints: ["Stevie Nicks singer Fleetwood Mac"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: don-henley
+    displayName: "Don Henley"
+    correctYear: 1947
+    peakFrom: 1971
+    peakTo: 2024
+    probability: 78
+    wikimediaSearchHints: ["Don Henley Eagles musician"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: shania-twain
+    displayName: "Shania Twain"
+    correctYear: 1965
+    peakFrom: 1993
+    peakTo: 2024
+    probability: 88
+    wikimediaSearchHints: ["Shania Twain country singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: andrea-bocelli
+    displayName: "Andrea Bocelli"
+    correctYear: 1958
+    peakFrom: 1992
+    peakTo: 2024
+    probability: 90
+    wikimediaSearchHints: ["Andrea Bocelli tenor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: garth-brooks
+    displayName: "Garth Brooks"
+    correctYear: 1962
+    peakFrom: 1989
+    peakTo: 2024
+    probability: 78
+    wikimediaSearchHints: ["Garth Brooks country singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: bryan-adams
+    displayName: "Bryan Adams"
+    correctYear: 1959
+    peakFrom: 1979
+    peakTo: 2024
+    probability: 92
+    wikimediaSearchHints: ["Bryan Adams singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: enya
+    displayName: "Enya"
+    correctYear: 1961
+    peakFrom: 1987
+    peakTo: 2024
+    probability: 82
+    wikimediaSearchHints: ["Enya singer Ireland"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: barry-white
+    displayName: "Barry White"
+    correctYear: 1944
+    peakFrom: 1973
+    peakTo: 2003
+    probability: 82
+    wikimediaSearchHints: ["Barry White singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: rick-astley
+    displayName: "Rick Astley"
+    correctYear: 1966
+    peakFrom: 1987
+    peakTo: 2024
+    probability: 82
+    wikimediaSearchHints: ["Rick Astley singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: ricky-martin
+    displayName: "Ricky Martin"
+    correctYear: 1971
+    peakFrom: 1991
+    peakTo: 2024
+    probability: 85
+    wikimediaSearchHints: ["Ricky Martin singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: gloria-estefan
+    displayName: "Gloria Estefan"
+    correctYear: 1957
+    peakFrom: 1984
+    peakTo: 2024
+    probability: 82
+    wikimediaSearchHints: ["Gloria Estefan singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: seal
+    displayName: "Seal"
+    correctYear: 1963
+    peakFrom: 1990
+    peakTo: 2024
+    probability: 82
+    wikimediaSearchHints: ["Seal singer Henry Olusegun"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: bonnie-tyler
+    displayName: "Bonnie Tyler"
+    correctYear: 1951
+    peakFrom: 1976
+    peakTo: 2024
+    probability: 82
+    wikimediaSearchHints: ["Bonnie Tyler singer Welsh"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: kylie-minogue
+    displayName: "Kylie Minogue"
+    correctYear: 1968
+    peakFrom: 1987
+    peakTo: 2024
+    probability: 90
+    wikimediaSearchHints: ["Kylie Minogue singer Australia"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: neneh-cherry
+    displayName: "Neneh Cherry"
+    correctYear: 1964
+    peakFrom: 1988
+    peakTo: 2024
+    probability: 75
+    wikimediaSearchHints: ["Neneh Cherry singer Sweden"]
+    answerMethods: ["timeline", "name-letters"]

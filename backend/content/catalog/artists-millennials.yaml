@@ -282,3 +282,35 @@ items:
     probability: 78
     wikimediaSearchHints: ["Lauryn Hill singer"]
     answerMethods: ["timeline", "name-letters"]
+  - id: enrique-iglesias
+    displayName: "Enrique Iglesias"
+    correctYear: 1975
+    peakFrom: 1995
+    peakTo: 2024
+    probability: 88
+    wikimediaSearchHints: ["Enrique Iglesias singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: gwen-stefani
+    displayName: "Gwen Stefani"
+    correctYear: 1969
+    peakFrom: 1990
+    peakTo: 2024
+    probability: 85
+    wikimediaSearchHints: ["Gwen Stefani"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: marc-anthony
+    displayName: "Marc Anthony"
+    correctYear: 1968
+    peakFrom: 1991
+    peakTo: 2024
+    probability: 80
+    wikimediaSearchHints: ["Marc Anthony singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: tracy-chapman
+    displayName: "Tracy Chapman"
+    correctYear: 1964
+    peakFrom: 1988
+    peakTo: 2024
+    probability: 82
+    wikimediaSearchHints: ["Tracy Chapman singer"]
+    answerMethods: ["timeline", "name-letters"]

@@ -307,3 +307,57 @@ items:
     probability: 80
     wikimediaSearchHints: ["Jakob Ingebrigtsen runner Norway"]
     answerMethods: ["timeline", "name-letters"]
+  - id: andres-iniesta
+    displayName: "Andrés Iniesta"
+    correctYear: 1984
+    probability: 88
+    wikimediaSearchHints: ["Andres Iniesta footballer Barcelona"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: xavi
+    displayName: "Xavi"
+    correctYear: 1980
+    probability: 85
+    wikimediaSearchHints: ["Xavi footballer Barcelona", "Xavi Hernandez"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: chris-paul
+    displayName: "Chris Paul"
+    correctYear: 1985
+    probability: 80
+    wikimediaSearchHints: ["Chris Paul basketball NBA"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: dwyane-wade
+    displayName: "Dwyane Wade"
+    correctYear: 1982
+    probability: 82
+    wikimediaSearchHints: ["Dwyane Wade basketball Heat"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: yao-ming
+    displayName: "Yao Ming"
+    correctYear: 1980
+    probability: 82
+    wikimediaSearchHints: ["Yao Ming basketball China"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: manny-pacquiao
+    displayName: "Manny Pacquiao"
+    correctYear: 1978
+    probability: 85
+    wikimediaSearchHints: ["Manny Pacquiao boxer Philippines"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: venus-williams
+    displayName: "Venus Williams"
+    correctYear: 1980
+    probability: 92
+    wikimediaSearchHints: ["Venus Williams tennis"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: katie-taylor
+    displayName: "Katie Taylor"
+    correctYear: 1986
+    probability: 75
+    wikimediaSearchHints: ["Katie Taylor boxer Ireland"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: stephanie-frappart
+    displayName: "Stéphanie Frappart"
+    correctYear: 1983
+    probability: 72
+    wikimediaSearchHints: ["Stéphanie Frappart referee France"]
+    answerMethods: ["timeline", "name-letters"]

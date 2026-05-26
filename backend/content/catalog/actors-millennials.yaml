@@ -235,3 +235,129 @@ items:
     probability: 80
     wikimediaSearchHints: ["Brie Larson actress"]
     answerMethods: ["timeline", "name-letters"]
+  - id: naomi-watts
+    displayName: "Naomi Watts"
+    correctYear: 1968
+    probability: 80
+    wikimediaSearchHints: ["Naomi Watts actress"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: eva-mendes
+    displayName: "Eva Mendes"
+    correctYear: 1974
+    probability: 78
+    wikimediaSearchHints: ["Eva Mendes actress"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: russell-crowe
+    displayName: "Russell Crowe"
+    correctYear: 1964
+    probability: 85
+    wikimediaSearchHints: ["Russell Crowe actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: kate-hudson
+    displayName: "Kate Hudson"
+    correctYear: 1979
+    probability: 80
+    wikimediaSearchHints: ["Kate Hudson actress"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: drew-barrymore
+    displayName: "Drew Barrymore"
+    correctYear: 1975
+    probability: 85
+    wikimediaSearchHints: ["Drew Barrymore actress"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: cameron-diaz
+    displayName: "Cameron Diaz"
+    correctYear: 1972
+    probability: 88
+    wikimediaSearchHints: ["Cameron Diaz actress"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: gwyneth-paltrow
+    displayName: "Gwyneth Paltrow"
+    correctYear: 1972
+    probability: 85
+    wikimediaSearchHints: ["Gwyneth Paltrow actress"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: uma-thurman
+    displayName: "Uma Thurman"
+    correctYear: 1970
+    probability: 85
+    wikimediaSearchHints: ["Uma Thurman actress"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: jessica-chastain
+    displayName: "Jessica Chastain"
+    correctYear: 1977
+    probability: 78
+    wikimediaSearchHints: ["Jessica Chastain actress"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: amy-adams
+    displayName: "Amy Adams"
+    correctYear: 1974
+    probability: 80
+    wikimediaSearchHints: ["Amy Adams actress"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: marion-cotillard
+    displayName: "Marion Cotillard"
+    correctYear: 1975
+    probability: 78
+    wikimediaSearchHints: ["Marion Cotillard actress"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: ewan-mcgregor
+    displayName: "Ewan McGregor"
+    correctYear: 1971
+    probability: 88
+    wikimediaSearchHints: ["Ewan McGregor actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: colin-firth
+    displayName: "Colin Firth"
+    correctYear: 1960
+    probability: 85
+    wikimediaSearchHints: ["Colin Firth actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: jason-statham
+    displayName: "Jason Statham"
+    correctYear: 1967
+    probability: 88
+    wikimediaSearchHints: ["Jason Statham actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: bradley-cooper
+    displayName: "Bradley Cooper"
+    correctYear: 1975
+    probability: 85
+    wikimediaSearchHints: ["Bradley Cooper actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: tom-hiddleston
+    displayName: "Tom Hiddleston"
+    correctYear: 1981
+    probability: 82
+    wikimediaSearchHints: ["Tom Hiddleston actor Loki"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: benedict-cumberbatch
+    displayName: "Benedict Cumberbatch"
+    correctYear: 1976
+    probability: 88
+    wikimediaSearchHints: ["Benedict Cumberbatch actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: rachel-weisz
+    displayName: "Rachel Weisz"
+    correctYear: 1970
+    probability: 80
+    wikimediaSearchHints: ["Rachel Weisz actress"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: keira-knightley
+    displayName: "Keira Knightley"
+    correctYear: 1985
+    probability: 88
+    wikimediaSearchHints: ["Keira Knightley actress"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: anne-hathaway
+    displayName: "Anne Hathaway"
+    correctYear: 1982
+    probability: 88
+    wikimediaSearchHints: ["Anne Hathaway actress"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: milla-jovovich
+    displayName: "Milla Jovovich"
+    correctYear: 1975
+    probability: 78
+    wikimediaSearchHints: ["Milla Jovovich actress"]
+    answerMethods: ["timeline", "name-letters"]

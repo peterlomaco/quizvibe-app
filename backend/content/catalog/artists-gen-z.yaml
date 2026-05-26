@@ -292,3 +292,27 @@ items:
     probability: 78
     wikimediaSearchHints: ["Khalid singer"]
     answerMethods: ["timeline", "name-letters"]
+  - id: lil-nas-x
+    displayName: "Lil Nas X"
+    correctYear: 1999
+    peakFrom: 2018
+    peakTo: 2024
+    probability: 80
+    wikimediaSearchHints: ["Lil Nas X rapper"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: maluma
+    displayName: "Maluma"
+    correctYear: 1994
+    peakFrom: 2014
+    peakTo: 2024
+    probability: 75
+    wikimediaSearchHints: ["Maluma singer Colombia"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: jack-harlow
+    displayName: "Jack Harlow"
+    correctYear: 1998
+    peakFrom: 2020
+    peakTo: 2024
+    probability: 72
+    wikimediaSearchHints: ["Jack Harlow rapper"]
+    answerMethods: ["timeline", "name-letters"]

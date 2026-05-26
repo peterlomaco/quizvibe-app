@@ -277,3 +277,105 @@ items:
     probability: 95
     wikimediaSearchHints: ["Michael Schumacher Formula 1"]
     answerMethods: ["timeline", "name-letters"]
+  - id: zinedine-zidane
+    displayName: "Zinédine Zidane"
+    correctYear: 1972
+    probability: 92
+    wikimediaSearchHints: ["Zinedine Zidane footballer France"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: kareem-abdul-jabbar
+    displayName: "Kareem Abdul-Jabbar"
+    correctYear: 1947
+    probability: 88
+    wikimediaSearchHints: ["Kareem Abdul-Jabbar basketball"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: jimmy-connors
+    displayName: "Jimmy Connors"
+    correctYear: 1952
+    probability: 82
+    wikimediaSearchHints: ["Jimmy Connors tennis"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: andre-agassi
+    displayName: "Andre Agassi"
+    correctYear: 1970
+    probability: 92
+    wikimediaSearchHints: ["Andre Agassi tennis"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: pete-sampras
+    displayName: "Pete Sampras"
+    correctYear: 1971
+    probability: 90
+    wikimediaSearchHints: ["Pete Sampras tennis"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: shaquille-oneal
+    displayName: "Shaquille O'Neal"
+    correctYear: 1972
+    probability: 92
+    wikimediaSearchHints: ["Shaquille O'Neal basketball"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: charles-barkley
+    displayName: "Charles Barkley"
+    correctYear: 1963
+    probability: 82
+    wikimediaSearchHints: ["Charles Barkley basketball"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: lennox-lewis
+    displayName: "Lennox Lewis"
+    correctYear: 1965
+    probability: 80
+    wikimediaSearchHints: ["Lennox Lewis boxer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: ronaldo-brazil
+    displayName: "Ronaldo"
+    correctYear: 1976
+    probability: 90
+    wikimediaSearchHints: ["Ronaldo Brazilian footballer R9"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: paul-gascoigne
+    displayName: "Paul Gascoigne"
+    correctYear: 1967
+    probability: 82
+    wikimediaSearchHints: ["Paul Gascoigne footballer Gazza"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: david-beckham
+    displayName: "David Beckham"
+    correctYear: 1975
+    probability: 96
+    wikimediaSearchHints: ["David Beckham footballer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: ronaldinho
+    displayName: "Ronaldinho"
+    correctYear: 1980
+    probability: 92
+    wikimediaSearchHints: ["Ronaldinho footballer Brazil"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: arthur-ashe
+    displayName: "Arthur Ashe"
+    correctYear: 1943
+    probability: 80
+    wikimediaSearchHints: ["Arthur Ashe tennis"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: franco-baresi
+    displayName: "Franco Baresi"
+    correctYear: 1960
+    probability: 75
+    wikimediaSearchHints: ["Franco Baresi footballer Milan"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: kenny-dalglish
+    displayName: "Kenny Dalglish"
+    correctYear: 1951
+    probability: 78
+    wikimediaSearchHints: ["Kenny Dalglish footballer Liverpool"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: ian-rush
+    displayName: "Ian Rush"
+    correctYear: 1961
+    probability: 75
+    wikimediaSearchHints: ["Ian Rush footballer Liverpool"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: gabriela-sabatini
+    displayName: "Gabriela Sabatini"
+    correctYear: 1970
+    probability: 80
+    wikimediaSearchHints: ["Gabriela Sabatini tennis Argentina"]
+    answerMethods: ["timeline", "name-letters"]

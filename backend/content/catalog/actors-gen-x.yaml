@@ -269,3 +269,117 @@ items:
     probability: 78
     wikimediaSearchHints: ["Kurt Russell actor"]
     answerMethods: ["timeline", "name-letters"]
+  - id: burt-reynolds
+    displayName: "Burt Reynolds"
+    correctYear: 1936
+    probability: 80
+    wikimediaSearchHints: ["Burt Reynolds actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: donald-sutherland
+    displayName: "Donald Sutherland"
+    correctYear: 1935
+    probability: 80
+    wikimediaSearchHints: ["Donald Sutherland actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: warren-beatty
+    displayName: "Warren Beatty"
+    correctYear: 1937
+    probability: 78
+    wikimediaSearchHints: ["Warren Beatty actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: sharon-stone
+    displayName: "Sharon Stone"
+    correctYear: 1958
+    probability: 82
+    wikimediaSearchHints: ["Sharon Stone actress"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: demi-moore
+    displayName: "Demi Moore"
+    correctYear: 1962
+    probability: 85
+    wikimediaSearchHints: ["Demi Moore actress"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: halle-berry
+    displayName: "Halle Berry"
+    correctYear: 1966
+    probability: 88
+    wikimediaSearchHints: ["Halle Berry actress"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: salma-hayek
+    displayName: "Salma Hayek"
+    correctYear: 1966
+    probability: 85
+    wikimediaSearchHints: ["Salma Hayek actress"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: owen-wilson
+    displayName: "Owen Wilson"
+    correctYear: 1968
+    probability: 82
+    wikimediaSearchHints: ["Owen Wilson actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: vince-vaughn
+    displayName: "Vince Vaughn"
+    correctYear: 1970
+    probability: 78
+    wikimediaSearchHints: ["Vince Vaughn actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: robert-duvall
+    displayName: "Robert Duvall"
+    correctYear: 1931
+    probability: 78
+    wikimediaSearchHints: ["Robert Duvall actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: faye-dunaway
+    displayName: "Faye Dunaway"
+    correctYear: 1941
+    probability: 75
+    wikimediaSearchHints: ["Faye Dunaway actress"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: john-malkovich
+    displayName: "John Malkovich"
+    correctYear: 1953
+    probability: 80
+    wikimediaSearchHints: ["John Malkovich actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: kevin-bacon
+    displayName: "Kevin Bacon"
+    correctYear: 1958
+    probability: 80
+    wikimediaSearchHints: ["Kevin Bacon actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: nicolas-cage
+    displayName: "Nicolas Cage"
+    correctYear: 1964
+    probability: 85
+    wikimediaSearchHints: ["Nicolas Cage actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: john-cleese
+    displayName: "John Cleese"
+    correctYear: 1939
+    probability: 88
+    wikimediaSearchHints: ["John Cleese actor Monty Python"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: ron-howard
+    displayName: "Ron Howard"
+    correctYear: 1954
+    probability: 80
+    wikimediaSearchHints: ["Ron Howard director actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: kenneth-branagh
+    displayName: "Kenneth Branagh"
+    correctYear: 1960
+    probability: 78
+    wikimediaSearchHints: ["Kenneth Branagh actor director"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: jim-broadbent
+    displayName: "Jim Broadbent"
+    correctYear: 1949
+    probability: 72
+    wikimediaSearchHints: ["Jim Broadbent actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: james-spader
+    displayName: "James Spader"
+    correctYear: 1960
+    probability: 75
+    wikimediaSearchHints: ["James Spader actor"]
+    answerMethods: ["timeline", "name-letters"]

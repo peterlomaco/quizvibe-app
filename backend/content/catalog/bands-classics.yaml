@@ -308,3 +308,39 @@ items:
     probability: 88
     wikimediaSearchHints: ["Bee Gees band brothers"]
     answerMethods: ["timeline", "name-letters"]
+  - id: aha
+    displayName: "a-ha"
+    correctYear: 1982
+    probability: 90
+    wikimediaSearchHints: ["a-ha"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: eurythmics
+    displayName: "Eurythmics"
+    correctYear: 1980
+    probability: 85
+    wikimediaSearchHints: ["Eurythmics band Annie Lennox"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: oasis
+    displayName: "Oasis"
+    correctYear: 1991
+    probability: 92
+    wikimediaSearchHints: ["Oasis band Gallagher Manchester"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: blur
+    displayName: "Blur"
+    correctYear: 1988
+    probability: 80
+    wikimediaSearchHints: ["Blur band Damon Albarn"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: roxette
+    displayName: "Roxette"
+    correctYear: 1986
+    probability: 92
+    wikimediaSearchHints: ["Roxette band Sweden"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: ace-of-base
+    displayName: "Ace of Base"
+    correctYear: 1990
+    probability: 90
+    wikimediaSearchHints: ["Ace of Base Sweden band"]
+    answerMethods: ["timeline", "name-letters"]

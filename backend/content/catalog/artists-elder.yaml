@@ -271,3 +271,43 @@ items:
     probability: 72
     wikimediaSearchHints: ["Pat Boone singer"]
     answerMethods: ["timeline", "name-letters"]
+  - id: lena-horne
+    displayName: "Lena Horne"
+    correctYear: 1917
+    peakFrom: 1942
+    peakTo: 2010
+    probability: 72
+    wikimediaSearchHints: ["Lena Horne singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: eartha-kitt
+    displayName: "Eartha Kitt"
+    correctYear: 1927
+    peakFrom: 1952
+    peakTo: 2008
+    probability: 72
+    wikimediaSearchHints: ["Eartha Kitt singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: donna-summer
+    displayName: "Donna Summer"
+    correctYear: 1948
+    peakFrom: 1974
+    peakTo: 2012
+    probability: 85
+    wikimediaSearchHints: ["Donna Summer disco singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: lionel-richie
+    displayName: "Lionel Richie"
+    correctYear: 1949
+    peakFrom: 1968
+    peakTo: 2024
+    probability: 90
+    wikimediaSearchHints: ["Lionel Richie singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: barbra-streisand
+    displayName: "Barbra Streisand"
+    correctYear: 1942
+    peakFrom: 1963
+    peakTo: 2024
+    probability: 88
+    wikimediaSearchHints: ["Barbra Streisand singer"]
+    answerMethods: ["timeline", "name-letters"]
