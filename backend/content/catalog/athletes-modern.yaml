@@ -67,12 +67,6 @@ items:
     probability: 88
     wikimediaSearchHints: ["Simone Biles gymnastics"]
     answerMethods: ["timeline", "name-letters"]
-  - id: tiger-woods
-    displayName: "Tiger Woods"
-    correctYear: 1975
-    probability: 92
-    wikimediaSearchHints: ["Tiger Woods golf"]
-    answerMethods: ["timeline", "name-letters"]
   - id: lewis-hamilton
     displayName: "Lewis Hamilton"
     correctYear: 1985

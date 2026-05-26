@@ -43,3 +43,63 @@ items:
     probability: 82
     wikimediaSearchHints: ["Saoirse Ronan actress"]
     answerMethods: ["timeline", "name-letters"]
+  - id: daniel-radcliffe
+    displayName: "Daniel Radcliffe"
+    correctYear: 1989
+    probability: 90
+    wikimediaSearchHints: ["Daniel Radcliffe actor Harry Potter"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: emma-watson
+    displayName: "Emma Watson"
+    correctYear: 1990
+    probability: 92
+    wikimediaSearchHints: ["Emma Watson actress"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: robert-pattinson
+    displayName: "Robert Pattinson"
+    correctYear: 1986
+    probability: 88
+    wikimediaSearchHints: ["Robert Pattinson actor Twilight"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: kristen-stewart
+    displayName: "Kristen Stewart"
+    correctYear: 1990
+    probability: 85
+    wikimediaSearchHints: ["Kristen Stewart actress"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: andrew-garfield
+    displayName: "Andrew Garfield"
+    correctYear: 1983
+    probability: 82
+    wikimediaSearchHints: ["Andrew Garfield actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: sydney-sweeney
+    displayName: "Sydney Sweeney"
+    correctYear: 1997
+    probability: 80
+    wikimediaSearchHints: ["Sydney Sweeney actress"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: jacob-elordi
+    displayName: "Jacob Elordi"
+    correctYear: 1997
+    probability: 80
+    wikimediaSearchHints: ["Jacob Elordi actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: finn-wolfhard
+    displayName: "Finn Wolfhard"
+    correctYear: 2002
+    probability: 78
+    wikimediaSearchHints: ["Finn Wolfhard actor Stranger Things"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: sadie-sink
+    displayName: "Sadie Sink"
+    correctYear: 2002
+    probability: 75
+    wikimediaSearchHints: ["Sadie Sink actress Stranger Things"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: noah-schnapp
+    displayName: "Noah Schnapp"
+    correctYear: 2004
+    probability: 75
+    wikimediaSearchHints: ["Noah Schnapp actor Stranger Things"]
+    answerMethods: ["timeline", "name-letters"]

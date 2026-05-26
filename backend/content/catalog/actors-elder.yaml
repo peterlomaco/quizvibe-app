@@ -53,3 +53,57 @@ items:
     probability: 82
     wikimediaSearchHints: ["Humphrey Bogart actor Casablanca"]
     answerMethods: ["timeline", "name-letters"]
+  - id: james-dean
+    displayName: "James Dean"
+    correctYear: 1931
+    probability: 82
+    wikimediaSearchHints: ["James Dean actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: james-stewart
+    displayName: "James Stewart"
+    correctYear: 1908
+    probability: 80
+    wikimediaSearchHints: ["James Stewart actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: bette-davis
+    displayName: "Bette Davis"
+    correctYear: 1908
+    probability: 80
+    wikimediaSearchHints: ["Bette Davis actress"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: clark-gable
+    displayName: "Clark Gable"
+    correctYear: 1901
+    probability: 80
+    wikimediaSearchHints: ["Clark Gable actor Gone with the Wind"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: gregory-peck
+    displayName: "Gregory Peck"
+    correctYear: 1916
+    probability: 78
+    wikimediaSearchHints: ["Gregory Peck actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: vivien-leigh
+    displayName: "Vivien Leigh"
+    correctYear: 1913
+    probability: 78
+    wikimediaSearchHints: ["Vivien Leigh actress"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: charlie-chaplin
+    displayName: "Charlie Chaplin"
+    correctYear: 1889
+    probability: 90
+    wikimediaSearchHints: ["Charlie Chaplin actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: spencer-tracy
+    displayName: "Spencer Tracy"
+    correctYear: 1900
+    probability: 78
+    wikimediaSearchHints: ["Spencer Tracy actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: gary-cooper
+    displayName: "Gary Cooper"
+    correctYear: 1901
+    probability: 78
+    wikimediaSearchHints: ["Gary Cooper actor"]
+    answerMethods: ["timeline", "name-letters"]

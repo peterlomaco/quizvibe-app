@@ -67,3 +67,99 @@ items:
     probability: 92
     wikimediaSearchHints: ["Robert Downey Jr actor Iron Man"]
     answerMethods: ["timeline", "name-letters"]
+  - id: sandra-bullock
+    displayName: "Sandra Bullock"
+    correctYear: 1964
+    probability: 90
+    wikimediaSearchHints: ["Sandra Bullock actress"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: reese-witherspoon
+    displayName: "Reese Witherspoon"
+    correctYear: 1976
+    probability: 85
+    wikimediaSearchHints: ["Reese Witherspoon actress"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: jude-law
+    displayName: "Jude Law"
+    correctYear: 1972
+    probability: 85
+    wikimediaSearchHints: ["Jude Law actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: christian-bale
+    displayName: "Christian Bale"
+    correctYear: 1974
+    probability: 88
+    wikimediaSearchHints: ["Christian Bale actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: matt-damon
+    displayName: "Matt Damon"
+    correctYear: 1970
+    probability: 90
+    wikimediaSearchHints: ["Matt Damon actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: ben-affleck
+    displayName: "Ben Affleck"
+    correctYear: 1972
+    probability: 88
+    wikimediaSearchHints: ["Ben Affleck actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: ryan-reynolds
+    displayName: "Ryan Reynolds"
+    correctYear: 1976
+    probability: 90
+    wikimediaSearchHints: ["Ryan Reynolds actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: ryan-gosling
+    displayName: "Ryan Gosling"
+    correctYear: 1980
+    probability: 88
+    wikimediaSearchHints: ["Ryan Gosling actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: jake-gyllenhaal
+    displayName: "Jake Gyllenhaal"
+    correctYear: 1980
+    probability: 85
+    wikimediaSearchHints: ["Jake Gyllenhaal actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: cate-blanchett
+    displayName: "Cate Blanchett"
+    correctYear: 1969
+    probability: 85
+    wikimediaSearchHints: ["Cate Blanchett actress"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: kate-winslet
+    displayName: "Kate Winslet"
+    correctYear: 1975
+    probability: 90
+    wikimediaSearchHints: ["Kate Winslet actress"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: nicole-kidman
+    displayName: "Nicole Kidman"
+    correctYear: 1967
+    probability: 90
+    wikimediaSearchHints: ["Nicole Kidman actress"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: charlize-theron
+    displayName: "Charlize Theron"
+    correctYear: 1975
+    probability: 85
+    wikimediaSearchHints: ["Charlize Theron actress"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: penelope-cruz
+    displayName: "Penélope Cruz"
+    correctYear: 1974
+    probability: 82
+    wikimediaSearchHints: ["Penelope Cruz actress"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: adam-sandler
+    displayName: "Adam Sandler"
+    correctYear: 1966
+    probability: 85
+    wikimediaSearchHints: ["Adam Sandler actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: will-ferrell
+    displayName: "Will Ferrell"
+    correctYear: 1967
+    probability: 82
+    wikimediaSearchHints: ["Will Ferrell actor"]
+    answerMethods: ["timeline", "name-letters"]

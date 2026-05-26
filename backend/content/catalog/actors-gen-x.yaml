@@ -89,3 +89,93 @@ items:
     probability: 85
     wikimediaSearchHints: ["Anthony Hopkins actor"]
     answerMethods: ["timeline", "name-letters"]
+  - id: robert-redford
+    displayName: "Robert Redford"
+    correctYear: 1936
+    probability: 85
+    wikimediaSearchHints: ["Robert Redford actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: paul-newman
+    displayName: "Paul Newman"
+    correctYear: 1925
+    probability: 82
+    wikimediaSearchHints: ["Paul Newman actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: gene-hackman
+    displayName: "Gene Hackman"
+    correctYear: 1930
+    probability: 80
+    wikimediaSearchHints: ["Gene Hackman actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: dustin-hoffman
+    displayName: "Dustin Hoffman"
+    correctYear: 1937
+    probability: 85
+    wikimediaSearchHints: ["Dustin Hoffman actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: diane-keaton
+    displayName: "Diane Keaton"
+    correctYear: 1946
+    probability: 82
+    wikimediaSearchHints: ["Diane Keaton actress"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: susan-sarandon
+    displayName: "Susan Sarandon"
+    correctYear: 1946
+    probability: 82
+    wikimediaSearchHints: ["Susan Sarandon actress"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: goldie-hawn
+    displayName: "Goldie Hawn"
+    correctYear: 1945
+    probability: 82
+    wikimediaSearchHints: ["Goldie Hawn actress"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: jeff-bridges
+    displayName: "Jeff Bridges"
+    correctYear: 1949
+    probability: 80
+    wikimediaSearchHints: ["Jeff Bridges actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: liam-neeson
+    displayName: "Liam Neeson"
+    correctYear: 1952
+    probability: 88
+    wikimediaSearchHints: ["Liam Neeson actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: tom-selleck
+    displayName: "Tom Selleck"
+    correctYear: 1945
+    probability: 82
+    wikimediaSearchHints: ["Tom Selleck actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: whoopi-goldberg
+    displayName: "Whoopi Goldberg"
+    correctYear: 1955
+    probability: 85
+    wikimediaSearchHints: ["Whoopi Goldberg actress"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: eddie-murphy
+    displayName: "Eddie Murphy"
+    correctYear: 1961
+    probability: 88
+    wikimediaSearchHints: ["Eddie Murphy actor comedian"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: denzel-washington
+    displayName: "Denzel Washington"
+    correctYear: 1954
+    probability: 90
+    wikimediaSearchHints: ["Denzel Washington actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: samuel-l-jackson
+    displayName: "Samuel L. Jackson"
+    correctYear: 1948
+    probability: 90
+    wikimediaSearchHints: ["Samuel L Jackson actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: helena-bonham-carter
+    displayName: "Helena Bonham Carter"
+    correctYear: 1966
+    probability: 80
+    wikimediaSearchHints: ["Helena Bonham Carter actress"]
+    answerMethods: ["timeline", "name-letters"]
