@@ -71,3 +71,11 @@ items:
     probability: 88
     wikimediaSearchHints: ["Stevie Wonder"]
     answerMethods: ["timeline", "name-letters"]
+  - id: tina-turner
+    displayName: "Tina Turner"
+    correctYear: 1939
+    peakFrom: 1960
+    peakTo: 2023
+    probability: 88
+    wikimediaSearchHints: ["Tina Turner singer"]
+    answerMethods: ["timeline", "name-letters"]

@@ -82,3 +82,11 @@ items:
     probability: 85
     wikimediaSearchHints: ["Pink singer P!nk Alecia Moore"]
     answerMethods: ["timeline", "name-letters"]
+  - id: mariah-carey
+    displayName: "Mariah Carey"
+    correctYear: 1969
+    peakFrom: 1990
+    peakTo: 2024
+    probability: 90
+    wikimediaSearchHints: ["Mariah Carey singer"]
+    answerMethods: ["timeline", "name-letters"]

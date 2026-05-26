@@ -47,3 +47,9 @@ items:
     probability: 90
     wikimediaSearchHints: ["Sean Connery actor James Bond"]
     answerMethods: ["timeline", "name-letters"]
+  - id: humphrey-bogart
+    displayName: "Humphrey Bogart"
+    correctYear: 1899
+    probability: 82
+    wikimediaSearchHints: ["Humphrey Bogart actor Casablanca"]
+    answerMethods: ["timeline", "name-letters"]

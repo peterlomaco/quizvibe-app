@@ -91,3 +91,27 @@ items:
     probability: 82
     wikimediaSearchHints: ["Naomi Osaka tennis"]
     answerMethods: ["timeline", "name-letters"]
+  - id: rafael-nadal
+    displayName: "Rafael Nadal"
+    correctYear: 1986
+    probability: 94
+    wikimediaSearchHints: ["Rafael Nadal tennis"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: novak-djokovic
+    displayName: "Novak Djokovic"
+    correctYear: 1987
+    probability: 92
+    wikimediaSearchHints: ["Novak Djokovic tennis"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: kylian-mbappe
+    displayName: "Kylian Mbappé"
+    correctYear: 1998
+    probability: 92
+    wikimediaSearchHints: ["Kylian Mbappé footballer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: mo-salah
+    displayName: "Mohamed Salah"
+    correctYear: 1992
+    probability: 90
+    wikimediaSearchHints: ["Mohamed Salah footballer Liverpool"]
+    answerMethods: ["timeline", "name-letters"]

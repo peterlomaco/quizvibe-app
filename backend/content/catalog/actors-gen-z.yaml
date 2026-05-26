@@ -31,3 +31,9 @@ items:
     probability: 85
     wikimediaSearchHints: ["Timothée Chalamet actor"]
     answerMethods: ["timeline", "name-letters"]
+  - id: anya-taylor-joy
+    displayName: "Anya Taylor-Joy"
+    correctYear: 1996
+    probability: 82
+    wikimediaSearchHints: ["Anya Taylor-Joy actress"]
+    answerMethods: ["timeline", "name-letters"]

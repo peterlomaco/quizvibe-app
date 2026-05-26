@@ -49,3 +49,9 @@ items:
     probability: 92
     wikimediaSearchHints: ["Will Smith actor"]
     answerMethods: ["timeline", "name-letters"]
+  - id: johnny-depp
+    displayName: "Johnny Depp"
+    correctYear: 1963
+    probability: 90
+    wikimediaSearchHints: ["Johnny Depp actor"]
+    answerMethods: ["timeline", "name-letters"]

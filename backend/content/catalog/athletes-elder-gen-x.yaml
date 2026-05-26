@@ -97,3 +97,15 @@ items:
     probability: 88
     wikimediaSearchHints: ["Boris Becker tennis"]
     answerMethods: ["timeline", "name-letters"]
+  - id: joe-montana
+    displayName: "Joe Montana"
+    correctYear: 1956
+    probability: 80
+    wikimediaSearchHints: ["Joe Montana NFL quarterback"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: john-mcenroe
+    displayName: "John McEnroe"
+    correctYear: 1959
+    probability: 88
+    wikimediaSearchHints: ["John McEnroe tennis"]
+    answerMethods: ["timeline", "name-letters"]

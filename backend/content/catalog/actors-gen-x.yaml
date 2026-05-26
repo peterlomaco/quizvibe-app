@@ -53,3 +53,21 @@ items:
     probability: 88
     wikimediaSearchHints: ["Robert De Niro actor"]
     answerMethods: ["timeline", "name-letters"]
+  - id: jim-carrey
+    displayName: "Jim Carrey"
+    correctYear: 1962
+    probability: 88
+    wikimediaSearchHints: ["Jim Carrey actor comedian"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: bruce-willis
+    displayName: "Bruce Willis"
+    correctYear: 1955
+    probability: 88
+    wikimediaSearchHints: ["Bruce Willis actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: sigourney-weaver
+    displayName: "Sigourney Weaver"
+    correctYear: 1949
+    probability: 80
+    wikimediaSearchHints: ["Sigourney Weaver actress"]
+    answerMethods: ["timeline", "name-letters"]

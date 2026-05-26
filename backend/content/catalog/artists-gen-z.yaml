@@ -76,3 +76,19 @@ items:
     probability: 90
     wikimediaSearchHints: ["Dua Lipa singer"]
     answerMethods: ["timeline", "name-letters"]
+  - id: harry-styles
+    displayName: "Harry Styles"
+    correctYear: 1994
+    peakFrom: 2010
+    peakTo: 2024
+    probability: 88
+    wikimediaSearchHints: ["Harry Styles singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: post-malone
+    displayName: "Post Malone"
+    correctYear: 1995
+    peakFrom: 2015
+    peakTo: 2024
+    probability: 85
+    wikimediaSearchHints: ["Post Malone rapper"]
+    answerMethods: ["timeline", "name-letters"]

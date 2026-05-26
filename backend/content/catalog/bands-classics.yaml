@@ -128,3 +128,27 @@ items:
     probability: 82
     wikimediaSearchHints: ["Arctic Monkeys band Alex Turner"]
     answerMethods: ["timeline", "name-letters"]
+  - id: red-hot-chili-peppers
+    displayName: "Red Hot Chili Peppers"
+    correctYear: 1983
+    probability: 88
+    wikimediaSearchHints: ["Red Hot Chili Peppers band"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: green-day
+    displayName: "Green Day"
+    correctYear: 1986
+    probability: 85
+    wikimediaSearchHints: ["Green Day band punk"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: linkin-park
+    displayName: "Linkin Park"
+    correctYear: 1996
+    probability: 85
+    wikimediaSearchHints: ["Linkin Park band Chester Bennington"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: imagine-dragons
+    displayName: "Imagine Dragons"
+    correctYear: 2008
+    probability: 82
+    wikimediaSearchHints: ["Imagine Dragons band"]
+    answerMethods: ["timeline", "name-letters"]
