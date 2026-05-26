@@ -205,3 +205,75 @@ items:
     probability: 90
     wikimediaSearchHints: ["Henrik Larsson footballer Sweden Celtic"]
     answerMethods: ["timeline", "name-letters"]
+  - id: nadia-comaneci
+    displayName: "Nadia Comăneci"
+    correctYear: 1961
+    probability: 88
+    wikimediaSearchHints: ["Nadia Comaneci gymnast Romania"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: olga-korbut
+    displayName: "Olga Korbut"
+    correctYear: 1955
+    probability: 78
+    wikimediaSearchHints: ["Olga Korbut gymnast Soviet"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: katarina-witt
+    displayName: "Katarina Witt"
+    correctYear: 1965
+    probability: 82
+    wikimediaSearchHints: ["Katarina Witt figure skater"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: alberto-tomba
+    displayName: "Alberto Tomba"
+    correctYear: 1966
+    probability: 82
+    wikimediaSearchHints: ["Alberto Tomba skier Italy"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: jean-claude-killy
+    displayName: "Jean-Claude Killy"
+    correctYear: 1943
+    probability: 75
+    wikimediaSearchHints: ["Jean-Claude Killy skier France"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: eddy-merckx
+    displayName: "Eddy Merckx"
+    correctYear: 1945
+    probability: 78
+    wikimediaSearchHints: ["Eddy Merckx cyclist Belgium"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: bjorn-daehlie
+    displayName: "Bjørn Dæhlie"
+    correctYear: 1967
+    probability: 85
+    wikimediaSearchHints: ["Bjørn Dæhlie skier Norway"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: niki-lauda
+    displayName: "Niki Lauda"
+    correctYear: 1949
+    probability: 85
+    wikimediaSearchHints: ["Niki Lauda Formula 1"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: ayrton-senna
+    displayName: "Ayrton Senna"
+    correctYear: 1960
+    probability: 92
+    wikimediaSearchHints: ["Ayrton Senna Formula 1 Brazil"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: alain-prost
+    displayName: "Alain Prost"
+    correctYear: 1955
+    probability: 82
+    wikimediaSearchHints: ["Alain Prost Formula 1 France"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: jackie-stewart
+    displayName: "Jackie Stewart"
+    correctYear: 1939
+    probability: 75
+    wikimediaSearchHints: ["Jackie Stewart Formula 1"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: michael-schumacher
+    displayName: "Michael Schumacher"
+    correctYear: 1969
+    probability: 95
+    wikimediaSearchHints: ["Michael Schumacher Formula 1"]
+    answerMethods: ["timeline", "name-letters"]

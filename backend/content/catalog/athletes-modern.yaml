@@ -235,3 +235,75 @@ items:
     probability: 90
     wikimediaSearchHints: ["Carolina Klüft heptathlon Sweden"]
     answerMethods: ["timeline", "name-letters"]
+  - id: max-verstappen
+    displayName: "Max Verstappen"
+    correctYear: 1997
+    probability: 92
+    wikimediaSearchHints: ["Max Verstappen Formula 1"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: valentino-rossi
+    displayName: "Valentino Rossi"
+    correctYear: 1979
+    probability: 88
+    wikimediaSearchHints: ["Valentino Rossi MotoGP"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: sebastian-vettel
+    displayName: "Sebastian Vettel"
+    correctYear: 1987
+    probability: 90
+    wikimediaSearchHints: ["Sebastian Vettel Formula 1"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: daniil-medvedev
+    displayName: "Daniil Medvedev"
+    correctYear: 1996
+    probability: 82
+    wikimediaSearchHints: ["Daniil Medvedev tennis"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: jannik-sinner
+    displayName: "Jannik Sinner"
+    correctYear: 2001
+    probability: 80
+    wikimediaSearchHints: ["Jannik Sinner tennis"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: katie-ledecky
+    displayName: "Katie Ledecky"
+    correctYear: 1997
+    probability: 85
+    wikimediaSearchHints: ["Katie Ledecky swimmer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: shelly-ann-fraser-pryce
+    displayName: "Shelly-Ann Fraser-Pryce"
+    correctYear: 1986
+    probability: 78
+    wikimediaSearchHints: ["Shelly-Ann Fraser-Pryce sprinter"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: megan-rapinoe
+    displayName: "Megan Rapinoe"
+    correctYear: 1985
+    probability: 82
+    wikimediaSearchHints: ["Megan Rapinoe soccer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: alex-morgan
+    displayName: "Alex Morgan"
+    correctYear: 1989
+    probability: 82
+    wikimediaSearchHints: ["Alex Morgan soccer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: adam-peaty
+    displayName: "Adam Peaty"
+    correctYear: 1994
+    probability: 80
+    wikimediaSearchHints: ["Adam Peaty swimmer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: karsten-warholm
+    displayName: "Karsten Warholm"
+    correctYear: 1996
+    probability: 82
+    wikimediaSearchHints: ["Karsten Warholm hurdler Norway"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: jakob-ingebrigtsen
+    displayName: "Jakob Ingebrigtsen"
+    correctYear: 2000
+    probability: 80
+    wikimediaSearchHints: ["Jakob Ingebrigtsen runner Norway"]
+    answerMethods: ["timeline", "name-letters"]
