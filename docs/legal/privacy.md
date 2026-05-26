@@ -64,7 +64,6 @@ Guests do not provide email/password. Guests are identified by an anonymous sess
 ### 2.3 Information we automatically collect
 
 - **In-app actions** for analytics — e.g., "user registered", "game completed", "purchase made". We log event names, not personal content.
-- **Crash logs and error reports** — to help us fix bugs. We do not collect contents of what you typed.
 
 ### 2.4 What we do NOT collect
 
@@ -138,7 +137,6 @@ GitHub's Privacy Policy: https://docs.github.com/en/site-policy/privacy-policies
 | Guest anonymous session | Until you leave the game (immediate) or 30 days of inactivity. |
 | Lobby state (room codes, player list) | Auto-deleted 24 hours after the lobby was created. |
 | Analytics events (anonymized) | 90 days, then aggregated and de-identified for long-term retention. |
-| Crash logs | 90 days. |
 | IP addresses (rate-limit tracking) | 1 hour, then automatically purged. |
 | In-app purchase records | 7 years (Swedish accounting law requirement for businesses; even though we are a personal project, we follow this conservatively). |
 
