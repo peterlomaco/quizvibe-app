@@ -10,30 +10,41 @@ Status mot den 4-stegs-plan vi följer för content-bygge inför launch:
 |---|---|---|
 | 1. Bild-format-fix | ✅ Klart | 16:9 container + `resizeMode='contain'` (commit `4ab2ac9`) |
 | 2. Audience-filter på bild- + musik-frågor | ✅ Klart | Pool-nivå union-filter (`audienceFilter.ts`) på BÅDA pools — items matchar minst en spelares gen ELLER `'all'`. Fallback-chain om filter tomt. Se "Image questions (MVP)". |
-| 3. Content build-out | 🟡 Pågående | **45 image + 110 youtube** (86 songs + 14 movies + 10 sport-events) efter film+sport-expansion 2026-05-22. Total **155 V1-playable** över 3 huvudkategorier. Film 29 / Sport 27 / Music 99. Fortsätt med character/fler items per kategori + 61 items utan YouTube-data i songs-elder/gen-x/millennials. |
+| 3. Content build-out | 🟡 Pågående | **82 image + 183 youtube** (159 songs + 14 movies + 10 sport-events) efter content-pass 2026-05-26. Total **265 V1-playable** över 3 huvudkategorier (+71% från 155). Music: alla 5 audience-files fullt curade (cleanup-pass + Topic-channel-prio för svåra items). Image: bands 8→16, artists 14→31, actors 15→21, athletes 17→23. Fortsätt med fler items per audience + film/sport-event-expansion. |
 | 4. Pre-launch-items | ⏸️ Ej påbörjat | Captcha, YouTube ToS-audit, nightly cron, FAQ — se `project_pre_launch_checklist.md` |
 
-**Pool-status idag (41 live image-items)** — V1-curering utifrån svensk igenkänning (global reach inte ett krav i V1; Release 2 whitelistar en delmängd med `region: Global` där lämpligt):
-- **Actors (15)** — utbyggt från 5 till 15 (2026-05-22, actor build-out v2):
-  - Elder (4): ingrid-bergman, marilyn-monroe, tom-hanks, audrey-hepburn.
-  - Gen-x (4): arnold-schwarzenegger, lasse-aberg, julia-roberts, leonardo-dicaprio.
-  - Millennials + Gen-z (5, audience-utökad): jennifer-aniston, margot-robbie, emma-stone, tom-holland, florence-pugh. Files audience-tag = `[millennials, gen-z]` så modern-era stars (Friends-reruns, Spider-Man, Barbie) följs av båda gens.
-  - Gen-z-only (2): millie-bobby-brown, jenna-ortega — streaming-era stars (Stranger Things, Wednesday).
-- **Artists (5)**: avicii, madonna, michael-jackson, taylor-swift, elvis-presley.
-- **Athletes (17)** — utbyggt från 4 till 17 (2026-05-22):
-  - Elder/Gen-x (10): bjorn-borg, muhammad-ali, mark-spitz, pele, diego-maradona, magic-johnson, michael-jordan, carl-lewis, steffi-graf, peter-forsberg.
-  - Millennials/Gen-z/Gen-alpha (7): zlatan-ibrahimovic, cristiano-ronaldo, lionel-messi, serena-williams, usain-bolt, roger-federer, armand-duplantis.
+**Pool-status idag (82 live image-items)** — V1-curering utifrån svensk igenkänning (global reach inte ett krav i V1; Release 2 whitelistar en delmängd med `region: Global` där lämpligt). Bilder är Wikipedia pageimage default — action-shot-policy-audit (`feedback_image_professional_context.md`) pågående i separat session.
+- **Actors (21)** — utbyggt från 15 till 21 (2026-05-26):
+  - Elder (6): ingrid-bergman, marilyn-monroe, tom-hanks, audrey-hepburn, cary-grant, katharine-hepburn.
+  - Gen-x (6): arnold-schwarzenegger, lasse-aberg, julia-roberts, leonardo-dicaprio, tom-cruise, meryl-streep.
+  - Millennials + Gen-z (6, audience-utökad): jennifer-aniston, margot-robbie, emma-stone, tom-holland, florence-pugh, brad-pitt. Files audience-tag = `[millennials, gen-z]` så modern-era stars (Friends-reruns, Spider-Man, Barbie) följs av båda gens.
+  - Gen-z-only (3): millie-bobby-brown, jenna-ortega, zendaya — streaming-era stars (Stranger Things, Wednesday, Spider-Man/Euphoria/Dune).
+- **Artists (31)** — utbyggt från 14 till 31 (2026-05-26):
+  - Elder (6): elvis-presley, frank-sinatra, nat-king-cole, louis-armstrong, ray-charles, bob-dylan.
+  - Gen-x (8): michael-jackson, madonna, carola-haggkvist, kurt-cobain, bruce-springsteen, whitney-houston, prince, david-bowie.
+  - Millennials (8): avicii, rihanna, eminem (Hip-Hop-paket), beyonce, bruno-mars, adele, lady-gaga, justin-timberlake.
+  - Gen-z (9): billie-eilish, taylor-swift, drake, ariana-grande, travis-scott, ed-sheeran, the-weeknd, olivia-rodrigo, bad-bunny.
+- **Bands (16)** — utbyggt från 8 till 16 (2026-05-26):
+  - Cross-gen (`audience: ['all']`): abba, beatles, queen, nirvana, pink-floyd, rolling-stones, led-zeppelin, acdc, u2, metallica, eagles, fleetwood-mac, the-who, black-sabbath, guns-n-roses, coldplay.
+- **Athletes (23)** — utbyggt från 17 till 23 (2026-05-26):
+  - Elder/Gen-x (13): bjorn-borg, muhammad-ali, mark-spitz, pele, diego-maradona, magic-johnson, michael-jordan, carl-lewis, steffi-graf, peter-forsberg, wayne-gretzky, martina-navratilova, larry-bird.
+  - Millennials/Gen-z/Gen-alpha (10): zlatan-ibrahimovic, cristiano-ronaldo, lionel-messi, serena-williams, usain-bolt, roger-federer, armand-duplantis, tom-brady, lebron-james, simone-biles.
 - **Capitals/cities (4)**: berlin, london, paris, stockholm.
 
 **Föreslagna nästa steg (när session återupptas):**
 
-1. **Fortsätt content build-out** mot 50+ pool:
-   - **Country, place** — 0 items, kräver Wikipedia-curation per subject. Byggnads-bilder hanteras via city/country-frågor (`building`-subjekt togs bort 2026-05-22).
-   - **Band** — 0 items än trots schema-stöd. Lägg till ABBA, The Beatles, Queen, Nirvana etc.
-   - **Movies** (YouTube + sport-event) — schema-redo, 0 items. Använd `npm run youtube-search` för clip-curation.
-   - **Music YouTube-clips för songs-elder/gen-x/millennials** — 81 items saknar YouTube-data helt; kräver `youtube-search` per item. Music v1 + bulk-conversion 2026-05-22 lyckades med songs-all (15 items) + songs-gen-z (30) + songs-gen-alpha (25) men resterande items i songs-elder (33), songs-gen-x (14), songs-millennials (30) behöver per-item-curation. (Music bulk-conversion `media:`→`youtubeClips:` är klar — script i `backend/scripts/convert-media-to-youtubeclips.ts`.)
-   - **Whitelist `region: Global`** för en delmängd av V1-katalogen som har global reach (t.ex. Madonna, Michael Jackson, Pelé, Muhammad Ali, Berlin, Paris). Default är Sverige-only — Global är opt-in per item. Release 2-task.
-2. **Pre-launch-items** — Captcha, YouTube ToS-audit, nightly cron, FAQ (se `project_pre_launch_checklist.md`).
+1. **Fortsätt content build-out**:
+   - **Movies + sport-events expansion** — schema-redo, 14 movies + 10 sport-events idag. Använd `npm run youtube-search` för clip-curation eller `topic-pick-clips` för Topic-channel-prio.
+   - **Bredda audience-pool för image-items** — actors/athletes per audience har fortfarande utrymme. Kan köra batch-wikimedia-process på fler items när items identifierats.
+   - **Action-shot-policy audit** — alla 82 image-items är Wikipedia pageimage default (typiskt porträtt-headshot). Policy säger personer ska visas i professionell kontext (idrottare i match, musiker på scen, skådespelare i filmroll). Audit + ev. ersättning via `npm run wikimedia-process <id> <commons-url>` med explicit action-shot-URL.
+   - **Whitelist `region: Global`** för en delmängd av V1-katalogen som har global reach. Default är Sverige-only — Global är opt-in per item. Release 2-task.
+2. **Curation-scripts** (skapade 2026-05-26):
+   - `scripts/find-missing-clips.mjs` — listar items utan youtubeClips per audience-file.
+   - `scripts/batch-pick-clips.ts` — YT-search per item, picka top-scored kandidat, output markdown-tabell + JSON. `--top N` eller explicit IDs. 10s throttle för YT API rate-limit (10/min).
+   - `scripts/topic-pick-clips.ts` — refined search för items där default-search hittar fel content (filmtrailers, talkshows, covers). Query-bias mot Topic-channels (auto-uploaded studio-master från musiklabels). Effective score +100 om Topic-channel-hit.
+   - `scripts/apply-batch-picks.ts` — YAML-insertion från batch-picks.json. CRLF/LF-detection bevarar Windows line-endings.
+   - `scripts/batch-wikimedia-process.ts` — batch Wikipedia pageimage → sharp → assets/quiz-images/. Engelska först, svenska fallback.
+3. **Pre-launch-items** — Captcha, YouTube ToS-audit, nightly cron, FAQ (se `project_pre_launch_checklist.md`).
 
 Se `memory/project_roadmap_phases.md` för bredare fas-status (Fas 4 backlog → Pre-launch → Launch).
 
