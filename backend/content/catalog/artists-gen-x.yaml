@@ -34,3 +34,35 @@ items:
     probability: 85
     wikimediaSearchHints: ["Kurt Cobain Nirvana"]
     answerMethods: ["timeline", "name-letters"]
+  - id: bruce-springsteen
+    displayName: "Bruce Springsteen"
+    correctYear: 1949
+    peakFrom: 1975
+    peakTo: 2020
+    probability: 88
+    wikimediaSearchHints: ["Bruce Springsteen singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: whitney-houston
+    displayName: "Whitney Houston"
+    correctYear: 1963
+    peakFrom: 1985
+    peakTo: 2012
+    probability: 92
+    wikimediaSearchHints: ["Whitney Houston singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: prince
+    displayName: "Prince"
+    correctYear: 1958
+    peakFrom: 1979
+    peakTo: 2016
+    probability: 90
+    wikimediaSearchHints: ["Prince musician Purple Rain"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: david-bowie
+    displayName: "David Bowie"
+    correctYear: 1947
+    peakFrom: 1969
+    peakTo: 2016
+    probability: 90
+    wikimediaSearchHints: ["David Bowie musician"]
+    answerMethods: ["timeline", "name-letters"]

@@ -42,3 +42,35 @@ items:
     probability: 90
     wikimediaSearchHints: ["Beyoncé"]
     answerMethods: ["timeline", "name-letters"]
+  - id: bruno-mars
+    displayName: "Bruno Mars"
+    correctYear: 1985
+    peakFrom: 2010
+    peakTo: 2024
+    probability: 92
+    wikimediaSearchHints: ["Bruno Mars singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: adele
+    displayName: "Adele"
+    correctYear: 1988
+    peakFrom: 2008
+    peakTo: 2024
+    probability: 94
+    wikimediaSearchHints: ["Adele singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: lady-gaga
+    displayName: "Lady Gaga"
+    correctYear: 1986
+    peakFrom: 2008
+    peakTo: 2024
+    probability: 92
+    wikimediaSearchHints: ["Lady Gaga singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: justin-timberlake
+    displayName: "Justin Timberlake"
+    correctYear: 1981
+    peakFrom: 2002
+    peakTo: 2020
+    probability: 88
+    wikimediaSearchHints: ["Justin Timberlake singer"]
+    answerMethods: ["timeline", "name-letters"]

@@ -36,3 +36,35 @@ items:
     probability: 88
     wikimediaSearchHints: ["Travis Scott rapper"]
     answerMethods: ["timeline", "name-letters"]
+  - id: ed-sheeran
+    displayName: "Ed Sheeran"
+    correctYear: 1991
+    peakFrom: 2011
+    peakTo: 2024
+    probability: 94
+    wikimediaSearchHints: ["Ed Sheeran singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: the-weeknd
+    displayName: "The Weeknd"
+    correctYear: 1990
+    peakFrom: 2012
+    peakTo: 2024
+    probability: 90
+    wikimediaSearchHints: ["The Weeknd singer", "Abel Tesfaye"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: olivia-rodrigo
+    displayName: "Olivia Rodrigo"
+    correctYear: 2003
+    peakFrom: 2021
+    peakTo: 2024
+    probability: 85
+    wikimediaSearchHints: ["Olivia Rodrigo singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: bad-bunny
+    displayName: "Bad Bunny"
+    correctYear: 1994
+    peakFrom: 2018
+    peakTo: 2024
+    probability: 85
+    wikimediaSearchHints: ["Bad Bunny rapper", "Benito Martinez Ocasio"]
+    answerMethods: ["timeline", "name-letters"]

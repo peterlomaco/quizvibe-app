@@ -15,3 +15,43 @@ items:
     probability: 98
     wikimediaSearchHints: ["Elvis Presley"]
     answerMethods: ["timeline", "name-letters"]
+  - id: frank-sinatra
+    displayName: "Frank Sinatra"
+    correctYear: 1915
+    peakFrom: 1940
+    peakTo: 1990
+    probability: 92
+    wikimediaSearchHints: ["Frank Sinatra singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: nat-king-cole
+    displayName: "Nat King Cole"
+    correctYear: 1919
+    peakFrom: 1945
+    peakTo: 1965
+    probability: 85
+    wikimediaSearchHints: ["Nat King Cole singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: louis-armstrong
+    displayName: "Louis Armstrong"
+    correctYear: 1901
+    peakFrom: 1925
+    peakTo: 1971
+    probability: 88
+    wikimediaSearchHints: ["Louis Armstrong jazz trumpet"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: ray-charles
+    displayName: "Ray Charles"
+    correctYear: 1930
+    peakFrom: 1955
+    peakTo: 2004
+    probability: 88
+    wikimediaSearchHints: ["Ray Charles musician"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: bob-dylan
+    displayName: "Bob Dylan"
+    correctYear: 1941
+    peakFrom: 1962
+    peakTo: 2020
+    probability: 90
+    wikimediaSearchHints: ["Bob Dylan singer songwriter"]
+    answerMethods: ["timeline", "name-letters"]
