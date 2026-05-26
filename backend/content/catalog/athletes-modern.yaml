@@ -139,3 +139,99 @@ items:
     probability: 90
     wikimediaSearchHints: ["Erling Haaland footballer"]
     answerMethods: ["timeline", "name-letters"]
+  - id: patrick-mahomes
+    displayName: "Patrick Mahomes"
+    correctYear: 1995
+    probability: 82
+    wikimediaSearchHints: ["Patrick Mahomes NFL quarterback"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: kevin-durant
+    displayName: "Kevin Durant"
+    correctYear: 1988
+    probability: 88
+    wikimediaSearchHints: ["Kevin Durant basketball"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: giannis-antetokounmpo
+    displayName: "Giannis Antetokounmpo"
+    correctYear: 1994
+    probability: 88
+    wikimediaSearchHints: ["Giannis Antetokounmpo basketball"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: luka-doncic
+    displayName: "Luka Dončić"
+    correctYear: 1999
+    probability: 82
+    wikimediaSearchHints: ["Luka Doncic basketball"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: nikola-jokic
+    displayName: "Nikola Jokić"
+    correctYear: 1995
+    probability: 80
+    wikimediaSearchHints: ["Nikola Jokic basketball"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: harry-kane
+    displayName: "Harry Kane"
+    correctYear: 1993
+    probability: 88
+    wikimediaSearchHints: ["Harry Kane footballer England"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: robert-lewandowski
+    displayName: "Robert Lewandowski"
+    correctYear: 1988
+    probability: 88
+    wikimediaSearchHints: ["Robert Lewandowski footballer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: luka-modric
+    displayName: "Luka Modrić"
+    correctYear: 1985
+    probability: 85
+    wikimediaSearchHints: ["Luka Modric footballer Croatia"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: andy-murray
+    displayName: "Andy Murray"
+    correctYear: 1987
+    probability: 90
+    wikimediaSearchHints: ["Andy Murray tennis"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: carlos-alcaraz
+    displayName: "Carlos Alcaraz"
+    correctYear: 2003
+    probability: 85
+    wikimediaSearchHints: ["Carlos Alcaraz tennis"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: coco-gauff
+    displayName: "Coco Gauff"
+    correctYear: 2004
+    probability: 80
+    wikimediaSearchHints: ["Coco Gauff tennis"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: iga-swiatek
+    displayName: "Iga Świątek"
+    correctYear: 2001
+    probability: 80
+    wikimediaSearchHints: ["Iga Swiatek tennis Poland"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: magnus-carlsen
+    displayName: "Magnus Carlsen"
+    correctYear: 1990
+    probability: 90
+    wikimediaSearchHints: ["Magnus Carlsen chess Norway"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: mikaela-shiffrin
+    displayName: "Mikaela Shiffrin"
+    correctYear: 1995
+    probability: 88
+    wikimediaSearchHints: ["Mikaela Shiffrin skier"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: sara-sjostrom
+    displayName: "Sarah Sjöström"
+    correctYear: 1993
+    probability: 92
+    wikimediaSearchHints: ["Sarah Sjöström swimmer Sweden"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: carolina-kluft
+    displayName: "Carolina Klüft"
+    correctYear: 1983
+    probability: 90
+    wikimediaSearchHints: ["Carolina Klüft heptathlon Sweden"]
+    answerMethods: ["timeline", "name-letters"]

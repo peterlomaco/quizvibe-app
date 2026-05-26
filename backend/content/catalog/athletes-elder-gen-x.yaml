@@ -121,3 +121,87 @@ items:
     probability: 82
     wikimediaSearchHints: ["Jack Nicklaus golf"]
     answerMethods: ["timeline", "name-letters"]
+  - id: johan-cruyff
+    displayName: "Johan Cruyff"
+    correctYear: 1947
+    probability: 90
+    wikimediaSearchHints: ["Johan Cruyff footballer Netherlands"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: franz-beckenbauer
+    displayName: "Franz Beckenbauer"
+    correctYear: 1945
+    probability: 88
+    wikimediaSearchHints: ["Franz Beckenbauer footballer Germany"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: george-best
+    displayName: "George Best"
+    correctYear: 1946
+    probability: 85
+    wikimediaSearchHints: ["George Best footballer Manchester United"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: paolo-maldini
+    displayName: "Paolo Maldini"
+    correctYear: 1968
+    probability: 85
+    wikimediaSearchHints: ["Paolo Maldini footballer Milan"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: roberto-baggio
+    displayName: "Roberto Baggio"
+    correctYear: 1967
+    probability: 85
+    wikimediaSearchHints: ["Roberto Baggio footballer Italy"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: marco-van-basten
+    displayName: "Marco van Basten"
+    correctYear: 1964
+    probability: 85
+    wikimediaSearchHints: ["Marco van Basten footballer Netherlands"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: ingemar-stenmark
+    displayName: "Ingemar Stenmark"
+    correctYear: 1956
+    probability: 95
+    wikimediaSearchHints: ["Ingemar Stenmark skier Sweden"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: joe-frazier
+    displayName: "Joe Frazier"
+    correctYear: 1944
+    probability: 82
+    wikimediaSearchHints: ["Joe Frazier boxer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: sugar-ray-leonard
+    displayName: "Sugar Ray Leonard"
+    correctYear: 1956
+    probability: 82
+    wikimediaSearchHints: ["Sugar Ray Leonard boxer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: bobby-charlton
+    displayName: "Bobby Charlton"
+    correctYear: 1937
+    probability: 82
+    wikimediaSearchHints: ["Bobby Charlton footballer England"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: eusebio
+    displayName: "Eusébio"
+    correctYear: 1942
+    probability: 82
+    wikimediaSearchHints: ["Eusébio footballer Portugal"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: magdalena-forsberg
+    displayName: "Magdalena Forsberg"
+    correctYear: 1967
+    probability: 85
+    wikimediaSearchHints: ["Magdalena Forsberg biathlon Sweden"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: pernilla-wiberg
+    displayName: "Pernilla Wiberg"
+    correctYear: 1970
+    probability: 85
+    wikimediaSearchHints: ["Pernilla Wiberg skier Sweden"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: henrik-larsson
+    displayName: "Henrik Larsson"
+    correctYear: 1971
+    probability: 90
+    wikimediaSearchHints: ["Henrik Larsson footballer Sweden Celtic"]
+    answerMethods: ["timeline", "name-letters"]
