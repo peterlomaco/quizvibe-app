@@ -379,3 +379,15 @@ items:
     probability: 80
     wikimediaSearchHints: ["Gabriela Sabatini tennis Argentina"]
     answerMethods: ["timeline", "name-letters"]
+  - id: mats-sundin
+    displayName: "Mats Sundin"
+    correctYear: 1971
+    probability: 90
+    wikimediaSearchHints: ["Mats Sundin hockey Sweden Maple Leafs"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: patrik-sjoberg
+    displayName: "Patrik Sjöberg"
+    correctYear: 1965
+    probability: 85
+    wikimediaSearchHints: ["Patrik Sjöberg high jump Sweden"]
+    answerMethods: ["timeline", "name-letters"]

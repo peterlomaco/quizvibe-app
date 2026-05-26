@@ -161,3 +161,9 @@ items:
     probability: 80
     wikimediaSearchHints: ["Shirley Temple child actress"]
     answerMethods: ["timeline", "name-letters"]
+  - id: judi-dench
+    displayName: "Judi Dench"
+    correctYear: 1934
+    probability: 82
+    wikimediaSearchHints: ["Judi Dench actress"]
+    answerMethods: ["timeline", "name-letters"]

@@ -383,3 +383,15 @@ items:
     probability: 75
     wikimediaSearchHints: ["James Spader actor"]
     answerMethods: ["timeline", "name-letters"]
+  - id: jodie-foster
+    displayName: "Jodie Foster"
+    correctYear: 1962
+    probability: 88
+    wikimediaSearchHints: ["Jodie Foster actress"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: helen-mirren
+    displayName: "Helen Mirren"
+    correctYear: 1945
+    probability: 85
+    wikimediaSearchHints: ["Helen Mirren actress"]
+    answerMethods: ["timeline", "name-letters"]
