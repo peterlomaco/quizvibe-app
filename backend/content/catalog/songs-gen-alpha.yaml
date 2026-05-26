@@ -23,11 +23,10 @@
 # Prioritet: 7clouds-style lyric-channel för konsistens; fallback till
 # officiell artist/label-kanal eller annan consistent-quality lyric-channel.
 #
-# 3 items utan media — alla studio-versioner är UMG-blocked i SE/EU:
-#   - taylor-swift-anti-hero
-#   - billie-eilish-birds-of-a-feather
-#   - rose-bruno-mars-apt
-# Parkerade tills alternativ källa hittas eller licensiering ordnas.
+# Tidigare 3 items utan media (UMG-blocked i SE/EU) löste sig 2026-05-26:
+# Taylor Swift + Billie Eilish via Topic-channel uploads (auto-uploaded
+# studio-master från label — annan region-policy än music-videon). ROSÉ
+# APT via official MV (ekr2nIex040, blocked endast i BY+RU, OK i SE).
 audience: ["gen-alpha", "gen-z"]
 category: songs
 contentForm: youtube
@@ -251,6 +250,12 @@ items:
     probability: 90
     wikimediaSearchHints: ["Taylor Swift Anti-Hero Midnights"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "pXpbKU24cMo"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Taylor Swift - Topic"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
     notes: "UTAN MEDIA: alla 10 YouTube-träffar UMG-blocked i SE/EU. Parkerat tills alternativ källa hittas."
   # 2023
   - id: miley-cyrus-flowers
@@ -293,6 +298,12 @@ items:
     probability: 88
     wikimediaSearchHints: ["Billie Eilish Birds of a Feather Hit Me Hard and Soft"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "WKZO-CWeOVA"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Billie Eilish - Topic"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
     notes: "UTAN MEDIA: alla studio-versioner UMG-blocked i SE/EU. Live-versioner ratade per policy. Parkerat tills alternativ källa hittas."
   - id: lady-gaga-bruno-mars-die-with-a-smile
     displayName: "Die With a Smile — Lady Gaga & Bruno Mars"
@@ -312,4 +323,10 @@ items:
     probability: 88
     wikimediaSearchHints: ["ROSE Bruno Mars APT 2024"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "ekr2nIex040"
+        startSec: 30
+        endSec: 45
+        channelTitle: "ROSÉ"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (-82)."
     notes: "UTAN MEDIA: alla studio-versioner UMG-blocked i SE/EU. Singel-release 18 okt 2024; toppade chartsen 2025. Parkerat tills alternativ källa hittas."

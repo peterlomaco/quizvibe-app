@@ -2472,6 +2472,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "beyonce-crazy-in-love",
+    "displayName": "Crazy in Love — Beyoncé",
+    "correctYear": 2003,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-z",
+      "millennials"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "KmJI1JqF-dU",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Beyoncé - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
     "id": "o-zone-dragostea-din-tei",
     "displayName": "Dragostea Din Tei — O-Zone",
     "correctYear": 2004,
@@ -3332,6 +3353,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "taylor-swift-anti-hero",
+    "displayName": "Anti-Hero — Taylor Swift",
+    "correctYear": 2022,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-alpha",
+      "gen-z"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "pXpbKU24cMo",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Taylor Swift - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
     "id": "doja-cat-paint-the-town-red",
     "displayName": "Paint the Town Red — Doja Cat",
     "correctYear": 2023,
@@ -3372,6 +3414,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "billie-eilish-birds-of-a-feather",
+    "displayName": "Birds of a Feather — Billie Eilish",
+    "correctYear": 2024,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-alpha",
+      "gen-z"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "WKZO-CWeOVA",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Billie Eilish - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
     "id": "lady-gaga-bruno-mars-die-with-a-smile",
     "displayName": "Die With a Smile — Lady Gaga & Bruno Mars",
     "correctYear": 2024,
@@ -3388,6 +3451,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 248,
         "channelTitle": "7cloudsnation",
         "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "rose-bruno-mars-apt",
+    "displayName": "APT. — ROSÉ & Bruno Mars",
+    "correctYear": 2024,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-alpha",
+      "gen-z"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "ekr2nIex040",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "ROSÉ",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (-82)."
       }
     ]
   },
