@@ -152,3 +152,159 @@ items:
     probability: 82
     wikimediaSearchHints: ["Imagine Dragons band"]
     answerMethods: ["timeline", "name-letters"]
+  - id: the-police
+    displayName: "The Police"
+    correctYear: 1977
+    probability: 85
+    wikimediaSearchHints: ["The Police band Sting"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: dire-straits
+    displayName: "Dire Straits"
+    correctYear: 1977
+    probability: 85
+    wikimediaSearchHints: ["Dire Straits band"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: bon-jovi
+    displayName: "Bon Jovi"
+    correctYear: 1983
+    probability: 88
+    wikimediaSearchHints: ["Bon Jovi band rock"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: iron-maiden
+    displayName: "Iron Maiden"
+    correctYear: 1975
+    probability: 85
+    wikimediaSearchHints: ["Iron Maiden"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: kiss
+    displayName: "Kiss"
+    correctYear: 1973
+    probability: 82
+    wikimediaSearchHints: ["Kiss band rock"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: def-leppard
+    displayName: "Def Leppard"
+    correctYear: 1977
+    probability: 82
+    wikimediaSearchHints: ["Def Leppard band"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: genesis
+    displayName: "Genesis"
+    correctYear: 1967
+    probability: 82
+    wikimediaSearchHints: ["Genesis Phil Collins band"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: yes
+    displayName: "Yes"
+    correctYear: 1968
+    probability: 78
+    wikimediaSearchHints: ["Yes band Jon Anderson"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: rush
+    displayName: "Rush"
+    correctYear: 1968
+    probability: 75
+    wikimediaSearchHints: ["Rush band Geddy Lee"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: talking-heads
+    displayName: "Talking Heads"
+    correctYear: 1975
+    probability: 75
+    wikimediaSearchHints: ["Talking Heads band David Byrne"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: depeche-mode
+    displayName: "Depeche Mode"
+    correctYear: 1980
+    probability: 85
+    wikimediaSearchHints: ["Depeche Mode"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: the-cure
+    displayName: "The Cure"
+    correctYear: 1976
+    probability: 82
+    wikimediaSearchHints: ["The Cure"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: the-smiths
+    displayName: "The Smiths"
+    correctYear: 1982
+    probability: 78
+    wikimediaSearchHints: ["The Smiths"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: rem
+    displayName: "R.E.M."
+    correctYear: 1980
+    probability: 82
+    wikimediaSearchHints: ["R.E.M. band Michael Stipe"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: pearl-jam
+    displayName: "Pearl Jam"
+    correctYear: 1990
+    probability: 85
+    wikimediaSearchHints: ["Pearl Jam"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: radiohead
+    displayName: "Radiohead"
+    correctYear: 1985
+    probability: 88
+    wikimediaSearchHints: ["Radiohead"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: muse
+    displayName: "Muse"
+    correctYear: 1994
+    probability: 85
+    wikimediaSearchHints: ["Muse band Matt Bellamy"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: the-strokes
+    displayName: "The Strokes"
+    correctYear: 1998
+    probability: 78
+    wikimediaSearchHints: ["The Strokes"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: white-stripes
+    displayName: "The White Stripes"
+    correctYear: 1997
+    probability: 78
+    wikimediaSearchHints: ["The White Stripes"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: daft-punk
+    displayName: "Daft Punk"
+    correctYear: 1993
+    probability: 88
+    wikimediaSearchHints: ["Daft Punk electronic duo"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: tame-impala
+    displayName: "Tame Impala"
+    correctYear: 2007
+    probability: 75
+    wikimediaSearchHints: ["Tame Impala"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: twenty-one-pilots
+    displayName: "Twenty One Pilots"
+    correctYear: 2009
+    probability: 82
+    wikimediaSearchHints: ["Twenty One Pilots"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: maroon-5
+    displayName: "Maroon 5"
+    correctYear: 1994
+    probability: 88
+    wikimediaSearchHints: ["Maroon 5"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: backstreet-boys
+    displayName: "Backstreet Boys"
+    correctYear: 1993
+    probability: 88
+    wikimediaSearchHints: ["Backstreet Boys band"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: spice-girls
+    displayName: "Spice Girls"
+    correctYear: 1994
+    probability: 92
+    wikimediaSearchHints: ["Spice Girls band"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: bee-gees
+    displayName: "Bee Gees"
+    correctYear: 1958
+    probability: 88
+    wikimediaSearchHints: ["Bee Gees band brothers"]
+    answerMethods: ["timeline", "name-letters"]
