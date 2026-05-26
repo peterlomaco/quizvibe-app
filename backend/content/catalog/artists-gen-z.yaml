@@ -100,3 +100,83 @@ items:
     probability: 82
     wikimediaSearchHints: ["Loreen singer Sweden Eurovision"]
     answerMethods: ["timeline", "name-letters"]
+  - id: justin-bieber
+    displayName: "Justin Bieber"
+    correctYear: 1994
+    peakFrom: 2009
+    peakTo: 2024
+    probability: 92
+    wikimediaSearchHints: ["Justin Bieber singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: selena-gomez
+    displayName: "Selena Gomez"
+    correctYear: 1992
+    peakFrom: 2009
+    peakTo: 2024
+    probability: 88
+    wikimediaSearchHints: ["Selena Gomez singer actress"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: miley-cyrus
+    displayName: "Miley Cyrus"
+    correctYear: 1992
+    peakFrom: 2006
+    peakTo: 2024
+    probability: 90
+    wikimediaSearchHints: ["Miley Cyrus singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: demi-lovato
+    displayName: "Demi Lovato"
+    correctYear: 1992
+    peakFrom: 2008
+    peakTo: 2024
+    probability: 82
+    wikimediaSearchHints: ["Demi Lovato singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: kendrick-lamar
+    displayName: "Kendrick Lamar"
+    correctYear: 1987
+    peakFrom: 2011
+    peakTo: 2024
+    probability: 88
+    wikimediaSearchHints: ["Kendrick Lamar rapper"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: doja-cat
+    displayName: "Doja Cat"
+    correctYear: 1995
+    peakFrom: 2018
+    peakTo: 2024
+    probability: 85
+    wikimediaSearchHints: ["Doja Cat singer rapper"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: sza
+    displayName: "SZA"
+    correctYear: 1989
+    peakFrom: 2017
+    peakTo: 2024
+    probability: 82
+    wikimediaSearchHints: ["SZA singer Solana Rowe"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: nicki-minaj
+    displayName: "Nicki Minaj"
+    correctYear: 1982
+    peakFrom: 2010
+    peakTo: 2024
+    probability: 85
+    wikimediaSearchHints: ["Nicki Minaj rapper"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: frank-ocean
+    displayName: "Frank Ocean"
+    correctYear: 1987
+    peakFrom: 2012
+    peakTo: 2024
+    probability: 78
+    wikimediaSearchHints: ["Frank Ocean singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: lana-del-rey
+    displayName: "Lana Del Rey"
+    correctYear: 1985
+    peakFrom: 2011
+    peakTo: 2024
+    probability: 82
+    wikimediaSearchHints: ["Lana Del Rey singer"]
+    answerMethods: ["timeline", "name-letters"]

@@ -79,3 +79,83 @@ items:
     probability: 88
     wikimediaSearchHints: ["Tina Turner singer"]
     answerMethods: ["timeline", "name-letters"]
+  - id: diana-ross
+    displayName: "Diana Ross"
+    correctYear: 1944
+    peakFrom: 1965
+    peakTo: 2024
+    probability: 85
+    wikimediaSearchHints: ["Diana Ross singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: marvin-gaye
+    displayName: "Marvin Gaye"
+    correctYear: 1939
+    peakFrom: 1961
+    peakTo: 1984
+    probability: 82
+    wikimediaSearchHints: ["Marvin Gaye singer Motown"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: otis-redding
+    displayName: "Otis Redding"
+    correctYear: 1941
+    peakFrom: 1962
+    peakTo: 1967
+    probability: 78
+    wikimediaSearchHints: ["Otis Redding soul singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: dolly-parton
+    displayName: "Dolly Parton"
+    correctYear: 1946
+    peakFrom: 1967
+    peakTo: 2024
+    probability: 88
+    wikimediaSearchHints: ["Dolly Parton singer country"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: joni-mitchell
+    displayName: "Joni Mitchell"
+    correctYear: 1943
+    peakFrom: 1968
+    peakTo: 2024
+    probability: 80
+    wikimediaSearchHints: ["Joni Mitchell singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: james-taylor
+    displayName: "James Taylor"
+    correctYear: 1948
+    peakFrom: 1970
+    peakTo: 2024
+    probability: 78
+    wikimediaSearchHints: ["James Taylor singer songwriter"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: carole-king
+    displayName: "Carole King"
+    correctYear: 1942
+    peakFrom: 1971
+    peakTo: 2024
+    probability: 75
+    wikimediaSearchHints: ["Carole King singer songwriter"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: leonard-cohen
+    displayName: "Leonard Cohen"
+    correctYear: 1934
+    peakFrom: 1967
+    peakTo: 2016
+    probability: 80
+    wikimediaSearchHints: ["Leonard Cohen singer songwriter"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: neil-young
+    displayName: "Neil Young"
+    correctYear: 1945
+    peakFrom: 1969
+    peakTo: 2024
+    probability: 82
+    wikimediaSearchHints: ["Neil Young musician"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: roy-orbison
+    displayName: "Roy Orbison"
+    correctYear: 1936
+    peakFrom: 1956
+    peakTo: 1988
+    probability: 78
+    wikimediaSearchHints: ["Roy Orbison singer"]
+    answerMethods: ["timeline", "name-letters"]

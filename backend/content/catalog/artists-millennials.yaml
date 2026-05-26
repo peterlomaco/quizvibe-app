@@ -98,3 +98,75 @@ items:
     probability: 80
     wikimediaSearchHints: ["Robyn singer Sweden", "Robin Carlsson"]
     answerMethods: ["timeline", "name-letters"]
+  - id: celine-dion
+    displayName: "Céline Dion"
+    correctYear: 1968
+    peakFrom: 1990
+    peakTo: 2024
+    probability: 92
+    wikimediaSearchHints: ["Celine Dion singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: christina-aguilera
+    displayName: "Christina Aguilera"
+    correctYear: 1980
+    peakFrom: 1999
+    peakTo: 2024
+    probability: 88
+    wikimediaSearchHints: ["Christina Aguilera"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: britney-spears
+    displayName: "Britney Spears"
+    correctYear: 1981
+    peakFrom: 1998
+    peakTo: 2024
+    probability: 92
+    wikimediaSearchHints: ["Britney Spears singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: shakira
+    displayName: "Shakira"
+    correctYear: 1977
+    peakFrom: 1995
+    peakTo: 2024
+    probability: 90
+    wikimediaSearchHints: ["Shakira singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: alicia-keys
+    displayName: "Alicia Keys"
+    correctYear: 1981
+    peakFrom: 2001
+    peakTo: 2024
+    probability: 85
+    wikimediaSearchHints: ["Alicia Keys singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: norah-jones
+    displayName: "Norah Jones"
+    correctYear: 1979
+    peakFrom: 2002
+    peakTo: 2024
+    probability: 78
+    wikimediaSearchHints: ["Norah Jones singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: robbie-williams
+    displayName: "Robbie Williams"
+    correctYear: 1974
+    peakFrom: 1995
+    peakTo: 2024
+    probability: 88
+    wikimediaSearchHints: ["Robbie Williams singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: jay-z
+    displayName: "Jay-Z"
+    correctYear: 1969
+    peakFrom: 1996
+    peakTo: 2024
+    probability: 88
+    wikimediaSearchHints: ["Jay-Z rapper", "Shawn Carter rapper"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: nelly-furtado
+    displayName: "Nelly Furtado"
+    correctYear: 1978
+    peakFrom: 2000
+    peakTo: 2024
+    probability: 78
+    wikimediaSearchHints: ["Nelly Furtado singer"]
+    answerMethods: ["timeline", "name-letters"]

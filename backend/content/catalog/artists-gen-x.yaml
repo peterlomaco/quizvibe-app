@@ -74,3 +74,83 @@ items:
     probability: 85
     wikimediaSearchHints: ["Cher singer actress"]
     answerMethods: ["timeline", "name-letters"]
+  - id: billy-joel
+    displayName: "Billy Joel"
+    correctYear: 1949
+    peakFrom: 1971
+    peakTo: 2024
+    probability: 85
+    wikimediaSearchHints: ["Billy Joel singer pianist"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: rod-stewart
+    displayName: "Rod Stewart"
+    correctYear: 1945
+    peakFrom: 1969
+    peakTo: 2024
+    probability: 85
+    wikimediaSearchHints: ["Rod Stewart singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: eric-clapton
+    displayName: "Eric Clapton"
+    correctYear: 1945
+    peakFrom: 1963
+    peakTo: 2024
+    probability: 88
+    wikimediaSearchHints: ["Eric Clapton guitarist"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: phil-collins
+    displayName: "Phil Collins"
+    correctYear: 1951
+    peakFrom: 1981
+    peakTo: 2020
+    probability: 85
+    wikimediaSearchHints: ["Phil Collins singer drummer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: elton-john
+    displayName: "Elton John"
+    correctYear: 1947
+    peakFrom: 1970
+    peakTo: 2024
+    probability: 95
+    wikimediaSearchHints: ["Elton John singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: cyndi-lauper
+    displayName: "Cyndi Lauper"
+    correctYear: 1953
+    peakFrom: 1983
+    peakTo: 2024
+    probability: 82
+    wikimediaSearchHints: ["Cyndi Lauper singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: annie-lennox
+    displayName: "Annie Lennox"
+    correctYear: 1954
+    peakFrom: 1980
+    peakTo: 2024
+    probability: 80
+    wikimediaSearchHints: ["Annie Lennox singer Eurythmics"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: george-michael
+    displayName: "George Michael"
+    correctYear: 1963
+    peakFrom: 1982
+    peakTo: 2016
+    probability: 88
+    wikimediaSearchHints: ["George Michael singer Wham"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: kate-bush
+    displayName: "Kate Bush"
+    correctYear: 1958
+    peakFrom: 1978
+    peakTo: 2024
+    probability: 80
+    wikimediaSearchHints: ["Kate Bush singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: bjork
+    displayName: "Björk"
+    correctYear: 1965
+    peakFrom: 1988
+    peakTo: 2024
+    probability: 82
+    wikimediaSearchHints: ["Björk singer Iceland"]
+    answerMethods: ["timeline", "name-letters"]
