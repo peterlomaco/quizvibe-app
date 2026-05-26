@@ -56,3 +56,51 @@ items:
     probability: 90
     wikimediaSearchHints: ["AC/DC band rock"]
     answerMethods: ["timeline", "name-letters"]
+  - id: u2
+    displayName: "U2"
+    correctYear: 1976
+    probability: 88
+    wikimediaSearchHints: ["U2 band Bono"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: metallica
+    displayName: "Metallica"
+    correctYear: 1981
+    probability: 90
+    wikimediaSearchHints: ["Metallica band metal"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: eagles
+    displayName: "Eagles"
+    correctYear: 1971
+    probability: 85
+    wikimediaSearchHints: ["Eagles band Hotel California"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: fleetwood-mac
+    displayName: "Fleetwood Mac"
+    correctYear: 1967
+    probability: 82
+    wikimediaSearchHints: ["Fleetwood Mac band"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: the-who
+    displayName: "The Who"
+    correctYear: 1964
+    probability: 82
+    wikimediaSearchHints: ["The Who band rock"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: black-sabbath
+    displayName: "Black Sabbath"
+    correctYear: 1968
+    probability: 82
+    wikimediaSearchHints: ["Black Sabbath band Ozzy"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: guns-n-roses
+    displayName: "Guns N' Roses"
+    correctYear: 1985
+    probability: 88
+    wikimediaSearchHints: ["Guns N Roses band Axl Rose"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: coldplay
+    displayName: "Coldplay"
+    correctYear: 1996
+    probability: 90
+    wikimediaSearchHints: ["Coldplay band Chris Martin"]
+    answerMethods: ["timeline", "name-letters"]
