@@ -27,6 +27,186 @@ export interface MusicQuestion {
 
 export const MUSIC_QUESTIONS: MusicQuestion[] = [
   {
+    "id": "louis-armstrong-body-and-soul",
+    "displayName": "Body and Soul — Louis Armstrong",
+    "correctYear": 1930,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "jSmIXHwQWBw",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "THE HEHR ARCHIVE",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
+    "id": "cab-calloway-minnie-the-moocher",
+    "displayName": "Minnie the Moocher — Cab Calloway",
+    "correctYear": 1931,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "250MMq0fTrU",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Juanjo de Goya",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
+    "id": "fred-astaire-night-and-day",
+    "displayName": "Night and Day — Fred Astaire",
+    "correctYear": 1932,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "h02OmcR-be4",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Music Video Vault",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
+    "id": "ethel-waters-stormy-weather",
+    "displayName": "Stormy Weather — Ethel Waters",
+    "correctYear": 1933,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "dyo77R5ShTM",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "American Musical Theater Archives",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
+    "id": "cole-porter-anything-goes",
+    "displayName": "Anything Goes — Cole Porter",
+    "correctYear": 1934,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "3zFBAEj7kdA",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Cole Porter - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (2)."
+      }
+    ]
+  },
+  {
+    "id": "fred-astaire-cheek-to-cheek",
+    "displayName": "Cheek to Cheek — Fred Astaire",
+    "correctYear": 1935,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "P1u2G16fq_Y",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Music Video Vault",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
+    "id": "bing-crosby-pennies-from-heaven",
+    "displayName": "Pennies from Heaven — Bing Crosby",
+    "correctYear": 1936,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "XXpUoL52a1w",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Richard Parker",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
+    "id": "duke-ellington-caravan",
+    "displayName": "Caravan — Duke Ellington",
+    "correctYear": 1937,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "cAeEhTD1xhU",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Alain Corrieras",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
+    "id": "ella-fitzgerald-a-tisket-a-tasket",
+    "displayName": "A-Tisket, A-Tasket — Ella Fitzgerald",
+    "correctYear": 1938,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "AeQlHNDB9no",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "The Culture Vaults",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
     "id": "judy-garland-over-the-rainbow",
     "displayName": "Over the Rainbow — Judy Garland",
     "correctYear": 1939,
@@ -67,6 +247,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "glenn-miller-chattanooga-choo-choo",
+    "displayName": "Chattanooga Choo Choo — Glenn Miller",
+    "correctYear": 1941,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "hae8bYKARr4",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "3 Roads Communications",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
     "id": "bing-crosby-white-christmas",
     "displayName": "White Christmas — Bing Crosby",
     "correctYear": 1942,
@@ -87,6 +287,66 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "dooley-wilson-as-time-goes-by",
+    "displayName": "As Time Goes By — Dooley Wilson",
+    "correctYear": 1943,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "BumNgaR13o0",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "༺☆𝗧𝗛𝗘𝗙𝗜𝗬𝗢𝗨 𝗠𝗢𝗩𝗜𝗘𝗦☆༻",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
+    "id": "bing-crosby-swinging-on-a-star",
+    "displayName": "Swinging on a Star — Bing Crosby",
+    "correctYear": 1944,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "BEnBcm3QIfs",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Classic Mood Experience",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
+    "id": "doris-day-sentimental-journey",
+    "displayName": "Sentimental Journey — Doris Day",
+    "correctYear": 1945,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "M3y0KbLvWLY",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Buzz Stephens",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
     "id": "nat-king-cole-the-christmas-song",
     "displayName": "The Christmas Song — Nat King Cole",
     "correctYear": 1946,
@@ -103,6 +363,186 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Nat King Cole - Topic",
         "license": "standard",
         "notes": "Officiell album-audio via YouTube Topic. 'Chestnuts roasting'-vers."
+      }
+    ]
+  },
+  {
+    "id": "frank-sinatra-almost-like-being-in-love",
+    "displayName": "Almost Like Being in Love — Frank Sinatra",
+    "correctYear": 1947,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "zMRoByJI43Q",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Micah Gwinn",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
+    "id": "nat-king-cole-nature-boy",
+    "displayName": "Nature Boy — Nat King Cole",
+    "correctYear": 1948,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "D6NOJZpYp8c",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "시공초월노래 번역자 기뮤",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
+    "id": "perry-como-some-enchanted-evening",
+    "displayName": "Some Enchanted Evening — Perry Como",
+    "correctYear": 1949,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "bltUKtRFdfY",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Perry Como - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (2)."
+      }
+    ]
+  },
+  {
+    "id": "nat-king-cole-mona-lisa",
+    "displayName": "Mona Lisa — Nat King Cole",
+    "correctYear": 1950,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "NIDX18Xl16s",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "RPG Collection",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
+    "id": "johnnie-ray-cry",
+    "displayName": "Cry — Johnnie Ray",
+    "correctYear": 1951,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "8MgIO03OWy8",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Classic Mood Experience",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
+    "id": "jo-stafford-you-belong-to-me",
+    "displayName": "You Belong to Me — Jo Stafford",
+    "correctYear": 1952,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "mJvwzZZkb4M",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Larry Hinze",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
+    "id": "patti-page-doggie-in-the-window",
+    "displayName": "(How Much Is) That Doggie in the Window — Patti Page",
+    "correctYear": 1953,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "qkCHxeWyeTA",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "vintage video clips",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
+    "id": "bill-haley-rock-around-the-clock",
+    "displayName": "Rock Around the Clock — Bill Haley & His Comets",
+    "correctYear": 1954,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "VsAlSuEG26A",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "OLD TAPES",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
+    "id": "chuck-berry-maybellene",
+    "displayName": "Maybellene — Chuck Berry",
+    "correctYear": 1955,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "RMkIK0qZnjw",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Chuck Berry - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
       }
     ]
   },
@@ -147,6 +587,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "chuck-berry-johnny-b-goode",
+    "displayName": "Johnny B. Goode — Chuck Berry",
+    "correctYear": 1958,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "aKCt8ssC7cs",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "VisageClub80s",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
     "id": "pele-1958-world-cup",
     "displayName": "Pelé 17-årig vinner sin första VM",
     "correctYear": 1958,
@@ -163,6 +623,86 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "FIFA",
         "license": "standard",
         "notes": "FIFA official channel — Pelé:s mål i Brasilien-Sverige-finalen 1958."
+      }
+    ]
+  },
+  {
+    "id": "ray-charles-whatd-i-say",
+    "displayName": "What'd I Say — Ray Charles",
+    "correctYear": 1959,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "EPLZL4s_jtI",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Classic Mood Experience",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
+    "id": "everly-brothers-cathys-clown",
+    "displayName": "Cathy's Clown — The Everly Brothers",
+    "correctYear": 1960,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "MhOTUZbS2Fw",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Magda0815007",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
+    "id": "ben-e-king-stand-by-me",
+    "displayName": "Stand by Me — Ben E. King",
+    "correctYear": 1961,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "dTd2ylacYNU",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "PRIMITIV RECORD",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
+    "id": "beach-boys-surfin-safari",
+    "displayName": "Surfin' Safari — The Beach Boys",
+    "correctYear": 1962,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "tMnqV26Njxo",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "The Beach Boys - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (2)."
       }
     ]
   },
@@ -187,6 +727,89 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "beatles-a-hard-days-night",
+    "displayName": "A Hard Day's Night — The Beatles",
+    "correctYear": 1964,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "zx2TFk0vh1I",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "The Beatles - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
+    "id": "rolling-stones-satisfaction",
+    "displayName": "(I Can't Get No) Satisfaction — The Rolling Stones",
+    "correctYear": 1965,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "g5W4k6vD2WY",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "The Rolling Stones",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (13)."
+      }
+    ]
+  },
+  {
+    "id": "beach-boys-good-vibrations",
+    "displayName": "Good Vibrations — The Beach Boys",
+    "correctYear": 1966,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "mdt0SOqPJcg",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "PhilGoodFactor1",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
+    "id": "beatles-all-you-need-is-love",
+    "displayName": "All You Need Is Love — The Beatles",
+    "correctYear": 1967,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "Lm9Uy7_EqNc",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "MusicClub80s",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
     "id": "beatles-hey-jude",
     "displayName": "Hey Jude — The Beatles",
     "correctYear": 1968,
@@ -204,6 +827,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "The Beatles - Topic",
         "license": "standard",
         "notes": "Officiell album-audio via YouTube Topic (Remastered 2015). Opening 'Hey Jude'-hook."
+      }
+    ]
+  },
+  {
+    "id": "elvis-presley-suspicious-minds",
+    "displayName": "Suspicious Minds — Elvis Presley",
+    "correctYear": 1969,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "xt8XQLvKBUs",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Elvis Presley - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
       }
     ]
   },
@@ -250,6 +894,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "bill-withers-lean-on-me",
+    "displayName": "Lean on Me — Bill Withers",
+    "correctYear": 1972,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "fOZ-MySzAac",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Bill Withers - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
     "id": "spitz-1972-munich-olympics",
     "displayName": "Mark Spitz tar 7 OS-guld i München",
     "correctYear": 1972,
@@ -286,6 +951,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Paramount Pictures",
         "license": "standard",
         "notes": "Paramount Pictures 50th Anniversary trailer — Nino Rota theme + iconic scener."
+      }
+    ]
+  },
+  {
+    "id": "roberta-flack-killing-me-softly",
+    "displayName": "Killing Me Softly with His Song — Roberta Flack",
+    "correctYear": 1973,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "DEbi_YjpA-Y",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "RHINO",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (3)."
       }
     ]
   },
@@ -411,6 +1097,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "bee-gees-stayin-alive",
+    "displayName": "Stayin' Alive — Bee Gees",
+    "correctYear": 1977,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "I_izvAbhExY",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "beegees",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (18)."
+      }
+    ]
+  },
+  {
     "id": "star-wars-new-hope",
     "displayName": "Star Wars: A New Hope",
     "correctYear": 1977,
@@ -427,6 +1134,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Star Wars",
         "license": "standard",
         "notes": "Official Star Wars channel — A New Hope trailer. John Williams theme."
+      }
+    ]
+  },
+  {
+    "id": "chic-le-freak",
+    "displayName": "Le Freak — Chic",
+    "correctYear": 1978,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "kb0S0oypx_o",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "BBC Music",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
       }
     ]
   },
@@ -533,6 +1261,48 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "kim-carnes-bette-davis-eyes",
+    "displayName": "Bette Davis Eyes — Kim Carnes",
+    "correctYear": 1981,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "jIG9whz2oxY",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Enhanced Music Videos",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (18)."
+      }
+    ]
+  },
+  {
+    "id": "soft-cell-tainted-love",
+    "displayName": "Tainted Love — Soft Cell",
+    "correctYear": 1981,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "QyI975M9FK4",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "BBC Music",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
     "id": "e-t-the-extra-terrestrial",
     "displayName": "E.T. the Extra-Terrestrial",
     "correctYear": 1982,
@@ -614,6 +1384,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "irene-cara-flashdance-what-a-feeling",
+    "displayName": "Flashdance... What a Feeling — Irene Cara",
+    "correctYear": 1983,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "ILWSp0m9G2U",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "UnidiscMusic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (18)."
+      }
+    ]
+  },
+  {
     "id": "police-every-breath-you-take",
     "displayName": "Every Breath You Take — The Police",
     "correctYear": 1983,
@@ -651,6 +1442,48 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Olympics",
         "license": "standard",
         "notes": "Olympics official channel — Carl Lewis long jump-guld LA 1984."
+      }
+    ]
+  },
+  {
+    "id": "madonna-like-a-virgin",
+    "displayName": "Like a Virgin — Madonna",
+    "correctYear": 1984,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "4u6UkngBufI",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Enhanced Music Videos",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (18)."
+      }
+    ]
+  },
+  {
+    "id": "wham-wake-me-up-before-you-go-go",
+    "displayName": "Wake Me Up Before You Go-Go — Wham!",
+    "correctYear": 1984,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "YfAF92Z3iFw",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "LatinHype",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
       }
     ]
   },
@@ -696,6 +1529,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "usa-for-africa-we-are-the-world",
+    "displayName": "We Are the World — USA for Africa",
+    "correctYear": 1985,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "s3wNuru4U0I",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Oxygene 80",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (18)."
+      }
+    ]
+  },
+  {
     "id": "bon-jovi-livin-on-a-prayer",
     "displayName": "Livin' on a Prayer — Bon Jovi",
     "correctYear": 1986,
@@ -713,6 +1567,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Jon Bon Jovi - Topic",
         "license": "standard",
         "notes": "Officiell album-audio via YouTube Topic. 'Whoaa, we're halfway there'-refräng."
+      }
+    ]
+  },
+  {
+    "id": "europe-the-final-countdown",
+    "displayName": "The Final Countdown — Europe",
+    "correctYear": 1986,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "HyWajWueH2w",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "earMUSIC",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
       }
     ]
   },
@@ -799,6 +1674,48 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "bobby-mcferrin-dont-worry-be-happy",
+    "displayName": "Don't Worry, Be Happy — Bobby McFerrin",
+    "correctYear": 1988,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "UkpSWy67ClY",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "chambers of hourrors",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
+    "id": "tracy-chapman-fast-car",
+    "displayName": "Fast Car — Tracy Chapman",
+    "correctYear": 1988,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "AIOAlaACuv4",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Tracy Chapman",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (18)."
+      }
+    ]
+  },
+  {
     "id": "madonna-like-a-prayer",
     "displayName": "Like a Prayer — Madonna",
     "correctYear": 1989,
@@ -816,6 +1733,90 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Madonna - Topic",
         "license": "standard",
         "notes": "Officiell album-audio via YouTube Topic. Refrängområde."
+      }
+    ]
+  },
+  {
+    "id": "phil-collins-another-day-in-paradise",
+    "displayName": "Another Day in Paradise — Phil Collins",
+    "correctYear": 1989,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "p-YFR5uIrKk",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Phil Collins - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
+    "id": "madonna-vogue",
+    "displayName": "Vogue — Madonna",
+    "correctYear": 1990,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "sbP6knug7Js",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "MVIDEO4K",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (15)."
+      }
+    ]
+  },
+  {
+    "id": "sinead-oconnor-nothing-compares-2-u",
+    "displayName": "Nothing Compares 2 U — Sinéad O'Connor",
+    "correctYear": 1990,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "5KuGUP-C9Ko",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "The Late Late Show",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
+    "id": "bryan-adams-everything-i-do",
+    "displayName": "(Everything I Do) I Do It for You — Bryan Adams",
+    "correctYear": 1991,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "Y0pdQU87dc8",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Bryan Adams",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
       }
     ]
   },
@@ -861,6 +1862,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "boyz-ii-men-end-of-the-road",
+    "displayName": "End of the Road — Boyz II Men",
+    "correctYear": 1992,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "GXRABWGZyJc",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Kingscup20",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
     "id": "dream-team-1992-barcelona",
     "displayName": "Dream Team — Barcelona OS basket",
     "correctYear": 1992,
@@ -877,6 +1899,48 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Olympics",
         "license": "standard",
         "notes": "Olympics official channel — Best of Dream Team Barcelona 1992. Jordan/Magic/Bird."
+      }
+    ]
+  },
+  {
+    "id": "snap-rhythm-is-a-dancer",
+    "displayName": "Rhythm Is a Dancer — Snap!",
+    "correctYear": 1992,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "JYIaWeVL1JM",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "SNAP!",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (18)."
+      }
+    ]
+  },
+  {
+    "id": "4-non-blondes-whats-up",
+    "displayName": "What's Up? — 4 Non Blondes",
+    "correctYear": 1993,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "B6GdsRIbTSk",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "4 Non Blondes - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
       }
     ]
   },
@@ -921,6 +1985,48 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "ace-of-base-the-sign",
+    "displayName": "The Sign — Ace of Base",
+    "correctYear": 1994,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "iqu132vTl5Y",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Ace of Base",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (18)."
+      }
+    ]
+  },
+  {
+    "id": "cranberries-zombie",
+    "displayName": "Zombie — The Cranberries",
+    "correctYear": 1994,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "lRrC_d6dRZw",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "RockHype",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
     "id": "forrest-gump",
     "displayName": "Forrest Gump",
     "correctYear": 1994,
@@ -957,6 +2063,69 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Movieclips",
         "license": "standard",
         "notes": "Official trailer (Movieclips) — iconic surf-rock soundtrack + ensemble-shots."
+      }
+    ]
+  },
+  {
+    "id": "coolio-gangstas-paradise",
+    "displayName": "Gangsta's Paradise — Coolio",
+    "correctYear": 1995,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "7DXlY8LhWnI",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Coolio - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
+    "id": "oasis-wonderwall",
+    "displayName": "Wonderwall — Oasis",
+    "correctYear": 1995,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "Ve1EbKsNCdw",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Oasis",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
+    "id": "los-del-rio-macarena",
+    "displayName": "Macarena — Los del Río",
+    "correctYear": 1996,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "Z7EsuR5I8SE",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Los Del Río - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
       }
     ]
   },

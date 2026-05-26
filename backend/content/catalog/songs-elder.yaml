@@ -16,54 +16,108 @@ items:
     probability: 75
     wikimediaSearchHints: ["Louis Armstrong Body and Soul"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "jSmIXHwQWBw"
+        startSec: 30
+        endSec: 45
+        channelTitle: "THE HEHR ARCHIVE"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: cab-calloway-minnie-the-moocher
     displayName: "Minnie the Moocher — Cab Calloway"
     correctYear: 1931
     probability: 80
     wikimediaSearchHints: ["Cab Calloway Minnie the Moocher"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "250MMq0fTrU"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Juanjo de Goya"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: fred-astaire-night-and-day
     displayName: "Night and Day — Fred Astaire"
     correctYear: 1932
     probability: 78
     wikimediaSearchHints: ["Fred Astaire Night and Day Cole Porter"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "h02OmcR-be4"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Music Video Vault"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: ethel-waters-stormy-weather
     displayName: "Stormy Weather — Ethel Waters"
     correctYear: 1933
     probability: 78
     wikimediaSearchHints: ["Ethel Waters Stormy Weather 1933"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "dyo77R5ShTM"
+        startSec: 30
+        endSec: 45
+        channelTitle: "American Musical Theater Archives"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: cole-porter-anything-goes
     displayName: "Anything Goes — Cole Porter"
     correctYear: 1934
     probability: 75
     wikimediaSearchHints: ["Anything Goes Cole Porter 1934"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "3zFBAEj7kdA"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Cole Porter - Topic"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (2)."
   - id: fred-astaire-cheek-to-cheek
     displayName: "Cheek to Cheek — Fred Astaire"
     correctYear: 1935
     probability: 82
     wikimediaSearchHints: ["Fred Astaire Cheek to Cheek Top Hat"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "P1u2G16fq_Y"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Music Video Vault"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: bing-crosby-pennies-from-heaven
     displayName: "Pennies from Heaven — Bing Crosby"
     correctYear: 1936
     probability: 78
     wikimediaSearchHints: ["Bing Crosby Pennies from Heaven 1936"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "XXpUoL52a1w"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Richard Parker"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: duke-ellington-caravan
     displayName: "Caravan — Duke Ellington"
     correctYear: 1937
     probability: 80
     wikimediaSearchHints: ["Duke Ellington Caravan 1937"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "cAeEhTD1xhU"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Alain Corrieras"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: ella-fitzgerald-a-tisket-a-tasket
     displayName: "A-Tisket, A-Tasket — Ella Fitzgerald"
     correctYear: 1938
     probability: 80
     wikimediaSearchHints: ["Ella Fitzgerald A-Tisket A-Tasket"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "AeQlHNDB9no"
+        startSec: 30
+        endSec: 45
+        channelTitle: "The Culture Vaults"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   # Over the Rainbow flyttad till songs-all.yaml (cross-gen-iconic) 2026-05-22.
   - id: glenn-miller-in-the-mood
     displayName: "In the Mood — Glenn Miller"
@@ -83,6 +137,12 @@ items:
     probability: 82
     wikimediaSearchHints: ["Glenn Miller Chattanooga Choo Choo"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "hae8bYKARr4"
+        startSec: 30
+        endSec: 45
+        channelTitle: "3 Roads Communications"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: bing-crosby-white-christmas
     displayName: "White Christmas — Bing Crosby"
     correctYear: 1942
@@ -101,18 +161,36 @@ items:
     probability: 85
     wikimediaSearchHints: ["As Time Goes By Casablanca Dooley Wilson"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "BumNgaR13o0"
+        startSec: 30
+        endSec: 45
+        channelTitle: "༺☆𝗧𝗛𝗘𝗙𝗜𝗬𝗢𝗨 𝗠𝗢𝗩𝗜𝗘𝗦☆༻"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: bing-crosby-swinging-on-a-star
     displayName: "Swinging on a Star — Bing Crosby"
     correctYear: 1944
     probability: 78
     wikimediaSearchHints: ["Bing Crosby Swinging on a Star Going My Way"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "BEnBcm3QIfs"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Classic Mood Experience"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: doris-day-sentimental-journey
     displayName: "Sentimental Journey — Doris Day"
     correctYear: 1945
     probability: 80
     wikimediaSearchHints: ["Doris Day Sentimental Journey Les Brown"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "M3y0KbLvWLY"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Buzz Stephens"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: nat-king-cole-the-christmas-song
     displayName: "The Christmas Song — Nat King Cole"
     correctYear: 1946
@@ -131,54 +209,108 @@ items:
     probability: 75
     wikimediaSearchHints: ["Frank Sinatra Almost Like Being in Love Brigadoon"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "zMRoByJI43Q"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Micah Gwinn"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: nat-king-cole-nature-boy
     displayName: "Nature Boy — Nat King Cole"
     correctYear: 1948
     probability: 82
     wikimediaSearchHints: ["Nat King Cole Nature Boy 1948"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "D6NOJZpYp8c"
+        startSec: 30
+        endSec: 45
+        channelTitle: "시공초월노래 번역자 기뮤"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: perry-como-some-enchanted-evening
     displayName: "Some Enchanted Evening — Perry Como"
     correctYear: 1949
     probability: 78
     wikimediaSearchHints: ["Perry Como Some Enchanted Evening South Pacific"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "bltUKtRFdfY"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Perry Como - Topic"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (2)."
   - id: nat-king-cole-mona-lisa
     displayName: "Mona Lisa — Nat King Cole"
     correctYear: 1950
     probability: 88
     wikimediaSearchHints: ["Nat King Cole Mona Lisa 1950"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "NIDX18Xl16s"
+        startSec: 30
+        endSec: 45
+        channelTitle: "RPG Collection"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: johnnie-ray-cry
     displayName: "Cry — Johnnie Ray"
     correctYear: 1951
     probability: 75
     wikimediaSearchHints: ["Johnnie Ray Cry 1951"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "8MgIO03OWy8"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Classic Mood Experience"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: jo-stafford-you-belong-to-me
     displayName: "You Belong to Me — Jo Stafford"
     correctYear: 1952
     probability: 78
     wikimediaSearchHints: ["Jo Stafford You Belong to Me 1952"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "mJvwzZZkb4M"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Larry Hinze"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: patti-page-doggie-in-the-window
     displayName: "(How Much Is) That Doggie in the Window — Patti Page"
     correctYear: 1953
     probability: 82
     wikimediaSearchHints: ["Patti Page Doggie in the Window 1953"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "qkCHxeWyeTA"
+        startSec: 30
+        endSec: 45
+        channelTitle: "vintage video clips"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: bill-haley-rock-around-the-clock
     displayName: "Rock Around the Clock — Bill Haley & His Comets"
     correctYear: 1954
     probability: 92
     wikimediaSearchHints: ["Bill Haley Rock Around the Clock"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "VsAlSuEG26A"
+        startSec: 30
+        endSec: 45
+        channelTitle: "OLD TAPES"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: chuck-berry-maybellene
     displayName: "Maybellene — Chuck Berry"
     correctYear: 1955
     probability: 82
     wikimediaSearchHints: ["Chuck Berry Maybellene 1955"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "RMkIK0qZnjw"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Chuck Berry - Topic"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
   # Heartbreak Hotel flyttad till songs-all.yaml (cross-gen-iconic) 2026-05-22.
   - id: elvis-presley-jailhouse-rock
     displayName: "Jailhouse Rock — Elvis Presley"
@@ -198,30 +330,60 @@ items:
     probability: 92
     wikimediaSearchHints: ["Chuck Berry Johnny B Goode"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "aKCt8ssC7cs"
+        startSec: 30
+        endSec: 45
+        channelTitle: "VisageClub80s"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: ray-charles-whatd-i-say
     displayName: "What'd I Say — Ray Charles"
     correctYear: 1959
     probability: 88
     wikimediaSearchHints: ["Ray Charles What'd I Say"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "EPLZL4s_jtI"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Classic Mood Experience"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: everly-brothers-cathys-clown
     displayName: "Cathy's Clown — The Everly Brothers"
     correctYear: 1960
     probability: 80
     wikimediaSearchHints: ["Everly Brothers Cathy's Clown"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "MhOTUZbS2Fw"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Magda0815007"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: ben-e-king-stand-by-me
     displayName: "Stand by Me — Ben E. King"
     correctYear: 1961
     probability: 92
     wikimediaSearchHints: ["Ben E King Stand by Me 1961"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "dTd2ylacYNU"
+        startSec: 30
+        endSec: 45
+        channelTitle: "PRIMITIV RECORD"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: beach-boys-surfin-safari
     displayName: "Surfin' Safari — The Beach Boys"
     correctYear: 1962
     probability: 80
     wikimediaSearchHints: ["Beach Boys Surfin Safari 1962"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "tMnqV26Njxo"
+        startSec: 30
+        endSec: 45
+        channelTitle: "The Beach Boys - Topic"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (2)."
   - id: beatles-she-loves-you
     displayName: "She Loves You — The Beatles"
     correctYear: 1963
@@ -240,3 +402,9 @@ items:
     probability: 92
     wikimediaSearchHints: ["The Beatles A Hard Day's Night"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "zx2TFk0vh1I"
+        startSec: 30
+        endSec: 45
+        channelTitle: "The Beatles - Topic"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."

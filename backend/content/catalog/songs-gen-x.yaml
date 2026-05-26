@@ -15,18 +15,36 @@ items:
     probability: 92
     wikimediaSearchHints: ["Rolling Stones Satisfaction"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "g5W4k6vD2WY"
+        startSec: 30
+        endSec: 45
+        channelTitle: "The Rolling Stones"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (13)."
   - id: beach-boys-good-vibrations
     displayName: "Good Vibrations — The Beach Boys"
     correctYear: 1966
     probability: 88
     wikimediaSearchHints: ["Beach Boys Good Vibrations 1966"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "mdt0SOqPJcg"
+        startSec: 30
+        endSec: 45
+        channelTitle: "PhilGoodFactor1"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: beatles-all-you-need-is-love
     displayName: "All You Need Is Love — The Beatles"
     correctYear: 1967
     probability: 90
     wikimediaSearchHints: ["The Beatles All You Need Is Love"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "Lm9Uy7_EqNc"
+        startSec: 30
+        endSec: 45
+        channelTitle: "MusicClub80s"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: beatles-hey-jude
     displayName: "Hey Jude — The Beatles"
     correctYear: 1968
@@ -45,6 +63,12 @@ items:
     probability: 88
     wikimediaSearchHints: ["Elvis Presley Suspicious Minds 1969"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "xt8XQLvKBUs"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Elvis Presley - Topic"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
   - id: simon-garfunkel-bridge-over-troubled-water
     displayName: "Bridge Over Troubled Water — Simon & Garfunkel"
     correctYear: 1970
@@ -75,12 +99,24 @@ items:
     probability: 85
     wikimediaSearchHints: ["Bill Withers Lean on Me"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "fOZ-MySzAac"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Bill Withers - Topic"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
   - id: roberta-flack-killing-me-softly
     displayName: "Killing Me Softly with His Song — Roberta Flack"
     correctYear: 1973
     probability: 85
     wikimediaSearchHints: ["Roberta Flack Killing Me Softly"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "DEbi_YjpA-Y"
+        startSec: 30
+        endSec: 45
+        channelTitle: "RHINO"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (3)."
   - id: abba-waterloo
     displayName: "Waterloo — ABBA"
     correctYear: 1974
@@ -101,12 +137,24 @@ items:
     probability: 92
     wikimediaSearchHints: ["Bee Gees Stayin Alive Saturday Night Fever"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "I_izvAbhExY"
+        startSec: 30
+        endSec: 45
+        channelTitle: "beegees"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (18)."
   - id: chic-le-freak
     displayName: "Le Freak — Chic"
     correctYear: 1978
     probability: 80
     wikimediaSearchHints: ["Chic Le Freak 1978"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "kb0S0oypx_o"
+        startSec: 30
+        endSec: 45
+        channelTitle: "BBC Music"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: pink-floyd-another-brick-in-the-wall
     displayName: "Another Brick in the Wall, Part 2 — Pink Floyd"
     correctYear: 1979

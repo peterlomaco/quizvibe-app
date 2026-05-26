@@ -16,12 +16,24 @@ items:
     probability: 88
     wikimediaSearchHints: ["Soft Cell Tainted Love"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "QyI975M9FK4"
+        startSec: 30
+        endSec: 45
+        channelTitle: "BBC Music"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: kim-carnes-bette-davis-eyes
     displayName: "Bette Davis Eyes — Kim Carnes"
     correctYear: 1981
     probability: 80
     wikimediaSearchHints: ["Kim Carnes Bette Davis Eyes"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "jIG9whz2oxY"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Enhanced Music Videos"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (18)."
   # 1982
   # Billie Jean flyttad till songs-all.yaml (cross-gen-iconic) 2026-05-22.
   - id: survivor-eye-of-the-tiger
@@ -55,6 +67,12 @@ items:
     probability: 82
     wikimediaSearchHints: ["Irene Cara Flashdance What a Feeling"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "ILWSp0m9G2U"
+        startSec: 30
+        endSec: 45
+        channelTitle: "UnidiscMusic"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (18)."
   # 1984
   - id: madonna-like-a-virgin
     displayName: "Like a Virgin — Madonna"
@@ -62,12 +80,24 @@ items:
     probability: 92
     wikimediaSearchHints: ["Madonna Like a Virgin"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "4u6UkngBufI"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Enhanced Music Videos"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (18)."
   - id: wham-wake-me-up-before-you-go-go
     displayName: "Wake Me Up Before You Go-Go — Wham!"
     correctYear: 1984
     probability: 88
     wikimediaSearchHints: ["Wham Wake Me Up Before You Go-Go"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "YfAF92Z3iFw"
+        startSec: 30
+        endSec: 45
+        channelTitle: "LatinHype"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   # 1985
   - id: a-ha-take-on-me
     displayName: "Take on Me — a-ha"
@@ -87,6 +117,12 @@ items:
     probability: 88
     wikimediaSearchHints: ["USA for Africa We Are the World"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "s3wNuru4U0I"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Oxygene 80"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (18)."
   # 1986
   - id: europe-the-final-countdown
     displayName: "The Final Countdown — Europe"
@@ -94,6 +130,12 @@ items:
     probability: 92
     wikimediaSearchHints: ["Europe The Final Countdown"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "HyWajWueH2w"
+        startSec: 30
+        endSec: 45
+        channelTitle: "earMUSIC"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: bon-jovi-livin-on-a-prayer
     displayName: "Livin' on a Prayer — Bon Jovi"
     correctYear: 1986
@@ -138,12 +180,24 @@ items:
     probability: 88
     wikimediaSearchHints: ["Bobby McFerrin Don't Worry Be Happy"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "UkpSWy67ClY"
+        startSec: 30
+        endSec: 45
+        channelTitle: "chambers of hourrors"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: tracy-chapman-fast-car
     displayName: "Fast Car — Tracy Chapman"
     correctYear: 1988
     probability: 82
     wikimediaSearchHints: ["Tracy Chapman Fast Car"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "AIOAlaACuv4"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Tracy Chapman"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (18)."
   # 1989
   - id: madonna-like-a-prayer
     displayName: "Like a Prayer — Madonna"
@@ -163,6 +217,12 @@ items:
     probability: 82
     wikimediaSearchHints: ["Phil Collins Another Day in Paradise"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "p-YFR5uIrKk"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Phil Collins - Topic"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
   # 1990
   - id: sinead-oconnor-nothing-compares-2-u
     displayName: "Nothing Compares 2 U — Sinéad O'Connor"
@@ -170,12 +230,24 @@ items:
     probability: 90
     wikimediaSearchHints: ["Sinead O'Connor Nothing Compares 2 U"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "5KuGUP-C9Ko"
+        startSec: 30
+        endSec: 45
+        channelTitle: "The Late Late Show"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: madonna-vogue
     displayName: "Vogue — Madonna"
     correctYear: 1990
     probability: 88
     wikimediaSearchHints: ["Madonna Vogue"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "sbP6knug7Js"
+        startSec: 30
+        endSec: 45
+        channelTitle: "MVIDEO4K"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (15)."
   # 1991
   - id: bryan-adams-everything-i-do
     displayName: "(Everything I Do) I Do It for You — Bryan Adams"
@@ -183,6 +255,12 @@ items:
     probability: 88
     wikimediaSearchHints: ["Bryan Adams Everything I Do I Do It for You Robin Hood"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "Y0pdQU87dc8"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Bryan Adams"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: michael-jackson-black-or-white
     displayName: "Black or White — Michael Jackson"
     correctYear: 1991
@@ -202,12 +280,24 @@ items:
     probability: 85
     wikimediaSearchHints: ["Snap Rhythm Is a Dancer"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "JYIaWeVL1JM"
+        startSec: 30
+        endSec: 45
+        channelTitle: "SNAP!"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (18)."
   - id: boyz-ii-men-end-of-the-road
     displayName: "End of the Road — Boyz II Men"
     correctYear: 1992
     probability: 82
     wikimediaSearchHints: ["Boyz II Men End of the Road"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "GXRABWGZyJc"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Kingscup20"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   # 1993
   # I Will Always Love You flyttad till songs-all.yaml (cross-gen-iconic) 2026-05-22.
   - id: 4-non-blondes-whats-up
@@ -216,6 +306,12 @@ items:
     probability: 85
     wikimediaSearchHints: ["4 Non Blondes What's Up"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "B6GdsRIbTSk"
+        startSec: 30
+        endSec: 45
+        channelTitle: "4 Non Blondes - Topic"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
   # 1994
   - id: ace-of-base-the-sign
     displayName: "The Sign — Ace of Base"
@@ -223,12 +319,24 @@ items:
     probability: 92
     wikimediaSearchHints: ["Ace of Base The Sign"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "iqu132vTl5Y"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Ace of Base"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (18)."
   - id: cranberries-zombie
     displayName: "Zombie — The Cranberries"
     correctYear: 1994
     probability: 88
     wikimediaSearchHints: ["The Cranberries Zombie"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "lRrC_d6dRZw"
+        startSec: 30
+        endSec: 45
+        channelTitle: "RockHype"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   # 1995
   - id: oasis-wonderwall
     displayName: "Wonderwall — Oasis"
@@ -236,12 +344,24 @@ items:
     probability: 92
     wikimediaSearchHints: ["Oasis Wonderwall"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "Ve1EbKsNCdw"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Oasis"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: coolio-gangstas-paradise
     displayName: "Gangsta's Paradise — Coolio"
     correctYear: 1995
     probability: 88
     wikimediaSearchHints: ["Coolio Gangsta's Paradise Dangerous Minds"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "7DXlY8LhWnI"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Coolio - Topic"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
   # 1996
   - id: spice-girls-wannabe
     displayName: "Wannabe — Spice Girls"
@@ -261,3 +381,9 @@ items:
     probability: 88
     wikimediaSearchHints: ["Los del Rio Macarena Bayside Boys"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "Z7EsuR5I8SE"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Los Del Río - Topic"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
