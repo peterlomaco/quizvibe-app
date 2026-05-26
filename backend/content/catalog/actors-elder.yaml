@@ -107,3 +107,57 @@ items:
     probability: 78
     wikimediaSearchHints: ["Gary Cooper actor"]
     answerMethods: ["timeline", "name-letters"]
+  - id: marlon-brando
+    displayName: "Marlon Brando"
+    correctYear: 1924
+    probability: 88
+    wikimediaSearchHints: ["Marlon Brando actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: grace-kelly
+    displayName: "Grace Kelly"
+    correctYear: 1929
+    probability: 85
+    wikimediaSearchHints: ["Grace Kelly actress princess"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: elizabeth-taylor
+    displayName: "Elizabeth Taylor"
+    correctYear: 1932
+    probability: 85
+    wikimediaSearchHints: ["Elizabeth Taylor actress"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: john-wayne
+    displayName: "John Wayne"
+    correctYear: 1907
+    probability: 85
+    wikimediaSearchHints: ["John Wayne actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: lauren-bacall
+    displayName: "Lauren Bacall"
+    correctYear: 1924
+    probability: 78
+    wikimediaSearchHints: ["Lauren Bacall actress"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: greta-garbo
+    displayName: "Greta Garbo"
+    correctYear: 1905
+    probability: 80
+    wikimediaSearchHints: ["Greta Garbo actress Sweden"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: errol-flynn
+    displayName: "Errol Flynn"
+    correctYear: 1909
+    probability: 75
+    wikimediaSearchHints: ["Errol Flynn actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: james-cagney
+    displayName: "James Cagney"
+    correctYear: 1899
+    probability: 75
+    wikimediaSearchHints: ["James Cagney actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: shirley-temple
+    displayName: "Shirley Temple"
+    correctYear: 1928
+    probability: 80
+    wikimediaSearchHints: ["Shirley Temple child actress"]
+    answerMethods: ["timeline", "name-letters"]

@@ -163,3 +163,75 @@ items:
     probability: 82
     wikimediaSearchHints: ["Will Ferrell actor"]
     answerMethods: ["timeline", "name-letters"]
+  - id: idris-elba
+    displayName: "Idris Elba"
+    correctYear: 1972
+    probability: 85
+    wikimediaSearchHints: ["Idris Elba actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: mark-wahlberg
+    displayName: "Mark Wahlberg"
+    correctYear: 1971
+    probability: 85
+    wikimediaSearchHints: ["Mark Wahlberg actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: channing-tatum
+    displayName: "Channing Tatum"
+    correctYear: 1980
+    probability: 82
+    wikimediaSearchHints: ["Channing Tatum actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: joaquin-phoenix
+    displayName: "Joaquin Phoenix"
+    correctYear: 1974
+    probability: 88
+    wikimediaSearchHints: ["Joaquin Phoenix actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: edward-norton
+    displayName: "Edward Norton"
+    correctYear: 1969
+    probability: 80
+    wikimediaSearchHints: ["Edward Norton actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: dwayne-johnson
+    displayName: "Dwayne Johnson"
+    correctYear: 1972
+    probability: 92
+    wikimediaSearchHints: ["Dwayne Johnson actor Rock"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: mark-ruffalo
+    displayName: "Mark Ruffalo"
+    correctYear: 1967
+    probability: 80
+    wikimediaSearchHints: ["Mark Ruffalo actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: chris-hemsworth
+    displayName: "Chris Hemsworth"
+    correctYear: 1983
+    probability: 88
+    wikimediaSearchHints: ["Chris Hemsworth actor Thor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: chris-evans
+    displayName: "Chris Evans"
+    correctYear: 1981
+    probability: 88
+    wikimediaSearchHints: ["Chris Evans actor Captain America"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: scarlett-johansson
+    displayName: "Scarlett Johansson"
+    correctYear: 1984
+    probability: 90
+    wikimediaSearchHints: ["Scarlett Johansson actress"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: jennifer-lawrence
+    displayName: "Jennifer Lawrence"
+    correctYear: 1990
+    probability: 88
+    wikimediaSearchHints: ["Jennifer Lawrence actress"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: brie-larson
+    displayName: "Brie Larson"
+    correctYear: 1989
+    probability: 80
+    wikimediaSearchHints: ["Brie Larson actress"]
+    answerMethods: ["timeline", "name-letters"]

@@ -179,3 +179,93 @@ items:
     probability: 80
     wikimediaSearchHints: ["Helena Bonham Carter actress"]
     answerMethods: ["timeline", "name-letters"]
+  - id: kevin-costner
+    displayName: "Kevin Costner"
+    correctYear: 1955
+    probability: 85
+    wikimediaSearchHints: ["Kevin Costner actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: john-travolta
+    displayName: "John Travolta"
+    correctYear: 1954
+    probability: 88
+    wikimediaSearchHints: ["John Travolta actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: patrick-swayze
+    displayName: "Patrick Swayze"
+    correctYear: 1952
+    probability: 82
+    wikimediaSearchHints: ["Patrick Swayze actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: pierce-brosnan
+    displayName: "Pierce Brosnan"
+    correctYear: 1953
+    probability: 85
+    wikimediaSearchHints: ["Pierce Brosnan actor James Bond"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: rowan-atkinson
+    displayName: "Rowan Atkinson"
+    correctYear: 1955
+    probability: 90
+    wikimediaSearchHints: ["Rowan Atkinson Mr Bean"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: hugh-grant
+    displayName: "Hugh Grant"
+    correctYear: 1960
+    probability: 85
+    wikimediaSearchHints: ["Hugh Grant actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: daniel-craig
+    displayName: "Daniel Craig"
+    correctYear: 1968
+    probability: 88
+    wikimediaSearchHints: ["Daniel Craig actor James Bond"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: jeff-goldblum
+    displayName: "Jeff Goldblum"
+    correctYear: 1952
+    probability: 80
+    wikimediaSearchHints: ["Jeff Goldblum actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: christopher-walken
+    displayName: "Christopher Walken"
+    correctYear: 1943
+    probability: 82
+    wikimediaSearchHints: ["Christopher Walken actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: joe-pesci
+    displayName: "Joe Pesci"
+    correctYear: 1943
+    probability: 78
+    wikimediaSearchHints: ["Joe Pesci actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: bill-murray
+    displayName: "Bill Murray"
+    correctYear: 1950
+    probability: 85
+    wikimediaSearchHints: ["Bill Murray actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: michael-douglas
+    displayName: "Michael Douglas"
+    correctYear: 1944
+    probability: 82
+    wikimediaSearchHints: ["Michael Douglas actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: michael-keaton
+    displayName: "Michael Keaton"
+    correctYear: 1951
+    probability: 82
+    wikimediaSearchHints: ["Michael Keaton actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: gary-oldman
+    displayName: "Gary Oldman"
+    correctYear: 1958
+    probability: 82
+    wikimediaSearchHints: ["Gary Oldman actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: kurt-russell
+    displayName: "Kurt Russell"
+    correctYear: 1951
+    probability: 78
+    wikimediaSearchHints: ["Kurt Russell actor"]
+    answerMethods: ["timeline", "name-letters"]
