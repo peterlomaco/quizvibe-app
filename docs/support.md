@@ -5,7 +5,7 @@ description: Get help with QuizVibe. Contact, FAQ, account management, refunds, 
 
 # QuizVibe Support
 
-Need help? You've come to the right place.
+Need help with QuizVibe? You've come to the right place.
 
 QuizVibe is operated by **Peter Björklund**, an individual residing in Sweden. For all support questions, email **infoquizvibe@gmail.com**.
 
