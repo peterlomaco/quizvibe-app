@@ -179,3 +179,174 @@ items:
         endSec: 45
         channelTitle: "Queen Official"
         notes: "Live at Montreal Forum 1981 (Remastered) — official Queen-kanal. Iconic bassline."
+  # Expansion 2026-05-26: 16 nya iconic items för 1965-1978 så density blir
+  # 2/år (matchar songs-millennials/gen-z/gen-alpha). Bohemian Rhapsody +
+  # Hotel California + Dancing Queen utelämnade — finns i songs-all.yaml.
+  - id: the-who-my-generation
+    displayName: "My Generation — The Who"
+    correctYear: 1965
+    probability: 82
+    wikimediaSearchHints: ["The Who My Generation 1965"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "qIYuXJYaZWw"
+        startSec: 30
+        endSec: 45
+        channelTitle: "The Who - Topic"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: rolling-stones-paint-it-black
+    displayName: "Paint It Black — The Rolling Stones"
+    correctYear: 1966
+    probability: 85
+    wikimediaSearchHints: ["Rolling Stones Paint It Black 1966"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "170sceOWWXc"
+        startSec: 30
+        endSec: 45
+        channelTitle: "The Rolling Stones - Topic"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: jimi-hendrix-purple-haze
+    displayName: "Purple Haze — Jimi Hendrix"
+    correctYear: 1967
+    probability: 85
+    wikimediaSearchHints: ["Jimi Hendrix Purple Haze Are You Experienced"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "cbG7HEEPE1o"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Jimi Hendrix - Topic"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: aretha-franklin-respect
+    displayName: "Respect — Aretha Franklin"
+    correctYear: 1967
+    probability: 88
+    wikimediaSearchHints: ["Aretha Franklin Respect 1967"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "9iayJ8u4Qew"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Aretha Franklin - Topic"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: steppenwolf-born-to-be-wild
+    displayName: "Born to Be Wild — Steppenwolf"
+    correctYear: 1968
+    probability: 82
+    wikimediaSearchHints: ["Steppenwolf Born to Be Wild Easy Rider"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "igvP806798U"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Steppenwolf - Topic"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: simon-garfunkel-mrs-robinson
+    displayName: "Mrs. Robinson — Simon & Garfunkel"
+    correctYear: 1968
+    probability: 80
+    wikimediaSearchHints: ["Simon Garfunkel Mrs Robinson Graduate"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "zJ_C0hk_pkE"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Simon & Garfunkel - Topic"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: archies-sugar-sugar
+    displayName: "Sugar, Sugar — The Archies"
+    correctYear: 1969
+    probability: 75
+    wikimediaSearchHints: ["The Archies Sugar Sugar 1969"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "C7T4aQMxTTM"
+        startSec: 30
+        endSec: 45
+        channelTitle: "The Archies - Topic"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: beatles-let-it-be
+    displayName: "Let It Be — The Beatles"
+    correctYear: 1970
+    probability: 92
+    wikimediaSearchHints: ["The Beatles Let It Be 1970"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "QDYfEBY9NM4"
+        startSec: 30
+        endSec: 45
+        channelTitle: "The Beatles - Topic"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: led-zeppelin-stairway-to-heaven
+    displayName: "Stairway to Heaven — Led Zeppelin"
+    correctYear: 1971
+    probability: 95
+    wikimediaSearchHints: ["Led Zeppelin Stairway to Heaven IV"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "X791IzOwt3Q"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Led Zeppelin - Topic"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: don-mclean-american-pie
+    displayName: "American Pie — Don McLean"
+    correctYear: 1971
+    probability: 88
+    wikimediaSearchHints: ["Don McLean American Pie 1971"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "iX_TFkut1PM"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Don McLean - Topic"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: elton-john-crocodile-rock
+    displayName: "Crocodile Rock — Elton John"
+    correctYear: 1973
+    probability: 82
+    wikimediaSearchHints: ["Elton John Crocodile Rock 1973"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "75r0nQu-hMs"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Elton John - Topic"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: lynyrd-skynyrd-sweet-home-alabama
+    displayName: "Sweet Home Alabama — Lynyrd Skynyrd"
+    correctYear: 1974
+    probability: 88
+    wikimediaSearchHints: ["Lynyrd Skynyrd Sweet Home Alabama 1974"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "iL-jC7XyLeo"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Lynyrd Skynyrd - Topic"
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: bruce-springsteen-born-to-run
+    displayName: "Born to Run — Bruce Springsteen"
+    correctYear: 1975
+    probability: 82
+    wikimediaSearchHints: ["Bruce Springsteen Born to Run 1975"]
+    answerMethods: ["timeline"]
+  - id: abba-mamma-mia
+    displayName: "Mamma Mia — ABBA"
+    correctYear: 1976
+    probability: 82
+    wikimediaSearchHints: ["ABBA Mamma Mia 1976"]
+    answerMethods: ["timeline"]
+  - id: queen-we-will-rock-you
+    displayName: "We Will Rock You — Queen"
+    correctYear: 1977
+    probability: 88
+    wikimediaSearchHints: ["Queen We Will Rock You News of the World"]
+    answerMethods: ["timeline"]
+  - id: village-people-ymca
+    displayName: "Y.M.C.A. — Village People"
+    correctYear: 1978
+    probability: 90
+    wikimediaSearchHints: ["Village People YMCA 1978"]
+    answerMethods: ["timeline"]

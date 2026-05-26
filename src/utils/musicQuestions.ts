@@ -768,6 +768,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "the-who-my-generation",
+    "displayName": "My Generation — The Who",
+    "correctYear": 1965,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "qIYuXJYaZWw",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "The Who - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
     "id": "beach-boys-good-vibrations",
     "displayName": "Good Vibrations — The Beach Boys",
     "correctYear": 1966,
@@ -785,6 +806,48 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "PhilGoodFactor1",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
+    "id": "rolling-stones-paint-it-black",
+    "displayName": "Paint It Black — The Rolling Stones",
+    "correctYear": 1966,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "170sceOWWXc",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "The Rolling Stones - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
+    "id": "aretha-franklin-respect",
+    "displayName": "Respect — Aretha Franklin",
+    "correctYear": 1967,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "9iayJ8u4Qew",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Aretha Franklin - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
       }
     ]
   },
@@ -810,6 +873,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "jimi-hendrix-purple-haze",
+    "displayName": "Purple Haze — Jimi Hendrix",
+    "correctYear": 1967,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "cbG7HEEPE1o",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Jimi Hendrix - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
     "id": "beatles-hey-jude",
     "displayName": "Hey Jude — The Beatles",
     "correctYear": 1968,
@@ -831,6 +915,69 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "simon-garfunkel-mrs-robinson",
+    "displayName": "Mrs. Robinson — Simon & Garfunkel",
+    "correctYear": 1968,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "zJ_C0hk_pkE",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Simon & Garfunkel - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
+    "id": "steppenwolf-born-to-be-wild",
+    "displayName": "Born to Be Wild — Steppenwolf",
+    "correctYear": 1968,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "igvP806798U",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Steppenwolf - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
+    "id": "archies-sugar-sugar",
+    "displayName": "Sugar, Sugar — The Archies",
+    "correctYear": 1969,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "C7T4aQMxTTM",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "The Archies - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
     "id": "elvis-presley-suspicious-minds",
     "displayName": "Suspicious Minds — Elvis Presley",
     "correctYear": 1969,
@@ -846,6 +993,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "startSec": 30,
         "endSec": 45,
         "channelTitle": "Elvis Presley - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
+    "id": "beatles-let-it-be",
+    "displayName": "Let It Be — The Beatles",
+    "correctYear": 1970,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "QDYfEBY9NM4",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "The Beatles - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
       }
@@ -873,6 +1041,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "don-mclean-american-pie",
+    "displayName": "American Pie — Don McLean",
+    "correctYear": 1971,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "iX_TFkut1PM",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Don McLean - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
     "id": "john-lennon-imagine",
     "displayName": "Imagine — John Lennon",
     "correctYear": 1971,
@@ -890,6 +1079,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "John Lennon - Topic",
         "license": "standard",
         "notes": "Officiell album-audio via YouTube Topic (Ultimate Mix). Mid-song."
+      }
+    ]
+  },
+  {
+    "id": "led-zeppelin-stairway-to-heaven",
+    "displayName": "Stairway to Heaven — Led Zeppelin",
+    "correctYear": 1971,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "X791IzOwt3Q",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Led Zeppelin - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
       }
     ]
   },
@@ -955,6 +1165,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "elton-john-crocodile-rock",
+    "displayName": "Crocodile Rock — Elton John",
+    "correctYear": 1973,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "75r0nQu-hMs",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Elton John - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
     "id": "roberta-flack-killing-me-softly",
     "displayName": "Killing Me Softly with His Song — Roberta Flack",
     "correctYear": 1973,
@@ -993,6 +1224,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "ABBA - Topic",
         "license": "standard",
         "notes": "Officiell album-audio via YouTube Topic. Eurovision-låten."
+      }
+    ]
+  },
+  {
+    "id": "lynyrd-skynyrd-sweet-home-alabama",
+    "displayName": "Sweet Home Alabama — Lynyrd Skynyrd",
+    "correctYear": 1974,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "iL-jC7XyLeo",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Lynyrd Skynyrd - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
       }
     ]
   },
