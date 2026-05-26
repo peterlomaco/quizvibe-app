@@ -66,3 +66,11 @@ items:
     probability: 90
     wikimediaSearchHints: ["David Bowie musician"]
     answerMethods: ["timeline", "name-letters"]
+  - id: cher
+    displayName: "Cher"
+    correctYear: 1946
+    peakFrom: 1965
+    peakTo: 2024
+    probability: 85
+    wikimediaSearchHints: ["Cher singer actress"]
+    answerMethods: ["timeline", "name-letters"]

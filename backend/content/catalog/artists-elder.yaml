@@ -55,3 +55,19 @@ items:
     probability: 90
     wikimediaSearchHints: ["Bob Dylan singer songwriter"]
     answerMethods: ["timeline", "name-letters"]
+  - id: james-brown
+    displayName: "James Brown"
+    correctYear: 1933
+    peakFrom: 1956
+    peakTo: 2006
+    probability: 85
+    wikimediaSearchHints: ["James Brown singer Godfather of Soul"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: stevie-wonder
+    displayName: "Stevie Wonder"
+    correctYear: 1950
+    peakFrom: 1963
+    peakTo: 2020
+    probability: 88
+    wikimediaSearchHints: ["Stevie Wonder"]
+    answerMethods: ["timeline", "name-letters"]

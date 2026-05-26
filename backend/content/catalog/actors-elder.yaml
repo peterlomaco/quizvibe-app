@@ -41,3 +41,9 @@ items:
     probability: 82
     wikimediaSearchHints: ["Katharine Hepburn actress"]
     answerMethods: ["timeline", "name-letters"]
+  - id: sean-connery
+    displayName: "Sean Connery"
+    correctYear: 1930
+    probability: 90
+    wikimediaSearchHints: ["Sean Connery actor James Bond"]
+    answerMethods: ["timeline", "name-letters"]

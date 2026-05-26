@@ -43,3 +43,9 @@ items:
     probability: 92
     wikimediaSearchHints: ["Brad Pitt actor"]
     answerMethods: ["timeline", "name-letters"]
+  - id: will-smith
+    displayName: "Will Smith"
+    correctYear: 1968
+    probability: 92
+    wikimediaSearchHints: ["Will Smith actor"]
+    answerMethods: ["timeline", "name-letters"]

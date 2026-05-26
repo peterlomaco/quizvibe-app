@@ -104,3 +104,27 @@ items:
     probability: 90
     wikimediaSearchHints: ["Coldplay band Chris Martin"]
     answerMethods: ["timeline", "name-letters"]
+  - id: aerosmith
+    displayName: "Aerosmith"
+    correctYear: 1970
+    probability: 85
+    wikimediaSearchHints: ["Aerosmith band Steven Tyler"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: the-doors
+    displayName: "The Doors"
+    correctYear: 1965
+    probability: 85
+    wikimediaSearchHints: ["The Doors band Jim Morrison"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: foo-fighters
+    displayName: "Foo Fighters"
+    correctYear: 1994
+    probability: 88
+    wikimediaSearchHints: ["Foo Fighters band Dave Grohl"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: arctic-monkeys
+    displayName: "Arctic Monkeys"
+    correctYear: 2002
+    probability: 82
+    wikimediaSearchHints: ["Arctic Monkeys band Alex Turner"]
+    answerMethods: ["timeline", "name-letters"]

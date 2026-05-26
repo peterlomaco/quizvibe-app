@@ -68,3 +68,11 @@ items:
     probability: 85
     wikimediaSearchHints: ["Bad Bunny rapper", "Benito Martinez Ocasio"]
     answerMethods: ["timeline", "name-letters"]
+  - id: dua-lipa
+    displayName: "Dua Lipa"
+    correctYear: 1995
+    peakFrom: 2015
+    peakTo: 2024
+    probability: 90
+    wikimediaSearchHints: ["Dua Lipa singer"]
+    answerMethods: ["timeline", "name-letters"]

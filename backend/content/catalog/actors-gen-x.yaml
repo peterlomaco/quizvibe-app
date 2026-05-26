@@ -41,3 +41,15 @@ items:
     probability: 88
     wikimediaSearchHints: ["Meryl Streep actress"]
     answerMethods: ["timeline", "name-letters"]
+  - id: robin-williams
+    displayName: "Robin Williams"
+    correctYear: 1951
+    probability: 90
+    wikimediaSearchHints: ["Robin Williams actor comedian"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: robert-de-niro
+    displayName: "Robert De Niro"
+    correctYear: 1943
+    probability: 88
+    wikimediaSearchHints: ["Robert De Niro actor"]
+    answerMethods: ["timeline", "name-letters"]

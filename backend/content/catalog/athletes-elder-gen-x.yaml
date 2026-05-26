@@ -85,3 +85,15 @@ items:
     probability: 85
     wikimediaSearchHints: ["Larry Bird basketball Celtics"]
     answerMethods: ["timeline", "name-letters"]
+  - id: mike-tyson
+    displayName: "Mike Tyson"
+    correctYear: 1966
+    probability: 92
+    wikimediaSearchHints: ["Mike Tyson boxer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: boris-becker
+    displayName: "Boris Becker"
+    correctYear: 1967
+    probability: 88
+    wikimediaSearchHints: ["Boris Becker tennis"]
+    answerMethods: ["timeline", "name-letters"]

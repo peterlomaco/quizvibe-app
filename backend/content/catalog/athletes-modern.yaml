@@ -67,3 +67,27 @@ items:
     probability: 88
     wikimediaSearchHints: ["Simone Biles gymnastics"]
     answerMethods: ["timeline", "name-letters"]
+  - id: tiger-woods
+    displayName: "Tiger Woods"
+    correctYear: 1975
+    probability: 92
+    wikimediaSearchHints: ["Tiger Woods golf"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: lewis-hamilton
+    displayName: "Lewis Hamilton"
+    correctYear: 1985
+    probability: 88
+    wikimediaSearchHints: ["Lewis Hamilton Formula 1 driver"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: stephen-curry
+    displayName: "Stephen Curry"
+    correctYear: 1988
+    probability: 88
+    wikimediaSearchHints: ["Stephen Curry basketball Warriors"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: naomi-osaka
+    displayName: "Naomi Osaka"
+    correctYear: 1997
+    probability: 82
+    wikimediaSearchHints: ["Naomi Osaka tennis"]
+    answerMethods: ["timeline", "name-letters"]

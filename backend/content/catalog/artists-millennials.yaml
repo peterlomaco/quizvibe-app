@@ -74,3 +74,11 @@ items:
     probability: 88
     wikimediaSearchHints: ["Justin Timberlake singer"]
     answerMethods: ["timeline", "name-letters"]
+  - id: pink
+    displayName: "Pink"
+    correctYear: 1979
+    peakFrom: 2000
+    peakTo: 2024
+    probability: 85
+    wikimediaSearchHints: ["Pink singer P!nk Alecia Moore"]
+    answerMethods: ["timeline", "name-letters"]

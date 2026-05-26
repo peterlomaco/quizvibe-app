@@ -25,3 +25,9 @@ items:
     probability: 88
     wikimediaSearchHints: ["Zendaya actress"]
     answerMethods: ["timeline", "name-letters"]
+  - id: timothee-chalamet
+    displayName: "Timothée Chalamet"
+    correctYear: 1995
+    probability: 85
+    wikimediaSearchHints: ["Timothée Chalamet actor"]
+    answerMethods: ["timeline", "name-letters"]
