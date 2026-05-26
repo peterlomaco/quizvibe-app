@@ -29,3 +29,15 @@ items:
     probability: 90
     wikimediaSearchHints: ["Audrey Hepburn"]
     answerMethods: ["timeline", "name-letters"]
+  - id: cary-grant
+    displayName: "Cary Grant"
+    correctYear: 1904
+    probability: 80
+    wikimediaSearchHints: ["Cary Grant actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: katharine-hepburn
+    displayName: "Katharine Hepburn"
+    correctYear: 1907
+    probability: 82
+    wikimediaSearchHints: ["Katharine Hepburn actress"]
+    answerMethods: ["timeline", "name-letters"]

@@ -29,3 +29,15 @@ items:
     probability: 96
     wikimediaSearchHints: ["Leonardo DiCaprio"]
     answerMethods: ["timeline", "name-letters"]
+  - id: tom-cruise
+    displayName: "Tom Cruise"
+    correctYear: 1962
+    probability: 92
+    wikimediaSearchHints: ["Tom Cruise actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: meryl-streep
+    displayName: "Meryl Streep"
+    correctYear: 1949
+    probability: 88
+    wikimediaSearchHints: ["Meryl Streep actress"]
+    answerMethods: ["timeline", "name-letters"]

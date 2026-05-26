@@ -37,3 +37,9 @@ items:
     probability: 80
     wikimediaSearchHints: ["Florence Pugh actress"]
     answerMethods: ["timeline", "name-letters"]
+  - id: brad-pitt
+    displayName: "Brad Pitt"
+    correctYear: 1963
+    probability: 92
+    wikimediaSearchHints: ["Brad Pitt actor"]
+    answerMethods: ["timeline", "name-letters"]

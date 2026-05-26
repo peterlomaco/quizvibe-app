@@ -19,3 +19,9 @@ items:
     probability: 80
     wikimediaSearchHints: ["Jenna Ortega actress"]
     answerMethods: ["timeline", "name-letters"]
+  - id: zendaya
+    displayName: "Zendaya"
+    correctYear: 1996
+    probability: 88
+    wikimediaSearchHints: ["Zendaya actress"]
+    answerMethods: ["timeline", "name-letters"]

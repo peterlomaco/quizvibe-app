@@ -67,3 +67,21 @@ items:
     probability: 92
     wikimediaSearchHints: ["Peter Forsberg ice hockey"]
     answerMethods: ["timeline", "name-letters"]
+  - id: wayne-gretzky
+    displayName: "Wayne Gretzky"
+    correctYear: 1961
+    probability: 88
+    wikimediaSearchHints: ["Wayne Gretzky ice hockey"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: martina-navratilova
+    displayName: "Martina Navratilova"
+    correctYear: 1956
+    probability: 85
+    wikimediaSearchHints: ["Martina Navratilova tennis"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: larry-bird
+    displayName: "Larry Bird"
+    correctYear: 1956
+    probability: 85
+    wikimediaSearchHints: ["Larry Bird basketball Celtics"]
+    answerMethods: ["timeline", "name-letters"]

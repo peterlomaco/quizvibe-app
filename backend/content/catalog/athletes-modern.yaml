@@ -49,3 +49,21 @@ items:
     probability: 88
     wikimediaSearchHints: ["Armand Duplantis pole vault"]
     answerMethods: ["timeline", "name-letters"]
+  - id: tom-brady
+    displayName: "Tom Brady"
+    correctYear: 1977
+    probability: 88
+    wikimediaSearchHints: ["Tom Brady NFL quarterback"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: lebron-james
+    displayName: "LeBron James"
+    correctYear: 1984
+    probability: 92
+    wikimediaSearchHints: ["LeBron James basketball"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: simone-biles
+    displayName: "Simone Biles"
+    correctYear: 1997
+    probability: 88
+    wikimediaSearchHints: ["Simone Biles gymnastics"]
+    answerMethods: ["timeline", "name-letters"]
