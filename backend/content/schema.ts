@@ -20,19 +20,19 @@ export const AudienceSchema = z.union([
 export type Audience = z.infer<typeof AudienceSchema>;
 
 // Region = kulturell igenkännings-scope. V1-katalogen kuras för svensk
-// igenkänning så alla items default-taggas `["sweden"]`. När vi senare
-// expanderar geografiskt kan items tagga flera regioner — t.ex. en
-// global-iconic-figur som The Beatles kan bli `["sweden", "nordics",
-// "europe", "global"]`. Item-level region override:ar fil-headerns
-// region-tag (parallell pattern som audience-override).
+// igenkänning så alla items default-taggas `["sweden"]`. Vi expanderar
+// land för land — när vi senare lägger till Norge utökas enum:en med
+// `'norway'` och relevanta items får multi-tag (`["sweden", "norway"]`).
+// Aggregations som "nordics" eller "global" introduceras INTE från start;
+// de kan eventuellt läggas till senare när vi har tillräckligt många
+// länder att gruppera, men då som separata explicit-curering-tags
+// (inte automatiska från geografisk närhet). Item-level region overrider
+// fil-headerns region-tag (parallell pattern som audience-override).
 //
-// Filter-semantik (V2): visa item om item.region intersects player.region
-// ELLER innehåller 'global'. Player default-region = 'sweden' i V1.
+// Filter-semantik: visa item om item.region intersects player.region.
+// Player default-region = 'sweden' i V1.
 export const RegionSchema = z.enum([
   'sweden',
-  'nordics',
-  'europe',
-  'global',
 ]);
 export type Region = z.infer<typeof RegionSchema>;
 
@@ -243,11 +243,10 @@ export const ContentItemSchema = z.object({
   audience: z.array(AudienceSchema).min(1).optional(),
   // Item-level region-override. När satt overrider den fil-headerns
   // region-tag för detta specifika item. Edge-case-fix när item-recognition
-  // är bredare än fil-default (t.ex. The Beatles i bands-classics.yaml som
-  // har region=['sweden'] default men borde vara ['sweden','nordics',
-  // 'europe','global']). Saknar item:et `region` används fil-region som
-  // tidigare. Multi-region-listor är OK; ordningen spelar ingen roll
-  // semantiskt men följ konventionen [sweden, nordics, europe, global].
+  // är bredare än fil-default — i V1 finns bara `sweden` så overriden
+  // har sällan användning. Kommer bli relevant när fler länder läggs till
+  // i RegionSchema (Norge, Danmark, etc.) och samma item bör visas i
+  // flera. Saknar item:et `region` används fil-region som tidigare.
   region: z.array(RegionSchema).min(1).optional(),
   notes: z.string().optional(),
 })
