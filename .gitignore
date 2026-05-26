@@ -53,3 +53,9 @@ app-example
 # FIXED_QUESTION_TEXT) speglar matrisens innehåll så vi inte beror på filen.
 *.xlsx
 ~$*.xlsx
+
+# secrets
+.secrets/
+
+# Transient curation artifact — regenererad varje batch via batch-pick-clips/topic-pick-clips
+backend/scripts/batch-picks.json
