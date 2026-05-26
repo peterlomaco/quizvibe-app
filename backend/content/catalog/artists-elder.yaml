@@ -159,3 +159,115 @@ items:
     probability: 78
     wikimediaSearchHints: ["Roy Orbison singer"]
     answerMethods: ["timeline", "name-letters"]
+  - id: aretha-franklin
+    displayName: "Aretha Franklin"
+    correctYear: 1942
+    peakFrom: 1961
+    peakTo: 2018
+    probability: 92
+    wikimediaSearchHints: ["Aretha Franklin singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: little-richard
+    displayName: "Little Richard"
+    correctYear: 1932
+    peakFrom: 1955
+    peakTo: 2020
+    probability: 82
+    wikimediaSearchHints: ["Little Richard musician"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: dean-martin
+    displayName: "Dean Martin"
+    correctYear: 1917
+    peakFrom: 1946
+    peakTo: 1995
+    probability: 82
+    wikimediaSearchHints: ["Dean Martin singer actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: sammy-davis-jr
+    displayName: "Sammy Davis Jr."
+    correctYear: 1925
+    peakFrom: 1949
+    peakTo: 1990
+    probability: 78
+    wikimediaSearchHints: ["Sammy Davis Jr singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: tom-jones
+    displayName: "Tom Jones"
+    correctYear: 1940
+    peakFrom: 1964
+    peakTo: 2024
+    probability: 85
+    wikimediaSearchHints: ["Tom Jones singer Welsh"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: smokey-robinson
+    displayName: "Smokey Robinson"
+    correctYear: 1940
+    peakFrom: 1960
+    peakTo: 2024
+    probability: 78
+    wikimediaSearchHints: ["Smokey Robinson singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: patsy-cline
+    displayName: "Patsy Cline"
+    correctYear: 1932
+    peakFrom: 1957
+    peakTo: 1963
+    probability: 75
+    wikimediaSearchHints: ["Patsy Cline singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: buddy-holly
+    displayName: "Buddy Holly"
+    correctYear: 1936
+    peakFrom: 1957
+    peakTo: 1959
+    probability: 82
+    wikimediaSearchHints: ["Buddy Holly singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: sam-cooke
+    displayName: "Sam Cooke"
+    correctYear: 1931
+    peakFrom: 1957
+    peakTo: 1964
+    probability: 78
+    wikimediaSearchHints: ["Sam Cooke singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: hank-williams
+    displayName: "Hank Williams"
+    correctYear: 1923
+    peakFrom: 1947
+    peakTo: 1953
+    probability: 78
+    wikimediaSearchHints: ["Hank Williams country singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: chuck-berry
+    displayName: "Chuck Berry"
+    correctYear: 1926
+    peakFrom: 1955
+    peakTo: 2017
+    probability: 88
+    wikimediaSearchHints: ["Chuck Berry musician"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: ella-fitzgerald
+    displayName: "Ella Fitzgerald"
+    correctYear: 1917
+    peakFrom: 1935
+    peakTo: 1993
+    probability: 85
+    wikimediaSearchHints: ["Ella Fitzgerald singer jazz"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: harry-belafonte
+    displayName: "Harry Belafonte"
+    correctYear: 1927
+    peakFrom: 1953
+    peakTo: 2023
+    probability: 78
+    wikimediaSearchHints: ["Harry Belafonte singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: pat-boone
+    displayName: "Pat Boone"
+    correctYear: 1934
+    peakFrom: 1955
+    peakTo: 2010
+    probability: 72
+    wikimediaSearchHints: ["Pat Boone singer"]
+    answerMethods: ["timeline", "name-letters"]

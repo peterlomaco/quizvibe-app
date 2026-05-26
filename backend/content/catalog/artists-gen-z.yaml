@@ -180,3 +180,115 @@ items:
     probability: 82
     wikimediaSearchHints: ["Lana Del Rey singer"]
     answerMethods: ["timeline", "name-letters"]
+  - id: charlie-puth
+    displayName: "Charlie Puth"
+    correctYear: 1991
+    peakFrom: 2015
+    peakTo: 2024
+    probability: 78
+    wikimediaSearchHints: ["Charlie Puth singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: shawn-mendes
+    displayName: "Shawn Mendes"
+    correctYear: 1998
+    peakFrom: 2014
+    peakTo: 2024
+    probability: 85
+    wikimediaSearchHints: ["Shawn Mendes singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: camila-cabello
+    displayName: "Camila Cabello"
+    correctYear: 1997
+    peakFrom: 2014
+    peakTo: 2024
+    probability: 80
+    wikimediaSearchHints: ["Camila Cabello singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: hayley-williams
+    displayName: "Hayley Williams"
+    correctYear: 1988
+    peakFrom: 2004
+    peakTo: 2024
+    probability: 75
+    wikimediaSearchHints: ["Hayley Williams Paramore"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: tyler-the-creator
+    displayName: "Tyler, The Creator"
+    correctYear: 1991
+    peakFrom: 2009
+    peakTo: 2024
+    probability: 78
+    wikimediaSearchHints: ["Tyler The Creator rapper"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: j-balvin
+    displayName: "J Balvin"
+    correctYear: 1985
+    peakFrom: 2009
+    peakTo: 2024
+    probability: 78
+    wikimediaSearchHints: ["J Balvin reggaeton"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: karol-g
+    displayName: "Karol G"
+    correctYear: 1991
+    peakFrom: 2017
+    peakTo: 2024
+    probability: 75
+    wikimediaSearchHints: ["Karol G singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: anitta
+    displayName: "Anitta"
+    correctYear: 1993
+    peakFrom: 2013
+    peakTo: 2024
+    probability: 72
+    wikimediaSearchHints: ["Anitta singer Brazil"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: megan-thee-stallion
+    displayName: "Megan Thee Stallion"
+    correctYear: 1995
+    peakFrom: 2018
+    peakTo: 2024
+    probability: 78
+    wikimediaSearchHints: ["Megan Thee Stallion rapper"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: lizzo
+    displayName: "Lizzo"
+    correctYear: 1988
+    peakFrom: 2013
+    peakTo: 2024
+    probability: 80
+    wikimediaSearchHints: ["Lizzo singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: sabrina-carpenter
+    displayName: "Sabrina Carpenter"
+    correctYear: 1999
+    peakFrom: 2014
+    peakTo: 2024
+    probability: 78
+    wikimediaSearchHints: ["Sabrina Carpenter singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: halsey
+    displayName: "Halsey"
+    correctYear: 1994
+    peakFrom: 2015
+    peakTo: 2024
+    probability: 80
+    wikimediaSearchHints: ["Halsey singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: lewis-capaldi
+    displayName: "Lewis Capaldi"
+    correctYear: 1996
+    peakFrom: 2017
+    peakTo: 2024
+    probability: 80
+    wikimediaSearchHints: ["Lewis Capaldi singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: khalid
+    displayName: "Khalid"
+    correctYear: 1998
+    peakFrom: 2016
+    peakTo: 2024
+    probability: 78
+    wikimediaSearchHints: ["Khalid singer"]
+    answerMethods: ["timeline", "name-letters"]

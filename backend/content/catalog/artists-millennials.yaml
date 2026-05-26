@@ -170,3 +170,115 @@ items:
     probability: 78
     wikimediaSearchHints: ["Nelly Furtado singer"]
     answerMethods: ["timeline", "name-letters"]
+  - id: jennifer-lopez
+    displayName: "Jennifer Lopez"
+    correctYear: 1969
+    peakFrom: 1999
+    peakTo: 2024
+    probability: 92
+    wikimediaSearchHints: ["Jennifer Lopez singer actress"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: mary-j-blige
+    displayName: "Mary J. Blige"
+    correctYear: 1971
+    peakFrom: 1992
+    peakTo: 2024
+    probability: 85
+    wikimediaSearchHints: ["Mary J Blige singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: john-legend
+    displayName: "John Legend"
+    correctYear: 1978
+    peakFrom: 2004
+    peakTo: 2024
+    probability: 85
+    wikimediaSearchHints: ["John Legend singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: sam-smith
+    displayName: "Sam Smith"
+    correctYear: 1992
+    peakFrom: 2012
+    peakTo: 2024
+    probability: 85
+    wikimediaSearchHints: ["Sam Smith singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: sia
+    displayName: "Sia"
+    correctYear: 1975
+    peakFrom: 2000
+    peakTo: 2024
+    probability: 85
+    wikimediaSearchHints: ["Sia singer Furler"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: avril-lavigne
+    displayName: "Avril Lavigne"
+    correctYear: 1984
+    peakFrom: 2002
+    peakTo: 2024
+    probability: 85
+    wikimediaSearchHints: ["Avril Lavigne singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: pharrell-williams
+    displayName: "Pharrell Williams"
+    correctYear: 1973
+    peakFrom: 1992
+    peakTo: 2024
+    probability: 85
+    wikimediaSearchHints: ["Pharrell Williams producer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: maxwell
+    displayName: "Maxwell"
+    correctYear: 1973
+    peakFrom: 1996
+    peakTo: 2024
+    probability: 70
+    wikimediaSearchHints: ["Maxwell singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: toni-braxton
+    displayName: "Toni Braxton"
+    correctYear: 1967
+    peakFrom: 1993
+    peakTo: 2024
+    probability: 82
+    wikimediaSearchHints: ["Toni Braxton singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: ne-yo
+    displayName: "Ne-Yo"
+    correctYear: 1979
+    peakFrom: 2006
+    peakTo: 2024
+    probability: 75
+    wikimediaSearchHints: ["Ne-Yo singer", "Shaffer Smith singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: usher
+    displayName: "Usher"
+    correctYear: 1978
+    peakFrom: 1994
+    peakTo: 2024
+    probability: 88
+    wikimediaSearchHints: ["Usher singer", "Usher Raymond"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: snoop-dogg
+    displayName: "Snoop Dogg"
+    correctYear: 1971
+    peakFrom: 1992
+    peakTo: 2024
+    probability: 92
+    wikimediaSearchHints: ["Snoop Dogg rapper"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: ll-cool-j
+    displayName: "LL Cool J"
+    correctYear: 1968
+    peakFrom: 1985
+    peakTo: 2024
+    probability: 78
+    wikimediaSearchHints: ["LL Cool J rapper"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: lauryn-hill
+    displayName: "Lauryn Hill"
+    correctYear: 1975
+    peakFrom: 1993
+    peakTo: 2024
+    probability: 78
+    wikimediaSearchHints: ["Lauryn Hill singer"]
+    answerMethods: ["timeline", "name-letters"]

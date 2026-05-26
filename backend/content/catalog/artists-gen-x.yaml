@@ -154,3 +154,115 @@ items:
     probability: 82
     wikimediaSearchHints: ["Björk singer Iceland"]
     answerMethods: ["timeline", "name-letters"]
+  - id: sting
+    displayName: "Sting"
+    correctYear: 1951
+    peakFrom: 1977
+    peakTo: 2024
+    probability: 88
+    wikimediaSearchHints: ["Sting musician Police"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: boy-george
+    displayName: "Boy George"
+    correctYear: 1961
+    peakFrom: 1981
+    peakTo: 2024
+    probability: 80
+    wikimediaSearchHints: ["Boy George Culture Club"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: lenny-kravitz
+    displayName: "Lenny Kravitz"
+    correctYear: 1964
+    peakFrom: 1989
+    peakTo: 2024
+    probability: 82
+    wikimediaSearchHints: ["Lenny Kravitz musician"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: sade
+    displayName: "Sade"
+    correctYear: 1959
+    peakFrom: 1984
+    peakTo: 2024
+    probability: 80
+    wikimediaSearchHints: ["Sade singer", "Sade Adu"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: pat-benatar
+    displayName: "Pat Benatar"
+    correctYear: 1953
+    peakFrom: 1979
+    peakTo: 2024
+    probability: 75
+    wikimediaSearchHints: ["Pat Benatar singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: joan-jett
+    displayName: "Joan Jett"
+    correctYear: 1958
+    peakFrom: 1975
+    peakTo: 2024
+    probability: 75
+    wikimediaSearchHints: ["Joan Jett musician"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: iggy-pop
+    displayName: "Iggy Pop"
+    correctYear: 1947
+    peakFrom: 1969
+    peakTo: 2024
+    probability: 78
+    wikimediaSearchHints: ["Iggy Pop musician"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: patti-smith
+    displayName: "Patti Smith"
+    correctYear: 1946
+    peakFrom: 1975
+    peakTo: 2024
+    probability: 75
+    wikimediaSearchHints: ["Patti Smith singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: peter-gabriel
+    displayName: "Peter Gabriel"
+    correctYear: 1950
+    peakFrom: 1967
+    peakTo: 2024
+    probability: 80
+    wikimediaSearchHints: ["Peter Gabriel Genesis singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: ozzy-osbourne
+    displayName: "Ozzy Osbourne"
+    correctYear: 1948
+    peakFrom: 1968
+    peakTo: 2024
+    probability: 85
+    wikimediaSearchHints: ["Ozzy Osbourne musician Black Sabbath"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: lou-reed
+    displayName: "Lou Reed"
+    correctYear: 1942
+    peakFrom: 1965
+    peakTo: 2013
+    probability: 75
+    wikimediaSearchHints: ["Lou Reed musician Velvet Underground"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: bryan-ferry
+    displayName: "Bryan Ferry"
+    correctYear: 1945
+    peakFrom: 1971
+    peakTo: 2024
+    probability: 75
+    wikimediaSearchHints: ["Bryan Ferry Roxy Music"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: alanis-morissette
+    displayName: "Alanis Morissette"
+    correctYear: 1974
+    peakFrom: 1995
+    peakTo: 2024
+    probability: 82
+    wikimediaSearchHints: ["Alanis Morissette singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: belinda-carlisle
+    displayName: "Belinda Carlisle"
+    correctYear: 1958
+    peakFrom: 1978
+    peakTo: 2024
+    probability: 72
+    wikimediaSearchHints: ["Belinda Carlisle Go-Gos"]
+    answerMethods: ["timeline", "name-letters"]
