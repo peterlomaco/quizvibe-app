@@ -90,3 +90,11 @@ items:
     probability: 90
     wikimediaSearchHints: ["Mariah Carey singer"]
     answerMethods: ["timeline", "name-letters"]
+  - id: robyn
+    displayName: "Robyn"
+    correctYear: 1979
+    peakFrom: 1995
+    peakTo: 2018
+    probability: 80
+    wikimediaSearchHints: ["Robyn singer Sweden", "Robin Carlsson"]
+    answerMethods: ["timeline", "name-letters"]

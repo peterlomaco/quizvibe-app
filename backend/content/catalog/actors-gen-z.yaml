@@ -37,3 +37,9 @@ items:
     probability: 82
     wikimediaSearchHints: ["Anya Taylor-Joy actress"]
     answerMethods: ["timeline", "name-letters"]
+  - id: saoirse-ronan
+    displayName: "Saoirse Ronan"
+    correctYear: 1994
+    probability: 82
+    wikimediaSearchHints: ["Saoirse Ronan actress"]
+    answerMethods: ["timeline", "name-letters"]

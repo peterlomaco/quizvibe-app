@@ -55,3 +55,15 @@ items:
     probability: 90
     wikimediaSearchHints: ["Johnny Depp actor"]
     answerMethods: ["timeline", "name-letters"]
+  - id: hugh-jackman
+    displayName: "Hugh Jackman"
+    correctYear: 1968
+    probability: 90
+    wikimediaSearchHints: ["Hugh Jackman actor Wolverine"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: robert-downey-jr
+    displayName: "Robert Downey Jr."
+    correctYear: 1965
+    probability: 92
+    wikimediaSearchHints: ["Robert Downey Jr actor Iron Man"]
+    answerMethods: ["timeline", "name-letters"]

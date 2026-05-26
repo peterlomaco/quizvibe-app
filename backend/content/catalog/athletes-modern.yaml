@@ -115,3 +115,33 @@ items:
     probability: 90
     wikimediaSearchHints: ["Mohamed Salah footballer Liverpool"]
     answerMethods: ["timeline", "name-letters"]
+  - id: annika-sorenstam
+    displayName: "Annika Sörenstam"
+    correctYear: 1970
+    probability: 85
+    wikimediaSearchHints: ["Annika Sörenstam golf Sweden"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: charlotte-kalla
+    displayName: "Charlotte Kalla"
+    correctYear: 1987
+    probability: 85
+    wikimediaSearchHints: ["Charlotte Kalla cross country skiing Sweden"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: henrik-stenson
+    displayName: "Henrik Stenson"
+    correctYear: 1976
+    probability: 82
+    wikimediaSearchHints: ["Henrik Stenson golf Sweden"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: kobe-bryant
+    displayName: "Kobe Bryant"
+    correctYear: 1978
+    probability: 92
+    wikimediaSearchHints: ["Kobe Bryant basketball Lakers"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: erling-haaland
+    displayName: "Erling Haaland"
+    correctYear: 2000
+    probability: 90
+    wikimediaSearchHints: ["Erling Haaland footballer"]
+    answerMethods: ["timeline", "name-letters"]

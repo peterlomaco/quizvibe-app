@@ -71,3 +71,21 @@ items:
     probability: 80
     wikimediaSearchHints: ["Sigourney Weaver actress"]
     answerMethods: ["timeline", "name-letters"]
+  - id: jack-nicholson
+    displayName: "Jack Nicholson"
+    correctYear: 1937
+    probability: 88
+    wikimediaSearchHints: ["Jack Nicholson actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: al-pacino
+    displayName: "Al Pacino"
+    correctYear: 1940
+    probability: 90
+    wikimediaSearchHints: ["Al Pacino actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: anthony-hopkins
+    displayName: "Anthony Hopkins"
+    correctYear: 1937
+    probability: 85
+    wikimediaSearchHints: ["Anthony Hopkins actor"]
+    answerMethods: ["timeline", "name-letters"]

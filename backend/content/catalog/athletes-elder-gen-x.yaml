@@ -109,3 +109,21 @@ items:
     probability: 88
     wikimediaSearchHints: ["John McEnroe tennis"]
     answerMethods: ["timeline", "name-letters"]
+  - id: stefan-edberg
+    displayName: "Stefan Edberg"
+    correctYear: 1966
+    probability: 90
+    wikimediaSearchHints: ["Stefan Edberg tennis Sweden"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: mats-wilander
+    displayName: "Mats Wilander"
+    correctYear: 1964
+    probability: 88
+    wikimediaSearchHints: ["Mats Wilander tennis Sweden"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: jack-nicklaus
+    displayName: "Jack Nicklaus"
+    correctYear: 1940
+    probability: 82
+    wikimediaSearchHints: ["Jack Nicklaus golf"]
+    answerMethods: ["timeline", "name-letters"]

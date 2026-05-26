@@ -92,3 +92,11 @@ items:
     probability: 85
     wikimediaSearchHints: ["Post Malone rapper"]
     answerMethods: ["timeline", "name-letters"]
+  - id: loreen
+    displayName: "Loreen"
+    correctYear: 1983
+    peakFrom: 2012
+    peakTo: 2024
+    probability: 82
+    wikimediaSearchHints: ["Loreen singer Sweden Eurovision"]
+    answerMethods: ["timeline", "name-letters"]
