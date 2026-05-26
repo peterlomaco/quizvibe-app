@@ -19,6 +19,23 @@ export const AudienceSchema = z.union([
 ]);
 export type Audience = z.infer<typeof AudienceSchema>;
 
+// Region = kulturell igenkännings-scope. V1-katalogen kuras för svensk
+// igenkänning så alla items default-taggas `["sweden"]`. När vi senare
+// expanderar geografiskt kan items tagga flera regioner — t.ex. en
+// global-iconic-figur som The Beatles kan bli `["sweden", "nordics",
+// "europe", "global"]`. Item-level region override:ar fil-headerns
+// region-tag (parallell pattern som audience-override).
+//
+// Filter-semantik (V2): visa item om item.region intersects player.region
+// ELLER innehåller 'global'. Player default-region = 'sweden' i V1.
+export const RegionSchema = z.enum([
+  'sweden',
+  'nordics',
+  'europe',
+  'global',
+]);
+export type Region = z.infer<typeof RegionSchema>;
+
 export const CategorySchema = z.enum([
   'persons',   // @deprecated — kvar för bakåtkompabilitet; nya filer ska
                // använda 'actors'/'athletes'/'artists' beroende på subject.
@@ -224,6 +241,14 @@ export const ContentItemSchema = z.object({
   // recognized). Saknar item:et `audience` används fil-audience som tidigare.
   // Se memory/project_audience_tagging.md för curator-checklista.
   audience: z.array(AudienceSchema).min(1).optional(),
+  // Item-level region-override. När satt overrider den fil-headerns
+  // region-tag för detta specifika item. Edge-case-fix när item-recognition
+  // är bredare än fil-default (t.ex. The Beatles i bands-classics.yaml som
+  // har region=['sweden'] default men borde vara ['sweden','nordics',
+  // 'europe','global']). Saknar item:et `region` används fil-region som
+  // tidigare. Multi-region-listor är OK; ordningen spelar ingen roll
+  // semantiskt men följ konventionen [sweden, nordics, europe, global].
+  region: z.array(RegionSchema).min(1).optional(),
   notes: z.string().optional(),
 })
   .refine(
@@ -259,6 +284,10 @@ export type ContentItem = z.infer<typeof ContentItemSchema>;
 export const ContentFileSchema = z
   .object({
     audience: z.array(AudienceSchema).min(1),
+    // Region = kulturell igenkännings-scope (V1: alla files ['sweden']).
+    // Multi-region-listor används när content recognized utöver V1-marknad
+    // — se RegionSchema kommentar. Item-level `region` override:ar denna.
+    region: z.array(RegionSchema).min(1),
     category: CategorySchema,
     // contentForm + contentSubject = två-axel-modellen från matrisen.
     // Fil-nivå eftersom V1-katalogen är homogen per fil (alla items i

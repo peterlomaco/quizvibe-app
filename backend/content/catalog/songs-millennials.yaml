@@ -5,6 +5,7 @@
 # media-fältet lämnas off-katalog tills `npm run youtube-search <item-id>`
 # har körts och en specifik videoId + start/endSec är vald.
 audience: ["millennials", "gen-x"]
+region: ["sweden"]
 category: songs
 contentForm: youtube
 contentSubject: song

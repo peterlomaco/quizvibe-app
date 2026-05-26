@@ -4,6 +4,7 @@
 # reflekterar denna cross-gen-recognition i V1-svensk-målgrupp.
 # correctYear = bildnings-år (formation year).
 audience: ["all"]
+region: ["sweden"]
 category: artists
 contentForm: image
 contentSubject: band

@@ -28,6 +28,7 @@
 # studio-master från label — annan region-policy än music-videon). ROSÉ
 # APT via official MV (ekr2nIex040, blocked endast i BY+RU, OK i SE).
 audience: ["gen-alpha", "gen-z"]
+region: ["sweden"]
 category: songs
 contentForm: youtube
 contentSubject: song

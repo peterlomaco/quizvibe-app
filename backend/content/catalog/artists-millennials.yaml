@@ -10,6 +10,7 @@
 #   (pkg-hiphop, pkg-rock idag). Andra strängar gör att items aldrig surfar
 #   eftersom inget paket aktiverar dem.
 audience: ["millennials"]
+region: ["sweden"]
 category: artists
 contentForm: image
 contentSubject: artist

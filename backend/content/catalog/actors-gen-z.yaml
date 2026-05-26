@@ -3,6 +3,7 @@
 # gen-z-actor-luckan i poolen (var 0 items innan).
 # correctYear = födelseår.
 audience: ["gen-z"]
+region: ["sweden"]
 category: actors
 contentForm: image
 contentSubject: actor

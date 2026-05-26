@@ -21,6 +21,7 @@
 # Era-filter respekterar fortsatt correctYear så ett 70-tal-spel inte får
 # 2019-låtar.
 audience: ["all"]
+region: ["sweden"]
 category: songs
 contentForm: youtube
 contentSubject: song

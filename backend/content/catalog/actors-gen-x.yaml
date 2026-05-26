@@ -1,6 +1,7 @@
 # Skådespelare kända för Gen X.
 # correctYear = födelseår.
 audience: ["gen-x"]
+region: ["sweden"]
 category: actors
 contentForm: image
 contentSubject: actor

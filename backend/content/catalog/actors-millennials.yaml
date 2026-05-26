@@ -3,6 +3,7 @@
 # (Friends-reruns på Netflix, Spider-Man-trilogi, Barbie etc.) följs av
 # båda generationer parallellt. correctYear = födelseår.
 audience: ["millennials", "gen-z"]
+region: ["sweden"]
 category: actors
 contentForm: image
 contentSubject: actor

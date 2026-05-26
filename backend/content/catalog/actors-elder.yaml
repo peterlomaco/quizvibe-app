@@ -1,6 +1,7 @@
 # Skådespelare kända för elder-generationen (Silent + Baby Boomers).
 # correctYear = födelseår.
 audience: ["elder"]
+region: ["sweden"]
 category: actors
 contentForm: image
 contentSubject: actor

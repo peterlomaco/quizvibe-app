@@ -10,6 +10,7 @@
 # Notera: 'songs'-category som approximation eftersom CategorySchema saknar
 # 'sport'. Distractor-pool är irrelevant för timeline-frågor.
 audience: ["all"]
+region: ["sweden"]
 category: songs
 contentForm: youtube
 contentSubject: sport-event

@@ -3,6 +3,7 @@
 # OCH globalt — V1-katalogen utgår från svensk recognition + global reach.
 # correctYear = födelseår.
 audience: ["elder", "gen-x"]
+region: ["sweden"]
 category: athletes
 contentForm: image
 contentSubject: athlete

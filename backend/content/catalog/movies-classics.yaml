@@ -9,6 +9,7 @@
 #
 # Frågetext: "Which Year was this Movie launched?" (från FIXED_QUESTION_TEXT).
 audience: ["all"]
+region: ["sweden"]
 category: songs
 contentForm: youtube
 contentSubject: movie

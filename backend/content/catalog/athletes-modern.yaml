@@ -3,6 +3,7 @@
 # igenkänningsfaktor i Sverige + global reach (V1-katalogens principlinje).
 # correctYear = födelseår.
 audience: ["millennials", "gen-z", "gen-alpha"]
+region: ["sweden"]
 category: athletes
 contentForm: image
 contentSubject: athlete

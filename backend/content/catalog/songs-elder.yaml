@@ -6,6 +6,7 @@
 # probability: 95 = ikoniskt (Over the Rainbow, Heartbreak Hotel),
 #              85 = välkänt över decennier, 75-80 = era-specifikt.
 audience: ["elder"]
+region: ["sweden"]
 category: songs
 contentForm: youtube
 contentSubject: song

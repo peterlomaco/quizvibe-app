@@ -3,6 +3,7 @@
 # bands-classics.yaml med audience: ['all'] istället — så solo-artister
 # och band hålls separata med distinkta frågetext ("artist" vs "band").
 audience: ["elder"]
+region: ["sweden"]
 category: artists
 contentForm: image
 contentSubject: artist
