@@ -1834,12 +1834,12 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "youtubeClips": [
       {
-        "videoId": "XegYZ8y3xMY",
+        "videoId": "-ccNkksrfls",
         "startSec": 0,
         "endSec": 15,
-        "channelTitle": "FIFA",
+        "channelTitle": "Third-party upload",
         "license": "standard",
-        "notes": "FIFA official channel — Maradona Top 5 Goals (Hand of God + Goal of the Century 1986)."
+        "notes": "Ersatte 2026-05-27 FIFA-officiellt klipp (XegYZ8y3xMY) som blockerats för embed. Tredjepartsuppladdning — re-validera periodiskt mot DMCA-takedown via youtube-validate."
       }
     ]
   },

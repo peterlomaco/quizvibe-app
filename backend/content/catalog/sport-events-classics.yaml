@@ -58,11 +58,11 @@ items:
     wikimediaSearchHints: ["Maradona Hand of God 1986 World Cup England"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "XegYZ8y3xMY"
+      - videoId: "-ccNkksrfls"
         startSec: 0
         endSec: 15
-        channelTitle: "FIFA"
-        notes: "FIFA official channel — Maradona Top 5 Goals (Hand of God + Goal of the Century 1986)."
+        channelTitle: "Third-party upload"
+        notes: "Ersatte 2026-05-27 FIFA-officiellt klipp (XegYZ8y3xMY) som blockerats för embed. Tredjepartsuppladdning — re-validera periodiskt mot DMCA-takedown via youtube-validate."
   - id: dream-team-1992-barcelona
     displayName: "Dream Team — Barcelona OS basket"
     correctYear: 1992
