@@ -13,7 +13,11 @@ Status mot den 4-stegs-plan vi följer för content-bygge inför launch:
 | 3. Content build-out | 🟡 Pågående | **82 image + 183 youtube** (159 songs + 14 movies + 10 sport-events) efter content-pass 2026-05-26. Total **265 V1-playable** över 3 huvudkategorier (+71% från 155). Music: alla 5 audience-files fullt curade (cleanup-pass + Topic-channel-prio för svåra items). Image: bands 8→16, artists 14→31, actors 15→21, athletes 17→23. Fortsätt med fler items per audience + film/sport-event-expansion. |
 | 4. Pre-launch-items | ⏸️ Ej påbörjat | Captcha, YouTube ToS-audit, nightly cron, FAQ — se `project_pre_launch_checklist.md` |
 
-**Pool-status idag (82 live image-items)** — V1-curering utifrån svensk igenkänning (global reach inte ett krav i V1; Release 2 whitelistar en delmängd med `region: Global` där lämpligt). Bilder är Wikipedia pageimage default — action-shot-policy-audit (`feedback_image_professional_context.md`) pågående i separat session.
+**Pool-status idag (82 live image-items)** — V1-curering utifrån svensk igenkänning (global reach inte ett krav i V1; Release 2 whitelistar en delmängd med `region: Global` där lämpligt). Bilder var initially Wikipedia pageimage default (typiskt porträtt). Action-shot-policy-audit (`feedback_image_professional_context.md`) pågår per bucket.
+
+**Audit-pass-status** (per bucket):
+- ✅ **Athletes-elder-gen-x** (audited 2026-05-27): 18/22 webp uppgraderade till sport-action. 2 keep current (Stenmark, Wiberg — peak-era ej tillgängligt på Commons). 2 blocked (Muhammad Ali, Patrik Sjöberg — © Leifer/IAAF, se `memory/project_image_audit_blocked.md`). Useful sources upptäckta: Lipofsky NBA-bilder, Anefo "in aktie"-serie, AFP/Scanpix PD, Freiburg LABW archive.
+- ⏸️ **Återstår**: actors (21), artists (31), bands (16), athletes-modern (10). Capitals (4) skippas (städer, inte personer).
 - **Actors (21)** — utbyggt från 15 till 21 (2026-05-26):
   - Elder (6): ingrid-bergman, marilyn-monroe, tom-hanks, audrey-hepburn, cary-grant, katharine-hepburn.
   - Gen-x (6): arnold-schwarzenegger, lasse-aberg, julia-roberts, leonardo-dicaprio, tom-cruise, meryl-streep.
@@ -31,13 +35,19 @@ Status mot den 4-stegs-plan vi följer för content-bygge inför launch:
   - Millennials/Gen-z/Gen-alpha (10): zlatan-ibrahimovic, cristiano-ronaldo, lionel-messi, serena-williams, usain-bolt, roger-federer, armand-duplantis, tom-brady, lebron-james, simone-biles.
 - **Capitals/cities (4)**: berlin, london, paris, stockholm.
 
-**Föreslagna nästa steg (när session återupptas):**
+**Föreslagna nästa steg (när session återupptas)** — Peter har bekräftat prioritet 2026-05-27:
 
-1. **Fortsätt content build-out**:
-   - **Movies + sport-events expansion** — schema-redo, 14 movies + 10 sport-events idag. Använd `npm run youtube-search` för clip-curation eller `topic-pick-clips` för Topic-channel-prio.
-   - **Bredda audience-pool för image-items** — actors/athletes per audience har fortfarande utrymme. Kan köra batch-wikimedia-process på fler items när items identifierats.
-   - **Action-shot-policy audit** — alla 82 image-items är Wikipedia pageimage default (typiskt porträtt-headshot). Policy säger personer ska visas i professionell kontext (idrottare i match, musiker på scen, skådespelare i filmroll). Audit + ev. ersättning via `npm run wikimedia-process <id> <commons-url>` med explicit action-shot-URL.
-   - **Whitelist `region: Global`** för en delmängd av V1-katalogen som har global reach. Default är Sverige-only — Global är opt-in per item. Release 2-task.
+1. **YouTube clips fortsättning** (PRIO 1 enligt Peter):
+   - **Movies + sport-events expansion** — schema-redo, 14 movies + 10 sport-events idag. Använd `npm run youtube-search` för clip-curation eller `topic-pick-clips` för Topic-channel-prio. YT Data API-kvoten resetar dagligen 09:00 svensk tid.
+   - **Music-items audit** — `npm run youtube-validate` kör nightly cron men kan triggas manuellt vid behov.
+2. **Image audit fortsättning** (PRIO 2 enligt Peter) — svenskt-fokus där relevant. Återstående buckets med svenska items:
+   - **Athletes-modern svenska**: Annika Sörenstam, Charlotte Kalla, Henrik Stenson, Carolina Klüft (4 audit-kandidater). Sarah Sjöström saknar webp helt (pool expansion).
+   - **Artists svenska**: Robyn, Loreen, Neneh Cherry (audit). Carola Häggkvist saknar webp (pool expansion).
+   - **Actors svenska**: Greta Garbo (audit), Lasse Åberg (audit).
+   - **Bands svenska**: Roxette, Ace of Base (audit). ABBA redan auditerad.
+   - **Non-svensk fortsättning**: actors-elder/gen-x/millennials/gen-z, artists-elder/gen-x/millennials/gen-z, athletes-modern non-svenskar, bands-classics non-svenska.
+3. **Workflow per item** (etablerat 2026-05-27): `npm run wikimedia-search <id>` → om bara post-career, curl Commons-kategori → välj action-shot från lista → `npm run wikimedia-process <id> <url>` → `cp backend/output/<id>.webp assets/quiz-images/<id>.webp`. Useful sources: Lipofsky (NBA), Anefo "in aktie" (70-80-tal sport), AFP/Scanpix PD (60-tal), Freiburg LABW archive.
+4. **Pre-launch-items** — Captcha, YouTube ToS-audit, nightly cron, FAQ (se `project_pre_launch_checklist.md`).
 2. **Curation-scripts** (skapade 2026-05-26):
    - `scripts/find-missing-clips.mjs` — listar items utan youtubeClips per audience-file.
    - `scripts/batch-pick-clips.ts` — YT-search per item, picka top-scored kandidat, output markdown-tabell + JSON. `--top N` eller explicit IDs. 10s throttle för YT API rate-limit (10/min).
