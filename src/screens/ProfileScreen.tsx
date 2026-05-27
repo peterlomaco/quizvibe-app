@@ -46,11 +46,7 @@ import {
     removeFriend,
     type Friend,
 } from '../utils/friendsStorage';
-import {
-    PURCHASED_PACKAGES,
-    getFreeGenerationPackage,
-    syncGenerationPackageIds,
-} from '../utils/mockPurchasedPackages';
+import { PURCHASED_PACKAGES, type MusicPackage } from '../utils/mockPurchasedPackages';
 import {
     clearProfile,
     loadProfile,
@@ -368,7 +364,8 @@ export default function ProfileScreen() {
   // Per-paket on/off — styr om paketet visas i Lobby:s Customized Host
   // packages-block (när användaren är host). Default = alla aktiverade så
   // nyköpta paket dyker upp i Lobby utan att man måste gå till Profile först.
-  // Free-gen-paket-id:t läggs in i loadProfile-effekten (kräver birthYear).
+  // V1: PURCHASED_PACKAGES är tom så listan startar tom (gen-paketen togs
+  // bort 2026-05-27).
   const [enabledHostPackages, setEnabledHostPackages] = useState<string[]>(
     () => PURCHASED_PACKAGES.map((p) => p.id),
   );
@@ -405,46 +402,22 @@ export default function ProfileScreen() {
       return MAIN_CATEGORIES.filter((c) => c === cat || prev.includes(c));
     });
   };
-  // Gratis generations-paket utifrån user:s Competition Year of Birth.
-  // Byts automatiskt när birthYear ändras (effect:en nedanför löser
-  // syncen i enabledHostPackages); denna useMemo styr bara render-listan.
-  const freeGenerationPackage = useMemo(
-    () => getFreeGenerationPackage(birthYear),
-    [birthYear],
+  // V1 har inga themed packages i PURCHASED_PACKAGES (parkerade till v1.1+
+  // per project_launch_scope_v1) och gen-paketen är borttagna 2026-05-27.
+  // availablePackages är därmed tom i hela V1 — UI:t visar empty-state.
+  const availablePackages = useMemo<MusicPackage[]>(
+    () => [...PURCHASED_PACKAGES],
+    [],
   );
-  // Komplett paket-katalog som visas i Customized Host packages-listan.
-  // Gen-paket först (gratis), köpta paket sedan. När birthYear saknas
-  // visas bara köpta — registreringsflödet kräver dock birthYear så
-  // detta är defensivt.
-  const availablePackages = useMemo(
-    () => (freeGenerationPackage ? [freeGenerationPackage, ...PURCHASED_PACKAGES] : [...PURCHASED_PACKAGES]),
-    [freeGenerationPackage],
-  );
-  // "Select all"-state — true bara när alla synliga paket (gen + köpta)
-  // är aktiverade. Speglar Lobby:s isAllSelected-mönster.
+  // "Select all"-state — true bara när alla synliga paket är aktiverade.
+  // Vid tom availablePackages är detta alltid false (UI gömmer toggle:n
+  // ändå när listan är tom).
   const isAllPackagesEnabled =
     availablePackages.length > 0 &&
     availablePackages.every((p) => enabledHostPackages.includes(p.id));
   const handleToggleAllPackages = () => {
     setEnabledHostPackages(isAllPackagesEnabled ? [] : availablePackages.map((p) => p.id));
   };
-  // Synca generations-paket-id i enabledHostPackages när birthYear byts.
-  // Strippar gamla gen-id:n och lägger till aktuell — köpta paket-id:n
-  // lämnas orörda. Idempotent så det är säkert att fyra på varje render
-  // där birthYear förändras.
-  useEffect(() => {
-    setEnabledHostPackages((prev) => {
-      const next = syncGenerationPackageIds(prev, birthYear);
-      // Bara skriv state om resultatet faktiskt skiljer sig — undviker
-      // onödig re-render när birthYear-ändringen råkar landa inom samma
-      // generation (eller bara löste in den förra renderens redan-correcta
-      // state).
-      if (next.length === prev.length && next.every((id, i) => id === prev[i])) {
-        return prev;
-      }
-      return next;
-    });
-  }, [birthYear]);
 
   // Ladda sparad profil från AsyncStorage varje gång Profile får fokus.
   // Detta täcker både mount och senare scenarier — t.ex. ny registrering
@@ -479,8 +452,9 @@ export default function ProfileScreen() {
           roundsDefault: data.roundsDefault ?? ROUNDS_DEFAULT,
           answerResponseSeconds: data.answerResponseSeconds ?? 30,
           // Default — alla köpta paket aktiverade så nyköpta dyker upp i
-          // Lobby utan extra steg via Profile. Free gen-paket-id:t läggs
-          // in nedanför via syncGenerationPackageIds (kräver birthYear).
+          // Lobby utan extra steg via Profile. V1: PURCHASED_PACKAGES är
+          // tom så detta resulterar i tom array idag. Legacy gen-paket-ids
+          // strippas nedanför.
           enabledHostPackages: data.enabledHostPackages ?? PURCHASED_PACKAGES.map((p) => p.id),
           // Tom array (från en defekt klient som råkat skriva []) coerce:as
           // till alla 3 så pool-filtret aldrig blir tomt och users alltid har
@@ -491,24 +465,18 @@ export default function ProfileScreen() {
               ? data.enabledMainCategories
               : defaultEnabledMainCategories(),
         };
-        // Synca free gen-paket-id (utifrån augmented birthYear) — täcker
-        // både fresh profil och äldre profiler skapade innan free-gen-
-        // funktionen kom in. Idempotent så ingen-op om gen-id redan är rätt.
-        augmented.enabledHostPackages = syncGenerationPackageIds(
-          augmented.enabledHostPackages ?? [],
-          augmented.birthYear,
+        // Strippa eventuellt kvarvarande gen-paket-id:n (pkg-gen-elder,
+        // pkg-gen-x, etc.) ur enabledHostPackages — gen-paket-konceptet
+        // togs bort 2026-05-27. Idempotent: ingen-op när inga gen-ids finns.
+        const LEGACY_GEN_PKG_IDS = ['pkg-gen-elder', 'pkg-gen-x', 'pkg-gen-millennials', 'pkg-gen-z', 'pkg-gen-alpha'];
+        const strippedPackages = (augmented.enabledHostPackages ?? []).filter(
+          (id) => !LEGACY_GEN_PKG_IDS.includes(id),
         );
-        // Om något fält saknades: persistera augmented-profilen tillbaka
-        // direkt så fallback-värdena (särskilt random birthYear) inte
-        // regenereras vid nästa reload. One-shot defensive write.
-        // Detect om syncGenerationPackageIds ändrade listan (gen-id saknades
-        // eller fel gen-id stod kvar efter birthYear-ändring i tidigare
-        // session). Då skriver vi också tillbaka.
-        const savedPackages = data.enabledHostPackages ?? null;
         const packagesChanged =
-          savedPackages == null ||
-          savedPackages.length !== augmented.enabledHostPackages!.length ||
-          savedPackages.some((id, i) => id !== augmented.enabledHostPackages![i]);
+          data.enabledHostPackages == null ||
+          strippedPackages.length !== (data.enabledHostPackages?.length ?? 0) ||
+          strippedPackages.some((id, i) => id !== data.enabledHostPackages![i]);
+        augmented.enabledHostPackages = strippedPackages;
         const wasIncomplete = (
           data.birthYear == null ||
           data.assistance == null ||
@@ -1444,17 +1412,15 @@ export default function ProfileScreen() {
 
             {/* Sub-rubrik på egen rad. Select all-toggle hamnar på en
                 separat rad nedanför, högerställd så switchen linjerar
-                med per-paket-switcharna i listan. Empty state visar en
-                informativ text när inga paket är tillgängliga (gen +
-                köpta tillsammans tomma — t.ex. inget birthYear). */}
+                med per-paket-switcharna i listan. V1: PURCHASED_PACKAGES
+                är tom så empty-state-texten alltid visas. */}
             <View style={styles.field}>
               <Text style={styles.fieldLabel}>
                 Available when you are the Host:
               </Text>
               {/* Select all-toggle göms när bara 1 paket finns — då blir
                   den redundant (single packagets egen toggle gör samma
-                  jobb). I v1 har vi bara gen-paketet; återinförs när
-                  themed packages aktiveras i framtida release. */}
+                  jobb). Aktiveras när themed packages introduceras i v1.1+. */}
               {availablePackages.length > 1 && (
                 <View style={styles.selectAllRow}>
                   <Text style={styles.selectAllLabel}>Select all</Text>
@@ -1495,9 +1461,7 @@ export default function ProfileScreen() {
                           onPress={() =>
                             Alert.alert(
                               pkg.name,
-                              isFree
-                                ? 'This Customized Host package is included for free based on your Competition Year of Birth. It changes automatically if you update your birth year.'
-                                : 'Information about this package will be available later.',
+                              'Information about this package will be available later.',
                             )
                           }
                           hitSlop={8}
@@ -1508,9 +1472,10 @@ export default function ProfileScreen() {
                         {/* Paketnamns-box: aktiv styling när enabled, dämpad
                             (grå border, transparent bg, dämpad text) när
                             disabled — speglar Lobby:s purchasedPackageBox /
-                            purchasedPackageBoxActive-mönster. Free gen-paket
-                            får en kantskärande FREE-badge för att markera att
-                            paketet ingår gratis. */}
+                            purchasedPackageBoxActive-mönster. Free-paket
+                            (pkg.free=true) får en kantskärande FREE-badge —
+                            inga free-paket i V1 men styling-pattern bevaras
+                            för framtida gratis-paket. */}
                         <View
                           style={[
                             styles.packageRow,

@@ -53,9 +53,7 @@ import { MAIN_CATEGORIES, defaultEnabledMainCategories, type MainCategory } from
 import { supabase } from '../utils/supabase';
 import { clearGameStarted, isGameStarted, markGameStarted } from '../utils/mockStartedGames';
 import {
-  GENERATION_PACKAGES,
   PURCHASED_PACKAGES,
-  isGenerationPackageId,
   type MusicPackage,
 } from '../utils/mockPurchasedPackages';
 import { consumePendingLobbyPlayers } from '../utils/pendingLobby';
@@ -1513,18 +1511,17 @@ export default function LobbyScreen() {
   // Profil-styrd filterlista: bara paket som hosten aktiverat i sin
   // Profile (Customized Host packages-toggle) visas i Lobby. Default =
   // alla paket aktiverade så nyköpta dyker upp utan extra steg via Profile.
-  // Free-gen-paket-id seedas in från host:s profil (host-seed-effekten).
+  // V1: PURCHASED_PACKAGES är tom så denna är tom array idag.
   const [enabledHostPackages, setEnabledHostPackages] = useState<string[]>(
     () => PURCHASED_PACKAGES.map((p) => p.id),
   );
-  // Komplett katalog av möjliga paket: alla gen-paket + alla köpta. För
-  // host filtreras detta sedan via enabledHostPackages (host:s profil-
-  // val); för non-host returneras hela katalogen oförändrad eftersom
-  // selectedExtraPackages från host är vad som styr vad som faktiskt
-  // visas på non-host:s sida — non-host vet inte vilka paket host äger,
-  // bara vilka han aktiverat för denna lobby.
+  // Komplett katalog av möjliga paket. V1: bara PURCHASED_PACKAGES (tom)
+  // — gen-paketen togs bort 2026-05-27. För host filtreras detta sedan
+  // via enabledHostPackages (host:s profil-val); för non-host returneras
+  // hela katalogen oförändrad eftersom selectedExtraPackages från host är
+  // vad som styr vad som faktiskt visas på non-host:s sida.
   const allPackagesCatalog = useMemo<MusicPackage[]>(
-    () => [...Object.values(GENERATION_PACKAGES), ...PURCHASED_PACKAGES],
+    () => [...PURCHASED_PACKAGES],
     [],
   );
   const availablePackages = useMemo(
@@ -3588,8 +3585,8 @@ export default function LobbyScreen() {
                   </Text>
                   {/* Select all-toggle göms när bara 1 paket finns — då
                       blir den redundant (single packagets egen toggle gör
-                      samma jobb). I v1 har vi bara gen-paketet; återinförs
-                      när themed packages aktiveras i framtida release. */}
+                      samma jobb). Aktiveras när themed packages introduceras
+                      i v1.1+ (V1 har inga paket alls). */}
                   {hostMode && availablePackages.length > 1 && (
                     <View style={styles.selectAllGroup}>
                       <Text style={styles.selectAllLabel}>Select all</Text>
@@ -3634,7 +3631,7 @@ export default function LobbyScreen() {
                     // För icke-host är raden alltid "aktiv" (vi visar bara
                     // valda paket), så active-stylen används oavsett.
                     const showActive = hostMode ? isSelected : true;
-                    const isFree = !!pkg.free || isGenerationPackageId(pkg.id);
+                    const isFree = !!pkg.free;
                     return (
                       <View key={pkg.id} style={styles.purchasedPackageRow}>
                         <TouchableOpacity
@@ -3642,9 +3639,7 @@ export default function LobbyScreen() {
                           onPress={() =>
                             Alert.alert(
                               pkg.name,
-                              isFree
-                                ? 'This Customized Host package is included for free based on the host’s Competition Year of Birth.'
-                                : 'Information about this package will be available later.',
+                              'Information about this package will be available later.',
                             )
                           }
                           hitSlop={8}

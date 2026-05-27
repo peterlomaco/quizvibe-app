@@ -42,9 +42,8 @@ const ANDROID_API_KEY = process.env.EXPO_PUBLIC_REVENUECAT_ANDROID_KEY;
 // som keys.
 //
 // V1 har BARA premium-entitlement. Themed packages (Hip Hop / Rock /
-// Film & Actors) är parkerade till v1.1+; för v1 har user bara det gratis
-// gen-paketet som inte mappar mot RC-entitlement (helt klient-driven via
-// getFreeGenerationPackage(birthYear)).
+// Film & Actors) är parkerade till v1.1+; för v1 har user inga paket alls
+// (gen-paketen togs bort 2026-05-27 — PURCHASED_PACKAGES är tom).
 export const ENTITLEMENTS = {
   /** Auto-renewable subscription (Premium membership) — unlocks Individual
       Devices, Max 12 players, Rounds up to 20, m.fl. */
