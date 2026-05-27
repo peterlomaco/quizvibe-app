@@ -121,7 +121,9 @@ export function TopUserBanner({ onPress, onBackPress, backLabel = 'Home', profil
           activeOpacity={0.7}
           onPress={onBackPress}
         >
-          <QuizVibeQAvatar size={20} />
+          {/* wifi-variant matchar Final Leaderboard:s Home-knapp och
+              start-skärmens QuizVibeLogo — brand-konsistent Q-mark. */}
+          <QuizVibeQAvatar size={20} variant="wifi" />
           <Text style={styles.backLinkText}>{backLabel}</Text>
         </TouchableOpacity>
       ))}
