@@ -2777,7 +2777,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "HyHNuVaZJ-k",
-        "startSec": 0,
+        "startSec": 15,
         "endSec": 255,
         "channelTitle": "Gorillaz",
         "license": "standard"

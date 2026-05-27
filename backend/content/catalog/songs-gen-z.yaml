@@ -217,7 +217,7 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "HyHNuVaZJ-k"
-        startSec: 0
+        startSec: 15
         endSec: 255
         channelTitle: "Gorillaz"
   # 2006
