@@ -704,3 +704,38 @@ items:
     probability: 82
     wikimediaSearchHints: ["Take That British boy band Gary Barlow Robbie Williams Back for Good"]
     answerMethods: ["timeline", "name-letters"]
+  # === Komplettering 2026-05-27 — svenska + internationella band ===
+  - id: gyllene-tider
+    displayName: "Gyllene Tider"
+    correctYear: 1977
+    probability: 92
+    wikimediaSearchHints: ["Gyllene Tider Swedish pop rock band Per Gessle"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: sabaton
+    displayName: "Sabaton"
+    correctYear: 1999
+    probability: 84
+    wikimediaSearchHints: ["Sabaton Swedish power metal band war history"]
+    answerMethods: ["timeline", "name-letters"]
+    audience: ["gen-x", "millennials", "gen-z"]
+  - id: ghost
+    displayName: "Ghost"
+    correctYear: 2006
+    probability: 85
+    wikimediaSearchHints: ["Ghost Swedish band Tobias Forge Papa Emeritus rock"]
+    answerMethods: ["timeline", "name-letters"]
+    audience: ["millennials", "gen-z"]
+  - id: amon-amarth
+    displayName: "Amon Amarth"
+    correctYear: 1992
+    probability: 78
+    wikimediaSearchHints: ["Amon Amarth Swedish death metal Viking themes"]
+    answerMethods: ["timeline", "name-letters"]
+    audience: ["gen-x", "millennials", "gen-z"]
+  - id: journey
+    displayName: "Journey"
+    correctYear: 1973
+    probability: 82
+    wikimediaSearchHints: ["Journey American rock band Steve Perry Don't Stop Believin"]
+    answerMethods: ["timeline", "name-letters"]
+    audience: ["gen-x", "millennials", "gen-z"]

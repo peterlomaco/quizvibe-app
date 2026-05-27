@@ -807,3 +807,24 @@ items:
     probability: 72
     wikimediaSearchHints: ["Vincent Pontare Swedish singer Mapei Mariko"]
     answerMethods: ["timeline", "name-letters"]
+  # === Komplettering 2026-05-27 — Mello/Eurodance/Global hip-hop ===
+  - id: danny-saucedo
+    displayName: "Danny Saucedo"
+    correctYear: 1986
+    probability: 88
+    wikimediaSearchHints: ["Danny Saucedo Swedish singer Melodifestivalen In the Club"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: e-type
+    displayName: "E-Type"
+    correctYear: 1965
+    probability: 92
+    wikimediaSearchHints: ["E-Type Swedish eurodance Martin Eriksson Set the World on Fire"]
+    answerMethods: ["timeline", "name-letters"]
+    audience: ["gen-x", "millennials"]
+  - id: kanye-west
+    displayName: "Kanye West"
+    correctYear: 1977
+    probability: 95
+    wikimediaSearchHints: ["Kanye West American rapper Ye producer Stronger"]
+    answerMethods: ["timeline", "name-letters"]
+    audience: ["millennials", "gen-z"]

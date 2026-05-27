@@ -32,12 +32,14 @@ items:
     probability: 98
     wikimediaSearchHints: ["Pelé footballer"]
     answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
   - id: diego-maradona
     displayName: "Diego Maradona"
     correctYear: 1960
     probability: 96
     wikimediaSearchHints: ["Diego Maradona"]
     answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
   - id: magic-johnson
     displayName: "Magic Johnson"
     correctYear: 1959
@@ -128,30 +130,35 @@ items:
     probability: 90
     wikimediaSearchHints: ["Johan Cruyff footballer Netherlands"]
     answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
   - id: franz-beckenbauer
     displayName: "Franz Beckenbauer"
     correctYear: 1945
     probability: 88
     wikimediaSearchHints: ["Franz Beckenbauer footballer Germany"]
     answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
   - id: george-best
     displayName: "George Best"
     correctYear: 1946
     probability: 85
     wikimediaSearchHints: ["George Best footballer Manchester United"]
     answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
   - id: paolo-maldini
     displayName: "Paolo Maldini"
     correctYear: 1968
     probability: 85
     wikimediaSearchHints: ["Paolo Maldini footballer Milan"]
     answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
   - id: roberto-baggio
     displayName: "Roberto Baggio"
     correctYear: 1967
     probability: 85
     wikimediaSearchHints: ["Roberto Baggio footballer Italy"]
     answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
   - id: marco-van-basten
     displayName: "Marco van Basten"
     correctYear: 1964
@@ -182,12 +189,14 @@ items:
     probability: 82
     wikimediaSearchHints: ["Bobby Charlton footballer England"]
     answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
   - id: eusebio
     displayName: "Eusébio"
     correctYear: 1942
     probability: 82
     wikimediaSearchHints: ["Eusébio footballer Portugal"]
     answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
   - id: magdalena-forsberg
     displayName: "Magdalena Forsberg"
     correctYear: 1967
@@ -206,6 +215,7 @@ items:
     probability: 90
     wikimediaSearchHints: ["Henrik Larsson footballer Sweden Celtic"]
     answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
   - id: nadia-comaneci
     displayName: "Nadia Comăneci"
     correctYear: 1961
@@ -284,6 +294,7 @@ items:
     probability: 92
     wikimediaSearchHints: ["Zinedine Zidane footballer France"]
     answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
   - id: kareem-abdul-jabbar
     displayName: "Kareem Abdul-Jabbar"
     correctYear: 1947
@@ -338,6 +349,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Paul Gascoigne footballer Gazza"]
     answerMethods: ["timeline", "name-letters"]
+    # pkg-fifa-wc-tag removed 2026-05-27 — only civilian on Commons
   - id: david-beckham
     displayName: "David Beckham"
     correctYear: 1975
@@ -362,18 +374,21 @@ items:
     probability: 75
     wikimediaSearchHints: ["Franco Baresi footballer Milan"]
     answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
   - id: kenny-dalglish
     displayName: "Kenny Dalglish"
     correctYear: 1951
     probability: 78
     wikimediaSearchHints: ["Kenny Dalglish footballer Liverpool"]
     answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
   - id: ian-rush
     displayName: "Ian Rush"
     correctYear: 1961
     probability: 75
     wikimediaSearchHints: ["Ian Rush footballer Liverpool"]
     answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
   - id: gabriela-sabatini
     displayName: "Gabriela Sabatini"
     correctYear: 1970
@@ -429,6 +444,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Tomas Brolin football Sweden World Cup Parma"]
     answerMethods: ["timeline", "name-letters"]
+    # pkg-fifa-wc-tag removed 2026-05-27 — no Brolin celebration / VM 94 photo on Commons
   - id: glenn-hysen
     displayName: "Glenn Hysén"
     correctYear: 1959
@@ -538,3 +554,1131 @@ items:
     probability: 74
     wikimediaSearchHints: ["Jonathan Edwards British triple jump world record 1995"]
     answerMethods: ["timeline", "name-letters"]
+  # === Komplettering 2026-05-27 — bordtennis/golf/hockey/fotboll/handboll ===
+  - id: jan-ove-waldner
+    displayName: "Jan-Ove Waldner"
+    correctYear: 1965
+    probability: 92
+    wikimediaSearchHints: ["Jan-Ove Waldner Swedish table tennis Olympic gold 1992"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: jorgen-persson
+    displayName: "Jörgen Persson"
+    correctYear: 1966
+    probability: 84
+    wikimediaSearchHints: ["Jörgen Persson Swedish table tennis world champion"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: jesper-parnevik
+    displayName: "Jesper Parnevik"
+    correctYear: 1965
+    probability: 86
+    wikimediaSearchHints: ["Jesper Parnevik Swedish golfer PGA Tour"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: kent-nilsson
+    displayName: "Kent Nilsson"
+    correctYear: 1956
+    probability: 82
+    wikimediaSearchHints: ["Kent Nilsson Swedish ice hockey Magic Man Flames Oilers"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: nils-liedholm
+    displayName: "Nils Liedholm"
+    correctYear: 1922
+    probability: 78
+    wikimediaSearchHints: ["Nils Liedholm Swedish footballer AC Milan 1950s"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: gunnar-nordahl
+    displayName: "Gunnar Nordahl"
+    correctYear: 1921
+    probability: 80
+    wikimediaSearchHints: ["Gunnar Nordahl Swedish footballer AC Milan striker"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: eric-cantona
+    displayName: "Eric Cantona"
+    correctYear: 1966
+    probability: 88
+    wikimediaSearchHints: ["Eric Cantona French footballer Manchester United"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: per-carlen
+    displayName: "Per Carlén"
+    correctYear: 1960
+    probability: 80
+    wikimediaSearchHints: ["Per Carlén Swedish handball coach player Bengan boys"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: magnus-wislander
+    displayName: "Magnus Wislander"
+    correctYear: 1965
+    probability: 86
+    wikimediaSearchHints: ["Magnus Wislander Swedish handball world's best 1994"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: stefan-lovgren
+    displayName: "Stefan Lövgren"
+    correctYear: 1970
+    probability: 78
+    wikimediaSearchHints: ["Stefan Lövgren Swedish handball player Bengan boys"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: ljubomir-vranjes
+    displayName: "Ljubomir Vranjes"
+    correctYear: 1973
+    probability: 76
+    wikimediaSearchHints: ["Ljubomir Vranjes Swedish handball coach Yugoslavian-born"]
+    answerMethods: ["timeline", "name-letters"]
+    audience: ["gen-x", "millennials"]
+  # === FIFA World Cup-paketet 2026-05-27 — fotbollsspelare i landslagskläder ===
+  # Items som redan finns i denna fil får genrePackages: ["pkg-fifa-wc"] på sin
+  # existing-rad (in-place edit). Nya items läggs till nedan.
+  - id: garrincha
+    displayName: "Garrincha"
+    correctYear: 1933
+    probability: 82
+    wikimediaSearchHints: ["Garrincha Brazilian footballer 1962 World Cup"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: bebeto
+    displayName: "Bebeto"
+    correctYear: 1964
+    probability: 80
+    wikimediaSearchHints: ["Bebeto Brazilian footballer 1994 World Cup celebration"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: dennis-bergkamp
+    displayName: "Dennis Bergkamp"
+    correctYear: 1969
+    probability: 82
+    wikimediaSearchHints: ["Dennis Bergkamp Dutch footballer Arsenal Netherlands"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: fabio-cannavaro
+    displayName: "Fabio Cannavaro"
+    correctYear: 1973
+    probability: 86
+    wikimediaSearchHints: ["Fabio Cannavaro Italian defender 2006 World Cup Ballon d'Or"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: paolo-rossi
+    displayName: "Paolo Rossi"
+    correctYear: 1956
+    probability: 82
+    wikimediaSearchHints: ["Paolo Rossi Italian striker 1982 World Cup golden boot"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: bobby-moore
+    displayName: "Bobby Moore"
+    correctYear: 1941
+    probability: 84
+    wikimediaSearchHints: ["Bobby Moore English football captain 1966 World Cup"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: gerd-muller
+    displayName: "Gerd Müller"
+    correctYear: 1945
+    probability: 84
+    wikimediaSearchHints: ["Gerd Müller German striker 1974 World Cup Bayern Munich"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  # === FIFA WC Pass 2 2026-05-27 — fler ikoniska VM-spelare/tränare ===
+  - id: rivellino
+    displayName: "Rivellino"
+    correctYear: 1946
+    probability: 80
+    wikimediaSearchHints: ["Rivellino Brazilian footballer 1970 World Cup"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: jairzinho
+    displayName: "Jairzinho"
+    correctYear: 1944
+    probability: 80
+    wikimediaSearchHints: ["Jairzinho Brazilian footballer 1970 World Cup all matches goal"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: giuseppe-meazza
+    displayName: "Giuseppe Meazza"
+    correctYear: 1910
+    probability: 78
+    wikimediaSearchHints: ["Giuseppe Meazza Italian footballer 1934 1938 World Cup"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: daniel-passarella
+    displayName: "Daniel Passarella"
+    correctYear: 1953
+    probability: 80
+    wikimediaSearchHints: ["Daniel Passarella Argentina captain 1978 World Cup"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: mario-zagallo
+    displayName: "Mário Zagallo"
+    correctYear: 1931
+    probability: 82
+    wikimediaSearchHints: ["Mário Zagallo Brazilian footballer coach 1970 World Cup"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: rinus-michels
+    displayName: "Rinus Michels"
+    correctYear: 1928
+    probability: 80
+    wikimediaSearchHints: ["Rinus Michels Dutch coach Total Football 1974 World Cup"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: vittorio-pozzo
+    displayName: "Vittorio Pozzo"
+    correctYear: 1886
+    probability: 72
+    wikimediaSearchHints: ["Vittorio Pozzo Italian coach 1934 1938 World Cup"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: alf-ramsey
+    displayName: "Alf Ramsey"
+    correctYear: 1920
+    probability: 78
+    wikimediaSearchHints: ["Alf Ramsey England coach 1966 World Cup"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: lev-yashin
+    displayName: "Lev Yashin"
+    correctYear: 1929
+    probability: 84
+    wikimediaSearchHints: ["Lev Yashin Soviet goalkeeper Black Spider 1960s"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: hristo-stoichkov
+    displayName: "Hristo Stoichkov"
+    correctYear: 1966
+    probability: 80
+    wikimediaSearchHints: ["Hristo Stoichkov Bulgarian footballer 1994 World Cup"]
+    answerMethods: ["timeline", "name-letters"]
+    # pkg-fifa-wc-tag removed 2026-05-27 — Peter rejected current webp (long-shot); no close-up alternative.
+  - id: just-fontaine
+    displayName: "Just Fontaine"
+    correctYear: 1933
+    probability: 78
+    wikimediaSearchHints: ["Just Fontaine French striker 1958 World Cup 13 goals"]
+    answerMethods: ["timeline", "name-letters"]
+  # === FIFA WC Pass 3 mid-tier 2026-05-27 — elder-gen-x ===
+  - id: jean-pierre-papin
+    displayName: "Jean-Pierre Papin"
+    correctYear: 1963
+    probability: 78
+    wikimediaSearchHints: ["Jean-Pierre Papin French striker 1990 World Cup Ballon d'Or"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: claudio-caniggia
+    displayName: "Claudio Caniggia"
+    correctYear: 1967
+    probability: 78
+    wikimediaSearchHints: ["Claudio Caniggia Argentina 1990 World Cup"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: socrates
+    displayName: "Sócrates"
+    correctYear: 1954
+    probability: 82
+    wikimediaSearchHints: ["Sócrates Brazilian midfielder captain 1982 World Cup"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: tostao
+    displayName: "Tostão"
+    correctYear: 1947
+    probability: 78
+    wikimediaSearchHints: ["Tostão Brazilian footballer 1970 World Cup champion"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: ademir
+    displayName: "Ademir"
+    correctYear: 1922
+    probability: 74
+    wikimediaSearchHints: ["Ademir de Menezes Brazilian striker 1950 World Cup"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: vava
+    displayName: "Vavá"
+    correctYear: 1934
+    probability: 76
+    wikimediaSearchHints: ["Vavá Brazilian striker 1958 1962 World Cup"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: nilton-santos
+    displayName: "Nilton Santos"
+    correctYear: 1925
+    probability: 76
+    wikimediaSearchHints: ["Nilton Santos Brazilian defender 1958 1962 World Cup Botafogo"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: djalma-santos
+    displayName: "Djalma Santos"
+    correctYear: 1929
+    probability: 76
+    wikimediaSearchHints: ["Djalma Santos Brazilian defender 1958 1962 World Cup"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  # grzegorz-lato removed 2026-05-27 — Peter rejected current webp.
+  - id: uwe-seeler
+    displayName: "Uwe Seeler"
+    correctYear: 1936
+    probability: 78
+    wikimediaSearchHints: ["Uwe Seeler German striker captain 1966 1970 World Cup Hamburg"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: gheorghe-popescu
+    displayName: "Gheorghe Popescu"
+    correctYear: 1967
+    probability: 74
+    wikimediaSearchHints: ["Gheorghe Popescu Romanian defender captain 1994 World Cup"]
+    answerMethods: ["timeline", "name-letters"]
+  # === FIFA WC Pass 4 2026-05-27 — Italian/Peruvian elder ===
+  - id: luigi-riva
+    displayName: "Luigi Riva"
+    correctYear: 1944
+    probability: 76
+    wikimediaSearchHints: ["Luigi Gigi Riva Italian striker 1970 World Cup"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: teofilo-cubillas
+    displayName: "Teófilo Cubillas"
+    correctYear: 1949
+    probability: 76
+    wikimediaSearchHints: ["Teófilo Cubillas Peruvian striker 1970 1978 World Cup"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  # === FIFA WC Pass 5 — landslagstränare 2026-05-27 ===
+  - id: jupp-derwall
+    displayName: "Jupp Derwall"
+    correctYear: 1927
+    probability: 72
+    wikimediaSearchHints: ["Jupp Derwall German coach 1982 World Cup final"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: bora-milutinovic
+    displayName: "Bora Milutinović"
+    correctYear: 1944
+    probability: 76
+    wikimediaSearchHints: ["Bora Milutinović Serbian coach 5 different World Cups"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: otto-rehhagel
+    displayName: "Otto Rehhagel"
+    correctYear: 1938
+    probability: 78
+    wikimediaSearchHints: ["Otto Rehhagel German coach Greece Euro 2004"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: jose-pekerman
+    displayName: "José Pekerman"
+    correctYear: 1949
+    probability: 74
+    wikimediaSearchHints: ["José Pekerman Argentine coach Colombia 2014 World Cup"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: tite
+    displayName: "Tite"
+    correctYear: 1961
+    probability: 78
+    wikimediaSearchHints: ["Tite Brazilian coach 2018 2022 World Cup"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: louis-van-gaal
+    displayName: "Louis van Gaal"
+    correctYear: 1951
+    probability: 84
+    wikimediaSearchHints: ["Louis van Gaal Dutch coach 2014 World Cup third place"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: guus-hiddink
+    displayName: "Guus Hiddink"
+    correctYear: 1946
+    probability: 82
+    wikimediaSearchHints: ["Guus Hiddink Dutch coach South Korea 2002 World Cup semifinal"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: sven-goran-eriksson
+    displayName: "Sven-Göran Eriksson"
+    correctYear: 1948
+    probability: 92
+    wikimediaSearchHints: ["Sven-Göran Eriksson Swedish coach England 2002 2006 World Cup"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: lars-lagerback
+    displayName: "Lars Lagerbäck"
+    correctYear: 1948
+    probability: 86
+    wikimediaSearchHints: ["Lars Lagerbäck Swedish coach Iceland Sweden Norway"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: tele-santana
+    displayName: "Telê Santana"
+    correctYear: 1931
+    probability: 74
+    wikimediaSearchHints: ["Telê Santana Brazilian coach 1982 1986 World Cup"]
+    answerMethods: ["timeline", "name-letters"]
+    # pkg-fifa-wc-tag removed 2026-05-27 — only TIF-archive image, no usable photo on Commons
+  - id: valeriy-lobanovskyi
+    displayName: "Valeriy Lobanovskyi"
+    correctYear: 1939
+    probability: 72
+    wikimediaSearchHints: ["Valeriy Lobanovskyi Soviet Ukraine coach Dynamo Kyiv"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: aleksandar-tirnanic
+    displayName: "Aleksandar Tirnanić"
+    correctYear: 1910
+    probability: 64
+    wikimediaSearchHints: ["Aleksandar Tirnanić Yugoslav coach 1962 World Cup"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: mladen-ramljak
+    displayName: "Mladen Ramljak"
+    correctYear: 1944
+    probability: 62
+    wikimediaSearchHints: ["Mladen Ramljak Yugoslav coach 1974 World Cup"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: ricardo-la-volpe
+    displayName: "Ricardo La Volpe"
+    correctYear: 1952
+    probability: 70
+    wikimediaSearchHints: ["Ricardo La Volpe Argentine coach Mexico 2006 World Cup"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: enzo-bearzot
+    displayName: "Enzo Bearzot"
+    correctYear: 1927
+    probability: 80
+    wikimediaSearchHints: ["Enzo Bearzot Italian coach 1982 World Cup champion"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: fernando-santos
+    displayName: "Fernando Santos"
+    correctYear: 1954
+    probability: 80
+    wikimediaSearchHints: ["Fernando Santos Portuguese coach Euro 2016 champion"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: rene-simoes
+    displayName: "René Simões"
+    correctYear: 1952
+    probability: 64
+    wikimediaSearchHints: ["René Simões Brazilian coach Jamaica 1998 World Cup"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: roger-lemerre
+    displayName: "Roger Lemerre"
+    correctYear: 1941
+    probability: 72
+    wikimediaSearchHints: ["Roger Lemerre French coach Euro 2000 champion"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: raymond-domenech
+    displayName: "Raymond Domenech"
+    correctYear: 1952
+    probability: 72
+    wikimediaSearchHints: ["Raymond Domenech French coach 2006 World Cup final"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: tomislav-ivic
+    displayName: "Tomislav Ivić"
+    correctYear: 1933
+    probability: 68
+    wikimediaSearchHints: ["Tomislav Ivić Croatian coach Yugoslav football"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: javier-aguirre
+    displayName: "Javier Aguirre"
+    correctYear: 1958
+    probability: 72
+    wikimediaSearchHints: ["Javier Aguirre Mexican coach 2002 2010 World Cup"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: morten-olsen
+    displayName: "Morten Olsen"
+    correctYear: 1949
+    probability: 74
+    wikimediaSearchHints: ["Morten Olsen Danish coach Denmark 2002 2010 World Cup"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: berti-vogts
+    displayName: "Berti Vogts"
+    correctYear: 1946
+    probability: 76
+    wikimediaSearchHints: ["Berti Vogts German coach Euro 1996 champion"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: cesare-maldini
+    displayName: "Cesare Maldini"
+    correctYear: 1932
+    probability: 74
+    wikimediaSearchHints: ["Cesare Maldini Italian coach 1998 World Cup father Paolo"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: paulo-bento
+    displayName: "Paulo Bento"
+    correctYear: 1969
+    probability: 70
+    wikimediaSearchHints: ["Paulo Bento Portuguese coach Euro 2012 South Korea 2022"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: hector-cuper
+    displayName: "Héctor Cúper"
+    correctYear: 1955
+    probability: 68
+    wikimediaSearchHints: ["Héctor Cúper Argentine coach Egypt 2018 World Cup"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  # gusztav-sebes removed 2026-05-27 — Peter rejected.
+  - id: roberto-martinez
+    displayName: "Roberto Martínez"
+    correctYear: 1973
+    probability: 76
+    wikimediaSearchHints: ["Roberto Martínez Spanish coach Belgium Portugal"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  # === FIFA WC Pass 6 — coaches 1-15 2026-05-27 ===
+  - id: didier-deschamps
+    displayName: "Didier Deschamps"
+    correctYear: 1968
+    probability: 86
+    wikimediaSearchHints: ["Didier Deschamps French coach 2018 World Cup champion captain 1998"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: carlos-alberto-parreira
+    displayName: "Carlos Alberto Parreira"
+    correctYear: 1943
+    probability: 76
+    wikimediaSearchHints: ["Carlos Alberto Parreira Brazilian coach 1994 World Cup champion"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: vicente-del-bosque
+    displayName: "Vicente del Bosque"
+    correctYear: 1950
+    probability: 82
+    wikimediaSearchHints: ["Vicente del Bosque Spanish coach 2010 World Cup champion"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: joachim-low
+    displayName: "Joachim Löw"
+    correctYear: 1960
+    probability: 86
+    wikimediaSearchHints: ["Joachim Löw Jogi German coach 2014 World Cup champion"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: cesar-luis-menotti
+    displayName: "César Luis Menotti"
+    correctYear: 1938
+    probability: 78
+    wikimediaSearchHints: ["César Luis Menotti Argentine coach 1978 World Cup champion"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: carlos-bilardo
+    displayName: "Carlos Bilardo"
+    correctYear: 1938
+    probability: 80
+    wikimediaSearchHints: ["Carlos Bilardo Argentine coach 1986 World Cup champion Maradona"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: helmut-schon
+    displayName: "Helmut Schön"
+    correctYear: 1915
+    probability: 76
+    wikimediaSearchHints: ["Helmut Schön German coach 1974 World Cup champion"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: luiz-felipe-scolari
+    displayName: "Luiz Felipe Scolari"
+    correctYear: 1948
+    probability: 82
+    wikimediaSearchHints: ["Luiz Felipe Scolari Felipão Brazilian coach 2002 World Cup champion"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: arrigo-sacchi
+    displayName: "Arrigo Sacchi"
+    correctYear: 1946
+    probability: 80
+    wikimediaSearchHints: ["Arrigo Sacchi Italian coach 1994 World Cup final AC Milan"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: marcello-lippi
+    displayName: "Marcello Lippi"
+    correctYear: 1948
+    probability: 82
+    wikimediaSearchHints: ["Marcello Lippi Italian coach 2006 World Cup champion"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: aime-jacquet
+    displayName: "Aimé Jacquet"
+    correctYear: 1941
+    probability: 78
+    wikimediaSearchHints: ["Aimé Jacquet French coach 1998 World Cup champion"]
+    answerMethods: ["timeline", "name-letters"]
+  # === FIFA WC Pass 7 — alt-source kit hits 2026-05-27 ===
+  - id: dino-zoff
+    displayName: "Dino Zoff"
+    correctYear: 1942
+    probability: 84
+    wikimediaSearchHints: ["Dino Zoff Italian goalkeeper captain 1982 World Cup"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: ruud-gullit
+    displayName: "Ruud Gullit"
+    correctYear: 1962
+    probability: 86
+    wikimediaSearchHints: ["Ruud Gullit Dutch footballer AC Milan Netherlands 1988"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: gary-lineker
+    displayName: "Gary Lineker"
+    correctYear: 1960
+    probability: 88
+    wikimediaSearchHints: ["Gary Lineker English striker 1986 1990 World Cup Spurs"]
+    answerMethods: ["timeline", "name-letters"]
+    # pkg-fifa-wc-tag removed 2026-05-27 — no clear single-player kit shot on Commons
+  - id: mario-kempes
+    displayName: "Mario Kempes"
+    correctYear: 1954
+    probability: 80
+    wikimediaSearchHints: ["Mario Kempes Argentine striker 1978 World Cup champion"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  # davor-suker removed 2026-05-27 — current webp is team-celebration shot
+  # (no individual player visible); no Commons single-player kit-bild found.
+  - id: gabriel-batistuta
+    displayName: "Gabriel Batistuta"
+    correctYear: 1969
+    probability: 86
+    wikimediaSearchHints: ["Gabriel Batistuta Argentine striker Batigol Fiorentina Roma"]
+    answerMethods: ["timeline", "name-letters"]
+    # pkg-fifa-wc-tag removed 2026-05-27 — current webp is civilian, no Commons action-shot found
+  # === FIFA WC Pass 8 — mass-add (Peter accepterar civilian) 2026-05-27 ===
+  - id: michel-platini
+    displayName: "Michel Platini"
+    correctYear: 1955
+    probability: 78
+    wikimediaSearchHints: ["Michel Platini footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: lothar-matthaus
+    displayName: "Lothar Matthaus"
+    correctYear: 1961
+    probability: 78
+    wikimediaSearchHints: ["Lothar Matthaus footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: cafu
+    displayName: "Cafu"
+    correctYear: 1970
+    probability: 78
+    wikimediaSearchHints: ["Cafu footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: roberto-carlos
+    displayName: "Roberto Carlos"
+    correctYear: 1973
+    probability: 78
+    wikimediaSearchHints: ["Roberto Carlos footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: rivaldo
+    displayName: "Rivaldo"
+    correctYear: 1972
+    probability: 78
+    wikimediaSearchHints: ["Rivaldo footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: carlos-alberto
+    displayName: "Carlos Alberto"
+    correctYear: 1944
+    probability: 78
+    wikimediaSearchHints: ["Carlos Alberto footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: rudi-voller
+    displayName: "Rudi Voller"
+    correctYear: 1960
+    probability: 78
+    wikimediaSearchHints: ["Rudi Voller footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    # pkg-fifa-wc-tag removed 2026-05-27 — no Italia 1990 kit-bild on Commons
+  - id: alan-shearer
+    displayName: "Alan Shearer"
+    correctYear: 1970
+    probability: 78
+    wikimediaSearchHints: ["Alan Shearer footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: peter-shilton
+    displayName: "Peter Shilton"
+    correctYear: 1949
+    probability: 78
+    wikimediaSearchHints: ["Peter Shilton footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: enzo-francescoli
+    displayName: "Enzo Francescoli"
+    correctYear: 1961
+    probability: 78
+    wikimediaSearchHints: ["Enzo Francescoli footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: javier-zanetti
+    displayName: "Javier Zanetti"
+    correctYear: 1973
+    probability: 78
+    wikimediaSearchHints: ["Javier Zanetti footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: dunga
+    displayName: "Dunga"
+    correctYear: 1963
+    probability: 78
+    wikimediaSearchHints: ["Dunga footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: zico
+    displayName: "Zico"
+    correctYear: 1953
+    probability: 78
+    wikimediaSearchHints: ["Zico footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: rogerio-ceni
+    displayName: "Rogerio Ceni"
+    correctYear: 1973
+    probability: 78
+    wikimediaSearchHints: ["Rogerio Ceni footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: jan-ceulemans
+    displayName: "Jan Ceulemans"
+    correctYear: 1957
+    probability: 78
+    wikimediaSearchHints: ["Jan Ceulemans footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: jean-marie-pfaff
+    displayName: "Jean Marie Pfaff"
+    correctYear: 1953
+    probability: 78
+    wikimediaSearchHints: ["Jean Marie Pfaff footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: zbigniew-boniek
+    displayName: "Zbigniew Boniek"
+    correctYear: 1956
+    probability: 78
+    wikimediaSearchHints: ["Zbigniew Boniek footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: cha-bum-kun
+    displayName: "Cha Bum Kun"
+    correctYear: 1953
+    probability: 78
+    wikimediaSearchHints: ["Cha Bum Kun footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: hugo-sanchez
+    displayName: "Hugo Sanchez"
+    correctYear: 1958
+    probability: 78
+    wikimediaSearchHints: ["Hugo Sanchez footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: cuauhtemoc-blanco
+    displayName: "Cuauhtemoc Blanco"
+    correctYear: 1973
+    probability: 78
+    wikimediaSearchHints: ["Cuauhtemoc Blanco footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: carlos-valderrama
+    displayName: "Carlos Valderrama"
+    correctYear: 1961
+    probability: 78
+    wikimediaSearchHints: ["Carlos Valderrama footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: rene-higuita
+    displayName: "Rene Higuita"
+    correctYear: 1966
+    probability: 78
+    wikimediaSearchHints: ["Rene Higuita footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    # pkg-fifa-wc-tag removed 2026-05-27 — no Commons kit/action found
+  - id: ivan-zamorano
+    displayName: "Ivan Zamorano"
+    correctYear: 1967
+    probability: 78
+    wikimediaSearchHints: ["Ivan Zamorano footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    # pkg-fifa-wc-tag removed 2026-05-27 — no Commons action/kit found
+  - id: marcelo-salas
+    displayName: "Marcelo Salas"
+    correctYear: 1974
+    probability: 78
+    wikimediaSearchHints: ["Marcelo Salas footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: robert-prosinecki
+    displayName: "Robert Prosinecki"
+    correctYear: 1969
+    probability: 78
+    wikimediaSearchHints: ["Robert Prosinecki footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: lilian-thuram
+    displayName: "Lilian Thuram"
+    correctYear: 1972
+    probability: 78
+    wikimediaSearchHints: ["Lilian Thuram footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: marcel-desailly
+    displayName: "Marcel Desailly"
+    correctYear: 1968
+    probability: 78
+    wikimediaSearchHints: ["Marcel Desailly footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: oliver-kahn
+    displayName: "Oliver Kahn"
+    correctYear: 1969
+    probability: 78
+    wikimediaSearchHints: ["Oliver Kahn footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: karl-heinz-rummenigge
+    displayName: "Karl Heinz Rummenigge"
+    correctYear: 1955
+    probability: 78
+    wikimediaSearchHints: ["Karl Heinz Rummenigge footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: sepp-maier
+    displayName: "Sepp Maier"
+    correctYear: 1944
+    probability: 78
+    wikimediaSearchHints: ["Sepp Maier footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: pavel-nedved
+    displayName: "Pavel Nedved"
+    correctYear: 1972
+    probability: 78
+    wikimediaSearchHints: ["Pavel Nedved footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: gheorghe-hagi
+    displayName: "Gheorghe Hagi"
+    correctYear: 1965
+    probability: 78
+    wikimediaSearchHints: ["Gheorghe Hagi footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: frank-rijkaard
+    displayName: "Frank Rijkaard"
+    correctYear: 1962
+    probability: 78
+    wikimediaSearchHints: ["Frank Rijkaard footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: edgar-davids
+    displayName: "Edgar Davids"
+    correctYear: 1973
+    probability: 78
+    wikimediaSearchHints: ["Edgar Davids footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: ruud-krol
+    displayName: "Ruud Krol"
+    correctYear: 1949
+    probability: 78
+    wikimediaSearchHints: ["Ruud Krol footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: alessandro-del-piero
+    displayName: "Alessandro Del Piero"
+    correctYear: 1974
+    probability: 78
+    wikimediaSearchHints: ["Alessandro Del Piero footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: christian-vieri
+    displayName: "Christian Vieri"
+    correctYear: 1973
+    probability: 78
+    wikimediaSearchHints: ["Christian Vieri footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: gaetano-scirea
+    displayName: "Gaetano Scirea"
+    correctYear: 1953
+    probability: 78
+    wikimediaSearchHints: ["Gaetano Scirea footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: sandro-mazzola
+    displayName: "Sandro Mazzola"
+    correctYear: 1942
+    probability: 78
+    wikimediaSearchHints: ["Sandro Mazzola footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: john-barnes
+    displayName: "John Barnes"
+    correctYear: 1963
+    probability: 78
+    wikimediaSearchHints: ["John Barnes footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: ryan-giggs
+    displayName: "Ryan Giggs"
+    correctYear: 1973
+    probability: 78
+    wikimediaSearchHints: ["Ryan Giggs footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: pat-jennings
+    displayName: "Pat Jennings"
+    correctYear: 1945
+    probability: 78
+    wikimediaSearchHints: ["Pat Jennings footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: roy-keane
+    displayName: "Roy Keane"
+    correctYear: 1971
+    probability: 78
+    wikimediaSearchHints: ["Roy Keane footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: rabah-madjer
+    displayName: "Rabah Madjer"
+    correctYear: 1958
+    probability: 78
+    wikimediaSearchHints: ["Rabah Madjer footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: lakhdar-belloumi
+    displayName: "Lakhdar Belloumi"
+    correctYear: 1958
+    probability: 78
+    wikimediaSearchHints: ["Lakhdar Belloumi footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: ali-daei
+    displayName: "Ali Daei"
+    correctYear: 1969
+    probability: 78
+    wikimediaSearchHints: ["Ali Daei footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: salvatore-schillaci
+    displayName: "Salvatore Schillaci"
+    correctYear: 1964
+    probability: 78
+    wikimediaSearchHints: ["Salvatore Schillaci footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    # pkg-fifa-wc-tag removed 2026-05-27 — only jersey-artifact on Commons
+  - id: jean-tigana
+    displayName: "Jean Tigana"
+    correctYear: 1955
+    probability: 78
+    wikimediaSearchHints: ["Jean Tigana footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    # pkg-fifa-wc-tag removed 2026-05-27 — no Commons action/kit found
+  - id: luis-figo
+    displayName: "Luis Figo"
+    correctYear: 1972
+    probability: 78
+    wikimediaSearchHints: ["Luis Figo footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  # pierre-littbarski removed 2026-05-27 — Peter rejected current webp.
+  - id: jurgen-klinsmann
+    displayName: "Jurgen Klinsmann"
+    correctYear: 1964
+    probability: 78
+    wikimediaSearchHints: ["Jurgen Klinsmann footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: andreas-brehme
+    displayName: "Andreas Brehme"
+    correctYear: 1960
+    probability: 78
+    wikimediaSearchHints: ["Andreas Brehme footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: martin-dahlin
+    displayName: "Martin Dahlin"
+    correctYear: 1968
+    probability: 78
+    wikimediaSearchHints: ["Martin Dahlin footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: thomas-ravelli
+    displayName: "Thomas Ravelli"
+    correctYear: 1959
+    probability: 78
+    wikimediaSearchHints: ["Thomas Ravelli footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  # === FIFA WC Pass 8 — mass-add (Peter accepterar civilian) 2026-05-27 ===
+  - id: marco-tardelli
+    displayName: "Marco Tardelli"
+    correctYear: 1954
+    probability: 78
+    wikimediaSearchHints: ["Marco Tardelli footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: bruno-conti
+    displayName: "Bruno Conti"
+    correctYear: 1955
+    probability: 78
+    wikimediaSearchHints: ["Bruno Conti footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: antonio-cabrini
+    displayName: "Antonio Cabrini"
+    correctYear: 1957
+    probability: 78
+    wikimediaSearchHints: ["Antonio Cabrini footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: marco-materazzi
+    displayName: "Marco Materazzi"
+    correctYear: 1973
+    probability: 78
+    wikimediaSearchHints: ["Marco Materazzi footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: filippo-inzaghi
+    displayName: "Filippo Inzaghi"
+    correctYear: 1973
+    probability: 78
+    wikimediaSearchHints: ["Filippo Inzaghi footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    # pkg-fifa-wc-tag removed 2026-05-27 — current webp is civilian, no Commons action-shot found
+  - id: demetrio-albertini
+    displayName: "Demetrio Albertini"
+    correctYear: 1971
+    probability: 78
+    wikimediaSearchHints: ["Demetrio Albertini footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: roberto-donadoni
+    displayName: "Roberto Donadoni"
+    correctYear: 1963
+    probability: 78
+    wikimediaSearchHints: ["Roberto Donadoni footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: andoni-zubizarreta
+    displayName: "Andoni Zubizarreta"
+    correctYear: 1961
+    probability: 78
+    wikimediaSearchHints: ["Andoni Zubizarreta footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    # pkg-fifa-wc-tag removed 2026-05-27 — no Spanish kit on Commons (only civilian)
+  - id: emilio-butragueno
+    displayName: "Emilio Butragueno"
+    correctYear: 1963
+    probability: 78
+    wikimediaSearchHints: ["Emilio Butragueno footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: fernando-hierro
+    displayName: "Fernando Hierro"
+    correctYear: 1968
+    probability: 78
+    wikimediaSearchHints: ["Fernando Hierro footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: luis-aragones
+    displayName: "Luis Aragones"
+    correctYear: 1938
+    probability: 78
+    wikimediaSearchHints: ["Luis Aragones footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: helmut-rahn
+    displayName: "Helmut Rahn"
+    correctYear: 1929
+    probability: 78
+    wikimediaSearchHints: ["Helmut Rahn footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: fritz-walter
+    displayName: "Fritz Walter"
+    correctYear: 1920
+    probability: 78
+    wikimediaSearchHints: ["Fritz Walter footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: wolfgang-overath
+    displayName: "Wolfgang Overath"
+    correctYear: 1943
+    probability: 78
+    wikimediaSearchHints: ["Wolfgang Overath footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: bernd-schuster
+    displayName: "Bernd Schuster"
+    correctYear: 1959
+    probability: 78
+    wikimediaSearchHints: ["Bernd Schuster footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: hans-peter-briegel
+    displayName: "Hans Peter Briegel"
+    correctYear: 1955
+    probability: 78
+    wikimediaSearchHints: ["Hans Peter Briegel footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  # karl-heinz-forster removed 2026-05-27 — Wikipedia pageimage for Förster
+  # is mislabeled (actually shows Rummenigge). Manual Commons-curation needed
+  # before re-adding to FIFA WC pool.
+  - id: hernan-crespo
+    displayName: "Hernan Crespo"
+    correctYear: 1975
+    probability: 78
+    wikimediaSearchHints: ["Hernan Crespo footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: juan-sebastian-veron
+    displayName: "Juan Sebastian Veron"
+    correctYear: 1975
+    probability: 78
+    wikimediaSearchHints: ["Juan Sebastian Veron footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: glenn-hoddle
+    displayName: "Glenn Hoddle"
+    correctYear: 1957
+    probability: 78
+    wikimediaSearchHints: ["Glenn Hoddle footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  # stuart-pearce removed 2026-05-27 — Peter rejected, no kit-bild on Commons.
+  - id: paul-ince
+    displayName: "Paul Ince"
+    correctYear: 1967
+    probability: 78
+    wikimediaSearchHints: ["Paul Ince footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    # pkg-fifa-wc-tag removed 2026-05-27 — only civilian on Commons
+  - id: sol-campbell
+    displayName: "Sol Campbell"
+    correctYear: 1974
+    probability: 78
+    wikimediaSearchHints: ["Sol Campbell footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: rui-costa
+    displayName: "Rui Costa"
+    correctYear: 1972
+    probability: 78
+    wikimediaSearchHints: ["Rui Costa footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: yoshikatsu-kawaguchi
+    displayName: "Yoshikatsu Kawaguchi"
+    correctYear: 1975
+    probability: 78
+    wikimediaSearchHints: ["Yoshikatsu Kawaguchi footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: cafu-falcao
+    displayName: "Cafu Falcao"
+    correctYear: 1953
+    probability: 78
+    wikimediaSearchHints: ["Cafu Falcao footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]
+  - id: claudio-taffarel
+    displayName: "Claudio Taffarel"
+    correctYear: 1966
+    probability: 78
+    wikimediaSearchHints: ["Claudio Taffarel footballer national team"]
+    answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["pkg-fifa-wc"]

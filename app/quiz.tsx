@@ -52,7 +52,10 @@ import {
   type ImageQuizQuestion,
 } from '@/src/utils/quizImageQuestions';
 import { buildImageVariant } from '@/src/utils/imageQuestionBuilder';
-import { getQuizImage } from '@/src/utils/quizImages';
+// import { getQuizImage } from '@/src/utils/quizImages';
+// ↑ Borttagen 2026-05-27 — text-rendering ersätter foto-rendering. Återintroducera
+// när sketches kommer (då med getQuizSketch() från assets/quiz-sketches/).
+import { NameRevealCard } from '@/src/components/NameRevealCard';
 import { generateRoomCode } from '@/src/utils/roomCode';
 import { hasPremiumSubscription } from '@/src/utils/subscriptionStorage';
 import { supabase } from '@/src/utils/supabase';
@@ -2972,23 +2975,9 @@ export default function QuizScreen() {
         onQuit={isHost ? handleQuitGame : undefined}
         onLeave={!isHost ? handleLeaveGame : undefined}
       />
-      {isImageQuestion && getQuizImage(question.id) && (
-        // Absolute-positionerad ovanpå GetReadyIntro med opacity 0 + 1×1
-        // storlek — hamnar visuellt utanför skärmen. iOS startar decode-
-        // pipeline:n så fort source-prop:n resolveras; cachat bitmap
-        // återanvänds när Image mount:as för riktig storlek i question-
-        // fasen. pointerEvents flyttad in i style (RN Image-prop:n
-        // accepterar inte top-level pointerEvents).
-        <Image
-          source={getQuizImage(question.id)!}
-          style={{
-            position: 'absolute',
-            width: 1,
-            height: 1,
-            opacity: 0,
-          }}
-        />
-      )}
+      {/* Pre-decode-trick borttaget 2026-05-27 — text-rendering kräver ingen
+          asset-decode. När AI-tecknade sketches kommer på plats behöver vi
+          återintroducera detta block för sketch-decode-preload. */}
       {inactivityCountdownSec !== null && (
         <InactivityCountdownBanner secondsLeft={inactivityCountdownSec} />
       )}
@@ -3009,20 +2998,7 @@ export default function QuizScreen() {
         playerEmoji={countdownPlayer?.emoji}
         onComplete={() => setPhase('question')}
       />
-      {/* Pre-decode forts. (se kommentar i intro-grenen). Två mount-platser
-          ger maximal tids-marginal: host som tappar Play snabbt får decode
-          via countdown-fasen; långsam tap → decode hinner via intro. */}
-      {isImageQuestion && getQuizImage(question.id) && (
-        <Image
-          source={getQuizImage(question.id)!}
-          style={{
-            position: 'absolute',
-            width: 1,
-            height: 1,
-            opacity: 0,
-          }}
-        />
-      )}
+      {/* Pre-decode-trick borttaget 2026-05-27 (text-rendering = no decode). */}
       {inactivityCountdownSec !== null && (
         <InactivityCountdownBanner secondsLeft={inactivityCountdownSec} />
       )}
@@ -3226,19 +3202,12 @@ export default function QuizScreen() {
                 till svaret) och visar den vid reveal. */}
             {isImageQuestion ? (
               <View style={styles.imageMediaCard}>
-                {getQuizImage(question.id) ? (
-                  <Image
-                    key={question.id}
-                    source={getQuizImage(question.id)!}
-                    style={styles.imageMediaImage}
-                    resizeMode="contain"
-                  />
-                ) : (
-                  // Defensiv fallback om assets-mappen saknar förväntad
-                  // bild — borde inte hända eftersom quizImageQuestions
-                  // genereras från samma fil-lista.
-                  <View style={styles.imageMediaPlaceholder} />
-                )}
+                {/* Mellanlösning: text-name-render istället för foto medan
+                    AI-tecknade sketches genereras. ProgressiveCover-mosaiken
+                    funkar oförändrad — block lyfts bort och spelaren ser
+                    gradvis mer av namnet. När sketches kommer byts denna
+                    rendering till <Image source={getQuizSketch(id)} />. */}
+                <NameRevealCard displayName={question.displayName} />
                 <ProgressiveCover
                   key={questionIndex}
                   resetKey={questionIndex}

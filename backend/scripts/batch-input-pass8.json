@@ -1,0 +1,522 @@
+[
+  {
+    "id": "michel-platini",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/6/66/Michel_Platini_2010_%28cropped%29.jpg",
+    "year": 1955
+  },
+  {
+    "id": "miroslav-klose",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/8/8c/2016209185719_2016-07-27_Champions_for_Charity_-_Sven_-_1D_X_-_0149_-_DV3P4742_mod.jpg",
+    "year": 1978
+  },
+  {
+    "id": "lothar-matthaus",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/8/84/2019_Lothar_Matth%C3%A4us.jpg",
+    "year": 1961
+  },
+  {
+    "id": "cafu",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/7/7a/14_06_2019_Abertura_da_Copa_Am%C3%A9rica_Brasil_2019_%2848064408836%29_%28cropped%29.jpg",
+    "year": 1970
+  },
+  {
+    "id": "roberto-carlos",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/a8/LS3_1288_%2853332367864%29_%28cropped%29.jpg",
+    "year": 1973
+  },
+  {
+    "id": "rivaldo",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/8/8e/Rivaldo.jpg",
+    "year": 1972
+  },
+  {
+    "id": "carlos-alberto",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/9/9b/Carlos_alberto_cosmos.jpg",
+    "year": 1944
+  },
+  {
+    "id": "thomas-muller",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/aa/FC_Red_Bull_Salzburg_gegen_Bayern_M%C3%BCnchen_%282025-01-06_Testspiel%29_19.jpg",
+    "year": 1989
+  },
+  {
+    "id": "rudi-voller",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/4e/Rudi_V%C3%B6ller_B%C3%BChne_%28cropped%29.jpg",
+    "year": 1960
+  },
+  {
+    "id": "alan-shearer",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/b/ba/Alan_Shearer_2008.jpg",
+    "year": 1970
+  },
+  {
+    "id": "steven-gerrard",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/d/d5/Steven_Gerrard_2018.jpg",
+    "year": 1980
+  },
+  {
+    "id": "frank-lampard",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/8/8c/Frank_Lampard_2019.jpg",
+    "year": 1978
+  },
+  {
+    "id": "peter-shilton",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/43/Peter_Shilton.png",
+    "year": 1949
+  },
+  {
+    "id": "sergio-busquets",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/40/Sergio_Busquets_NYCFC_Miami_24_Sep_2025-020_%28cropped%29.jpg",
+    "year": 1988
+  },
+  {
+    "id": "xabi-alonso",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/b/b6/Los_Caminos_del_f%C3%BAtbol._Xabi_Alonso_%2839666778464%29_%28cropped%29.jpg",
+    "year": 1981
+  },
+  {
+    "id": "raul",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/5/5a/25th_Laureus_World_Sports_Awards_-_Ra%C3%BAl_-_240422_132916-2_%28cropped%29.jpg",
+    "year": 1977
+  },
+  {
+    "id": "luis-suarez",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/f/f7/Luis_Su%C3%A1rez_2026_%28cropped%29.jpg",
+    "year": 1987
+  },
+  {
+    "id": "edinson-cavani",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/9/9f/Edinson_Cavani_2018_%28cropped%29.jpg",
+    "year": 1987
+  },
+  {
+    "id": "diego-forlan",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/f/f3/U10_Diego_Forl%C3%A1n_7524.jpg",
+    "year": 1979
+  },
+  {
+    "id": "enzo-francescoli",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/2/24/Enzo_Francescoli_in_2018.png",
+    "year": 1961
+  },
+  {
+    "id": "javier-zanetti",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/e/e7/Metalist-Inter_%282%29.jpg",
+    "year": 1973
+  },
+  {
+    "id": "juan-roman-riquelme",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/b/ba/Juan_Rom%C3%A1n_Riquelme_-_2019.jpg",
+    "year": 1978
+  },
+  {
+    "id": "dunga",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/6/66/Aecio_Neves_e_Dunga_-_17-06-2008_%288368243127%29_%28cropped%29.jpg",
+    "year": 1963
+  },
+  {
+    "id": "zico",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/e/e3/Zico_2012_3.jpg",
+    "year": 1953
+  },
+  {
+    "id": "rogerio-ceni",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/4e/Rogerio-Ceni-Sao-Paulo-Juventude-jun-2022_%28cropped%29.jpg",
+    "year": 1973
+  },
+  {
+    "id": "romelu-lukaku",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/d/dc/Romelu_Lukaku_2021.jpg",
+    "year": 1993
+  },
+  {
+    "id": "eden-hazard",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/46/Eden_Hazard_at_Baku_before_2019_UEFA_Europe_League_Final.jpg",
+    "year": 1991
+  },
+  {
+    "id": "jan-ceulemans",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/c/c5/Jan_Ceulemans.jpg",
+    "year": 1957
+  },
+  {
+    "id": "jean-marie-pfaff",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/1/16/Jean-Marie_Pfaff_at_Runa_Ralley_2007_cropped.jpg",
+    "year": 1953
+  },
+  {
+    "id": "zbigniew-boniek",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/6/64/Zbigniew_Boniek_2015.jpg",
+    "year": 1956
+  },
+  {
+    "id": "cha-bum-kun",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/0/05/Cha_Bum_Kun.jpg",
+    "year": 1953
+  },
+  {
+    "id": "park-ji-sung",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/4a/Park_Ji-sung_G20_Seoul_Summit_Ambassador_%28cropped%29.jpg",
+    "year": 1981
+  },
+  {
+    "id": "hidetoshi-nakata",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/e/eb/Hidetoshi_Nakata_in_Okinawa.jpg",
+    "year": 1977
+  },
+  {
+    "id": "keisuke-honda",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/7/79/Keisuke_Honda_2018_%28cropped%29_%28cropped%29.jpg",
+    "year": 1986
+  },
+  {
+    "id": "shinji-kagawa",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/8/81/Shinji_Kagawa_2018_%28cropped%29.jpg",
+    "year": 1989
+  },
+  {
+    "id": "tim-cahill",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/d/dc/Tim_Cahill_%2853557484101%29.jpg",
+    "year": 1979
+  },
+  {
+    "id": "harry-kewell",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/b/b2/HarryKewell.jpg",
+    "year": 1978
+  },
+  {
+    "id": "landon-donovan",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/6/6f/NC_Courage_vs_SD_Wave_%28Oct_2024%29_045.jpg",
+    "year": 1982
+  },
+  {
+    "id": "clint-dempsey",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/e/e3/Clint_Dempsey_%2826347615912%29_%28cropped%29.jpg",
+    "year": 1983
+  },
+  {
+    "id": "hugo-sanchez",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/9/9e/Huguito.jpg",
+    "year": 1958
+  },
+  {
+    "id": "cuauhtemoc-blanco",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/2/25/Cuauht%C3%A9moc_Blanco_MORELOS_%28cropped%29.jpg",
+    "year": 1973
+  },
+  {
+    "id": "radamel-falcao",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/9/98/Radamel_Falcao_Garc%C3%ADa_%28cropped%29.jpg",
+    "year": 1986
+  },
+  {
+    "id": "carlos-valderrama",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/a1/Pibe_Valderrama_2022.jpg",
+    "year": 1961
+  },
+  {
+    "id": "rene-higuita",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/7/7a/Ren%C3%A9_Higuita%2C_2007.jpg",
+    "year": 1966
+  },
+  {
+    "id": "james-rodriguez",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/7/79/James_Rodriguez_2018.jpg",
+    "year": 1991
+  },
+  {
+    "id": "alexis-sanchez",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/5/50/Alexis_S%C3%A1nchez_2017.jpg",
+    "year": 1988
+  },
+  {
+    "id": "arturo-vidal",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/0/0d/Arturo_Vidal_Copiap%C3%B3_v_Colo-Colo_20241110_13.jpg",
+    "year": 1987
+  },
+  {
+    "id": "ivan-zamorano",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/4b/Iv%C3%A1n_Zamorano.jpg",
+    "year": 1967
+  },
+  {
+    "id": "marcelo-salas",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/6/61/Marcelo_Salas_2015.jpg",
+    "year": 1974
+  },
+  {
+    "id": "robert-prosinecki",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/d/df/Prosinecki_in_2025.jpg",
+    "year": 1969
+  },
+  {
+    "id": "ivan-rakitic",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/f/f0/Ivan_Rakiti%C4%87_2020_%28cropped%29.jpg",
+    "year": 1988
+  },
+  {
+    "id": "lilian-thuram",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/2/24/Lilian_Thuram_-_F%C3%A9vrier_2013.jpg",
+    "year": 1972
+  },
+  {
+    "id": "patrick-vieira",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/6/6c/Patrick_Vieira_NYCFC_%28cropped%29.JPG",
+    "year": 1976
+  },
+  {
+    "id": "marcel-desailly",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/c/c7/25th_Laureus_World_Sports_Awards_-_Red_Carpet_-_Marcel_Desailly_-_240422_192752-3_%28cropped%29.jpg",
+    "year": 1968
+  },
+  {
+    "id": "karim-benzema",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/5/5f/Karim_Benzema_Pick.jpg",
+    "year": 1987
+  },
+  {
+    "id": "oliver-kahn",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/4b/2022-07-30_Fu%C3%9Fball%2C_M%C3%A4nner%2C_DFL-Supercup%2C_RB_Leipzig_-_FC_Bayern_M%C3%BCnchen_1DX_3179_by_Stepro.jpg",
+    "year": 1969
+  },
+  {
+    "id": "karl-heinz-rummenigge",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/f/fc/2015-02-06_Rummenigge_0370_%28cropped%29.JPG",
+    "year": 1955
+  },
+  {
+    "id": "sepp-maier",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/5/51/6137Sepp_Maier_Torwart-Legende.JPG",
+    "year": 1944
+  },
+  {
+    "id": "andriy-shevchenko",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/2/25/%D0%90%D0%BD%D0%B4%D1%80%D1%96%D0%B9_%D0%A8%D0%B5%D0%B2%D1%87%D0%B5%D0%BD%D0%BA%D0%BE_2024_%28cropped%29.png",
+    "year": 1976
+  },
+  {
+    "id": "pavel-nedved",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/46/Pavel_Nedv%C4%9Bd.jpg",
+    "year": 1972
+  },
+  {
+    "id": "petr-cech",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/7/75/Arsenal_players_training_before_2019_UEFA_Europa_League_final_07_%28cropped%29.jpg",
+    "year": 1982
+  },
+  {
+    "id": "gheorghe-hagi",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/49/Lansarea_candidaturii_Gabrielei_Szabo_pentru_Camera_Deputatilor%2C_Voluntari_-_04.05_%2848%29_%2814270956179%29_%28cropped%29.jpg",
+    "year": 1965
+  },
+  {
+    "id": "arjen-robben",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/42/Arjen_Robben_v_Shakhtar_2015_%28cropped%29.jpg",
+    "year": 1984
+  },
+  {
+    "id": "wesley-sneijder",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/42/Wesley_Sneijder_%2815487233555%29_%28cropped%29.jpg",
+    "year": 1984
+  },
+  {
+    "id": "frank-rijkaard",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/4a/FrankRijkaard2.jpg",
+    "year": 1962
+  },
+  {
+    "id": "edgar-davids",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/e/ee/Edgar_Davids_%28cropped%29.jpg",
+    "year": 1973
+  },
+  {
+    "id": "robin-van-persie",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/6/65/Loco-Fener_%2810%29.jpg",
+    "year": 1983
+  },
+  {
+    "id": "ruud-krol",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/7/7a/Ruud_Krol_2005.jpg",
+    "year": 1949
+  },
+  {
+    "id": "clarence-seedorf",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/c/c2/Clarence_Seedorf_Introductory_Press_Conferences%2C_2_June_2025_-_40_%28cropped%29.jpg",
+    "year": 1976
+  },
+  {
+    "id": "patrick-kluivert",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/3/3c/Patrick_Kluivert_at_Web_Summit_2024_%28cropped_2%29.jpg",
+    "year": 1976
+  },
+  {
+    "id": "dirk-kuyt",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/9/98/Dirk_Kuijt-Feyenoord-DSC_0058_%28cropped%29.jpg",
+    "year": 1980
+  },
+  {
+    "id": "alessandro-del-piero",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/d/d3/25th_Laureus_World_Sports_Awards_-_Alessandro_Del_Piero_-_240421_155220_%28cropped%29.jpg",
+    "year": 1974
+  },
+  {
+    "id": "gennaro-gattuso",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/0/01/Lausanne_vs_Sion_27_february_2013_-_Gennaro_Gattuso.jpg",
+    "year": 1978
+  },
+  {
+    "id": "alessandro-nesta",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/0/0f/Alessandro_Nesta_as_Miami_FC_Manager.jpg",
+    "year": 1976
+  },
+  {
+    "id": "christian-vieri",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/42/Christian_Vieri_%28cropped%29.jpg",
+    "year": 1973
+  },
+  {
+    "id": "gaetano-scirea",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/5/5e/1975%E2%80%9376_Juventus_FC_-_Gaetano_Scirea.jpg",
+    "year": 1953
+  },
+  {
+    "id": "sandro-mazzola",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/c/cb/Inter_Milan_1971-1972_Sandro_Mazzola.jpg",
+    "year": 1942
+  },
+  {
+    "id": "john-terry",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/c/c3/John_Terry_at_pro-am_Wentworth_golf_course_September_2023_%28cropped%29.jpg",
+    "year": 1980
+  },
+  {
+    "id": "rio-ferdinand",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/4c/Web_Summit_2015_-_Dublin%2C_Ireland_-_22183056474_%28cropped%29.jpg",
+    "year": 1978
+  },
+  {
+    "id": "ashley-cole",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/d/d5/ACole.JPG",
+    "year": 1980
+  },
+  {
+    "id": "michael-owen",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/2/24/Michael_Owen.jpg",
+    "year": 1979
+  },
+  {
+    "id": "john-barnes",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/e/e4/John_Barnes_in_Singapore%2C_2023_01.jpg",
+    "year": 1963
+  },
+  {
+    "id": "ryan-giggs",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/1/13/Ryan_Giggs_2015_%28cropped%29.jpg",
+    "year": 1973
+  },
+  {
+    "id": "pat-jennings",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/9/9a/Pat_Jennings_%282018%29.jpg",
+    "year": 1945
+  },
+  {
+    "id": "robbie-keane",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/3/30/2013_Robbie_Keane_%28cropped%29.jpg",
+    "year": 1980
+  },
+  {
+    "id": "roy-keane",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/0/0a/Roy_keane_2014.jpg",
+    "year": 1971
+  },
+  {
+    "id": "freddie-ljungberg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/3/3a/Football_against_poverty_2014_-_Fredrik_Ljungberg.jpg",
+    "year": 1977
+  },
+  {
+    "id": "rabah-madjer",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/a0/FC_Porto_%28in_verband_met_wedstrijd_om_Super_Cup_tegen_Ajax%29_speler_Madjer_%28l%29_e%2C_Bestanddeelnr_934-1340_%28cropped%29.jpg",
+    "year": 1958
+  },
+  {
+    "id": "lakhdar-belloumi",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/1/1b/Lakhdar_Belloumi_%282017%29.jpg",
+    "year": 1958
+  },
+  {
+    "id": "riyad-mahrez",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/45/Mahrez_2021.jpg",
+    "year": 1991
+  },
+  {
+    "id": "ali-daei",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/f/ff/Ali_Daei%2C_Saipa_vs._Al-Rayyan_pre-match_conference.jpg",
+    "year": 1969
+  },
+  {
+    "id": "asamoah-gyan",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/7/71/Asamoah_Gyan_%282014%29.jpg",
+    "year": 1985
+  },
+  {
+    "id": "salvatore-schillaci",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/1/10/Salvatore_Schillaci.jpg",
+    "year": 1964
+  },
+  {
+    "id": "jean-tigana",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/5/59/Jean_Tigana_cropped.jpg",
+    "year": 1955
+  },
+  {
+    "id": "david-trezeguet",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/1/15/David_Trezeguet_became_Save_the_Dream_Ambassador%2C_2017_%28cropped%29.jpg",
+    "year": 1977
+  },
+  {
+    "id": "luis-figo",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/1/15/Luis_Figo_2023.jpg",
+    "year": 1972
+  },
+  {
+    "id": "ricardo-quaresma",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/b/be/Ricardo_Quaresma_%28cropped%29_2.jpg",
+    "year": 1983
+  },
+  {
+    "id": "pepe",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/5/55/Pepe_2018.jpg",
+    "year": 1983
+  },
+  {
+    "id": "deco",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/f/fa/Deco_com_o_Fluminense_em_2013_%28cropped%29.jpg",
+    "year": 1977
+  },
+  {
+    "id": "pierre-littbarski",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/b/b8/Pierre_Littbarski_2006_%28cropped%29.jpg",
+    "year": 1960
+  },
+  {
+    "id": "jurgen-klinsmann",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/af/J%C3%BCrgen_Klinsmann_14021113000678638425063004371092_64131.jpg",
+    "year": 1964
+  },
+  {
+    "id": "andreas-brehme",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/c/c1/Andreas_Brehme.jpg",
+    "year": 1960
+  },
+  {
+    "id": "martin-dahlin",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/40/Martin_Dahlin_in_Jan_2014.jpg",
+    "year": 1968
+  },
+  {
+    "id": "thomas-ravelli",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/41/Thomas_Ravelli_in_January_2014.jpg",
+    "year": 1959
+  }
+]
