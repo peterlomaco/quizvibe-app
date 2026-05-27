@@ -1965,10 +1965,60 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        {/* ── Primary actions (Join + Create) ───────────────── */}
-        {/* Pulse-animationen följer den primära knappen för aktuellt
-            login-state: registered när inloggad, guest när utloggad. */}
+        {/* ── Primary actions ───────────────────────────────── */}
+        {/* Knappordning (uppifrån):
+              1. Register or Login (bara när utloggad — pulse:ar som primär CTA)
+              2. Create Game
+              3. Join Game — as registered user
+              4. Join Game — as guest (längst ned)
+            Pulse följer "primär åtgärd för aktuellt login-state":
+              - utloggad → Register or Login pulserar (primär path)
+              - inloggad → Create + Join (registered) pulserar */}
         <View style={styles.actionsSection}>
+          {/* Register or Login — bara när utloggad. Primär CTA → leder till
+              profile-menyn (samma destination som locked Create/Join). */}
+          {!isLoggedIn && (
+            <Animated.View style={{ transform: [{ scale: pulse }] }}>
+              <TouchableOpacity
+                style={styles.gameBtn}
+                activeOpacity={0.85}
+                onPress={() => setProfileMenuVisible(true)}
+              >
+                <Text
+                  style={[
+                    styles.gameBtnText,
+                    { fontFamily: fontsLoaded ? 'Nunito_600SemiBold' : undefined },
+                  ]}
+                  numberOfLines={1}
+                  adjustsFontSizeToFit
+                >
+                  Register or Login
+                </Text>
+              </TouchableOpacity>
+            </Animated.View>
+          )}
+
+          {/* Create Game (låst när utloggad) */}
+          <Animated.View
+            style={isLoggedIn ? { transform: [{ scale: pulse }] } : undefined}
+          >
+            <TouchableOpacity
+              style={[styles.gameBtn, !isLoggedIn && styles.gameBtnDisabled]}
+              activeOpacity={0.85}
+              onPress={isLoggedIn ? handleCreateGame : () => setProfileMenuVisible(true)}
+            >
+              <Text
+                style={[
+                  styles.gameBtnText,
+                  !isLoggedIn && styles.gameBtnTextDisabled,
+                  { fontFamily: fontsLoaded ? 'Nunito_600SemiBold' : undefined },
+                ]}
+              >
+                {isLoggedIn ? 'Create Game' : '🔒 Create Game'}
+              </Text>
+            </TouchableOpacity>
+          </Animated.View>
+
           {/* Join Game — as registered user (låst när utloggad) */}
           <Animated.View
             style={isLoggedIn ? { transform: [{ scale: pulse }] } : undefined}
@@ -1998,15 +2048,21 @@ export default function HomeScreen() {
             </TouchableOpacity>
           </Animated.View>
 
-          {/* Join Game — as guest (utgråad när inloggad — då används registered).
-              Döljs visuellt när Join-modalen är öppen så att modal-sheetens
-              rundade ovankant inte avslöjar knappen bakom. Layout-utrymmet
-              bevaras med opacity/pointerEvents så övriga knappar inte hoppar. */}
+          {/* "Guest"-rubrik separerar guest-pathen från de tre registered-
+              åtgärderna ovan. Overline-stil (uppercase + letterSpacing +
+              textSecondary) signalerar att det är en sub-sektions-label. */}
+          <Text style={[styles.guestSectionHeader, { fontFamily: taglineFont }]}>
+            Guest
+          </Text>
+
+          {/* Join Game — as guest (längst ned, utgråad när inloggad — då
+              används registered). Döljs visuellt när Join-modalen är öppen
+              så att modal-sheetens rundade ovankant inte avslöjar knappen
+              bakom. Layout-utrymmet bevaras med opacity/pointerEvents så
+              övriga knappar inte hoppar.
+              Ingen pulse — Register or Login är primär CTA när utloggad. */}
           <Animated.View
-            style={[
-              !isLoggedIn ? { transform: [{ scale: pulse }] } : undefined,
-              joinVisible && { opacity: 0 },
-            ]}
+            style={[joinVisible && { opacity: 0 }]}
             pointerEvents={joinVisible ? 'none' : 'auto'}
           >
             <TouchableOpacity
@@ -2025,27 +2081,6 @@ export default function HomeScreen() {
                 adjustsFontSizeToFit
               >
                 Join Game — as guest
-              </Text>
-            </TouchableOpacity>
-          </Animated.View>
-
-          {/* Create Game (låst när utloggad) */}
-          <Animated.View
-            style={isLoggedIn ? { transform: [{ scale: pulse }] } : undefined}
-          >
-            <TouchableOpacity
-              style={[styles.gameBtn, !isLoggedIn && styles.gameBtnDisabled]}
-              activeOpacity={0.85}
-              onPress={isLoggedIn ? handleCreateGame : () => setProfileMenuVisible(true)}
-            >
-              <Text
-                style={[
-                  styles.gameBtnText,
-                  !isLoggedIn && styles.gameBtnTextDisabled,
-                  { fontFamily: fontsLoaded ? 'Nunito_600SemiBold' : undefined },
-                ]}
-              >
-                {isLoggedIn ? 'Create Game' : '🔒 Create Game'}
               </Text>
             </TouchableOpacity>
           </Animated.View>
@@ -3119,6 +3154,18 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: -Spacing.sm,
     fontStyle: 'italic',
+  },
+  // "Guest"-rubrik som separerar Join Game — as guest-knappen från de
+  // tre registered-action-knapparna ovan. Overline-stil för att signalera
+  // att det är en sub-sektions-label, inte en del av en knapp.
+  guestSectionHeader: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: Colors.textSecondary,
+    letterSpacing: 1.2,
+    textTransform: 'uppercase',
+    textAlign: 'center',
+    marginTop: Spacing.sm,
   },
   footer: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: Spacing.sm, paddingTop: Spacing.sm },
   footerText: { fontSize: 12, color: Colors.textSecondary },

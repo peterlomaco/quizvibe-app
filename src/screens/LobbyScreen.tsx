@@ -3530,7 +3530,28 @@ export default function LobbyScreen() {
                 hosten kan välja till köpta Extra packages ovanpå. För
                 icke-host visas allt read-only (disabled på TouchableOpacity). */}
             <View style={styles.usePackagesBlock}>
-              <Text style={styles.sectionLabel}>Customized Host packages</Text>
+              {/* Rubrik-rad: section label vänster + info-ikon höger som
+                  förklarar Generic vs Extra Host Packages. Info-ikonen
+                  använder samma styling som paket-radernas infoIconBtn. */}
+              <View style={styles.customizedPackagesHeaderRow}>
+                <Text style={styles.sectionLabel}>Customized Host packages</Text>
+                <Pressable
+                  style={({ pressed }) => [
+                    styles.infoIconBtn,
+                    pressed && { opacity: 0.7 },
+                  ]}
+                  onPress={() =>
+                    Alert.alert(
+                      'Customized Host packages',
+                      'Generic - Generic portfolio includes quiz from all main categories Music, Film and Sport.\n\nExtra Host Packages - specific themes for a customized game experience',
+                    )
+                  }
+                  hitSlop={8}
+                  accessibilityLabel="Customized Host packages info"
+                >
+                  <Text style={styles.infoIconText}>i</Text>
+                </Pressable>
+              </View>
 
               {/* Två-knapps-rad direkt under rubriken — vänster: "Generic"-
                   ruta med FREE-badge som signalerar att lobby:n kör basic
@@ -5595,6 +5616,13 @@ const styles = StyleSheet.create({
   },
   packageRowFreeBadgeTextMuted: {
     color: '#FFF',
+  },
+  // Rubrik-rad för Customized Host packages-blocket: section-label
+  // vänster, info-ikon höger som förklarar Generic vs Extra packages.
+  customizedPackagesHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
   },
   // Liten info-knapp ("i" i en cirkel) som används av paket-raderna i
   // Customized Host packages-listan — tap visar en Alert med förklaringen
