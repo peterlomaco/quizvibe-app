@@ -1397,7 +1397,7 @@ export default function ProfileScreen() {
                 styles.addPackageBtn,
                 pressed && { opacity: 0.7 },
               ]}
-              onPress={() => router.push('/store?focus=packages&from=/profile')}
+              onPress={() => router.push('/store?focus=packages-only&from=/profile')}
             >
               <Text style={styles.modeLabel}>+ Add Host packages</Text>
               <View

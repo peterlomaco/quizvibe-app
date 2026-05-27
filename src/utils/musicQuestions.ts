@@ -1320,11 +1320,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "PNEv3koIeaE",
-        "startSec": 10,
-        "endSec": 25,
+        "startSec": 65,
+        "endSec": 80,
         "channelTitle": "Mark Tandle",
         "license": "standard",
-        "notes": "1994 Hell Freezes Over Acoustic Live — iconic 12-string intro."
+        "notes": "1994 Hell Freezes Over Acoustic Live — hoppar förbi 12-string-intro till Don Henley:s vocal-start (\"On a dark desert highway\")."
       }
     ]
   },

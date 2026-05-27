@@ -174,8 +174,8 @@ export default function StoreScreen() {
     from?: string;
     fromCode?: string;
   }>();
-  const focusMode: 'subscription' | 'packages' | 'credits' | 'default' =
-    focus === 'subscription' || focus === 'packages' || focus === 'credits' ? focus : 'default';
+  const focusMode: 'subscription' | 'packages' | 'packages-only' | 'credits' | 'default' =
+    focus === 'subscription' || focus === 'packages' || focus === 'packages-only' || focus === 'credits' ? focus : 'default';
 
   const router = useRouter();
   // Back-knappens beteende: föredra router.back() när vi har navigation-
@@ -423,26 +423,41 @@ export default function StoreScreen() {
     </View>
   );
 
-  // Customized Host Packages-sektionen göms helt när PACKAGE_TIERS är tom
-  // (= inget köpbart paket i v1). När paketen läggs in igen ska sektionen
-  // visa sig automatiskt — renderingen nedan är oförändrad utöver guarden.
-  const packagesSection = PACKAGE_TIERS.length === 0 ? null : (
-    <View style={styles.section}>
-      <Text style={styles.sectionTitle}>Customized Host Packages</Text>
-      <Text style={styles.sectionSubtitle}>
-        One-time purchase. Adds extra question content to your Lobby host setup.
-      </Text>
-      <View style={styles.tierList}>
-        {PACKAGE_TIERS.map((tier) => (
-          <PackageTierCard
-            key={tier.id}
-            tier={tier}
-            onBuy={() => handleBuyPackage(tier)}
-          />
-        ))}
+  // Customized Host Packages-sektionen. När PACKAGE_TIERS är tom (= inget
+  // köpbart paket i V1) göms sektionen i de fokus-lägen som BLANDAR den med
+  // andra sektioner — ingen poäng att visa en tom rubrik bredvid Credits/
+  // Subscriptions. I `packages-only`-läget (Profile + Lobby "+ Add Host
+  // packages"-CTA) är paket primärfokus → render istället en empty-state-
+  // text så user förstår varför sidan är tom istället för att tro att den
+  // crashat. När paket läggs in i PACKAGE_TIERS aktiveras båda fallen
+  // automatiskt utan att UI:t behöver ändras.
+  const isPackagesOnly = focusMode === 'packages-only';
+  const packagesSection = PACKAGE_TIERS.length === 0
+    ? (isPackagesOnly ? (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Customized Host Packages</Text>
+          <Text style={styles.packagesEmptyText}>
+            No Extra Host packages available at the moment.
+          </Text>
+        </View>
+      ) : null)
+    : (
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Customized Host Packages</Text>
+        <Text style={styles.sectionSubtitle}>
+          One-time purchase. Adds extra question content to your Lobby host setup.
+        </Text>
+        <View style={styles.tierList}>
+          {PACKAGE_TIERS.map((tier) => (
+            <PackageTierCard
+              key={tier.id}
+              tier={tier}
+              onBuy={() => handleBuyPackage(tier)}
+            />
+          ))}
+        </View>
       </View>
-    </View>
-  );
+    );
 
   const creditsSection = (
     <View style={styles.section}>
@@ -559,6 +574,11 @@ export default function StoreScreen() {
             {otherHeading}
             {creditsSection}
             {subscriptionSection}
+          </>
+        )}
+        {focusMode === 'packages-only' && (
+          <>
+            {packagesSection}
           </>
         )}
         {focusMode === 'credits' && (
@@ -770,6 +790,16 @@ const styles = StyleSheet.create({
     fontSize: FontSize.sm,
     color: Colors.textSecondary,
     marginBottom: Spacing.xs,
+  },
+  // Empty-state-text för packages-only-vyn när PACKAGE_TIERS = []. Lite
+  // mer luft (paddingVertical) än sectionSubtitle eftersom det är den
+  // enda textrad som syns i hela vyn — vill att den känns intentionell
+  // och inte glömd.
+  packagesEmptyText: {
+    fontSize: FontSize.md,
+    color: Colors.textSecondary,
+    paddingVertical: Spacing.md,
+    lineHeight: 22,
   },
   // "Other"-rubrik som separerar primära fokus-sektioner (focus=packages
   // eller focus=credits) från resten av Store-utbudet. Subtilt: tunn

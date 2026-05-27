@@ -49,7 +49,9 @@ import { deactivateRoom, getRoomMeta, markRoomGameStarted, roomExists, setRoomMa
 import { clearEjected, isEjected, markEjected } from '../utils/ejectedPlayers';
 import { clearLobbyPlayers, getLobbyPlayers, markOwnPlayerLeft, setLobbyPlayers, upsertOwnLobbyPlayer } from '../utils/mockLobbyPlayers';
 import { clearLobbySettings, getLobbySettings, setLobbySettings } from '../utils/mockLobbySettings';
-import { MAIN_CATEGORIES, defaultEnabledMainCategories, type MainCategory } from '../utils/mainCategory';
+import { MAIN_CATEGORIES, defaultEnabledMainCategories, subjectToMainCategory, type MainCategory } from '../utils/mainCategory';
+import { MUSIC_QUESTIONS } from '../utils/musicQuestions';
+import { IMAGE_QUIZ_QUESTIONS } from '../utils/quizImageQuestions';
 import { supabase } from '../utils/supabase';
 import { clearGameStarted, isGameStarted, markGameStarted } from '../utils/mockStartedGames';
 import {
@@ -2707,6 +2709,49 @@ export default function LobbyScreen() {
   };
 
   const handleStartGame = async (ptpConfirmed = false) => {
+    // Pool-preflight FÖRST — settings-issue ska upptäckas innan vi bryr
+    // oss om spelar-state (approve/single-player-popups). Om host:s filter-
+    // kombo (era + main-categories + source-toggles) ger noll matchande
+    // items i båda pools, visa egen separat popup och avbryt. Detta är
+    // ortogonalt från player-flödet — egen popup, ingen overlay mot andra
+    // start-game-popupar (single player / approve players in lobby).
+    //
+    // Tidigare bug (2026-05-27): emergency fallback i quiz.tsx returnerade
+    // SEED_QUESTIONS (orörda music-items) när båda pools var tomma →
+    // bypassade era + category-filter helt → user fick t.ex. Armstrong 1930
+    // efter att ha valt Sport-only + 2016-2026. Fångas nu här.
+    const eraFrom = eraValues[0];
+    const eraTo = eraValues[1];
+    const isAllCats =
+      enabledMainCategories.length === 3 &&
+      enabledMainCategories.includes('Music') &&
+      enabledMainCategories.includes('Film') &&
+      enabledMainCategories.includes('Sport');
+    const matchesCategory = (mc: MainCategory | null) =>
+      isAllCats ? true : mc !== null && enabledMainCategories.includes(mc);
+    const hasMusicHit = youtubeEnabled && MUSIC_QUESTIONS.some(
+      (q) =>
+        q.correctYear >= eraFrom &&
+        q.correctYear <= eraTo &&
+        matchesCategory(subjectToMainCategory(q.contentSubject)),
+    );
+    const hasImageHit = imagesEnabled && IMAGE_QUIZ_QUESTIONS.some((q) => {
+      let inEra = true;
+      if (q.peakFrom !== undefined && q.peakTo !== undefined) {
+        inEra = eraFrom <= q.peakTo && eraTo >= q.peakFrom;
+      } else if (q.correctYear !== undefined) {
+        inEra = q.correctYear >= eraFrom && q.correctYear <= eraTo;
+      }
+      return inEra && matchesCategory(subjectToMainCategory(q.contentSubject));
+    });
+    if (!hasMusicHit && !hasImageHit) {
+      Alert.alert(
+        'No matching quiz',
+        'No quiz within selected range of game connections, game era and main category. Please change settings.',
+      );
+      return;
+    }
+
     // Turordningen för Pass-the-phone bygger på array-ordningen i `players[]`
     // (host alltid på index 0). Filtrera bort spelare som lämnat lobbyn —
     // de kan inte vara på tur. Skicka en minimal player-payload så quiz.tsx
@@ -3553,7 +3598,7 @@ export default function LobbyScreen() {
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={styles.addPackageBtn}
-                      onPress={() => router.push({ pathname: '/store' as const, params: { focus: 'packages', from: '/lobby', fromCode: roomCode } })}
+                      onPress={() => router.push({ pathname: '/store' as const, params: { focus: 'packages-only', from: '/lobby', fromCode: roomCode } })}
                       activeOpacity={0.7}
                     >
                       <Text style={styles.modeLabel}>+ Add Host packages</Text>

@@ -880,10 +880,19 @@ export default function QuizScreen() {
     const hasImage = imagePool.length > 0;
 
     // Edge cases: om en pool är tom, kör bara den andra. Om båda tomma →
-    // sista-utvägs-fallback till SEED_QUESTIONS (hardcoded mock). Lobby
-    // blockar normalt detta läge ("Minimum 1 Game connection source") så
-    // i praktiken ska vi aldrig hamna här.
-    if (!hasYoutube && !hasImage) return SEED_QUESTIONS;
+    // sista-utvägs-fallback. Lobby:s pool-preflight blockar normalt detta
+    // läge vid Start Game; emergency-pathen täcker direkt-nav till /quiz
+    // utan Lobby + edge cases (Play Again med ändrade defaults osv.).
+    // Defense in depth: respektera main-category-filtret även här så user
+    // som valt Sport-only inte plötsligt får Music-content (tidigare bug
+    // 2026-05-27 där SEED_QUESTIONS returnerades orörd).
+    if (!hasYoutube && !hasImage) {
+      if (isAllCategoriesEnabled) return SEED_QUESTIONS;
+      const respectful = SEED_QUESTIONS.filter(
+        (q) => q.mainCategory !== null && enabledMainCategories.includes(q.mainCategory),
+      );
+      return respectful.length > 0 ? respectful : SEED_QUESTIONS;
+    }
 
     // Bygg pool täckande hela spelet utan modulo-cykling i UI-laget.
     //   Pass-the-Phone: questionsPerBlock = playerCount (alla spelare i ronden
