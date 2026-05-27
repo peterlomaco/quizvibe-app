@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from './supabase';
+import { MainCategory, defaultEnabledMainCategories, isMainCategory } from './mainCategory';
 
 /**
  * Profil-lagring — dual-läge sedan Fas 2:
@@ -72,6 +73,12 @@ export interface ProfileData {
   // visas inte alls i Lobby. Optional för bakåtkompat — defaultas till alla
   // PURCHASED_PACKAGES-id:n (allt aktiverat) i UI.
   enabledHostPackages?: string[];
+  // Lista över huvudkategorier (Music/Film/Sport) som host har aktiverat
+  // som default vid skapande av spel. Filtrerar quiz-poolen i quiz.tsx via
+  // backend-subject → MainCategory-mappning. Optional för bakåtkompat —
+  // defaultas till alla 3 i UI (befintliga users ser inget beteendebyte).
+  // Min 1 enforce:as i UI så filtret aldrig blir tomt.
+  enabledMainCategories?: MainCategory[];
 }
 
 // Dual-read mapping för profiler skapade innan rename
@@ -158,6 +165,7 @@ interface ProfileRow {
   game_mode: GameMode;
   single_player_default: boolean;
   enabled_host_packages: string[];
+  enabled_main_categories: string[];
   rounds_count: number;
 }
 
@@ -180,6 +188,7 @@ function rowToProfile(row: ProfileRow): ProfileData {
     gameMode: row.game_mode,
     singlePlayerDefault: row.single_player_default,
     enabledHostPackages: row.enabled_host_packages,
+    enabledMainCategories: (row.enabled_main_categories ?? []).filter(isMainCategory),
     roundsDefault: row.rounds_count,
   };
 }
@@ -207,6 +216,7 @@ function profileToRow(userId: string, email: string, p: ProfileData): ProfileRow
     game_mode: p.gameMode ?? 'pass-the-phone',
     single_player_default: p.singlePlayerDefault ?? false,
     enabled_host_packages: p.enabledHostPackages ?? [],
+    enabled_main_categories: p.enabledMainCategories ?? defaultEnabledMainCategories(),
     rounds_count: p.roundsDefault ?? 4,
   };
 }
@@ -373,6 +383,7 @@ async function backfillProfileFromSession(user: { id: string; email?: string; us
     singlePlayerDefault: cache?.singlePlayerDefault,
     roundsDefault: cache?.roundsDefault,
     enabledHostPackages: cache?.enabledHostPackages,
+    enabledMainCategories: cache?.enabledMainCategories,
   };
 
   // Persistera mot Supabase. Vi använder upsert eftersom raden kan ha

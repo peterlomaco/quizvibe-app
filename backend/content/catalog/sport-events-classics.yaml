@@ -87,18 +87,6 @@ items:
         endSec: 315
         channelTitle: "Wimbledon"
         notes: "Wimbledon official channel — 1980 tie-break i fjärde set (18-16 till McEnroe). Mid-tiebreak."
-  - id: carl-lewis-1984-la-olympics
-    displayName: "Carl Lewis 4 OS-guld i LA"
-    correctYear: 1984
-    probability: 85
-    wikimediaSearchHints: ["Carl Lewis 1984 Los Angeles Olympics four gold"]
-    answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "s6lS_EcuUdY"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Olympics"
-        notes: "Olympics official channel — Carl Lewis long jump-guld LA 1984."
   - id: federer-nadal-wimbledon-2008
     displayName: "Federer-Nadal Wimbledon-final ('greatest match')"
     correctYear: 2008

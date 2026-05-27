@@ -1678,26 +1678,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "carl-lewis-1984-la-olympics",
-    "displayName": "Carl Lewis 4 OS-guld i LA",
-    "correctYear": 1984,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "audiences": [
-      "all"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "s6lS_EcuUdY",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Olympics",
-        "license": "standard",
-        "notes": "Olympics official channel — Carl Lewis long jump-guld LA 1984."
-      }
-    ]
-  },
-  {
     "id": "madonna-like-a-virgin",
     "displayName": "Like a Virgin — Madonna",
     "correctYear": 1984,

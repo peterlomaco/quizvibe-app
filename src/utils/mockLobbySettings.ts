@@ -10,6 +10,7 @@
 // + initial-load via getLobbySettings.
 
 import { supabase } from './supabase';
+import { MainCategory, defaultEnabledMainCategories, isMainCategory } from './mainCategory';
 
 export type LobbyGameMode = 'pass-the-phone' | 'individual-devices';
 // UI använder capitalized strings; DB lagrar lowercase enligt CHECK-
@@ -29,6 +30,7 @@ export interface LobbySettings {
   selectedExtraPackages: string[];
   youtubeEnabled: boolean;
   imagesEnabled: boolean;
+  enabledMainCategories: MainCategory[];
 }
 
 interface LobbySettingsRow {
@@ -43,6 +45,7 @@ interface LobbySettingsRow {
   selected_extra_packages: string[];
   youtube_enabled: boolean;
   images_enabled: boolean;
+  enabled_main_categories: string[];
 }
 
 const UI_TO_DB_REGION: Record<LobbyRegion, DbRegion> = {
@@ -70,6 +73,7 @@ function rowToSettings(row: LobbySettingsRow): LobbySettings {
     selectedExtraPackages: row.selected_extra_packages,
     youtubeEnabled: row.youtube_enabled,
     imagesEnabled: row.images_enabled,
+    enabledMainCategories: (row.enabled_main_categories ?? []).filter(isMainCategory),
   };
 }
 
@@ -86,6 +90,9 @@ function settingsToRow(code: string, s: LobbySettings): LobbySettingsRow {
     selected_extra_packages: [...s.selectedExtraPackages],
     youtube_enabled: s.youtubeEnabled,
     images_enabled: s.imagesEnabled,
+    enabled_main_categories: s.enabledMainCategories.length > 0
+      ? [...s.enabledMainCategories]
+      : defaultEnabledMainCategories(),
   };
 }
 

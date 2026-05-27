@@ -15,6 +15,7 @@ import {
   View,
 } from 'react-native';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
+import { MainCategory } from '../utils/mainCategory';
 import { MediaSourceIcon } from './MediaSourceIcon';
 import { QuizVibeLogo } from './QuizVibeLogo';
 import { QuizVibePlayLogo } from './QuizVibePlayLogo';
@@ -70,11 +71,6 @@ const ASSISTANCE_LABEL: Record<'minimal' | 'standard' | 'full', string> = {
 /** Media-källa per fråga, för IndDev:s media-source-kö. 'none' renderas som
  *  ❓ när YouTube inte är aktiv för frågan. */
 export type QuestionMediaType = 'youtube' | 'image' | 'none';
-
-/** V1-huvudkategori för en fråga — driver kant-skärande badge på första
- *  kö-rutan så spelaren ser i förväg vilken typ av fråga som kommer
- *  härnäst. null när subjectet inte mappar till någon V1-kategori. */
-export type MainCategory = 'Music' | 'Film' | 'Sport';
 
 interface Props {
   /** Game mode — styr vilken vy av kö-tabellen som renderas + ev. UI-text. */

@@ -415,6 +415,30 @@ Profile-toggle som filtrerar vilka paket som syns i Lobby:n när användaren är
   - Free-paket-raden får samma kantskärande FREE-badge som i Profile (`packageRowFreeBadge`). `isFree`-detektion: `pkg.free || isGenerationPackageId(pkg.id)` som belt-and-suspenders så icke-host (som får packages från katalogen där `free: true` är satt) också taggas korrekt även om någon framtida data-källa skulle utelämna `free`-flaggan.
 - **Seeding**: Lobby host-seed-effekten läser `profile.enabledHostPackages` (som redan innehåller rätt gen-pack-id efter ProfileScreen:s sync). Bara host får filterlistan (non-hosts ser endast paket som hosten faktiskt aktiverat för denna lobby via `selectedExtraPackages`).
 
+## Main categories (Profile-toggle → Lobby-filter → quiz pool-filter)
+
+V1-huvudkategori-filter implementerat 2026-05-27. Host väljer Music/Film/Sport som ska ingå i spelet — quiz.tsx filtrerar poolen via backend-subject → `MainCategory`-mappning.
+
+- **Shared utility** ([src/utils/mainCategory.ts](src/utils/mainCategory.ts)): `MainCategory = 'Music' | 'Film' | 'Sport'`, `subjectToMainCategory(subject)`-helper, `MAIN_CATEGORIES`-konstant, `defaultEnabledMainCategories()` (alla 3), `isMainCategory(value)` type-guard. Tidigare lokala kopior i quiz.tsx och GetReadyIntro.tsx ersatta av imports från detta module.
+- **Profile-state** `enabledMainCategories?: MainCategory[]` på `ProfileData` ([profileStorage.ts](src/utils/profileStorage.ts)). Default vid load = alla 3 (`['Music', 'Film', 'Sport']`) så befintliga profiler ser inget beteendebyte. `loadProfile` coerce:ar tom array → defaults (defensive mot DB-edge cases). DB-kolumn: `profiles.enabled_main_categories text[]` med default `array['Music','Film','Sport']`.
+- **Lobby-state** `enabledMainCategories: MainCategory[]` på `LobbySettings` ([mockLobbySettings.ts](src/utils/mockLobbySettings.ts)). Host-seed-effekten prio:erar `stored` (carry-over från Play Again) > `profile.enabledMainCategories` > all 3 (defensive fallback). Non-host syncar via 2s polling + Realtime-tick. DB-kolumn: `lobby_settings.enabled_main_categories text[]` med samma default. Migration: [supabase/migrations/0012_main_categories.sql](supabase/migrations/0012_main_categories.sql) — appliceras manuellt via Supabase SQL editor.
+- **UI-stil**: 3 tappbara bordered-rutor (`mainCategoryToggle` + `mainCategoryBox`) som speglar Game Mode-toggle:ns visuella språk men med multi-select-semantik. Active = `Colors.primary` border + `Colors.primaryMuted` bg + primary-färgad semibold-text. Inactive = `Colors.borderStrong` border + transparent bg + textSecondary-färg. Styles dupliceras mellan ProfileScreen och LobbyScreen som **lokal kopia** (icke-domän-vokabulär, små diffs) — håll dem synkade vid framtida ändringar.
+- **Min-1-guard** (`handleToggleMainCategory`): försök att avaktivera sista enabled visar Alert "At least one main category. Minimum 1 main category needs to be enabled. Activate another category before disabling this one." och no-op:ar state-changen. Speglar Game Connections-källornas motsvarande guard. Båda Profile och Lobby har identisk logik.
+- **Layout-position**:
+  - Profile: mellan Multiplayer-bracket och "Region scope + Answer response time"-raden (= top of Quiz settings-blocket).
+  - Lobby: mellan Game Connections-källornas Images-rad och Customized Host packages-sub-blocket (inom samma `connectionsList`-View, så luftgivningen följer `usePackagesBlock`-mönstret med `marginTop: Spacing.md`).
+- **Pool-filter i quiz.tsx** ([app/quiz.tsx](app/quiz.tsx) `gameQuestions`-useMemo):
+  - **HÅRD filter** — inga auto-fallbacks som strippar kategorin (host:s val respekteras). Edge case "filtret tömmer pool helt" fångas av "båda pools tomma → SEED_QUESTIONS"-fallbacken (UI:t ska normalt blockera detta läge via min-1-guard).
+  - **Filter-position i pipeline** (efter `audienceFilter`):
+    1. Source-toggle (youtubeEnabled / imagesEnabled) — HÅRD.
+    2. Era (correctYear ∈ [eraFrom, eraTo], eller peak-overlap) — HÅRD.
+    3. Audience (union av spelares generationer) — PREFERENS (relaxbar till era-only).
+    4. **Main category** — HÅRD (inga fallbacks).
+  - **Specialfall för `null mainCategory`-items** (capitals/places-items, currently 4 i pool men inte V1-playable per `project_launch_scope_v1`): när alla 3 categories enabled = no-op (= default-läget bevarar items oavsett mainCategory). Annars strict filter `q.mainCategory && enabledMainCategories.includes(q.mainCategory)` → null-items exkluderas. Detta är **forward-looking** — så fort capitals/places re-aktiveras post-V1 fungerar handler:n korrekt utan att items tappas tyst i default-läget.
+- **URL-params**: `handleStartGame` (host-vägen) + non-host:s Realtime-driven navigation skickar `enabledMainCategories: JSON.stringify(enabledMainCategories)`. quiz.tsx parsar via `try/catch` + `isMainCategory`-filter + non-empty-guard så korrupt payload fall:er till alla 3 (= ingen filtrering).
+- **Play Again carry-over**: `goToNewLobby` i quiz.tsx använder spread (`{ ...oldSettings, answerResponseSeconds }`) vid `keepSettings=true` så main-categories bär över automatiskt till nya lobby:n. Vid `keepSettings=false` (Start fresh) seedas från profil-defaults igen.
+- **HistoryEntry** lagrar INTE `enabledMainCategories` ännu — kan adderas i Player history-displayen post-V1 om relevant. Datan finns på URL-params i quiz.tsx men appendGameHistoryEntry-call:en exkluderar fältet idag.
+
 ## Generic + Add host packages-rad (Lobby host-vyn)
 
 Två-knapps-rad direkt under "Customized Host packages"-rubriken i Lobby — host-only:
@@ -860,6 +884,7 @@ Namnet som visas (`pickNameForPrefix`): det rätta namnet om prefix matchar `cor
 - **`audienceSet` byggs en gång** per useMemo-körning och delas mellan music + image — gemensam generations-union.
 - **Emergency fallback** kvarstår på `if (!hasYoutube && !hasImage) return SEED_QUESTIONS` (rad 816 nedan) — fires endast när BÅDA pools är utterly tomma (typ source-toggle off på båda, men Lobby:s "min 1 source"-gate förhindrar normalt). Strippar era som sista utväg så spelet kan starta.
 - **Per-spelare-filter (V2)** kan ersätta union-modellen om Peter vill — kräver per-tur-pick i round-block-loopen istället för pool-nivå-filter. Aktuellt pragmatiskt val: union-filter håller round-block-strukturen intakt och fungerar för både Pass-the-Phone och Individual Devices.
+- **Main category-filter** (Music/Film/Sport) appliceras EFTER audience-filtret i pipeline:n (= sista filter-steget innan round-block-bygget). HÅRD — inga fallbacks som strippar kategorin. Se "Main categories (Profile-toggle → Lobby-filter → quiz pool-filter)" för detaljer.
 
 ## Image questions (MVP)
 

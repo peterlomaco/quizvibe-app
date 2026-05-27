@@ -49,6 +49,7 @@ import { deactivateRoom, getRoomMeta, markRoomGameStarted, roomExists, setRoomMa
 import { clearEjected, isEjected, markEjected } from '../utils/ejectedPlayers';
 import { clearLobbyPlayers, getLobbyPlayers, markOwnPlayerLeft, setLobbyPlayers, upsertOwnLobbyPlayer } from '../utils/mockLobbyPlayers';
 import { clearLobbySettings, getLobbySettings, setLobbySettings } from '../utils/mockLobbySettings';
+import { MAIN_CATEGORIES, defaultEnabledMainCategories, type MainCategory } from '../utils/mainCategory';
 import { supabase } from '../utils/supabase';
 import { clearGameStarted, isGameStarted, markGameStarted } from '../utils/mockStartedGames';
 import {
@@ -1077,6 +1078,15 @@ export default function LobbyScreen() {
           setEnabledHostPackages(
             profile?.enabledHostPackages ?? PURCHASED_PACKAGES.map((p) => p.id),
           );
+          // Main categories — prio: stored (carry-over från previous Play
+          // Again) > profil (host-default) > all 3 (defensive fallback).
+          const seedMainCategories =
+            stored?.enabledMainCategories && stored.enabledMainCategories.length > 0
+              ? stored.enabledMainCategories
+              : profile?.enabledMainCategories && profile.enabledMainCategories.length > 0
+                ? profile.enabledMainCategories
+                : defaultEnabledMainCategories();
+          setEnabledMainCategories(seedMainCategories);
         },
       );
     }
@@ -1473,6 +1483,29 @@ export default function LobbyScreen() {
   const [youtubeEnabled, setYoutubeEnabled] = useState(true);
   // Profiles and Places styrs helt av host-toggeln. Default = på.
   const [imagesEnabled, setImagesEnabled] = useState(true);
+  // Main categories (Music/Film/Sport) — host-toggleln filtrerar quiz-poolen
+  // via backend-subject → MainCategory-mappning. Min 1 enforce:as i
+  // handleToggleMainCategory så listan aldrig blir tom. Seedas från host:s
+  // profil i host-seed-effekten; non-host syncar via mockLobbySettings-pollning.
+  const [enabledMainCategories, setEnabledMainCategories] = useState<MainCategory[]>(
+    () => defaultEnabledMainCategories(),
+  );
+  const handleToggleMainCategory = (cat: MainCategory) => {
+    setEnabledMainCategories((prev) => {
+      const isActive = prev.includes(cat);
+      if (isActive) {
+        if (prev.length <= 1) {
+          Alert.alert(
+            'At least one main category',
+            'Minimum 1 main category needs to be enabled. Activate another category before disabling this one.',
+          );
+          return prev;
+        }
+        return prev.filter((c) => c !== cat);
+      }
+      return MAIN_CATEGORIES.filter((c) => c === cat || prev.includes(c));
+    });
+  };
   // Use Packages — Basic-utbudet är alltid implicit aktivt (ingen UI). Hosten
   // kan välja till extra-paket ovanpå. Knytningen mellan packages och
   // room-code är implicit (lobby-state).
@@ -2140,6 +2173,7 @@ export default function LobbyScreen() {
         selectedExtraPackages,
         youtubeEnabled,
         imagesEnabled,
+        enabledMainCategories,
       }).catch(() => { /* loggas i mockLobbySettings */ });
     }, 300);
     return () => clearTimeout(handle);
@@ -2155,6 +2189,7 @@ export default function LobbyScreen() {
     selectedExtraPackages,
     youtubeEnabled,
     imagesEnabled,
+    enabledMainCategories,
   ]);
 
   // Realtime-tick: bumpas av lobby_players + lobby_settings-channel-
@@ -2197,6 +2232,17 @@ export default function LobbyScreen() {
       });
       setYoutubeEnabled(stored.youtubeEnabled);
       setImagesEnabled(stored.imagesEnabled);
+      // Main categories — coerce tom array till alla 3 så pool-filtret
+      // aldrig blir tomt om host:s skrivning skulle ha landat ofullständig.
+      setEnabledMainCategories((prev) => {
+        const next = stored.enabledMainCategories.length > 0
+          ? stored.enabledMainCategories
+          : defaultEnabledMainCategories();
+        if (prev.length === next.length && prev.every((c, i) => c === next[i])) {
+          return prev;
+        }
+        return next;
+      });
     };
     syncFromStore();
     const interval = setInterval(syncFromStore, 2000);
@@ -2463,6 +2509,14 @@ export default function LobbyScreen() {
               // host-path:en så HistoryEntry får samma data oavsett vilken
               // enhet som triggade navigation till /quiz.
               selectedExtraPackages: JSON.stringify(settingsStored?.selectedExtraPackages ?? []),
+              // Main categories — non-host använder host:s synkade värde från
+              // settingsStored. Fallback till lokal state om settings ännu
+              // inte är skrivna (osannolikt vid game-started-detection).
+              enabledMainCategories: JSON.stringify(
+                settingsStored?.enabledMainCategories && settingsStored.enabledMainCategories.length > 0
+                  ? settingsStored.enabledMainCategories
+                  : enabledMainCategories,
+              ),
               roomCode,
             },
           });
@@ -2847,6 +2901,11 @@ export default function LobbyScreen() {
         // att frysa in i HistoryEntry så Player history visar vilket paket
         // spelet kördes med.
         selectedExtraPackages: JSON.stringify(selectedExtraPackages),
+        // Main categories aktiverade i lobby:n. JSON-stringifierad array av
+        // MainCategory-strings (Music/Film/Sport). quiz.tsx läser detta i
+        // gameQuestions-useMemo:n för att filtrera pool:en. UI:t enforce:ar
+        // min 1 enabled så listan kan inte vara tom här.
+        enabledMainCategories: JSON.stringify(enabledMainCategories),
         // Skickas så Quit Game-flödet i quiz.tsx kan deactivera rummet
         // och rensa leftPlayers när host avslutar mitt i ett spel.
         roomCode,
@@ -3380,6 +3439,47 @@ export default function LobbyScreen() {
                   ios_backgroundColor={imagesEnabled ? Colors.success : Colors.error}
                   style={styles.connectionSwitch}
                 />
+              )}
+            </View>
+
+            {/* Main categories — host-toggle som filtrerar quiz-poolen via
+                backend-subject → MainCategory-mappning. Mellan Game
+                Connections-källorna (YouTube/Images ovan) och Customized
+                Host packages-sub-blocket nedan. Speglar Profile:s
+                motsvarande sektion 1:1 men visas för alla i lobbyn —
+                host-only-tap via disabled-flagga. Min 1 enforce:as i
+                handleToggleMainCategory så listan aldrig blir tom. */}
+            <View style={styles.mainCategoryBlock}>
+              <Text style={styles.sectionLabel}>Main categories</Text>
+              <View style={styles.mainCategoryToggle}>
+                {MAIN_CATEGORIES.map((cat) => {
+                  const isActive = enabledMainCategories.includes(cat);
+                  return (
+                    <Pressable
+                      key={cat}
+                      onPress={() => handleToggleMainCategory(cat)}
+                      disabled={!hostMode}
+                      style={[
+                        styles.mainCategoryBox,
+                        isActive ? styles.mainCategoryBoxActive : styles.mainCategoryBoxInactive,
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.mainCategoryLabel,
+                          isActive && styles.mainCategoryLabelActive,
+                        ]}
+                      >
+                        {cat}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+              {hostMode && (
+                <Text style={styles.mainCategoryDescription}>
+                  Quiz questions are drawn only from active categories. At least 1 must be enabled.
+                </Text>
               )}
             </View>
 
@@ -5222,6 +5322,57 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     letterSpacing: 0.4,
     textAlign: 'center',
+  },
+  // Main categories-block — sub-block mellan Game Connections-källorna
+  // och Customized Host packages-blocket. Speglar usePackagesBlock i
+  // paddings/marginal så de tre delarna inom connectionsList sitter med
+  // samma luftgivning. Lokal kopia av mainCategoryToggle-stilen som även
+  // finns i ProfileScreen — håll dem synkade vid framtida ändringar.
+  mainCategoryBlock: {
+    gap: Spacing.sm,
+    paddingTop: Spacing.xs,
+    paddingBottom: Spacing.xs,
+    marginTop: Spacing.md,
+  },
+  mainCategoryToggle: {
+    flexDirection: 'row',
+    backgroundColor: Colors.background,
+    borderRadius: Radius.md,
+    padding: 3,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    height: 46,
+    gap: 4,
+  },
+  mainCategoryBox: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: Radius.sm,
+    borderWidth: 1,
+  },
+  mainCategoryBoxInactive: {
+    borderColor: Colors.borderStrong,
+    backgroundColor: 'transparent',
+  },
+  mainCategoryBoxActive: {
+    borderColor: Colors.primary,
+    backgroundColor: Colors.primaryMuted,
+  },
+  mainCategoryLabel: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.medium,
+    color: Colors.textSecondary,
+  },
+  mainCategoryLabelActive: {
+    color: Colors.primary,
+    fontWeight: FontWeight.semibold,
+  },
+  mainCategoryDescription: {
+    fontSize: FontSize.xs,
+    color: Colors.textSecondary,
+    paddingHorizontal: Spacing.xs,
+    lineHeight: 17,
   },
   // Use Packages — sub-block för musikpaket-val. Vänsterställt mot
   // connectionsList-kanten så "Extra packages:"-labeln och chipsen börjar

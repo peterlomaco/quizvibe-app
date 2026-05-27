@@ -62,6 +62,11 @@ import {
     type Region,
 } from '../utils/profileStorage';
 import { hasPremiumSubscription } from '../utils/subscriptionStorage';
+import {
+    MAIN_CATEGORIES,
+    defaultEnabledMainCategories,
+    type MainCategory,
+} from '../utils/mainCategory';
 // Create Game-flödet (samma som Home:s handleCreateGame). När fler skärmar
 // får denna entry-punkt: lyft till en delad utility i src/utils/.
 import { clearEjected } from '../utils/ejectedPlayers';
@@ -372,6 +377,34 @@ export default function ProfileScreen() {
       prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id],
     );
   };
+  // Main categories (Music/Film/Sport) — host-default som filtrerar quiz-
+  // poolen via backend-subject → MainCategory-mappning. Min 1 enforce:as i
+  // handleToggleMainCategory så listan aldrig blir tom (annars vore quiz-
+  // poolen tom). Default = alla 3 så fresh profiler ser inget beteendebyte.
+  const [enabledMainCategories, setEnabledMainCategories] = useState<MainCategory[]>(
+    () => defaultEnabledMainCategories(),
+  );
+  const handleToggleMainCategory = (cat: MainCategory) => {
+    setEnabledMainCategories((prev) => {
+      const isActive = prev.includes(cat);
+      if (isActive) {
+        // Min 1 main category måste vara aktiv — annars finns inga frågor
+        // att hämta i pool-filtret. Speglar Game Connections-källans
+        // motsvarande guard (min 1 av YouTube/Images).
+        if (prev.length <= 1) {
+          Alert.alert(
+            'At least one main category',
+            'Minimum 1 main category needs to be enabled. Activate another category before disabling this one.',
+          );
+          return prev;
+        }
+        return prev.filter((c) => c !== cat);
+      }
+      // Lägg till och behåll deklarations-ordning (Music, Film, Sport) för
+      // stabil serialiserings-ordning mot DB.
+      return MAIN_CATEGORIES.filter((c) => c === cat || prev.includes(c));
+    });
+  };
   // Gratis generations-paket utifrån user:s Competition Year of Birth.
   // Byts automatiskt när birthYear ändras (effect:en nedanför löser
   // syncen i enabledHostPackages); denna useMemo styr bara render-listan.
@@ -449,6 +482,14 @@ export default function ProfileScreen() {
           // Lobby utan extra steg via Profile. Free gen-paket-id:t läggs
           // in nedanför via syncGenerationPackageIds (kräver birthYear).
           enabledHostPackages: data.enabledHostPackages ?? PURCHASED_PACKAGES.map((p) => p.id),
+          // Tom array (från en defekt klient som råkat skriva []) coerce:as
+          // till alla 3 så pool-filtret aldrig blir tomt och users alltid har
+          // content. UI:t enforce:ar min 1 men DB-defaulten är belt-and-
+          // suspenders.
+          enabledMainCategories:
+            data.enabledMainCategories && data.enabledMainCategories.length > 0
+              ? data.enabledMainCategories
+              : defaultEnabledMainCategories(),
         };
         // Synca free gen-paket-id (utifrån augmented birthYear) — täcker
         // både fresh profil och äldre profiler skapade innan free-gen-
@@ -480,7 +521,9 @@ export default function ProfileScreen() {
           data.singlePlayerDefault == null ||
           data.roundsDefault == null ||
           data.answerResponseSeconds == null ||
-          packagesChanged
+          packagesChanged ||
+          data.enabledMainCategories == null ||
+          data.enabledMainCategories.length === 0
         );
         if (wasIncomplete) {
           saveProfile(augmented).catch(() => { /* silent — vyn fungerar ändå */ });
@@ -515,6 +558,7 @@ export default function ProfileScreen() {
           : ROUNDS_MAX_INDIV;
         setRoundsCount(Math.max(ROUNDS_MIN, Math.min(initialMax, savedRounds)));
         setEnabledHostPackages(augmented.enabledHostPackages ?? PURCHASED_PACKAGES.map((p) => p.id));
+        setEnabledMainCategories(augmented.enabledMainCategories ?? defaultEnabledMainCategories());
       });
       loadFriends().then((list) => {
         if (active) setFriends(list);
@@ -584,6 +628,7 @@ export default function ProfileScreen() {
         singlePlayerDefault,
         roundsDefault: roundsCount,
         enabledHostPackages,
+        enabledMainCategories,
       });
       setSavedSection(section);
       setTimeout(() => setSavedSection(null), 2000);
@@ -1124,6 +1169,42 @@ export default function ProfileScreen() {
               {gameMode === 'pass-the-phone'
                 ? 'Use one single device. Max 4 players.'
                 : 'Each player plays on their own device. Max 12 players.'}
+            </Text>
+          </View>
+
+          {/* Main categories — host-default som filtrerar quiz-poolen via
+              backend-subject → MainCategory-mappning. Multi-select (Music
+              + Film + Sport), min 1 enforce:as i handleToggleMainCategory.
+              Speglar Game Mode-toggle:ns bordered-box-mönster men med
+              multi-select-semantik. */}
+          <View style={styles.field}>
+            <Text style={styles.fieldLabel}>Main categories</Text>
+            <View style={styles.mainCategoryToggle}>
+              {MAIN_CATEGORIES.map((cat) => {
+                const isActive = enabledMainCategories.includes(cat);
+                return (
+                  <Pressable
+                    key={cat}
+                    onPress={() => handleToggleMainCategory(cat)}
+                    style={[
+                      styles.mainCategoryBox,
+                      isActive ? styles.mainCategoryBoxActive : styles.mainCategoryBoxInactive,
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.mainCategoryLabel,
+                        isActive && styles.mainCategoryLabelActive,
+                      ]}
+                    >
+                      {cat}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+            <Text style={styles.mainCategoryDescription}>
+              Quiz questions are drawn only from active categories. At least 1 must be enabled.
             </Text>
           </View>
 
@@ -3009,6 +3090,52 @@ const styles = StyleSheet.create({
     lineHeight: 17,
     marginTop: Spacing.xs,
     textAlign: 'center',
+  },
+
+  // Main categories-toggle (Music / Film / Sport) — multi-select-rad med
+  // 3 bordered-rutor som speglar Game Mode-toggle:ns visuella språk
+  // (samma container-mått, samma active/inactive-färgvokabulär). Kallas
+  // även från Lobby:n med samma styles (men där lyfts de till lokal kopia).
+  mainCategoryToggle: {
+    flexDirection: 'row',
+    backgroundColor: Colors.background,
+    borderRadius: Radius.md,
+    padding: 3,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    height: 46,
+    gap: 4,
+  },
+  mainCategoryBox: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: Radius.sm,
+    borderWidth: 1,
+  },
+  mainCategoryBoxInactive: {
+    borderColor: Colors.borderStrong,
+    backgroundColor: 'transparent',
+  },
+  mainCategoryBoxActive: {
+    borderColor: Colors.primary,
+    backgroundColor: Colors.primaryMuted,
+  },
+  mainCategoryLabel: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.medium,
+    color: Colors.textSecondary,
+  },
+  mainCategoryLabelActive: {
+    color: Colors.primary,
+    fontWeight: FontWeight.semibold,
+  },
+  mainCategoryDescription: {
+    fontSize: FontSize.xs,
+    color: Colors.textSecondary,
+    paddingHorizontal: Spacing.xs,
+    lineHeight: 17,
+    marginTop: Spacing.xs,
   },
 
   // "Multiplayer mode"-klammer under Game Mode-toggle:n. Speglar
