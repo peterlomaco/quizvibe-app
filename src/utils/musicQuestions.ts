@@ -627,6 +627,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "sweden-1958-world-cup-final",
+    "displayName": "Sverige-Brasilien VM-finalen i Solna",
+    "correctYear": 1958,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "3vUpZgzj-3I",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "freekick3596",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
     "id": "ray-charles-whatd-i-say",
     "displayName": "What'd I Say — Ray Charles",
     "correctYear": 1959,
@@ -1329,6 +1349,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "nadia-comaneci-montreal-1976",
+    "displayName": "Nadia Comăneci perfekta 10:or i Montreal",
+    "correctYear": 1976,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "Yi_5xbd5xdE",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Olympics",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
     "id": "rocky",
     "displayName": "Rocky",
     "correctYear": 1976,
@@ -1489,6 +1529,86 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Queen Official",
         "license": "standard",
         "notes": "Live at Montreal Forum 1981 (Remastered) — official Queen-kanal. Iconic bassline."
+      }
+    ]
+  },
+  {
+    "id": "raging-bull-1980",
+    "displayName": "Raging Bull",
+    "correctYear": 1980,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "F2UKuKxCJqc",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Amazon MGM Studios",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (13)."
+      }
+    ]
+  },
+  {
+    "id": "stenmark-os-guld-slalom-1980",
+    "displayName": "Stenmark OS-guld slalom Lake Placid",
+    "correctYear": 1980,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "zFy1OYa7Qm4",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Nostalgi",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
+    "id": "wassberg-os-guld-1980",
+    "displayName": "Thomas Wassberg OS-guld 15 km Lake Placid",
+    "correctYear": 1980,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "ZQEBtR2pDXY",
+        "startSec": 5,
+        "endSec": 20,
+        "channelTitle": "Nostalgi",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
+    "id": "chariots-of-fire-1981",
+    "displayName": "Chariots of Fire",
+    "correctYear": 1981,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "odtqtlhsv4E",
+        "startSec": 21,
+        "endSec": 36,
+        "channelTitle": "Rotten Tomatoes Classic Trailers",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (13)."
       }
     ]
   },
@@ -1674,6 +1794,46 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "The Police - Topic",
         "license": "standard",
         "notes": "Officiell album-audio via YouTube Topic. Iconic guitar-arpeggio-intro."
+      }
+    ]
+  },
+  {
+    "id": "carl-lewis-los-angeles-1984",
+    "displayName": "Carl Lewis tar 4 OS-guld Los Angeles",
+    "correctYear": 1984,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "xNafT5HK_Ro",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "How To Run Faster - By Performance Lab",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
+    "id": "gunde-svan-os-guld-1984",
+    "displayName": "Gunde Svan OS-guld 15 km Sarajevo",
+    "correctYear": 1984,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "U4FVIDWttIs",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "GundeWassberg",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
       }
     ]
   },
@@ -1885,6 +2045,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "patrik-sjoberg-vr-hojdhopp-1987",
+    "displayName": "Patrik Sjöberg sätter VR i höjdhopp",
+    "correctYear": 1987,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "ASymMBD6ReM",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Carl King Lewis",
+        "license": "standard",
+        "notes": "Refined query 2026-05-27 — Sjöbergs VR 2.42m på DN Galan Stockholm 1987-06-30."
+      }
+    ]
+  },
+  {
     "id": "rick-astley-never-gonna-give-you-up",
     "displayName": "Never Gonna Give You Up — Rick Astley",
     "correctYear": 1987,
@@ -1902,6 +2082,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Rick Astley - Topic",
         "license": "standard",
         "notes": "Officiell album-audio via YouTube Topic (2022 Remaster). Iconic 'Never gonna give you up'-hook."
+      }
+    ]
+  },
+  {
+    "id": "tre-kronor-vm-1987-vien",
+    "displayName": "Tre Kronor VM-guld Wien",
+    "correctYear": 1987,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "dUQg2eu6lf4",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "HockeySverige",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
       }
     ]
   },
@@ -1948,6 +2148,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "field-of-dreams-1989",
+    "displayName": "Field of Dreams",
+    "correctYear": 1989,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "Ut06d4dptWo",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Movieclips",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (13)."
+      }
+    ]
+  },
+  {
     "id": "madonna-like-a-prayer",
     "displayName": "Like a Prayer — Madonna",
     "correctYear": 1989,
@@ -1986,6 +2206,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Phil Collins - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
+    "id": "stenmark-86-segrar-1989",
+    "displayName": "Stenmarks 86:e (sista) världscupseger",
+    "correctYear": 1989,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "LmSPZ-MHD8s",
+        "startSec": 60,
+        "endSec": 75,
+        "channelTitle": "Jon Ahlsén",
+        "license": "standard",
+        "notes": "Refined query 2026-05-27 — 'Stenmark: Decade of Dominance' compilation (20 min). Third-party — replace med dedikerat 86:e-seger-klipp om sådant hittas."
       }
     ]
   },
@@ -2094,6 +2334,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "tre-kronor-vm-1991-turku",
+    "displayName": "Tre Kronor VM-guld Turku",
+    "correctYear": 1991,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "roFDtX3CNG4",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Daniel Risarp",
+        "license": "standard",
+        "notes": "Refined query 2026-05-27 — 'Mats Sundin avgör när Tre Kronor tar VM guld 1991'."
+      }
+    ]
+  },
+  {
     "id": "boyz-ii-men-end-of-the-road",
     "displayName": "End of the Road — Boyz II Men",
     "correctYear": 1992,
@@ -2152,6 +2412,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "SNAP!",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (18)."
+      }
+    ]
+  },
+  {
+    "id": "sverige-em-1992-semifinal",
+    "displayName": "Sverige semifinal hemma-EM mot Tyskland",
+    "correctYear": 1992,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "8LkwRue9aK4",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "hejatysklanduuups",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
       }
     ]
   },
@@ -2279,6 +2559,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "forsberg-foppa-flick-lillehammer-1994",
+    "displayName": "Peter Forsbergs straff-flick Lillehammer",
+    "correctYear": 1994,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "QISjlZgP4vA",
+        "startSec": 5,
+        "endSec": 20,
+        "channelTitle": "stansmith98",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
     "id": "pulp-fiction",
     "displayName": "Pulp Fiction",
     "correctYear": 1994,
@@ -2295,6 +2595,66 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Movieclips",
         "license": "standard",
         "notes": "Official trailer (Movieclips) — iconic surf-rock soundtrack + ensemble-shots."
+      }
+    ]
+  },
+  {
+    "id": "ravelli-vm-94-rumanien",
+    "displayName": "Ravelli stoppar Rumäniens straffar VM-94",
+    "correctYear": 1994,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "Yul90ZNSRFM",
+        "startSec": 5,
+        "endSec": 20,
+        "channelTitle": "Nostalgi",
+        "license": "standard",
+        "notes": "Refined query 2026-05-27 — Ravellis 1:a straffräddning Sverige-Rumänien VM 1994."
+      }
+    ]
+  },
+  {
+    "id": "sverige-vm-94-brons-bulgarien",
+    "displayName": "Sverige VM-brons mot Bulgarien",
+    "correctYear": 1994,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "EcE842FxpQk",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Football Flashback 6",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
+    "id": "tomas-brolin-vm-1994",
+    "displayName": "Tomas Brolins mål VM-94",
+    "correctYear": 1994,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "GMpUuXe9uzM",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "MatigolVidz",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
       }
     ]
   },
@@ -2684,6 +3044,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "sorenstam-kraft-nabisco-2002",
+    "displayName": "Annika Sörenstam vinner Kraft Nabisco",
+    "correctYear": 2002,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "vjB0zk5P2SA",
+        "startSec": 6600,
+        "endSec": 6615,
+        "channelTitle": "LPGA",
+        "license": "standard",
+        "notes": "LPGA official full final round replay (119 min) — start ~110 min in vid playoff mot Liselotte Neumann. Curerad 2026-05-27 via refined query. Replace med dedikerat highlight-klipp om sådant hittas."
+      }
+    ]
+  },
+  {
     "id": "50-cent-in-da-club",
     "displayName": "In da Club — 50 Cent",
     "correctYear": 2003,
@@ -2725,6 +3105,46 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "carolina-kluft-os-guld-2004",
+    "displayName": "Carolina Klüft OS-guld sjukamp Aten",
+    "correctYear": 2004,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "DvbQ1mXFPCo",
+        "startSec": 16,
+        "endSec": 31,
+        "channelTitle": "Expressen",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
+    "id": "christian-olsson-tresteg-2004",
+    "displayName": "Christian Olsson OS-guld tresteg Aten",
+    "correctYear": 2004,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "6zEKGJenFhY",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Biketommy999",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
     "id": "o-zone-dragostea-din-tei",
     "displayName": "Dragostea Din Tei — O-Zone",
     "correctYear": 2004,
@@ -2741,6 +3161,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 224,
         "channelTitle": "Lyrixa",
         "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "stefan-holm-os-guld-2004",
+    "displayName": "Stefan Holm OS-guld höjdhopp Aten",
+    "correctYear": 2004,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "aBh3nDidTQ0",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "MaramaGitz",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
       }
     ]
   },
@@ -2805,6 +3245,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "anja-parson-os-guld-slalom-2006",
+    "displayName": "Anja Pärson OS-guld slalom Torino",
+    "correctYear": 2006,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "-JcJcrFEAjw",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Biketommy999",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
     "id": "gnarls-barkley-crazy",
     "displayName": "Crazy — Gnarls Barkley",
     "correctYear": 2006,
@@ -2841,6 +3301,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 219,
         "channelTitle": "7clouds",
         "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "tre-kronor-os-turin-2006",
+    "displayName": "Tre Kronor OS-guld Turin",
+    "correctYear": 2006,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "3vdtHuuhtCU",
+        "startSec": 5,
+        "endSec": 20,
+        "channelTitle": "Radiosporten",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
       }
     ]
   },
@@ -2941,6 +3421,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 180,
         "channelTitle": "Katy Perry - Topic",
         "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "phelps-beijing-8-guld-2008",
+    "displayName": "Michael Phelps 8 OS-guld Peking",
+    "correctYear": 2008,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "sftrI-e8nHg",
+        "startSec": 15,
+        "endSec": 30,
+        "channelTitle": "Bao Highlights",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
       }
     ]
   },
@@ -3065,6 +3565,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "marcus-hellner-os-guld-2010",
+    "displayName": "Marcus Hellner OS-guld jaktstart Vancouver",
+    "correctYear": 2010,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "cu9buHVFPfo",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Johann Mühlegg",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
     "id": "shakira-waka-waka",
     "displayName": "Waka Waka (This Time for Africa) — Shakira",
     "correctYear": 2010,
@@ -3125,6 +3645,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "moneyball-2011",
+    "displayName": "Moneyball",
+    "correctYear": 2011,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "-4QPVo0UIzc",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Rotten Tomatoes Trailers",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
     "id": "carly-rae-jepsen-call-me-maybe",
     "displayName": "Call Me Maybe — Carly Rae Jepsen",
     "correctYear": 2012,
@@ -3161,6 +3701,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 253,
         "channelTitle": "officialpsy",
         "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "zlatan-bicycle-kick-england-2012",
+    "displayName": "Zlatans bicycle kick mot England",
+    "correctYear": 2012,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "RM_5tJncHww",
+        "startSec": 19,
+        "endSec": 34,
+        "channelTitle": "GOAL",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
       }
     ]
   },
@@ -3205,6 +3765,46 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "johan-olsson-vm-50km-2013",
+    "displayName": "Johan Olsson VM-guld 50 km Val di Fiemme",
+    "correctYear": 2013,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "cX3k5BdCc6k",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "VMValdifiemme2013",
+        "license": "standard",
+        "notes": "Refined query 2026-05-27 — 'AMAZING Johan Olsson Men's 50 Km Val di Fiemme 2013'."
+      }
+    ]
+  },
+  {
+    "id": "kalla-os-guld-stafett-2014",
+    "displayName": "Charlotte Kalla OS-guld stafett Sochi",
+    "correctYear": 2014,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "kdxbknklbAU",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Pheyman",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
     "id": "pharrell-williams-happy",
     "displayName": "Happy — Pharrell Williams",
     "correctYear": 2014,
@@ -3241,6 +3841,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 242,
         "channelTitle": "Taylor Swift",
         "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "tre-kronor-os-silver-sochi-2014",
+    "displayName": "Tre Kronor OS-silver Sochi (mot Kanada)",
+    "correctYear": 2014,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "3e7FyDCxxL4",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Expressen",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
       }
     ]
   },
@@ -3325,6 +3945,86 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "sarah-sjostrom-os-guld-rio-2016",
+    "displayName": "Sarah Sjöström OS-guld 100m fjäril Rio",
+    "correctYear": 2016,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "KIurOF8zYJc",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Nyhetsmorgon",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
+    "id": "simone-biles-rio-2016",
+    "displayName": "Simone Biles 4 OS-guld i Rio",
+    "correctYear": 2016,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "aBrmCgCuwno",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "TNT Sports",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
+    "id": "borg-vs-mcenroe-2017",
+    "displayName": "Borg vs McEnroe",
+    "correctYear": 2017,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "yQgWMs0TBKU",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "SF Studios",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (13)."
+      }
+    ]
+  },
+  {
+    "id": "federer-australian-open-2017",
+    "displayName": "Federers comeback-vinst Australian Open",
+    "correctYear": 2017,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "TzA0pe2DQ_s",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Australian Open",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
     "id": "luis-fonsi-despacito",
     "displayName": "Despacito — Luis Fonsi & Daddy Yankee",
     "correctYear": 2017,
@@ -3385,6 +4085,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "tre-kronor-vm-2017-koln",
+    "displayName": "Tre Kronor VM-guld Köln",
+    "correctYear": 2017,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "EjxAdkmx3vs",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "IIHF",
+        "license": "standard",
+        "notes": "IIHF official channel — Canada-Sweden 2017 World Championship final highlights. Curerad 2026-05-27 via refined query."
+      }
+    ]
+  },
+  {
     "id": "drake-gods-plan",
     "displayName": "God's Plan — Drake",
     "correctYear": 2018,
@@ -3401,6 +4121,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 199,
         "channelTitle": "Drake - Topic",
         "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "emil-forsberg-vs-schweiz-vm-2018",
+    "displayName": "Emil Forsbergs mål mot Schweiz åttondelsfinal",
+    "correctYear": 2018,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "6jvU9naWHV0",
+        "startSec": 5,
+        "endSec": 20,
+        "channelTitle": "Sports Heroes",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
       }
     ]
   },
@@ -3501,6 +4241,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 206,
         "channelTitle": "7clouds K-pop",
         "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "duplantis-stavhopp-vr-2020",
+    "displayName": "Armand Duplantis sätter stavhopps-VR (6.17m)",
+    "correctYear": 2020,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "aeKnFJS8orA",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "World Athletics",
+        "license": "standard",
+        "notes": "World Athletics official channel — Duplantis 6.17m world record Toruń 2020. Curerad 2026-05-27 via refined query."
       }
     ]
   },
@@ -3622,6 +4382,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 232,
         "channelTitle": "7clouds",
         "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "frida-karlsson-vm-planica-2023",
+    "displayName": "Frida Karlsson VM-medalj Planica",
+    "correctYear": 2023,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "A8W64l14zCI",
+        "startSec": 0,
+        "endSec": 13,
+        "channelTitle": "Nordic Skiing And Running Club",
+        "license": "standard",
+        "notes": "Refined query 2026-05-27 — Frida Karlsson Tour de Ski 2023 first win, 13s clip."
       }
     ]
   },

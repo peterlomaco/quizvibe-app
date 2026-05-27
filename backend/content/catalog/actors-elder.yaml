@@ -168,3 +168,103 @@ items:
     probability: 82
     wikimediaSearchHints: ["Judi Dench actress"]
     answerMethods: ["timeline", "name-letters"]
+  # === Svenska expansion 2026-05-27 ===
+  - id: max-von-sydow
+    displayName: "Max von Sydow"
+    correctYear: 1929
+    probability: 84
+    wikimediaSearchHints: ["Max von Sydow Swedish actor Bergman Exorcist"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: anita-ekberg
+    displayName: "Anita Ekberg"
+    correctYear: 1931
+    probability: 78
+    wikimediaSearchHints: ["Anita Ekberg Swedish actress La Dolce Vita Trevi"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: britt-ekland
+    displayName: "Britt Ekland"
+    correctYear: 1942
+    probability: 78
+    wikimediaSearchHints: ["Britt Ekland Swedish actress Man with the Golden Gun Bond"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: ingrid-thulin
+    displayName: "Ingrid Thulin"
+    correctYear: 1926
+    probability: 70
+    wikimediaSearchHints: ["Ingrid Thulin Swedish actress Bergman Wild Strawberries"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: bibi-andersson
+    displayName: "Bibi Andersson"
+    correctYear: 1935
+    probability: 72
+    wikimediaSearchHints: ["Bibi Andersson Swedish actress Bergman Persona"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: gunnel-lindblom
+    displayName: "Gunnel Lindblom"
+    correctYear: 1931
+    probability: 65
+    wikimediaSearchHints: ["Gunnel Lindblom Swedish actress Bergman Seventh Seal"]
+    answerMethods: ["timeline", "name-letters"]
+  # === Sport-crossover actors 2026-05-27 ===
+  - id: chuck-norris
+    displayName: "Chuck Norris"
+    correctYear: 1940
+    probability: 88
+    wikimediaSearchHints: ["Chuck Norris actor martial artist Walker Texas Ranger"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: jim-brown
+    displayName: "Jim Brown"
+    correctYear: 1936
+    probability: 76
+    wikimediaSearchHints: ["Jim Brown NFL running back actor Cleveland Browns"]
+    answerMethods: ["timeline", "name-letters"]
+  # === Batch B 2026-05-27 — svenska jullov/SVT-barn-tv-klassiker ===
+  - id: magnus-harenstam
+    displayName: "Magnus Härenstam"
+    correctYear: 1941
+    probability: 88
+    wikimediaSearchHints: ["Magnus Härenstam Swedish TV host Fem myror Vill du bli miljonär"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: tomas-von-bromssen
+    displayName: "Tomas von Brömssen"
+    correctYear: 1943
+    probability: 84
+    wikimediaSearchHints: ["Tomas von Brömssen Swedish actor Sune Söderkåkar"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: brasse-brannstrom
+    displayName: "Brasse Brännström"
+    correctYear: 1945
+    probability: 86
+    wikimediaSearchHints: ["Brasse Brännström Swedish actor Fem myror är fler än fyra elefanter"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: hans-alfredson
+    displayName: "Hans Alfredson"
+    correctYear: 1931
+    probability: 86
+    wikimediaSearchHints: ["Hans Alfredson Swedish actor comedian Hasseåtage"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: tage-danielsson
+    displayName: "Tage Danielsson"
+    correctYear: 1928
+    probability: 84
+    wikimediaSearchHints: ["Tage Danielsson Swedish actor director Hasseåtage"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: sven-wollter
+    displayName: "Sven Wollter"
+    correctYear: 1934
+    probability: 78
+    wikimediaSearchHints: ["Sven Wollter Swedish actor Sacrifice Tarkovsky"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: loa-falkman
+    displayName: "Loa Falkman"
+    correctYear: 1947
+    probability: 76
+    wikimediaSearchHints: ["Loa Falkman Swedish opera singer actor Eurovision"]
+    answerMethods: ["timeline", "name-letters"]
+  # === Batch C 2026-05-27 — svensk skådespelar-elder ===
+  - id: krister-henriksson
+    displayName: "Krister Henriksson"
+    correctYear: 1946
+    probability: 82
+    wikimediaSearchHints: ["Krister Henriksson Swedish actor Wallander"]
+    answerMethods: ["timeline", "name-letters"]

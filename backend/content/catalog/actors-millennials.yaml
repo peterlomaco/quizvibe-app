@@ -362,3 +362,77 @@ items:
     probability: 78
     wikimediaSearchHints: ["Milla Jovovich actress"]
     answerMethods: ["timeline", "name-letters"]
+  # === Svenska expansion 2026-05-27 ===
+  - id: alexander-skarsgard
+    displayName: "Alexander Skarsgård"
+    correctYear: 1976
+    probability: 86
+    wikimediaSearchHints: ["Alexander Skarsgard Swedish actor True Blood Tarzan Big Little Lies"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: bill-skarsgard
+    displayName: "Bill Skarsgård"
+    correctYear: 1990
+    probability: 84
+    wikimediaSearchHints: ["Bill Skarsgard Swedish actor IT Pennywise John Wick"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: gustaf-skarsgard
+    displayName: "Gustaf Skarsgård"
+    correctYear: 1980
+    probability: 78
+    wikimediaSearchHints: ["Gustaf Skarsgard Swedish actor Vikings Floki"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: joel-kinnaman
+    displayName: "Joel Kinnaman"
+    correctYear: 1979
+    probability: 82
+    wikimediaSearchHints: ["Joel Kinnaman Swedish actor Easy Money House of Cards Suicide Squad"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: noomi-rapace
+    displayName: "Noomi Rapace"
+    correctYear: 1979
+    probability: 84
+    wikimediaSearchHints: ["Noomi Rapace Swedish actress Millennium Dragon Tattoo Lisbeth"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: alicia-vikander
+    displayName: "Alicia Vikander"
+    correctYear: 1988
+    probability: 82
+    wikimediaSearchHints: ["Alicia Vikander Swedish actress Ex Machina Danish Girl Tomb Raider"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: rebecca-ferguson
+    displayName: "Rebecca Ferguson"
+    correctYear: 1983
+    probability: 82
+    wikimediaSearchHints: ["Rebecca Ferguson Swedish actress Mission Impossible Dune"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: david-dencik
+    displayName: "David Dencik"
+    correctYear: 1974
+    probability: 72
+    wikimediaSearchHints: ["David Dencik Swedish actor Tinker Tailor Soldier Spy"]
+    answerMethods: ["timeline", "name-letters"]
+  # === Batch C 2026-05-27 — svenska modern skådespelare ===
+  - id: mikael-nyqvist
+    displayName: "Mikael Nyqvist"
+    correctYear: 1960
+    probability: 84
+    wikimediaSearchHints: ["Mikael Nyqvist Swedish actor Millennium John Wick"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: sofia-helin
+    displayName: "Sofia Helin"
+    correctYear: 1972
+    probability: 80
+    wikimediaSearchHints: ["Sofia Helin Swedish actress Bron The Bridge Saga"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: sverrir-gudnason
+    displayName: "Sverrir Gudnason"
+    correctYear: 1978
+    probability: 76
+    wikimediaSearchHints: ["Sverrir Gudnason Swedish actor Borg vs McEnroe"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: adam-palsson
+    displayName: "Adam Pålsson"
+    correctYear: 1988
+    probability: 74
+    wikimediaSearchHints: ["Adam Pålsson Swedish actor Snabba Cash The Bridge"]
+    answerMethods: ["timeline", "name-letters"]

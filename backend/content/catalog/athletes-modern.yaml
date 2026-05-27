@@ -362,3 +362,137 @@ items:
     probability: 72
     wikimediaSearchHints: ["Stéphanie Frappart referee France"]
     answerMethods: ["timeline", "name-letters"]
+  # === Svenska expansion 2026-05-27 — hockey/fotboll/skidor modern ===
+  - id: henrik-lundqvist
+    displayName: "Henrik Lundqvist"
+    correctYear: 1982
+    probability: 86
+    wikimediaSearchHints: ["Henrik Lundqvist New York Rangers goaltender Sweden"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: daniel-sedin
+    displayName: "Daniel Sedin"
+    correctYear: 1980
+    probability: 82
+    wikimediaSearchHints: ["Daniel Sedin Vancouver Canucks hockey Sweden twin"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: henrik-sedin
+    displayName: "Henrik Sedin"
+    correctYear: 1980
+    probability: 82
+    wikimediaSearchHints: ["Henrik Sedin Vancouver Canucks hockey Sweden twin"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: erik-karlsson
+    displayName: "Erik Karlsson"
+    correctYear: 1990
+    probability: 80
+    wikimediaSearchHints: ["Erik Karlsson hockey Sweden defenseman Senators"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: victor-hedman
+    displayName: "Victor Hedman"
+    correctYear: 1990
+    probability: 78
+    wikimediaSearchHints: ["Victor Hedman Tampa Bay Lightning defenseman Sweden"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: caroline-seger
+    displayName: "Caroline Seger"
+    correctYear: 1985
+    probability: 76
+    wikimediaSearchHints: ["Caroline Seger football Sweden captain"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: anja-parson
+    displayName: "Anja Pärson"
+    correctYear: 1981
+    probability: 82
+    wikimediaSearchHints: ["Anja Parson alpine skiing Sweden Olympic gold"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: marcus-hellner
+    displayName: "Marcus Hellner"
+    correctYear: 1985
+    probability: 78
+    wikimediaSearchHints: ["Marcus Hellner cross country skiing Sweden Olympic"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: frida-karlsson
+    displayName: "Frida Karlsson"
+    correctYear: 1999
+    probability: 76
+    wikimediaSearchHints: ["Frida Karlsson cross country skiing Sweden"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: stina-nilsson
+    displayName: "Stina Nilsson"
+    correctYear: 1993
+    probability: 76
+    wikimediaSearchHints: ["Stina Nilsson cross country biathlon Sweden Olympic"]
+    answerMethods: ["timeline", "name-letters"]
+  # === Batch C 2026-05-27 — international modern athletes ===
+  - id: sidney-crosby
+    displayName: "Sidney Crosby"
+    correctYear: 1987
+    probability: 88
+    wikimediaSearchHints: ["Sidney Crosby Pittsburgh Penguins captain hockey"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: alex-ovechkin
+    displayName: "Alex Ovechkin"
+    correctYear: 1985
+    probability: 84
+    wikimediaSearchHints: ["Alex Ovechkin Washington Capitals Russian hockey goals record"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: connor-mcdavid
+    displayName: "Connor McDavid"
+    correctYear: 1997
+    probability: 80
+    wikimediaSearchHints: ["Connor McDavid Edmonton Oilers captain hockey"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: marat-safin
+    displayName: "Marat Safin"
+    correctYear: 1980
+    probability: 76
+    wikimediaSearchHints: ["Marat Safin Russian tennis player US Open Australian Open"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: neymar
+    displayName: "Neymar"
+    correctYear: 1992
+    probability: 90
+    wikimediaSearchHints: ["Neymar Brazilian footballer Barcelona PSG Santos"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: iker-casillas
+    displayName: "Iker Casillas"
+    correctYear: 1981
+    probability: 82
+    wikimediaSearchHints: ["Iker Casillas Spanish goalkeeper Real Madrid 2010 World Cup"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: sergio-ramos
+    displayName: "Sergio Ramos"
+    correctYear: 1986
+    probability: 84
+    wikimediaSearchHints: ["Sergio Ramos Spanish defender Real Madrid captain"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: bastian-schweinsteiger
+    displayName: "Bastian Schweinsteiger"
+    correctYear: 1984
+    probability: 82
+    wikimediaSearchHints: ["Bastian Schweinsteiger German footballer Bayern Munich 2014 World Cup"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: toni-kroos
+    displayName: "Toni Kroos"
+    correctYear: 1990
+    probability: 82
+    wikimediaSearchHints: ["Toni Kroos German midfielder Real Madrid Bayern"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: manuel-neuer
+    displayName: "Manuel Neuer"
+    correctYear: 1986
+    probability: 82
+    wikimediaSearchHints: ["Manuel Neuer German goalkeeper Bayern Munich captain"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: floyd-mayweather
+    displayName: "Floyd Mayweather"
+    correctYear: 1977
+    probability: 86
+    wikimediaSearchHints: ["Floyd Mayweather American boxer undefeated Pacquiao"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: allyson-felix
+    displayName: "Allyson Felix"
+    correctYear: 1985
+    probability: 78
+    wikimediaSearchHints: ["Allyson Felix American sprinter Olympic gold 200m"]
+    answerMethods: ["timeline", "name-letters"]

@@ -392,3 +392,149 @@ items:
     probability: 85
     wikimediaSearchHints: ["Patrik Sjöberg high jump Sweden"]
     answerMethods: ["timeline", "name-letters"]
+  # === Svenska expansion 2026-05-27 — hockey/fotboll/skidor/friidrott ===
+  - id: borje-salming
+    displayName: "Börje Salming"
+    correctYear: 1951
+    probability: 88
+    wikimediaSearchHints: ["Borje Salming Toronto Maple Leafs hockey Sweden"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: nicklas-lidstrom
+    displayName: "Nicklas Lidström"
+    correctYear: 1970
+    probability: 86
+    wikimediaSearchHints: ["Nicklas Lidstrom Detroit Red Wings defenseman Sweden"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: daniel-alfredsson
+    displayName: "Daniel Alfredsson"
+    correctYear: 1972
+    probability: 80
+    wikimediaSearchHints: ["Daniel Alfredsson Ottawa Senators hockey Sweden"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: markus-naslund
+    displayName: "Markus Näslund"
+    correctYear: 1973
+    probability: 78
+    wikimediaSearchHints: ["Markus Naslund Vancouver Canucks hockey Sweden"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: mats-naslund
+    displayName: "Mats Näslund"
+    correctYear: 1959
+    probability: 75
+    wikimediaSearchHints: ["Mats Naslund Montreal Canadiens hockey Sweden Le Petit Viking"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: tomas-brolin
+    displayName: "Tomas Brolin"
+    correctYear: 1969
+    probability: 82
+    wikimediaSearchHints: ["Tomas Brolin football Sweden World Cup Parma"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: glenn-hysen
+    displayName: "Glenn Hysén"
+    correctYear: 1959
+    probability: 75
+    wikimediaSearchHints: ["Glenn Hysen football Sweden Liverpool defender"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: gunde-svan
+    displayName: "Gunde Svan"
+    correctYear: 1962
+    probability: 86
+    wikimediaSearchHints: ["Gunde Svan cross country skiing Sweden Olympic"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: stefan-holm
+    displayName: "Stefan Holm"
+    correctYear: 1976
+    probability: 84
+    wikimediaSearchHints: ["Stefan Holm high jump Sweden Olympic 2004"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: christian-olsson
+    displayName: "Christian Olsson"
+    correctYear: 1980
+    probability: 80
+    wikimediaSearchHints: ["Christian Olsson triple jump Sweden Olympic 2004"]
+    answerMethods: ["timeline", "name-letters"]
+  # === Batch C 2026-05-27 — international legends ===
+  - id: mario-lemieux
+    displayName: "Mario Lemieux"
+    correctYear: 1965
+    probability: 86
+    wikimediaSearchHints: ["Mario Lemieux Pittsburgh Penguins hockey legend"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: bobby-orr
+    displayName: "Bobby Orr"
+    correctYear: 1948
+    probability: 80
+    wikimediaSearchHints: ["Bobby Orr Boston Bruins hockey legend defenseman"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: patrick-roy
+    displayName: "Patrick Roy"
+    correctYear: 1965
+    probability: 82
+    wikimediaSearchHints: ["Patrick Roy Montreal Canadiens Colorado Avalanche goaltender"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: jaromir-jagr
+    displayName: "Jaromír Jágr"
+    correctYear: 1972
+    probability: 84
+    wikimediaSearchHints: ["Jaromir Jagr Czech hockey player Pittsburgh Penguins"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: martin-brodeur
+    displayName: "Martin Brodeur"
+    correctYear: 1972
+    probability: 78
+    wikimediaSearchHints: ["Martin Brodeur New Jersey Devils goaltender legend"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: ivan-lendl
+    displayName: "Ivan Lendl"
+    correctYear: 1960
+    probability: 82
+    wikimediaSearchHints: ["Ivan Lendl Czech American tennis player Grand Slam"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: goran-ivanisevic
+    displayName: "Goran Ivanišević"
+    correctYear: 1971
+    probability: 78
+    wikimediaSearchHints: ["Goran Ivanisevic Croatian tennis player Wimbledon 2001"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: wilt-chamberlain
+    displayName: "Wilt Chamberlain"
+    correctYear: 1936
+    probability: 82
+    wikimediaSearchHints: ["Wilt Chamberlain basketball Lakers 76ers 100 point game"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: bill-russell
+    displayName: "Bill Russell"
+    correctYear: 1934
+    probability: 80
+    wikimediaSearchHints: ["Bill Russell Boston Celtics basketball legend 11 championships"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: george-foreman
+    displayName: "George Foreman"
+    correctYear: 1949
+    probability: 84
+    wikimediaSearchHints: ["George Foreman boxer heavyweight champion Rumble in the Jungle"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: evander-holyfield
+    displayName: "Evander Holyfield"
+    correctYear: 1962
+    probability: 82
+    wikimediaSearchHints: ["Evander Holyfield boxer heavyweight champion Tyson"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: sergey-bubka
+    displayName: "Sergey Bubka"
+    correctYear: 1963
+    probability: 78
+    wikimediaSearchHints: ["Sergey Bubka pole vault Ukrainian Olympic world record"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: romario
+    displayName: "Romário"
+    correctYear: 1966
+    probability: 82
+    wikimediaSearchHints: ["Romario Brazilian footballer 1994 World Cup Barcelona"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: jonathan-edwards
+    displayName: "Jonathan Edwards"
+    correctYear: 1966
+    probability: 74
+    wikimediaSearchHints: ["Jonathan Edwards British triple jump world record 1995"]
+    answerMethods: ["timeline", "name-letters"]

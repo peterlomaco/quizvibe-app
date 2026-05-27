@@ -123,3 +123,456 @@ items:
         endSec: 75
         channelTitle: "World Athletics"
         notes: "World Athletics official channel — Berlin 2009 100m WR 9.58s."
+  # === Sportbatch v2 (2026-05-27) — svenska iconic + OS-bredd ===
+  # Decennie-viktad: 60% post-1990, tunnare ju längre tillbaka.
+  # Fokus: fotboll, hockey, skidor, OS-friidrott + simning, tennis/golf.
+  - id: sweden-1958-world-cup-final
+    displayName: "Sverige-Brasilien VM-finalen i Solna"
+    correctYear: 1958
+    probability: 78
+    wikimediaSearchHints: ["Sweden Brazil 1958 World Cup final Solna"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "3vUpZgzj-3I"
+        startSec: 30
+        endSec: 45
+        channelTitle: "freekick3596"
+        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+  - id: borg-wimbledon-1976
+    displayName: "Björn Borg vinner sin första Wimbledon"
+    correctYear: 1976
+    probability: 82
+    wikimediaSearchHints: ["Bjorn Borg 1976 Wimbledon final first title"]
+    answerMethods: ["timeline"]
+  - id: nadia-comaneci-montreal-1976
+    displayName: "Nadia Comăneci perfekta 10:or i Montreal"
+    correctYear: 1976
+    probability: 82
+    wikimediaSearchHints: ["Nadia Comaneci 1976 Montreal Olympics perfect 10"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "Yi_5xbd5xdE"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Olympics"
+        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+  - id: stenmark-os-guld-slalom-1980
+    displayName: "Stenmark OS-guld slalom Lake Placid"
+    correctYear: 1980
+    probability: 92
+    wikimediaSearchHints: ["Ingemar Stenmark 1980 Lake Placid Olympics slalom gold"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "zFy1OYa7Qm4"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Nostalgi"
+        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+  - id: stenmark-os-guld-storslalom-1980
+    displayName: "Stenmark OS-guld storslalom Lake Placid"
+    correctYear: 1980
+    probability: 88
+    wikimediaSearchHints: ["Ingemar Stenmark 1980 Lake Placid Olympics giant slalom"]
+    answerMethods: ["timeline"]
+  - id: wassberg-os-guld-1980
+    displayName: "Thomas Wassberg OS-guld 15 km Lake Placid"
+    correctYear: 1980
+    probability: 75
+    wikimediaSearchHints: ["Thomas Wassberg 1980 Olympics 15km cross country gold"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "ZQEBtR2pDXY"
+        startSec: 5
+        endSec: 20
+        channelTitle: "Nostalgi"
+        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+  - id: gunde-svan-os-guld-1984
+    displayName: "Gunde Svan OS-guld 15 km Sarajevo"
+    correctYear: 1984
+    probability: 82
+    wikimediaSearchHints: ["Gunde Svan 1984 Sarajevo Olympics 15km gold cross country"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "U4FVIDWttIs"
+        startSec: 30
+        endSec: 45
+        channelTitle: "GundeWassberg"
+        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+  - id: carl-lewis-los-angeles-1984
+    displayName: "Carl Lewis tar 4 OS-guld Los Angeles"
+    correctYear: 1984
+    probability: 82
+    wikimediaSearchHints: ["Carl Lewis 1984 Los Angeles Olympics four gold medals"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "xNafT5HK_Ro"
+        startSec: 30
+        endSec: 45
+        channelTitle: "How To Run Faster - By Performance Lab"
+        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+  - id: tre-kronor-vm-1987-vien
+    displayName: "Tre Kronor VM-guld Wien"
+    correctYear: 1987
+    probability: 75
+    wikimediaSearchHints: ["Sweden 1987 IIHF World Championship Vienna gold"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "dUQg2eu6lf4"
+        startSec: 30
+        endSec: 45
+        channelTitle: "HockeySverige"
+        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+  - id: patrik-sjoberg-vr-hojdhopp-1987
+    displayName: "Patrik Sjöberg sätter VR i höjdhopp"
+    correctYear: 1987
+    probability: 80
+    wikimediaSearchHints: ["Patrik Sjoberg 1987 high jump world record"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "ASymMBD6ReM"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Carl King Lewis"
+        notes: "Refined query 2026-05-27 — Sjöbergs VR 2.42m på DN Galan Stockholm 1987-06-30."
+  - id: ben-johnson-disqualification-1988
+    displayName: "Ben Johnson diskvalificerad efter 100m Seoul"
+    correctYear: 1988
+    probability: 85
+    wikimediaSearchHints: ["Ben Johnson 1988 Seoul Olympics 100m disqualification"]
+    answerMethods: ["timeline"]
+  - id: flo-jo-100m-1988
+    displayName: "Flo-Jo sätter 100m-VR Seoul"
+    correctYear: 1988
+    probability: 78
+    wikimediaSearchHints: ["Florence Griffith Joyner 1988 Seoul Olympics 100m world record"]
+    answerMethods: ["timeline"]
+  - id: greg-louganis-1988
+    displayName: "Greg Louganis slår huvudet i Seoul"
+    correctYear: 1988
+    probability: 76
+    wikimediaSearchHints: ["Greg Louganis 1988 Seoul Olympics diving head hit"]
+    answerMethods: ["timeline"]
+  - id: stenmark-86-segrar-1989
+    displayName: "Stenmarks 86:e (sista) världscupseger"
+    correctYear: 1989
+    probability: 78
+    wikimediaSearchHints: ["Ingemar Stenmark final career win 1989 world cup"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "LmSPZ-MHD8s"
+        startSec: 60
+        endSec: 75
+        channelTitle: "Jon Ahlsén"
+        notes: "Refined query 2026-05-27 — 'Stenmark: Decade of Dominance' compilation (20 min). Third-party — replace med dedikerat 86:e-seger-klipp om sådant hittas."
+  - id: tre-kronor-vm-1991-turku
+    displayName: "Tre Kronor VM-guld Turku"
+    correctYear: 1991
+    probability: 72
+    wikimediaSearchHints: ["Sweden 1991 IIHF World Championship Turku gold"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "roFDtX3CNG4"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Daniel Risarp"
+        notes: "Refined query 2026-05-27 — 'Mats Sundin avgör när Tre Kronor tar VM guld 1991'."
+  - id: sverige-em-1992-semifinal
+    displayName: "Sverige semifinal hemma-EM mot Tyskland"
+    correctYear: 1992
+    probability: 80
+    wikimediaSearchHints: ["Sweden Germany 1992 Euro semifinal Solna"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "8LkwRue9aK4"
+        startSec: 30
+        endSec: 45
+        channelTitle: "hejatysklanduuups"
+        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+  - id: forsberg-foppa-flick-lillehammer-1994
+    displayName: "Peter Forsbergs straff-flick Lillehammer"
+    correctYear: 1994
+    probability: 96
+    wikimediaSearchHints: ["Peter Forsberg 1994 Lillehammer Olympics shootout penalty Canada"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "QISjlZgP4vA"
+        startSec: 5
+        endSec: 20
+        channelTitle: "stansmith98"
+        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+  - id: sverige-vm-94-brons-bulgarien
+    displayName: "Sverige VM-brons mot Bulgarien"
+    correctYear: 1994
+    probability: 86
+    wikimediaSearchHints: ["Sweden Bulgaria 1994 World Cup third place playoff"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "EcE842FxpQk"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Football Flashback 6"
+        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+  - id: tomas-brolin-vm-1994
+    displayName: "Tomas Brolins mål VM-94"
+    correctYear: 1994
+    probability: 78
+    wikimediaSearchHints: ["Tomas Brolin 1994 World Cup goal Sweden"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "GMpUuXe9uzM"
+        startSec: 30
+        endSec: 45
+        channelTitle: "MatigolVidz"
+        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+  - id: ravelli-vm-94-rumanien
+    displayName: "Ravelli stoppar Rumäniens straffar VM-94"
+    correctYear: 1994
+    probability: 82
+    wikimediaSearchHints: ["Thomas Ravelli 1994 World Cup Romania penalty shootout"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "Yul90ZNSRFM"
+        startSec: 5
+        endSec: 20
+        channelTitle: "Nostalgi"
+        notes: "Refined query 2026-05-27 — Ravellis 1:a straffräddning Sverige-Rumänien VM 1994."
+  - id: kerri-strug-atlanta-1996
+    displayName: "Kerri Strug hoppar skadad i Atlanta"
+    correctYear: 1996
+    probability: 76
+    wikimediaSearchHints: ["Kerri Strug 1996 Atlanta Olympics vault injured ankle"]
+    answerMethods: ["timeline"]
+  - id: sorenstam-kraft-nabisco-2002
+    displayName: "Annika Sörenstam vinner Kraft Nabisco"
+    correctYear: 2002
+    probability: 72
+    wikimediaSearchHints: ["Annika Sorenstam 2002 Kraft Nabisco Championship win"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "vjB0zk5P2SA"
+        startSec: 6600
+        endSec: 6615
+        channelTitle: "LPGA"
+        notes: "LPGA official full final round replay (119 min) — start ~110 min in vid playoff mot Liselotte Neumann. Curerad 2026-05-27 via refined query. Replace med dedikerat highlight-klipp om sådant hittas."
+  - id: carolina-kluft-os-guld-2004
+    displayName: "Carolina Klüft OS-guld sjukamp Aten"
+    correctYear: 2004
+    probability: 88
+    wikimediaSearchHints: ["Carolina Kluft 2004 Athens Olympics heptathlon gold"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "DvbQ1mXFPCo"
+        startSec: 16
+        endSec: 31
+        channelTitle: "Expressen"
+        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+  - id: stefan-holm-os-guld-2004
+    displayName: "Stefan Holm OS-guld höjdhopp Aten"
+    correctYear: 2004
+    probability: 85
+    wikimediaSearchHints: ["Stefan Holm 2004 Athens Olympics high jump gold"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "aBh3nDidTQ0"
+        startSec: 30
+        endSec: 45
+        channelTitle: "MaramaGitz"
+        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+  - id: christian-olsson-tresteg-2004
+    displayName: "Christian Olsson OS-guld tresteg Aten"
+    correctYear: 2004
+    probability: 82
+    wikimediaSearchHints: ["Christian Olsson 2004 Athens Olympics triple jump gold"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "6zEKGJenFhY"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Biketommy999"
+        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+  - id: zlatan-heel-italy-em-2004
+    displayName: "Zlatans häl-mål mot Italien EM-04"
+    correctYear: 2004
+    probability: 88
+    wikimediaSearchHints: ["Zlatan Ibrahimovic 2004 Euro Italy backheel goal"]
+    answerMethods: ["timeline"]
+  - id: tre-kronor-os-turin-2006
+    displayName: "Tre Kronor OS-guld Turin"
+    correctYear: 2006
+    probability: 88
+    wikimediaSearchHints: ["Sweden 2006 Turin Olympics ice hockey gold medal Finland"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "3vdtHuuhtCU"
+        startSec: 5
+        endSec: 20
+        channelTitle: "Radiosporten"
+        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+  - id: anja-parson-os-guld-slalom-2006
+    displayName: "Anja Pärson OS-guld slalom Torino"
+    correctYear: 2006
+    probability: 82
+    wikimediaSearchHints: ["Anja Parson 2006 Turin Olympics slalom gold"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "-JcJcrFEAjw"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Biketommy999"
+        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+  - id: phelps-beijing-8-guld-2008
+    displayName: "Michael Phelps 8 OS-guld Peking"
+    correctYear: 2008
+    probability: 92
+    wikimediaSearchHints: ["Michael Phelps 2008 Beijing Olympics eight gold medals"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "sftrI-e8nHg"
+        startSec: 15
+        endSec: 30
+        channelTitle: "Bao Highlights"
+        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+  - id: marcus-hellner-os-guld-2010
+    displayName: "Marcus Hellner OS-guld jaktstart Vancouver"
+    correctYear: 2010
+    probability: 78
+    wikimediaSearchHints: ["Marcus Hellner 2010 Vancouver Olympics cross country gold"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "cu9buHVFPfo"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Johann Mühlegg"
+        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+  - id: zlatan-bicycle-kick-england-2012
+    displayName: "Zlatans bicycle kick mot England"
+    correctYear: 2012
+    probability: 95
+    wikimediaSearchHints: ["Zlatan Ibrahimovic 2012 bicycle kick England 30 yards"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "RM_5tJncHww"
+        startSec: 19
+        endSec: 34
+        channelTitle: "GOAL"
+        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+  - id: johan-olsson-vm-50km-2013
+    displayName: "Johan Olsson VM-guld 50 km Val di Fiemme"
+    correctYear: 2013
+    probability: 70
+    wikimediaSearchHints: ["Johan Olsson 2013 World Championship 50km cross country gold"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "cX3k5BdCc6k"
+        startSec: 30
+        endSec: 45
+        channelTitle: "VMValdifiemme2013"
+        notes: "Refined query 2026-05-27 — 'AMAZING Johan Olsson Men's 50 Km Val di Fiemme 2013'."
+  - id: kalla-os-guld-stafett-2014
+    displayName: "Charlotte Kalla OS-guld stafett Sochi"
+    correctYear: 2014
+    probability: 84
+    wikimediaSearchHints: ["Charlotte Kalla 2014 Sochi Olympics relay gold cross country"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "kdxbknklbAU"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Pheyman"
+        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+  - id: tre-kronor-os-silver-sochi-2014
+    displayName: "Tre Kronor OS-silver Sochi (mot Kanada)"
+    correctYear: 2014
+    probability: 76
+    wikimediaSearchHints: ["Sweden Canada 2014 Sochi Olympics hockey final silver"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "3e7FyDCxxL4"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Expressen"
+        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+  - id: simone-biles-rio-2016
+    displayName: "Simone Biles 4 OS-guld i Rio"
+    correctYear: 2016
+    probability: 85
+    wikimediaSearchHints: ["Simone Biles 2016 Rio Olympics four gold medals gymnastics"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "aBrmCgCuwno"
+        startSec: 30
+        endSec: 45
+        channelTitle: "TNT Sports"
+        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+  - id: sarah-sjostrom-os-guld-rio-2016
+    displayName: "Sarah Sjöström OS-guld 100m fjäril Rio"
+    correctYear: 2016
+    probability: 82
+    wikimediaSearchHints: ["Sarah Sjostrom 2016 Rio Olympics 100m butterfly gold"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "KIurOF8zYJc"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Nyhetsmorgon"
+        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+  - id: tre-kronor-vm-2017-koln
+    displayName: "Tre Kronor VM-guld Köln"
+    correctYear: 2017
+    probability: 75
+    wikimediaSearchHints: ["Sweden 2017 IIHF World Championship Cologne gold Canada"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "EjxAdkmx3vs"
+        startSec: 30
+        endSec: 45
+        channelTitle: "IIHF"
+        notes: "IIHF official channel — Canada-Sweden 2017 World Championship final highlights. Curerad 2026-05-27 via refined query."
+  - id: federer-australian-open-2017
+    displayName: "Federers comeback-vinst Australian Open"
+    correctYear: 2017
+    probability: 78
+    wikimediaSearchHints: ["Roger Federer 2017 Australian Open final Nadal comeback"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "TzA0pe2DQ_s"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Australian Open"
+        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+  - id: emil-forsberg-vs-schweiz-vm-2018
+    displayName: "Emil Forsbergs mål mot Schweiz åttondelsfinal"
+    correctYear: 2018
+    probability: 84
+    wikimediaSearchHints: ["Emil Forsberg 2018 World Cup Switzerland goal round of 16"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "6jvU9naWHV0"
+        startSec: 5
+        endSec: 20
+        channelTitle: "Sports Heroes"
+        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+  - id: duplantis-stavhopp-vr-2020
+    displayName: "Armand Duplantis sätter stavhopps-VR (6.17m)"
+    correctYear: 2020
+    probability: 88
+    wikimediaSearchHints: ["Armand Duplantis 2020 pole vault world record 6.17"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "aeKnFJS8orA"
+        startSec: 30
+        endSec: 45
+        channelTitle: "World Athletics"
+        notes: "World Athletics official channel — Duplantis 6.17m world record Toruń 2020. Curerad 2026-05-27 via refined query."
+  - id: frida-karlsson-vm-planica-2023
+    displayName: "Frida Karlsson VM-medalj Planica"
+    correctYear: 2023
+    probability: 70
+    wikimediaSearchHints: ["Frida Karlsson 2023 Planica World Championship medal"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "A8W64l14zCI"
+        startSec: 0
+        endSec: 13
+        channelTitle: "Nordic Skiing And Running Club"
+        notes: "Refined query 2026-05-27 — Frida Karlsson Tour de Ski 2023 first win, 13s clip."

@@ -8,7 +8,7 @@
 //
 // Output: markdown-tabell på stdout + JSON-fil till scripts/batch-picks.json.
 
-import { writeFileSync, readFileSync } from 'fs';
+import { writeFileSync, readFileSync, readdirSync } from 'fs';
 import { parse } from 'yaml';
 import { searchVideos, getVideoDetails, getClipBlockReasons } from '../youtube/client';
 import { scoreSuggestion } from '../youtube/scoring';
@@ -39,19 +39,29 @@ interface Pick {
 }
 
 function loadAllMissing(): MissingItem[] {
-  const files = ['songs-elder', 'songs-gen-x', 'songs-millennials'];
+  // Scanna alla *.yaml-filer i content/catalog/ vars file-header har
+  // contentForm: youtube (= filerna som faktiskt bär youtubeClips). Image-
+  // filer (actors-*, artists-*, athletes-*, bands-*, capitals-*) skippas.
+  // distractor-pool.yaml har ingen contentForm och skippas också.
+  const catalogDir = 'content/catalog';
+  const yamlFiles = readdirSync(catalogDir).filter((f) => f.endsWith('.yaml'));
   const missing: MissingItem[] = [];
-  for (const f of files) {
-    const doc = parse(readFileSync(`content/catalog/${f}.yaml`, 'utf8')) as {
-      items: Array<{
+  for (const file of yamlFiles) {
+    const f = file.replace(/\.yaml$/, '');
+    const doc = parse(readFileSync(`${catalogDir}/${file}`, 'utf8')) as {
+      contentForm?: string;
+      items?: Array<{
         id: string;
         displayName: string;
-        correctYear: number;
+        correctYear?: number;
         probability: number;
         youtubeClips?: unknown[];
       }>;
     };
+    if (doc.contentForm !== 'youtube') continue;
+    if (!doc.items) continue;
     for (const item of doc.items) {
+      if (item.correctYear === undefined) continue; // safety: timeline-items kräver correctYear
       if (!item.youtubeClips || item.youtubeClips.length === 0) {
         missing.push({
           file: f,

@@ -312,3 +312,116 @@ items:
     probability: 88
     wikimediaSearchHints: ["Barbra Streisand singer"]
     answerMethods: ["timeline", "name-letters"]
+  # === Svenska expansion 2026-05-27 ===
+  - id: lill-babs
+    displayName: "Lill-Babs"
+    correctYear: 1938
+    probability: 80
+    wikimediaSearchHints: ["Lill-Babs Swedish singer Barbro Svensson"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: lill-lindfors
+    displayName: "Lill Lindfors"
+    correctYear: 1940
+    probability: 78
+    wikimediaSearchHints: ["Lill Lindfors Swedish singer Eurovision host"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: monica-zetterlund
+    displayName: "Monica Zetterlund"
+    correctYear: 1937
+    probability: 75
+    wikimediaSearchHints: ["Monica Zetterlund Swedish jazz singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: tomas-ledin
+    displayName: "Tomas Ledin"
+    correctYear: 1952
+    probability: 82
+    wikimediaSearchHints: ["Tomas Ledin Swedish singer Sommaren är kort"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: magnus-uggla
+    displayName: "Magnus Uggla"
+    correctYear: 1954
+    probability: 80
+    wikimediaSearchHints: ["Magnus Uggla Swedish singer rock"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: lasse-berghagen
+    displayName: "Lasse Berghagen"
+    correctYear: 1945
+    probability: 76
+    wikimediaSearchHints: ["Lasse Berghagen Swedish singer Allsång på Skansen"]
+    answerMethods: ["timeline", "name-letters"]
+  # === Cross-nordic expansion 2026-05-27 ===
+  - id: kim-larsen
+    displayName: "Kim Larsen"
+    correctYear: 1945
+    probability: 78
+    wikimediaSearchHints: ["Kim Larsen Danish singer Gasolin Midt om natten"]
+    answerMethods: ["timeline", "name-letters"]
+  # === Vemod-batch 2026-05-27 — svenska klassiker ===
+  - id: cornelis-vreeswijk
+    displayName: "Cornelis Vreeswijk"
+    correctYear: 1937
+    probability: 86
+    wikimediaSearchHints: ["Cornelis Vreeswijk Swedish singer songwriter Ballader"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: olle-adolphson
+    displayName: "Olle Adolphson"
+    correctYear: 1934
+    probability: 78
+    wikimediaSearchHints: ["Olle Adolphson Swedish singer songwriter Trubadur"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: pugh-rogefeldt
+    displayName: "Pugh Rogefeldt"
+    correctYear: 1947
+    probability: 76
+    wikimediaSearchHints: ["Pugh Rogefeldt Swedish rock singer Ja dä ä dä"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: sven-bertil-taube
+    displayName: "Sven-Bertil Taube"
+    correctYear: 1934
+    probability: 76
+    wikimediaSearchHints: ["Sven-Bertil Taube Swedish singer actor Calle Schewen"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: evert-taube
+    displayName: "Evert Taube"
+    correctYear: 1890
+    probability: 84
+    wikimediaSearchHints: ["Evert Taube Swedish poet singer Sjösala vals"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: barbro-horberg
+    displayName: "Barbro Hörberg"
+    correctYear: 1932
+    probability: 70
+    wikimediaSearchHints: ["Barbro Hörberg Swedish singer songwriter Man borde inte sova"]
+    answerMethods: ["timeline", "name-letters"]
+  # === Bred batch 2026-05-27 — dansband-elder/cross-nordic/vemod ===
+  - id: christer-sjogren
+    displayName: "Christer Sjögren"
+    correctYear: 1950
+    probability: 78
+    wikimediaSearchHints: ["Christer Sjögren Swedish dansband Vikingarna singer Eurovision"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: allan-edwall
+    displayName: "Allan Edwall"
+    correctYear: 1924
+    probability: 80
+    wikimediaSearchHints: ["Allan Edwall Swedish actor singer Astrid Lindgren"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: arja-saijonmaa
+    displayName: "Arja Saijonmaa"
+    correctYear: 1944
+    probability: 78
+    wikimediaSearchHints: ["Arja Saijonmaa Finnish singer Jag vill tacka livet"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: sanne-salomonsen
+    displayName: "Sanne Salomonsen"
+    correctYear: 1955
+    probability: 74
+    wikimediaSearchHints: ["Sanne Salomonsen Danish singer rock pop"]
+    answerMethods: ["timeline", "name-letters"]
+  # === Batch B 2026-05-27 — Björn Skifs ===
+  - id: bjorn-skifs
+    displayName: "Björn Skifs"
+    correctYear: 1947
+    probability: 84
+    wikimediaSearchHints: ["Björn Skifs Swedish singer Hooked on a Feeling Eurovision"]
+    answerMethods: ["timeline", "name-letters"]

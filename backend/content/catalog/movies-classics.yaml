@@ -182,3 +182,76 @@ items:
         endSec: 75
         channelTitle: "20th Century Studios"
         notes: "20th Century Studios official 2009-trailer — Pandora-värld, Na'vi-action."
+  # === Sport-tema-filmer expansion 2026-05-27 (rocky-1976 borttagen — dupli av existing `rocky`) ===
+  - id: raging-bull-1980
+    displayName: "Raging Bull"
+    correctYear: 1980
+    probability: 84
+    wikimediaSearchHints: ["Raging Bull 1980 film Robert De Niro Jake LaMotta Scorsese"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "F2UKuKxCJqc"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Amazon MGM Studios"
+        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (13)."
+  - id: chariots-of-fire-1981
+    displayName: "Chariots of Fire"
+    correctYear: 1981
+    probability: 80
+    wikimediaSearchHints: ["Chariots of Fire 1981 film Olympic running Vangelis"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "odtqtlhsv4E"
+        startSec: 21
+        endSec: 36
+        channelTitle: "Rotten Tomatoes Classic Trailers"
+        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (13)."
+  - id: field-of-dreams-1989
+    displayName: "Field of Dreams"
+    correctYear: 1989
+    probability: 82
+    wikimediaSearchHints: ["Field of Dreams 1989 film Kevin Costner baseball Iowa"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "Ut06d4dptWo"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Movieclips"
+        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (13)."
+  - id: cool-runnings-1993
+    displayName: "Cool Runnings"
+    correctYear: 1993
+    probability: 85
+    wikimediaSearchHints: ["Cool Runnings 1993 film Jamaican bobsled Disney"]
+    answerMethods: ["timeline"]
+  - id: million-dollar-baby-2004
+    displayName: "Million Dollar Baby"
+    correctYear: 2004
+    probability: 82
+    wikimediaSearchHints: ["Million Dollar Baby 2004 film Clint Eastwood boxing"]
+    answerMethods: ["timeline"]
+  - id: moneyball-2011
+    displayName: "Moneyball"
+    correctYear: 2011
+    probability: 80
+    wikimediaSearchHints: ["Moneyball 2011 film Brad Pitt baseball Oakland A's"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "-4QPVo0UIzc"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Rotten Tomatoes Trailers"
+        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+  - id: borg-vs-mcenroe-2017
+    displayName: "Borg vs McEnroe"
+    correctYear: 2017
+    probability: 78
+    wikimediaSearchHints: ["Borg vs McEnroe 2017 film Sverrir Gudnason Wimbledon"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "yQgWMs0TBKU"
+        startSec: 30
+        endSec: 45
+        channelTitle: "SF Studios"
+        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (13)."

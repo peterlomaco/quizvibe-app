@@ -315,3 +315,495 @@ items:
     probability: 82
     wikimediaSearchHints: ["Tracy Chapman singer"]
     answerMethods: ["timeline", "name-letters"]
+  # === Svenska expansion 2026-05-27 ===
+  - id: tove-lo
+    displayName: "Tove Lo"
+    correctYear: 1987
+    probability: 82
+    wikimediaSearchHints: ["Tove Lo Swedish singer Habits Stay High"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: lykke-li
+    displayName: "Lykke Li"
+    correctYear: 1986
+    probability: 78
+    wikimediaSearchHints: ["Lykke Li Swedish singer I Follow Rivers"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: zara-larsson
+    displayName: "Zara Larsson"
+    correctYear: 1997
+    probability: 82
+    wikimediaSearchHints: ["Zara Larsson Swedish singer Lush Life Never Forget You"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: veronica-maggio
+    displayName: "Veronica Maggio"
+    correctYear: 1981
+    probability: 80
+    wikimediaSearchHints: ["Veronica Maggio Swedish singer Jag kommer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: hakan-hellstrom
+    displayName: "Håkan Hellström"
+    correctYear: 1974
+    probability: 82
+    wikimediaSearchHints: ["Håkan Hellström Swedish singer Känn ingen sorg"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: petter
+    displayName: "Petter"
+    correctYear: 1974
+    probability: 76
+    wikimediaSearchHints: ["Petter Swedish rapper hip hop Mitt sjätte sinne"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: adam-tensta
+    displayName: "Adam Tensta"
+    correctYear: 1983
+    probability: 70
+    wikimediaSearchHints: ["Adam Tensta Swedish rapper"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: eagle-eye-cherry
+    displayName: "Eagle-Eye Cherry"
+    correctYear: 1968
+    probability: 78
+    wikimediaSearchHints: ["Eagle-Eye Cherry Swedish singer Save Tonight"]
+    answerMethods: ["timeline", "name-letters"]
+  # === Svenska genrer expansion 2026-05-27 — House/Hip Hop/Pop/Vemod ===
+  - id: steve-angello
+    displayName: "Steve Angello"
+    correctYear: 1982
+    probability: 78
+    wikimediaSearchHints: ["Steve Angello Swedish house DJ producer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: axwell
+    displayName: "Axwell"
+    correctYear: 1977
+    probability: 78
+    wikimediaSearchHints: ["Axwell Swedish house DJ producer Axel Hedfors"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: eric-prydz
+    displayName: "Eric Prydz"
+    correctYear: 1976
+    probability: 78
+    wikimediaSearchHints: ["Eric Prydz Swedish DJ producer Call on Me Pjanoo"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: timbuktu
+    displayName: "Timbuktu"
+    correctYear: 1975
+    probability: 82
+    wikimediaSearchHints: ["Timbuktu Swedish rapper Jason Diakité Alla vill till himmelen"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: cleo
+    displayName: "Cleo"
+    correctYear: 1985
+    probability: 74
+    wikimediaSearchHints: ["Cleo Swedish rapper hip hop Cleopatra Christianty"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: silvana-imam
+    displayName: "Silvana Imam"
+    correctYear: 1986
+    probability: 76
+    wikimediaSearchHints: ["Silvana Imam Swedish rapper hip hop feminist"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: petra-marklund
+    displayName: "Petra Marklund"
+    correctYear: 1984
+    probability: 78
+    wikimediaSearchHints: ["Petra Marklund Swedish singer September Cry for You"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: lars-winnerback
+    displayName: "Lars Winnerbäck"
+    correctYear: 1975
+    probability: 82
+    wikimediaSearchHints: ["Lars Winnerbäck Swedish singer Hosianna Söndermarken"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: patrik-isaksson
+    displayName: "Patrik Isaksson"
+    correctYear: 1971
+    probability: 76
+    wikimediaSearchHints: ["Patrik Isaksson Swedish singer Hon kommer med solsken"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: markoolio
+    displayName: "Markoolio"
+    correctYear: 1975
+    probability: 80
+    wikimediaSearchHints: ["Markoolio Swedish singer rap Vi drar till fjällen"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: basshunter
+    displayName: "Basshunter"
+    correctYear: 1984
+    probability: 82
+    wikimediaSearchHints: ["Basshunter Swedish DJ Boten Anna Jonas Altberg"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: mans-zelmerlow
+    displayName: "Måns Zelmerlöw"
+    correctYear: 1986
+    probability: 84
+    wikimediaSearchHints: ["Måns Zelmerlöw Swedish singer Eurovision Heroes 2015"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: darin
+    displayName: "Darin"
+    correctYear: 1987
+    probability: 80
+    wikimediaSearchHints: ["Darin Zanyar Swedish singer Idol 2004"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: salem-al-fakir
+    displayName: "Salem Al Fakir"
+    correctYear: 1981
+    probability: 74
+    wikimediaSearchHints: ["Salem Al Fakir Swedish singer songwriter producer"]
+    answerMethods: ["timeline", "name-letters"]
+  # === Vemod-batch 2026-05-27 — svenska millennials melankoli/indie/pop ===
+  - id: melissa-horn
+    displayName: "Melissa Horn"
+    correctYear: 1987
+    probability: 82
+    wikimediaSearchHints: ["Melissa Horn Swedish singer Lät den rätte komma in"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: molly-sanden
+    displayName: "Molly Sandén"
+    correctYear: 1992
+    probability: 84
+    wikimediaSearchHints: ["Molly Sandén Swedish singer Eurovision Husavik"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: albin-lee-meldau
+    displayName: "Albin Lee Meldau"
+    correctYear: 1987
+    probability: 76
+    wikimediaSearchHints: ["Albin Lee Meldau Swedish singer Lou Lou"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: laleh
+    displayName: "Laleh"
+    correctYear: 1982
+    probability: 84
+    wikimediaSearchHints: ["Laleh Pourkarim Swedish singer Some Die Young Goliat"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: oskar-linnros
+    displayName: "Oskar Linnros"
+    correctYear: 1983
+    probability: 80
+    wikimediaSearchHints: ["Oskar Linnros Swedish singer Från och med du"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: markus-krunegard
+    displayName: "Markus Krunegård"
+    correctYear: 1980
+    probability: 74
+    wikimediaSearchHints: ["Markus Krunegård Swedish singer Laakso"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: jonathan-johansson
+    displayName: "Jonathan Johansson"
+    correctYear: 1979
+    probability: 72
+    wikimediaSearchHints: ["Jonathan Johansson Swedish singer indie pop En hand i himlen"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: anna-ternheim
+    displayName: "Anna Ternheim"
+    correctYear: 1978
+    probability: 76
+    wikimediaSearchHints: ["Anna Ternheim Swedish singer indie folk"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: jens-lekman
+    displayName: "Jens Lekman"
+    correctYear: 1981
+    probability: 76
+    wikimediaSearchHints: ["Jens Lekman Swedish singer indie Gothenburg"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: miriam-bryant
+    displayName: "Miriam Bryant"
+    correctYear: 1991
+    probability: 82
+    wikimediaSearchHints: ["Miriam Bryant Swedish singer Push Play"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: benjamin-ingrosso
+    displayName: "Benjamin Ingrosso"
+    correctYear: 1997
+    probability: 82
+    wikimediaSearchHints: ["Benjamin Ingrosso Swedish singer Eurovision Dance You Off"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: thomas-stenstrom
+    displayName: "Thomas Stenström"
+    correctYear: 1981
+    probability: 70
+    wikimediaSearchHints: ["Thomas Stenström Swedish singer Mannen utan minne"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: moonica-mac
+    displayName: "Moonica Mac"
+    correctYear: 1986
+    probability: 66
+    wikimediaSearchHints: ["Moonica Mac Swedish singer indie"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: hurula
+    displayName: "Hurula"
+    correctYear: 1979
+    probability: 72
+    wikimediaSearchHints: ["Hurula Swedish singer punk Robert Pettersson"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: cherrie
+    displayName: "Cherrie"
+    correctYear: 1991
+    probability: 76
+    wikimediaSearchHints: ["Cherrie Swedish singer R&B Sherihan Hersi"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: maja-francis
+    displayName: "Maja Francis"
+    correctYear: 1988
+    probability: 72
+    wikimediaSearchHints: ["Maja Francis Swedish singer indie pop"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: sarah-klang
+    displayName: "Sarah Klang"
+    correctYear: 1990
+    probability: 78
+    wikimediaSearchHints: ["Sarah Klang Swedish singer indie folk Sentimental"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: sophie-zelmani
+    displayName: "Sophie Zelmani"
+    correctYear: 1972
+    probability: 76
+    wikimediaSearchHints: ["Sophie Zelmani Swedish singer folk Always You"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: frida-hyvonen
+    displayName: "Frida Hyvönen"
+    correctYear: 1977
+    probability: 70
+    wikimediaSearchHints: ["Frida Hyvönen Swedish singer piano indie"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: the-tallest-man-on-earth
+    displayName: "The Tallest Man on Earth"
+    correctYear: 1983
+    probability: 76
+    wikimediaSearchHints: ["The Tallest Man on Earth Kristian Matsson Swedish folk singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: linnea-henriksson
+    displayName: "Linnéa Henriksson"
+    correctYear: 1987
+    probability: 74
+    wikimediaSearchHints: ["Linnéa Henriksson Swedish singer Lyckligare nu"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: newkid
+    displayName: "Newkid"
+    correctYear: 1989
+    probability: 68
+    wikimediaSearchHints: ["Newkid Swedish singer Ali Jammali pop"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: victor-leksell
+    displayName: "Victor Leksell"
+    correctYear: 1996
+    probability: 80
+    wikimediaSearchHints: ["Victor Leksell Swedish singer Svag Molly Sandén"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: miss-li
+    displayName: "Miss Li"
+    correctYear: 1982
+    probability: 76
+    wikimediaSearchHints: ["Miss Li Linna Larsson Swedish singer Bourgeois Shangri-La"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: joakim-berg
+    displayName: "Joakim Berg"
+    correctYear: 1970
+    probability: 72
+    wikimediaSearchHints: ["Joakim Berg Swedish singer Kent solo"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: adna
+    displayName: "Adna"
+    correctYear: 1989
+    probability: 66
+    wikimediaSearchHints: ["Adna Kadic Swedish singer indie folk"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: daniel-adams-ray
+    displayName: "Daniel Adams-Ray"
+    correctYear: 1983
+    probability: 76
+    wikimediaSearchHints: ["Daniel Adams-Ray Swedish singer rapper Snook"]
+    answerMethods: ["timeline", "name-letters"]
+  # === Bred batch 2026-05-27 — tonårsidoler/house/hiphop/epa-dunk/cross-nordic ===
+  - id: daniel-lindstrom
+    displayName: "Daniel Lindström"
+    correctYear: 1980
+    probability: 76
+    wikimediaSearchHints: ["Daniel Lindström Swedish singer Idol 2004 winner"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: agnes-carlsson
+    displayName: "Agnes Carlsson"
+    correctYear: 1988
+    probability: 80
+    wikimediaSearchHints: ["Agnes Carlsson Swedish singer Idol 2005 Release Me"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: sanna-nielsen
+    displayName: "Sanna Nielsen"
+    correctYear: 1984
+    probability: 80
+    wikimediaSearchHints: ["Sanna Nielsen Swedish singer Eurovision 2014 Undo"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: robin-bengtsson
+    displayName: "Robin Bengtsson"
+    correctYear: 1990
+    probability: 76
+    wikimediaSearchHints: ["Robin Bengtsson Swedish singer Eurovision 2017 I Cant Go On"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: eric-saade
+    displayName: "Eric Saade"
+    correctYear: 1990
+    probability: 82
+    wikimediaSearchHints: ["Eric Saade Swedish singer Eurovision Popular Melfest"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: kim-cesarion
+    displayName: "Kim Cesarion"
+    correctYear: 1988
+    probability: 72
+    wikimediaSearchHints: ["Kim Cesarion Swedish singer Undressed"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: alesso
+    displayName: "Alesso"
+    correctYear: 1991
+    probability: 84
+    wikimediaSearchHints: ["Alesso Alessandro Lindblad Swedish DJ producer Heroes"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: john-dahlback
+    displayName: "John Dahlbäck"
+    correctYear: 1985
+    probability: 72
+    wikimediaSearchHints: ["John Dahlback Swedish house DJ producer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: otto-knows
+    displayName: "Otto Knows"
+    correctYear: 1989
+    probability: 72
+    wikimediaSearchHints: ["Otto Knows Otto Jettmann Swedish DJ Million Voices"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: sebastian-ingrosso
+    displayName: "Sebastian Ingrosso"
+    correctYear: 1983
+    probability: 80
+    wikimediaSearchHints: ["Sebastian Ingrosso Swedish house DJ Swedish House Mafia"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: erik-lundin
+    displayName: "Erik Lundin"
+    correctYear: 1985
+    probability: 76
+    wikimediaSearchHints: ["Erik Lundin Swedish rapper hip hop Suedi"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: stor
+    displayName: "Stor"
+    correctYear: 1985
+    probability: 74
+    wikimediaSearchHints: ["Stor Swedish rapper Pugh hip hop"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: linda-pira
+    displayName: "Linda Pira"
+    correctYear: 1985
+    probability: 74
+    wikimediaSearchHints: ["Linda Pira Swedish rapper Knäpper mina fingrar"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: snoh-aalegra
+    displayName: "Snoh Aalegra"
+    correctYear: 1987
+    probability: 78
+    wikimediaSearchHints: ["Snoh Aalegra Swedish Iranian singer R&B soul"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: mwuana
+    displayName: "Mwuana"
+    correctYear: 1996
+    probability: 70
+    wikimediaSearchHints: ["Mwuana Swedish rapper hip hop"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: raaban
+    displayName: "Raaban"
+    correctYear: 1990
+    probability: 74
+    wikimediaSearchHints: ["Raaban Swedish DJ producer Tungevaag EDM"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: aronchupa
+    displayName: "AronChupa"
+    correctYear: 1993
+    probability: 76
+    wikimediaSearchHints: ["AronChupa Aron Ekberg Swedish DJ Im an Albatraoz"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: marit-larsen
+    displayName: "Marit Larsen"
+    correctYear: 1983
+    probability: 74
+    wikimediaSearchHints: ["Marit Larsen Norwegian singer M2M If a Song Could Get Me You"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: kygo
+    displayName: "Kygo"
+    correctYear: 1991
+    probability: 84
+    wikimediaSearchHints: ["Kygo Kyrre Gørvell-Dahll Norwegian DJ tropical house"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: aurora-aksnes
+    displayName: "Aurora"
+    correctYear: 1996
+    probability: 78
+    wikimediaSearchHints: ["Aurora Aksnes Norwegian singer Runaway Frozen"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: alexander-rybak
+    displayName: "Alexander Rybak"
+    correctYear: 1986
+    probability: 82
+    wikimediaSearchHints: ["Alexander Rybak Norwegian singer Eurovision 2009 Fairytale"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: aura-dione
+    displayName: "Aura Dione"
+    correctYear: 1985
+    probability: 72
+    wikimediaSearchHints: ["Aura Dione Danish singer Friends Geronimo"]
+    answerMethods: ["timeline", "name-letters"]
+  # === Batch B 2026-05-27 — kvinnliga svenska sångerskor + cross-nordic ===
+  - id: marie-serneholt
+    displayName: "Marie Serneholt"
+    correctYear: 1983
+    probability: 76
+    wikimediaSearchHints: ["Marie Serneholt Swedish singer A*Teens That's the Way My Heart Goes"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: anna-sahlene
+    displayName: "Anna Sahlene"
+    correctYear: 1976
+    probability: 72
+    wikimediaSearchHints: ["Anna Sahlene Swedish singer Eurovision 2002 Estonia"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: sarah-dawn-finer
+    displayName: "Sarah Dawn Finer"
+    correctYear: 1981
+    probability: 78
+    wikimediaSearchHints: ["Sarah Dawn Finer Swedish singer Moving On Eurovision"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: lisa-miskovsky
+    displayName: "Lisa Miskovsky"
+    correctYear: 1975
+    probability: 76
+    wikimediaSearchHints: ["Lisa Miskovsky Swedish singer Driving One of Your Cars Mirror's Edge"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: pernilla-andersson
+    displayName: "Pernilla Andersson"
+    correctYear: 1979
+    probability: 72
+    wikimediaSearchHints: ["Pernilla Andersson Swedish singer indie folk"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: linda-sundblad
+    displayName: "Linda Sundblad"
+    correctYear: 1981
+    probability: 74
+    wikimediaSearchHints: ["Linda Sundblad Swedish singer Lambretta Oh Father"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: maria-mena
+    displayName: "Maria Mena"
+    correctYear: 1986
+    probability: 74
+    wikimediaSearchHints: ["Maria Mena Norwegian singer You're the Only One"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: mariette
+    displayName: "Mariette"
+    correctYear: 1983
+    probability: 76
+    wikimediaSearchHints: ["Mariette Hansson Swedish singer Melodifestivalen Don't Stop Believing"]
+    answerMethods: ["timeline", "name-letters"]
+  # === Batch C 2026-05-27 — svenska millennials artister ===
+  - id: sabina-ddumba
+    displayName: "Sabina Ddumba"
+    correctYear: 1994
+    probability: 74
+    wikimediaSearchHints: ["Sabina Ddumba Swedish singer Effortless"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: vincent-pontare
+    displayName: "Vincent"
+    correctYear: 1987
+    probability: 72
+    wikimediaSearchHints: ["Vincent Pontare Swedish singer Mapei Mariko"]
+    answerMethods: ["timeline", "name-letters"]

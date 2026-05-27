@@ -2,7 +2,7 @@
 
 Expo Router quiz app (React Native 0.81, React 19, Expo SDK 54). Dark-themed, mobile-first. Mock data on the client; en `backend/`-folder är påbörjad för content-katalog + bild-pipeline (ingen live-API ännu — se "Backend" nedan).
 
-## Aktiv roadmap (uppdaterad 2026-05-22)
+## Aktiv roadmap (uppdaterad 2026-05-27)
 
 Status mot den 4-stegs-plan vi följer för content-bygge inför launch:
 
@@ -10,10 +10,16 @@ Status mot den 4-stegs-plan vi följer för content-bygge inför launch:
 |---|---|---|
 | 1. Bild-format-fix | ✅ Klart | 16:9 container + `resizeMode='contain'` (commit `4ab2ac9`) |
 | 2. Audience-filter på bild- + musik-frågor | ✅ Klart | Pool-nivå union-filter (`audienceFilter.ts`) på BÅDA pools — items matchar minst en spelares gen ELLER `'all'`. Fallback-chain om filter tomt. Se "Image questions (MVP)". |
-| 3. Content build-out | 🟡 Pågående | **82 image + 183 youtube** (159 songs + 14 movies + 10 sport-events) efter content-pass 2026-05-26. Total **265 V1-playable** över 3 huvudkategorier (+71% från 155). Music: alla 5 audience-files fullt curade (cleanup-pass + Topic-channel-prio för svåra items). Image: bands 8→16, artists 14→31, actors 15→21, athletes 17→23. Fortsätt med fler items per audience + film/sport-event-expansion. |
+| 3. Content build-out | 🟡 Pågående | **777 image + 221 youtube** (175 songs + 19 movies + 27 sport-events) efter mass-expansion-passet 2026-05-27. Total **~998 V1-playable** över 3 huvudkategorier (+275% från 265). Catalog: **1032 items**. Mass-batches lade till svenska artister/band (vemod, dansband, house, hip hop, R&B, Eurovision, kvinnliga sångerskor), skådespelare (Bergman-era → Skarsgård-familjen + svensk modern), idrottare (hockey-legender + modern + sport-crossover-actors), cross-nordic (norsk/finsk/dansk), sport-events (svenska + OS-bredd), sport-tema-movies. 23 items kvar utan webp (Wikipedia pageimage saknas — manuell Commons-search pending). Quizvibe positionering: strikt **musik/film/sport** (inga komiker/journalister/författare/kompositörer per Peter 2026-05-27). |
 | 4. Pre-launch-items | ⏸️ Ej påbörjat | Captcha, YouTube ToS-audit, nightly cron, FAQ — se `project_pre_launch_checklist.md` |
 
-**Pool-status idag (82 live image-items)** — V1-curering utifrån svensk igenkänning (global reach inte ett krav i V1; Release 2 whitelistar en delmängd med `region: Global` där lämpligt). Bilder var initially Wikipedia pageimage default (typiskt porträtt). Action-shot-policy-audit (`feedback_image_professional_context.md`) pågår per bucket.
+**Performance-refactor 2026-05-27** (`quizImageQuestions.ts` slim-down): Tidigare pre-bakad Letter Grid + nameOptions per item × 3 varianter → 8.5 MB JS-fil som parsades vid app-start. Refactorad till minimal metadata per item + runtime-generation via [src/utils/imageQuestionBuilder.ts](src/utils/imageQuestionBuilder.ts) (port av `backend/content/distractors.ts`). Storlek: **8.5 MB → 208 KB** (97.5% reduktion). Cold-start-parse-tid: ~150-400 ms → ~5-10 ms. Algoritmiskt 1:1 — samma 10 prefix-knappar, samma nameOptions-distribution. `buildImageVariant(item, assistance, audienceSet, allItems, distractorNames)` anropas runtime i quiz.tsx, memoiserad på `[question.id, currentAssistance, audienceSetForVariants]` så shuffle bara körs vid frågebyte/spelar-rotation. `pickImageQuestionVariant` borttagen (ersatt av `buildImageVariant`). Backend `export-image-questions.ts` skriver nu också `DISTRACTOR_POOL_NAMES`-export (per category) som klienten använder som fallback-namn.
+
+**Parkerade pre-launch-optimizations** (per Peter 2026-05-27 — fokus på item-validation + content istället tills nödvändigt):
+- **B**) Server-side asset-hosting (Supabase Storage / CDN) — assets på 73 MB i bundle. Aktiveras post-launch eller när bundle-storlek närmar sig App Store cellular-limit (200 MB).
+- **C**) webp q85 → q75 reprocess (~30% storleksbesparing utan synbar kvalitetsförlust) — opportunistic kvalitets-justering om tid finns.
+
+**Pool-status idag (777 live image-webps)** — V1-curering utifrån svensk igenkänning (`region: sweden` = recognition i Sverige, NOT nationality — Adele, Drake etc. är taggade `region: sweden` eftersom svenska spelare känner igen dem). Action-shot-policy-audit per bucket (`feedback_image_professional_context.md`) är paussad till mass-curation klar; porträtt-fallback godtagbar för items utan tillgänglig action-shot per 2026-05-27.
 
 **Audit-pass-status** (per bucket):
 - ✅ **Athletes-elder-gen-x** (audited 2026-05-27): 18/22 webp uppgraderade till sport-action. 2 keep current (Stenmark, Wiberg — peak-era ej tillgängligt på Commons). 2 blocked (Muhammad Ali, Patrik Sjöberg — © Leifer/IAAF, se `memory/project_image_audit_blocked.md`). Useful sources upptäckta: Lipofsky NBA-bilder, Anefo "in aktie"-serie, AFP/Scanpix PD, Freiburg LABW archive.

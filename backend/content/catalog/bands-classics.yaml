@@ -345,3 +345,362 @@ items:
     probability: 90
     wikimediaSearchHints: ["Ace of Base Sweden band"]
     answerMethods: ["timeline", "name-letters"]
+  # === Svenska expansion 2026-05-27 ===
+  - id: europe
+    displayName: "Europe"
+    correctYear: 1979
+    probability: 88
+    wikimediaSearchHints: ["Europe Swedish rock band Final Countdown Joey Tempest"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: kent
+    displayName: "Kent"
+    correctYear: 1990
+    probability: 86
+    wikimediaSearchHints: ["Kent Swedish rock band Eskilstuna Joakim Berg"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: the-cardigans
+    displayName: "The Cardigans"
+    correctYear: 1992
+    probability: 84
+    wikimediaSearchHints: ["The Cardigans Swedish band Lovefool Nina Persson"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: in-flames
+    displayName: "In Flames"
+    correctYear: 1990
+    probability: 78
+    wikimediaSearchHints: ["In Flames Swedish melodic death metal Gothenburg"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: opeth
+    displayName: "Opeth"
+    correctYear: 1989
+    probability: 76
+    wikimediaSearchHints: ["Opeth Swedish progressive metal Mikael Åkerfeldt"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: mando-diao
+    displayName: "Mando Diao"
+    correctYear: 1999
+    probability: 78
+    wikimediaSearchHints: ["Mando Diao Swedish rock band Borlänge"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: the-hives
+    displayName: "The Hives"
+    correctYear: 1993
+    probability: 80
+    wikimediaSearchHints: ["The Hives Swedish garage rock band Pelle Almqvist"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: bo-kaspers-orkester
+    displayName: "Bo Kaspers Orkester"
+    correctYear: 1991
+    probability: 78
+    wikimediaSearchHints: ["Bo Kaspers Orkester Swedish band Vi kommer aldrig att dö"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: looptroop-rockers
+    displayName: "Looptroop Rockers"
+    correctYear: 1991
+    probability: 72
+    wikimediaSearchHints: ["Looptroop Rockers Swedish hip hop crew Västerås"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: stiftelsen
+    displayName: "Stiftelsen"
+    correctYear: 2010
+    probability: 76
+    wikimediaSearchHints: ["Stiftelsen Swedish band Vart jag mig i världen vänder"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: the-ark
+    displayName: "The Ark"
+    correctYear: 2000
+    probability: 74
+    wikimediaSearchHints: ["The Ark Swedish glam rock Ola Salo"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: a-teens
+    displayName: "A*Teens"
+    correctYear: 1998
+    probability: 78
+    wikimediaSearchHints: ["A*Teens Swedish pop band Mamma Mia ABBA"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: vikingarna
+    displayName: "Vikingarna"
+    correctYear: 1958
+    probability: 76
+    wikimediaSearchHints: ["Vikingarna Swedish dansband Christer Sjögren"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: hep-stars
+    displayName: "Hep Stars"
+    correctYear: 1964
+    probability: 72
+    wikimediaSearchHints: ["Hep Stars Swedish band Benny Andersson Sunny Girl"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: tages
+    displayName: "Tages"
+    correctYear: 1963
+    probability: 70
+    wikimediaSearchHints: ["Tages Swedish band Gothenburg 1960s"]
+    answerMethods: ["timeline", "name-letters"]
+  # === Genre/dansband/cross-nordic expansion 2026-05-27 ===
+  - id: swedish-house-mafia
+    displayName: "Swedish House Mafia"
+    correctYear: 2008
+    probability: 86
+    wikimediaSearchHints: ["Swedish House Mafia Axwell Ingrosso Angello Don't You Worry Child"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: aqua
+    displayName: "Aqua"
+    correctYear: 1989
+    probability: 84
+    wikimediaSearchHints: ["Aqua Danish band Barbie Girl Lene Nystrøm"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: drangarna
+    displayName: "Drängarna"
+    correctYear: 1980
+    probability: 78
+    wikimediaSearchHints: ["Drängarna Swedish dansband Sommar och sol"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: lasse-stefanz
+    displayName: "Lasse Stefanz"
+    correctYear: 1967
+    probability: 76
+    wikimediaSearchHints: ["Lasse Stefanz Swedish dansband Cabaret"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: streaplers
+    displayName: "Streaplers"
+    correctYear: 1959
+    probability: 70
+    wikimediaSearchHints: ["Streaplers Swedish dansband Trollhättan"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: wizex
+    displayName: "Wizex"
+    correctYear: 1973
+    probability: 70
+    wikimediaSearchHints: ["Wizex Swedish dansband Kikki Danielsson"]
+    answerMethods: ["timeline", "name-letters"]
+  # === Vemod-batch 2026-05-27 — svenska indie/rock/melankoli/80-tal ===
+  - id: first-aid-kit
+    displayName: "First Aid Kit"
+    correctYear: 2007
+    probability: 84
+    wikimediaSearchHints: ["First Aid Kit Swedish folk band Söderberg sisters Emmylou"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: sakert
+    displayName: "Säkert!"
+    correctYear: 2007
+    probability: 74
+    wikimediaSearchHints: ["Säkert Swedish band Annika Norlin Hello Saferide"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: familjen
+    displayName: "Familjen"
+    correctYear: 2002
+    probability: 74
+    wikimediaSearchHints: ["Familjen Swedish electro band Johan T Karlsson Det snurrar"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: eldkvarn
+    displayName: "Eldkvarn"
+    correctYear: 1971
+    probability: 78
+    wikimediaSearchHints: ["Eldkvarn Swedish rock band Plura Jonsson"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: shout-out-louds
+    displayName: "Shout Out Louds"
+    correctYear: 2001
+    probability: 72
+    wikimediaSearchHints: ["Shout Out Louds Swedish indie band Stockholm"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: imperiet
+    displayName: "Imperiet"
+    correctYear: 1982
+    probability: 80
+    wikimediaSearchHints: ["Imperiet Swedish rock band Thåström Ebba Grön"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: nationalteatern
+    displayName: "Nationalteatern"
+    correctYear: 1968
+    probability: 76
+    wikimediaSearchHints: ["Nationalteatern Swedish progressive rock band Bängen trålar"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: noice
+    displayName: "Noice"
+    correctYear: 1979
+    probability: 76
+    wikimediaSearchHints: ["Noice Swedish rock band Hubert Hansson En kväll i tunnelbanan"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: freestyle
+    displayName: "Freestyle"
+    correctYear: 1976
+    probability: 70
+    wikimediaSearchHints: ["Freestyle Swedish pop band Adam Glenn 1980s"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: ratata
+    displayName: "Ratata"
+    correctYear: 1980
+    probability: 78
+    wikimediaSearchHints: ["Ratata Swedish synth pop band Mauro Scocco"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: reeperbahn
+    displayName: "Reeperbahn"
+    correctYear: 1976
+    probability: 68
+    wikimediaSearchHints: ["Reeperbahn Swedish rock band 1980s"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: docenterna
+    displayName: "Docenterna"
+    correctYear: 1981
+    probability: 70
+    wikimediaSearchHints: ["Docenterna Swedish rock band Anders Glenmark"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: lolita-pop
+    displayName: "Lolita Pop"
+    correctYear: 1980
+    probability: 70
+    wikimediaSearchHints: ["Lolita Pop Swedish rock band Karin Wistrand"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: the-soundtrack-of-our-lives
+    displayName: "The Soundtrack of Our Lives"
+    correctYear: 1995
+    probability: 76
+    wikimediaSearchHints: ["The Soundtrack of Our Lives Swedish rock band TSOOL Ebbot Lundberg"]
+    answerMethods: ["timeline", "name-letters"]
+  # === Bred batch 2026-05-27 — dansband/house/hiphop/epa-dunk/svensk-finsk-norsk-dansk ===
+  - id: sten-and-stanley
+    displayName: "Sten & Stanley"
+    correctYear: 1962
+    probability: 76
+    wikimediaSearchHints: ["Sten Stanley Swedish dansband"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: larz-kristerz
+    displayName: "Larz-Kristerz"
+    correctYear: 1990
+    probability: 78
+    wikimediaSearchHints: ["Larz-Kristerz Swedish dansband Hultsfred"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: sven-ingvars
+    displayName: "Sven-Ingvars"
+    correctYear: 1956
+    probability: 80
+    wikimediaSearchHints: ["Sven-Ingvars Swedish dansband Sven-Erik Magnusson"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: galantis
+    displayName: "Galantis"
+    correctYear: 2007
+    probability: 82
+    wikimediaSearchHints: ["Galantis Swedish electronic duo Runaway Christian Karlsson"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: cazzette
+    displayName: "Cazzette"
+    correctYear: 2010
+    probability: 72
+    wikimediaSearchHints: ["Cazzette Swedish electronic duo Alexander Björklund Sebastian Furrer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: kartellen
+    displayName: "Kartellen"
+    correctYear: 2008
+    probability: 74
+    wikimediaSearchHints: ["Kartellen Swedish hip hop crew"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: tjuvjakt
+    displayName: "Tjuvjakt"
+    correctYear: 2012
+    probability: 76
+    wikimediaSearchHints: ["Tjuvjakt Swedish pop band Tellus Pengar"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: hanoi-rocks
+    displayName: "Hanoi Rocks"
+    correctYear: 1979
+    probability: 78
+    wikimediaSearchHints: ["Hanoi Rocks Finnish rock band Michael Monroe"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: lordi
+    displayName: "Lordi"
+    correctYear: 1992
+    probability: 84
+    wikimediaSearchHints: ["Lordi Finnish hard rock monsters Eurovision 2006 Hard Rock Hallelujah"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: nightwish
+    displayName: "Nightwish"
+    correctYear: 1996
+    probability: 78
+    wikimediaSearchHints: ["Nightwish Finnish symphonic metal Tarja Turunen"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: apocalyptica
+    displayName: "Apocalyptica"
+    correctYear: 1993
+    probability: 76
+    wikimediaSearchHints: ["Apocalyptica Finnish cello metal Metallica"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: ylvis
+    displayName: "Ylvis"
+    correctYear: 2000
+    probability: 82
+    wikimediaSearchHints: ["Ylvis Norwegian duo What Does the Fox Say"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: lukas-graham
+    displayName: "Lukas Graham"
+    correctYear: 2011
+    probability: 84
+    wikimediaSearchHints: ["Lukas Graham Danish band 7 Years"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: volbeat
+    displayName: "Volbeat"
+    correctYear: 2001
+    probability: 80
+    wikimediaSearchHints: ["Volbeat Danish rock metal band Michael Poulsen"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: mew
+    displayName: "Mew"
+    correctYear: 1995
+    probability: 70
+    wikimediaSearchHints: ["Mew Danish indie rock band"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: d-a-d
+    displayName: "D-A-D"
+    correctYear: 1982
+    probability: 74
+    wikimediaSearchHints: ["D-A-D Disneyland After Dark Danish rock band Sleeping My Day Away"]
+    answerMethods: ["timeline", "name-letters"]
+  # === Batch C 2026-05-27 — international 80s/90s-band ===
+  - id: wham
+    displayName: "Wham!"
+    correctYear: 1981
+    probability: 88
+    wikimediaSearchHints: ["Wham band George Michael Andrew Ridgeley Last Christmas"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: pet-shop-boys
+    displayName: "Pet Shop Boys"
+    correctYear: 1981
+    probability: 86
+    wikimediaSearchHints: ["Pet Shop Boys Neil Tennant Chris Lowe West End Girls"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: duran-duran
+    displayName: "Duran Duran"
+    correctYear: 1978
+    probability: 86
+    wikimediaSearchHints: ["Duran Duran band Birmingham new wave Hungry Like the Wolf"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: tears-for-fears
+    displayName: "Tears for Fears"
+    correctYear: 1981
+    probability: 84
+    wikimediaSearchHints: ["Tears for Fears band Curt Smith Roland Orzabal Shout"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: simple-minds
+    displayName: "Simple Minds"
+    correctYear: 1977
+    probability: 80
+    wikimediaSearchHints: ["Simple Minds Scottish band Jim Kerr Don't You Forget About Me"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: inxs
+    displayName: "INXS"
+    correctYear: 1977
+    probability: 80
+    wikimediaSearchHints: ["INXS Australian rock band Michael Hutchence Never Tear Us Apart"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: crowded-house
+    displayName: "Crowded House"
+    correctYear: 1985
+    probability: 78
+    wikimediaSearchHints: ["Crowded House New Zealand band Neil Finn Don't Dream It's Over"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: take-that
+    displayName: "Take That"
+    correctYear: 1990
+    probability: 82
+    wikimediaSearchHints: ["Take That British boy band Gary Barlow Robbie Williams Back for Good"]
+    answerMethods: ["timeline", "name-letters"]

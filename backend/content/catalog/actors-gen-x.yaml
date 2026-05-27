@@ -396,3 +396,122 @@ items:
     probability: 85
     wikimediaSearchHints: ["Helen Mirren actress"]
     answerMethods: ["timeline", "name-letters"]
+  # === Svenska expansion 2026-05-27 ===
+  - id: stellan-skarsgard
+    displayName: "Stellan Skarsgård"
+    correctYear: 1951
+    probability: 85
+    wikimediaSearchHints: ["Stellan Skarsgard Swedish actor Mamma Mia Chernobyl"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: peter-stormare
+    displayName: "Peter Stormare"
+    correctYear: 1953
+    probability: 80
+    wikimediaSearchHints: ["Peter Stormare Swedish actor Fargo Big Lebowski"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: mikael-persbrandt
+    displayName: "Mikael Persbrandt"
+    correctYear: 1963
+    probability: 82
+    wikimediaSearchHints: ["Mikael Persbrandt Swedish actor Beck The Hobbit"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: rolf-lassgard
+    displayName: "Rolf Lassgård"
+    correctYear: 1955
+    probability: 80
+    wikimediaSearchHints: ["Rolf Lassgard Swedish actor Wallander A Man Called Ove"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: lena-olin
+    displayName: "Lena Olin"
+    correctYear: 1955
+    probability: 78
+    wikimediaSearchHints: ["Lena Olin Swedish actress Chocolat Unbearable Lightness"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: dolph-lundgren
+    displayName: "Dolph Lundgren"
+    correctYear: 1957
+    probability: 85
+    wikimediaSearchHints: ["Dolph Lundgren Swedish actor Rocky IV Expendables"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: pernilla-august
+    displayName: "Pernilla August"
+    correctYear: 1958
+    probability: 76
+    wikimediaSearchHints: ["Pernilla August Swedish actress Best Intentions Star Wars Shmi"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: helena-bergstrom
+    displayName: "Helena Bergström"
+    correctYear: 1964
+    probability: 72
+    wikimediaSearchHints: ["Helena Bergstrom Swedish actress Änglagård"]
+    answerMethods: ["timeline", "name-letters"]
+  # === Sport-crossover actors 2026-05-27 (idrottare → skådespelare) ===
+  - id: vinnie-jones
+    displayName: "Vinnie Jones"
+    correctYear: 1965
+    probability: 82
+    wikimediaSearchHints: ["Vinnie Jones English footballer actor Lock Stock Snatch"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: brian-bosworth
+    displayName: "Brian Bosworth"
+    correctYear: 1965
+    probability: 70
+    wikimediaSearchHints: ["Brian Bosworth NFL linebacker actor Stone Cold"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: terry-crews
+    displayName: "Terry Crews"
+    correctYear: 1968
+    probability: 80
+    wikimediaSearchHints: ["Terry Crews NFL actor Brooklyn Nine-Nine Expendables"]
+    answerMethods: ["timeline", "name-letters"]
+  # === Batch B 2026-05-27 — svenska SVT-personligheter ===
+  - id: lasse-brandeby
+    displayName: "Lasse Brandeby"
+    correctYear: 1945
+    probability: 80
+    wikimediaSearchHints: ["Lasse Brandeby Swedish actor Kurt Olsson"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: anders-lundin
+    displayName: "Anders Lundin"
+    correctYear: 1963
+    probability: 80
+    wikimediaSearchHints: ["Anders Lundin Swedish TV host Robinson Expedition"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: ulf-brunnberg
+    displayName: "Ulf Brunnberg"
+    correctYear: 1947
+    probability: 76
+    wikimediaSearchHints: ["Ulf Brunnberg Swedish actor Sune Jönssonligan"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: eva-remaeus
+    displayName: "Eva Remaeus"
+    correctYear: 1962
+    probability: 74
+    wikimediaSearchHints: ["Eva Remaeus Swedish actress Sune-mamma"]
+    answerMethods: ["timeline", "name-letters"]
+  # === Batch C 2026-05-27 — international gen-x skådespelare ===
+  # (russell-crowe borttagen — fanns redan i actors-millennials)
+  - id: ben-stiller
+    displayName: "Ben Stiller"
+    correctYear: 1965
+    probability: 86
+    wikimediaSearchHints: ["Ben Stiller actor Zoolander Meet the Parents Night at the Museum"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: paul-rudd
+    displayName: "Paul Rudd"
+    correctYear: 1969
+    probability: 84
+    wikimediaSearchHints: ["Paul Rudd actor Ant-Man Friends Anchorman"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: jason-bateman
+    displayName: "Jason Bateman"
+    correctYear: 1969
+    probability: 80
+    wikimediaSearchHints: ["Jason Bateman actor Arrested Development Ozark"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: kevin-hart
+    displayName: "Kevin Hart"
+    correctYear: 1979
+    probability: 86
+    wikimediaSearchHints: ["Kevin Hart comedian actor Jumanji Ride Along"]
+    answerMethods: ["timeline", "name-letters"]

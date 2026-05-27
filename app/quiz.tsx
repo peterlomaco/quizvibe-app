@@ -45,11 +45,13 @@ import { savePendingLobbyPlayers } from '@/src/utils/pendingLobby';
 import { loadProfile } from '@/src/utils/profileStorage';
 import {
   IMAGE_QUIZ_QUESTIONS,
-  pickImageQuestionVariant,
+  DISTRACTOR_POOL_NAMES,
+  type ImageQuestionAudience,
   type ImageNameOption,
   type ImageQuestionVariant,
-  type ImageVariantKey,
+  type ImageQuizQuestion,
 } from '@/src/utils/quizImageQuestions';
+import { buildImageVariant } from '@/src/utils/imageQuestionBuilder';
 import { getQuizImage } from '@/src/utils/quizImages';
 import { generateRoomCode } from '@/src/utils/roomCode';
 import { hasPremiumSubscription } from '@/src/utils/subscriptionStorage';
@@ -118,9 +120,10 @@ interface ImageQuestion {
    *  spann (semantiskt rättare än correctYear för artister). */
   peakFrom?: number;
   peakTo?: number;
-  /** Pre-baked Letter Grid + name-options per prefix-längd. Klienten väljer
-   *  variant runtime via `pickImageQuestionVariant(q, assistance)`. */
-  variants: Record<ImageVariantKey, ImageQuestionVariant>;
+  /** Backreference till källan från IMAGE_QUIZ_QUESTIONS — driver runtime-
+   *  generation av variants via buildImageVariant() istället för pre-bakad
+   *  data (sparade ~8.3 MB av JS-bundlen, refactor 2026-05-27). */
+  source: ImageQuizQuestion;
 }
 
 type QuizQuestion = TimelineQuestion | ImageQuestion;
@@ -161,7 +164,7 @@ const IMAGE_SEED_QUESTIONS: ImageQuestion[] = IMAGE_QUIZ_QUESTIONS.map(
     correctYear: q.correctYear,
     peakFrom: q.peakFrom,
     peakTo: q.peakTo,
-    variants: q.variants,
+    source: q,
   }),
 );
 
@@ -782,6 +785,14 @@ export default function QuizScreen() {
   //
   // MÅSTE deklareras EFTER `turnOrder` — annars TDZ-error eftersom deps
   // läser turnOrder.length innan const är initialiserad.
+  // Audience-set lyfts ut som top-level useMemo så det kan återanvändas
+  // av image-variant-builderns runtime-generation (gameQuestions räknar
+  // ut samma värde internt — pekar tillsammans mot samma sak).
+  const audienceSetForVariants = useMemo(
+    () => buildAudienceSet(turnOrder) as Set<ImageQuestionAudience>,
+    [turnOrder],
+  );
+
   const gameQuestions = useMemo<QuizQuestion[]>(() => {
     // Filter-hierarki (i ordning, från hård → mjuk):
     //   1. Source-toggle (youtubeEnabled / imagesEnabled) — HÅRD. Host:s val.
@@ -1193,6 +1204,23 @@ export default function QuizScreen() {
   const question: QuizQuestion = gameQuestions[questionIndex % gameQuestions.length];
   const isImageQuestion = question.type === 'image';
   const isLastQuestion = questionIndex === totalQuestions - 1;
+
+  // Bygg image-variant runtime baserat på source + assistance + audience-set.
+  // Memo:as på question-id + assistance så shuffle/distractor-pick körs ENDAST
+  // när frågan byts eller spelarens assistance ändras (= turnordnings-rotation
+  // i Pass-the-Phone). Annars skulle prefix-knappar randomiseras varje render
+  // → ImageAnswerBlock skulle få ny variant-prop per frame.
+  const imageVariant = useMemo<ImageQuestionVariant | null>(() => {
+    if (question.type !== 'image') return null;
+    return buildImageVariant(
+      question.source,
+      currentAssistance,
+      audienceSetForVariants,
+      IMAGE_QUIZ_QUESTIONS,
+      DISTRACTOR_POOL_NAMES[question.source.category] ?? [],
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [question.id, currentAssistance, audienceSetForVariants]);
   // Aktiv media-källa för aktuell fråga. Returneras `kind: 'none'` om
   // host stängt av alla källor eller frågan saknar curerade klipp —
   // MediaPlayer renderar då NoSourcePlayer-placeholder istället för att
@@ -3509,35 +3537,27 @@ export default function QuizScreen() {
                   phase === 'awaiting' || phase === 'reveal' || shouldLockForUnstable
                 }
               />
-            ) : (() => {
-              // Per-spelare-variant baserat på assistance:
-              //   full → full-names (mest hjälp = se hela namnet)
-              //   standard → prefix-2
-              //   minimal → prefix-1
-              // pickImageQuestionVariant kapslar mappningen så call-sites slipper
-              // duplicera switchen.
-              const variant = pickImageQuestionVariant(question.variants, currentAssistance);
+            ) : imageVariant ? (
+              // Variant byggdes runtime via `imageVariant`-useMemo ovan.
               // D-iii: ImageAnswerBlock har ingen egen disabled-prop —
               // wrappa i View med pointerEvents='none' + dimmad opacity
               // när connection är unstable. Komponenten själv behåller
               // sin phase-baserade låsning oförändrat.
-              return (
-                <View
-                  pointerEvents={shouldLockForUnstable ? 'none' : 'auto'}
-                  style={shouldLockForUnstable ? { opacity: 0.4 } : undefined}
-                >
-                  <ImageAnswerBlock
-                    question={variant}
-                    phase={phase}
-                    pendingName={pendingNameOption}
-                    confirmedName={confirmedNameOption}
-                    isTimedOut={phase === 'reveal' && confirmedNameOption === null}
-                    onNameSelect={setPendingNameOption}
-                    resetKey={`${questionIndex}-${currentAssistance}`}
-                  />
-                </View>
-              );
-            })()}
+              <View
+                pointerEvents={shouldLockForUnstable ? 'none' : 'auto'}
+                style={shouldLockForUnstable ? { opacity: 0.4 } : undefined}
+              >
+                <ImageAnswerBlock
+                  question={imageVariant}
+                  phase={phase}
+                  pendingName={pendingNameOption}
+                  confirmedName={confirmedNameOption}
+                  isTimedOut={phase === 'reveal' && confirmedNameOption === null}
+                  onNameSelect={setPendingNameOption}
+                  resetKey={`${questionIndex}-${currentAssistance}`}
+                />
+              </View>
+            ) : null}
 
             {/* Inline reveal-feedback: green vid rätt, red vid fel. Visas
                 ENDAST i 'reveal'-fasen (= efter timer hit 0) — under awaiting
