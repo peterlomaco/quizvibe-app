@@ -17,6 +17,7 @@
     "export-image-questions": "tsx scripts/export-image-questions.ts",
     "measure-images": "tsx scripts/measure-images.ts",
     "sketch-generate": "tsx --env-file=.env.local sketch/generate.ts",
+    "sketch-source": "tsx sketch/source.ts",
     "build": "tsc"
   },
   "dependencies": {

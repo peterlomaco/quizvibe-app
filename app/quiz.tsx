@@ -56,6 +56,8 @@ import { buildImageVariant } from '@/src/utils/imageQuestionBuilder';
 // ↑ Borttagen 2026-05-27 — text-rendering ersätter foto-rendering. Återintroducera
 // när sketches kommer (då med getQuizSketch() från assets/quiz-sketches/).
 import { NameRevealCard } from '@/src/components/NameRevealCard';
+import { SketchCanvas } from '@/src/components/SketchCanvas';
+import { hasSketch, getQuizSketch } from '@/src/utils/quizSketches';
 import { generateRoomCode } from '@/src/utils/roomCode';
 import { hasPremiumSubscription } from '@/src/utils/subscriptionStorage';
 import { supabase } from '@/src/utils/supabase';
@@ -3202,20 +3204,33 @@ export default function QuizScreen() {
                 till svaret) och visar den vid reveal. */}
             {isImageQuestion ? (
               <View style={styles.imageMediaCard}>
-                {/* Mellanlösning: text-name-render istället för foto medan
-                    AI-tecknade sketches genereras. ProgressiveCover-mosaiken
-                    funkar oförändrad — block lyfts bort och spelaren ser
-                    gradvis mer av namnet. När sketches kommer byts denna
-                    rendering till <Image source={getQuizSketch(id)} />. */}
-                <NameRevealCard displayName={question.displayName} />
-                <ProgressiveCover
-                  key={questionIndex}
-                  resetKey={questionIndex}
-                  profile={{ birthYear: 1990, assistance: currentAssistance }}
-                  assistance={currentAssistance}
-                  totalSeconds={responseSeconds}
-                  logoSize={220}
-                />
+                {/* Fragmenterad fråga-routning: har item:t en tecknad sketch
+                    (assets/quiz-sketches/<id>.webp via hasSketch) renderas den
+                    som "pencil_sketch" — SketchCanvas ritar skissen live på tom
+                    mörk canvas och sköter sin egen fasvisa reveal. Saknas sketch
+                    faller vi tillbaka till NameRevealCard + ProgressiveCover-
+                    mosaik (text-mellanlösning). */}
+                {hasSketch(question.id) ? (
+                  <SketchCanvas
+                    key={questionIndex}
+                    source={getQuizSketch(question.id)!}
+                    resetKey={questionIndex}
+                    assistance={currentAssistance}
+                    totalSeconds={responseSeconds}
+                  />
+                ) : (
+                  <>
+                    <NameRevealCard displayName={question.displayName} />
+                    <ProgressiveCover
+                      key={questionIndex}
+                      resetKey={questionIndex}
+                      profile={{ birthYear: 1990, assistance: currentAssistance }}
+                      assistance={currentAssistance}
+                      totalSeconds={responseSeconds}
+                      logoSize={220}
+                    />
+                  </>
+                )}
               </View>
             ) : (
               <MediaPlayer

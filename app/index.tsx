@@ -2118,6 +2118,22 @@ export default function HomeScreen() {
               </Text>
             )}
           </Pressable>
+          <Text style={[styles.footerDot, { fontFamily: taglineFont }]}>·</Text>
+          {/* Temporär dev-länk: standalone preview av sketch-rit-animationen. */}
+          <Pressable onPress={() => router.push('/sketch-demo')} hitSlop={8}>
+            {({ pressed }) => (
+              <Text
+                style={[
+                  styles.footerText,
+                  styles.footerLink,
+                  { fontFamily: taglineFont },
+                  pressed && { opacity: 0.6 },
+                ]}
+              >
+                Sketch demo
+              </Text>
+            )}
+          </Pressable>
         </View>
       </View>
 
