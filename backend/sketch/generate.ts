@@ -35,7 +35,10 @@
 //   npm run sketch-generate -- --layers <a,b,c> --id <id> --era "<era>" --category <...> [--mode ...]
 //   npm run sketch-generate -- --batch <path-to-tsv>
 //
-// Batch TSV (tab-separated, no header):  id  ref  era  category  [mode]
+// Batch TSV (tab-separated, no header):  id  ref  era  category  [mode]  [flags]
+//   flags = '|'-separerade: bow | rembg | noiseClean=a,b | crop=x,y,w,h |
+//           mask=cx,cy,rx,ry;... | vignette=none | displayName=... | strength=0.6
+//   Line-art-rad: <id><TAB><ref><TAB><era><TAB>athlete<TAB>edges<TAB>bow|crop=0,0,1,0.58|displayName=...
 //
 // Env: FAL_KEY (krävs endast för mode=fal) — sätt i backend/.env.local.
 
@@ -900,6 +903,37 @@ function parseArgs(argv: string[]): Partial<SketchInput> & { batch?: string } {
   return args;
 }
 
+// Batch-TSV-kolumn 6 = valfria flaggor, '|'-separerade (mask-ellipser internt ';'):
+//   bow | rembg | noiseClean=2.0,-130 | crop=0,0,1,0.58 | mask=cx,cy,rx,ry;... |
+//   vignette=none | displayName=Carlos Valderrama | strength=0.6
+// Line-art-produktions-rad är typiskt: ...edges<TAB>bow|crop=...|mask=...|displayName=...
+function parseBatchFlags(flags: string | undefined): Partial<SketchInput> {
+  const out: Partial<SketchInput> = {};
+  if (!flags) return out;
+  for (const f of flags.split('|').map((s) => s.trim()).filter(Boolean)) {
+    const eq = f.indexOf('=');
+    const key = eq === -1 ? f : f.slice(0, eq);
+    const val = eq === -1 ? '' : f.slice(eq + 1);
+    if (key === 'bow') out.bow = true;
+    else if (key === 'rembg') out.rembg = true;
+    else if (key === 'noiseClean') {
+      const [a, b] = val.split(',').map(Number);
+      out.noiseClean = [a, b];
+    } else if (key === 'crop') {
+      const [x, y, w, h] = val.split(',').map(Number);
+      out.crop = { x, y, w, h };
+    } else if (key === 'mask') {
+      out.maskEllipses = val.split(';').map((e) => {
+        const [cx, cy, rx, ry] = e.split(',').map(Number);
+        return { cx, cy, rx, ry };
+      });
+    } else if (key === 'vignette') out.vignette = val as VignetteMode;
+    else if (key === 'displayName') out.displayName = val;
+    else if (key === 'strength') out.strength = parseFloat(val);
+  }
+  return out;
+}
+
 async function runBatch(tsvPath: string): Promise<void> {
   const lines = fs
     .readFileSync(tsvPath, 'utf8')
@@ -909,7 +943,7 @@ async function runBatch(tsvPath: string): Promise<void> {
 
   const results: Array<{ id: string; status: 'ok' | 'err'; msg: string }> = [];
   for (const line of lines) {
-    const [id, ref, era, category, mode] = line.split('\t');
+    const [id, ref, era, category, mode, flags] = line.split('\t');
     if (!id || !ref || !era || !category) {
       results.push({ id: id ?? '<empty>', status: 'err', msg: 'malformed row' });
       continue;
@@ -921,6 +955,7 @@ async function runBatch(tsvPath: string): Promise<void> {
         era,
         category: category as Category,
         mode: (mode as Mode) || undefined,
+        ...parseBatchFlags(flags),
       });
       results.push({ id, status: 'ok', msg: r.assetsPath });
       console.log(`  ✓ ${id} → ${r.assetsPath}`);
@@ -948,7 +983,8 @@ async function main(): Promise<void> {
     console.error('Usage:');
     console.error('  Single: --ref <path|url> --id <id> --era "<era>" --category <athlete|artist|actor|band> [--mode edges|poster|fal|canny|filter] [--strength 0.6]');
     console.error('  Layers: --layers <a,b,c> --id <id> --era "<era>" --category <...> [--mode ...]');
-    console.error('  Batch:  --batch <path-to-tsv>   (cols: id  ref  era  category  [mode])');
+    console.error('  Batch:  --batch <path-to-tsv>   (cols: id  ref  era  category  [mode]  [flags])');
+    console.error('          flags (|-sep): bow|rembg|noiseClean=a,b|crop=x,y,w,h|mask=cx,cy,rx,ry;...|displayName=...');
     process.exit(1);
   }
 

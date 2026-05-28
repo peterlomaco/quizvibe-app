@@ -18,6 +18,7 @@
     "measure-images": "tsx scripts/measure-images.ts",
     "sketch-generate": "tsx --env-file=.env.local sketch/generate.ts",
     "sketch-source": "tsx sketch/source.ts",
+    "sync-quiz-sketches": "tsx scripts/sync-quiz-sketches.ts",
     "build": "tsc"
   },
   "dependencies": {
