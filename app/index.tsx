@@ -2134,6 +2134,22 @@ export default function HomeScreen() {
               </Text>
             )}
           </Pressable>
+          <Text style={[styles.footerDot, { fontFamily: taglineFont }]}>·</Text>
+          {/* Temporär dev-länk: standalone preview av Guess Who split-view-prototypen. */}
+          <Pressable onPress={() => router.push('/guess-who-demo')} hitSlop={8}>
+            {({ pressed }) => (
+              <Text
+                style={[
+                  styles.footerText,
+                  styles.footerLink,
+                  { fontFamily: taglineFont },
+                  pressed && { opacity: 0.6 },
+                ]}
+              >
+                Guess Who demo
+              </Text>
+            )}
+          </Pressable>
         </View>
       </View>
 

@@ -88,6 +88,7 @@ export default function RootLayout() {
         <Stack.Screen name="quiz" />
         <Stack.Screen name="name-quiz-demo" />
         <Stack.Screen name="sketch-demo" />
+        <Stack.Screen name="guess-who-demo" />
       </Stack>
     </GestureHandlerRootView>
   );

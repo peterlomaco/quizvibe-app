@@ -11,6 +11,8 @@ import type { ImageSourcePropType } from 'react-native';
 
 export const QUIZ_SKETCHES: Record<string, ImageSourcePropType> = {
   'carlos-valderrama': require('../../assets/quiz-sketches/carlos-valderrama.webp'),
+  'tomas-brolin': require('../../assets/quiz-sketches/tomas-brolin.webp'),
+  'zlatan-ibrahimovic': require('../../assets/quiz-sketches/zlatan-ibrahimovic.webp'),
 };
 
 /** Finns en tecknad sketch för detta item-id? Driver pencil_sketch-routning. */

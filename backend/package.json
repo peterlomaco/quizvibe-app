@@ -17,6 +17,8 @@
     "export-image-questions": "tsx scripts/export-image-questions.ts",
     "measure-images": "tsx scripts/measure-images.ts",
     "sketch-generate": "tsx --env-file=.env.local sketch/generate.ts",
+    "doodle-generate": "tsx --env-file=.env.local sketch/doodle.ts",
+    "doodle-batch": "tsx --env-file=.env.local sketch/batch-doodle.ts",
     "sketch-source": "tsx sketch/source.ts",
     "sketch-vectorize": "tsx sketch/vectorize.ts",
     "sync-quiz-sketches": "tsx scripts/sync-quiz-sketches.ts",
