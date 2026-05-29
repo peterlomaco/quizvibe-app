@@ -17,6 +17,12 @@ items:
     probability: 88
     wikimediaSearchHints: ["Soft Cell Tainted Love"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "EWZxFSo-XZY"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Soft Cell - Topic"
+        notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: kim-carnes-bette-davis-eyes
     displayName: "Bette Davis Eyes — Kim Carnes"
     correctYear: 1981
@@ -125,6 +131,12 @@ items:
     probability: 92
     wikimediaSearchHints: ["Europe The Final Countdown"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "4hj8M8XZpis"
+        startSec: 30
+        endSec: 45
+        channelTitle: "EUROPE - Topic"
+        notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: bon-jovi-livin-on-a-prayer
     displayName: "Livin' on a Prayer — Bon Jovi"
     correctYear: 1986
@@ -169,6 +181,12 @@ items:
     probability: 88
     wikimediaSearchHints: ["Bobby McFerrin Don't Worry Be Happy"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "qTuntvl6oLQ"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Bobby McFerrin - Topic"
+        notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: tracy-chapman-fast-car
     displayName: "Fast Car — Tracy Chapman"
     correctYear: 1988
@@ -200,6 +218,12 @@ items:
     probability: 82
     wikimediaSearchHints: ["Phil Collins Another Day in Paradise"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "At9FypGZ44M"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Phil Collins"
+        notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (3)."
   # 1990
   - id: sinead-oconnor-nothing-compares-2-u
     displayName: "Nothing Compares 2 U — Sinéad O'Connor"
@@ -207,6 +231,12 @@ items:
     probability: 90
     wikimediaSearchHints: ["Sinead O'Connor Nothing Compares 2 U"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "Ouf9-bOqJVk"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Sinéad O'Connor - Topic"
+        notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: madonna-vogue
     displayName: "Vogue — Madonna"
     correctYear: 1990
@@ -263,6 +293,12 @@ items:
     probability: 82
     wikimediaSearchHints: ["Boyz II Men End of the Road"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "CmeriHkAF5c"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Boyz II Men - Topic"
+        notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   # 1993
   # I Will Always Love You flyttad till songs-all.yaml (cross-gen-iconic) 2026-05-22.
   - id: 4-non-blondes-whats-up
@@ -309,6 +345,12 @@ items:
     probability: 92
     wikimediaSearchHints: ["Oasis Wonderwall"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "FVdjZYfDuLE"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Oasis - Topic"
+        notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: coolio-gangstas-paradise
     displayName: "Gangsta's Paradise — Coolio"
     correctYear: 1995
@@ -377,6 +419,12 @@ items:
     probability: 86
     wikimediaSearchHints: ["Cyndi Lauper Girls Just Want to Have Fun 1983"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "jRr5EasAq84"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Cyndi Lauper - Topic"
+        notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: eurythmics-sweet-dreams
     displayName: "Sweet Dreams (Are Made of This) — Eurythmics"
     correctYear: 1983
@@ -395,6 +443,12 @@ items:
     probability: 87
     wikimediaSearchHints: ["Whitney Houston I Wanna Dance with Somebody 1987"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "2dzf4T3RbEc"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Whitney Houston - Topic"
+        notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: rem-losing-my-religion
     displayName: "Losing My Religion — R.E.M."
     correctYear: 1991
@@ -413,9 +467,21 @@ items:
     probability: 84
     wikimediaSearchHints: ["Metallica Enter Sandman 1991"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "XZuM4zFg-60"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Metallica - Topic"
+        notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: scorpions-wind-of-change
     displayName: "Wind of Change — Scorpions"
     correctYear: 1991
     probability: 83
     wikimediaSearchHints: ["Scorpions Wind of Change 1991"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "F_-ZuVy76yg"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Scorpions - Topic"
+        notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."

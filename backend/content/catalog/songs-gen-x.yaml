@@ -16,6 +16,12 @@ items:
     probability: 92
     wikimediaSearchHints: ["Rolling Stones Satisfaction"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "MSSxnv1_J2g"
+        startSec: 30
+        endSec: 45
+        channelTitle: "The Rolling Stones - Topic"
+        notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: beach-boys-good-vibrations
     displayName: "Good Vibrations — The Beach Boys"
     correctYear: 1966
@@ -144,6 +150,12 @@ items:
     probability: 80
     wikimediaSearchHints: ["Chic Le Freak 1978"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "7PC-AcrHEKU"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Chic - Topic"
+        notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: pink-floyd-another-brick-in-the-wall
     displayName: "Another Brick in the Wall, Part 2 — Pink Floyd"
     correctYear: 1979
@@ -162,6 +174,12 @@ items:
     probability: 90
     wikimediaSearchHints: ["Queen Another One Bites the Dust"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "Y09uL2qbYCg"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Queen - Topic"
+        notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   # Expansion 2026-05-26: 16 nya iconic items för 1965-1978 så density blir
   # 2/år (matchar songs-millennials/gen-z/gen-alpha). Bohemian Rhapsody +
   # Hotel California + Dancing Queen utelämnade — finns i songs-all.yaml.
@@ -339,6 +357,12 @@ items:
     probability: 88
     wikimediaSearchHints: ["Queen We Will Rock You News of the World"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "vDRVTnbuGec"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Queen - Topic"
+        notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: village-people-ymca
     displayName: "Y.M.C.A. — Village People"
     correctYear: 1978
@@ -358,6 +382,12 @@ items:
     probability: 85
     wikimediaSearchHints: ["The Doors Light My Fire 1967"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "qoX6AKuYWL8"
+        startSec: 30
+        endSec: 45
+        channelTitle: "The Doors - Topic"
+        notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: marvin-gaye-whats-going-on
     displayName: "What's Going On — Marvin Gaye"
     correctYear: 1971
@@ -412,3 +442,9 @@ items:
     probability: 88
     wikimediaSearchHints: ["Gloria Gaynor I Will Survive 1978"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "FHhZPp08s74"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Gloria Gaynor - Topic"
+        notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."

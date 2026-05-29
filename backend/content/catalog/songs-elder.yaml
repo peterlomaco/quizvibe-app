@@ -113,6 +113,12 @@ items:
     probability: 80
     wikimediaSearchHints: ["Ella Fitzgerald A-Tisket A-Tasket"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "ETbyLdCoJPw"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Ella Fitzgerald - Topic"
+        notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   # Over the Rainbow flyttad till songs-all.yaml (cross-gen-iconic) 2026-05-22.
   - id: glenn-miller-in-the-mood
     displayName: "In the Mood — Glenn Miller"
@@ -132,6 +138,12 @@ items:
     probability: 82
     wikimediaSearchHints: ["Glenn Miller Chattanooga Choo Choo"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "QGZ6jigic_I"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Glenn Miller Orchestra - Topic"
+        notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: bing-crosby-white-christmas
     displayName: "White Christmas — Bing Crosby"
     correctYear: 1942
@@ -174,6 +186,12 @@ items:
     probability: 80
     wikimediaSearchHints: ["Doris Day Sentimental Journey Les Brown"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "IpQCROAHoU4"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Doris Day - Topic"
+        notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: nat-king-cole-the-christmas-song
     displayName: "The Christmas Song — Nat King Cole"
     correctYear: 1946
@@ -337,6 +355,12 @@ items:
     probability: 80
     wikimediaSearchHints: ["Everly Brothers Cathy's Clown"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "K8fcGgmUv_w"
+        startSec: 30
+        endSec: 45
+        channelTitle: "The Everly Brothers - Topic"
+        notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: ben-e-king-stand-by-me
     displayName: "Stand by Me — Ben E. King"
     correctYear: 1961
@@ -404,6 +428,12 @@ items:
     probability: 78
     wikimediaSearchHints: ["Buddy Holly That'll Be the Day 1957"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "M4TfFTmITLo"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Buddy Holly - Topic"
+        notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: ritchie-valens-la-bamba
     displayName: "La Bamba — Ritchie Valens"
     correctYear: 1958

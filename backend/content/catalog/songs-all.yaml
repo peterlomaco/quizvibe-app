@@ -56,6 +56,12 @@ items:
     probability: 95
     wikimediaSearchHints: ["Queen Bohemian Rhapsody"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "XHrdsx8izBs"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Queen - Topic"
+        notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: eagles-hotel-california
     displayName: "Hotel California — Eagles"
     correctYear: 1976
@@ -80,6 +86,12 @@ items:
     probability: 95
     wikimediaSearchHints: ["Michael Jackson Billie Jean"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "Kr4EQDVETuA"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Michael Jackson - Topic"
+        notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: thriller
     displayName: "Thriller — Michael Jackson"
     correctYear: 1982
@@ -110,6 +122,12 @@ items:
     probability: 95
     wikimediaSearchHints: ["Whitney Houston I Will Always Love You Bodyguard"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "tP0zj220CbQ"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Whitney Houston - Topic"
+        notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: celine-dion-my-heart-will-go-on
     displayName: "My Heart Will Go On — Celine Dion"
     correctYear: 1997
@@ -152,6 +170,12 @@ items:
     probability: 95
     wikimediaSearchHints: ["Avicii Wake Me Up True"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "2NiyrtYegso"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Avicii - Topic"
+        notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: shape-of-you
     displayName: "Shape of You — Ed Sheeran"
     correctYear: 2017
