@@ -21,12 +21,8 @@ items:
     probability: 88
     wikimediaSearchHints: ["Pelé 1958 World Cup Sweden final"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "TYNsrKtV6Mc"
-        startSec: 0
-        endSec: 15
-        channelTitle: "FIFA"
-        notes: "FIFA official channel — Pelé:s mål i Brasilien-Sverige-finalen 1958."
+    # Klipp borttaget 2026-05-29 — FIFA-kanalen blockerar embedded playback
+    # ("Videon ej tillgänglig"). Re-curera från icke-FIFA highlights-källa.
   - id: spitz-1972-munich-olympics
     displayName: "Mark Spitz tar 7 OS-guld i München"
     correctYear: 1972
@@ -105,12 +101,8 @@ items:
     probability: 88
     wikimediaSearchHints: ["Iniesta 2010 World Cup final goal Spain Netherlands"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "3pCPQDxZzfY"
-        startSec: 0
-        endSec: 15
-        channelTitle: "FIFA"
-        notes: "FIFA official channel — Iniesta's målgörande Spanien-Holland 2010 från alla vinklar."
+    # Klipp borttaget 2026-05-29 — FIFA-kanalen blockerar embedded playback.
+    # Re-curera från icke-FIFA highlights-källa.
   - id: bolt-100m-world-record-2009
     displayName: "Usain Bolt slår 100m-VR (9.58s)"
     correctYear: 2009
@@ -174,6 +166,12 @@ items:
     probability: 88
     wikimediaSearchHints: ["Ingemar Stenmark 1980 Lake Placid Olympics giant slalom"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "zFy1OYa7Qm4"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Nostalgi"
+        notes: "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (10)."
   - id: wassberg-os-guld-1980
     displayName: "Thomas Wassberg OS-guld 15 km Lake Placid"
     correctYear: 1980
@@ -576,3 +574,60 @@ items:
         endSec: 13
         channelTitle: "Nordic Skiing And Running Club"
         notes: "Refined query 2026-05-27 — Frida Karlsson Tour de Ski 2023 first win, 13s clip."
+  # === Content-expansion 2026-05-29: fler cross-gen-ikoniska sport-händelser ===
+  - id: ali-rumble-jungle-1974
+    displayName: "Muhammad Ali 'Rumble in the Jungle' mot Foreman"
+    correctYear: 1974
+    probability: 82
+    wikimediaSearchHints: ["Muhammad Ali Rumble in the Jungle 1974 Foreman Zaire"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "M22nWSzyccE"
+        startSec: 30
+        endSec: 45
+        channelTitle: "ElTerribleProduction"
+        notes: "Curerad 2026-05-29 — Ali vs Foreman highlights HD (1974)."
+  - id: maradona-goal-of-century-1986
+    displayName: "Maradonas 'Goal of the Century' mot England"
+    correctYear: 1986
+    probability: 88
+    wikimediaSearchHints: ["Maradona Goal of the Century 1986 England World Cup"]
+    answerMethods: ["timeline"]
+    # Klipp borttaget 2026-05-29 — FIFA-kanalen blockerar embedded playback.
+    # Re-curera från icke-FIFA highlights-källa.
+  - id: jordan-last-shot-1998
+    displayName: "Michael Jordans 'Last Shot' i NBA-finalen"
+    correctYear: 1998
+    probability: 80
+    wikimediaSearchHints: ["Michael Jordan Last Shot 1998 NBA Finals Bulls Jazz"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "AKgDmNrFDow"
+        startSec: 5
+        endSec: 20
+        channelTitle: "Coach Clank"
+        notes: "Curerad 2026-05-29 — Jordans iconic last shot, 1998 NBA Finals (NBA-officiella var region-blockerade)."
+  - id: leicester-premier-league-2016
+    displayName: "Leicester City vinner Premier League"
+    correctYear: 2016
+    probability: 80
+    wikimediaSearchHints: ["Leicester City Premier League title 2016"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "7MHy3eS43FE"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Sky Sports Retro"
+        notes: "Curerad 2026-05-29 — ögonblicket Leicester blev mästare 2016 (Sky Sports)."
+  - id: messi-world-cup-2022
+    displayName: "Messi och Argentina vinner VM i Qatar"
+    correctYear: 2022
+    probability: 88
+    wikimediaSearchHints: ["Messi Argentina World Cup 2022 Qatar final"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "otlAmUJ5wfw"
+        startSec: 0
+        endSec: 15
+        channelTitle: "cfcfootball"
+        notes: "Curerad 2026-05-29 — Messis reaktion på VM-vinsten 2022 (FIFA-officiella var blockerade)."

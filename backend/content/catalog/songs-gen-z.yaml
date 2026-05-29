@@ -371,3 +371,76 @@ items:
         startSec: 0
         endSec: 210
         channelTitle: "Unique Vibes"
+  # === Content-expansion 2026-05-29: fler ikoniska 00-10-tals-låtar ===
+  - id: white-stripes-seven-nation-army
+    displayName: "Seven Nation Army — The White Stripes"
+    correctYear: 2003
+    probability: 88
+    wikimediaSearchHints: ["The White Stripes Seven Nation Army 2003"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "0J2QdDbelmY"
+        startSec: 30
+        endSec: 45
+        channelTitle: "The White Stripes"
+        notes: "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
+  - id: outkast-hey-ya
+    displayName: "Hey Ya! — OutKast"
+    correctYear: 2003
+    probability: 85
+    wikimediaSearchHints: ["OutKast Hey Ya 2003"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "_pYHJWd_yto"
+        startSec: 30
+        endSec: 45
+        channelTitle: "MASTER RJ"
+        notes: "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
+  - id: the-killers-mr-brightside
+    displayName: "Mr. Brightside — The Killers"
+    correctYear: 2004
+    probability: 86
+    wikimediaSearchHints: ["The Killers Mr Brightside 2004"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "yVLRhZiZ5Wc"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Rock Preservation Society"
+        notes: "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
+  - id: adele-rolling-in-the-deep
+    displayName: "Rolling in the Deep — Adele"
+    correctYear: 2010
+    probability: 89
+    wikimediaSearchHints: ["Adele Rolling in the Deep 2010"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "rYEDA3JcQqw"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Adele"
+        notes: "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
+  - id: lmfao-party-rock-anthem
+    displayName: "Party Rock Anthem — LMFAO"
+    correctYear: 2011
+    probability: 85
+    wikimediaSearchHints: ["LMFAO Party Rock Anthem 2011"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "XD96scj1kd8"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Musikmix Germany"
+        notes: "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
+  - id: gotye-somebody-that-i-used-to-know
+    displayName: "Somebody That I Used to Know — Gotye"
+    correctYear: 2011
+    probability: 84
+    wikimediaSearchHints: ["Gotye Somebody That I Used to Know 2011"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "8UVNT4wvIGY"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Gotye"
+        notes: "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."

@@ -17,12 +17,6 @@ items:
     probability: 88
     wikimediaSearchHints: ["Soft Cell Tainted Love"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "QyI975M9FK4"
-        startSec: 30
-        endSec: 45
-        channelTitle: "BBC Music"
-        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: kim-carnes-bette-davis-eyes
     displayName: "Bette Davis Eyes — Kim Carnes"
     correctYear: 1981
@@ -131,12 +125,6 @@ items:
     probability: 92
     wikimediaSearchHints: ["Europe The Final Countdown"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "HyWajWueH2w"
-        startSec: 30
-        endSec: 45
-        channelTitle: "earMUSIC"
-        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: bon-jovi-livin-on-a-prayer
     displayName: "Livin' on a Prayer — Bon Jovi"
     correctYear: 1986
@@ -181,12 +169,6 @@ items:
     probability: 88
     wikimediaSearchHints: ["Bobby McFerrin Don't Worry Be Happy"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "UkpSWy67ClY"
-        startSec: 30
-        endSec: 45
-        channelTitle: "chambers of hourrors"
-        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: tracy-chapman-fast-car
     displayName: "Fast Car — Tracy Chapman"
     correctYear: 1988
@@ -218,12 +200,6 @@ items:
     probability: 82
     wikimediaSearchHints: ["Phil Collins Another Day in Paradise"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "p-YFR5uIrKk"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Phil Collins - Topic"
-        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
   # 1990
   - id: sinead-oconnor-nothing-compares-2-u
     displayName: "Nothing Compares 2 U — Sinéad O'Connor"
@@ -231,12 +207,6 @@ items:
     probability: 90
     wikimediaSearchHints: ["Sinead O'Connor Nothing Compares 2 U"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "5KuGUP-C9Ko"
-        startSec: 30
-        endSec: 45
-        channelTitle: "The Late Late Show"
-        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: madonna-vogue
     displayName: "Vogue — Madonna"
     correctYear: 1990
@@ -293,12 +263,6 @@ items:
     probability: 82
     wikimediaSearchHints: ["Boyz II Men End of the Road"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "GXRABWGZyJc"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Kingscup20"
-        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   # 1993
   # I Will Always Love You flyttad till songs-all.yaml (cross-gen-iconic) 2026-05-22.
   - id: 4-non-blondes-whats-up
@@ -345,12 +309,6 @@ items:
     probability: 92
     wikimediaSearchHints: ["Oasis Wonderwall"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "Ve1EbKsNCdw"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Oasis"
-        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: coolio-gangstas-paradise
     displayName: "Gangsta's Paradise — Coolio"
     correctYear: 1995
@@ -388,3 +346,76 @@ items:
         endSec: 45
         channelTitle: "Los Del Río - Topic"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+  # === Content-expansion 2026-05-29: fler ikoniska 80-90-tals-låtar ===
+  - id: journey-dont-stop-believin
+    displayName: "Don't Stop Believin' — Journey"
+    correctYear: 1981
+    probability: 88
+    wikimediaSearchHints: ["Journey Don't Stop Believin 1981"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "PIFUWHvSixw"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Journey - Topic"
+        notes: "Curerad 2026-05-29 — officiell album-audio via YouTube Topic (1981 studio)."
+  - id: toto-africa
+    displayName: "Africa — Toto"
+    correctYear: 1982
+    probability: 89
+    wikimediaSearchHints: ["Toto Africa 1982"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "U1LB_OerHCE"
+        startSec: 30
+        endSec: 45
+        channelTitle: "7clouds"
+        notes: "Curerad 2026-05-29 — 7clouds lyric-video (katalogens standard-lyric-kanal); ingen officiell Toto-upload tillgänglig i SE."
+  - id: cyndi-lauper-girls-just-want-to-have-fun
+    displayName: "Girls Just Want to Have Fun — Cyndi Lauper"
+    correctYear: 1983
+    probability: 86
+    wikimediaSearchHints: ["Cyndi Lauper Girls Just Want to Have Fun 1983"]
+    answerMethods: ["timeline"]
+  - id: eurythmics-sweet-dreams
+    displayName: "Sweet Dreams (Are Made of This) — Eurythmics"
+    correctYear: 1983
+    probability: 85
+    wikimediaSearchHints: ["Eurythmics Sweet Dreams Are Made of This 1983"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "6KR52lEWLEM"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Enhanced Music Videos"
+        notes: "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
+  - id: whitney-houston-i-wanna-dance-with-somebody
+    displayName: "I Wanna Dance with Somebody — Whitney Houston"
+    correctYear: 1987
+    probability: 87
+    wikimediaSearchHints: ["Whitney Houston I Wanna Dance with Somebody 1987"]
+    answerMethods: ["timeline"]
+  - id: rem-losing-my-religion
+    displayName: "Losing My Religion — R.E.M."
+    correctYear: 1991
+    probability: 81
+    wikimediaSearchHints: ["R.E.M. Losing My Religion 1991"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "xwtdhWltSIg"
+        startSec: 30
+        endSec: 45
+        channelTitle: "remhq"
+        notes: "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (15)."
+  - id: metallica-enter-sandman
+    displayName: "Enter Sandman — Metallica"
+    correctYear: 1991
+    probability: 84
+    wikimediaSearchHints: ["Metallica Enter Sandman 1991"]
+    answerMethods: ["timeline"]
+  - id: scorpions-wind-of-change
+    displayName: "Wind of Change — Scorpions"
+    correctYear: 1991
+    probability: 83
+    wikimediaSearchHints: ["Scorpions Wind of Change 1991"]
+    answerMethods: ["timeline"]

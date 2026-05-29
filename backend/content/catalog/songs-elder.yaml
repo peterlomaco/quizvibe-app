@@ -113,12 +113,6 @@ items:
     probability: 80
     wikimediaSearchHints: ["Ella Fitzgerald A-Tisket A-Tasket"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "AeQlHNDB9no"
-        startSec: 30
-        endSec: 45
-        channelTitle: "The Culture Vaults"
-        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   # Over the Rainbow flyttad till songs-all.yaml (cross-gen-iconic) 2026-05-22.
   - id: glenn-miller-in-the-mood
     displayName: "In the Mood — Glenn Miller"
@@ -138,12 +132,6 @@ items:
     probability: 82
     wikimediaSearchHints: ["Glenn Miller Chattanooga Choo Choo"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "hae8bYKARr4"
-        startSec: 30
-        endSec: 45
-        channelTitle: "3 Roads Communications"
-        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: bing-crosby-white-christmas
     displayName: "White Christmas — Bing Crosby"
     correctYear: 1942
@@ -186,12 +174,6 @@ items:
     probability: 80
     wikimediaSearchHints: ["Doris Day Sentimental Journey Les Brown"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "M3y0KbLvWLY"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Buzz Stephens"
-        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: nat-king-cole-the-christmas-song
     displayName: "The Christmas Song — Nat King Cole"
     correctYear: 1946
@@ -355,12 +337,6 @@ items:
     probability: 80
     wikimediaSearchHints: ["Everly Brothers Cathy's Clown"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "MhOTUZbS2Fw"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Magda0815007"
-        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: ben-e-king-stand-by-me
     displayName: "Stand by Me — Ben E. King"
     correctYear: 1961
@@ -409,3 +385,46 @@ items:
         endSec: 45
         channelTitle: "The Beatles - Topic"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+  # === Content-expansion 2026-05-29: fler ikoniska 50-60-tals-låtar ===
+  - id: little-richard-tutti-frutti
+    displayName: "Tutti Frutti — Little Richard"
+    correctYear: 1955
+    probability: 82
+    wikimediaSearchHints: ["Little Richard Tutti Frutti 1955"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "eQ-U2kGDHSI"
+        startSec: 28
+        endSec: 43
+        channelTitle: "OLD TAPES"
+        notes: "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (10)."
+  - id: buddy-holly-thatll-be-the-day
+    displayName: "That'll Be the Day — Buddy Holly"
+    correctYear: 1957
+    probability: 78
+    wikimediaSearchHints: ["Buddy Holly That'll Be the Day 1957"]
+    answerMethods: ["timeline"]
+  - id: ritchie-valens-la-bamba
+    displayName: "La Bamba — Ritchie Valens"
+    correctYear: 1958
+    probability: 80
+    wikimediaSearchHints: ["Ritchie Valens La Bamba 1958"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "BycLmWI97Nc"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Ritchie Valens - Topic"
+        notes: "Curerad 2026-05-29 — officiell single-version via YouTube Topic (1958 original, ej Los Lobos/film)."
+  - id: sam-cooke-a-change-is-gonna-come
+    displayName: "A Change Is Gonna Come — Sam Cooke"
+    correctYear: 1964
+    probability: 76
+    wikimediaSearchHints: ["Sam Cooke A Change Is Gonna Come 1964"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "Z5zDRtEC0x0"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Sam Cooke - Topic"
+        notes: "Curerad 2026-05-29 — officiell album-audio via YouTube Topic (Sam Cooke-originalet, ej Brian Owens-cover)."

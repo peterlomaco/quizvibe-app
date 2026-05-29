@@ -225,12 +225,24 @@ items:
     probability: 85
     wikimediaSearchHints: ["Cool Runnings 1993 film Jamaican bobsled Disney"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "3mS-l1F5Xvs"
+        startSec: 15
+        endSec: 30
+        channelTitle: "DVDizzydotcom"
+        notes: "Curerad 2026-05-29 — original 1993-trailer (1080p HD-upscale)."
   - id: million-dollar-baby-2004
     displayName: "Million Dollar Baby"
     correctYear: 2004
     probability: 82
     wikimediaSearchHints: ["Million Dollar Baby 2004 film Clint Eastwood boxing"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "5_RsHRmIRBY"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Rotten Tomatoes Classic Trailers"
+        notes: "Curerad 2026-05-29 — officiell 2004-trailer (Swank/Eastwood). Ej Ava Max-låten."
   - id: moneyball-2011
     displayName: "Moneyball"
     correctYear: 2011
@@ -255,3 +267,88 @@ items:
         endSec: 45
         channelTitle: "SF Studios"
         notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (13)."
+  # === Content-expansion 2026-05-29: fler cross-gen-ikoniska filmer ===
+  - id: grease-1978
+    displayName: "Grease"
+    correctYear: 1978
+    probability: 88
+    wikimediaSearchHints: ["Grease 1978 film Travolta Newton-John"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "aOpnnrS4ags"
+        startSec: 20
+        endSec: 35
+        channelTitle: "Frankie Valli and the Four Seasons"
+        notes: "Curerad 2026-05-29 — Grease-titelmelodin (Frankie Valli, TOTP 1978). Officiell artist-kanal."
+  - id: the-terminator-1984
+    displayName: "The Terminator"
+    correctYear: 1984
+    probability: 88
+    wikimediaSearchHints: ["The Terminator 1984 film Schwarzenegger Cameron"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "nGrW-OR2uDk"
+        startSec: 15
+        endSec: 30
+        channelTitle: "Amazon MGM Studios"
+        notes: "Curerad 2026-05-29 — officiell 1984-trailer (MGM)."
+  - id: the-lion-king-1994
+    displayName: "The Lion King"
+    correctYear: 1994
+    probability: 93
+    wikimediaSearchHints: ["The Lion King 1994 Disney film"]
+    answerMethods: ["timeline"]
+  - id: gladiator-2000
+    displayName: "Gladiator"
+    correctYear: 2000
+    probability: 90
+    wikimediaSearchHints: ["Gladiator 2000 film Russell Crowe Ridley Scott"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "gDbltV8z7dQ"
+        startSec: 5
+        endSec: 20
+        channelTitle: "Paramount Movies"
+        notes: "Curerad 2026-05-29 — officiell Paramount-klipp 'My name is Maximus' (2000-filmen, ej Gladiator II)."
+  - id: lotr-fellowship-2001
+    displayName: "The Lord of the Rings: The Fellowship of the Ring"
+    correctYear: 2001
+    probability: 89
+    wikimediaSearchHints: ["Lord of the Rings Fellowship of the Ring 2001 film"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "V75dMMIW2B4"
+        startSec: 15
+        endSec: 30
+        channelTitle: "Movieclips"
+        notes: "Curerad 2026-05-29 — officiell 2001-trailer #1 (Movieclips)."
+  - id: harry-potter-philosophers-stone-2001
+    displayName: "Harry Potter and the Philosopher's Stone"
+    correctYear: 2001
+    probability: 91
+    wikimediaSearchHints: ["Harry Potter Philosopher's Stone 2001 film"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "iSItf2y7hgs"
+        startSec: 30
+        endSec: 45
+        channelTitle: "ClipZone: Heroes & Villains"
+        notes: "Curerad 2026-05-29 — scen ur 2001-filmen (ej 2026 HBO-reboot-teaser)."
+  - id: the-dark-knight-2008
+    displayName: "The Dark Knight"
+    correctYear: 2008
+    probability: 90
+    wikimediaSearchHints: ["The Dark Knight 2008 film Nolan Batman"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "EXeTwQWrcwY"
+        startSec: 15
+        endSec: 30
+        channelTitle: "Rotten Tomatoes Classic Trailers"
+        notes: "Curerad 2026-05-29 — officiell 2008-trailer #1 (Nolan)."
+  - id: frozen-2013
+    displayName: "Frozen"
+    correctYear: 2013
+    probability: 91
+    wikimediaSearchHints: ["Frozen 2013 Disney film Let It Go"]
+    answerMethods: ["timeline"]

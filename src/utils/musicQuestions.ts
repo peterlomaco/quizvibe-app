@@ -187,26 +187,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "ella-fitzgerald-a-tisket-a-tasket",
-    "displayName": "A-Tisket, A-Tasket — Ella Fitzgerald",
-    "correctYear": 1938,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "AeQlHNDB9no",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "The Culture Vaults",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
-      }
-    ]
-  },
-  {
     "id": "judy-garland-over-the-rainbow",
     "displayName": "Over the Rainbow — Judy Garland",
     "correctYear": 1939,
@@ -243,26 +223,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Glenn Miller Orchestra - Topic",
         "license": "standard",
         "notes": "Officiell album-audio via YouTube Topic. Iconic swing-intro."
-      }
-    ]
-  },
-  {
-    "id": "glenn-miller-chattanooga-choo-choo",
-    "displayName": "Chattanooga Choo Choo — Glenn Miller",
-    "correctYear": 1941,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "hae8bYKARr4",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "3 Roads Communications",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
       }
     ]
   },
@@ -321,26 +281,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "startSec": 30,
         "endSec": 45,
         "channelTitle": "Classic Mood Experience",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
-      }
-    ]
-  },
-  {
-    "id": "doris-day-sentimental-journey",
-    "displayName": "Sentimental Journey — Doris Day",
-    "correctYear": 1945,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "M3y0KbLvWLY",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Buzz Stephens",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
       }
@@ -547,6 +487,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "little-richard-tutti-frutti",
+    "displayName": "Tutti Frutti — Little Richard",
+    "correctYear": 1955,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "eQ-U2kGDHSI",
+        "startSec": 28,
+        "endSec": 43,
+        "channelTitle": "OLD TAPES",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
     "id": "elvis-presley-heartbreak-hotel",
     "displayName": "Heartbreak Hotel — Elvis Presley",
     "correctYear": 1956,
@@ -607,22 +567,22 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "pele-1958-world-cup",
-    "displayName": "Pelé 17-årig vinner sin första VM",
+    "id": "ritchie-valens-la-bamba",
+    "displayName": "La Bamba — Ritchie Valens",
     "correctYear": 1958,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
     "audiences": [
-      "all"
+      "elder"
     ],
     "youtubeClips": [
       {
-        "videoId": "TYNsrKtV6Mc",
-        "startSec": 0,
-        "endSec": 15,
-        "channelTitle": "FIFA",
+        "videoId": "BycLmWI97Nc",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Ritchie Valens - Topic",
         "license": "standard",
-        "notes": "FIFA official channel — Pelé:s mål i Brasilien-Sverige-finalen 1958."
+        "notes": "Curerad 2026-05-29 — officiell single-version via YouTube Topic (1958 original, ej Los Lobos/film)."
       }
     ]
   },
@@ -661,26 +621,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "startSec": 30,
         "endSec": 45,
         "channelTitle": "Classic Mood Experience",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
-      }
-    ]
-  },
-  {
-    "id": "everly-brothers-cathys-clown",
-    "displayName": "Cathy's Clown — The Everly Brothers",
-    "correctYear": 1960,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "MhOTUZbS2Fw",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Magda0815007",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
       }
@@ -767,23 +707,22 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "rolling-stones-satisfaction",
-    "displayName": "(I Can't Get No) Satisfaction — The Rolling Stones",
-    "correctYear": 1965,
+    "id": "sam-cooke-a-change-is-gonna-come",
+    "displayName": "A Change Is Gonna Come — Sam Cooke",
+    "correctYear": 1964,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-x",
       "elder"
     ],
     "youtubeClips": [
       {
-        "videoId": "g5W4k6vD2WY",
+        "videoId": "Z5zDRtEC0x0",
         "startSec": 30,
         "endSec": 45,
-        "channelTitle": "The Rolling Stones",
+        "channelTitle": "Sam Cooke - Topic",
         "license": "standard",
-        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (13)."
+        "notes": "Curerad 2026-05-29 — officiell album-audio via YouTube Topic (Sam Cooke-originalet, ej Brian Owens-cover)."
       }
     ]
   },
@@ -1124,6 +1063,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "marvin-gaye-whats-going-on",
+    "displayName": "What's Going On — Marvin Gaye",
+    "correctYear": 1971,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "ApthDWoPMFQ",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Marvin Gaye - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (2)."
+      }
+    ]
+  },
+  {
     "id": "bill-withers-lean-on-me",
     "displayName": "Lean on Me — Bill Withers",
     "correctYear": 1972,
@@ -1145,6 +1105,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "deep-purple-smoke-on-the-water",
+    "displayName": "Smoke on the Water — Deep Purple",
+    "correctYear": 1972,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "qK7j_EERgT4",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Deep Purple - Topic",
+        "license": "standard",
+        "notes": "Curerad 2026-05-29 — officiell album-audio via YouTube Topic (2024 remaster av 1972-originalet, ej Rock Aid Armenia-versionen)."
+      }
+    ]
+  },
+  {
     "id": "spitz-1972-munich-olympics",
     "displayName": "Mark Spitz tar 7 OS-guld i München",
     "correctYear": 1972,
@@ -1161,6 +1142,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Olympics",
         "license": "standard",
         "notes": "Olympics official channel — Spitz 7 OS-guld München 1972."
+      }
+    ]
+  },
+  {
+    "id": "stevie-wonder-superstition",
+    "displayName": "Superstition — Stevie Wonder",
+    "correctYear": 1972,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "7_tmeHCO1IM",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Weedy Weed Smoker",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
       }
     ]
   },
@@ -1248,6 +1250,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "ali-rumble-jungle-1974",
+    "displayName": "Muhammad Ali 'Rumble in the Jungle' mot Foreman",
+    "correctYear": 1974,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "M22nWSzyccE",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "ElTerribleProduction",
+        "license": "standard",
+        "notes": "Curerad 2026-05-29 — Ali vs Foreman highlights HD (1974)."
+      }
+    ]
+  },
+  {
     "id": "lynyrd-skynyrd-sweet-home-alabama",
     "displayName": "Sweet Home Alabama — Lynyrd Skynyrd",
     "correctYear": 1974,
@@ -1265,6 +1287,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Lynyrd Skynyrd - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
+    "id": "bruce-springsteen-born-to-run",
+    "displayName": "Born to Run — Bruce Springsteen",
+    "correctYear": 1975,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "Wu4_zVxmufY",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Bruce Springsteen - Topic",
+        "license": "standard",
+        "notes": "Curerad 2026-05-29 — officiell album-audio via YouTube Topic (1975 studio-version)."
       }
     ]
   },
@@ -1289,22 +1332,23 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "queen-bohemian-rhapsody",
-    "displayName": "Bohemian Rhapsody — Queen",
-    "correctYear": 1975,
+    "id": "abba-mamma-mia",
+    "displayName": "Mamma Mia — ABBA",
+    "correctYear": 1976,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "all"
+      "gen-x",
+      "elder"
     ],
     "youtubeClips": [
       {
-        "videoId": "vbvyNnw8Qjg",
+        "videoId": "KMViJKmAV4M",
         "startSec": 30,
         "endSec": 45,
-        "channelTitle": "Live Aid",
+        "channelTitle": "ABBA - Topic",
         "license": "standard",
-        "notes": "Live Aid 1985 — iconic Freddie Mercury-performance. Mid-song."
+        "notes": "Curerad 2026-05-29 — officiell album-audio via YouTube Topic (ABBA studio-version, ej film-soundtrack)."
       }
     ]
   },
@@ -1325,26 +1369,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "MASTER RJ",
         "license": "standard",
         "notes": "Official Video Remaster — rörlig MV med dans/scen. Refrängområde."
-      }
-    ]
-  },
-  {
-    "id": "eagles-hotel-california",
-    "displayName": "Hotel California — Eagles",
-    "correctYear": 1976,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "all"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "PNEv3koIeaE",
-        "startSec": 65,
-        "endSec": 80,
-        "channelTitle": "Mark Tandle",
-        "license": "standard",
-        "notes": "1994 Hell Freezes Over Acoustic Live — hoppar förbi 12-string-intro till Don Henley:s vocal-start (\"On a dark desert highway\")."
       }
     ]
   },
@@ -1410,6 +1434,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "fleetwood-mac-go-your-own-way",
+    "displayName": "Go Your Own Way — Fleetwood Mac",
+    "correctYear": 1977,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "oiosqtFLBBA",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Fleetwood Mac",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (3)."
+      }
+    ]
+  },
+  {
     "id": "star-wars-new-hope",
     "displayName": "Star Wars: A New Hope",
     "correctYear": 1977,
@@ -1430,8 +1475,28 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "chic-le-freak",
-    "displayName": "Le Freak — Chic",
+    "id": "grease-1978",
+    "displayName": "Grease",
+    "correctYear": 1978,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "aOpnnrS4ags",
+        "startSec": 20,
+        "endSec": 35,
+        "channelTitle": "Frankie Valli and the Four Seasons",
+        "license": "standard",
+        "notes": "Curerad 2026-05-29 — Grease-titelmelodin (Frankie Valli, TOTP 1978). Officiell artist-kanal."
+      }
+    ]
+  },
+  {
+    "id": "village-people-ymca",
+    "displayName": "Y.M.C.A. — Village People",
     "correctYear": 1978,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
@@ -1441,12 +1506,12 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "youtubeClips": [
       {
-        "videoId": "kb0S0oypx_o",
+        "videoId": "fvzs2ozG-mc",
         "startSec": 30,
         "endSec": 45,
-        "channelTitle": "BBC Music",
+        "channelTitle": "PRIVADO 80s",
         "license": "standard",
-        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
+        "notes": "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (10)."
       }
     ]
   },
@@ -1512,27 +1577,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "queen-another-one-bites-the-dust",
-    "displayName": "Another One Bites the Dust — Queen",
-    "correctYear": 1980,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "gen-x",
-      "elder"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "x3SlTBOfMww",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Queen Official",
-        "license": "standard",
-        "notes": "Live at Montreal Forum 1981 (Remastered) — official Queen-kanal. Iconic bassline."
-      }
-    ]
-  },
-  {
     "id": "raging-bull-1980",
     "displayName": "Raging Bull",
     "correctYear": 1980,
@@ -1569,6 +1613,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Nostalgi",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
+    "id": "stenmark-os-guld-storslalom-1980",
+    "displayName": "Stenmark OS-guld storslalom Lake Placid",
+    "correctYear": 1980,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "zFy1OYa7Qm4",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Nostalgi",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (10)."
       }
     ]
   },
@@ -1633,6 +1697,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "journey-dont-stop-believin",
+    "displayName": "Don't Stop Believin' — Journey",
+    "correctYear": 1981,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "PIFUWHvSixw",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Journey - Topic",
+        "license": "standard",
+        "notes": "Curerad 2026-05-29 — officiell album-audio via YouTube Topic (1981 studio)."
+      }
+    ]
+  },
+  {
     "id": "kim-carnes-bette-davis-eyes",
     "displayName": "Bette Davis Eyes — Kim Carnes",
     "correctYear": 1981,
@@ -1654,27 +1739,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "soft-cell-tainted-love",
-    "displayName": "Tainted Love — Soft Cell",
-    "correctYear": 1981,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "millennials",
-      "gen-x"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "QyI975M9FK4",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "BBC Music",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
-      }
-    ]
-  },
-  {
     "id": "e-t-the-extra-terrestrial",
     "displayName": "E.T. the Extra-Terrestrial",
     "correctYear": 1982,
@@ -1691,26 +1755,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "IMAX",
         "license": "standard",
         "notes": "IMAX official trailer — John Williams theme + iconic bicycle/moon-scen."
-      }
-    ]
-  },
-  {
-    "id": "michael-jackson-billie-jean",
-    "displayName": "Billie Jean — Michael Jackson",
-    "correctYear": 1982,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "all"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "CauNjt2j-BM",
-        "startSec": 40,
-        "endSec": 55,
-        "channelTitle": "New Michael Jackson",
-        "license": "standard",
-        "notes": "Motown 25 1983 performance — iconic moonwalk + era-defining."
       }
     ]
   },
@@ -1752,6 +1796,48 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "prod. ovr",
         "license": "standard",
         "notes": "Official Shortened 4K Video — rörlig MV (zombiedans). Mid-song."
+      }
+    ]
+  },
+  {
+    "id": "toto-africa",
+    "displayName": "Africa — Toto",
+    "correctYear": 1982,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "U1LB_OerHCE",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "7clouds",
+        "license": "standard",
+        "notes": "Curerad 2026-05-29 — 7clouds lyric-video (katalogens standard-lyric-kanal); ingen officiell Toto-upload tillgänglig i SE."
+      }
+    ]
+  },
+  {
+    "id": "eurythmics-sweet-dreams",
+    "displayName": "Sweet Dreams (Are Made of This) — Eurythmics",
+    "correctYear": 1983,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "6KR52lEWLEM",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Enhanced Music Videos",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
       }
     ]
   },
@@ -1859,6 +1945,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "the-terminator-1984",
+    "displayName": "The Terminator",
+    "correctYear": 1984,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "nGrW-OR2uDk",
+        "startSec": 15,
+        "endSec": 30,
+        "channelTitle": "Amazon MGM Studios",
+        "license": "standard",
+        "notes": "Curerad 2026-05-29 — officiell 1984-trailer (MGM)."
+      }
+    ]
+  },
+  {
     "id": "wham-wake-me-up-before-you-go-go",
     "displayName": "Wake Me Up Before You Go-Go — Wham!",
     "correctYear": 1984,
@@ -1959,27 +2065,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Jon Bon Jovi - Topic",
         "license": "standard",
         "notes": "Officiell album-audio via YouTube Topic. 'Whoaa, we're halfway there'-refräng."
-      }
-    ]
-  },
-  {
-    "id": "europe-the-final-countdown",
-    "displayName": "The Final Countdown — Europe",
-    "correctYear": 1986,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "millennials",
-      "gen-x"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "HyWajWueH2w",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "earMUSIC",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
       }
     ]
   },
@@ -2106,27 +2191,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "bobby-mcferrin-dont-worry-be-happy",
-    "displayName": "Don't Worry, Be Happy — Bobby McFerrin",
-    "correctYear": 1988,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "millennials",
-      "gen-x"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "UkpSWy67ClY",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "chambers of hourrors",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
-      }
-    ]
-  },
-  {
     "id": "tracy-chapman-fast-car",
     "displayName": "Fast Car — Tracy Chapman",
     "correctYear": 1988,
@@ -2189,27 +2253,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "phil-collins-another-day-in-paradise",
-    "displayName": "Another Day in Paradise — Phil Collins",
-    "correctYear": 1989,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "millennials",
-      "gen-x"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "p-YFR5uIrKk",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Phil Collins - Topic",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
-      }
-    ]
-  },
-  {
     "id": "stenmark-86-segrar-1989",
     "displayName": "Stenmarks 86:e (sista) världscupseger",
     "correctYear": 1989,
@@ -2247,27 +2290,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "MVIDEO4K",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (15)."
-      }
-    ]
-  },
-  {
-    "id": "sinead-oconnor-nothing-compares-2-u",
-    "displayName": "Nothing Compares 2 U — Sinéad O'Connor",
-    "correctYear": 1990,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "millennials",
-      "gen-x"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "5KuGUP-C9Ko",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "The Late Late Show",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
       }
     ]
   },
@@ -2314,6 +2336,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "rem-losing-my-religion",
+    "displayName": "Losing My Religion — R.E.M.",
+    "correctYear": 1991,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "xwtdhWltSIg",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "remhq",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (15)."
+      }
+    ]
+  },
+  {
     "id": "smells-like-teen-spirit",
     "displayName": "Smells Like Teen Spirit — Nirvana",
     "correctYear": 1991,
@@ -2350,27 +2393,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Daniel Risarp",
         "license": "standard",
         "notes": "Refined query 2026-05-27 — 'Mats Sundin avgör när Tre Kronor tar VM guld 1991'."
-      }
-    ]
-  },
-  {
-    "id": "boyz-ii-men-end-of-the-road",
-    "displayName": "End of the Road — Boyz II Men",
-    "correctYear": 1992,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "millennials",
-      "gen-x"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "GXRABWGZyJc",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Kingscup20",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
       }
     ]
   },
@@ -2457,6 +2479,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "cool-runnings-1993",
+    "displayName": "Cool Runnings",
+    "correctYear": 1993,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "3mS-l1F5Xvs",
+        "startSec": 15,
+        "endSec": 30,
+        "channelTitle": "DVDizzydotcom",
+        "license": "standard",
+        "notes": "Curerad 2026-05-29 — original 1993-trailer (1080p HD-upscale)."
+      }
+    ]
+  },
+  {
     "id": "jurassic-park",
     "displayName": "Jurassic Park",
     "correctYear": 1993,
@@ -2473,26 +2515,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Universal Pictures At Home",
         "license": "standard",
         "notes": "Official Universal Pictures-klipp 4K — iconic theme + dinosaur-reveal."
-      }
-    ]
-  },
-  {
-    "id": "whitney-houston-i-will-always-love-you",
-    "displayName": "I Will Always Love You — Whitney Houston",
-    "correctYear": 1993,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "all"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "mK4hweZRU0k",
-        "startSec": 100,
-        "endSec": 115,
-        "channelTitle": "roelofjan1986",
-        "license": "standard",
-        "notes": "World Music Awards 1994 — iconic high-note chorus."
       }
     ]
   },
@@ -2680,27 +2702,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "oasis-wonderwall",
-    "displayName": "Wonderwall — Oasis",
-    "correctYear": 1995,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "millennials",
-      "gen-x"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "Ve1EbKsNCdw",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Oasis",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
-      }
-    ]
-  },
-  {
     "id": "los-del-rio-macarena",
     "displayName": "Macarena — Los del Río",
     "correctYear": 1996,
@@ -2843,6 +2844,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "jordan-last-shot-1998",
+    "displayName": "Michael Jordans 'Last Shot' i NBA-finalen",
+    "correctYear": 1998,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "AKgDmNrFDow",
+        "startSec": 5,
+        "endSec": 20,
+        "channelTitle": "Coach Clank",
+        "license": "standard",
+        "notes": "Curerad 2026-05-29 — Jordans iconic last shot, 1998 NBA Finals (NBA-officiella var region-blockerade)."
+      }
+    ]
+  },
+  {
     "id": "madonna-frozen",
     "displayName": "Frozen — Madonna",
     "correctYear": 1998,
@@ -2963,6 +2984,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "gladiator-2000",
+    "displayName": "Gladiator",
+    "correctYear": 2000,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "gDbltV8z7dQ",
+        "startSec": 5,
+        "endSec": 20,
+        "channelTitle": "Paramount Movies",
+        "license": "standard",
+        "notes": "Curerad 2026-05-29 — officiell Paramount-klipp 'My name is Maximus' (2000-filmen, ej Gladiator II)."
+      }
+    ]
+  },
+  {
     "id": "alicia-keys-fallin",
     "displayName": "Fallin' — Alicia Keys",
     "correctYear": 2001,
@@ -2979,6 +3020,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 211,
         "channelTitle": "Bussin",
         "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "harry-potter-philosophers-stone-2001",
+    "displayName": "Harry Potter and the Philosopher's Stone",
+    "correctYear": 2001,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "iSItf2y7hgs",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "ClipZone: Heroes & Villains",
+        "license": "standard",
+        "notes": "Curerad 2026-05-29 — scen ur 2001-filmen (ej 2026 HBO-reboot-teaser)."
       }
     ]
   },
@@ -3000,6 +3061,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "MUSIC EVOLUTION",
         "license": "standard",
         "notes": "Official Video 4K 60fps remaster — HD-fix av tidigare SD-klipp 2026-05-22. Refrängområde."
+      }
+    ]
+  },
+  {
+    "id": "lotr-fellowship-2001",
+    "displayName": "The Lord of the Rings: The Fellowship of the Ring",
+    "correctYear": 2001,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "V75dMMIW2B4",
+        "startSec": 15,
+        "endSec": 30,
+        "channelTitle": "Movieclips",
+        "license": "standard",
+        "notes": "Curerad 2026-05-29 — officiell 2001-trailer #1 (Movieclips)."
       }
     ]
   },
@@ -3105,6 +3186,48 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "outkast-hey-ya",
+    "displayName": "Hey Ya! — OutKast",
+    "correctYear": 2003,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-z",
+      "millennials"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "_pYHJWd_yto",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "MASTER RJ",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
+      }
+    ]
+  },
+  {
+    "id": "white-stripes-seven-nation-army",
+    "displayName": "Seven Nation Army — The White Stripes",
+    "correctYear": 2003,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-z",
+      "millennials"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "0J2QdDbelmY",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "The White Stripes",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
+      }
+    ]
+  },
+  {
     "id": "carolina-kluft-os-guld-2004",
     "displayName": "Carolina Klüft OS-guld sjukamp Aten",
     "correctYear": 2004,
@@ -3145,6 +3268,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "million-dollar-baby-2004",
+    "displayName": "Million Dollar Baby",
+    "correctYear": 2004,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "5_RsHRmIRBY",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Rotten Tomatoes Classic Trailers",
+        "license": "standard",
+        "notes": "Curerad 2026-05-29 — officiell 2004-trailer (Swank/Eastwood). Ej Ava Max-låten."
+      }
+    ]
+  },
+  {
     "id": "o-zone-dragostea-din-tei",
     "displayName": "Dragostea Din Tei — O-Zone",
     "correctYear": 2004,
@@ -3181,6 +3324,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "MaramaGitz",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
+    "id": "the-killers-mr-brightside",
+    "displayName": "Mr. Brightside — The Killers",
+    "correctYear": 2004,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-z",
+      "millennials"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "yVLRhZiZ5Wc",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Rock Preservation Society",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
       }
     ]
   },
@@ -3445,6 +3609,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "the-dark-knight-2008",
+    "displayName": "The Dark Knight",
+    "correctYear": 2008,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "EXeTwQWrcwY",
+        "startSec": 15,
+        "endSec": 30,
+        "channelTitle": "Rotten Tomatoes Classic Trailers",
+        "license": "standard",
+        "notes": "Curerad 2026-05-29 — officiell 2008-trailer #1 (Nolan)."
+      }
+    ]
+  },
+  {
     "id": "avatar",
     "displayName": "Avatar",
     "correctYear": 2009,
@@ -3525,6 +3709,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "adele-rolling-in-the-deep",
+    "displayName": "Rolling in the Deep — Adele",
+    "correctYear": 2010,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-z",
+      "millennials"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "rYEDA3JcQqw",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Adele",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
+      }
+    ]
+  },
+  {
     "id": "eminem-rihanna-love-the-way-you-lie",
     "displayName": "Love the Way You Lie — Eminem & Rihanna",
     "correctYear": 2010,
@@ -3541,26 +3746,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 264,
         "channelTitle": "Eminem - Topic",
         "license": "standard"
-      }
-    ]
-  },
-  {
-    "id": "iniesta-world-cup-final-goal-2010",
-    "displayName": "Iniesta gör VM-finalmålet",
-    "correctYear": 2010,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "audiences": [
-      "all"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "3pCPQDxZzfY",
-        "startSec": 0,
-        "endSec": 15,
-        "channelTitle": "FIFA",
-        "license": "standard",
-        "notes": "FIFA official channel — Iniesta's målgörande Spanien-Holland 2010 från alla vinklar."
       }
     ]
   },
@@ -3645,6 +3830,48 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "gotye-somebody-that-i-used-to-know",
+    "displayName": "Somebody That I Used to Know — Gotye",
+    "correctYear": 2011,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-z",
+      "millennials"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "8UVNT4wvIGY",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Gotye",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
+      }
+    ]
+  },
+  {
+    "id": "lmfao-party-rock-anthem",
+    "displayName": "Party Rock Anthem — LMFAO",
+    "correctYear": 2011,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-z",
+      "millennials"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "XD96scj1kd8",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Musikmix Germany",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
+      }
+    ]
+  },
+  {
     "id": "moneyball-2011",
     "displayName": "Moneyball",
     "correctYear": 2011,
@@ -3725,26 +3952,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "avicii-wake-me-up",
-    "displayName": "Wake Me Up — Avicii",
-    "correctYear": 2013,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "all"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "Orp4k_YkE5w",
-        "startSec": 10,
-        "endSec": 25,
-        "channelTitle": "Avicii",
-        "license": "standard",
-        "notes": "Avicii Tribute Concert 2019 — Aloe Blacc-vokal. Intro/vers."
-      }
-    ]
-  },
-  {
     "id": "daft-punk-get-lucky",
     "displayName": "Get Lucky — Daft Punk",
     "correctYear": 2013,
@@ -3781,6 +3988,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "VMValdifiemme2013",
         "license": "standard",
         "notes": "Refined query 2026-05-27 — 'AMAZING Johan Olsson Men's 50 Km Val di Fiemme 2013'."
+      }
+    ]
+  },
+  {
+    "id": "ed-sheeran-thinking-out-loud",
+    "displayName": "Thinking Out Loud — Ed Sheeran",
+    "correctYear": 2014,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-alpha",
+      "gen-z"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "lp-EO5I60KA",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Ed Sheeran",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
       }
     ]
   },
@@ -3945,6 +4173,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "leicester-premier-league-2016",
+    "displayName": "Leicester City vinner Premier League",
+    "correctYear": 2016,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "7MHy3eS43FE",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Sky Sports Retro",
+        "license": "standard",
+        "notes": "Curerad 2026-05-29 — ögonblicket Leicester blev mästare 2016 (Sky Sports)."
+      }
+    ]
+  },
+  {
     "id": "sarah-sjostrom-os-guld-rio-2016",
     "displayName": "Sarah Sjöström OS-guld 100m fjäril Rio",
     "correctYear": 2016,
@@ -3961,6 +4209,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Nyhetsmorgon",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
+    "id": "sia-cheap-thrills",
+    "displayName": "Cheap Thrills — Sia",
+    "correctYear": 2016,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-alpha",
+      "gen-z"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "HbzZPpWr4MI",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Sia - Topic",
+        "license": "standard",
+        "notes": "Curerad 2026-05-29 — officiell album-audio via YouTube Topic."
       }
     ]
   },
@@ -4021,6 +4290,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Australian Open",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
+    "id": "imagine-dragons-believer",
+    "displayName": "Believer — Imagine Dragons",
+    "correctYear": 2017,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-alpha",
+      "gen-z"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "3uSfERhxvlg",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Imagine Dragons - Topic",
+        "license": "standard",
+        "notes": "Curerad 2026-05-29 — officiell album-audio via YouTube Topic (ej barnkör-cover)."
       }
     ]
   },
@@ -4205,22 +4495,23 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "weeknd-blinding-lights",
-    "displayName": "Blinding Lights — The Weeknd",
+    "id": "tones-and-i-dance-monkey",
+    "displayName": "Dance Monkey — Tones and I",
     "correctYear": 2019,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "all"
+      "gen-alpha",
+      "gen-z"
     ],
     "youtubeClips": [
       {
-        "videoId": "sveiX_mA9A4",
+        "videoId": "q0hyYWKXF0Q",
         "startSec": 30,
         "endSec": 45,
-        "channelTitle": "The Late Show with Stephen Colbert",
+        "channelTitle": "Tones And I",
         "license": "standard",
-        "notes": "Late Show 2019 TV-performance — synthwave-hook."
+        "notes": "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
       }
     ]
   },
@@ -4241,6 +4532,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 206,
         "channelTitle": "7clouds K-pop",
         "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "dua-lipa-levitating",
+    "displayName": "Levitating — Dua Lipa",
+    "correctYear": 2020,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-alpha",
+      "gen-z"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "TUVcZfQe-Kw",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Dua Lipa",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
       }
     ]
   },
@@ -4341,6 +4653,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 165,
         "channelTitle": "7clouds",
         "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "messi-world-cup-2022",
+    "displayName": "Messi och Argentina vinner VM i Qatar",
+    "correctYear": 2022,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "otlAmUJ5wfw",
+        "startSec": 0,
+        "endSec": 15,
+        "channelTitle": "cfcfootball",
+        "license": "standard",
+        "notes": "Curerad 2026-05-29 — Messis reaktion på VM-vinsten 2022 (FIFA-officiella var blockerade)."
       }
     ]
   },

@@ -84,22 +84,31 @@ export async function configurePurchases(userId?: string): Promise<void> {
       );
       return;
     }
-    if (!configured) {
-      // Logga RC SDK-info-meddelanden i dev, tystare i prod.
-      if (__DEV__) {
-        Purchases.setLogLevel(Purchases.LOG_LEVEL.WARN);
-      } else {
-        Purchases.setLogLevel(Purchases.LOG_LEVEL.ERROR);
-      }
-      Purchases.configure({ apiKey: IOS_API_KEY, appUserID: userId });
-      configured = true;
-    } else if (userId) {
-      // Re-configure inte vid varje login — använd logIn istället så RC
-      // mergear anonymous purchases med den nya user:n.
-      try {
+    try {
+      if (!configured) {
+        // Logga RC SDK-info-meddelanden i dev, tystare i prod.
+        if (__DEV__) {
+          Purchases.setLogLevel(Purchases.LOG_LEVEL.WARN);
+        } else {
+          Purchases.setLogLevel(Purchases.LOG_LEVEL.ERROR);
+        }
+        Purchases.configure({ apiKey: IOS_API_KEY, appUserID: userId });
+        configured = true;
+      } else if (userId) {
+        // Re-configure inte vid varje login — använd logIn istället så RC
+        // mergear anonymous purchases med den nya user:n.
         await Purchases.logIn(userId);
-      } catch (err) {
-        console.warn('[iap] Purchases.logIn failed:', err);
+      }
+    } catch (err) {
+      // Native-modulen saknas (t.ex. Expo Go) eller annat init-fel. Vi låter
+      // IAP förbli inaktiv (configured=false) — alla andra anrop no-op:ar via
+      // sina !configured-guards, så appen KRASCHAR INTE. I en dev-/standalone-
+      // build (där native-modulen finns) körs detta normalt och IAP funkar.
+      if (__DEV__) {
+        console.warn(
+          '[iap] Purchases init hoppades över (native-modul saknas? Expo Go?):',
+          err,
+        );
       }
     }
     return;

@@ -26,6 +26,12 @@
 // visas på en idle player. YouTube-ToS: branding måste vara synlig
 // UNDER uppspelning (iframe visar logo + bottom-bar); EFTER playback-end
 // får appen ta över UI:t — vilket är vad vi gör.
+//
+// SPOILER-SKYDD: vi lägger INTE overlays ovanpå videon — YouTubes Developer
+// Policies förbjuder att dölja/skymma spelaren eller dess innehåll. Mot
+// answer-läckande text förlitar vi oss istället på kurering: `startSec`
+// (starta efter intro-titelkort), välja klipp/segment utan inbränd
+// avslöjande text, och välja videor vars titel inte avslöjar svaret.
 
 import { Nunito_700Bold, useFonts } from '@expo-google-fonts/nunito';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
@@ -189,6 +195,9 @@ export function YouTubeMediaPlayer({
         initialPlayerParams={{
           controls: false,
           rel: false,
+          // `start` = curerad startpunkt. Används bl.a. för att hoppa förbi
+          // intro-titelkort som annars skulle avslöja svaret (ToS-tillåtet —
+          // vi väljer bara när uppspelningen börjar, inte modifierar videon).
           start: clip.startSec,
           // `end` medvetet utelämnat — klippet (musik / filmscen /
           // sportklipp / etc) ska spela klart utan att klippas vid

@@ -16,12 +16,6 @@ items:
     probability: 92
     wikimediaSearchHints: ["Rolling Stones Satisfaction"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "g5W4k6vD2WY"
-        startSec: 30
-        endSec: 45
-        channelTitle: "The Rolling Stones"
-        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (13)."
   - id: beach-boys-good-vibrations
     displayName: "Good Vibrations — The Beach Boys"
     correctYear: 1966
@@ -150,12 +144,6 @@ items:
     probability: 80
     wikimediaSearchHints: ["Chic Le Freak 1978"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "kb0S0oypx_o"
-        startSec: 30
-        endSec: 45
-        channelTitle: "BBC Music"
-        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: pink-floyd-another-brick-in-the-wall
     displayName: "Another Brick in the Wall, Part 2 — Pink Floyd"
     correctYear: 1979
@@ -174,12 +162,6 @@ items:
     probability: 90
     wikimediaSearchHints: ["Queen Another One Bites the Dust"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "x3SlTBOfMww"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Queen Official"
-        notes: "Live at Montreal Forum 1981 (Remastered) — official Queen-kanal. Iconic bassline."
   # Expansion 2026-05-26: 16 nya iconic items för 1965-1978 så density blir
   # 2/år (matchar songs-millennials/gen-z/gen-alpha). Bohemian Rhapsody +
   # Hotel California + Dancing Queen utelämnade — finns i songs-all.yaml.
@@ -333,12 +315,24 @@ items:
     probability: 82
     wikimediaSearchHints: ["Bruce Springsteen Born to Run 1975"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "Wu4_zVxmufY"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Bruce Springsteen - Topic"
+        notes: "Curerad 2026-05-29 — officiell album-audio via YouTube Topic (1975 studio-version)."
   - id: abba-mamma-mia
     displayName: "Mamma Mia — ABBA"
     correctYear: 1976
     probability: 82
     wikimediaSearchHints: ["ABBA Mamma Mia 1976"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "KMViJKmAV4M"
+        startSec: 30
+        endSec: 45
+        channelTitle: "ABBA - Topic"
+        notes: "Curerad 2026-05-29 — officiell album-audio via YouTube Topic (ABBA studio-version, ej film-soundtrack)."
   - id: queen-we-will-rock-you
     displayName: "We Will Rock You — Queen"
     correctYear: 1977
@@ -350,4 +344,71 @@ items:
     correctYear: 1978
     probability: 90
     wikimediaSearchHints: ["Village People YMCA 1978"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "fvzs2ozG-mc"
+        startSec: 30
+        endSec: 45
+        channelTitle: "PRIVADO 80s"
+        notes: "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (10)."
+  # === Content-expansion 2026-05-29: fler ikoniska 60-70-tals-låtar ===
+  - id: the-doors-light-my-fire
+    displayName: "Light My Fire — The Doors"
+    correctYear: 1967
+    probability: 85
+    wikimediaSearchHints: ["The Doors Light My Fire 1967"]
+    answerMethods: ["timeline"]
+  - id: marvin-gaye-whats-going-on
+    displayName: "What's Going On — Marvin Gaye"
+    correctYear: 1971
+    probability: 83
+    wikimediaSearchHints: ["Marvin Gaye What's Going On 1971"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "ApthDWoPMFQ"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Marvin Gaye - Topic"
+        notes: "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (2)."
+  - id: stevie-wonder-superstition
+    displayName: "Superstition — Stevie Wonder"
+    correctYear: 1972
+    probability: 86
+    wikimediaSearchHints: ["Stevie Wonder Superstition 1972"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "7_tmeHCO1IM"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Weedy Weed Smoker"
+        notes: "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
+  - id: deep-purple-smoke-on-the-water
+    displayName: "Smoke on the Water — Deep Purple"
+    correctYear: 1972
+    probability: 87
+    wikimediaSearchHints: ["Deep Purple Smoke on the Water 1972"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "qK7j_EERgT4"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Deep Purple - Topic"
+        notes: "Curerad 2026-05-29 — officiell album-audio via YouTube Topic (2024 remaster av 1972-originalet, ej Rock Aid Armenia-versionen)."
+  - id: fleetwood-mac-go-your-own-way
+    displayName: "Go Your Own Way — Fleetwood Mac"
+    correctYear: 1977
+    probability: 82
+    wikimediaSearchHints: ["Fleetwood Mac Go Your Own Way 1977"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "oiosqtFLBBA"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Fleetwood Mac"
+        notes: "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (3)."
+  - id: gloria-gaynor-i-will-survive
+    displayName: "I Will Survive — Gloria Gaynor"
+    correctYear: 1978
+    probability: 88
+    wikimediaSearchHints: ["Gloria Gaynor I Will Survive 1978"]
     answerMethods: ["timeline"]

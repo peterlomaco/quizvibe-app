@@ -56,24 +56,12 @@ items:
     probability: 95
     wikimediaSearchHints: ["Queen Bohemian Rhapsody"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "vbvyNnw8Qjg"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Live Aid"
-        notes: "Live Aid 1985 — iconic Freddie Mercury-performance. Mid-song."
   - id: eagles-hotel-california
     displayName: "Hotel California — Eagles"
     correctYear: 1976
     probability: 95
     wikimediaSearchHints: ["Eagles Hotel California"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "PNEv3koIeaE"
-        startSec: 65
-        endSec: 80
-        channelTitle: "Mark Tandle"
-        notes: "1994 Hell Freezes Over Acoustic Live — hoppar förbi 12-string-intro till Don Henley:s vocal-start (\"On a dark desert highway\")."
   - id: dancing-queen
     displayName: "Dancing Queen — ABBA"
     correctYear: 1976
@@ -92,12 +80,6 @@ items:
     probability: 95
     wikimediaSearchHints: ["Michael Jackson Billie Jean"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "CauNjt2j-BM"
-        startSec: 40
-        endSec: 55
-        channelTitle: "New Michael Jackson"
-        notes: "Motown 25 1983 performance — iconic moonwalk + era-defining."
   - id: thriller
     displayName: "Thriller — Michael Jackson"
     correctYear: 1982
@@ -128,12 +110,6 @@ items:
     probability: 95
     wikimediaSearchHints: ["Whitney Houston I Will Always Love You Bodyguard"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "mK4hweZRU0k"
-        startSec: 100
-        endSec: 115
-        channelTitle: "roelofjan1986"
-        notes: "World Music Awards 1994 — iconic high-note chorus."
   - id: celine-dion-my-heart-will-go-on
     displayName: "My Heart Will Go On — Celine Dion"
     correctYear: 1997
@@ -176,12 +152,6 @@ items:
     probability: 95
     wikimediaSearchHints: ["Avicii Wake Me Up True"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "Orp4k_YkE5w"
-        startSec: 10
-        endSec: 25
-        channelTitle: "Avicii"
-        notes: "Avicii Tribute Concert 2019 — Aloe Blacc-vokal. Intro/vers."
   - id: shape-of-you
     displayName: "Shape of You — Ed Sheeran"
     correctYear: 2017
@@ -201,9 +171,3 @@ items:
     wikimediaSearchHints: ["The Weeknd Blinding Lights After Hours"]
     answerMethods: ["timeline"]
     notes: "Singel-release 29 nov 2019; peakade Billboard 2020."
-    youtubeClips:
-      - videoId: "sveiX_mA9A4"
-        startSec: 30
-        endSec: 45
-        channelTitle: "The Late Show with Stephen Colbert"
-        notes: "Late Show 2019 TV-performance — synthwave-hook."
