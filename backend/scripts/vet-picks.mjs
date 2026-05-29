@@ -24,6 +24,10 @@ const NON_STUDIO =
 // Studio-säkra kanal-/titel-signaler.
 const STUDIO_TITLE = /\b(official\s+(music\s+)?video|official\s+mv|official\s+audio|lyric(s)?\s+video|\(audio\)|visualizer)\b/i;
 
+// Federations-kanaler embed-blockar trots embeddable=true (FIFA-fällan, Peter
+// 2026-05-29) → kan ej auto-detekteras, så undvik dem helt för sport-event.
+const FEDERATION = /\b(fifa|uefa|olympics?|ioc|nba|nfl|nhl|mlb|premier league)\b/i;
+
 function channelKind(ch) {
   const c = (ch || '').toLowerCase();
   if (/\s-\s*topic$/.test(c) || /\btopic$/.test(c)) return 'Topic';
@@ -40,7 +44,8 @@ for (const p of picks) {
   const title = p.topTitle || '';
   const kind = channelKind(p.channelTitle);
   let verdict;
-  if (NON_STUDIO.test(title)) verdict = 'REJECT(non-studio)';
+  if (FEDERATION.test(p.channelTitle || '') || FEDERATION.test(title)) verdict = 'REJECT(federation-embed-block)';
+  else if (NON_STUDIO.test(title)) verdict = 'REJECT(non-studio)';
   else if (kind === 'Topic' || kind === 'VEVO' || kind === 'official' || STUDIO_TITLE.test(title))
     verdict = 'ACCEPT';
   else verdict = 'REVIEW(uploader?)';
