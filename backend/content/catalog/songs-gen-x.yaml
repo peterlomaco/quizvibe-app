@@ -18,8 +18,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "MSSxnv1_J2g"
-        startSec: 30
-        endSec: 45
+        startSec: 0
+        endSec: 15
         channelTitle: "The Rolling Stones - Topic"
         notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: beach-boys-good-vibrations
@@ -152,8 +152,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "7PC-AcrHEKU"
-        startSec: 30
-        endSec: 45
+        startSec: 0
+        endSec: 15
         channelTitle: "Chic - Topic"
         notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: pink-floyd-another-brick-in-the-wall
@@ -176,8 +176,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "Y09uL2qbYCg"
-        startSec: 30
-        endSec: 45
+        startSec: 0
+        endSec: 15
         channelTitle: "Queen - Topic"
         notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   # Expansion 2026-05-26: 16 nya iconic items för 1965-1978 så density blir
@@ -359,8 +359,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "vDRVTnbuGec"
-        startSec: 30
-        endSec: 45
+        startSec: 0
+        endSec: 15
         channelTitle: "Queen - Topic"
         notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: village-people-ymca
@@ -384,8 +384,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "qoX6AKuYWL8"
-        startSec: 30
-        endSec: 45
+        startSec: 0
+        endSec: 15
         channelTitle: "The Doors - Topic"
         notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: marvin-gaye-whats-going-on

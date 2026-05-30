@@ -19,8 +19,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "EWZxFSo-XZY"
-        startSec: 30
-        endSec: 45
+        startSec: 0
+        endSec: 15
         channelTitle: "Soft Cell - Topic"
         notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: kim-carnes-bette-davis-eyes
@@ -133,8 +133,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "4hj8M8XZpis"
-        startSec: 30
-        endSec: 45
+        startSec: 0
+        endSec: 15
         channelTitle: "EUROPE - Topic"
         notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: bon-jovi-livin-on-a-prayer
@@ -183,8 +183,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "qTuntvl6oLQ"
-        startSec: 30
-        endSec: 45
+        startSec: 0
+        endSec: 15
         channelTitle: "Bobby McFerrin - Topic"
         notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: tracy-chapman-fast-car
@@ -233,8 +233,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "Ouf9-bOqJVk"
-        startSec: 30
-        endSec: 45
+        startSec: 0
+        endSec: 15
         channelTitle: "Sinéad O'Connor - Topic"
         notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: madonna-vogue
@@ -347,8 +347,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "FVdjZYfDuLE"
-        startSec: 30
-        endSec: 45
+        startSec: 0
+        endSec: 15
         channelTitle: "Oasis - Topic"
         notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: coolio-gangstas-paradise
@@ -421,8 +421,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "jRr5EasAq84"
-        startSec: 30
-        endSec: 45
+        startSec: 0
+        endSec: 15
         channelTitle: "Cyndi Lauper - Topic"
         notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: eurythmics-sweet-dreams
@@ -445,8 +445,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "2dzf4T3RbEc"
-        startSec: 30
-        endSec: 45
+        startSec: 0
+        endSec: 15
         channelTitle: "Whitney Houston - Topic"
         notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: rem-losing-my-religion
@@ -481,7 +481,7 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "F_-ZuVy76yg"
-        startSec: 30
-        endSec: 45
+        startSec: 0
+        endSec: 15
         channelTitle: "Scorpions - Topic"
         notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."

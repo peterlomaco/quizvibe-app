@@ -58,8 +58,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "XHrdsx8izBs"
-        startSec: 30
-        endSec: 45
+        startSec: 0
+        endSec: 15
         channelTitle: "Queen - Topic"
         notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: eagles-hotel-california
@@ -88,8 +88,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "Kr4EQDVETuA"
-        startSec: 30
-        endSec: 45
+        startSec: 0
+        endSec: 15
         channelTitle: "Michael Jackson - Topic"
         notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: thriller
@@ -124,8 +124,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "tP0zj220CbQ"
-        startSec: 30
-        endSec: 45
+        startSec: 0
+        endSec: 15
         channelTitle: "Whitney Houston - Topic"
         notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: celine-dion-my-heart-will-go-on
@@ -172,8 +172,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "2NiyrtYegso"
-        startSec: 30
-        endSec: 45
+        startSec: 0
+        endSec: 15
         channelTitle: "Avicii - Topic"
         notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: shape-of-you

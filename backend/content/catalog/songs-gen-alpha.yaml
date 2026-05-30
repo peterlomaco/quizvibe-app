@@ -340,8 +340,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "fmsv4gPe9bg"
-        startSec: 30
-        endSec: 45
+        startSec: 0
+        endSec: 15
         channelTitle: "Mark Ronson - Topic"
         notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: ed-sheeran-thinking-out-loud
