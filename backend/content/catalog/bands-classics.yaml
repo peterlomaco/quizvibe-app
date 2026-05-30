@@ -81,12 +81,6 @@ items:
     probability: 82
     wikimediaSearchHints: ["Fleetwood Mac band"]
     answerMethods: ["timeline", "name-letters"]
-  - id: the-who
-    displayName: "The Who"
-    correctYear: 1964
-    probability: 82
-    wikimediaSearchHints: ["The Who band rock"]
-    answerMethods: ["timeline", "name-letters"]
   - id: black-sabbath
     displayName: "Black Sabbath"
     correctYear: 1968
@@ -147,12 +141,6 @@ items:
     probability: 85
     wikimediaSearchHints: ["Linkin Park band Chester Bennington"]
     answerMethods: ["timeline", "name-letters"]
-  - id: imagine-dragons
-    displayName: "Imagine Dragons"
-    correctYear: 2008
-    probability: 82
-    wikimediaSearchHints: ["Imagine Dragons band"]
-    answerMethods: ["timeline", "name-letters"]
   - id: the-police
     displayName: "The Police"
     correctYear: 1977
@@ -195,24 +183,6 @@ items:
     probability: 82
     wikimediaSearchHints: ["Genesis Phil Collins band"]
     answerMethods: ["timeline", "name-letters"]
-  - id: yes
-    displayName: "Yes"
-    correctYear: 1968
-    probability: 78
-    wikimediaSearchHints: ["Yes band Jon Anderson"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: rush
-    displayName: "Rush"
-    correctYear: 1968
-    probability: 75
-    wikimediaSearchHints: ["Rush band Geddy Lee"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: talking-heads
-    displayName: "Talking Heads"
-    correctYear: 1975
-    probability: 75
-    wikimediaSearchHints: ["Talking Heads band David Byrne"]
-    answerMethods: ["timeline", "name-letters"]
   - id: depeche-mode
     displayName: "Depeche Mode"
     correctYear: 1980
@@ -249,41 +219,11 @@ items:
     probability: 88
     wikimediaSearchHints: ["Radiohead"]
     answerMethods: ["timeline", "name-letters"]
-  - id: muse
-    displayName: "Muse"
-    correctYear: 1994
-    probability: 85
-    wikimediaSearchHints: ["Muse band Matt Bellamy"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: the-strokes
-    displayName: "The Strokes"
-    correctYear: 1998
-    probability: 78
-    wikimediaSearchHints: ["The Strokes"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: white-stripes
-    displayName: "The White Stripes"
-    correctYear: 1997
-    probability: 78
-    wikimediaSearchHints: ["The White Stripes"]
-    answerMethods: ["timeline", "name-letters"]
   - id: daft-punk
     displayName: "Daft Punk"
     correctYear: 1993
     probability: 88
     wikimediaSearchHints: ["Daft Punk electronic duo"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: tame-impala
-    displayName: "Tame Impala"
-    correctYear: 2007
-    probability: 75
-    wikimediaSearchHints: ["Tame Impala"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: twenty-one-pilots
-    displayName: "Twenty One Pilots"
-    correctYear: 2009
-    probability: 82
-    wikimediaSearchHints: ["Twenty One Pilots"]
     answerMethods: ["timeline", "name-letters"]
   - id: maroon-5
     displayName: "Maroon 5"
@@ -370,12 +310,6 @@ items:
     probability: 78
     wikimediaSearchHints: ["In Flames Swedish melodic death metal Gothenburg"]
     answerMethods: ["timeline", "name-letters"]
-  - id: opeth
-    displayName: "Opeth"
-    correctYear: 1989
-    probability: 76
-    wikimediaSearchHints: ["Opeth Swedish progressive metal Mikael Åkerfeldt"]
-    answerMethods: ["timeline", "name-letters"]
   - id: mando-diao
     displayName: "Mando Diao"
     correctYear: 1999
@@ -399,12 +333,6 @@ items:
     correctYear: 1991
     probability: 72
     wikimediaSearchHints: ["Looptroop Rockers Swedish hip hop crew Västerås"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: stiftelsen
-    displayName: "Stiftelsen"
-    correctYear: 2010
-    probability: 76
-    wikimediaSearchHints: ["Stiftelsen Swedish band Vart jag mig i världen vänder"]
     answerMethods: ["timeline", "name-letters"]
   - id: the-ark
     displayName: "The Ark"
@@ -449,23 +377,11 @@ items:
     probability: 84
     wikimediaSearchHints: ["Aqua Danish band Barbie Girl Lene Nystrøm"]
     answerMethods: ["timeline", "name-letters"]
-  - id: drangarna
-    displayName: "Drängarna"
-    correctYear: 1980
-    probability: 78
-    wikimediaSearchHints: ["Drängarna Swedish dansband Sommar och sol"]
-    answerMethods: ["timeline", "name-letters"]
   - id: lasse-stefanz
     displayName: "Lasse Stefanz"
     correctYear: 1967
     probability: 76
     wikimediaSearchHints: ["Lasse Stefanz Swedish dansband Cabaret"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: streaplers
-    displayName: "Streaplers"
-    correctYear: 1959
-    probability: 70
-    wikimediaSearchHints: ["Streaplers Swedish dansband Trollhättan"]
     answerMethods: ["timeline", "name-letters"]
   - id: wizex
     displayName: "Wizex"
@@ -480,12 +396,6 @@ items:
     probability: 84
     wikimediaSearchHints: ["First Aid Kit Swedish folk band Söderberg sisters Emmylou"]
     answerMethods: ["timeline", "name-letters"]
-  - id: sakert
-    displayName: "Säkert!"
-    correctYear: 2007
-    probability: 74
-    wikimediaSearchHints: ["Säkert Swedish band Annika Norlin Hello Saferide"]
-    answerMethods: ["timeline", "name-letters"]
   - id: familjen
     displayName: "Familjen"
     correctYear: 2002
@@ -497,12 +407,6 @@ items:
     correctYear: 1971
     probability: 78
     wikimediaSearchHints: ["Eldkvarn Swedish rock band Plura Jonsson"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: shout-out-louds
-    displayName: "Shout Out Louds"
-    correctYear: 2001
-    probability: 72
-    wikimediaSearchHints: ["Shout Out Louds Swedish indie band Stockholm"]
     answerMethods: ["timeline", "name-letters"]
   - id: imperiet
     displayName: "Imperiet"
@@ -516,12 +420,6 @@ items:
     probability: 76
     wikimediaSearchHints: ["Nationalteatern Swedish progressive rock band Bängen trålar"]
     answerMethods: ["timeline", "name-letters"]
-  - id: noice
-    displayName: "Noice"
-    correctYear: 1979
-    probability: 76
-    wikimediaSearchHints: ["Noice Swedish rock band Hubert Hansson En kväll i tunnelbanan"]
-    answerMethods: ["timeline", "name-letters"]
   - id: freestyle
     displayName: "Freestyle"
     correctYear: 1976
@@ -533,12 +431,6 @@ items:
     correctYear: 1980
     probability: 78
     wikimediaSearchHints: ["Ratata Swedish synth pop band Mauro Scocco"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: reeperbahn
-    displayName: "Reeperbahn"
-    correctYear: 1976
-    probability: 68
-    wikimediaSearchHints: ["Reeperbahn Swedish rock band 1980s"]
     answerMethods: ["timeline", "name-letters"]
   - id: docenterna
     displayName: "Docenterna"
@@ -589,23 +481,11 @@ items:
     probability: 72
     wikimediaSearchHints: ["Cazzette Swedish electronic duo Alexander Björklund Sebastian Furrer"]
     answerMethods: ["timeline", "name-letters"]
-  - id: kartellen
-    displayName: "Kartellen"
-    correctYear: 2008
-    probability: 74
-    wikimediaSearchHints: ["Kartellen Swedish hip hop crew"]
-    answerMethods: ["timeline", "name-letters"]
   - id: tjuvjakt
     displayName: "Tjuvjakt"
     correctYear: 2012
     probability: 76
     wikimediaSearchHints: ["Tjuvjakt Swedish pop band Tellus Pengar"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: hanoi-rocks
-    displayName: "Hanoi Rocks"
-    correctYear: 1979
-    probability: 78
-    wikimediaSearchHints: ["Hanoi Rocks Finnish rock band Michael Monroe"]
     answerMethods: ["timeline", "name-letters"]
   - id: lordi
     displayName: "Lordi"
@@ -619,35 +499,11 @@ items:
     probability: 78
     wikimediaSearchHints: ["Nightwish Finnish symphonic metal Tarja Turunen"]
     answerMethods: ["timeline", "name-letters"]
-  - id: apocalyptica
-    displayName: "Apocalyptica"
-    correctYear: 1993
-    probability: 76
-    wikimediaSearchHints: ["Apocalyptica Finnish cello metal Metallica"]
-    answerMethods: ["timeline", "name-letters"]
   - id: ylvis
     displayName: "Ylvis"
     correctYear: 2000
     probability: 82
     wikimediaSearchHints: ["Ylvis Norwegian duo What Does the Fox Say"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: lukas-graham
-    displayName: "Lukas Graham"
-    correctYear: 2011
-    probability: 84
-    wikimediaSearchHints: ["Lukas Graham Danish band 7 Years"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: volbeat
-    displayName: "Volbeat"
-    correctYear: 2001
-    probability: 80
-    wikimediaSearchHints: ["Volbeat Danish rock metal band Michael Poulsen"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: mew
-    displayName: "Mew"
-    correctYear: 1995
-    probability: 70
-    wikimediaSearchHints: ["Mew Danish indie rock band"]
     answerMethods: ["timeline", "name-letters"]
   - id: d-a-d
     displayName: "D-A-D"
@@ -673,12 +529,6 @@ items:
     correctYear: 1978
     probability: 86
     wikimediaSearchHints: ["Duran Duran band Birmingham new wave Hungry Like the Wolf"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: tears-for-fears
-    displayName: "Tears for Fears"
-    correctYear: 1981
-    probability: 84
-    wikimediaSearchHints: ["Tears for Fears band Curt Smith Roland Orzabal Shout"]
     answerMethods: ["timeline", "name-letters"]
   - id: simple-minds
     displayName: "Simple Minds"
@@ -711,13 +561,6 @@ items:
     probability: 92
     wikimediaSearchHints: ["Gyllene Tider Swedish pop rock band Per Gessle"]
     answerMethods: ["timeline", "name-letters"]
-  - id: sabaton
-    displayName: "Sabaton"
-    correctYear: 1999
-    probability: 84
-    wikimediaSearchHints: ["Sabaton Swedish power metal band war history"]
-    answerMethods: ["timeline", "name-letters"]
-    audience: ["gen-x", "millennials", "gen-z"]
   - id: ghost
     displayName: "Ghost"
     correctYear: 2006
@@ -725,13 +568,6 @@ items:
     wikimediaSearchHints: ["Ghost Swedish band Tobias Forge Papa Emeritus rock"]
     answerMethods: ["timeline", "name-letters"]
     audience: ["millennials", "gen-z"]
-  - id: amon-amarth
-    displayName: "Amon Amarth"
-    correctYear: 1992
-    probability: 78
-    wikimediaSearchHints: ["Amon Amarth Swedish death metal Viking themes"]
-    answerMethods: ["timeline", "name-letters"]
-    audience: ["gen-x", "millennials", "gen-z"]
   - id: journey
     displayName: "Journey"
     correctYear: 1973

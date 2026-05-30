@@ -181,14 +181,6 @@ items:
     probability: 82
     wikimediaSearchHints: ["Lana Del Rey singer"]
     answerMethods: ["timeline", "name-letters"]
-  - id: charlie-puth
-    displayName: "Charlie Puth"
-    correctYear: 1991
-    peakFrom: 2015
-    peakTo: 2024
-    probability: 78
-    wikimediaSearchHints: ["Charlie Puth singer"]
-    answerMethods: ["timeline", "name-letters"]
   - id: shawn-mendes
     displayName: "Shawn Mendes"
     correctYear: 1998
@@ -213,14 +205,6 @@ items:
     probability: 75
     wikimediaSearchHints: ["Hayley Williams Paramore"]
     answerMethods: ["timeline", "name-letters"]
-  - id: tyler-the-creator
-    displayName: "Tyler, The Creator"
-    correctYear: 1991
-    peakFrom: 2009
-    peakTo: 2024
-    probability: 78
-    wikimediaSearchHints: ["Tyler The Creator rapper"]
-    answerMethods: ["timeline", "name-letters"]
   - id: j-balvin
     displayName: "J Balvin"
     correctYear: 1985
@@ -228,14 +212,6 @@ items:
     peakTo: 2024
     probability: 78
     wikimediaSearchHints: ["J Balvin reggaeton"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: karol-g
-    displayName: "Karol G"
-    correctYear: 1991
-    peakFrom: 2017
-    peakTo: 2024
-    probability: 75
-    wikimediaSearchHints: ["Karol G singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: anitta
     displayName: "Anitta"
@@ -284,14 +260,6 @@ items:
     peakTo: 2024
     probability: 80
     wikimediaSearchHints: ["Lewis Capaldi singer"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: khalid
-    displayName: "Khalid"
-    correctYear: 1998
-    peakFrom: 2016
-    peakTo: 2024
-    probability: 78
-    wikimediaSearchHints: ["Khalid singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: lil-nas-x
     displayName: "Lil Nas X"

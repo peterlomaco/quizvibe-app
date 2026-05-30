@@ -206,18 +206,6 @@ items:
     wikimediaSearchHints: ["Gunnel Lindblom Swedish actress Bergman Seventh Seal"]
     answerMethods: ["timeline", "name-letters"]
   # === Sport-crossover actors 2026-05-27 ===
-  - id: chuck-norris
-    displayName: "Chuck Norris"
-    correctYear: 1940
-    probability: 88
-    wikimediaSearchHints: ["Chuck Norris actor martial artist Walker Texas Ranger"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: jim-brown
-    displayName: "Jim Brown"
-    correctYear: 1936
-    probability: 76
-    wikimediaSearchHints: ["Jim Brown NFL running back actor Cleveland Browns"]
-    answerMethods: ["timeline", "name-letters"]
   # === Batch B 2026-05-27 — svenska jullov/SVT-barn-tv-klassiker ===
   - id: magnus-harenstam
     displayName: "Magnus Härenstam"

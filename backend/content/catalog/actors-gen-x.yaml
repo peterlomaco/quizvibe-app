@@ -228,12 +228,6 @@ items:
     probability: 80
     wikimediaSearchHints: ["Jeff Goldblum actor"]
     answerMethods: ["timeline", "name-letters"]
-  - id: christopher-walken
-    displayName: "Christopher Walken"
-    correctYear: 1943
-    probability: 82
-    wikimediaSearchHints: ["Christopher Walken actor"]
-    answerMethods: ["timeline", "name-letters"]
   - id: joe-pesci
     displayName: "Joe Pesci"
     correctYear: 1943
@@ -378,12 +372,6 @@ items:
     probability: 72
     wikimediaSearchHints: ["Jim Broadbent actor"]
     answerMethods: ["timeline", "name-letters"]
-  - id: james-spader
-    displayName: "James Spader"
-    correctYear: 1960
-    probability: 75
-    wikimediaSearchHints: ["James Spader actor"]
-    answerMethods: ["timeline", "name-letters"]
   - id: jodie-foster
     displayName: "Jodie Foster"
     correctYear: 1962
@@ -476,12 +464,6 @@ items:
     correctYear: 1963
     probability: 80
     wikimediaSearchHints: ["Anders Lundin Swedish TV host Robinson Expedition"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: ulf-brunnberg
-    displayName: "Ulf Brunnberg"
-    correctYear: 1947
-    probability: 76
-    wikimediaSearchHints: ["Ulf Brunnberg Swedish actor Sune Jönssonligan"]
     answerMethods: ["timeline", "name-letters"]
   - id: eva-remaeus
     displayName: "Eva Remaeus"

@@ -200,14 +200,6 @@ items:
     probability: 85
     wikimediaSearchHints: ["Tom Jones singer Welsh"]
     answerMethods: ["timeline", "name-letters"]
-  - id: smokey-robinson
-    displayName: "Smokey Robinson"
-    correctYear: 1940
-    peakFrom: 1960
-    peakTo: 2024
-    probability: 78
-    wikimediaSearchHints: ["Smokey Robinson singer"]
-    answerMethods: ["timeline", "name-letters"]
   - id: patsy-cline
     displayName: "Patsy Cline"
     correctYear: 1932
@@ -263,14 +255,6 @@ items:
     peakTo: 2023
     probability: 78
     wikimediaSearchHints: ["Harry Belafonte singer"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: pat-boone
-    displayName: "Pat Boone"
-    correctYear: 1934
-    peakFrom: 1955
-    peakTo: 2010
-    probability: 72
-    wikimediaSearchHints: ["Pat Boone singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: lena-horne
     displayName: "Lena Horne"

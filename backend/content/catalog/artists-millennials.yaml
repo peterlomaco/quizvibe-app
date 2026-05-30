@@ -443,12 +443,6 @@ items:
     probability: 80
     wikimediaSearchHints: ["Darin Zanyar Swedish singer Idol 2004"]
     answerMethods: ["timeline", "name-letters"]
-  - id: salem-al-fakir
-    displayName: "Salem Al Fakir"
-    correctYear: 1981
-    probability: 74
-    wikimediaSearchHints: ["Salem Al Fakir Swedish singer songwriter producer"]
-    answerMethods: ["timeline", "name-letters"]
   # === Vemod-batch 2026-05-27 — svenska millennials melankoli/indie/pop ===
   - id: melissa-horn
     displayName: "Melissa Horn"
@@ -485,12 +479,6 @@ items:
     correctYear: 1980
     probability: 74
     wikimediaSearchHints: ["Markus Krunegård Swedish singer Laakso"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: jonathan-johansson
-    displayName: "Jonathan Johansson"
-    correctYear: 1979
-    probability: 72
-    wikimediaSearchHints: ["Jonathan Johansson Swedish singer indie pop En hand i himlen"]
     answerMethods: ["timeline", "name-letters"]
   - id: anna-ternheim
     displayName: "Anna Ternheim"
@@ -539,18 +527,6 @@ items:
     correctYear: 1991
     probability: 76
     wikimediaSearchHints: ["Cherrie Swedish singer R&B Sherihan Hersi"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: maja-francis
-    displayName: "Maja Francis"
-    correctYear: 1988
-    probability: 72
-    wikimediaSearchHints: ["Maja Francis Swedish singer indie pop"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: sarah-klang
-    displayName: "Sarah Klang"
-    correctYear: 1990
-    probability: 78
-    wikimediaSearchHints: ["Sarah Klang Swedish singer indie folk Sentimental"]
     answerMethods: ["timeline", "name-letters"]
   - id: sophie-zelmani
     displayName: "Sophie Zelmani"
@@ -679,12 +655,6 @@ items:
     probability: 76
     wikimediaSearchHints: ["Erik Lundin Swedish rapper hip hop Suedi"]
     answerMethods: ["timeline", "name-letters"]
-  - id: stor
-    displayName: "Stor"
-    correctYear: 1985
-    probability: 74
-    wikimediaSearchHints: ["Stor Swedish rapper Pugh hip hop"]
-    answerMethods: ["timeline", "name-letters"]
   - id: linda-pira
     displayName: "Linda Pira"
     correctYear: 1985
@@ -696,18 +666,6 @@ items:
     correctYear: 1987
     probability: 78
     wikimediaSearchHints: ["Snoh Aalegra Swedish Iranian singer R&B soul"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: mwuana
-    displayName: "Mwuana"
-    correctYear: 1996
-    probability: 70
-    wikimediaSearchHints: ["Mwuana Swedish rapper hip hop"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: raaban
-    displayName: "Raaban"
-    correctYear: 1990
-    probability: 74
-    wikimediaSearchHints: ["Raaban Swedish DJ producer Tungevaag EDM"]
     answerMethods: ["timeline", "name-letters"]
   - id: aronchupa
     displayName: "AronChupa"

@@ -235,14 +235,6 @@ items:
     probability: 85
     wikimediaSearchHints: ["Ozzy Osbourne musician Black Sabbath"]
     answerMethods: ["timeline", "name-letters"]
-  - id: lou-reed
-    displayName: "Lou Reed"
-    correctYear: 1942
-    peakFrom: 1965
-    peakTo: 2013
-    probability: 75
-    wikimediaSearchHints: ["Lou Reed musician Velvet Underground"]
-    answerMethods: ["timeline", "name-letters"]
   - id: bryan-ferry
     displayName: "Bryan Ferry"
     correctYear: 1945
@@ -274,14 +266,6 @@ items:
     peakTo: 2017
     probability: 82
     wikimediaSearchHints: ["Tom Petty musician Heartbreakers"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: stevie-nicks
-    displayName: "Stevie Nicks"
-    correctYear: 1948
-    peakFrom: 1975
-    peakTo: 2024
-    probability: 82
-    wikimediaSearchHints: ["Stevie Nicks singer Fleetwood Mac"]
     answerMethods: ["timeline", "name-letters"]
   - id: don-henley
     displayName: "Don Henley"
@@ -529,12 +513,6 @@ items:
     correctYear: 1958
     probability: 76
     wikimediaSearchHints: ["Niklas Strömstedt Swedish singer Sista morgonen"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: stefan-sundstrom
-    displayName: "Stefan Sundström"
-    correctYear: 1965
-    probability: 72
-    wikimediaSearchHints: ["Stefan Sundström Swedish singer Söndermarken"]
     answerMethods: ["timeline", "name-letters"]
   - id: peter-lemarc
     displayName: "Peter LeMarc"

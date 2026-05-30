@@ -243,31 +243,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "questionText": "What is the Name of this band?"
   },
   {
-    "id": "ahn-jung-hwan",
-    "displayName": "Ahn Jung Hwan",
-    "category": "athletes",
-    "contentSubject": "athlete",
-    "correctYear": 1976,
-    "audiences": [
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "questionText": "What is the Name of this athlete?"
-  },
-  {
-    "id": "aime-jacquet",
-    "displayName": "Aimé Jacquet",
-    "category": "athletes",
-    "contentSubject": "athlete",
-    "correctYear": 1941,
-    "audiences": [
-      "elder",
-      "gen-x"
-    ],
-    "questionText": "What is the Name of this athlete?"
-  },
-  {
     "id": "al-pacino",
     "displayName": "Al Pacino",
     "category": "actors",
@@ -535,19 +510,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "questionText": "What is the Name of this athlete?"
   },
   {
-    "id": "amon-amarth",
-    "displayName": "Amon Amarth",
-    "category": "artists",
-    "contentSubject": "band",
-    "correctYear": 1992,
-    "audiences": [
-      "gen-x",
-      "millennials",
-      "gen-z"
-    ],
-    "questionText": "What is the Name of this band?"
-  },
-  {
     "id": "amy-adams",
     "displayName": "Amy Adams",
     "category": "actors",
@@ -580,18 +542,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-x"
     ],
     "questionText": "What is the Name of this actor?"
-  },
-  {
-    "id": "andoni-zubizarreta",
-    "displayName": "Andoni Zubizarreta",
-    "category": "athletes",
-    "contentSubject": "athlete",
-    "correctYear": 1961,
-    "audiences": [
-      "elder",
-      "gen-x"
-    ],
-    "questionText": "What is the Name of this athlete?"
   },
   {
     "id": "andre-agassi",
@@ -899,17 +849,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z"
     ],
     "questionText": "What is the Name of this actor?"
-  },
-  {
-    "id": "apocalyptica",
-    "displayName": "Apocalyptica",
-    "category": "artists",
-    "contentSubject": "band",
-    "correctYear": 1993,
-    "audiences": [
-      "all"
-    ],
-    "questionText": "What is the Name of this band?"
   },
   {
     "id": "aqua",
@@ -1611,18 +1550,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "questionText": "What is the Name of this athlete?"
   },
   {
-    "id": "bobby-orr",
-    "displayName": "Bobby Orr",
-    "category": "athletes",
-    "contentSubject": "athlete",
-    "correctYear": 1948,
-    "audiences": [
-      "elder",
-      "gen-x"
-    ],
-    "questionText": "What is the Name of this athlete?"
-  },
-  {
     "id": "bon-jovi",
     "displayName": "Bon Jovi",
     "category": "artists",
@@ -1645,18 +1572,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-x"
     ],
     "questionText": "What is the Name of this Artist?"
-  },
-  {
-    "id": "bora-milutinovic",
-    "displayName": "Bora Milutinović",
-    "category": "athletes",
-    "contentSubject": "athlete",
-    "correctYear": 1944,
-    "audiences": [
-      "elder",
-      "gen-x"
-    ],
-    "questionText": "What is the Name of this athlete?"
   },
   {
     "id": "boris-becker",
@@ -1964,19 +1879,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "questionText": "What is the Name of this athlete?"
   },
   {
-    "id": "carles-puyol",
-    "displayName": "Carles Puyol",
-    "category": "athletes",
-    "contentSubject": "athlete",
-    "correctYear": 1978,
-    "audiences": [
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "questionText": "What is the Name of this athlete?"
-  },
-  {
     "id": "carlos-alberto",
     "displayName": "Carlos Alberto",
     "category": "athletes",
@@ -2230,19 +2132,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "questionText": "What is the Name of this actor?"
   },
   {
-    "id": "charlie-puth",
-    "displayName": "Charlie Puth",
-    "category": "artists",
-    "contentSubject": "artist",
-    "correctYear": 1991,
-    "peakFrom": 2015,
-    "peakTo": 2024,
-    "audiences": [
-      "gen-z"
-    ],
-    "questionText": "What is the Name of this Artist?"
-  },
-  {
     "id": "charlize-theron",
     "displayName": "Charlize Theron",
     "category": "actors",
@@ -2308,18 +2197,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1981,
-    "audiences": [
-      "millennials",
-      "gen-z"
-    ],
-    "questionText": "What is the Name of this actor?"
-  },
-  {
-    "id": "chris-hemsworth",
-    "displayName": "Chris Hemsworth",
-    "category": "actors",
-    "contentSubject": "actor",
-    "correctYear": 1983,
     "audiences": [
       "millennials",
       "gen-z"
@@ -2413,17 +2290,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "questionText": "What is the Name of this Artist?"
   },
   {
-    "id": "christopher-walken",
-    "displayName": "Christopher Walken",
-    "category": "actors",
-    "contentSubject": "actor",
-    "correctYear": 1943,
-    "audiences": [
-      "gen-x"
-    ],
-    "questionText": "What is the Name of this actor?"
-  },
-  {
     "id": "chuck-berry",
     "displayName": "Chuck Berry",
     "category": "artists",
@@ -2435,17 +2301,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder"
     ],
     "questionText": "What is the Name of this Artist?"
-  },
-  {
-    "id": "chuck-norris",
-    "displayName": "Chuck Norris",
-    "category": "actors",
-    "contentSubject": "actor",
-    "correctYear": 1940,
-    "audiences": [
-      "elder"
-    ],
-    "questionText": "What is the Name of this actor?"
   },
   {
     "id": "clarence-seedorf",
@@ -2615,18 +2470,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "all"
     ],
     "questionText": "What is the Name of this band?"
-  },
-  {
-    "id": "cuauhtemoc-blanco",
-    "displayName": "Cuauhtemoc Blanco",
-    "category": "athletes",
-    "contentSubject": "athlete",
-    "correctYear": 1973,
-    "audiences": [
-      "elder",
-      "gen-x"
-    ],
-    "questionText": "What is the Name of this athlete?"
   },
   {
     "id": "cyndi-lauper",
@@ -2876,18 +2719,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z",
       "gen-alpha"
-    ],
-    "questionText": "What is the Name of this athlete?"
-  },
-  {
-    "id": "davor-suker",
-    "displayName": "Davor Šuker",
-    "category": "athletes",
-    "contentSubject": "athlete",
-    "correctYear": 1968,
-    "audiences": [
-      "elder",
-      "gen-x"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -3269,29 +3100,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "questionText": "What is the Name of this Artist?"
   },
   {
-    "id": "drangarna",
-    "displayName": "Drängarna",
-    "category": "artists",
-    "contentSubject": "band",
-    "correctYear": 1980,
-    "audiences": [
-      "all"
-    ],
-    "questionText": "What is the Name of this band?"
-  },
-  {
-    "id": "drew-barrymore",
-    "displayName": "Drew Barrymore",
-    "category": "actors",
-    "contentSubject": "actor",
-    "correctYear": 1975,
-    "audiences": [
-      "millennials",
-      "gen-z"
-    ],
-    "questionText": "What is the Name of this actor?"
-  },
-  {
     "id": "dua-lipa",
     "displayName": "Dua Lipa",
     "category": "artists",
@@ -3433,18 +3241,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-x"
     ],
     "questionText": "What is the Name of this actor?"
-  },
-  {
-    "id": "eddy-merckx",
-    "displayName": "Eddy Merckx",
-    "category": "athletes",
-    "contentSubject": "athlete",
-    "correctYear": 1945,
-    "audiences": [
-      "elder",
-      "gen-x"
-    ],
-    "questionText": "What is the Name of this athlete?"
   },
   {
     "id": "eden-hazard",
@@ -3668,18 +3464,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "questionText": "What is the Name of this athlete?"
   },
   {
-    "id": "enzo-francescoli",
-    "displayName": "Enzo Francescoli",
-    "category": "athletes",
-    "contentSubject": "athlete",
-    "correctYear": 1961,
-    "audiences": [
-      "elder",
-      "gen-x"
-    ],
-    "questionText": "What is the Name of this athlete?"
-  },
-  {
     "id": "eric-cantona",
     "displayName": "Eric Cantona",
     "category": "athletes",
@@ -3845,18 +3629,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "questionText": "What is the Name of this actor?"
   },
   {
-    "id": "evander-holyfield",
-    "displayName": "Evander Holyfield",
-    "category": "athletes",
-    "contentSubject": "athlete",
-    "correctYear": 1962,
-    "audiences": [
-      "elder",
-      "gen-x"
-    ],
-    "questionText": "What is the Name of this athlete?"
-  },
-  {
     "id": "evert-taube",
     "displayName": "Evert Taube",
     "category": "artists",
@@ -3919,18 +3691,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "athletes",
     "contentSubject": "athlete",
     "correctYear": 1968,
-    "audiences": [
-      "elder",
-      "gen-x"
-    ],
-    "questionText": "What is the Name of this athlete?"
-  },
-  {
-    "id": "fernando-santos",
-    "displayName": "Fernando Santos",
-    "category": "athletes",
-    "contentSubject": "athlete",
-    "correctYear": 1954,
     "audiences": [
       "elder",
       "gen-x"
@@ -4170,35 +3930,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "questionText": "What is the Name of this athlete?"
   },
   {
-    "id": "fritz-walter",
-    "displayName": "Fritz Walter",
-    "category": "athletes",
-    "contentSubject": "athlete",
-    "correctYear": 1920,
-    "audiences": [
-      "elder",
-      "gen-x"
-    ],
-    "questionText": "What is the Name of this athlete?"
-  },
-  {
     "id": "gabriel-batistuta",
     "displayName": "Gabriel Batistuta",
     "category": "athletes",
     "contentSubject": "athlete",
     "correctYear": 1969,
-    "audiences": [
-      "elder",
-      "gen-x"
-    ],
-    "questionText": "What is the Name of this athlete?"
-  },
-  {
-    "id": "gabriela-sabatini",
-    "displayName": "Gabriela Sabatini",
-    "category": "athletes",
-    "contentSubject": "athlete",
-    "correctYear": 1970,
     "audiences": [
       "elder",
       "gen-x"
@@ -4238,18 +3974,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z",
       "gen-alpha"
-    ],
-    "questionText": "What is the Name of this athlete?"
-  },
-  {
-    "id": "garrincha",
-    "displayName": "Garrincha",
-    "category": "athletes",
-    "contentSubject": "athlete",
-    "correctYear": 1933,
-    "audiences": [
-      "elder",
-      "gen-x"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -4410,18 +4134,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "questionText": "What is the Name of this athlete?"
   },
   {
-    "id": "gheorghe-popescu",
-    "displayName": "Gheorghe Popescu",
-    "category": "athletes",
-    "contentSubject": "athlete",
-    "correctYear": 1967,
-    "audiences": [
-      "elder",
-      "gen-x"
-    ],
-    "questionText": "What is the Name of this athlete?"
-  },
-  {
     "id": "ghost",
     "displayName": "Ghost",
     "category": "artists",
@@ -4432,32 +4144,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z"
     ],
     "questionText": "What is the Name of this band?"
-  },
-  {
-    "id": "gianluca-zambrotta",
-    "displayName": "Gianluca Zambrotta",
-    "category": "athletes",
-    "contentSubject": "athlete",
-    "correctYear": 1977,
-    "audiences": [
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "questionText": "What is the Name of this athlete?"
-  },
-  {
-    "id": "gianluigi-buffon",
-    "displayName": "Gianluigi Buffon",
-    "category": "athletes",
-    "contentSubject": "athlete",
-    "correctYear": 1978,
-    "audiences": [
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "questionText": "What is the Name of this athlete?"
   },
   {
     "id": "giannis-antetokounmpo",
@@ -4602,18 +4288,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "questionText": "What is the Name of this actor?"
   },
   {
-    "id": "grzegorz-lato",
-    "displayName": "Grzegorz Lato",
-    "category": "athletes",
-    "contentSubject": "athlete",
-    "correctYear": 1950,
-    "audiences": [
-      "elder",
-      "gen-x"
-    ],
-    "questionText": "What is the Name of this athlete?"
-  },
-  {
     "id": "guillermo-ochoa",
     "displayName": "Guillermo Ochoa",
     "category": "athletes",
@@ -4683,18 +4357,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z"
     ],
     "questionText": "What is the Name of this actor?"
-  },
-  {
-    "id": "gusztav-sebes",
-    "displayName": "Gusztáv Sebes",
-    "category": "athletes",
-    "contentSubject": "athlete",
-    "correctYear": 1906,
-    "audiences": [
-      "elder",
-      "gen-x"
-    ],
-    "questionText": "What is the Name of this athlete?"
   },
   {
     "id": "guus-hiddink",
@@ -4791,17 +4453,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder"
     ],
     "questionText": "What is the Name of this Artist?"
-  },
-  {
-    "id": "hanoi-rocks",
-    "displayName": "Hanoi Rocks",
-    "category": "artists",
-    "contentSubject": "band",
-    "correctYear": 1979,
-    "audiences": [
-      "all"
-    ],
-    "questionText": "What is the Name of this band?"
   },
   {
     "id": "hans-alfredson",
@@ -5047,18 +4698,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "questionText": "What is the Name of this band?"
   },
   {
-    "id": "hernan-crespo",
-    "displayName": "Hernan Crespo",
-    "category": "athletes",
-    "contentSubject": "athlete",
-    "correctYear": 1975,
-    "audiences": [
-      "elder",
-      "gen-x"
-    ],
-    "questionText": "What is the Name of this athlete?"
-  },
-  {
     "id": "hidetoshi-nakata",
     "displayName": "Hidetoshi Nakata",
     "category": "athletes",
@@ -5206,17 +4845,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "questionText": "What is the Name of this athlete?"
   },
   {
-    "id": "imagine-dragons",
-    "displayName": "Imagine Dragons",
-    "category": "artists",
-    "contentSubject": "band",
-    "correctYear": 2008,
-    "audiences": [
-      "all"
-    ],
-    "questionText": "What is the Name of this band?"
-  },
-  {
     "id": "imperiet",
     "displayName": "Imperiet",
     "category": "artists",
@@ -5316,18 +4944,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z",
       "gen-alpha"
-    ],
-    "questionText": "What is the Name of this athlete?"
-  },
-  {
-    "id": "ivan-zamorano",
-    "displayName": "Ivan Zamorano",
-    "category": "athletes",
-    "contentSubject": "athlete",
-    "correctYear": 1967,
-    "audiences": [
-      "elder",
-      "gen-x"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -5487,17 +5103,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-alpha"
     ],
     "questionText": "What is the Name of this athlete?"
-  },
-  {
-    "id": "james-spader",
-    "displayName": "James Spader",
-    "category": "actors",
-    "contentSubject": "actor",
-    "correctYear": 1960,
-    "audiences": [
-      "gen-x"
-    ],
-    "questionText": "What is the Name of this actor?"
   },
   {
     "id": "james-stewart",
@@ -5695,18 +5300,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "questionText": "What is the Name of this athlete?"
   },
   {
-    "id": "jean-marie-pfaff",
-    "displayName": "Jean Marie Pfaff",
-    "category": "athletes",
-    "contentSubject": "athlete",
-    "correctYear": 1953,
-    "audiences": [
-      "elder",
-      "gen-x"
-    ],
-    "questionText": "What is the Name of this athlete?"
-  },
-  {
     "id": "jean-pierre-papin",
     "displayName": "Jean-Pierre Papin",
     "category": "athletes",
@@ -5858,17 +5451,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "questionText": "What is the Name of this actor?"
   },
   {
-    "id": "jim-brown",
-    "displayName": "Jim Brown",
-    "category": "actors",
-    "contentSubject": "actor",
-    "correctYear": 1936,
-    "audiences": [
-      "elder"
-    ],
-    "questionText": "What is the Name of this actor?"
-  },
-  {
     "id": "jim-carrey",
     "displayName": "Jim Carrey",
     "category": "actors",
@@ -5989,18 +5571,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "questionText": "What is the Name of this athlete?"
   },
   {
-    "id": "joe-montana",
-    "displayName": "Joe Montana",
-    "category": "athletes",
-    "contentSubject": "athlete",
-    "correctYear": 1956,
-    "audiences": [
-      "elder",
-      "gen-x"
-    ],
-    "questionText": "What is the Name of this athlete?"
-  },
-  {
     "id": "joe-pesci",
     "displayName": "Joe Pesci",
     "category": "actors",
@@ -6029,18 +5599,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "athletes",
     "contentSubject": "athlete",
     "correctYear": 1947,
-    "audiences": [
-      "elder",
-      "gen-x"
-    ],
-    "questionText": "What is the Name of this athlete?"
-  },
-  {
-    "id": "john-barnes",
-    "displayName": "John Barnes",
-    "category": "athletes",
-    "contentSubject": "athlete",
-    "correctYear": 1963,
     "audiences": [
       "elder",
       "gen-x"
@@ -6152,17 +5710,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-x"
     ],
     "questionText": "What is the Name of this athlete?"
-  },
-  {
-    "id": "jonathan-johansson",
-    "displayName": "Jonathan Johansson",
-    "category": "artists",
-    "contentSubject": "artist",
-    "correctYear": 1979,
-    "audiences": [
-      "millennials"
-    ],
-    "questionText": "What is the Name of this Artist?"
   },
   {
     "id": "joni-mitchell",
@@ -6425,19 +5972,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "questionText": "What is the Name of this athlete?"
   },
   {
-    "id": "karim-benzema",
-    "displayName": "Karim Benzema",
-    "category": "athletes",
-    "contentSubject": "athlete",
-    "correctYear": 1987,
-    "audiences": [
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "questionText": "What is the Name of this athlete?"
-  },
-  {
     "id": "karl-heinz-rummenigge",
     "displayName": "Karl Heinz Rummenigge",
     "category": "athletes",
@@ -6448,19 +5982,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-x"
     ],
     "questionText": "What is the Name of this athlete?"
-  },
-  {
-    "id": "karol-g",
-    "displayName": "Karol G",
-    "category": "artists",
-    "contentSubject": "artist",
-    "correctYear": 1991,
-    "peakFrom": 2017,
-    "peakTo": 2024,
-    "audiences": [
-      "gen-z"
-    ],
-    "questionText": "What is the Name of this Artist?"
   },
   {
     "id": "karsten-warholm",
@@ -6474,17 +5995,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-alpha"
     ],
     "questionText": "What is the Name of this athlete?"
-  },
-  {
-    "id": "kartellen",
-    "displayName": "Kartellen",
-    "category": "artists",
-    "contentSubject": "band",
-    "correctYear": 2008,
-    "audiences": [
-      "all"
-    ],
-    "questionText": "What is the Name of this band?"
   },
   {
     "id": "katarina-witt",
@@ -6727,19 +6237,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-alpha"
     ],
     "questionText": "What is the Name of this athlete?"
-  },
-  {
-    "id": "khalid",
-    "displayName": "Khalid",
-    "category": "artists",
-    "contentSubject": "artist",
-    "correctYear": 1998,
-    "peakFrom": 2016,
-    "peakTo": 2024,
-    "audiences": [
-      "gen-z"
-    ],
-    "questionText": "What is the Name of this Artist?"
   },
   {
     "id": "kikki-danielsson",
@@ -7520,19 +7017,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "questionText": "What is the Name of this Artist?"
   },
   {
-    "id": "lou-reed",
-    "displayName": "Lou Reed",
-    "category": "artists",
-    "contentSubject": "artist",
-    "correctYear": 1942,
-    "peakFrom": 1965,
-    "peakTo": 2013,
-    "audiences": [
-      "gen-x"
-    ],
-    "questionText": "What is the Name of this Artist?"
-  },
-  {
     "id": "louis-armstrong",
     "displayName": "Louis Armstrong",
     "category": "artists",
@@ -7658,17 +7142,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "questionText": "What is the Name of this athlete?"
   },
   {
-    "id": "lukas-graham",
-    "displayName": "Lukas Graham",
-    "category": "artists",
-    "contentSubject": "band",
-    "correctYear": 2011,
-    "audiences": [
-      "all"
-    ],
-    "questionText": "What is the Name of this band?"
-  },
-  {
     "id": "lykke-li",
     "displayName": "Lykke Li",
     "category": "artists",
@@ -7717,19 +7190,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "questionText": "What is the Name of this athlete?"
   },
   {
-    "id": "magnus-carlsen",
-    "displayName": "Magnus Carlsen",
-    "category": "athletes",
-    "contentSubject": "athlete",
-    "correctYear": 1990,
-    "audiences": [
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "questionText": "What is the Name of this athlete?"
-  },
-  {
     "id": "magnus-harenstam",
     "displayName": "Magnus Härenstam",
     "category": "actors",
@@ -7762,17 +7222,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-x"
     ],
     "questionText": "What is the Name of this athlete?"
-  },
-  {
-    "id": "maja-francis",
-    "displayName": "Maja Francis",
-    "category": "artists",
-    "contentSubject": "artist",
-    "correctYear": 1988,
-    "audiences": [
-      "millennials"
-    ],
-    "questionText": "What is the Name of this Artist?"
   },
   {
     "id": "maluma",
@@ -8148,18 +7597,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "questionText": "What is the Name of this actor?"
   },
   {
-    "id": "mark-spitz",
-    "displayName": "Mark Spitz",
-    "category": "athletes",
-    "contentSubject": "athlete",
-    "correctYear": 1950,
-    "audiences": [
-      "elder",
-      "gen-x"
-    ],
-    "questionText": "What is the Name of this athlete?"
-  },
-  {
     "id": "mark-wahlberg",
     "displayName": "Mark Wahlberg",
     "category": "actors",
@@ -8475,35 +7912,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "questionText": "What is the Name of this actor?"
   },
   {
-    "id": "mesut-ozil",
-    "displayName": "Mesut Özil",
-    "category": "athletes",
-    "contentSubject": "athlete",
-    "correctYear": 1988,
-    "audiences": [
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "questionText": "What is the Name of this athlete?"
-  },
-  {
     "id": "metallica",
     "displayName": "Metallica",
     "category": "artists",
     "contentSubject": "band",
     "correctYear": 1981,
-    "audiences": [
-      "all"
-    ],
-    "questionText": "What is the Name of this band?"
-  },
-  {
-    "id": "mew",
-    "displayName": "Mew",
-    "category": "artists",
-    "contentSubject": "band",
-    "correctYear": 1995,
     "audiences": [
       "all"
     ],
@@ -8737,19 +8150,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "questionText": "What is the Name of this athlete?"
   },
   {
-    "id": "mo-salah",
-    "displayName": "Mohamed Salah",
-    "category": "athletes",
-    "contentSubject": "athlete",
-    "correctYear": 1992,
-    "audiences": [
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "questionText": "What is the Name of this athlete?"
-  },
-  {
     "id": "mohamed-salah",
     "displayName": "Mohamed Salah",
     "category": "athletes",
@@ -8818,28 +8218,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-x"
     ],
     "questionText": "What is the Name of this athlete?"
-  },
-  {
-    "id": "muse",
-    "displayName": "Muse",
-    "category": "artists",
-    "contentSubject": "band",
-    "correctYear": 1994,
-    "audiences": [
-      "all"
-    ],
-    "questionText": "What is the Name of this band?"
-  },
-  {
-    "id": "mwuana",
-    "displayName": "Mwuana",
-    "category": "artists",
-    "contentSubject": "artist",
-    "correctYear": 1996,
-    "audiences": [
-      "millennials"
-    ],
-    "questionText": "What is the Name of this Artist?"
   },
   {
     "id": "nadia-comaneci",
@@ -9146,17 +8524,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "questionText": "What is the Name of this actor?"
   },
   {
-    "id": "noice",
-    "displayName": "Noice",
-    "category": "artists",
-    "contentSubject": "band",
-    "correctYear": 1979,
-    "audiences": [
-      "all"
-    ],
-    "questionText": "What is the Name of this band?"
-  },
-  {
     "id": "noomi-rapace",
     "displayName": "Noomi Rapace",
     "category": "actors",
@@ -9267,17 +8634,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "questionText": "What is the Name of this Artist?"
   },
   {
-    "id": "opeth",
-    "displayName": "Opeth",
-    "category": "artists",
-    "contentSubject": "band",
-    "correctYear": 1989,
-    "audiences": [
-      "all"
-    ],
-    "questionText": "What is the Name of this band?"
-  },
-  {
     "id": "orup",
     "displayName": "Orup",
     "category": "artists",
@@ -9373,32 +8729,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "questionText": "What is the Name of this Artist?"
   },
   {
-    "id": "pablo-aimar",
-    "displayName": "Pablo Aimar",
-    "category": "athletes",
-    "contentSubject": "athlete",
-    "correctYear": 1979,
-    "audiences": [
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "questionText": "What is the Name of this athlete?"
-  },
-  {
-    "id": "paolo-guerrero",
-    "displayName": "Paolo Guerrero",
-    "category": "athletes",
-    "contentSubject": "athlete",
-    "correctYear": 1984,
-    "audiences": [
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "questionText": "What is the Name of this athlete?"
-  },
-  {
     "id": "paolo-maldini",
     "displayName": "Paolo Maldini",
     "category": "athletes",
@@ -9449,19 +8779,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "questionText": "What is the Name of this Artist?"
   },
   {
-    "id": "pat-boone",
-    "displayName": "Pat Boone",
-    "category": "artists",
-    "contentSubject": "artist",
-    "correctYear": 1934,
-    "peakFrom": 1955,
-    "peakTo": 2010,
-    "audiences": [
-      "elder"
-    ],
-    "questionText": "What is the Name of this Artist?"
-  },
-  {
     "id": "pat-jennings",
     "displayName": "Pat Jennings",
     "category": "athletes",
@@ -9496,18 +8813,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z",
       "gen-alpha"
-    ],
-    "questionText": "What is the Name of this athlete?"
-  },
-  {
-    "id": "patrick-roy",
-    "displayName": "Patrick Roy",
-    "category": "athletes",
-    "contentSubject": "athlete",
-    "correctYear": 1965,
-    "audiences": [
-      "elder",
-      "gen-x"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -9597,18 +8902,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "questionText": "What is the Name of this athlete?"
   },
   {
-    "id": "paul-ince",
-    "displayName": "Paul Ince",
-    "category": "athletes",
-    "contentSubject": "athlete",
-    "correctYear": 1967,
-    "audiences": [
-      "elder",
-      "gen-x"
-    ],
-    "questionText": "What is the Name of this athlete?"
-  },
-  {
     "id": "paul-newman",
     "displayName": "Paul Newman",
     "category": "actors",
@@ -9642,18 +8935,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-x"
     ],
     "questionText": "What is the Name of this actor?"
-  },
-  {
-    "id": "paulo-bento",
-    "displayName": "Paulo Bento",
-    "category": "athletes",
-    "contentSubject": "athlete",
-    "correctYear": 1969,
-    "audiences": [
-      "elder",
-      "gen-x"
-    ],
-    "questionText": "What is the Name of this athlete?"
   },
   {
     "id": "pavel-nedved",
@@ -9856,18 +9137,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "questionText": "What is the Name of this Artist?"
   },
   {
-    "id": "peter-shilton",
-    "displayName": "Peter Shilton",
-    "category": "athletes",
-    "contentSubject": "athlete",
-    "correctYear": 1949,
-    "audiences": [
-      "elder",
-      "gen-x"
-    ],
-    "questionText": "What is the Name of this athlete?"
-  },
-  {
     "id": "peter-stormare",
     "displayName": "Peter Stormare",
     "category": "actors",
@@ -9977,18 +9246,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "questionText": "What is the Name of this actor?"
   },
   {
-    "id": "pierre-littbarski",
-    "displayName": "Pierre Littbarski",
-    "category": "athletes",
-    "contentSubject": "athlete",
-    "correctYear": 1960,
-    "audiences": [
-      "elder",
-      "gen-x"
-    ],
-    "questionText": "What is the Name of this athlete?"
-  },
-  {
     "id": "pink",
     "displayName": "Pink",
     "category": "artists",
@@ -10081,17 +9338,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "all"
     ],
     "questionText": "What is the Name of this band?"
-  },
-  {
-    "id": "raaban",
-    "displayName": "Raaban",
-    "category": "artists",
-    "contentSubject": "artist",
-    "correctYear": 1990,
-    "audiences": [
-      "millennials"
-    ],
-    "questionText": "What is the Name of this Artist?"
   },
   {
     "id": "rabah-madjer",
@@ -10242,17 +9488,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "questionText": "What is the Name of this band?"
   },
   {
-    "id": "reeperbahn",
-    "displayName": "Reeperbahn",
-    "category": "artists",
-    "contentSubject": "band",
-    "correctYear": 1976,
-    "audiences": [
-      "all"
-    ],
-    "questionText": "What is the Name of this band?"
-  },
-  {
     "id": "reese-witherspoon",
     "displayName": "Reese Witherspoon",
     "category": "actors",
@@ -10274,30 +9509,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "all"
     ],
     "questionText": "What is the Name of this band?"
-  },
-  {
-    "id": "rene-higuita",
-    "displayName": "Rene Higuita",
-    "category": "athletes",
-    "contentSubject": "athlete",
-    "correctYear": 1966,
-    "audiences": [
-      "elder",
-      "gen-x"
-    ],
-    "questionText": "What is the Name of this athlete?"
-  },
-  {
-    "id": "rene-simoes",
-    "displayName": "René Simões",
-    "category": "athletes",
-    "contentSubject": "athlete",
-    "correctYear": 1952,
-    "audiences": [
-      "elder",
-      "gen-x"
-    ],
-    "questionText": "What is the Name of this athlete?"
   },
   {
     "id": "ricardo-la-volpe",
@@ -10362,18 +9573,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "questionText": "What is the Name of this Artist?"
   },
   {
-    "id": "rinus-michels",
-    "displayName": "Rinus Michels",
-    "category": "athletes",
-    "contentSubject": "athlete",
-    "correctYear": 1928,
-    "audiences": [
-      "elder",
-      "gen-x"
-    ],
-    "questionText": "What is the Name of this athlete?"
-  },
-  {
     "id": "rio-ferdinand",
     "displayName": "Rio Ferdinand",
     "category": "athletes",
@@ -10407,19 +9606,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
-    ],
-    "questionText": "What is the Name of this athlete?"
-  },
-  {
-    "id": "riyad-mahrez",
-    "displayName": "Riyad Mahrez",
-    "category": "athletes",
-    "contentSubject": "athlete",
-    "correctYear": 1991,
-    "audiences": [
-      "millennials",
-      "gen-z",
-      "gen-alpha"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -10508,18 +9694,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "questionText": "What is the Name of this actor?"
   },
   {
-    "id": "robert-prosinecki",
-    "displayName": "Robert Prosinecki",
-    "category": "athletes",
-    "contentSubject": "athlete",
-    "correctYear": 1969,
-    "audiences": [
-      "elder",
-      "gen-x"
-    ],
-    "questionText": "What is the Name of this athlete?"
-  },
-  {
     "id": "robert-redford",
     "displayName": "Robert Redford",
     "category": "actors",
@@ -10536,18 +9710,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "athletes",
     "contentSubject": "athlete",
     "correctYear": 1967,
-    "audiences": [
-      "elder",
-      "gen-x"
-    ],
-    "questionText": "What is the Name of this athlete?"
-  },
-  {
-    "id": "roberto-carlos",
-    "displayName": "Roberto Carlos",
-    "category": "athletes",
-    "contentSubject": "athlete",
-    "correctYear": 1973,
     "audiences": [
       "elder",
       "gen-x"
@@ -10666,18 +9828,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "questionText": "What is the Name of this athlete?"
   },
   {
-    "id": "roger-lemerre",
-    "displayName": "Roger Lemerre",
-    "category": "athletes",
-    "contentSubject": "athlete",
-    "correctYear": 1941,
-    "audiences": [
-      "elder",
-      "gen-x"
-    ],
-    "questionText": "What is the Name of this athlete?"
-  },
-  {
     "id": "rogerio-ceni",
     "displayName": "Rogerio Ceni",
     "category": "athletes",
@@ -10759,18 +9909,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z",
       "gen-alpha"
-    ],
-    "questionText": "What is the Name of this athlete?"
-  },
-  {
-    "id": "ronaldo-brazil",
-    "displayName": "Ronaldo",
-    "category": "athletes",
-    "contentSubject": "athlete",
-    "correctYear": 1976,
-    "audiences": [
-      "elder",
-      "gen-x"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -10859,17 +9997,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "questionText": "What is the Name of this athlete?"
   },
   {
-    "id": "rush",
-    "displayName": "Rush",
-    "category": "artists",
-    "contentSubject": "band",
-    "correctYear": 1968,
-    "audiences": [
-      "all"
-    ],
-    "questionText": "What is the Name of this band?"
-  },
-  {
     "id": "russell-crowe",
     "displayName": "Russell Crowe",
     "category": "actors",
@@ -10955,19 +10082,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "questionText": "What is the Name of this actor?"
   },
   {
-    "id": "sabaton",
-    "displayName": "Sabaton",
-    "category": "artists",
-    "contentSubject": "band",
-    "correctYear": 1999,
-    "audiences": [
-      "gen-x",
-      "millennials",
-      "gen-z"
-    ],
-    "questionText": "What is the Name of this band?"
-  },
-  {
     "id": "sabina-ddumba",
     "displayName": "Sabina Ddumba",
     "category": "artists",
@@ -11014,28 +10128,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z"
     ],
     "questionText": "What is the Name of this actor?"
-  },
-  {
-    "id": "sakert",
-    "displayName": "Säkert!",
-    "category": "artists",
-    "contentSubject": "band",
-    "correctYear": 2007,
-    "audiences": [
-      "all"
-    ],
-    "questionText": "What is the Name of this band?"
-  },
-  {
-    "id": "salem-al-fakir",
-    "displayName": "Salem Al Fakir",
-    "category": "artists",
-    "contentSubject": "artist",
-    "correctYear": 1981,
-    "audiences": [
-      "millennials"
-    ],
-    "questionText": "What is the Name of this Artist?"
   },
   {
     "id": "salma-hayek",
@@ -11199,17 +10291,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "artists",
     "contentSubject": "artist",
     "correctYear": 1981,
-    "audiences": [
-      "millennials"
-    ],
-    "questionText": "What is the Name of this Artist?"
-  },
-  {
-    "id": "sarah-klang",
-    "displayName": "Sarah Klang",
-    "category": "artists",
-    "contentSubject": "artist",
-    "correctYear": 1990,
     "audiences": [
       "millennials"
     ],
@@ -11391,18 +10472,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "questionText": "What is the Name of this Artist?"
   },
   {
-    "id": "shaquille-oneal",
-    "displayName": "Shaquille O'Neal",
-    "category": "athletes",
-    "contentSubject": "athlete",
-    "correctYear": 1972,
-    "audiences": [
-      "elder",
-      "gen-x"
-    ],
-    "questionText": "What is the Name of this athlete?"
-  },
-  {
     "id": "sharon-stone",
     "displayName": "Sharon Stone",
     "category": "actors",
@@ -11425,19 +10494,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z"
     ],
     "questionText": "What is the Name of this Artist?"
-  },
-  {
-    "id": "shelly-ann-fraser-pryce",
-    "displayName": "Shelly-Ann Fraser-Pryce",
-    "category": "athletes",
-    "contentSubject": "athlete",
-    "correctYear": 1986,
-    "audiences": [
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "questionText": "What is the Name of this athlete?"
   },
   {
     "id": "shinji-kagawa",
@@ -11473,17 +10529,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder"
     ],
     "questionText": "What is the Name of this actor?"
-  },
-  {
-    "id": "shout-out-louds",
-    "displayName": "Shout Out Louds",
-    "category": "artists",
-    "contentSubject": "band",
-    "correctYear": 2001,
-    "audiences": [
-      "all"
-    ],
-    "questionText": "What is the Name of this band?"
   },
   {
     "id": "shunsuke-nakamura",
@@ -11578,19 +10623,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1969,
     "audiences": [
       "gen-x"
-    ],
-    "questionText": "What is the Name of this Artist?"
-  },
-  {
-    "id": "smokey-robinson",
-    "displayName": "Smokey Robinson",
-    "category": "artists",
-    "contentSubject": "artist",
-    "correctYear": 1940,
-    "peakFrom": 1960,
-    "peakTo": 2024,
-    "audiences": [
-      "elder"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -11737,17 +10769,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "questionText": "What is the Name of this athlete?"
   },
   {
-    "id": "stefan-sundstrom",
-    "displayName": "Stefan Sundström",
-    "category": "artists",
-    "contentSubject": "artist",
-    "correctYear": 1965,
-    "audiences": [
-      "gen-x"
-    ],
-    "questionText": "What is the Name of this Artist?"
-  },
-  {
     "id": "steffi-graf",
     "displayName": "Steffi Graf",
     "category": "athletes",
@@ -11780,19 +10801,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "all"
     ],
     "questionText": "What is the Name of this band?"
-  },
-  {
-    "id": "stephanie-frappart",
-    "displayName": "Stéphanie Frappart",
-    "category": "athletes",
-    "contentSubject": "athlete",
-    "correctYear": 1983,
-    "audiences": [
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "questionText": "What is the Name of this athlete?"
   },
   {
     "id": "stephen-curry",
@@ -11843,19 +10851,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "questionText": "What is the Name of this athlete?"
   },
   {
-    "id": "stevie-nicks",
-    "displayName": "Stevie Nicks",
-    "category": "artists",
-    "contentSubject": "artist",
-    "correctYear": 1948,
-    "peakFrom": 1975,
-    "peakTo": 2024,
-    "audiences": [
-      "gen-x"
-    ],
-    "questionText": "What is the Name of this Artist?"
-  },
-  {
     "id": "stevie-wonder",
     "displayName": "Stevie Wonder",
     "category": "artists",
@@ -11867,17 +10862,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder"
     ],
     "questionText": "What is the Name of this Artist?"
-  },
-  {
-    "id": "stiftelsen",
-    "displayName": "Stiftelsen",
-    "category": "artists",
-    "contentSubject": "band",
-    "correctYear": 2010,
-    "audiences": [
-      "all"
-    ],
-    "questionText": "What is the Name of this band?"
   },
   {
     "id": "stina-nilsson",
@@ -11904,40 +10888,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-x"
     ],
     "questionText": "What is the Name of this Artist?"
-  },
-  {
-    "id": "stor",
-    "displayName": "Stor",
-    "category": "artists",
-    "contentSubject": "artist",
-    "correctYear": 1985,
-    "audiences": [
-      "millennials"
-    ],
-    "questionText": "What is the Name of this Artist?"
-  },
-  {
-    "id": "streaplers",
-    "displayName": "Streaplers",
-    "category": "artists",
-    "contentSubject": "band",
-    "correctYear": 1959,
-    "audiences": [
-      "all"
-    ],
-    "questionText": "What is the Name of this band?"
-  },
-  {
-    "id": "stuart-pearce",
-    "displayName": "Stuart Pearce",
-    "category": "athletes",
-    "contentSubject": "athlete",
-    "correctYear": 1962,
-    "audiences": [
-      "elder",
-      "gen-x"
-    ],
-    "questionText": "What is the Name of this athlete?"
   },
   {
     "id": "sugar-ray-leonard",
@@ -12088,28 +11038,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "questionText": "What is the Name of this band?"
   },
   {
-    "id": "talking-heads",
-    "displayName": "Talking Heads",
-    "category": "artists",
-    "contentSubject": "band",
-    "correctYear": 1975,
-    "audiences": [
-      "all"
-    ],
-    "questionText": "What is the Name of this band?"
-  },
-  {
-    "id": "tame-impala",
-    "displayName": "Tame Impala",
-    "category": "artists",
-    "contentSubject": "band",
-    "correctYear": 2007,
-    "audiences": [
-      "all"
-    ],
-    "questionText": "What is the Name of this band?"
-  },
-  {
     "id": "taylor-swift",
     "displayName": "Taylor Swift",
     "category": "artists",
@@ -12123,17 +11051,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "questionText": "What is the Name of this Artist?"
   },
   {
-    "id": "tears-for-fears",
-    "displayName": "Tears for Fears",
-    "category": "artists",
-    "contentSubject": "band",
-    "correctYear": 1981,
-    "audiences": [
-      "all"
-    ],
-    "questionText": "What is the Name of this band?"
-  },
-  {
     "id": "ted-gardestad",
     "displayName": "Ted Gärdestad",
     "category": "artists",
@@ -12143,18 +11060,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-x"
     ],
     "questionText": "What is the Name of this Artist?"
-  },
-  {
-    "id": "tele-santana",
-    "displayName": "Telê Santana",
-    "category": "athletes",
-    "contentSubject": "athlete",
-    "correctYear": 1931,
-    "audiences": [
-      "elder",
-      "gen-x"
-    ],
-    "questionText": "What is the Name of this athlete?"
   },
   {
     "id": "teofilo-cubillas",
@@ -12279,17 +11184,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "questionText": "What is the Name of this band?"
   },
   {
-    "id": "the-strokes",
-    "displayName": "The Strokes",
-    "category": "artists",
-    "contentSubject": "band",
-    "correctYear": 1998,
-    "audiences": [
-      "all"
-    ],
-    "questionText": "What is the Name of this band?"
-  },
-  {
     "id": "the-tallest-man-on-earth",
     "displayName": "The Tallest Man on Earth",
     "category": "artists",
@@ -12312,17 +11206,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z"
     ],
     "questionText": "What is the Name of this Artist?"
-  },
-  {
-    "id": "the-who",
-    "displayName": "The Who",
-    "category": "artists",
-    "contentSubject": "band",
-    "correctYear": 1964,
-    "audiences": [
-      "all"
-    ],
-    "questionText": "What is the Name of this band?"
   },
   {
     "id": "thiago-silva",
@@ -12710,30 +11593,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "questionText": "What is the Name of this athlete?"
   },
   {
-    "id": "twenty-one-pilots",
-    "displayName": "Twenty One Pilots",
-    "category": "artists",
-    "contentSubject": "band",
-    "correctYear": 2009,
-    "audiences": [
-      "all"
-    ],
-    "questionText": "What is the Name of this band?"
-  },
-  {
-    "id": "tyler-the-creator",
-    "displayName": "Tyler, The Creator",
-    "category": "artists",
-    "contentSubject": "artist",
-    "correctYear": 1991,
-    "peakFrom": 2009,
-    "peakTo": 2024,
-    "audiences": [
-      "gen-z"
-    ],
-    "questionText": "What is the Name of this Artist?"
-  },
-  {
     "id": "u2",
     "displayName": "U2",
     "category": "artists",
@@ -12743,17 +11602,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "all"
     ],
     "questionText": "What is the Name of this band?"
-  },
-  {
-    "id": "ulf-brunnberg",
-    "displayName": "Ulf Brunnberg",
-    "category": "actors",
-    "contentSubject": "actor",
-    "correctYear": 1947,
-    "audiences": [
-      "gen-x"
-    ],
-    "questionText": "What is the Name of this actor?"
   },
   {
     "id": "ulf-lundell",
@@ -13007,17 +11855,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "questionText": "What is the Name of this actor?"
   },
   {
-    "id": "volbeat",
-    "displayName": "Volbeat",
-    "category": "artists",
-    "contentSubject": "band",
-    "correctYear": 2001,
-    "audiences": [
-      "all"
-    ],
-    "questionText": "What is the Name of this band?"
-  },
-  {
     "id": "warren-beatty",
     "displayName": "Warren Beatty",
     "category": "actors",
@@ -13083,17 +11920,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "artists",
     "contentSubject": "band",
     "correctYear": 1981,
-    "audiences": [
-      "all"
-    ],
-    "questionText": "What is the Name of this band?"
-  },
-  {
-    "id": "white-stripes",
-    "displayName": "The White Stripes",
-    "category": "artists",
-    "contentSubject": "band",
-    "correctYear": 1997,
     "audiences": [
       "all"
     ],
@@ -13233,17 +12059,6 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-alpha"
     ],
     "questionText": "What is the Name of this athlete?"
-  },
-  {
-    "id": "yes",
-    "displayName": "Yes",
-    "category": "artists",
-    "contentSubject": "band",
-    "correctYear": 1968,
-    "audiences": [
-      "all"
-    ],
-    "questionText": "What is the Name of this band?"
   },
   {
     "id": "ylvis",

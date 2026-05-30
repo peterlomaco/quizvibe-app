@@ -206,12 +206,6 @@ items:
     probability: 80
     wikimediaSearchHints: ["Mark Ruffalo actor"]
     answerMethods: ["timeline", "name-letters"]
-  - id: chris-hemsworth
-    displayName: "Chris Hemsworth"
-    correctYear: 1983
-    probability: 88
-    wikimediaSearchHints: ["Chris Hemsworth actor Thor"]
-    answerMethods: ["timeline", "name-letters"]
   - id: chris-evans
     displayName: "Chris Evans"
     correctYear: 1981
@@ -259,12 +253,6 @@ items:
     correctYear: 1979
     probability: 80
     wikimediaSearchHints: ["Kate Hudson actress"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: drew-barrymore
-    displayName: "Drew Barrymore"
-    correctYear: 1975
-    probability: 85
-    wikimediaSearchHints: ["Drew Barrymore actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: cameron-diaz
     displayName: "Cameron Diaz"
