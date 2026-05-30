@@ -30,6 +30,10 @@ export interface LobbySettings {
   selectedExtraPackages: string[];
   youtubeEnabled: boolean;
   imagesEnabled: boolean;
+  // "Profiles"-källan har två under-toggles i Lobby:n: Images (foto, 1+2) och
+  // Sketch (doodle, 4). sketchEnabled är förberedd men doodlen är INTE wirad
+  // till quiz-poolen ännu (prototyp) → toggeln är strukturell. Default false.
+  sketchEnabled: boolean;
   enabledMainCategories: MainCategory[];
 }
 
@@ -45,6 +49,8 @@ interface LobbySettingsRow {
   selected_extra_packages: string[];
   youtube_enabled: boolean;
   images_enabled: boolean;
+  // Optional tills migration 0013_sketch_enabled.sql körts (tolerant read).
+  sketch_enabled?: boolean;
   enabled_main_categories: string[];
 }
 
@@ -73,6 +79,8 @@ function rowToSettings(row: LobbySettingsRow): LobbySettings {
     selectedExtraPackages: row.selected_extra_packages,
     youtubeEnabled: row.youtube_enabled,
     imagesEnabled: row.images_enabled,
+    // Tolerant: kolumnen kanske inte finns ännu (pre-migration) → default false.
+    sketchEnabled: row.sketch_enabled ?? false,
     enabledMainCategories: (row.enabled_main_categories ?? []).filter(isMainCategory),
   };
 }
@@ -90,6 +98,12 @@ function settingsToRow(code: string, s: LobbySettings): LobbySettingsRow {
     selected_extra_packages: [...s.selectedExtraPackages],
     youtube_enabled: s.youtubeEnabled,
     images_enabled: s.imagesEnabled,
+    // OBS: sketch_enabled skrivs INTE ännu — kolumnen finns inte förrän
+    // migration 0013_sketch_enabled.sql körts, och en upsert mot en okänd
+    // kolumn skulle faila HELA settings-skrivningen → bryta all lobby-sync.
+    // När migrationen är applicerad: avkommentera raden nedan för cross-device
+    // sketch-sync.
+    // sketch_enabled: s.sketchEnabled,
     enabled_main_categories: s.enabledMainCategories.length > 0
       ? [...s.enabledMainCategories]
       : defaultEnabledMainCategories(),

@@ -1074,6 +1074,7 @@ export default function LobbyScreen() {
             setSelectedExtraPackages(stored.selectedExtraPackages);
             setYoutubeEnabled(stored.youtubeEnabled);
             setImagesEnabled(stored.imagesEnabled);
+            setSketchEnabled(stored.sketchEnabled);
           }
           setEnabledHostPackages(
             profile?.enabledHostPackages ?? PURCHASED_PACKAGES.map((p) => p.id),
@@ -1481,8 +1482,11 @@ export default function LobbyScreen() {
   // YouTube är alltid tillgänglig som källa, men host kan slå av/på manuellt
   // via en toggle. Default = på. Skickas till alla via lobbyns state.
   const [youtubeEnabled, setYoutubeEnabled] = useState(true);
-  // Profiles and Places styrs helt av host-toggeln. Default = på.
+  // "Profiles"-källan har två under-toggles: Images (foto) + Sketch (doodle).
+  // Images default på; Sketch default AV (doodlen är prototyp, ej wirad till
+  // quiz-poolen — toggeln är strukturell tills den kopplas in).
   const [imagesEnabled, setImagesEnabled] = useState(true);
+  const [sketchEnabled, setSketchEnabled] = useState(false);
   // Main categories (Music/Film/Sport) — host-toggleln filtrerar quiz-poolen
   // via backend-subject → MainCategory-mappning. Min 1 enforce:as i
   // handleToggleMainCategory så listan aldrig blir tom. Seedas från host:s
@@ -2172,6 +2176,7 @@ export default function LobbyScreen() {
         selectedExtraPackages,
         youtubeEnabled,
         imagesEnabled,
+        sketchEnabled,
         enabledMainCategories,
       }).catch(() => { /* loggas i mockLobbySettings */ });
     }, 300);
@@ -2188,6 +2193,7 @@ export default function LobbyScreen() {
     selectedExtraPackages,
     youtubeEnabled,
     imagesEnabled,
+    sketchEnabled,
     enabledMainCategories,
   ]);
 
@@ -2231,6 +2237,7 @@ export default function LobbyScreen() {
       });
       setYoutubeEnabled(stored.youtubeEnabled);
       setImagesEnabled(stored.imagesEnabled);
+      setSketchEnabled(stored.sketchEnabled);
       // Main categories — coerce tom array till alla 3 så pool-filtret
       // aldrig blir tomt om host:s skrivning skulle ha landat ofullständig.
       setEnabledMainCategories((prev) => {
@@ -3442,12 +3449,19 @@ export default function LobbyScreen() {
                 />
               )}
             </View>
-            {/* Images — Q-cirkel med blå primary-border och "?"-glyph centrerad. */}
+            {/* ── Profiles ── förälder-källa med TVÅ under-toggles:
+                  • Images = foto-biblioteket (riktiga bilder + mosaik-reveal)
+                  • Sketch = AI-doodlen (text-till-bild, "Guess Who")
+                Host kan ha BÅDA, ENA eller INGEN aktiverad. Images räknas i
+                min-1-guarden (handleToggleSource); Sketch är en FRI toggle
+                eftersom doodlen inte är wirad till quiz-poolen ännu (prototyp)
+                → en sketch-only-lobby skulle ge tom pool. När doodlen kopplas
+                in: lägg sketchEnabled i enabledSourceCount + en egen guard. */}
+            <Text style={styles.connectionSubHeading}>Profiles</Text>
+
+            {/* Images (foto) — Q-cirkel med "?"-glyph. */}
             <View style={styles.connectionRow}>
               <View style={styles.connectionIconWrap}>
-                {/* Q-figuren från startskärmens logga (utan omgivande kvadrater).
-                    "?"-glyph överlagrad i mitten ersätter den lilla pricken —
-                    speglar QuizVibeQuestionMarkLogo:s symbolik. */}
                 <Svg width={28} height={28} viewBox="24 22 32 32" style={StyleSheet.absoluteFillObject}>
                   <Circle cx="40" cy="38" r="13" fill="none" stroke={Colors.primary} strokeWidth="2.5" />
                   <Path d="M49 47 L53 51" stroke={Colors.primary} strokeWidth="2.5" strokeLinecap="round" />
@@ -3455,8 +3469,6 @@ export default function LobbyScreen() {
                 <Text style={styles.connectionIconAiText}>?</Text>
               </View>
               <Text style={styles.connectionLabel}>Images</Text>
-              {/* FREE-badgen sitter alltid kvar (samma mönster som YouTube) —
-                  grön i Enabled, grå i Disabled. */}
               <View style={imagesEnabled ? styles.youtubeEnabledPill : styles.statusPillDisabled}>
                 <Text style={imagesEnabled ? styles.youtubeEnabledText : styles.statusPillTextDisabled}>
                   {imagesEnabled ? 'Enabled' : 'Disabled'}
@@ -3476,9 +3488,43 @@ export default function LobbyScreen() {
                   onValueChange={(v) => handleToggleSource(imagesEnabled, setImagesEnabled, v)}
                   trackColor={{ false: Colors.error, true: Colors.success }}
                   thumbColor="#FFF"
-                  // Synca ios_backgroundColor med aktiv track-färg — se
-                  // YouTube-switchen ovan för rationale.
                   ios_backgroundColor={imagesEnabled ? Colors.success : Colors.error}
+                  style={styles.connectionSwitch}
+                />
+              )}
+            </View>
+
+            {/* Sketch (doodle) — pennikon. Fri toggle (default av). */}
+            <View style={styles.connectionRow}>
+              <View style={styles.connectionIconWrap}>
+                <Svg width={22} height={22} viewBox="0 0 24 24">
+                  <Path
+                    d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
+                    fill={Colors.primary}
+                  />
+                </Svg>
+              </View>
+              <Text style={styles.connectionLabel}>Sketch</Text>
+              <View style={sketchEnabled ? styles.youtubeEnabledPill : styles.statusPillDisabled}>
+                <Text style={sketchEnabled ? styles.youtubeEnabledText : styles.statusPillTextDisabled}>
+                  {sketchEnabled ? 'Enabled' : 'Disabled'}
+                </Text>
+                <View
+                  style={[styles.freeBadgeSmall, !sketchEnabled && styles.freeBadgeSmallGrey]}
+                  pointerEvents="none"
+                >
+                  <Text style={[styles.freeBadgeTextSmall, !sketchEnabled && styles.freeBadgeSmallTextGrey]}>
+                    FREE
+                  </Text>
+                </View>
+              </View>
+              {hostMode && (
+                <Switch
+                  value={sketchEnabled}
+                  onValueChange={setSketchEnabled}
+                  trackColor={{ false: Colors.error, true: Colors.success }}
+                  thumbColor="#FFF"
+                  ios_backgroundColor={sketchEnabled ? Colors.success : Colors.error}
                   style={styles.connectionSwitch}
                 />
               )}
@@ -5248,6 +5294,13 @@ const styles = StyleSheet.create({
     // paketlistan nedanför. Pillarna shiftas vänster med samma värde via
     // en mindre connectionLabel.minWidth.
     paddingRight: 18,
+  },
+  // "Profiles"-förälder-rubrik över Images/Sketch-under-togglarna.
+  connectionSubHeading: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.bold,
+    color: Colors.textPrimary,
+    marginTop: 2,
   },
   connectionIconWrap: {
     width: 28,
