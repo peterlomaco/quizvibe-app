@@ -335,7 +335,7 @@ Alla tre kör samma reset-logic. Redundansen är medveten — om ett path missar
 Five top-level collapsible sections — all use the same tappable-header pattern with a `+/−`-toggle box (26×26, `borderColor: borderStrong`) next to the title (`Typography.title` + bold + `Colors.textPrimary`). When collapsed, a 1px `sectionDivider` line shows under the header for visual separation. Default expanded; state per section is local (not persisted across app restarts).
 
 1. **Profile default settings** — avatar + Player Name (read-only `Text`, set at registration, NOT editable from this screen), competition setup (Year of birth, auto Competition Age, Assistance level), Save Profile button. Innehåller bara user-defaults nu — host-defaults har lyfts ut till egen top-level sektion (#2).
-2. **Host default settings** — Game Mode (Pass-the-Phone vs Individual Devices), Region scope + Answer response time, Game era, Number of Rounds, "Save Host settings"-knapp. Tidigare en sub-rubrik inom Profile defaults; lyftes ut 2026-05-06 till egen kollapsbar sektion för att hålla sektionerna semantiskt separerade. Number of Players-toggle togs bort 2026-05-25 — `maxPlayers` deriveras nu automatiskt från `gameMode` (PtP=4, IndDev=12) via auto-sync useEffect, eftersom de två settings:n var starkt kopplade och separat UI bara skapade redundant tap-yta.
+2. **Host default settings** — Game Mode (Pass-the-Phone vs Individual Devices), Region scope + Answer response time, Game era, Number of Rounds, "Save Host settings"-knapp. Tidigare en sub-rubrik inom Profile defaults; lyftes ut 2026-05-06 till egen kollapsbar sektion för att hålla sektionerna semantiskt separerade. Players-sektion (Max 4 / Max 12) återinförd 2026-06-01 — sätter `maxPlayers` explicit (Max 12 = premium-gated). Tidigare (2026-05-25 → 2026-06-01) deriverades `maxPlayers` automatiskt från `gameMode`; se "Game Mode + Players".
 3. **Customized Host packages** — "+ Add host packages"-CTA + "Purchased and available when you are the Host:"-listrubrik + per-paket-toggles + "Select all"-toggle på egen rad + "Save settings"-knapp. Driver `enabledHostPackages` i ProfileData (se "Customized Host packages" nedan).
 4. **Game connections** — QuizVibe friends card. YouTube-membership-kortet plockades ut 2026-05-06 — användaren kommer tills vidare inte blanda in YouTube-konton i appen (YouTube finns kvar som content-source-toggle i Lobby:s Game Connections, men det är källflagga, inte konto-koppling). Spotify-kortet togs bort 2026-05-18 — se memory/project_spotify_dashboard.md för varför (Spotify-integration parkerad).
 5. **Player history** — `src/components/PlayerHistorySection.tsx` manages its own collapse state. **Månads-grupperade entries (2026-05-25):** spel grupperas per kalender-månad (YYYY-MM-key) via `groupByMonth()`-helper. Varje månad renderas som collapsible sub-block med header `{label} · {N games} · {avgPct}% avg`. Senaste månaden default-expanded vid första load (via `didInitMonthExpansionRef`-flagga som bara fyrar EN gång — subsequent re-focuses respekterar user:s explicita toggle). Inom månad används samma `GameHistoryRow`-komponent som tidigare flat-list. HCP shield togs bort 2026-05-18 (introduceras i v2 när HCP-progression byggs ut med riktig data).
@@ -394,20 +394,25 @@ Five top-level collapsible sections — all use the same tappable-header pattern
 
 **Profile auto-augment** i `loadProfile`-effekten: alla saknade fält fylls i med generic-fallback-spec (Pass-the-Phone, Max 4, Global, 1981→`ERA_MAX` (= current year), `ROUNDS_DEFAULT`, 30 sek, Standard assistance, alla paket aktiverade, `randomAdultBirthYear`-värde). Augmented-profilen beräknas EN gång per load så samma random-värde används för både setState och eventuell write-back. Om något fält var saknat persisteras augmented direkt via `saveProfile` i bakgrunden — one-shot defensive write så fallbacks inte regenereras nästa load (särskilt random birthYear).
 
-## singlePlayerDefault-toggle (Profile + Lobby)
+## Game Mode + Players (Profile + Lobby)
 
-Checkbox **"Use single player mode as default"** ovanför Game Mode-toggle:n i både Profile (host-default) och Lobby (per-spel). Logik:
+**OMARBETAD 2026-06-01.** Game Mode-sektionen är nu **tre fria val-rutor** (inte checkbox + 2 rutor) grupperade i två rader + en separat **Players**-sektion. Layouten är identisk i Lobby (per-spel, host editerar / non-host read-only via `disabled`) och Profile (host-default). Render-helper `renderModeBox(key, label)` i båda filerna; styles `gameModeGroupLabel` (grå grupprubrik), `modeRow` (transparent flex-row, ingen segment-container), `modeOption` (fristående bordered box, **fast höjd 38** = samma som Generic/`addPackageBtn`). Tidigare `modeToggle`-container + `singlePlayerRow`/`singlePlayerCheckbox`/`multiplayerBracket*`-styles lämnade som död kod.
 
-- **Checked**: BÅDA multiplayer-rutorna dimmas — Pass-the-Phone OCH Individual Devices får `Colors.borderStrong`-grå border, transparent bg, dämpad text (`Colors.textSecondary`), grå badges. Speglar Individual Devices-rutans inaktiva look så låst läge är konsistent.
-- **Tap på dämpad Pass-the-Phone** → uncheck + aktivera Pass-the-Phone i samma gest.
-- **Tap på dämpad Individual Devices** är Premium-gated:
-  - Premium-användare → uncheck + aktivera Individual Devices direkt.
-  - Icke-Premium → "Premium feature — Go to Store"-popup. **Ingen state-ändring** — Pass-the-Phone tänds inte upp; användaren måste tappa Pass-the-Phone-rutan eller bocka ur checkboxen för att lämna single-player-läget.
-- **Uncheck via checkbox** → alltid Pass-the-Phone (gratis-läget), oavsett vad som var aktivt innan check. Säkrar att en Premium-användare som hade Individual Devices inte hamnar kvar där efter uncheck. `maxPlayers` följer med automatiskt via gameMode-deriverings-useEffect:en (PtP=4).
-- **Tickbox-styling**: 20×20 kvadrat, `Colors.primary` border (alltid blå även i ocheckat läge), bockmarkering vit på primary-bg när checkad.
-- **"Multiplayer mode"-klammer** under Game Mode-toggle:n: uppåt-öppen U (1.5px border, `#6B7280` grå, 10 px höga ben, rundade botten-hörn) med "MULTIPLAYER MODE"-label centrerat under. Speglar Lobby:s Number of Rounds-bracket exakt — samma form/färg/mått.
+Struktur (per skiss):
+- Grupprubrik **"Single device / Single player mode"** → **Single player**-ruta (halv bredd, vänsterställd via en `flex:1`-spacer till höger så den linjerar med multiplayer-radens vänstra ruta).
+- Info-rader (`modeInfoLine`, host-only i Lobby): "Pass-the-Phone: Single device mode" + "Individual device: Multi-device mode / QuizVibe users only".
+- Grupprubrik **"Multiplayer mode"** → **Pass-the-Phone** + **Individual device** (två rutor på en rad).
+- Grupprubrik **"Players"** → **Max 4 players** (FREE-badge) + **Max 12 players** (PREMIUM-badge).
 
-Persisteras som `singlePlayerDefault?: boolean` på `ProfileData`. Lobby:s state initialiseras lokalt (default false) och seeds från profil i host-mount-effekten.
+**Alla tre game-mode-lägen är GRATIS** (ingen premium-gate på lägesvalet — IndDev avkopplad från Premium 2026-06-01). Varje game-mode-ruta har en FREE-badge: grön när aktiv (`modeOptionPassActive` = grön kant + `primaryMuted` bg, `freeBadge` grön), grå när inaktiv (`modeOptionInactive` + `freeBadgeDimmed`).
+
+**State-mappning** (oförändrad datamodell — `gameMode: 'pass-the-phone' | 'individual-devices'` + `singlePlayerDefault: boolean`): Single player = `singlePlayerDefault=true`; Pass-the-Phone = `!singlePlayerDefault && gameMode==='pass-the-phone'`; Individual device = `!singlePlayerDefault && gameMode==='individual-devices'`. Handlers: `handleSelectSingle()` (Lobby: ejectar non-host-spelare via `markEjected` + DB-delete; Profile: sätter bara flaggan), `handleSelectMode(mode)` (clearar singlePlayerDefault; vid IndDev körs `confirmAndRemoveGuests` först).
+
+**Individual device kräver registrerade konton** (2026-06-01) — guests (självanslutna ELLER host-tillagda) kan inte vara med. Enforced på 4 ställen: (a) byte till IndDev → `confirmAndRemoveGuests` tar bort ALLA `type !== 'registered'` (med eject-popup); (b) "+ Add Player" blockeras i IndDev; (c) `handleStartGame`-guard blockerar start om någon approved icke-host är guest i IndDev; (d) Home `handleJoinAsGuest` blockerar guest från att joina en IndDev-lobby (läser `getLobbySettings(code).gameMode`).
+
+**Players-sektionen** (Max 4 / Max 12) sätter `maxPlayers` **explicit** — `maxPlayers` härleds INTE längre från gameMode. **Max 12 = subscription-perk**: `handleSelectMaxPlayers(n)` gatar 12 på `hasPremium` (gratis-host → Store-redirect, ingen state-ändring). Premium-clamp-effekt tvingar `maxPlayers=4` för gratis-host oavsett seedat värde. Max 4-rutan har FREE-badge (grön aktiv), Max 12-rutan PREMIUM-badge (`premiumBadge` guld med subscription / `premiumBadgeGrey` grå utan). `maxPlayers` styr lobby-cappen + hur många host kan godkänna i "Players in lobby".
+
+Persisteras som `singlePlayerDefault?: boolean` + `maxPlayers` på `ProfileData`. Lobby seeds från profil/stored i host-mount-effekten.
 
 ## Customized Host packages (Profile-toggle → Lobby-filter)
 
@@ -513,7 +518,7 @@ Shared `CreditTierCard`, `PackageTierCard` and `SubscriptionTierCard` mirror the
 
 | `?focus` | Ordning | Triggas av |
 |---|---|---|
-| `subscription` | Subscription → Basic → Packages → Credits | Individual Devices Premium-popup, Rounds-rulerns guld PREMIUM-badge (Lobby + Profile) |
+| `subscription` | Subscription → Basic → Packages → Credits | Max 12 players-rutans Premium-popup, Rounds-rulerns PREMIUM-badge (Lobby + Profile) |
 | `packages` | Packages → Basic → **[Other heading]** → Credits → Subscriptions | "+ Add host packages"-CTA (Lobby Game Connections + Profile Customized Host packages-blocket) |
 | `credits` | Credits → Basic → **[Other heading]** → Subscriptions → Packages | Host Game Credits-pillen, Extras-rutans köp-popup, "Out of Host Game Credits"-popup vid Start Game (Lobby + Profile) |
 | (ingen) | Basic → Credits → Packages → Subscriptions | User-login-modalens Store-knappar (Home + Profile) |
@@ -527,11 +532,16 @@ Shared `CreditTierCard`, `PackageTierCard` and `SubscriptionTierCard` mirror the
 - **Varför**: explicit `from`-destination ger förutsägbar Back-routing när Store nås från flera källor (Lobby:s Host Game Credits-pill, Profile:s logoutSheet Store-knapp, Home:s profileMenu Store-knapp osv.). `router.back()` ensam hade poppat något godtyckligt på navigation-stacken; med `from` vet vi alltid var användaren ska tillbaka.
 - Saknas `from` faller `handleBack` tillbaka till `router.canGoBack() → router.back()`, sedan `router.replace('/')` (Home) som sista utväg så användaren alltid har en utväg.
 
-## Subscription-styling (host-vyn) — IndDev + Rounds of Game
+## Subscription-styling (host-vyn) — Rounds + Players
 
-Två separata color-regler i Lobby:s host-vy som speglar host:s subscription-status. Båda gated på `hasMultiplayerPackage` (Lobby) eller `hasPremium` (Profile, för Rounds-rulern i host-defaults-blocket) — båda hardcoded `false` tills Store-integrationen kopplas in.
+**OMARBETAD 2026-06-01:** subscription gatar inte längre lägesvalet. **Individual device är gratis** (premium-gating + Store-länk borttagen). Subscription = **Unlimited Host Games + Max 20 rounds + Up to 12 players** (`SUBSCRIPTION_FEATURES` i StoreScreen — "Individual Device Game mode"-raden borttagen). Caps gatas på `hasPremium` OBEROENDE av läge:
+- `roundsMax = hasPremium ? ROUNDS_MAX_INDIV(20) : ROUNDS_MAX_PASS(4)` — RoundsRuler visar grå låsta tickar > 4 + PREMIUM-badge + Store-länk (`onPremiumPress` → alltid `/store?focus=subscription`). `hasSubscription={hasPremium}`, `applicable` default true.
+- `maxPlayers` via Players-toggeln — Max 12 gatad på `hasPremium` (se "Game Mode + Players").
+- `hasPremium` (= f.d. `hasMultiplayerPackage`, borttagen) hardcoded `false` tills Store-state kopplas in.
 
-**Individual Devices-rutan** (Game Mode-toggle):
+Den nedan beskrivna **Individual Devices-rutans** guld/grå-premium-styling är STALE (IndDev är nu en vanlig grön/grå FREE-ruta) — behållen för historik; `modeOptionPremiumActive`/`premiumBadge`-stilarna återanvänds nu istället av **Max 12 players**-rutan.
+
+**(STALE) Individual Devices-rutan** (Game Mode-toggle):
 
 | Sub | Vald | Frame | Badge |
 |---|---|---|---|
