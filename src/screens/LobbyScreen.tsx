@@ -1453,15 +1453,17 @@ export default function LobbyScreen() {
   // pollen ovan, så de behöver inte auto-set:as här.
   useEffect(() => {
     if (!hostMode) return;
-    const targetMax: 4 | 12 = gameMode === 'pass-the-phone' ? 4 : 12;
+    // 12 spelare är en subscription-perk (oberoende av läge). Individual device
+    // är gratis att VÄLJA, men gratis-host capas vid 4 spelare — bara Premium
+    // unlock:ar 12. Pass-the-Phone alltid 4.
+    const targetMax: 4 | 12 = gameMode === 'individual-devices' && hasPremium ? 12 : 4;
     setMaxPlayers((prev) => (prev === targetMax ? prev : targetMax));
-  }, [gameMode, hostMode]);
+  }, [gameMode, hostMode, hasPremium]);
 
-  // Max rundor beror på gameMode. Pass-the-Phone (inkl. single-player ovanpå
-  // PtP) är ALLTID capad vid 4 — speltiden växer snabbt när telefonen rör sig
-  // fysiskt mellan spelare, och Premium-subscription unlock:ar inte längre
-  // 20-rundor i PtP. Individual Devices (Premium-gated) får 20.
-  const roundsMax = gameMode === 'individual-devices' ? ROUNDS_MAX_INDIV : ROUNDS_MAX_PASS;
+  // Max rundor är en subscription-perk OBEROENDE av läge: Premium → 20, annars
+  // 4. (Tidigare gav Individual Devices implicit 20; nu är IndDev gratis och
+  // 20-rundor gatas enbart på Premium.)
+  const roundsMax = hasPremium ? ROUNDS_MAX_INDIV : ROUNDS_MAX_PASS;
   useEffect(() => {
     setRoundsCount((prev) => Math.max(ROUNDS_MIN, Math.min(roundsMax, prev)));
   }, [roundsMax]);
@@ -1558,11 +1560,6 @@ export default function LobbyScreen() {
       setSelectedExtraPackages(availablePackages.map((p) => p.id));
     }
   };
-  // hasMultiplayerPackage = Individual Devices-unlock. Tidigare separat
-  // hårdkodad flagga; nu unified med hasPremium (samma Premium-tier
-  // unlockar både IndDev + Max 12). När real subscription-tiers introduceras
-  // (t.ex. olika tier per feature) kan vi splita dem igen.
-  const hasMultiplayerPackage = hasPremium;
 
   // Switch som kräver att host:s manuellt tillagda guests försvinner (de
   // saknar egen mobil och kan inte spela på individual devices). Visar Alert
@@ -1610,29 +1607,60 @@ export default function LobbyScreen() {
     );
   };
 
+  // Game mode-val: tre fria lägen (single / PtP / IndDev). IndDev är INTE
+  // längre premium-gated — alla tre är gratis att välja. Subscription gatar
+  // istället caps (rundor/spelare), inte lägesvalet.
   const handleSelectMode = (mode: GameMode) => {
-    if (mode === gameMode) return;
-    if (mode === 'individual-devices' && !hasMultiplayerPackage) {
-      Alert.alert(
-        'Premium feature',
-        'Multiplayer on individual devices requires the "Multiplayer Individual Devices" package. Get it in the Store?',
-        [
-          { text: 'Cancel', style: 'cancel' },
-          { text: 'Go to Store', onPress: () => router.push({ pathname: '/store' as const, params: { focus: 'subscription', from: '/lobby', fromCode: roomCode } }) },
-        ],
-      );
-      return;
-    }
-    // Vid byte till Individual Devices: varna om host har manuellt tillagda
-    // spelare. De saknar egen mobil och måste tas bort när alla ska spela
-    // från sina egna enheter.
+    if (mode === gameMode && !singlePlayerDefault) return;
+    // Vid byte till Individual device: varna om host har manuellt tillagda
+    // spelare (de saknar egen mobil och måste tas bort när alla spelar från
+    // sina egna enheter). Lämnar även single-player-läget.
     if (mode === 'individual-devices') {
-      confirmAndRemoveManualGuests('Switch to Individual Devices?', () =>
-        setGameMode(mode),
-      );
+      confirmAndRemoveManualGuests('Switch to Individual device?', () => {
+        setSinglePlayerDefault(false);
+        setGameMode('individual-devices');
+      });
       return;
     }
-    setGameMode(mode);
+    setSinglePlayerDefault(false);
+    setGameMode('pass-the-phone');
+  };
+
+  // Single player-val: ejecta ev. non-host-spelare (de kan inte vara med i
+  // single-player). Samma logik som tidigare singlePlayerDefault-checkbox ON.
+  const handleSelectSingle = () => {
+    if (singlePlayerDefault) return;
+    const ejectables = players.filter((p) => !p.isHost && !p.hasLeft);
+    if (ejectables.length === 0) {
+      setSinglePlayerDefault(true);
+      return;
+    }
+    Alert.alert(
+      'Switch to single-player mode?',
+      'Play single player mode will delete players in lobby. Still want to play single player?',
+      [
+        { text: 'No', style: 'cancel' },
+        {
+          text: 'Yes',
+          style: 'destructive',
+          onPress: () => {
+            ejectables.forEach((p) => {
+              markEjected(roomCode, p.id);
+              supabase
+                .from('lobby_players')
+                .delete()
+                .eq('room_code', roomCode)
+                .eq('player_id', p.id)
+                .then(({ error }) => {
+                  if (error) console.warn('[lobbyPlayers] single-player eject failed:', error.message);
+                });
+            });
+            setPlayers((prev) => prev.filter((p) => p.isHost));
+            setSinglePlayerDefault(true);
+          },
+        },
+      ],
+    );
   };
 
   // Approved spelare = i spelet, har turn-nummer, syns överst.
@@ -3151,234 +3179,63 @@ export default function LobbyScreen() {
               sectionLabel-style → Typography.overline:s textTransform
               uppercasar hela strängen automatiskt. */}
           <Text style={styles.sectionLabel}>
-            {hostMode ? 'Game Mode' : 'Game Mode - Multiplayer'}
+            Game Mode
           </Text>
 
-          {/* "Use single player mode as default" — sitter ovanför Game
-              Mode-toggle:n. När checkad dämpas BÅDA multiplayer-rutorna
-              (Pass-the-Phone + Individual Devices) eftersom single-player
-              inte använder någon av dem. När bocken tas bort defaultar
-              vi alltid till Pass-the-Phone (gratis-läget). Renderas bara
-              för host — non-host ser bara host:s aktuella Game Mode-val
-              via modeToggle nedan, inte single-player-default-inställningen. */}
-          {hostMode && (
-            <TouchableOpacity
-              style={styles.singlePlayerRow}
-              activeOpacity={0.7}
-              onPress={() => {
-                if (!singlePlayerDefault) {
-                  // Försöker toggla ON → confirmation-popup först om det
-                  // finns non-host-spelare som kommer ejectas. Endast host
-                  // som är ensam i lobbyn slipper popupen (inget att radera).
-                  const ejectables = players.filter((p) => !p.isHost && !p.hasLeft);
-                  if (ejectables.length === 0) {
-                    setSinglePlayerDefault(true);
-                    return;
-                  }
-                  Alert.alert(
-                    'Switch to single-player mode?',
-                    'Play single player mode will delete players in lobby. Still want to play single player?',
-                    [
-                      { text: 'No', style: 'cancel' },
-                      {
-                        text: 'Yes',
-                        style: 'destructive',
-                        onPress: () => {
-                          // Mark in-memory (för same-device polling-test) +
-                          // DELETE från lobby_players-DB:n så Realtime-event
-                          // når non-host:s subscription → eject-popup.
-                          ejectables.forEach((p) => {
-                            markEjected(roomCode, p.id);
-                            supabase
-                              .from('lobby_players')
-                              .delete()
-                              .eq('room_code', roomCode)
-                              .eq('player_id', p.id)
-                              .then(({ error }) => {
-                                if (error) console.warn('[lobbyPlayers] single-player eject failed:', error.message);
-                              });
-                          });
-                          setPlayers((prev) => prev.filter((p) => p.isHost));
-                          setSinglePlayerDefault(true);
-                        },
-                      },
-                    ],
-                  );
-                } else {
-                  // Toggle OFF → defaulta till Pass-the-Phone så lobby:n
-                  // hamnar i ett konsekvent multiplayer-läge. maxPlayers
-                  // auto-syncar till 4 via gameMode-deriverings-effekten.
-                  setGameMode('pass-the-phone');
-                  setSinglePlayerDefault(false);
-                }
-              }}
-            >
-              <View
-                style={[
-                  styles.singlePlayerCheckbox,
-                  singlePlayerDefault && styles.singlePlayerCheckboxChecked,
-                ]}
-              >
-                {singlePlayerDefault && (
-                  <Text style={styles.singlePlayerCheckmark}>✓</Text>
-                )}
-              </View>
-              <Text style={styles.singlePlayerLabel}>
-                Single-player mode
-              </Text>
-            </TouchableOpacity>
-          )}
-
+          {/* Game mode — tre FRIA val: Single player + Pass-the-Phone (single
+              device) och Individual device (multi-device). Alla tre gratis
+              (ingen premium-gate på lägesvalet); subscription gatar caps
+              (rundor/spelare) separat. Varje ruta bär en FREE-badge: grön när
+              aktiv, grå när inaktiv. Renderas för alla men disabled för
+              non-host (read-only — ser host:s val). */}
           <View style={styles.modeToggle}>
-            {/* Pass-the-Phone */}
-            <TouchableOpacity
-              style={[
-                styles.modeOption,
-                singlePlayerDefault
-                  ? styles.modeOptionDimmed
-                  : gameMode === 'pass-the-phone'
-                    ? (hostMode ? styles.modeOptionPassActive : styles.modeOptionIndivActive)
-                    : styles.modeOptionInactive,
-              ]}
-              onPress={() => {
-                // Tap på dämpad ruta = bocka av single-player-defaulten
-                // OCH aktivera Pass-the-Phone i samma gest. Bara host:en
-                // (disabled-prop blockar non-host innan vi når hit).
-                if (singlePlayerDefault) {
-                  setSinglePlayerDefault(false);
-                  setGameMode('pass-the-phone');
-                  return;
-                }
-                handleSelectMode('pass-the-phone');
-              }}
-              disabled={!hostMode}
-              activeOpacity={0.7}
-            >
-              <Text style={[
-                styles.modeLabel,
-                !singlePlayerDefault && gameMode === 'pass-the-phone' && styles.modeLabelActiveFree,
-                singlePlayerDefault && styles.modeLabelDimmed,
-              ]}>
-                Pass-the-Phone
-              </Text>
-              {hostMode && gameMode === 'pass-the-phone' && (
-                <View
-                  style={[styles.freeBadge, singlePlayerDefault && styles.freeBadgeDimmed]}
-                  pointerEvents="none"
-                >
-                  <Text
-                    style={[
-                      styles.freeBadgeText,
-                      singlePlayerDefault && styles.freeBadgeTextDimmed,
-                    ]}
-                  >
-                    FREE
-                  </Text>
-                </View>
-              )}
-            </TouchableOpacity>
-
-            {/* Individual Devices — premium-låst för host (paketkrav). Host-regel:
-                  • Sub off: grå frame, GRÅ PREMIUM-badge.
-                  • Sub on + Pass-the-Phone eller Single player vald: grå frame
-                    (host har subscription men har valt att INTE köra IndDev),
-                    GULD badge.
-                  • Sub on + IndDev vald: guld frame + muted bg (active premium),
-                    guld badge.
-                Frame är guld endast när IndDev är aktivt valt — host kan ha
-                Premium och ändå föredra Pass-the-Phone eller Single Play. Badgen
-                signalerar däremot subscription-status oavsett vilket läge som
-                är valt (guld = unlocked, grå = locked). För icke-host visas blå
-                "lit" kant när läget är aktivt, oavsett deras egna paket. När
-                singlePlayerDefault är checkad: rutan dämpas (samma look som
-                Pass-the-Phone-dimming) och tap bockar av defaulten + defaultar
-                till Pass-the-Phone (alltid Pass-the-Phone på uncheck). */}
-            <TouchableOpacity
-              style={[
-                styles.modeOption,
-                singlePlayerDefault
-                  ? styles.modeOptionDimmed
-                  : hostMode
-                    ? hasMultiplayerPackage && gameMode === 'individual-devices'
-                      ? styles.modeOptionPremiumActive
-                      : styles.modeOptionInactive
-                    : gameMode === 'individual-devices'
-                      ? styles.modeOptionIndivActive
-                      : styles.modeOptionInactive,
-              ]}
-              onPress={() => {
-                // Tap på dämpad Individual Devices-ruta är Premium-gated:
-                //   • Med Multiplayer-paket → bocka av defaulten OCH aktivera
-                //     Individual Devices direkt (en gest för båda).
-                //   • Utan paket → låt handleSelectMode visa Premium-popup
-                //     (Store-redirect) UTAN att ändra state. Pass-the-Phone
-                //     tänds inte upp; användaren måste tappa Pass-the-Phone-
-                //     rutan eller bocka ur checkboxen för att lämna single-
-                //     player-läget.
-                if (singlePlayerDefault) {
-                  if (!hasMultiplayerPackage) {
-                    handleSelectMode('individual-devices');
-                    return;
-                  }
-                  setSinglePlayerDefault(false);
-                  setGameMode('individual-devices');
-                  return;
-                }
-                handleSelectMode('individual-devices');
-              }}
-              disabled={!hostMode}
-              activeOpacity={0.7}
-            >
-              <Text style={[
-                styles.modeLabel,
-                !singlePlayerDefault && gameMode === 'individual-devices' && (
-                  hostMode
-                    ? hasMultiplayerPackage && styles.modeLabelActivePremium
-                    : styles.modeLabelActiveFree
-                ),
-                singlePlayerDefault && styles.modeLabelDimmed,
-              ]}>
-                Individual Devices
-              </Text>
-              {hostMode && (
-                <View
+            {([
+              { key: 'single', label: 'Single player' },
+              { key: 'ptp', label: 'Pass-the-Phone' },
+              { key: 'indiv', label: 'Individual device' },
+            ] as const).map((m) => {
+              const isActive =
+                m.key === 'single'
+                  ? singlePlayerDefault
+                  : m.key === 'ptp'
+                    ? !singlePlayerDefault && gameMode === 'pass-the-phone'
+                    : !singlePlayerDefault && gameMode === 'individual-devices';
+              return (
+                <TouchableOpacity
+                  key={m.key}
                   style={[
-                    styles.premiumBadge,
-                    (singlePlayerDefault || !hasMultiplayerPackage) && styles.premiumBadgeGrey,
+                    styles.modeOption,
+                    isActive ? styles.modeOptionPassActive : styles.modeOptionInactive,
                   ]}
-                  pointerEvents="none"
+                  onPress={() =>
+                    m.key === 'single'
+                      ? handleSelectSingle()
+                      : handleSelectMode(m.key === 'ptp' ? 'pass-the-phone' : 'individual-devices')
+                  }
+                  disabled={!hostMode}
+                  activeOpacity={0.7}
                 >
                   <Text
-                    style={[
-                      styles.premiumBadgeText,
-                      (singlePlayerDefault || !hasMultiplayerPackage) && styles.premiumBadgeTextGrey,
-                    ]}
+                    style={[styles.modeLabel, { textAlign: 'center' }, isActive && styles.modeLabelActiveFree]}
+                    numberOfLines={2}
                   >
-                    PREMIUM
+                    {m.label}
                   </Text>
-                </View>
-              )}
-            </TouchableOpacity>
+                  <View style={[styles.freeBadge, !isActive && styles.freeBadgeDimmed]} pointerEvents="none">
+                    <Text style={[styles.freeBadgeText, !isActive && styles.freeBadgeTextDimmed]}>FREE</Text>
+                  </View>
+                </TouchableOpacity>
+              );
+            })}
           </View>
-
-          {/* Klammer (uppåt-öppen U) under modeToggle:n med "Multiplayer
-              mode"-label centrerad. Speglar Profile:s motsvarande klammer
-              och Lobby:s Number of Rounds-bracket — samma #6B7280 grå,
-              1.5px borders, 10px höga ben med rundade botten-hörn. Bara
-              för host — non-host får istället "Multiplayer" inline efter
-              "Game Mode"-rubriken (se ovan). */}
-          {hostMode && (
-            <View style={styles.multiplayerBracketWrap}>
-              <View style={styles.multiplayerBracket} />
-              <Text style={styles.multiplayerBracketLabel}>Multiplayer mode</Text>
-            </View>
-          )}
 
           {hostMode && (
             <Text style={styles.modeDescription}>
-              {gameMode === 'pass-the-phone'
-                ? 'Use one single device. Max 4 players.'
-                : 'Each player plays on their own device. Max 12 players.'}
+              {singlePlayerDefault
+                ? 'Play solo on this device.'
+                : gameMode === 'pass-the-phone'
+                  ? 'One shared device — pass it around. Max 4 players.'
+                  : 'Each player on their own device. Up to 12 players with Premium.'}
             </Text>
           )}
 
@@ -4129,32 +3986,11 @@ export default function LobbyScreen() {
                       min={ROUNDS_MIN}
                       gameModeMax={roundsMax}
                       onPremiumPress={() => {
-                        // Premium-host i PtP: subscription:n unlock:ar fler rondor
-                        // bara i IndDev. Skicka dem INTE till Store (de äger redan
-                        // paketet) — guida dem istället till mode-bytet med en
-                        // confirm. Free host (utan subscription) behåller den gamla
-                        // Store-upsell-routingen.
-                        if (hasMultiplayerPackage && gameMode === 'pass-the-phone') {
-                          Alert.alert(
-                            'Switch to Individual Devices mode?',
-                            'Switch to Individual Devices mode to expand number of rounds up to 20.',
-                            [
-                              { text: 'Cancel', style: 'cancel' },
-                              {
-                                text: 'Switch',
-                                onPress: () =>
-                                  confirmAndRemoveManualGuests('Switch to Individual Devices?', () =>
-                                    setGameMode('individual-devices'),
-                                  ),
-                              },
-                            ],
-                          );
-                          return;
-                        }
+                        // 20 rundor är en subscription-perk OBEROENDE av läge —
+                        // alltid Store-upsell (IndDev är inte längre unlock:en).
                         router.push({ pathname: '/store' as const, params: { focus: 'subscription', from: '/lobby', fromCode: roomCode } });
                       }}
-                      hasSubscription={hasMultiplayerPackage}
-                      applicable={gameMode === 'individual-devices'}
+                      hasSubscription={hasPremium}
                     />
                   </View>
                 </>
@@ -5104,7 +4940,9 @@ const styles = StyleSheet.create({
     padding: 3,
     borderWidth: 1,
     borderColor: Colors.border,
-    height: 46,
+    // 56 (höjt från 46) så de tre smalare rutorna rymmer 2-raders-labels
+    // ("Pass-the-Phone", "Individual device") + FREE-badgen ovanför.
+    height: 56,
     gap: 4,
   },
   // Bas-stil för båda inre rutorna. Konkret kant-/bg-färg sätts av varianterna nedan.

@@ -151,7 +151,6 @@ const SUBSCRIPTION_FEATURES: SubscriptionFeature[] = [
   { premium: 'Unlimited Host Games', basic: '2 + 2 launch bonus games per day' },
   { premium: 'Max 20 rounds per game', basic: 'Max 4 rounds per game' },
   { premium: 'Invite up to 12 players per Game', basic: '4 players' },
-  { premium: 'Individual Device Game mode', basic: 'Not available' },
 ];
 
 // ─── Screen ───────────────────────────────────────────────────────────────────

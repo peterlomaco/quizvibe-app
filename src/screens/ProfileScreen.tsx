@@ -284,16 +284,16 @@ export default function ProfileScreen() {
   // (Premium-gated) får 20. Vid byte av gameMode clampas värdet automatiskt
   // ner om det skulle hamna utanför nya max:t.
   const [roundsCount, setRoundsCount] = useState<number>(ROUNDS_DEFAULT);
-  const roundsMax = gameMode === 'individual-devices' ? ROUNDS_MAX_INDIV : ROUNDS_MAX_PASS;
-  // Auto-sync maxPlayers ↔ gameMode: Pass-the-Phone capas alltid vid 4
-  // (PtP med 12 spelare × 20 rundor = orimligt långt spel), Individual
-  // Devices defaulta:r till 12 så host får full multiplayer-cap direkt.
-  // Speglar Lobby:s motsvarande auto-sync så host-defaults och in-lobby-
-  // state håller samma policy.
+  // 20 rundor är en subscription-perk OBEROENDE av läge: Premium → 20, annars
+  // 4. (IndDev är nu gratis att välja; caps gatas separat på Premium.)
+  const roundsMax = hasPremium ? ROUNDS_MAX_INDIV : ROUNDS_MAX_PASS;
+  // Auto-sync maxPlayers ↔ gameMode: 12 spelare är en subscription-perk —
+  // Individual device är gratis att välja men gratis-host capas vid 4, bara
+  // Premium unlock:ar 12. Pass-the-Phone alltid 4. Speglar Lobby.
   useEffect(() => {
-    const targetMax: 4 | 12 = gameMode === 'pass-the-phone' ? 4 : 12;
+    const targetMax: 4 | 12 = gameMode === 'individual-devices' && hasPremium ? 12 : 4;
     setMaxPlayers((prev) => (prev === targetMax ? prev : targetMax));
-  }, [gameMode]);
+  }, [gameMode, hasPremium]);
   const handleDecrementRounds = () => {
     setRoundsCount((prev) => {
       const next = Math.max(ROUNDS_MIN, prev - ROUNDS_STEP);
@@ -317,21 +317,14 @@ export default function ProfileScreen() {
     setRoundsCount((prev) => Math.max(ROUNDS_MIN, Math.min(roundsMax, prev)));
   }, [roundsMax]);
 
-  // Försök att välja Individual Devices utan Premium → Store-omdirigering.
-  // Speglar Lobby:s handleSelectMode-pattern.
+  // Tre fria game mode-val (host-default). Inget premium-gate på lägesvalet —
+  // subscription gatar caps (rundor/spelare) separat. Single player sätter
+  // bara flaggan (inga lobby-spelare att eject:a i Profile-vyn).
+  const handleSelectSingle = () => {
+    setSinglePlayerDefault(true);
+  };
   const handleSelectGameMode = (mode: GameMode) => {
-    if (mode === gameMode) return;
-    if (mode === 'individual-devices' && !hasPremium) {
-      Alert.alert(
-        'Premium feature',
-        'Multiplayer on individual devices requires the Premium subscription. Get it in the Store?',
-        [
-          { text: 'Cancel', style: 'cancel' },
-          { text: 'Go to Store', onPress: () => router.push('/store?focus=subscription&from=/profile') },
-        ],
-      );
-      return;
-    }
+    setSinglePlayerDefault(false);
     setGameMode(mode);
   };
 
@@ -997,150 +990,55 @@ export default function ProfileScreen() {
               Premium triggar Store-omdirigering. */}
           <View style={styles.field}>
             <Text style={styles.fieldLabel}>Game Mode</Text>
-            {/* "Use single player mode as default" — sitter ovanför Game
-                Mode-toggle:n. När checkad dämpas BÅDA multiplayer-rutorna
-                (Pass-the-Phone + Individual Devices) eftersom single-player
-                inte använder någon av dem. När bocken tas bort defaultar
-                vi alltid till Pass-the-Phone (gratis-läget) — användaren
-                kan sedan tappa Individual Devices-rutan om de vill växla. */}
-            <Pressable
-              style={({ pressed }) => [
-                styles.singlePlayerRow,
-                pressed && { opacity: 0.7 },
-              ]}
-              onPress={() => {
-                setSinglePlayerDefault((v) => {
-                  const next = !v;
-                  if (!next) {
-                    // Uncheck → defaulta till gratis-läget på BÅDA
-                    // toggles (Pass-the-Phone + Max 4) så användaren
-                    // hamnar i ett konsekvent multiplayer-läge.
-                    setGameMode('pass-the-phone');
-                    setMaxPlayers(4);
-                  }
-                  return next;
-                });
-              }}
-            >
-              <View
-                style={[
-                  styles.singlePlayerCheckbox,
-                  singlePlayerDefault && styles.singlePlayerCheckboxChecked,
-                ]}
-              >
-                {singlePlayerDefault && (
-                  <Text style={styles.singlePlayerCheckmark}>✓</Text>
-                )}
-              </View>
-              <Text style={styles.singlePlayerLabel}>
-                Single-player mode
-              </Text>
-            </Pressable>
+            {/* Game mode — tre FRIA val (host-default): Single player + Pass-
+                the-Phone + Individual device. Inget premium-gate på lägesvalet;
+                subscription gatar caps (rundor/spelare) separat. FREE-badge per
+                ruta (grön aktiv, grå inaktiv). Speglar Lobby. */}
             <View style={styles.modeToggle}>
-              <Pressable
-                style={({ pressed }) => [
-                  styles.modeOption,
-                  singlePlayerDefault
-                    ? styles.modeOptionDimmed
-                    : gameMode === 'pass-the-phone'
-                      ? styles.modeOptionPassActive
-                      : styles.modeOptionInactive,
-                  pressed && { opacity: 0.7 },
-                ]}
-                onPress={() => {
-                  if (singlePlayerDefault) {
-                    setSinglePlayerDefault(false);
-                    setGameMode('pass-the-phone');
-                    return;
-                  }
-                  handleSelectGameMode('pass-the-phone');
-                }}
-              >
-                <Text
-                  style={[
-                    styles.modeLabel,
-                    !singlePlayerDefault && gameMode === 'pass-the-phone' && styles.modeLabelActiveFree,
-                    singlePlayerDefault && styles.modeLabelDimmed,
-                  ]}
-                >
-                  Pass-the-Phone
-                </Text>
-                <View
-                  style={[styles.freeBadge, singlePlayerDefault && styles.freeBadgeDimmed]}
-                  pointerEvents="none"
-                >
-                  <Text
-                    style={[
-                      styles.freeBadgeText,
-                      singlePlayerDefault && styles.freeBadgeTextDimmed,
+              {([
+                { key: 'single', label: 'Single player' },
+                { key: 'ptp', label: 'Pass-the-Phone' },
+                { key: 'indiv', label: 'Individual device' },
+              ] as const).map((m) => {
+                const isActive =
+                  m.key === 'single'
+                    ? singlePlayerDefault
+                    : m.key === 'ptp'
+                      ? !singlePlayerDefault && gameMode === 'pass-the-phone'
+                      : !singlePlayerDefault && gameMode === 'individual-devices';
+                return (
+                  <Pressable
+                    key={m.key}
+                    style={({ pressed }) => [
+                      styles.modeOption,
+                      isActive ? styles.modeOptionPassActive : styles.modeOptionInactive,
+                      pressed && { opacity: 0.7 },
                     ]}
-                  >
-                    FREE
-                  </Text>
-                </View>
-              </Pressable>
-              <Pressable
-                style={({ pressed }) => [
-                  styles.modeOption,
-                  singlePlayerDefault
-                    ? styles.modeOptionDimmed
-                    : gameMode === 'individual-devices'
-                      ? styles.modeOptionPremiumActive
-                      : styles.modeOptionInactive,
-                  pressed && { opacity: 0.7 },
-                ]}
-                onPress={() => {
-                  if (singlePlayerDefault) {
-                    if (!hasPremium) {
-                      handleSelectGameMode('individual-devices');
-                      return;
+                    onPress={() =>
+                      m.key === 'single'
+                        ? handleSelectSingle()
+                        : handleSelectGameMode(m.key === 'ptp' ? 'pass-the-phone' : 'individual-devices')
                     }
-                    setSinglePlayerDefault(false);
-                    setGameMode('individual-devices');
-                    return;
-                  }
-                  handleSelectGameMode('individual-devices');
-                }}
-              >
-                <Text
-                  style={[
-                    styles.modeLabel,
-                    !singlePlayerDefault && gameMode === 'individual-devices' && styles.modeLabelActivePremium,
-                    singlePlayerDefault && styles.modeLabelDimmed,
-                  ]}
-                >
-                  Individual Devices
-                </Text>
-                <View
-                  style={[
-                    styles.premiumBadge,
-                    (singlePlayerDefault || !(gameMode === 'individual-devices' || hasPremium)) && styles.premiumBadgeGrey,
-                  ]}
-                  pointerEvents="none"
-                >
-                  <Text
-                    style={[
-                      styles.premiumBadgeText,
-                      (singlePlayerDefault || !(gameMode === 'individual-devices' || hasPremium)) && styles.premiumBadgeTextGrey,
-                    ]}
                   >
-                    PREMIUM
-                  </Text>
-                </View>
-              </Pressable>
+                    <Text
+                      style={[styles.modeLabel, { textAlign: 'center' }, isActive && styles.modeLabelActiveFree]}
+                      numberOfLines={2}
+                    >
+                      {m.label}
+                    </Text>
+                    <View style={[styles.freeBadge, !isActive && styles.freeBadgeDimmed]} pointerEvents="none">
+                      <Text style={[styles.freeBadgeText, !isActive && styles.freeBadgeTextDimmed]}>FREE</Text>
+                    </View>
+                  </Pressable>
+                );
+              })}
             </View>
-            {/* Klammer (uppåt-öppen U) under modeToggle:n med "Multiplayer
-                mode"-label centrerad. */}
-            <View style={styles.multiplayerBracketWrap}>
-              <View style={styles.multiplayerBracket} />
-              <Text style={styles.multiplayerBracketLabel}>Multiplayer mode</Text>
-            </View>
-            {/* Mode-beskrivning under Multiplayer-bracket — speglar
-                Lobby:s modeDescription för konsistent host-default-vy. */}
             <Text style={styles.modeDescription}>
-              {gameMode === 'pass-the-phone'
-                ? 'Use one single device. Max 4 players.'
-                : 'Each player plays on their own device. Max 12 players.'}
+              {singlePlayerDefault
+                ? 'Play solo on this device.'
+                : gameMode === 'pass-the-phone'
+                  ? 'One shared device — pass it around. Max 4 players.'
+                  : 'Each player on their own device. Up to 12 players with Premium.'}
             </Text>
           </View>
 
@@ -1362,7 +1260,6 @@ export default function ProfileScreen() {
                 gameModeMax={roundsMax}
                 onPremiumPress={() => router.push('/store?focus=subscription&from=/profile')}
                 hasSubscription={hasPremium}
-                applicable={gameMode === 'individual-devices'}
               />
             </View>
           </View>
@@ -2920,7 +2817,8 @@ const styles = StyleSheet.create({
     padding: 3,
     borderWidth: 1,
     borderColor: Colors.border,
-    height: 46,
+    // 56 (höjt från 46) så tre smalare rutor rymmer 2-raders-labels + FREE-badge.
+    height: 56,
     gap: 4,
   },
   modeOption: {
