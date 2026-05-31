@@ -3249,7 +3249,12 @@ export default function LobbyScreen() {
               rad. FREE-badge per ruta (grön aktiv / grå inaktiv). Read-only
               (disabled) för non-host. */}
           <Text style={styles.gameModeGroupLabel}>Single device / Single player mode</Text>
-          <View style={styles.modeRow}>{renderModeBox('single', 'Single player')}</View>
+          {/* Spacer (flex 1) till höger → Single player-rutan blir halv bredd,
+              vänsterställd, och linjerar med multiplayer-radens vänstra ruta. */}
+          <View style={styles.modeRow}>
+            {renderModeBox('single', 'Single player')}
+            <View style={{ flex: 1 }} />
+          </View>
 
           <Text style={[styles.gameModeGroupLabel, styles.gameModeGroupLabelSpaced]}>Multiplayer mode</Text>
           <View style={styles.modeRow}>
@@ -4989,17 +4994,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: Spacing.sm,
   },
-  // Bas-stil för game-mode-rutorna. Egen minHeight + padding eftersom de inte
-  // längre ligger i en höjd-satt segment-container. Kant-/bg-färg sätts av
-  // varianterna nedan.
+  // Bas-stil för game-mode-rutorna. Fast höjd 38 = samma som Generic-/Add
+  // host packages-rutorna (addPackageBtn) så alla val-rutor är enhetliga.
+  // Kant-/bg-färg sätts av varianterna nedan.
   modeOption: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: Radius.sm,
     borderWidth: 1,
-    minHeight: 52,
-    paddingVertical: Spacing.sm,
+    height: 38,
     paddingHorizontal: 4,
     position: 'relative',
   },

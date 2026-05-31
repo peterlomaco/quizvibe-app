@@ -1029,7 +1029,10 @@ export default function ProfileScreen() {
                 subscription gatar caps (rundor/spelare) separat. FREE-badge per
                 ruta (grön aktiv, grå inaktiv). Speglar Lobby. */}
             <Text style={styles.gameModeGroupLabel}>Single device / Single player mode</Text>
-            <View style={styles.modeRow}>{renderModeBox('single', 'Single player')}</View>
+            <View style={styles.modeRow}>
+              {renderModeBox('single', 'Single player')}
+              <View style={{ flex: 1 }} />
+            </View>
 
             <Text style={[styles.gameModeGroupLabel, styles.gameModeGroupLabelSpaced]}>Multiplayer mode</Text>
             <View style={styles.modeRow}>
@@ -2844,8 +2847,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: Radius.sm,
     borderWidth: 1,
-    minHeight: 52,
-    paddingVertical: Spacing.sm,
+    height: 38,
     paddingHorizontal: 4,
     position: 'relative',
   },
