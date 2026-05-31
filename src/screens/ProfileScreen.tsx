@@ -1301,6 +1301,11 @@ export default function ProfileScreen() {
                 <Text style={{ fontSize: FontSize.xs, color: Colors.warning, lineHeight: 17 }}>⚠️ To-year can not be earlier than 1980</Text>
               </View>
             )}
+            {eraValues[1] - eraValues[0] <= ERA_MIN_INTERVAL && (
+              <View style={{ backgroundColor: Colors.warningMuted, borderRadius: Radius.sm, padding: Spacing.sm, borderWidth: 1, borderColor: Colors.warningBorder, marginTop: Spacing.sm }}>
+                <Text style={{ fontSize: FontSize.xs, color: Colors.warning, lineHeight: 17 }}>⚠️ Min interval 15 years</Text>
+              </View>
+            )}
           </View>
 
           {/* Number of Rounds — speglar Lobby:s motsvarande sektion. */}

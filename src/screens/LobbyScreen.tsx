@@ -1693,6 +1693,8 @@ export default function LobbyScreen() {
   const { warning: eraWarning } = checkEraAgainstPlayer(displayEra[1], players);
   // To-året kan inte gå under ERA_TO_MIN (1980) — visa gul varning vid golvet.
   const eraAtToFloor = displayEra[1] <= ERA_TO_MIN;
+  // Intervallet kan inte bli mindre än ERA_MIN_INTERVAL (15 år) — gul varning.
+  const eraAtMinInterval = displayEra[1] - displayEra[0] <= ERA_MIN_INTERVAL;
 
   // Räkna aktiva spelare (exkl. hasLeft, vars plats är frigjord) — används
   // som capacity-check både vid + Add Player-knappen och vid Confirm i
@@ -4082,6 +4084,7 @@ export default function LobbyScreen() {
                 </View>
               )}
               {hostMode && eraAtToFloor && <View style={styles.eraWarning}><Text style={styles.eraWarningText}>⚠️ To-year can not be earlier than 1980</Text></View>}
+              {hostMode && eraAtMinInterval && <View style={styles.eraWarning}><Text style={styles.eraWarningText}>⚠️ Min interval 15 years</Text></View>}
               {eraWarning && <View style={styles.eraWarning}><Text style={styles.eraWarningText}>⚠️ {eraWarning}</Text></View>}
             </View>
 
