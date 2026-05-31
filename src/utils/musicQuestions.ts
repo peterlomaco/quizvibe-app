@@ -22,6 +22,7 @@ export interface MusicQuestion {
   contentSubject: YoutubeContentSubject;
   questionText: string;
   audiences: MusicQuestionAudience[];
+  genrePackages?: string[];
   youtubeClips: YoutubeClip[];
 }
 
@@ -3230,6 +3231,29 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "whitney-one-moment-in-time",
+    "displayName": "One Moment in Time — Whitney Houston",
+    "correctYear": 1988,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "all"
+    ],
+    "genrePackages": [
+      "sport"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "4Yp2eZ-TMuI",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Whitney Houston - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
     "id": "field-of-dreams-1989",
     "displayName": "Field of Dreams",
     "correctYear": 1989,
@@ -3246,6 +3270,29 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Movieclips",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (13)."
+      }
+    ]
+  },
+  {
+    "id": "hakan-sodergren-nu-tar-vi-dom",
+    "displayName": "Nu tar vi dom — Håkan Södergren & Ishockeylandslaget",
+    "correctYear": 1989,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "all"
+    ],
+    "genrePackages": [
+      "sport"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "eToFpwpVJ1k",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Håkan Södergren - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
       }
     ]
   },
@@ -3350,6 +3397,29 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "MVIDEO4K",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (15)."
+      }
+    ]
+  },
+  {
+    "id": "new-order-world-in-motion",
+    "displayName": "World in Motion — New Order",
+    "correctYear": 1990,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "all"
+    ],
+    "genrePackages": [
+      "sport"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "T8T1a45HX4o",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "New Order - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
       }
     ]
   },
@@ -3849,6 +3919,29 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "ges-graver-guld-usa",
+    "displayName": "När vi gräver guld i USA — GES",
+    "correctYear": 1994,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "all"
+    ],
+    "genrePackages": [
+      "sport"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "7YOzs-dD8qU",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Glenmark Eriksson Strömstedt - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
     "id": "pulp-fiction",
     "displayName": "Pulp Fiction",
     "correctYear": 1994,
@@ -3971,6 +4064,29 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "nick-borgen-den-glider-in",
+    "displayName": "Den glider in — Nick Borgen",
+    "correctYear": 1995,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "all"
+    ],
+    "genrePackages": [
+      "sport"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "QgppLdY0QjU",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Tre Kronor - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
     "id": "oasis-wonderwall",
     "displayName": "Wonderwall — Oasis",
     "correctYear": 1995,
@@ -4028,6 +4144,29 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "startSec": 30,
         "endSec": 45,
         "channelTitle": "Kent - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
+    "id": "lightning-seeds-three-lions",
+    "displayName": "Three Lions — Baddiel, Skinner & The Lightning Seeds",
+    "correctYear": 1996,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "all"
+    ],
+    "genrePackages": [
+      "sport"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "xm7et8ecVjM",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Baddiel - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
       }
@@ -4237,6 +4376,29 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "ricky-martin-copa-de-la-vida",
+    "displayName": "La Copa de la Vida — Ricky Martin",
+    "correctYear": 1998,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "all"
+    ],
+    "genrePackages": [
+      "sport"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "Qm9KCQd3mg4",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Ricky Martin - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
     "id": "eiffel-65-blue",
     "displayName": "Blue (Da Ba Dee) — Eiffel 65",
     "correctYear": 1999,
@@ -4393,6 +4555,29 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "startSec": 30,
         "endSec": 45,
         "channelTitle": "Håkan Hellström - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
+    "id": "markoolio-mera-mal",
+    "displayName": "Mera mål — Markoolio",
+    "correctYear": 2000,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "all"
+    ],
+    "genrePackages": [
+      "sport"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "nhEewGN6ePQ",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Markoolio - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
       }
@@ -4705,6 +4890,52 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "malin-baryard-do-you-wanna-ride",
+    "displayName": "Do You Wanna Ride? — Spånka NKPG & Malin Baryard",
+    "correctYear": 2004,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "all"
+    ],
+    "genrePackages": [
+      "sport"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "BffT-VRIOIk",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Spånka NKPG - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
+    "id": "markoolio-in-med-bollen",
+    "displayName": "In med bollen — Markoolio",
+    "correctYear": 2004,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "all"
+    ],
+    "genrePackages": [
+      "sport"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "miPLp_U0sMU",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Markoolio - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
     "id": "million-dollar-baby-2004",
     "displayName": "Million Dollar Baby",
     "correctYear": 2004,
@@ -4923,6 +5154,29 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 219,
         "channelTitle": "7clouds",
         "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "tomas-ledin-vi-ar-pa-gang",
+    "displayName": "Vi är på gång — Tomas Ledin",
+    "correctYear": 2006,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "all"
+    ],
+    "genrePackages": [
+      "sport"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "XVpjr3arHBM",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Tomas Ledin - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
       }
     ]
   },
@@ -5307,6 +5561,29 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "startSec": 5,
         "endSec": 20,
         "channelTitle": "Katy Perry - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
+    "id": "knaan-wavin-flag",
+    "displayName": "Wavin' Flag — K'naan",
+    "correctYear": 2010,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "all"
+    ],
+    "genrePackages": [
+      "sport"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "NENQMda7Mbs",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "K'NAAN - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
       }
@@ -5842,6 +6119,29 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 238,
         "channelTitle": "AnimeOracle",
         "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "pitbull-we-are-one-ole-ola",
+    "displayName": "We Are One (Ole Ola) — Pitbull, Jennifer Lopez & Claudia Leitte",
+    "correctYear": 2014,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "all"
+    ],
+    "genrePackages": [
+      "sport"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "zfXd_AY8hmg",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Pitbull - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
       }
     ]
   },
@@ -6776,6 +7076,30 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 171,
         "channelTitle": "7cloudsnation",
         "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "duplantis-bop",
+    "displayName": "Bop — Armand Duplantis",
+    "correctYear": 2025,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-z",
+      "gen-alpha"
+    ],
+    "genrePackages": [
+      "sport"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "Ze_ZuiE1gAk",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Mondo - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
       }
     ]
   }

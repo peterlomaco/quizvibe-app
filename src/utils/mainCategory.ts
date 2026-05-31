@@ -44,3 +44,27 @@ export function isMainCategory(value: unknown): value is MainCategory {
 export function defaultEnabledMainCategories(): MainCategory[] {
   return [...MAIN_CATEGORIES];
 }
+
+/**
+ * Avgör om ett item ska visas givet host:s aktiverade huvudkategorier.
+ *
+ * Bas-regeln: item:ets `mainCategory` (härledd från contentSubject) måste
+ * finnas i `enabled`. Items med null mainCategory (capitals/places) matchar
+ * aldrig här (de hanteras separat av "alla 3 enabled = no-op"-specialfallet
+ * i quiz.tsx).
+ *
+ * Sport-tema-undantag: en låt taggad `genrePackages: ["sport"]` (sport-musik —
+ * fotbolls-VM-låt, hockey-VM-låt, idrottare som gjort musik) är subject=song
+ * → mainCategory='Music', MEN surfar ÄVEN under Sport-toggeln. En host som
+ * aktiverat antingen Music ELLER Sport får dessa. Driver "YouTube + musik +
+ * sport"-crossover-kategorin (songs-sport.yaml).
+ */
+export function itemMatchesEnabledCategories(
+  mainCategory: MainCategory | null,
+  enabled: readonly MainCategory[],
+  genrePackages?: readonly string[],
+): boolean {
+  if (mainCategory !== null && enabled.includes(mainCategory)) return true;
+  if (genrePackages?.includes('sport') && enabled.includes('Sport')) return true;
+  return false;
+}

@@ -35,6 +35,9 @@ interface ExportedMusicQuestion {
   /** Generationer som item:et är curerat för — kopieras från file-header
    *  audience eller item-override. Driver klient-side audience-filtret. */
   audiences: Audience[];
+  /** Genre/tema-paket-taggar (t.ex. ["sport"]). Emittas bara när non-empty.
+   *  Driver klientens crossover-filter (sport-musik surfar under Music+Sport). */
+  genrePackages?: string[];
   youtubeClips: ExportedYoutubeClip[];
 }
 
@@ -63,6 +66,7 @@ export interface MusicQuestion {
   contentSubject: YoutubeContentSubject;
   questionText: string;
   audiences: MusicQuestionAudience[];
+  genrePackages?: string[];
   youtubeClips: YoutubeClip[];
 }
 
@@ -105,6 +109,9 @@ async function main(): Promise<void> {
         // 'millennials'] för korrekt cross-gen-recognition. Saknas item-tag
         // används file-tag som tidigare.
         audiences: item.audience ?? file.audience,
+        // genrePackages (t.ex. ["sport"]) — bara när non-empty (minimal diff).
+        // Driver klientens crossover-filter: sport-musik under Music+Sport.
+        ...(item.genrePackages.length ? { genrePackages: item.genrePackages } : {}),
         youtubeClips: item.youtubeClips.map((c) => ({
           videoId: c.videoId,
           startSec: c.startSec,

@@ -1,0 +1,217 @@
+# Sport-musik — låtar med sportinriktning (fotbolls-VM/EM-låtar, hockey-VM-
+# låtar, idrottare som gjort musik). Crossover-kategori: contentForm=youtube
+# ("YouTube"), contentSubject=song ("musik", svaret är årtal), och varje item
+# bär genrePackages: ["sport"] ("sport"-taggen). Klientens mainCategory-filter
+# låter dessa matcha BÅDE Music- och Sport-togglarna (sport-tema-låt).
+#
+# audience: ["all"] eftersom sport-hymner känns igen tvärs generationer.
+# Item-level audience-override för väldigt nya låtar (t.ex. Duplantis "Bop").
+# correctYear = release-år. region sweden = svensk igenkänning (V1).
+audience: ["all"]
+region: ["sweden"]
+category: songs
+contentForm: youtube
+contentSubject: song
+items:
+  # ── Svenska fotbolls-låtar ──
+  - id: ges-graver-guld-usa
+    displayName: "När vi gräver guld i USA — GES"
+    correctYear: 1994
+    probability: 88
+    wikimediaSearchHints: ["Glenmark Eriksson Strömstedt När vi gräver guld i USA 1994"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "7YOzs-dD8qU"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Glenmark Eriksson Strömstedt - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+    genrePackages: ["sport"]
+  - id: nick-borgen-den-glider-in
+    displayName: "Den glider in — Nick Borgen"
+    correctYear: 1995
+    probability: 88
+    wikimediaSearchHints: ["Nick Borgen Den glider in 1995"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "QgppLdY0QjU"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Tre Kronor - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+    genrePackages: ["sport"]
+  - id: markoolio-mera-mal
+    displayName: "Mera mål — Markoolio"
+    correctYear: 2000
+    probability: 80
+    wikimediaSearchHints: ["Markoolio Mera mål EM 2000"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "nhEewGN6ePQ"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Markoolio - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+    genrePackages: ["sport"]
+  - id: markoolio-in-med-bollen
+    displayName: "In med bollen — Markoolio"
+    correctYear: 2004
+    probability: 80
+    wikimediaSearchHints: ["Markoolio In med bollen EM 2004"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "miPLp_U0sMU"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Markoolio - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+    genrePackages: ["sport"]
+  - id: tomas-ledin-vi-ar-pa-gang
+    displayName: "Vi är på gång — Tomas Ledin"
+    correctYear: 2006
+    probability: 78
+    wikimediaSearchHints: ["Tomas Ledin Vi är på gång VM 2006"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "XVpjr3arHBM"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Tomas Ledin - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+    genrePackages: ["sport"]
+  - id: friends-in-need-alla-vi
+    displayName: "Alla vi — Friends In Need"
+    correctYear: 1999
+    probability: 80
+    wikimediaSearchHints: ["Dr Alban Björn Borg Tomas Brolin Alla vi 1999"]
+    answerMethods: ["timeline"]
+    genrePackages: ["sport"]
+  # ── Svenska hockey-låtar ──
+  - id: hakan-sodergren-nu-tar-vi-dom
+    displayName: "Nu tar vi dom — Håkan Södergren & Ishockeylandslaget"
+    correctYear: 1989
+    probability: 84
+    wikimediaSearchHints: ["Håkan Södergren Nu tar vi dom hockey-VM 1989"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "eToFpwpVJ1k"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Håkan Södergren - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+    genrePackages: ["sport"]
+  - id: poodles-en-for-alla-for-en
+    displayName: "En för alla, för en — Tre Kronor & The Poodles"
+    correctYear: 2013
+    probability: 78
+    wikimediaSearchHints: ["The Poodles En för alla för en hockey-VM 2013"]
+    answerMethods: ["timeline"]
+    genrePackages: ["sport"]
+  # ── Övrig svensk sport-musik ──
+  - id: malin-baryard-do-you-wanna-ride
+    displayName: "Do You Wanna Ride? — Spånka NKPG & Malin Baryard"
+    correctYear: 2004
+    probability: 74
+    wikimediaSearchHints: ["Spånka NKPG Malin Baryard Do You Wanna Ride 2004"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "BffT-VRIOIk"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Spånka NKPG - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+    genrePackages: ["sport"]
+  # ── Internationella fotbolls-VM/EM-låtar ──
+  - id: lightning-seeds-three-lions
+    displayName: "Three Lions — Baddiel, Skinner & The Lightning Seeds"
+    correctYear: 1996
+    probability: 80
+    wikimediaSearchHints: ["Lightning Seeds Three Lions Football's Coming Home 1996"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "xm7et8ecVjM"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Baddiel - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+    genrePackages: ["sport"]
+  - id: new-order-world-in-motion
+    displayName: "World in Motion — New Order"
+    correctYear: 1990
+    probability: 76
+    wikimediaSearchHints: ["New Order World in Motion 1990 England World Cup"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "T8T1a45HX4o"
+        startSec: 30
+        endSec: 45
+        channelTitle: "New Order - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+    genrePackages: ["sport"]
+  - id: ricky-martin-copa-de-la-vida
+    displayName: "La Copa de la Vida — Ricky Martin"
+    correctYear: 1998
+    probability: 80
+    wikimediaSearchHints: ["Ricky Martin La Copa de la Vida The Cup of Life 1998"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "Qm9KCQd3mg4"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Ricky Martin - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+    genrePackages: ["sport"]
+  - id: knaan-wavin-flag
+    displayName: "Wavin' Flag — K'naan"
+    correctYear: 2010
+    probability: 82
+    wikimediaSearchHints: ["K'naan Wavin' Flag 2010 World Cup"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "NENQMda7Mbs"
+        startSec: 30
+        endSec: 45
+        channelTitle: "K'NAAN - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+    genrePackages: ["sport"]
+  - id: pitbull-we-are-one-ole-ola
+    displayName: "We Are One (Ole Ola) — Pitbull, Jennifer Lopez & Claudia Leitte"
+    correctYear: 2014
+    probability: 80
+    wikimediaSearchHints: ["Pitbull Jennifer Lopez We Are One Ole Ola 2014 World Cup"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "zfXd_AY8hmg"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Pitbull - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+    genrePackages: ["sport"]
+  - id: whitney-one-moment-in-time
+    displayName: "One Moment in Time — Whitney Houston"
+    correctYear: 1988
+    probability: 80
+    wikimediaSearchHints: ["Whitney Houston One Moment in Time 1988 Olympics"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "4Yp2eZ-TMuI"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Whitney Houston - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+    genrePackages: ["sport"]
+  # ── Idrottare som gjort musik ──
+  - id: duplantis-bop
+    displayName: "Bop — Armand Duplantis"
+    correctYear: 2025
+    probability: 74
+    audience: ["gen-z", "gen-alpha"]
+    wikimediaSearchHints: ["Mondo Armand Duplantis Bop 2025"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "Ze_ZuiE1gAk"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Mondo - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+    genrePackages: ["sport"]

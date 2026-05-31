@@ -34,7 +34,7 @@ interface Pick {
 }
 
 function loadAllMissing(): MissingItem[] {
-  const files = ['songs-elder', 'songs-gen-x', 'songs-millennials', 'songs-gen-z', 'songs-gen-alpha', 'songs-all'];
+  const files = ['songs-elder', 'songs-gen-x', 'songs-millennials', 'songs-gen-z', 'songs-gen-alpha', 'songs-all', 'songs-sport'];
   const missing: MissingItem[] = [];
   for (const f of files) {
     const doc = parse(readFileSync(`content/catalog/${f}.yaml`, 'utf8')) as {

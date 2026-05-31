@@ -38,7 +38,7 @@ import {
   type PlayerAudioOverrides,
 } from '@/src/utils/mockLobbySettings';
 import { buildAudienceSet, filterByAudience } from '@/src/utils/audienceFilter';
-import { isMainCategory, subjectToMainCategory, type MainCategory } from '@/src/utils/mainCategory';
+import { isMainCategory, subjectToMainCategory, itemMatchesEnabledCategories, type MainCategory } from '@/src/utils/mainCategory';
 import { clearGameStarted } from '@/src/utils/mockStartedGames';
 import { MUSIC_QUESTIONS } from '@/src/utils/musicQuestions';
 import { savePendingLobbyPlayers } from '@/src/utils/pendingLobby';
@@ -95,6 +95,10 @@ interface TimelineQuestion {
   question: string;
   correctYear: number;
   hint: string;
+  /** Genre/tema-paket-taggar (t.ex. ["sport"]) från backend-katalogen. Driver
+   *  crossover-filter: sport-musik (subject=song → mainCategory='Music') surfar
+   *  ÄVEN under Sport-toggeln. Se itemMatchesEnabledCategories. */
+  genrePackages?: readonly string[];
   // Pre-curerade YouTube-klipp för frågan. Optional — items utan klipp
   // renderar `NoSourcePlayer`-placeholder via pickMediaSource. Real katalog
   // (Phase 4 → riktig fråge-bank) kommer ha clips fyllda från
@@ -151,6 +155,7 @@ const SEED_QUESTIONS: TimelineQuestion[] = MUSIC_QUESTIONS.map((q, i) => ({
   question: q.questionText,
   correctYear: q.correctYear,
   hint: q.displayName,
+  genrePackages: q.genrePackages,
   youtubeClips: q.youtubeClips,
 }));
 
@@ -885,8 +890,12 @@ export default function QuizScreen() {
     const filterByCategory = (pool: QuizQuestion[]): QuizQuestion[] =>
       isAllCategoriesEnabled
         ? pool
-        : pool.filter(
-            (q) => q.mainCategory !== null && enabledMainCategories.includes(q.mainCategory),
+        : pool.filter((q) =>
+            itemMatchesEnabledCategories(
+              q.mainCategory,
+              enabledMainCategories,
+              q.type === 'timeline' ? q.genrePackages : undefined,
+            ),
           );
     const youtubePool = filterByCategory(youtubePoolPreCategory);
     const imagePool = filterByCategory(imagePoolPreCategory);
@@ -904,8 +913,8 @@ export default function QuizScreen() {
     // 2026-05-27 där SEED_QUESTIONS returnerades orörd).
     if (!hasYoutube && !hasImage) {
       if (isAllCategoriesEnabled) return SEED_QUESTIONS;
-      const respectful = SEED_QUESTIONS.filter(
-        (q) => q.mainCategory !== null && enabledMainCategories.includes(q.mainCategory),
+      const respectful = SEED_QUESTIONS.filter((q) =>
+        itemMatchesEnabledCategories(q.mainCategory, enabledMainCategories, q.genrePackages),
       );
       return respectful.length > 0 ? respectful : SEED_QUESTIONS;
     }
