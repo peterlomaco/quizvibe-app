@@ -157,11 +157,11 @@ const ANSWER_RESPONSE_OPTIONS: { id: AnswerResponse; label: string }[] = [
 // ERA_MIN_INTERVAL = minsta tillåtna avstånd mellan from/to-markörer (10 år).
 // ERA_MIN_INTERVAL_PX räknar om det till slider-pixel för MultiSlider:s
 // minMarkerOverlapDistance-prop.
-// ERA_MIN = 1930 så slider-värdet matchar tidsaxelns vänsterkant ("<1930").
+// ERA_MIN = 1950 så slider-värdet matchar tidsaxelns vänsterkant ("<1950").
 // Tidigare gick slidern 1900..currentYear medan axeln visuellt började vid
 // "<1930" — det skapade en 30-års-förskjutning mellan thumb-position och
 // vad rutan ovan visade. Nu mappar 0 % → 1930 och 100 % → currentYear.
-const ERA_MIN = 1930;
+const ERA_MIN = 1950;
 const ERA_MAX = new Date().getFullYear();
 const ERA_SLIDER_WIDTH = 280;
 // SLIDER_INSET = pixel-buffer på vardera sida så thumb-cirklarna inte
@@ -181,9 +181,7 @@ function DecadeMarks() {
   // * ERA_SLIDER_WIDTH per label. Ledmellanrummet 2010 → ERA_MAX är något
   // bredare än övriga eftersom det spannet är ~16 år istället för 10.
   const labelEntries: { label: string; year: number }[] = [
-    { label: '<1930', year: ERA_MIN },
-    { label: '1940', year: 1940 },
-    { label: '1950', year: 1950 },
+    { label: '<1950', year: ERA_MIN },
     { label: '1960', year: 1960 },
     { label: '1970', year: 1970 },
     { label: '1980', year: 1980 },
