@@ -28,46 +28,6 @@ export interface MusicQuestion {
 
 export const MUSIC_QUESTIONS: MusicQuestion[] = [
   {
-    "id": "louis-armstrong-body-and-soul",
-    "displayName": "Body and Soul — Louis Armstrong",
-    "correctYear": 1930,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "jSmIXHwQWBw",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "THE HEHR ARCHIVE",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
-      }
-    ]
-  },
-  {
-    "id": "cab-calloway-minnie-the-moocher",
-    "displayName": "Minnie the Moocher — Cab Calloway",
-    "correctYear": 1931,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "250MMq0fTrU",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Juanjo de Goya",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
-      }
-    ]
-  },
-  {
     "id": "fred-astaire-night-and-day",
     "displayName": "Night and Day — Fred Astaire",
     "correctYear": 1932,
@@ -128,106 +88,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "fred-astaire-cheek-to-cheek",
-    "displayName": "Cheek to Cheek — Fred Astaire",
-    "correctYear": 1935,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "P1u2G16fq_Y",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Music Video Vault",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
-      }
-    ]
-  },
-  {
-    "id": "bing-crosby-pennies-from-heaven",
-    "displayName": "Pennies from Heaven — Bing Crosby",
-    "correctYear": 1936,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "XXpUoL52a1w",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Richard Parker",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
-      }
-    ]
-  },
-  {
-    "id": "duke-ellington-caravan",
-    "displayName": "Caravan — Duke Ellington",
-    "correctYear": 1937,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "cAeEhTD1xhU",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Alain Corrieras",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
-      }
-    ]
-  },
-  {
-    "id": "ella-fitzgerald-a-tisket-a-tasket",
-    "displayName": "A-Tisket, A-Tasket — Ella Fitzgerald",
-    "correctYear": 1938,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "ETbyLdCoJPw",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Ella Fitzgerald - Topic",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
-      }
-    ]
-  },
-  {
-    "id": "judy-garland-over-the-rainbow",
-    "displayName": "Over the Rainbow — Judy Garland",
-    "correctYear": 1939,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "all"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "XW5nIlIfR5s",
-        "startSec": 5,
-        "endSec": 20,
-        "channelTitle": "Judy Garland - Topic",
-        "license": "standard",
-        "notes": "Officiell album-audio via YouTube Topic — statisk album-art. Refrängområde."
-      }
-    ]
-  },
-  {
     "id": "glenn-miller-in-the-mood",
     "displayName": "In the Mood — Glenn Miller",
     "correctYear": 1940,
@@ -248,26 +108,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "glenn-miller-chattanooga-choo-choo",
-    "displayName": "Chattanooga Choo Choo — Glenn Miller",
-    "correctYear": 1941,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "QGZ6jigic_I",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Glenn Miller Orchestra - Topic",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
-      }
-    ]
-  },
-  {
     "id": "bing-crosby-white-christmas",
     "displayName": "White Christmas — Bing Crosby",
     "correctYear": 1942,
@@ -284,26 +124,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Bing Crosby - Topic",
         "license": "standard",
         "notes": "Officiell album-audio via YouTube Topic. Refrängområde."
-      }
-    ]
-  },
-  {
-    "id": "dooley-wilson-as-time-goes-by",
-    "displayName": "As Time Goes By — Dooley Wilson",
-    "correctYear": 1943,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "BumNgaR13o0",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "༺☆𝗧𝗛𝗘𝗙𝗜𝗬𝗢𝗨 𝗠𝗢𝗩𝗜𝗘𝗦☆༻",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
       }
     ]
   },
@@ -428,86 +248,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "nat-king-cole-mona-lisa",
-    "displayName": "Mona Lisa — Nat King Cole",
-    "correctYear": 1950,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "NIDX18Xl16s",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "RPG Collection",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
-      }
-    ]
-  },
-  {
-    "id": "johnnie-ray-cry",
-    "displayName": "Cry — Johnnie Ray",
-    "correctYear": 1951,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "8MgIO03OWy8",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Classic Mood Experience",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
-      }
-    ]
-  },
-  {
-    "id": "jo-stafford-you-belong-to-me",
-    "displayName": "You Belong to Me — Jo Stafford",
-    "correctYear": 1952,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "mJvwzZZkb4M",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Larry Hinze",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
-      }
-    ]
-  },
-  {
-    "id": "patti-page-doggie-in-the-window",
-    "displayName": "(How Much Is) That Doggie in the Window — Patti Page",
-    "correctYear": 1953,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "qkCHxeWyeTA",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "vintage video clips",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
-      }
-    ]
-  },
-  {
     "id": "bill-haley-rock-around-the-clock",
     "displayName": "Rock Around the Clock — Bill Haley & His Comets",
     "correctYear": 1954,
@@ -524,26 +264,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "OLD TAPES",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
-      }
-    ]
-  },
-  {
-    "id": "chuck-berry-maybellene",
-    "displayName": "Maybellene — Chuck Berry",
-    "correctYear": 1955,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "RMkIK0qZnjw",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Chuck Berry - Topic",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
       }
     ]
   },

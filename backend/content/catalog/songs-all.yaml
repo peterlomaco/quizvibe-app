@@ -32,12 +32,6 @@ items:
     probability: 95
     wikimediaSearchHints: ["Judy Garland Over the Rainbow Wizard of Oz"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "XW5nIlIfR5s"
-        startSec: 5
-        endSec: 20
-        channelTitle: "Judy Garland - Topic"
-        notes: "Officiell album-audio via YouTube Topic — statisk album-art. Refrängområde."
   - id: elvis-presley-heartbreak-hotel
     displayName: "Heartbreak Hotel — Elvis Presley"
     correctYear: 1956

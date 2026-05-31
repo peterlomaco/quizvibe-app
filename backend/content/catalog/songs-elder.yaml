@@ -17,24 +17,12 @@ items:
     probability: 75
     wikimediaSearchHints: ["Louis Armstrong Body and Soul"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "jSmIXHwQWBw"
-        startSec: 30
-        endSec: 45
-        channelTitle: "THE HEHR ARCHIVE"
-        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: cab-calloway-minnie-the-moocher
     displayName: "Minnie the Moocher — Cab Calloway"
     correctYear: 1931
     probability: 80
     wikimediaSearchHints: ["Cab Calloway Minnie the Moocher"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "250MMq0fTrU"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Juanjo de Goya"
-        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: fred-astaire-night-and-day
     displayName: "Night and Day — Fred Astaire"
     correctYear: 1932
@@ -77,48 +65,24 @@ items:
     probability: 82
     wikimediaSearchHints: ["Fred Astaire Cheek to Cheek Top Hat"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "P1u2G16fq_Y"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Music Video Vault"
-        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: bing-crosby-pennies-from-heaven
     displayName: "Pennies from Heaven — Bing Crosby"
     correctYear: 1936
     probability: 78
     wikimediaSearchHints: ["Bing Crosby Pennies from Heaven 1936"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "XXpUoL52a1w"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Richard Parker"
-        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: duke-ellington-caravan
     displayName: "Caravan — Duke Ellington"
     correctYear: 1937
     probability: 80
     wikimediaSearchHints: ["Duke Ellington Caravan 1937"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "cAeEhTD1xhU"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Alain Corrieras"
-        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: ella-fitzgerald-a-tisket-a-tasket
     displayName: "A-Tisket, A-Tasket — Ella Fitzgerald"
     correctYear: 1938
     probability: 80
     wikimediaSearchHints: ["Ella Fitzgerald A-Tisket A-Tasket"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "ETbyLdCoJPw"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Ella Fitzgerald - Topic"
-        notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   # Over the Rainbow flyttad till songs-all.yaml (cross-gen-iconic) 2026-05-22.
   - id: glenn-miller-in-the-mood
     displayName: "In the Mood — Glenn Miller"
@@ -138,12 +102,6 @@ items:
     probability: 82
     wikimediaSearchHints: ["Glenn Miller Chattanooga Choo Choo"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "QGZ6jigic_I"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Glenn Miller Orchestra - Topic"
-        notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: bing-crosby-white-christmas
     displayName: "White Christmas — Bing Crosby"
     correctYear: 1942
@@ -162,12 +120,6 @@ items:
     probability: 85
     wikimediaSearchHints: ["As Time Goes By Casablanca Dooley Wilson"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "BumNgaR13o0"
-        startSec: 30
-        endSec: 45
-        channelTitle: "༺☆𝗧𝗛𝗘𝗙𝗜𝗬𝗢𝗨 𝗠𝗢𝗩𝗜𝗘𝗦☆༻"
-        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: bing-crosby-swinging-on-a-star
     displayName: "Swinging on a Star — Bing Crosby"
     correctYear: 1944
@@ -246,48 +198,24 @@ items:
     probability: 88
     wikimediaSearchHints: ["Nat King Cole Mona Lisa 1950"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "NIDX18Xl16s"
-        startSec: 30
-        endSec: 45
-        channelTitle: "RPG Collection"
-        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: johnnie-ray-cry
     displayName: "Cry — Johnnie Ray"
     correctYear: 1951
     probability: 75
     wikimediaSearchHints: ["Johnnie Ray Cry 1951"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "8MgIO03OWy8"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Classic Mood Experience"
-        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: jo-stafford-you-belong-to-me
     displayName: "You Belong to Me — Jo Stafford"
     correctYear: 1952
     probability: 78
     wikimediaSearchHints: ["Jo Stafford You Belong to Me 1952"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "mJvwzZZkb4M"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Larry Hinze"
-        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: patti-page-doggie-in-the-window
     displayName: "(How Much Is) That Doggie in the Window — Patti Page"
     correctYear: 1953
     probability: 82
     wikimediaSearchHints: ["Patti Page Doggie in the Window 1953"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "qkCHxeWyeTA"
-        startSec: 30
-        endSec: 45
-        channelTitle: "vintage video clips"
-        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: bill-haley-rock-around-the-clock
     displayName: "Rock Around the Clock — Bill Haley & His Comets"
     correctYear: 1954
@@ -306,12 +234,6 @@ items:
     probability: 82
     wikimediaSearchHints: ["Chuck Berry Maybellene 1955"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "RMkIK0qZnjw"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Chuck Berry - Topic"
-        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
   # Heartbreak Hotel flyttad till songs-all.yaml (cross-gen-iconic) 2026-05-22.
   - id: elvis-presley-jailhouse-rock
     displayName: "Jailhouse Rock — Elvis Presley"
