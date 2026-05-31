@@ -9,7 +9,7 @@ import { getAvatarEmojiById } from '@/src/utils/avatars';
 import { clearLeftPlayers } from '@/src/utils/leftPlayers';
 import { clearEjected } from '@/src/utils/ejectedPlayers';
 import { clearLobbyPlayers, getLobbyPlayers } from '@/src/utils/mockLobbyPlayers';
-import { clearLobbySettings } from '@/src/utils/mockLobbySettings';
+import { clearLobbySettings, getLobbySettings } from '@/src/utils/mockLobbySettings';
 import { clearGameStarted } from '@/src/utils/mockStartedGames';
 import { getRoomMeta, isActiveRoom, isLobbyFull, isOwnLobby, registerActiveRoom } from '@/src/utils/mockActiveRooms';
 import {
@@ -588,6 +588,16 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
       Alert.alert(
         'Room not found',
         'There is no Room code activated with this combination',
+      );
+      return;
+    }
+    // Individual device-spel kräver registrerat QuizVibe-konto för alla —
+    // guests kan inte joina. Blocka redan här på Home innan navigation.
+    const roomSettings = await getLobbySettings(code);
+    if (roomSettings?.gameMode === 'individual-devices') {
+      Alert.alert(
+        'Registered account required',
+        "This is an Individual device game. Guests can't join — register or log in to play on your own device.",
       );
       return;
     }

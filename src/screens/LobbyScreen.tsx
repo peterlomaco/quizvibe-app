@@ -1569,24 +1569,30 @@ export default function LobbyScreen() {
   // (PtP→IndDev). DB DELETE krävs — utan det skulle host:s fetchNewJoiners-
   // sync re-injektera guests nästa state-ändring (setLobbyPlayers är
   // UPSERT-only).
-  const confirmAndRemoveManualGuests = (title: string, applySwitch: () => void) => {
-    const manualPlayers = players.filter((p) => p.addedByHost);
-    if (manualPlayers.length === 0) {
+  // Individual device kräver att ALLA spelare är registrerade QuizVibe-users
+  // (guests kan inte vara med — varken host-tillagda eller självanslutna via
+  // guest-form). Vid byte till IndDev tas alla icke-registrerade bort. Host
+  // exkluderas alltid (host är alltid registrerad/synthetic). markEjected +
+  // DB-DELETE så självanslutna guests får eject-popup på sin enhet.
+  const confirmAndRemoveGuests = (title: string, applySwitch: () => void) => {
+    const guests = players.filter((p) => !p.isHost && p.type !== 'registered');
+    if (guests.length === 0) {
       applySwitch();
       return;
     }
     Alert.alert(
       title,
-      'Guest players will be removed — ask them to join with their own device.',
+      'Individual device games require every player to have a registered QuizVibe account. Guest players will be removed.',
       [
         { text: 'Cancel', style: 'cancel' },
         {
           text: 'Switch & remove',
           style: 'destructive',
           onPress: () => {
-            setPlayers((prev) => prev.filter((p) => !p.addedByHost));
+            setPlayers((prev) => prev.filter((p) => p.isHost || p.type === 'registered'));
             applySwitch();
-            manualPlayers.forEach((p) => {
+            guests.forEach((p) => {
+              markEjected(roomCode, p.id);
               supabase
                 .from('lobby_players')
                 .delete()
@@ -1595,7 +1601,7 @@ export default function LobbyScreen() {
                 .then(({ error }) => {
                   if (error) {
                     console.warn(
-                      '[lobbyPlayers] manual-guest delete on mode switch failed:',
+                      '[lobbyPlayers] guest delete on IndDev switch failed:',
                       error.message,
                     );
                   }
@@ -1616,7 +1622,7 @@ export default function LobbyScreen() {
     // spelare (de saknar egen mobil och måste tas bort när alla spelar från
     // sina egna enheter). Lämnar även single-player-läget.
     if (mode === 'individual-devices') {
-      confirmAndRemoveManualGuests('Switch to Individual device?', () => {
+      confirmAndRemoveGuests('Switch to Individual device?', () => {
         setSinglePlayerDefault(false);
         setGameMode('individual-devices');
       });
@@ -1734,6 +1740,15 @@ export default function LobbyScreen() {
   // Tryck på "+ Add Player" — blockera redan här om lobbyn är full så
   // host inte slösar tid på att fylla i formuläret.
   const handleOpenAddPlayer = () => {
+    // Individual device kräver registrerade konton — host kan inte lägga till
+    // guests manuellt. De måste joina med sitt eget registrerade konto.
+    if (gameMode === 'individual-devices' && !singlePlayerDefault) {
+      Alert.alert(
+        'Registered accounts required',
+        "Individual device games can't include guest players. Ask players to join with their own registered QuizVibe account, or switch game mode.",
+      );
+      return;
+    }
     if (isLobbyAtCapacity()) {
       Alert.alert('Lobby is full', 'Lobby is already full with waiting and approved players. Remove players if to add others');
       return;
@@ -2871,6 +2886,19 @@ export default function LobbyScreen() {
     // där, gateas bort. Host:s egen status är aldrig 'unstable' i
     // map:en (self exkluderas från useLobbyPeerHealth-returvärdet).
     if (gameMode === 'individual-devices') {
+      // Individual device kräver registrerade konton för alla — guests
+      // (självanslutna eller host-tillagda) får inte vara med. Defensiv guard
+      // ifall en guest hann joina via kod efter mode-bytet.
+      const guestPlayer = approvedPlayers.find(
+        (p) => !p.isHost && !p.hasLeft && p.type !== 'registered',
+      );
+      if (guestPlayer) {
+        Alert.alert(
+          'Registered accounts required',
+          `Individual device games require every player to have a registered QuizVibe account. Remove ${guestPlayer.name} (guest) or switch game mode before starting.`,
+        );
+        return;
+      }
       const unstablePlayer = approvedPlayers.find(
         (p) => !p.isHost && !p.hasLeft && lobbyPeerHealth[p.id] === 'unstable',
       );
