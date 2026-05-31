@@ -78,8 +78,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "YQHsXMglC9A"
-        startSec: 0
-        endSec: 367
+        startSec: 70
+        endSec: 85
         channelTitle: "Adele"
   - id: wiz-khalifa-charlie-puth-see-you-again
     displayName: "See You Again — Wiz Khalifa & Charlie Puth"
@@ -362,24 +362,12 @@ items:
     probability: 83
     wikimediaSearchHints: ["Sia Cheap Thrills 2016"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "HbzZPpWr4MI"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Sia - Topic"
-        notes: "Curerad 2026-05-29 — officiell album-audio via YouTube Topic."
   - id: imagine-dragons-believer
     displayName: "Believer — Imagine Dragons"
     correctYear: 2017
     probability: 85
     wikimediaSearchHints: ["Imagine Dragons Believer 2017"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "3uSfERhxvlg"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Imagine Dragons - Topic"
-        notes: "Curerad 2026-05-29 — officiell album-audio via YouTube Topic (ej barnkör-cover)."
   - id: tones-and-i-dance-monkey
     displayName: "Dance Monkey — Tones and I"
     correctYear: 2019
@@ -434,6 +422,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Måns Zelmerlöw Heroes Eurovision 2015"]
     answerMethods: ["timeline"]
+    genrePackages: ["eurovision"]
     youtubeClips:
       - videoId: "-nbq6Ur103Q"
         startSec: 30
@@ -488,12 +477,6 @@ items:
     probability: 82
     wikimediaSearchHints: ["Glass Animals Heat Waves 2020"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "pzeefqfSMjY"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Glass Animals - Topic"
-        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: olivia-rodrigo-good-4-u
     displayName: "Good 4 U — Olivia Rodrigo"
     correctYear: 2021

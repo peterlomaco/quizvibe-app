@@ -108,26 +108,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "bing-crosby-white-christmas",
-    "displayName": "White Christmas — Bing Crosby",
-    "correctYear": 1942,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "w7mz91nTF40",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Bing Crosby - Topic",
-        "license": "standard",
-        "notes": "Officiell album-audio via YouTube Topic. Refrängområde."
-      }
-    ]
-  },
-  {
     "id": "bing-crosby-swinging-on-a-star",
     "displayName": "Swinging on a Star — Bing Crosby",
     "correctYear": 1944,
@@ -1616,6 +1596,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "audiences": [
       "all"
     ],
+    "genrePackages": [
+      "sport"
+    ],
     "youtubeClips": [
       {
         "videoId": "-Hk-LYcavrw",
@@ -1967,6 +1950,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "questionText": "Which Year was this Movie launched?",
     "audiences": [
       "all"
+    ],
+    "genrePackages": [
+      "sport"
     ],
     "youtubeClips": [
       {
@@ -3505,6 +3491,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "audiences": [
       "all"
     ],
+    "genrePackages": [
+      "sport"
+    ],
     "youtubeClips": [
       {
         "videoId": "3mS-l1F5Xvs",
@@ -4664,6 +4653,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "audiences": [
       "all"
     ],
+    "genrePackages": [
+      "sport"
+    ],
     "youtubeClips": [
       {
         "videoId": "5_RsHRmIRBY",
@@ -5461,6 +5453,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "audiences": [
       "all"
     ],
+    "genrePackages": [
+      "sport"
+    ],
     "youtubeClips": [
       {
         "videoId": "-4QPVo0UIzc",
@@ -5918,8 +5913,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "YQHsXMglC9A",
-        "startSec": 0,
-        "endSec": 367,
+        "startSec": 70,
+        "endSec": 85,
         "channelTitle": "Adele",
         "license": "standard"
       }
@@ -5934,6 +5929,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "audiences": [
       "gen-alpha",
       "gen-z"
+    ],
+    "genrePackages": [
+      "eurovision"
     ],
     "youtubeClips": [
       {
@@ -6091,27 +6089,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "sia-cheap-thrills",
-    "displayName": "Cheap Thrills — Sia",
-    "correctYear": 2016,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "gen-alpha",
-      "gen-z"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "HbzZPpWr4MI",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Sia - Topic",
-        "license": "standard",
-        "notes": "Curerad 2026-05-29 — officiell album-audio via YouTube Topic."
-      }
-    ]
-  },
-  {
     "id": "simone-biles-rio-2016",
     "displayName": "Simone Biles 4 OS-guld i Rio",
     "correctYear": 2016,
@@ -6161,6 +6138,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "audiences": [
       "all"
     ],
+    "genrePackages": [
+      "sport"
+    ],
     "youtubeClips": [
       {
         "videoId": "yQgWMs0TBKU",
@@ -6189,27 +6169,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Australian Open",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
-      }
-    ]
-  },
-  {
-    "id": "imagine-dragons-believer",
-    "displayName": "Believer — Imagine Dragons",
-    "correctYear": 2017,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "gen-alpha",
-      "gen-z"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "3uSfERhxvlg",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Imagine Dragons - Topic",
-        "license": "standard",
-        "notes": "Curerad 2026-05-29 — officiell album-audio via YouTube Topic (ej barnkör-cover)."
       }
     ]
   },
@@ -6514,27 +6473,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "World Athletics",
         "license": "standard",
         "notes": "World Athletics official channel — Duplantis 6.17m world record Toruń 2020. Curerad 2026-05-27 via refined query."
-      }
-    ]
-  },
-  {
-    "id": "glass-animals-heat-waves",
-    "displayName": "Heat Waves — Glass Animals",
-    "correctYear": 2020,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "gen-alpha",
-      "gen-z"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "pzeefqfSMjY",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Glass Animals - Topic",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
       }
     ]
   },

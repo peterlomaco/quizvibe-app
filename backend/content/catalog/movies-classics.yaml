@@ -116,6 +116,7 @@ items:
     probability: 92
     wikimediaSearchHints: ["Rocky 1976 Stallone"]
     answerMethods: ["timeline"]
+    genrePackages: ["sport"]
     youtubeClips:
       - videoId: "-Hk-LYcavrw"
         startSec: 30
@@ -189,6 +190,7 @@ items:
     probability: 84
     wikimediaSearchHints: ["Raging Bull 1980 film Robert De Niro Jake LaMotta Scorsese"]
     answerMethods: ["timeline"]
+    genrePackages: ["sport"]
     youtubeClips:
       - videoId: "F2UKuKxCJqc"
         startSec: 30
@@ -225,6 +227,7 @@ items:
     probability: 85
     wikimediaSearchHints: ["Cool Runnings 1993 film Jamaican bobsled Disney"]
     answerMethods: ["timeline"]
+    genrePackages: ["sport"]
     youtubeClips:
       - videoId: "3mS-l1F5Xvs"
         startSec: 15
@@ -237,6 +240,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Million Dollar Baby 2004 film Clint Eastwood boxing"]
     answerMethods: ["timeline"]
+    genrePackages: ["sport"]
     youtubeClips:
       - videoId: "5_RsHRmIRBY"
         startSec: 30
@@ -249,6 +253,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Moneyball 2011 film Brad Pitt baseball Oakland A's"]
     answerMethods: ["timeline"]
+    genrePackages: ["sport"]
     youtubeClips:
       - videoId: "-4QPVo0UIzc"
         startSec: 30
@@ -261,6 +266,7 @@ items:
     probability: 78
     wikimediaSearchHints: ["Borg vs McEnroe 2017 film Sverrir Gudnason Wimbledon"]
     answerMethods: ["timeline"]
+    genrePackages: ["sport"]
     youtubeClips:
       - videoId: "yQgWMs0TBKU"
         startSec: 30

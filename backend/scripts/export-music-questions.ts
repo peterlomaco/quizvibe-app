@@ -85,6 +85,13 @@ async function main(): Promise<void> {
     // CategorySchema saknar 'movies'). Filtrera istället på contentForm.
     if (file.contentForm !== 'youtube') continue;
     for (const item of file.items) {
+      // inBaseCatalog=false → item är reserverat för ett kommande Host-paket
+      // (t.ex. christmas, eurovision) och ska INTE in i base-poolen som spelas
+      // nu. Klippet + taggen bevaras i katalogen tills paket-systemet aktiveras.
+      if (!item.inBaseCatalog) {
+        skipped.push(`${item.id} (inBaseCatalog=false → reserverat för paket)`);
+        continue;
+      }
       if (!item.youtubeClips || item.youtubeClips.length === 0) {
         skipped.push(`${item.id} (no youtubeClips)`);
         continue;

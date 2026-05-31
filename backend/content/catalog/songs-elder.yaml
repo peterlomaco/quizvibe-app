@@ -108,6 +108,8 @@ items:
     probability: 95
     wikimediaSearchHints: ["Bing Crosby White Christmas"]
     answerMethods: ["timeline"]
+    inBaseCatalog: false
+    genrePackages: ["christmas"]
     youtubeClips:
       - videoId: "w7mz91nTF40"
         startSec: 30
