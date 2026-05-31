@@ -973,16 +973,14 @@ export default function QuizScreen() {
   // (lagras på QuizQuestion.mainCategory vid SEED-konvertering); null om
   // subject inte mappar till någon V1-kategori (t.ex. capital).
   //
-  // Display-override: sport-temad musik (genrePackages: ["sport"]) har
-  // mainCategory='Music' (för filtret) men visar "Sport"-badge — det är den
-  // sport-vinkel spelaren känner igen ("Den glider in" läses som sport, inte
-  // generisk musik). Filtret påverkas INTE (det använder mainCategory + genre).
+  // OBS: badgen visar den FAKTISKA fråge-typen (sport-temad musik = "Music",
+  // inte "Sport"). Sport är ett LOBBY-FILTER, inte en badge: väljer host Sport
+  // får hen sport-relaterade frågor ur både musik- och sport-poolen (via
+  // genrePackages: ["sport"] + itemMatchesEnabledCategories), men frågan i sig
+  // är fortfarande en musikfråga och visas så. Samma mönster planeras för Film
+  // (idrottare som varit med i film / sport-tema-filmer).
   const categoryByQuestion = useMemo<(MainCategory | null)[]>(() => {
-    return gameQuestions.map((q) =>
-      q.type === 'timeline' && q.genrePackages?.includes('sport')
-        ? 'Sport'
-        : q.mainCategory,
-    );
+    return gameQuestions.map((q) => q.mainCategory);
   }, [gameQuestions]);
 
   const [questionIndex, setQuestionIndex] = useState(0);
