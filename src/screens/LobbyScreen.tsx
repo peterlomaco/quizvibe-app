@@ -1669,6 +1669,39 @@ export default function LobbyScreen() {
     );
   };
 
+  // En game-mode-ruta (delas av Single device- och Multiplayer-grupperna).
+  // FREE-badge grön när aktiv, grå när inaktiv. disabled för non-host.
+  const renderModeBox = (key: 'single' | 'ptp' | 'indiv', label: string) => {
+    const isActive =
+      key === 'single'
+        ? singlePlayerDefault
+        : key === 'ptp'
+          ? !singlePlayerDefault && gameMode === 'pass-the-phone'
+          : !singlePlayerDefault && gameMode === 'individual-devices';
+    return (
+      <TouchableOpacity
+        style={[styles.modeOption, isActive ? styles.modeOptionPassActive : styles.modeOptionInactive]}
+        onPress={() =>
+          key === 'single'
+            ? handleSelectSingle()
+            : handleSelectMode(key === 'ptp' ? 'pass-the-phone' : 'individual-devices')
+        }
+        disabled={!hostMode}
+        activeOpacity={0.7}
+      >
+        <Text
+          style={[styles.modeLabel, { textAlign: 'center' }, isActive && styles.modeLabelActiveFree]}
+          numberOfLines={2}
+        >
+          {label}
+        </Text>
+        <View style={[styles.freeBadge, !isActive && styles.freeBadgeDimmed]} pointerEvents="none">
+          <Text style={[styles.freeBadgeText, !isActive && styles.freeBadgeTextDimmed]}>FREE</Text>
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
   // Approved spelare = i spelet, har turn-nummer, syns överst.
   // Host räknas alltid som approved oavsett approved-flaggans värde.
   // Alla spelare som hamnar i lobbyn har komplett HCP (sätts vid Join as
@@ -3210,51 +3243,18 @@ export default function LobbyScreen() {
             Game Mode
           </Text>
 
-          {/* Game mode — tre FRIA val: Single player + Pass-the-Phone (single
-              device) och Individual device (multi-device). Alla tre gratis
-              (ingen premium-gate på lägesvalet); subscription gatar caps
-              (rundor/spelare) separat. Varje ruta bär en FREE-badge: grön när
-              aktiv, grå när inaktiv. Renderas för alla men disabled för
-              non-host (read-only — ser host:s val). */}
-          <View style={styles.modeToggle}>
-            {([
-              { key: 'single', label: 'Single player' },
-              { key: 'ptp', label: 'Pass-the-Phone' },
-              { key: 'indiv', label: 'Individual device' },
-            ] as const).map((m) => {
-              const isActive =
-                m.key === 'single'
-                  ? singlePlayerDefault
-                  : m.key === 'ptp'
-                    ? !singlePlayerDefault && gameMode === 'pass-the-phone'
-                    : !singlePlayerDefault && gameMode === 'individual-devices';
-              return (
-                <TouchableOpacity
-                  key={m.key}
-                  style={[
-                    styles.modeOption,
-                    isActive ? styles.modeOptionPassActive : styles.modeOptionInactive,
-                  ]}
-                  onPress={() =>
-                    m.key === 'single'
-                      ? handleSelectSingle()
-                      : handleSelectMode(m.key === 'ptp' ? 'pass-the-phone' : 'individual-devices')
-                  }
-                  disabled={!hostMode}
-                  activeOpacity={0.7}
-                >
-                  <Text
-                    style={[styles.modeLabel, { textAlign: 'center' }, isActive && styles.modeLabelActiveFree]}
-                    numberOfLines={2}
-                  >
-                    {m.label}
-                  </Text>
-                  <View style={[styles.freeBadge, !isActive && styles.freeBadgeDimmed]} pointerEvents="none">
-                    <Text style={[styles.freeBadgeText, !isActive && styles.freeBadgeTextDimmed]}>FREE</Text>
-                  </View>
-                </TouchableOpacity>
-              );
-            })}
+          {/* Game mode — grupperat i två rader istället för tre rutor bredvid
+              varandra (för trångt). Single device får egen full-bredds-ruta;
+              Multiplayer-lägena (Pass-the-Phone + Individual device) delar en
+              rad. FREE-badge per ruta (grön aktiv / grå inaktiv). Read-only
+              (disabled) för non-host. */}
+          <Text style={styles.gameModeGroupLabel}>Single device / Single player mode</Text>
+          <View style={styles.modeRow}>{renderModeBox('single', 'Single player')}</View>
+
+          <Text style={[styles.gameModeGroupLabel, styles.gameModeGroupLabelSpaced]}>Multiplayer mode</Text>
+          <View style={styles.modeRow}>
+            {renderModeBox('ptp', 'Pass-the-Phone')}
+            {renderModeBox('indiv', 'Individual device')}
           </View>
 
           {hostMode && (
@@ -4973,13 +4973,35 @@ const styles = StyleSheet.create({
     height: 56,
     gap: 4,
   },
-  // Bas-stil för båda inre rutorna. Konkret kant-/bg-färg sätts av varianterna nedan.
+  // Grå rubriker över Single device- resp. Multiplayer-grupperna.
+  gameModeGroupLabel: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.semibold,
+    color: Colors.textSecondary,
+    marginBottom: 8,
+  },
+  gameModeGroupLabelSpaced: {
+    marginTop: Spacing.md,
+  },
+  // Rad som håller game-mode-rutorna. Transparent (ingen segment-container) —
+  // rutorna är fristående bordered boxar med egen FREE-badge.
+  modeRow: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+  },
+  // Bas-stil för game-mode-rutorna. Egen minHeight + padding eftersom de inte
+  // längre ligger i en höjd-satt segment-container. Kant-/bg-färg sätts av
+  // varianterna nedan.
   modeOption: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: Radius.sm,
     borderWidth: 1,
+    minHeight: 52,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: 4,
+    position: 'relative',
   },
   // Inaktiv ruta — svag grå kantlinje, transparent bg. Används för båda alternativen
   // när de inte är valda (samt för Individual Devices så länge premium saknas).

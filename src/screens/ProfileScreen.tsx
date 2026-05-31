@@ -327,6 +327,40 @@ export default function ProfileScreen() {
     setSinglePlayerDefault(false);
     setGameMode(mode);
   };
+  // En game-mode-ruta (delas av Single device- och Multiplayer-grupperna).
+  // FREE-badge grön när aktiv, grå när inaktiv. Speglar Lobby.
+  const renderModeBox = (key: 'single' | 'ptp' | 'indiv', label: string) => {
+    const isActive =
+      key === 'single'
+        ? singlePlayerDefault
+        : key === 'ptp'
+          ? !singlePlayerDefault && gameMode === 'pass-the-phone'
+          : !singlePlayerDefault && gameMode === 'individual-devices';
+    return (
+      <Pressable
+        style={({ pressed }) => [
+          styles.modeOption,
+          isActive ? styles.modeOptionPassActive : styles.modeOptionInactive,
+          pressed && { opacity: 0.7 },
+        ]}
+        onPress={() =>
+          key === 'single'
+            ? handleSelectSingle()
+            : handleSelectGameMode(key === 'ptp' ? 'pass-the-phone' : 'individual-devices')
+        }
+      >
+        <Text
+          style={[styles.modeLabel, { textAlign: 'center' }, isActive && styles.modeLabelActiveFree]}
+          numberOfLines={2}
+        >
+          {label}
+        </Text>
+        <View style={[styles.freeBadge, !isActive && styles.freeBadgeDimmed]} pointerEvents="none">
+          <Text style={[styles.freeBadgeText, !isActive && styles.freeBadgeTextDimmed]}>FREE</Text>
+        </View>
+      </Pressable>
+    );
+  };
 
   const [yearPickerOpen, setYearPickerOpen]     = useState(false);
   const [assistancePickerOpen, setAssistancePickerOpen]   = useState(false);
@@ -994,45 +1028,15 @@ export default function ProfileScreen() {
                 the-Phone + Individual device. Inget premium-gate på lägesvalet;
                 subscription gatar caps (rundor/spelare) separat. FREE-badge per
                 ruta (grön aktiv, grå inaktiv). Speglar Lobby. */}
-            <View style={styles.modeToggle}>
-              {([
-                { key: 'single', label: 'Single player' },
-                { key: 'ptp', label: 'Pass-the-Phone' },
-                { key: 'indiv', label: 'Individual device' },
-              ] as const).map((m) => {
-                const isActive =
-                  m.key === 'single'
-                    ? singlePlayerDefault
-                    : m.key === 'ptp'
-                      ? !singlePlayerDefault && gameMode === 'pass-the-phone'
-                      : !singlePlayerDefault && gameMode === 'individual-devices';
-                return (
-                  <Pressable
-                    key={m.key}
-                    style={({ pressed }) => [
-                      styles.modeOption,
-                      isActive ? styles.modeOptionPassActive : styles.modeOptionInactive,
-                      pressed && { opacity: 0.7 },
-                    ]}
-                    onPress={() =>
-                      m.key === 'single'
-                        ? handleSelectSingle()
-                        : handleSelectGameMode(m.key === 'ptp' ? 'pass-the-phone' : 'individual-devices')
-                    }
-                  >
-                    <Text
-                      style={[styles.modeLabel, { textAlign: 'center' }, isActive && styles.modeLabelActiveFree]}
-                      numberOfLines={2}
-                    >
-                      {m.label}
-                    </Text>
-                    <View style={[styles.freeBadge, !isActive && styles.freeBadgeDimmed]} pointerEvents="none">
-                      <Text style={[styles.freeBadgeText, !isActive && styles.freeBadgeTextDimmed]}>FREE</Text>
-                    </View>
-                  </Pressable>
-                );
-              })}
+            <Text style={styles.gameModeGroupLabel}>Single device / Single player mode</Text>
+            <View style={styles.modeRow}>{renderModeBox('single', 'Single player')}</View>
+
+            <Text style={[styles.gameModeGroupLabel, styles.gameModeGroupLabelSpaced]}>Multiplayer mode</Text>
+            <View style={styles.modeRow}>
+              {renderModeBox('ptp', 'Pass-the-Phone')}
+              {renderModeBox('indiv', 'Individual device')}
             </View>
+
             <Text style={styles.modeDescription}>
               {singlePlayerDefault
                 ? 'Play solo on this device.'
@@ -2821,12 +2825,29 @@ const styles = StyleSheet.create({
     height: 56,
     gap: 4,
   },
+  gameModeGroupLabel: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.semibold,
+    color: Colors.textSecondary,
+    marginBottom: 8,
+  },
+  gameModeGroupLabelSpaced: {
+    marginTop: Spacing.md,
+  },
+  modeRow: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+  },
   modeOption: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: Radius.sm,
     borderWidth: 1,
+    minHeight: 52,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: 4,
+    position: 'relative',
   },
   modeOptionInactive: {
     borderColor: Colors.borderStrong,
