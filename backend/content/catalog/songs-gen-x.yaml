@@ -448,3 +448,141 @@ items:
         endSec: 45
         channelTitle: "Gloria Gaynor - Topic"
         notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: beatles-yesterday
+    displayName: "Yesterday — The Beatles"
+    correctYear: 1965
+    probability: 90
+    wikimediaSearchHints: ["The Beatles Yesterday 1965"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "NrgmdOz227I"
+        startSec: 30
+        endSec: 45
+        channelTitle: "The Beatles - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: beatles-come-together
+    displayName: "Come Together — The Beatles"
+    correctYear: 1969
+    probability: 86
+    wikimediaSearchHints: ["The Beatles Come Together 1969"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "oolpPmuK2I8"
+        startSec: 30
+        endSec: 45
+        channelTitle: "The Beatles - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: bowie-space-oddity
+    displayName: "Space Oddity — David Bowie"
+    correctYear: 1969
+    probability: 84
+    wikimediaSearchHints: ["David Bowie Space Oddity 1969"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "tRNpjt29n6Y"
+        startSec: 30
+        endSec: 45
+        channelTitle: "David Bowie - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: led-zeppelin-whole-lotta-love
+    displayName: "Whole Lotta Love — Led Zeppelin"
+    correctYear: 1969
+    probability: 84
+    wikimediaSearchHints: ["Led Zeppelin Whole Lotta Love 1969"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "oaSk5vnAVJ8"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Led Zeppelin - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: elton-john-your-song
+    displayName: "Your Song — Elton John"
+    correctYear: 1970
+    probability: 84
+    wikimediaSearchHints: ["Elton John Your Song 1970"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "FT3D1Cu6g10"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Elton John - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: john-denver-country-roads
+    displayName: "Take Me Home, Country Roads — John Denver"
+    correctYear: 1971
+    probability: 84
+    wikimediaSearchHints: ["John Denver Take Me Home Country Roads 1971"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "6N2b14J-5tA"
+        startSec: 30
+        endSec: 45
+        channelTitle: "John Denver - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: bob-marley-no-woman-no-cry
+    displayName: "No Woman, No Cry — Bob Marley & The Wailers"
+    correctYear: 1974
+    probability: 84
+    wikimediaSearchHints: ["Bob Marley No Woman No Cry Natty Dread 1974"]
+    answerMethods: ["timeline"]
+  - id: fleetwood-mac-dreams
+    displayName: "Dreams — Fleetwood Mac"
+    correctYear: 1977
+    probability: 84
+    wikimediaSearchHints: ["Fleetwood Mac Dreams Rumours 1977"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "5oWyMakvQew"
+        startSec: 30
+        endSec: 45
+        channelTitle: "FLEETWOOD MAC - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: queen-we-are-the-champions
+    displayName: "We Are the Champions — Queen"
+    correctYear: 1977
+    probability: 90
+    wikimediaSearchHints: ["Queen We Are the Champions 1977"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "lxHuY6DgSJQ"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Queen - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: police-roxanne
+    displayName: "Roxanne — The Police"
+    correctYear: 1978
+    probability: 82
+    wikimediaSearchHints: ["The Police Roxanne 1978"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "Cdu3a2arXdw"
+        startSec: 30
+        endSec: 45
+        channelTitle: "The Police - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: acdc-highway-to-hell
+    displayName: "Highway to Hell — AC/DC"
+    correctYear: 1979
+    probability: 86
+    wikimediaSearchHints: ["AC/DC Highway to Hell 1979"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "ikFFVfObwss"
+        startSec: 30
+        endSec: 45
+        channelTitle: "AC/DC - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: dolly-parton-jolene
+    displayName: "Jolene — Dolly Parton"
+    correctYear: 1973
+    probability: 82
+    wikimediaSearchHints: ["Dolly Parton Jolene 1973"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "SFTEfOIJkPg"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Dolly Parton - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."

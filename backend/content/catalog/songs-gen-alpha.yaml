@@ -404,3 +404,105 @@ items:
         endSec: 45
         channelTitle: "Dua Lipa"
         notes: "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
+  - id: tove-lo-habits
+    displayName: "Habits (Stay High) — Tove Lo"
+    correctYear: 2013
+    probability: 80
+    wikimediaSearchHints: ["Tove Lo Habits Stay High 2013"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "SQ-iwsVHbH8"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Tove Lo - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: zara-larsson-lush-life
+    displayName: "Lush Life — Zara Larsson"
+    correctYear: 2015
+    probability: 80
+    wikimediaSearchHints: ["Zara Larsson Lush Life 2015"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "8BmMB3i--FM"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Zara Larsson - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: mans-zelmerlow-heroes
+    displayName: "Heroes — Måns Zelmerlöw"
+    correctYear: 2015
+    probability: 80
+    wikimediaSearchHints: ["Måns Zelmerlöw Heroes Eurovision 2015"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "-nbq6Ur103Q"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Warner Music Sweden"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (18)."
+  - id: weeknd-starboy
+    displayName: "Starboy — The Weeknd"
+    correctYear: 2016
+    probability: 84
+    wikimediaSearchHints: ["The Weeknd Starboy 2016"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "3_g2un5M350"
+        startSec: 30
+        endSec: 45
+        channelTitle: "The Weeknd - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: ed-sheeran-perfect
+    displayName: "Perfect — Ed Sheeran"
+    correctYear: 2017
+    probability: 86
+    wikimediaSearchHints: ["Ed Sheeran Perfect 2017"]
+    answerMethods: ["timeline"]
+  - id: dua-lipa-dont-start-now
+    displayName: "Don't Start Now — Dua Lipa"
+    correctYear: 2019
+    probability: 84
+    wikimediaSearchHints: ["Dua Lipa Don't Start Now 2019"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "oygrmJFKYZY"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Dua Lipa"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (18)."
+  - id: lewis-capaldi-someone-you-loved
+    displayName: "Someone You Loved — Lewis Capaldi"
+    correctYear: 2019
+    probability: 82
+    wikimediaSearchHints: ["Lewis Capaldi Someone You Loved 2019"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "pRIZohFFOMo"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Lewis Capaldi - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: glass-animals-heat-waves
+    displayName: "Heat Waves — Glass Animals"
+    correctYear: 2020
+    probability: 82
+    wikimediaSearchHints: ["Glass Animals Heat Waves 2020"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "pzeefqfSMjY"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Glass Animals - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: olivia-rodrigo-good-4-u
+    displayName: "Good 4 U — Olivia Rodrigo"
+    correctYear: 2021
+    probability: 84
+    wikimediaSearchHints: ["Olivia Rodrigo Good 4 U 2021"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "Bc9ijogGmtU"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Olivia Rodrigo - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."

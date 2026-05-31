@@ -458,3 +458,51 @@ items:
         endSec: 45
         channelTitle: "Sam Cooke - Topic"
         notes: "Curerad 2026-05-29 — officiell album-audio via YouTube Topic (Sam Cooke-originalet, ej Brian Owens-cover)."
+  - id: etta-james-at-last
+    displayName: "At Last — Etta James"
+    correctYear: 1960
+    probability: 80
+    wikimediaSearchHints: ["Etta James At Last 1960"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "cZag0E32is0"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Etta James - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: ray-charles-georgia-on-my-mind
+    displayName: "Georgia on My Mind — Ray Charles"
+    correctYear: 1960
+    probability: 80
+    wikimediaSearchHints: ["Ray Charles Georgia on My Mind 1960"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "JJoRBtz1fHg"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Ray Charles - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: roy-orbison-oh-pretty-woman
+    displayName: "Oh, Pretty Woman — Roy Orbison"
+    correctYear: 1964
+    probability: 82
+    wikimediaSearchHints: ["Roy Orbison Oh Pretty Woman 1964"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "3KFvoDDs0XM"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Roy Orbison - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: frank-sinatra-fly-me-to-the-moon
+    displayName: "Fly Me to the Moon — Frank Sinatra"
+    correctYear: 1964
+    probability: 84
+    wikimediaSearchHints: ["Frank Sinatra Fly Me to the Moon 1964"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "ZEcqHA7dbwM"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Frank Sinatra - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."

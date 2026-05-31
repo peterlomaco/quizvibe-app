@@ -485,3 +485,165 @@ items:
         endSec: 15
         channelTitle: "Scorpions - Topic"
         notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: michael-jackson-beat-it
+    displayName: "Beat It — Michael Jackson"
+    correctYear: 1982
+    probability: 88
+    wikimediaSearchHints: ["Michael Jackson Beat It Thriller 1982"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "WlTlUseVt7E"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Michael Jackson - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: bowie-lets-dance
+    displayName: "Let's Dance — David Bowie"
+    correctYear: 1983
+    probability: 82
+    wikimediaSearchHints: ["David Bowie Let's Dance 1983"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "ZoC9_udLNeU"
+        startSec: 30
+        endSec: 45
+        channelTitle: "David Bowie - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: prince-purple-rain
+    displayName: "Purple Rain — Prince"
+    correctYear: 1984
+    probability: 86
+    wikimediaSearchHints: ["Prince Purple Rain 1984"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "iSBVeZrDfGY"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Prince - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: wham-last-christmas
+    displayName: "Last Christmas — Wham!"
+    correctYear: 1984
+    probability: 90
+    wikimediaSearchHints: ["Wham Last Christmas 1984"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "T0T9GyM28tg"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Wham! - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: springsteen-dancing-in-the-dark
+    displayName: "Dancing in the Dark — Bruce Springsteen"
+    correctYear: 1984
+    probability: 82
+    wikimediaSearchHints: ["Bruce Springsteen Dancing in the Dark 1984"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "nCFTL4IO6t4"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Bruce Springsteen - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: acdc-thunderstruck
+    displayName: "Thunderstruck — AC/DC"
+    correctYear: 1990
+    probability: 86
+    wikimediaSearchHints: ["AC/DC Thunderstruck 1990"]
+    answerMethods: ["timeline"]
+  - id: guns-n-roses-november-rain
+    displayName: "November Rain — Guns N' Roses"
+    correctYear: 1992
+    probability: 84
+    wikimediaSearchHints: ["Guns N Roses November Rain 1992"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "y6lfK3bH4z8"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Guns N' Roses - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: nirvana-come-as-you-are
+    displayName: "Come as You Are — Nirvana"
+    correctYear: 1992
+    probability: 84
+    wikimediaSearchHints: ["Nirvana Come as You Are 1992"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "f1IdyrhOrGs"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Nirvana - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: roxette-the-look
+    displayName: "The Look — Roxette"
+    correctYear: 1989
+    probability: 86
+    wikimediaSearchHints: ["Roxette The Look 1989"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "2-IId2Fx43Y"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Roxette - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: roxette-listen-to-your-heart
+    displayName: "Listen to Your Heart — Roxette"
+    correctYear: 1988
+    probability: 86
+    wikimediaSearchHints: ["Roxette Listen to Your Heart 1988"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "jhTFCxvHVYY"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Roxette - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: ace-of-base-all-that-she-wants
+    displayName: "All That She Wants — Ace of Base"
+    correctYear: 1992
+    probability: 86
+    wikimediaSearchHints: ["Ace of Base All That She Wants 1992"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "8JqCWX-MXuk"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Ace of Base - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: dr-alban-its-my-life
+    displayName: "It's My Life — Dr. Alban"
+    correctYear: 1992
+    probability: 82
+    wikimediaSearchHints: ["Dr Alban It's My Life 1992"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "aBJZsHDJvf0"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Dr. Alban - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: rednex-cotton-eye-joe
+    displayName: "Cotton Eye Joe — Rednex"
+    correctYear: 1994
+    probability: 84
+    wikimediaSearchHints: ["Rednex Cotton Eye Joe 1994"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "fYnJZh5ZHIA"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Rednex - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: cardigans-lovefool
+    displayName: "Lovefool — The Cardigans"
+    correctYear: 1996
+    probability: 84
+    wikimediaSearchHints: ["The Cardigans Lovefool 1996"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "c0fHs7THj4k"
+        startSec: 30
+        endSec: 45
+        channelTitle: "The Cardigans - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."

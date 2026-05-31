@@ -444,3 +444,123 @@ items:
         endSec: 45
         channelTitle: "Gotye"
         notes: "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
+  - id: coldplay-the-scientist
+    displayName: "The Scientist — Coldplay"
+    correctYear: 2002
+    probability: 84
+    wikimediaSearchHints: ["Coldplay The Scientist 2002"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "RB-RcX5DS5A"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Coldplay"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (13)."
+  - id: robyn-dancing-on-my-own
+    displayName: "Dancing on My Own — Robyn"
+    correctYear: 2010
+    probability: 84
+    wikimediaSearchHints: ["Robyn Dancing on My Own 2010"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "xvI7C9I_U2U"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Robyn - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: swedish-house-mafia-dont-you-worry-child
+    displayName: "Don't You Worry Child — Swedish House Mafia"
+    correctYear: 2012
+    probability: 86
+    wikimediaSearchHints: ["Swedish House Mafia Don't You Worry Child 2012"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "3mWbRB3Y4R8"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Swedish House Mafia - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: eric-prydz-call-on-me
+    displayName: "Call on Me — Eric Prydz"
+    correctYear: 2004
+    probability: 80
+    wikimediaSearchHints: ["Eric Prydz Call on Me 2004"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "MnyFWY0tFYc"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eric Prydz - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: loreen-euphoria
+    displayName: "Euphoria — Loreen"
+    correctYear: 2012
+    probability: 86
+    wikimediaSearchHints: ["Loreen Euphoria Eurovision 2012"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "chK8XTtqEJI"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Loreen - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: beyonce-single-ladies
+    displayName: "Single Ladies (Put a Ring on It) — Beyoncé"
+    correctYear: 2008
+    probability: 86
+    wikimediaSearchHints: ["Beyoncé Single Ladies 2008"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "4z-bOdAdias"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Beyoncé - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: bruno-mars-just-the-way-you-are
+    displayName: "Just the Way You Are — Bruno Mars"
+    correctYear: 2010
+    probability: 84
+    wikimediaSearchHints: ["Bruno Mars Just the Way You Are 2010"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "LjhCEhWiKXk"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Bruno Mars"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (18)."
+  - id: bon-jovi-its-my-life
+    displayName: "It's My Life — Bon Jovi"
+    correctYear: 2000
+    probability: 84
+    wikimediaSearchHints: ["Bon Jovi It's My Life 2000"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "bY3vXr7fm8k"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Jon Bon Jovi - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: veronica-maggio-jag-kommer
+    displayName: "Jag kommer — Veronica Maggio"
+    correctYear: 2011
+    probability: 80
+    wikimediaSearchHints: ["Veronica Maggio Jag kommer 2011"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "zNKwziMG5UI"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Veronica Maggio - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: hakan-hellstrom-kann-ingen-sorg
+    displayName: "Känn ingen sorg för mig Göteborg — Håkan Hellström"
+    correctYear: 2000
+    probability: 80
+    wikimediaSearchHints: ["Håkan Hellström Känn ingen sorg för mig Göteborg 2000"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "jm5GHefyJp8"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Håkan Hellström - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
