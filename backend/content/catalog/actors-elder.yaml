@@ -9,162 +9,216 @@ items:
   - id: ingrid-bergman
     displayName: "Ingrid Bergman"
     correctYear: 1915
+    peakFrom: 1942
+    peakTo: 1978
     probability: 85
     wikimediaSearchHints: ["Ingrid Bergman actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: marilyn-monroe
     displayName: "Marilyn Monroe"
     correctYear: 1926
+    peakFrom: 1950
+    peakTo: 1962
     probability: 82
     wikimediaSearchHints: ["Marilyn Monroe"]
     answerMethods: ["timeline", "name-letters"]
   - id: tom-hanks
     displayName: "Tom Hanks"
     correctYear: 1956
+    peakFrom: 1988
+    peakTo: 2020
     probability: 95
     wikimediaSearchHints: ["Tom Hanks actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: audrey-hepburn
     displayName: "Audrey Hepburn"
     correctYear: 1929
+    peakFrom: 1953
+    peakTo: 1967
     probability: 90
     wikimediaSearchHints: ["Audrey Hepburn"]
     answerMethods: ["timeline", "name-letters"]
   - id: cary-grant
     displayName: "Cary Grant"
     correctYear: 1904
+    peakFrom: 1937
+    peakTo: 1966
     probability: 80
     wikimediaSearchHints: ["Cary Grant actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: katharine-hepburn
     displayName: "Katharine Hepburn"
     correctYear: 1907
+    peakFrom: 1933
+    peakTo: 1981
     probability: 82
     wikimediaSearchHints: ["Katharine Hepburn actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: sean-connery
     displayName: "Sean Connery"
     correctYear: 1930
+    peakFrom: 1962
+    peakTo: 1990
     probability: 90
     wikimediaSearchHints: ["Sean Connery actor James Bond"]
     answerMethods: ["timeline", "name-letters"]
   - id: humphrey-bogart
     displayName: "Humphrey Bogart"
     correctYear: 1899
+    peakFrom: 1941
+    peakTo: 1956
     probability: 82
     wikimediaSearchHints: ["Humphrey Bogart actor Casablanca"]
     answerMethods: ["timeline", "name-letters"]
   - id: james-dean
     displayName: "James Dean"
     correctYear: 1931
+    peakFrom: 1955
+    peakTo: 1955
     probability: 82
     wikimediaSearchHints: ["James Dean actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: james-stewart
     displayName: "James Stewart"
     correctYear: 1908
+    peakFrom: 1939
+    peakTo: 1965
     probability: 80
     wikimediaSearchHints: ["James Stewart actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: bette-davis
     displayName: "Bette Davis"
     correctYear: 1908
+    peakFrom: 1938
+    peakTo: 1962
     probability: 80
     wikimediaSearchHints: ["Bette Davis actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: clark-gable
     displayName: "Clark Gable"
     correctYear: 1901
+    peakFrom: 1934
+    peakTo: 1960
     probability: 80
     wikimediaSearchHints: ["Clark Gable actor Gone with the Wind"]
     answerMethods: ["timeline", "name-letters"]
   - id: gregory-peck
     displayName: "Gregory Peck"
     correctYear: 1916
+    peakFrom: 1945
+    peakTo: 1975
     probability: 78
     wikimediaSearchHints: ["Gregory Peck actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: vivien-leigh
     displayName: "Vivien Leigh"
     correctYear: 1913
+    peakFrom: 1939
+    peakTo: 1951
     probability: 78
     wikimediaSearchHints: ["Vivien Leigh actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: charlie-chaplin
     displayName: "Charlie Chaplin"
     correctYear: 1889
+    peakFrom: 1918
+    peakTo: 1940
     probability: 90
     wikimediaSearchHints: ["Charlie Chaplin actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: spencer-tracy
     displayName: "Spencer Tracy"
     correctYear: 1900
+    peakFrom: 1937
+    peakTo: 1967
     probability: 78
     wikimediaSearchHints: ["Spencer Tracy actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: gary-cooper
     displayName: "Gary Cooper"
     correctYear: 1901
+    peakFrom: 1929
+    peakTo: 1959
     probability: 78
     wikimediaSearchHints: ["Gary Cooper actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: marlon-brando
     displayName: "Marlon Brando"
     correctYear: 1924
+    peakFrom: 1951
+    peakTo: 1979
     probability: 88
     wikimediaSearchHints: ["Marlon Brando actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: grace-kelly
     displayName: "Grace Kelly"
     correctYear: 1929
+    peakFrom: 1952
+    peakTo: 1956
     probability: 85
     wikimediaSearchHints: ["Grace Kelly actress princess"]
     answerMethods: ["timeline", "name-letters"]
   - id: elizabeth-taylor
     displayName: "Elizabeth Taylor"
     correctYear: 1932
+    peakFrom: 1944
+    peakTo: 1966
     probability: 85
     wikimediaSearchHints: ["Elizabeth Taylor actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: john-wayne
     displayName: "John Wayne"
     correctYear: 1907
+    peakFrom: 1939
+    peakTo: 1976
     probability: 85
     wikimediaSearchHints: ["John Wayne actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: lauren-bacall
     displayName: "Lauren Bacall"
     correctYear: 1924
+    peakFrom: 1944
+    peakTo: 1985
     probability: 78
     wikimediaSearchHints: ["Lauren Bacall actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: greta-garbo
     displayName: "Greta Garbo"
     correctYear: 1905
+    peakFrom: 1926
+    peakTo: 1941
     probability: 80
     wikimediaSearchHints: ["Greta Garbo actress Sweden"]
     answerMethods: ["timeline", "name-letters"]
   - id: errol-flynn
     displayName: "Errol Flynn"
     correctYear: 1909
+    peakFrom: 1935
+    peakTo: 1952
     probability: 75
     wikimediaSearchHints: ["Errol Flynn actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: james-cagney
     displayName: "James Cagney"
     correctYear: 1899
+    peakFrom: 1931
+    peakTo: 1961
     probability: 75
     wikimediaSearchHints: ["James Cagney actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: shirley-temple
     displayName: "Shirley Temple"
     correctYear: 1928
+    peakFrom: 1934
+    peakTo: 1940
     probability: 80
     wikimediaSearchHints: ["Shirley Temple child actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: judi-dench
     displayName: "Judi Dench"
     correctYear: 1934
+    peakFrom: 1995
+    peakTo: 2013
     probability: 82
     wikimediaSearchHints: ["Judi Dench actress"]
     answerMethods: ["timeline", "name-letters"]
@@ -172,36 +226,48 @@ items:
   - id: max-von-sydow
     displayName: "Max von Sydow"
     correctYear: 1929
+    peakFrom: 1957
+    peakTo: 2011
     probability: 84
     wikimediaSearchHints: ["Max von Sydow Swedish actor Bergman Exorcist"]
     answerMethods: ["timeline", "name-letters"]
   - id: anita-ekberg
     displayName: "Anita Ekberg"
     correctYear: 1931
+    peakFrom: 1960
+    peakTo: 1965
     probability: 78
     wikimediaSearchHints: ["Anita Ekberg Swedish actress La Dolce Vita Trevi"]
     answerMethods: ["timeline", "name-letters"]
   - id: britt-ekland
     displayName: "Britt Ekland"
     correctYear: 1942
+    peakFrom: 1965
+    peakTo: 1980
     probability: 78
     wikimediaSearchHints: ["Britt Ekland Swedish actress Man with the Golden Gun Bond"]
     answerMethods: ["timeline", "name-letters"]
   - id: ingrid-thulin
     displayName: "Ingrid Thulin"
     correctYear: 1926
+    peakFrom: 1957
+    peakTo: 1975
     probability: 70
     wikimediaSearchHints: ["Ingrid Thulin Swedish actress Bergman Wild Strawberries"]
     answerMethods: ["timeline", "name-letters"]
   - id: bibi-andersson
     displayName: "Bibi Andersson"
     correctYear: 1935
+    peakFrom: 1957
+    peakTo: 1980
     probability: 72
     wikimediaSearchHints: ["Bibi Andersson Swedish actress Bergman Persona"]
     answerMethods: ["timeline", "name-letters"]
   - id: gunnel-lindblom
     displayName: "Gunnel Lindblom"
     correctYear: 1931
+    peakFrom: 1957
+    peakTo: 1975
     probability: 65
     wikimediaSearchHints: ["Gunnel Lindblom Swedish actress Bergman Seventh Seal"]
     answerMethods: ["timeline", "name-letters"]
@@ -210,42 +276,56 @@ items:
   - id: magnus-harenstam
     displayName: "Magnus Härenstam"
     correctYear: 1941
+    peakFrom: 1975
+    peakTo: 2000
     probability: 88
     wikimediaSearchHints: ["Magnus Härenstam Swedish TV host Fem myror Vill du bli miljonär"]
     answerMethods: ["timeline", "name-letters"]
   - id: tomas-von-bromssen
     displayName: "Tomas von Brömssen"
     correctYear: 1943
+    peakFrom: 1985
+    peakTo: 2000
     probability: 84
     wikimediaSearchHints: ["Tomas von Brömssen Swedish actor Sune Söderkåkar"]
     answerMethods: ["timeline", "name-letters"]
   - id: brasse-brannstrom
     displayName: "Brasse Brännström"
     correctYear: 1945
+    peakFrom: 1975
+    peakTo: 2005
     probability: 86
     wikimediaSearchHints: ["Brasse Brännström Swedish actor Fem myror är fler än fyra elefanter"]
     answerMethods: ["timeline", "name-letters"]
   - id: hans-alfredson
     displayName: "Hans Alfredson"
     correctYear: 1931
+    peakFrom: 1963
+    peakTo: 1990
     probability: 86
     wikimediaSearchHints: ["Hans Alfredson Swedish actor comedian Hasseåtage"]
     answerMethods: ["timeline", "name-letters"]
   - id: tage-danielsson
     displayName: "Tage Danielsson"
     correctYear: 1928
+    peakFrom: 1965
+    peakTo: 1985
     probability: 84
     wikimediaSearchHints: ["Tage Danielsson Swedish actor director Hasseåtage"]
     answerMethods: ["timeline", "name-letters"]
   - id: sven-wollter
     displayName: "Sven Wollter"
     correctYear: 1934
+    peakFrom: 1975
+    peakTo: 2005
     probability: 78
     wikimediaSearchHints: ["Sven Wollter Swedish actor Sacrifice Tarkovsky"]
     answerMethods: ["timeline", "name-letters"]
   - id: loa-falkman
     displayName: "Loa Falkman"
     correctYear: 1947
+    peakFrom: 1985
+    peakTo: 2010
     probability: 76
     wikimediaSearchHints: ["Loa Falkman Swedish opera singer actor Eurovision"]
     answerMethods: ["timeline", "name-letters"]
@@ -253,6 +333,8 @@ items:
   - id: krister-henriksson
     displayName: "Krister Henriksson"
     correctYear: 1946
+    peakFrom: 1995
+    peakTo: 2015
     probability: 82
     wikimediaSearchHints: ["Krister Henriksson Swedish actor Wallander"]
     answerMethods: ["timeline", "name-letters"]

@@ -9,378 +9,504 @@ items:
   - id: arnold-schwarzenegger
     displayName: "Arnold Schwarzenegger"
     correctYear: 1947
+    peakFrom: 1970
+    peakTo: 2000
     probability: 89
     wikimediaSearchHints: ["Arnold Schwarzenegger"]
     answerMethods: ["timeline", "name-letters"]
   - id: lasse-aberg
     displayName: "Lasse Åberg"
     correctYear: 1940
+    peakFrom: 1963
+    peakTo: 1993
     probability: 84
     wikimediaSearchHints: ["Lasse Åberg"]
     answerMethods: ["timeline", "name-letters"]
   - id: julia-roberts
     displayName: "Julia Roberts"
     correctYear: 1967
+    peakFrom: 1990
+    peakTo: 2020
     probability: 92
     wikimediaSearchHints: ["Julia Roberts actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: leonardo-dicaprio
     displayName: "Leonardo DiCaprio"
     correctYear: 1974
+    peakFrom: 1997
+    peakTo: 2026
     probability: 96
     wikimediaSearchHints: ["Leonardo DiCaprio"]
     answerMethods: ["timeline", "name-letters"]
   - id: tom-cruise
     displayName: "Tom Cruise"
     correctYear: 1962
+    peakFrom: 1985
+    peakTo: 2015
     probability: 92
     wikimediaSearchHints: ["Tom Cruise actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: meryl-streep
     displayName: "Meryl Streep"
     correctYear: 1949
+    peakFrom: 1972
+    peakTo: 2002
     probability: 88
     wikimediaSearchHints: ["Meryl Streep actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: robin-williams
     displayName: "Robin Williams"
     correctYear: 1951
+    peakFrom: 1974
+    peakTo: 2004
     probability: 90
     wikimediaSearchHints: ["Robin Williams actor comedian"]
     answerMethods: ["timeline", "name-letters"]
   - id: robert-de-niro
     displayName: "Robert De Niro"
     correctYear: 1943
+    peakFrom: 1966
+    peakTo: 1996
     probability: 88
     wikimediaSearchHints: ["Robert De Niro actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: jim-carrey
     displayName: "Jim Carrey"
     correctYear: 1962
+    peakFrom: 1985
+    peakTo: 2015
     probability: 88
     wikimediaSearchHints: ["Jim Carrey actor comedian"]
     answerMethods: ["timeline", "name-letters"]
   - id: bruce-willis
     displayName: "Bruce Willis"
     correctYear: 1955
+    peakFrom: 1978
+    peakTo: 2008
     probability: 88
     wikimediaSearchHints: ["Bruce Willis actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: sigourney-weaver
     displayName: "Sigourney Weaver"
     correctYear: 1949
+    peakFrom: 1972
+    peakTo: 2002
     probability: 80
     wikimediaSearchHints: ["Sigourney Weaver actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: jack-nicholson
     displayName: "Jack Nicholson"
     correctYear: 1937
+    peakFrom: 1960
+    peakTo: 1990
     probability: 88
     wikimediaSearchHints: ["Jack Nicholson actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: al-pacino
     displayName: "Al Pacino"
     correctYear: 1940
+    peakFrom: 1963
+    peakTo: 1993
     probability: 90
     wikimediaSearchHints: ["Al Pacino actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: anthony-hopkins
     displayName: "Anthony Hopkins"
     correctYear: 1937
+    peakFrom: 1960
+    peakTo: 1990
     probability: 85
     wikimediaSearchHints: ["Anthony Hopkins actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: robert-redford
     displayName: "Robert Redford"
     correctYear: 1936
+    peakFrom: 1959
+    peakTo: 1989
     probability: 85
     wikimediaSearchHints: ["Robert Redford actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: paul-newman
     displayName: "Paul Newman"
     correctYear: 1925
+    peakFrom: 1948
+    peakTo: 1978
     probability: 82
     wikimediaSearchHints: ["Paul Newman actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: gene-hackman
     displayName: "Gene Hackman"
     correctYear: 1930
+    peakFrom: 1953
+    peakTo: 1983
     probability: 80
     wikimediaSearchHints: ["Gene Hackman actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: dustin-hoffman
     displayName: "Dustin Hoffman"
     correctYear: 1937
+    peakFrom: 1960
+    peakTo: 1990
     probability: 85
     wikimediaSearchHints: ["Dustin Hoffman actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: diane-keaton
     displayName: "Diane Keaton"
     correctYear: 1946
+    peakFrom: 1969
+    peakTo: 1999
     probability: 82
     wikimediaSearchHints: ["Diane Keaton actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: susan-sarandon
     displayName: "Susan Sarandon"
     correctYear: 1946
+    peakFrom: 1969
+    peakTo: 1999
     probability: 82
     wikimediaSearchHints: ["Susan Sarandon actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: goldie-hawn
     displayName: "Goldie Hawn"
     correctYear: 1945
+    peakFrom: 1968
+    peakTo: 1998
     probability: 82
     wikimediaSearchHints: ["Goldie Hawn actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: jeff-bridges
     displayName: "Jeff Bridges"
     correctYear: 1949
+    peakFrom: 1972
+    peakTo: 2002
     probability: 80
     wikimediaSearchHints: ["Jeff Bridges actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: liam-neeson
     displayName: "Liam Neeson"
     correctYear: 1952
+    peakFrom: 1975
+    peakTo: 2005
     probability: 88
     wikimediaSearchHints: ["Liam Neeson actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: tom-selleck
     displayName: "Tom Selleck"
     correctYear: 1945
+    peakFrom: 1968
+    peakTo: 1998
     probability: 82
     wikimediaSearchHints: ["Tom Selleck actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: whoopi-goldberg
     displayName: "Whoopi Goldberg"
     correctYear: 1955
+    peakFrom: 1978
+    peakTo: 2008
     probability: 85
     wikimediaSearchHints: ["Whoopi Goldberg actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: eddie-murphy
     displayName: "Eddie Murphy"
     correctYear: 1961
+    peakFrom: 1984
+    peakTo: 2014
     probability: 88
     wikimediaSearchHints: ["Eddie Murphy actor comedian"]
     answerMethods: ["timeline", "name-letters"]
   - id: denzel-washington
     displayName: "Denzel Washington"
     correctYear: 1954
+    peakFrom: 1977
+    peakTo: 2007
     probability: 90
     wikimediaSearchHints: ["Denzel Washington actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: samuel-l-jackson
     displayName: "Samuel L. Jackson"
     correctYear: 1948
+    peakFrom: 1971
+    peakTo: 2001
     probability: 90
     wikimediaSearchHints: ["Samuel L Jackson actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: helena-bonham-carter
     displayName: "Helena Bonham Carter"
     correctYear: 1966
+    peakFrom: 1989
+    peakTo: 2019
     probability: 80
     wikimediaSearchHints: ["Helena Bonham Carter actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: kevin-costner
     displayName: "Kevin Costner"
     correctYear: 1955
+    peakFrom: 1978
+    peakTo: 2008
     probability: 85
     wikimediaSearchHints: ["Kevin Costner actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: john-travolta
     displayName: "John Travolta"
     correctYear: 1954
+    peakFrom: 1977
+    peakTo: 2007
     probability: 88
     wikimediaSearchHints: ["John Travolta actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: patrick-swayze
     displayName: "Patrick Swayze"
     correctYear: 1952
+    peakFrom: 1975
+    peakTo: 2005
     probability: 82
     wikimediaSearchHints: ["Patrick Swayze actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: pierce-brosnan
     displayName: "Pierce Brosnan"
     correctYear: 1953
+    peakFrom: 1976
+    peakTo: 2006
     probability: 85
     wikimediaSearchHints: ["Pierce Brosnan actor James Bond"]
     answerMethods: ["timeline", "name-letters"]
   - id: rowan-atkinson
     displayName: "Rowan Atkinson"
     correctYear: 1955
+    peakFrom: 1978
+    peakTo: 2008
     probability: 90
     wikimediaSearchHints: ["Rowan Atkinson Mr Bean"]
     answerMethods: ["timeline", "name-letters"]
   - id: hugh-grant
     displayName: "Hugh Grant"
     correctYear: 1960
+    peakFrom: 1983
+    peakTo: 2013
     probability: 85
     wikimediaSearchHints: ["Hugh Grant actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: daniel-craig
     displayName: "Daniel Craig"
     correctYear: 1968
+    peakFrom: 1991
+    peakTo: 2021
     probability: 88
     wikimediaSearchHints: ["Daniel Craig actor James Bond"]
     answerMethods: ["timeline", "name-letters"]
   - id: jeff-goldblum
     displayName: "Jeff Goldblum"
     correctYear: 1952
+    peakFrom: 1975
+    peakTo: 2005
     probability: 80
     wikimediaSearchHints: ["Jeff Goldblum actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: joe-pesci
     displayName: "Joe Pesci"
     correctYear: 1943
+    peakFrom: 1966
+    peakTo: 1996
     probability: 78
     wikimediaSearchHints: ["Joe Pesci actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: bill-murray
     displayName: "Bill Murray"
     correctYear: 1950
+    peakFrom: 1973
+    peakTo: 2003
     probability: 85
     wikimediaSearchHints: ["Bill Murray actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: michael-douglas
     displayName: "Michael Douglas"
     correctYear: 1944
+    peakFrom: 1967
+    peakTo: 1997
     probability: 82
     wikimediaSearchHints: ["Michael Douglas actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: michael-keaton
     displayName: "Michael Keaton"
     correctYear: 1951
+    peakFrom: 1974
+    peakTo: 2004
     probability: 82
     wikimediaSearchHints: ["Michael Keaton actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: gary-oldman
     displayName: "Gary Oldman"
     correctYear: 1958
+    peakFrom: 1981
+    peakTo: 2011
     probability: 82
     wikimediaSearchHints: ["Gary Oldman actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: kurt-russell
     displayName: "Kurt Russell"
     correctYear: 1951
+    peakFrom: 1974
+    peakTo: 2004
     probability: 78
     wikimediaSearchHints: ["Kurt Russell actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: burt-reynolds
     displayName: "Burt Reynolds"
     correctYear: 1936
+    peakFrom: 1959
+    peakTo: 1989
     probability: 80
     wikimediaSearchHints: ["Burt Reynolds actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: donald-sutherland
     displayName: "Donald Sutherland"
     correctYear: 1935
+    peakFrom: 1958
+    peakTo: 1988
     probability: 80
     wikimediaSearchHints: ["Donald Sutherland actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: warren-beatty
     displayName: "Warren Beatty"
     correctYear: 1937
+    peakFrom: 1960
+    peakTo: 1990
     probability: 78
     wikimediaSearchHints: ["Warren Beatty actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: sharon-stone
     displayName: "Sharon Stone"
     correctYear: 1958
+    peakFrom: 1981
+    peakTo: 2011
     probability: 82
     wikimediaSearchHints: ["Sharon Stone actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: demi-moore
     displayName: "Demi Moore"
     correctYear: 1962
+    peakFrom: 1985
+    peakTo: 2015
     probability: 85
     wikimediaSearchHints: ["Demi Moore actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: halle-berry
     displayName: "Halle Berry"
     correctYear: 1966
+    peakFrom: 1989
+    peakTo: 2019
     probability: 88
     wikimediaSearchHints: ["Halle Berry actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: salma-hayek
     displayName: "Salma Hayek"
     correctYear: 1966
+    peakFrom: 1989
+    peakTo: 2019
     probability: 85
     wikimediaSearchHints: ["Salma Hayek actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: owen-wilson
     displayName: "Owen Wilson"
     correctYear: 1968
+    peakFrom: 1991
+    peakTo: 2021
     probability: 82
     wikimediaSearchHints: ["Owen Wilson actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: vince-vaughn
     displayName: "Vince Vaughn"
     correctYear: 1970
+    peakFrom: 1993
+    peakTo: 2023
     probability: 78
     wikimediaSearchHints: ["Vince Vaughn actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: robert-duvall
     displayName: "Robert Duvall"
     correctYear: 1931
+    peakFrom: 1954
+    peakTo: 1984
     probability: 78
     wikimediaSearchHints: ["Robert Duvall actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: faye-dunaway
     displayName: "Faye Dunaway"
     correctYear: 1941
+    peakFrom: 1964
+    peakTo: 1994
     probability: 75
     wikimediaSearchHints: ["Faye Dunaway actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: john-malkovich
     displayName: "John Malkovich"
     correctYear: 1953
+    peakFrom: 1976
+    peakTo: 2006
     probability: 80
     wikimediaSearchHints: ["John Malkovich actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: kevin-bacon
     displayName: "Kevin Bacon"
     correctYear: 1958
+    peakFrom: 1981
+    peakTo: 2011
     probability: 80
     wikimediaSearchHints: ["Kevin Bacon actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: nicolas-cage
     displayName: "Nicolas Cage"
     correctYear: 1964
+    peakFrom: 1987
+    peakTo: 2017
     probability: 85
     wikimediaSearchHints: ["Nicolas Cage actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: john-cleese
     displayName: "John Cleese"
     correctYear: 1939
+    peakFrom: 1962
+    peakTo: 1992
     probability: 88
     wikimediaSearchHints: ["John Cleese actor Monty Python"]
     answerMethods: ["timeline", "name-letters"]
   - id: ron-howard
     displayName: "Ron Howard"
     correctYear: 1954
+    peakFrom: 1977
+    peakTo: 2007
     probability: 80
     wikimediaSearchHints: ["Ron Howard director actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: kenneth-branagh
     displayName: "Kenneth Branagh"
     correctYear: 1960
+    peakFrom: 1983
+    peakTo: 2013
     probability: 78
     wikimediaSearchHints: ["Kenneth Branagh actor director"]
     answerMethods: ["timeline", "name-letters"]
   - id: jim-broadbent
     displayName: "Jim Broadbent"
     correctYear: 1949
+    peakFrom: 1972
+    peakTo: 2002
     probability: 72
     wikimediaSearchHints: ["Jim Broadbent actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: jodie-foster
     displayName: "Jodie Foster"
     correctYear: 1962
+    peakFrom: 1985
+    peakTo: 2015
     probability: 88
     wikimediaSearchHints: ["Jodie Foster actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: helen-mirren
     displayName: "Helen Mirren"
     correctYear: 1945
+    peakFrom: 1968
+    peakTo: 1998
     probability: 85
     wikimediaSearchHints: ["Helen Mirren actress"]
     answerMethods: ["timeline", "name-letters"]
@@ -388,48 +514,64 @@ items:
   - id: stellan-skarsgard
     displayName: "Stellan Skarsgård"
     correctYear: 1951
+    peakFrom: 1974
+    peakTo: 2004
     probability: 85
     wikimediaSearchHints: ["Stellan Skarsgard Swedish actor Mamma Mia Chernobyl"]
     answerMethods: ["timeline", "name-letters"]
   - id: peter-stormare
     displayName: "Peter Stormare"
     correctYear: 1953
+    peakFrom: 1976
+    peakTo: 2006
     probability: 80
     wikimediaSearchHints: ["Peter Stormare Swedish actor Fargo Big Lebowski"]
     answerMethods: ["timeline", "name-letters"]
   - id: mikael-persbrandt
     displayName: "Mikael Persbrandt"
     correctYear: 1963
+    peakFrom: 1986
+    peakTo: 2016
     probability: 82
     wikimediaSearchHints: ["Mikael Persbrandt Swedish actor Beck The Hobbit"]
     answerMethods: ["timeline", "name-letters"]
   - id: rolf-lassgard
     displayName: "Rolf Lassgård"
     correctYear: 1955
+    peakFrom: 1978
+    peakTo: 2008
     probability: 80
     wikimediaSearchHints: ["Rolf Lassgard Swedish actor Wallander A Man Called Ove"]
     answerMethods: ["timeline", "name-letters"]
   - id: lena-olin
     displayName: "Lena Olin"
     correctYear: 1955
+    peakFrom: 1978
+    peakTo: 2008
     probability: 78
     wikimediaSearchHints: ["Lena Olin Swedish actress Chocolat Unbearable Lightness"]
     answerMethods: ["timeline", "name-letters"]
   - id: dolph-lundgren
     displayName: "Dolph Lundgren"
     correctYear: 1957
+    peakFrom: 1980
+    peakTo: 2010
     probability: 85
     wikimediaSearchHints: ["Dolph Lundgren Swedish actor Rocky IV Expendables"]
     answerMethods: ["timeline", "name-letters"]
   - id: pernilla-august
     displayName: "Pernilla August"
     correctYear: 1958
+    peakFrom: 1981
+    peakTo: 2011
     probability: 76
     wikimediaSearchHints: ["Pernilla August Swedish actress Best Intentions Star Wars Shmi"]
     answerMethods: ["timeline", "name-letters"]
   - id: helena-bergstrom
     displayName: "Helena Bergström"
     correctYear: 1964
+    peakFrom: 1987
+    peakTo: 2017
     probability: 72
     wikimediaSearchHints: ["Helena Bergstrom Swedish actress Änglagård"]
     answerMethods: ["timeline", "name-letters"]
@@ -437,18 +579,24 @@ items:
   - id: vinnie-jones
     displayName: "Vinnie Jones"
     correctYear: 1965
+    peakFrom: 1988
+    peakTo: 2018
     probability: 82
     wikimediaSearchHints: ["Vinnie Jones English footballer actor Lock Stock Snatch"]
     answerMethods: ["timeline", "name-letters"]
   - id: brian-bosworth
     displayName: "Brian Bosworth"
     correctYear: 1965
+    peakFrom: 1988
+    peakTo: 2018
     probability: 70
     wikimediaSearchHints: ["Brian Bosworth NFL linebacker actor Stone Cold"]
     answerMethods: ["timeline", "name-letters"]
   - id: terry-crews
     displayName: "Terry Crews"
     correctYear: 1968
+    peakFrom: 1991
+    peakTo: 2021
     probability: 80
     wikimediaSearchHints: ["Terry Crews NFL actor Brooklyn Nine-Nine Expendables"]
     answerMethods: ["timeline", "name-letters"]
@@ -456,18 +604,24 @@ items:
   - id: lasse-brandeby
     displayName: "Lasse Brandeby"
     correctYear: 1945
+    peakFrom: 1968
+    peakTo: 1998
     probability: 80
     wikimediaSearchHints: ["Lasse Brandeby Swedish actor Kurt Olsson"]
     answerMethods: ["timeline", "name-letters"]
   - id: anders-lundin
     displayName: "Anders Lundin"
     correctYear: 1963
+    peakFrom: 1986
+    peakTo: 2016
     probability: 80
     wikimediaSearchHints: ["Anders Lundin Swedish TV host Robinson Expedition"]
     answerMethods: ["timeline", "name-letters"]
   - id: eva-remaeus
     displayName: "Eva Remaeus"
     correctYear: 1962
+    peakFrom: 1985
+    peakTo: 2015
     probability: 74
     wikimediaSearchHints: ["Eva Remaeus Swedish actress Sune-mamma"]
     answerMethods: ["timeline", "name-letters"]
@@ -476,24 +630,32 @@ items:
   - id: ben-stiller
     displayName: "Ben Stiller"
     correctYear: 1965
+    peakFrom: 1988
+    peakTo: 2018
     probability: 86
     wikimediaSearchHints: ["Ben Stiller actor Zoolander Meet the Parents Night at the Museum"]
     answerMethods: ["timeline", "name-letters"]
   - id: paul-rudd
     displayName: "Paul Rudd"
     correctYear: 1969
+    peakFrom: 1992
+    peakTo: 2022
     probability: 84
     wikimediaSearchHints: ["Paul Rudd actor Ant-Man Friends Anchorman"]
     answerMethods: ["timeline", "name-letters"]
   - id: jason-bateman
     displayName: "Jason Bateman"
     correctYear: 1969
+    peakFrom: 1992
+    peakTo: 2022
     probability: 80
     wikimediaSearchHints: ["Jason Bateman actor Arrested Development Ozark"]
     answerMethods: ["timeline", "name-letters"]
   - id: kevin-hart
     displayName: "Kevin Hart"
     correctYear: 1979
+    peakFrom: 2002
+    peakTo: 2026
     probability: 86
     wikimediaSearchHints: ["Kevin Hart comedian actor Jumanji Ride Along"]
     answerMethods: ["timeline", "name-letters"]

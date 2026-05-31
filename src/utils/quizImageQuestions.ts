@@ -131,6 +131,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1988,
+    "peakFrom": 2011,
+    "peakTo": 2026,
     "audiences": [
       "millennials",
       "gen-z"
@@ -156,6 +158,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1966,
+    "peakFrom": 1989,
+    "peakTo": 2019,
     "audiences": [
       "millennials",
       "gen-z"
@@ -248,6 +252,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1940,
+    "peakFrom": 1963,
+    "peakTo": 1993,
     "audiences": [
       "gen-x"
     ],
@@ -417,6 +423,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1976,
+    "peakFrom": 1999,
+    "peakTo": 2026,
     "audiences": [
       "millennials",
       "gen-z"
@@ -479,6 +487,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1988,
+    "peakFrom": 2011,
+    "peakTo": 2026,
     "audiences": [
       "millennials",
       "gen-z"
@@ -515,6 +525,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1974,
+    "peakFrom": 1997,
+    "peakTo": 2026,
     "audiences": [
       "millennials",
       "gen-z"
@@ -538,6 +550,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1963,
+    "peakFrom": 1986,
+    "peakTo": 2016,
     "audiences": [
       "gen-x"
     ],
@@ -651,6 +665,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1983,
+    "peakFrom": 2006,
+    "peakTo": 2026,
     "audiences": [
       "gen-z"
     ],
@@ -701,6 +717,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1931,
+    "peakFrom": 1960,
+    "peakTo": 1965,
     "audiences": [
       "elder"
     ],
@@ -760,6 +778,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1982,
+    "peakFrom": 2005,
+    "peakTo": 2026,
     "audiences": [
       "millennials",
       "gen-z"
@@ -809,6 +829,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1937,
+    "peakFrom": 1960,
+    "peakTo": 1990,
     "audiences": [
       "gen-x"
     ],
@@ -845,6 +867,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1996,
+    "peakFrom": 2016,
+    "peakTo": 2026,
     "audiences": [
       "gen-z"
     ],
@@ -939,6 +963,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1947,
+    "peakFrom": 1970,
+    "peakTo": 2000,
     "audiences": [
       "gen-x"
     ],
@@ -1024,6 +1050,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1929,
+    "peakFrom": 1953,
+    "peakTo": 1967,
     "audiences": [
       "elder"
     ],
@@ -1251,6 +1279,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1972,
+    "peakFrom": 1995,
+    "peakTo": 2025,
     "audiences": [
       "millennials",
       "gen-z"
@@ -1263,6 +1293,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1965,
+    "peakFrom": 1988,
+    "peakTo": 2018,
     "audiences": [
       "gen-x"
     ],
@@ -1274,6 +1306,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1976,
+    "peakFrom": 1999,
+    "peakTo": 2026,
     "audiences": [
       "millennials",
       "gen-z"
@@ -1334,6 +1368,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1908,
+    "peakFrom": 1938,
+    "peakTo": 1962,
     "audiences": [
       "elder"
     ],
@@ -1356,6 +1392,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1935,
+    "peakFrom": 1957,
+    "peakTo": 1980,
     "audiences": [
       "elder"
     ],
@@ -1367,6 +1405,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1950,
+    "peakFrom": 1973,
+    "peakTo": 2003,
     "audiences": [
       "gen-x"
     ],
@@ -1390,6 +1430,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1990,
+    "peakFrom": 2013,
+    "peakTo": 2026,
     "audiences": [
       "millennials",
       "gen-z"
@@ -1616,6 +1658,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1963,
+    "peakFrom": 1986,
+    "peakTo": 2016,
     "audiences": [
       "millennials",
       "gen-z"
@@ -1628,6 +1672,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1975,
+    "peakFrom": 1998,
+    "peakTo": 2026,
     "audiences": [
       "millennials",
       "gen-z"
@@ -1640,6 +1686,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1945,
+    "peakFrom": 1975,
+    "peakTo": 2005,
     "audiences": [
       "elder"
     ],
@@ -1651,6 +1699,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1965,
+    "peakFrom": 1988,
+    "peakTo": 2018,
     "audiences": [
       "gen-x"
     ],
@@ -1662,6 +1712,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1989,
+    "peakFrom": 2012,
+    "peakTo": 2026,
     "audiences": [
       "millennials",
       "gen-z"
@@ -1687,6 +1739,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1942,
+    "peakFrom": 1965,
+    "peakTo": 1980,
     "audiences": [
       "elder"
     ],
@@ -1711,6 +1765,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1955,
+    "peakFrom": 1978,
+    "peakTo": 2008,
     "audiences": [
       "gen-x"
     ],
@@ -1812,6 +1868,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1936,
+    "peakFrom": 1959,
+    "peakTo": 1989,
     "audiences": [
       "gen-x"
     ],
@@ -1847,6 +1905,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1972,
+    "peakFrom": 1995,
+    "peakTo": 2025,
     "audiences": [
       "millennials",
       "gen-z"
@@ -2006,6 +2066,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1904,
+    "peakFrom": 1937,
+    "peakTo": 1966,
     "audiences": [
       "elder"
     ],
@@ -2017,6 +2079,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1969,
+    "peakFrom": 1992,
+    "peakTo": 2022,
     "audiences": [
       "millennials",
       "gen-z"
@@ -2102,6 +2166,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1980,
+    "peakFrom": 2003,
+    "peakTo": 2026,
     "audiences": [
       "millennials",
       "gen-z"
@@ -2126,6 +2192,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1889,
+    "peakFrom": 1918,
+    "peakTo": 1940,
     "audiences": [
       "elder"
     ],
@@ -2137,6 +2205,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1975,
+    "peakFrom": 1998,
+    "peakTo": 2026,
     "audiences": [
       "millennials",
       "gen-z"
@@ -2197,6 +2267,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1981,
+    "peakFrom": 2004,
+    "peakTo": 2026,
     "audiences": [
       "millennials",
       "gen-z"
@@ -2233,6 +2305,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1974,
+    "peakFrom": 1997,
+    "peakTo": 2026,
     "audiences": [
       "millennials",
       "gen-z"
@@ -2321,6 +2395,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1901,
+    "peakFrom": 1934,
+    "peakTo": 1960,
     "audiences": [
       "elder"
     ],
@@ -2417,6 +2493,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1960,
+    "peakFrom": 1983,
+    "peakTo": 2013,
     "audiences": [
       "millennials",
       "gen-z"
@@ -2559,6 +2637,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1968,
+    "peakFrom": 1991,
+    "peakTo": 2021,
     "audiences": [
       "gen-x"
     ],
@@ -2593,6 +2673,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1989,
+    "peakFrom": 2001,
+    "peakTo": 2011,
     "audiences": [
       "gen-z"
     ],
@@ -2690,6 +2772,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1974,
+    "peakFrom": 1997,
+    "peakTo": 2026,
     "audiences": [
       "millennials",
       "gen-z"
@@ -2816,6 +2900,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1962,
+    "peakFrom": 1985,
+    "peakTo": 2015,
     "audiences": [
       "gen-x"
     ],
@@ -2839,6 +2925,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1954,
+    "peakFrom": 1977,
+    "peakTo": 2007,
     "audiences": [
       "gen-x"
     ],
@@ -2874,6 +2962,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1946,
+    "peakFrom": 1969,
+    "peakTo": 1999,
     "audiences": [
       "gen-x"
     ],
@@ -3046,6 +3136,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1957,
+    "peakFrom": 1980,
+    "peakTo": 2010,
     "audiences": [
       "gen-x"
     ],
@@ -3070,6 +3162,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1935,
+    "peakFrom": 1958,
+    "peakTo": 1988,
     "audiences": [
       "gen-x"
     ],
@@ -3141,6 +3235,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1937,
+    "peakFrom": 1960,
+    "peakTo": 1990,
     "audiences": [
       "gen-x"
     ],
@@ -3152,6 +3248,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1972,
+    "peakFrom": 1995,
+    "peakTo": 2025,
     "audiences": [
       "millennials",
       "gen-z"
@@ -3237,6 +3335,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1961,
+    "peakFrom": 1984,
+    "peakTo": 2014,
     "audiences": [
       "gen-x"
     ],
@@ -3286,6 +3386,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1969,
+    "peakFrom": 1992,
+    "peakTo": 2022,
     "audiences": [
       "millennials",
       "gen-z"
@@ -3322,6 +3424,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1932,
+    "peakFrom": 1944,
+    "peakTo": 1966,
     "audiences": [
       "elder"
     ],
@@ -3395,6 +3499,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1988,
+    "peakFrom": 2011,
+    "peakTo": 2026,
     "audiences": [
       "millennials",
       "gen-z"
@@ -3407,6 +3513,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1990,
+    "peakFrom": 2001,
+    "peakTo": 2017,
     "audiences": [
       "gen-z"
     ],
@@ -3553,6 +3661,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1909,
+    "peakFrom": 1935,
+    "peakTo": 1952,
     "audiences": [
       "elder"
     ],
@@ -3622,6 +3732,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1974,
+    "peakFrom": 1997,
+    "peakTo": 2026,
     "audiences": [
       "millennials",
       "gen-z"
@@ -3645,6 +3757,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1971,
+    "peakFrom": 1994,
+    "peakTo": 2024,
     "audiences": [
       "millennials",
       "gen-z"
@@ -3680,6 +3794,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1941,
+    "peakFrom": 1964,
+    "peakTo": 1994,
     "audiences": [
       "gen-x"
     ],
@@ -3715,6 +3831,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 2002,
+    "peakFrom": 2016,
+    "peakTo": 2026,
     "audiences": [
       "gen-z"
     ],
@@ -3748,6 +3866,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1996,
+    "peakFrom": 2019,
+    "peakTo": 2026,
     "audiences": [
       "millennials",
       "gen-z"
@@ -3996,6 +4116,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1901,
+    "peakFrom": 1929,
+    "peakTo": 1959,
     "audiences": [
       "elder"
     ],
@@ -4019,6 +4141,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1958,
+    "peakFrom": 1981,
+    "peakTo": 2011,
     "audiences": [
       "gen-x"
     ],
@@ -4030,6 +4154,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1930,
+    "peakFrom": 1953,
+    "peakTo": 1983,
     "audiences": [
       "gen-x"
     ],
@@ -4213,6 +4339,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1945,
+    "peakFrom": 1968,
+    "peakTo": 1998,
     "audiences": [
       "gen-x"
     ],
@@ -4249,6 +4377,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1929,
+    "peakFrom": 1952,
+    "peakTo": 1956,
     "audiences": [
       "elder"
     ],
@@ -4271,6 +4401,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1916,
+    "peakFrom": 1945,
+    "peakTo": 1975,
     "audiences": [
       "elder"
     ],
@@ -4282,6 +4414,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1905,
+    "peakFrom": 1926,
+    "peakTo": 1941,
     "audiences": [
       "elder"
     ],
@@ -4330,6 +4464,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1931,
+    "peakFrom": 1957,
+    "peakTo": 1975,
     "audiences": [
       "elder"
     ],
@@ -4352,6 +4488,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1980,
+    "peakFrom": 2003,
+    "peakTo": 2026,
     "audiences": [
       "millennials",
       "gen-z"
@@ -4389,6 +4527,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1972,
+    "peakFrom": 1995,
+    "peakTo": 2025,
     "audiences": [
       "millennials",
       "gen-z"
@@ -4423,6 +4563,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1966,
+    "peakFrom": 1989,
+    "peakTo": 2019,
     "audiences": [
       "gen-x"
     ],
@@ -4460,6 +4602,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1931,
+    "peakFrom": 1963,
+    "peakTo": 1990,
     "audiences": [
       "elder"
     ],
@@ -4560,6 +4704,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1945,
+    "peakFrom": 1968,
+    "peakTo": 1998,
     "audiences": [
       "gen-x"
     ],
@@ -4582,6 +4728,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1964,
+    "peakFrom": 1987,
+    "peakTo": 2017,
     "audiences": [
       "gen-x"
     ],
@@ -4593,6 +4741,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1966,
+    "peakFrom": 1989,
+    "peakTo": 2019,
     "audiences": [
       "gen-x"
     ],
@@ -4728,6 +4878,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1960,
+    "peakFrom": 1983,
+    "peakTo": 2013,
     "audiences": [
       "gen-x"
     ],
@@ -4739,6 +4891,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1968,
+    "peakFrom": 1991,
+    "peakTo": 2021,
     "audiences": [
       "millennials",
       "gen-z"
@@ -4776,6 +4930,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1899,
+    "peakFrom": 1941,
+    "peakTo": 1956,
     "audiences": [
       "elder"
     ],
@@ -4799,6 +4955,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1972,
+    "peakFrom": 1995,
+    "peakTo": 2025,
     "audiences": [
       "millennials",
       "gen-z"
@@ -4884,6 +5042,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1915,
+    "peakFrom": 1942,
+    "peakTo": 1978,
     "audiences": [
       "elder"
     ],
@@ -4895,6 +5055,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1926,
+    "peakFrom": 1957,
+    "peakTo": 1975,
     "audiences": [
       "elder"
     ],
@@ -4979,6 +5141,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1937,
+    "peakFrom": 1960,
+    "peakTo": 1990,
     "audiences": [
       "gen-x"
     ],
@@ -5014,6 +5178,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1997,
+    "peakFrom": 2020,
+    "peakTo": 2026,
     "audiences": [
       "gen-z"
     ],
@@ -5037,6 +5203,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1980,
+    "peakFrom": 2003,
+    "peakTo": 2026,
     "audiences": [
       "millennials",
       "gen-z"
@@ -5075,6 +5243,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1899,
+    "peakFrom": 1931,
+    "peakTo": 1961,
     "audiences": [
       "elder"
     ],
@@ -5086,6 +5256,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1931,
+    "peakFrom": 1955,
+    "peakTo": 1955,
     "audiences": [
       "elder"
     ],
@@ -5110,6 +5282,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1908,
+    "peakFrom": 1939,
+    "peakTo": 1965,
     "audiences": [
       "elder"
     ],
@@ -5207,6 +5381,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1969,
+    "peakFrom": 1992,
+    "peakTo": 2022,
     "audiences": [
       "gen-x"
     ],
@@ -5218,6 +5394,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1967,
+    "peakFrom": 1990,
+    "peakTo": 2020,
     "audiences": [
       "millennials",
       "gen-z"
@@ -5329,6 +5507,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1949,
+    "peakFrom": 1972,
+    "peakTo": 2002,
     "audiences": [
       "gen-x"
     ],
@@ -5340,6 +5520,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1952,
+    "peakFrom": 1975,
+    "peakTo": 2005,
     "audiences": [
       "gen-x"
     ],
@@ -5351,6 +5533,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 2002,
+    "peakFrom": 2018,
+    "peakTo": 2026,
     "audiences": [
       "gen-z"
     ],
@@ -5362,6 +5546,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1969,
+    "peakFrom": 1992,
+    "peakTo": 2022,
     "audiences": [
       "millennials",
       "gen-z"
@@ -5374,6 +5560,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1990,
+    "peakFrom": 2013,
+    "peakTo": 2026,
     "audiences": [
       "millennials",
       "gen-z"
@@ -5422,6 +5610,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1977,
+    "peakFrom": 2000,
+    "peakTo": 2026,
     "audiences": [
       "millennials",
       "gen-z"
@@ -5445,6 +5635,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1949,
+    "peakFrom": 1972,
+    "peakTo": 2002,
     "audiences": [
       "gen-x"
     ],
@@ -5456,6 +5648,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1962,
+    "peakFrom": 1985,
+    "peakTo": 2015,
     "audiences": [
       "gen-x"
     ],
@@ -5541,6 +5735,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1974,
+    "peakFrom": 1997,
+    "peakTo": 2026,
     "audiences": [
       "millennials",
       "gen-z"
@@ -5553,6 +5749,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1962,
+    "peakFrom": 1985,
+    "peakTo": 2015,
     "audiences": [
       "gen-x"
     ],
@@ -5576,6 +5774,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1943,
+    "peakFrom": 1966,
+    "peakTo": 1996,
     "audiences": [
       "gen-x"
     ],
@@ -5587,6 +5787,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1979,
+    "peakFrom": 2002,
+    "peakTo": 2026,
     "audiences": [
       "millennials",
       "gen-z"
@@ -5611,6 +5813,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1939,
+    "peakFrom": 1962,
+    "peakTo": 1992,
     "audiences": [
       "gen-x"
     ],
@@ -5635,6 +5839,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1953,
+    "peakFrom": 1976,
+    "peakTo": 2006,
     "audiences": [
       "gen-x"
     ],
@@ -5671,6 +5877,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1954,
+    "peakFrom": 1977,
+    "peakTo": 2007,
     "audiences": [
       "gen-x"
     ],
@@ -5682,6 +5890,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1907,
+    "peakFrom": 1939,
+    "peakTo": 1976,
     "audiences": [
       "elder"
     ],
@@ -5693,6 +5903,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1963,
+    "peakFrom": 1986,
+    "peakTo": 2016,
     "audiences": [
       "millennials",
       "gen-z"
@@ -5818,6 +6030,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1972,
+    "peakFrom": 1995,
+    "peakTo": 2025,
     "audiences": [
       "millennials",
       "gen-z"
@@ -5830,6 +6044,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1934,
+    "peakFrom": 1995,
+    "peakTo": 2013,
     "audiences": [
       "elder"
     ],
@@ -5854,6 +6070,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1967,
+    "peakFrom": 1990,
+    "peakTo": 2020,
     "audiences": [
       "gen-x"
     ],
@@ -6027,6 +6245,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1979,
+    "peakFrom": 2002,
+    "peakTo": 2026,
     "audiences": [
       "millennials",
       "gen-z"
@@ -6039,6 +6259,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1975,
+    "peakFrom": 1998,
+    "peakTo": 2026,
     "audiences": [
       "millennials",
       "gen-z"
@@ -6051,6 +6273,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1907,
+    "peakFrom": 1933,
+    "peakTo": 1981,
     "audiences": [
       "elder"
     ],
@@ -6088,6 +6312,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1985,
+    "peakFrom": 2008,
+    "peakTo": 2026,
     "audiences": [
       "millennials",
       "gen-z"
@@ -6126,6 +6352,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1960,
+    "peakFrom": 1983,
+    "peakTo": 2013,
     "audiences": [
       "gen-x"
     ],
@@ -6172,6 +6400,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1958,
+    "peakFrom": 1981,
+    "peakTo": 2011,
     "audiences": [
       "gen-x"
     ],
@@ -6183,6 +6413,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1955,
+    "peakFrom": 1978,
+    "peakTo": 2008,
     "audiences": [
       "gen-x"
     ],
@@ -6220,6 +6452,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1979,
+    "peakFrom": 2002,
+    "peakTo": 2026,
     "audiences": [
       "gen-x"
     ],
@@ -6314,6 +6548,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1990,
+    "peakFrom": 2013,
+    "peakTo": 2026,
     "audiences": [
       "gen-z"
     ],
@@ -6325,6 +6561,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1946,
+    "peakFrom": 1995,
+    "peakTo": 2015,
     "audiences": [
       "elder"
     ],
@@ -6347,6 +6585,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1951,
+    "peakFrom": 1974,
+    "peakTo": 2004,
     "audiences": [
       "gen-x"
     ],
@@ -6503,6 +6743,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1940,
+    "peakFrom": 1963,
+    "peakTo": 1993,
     "audiences": [
       "gen-x"
     ],
@@ -6525,6 +6767,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1945,
+    "peakFrom": 1968,
+    "peakTo": 1998,
     "audiences": [
       "gen-x"
     ],
@@ -6558,6 +6802,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1924,
+    "peakFrom": 1944,
+    "peakTo": 1985,
     "audiences": [
       "elder"
     ],
@@ -6619,6 +6865,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1955,
+    "peakFrom": 1978,
+    "peakTo": 2008,
     "audiences": [
       "gen-x"
     ],
@@ -6679,6 +6927,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1974,
+    "peakFrom": 1997,
+    "peakTo": 2026,
     "audiences": [
       "gen-x"
     ],
@@ -6728,6 +6978,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1952,
+    "peakFrom": 1975,
+    "peakTo": 2005,
     "audiences": [
       "gen-x"
     ],
@@ -6953,6 +7205,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1947,
+    "peakFrom": 1985,
+    "peakTo": 2010,
     "audiences": [
       "elder"
     ],
@@ -7195,6 +7449,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1941,
+    "peakFrom": 1975,
+    "peakTo": 2000,
     "audiences": [
       "elder"
     ],
@@ -7427,6 +7683,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1990,
+    "peakFrom": 2013,
+    "peakTo": 2026,
     "audiences": [
       "millennials",
       "gen-z"
@@ -7507,6 +7765,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1926,
+    "peakFrom": 1950,
+    "peakTo": 1962,
     "audiences": [
       "elder"
     ],
@@ -7567,6 +7827,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1975,
+    "peakFrom": 1998,
+    "peakTo": 2026,
     "audiences": [
       "millennials",
       "gen-z"
@@ -7590,6 +7852,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1967,
+    "peakFrom": 1990,
+    "peakTo": 2020,
     "audiences": [
       "millennials",
       "gen-z"
@@ -7602,6 +7866,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1971,
+    "peakFrom": 1994,
+    "peakTo": 2024,
     "audiences": [
       "millennials",
       "gen-z"
@@ -7648,6 +7914,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1924,
+    "peakFrom": 1951,
+    "peakTo": 1979,
     "audiences": [
       "elder"
     ],
@@ -7781,6 +8049,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1970,
+    "peakFrom": 1993,
+    "peakTo": 2023,
     "audiences": [
       "millennials",
       "gen-z"
@@ -7832,6 +8102,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1929,
+    "peakFrom": 1957,
+    "peakTo": 2011,
     "audiences": [
       "elder"
     ],
@@ -7906,6 +8178,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1949,
+    "peakFrom": 1972,
+    "peakTo": 2002,
     "audiences": [
       "gen-x"
     ],
@@ -7928,6 +8202,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1944,
+    "peakFrom": 1967,
+    "peakTo": 1997,
     "audiences": [
       "gen-x"
     ],
@@ -7977,6 +8253,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1951,
+    "peakFrom": 1974,
+    "peakTo": 2004,
     "audiences": [
       "gen-x"
     ],
@@ -8025,6 +8303,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1960,
+    "peakFrom": 1983,
+    "peakTo": 2013,
     "audiences": [
       "millennials",
       "gen-z"
@@ -8037,6 +8317,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1963,
+    "peakFrom": 1986,
+    "peakTo": 2016,
     "audiences": [
       "gen-x"
     ],
@@ -8085,6 +8367,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1975,
+    "peakFrom": 1998,
+    "peakTo": 2026,
     "audiences": [
       "millennials",
       "gen-z"
@@ -8097,6 +8381,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 2004,
+    "peakFrom": 2016,
+    "peakTo": 2026,
     "audiences": [
       "gen-z"
     ],
@@ -8263,6 +8549,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1968,
+    "peakFrom": 1991,
+    "peakTo": 2021,
     "audiences": [
       "millennials",
       "gen-z"
@@ -8413,6 +8701,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1964,
+    "peakFrom": 1987,
+    "peakTo": 2017,
     "audiences": [
       "gen-x"
     ],
@@ -8424,6 +8714,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1967,
+    "peakFrom": 1990,
+    "peakTo": 2020,
     "audiences": [
       "millennials",
       "gen-z"
@@ -8518,6 +8810,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 2004,
+    "peakFrom": 2016,
+    "peakTo": 2026,
     "audiences": [
       "gen-z"
     ],
@@ -8529,6 +8823,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1979,
+    "peakFrom": 2002,
+    "peakTo": 2026,
     "audiences": [
       "millennials",
       "gen-z"
@@ -8710,6 +9006,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1968,
+    "peakFrom": 1991,
+    "peakTo": 2021,
     "audiences": [
       "gen-x"
     ],
@@ -8822,6 +9120,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1952,
+    "peakFrom": 1975,
+    "peakTo": 2005,
     "audiences": [
       "gen-x"
     ],
@@ -8907,6 +9207,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1925,
+    "peakFrom": 1948,
+    "peakTo": 1978,
     "audiences": [
       "gen-x"
     ],
@@ -8931,6 +9233,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1969,
+    "peakFrom": 1992,
+    "peakTo": 2022,
     "audiences": [
       "gen-x"
     ],
@@ -8990,6 +9294,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1974,
+    "peakFrom": 1997,
+    "peakTo": 2026,
     "audiences": [
       "millennials",
       "gen-z"
@@ -9049,6 +9355,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1958,
+    "peakFrom": 1981,
+    "peakTo": 2011,
     "audiences": [
       "gen-x"
     ],
@@ -9142,6 +9450,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1953,
+    "peakFrom": 1976,
+    "peakTo": 2006,
     "audiences": [
       "gen-x"
     ],
@@ -9240,6 +9550,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1953,
+    "peakFrom": 1976,
+    "peakTo": 2006,
     "audiences": [
       "gen-x"
     ],
@@ -9357,6 +9669,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1970,
+    "peakFrom": 1993,
+    "peakTo": 2023,
     "audiences": [
       "millennials",
       "gen-z"
@@ -9470,6 +9784,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1983,
+    "peakFrom": 2006,
+    "peakTo": 2026,
     "audiences": [
       "millennials",
       "gen-z"
@@ -9493,6 +9809,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1976,
+    "peakFrom": 1999,
+    "peakTo": 2026,
     "audiences": [
       "millennials",
       "gen-z"
@@ -9641,6 +9959,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1943,
+    "peakFrom": 1966,
+    "peakTo": 1996,
     "audiences": [
       "gen-x"
     ],
@@ -9652,6 +9972,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1965,
+    "peakFrom": 1988,
+    "peakTo": 2018,
     "audiences": [
       "millennials",
       "gen-z"
@@ -9664,6 +9986,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1931,
+    "peakFrom": 1954,
+    "peakTo": 1984,
     "audiences": [
       "gen-x"
     ],
@@ -9688,6 +10012,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1986,
+    "peakFrom": 2009,
+    "peakTo": 2026,
     "audiences": [
       "gen-z"
     ],
@@ -9699,6 +10025,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1936,
+    "peakFrom": 1959,
+    "peakTo": 1989,
     "audiences": [
       "gen-x"
     ],
@@ -9770,6 +10098,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1951,
+    "peakFrom": 1974,
+    "peakTo": 2004,
     "audiences": [
       "gen-x"
     ],
@@ -9845,6 +10175,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1955,
+    "peakFrom": 1978,
+    "peakTo": 2008,
     "audiences": [
       "gen-x"
     ],
@@ -9892,6 +10224,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1954,
+    "peakFrom": 1977,
+    "peakTo": 2007,
     "audiences": [
       "gen-x"
     ],
@@ -9931,6 +10265,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1955,
+    "peakFrom": 1978,
+    "peakTo": 2008,
     "audiences": [
       "gen-x"
     ],
@@ -10002,6 +10338,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1964,
+    "peakFrom": 1987,
+    "peakTo": 2017,
     "audiences": [
       "millennials",
       "gen-z"
@@ -10063,6 +10401,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1980,
+    "peakFrom": 2003,
+    "peakTo": 2026,
     "audiences": [
       "millennials",
       "gen-z"
@@ -10075,6 +10415,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1976,
+    "peakFrom": 1999,
+    "peakTo": 2026,
     "audiences": [
       "millennials",
       "gen-z"
@@ -10124,6 +10466,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 2002,
+    "peakFrom": 2016,
+    "peakTo": 2026,
     "audiences": [
       "gen-z"
     ],
@@ -10135,6 +10479,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1966,
+    "peakFrom": 1989,
+    "peakTo": 2019,
     "audiences": [
       "gen-x"
     ],
@@ -10210,6 +10556,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1948,
+    "peakFrom": 1971,
+    "peakTo": 2001,
     "audiences": [
       "gen-x"
     ],
@@ -10221,6 +10569,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1964,
+    "peakFrom": 1987,
+    "peakTo": 2017,
     "audiences": [
       "millennials",
       "gen-z"
@@ -10267,6 +10617,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1994,
+    "peakFrom": 2007,
+    "peakTo": 2026,
     "audiences": [
       "gen-z"
     ],
@@ -10302,6 +10654,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1984,
+    "peakFrom": 2007,
+    "peakTo": 2026,
     "audiences": [
       "millennials",
       "gen-z"
@@ -10327,6 +10681,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1930,
+    "peakFrom": 1962,
+    "peakTo": 1990,
     "audiences": [
       "elder"
     ],
@@ -10477,6 +10833,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1958,
+    "peakFrom": 1981,
+    "peakTo": 2011,
     "audiences": [
       "gen-x"
     ],
@@ -10525,6 +10883,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1928,
+    "peakFrom": 1934,
+    "peakTo": 1940,
     "audiences": [
       "elder"
     ],
@@ -10575,6 +10935,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1949,
+    "peakFrom": 1972,
+    "peakTo": 2002,
     "audiences": [
       "gen-x"
     ],
@@ -10668,6 +11030,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1972,
+    "peakFrom": 1995,
+    "peakTo": 2025,
     "audiences": [
       "millennials",
       "gen-z"
@@ -10716,6 +11080,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1900,
+    "peakFrom": 1937,
+    "peakTo": 1967,
     "audiences": [
       "elder"
     ],
@@ -10786,6 +11152,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1951,
+    "peakFrom": 1974,
+    "peakTo": 2004,
     "audiences": [
       "gen-x"
     ],
@@ -10907,6 +11275,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1946,
+    "peakFrom": 1969,
+    "peakTo": 1999,
     "audiences": [
       "gen-x"
     ],
@@ -10952,6 +11322,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1934,
+    "peakFrom": 1975,
+    "peakTo": 2005,
     "audiences": [
       "elder"
     ],
@@ -10963,6 +11335,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1978,
+    "peakFrom": 2001,
+    "peakTo": 2026,
     "audiences": [
       "millennials",
       "gen-z"
@@ -10986,6 +11360,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1997,
+    "peakFrom": 2020,
+    "peakTo": 2026,
     "audiences": [
       "gen-z"
     ],
@@ -11010,6 +11386,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1928,
+    "peakFrom": 1965,
+    "peakTo": 1985,
     "audiences": [
       "elder"
     ],
@@ -11079,6 +11457,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1968,
+    "peakFrom": 1991,
+    "peakTo": 2021,
     "audiences": [
       "gen-x"
     ],
@@ -11312,6 +11692,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1995,
+    "peakFrom": 2017,
+    "peakTo": 2026,
     "audiences": [
       "gen-z"
     ],
@@ -11372,6 +11754,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1962,
+    "peakFrom": 1985,
+    "peakTo": 2015,
     "audiences": [
       "gen-x"
     ],
@@ -11383,6 +11767,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1956,
+    "peakFrom": 1988,
+    "peakTo": 2020,
     "audiences": [
       "elder"
     ],
@@ -11394,6 +11780,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1981,
+    "peakFrom": 2004,
+    "peakTo": 2026,
     "audiences": [
       "millennials",
       "gen-z"
@@ -11406,6 +11794,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1996,
+    "peakFrom": 2016,
+    "peakTo": 2026,
     "audiences": [
       "millennials",
       "gen-z"
@@ -11444,6 +11834,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1945,
+    "peakFrom": 1968,
+    "peakTo": 1998,
     "audiences": [
       "gen-x"
     ],
@@ -11478,6 +11870,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1943,
+    "peakFrom": 1985,
+    "peakTo": 2000,
     "audiences": [
       "elder"
     ],
@@ -11620,6 +12014,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1970,
+    "peakFrom": 1993,
+    "peakTo": 2023,
     "audiences": [
       "millennials",
       "gen-z"
@@ -11778,6 +12174,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1970,
+    "peakFrom": 1993,
+    "peakTo": 2023,
     "audiences": [
       "gen-x"
     ],
@@ -11813,6 +12211,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1965,
+    "peakFrom": 1988,
+    "peakTo": 2018,
     "audiences": [
       "gen-x"
     ],
@@ -11849,6 +12249,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1913,
+    "peakFrom": 1939,
+    "peakTo": 1951,
     "audiences": [
       "elder"
     ],
@@ -11860,6 +12262,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1937,
+    "peakFrom": 1960,
+    "peakTo": 1990,
     "audiences": [
       "gen-x"
     ],
@@ -11944,6 +12348,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1955,
+    "peakFrom": 1978,
+    "peakTo": 2008,
     "audiences": [
       "gen-x"
     ],
@@ -11955,6 +12361,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1967,
+    "peakFrom": 1990,
+    "peakTo": 2020,
     "audiences": [
       "millennials",
       "gen-z"
@@ -11967,6 +12375,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1968,
+    "peakFrom": 1991,
+    "peakTo": 2021,
     "audiences": [
       "millennials",
       "gen-z"
@@ -12112,6 +12522,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "category": "actors",
     "contentSubject": "actor",
     "correctYear": 1996,
+    "peakFrom": 2016,
+    "peakTo": 2026,
     "audiences": [
       "gen-z"
     ],
