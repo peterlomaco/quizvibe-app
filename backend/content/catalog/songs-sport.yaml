@@ -200,6 +200,19 @@ items:
         channelTitle: "Whitney Houston - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
     genrePackages: ["sport"]
+  - id: guetta-this-ones-for-you
+    displayName: "This One's for You — David Guetta ft. Zara Larsson"
+    correctYear: 2016
+    probability: 82
+    wikimediaSearchHints: ["David Guetta Zara Larsson This One's for You UEFA Euro 2016"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "Bs7ckMiXZok"
+        startSec: 30
+        endSec: 45
+        channelTitle: "David Guetta - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+    genrePackages: ["sport"]
   # ── Idrottare som gjort musik ──
   - id: duplantis-bop
     displayName: "Bop — Armand Duplantis"

@@ -6308,6 +6308,29 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "guetta-this-ones-for-you",
+    "displayName": "This One's for You — David Guetta ft. Zara Larsson",
+    "correctYear": 2016,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "all"
+    ],
+    "genrePackages": [
+      "sport"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "Bs7ckMiXZok",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "David Guetta - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
     "id": "leicester-premier-league-2016",
     "displayName": "Leicester City vinner Premier League",
     "correctYear": 2016,
