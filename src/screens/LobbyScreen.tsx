@@ -49,7 +49,7 @@ import { deactivateRoom, getRoomMeta, markRoomGameStarted, roomExists, setRoomMa
 import { clearEjected, isEjected, markEjected } from '../utils/ejectedPlayers';
 import { clearLobbyPlayers, getLobbyPlayers, markOwnPlayerLeft, setLobbyPlayers, upsertOwnLobbyPlayer } from '../utils/mockLobbyPlayers';
 import { clearLobbySettings, getLobbySettings, setLobbySettings } from '../utils/mockLobbySettings';
-import { MAIN_CATEGORIES, defaultEnabledMainCategories, subjectToMainCategory, type MainCategory } from '../utils/mainCategory';
+import { MAIN_CATEGORIES, MAIN_CATEGORY_LABELS, defaultEnabledMainCategories, subjectToMainCategory, type MainCategory } from '../utils/mainCategory';
 import { MUSIC_QUESTIONS } from '../utils/musicQuestions';
 import { IMAGE_QUIZ_QUESTIONS } from '../utils/quizImageQuestions';
 import { supabase } from '../utils/supabase';
@@ -3558,7 +3558,7 @@ export default function LobbyScreen() {
                           isActive && styles.mainCategoryLabelActive,
                         ]}
                       >
-                        {cat}
+                        {MAIN_CATEGORY_LABELS[cat]}
                       </Text>
                     </Pressable>
                   );

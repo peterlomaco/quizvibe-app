@@ -60,6 +60,7 @@ import {
 import { hasPremiumSubscription } from '../utils/subscriptionStorage';
 import {
     MAIN_CATEGORIES,
+    MAIN_CATEGORY_LABELS,
     defaultEnabledMainCategories,
     type MainCategory,
 } from '../utils/mainCategory';
@@ -1165,7 +1166,7 @@ export default function ProfileScreen() {
                         isActive && styles.mainCategoryLabelActive,
                       ]}
                     >
-                      {cat}
+                      {MAIN_CATEGORY_LABELS[cat]}
                     </Text>
                   </Pressable>
                 );

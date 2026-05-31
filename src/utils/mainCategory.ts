@@ -16,6 +16,22 @@ export type MainCategory = 'Music' | 'Film' | 'Sport';
 export const MAIN_CATEGORIES: readonly MainCategory[] = ['Music', 'Film', 'Sport'] as const;
 
 /**
+ * Användar-vänliga etiketter för lobby/profile-filtret. Filtret är PERSON-
+ * centrerat (vem) medan det interna MainCategory-värdet + fråge-badgen är
+ * MEDIUM-centrerat (vad). Samma mappning, bara annan etikett:
+ *   Music → "Artist"  ·  Film → "Actors"  ·  Sport → "Athlete"
+ * Rationale (Peter 2026-05-31): man filtrerar inte på "sport" utan på en
+ * sport-ATLET — som även kan ha gjort musiklåtar eller medverkat i film
+ * (genrePackages-crossover). Internt värde, filterlogik, persistens och
+ * fråge-badge är OFÖRÄNDRADE — detta är enbart en display-etikett.
+ */
+export const MAIN_CATEGORY_LABELS: Record<MainCategory, string> = {
+  Music: 'Artist',
+  Film: 'Actors',
+  Sport: 'Athlete',
+};
+
+/**
  * Mappar backend-subject → V1-huvudkategori. null när subjectet inte tillhör
  * någon av Music/Film/Sport (t.ex. capital, country, place — geografi-items
  * som curators valt att inte gruppera under huvudkategorierna).
