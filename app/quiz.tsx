@@ -972,8 +972,17 @@ export default function QuizScreen() {
   // typ av fråga som kommer härnäst. Härleds från backend:s contentSubject
   // (lagras på QuizQuestion.mainCategory vid SEED-konvertering); null om
   // subject inte mappar till någon V1-kategori (t.ex. capital).
+  //
+  // Display-override: sport-temad musik (genrePackages: ["sport"]) har
+  // mainCategory='Music' (för filtret) men visar "Sport"-badge — det är den
+  // sport-vinkel spelaren känner igen ("Den glider in" läses som sport, inte
+  // generisk musik). Filtret påverkas INTE (det använder mainCategory + genre).
   const categoryByQuestion = useMemo<(MainCategory | null)[]>(() => {
-    return gameQuestions.map((q) => q.mainCategory);
+    return gameQuestions.map((q) =>
+      q.type === 'timeline' && q.genrePackages?.includes('sport')
+        ? 'Sport'
+        : q.mainCategory,
+    );
   }, [gameQuestions]);
 
   const [questionIndex, setQuestionIndex] = useState(0);
