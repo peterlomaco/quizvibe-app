@@ -1262,8 +1262,11 @@ export default function ProfileScreen() {
                     next = [lockedLeft, clampedRight];
                   }
 
+                  // to-golv: clampa to till 1980 + dra in from så intervallet hålls.
+                  if (next[1] < ERA_TO_MIN) {
+                    next = [Math.min(next[0], ERA_TO_MIN - ERA_MIN_INTERVAL), ERA_TO_MIN];
+                  }
                   if (next[1] - next[0] < ERA_MIN_INTERVAL) return;
-                  if (next[1] < ERA_TO_MIN) return; // to-året får ej gå under 1980
                   if (next[0] === eraValues[0] && next[1] === eraValues[1]) return;
                   void Haptics.selectionAsync();
                   setEraValues(next);
@@ -1292,6 +1295,11 @@ export default function ProfileScreen() {
               />
               <DecadeMarks />
             </View>
+            {eraValues[1] <= ERA_TO_MIN && (
+              <View style={{ backgroundColor: Colors.warningMuted, borderRadius: Radius.sm, padding: Spacing.sm, borderWidth: 1, borderColor: Colors.warningBorder, marginTop: Spacing.sm }}>
+                <Text style={{ fontSize: FontSize.xs, color: Colors.warning, lineHeight: 17 }}>⚠️ To-year can not be earlier than 1980</Text>
+              </View>
+            )}
           </View>
 
           {/* Number of Rounds — speglar Lobby:s motsvarande sektion. */}

@@ -1691,6 +1691,8 @@ export default function LobbyScreen() {
   // live medan host drar utan att vi behöver toucha lib:ns prop.
   const displayEra = dragEraValues ?? eraValues;
   const { warning: eraWarning } = checkEraAgainstPlayer(displayEra[1], players);
+  // To-året kan inte gå under ERA_TO_MIN (1980) — visa gul varning vid golvet.
+  const eraAtToFloor = displayEra[1] <= ERA_TO_MIN;
 
   // Räkna aktiva spelare (exkl. hasLeft, vars plats är frigjord) — används
   // som capacity-check både vid + Add Player-knappen och vid Confirm i
@@ -3987,11 +3989,14 @@ export default function LobbyScreen() {
                       // den aktiva thumben — vi behöver ingen egen
                       // detektion/låsning. Defensiv guard ifall lib:n
                       // släpper igenom värden under 10 år.
-                      if (vals[1] - vals[0] < ERA_MIN_INTERVAL) return;
-                      if (vals[1] < ERA_TO_MIN) return; // to-året får ej gå under 1980
+                      // to-golv: clampa (inte frys) så rutan spårar exakt till
+                      // 1980 även vid snabba drag, och thumben commit:as till
+                      // 1980 vid släpp.
+                      const clampedTo = Math.max(vals[1], ERA_TO_MIN);
+                      if (clampedTo - vals[0] < ERA_MIN_INTERVAL) return;
                       const prev = dragEraValuesRef.current;
-                      if (prev && prev[0] === vals[0] && prev[1] === vals[1]) return;
-                      const next: [number, number] = [vals[0], vals[1]];
+                      if (prev && prev[0] === vals[0] && prev[1] === clampedTo) return;
+                      const next: [number, number] = [vals[0], clampedTo];
                       dragEraValuesRef.current = next;
                       // Tick-haptic per år-ändring — selectionAsync är
                       // Apple:s picker-tick på iOS, KEYBOARD_TAP på
@@ -4075,6 +4080,7 @@ export default function LobbyScreen() {
                   <DecadeMarks />
                 </View>
               )}
+              {hostMode && eraAtToFloor && <View style={styles.eraWarning}><Text style={styles.eraWarningText}>⚠️ To-year can not be earlier than 1980</Text></View>}
               {eraWarning && <View style={styles.eraWarning}><Text style={styles.eraWarningText}>⚠️ {eraWarning}</Text></View>}
             </View>
 
