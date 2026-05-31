@@ -287,13 +287,25 @@ export default function ProfileScreen() {
   // 20 rundor är en subscription-perk OBEROENDE av läge: Premium → 20, annars
   // 4. (IndDev är nu gratis att välja; caps gatas separat på Premium.)
   const roundsMax = hasPremium ? ROUNDS_MAX_INDIV : ROUNDS_MAX_PASS;
-  // Auto-sync maxPlayers ↔ gameMode: 12 spelare är en subscription-perk —
-  // Individual device är gratis att välja men gratis-host capas vid 4, bara
-  // Premium unlock:ar 12. Pass-the-Phone alltid 4. Speglar Lobby.
+  // maxPlayers sätts explicit via Players-toggeln (Max 4 / Max 12). 12 är en
+  // subscription-perk → clampa till 4 för gratis-host oavsett seedat värde.
   useEffect(() => {
-    const targetMax: 4 | 12 = gameMode === 'individual-devices' && hasPremium ? 12 : 4;
-    setMaxPlayers((prev) => (prev === targetMax ? prev : targetMax));
-  }, [gameMode, hasPremium]);
+    if (!hasPremium) setMaxPlayers((prev) => (prev === 4 ? prev : 4));
+  }, [hasPremium]);
+  const handleSelectMaxPlayers = (n: 4 | 12) => {
+    if (n === 12 && !hasPremium) {
+      Alert.alert(
+        'Premium feature',
+        'Hosting up to 12 players requires QuizVibe Premium. Get it in the Store?',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Go to Store', onPress: () => router.push('/store?focus=subscription&from=/profile') },
+        ],
+      );
+      return;
+    }
+    setMaxPlayers(n);
+  };
   const handleDecrementRounds = () => {
     setRoundsCount((prev) => {
       const next = Math.max(ROUNDS_MIN, prev - ROUNDS_STEP);
@@ -1040,13 +1052,43 @@ export default function ProfileScreen() {
               {renderModeBox('indiv', 'Individual device')}
             </View>
 
-            <Text style={styles.modeDescription}>
-              {singlePlayerDefault
-                ? 'Play solo on this device.'
-                : gameMode === 'pass-the-phone'
-                  ? 'One shared device — pass it around. Max 4 players.'
-                  : 'Each player on their own device. Up to 12 players with Premium.'}
-            </Text>
+            <Text style={styles.modeInfoLine}>Pass-the-Phone: Single device mode</Text>
+            <Text style={styles.modeInfoLine}>Individual device: Multi-device mode / QuizVibe users only</Text>
+
+            {/* Players — max antal spelare (Max 4 gratis / Max 12 Premium). */}
+            <Text style={[styles.gameModeGroupLabel, styles.gameModeGroupLabelSpaced]}>Players</Text>
+            <View style={styles.modeRow}>
+              <Pressable
+                style={({ pressed }) => [
+                  styles.modeOption,
+                  maxPlayers === 4 ? styles.modeOptionPassActive : styles.modeOptionInactive,
+                  pressed && { opacity: 0.7 },
+                ]}
+                onPress={() => handleSelectMaxPlayers(4)}
+              >
+                <Text style={[styles.modeLabel, { textAlign: 'center' }, maxPlayers === 4 && styles.modeLabelActiveFree]}>
+                  Max 4 players
+                </Text>
+                <View style={[styles.freeBadge, maxPlayers !== 4 && styles.freeBadgeDimmed]} pointerEvents="none">
+                  <Text style={[styles.freeBadgeText, maxPlayers !== 4 && styles.freeBadgeTextDimmed]}>FREE</Text>
+                </View>
+              </Pressable>
+              <Pressable
+                style={({ pressed }) => [
+                  styles.modeOption,
+                  maxPlayers === 12 && hasPremium ? styles.modeOptionPremiumActive : styles.modeOptionInactive,
+                  pressed && { opacity: 0.7 },
+                ]}
+                onPress={() => handleSelectMaxPlayers(12)}
+              >
+                <Text style={[styles.modeLabel, { textAlign: 'center' }, maxPlayers === 12 && hasPremium && styles.modeLabelActivePremium]}>
+                  Max 12 players
+                </Text>
+                <View style={[styles.premiumBadge, !hasPremium && styles.premiumBadgeGrey]} pointerEvents="none">
+                  <Text style={[styles.premiumBadgeText, !hasPremium && styles.premiumBadgeTextGrey]}>PREMIUM</Text>
+                </View>
+              </Pressable>
+            </View>
           </View>
 
           {/* Main categories — host-default som filtrerar quiz-poolen via
@@ -2836,6 +2878,12 @@ const styles = StyleSheet.create({
   },
   gameModeGroupLabelSpaced: {
     marginTop: Spacing.md,
+  },
+  modeInfoLine: {
+    fontSize: FontSize.xs,
+    color: Colors.textSecondary,
+    lineHeight: 16,
+    marginTop: 2,
   },
   modeRow: {
     flexDirection: 'row',

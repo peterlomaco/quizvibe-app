@@ -1451,14 +1451,12 @@ export default function LobbyScreen() {
   // Individual Devices defaulta:r till 12 så host får full multiplayer-cap
   // direkt utan extra knapptryck. Non-host syncar maxPlayers via room-meta-
   // pollen ovan, så de behöver inte auto-set:as här.
+  // maxPlayers sätts nu explicit via Players-toggeln (Max 4 / Max 12). 12 är en
+  // subscription-perk → clampa till 4 för gratis-host oavsett seedat värde.
   useEffect(() => {
     if (!hostMode) return;
-    // 12 spelare är en subscription-perk (oberoende av läge). Individual device
-    // är gratis att VÄLJA, men gratis-host capas vid 4 spelare — bara Premium
-    // unlock:ar 12. Pass-the-Phone alltid 4.
-    const targetMax: 4 | 12 = gameMode === 'individual-devices' && hasPremium ? 12 : 4;
-    setMaxPlayers((prev) => (prev === targetMax ? prev : targetMax));
-  }, [gameMode, hostMode, hasPremium]);
+    if (!hasPremium) setMaxPlayers((prev) => (prev === 4 ? prev : 4));
+  }, [hostMode, hasPremium]);
 
   // Max rundor är en subscription-perk OBEROENDE av läge: Premium → 20, annars
   // 4. (Tidigare gav Individual Devices implicit 20; nu är IndDev gratis och
@@ -1667,6 +1665,24 @@ export default function LobbyScreen() {
         },
       ],
     );
+  };
+
+  // Players-val: Max 4 (gratis) / Max 12 (Premium). 12 kräver subscription →
+  // Store-redirect om gratis-host. Sätter maxPlayers som styr lobby-cap +
+  // hur många host kan godkänna i "Players in lobby".
+  const handleSelectMaxPlayers = (n: 4 | 12) => {
+    if (n === 12 && !hasPremium) {
+      Alert.alert(
+        'Premium feature',
+        'Hosting up to 12 players requires QuizVibe Premium. Get it in the Store?',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Go to Store', onPress: () => router.push({ pathname: '/store' as const, params: { focus: 'subscription', from: '/lobby', fromCode: roomCode } }) },
+        ],
+      );
+      return;
+    }
+    setMaxPlayers(n);
   };
 
   // En game-mode-ruta (delas av Single device- och Multiplayer-grupperna).
@@ -3263,14 +3279,44 @@ export default function LobbyScreen() {
           </View>
 
           {hostMode && (
-            <Text style={styles.modeDescription}>
-              {singlePlayerDefault
-                ? 'Play solo on this device.'
-                : gameMode === 'pass-the-phone'
-                  ? 'One shared device — pass it around. Max 4 players.'
-                  : 'Each player on their own device. Up to 12 players with Premium.'}
-            </Text>
+            <>
+              <Text style={styles.modeInfoLine}>Pass-the-Phone: Single device mode</Text>
+              <Text style={styles.modeInfoLine}>Individual device: Multi-device mode / QuizVibe users only</Text>
+            </>
           )}
+
+          {/* Players — max antal spelare. Max 4 gratis, Max 12 Premium. Styr
+              lobby-cap + hur många host kan godkänna i "Players in lobby".
+              Renderas för alla men disabled för non-host (read-only). */}
+          <Text style={[styles.gameModeGroupLabel, styles.gameModeGroupLabelSpaced]}>Players</Text>
+          <View style={styles.modeRow}>
+            <TouchableOpacity
+              style={[styles.modeOption, maxPlayers === 4 ? styles.modeOptionPassActive : styles.modeOptionInactive]}
+              onPress={() => handleSelectMaxPlayers(4)}
+              disabled={!hostMode}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.modeLabel, { textAlign: 'center' }, maxPlayers === 4 && styles.modeLabelActiveFree]}>
+                Max 4 players
+              </Text>
+              <View style={[styles.freeBadge, maxPlayers !== 4 && styles.freeBadgeDimmed]} pointerEvents="none">
+                <Text style={[styles.freeBadgeText, maxPlayers !== 4 && styles.freeBadgeTextDimmed]}>FREE</Text>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.modeOption, maxPlayers === 12 && hasPremium ? styles.modeOptionPremiumActive : styles.modeOptionInactive]}
+              onPress={() => handleSelectMaxPlayers(12)}
+              disabled={!hostMode}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.modeLabel, { textAlign: 'center' }, maxPlayers === 12 && hasPremium && styles.modeLabelActivePremium]}>
+                Max 12 players
+              </Text>
+              <View style={[styles.premiumBadge, !hasPremium && styles.premiumBadgeGrey]} pointerEvents="none">
+                <Text style={[styles.premiumBadgeText, !hasPremium && styles.premiumBadgeTextGrey]}>PREMIUM</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
 
         </View>
 
@@ -4987,6 +5033,13 @@ const styles = StyleSheet.create({
   },
   gameModeGroupLabelSpaced: {
     marginTop: Spacing.md,
+  },
+  // Info-rader under multiplayer-rutorna (Pass-the-Phone / Individual device).
+  modeInfoLine: {
+    fontSize: FontSize.xs,
+    color: Colors.textSecondary,
+    lineHeight: 16,
+    marginTop: 2,
   },
   // Rad som håller game-mode-rutorna. Transparent (ingen segment-container) —
   // rutorna är fristående bordered boxar med egen FREE-badge.
