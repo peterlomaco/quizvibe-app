@@ -4018,6 +4018,7 @@ export default function LobbyScreen() {
                       setDragEraValues(null);
                     }}
                     minMarkerOverlapDistance={ERA_MIN_INTERVAL_PX}
+                    minMarkerValueTwo={ERA_TO_MIN}
                     isMarkersSeparated
                     customMarkerLeft={EraMarkerMinus}
                     customMarkerRight={EraMarkerPlus}
