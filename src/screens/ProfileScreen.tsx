@@ -154,9 +154,11 @@ const ANSWER_RESPONSE_OPTIONS: { id: AnswerResponse; label: string }[] = [
 
 // Game era — år-spann för frågor. Speglar Lobby-skärmens slider men utan
 // player-clamping (Profile är default-setup, inga spelare i kontext).
-// ERA_MIN_INTERVAL = minsta tillåtna avstånd mellan from/to-markörer (10 år).
+// ERA_MIN_INTERVAL = minsta tillåtna avstånd mellan from/to-markörer (15 år).
 // ERA_MIN_INTERVAL_PX räknar om det till slider-pixel för MultiSlider:s
 // minMarkerOverlapDistance-prop.
+// ERA_TO_MIN = lägsta tillåtna "to"-år (höger thumb-golv). En era som slutar
+// före 1980 ger för tunn pool. Vänster thumb (from) får gå till ERA_MIN.
 // ERA_MIN = 1950 så slider-värdet matchar tidsaxelns vänsterkant ("<1950").
 // Tidigare gick slidern 1900..currentYear medan axeln visuellt började vid
 // "<1930" — det skapade en 30-års-förskjutning mellan thumb-position och
@@ -169,7 +171,8 @@ const ERA_SLIDER_WIDTH = 280;
 // sätts till INNER_WIDTH och DecadeMarks-positionen offset:as med INSET.
 const ERA_SLIDER_INSET = 12;
 const ERA_SLIDER_INNER_WIDTH = ERA_SLIDER_WIDTH - 2 * ERA_SLIDER_INSET;
-const ERA_MIN_INTERVAL = 10;
+const ERA_MIN_INTERVAL = 15;
+const ERA_TO_MIN = 1980;
 const ERA_MIN_INTERVAL_PX = Math.ceil((ERA_MIN_INTERVAL / (ERA_MAX - ERA_MIN)) * ERA_SLIDER_INNER_WIDTH);
 
 function DecadeMarks() {
@@ -506,13 +509,15 @@ export default function ProfileScreen() {
         setFreeGameCredits(augmented.freeGameCredits ?? 0);
         setLastFreeCreditsRefreshDate(augmented.lastFreeCreditsRefreshDate);
         setAnswerResponseSeconds(augmented.answerResponseSeconds ?? 30);
-        // Clamp till nuvarande slider-range — gamla profiler kan ha sparat
-        // gameEraFrom < 1930 från tiden då ERA_MIN var 1900. Utan clamp:n
-        // skulle box visa t.ex. "1925" medan thumben sitter på 1930.
-        setEraValues([
-          Math.max(ERA_MIN, augmented.gameEraFrom ?? 1981),
-          Math.min(ERA_MAX, augmented.gameEraTo ?? ERA_MAX),
-        ]);
+        // Clamp till nuvarande slider-range + regler: to-året golvas till
+        // ERA_TO_MIN (1980) och from till [ERA_MIN, to - ERA_MIN_INTERVAL] så
+        // gamla profiler (sparade när golvet/intervallet var lägre) hamnar i
+        // ett giltigt läge istället för att box/thumb hamnar i otillåtet spann.
+        {
+          const clampTo = Math.max(ERA_TO_MIN, Math.min(ERA_MAX, augmented.gameEraTo ?? ERA_MAX));
+          const clampFrom = Math.max(ERA_MIN, Math.min(augmented.gameEraFrom ?? 1981, clampTo - ERA_MIN_INTERVAL));
+          setEraValues([clampFrom, clampTo]);
+        }
         setMaxPlayers(augmented.maxPlayers ?? 4);
         setGameMode(augmented.gameMode ?? 'pass-the-phone');
         setSinglePlayerDefault(augmented.singlePlayerDefault ?? false);
@@ -1218,7 +1223,7 @@ export default function ProfileScreen() {
 
           {/* Game era — adjustable år-spann för frågor. */}
           <View style={styles.field}>
-            <Text style={styles.fieldLabel}>Game era (min 10 year interval)</Text>
+            <Text style={styles.fieldLabel}>Game era (min 15 year interval)</Text>
             <View style={styles.eraGuestBoxWrap}>
               <View style={styles.eraGuestBox}>
                 <Text style={styles.eraGuestBoxText}>{eraValues[0]} – {eraValues[1]}</Text>
@@ -1258,6 +1263,7 @@ export default function ProfileScreen() {
                   }
 
                   if (next[1] - next[0] < ERA_MIN_INTERVAL) return;
+                  if (next[1] < ERA_TO_MIN) return; // to-året får ej gå under 1980
                   if (next[0] === eraValues[0] && next[1] === eraValues[1]) return;
                   void Haptics.selectionAsync();
                   setEraValues(next);

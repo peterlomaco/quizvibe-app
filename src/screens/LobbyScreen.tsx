@@ -220,12 +220,16 @@ const SLIDER_WIDTH = 280;
 const SLIDER_INSET = 12;
 const SLIDER_INNER_WIDTH = SLIDER_WIDTH - 2 * SLIDER_INSET;
 // Minsta tillåtna avstånd mellan from/to-markörerna på Game Era-slidern.
-// Ett 10-årigt fönster är minimum för att frågedatabasen ska kunna leverera
+// Ett 15-årigt fönster är minimum för att frågedatabasen ska kunna leverera
 // ett rimligt urval — kortare span blir för glest.
-const ERA_MIN_INTERVAL = 10;
+const ERA_MIN_INTERVAL = 15;
+// Lägsta tillåtna "to"-år (höger thumb-golv). En era som slutar före 1980 ger
+// för tunn pool. Vänster thumb (from) får fortf. gå till ERA_MIN; bara
+// to-thumben golvas. Enforced i onValuesChange + seed-clamp.
+const ERA_TO_MIN = 1980;
 // MultiSlider:s minMarkerOverlapDistance är i pixel — räkna ut hur många
-// pixel 10 år motsvarar på SLIDER_INNER_WIDTH-skalan så lib:n håller
-// markörerna från att komma närmare än så. Ceil för att inte underskrida.
+// pixel ERA_MIN_INTERVAL år motsvarar på SLIDER_INNER_WIDTH-skalan så lib:n
+// håller markörerna från att komma närmare än så. Ceil för att inte underskrida.
 const ERA_MIN_INTERVAL_PX = Math.ceil((ERA_MIN_INTERVAL / (ERA_MAX - ERA_MIN)) * SLIDER_INNER_WIDTH);
 
 // (Antal rundor: konstanter + RoundsRuler-komponenten lever i shared
@@ -1050,10 +1054,11 @@ export default function LobbyScreen() {
           );
           const eraFrom = stored?.eraFrom ?? profile?.gameEraFrom ?? 1981;
           const eraTo = stored?.eraTo ?? profile?.gameEraTo ?? ERA_MAX;
-          setEraValues([
-            Math.max(ERA_MIN, eraFrom),
-            Math.min(ERA_MAX, eraTo),
-          ]);
+          // to golvas till ERA_TO_MIN (1980), from till [ERA_MIN, to - intervall]
+          // så seedade/carry-over-värden alltid hamnar i giltigt spann.
+          const clampTo = Math.max(ERA_TO_MIN, Math.min(ERA_MAX, eraTo));
+          const clampFrom = Math.max(ERA_MIN, Math.min(eraFrom, clampTo - ERA_MIN_INTERVAL));
+          setEraValues([clampFrom, clampTo]);
           // Clamp roundsCount mot gameMode:s tak (Pass-the-Phone capas vid 4,
           // Individual Devices vid 20) så ett gammalt sparat värde inte
           // hamnar utanför range:n.
@@ -3942,7 +3947,7 @@ export default function LobbyScreen() {
             </View>
             {/* Game Era */}
             <View>
-              <Text style={styles.cardTitle}>Game Era (min 10 year interval)</Text>
+              <Text style={styles.cardTitle}>Game Era (min 15 year interval)</Text>
               {hostMode && (
                 <Text style={styles.cardSubtitle}>Set the time span for questions</Text>
               )}
@@ -3983,6 +3988,7 @@ export default function LobbyScreen() {
                       // detektion/låsning. Defensiv guard ifall lib:n
                       // släpper igenom värden under 10 år.
                       if (vals[1] - vals[0] < ERA_MIN_INTERVAL) return;
+                      if (vals[1] < ERA_TO_MIN) return; // to-året får ej gå under 1980
                       const prev = dragEraValuesRef.current;
                       if (prev && prev[0] === vals[0] && prev[1] === vals[1]) return;
                       const next: [number, number] = [vals[0], vals[1]];
