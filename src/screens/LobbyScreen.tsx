@@ -3958,7 +3958,7 @@ export default function LobbyScreen() {
                 </View>
               </View>
               {hostMode && (
-                <View style={{ alignItems: 'center', position: 'relative', width: SLIDER_WIDTH }}>
+                <View style={{ alignItems: 'center', position: 'relative', width: SLIDER_WIDTH, alignSelf: 'center' }}>
                   <MultiSlider
                     // values-propen hålls STABIL under drag (= committed
                     // eraValues). MultiSlider:s componentDidUpdate skulle
