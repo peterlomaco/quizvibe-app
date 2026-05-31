@@ -26,9 +26,9 @@ export const MAIN_CATEGORIES: readonly MainCategory[] = ['Music', 'Film', 'Sport
  * fråge-badge är OFÖRÄNDRADE — detta är enbart en display-etikett.
  */
 export const MAIN_CATEGORY_LABELS: Record<MainCategory, string> = {
-  Music: 'Artist',
+  Music: 'Artists',
   Film: 'Actors',
-  Sport: 'Athlete',
+  Sport: 'Athletes',
 };
 
 /**

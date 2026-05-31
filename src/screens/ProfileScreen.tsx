@@ -1150,7 +1150,7 @@ export default function ProfileScreen() {
               Speglar Game Mode-toggle:ns bordered-box-mönster men med
               multi-select-semantik. */}
           <View style={styles.field}>
-            <Text style={styles.fieldLabel}>Main categories</Text>
+            <Text style={styles.fieldLabel}>Person type portfolio</Text>
             <View style={styles.mainCategoryToggle}>
               {MAIN_CATEGORIES.map((cat) => {
                 const isActive = enabledMainCategories.includes(cat);
@@ -1163,6 +1163,9 @@ export default function ProfileScreen() {
                       isActive ? styles.mainCategoryBoxActive : styles.mainCategoryBoxInactive,
                     ]}
                   >
+                    <View style={[styles.mainCategoryFreeBadge, !isActive && styles.mainCategoryFreeBadgeGrey]}>
+                      <Text style={[styles.mainCategoryFreeBadgeText, !isActive && styles.mainCategoryFreeBadgeTextGrey]}>Free</Text>
+                    </View>
                     <Text
                       style={[
                         styles.mainCategoryLabel,
@@ -3096,14 +3099,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: Radius.sm,
     borderWidth: 1,
+    position: 'relative',
   },
   mainCategoryBoxInactive: {
     borderColor: Colors.borderStrong,
     backgroundColor: 'transparent',
   },
   mainCategoryBoxActive: {
-    borderColor: Colors.primary,
-    backgroundColor: Colors.primaryMuted,
+    borderColor: Colors.success,
+    backgroundColor: Colors.successMuted,
   },
   mainCategoryLabel: {
     fontSize: FontSize.sm,
@@ -3111,8 +3115,33 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
   },
   mainCategoryLabelActive: {
-    color: Colors.primary,
+    color: Colors.textPrimary,
     fontWeight: FontWeight.semibold,
+  },
+  // Free-badge på varje person-type-ruta (kant-skärande): grön + vit text när
+  // aktiv, grå + grå text när inaktiv.
+  mainCategoryFreeBadge: {
+    position: 'absolute',
+    top: -8,
+    right: 4,
+    backgroundColor: Colors.success,
+    borderRadius: 3,
+    paddingHorizontal: 5,
+    paddingVertical: 1,
+    zIndex: 10,
+    elevation: 4,
+  },
+  mainCategoryFreeBadgeGrey: {
+    backgroundColor: '#6B7280',
+  },
+  mainCategoryFreeBadgeText: {
+    fontSize: 9,
+    fontWeight: FontWeight.bold,
+    color: Colors.textPrimary,
+    letterSpacing: 0.3,
+  },
+  mainCategoryFreeBadgeTextGrey: {
+    color: Colors.textSecondary,
   },
   mainCategoryDescription: {
     fontSize: FontSize.xs,
