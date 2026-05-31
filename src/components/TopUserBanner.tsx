@@ -5,6 +5,7 @@ import { Colors, Radius, Spacing } from '../theme';
 import { getAvatarEmojiById } from '../utils/avatars';
 import { loadProfile, type ProfileData } from '../utils/profileStorage';
 import { QuizVibeQAvatar } from './QuizVibeQAvatar';
+import { GearIcon } from './GearIcon';
 
 interface Props {
   /**
@@ -130,7 +131,7 @@ export function TopUserBanner({ onPress, onBackPress, backLabel = 'Home', profil
       {onPress ? (
         <TouchableOpacity style={pillStyle} activeOpacity={0.7} onPress={onPress}>
           {showBrandAvatar ? (
-            <QuizVibeQAvatar size={16} />
+            <GearIcon size={16} color={Colors.primary} />
           ) : (
             <Text style={styles.loginPillIcon}>{iconText}</Text>
           )}
@@ -141,7 +142,7 @@ export function TopUserBanner({ onPress, onBackPress, backLabel = 'Home', profil
       ) : (
         <View style={pillStyle}>
           {showBrandAvatar ? (
-            <QuizVibeQAvatar size={16} />
+            <GearIcon size={16} color={Colors.primary} />
           ) : (
             <Text style={styles.loginPillIcon}>{iconText}</Text>
           )}
