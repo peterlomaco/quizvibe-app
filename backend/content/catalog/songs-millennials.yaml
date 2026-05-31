@@ -647,3 +647,93 @@ items:
         endSec: 45
         channelTitle: "The Cardigans - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: marvin-gaye-sexual-healing
+    displayName: "Sexual Healing — Marvin Gaye"
+    correctYear: 1982
+    probability: 82
+    wikimediaSearchHints: ["Marvin Gaye Sexual Healing 1982"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "9LxPoJ4QoSk"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Marvin Gaye - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: springsteen-born-in-the-usa
+    displayName: "Born in the U.S.A. — Bruce Springsteen"
+    correctYear: 1984
+    probability: 84
+    wikimediaSearchHints: ["Bruce Springsteen Born in the USA 1984"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "tRx212PUa4g"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Bruce Springsteen - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: tina-turner-whats-love
+    displayName: "What's Love Got to Do with It — Tina Turner"
+    correctYear: 1984
+    probability: 84
+    wikimediaSearchHints: ["Tina Turner What's Love Got to Do with It 1984"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "1avX1lX7gSs"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Tina Turner - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: george-michael-careless-whisper
+    displayName: "Careless Whisper — George Michael"
+    correctYear: 1984
+    probability: 86
+    wikimediaSearchHints: ["George Michael Careless Whisper 1984"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "gTwn_LoH7ig"
+        startSec: 30
+        endSec: 45
+        channelTitle: "George Michael - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: bryan-adams-summer-of-69
+    displayName: "Summer of '69 — Bryan Adams"
+    correctYear: 1985
+    probability: 86
+    wikimediaSearchHints: ["Bryan Adams Summer of 69 1985"]
+    answerMethods: ["timeline"]
+  - id: u2-with-or-without-you
+    displayName: "With or Without You — U2"
+    correctYear: 1987
+    probability: 84
+    wikimediaSearchHints: ["U2 With or Without You 1987"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "oNvWDP_GkiY"
+        startSec: 30
+        endSec: 45
+        channelTitle: "U2 - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: oasis-dont-look-back-in-anger
+    displayName: "Don't Look Back in Anger — Oasis"
+    correctYear: 1996
+    probability: 84
+    wikimediaSearchHints: ["Oasis Don't Look Back in Anger 1996"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "oplra1FJxWI"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Oasis - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: kent-music-non-stop
+    displayName: "Music Non Stop — Kent"
+    correctYear: 1996
+    probability: 78
+    wikimediaSearchHints: ["Kent Music Non Stop 1996"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "HJXsv1UIDmQ"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Kent - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."

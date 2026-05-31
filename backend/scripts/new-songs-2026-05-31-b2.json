@@ -1,0 +1,30 @@
+[
+  { "file": "songs-gen-x", "id": "bob-dylan-like-a-rolling-stone", "displayName": "Like a Rolling Stone — Bob Dylan", "correctYear": 1965, "probability": 84, "hint": "Bob Dylan Like a Rolling Stone 1965" },
+  { "file": "songs-gen-x", "id": "beatles-help", "displayName": "Help! — The Beatles", "correctYear": 1965, "probability": 86, "hint": "The Beatles Help 1965" },
+  { "file": "songs-gen-x", "id": "simon-garfunkel-sound-of-silence", "displayName": "The Sound of Silence — Simon & Garfunkel", "correctYear": 1965, "probability": 84, "hint": "Simon and Garfunkel The Sound of Silence 1965" },
+  { "file": "songs-gen-x", "id": "rolling-stones-angie", "displayName": "Angie — The Rolling Stones", "correctYear": 1973, "probability": 82, "hint": "The Rolling Stones Angie 1973" },
+  { "file": "songs-gen-x", "id": "led-zeppelin-kashmir", "displayName": "Kashmir — Led Zeppelin", "correctYear": 1975, "probability": 82, "hint": "Led Zeppelin Kashmir Physical Graffiti 1975" },
+
+  { "file": "songs-millennials", "id": "marvin-gaye-sexual-healing", "displayName": "Sexual Healing — Marvin Gaye", "correctYear": 1982, "probability": 82, "hint": "Marvin Gaye Sexual Healing 1982" },
+  { "file": "songs-millennials", "id": "springsteen-born-in-the-usa", "displayName": "Born in the U.S.A. — Bruce Springsteen", "correctYear": 1984, "probability": 84, "hint": "Bruce Springsteen Born in the USA 1984" },
+  { "file": "songs-millennials", "id": "tina-turner-whats-love", "displayName": "What's Love Got to Do with It — Tina Turner", "correctYear": 1984, "probability": 84, "hint": "Tina Turner What's Love Got to Do with It 1984" },
+  { "file": "songs-millennials", "id": "george-michael-careless-whisper", "displayName": "Careless Whisper — George Michael", "correctYear": 1984, "probability": 86, "hint": "George Michael Careless Whisper 1984" },
+  { "file": "songs-millennials", "id": "bryan-adams-summer-of-69", "displayName": "Summer of '69 — Bryan Adams", "correctYear": 1985, "probability": 86, "hint": "Bryan Adams Summer of 69 1985" },
+  { "file": "songs-millennials", "id": "u2-with-or-without-you", "displayName": "With or Without You — U2", "correctYear": 1987, "probability": 84, "hint": "U2 With or Without You 1987" },
+  { "file": "songs-millennials", "id": "oasis-dont-look-back-in-anger", "displayName": "Don't Look Back in Anger — Oasis", "correctYear": 1996, "probability": 84, "hint": "Oasis Don't Look Back in Anger 1996" },
+  { "file": "songs-millennials", "id": "kent-music-non-stop", "displayName": "Music Non Stop — Kent", "correctYear": 1996, "probability": 78, "hint": "Kent Music Non Stop 1996" },
+
+  { "file": "songs-gen-z", "id": "the-hives-hate-to-say", "displayName": "Hate to Say I Told You So — The Hives", "correctYear": 2000, "probability": 78, "hint": "The Hives Hate to Say I Told You So 2000" },
+  { "file": "songs-gen-z", "id": "timbuktu-alla-vill-till-himlen", "displayName": "Alla vill till himlen — Timbuktu", "correctYear": 2005, "probability": 76, "hint": "Timbuktu Alla vill till himlen 2005" },
+  { "file": "songs-gen-z", "id": "robyn-with-every-heartbeat", "displayName": "With Every Heartbeat — Robyn", "correctYear": 2007, "probability": 78, "hint": "Robyn With Every Heartbeat 2007" },
+  { "file": "songs-gen-z", "id": "lady-gaga-poker-face", "displayName": "Poker Face — Lady Gaga", "correctYear": 2008, "probability": 86, "hint": "Lady Gaga Poker Face 2008" },
+  { "file": "songs-gen-z", "id": "mando-diao-dance-with-somebody", "displayName": "Dance with Somebody — Mando Diao", "correctYear": 2009, "probability": 76, "hint": "Mando Diao Dance with Somebody 2009" },
+  { "file": "songs-gen-z", "id": "katy-perry-firework", "displayName": "Firework — Katy Perry", "correctYear": 2010, "probability": 84, "hint": "Katy Perry Firework 2010" },
+  { "file": "songs-gen-z", "id": "rihanna-diamonds", "displayName": "Diamonds — Rihanna", "correctYear": 2012, "probability": 84, "hint": "Rihanna Diamonds 2012" },
+  { "file": "songs-gen-z", "id": "first-aid-kit-emmylou", "displayName": "Emmylou — First Aid Kit", "correctYear": 2012, "probability": 76, "hint": "First Aid Kit Emmylou 2012" },
+  { "file": "songs-gen-z", "id": "icona-pop-i-love-it", "displayName": "I Love It — Icona Pop", "correctYear": 2012, "probability": 80, "hint": "Icona Pop I Love It 2012" },
+
+  { "file": "songs-gen-alpha", "id": "avicii-hey-brother", "displayName": "Hey Brother — Avicii", "correctYear": 2013, "probability": 82, "hint": "Avicii Hey Brother 2013" },
+  { "file": "songs-gen-alpha", "id": "hakan-hellstrom-aldrig-over", "displayName": "Det kommer aldrig va över för mig — Håkan Hellström", "correctYear": 2013, "probability": 76, "hint": "Håkan Hellström Det kommer aldrig va över för mig 2013" },
+  { "file": "songs-gen-alpha", "id": "benjamin-ingrosso-dance-you-off", "displayName": "Dance You Off — Benjamin Ingrosso", "correctYear": 2018, "probability": 74, "hint": "Benjamin Ingrosso Dance You Off Eurovision 2018" }
+]

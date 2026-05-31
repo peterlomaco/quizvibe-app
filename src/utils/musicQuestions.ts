@@ -907,6 +907,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "beatles-help",
+    "displayName": "Help! — The Beatles",
+    "correctYear": 1965,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "MKUex3fci5c",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "The Beatles - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
     "id": "beatles-yesterday",
     "displayName": "Yesterday — The Beatles",
     "correctYear": 1965,
@@ -922,6 +943,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "startSec": 30,
         "endSec": 45,
         "channelTitle": "The Beatles - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
+    "id": "bob-dylan-like-a-rolling-stone",
+    "displayName": "Like a Rolling Stone — Bob Dylan",
+    "correctYear": 1965,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "ZAigkYd0ipE",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Bob Dylan - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
       }
@@ -945,6 +987,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "The Rolling Stones - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
+    "id": "simon-garfunkel-sound-of-silence",
+    "displayName": "The Sound of Silence — Simon & Garfunkel",
+    "correctYear": 1965,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "9O9DaZUS_EU",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Simon & Garfunkel - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
       }
     ]
   },
@@ -1598,6 +1661,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "rolling-stones-angie",
+    "displayName": "Angie — The Rolling Stones",
+    "correctYear": 1973,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "t1CvS7aOMa4",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "The Rolling Stones - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
     "id": "abba-waterloo",
     "displayName": "Waterloo — ABBA",
     "correctYear": 1974,
@@ -1697,6 +1781,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Universal Pictures",
         "license": "standard",
         "notes": "Official Universal Pictures-klipp — 'Bigger Boat'-scenen i 4K HDR."
+      }
+    ]
+  },
+  {
+    "id": "led-zeppelin-kashmir",
+    "displayName": "Kashmir — Led Zeppelin",
+    "correctYear": 1975,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "QGIyFpFhFII",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Led Zeppelin - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
       }
     ]
   },
@@ -2337,6 +2442,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "marvin-gaye-sexual-healing",
+    "displayName": "Sexual Healing — Marvin Gaye",
+    "correctYear": 1982,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "9LxPoJ4QoSk",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Marvin Gaye - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
     "id": "michael-jackson-beat-it",
     "displayName": "Beat It — Michael Jackson",
     "correctYear": 1982,
@@ -2565,6 +2691,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "george-michael-careless-whisper",
+    "displayName": "Careless Whisper — George Michael",
+    "correctYear": 1984,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "gTwn_LoH7ig",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "George Michael - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
     "id": "gunde-svan-os-guld-1984",
     "displayName": "Gunde Svan OS-guld 15 km Sarajevo",
     "correctYear": 1984,
@@ -2627,6 +2774,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "springsteen-born-in-the-usa",
+    "displayName": "Born in the U.S.A. — Bruce Springsteen",
+    "correctYear": 1984,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "tRx212PUa4g",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Bruce Springsteen - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
     "id": "springsteen-dancing-in-the-dark",
     "displayName": "Dancing in the Dark — Bruce Springsteen",
     "correctYear": 1984,
@@ -2664,6 +2832,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Amazon MGM Studios",
         "license": "standard",
         "notes": "Curerad 2026-05-29 — officiell 1984-trailer (MGM)."
+      }
+    ]
+  },
+  {
+    "id": "tina-turner-whats-love",
+    "displayName": "What's Love Got to Do with It — Tina Turner",
+    "correctYear": 1984,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "1avX1lX7gSs",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Tina Turner - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
       }
     ]
   },
@@ -2932,6 +3121,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "HockeySverige",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
+    "id": "u2-with-or-without-you",
+    "displayName": "With or Without You — U2",
+    "correctYear": 1987,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "oNvWDP_GkiY",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "U2 - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
       }
     ]
   },
@@ -3803,6 +4013,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "kent-music-non-stop",
+    "displayName": "Music Non Stop — Kent",
+    "correctYear": 1996,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "HJXsv1UIDmQ",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Kent - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
     "id": "los-del-rio-macarena",
     "displayName": "Macarena — Los del Río",
     "correctYear": 1996,
@@ -3820,6 +4051,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Los Del Río - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
+    "id": "oasis-dont-look-back-in-anger",
+    "displayName": "Don't Look Back in Anger — Oasis",
+    "correctYear": 1996,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "oplra1FJxWI",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Oasis - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
       }
     ]
   },
@@ -4594,6 +4846,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "timbuktu-alla-vill-till-himlen",
+    "displayName": "Alla vill till himlen — Timbuktu",
+    "correctYear": 2005,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-z",
+      "millennials"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "6cdxVmMFN-E",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Timbuktu - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
     "id": "anja-parson-os-guld-slalom-2006",
     "displayName": "Anja Pärson OS-guld slalom Torino",
     "correctYear": 2006,
@@ -4795,6 +5068,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "lady-gaga-poker-face",
+    "displayName": "Poker Face — Lady Gaga",
+    "correctYear": 2008,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-z",
+      "millennials"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "oG-4Uvhm4lI",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Lady Gaga - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
     "id": "phelps-beijing-8-guld-2008",
     "displayName": "Michael Phelps 8 OS-guld Peking",
     "correctYear": 2008,
@@ -4915,6 +5209,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "mando-diao-dance-with-somebody",
+    "displayName": "Dance with Somebody — Mando Diao",
+    "correctYear": 2009,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-z",
+      "millennials"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "B3SSPURxGJ0",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Mando Diao - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
     "id": "adele-rolling-in-the-deep",
     "displayName": "Rolling in the Deep — Adele",
     "correctYear": 2010,
@@ -4973,6 +5288,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 264,
         "channelTitle": "Eminem - Topic",
         "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "katy-perry-firework",
+    "displayName": "Firework — Katy Perry",
+    "correctYear": 2010,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-z",
+      "millennials"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "lmHSLBnzB0M",
+        "startSec": 5,
+        "endSec": 20,
+        "channelTitle": "Katy Perry - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
       }
     ]
   },
@@ -5181,6 +5517,48 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "first-aid-kit-emmylou",
+    "displayName": "Emmylou — First Aid Kit",
+    "correctYear": 2012,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-z",
+      "millennials"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "nPWrX9PJAOs",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "First Aid Kit",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (18)."
+      }
+    ]
+  },
+  {
+    "id": "icona-pop-i-love-it",
+    "displayName": "I Love It — Icona Pop",
+    "correctYear": 2012,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-z",
+      "millennials"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "ayX4RhsLyUo",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Icona Pop - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
     "id": "loreen-euphoria",
     "displayName": "Euphoria — Loreen",
     "correctYear": 2012,
@@ -5263,6 +5641,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "avicii-hey-brother",
+    "displayName": "Hey Brother — Avicii",
+    "correctYear": 2013,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-alpha",
+      "gen-z"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "OjpX8ILe2N4",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Avicii - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
     "id": "avicii-wake-me-up",
     "displayName": "Wake Me Up — Avicii",
     "correctYear": 2013,
@@ -5299,6 +5698,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 246,
         "channelTitle": "7clouds",
         "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "hakan-hellstrom-aldrig-over",
+    "displayName": "Det kommer aldrig va över för mig — Håkan Hellström",
+    "correctYear": 2013,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-alpha",
+      "gen-z"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "z0hiC9rCG1c",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Håkan Hellström - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
       }
     ]
   },

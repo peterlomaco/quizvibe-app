@@ -586,3 +586,63 @@ items:
         endSec: 45
         channelTitle: "Dolly Parton - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: bob-dylan-like-a-rolling-stone
+    displayName: "Like a Rolling Stone — Bob Dylan"
+    correctYear: 1965
+    probability: 84
+    wikimediaSearchHints: ["Bob Dylan Like a Rolling Stone 1965"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "ZAigkYd0ipE"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Bob Dylan - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: beatles-help
+    displayName: "Help! — The Beatles"
+    correctYear: 1965
+    probability: 86
+    wikimediaSearchHints: ["The Beatles Help 1965"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "MKUex3fci5c"
+        startSec: 30
+        endSec: 45
+        channelTitle: "The Beatles - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: simon-garfunkel-sound-of-silence
+    displayName: "The Sound of Silence — Simon & Garfunkel"
+    correctYear: 1965
+    probability: 84
+    wikimediaSearchHints: ["Simon and Garfunkel The Sound of Silence 1965"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "9O9DaZUS_EU"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Simon & Garfunkel - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: rolling-stones-angie
+    displayName: "Angie — The Rolling Stones"
+    correctYear: 1973
+    probability: 82
+    wikimediaSearchHints: ["The Rolling Stones Angie 1973"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "t1CvS7aOMa4"
+        startSec: 30
+        endSec: 45
+        channelTitle: "The Rolling Stones - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: led-zeppelin-kashmir
+    displayName: "Kashmir — Led Zeppelin"
+    correctYear: 1975
+    probability: 82
+    wikimediaSearchHints: ["Led Zeppelin Kashmir Physical Graffiti 1975"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "QGIyFpFhFII"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Led Zeppelin - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."

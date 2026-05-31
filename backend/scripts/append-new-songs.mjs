@@ -4,8 +4,10 @@
 import { readFileSync, writeFileSync } from 'fs';
 import { parse } from 'yaml';
 
-const DRY = process.argv[2] !== '--write';
-const items = JSON.parse(readFileSync('scripts/new-songs-2026-05-31.json', 'utf8'));
+const args = process.argv.slice(2);
+const DRY = !args.includes('--write');
+const pathArg = args.find((a) => a.endsWith('.json'));
+const items = JSON.parse(readFileSync(pathArg || 'scripts/new-songs-2026-05-31.json', 'utf8'));
 
 // Samla alla befintliga id:n över alla song-filer
 const SONG_FILES = ['songs-elder', 'songs-gen-x', 'songs-millennials', 'songs-gen-z', 'songs-gen-alpha', 'songs-all'];

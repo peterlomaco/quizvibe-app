@@ -506,3 +506,33 @@ items:
         endSec: 45
         channelTitle: "Olivia Rodrigo - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: avicii-hey-brother
+    displayName: "Hey Brother — Avicii"
+    correctYear: 2013
+    probability: 82
+    wikimediaSearchHints: ["Avicii Hey Brother 2013"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "OjpX8ILe2N4"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Avicii - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: hakan-hellstrom-aldrig-over
+    displayName: "Det kommer aldrig va över för mig — Håkan Hellström"
+    correctYear: 2013
+    probability: 76
+    wikimediaSearchHints: ["Håkan Hellström Det kommer aldrig va över för mig 2013"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "z0hiC9rCG1c"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Håkan Hellström - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: benjamin-ingrosso-dance-you-off
+    displayName: "Dance You Off — Benjamin Ingrosso"
+    correctYear: 2018
+    probability: 74
+    wikimediaSearchHints: ["Benjamin Ingrosso Dance You Off Eurovision 2018"]
+    answerMethods: ["timeline"]

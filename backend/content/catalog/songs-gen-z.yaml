@@ -564,3 +564,93 @@ items:
         endSec: 45
         channelTitle: "Håkan Hellström - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: the-hives-hate-to-say
+    displayName: "Hate to Say I Told You So — The Hives"
+    correctYear: 2000
+    probability: 78
+    wikimediaSearchHints: ["The Hives Hate to Say I Told You So 2000"]
+    answerMethods: ["timeline"]
+  - id: timbuktu-alla-vill-till-himlen
+    displayName: "Alla vill till himlen — Timbuktu"
+    correctYear: 2005
+    probability: 76
+    wikimediaSearchHints: ["Timbuktu Alla vill till himlen 2005"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "6cdxVmMFN-E"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Timbuktu - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: robyn-with-every-heartbeat
+    displayName: "With Every Heartbeat — Robyn"
+    correctYear: 2007
+    probability: 78
+    wikimediaSearchHints: ["Robyn With Every Heartbeat 2007"]
+    answerMethods: ["timeline"]
+  - id: lady-gaga-poker-face
+    displayName: "Poker Face — Lady Gaga"
+    correctYear: 2008
+    probability: 86
+    wikimediaSearchHints: ["Lady Gaga Poker Face 2008"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "oG-4Uvhm4lI"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Lady Gaga - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: mando-diao-dance-with-somebody
+    displayName: "Dance with Somebody — Mando Diao"
+    correctYear: 2009
+    probability: 76
+    wikimediaSearchHints: ["Mando Diao Dance with Somebody 2009"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "B3SSPURxGJ0"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Mando Diao - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: katy-perry-firework
+    displayName: "Firework — Katy Perry"
+    correctYear: 2010
+    probability: 84
+    wikimediaSearchHints: ["Katy Perry Firework 2010"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "lmHSLBnzB0M"
+        startSec: 5
+        endSec: 20
+        channelTitle: "Katy Perry - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: rihanna-diamonds
+    displayName: "Diamonds — Rihanna"
+    correctYear: 2012
+    probability: 84
+    wikimediaSearchHints: ["Rihanna Diamonds 2012"]
+    answerMethods: ["timeline"]
+  - id: first-aid-kit-emmylou
+    displayName: "Emmylou — First Aid Kit"
+    correctYear: 2012
+    probability: 76
+    wikimediaSearchHints: ["First Aid Kit Emmylou 2012"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "nPWrX9PJAOs"
+        startSec: 30
+        endSec: 45
+        channelTitle: "First Aid Kit"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (18)."
+  - id: icona-pop-i-love-it
+    displayName: "I Love It — Icona Pop"
+    correctYear: 2012
+    probability: 80
+    wikimediaSearchHints: ["Icona Pop I Love It 2012"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "ayX4RhsLyUo"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Icona Pop - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
