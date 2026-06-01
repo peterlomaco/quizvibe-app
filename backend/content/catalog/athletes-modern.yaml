@@ -59,35 +59,11 @@ items:
     probability: 88
     wikimediaSearchHints: ["Tom Brady NFL quarterback"]
     answerMethods: ["timeline", "name-letters"]
-  - id: lebron-james
-    displayName: "LeBron James"
-    correctYear: 1984
-    probability: 92
-    wikimediaSearchHints: ["LeBron James basketball"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: simone-biles
-    displayName: "Simone Biles"
-    correctYear: 1997
-    probability: 88
-    wikimediaSearchHints: ["Simone Biles gymnastics"]
-    answerMethods: ["timeline", "name-letters"]
   - id: lewis-hamilton
     displayName: "Lewis Hamilton"
     correctYear: 1985
     probability: 88
     wikimediaSearchHints: ["Lewis Hamilton Formula 1 driver"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: stephen-curry
-    displayName: "Stephen Curry"
-    correctYear: 1988
-    probability: 88
-    wikimediaSearchHints: ["Stephen Curry basketball Warriors"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: naomi-osaka
-    displayName: "Naomi Osaka"
-    correctYear: 1997
-    probability: 82
-    wikimediaSearchHints: ["Naomi Osaka tennis"]
     answerMethods: ["timeline", "name-letters"]
   - id: rafael-nadal
     displayName: "Rafael Nadal"
@@ -139,36 +115,6 @@ items:
     wikimediaSearchHints: ["Erling Haaland footballer"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
-  - id: patrick-mahomes
-    displayName: "Patrick Mahomes"
-    correctYear: 1995
-    probability: 82
-    wikimediaSearchHints: ["Patrick Mahomes NFL quarterback"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: kevin-durant
-    displayName: "Kevin Durant"
-    correctYear: 1988
-    probability: 88
-    wikimediaSearchHints: ["Kevin Durant basketball"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: giannis-antetokounmpo
-    displayName: "Giannis Antetokounmpo"
-    correctYear: 1994
-    probability: 88
-    wikimediaSearchHints: ["Giannis Antetokounmpo basketball"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: luka-doncic
-    displayName: "Luka Dončić"
-    correctYear: 1999
-    probability: 82
-    wikimediaSearchHints: ["Luka Doncic basketball"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: nikola-jokic
-    displayName: "Nikola Jokić"
-    correctYear: 1995
-    probability: 80
-    wikimediaSearchHints: ["Nikola Jokic basketball"]
-    answerMethods: ["timeline", "name-letters"]
   - id: harry-kane
     displayName: "Harry Kane"
     correctYear: 1993
@@ -202,18 +148,6 @@ items:
     probability: 85
     wikimediaSearchHints: ["Carlos Alcaraz tennis"]
     answerMethods: ["timeline", "name-letters"]
-  - id: coco-gauff
-    displayName: "Coco Gauff"
-    correctYear: 2004
-    probability: 80
-    wikimediaSearchHints: ["Coco Gauff tennis"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: iga-swiatek
-    displayName: "Iga Świątek"
-    correctYear: 2001
-    probability: 80
-    wikimediaSearchHints: ["Iga Swiatek tennis Poland"]
-    answerMethods: ["timeline", "name-letters"]
   - id: mikaela-shiffrin
     displayName: "Mikaela Shiffrin"
     correctYear: 1995
@@ -244,30 +178,6 @@ items:
     probability: 88
     wikimediaSearchHints: ["Valentino Rossi MotoGP"]
     answerMethods: ["timeline", "name-letters"]
-  - id: sebastian-vettel
-    displayName: "Sebastian Vettel"
-    correctYear: 1987
-    probability: 90
-    wikimediaSearchHints: ["Sebastian Vettel Formula 1"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: daniil-medvedev
-    displayName: "Daniil Medvedev"
-    correctYear: 1996
-    probability: 82
-    wikimediaSearchHints: ["Daniil Medvedev tennis"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: jannik-sinner
-    displayName: "Jannik Sinner"
-    correctYear: 2001
-    probability: 80
-    wikimediaSearchHints: ["Jannik Sinner tennis"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: katie-ledecky
-    displayName: "Katie Ledecky"
-    correctYear: 1997
-    probability: 85
-    wikimediaSearchHints: ["Katie Ledecky swimmer"]
-    answerMethods: ["timeline", "name-letters"]
   - id: megan-rapinoe
     displayName: "Megan Rapinoe"
     correctYear: 1985
@@ -279,12 +189,6 @@ items:
     correctYear: 1989
     probability: 82
     wikimediaSearchHints: ["Alex Morgan soccer"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: adam-peaty
-    displayName: "Adam Peaty"
-    correctYear: 1994
-    probability: 80
-    wikimediaSearchHints: ["Adam Peaty swimmer"]
     answerMethods: ["timeline", "name-letters"]
   - id: karsten-warholm
     displayName: "Karsten Warholm"
@@ -311,29 +215,11 @@ items:
     probability: 85
     wikimediaSearchHints: ["Xavi footballer Barcelona", "Xavi Hernandez"]
     answerMethods: ["timeline", "name-letters"]
-  - id: chris-paul
-    displayName: "Chris Paul"
-    correctYear: 1985
-    probability: 80
-    wikimediaSearchHints: ["Chris Paul basketball NBA"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: dwyane-wade
-    displayName: "Dwyane Wade"
-    correctYear: 1982
-    probability: 82
-    wikimediaSearchHints: ["Dwyane Wade basketball Heat"]
-    answerMethods: ["timeline", "name-letters"]
   - id: yao-ming
     displayName: "Yao Ming"
     correctYear: 1980
     probability: 82
     wikimediaSearchHints: ["Yao Ming basketball China"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: manny-pacquiao
-    displayName: "Manny Pacquiao"
-    correctYear: 1978
-    probability: 85
-    wikimediaSearchHints: ["Manny Pacquiao boxer Philippines"]
     answerMethods: ["timeline", "name-letters"]
   - id: venus-williams
     displayName: "Venus Williams"
@@ -341,13 +227,6 @@ items:
     probability: 92
     wikimediaSearchHints: ["Venus Williams tennis"]
     answerMethods: ["timeline", "name-letters"]
-  - id: katie-taylor
-    displayName: "Katie Taylor"
-    correctYear: 1986
-    probability: 75
-    wikimediaSearchHints: ["Katie Taylor boxer Ireland"]
-    answerMethods: ["timeline", "name-letters"]
-  # === Svenska expansion 2026-05-27 — hockey/fotboll/skidor modern ===
   - id: henrik-lundqvist
     displayName: "Henrik Lundqvist"
     correctYear: 1982
@@ -427,12 +306,6 @@ items:
     probability: 80
     wikimediaSearchHints: ["Connor McDavid Edmonton Oilers captain hockey"]
     answerMethods: ["timeline", "name-letters"]
-  - id: marat-safin
-    displayName: "Marat Safin"
-    correctYear: 1980
-    probability: 76
-    wikimediaSearchHints: ["Marat Safin Russian tennis player US Open Australian Open"]
-    answerMethods: ["timeline", "name-letters"]
   - id: neymar
     displayName: "Neymar"
     correctYear: 1992
@@ -452,13 +325,6 @@ items:
     correctYear: 1986
     probability: 84
     wikimediaSearchHints: ["Sergio Ramos Spanish defender Real Madrid captain"]
-    answerMethods: ["timeline", "name-letters"]
-    genrePackages: ["pkg-fifa-wc"]
-  - id: bastian-schweinsteiger
-    displayName: "Bastian Schweinsteiger"
-    correctYear: 1984
-    probability: 82
-    wikimediaSearchHints: ["Bastian Schweinsteiger German footballer Bayern Munich 2014 World Cup"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: toni-kroos
@@ -481,13 +347,6 @@ items:
     probability: 86
     wikimediaSearchHints: ["Floyd Mayweather American boxer undefeated Pacquiao"]
     answerMethods: ["timeline", "name-letters"]
-  - id: allyson-felix
-    displayName: "Allyson Felix"
-    correctYear: 1985
-    probability: 78
-    wikimediaSearchHints: ["Allyson Felix American sprinter Olympic gold 200m"]
-    answerMethods: ["timeline", "name-letters"]
-  # === Komplettering 2026-05-27 — bordtennis/golf/hockey/fotboll/handboll modern ===
   - id: truls-moregardh
     displayName: "Truls Möregårdh"
     correctYear: 2002
@@ -616,20 +475,6 @@ items:
     wikimediaSearchHints: ["Christian Pulisic American winger USMNT Chelsea"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
-  - id: rafa-marquez
-    displayName: "Rafael Márquez"
-    correctYear: 1979
-    probability: 80
-    wikimediaSearchHints: ["Rafael Márquez Mexican defender captain 2002 2014 World Cup"]
-    answerMethods: ["timeline", "name-letters"]
-    genrePackages: ["pkg-fifa-wc"]
-  - id: keylor-navas
-    displayName: "Keylor Navas"
-    correctYear: 1986
-    probability: 78
-    wikimediaSearchHints: ["Keylor Navas Costa Rica goalkeeper 2014 World Cup quarterfinal"]
-    answerMethods: ["timeline", "name-letters"]
-    genrePackages: ["pkg-fifa-wc"]
   - id: antoine-griezmann
     displayName: "Antoine Griezmann"
     correctYear: 1991
@@ -740,13 +585,6 @@ items:
     genrePackages: ["pkg-fifa-wc"]
   # carles-puyol removed 2026-05-27 — webp is team-celebration shot,
   # individual player not visible. Re-curate with portrait from Commons.
-  - id: yaya-toure
-    displayName: "Yaya Touré"
-    correctYear: 1983
-    probability: 80
-    wikimediaSearchHints: ["Yaya Touré Ivorian midfielder Manchester City Barcelona"]
-    answerMethods: ["timeline", "name-letters"]
-    genrePackages: ["pkg-fifa-wc"]
   - id: michael-essien
     displayName: "Michael Essien"
     correctYear: 1982
@@ -780,13 +618,6 @@ items:
     correctYear: 1988
     probability: 82
     wikimediaSearchHints: ["Marcelo Vieira Brazilian left back Real Madrid 2014 2018 World Cup"]
-    answerMethods: ["timeline", "name-letters"]
-    genrePackages: ["pkg-fifa-wc"]
-  - id: son-heung-min
-    displayName: "Son Heung-min"
-    correctYear: 1992
-    probability: 86
-    wikimediaSearchHints: ["Son Heung-min South Korean striker Tottenham 2022 World Cup"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: vinicius-junior
@@ -867,12 +698,6 @@ items:
     wikimediaSearchHints: ["Diego Forlan footballer national team"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
-  - id: juan-roman-riquelme
-    displayName: "Juan Roman Riquelme"
-    correctYear: 1978
-    probability: 78
-    wikimediaSearchHints: ["Juan Roman Riquelme footballer national team"]
-    answerMethods: ["timeline", "name-letters"]
   - id: romelu-lukaku
     displayName: "Romelu Lukaku"
     correctYear: 1993
@@ -887,32 +712,11 @@ items:
     wikimediaSearchHints: ["Eden Hazard footballer national team"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
-  - id: park-ji-sung
-    displayName: "Park Ji Sung"
-    correctYear: 1981
-    probability: 78
-    wikimediaSearchHints: ["Park Ji Sung footballer national team"]
-    answerMethods: ["timeline", "name-letters"]
-    genrePackages: ["pkg-fifa-wc"]
   - id: hidetoshi-nakata
     displayName: "Hidetoshi Nakata"
     correctYear: 1977
     probability: 78
     wikimediaSearchHints: ["Hidetoshi Nakata footballer national team"]
-    answerMethods: ["timeline", "name-letters"]
-    genrePackages: ["pkg-fifa-wc"]
-  - id: keisuke-honda
-    displayName: "Keisuke Honda"
-    correctYear: 1986
-    probability: 78
-    wikimediaSearchHints: ["Keisuke Honda footballer national team"]
-    answerMethods: ["timeline", "name-letters"]
-    genrePackages: ["pkg-fifa-wc"]
-  - id: shinji-kagawa
-    displayName: "Shinji Kagawa"
-    correctYear: 1989
-    probability: 78
-    wikimediaSearchHints: ["Shinji Kagawa footballer national team"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: tim-cahill
@@ -927,27 +731,6 @@ items:
     correctYear: 1978
     probability: 78
     wikimediaSearchHints: ["Harry Kewell footballer national team"]
-    answerMethods: ["timeline", "name-letters"]
-    genrePackages: ["pkg-fifa-wc"]
-  - id: landon-donovan
-    displayName: "Landon Donovan"
-    correctYear: 1982
-    probability: 78
-    wikimediaSearchHints: ["Landon Donovan footballer national team"]
-    answerMethods: ["timeline", "name-letters"]
-    genrePackages: ["pkg-fifa-wc"]
-  - id: clint-dempsey
-    displayName: "Clint Dempsey"
-    correctYear: 1983
-    probability: 78
-    wikimediaSearchHints: ["Clint Dempsey footballer national team"]
-    answerMethods: ["timeline", "name-letters"]
-    genrePackages: ["pkg-fifa-wc"]
-  - id: radamel-falcao
-    displayName: "Radamel Falcao"
-    correctYear: 1986
-    probability: 78
-    wikimediaSearchHints: ["Radamel Falcao footballer national team"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: james-rodriguez
@@ -1095,13 +878,6 @@ items:
     probability: 78
     wikimediaSearchHints: ["Freddie Ljungberg footballer national team"]
     answerMethods: ["timeline", "name-letters"]
-  - id: asamoah-gyan
-    displayName: "Asamoah Gyan"
-    correctYear: 1985
-    probability: 78
-    wikimediaSearchHints: ["Asamoah Gyan footballer national team"]
-    answerMethods: ["timeline", "name-letters"]
-    genrePackages: ["pkg-fifa-wc"]
   - id: david-trezeguet
     displayName: "David Trezeguet"
     correctYear: 1977
@@ -1166,13 +942,6 @@ items:
     wikimediaSearchHints: ["Diego Costa footballer national team"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
-  - id: joaquin
-    displayName: "Joaquin"
-    correctYear: 1981
-    probability: 78
-    wikimediaSearchHints: ["Joaquin footballer national team"]
-    answerMethods: ["timeline", "name-letters"]
-    genrePackages: ["pkg-fifa-wc"]
   - id: frenkie-de-jong
     displayName: "Frenkie De Jong"
     correctYear: 1997
@@ -1234,20 +1003,6 @@ items:
     correctYear: 1993
     probability: 78
     wikimediaSearchHints: ["Raphael Varane footballer national team"]
-    answerMethods: ["timeline", "name-letters"]
-    genrePackages: ["pkg-fifa-wc"]
-  - id: aurelien-tchouameni
-    displayName: "Aurelien Tchouameni"
-    correctYear: 2000
-    probability: 78
-    wikimediaSearchHints: ["Aurelien Tchouameni footballer national team"]
-    answerMethods: ["timeline", "name-letters"]
-    genrePackages: ["pkg-fifa-wc"]
-  - id: jules-kounde
-    displayName: "Jules Kounde"
-    correctYear: 1998
-    probability: 78
-    wikimediaSearchHints: ["Jules Kounde footballer national team"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: esteban-cambiasso
@@ -1319,46 +1074,11 @@ items:
     wikimediaSearchHints: ["Bruno Fernandes footballer national team"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
-  - id: bernardo-silva
-    displayName: "Bernardo Silva"
-    correctYear: 1994
-    probability: 78
-    wikimediaSearchHints: ["Bernardo Silva footballer national team"]
-    answerMethods: ["timeline", "name-letters"]
-    genrePackages: ["pkg-fifa-wc"]
   - id: nani
     displayName: "Nani"
     correctYear: 1986
     probability: 78
     wikimediaSearchHints: ["Nani footballer national team"]
-    answerMethods: ["timeline", "name-letters"]
-    genrePackages: ["pkg-fifa-wc"]
-  - id: mario-mandzukic
-    displayName: "Mario Mandzukic"
-    correctYear: 1986
-    probability: 78
-    wikimediaSearchHints: ["Mario Mandzukic footballer national team"]
-    answerMethods: ["timeline", "name-letters"]
-    genrePackages: ["pkg-fifa-wc"]
-  - id: marcelo-brozovic
-    displayName: "Marcelo Brozovic"
-    correctYear: 1992
-    probability: 78
-    wikimediaSearchHints: ["Marcelo Brozovic footballer national team"]
-    answerMethods: ["timeline", "name-letters"]
-    genrePackages: ["pkg-fifa-wc"]
-  - id: andrej-kramaric
-    displayName: "Andrej Kramaric"
-    correctYear: 1991
-    probability: 78
-    wikimediaSearchHints: ["Andrej Kramaric footballer national team"]
-    answerMethods: ["timeline", "name-letters"]
-    genrePackages: ["pkg-fifa-wc"]
-  - id: shunsuke-nakamura
-    displayName: "Shunsuke Nakamura"
-    correctYear: 1978
-    probability: 78
-    wikimediaSearchHints: ["Shunsuke Nakamura footballer national team"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: julio-cesar

@@ -1,0 +1,62 @@
+# Svenska fotbollsspelare — klassisk era
+audience: ["elder", "gen-x"]
+region: ["sweden"]
+category: persons
+contentForm: image
+contentSubject: athlete
+items:
+  - id: gunnar-gren
+    displayName: Gunnar Gren
+    correctYear: 1920
+    probability: 80
+    wikimediaSearchHints: ["Gunnar Gren Swedish footballer"]
+    answerMethods: ["timeline", "name-letters"]
+    sensitivity: standard
+
+  - id: bjorn-nordqvist
+    displayName: Björn Nordqvist
+    correctYear: 1942
+    probability: 78
+    wikimediaSearchHints: ["Björn Nordqvist Swedish footballer"]
+    answerMethods: ["timeline", "name-letters"]
+    sensitivity: standard
+
+  - id: lennart-skoglund
+    displayName: Lennart Skoglund
+    correctYear: 1929
+    probability: 76
+    wikimediaSearchHints: ["Lennart Skoglund Swedish footballer"]
+    answerMethods: ["timeline", "name-letters"]
+    sensitivity: standard
+
+  - id: conny-torstensson
+    displayName: Conny Torstensson
+    correctYear: 1947
+    probability: 74
+    wikimediaSearchHints: ["Conny Torstensson Swedish footballer"]
+    answerMethods: ["timeline", "name-letters"]
+    sensitivity: standard
+
+  - id: ralf-edstrom
+    displayName: Ralf Edström
+    correctYear: 1952
+    probability: 76
+    wikimediaSearchHints: ["Ralf Edström Swedish footballer"]
+    answerMethods: ["timeline", "name-letters"]
+    sensitivity: standard
+
+  - id: torbjorn-nilsson
+    displayName: Torbjörn Nilsson
+    correctYear: 1960
+    probability: 74
+    wikimediaSearchHints: ["Torbjörn Nilsson Swedish footballer"]
+    answerMethods: ["timeline", "name-letters"]
+    sensitivity: standard
+
+  - id: glenn-stromberg
+    displayName: Glenn Strömberg
+    correctYear: 1960
+    probability: 76
+    wikimediaSearchHints: ["Glenn Strömberg Swedish footballer"]
+    answerMethods: ["timeline", "name-letters"]
+    sensitivity: standard

@@ -2026,26 +2026,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "chariots-of-fire-1981",
-    "displayName": "Chariots of Fire",
-    "correctYear": 1981,
-    "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
-    "audiences": [
-      "all"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "odtqtlhsv4E",
-        "startSec": 21,
-        "endSec": 36,
-        "channelTitle": "Rotten Tomatoes Classic Trailers",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (13)."
-      }
-    ]
-  },
-  {
     "id": "indiana-jones-raiders",
     "displayName": "Indiana Jones: Raiders of the Lost Ark",
     "correctYear": 1981,

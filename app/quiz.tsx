@@ -59,6 +59,7 @@ import { NameRevealCard } from '@/src/components/NameRevealCard';
 import { SketchCanvas } from '@/src/components/SketchCanvas';
 import { hasSketch, getQuizSketch } from '@/src/utils/quizSketches';
 import { generateRoomCode } from '@/src/utils/roomCode';
+import { addSeenQuestionIds, loadSeenQuestionIds } from '@/src/utils/hostQuestionHistory';
 import { hasPremiumSubscription } from '@/src/utils/subscriptionStorage';
 import { supabase } from '@/src/utils/supabase';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -177,6 +178,16 @@ const IMAGE_SEED_QUESTIONS: ImageQuestion[] = IMAGE_QUIZ_QUESTIONS.map(
     source: q,
   }),
 );
+
+// Fisher-Yates-shuffle — slumpar ordningen i en ny kopia utan att muttera originalet.
+function shuffleArray<T>(arr: T[]): T[] {
+  const out = [...arr];
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [out[i], out[j]] = [out[j], out[i]];
+  }
+  return out;
+}
 
 function getIntervalForAssistance(assistance: AssistanceLevel): number {
   if (assistance === 'minimal') return 0;
@@ -803,6 +814,14 @@ export default function QuizScreen() {
     [turnOrder],
   );
 
+  // Fråge-IDs som hosten sett i tidigare omgångar — laddas från AsyncStorage
+  // vid mount. Används av gameQuestions-useMemo för att ordna osedda frågor
+  // först. Startar tom; uppdateras asynkront inom ~50 ms (innan spelaren
+  // hinner trycka Play i GetReadyIntro).
+  // MÅSTE deklareras FÖRE gameQuestions-useMemo (TDZ-fel annars).
+  const [seenQuestionIds, setSeenQuestionIds] = useState<Set<string>>(new Set());
+  const savedSeenRef = useRef(false);
+
   const gameQuestions = useMemo<QuizQuestion[]>(() => {
     // Filter-hierarki (i ordning, från hård → mjuk):
     //   1. Source-toggle (youtubeEnabled / imagesEnabled) — HÅRD. Host:s val.
@@ -919,6 +938,55 @@ export default function QuizScreen() {
       return respectful.length > 0 ? respectful : SEED_QUESTIONS;
     }
 
+    // Prioritera frågor som hosten inte sett i tidigare spelomgångar.
+    // Delar upp poolen i osedda + sedda, slumpar varje grupp för sig,
+    // konkatenerar [osedda..., sedda...]. Cyklisk indexering nedan plockar
+    // då osedda frågor tills de tar slut — sedan åter sedda. Om seenQuestionIds
+    // är tom (första spelet eller inget konto) slumpas hela poolen.
+    const prioritiseUnseen = (pool: QuizQuestion[]): QuizQuestion[] => {
+      if (!seenQuestionIds.size) return shuffleArray(pool);
+      const unseen = shuffleArray(pool.filter((q) => !seenQuestionIds.has(q.id)));
+      const seen = shuffleArray(pool.filter((q) => seenQuestionIds.has(q.id)));
+      return [...unseen, ...seen];
+    };
+
+    // Fast kategori-ordning som används för både YouTube- och bild-poolerna:
+    // Musik → Film → Sport. Osedda frågor prioriteras per grupp, och grupp-
+    // ordningen är densamma i båda sektionerna av spelet.
+    // Om en kategori är avaktiverad av Host hoppas den gruppen över automatiskt
+    // (pool:en är redan filtrerad av filterByCategory ovan).
+    const CATEGORY_ORDER: MainCategory[] = ['Music', 'Film', 'Sport'];
+
+    const groupByCategory = (pool: QuizQuestion[]): QuizQuestion[] => {
+      const result: QuizQuestion[] = [];
+      for (const cat of CATEGORY_ORDER) {
+        if (!enabledMainCategories.includes(cat)) continue;
+        const catPool = pool.filter((q) => q.mainCategory === cat);
+        if (catPool.length) result.push(...prioritiseUnseen(catPool));
+      }
+      // Defensiv fallback: items utan mainCategory (capitals/places e.d.).
+      const uncategorized = pool.filter(
+        (q) => !q.mainCategory || !CATEGORY_ORDER.includes(q.mainCategory as MainCategory),
+      );
+      if (uncategorized.length) result.push(...prioritiseUnseen(uncategorized));
+      return result;
+    };
+
+    // YouTube: Musik-klipp → Film-klipp → Sport-klipp (osedda först per grupp).
+    // Om bilder är avaktiverade spelar intern ordning ingen roll — blanda fritt.
+    const orderedYoutubePool: QuizQuestion[] =
+      !hasYoutube ? [] :
+      !hasImage   ? prioritiseUnseen(youtubePool) :
+                    groupByCategory(youtubePool);
+
+    // Bilder: samma kategori-ordning (Musik → Film → Sport) som YouTube-sektionen
+    // så spelet känns konsekvent i sin resa igenom innehållstyperna.
+    // Om YouTube är avaktiverat spelar intern ordning ingen roll — blanda fritt.
+    const orderedImagePool: QuizQuestion[] =
+      !hasImage   ? [] :
+      !hasYoutube ? prioritiseUnseen(imagePool) :
+                    groupByCategory(imagePool);
+
     // Bygg pool täckande hela spelet utan modulo-cykling i UI-laget.
     //   Pass-the-Phone: questionsPerBlock = playerCount (alla spelare i ronden
     //     får varsin item av samma typ).
@@ -926,16 +994,48 @@ export default function QuizScreen() {
     //     samma fråga samtidigt → 1 item per rond totalt).
     const questionsPerBlock =
       gameMode === 'individual-devices' ? 1 : playerCount;
+    // Räkna ut hur tätt YouTube-block ska läggas in bland image-block.
+    // Baseras på faktisk pool-ratio efter filtrering: var N:e block är YouTube
+    // där N = round(imagePool / youtubePool), begränsad till [2, 4].
+    //
+    // Exempel med fullständiga pooler (327 YT, 1038 bilder):
+    //   N = round(1038 / 327) = round(3.17) = 3 → var 3:e block = ~33% YouTube
+    // Om era-filtret ger ungefär lika stora pooler (t.ex. 150 YT + 150 bilder):
+    //   N = round(1) = 1 → clampad till 2 → 50% YouTube
+    // Om YouTube är sparsamt efter filtrering (50 YT + 800 bilder):
+    //   N = round(16) → clampad till 4 → 25% YouTube
+    //
+    // Gränserna [2, 4] garanterar att YouTube aldrig dominerar (max 50%) och
+    // aldrig försvinner helt (minst 25%) oavsett hur era/audience-filtret slår.
+    const ytInterval =
+      hasYoutube && hasImage
+        ? Math.max(2, Math.min(4, Math.round(imagePool.length / youtubePool.length)))
+        : 1; // bara en typ tillgänglig — interval är irrelevant
+
+    // Antal YouTube-block (= ronder av YouTube-typ) i spelet. Samma total som
+    // den proportionella formeln ovan gav, men nu samlade i BÖRJAN av spelet
+    // följt av alla bildrunder i SLUTET. Formel: floor((N-1)/ytInterval) + 1
+    // ger exakt lika många YouTube-block som block % ytInterval === 0 hade
+    // spridit ut — räknar hur många multiplar av ytInterval som ryms i [0, N-1].
+    const ytBlockCount =
+      hasYoutube && hasImage
+        ? Math.floor((totalRounds - 1) / ytInterval) + 1
+        : hasYoutube
+          ? totalRounds
+          : 0;
+
     const mixed: QuizQuestion[] = [];
     for (let block = 0; block < totalRounds; block++) {
-      // Alternera YouTube ↔ image per block. Om bara en typ finns, använd alltid den.
+      // YouTube-block först (block < ytBlockCount), sedan bilder. Om bara en
+      // typ finns används den alltid.
       const isYoutubeBlock = hasYoutube && hasImage
-        ? block % 2 === 0
+        ? block < ytBlockCount
         : hasYoutube;
-      const pool = isYoutubeBlock ? youtubePool : imagePool;
+      const pool = isYoutubeBlock ? orderedYoutubePool : orderedImagePool;
       // Cyklisk indexering inom poolen — items kan upprepas om pool < block*players,
       // men varje block:s spelare får olika items (det är det viktiga för
-      // round-paritet).
+      // round-paritet). Med unseen-first-ordningen innebär cycling att osedda
+      // items alltid plockas före sedda.
       for (let q = 0; q < questionsPerBlock; q++) {
         const idx = (block * questionsPerBlock + q) % pool.length;
         mixed.push(pool[idx]);
@@ -946,7 +1046,9 @@ export default function QuizScreen() {
     // varje spelares age — byten av spelare inom samma längd ska re-bygga
     // poolen. turnOrder är själv ett useMemo så objektidentiteten ändras bara
     // när URL-params (players-json) faktiskt ändras.
-  }, [eraFrom, eraTo, turnOrder, totalRounds, youtubeEnabled, imagesEnabled, gameMode, enabledMainCategories]);
+    // seenQuestionIds: uppdateras asynkront vid mount + vid spelets slut;
+    // triggerar re-beräkning som prioriterar nya osedda frågor nästa omgång.
+  }, [eraFrom, eraTo, turnOrder, totalRounds, youtubeEnabled, imagesEnabled, gameMode, enabledMainCategories, seenQuestionIds]);
 
   // Media-källa per fråga (driver GetReadyIntro:s IndDev media-kö).
   // Image-frågor → 'image'; timeline-frågor (YouTube-content idag, men
@@ -1067,6 +1169,15 @@ export default function QuizScreen() {
   // analytics-vendor:n på dashboard-sidan, behöver inte skickas här.
   useEffect(() => {
     track('game_started', { assistance: fallbackAssistance });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Ladda Host:s tidigare sedda fråge-IDs från AsyncStorage. Sker asynkront
+  // men klart innan spelaren hinner trycka Play i GetReadyIntro (~50 ms).
+  // Uppdaterar seenQuestionIds vilket triggerar gameQuestions-useMemo att
+  // räkna om med korrekt unseen-prioritering.
+  useEffect(() => {
+    loadSeenQuestionIds().then(setSeenQuestionIds);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -1571,6 +1682,20 @@ export default function QuizScreen() {
     const id = setInterval(tick, 50);
     return () => clearInterval(id);
   }, [phase, questionIndex, responseSeconds]);
+
+  // Spara alla unika fråge-IDs i denna omgång när spelet är klart.
+  // savedSeenRef förhindrar dubbelskrivning om effekten av någon anledning
+  // re-fyrar. seenQuestionIds-state uppdateras lokalt också så nästa Play
+  // Again direkt i samma session redan ser de nyss spelade frågorna.
+  useEffect(() => {
+    if (phase !== 'leaderboard' || savedSeenRef.current) return;
+    savedSeenRef.current = true;
+    const playedIds = [...new Set(gameQuestions.map((q) => q.id))];
+    addSeenQuestionIds(playedIds).then(() =>
+      setSeenQuestionIds((prev) => new Set([...prev, ...playedIds])),
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase]);
 
   // "Kan användaren confirma just nu?" — discriminerad-union-helper.
   // Musik: pendingYear satt. Bild: pendingNameOption satt.
@@ -2569,6 +2694,14 @@ export default function QuizScreen() {
           text: 'Quit game',
           style: 'destructive',
           onPress: async () => {
+            // Spara frågor som visats hittills (index 0 till questionIndex-1)
+            // så hosten inte ser dem igen vid nästa spelstart.
+            if (questionIndex > 0) {
+              const playedIds = [
+                ...new Set(gameQuestions.slice(0, questionIndex).map((q) => q.id)),
+              ];
+              await addSeenQuestionIds(playedIds);
+            }
             const code = params.roomCode;
             if (code) {
               await deactivateRoom(code);

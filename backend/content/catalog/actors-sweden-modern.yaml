@@ -159,3 +159,51 @@ items:
     peakTo: 2022
     wikimediaSearchHints: ["Eva Melander actress"]
     answerMethods: ["name-letters"]
+  - id: rakel-warmlander
+    displayName: "Rakel Wärmländer"
+    correctYear: 1986
+    peakFrom: 2010
+    peakTo: 2024
+    probability: 68
+    wikimediaSearchHints: ["Rakel Wärmländer Swedish actress"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: vilhelm-blomgren
+    displayName: "Vilhelm Blomgren"
+    correctYear: 1995
+    peakFrom: 2018
+    peakTo: 2024
+    probability: 66
+    wikimediaSearchHints: ["Vilhelm Blomgren Swedish actor Midsommar"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: bianca-kronlof
+    displayName: "Bianca Kronlöf"
+    correctYear: 1984
+    peakFrom: 2010
+    peakTo: 2024
+    probability: 68
+    wikimediaSearchHints: ["Bianca Kronlöf Swedish actress"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: josephine-bornebusch
+    displayName: "Josephine Bornebusch"
+    correctYear: 1981
+    peakFrom: 2006
+    peakTo: 2024
+    probability: 70
+    wikimediaSearchHints: ["Josephine Bornebusch Swedish actress"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: alexandra-rapaport
+    displayName: "Alexandra Rapaport"
+    correctYear: 1974
+    peakFrom: 2003
+    peakTo: 2024
+    probability: 70
+    wikimediaSearchHints: ["Alexandra Rapaport Swedish actress"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: nour-el-refai
+    displayName: "Nour El Refai"
+    correctYear: 1980
+    peakFrom: 2005
+    peakTo: 2024
+    probability: 70
+    wikimediaSearchHints: ["Nour El Refai Swedish comedian actress"]
+    answerMethods: ["timeline", "name-letters"]

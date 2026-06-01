@@ -112,22 +112,6 @@ items:
     probability: 88
     wikimediaSearchHints: ["Dolly Parton singer country"]
     answerMethods: ["timeline", "name-letters"]
-  - id: joni-mitchell
-    displayName: "Joni Mitchell"
-    correctYear: 1943
-    peakFrom: 1968
-    peakTo: 2024
-    probability: 80
-    wikimediaSearchHints: ["Joni Mitchell singer"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: james-taylor
-    displayName: "James Taylor"
-    correctYear: 1948
-    peakFrom: 1970
-    peakTo: 2024
-    probability: 78
-    wikimediaSearchHints: ["James Taylor singer songwriter"]
-    answerMethods: ["timeline", "name-letters"]
   - id: carole-king
     displayName: "Carole King"
     correctYear: 1942
@@ -143,14 +127,6 @@ items:
     peakTo: 2016
     probability: 80
     wikimediaSearchHints: ["Leonard Cohen singer songwriter"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: neil-young
-    displayName: "Neil Young"
-    correctYear: 1945
-    peakFrom: 1969
-    peakTo: 2024
-    probability: 82
-    wikimediaSearchHints: ["Neil Young musician"]
     answerMethods: ["timeline", "name-letters"]
   - id: roy-orbison
     displayName: "Roy Orbison"
@@ -224,14 +200,6 @@ items:
     probability: 78
     wikimediaSearchHints: ["Sam Cooke singer"]
     answerMethods: ["timeline", "name-letters"]
-  - id: hank-williams
-    displayName: "Hank Williams"
-    correctYear: 1923
-    peakFrom: 1947
-    peakTo: 1953
-    probability: 78
-    wikimediaSearchHints: ["Hank Williams country singer"]
-    answerMethods: ["timeline", "name-letters"]
   - id: chuck-berry
     displayName: "Chuck Berry"
     correctYear: 1926
@@ -255,22 +223,6 @@ items:
     peakTo: 2023
     probability: 78
     wikimediaSearchHints: ["Harry Belafonte singer"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: lena-horne
-    displayName: "Lena Horne"
-    correctYear: 1917
-    peakFrom: 1942
-    peakTo: 2010
-    probability: 72
-    wikimediaSearchHints: ["Lena Horne singer"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: eartha-kitt
-    displayName: "Eartha Kitt"
-    correctYear: 1927
-    peakFrom: 1952
-    peakTo: 2008
-    probability: 72
-    wikimediaSearchHints: ["Eartha Kitt singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: donna-summer
     displayName: "Donna Summer"
@@ -408,4 +360,20 @@ items:
     correctYear: 1947
     probability: 84
     wikimediaSearchHints: ["Björn Skifs Swedish singer Hooked on a Feeling Eurovision"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: mick-jagger
+    displayName: "Mick Jagger"
+    correctYear: 1943
+    peakFrom: 1962
+    peakTo: 2024
+    probability: 90
+    wikimediaSearchHints: ["Mick Jagger Rolling Stones singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: steven-tyler
+    displayName: "Steven Tyler"
+    correctYear: 1948
+    peakFrom: 1973
+    peakTo: 2024
+    probability: 85
+    wikimediaSearchHints: ["Steven Tyler Aerosmith singer"]
     answerMethods: ["timeline", "name-letters"]

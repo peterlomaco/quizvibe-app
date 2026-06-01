@@ -23,6 +23,7 @@
     "sketch-vectorize": "tsx sketch/vectorize.ts",
     "sync-quiz-sketches": "tsx scripts/sync-quiz-sketches.ts",
     "review-quiz-images": "tsx scripts/review-quiz-images.ts",
+    "review-non-swedish-images": "tsx scripts/review-non-swedish-images.ts",
     "build": "tsc"
   },
   "dependencies": {

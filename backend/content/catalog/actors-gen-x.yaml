@@ -174,14 +174,6 @@ items:
     probability: 82
     wikimediaSearchHints: ["Goldie Hawn actress"]
     answerMethods: ["timeline", "name-letters"]
-  - id: jeff-bridges
-    displayName: "Jeff Bridges"
-    correctYear: 1949
-    peakFrom: 1972
-    peakTo: 2002
-    probability: 80
-    wikimediaSearchHints: ["Jeff Bridges actor"]
-    answerMethods: ["timeline", "name-letters"]
   - id: liam-neeson
     displayName: "Liam Neeson"
     correctYear: 1952
@@ -229,14 +221,6 @@ items:
     peakTo: 2001
     probability: 90
     wikimediaSearchHints: ["Samuel L Jackson actor"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: helena-bonham-carter
-    displayName: "Helena Bonham Carter"
-    correctYear: 1966
-    peakFrom: 1989
-    peakTo: 2019
-    probability: 80
-    wikimediaSearchHints: ["Helena Bonham Carter actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: kevin-costner
     displayName: "Kevin Costner"
@@ -342,14 +326,6 @@ items:
     probability: 82
     wikimediaSearchHints: ["Gary Oldman actor"]
     answerMethods: ["timeline", "name-letters"]
-  - id: kurt-russell
-    displayName: "Kurt Russell"
-    correctYear: 1951
-    peakFrom: 1974
-    peakTo: 2004
-    probability: 78
-    wikimediaSearchHints: ["Kurt Russell actor"]
-    answerMethods: ["timeline", "name-letters"]
   - id: burt-reynolds
     displayName: "Burt Reynolds"
     correctYear: 1936
@@ -357,22 +333,6 @@ items:
     peakTo: 1989
     probability: 80
     wikimediaSearchHints: ["Burt Reynolds actor"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: donald-sutherland
-    displayName: "Donald Sutherland"
-    correctYear: 1935
-    peakFrom: 1958
-    peakTo: 1988
-    probability: 80
-    wikimediaSearchHints: ["Donald Sutherland actor"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: warren-beatty
-    displayName: "Warren Beatty"
-    correctYear: 1937
-    peakFrom: 1960
-    peakTo: 1990
-    probability: 78
-    wikimediaSearchHints: ["Warren Beatty actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: sharon-stone
     displayName: "Sharon Stone"
@@ -438,14 +398,6 @@ items:
     probability: 75
     wikimediaSearchHints: ["Faye Dunaway actress"]
     answerMethods: ["timeline", "name-letters"]
-  - id: john-malkovich
-    displayName: "John Malkovich"
-    correctYear: 1953
-    peakFrom: 1976
-    peakTo: 2006
-    probability: 80
-    wikimediaSearchHints: ["John Malkovich actor"]
-    answerMethods: ["timeline", "name-letters"]
   - id: kevin-bacon
     displayName: "Kevin Bacon"
     correctYear: 1958
@@ -470,30 +422,6 @@ items:
     probability: 88
     wikimediaSearchHints: ["John Cleese actor Monty Python"]
     answerMethods: ["timeline", "name-letters"]
-  - id: ron-howard
-    displayName: "Ron Howard"
-    correctYear: 1954
-    peakFrom: 1977
-    peakTo: 2007
-    probability: 80
-    wikimediaSearchHints: ["Ron Howard director actor"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: kenneth-branagh
-    displayName: "Kenneth Branagh"
-    correctYear: 1960
-    peakFrom: 1983
-    peakTo: 2013
-    probability: 78
-    wikimediaSearchHints: ["Kenneth Branagh actor director"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: jim-broadbent
-    displayName: "Jim Broadbent"
-    correctYear: 1949
-    peakFrom: 1972
-    peakTo: 2002
-    probability: 72
-    wikimediaSearchHints: ["Jim Broadbent actor"]
-    answerMethods: ["timeline", "name-letters"]
   - id: jodie-foster
     displayName: "Jodie Foster"
     correctYear: 1962
@@ -502,15 +430,6 @@ items:
     probability: 88
     wikimediaSearchHints: ["Jodie Foster actress"]
     answerMethods: ["timeline", "name-letters"]
-  - id: helen-mirren
-    displayName: "Helen Mirren"
-    correctYear: 1945
-    peakFrom: 1968
-    peakTo: 1998
-    probability: 85
-    wikimediaSearchHints: ["Helen Mirren actress"]
-    answerMethods: ["timeline", "name-letters"]
-  # === Svenska expansion 2026-05-27 ===
   - id: stellan-skarsgard
     displayName: "Stellan Skarsgård"
     correctYear: 1951
@@ -592,15 +511,6 @@ items:
     probability: 70
     wikimediaSearchHints: ["Brian Bosworth NFL linebacker actor Stone Cold"]
     answerMethods: ["timeline", "name-letters"]
-  - id: terry-crews
-    displayName: "Terry Crews"
-    correctYear: 1968
-    peakFrom: 1991
-    peakTo: 2021
-    probability: 80
-    wikimediaSearchHints: ["Terry Crews NFL actor Brooklyn Nine-Nine Expendables"]
-    answerMethods: ["timeline", "name-letters"]
-  # === Batch B 2026-05-27 — svenska SVT-personligheter ===
   - id: lasse-brandeby
     displayName: "Lasse Brandeby"
     correctYear: 1945
@@ -642,20 +552,4 @@ items:
     peakTo: 2022
     probability: 84
     wikimediaSearchHints: ["Paul Rudd actor Ant-Man Friends Anchorman"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: jason-bateman
-    displayName: "Jason Bateman"
-    correctYear: 1969
-    peakFrom: 1992
-    peakTo: 2022
-    probability: 80
-    wikimediaSearchHints: ["Jason Bateman actor Arrested Development Ozark"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: kevin-hart
-    displayName: "Kevin Hart"
-    correctYear: 1979
-    peakFrom: 2002
-    peakTo: 2026
-    probability: 86
-    wikimediaSearchHints: ["Kevin Hart comedian actor Jumanji Ride Along"]
     answerMethods: ["timeline", "name-letters"]

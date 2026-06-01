@@ -33,12 +33,6 @@ items:
     probability: 90
     wikimediaSearchHints: ["Pink Floyd band"]
     answerMethods: ["timeline", "name-letters"]
-  - id: rolling-stones
-    displayName: "The Rolling Stones"
-    correctYear: 1962
-    probability: 92
-    wikimediaSearchHints: ["The Rolling Stones band Mick Jagger"]
-    answerMethods: ["timeline", "name-letters"]
   - id: led-zeppelin
     displayName: "Led Zeppelin"
     correctYear: 1968
@@ -93,23 +87,11 @@ items:
     probability: 90
     wikimediaSearchHints: ["Coldplay band Chris Martin"]
     answerMethods: ["timeline", "name-letters"]
-  - id: aerosmith
-    displayName: "Aerosmith"
-    correctYear: 1970
-    probability: 85
-    wikimediaSearchHints: ["Aerosmith band Steven Tyler"]
-    answerMethods: ["timeline", "name-letters"]
   - id: the-doors
     displayName: "The Doors"
     correctYear: 1965
     probability: 85
     wikimediaSearchHints: ["The Doors band Jim Morrison"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: foo-fighters
-    displayName: "Foo Fighters"
-    correctYear: 1994
-    probability: 88
-    wikimediaSearchHints: ["Foo Fighters band Dave Grohl"]
     answerMethods: ["timeline", "name-letters"]
   - id: arctic-monkeys
     displayName: "Arctic Monkeys"
@@ -129,35 +111,17 @@ items:
     probability: 85
     wikimediaSearchHints: ["The Police band Sting"]
     answerMethods: ["timeline", "name-letters"]
-  - id: dire-straits
-    displayName: "Dire Straits"
-    correctYear: 1977
-    probability: 85
-    wikimediaSearchHints: ["Dire Straits band"]
-    answerMethods: ["timeline", "name-letters"]
   - id: kiss
     displayName: "Kiss"
     correctYear: 1973
     probability: 82
     wikimediaSearchHints: ["Kiss band rock"]
     answerMethods: ["timeline", "name-letters"]
-  - id: def-leppard
-    displayName: "Def Leppard"
-    correctYear: 1977
-    probability: 82
-    wikimediaSearchHints: ["Def Leppard band"]
-    answerMethods: ["timeline", "name-letters"]
   - id: genesis
     displayName: "Genesis"
     correctYear: 1967
     probability: 82
     wikimediaSearchHints: ["Genesis Phil Collins band"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: depeche-mode
-    displayName: "Depeche Mode"
-    correctYear: 1980
-    probability: 85
-    wikimediaSearchHints: ["Depeche Mode"]
     answerMethods: ["timeline", "name-letters"]
   - id: the-smiths
     displayName: "The Smiths"
@@ -212,19 +176,6 @@ items:
     correctYear: 1986
     probability: 92
     wikimediaSearchHints: ["Roxette band Sweden"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: ace-of-base
-    displayName: "Ace of Base"
-    correctYear: 1990
-    probability: 90
-    wikimediaSearchHints: ["Ace of Base Sweden band"]
-    answerMethods: ["timeline", "name-letters"]
-  # === Svenska expansion 2026-05-27 ===
-  - id: europe
-    displayName: "Europe"
-    correctYear: 1979
-    probability: 88
-    wikimediaSearchHints: ["Europe Swedish rock band Final Countdown Joey Tempest"]
     answerMethods: ["timeline", "name-letters"]
   - id: kent
     displayName: "Kent"
@@ -293,13 +244,6 @@ items:
     probability: 76
     wikimediaSearchHints: ["Lasse Stefanz Swedish dansband Cabaret"]
     answerMethods: ["timeline", "name-letters"]
-  - id: wizex
-    displayName: "Wizex"
-    correctYear: 1973
-    probability: 70
-    wikimediaSearchHints: ["Wizex Swedish dansband Kikki Danielsson"]
-    answerMethods: ["timeline", "name-letters"]
-  # === Vemod-batch 2026-05-27 — svenska indie/rock/melankoli/80-tal ===
   - id: first-aid-kit
     displayName: "First Aid Kit"
     correctYear: 2007
@@ -311,18 +255,6 @@ items:
     correctYear: 2002
     probability: 74
     wikimediaSearchHints: ["Familjen Swedish electro band Johan T Karlsson Det snurrar"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: eldkvarn
-    displayName: "Eldkvarn"
-    correctYear: 1971
-    probability: 78
-    wikimediaSearchHints: ["Eldkvarn Swedish rock band Plura Jonsson"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: imperiet
-    displayName: "Imperiet"
-    correctYear: 1982
-    probability: 80
-    wikimediaSearchHints: ["Imperiet Swedish rock band Thåström Ebba Grön"]
     answerMethods: ["timeline", "name-letters"]
   - id: nationalteatern
     displayName: "Nationalteatern"
@@ -341,12 +273,6 @@ items:
     correctYear: 1980
     probability: 78
     wikimediaSearchHints: ["Ratata Swedish synth pop band Mauro Scocco"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: docenterna
-    displayName: "Docenterna"
-    correctYear: 1981
-    probability: 70
-    wikimediaSearchHints: ["Docenterna Swedish rock band Anders Glenmark"]
     answerMethods: ["timeline", "name-letters"]
   - id: lolita-pop
     displayName: "Lolita Pop"
@@ -379,12 +305,6 @@ items:
     probability: 82
     wikimediaSearchHints: ["Galantis Swedish electronic duo Runaway Christian Karlsson"]
     answerMethods: ["timeline", "name-letters"]
-  - id: cazzette
-    displayName: "Cazzette"
-    correctYear: 2010
-    probability: 72
-    wikimediaSearchHints: ["Cazzette Swedish electronic duo Alexander Björklund Sebastian Furrer"]
-    answerMethods: ["timeline", "name-letters"]
   - id: tjuvjakt
     displayName: "Tjuvjakt"
     correctYear: 2012
@@ -409,39 +329,18 @@ items:
     probability: 82
     wikimediaSearchHints: ["Ylvis Norwegian duo What Does the Fox Say"]
     answerMethods: ["timeline", "name-letters"]
-  - id: d-a-d
-    displayName: "D-A-D"
-    correctYear: 1982
-    probability: 74
-    wikimediaSearchHints: ["D-A-D Disneyland After Dark Danish rock band Sleeping My Day Away"]
-    answerMethods: ["timeline", "name-letters"]
-  # === Batch C 2026-05-27 — international 80s/90s-band ===
   - id: wham
     displayName: "Wham!"
     correctYear: 1981
     probability: 88
     wikimediaSearchHints: ["Wham band George Michael Andrew Ridgeley Last Christmas"]
     answerMethods: ["timeline", "name-letters"]
-  - id: duran-duran
-    displayName: "Duran Duran"
-    correctYear: 1978
-    probability: 86
-    wikimediaSearchHints: ["Duran Duran band Birmingham new wave Hungry Like the Wolf"]
-    answerMethods: ["timeline", "name-letters"]
-  # === Komplettering 2026-05-27 — svenska + internationella band ===
   - id: gyllene-tider
     displayName: "Gyllene Tider"
     correctYear: 1977
     probability: 92
     wikimediaSearchHints: ["Gyllene Tider Swedish pop rock band Per Gessle"]
     answerMethods: ["timeline", "name-letters"]
-  - id: ghost
-    displayName: "Ghost"
-    correctYear: 2006
-    probability: 85
-    wikimediaSearchHints: ["Ghost Swedish band Tobias Forge Papa Emeritus rock"]
-    answerMethods: ["timeline", "name-letters"]
-    audience: ["millennials", "gen-z"]
   - id: journey
     displayName: "Journey"
     correctYear: 1973

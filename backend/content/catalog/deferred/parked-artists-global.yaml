@@ -1,0 +1,188 @@
+# Parkerade artister — väntar på global-scope (v1.x)
+# Återaktivera: flytta item(s) till rätt audience-fil,
+# kör export-image-questions + uppdatera quizImages.ts
+audience: ["all"]
+region: ["global"]
+category: artists
+contentForm: image
+contentSubject: artist
+items:
+  - id: joni-mitchell
+    displayName: "Joni Mitchell"
+    correctYear: 1943
+    peakFrom: 1968
+    peakTo: 2024
+    probability: 80
+    wikimediaSearchHints: ["Joni Mitchell singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: james-taylor
+    displayName: "James Taylor"
+    correctYear: 1948
+    peakFrom: 1970
+    peakTo: 2024
+    probability: 78
+    wikimediaSearchHints: ["James Taylor singer songwriter"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: neil-young
+    displayName: "Neil Young"
+    correctYear: 1945
+    peakFrom: 1969
+    peakTo: 2024
+    probability: 82
+    wikimediaSearchHints: ["Neil Young musician"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: hank-williams
+    displayName: "Hank Williams"
+    correctYear: 1923
+    peakFrom: 1947
+    peakTo: 1953
+    probability: 78
+    wikimediaSearchHints: ["Hank Williams country singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: lena-horne
+    displayName: "Lena Horne"
+    correctYear: 1917
+    peakFrom: 1942
+    peakTo: 2010
+    probability: 72
+    wikimediaSearchHints: ["Lena Horne singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: eartha-kitt
+    displayName: "Eartha Kitt"
+    correctYear: 1927
+    peakFrom: 1952
+    peakTo: 2008
+    probability: 72
+    wikimediaSearchHints: ["Eartha Kitt singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: sade
+    displayName: "Sade"
+    correctYear: 1959
+    peakFrom: 1984
+    peakTo: 2024
+    probability: 80
+    wikimediaSearchHints: ["Sade singer", "Sade Adu"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: pat-benatar
+    displayName: "Pat Benatar"
+    correctYear: 1953
+    peakFrom: 1979
+    peakTo: 2024
+    probability: 75
+    wikimediaSearchHints: ["Pat Benatar singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: bryan-ferry
+    displayName: "Bryan Ferry"
+    correctYear: 1945
+    peakFrom: 1971
+    peakTo: 2024
+    probability: 75
+    wikimediaSearchHints: ["Bryan Ferry Roxy Music"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: don-henley
+    displayName: "Don Henley"
+    correctYear: 1947
+    peakFrom: 1971
+    peakTo: 2024
+    probability: 78
+    wikimediaSearchHints: ["Don Henley Eagles musician"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: garth-brooks
+    displayName: "Garth Brooks"
+    correctYear: 1962
+    peakFrom: 1989
+    peakTo: 2024
+    probability: 78
+    wikimediaSearchHints: ["Garth Brooks country singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: adna
+    displayName: "Adna"
+    correctYear: 1989
+    probability: 66
+    wikimediaSearchHints: ["Adna Kadic Swedish singer indie folk"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: aurora-aksnes
+    displayName: "Aurora"
+    correctYear: 1996
+    probability: 78
+    wikimediaSearchHints: ["Aurora Aksnes Norwegian singer Runaway Frozen"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: aura-dione
+    displayName: "Aura Dione"
+    correctYear: 1985
+    probability: 72
+    wikimediaSearchHints: ["Aura Dione Danish singer Friends Geronimo"]
+    answerMethods: ["timeline", "name-letters"]
+  # === Batch B 2026-05-27 — kvinnliga svenska sångerskor + cross-nordic ===
+  - id: hayley-williams
+    displayName: "Hayley Williams"
+    correctYear: 1988
+    peakFrom: 2004
+    peakTo: 2024
+    probability: 75
+    wikimediaSearchHints: ["Hayley Williams Paramore"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: j-balvin
+    displayName: "J Balvin"
+    correctYear: 1985
+    peakFrom: 2009
+    peakTo: 2024
+    probability: 78
+    wikimediaSearchHints: ["J Balvin reggaeton"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: anitta
+    displayName: "Anitta"
+    correctYear: 1993
+    peakFrom: 2013
+    peakTo: 2024
+    probability: 72
+    wikimediaSearchHints: ["Anitta singer Brazil"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: lizzo
+    displayName: "Lizzo"
+    correctYear: 1988
+    peakFrom: 2013
+    peakTo: 2024
+    probability: 80
+    wikimediaSearchHints: ["Lizzo singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: halsey
+    displayName: "Halsey"
+    correctYear: 1994
+    peakFrom: 2015
+    peakTo: 2024
+    probability: 80
+    wikimediaSearchHints: ["Halsey singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: maluma
+    displayName: "Maluma"
+    correctYear: 1994
+    peakFrom: 2014
+    peakTo: 2024
+    probability: 75
+    wikimediaSearchHints: ["Maluma singer Colombia"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: jack-harlow
+    displayName: "Jack Harlow"
+    correctYear: 1998
+    peakFrom: 2020
+    peakTo: 2024
+    probability: 72
+    wikimediaSearchHints: ["Jack Harlow rapper"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: bjork
+    displayName: "Björk"
+    correctYear: 1965
+    peakFrom: 1988
+    peakTo: 2024
+    probability: 82
+    wikimediaSearchHints: ["Björk singer Iceland"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: andrea-bocelli
+    displayName: "Andrea Bocelli"
+    correctYear: 1958
+    peakFrom: 1992
+    peakTo: 2024
+    probability: 90
+    wikimediaSearchHints: ["Andrea Bocelli tenor"]
+    answerMethods: ["timeline", "name-letters"]

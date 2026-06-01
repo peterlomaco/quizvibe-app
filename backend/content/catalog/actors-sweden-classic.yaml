@@ -5,13 +5,6 @@ category: actors
 contentForm: image
 contentSubject: actor
 items:
-  - id: peter-haber
-    displayName: "Peter Haber"
-    probability: 80
-    peakFrom: 1997
-    peakTo: 2018
-    wikimediaSearchHints: ["Peter Haber actor Beck"]
-    answerMethods: ["name-letters"]
   - id: johan-rheborg
     displayName: "Johan Rheborg"
     probability: 78
@@ -180,3 +173,91 @@ items:
     peakTo: 2015
     wikimediaSearchHints: ["Suzanne Axell programledare"]
     answerMethods: ["name-letters"]
+  - id: margaretha-krook
+    displayName: "Margaretha Krook"
+    correctYear: 1925
+    peakFrom: 1950
+    peakTo: 2001
+    probability: 78
+    wikimediaSearchHints: ["Margaretha Krook Swedish actress"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: harriet-andersson
+    displayName: "Harriet Andersson"
+    correctYear: 1932
+    peakFrom: 1952
+    peakTo: 2020
+    probability: 76
+    wikimediaSearchHints: ["Harriet Andersson Swedish actress Ingmar Bergman"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: liv-ullmann
+    displayName: "Liv Ullmann"
+    correctYear: 1938
+    peakFrom: 1966
+    peakTo: 2010
+    probability: 78
+    wikimediaSearchHints: ["Liv Ullmann Norwegian actress Bergman"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: nils-poppe
+    displayName: "Nils Poppe"
+    correctYear: 1908
+    peakFrom: 1930
+    peakTo: 1990
+    probability: 72
+    wikimediaSearchHints: ["Nils Poppe Swedish actor comedian"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: johannes-brost
+    displayName: "Johannes Brost"
+    correctYear: 1954
+    peakFrom: 1980
+    peakTo: 2020
+    probability: 74
+    wikimediaSearchHints: ["Johannes Brost Swedish actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: rikard-wolff
+    displayName: "Rikard Wolff"
+    correctYear: 1958
+    peakFrom: 1985
+    peakTo: 2007
+    probability: 72
+    wikimediaSearchHints: ["Rikard Wolff Swedish actor singer"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: rolf-skoglund
+    displayName: "Rolf Skoglund"
+    correctYear: 1949
+    peakFrom: 1975
+    peakTo: 2010
+    probability: 72
+    wikimediaSearchHints: ["Rolf Skoglund Swedish actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: mans-herngren
+    displayName: "Måns Herngren"
+    correctYear: 1960
+    peakFrom: 1990
+    peakTo: 2020
+    probability: 74
+    wikimediaSearchHints: ["Måns Herngren Swedish director actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: peter-dalle
+    displayName: "Peter Dalle"
+    correctYear: 1965
+    peakFrom: 1990
+    peakTo: 2020
+    probability: 74
+    wikimediaSearchHints: ["Peter Dalle Swedish comedian actor"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: ewa-froling
+    displayName: "Ewa Fröling"
+    correctYear: 1952
+    peakFrom: 1978
+    peakTo: 2010
+    probability: 72
+    wikimediaSearchHints: ["Ewa Fröling Swedish actress Bergman"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: ing-marie-carlsson
+    displayName: "Ing-Marie Carlsson"
+    correctYear: 1963
+    peakFrom: 1988
+    peakTo: 2015
+    probability: 70
+    wikimediaSearchHints: ["Ing-Marie Carlsson Swedish actress"]
+    answerMethods: ["timeline", "name-letters"]

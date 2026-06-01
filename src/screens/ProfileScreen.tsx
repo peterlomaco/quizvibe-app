@@ -1167,7 +1167,7 @@ export default function ProfileScreen() {
                     ]}
                   >
                     <View style={[styles.mainCategoryFreeBadge, !isActive && styles.mainCategoryFreeBadgeGrey]}>
-                      <Text style={[styles.mainCategoryFreeBadgeText, !isActive && styles.mainCategoryFreeBadgeTextGrey]}>Free</Text>
+                      <Text style={[styles.mainCategoryFreeBadgeText, !isActive && styles.mainCategoryFreeBadgeTextGrey]}>FREE</Text>
                     </View>
                     <Text
                       style={[

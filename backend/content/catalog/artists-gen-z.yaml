@@ -189,30 +189,6 @@ items:
     probability: 80
     wikimediaSearchHints: ["Camila Cabello singer"]
     answerMethods: ["timeline", "name-letters"]
-  - id: hayley-williams
-    displayName: "Hayley Williams"
-    correctYear: 1988
-    peakFrom: 2004
-    peakTo: 2024
-    probability: 75
-    wikimediaSearchHints: ["Hayley Williams Paramore"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: j-balvin
-    displayName: "J Balvin"
-    correctYear: 1985
-    peakFrom: 2009
-    peakTo: 2024
-    probability: 78
-    wikimediaSearchHints: ["J Balvin reggaeton"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: anitta
-    displayName: "Anitta"
-    correctYear: 1993
-    peakFrom: 2013
-    peakTo: 2024
-    probability: 72
-    wikimediaSearchHints: ["Anitta singer Brazil"]
-    answerMethods: ["timeline", "name-letters"]
   - id: megan-thee-stallion
     displayName: "Megan Thee Stallion"
     correctYear: 1995
@@ -221,14 +197,6 @@ items:
     probability: 78
     wikimediaSearchHints: ["Megan Thee Stallion rapper"]
     answerMethods: ["timeline", "name-letters"]
-  - id: lizzo
-    displayName: "Lizzo"
-    correctYear: 1988
-    peakFrom: 2013
-    peakTo: 2024
-    probability: 80
-    wikimediaSearchHints: ["Lizzo singer"]
-    answerMethods: ["timeline", "name-letters"]
   - id: sabrina-carpenter
     displayName: "Sabrina Carpenter"
     correctYear: 1999
@@ -236,14 +204,6 @@ items:
     peakTo: 2024
     probability: 78
     wikimediaSearchHints: ["Sabrina Carpenter singer"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: halsey
-    displayName: "Halsey"
-    correctYear: 1994
-    peakFrom: 2015
-    peakTo: 2024
-    probability: 80
-    wikimediaSearchHints: ["Halsey singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: lewis-capaldi
     displayName: "Lewis Capaldi"
@@ -260,20 +220,4 @@ items:
     peakTo: 2024
     probability: 80
     wikimediaSearchHints: ["Lil Nas X rapper"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: maluma
-    displayName: "Maluma"
-    correctYear: 1994
-    peakFrom: 2014
-    peakTo: 2024
-    probability: 75
-    wikimediaSearchHints: ["Maluma singer Colombia"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: jack-harlow
-    displayName: "Jack Harlow"
-    correctYear: 1998
-    peakFrom: 2020
-    peakTo: 2024
-    probability: 72
-    wikimediaSearchHints: ["Jack Harlow rapper"]
     answerMethods: ["timeline", "name-letters"]

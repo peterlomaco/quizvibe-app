@@ -16,14 +16,6 @@ items:
     probability: 85
     wikimediaSearchHints: ["Millie Bobby Brown actress"]
     answerMethods: ["timeline", "name-letters"]
-  - id: jenna-ortega
-    displayName: "Jenna Ortega"
-    correctYear: 2002
-    peakFrom: 2018
-    peakTo: 2026
-    probability: 80
-    wikimediaSearchHints: ["Jenna Ortega actress"]
-    answerMethods: ["timeline", "name-letters"]
   - id: zendaya
     displayName: "Zendaya"
     correctYear: 1996
@@ -31,30 +23,6 @@ items:
     peakTo: 2026
     probability: 88
     wikimediaSearchHints: ["Zendaya actress"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: timothee-chalamet
-    displayName: "Timothée Chalamet"
-    correctYear: 1995
-    peakFrom: 2017
-    peakTo: 2026
-    probability: 85
-    wikimediaSearchHints: ["Timothée Chalamet actor"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: anya-taylor-joy
-    displayName: "Anya Taylor-Joy"
-    correctYear: 1996
-    peakFrom: 2016
-    peakTo: 2026
-    probability: 82
-    wikimediaSearchHints: ["Anya Taylor-Joy actress"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: saoirse-ronan
-    displayName: "Saoirse Ronan"
-    correctYear: 1994
-    peakFrom: 2007
-    peakTo: 2026
-    probability: 82
-    wikimediaSearchHints: ["Saoirse Ronan actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: daniel-radcliffe
     displayName: "Daniel Radcliffe"
@@ -88,30 +56,6 @@ items:
     probability: 85
     wikimediaSearchHints: ["Kristen Stewart actress"]
     answerMethods: ["timeline", "name-letters"]
-  - id: andrew-garfield
-    displayName: "Andrew Garfield"
-    correctYear: 1983
-    peakFrom: 2006
-    peakTo: 2026
-    probability: 82
-    wikimediaSearchHints: ["Andrew Garfield actor"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: sydney-sweeney
-    displayName: "Sydney Sweeney"
-    correctYear: 1997
-    peakFrom: 2020
-    peakTo: 2026
-    probability: 80
-    wikimediaSearchHints: ["Sydney Sweeney actress"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: jacob-elordi
-    displayName: "Jacob Elordi"
-    correctYear: 1997
-    peakFrom: 2020
-    peakTo: 2026
-    probability: 80
-    wikimediaSearchHints: ["Jacob Elordi actor"]
-    answerMethods: ["timeline", "name-letters"]
   - id: finn-wolfhard
     displayName: "Finn Wolfhard"
     correctYear: 2002
@@ -119,14 +63,6 @@ items:
     peakTo: 2026
     probability: 78
     wikimediaSearchHints: ["Finn Wolfhard actor Stranger Things"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: sadie-sink
-    displayName: "Sadie Sink"
-    correctYear: 2002
-    peakFrom: 2016
-    peakTo: 2026
-    probability: 75
-    wikimediaSearchHints: ["Sadie Sink actress Stranger Things"]
     answerMethods: ["timeline", "name-letters"]
   - id: noah-schnapp
     displayName: "Noah Schnapp"

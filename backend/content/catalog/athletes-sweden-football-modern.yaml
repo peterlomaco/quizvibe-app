@@ -1,0 +1,334 @@
+# Svenska fotbollsspelare — modern era
+audience: ["gen-x", "millennials"]
+region: ["sweden"]
+category: persons
+contentForm: image
+contentSubject: athlete
+items:
+  - id: tomas-brolin
+    displayName: Tomas Brolin
+    correctYear: 1969
+    probability: 85
+    wikimediaSearchHints: ["Tomas Brolin Swedish footballer"]
+    answerMethods: ["timeline", "name-letters"]
+    sensitivity: standard
+
+  - id: marcus-allback
+    displayName: Marcus Allbäck
+    correctYear: 1973
+    probability: 76
+    wikimediaSearchHints: ["Marcus Allbäck Swedish footballer"]
+    answerMethods: ["timeline", "name-letters"]
+    sensitivity: standard
+
+  - id: marcus-berg
+    displayName: Marcus Berg
+    correctYear: 1986
+    probability: 74
+    wikimediaSearchHints: ["Marcus Berg Swedish footballer"]
+    answerMethods: ["timeline", "name-letters"]
+    sensitivity: standard
+
+  - id: niclas-alexandersson
+    displayName: Niclas Alexandersson
+    correctYear: 1971
+    probability: 76
+    wikimediaSearchHints: ["Niclas Alexandersson Swedish footballer"]
+    answerMethods: ["timeline", "name-letters"]
+    sensitivity: standard
+
+  - id: mikael-lustig
+    displayName: Mikael Lustig
+    correctYear: 1986
+    probability: 76
+    wikimediaSearchHints: ["Mikael Lustig Swedish footballer"]
+    answerMethods: ["timeline", "name-letters"]
+    sensitivity: standard
+
+  - id: andreas-granqvist
+    displayName: Andreas Granqvist
+    correctYear: 1985
+    probability: 78
+    wikimediaSearchHints: ["Andreas Granqvist Swedish footballer"]
+    answerMethods: ["timeline", "name-letters"]
+    sensitivity: standard
+
+  - id: hakan-mild
+    displayName: Håkan Mild
+    correctYear: 1971
+    probability: 75
+    wikimediaSearchHints: ["Håkan Mild Swedish footballer"]
+    answerMethods: ["timeline", "name-letters"]
+    sensitivity: standard
+
+  - id: joachim-bjorklund
+    displayName: Joachim Björklund
+    correctYear: 1971
+    probability: 74
+    wikimediaSearchHints: ["Joachim Björklund Swedish footballer"]
+    answerMethods: ["timeline", "name-letters"]
+    sensitivity: standard
+
+  - id: teddy-lucic
+    displayName: Teddy Lučić
+    correctYear: 1977
+    probability: 74
+    wikimediaSearchHints: ["Teddy Lučić Swedish footballer"]
+    answerMethods: ["timeline", "name-letters"]
+    sensitivity: standard
+
+  - id: kennedy-bakircioglu
+    displayName: Kennedy Bakircioglü
+    correctYear: 1980
+    probability: 75
+    wikimediaSearchHints: ["Kennedy Bakircioglü Swedish footballer"]
+    answerMethods: ["timeline", "name-letters"]
+    sensitivity: standard
+
+  - id: christian-wilhelmsson
+    displayName: Christian Wilhelmsson
+    correctYear: 1979
+    probability: 75
+    wikimediaSearchHints: ["Christian Wilhelmsson Swedish footballer"]
+    answerMethods: ["timeline", "name-letters"]
+    sensitivity: standard
+
+  - id: jesper-blomqvist
+    displayName: Jesper Blomqvist
+    correctYear: 1974
+    probability: 78
+    wikimediaSearchHints: ["Jesper Blomqvist Swedish footballer"]
+    answerMethods: ["timeline", "name-letters"]
+    sensitivity: standard
+
+  - id: henrik-rydstrom
+    displayName: Henrik Rydström
+    correctYear: 1975
+    probability: 72
+    wikimediaSearchHints: ["Henrik Rydström Swedish footballer"]
+    answerMethods: ["timeline", "name-letters"]
+    sensitivity: standard
+
+  - id: tobias-linderoth
+    displayName: Tobias Linderoth
+    correctYear: 1979
+    probability: 74
+    wikimediaSearchHints: ["Tobias Linderoth Swedish footballer"]
+    answerMethods: ["timeline", "name-letters"]
+    sensitivity: standard
+
+  - id: daniel-andersson
+    displayName: Daniel Andersson
+    correctYear: 1977
+    probability: 72
+    wikimediaSearchHints: ["Daniel Andersson Swedish footballer"]
+    answerMethods: ["timeline", "name-letters"]
+    sensitivity: standard
+
+  - id: ola-toivonen
+    displayName: Ola Toivonen
+    correctYear: 1986
+    probability: 75
+    wikimediaSearchHints: ["Ola Toivonen Swedish footballer"]
+    answerMethods: ["timeline", "name-letters"]
+    sensitivity: standard
+
+  - id: albin-ekdal
+    displayName: Albin Ekdal
+    correctYear: 1989
+    probability: 74
+    wikimediaSearchHints: ["Albin Ekdal Swedish footballer"]
+    answerMethods: ["timeline", "name-letters"]
+    sensitivity: standard
+
+  - id: jimmy-durmaz
+    displayName: Jimmy Durmaz
+    correctYear: 1989
+    probability: 75
+    wikimediaSearchHints: ["Jimmy Durmaz Swedish footballer"]
+    answerMethods: ["timeline", "name-letters"]
+    sensitivity: standard
+
+  - id: erkan-zengin
+    displayName: Erkan Zengin
+    correctYear: 1985
+    probability: 73
+    wikimediaSearchHints: ["Erkan Zengin Swedish footballer"]
+    answerMethods: ["timeline", "name-letters"]
+    sensitivity: standard
+
+  - id: andreas-andersson
+    displayName: Andreas Andersson
+    correctYear: 1971
+    probability: 72
+    wikimediaSearchHints: ["Andreas Andersson Swedish footballer"]
+    answerMethods: ["timeline", "name-letters"]
+    sensitivity: standard
+
+  - id: martin-olsson
+    displayName: Martin Olsson
+    correctYear: 1988
+    probability: 74
+    wikimediaSearchHints: ["Martin Olsson Swedish footballer"]
+    answerMethods: ["timeline", "name-letters"]
+    sensitivity: standard
+
+  - id: mikael-dorsin
+    displayName: Mikael Dorsin
+    correctYear: 1981
+    probability: 72
+    wikimediaSearchHints: ["Mikael Dorsin Swedish footballer"]
+    answerMethods: ["timeline", "name-letters"]
+    sensitivity: standard
+
+  - id: oscar-wendt
+    displayName: Oscar Wendt
+    correctYear: 1985
+    probability: 74
+    wikimediaSearchHints: ["Oscar Wendt Swedish footballer"]
+    answerMethods: ["timeline", "name-letters"]
+    sensitivity: standard
+
+  - id: jesper-karlstrom
+    displayName: Jesper Karlström
+    correctYear: 1995
+    probability: 73
+    wikimediaSearchHints: ["Jesper Karlström Swedish footballer"]
+    answerMethods: ["timeline", "name-letters"]
+    sensitivity: standard
+
+  - id: hugo-larsson
+    displayName: Hugo Larsson
+    correctYear: 2004
+    probability: 75
+    wikimediaSearchHints: ["Hugo Larsson Swedish footballer"]
+    answerMethods: ["timeline", "name-letters"]
+    sensitivity: standard
+
+  - id: lucas-bergvall
+    displayName: Lucas Bergvall
+    correctYear: 2006
+    probability: 76
+    wikimediaSearchHints: ["Lucas Bergvall Swedish footballer"]
+    answerMethods: ["timeline", "name-letters"]
+    sensitivity: standard
+
+  - id: isak-hien
+    displayName: Isak Hien
+    correctYear: 1999
+    probability: 74
+    wikimediaSearchHints: ["Isak Hien Swedish footballer"]
+    answerMethods: ["timeline", "name-letters"]
+    sensitivity: standard
+
+  - id: sebastian-nanasi
+    displayName: Sebastian Nanasi
+    correctYear: 2003
+    probability: 73
+    wikimediaSearchHints: ["Sebastian Nanasi Swedish footballer"]
+    answerMethods: ["timeline", "name-letters"]
+    sensitivity: standard
+
+  - id: jordan-larsson
+    displayName: Jordan Larsson
+    correctYear: 1997
+    probability: 75
+    wikimediaSearchHints: ["Jordan Larsson Swedish footballer"]
+    answerMethods: ["timeline", "name-letters"]
+    sensitivity: standard
+
+  - id: emil-krafth
+    displayName: Emil Krafth
+    correctYear: 1994
+    probability: 73
+    wikimediaSearchHints: ["Emil Krafth Swedish footballer"]
+    answerMethods: ["timeline", "name-letters"]
+    sensitivity: standard
+
+  - id: gustav-svensson
+    displayName: Gustav Svensson
+    correctYear: 1987
+    probability: 72
+    wikimediaSearchHints: ["Gustav Svensson Swedish footballer"]
+    answerMethods: ["timeline", "name-letters"]
+    sensitivity: standard
+
+  - id: alexander-milosevic
+    displayName: Alexander Milosevic
+    correctYear: 1992
+    probability: 73
+    wikimediaSearchHints: ["Alexander Milosevic Swedish footballer"]
+    answerMethods: ["timeline", "name-letters"]
+    sensitivity: standard
+
+  - id: patrik-andersson
+    displayName: Patrik Andersson
+    correctYear: 1971
+    probability: 78
+    wikimediaSearchHints: ["Patrik Andersson Swedish footballer"]
+    answerMethods: ["timeline", "name-letters"]
+    sensitivity: standard
+
+  - id: roland-nilsson
+    displayName: Roland Nilsson
+    correctYear: 1963
+    probability: 78
+    wikimediaSearchHints: ["Roland Nilsson Swedish footballer"]
+    answerMethods: ["timeline", "name-letters"]
+    sensitivity: standard
+
+  - id: anders-svensson
+    displayName: Anders Svensson
+    correctYear: 1976
+    probability: 80
+    wikimediaSearchHints: ["Anders Svensson Swedish footballer"]
+    answerMethods: ["timeline", "name-letters"]
+    sensitivity: standard
+
+  - id: jonas-thern
+    displayName: Jonas Thern
+    correctYear: 1967
+    probability: 80
+    wikimediaSearchHints: ["Jonas Thern Swedish footballer"]
+    answerMethods: ["timeline", "name-letters"]
+    sensitivity: standard
+
+  - id: johan-mjallby
+    displayName: Johan Mjällby
+    correctYear: 1971
+    probability: 76
+    wikimediaSearchHints: ["Johan Mjällby Swedish footballer"]
+    answerMethods: ["timeline", "name-letters"]
+    sensitivity: standard
+
+  - id: mattias-jonson
+    displayName: Mattias Jonson
+    correctYear: 1974
+    probability: 74
+    wikimediaSearchHints: ["Mattias Jonson Swedish footballer"]
+    answerMethods: ["timeline", "name-letters"]
+    sensitivity: standard
+
+  - id: emil-forsberg
+    displayName: Emil Forsberg
+    correctYear: 1991
+    probability: 83
+    wikimediaSearchHints: ["Emil Forsberg Swedish footballer"]
+    answerMethods: ["timeline", "name-letters"]
+    sensitivity: standard
+
+  - id: victor-lindelof
+    displayName: Victor Lindelöf
+    correctYear: 1994
+    probability: 84
+    wikimediaSearchHints: ["Victor Lindelöf Swedish footballer"]
+    answerMethods: ["timeline", "name-letters"]
+    sensitivity: standard
+
+  - id: anthony-elanga
+    displayName: Anthony Elanga
+    correctYear: 2002
+    probability: 78
+    wikimediaSearchHints: ["Anthony Elanga Swedish footballer"]
+    answerMethods: ["timeline", "name-letters"]
+    sensitivity: standard

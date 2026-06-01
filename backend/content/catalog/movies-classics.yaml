@@ -197,18 +197,6 @@ items:
         endSec: 45
         channelTitle: "Amazon MGM Studios"
         notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (13)."
-  - id: chariots-of-fire-1981
-    displayName: "Chariots of Fire"
-    correctYear: 1981
-    probability: 80
-    wikimediaSearchHints: ["Chariots of Fire 1981 film Olympic running Vangelis"]
-    answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "odtqtlhsv4E"
-        startSec: 21
-        endSec: 36
-        channelTitle: "Rotten Tomatoes Classic Trailers"
-        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (13)."
   - id: field-of-dreams-1989
     displayName: "Field of Dreams"
     correctYear: 1989

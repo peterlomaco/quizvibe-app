@@ -227,14 +227,6 @@ items:
     probability: 85
     wikimediaSearchHints: ["Pharrell Williams producer"]
     answerMethods: ["timeline", "name-letters"]
-  - id: maxwell
-    displayName: "Maxwell"
-    correctYear: 1973
-    peakFrom: 1996
-    peakTo: 2024
-    probability: 70
-    wikimediaSearchHints: ["Maxwell singer"]
-    answerMethods: ["timeline", "name-letters"]
   - id: toni-braxton
     displayName: "Toni Braxton"
     correctYear: 1967
@@ -534,12 +526,6 @@ items:
     probability: 70
     wikimediaSearchHints: ["Frida Hyvönen Swedish singer piano indie"]
     answerMethods: ["timeline", "name-letters"]
-  - id: the-tallest-man-on-earth
-    displayName: "The Tallest Man on Earth"
-    correctYear: 1983
-    probability: 76
-    wikimediaSearchHints: ["The Tallest Man on Earth Kristian Matsson Swedish folk singer"]
-    answerMethods: ["timeline", "name-letters"]
   - id: linnea-henriksson
     displayName: "Linnéa Henriksson"
     correctYear: 1987
@@ -563,12 +549,6 @@ items:
     correctYear: 1970
     probability: 72
     wikimediaSearchHints: ["Joakim Berg Swedish singer Kent solo"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: adna
-    displayName: "Adna"
-    correctYear: 1989
-    probability: 66
-    wikimediaSearchHints: ["Adna Kadic Swedish singer indie folk"]
     answerMethods: ["timeline", "name-letters"]
   - id: daniel-adams-ray
     displayName: "Daniel Adams-Ray"
@@ -649,12 +629,6 @@ items:
     probability: 74
     wikimediaSearchHints: ["Linda Pira Swedish rapper Knäpper mina fingrar"]
     answerMethods: ["timeline", "name-letters"]
-  - id: snoh-aalegra
-    displayName: "Snoh Aalegra"
-    correctYear: 1987
-    probability: 78
-    wikimediaSearchHints: ["Snoh Aalegra Swedish Iranian singer R&B soul"]
-    answerMethods: ["timeline", "name-letters"]
   - id: aronchupa
     displayName: "AronChupa"
     correctYear: 1993
@@ -673,25 +647,12 @@ items:
     probability: 84
     wikimediaSearchHints: ["Kygo Kyrre Gørvell-Dahll Norwegian DJ tropical house"]
     answerMethods: ["timeline", "name-letters"]
-  - id: aurora-aksnes
-    displayName: "Aurora"
-    correctYear: 1996
-    probability: 78
-    wikimediaSearchHints: ["Aurora Aksnes Norwegian singer Runaway Frozen"]
-    answerMethods: ["timeline", "name-letters"]
   - id: alexander-rybak
     displayName: "Alexander Rybak"
     correctYear: 1986
     probability: 82
     wikimediaSearchHints: ["Alexander Rybak Norwegian singer Eurovision 2009 Fairytale"]
     answerMethods: ["timeline", "name-letters"]
-  - id: aura-dione
-    displayName: "Aura Dione"
-    correctYear: 1985
-    probability: 72
-    wikimediaSearchHints: ["Aura Dione Danish singer Friends Geronimo"]
-    answerMethods: ["timeline", "name-letters"]
-  # === Batch B 2026-05-27 — kvinnliga svenska sångerskor + cross-nordic ===
   - id: marie-serneholt
     displayName: "Marie Serneholt"
     correctYear: 1983
@@ -727,12 +688,6 @@ items:
     correctYear: 1981
     probability: 74
     wikimediaSearchHints: ["Linda Sundblad Swedish singer Lambretta Oh Father"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: maria-mena
-    displayName: "Maria Mena"
-    correctYear: 1986
-    probability: 74
-    wikimediaSearchHints: ["Maria Mena Norwegian singer You're the Only One"]
     answerMethods: ["timeline", "name-letters"]
   - id: mariette
     displayName: "Mariette"

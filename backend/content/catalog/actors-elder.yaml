@@ -38,14 +38,6 @@ items:
     probability: 90
     wikimediaSearchHints: ["Audrey Hepburn"]
     answerMethods: ["timeline", "name-letters"]
-  - id: cary-grant
-    displayName: "Cary Grant"
-    correctYear: 1904
-    peakFrom: 1937
-    peakTo: 1966
-    probability: 80
-    wikimediaSearchHints: ["Cary Grant actor"]
-    answerMethods: ["timeline", "name-letters"]
   - id: katharine-hepburn
     displayName: "Katharine Hepburn"
     correctYear: 1907
@@ -94,30 +86,6 @@ items:
     probability: 80
     wikimediaSearchHints: ["Bette Davis actress"]
     answerMethods: ["timeline", "name-letters"]
-  - id: clark-gable
-    displayName: "Clark Gable"
-    correctYear: 1901
-    peakFrom: 1934
-    peakTo: 1960
-    probability: 80
-    wikimediaSearchHints: ["Clark Gable actor Gone with the Wind"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: gregory-peck
-    displayName: "Gregory Peck"
-    correctYear: 1916
-    peakFrom: 1945
-    peakTo: 1975
-    probability: 78
-    wikimediaSearchHints: ["Gregory Peck actor"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: vivien-leigh
-    displayName: "Vivien Leigh"
-    correctYear: 1913
-    peakFrom: 1939
-    peakTo: 1951
-    probability: 78
-    wikimediaSearchHints: ["Vivien Leigh actress"]
-    answerMethods: ["timeline", "name-letters"]
   - id: charlie-chaplin
     displayName: "Charlie Chaplin"
     correctYear: 1889
@@ -133,14 +101,6 @@ items:
     peakTo: 1967
     probability: 78
     wikimediaSearchHints: ["Spencer Tracy actor"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: gary-cooper
-    displayName: "Gary Cooper"
-    correctYear: 1901
-    peakFrom: 1929
-    peakTo: 1959
-    probability: 78
-    wikimediaSearchHints: ["Gary Cooper actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: marlon-brando
     displayName: "Marlon Brando"
@@ -174,14 +134,6 @@ items:
     probability: 85
     wikimediaSearchHints: ["John Wayne actor"]
     answerMethods: ["timeline", "name-letters"]
-  - id: lauren-bacall
-    displayName: "Lauren Bacall"
-    correctYear: 1924
-    peakFrom: 1944
-    peakTo: 1985
-    probability: 78
-    wikimediaSearchHints: ["Lauren Bacall actress"]
-    answerMethods: ["timeline", "name-letters"]
   - id: greta-garbo
     displayName: "Greta Garbo"
     correctYear: 1905
@@ -189,22 +141,6 @@ items:
     peakTo: 1941
     probability: 80
     wikimediaSearchHints: ["Greta Garbo actress Sweden"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: errol-flynn
-    displayName: "Errol Flynn"
-    correctYear: 1909
-    peakFrom: 1935
-    peakTo: 1952
-    probability: 75
-    wikimediaSearchHints: ["Errol Flynn actor"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: james-cagney
-    displayName: "James Cagney"
-    correctYear: 1899
-    peakFrom: 1931
-    peakTo: 1961
-    probability: 75
-    wikimediaSearchHints: ["James Cagney actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: shirley-temple
     displayName: "Shirley Temple"
