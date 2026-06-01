@@ -1,0 +1,36 @@
+# Svenska solo-artister kända för elder + Gen X. Tillagda 2026-06-01.
+# peak = aktiv/recognition-fönster (ingen correctYear → era-gating via peak).
+audience: ["elder", "gen-x"]
+region: ["sweden"]
+category: artists
+contentForm: image
+contentSubject: artist
+items:
+  - id: jerry-williams-sv
+    displayName: "Jerry Williams"
+    probability: 74
+    peakFrom: 1963
+    peakTo: 2000
+    wikimediaSearchHints: ["Jerry Williams Swedish singer"]
+    answerMethods: ["name-letters"]
+  - id: mauro-scocco
+    displayName: "Mauro Scocco"
+    probability: 74
+    peakFrom: 1988
+    peakTo: 2000
+    wikimediaSearchHints: ["Mauro Scocco"]
+    answerMethods: ["name-letters"]
+  - id: peter-joback
+    displayName: "Peter Jöback"
+    probability: 80
+    peakFrom: 1995
+    peakTo: 2015
+    wikimediaSearchHints: ["Peter Jöback"]
+    answerMethods: ["name-letters"]
+  - id: eric-gadd
+    displayName: "Eric Gadd"
+    probability: 70
+    peakFrom: 1993
+    peakTo: 2003
+    wikimediaSearchHints: ["Eric Gadd"]
+    answerMethods: ["name-letters"]

@@ -1,0 +1,161 @@
+# Svenska skådespelare/komiker kända för Millennials + Gen Z. Tillagda 2026-06-01.
+audience: ["millennials", "gen-z"]
+region: ["sweden"]
+category: actors
+contentForm: image
+contentSubject: actor
+items:
+  - id: valter-skarsgard
+    displayName: "Valter Skarsgård"
+    probability: 58
+    peakFrom: 2015
+    peakTo: 2024
+    wikimediaSearchHints: ["Valter Skarsgård"]
+    answerMethods: ["name-letters"]
+  - id: fares-fares
+    displayName: "Fares Fares"
+    probability: 76
+    peakFrom: 2008
+    peakTo: 2022
+    wikimediaSearchHints: ["Fares Fares actor"]
+    answerMethods: ["name-letters"]
+  - id: tuva-novotny
+    displayName: "Tuva Novotny"
+    probability: 70
+    peakFrom: 2004
+    peakTo: 2020
+    wikimediaSearchHints: ["Tuva Novotny"]
+    answerMethods: ["name-letters"]
+  - id: henrik-dorsin
+    displayName: "Henrik Dorsin"
+    probability: 76
+    peakFrom: 2010
+    peakTo: 2022
+    wikimediaSearchHints: ["Henrik Dorsin"]
+    answerMethods: ["name-letters"]
+  - id: rachel-mohlin
+    displayName: "Rachel Mohlin"
+    probability: 60
+    peakFrom: 2010
+    peakTo: 2022
+    wikimediaSearchHints: ["Rachel Mohlin"]
+    answerMethods: ["name-letters"]
+  - id: johan-glans
+    displayName: "Johan Glans"
+    probability: 78
+    peakFrom: 2008
+    peakTo: 2022
+    wikimediaSearchHints: ["Johan Glans komiker"]
+    answerMethods: ["name-letters"]
+  - id: david-hellenius
+    displayName: "David Hellenius"
+    probability: 76
+    peakFrom: 2008
+    peakTo: 2022
+    wikimediaSearchHints: ["David Hellenius"]
+    answerMethods: ["name-letters"]
+  - id: felix-herngren
+    displayName: "Felix Herngren"
+    probability: 72
+    peakFrom: 2005
+    peakTo: 2018
+    wikimediaSearchHints: ["Felix Herngren"]
+    answerMethods: ["name-letters"]
+  - id: peter-settman
+    displayName: "Peter Settman"
+    probability: 66
+    peakFrom: 1998
+    peakTo: 2015
+    wikimediaSearchHints: ["Peter Settman"]
+    answerMethods: ["name-letters"]
+  - id: bjorn-gustafsson
+    displayName: "Björn Gustafsson"
+    probability: 70
+    peakFrom: 2009
+    peakTo: 2020
+    wikimediaSearchHints: ["Björn Gustafsson komiker"]
+    answerMethods: ["name-letters"]
+  - id: edvin-ryding
+    displayName: "Edvin Ryding"
+    probability: 66
+    peakFrom: 2021
+    peakTo: 2024
+    wikimediaSearchHints: ["Edvin Ryding"]
+    answerMethods: ["name-letters"]
+  - id: omar-rudberg
+    displayName: "Omar Rudberg"
+    probability: 64
+    peakFrom: 2021
+    peakTo: 2024
+    wikimediaSearchHints: ["Omar Rudberg"]
+    answerMethods: ["name-letters"]
+  - id: adam-lundgren
+    displayName: "Adam Lundgren"
+    probability: 62
+    peakFrom: 2008
+    peakTo: 2020
+    wikimediaSearchHints: ["Adam Lundgren actor"]
+    answerMethods: ["name-letters"]
+  - id: happy-jankell
+    displayName: "Happy Jankell"
+    probability: 56
+    peakFrom: 2015
+    peakTo: 2024
+    wikimediaSearchHints: ["Happy Jankell"]
+    answerMethods: ["name-letters"]
+  - id: alba-august
+    displayName: "Alba August"
+    probability: 62
+    peakFrom: 2017
+    peakTo: 2024
+    wikimediaSearchHints: ["Alba August"]
+    answerMethods: ["name-letters"]
+  - id: evin-ahmad
+    displayName: "Evin Ahmad"
+    probability: 60
+    peakFrom: 2017
+    peakTo: 2024
+    wikimediaSearchHints: ["Evin Ahmad"]
+    answerMethods: ["name-letters"]
+  - id: gizem-erdogan
+    displayName: "Gizem Erdogan"
+    probability: 60
+    peakFrom: 2018
+    peakTo: 2024
+    wikimediaSearchHints: ["Gizem Erdogan"]
+    answerMethods: ["name-letters"]
+  - id: malin-akerman
+    displayName: "Malin Åkerman"
+    probability: 70
+    peakFrom: 2007
+    peakTo: 2020
+    wikimediaSearchHints: ["Malin Åkerman"]
+    answerMethods: ["name-letters"]
+  - id: erik-johansson-actor
+    displayName: "Erik Johansson"
+    probability: 58
+    peakFrom: 2010
+    peakTo: 2022
+    wikimediaSearchHints: ["Erik Johansson skådespelare"]
+    answerMethods: ["name-letters"]
+  - id: moa-gammel
+    displayName: "Moa Gammel"
+    probability: 58
+    peakFrom: 2008
+    peakTo: 2018
+    wikimediaSearchHints: ["Moa Gammel"]
+    answerMethods: ["name-letters"]
+  - id: liv-mjones
+    displayName: "Liv Mjönes"
+    probability: 56
+    peakFrom: 2008
+    peakTo: 2018
+    wikimediaSearchHints: ["Liv Mjönes"]
+    answerMethods: ["name-letters"]
+  - id: eva-melander
+    displayName: "Eva Melander"
+    probability: 56
+    peakFrom: 2018
+    peakTo: 2022
+    wikimediaSearchHints: ["Eva Melander actress"]
+    answerMethods: ["name-letters"]

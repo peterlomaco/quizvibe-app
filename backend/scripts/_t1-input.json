@@ -1,0 +1,1937 @@
+[
+  {
+    "id": "anders-lundin",
+    "name": "Anders Lundin",
+    "file": "actors-gen-x.yaml",
+    "subject": "actor",
+    "occ": [
+      "actor",
+      "actress",
+      "comedian",
+      "director"
+    ]
+  },
+  {
+    "id": "ben-affleck",
+    "name": "Ben Affleck",
+    "file": "actors-millennials.yaml",
+    "subject": "actor",
+    "occ": [
+      "actor",
+      "actress",
+      "comedian",
+      "director"
+    ]
+  },
+  {
+    "id": "brasse-brannstrom",
+    "name": "Brasse Brännström",
+    "file": "actors-elder.yaml",
+    "subject": "actor",
+    "occ": [
+      "actor",
+      "actress",
+      "comedian",
+      "director"
+    ]
+  },
+  {
+    "id": "charlie-chaplin",
+    "name": "Charlie Chaplin",
+    "file": "actors-elder.yaml",
+    "subject": "actor",
+    "occ": [
+      "actor",
+      "actress",
+      "comedian",
+      "director"
+    ]
+  },
+  {
+    "id": "gene-hackman",
+    "name": "Gene Hackman",
+    "file": "actors-gen-x.yaml",
+    "subject": "actor",
+    "occ": [
+      "actor",
+      "actress",
+      "comedian",
+      "director"
+    ]
+  },
+  {
+    "id": "john-cleese",
+    "name": "John Cleese",
+    "file": "actors-gen-x.yaml",
+    "subject": "actor",
+    "occ": [
+      "actor",
+      "actress",
+      "comedian",
+      "director"
+    ]
+  },
+  {
+    "id": "patrick-swayze",
+    "name": "Patrick Swayze",
+    "file": "actors-gen-x.yaml",
+    "subject": "actor",
+    "occ": [
+      "actor",
+      "actress",
+      "comedian",
+      "director"
+    ]
+  },
+  {
+    "id": "britney-spears",
+    "name": "Britney Spears",
+    "file": "artists-millennials.yaml",
+    "subject": "artist",
+    "occ": [
+      "singer",
+      "musician",
+      "songwriter",
+      "rapper",
+      "dj",
+      "producer",
+      "guitarist",
+      "artist",
+      "composer"
+    ]
+  },
+  {
+    "id": "bruce-springsteen",
+    "name": "Bruce Springsteen",
+    "file": "artists-gen-x.yaml",
+    "subject": "artist",
+    "occ": [
+      "singer",
+      "musician",
+      "songwriter",
+      "rapper",
+      "dj",
+      "producer",
+      "guitarist",
+      "artist",
+      "composer"
+    ]
+  },
+  {
+    "id": "bryan-adams",
+    "name": "Bryan Adams",
+    "file": "artists-gen-x.yaml",
+    "subject": "artist",
+    "occ": [
+      "singer",
+      "musician",
+      "songwriter",
+      "rapper",
+      "dj",
+      "producer",
+      "guitarist",
+      "artist",
+      "composer"
+    ]
+  },
+  {
+    "id": "david-bowie",
+    "name": "David Bowie",
+    "file": "artists-gen-x.yaml",
+    "subject": "artist",
+    "occ": [
+      "singer",
+      "musician",
+      "songwriter",
+      "rapper",
+      "dj",
+      "producer",
+      "guitarist",
+      "artist",
+      "composer"
+    ]
+  },
+  {
+    "id": "dua-lipa",
+    "name": "Dua Lipa",
+    "file": "artists-gen-z.yaml",
+    "subject": "artist",
+    "occ": [
+      "singer",
+      "musician",
+      "songwriter",
+      "rapper",
+      "dj",
+      "producer",
+      "guitarist",
+      "artist",
+      "composer"
+    ]
+  },
+  {
+    "id": "kurt-cobain",
+    "name": "Kurt Cobain",
+    "file": "artists-gen-x.yaml",
+    "subject": "artist",
+    "occ": [
+      "singer",
+      "musician",
+      "songwriter",
+      "rapper",
+      "dj",
+      "producer",
+      "guitarist",
+      "artist",
+      "composer"
+    ]
+  },
+  {
+    "id": "kygo",
+    "name": "Kygo",
+    "file": "artists-millennials.yaml",
+    "subject": "artist",
+    "occ": [
+      "singer",
+      "musician",
+      "songwriter",
+      "rapper",
+      "dj",
+      "producer",
+      "guitarist",
+      "artist",
+      "composer"
+    ]
+  },
+  {
+    "id": "kylie-minogue",
+    "name": "Kylie Minogue",
+    "file": "artists-gen-x.yaml",
+    "subject": "artist",
+    "occ": [
+      "singer",
+      "musician",
+      "songwriter",
+      "rapper",
+      "dj",
+      "producer",
+      "guitarist",
+      "artist",
+      "composer"
+    ]
+  },
+  {
+    "id": "laleh",
+    "name": "Laleh",
+    "file": "artists-millennials.yaml",
+    "subject": "artist",
+    "occ": [
+      "singer",
+      "musician",
+      "songwriter",
+      "rapper",
+      "dj",
+      "producer",
+      "guitarist",
+      "artist",
+      "composer"
+    ]
+  },
+  {
+    "id": "lana-del-rey",
+    "name": "Lana Del Rey",
+    "file": "artists-gen-z.yaml",
+    "subject": "artist",
+    "occ": [
+      "singer",
+      "musician",
+      "songwriter",
+      "rapper",
+      "dj",
+      "producer",
+      "guitarist",
+      "artist",
+      "composer"
+    ]
+  },
+  {
+    "id": "lenny-kravitz",
+    "name": "Lenny Kravitz",
+    "file": "artists-gen-x.yaml",
+    "subject": "artist",
+    "occ": [
+      "singer",
+      "musician",
+      "songwriter",
+      "rapper",
+      "dj",
+      "producer",
+      "guitarist",
+      "artist",
+      "composer"
+    ]
+  },
+  {
+    "id": "lill-lindfors",
+    "name": "Lill Lindfors",
+    "file": "artists-elder.yaml",
+    "subject": "artist",
+    "occ": [
+      "singer",
+      "musician",
+      "songwriter",
+      "rapper",
+      "dj",
+      "producer",
+      "guitarist",
+      "artist",
+      "composer"
+    ]
+  },
+  {
+    "id": "miss-li",
+    "name": "Miss Li",
+    "file": "artists-millennials.yaml",
+    "subject": "artist",
+    "occ": [
+      "singer",
+      "musician",
+      "songwriter",
+      "rapper",
+      "dj",
+      "producer",
+      "guitarist",
+      "artist",
+      "composer"
+    ]
+  },
+  {
+    "id": "neil-young",
+    "name": "Neil Young",
+    "file": "artists-elder.yaml",
+    "subject": "artist",
+    "occ": [
+      "singer",
+      "musician",
+      "songwriter",
+      "rapper",
+      "dj",
+      "producer",
+      "guitarist",
+      "artist",
+      "composer"
+    ]
+  },
+  {
+    "id": "nelly-furtado",
+    "name": "Nelly Furtado",
+    "file": "artists-millennials.yaml",
+    "subject": "artist",
+    "occ": [
+      "singer",
+      "musician",
+      "songwriter",
+      "rapper",
+      "dj",
+      "producer",
+      "guitarist",
+      "artist",
+      "composer"
+    ]
+  },
+  {
+    "id": "newkid",
+    "name": "Newkid",
+    "file": "artists-millennials.yaml",
+    "subject": "artist",
+    "occ": [
+      "singer",
+      "musician",
+      "songwriter",
+      "rapper",
+      "dj",
+      "producer",
+      "guitarist",
+      "artist",
+      "composer"
+    ]
+  },
+  {
+    "id": "orup",
+    "name": "Orup",
+    "file": "artists-gen-x.yaml",
+    "subject": "artist",
+    "occ": [
+      "singer",
+      "musician",
+      "songwriter",
+      "rapper",
+      "dj",
+      "producer",
+      "guitarist",
+      "artist",
+      "composer"
+    ]
+  },
+  {
+    "id": "oskar-linnros",
+    "name": "Oskar Linnros",
+    "file": "artists-millennials.yaml",
+    "subject": "artist",
+    "occ": [
+      "singer",
+      "musician",
+      "songwriter",
+      "rapper",
+      "dj",
+      "producer",
+      "guitarist",
+      "artist",
+      "composer"
+    ]
+  },
+  {
+    "id": "peter-gabriel",
+    "name": "Peter Gabriel",
+    "file": "artists-gen-x.yaml",
+    "subject": "artist",
+    "occ": [
+      "singer",
+      "musician",
+      "songwriter",
+      "rapper",
+      "dj",
+      "producer",
+      "guitarist",
+      "artist",
+      "composer"
+    ]
+  },
+  {
+    "id": "peter-lemarc",
+    "name": "Peter LeMarc",
+    "file": "artists-gen-x.yaml",
+    "subject": "artist",
+    "occ": [
+      "singer",
+      "musician",
+      "songwriter",
+      "rapper",
+      "dj",
+      "producer",
+      "guitarist",
+      "artist",
+      "composer"
+    ]
+  },
+  {
+    "id": "sanne-salomonsen",
+    "name": "Sanne Salomonsen",
+    "file": "artists-elder.yaml",
+    "subject": "artist",
+    "occ": [
+      "singer",
+      "musician",
+      "songwriter",
+      "rapper",
+      "dj",
+      "producer",
+      "guitarist",
+      "artist",
+      "composer"
+    ]
+  },
+  {
+    "id": "stephen-simmonds",
+    "name": "Stephen Simmonds",
+    "file": "artists-gen-x.yaml",
+    "subject": "artist",
+    "occ": [
+      "singer",
+      "musician",
+      "songwriter",
+      "rapper",
+      "dj",
+      "producer",
+      "guitarist",
+      "artist",
+      "composer"
+    ]
+  },
+  {
+    "id": "sting",
+    "name": "Sting",
+    "file": "artists-gen-x.yaml",
+    "subject": "artist",
+    "occ": [
+      "singer",
+      "musician",
+      "songwriter",
+      "rapper",
+      "dj",
+      "producer",
+      "guitarist",
+      "artist",
+      "composer"
+    ]
+  },
+  {
+    "id": "ted-gardestad",
+    "name": "Ted Gärdestad",
+    "file": "artists-gen-x.yaml",
+    "subject": "artist",
+    "occ": [
+      "singer",
+      "musician",
+      "songwriter",
+      "rapper",
+      "dj",
+      "producer",
+      "guitarist",
+      "artist",
+      "composer"
+    ]
+  },
+  {
+    "id": "thomas-stenstrom",
+    "name": "Thomas Stenström",
+    "file": "artists-millennials.yaml",
+    "subject": "artist",
+    "occ": [
+      "singer",
+      "musician",
+      "songwriter",
+      "rapper",
+      "dj",
+      "producer",
+      "guitarist",
+      "artist",
+      "composer"
+    ]
+  },
+  {
+    "id": "thastrom",
+    "name": "Thåström",
+    "file": "artists-gen-x.yaml",
+    "subject": "artist",
+    "occ": [
+      "singer",
+      "musician",
+      "songwriter",
+      "rapper",
+      "dj",
+      "producer",
+      "guitarist",
+      "artist",
+      "composer"
+    ]
+  },
+  {
+    "id": "tom-petty",
+    "name": "Tom Petty",
+    "file": "artists-gen-x.yaml",
+    "subject": "artist",
+    "occ": [
+      "singer",
+      "musician",
+      "songwriter",
+      "rapper",
+      "dj",
+      "producer",
+      "guitarist",
+      "artist",
+      "composer"
+    ]
+  },
+  {
+    "id": "tomas-ledin",
+    "name": "Tomas Ledin",
+    "file": "artists-elder.yaml",
+    "subject": "artist",
+    "occ": [
+      "singer",
+      "musician",
+      "songwriter",
+      "rapper",
+      "dj",
+      "producer",
+      "guitarist",
+      "artist",
+      "composer"
+    ]
+  },
+  {
+    "id": "alberto-tomba",
+    "name": "Alberto Tomba",
+    "file": "athletes-elder-gen-x.yaml",
+    "subject": "athlete",
+    "occ": [
+      "football",
+      "soccer",
+      "hockey",
+      "tennis",
+      "athlete",
+      "player",
+      "sprinter",
+      "skier",
+      "boxer",
+      "sport",
+      "goalkeeper",
+      "striker",
+      "midfielder",
+      "defender",
+      "skater"
+    ]
+  },
+  {
+    "id": "alex-ovechkin",
+    "name": "Alex Ovechkin",
+    "file": "athletes-modern.yaml",
+    "subject": "athlete",
+    "occ": [
+      "football",
+      "soccer",
+      "hockey",
+      "tennis",
+      "athlete",
+      "player",
+      "sprinter",
+      "skier",
+      "boxer",
+      "sport",
+      "goalkeeper",
+      "striker",
+      "midfielder",
+      "defender",
+      "skater"
+    ]
+  },
+  {
+    "id": "andreas-brehme",
+    "name": "Andreas Brehme",
+    "file": "athletes-elder-gen-x.yaml",
+    "subject": "athlete",
+    "occ": [
+      "football",
+      "soccer",
+      "hockey",
+      "tennis",
+      "athlete",
+      "player",
+      "sprinter",
+      "skier",
+      "boxer",
+      "sport",
+      "goalkeeper",
+      "striker",
+      "midfielder",
+      "defender",
+      "skater"
+    ]
+  },
+  {
+    "id": "carlos-valderrama",
+    "name": "Carlos Valderrama",
+    "file": "athletes-elder-gen-x.yaml",
+    "subject": "athlete",
+    "occ": [
+      "football",
+      "soccer",
+      "hockey",
+      "tennis",
+      "athlete",
+      "player",
+      "sprinter",
+      "skier",
+      "boxer",
+      "sport",
+      "goalkeeper",
+      "striker",
+      "midfielder",
+      "defender",
+      "skater"
+    ]
+  },
+  {
+    "id": "christian-olsson",
+    "name": "Christian Olsson",
+    "file": "athletes-elder-gen-x.yaml",
+    "subject": "athlete",
+    "occ": [
+      "football",
+      "soccer",
+      "hockey",
+      "tennis",
+      "athlete",
+      "player",
+      "sprinter",
+      "skier",
+      "boxer",
+      "sport",
+      "goalkeeper",
+      "striker",
+      "midfielder",
+      "defender",
+      "skater"
+    ]
+  },
+  {
+    "id": "christian-vieri",
+    "name": "Christian Vieri",
+    "file": "athletes-elder-gen-x.yaml",
+    "subject": "athlete",
+    "occ": [
+      "football",
+      "soccer",
+      "hockey",
+      "tennis",
+      "athlete",
+      "player",
+      "sprinter",
+      "skier",
+      "boxer",
+      "sport",
+      "goalkeeper",
+      "striker",
+      "midfielder",
+      "defender",
+      "skater"
+    ]
+  },
+  {
+    "id": "claudio-caniggia",
+    "name": "Claudio Caniggia",
+    "file": "athletes-elder-gen-x.yaml",
+    "subject": "athlete",
+    "occ": [
+      "football",
+      "soccer",
+      "hockey",
+      "tennis",
+      "athlete",
+      "player",
+      "sprinter",
+      "skier",
+      "boxer",
+      "sport",
+      "goalkeeper",
+      "striker",
+      "midfielder",
+      "defender",
+      "skater"
+    ]
+  },
+  {
+    "id": "didier-drogba",
+    "name": "Didier Drogba",
+    "file": "athletes-modern.yaml",
+    "subject": "athlete",
+    "occ": [
+      "football",
+      "soccer",
+      "hockey",
+      "tennis",
+      "athlete",
+      "player",
+      "sprinter",
+      "skier",
+      "boxer",
+      "sport",
+      "goalkeeper",
+      "striker",
+      "midfielder",
+      "defender",
+      "skater"
+    ]
+  },
+  {
+    "id": "freddie-ljungberg",
+    "name": "Freddie Ljungberg",
+    "file": "athletes-modern.yaml",
+    "subject": "athlete",
+    "occ": [
+      "football",
+      "soccer",
+      "hockey",
+      "tennis",
+      "athlete",
+      "player",
+      "sprinter",
+      "skier",
+      "boxer",
+      "sport",
+      "goalkeeper",
+      "striker",
+      "midfielder",
+      "defender",
+      "skater"
+    ]
+  },
+  {
+    "id": "gabriel-batistuta",
+    "name": "Gabriel Batistuta",
+    "file": "athletes-elder-gen-x.yaml",
+    "subject": "athlete",
+    "occ": [
+      "football",
+      "soccer",
+      "hockey",
+      "tennis",
+      "athlete",
+      "player",
+      "sprinter",
+      "skier",
+      "boxer",
+      "sport",
+      "goalkeeper",
+      "striker",
+      "midfielder",
+      "defender",
+      "skater"
+    ]
+  },
+  {
+    "id": "gheorghe-hagi",
+    "name": "Gheorghe Hagi",
+    "file": "athletes-elder-gen-x.yaml",
+    "subject": "athlete",
+    "occ": [
+      "football",
+      "soccer",
+      "hockey",
+      "tennis",
+      "athlete",
+      "player",
+      "sprinter",
+      "skier",
+      "boxer",
+      "sport",
+      "goalkeeper",
+      "striker",
+      "midfielder",
+      "defender",
+      "skater"
+    ]
+  },
+  {
+    "id": "glenn-hysen",
+    "name": "Glenn Hysén",
+    "file": "athletes-elder-gen-x.yaml",
+    "subject": "athlete",
+    "occ": [
+      "football",
+      "soccer",
+      "hockey",
+      "tennis",
+      "athlete",
+      "player",
+      "sprinter",
+      "skier",
+      "boxer",
+      "sport",
+      "goalkeeper",
+      "striker",
+      "midfielder",
+      "defender",
+      "skater"
+    ]
+  },
+  {
+    "id": "goran-ivanisevic",
+    "name": "Goran Ivanišević",
+    "file": "athletes-elder-gen-x.yaml",
+    "subject": "athlete",
+    "occ": [
+      "football",
+      "soccer",
+      "hockey",
+      "tennis",
+      "athlete",
+      "player",
+      "sprinter",
+      "skier",
+      "boxer",
+      "sport",
+      "goalkeeper",
+      "striker",
+      "midfielder",
+      "defender",
+      "skater"
+    ]
+  },
+  {
+    "id": "hristo-stoichkov",
+    "name": "Hristo Stoichkov",
+    "file": "athletes-elder-gen-x.yaml",
+    "subject": "athlete",
+    "occ": [
+      "football",
+      "soccer",
+      "hockey",
+      "tennis",
+      "athlete",
+      "player",
+      "sprinter",
+      "skier",
+      "boxer",
+      "sport",
+      "goalkeeper",
+      "striker",
+      "midfielder",
+      "defender",
+      "skater"
+    ]
+  },
+  {
+    "id": "ian-rush",
+    "name": "Ian Rush",
+    "file": "athletes-elder-gen-x.yaml",
+    "subject": "athlete",
+    "occ": [
+      "football",
+      "soccer",
+      "hockey",
+      "tennis",
+      "athlete",
+      "player",
+      "sprinter",
+      "skier",
+      "boxer",
+      "sport",
+      "goalkeeper",
+      "striker",
+      "midfielder",
+      "defender",
+      "skater"
+    ]
+  },
+  {
+    "id": "iker-casillas",
+    "name": "Iker Casillas",
+    "file": "athletes-modern.yaml",
+    "subject": "athlete",
+    "occ": [
+      "football",
+      "soccer",
+      "hockey",
+      "tennis",
+      "athlete",
+      "player",
+      "sprinter",
+      "skier",
+      "boxer",
+      "sport",
+      "goalkeeper",
+      "striker",
+      "midfielder",
+      "defender",
+      "skater"
+    ]
+  },
+  {
+    "id": "ivan-lendl",
+    "name": "Ivan Lendl",
+    "file": "athletes-elder-gen-x.yaml",
+    "subject": "athlete",
+    "occ": [
+      "football",
+      "soccer",
+      "hockey",
+      "tennis",
+      "athlete",
+      "player",
+      "sprinter",
+      "skier",
+      "boxer",
+      "sport",
+      "goalkeeper",
+      "striker",
+      "midfielder",
+      "defender",
+      "skater"
+    ]
+  },
+  {
+    "id": "jamie-carragher",
+    "name": "Jamie Carragher",
+    "file": "athletes-modern.yaml",
+    "subject": "athlete",
+    "occ": [
+      "football",
+      "soccer",
+      "hockey",
+      "tennis",
+      "athlete",
+      "player",
+      "sprinter",
+      "skier",
+      "boxer",
+      "sport",
+      "goalkeeper",
+      "striker",
+      "midfielder",
+      "defender",
+      "skater"
+    ]
+  },
+  {
+    "id": "jimmy-connors",
+    "name": "Jimmy Connors",
+    "file": "athletes-elder-gen-x.yaml",
+    "subject": "athlete",
+    "occ": [
+      "football",
+      "soccer",
+      "hockey",
+      "tennis",
+      "athlete",
+      "player",
+      "sprinter",
+      "skier",
+      "boxer",
+      "sport",
+      "goalkeeper",
+      "striker",
+      "midfielder",
+      "defender",
+      "skater"
+    ]
+  },
+  {
+    "id": "kaka",
+    "name": "Kaká",
+    "file": "athletes-modern.yaml",
+    "subject": "athlete",
+    "occ": [
+      "football",
+      "soccer",
+      "hockey",
+      "tennis",
+      "athlete",
+      "player",
+      "sprinter",
+      "skier",
+      "boxer",
+      "sport",
+      "goalkeeper",
+      "striker",
+      "midfielder",
+      "defender",
+      "skater"
+    ]
+  },
+  {
+    "id": "kent-nilsson",
+    "name": "Kent Nilsson",
+    "file": "athletes-elder-gen-x.yaml",
+    "subject": "athlete",
+    "occ": [
+      "football",
+      "soccer",
+      "hockey",
+      "tennis",
+      "athlete",
+      "player",
+      "sprinter",
+      "skier",
+      "boxer",
+      "sport",
+      "goalkeeper",
+      "striker",
+      "midfielder",
+      "defender",
+      "skater"
+    ]
+  },
+  {
+    "id": "magnus-wislander",
+    "name": "Magnus Wislander",
+    "file": "athletes-elder-gen-x.yaml",
+    "subject": "athlete",
+    "occ": [
+      "football",
+      "soccer",
+      "hockey",
+      "tennis",
+      "athlete",
+      "player",
+      "sprinter",
+      "skier",
+      "boxer",
+      "sport",
+      "goalkeeper",
+      "striker",
+      "midfielder",
+      "defender",
+      "skater"
+    ]
+  },
+  {
+    "id": "marcel-desailly",
+    "name": "Marcel Desailly",
+    "file": "athletes-elder-gen-x.yaml",
+    "subject": "athlete",
+    "occ": [
+      "football",
+      "soccer",
+      "hockey",
+      "tennis",
+      "athlete",
+      "player",
+      "sprinter",
+      "skier",
+      "boxer",
+      "sport",
+      "goalkeeper",
+      "striker",
+      "midfielder",
+      "defender",
+      "skater"
+    ]
+  },
+  {
+    "id": "marcelo",
+    "name": "Marcelo",
+    "file": "athletes-modern.yaml",
+    "subject": "athlete",
+    "occ": [
+      "football",
+      "soccer",
+      "hockey",
+      "tennis",
+      "athlete",
+      "player",
+      "sprinter",
+      "skier",
+      "boxer",
+      "sport",
+      "goalkeeper",
+      "striker",
+      "midfielder",
+      "defender",
+      "skater"
+    ]
+  },
+  {
+    "id": "marco-van-basten",
+    "name": "Marco van Basten",
+    "file": "athletes-elder-gen-x.yaml",
+    "subject": "athlete",
+    "occ": [
+      "football",
+      "soccer",
+      "hockey",
+      "tennis",
+      "athlete",
+      "player",
+      "sprinter",
+      "skier",
+      "boxer",
+      "sport",
+      "goalkeeper",
+      "striker",
+      "midfielder",
+      "defender",
+      "skater"
+    ]
+  },
+  {
+    "id": "per-carlen",
+    "name": "Per Carlén",
+    "file": "athletes-elder-gen-x.yaml",
+    "subject": "athlete",
+    "occ": [
+      "football",
+      "soccer",
+      "hockey",
+      "tennis",
+      "athlete",
+      "player",
+      "sprinter",
+      "skier",
+      "boxer",
+      "sport",
+      "goalkeeper",
+      "striker",
+      "midfielder",
+      "defender",
+      "skater"
+    ]
+  },
+  {
+    "id": "rivaldo",
+    "name": "Rivaldo",
+    "file": "athletes-elder-gen-x.yaml",
+    "subject": "athlete",
+    "occ": [
+      "football",
+      "soccer",
+      "hockey",
+      "tennis",
+      "athlete",
+      "player",
+      "sprinter",
+      "skier",
+      "boxer",
+      "sport",
+      "goalkeeper",
+      "striker",
+      "midfielder",
+      "defender",
+      "skater"
+    ]
+  },
+  {
+    "id": "roy-keane",
+    "name": "Roy Keane",
+    "file": "athletes-elder-gen-x.yaml",
+    "subject": "athlete",
+    "occ": [
+      "football",
+      "soccer",
+      "hockey",
+      "tennis",
+      "athlete",
+      "player",
+      "sprinter",
+      "skier",
+      "boxer",
+      "sport",
+      "goalkeeper",
+      "striker",
+      "midfielder",
+      "defender",
+      "skater"
+    ]
+  },
+  {
+    "id": "rudi-voller",
+    "name": "Rudi Voller",
+    "file": "athletes-elder-gen-x.yaml",
+    "subject": "athlete",
+    "occ": [
+      "football",
+      "soccer",
+      "hockey",
+      "tennis",
+      "athlete",
+      "player",
+      "sprinter",
+      "skier",
+      "boxer",
+      "sport",
+      "goalkeeper",
+      "striker",
+      "midfielder",
+      "defender",
+      "skater"
+    ]
+  },
+  {
+    "id": "rui-costa",
+    "name": "Rui Costa",
+    "file": "athletes-elder-gen-x.yaml",
+    "subject": "athlete",
+    "occ": [
+      "football",
+      "soccer",
+      "hockey",
+      "tennis",
+      "athlete",
+      "player",
+      "sprinter",
+      "skier",
+      "boxer",
+      "sport",
+      "goalkeeper",
+      "striker",
+      "midfielder",
+      "defender",
+      "skater"
+    ]
+  },
+  {
+    "id": "salvatore-schillaci",
+    "name": "Salvatore Schillaci",
+    "file": "athletes-elder-gen-x.yaml",
+    "subject": "athlete",
+    "occ": [
+      "football",
+      "soccer",
+      "hockey",
+      "tennis",
+      "athlete",
+      "player",
+      "sprinter",
+      "skier",
+      "boxer",
+      "sport",
+      "goalkeeper",
+      "striker",
+      "midfielder",
+      "defender",
+      "skater"
+    ]
+  },
+  {
+    "id": "sepp-maier",
+    "name": "Sepp Maier",
+    "file": "athletes-elder-gen-x.yaml",
+    "subject": "athlete",
+    "occ": [
+      "football",
+      "soccer",
+      "hockey",
+      "tennis",
+      "athlete",
+      "player",
+      "sprinter",
+      "skier",
+      "boxer",
+      "sport",
+      "goalkeeper",
+      "striker",
+      "midfielder",
+      "defender",
+      "skater"
+    ]
+  },
+  {
+    "id": "sergio-ramos",
+    "name": "Sergio Ramos",
+    "file": "athletes-modern.yaml",
+    "subject": "athlete",
+    "occ": [
+      "football",
+      "soccer",
+      "hockey",
+      "tennis",
+      "athlete",
+      "player",
+      "sprinter",
+      "skier",
+      "boxer",
+      "sport",
+      "goalkeeper",
+      "striker",
+      "midfielder",
+      "defender",
+      "skater"
+    ]
+  },
+  {
+    "id": "tomas-brolin",
+    "name": "Tomas Brolin",
+    "file": "athletes-elder-gen-x.yaml",
+    "subject": "athlete",
+    "occ": [
+      "football",
+      "soccer",
+      "hockey",
+      "tennis",
+      "athlete",
+      "player",
+      "sprinter",
+      "skier",
+      "boxer",
+      "sport",
+      "goalkeeper",
+      "striker",
+      "midfielder",
+      "defender",
+      "skater"
+    ]
+  },
+  {
+    "id": "xavi",
+    "name": "Xavi",
+    "file": "athletes-modern.yaml",
+    "subject": "athlete",
+    "occ": [
+      "football",
+      "soccer",
+      "hockey",
+      "tennis",
+      "athlete",
+      "player",
+      "sprinter",
+      "skier",
+      "boxer",
+      "sport",
+      "goalkeeper",
+      "striker",
+      "midfielder",
+      "defender",
+      "skater"
+    ]
+  },
+  {
+    "id": "aqua",
+    "name": "Aqua",
+    "file": "bands-classics.yaml",
+    "subject": "band",
+    "occ": [
+      "band",
+      "group",
+      "musical",
+      "duo",
+      "rock",
+      "metal",
+      "ensemble"
+    ]
+  },
+  {
+    "id": "blur",
+    "name": "Blur",
+    "file": "bands-classics.yaml",
+    "subject": "band",
+    "occ": [
+      "band",
+      "group",
+      "musical",
+      "duo",
+      "rock",
+      "metal",
+      "ensemble"
+    ]
+  },
+  {
+    "id": "bo-kaspers-orkester",
+    "name": "Bo Kaspers Orkester",
+    "file": "bands-classics.yaml",
+    "subject": "band",
+    "occ": [
+      "band",
+      "group",
+      "musical",
+      "duo",
+      "rock",
+      "metal",
+      "ensemble"
+    ]
+  },
+  {
+    "id": "bon-jovi",
+    "name": "Bon Jovi",
+    "file": "bands-classics.yaml",
+    "subject": "band",
+    "occ": [
+      "band",
+      "group",
+      "musical",
+      "duo",
+      "rock",
+      "metal",
+      "ensemble"
+    ]
+  },
+  {
+    "id": "coldplay",
+    "name": "Coldplay",
+    "file": "bands-classics.yaml",
+    "subject": "band",
+    "occ": [
+      "band",
+      "group",
+      "musical",
+      "duo",
+      "rock",
+      "metal",
+      "ensemble"
+    ]
+  },
+  {
+    "id": "crowded-house",
+    "name": "Crowded House",
+    "file": "bands-classics.yaml",
+    "subject": "band",
+    "occ": [
+      "band",
+      "group",
+      "musical",
+      "duo",
+      "rock",
+      "metal",
+      "ensemble"
+    ]
+  },
+  {
+    "id": "daft-punk",
+    "name": "Daft Punk",
+    "file": "bands-classics.yaml",
+    "subject": "band",
+    "occ": [
+      "band",
+      "group",
+      "musical",
+      "duo",
+      "rock",
+      "metal",
+      "ensemble"
+    ]
+  },
+  {
+    "id": "eldkvarn",
+    "name": "Eldkvarn",
+    "file": "bands-classics.yaml",
+    "subject": "band",
+    "occ": [
+      "band",
+      "group",
+      "musical",
+      "duo",
+      "rock",
+      "metal",
+      "ensemble"
+    ]
+  },
+  {
+    "id": "first-aid-kit",
+    "name": "First Aid Kit",
+    "file": "bands-classics.yaml",
+    "subject": "band",
+    "occ": [
+      "band",
+      "group",
+      "musical",
+      "duo",
+      "rock",
+      "metal",
+      "ensemble"
+    ]
+  },
+  {
+    "id": "genesis",
+    "name": "Genesis",
+    "file": "bands-classics.yaml",
+    "subject": "band",
+    "occ": [
+      "band",
+      "group",
+      "musical",
+      "duo",
+      "rock",
+      "metal",
+      "ensemble"
+    ]
+  },
+  {
+    "id": "green-day",
+    "name": "Green Day",
+    "file": "bands-classics.yaml",
+    "subject": "band",
+    "occ": [
+      "band",
+      "group",
+      "musical",
+      "duo",
+      "rock",
+      "metal",
+      "ensemble"
+    ]
+  },
+  {
+    "id": "guns-n-roses",
+    "name": "Guns N' Roses",
+    "file": "bands-classics.yaml",
+    "subject": "band",
+    "occ": [
+      "band",
+      "group",
+      "musical",
+      "duo",
+      "rock",
+      "metal",
+      "ensemble"
+    ]
+  },
+  {
+    "id": "in-flames",
+    "name": "In Flames",
+    "file": "bands-classics.yaml",
+    "subject": "band",
+    "occ": [
+      "band",
+      "group",
+      "musical",
+      "duo",
+      "rock",
+      "metal",
+      "ensemble"
+    ]
+  },
+  {
+    "id": "inxs",
+    "name": "INXS",
+    "file": "bands-classics.yaml",
+    "subject": "band",
+    "occ": [
+      "band",
+      "group",
+      "musical",
+      "duo",
+      "rock",
+      "metal",
+      "ensemble"
+    ]
+  },
+  {
+    "id": "iron-maiden",
+    "name": "Iron Maiden",
+    "file": "bands-classics.yaml",
+    "subject": "band",
+    "occ": [
+      "band",
+      "group",
+      "musical",
+      "duo",
+      "rock",
+      "metal",
+      "ensemble"
+    ]
+  },
+  {
+    "id": "kent",
+    "name": "Kent",
+    "file": "bands-classics.yaml",
+    "subject": "band",
+    "occ": [
+      "band",
+      "group",
+      "musical",
+      "duo",
+      "rock",
+      "metal",
+      "ensemble"
+    ]
+  },
+  {
+    "id": "linkin-park",
+    "name": "Linkin Park",
+    "file": "bands-classics.yaml",
+    "subject": "band",
+    "occ": [
+      "band",
+      "group",
+      "musical",
+      "duo",
+      "rock",
+      "metal",
+      "ensemble"
+    ]
+  },
+  {
+    "id": "looptroop-rockers",
+    "name": "Looptroop Rockers",
+    "file": "bands-classics.yaml",
+    "subject": "band",
+    "occ": [
+      "band",
+      "group",
+      "musical",
+      "duo",
+      "rock",
+      "metal",
+      "ensemble"
+    ]
+  },
+  {
+    "id": "lordi",
+    "name": "Lordi",
+    "file": "bands-classics.yaml",
+    "subject": "band",
+    "occ": [
+      "band",
+      "group",
+      "musical",
+      "duo",
+      "rock",
+      "metal",
+      "ensemble"
+    ]
+  },
+  {
+    "id": "maroon-5",
+    "name": "Maroon 5",
+    "file": "bands-classics.yaml",
+    "subject": "band",
+    "occ": [
+      "band",
+      "group",
+      "musical",
+      "duo",
+      "rock",
+      "metal",
+      "ensemble"
+    ]
+  },
+  {
+    "id": "nirvana",
+    "name": "Nirvana",
+    "file": "bands-classics.yaml",
+    "subject": "band",
+    "occ": [
+      "band",
+      "group",
+      "musical",
+      "duo",
+      "rock",
+      "metal",
+      "ensemble"
+    ]
+  },
+  {
+    "id": "oasis",
+    "name": "Oasis",
+    "file": "bands-classics.yaml",
+    "subject": "band",
+    "occ": [
+      "band",
+      "group",
+      "musical",
+      "duo",
+      "rock",
+      "metal",
+      "ensemble"
+    ]
+  },
+  {
+    "id": "pearl-jam",
+    "name": "Pearl Jam",
+    "file": "bands-classics.yaml",
+    "subject": "band",
+    "occ": [
+      "band",
+      "group",
+      "musical",
+      "duo",
+      "rock",
+      "metal",
+      "ensemble"
+    ]
+  },
+  {
+    "id": "pet-shop-boys",
+    "name": "Pet Shop Boys",
+    "file": "bands-classics.yaml",
+    "subject": "band",
+    "occ": [
+      "band",
+      "group",
+      "musical",
+      "duo",
+      "rock",
+      "metal",
+      "ensemble"
+    ]
+  },
+  {
+    "id": "queen",
+    "name": "Queen",
+    "file": "bands-classics.yaml",
+    "subject": "band",
+    "occ": [
+      "band",
+      "group",
+      "musical",
+      "duo",
+      "rock",
+      "metal",
+      "ensemble"
+    ]
+  },
+  {
+    "id": "rem",
+    "name": "R.E.M.",
+    "file": "bands-classics.yaml",
+    "subject": "band",
+    "occ": [
+      "band",
+      "group",
+      "musical",
+      "duo",
+      "rock",
+      "metal",
+      "ensemble"
+    ]
+  },
+  {
+    "id": "radiohead",
+    "name": "Radiohead",
+    "file": "bands-classics.yaml",
+    "subject": "band",
+    "occ": [
+      "band",
+      "group",
+      "musical",
+      "duo",
+      "rock",
+      "metal",
+      "ensemble"
+    ]
+  },
+  {
+    "id": "red-hot-chili-peppers",
+    "name": "Red Hot Chili Peppers",
+    "file": "bands-classics.yaml",
+    "subject": "band",
+    "occ": [
+      "band",
+      "group",
+      "musical",
+      "duo",
+      "rock",
+      "metal",
+      "ensemble"
+    ]
+  },
+  {
+    "id": "simple-minds",
+    "name": "Simple Minds",
+    "file": "bands-classics.yaml",
+    "subject": "band",
+    "occ": [
+      "band",
+      "group",
+      "musical",
+      "duo",
+      "rock",
+      "metal",
+      "ensemble"
+    ]
+  },
+  {
+    "id": "sven-ingvars",
+    "name": "Sven-Ingvars",
+    "file": "bands-classics.yaml",
+    "subject": "band",
+    "occ": [
+      "band",
+      "group",
+      "musical",
+      "duo",
+      "rock",
+      "metal",
+      "ensemble"
+    ]
+  },
+  {
+    "id": "swedish-house-mafia",
+    "name": "Swedish House Mafia",
+    "file": "bands-classics.yaml",
+    "subject": "band",
+    "occ": [
+      "band",
+      "group",
+      "musical",
+      "duo",
+      "rock",
+      "metal",
+      "ensemble"
+    ]
+  },
+  {
+    "id": "take-that",
+    "name": "Take That",
+    "file": "bands-classics.yaml",
+    "subject": "band",
+    "occ": [
+      "band",
+      "group",
+      "musical",
+      "duo",
+      "rock",
+      "metal",
+      "ensemble"
+    ]
+  },
+  {
+    "id": "the-ark",
+    "name": "The Ark",
+    "file": "bands-classics.yaml",
+    "subject": "band",
+    "occ": [
+      "band",
+      "group",
+      "musical",
+      "duo",
+      "rock",
+      "metal",
+      "ensemble"
+    ]
+  },
+  {
+    "id": "the-cardigans",
+    "name": "The Cardigans",
+    "file": "bands-classics.yaml",
+    "subject": "band",
+    "occ": [
+      "band",
+      "group",
+      "musical",
+      "duo",
+      "rock",
+      "metal",
+      "ensemble"
+    ]
+  },
+  {
+    "id": "the-cure",
+    "name": "The Cure",
+    "file": "bands-classics.yaml",
+    "subject": "band",
+    "occ": [
+      "band",
+      "group",
+      "musical",
+      "duo",
+      "rock",
+      "metal",
+      "ensemble"
+    ]
+  },
+  {
+    "id": "the-doors",
+    "name": "The Doors",
+    "file": "bands-classics.yaml",
+    "subject": "band",
+    "occ": [
+      "band",
+      "group",
+      "musical",
+      "duo",
+      "rock",
+      "metal",
+      "ensemble"
+    ]
+  },
+  {
+    "id": "wham",
+    "name": "Wham!",
+    "file": "bands-classics.yaml",
+    "subject": "band",
+    "occ": [
+      "band",
+      "group",
+      "musical",
+      "duo",
+      "rock",
+      "metal",
+      "ensemble"
+    ]
+  },
+  {
+    "id": "ylvis",
+    "name": "Ylvis",
+    "file": "bands-classics.yaml",
+    "subject": "band",
+    "occ": [
+      "band",
+      "group",
+      "musical",
+      "duo",
+      "rock",
+      "metal",
+      "ensemble"
+    ]
+  }
+]

@@ -1,0 +1,366 @@
+[
+  {
+    "name": "Sabaton",
+    "cat": "Musik"
+  },
+  {
+    "name": "Jerry Williams",
+    "cat": "Musik"
+  },
+  {
+    "name": "Ola Salo",
+    "cat": "Musik"
+  },
+  {
+    "name": "Arvingarna",
+    "cat": "Musik"
+  },
+  {
+    "name": "Nordman",
+    "cat": "Musik"
+  },
+  {
+    "name": "Alcazar",
+    "cat": "Musik"
+  },
+  {
+    "name": "Linda Bengtzing",
+    "cat": "Musik"
+  },
+  {
+    "name": "Anna Bergendahl",
+    "cat": "Musik"
+  },
+  {
+    "name": "Cornelia Jakobs",
+    "cat": "Musik"
+  },
+  {
+    "name": "Mauro Scocco",
+    "cat": "Musik"
+  },
+  {
+    "name": "Peter Jöback",
+    "cat": "Musik"
+  },
+  {
+    "name": "Eric Gadd",
+    "cat": "Musik"
+  },
+  {
+    "name": "Emilia Rydberg",
+    "cat": "Musik"
+  },
+  {
+    "name": "Amanda Jenssen",
+    "cat": "Musik"
+  },
+  {
+    "name": "Yohio",
+    "cat": "Musik"
+  },
+  {
+    "name": "Fronda",
+    "cat": "Musik"
+  },
+  {
+    "name": "Seinabo Sey",
+    "cat": "Musik"
+  },
+  {
+    "name": "HammerFall",
+    "cat": "Musik"
+  },
+  {
+    "name": "Valter Skarsgård",
+    "cat": "Film"
+  },
+  {
+    "name": "Peter Haber",
+    "cat": "Film"
+  },
+  {
+    "name": "Johan Rheborg",
+    "cat": "Film"
+  },
+  {
+    "name": "Robert Gustafsson",
+    "cat": "Film"
+  },
+  {
+    "name": "Lena Endre",
+    "cat": "Film"
+  },
+  {
+    "name": "Suzanne Reuter",
+    "cat": "Film"
+  },
+  {
+    "name": "Kjell Bergqvist",
+    "cat": "Film"
+  },
+  {
+    "name": "Börje Ahlstedt",
+    "cat": "Film"
+  },
+  {
+    "name": "Ernst-Hugo Järegård",
+    "cat": "Film"
+  },
+  {
+    "name": "Gösta Ekman",
+    "cat": "Film"
+  },
+  {
+    "name": "Ingvar Hirdwall",
+    "cat": "Film"
+  },
+  {
+    "name": "Jarl Kulle",
+    "cat": "Film"
+  },
+  {
+    "name": "Maria Lundqvist",
+    "cat": "Film"
+  },
+  {
+    "name": "Ulla Skoog",
+    "cat": "Film"
+  },
+  {
+    "name": "Sissela Kyle",
+    "cat": "Film"
+  },
+  {
+    "name": "Björn Gustafsson",
+    "cat": "Film"
+  },
+  {
+    "name": "Eva Rydberg",
+    "cat": "Film"
+  },
+  {
+    "name": "Fares Fares",
+    "cat": "Film"
+  },
+  {
+    "name": "Tuva Novotny",
+    "cat": "Film"
+  },
+  {
+    "name": "Jonas Karlsson",
+    "cat": "Film"
+  },
+  {
+    "name": "Johan Ulveson",
+    "cat": "Film"
+  },
+  {
+    "name": "Claes Månsson",
+    "cat": "Film"
+  },
+  {
+    "name": "Claes Malmberg",
+    "cat": "Film"
+  },
+  {
+    "name": "Henrik Dorsin",
+    "cat": "Film"
+  },
+  {
+    "name": "Rachel Mohlin",
+    "cat": "Film"
+  },
+  {
+    "name": "Torkel Petersson",
+    "cat": "Film"
+  },
+  {
+    "name": "Johan Glans",
+    "cat": "Film"
+  },
+  {
+    "name": "David Hellenius",
+    "cat": "Film"
+  },
+  {
+    "name": "Felix Herngren",
+    "cat": "Film"
+  },
+  {
+    "name": "Peter Settman",
+    "cat": "Film"
+  },
+  {
+    "name": "Suzanne Axell",
+    "cat": "Film"
+  },
+  {
+    "name": "Edvin Ryding",
+    "cat": "Film"
+  },
+  {
+    "name": "Omar Rudberg",
+    "cat": "Film"
+  },
+  {
+    "name": "Adam Lundgren",
+    "cat": "Film"
+  },
+  {
+    "name": "Happy Jankell",
+    "cat": "Film"
+  },
+  {
+    "name": "Alba August",
+    "cat": "Film"
+  },
+  {
+    "name": "Evin Ahmad",
+    "cat": "Film"
+  },
+  {
+    "name": "Gizem Erdogan",
+    "cat": "Film"
+  },
+  {
+    "name": "Reine Brynolfsson",
+    "cat": "Film"
+  },
+  {
+    "name": "Shanti Roney",
+    "cat": "Film"
+  },
+  {
+    "name": "Malin Åkerman",
+    "cat": "Film"
+  },
+  {
+    "name": "Erik Johansson",
+    "cat": "Film"
+  },
+  {
+    "name": "Moa Gammel",
+    "cat": "Film"
+  },
+  {
+    "name": "Gustaf Hammarsten",
+    "cat": "Film"
+  },
+  {
+    "name": "Liv Mjönes",
+    "cat": "Film"
+  },
+  {
+    "name": "Eva Melander",
+    "cat": "Film"
+  },
+  {
+    "name": "Anders Jansson",
+    "cat": "Film"
+  },
+  {
+    "name": "Jonas Inde",
+    "cat": "Film"
+  },
+  {
+    "name": "Nils van der Poel",
+    "cat": "Sport"
+  },
+  {
+    "name": "Kajsa Bergqvist",
+    "cat": "Sport"
+  },
+  {
+    "name": "Daniel Ståhl",
+    "cat": "Sport"
+  },
+  {
+    "name": "Jenny Rissveds",
+    "cat": "Sport"
+  },
+  {
+    "name": "Tomas Ravelli",
+    "cat": "Sport"
+  },
+  {
+    "name": "Kennet Andersson",
+    "cat": "Sport"
+  },
+  {
+    "name": "Lotta Schelin",
+    "cat": "Sport"
+  },
+  {
+    "name": "Kosovare Asllani",
+    "cat": "Sport"
+  },
+  {
+    "name": "Johan Elmander",
+    "cat": "Sport"
+  },
+  {
+    "name": "Viktor Gyökeres",
+    "cat": "Sport"
+  },
+  {
+    "name": "Jörgen Brink",
+    "cat": "Sport"
+  },
+  {
+    "name": "Ludmila Engquist",
+    "cat": "Sport"
+  },
+  {
+    "name": "Kurt Hamrin",
+    "cat": "Sport"
+  },
+  {
+    "name": "Anders Limpar",
+    "cat": "Sport"
+  },
+  {
+    "name": "Kim Källström",
+    "cat": "Sport"
+  },
+  {
+    "name": "Olof Mellberg",
+    "cat": "Sport"
+  },
+  {
+    "name": "Sebastian Larsson",
+    "cat": "Sport"
+  },
+  {
+    "name": "Robin Olsen",
+    "cat": "Sport"
+  },
+  {
+    "name": "Robin Söderling",
+    "cat": "Sport"
+  },
+  {
+    "name": "Thomas Johansson",
+    "cat": "Sport"
+  },
+  {
+    "name": "Mikaela Laurén",
+    "cat": "Sport"
+  },
+  {
+    "name": "Susanna Kallur",
+    "cat": "Sport"
+  },
+  {
+    "name": "Michel Tornéus",
+    "cat": "Sport"
+  },
+  {
+    "name": "Emma Green",
+    "cat": "Sport"
+  },
+  {
+    "name": "Tobias Karlsson",
+    "cat": "Sport"
+  }
+]

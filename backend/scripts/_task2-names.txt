@@ -1,0 +1,219 @@
+ABBA|Musik
+Avicii|Musik
+Zara Larsson|Musik
+Håkan Hellström|Musik
+Veronica Maggio|Musik
+Kent|Musik
+Roxette|Musik
+Carola|Musik
+Laleh|Musik
+Björn Skifs|Musik
+Magnus Uggla|Musik
+Lars Winnerbäck|Musik
+Ted Gärdestad|Musik
+Tomas Ledin|Musik
+Lena Philipsson|Musik
+Per Gessle|Musik
+Jill Johnson|Musik
+Robyn|Musik
+Tove Lo|Musik
+Loreen|Musik
+Måns Zelmerlöw|Musik
+Danny Saucedo|Musik
+Molly Sandén|Musik
+Benjamin Ingrosso|Musik
+First Aid Kit|Musik
+Miriam Bryant|Musik
+Darin|Musik
+Agnes|Musik
+Petra Marklund|Musik
+Sarah Dawn Finer|Musik
+E-Type|Musik
+Ace of Base|Musik
+Europe|Musik
+The Cardigans|Musik
+The Hives|Musik
+The Ark|Musik
+Ghost|Musik
+Sabaton|Musik
+Swedish House Mafia|Musik
+Basshunter|Musik
+Petter|Musik
+Markoolio|Musik
+Tommy Körberg|Musik
+Jerry Williams|Musik
+Ola Salo|Musik
+Arvingarna|Musik
+Vikingarna|Musik
+Nordman|Musik
+Alcazar|Musik
+Charlotte Perrelli|Musik
+Sanna Nielsen|Musik
+Shirley Clamp|Musik
+Christer Sjögren|Musik
+Linda Bengtzing|Musik
+Anna Bergendahl|Musik
+Albin Lee Meldau|Musik
+Victor Leksell|Musik
+Thomas Stenström|Musik
+Miss Li|Musik
+Cornelia Jakobs|Musik
+Jan Johansen|Musik
+Orup|Musik
+Niklas Strömstedt|Musik
+Mauro Scocco|Musik
+Ulf Lundell|Musik
+Lisa Nilsson|Musik
+Helen Sjöholm|Musik
+Peter Jöback|Musik
+Eric Gadd|Musik
+Emilia Rydberg|Musik
+Amanda Jenssen|Musik
+Yohio|Musik
+Fronda|Musik
+Timbuktu|Musik
+Oskar Linnros|Musik
+Seinabo Sey|Musik
+Mando Diao|Musik
+Gyllene Tider|Musik
+Eldkvarn|Musik
+HammerFall|Musik
+Ingrid Bergman|Film
+Greta Garbo|Film
+Max von Sydow|Film
+Stellan Skarsgård|Film
+Alexander Skarsgård|Film
+Gustaf Skarsgård|Film
+Bill Skarsgård|Film
+Valter Skarsgård|Film
+Alicia Vikander|Film
+Mikael Persbrandt|Film
+Peter Stormare|Film
+Lena Olin|Film
+Noomi Rapace|Film
+Rolf Lassgård|Film
+Peter Haber|Film
+Mikael Nyqvist|Film
+Krister Henriksson|Film
+Johan Rheborg|Film
+Robert Gustafsson|Film
+Helena Bergström|Film
+Pernilla August|Film
+Lena Endre|Film
+Suzanne Reuter|Film
+Kjell Bergqvist|Film
+Börje Ahlstedt|Film
+Sven Wollter|Film
+Ernst-Hugo Järegård|Film
+Gösta Ekman|Film
+Ingvar Hirdwall|Film
+Allan Edwall|Film
+Jarl Kulle|Film
+Tomas von Brömssen|Film
+Maria Lundqvist|Film
+Ulla Skoog|Film
+Sissela Kyle|Film
+Björn Gustafsson|Film
+Eva Rydberg|Film
+Fares Fares|Film
+Tuva Novotny|Film
+Sofia Helin|Film
+Jonas Karlsson|Film
+Johan Ulveson|Film
+Claes Månsson|Film
+Claes Malmberg|Film
+Henrik Dorsin|Film
+Rachel Mohlin|Film
+Torkel Petersson|Film
+Johan Glans|Film
+David Hellenius|Film
+Felix Herngren|Film
+Peter Settman|Film
+Suzanne Axell|Film
+Edvin Ryding|Film
+Omar Rudberg|Film
+Adam Lundgren|Film
+Happy Jankell|Film
+Alba August|Film
+Evin Ahmad|Film
+Gizem Erdogan|Film
+Reine Brynolfsson|Film
+Shanti Roney|Film
+Malin Åkerman|Film
+Erik Johansson|Film
+Moa Gammel|Film
+Gustaf Hammarsten|Film
+Liv Mjönes|Film
+Eva Melander|Film
+Anders Jansson|Film
+Jonas Inde|Film
+Zlatan Ibrahimović|Sport
+Björn Borg|Sport
+Ingemar Stenmark|Sport
+Armand Duplantis|Sport
+Sarah Sjöström|Sport
+Peter Forsberg|Sport
+Henrik Lundqvist|Sport
+Mats Sundin|Sport
+Börje Salming|Sport
+Annika Sörenstam|Sport
+Jan-Ove Waldner|Sport
+Carolina Klüft|Sport
+Stefan Edberg|Sport
+Mats Wilander|Sport
+Charlotte Kalla|Sport
+Anja Pärson|Sport
+Magdalena Forsberg|Sport
+Pernilla Wiberg|Sport
+Gunde Svan|Sport
+Nils van der Poel|Sport
+Patrik Sjöberg|Sport
+Christian Olsson|Sport
+Kajsa Bergqvist|Sport
+Stefan Holm|Sport
+Daniel Ståhl|Sport
+Jenny Rissveds|Sport
+Peder Fredricson|Sport
+Glenn Hysén|Sport
+Tomas Brolin|Sport
+Henrik Larsson|Sport
+Tomas Ravelli|Sport
+Kennet Andersson|Sport
+Fredrik Ljungberg|Sport
+Caroline Seger|Sport
+Lotta Schelin|Sport
+Kosovare Asllani|Sport
+Johan Elmander|Sport
+Dejan Kulusevski|Sport
+Viktor Gyökeres|Sport
+Victor Hedman|Sport
+Nicklas Lidström|Sport
+Daniel Alfredsson|Sport
+Markus Näslund|Sport
+Erik Karlsson|Sport
+Mats Näslund|Sport
+Johan Olsson|Sport
+Jörgen Brink|Sport
+Ludmila Engquist|Sport
+Gunnar Nordahl|Sport
+Nils Liedholm|Sport
+Kurt Hamrin|Sport
+Anders Limpar|Sport
+Kim Källström|Sport
+Olof Mellberg|Sport
+Sebastian Larsson|Sport
+Emil Forsberg|Sport
+Robin Olsen|Sport
+Alexander Isak|Sport
+Robin Söderling|Sport
+Jonas Björkman|Sport
+Thomas Johansson|Sport
+Jörgen Persson|Sport
+Mikaela Laurén|Sport
+Susanna Kallur|Sport
+Michel Tornéus|Sport
+Emma Green|Sport
+Stefan Lövgren|Sport
+Magnus Wislander|Sport
+Kim Andersson|Sport
+Tobias Karlsson|Sport

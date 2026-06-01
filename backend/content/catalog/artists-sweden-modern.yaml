@@ -1,0 +1,63 @@
+# Svenska solo-artister kända för Millennials + Gen Z. Tillagda 2026-06-01.
+audience: ["millennials", "gen-z"]
+region: ["sweden"]
+category: artists
+contentForm: image
+contentSubject: artist
+items:
+  - id: ola-salo
+    displayName: "Ola Salo"
+    probability: 78
+    peakFrom: 2000
+    peakTo: 2011
+    wikimediaSearchHints: ["Ola Salo singer The Ark"]
+    answerMethods: ["name-letters"]
+  - id: linda-bengtzing
+    displayName: "Linda Bengtzing"
+    probability: 74
+    peakFrom: 2005
+    peakTo: 2015
+    wikimediaSearchHints: ["Linda Bengtzing"]
+    answerMethods: ["name-letters"]
+  - id: anna-bergendahl
+    displayName: "Anna Bergendahl"
+    probability: 74
+    peakFrom: 2010
+    peakTo: 2022
+    wikimediaSearchHints: ["Anna Bergendahl"]
+    answerMethods: ["name-letters"]
+  - id: cornelia-jakobs
+    displayName: "Cornelia Jakobs"
+    probability: 72
+    peakFrom: 2022
+    peakTo: 2024
+    wikimediaSearchHints: ["Cornelia Jakobs"]
+    answerMethods: ["name-letters"]
+  - id: amanda-jenssen
+    displayName: "Amanda Jenssen"
+    probability: 74
+    peakFrom: 2007
+    peakTo: 2015
+    wikimediaSearchHints: ["Amanda Jenssen"]
+    answerMethods: ["name-letters"]
+  - id: yohio
+    displayName: "Yohio"
+    probability: 66
+    peakFrom: 2013
+    peakTo: 2016
+    wikimediaSearchHints: ["Yohio singer"]
+    answerMethods: ["name-letters"]
+  - id: fronda
+    displayName: "Fronda"
+    probability: 62
+    peakFrom: 2010
+    peakTo: 2018
+    wikimediaSearchHints: ["Fronda rapper"]
+    answerMethods: ["name-letters"]
+  - id: seinabo-sey
+    displayName: "Seinabo Sey"
+    probability: 70
+    peakFrom: 2014
+    peakTo: 2020
+    wikimediaSearchHints: ["Seinabo Sey"]
+    answerMethods: ["name-letters"]

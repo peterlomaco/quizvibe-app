@@ -219,14 +219,6 @@ items:
     probability: 75
     wikimediaSearchHints: ["Patti Smith singer"]
     answerMethods: ["timeline", "name-letters"]
-  - id: peter-gabriel
-    displayName: "Peter Gabriel"
-    correctYear: 1950
-    peakFrom: 1967
-    peakTo: 2024
-    probability: 80
-    wikimediaSearchHints: ["Peter Gabriel Genesis singer"]
-    answerMethods: ["timeline", "name-letters"]
   - id: ozzy-osbourne
     displayName: "Ozzy Osbourne"
     correctYear: 1948
@@ -298,14 +290,6 @@ items:
     peakTo: 2024
     probability: 78
     wikimediaSearchHints: ["Garth Brooks country singer"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: bryan-adams
-    displayName: "Bryan Adams"
-    correctYear: 1959
-    peakFrom: 1979
-    peakTo: 2024
-    probability: 92
-    wikimediaSearchHints: ["Bryan Adams singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: enya
     displayName: "Enya"
@@ -538,12 +522,6 @@ items:
     correctYear: 1963
     probability: 78
     wikimediaSearchHints: ["Lotta Engberg Swedish dansband singer Eurovision Boogaloo"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: stephen-simmonds
-    displayName: "Stephen Simmonds"
-    correctYear: 1973
-    probability: 70
-    wikimediaSearchHints: ["Stephen Simmonds Swedish R&B singer Tears Never Dry"]
     answerMethods: ["timeline", "name-letters"]
   - id: anders-f-ronnblom
     displayName: "Anders F Rönnblom"

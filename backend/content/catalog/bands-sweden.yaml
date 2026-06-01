@@ -1,0 +1,22 @@
+# Svenska band — cross-gen-igenkända i Sverige (V1 svensk-fokus).
+# Tillagda 2026-06-01 (kända-svenskar-utbyggnad). peak = aktiv/recognition-fönster.
+audience: ["all"]
+region: ["sweden"]
+category: artists
+contentForm: image
+contentSubject: band
+items:
+  - id: arvingarna
+    displayName: "Arvingarna"
+    probability: 78
+    peakFrom: 1993
+    peakTo: 2023
+    wikimediaSearchHints: ["Arvingarna dansband"]
+    answerMethods: ["name-letters"]
+  - id: alcazar
+    displayName: "Alcazar"
+    probability: 78
+    peakFrom: 1999
+    peakTo: 2009
+    wikimediaSearchHints: ["Alcazar band Sweden"]
+    answerMethods: ["name-letters"]

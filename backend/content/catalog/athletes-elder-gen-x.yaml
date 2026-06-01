@@ -222,12 +222,6 @@ items:
     probability: 82
     wikimediaSearchHints: ["Katarina Witt figure skater"]
     answerMethods: ["timeline", "name-letters"]
-  - id: alberto-tomba
-    displayName: "Alberto Tomba"
-    correctYear: 1966
-    probability: 82
-    wikimediaSearchHints: ["Alberto Tomba skier Italy"]
-    answerMethods: ["timeline", "name-letters"]
   - id: jean-claude-killy
     displayName: "Jean-Claude Killy"
     correctYear: 1943
@@ -402,13 +396,6 @@ items:
     probability: 75
     wikimediaSearchHints: ["Mats Naslund Montreal Canadiens hockey Sweden Le Petit Viking"]
     answerMethods: ["timeline", "name-letters"]
-  - id: tomas-brolin
-    displayName: "Tomas Brolin"
-    correctYear: 1969
-    probability: 82
-    wikimediaSearchHints: ["Tomas Brolin football Sweden World Cup Parma"]
-    answerMethods: ["timeline", "name-letters"]
-    # pkg-fifa-wc-tag removed 2026-05-27 — no Brolin celebration / VM 94 photo on Commons
   - id: glenn-hysen
     displayName: "Glenn Hysén"
     correctYear: 1959
@@ -518,12 +505,6 @@ items:
     correctYear: 1965
     probability: 86
     wikimediaSearchHints: ["Jesper Parnevik Swedish golfer PGA Tour"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: kent-nilsson
-    displayName: "Kent Nilsson"
-    correctYear: 1956
-    probability: 82
-    wikimediaSearchHints: ["Kent Nilsson Swedish ice hockey Magic Man Flames Oilers"]
     answerMethods: ["timeline", "name-letters"]
   - id: nils-liedholm
     displayName: "Nils Liedholm"
@@ -671,13 +652,6 @@ items:
     wikimediaSearchHints: ["Lev Yashin Soviet goalkeeper Black Spider 1960s"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
-  - id: hristo-stoichkov
-    displayName: "Hristo Stoichkov"
-    correctYear: 1966
-    probability: 80
-    wikimediaSearchHints: ["Hristo Stoichkov Bulgarian footballer 1994 World Cup"]
-    answerMethods: ["timeline", "name-letters"]
-    # pkg-fifa-wc-tag removed 2026-05-27 — Peter rejected current webp (long-shot); no close-up alternative.
   - id: just-fontaine
     displayName: "Just Fontaine"
     correctYear: 1933
@@ -690,12 +664,6 @@ items:
     correctYear: 1963
     probability: 78
     wikimediaSearchHints: ["Jean-Pierre Papin French striker 1990 World Cup Ballon d'Or"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: claudio-caniggia
-    displayName: "Claudio Caniggia"
-    correctYear: 1967
-    probability: 78
-    wikimediaSearchHints: ["Claudio Caniggia Argentina 1990 World Cup"]
     answerMethods: ["timeline", "name-letters"]
   - id: socrates
     displayName: "Sócrates"
@@ -1013,13 +981,6 @@ items:
     genrePackages: ["pkg-fifa-wc"]
   # davor-suker removed 2026-05-27 — current webp is team-celebration shot
   # (no individual player visible); no Commons single-player kit-bild found.
-  - id: gabriel-batistuta
-    displayName: "Gabriel Batistuta"
-    correctYear: 1969
-    probability: 86
-    wikimediaSearchHints: ["Gabriel Batistuta Argentine striker Batigol Fiorentina Roma"]
-    answerMethods: ["timeline", "name-letters"]
-    # pkg-fifa-wc-tag removed 2026-05-27 — current webp is civilian, no Commons action-shot found
   # === FIFA WC Pass 8 — mass-add (Peter accepterar civilian) 2026-05-27 ===
   - id: michel-platini
     displayName: "Michel Platini"
@@ -1056,13 +1017,6 @@ items:
     wikimediaSearchHints: ["Carlos Alberto footballer national team"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
-  - id: rudi-voller
-    displayName: "Rudi Voller"
-    correctYear: 1960
-    probability: 78
-    wikimediaSearchHints: ["Rudi Voller footballer national team"]
-    answerMethods: ["timeline", "name-letters"]
-    # pkg-fifa-wc-tag removed 2026-05-27 — no Italia 1990 kit-bild on Commons
   - id: alan-shearer
     displayName: "Alan Shearer"
     correctYear: 1970
@@ -1125,12 +1079,6 @@ items:
     wikimediaSearchHints: ["Hugo Sanchez footballer national team"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
-  - id: carlos-valderrama
-    displayName: "Carlos Valderrama"
-    correctYear: 1961
-    probability: 78
-    wikimediaSearchHints: ["Carlos Valderrama footballer national team"]
-    answerMethods: ["timeline", "name-letters"]
   - id: marcelo-salas
     displayName: "Marcelo Salas"
     correctYear: 1974
@@ -1145,12 +1093,6 @@ items:
     wikimediaSearchHints: ["Lilian Thuram footballer national team"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
-  - id: marcel-desailly
-    displayName: "Marcel Desailly"
-    correctYear: 1968
-    probability: 78
-    wikimediaSearchHints: ["Marcel Desailly footballer national team"]
-    answerMethods: ["timeline", "name-letters"]
   - id: oliver-kahn
     displayName: "Oliver Kahn"
     correctYear: 1969
@@ -1179,12 +1121,6 @@ items:
     wikimediaSearchHints: ["Pavel Nedved footballer national team"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
-  - id: gheorghe-hagi
-    displayName: "Gheorghe Hagi"
-    correctYear: 1965
-    probability: 78
-    wikimediaSearchHints: ["Gheorghe Hagi footballer national team"]
-    answerMethods: ["timeline", "name-letters"]
   - id: frank-rijkaard
     displayName: "Frank Rijkaard"
     correctYear: 1962
@@ -1211,13 +1147,6 @@ items:
     correctYear: 1974
     probability: 78
     wikimediaSearchHints: ["Alessandro Del Piero footballer national team"]
-    answerMethods: ["timeline", "name-letters"]
-    genrePackages: ["pkg-fifa-wc"]
-  - id: christian-vieri
-    displayName: "Christian Vieri"
-    correctYear: 1973
-    probability: 78
-    wikimediaSearchHints: ["Christian Vieri footballer national team"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: gaetano-scirea
@@ -1248,12 +1177,6 @@ items:
     wikimediaSearchHints: ["Pat Jennings footballer national team"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
-  - id: roy-keane
-    displayName: "Roy Keane"
-    correctYear: 1971
-    probability: 78
-    wikimediaSearchHints: ["Roy Keane footballer national team"]
-    answerMethods: ["timeline", "name-letters"]
   - id: rabah-madjer
     displayName: "Rabah Madjer"
     correctYear: 1958
@@ -1275,13 +1198,6 @@ items:
     wikimediaSearchHints: ["Ali Daei footballer national team"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
-  - id: salvatore-schillaci
-    displayName: "Salvatore Schillaci"
-    correctYear: 1964
-    probability: 78
-    wikimediaSearchHints: ["Salvatore Schillaci footballer national team"]
-    answerMethods: ["timeline", "name-letters"]
-    # pkg-fifa-wc-tag removed 2026-05-27 — only jersey-artifact on Commons
   - id: jean-tigana
     displayName: "Jean Tigana"
     correctYear: 1955
@@ -1302,13 +1218,6 @@ items:
     correctYear: 1964
     probability: 78
     wikimediaSearchHints: ["Jurgen Klinsmann footballer national team"]
-    answerMethods: ["timeline", "name-letters"]
-    genrePackages: ["pkg-fifa-wc"]
-  - id: andreas-brehme
-    displayName: "Andreas Brehme"
-    correctYear: 1960
-    probability: 78
-    wikimediaSearchHints: ["Andreas Brehme footballer national team"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: martin-dahlin
@@ -1447,13 +1356,6 @@ items:
     correctYear: 1974
     probability: 78
     wikimediaSearchHints: ["Sol Campbell footballer national team"]
-    answerMethods: ["timeline", "name-letters"]
-    genrePackages: ["pkg-fifa-wc"]
-  - id: rui-costa
-    displayName: "Rui Costa"
-    correctYear: 1972
-    probability: 78
-    wikimediaSearchHints: ["Rui Costa footballer national team"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: yoshikatsu-kawaguchi

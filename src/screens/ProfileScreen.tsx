@@ -16,8 +16,10 @@ import {
     Switch,
     Text,
     TextInput,
+    TouchableOpacity,
     View,
 } from 'react-native';
+import Svg, { Path } from 'react-native-svg';
 import { Avatar } from '../components/Avatar';
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
@@ -83,9 +85,10 @@ const CATEGORIES: AvatarCategory[] = ['All', 'Basic', 'Retro', 'Music', 'Tech', 
 // ─── Birth year options (descending, newest first) ────────────────────────────
 const CURRENT_YEAR = new Date().getFullYear();
 const MIN_BIRTH_YEAR = 1930;
-// 13+ minimum age requirement (App Store / GDPR compliance). Dynamisk så
-// minimum-året följer current year — 2026: max 2013, 2027: max 2014, osv.
-const MAX_BIRTH_YEAR = CURRENT_YEAR - 13;
+// 15+ minimum age requirement (2026-06-01: höjt från 13+ pga 15+-gränsat
+// film-/innehåll i appen, utöver App Store / GDPR). Dynamisk så minimum-året
+// följer current year — 2026: max 2011, 2027: max 2012, osv.
+const MAX_BIRTH_YEAR = CURRENT_YEAR - 15;
 const BIRTH_YEARS = Array.from(
   { length: MAX_BIRTH_YEAR - MIN_BIRTH_YEAR + 1 },
   (_, i) => MAX_BIRTH_YEAR - i,
@@ -141,6 +144,7 @@ const ASSISTANCE_OPTIONS: { id: AssistanceLevel; label: string }[] = [
 const REGION_OPTIONS: { id: Region; label: string }[] = [
   { id: 'sweden', label: 'Sweden' },
 ];
+const REGION_FLAGS: Record<string, string> = { sweden: '🇸🇪', Sweden: '🇸🇪' };
 
 // Hur länge spelarna har på sig att svara på en fråga (skiljer sig från
 // hur länge själva frågematerialet — låt/video/bild — spelas upp).
@@ -386,18 +390,18 @@ export default function ProfileScreen() {
   // Game connections-blocket (Friends) kan kollapsas
   // för att minska scrollning. Default expanded så användaren ser
   // alternativen direkt vid första besöket.
-  const [gameConnectionsExpanded, setGameConnectionsExpanded] = useState(true);
+  const [gameConnectionsExpanded, setGameConnectionsExpanded] = useState(false);
   // Profile default settings-blocket (avatar + playerName + setup + Save)
   // — samma kollapsbara mönster som Game connections och Player history.
-  const [profileDefaultsExpanded, setProfileDefaultsExpanded] = useState(true);
+  const [profileDefaultsExpanded, setProfileDefaultsExpanded] = useState(false);
   // Host default settings-blocket (Game Mode → Number of Rounds) —
   // egen huvudrubrik mellan Profile defaults och Game connections, samma
   // kollapsbara mönster som de övriga top-level sektionerna.
-  const [hostDefaultsExpanded, setHostDefaultsExpanded] = useState(true);
+  const [hostDefaultsExpanded, setHostDefaultsExpanded] = useState(false);
   // Customized Host packages — egen kollapsbar sektion mellan Host defaults
   // och Game connections. Listar PURCHASED_PACKAGES (mock tills Store-
   // integrationen är inkopplad) + Add-knapp som leder till Store.
-  const [customizedPackagesExpanded, setCustomizedPackagesExpanded] = useState(true);
+  const [customizedPackagesExpanded, setCustomizedPackagesExpanded] = useState(false);
   // Legal-sektionen — Privacy Policy + Terms of Service. Default collapsed
   // eftersom användare sällan behöver öppna dokumenten; vid behov hittar
   // de fram via +-toggleln.
@@ -1015,7 +1019,12 @@ export default function ProfileScreen() {
           ]}
           hitSlop={8}
         >
-          <Text style={styles.sectionHeaderEmoji}>👑</Text>
+          {/* Blå krona-silhuett (Colors.primary) — matchar blå-temat. */}
+          <View style={styles.sectionHeaderIcon}>
+            <Svg width={24} height={24} viewBox="0 0 24 24">
+              <Path d="M5 16L3 6l5 4 4-6 4 6 5-4-2 10H5zm0 2h14v2H5v-2z" fill={Colors.primary} />
+            </Svg>
+          </View>
           <Text style={styles.gameConnectionsHeader}>Host default settings</Text>
           <View style={styles.gameConnectionsToggleBox}>
             <Text style={styles.gameConnectionsChevron}>
@@ -1035,28 +1044,43 @@ export default function ProfileScreen() {
               (premium-läge). Försök att välja Individual Devices utan
               Premium triggar Store-omdirigering. */}
           <View style={styles.field}>
-            <Text style={styles.fieldLabel}>Game Mode</Text>
+            <Text style={styles.sectionLabel}>Game Mode</Text>
             {/* Game mode — tre FRIA val (host-default): Single player + Pass-
                 the-Phone + Individual device. Inget premium-gate på lägesvalet;
                 subscription gatar caps (rundor/spelare) separat. FREE-badge per
                 ruta (grön aktiv, grå inaktiv). Speglar Lobby. */}
-            <Text style={styles.gameModeGroupLabel}>Single device / Single player mode</Text>
+            <Text style={styles.gameModeGroupLabel}>Single player mode</Text>
             <View style={styles.modeRow}>
               {renderModeBox('single', 'Single player')}
               <View style={{ flex: 1 }} />
             </View>
 
-            <Text style={[styles.gameModeGroupLabel, styles.gameModeGroupLabelSpaced]}>Multiplayer mode</Text>
+            <View style={styles.multiplayerLabelRow}>
+              <Text style={[styles.gameModeGroupLabel, { marginTop: 0, marginBottom: 0 }]}>Multiplayer mode</Text>
+              <Pressable
+                style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
+                onPress={() => Alert.alert('Multiplayer mode', 'Pass-the-Phone: Single device mode\n\nIndividual device: Multi-device mode / QuizVibe users only')}
+                hitSlop={8}
+              >
+                <Text style={styles.infoIconText}>i</Text>
+              </Pressable>
+            </View>
             <View style={styles.modeRow}>
               {renderModeBox('ptp', 'Pass-the-Phone')}
               {renderModeBox('indiv', 'Individual device')}
             </View>
 
-            <Text style={styles.modeInfoLine}>Pass-the-Phone: Single device mode</Text>
-            <Text style={styles.modeInfoLine}>Individual device: Multi-device mode / QuizVibe users only</Text>
-
             {/* Players — max antal spelare (Max 4 gratis / Max 12 Premium). */}
-            <Text style={[styles.gameModeGroupLabel, styles.gameModeGroupLabelSpaced]}>Players</Text>
+            <View style={styles.playersLabelRow}>
+              <Text style={[styles.sectionLabel, { marginTop: 0, marginBottom: 0 }]}>Players</Text>
+              <Pressable
+                style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
+                onPress={() => Alert.alert('Players', 'Max 4 players - use as standard and applicable for all Single and Multiplayer modes.\n\nMax 12 players - only applicable with Individual device mode')}
+                hitSlop={8}
+              >
+                <Text style={styles.infoIconText}>i</Text>
+              </Pressable>
+            </View>
             <View style={styles.modeRow}>
               <Pressable
                 style={({ pressed }) => [
@@ -1091,13 +1115,45 @@ export default function ProfileScreen() {
             </View>
           </View>
 
+          {/* Region scope — samma regionTrigger-stil som i Lobby + info-ikon. */}
+          <View style={styles.field}>
+            <View style={styles.regionLabelRow}>
+              <Text style={styles.sectionLabel}>Region scope</Text>
+              <Pressable
+                style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
+                onPress={() => Alert.alert('Region Scope', "Recognition context — the region the questions are drawn from and whose audience the recognition level is based on. Players get content that's familiar in the chosen region.")}
+                hitSlop={8}
+              >
+                <Text style={styles.infoIconText}>i</Text>
+              </Pressable>
+            </View>
+            <TouchableOpacity
+              style={styles.regionTrigger}
+              activeOpacity={0.7}
+              onPress={() => setRegionPickerOpen(true)}
+            >
+              <Text style={{ fontSize: 18 }}>{region ? REGION_FLAGS[region] ?? '' : ''}</Text>
+              <Text style={styles.regionTriggerText}>{regionLabel ?? 'Select'}</Text>
+              <Text style={{ fontSize: 14, color: Colors.textSecondary }}>⌄</Text>
+            </TouchableOpacity>
+          </View>
+
           {/* Main categories — host-default som filtrerar quiz-poolen via
               backend-subject → MainCategory-mappning. Multi-select (Music
               + Film + Sport), min 1 enforce:as i handleToggleMainCategory.
               Speglar Game Mode-toggle:ns bordered-box-mönster men med
               multi-select-semantik. */}
           <View style={styles.field}>
-            <Text style={styles.fieldLabel}>Person type portfolio</Text>
+            <View style={styles.regionLabelRow}>
+              <Text style={styles.sectionLabel}>Person type portfolio</Text>
+              <Pressable
+                style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
+                onPress={() => Alert.alert('Person type portfolio', 'Quiz questions are drawn only from active person types. At least 1 must be enabled.')}
+                hitSlop={8}
+              >
+                <Text style={styles.infoIconText}>i</Text>
+              </Pressable>
+            </View>
             <View style={styles.mainCategoryToggle}>
               {MAIN_CATEGORIES.map((cat) => {
                 const isActive = enabledMainCategories.includes(cat);
@@ -1125,55 +1181,20 @@ export default function ProfileScreen() {
                 );
               })}
             </View>
-            <Text style={styles.mainCategoryDescription}>
-              Quiz questions are drawn only from active categories. At least 1 must be enabled.
-            </Text>
-          </View>
-
-          {/* Region scope + Answer response — sida vid sida, halv bredd
-              vardera. */}
-          <View style={styles.fieldRow}>
-            <View style={[styles.field, styles.fieldHalf]}>
-              <Text style={styles.fieldLabel}>Region scope</Text>
-              <Pressable
-                onPress={() => setRegionPickerOpen(true)}
-                style={({ pressed }) => [
-                  styles.selector,
-                  pressed && styles.selectorPressed,
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.selectorText,
-                    region === null && styles.selectorPlaceholder,
-                  ]}
-                  numberOfLines={1}
-                >
-                  {regionLabel ?? 'Select'}
-                </Text>
-                <Text style={styles.selectorChevron}>›</Text>
-              </Pressable>
-            </View>
-            <View style={[styles.field, styles.fieldHalf]}>
-              <Text style={styles.fieldLabel}>Answer response time</Text>
-              <Pressable
-                onPress={() => setAnswerResponsePickerOpen(true)}
-                style={({ pressed }) => [
-                  styles.selector,
-                  pressed && styles.selectorPressed,
-                ]}
-              >
-                <Text style={styles.selectorText} numberOfLines={1}>
-                  {answerResponseLabel}
-                </Text>
-                <Text style={styles.selectorChevron}>›</Text>
-              </Pressable>
-            </View>
           </View>
 
           {/* Game era — adjustable år-spann för frågor. */}
           <View style={styles.field}>
-            <Text style={styles.fieldLabel}>Game era (min 15 year interval)</Text>
+            <View style={styles.regionLabelRow}>
+              <Text style={styles.sectionLabel}>Game era (min 15 year interval)</Text>
+              <Pressable
+                style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
+                onPress={() => Alert.alert('Game Era', 'Set the time span for questions')}
+                hitSlop={8}
+              >
+                <Text style={styles.infoIconText}>i</Text>
+              </Pressable>
+            </View>
             <View style={styles.eraGuestBoxWrap}>
               <View style={styles.eraGuestBox}>
                 <Text style={styles.eraGuestBoxText}>{eraValues[0]} – {eraValues[1]}</Text>
@@ -1260,7 +1281,16 @@ export default function ProfileScreen() {
 
           {/* Number of Rounds — speglar Lobby:s motsvarande sektion. */}
           <View style={styles.field}>
-            <Text style={styles.fieldLabel}>Number of Rounds</Text>
+            <View style={styles.regionLabelRow}>
+              <Text style={styles.sectionLabel}>Number of Rounds</Text>
+              <Pressable
+                style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
+                onPress={() => Alert.alert('Number of Rounds', 'How many rounds in this game')}
+                hitSlop={8}
+              >
+                <Text style={styles.infoIconText}>i</Text>
+              </Pressable>
+            </View>
             <View style={styles.roundsStepperRow}>
               <Pressable
                 style={({ pressed }) => [
@@ -1313,6 +1343,40 @@ export default function ProfileScreen() {
             </View>
           </View>
 
+          {/* Answer response time — 4-knapps-rad (samma som i Lobby). */}
+          <View style={styles.field}>
+            <View style={styles.regionLabelRow}>
+              <Text style={styles.sectionLabel}>Answer response time</Text>
+              <Pressable
+                style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
+                onPress={() => Alert.alert('Answer response time', 'Seconds players have to answer each question')}
+                hitSlop={8}
+              >
+                <Text style={styles.infoIconText}>i</Text>
+              </Pressable>
+            </View>
+            <View style={styles.responseRow}>
+              {([15, 30, 45, 60] as const).map((sec) => {
+                const isActive = answerResponseSeconds === sec;
+                return (
+                  <Pressable
+                    key={sec}
+                    onPress={() => setAnswerResponseSeconds(sec)}
+                    style={({ pressed }) => [
+                      styles.responseBtn,
+                      isActive ? styles.responseBtnActive : styles.responseBtnInactive,
+                      pressed && { opacity: 0.85 },
+                    ]}
+                  >
+                    <Text style={[styles.responseBtnText, isActive && styles.responseBtnTextActive]}>
+                      {sec}s
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+          </View>
+
           {/* Save Profile — egen Save-knapp för Host defaults-sektionen
               (helt separerad från Profile defaults-kortet:s Save Profile
               och Customized packages-sektionens Save settings — feedback
@@ -1343,7 +1407,12 @@ export default function ProfileScreen() {
           ]}
           hitSlop={8}
         >
-          <Text style={styles.sectionHeaderEmoji}>🎁</Text>
+          {/* Blå present/paket-silhuett (Colors.primary) — matchar blå-temat. */}
+          <View style={styles.sectionHeaderIcon}>
+            <Svg width={24} height={24} viewBox="0 0 24 24">
+              <Path d="M20 6h-2.18c.11-.31.18-.65.18-1 0-1.66-1.34-3-3-3-1.05 0-1.96.54-2.5 1.35l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-5-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm11 15H4v-2h16v2zm0-5H4V8h5.08L7 10.83 8.62 12 11 8.76l1-1.36 1 1.36L15.38 12 17 10.83 14.92 8H20v6z" fill={Colors.primary} />
+            </Svg>
+          </View>
           <Text style={styles.gameConnectionsHeader}>Customized Host packages</Text>
           <View style={styles.gameConnectionsToggleBox}>
             <Text style={styles.gameConnectionsChevron}>
@@ -1513,8 +1582,9 @@ export default function ProfileScreen() {
           ]}
           hitSlop={8}
         >
-          <Text style={styles.sectionHeaderEmoji}>🔗</Text>
-          <Text style={styles.gameConnectionsHeader}>Game connections</Text>
+          {/* Profil-silhuett-emoji — samma ikon som Players in Lobby. */}
+          <Text style={styles.sectionHeaderEmoji}>👥</Text>
+          <Text style={styles.gameConnectionsHeader}>QuizVibe Community & Friends</Text>
           <View style={styles.gameConnectionsToggleBox}>
             <Text style={styles.gameConnectionsChevron}>
               {gameConnectionsExpanded ? '−' : '+'}
@@ -2846,6 +2916,10 @@ const styles = StyleSheet.create({
     fontVariant: ['tabular-nums'],
     letterSpacing: -0.5,
   },
+  // Info-ikon-rader för rubriker — speglar Lobby 1:1.
+  multiplayerLabelRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: Spacing.xs, marginBottom: 8 },
+  playersLabelRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: Spacing.md, marginBottom: 8 },
+  regionLabelRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   fieldLabel: {
     fontSize: 10,
     fontWeight: FontWeight.semibold,
@@ -2963,7 +3037,7 @@ const styles = StyleSheet.create({
   freeBadgeText: {
     fontSize: 10,
     fontWeight: '700',
-    color: '#000',
+    color: '#FFFFFF',
     letterSpacing: 0.6,
   },
   // Dämpad FREE-badge — appliceras tillsammans med modeOptionDimmed
@@ -3056,6 +3130,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: Colors.background,
     borderRadius: Radius.md,
+    marginTop: Spacing.sm,
     padding: 3,
     borderWidth: 1,
     borderColor: Colors.border,
@@ -3076,7 +3151,8 @@ const styles = StyleSheet.create({
   },
   mainCategoryBoxActive: {
     borderColor: Colors.success,
-    backgroundColor: Colors.successMuted,
+    // bg matchar Pass-the-Phone-rutans aktiva bg (modeOptionPassActive) — synkad med Lobby 2026-06-01.
+    backgroundColor: Colors.primaryMuted,
   },
   mainCategoryLabel: {
     fontSize: FontSize.sm,
@@ -3335,6 +3411,15 @@ const styles = StyleSheet.create({
   roundsStepperBtnTextDisabled: {
     color: Colors.textDisabled,
   },
+  // Region trigger + Answer response — speglar Lobby 1:1.
+  regionTrigger: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, backgroundColor: Colors.background, borderRadius: Radius.md, borderWidth: 1, borderColor: Colors.borderStrong, paddingHorizontal: Spacing.lg, paddingVertical: Spacing.md },
+  regionTriggerText: { flex: 1, fontSize: FontSize.md, fontWeight: FontWeight.medium, color: Colors.textPrimary },
+  responseRow: { flexDirection: 'row', gap: Spacing.sm },
+  responseBtn: { flex: 1, height: 44, borderRadius: Radius.md, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
+  responseBtnActive: { borderColor: Colors.primaryBorder, backgroundColor: Colors.primaryMuted },
+  responseBtnInactive: { borderColor: Colors.borderStrong, backgroundColor: 'transparent' },
+  responseBtnText: { fontSize: FontSize.md, fontWeight: FontWeight.semibold, color: Colors.textSecondary },
+  responseBtnTextActive: { color: Colors.textPrimary, fontWeight: FontWeight.bold },
   selector: {
     flexDirection: 'row',
     alignItems: 'center',

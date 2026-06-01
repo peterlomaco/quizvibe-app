@@ -173,14 +173,6 @@ items:
     probability: 78
     wikimediaSearchHints: ["Frank Ocean singer"]
     answerMethods: ["timeline", "name-letters"]
-  - id: lana-del-rey
-    displayName: "Lana Del Rey"
-    correctYear: 1985
-    peakFrom: 2011
-    peakTo: 2024
-    probability: 82
-    wikimediaSearchHints: ["Lana Del Rey singer"]
-    answerMethods: ["timeline", "name-letters"]
   - id: shawn-mendes
     displayName: "Shawn Mendes"
     correctYear: 1998

@@ -11,12 +11,15 @@ import {
   Platform,
   Pressable,
   SafeAreaView,
+  StyleProp,
   StyleSheet,
   Switch,
   Text,
   TextInput,
+  TextStyle,
   TouchableOpacity,
   View,
+  ViewStyle,
 } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import Svg, { Circle, Path } from 'react-native-svg';
@@ -115,11 +118,12 @@ export interface LobbyPlayer extends Player {
 type GameMode = 'pass-the-phone' | 'individual-devices';
 
 // Year-of-birth gränser (samma som registreringsformuläret för gäster) ....
-// 13+ minimum age requirement (App Store / GDPR compliance). Dynamisk så
-// minimum-året följer current year — 2026: max 2013, 2027: max 2014, osv.
+// 15+ minimum age requirement (2026-06-01: höjt från 13+ pga 15+-gränsat
+// film-/innehåll i appen, utöver App Store / GDPR). Dynamisk så minimum-året
+// följer current year — 2026: max 2011, 2027: max 2012, osv.
 const CURRENT_YEAR = new Date().getFullYear();
 const MIN_BIRTH_YEAR = 1930;
-const MAX_BIRTH_YEAR = CURRENT_YEAR - 13;
+const MAX_BIRTH_YEAR = CURRENT_YEAR - 15;
 const BIRTH_YEARS = Array.from(
   { length: MAX_BIRTH_YEAR - MIN_BIRTH_YEAR + 1 },
   (_, i) => MAX_BIRTH_YEAR - i,
@@ -308,7 +312,7 @@ function RegionModal({ visible, value, onChange, onClose }: {
         <View style={regionSheet.container}>
           <View style={regionSheet.handle} />
           <Text style={regionSheet.title}>Region Scope</Text>
-          <Text style={regionSheet.subtitle}>Sets the cultural context for questions</Text>
+          <Text style={regionSheet.subtitle}>Sets the recognition context based on</Text>
           <View style={regionSheet.list}>
             {REGIONS.map((r, i) => (
               <TouchableOpacity
@@ -909,6 +913,67 @@ const waveDotsStyles = StyleSheet.create({
 // med GetReadyIntro (icke-host:s "Waiting for Host to start quiz"-ruta).
 
 
+// Approved-kapacitetsruta som äger sin egen blink-animation. opacity är ALLTID
+// samma Animated.Value (byter aldrig typ mellan static-number och Animated.Value,
+// vilket annars gör att native-driver-bindningen inte re-attachar → rutan fastnar
+// på fast sken). Loopen startas/stoppas via `blinking`-propen.
+function ApprovedBox({
+  blinking,
+  style,
+  children,
+}: {
+  blinking: boolean;
+  style: StyleProp<ViewStyle>;
+  children: React.ReactNode;
+}) {
+  const opacity = useRef(new Animated.Value(1)).current;
+  useEffect(() => {
+    if (!blinking) {
+      opacity.setValue(1);
+      return;
+    }
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(opacity, { toValue: 0.3, duration: 600, useNativeDriver: true }),
+        Animated.timing(opacity, { toValue: 1, duration: 600, useNativeDriver: true }),
+      ]),
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [blinking, opacity]);
+  return <Animated.View style={[style, { opacity }]}>{children}</Animated.View>;
+}
+
+// Blinkande text som äger sin egen blink-loop (startas i egen effekt vid mount)
+// så den blinkar pålitligt även när den monteras om (t.ex. när "Players Waiting"
+// dyker upp igen efter att host rejectat en spelare). Att binda till ett delat,
+// redan löpande native-värde gör annars att en nyss-monterad nod fastnar på en
+// svag opacity utan att animera.
+function BlinkingLabel({
+  style,
+  children,
+}: {
+  style: StyleProp<TextStyle>;
+  children: React.ReactNode;
+}) {
+  const opacity = useRef(new Animated.Value(1)).current;
+  useEffect(() => {
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(opacity, { toValue: 0.3, duration: 600, useNativeDriver: true }),
+        Animated.timing(opacity, { toValue: 1, duration: 600, useNativeDriver: true }),
+      ]),
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [opacity]);
+  return (
+    <Animated.Text style={[style, { opacity }]} numberOfLines={1}>
+      {children}
+    </Animated.Text>
+  );
+}
+
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
 export default function LobbyScreen() {
@@ -967,6 +1032,19 @@ export default function LobbyScreen() {
   // kör onödig animation.
   const startGlow = useRef(new Animated.Value(0.4)).current;
   const startPulse = useRef(new Animated.Value(1)).current;
+  // Opacity-pulse för "Music. Film. Sport."-taglinen i room code-kortet.
+  const taglineFade = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    const fadeLoop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(taglineFade, { toValue: 0.15, duration: 1600, useNativeDriver: true }),
+        Animated.timing(taglineFade, { toValue: 1, duration: 1600, useNativeDriver: true }),
+      ]),
+    );
+    fadeLoop.start();
+    return () => fadeLoop.stop();
+  }, [taglineFade]);
 
   useEffect(() => {
     // Animationen körs för båda host (Start Game-knappen) och non-host
@@ -1490,6 +1568,52 @@ export default function LobbyScreen() {
   // quiz-poolen — toggeln är strukturell tills den kopplas in).
   const [imagesEnabled, setImagesEnabled] = useState(true);
   const [sketchEnabled, setSketchEnabled] = useState(false);
+  // Kollapsbara Lobby-sektioner (samma +/− mönster som Profile-vyn). Default expanderade.
+  // Alla (host OCH non-host) kommer in med Game Settings + Quiz Tuning REDAN
+  // hopfällda (folded) och Players in Lobby utfälld.
+  const [gameSettingsExpanded, setGameSettingsExpanded] = useState(false);
+  // Host kommer in med Players in Lobby hopfälld (likt Game Settings + Quiz
+  // Tuning); non-host får den utfälld så de direkt ser spelarlistan.
+  const [playersExpanded, setPlayersExpanded] = useState(!hostMode);
+  const [quizTuningExpanded, setQuizTuningExpanded] = useState(false);
+
+  // Scroll-hint-pil i nederkant (samma som quiz.tsx:s namn-fråge-pil) — guidar
+  // användaren att scrolla ner till Start Game-knappen. Blink-puls + auto-göm
+  // när man nått botten / när innehållet inte är scrollbart.
+  const scrollHintOpacity = useRef(new Animated.Value(1)).current;
+  const [scrollHintAtBottom, setScrollHintAtBottom] = useState(false);
+  const [scrollHintScrollable, setScrollHintScrollable] = useState(false);
+  const scrollViewportH = useRef(0);
+  const scrollContentH = useRef(0);
+  const recomputeScrollHint = useCallback(() => {
+    setScrollHintScrollable(scrollContentH.current > scrollViewportH.current + 24);
+  }, []);
+  useEffect(() => {
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(scrollHintOpacity, { toValue: 0.3, duration: 600, useNativeDriver: true }),
+        Animated.timing(scrollHintOpacity, { toValue: 1, duration: 600, useNativeDriver: true }),
+      ]),
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [scrollHintOpacity]);
+
+
+  const handleScrollHintScroll = useCallback((e: {
+    nativeEvent: {
+      contentOffset: { y: number };
+      layoutMeasurement: { height: number };
+      contentSize: { height: number };
+    };
+  }) => {
+    const { contentOffset, layoutMeasurement, contentSize } = e.nativeEvent;
+    scrollViewportH.current = layoutMeasurement.height;
+    scrollContentH.current = contentSize.height;
+    const distanceFromBottom = contentSize.height - (contentOffset.y + layoutMeasurement.height);
+    setScrollHintAtBottom(distanceFromBottom <= 24);
+    setScrollHintScrollable(contentSize.height > layoutMeasurement.height + 24);
+  }, []);
   // Main categories (Music/Film/Sport) — host-toggleln filtrerar quiz-poolen
   // via backend-subject → MainCategory-mappning. Min 1 enforce:as i
   // handleToggleMainCategory så listan aldrig blir tom. Seedas från host:s
@@ -1949,32 +2073,9 @@ export default function LobbyScreen() {
   // Assistance-progressions-ordning: lägre tal = svårare nivå. Host får
   // bara flytta nedåt eller stå still — Full(2) → Standard(1) → Minimal(0).
   // Minimal är låst (kan inte ändras alls).
-  const ASSISTANCE_RANK: Record<'minimal' | 'standard' | 'full', number> = {
-    full: 2,
-    standard: 1,
-    minimal: 0,
-  };
-
-  // Tap-tid-validering på Assistance-knappen — visar popup för disallowed
-  // transitions istället för att uppdatera state. Tillåtna: stå still
-  // (samma värde), eller progress nedåt i ranken. Disallowed: höja
-  // ranken eller röra Minimal alls.
+  // Host får fritt justera Assistance åt båda håll (lättare som svårare) från
+  // spelarens default — ingen riktnings-låsning längre (2026-06-01).
   const handleSelectEditAssistance = (next: 'minimal' | 'standard' | 'full') => {
-    const current = playerEditTarget?.assistance ?? 'standard';
-    if (current === 'minimal' && next !== 'minimal') {
-      Alert.alert(
-        'Cannot change Minimal',
-        'Once a player has Minimal assistance, it cannot be changed.',
-      );
-      return;
-    }
-    if (ASSISTANCE_RANK[next] > ASSISTANCE_RANK[current]) {
-      Alert.alert(
-        'Cannot raise assistance',
-        'Assistance can only progress in the order Full → Standard → Minimal.',
-      );
-      return;
-    }
     setEditAssistance(next);
   };
 
@@ -1988,7 +2089,6 @@ export default function LobbyScreen() {
     const currentYear = new Date().getFullYear();
     const nextAge = currentYear - editBirthYear;
     const originalAge = target.age ?? nextAge;
-    const originalAssistance = target.assistance ?? 'standard';
 
     // 1) Age får bara höjas (= tidigare birth year). Stå-still tillåtet.
     if (nextAge < originalAge) {
@@ -1999,23 +2099,8 @@ export default function LobbyScreen() {
       return;
     }
 
-    // 2) Assistance: dubbelkollar samma regler som tap-tid-checken (host
-    //    kan ha öppnat picker:n med disallowed seedAssistance från korrupt
-    //    state, eller om vi i framtiden tillåter direkt-input). Belt + suspenders.
-    if (originalAssistance === 'minimal' && editAssistance !== 'minimal') {
-      Alert.alert(
-        'Cannot change Minimal',
-        'Once a player has Minimal assistance, it cannot be changed.',
-      );
-      return;
-    }
-    if (ASSISTANCE_RANK[editAssistance] > ASSISTANCE_RANK[originalAssistance]) {
-      Alert.alert(
-        'Cannot raise assistance',
-        'Assistance can only progress in the order Full → Standard → Minimal.',
-      );
-      return;
-    }
+    // 2) Assistance: host får sätta valfri nivå (lättare som svårare) — ingen
+    //    riktnings-validering längre.
 
     // 3) HCP-validering bara för icke-guest (guest:ens HCP är auto-derived
     //    och fältet är dolt). För registrerade kräver vi ett giltigt 1–99
@@ -2659,13 +2744,16 @@ export default function LobbyScreen() {
       // device Slice 3C-ii) via rowToPlayer-mapping, (b) AsyncStorage-
       // snapshot:s (legacy + offline-fallback). OR:as så cross-device-
       // broadcasts slår igenom även när AsyncStorage inte hunnit synka.
+      // Inkludera ALLA spelare (godkända + väntande på godkännande), inte bara
+      // approved — annars saknar non-host:ens lokala state väntande spelare och
+      // Approved-kapacitetsrutorna kan aldrig blinka för dem (2026-06-01-fix).
+      // Väntande spelare renderas read-only i "To be Approved by Host"-listan
+      // för non-host (approve-kontrollerna är ändå host-gated).
       let approvedFromHost: LobbyPlayer[] = stored
-        ? stored
-            .filter((p) => !!p.approved || !!p.isHost)
-            .map((p) => {
-              if (p.isHost) return { ...p, hasLeft: false };
-              return { ...p, hasLeft: !!p.hasLeft || leftIds.has(p.id) };
-            })
+        ? stored.map((p) => {
+            if (p.isHost) return { ...p, hasLeft: false };
+            return { ...p, hasLeft: !!p.hasLeft || leftIds.has(p.id) };
+          })
         : [];
       // Synthesera host-placeholder från RoomMeta om host saknas i listan
       // (mock-only — non-host joinar via test-seed-kod eller fresh kod där
@@ -3098,6 +3186,10 @@ export default function LobbyScreen() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
+        scrollEventThrottle={32}
+        onScroll={handleScrollHintScroll}
+        onLayout={(e) => { scrollViewportH.current = e.nativeEvent.layout.height; recomputeScrollHint(); }}
+        onContentSizeChange={(_w, h) => { scrollContentH.current = h; recomputeScrollHint(); }}
       >
         <View style={styles.header}>
           <Text style={styles.screenTitle}>Game Lobby</Text>
@@ -3173,7 +3265,26 @@ export default function LobbyScreen() {
               </View>
             </Pressable>
           )}
+          {/* Non-host: "Music. Film. Sport."-tagline på samma rad som "Game
+              Lobby", uppe i högra hörnet (host saknar credits-pill där så
+              utrymmet är fritt). Host visar den ovanför room code-kortet. */}
+          {!hostMode && (
+            <Animated.Text
+              style={[styles.headerTagline, { opacity: taglineFade }]}
+              numberOfLines={1}
+            >
+              Music. Film. Sport.
+            </Animated.Text>
+          )}
         </View>
+
+        {/* Brand-tagline (glowing gold, opacity-pulse) — host visar den OVANFÖR
+            room code-kortet; non-host visar den i headern (se ovan). */}
+        {hostMode && (
+          <Animated.Text style={[styles.roomTagline, { opacity: taglineFade }]}>
+            Music. Film. Sport.
+          </Animated.Text>
+        )}
 
         <Card style={styles.roomCard} padding={Spacing.xl}>
           {/* Loggan är absolut-positionerad i Card:ens övre vänstra hörn med
@@ -3200,8 +3311,17 @@ export default function LobbyScreen() {
               <Text style={styles.roomLabelGuestAbsolute}>Room Code</Text>
             </>
           )}
-          {hostMode && <View style={styles.hostBadge}><Text style={styles.hostBadgeText}>👑 You are the host</Text></View>}
-          <View style={[styles.roomCodeRow, !hostMode && styles.roomCodeRowGuestSpacing]}>
+          {/* "You are the host" som centrerad rubrik över Room Code (ingen
+              kantlinje-ruta längre) — kungakrona-ikon före texten. */}
+          {hostMode && (
+            <View style={styles.hostBadge}>
+              <Svg width={18} height={18} viewBox="0 0 24 24">
+                <Path d="M5 16L3 6l5 4 4-6 4 6 5-4-2 10H5zm0 2h14v2H5v-2z" fill={Colors.primary} />
+              </Svg>
+              <Text style={styles.hostBadgeText}>You are the host</Text>
+            </View>
+          )}
+          <View style={[styles.roomCodeRow, !hostMode && styles.roomCodeRowGuestSpacing, hostMode && styles.roomCodeRowHostSpacing]}>
             <View style={styles.roomCodeStack}>
               {hostMode && (
                 <Text style={styles.roomLabel}>Room Code</Text>
@@ -3235,10 +3355,38 @@ export default function LobbyScreen() {
           )}
         </Card>
 
-        {/* ── Game Settings ───────────────────────────────────────
+        {/* Game Settings — sitter mellan room code-kortet och Game Mode-kortet.
+            Wrappad i styles.section (samma som Players/Quiz Tuning) så header→
+            divider-avståndet styrs av section-gap och blir identiskt för alla tre. */}
+        <View style={styles.section}>
+        {/* Kollapsbar sektionsrubrik (samma +/− mönster som Profile). */}
+        <TouchableOpacity
+          onPress={() => setGameSettingsExpanded(!gameSettingsExpanded)}
+          activeOpacity={0.7}
+          style={styles.sectionHeaderRow}
+          hitSlop={8}
+        >
+          {/* Blå kugghjuls-silhuett (Colors.primary) — matchar blå-temat. */}
+          <View style={styles.sectionHeaderSvg}>
+            <Svg width={24} height={24} viewBox="0 0 24 24">
+              <Path
+                d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"
+                fill={Colors.primary}
+              />
+            </Svg>
+          </View>
+          <Text style={styles.sectionHeaderTitle}>Game Settings</Text>
+          <View style={styles.sectionToggleBox}>
+            <Text style={styles.sectionChevron}>{gameSettingsExpanded ? '−' : '+'}</Text>
+          </View>
+        </TouchableOpacity>
+        {!gameSettingsExpanded && <View style={styles.sectionDivider} />}
+
+        {/* ── Game Settings (kollapsbar body) ──────────────────────
             Game Mode + Game Connections delar en gemensam blåbordrad
             container. Ger semantiskt en "vad spelet ska spelas som"-sektion
             som visuellt skiljer sig från Players in Lobby nedanför. */}
+        {gameSettingsExpanded && (
         <View style={styles.gameSettingsBorder}>
         <View style={styles.definedByHostBadge} pointerEvents="none">
           <Text style={styles.definedByHostBadgeText}>DEFINED BY HOST</Text>
@@ -3264,7 +3412,7 @@ export default function LobbyScreen() {
               Multiplayer-lägena (Pass-the-Phone + Individual device) delar en
               rad. FREE-badge per ruta (grön aktiv / grå inaktiv). Read-only
               (disabled) för non-host. */}
-          <Text style={styles.gameModeGroupLabel}>Single device / Single player mode</Text>
+          <Text style={styles.gameModeGroupLabel}>Single player mode</Text>
           {/* Spacer (flex 1) till höger → Single player-rutan blir halv bredd,
               vänsterställd, och linjerar med multiplayer-radens vänstra ruta. */}
           <View style={styles.modeRow}>
@@ -3272,23 +3420,50 @@ export default function LobbyScreen() {
             <View style={{ flex: 1 }} />
           </View>
 
-          <Text style={[styles.gameModeGroupLabel, styles.gameModeGroupLabelSpaced]}>Multiplayer mode</Text>
+          {/* Multiplayer mode-rubrik + info-ikon. Beskrivningstexten för PtP/
+              IndDev ligger numera i info-ikonens popup istället för under rutorna. */}
+          <View style={styles.multiplayerLabelRow}>
+            <Text style={[styles.gameModeGroupLabel, { marginTop: 0, marginBottom: 0 }]}>Multiplayer mode</Text>
+            <Pressable
+              style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
+              onPress={() =>
+                Alert.alert(
+                  'Multiplayer mode',
+                  'Pass-the-Phone: Single device mode\n\nIndividual device: Multi-device mode / QuizVibe users only',
+                )
+              }
+              hitSlop={8}
+              accessibilityLabel="Multiplayer mode info"
+            >
+              <Text style={styles.infoIconText}>i</Text>
+            </Pressable>
+          </View>
           <View style={styles.modeRow}>
             {renderModeBox('ptp', 'Pass-the-Phone')}
             {renderModeBox('indiv', 'Individual device')}
           </View>
 
-          {hostMode && (
-            <>
-              <Text style={styles.modeInfoLine}>Pass-the-Phone: Single device mode</Text>
-              <Text style={styles.modeInfoLine}>Individual device: Multi-device mode / QuizVibe users only</Text>
-            </>
-          )}
-
           {/* Players — max antal spelare. Max 4 gratis, Max 12 Premium. Styr
               lobby-cap + hur många host kan godkänna i "Players in lobby".
               Renderas för alla men disabled för non-host (read-only). */}
-          <Text style={[styles.gameModeGroupLabel, styles.gameModeGroupLabelSpaced]}>Players</Text>
+          {/* Versaler i samma stil som Game Mode-rubriken (sectionLabel/overline)
+              + info-ikon vars popup förklarar Max 4 vs Max 12. */}
+          <View style={styles.playersLabelRow}>
+            <Text style={[styles.sectionLabel, { marginTop: 0, marginBottom: 0 }]}>Players</Text>
+            <Pressable
+              style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
+              onPress={() =>
+                Alert.alert(
+                  'Players',
+                  'Max 4 players - use as standard and applicable for all Single and Multiplayer modes.\n\nMax 12 players - only applicable with Individual device mode',
+                )
+              }
+              hitSlop={8}
+              accessibilityLabel="Players info"
+            >
+              <Text style={styles.infoIconText}>i</Text>
+            </Pressable>
+          </View>
           <View style={styles.modeRow}>
             <TouchableOpacity
               style={[styles.modeOption, maxPlayers === 4 ? styles.modeOptionPassActive : styles.modeOptionInactive]}
@@ -3325,10 +3500,22 @@ export default function LobbyScreen() {
             ska dras från). Visas för alla i lobbyn men kan bara
             *ändras* av host — samma mönster som Game Mode ovanför. */}
         <View style={[styles.section, { marginTop: Spacing.sm, gap: Spacing.xs }]}>
-          <Text style={styles.sectionLabel}>🌍 Region Scope</Text>
-          {hostMode && (
-            <Text style={[styles.cardSubtitle, { marginBottom: 0 }]}>Sets the cultural context for questions</Text>
-          )}
+          <View style={styles.regionLabelRow}>
+            <Text style={styles.sectionLabel}>Region Scope</Text>
+            <Pressable
+              style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
+              onPress={() =>
+                Alert.alert(
+                  'Region Scope',
+                  "Recognition context — the region the questions are drawn from and whose audience the recognition level is based on. Players get content that's familiar in the chosen region.",
+                )
+              }
+              hitSlop={8}
+              accessibilityLabel="Region Scope info"
+            >
+              <Text style={styles.infoIconText}>i</Text>
+            </Pressable>
+          </View>
           <TouchableOpacity
             style={styles.regionTrigger}
             activeOpacity={0.7}
@@ -3392,17 +3579,13 @@ export default function LobbyScreen() {
                 />
               )}
             </View>
-            {/* ── Profiles ── förälder-källa med TVÅ under-toggles:
-                  • Images = foto-biblioteket (riktiga bilder + mosaik-reveal)
-                  • Sketch = AI-doodlen (text-till-bild, "Guess Who")
-                Host kan ha BÅDA, ENA eller INGEN aktiverad. Images räknas i
-                min-1-guarden (handleToggleSource); Sketch är en FRI toggle
-                eftersom doodlen inte är wirad till quiz-poolen ännu (prototyp)
-                → en sketch-only-lobby skulle ge tom pool. När doodlen kopplas
-                in: lägg sketchEnabled i enabledSourceCount + en egen guard. */}
-            <Text style={styles.connectionSubHeading}>Profiles</Text>
-
-            {/* Images (foto) — Q-cirkel med "?"-glyph. */}
+            {/* ── Profiles Images ── foto-biblioteket (riktiga bilder +
+                  mosaik-reveal). Q-cirkel med "?"-glyph. Räknas i min-1-
+                  guarden (handleToggleSource). Tidigare "Profiles"-förälder
+                  med Images + Sketch-undertoggles — "Profiles"-rubriken + hela
+                  Sketch-alternativet borttaget ur lobbyn 2026-06-01 (doodlen
+                  var aldrig wirad till quiz-poolen). `sketchEnabled`-state
+                  lämnas som död plumbing så settings/DB-synken är orörd. */}
             <View style={styles.connectionRow}>
               <View style={styles.connectionIconWrap}>
                 <Svg width={28} height={28} viewBox="24 22 32 32" style={StyleSheet.absoluteFillObject}>
@@ -3411,7 +3594,7 @@ export default function LobbyScreen() {
                 </Svg>
                 <Text style={styles.connectionIconAiText}>?</Text>
               </View>
-              <Text style={styles.connectionLabel}>Images</Text>
+              <Text style={styles.connectionLabel}>Profiles Images</Text>
               <View style={imagesEnabled ? styles.youtubeEnabledPill : styles.statusPillDisabled}>
                 <Text style={imagesEnabled ? styles.youtubeEnabledText : styles.statusPillTextDisabled}>
                   {imagesEnabled ? 'Enabled' : 'Disabled'}
@@ -3437,42 +3620,6 @@ export default function LobbyScreen() {
               )}
             </View>
 
-            {/* Sketch (doodle) — pennikon. Fri toggle (default av). */}
-            <View style={styles.connectionRow}>
-              <View style={styles.connectionIconWrap}>
-                <Svg width={22} height={22} viewBox="0 0 24 24">
-                  <Path
-                    d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
-                    fill={Colors.primary}
-                  />
-                </Svg>
-              </View>
-              <Text style={styles.connectionLabel}>Sketch</Text>
-              <View style={sketchEnabled ? styles.youtubeEnabledPill : styles.statusPillDisabled}>
-                <Text style={sketchEnabled ? styles.youtubeEnabledText : styles.statusPillTextDisabled}>
-                  {sketchEnabled ? 'Enabled' : 'Disabled'}
-                </Text>
-                <View
-                  style={[styles.freeBadgeSmall, !sketchEnabled && styles.freeBadgeSmallGrey]}
-                  pointerEvents="none"
-                >
-                  <Text style={[styles.freeBadgeTextSmall, !sketchEnabled && styles.freeBadgeSmallTextGrey]}>
-                    FREE
-                  </Text>
-                </View>
-              </View>
-              {hostMode && (
-                <Switch
-                  value={sketchEnabled}
-                  onValueChange={setSketchEnabled}
-                  trackColor={{ false: Colors.error, true: Colors.success }}
-                  thumbColor="#FFF"
-                  ios_backgroundColor={sketchEnabled ? Colors.success : Colors.error}
-                  style={styles.connectionSwitch}
-                />
-              )}
-            </View>
-
             {/* Main categories — host-toggle som filtrerar quiz-poolen via
                 backend-subject → MainCategory-mappning. Mellan Game
                 Connections-källorna (YouTube/Images ovan) och Customized
@@ -3481,7 +3628,22 @@ export default function LobbyScreen() {
                 host-only-tap via disabled-flagga. Min 1 enforce:as i
                 handleToggleMainCategory så listan aldrig blir tom. */}
             <View style={styles.mainCategoryBlock}>
-              <Text style={styles.sectionLabel}>Person type portfolio</Text>
+              <View style={styles.regionLabelRow}>
+                <Text style={styles.sectionLabel}>Person type portfolio</Text>
+                <Pressable
+                  style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
+                  onPress={() =>
+                    Alert.alert(
+                      'Person type portfolio',
+                      'Quiz questions are drawn only from active person types. At least 1 must be enabled.',
+                    )
+                  }
+                  hitSlop={8}
+                  accessibilityLabel="Person type portfolio info"
+                >
+                  <Text style={styles.infoIconText}>i</Text>
+                </Pressable>
+              </View>
               <View style={styles.mainCategoryToggle}>
                 {MAIN_CATEGORIES.map((cat) => {
                   const isActive = enabledMainCategories.includes(cat);
@@ -3496,7 +3658,7 @@ export default function LobbyScreen() {
                       ]}
                     >
                       <View style={[styles.mainCategoryFreeBadge, !isActive && styles.mainCategoryFreeBadgeGrey]}>
-                        <Text style={[styles.mainCategoryFreeBadgeText, !isActive && styles.mainCategoryFreeBadgeTextGrey]}>Free</Text>
+                        <Text style={[styles.mainCategoryFreeBadgeText, !isActive && styles.mainCategoryFreeBadgeTextGrey]}>FREE</Text>
                       </View>
                       <Text
                         style={[
@@ -3510,11 +3672,6 @@ export default function LobbyScreen() {
                   );
                 })}
               </View>
-              {hostMode && (
-                <Text style={styles.mainCategoryDescription}>
-                  Quiz questions are drawn only from active categories. At least 1 must be enabled.
-                </Text>
-              )}
             </View>
 
             {/* Use Packages — sub-block sist i Game Connections för musikpaket-val.
@@ -3639,7 +3796,7 @@ export default function LobbyScreen() {
                     valt att aktivera i den här lobbyn. */}
                 <View style={styles.extraPackagesHeadingRow}>
                   <Text style={styles.extraPackagesHeading}>
-                    {hostMode ? 'Packages available for you:' : 'Packages for this lobby selected by the Host:'}
+                    {hostMode ? 'Your Customized packages:' : 'Packages for this lobby selected by the Host:'}
                   </Text>
                   {/* Select all-toggle göms när bara 1 paket finns — då
                       blir den redundant (single packagets egen toggle gör
@@ -3679,7 +3836,7 @@ export default function LobbyScreen() {
                   if (sorted.length === 0) {
                     return (
                       <Text style={styles.noExtraPackagesText}>
-                        {hostMode ? 'No Extra packages purchased' : 'No extra packages active in this lobby'}
+                        {hostMode ? 'No customized package purchased' : 'No extra packages active in this lobby'}
                       </Text>
                     );
                   }
@@ -3755,25 +3912,102 @@ export default function LobbyScreen() {
             </View>
           </View>
         </View>
-        </View>{/* /gameSettingsBorder */}
+        </View>
+        )}{/* /gameSettingsBorder */}
+        </View>{/* /Game Settings section */}
 
         {/* ── Players in Lobby ─────────────────────────────────── */}
         <View style={styles.section}>
-          <View style={styles.sectionRow}>
-            <Text style={styles.sectionLabel}>Players in Lobby</Text>
-            <View style={styles.sectionRowRight}>
-              <View style={styles.sectionMetaStack}>
-                <Text style={styles.sectionMetaTop}>Approved:</Text>
-                <Text style={styles.sectionMeta}>
-                  {approvedPlayers.filter((p) => !p.hasLeft).length} of max {maxPlayers}
-                </Text>
-              </View>
-              {hostMode && gameMode === 'pass-the-phone' && (
-                <TouchableOpacity style={styles.addBtn} onPress={handleOpenAddPlayer}>
-                  <Text style={styles.addBtnText}>+ Add Guest</Text>
-                </TouchableOpacity>
-              )}
+          {/* Kollapsbar sektionsrubrik (samma +/− mönster som Profile). */}
+          <TouchableOpacity
+            onPress={() => setPlayersExpanded(!playersExpanded)}
+            activeOpacity={0.7}
+            style={styles.sectionHeaderRow}
+            hitSlop={8}
+          >
+            <Text style={styles.sectionHeaderEmoji}>👥</Text>
+            <Text style={styles.sectionHeaderTitle}>Players in Lobby</Text>
+            <View style={styles.sectionToggleBox}>
+              <Text style={styles.sectionChevron}>{playersExpanded ? '−' : '+'}</Text>
             </View>
+            {/* Röd "Players Waiting"-signal till höger om +/− när det finns
+                spelare som väntar på godkännande. Försvinner när alla är godkända. */}
+            {waitingForApproval.length > 0 && (
+              <BlinkingLabel style={styles.playersWaitingLabel}>
+                Players Waiting
+              </BlinkingLabel>
+            )}
+          </TouchableOpacity>
+          {!playersExpanded && <View style={styles.sectionDivider} />}
+          {playersExpanded && (<>
+          {/* Approved-räknaren + "+ Add Guest" flyttade ned till egen rad
+              under rubriken (2026-06-01), högerställd med lite toppluft. */}
+          {/* Approved-kapacitetsmätare: "Approved"-rubrik + N rutor (N = maxPlayers,
+              4 i Pass-the-Phone/Max 4, 12 i Individual Devices/Max 12). Rutorna
+              speglar GetReady:s rounds-dots: filled (lit) = godkänd spelare (host
+              alltid med = ruta 1), blinkande = väntar på godkännande, tom = ledig
+              plats. Sista rutan visar "max N". */}
+          <View style={[styles.sectionRow, styles.playersMetaRow]}>
+            <Text style={styles.approvedLabel}>Approved</Text>
+            <View style={styles.approvedBoxesGrid}>
+              {(() => {
+                const approvedCount = approvedPlayers.filter((p) => !p.hasLeft).length;
+                const waitingCount = waitingForApproval.length;
+                // 4 rutor i bredd → 4 spelare = 1 rad, 12 spelare = 3 rader
+                // (ruta 5 hamnar under ruta 1, ruta 6 under ruta 2 osv.).
+                const COLS = 4;
+                const renderBox = (i: number) => {
+                  const isFilled = i < approvedCount;
+                  const isBlinking = !isFilled && i < approvedCount + waitingCount;
+                  const isLast = i === maxPlayers - 1;
+                  const boxStyle = [
+                    styles.approvedBox,
+                    (isFilled || isBlinking) && styles.approvedBoxFilled,
+                  ];
+                  // Sista rutan: "max" på en rad och siffran (4/12) på raden under.
+                  const content = isLast ? (
+                    <View style={styles.approvedBoxMaxStack}>
+                      <Text style={styles.approvedBoxMaxLabel} numberOfLines={1}>max</Text>
+                      <Text style={styles.approvedBoxMaxNum} numberOfLines={1}>{maxPlayers}</Text>
+                    </View>
+                  ) : (
+                    <Text
+                      style={styles.approvedBoxNumber}
+                      numberOfLines={1}
+                      adjustsFontSizeToFit
+                      minimumFontScale={0.6}
+                    >
+                      {i + 1}
+                    </Text>
+                  );
+                  // ApprovedBox äger sin egen blink-loop (start/stopp via prop)
+                  // så övergången fast sken ↔ blinkande fungerar pålitligt.
+                  return (
+                    <ApprovedBox key={i} blinking={isBlinking} style={boxStyle}>
+                      {content}
+                    </ApprovedBox>
+                  );
+                };
+                const rowCount = Math.ceil(maxPlayers / COLS);
+                return Array.from({ length: rowCount }).map((_, r) => (
+                  <View key={r} style={styles.approvedBoxesGridRow}>
+                    {Array.from({ length: COLS }).map((_, c) => {
+                      const i = r * COLS + c;
+                      // Osynlig spacer på ev. ofull sista rad så kolumnerna
+                      // linjerar (maxPlayers=4/12 = alltid full, men robust).
+                      return i < maxPlayers ? renderBox(i) : (
+                        <View key={`sp-${c}`} style={styles.approvedBoxSpacer} />
+                      );
+                    })}
+                  </View>
+                ));
+              })()}
+            </View>
+            {hostMode && gameMode === 'pass-the-phone' && (
+              <TouchableOpacity style={styles.addBtn} onPress={handleOpenAddPlayer}>
+                <Text style={styles.addBtnText}>+ Add Guest</Text>
+              </TouchableOpacity>
+            )}
           </View>
 
           {gameMode === 'pass-the-phone' && approvedPlayers.length > 0 && (
@@ -3873,6 +4107,7 @@ export default function LobbyScreen() {
             )}
 
           </View>
+          </>)}
         </View>
 
         {/* ── Quiz Settings ─────────────────────────────────────
@@ -3882,18 +4117,50 @@ export default function LobbyScreen() {
             inte per-block, så ramen visuellt klumpar host-kontrollerade
             quiz-inställningar tillsammans. */}
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>Quiz Settings</Text>
+          {/* Kollapsbar sektionsrubrik (samma +/− mönster som Profile). */}
+          <TouchableOpacity
+            onPress={() => setQuizTuningExpanded(!quizTuningExpanded)}
+            activeOpacity={0.7}
+            style={styles.sectionHeaderRow}
+            hitSlop={8}
+          >
+            {/* Sliders/equalizer-ikon (tre horisontella reglage med rattar)
+                — inline-SVG, matchar referensbilden. Cirklarna fylls med
+                bakgrundsfärgen så linjen "stannar" vid ratten (hollow knob). */}
+            <View style={styles.sectionHeaderSvg}>
+              <Svg width={24} height={24} viewBox="0 0 24 24">
+                <Path d="M3 6 H21" stroke={Colors.primary} strokeWidth={2} strokeLinecap="round" />
+                <Path d="M3 12 H21" stroke={Colors.primary} strokeWidth={2} strokeLinecap="round" />
+                <Path d="M3 18 H21" stroke={Colors.primary} strokeWidth={2} strokeLinecap="round" />
+                <Circle cx={9} cy={6} r={3} fill={Colors.background} stroke={Colors.primary} strokeWidth={2} />
+                <Circle cx={15} cy={12} r={3} fill={Colors.background} stroke={Colors.primary} strokeWidth={2} />
+                <Circle cx={9} cy={18} r={3} fill={Colors.background} stroke={Colors.primary} strokeWidth={2} />
+              </Svg>
+            </View>
+            <Text style={styles.sectionHeaderTitle}>Quiz Tuning</Text>
+            <View style={styles.sectionToggleBox}>
+              <Text style={styles.sectionChevron}>{quizTuningExpanded ? '−' : '+'}</Text>
+            </View>
+          </TouchableOpacity>
+          {!quizTuningExpanded && <View style={styles.sectionDivider} />}
 
+          {quizTuningExpanded && (
           <View style={styles.quizSettingsBorder}>
             <View style={styles.definedByHostBadge} pointerEvents="none">
               <Text style={styles.definedByHostBadgeText}>DEFINED BY HOST</Text>
             </View>
             {/* Game Era */}
             <View>
-              <Text style={styles.cardTitle}>Game Era (min 15 year interval)</Text>
-              {hostMode && (
-                <Text style={styles.cardSubtitle}>Set the time span for questions</Text>
-              )}
+              <View style={styles.regionLabelRow}>
+                <Text style={styles.sectionLabel}>Game Era (min 15 year interval)</Text>
+                <Pressable
+                  style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
+                  onPress={() => Alert.alert('Game Era', 'Set the time span for questions')}
+                  hitSlop={8}
+                >
+                  <Text style={styles.infoIconText}>i</Text>
+                </Pressable>
+              </View>
               {/* Det valda årtalsintervallet visas i samma gul/glow-ruta för
                   både host och non-host (in-game year-selector-paritet). Host
                   får dessutom slidern + DecadeMarks under för att kunna dra.
@@ -4029,10 +4296,16 @@ export default function LobbyScreen() {
 
             {/* Number of Rounds */}
             <View>
-              <Text style={styles.cardTitle}>Number of Rounds</Text>
-              {hostMode && (
-                <Text style={styles.cardSubtitle}>How many rounds in this game</Text>
-              )}
+              <View style={styles.regionLabelRow}>
+                <Text style={styles.sectionLabel}>Number of Rounds</Text>
+                <Pressable
+                  style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
+                  onPress={() => Alert.alert('Number of Rounds', 'How many rounds in this game')}
+                  hitSlop={8}
+                >
+                  <Text style={styles.infoIconText}>i</Text>
+                </Pressable>
+              </View>
               {/* Siffran ramas in i samma blå-bordred ruta för både host och
                   non-host. Host får -/+ knappar på sidorna och RoundsRuler
                   under för att stega och se intervallet. */}
@@ -4096,8 +4369,16 @@ export default function LobbyScreen() {
 
             {/* Answer response time */}
             <View>
-              <Text style={styles.cardTitle}>Answer response time</Text>
-              <Text style={styles.cardSubtitle}>Seconds players have to answer each question</Text>
+              <View style={styles.regionLabelRow}>
+                <Text style={styles.sectionLabel}>Answer response time</Text>
+                <Pressable
+                  style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
+                  onPress={() => Alert.alert('Answer response time', 'Seconds players have to answer each question')}
+                  hitSlop={8}
+                >
+                  <Text style={styles.infoIconText}>i</Text>
+                </Pressable>
+              </View>
               {/* 4-knapps-rad (15/30/45/60). Renderas för alla i lobbyn så
                   non-host ser host:s val i real-tid; bara host kan ändra
                   (disabled={!hostMode}). Default-värdet seeds från host:s
@@ -4128,6 +4409,7 @@ export default function LobbyScreen() {
               </View>
             </View>
           </View>
+          )}
         </View>
 
         {/* ── Start game ────────────────────────────────────────
@@ -4184,6 +4466,19 @@ export default function LobbyScreen() {
 
         <View style={styles.bottomPad} />
       </ScrollView>
+
+      {/* Scroll-hint-pil — guidar ner till Start Game-knappen. Samma som
+          quiz.tsx:s namn-fråge-pil (blink-puls, auto-göm vid botten). */}
+      {scrollHintScrollable && !scrollHintAtBottom && (
+        <Animated.View
+          style={[lobbyScrollHintStyles.wrap, { opacity: scrollHintOpacity }]}
+          pointerEvents="none"
+        >
+          <View style={lobbyScrollHintStyles.pill}>
+            <Text style={lobbyScrollHintStyles.chevron}>⌄</Text>
+          </View>
+        </Animated.View>
+      )}
 
       {/* Alla modaler utanför ScrollView */}
       <AddPlayerModal visible={addModalVisible} onClose={() => setAddModalVisible(false)} onAdd={handleAddPlayer} takenGuestLetters={takenGuestLetters} />
@@ -4246,27 +4541,19 @@ export default function LobbyScreen() {
                 </TouchableOpacity>
               </View>
 
-              {/* Assistance level — Full→Standard→Minimal, en-väg.
-                  Disallowed transitions dimmas (men förblir tappbara så
-                  popup:en kan informera). Originalet bestäms av playerEdit-
-                  Target:s sparade värde, inte editAssistance — så host kan
-                  toggla mellan tillåtna alternativ utan att låsa sig. */}
+              {/* Assistance level — host får fritt välja valfri nivå (lättare
+                  som svårare) från spelarens default. Ingen riktnings-låsning. */}
               <View style={playerEditSheet.fieldGroup}>
                 <Text style={playerEditSheet.fieldLabel}>Assistance Level</Text>
                 <View style={playerEditSheet.skillRow}>
                   {(['full', 'standard', 'minimal'] as const).map((opt) => {
                     const isSelected = editAssistance === opt;
-                    const originalAssistance = playerEditTarget?.assistance ?? 'standard';
-                    const isLocked =
-                      (originalAssistance === 'minimal' && opt !== 'minimal') ||
-                      ASSISTANCE_RANK[opt] > ASSISTANCE_RANK[originalAssistance];
                     return (
                       <TouchableOpacity
                         key={opt}
                         style={[
                           playerEditSheet.skillBtn,
                           isSelected && playerEditSheet.skillBtnActive,
-                          isLocked && playerEditSheet.skillBtnLocked,
                         ]}
                         onPress={() => handleSelectEditAssistance(opt)}
                       >
@@ -4274,7 +4561,6 @@ export default function LobbyScreen() {
                           style={[
                             playerEditSheet.skillBtnText,
                             isSelected && playerEditSheet.skillBtnTextActive,
-                            isLocked && playerEditSheet.skillBtnTextLocked,
                           ]}
                         >
                           {opt.charAt(0).toUpperCase() + opt.slice(1)}
@@ -4599,6 +4885,41 @@ export default function LobbyScreen() {
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
+// Scroll-hint-pil — speglar quiz.tsx:s scrollHintStyles 1:1 (blå pill + vit ⌄).
+const lobbyScrollHintStyles = StyleSheet.create({
+  wrap: {
+    position: 'absolute',
+    bottom: Spacing.lg,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    zIndex: 50,
+    elevation: 50,
+  },
+  pill: {
+    minWidth: 64,
+    height: 36,
+    paddingHorizontal: Spacing.lg,
+    borderRadius: 999,
+    backgroundColor: Colors.warning,
+    alignItems: 'center',
+    justifyContent: 'center',
+    // Golden glow — guld shadow med 0 offset ger en jämn glöd runt pillen.
+    shadowColor: Colors.warning,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.9,
+    shadowRadius: 12,
+  },
+  chevron: {
+    fontSize: 32,
+    lineHeight: 32,
+    // Mörk glyph på guld (samma vokabulär som Start Game-knappens text på guld).
+    color: Colors.background,
+    fontWeight: '900',
+    marginTop: -10,
+  },
+});
+
 const styles = StyleSheet.create({
   // ── Guest leave-room sheet (speglar ProfileScreen.logout-sheet —
   //     samma shell/typografi/färgpalett. Status-texten är textSecondary
@@ -4704,6 +5025,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: Spacing.md,
+  },
+  // Non-host: "Music. Film. Sport." på samma rad som Game Lobby (höger). Mindre
+  // än room-card-varianten + glowing gold, så den ryms i headern.
+  headerTagline: {
+    flexShrink: 1,
+    fontSize: 19,
+    fontWeight: FontWeight.semibold,
+    color: Colors.warning,
+    letterSpacing: 0.2,
+    textAlign: 'right',
+    textShadowColor: Colors.warning,
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 8,
   },
   // Speglar Profile:s creditsPill 1:1 (samma styling, samma layout) så
   // pillen ser identisk ut i båda vyerna och användaren känner igen den.
@@ -4835,10 +5169,13 @@ const styles = StyleSheet.create({
   },
   screenTitle: { fontSize: 24, fontWeight: '700', color: Colors.textPrimary },
 
-  hostBadge: { backgroundColor: Colors.primaryMuted, borderRadius: Radius.full, paddingHorizontal: Spacing.md, paddingVertical: 4, marginBottom: Spacing.sm, borderWidth: 1, borderColor: Colors.primaryBorder },
-  hostBadgeText: { fontSize: FontSize.xs, fontWeight: FontWeight.semibold, color: Colors.primary },
+  // "You are the host" — centrerad rubrik (ingen pill/kantlinje) över Room Code.
+  hostBadge: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, alignSelf: 'center', marginTop: -Spacing.sm, marginBottom: Spacing.sm },
+  hostBadgeText: { fontSize: FontSize.lg, fontWeight: FontWeight.bold, color: Colors.primary },
 
-  roomCard: { alignItems: 'center' },
+  // paddingBottom override:ar Card:ens uniforma Spacing.xl-padding → minskar
+  // avståndet mellan Share invite-rutan och kortets nederkant.
+  roomCard: { alignItems: 'center', paddingBottom: Spacing.lg },
   // Logga + Room Code-stack på en rad. Stacken har `flex: 1` och en
   // matchande spacer på höger sida så Room Code-numret hamnar centrerat
   // i kortet samtidigt som loggan ligger vänsterställd. width: '100%' så
@@ -4862,6 +5199,11 @@ const styles = StyleSheet.create({
   // gapet bevaras när hela block:et flyttas ned för att ge plats åt
   // "You are invited"-badge:n ovanför.
   roomCodeRowGuestSpacing: { marginTop: 64 },
+  // Host: skjut ned "Room Code"-labeln + cellerna så de klarar QuizVibe-loggan
+  // (104px) i kortets övre vänstra hörn — annars går AA-11-AA in i loggan.
+  // Mindre än guest-spacing (64) eftersom host-rubriken "You are the host"
+  // redan tar lite toppyta.
+  roomCodeRowHostSpacing: { marginTop: 18 },
   // Loggan pinnas i Card:s övre vänstra hörn. top/left: 0 = inkant av
   // Card:s padding-edge (RN positionerar absolute children från padding-
   // edge, inte content-edge). Negativa offsets drar in loggan i själva
@@ -4954,7 +5296,26 @@ const styles = StyleSheet.create({
     marginHorizontal: 2,
   },
   shareBtn: { marginTop: Spacing.md, paddingHorizontal: Spacing.lg, paddingVertical: Spacing.sm, borderRadius: Radius.full, backgroundColor: Colors.primaryMuted, borderWidth: 1, borderColor: Colors.primaryBorder },
-  shareBtnText: { fontSize: FontSize.sm, fontWeight: FontWeight.semibold, color: Colors.primary },
+  shareBtnText: { fontSize: FontSize.sm, fontWeight: FontWeight.bold, color: Colors.textPrimary },
+  // Brand-tagline i room code-kortet — speglar startskärmens tagline-format
+  // (textSecondary, letterSpacing 0.2) men i större font (20 vs 15).
+  // marginTop = kortets bottenpadding (Spacing.xl) så avståndet text→Share invite
+  // matchar avståndet text→kortets nederkant (border).
+  // Glowing gold tagline — guld-text (Colors.warning) med matchande
+  // text-shadow-glow. Opacity-pulsen ovanpå ger en levande "glödande" känsla.
+  roomTagline: {
+    marginTop: 0,
+    marginBottom: 0,
+    // Samma storlek som non-host:ens headerTagline (2026-06-01).
+    fontSize: 19,
+    fontWeight: FontWeight.semibold,
+    color: Colors.warning,
+    letterSpacing: 0.2,
+    textAlign: 'center',
+    textShadowColor: Colors.warning,
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 10,
+  },
 
   section: { gap: Spacing.sm },
 
@@ -5034,6 +5395,28 @@ const styles = StyleSheet.create({
   gameModeGroupLabelSpaced: {
     marginTop: Spacing.md,
   },
+  // Multiplayer mode-rubrik + info-ikon på en rad.
+  multiplayerLabelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: Spacing.xs,
+    marginBottom: 8,
+  },
+  // Players-rubrik + info-ikon på en rad.
+  playersLabelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: Spacing.md,
+    marginBottom: 8,
+  },
+  // Region Scope-rubrik + info-ikon på en rad.
+  regionLabelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
   // Info-rader under multiplayer-rutorna (Pass-the-Phone / Individual device).
   modeInfoLine: {
     fontSize: FontSize.xs,
@@ -5110,7 +5493,7 @@ const styles = StyleSheet.create({
   freeBadgeText: {
     fontSize: 10,
     fontWeight: '700',
-    color: '#000',
+    color: '#FFFFFF',
     letterSpacing: 0.6,
   },
   // Dämpad FREE-badge — appliceras tillsammans med modeOptionDimmed
@@ -5313,7 +5696,7 @@ const styles = StyleSheet.create({
   freeBadgeTextSmall: {
     fontSize: 8,
     fontWeight: '700',
-    color: '#000',
+    color: '#FFFFFF',
     letterSpacing: 0.5,
   },
   // Grey overrides för freeBadgeSmall + freeBadgeTextSmall som appliceras när
@@ -5434,7 +5817,8 @@ const styles = StyleSheet.create({
   },
   mainCategoryBoxActive: {
     borderColor: Colors.success,
-    backgroundColor: Colors.successMuted,
+    // bg matchar Pass-the-Phone-rutans aktiva bg (modeOptionPassActive) — 2026-06-01.
+    backgroundColor: Colors.primaryMuted,
   },
   mainCategoryLabel: {
     fontSize: FontSize.sm,
@@ -5691,15 +6075,101 @@ const styles = StyleSheet.create({
     // Reservera samma horisontella utrymme för alla labels så efterföljande
     // status-pillar (YouTubes Enabled / Images Enabled-Disabled) linjerar
     // exakt under varandra trots att labels har olika pixel-bredd i
-    // proportionell font. Värdet rymmer den bredaste labeln (idag "YouTube"
-    // / "Images" — båda under 100 px) med marginal — annars trycks just den
-    // radens pill till höger och bryter linjeringen. Värdet är paret med
-    // connectionRow.paddingRight (18) så att pillarna och switcharna båda
-    // shiftas vänster med 18px och linjerar med paketlistans switchar.
-    minWidth: 112,
+    // proportionell font. Värdet rymmer den bredaste labeln (idag
+    // "Profiles Images" ~110px @ FontSize.sm) med marginal — annars trycks
+    // just den radens pill till höger och bryter linjeringen mot YouTube-
+    // raden. Värdet är paret med connectionRow.paddingRight (18) så att
+    // pillarna och switcharna båda shiftas vänster med 18px och linjerar
+    // med paketlistans switchar.
+    minWidth: 124,
   },
 
   sectionRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: Spacing.xs },
+  // Kollapsbar sektionsrubrik — speglar Profile-vyns header-mönster (ledande
+  // ikon + Typography.title bold + +/−-toggle-box). paddingHorizontal: xs så
+  // rubriken linjerar i vänsterkant med övriga sektioner. 2026-06-01.
+  sectionHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    paddingHorizontal: Spacing.xs,
+    // Ingen marginBottom — avståndet header→divider/innehåll styrs av
+    // section-containerns `gap` så alla tre sektioner blir identiska.
+  },
+  sectionHeaderEmoji: { fontSize: 22, lineHeight: 26 },
+  // Wrap för SVG-ikon i sektionsrubrik — samma höjd som emoji-varianten
+  // så raden centreras likadant.
+  sectionHeaderSvg: { width: 24, height: 26, alignItems: 'center', justifyContent: 'center' },
+  sectionHeaderTitle: { ...Typography.title, color: Colors.textPrimary, fontWeight: FontWeight.bold },
+  // Röd "Players Waiting"-signal i Players in Lobby-rubriken (vid väntande spelare).
+  playersWaitingLabel: { fontSize: FontSize.sm, fontWeight: FontWeight.semibold, color: Colors.error },
+  sectionToggleBox: {
+    width: 26,
+    height: 26,
+    borderRadius: Radius.sm,
+    borderWidth: 1,
+    borderColor: Colors.borderStrong,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sectionChevron: { fontSize: 18, fontWeight: FontWeight.bold, color: Colors.textSecondary, lineHeight: 20 },
+  // Tunn linje under kollapsad rubrik (visuell separation), som i Profile.
+  sectionDivider: { height: 1, backgroundColor: Colors.border, marginHorizontal: Spacing.xs },
+  // Approved-räknare + "+ Add Guest" på egen rad under "Players in Lobby"-
+  // rubriken — högerställd med lite toppluft (2026-06-01).
+  playersMetaRow: { justifyContent: 'flex-start', marginTop: Spacing.sm, gap: Spacing.sm },
+  // "Approved"-rubrik vänster om kapacitetsrutorna.
+  approvedLabel: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.semibold,
+    color: Colors.textSecondary,
+    letterSpacing: 0.5,
+  },
+  // Kapacitetsruts-grid — kolumn av rader (4 rutor i bredd per rad). flex:1 så
+  // den fyller mitten; marginRight ger "viss avstånd" till "+ Add Guest".
+  approvedBoxesGrid: { flex: 1, gap: 4, marginRight: Spacing.md },
+  approvedBoxesGridRow: { flexDirection: 'row', gap: 4 },
+  // Osynlig spacer som håller kolumn-linjeringen på ev. ofull sista rad.
+  approvedBoxSpacer: { flex: 1 },
+  // Enskild ruta — speglar GetReady:s progressDot/progressDotFilled.
+  approvedBox: {
+    flex: 1,
+    height: 24,
+    borderRadius: 4,
+    borderWidth: 1.5,
+    borderColor: Colors.borderStrong,
+    backgroundColor: 'transparent',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  approvedBoxFilled: {
+    backgroundColor: Colors.primaryMuted,
+    borderColor: Colors.primary,
+  },
+  approvedBoxNumber: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: Colors.primary,
+    lineHeight: 13,
+    includeFontPadding: false,
+    paddingHorizontal: 1,
+  },
+  // Sista rutans "max"/siffra-stack — två kompakta rader inom rutans 24px-höjd.
+  approvedBoxMaxStack: { alignItems: 'center', justifyContent: 'center' },
+  approvedBoxMaxLabel: {
+    fontSize: 8,
+    fontWeight: '700',
+    color: Colors.primary,
+    lineHeight: 9,
+    includeFontPadding: false,
+  },
+  approvedBoxMaxNum: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: Colors.primary,
+    lineHeight: 11,
+    includeFontPadding: false,
+  },
   sectionRowRight: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
   sectionLabel: { ...Typography.overline, color: Colors.textSecondary },
   sectionHint: { fontSize: FontSize.xs, color: Colors.textSecondary, fontStyle: 'italic' },
@@ -5710,7 +6180,7 @@ const styles = StyleSheet.create({
   sectionMetaStack: { alignItems: 'center' },
   sectionMetaTop: { fontSize: FontSize.xs, fontWeight: FontWeight.medium, color: Colors.textSecondary },
   addBtn: { paddingHorizontal: Spacing.lg, paddingVertical: Spacing.sm, borderRadius: Radius.md, backgroundColor: Colors.primaryMuted, borderWidth: 1, borderColor: Colors.primaryBorder },
-  addBtnText: { fontSize: FontSize.sm, fontWeight: FontWeight.semibold, color: Colors.primary },
+  addBtnText: { fontSize: FontSize.sm, fontWeight: FontWeight.semibold, color: Colors.textPrimary },
 
   playerBoard: { backgroundColor: Colors.card, borderRadius: Radius.lg, borderWidth: 1, borderColor: Colors.border, padding: Spacing.md, gap: Spacing.xs },
   turnOrderHint: {
@@ -5856,6 +6326,7 @@ const styles = StyleSheet.create({
   responseRow: {
     flexDirection: 'row',
     gap: Spacing.sm,
+    marginTop: Spacing.sm,
   },
   responseBtn: {
     flex: 1,

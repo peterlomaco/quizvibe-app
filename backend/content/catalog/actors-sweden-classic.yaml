@@ -1,0 +1,182 @@
+# Svenska skådespelare/komiker kända för elder + Gen X. Tillagda 2026-06-01.
+audience: ["elder", "gen-x"]
+region: ["sweden"]
+category: actors
+contentForm: image
+contentSubject: actor
+items:
+  - id: peter-haber
+    displayName: "Peter Haber"
+    probability: 80
+    peakFrom: 1997
+    peakTo: 2018
+    wikimediaSearchHints: ["Peter Haber actor Beck"]
+    answerMethods: ["name-letters"]
+  - id: johan-rheborg
+    displayName: "Johan Rheborg"
+    probability: 78
+    peakFrom: 1995
+    peakTo: 2018
+    wikimediaSearchHints: ["Johan Rheborg"]
+    answerMethods: ["name-letters"]
+  - id: robert-gustafsson
+    displayName: "Robert Gustafsson"
+    probability: 84
+    peakFrom: 1995
+    peakTo: 2018
+    wikimediaSearchHints: ["Robert Gustafsson comedian"]
+    answerMethods: ["name-letters"]
+  - id: lena-endre
+    displayName: "Lena Endre"
+    probability: 74
+    peakFrom: 1990
+    peakTo: 2012
+    wikimediaSearchHints: ["Lena Endre actress"]
+    answerMethods: ["name-letters"]
+  - id: suzanne-reuter
+    displayName: "Suzanne Reuter"
+    probability: 72
+    peakFrom: 1985
+    peakTo: 2010
+    wikimediaSearchHints: ["Suzanne Reuter"]
+    answerMethods: ["name-letters"]
+  - id: kjell-bergqvist
+    displayName: "Kjell Bergqvist"
+    probability: 78
+    peakFrom: 1985
+    peakTo: 2015
+    wikimediaSearchHints: ["Kjell Bergqvist actor"]
+    answerMethods: ["name-letters"]
+  - id: borje-ahlstedt
+    displayName: "Börje Ahlstedt"
+    probability: 68
+    peakFrom: 1970
+    peakTo: 2005
+    wikimediaSearchHints: ["Börje Ahlstedt"]
+    answerMethods: ["name-letters"]
+  - id: ernst-hugo-jaregard
+    displayName: "Ernst-Hugo Järegård"
+    probability: 72
+    peakFrom: 1975
+    peakTo: 1998
+    wikimediaSearchHints: ["Ernst-Hugo Järegård"]
+    answerMethods: ["name-letters"]
+  - id: gosta-ekman-actor
+    displayName: "Gösta Ekman"
+    probability: 78
+    peakFrom: 1970
+    peakTo: 2010
+    wikimediaSearchHints: ["Gösta Ekman skådespelare 1939"]
+    answerMethods: ["name-letters"]
+  - id: ingvar-hirdwall
+    displayName: "Ingvar Hirdwall"
+    probability: 70
+    peakFrom: 1980
+    peakTo: 2015
+    wikimediaSearchHints: ["Ingvar Hirdwall"]
+    answerMethods: ["name-letters"]
+  - id: jarl-kulle
+    displayName: "Jarl Kulle"
+    probability: 66
+    peakFrom: 1955
+    peakTo: 1995
+    wikimediaSearchHints: ["Jarl Kulle"]
+    answerMethods: ["name-letters"]
+  - id: maria-lundqvist
+    displayName: "Maria Lundqvist"
+    probability: 74
+    peakFrom: 1995
+    peakTo: 2015
+    wikimediaSearchHints: ["Maria Lundqvist actress"]
+    answerMethods: ["name-letters"]
+  - id: ulla-skoog
+    displayName: "Ulla Skoog"
+    probability: 70
+    peakFrom: 1990
+    peakTo: 2010
+    wikimediaSearchHints: ["Ulla Skoog"]
+    answerMethods: ["name-letters"]
+  - id: sissela-kyle
+    displayName: "Sissela Kyle"
+    probability: 74
+    peakFrom: 1990
+    peakTo: 2015
+    wikimediaSearchHints: ["Sissela Kyle"]
+    answerMethods: ["name-letters"]
+  - id: eva-rydberg
+    displayName: "Eva Rydberg"
+    probability: 68
+    peakFrom: 1970
+    peakTo: 2010
+    wikimediaSearchHints: ["Eva Rydberg revy"]
+    answerMethods: ["name-letters"]
+  - id: reine-brynolfsson
+    displayName: "Reine Brynolfsson"
+    probability: 68
+    peakFrom: 1988
+    peakTo: 2010
+    wikimediaSearchHints: ["Reine Brynolfsson"]
+    answerMethods: ["name-letters"]
+  - id: claes-mansson
+    displayName: "Claes Månsson"
+    probability: 66
+    peakFrom: 1985
+    peakTo: 2012
+    wikimediaSearchHints: ["Claes Månsson actor"]
+    answerMethods: ["name-letters"]
+  - id: claes-malmberg
+    displayName: "Claes Malmberg"
+    probability: 68
+    peakFrom: 1990
+    peakTo: 2012
+    wikimediaSearchHints: ["Claes Malmberg"]
+    answerMethods: ["name-letters"]
+  - id: johan-ulveson
+    displayName: "Johan Ulveson"
+    probability: 68
+    peakFrom: 1990
+    peakTo: 2015
+    wikimediaSearchHints: ["Johan Ulveson"]
+    answerMethods: ["name-letters"]
+  - id: torkel-petersson
+    displayName: "Torkel Petersson"
+    probability: 68
+    peakFrom: 2000
+    peakTo: 2015
+    wikimediaSearchHints: ["Torkel Petersson actor"]
+    answerMethods: ["name-letters"]
+  - id: anders-jansson
+    displayName: "Anders Jansson"
+    probability: 70
+    peakFrom: 1998
+    peakTo: 2015
+    wikimediaSearchHints: ["Anders Jansson komiker"]
+    answerMethods: ["name-letters"]
+  - id: jonas-inde
+    displayName: "Jonas Inde"
+    probability: 60
+    peakFrom: 1995
+    peakTo: 2010
+    wikimediaSearchHints: ["Jonas Inde"]
+    answerMethods: ["name-letters"]
+  - id: jonas-karlsson-actor
+    displayName: "Jonas Karlsson"
+    probability: 68
+    peakFrom: 2000
+    peakTo: 2018
+    wikimediaSearchHints: ["Jonas Karlsson skådespelare"]
+    answerMethods: ["name-letters"]
+  - id: gustaf-hammarsten
+    displayName: "Gustaf Hammarsten"
+    probability: 62
+    peakFrom: 2000
+    peakTo: 2015
+    wikimediaSearchHints: ["Gustaf Hammarsten"]
+    answerMethods: ["name-letters"]
+  - id: suzanne-axell
+    displayName: "Suzanne Axell"
+    probability: 58
+    peakFrom: 1995
+    peakTo: 2015
+    wikimediaSearchHints: ["Suzanne Axell programledare"]
+    answerMethods: ["name-letters"]

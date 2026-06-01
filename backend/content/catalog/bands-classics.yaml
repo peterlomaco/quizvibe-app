@@ -27,12 +27,6 @@ items:
     probability: 96
     wikimediaSearchHints: ["Queen rock band Freddie Mercury"]
     answerMethods: ["timeline", "name-letters"]
-  - id: nirvana
-    displayName: "Nirvana"
-    correctYear: 1987
-    probability: 88
-    wikimediaSearchHints: ["Nirvana band Kurt Cobain"]
-    answerMethods: ["timeline", "name-letters"]
   - id: pink-floyd
     displayName: "Pink Floyd"
     correctYear: 1965
@@ -123,23 +117,11 @@ items:
     probability: 82
     wikimediaSearchHints: ["Arctic Monkeys band Alex Turner"]
     answerMethods: ["timeline", "name-letters"]
-  - id: red-hot-chili-peppers
-    displayName: "Red Hot Chili Peppers"
-    correctYear: 1983
-    probability: 88
-    wikimediaSearchHints: ["Red Hot Chili Peppers band"]
-    answerMethods: ["timeline", "name-letters"]
   - id: green-day
     displayName: "Green Day"
     correctYear: 1986
     probability: 85
     wikimediaSearchHints: ["Green Day band punk"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: linkin-park
-    displayName: "Linkin Park"
-    correctYear: 1996
-    probability: 85
-    wikimediaSearchHints: ["Linkin Park band Chester Bennington"]
     answerMethods: ["timeline", "name-letters"]
   - id: the-police
     displayName: "The Police"
@@ -152,18 +134,6 @@ items:
     correctYear: 1977
     probability: 85
     wikimediaSearchHints: ["Dire Straits band"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: bon-jovi
-    displayName: "Bon Jovi"
-    correctYear: 1983
-    probability: 88
-    wikimediaSearchHints: ["Bon Jovi band rock"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: iron-maiden
-    displayName: "Iron Maiden"
-    correctYear: 1975
-    probability: 85
-    wikimediaSearchHints: ["Iron Maiden"]
     answerMethods: ["timeline", "name-letters"]
   - id: kiss
     displayName: "Kiss"
@@ -189,35 +159,11 @@ items:
     probability: 85
     wikimediaSearchHints: ["Depeche Mode"]
     answerMethods: ["timeline", "name-letters"]
-  - id: the-cure
-    displayName: "The Cure"
-    correctYear: 1976
-    probability: 82
-    wikimediaSearchHints: ["The Cure"]
-    answerMethods: ["timeline", "name-letters"]
   - id: the-smiths
     displayName: "The Smiths"
     correctYear: 1982
     probability: 78
     wikimediaSearchHints: ["The Smiths"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: rem
-    displayName: "R.E.M."
-    correctYear: 1980
-    probability: 82
-    wikimediaSearchHints: ["R.E.M. band Michael Stipe"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: pearl-jam
-    displayName: "Pearl Jam"
-    correctYear: 1990
-    probability: 85
-    wikimediaSearchHints: ["Pearl Jam"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: radiohead
-    displayName: "Radiohead"
-    correctYear: 1985
-    probability: 88
-    wikimediaSearchHints: ["Radiohead"]
     answerMethods: ["timeline", "name-letters"]
   - id: daft-punk
     displayName: "Daft Punk"
@@ -261,18 +207,6 @@ items:
     probability: 85
     wikimediaSearchHints: ["Eurythmics band Annie Lennox"]
     answerMethods: ["timeline", "name-letters"]
-  - id: oasis
-    displayName: "Oasis"
-    correctYear: 1991
-    probability: 92
-    wikimediaSearchHints: ["Oasis band Gallagher Manchester"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: blur
-    displayName: "Blur"
-    correctYear: 1988
-    probability: 80
-    wikimediaSearchHints: ["Blur band Damon Albarn"]
-    answerMethods: ["timeline", "name-letters"]
   - id: roxette
     displayName: "Roxette"
     correctYear: 1986
@@ -298,18 +232,6 @@ items:
     probability: 86
     wikimediaSearchHints: ["Kent Swedish rock band Eskilstuna Joakim Berg"]
     answerMethods: ["timeline", "name-letters"]
-  - id: the-cardigans
-    displayName: "The Cardigans"
-    correctYear: 1992
-    probability: 84
-    wikimediaSearchHints: ["The Cardigans Swedish band Lovefool Nina Persson"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: in-flames
-    displayName: "In Flames"
-    correctYear: 1990
-    probability: 78
-    wikimediaSearchHints: ["In Flames Swedish melodic death metal Gothenburg"]
-    answerMethods: ["timeline", "name-letters"]
   - id: mando-diao
     displayName: "Mando Diao"
     correctYear: 1999
@@ -327,12 +249,6 @@ items:
     correctYear: 1991
     probability: 78
     wikimediaSearchHints: ["Bo Kaspers Orkester Swedish band Vi kommer aldrig att dö"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: looptroop-rockers
-    displayName: "Looptroop Rockers"
-    correctYear: 1991
-    probability: 72
-    wikimediaSearchHints: ["Looptroop Rockers Swedish hip hop crew Västerås"]
     answerMethods: ["timeline", "name-letters"]
   - id: the-ark
     displayName: "The Ark"
@@ -370,12 +286,6 @@ items:
     correctYear: 2008
     probability: 86
     wikimediaSearchHints: ["Swedish House Mafia Axwell Ingrosso Angello Don't You Worry Child"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: aqua
-    displayName: "Aqua"
-    correctYear: 1989
-    probability: 84
-    wikimediaSearchHints: ["Aqua Danish band Barbie Girl Lene Nystrøm"]
     answerMethods: ["timeline", "name-letters"]
   - id: lasse-stefanz
     displayName: "Lasse Stefanz"
@@ -463,12 +373,6 @@ items:
     probability: 78
     wikimediaSearchHints: ["Larz-Kristerz Swedish dansband Hultsfred"]
     answerMethods: ["timeline", "name-letters"]
-  - id: sven-ingvars
-    displayName: "Sven-Ingvars"
-    correctYear: 1956
-    probability: 80
-    wikimediaSearchHints: ["Sven-Ingvars Swedish dansband Sven-Erik Magnusson"]
-    answerMethods: ["timeline", "name-letters"]
   - id: galantis
     displayName: "Galantis"
     correctYear: 2007
@@ -518,41 +422,11 @@ items:
     probability: 88
     wikimediaSearchHints: ["Wham band George Michael Andrew Ridgeley Last Christmas"]
     answerMethods: ["timeline", "name-letters"]
-  - id: pet-shop-boys
-    displayName: "Pet Shop Boys"
-    correctYear: 1981
-    probability: 86
-    wikimediaSearchHints: ["Pet Shop Boys Neil Tennant Chris Lowe West End Girls"]
-    answerMethods: ["timeline", "name-letters"]
   - id: duran-duran
     displayName: "Duran Duran"
     correctYear: 1978
     probability: 86
     wikimediaSearchHints: ["Duran Duran band Birmingham new wave Hungry Like the Wolf"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: simple-minds
-    displayName: "Simple Minds"
-    correctYear: 1977
-    probability: 80
-    wikimediaSearchHints: ["Simple Minds Scottish band Jim Kerr Don't You Forget About Me"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: inxs
-    displayName: "INXS"
-    correctYear: 1977
-    probability: 80
-    wikimediaSearchHints: ["INXS Australian rock band Michael Hutchence Never Tear Us Apart"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: crowded-house
-    displayName: "Crowded House"
-    correctYear: 1985
-    probability: 78
-    wikimediaSearchHints: ["Crowded House New Zealand band Neil Finn Don't Dream It's Over"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: take-that
-    displayName: "Take That"
-    correctYear: 1990
-    probability: 82
-    wikimediaSearchHints: ["Take That British boy band Gary Barlow Robbie Williams Back for Good"]
     answerMethods: ["timeline", "name-letters"]
   # === Komplettering 2026-05-27 — svenska + internationella band ===
   - id: gyllene-tider

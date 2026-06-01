@@ -1,0 +1,898 @@
+[
+  {
+    "name": "ABBA",
+    "cat": "Musik",
+    "ids": [
+      "abba"
+    ]
+  },
+  {
+    "name": "Avicii",
+    "cat": "Musik",
+    "ids": [
+      "avicii"
+    ]
+  },
+  {
+    "name": "Zara Larsson",
+    "cat": "Musik",
+    "ids": [
+      "zara-larsson"
+    ]
+  },
+  {
+    "name": "Håkan Hellström",
+    "cat": "Musik",
+    "ids": [
+      "hakan-hellstrom"
+    ]
+  },
+  {
+    "name": "Veronica Maggio",
+    "cat": "Musik",
+    "ids": [
+      "veronica-maggio"
+    ]
+  },
+  {
+    "name": "Kent",
+    "cat": "Musik",
+    "ids": [
+      "kent"
+    ]
+  },
+  {
+    "name": "Roxette",
+    "cat": "Musik",
+    "ids": [
+      "roxette"
+    ]
+  },
+  {
+    "name": "Carola",
+    "cat": "Musik",
+    "ids": [
+      "carola-haggkvist"
+    ]
+  },
+  {
+    "name": "Laleh",
+    "cat": "Musik",
+    "ids": [
+      "laleh"
+    ]
+  },
+  {
+    "name": "Björn Skifs",
+    "cat": "Musik",
+    "ids": [
+      "bjorn-skifs"
+    ]
+  },
+  {
+    "name": "Magnus Uggla",
+    "cat": "Musik",
+    "ids": [
+      "magnus-uggla"
+    ]
+  },
+  {
+    "name": "Lars Winnerbäck",
+    "cat": "Musik",
+    "ids": [
+      "lars-winnerback"
+    ]
+  },
+  {
+    "name": "Ted Gärdestad",
+    "cat": "Musik",
+    "ids": [
+      "ted-gardestad"
+    ]
+  },
+  {
+    "name": "Tomas Ledin",
+    "cat": "Musik",
+    "ids": [
+      "tomas-ledin"
+    ]
+  },
+  {
+    "name": "Lena Philipsson",
+    "cat": "Musik",
+    "ids": [
+      "lena-philipsson"
+    ]
+  },
+  {
+    "name": "Per Gessle",
+    "cat": "Musik",
+    "ids": [
+      "per-gessle"
+    ]
+  },
+  {
+    "name": "Jill Johnson",
+    "cat": "Musik",
+    "ids": [
+      "jill-johnson"
+    ]
+  },
+  {
+    "name": "Robyn",
+    "cat": "Musik",
+    "ids": [
+      "robyn"
+    ]
+  },
+  {
+    "name": "Tove Lo",
+    "cat": "Musik",
+    "ids": [
+      "tove-lo"
+    ]
+  },
+  {
+    "name": "Loreen",
+    "cat": "Musik",
+    "ids": [
+      "loreen"
+    ]
+  },
+  {
+    "name": "Måns Zelmerlöw",
+    "cat": "Musik",
+    "ids": [
+      "mans-zelmerlow"
+    ]
+  },
+  {
+    "name": "Danny Saucedo",
+    "cat": "Musik",
+    "ids": [
+      "danny-saucedo"
+    ]
+  },
+  {
+    "name": "Molly Sandén",
+    "cat": "Musik",
+    "ids": [
+      "molly-sanden"
+    ]
+  },
+  {
+    "name": "Benjamin Ingrosso",
+    "cat": "Musik",
+    "ids": [
+      "benjamin-ingrosso"
+    ]
+  },
+  {
+    "name": "First Aid Kit",
+    "cat": "Musik",
+    "ids": [
+      "first-aid-kit"
+    ]
+  },
+  {
+    "name": "Miriam Bryant",
+    "cat": "Musik",
+    "ids": [
+      "miriam-bryant"
+    ]
+  },
+  {
+    "name": "Darin",
+    "cat": "Musik",
+    "ids": [
+      "darin"
+    ]
+  },
+  {
+    "name": "Agnes",
+    "cat": "Musik",
+    "ids": [
+      "agnes-carlsson"
+    ]
+  },
+  {
+    "name": "Petra Marklund",
+    "cat": "Musik",
+    "ids": [
+      "petra-marklund"
+    ]
+  },
+  {
+    "name": "Sarah Dawn Finer",
+    "cat": "Musik",
+    "ids": [
+      "sarah-dawn-finer"
+    ]
+  },
+  {
+    "name": "E-Type",
+    "cat": "Musik",
+    "ids": [
+      "e-type"
+    ]
+  },
+  {
+    "name": "Ace of Base",
+    "cat": "Musik",
+    "ids": [
+      "ace-of-base"
+    ]
+  },
+  {
+    "name": "Europe",
+    "cat": "Musik",
+    "ids": [
+      "europe"
+    ]
+  },
+  {
+    "name": "The Cardigans",
+    "cat": "Musik",
+    "ids": [
+      "the-cardigans"
+    ]
+  },
+  {
+    "name": "The Hives",
+    "cat": "Musik",
+    "ids": [
+      "the-hives"
+    ]
+  },
+  {
+    "name": "The Ark",
+    "cat": "Musik",
+    "ids": [
+      "the-ark"
+    ]
+  },
+  {
+    "name": "Ghost",
+    "cat": "Musik",
+    "ids": [
+      "ghost"
+    ]
+  },
+  {
+    "name": "Swedish House Mafia",
+    "cat": "Musik",
+    "ids": [
+      "swedish-house-mafia"
+    ]
+  },
+  {
+    "name": "Basshunter",
+    "cat": "Musik",
+    "ids": [
+      "basshunter"
+    ]
+  },
+  {
+    "name": "Petter",
+    "cat": "Musik",
+    "ids": [
+      "petter"
+    ]
+  },
+  {
+    "name": "Markoolio",
+    "cat": "Musik",
+    "ids": [
+      "markoolio"
+    ]
+  },
+  {
+    "name": "Tommy Körberg",
+    "cat": "Musik",
+    "ids": [
+      "tommy-korberg"
+    ]
+  },
+  {
+    "name": "Vikingarna",
+    "cat": "Musik",
+    "ids": [
+      "vikingarna"
+    ]
+  },
+  {
+    "name": "Charlotte Perrelli",
+    "cat": "Musik",
+    "ids": [
+      "charlotte-perrelli"
+    ]
+  },
+  {
+    "name": "Sanna Nielsen",
+    "cat": "Musik",
+    "ids": [
+      "sanna-nielsen"
+    ]
+  },
+  {
+    "name": "Shirley Clamp",
+    "cat": "Musik",
+    "ids": [
+      "shirley-clamp"
+    ]
+  },
+  {
+    "name": "Christer Sjögren",
+    "cat": "Musik",
+    "ids": [
+      "christer-sjogren"
+    ]
+  },
+  {
+    "name": "Albin Lee Meldau",
+    "cat": "Musik",
+    "ids": [
+      "albin-lee-meldau"
+    ]
+  },
+  {
+    "name": "Victor Leksell",
+    "cat": "Musik",
+    "ids": [
+      "victor-leksell"
+    ]
+  },
+  {
+    "name": "Thomas Stenström",
+    "cat": "Musik",
+    "ids": [
+      "thomas-stenstrom"
+    ]
+  },
+  {
+    "name": "Miss Li",
+    "cat": "Musik",
+    "ids": [
+      "miss-li"
+    ]
+  },
+  {
+    "name": "Jan Johansen",
+    "cat": "Musik",
+    "ids": [
+      "jan-johansen"
+    ]
+  },
+  {
+    "name": "Orup",
+    "cat": "Musik",
+    "ids": [
+      "orup"
+    ]
+  },
+  {
+    "name": "Niklas Strömstedt",
+    "cat": "Musik",
+    "ids": [
+      "niklas-stromstedt"
+    ]
+  },
+  {
+    "name": "Ulf Lundell",
+    "cat": "Musik",
+    "ids": [
+      "ulf-lundell"
+    ]
+  },
+  {
+    "name": "Lisa Nilsson",
+    "cat": "Musik",
+    "ids": [
+      "lisa-nilsson"
+    ]
+  },
+  {
+    "name": "Helen Sjöholm",
+    "cat": "Musik",
+    "ids": [
+      "helen-sjoholm"
+    ]
+  },
+  {
+    "name": "Timbuktu",
+    "cat": "Musik",
+    "ids": [
+      "timbuktu"
+    ]
+  },
+  {
+    "name": "Oskar Linnros",
+    "cat": "Musik",
+    "ids": [
+      "oskar-linnros"
+    ]
+  },
+  {
+    "name": "Mando Diao",
+    "cat": "Musik",
+    "ids": [
+      "mando-diao"
+    ]
+  },
+  {
+    "name": "Gyllene Tider",
+    "cat": "Musik",
+    "ids": [
+      "gyllene-tider"
+    ]
+  },
+  {
+    "name": "Eldkvarn",
+    "cat": "Musik",
+    "ids": [
+      "eldkvarn"
+    ]
+  },
+  {
+    "name": "Ingrid Bergman",
+    "cat": "Film",
+    "ids": [
+      "ingrid-bergman"
+    ]
+  },
+  {
+    "name": "Greta Garbo",
+    "cat": "Film",
+    "ids": [
+      "greta-garbo"
+    ]
+  },
+  {
+    "name": "Max von Sydow",
+    "cat": "Film",
+    "ids": [
+      "max-von-sydow"
+    ]
+  },
+  {
+    "name": "Stellan Skarsgård",
+    "cat": "Film",
+    "ids": [
+      "stellan-skarsgard"
+    ]
+  },
+  {
+    "name": "Alexander Skarsgård",
+    "cat": "Film",
+    "ids": [
+      "alexander-skarsgard"
+    ]
+  },
+  {
+    "name": "Gustaf Skarsgård",
+    "cat": "Film",
+    "ids": [
+      "gustaf-skarsgard"
+    ]
+  },
+  {
+    "name": "Bill Skarsgård",
+    "cat": "Film",
+    "ids": [
+      "bill-skarsgard"
+    ]
+  },
+  {
+    "name": "Alicia Vikander",
+    "cat": "Film",
+    "ids": [
+      "alicia-vikander"
+    ]
+  },
+  {
+    "name": "Mikael Persbrandt",
+    "cat": "Film",
+    "ids": [
+      "mikael-persbrandt"
+    ]
+  },
+  {
+    "name": "Peter Stormare",
+    "cat": "Film",
+    "ids": [
+      "peter-stormare"
+    ]
+  },
+  {
+    "name": "Lena Olin",
+    "cat": "Film",
+    "ids": [
+      "lena-olin"
+    ]
+  },
+  {
+    "name": "Noomi Rapace",
+    "cat": "Film",
+    "ids": [
+      "noomi-rapace"
+    ]
+  },
+  {
+    "name": "Rolf Lassgård",
+    "cat": "Film",
+    "ids": [
+      "rolf-lassgard"
+    ]
+  },
+  {
+    "name": "Mikael Nyqvist",
+    "cat": "Film",
+    "ids": [
+      "mikael-nyqvist"
+    ]
+  },
+  {
+    "name": "Krister Henriksson",
+    "cat": "Film",
+    "ids": [
+      "krister-henriksson"
+    ]
+  },
+  {
+    "name": "Helena Bergström",
+    "cat": "Film",
+    "ids": [
+      "helena-bergstrom"
+    ]
+  },
+  {
+    "name": "Pernilla August",
+    "cat": "Film",
+    "ids": [
+      "pernilla-august"
+    ]
+  },
+  {
+    "name": "Sven Wollter",
+    "cat": "Film",
+    "ids": [
+      "sven-wollter"
+    ]
+  },
+  {
+    "name": "Allan Edwall",
+    "cat": "Film",
+    "ids": [
+      "allan-edwall"
+    ]
+  },
+  {
+    "name": "Tomas von Brömssen",
+    "cat": "Film",
+    "ids": [
+      "tomas-von-bromssen"
+    ]
+  },
+  {
+    "name": "Sofia Helin",
+    "cat": "Film",
+    "ids": [
+      "sofia-helin"
+    ]
+  },
+  {
+    "name": "Zlatan Ibrahimović",
+    "cat": "Sport",
+    "ids": [
+      "zlatan-ibrahimovic"
+    ]
+  },
+  {
+    "name": "Björn Borg",
+    "cat": "Sport",
+    "ids": [
+      "bjorn-borg"
+    ]
+  },
+  {
+    "name": "Ingemar Stenmark",
+    "cat": "Sport",
+    "ids": [
+      "ingemar-stenmark"
+    ]
+  },
+  {
+    "name": "Armand Duplantis",
+    "cat": "Sport",
+    "ids": [
+      "armand-duplantis"
+    ]
+  },
+  {
+    "name": "Sarah Sjöström",
+    "cat": "Sport",
+    "ids": [
+      "sara-sjostrom"
+    ]
+  },
+  {
+    "name": "Peter Forsberg",
+    "cat": "Sport",
+    "ids": [
+      "peter-forsberg"
+    ]
+  },
+  {
+    "name": "Henrik Lundqvist",
+    "cat": "Sport",
+    "ids": [
+      "henrik-lundqvist"
+    ]
+  },
+  {
+    "name": "Mats Sundin",
+    "cat": "Sport",
+    "ids": [
+      "mats-sundin"
+    ]
+  },
+  {
+    "name": "Börje Salming",
+    "cat": "Sport",
+    "ids": [
+      "borje-salming"
+    ]
+  },
+  {
+    "name": "Annika Sörenstam",
+    "cat": "Sport",
+    "ids": [
+      "annika-sorenstam"
+    ]
+  },
+  {
+    "name": "Jan-Ove Waldner",
+    "cat": "Sport",
+    "ids": [
+      "jan-ove-waldner"
+    ]
+  },
+  {
+    "name": "Carolina Klüft",
+    "cat": "Sport",
+    "ids": [
+      "carolina-kluft"
+    ]
+  },
+  {
+    "name": "Stefan Edberg",
+    "cat": "Sport",
+    "ids": [
+      "stefan-edberg"
+    ]
+  },
+  {
+    "name": "Mats Wilander",
+    "cat": "Sport",
+    "ids": [
+      "mats-wilander"
+    ]
+  },
+  {
+    "name": "Charlotte Kalla",
+    "cat": "Sport",
+    "ids": [
+      "charlotte-kalla"
+    ]
+  },
+  {
+    "name": "Anja Pärson",
+    "cat": "Sport",
+    "ids": [
+      "anja-parson"
+    ]
+  },
+  {
+    "name": "Magdalena Forsberg",
+    "cat": "Sport",
+    "ids": [
+      "magdalena-forsberg"
+    ]
+  },
+  {
+    "name": "Pernilla Wiberg",
+    "cat": "Sport",
+    "ids": [
+      "pernilla-wiberg"
+    ]
+  },
+  {
+    "name": "Gunde Svan",
+    "cat": "Sport",
+    "ids": [
+      "gunde-svan"
+    ]
+  },
+  {
+    "name": "Patrik Sjöberg",
+    "cat": "Sport",
+    "ids": [
+      "patrik-sjoberg"
+    ]
+  },
+  {
+    "name": "Christian Olsson",
+    "cat": "Sport",
+    "ids": [
+      "christian-olsson"
+    ]
+  },
+  {
+    "name": "Stefan Holm",
+    "cat": "Sport",
+    "ids": [
+      "stefan-holm"
+    ]
+  },
+  {
+    "name": "Peder Fredricson",
+    "cat": "Sport",
+    "ids": [
+      "fred"
+    ]
+  },
+  {
+    "name": "Glenn Hysén",
+    "cat": "Sport",
+    "ids": [
+      "glenn-hysen"
+    ]
+  },
+  {
+    "name": "Tomas Brolin",
+    "cat": "Sport",
+    "ids": [
+      "tomas-brolin"
+    ]
+  },
+  {
+    "name": "Henrik Larsson",
+    "cat": "Sport",
+    "ids": [
+      "henrik-larsson"
+    ]
+  },
+  {
+    "name": "Fredrik Ljungberg",
+    "cat": "Sport",
+    "ids": [
+      "fred"
+    ]
+  },
+  {
+    "name": "Caroline Seger",
+    "cat": "Sport",
+    "ids": [
+      "caroline-seger"
+    ]
+  },
+  {
+    "name": "Dejan Kulusevski",
+    "cat": "Sport",
+    "ids": [
+      "dejan-kulusevski"
+    ]
+  },
+  {
+    "name": "Victor Hedman",
+    "cat": "Sport",
+    "ids": [
+      "victor-hedman"
+    ]
+  },
+  {
+    "name": "Nicklas Lidström",
+    "cat": "Sport",
+    "ids": [
+      "nicklas-lidstrom"
+    ]
+  },
+  {
+    "name": "Daniel Alfredsson",
+    "cat": "Sport",
+    "ids": [
+      "daniel-alfredsson"
+    ]
+  },
+  {
+    "name": "Markus Näslund",
+    "cat": "Sport",
+    "ids": [
+      "markus-naslund"
+    ]
+  },
+  {
+    "name": "Erik Karlsson",
+    "cat": "Sport",
+    "ids": [
+      "erik-karlsson"
+    ]
+  },
+  {
+    "name": "Mats Näslund",
+    "cat": "Sport",
+    "ids": [
+      "mats-naslund"
+    ]
+  },
+  {
+    "name": "Johan Olsson",
+    "cat": "Sport",
+    "ids": [
+      "johan-olsson-vm-50km-2013"
+    ]
+  },
+  {
+    "name": "Gunnar Nordahl",
+    "cat": "Sport",
+    "ids": [
+      "gunnar-nordahl"
+    ]
+  },
+  {
+    "name": "Nils Liedholm",
+    "cat": "Sport",
+    "ids": [
+      "nils-liedholm"
+    ]
+  },
+  {
+    "name": "Emil Forsberg",
+    "cat": "Sport",
+    "ids": [
+      "emil-forsberg-vs-schweiz-vm-2018"
+    ]
+  },
+  {
+    "name": "Alexander Isak",
+    "cat": "Sport",
+    "ids": [
+      "alexander-isak"
+    ]
+  },
+  {
+    "name": "Jonas Björkman",
+    "cat": "Sport",
+    "ids": [
+      "bjork"
+    ]
+  },
+  {
+    "name": "Jörgen Persson",
+    "cat": "Sport",
+    "ids": [
+      "jorgen-persson"
+    ]
+  },
+  {
+    "name": "Stefan Lövgren",
+    "cat": "Sport",
+    "ids": [
+      "stefan-lovgren"
+    ]
+  },
+  {
+    "name": "Magnus Wislander",
+    "cat": "Sport",
+    "ids": [
+      "magnus-wislander"
+    ]
+  },
+  {
+    "name": "Kim Andersson",
+    "cat": "Sport",
+    "ids": [
+      "kim-andersson"
+    ]
+  }
+]

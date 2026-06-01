@@ -504,12 +504,6 @@ items:
     probability: 82
     wikimediaSearchHints: ["Benjamin Ingrosso Swedish singer Eurovision Dance You Off"]
     answerMethods: ["timeline", "name-letters"]
-  - id: thomas-stenstrom
-    displayName: "Thomas Stenström"
-    correctYear: 1981
-    probability: 70
-    wikimediaSearchHints: ["Thomas Stenström Swedish singer Mannen utan minne"]
-    answerMethods: ["timeline", "name-letters"]
   - id: moonica-mac
     displayName: "Moonica Mac"
     correctYear: 1986
@@ -551,12 +545,6 @@ items:
     correctYear: 1987
     probability: 74
     wikimediaSearchHints: ["Linnéa Henriksson Swedish singer Lyckligare nu"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: newkid
-    displayName: "Newkid"
-    correctYear: 1989
-    probability: 68
-    wikimediaSearchHints: ["Newkid Swedish singer Ali Jammali pop"]
     answerMethods: ["timeline", "name-letters"]
   - id: victor-leksell
     displayName: "Victor Leksell"

@@ -289,14 +289,6 @@ items:
     probability: 84
     wikimediaSearchHints: ["Tomas von Brömssen Swedish actor Sune Söderkåkar"]
     answerMethods: ["timeline", "name-letters"]
-  - id: brasse-brannstrom
-    displayName: "Brasse Brännström"
-    correctYear: 1945
-    peakFrom: 1975
-    peakTo: 2005
-    probability: 86
-    wikimediaSearchHints: ["Brasse Brännström Swedish actor Fem myror är fler än fyra elefanter"]
-    answerMethods: ["timeline", "name-letters"]
   - id: hans-alfredson
     displayName: "Hans Alfredson"
     correctYear: 1931

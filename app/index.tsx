@@ -63,7 +63,7 @@ interface JoinModalProps {
   onClose: () => void;
   initialStep?: JoinStep;
   // Döljer Guest-valet i chooser-steget. Sätts när användaren öppnat
-  // modalen via "Join Game — as registered user"-knappen, eftersom
+  // modalen via "Join with Room Code — user"-knappen, eftersom
   // guest då är ett irrelevant val.
   hideGuest?: boolean;
   // Inloggad users playerName från parent (HomeScreen). Används för
@@ -120,9 +120,10 @@ const REG_REGION_OPTIONS: { id: RegRegion; label: string }[] = [
 
 const CURRENT_YEAR = new Date().getFullYear();
 const MIN_BIRTH_YEAR = 1930;
-// 13+ minimum age requirement (App Store / GDPR compliance). Dynamisk så
-// minimum-året följer current year — 2026: max 2013, 2027: max 2014, osv.
-const MAX_BIRTH_YEAR = CURRENT_YEAR - 13;
+// 15+ minimum age requirement (2026-06-01: höjt från 13+ pga 15+-gränsat
+// film-/innehåll i appen, utöver App Store / GDPR). Dynamisk så minimum-året
+// följer current year — 2026: max 2011, 2027: max 2012, osv.
+const MAX_BIRTH_YEAR = CURRENT_YEAR - 15;
 // Lista, nyaste år först — samma ordning som ProfileScreens year picker.
 const BIRTH_YEARS = Array.from(
   { length: MAX_BIRTH_YEAR - MIN_BIRTH_YEAR + 1 },
@@ -1979,8 +1980,8 @@ export default function HomeScreen() {
         {/* Knappordning (uppifrån):
               1. Register or Login (bara när utloggad — pulse:ar som primär CTA)
               2. Create Game
-              3. Join Game — as registered user
-              4. Join Game — as guest (längst ned)
+              3. Join with Room Code — user
+              4. Join with Room Code — guest (längst ned)
             Pulse följer "primär åtgärd för aktuellt login-state":
               - utloggad → Register or Login pulserar (primär path)
               - inloggad → Create + Join (registered) pulserar */}
@@ -2024,12 +2025,12 @@ export default function HomeScreen() {
                   { fontFamily: fontsLoaded ? 'Nunito_600SemiBold' : undefined },
                 ]}
               >
-                {isLoggedIn ? 'Create Game' : '🔒 Create Game'}
+                {isLoggedIn ? 'Start New Game' : '🔒 Start New Game'}
               </Text>
             </TouchableOpacity>
           </Animated.View>
 
-          {/* Join Game — as registered user (låst när utloggad) */}
+          {/* Join with Room Code — user (låst när utloggad) */}
           <Animated.View
             style={isLoggedIn ? { transform: [{ scale: pulse }] } : undefined}
           >
@@ -2052,8 +2053,8 @@ export default function HomeScreen() {
                 adjustsFontSizeToFit
               >
                 {isLoggedIn
-                  ? 'Join Game — as registered user'
-                  : '🔒 Join Game — as registered user'}
+                  ? 'Join with Room Code — user'
+                  : '🔒 Join with Room Code — user'}
               </Text>
             </TouchableOpacity>
           </Animated.View>
@@ -2065,7 +2066,7 @@ export default function HomeScreen() {
             Guest
           </Text>
 
-          {/* Join Game — as guest (längst ned, utgråad när inloggad — då
+          {/* Join with Room Code — guest (längst ned, utgråad när inloggad — då
               används registered). Döljs visuellt när Join-modalen är öppen
               så att modal-sheetens rundade ovankant inte avslöjar knappen
               bakom. Layout-utrymmet bevaras med opacity/pointerEvents så
@@ -2090,7 +2091,7 @@ export default function HomeScreen() {
                 numberOfLines={1}
                 adjustsFontSizeToFit
               >
-                Join Game — as guest
+                Join with Room Code — guest
               </Text>
             </TouchableOpacity>
           </Animated.View>
@@ -3197,7 +3198,7 @@ const styles = StyleSheet.create({
     marginTop: -Spacing.sm,
     fontStyle: 'italic',
   },
-  // "Guest"-rubrik som separerar Join Game — as guest-knappen från de
+  // "Guest"-rubrik som separerar Join with Room Code — guest-knappen från de
   // tre registered-action-knapparna ovan. Overline-stil för att signalera
   // att det är en sub-sektions-label, inte en del av en knapp.
   guestSectionHeader: {
@@ -3737,7 +3738,7 @@ const profileMenu = StyleSheet.create({
   freeBadgeText: {
     fontSize: 10,
     fontWeight: '700',
-    color: '#000',
+    color: '#FFFFFF',
     letterSpacing: 0.6,
   },
   input: {

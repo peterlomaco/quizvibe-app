@@ -1,0 +1,28 @@
+# Svenska idrottare kända för elder + Gen X. Tillagda 2026-06-01.
+audience: ["elder", "gen-x"]
+region: ["sweden"]
+category: athletes
+contentForm: image
+contentSubject: athlete
+items:
+  - id: kennet-andersson
+    displayName: "Kennet Andersson"
+    probability: 70
+    peakFrom: 1994
+    peakTo: 1998
+    wikimediaSearchHints: ["Kennet Andersson footballer"]
+    answerMethods: ["name-letters"]
+  - id: kurt-hamrin
+    displayName: "Kurt Hamrin"
+    probability: 62
+    peakFrom: 1958
+    peakTo: 1967
+    wikimediaSearchHints: ["Kurt Hamrin"]
+    answerMethods: ["name-letters"]
+  - id: ludmila-engquist
+    displayName: "Ludmila Engquist"
+    probability: 68
+    peakFrom: 1996
+    peakTo: 1999
+    wikimediaSearchHints: ["Ludmila Engquist"]
+    answerMethods: ["name-letters"]

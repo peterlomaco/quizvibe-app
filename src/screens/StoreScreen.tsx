@@ -905,7 +905,7 @@ const styles = StyleSheet.create({
   freeBadgeText: {
     fontSize: 9,
     fontWeight: FontWeight.bold,
-    color: '#000',
+    color: '#FFFFFF',
     letterSpacing: 0.5,
   },
 

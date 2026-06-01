@@ -173,10 +173,17 @@ export function RoundsRuler({ value, min, gameModeMax, onPremiumPress, hasSubscr
                 top: 14,
                 left: bracketLeft,
                 width: bracketWidth,
+                flexDirection: 'row',
                 alignItems: 'center',
+                justifyContent: 'center',
+                gap: 4,
               }}
               pointerEvents="box-none"
             >
+              {/* "Individual device +" i vit text framför PREMIUM-badgen. */}
+              <Text style={roundsRulerStyles.individualDeviceText} numberOfLines={1}>
+                Individual device +
+              </Text>
               {/* hasBracket => interactive => onPremiumPress definierad. Säkert
                   att rendera direkt utan onPremiumPress-presence-fallback.
                   Badge:n följer subscription-status: guld + svart text när
@@ -263,6 +270,13 @@ const roundsRulerStyles = StyleSheet.create({
     fontWeight: '700',
     color: '#000',
     letterSpacing: 0.6,
+  },
+  // "Individual device +" i vit text framför PREMIUM-badgen under klammern.
+  individualDeviceText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    letterSpacing: 0.3,
   },
   // Explainer-text ovanför klammern när feature:n inte gäller här. Diskret
   // textSecondary, samma typografi som RoundsRuler:s tick-text för

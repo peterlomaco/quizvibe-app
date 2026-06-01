@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import type { PeerHealth } from '../lib/realtime/lobbyHealthChannel';
@@ -81,6 +81,34 @@ export function PlayerRow({
   onEditPlayer,
   peerHealth,
 }: PlayerRowProps) {
+  // "Details +/-"-toggle per spelarkort — gömmer Assistance + Age-pillarna
+  // tills man fäller ut. Default hopfällt (Details +).
+  // Default-läge för "Details": utfällt för non-host som väntar på godkännande
+  // (host ska se assist level + age innan approve), hopfällt för host:ens eget
+  // kort och för redan godkända spelare. När en väntande spelare godkänns löpande
+  // fäller den ihop sig automatiskt (effekten nedan reagerar på approved-byte).
+  // Manuell toggle gäller tills nästa approved-byte.
+  const isWaitingNonHost = !isHostPlayer && !hasLeft && !approved;
+  const [detailsExpanded, setDetailsExpanded] = useState(isWaitingNonHost);
+  useEffect(() => {
+    setDetailsExpanded(isWaitingNonHost);
+  }, [isWaitingNonHost]);
+  const hasDetails = !hasLeft && hcpComplete && !!age && !!assistance;
+  // Höger-slotens kontroller (approve-toggle / papperskorg) som måste synas
+  // även i hopfällt läge — styr om meta-raden ska renderas trots att pillarna
+  // är gömda. Saknas de helt (t.ex. host:ens eget kort) skippas meta-raden i
+  // hopfällt läge så "Details +" sitter tätt mot kortets nederkant.
+  // Meta-radens höger-slot innehåller bara papperskorg (waiting). Approve-
+  // toggeln är absolut-positionerad i övre raden. Styr om meta-raden ska
+  // renderas i hopfällt läge trots gömda pillar.
+  const hasRightSlot = !isHostPlayer && !!onDelete;
+  // När ett turn-nummer (turnColumn) renderas är avataren indragen förbi
+  // turnColumn:en. Meta-radens pillar ligger annars kvar vid kort-kanten →
+  // indrag dem lika mycket så de vänsterställs i linje med avataren.
+  // turnColumn-bredd = pil-rad (48) om pilarna visas, annars bara badge (26).
+  const showTurnArrows = (!!onMoveUp || !!onMoveDown) && !hasLeft;
+  const metaIndent =
+    turnNumber !== undefined ? (showTurnArrows ? 48 : 26) + Spacing.md : 0;
   return (
     <View style={styles.cardWrapper}>
       <View
@@ -182,6 +210,20 @@ export function PlayerRow({
               </Text>
             </View>
           ) : null}
+          {/* "Details +/-"-toggle — fäller ut/in Assistance + Age-pillarna nedan. */}
+          {hasDetails && (
+            <Pressable
+              onPress={() => setDetailsExpanded((v) => !v)}
+              hitSlop={6}
+              style={({ pressed }) => [styles.detailsToggle, pressed && styles.hcpMetaPressed]}
+              accessibilityRole="button"
+              accessibilityLabel={detailsExpanded ? 'Hide player details' : 'Show player details'}
+            >
+              <Text style={styles.detailsToggleText}>
+                {detailsExpanded ? 'Details −' : 'Details +'}
+              </Text>
+            </Pressable>
+          )}
         </View>
 
         {/* Approve-toggle i övre högra hörnet av kortet — visas BARA
@@ -203,6 +245,19 @@ export function PlayerRow({
             />
           </View>
         )}
+        {/* Approved non-host: approve-toggeln absolut-positionerad i nedre
+            högra hörnet av övre raden (≈ "Details +"-nivån). Out-of-flow →
+            PlayerName-raden får full bredd och ellipseras inte, och meta-raden
+            behöver inte renderas bara för toggeln (mindre kort-höjd hopfällt). */}
+        {showApproveToggle && !hasLeft && !isHostPlayer && approved && (
+          <View style={styles.approveSlotApproved}>
+            <ApproveToggle
+              value={approved ? 'yes' : 'no'}
+              onChange={(next) => onApproveChange?.(next === 'yes')}
+              disabled={peerHealth === 'unstable'}
+            />
+          </View>
+        )}
       </View>
 
       {/* ── Meta-rad: Assistance · Age + ev. trash ─────────────── */}
@@ -210,15 +265,15 @@ export function PlayerRow({
           och signalera "borta", inte presentera spel-data. HCP-värdet
           används fortsatt internt (scoring + edit-modal) men har ingen
           synlig representation på spelarkortet. */}
-      {!hasLeft && hcpComplete && age && assistance && (
+      {hasDetails && (detailsExpanded || hasRightSlot) && (
         <View style={styles.hcpRow}>
           {/* Vänster slot: två blå-bordered pillar för Assistance Level
               och Age — signalerar att de är valbara för editering (host
               tappar någonstans i pill-raden → öppnar player-edit-modal i
               parent). När onEditPlayer saknas (non-host-vy) renderas
               pillarna utan Pressable så de bara visar info. */}
-          <View style={styles.hcpRowLeft}>
-            {onEditPlayer ? (
+          <View style={[styles.hcpRowLeft, metaIndent > 0 && { marginLeft: metaIndent }]}>
+            {detailsExpanded && (onEditPlayer ? (
               <Pressable
                 onPress={onEditPlayer}
                 hitSlop={6}
@@ -248,22 +303,12 @@ export function PlayerRow({
                   <Text style={styles.hcpPillText}>Age {age}</Text>
                 </View>
               </View>
-            )}
+            ))}
           </View>
 
-          {/* Höger slot: antingen approve-toggle (för approved non-host —
-              flyttad ner från övre raden för att frigöra utrymme åt
-              PlayerName) ELLER papperskorgs-knapp (för waiting-cards).
-              Aldrig båda eftersom delete bara renderas på waiting-rader
-              och approve-toggle i nedre slot bara på approved-rader. */}
+          {/* Höger slot: papperskorgs-knapp (waiting-cards). Approve-toggeln
+              för approved non-host ligger absolut-positionerad i övre raden. */}
           <View style={styles.hcpRowRight}>
-            {showApproveToggle && !isHostPlayer && approved && (
-              <ApproveToggle
-                value={approved ? 'yes' : 'no'}
-                onChange={(next) => onApproveChange?.(next === 'yes')}
-                disabled={peerHealth === 'unstable'}
-              />
-            )}
             {!isHostPlayer && onDelete && (
               <Pressable
                 onPress={onDelete}
@@ -315,6 +360,14 @@ export function PlayerRow({
       {!isHostPlayer && isGuest && (
         <View style={styles.guestBorderTag} pointerEvents="none">
           <Text style={styles.guestBorderTagText}>GUEST</Text>
+        </View>
+      )}
+
+      {/* ── QuizVibe user-tag — registrerade non-host (ej guest, ej host).
+          Samma blå-tema som "+ Add Guest"-knappen (primaryMuted + primaryBorder). ── */}
+      {!isHostPlayer && !isGuest && (
+        <View style={styles.quizUserBorderTag} pointerEvents="none">
+          <Text style={[styles.quizUserBorderTagText, { color: '#FFFFFF' }]}>QuizVibe user</Text>
         </View>
       )}
     </View>
@@ -445,6 +498,34 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
 
+  // QuizVibe user-tagg — registrerade non-host. Blå-tema identiskt med
+  // "+ Add Guest"-knappen (primaryMuted bg + primaryBorder + primary text).
+  quizUserBorderTag: {
+    position: 'absolute',
+    top: -8,
+    left: Spacing.lg,
+    // Opak blå fyllning + opak blå kant (ersätter translucenta primaryMuted/
+    // primaryBorder) så kortets kantlinje inte skiner igenom badgen.
+    backgroundColor: '#16294A',
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: Colors.primary,
+    // paddingRight något större än vänster: RN klipper annars sista glyfen när
+    // letterSpacing reserverar trailing-space efter sista tecknet (sista "R").
+    paddingLeft: 8,
+    paddingRight: 11,
+    paddingVertical: 2,
+    zIndex: 10,
+    elevation: 4,
+  },
+  quizUserBorderTagText: {
+    fontSize: 9,
+    fontWeight: FontWeight.semibold,
+    color: Colors.textPrimary,
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
+  },
+
   row: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -458,7 +539,18 @@ const styles = StyleSheet.create({
   // linjerar med "Approve All"-toggleln ovanför listan (samma right-
   // padding via row.paddingHorizontal).
   toggleSlot: {
-    alignSelf: 'flex-start',
+    // Bottom-aligned så approve-toggeln hamnar på samma nivå som
+    // "Details +"-texten (info-kolumnens nedersta rad) istället för uppe
+    // vid PlayerName. 2026-06-01.
+    alignSelf: 'flex-end',
+  },
+  // Approved non-host: approve-toggeln absolut-positionerad i nedre högra
+  // hörnet av övre raden (≈ Details-nivån) — out-of-flow så PlayerName får
+  // full bredd. right/bottom matchar radens paddingHorizontal/paddingVertical.
+  approveSlotApproved: {
+    position: 'absolute',
+    right: Spacing.lg,
+    bottom: Spacing.md,
   },
 
   // Turn-order column (only shown in Pass-the-Phone mode):
@@ -579,13 +671,24 @@ const styles = StyleSheet.create({
   },
   hcpPillText: {
     fontSize: FontSize.xs,
-    color: Colors.textSecondary,
+    color: Colors.textPrimary,
     fontWeight: FontWeight.medium,
   },
   // Diskret opacity-dim på meta-raden när host tappar för att öppna
   // edit-modalen — signalerar tryckbar utan att skrika.
   hcpMetaPressed: {
     opacity: 0.6,
+  },
+  // "Details +/-"-toggle under PlayerName — diskret muted-grå text i appens
+  // befintliga färgtema (samma som meta-pillarnas text).
+  detailsToggle: {
+    marginTop: 2,
+    alignSelf: 'flex-start',
+  },
+  detailsToggleText: {
+    fontSize: FontSize.sm,
+    color: Colors.textSecondary,
+    fontWeight: FontWeight.medium,
   },
 
   // Papperskorgs-knapp i kort-headern. Lättviktig hit-zon (tap-target ≥30px
