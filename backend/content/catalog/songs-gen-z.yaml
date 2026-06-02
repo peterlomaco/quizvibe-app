@@ -638,8 +638,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "nMrluZPFMZs"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 1998 vinnare."
     genrePackages: ["Eurovision"]
@@ -651,8 +651,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "a0cERXG3m90"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 1999 vinnare, ESC-vinnare 1999. ESC-version på engelska (Take Me To Your Heaven)."
     genrePackages: ["Eurovision"]
@@ -677,8 +677,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "na2qDYmm7LM"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 2004 vinnare. ESC-version It Hurts."
   - id: martin-stenmarck-las-vegas
@@ -689,8 +689,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "YbZjSdSNCiw"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 2005 vinnare. ESC 2005 performance."
   - id: carola-evighet
@@ -713,8 +713,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "r02Lg8JIco0"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 2007 vinnare. ESC 2007 performance."
   - id: charlotte-perrelli-hero
@@ -725,8 +725,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "x_iSoluR53U"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 2008 vinnare. ESC 2008 performance."
     genrePackages: ["Eurovision"]
@@ -738,8 +738,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "xE9Pl3mqRbo"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 2009 vinnare. ESC 2009 performance."
     genrePackages: ["Eurovision"]
@@ -778,8 +778,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "KwLBCKA5-ls"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1997 vinnare — Storbritannien."
     genrePackages: ["Eurovision"]
@@ -791,8 +791,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "4No1oClTp_E"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1998 vinnare — Israel."
     genrePackages: ["Eurovision"]
@@ -804,8 +804,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "JF8fkHK0AWs"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2000 vinnare — Danmark."
     genrePackages: ["Eurovision"]
@@ -817,8 +817,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "92TSUlqzFi8"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2001 vinnare — Estland."
     genrePackages: ["Eurovision"]
@@ -830,8 +830,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "_M-w89U8TEU"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2002 vinnare — Lettland."
     genrePackages: ["Eurovision"]
@@ -843,8 +843,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "j0_QrKnqd5E"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2003 vinnare — Turkiet."
     genrePackages: ["Eurovision"]
@@ -869,8 +869,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "rcOwvZ26KFQ"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2005 vinnare — Grekland."
     genrePackages: ["Eurovision"]
@@ -882,8 +882,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "gAh9NRGNhUU"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2006 vinnare — Finland."
     genrePackages: ["Eurovision"]
@@ -908,8 +908,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "-72s4WzUcKI"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2008 vinnare — Ryssland."
     genrePackages: ["Eurovision"]
@@ -921,8 +921,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "WXwgZL4zx9o"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2009 vinnare — Norge."
   - id: lena-satellite
@@ -933,8 +933,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "8QSgNM9yNjo"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2010 vinnare — Tyskland. Officiell music video."
     genrePackages: ["Eurovision"]
@@ -946,8 +946,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "3Vk4HYUatv8"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2011 vinnare — Azerbajdzjan. Officiell music video."
     genrePackages: ["Eurovision"]

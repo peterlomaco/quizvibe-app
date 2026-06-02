@@ -734,8 +734,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "2GAaOyfMLfA"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 1982 vinnare. ESC 1982 performance."
   - id: herreys-diggiloo-diggiley
@@ -746,8 +746,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "ySOCalwr6Yo"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 1984 vinnare, ESC-vinnare 1984."
     genrePackages: ["Eurovision"]
@@ -759,8 +759,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "OfVcmnxKfqc"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 1985 vinnare. ESC 1985 performance."
   - id: lotta-engberg-fyra-bugg
@@ -771,8 +771,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "U7hLR82zSE0"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 1987 vinnare."
     genrePackages: ["Eurovision"]
@@ -784,8 +784,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "u4-gEpNI6CI"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 1988 vinnare. ESC 1988 performance."
     genrePackages: ["Eurovision"]
@@ -797,8 +797,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "4Ml6pJqc_bw"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 1991 vinnare, ESC-vinnare 1991."
   - id: arvingarna-eloise
@@ -809,8 +809,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "a6MCRuE6tx8"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 1993 vinnare. ESC 1993 performance."
     genrePackages: ["Eurovision"]
@@ -823,8 +823,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "DszqGGSY4oo"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1981 vinnare — Storbritannien."
   - id: nicole-ein-bisschen-frieden
@@ -835,8 +835,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "hp_b-095yPc"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1982 vinnare — Tyskland."
   - id: corinne-hermes-si-la-vie-est-cadeau
@@ -847,8 +847,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "F8y5xc8UodE"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1983 vinnare — Luxemburg."
     genrePackages: ["Eurovision"]
@@ -860,8 +860,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "U94_AErNBZU"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1985 vinnare — Norge."
   - id: sandra-kim-jaime-la-vie
@@ -872,8 +872,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "AT3c41gi3B4"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1986 vinnare — Belgien."
     genrePackages: ["Eurovision"]
@@ -885,8 +885,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "gl2yKH5zbyo"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1987 vinnare — Irland."
     genrePackages: ["Eurovision"]
@@ -898,8 +898,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "VXLWfXmlXPc"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1988 vinnare — Schweiz."
     genrePackages: ["Eurovision"]
@@ -911,8 +911,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "ZWwmCT7P3VE"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1989 vinnare — Jugoslavien."
     region: ["unknown-region"]
@@ -924,8 +924,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "JiRppGSF-tI"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1990 vinnare — Italien."
     genrePackages: ["Eurovision"]
@@ -937,8 +937,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "DKd50924Qxs"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1992 vinnare — Irland."
     genrePackages: ["Eurovision"]
@@ -950,8 +950,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "pysQioMtrAU"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1993 vinnare — Irland."
     genrePackages: ["Eurovision"]
@@ -963,8 +963,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "ohBO8OxQbv8"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1994 vinnare — Irland."
     genrePackages: ["Eurovision"]
@@ -976,8 +976,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "u-gA0aU-d88"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1995 vinnare — Norge."
     genrePackages: ["Eurovision"]
@@ -989,8 +989,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "0KiE1byYXtA"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1996 vinnare — Irland."
     genrePackages: ["Eurovision"]

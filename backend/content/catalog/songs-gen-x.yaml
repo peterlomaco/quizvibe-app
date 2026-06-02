@@ -645,8 +645,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "khv8TygskVU"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 1980 vinnare."
     genrePackages: ["Eurovision"]
@@ -659,8 +659,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "sZ8W9oOgjM4"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1970 vinnare — Irland."
     region: ["unknown-region"]
@@ -672,8 +672,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "JQUC9TycGWU"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1971 vinnare — Monaco."
     genrePackages: ["Eurovision"]
@@ -685,8 +685,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "52W1665yI1Y"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1972 vinnare — Luxemburg."
     genrePackages: ["Eurovision"]
@@ -698,8 +698,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "vfgR0sXxVWA"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1973 vinnare — Luxemburg."
     genrePackages: ["Eurovision"]
@@ -711,8 +711,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "jqqJvMTNeq4"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1975 vinnare — Nederländerna."
     genrePackages: ["Eurovision"]
@@ -724,8 +724,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "5yJUi6ke71I"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1976 vinnare — Storbritannien."
     genrePackages: ["Eurovision"]
@@ -737,8 +737,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "bybdhTg_g20"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1977 vinnare — Frankrike."
     genrePackages: ["Eurovision"]
@@ -750,8 +750,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "uFd5nk2sXow"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1978 vinnare — Israel."
     genrePackages: ["Eurovision"]
@@ -763,8 +763,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "vvmHIhhlzOA"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1979 vinnare — Israel."
     genrePackages: ["Eurovision"]
@@ -776,8 +776,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "R7k1DH71bO8"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1980 vinnare — Irland."
     genrePackages: ["Eurovision"]

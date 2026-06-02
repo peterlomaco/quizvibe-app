@@ -527,8 +527,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "vtjdTPnCcu0"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 2013 vinnare. ESC 2013 performance."
   - id: sanna-nielsen-undo
@@ -563,8 +563,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "1jSrBdN4b5c"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 2017 vinnare. ESC 2017 official music video."
     genrePackages: ["Eurovision"]
@@ -576,8 +576,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "iEEuG5XML-A"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 2019 vinnare. ESC 2019 official video."
     genrePackages: ["Eurovision"]
@@ -589,8 +589,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "7EpSBDPlZn4"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 2020 vinnare. ESC 2020 official video."
     genrePackages: ["Eurovision"]
@@ -602,8 +602,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "5P1ueI9j6gk"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 2021 vinnare. ESC 2021 official video."
     genrePackages: ["Eurovision"]
@@ -615,8 +615,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "wWDThAfryW4"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 2022 vinnare. ESC 2022 official music video."
     genrePackages: ["Eurovision"]
@@ -628,8 +628,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "b3vJfR81xO0"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 2023 vinnare, ESC-vinnare 2023. ESC 2023 official music video."
     genrePackages: ["Eurovision"]
@@ -641,8 +641,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "yekc8t0rJqA"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 2024 vinnare. ESC 2024 official music video."
   - id: kaj-bara-bada-bastu
@@ -653,8 +653,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "WK3HOMhAeQY"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 2025 vinnare. ESC 2025 official music video."
     genrePackages: ["Eurovision"]
@@ -666,8 +666,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "ibbfS8iG450"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 2026 vinnare. ESC 2026 official music video."
     genrePackages: ["Eurovision"]
@@ -680,8 +680,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "k59E7T0H-Us"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2013 vinnare — Danmark. Officiell music video."
     genrePackages: ["Eurovision"]
@@ -693,8 +693,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "ToqNa0rqUtY"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2014 vinnare — Österrike. Officiell music video."
     genrePackages: ["Eurovision"]
@@ -719,8 +719,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "ymFVfzu-2mw"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2017 vinnare — Portugal. Officiell music video."
     genrePackages: ["Eurovision"]
@@ -732,8 +732,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "CziHrYYSyPc"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2018 vinnare — Israel. Officiell music video."
     genrePackages: ["Eurovision"]
@@ -745,8 +745,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "Eztx7Wr8PtE"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2019 vinnare — Nederländerna. Officiell music video."
     genrePackages: ["Eurovision"]
@@ -758,8 +758,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "RVH5dn1cxAQ"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2021 vinnare — Italien."
     genrePackages: ["Eurovision"]
@@ -771,8 +771,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "UiEGVYOruLk"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2022 vinnare — Ukraina. Officiell music video."
     genrePackages: ["Eurovision"]
@@ -784,8 +784,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "kiGDvM14Kwg"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2024 vinnare — Schweiz. Officiell music video."
     genrePackages: ["Eurovision"]
@@ -797,8 +797,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "-ieSTNpxvio"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2025 vinnare — Österrike. Officiell music video."
     genrePackages: ["Eurovision"]
@@ -810,8 +810,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "J3oGYo_mekw"
-        startSec: 30
-        endSec: 45
+        startSec: 5
+        endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2026 vinnare — Bulgarien. Officiell music video."
     genrePackages: ["Eurovision"]

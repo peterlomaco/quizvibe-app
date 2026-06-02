@@ -1061,8 +1061,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "sZ8W9oOgjM4",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 1970 vinnare — Irland."
@@ -1232,8 +1232,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "JQUC9TycGWU",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 1971 vinnare — Monaco."
@@ -1359,8 +1359,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "52W1665yI1Y",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 1972 vinnare — Luxemburg."
@@ -1383,8 +1383,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "vfgR0sXxVWA",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 1973 vinnare — Luxemburg."
@@ -1618,8 +1618,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "jqqJvMTNeq4",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 1975 vinnare — Nederländerna."
@@ -1663,8 +1663,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "5yJUi6ke71I",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 1976 vinnare — Storbritannien."
@@ -1813,8 +1813,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "bybdhTg_g20",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 1977 vinnare — Frankrike."
@@ -1967,8 +1967,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "uFd5nk2sXow",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 1978 vinnare — Israel."
@@ -2054,8 +2054,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "vvmHIhhlzOA",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 1979 vinnare — Israel."
@@ -2098,8 +2098,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "R7k1DH71bO8",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 1980 vinnare — Irland."
@@ -2248,8 +2248,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "khv8TygskVU",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "Melodifestivalen 1980 vinnare."
@@ -2293,8 +2293,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "DszqGGSY4oo",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 1981 vinnare — Storbritannien."
@@ -2398,8 +2398,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "2GAaOyfMLfA",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "Melodifestivalen 1982 vinnare. ESC 1982 performance."
@@ -2501,8 +2501,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "hp_b-095yPc",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 1982 vinnare — Tyskland."
@@ -2608,8 +2608,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "F8y5xc8UodE",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 1983 vinnare — Luxemburg."
@@ -2777,8 +2777,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "ySOCalwr6Yo",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "Melodifestivalen 1984 vinnare, ESC-vinnare 1984."
@@ -3028,8 +3028,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "U94_AErNBZU",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 1985 vinnare — Norge."
@@ -3049,8 +3049,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "OfVcmnxKfqc",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "Melodifestivalen 1985 vinnare. ESC 1985 performance."
@@ -3156,8 +3156,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "AT3c41gi3B4",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 1986 vinnare — Belgien."
@@ -3200,8 +3200,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "gl2yKH5zbyo",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 1987 vinnare — Irland."
@@ -3224,8 +3224,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "U7hLR82zSE0",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "Melodifestivalen 1987 vinnare."
@@ -3352,8 +3352,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "VXLWfXmlXPc",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 1988 vinnare — Schweiz."
@@ -3397,8 +3397,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "u4-gEpNI6CI",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "Melodifestivalen 1988 vinnare. ESC 1988 performance."
@@ -3567,8 +3567,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "ZWwmCT7P3VE",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 1989 vinnare — Jugoslavien."
@@ -3677,8 +3677,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "JiRppGSF-tI",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 1990 vinnare — Italien."
@@ -3719,8 +3719,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "4Ml6pJqc_bw",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "Melodifestivalen 1991 vinnare, ESC-vinnare 1991."
@@ -3971,8 +3971,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "DKd50924Qxs",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 1992 vinnare — Irland."
@@ -4078,8 +4078,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "a6MCRuE6tx8",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "Melodifestivalen 1993 vinnare. ESC 1993 performance."
@@ -4145,8 +4145,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "pysQioMtrAU",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 1993 vinnare — Irland."
@@ -4316,8 +4316,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "ohBO8OxQbv8",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 1994 vinnare — Irland."
@@ -4506,8 +4506,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "u-gA0aU-d88",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 1995 vinnare — Norge."
@@ -4551,8 +4551,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "0KiE1byYXtA",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 1996 vinnare — Irland."
@@ -4722,8 +4722,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "KwLBCKA5-ls",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 1997 vinnare — Storbritannien."
@@ -4806,8 +4806,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "4No1oClTp_E",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 1998 vinnare — Israel."
@@ -4830,8 +4830,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "nMrluZPFMZs",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "Melodifestivalen 1998 vinnare."
@@ -4894,8 +4894,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "a0cERXG3m90",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "Melodifestivalen 1999 vinnare, ESC-vinnare 1999. ESC-version på engelska (Take Me To Your Heaven)."
@@ -5082,8 +5082,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "JF8fkHK0AWs",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 2000 vinnare — Danmark."
@@ -5234,8 +5234,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "92TSUlqzFi8",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 2001 vinnare — Estland."
@@ -5319,8 +5319,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "_M-w89U8TEU",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 2002 vinnare — Lettland."
@@ -5404,8 +5404,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "j0_QrKnqd5E",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 2003 vinnare — Turkiet."
@@ -5487,8 +5487,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "na2qDYmm7LM",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "Melodifestivalen 2004 vinnare. ESC-version It Hurts."
@@ -5704,8 +5704,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "rcOwvZ26KFQ",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 2005 vinnare — Grekland."
@@ -5745,8 +5745,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "YbZjSdSNCiw",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "Melodifestivalen 2005 vinnare. ESC 2005 performance."
@@ -5851,8 +5851,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "gAh9NRGNhUU",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 2006 vinnare — Finland."
@@ -5979,8 +5979,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "r02Lg8JIco0",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "Melodifestivalen 2007 vinnare. ESC 2007 performance."
@@ -6044,8 +6044,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "x_iSoluR53U",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "Melodifestivalen 2008 vinnare. ESC 2008 performance."
@@ -6088,8 +6088,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "-72s4WzUcKI",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 2008 vinnare — Ryssland."
@@ -6210,8 +6210,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "WXwgZL4zx9o",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 2009 vinnare — Norge."
@@ -6314,8 +6314,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "xE9Pl3mqRbo",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "Melodifestivalen 2009 vinnare. ESC 2009 performance."
@@ -6489,8 +6489,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "8QSgNM9yNjo",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 2010 vinnare — Tyskland. Officiell music video."
@@ -6594,8 +6594,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "3Vk4HYUatv8",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 2011 vinnare — Azerbajdzjan. Officiell music video."
@@ -6936,8 +6936,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "k59E7T0H-Us",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 2013 vinnare — Danmark. Officiell music video."
@@ -7019,8 +7019,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "vtjdTPnCcu0",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "Melodifestivalen 2013 vinnare. ESC 2013 performance."
@@ -7064,8 +7064,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "ToqNa0rqUtY",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 2014 vinnare — Österrike. Officiell music video."
@@ -7589,8 +7589,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "1jSrBdN4b5c",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "Melodifestivalen 2017 vinnare. ESC 2017 official music video."
@@ -7613,8 +7613,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "ymFVfzu-2mw",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 2017 vinnare — Portugal. Officiell music video."
@@ -7757,8 +7757,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "CziHrYYSyPc",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 2018 vinnare — Israel. Officiell music video."
@@ -7822,8 +7822,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "Eztx7Wr8PtE",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 2019 vinnare — Nederländerna. Officiell music video."
@@ -7846,8 +7846,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "iEEuG5XML-A",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "Melodifestivalen 2019 vinnare. ESC 2019 official video."
@@ -7993,8 +7993,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "7EpSBDPlZn4",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "Melodifestivalen 2020 vinnare. ESC 2020 official video."
@@ -8037,8 +8037,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "RVH5dn1cxAQ",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 2021 vinnare — Italien."
@@ -8102,8 +8102,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "5P1ueI9j6gk",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "Melodifestivalen 2021 vinnare. ESC 2021 official video."
@@ -8126,8 +8126,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "wWDThAfryW4",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "Melodifestivalen 2022 vinnare. ESC 2022 official music video."
@@ -8170,8 +8170,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "UiEGVYOruLk",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 2022 vinnare — Ukraina. Officiell music video."
@@ -8275,8 +8275,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "b3vJfR81xO0",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "Melodifestivalen 2023 vinnare, ESC-vinnare 2023. ESC 2023 official music video."
@@ -8357,8 +8357,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "yekc8t0rJqA",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "Melodifestivalen 2024 vinnare. ESC 2024 official music video."
@@ -8381,8 +8381,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "kiGDvM14Kwg",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 2024 vinnare — Schweiz. Officiell music video."
@@ -8470,8 +8470,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "-ieSTNpxvio",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 2025 vinnare — Österrike. Officiell music video."
@@ -8494,8 +8494,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "WK3HOMhAeQY",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "Melodifestivalen 2025 vinnare. ESC 2025 official music video."
@@ -8518,8 +8518,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "J3oGYo_mekw",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 2026 vinnare — Bulgarien. Officiell music video."
@@ -8542,8 +8542,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "ibbfS8iG450",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 5,
+        "endSec": 20,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "Melodifestivalen 2026 vinnare. ESC 2026 official music video."
