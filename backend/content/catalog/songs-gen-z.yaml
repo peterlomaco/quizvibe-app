@@ -161,19 +161,6 @@ items:
         startSec: 0
         endSec: 194
         channelTitle: "50 Cent - Topic"
-  - id: beyonce-crazy-in-love
-    displayName: "Crazy in Love — Beyoncé"
-    correctYear: 2003
-    probability: 92
-    wikimediaSearchHints: ["Beyonce Crazy in Love Jay-Z"]
-    answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "KmJI1JqF-dU"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Beyoncé - Topic"
-        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
-    notes: "UTAN MEDIA: top-1 BLOCKED i 1 region, top-2 är live, top-3 är Fifty Shades-remix (ej original). Parkerat tills alternativ källa hittas."
   # 2004
   - id: usher-yeah
     displayName: "Yeah! — Usher"
@@ -263,8 +250,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "xTjwTbnX_EA"
-        startSec: 0
-        endSec: 186
+        startSec: 15
+        endSec: 201
         channelTitle: "Lost Panda"
   # 2008
   - id: coldplay-viva-la-vida
@@ -345,8 +332,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "yMsKK0zNT_4"
-        startSec: 0
-        endSec: 203
+        startSec: 5
+        endSec: 208
         channelTitle: "Kontor.TV"
   # 2012
   - id: psy-gangnam-style
@@ -440,8 +427,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "8UVNT4wvIGY"
-        startSec: 30
-        endSec: 45
+        startSec: 90
+        endSec: 105
         channelTitle: "Gotye"
         notes: "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
   - id: coldplay-the-scientist
@@ -463,11 +450,11 @@ items:
     wikimediaSearchHints: ["Robyn Dancing on My Own 2010"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "xvI7C9I_U2U"
+      - videoId: "J294A-R1Cjk"
         startSec: 30
         endSec: 45
-        channelTitle: "Robyn - Topic"
-        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+        channelTitle: "Embassy One"
+        notes: "Officiell MV via Embassy One (Robyns label). Ersätter Topic-versionen (statisk albumkonst)."
   - id: swedish-house-mafia-dont-you-worry-child
     displayName: "Don't You Worry Child — Swedish House Mafia"
     correctYear: 2012
@@ -504,6 +491,7 @@ items:
         endSec: 45
         channelTitle: "Loreen - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+    genrePackages: ["Eurovision"]
   - id: beyonce-single-ladies
     displayName: "Single Ladies (Put a Ring on It) — Beyoncé"
     correctYear: 2008
@@ -551,18 +539,6 @@ items:
         startSec: 30
         endSec: 45
         channelTitle: "Veronica Maggio - Topic"
-        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
-  - id: hakan-hellstrom-kann-ingen-sorg
-    displayName: "Känn ingen sorg för mig Göteborg — Håkan Hellström"
-    correctYear: 2000
-    probability: 80
-    wikimediaSearchHints: ["Håkan Hellström Känn ingen sorg för mig Göteborg 2000"]
-    answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "jm5GHefyJp8"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Håkan Hellström - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: the-hives-hate-to-say
     displayName: "Hate to Say I Told You So — The Hives"
@@ -666,6 +642,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 1998 vinnare."
+    genrePackages: ["Eurovision"]
   - id: charlotte-nilsson-tusen-och-en-natt
     displayName: "Tusen och en natt — Charlotte Nilsson"
     correctYear: 1999
@@ -678,6 +655,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 1999 vinnare, ESC-vinnare 1999. ESC-version på engelska (Take Me To Your Heaven)."
+    genrePackages: ["Eurovision"]
   - id: roger-pontare-vindarna-viskar
     displayName: "När vindarna viskar mitt namn — Roger Pontare"
     correctYear: 2000
@@ -690,6 +668,7 @@ items:
         endSec: 45
         channelTitle: "Melodifestivalen"
         notes: "Melodifestivalen 2000 vinnare."
+    genrePackages: ["Eurovision"]
   - id: lena-philipsson-det-gor-ont
     displayName: "Det gör ont — Lena Philipsson"
     correctYear: 2004
@@ -750,6 +729,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 2008 vinnare. ESC 2008 performance."
+    genrePackages: ["Eurovision"]
   - id: malena-ernman-la-voix
     displayName: "La Voix — Malena Ernman"
     correctYear: 2009
@@ -762,6 +742,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 2009 vinnare. ESC 2009 performance."
+    genrePackages: ["Eurovision"]
   - id: anna-bergendahl-this-is-my-life
     displayName: "This Is My Life — Anna Bergendahl"
     correctYear: 2010
@@ -774,6 +755,7 @@ items:
         endSec: 45
         channelTitle: "Anakina_Skywalker"
         notes: "Melodifestivalen 2010 vinnare."
+    genrePackages: ["Eurovision"]
   - id: eric-saade-popular
     displayName: "Popular — Eric Saade"
     correctYear: 2011
@@ -782,10 +764,11 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "g_67DS2j9hs"
-        startSec: 30
-        endSec: 45
+        startSec: 35
+        endSec: 50
         channelTitle: "Eric Saade"
         notes: "Melodifestivalen 2011 vinnare. Officiell music video (Director's Cut)."
+    genrePackages: ["Eurovision"]
   # ===== Eurovision Song Contest vinnare =====
   - id: katrina-waves-love-shine-a-light
     displayName: "Love Shine a Light — Katrina and the Waves"
@@ -799,6 +782,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1997 vinnare — Storbritannien."
+    genrePackages: ["Eurovision"]
   - id: dana-international-diva
     displayName: "Diva — Dana International"
     correctYear: 1998
@@ -811,6 +795,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1998 vinnare — Israel."
+    genrePackages: ["Eurovision"]
   - id: olsen-brothers-fly-on-wings-of-love
     displayName: "Fly on the Wings of Love — Olsen Brothers"
     correctYear: 2000
@@ -823,6 +808,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2000 vinnare — Danmark."
+    genrePackages: ["Eurovision"]
   - id: tanel-padar-everybody
     displayName: "Everybody — Tanel Padar, Dave Benton & 2XL"
     correctYear: 2001
@@ -835,6 +821,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2001 vinnare — Estland."
+    genrePackages: ["Eurovision"]
   - id: marie-n-i-wanna
     displayName: "I Wanna — Marie N"
     correctYear: 2002
@@ -847,6 +834,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2002 vinnare — Lettland."
+    genrePackages: ["Eurovision"]
   - id: sertab-erener-everyway-that-i-can
     displayName: "Everyway That I Can — Sertab Erener"
     correctYear: 2003
@@ -859,6 +847,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2003 vinnare — Turkiet."
+    genrePackages: ["Eurovision"]
   - id: ruslana-wild-dances
     displayName: "Wild Dances — Ruslana"
     correctYear: 2004
@@ -867,10 +856,11 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "MTLmoV0E_6c"
-        startSec: 30
-        endSec: 45
+        startSec: 50
+        endSec: 65
         channelTitle: "Ruslana"
         notes: "ESC 2004 vinnare — Ukraina. Officiell remastered MV."
+    genrePackages: ["Eurovision"]
   - id: helena-paparizou-my-number-one
     displayName: "My Number One — Helena Paparizou"
     correctYear: 2005
@@ -883,6 +873,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2005 vinnare — Grekland."
+    genrePackages: ["Eurovision"]
   - id: lordi-hard-rock-hallelujah
     displayName: "Hard Rock Hallelujah — Lordi"
     correctYear: 2006
@@ -895,6 +886,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2006 vinnare — Finland."
+    genrePackages: ["Eurovision"]
   - id: marija-serifovic-molitva
     displayName: "Molitva — Marija Šerifović"
     correctYear: 2007
@@ -907,6 +899,7 @@ items:
         endSec: 45
         channelTitle: "Marija Šerifović"
         notes: "ESC 2007 vinnare — Serbien. Officiell music video."
+    genrePackages: ["Eurovision"]
   - id: dima-bilan-believe
     displayName: "Believe — Dima Bilan"
     correctYear: 2008
@@ -919,6 +912,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2008 vinnare — Ryssland."
+    genrePackages: ["Eurovision"]
   - id: alexander-rybak-fairytale
     displayName: "Fairytale — Alexander Rybak"
     correctYear: 2009
@@ -943,6 +937,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2010 vinnare — Tyskland. Officiell music video."
+    genrePackages: ["Eurovision"]
   - id: ell-nikki-running-scared
     displayName: "Running Scared — Ell & Nikki"
     correctYear: 2011
@@ -955,3 +950,4 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2011 vinnare — Azerbajdzjan. Officiell music video."
+    genrePackages: ["Eurovision"]

@@ -399,11 +399,11 @@ items:
     wikimediaSearchHints: ["Tove Lo Habits Stay High 2013"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "SQ-iwsVHbH8"
+      - videoId: "fG-EIvEiSHs"
         startSec: 30
         endSec: 45
-        channelTitle: "Tove Lo - Topic"
-        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+        channelTitle: "Tove Lo"
+        notes: "Officiell OG Independent Video från Tove Lo:s egen kanal. Ersätter Topic-versionen."
   - id: zara-larsson-lush-life
     displayName: "Lush Life — Zara Larsson"
     correctYear: 2015
@@ -422,7 +422,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Måns Zelmerlöw Heroes Eurovision 2015"]
     answerMethods: ["timeline"]
-    genrePackages: ["eurovision"]
+    genrePackages: ["Eurovision"]
     youtubeClips:
       - videoId: "-nbq6Ur103Q"
         startSec: 30
@@ -567,6 +567,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 2017 vinnare. ESC 2017 official music video."
+    genrePackages: ["Eurovision"]
   - id: john-lundvik-too-late-for-love
     displayName: "Too Late for Love — John Lundvik"
     correctYear: 2019
@@ -579,6 +580,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 2019 vinnare. ESC 2019 official video."
+    genrePackages: ["Eurovision"]
   - id: the-mamas-move
     displayName: "Move — The Mamas"
     correctYear: 2020
@@ -591,6 +593,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 2020 vinnare. ESC 2020 official video."
+    genrePackages: ["Eurovision"]
   - id: tusse-voices
     displayName: "Voices — Tusse"
     correctYear: 2021
@@ -603,6 +606,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 2021 vinnare. ESC 2021 official video."
+    genrePackages: ["Eurovision"]
   - id: cornelia-jakobs-hold-me-closer
     displayName: "Hold Me Closer — Cornelia Jakobs"
     correctYear: 2022
@@ -615,6 +619,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 2022 vinnare. ESC 2022 official music video."
+    genrePackages: ["Eurovision"]
   - id: loreen-tattoo
     displayName: "Tattoo — Loreen"
     correctYear: 2023
@@ -627,6 +632,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 2023 vinnare, ESC-vinnare 2023. ESC 2023 official music video."
+    genrePackages: ["Eurovision"]
   - id: marcus-martinus-unforgettable
     displayName: "Unforgettable — Marcus & Martinus"
     correctYear: 2024
@@ -651,6 +657,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 2025 vinnare. ESC 2025 official music video."
+    genrePackages: ["Eurovision"]
   - id: felicia-my-system
     displayName: "My System — Felicia"
     correctYear: 2026
@@ -663,6 +670,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 2026 vinnare. ESC 2026 official music video."
+    genrePackages: ["Eurovision"]
   # ===== Eurovision Song Contest vinnare =====
   - id: emmelie-de-forest-only-teardrops
     displayName: "Only Teardrops — Emmelie de Forest"
@@ -676,6 +684,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2013 vinnare — Danmark. Officiell music video."
+    genrePackages: ["Eurovision"]
   - id: conchita-wurst-rise-like-a-phoenix
     displayName: "Rise Like a Phoenix — Conchita Wurst"
     correctYear: 2014
@@ -688,6 +697,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2014 vinnare — Österrike. Officiell music video."
+    genrePackages: ["Eurovision"]
   - id: jamala-1944
     displayName: "1944 — Jamala"
     correctYear: 2016
@@ -700,6 +710,7 @@ items:
         endSec: 45
         channelTitle: "Jamala"
         notes: "ESC 2016 vinnare — Ukraina. Officiell music video."
+    genrePackages: ["Eurovision"]
   - id: salvador-sobral-amar-pelos-dois
     displayName: "Amar pelos dois — Salvador Sobral"
     correctYear: 2017
@@ -712,6 +723,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2017 vinnare — Portugal. Officiell music video."
+    genrePackages: ["Eurovision"]
   - id: netta-toy
     displayName: "Toy — Netta"
     correctYear: 2018
@@ -724,6 +736,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2018 vinnare — Israel. Officiell music video."
+    genrePackages: ["Eurovision"]
   - id: duncan-laurence-arcade
     displayName: "Arcade — Duncan Laurence"
     correctYear: 2019
@@ -736,6 +749,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2019 vinnare — Nederländerna. Officiell music video."
+    genrePackages: ["Eurovision"]
   - id: maneskin-zitti-e-buoni
     displayName: "Zitti e buoni — Måneskin"
     correctYear: 2021
@@ -748,6 +762,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2021 vinnare — Italien."
+    genrePackages: ["Eurovision"]
   - id: kalush-orchestra-stefania
     displayName: "Stefania — Kalush Orchestra"
     correctYear: 2022
@@ -760,6 +775,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2022 vinnare — Ukraina. Officiell music video."
+    genrePackages: ["Eurovision"]
   - id: nemo-the-code
     displayName: "The Code — Nemo"
     correctYear: 2024
@@ -772,6 +788,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2024 vinnare — Schweiz. Officiell music video."
+    genrePackages: ["Eurovision"]
   - id: jj-wasted-love
     displayName: "Wasted Love — JJ"
     correctYear: 2025
@@ -784,6 +801,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2025 vinnare — Österrike. Officiell music video."
+    genrePackages: ["Eurovision"]
   - id: dara-bangaranga
     displayName: "Bangaranga — DARA"
     correctYear: 2026
@@ -796,3 +814,4 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2026 vinnare — Bulgarien. Officiell music video."
+    genrePackages: ["Eurovision"]

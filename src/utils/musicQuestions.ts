@@ -1226,6 +1226,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-x",
       "elder"
     ],
+    "genrePackages": [
+      "Eurovision"
+    ],
     "youtubeClips": [
       {
         "videoId": "JQUC9TycGWU",
@@ -1350,6 +1353,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-x",
       "elder"
     ],
+    "genrePackages": [
+      "Eurovision"
+    ],
     "youtubeClips": [
       {
         "videoId": "52W1665yI1Y",
@@ -1370,6 +1376,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "audiences": [
       "gen-x",
       "elder"
+    ],
+    "genrePackages": [
+      "Eurovision"
     ],
     "youtubeClips": [
       {
@@ -1475,6 +1484,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "audiences": [
       "gen-x",
       "elder"
+    ],
+    "genrePackages": [
+      "Eurovision"
     ],
     "youtubeClips": [
       {
@@ -1591,26 +1603,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "queen-bohemian-rhapsody",
-    "displayName": "Bohemian Rhapsody — Queen",
-    "correctYear": 1975,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "all"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "XHrdsx8izBs",
-        "startSec": 0,
-        "endSec": 15,
-        "channelTitle": "Queen - Topic",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
-      }
-    ]
-  },
-  {
     "id": "teach-in-ding-a-dong",
     "displayName": "Ding-a-dong — Teach-In",
     "correctYear": 1975,
@@ -1619,6 +1611,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "audiences": [
       "gen-x",
       "elder"
+    ],
+    "genrePackages": [
+      "Eurovision"
     ],
     "youtubeClips": [
       {
@@ -1661,6 +1656,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "audiences": [
       "gen-x",
       "elder"
+    ],
+    "genrePackages": [
+      "Eurovision"
     ],
     "youtubeClips": [
       {
@@ -1809,6 +1807,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-x",
       "elder"
     ],
+    "genrePackages": [
+      "Eurovision"
+    ],
     "youtubeClips": [
       {
         "videoId": "bybdhTg_g20",
@@ -1830,6 +1831,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-x",
       "elder"
     ],
+    "genrePackages": [
+      "sport"
+    ],
     "youtubeClips": [
       {
         "videoId": "lxHuY6DgSJQ",
@@ -1850,6 +1854,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "audiences": [
       "gen-x",
       "elder"
+    ],
+    "genrePackages": [
+      "sport"
     ],
     "youtubeClips": [
       {
@@ -1954,6 +1961,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-x",
       "elder"
     ],
+    "genrePackages": [
+      "Eurovision"
+    ],
     "youtubeClips": [
       {
         "videoId": "uFd5nk2sXow",
@@ -2038,6 +2048,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-x",
       "elder"
     ],
+    "genrePackages": [
+      "Eurovision"
+    ],
     "youtubeClips": [
       {
         "videoId": "vvmHIhhlzOA",
@@ -2046,27 +2059,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 1979 vinnare — Israel."
-      }
-    ]
-  },
-  {
-    "id": "pink-floyd-another-brick-in-the-wall",
-    "displayName": "Another Brick in the Wall, Part 2 — Pink Floyd",
-    "correctYear": 1979,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "gen-x",
-      "elder"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "A6iqfDrQ0_o",
-        "startSec": 45,
-        "endSec": 60,
-        "channelTitle": "PINK FLOYD - Topic",
-        "license": "standard",
-        "notes": "Officiell album-audio via YouTube Topic. 'We don't need no education'-vers."
       }
     ]
   },
@@ -2099,6 +2091,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "audiences": [
       "gen-x",
       "elder"
+    ],
+    "genrePackages": [
+      "Eurovision"
     ],
     "youtubeClips": [
       {
@@ -2176,6 +2171,28 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "sallskapsresan",
+    "displayName": "Sällskapsresan",
+    "correctYear": 1980,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "3WD7f7pvoSY",
+        "startSec": 10,
+        "endSec": 45,
+        "channelTitle": "HD Retro Trailers",
+        "license": "standard",
+        "notes": "HD originaltrailer. Uno Svenningsson + Lasse Åberg ikonisk öppning."
+      }
+    ]
+  },
+  {
     "id": "stenmark-os-guld-slalom-1980",
     "displayName": "Stenmark OS-guld slalom Lake Placid",
     "correctYear": 1980,
@@ -2225,6 +2242,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-x",
       "elder"
     ],
+    "genrePackages": [
+      "Eurovision"
+    ],
     "youtubeClips": [
       {
         "videoId": "khv8TygskVU",
@@ -2237,26 +2257,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "wassberg-os-guld-1980",
-    "displayName": "Thomas Wassberg OS-guld 15 km Lake Placid",
-    "correctYear": 1980,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "audiences": [
-      "all"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "ZQEBtR2pDXY",
-        "startSec": 5,
-        "endSec": 20,
-        "channelTitle": "Nostalgi",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
-      }
-    ]
-  },
-  {
     "id": "bjorn-skifs-fangad-i-en-drom",
     "displayName": "Fångad i en dröm — Björn Skifs",
     "correctYear": 1981,
@@ -2265,6 +2265,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "audiences": [
       "millennials",
       "gen-x"
+    ],
+    "genrePackages": [
+      "Eurovision"
     ],
     "youtubeClips": [
       {
@@ -2295,6 +2298,28 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 1981 vinnare — Storbritannien."
+      }
+    ]
+  },
+  {
+    "id": "gota-kanal",
+    "displayName": "Göta kanal — eller vem drog ur proppen?",
+    "correctYear": 1981,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "qx7zpGYSm0s",
+        "startSec": 5,
+        "endSec": 35,
+        "channelTitle": "NjutafilmsStudioS",
+        "license": "standard",
+        "notes": "Officiell NjutaFilms-trailer. Karaktärerna + kanalscenerna väl representerade."
       }
     ]
   },
@@ -2357,27 +2382,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Enhanced Music Videos",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (18)."
-      }
-    ]
-  },
-  {
-    "id": "soft-cell-tainted-love",
-    "displayName": "Tainted Love — Soft Cell",
-    "correctYear": 1981,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "millennials",
-      "gen-x"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "EWZxFSo-XZY",
-        "startSec": 0,
-        "endSec": 15,
-        "channelTitle": "Soft Cell - Topic",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
       }
     ]
   },
@@ -2598,6 +2602,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "millennials",
       "gen-x"
     ],
+    "genrePackages": [
+      "Eurovision"
+    ],
     "youtubeClips": [
       {
         "videoId": "F8y5xc8UodE",
@@ -2764,6 +2771,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "millennials",
       "gen-x"
     ],
+    "genrePackages": [
+      "Eurovision"
+    ],
     "youtubeClips": [
       {
         "videoId": "ySOCalwr6Yo",
@@ -2772,6 +2782,28 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "Melodifestivalen 1984 vinnare, ESC-vinnare 1984."
+      }
+    ]
+  },
+  {
+    "id": "jonssonligan-far-guldfeber",
+    "displayName": "Jönssonligan får guldfeber",
+    "correctYear": 1984,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "FD3jK0gWbPc",
+        "startSec": 5,
+        "endSec": 35,
+        "channelTitle": "ZorbaMovies",
+        "license": "standard",
+        "notes": "Trailer. Jönssonligan-gänget tydliga."
       }
     ]
   },
@@ -3118,6 +3150,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "millennials",
       "gen-x"
     ],
+    "genrePackages": [
+      "Eurovision"
+    ],
     "youtubeClips": [
       {
         "videoId": "AT3c41gi3B4",
@@ -3150,27 +3185,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "guns-n-roses-sweet-child-o-mine",
-    "displayName": "Sweet Child O' Mine — Guns N' Roses",
-    "correctYear": 1987,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "millennials",
-      "gen-x"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "oMfMUfgjiLg",
-        "startSec": 0,
-        "endSec": 15,
-        "channelTitle": "Guns N' Roses - Topic",
-        "license": "standard",
-        "notes": "Officiell album-audio via YouTube Topic. Iconic guitar-intro."
-      }
-    ]
-  },
-  {
     "id": "johnny-logan-hold-me-now",
     "displayName": "Hold Me Now — Johnny Logan",
     "correctYear": 1987,
@@ -3179,6 +3193,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "audiences": [
       "millennials",
       "gen-x"
+    ],
+    "genrePackages": [
+      "Eurovision"
     ],
     "youtubeClips": [
       {
@@ -3201,6 +3218,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "millennials",
       "gen-x"
     ],
+    "genrePackages": [
+      "Eurovision"
+    ],
     "youtubeClips": [
       {
         "videoId": "U7hLR82zSE0",
@@ -3209,26 +3229,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "Melodifestivalen 1987 vinnare."
-      }
-    ]
-  },
-  {
-    "id": "patrik-sjoberg-vr-hojdhopp-1987",
-    "displayName": "Patrik Sjöberg sätter VR i höjdhopp",
-    "correctYear": 1987,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "audiences": [
-      "all"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "ASymMBD6ReM",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Carl King Lewis",
-        "license": "standard",
-        "notes": "Refined query 2026-05-27 — Sjöbergs VR 2.42m på DN Galan Stockholm 1987-06-30."
       }
     ]
   },
@@ -3346,6 +3346,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "millennials",
       "gen-x"
     ],
+    "genrePackages": [
+      "Eurovision"
+    ],
     "youtubeClips": [
       {
         "videoId": "VXLWfXmlXPc",
@@ -3387,6 +3390,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "audiences": [
       "millennials",
       "gen-x"
+    ],
+    "genrePackages": [
+      "Eurovision"
     ],
     "youtubeClips": [
       {
@@ -3518,12 +3524,12 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "youtubeClips": [
       {
-        "videoId": "IaHQYTm14Kc",
+        "videoId": "MMNTbnLrBK8",
         "startSec": 45,
         "endSec": 60,
-        "channelTitle": "Madonna - Topic",
+        "channelTitle": "Enhanced Music Videos",
         "license": "standard",
-        "notes": "Officiell album-audio via YouTube Topic. Refrängområde."
+        "notes": "Remastered Full HD musikvideo. Officiell MV-innehåll, bättre bildkvalitet än Topic-versionen (statisk albumkonst)."
       }
     ]
   },
@@ -3581,32 +3587,12 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "youtubeClips": [
       {
-        "videoId": "2-IId2Fx43Y",
+        "videoId": "--8mvZzZIcU",
         "startSec": 30,
         "endSec": 45,
-        "channelTitle": "Roxette - Topic",
+        "channelTitle": "Enhanced Music Videos",
         "license": "standard",
-        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
-      }
-    ]
-  },
-  {
-    "id": "stenmark-86-segrar-1989",
-    "displayName": "Stenmarks 86:e (sista) världscupseger",
-    "correctYear": 1989,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "audiences": [
-      "all"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "LmSPZ-MHD8s",
-        "startSec": 60,
-        "endSec": 75,
-        "channelTitle": "Jon Ahlsén",
-        "license": "standard",
-        "notes": "Refined query 2026-05-27 — 'Stenmark: Decade of Dominance' compilation (20 min). Third-party — replace med dedikerat 86:e-seger-klipp om sådant hittas."
+        "notes": "Remastered Full HD musikvideo. Officiell MV-innehåll, ersätter Topic-versionen (statisk albumkonst)."
       }
     ]
   },
@@ -3684,6 +3670,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "audiences": [
       "millennials",
       "gen-x"
+    ],
+    "genrePackages": [
+      "Eurovision"
     ],
     "youtubeClips": [
       {
@@ -3772,8 +3761,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "m-y_IxPcx8U",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 58,
+        "endSec": 73,
         "channelTitle": "Michael Jackson - Topic",
         "license": "standard",
         "notes": "Officiell album-audio via YouTube Topic. Iconic guitar-riff."
@@ -3976,6 +3965,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "millennials",
       "gen-x"
     ],
+    "genrePackages": [
+      "Eurovision"
+    ],
     "youtubeClips": [
       {
         "videoId": "DKd50924Qxs",
@@ -4080,6 +4072,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "millennials",
       "gen-x"
     ],
+    "genrePackages": [
+      "Eurovision"
+    ],
     "youtubeClips": [
       {
         "videoId": "a6MCRuE6tx8",
@@ -4144,6 +4139,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "millennials",
       "gen-x"
     ],
+    "genrePackages": [
+      "Eurovision"
+    ],
     "youtubeClips": [
       {
         "videoId": "pysQioMtrAU",
@@ -4152,6 +4150,28 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 1993 vinnare — Irland."
+      }
+    ]
+  },
+  {
+    "id": "sunes-sommar",
+    "displayName": "Sunes sommar",
+    "correctYear": 1993,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "88B9JxorPcI",
+        "startSec": 5,
+        "endSec": 35,
+        "channelTitle": "ZorbaMovies",
+        "license": "standard",
+        "notes": "Trailer. Familjefilm, stark igenkänning hos millennials som barn."
       }
     ]
   },
@@ -4290,6 +4310,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "millennials",
       "gen-x"
     ],
+    "genrePackages": [
+      "Eurovision"
+    ],
     "youtubeClips": [
       {
         "videoId": "ohBO8OxQbv8",
@@ -4353,12 +4376,12 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "youtubeClips": [
       {
-        "videoId": "fYnJZh5ZHIA",
+        "videoId": "mOYZaiDZ7BM",
         "startSec": 30,
         "endSec": 45,
-        "channelTitle": "Rednex - Topic",
+        "channelTitle": "Rednex Videos",
         "license": "standard",
-        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+        "notes": "Officiell musikvideo, Rednex Videos-kanalen. HD. Ersätter Topic-versionen."
       }
     ]
   },
@@ -4477,6 +4500,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "millennials",
       "gen-x"
     ],
+    "genrePackages": [
+      "Eurovision"
+    ],
     "youtubeClips": [
       {
         "videoId": "u-gA0aU-d88",
@@ -4518,6 +4544,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "audiences": [
       "millennials",
       "gen-x"
+    ],
+    "genrePackages": [
+      "Eurovision"
     ],
     "youtubeClips": [
       {
@@ -4687,6 +4716,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-z",
       "millennials"
     ],
+    "genrePackages": [
+      "Eurovision"
+    ],
     "youtubeClips": [
       {
         "videoId": "KwLBCKA5-ls",
@@ -4768,6 +4800,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-z",
       "millennials"
     ],
+    "genrePackages": [
+      "Eurovision"
+    ],
     "youtubeClips": [
       {
         "videoId": "4No1oClTp_E",
@@ -4788,6 +4823,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "audiences": [
       "gen-z",
       "millennials"
+    ],
+    "genrePackages": [
+      "Eurovision"
     ],
     "youtubeClips": [
       {
@@ -4841,29 +4879,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "ricky-martin-copa-de-la-vida",
-    "displayName": "La Copa de la Vida — Ricky Martin",
-    "correctYear": 1998,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "all"
-    ],
-    "genrePackages": [
-      "sport"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "Qm9KCQd3mg4",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Ricky Martin - Topic",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
-      }
-    ]
-  },
-  {
     "id": "charlotte-nilsson-tusen-och-en-natt",
     "displayName": "Tusen och en natt — Charlotte Nilsson",
     "correctYear": 1999,
@@ -4872,6 +4887,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "audiences": [
       "gen-z",
       "millennials"
+    ],
+    "genrePackages": [
+      "Eurovision"
     ],
     "youtubeClips": [
       {
@@ -5026,27 +5044,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "hakan-hellstrom-kann-ingen-sorg",
-    "displayName": "Känn ingen sorg för mig Göteborg — Håkan Hellström",
-    "correctYear": 2000,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "gen-z",
-      "millennials"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "jm5GHefyJp8",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Håkan Hellström - Topic",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
-      }
-    ]
-  },
-  {
     "id": "markoolio-mera-mal",
     "displayName": "Mera mål — Markoolio",
     "correctYear": 2000,
@@ -5079,6 +5076,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-z",
       "millennials"
     ],
+    "genrePackages": [
+      "Eurovision"
+    ],
     "youtubeClips": [
       {
         "videoId": "JF8fkHK0AWs",
@@ -5099,6 +5099,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "audiences": [
       "gen-z",
       "millennials"
+    ],
+    "genrePackages": [
+      "Eurovision"
     ],
     "youtubeClips": [
       {
@@ -5225,6 +5228,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-z",
       "millennials"
     ],
+    "genrePackages": [
+      "Eurovision"
+    ],
     "youtubeClips": [
       {
         "videoId": "92TSUlqzFi8",
@@ -5307,6 +5313,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-z",
       "millennials"
     ],
+    "genrePackages": [
+      "Eurovision"
+    ],
     "youtubeClips": [
       {
         "videoId": "_M-w89U8TEU",
@@ -5359,27 +5368,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "beyonce-crazy-in-love",
-    "displayName": "Crazy in Love — Beyoncé",
-    "correctYear": 2003,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "gen-z",
-      "millennials"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "KmJI1JqF-dU",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Beyoncé - Topic",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
-      }
-    ]
-  },
-  {
     "id": "outkast-hey-ya",
     "displayName": "Hey Ya! — OutKast",
     "correctYear": 2003,
@@ -5410,6 +5398,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-z",
       "millennials"
     ],
+    "genrePackages": [
+      "Eurovision"
+    ],
     "youtubeClips": [
       {
         "videoId": "j0_QrKnqd5E",
@@ -5439,26 +5430,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "The White Stripes",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
-      }
-    ]
-  },
-  {
-    "id": "carolina-kluft-os-guld-2004",
-    "displayName": "Carolina Klüft OS-guld sjukamp Aten",
-    "correctYear": 2004,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "audiences": [
-      "all"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "DvbQ1mXFPCo",
-        "startSec": 16,
-        "endSec": 31,
-        "channelTitle": "Expressen",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
       }
     ]
   },
@@ -5521,29 +5492,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "Melodifestivalen 2004 vinnare. ESC-version It Hurts."
-      }
-    ]
-  },
-  {
-    "id": "malin-baryard-do-you-wanna-ride",
-    "displayName": "Do You Wanna Ride? — Spånka NKPG & Malin Baryard",
-    "correctYear": 2004,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "all"
-    ],
-    "genrePackages": [
-      "sport"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "BffT-VRIOIk",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Spånka NKPG - Topic",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
       }
     ]
   },
@@ -5623,14 +5571,39 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-z",
       "millennials"
     ],
+    "genrePackages": [
+      "Eurovision"
+    ],
     "youtubeClips": [
       {
         "videoId": "MTLmoV0E_6c",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 50,
+        "endSec": 65,
         "channelTitle": "Ruslana",
         "license": "standard",
         "notes": "ESC 2004 vinnare — Ukraina. Officiell remastered MV."
+      }
+    ]
+  },
+  {
+    "id": "sa-som-i-himmelen",
+    "displayName": "Så som i himmelen",
+    "correctYear": 2004,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "audiences": [
+      "gen-x",
+      "millennials",
+      "gen-z"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "FT5A0rYUSVE",
+        "startSec": 5,
+        "endSec": 40,
+        "channelTitle": "NuovoCinemaGiornico",
+        "license": "standard",
+        "notes": "Originaltrailer. Oscar-nominerad svensk film. Michael Nyqvist."
       }
     ]
   },
@@ -5724,6 +5697,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "audiences": [
       "gen-z",
       "millennials"
+    ],
+    "genrePackages": [
+      "Eurovision"
     ],
     "youtubeClips": [
       {
@@ -5869,6 +5845,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-z",
       "millennials"
     ],
+    "genrePackages": [
+      "Eurovision"
+    ],
     "youtubeClips": [
       {
         "videoId": "gAh9NRGNhUU",
@@ -5953,6 +5932,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-z",
       "millennials"
     ],
+    "genrePackages": [
+      "Eurovision"
+    ],
     "youtubeClips": [
       {
         "videoId": "Kbi08wfT7mA",
@@ -6018,8 +6000,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "xTjwTbnX_EA",
-        "startSec": 0,
-        "endSec": 186,
+        "startSec": 15,
+        "endSec": 201,
         "channelTitle": "Lost Panda",
         "license": "standard"
       }
@@ -6055,6 +6037,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "audiences": [
       "gen-z",
       "millennials"
+    ],
+    "genrePackages": [
+      "Eurovision"
     ],
     "youtubeClips": [
       {
@@ -6096,6 +6081,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "audiences": [
       "gen-z",
       "millennials"
+    ],
+    "genrePackages": [
+      "Eurovision"
     ],
     "youtubeClips": [
       {
@@ -6320,6 +6308,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-z",
       "millennials"
     ],
+    "genrePackages": [
+      "Eurovision"
+    ],
     "youtubeClips": [
       {
         "videoId": "xE9Pl3mqRbo",
@@ -6382,6 +6373,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "audiences": [
       "gen-z",
       "millennials"
+    ],
+    "genrePackages": [
+      "Eurovision"
     ],
     "youtubeClips": [
       {
@@ -6489,6 +6483,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-z",
       "millennials"
     ],
+    "genrePackages": [
+      "Eurovision"
+    ],
     "youtubeClips": [
       {
         "videoId": "8QSgNM9yNjo",
@@ -6497,26 +6494,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 2010 vinnare — Tyskland. Officiell music video."
-      }
-    ]
-  },
-  {
-    "id": "marcus-hellner-os-guld-2010",
-    "displayName": "Marcus Hellner OS-guld jaktstart Vancouver",
-    "correctYear": 2010,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "audiences": [
-      "all"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "cu9buHVFPfo",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Johann Mühlegg",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
       }
     ]
   },
@@ -6532,12 +6509,12 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "youtubeClips": [
       {
-        "videoId": "xvI7C9I_U2U",
+        "videoId": "J294A-R1Cjk",
         "startSec": 30,
         "endSec": 45,
-        "channelTitle": "Robyn - Topic",
+        "channelTitle": "Embassy One",
         "license": "standard",
-        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+        "notes": "Officiell MV via Embassy One (Robyns label). Ersätter Topic-versionen (statisk albumkonst)."
       }
     ]
   },
@@ -6594,8 +6571,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "yMsKK0zNT_4",
-        "startSec": 0,
-        "endSec": 203,
+        "startSec": 5,
+        "endSec": 208,
         "channelTitle": "Kontor.TV",
         "license": "standard"
       }
@@ -6610,6 +6587,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "audiences": [
       "gen-z",
       "millennials"
+    ],
+    "genrePackages": [
+      "Eurovision"
     ],
     "youtubeClips": [
       {
@@ -6632,11 +6612,14 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-z",
       "millennials"
     ],
+    "genrePackages": [
+      "Eurovision"
+    ],
     "youtubeClips": [
       {
         "videoId": "g_67DS2j9hs",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 35,
+        "endSec": 50,
         "channelTitle": "Eric Saade",
         "license": "standard",
         "notes": "Melodifestivalen 2011 vinnare. Officiell music video (Director's Cut)."
@@ -6656,8 +6639,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "8UVNT4wvIGY",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 90,
+        "endSec": 105,
         "channelTitle": "Gotye",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
@@ -6800,6 +6783,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "audiences": [
       "gen-z",
       "millennials"
+    ],
+    "genrePackages": [
+      "Eurovision"
     ],
     "youtubeClips": [
       {
@@ -6944,6 +6930,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha",
       "gen-z"
     ],
+    "genrePackages": [
+      "Eurovision"
+    ],
     "youtubeClips": [
       {
         "videoId": "k59E7T0H-Us",
@@ -6973,6 +6962,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Håkan Hellström - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
+    "id": "hundraringen-klev-ut",
+    "displayName": "Hundraåringen som klev ut genom fönstret och försvann",
+    "correctYear": 2013,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "audiences": [
+      "millennials",
+      "gen-z"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "pjiJ1cL3Uss",
+        "startSec": 5,
+        "endSec": 40,
+        "channelTitle": "Buena Vista Sverige",
+        "license": "standard",
+        "notes": "Officiell svensk trailer. Buena Vista Sverige. Robert Gustafsson."
       }
     ]
   },
@@ -7029,12 +7039,12 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "youtubeClips": [
       {
-        "videoId": "SQ-iwsVHbH8",
+        "videoId": "fG-EIvEiSHs",
         "startSec": 30,
         "endSec": 45,
-        "channelTitle": "Tove Lo - Topic",
+        "channelTitle": "Tove Lo",
         "license": "standard",
-        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+        "notes": "Officiell OG Independent Video från Tove Lo:s egen kanal. Ersätter Topic-versionen."
       }
     ]
   },
@@ -7047,6 +7057,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "audiences": [
       "gen-alpha",
       "gen-z"
+    ],
+    "genrePackages": [
+      "Eurovision"
     ],
     "youtubeClips": [
       {
@@ -7142,29 +7155,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "pitbull-we-are-one-ole-ola",
-    "displayName": "We Are One (Ole Ola) — Pitbull, Jennifer Lopez & Claudia Leitte",
-    "correctYear": 2014,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "all"
-    ],
-    "genrePackages": [
-      "sport"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "zfXd_AY8hmg",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Pitbull - Topic",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
-      }
-    ]
-  },
-  {
     "id": "sanna-nielsen-undo",
     "displayName": "Undo — Sanna Nielsen",
     "correctYear": 2014,
@@ -7246,6 +7236,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "en-man-som-heter-ove",
+    "displayName": "En man som heter Ove",
+    "correctYear": 2015,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "audiences": [
+      "millennials",
+      "gen-z"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "q84plEEyGZY",
+        "startSec": 12,
+        "endSec": 47,
+        "channelTitle": "MovieZine",
+        "license": "standard",
+        "notes": "Officiell svensk trailer. Rolf Lassgård. SF Studios-produktion."
+      }
+    ]
+  },
+  {
     "id": "mans-zelmerlow-heroes",
     "displayName": "Heroes — Måns Zelmerlöw",
     "correctYear": 2015,
@@ -7256,7 +7267,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-z"
     ],
     "genrePackages": [
-      "eurovision"
+      "Eurovision"
     ],
     "youtubeClips": [
       {
@@ -7385,12 +7396,12 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "youtubeClips": [
       {
-        "videoId": "Bs7ckMiXZok",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "David Guetta - Topic",
+        "videoId": "MoHnffhBwqs",
+        "startSec": 15,
+        "endSec": 30,
+        "channelTitle": "David Guetta",
         "license": "standard",
-        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+        "notes": "Officiell MV från David Guettas kanal. UEFA EURO 2016 Official Song. Ersätter Topic-versionen."
       }
     ]
   },
@@ -7403,6 +7414,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "audiences": [
       "gen-alpha",
       "gen-z"
+    ],
+    "genrePackages": [
+      "Eurovision"
     ],
     "youtubeClips": [
       {
@@ -7432,26 +7446,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Sky Sports Retro",
         "license": "standard",
         "notes": "Curerad 2026-05-29 — ögonblicket Leicester blev mästare 2016 (Sky Sports)."
-      }
-    ]
-  },
-  {
-    "id": "sarah-sjostrom-os-guld-rio-2016",
-    "displayName": "Sarah Sjöström OS-guld 100m fjäril Rio",
-    "correctYear": 2016,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "audiences": [
-      "all"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "KIurOF8zYJc",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Nyhetsmorgon",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
       }
     ]
   },
@@ -7589,6 +7583,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha",
       "gen-z"
     ],
+    "genrePackages": [
+      "Eurovision"
+    ],
     "youtubeClips": [
       {
         "videoId": "1jSrBdN4b5c",
@@ -7609,6 +7606,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "audiences": [
       "gen-alpha",
       "gen-z"
+    ],
+    "genrePackages": [
+      "Eurovision"
     ],
     "youtubeClips": [
       {
@@ -7751,6 +7751,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha",
       "gen-z"
     ],
+    "genrePackages": [
+      "Eurovision"
+    ],
     "youtubeClips": [
       {
         "videoId": "CziHrYYSyPc",
@@ -7813,6 +7816,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha",
       "gen-z"
     ],
+    "genrePackages": [
+      "Eurovision"
+    ],
     "youtubeClips": [
       {
         "videoId": "Eztx7Wr8PtE",
@@ -7833,6 +7839,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "audiences": [
       "gen-alpha",
       "gen-z"
+    ],
+    "genrePackages": [
+      "Eurovision"
     ],
     "youtubeClips": [
       {
@@ -7978,6 +7987,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha",
       "gen-z"
     ],
+    "genrePackages": [
+      "Eurovision"
+    ],
     "youtubeClips": [
       {
         "videoId": "7EpSBDPlZn4",
@@ -8018,6 +8030,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "audiences": [
       "gen-alpha",
       "gen-z"
+    ],
+    "genrePackages": [
+      "Eurovision"
     ],
     "youtubeClips": [
       {
@@ -8081,6 +8096,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha",
       "gen-z"
     ],
+    "genrePackages": [
+      "Eurovision"
+    ],
     "youtubeClips": [
       {
         "videoId": "5P1ueI9j6gk",
@@ -8101,6 +8119,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "audiences": [
       "gen-alpha",
       "gen-z"
+    ],
+    "genrePackages": [
+      "Eurovision"
     ],
     "youtubeClips": [
       {
@@ -8142,6 +8163,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "audiences": [
       "gen-alpha",
       "gen-z"
+    ],
+    "genrePackages": [
+      "Eurovision"
     ],
     "youtubeClips": [
       {
@@ -8244,6 +8268,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "audiences": [
       "gen-alpha",
       "gen-z"
+    ],
+    "genrePackages": [
+      "Eurovision"
     ],
     "youtubeClips": [
       {
@@ -8348,6 +8375,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha",
       "gen-z"
     ],
+    "genrePackages": [
+      "Eurovision"
+    ],
     "youtubeClips": [
       {
         "videoId": "kiGDvM14Kwg",
@@ -8434,6 +8464,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha",
       "gen-z"
     ],
+    "genrePackages": [
+      "Eurovision"
+    ],
     "youtubeClips": [
       {
         "videoId": "-ieSTNpxvio",
@@ -8454,6 +8487,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "audiences": [
       "gen-alpha",
       "gen-z"
+    ],
+    "genrePackages": [
+      "Eurovision"
     ],
     "youtubeClips": [
       {
@@ -8476,6 +8512,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha",
       "gen-z"
     ],
+    "genrePackages": [
+      "Eurovision"
+    ],
     "youtubeClips": [
       {
         "videoId": "J3oGYo_mekw",
@@ -8496,6 +8535,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "audiences": [
       "gen-alpha",
       "gen-z"
+    ],
+    "genrePackages": [
+      "Eurovision"
     ],
     "youtubeClips": [
       {

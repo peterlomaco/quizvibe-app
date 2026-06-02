@@ -11,18 +11,6 @@ contentForm: youtube
 contentSubject: song
 items:
   # 1981
-  - id: soft-cell-tainted-love
-    displayName: "Tainted Love — Soft Cell"
-    correctYear: 1981
-    probability: 88
-    wikimediaSearchHints: ["Soft Cell Tainted Love"]
-    answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "EWZxFSo-XZY"
-        startSec: 0
-        endSec: 15
-        channelTitle: "Soft Cell - Topic"
-        notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: kim-carnes-bette-davis-eyes
     displayName: "Bette Davis Eyes — Kim Carnes"
     correctYear: 1981
@@ -150,18 +138,6 @@ items:
         channelTitle: "Jon Bon Jovi - Topic"
         notes: "Officiell album-audio via YouTube Topic. 'Whoaa, we're halfway there'-refräng."
   # 1987
-  - id: guns-n-roses-sweet-child-o-mine
-    displayName: "Sweet Child O' Mine — Guns N' Roses"
-    correctYear: 1987
-    probability: 92
-    wikimediaSearchHints: ["Guns N Roses Sweet Child O Mine"]
-    answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "oMfMUfgjiLg"
-        startSec: 0
-        endSec: 15
-        channelTitle: "Guns N' Roses - Topic"
-        notes: "Officiell album-audio via YouTube Topic. Iconic guitar-intro."
   - id: rick-astley-never-gonna-give-you-up
     displayName: "Never Gonna Give You Up — Rick Astley"
     correctYear: 1987
@@ -207,11 +183,11 @@ items:
     wikimediaSearchHints: ["Madonna Like a Prayer"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "IaHQYTm14Kc"
+      - videoId: "MMNTbnLrBK8"
         startSec: 45
         endSec: 60
-        channelTitle: "Madonna - Topic"
-        notes: "Officiell album-audio via YouTube Topic. Refrängområde."
+        channelTitle: "Enhanced Music Videos"
+        notes: "Remastered Full HD musikvideo. Officiell MV-innehåll, bättre bildkvalitet än Topic-versionen (statisk albumkonst)."
   - id: phil-collins-another-day-in-paradise
     displayName: "Another Day in Paradise — Phil Collins"
     correctYear: 1989
@@ -270,8 +246,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "m-y_IxPcx8U"
-        startSec: 30
-        endSec: 45
+        startSec: 58
+        endSec: 73
         channelTitle: "Michael Jackson - Topic"
         notes: "Officiell album-audio via YouTube Topic. Iconic guitar-riff."
   # 1992
@@ -582,11 +558,11 @@ items:
     wikimediaSearchHints: ["Roxette The Look 1989"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "2-IId2Fx43Y"
+      - videoId: "--8mvZzZIcU"
         startSec: 30
         endSec: 45
-        channelTitle: "Roxette - Topic"
-        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+        channelTitle: "Enhanced Music Videos"
+        notes: "Remastered Full HD musikvideo. Officiell MV-innehåll, ersätter Topic-versionen (statisk albumkonst)."
   - id: roxette-listen-to-your-heart
     displayName: "Listen to Your Heart — Roxette"
     correctYear: 1988
@@ -630,11 +606,11 @@ items:
     wikimediaSearchHints: ["Rednex Cotton Eye Joe 1994"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "fYnJZh5ZHIA"
+      - videoId: "mOYZaiDZ7BM"
         startSec: 30
         endSec: 45
-        channelTitle: "Rednex - Topic"
-        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+        channelTitle: "Rednex Videos"
+        notes: "Officiell musikvideo, Rednex Videos-kanalen. HD. Ersätter Topic-versionen."
   - id: cardigans-lovefool
     displayName: "Lovefool — The Cardigans"
     correctYear: 1996
@@ -749,6 +725,7 @@ items:
         endSec: 45
         channelTitle: "SchlagerArchive"
         notes: "Melodifestivalen 1981 vinnare."
+    genrePackages: ["Eurovision"]
   - id: chips-dag-efter-dag
     displayName: "Dag efter dag — Chips"
     correctYear: 1982
@@ -773,6 +750,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 1984 vinnare, ESC-vinnare 1984."
+    genrePackages: ["Eurovision"]
   - id: kikki-danielsson-bra-vibrationer
     displayName: "Bra vibrationer — Kikki Danielsson"
     correctYear: 1985
@@ -797,6 +775,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 1987 vinnare."
+    genrePackages: ["Eurovision"]
   - id: tommy-korberg-stad-i-ljus
     displayName: "Stad i ljus — Tommy Körberg"
     correctYear: 1988
@@ -809,6 +788,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 1988 vinnare. ESC 1988 performance."
+    genrePackages: ["Eurovision"]
   - id: carola-fangad-av-en-stormvind
     displayName: "Fångad av en stormvind — Carola"
     correctYear: 1991
@@ -833,6 +813,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 1993 vinnare. ESC 1993 performance."
+    genrePackages: ["Eurovision"]
   # ===== Eurovision Song Contest vinnare =====
   - id: bucks-fizz-making-your-mind-up
     displayName: "Making Your Mind Up — Bucks Fizz"
@@ -870,6 +851,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1983 vinnare — Luxemburg."
+    genrePackages: ["Eurovision"]
   - id: bobbysocks-la-det-swinge
     displayName: "La det swinge — Bobbysocks!"
     correctYear: 1985
@@ -894,6 +876,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1986 vinnare — Belgien."
+    genrePackages: ["Eurovision"]
   - id: johnny-logan-hold-me-now
     displayName: "Hold Me Now — Johnny Logan"
     correctYear: 1987
@@ -906,6 +889,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1987 vinnare — Irland."
+    genrePackages: ["Eurovision"]
   - id: celine-dion-ne-partez-pas
     displayName: "Ne partez pas sans moi — Céline Dion"
     correctYear: 1988
@@ -918,6 +902,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1988 vinnare — Schweiz."
+    genrePackages: ["Eurovision"]
   - id: riva-rock-me
     displayName: "Rock Me — Riva"
     correctYear: 1989
@@ -930,6 +915,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1989 vinnare — Jugoslavien."
+    region: ["unknown-region"]
   - id: toto-cutugno-insieme
     displayName: "Insieme: 1992 — Toto Cutugno"
     correctYear: 1990
@@ -942,6 +928,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1990 vinnare — Italien."
+    genrePackages: ["Eurovision"]
   - id: linda-martin-why-me
     displayName: "Why Me? — Linda Martin"
     correctYear: 1992
@@ -954,6 +941,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1992 vinnare — Irland."
+    genrePackages: ["Eurovision"]
   - id: niamh-kavanagh-in-your-eyes
     displayName: "In Your Eyes — Niamh Kavanagh"
     correctYear: 1993
@@ -966,6 +954,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1993 vinnare — Irland."
+    genrePackages: ["Eurovision"]
   - id: paul-harrington-rock-n-roll-kids
     displayName: "Rock 'n' Roll Kids — Paul Harrington & Charlie McGettigan"
     correctYear: 1994
@@ -978,6 +967,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1994 vinnare — Irland."
+    genrePackages: ["Eurovision"]
   - id: secret-garden-nocturne
     displayName: "Nocturne — Secret Garden"
     correctYear: 1995
@@ -990,6 +980,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1995 vinnare — Norge."
+    genrePackages: ["Eurovision"]
   - id: eimear-quinn-the-voice
     displayName: "The Voice — Eimear Quinn"
     correctYear: 1996
@@ -1002,3 +993,4 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1996 vinnare — Irland."
+    genrePackages: ["Eurovision"]

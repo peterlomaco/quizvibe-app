@@ -148,6 +148,7 @@ items:
         endSec: 45
         channelTitle: "Olympics"
         notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+    region: ["unknown-region"]
   - id: stenmark-os-guld-slalom-1980
     displayName: "Stenmark OS-guld slalom Lake Placid"
     correctYear: 1980
@@ -172,18 +173,6 @@ items:
         endSec: 45
         channelTitle: "Nostalgi"
         notes: "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (10)."
-  - id: wassberg-os-guld-1980
-    displayName: "Thomas Wassberg OS-guld 15 km Lake Placid"
-    correctYear: 1980
-    probability: 75
-    wikimediaSearchHints: ["Thomas Wassberg 1980 Olympics 15km cross country gold"]
-    answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "ZQEBtR2pDXY"
-        startSec: 5
-        endSec: 20
-        channelTitle: "Nostalgi"
-        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
   - id: gunde-svan-os-guld-1984
     displayName: "Gunde Svan OS-guld 15 km Sarajevo"
     correctYear: 1984
@@ -208,6 +197,7 @@ items:
         endSec: 45
         channelTitle: "How To Run Faster - By Performance Lab"
         notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+    region: ["unknown-region"]
   - id: tre-kronor-vm-1987-vien
     displayName: "Tre Kronor VM-guld Wien"
     correctYear: 1987
@@ -220,18 +210,6 @@ items:
         endSec: 45
         channelTitle: "HockeySverige"
         notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
-  - id: patrik-sjoberg-vr-hojdhopp-1987
-    displayName: "Patrik Sjöberg sätter VR i höjdhopp"
-    correctYear: 1987
-    probability: 80
-    wikimediaSearchHints: ["Patrik Sjoberg 1987 high jump world record"]
-    answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "ASymMBD6ReM"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Carl King Lewis"
-        notes: "Refined query 2026-05-27 — Sjöbergs VR 2.42m på DN Galan Stockholm 1987-06-30."
   - id: ben-johnson-disqualification-1988
     displayName: "Ben Johnson diskvalificerad efter 100m Seoul"
     correctYear: 1988
@@ -250,18 +228,6 @@ items:
     probability: 76
     wikimediaSearchHints: ["Greg Louganis 1988 Seoul Olympics diving head hit"]
     answerMethods: ["timeline"]
-  - id: stenmark-86-segrar-1989
-    displayName: "Stenmarks 86:e (sista) världscupseger"
-    correctYear: 1989
-    probability: 78
-    wikimediaSearchHints: ["Ingemar Stenmark final career win 1989 world cup"]
-    answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "LmSPZ-MHD8s"
-        startSec: 60
-        endSec: 75
-        channelTitle: "Jon Ahlsén"
-        notes: "Refined query 2026-05-27 — 'Stenmark: Decade of Dominance' compilation (20 min). Third-party — replace med dedikerat 86:e-seger-klipp om sådant hittas."
   - id: tre-kronor-vm-1991-turku
     displayName: "Tre Kronor VM-guld Turku"
     correctYear: 1991
@@ -352,18 +318,6 @@ items:
         endSec: 6615
         channelTitle: "LPGA"
         notes: "LPGA official full final round replay (119 min) — start ~110 min in vid playoff mot Liselotte Neumann. Curerad 2026-05-27 via refined query. Replace med dedikerat highlight-klipp om sådant hittas."
-  - id: carolina-kluft-os-guld-2004
-    displayName: "Carolina Klüft OS-guld sjukamp Aten"
-    correctYear: 2004
-    probability: 88
-    wikimediaSearchHints: ["Carolina Kluft 2004 Athens Olympics heptathlon gold"]
-    answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "DvbQ1mXFPCo"
-        startSec: 16
-        endSec: 31
-        channelTitle: "Expressen"
-        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
   - id: stefan-holm-os-guld-2004
     displayName: "Stefan Holm OS-guld höjdhopp Aten"
     correctYear: 2004
@@ -430,18 +384,7 @@ items:
         endSec: 30
         channelTitle: "Bao Highlights"
         notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
-  - id: marcus-hellner-os-guld-2010
-    displayName: "Marcus Hellner OS-guld jaktstart Vancouver"
-    correctYear: 2010
-    probability: 78
-    wikimediaSearchHints: ["Marcus Hellner 2010 Vancouver Olympics cross country gold"]
-    answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "cu9buHVFPfo"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Johann Mühlegg"
-        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+    region: ["unknown-region"]
   - id: zlatan-bicycle-kick-england-2012
     displayName: "Zlatans bicycle kick mot England"
     correctYear: 2012
@@ -502,18 +445,7 @@ items:
         endSec: 45
         channelTitle: "TNT Sports"
         notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
-  - id: sarah-sjostrom-os-guld-rio-2016
-    displayName: "Sarah Sjöström OS-guld 100m fjäril Rio"
-    correctYear: 2016
-    probability: 82
-    wikimediaSearchHints: ["Sarah Sjostrom 2016 Rio Olympics 100m butterfly gold"]
-    answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "KIurOF8zYJc"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Nyhetsmorgon"
-        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+    region: ["unknown-region"]
   - id: tre-kronor-vm-2017-koln
     displayName: "Tre Kronor VM-guld Köln"
     correctYear: 2017
@@ -607,6 +539,7 @@ items:
         endSec: 20
         channelTitle: "Coach Clank"
         notes: "Curerad 2026-05-29 — Jordans iconic last shot, 1998 NBA Finals (NBA-officiella var region-blockerade)."
+    region: ["unknown-region"]
   - id: leicester-premier-league-2016
     displayName: "Leicester City vinner Premier League"
     correctYear: 2016
@@ -643,3 +576,4 @@ items:
         endSec: 30
         channelTitle: "Deadball Diaries"
         notes: "Ikonisk fotbollsmoment — Vinnie Jones (Wimbledon) griper Gascoigne (Newcastle) 1988. Sport-kategori via contentSubject: sport-event."
+    region: ["unknown-region"]

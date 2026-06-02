@@ -108,19 +108,6 @@ items:
     answerMethods: ["timeline"]
     genrePackages: ["sport"]
   # ── Övrig svensk sport-musik ──
-  - id: malin-baryard-do-you-wanna-ride
-    displayName: "Do You Wanna Ride? — Spånka NKPG & Malin Baryard"
-    correctYear: 2004
-    probability: 74
-    wikimediaSearchHints: ["Spånka NKPG Malin Baryard Do You Wanna Ride 2004"]
-    answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "BffT-VRIOIk"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Spånka NKPG - Topic"
-        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
-    genrePackages: ["sport"]
   # ── Internationella fotbolls-VM/EM-låtar ──
   - id: lightning-seeds-three-lions
     displayName: "Three Lions — Baddiel, Skinner & The Lightning Seeds"
@@ -148,19 +135,6 @@ items:
         channelTitle: "New Order - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
     genrePackages: ["sport"]
-  - id: ricky-martin-copa-de-la-vida
-    displayName: "La Copa de la Vida — Ricky Martin"
-    correctYear: 1998
-    probability: 80
-    wikimediaSearchHints: ["Ricky Martin La Copa de la Vida The Cup of Life 1998"]
-    answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "Qm9KCQd3mg4"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Ricky Martin - Topic"
-        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
-    genrePackages: ["sport"]
   - id: knaan-wavin-flag
     displayName: "Wavin' Flag — K'naan"
     correctYear: 2010
@@ -172,19 +146,6 @@ items:
         startSec: 30
         endSec: 45
         channelTitle: "K'NAAN - Topic"
-        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
-    genrePackages: ["sport"]
-  - id: pitbull-we-are-one-ole-ola
-    displayName: "We Are One (Ole Ola) — Pitbull, Jennifer Lopez & Claudia Leitte"
-    correctYear: 2014
-    probability: 80
-    wikimediaSearchHints: ["Pitbull Jennifer Lopez We Are One Ole Ola 2014 World Cup"]
-    answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "zfXd_AY8hmg"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Pitbull - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
     genrePackages: ["sport"]
   - id: whitney-one-moment-in-time
@@ -207,11 +168,11 @@ items:
     wikimediaSearchHints: ["David Guetta Zara Larsson This One's for You UEFA Euro 2016"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "Bs7ckMiXZok"
-        startSec: 30
-        endSec: 45
-        channelTitle: "David Guetta - Topic"
-        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      - videoId: "MoHnffhBwqs"
+        startSec: 15
+        endSec: 30
+        channelTitle: "David Guetta"
+        notes: "Officiell MV från David Guettas kanal. UEFA EURO 2016 Official Song. Ersätter Topic-versionen."
     genrePackages: ["sport"]
   # ── Idrottare som gjort musik ──
   - id: duplantis-bop

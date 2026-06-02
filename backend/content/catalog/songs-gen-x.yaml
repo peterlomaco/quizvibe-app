@@ -130,6 +130,7 @@ items:
         endSec: 30
         channelTitle: "ABBA - Topic"
         notes: "Officiell album-audio via YouTube Topic. Eurovision-låten."
+    genrePackages: ["Eurovision"]
   # Bohemian Rhapsody flyttad till songs-all.yaml (cross-gen-iconic) 2026-05-22.
   # Hotel California flyttad till songs-all.yaml (cross-gen-iconic) 2026-05-22.
   - id: bee-gees-stayin-alive
@@ -156,18 +157,6 @@ items:
         endSec: 15
         channelTitle: "Chic - Topic"
         notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
-  - id: pink-floyd-another-brick-in-the-wall
-    displayName: "Another Brick in the Wall, Part 2 — Pink Floyd"
-    correctYear: 1979
-    probability: 90
-    wikimediaSearchHints: ["Pink Floyd Another Brick in the Wall The Wall"]
-    answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "A6iqfDrQ0_o"
-        startSec: 45
-        endSec: 60
-        channelTitle: "PINK FLOYD - Topic"
-        notes: "Officiell album-audio via YouTube Topic. 'We don't need no education'-vers."
   - id: queen-another-one-bites-the-dust
     displayName: "Another One Bites the Dust — Queen"
     correctYear: 1980
@@ -363,6 +352,7 @@ items:
         endSec: 15
         channelTitle: "Queen - Topic"
         notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
+    genrePackages: ["sport"]
   - id: village-people-ymca
     displayName: "Y.M.C.A. — Village People"
     correctYear: 1978
@@ -550,6 +540,7 @@ items:
         endSec: 45
         channelTitle: "Queen - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+    genrePackages: ["sport"]
   - id: police-roxanne
     displayName: "Roxanne — The Police"
     correctYear: 1978
@@ -658,6 +649,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 1980 vinnare."
+    genrePackages: ["Eurovision"]
   # ===== Eurovision Song Contest vinnare =====
   - id: dana-all-kinds-of-everything
     displayName: "All Kinds of Everything — Dana"
@@ -671,6 +663,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1970 vinnare — Irland."
+    region: ["unknown-region"]
   - id: severine-un-banc-un-arbre
     displayName: "Un banc, un arbre, une rue — Séverine"
     correctYear: 1971
@@ -683,6 +676,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1971 vinnare — Monaco."
+    genrePackages: ["Eurovision"]
   - id: vicky-leandros-apres-toi
     displayName: "Après toi — Vicky Leandros"
     correctYear: 1972
@@ -695,6 +689,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1972 vinnare — Luxemburg."
+    genrePackages: ["Eurovision"]
   - id: anne-marie-david-tu-te-reconnaitras
     displayName: "Tu te reconnaîtras — Anne-Marie David"
     correctYear: 1973
@@ -707,6 +702,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1973 vinnare — Luxemburg."
+    genrePackages: ["Eurovision"]
   - id: teach-in-ding-a-dong
     displayName: "Ding-a-dong — Teach-In"
     correctYear: 1975
@@ -719,6 +715,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1975 vinnare — Nederländerna."
+    genrePackages: ["Eurovision"]
   - id: brotherhood-of-man-save-your-kisses
     displayName: "Save Your Kisses for Me — Brotherhood of Man"
     correctYear: 1976
@@ -731,6 +728,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1976 vinnare — Storbritannien."
+    genrePackages: ["Eurovision"]
   - id: marie-myriam-loiseau-et-lenfant
     displayName: "L'Oiseau et l'Enfant — Marie Myriam"
     correctYear: 1977
@@ -743,6 +741,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1977 vinnare — Frankrike."
+    genrePackages: ["Eurovision"]
   - id: izhar-cohen-a-ba-ni-bi
     displayName: "A-Ba-Ni-Bi — Izhar Cohen & The Alphabeta"
     correctYear: 1978
@@ -755,6 +754,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1978 vinnare — Israel."
+    genrePackages: ["Eurovision"]
   - id: milk-and-honey-hallelujah
     displayName: "Hallelujah — Milk & Honey"
     correctYear: 1979
@@ -767,6 +767,7 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1979 vinnare — Israel."
+    genrePackages: ["Eurovision"]
   - id: johnny-logan-whats-another-year
     displayName: "What's Another Year — Johnny Logan"
     correctYear: 1980
@@ -779,3 +780,4 @@ items:
         endSec: 45
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1980 vinnare — Irland."
+    genrePackages: ["Eurovision"]

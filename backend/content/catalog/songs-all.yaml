@@ -44,18 +44,6 @@ items:
         endSec: 25
         channelTitle: "Elvis Presley - Topic"
         notes: "Officiell album-audio via YouTube Topic. Refrängområde."
-  - id: queen-bohemian-rhapsody
-    displayName: "Bohemian Rhapsody — Queen"
-    correctYear: 1975
-    probability: 95
-    wikimediaSearchHints: ["Queen Bohemian Rhapsody"]
-    answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "XHrdsx8izBs"
-        startSec: 0
-        endSec: 15
-        channelTitle: "Queen - Topic"
-        notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: eagles-hotel-california
     displayName: "Hotel California — Eagles"
     correctYear: 1976
