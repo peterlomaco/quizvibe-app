@@ -15,6 +15,10 @@ export type MainCategory = 'Music' | 'Film' | 'Sport';
 
 export const MAIN_CATEGORIES: readonly MainCategory[] = ['Music', 'Film', 'Sport'] as const;
 
+// Images-källan har Film (Actors) + Sport (Athletes) som obligatoriska kategorier.
+// Bara Music (Artists) kan slås av/på av host.
+export const IMAGES_MANDATORY_CATEGORIES: readonly MainCategory[] = ['Film', 'Sport'] as const;
+
 /**
  * Användar-vänliga etiketter för lobby/profile-filtret. Filtret är PERSON-
  * centrerat (vem) medan det interna MainCategory-värdet + fråge-badgen är

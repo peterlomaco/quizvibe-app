@@ -617,17 +617,14 @@ export default function QuizScreen() {
     eraFrom?: string;
     eraTo?: string;
     answerResponseSeconds?: string;
-    youtubeEnabled?: string;
-    imagesEnabled?: string;
+    /** JSON-stringifierad array av MainCategory-strings aktiva för YouTube-källan. Min 1. */
+    youtubeEnabledCategories?: string;
+    /** JSON-stringifierad array av MainCategory-strings aktiva för Images-källan.
+     *  Film+Sport alltid inkluderade (mandatory); Music valbar. */
+    imagesEnabledCategories?: string;
     /** JSON-stringifierad array av theme package-IDs aktiva vid spelstart.
      *  Tom array = Generic. Used för att frysa in i HistoryEntry. */
     selectedExtraPackages?: string;
-    /** JSON-stringifierad array av MainCategory-strings (Music/Film/Sport)
-     *  som host enabled:at i Lobby. Filtrerar quiz-poolen — items vars
-     *  mainCategory inte är i listan strippas. Items med null
-     *  mainCategory (capitals/places) bevaras endast när alla 3 är
-     *  enabled (default). UI:t enforce:ar min 1 så listan är aldrig tom. */
-    enabledMainCategories?: string;
   }>();
   // Default assistance från URL-param — fallback om turnOrder-spelaren
   // saknar egen assistance-flagga. Per-player-värdet från turnOrder:n
@@ -723,10 +720,33 @@ export default function QuizScreen() {
   const eraTo = parseInt(String(params.eraTo ?? new Date().getFullYear()), 10);
   // Game Connections-källor från Lobby. Default båda=on vid direkt-nav
   // (utan Lobby) så MediaPlayer-stuben renderar klipp för mock-frågor och
-  // image-items också kommer in i poolen. youtubeEnabled gatar items med
-  // youtubeClips (= today's music-pool); imagesEnabled gatar image-items.
-  const youtubeEnabled = (params.youtubeEnabled ?? 'true') === 'true';
-  const imagesEnabled = (params.imagesEnabled ?? 'true') === 'true';
+  // Per-source profession-category-filter. YouTube: min 1, alla tre valbara.
+  // Images: Film+Sport alltid inkluderade (mandatory), Music valbar.
+  const youtubeEnabledCategories = useMemo<MainCategory[]>(() => {
+    if (!params.youtubeEnabledCategories) return ['Music', 'Film', 'Sport'];
+    try {
+      const parsed = JSON.parse(params.youtubeEnabledCategories);
+      const filtered = Array.isArray(parsed) ? parsed.filter(isMainCategory) : [];
+      return filtered.length > 0 ? filtered : ['Music', 'Film', 'Sport'];
+    } catch {
+      return ['Music', 'Film', 'Sport'];
+    }
+  }, [params.youtubeEnabledCategories]);
+  const imagesEnabledCategories = useMemo<MainCategory[]>(() => {
+    if (!params.imagesEnabledCategories) return ['Music', 'Film', 'Sport'];
+    try {
+      const parsed = JSON.parse(params.imagesEnabledCategories);
+      const filtered = Array.isArray(parsed) ? parsed.filter(isMainCategory) : [];
+      // Säkerställ att mandatory-kategorier alltid ingår.
+      const withMandatory = [...new Set([...filtered, 'Film' as MainCategory, 'Sport' as MainCategory])];
+      return withMandatory.length > 0 ? withMandatory : ['Music', 'Film', 'Sport'];
+    } catch {
+      return ['Music', 'Film', 'Sport'];
+    }
+  }, [params.imagesEnabledCategories]);
+  // Deriverade source-flags: YouTube aktiv om min 1 kategori vald, Images alltid aktiv.
+  const youtubeEnabled = youtubeEnabledCategories.length > 0;
+  const imagesEnabled = true;
   // Theme packages aktiva vid spelstart (host:s lobby-val, JSON-stringifierad
   // array av paket-IDs). Tom array = Generic. Default tom vid direkt-nav
   // utan Lobby. Behövs i HistoryEntry vid game-completion så Player history
@@ -740,23 +760,6 @@ export default function QuizScreen() {
       return [];
     }
   }, [params.selectedExtraPackages]);
-  // Main categories — host:s aktiva V1-kategorier (Music/Film/Sport).
-  // Default vid direkt-nav (utan Lobby) = alla 3 så pool-filtret blir
-  // no-op och spelet kan starta. Parsing tolererar korrupt payload
-  // genom att falla tillbaka till alla 3 — quiz får inte fastna på en
-  // tom array bara för att URL-encoding gick fel någonstans.
-  const enabledMainCategories = useMemo<MainCategory[]>(() => {
-    if (!params.enabledMainCategories) return ['Music', 'Film', 'Sport'];
-    try {
-      const parsed = JSON.parse(params.enabledMainCategories);
-      const filtered = Array.isArray(parsed)
-        ? parsed.filter(isMainCategory)
-        : [];
-      return filtered.length > 0 ? filtered : ['Music', 'Film', 'Sport'];
-    } catch {
-      return ['Music', 'Film', 'Sport'];
-    }
-  }, [params.enabledMainCategories]);
   // Turordningen levereras som JSON-sträng från Lobby:s handleStartGame.
   // try/catch:en gör att en korrupt payload graceful degradar till tom lista
   // → 'intro'-fasen hoppas över istället för att skärmen fastnar tom.
@@ -890,34 +893,35 @@ export default function QuizScreen() {
     const imagePoolPreCategory: QuizQuestion[] =
       inEraAudienceImages.length > 0 ? inEraAudienceImages : inEraImages;
 
-    // ── Main category-filter ──────────────────────────────────────────
-    // HÅRD — host:s val av Music/Film/Sport respekteras. Inga fallbacks
-    // som auto-stripper kategorin (= en "Sport-only"-spelare skulle bli
-    // förvirrad om quiz plötsligt visade Music). Edge case: filtret tömmer
-    // POOLEN helt → fångas av "båda pools tomma → SEED_QUESTIONS"-fallbacken
-    // nedan (UI:t ska normalt blockera detta läge via min-1-kategori-guard).
-    //
-    // Specialfall: när alla 3 är enabled (= default) skippas filtret helt
-    // så items med null mainCategory (capitals/places — era-agnostiska)
-    // bevaras. Annars skulle default-läget tappa capitals tyst, vilket är
-    // en oönskad bieffekt av en feature som ska VARA en host-controll.
-    const isAllCategoriesEnabled =
-      enabledMainCategories.length === 3 &&
-      enabledMainCategories.includes('Music') &&
-      enabledMainCategories.includes('Film') &&
-      enabledMainCategories.includes('Sport');
-    const filterByCategory = (pool: QuizQuestion[]): QuizQuestion[] =>
-      isAllCategoriesEnabled
-        ? pool
-        : pool.filter((q) =>
-            itemMatchesEnabledCategories(
-              q.mainCategory,
-              enabledMainCategories,
-              q.type === 'timeline' ? q.genrePackages : undefined,
-            ),
-          );
-    const youtubePool = filterByCategory(youtubePoolPreCategory);
-    const imagePool = filterByCategory(imagePoolPreCategory);
+    // ── Per-source category-filter ───────────────────────────────────
+    // HÅRD — host:s val respekteras per källa. YouTube filtreras mot
+    // youtubeEnabledCategories; Images mot imagesEnabledCategories.
+    // Specialfall: om alla 3 aktiva för en källa (= default) skippas
+    // filtret helt så items med null mainCategory bevaras.
+    const isAllYoutubeCats =
+      youtubeEnabledCategories.length === 3 &&
+      youtubeEnabledCategories.includes('Music') &&
+      youtubeEnabledCategories.includes('Film') &&
+      youtubeEnabledCategories.includes('Sport');
+    const isAllImageCats =
+      imagesEnabledCategories.length === 3 &&
+      imagesEnabledCategories.includes('Music') &&
+      imagesEnabledCategories.includes('Film') &&
+      imagesEnabledCategories.includes('Sport');
+    const youtubePool = isAllYoutubeCats
+      ? youtubePoolPreCategory
+      : youtubePoolPreCategory.filter((q) =>
+          itemMatchesEnabledCategories(
+            q.mainCategory,
+            youtubeEnabledCategories,
+            q.type === 'timeline' ? q.genrePackages : undefined,
+          ),
+        );
+    const imagePool = isAllImageCats
+      ? imagePoolPreCategory
+      : imagePoolPreCategory.filter((q) =>
+          itemMatchesEnabledCategories(q.mainCategory, imagesEnabledCategories, undefined),
+        );
 
     const playerCount = Math.max(1, turnOrder.length);
     const hasYoutube = youtubePool.length > 0;
@@ -927,15 +931,8 @@ export default function QuizScreen() {
     // sista-utvägs-fallback. Lobby:s pool-preflight blockar normalt detta
     // läge vid Start Game; emergency-pathen täcker direkt-nav till /quiz
     // utan Lobby + edge cases (Play Again med ändrade defaults osv.).
-    // Defense in depth: respektera main-category-filtret även här så user
-    // som valt Sport-only inte plötsligt får Music-content (tidigare bug
-    // 2026-05-27 där SEED_QUESTIONS returnerades orörd).
     if (!hasYoutube && !hasImage) {
-      if (isAllCategoriesEnabled) return SEED_QUESTIONS;
-      const respectful = SEED_QUESTIONS.filter((q) =>
-        itemMatchesEnabledCategories(q.mainCategory, enabledMainCategories, q.genrePackages),
-      );
-      return respectful.length > 0 ? respectful : SEED_QUESTIONS;
+      return SEED_QUESTIONS;
     }
 
     // Prioritera frågor som hosten inte sett i tidigare spelomgångar.
@@ -950,17 +947,14 @@ export default function QuizScreen() {
       return [...unseen, ...seen];
     };
 
-    // Fast kategori-ordning som används för både YouTube- och bild-poolerna:
-    // Musik → Film → Sport. Osedda frågor prioriteras per grupp, och grupp-
-    // ordningen är densamma i båda sektionerna av spelet.
-    // Om en kategori är avaktiverad av Host hoppas den gruppen över automatiskt
-    // (pool:en är redan filtrerad av filterByCategory ovan).
+    // Fast kategori-ordning: Musik → Film → Sport. Osedda frågor prioriteras
+    // per grupp. Pool:en är redan filtrerad per källa ovan, så tomma grupper
+    // hoppas över automatiskt.
     const CATEGORY_ORDER: MainCategory[] = ['Music', 'Film', 'Sport'];
 
     const groupByCategory = (pool: QuizQuestion[]): QuizQuestion[] => {
       const result: QuizQuestion[] = [];
       for (const cat of CATEGORY_ORDER) {
-        if (!enabledMainCategories.includes(cat)) continue;
         const catPool = pool.filter((q) => q.mainCategory === cat);
         if (catPool.length) result.push(...prioritiseUnseen(catPool));
       }
@@ -1048,7 +1042,7 @@ export default function QuizScreen() {
     // när URL-params (players-json) faktiskt ändras.
     // seenQuestionIds: uppdateras asynkront vid mount + vid spelets slut;
     // triggerar re-beräkning som prioriterar nya osedda frågor nästa omgång.
-  }, [eraFrom, eraTo, turnOrder, totalRounds, youtubeEnabled, imagesEnabled, gameMode, enabledMainCategories, seenQuestionIds]);
+  }, [eraFrom, eraTo, turnOrder, totalRounds, youtubeEnabled, imagesEnabled, gameMode, youtubeEnabledCategories, imagesEnabledCategories, seenQuestionIds]);
 
   // Media-källa per fråga (driver GetReadyIntro:s IndDev media-kö).
   // Image-frågor → 'image'; timeline-frågor (YouTube-content idag, men

@@ -10,7 +10,7 @@
 // + initial-load via getLobbySettings.
 
 import { supabase } from './supabase';
-import { MainCategory, defaultEnabledMainCategories, isMainCategory } from './mainCategory';
+import { MainCategory, defaultEnabledMainCategories, isMainCategory, IMAGES_MANDATORY_CATEGORIES } from './mainCategory';
 
 export type LobbyGameMode = 'pass-the-phone' | 'individual-devices';
 // UI använder capitalized strings; DB lagrar lowercase enligt CHECK-
@@ -28,13 +28,16 @@ export interface LobbySettings {
   eraTo: number;
   roundsCount: number;
   selectedExtraPackages: string[];
-  youtubeEnabled: boolean;
-  imagesEnabled: boolean;
+  // Per-source profession-category-filter (ersätter youtubeEnabled/imagesEnabled/enabledMainCategories).
+  // YouTube: alla tre är valbara, min 1 krävs (guard i handleToggleYoutubeCategory).
+  // Images: Film (Actors) + Sport (Athletes) är MANDATORY — alltid i arrayen.
+  //         Music (Artists) är valbar — host kan toggla av/på.
+  youtubeEnabledCategories: MainCategory[];
+  imagesEnabledCategories: MainCategory[];
   // "Profiles"-källan har två under-toggles i Lobby:n: Images (foto, 1+2) och
   // Sketch (doodle, 4). sketchEnabled är förberedd men doodlen är INTE wirad
   // till quiz-poolen ännu (prototyp) → toggeln är strukturell. Default false.
   sketchEnabled: boolean;
-  enabledMainCategories: MainCategory[];
 }
 
 interface LobbySettingsRow {
@@ -47,11 +50,17 @@ interface LobbySettingsRow {
   era_to: number;
   rounds_count: number;
   selected_extra_packages: string[];
+  // Gamla source-kolumner bevaras för bakåt-kompatibilitet (skrivs av settingsToRow
+  // tills migration 0014 körts och kommentarerna nedan aktiveras).
   youtube_enabled: boolean;
   images_enabled: boolean;
+  enabled_main_categories: string[];
+  // Migration 0014: nya per-source category-kolumner — läses med tolerant fallback
+  // (undefined om kolumnen ännu ej finns = migration ej applicerad).
+  youtube_enabled_categories?: string[];
+  images_enabled_categories?: string[];
   // Optional tills migration 0013_sketch_enabled.sql körts (tolerant read).
   sketch_enabled?: boolean;
-  enabled_main_categories: string[];
 }
 
 const UI_TO_DB_REGION: Record<LobbyRegion, DbRegion> = {
@@ -68,6 +77,12 @@ const DB_TO_UI_REGION: Record<DbRegion, LobbyRegion> = {
 };
 
 function rowToSettings(row: LobbySettingsRow): LobbySettings {
+  // Tolerant read: nya category-kolumner tas om de finns (migration 0014),
+  // annars fall-back mot gamla bool-kolumner + defaultvärden.
+  const ytCatsRaw = row.youtube_enabled_categories;
+  const imgCatsRaw = row.images_enabled_categories;
+  const ytCats = ytCatsRaw ? ytCatsRaw.filter(isMainCategory) as MainCategory[] : null;
+  const imgCats = imgCatsRaw ? imgCatsRaw.filter(isMainCategory) as MainCategory[] : null;
   return {
     gameMode: row.game_mode,
     singlePlayerDefault: row.single_player_default,
@@ -77,11 +92,20 @@ function rowToSettings(row: LobbySettingsRow): LobbySettings {
     eraTo: row.era_to,
     roundsCount: row.rounds_count,
     selectedExtraPackages: row.selected_extra_packages,
-    youtubeEnabled: row.youtube_enabled,
-    imagesEnabled: row.images_enabled,
+    // Ny kolumn finns → använd direkt. Saknas (pre-migration) → fall-back:
+    // youtube: all-on om youtube_enabled=true (gammal data), annars tom array.
+    youtubeEnabledCategories: ytCats && ytCats.length > 0
+      ? ytCats
+      : (row.youtube_enabled !== false ? defaultEnabledMainCategories() : []),
+    // images: mandatory-kategorier + Music om youtube_enabled-equiv för images.
+    imagesEnabledCategories: imgCats && imgCats.length > 0
+      ? imgCats
+      // Säkerställ att mandatory-kategorier alltid finns även i fallback.
+      : [...new Set([...IMAGES_MANDATORY_CATEGORIES,
+          ...(row.images_enabled !== false ? (['Music'] as MainCategory[]) : []),
+        ]) as unknown as MainCategory[]],
     // Tolerant: kolumnen kanske inte finns ännu (pre-migration) → default false.
     sketchEnabled: row.sketch_enabled ?? false,
-    enabledMainCategories: (row.enabled_main_categories ?? []).filter(isMainCategory),
   };
 }
 
@@ -96,17 +120,21 @@ function settingsToRow(code: string, s: LobbySettings): LobbySettingsRow {
     era_to: s.eraTo,
     rounds_count: s.roundsCount,
     selected_extra_packages: [...s.selectedExtraPackages],
-    youtube_enabled: s.youtubeEnabled,
-    images_enabled: s.imagesEnabled,
+    // Gamla source-kolumner skrivs fortsatt för bakåt-kompatibilitet tills
+    // migration 0014 körts. Härleds från nya category-arrays.
+    youtube_enabled: s.youtubeEnabledCategories.length > 0,
+    images_enabled: true, // Images alltid aktiv (Film+Sport mandatory)
+    enabled_main_categories: defaultEnabledMainCategories(), // legacy — ej längre använt av klienten
     // OBS: sketch_enabled skrivs INTE ännu — kolumnen finns inte förrän
     // migration 0013_sketch_enabled.sql körts, och en upsert mot en okänd
     // kolumn skulle faila HELA settings-skrivningen → bryta all lobby-sync.
-    // När migrationen är applicerad: avkommentera raden nedan för cross-device
-    // sketch-sync.
     // sketch_enabled: s.sketchEnabled,
-    enabled_main_categories: s.enabledMainCategories.length > 0
-      ? [...s.enabledMainCategories]
-      : defaultEnabledMainCategories(),
+    //
+    // Migration 0014: per-source category-kolumner.
+    // OBS: kommenterade TILLS migration körs (se supabase/migrations/0014_per_source_categories.sql).
+    // Aktivera efter: ALTER TABLE lobby_settings ADD COLUMN youtube_enabled_categories text[], ...
+    // youtube_enabled_categories: [...s.youtubeEnabledCategories],
+    // images_enabled_categories: [...s.imagesEnabledCategories],
   };
 }
 

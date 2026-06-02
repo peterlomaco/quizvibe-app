@@ -19,8 +19,9 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
-import Svg, { Path } from 'react-native-svg';
+import Svg, { Circle, Path } from 'react-native-svg';
 import { Avatar } from '../components/Avatar';
+import { YouTubeBrandIcon } from '../components/YouTubeBrandIcon';
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { EraMarkerMinus, EraMarkerPlus } from '../components/EraSliderMarker';
@@ -61,8 +62,6 @@ import {
 } from '../utils/profileStorage';
 import { hasPremiumSubscription } from '../utils/subscriptionStorage';
 import {
-    MAIN_CATEGORIES,
-    MAIN_CATEGORY_LABELS,
     defaultEnabledMainCategories,
     type MainCategory,
 } from '../utils/mainCategory';
@@ -240,6 +239,9 @@ export default function ProfileScreen() {
   // Save-action:en själv persisterar hela profilen oavsett knapp (en blob i
   // AsyncStorage); det är bara den visuella bekräftelsen som är knapp-lokal.
   const [savedSection, setSavedSection] = useState<null | 'defaults' | 'host' | 'packages'>(null);
+  // Snapshot av profil-state vid senaste load/save — jämförs mot aktuell state
+  // i guardedNavigate för att avgöra om osparade ändringar finns.
+  const savedSnapshotRef = useRef('');
   const [pickerOpen, setPickerOpen]       = useState(false);
   const [playerName, setPlayerName]           = useState('Player One');
   const [email, setEmail]                     = useState<string>('');
@@ -419,33 +421,25 @@ export default function ProfileScreen() {
       prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id],
     );
   };
-  // Main categories (Music/Film/Sport) — host-default som filtrerar quiz-
-  // poolen via backend-subject → MainCategory-mappning. Min 1 enforce:as i
-  // handleToggleMainCategory så listan aldrig blir tom (annars vore quiz-
-  // poolen tom). Default = alla 3 så fresh profiler ser inget beteendebyte.
-  const [enabledMainCategories, setEnabledMainCategories] = useState<MainCategory[]>(
+  // Per-source profession-category-defaults (ersätter enabledMainCategories).
+  const [youtubeEnabledCategories, setYoutubeEnabledCategories] = useState<MainCategory[]>(
     () => defaultEnabledMainCategories(),
   );
-  const handleToggleMainCategory = (cat: MainCategory) => {
-    setEnabledMainCategories((prev) => {
-      const isActive = prev.includes(cat);
-      if (isActive) {
-        // Min 1 main category måste vara aktiv — annars finns inga frågor
-        // att hämta i pool-filtret. Speglar Game Connections-källans
-        // motsvarande guard (min 1 av YouTube/Images).
-        if (prev.length <= 1) {
-          Alert.alert(
-            'At least one main category',
-            'Minimum 1 main category needs to be enabled. Activate another category before disabling this one.',
-          );
-          return prev;
-        }
-        return prev.filter((c) => c !== cat);
+  const [imagesEnabledCategories, setImagesEnabledCategories] = useState<MainCategory[]>(
+    () => defaultEnabledMainCategories(),
+  );
+  const handleToggleYoutubeCategory = (cat: MainCategory, value: boolean) => {
+    setYoutubeEnabledCategories((prev) => {
+      if (!value && prev.length <= 1) {
+        Alert.alert('YouTube sources', 'At least 1 profession type must be enabled for YouTube.');
+        return prev;
       }
-      // Lägg till och behåll deklarations-ordning (Music, Film, Sport) för
-      // stabil serialiserings-ordning mot DB.
-      return MAIN_CATEGORIES.filter((c) => c === cat || prev.includes(c));
+      if (value) return [...new Set([...prev, cat])] as MainCategory[];
+      return prev.filter((c) => c !== cat);
     });
+  };
+  const handleToggleImagesArtists = (value: boolean) => {
+    setImagesEnabledCategories(value ? ['Music', 'Film', 'Sport'] : ['Film', 'Sport']);
   };
   // V1 har inga themed packages i PURCHASED_PACKAGES (parkerade till v1.1+
   // per project_launch_scope_v1) och gen-paketen är borttagna 2026-05-27.
@@ -501,13 +495,14 @@ export default function ProfileScreen() {
           // tom så detta resulterar i tom array idag. Legacy gen-paket-ids
           // strippas nedanför.
           enabledHostPackages: data.enabledHostPackages ?? PURCHASED_PACKAGES.map((p) => p.id),
-          // Tom array (från en defekt klient som råkat skriva []) coerce:as
-          // till alla 3 så pool-filtret aldrig blir tomt och users alltid har
-          // content. UI:t enforce:ar min 1 men DB-defaulten är belt-and-
-          // suspenders.
-          enabledMainCategories:
-            data.enabledMainCategories && data.enabledMainCategories.length > 0
-              ? data.enabledMainCategories
+          // Per-source categories — default all 3 (safe fallback).
+          youtubeEnabledCategories:
+            data.youtubeEnabledCategories && data.youtubeEnabledCategories.length > 0
+              ? data.youtubeEnabledCategories
+              : defaultEnabledMainCategories(),
+          imagesEnabledCategories:
+            data.imagesEnabledCategories && data.imagesEnabledCategories.length > 0
+              ? data.imagesEnabledCategories
               : defaultEnabledMainCategories(),
         };
         // Strippa eventuellt kvarvarande gen-paket-id:n (pkg-gen-elder,
@@ -535,8 +530,8 @@ export default function ProfileScreen() {
           data.roundsDefault == null ||
           data.answerResponseSeconds == null ||
           packagesChanged ||
-          data.enabledMainCategories == null ||
-          data.enabledMainCategories.length === 0
+          !data.youtubeEnabledCategories || data.youtubeEnabledCategories.length === 0 ||
+          !data.imagesEnabledCategories || data.imagesEnabledCategories.length === 0
         );
         if (wasIncomplete) {
           saveProfile(augmented).catch(() => { /* silent — vyn fungerar ändå */ });
@@ -573,7 +568,26 @@ export default function ProfileScreen() {
           : ROUNDS_MAX_INDIV;
         setRoundsCount(Math.max(ROUNDS_MIN, Math.min(initialMax, savedRounds)));
         setEnabledHostPackages(augmented.enabledHostPackages ?? PURCHASED_PACKAGES.map((p) => p.id));
-        setEnabledMainCategories(augmented.enabledMainCategories ?? defaultEnabledMainCategories());
+        setYoutubeEnabledCategories(augmented.youtubeEnabledCategories ?? defaultEnabledMainCategories());
+        setImagesEnabledCategories(augmented.imagesEnabledCategories ?? defaultEnabledMainCategories());
+        // Snapshot av laddad state — jämförs vid navigation bort.
+        savedSnapshotRef.current = JSON.stringify({
+          birthYear: augmented.birthYear,
+          assistance: augmented.assistance,
+          gameEraFrom: augmented.gameEraFrom ?? 1981,
+          gameEraTo: augmented.gameEraTo ?? ERA_MAX,
+          gameMode: augmented.gameMode ?? 'pass-the-phone',
+          singlePlayerDefault: augmented.singlePlayerDefault ?? false,
+          maxPlayers: augmented.maxPlayers ?? 4,
+          roundsCount: Math.max(ROUNDS_MIN, Math.min(
+            (augmented.gameMode ?? 'pass-the-phone') === 'pass-the-phone' ? ROUNDS_MAX_PASS : ROUNDS_MAX_INDIV,
+            augmented.roundsDefault ?? ROUNDS_DEFAULT,
+          )),
+          answerResponseSeconds: augmented.answerResponseSeconds ?? 30,
+          youtubeEnabledCategories: augmented.youtubeEnabledCategories ?? defaultEnabledMainCategories(),
+          imagesEnabledCategories: augmented.imagesEnabledCategories ?? defaultEnabledMainCategories(),
+          enabledHostPackages: augmented.enabledHostPackages ?? [],
+        });
       });
       loadFriends().then((list) => {
         if (active) setFriends(list);
@@ -643,13 +657,61 @@ export default function ProfileScreen() {
         singlePlayerDefault,
         roundsDefault: roundsCount,
         enabledHostPackages,
-        enabledMainCategories,
+        youtubeEnabledCategories,
+        imagesEnabledCategories,
+      });
+      savedSnapshotRef.current = JSON.stringify({
+        birthYear, assistance,
+        gameEraFrom: eraValues[0], gameEraTo: eraValues[1],
+        gameMode, singlePlayerDefault, maxPlayers, roundsCount,
+        answerResponseSeconds, youtubeEnabledCategories,
+        imagesEnabledCategories, enabledHostPackages,
       });
       setSavedSection(section);
       setTimeout(() => setSavedSection(null), 2000);
     } catch {
       // TODO: visa felmeddelande till användaren om spara misslyckas
     }
+  };
+
+  // Jämför aktuell state mot load-snapshot — true om något ändrats.
+  const hasUnsavedChanges = (): boolean => {
+    const current = JSON.stringify({
+      birthYear, assistance,
+      gameEraFrom: eraValues[0], gameEraTo: eraValues[1],
+      gameMode, singlePlayerDefault, maxPlayers, roundsCount,
+      answerResponseSeconds, youtubeEnabledCategories,
+      imagesEnabledCategories, enabledHostPackages,
+    });
+    return current !== savedSnapshotRef.current;
+  };
+
+  // Interceptar navigation bort från Profile med osparade ändringar.
+  const guardedNavigate = (navigateFn: () => void) => {
+    if (!hasUnsavedChanges()) {
+      navigateFn();
+      return;
+    }
+    Alert.alert(
+      'Unsaved changes',
+      'Do you want to save your changes before leaving?',
+      [
+        {
+          text: "Don't save",
+          style: 'destructive',
+          onPress: () => navigateFn(),
+        },
+        {
+          text: 'Save',
+          onPress: async () => {
+            await handleSave('defaults');
+            await handleSave('host');
+            navigateFn();
+          },
+        },
+        { text: 'Stay', style: 'cancel' },
+      ],
+    );
   };
 
   const previewCaption =
@@ -783,7 +845,7 @@ export default function ProfileScreen() {
           login/edit på andra skärmar. */}
       <TopUserBanner
         onPress={() => setLogoutModalVisible(true)}
-        onBackPress={() => router.replace('/')}
+        onBackPress={() => guardedNavigate(() => router.replace('/'))}
       />
       <ScrollView
         ref={scrollRef}
@@ -1138,48 +1200,144 @@ export default function ProfileScreen() {
             </TouchableOpacity>
           </View>
 
-          {/* Main categories — host-default som filtrerar quiz-poolen via
-              backend-subject → MainCategory-mappning. Multi-select (Music
-              + Film + Sport), min 1 enforce:as i handleToggleMainCategory.
-              Speglar Game Mode-toggle:ns bordered-box-mönster men med
-              multi-select-semantik. */}
+          {/* Source × Category Matrix (kolumn-baserad layout) */}
           <View style={styles.field}>
-            <View style={styles.regionLabelRow}>
-              <Text style={styles.sectionLabel}>Main Profession Portfolio</Text>
-              <Pressable
-                style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                onPress={() => Alert.alert('Main Profession Portfolio', 'Questions are drawn from people whose main profession matches the selected type. People may also appear in other categories (e.g. an athlete in a film). At least 1 must be enabled.')}
-                hitSlop={8}
-              >
-                <Text style={styles.infoIconText}>i</Text>
-              </Pressable>
-            </View>
-            <View style={styles.mainCategoryToggle}>
-              {MAIN_CATEGORIES.map((cat) => {
-                const isActive = enabledMainCategories.includes(cat);
-                return (
+            <Text style={styles.sectionLabel}>SOURCE AND PROFESSIONS</Text>
+            <View style={styles.sourceMatrix}>
+              {/* Kolumn 0: källetiketter */}
+              <View style={styles.sourceMatrixLabelCol}>
+                <View style={styles.sourceMatrixHeaderCell} />
+                <View style={styles.sourceMatrixSourceRow}>
+                  <YouTubeBrandIcon size={20} />
+                  <Text style={styles.sourceMatrixSourceText}>YouTube</Text>
                   <Pressable
-                    key={cat}
-                    onPress={() => handleToggleMainCategory(cat)}
-                    style={[
-                      styles.mainCategoryBox,
-                      isActive ? styles.mainCategoryBoxActive : styles.mainCategoryBoxInactive,
-                    ]}
+                    onPress={() =>
+                      Alert.alert(
+                        'YouTube sources',
+                        '• Artists – includes music videos\n• Actors – includes movie clips & trailers\n• Athletes – includes sport events',
+                      )
+                    }
+                    hitSlop={8}
+                    style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
                   >
-                    <View style={[styles.mainCategoryFreeBadge, !isActive && styles.mainCategoryFreeBadgeGrey]}>
-                      <Text style={[styles.mainCategoryFreeBadgeText, !isActive && styles.mainCategoryFreeBadgeTextGrey]}>FREE</Text>
-                    </View>
-                    <Text
-                      style={[
-                        styles.mainCategoryLabel,
-                        isActive && styles.mainCategoryLabelActive,
-                      ]}
-                    >
-                      {MAIN_CATEGORY_LABELS[cat]}
-                    </Text>
+                    <Text style={styles.infoIconText}>i</Text>
                   </Pressable>
-                );
-              })}
+                </View>
+                <View style={styles.sourceMatrixSourceRow}>
+                  <View style={styles.imagesIconWrap}>
+                    <Svg width={20} height={20} viewBox="24 22 32 32">
+                      <Circle cx="40" cy="38" r="13" fill="none" stroke={Colors.primary} strokeWidth="2.5" />
+                      <Path d="M49 47 L53 51" stroke={Colors.primary} strokeWidth="2.5" strokeLinecap="round" />
+                    </Svg>
+                    <Text style={styles.imagesQMark}>?</Text>
+                  </View>
+                  <Text style={styles.sourceMatrixSourceText}>Images</Text>
+                  <Pressable
+                    onPress={() =>
+                      Alert.alert(
+                        'Images sources',
+                        'Artists is optional — toggle on or off.\n\nActors & Athletes are mandatory and always enabled for Images.',
+                      )
+                    }
+                    hitSlop={8}
+                    style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
+                    accessibilityLabel="Images source info"
+                  >
+                    <Text style={styles.infoIconText}>i</Text>
+                  </Pressable>
+                </View>
+              </View>
+
+              {/* Kolumn 1: Artists */}
+              <View style={styles.sourceMatrixDataCol}>
+                <View style={styles.sourceMatrixHeaderCell}>
+                  <Text style={styles.sourceMatrixHeaderText}>Artists</Text>
+                </View>
+                <View style={styles.sourceMatrixSwitchCell}>
+                  <Switch
+                    value={youtubeEnabledCategories.includes('Music')}
+                    onValueChange={(v) => handleToggleYoutubeCategory('Music', v)}
+                    trackColor={{ false: Colors.borderStrong, true: Colors.success }}
+                    thumbColor="#FFF"
+                    ios_backgroundColor={youtubeEnabledCategories.includes('Music') ? Colors.success : Colors.borderStrong}
+                    style={styles.profileSwitch}
+                  />
+                </View>
+                <View style={styles.sourceMatrixSwitchCell}>
+                  <Switch
+                    value={imagesEnabledCategories.includes('Music')}
+                    onValueChange={(v) => handleToggleImagesArtists(v)}
+                    trackColor={{ false: Colors.borderStrong, true: Colors.success }}
+                    thumbColor="#FFF"
+                    ios_backgroundColor={imagesEnabledCategories.includes('Music') ? Colors.success : Colors.borderStrong}
+                    style={styles.profileSwitch}
+                  />
+                </View>
+              </View>
+
+              {/* Kolumn 2: Actors */}
+              <View style={styles.sourceMatrixDataCol}>
+                <View style={styles.sourceMatrixHeaderCell}>
+                  <Text style={styles.sourceMatrixHeaderText}>Actors</Text>
+                </View>
+                <View style={styles.sourceMatrixSwitchCell}>
+                  <Switch
+                    value={youtubeEnabledCategories.includes('Film')}
+                    onValueChange={(v) => handleToggleYoutubeCategory('Film', v)}
+                    trackColor={{ false: Colors.borderStrong, true: Colors.success }}
+                    thumbColor="#FFF"
+                    ios_backgroundColor={youtubeEnabledCategories.includes('Film') ? Colors.success : Colors.borderStrong}
+                    style={styles.profileSwitch}
+                  />
+                </View>
+                <View style={styles.sourceMatrixSwitchCell}>
+                  <View style={styles.mandatorySwitchWrap}>
+                    <Switch
+                      value={true}
+                      onValueChange={() => Alert.alert('Mandatory source', 'Actors are always enabled for Images.')}
+                      trackColor={{ false: Colors.borderStrong, true: Colors.success }}
+                      thumbColor="#FFF"
+                      ios_backgroundColor={Colors.success}
+                      style={styles.profileSwitch}
+                    />
+                    <View style={styles.mandatoryOverlay} pointerEvents="none">
+                      <Text style={styles.mandatoryLockIcon}>🔒</Text>
+                    </View>
+                  </View>
+                </View>
+              </View>
+
+              {/* Kolumn 3: Athletes */}
+              <View style={styles.sourceMatrixDataCol}>
+                <View style={styles.sourceMatrixHeaderCell}>
+                  <Text style={styles.sourceMatrixHeaderText}>Athletes</Text>
+                </View>
+                <View style={styles.sourceMatrixSwitchCell}>
+                  <Switch
+                    value={youtubeEnabledCategories.includes('Sport')}
+                    onValueChange={(v) => handleToggleYoutubeCategory('Sport', v)}
+                    trackColor={{ false: Colors.borderStrong, true: Colors.success }}
+                    thumbColor="#FFF"
+                    ios_backgroundColor={youtubeEnabledCategories.includes('Sport') ? Colors.success : Colors.borderStrong}
+                    style={styles.profileSwitch}
+                  />
+                </View>
+                <View style={styles.sourceMatrixSwitchCell}>
+                  <View style={styles.mandatorySwitchWrap}>
+                    <Switch
+                      value={true}
+                      onValueChange={() => Alert.alert('Mandatory source', 'Athletes are always enabled for Images.')}
+                      trackColor={{ false: Colors.borderStrong, true: Colors.success }}
+                      thumbColor="#FFF"
+                      ios_backgroundColor={Colors.success}
+                      style={styles.profileSwitch}
+                    />
+                    <View style={styles.mandatoryOverlay} pointerEvents="none">
+                      <Text style={styles.mandatoryLockIcon}>🔒</Text>
+                    </View>
+                  </View>
+                </View>
+              </View>
             </View>
           </View>
 
@@ -2099,9 +2257,9 @@ export default function ProfileScreen() {
                 styles.logoutCreateGameBtn,
                 pressed && { opacity: 0.85 },
               ]}
-              onPress={handleCreateGame}
+              onPress={() => guardedNavigate(handleCreateGame)}
             >
-              <Text style={styles.logoutCreateGameBtnText}>Create Game</Text>
+              <Text style={styles.logoutCreateGameBtnText}>Start New Game</Text>
             </Pressable>
 
             {/* Join Game — as registered user. Navigerar till Home med
@@ -2114,12 +2272,12 @@ export default function ProfileScreen() {
                 styles.logoutCreateGameBtn,
                 pressed && { opacity: 0.85 },
               ]}
-              onPress={() => {
+              onPress={() => guardedNavigate(() => {
                 setLogoutModalVisible(false);
                 router.push('/?openJoinRegistered=1');
-              }}
+              })}
             >
-              <Text style={styles.logoutCreateGameBtnText}>Join Game</Text>
+              <Text style={styles.logoutCreateGameBtnText}>Join with Room code</Text>
             </Pressable>
 
             {/* Store-genväg — utan focus-param följer Store sin default-
@@ -2130,10 +2288,10 @@ export default function ProfileScreen() {
                 styles.logoutStoreBtn,
                 pressed && { opacity: 0.85 },
               ]}
-              onPress={() => {
+              onPress={() => guardedNavigate(() => {
                 setLogoutModalVisible(false);
                 router.push('/store?from=/profile');
-              }}
+              })}
             >
               <View style={styles.logoutStoreBtnInner}>
                 <ShoppingCartIcon size={22} />
@@ -3077,6 +3235,81 @@ const styles = StyleSheet.create({
   premiumBadgeTextGrey: {
     color: '#FFF',
   },
+  // ── Source × Category Matrix (kolumn-baserad, speglar LobbyScreen) ─────
+  sourceMatrix: {
+    flexDirection: 'row',
+    paddingTop: Spacing.sm,
+  },
+  sourceMatrixLabelCol: {
+    width: 100,
+    flexShrink: 0,
+  },
+  sourceMatrixHeaderCell: {
+    height: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sourceMatrixSourceRow: {
+    height: 44,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  sourceMatrixSourceText: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.semibold,
+    color: Colors.textPrimary,
+  },
+  sourceMatrixDataCol: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  sourceMatrixHeaderText: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.semibold,
+    color: Colors.textPrimary,
+    textAlign: 'center',
+  },
+  sourceMatrixSwitchCell: {
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  mandatorySwitchWrap: {
+    position: 'relative',
+  },
+  mandatoryOverlay: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    right: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  mandatoryLockIcon: {
+    fontSize: 10,
+    lineHeight: 13,
+  },
+  imagesIconWrap: {
+    width: 20,
+    height: 20,
+    position: 'relative',
+  },
+  imagesQMark: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    textAlign: 'center',
+    lineHeight: 20,
+    color: Colors.primary,
+    fontSize: 9,
+    fontWeight: FontWeight.bold,
+  },
+  // Switch-style för matrix i Profile
+  profileSwitch: {
+    transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }],
+  },
   // "Use single player mode as default"-rad ovanför Game Mode-toggle:n.
   singlePlayerRow: {
     flexDirection: 'row',
@@ -3304,7 +3537,7 @@ const styles = StyleSheet.create({
   packageFreeBadge: {
     position: 'absolute',
     top: -8,
-    right: 8,
+    right: 14,
     backgroundColor: Colors.success,
     borderRadius: 4,
     paddingHorizontal: 6,

@@ -73,12 +73,11 @@ export interface ProfileData {
   // visas inte alls i Lobby. Optional för bakåtkompat — defaultas till alla
   // PURCHASED_PACKAGES-id:n (allt aktiverat) i UI.
   enabledHostPackages?: string[];
-  // Lista över huvudkategorier (Music/Film/Sport) som host har aktiverat
-  // som default vid skapande av spel. Filtrerar quiz-poolen i quiz.tsx via
-  // backend-subject → MainCategory-mappning. Optional för bakåtkompat —
-  // defaultas till alla 3 i UI (befintliga users ser inget beteendebyte).
-  // Min 1 enforce:as i UI så filtret aldrig blir tomt.
-  enabledMainCategories?: MainCategory[];
+  // Per-source profession-category-defaults (ersätter enabledMainCategories).
+  // YouTube: alla tre valbara, min 1 krävs. Default = alla 3.
+  // Images: Film+Sport är mandatory (alltid i arrayen), Music valbar. Default = alla 3.
+  youtubeEnabledCategories?: MainCategory[];
+  imagesEnabledCategories?: MainCategory[];
 }
 
 // Dual-read mapping för profiler skapade innan rename
@@ -188,7 +187,10 @@ function rowToProfile(row: ProfileRow): ProfileData {
     gameMode: row.game_mode,
     singlePlayerDefault: row.single_player_default,
     enabledHostPackages: row.enabled_host_packages,
-    enabledMainCategories: (row.enabled_main_categories ?? []).filter(isMainCategory),
+    // Dual-read: läs nya per-source-fält om de finns, annars migrera från
+    // gamla enabled_main_categories (alla tre → båda sources all-on; annars defaults).
+    youtubeEnabledCategories: ((row as any).youtube_enabled_categories as string[] | undefined)?.filter(isMainCategory) as MainCategory[] | undefined,
+    imagesEnabledCategories: ((row as any).images_enabled_categories as string[] | undefined)?.filter(isMainCategory) as MainCategory[] | undefined,
     roundsDefault: row.rounds_count,
   };
 }
@@ -216,7 +218,11 @@ function profileToRow(userId: string, email: string, p: ProfileData): ProfileRow
     game_mode: p.gameMode ?? 'pass-the-phone',
     single_player_default: p.singlePlayerDefault ?? false,
     enabled_host_packages: p.enabledHostPackages ?? [],
-    enabled_main_categories: p.enabledMainCategories ?? defaultEnabledMainCategories(),
+    // Gamla kolumn bevaras för bakåt-kompatibilitet (migration 0014 behövs för nya kolumner).
+    enabled_main_categories: defaultEnabledMainCategories(),
+    // Migration 0014: per-source category-kolumner (ej i DB ännu — skrivs när kolumnerna finns).
+    // youtube_enabled_categories: p.youtubeEnabledCategories ?? defaultEnabledMainCategories(),
+    // images_enabled_categories: p.imagesEnabledCategories ?? defaultImagesEnabledCategories(),
     rounds_count: p.roundsDefault ?? 4,
   };
 }
@@ -289,7 +295,23 @@ export async function loadProfile(): Promise<ProfileData | null> {
 
   if (row) {
     if (__DEV__) console.log('[profileStorage] loadProfile: found profiles row');
-    const profile = rowToProfile(row as ProfileRow);
+    let profile = rowToProfile(row as ProfileRow);
+    // Migration 0014: youtube_enabled_categories / images_enabled_categories finns
+    // inte i DB förrän migrationen körts. Merge från AsyncStorage-cache om fälten
+    // saknas i DB-raden, annars förlorar Profile-settings sin effekt vid nästa
+    // Create Game (Lobby seedar från loadProfile-resultatet).
+    if (!profile.youtubeEnabledCategories?.length || !profile.imagesEnabledCategories?.length) {
+      const cached = await loadFromAsyncStorage();
+      profile = {
+        ...profile,
+        youtubeEnabledCategories: profile.youtubeEnabledCategories?.length
+          ? profile.youtubeEnabledCategories
+          : cached?.youtubeEnabledCategories,
+        imagesEnabledCategories: profile.imagesEnabledCategories?.length
+          ? profile.imagesEnabledCategories
+          : cached?.imagesEnabledCategories,
+      };
+    }
     const { data: refreshed, changed } = refreshFreeCreditsIfNeeded(profile);
     // Cache till AsyncStorage så efterföljande loads har varm fallback.
     AsyncStorage.setItem(PROFILE_KEY, JSON.stringify(refreshed)).catch((err) => {
@@ -383,7 +405,8 @@ async function backfillProfileFromSession(user: { id: string; email?: string; us
     singlePlayerDefault: cache?.singlePlayerDefault,
     roundsDefault: cache?.roundsDefault,
     enabledHostPackages: cache?.enabledHostPackages,
-    enabledMainCategories: cache?.enabledMainCategories,
+    youtubeEnabledCategories: cache?.youtubeEnabledCategories,
+    imagesEnabledCategories: cache?.imagesEnabledCategories,
   };
 
   // Persistera mot Supabase. Vi använder upsert eftersom raden kan ha

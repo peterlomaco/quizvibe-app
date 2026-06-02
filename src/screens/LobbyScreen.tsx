@@ -52,7 +52,7 @@ import { deactivateRoom, getRoomMeta, markRoomGameStarted, roomExists, setRoomMa
 import { clearEjected, isEjected, markEjected } from '../utils/ejectedPlayers';
 import { clearLobbyPlayers, getLobbyPlayers, markOwnPlayerLeft, setLobbyPlayers, upsertOwnLobbyPlayer } from '../utils/mockLobbyPlayers';
 import { clearLobbySettings, getLobbySettings, setLobbySettings } from '../utils/mockLobbySettings';
-import { MAIN_CATEGORIES, MAIN_CATEGORY_LABELS, defaultEnabledMainCategories, subjectToMainCategory, type MainCategory } from '../utils/mainCategory';
+import { defaultEnabledMainCategories, subjectToMainCategory, type MainCategory } from '../utils/mainCategory';
 import { MUSIC_QUESTIONS } from '../utils/musicQuestions';
 import { IMAGE_QUIZ_QUESTIONS } from '../utils/quizImageQuestions';
 import { supabase } from '../utils/supabase';
@@ -1149,26 +1149,31 @@ export default function LobbyScreen() {
           setRoundsCount(
             Math.max(ROUNDS_MIN, Math.min(initialMax, savedRounds)),
           );
-          // Game Connections-toggles + extra-paket från stored om finns,
-          // annars profil-default (= alla paket aktiverade).
+          // Per-source categories + extra-paket från stored (carry-over) om finns,
+          // annars profil-default, annars all 3 (defensive fallback).
           if (stored) {
             setSelectedExtraPackages(stored.selectedExtraPackages);
-            setYoutubeEnabled(stored.youtubeEnabled);
-            setImagesEnabled(stored.imagesEnabled);
             setSketchEnabled(stored.sketchEnabled);
           }
           setEnabledHostPackages(
             profile?.enabledHostPackages ?? PURCHASED_PACKAGES.map((p) => p.id),
           );
-          // Main categories — prio: stored (carry-over från previous Play
-          // Again) > profil (host-default) > all 3 (defensive fallback).
-          const seedMainCategories =
-            stored?.enabledMainCategories && stored.enabledMainCategories.length > 0
-              ? stored.enabledMainCategories
-              : profile?.enabledMainCategories && profile.enabledMainCategories.length > 0
-                ? profile.enabledMainCategories
+          // YouTube categories — prio: stored > profil > all 3.
+          const seedYtCats =
+            stored?.youtubeEnabledCategories && stored.youtubeEnabledCategories.length > 0
+              ? stored.youtubeEnabledCategories
+              : profile?.youtubeEnabledCategories && profile.youtubeEnabledCategories.length > 0
+                ? profile.youtubeEnabledCategories
                 : defaultEnabledMainCategories();
-          setEnabledMainCategories(seedMainCategories);
+          setYoutubeEnabledCategories(seedYtCats);
+          // Images categories — prio: stored > profil > all 3 (incl. mandatory).
+          const seedImgCats =
+            stored?.imagesEnabledCategories && stored.imagesEnabledCategories.length > 0
+              ? stored.imagesEnabledCategories
+              : profile?.imagesEnabledCategories && profile.imagesEnabledCategories.length > 0
+                ? profile.imagesEnabledCategories
+                : defaultEnabledMainCategories();
+          setImagesEnabledCategories(seedImgCats);
         },
       );
     }
@@ -1560,13 +1565,15 @@ export default function LobbyScreen() {
       return next;
     });
   }, [roundsMax]);
-  // YouTube är alltid tillgänglig som källa, men host kan slå av/på manuellt
-  // via en toggle. Default = på. Skickas till alla via lobbyns state.
-  const [youtubeEnabled, setYoutubeEnabled] = useState(true);
-  // "Profiles"-källan har två under-toggles: Images (foto) + Sketch (doodle).
-  // Images default på; Sketch default AV (doodlen är prototyp, ej wirad till
-  // quiz-poolen — toggeln är strukturell tills den kopplas in).
-  const [imagesEnabled, setImagesEnabled] = useState(true);
+  // Per-source profession-category-filter (ersätter youtubeEnabled/imagesEnabled/enabledMainCategories).
+  // YouTube: alla tre valbara, min 1 krävs. Images: Film+Sport mandatory, Music valbar.
+  const [youtubeEnabledCategories, setYoutubeEnabledCategories] = useState<MainCategory[]>(
+    () => defaultEnabledMainCategories(),
+  );
+  const [imagesEnabledCategories, setImagesEnabledCategories] = useState<MainCategory[]>(
+    () => defaultEnabledMainCategories(),
+  );
+  // Sketch — prototyp, ej wirad till quiz-poolen. Strukturell placeholder.
   const [sketchEnabled, setSketchEnabled] = useState(false);
   // Kollapsbara Lobby-sektioner (samma +/− mönster som Profile-vyn). Default expanderade.
   // Alla (host OCH non-host) kommer in med Game Settings + Quiz Tuning REDAN
@@ -1614,28 +1621,25 @@ export default function LobbyScreen() {
     setScrollHintAtBottom(distanceFromBottom <= 24);
     setScrollHintScrollable(contentSize.height > layoutMeasurement.height + 24);
   }, []);
-  // Main categories (Music/Film/Sport) — host-toggleln filtrerar quiz-poolen
-  // via backend-subject → MainCategory-mappning. Min 1 enforce:as i
-  // handleToggleMainCategory så listan aldrig blir tom. Seedas från host:s
-  // profil i host-seed-effekten; non-host syncar via mockLobbySettings-pollning.
-  const [enabledMainCategories, setEnabledMainCategories] = useState<MainCategory[]>(
-    () => defaultEnabledMainCategories(),
-  );
-  const handleToggleMainCategory = (cat: MainCategory) => {
-    setEnabledMainCategories((prev) => {
-      const isActive = prev.includes(cat);
-      if (isActive) {
-        if (prev.length <= 1) {
-          Alert.alert(
-            'At least one main category',
-            'Minimum 1 main category needs to be enabled. Activate another category before disabling this one.',
-          );
-          return prev;
-        }
-        return prev.filter((c) => c !== cat);
+  // YouTube category-toggle: min 1 måste vara aktiv.
+  const handleToggleYoutubeCategory = (cat: MainCategory, value: boolean) => {
+    setYoutubeEnabledCategories((prev) => {
+      if (!value && prev.length <= 1) {
+        Alert.alert(
+          'YouTube sources',
+          'At least 1 profession type must be enabled for YouTube.',
+        );
+        return prev;
       }
-      return MAIN_CATEGORIES.filter((c) => c === cat || prev.includes(c));
+      if (value) return [...new Set([...prev, cat])] as MainCategory[];
+      return prev.filter((c) => c !== cat);
     });
+  };
+  // Images Artists-toggle: Actors+Athletes är mandatory (alltid på).
+  const handleToggleImagesArtists = (value: boolean) => {
+    setImagesEnabledCategories(
+      value ? ['Music', 'Film', 'Sport'] : ['Film', 'Sport'],
+    );
   };
   // Use Packages — Basic-utbudet är alltid implicit aktivt (ingen UI). Hosten
   // kan välja till extra-paket ovanpå. Knytningen mellan packages och
@@ -1874,25 +1878,9 @@ export default function LobbyScreen() {
     !hostMode &&
     !!ownPlayerIdRef.current &&
     players.some((p) => p.id === ownPlayerIdRef.current && !!p.approved);
-  // Minst en Game Connection-källa måste vara aktiv — annars finns inget
-  // underlag att hämta frågor från. Räkna aktiva källor och blockera när
-  // användaren försöker stänga av den enda kvarvarande.
-  const enabledSourceCount =
-    (youtubeEnabled ? 1 : 0) + (imagesEnabled ? 1 : 0);
-  const handleToggleSource = (
-    currentlyEnabled: boolean,
-    setter: (v: boolean) => void,
-    nextValue: boolean,
-  ) => {
-    if (!nextValue && currentlyEnabled && enabledSourceCount === 1) {
-      Alert.alert(
-        'Game connections',
-        'Minimum 1 Game connection source needs to be enabled.',
-      );
-      return;
-    }
-    setter(nextValue);
-  };
+  // YouTube aktiv om min 1 kategori vald; Images alltid aktiv (mandatory categories).
+  const youtubeEnabled = youtubeEnabledCategories.length > 0;
+  const imagesEnabled = true;
   // displayEra speglar realtids-värdet under drag och commitat värde
   // däremellan — så box "1990 – 2020" + youngest-player-warning uppdateras
   // live medan host drar utan att vi behöver toucha lib:ns prop.
@@ -2358,10 +2346,9 @@ export default function LobbyScreen() {
         eraTo: eraValues[1],
         roundsCount,
         selectedExtraPackages,
-        youtubeEnabled,
-        imagesEnabled,
+        youtubeEnabledCategories,
+        imagesEnabledCategories,
         sketchEnabled,
-        enabledMainCategories,
       }).catch(() => { /* loggas i mockLobbySettings */ });
     }, 300);
     return () => clearTimeout(handle);
@@ -2375,10 +2362,9 @@ export default function LobbyScreen() {
     eraValues,
     roundsCount,
     selectedExtraPackages,
-    youtubeEnabled,
-    imagesEnabled,
+    youtubeEnabledCategories,
+    imagesEnabledCategories,
     sketchEnabled,
-    enabledMainCategories,
   ]);
 
   // Realtime-tick: bumpas av lobby_players + lobby_settings-channel-
@@ -2419,19 +2405,19 @@ export default function LobbyScreen() {
         }
         return stored.selectedExtraPackages;
       });
-      setYoutubeEnabled(stored.youtubeEnabled);
-      setImagesEnabled(stored.imagesEnabled);
       setSketchEnabled(stored.sketchEnabled);
-      // Main categories — coerce tom array till alla 3 så pool-filtret
-      // aldrig blir tomt om host:s skrivning skulle ha landat ofullständig.
-      setEnabledMainCategories((prev) => {
-        const next = stored.enabledMainCategories.length > 0
-          ? stored.enabledMainCategories
+      // Per-source categories — coerce tom array till defaults (safe fallback).
+      setYoutubeEnabledCategories((prev) => {
+        const next = stored.youtubeEnabledCategories.length > 0
+          ? stored.youtubeEnabledCategories
           : defaultEnabledMainCategories();
-        if (prev.length === next.length && prev.every((c, i) => c === next[i])) {
-          return prev;
-        }
-        return next;
+        return prev.length === next.length && prev.every((c, i) => c === next[i]) ? prev : next;
+      });
+      setImagesEnabledCategories((prev) => {
+        const next = stored.imagesEnabledCategories.length > 0
+          ? stored.imagesEnabledCategories
+          : defaultEnabledMainCategories();
+        return prev.length === next.length && prev.every((c, i) => c === next[i]) ? prev : next;
       });
     };
     syncFromStore();
@@ -2644,14 +2630,12 @@ export default function LobbyScreen() {
         const effectiveEraFrom = settingsStored?.eraFrom ?? eraValues[0];
         const effectiveEraTo = settingsStored?.eraTo ?? eraValues[1];
         const effectiveRoundsCount = settingsStored?.roundsCount ?? roundsCount;
-        // Game Connections-källor — KRITISKT att non-host får samma värden
+        // Per-source categories — KRITISKT att non-host får samma värden
         // som host så båda enheter bygger identisk gameQuestions-pool.
-        // Annars ser host bara YouTube-frågor medan non-host får
-        // alternerande mix → desync på spelets fråge-typ.
-        const effectiveYoutubeEnabled =
-          settingsStored?.youtubeEnabled ?? youtubeEnabled;
-        const effectiveProfilesEnabled =
-          settingsStored?.imagesEnabled ?? imagesEnabled;
+        const effectiveYtCats =
+          settingsStored?.youtubeEnabledCategories ?? youtubeEnabledCategories;
+        const effectiveImgCats =
+          settingsStored?.imagesEnabledCategories ?? imagesEnabledCategories;
         // Approved spelare: nästa steg beror på gameMode.
         // - Pass-the-Phone: bara host spelar på sin telefon → vänligare
         //   popup "Host has started... use the Host device".
@@ -2692,21 +2676,13 @@ export default function LobbyScreen() {
               answerResponseSeconds: String(effectiveAnswerResponseSeconds),
               eraFrom: String(effectiveEraFrom),
               eraTo: String(effectiveEraTo),
-              youtubeEnabled: String(effectiveYoutubeEnabled),
-              imagesEnabled: String(effectiveProfilesEnabled),
+              youtubeEnabledCategories: JSON.stringify(effectiveYtCats),
+              imagesEnabledCategories: JSON.stringify(effectiveImgCats),
               // Theme packages aktiva i lobby:n vid speltillfället (non-host
               // path — efter Realtime-detection av game-started). Speglar
               // host-path:en så HistoryEntry får samma data oavsett vilken
               // enhet som triggade navigation till /quiz.
               selectedExtraPackages: JSON.stringify(settingsStored?.selectedExtraPackages ?? []),
-              // Main categories — non-host använder host:s synkade värde från
-              // settingsStored. Fallback till lokal state om settings ännu
-              // inte är skrivna (osannolikt vid game-started-detection).
-              enabledMainCategories: JSON.stringify(
-                settingsStored?.enabledMainCategories && settingsStored.enabledMainCategories.length > 0
-                  ? settingsStored.enabledMainCategories
-                  : enabledMainCategories,
-              ),
               roomCode,
             },
           });
@@ -2916,27 +2892,26 @@ export default function LobbyScreen() {
     // efter att ha valt Sport-only + 2016-2026. Fångas nu här.
     const eraFrom = eraValues[0];
     const eraTo = eraValues[1];
-    const isAllCats =
-      enabledMainCategories.length === 3 &&
-      enabledMainCategories.includes('Music') &&
-      enabledMainCategories.includes('Film') &&
-      enabledMainCategories.includes('Sport');
-    const matchesCategory = (mc: MainCategory | null) =>
-      isAllCats ? true : mc !== null && enabledMainCategories.includes(mc);
+    const ytCatsAll = youtubeEnabledCategories.length === 3;
+    const matchesYtCat = (mc: MainCategory | null) =>
+      ytCatsAll ? true : mc !== null && youtubeEnabledCategories.includes(mc);
+    const imgCatsAll = imagesEnabledCategories.length === 3;
+    const matchesImgCat = (mc: MainCategory | null) =>
+      imgCatsAll ? true : mc !== null && imagesEnabledCategories.includes(mc);
     const hasMusicHit = youtubeEnabled && MUSIC_QUESTIONS.some(
       (q) =>
         q.correctYear >= eraFrom &&
         q.correctYear <= eraTo &&
-        matchesCategory(subjectToMainCategory(q.contentSubject)),
+        matchesYtCat(subjectToMainCategory(q.contentSubject)),
     );
-    const hasImageHit = imagesEnabled && IMAGE_QUIZ_QUESTIONS.some((q) => {
+    const hasImageHit = IMAGE_QUIZ_QUESTIONS.some((q) => {
       let inEra = true;
       if (q.peakFrom !== undefined && q.peakTo !== undefined) {
         inEra = eraFrom <= q.peakTo && eraTo >= q.peakFrom;
       } else if (q.correctYear !== undefined) {
         inEra = q.correctYear >= eraFrom && q.correctYear <= eraTo;
       }
-      return inEra && matchesCategory(subjectToMainCategory(q.contentSubject));
+      return inEra && matchesImgCat(subjectToMainCategory(q.contentSubject));
     });
     if (!hasMusicHit && !hasImageHit) {
       Alert.alert(
@@ -3138,23 +3113,15 @@ export default function LobbyScreen() {
         // genom att skriva clamped till lobbySettings.
         eraFrom: String(eraValues[0]),
         eraTo: String(eraValues[1]),
-        // Game Connections-källor — quiz.tsx gatar fråge-poolen på dessa
-        // (YouTube off → items med youtubeClips faller bort; Profiles off
-        // → image-items faller bort). Minst en MÅSTE vara på (Lobby
-        // blockar avstängning av sista källan), så båda-off-fallet är
-        // skyddat upstream.
-        youtubeEnabled: String(youtubeEnabled),
-        imagesEnabled: String(imagesEnabled),
+        // Per-source category-filter. quiz.tsx filtrerar YouTube-pool mot
+        // youtubeEnabledCategories och image-pool mot imagesEnabledCategories.
+        youtubeEnabledCategories: JSON.stringify(youtubeEnabledCategories),
+        imagesEnabledCategories: JSON.stringify(imagesEnabledCategories),
         // Theme packages aktiva i lobby:n vid speltillfället. JSON-stringifierad
         // array av paket-IDs (tom array = Generic). quiz.tsx läser detta för
         // att frysa in i HistoryEntry så Player history visar vilket paket
         // spelet kördes med.
         selectedExtraPackages: JSON.stringify(selectedExtraPackages),
-        // Main categories aktiverade i lobby:n. JSON-stringifierad array av
-        // MainCategory-strings (Music/Film/Sport). quiz.tsx läser detta i
-        // gameQuestions-useMemo:n för att filtrera pool:en. UI:t enforce:ar
-        // min 1 enabled så listan kan inte vara tom här.
-        enabledMainCategories: JSON.stringify(enabledMainCategories),
         // Skickas så Quit Game-flödet i quiz.tsx kan deactivera rummet
         // och rensa leftPlayers när host avslutar mitt i ett spel.
         roomCode,
@@ -3533,144 +3500,155 @@ export default function LobbyScreen() {
             med färgade brand-badges (kompakt list-format). marginTop ger lite
             extra luft mellan Game Mode-beskrivningen och denna rubrik. */}
         <View style={[styles.section, { marginTop: Spacing.sm }]}>
-          <Text style={styles.sectionLabel}>Game Connections</Text>
+          <Text style={styles.sectionLabel}>SOURCE AND PROFESSIONS</Text>
           <View style={styles.connectionsList}>
-            {/* YouTube — alltid tillgänglig, host kan toggla av/på manuellt.
-                Enabled-pillen får grön kantlinje + FREE-badge (samma border-
-                skärande badge-mönster som Pass-the-Phone-knappen). Switchen
-                till höger är host-only och får grön track när på, röd när av.
-                Ikonen är YouTube:s officiella play-button (röd rounded-rect
-                + vit triangel) per deras Branding Guidelines — signalerar
-                tydligt att klippen kommer från YouTube. */}
-            <View style={styles.connectionRow}>
-              <View style={styles.connectionIconWrap}>
-                <YouTubeBrandIcon size={28} />
-              </View>
-              <Text style={styles.connectionLabel}>YouTube</Text>
-              {/* FREE-badgen sitter alltid kvar — i Enabled-läge med grön bg
-                  och svart text, i Disabled-läge med grå bg och dämpad text
-                  så den signalerar "ingår gratis" utan att konkurrera med
-                  Disabled-pillens budskap. */}
-              <View style={youtubeEnabled ? styles.youtubeEnabledPill : styles.statusPillDisabled}>
-                <Text style={youtubeEnabled ? styles.youtubeEnabledText : styles.statusPillTextDisabled}>
-                  {youtubeEnabled ? 'Enabled' : 'Disabled'}
-                </Text>
-                <View
-                  style={[styles.freeBadgeSmall, !youtubeEnabled && styles.freeBadgeSmallGrey]}
-                  pointerEvents="none"
-                >
-                  <Text style={[styles.freeBadgeTextSmall, !youtubeEnabled && styles.freeBadgeSmallTextGrey]}>
-                    FREE
-                  </Text>
+            {/* ── Source × Category Matrix (kolumn-baserad layout) ──────
+                Kolumn-layout garanterar att varje rubrik och dess switchar
+                delar exakt samma horisontella position — radbaserad layout
+                kan ge sub-pixel-offset beroende på innehållsbredd. */}
+            <View style={styles.sourceMatrix}>
+              {/* Kolumn 0: källetiketter */}
+              <View style={styles.sourceMatrixLabelCol}>
+                <View style={styles.sourceMatrixHeaderCell} />
+                <View style={styles.sourceMatrixSourceRow}>
+                  <YouTubeBrandIcon size={22} />
+                  <Text style={styles.sourceMatrixSourceText}>YouTube</Text>
+                  <Pressable
+                    onPress={() =>
+                      Alert.alert(
+                        'YouTube sources',
+                        '• Artists – includes music videos\n• Actors – includes movie clips & trailers\n• Athletes – includes sport events',
+                      )
+                    }
+                    hitSlop={8}
+                    style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
+                    accessibilityLabel="YouTube source info"
+                  >
+                    <Text style={styles.infoIconText}>i</Text>
+                  </Pressable>
+                </View>
+                <View style={styles.sourceMatrixSourceRow}>
+                  <View style={styles.imagesIconWrap}>
+                    <Svg width={22} height={22} viewBox="24 22 32 32">
+                      <Circle cx="40" cy="38" r="13" fill="none" stroke={Colors.primary} strokeWidth="2.5" />
+                      <Path d="M49 47 L53 51" stroke={Colors.primary} strokeWidth="2.5" strokeLinecap="round" />
+                    </Svg>
+                    <Text style={styles.imagesQMark}>?</Text>
+                  </View>
+                  <Text style={styles.sourceMatrixSourceText}>Images</Text>
+                  <Pressable
+                    onPress={() =>
+                      Alert.alert(
+                        'Images sources',
+                        'Artists is optional — toggle on or off.\n\nActors & Athletes are mandatory and always enabled for Images.',
+                      )
+                    }
+                    hitSlop={8}
+                    style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
+                    accessibilityLabel="Images source info"
+                  >
+                    <Text style={styles.infoIconText}>i</Text>
+                  </Pressable>
                 </View>
               </View>
-              {hostMode && (
-                <Switch
-                  value={youtubeEnabled}
-                  onValueChange={(v) => handleToggleSource(youtubeEnabled, setYoutubeEnabled, v)}
-                  trackColor={{ false: Colors.error, true: Colors.success }}
-                  thumbColor="#FFF"
-                  // iOS native Switch:s track-fill är något smalare än outer
-                  // pill, så `ios_backgroundColor` läcker som en tunn röd
-                  // flärd vid kanterna även när toggle är ON. Synca med
-                  // aktiv track-färg så ingen röd flärd syns när aktiverad.
-                  ios_backgroundColor={youtubeEnabled ? Colors.success : Colors.error}
-                  style={styles.connectionSwitch}
-                />
-              )}
-            </View>
-            {/* ── Profiles Images ── foto-biblioteket (riktiga bilder +
-                  mosaik-reveal). Q-cirkel med "?"-glyph. Räknas i min-1-
-                  guarden (handleToggleSource). Tidigare "Profiles"-förälder
-                  med Images + Sketch-undertoggles — "Profiles"-rubriken + hela
-                  Sketch-alternativet borttaget ur lobbyn 2026-06-01 (doodlen
-                  var aldrig wirad till quiz-poolen). `sketchEnabled`-state
-                  lämnas som död plumbing så settings/DB-synken är orörd. */}
-            <View style={styles.connectionRow}>
-              <View style={styles.connectionIconWrap}>
-                <Svg width={28} height={28} viewBox="24 22 32 32" style={StyleSheet.absoluteFillObject}>
-                  <Circle cx="40" cy="38" r="13" fill="none" stroke={Colors.primary} strokeWidth="2.5" />
-                  <Path d="M49 47 L53 51" stroke={Colors.primary} strokeWidth="2.5" strokeLinecap="round" />
-                </Svg>
-                <Text style={styles.connectionIconAiText}>?</Text>
-              </View>
-              <Text style={styles.connectionLabel}>Profiles Images</Text>
-              <View style={imagesEnabled ? styles.youtubeEnabledPill : styles.statusPillDisabled}>
-                <Text style={imagesEnabled ? styles.youtubeEnabledText : styles.statusPillTextDisabled}>
-                  {imagesEnabled ? 'Enabled' : 'Disabled'}
-                </Text>
-                <View
-                  style={[styles.freeBadgeSmall, !imagesEnabled && styles.freeBadgeSmallGrey]}
-                  pointerEvents="none"
-                >
-                  <Text style={[styles.freeBadgeTextSmall, !imagesEnabled && styles.freeBadgeSmallTextGrey]}>
-                    FREE
-                  </Text>
-                </View>
-              </View>
-              {hostMode && (
-                <Switch
-                  value={imagesEnabled}
-                  onValueChange={(v) => handleToggleSource(imagesEnabled, setImagesEnabled, v)}
-                  trackColor={{ false: Colors.error, true: Colors.success }}
-                  thumbColor="#FFF"
-                  ios_backgroundColor={imagesEnabled ? Colors.success : Colors.error}
-                  style={styles.connectionSwitch}
-                />
-              )}
-            </View>
 
-            {/* Main categories — host-toggle som filtrerar quiz-poolen via
-                backend-subject → MainCategory-mappning. Mellan Game
-                Connections-källorna (YouTube/Images ovan) och Customized
-                Host packages-sub-blocket nedan. Speglar Profile:s
-                motsvarande sektion 1:1 men visas för alla i lobbyn —
-                host-only-tap via disabled-flagga. Min 1 enforce:as i
-                handleToggleMainCategory så listan aldrig blir tom. */}
-            <View style={styles.mainCategoryBlock}>
-              <View style={styles.regionLabelRow}>
-                <Text style={styles.sectionLabel}>Main Profession Portfolio</Text>
-                <Pressable
-                  style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                  onPress={() =>
-                    Alert.alert(
-                      'Main Profession Portfolio',
-                      'Questions are drawn from people whose main profession matches the selected type. People may also appear in other categories (e.g. an athlete in a film). At least 1 must be enabled.',
-                    )
-                  }
-                  hitSlop={8}
-                  accessibilityLabel="Main Profession Portfolio info"
-                >
-                  <Text style={styles.infoIconText}>i</Text>
-                </Pressable>
+              {/* Kolumn 1: Artists */}
+              <View style={styles.sourceMatrixDataCol}>
+                <View style={styles.sourceMatrixHeaderCell}>
+                  <Text style={styles.sourceMatrixHeaderText}>Artists</Text>
+                </View>
+                <View style={styles.sourceMatrixSwitchCell}>
+                  <Switch
+                    value={youtubeEnabledCategories.includes('Music')}
+                    onValueChange={(v) => handleToggleYoutubeCategory('Music', v)}
+                    disabled={!hostMode}
+                    trackColor={{ false: Colors.borderStrong, true: Colors.success }}
+                    thumbColor="#FFF"
+                    ios_backgroundColor={youtubeEnabledCategories.includes('Music') ? Colors.success : Colors.borderStrong}
+                    style={styles.sourceMatrixSwitch}
+                  />
+                </View>
+                <View style={styles.sourceMatrixSwitchCell}>
+                  <Switch
+                    value={imagesEnabledCategories.includes('Music')}
+                    onValueChange={(v) => handleToggleImagesArtists(v)}
+                    disabled={!hostMode}
+                    trackColor={{ false: Colors.borderStrong, true: Colors.success }}
+                    thumbColor="#FFF"
+                    ios_backgroundColor={imagesEnabledCategories.includes('Music') ? Colors.success : Colors.borderStrong}
+                    style={styles.sourceMatrixSwitch}
+                  />
+                </View>
               </View>
-              <View style={styles.mainCategoryToggle}>
-                {MAIN_CATEGORIES.map((cat) => {
-                  const isActive = enabledMainCategories.includes(cat);
-                  return (
-                    <Pressable
-                      key={cat}
-                      onPress={() => handleToggleMainCategory(cat)}
-                      disabled={!hostMode}
-                      style={[
-                        styles.mainCategoryBox,
-                        isActive ? styles.mainCategoryBoxActive : styles.mainCategoryBoxInactive,
-                      ]}
-                    >
-                      <View style={[styles.mainCategoryFreeBadge, !isActive && styles.mainCategoryFreeBadgeGrey]}>
-                        <Text style={[styles.mainCategoryFreeBadgeText, !isActive && styles.mainCategoryFreeBadgeTextGrey]}>FREE</Text>
-                      </View>
-                      <Text
-                        style={[
-                          styles.mainCategoryLabel,
-                          isActive && styles.mainCategoryLabelActive,
-                        ]}
-                      >
-                        {MAIN_CATEGORY_LABELS[cat]}
-                      </Text>
-                    </Pressable>
-                  );
-                })}
+
+              {/* Kolumn 2: Actors */}
+              <View style={styles.sourceMatrixDataCol}>
+                <View style={styles.sourceMatrixHeaderCell}>
+                  <Text style={styles.sourceMatrixHeaderText}>Actors</Text>
+                </View>
+                <View style={styles.sourceMatrixSwitchCell}>
+                  <Switch
+                    value={youtubeEnabledCategories.includes('Film')}
+                    onValueChange={(v) => handleToggleYoutubeCategory('Film', v)}
+                    disabled={!hostMode}
+                    trackColor={{ false: Colors.borderStrong, true: Colors.success }}
+                    thumbColor="#FFF"
+                    ios_backgroundColor={youtubeEnabledCategories.includes('Film') ? Colors.success : Colors.borderStrong}
+                    style={styles.sourceMatrixSwitch}
+                  />
+                </View>
+                <View style={styles.sourceMatrixSwitchCell}>
+                  <View style={styles.mandatorySwitchWrap}>
+                    <Switch
+                      value={true}
+                      onValueChange={() =>
+                        Alert.alert('Mandatory source', 'Actors are always enabled for Images.')
+                      }
+                      trackColor={{ false: Colors.borderStrong, true: Colors.success }}
+                      thumbColor="#FFF"
+                      ios_backgroundColor={Colors.success}
+                      style={styles.sourceMatrixSwitch}
+                    />
+                    <View style={styles.mandatoryOverlay} pointerEvents="none">
+                      <Text style={styles.mandatoryLockIcon}>🔒</Text>
+                    </View>
+                  </View>
+                </View>
+              </View>
+
+              {/* Kolumn 3: Athletes */}
+              <View style={styles.sourceMatrixDataCol}>
+                <View style={styles.sourceMatrixHeaderCell}>
+                  <Text style={styles.sourceMatrixHeaderText}>Athletes</Text>
+                </View>
+                <View style={styles.sourceMatrixSwitchCell}>
+                  <Switch
+                    value={youtubeEnabledCategories.includes('Sport')}
+                    onValueChange={(v) => handleToggleYoutubeCategory('Sport', v)}
+                    disabled={!hostMode}
+                    trackColor={{ false: Colors.borderStrong, true: Colors.success }}
+                    thumbColor="#FFF"
+                    ios_backgroundColor={youtubeEnabledCategories.includes('Sport') ? Colors.success : Colors.borderStrong}
+                    style={styles.sourceMatrixSwitch}
+                  />
+                </View>
+                <View style={styles.sourceMatrixSwitchCell}>
+                  <View style={styles.mandatorySwitchWrap}>
+                    <Switch
+                      value={true}
+                      onValueChange={() =>
+                        Alert.alert('Mandatory source', 'Athletes are always enabled for Images.')
+                      }
+                      trackColor={{ false: Colors.borderStrong, true: Colors.success }}
+                      thumbColor="#FFF"
+                      ios_backgroundColor={Colors.success}
+                      style={styles.sourceMatrixSwitch}
+                    />
+                    <View style={styles.mandatoryOverlay} pointerEvents="none">
+                      <Text style={styles.mandatoryLockIcon}>🔒</Text>
+                    </View>
+                  </View>
+                </View>
               </View>
             </View>
 
@@ -5860,9 +5838,96 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.xs,
     lineHeight: 17,
   },
+  // ── Source × Category Matrix (kolumn-baserad layout) ─────────────────
+  // sourceMatrix är en horisontell rad av kolumn-Views. Varje kolumn
+  // innehåller sin rubrik + sina switchar staplade vertikalt — detta
+  // garanterar att rubriken alltid är exakt centrerad över sina switchar.
+  sourceMatrix: {
+    flexDirection: 'row',
+    paddingVertical: Spacing.xs,
+  },
+  // Kolumn 0: källetiketter (YouTube / Images).
+  sourceMatrixLabelCol: {
+    width: 100,
+    flexShrink: 0,
+  },
+  // Rubrik-cell i kolumn 0 — tom spacer med samma höjd som kolumn 1-3:s rubrik.
+  sourceMatrixHeaderCell: {
+    height: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  // Källetikett-rad: ikon + text + ev. info-ikon, centrerade vertikalt.
+  sourceMatrixSourceRow: {
+    height: 44,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  sourceMatrixSourceText: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.semibold,
+    color: Colors.textPrimary,
+  },
+  // Kolumn 1-3: en per professionskategori (Artists / Actors / Athletes).
+  sourceMatrixDataCol: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  sourceMatrixHeaderText: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.semibold,
+    color: Colors.textPrimary,
+    textAlign: 'center',
+  },
+  // Switch-cell inom en datakkolumn.
+  sourceMatrixSwitchCell: {
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  // Matrix-switch: centrerad (ingen marginLeft:'auto' som connectionSwitch har).
+  sourceMatrixSwitch: {
+    transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }],
+  },
+  // Mandatory-cell: wrapper runt Switch för att placera låset relativt switch-bounds.
+  mandatorySwitchWrap: {
+    position: 'relative',
+  },
+  // Lås-ikon overlay — positioneras på tummen (höger/vit del av switch).
+  // pointerEvents="none" (satt i JSX) låter taps nå Switch bakom.
+  mandatoryOverlay: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    right: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  mandatoryLockIcon: {
+    fontSize: 10,
+    lineHeight: 13,
+  },
+  // Q-ikon för Images-källan: ringen + svansen i SVG med "?"-Text ovanpå.
+  imagesIconWrap: {
+    width: 22,
+    height: 22,
+    position: 'relative',
+  },
+  imagesQMark: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    textAlign: 'center',
+    lineHeight: 22,
+    color: Colors.primary,
+    fontSize: 10,
+    fontWeight: FontWeight.bold,
+  },
   // Use Packages — sub-block för musikpaket-val. Vänsterställt mot
   // connectionsList-kanten så "Extra packages:"-labeln och chipsen börjar
-  // på samma x-position som ikonerna på YouTube-/Images-raderna ovanför.
+  // på samma x-position som ikonerna i matrisen ovanför.
   usePackagesBlock: {
     gap: Spacing.sm,
     paddingTop: Spacing.xs,
@@ -6020,7 +6085,7 @@ const styles = StyleSheet.create({
   packageRowFreeBadge: {
     position: 'absolute',
     top: -7,
-    right: 8,
+    right: 14,
     backgroundColor: Colors.success,
     borderRadius: 4,
     paddingHorizontal: 6,
