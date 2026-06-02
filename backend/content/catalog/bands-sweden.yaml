@@ -20,3 +20,11 @@ items:
     peakTo: 2009
     wikimediaSearchHints: ["Alcazar band Sweden"]
     answerMethods: ["name-letters"]
+  - id: marcus-martinus
+    displayName: "Marcus & Martinus"
+    probability: 84
+    audience: ["gen-z", "gen-alpha", "millennials"]
+    peakFrom: 2016
+    peakTo: 2026
+    wikimediaSearchHints: ["Marcus Martinus Norwegian pop duo"]
+    answerMethods: ["name-letters"]

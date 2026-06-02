@@ -173,6 +173,7 @@ items:
     wikimediaSearchHints: ["Max Verstappen Formula 1"]
     answerMethods: ["timeline", "name-letters"]
   - id: valentino-rossi
+    region: ["global"]
     displayName: "Valentino Rossi"
     correctYear: 1979
     probability: 88
@@ -202,13 +203,6 @@ items:
     probability: 80
     wikimediaSearchHints: ["Jakob Ingebrigtsen runner Norway"]
     answerMethods: ["timeline", "name-letters"]
-  - id: andres-iniesta
-    displayName: "Andrés Iniesta"
-    correctYear: 1984
-    probability: 88
-    wikimediaSearchHints: ["Andres Iniesta footballer Barcelona"]
-    answerMethods: ["timeline", "name-letters"]
-    genrePackages: ["pkg-fifa-wc"]
   - id: xavi
     displayName: "Xavi"
     correctYear: 1980
@@ -562,6 +556,7 @@ items:
     genrePackages: ["pkg-fifa-wc"]
     audience: ["gen-x", "millennials", "gen-z"]
   - id: lionel-scaloni
+    region: ["global"]
     displayName: "Lionel Scaloni"
     correctYear: 1978
     probability: 80
@@ -713,6 +708,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: hidetoshi-nakata
+    region: ["global"]
     displayName: "Hidetoshi Nakata"
     correctYear: 1977
     probability: 78
@@ -886,6 +882,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: ricardo-quaresma
+    region: ["global"]
     displayName: "Ricardo Quaresma"
     correctYear: 1983
     probability: 78

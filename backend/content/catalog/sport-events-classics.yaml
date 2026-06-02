@@ -631,3 +631,15 @@ items:
         endSec: 15
         channelTitle: "cfcfootball"
         notes: "Curerad 2026-05-29 — Messis reaktion på VM-vinsten 2022 (FIFA-officiella var blockerade)."
+  - id: vinnie-jones-gascoigne-grab
+    displayName: "Vinnie Jones griper Gascoigne — det berömda greppet"
+    correctYear: 1988
+    probability: 76
+    wikimediaSearchHints: ["Vinnie Jones Paul Gascoigne grab 1988 football"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "FyCw5RLDyYw"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Deadball Diaries"
+        notes: "Ikonisk fotbollsmoment — Vinnie Jones (Wimbledon) griper Gascoigne (Newcastle) 1988. Sport-kategori via contentSubject: sport-event."

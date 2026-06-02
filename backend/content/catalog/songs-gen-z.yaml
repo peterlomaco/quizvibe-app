@@ -654,3 +654,304 @@ items:
         endSec: 45
         channelTitle: "Icona Pop - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: jill-johnson-karleken-ar
+    displayName: "Kärleken är — Jill Johnson"
+    correctYear: 1998
+    probability: 72
+    wikimediaSearchHints: ["Jill Johnson Kärleken är Melodifestivalen 1998"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "nMrluZPFMZs"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "Melodifestivalen 1998 vinnare."
+  - id: charlotte-nilsson-tusen-och-en-natt
+    displayName: "Tusen och en natt — Charlotte Nilsson"
+    correctYear: 1999
+    probability: 74
+    wikimediaSearchHints: ["Charlotte Nilsson Take Me To Your Heaven Eurovision 1999"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "a0cERXG3m90"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "Melodifestivalen 1999 vinnare, ESC-vinnare 1999. ESC-version på engelska (Take Me To Your Heaven)."
+  - id: roger-pontare-vindarna-viskar
+    displayName: "När vindarna viskar mitt namn — Roger Pontare"
+    correctYear: 2000
+    probability: 70
+    wikimediaSearchHints: ["Roger Pontare När vindarna viskar mitt namn Melodifestivalen 2000"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "ZgPzU2Nlonw"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Melodifestivalen"
+        notes: "Melodifestivalen 2000 vinnare."
+  - id: lena-philipsson-det-gor-ont
+    displayName: "Det gör ont — Lena Philipsson"
+    correctYear: 2004
+    probability: 74
+    wikimediaSearchHints: ["Lena Philipsson Det gör ont Eurovision 2004"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "na2qDYmm7LM"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "Melodifestivalen 2004 vinnare. ESC-version It Hurts."
+  - id: martin-stenmarck-las-vegas
+    displayName: "Las Vegas — Martin Stenmarck"
+    correctYear: 2005
+    probability: 70
+    wikimediaSearchHints: ["Martin Stenmarck Las Vegas Eurovision 2005"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "YbZjSdSNCiw"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "Melodifestivalen 2005 vinnare. ESC 2005 performance."
+  - id: carola-evighet
+    displayName: "Evighet — Carola"
+    correctYear: 2006
+    probability: 72
+    wikimediaSearchHints: ["Carola Evighet Melodifestivalen 2006"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "m9ghEC3wiIc"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Melodifestivalen"
+        notes: "Melodifestivalen 2006 vinnare."
+  - id: the-ark-the-worrying-kind
+    displayName: "The Worrying Kind — The Ark"
+    correctYear: 2007
+    probability: 74
+    wikimediaSearchHints: ["The Ark The Worrying Kind Eurovision 2007"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "r02Lg8JIco0"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "Melodifestivalen 2007 vinnare. ESC 2007 performance."
+  - id: charlotte-perrelli-hero
+    displayName: "Hero — Charlotte Perrelli"
+    correctYear: 2008
+    probability: 72
+    wikimediaSearchHints: ["Charlotte Perrelli Hero Eurovision 2008"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "x_iSoluR53U"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "Melodifestivalen 2008 vinnare. ESC 2008 performance."
+  - id: malena-ernman-la-voix
+    displayName: "La Voix — Malena Ernman"
+    correctYear: 2009
+    probability: 70
+    wikimediaSearchHints: ["Malena Ernman La Voix Eurovision 2009"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "xE9Pl3mqRbo"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "Melodifestivalen 2009 vinnare. ESC 2009 performance."
+  - id: anna-bergendahl-this-is-my-life
+    displayName: "This Is My Life — Anna Bergendahl"
+    correctYear: 2010
+    probability: 72
+    wikimediaSearchHints: ["Anna Bergendahl This Is My Life Eurovision 2010"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "OTRcAg6VxU4"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Anakina_Skywalker"
+        notes: "Melodifestivalen 2010 vinnare."
+  - id: eric-saade-popular
+    displayName: "Popular — Eric Saade"
+    correctYear: 2011
+    probability: 80
+    wikimediaSearchHints: ["Eric Saade Popular Eurovision 2011"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "g_67DS2j9hs"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eric Saade"
+        notes: "Melodifestivalen 2011 vinnare. Officiell music video (Director's Cut)."
+  # ===== Eurovision Song Contest vinnare =====
+  - id: katrina-waves-love-shine-a-light
+    displayName: "Love Shine a Light — Katrina and the Waves"
+    correctYear: 1997
+    probability: 72
+    wikimediaSearchHints: ["Katrina and the Waves Love Shine a Light Eurovision 1997 UK"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "KwLBCKA5-ls"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "ESC 1997 vinnare — Storbritannien."
+  - id: dana-international-diva
+    displayName: "Diva — Dana International"
+    correctYear: 1998
+    probability: 76
+    wikimediaSearchHints: ["Dana International Diva Eurovision 1998 Israel"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "4No1oClTp_E"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "ESC 1998 vinnare — Israel."
+  - id: olsen-brothers-fly-on-wings-of-love
+    displayName: "Fly on the Wings of Love — Olsen Brothers"
+    correctYear: 2000
+    probability: 74
+    wikimediaSearchHints: ["Olsen Brothers Fly on the Wings of Love Eurovision 2000 Denmark"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "JF8fkHK0AWs"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "ESC 2000 vinnare — Danmark."
+  - id: tanel-padar-everybody
+    displayName: "Everybody — Tanel Padar, Dave Benton & 2XL"
+    correctYear: 2001
+    probability: 70
+    wikimediaSearchHints: ["Tanel Padar Dave Benton Everybody Eurovision 2001 Estonia"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "92TSUlqzFi8"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "ESC 2001 vinnare — Estland."
+  - id: marie-n-i-wanna
+    displayName: "I Wanna — Marie N"
+    correctYear: 2002
+    probability: 70
+    wikimediaSearchHints: ["Marie N I Wanna Eurovision 2002 Latvia"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "_M-w89U8TEU"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "ESC 2002 vinnare — Lettland."
+  - id: sertab-erener-everyway-that-i-can
+    displayName: "Everyway That I Can — Sertab Erener"
+    correctYear: 2003
+    probability: 72
+    wikimediaSearchHints: ["Sertab Erener Everyway That I Can Eurovision 2003 Turkey"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "j0_QrKnqd5E"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "ESC 2003 vinnare — Turkiet."
+  - id: ruslana-wild-dances
+    displayName: "Wild Dances — Ruslana"
+    correctYear: 2004
+    probability: 78
+    wikimediaSearchHints: ["Ruslana Wild Dances Eurovision 2004 Ukraine"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "MTLmoV0E_6c"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Ruslana"
+        notes: "ESC 2004 vinnare — Ukraina. Officiell remastered MV."
+  - id: helena-paparizou-my-number-one
+    displayName: "My Number One — Helena Paparizou"
+    correctYear: 2005
+    probability: 76
+    wikimediaSearchHints: ["Helena Paparizou My Number One Eurovision 2005 Greece"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "rcOwvZ26KFQ"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "ESC 2005 vinnare — Grekland."
+  - id: lordi-hard-rock-hallelujah
+    displayName: "Hard Rock Hallelujah — Lordi"
+    correctYear: 2006
+    probability: 84
+    wikimediaSearchHints: ["Lordi Hard Rock Hallelujah Eurovision 2006 Finland"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "gAh9NRGNhUU"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "ESC 2006 vinnare — Finland."
+  - id: marija-serifovic-molitva
+    displayName: "Molitva — Marija Šerifović"
+    correctYear: 2007
+    probability: 74
+    wikimediaSearchHints: ["Marija Šerifović Molitva Eurovision 2007 Serbia"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "Kbi08wfT7mA"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Marija Šerifović"
+        notes: "ESC 2007 vinnare — Serbien. Officiell music video."
+  - id: dima-bilan-believe
+    displayName: "Believe — Dima Bilan"
+    correctYear: 2008
+    probability: 74
+    wikimediaSearchHints: ["Dima Bilan Believe Eurovision 2008 Russia"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "-72s4WzUcKI"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "ESC 2008 vinnare — Ryssland."
+  - id: alexander-rybak-fairytale
+    displayName: "Fairytale — Alexander Rybak"
+    correctYear: 2009
+    probability: 84
+    wikimediaSearchHints: ["Alexander Rybak Fairytale Eurovision 2009 Norway"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "WXwgZL4zx9o"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "ESC 2009 vinnare — Norge."
+  - id: lena-satellite
+    displayName: "Satellite — Lena"
+    correctYear: 2010
+    probability: 78
+    wikimediaSearchHints: ["Lena Meyer-Landrut Satellite Eurovision 2010 Germany"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "8QSgNM9yNjo"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "ESC 2010 vinnare — Tyskland. Officiell music video."
+  - id: ell-nikki-running-scared
+    displayName: "Running Scared — Ell & Nikki"
+    correctYear: 2011
+    probability: 72
+    wikimediaSearchHints: ["Ell Nikki Running Scared Eurovision 2011 Azerbaijan"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "3Vk4HYUatv8"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "ESC 2011 vinnare — Azerbajdzjan. Officiell music video."

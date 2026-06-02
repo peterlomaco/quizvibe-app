@@ -646,3 +646,136 @@ items:
         endSec: 45
         channelTitle: "Led Zeppelin - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: tomas-ledin-just-nu
+    displayName: "Just nu! — Tomas Ledin"
+    correctYear: 1980
+    probability: 70
+    wikimediaSearchHints: ["Tomas Ledin Just nu Eurovision 1980"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "khv8TygskVU"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "Melodifestivalen 1980 vinnare."
+  # ===== Eurovision Song Contest vinnare =====
+  - id: dana-all-kinds-of-everything
+    displayName: "All Kinds of Everything — Dana"
+    correctYear: 1970
+    probability: 64
+    wikimediaSearchHints: ["Dana All Kinds of Everything Eurovision 1970 Ireland"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "sZ8W9oOgjM4"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "ESC 1970 vinnare — Irland."
+  - id: severine-un-banc-un-arbre
+    displayName: "Un banc, un arbre, une rue — Séverine"
+    correctYear: 1971
+    probability: 62
+    wikimediaSearchHints: ["Séverine Un banc un arbre une rue Eurovision 1971"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "JQUC9TycGWU"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "ESC 1971 vinnare — Monaco."
+  - id: vicky-leandros-apres-toi
+    displayName: "Après toi — Vicky Leandros"
+    correctYear: 1972
+    probability: 64
+    wikimediaSearchHints: ["Vicky Leandros Après toi Eurovision 1972"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "52W1665yI1Y"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "ESC 1972 vinnare — Luxemburg."
+  - id: anne-marie-david-tu-te-reconnaitras
+    displayName: "Tu te reconnaîtras — Anne-Marie David"
+    correctYear: 1973
+    probability: 62
+    wikimediaSearchHints: ["Anne-Marie David Tu te reconnaîtras Eurovision 1973"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "vfgR0sXxVWA"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "ESC 1973 vinnare — Luxemburg."
+  - id: teach-in-ding-a-dong
+    displayName: "Ding-a-dong — Teach-In"
+    correctYear: 1975
+    probability: 65
+    wikimediaSearchHints: ["Teach-In Ding-a-dong Eurovision 1975 Netherlands"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "jqqJvMTNeq4"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "ESC 1975 vinnare — Nederländerna."
+  - id: brotherhood-of-man-save-your-kisses
+    displayName: "Save Your Kisses for Me — Brotherhood of Man"
+    correctYear: 1976
+    probability: 72
+    wikimediaSearchHints: ["Brotherhood of Man Save Your Kisses for Me Eurovision 1976"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "5yJUi6ke71I"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "ESC 1976 vinnare — Storbritannien."
+  - id: marie-myriam-loiseau-et-lenfant
+    displayName: "L'Oiseau et l'Enfant — Marie Myriam"
+    correctYear: 1977
+    probability: 62
+    wikimediaSearchHints: ["Marie Myriam L'Oiseau et l'Enfant Eurovision 1977 France"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "bybdhTg_g20"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "ESC 1977 vinnare — Frankrike."
+  - id: izhar-cohen-a-ba-ni-bi
+    displayName: "A-Ba-Ni-Bi — Izhar Cohen & The Alphabeta"
+    correctYear: 1978
+    probability: 66
+    wikimediaSearchHints: ["Izhar Cohen A-Ba-Ni-Bi Eurovision 1978 Israel"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "uFd5nk2sXow"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "ESC 1978 vinnare — Israel."
+  - id: milk-and-honey-hallelujah
+    displayName: "Hallelujah — Milk & Honey"
+    correctYear: 1979
+    probability: 68
+    wikimediaSearchHints: ["Milk Honey Hallelujah Eurovision 1979 Israel"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "vvmHIhhlzOA"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "ESC 1979 vinnare — Israel."
+  - id: johnny-logan-whats-another-year
+    displayName: "What's Another Year — Johnny Logan"
+    correctYear: 1980
+    probability: 70
+    wikimediaSearchHints: ["Johnny Logan What's Another Year Eurovision 1980 Ireland"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "R7k1DH71bO8"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "ESC 1980 vinnare — Irland."

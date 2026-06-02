@@ -737,3 +737,268 @@ items:
         endSec: 45
         channelTitle: "Kent - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: bjorn-skifs-fangad-i-en-drom
+    displayName: "Fångad i en dröm — Björn Skifs"
+    correctYear: 1981
+    probability: 68
+    wikimediaSearchHints: ["Björn Skifs Fångad i en dröm Melodifestivalen 1981"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "LvbW7lWZbVo"
+        startSec: 30
+        endSec: 45
+        channelTitle: "SchlagerArchive"
+        notes: "Melodifestivalen 1981 vinnare."
+  - id: chips-dag-efter-dag
+    displayName: "Dag efter dag — Chips"
+    correctYear: 1982
+    probability: 70
+    wikimediaSearchHints: ["Chips Dag efter dag Eurovision 1982"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "2GAaOyfMLfA"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "Melodifestivalen 1982 vinnare. ESC 1982 performance."
+  - id: herreys-diggiloo-diggiley
+    displayName: "Diggi-Loo Diggi-Ley — Herreys"
+    correctYear: 1984
+    probability: 74
+    wikimediaSearchHints: ["Herreys Diggi-Loo Diggi-Ley Eurovision 1984"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "ySOCalwr6Yo"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "Melodifestivalen 1984 vinnare, ESC-vinnare 1984."
+  - id: kikki-danielsson-bra-vibrationer
+    displayName: "Bra vibrationer — Kikki Danielsson"
+    correctYear: 1985
+    probability: 70
+    wikimediaSearchHints: ["Kikki Danielsson Bra vibrationer Eurovision 1985"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "OfVcmnxKfqc"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "Melodifestivalen 1985 vinnare. ESC 1985 performance."
+  - id: lotta-engberg-fyra-bugg
+    displayName: "Fyra bugg och en Coca Cola — Lotta Engberg"
+    correctYear: 1987
+    probability: 72
+    wikimediaSearchHints: ["Lotta Engberg Fyra bugg Coca Cola Melodifestivalen 1987"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "U7hLR82zSE0"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "Melodifestivalen 1987 vinnare."
+  - id: tommy-korberg-stad-i-ljus
+    displayName: "Stad i ljus — Tommy Körberg"
+    correctYear: 1988
+    probability: 70
+    wikimediaSearchHints: ["Tommy Körberg Stad i ljus Eurovision 1988"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "u4-gEpNI6CI"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "Melodifestivalen 1988 vinnare. ESC 1988 performance."
+  - id: carola-fangad-av-en-stormvind
+    displayName: "Fångad av en stormvind — Carola"
+    correctYear: 1991
+    probability: 78
+    wikimediaSearchHints: ["Carola Fångad av en stormvind Eurovision 1991"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "4Ml6pJqc_bw"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "Melodifestivalen 1991 vinnare, ESC-vinnare 1991."
+  - id: arvingarna-eloise
+    displayName: "Eloise — Arvingarna"
+    correctYear: 1993
+    probability: 72
+    wikimediaSearchHints: ["Arvingarna Eloise Melodifestivalen 1993"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "a6MCRuE6tx8"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "Melodifestivalen 1993 vinnare. ESC 1993 performance."
+  # ===== Eurovision Song Contest vinnare =====
+  - id: bucks-fizz-making-your-mind-up
+    displayName: "Making Your Mind Up — Bucks Fizz"
+    correctYear: 1981
+    probability: 72
+    wikimediaSearchHints: ["Bucks Fizz Making Your Mind Up Eurovision 1981 UK"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "DszqGGSY4oo"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "ESC 1981 vinnare — Storbritannien."
+  - id: nicole-ein-bisschen-frieden
+    displayName: "Ein bißchen Frieden — Nicole"
+    correctYear: 1982
+    probability: 70
+    wikimediaSearchHints: ["Nicole Ein bißchen Frieden Eurovision 1982 Germany"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "hp_b-095yPc"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "ESC 1982 vinnare — Tyskland."
+  - id: corinne-hermes-si-la-vie-est-cadeau
+    displayName: "Si la vie est cadeau — Corinne Hermès"
+    correctYear: 1983
+    probability: 64
+    wikimediaSearchHints: ["Corinne Hermès Si la vie est cadeau Eurovision 1983"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "F8y5xc8UodE"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "ESC 1983 vinnare — Luxemburg."
+  - id: bobbysocks-la-det-swinge
+    displayName: "La det swinge — Bobbysocks!"
+    correctYear: 1985
+    probability: 70
+    wikimediaSearchHints: ["Bobbysocks La det swinge Eurovision 1985 Norway"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "U94_AErNBZU"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "ESC 1985 vinnare — Norge."
+  - id: sandra-kim-jaime-la-vie
+    displayName: "J'aime la vie — Sandra Kim"
+    correctYear: 1986
+    probability: 68
+    wikimediaSearchHints: ["Sandra Kim J'aime la vie Eurovision 1986 Belgium"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "AT3c41gi3B4"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "ESC 1986 vinnare — Belgien."
+  - id: johnny-logan-hold-me-now
+    displayName: "Hold Me Now — Johnny Logan"
+    correctYear: 1987
+    probability: 72
+    wikimediaSearchHints: ["Johnny Logan Hold Me Now Eurovision 1987 Ireland"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "gl2yKH5zbyo"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "ESC 1987 vinnare — Irland."
+  - id: celine-dion-ne-partez-pas
+    displayName: "Ne partez pas sans moi — Céline Dion"
+    correctYear: 1988
+    probability: 86
+    wikimediaSearchHints: ["Céline Dion Ne partez pas sans moi Eurovision 1988"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "VXLWfXmlXPc"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "ESC 1988 vinnare — Schweiz."
+  - id: riva-rock-me
+    displayName: "Rock Me — Riva"
+    correctYear: 1989
+    probability: 68
+    wikimediaSearchHints: ["Riva Rock Me Eurovision 1989 Yugoslavia"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "ZWwmCT7P3VE"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "ESC 1989 vinnare — Jugoslavien."
+  - id: toto-cutugno-insieme
+    displayName: "Insieme: 1992 — Toto Cutugno"
+    correctYear: 1990
+    probability: 70
+    wikimediaSearchHints: ["Toto Cutugno Insieme 1992 Eurovision 1990 Italy"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "JiRppGSF-tI"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "ESC 1990 vinnare — Italien."
+  - id: linda-martin-why-me
+    displayName: "Why Me? — Linda Martin"
+    correctYear: 1992
+    probability: 68
+    wikimediaSearchHints: ["Linda Martin Why Me Eurovision 1992 Ireland"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "DKd50924Qxs"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "ESC 1992 vinnare — Irland."
+  - id: niamh-kavanagh-in-your-eyes
+    displayName: "In Your Eyes — Niamh Kavanagh"
+    correctYear: 1993
+    probability: 68
+    wikimediaSearchHints: ["Niamh Kavanagh In Your Eyes Eurovision 1993 Ireland"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "pysQioMtrAU"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "ESC 1993 vinnare — Irland."
+  - id: paul-harrington-rock-n-roll-kids
+    displayName: "Rock 'n' Roll Kids — Paul Harrington & Charlie McGettigan"
+    correctYear: 1994
+    probability: 66
+    wikimediaSearchHints: ["Paul Harrington Charlie McGettigan Rock n Roll Kids Eurovision 1994"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "ohBO8OxQbv8"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "ESC 1994 vinnare — Irland."
+  - id: secret-garden-nocturne
+    displayName: "Nocturne — Secret Garden"
+    correctYear: 1995
+    probability: 74
+    wikimediaSearchHints: ["Secret Garden Nocturne Eurovision 1995 Norway"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "u-gA0aU-d88"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "ESC 1995 vinnare — Norge."
+  - id: eimear-quinn-the-voice
+    displayName: "The Voice — Eimear Quinn"
+    correctYear: 1996
+    probability: 66
+    wikimediaSearchHints: ["Eimear Quinn The Voice Eurovision 1996 Ireland"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "0KiE1byYXtA"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "ESC 1996 vinnare — Irland."

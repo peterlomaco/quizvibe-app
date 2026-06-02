@@ -346,3 +346,16 @@ items:
     probability: 91
     wikimediaSearchHints: ["Frozen 2013 Disney film Let It Go"]
     answerMethods: ["timeline"]
+  - id: snatch-2000
+    displayName: "Snatch"
+    correctYear: 2000
+    probability: 82
+    wikimediaSearchHints: ["Snatch 2000 film Guy Ritchie Brad Pitt Vinnie Jones"]
+    answerMethods: ["timeline"]
+    genrePackages: ["sport"]
+    youtubeClips:
+      - videoId: "9Jar2XkBboo"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Movieclips Classic Trailers"
+        notes: "Snatch (2000) — officiell trailer. Vinnie Jones (f.d. Wimbledon FC) som Bullet Tooth Tony. genrePackages:sport → surfar under Athletes/Sport-filtret trots Film-nativ-kategori."

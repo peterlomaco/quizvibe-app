@@ -21,14 +21,6 @@ items:
     answerMethods: ["timeline", "name-letters"]
     sensitivity: standard
 
-  - id: lennart-skoglund
-    displayName: Lennart Skoglund
-    correctYear: 1929
-    probability: 76
-    wikimediaSearchHints: ["Lennart Skoglund Swedish footballer"]
-    answerMethods: ["timeline", "name-letters"]
-    sensitivity: standard
-
   - id: conny-torstensson
     displayName: Conny Torstensson
     correctYear: 1947

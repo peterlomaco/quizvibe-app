@@ -33,6 +33,10 @@ export type Audience = z.infer<typeof AudienceSchema>;
 // Player default-region = 'sweden' i V1.
 export const RegionSchema = z.enum([
   'sweden',
+  'global',   // Internationellt erkänd men ej specifikt Sverige-fokuserad i V1.
+              // Items med region:["global"] visas ej för svensk spelare
+              // (filter: item.region ∩ player.region — "sweden"∩"global"=∅).
+              // Aktiveras när global expansion öppnas i V2+.
 ]);
 export type Region = z.infer<typeof RegionSchema>;
 

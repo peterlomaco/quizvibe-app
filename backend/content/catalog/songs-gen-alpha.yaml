@@ -519,3 +519,280 @@ items:
     probability: 74
     wikimediaSearchHints: ["Benjamin Ingrosso Dance You Off Eurovision 2018"]
     answerMethods: ["timeline"]
+  - id: robin-stjernberg-you
+    displayName: "You — Robin Stjernberg"
+    correctYear: 2013
+    probability: 70
+    wikimediaSearchHints: ["Robin Stjernberg You Melodifestivalen 2013"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "vtjdTPnCcu0"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "Melodifestivalen 2013 vinnare. ESC 2013 performance."
+  - id: sanna-nielsen-undo
+    displayName: "Undo — Sanna Nielsen"
+    correctYear: 2014
+    probability: 80
+    wikimediaSearchHints: ["Sanna Nielsen Undo Eurovision 2014"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "N_hmzLU1_cc"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Sanna Nielsen"
+        notes: "Melodifestivalen 2014 vinnare. Officiell music video."
+  - id: frans-if-i-were-sorry
+    displayName: "If I Were Sorry — Frans"
+    correctYear: 2016
+    probability: 78
+    wikimediaSearchHints: ["Frans If I Were Sorry Eurovision 2016"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "nANXQA9JEMY"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Frans"
+        notes: "Melodifestivalen 2016 vinnare. Officiell music video."
+  - id: robin-bengtsson-i-cant-go-on
+    displayName: "I Can't Go On — Robin Bengtsson"
+    correctYear: 2017
+    probability: 80
+    wikimediaSearchHints: ["Robin Bengtsson I Can't Go On Eurovision 2017"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "1jSrBdN4b5c"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "Melodifestivalen 2017 vinnare. ESC 2017 official music video."
+  - id: john-lundvik-too-late-for-love
+    displayName: "Too Late for Love — John Lundvik"
+    correctYear: 2019
+    probability: 78
+    wikimediaSearchHints: ["John Lundvik Too Late For Love Eurovision 2019"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "iEEuG5XML-A"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "Melodifestivalen 2019 vinnare. ESC 2019 official video."
+  - id: the-mamas-move
+    displayName: "Move — The Mamas"
+    correctYear: 2020
+    probability: 78
+    wikimediaSearchHints: ["The Mamas Move Eurovision 2020"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "7EpSBDPlZn4"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "Melodifestivalen 2020 vinnare. ESC 2020 official video."
+  - id: tusse-voices
+    displayName: "Voices — Tusse"
+    correctYear: 2021
+    probability: 76
+    wikimediaSearchHints: ["Tusse Voices Eurovision 2021"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "5P1ueI9j6gk"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "Melodifestivalen 2021 vinnare. ESC 2021 official video."
+  - id: cornelia-jakobs-hold-me-closer
+    displayName: "Hold Me Closer — Cornelia Jakobs"
+    correctYear: 2022
+    probability: 82
+    wikimediaSearchHints: ["Cornelia Jakobs Hold Me Closer Eurovision 2022"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "wWDThAfryW4"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "Melodifestivalen 2022 vinnare. ESC 2022 official music video."
+  - id: loreen-tattoo
+    displayName: "Tattoo — Loreen"
+    correctYear: 2023
+    probability: 90
+    wikimediaSearchHints: ["Loreen Tattoo Eurovision 2023"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "b3vJfR81xO0"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "Melodifestivalen 2023 vinnare, ESC-vinnare 2023. ESC 2023 official music video."
+  - id: marcus-martinus-unforgettable
+    displayName: "Unforgettable — Marcus & Martinus"
+    correctYear: 2024
+    probability: 86
+    wikimediaSearchHints: ["Marcus Martinus Unforgettable Eurovision 2024"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "yekc8t0rJqA"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "Melodifestivalen 2024 vinnare. ESC 2024 official music video."
+  - id: kaj-bara-bada-bastu
+    displayName: "Bara bada bastu — KAJ"
+    correctYear: 2025
+    probability: 84
+    wikimediaSearchHints: ["KAJ Bara Bada Bastu Eurovision 2025"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "WK3HOMhAeQY"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "Melodifestivalen 2025 vinnare. ESC 2025 official music video."
+  - id: felicia-my-system
+    displayName: "My System — Felicia"
+    correctYear: 2026
+    probability: 80
+    wikimediaSearchHints: ["Felicia My System Eurovision 2026"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "ibbfS8iG450"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "Melodifestivalen 2026 vinnare. ESC 2026 official music video."
+  # ===== Eurovision Song Contest vinnare =====
+  - id: emmelie-de-forest-only-teardrops
+    displayName: "Only Teardrops — Emmelie de Forest"
+    correctYear: 2013
+    probability: 76
+    wikimediaSearchHints: ["Emmelie de Forest Only Teardrops Eurovision 2013 Denmark"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "k59E7T0H-Us"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "ESC 2013 vinnare — Danmark. Officiell music video."
+  - id: conchita-wurst-rise-like-a-phoenix
+    displayName: "Rise Like a Phoenix — Conchita Wurst"
+    correctYear: 2014
+    probability: 84
+    wikimediaSearchHints: ["Conchita Wurst Rise Like a Phoenix Eurovision 2014 Austria"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "ToqNa0rqUtY"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "ESC 2014 vinnare — Österrike. Officiell music video."
+  - id: jamala-1944
+    displayName: "1944 — Jamala"
+    correctYear: 2016
+    probability: 78
+    wikimediaSearchHints: ["Jamala 1944 Eurovision 2016 Ukraine"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "wNECV2h-y58"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Jamala"
+        notes: "ESC 2016 vinnare — Ukraina. Officiell music video."
+  - id: salvador-sobral-amar-pelos-dois
+    displayName: "Amar pelos dois — Salvador Sobral"
+    correctYear: 2017
+    probability: 78
+    wikimediaSearchHints: ["Salvador Sobral Amar pelos dois Eurovision 2017 Portugal"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "ymFVfzu-2mw"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "ESC 2017 vinnare — Portugal. Officiell music video."
+  - id: netta-toy
+    displayName: "Toy — Netta"
+    correctYear: 2018
+    probability: 84
+    wikimediaSearchHints: ["Netta Toy Eurovision 2018 Israel"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "CziHrYYSyPc"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "ESC 2018 vinnare — Israel. Officiell music video."
+  - id: duncan-laurence-arcade
+    displayName: "Arcade — Duncan Laurence"
+    correctYear: 2019
+    probability: 84
+    wikimediaSearchHints: ["Duncan Laurence Arcade Eurovision 2019 Netherlands"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "Eztx7Wr8PtE"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "ESC 2019 vinnare — Nederländerna. Officiell music video."
+  - id: maneskin-zitti-e-buoni
+    displayName: "Zitti e buoni — Måneskin"
+    correctYear: 2021
+    probability: 86
+    wikimediaSearchHints: ["Måneskin Zitti e buoni Eurovision 2021 Italy"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "RVH5dn1cxAQ"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "ESC 2021 vinnare — Italien."
+  - id: kalush-orchestra-stefania
+    displayName: "Stefania — Kalush Orchestra"
+    correctYear: 2022
+    probability: 84
+    wikimediaSearchHints: ["Kalush Orchestra Stefania Eurovision 2022 Ukraine"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "UiEGVYOruLk"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "ESC 2022 vinnare — Ukraina. Officiell music video."
+  - id: nemo-the-code
+    displayName: "The Code — Nemo"
+    correctYear: 2024
+    probability: 82
+    wikimediaSearchHints: ["Nemo The Code Eurovision 2024 Switzerland"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "kiGDvM14Kwg"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "ESC 2024 vinnare — Schweiz. Officiell music video."
+  - id: jj-wasted-love
+    displayName: "Wasted Love — JJ"
+    correctYear: 2025
+    probability: 80
+    wikimediaSearchHints: ["JJ Wasted Love Eurovision 2025 Austria"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "-ieSTNpxvio"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "ESC 2025 vinnare — Österrike. Officiell music video."
+  - id: dara-bangaranga
+    displayName: "Bangaranga — DARA"
+    correctYear: 2026
+    probability: 78
+    wikimediaSearchHints: ["DARA Bangaranga Eurovision 2026 Bulgaria"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "J3oGYo_mekw"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Eurovision Song Contest"
+        notes: "ESC 2026 vinnare — Bulgarien. Officiell music video."

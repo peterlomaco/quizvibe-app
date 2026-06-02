@@ -32,6 +32,7 @@ items:
     wikimediaSearchHints: ["Ariana Grande"]
     answerMethods: ["timeline", "name-letters"]
   - id: travis-scott
+    region: ["global"]
     displayName: "Travis Scott"
     correctYear: 1991
     probability: 88
@@ -221,3 +222,11 @@ items:
     probability: 80
     wikimediaSearchHints: ["Lil Nas X rapper"]
     answerMethods: ["timeline", "name-letters"]
+  - id: netta-barzilai
+    displayName: "Netta Barzilai"
+    correctYear: 1993
+    probability: 74
+    peakFrom: 2018
+    peakTo: 2023
+    wikimediaSearchHints: ["Netta Barzilai Israeli singer Eurovision 2018"]
+    answerMethods: ["name-letters"]

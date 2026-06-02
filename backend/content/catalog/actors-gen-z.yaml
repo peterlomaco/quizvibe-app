@@ -49,6 +49,7 @@ items:
     wikimediaSearchHints: ["Robert Pattinson actor Twilight"]
     answerMethods: ["timeline", "name-letters"]
   - id: kristen-stewart
+    region: ["global"]
     displayName: "Kristen Stewart"
     correctYear: 1990
     peakFrom: 2013
@@ -57,6 +58,7 @@ items:
     wikimediaSearchHints: ["Kristen Stewart actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: finn-wolfhard
+    region: ["global"]
     displayName: "Finn Wolfhard"
     correctYear: 2002
     peakFrom: 2016
@@ -65,6 +67,7 @@ items:
     wikimediaSearchHints: ["Finn Wolfhard actor Stranger Things"]
     answerMethods: ["timeline", "name-letters"]
   - id: noah-schnapp
+    region: ["global"]
     displayName: "Noah Schnapp"
     correctYear: 2004
     peakFrom: 2016

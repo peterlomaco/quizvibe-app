@@ -1145,10 +1145,10 @@ export default function ProfileScreen() {
               multi-select-semantik. */}
           <View style={styles.field}>
             <View style={styles.regionLabelRow}>
-              <Text style={styles.sectionLabel}>Person type portfolio</Text>
+              <Text style={styles.sectionLabel}>Main Profession Portfolio</Text>
               <Pressable
                 style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                onPress={() => Alert.alert('Person type portfolio', 'Quiz questions are drawn only from active person types. At least 1 must be enabled.')}
+                onPress={() => Alert.alert('Main Profession Portfolio', 'Questions are drawn from people whose main profession matches the selected type. People may also appear in other categories (e.g. an athlete in a film). At least 1 must be enabled.')}
                 hitSlop={8}
               >
                 <Text style={styles.infoIconText}>i</Text>

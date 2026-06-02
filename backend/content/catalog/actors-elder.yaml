@@ -71,6 +71,7 @@ items:
     wikimediaSearchHints: ["James Dean actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: james-stewart
+    region: ["global"]
     displayName: "James Stewart"
     correctYear: 1908
     peakFrom: 1939
@@ -95,6 +96,7 @@ items:
     wikimediaSearchHints: ["Charlie Chaplin actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: spencer-tracy
+    region: ["global"]
     displayName: "Spencer Tracy"
     correctYear: 1900
     peakFrom: 1937

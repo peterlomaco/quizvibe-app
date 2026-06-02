@@ -77,6 +77,7 @@ items:
     wikimediaSearchHints: ["Martina Navratilova tennis"]
     answerMethods: ["timeline", "name-letters"]
   - id: larry-bird
+    region: ["global"]
     displayName: "Larry Bird"
     correctYear: 1956
     probability: 85
@@ -199,12 +200,14 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: olga-korbut
+    region: ["global"]
     displayName: "Olga Korbut"
     correctYear: 1955
     probability: 78
     wikimediaSearchHints: ["Olga Korbut gymnast Soviet"]
     answerMethods: ["timeline", "name-letters"]
   - id: katarina-witt
+    region: ["global"]
     displayName: "Katarina Witt"
     correctYear: 1965
     probability: 82
@@ -511,6 +514,7 @@ items:
     genrePackages: ["pkg-fifa-wc"]
   # === FIFA WC Pass 2 2026-05-27 — fler ikoniska VM-spelare/tränare ===
   - id: jairzinho
+    region: ["global"]
     displayName: "Jairzinho"
     correctYear: 1944
     probability: 80
@@ -532,6 +536,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: just-fontaine
+    region: ["global"]
     displayName: "Just Fontaine"
     correctYear: 1933
     probability: 78
@@ -746,6 +751,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: jan-ceulemans
+    region: ["global"]
     displayName: "Jan Ceulemans"
     correctYear: 1957
     probability: 78
@@ -753,6 +759,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: hugo-sanchez
+    region: ["global"]
     displayName: "Hugo Sanchez"
     correctYear: 1958
     probability: 78
@@ -816,19 +823,13 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: lakhdar-belloumi
+    region: ["global"]
     displayName: "Lakhdar Belloumi"
     correctYear: 1958
     probability: 78
     wikimediaSearchHints: ["Lakhdar Belloumi footballer national team"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
-  - id: jean-tigana
-    displayName: "Jean Tigana"
-    correctYear: 1955
-    probability: 78
-    wikimediaSearchHints: ["Jean Tigana footballer national team"]
-    answerMethods: ["timeline", "name-letters"]
-    # pkg-fifa-wc-tag removed 2026-05-27 — no Commons action/kit found
   - id: luis-figo
     displayName: "Luis Figo"
     correctYear: 1972

@@ -319,6 +319,7 @@ items:
     wikimediaSearchHints: ["Michael Keaton actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: gary-oldman
+    region: ["global"]
     displayName: "Gary Oldman"
     correctYear: 1958
     peakFrom: 1981
@@ -391,6 +392,7 @@ items:
     wikimediaSearchHints: ["Robert Duvall actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: faye-dunaway
+    region: ["global"]
     displayName: "Faye Dunaway"
     correctYear: 1941
     peakFrom: 1964
@@ -504,6 +506,7 @@ items:
     wikimediaSearchHints: ["Vinnie Jones English footballer actor Lock Stock Snatch"]
     answerMethods: ["timeline", "name-letters"]
   - id: brian-bosworth
+    region: ["global"]
     displayName: "Brian Bosworth"
     correctYear: 1965
     peakFrom: 1988

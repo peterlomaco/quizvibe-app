@@ -260,6 +260,7 @@ items:
     wikimediaSearchHints: ["Snoop Dogg rapper"]
     answerMethods: ["timeline", "name-letters"]
   - id: ll-cool-j
+    region: ["global"]
     displayName: "LL Cool J"
     correctYear: 1968
     peakFrom: 1985
@@ -382,16 +383,11 @@ items:
     wikimediaSearchHints: ["Timbuktu Swedish rapper Jason Diakité Alla vill till himmelen"]
     answerMethods: ["timeline", "name-letters"]
   - id: cleo
+    region: ["global"]
     displayName: "Cleo"
     correctYear: 1985
     probability: 74
     wikimediaSearchHints: ["Cleo Swedish rapper hip hop Cleopatra Christianty"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: silvana-imam
-    displayName: "Silvana Imam"
-    correctYear: 1986
-    probability: 76
-    wikimediaSearchHints: ["Silvana Imam Swedish rapper hip hop feminist"]
     answerMethods: ["timeline", "name-letters"]
   - id: petra-marklund
     displayName: "Petra Marklund"
@@ -496,12 +492,6 @@ items:
     probability: 82
     wikimediaSearchHints: ["Benjamin Ingrosso Swedish singer Eurovision Dance You Off"]
     answerMethods: ["timeline", "name-letters"]
-  - id: moonica-mac
-    displayName: "Moonica Mac"
-    correctYear: 1986
-    probability: 66
-    wikimediaSearchHints: ["Moonica Mac Swedish singer indie"]
-    answerMethods: ["timeline", "name-letters"]
   - id: hurula
     displayName: "Hurula"
     correctYear: 1979
@@ -519,12 +509,6 @@ items:
     correctYear: 1972
     probability: 76
     wikimediaSearchHints: ["Sophie Zelmani Swedish singer folk Always You"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: frida-hyvonen
-    displayName: "Frida Hyvönen"
-    correctYear: 1977
-    probability: 70
-    wikimediaSearchHints: ["Frida Hyvönen Swedish singer piano indie"]
     answerMethods: ["timeline", "name-letters"]
   - id: linnea-henriksson
     displayName: "Linnéa Henriksson"
@@ -630,16 +614,11 @@ items:
     wikimediaSearchHints: ["Linda Pira Swedish rapper Knäpper mina fingrar"]
     answerMethods: ["timeline", "name-letters"]
   - id: aronchupa
+    region: ["global"]
     displayName: "AronChupa"
     correctYear: 1993
     probability: 76
     wikimediaSearchHints: ["AronChupa Aron Ekberg Swedish DJ Im an Albatraoz"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: marit-larsen
-    displayName: "Marit Larsen"
-    correctYear: 1983
-    probability: 74
-    wikimediaSearchHints: ["Marit Larsen Norwegian singer M2M If a Song Could Get Me You"]
     answerMethods: ["timeline", "name-letters"]
   - id: kygo
     displayName: "Kygo"
@@ -729,3 +708,12 @@ items:
     wikimediaSearchHints: ["Kanye West American rapper Ye producer Stronger"]
     answerMethods: ["timeline", "name-letters"]
     audience: ["millennials", "gen-z"]
+  - id: conchita-wurst
+    displayName: "Conchita Wurst"
+    correctYear: 1988
+    probability: 80
+    peakFrom: 2014
+    peakTo: 2022
+    wikimediaSearchHints: ["Conchita Wurst Austrian singer Eurovision 2014"]
+    answerMethods: ["name-letters"]
+    audience: ["millennials", "gen-x", "gen-z"]

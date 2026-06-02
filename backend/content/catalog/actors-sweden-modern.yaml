@@ -19,13 +19,6 @@ items:
     peakTo: 2022
     wikimediaSearchHints: ["Fares Fares actor"]
     answerMethods: ["name-letters"]
-  - id: tuva-novotny
-    displayName: "Tuva Novotny"
-    probability: 70
-    peakFrom: 2004
-    peakTo: 2020
-    wikimediaSearchHints: ["Tuva Novotny"]
-    answerMethods: ["name-letters"]
   - id: henrik-dorsin
     displayName: "Henrik Dorsin"
     probability: 76
@@ -111,6 +104,7 @@ items:
     wikimediaSearchHints: ["Alba August"]
     answerMethods: ["name-letters"]
   - id: evin-ahmad
+    region: ["global"]
     displayName: "Evin Ahmad"
     probability: 60
     peakFrom: 2017
@@ -139,6 +133,7 @@ items:
     wikimediaSearchHints: ["Erik Johansson skådespelare"]
     answerMethods: ["name-letters"]
   - id: moa-gammel
+    region: ["global"]
     displayName: "Moa Gammel"
     probability: 58
     peakFrom: 2008

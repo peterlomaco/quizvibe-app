@@ -113,6 +113,7 @@ items:
     wikimediaSearchHints: ["Dolly Parton singer country"]
     answerMethods: ["timeline", "name-letters"]
   - id: carole-king
+    region: ["global"]
     displayName: "Carole King"
     correctYear: 1942
     peakFrom: 1971
@@ -177,6 +178,7 @@ items:
     wikimediaSearchHints: ["Tom Jones singer Welsh"]
     answerMethods: ["timeline", "name-letters"]
   - id: patsy-cline
+    region: ["global"]
     displayName: "Patsy Cline"
     correctYear: 1932
     peakFrom: 1957

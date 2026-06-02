@@ -93,14 +93,6 @@ items:
     answerMethods: ["timeline", "name-letters"]
     sensitivity: standard
 
-  - id: jesper-blomqvist
-    displayName: Jesper Blomqvist
-    correctYear: 1974
-    probability: 78
-    wikimediaSearchHints: ["Jesper Blomqvist Swedish footballer"]
-    answerMethods: ["timeline", "name-letters"]
-    sensitivity: standard
-
   - id: henrik-rydstrom
     displayName: Henrik Rydström
     correctYear: 1975
@@ -170,14 +162,6 @@ items:
     correctYear: 1988
     probability: 74
     wikimediaSearchHints: ["Martin Olsson Swedish footballer"]
-    answerMethods: ["timeline", "name-letters"]
-    sensitivity: standard
-
-  - id: mikael-dorsin
-    displayName: Mikael Dorsin
-    correctYear: 1981
-    probability: 72
-    wikimediaSearchHints: ["Mikael Dorsin Swedish footballer"]
     answerMethods: ["timeline", "name-letters"]
     sensitivity: standard
 

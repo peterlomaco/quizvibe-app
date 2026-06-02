@@ -217,6 +217,7 @@ items:
     wikimediaSearchHints: ["Dwayne Johnson actor Rock"]
     answerMethods: ["timeline", "name-letters"]
   - id: chris-evans
+    region: ["global"]
     displayName: "Chris Evans"
     correctYear: 1981
     peakFrom: 2004
@@ -247,14 +248,6 @@ items:
     peakTo: 2026
     probability: 78
     wikimediaSearchHints: ["Eva Mendes actress"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: russell-crowe
-    displayName: "Russell Crowe"
-    correctYear: 1964
-    peakFrom: 1987
-    peakTo: 2017
-    probability: 85
-    wikimediaSearchHints: ["Russell Crowe actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: kate-hudson
     displayName: "Kate Hudson"
@@ -289,6 +282,7 @@ items:
     wikimediaSearchHints: ["Uma Thurman actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: jessica-chastain
+    region: ["global"]
     displayName: "Jessica Chastain"
     correctYear: 1977
     peakFrom: 2000
@@ -297,6 +291,7 @@ items:
     wikimediaSearchHints: ["Jessica Chastain actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: amy-adams
+    region: ["global"]
     displayName: "Amy Adams"
     correctYear: 1974
     peakFrom: 1997
@@ -321,6 +316,7 @@ items:
     wikimediaSearchHints: ["Bradley Cooper actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: tom-hiddleston
+    region: ["global"]
     displayName: "Tom Hiddleston"
     correctYear: 1981
     peakFrom: 2004
@@ -337,6 +333,7 @@ items:
     wikimediaSearchHints: ["Keira Knightley actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: anne-hathaway
+    region: ["global"]
     displayName: "Anne Hathaway"
     correctYear: 1982
     peakFrom: 2005
@@ -393,6 +390,7 @@ items:
     wikimediaSearchHints: ["Alicia Vikander Swedish actress Ex Machina Danish Girl Tomb Raider"]
     answerMethods: ["timeline", "name-letters"]
   - id: rebecca-ferguson
+    region: ["global"]
     displayName: "Rebecca Ferguson"
     correctYear: 1983
     peakFrom: 2006
@@ -407,14 +405,6 @@ items:
     peakTo: 2013
     probability: 84
     wikimediaSearchHints: ["Mikael Nyqvist Swedish actor Millennium John Wick"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: sofia-helin
-    displayName: "Sofia Helin"
-    correctYear: 1972
-    peakFrom: 1995
-    peakTo: 2025
-    probability: 80
-    wikimediaSearchHints: ["Sofia Helin Swedish actress Bron The Bridge Saga"]
     answerMethods: ["timeline", "name-letters"]
   - id: adam-palsson
     displayName: "Adam Pålsson"

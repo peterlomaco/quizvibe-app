@@ -61,3 +61,26 @@ items:
     peakTo: 2020
     wikimediaSearchHints: ["Seinabo Sey"]
     answerMethods: ["name-letters"]
+  - id: malena-ernman
+    displayName: "Malena Ernman"
+    probability: 74
+    audience: ["gen-x", "millennials"]
+    peakFrom: 2009
+    peakTo: 2019
+    wikimediaSearchHints: ["Malena Ernman opera singer"]
+    answerMethods: ["name-letters"]
+  - id: robin-stjernberg
+    displayName: "Robin Stjernberg"
+    probability: 72
+    peakFrom: 2013
+    peakTo: 2018
+    wikimediaSearchHints: ["Robin Stjernberg Melodifestivalen 2013"]
+    answerMethods: ["name-letters"]
+  - id: tusse
+    displayName: "Tusse"
+    probability: 76
+    audience: ["gen-z", "millennials"]
+    peakFrom: 2021
+    peakTo: 2025
+    wikimediaSearchHints: ["Tusse Chiza singer Eurovision 2021"]
+    answerMethods: ["name-letters"]

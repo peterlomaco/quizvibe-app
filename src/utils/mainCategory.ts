@@ -62,25 +62,48 @@ export function defaultEnabledMainCategories(): MainCategory[] {
 }
 
 /**
- * Avgör om ett item ska visas givet host:s aktiverade huvudkategorier.
+ * Avgör om ett item ska visas givet host:s aktiverade person-typer
+ * (Artists / Actors / Athletes — mappar 1:1 till Music / Film / Sport).
  *
  * Bas-regeln: item:ets `mainCategory` (härledd från contentSubject) måste
  * finnas i `enabled`. Items med null mainCategory (capitals/places) matchar
  * aldrig här (de hanteras separat av "alla 3 enabled = no-op"-specialfallet
  * i quiz.tsx).
  *
- * Sport-tema-undantag: en låt taggad `genrePackages: ["sport"]` (sport-musik —
- * fotbolls-VM-låt, hockey-VM-låt, idrottare som gjort musik) är subject=song
- * → mainCategory='Music', MEN surfar ÄVEN under Sport-toggeln. En host som
- * aktiverat antingen Music ELLER Sport får dessa. Driver "YouTube + musik +
- * sport"-crossover-kategorin (songs-sport.yaml).
+ * Crossover-regler — baserade på personens PRIMÄRPROFESSION:
+ *
+ *   genrePackages: ["sport"]
+ *     → surfar ÄVEN under Sport/Athletes.
+ *     Används på: Film- eller Music-items som gestaltar en ATLET (primär
+ *     profession: sport) i en annan kontext — sport-film (Rocky, Rush,
+ *     Snatch med Vinnie Jones), sport-musik, låt av känd atlet.
+ *
+ *   genrePackages: ["music"]
+ *     → surfar ÄVEN under Music/Artists.
+ *     Används på: Film-items som gestaltar en ARTIST (primär profession:
+ *     musik) — t.ex. musikerbiopic, film där en känd artist spelar sig
+ *     själv i bärande roll.
+ *
+ *   genrePackages: ["film"]
+ *     → surfar ÄVEN under Film/Actors.
+ *     Används på: Music-items gjorda av en SKÅDESPELARE (primär profession:
+ *     film) — t.ex. en känd skådespelares hit-låt.
+ *     OBS: används INTE på sport-events — det finns inga kända skådespelare
+ *     vars primärprofession gjorde dem berömda atleter.
+ *
+ * Taggar baseras alltid på vem PERSONEN är i grunden, inte innehållets typ.
+ * Items crossovar INTE automatiskt till sin nativa kategori — bas-regeln täcker det.
  */
 export function itemMatchesEnabledCategories(
   mainCategory: MainCategory | null,
   enabled: readonly MainCategory[],
   genrePackages?: readonly string[],
 ): boolean {
+  // Nativ kategori
   if (mainCategory !== null && enabled.includes(mainCategory)) return true;
+  // Crossover: person från annan profession gör item relevant i ytterligare kategori
   if (genrePackages?.includes('sport') && enabled.includes('Sport')) return true;
+  if (genrePackages?.includes('film') && enabled.includes('Film')) return true;
+  if (genrePackages?.includes('music') && enabled.includes('Music')) return true;
   return false;
 }
