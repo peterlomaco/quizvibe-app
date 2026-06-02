@@ -433,37 +433,33 @@ Profile-toggle som filtrerar vilka paket som syns i Lobby:n när användaren är
   - **FREE-badge-pattern bevarad**: `pkg.free` på `MusicPackage`-interfacet är optional och styr en kantskärande FREE-badge på paket-raden (`packageRowFreeBadge` styles). Inga free-paket existerar i V1 men styling finns kvar för framtida gratis-paket.
 - **Seeding**: Lobby host-seed-effekten läser `profile.enabledHostPackages` (= tom i V1). Bara host får filterlistan (non-hosts ser endast paket som hosten faktiskt aktiverat för denna lobby via `selectedExtraPackages`).
 
-## Main Profession Portfolio (Profile-toggle → Lobby-filter → quiz pool-filter)
+## SOURCE AND PROFESSIONS — per-source category filter (2026-06-03)
 
-V1-filtret är PERSON-centrerat — spelare väljer Artists/Actors/Athletes i lobbyn (= "Main Profession Portfolio"-sektionen, döpt om 2026-06-02 från "Person type portfolio"). Internt mappas 1:1 mot `MainCategory = 'Music' | 'Film' | 'Sport'` men UI-etiketterna är person-centric (`MAIN_CATEGORY_LABELS = {Music:'Artists', Film:'Actors', Sport:'Athletes'}`).
+Ersätter gamla `enabledMainCategories` + `youtubeEnabled`/`imagesEnabled`-booleans med **per-source category-arrays**. UI-rubriken "SOURCE AND PROFESSIONS" i både Lobby och Profile.
 
-**Person-type crossover (2026-06-02):** `itemMatchesEnabledCategories` i `mainCategory.ts` stöder nu symmetrisk crossover via `genrePackages`:
-- `genrePackages: ["sport"]` → item surfar ÄVEN under Athletes/Sport (film med atlet, sport-musik)
-- `genrePackages: ["film"]` → item surfar ÄVEN under Actors/Film (låt av skådespelare)
-- `genrePackages: ["music"]` → item surfar ÄVEN under Artists/Music (film med artist)
-Taggas baserat på personens PRIMÄRPROFESSION. Sport-klipp med skådespelares deltagande är INTE ett giltigt crossover-case. Se `memory/project_persontype_crossover.md`.
+**Datamodell**: `youtubeEnabledCategories: MainCategory[]` (alla 3 valbara, min 1 guard) + `imagesEnabledCategories: MainCategory[]` (Film+Sport = `IMAGES_MANDATORY_CATEGORIES` i `mainCategory.ts`, alltid i arrayen; Music valbar). `youtubeEnabled = youtubeEnabledCategories.length > 0`, `imagesEnabled = true` (alltid).
 
-**HOST PACKAGE (v1.1+):** Pure mode — t.ex. "Athletes strict" = BARA sport-klipp, inga crossover-filmer/musik. Det är STRICT MODE som säljs som host-paket, inte person-type-valet som är gratis.
+**UI**: kolumn-baserad matris-layout (`sourceMatrixDataCol` per professionskategori). Kolumnhuvuden = Artists / Actors / Athletes. Rader = YouTube (ikon + ⓘ-info-popup) / Images (Q-ikon med "?" + ⓘ-info-popup). Actors + Athletes i Images-raden har låsta switchar med 🔒-ikon på tummen (`mandatoryOverlay`, `right: 14`). Artists i Images-raden har vanlig toggle.
 
-- **Shared utility** ([src/utils/mainCategory.ts](src/utils/mainCategory.ts)): `MainCategory = 'Music' | 'Film' | 'Sport'`, `subjectToMainCategory(subject)`-helper, `MAIN_CATEGORIES`-konstant, `defaultEnabledMainCategories()` (alla 3), `isMainCategory(value)` type-guard, `MAIN_CATEGORY_LABELS = {Music:'Artists', Film:'Actors', Sport:'Athletes'}`, `itemMatchesEnabledCategories(mainCategory, enabled, genrePackages?)` (symmetrisk crossover). Tidigare lokala kopior i quiz.tsx och GetReadyIntro.tsx ersatta av imports från detta module.
-- **Profile-state** `enabledMainCategories?: MainCategory[]` på `ProfileData` ([profileStorage.ts](src/utils/profileStorage.ts)). Default vid load = alla 3 (`['Music', 'Film', 'Sport']`) så befintliga profiler ser inget beteendebyte. `loadProfile` coerce:ar tom array → defaults (defensive mot DB-edge cases). DB-kolumn: `profiles.enabled_main_categories text[]` med default `array['Music','Film','Sport']`.
-- **Lobby-state** `enabledMainCategories: MainCategory[]` på `LobbySettings` ([mockLobbySettings.ts](src/utils/mockLobbySettings.ts)). Host-seed-effekten prio:erar `stored` (carry-over från Play Again) > `profile.enabledMainCategories` > all 3 (defensive fallback). Non-host syncar via 2s polling + Realtime-tick. DB-kolumn: `lobby_settings.enabled_main_categories text[]` med samma default. Migration: [supabase/migrations/0012_main_categories.sql](supabase/migrations/0012_main_categories.sql) — appliceras manuellt via Supabase SQL editor.
-- **UI-stil**: 3 tappbara bordered-rutor (`mainCategoryToggle` + `mainCategoryBox`) som speglar Game Mode-toggle:ns visuella språk men med multi-select-semantik. Active = `Colors.primary` border + `Colors.primaryMuted` bg + primary-färgad semibold-text. Inactive = `Colors.borderStrong` border + transparent bg + textSecondary-färg. Styles dupliceras mellan ProfileScreen och LobbyScreen som **lokal kopia** (icke-domän-vokabulär, små diffs) — håll dem synkade vid framtida ändringar.
-- **Min-1-guard** (`handleToggleMainCategory`): försök att avaktivera sista enabled visar Alert "At least one main category. Minimum 1 main category needs to be enabled. Activate another category before disabling this one." och no-op:ar state-changen. Speglar Game Connections-källornas motsvarande guard. Båda Profile och Lobby har identisk logik.
-- **Layout-position**:
-  - Profile: mellan Multiplayer-bracket och "Region scope + Answer response time"-raden (= top of Quiz settings-blocket).
-  - Lobby: mellan Game Connections-källornas Images-rad och Customized Host packages-sub-blocket (inom samma `connectionsList`-View, så luftgivningen följer `usePackagesBlock`-mönstret med `marginTop: Spacing.md`).
-- **Pool-filter i quiz.tsx** ([app/quiz.tsx](app/quiz.tsx) `gameQuestions`-useMemo):
-  - **HÅRD filter** — inga auto-fallbacks som strippar kategorin (host:s val respekteras). Edge case "filtret tömmer pool helt" fångas av "båda pools tomma → SEED_QUESTIONS"-fallbacken (UI:t ska normalt blockera detta läge via min-1-guard).
-  - **Filter-position i pipeline** (efter `audienceFilter`):
-    1. Source-toggle (youtubeEnabled / imagesEnabled) — HÅRD.
-    2. Era (correctYear ∈ [eraFrom, eraTo], eller peak-overlap) — HÅRD.
-    3. Audience (union av spelares generationer) — PREFERENS (relaxbar till era-only).
-    4. **Main category** — HÅRD (inga fallbacks).
-  - **Specialfall för `null mainCategory`-items** (capitals/places-items, currently 4 i pool men inte V1-playable per `project_launch_scope_v1`): när alla 3 categories enabled = no-op (= default-läget bevarar items oavsett mainCategory). Annars strict filter `q.mainCategory && enabledMainCategories.includes(q.mainCategory)` → null-items exkluderas. Detta är **forward-looking** — så fort capitals/places re-aktiveras post-V1 fungerar handler:n korrekt utan att items tappas tyst i default-läget.
-- **URL-params**: `handleStartGame` (host-vägen) + non-host:s Realtime-driven navigation skickar `enabledMainCategories: JSON.stringify(enabledMainCategories)`. quiz.tsx parsar via `try/catch` + `isMainCategory`-filter + non-empty-guard så korrupt payload fall:er till alla 3 (= ingen filtrering).
-- **Play Again carry-over**: `goToNewLobby` i quiz.tsx använder spread (`{ ...oldSettings, answerResponseSeconds }`) vid `keepSettings=true` så main-categories bär över automatiskt till nya lobby:n. Vid `keepSettings=false` (Start fresh) seedas från profil-defaults igen.
-- **HistoryEntry** lagrar INTE `enabledMainCategories` ännu — kan adderas i Player history-displayen post-V1 om relevant. Datan finns på URL-params i quiz.tsx men appendGameHistoryEntry-call:en exkluderar fältet idag.
+**Person-type crossover (2026-06-02):** `itemMatchesEnabledCategories` i `mainCategory.ts` stöder symmetrisk crossover via `genrePackages`:
+- `genrePackages: ["sport"]` → item surfar ÄVEN under Athletes/Sport
+- `genrePackages: ["film"]` → item surfar ÄVEN under Actors/Film
+- `genrePackages: ["music"]` → item surfar ÄVEN under Artists/Music
+Taggas baserat på personens PRIMÄRPROFESSION. Se `memory/project_persontype_crossover.md`.
+
+- **Shared utility** ([src/utils/mainCategory.ts](src/utils/mainCategory.ts)): `MainCategory`, `IMAGES_MANDATORY_CATEGORIES`, `MAIN_CATEGORIES`, `defaultEnabledMainCategories()`, `isMainCategory()`, `MAIN_CATEGORY_LABELS`, `itemMatchesEnabledCategories()`, `subjectToMainCategory()`.
+- **Profile-state** `youtubeEnabledCategories?: MainCategory[]` + `imagesEnabledCategories?: MainCategory[]` på `ProfileData`. Default = alla 3. `loadProfile` merge:ar från AsyncStorage-cache om Supabase-raden saknar nya kolumner (pre-migration 0014).
+- **Lobby-state** `youtubeEnabledCategories: MainCategory[]` + `imagesEnabledCategories: MainCategory[]` på `LobbySettings`. Host-seed prio: `stored > profile > all 3`. Non-host syncar via polling. Tolerant read i `rowToSettings` (fallback mot gamla `youtube_enabled`/`images_enabled`-kolumner om migration 0014 ej körd).
+- **DB-migration**: [supabase/migrations/0014_per_source_categories.sql](supabase/migrations/0014_per_source_categories.sql) — `youtube_enabled_categories text[]` + `images_enabled_categories text[]` på `lobby_settings` + `profiles`. Appliceras manuellt via Supabase SQL editor. Gamla kolumner bevaras under övergång.
+- **Pool-filter i quiz.tsx**: YouTube-pool filtreras mot `youtubeEnabledCategories`, image-pool mot `imagesEnabledCategories`. HÅRD filter — inga fallbacks. Filter-pipeline: source-toggle → era → audience → per-source category.
+- **URL-params**: `youtubeEnabledCategories: JSON.stringify(...)` + `imagesEnabledCategories: JSON.stringify(...)`. quiz.tsx parsar med `try/catch` + `isMainCategory`-filter, fallback alla 3. Images enforce:ar mandatory via `[...new Set([...filtered, 'Film', 'Sport'])]`.
+- **Play Again carry-over**: spread `{ ...oldSettings }` i `goToNewLobby` bär automatiskt per-source categories.
+- **Min-1-guard** (YouTube): `handleToggleYoutubeCategory` blockerar om `prev.length <= 1`. Alert "At least 1 profession type must be enabled for YouTube."
+- **Images-guard**: `handleToggleImagesArtists` togglear enbart Music; Film+Sport alltid i arrayen.
+
+## Profile — unsaved changes guard (2026-06-03)
+
+Snapshot-baserad jämförelse (`savedSnapshotRef` = JSON vid load/save). `hasUnsavedChanges()` jämför aktuell state vid navigation. `guardedNavigate(navigateFn)` wrappar alla exit-punkter: TopUserBanner back, Create Game ("Start New Game"), Join Game ("Join with Room code"), Store. Alert: "Don't save" (navigerar direkt) / "Save" (sparar defaults + host, sedan navigerar) / "Stay" (avbryter). Expo Routers native stack stödjer inte `usePreventRemove`/`beforeRemove` — explicit callback-wrapping är enda tillförlitliga metoden.
 
 ## Generic + Add host packages-rad (Lobby host-vyn)
 
@@ -581,9 +577,9 @@ Non-host-vyn använder fortfarande default `hasSubscription={false}` → grå st
 
 ## Lobby — Game Settings card
 
-Game Mode and Game Connections share a single bordered card (`gameSettingsBorder` in `LobbyScreen.tsx`) — they're treated as one "spelregler"-grupp. Order inside Game Connections: YouTube → **Profiles** → Main categories → "Customized Host packages" sub-block (`usePackagesBlock`).
+Game Mode and SOURCE AND PROFESSIONS share a single bordered card (`gameSettingsBorder` in `LobbyScreen.tsx`) — they're treated as one "spelregler"-grupp. Order inside SOURCE AND PROFESSIONS: Source × Profession matrix (kolumn-baserad: Artists/Actors/Athletes som kolumner, YouTube/Images som rader) → "Customized Host packages" sub-block (`usePackagesBlock`).
 
-**Profiles Images-källan** (2026-06-01, f.d. "Profiles"-förälder med Images+Sketch-undertoggles): en enda plain `connectionRow` som linjerar med YouTube-raden — **Profiles Images** (foto-biblioteket, Q-"?"-ikon = `Circle`+`Path`-SVG + `connectionIconAiText`, `imagesEnabled`). Räknas i min-1-guarden (`handleToggleSource`/`enabledSourceCount` = youtube+images). **"Profiles"-förälder-rubriken (`connectionSubHeading`) + hela Sketch-alternativet borttaget ur lobbyn 2026-06-01** (Peter: doodlen var aldrig wirad till quiz-poolen). `connectionSubHeading`-stilen finns kvar som död CSS. `sketchEnabled`-state + dess `mockLobbySettings`/DB-plumbing (`sketch_enabled`-kolumn, migration `0013`) lämnas orörda som död plumbing (default AV) så lobby-synken inte destabiliseras — bara UI-raden + förälder-rubriken är borttagna. `connectionLabel.minWidth` höjt 112→124 så "Profiles Images" ryms och pillen linjerar med YouTube-raden.
+**Source × Profession matrix** (2026-06-03, ersätter separata YouTube/Images-rader + Main categories-block): kolumn-baserad layout (`sourceMatrixDataCol`) med professionstyperna (Artists/Actors/Athletes) som kolumner och källorna (YouTube/Images) som rader. YouTube-raden har ⓘ-info-ikon, Images-raden har Q-ikon med "?" + ⓘ. Images Actors+Athletes har låsta switchar med 🔒 på tummen. Se "SOURCE AND PROFESSIONS" ovan för full spec. `sketchEnabled`-state + `mockLobbySettings`/DB-plumbing (`sketch_enabled`-kolumn, migration `0013`) lämnas som död plumbing (default AV).
 
 **Lobby host-seed-effekten** (i URL-params-deps useEffect:n) läser host:s profil vid varje lobby-mount och seeds lokala lobby-settings: `gameMode`, `maxPlayers`, `singlePlayerDefault`, `region` (mappas via `mapProfileRegion`-helper: `'sweden' → 'Sweden'`, `'nordics' → 'Nordics'`, `'global' → 'Global'`; null → `'Global'`-fallback eftersom Lobby:s Region-set inkluderar `'Europe'` som Profile saknar), `answerResponseSeconds`, `eraValues` (clamp:as till `[ERA_MIN, ERA_MAX]`), `roundsCount` (clamp:as mot `roundsMax`), `enabledHostPackages`. Generic-fallbacks per fält om profil saknar värdet — speglar Profile:s motsvarande spec (Pass-the-Phone, Max 4, Global, 1981→`ERA_MAX` (current year), `ROUNDS_DEFAULT`, 30 sek, alla paket aktiverade). Effekten triggar både vid första lobby-mount OCH vid Play Again-återinträde (component re-mountar då URL-params byter).
 
@@ -804,7 +800,7 @@ Glöm inte lägga till nya stores här när de skapas — annars läcker stale d
 | Number of Rounds | `mockLobbySettings.roundsCount` | ↑ |
 | Answer response time | `mockLobbySettings.answerResponseSeconds` | ↑ |
 | Customized Host packages | `mockLobbySettings.selectedExtraPackages` | ↑ |
-| Game Connections-pillar | `mockLobbySettings.{youtubeEnabled,imagesEnabled}` | ↑ |
+| Source × Profession matrix | `mockLobbySettings.{youtubeEnabledCategories,imagesEnabledCategories}` | ↑ |
 
 **Synthetic-host fallback** ([src/screens/LobbyScreen.tsx](src/screens/LobbyScreen.tsx) i non-host:s player-poll): om host saknas i `getLobbyPlayers`-resultatet (test-seed-kod eller fresh kod där host inte hunnit skriva ännu), syntheserar polling en placeholder-rad från `RoomMeta.hostPlayerName`:
 - `id: 'synthetic-host'`, `emoji: '👑'`, `type: 'registered'`, `isHost: true`, `approved: true`.
@@ -1165,7 +1161,7 @@ Båda knappar `flex: 1` så footer-raden fylls 50/50 med Spacing.sm gap mellan; 
 
 **Settings carry-over** (när `keepSettings=true`):
 - Läser `getLobbySettings(params.roomCode)` (= OLD room) och `setLobbySettings(newCode, { ...oldSettings, answerResponseSeconds: responseSeconds })`. responseSeconds override:as eftersom host kan ha justerat mid-game via GetReadyIntro:s dropdown.
-- Alla andra fält (`gameMode`, `singlePlayerDefault`, `region`, `eraFrom/To`, `roundsCount`, `selectedExtraPackages`, `youtubeEnabled`, `imagesEnabled`) bärs över oförändrade från gamla rummet.
+- Alla andra fält (`gameMode`, `singlePlayerDefault`, `region`, `eraFrom/To`, `roundsCount`, `selectedExtraPackages`, `youtubeEnabledCategories`, `imagesEnabledCategories`) bärs över oförändrade från gamla rummet.
 - Vid `keepSettings=false` (Start fresh): ingen `setLobbySettings`-skrivning → LobbyScreen:s host-seed-effekt fyller med profil-defaults vid mount.
 
 **Start Fresh-fix: host-id MÅSTE vara `'1'`** — carry-over-objektet i `reusePlayers=false`-grenen sätter `id: '1'` (matchar `SEED_PLAYERS[0].id` i LobbyScreen). Buggen tidigare: id var hardcoded `'you'`, vilket inte matchade seed-host:en. LobbyScreen:s mount-sekvens sätter först `players = [SEED_PLAYERS[0]]` (Alex K., id='1') och `useEffect`-skrivningen till `lobby_players` exekverar INNAN `consumePendingLobbyPlayers()` ersatte state med carry-over:n (id='you'). Resultat: TVÅ host-rader i DB:n (`id='1'` Alex K. + `id='you'` HostName) eftersom `setLobbyPlayers` UPSERT:ar utan att DELETE:a stale rader. Host:s lokala state hade bara 'you' så host:s vy visade 2 spelare (host + non-host), men non-host läste DB via polling och fick BÅDA host-raderna + sig själv = 3 spelare inklusive en fantom "Alex K." på leaderboard + timeline-banner. Genom att matcha id='1' träffar carry-over-skrivningen SAMMA DB-rad som seedet → bara name/emoji uppdateras, ingen extra host-rad.
