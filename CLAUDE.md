@@ -433,13 +433,31 @@ Profile-toggle som filtrerar vilka paket som syns i Lobby:n när användaren är
   - **FREE-badge-pattern bevarad**: `pkg.free` på `MusicPackage`-interfacet är optional och styr en kantskärande FREE-badge på paket-raden (`packageRowFreeBadge` styles). Inga free-paket existerar i V1 men styling finns kvar för framtida gratis-paket.
 - **Seeding**: Lobby host-seed-effekten läser `profile.enabledHostPackages` (= tom i V1). Bara host får filterlistan (non-hosts ser endast paket som hosten faktiskt aktiverat för denna lobby via `selectedExtraPackages`).
 
-## SOURCE AND PROFESSIONS — per-source category filter (2026-06-03)
+## SOURCE DASHBOARD — per-source category matrix (uppdaterad 2026-06-03)
 
-Ersätter gamla `enabledMainCategories` + `youtubeEnabled`/`imagesEnabled`-booleans med **per-source category-arrays**. UI-rubriken "SOURCE AND PROFESSIONS" i både Lobby och Profile.
+Ersätter gamla `enabledMainCategories` + `youtubeEnabled`/`imagesEnabled`-booleans med **per-source category-arrays**. UI-rubriken "SOURCE DASHBOARD" i både Lobby och Profile.
 
-**Datamodell**: `youtubeEnabledCategories: MainCategory[]` (alla 3 valbara, min 1 guard) + `imagesEnabledCategories: MainCategory[]` (Film+Sport = `IMAGES_MANDATORY_CATEGORIES` i `mainCategory.ts`, alltid i arrayen; Music valbar). `youtubeEnabled = youtubeEnabledCategories.length > 0`, `imagesEnabled = true` (alltid).
+**Datamodell**: `youtubeEnabledCategories: MainCategory[]` + `imagesEnabledCategories: MainCategory[]`. Båda kan innehålla 0–3 av Music/Film/Sport. `youtubeEnabled = youtubeEnabledCategories.length > 0`, `imagesEnabled = imagesEnabledCategories.length > 0`.
 
-**UI**: kolumn-baserad matris-layout (`sourceMatrixDataCol` per professionskategori). Kolumnhuvuden = Artists / Actors / Athletes. Rader = YouTube (ikon + ⓘ-info-popup) / Images (Q-ikon med "?" + ⓘ-info-popup). Actors + Athletes i Images-raden har låsta switchar med 🔒-ikon på tummen (`mandatoryOverlay`, `right: 14`). Artists i Images-raden har vanlig toggle.
+**UI — kolumn-baserad matrix-layout** (`smGrid` i LobbyScreen + ProfileScreen):
+- **Rad 1 (rubriker)**: `[All]` | Artists | Actors | Athletes — text i varsin kolumn-stack
+- **Rad 2 (All-rad)**: All master-toggle (label-col) + Artists/Actors/Athletes kolumn-masters — grå bakgrund + rundade hörn, `paddingLeft: 29pt` på All-toggle, `paddingLeft: 6pt` (Lobby) / `4pt` (Profile) på data-toggles
+- **Rad 3 (YouTube)**: YouTube-ikon + label (112pt label-col) + switchar per kolumn
+- **Rad 4 (Auto-sync)**: `height: 10pt` spacer-cell, Actors+Athletes visar "Auto-sync"-text
+- **Rad 5 (Images)**: Q?-ikon + label + switchar per kolumn
+- Vertikala separator-linjer (borderLeft) mellan Artists/Actors/Athletes
+- `onLayout` på `smGrid` mäter exakt kolumnbredd → `smCellStyle = { width: smColWidth }` för pixel-perfekt centrering
+
+**All-rad AND-logik**: `artistsAllOn/actorsAllOn/athletesAllOn = YT && Images` (båda måste vara ON för att All-switch ska lysa grön). `allEnabled = artistsAllOn && actorsAllOn && athletesAllOn`.
+
+**Auto-sync-logik** (ny 2026-06-03):
+- **Artists**: YouTube och Images är **oberoende** — vardera kan slås av/på fritt
+- **Actors/Athletes YouTube ON** → Images auto-aktiveras (Auto-sync)
+- **Actors/Athletes Images OFF** → YouTube stängs också av (Auto-sync bidirektionell)
+- **Actors/Athletes YouTube OFF** → Images förblir oberoende styrbar
+- `useEffect` normaliserar initial state: om YT Film/Sport är ON läggs Film/Sport till Images
+
+**quiz.tsx-filter**: YouTube-pool filtreras på `youtubeEnabledCategories` inkl. `genrePackages`-crossover (sport-taggad låt visas under Athletes/YT). Images-pool filtreras utan crossover. Inga mandatory-kategorier längre (Images Film+Sport kan stängas av).
 
 **Person-type crossover (2026-06-02):** `itemMatchesEnabledCategories` i `mainCategory.ts` stöder symmetrisk crossover via `genrePackages`:
 - `genrePackages: ["sport"]` → item surfar ÄVEN under Athletes/Sport
@@ -452,9 +470,9 @@ Taggas baserat på personens PRIMÄRPROFESSION. Se `memory/project_persontype_cr
 - **Lobby-state** `youtubeEnabledCategories: MainCategory[]` + `imagesEnabledCategories: MainCategory[]` på `LobbySettings`. Host-seed prio: `stored > profile > all 3`. Non-host syncar via polling. Tolerant read i `rowToSettings` (fallback mot gamla `youtube_enabled`/`images_enabled`-kolumner om migration 0014 ej körd).
 - **DB-migration**: [supabase/migrations/0014_per_source_categories.sql](supabase/migrations/0014_per_source_categories.sql) — `youtube_enabled_categories text[]` + `images_enabled_categories text[]` på `lobby_settings` + `profiles`. Appliceras manuellt via Supabase SQL editor. Gamla kolumner bevaras under övergång.
 - **Pool-filter i quiz.tsx**: YouTube-pool filtreras mot `youtubeEnabledCategories`, image-pool mot `imagesEnabledCategories`. HÅRD filter — inga fallbacks. Filter-pipeline: source-toggle → era → audience → per-source category.
-- **URL-params**: `youtubeEnabledCategories: JSON.stringify(...)` + `imagesEnabledCategories: JSON.stringify(...)`. quiz.tsx parsar med `try/catch` + `isMainCategory`-filter, fallback alla 3. Images enforce:ar mandatory via `[...new Set([...filtered, 'Film', 'Sport'])]`.
+- **URL-params**: `youtubeEnabledCategories: JSON.stringify(...)` + `imagesEnabledCategories: JSON.stringify(...)`. quiz.tsx parsar med `try/catch` + `isMainCategory`-filter, fallback alla 3. Ingen mandatory Film/Sport enforcement längre.
 - **Play Again carry-over**: spread `{ ...oldSettings }` i `goToNewLobby` bär automatiskt per-source categories.
-- **Min-1-guard** (YouTube): `handleToggleYoutubeCategory` blockerar om `prev.length <= 1`. Alert "At least 1 profession type must be enabled for YouTube."
+- **Min-1-guard**: minst 1 kolumn (profession) måste alltid vara aktiv. Enforced på kolumn-master-nivå + individuella toggle-handlers.
 - **Images-guard**: `handleToggleImagesArtists` togglear enbart Music; Film+Sport alltid i arrayen.
 
 ## Profile — unsaved changes guard (2026-06-03)
