@@ -33,6 +33,9 @@ export type Audience = z.infer<typeof AudienceSchema>;
 // Player default-region = 'sweden' i V1.
 export const RegionSchema = z.enum([
   'sweden',
+  'nordic',            // Skandinaviska/nordiska items — igenkänning i Sverige + Norge + Danmark
+                       // + Finland + Island. Items med region:["sweden","nordic"] visas för
+                       // svenska spelare i V1 OCH för nordiska spelare i V2+.
   'global',            // Internationellt erkänd men ej specifikt Sverige-fokuserad i V1.
                        // Items med region:["global"] visas ej för svensk spelare
                        // (filter: item.region ∩ player.region — "sweden"∩"global"=∅).

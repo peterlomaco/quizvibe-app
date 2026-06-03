@@ -54,26 +54,13 @@ items:
     peakTo: 2024
     wikimediaSearchHints: ["Kosovare Asllani"]
     answerMethods: ["name-letters"]
-  - id: johan-elmander
-    displayName: "Johan Elmander"
-    probability: 68
-    peakFrom: 2007
-    peakTo: 2014
-    wikimediaSearchHints: ["Johan Elmander"]
-    answerMethods: ["name-letters"]
   - id: viktor-gyokeres
     displayName: "Viktor Gyökeres"
+    region: ["sweden", "global"]
     probability: 78
     peakFrom: 2022
     peakTo: 2024
     wikimediaSearchHints: ["Viktor Gyökeres"]
-    answerMethods: ["name-letters"]
-  - id: jorgen-brink
-    displayName: "Jörgen Brink"
-    probability: 58
-    peakFrom: 2003
-    peakTo: 2010
-    wikimediaSearchHints: ["Jörgen Brink skier"]
     answerMethods: ["name-letters"]
   - id: kim-kallstrom
     displayName: "Kim Källström"

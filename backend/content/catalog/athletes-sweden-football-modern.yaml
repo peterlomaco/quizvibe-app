@@ -77,27 +77,11 @@ items:
     answerMethods: ["timeline", "name-letters"]
     sensitivity: standard
 
-  - id: kennedy-bakircioglu
-    displayName: Kennedy Bakircioglü
-    correctYear: 1980
-    probability: 75
-    wikimediaSearchHints: ["Kennedy Bakircioglü Swedish footballer"]
-    answerMethods: ["timeline", "name-letters"]
-    sensitivity: standard
-
   - id: christian-wilhelmsson
     displayName: Christian Wilhelmsson
     correctYear: 1979
     probability: 75
     wikimediaSearchHints: ["Christian Wilhelmsson Swedish footballer"]
-    answerMethods: ["timeline", "name-letters"]
-    sensitivity: standard
-
-  - id: henrik-rydstrom
-    displayName: Henrik Rydström
-    correctYear: 1975
-    probability: 72
-    wikimediaSearchHints: ["Henrik Rydström Swedish footballer"]
     answerMethods: ["timeline", "name-letters"]
     sensitivity: standard
 
@@ -141,14 +125,6 @@ items:
     answerMethods: ["timeline", "name-letters"]
     sensitivity: standard
 
-  - id: erkan-zengin
-    displayName: Erkan Zengin
-    correctYear: 1985
-    probability: 73
-    wikimediaSearchHints: ["Erkan Zengin Swedish footballer"]
-    answerMethods: ["timeline", "name-letters"]
-    sensitivity: standard
-
   - id: andreas-andersson
     displayName: Andreas Andersson
     correctYear: 1971
@@ -157,35 +133,11 @@ items:
     answerMethods: ["timeline", "name-letters"]
     sensitivity: standard
 
-  - id: martin-olsson
-    displayName: Martin Olsson
-    correctYear: 1988
-    probability: 74
-    wikimediaSearchHints: ["Martin Olsson Swedish footballer"]
-    answerMethods: ["timeline", "name-letters"]
-    sensitivity: standard
-
   - id: oscar-wendt
     displayName: Oscar Wendt
     correctYear: 1985
     probability: 74
     wikimediaSearchHints: ["Oscar Wendt Swedish footballer"]
-    answerMethods: ["timeline", "name-letters"]
-    sensitivity: standard
-
-  - id: jesper-karlstrom
-    displayName: Jesper Karlström
-    correctYear: 1995
-    probability: 73
-    wikimediaSearchHints: ["Jesper Karlström Swedish footballer"]
-    answerMethods: ["timeline", "name-letters"]
-    sensitivity: standard
-
-  - id: hugo-larsson
-    displayName: Hugo Larsson
-    correctYear: 2004
-    probability: 75
-    wikimediaSearchHints: ["Hugo Larsson Swedish footballer"]
     answerMethods: ["timeline", "name-letters"]
     sensitivity: standard
 
@@ -202,14 +154,6 @@ items:
     correctYear: 1999
     probability: 74
     wikimediaSearchHints: ["Isak Hien Swedish footballer"]
-    answerMethods: ["timeline", "name-letters"]
-    sensitivity: standard
-
-  - id: sebastian-nanasi
-    displayName: Sebastian Nanasi
-    correctYear: 2003
-    probability: 73
-    wikimediaSearchHints: ["Sebastian Nanasi Swedish footballer"]
     answerMethods: ["timeline", "name-letters"]
     sensitivity: standard
 
@@ -234,14 +178,6 @@ items:
     correctYear: 1987
     probability: 72
     wikimediaSearchHints: ["Gustav Svensson Swedish footballer"]
-    answerMethods: ["timeline", "name-letters"]
-    sensitivity: standard
-
-  - id: alexander-milosevic
-    displayName: Alexander Milosevic
-    correctYear: 1992
-    probability: 73
-    wikimediaSearchHints: ["Alexander Milosevic Swedish footballer"]
     answerMethods: ["timeline", "name-letters"]
     sensitivity: standard
 
@@ -285,14 +221,6 @@ items:
     answerMethods: ["timeline", "name-letters"]
     sensitivity: standard
 
-  - id: mattias-jonson
-    displayName: Mattias Jonson
-    correctYear: 1974
-    probability: 74
-    wikimediaSearchHints: ["Mattias Jonson Swedish footballer"]
-    answerMethods: ["timeline", "name-letters"]
-    sensitivity: standard
-
   - id: emil-forsberg
     displayName: Emil Forsberg
     correctYear: 1991
@@ -306,13 +234,5 @@ items:
     correctYear: 1994
     probability: 84
     wikimediaSearchHints: ["Victor Lindelöf Swedish footballer"]
-    answerMethods: ["timeline", "name-letters"]
-    sensitivity: standard
-
-  - id: anthony-elanga
-    displayName: Anthony Elanga
-    correctYear: 2002
-    probability: 78
-    wikimediaSearchHints: ["Anthony Elanga Swedish footballer"]
     answerMethods: ["timeline", "name-letters"]
     sensitivity: standard

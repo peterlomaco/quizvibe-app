@@ -10,18 +10,21 @@ contentSubject: athlete
 items:
   - id: bjorn-borg
     displayName: "Björn Borg"
+    region: ["sweden", "global"]
     correctYear: 1956
     probability: 97
     wikimediaSearchHints: ["Björn Borg tennis"]
     answerMethods: ["timeline", "name-letters"]
   - id: muhammad-ali
     displayName: "Muhammad Ali"
+    region: ["sweden", "global"]
     correctYear: 1942
     probability: 98
     wikimediaSearchHints: ["Muhammad Ali boxer"]
     answerMethods: ["timeline", "name-letters"]
   - id: pele
     displayName: "Pelé"
+    region: ["sweden", "global"]
     correctYear: 1940
     probability: 98
     wikimediaSearchHints: ["Pelé footballer"]
@@ -29,6 +32,7 @@ items:
     genrePackages: ["pkg-fifa-wc"]
   - id: diego-maradona
     displayName: "Diego Maradona"
+    region: ["sweden", "global"]
     correctYear: 1960
     probability: 96
     wikimediaSearchHints: ["Diego Maradona"]
@@ -36,12 +40,14 @@ items:
     genrePackages: ["pkg-fifa-wc"]
   - id: magic-johnson
     displayName: "Magic Johnson"
+    region: ["sweden", "global"]
     correctYear: 1959
     probability: 90
     wikimediaSearchHints: ["Magic Johnson basketball"]
     answerMethods: ["timeline", "name-letters"]
   - id: michael-jordan
     displayName: "Michael Jordan"
+    region: ["sweden", "global"]
     correctYear: 1963
     probability: 99
     wikimediaSearchHints: ["Michael Jordan basketball"]
@@ -52,12 +58,6 @@ items:
     probability: 85
     wikimediaSearchHints: ["Carl Lewis athlete"]
     answerMethods: ["timeline", "name-letters"]
-  - id: steffi-graf
-    displayName: "Steffi Graf"
-    correctYear: 1969
-    probability: 88
-    wikimediaSearchHints: ["Steffi Graf tennis"]
-    answerMethods: ["timeline", "name-letters"]
   - id: peter-forsberg
     displayName: "Peter Forsberg"
     correctYear: 1973
@@ -66,6 +66,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
   - id: wayne-gretzky
     displayName: "Wayne Gretzky"
+    region: ["sweden", "global"]
     correctYear: 1961
     probability: 88
     wikimediaSearchHints: ["Wayne Gretzky ice hockey"]
@@ -76,21 +77,9 @@ items:
     probability: 85
     wikimediaSearchHints: ["Martina Navratilova tennis"]
     answerMethods: ["timeline", "name-letters"]
-  - id: larry-bird
-    region: ["global"]
-    displayName: "Larry Bird"
-    correctYear: 1956
-    probability: 85
-    wikimediaSearchHints: ["Larry Bird basketball Celtics"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: boris-becker
-    displayName: "Boris Becker"
-    correctYear: 1967
-    probability: 88
-    wikimediaSearchHints: ["Boris Becker tennis"]
-    answerMethods: ["timeline", "name-letters"]
   - id: john-mcenroe
     displayName: "John McEnroe"
+    region: ["sweden", "global"]
     correctYear: 1959
     probability: 88
     wikimediaSearchHints: ["John McEnroe tennis"]
@@ -106,12 +95,6 @@ items:
     correctYear: 1964
     probability: 88
     wikimediaSearchHints: ["Mats Wilander tennis Sweden"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: jack-nicklaus
-    displayName: "Jack Nicklaus"
-    correctYear: 1940
-    probability: 82
-    wikimediaSearchHints: ["Jack Nicklaus golf"]
     answerMethods: ["timeline", "name-letters"]
   - id: johan-cruyff
     displayName: "Johan Cruyff"
@@ -136,6 +119,7 @@ items:
     genrePackages: ["pkg-fifa-wc"]
   - id: paolo-maldini
     displayName: "Paolo Maldini"
+    region: ["sweden", "global"]
     correctYear: 1968
     probability: 85
     wikimediaSearchHints: ["Paolo Maldini footballer Milan"]
@@ -143,6 +127,7 @@ items:
     genrePackages: ["pkg-fifa-wc"]
   - id: roberto-baggio
     displayName: "Roberto Baggio"
+    region: ["sweden", "global"]
     correctYear: 1967
     probability: 85
     wikimediaSearchHints: ["Roberto Baggio footballer Italy"]
@@ -150,6 +135,7 @@ items:
     genrePackages: ["pkg-fifa-wc"]
   - id: marco-van-basten
     displayName: "Marco van Basten"
+    region: ["sweden", "global"]
     correctYear: 1964
     probability: 85
     wikimediaSearchHints: ["Marco van Basten footballer Netherlands"]
@@ -215,6 +201,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
   - id: bjorn-daehlie
     displayName: "Bjørn Dæhlie"
+    region: ["sweden", "nordic"]
     correctYear: 1967
     probability: 85
     wikimediaSearchHints: ["Bjørn Dæhlie skier Norway"]
@@ -233,23 +220,19 @@ items:
     answerMethods: ["timeline", "name-letters"]
   - id: michael-schumacher
     displayName: "Michael Schumacher"
+    region: ["sweden", "global"]
     correctYear: 1969
     probability: 95
     wikimediaSearchHints: ["Michael Schumacher Formula 1"]
     answerMethods: ["timeline", "name-letters"]
   - id: zinedine-zidane
     displayName: "Zinédine Zidane"
+    region: ["sweden", "global"]
     correctYear: 1972
     probability: 92
     wikimediaSearchHints: ["Zinedine Zidane footballer France"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
-  - id: jimmy-connors
-    displayName: "Jimmy Connors"
-    correctYear: 1952
-    probability: 82
-    wikimediaSearchHints: ["Jimmy Connors tennis"]
-    answerMethods: ["timeline", "name-letters"]
   - id: andre-agassi
     displayName: "Andre Agassi"
     correctYear: 1970
@@ -282,6 +265,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
   - id: ronaldinho
     displayName: "Ronaldinho"
+    region: ["sweden", "global"]
     correctYear: 1980
     probability: 92
     wikimediaSearchHints: ["Ronaldinho footballer Brazil"]
@@ -362,23 +346,12 @@ items:
     wikimediaSearchHints: ["Christian Olsson triple jump Sweden Olympic 2004"]
     answerMethods: ["timeline", "name-letters"]
   # === Batch C 2026-05-27 — international legends ===
-  - id: mario-lemieux
-    displayName: "Mario Lemieux"
-    correctYear: 1965
-    probability: 86
-    wikimediaSearchHints: ["Mario Lemieux Pittsburgh Penguins hockey legend"]
-    answerMethods: ["timeline", "name-letters"]
   - id: jaromir-jagr
     displayName: "Jaromír Jágr"
+    region: ["sweden", "global"]
     correctYear: 1972
     probability: 84
     wikimediaSearchHints: ["Jaromir Jagr Czech hockey player Pittsburgh Penguins"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: ivan-lendl
-    displayName: "Ivan Lendl"
-    correctYear: 1960
-    probability: 82
-    wikimediaSearchHints: ["Ivan Lendl Czech American tennis player Grand Slam"]
     answerMethods: ["timeline", "name-letters"]
   - id: goran-ivanisevic
     displayName: "Goran Ivanišević"
@@ -392,19 +365,6 @@ items:
     probability: 84
     wikimediaSearchHints: ["George Foreman boxer heavyweight champion Rumble in the Jungle"]
     answerMethods: ["timeline", "name-letters"]
-  - id: sergey-bubka
-    displayName: "Sergey Bubka"
-    correctYear: 1963
-    probability: 78
-    wikimediaSearchHints: ["Sergey Bubka pole vault Ukrainian Olympic world record"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: jonathan-edwards
-    displayName: "Jonathan Edwards"
-    correctYear: 1966
-    probability: 74
-    wikimediaSearchHints: ["Jonathan Edwards British triple jump world record 1995"]
-    answerMethods: ["timeline", "name-letters"]
-  # === Komplettering 2026-05-27 — bordtennis/golf/hockey/fotboll/handboll ===
   - id: jan-ove-waldner
     displayName: "Jan-Ove Waldner"
     correctYear: 1965
@@ -438,15 +398,10 @@ items:
     answerMethods: ["timeline", "name-letters"]
   - id: eric-cantona
     displayName: "Eric Cantona"
+    region: ["sweden", "global"]
     correctYear: 1966
     probability: 88
     wikimediaSearchHints: ["Eric Cantona French footballer Manchester United"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: per-carlen
-    displayName: "Per Carlén"
-    correctYear: 1960
-    probability: 80
-    wikimediaSearchHints: ["Per Carlén Swedish handball coach player Bengan boys"]
     answerMethods: ["timeline", "name-letters"]
   - id: magnus-wislander
     displayName: "Magnus Wislander"
@@ -477,22 +432,9 @@ items:
     wikimediaSearchHints: ["Bebeto Brazilian footballer 1994 World Cup celebration"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
-  - id: dennis-bergkamp
-    displayName: "Dennis Bergkamp"
-    correctYear: 1969
-    probability: 82
-    wikimediaSearchHints: ["Dennis Bergkamp Dutch footballer Arsenal Netherlands"]
-    answerMethods: ["timeline", "name-letters"]
-    genrePackages: ["pkg-fifa-wc"]
-  - id: fabio-cannavaro
-    displayName: "Fabio Cannavaro"
-    correctYear: 1973
-    probability: 86
-    wikimediaSearchHints: ["Fabio Cannavaro Italian defender 2006 World Cup Ballon d'Or"]
-    answerMethods: ["timeline", "name-letters"]
-    genrePackages: ["pkg-fifa-wc"]
   - id: paolo-rossi
     displayName: "Paolo Rossi"
+    region: ["sweden", "global"]
     correctYear: 1956
     probability: 82
     wikimediaSearchHints: ["Paolo Rossi Italian striker 1982 World Cup golden boot"]
@@ -543,12 +485,6 @@ items:
     wikimediaSearchHints: ["Just Fontaine French striker 1958 World Cup 13 goals"]
     answerMethods: ["timeline", "name-letters"]
   # === FIFA WC Pass 3 mid-tier 2026-05-27 — elder-gen-x ===
-  - id: jean-pierre-papin
-    displayName: "Jean-Pierre Papin"
-    correctYear: 1963
-    probability: 78
-    wikimediaSearchHints: ["Jean-Pierre Papin French striker 1990 World Cup Ballon d'Or"]
-    answerMethods: ["timeline", "name-letters"]
   - id: otto-rehhagel
     displayName: "Otto Rehhagel"
     correctYear: 1938
@@ -643,23 +579,10 @@ items:
     genrePackages: ["pkg-fifa-wc"]
   - id: joachim-low
     displayName: "Joachim Löw"
+    region: ["sweden", "global"]
     correctYear: 1960
     probability: 86
     wikimediaSearchHints: ["Joachim Löw Jogi German coach 2014 World Cup champion"]
-    answerMethods: ["timeline", "name-letters"]
-    genrePackages: ["pkg-fifa-wc"]
-  - id: luiz-felipe-scolari
-    displayName: "Luiz Felipe Scolari"
-    correctYear: 1948
-    probability: 82
-    wikimediaSearchHints: ["Luiz Felipe Scolari Felipão Brazilian coach 2002 World Cup champion"]
-    answerMethods: ["timeline", "name-letters"]
-    genrePackages: ["pkg-fifa-wc"]
-  - id: arrigo-sacchi
-    displayName: "Arrigo Sacchi"
-    correctYear: 1946
-    probability: 80
-    wikimediaSearchHints: ["Arrigo Sacchi Italian coach 1994 World Cup final AC Milan"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: marcello-lippi
@@ -679,47 +602,18 @@ items:
     genrePackages: ["pkg-fifa-wc"]
   - id: ruud-gullit
     displayName: "Ruud Gullit"
+    region: ["sweden", "global"]
     correctYear: 1962
     probability: 86
     wikimediaSearchHints: ["Ruud Gullit Dutch footballer AC Milan Netherlands 1988"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
-  - id: gary-lineker
-    displayName: "Gary Lineker"
-    correctYear: 1960
-    probability: 88
-    wikimediaSearchHints: ["Gary Lineker English striker 1986 1990 World Cup Spurs"]
-    answerMethods: ["timeline", "name-letters"]
-    # pkg-fifa-wc-tag removed 2026-05-27 — no clear single-player kit shot on Commons
-  - id: mario-kempes
-    displayName: "Mario Kempes"
-    correctYear: 1954
-    probability: 80
-    wikimediaSearchHints: ["Mario Kempes Argentine striker 1978 World Cup champion"]
-    answerMethods: ["timeline", "name-letters"]
-    genrePackages: ["pkg-fifa-wc"]
-  # davor-suker removed 2026-05-27 — current webp is team-celebration shot
-  # (no individual player visible); no Commons single-player kit-bild found.
-  # === FIFA WC Pass 8 — mass-add (Peter accepterar civilian) 2026-05-27 ===
-  - id: michel-platini
-    displayName: "Michel Platini"
-    correctYear: 1955
-    probability: 78
-    wikimediaSearchHints: ["Michel Platini footballer national team"]
-    answerMethods: ["timeline", "name-letters"]
-    genrePackages: ["pkg-fifa-wc"]
   - id: lothar-matthaus
     displayName: "Lothar Matthaus"
+    region: ["sweden", "global"]
     correctYear: 1961
     probability: 78
     wikimediaSearchHints: ["Lothar Matthaus footballer national team"]
-    answerMethods: ["timeline", "name-letters"]
-    genrePackages: ["pkg-fifa-wc"]
-  - id: cafu
-    displayName: "Cafu"
-    correctYear: 1970
-    probability: 78
-    wikimediaSearchHints: ["Cafu footballer national team"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: rivaldo
@@ -787,13 +681,6 @@ items:
     wikimediaSearchHints: ["Sepp Maier footballer national team"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
-  - id: pavel-nedved
-    displayName: "Pavel Nedved"
-    correctYear: 1972
-    probability: 78
-    wikimediaSearchHints: ["Pavel Nedved footballer national team"]
-    answerMethods: ["timeline", "name-letters"]
-    genrePackages: ["pkg-fifa-wc"]
   - id: frank-rijkaard
     displayName: "Frank Rijkaard"
     correctYear: 1962
@@ -817,21 +704,15 @@ items:
     genrePackages: ["pkg-fifa-wc"]
   - id: ryan-giggs
     displayName: "Ryan Giggs"
+    region: ["sweden", "global"]
     correctYear: 1973
     probability: 78
     wikimediaSearchHints: ["Ryan Giggs footballer national team"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
-  - id: lakhdar-belloumi
-    region: ["global"]
-    displayName: "Lakhdar Belloumi"
-    correctYear: 1958
-    probability: 78
-    wikimediaSearchHints: ["Lakhdar Belloumi footballer national team"]
-    answerMethods: ["timeline", "name-letters"]
-    genrePackages: ["pkg-fifa-wc"]
   - id: luis-figo
     displayName: "Luis Figo"
+    region: ["sweden", "global"]
     correctYear: 1972
     probability: 78
     wikimediaSearchHints: ["Luis Figo footballer national team"]
@@ -840,6 +721,7 @@ items:
   # pierre-littbarski removed 2026-05-27 — Peter rejected current webp.
   - id: jurgen-klinsmann
     displayName: "Jurgen Klinsmann"
+    region: ["sweden", "global"]
     correctYear: 1964
     probability: 78
     wikimediaSearchHints: ["Jurgen Klinsmann footballer national team"]
@@ -888,13 +770,6 @@ items:
     wikimediaSearchHints: ["Fernando Hierro footballer national team"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
-  - id: juan-sebastian-veron
-    displayName: "Juan Sebastian Veron"
-    correctYear: 1975
-    probability: 78
-    wikimediaSearchHints: ["Juan Sebastian Veron footballer national team"]
-    answerMethods: ["timeline", "name-letters"]
-    genrePackages: ["pkg-fifa-wc"]
   - id: glenn-hoddle
     displayName: "Glenn Hoddle"
     correctYear: 1957
@@ -903,13 +778,6 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   # stuart-pearce removed 2026-05-27 — Peter rejected, no kit-bild on Commons.
-  - id: sol-campbell
-    displayName: "Sol Campbell"
-    correctYear: 1974
-    probability: 78
-    wikimediaSearchHints: ["Sol Campbell footballer national team"]
-    answerMethods: ["timeline", "name-letters"]
-    genrePackages: ["pkg-fifa-wc"]
   - id: cafu-falcao
     displayName: "Cafu Falcao"
     correctYear: 1953

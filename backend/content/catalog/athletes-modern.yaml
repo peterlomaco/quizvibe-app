@@ -10,6 +10,7 @@ contentSubject: athlete
 items:
   - id: zlatan-ibrahimovic
     displayName: "Zlatan Ibrahimović"
+    region: ["sweden", "global"]
     correctYear: 1981
     probability: 98
     wikimediaSearchHints: ["Zlatan Ibrahimović"]
@@ -17,6 +18,7 @@ items:
     genrePackages: ["pkg-fifa-wc"]
   - id: cristiano-ronaldo
     displayName: "Cristiano Ronaldo"
+    region: ["sweden", "global"]
     correctYear: 1985
     probability: 97
     wikimediaSearchHints: ["Cristiano Ronaldo"]
@@ -24,6 +26,7 @@ items:
     genrePackages: ["pkg-fifa-wc"]
   - id: lionel-messi
     displayName: "Lionel Messi"
+    region: ["sweden", "global"]
     correctYear: 1987
     probability: 97
     wikimediaSearchHints: ["Lionel Messi"]
@@ -37,6 +40,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
   - id: usain-bolt
     displayName: "Usain Bolt"
+    region: ["sweden", "global"]
     correctYear: 1986
     probability: 97
     wikimediaSearchHints: ["Usain Bolt sprinter"]
@@ -61,12 +65,14 @@ items:
     answerMethods: ["timeline", "name-letters"]
   - id: lewis-hamilton
     displayName: "Lewis Hamilton"
+    region: ["sweden", "global"]
     correctYear: 1985
     probability: 88
     wikimediaSearchHints: ["Lewis Hamilton Formula 1 driver"]
     answerMethods: ["timeline", "name-letters"]
   - id: rafael-nadal
     displayName: "Rafael Nadal"
+    region: ["sweden", "global"]
     correctYear: 1986
     probability: 94
     wikimediaSearchHints: ["Rafael Nadal tennis"]
@@ -104,12 +110,14 @@ items:
     answerMethods: ["timeline", "name-letters"]
   - id: kobe-bryant
     displayName: "Kobe Bryant"
+    region: ["sweden", "global"]
     correctYear: 1978
     probability: 92
     wikimediaSearchHints: ["Kobe Bryant basketball Lakers"]
     answerMethods: ["timeline", "name-letters"]
   - id: erling-haaland
     displayName: "Erling Haaland"
+    region: ["sweden", "nordic"]
     correctYear: 2000
     probability: 90
     wikimediaSearchHints: ["Erling Haaland footballer"]
@@ -117,6 +125,7 @@ items:
     genrePackages: ["pkg-fifa-wc"]
   - id: harry-kane
     displayName: "Harry Kane"
+    region: ["sweden", "global"]
     correctYear: 1993
     probability: 88
     wikimediaSearchHints: ["Harry Kane footballer England"]
@@ -124,6 +133,7 @@ items:
     genrePackages: ["pkg-fifa-wc"]
   - id: robert-lewandowski
     displayName: "Robert Lewandowski"
+    region: ["sweden", "global"]
     correctYear: 1988
     probability: 88
     wikimediaSearchHints: ["Robert Lewandowski footballer"]
@@ -131,6 +141,7 @@ items:
     genrePackages: ["pkg-fifa-wc"]
   - id: luka-modric
     displayName: "Luka Modrić"
+    region: ["sweden", "global"]
     correctYear: 1985
     probability: 85
     wikimediaSearchHints: ["Luka Modric footballer Croatia"]
@@ -141,12 +152,6 @@ items:
     correctYear: 1987
     probability: 90
     wikimediaSearchHints: ["Andy Murray tennis"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: carlos-alcaraz
-    displayName: "Carlos Alcaraz"
-    correctYear: 2003
-    probability: 85
-    wikimediaSearchHints: ["Carlos Alcaraz tennis"]
     answerMethods: ["timeline", "name-letters"]
   - id: mikaela-shiffrin
     displayName: "Mikaela Shiffrin"
@@ -166,25 +171,6 @@ items:
     probability: 90
     wikimediaSearchHints: ["Carolina Klüft heptathlon Sweden"]
     answerMethods: ["timeline", "name-letters"]
-  - id: max-verstappen
-    displayName: "Max Verstappen"
-    correctYear: 1997
-    probability: 92
-    wikimediaSearchHints: ["Max Verstappen Formula 1"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: valentino-rossi
-    region: ["global"]
-    displayName: "Valentino Rossi"
-    correctYear: 1979
-    probability: 88
-    wikimediaSearchHints: ["Valentino Rossi MotoGP"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: megan-rapinoe
-    displayName: "Megan Rapinoe"
-    correctYear: 1985
-    probability: 82
-    wikimediaSearchHints: ["Megan Rapinoe soccer"]
-    answerMethods: ["timeline", "name-letters"]
   - id: alex-morgan
     displayName: "Alex Morgan"
     correctYear: 1989
@@ -193,12 +179,14 @@ items:
     answerMethods: ["timeline", "name-letters"]
   - id: karsten-warholm
     displayName: "Karsten Warholm"
+    region: ["sweden", "nordic"]
     correctYear: 1996
     probability: 82
     wikimediaSearchHints: ["Karsten Warholm hurdler Norway"]
     answerMethods: ["timeline", "name-letters"]
   - id: jakob-ingebrigtsen
     displayName: "Jakob Ingebrigtsen"
+    region: ["sweden", "nordic"]
     correctYear: 2000
     probability: 80
     wikimediaSearchHints: ["Jakob Ingebrigtsen runner Norway"]
@@ -217,6 +205,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
   - id: venus-williams
     displayName: "Venus Williams"
+    region: ["sweden", "global"]
     correctYear: 1980
     probability: 92
     wikimediaSearchHints: ["Venus Williams tennis"]
@@ -232,12 +221,6 @@ items:
     correctYear: 1980
     probability: 82
     wikimediaSearchHints: ["Daniel Sedin Vancouver Canucks hockey Sweden twin"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: henrik-sedin
-    displayName: "Henrik Sedin"
-    correctYear: 1980
-    probability: 82
-    wikimediaSearchHints: ["Henrik Sedin Vancouver Canucks hockey Sweden twin"]
     answerMethods: ["timeline", "name-letters"]
   - id: erik-karlsson
     displayName: "Erik Karlsson"
@@ -284,15 +267,10 @@ items:
   # === Batch C 2026-05-27 — international modern athletes ===
   - id: sidney-crosby
     displayName: "Sidney Crosby"
+    region: ["sweden", "global"]
     correctYear: 1987
     probability: 88
     wikimediaSearchHints: ["Sidney Crosby Pittsburgh Penguins captain hockey"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: alex-ovechkin
-    displayName: "Alex Ovechkin"
-    correctYear: 1985
-    probability: 84
-    wikimediaSearchHints: ["Alex Ovechkin Washington Capitals Russian hockey goals record"]
     answerMethods: ["timeline", "name-letters"]
   - id: connor-mcdavid
     displayName: "Connor McDavid"
@@ -312,13 +290,6 @@ items:
     correctYear: 1981
     probability: 82
     wikimediaSearchHints: ["Iker Casillas Spanish goalkeeper Real Madrid 2010 World Cup"]
-    answerMethods: ["timeline", "name-letters"]
-    genrePackages: ["pkg-fifa-wc"]
-  - id: sergio-ramos
-    displayName: "Sergio Ramos"
-    correctYear: 1986
-    probability: 84
-    wikimediaSearchHints: ["Sergio Ramos Spanish defender Real Madrid captain"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: toni-kroos
@@ -361,6 +332,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
   - id: wayne-rooney
     displayName: "Wayne Rooney"
+    region: ["sweden", "global"]
     correctYear: 1985
     probability: 92
     wikimediaSearchHints: ["Wayne Rooney English footballer Manchester United England"]
@@ -387,6 +359,7 @@ items:
   # === FIFA World Cup-paketet 2026-05-27 — fotbollsspelare i landslagskläder ===
   - id: ronaldinho
     displayName: "Ronaldinho"
+    region: ["sweden", "global"]
     correctYear: 1980
     probability: 92
     wikimediaSearchHints: ["Ronaldinho Brazilian footballer Barcelona 2002 World Cup"]
@@ -420,13 +393,6 @@ items:
     wikimediaSearchHints: ["David Villa Spanish striker 2010 World Cup"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
-  - id: samuel-etoo
-    displayName: "Samuel Eto'o"
-    correctYear: 1981
-    probability: 84
-    wikimediaSearchHints: ["Samuel Eto'o Cameroon striker Barcelona Inter Milan"]
-    answerMethods: ["timeline", "name-letters"]
-    genrePackages: ["pkg-fifa-wc"]
   - id: didier-drogba
     displayName: "Didier Drogba"
     correctYear: 1978
@@ -457,6 +423,7 @@ items:
     genrePackages: ["pkg-fifa-wc"]
   - id: kevin-de-bruyne
     displayName: "Kevin De Bruyne"
+    region: ["sweden", "global"]
     correctYear: 1991
     probability: 88
     wikimediaSearchHints: ["Kevin De Bruyne Belgian midfielder Manchester City"]
@@ -478,6 +445,7 @@ items:
     genrePackages: ["pkg-fifa-wc"]
   - id: virgil-van-dijk
     displayName: "Virgil van Dijk"
+    region: ["sweden", "global"]
     correctYear: 1991
     probability: 86
     wikimediaSearchHints: ["Virgil van Dijk Dutch defender captain Liverpool"]
@@ -535,6 +503,7 @@ items:
     genrePackages: ["pkg-fifa-wc"]
   - id: martin-odegaard
     displayName: "Martin Ødegaard"
+    region: ["sweden", "nordic"]
     correctYear: 1998
     probability: 82
     wikimediaSearchHints: ["Martin Ødegaard Norwegian midfielder Arsenal captain"]
@@ -555,57 +524,12 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
     audience: ["gen-x", "millennials", "gen-z"]
-  - id: lionel-scaloni
-    region: ["global"]
-    displayName: "Lionel Scaloni"
-    correctYear: 1978
-    probability: 80
-    wikimediaSearchHints: ["Lionel Scaloni Argentine coach 2022 World Cup champion"]
-    answerMethods: ["timeline", "name-letters"]
-    genrePackages: ["pkg-fifa-wc"]
-  # === FIFA WC Pass 7 — alt-source kit hits modern 2026-05-27 ===
   - id: ronaldo-nazario
     displayName: "Ronaldo Nazário"
+    region: ["sweden", "global"]
     correctYear: 1976
     probability: 96
     wikimediaSearchHints: ["Ronaldo Brazilian striker 1998 2002 World Cup champion"]
-    answerMethods: ["timeline", "name-letters"]
-    genrePackages: ["pkg-fifa-wc"]
-  - id: francesco-totti
-    displayName: "Francesco Totti"
-    correctYear: 1976
-    probability: 84
-    wikimediaSearchHints: ["Francesco Totti Italian forward Roma 2006 World Cup champion"]
-    answerMethods: ["timeline", "name-letters"]
-    genrePackages: ["pkg-fifa-wc"]
-  # carles-puyol removed 2026-05-27 — webp is team-celebration shot,
-  # individual player not visible. Re-curate with portrait from Commons.
-  - id: michael-essien
-    displayName: "Michael Essien"
-    correctYear: 1982
-    probability: 78
-    wikimediaSearchHints: ["Michael Essien Ghanaian midfielder Chelsea Real Madrid"]
-    answerMethods: ["timeline", "name-letters"]
-    genrePackages: ["pkg-fifa-wc"]
-  - id: robinho
-    displayName: "Robinho"
-    correctYear: 1984
-    probability: 76
-    wikimediaSearchHints: ["Robinho Brazilian forward Santos Real Madrid Manchester City"]
-    answerMethods: ["timeline", "name-letters"]
-    genrePackages: ["pkg-fifa-wc"]
-  - id: philipp-lahm
-    displayName: "Philipp Lahm"
-    correctYear: 1983
-    probability: 86
-    wikimediaSearchHints: ["Philipp Lahm German captain 2014 World Cup champion"]
-    answerMethods: ["timeline", "name-letters"]
-    genrePackages: ["pkg-fifa-wc"]
-  - id: olivier-giroud
-    displayName: "Olivier Giroud"
-    correctYear: 1986
-    probability: 80
-    wikimediaSearchHints: ["Olivier Giroud French striker 2018 World Cup champion Chelsea Arsenal"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: marcelo
@@ -615,14 +539,6 @@ items:
     wikimediaSearchHints: ["Marcelo Vieira Brazilian left back Real Madrid 2014 2018 World Cup"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
-  - id: vinicius-junior
-    displayName: "Vinícius Júnior"
-    correctYear: 2000
-    probability: 86
-    wikimediaSearchHints: ["Vinícius Júnior Brazilian winger Real Madrid 2022 World Cup"]
-    answerMethods: ["timeline", "name-letters"]
-    genrePackages: ["pkg-fifa-wc"]
-  # === FIFA WC Pass 8 — mass-add (Peter accepterar civilian) 2026-05-27 ===
   - id: miroslav-klose
     displayName: "Miroslav Klose"
     correctYear: 1978
@@ -773,16 +689,10 @@ items:
     genrePackages: ["pkg-fifa-wc"]
   - id: petr-cech
     displayName: "Petr Cech"
+    region: ["sweden", "global"]
     correctYear: 1982
     probability: 78
     wikimediaSearchHints: ["Petr Cech footballer national team"]
-    answerMethods: ["timeline", "name-letters"]
-    genrePackages: ["pkg-fifa-wc"]
-  - id: arjen-robben
-    displayName: "Arjen Robben"
-    correctYear: 1984
-    probability: 78
-    wikimediaSearchHints: ["Arjen Robben footballer national team"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: wesley-sneijder
@@ -808,6 +718,7 @@ items:
     genrePackages: ["pkg-fifa-wc"]
   - id: patrick-kluivert
     displayName: "Patrick Kluivert"
+    region: ["sweden", "global"]
     correctYear: 1976
     probability: 78
     wikimediaSearchHints: ["Patrick Kluivert footballer national team"]
@@ -960,20 +871,6 @@ items:
     wikimediaSearchHints: ["Cody Gakpo footballer national team"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
-  - id: matthijs-de-ligt
-    displayName: "Matthijs De Ligt"
-    correctYear: 1999
-    probability: 78
-    wikimediaSearchHints: ["Matthijs De Ligt footballer national team"]
-    answerMethods: ["timeline", "name-letters"]
-    genrePackages: ["pkg-fifa-wc"]
-  - id: ruud-van-nistelrooy
-    displayName: "Ruud Van Nistelrooy"
-    correctYear: 1976
-    probability: 78
-    wikimediaSearchHints: ["Ruud Van Nistelrooy footballer national team"]
-    answerMethods: ["timeline", "name-letters"]
-    genrePackages: ["pkg-fifa-wc"]
   - id: hugo-lloris
     displayName: "Hugo Lloris"
     correctYear: 1986
@@ -990,6 +887,7 @@ items:
     genrePackages: ["pkg-fifa-wc"]
   - id: paul-pogba
     displayName: "Paul Pogba"
+    region: ["sweden", "global"]
     correctYear: 1993
     probability: 78
     wikimediaSearchHints: ["Paul Pogba footballer national team"]
@@ -1085,13 +983,6 @@ items:
     wikimediaSearchHints: ["Julio Cesar footballer national team"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
-  - id: el-hadji-diouf
-    displayName: "El Hadji Diouf"
-    correctYear: 1981
-    probability: 78
-    wikimediaSearchHints: ["El Hadji Diouf footballer national team"]
-    answerMethods: ["timeline", "name-letters"]
-    genrePackages: ["pkg-fifa-wc"]
   - id: emmanuel-adebayor
     displayName: "Emmanuel Adebayor"
     correctYear: 1984
@@ -1101,6 +992,7 @@ items:
     genrePackages: ["pkg-fifa-wc"]
   - id: mohamed-salah
     displayName: "Mohamed Salah"
+    region: ["sweden", "global"]
     correctYear: 1992
     probability: 78
     wikimediaSearchHints: ["Mohamed Salah footballer national team"]

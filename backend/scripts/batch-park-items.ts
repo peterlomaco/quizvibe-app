@@ -43,6 +43,23 @@ const REMOVE_IDS = new Set([
   'niclas-eliasson', 'magnus-hedman',
   'rolling-stones', 'foo-fighters', 'aerosmith', 'europe',
   'wizex', 'ace-of-base', 'dire-straits', 'depeche-mode', 'duran-duran',
+  // logo-blur curation pass 1 — bilder med ej hanterbara logotyper
+  'dennis-bergkamp', 'el-hadji-diouf', 'erkan-zengin', 'fabio-cannavaro',
+  'francesco-totti', 'gary-lineker', 'jean-pierre-papin', 'johan-elmander',
+  'jonathan-edwards', 'larry-bird', 'martin-olsson', 'michael-essien',
+  'olivier-giroud', 'ruud-van-nistelrooy', 'samuel-etoo', 'sebastian-nanasi',
+  'sergio-ramos', 'sol-campbell', 'steffi-graf', 'valentino-rossi',
+  'vinicius-junior',
+  // logo-blur curation pass 2
+  'alex-ovechkin', 'alexander-milosevic', 'anthony-elanga', 'arjen-robben',
+  'arrigo-sacchi', 'boris-becker', 'cafu', 'carlos-alcaraz',
+  'henrik-rydstrom', 'henrik-sedin', 'hugo-larsson', 'ivan-lendl',
+  'jack-nicklaus', 'jesper-karlstrom', 'jimmy-connors', 'jorgen-brink',
+  'juan-sebastian-veron', 'kennedy-bakircioglu', 'lakhdar-belloumi',
+  'lionel-scaloni', 'luiz-felipe-scolari', 'mario-kempes', 'mario-lemieux',
+  'matthijs-de-ligt', 'mattias-jonson', 'max-verstappen', 'megan-rapinoe',
+  'michel-platini', 'pavel-nedved', 'per-carlen', 'philipp-lahm',
+  'sergey-bubka',
 ]);
 
 // Items att PARKERA i deferred/ (bevarar webp för ev. återaktivering)
@@ -130,6 +147,7 @@ const SOURCE_FILES = [
   'actors-sweden-classic.yaml',
   'athletes-sweden-football-classic.yaml',
   'athletes-sweden-football-modern.yaml',
+  'athletes-sweden-modern.yaml',
 ];
 
 // ── Hjälpfunktioner ───────────────────────────────────────────────────────
