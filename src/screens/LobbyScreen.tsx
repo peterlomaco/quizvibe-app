@@ -976,6 +976,10 @@ function BlinkingLabel({
 
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
+// Synlig OFF-färg för source matrix-switchar. Colors.borderStrong är
+// rgba(255,255,255,0.14) = nästan osynlig på mörk bakgrund.
+const MATRIX_SWITCH_OFF = '#3A5068';
+
 export default function LobbyScreen() {
   const {
     code,
@@ -1533,12 +1537,12 @@ export default function LobbyScreen() {
   // vid 4 spelare (PtP med 12 spelare × 20 rundor = orimligt långt spel),
   // Individual Devices defaulta:r till 12 så host får full multiplayer-cap
   // direkt utan extra knapptryck. Non-host syncar maxPlayers via room-meta-
-  // pollen ovan, så de behöver inte auto-set:as här.
-  // maxPlayers sätts nu explicit via Players-toggeln (Max 4 / Max 12). 12 är en
-  // subscription-perk → clampa till 4 för gratis-host oavsett seedat värde.
+  // maxPlayers sätts nu explicit via Players-toggeln (Max 4 / Max 12).
+  // Premium → auto-välj Max 12 och lås (Max 4 utgråas).
+  // Ej premium → tvinga tillbaka till Max 4.
   useEffect(() => {
     if (!hostMode) return;
-    if (!hasPremium) setMaxPlayers((prev) => (prev === 4 ? prev : 4));
+    setMaxPlayers(hasPremium ? 12 : 4);
   }, [hostMode, hasPremium]);
 
   // Max rundor är en subscription-perk OBEROENDE av läge: Premium → 20, annars
@@ -1621,25 +1625,197 @@ export default function LobbyScreen() {
     setScrollHintAtBottom(distanceFromBottom <= 24);
     setScrollHintScrollable(contentSize.height > layoutMeasurement.height + 24);
   }, []);
-  // YouTube category-toggle: min 1 måste vara aktiv.
-  const handleToggleYoutubeCategory = (cat: MainCategory, value: boolean) => {
-    setYoutubeEnabledCategories((prev) => {
-      if (!value && prev.length <= 1) {
-        Alert.alert(
-          'YouTube sources',
-          'At least 1 profession type must be enabled for YouTube.',
-        );
-        return prev;
-      }
-      if (value) return [...new Set([...prev, cat])] as MainCategory[];
-      return prev.filter((c) => c !== cat);
+  // ── Source Dashboard — kolumn-masters + individuella togglear ─────────
+  // Artists: YouTube + Images är oberoende valbara var och en.
+  // Actors/Athletes: Images följer YouTube automatiskt (Auto).
+  // All-master slår på alla kolumner; kolumn-masters slår på/av en kolumn.
+
+  // Kolumn är "aktiv" om minst EN källa (YT eller Images) är på.
+  const artistsEnabled =
+    youtubeEnabledCategories.includes('Music') || imagesEnabledCategories.includes('Music');
+  // Artists/All är ON enbart om BÅDA YT och Images är aktiva (AND).
+  const artistsAllOn =
+    youtubeEnabledCategories.includes('Music') && imagesEnabledCategories.includes('Music');
+  // Actors/Athletes: kolumn aktiv (OR) om minst en källa är på — används för min-1-guards.
+  const actorsEnabled =
+    youtubeEnabledCategories.includes('Film') || imagesEnabledCategories.includes('Film');
+  const athletesEnabled =
+    youtubeEnabledCategories.includes('Sport') || imagesEnabledCategories.includes('Sport');
+  // AND-logik: Actors/All och Athletes/All är ON enbart om BÅDA YT och Images är aktiva.
+  const actorsAllOn =
+    youtubeEnabledCategories.includes('Film') && imagesEnabledCategories.includes('Film');
+  const athletesAllOn =
+    youtubeEnabledCategories.includes('Sport') && imagesEnabledCategories.includes('Sport');
+  const allEnabled = artistsAllOn && actorsAllOn && athletesAllOn;
+  const enabledColumnsCount = [artistsEnabled, actorsEnabled, athletesEnabled].filter(Boolean).length;
+  // Uppmätt kolumnbredd via onLayout på smGrid — garanterar pixel-perfekt
+  // centrering oavsett flex-beräkningsfel i Yoga/React Native.
+  const [smColWidth, setSmColWidth] = useState(0);
+  const smCellStyle = smColWidth > 0 ? { width: smColWidth } : undefined;
+
+  // En-vägs auto-sync (initial load): säkerställ att Images Film/Sport är PÅ
+  // om YT Film/Sport är PÅ — hanterar stale state från gamla sparade profiler.
+  // OBS: vi tar INTE bort Film/Sport från Images när YT stängs — Images är
+  // oberoende styrbar när YT är av (ny logik 2026-06-03).
+  useEffect(() => {
+    setImagesEnabledCategories((prev) => {
+      let next = [...prev];
+      if (youtubeEnabledCategories.includes('Film') && !next.includes('Film'))
+        next = [...next, 'Film' as MainCategory];
+      if (youtubeEnabledCategories.includes('Sport') && !next.includes('Sport'))
+        next = [...next, 'Sport' as MainCategory];
+      if (next.length === prev.length && next.every((c) => prev.includes(c))) return prev;
+      return next as MainCategory[];
     });
+  }, [youtubeEnabledCategories]);
+
+  const handleToggleAllSources = (value: boolean) => {
+    if (!value) {
+      Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
+      return;
+    }
+    setYoutubeEnabledCategories(['Music', 'Film', 'Sport']);
+    setImagesEnabledCategories(['Music', 'Film', 'Sport']);
   };
-  // Images Artists-toggle: Actors+Athletes är mandatory (alltid på).
-  const handleToggleImagesArtists = (value: boolean) => {
-    setImagesEnabledCategories(
-      value ? ['Music', 'Film', 'Sport'] : ['Film', 'Sport'],
+
+  const handleToggleArtistsColumn = (value: boolean) => {
+    if (!value && enabledColumnsCount <= 1) {
+      Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
+      return;
+    }
+    setYoutubeEnabledCategories((prev) =>
+      value ? ([...new Set([...prev, 'Music'])] as MainCategory[]) : prev.filter((c) => c !== 'Music'),
     );
+    setImagesEnabledCategories((prev) =>
+      value ? ([...new Set([...prev, 'Music'])] as MainCategory[]) : prev.filter((c) => c !== 'Music'),
+    );
+  };
+
+  const handleToggleActorsColumn = (value: boolean) => {
+    if (!value && enabledColumnsCount <= 1) {
+      Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
+      return;
+    }
+    setYoutubeEnabledCategories((prev) =>
+      value ? ([...new Set([...prev, 'Film'])] as MainCategory[]) : prev.filter((c) => c !== 'Film'),
+    );
+    setImagesEnabledCategories((prev) =>
+      value ? ([...new Set([...prev, 'Film'])] as MainCategory[]) : prev.filter((c) => c !== 'Film'),
+    );
+  };
+
+  const handleToggleAthletesColumn = (value: boolean) => {
+    if (!value && enabledColumnsCount <= 1) {
+      Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
+      return;
+    }
+    setYoutubeEnabledCategories((prev) =>
+      value ? ([...new Set([...prev, 'Sport'])] as MainCategory[]) : prev.filter((c) => c !== 'Sport'),
+    );
+    setImagesEnabledCategories((prev) =>
+      value ? ([...new Set([...prev, 'Sport'])] as MainCategory[]) : prev.filter((c) => c !== 'Sport'),
+    );
+  };
+
+  const handleToggleArtistsYoutube = (value: boolean) => {
+    if (!value) {
+      const artistsWouldHaveImage = imagesEnabledCategories.includes('Music');
+      if (!artistsWouldHaveImage && enabledColumnsCount <= 1) {
+        Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
+        return;
+      }
+    }
+    setYoutubeEnabledCategories((prev) =>
+      value ? ([...new Set([...prev, 'Music'])] as MainCategory[]) : prev.filter((c) => c !== 'Music'),
+    );
+  };
+
+  const handleToggleArtistsImages = (value: boolean) => {
+    if (!value) {
+      const artistsWouldHaveYt = youtubeEnabledCategories.includes('Music');
+      if (!artistsWouldHaveYt && enabledColumnsCount <= 1) {
+        Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
+        return;
+      }
+    }
+    setImagesEnabledCategories((prev) =>
+      value ? ([...new Set([...prev, 'Music'])] as MainCategory[]) : prev.filter((c) => c !== 'Music'),
+    );
+  };
+
+  // Actors YouTube: aktiverar Images automatiskt när YT slås PÅ (auto-activation).
+  // Om YT slås AV förblir Images oberoende styrbar — stängs INTE automatiskt.
+  const handleToggleActorsYoutube = (value: boolean) => {
+    if (!value) {
+      const actorsWouldHaveImages = imagesEnabledCategories.includes('Film');
+      if (!actorsWouldHaveImages && enabledColumnsCount <= 1) {
+        Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
+        return;
+      }
+    }
+    setYoutubeEnabledCategories((prev) =>
+      value ? ([...new Set([...prev, 'Film'])] as MainCategory[]) : prev.filter((c) => c !== 'Film'),
+    );
+    if (value) {
+      // Alltid sätt Images Film ON när YT Film aktiveras — ingen conditional
+      // check så att vi garanterat aktiverar oavsett eventuellt stale state.
+      setImagesEnabledCategories((prev) =>
+        ([...new Set([...prev, 'Film'])] as MainCategory[])
+      );
+    }
+  };
+
+  // Actors Images OFF → Auto-sync: YouTube stängs också av (hela kolumnen av).
+  // Actors Images ON → enbart Images på (YouTube tvingas inte på).
+  const handleToggleActorsImages = (value: boolean) => {
+    if (!value) {
+      // Images OFF tar med sig YouTube → hela Actors-kolumnen går av.
+      if (enabledColumnsCount <= 1) {
+        Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
+        return;
+      }
+      setImagesEnabledCategories((prev) => prev.filter((c) => c !== 'Film'));
+      setYoutubeEnabledCategories((prev) => prev.filter((c) => c !== 'Film'));
+    } else {
+      setImagesEnabledCategories((prev) => ([...new Set([...prev, 'Film'])] as MainCategory[]));
+    }
+  };
+
+  // Athletes YouTube: aktiverar Images automatiskt när YT slås PÅ (auto-activation).
+  // Om YT slås AV förblir Images oberoende styrbar.
+  const handleToggleAthletesYoutube = (value: boolean) => {
+    if (!value) {
+      const athletesWouldHaveImages = imagesEnabledCategories.includes('Sport');
+      if (!athletesWouldHaveImages && enabledColumnsCount <= 1) {
+        Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
+        return;
+      }
+    }
+    setYoutubeEnabledCategories((prev) =>
+      value ? ([...new Set([...prev, 'Sport'])] as MainCategory[]) : prev.filter((c) => c !== 'Sport'),
+    );
+    if (value) {
+      // Alltid sätt Images Sport ON när YT Sport aktiveras — ingen conditional.
+      setImagesEnabledCategories((prev) =>
+        ([...new Set([...prev, 'Sport'])] as MainCategory[])
+      );
+    }
+  };
+
+  // Athletes Images OFF → Auto-sync: YouTube stängs också av (hela kolumnen av).
+  // Athletes Images ON → enbart Images på (YouTube tvingas inte på).
+  const handleToggleAthletesImages = (value: boolean) => {
+    if (!value) {
+      // Images OFF tar med sig YouTube → hela Athletes-kolumnen går av.
+      if (enabledColumnsCount <= 1) {
+        Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
+        return;
+      }
+      setImagesEnabledCategories((prev) => prev.filter((c) => c !== 'Sport'));
+      setYoutubeEnabledCategories((prev) => prev.filter((c) => c !== 'Sport'));
+    } else {
+      setImagesEnabledCategories((prev) => ([...new Set([...prev, 'Sport'])] as MainCategory[]));
+    }
   };
   // Use Packages — Basic-utbudet är alltid implicit aktivt (ingen UI). Hosten
   // kan välja till extra-paket ovanpå. Knytningen mellan packages och
@@ -3432,19 +3608,22 @@ export default function LobbyScreen() {
             </Pressable>
           </View>
           <View style={styles.modeRow}>
+            {/* Max 4: aktiv (grön) enbart för icke-premium. Premium → alltid
+                utgråad + disabled eftersom Max 12 är auto-valt. */}
             <TouchableOpacity
-              style={[styles.modeOption, maxPlayers === 4 ? styles.modeOptionPassActive : styles.modeOptionInactive]}
+              style={[styles.modeOption, !hasPremium && maxPlayers === 4 ? styles.modeOptionPassActive : styles.modeOptionInactive]}
               onPress={() => handleSelectMaxPlayers(4)}
-              disabled={!hostMode}
+              disabled={!hostMode || hasPremium}
               activeOpacity={0.7}
             >
-              <Text style={[styles.modeLabel, { textAlign: 'center' }, maxPlayers === 4 && styles.modeLabelActiveFree]}>
+              <Text style={[styles.modeLabel, { textAlign: 'center' }, !hasPremium && maxPlayers === 4 && styles.modeLabelActiveFree]}>
                 Max 4 players
               </Text>
-              <View style={[styles.freeBadge, maxPlayers !== 4 && styles.freeBadgeDimmed]} pointerEvents="none">
-                <Text style={[styles.freeBadgeText, maxPlayers !== 4 && styles.freeBadgeTextDimmed]}>FREE</Text>
+              <View style={[styles.freeBadge, (hasPremium || maxPlayers !== 4) && styles.freeBadgeDimmed]} pointerEvents="none">
+                <Text style={[styles.freeBadgeText, (hasPremium || maxPlayers !== 4) && styles.freeBadgeTextDimmed]}>FREE</Text>
               </View>
             </TouchableOpacity>
+            {/* Max 12: auto-valt och aktivt (guld) när premium. */}
             <TouchableOpacity
               style={[styles.modeOption, maxPlayers === 12 && hasPremium ? styles.modeOptionPremiumActive : styles.modeOptionInactive]}
               onPress={() => handleSelectMaxPlayers(12)}
@@ -3500,34 +3679,53 @@ export default function LobbyScreen() {
             med färgade brand-badges (kompakt list-format). marginTop ger lite
             extra luft mellan Game Mode-beskrivningen och denna rubrik. */}
         <View style={[styles.section, { marginTop: Spacing.sm }]}>
-          <Text style={styles.sectionLabel}>SOURCE AND PROFESSIONS</Text>
+          <Text style={styles.sectionLabel}>SOURCE DASHBOARD</Text>
           <View style={styles.connectionsList}>
             {/* ── Source × Category Matrix (kolumn-baserad layout) ──────
                 Kolumn-layout garanterar att varje rubrik och dess switchar
                 delar exakt samma horisontella position — radbaserad layout
                 kan ge sub-pixel-offset beroende på innehållsbredd. */}
-            <View style={styles.sourceMatrix}>
-              {/* Kolumn 0: källetiketter */}
-              <View style={styles.sourceMatrixLabelCol}>
-                <View style={styles.sourceMatrixHeaderCell} />
-                <View style={styles.sourceMatrixSourceRow}>
+            {/* ── Source Dashboard: äkta kolumn-baserad layout ────────────
+                Varje profession (Artists/Actors/Athletes) är en egen
+                flex-kolumn-stack. Rubrik + alla toggles i SAMMA container
+                → garanterat identisk horisontell centrering. */}
+            <View
+              style={styles.smGrid}
+              onLayout={(e) => {
+                const w = Math.round((e.nativeEvent.layout.width - 112) / 3);
+                if (w > 0 && w !== smColWidth) setSmColWidth(w);
+              }}
+            >
+
+              {/* ── Etikett-stack (vänster) ── */}
+              <View style={styles.smLabelStack}>
+                <View style={[styles.smHeaderCell, styles.smDataShift]}>
+                  <Text style={styles.sourceMatrixAllText}>All</Text>
+                </View>
+                <View style={[styles.smAllToggleCell, { paddingLeft: 29, borderTopLeftRadius: Radius.sm, borderBottomLeftRadius: Radius.sm }]}>
+                  <Switch
+                    value={allEnabled}
+                    onValueChange={hostMode ? handleToggleAllSources : undefined}
+                    disabled={!hostMode}
+                    trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }}
+                    thumbColor="#FFF"
+                    ios_backgroundColor={allEnabled ? Colors.success : MATRIX_SWITCH_OFF}
+                    style={styles.sourceMatrixSwitch}
+                  />
+                </View>
+                <View style={styles.smLabelSourceCell}>
                   <YouTubeBrandIcon size={22} />
                   <Text style={styles.sourceMatrixSourceText}>YouTube</Text>
                   <Pressable
-                    onPress={() =>
-                      Alert.alert(
-                        'YouTube sources',
-                        '• Artists – includes music videos\n• Actors – includes movie clips & trailers\n• Athletes – includes sport events',
-                      )
-                    }
+                    onPress={() => Alert.alert('YouTube sources', '• Artists – music videos\n• Actors – movie clips & trailers\n• Athletes – sport events')}
                     hitSlop={8}
                     style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                    accessibilityLabel="YouTube source info"
                   >
                     <Text style={styles.infoIconText}>i</Text>
                   </Pressable>
                 </View>
-                <View style={styles.sourceMatrixSourceRow}>
+                <View style={styles.smAutoCell} />
+                <View style={styles.smLabelSourceCell}>
                   <View style={styles.imagesIconWrap}>
                     <Svg width={22} height={22} viewBox="24 22 32 32">
                       <Circle cx="40" cy="38" r="13" fill="none" stroke={Colors.primary} strokeWidth="2.5" />
@@ -3537,119 +3735,78 @@ export default function LobbyScreen() {
                   </View>
                   <Text style={styles.sourceMatrixSourceText}>Images</Text>
                   <Pressable
-                    onPress={() =>
-                      Alert.alert(
-                        'Images sources',
-                        'Artists is optional — toggle on or off.\n\nActors & Athletes are mandatory and always enabled for Images.',
-                      )
-                    }
+                    onPress={() => Alert.alert('Images sources', 'When YouTube is enabled, Images auto-activates.\n\nWhen YouTube is off, Images can still be enabled independently.')}
                     hitSlop={8}
                     style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                    accessibilityLabel="Images source info"
                   >
                     <Text style={styles.infoIconText}>i</Text>
                   </Pressable>
                 </View>
               </View>
 
-              {/* Kolumn 1: Artists */}
-              <View style={styles.sourceMatrixDataCol}>
-                <View style={styles.sourceMatrixHeaderCell}>
+              {/* ── Artists kolumn-stack ── */}
+              <View style={styles.smDataStack}>
+                <View style={[styles.smHeaderCell, smCellStyle]}>
                   <Text style={styles.sourceMatrixHeaderText}>Artists</Text>
                 </View>
-                <View style={styles.sourceMatrixSwitchCell}>
+                <View style={[styles.smAllToggleCell, smCellStyle, styles.smDataShift]}>
                   <Switch
-                    value={youtubeEnabledCategories.includes('Music')}
-                    onValueChange={(v) => handleToggleYoutubeCategory('Music', v)}
+                    value={artistsAllOn}
+                    onValueChange={hostMode ? handleToggleArtistsColumn : undefined}
                     disabled={!hostMode}
-                    trackColor={{ false: Colors.borderStrong, true: Colors.success }}
+                    trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }}
                     thumbColor="#FFF"
-                    ios_backgroundColor={youtubeEnabledCategories.includes('Music') ? Colors.success : Colors.borderStrong}
+                    ios_backgroundColor={artistsAllOn ? Colors.success : MATRIX_SWITCH_OFF}
                     style={styles.sourceMatrixSwitch}
                   />
                 </View>
-                <View style={styles.sourceMatrixSwitchCell}>
-                  <Switch
-                    value={imagesEnabledCategories.includes('Music')}
-                    onValueChange={(v) => handleToggleImagesArtists(v)}
-                    disabled={!hostMode}
-                    trackColor={{ false: Colors.borderStrong, true: Colors.success }}
-                    thumbColor="#FFF"
-                    ios_backgroundColor={imagesEnabledCategories.includes('Music') ? Colors.success : Colors.borderStrong}
-                    style={styles.sourceMatrixSwitch}
-                  />
+                <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
+                  <Switch value={youtubeEnabledCategories.includes('Music')} onValueChange={handleToggleArtistsYoutube} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={youtubeEnabledCategories.includes('Music') ? Colors.success : MATRIX_SWITCH_OFF} style={styles.sourceMatrixSwitch} />
+                </View>
+                <View style={[styles.smAutoCell, smCellStyle]} />
+                <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
+                  <Switch value={imagesEnabledCategories.includes('Music')} onValueChange={handleToggleArtistsImages} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={imagesEnabledCategories.includes('Music') ? Colors.success : MATRIX_SWITCH_OFF} style={styles.sourceMatrixSwitch} />
                 </View>
               </View>
 
-              {/* Kolumn 2: Actors */}
-              <View style={styles.sourceMatrixDataCol}>
-                <View style={styles.sourceMatrixHeaderCell}>
+              {/* ── Actors kolumn-stack ── */}
+              <View style={[styles.smDataStack, styles.sourceMatrixColSep]}>
+                <View style={[styles.smHeaderCell, smCellStyle]}>
                   <Text style={styles.sourceMatrixHeaderText}>Actors</Text>
                 </View>
-                <View style={styles.sourceMatrixSwitchCell}>
-                  <Switch
-                    value={youtubeEnabledCategories.includes('Film')}
-                    onValueChange={(v) => handleToggleYoutubeCategory('Film', v)}
-                    disabled={!hostMode}
-                    trackColor={{ false: Colors.borderStrong, true: Colors.success }}
-                    thumbColor="#FFF"
-                    ios_backgroundColor={youtubeEnabledCategories.includes('Film') ? Colors.success : Colors.borderStrong}
-                    style={styles.sourceMatrixSwitch}
-                  />
+                <View style={[styles.smAllToggleCell, smCellStyle, styles.smDataShift]}>
+                  <Switch value={actorsAllOn} onValueChange={hostMode ? handleToggleActorsColumn : undefined} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={actorsAllOn ? Colors.success : MATRIX_SWITCH_OFF} style={styles.sourceMatrixSwitch} />
                 </View>
-                <View style={styles.sourceMatrixSwitchCell}>
-                  <View style={styles.mandatorySwitchWrap}>
-                    <Switch
-                      value={true}
-                      onValueChange={() =>
-                        Alert.alert('Mandatory source', 'Actors are always enabled for Images.')
-                      }
-                      trackColor={{ false: Colors.borderStrong, true: Colors.success }}
-                      thumbColor="#FFF"
-                      ios_backgroundColor={Colors.success}
-                      style={styles.sourceMatrixSwitch}
-                    />
-                    <View style={styles.mandatoryOverlay} pointerEvents="none">
-                      <Text style={styles.mandatoryLockIcon}>🔒</Text>
-                    </View>
-                  </View>
+                <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
+                  <Switch value={youtubeEnabledCategories.includes('Film')} onValueChange={handleToggleActorsYoutube} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={youtubeEnabledCategories.includes('Film') ? Colors.success : MATRIX_SWITCH_OFF} style={styles.sourceMatrixSwitch} />
+                </View>
+                <View style={[styles.smAutoCell, smCellStyle]}>
+                  <Text style={styles.autoActivationLabel}>Auto-sync</Text>
+                </View>
+                <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
+                  <Switch value={imagesEnabledCategories.includes('Film')} onValueChange={handleToggleActorsImages} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={imagesEnabledCategories.includes('Film') ? Colors.success : MATRIX_SWITCH_OFF} style={styles.sourceMatrixSwitch} />
                 </View>
               </View>
 
-              {/* Kolumn 3: Athletes */}
-              <View style={styles.sourceMatrixDataCol}>
-                <View style={styles.sourceMatrixHeaderCell}>
+              {/* ── Athletes kolumn-stack ── */}
+              <View style={[styles.smDataStack, styles.sourceMatrixColSep]}>
+                <View style={[styles.smHeaderCell, smCellStyle]}>
                   <Text style={styles.sourceMatrixHeaderText}>Athletes</Text>
                 </View>
-                <View style={styles.sourceMatrixSwitchCell}>
-                  <Switch
-                    value={youtubeEnabledCategories.includes('Sport')}
-                    onValueChange={(v) => handleToggleYoutubeCategory('Sport', v)}
-                    disabled={!hostMode}
-                    trackColor={{ false: Colors.borderStrong, true: Colors.success }}
-                    thumbColor="#FFF"
-                    ios_backgroundColor={youtubeEnabledCategories.includes('Sport') ? Colors.success : Colors.borderStrong}
-                    style={styles.sourceMatrixSwitch}
-                  />
+                <View style={[styles.smAllToggleCell, smCellStyle, styles.smDataShift, { borderTopRightRadius: Radius.sm, borderBottomRightRadius: Radius.sm }]}>
+                  <Switch value={athletesAllOn} onValueChange={hostMode ? handleToggleAthletesColumn : undefined} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={athletesAllOn ? Colors.success : MATRIX_SWITCH_OFF} style={styles.sourceMatrixSwitch} />
                 </View>
-                <View style={styles.sourceMatrixSwitchCell}>
-                  <View style={styles.mandatorySwitchWrap}>
-                    <Switch
-                      value={true}
-                      onValueChange={() =>
-                        Alert.alert('Mandatory source', 'Athletes are always enabled for Images.')
-                      }
-                      trackColor={{ false: Colors.borderStrong, true: Colors.success }}
-                      thumbColor="#FFF"
-                      ios_backgroundColor={Colors.success}
-                      style={styles.sourceMatrixSwitch}
-                    />
-                    <View style={styles.mandatoryOverlay} pointerEvents="none">
-                      <Text style={styles.mandatoryLockIcon}>🔒</Text>
-                    </View>
-                  </View>
+                <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
+                  <Switch value={youtubeEnabledCategories.includes('Sport')} onValueChange={handleToggleAthletesYoutube} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={youtubeEnabledCategories.includes('Sport') ? Colors.success : MATRIX_SWITCH_OFF} style={styles.sourceMatrixSwitch} />
+                </View>
+                <View style={[styles.smAutoCell, smCellStyle]}>
+                  <Text style={styles.autoActivationLabel}>Auto-sync</Text>
+                </View>
+                <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
+                  <Switch value={imagesEnabledCategories.includes('Sport')} onValueChange={handleToggleAthletesImages} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={imagesEnabledCategories.includes('Sport') ? Colors.success : MATRIX_SWITCH_OFF} style={styles.sourceMatrixSwitch} />
                 </View>
               </View>
+
             </View>
 
             {/* Use Packages — sub-block sist i Game Connections för musikpaket-val.
@@ -5838,75 +5995,110 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.xs,
     lineHeight: 17,
   },
-  // ── Source × Category Matrix (kolumn-baserad layout) ─────────────────
-  // sourceMatrix är en horisontell rad av kolumn-Views. Varje kolumn
-  // innehåller sin rubrik + sina switchar staplade vertikalt — detta
-  // garanterar att rubriken alltid är exakt centrerad över sina switchar.
-  sourceMatrix: {
+  // ── Source Dashboard: äkta kolumn-baserad layout ────────────────────
+  // Varje profession är en egen vertikal stack (smDataStack). Alla element
+  // i stacken delar samma flex: 1 container → garanterad centrering.
+  smGrid: {
     flexDirection: 'row',
     paddingVertical: Spacing.xs,
   },
-  // Kolumn 0: källetiketter (YouTube / Images).
-  sourceMatrixLabelCol: {
-    width: 100,
+  smLabelStack: {
+    width: 112,
+    minWidth: 112,
+    maxWidth: 112,
     flexShrink: 0,
   },
-  // Rubrik-cell i kolumn 0 — tom spacer med samma höjd som kolumn 1-3:s rubrik.
-  sourceMatrixHeaderCell: {
-    height: 28,
+  smDataStack: {
+    flex: 1,
+  },
+  smLabelAllCell: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    height: 52,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderTopLeftRadius: Radius.sm,
+    borderBottomLeftRadius: Radius.sm,
+    marginBottom: Spacing.xs,
+  },
+  smDataAllCell: {
+    alignSelf: 'stretch',
+    alignItems: 'center',
+    gap: 6,
+    height: 52,
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    marginBottom: Spacing.xs,
+  },
+  smHeaderCell: {
+    height: 32,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  // Källetikett-rad: ikon + text + ev. info-ikon, centrerade vertikalt.
-  sourceMatrixSourceRow: {
+  smAllToggleCell: {
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    marginBottom: Spacing.xs,
+  },
+  smDataShift: {
+    paddingLeft: 6,
+  },
+  smAllToggleShift: {
+    paddingLeft: 18,
+  },
+  smLabelSourceCell: {
     height: 44,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
   },
-  sourceMatrixSourceText: {
+  smSwitchCell: {
+    alignSelf: 'stretch',
+    height: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  smAutoCell: {
+    alignSelf: 'stretch',
+    height: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  sourceMatrixAllText: {
     fontSize: FontSize.sm,
     fontWeight: FontWeight.semibold,
     color: Colors.textPrimary,
-  },
-  // Kolumn 1-3: en per professionskategori (Artists / Actors / Athletes).
-  sourceMatrixDataCol: {
-    flex: 1,
-    alignItems: 'center',
   },
   sourceMatrixHeaderText: {
     fontSize: FontSize.sm,
     fontWeight: FontWeight.semibold,
     color: Colors.textPrimary,
     textAlign: 'center',
+    width: '100%',
   },
-  // Switch-cell inom en datakkolumn.
-  sourceMatrixSwitchCell: {
-    height: 44,
-    alignItems: 'center',
-    justifyContent: 'center',
+  sourceMatrixSourceText: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.semibold,
+    color: Colors.textPrimary,
   },
   // Matrix-switch: centrerad (ingen marginLeft:'auto' som connectionSwitch har).
   sourceMatrixSwitch: {
     transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }],
   },
-  // Mandatory-cell: wrapper runt Switch för att placera låset relativt switch-bounds.
-  mandatorySwitchWrap: {
-    position: 'relative',
+  // Vertikal separator-linje mellan kolumnerna (Actors och Athletes får borderLeft).
+  sourceMatrixColSep: {
+    borderLeftWidth: 1,
+    borderLeftColor: Colors.borderStrong,
   },
-  // Lås-ikon overlay — positioneras på tummen (höger/vit del av switch).
-  // pointerEvents="none" (satt i JSX) låter taps nå Switch bakom.
-  mandatoryOverlay: {
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    right: 14,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  mandatoryLockIcon: {
-    fontSize: 10,
-    lineHeight: 13,
+  // "Auto-sync"-text i Actors/Athletes-kolumnerna.
+  autoActivationLabel: {
+    fontSize: 9,
+    color: Colors.textSecondary,
+    letterSpacing: 0.4,
+    textAlign: 'center',
+    opacity: 0.8,
   },
   // Q-ikon för Images-källan: ringen + svansen i SVG med "?"-Text ovanpå.
   imagesIconWrap: {

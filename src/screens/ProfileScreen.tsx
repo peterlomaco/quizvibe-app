@@ -223,6 +223,9 @@ function DecadeMarks() {
 
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
+// Synlig OFF-färg för Source Dashboard-switchar (Colors.borderStrong är för transparent).
+const PROFILE_MATRIX_OFF = '#3A5068';
+
 export default function ProfileScreen() {
   // ScrollView-ref för programmatisk scroll-to-top när man entrar via Home:s
   // "Profile settings"-knapp (som pushar med scrollToTop=1 i routen-paramen).
@@ -293,10 +296,10 @@ export default function ProfileScreen() {
   // 20 rundor är en subscription-perk OBEROENDE av läge: Premium → 20, annars
   // 4. (IndDev är nu gratis att välja; caps gatas separat på Premium.)
   const roundsMax = hasPremium ? ROUNDS_MAX_INDIV : ROUNDS_MAX_PASS;
-  // maxPlayers sätts explicit via Players-toggeln (Max 4 / Max 12). 12 är en
-  // subscription-perk → clampa till 4 för gratis-host oavsett seedat värde.
+  // Premium → auto-välj Max 12 och lås (Max 4 utgråas).
+  // Ej premium → tvinga tillbaka till Max 4.
   useEffect(() => {
-    if (!hasPremium) setMaxPlayers((prev) => (prev === 4 ? prev : 4));
+    setMaxPlayers(hasPremium ? 12 : 4);
   }, [hasPremium]);
   const handleSelectMaxPlayers = (n: 4 | 12) => {
     if (n === 12 && !hasPremium) {
@@ -428,18 +431,149 @@ export default function ProfileScreen() {
   const [imagesEnabledCategories, setImagesEnabledCategories] = useState<MainCategory[]>(
     () => defaultEnabledMainCategories(),
   );
-  const handleToggleYoutubeCategory = (cat: MainCategory, value: boolean) => {
-    setYoutubeEnabledCategories((prev) => {
-      if (!value && prev.length <= 1) {
-        Alert.alert('YouTube sources', 'At least 1 profession type must be enabled for YouTube.');
-        return prev;
-      }
-      if (value) return [...new Set([...prev, cat])] as MainCategory[];
-      return prev.filter((c) => c !== cat);
+  // ── Source Dashboard — derived state ────────────────────────────────
+  const artistsEnabled =
+    youtubeEnabledCategories.includes('Music') || imagesEnabledCategories.includes('Music');
+  const artistsAllOn =
+    youtubeEnabledCategories.includes('Music') && imagesEnabledCategories.includes('Music');
+  const actorsEnabled =
+    youtubeEnabledCategories.includes('Film') || imagesEnabledCategories.includes('Film');
+  const actorsAllOn =
+    youtubeEnabledCategories.includes('Film') && imagesEnabledCategories.includes('Film');
+  const athletesEnabled =
+    youtubeEnabledCategories.includes('Sport') || imagesEnabledCategories.includes('Sport');
+  const athletesAllOn =
+    youtubeEnabledCategories.includes('Sport') && imagesEnabledCategories.includes('Sport');
+  const sourcesAllEnabled = artistsAllOn && actorsAllOn && athletesAllOn;
+  const enabledSourceColumnsCount = [artistsEnabled, actorsEnabled, athletesEnabled].filter(Boolean).length;
+  const [smColWidth, setSmColWidth] = useState(0);
+  const smCellStyle = smColWidth > 0 ? { width: smColWidth } : undefined;
+
+  // En-vägs auto-sync (initial load): säkerställ att Images Film/Sport är PÅ
+  // om YT Film/Sport är PÅ.
+  useEffect(() => {
+    setImagesEnabledCategories((prev) => {
+      let next = [...prev];
+      if (youtubeEnabledCategories.includes('Film') && !next.includes('Film'))
+        next = [...next, 'Film' as MainCategory];
+      if (youtubeEnabledCategories.includes('Sport') && !next.includes('Sport'))
+        next = [...next, 'Sport' as MainCategory];
+      if (next.length === prev.length && next.every((c) => prev.includes(c))) return prev;
+      return next as MainCategory[];
     });
+  }, [youtubeEnabledCategories]);
+
+  const handleToggleAllSources = (value: boolean) => {
+    if (!value) {
+      Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
+      return;
+    }
+    setYoutubeEnabledCategories(['Music', 'Film', 'Sport']);
+    setImagesEnabledCategories(['Music', 'Film', 'Sport']);
   };
-  const handleToggleImagesArtists = (value: boolean) => {
-    setImagesEnabledCategories(value ? ['Music', 'Film', 'Sport'] : ['Film', 'Sport']);
+  const handleToggleArtistsColumn = (value: boolean) => {
+    if (!value && enabledSourceColumnsCount <= 1) {
+      Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
+      return;
+    }
+    setYoutubeEnabledCategories((prev) =>
+      value ? ([...new Set([...prev, 'Music'])] as MainCategory[]) : prev.filter((c) => c !== 'Music'),
+    );
+    setImagesEnabledCategories((prev) =>
+      value ? ([...new Set([...prev, 'Music'])] as MainCategory[]) : prev.filter((c) => c !== 'Music'),
+    );
+  };
+  const handleToggleActorsColumn = (value: boolean) => {
+    if (!value && enabledSourceColumnsCount <= 1) {
+      Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
+      return;
+    }
+    setYoutubeEnabledCategories((prev) =>
+      value ? ([...new Set([...prev, 'Film'])] as MainCategory[]) : prev.filter((c) => c !== 'Film'),
+    );
+    setImagesEnabledCategories((prev) =>
+      value ? ([...new Set([...prev, 'Film'])] as MainCategory[]) : prev.filter((c) => c !== 'Film'),
+    );
+  };
+  const handleToggleAthletesColumn = (value: boolean) => {
+    if (!value && enabledSourceColumnsCount <= 1) {
+      Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
+      return;
+    }
+    setYoutubeEnabledCategories((prev) =>
+      value ? ([...new Set([...prev, 'Sport'])] as MainCategory[]) : prev.filter((c) => c !== 'Sport'),
+    );
+    setImagesEnabledCategories((prev) =>
+      value ? ([...new Set([...prev, 'Sport'])] as MainCategory[]) : prev.filter((c) => c !== 'Sport'),
+    );
+  };
+  const handleToggleArtistsYoutube = (value: boolean) => {
+    if (!value && !imagesEnabledCategories.includes('Music') && enabledSourceColumnsCount <= 1) {
+      Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
+      return;
+    }
+    setYoutubeEnabledCategories((prev) =>
+      value ? ([...new Set([...prev, 'Music'])] as MainCategory[]) : prev.filter((c) => c !== 'Music'),
+    );
+  };
+  const handleToggleArtistsImages = (value: boolean) => {
+    if (!value && !youtubeEnabledCategories.includes('Music') && enabledSourceColumnsCount <= 1) {
+      Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
+      return;
+    }
+    setImagesEnabledCategories((prev) =>
+      value ? ([...new Set([...prev, 'Music'])] as MainCategory[]) : prev.filter((c) => c !== 'Music'),
+    );
+  };
+  // Actors YouTube ON → Images auto-aktiveras. Images OFF → YouTube stängs också.
+  const handleToggleActorsYoutube = (value: boolean) => {
+    if (!value && !imagesEnabledCategories.includes('Film') && enabledSourceColumnsCount <= 1) {
+      Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
+      return;
+    }
+    setYoutubeEnabledCategories((prev) =>
+      value ? ([...new Set([...prev, 'Film'])] as MainCategory[]) : prev.filter((c) => c !== 'Film'),
+    );
+    if (value) {
+      setImagesEnabledCategories((prev) => ([...new Set([...prev, 'Film'])] as MainCategory[]));
+    }
+  };
+  const handleToggleActorsImages = (value: boolean) => {
+    if (!value) {
+      if (enabledSourceColumnsCount <= 1) {
+        Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
+        return;
+      }
+      setImagesEnabledCategories((prev) => prev.filter((c) => c !== 'Film'));
+      setYoutubeEnabledCategories((prev) => prev.filter((c) => c !== 'Film'));
+    } else {
+      setImagesEnabledCategories((prev) => ([...new Set([...prev, 'Film'])] as MainCategory[]));
+    }
+  };
+  // Athletes YouTube ON → Images auto-aktiveras. Images OFF → YouTube stängs också.
+  const handleToggleAthletesYoutube = (value: boolean) => {
+    if (!value && !imagesEnabledCategories.includes('Sport') && enabledSourceColumnsCount <= 1) {
+      Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
+      return;
+    }
+    setYoutubeEnabledCategories((prev) =>
+      value ? ([...new Set([...prev, 'Sport'])] as MainCategory[]) : prev.filter((c) => c !== 'Sport'),
+    );
+    if (value) {
+      setImagesEnabledCategories((prev) => ([...new Set([...prev, 'Sport'])] as MainCategory[]));
+    }
+  };
+  const handleToggleAthletesImages = (value: boolean) => {
+    if (!value) {
+      if (enabledSourceColumnsCount <= 1) {
+        Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
+        return;
+      }
+      setImagesEnabledCategories((prev) => prev.filter((c) => c !== 'Sport'));
+      setYoutubeEnabledCategories((prev) => prev.filter((c) => c !== 'Sport'));
+    } else {
+      setImagesEnabledCategories((prev) => ([...new Set([...prev, 'Sport'])] as MainCategory[]));
+    }
   };
   // V1 har inga themed packages i PURCHASED_PACKAGES (parkerade till v1.1+
   // per project_launch_scope_v1) och gen-paketen är borttagna 2026-05-27.
@@ -1144,21 +1278,26 @@ export default function ProfileScreen() {
               </Pressable>
             </View>
             <View style={styles.modeRow}>
+              {/* Max 4: aktiv (grön) enbart för icke-premium. Premium → alltid
+                  utgråad + disabled eftersom Max 12 är auto-valt. */}
               <Pressable
                 style={({ pressed }) => [
                   styles.modeOption,
-                  maxPlayers === 4 ? styles.modeOptionPassActive : styles.modeOptionInactive,
-                  pressed && { opacity: 0.7 },
+                  !hasPremium && maxPlayers === 4 ? styles.modeOptionPassActive : styles.modeOptionInactive,
+                  pressed && !hasPremium && { opacity: 0.7 },
+                  hasPremium && { opacity: 0.45 },
                 ]}
-                onPress={() => handleSelectMaxPlayers(4)}
+                onPress={() => !hasPremium && handleSelectMaxPlayers(4)}
+                disabled={hasPremium}
               >
-                <Text style={[styles.modeLabel, { textAlign: 'center' }, maxPlayers === 4 && styles.modeLabelActiveFree]}>
+                <Text style={[styles.modeLabel, { textAlign: 'center' }, !hasPremium && maxPlayers === 4 && styles.modeLabelActiveFree]}>
                   Max 4 players
                 </Text>
-                <View style={[styles.freeBadge, maxPlayers !== 4 && styles.freeBadgeDimmed]} pointerEvents="none">
-                  <Text style={[styles.freeBadgeText, maxPlayers !== 4 && styles.freeBadgeTextDimmed]}>FREE</Text>
+                <View style={[styles.freeBadge, (hasPremium || maxPlayers !== 4) && styles.freeBadgeDimmed]} pointerEvents="none">
+                  <Text style={[styles.freeBadgeText, (hasPremium || maxPlayers !== 4) && styles.freeBadgeTextDimmed]}>FREE</Text>
                 </View>
               </Pressable>
+              {/* Max 12: auto-valt och aktivt (guld) när premium. */}
               <Pressable
                 style={({ pressed }) => [
                   styles.modeOption,
@@ -1200,30 +1339,45 @@ export default function ProfileScreen() {
             </TouchableOpacity>
           </View>
 
-          {/* Source × Category Matrix (kolumn-baserad layout) */}
+          {/* Source Dashboard */}
           <View style={styles.field}>
-            <Text style={styles.sectionLabel}>SOURCE AND PROFESSIONS</Text>
-            <View style={styles.sourceMatrix}>
-              {/* Kolumn 0: källetiketter */}
-              <View style={styles.sourceMatrixLabelCol}>
-                <View style={styles.sourceMatrixHeaderCell} />
-                <View style={styles.sourceMatrixSourceRow}>
+            <Text style={styles.sectionLabel}>SOURCE DASHBOARD</Text>
+            <View
+              style={styles.smGrid}
+              onLayout={(e) => {
+                const w = Math.round((e.nativeEvent.layout.width - 112) / 3);
+                if (w > 0 && w !== smColWidth) setSmColWidth(w);
+              }}
+            >
+
+              {/* Etikett-stack */}
+              <View style={styles.smLabelStack}>
+                <View style={[styles.smHeaderCell, styles.smDataShift]}>
+                  <Text style={styles.sourceMatrixAllText}>All</Text>
+                </View>
+                <View style={[styles.smAllToggleCell, { paddingLeft: 29, borderTopLeftRadius: Radius.sm, borderBottomLeftRadius: Radius.sm }]}>
+                  <Switch
+                    value={sourcesAllEnabled}
+                    onValueChange={handleToggleAllSources}
+                    trackColor={{ false: PROFILE_MATRIX_OFF, true: Colors.success }}
+                    thumbColor="#FFF"
+                    ios_backgroundColor={sourcesAllEnabled ? Colors.success : PROFILE_MATRIX_OFF}
+                    style={styles.profileSwitch}
+                  />
+                </View>
+                <View style={styles.smLabelSourceCell}>
                   <YouTubeBrandIcon size={20} />
                   <Text style={styles.sourceMatrixSourceText}>YouTube</Text>
                   <Pressable
-                    onPress={() =>
-                      Alert.alert(
-                        'YouTube sources',
-                        '• Artists – includes music videos\n• Actors – includes movie clips & trailers\n• Athletes – includes sport events',
-                      )
-                    }
+                    onPress={() => Alert.alert('YouTube sources', '• Artists – music videos\n• Actors – movie clips & trailers\n• Athletes – sport events')}
                     hitSlop={8}
                     style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
                   >
                     <Text style={styles.infoIconText}>i</Text>
                   </Pressable>
                 </View>
-                <View style={styles.sourceMatrixSourceRow}>
+                <View style={styles.smAutoCell} />
+                <View style={styles.smLabelSourceCell}>
                   <View style={styles.imagesIconWrap}>
                     <Svg width={20} height={20} viewBox="24 22 32 32">
                       <Circle cx="40" cy="38" r="13" fill="none" stroke={Colors.primary} strokeWidth="2.5" />
@@ -1233,111 +1387,70 @@ export default function ProfileScreen() {
                   </View>
                   <Text style={styles.sourceMatrixSourceText}>Images</Text>
                   <Pressable
-                    onPress={() =>
-                      Alert.alert(
-                        'Images sources',
-                        'Artists is optional — toggle on or off.\n\nActors & Athletes are mandatory and always enabled for Images.',
-                      )
-                    }
+                    onPress={() => Alert.alert('Images sources', 'Artists can be toggled independently.\n\nActors & Athletes Images auto-sync with their YouTube toggle.')}
                     hitSlop={8}
                     style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                    accessibilityLabel="Images source info"
                   >
                     <Text style={styles.infoIconText}>i</Text>
                   </Pressable>
                 </View>
               </View>
 
-              {/* Kolumn 1: Artists */}
-              <View style={styles.sourceMatrixDataCol}>
-                <View style={styles.sourceMatrixHeaderCell}>
+              {/* Artists kolumn */}
+              <View style={styles.smDataStack}>
+                <View style={[styles.smHeaderCell, smCellStyle]}>
                   <Text style={styles.sourceMatrixHeaderText}>Artists</Text>
                 </View>
-                <View style={styles.sourceMatrixSwitchCell}>
-                  <Switch
-                    value={youtubeEnabledCategories.includes('Music')}
-                    onValueChange={(v) => handleToggleYoutubeCategory('Music', v)}
-                    trackColor={{ false: Colors.borderStrong, true: Colors.success }}
-                    thumbColor="#FFF"
-                    ios_backgroundColor={youtubeEnabledCategories.includes('Music') ? Colors.success : Colors.borderStrong}
-                    style={styles.profileSwitch}
-                  />
+                <View style={[styles.smAllToggleCell, smCellStyle, styles.smDataShift]}>
+                  <Switch value={artistsAllOn} onValueChange={handleToggleArtistsColumn} trackColor={{ false: PROFILE_MATRIX_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={artistsAllOn ? Colors.success : PROFILE_MATRIX_OFF} style={styles.profileSwitch} />
                 </View>
-                <View style={styles.sourceMatrixSwitchCell}>
-                  <Switch
-                    value={imagesEnabledCategories.includes('Music')}
-                    onValueChange={(v) => handleToggleImagesArtists(v)}
-                    trackColor={{ false: Colors.borderStrong, true: Colors.success }}
-                    thumbColor="#FFF"
-                    ios_backgroundColor={imagesEnabledCategories.includes('Music') ? Colors.success : Colors.borderStrong}
-                    style={styles.profileSwitch}
-                  />
+                <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
+                  <Switch value={youtubeEnabledCategories.includes('Music')} onValueChange={handleToggleArtistsYoutube} trackColor={{ false: PROFILE_MATRIX_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={youtubeEnabledCategories.includes('Music') ? Colors.success : PROFILE_MATRIX_OFF} style={styles.profileSwitch} />
+                </View>
+                <View style={[styles.smAutoCell, smCellStyle]} />
+                <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
+                  <Switch value={imagesEnabledCategories.includes('Music')} onValueChange={handleToggleArtistsImages} trackColor={{ false: PROFILE_MATRIX_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={imagesEnabledCategories.includes('Music') ? Colors.success : PROFILE_MATRIX_OFF} style={styles.profileSwitch} />
                 </View>
               </View>
 
-              {/* Kolumn 2: Actors */}
-              <View style={styles.sourceMatrixDataCol}>
-                <View style={styles.sourceMatrixHeaderCell}>
+              {/* Actors kolumn */}
+              <View style={[styles.smDataStack, styles.sourceMatrixColSep]}>
+                <View style={[styles.smHeaderCell, smCellStyle]}>
                   <Text style={styles.sourceMatrixHeaderText}>Actors</Text>
                 </View>
-                <View style={styles.sourceMatrixSwitchCell}>
-                  <Switch
-                    value={youtubeEnabledCategories.includes('Film')}
-                    onValueChange={(v) => handleToggleYoutubeCategory('Film', v)}
-                    trackColor={{ false: Colors.borderStrong, true: Colors.success }}
-                    thumbColor="#FFF"
-                    ios_backgroundColor={youtubeEnabledCategories.includes('Film') ? Colors.success : Colors.borderStrong}
-                    style={styles.profileSwitch}
-                  />
+                <View style={[styles.smAllToggleCell, smCellStyle, styles.smDataShift]}>
+                  <Switch value={actorsAllOn} onValueChange={handleToggleActorsColumn} trackColor={{ false: PROFILE_MATRIX_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={actorsAllOn ? Colors.success : PROFILE_MATRIX_OFF} style={styles.profileSwitch} />
                 </View>
-                <View style={styles.sourceMatrixSwitchCell}>
-                  <View style={styles.mandatorySwitchWrap}>
-                    <Switch
-                      value={true}
-                      onValueChange={() => Alert.alert('Mandatory source', 'Actors are always enabled for Images.')}
-                      trackColor={{ false: Colors.borderStrong, true: Colors.success }}
-                      thumbColor="#FFF"
-                      ios_backgroundColor={Colors.success}
-                      style={styles.profileSwitch}
-                    />
-                    <View style={styles.mandatoryOverlay} pointerEvents="none">
-                      <Text style={styles.mandatoryLockIcon}>🔒</Text>
-                    </View>
-                  </View>
+                <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
+                  <Switch value={youtubeEnabledCategories.includes('Film')} onValueChange={handleToggleActorsYoutube} trackColor={{ false: PROFILE_MATRIX_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={youtubeEnabledCategories.includes('Film') ? Colors.success : PROFILE_MATRIX_OFF} style={styles.profileSwitch} />
+                </View>
+                <View style={[styles.smAutoCell, smCellStyle, { paddingRight: 0 }]}>
+                  <Text style={styles.autoSyncLabel}>Auto-sync</Text>
+                </View>
+                <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
+                  <Switch value={imagesEnabledCategories.includes('Film')} onValueChange={handleToggleActorsImages} trackColor={{ false: PROFILE_MATRIX_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={imagesEnabledCategories.includes('Film') ? Colors.success : PROFILE_MATRIX_OFF} style={styles.profileSwitch} />
                 </View>
               </View>
 
-              {/* Kolumn 3: Athletes */}
-              <View style={styles.sourceMatrixDataCol}>
-                <View style={styles.sourceMatrixHeaderCell}>
+              {/* Athletes kolumn */}
+              <View style={[styles.smDataStack, styles.sourceMatrixColSep]}>
+                <View style={[styles.smHeaderCell, smCellStyle]}>
                   <Text style={styles.sourceMatrixHeaderText}>Athletes</Text>
                 </View>
-                <View style={styles.sourceMatrixSwitchCell}>
-                  <Switch
-                    value={youtubeEnabledCategories.includes('Sport')}
-                    onValueChange={(v) => handleToggleYoutubeCategory('Sport', v)}
-                    trackColor={{ false: Colors.borderStrong, true: Colors.success }}
-                    thumbColor="#FFF"
-                    ios_backgroundColor={youtubeEnabledCategories.includes('Sport') ? Colors.success : Colors.borderStrong}
-                    style={styles.profileSwitch}
-                  />
+                <View style={[styles.smAllToggleCell, smCellStyle, styles.smDataShift, { borderTopRightRadius: Radius.sm, borderBottomRightRadius: Radius.sm }]}>
+                  <Switch value={athletesAllOn} onValueChange={handleToggleAthletesColumn} trackColor={{ false: PROFILE_MATRIX_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={athletesAllOn ? Colors.success : PROFILE_MATRIX_OFF} style={styles.profileSwitch} />
                 </View>
-                <View style={styles.sourceMatrixSwitchCell}>
-                  <View style={styles.mandatorySwitchWrap}>
-                    <Switch
-                      value={true}
-                      onValueChange={() => Alert.alert('Mandatory source', 'Athletes are always enabled for Images.')}
-                      trackColor={{ false: Colors.borderStrong, true: Colors.success }}
-                      thumbColor="#FFF"
-                      ios_backgroundColor={Colors.success}
-                      style={styles.profileSwitch}
-                    />
-                    <View style={styles.mandatoryOverlay} pointerEvents="none">
-                      <Text style={styles.mandatoryLockIcon}>🔒</Text>
-                    </View>
-                  </View>
+                <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
+                  <Switch value={youtubeEnabledCategories.includes('Sport')} onValueChange={handleToggleAthletesYoutube} trackColor={{ false: PROFILE_MATRIX_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={youtubeEnabledCategories.includes('Sport') ? Colors.success : PROFILE_MATRIX_OFF} style={styles.profileSwitch} />
+                </View>
+                <View style={[styles.smAutoCell, smCellStyle, { paddingRight: 0 }]}>
+                  <Text style={styles.autoSyncLabel}>Auto-sync</Text>
+                </View>
+                <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
+                  <Switch value={imagesEnabledCategories.includes('Sport')} onValueChange={handleToggleAthletesImages} trackColor={{ false: PROFILE_MATRIX_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={imagesEnabledCategories.includes('Sport') ? Colors.success : PROFILE_MATRIX_OFF} style={styles.profileSwitch} />
                 </View>
               </View>
+
             </View>
           </View>
 
@@ -3235,60 +3348,102 @@ const styles = StyleSheet.create({
   premiumBadgeTextGrey: {
     color: '#FFF',
   },
-  // ── Source × Category Matrix (kolumn-baserad, speglar LobbyScreen) ─────
-  sourceMatrix: {
+  // ── Source Dashboard: äkta kolumn-baserad layout (speglar LobbyScreen) ─
+  smGrid: {
     flexDirection: 'row',
-    paddingTop: Spacing.sm,
+    paddingVertical: Spacing.xs,
   },
-  sourceMatrixLabelCol: {
-    width: 100,
+  smLabelStack: {
+    width: 112,
+    minWidth: 112,
+    maxWidth: 112,
     flexShrink: 0,
   },
-  sourceMatrixHeaderCell: {
-    height: 28,
+  smDataStack: {
+    flex: 1,
+  },
+  smLabelAllCell: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    height: 52,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderTopLeftRadius: Radius.sm,
+    borderBottomLeftRadius: Radius.sm,
+    marginBottom: Spacing.xs,
+  },
+  smDataAllCell: {
+    alignSelf: 'stretch',
+    alignItems: 'center',
+    gap: 6,
+    height: 52,
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    marginBottom: Spacing.xs,
+  },
+  smHeaderCell: {
+    height: 32,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  sourceMatrixSourceRow: {
+  smAllToggleCell: {
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    marginBottom: Spacing.xs,
+  },
+  smDataShift: {
+    paddingLeft: 4,
+  },
+  smAllToggleShift: {
+    paddingLeft: 18,
+  },
+  smLabelSourceCell: {
     height: 44,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
   },
-  sourceMatrixSourceText: {
+  smSwitchCell: {
+    alignSelf: 'stretch',
+    height: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  smAutoCell: {
+    alignSelf: 'stretch',
+    height: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  sourceMatrixAllText: {
     fontSize: FontSize.sm,
     fontWeight: FontWeight.semibold,
     color: Colors.textPrimary,
-  },
-  sourceMatrixDataCol: {
-    flex: 1,
-    alignItems: 'center',
   },
   sourceMatrixHeaderText: {
     fontSize: FontSize.sm,
     fontWeight: FontWeight.semibold,
     color: Colors.textPrimary,
     textAlign: 'center',
+    width: '100%',
   },
-  sourceMatrixSwitchCell: {
-    height: 44,
-    alignItems: 'center',
-    justifyContent: 'center',
+  sourceMatrixSourceText: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.semibold,
+    color: Colors.textPrimary,
   },
-  mandatorySwitchWrap: {
-    position: 'relative',
+  sourceMatrixColSep: {
+    borderLeftWidth: 1,
+    borderLeftColor: Colors.borderStrong,
   },
-  mandatoryOverlay: {
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    right: 14,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  mandatoryLockIcon: {
-    fontSize: 10,
-    lineHeight: 13,
+  autoSyncLabel: {
+    fontSize: 9,
+    color: Colors.textSecondary,
+    letterSpacing: 0.4,
+    textAlign: 'center',
+    opacity: 0.8,
   },
   imagesIconWrap: {
     width: 20,

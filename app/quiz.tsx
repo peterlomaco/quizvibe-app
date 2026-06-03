@@ -620,7 +620,7 @@ export default function QuizScreen() {
     /** JSON-stringifierad array av MainCategory-strings aktiva för YouTube-källan. Min 1. */
     youtubeEnabledCategories?: string;
     /** JSON-stringifierad array av MainCategory-strings aktiva för Images-källan.
-     *  Film+Sport alltid inkluderade (mandatory); Music valbar. */
+     *  Actors/Athletes Images följer sin YouTube-toggle (Auto-beteende i Lobby). */
     imagesEnabledCategories?: string;
     /** JSON-stringifierad array av theme package-IDs aktiva vid spelstart.
      *  Tom array = Generic. Used för att frysa in i HistoryEntry. */
@@ -718,10 +718,8 @@ export default function QuizScreen() {
   // (t.ex. direkt-nav till /quiz utan Lobby).
   const eraFrom = parseInt(String(params.eraFrom ?? '1900'), 10);
   const eraTo = parseInt(String(params.eraTo ?? new Date().getFullYear()), 10);
-  // Game Connections-källor från Lobby. Default båda=on vid direkt-nav
-  // (utan Lobby) så MediaPlayer-stuben renderar klipp för mock-frågor och
   // Per-source profession-category-filter. YouTube: min 1, alla tre valbara.
-  // Images: Film+Sport alltid inkluderade (mandatory), Music valbar.
+  // Images: Actors/Athletes är mandatory (alltid inkluderade), Music valbar.
   const youtubeEnabledCategories = useMemo<MainCategory[]>(() => {
     if (!params.youtubeEnabledCategories) return ['Music', 'Film', 'Sport'];
     try {
@@ -737,9 +735,7 @@ export default function QuizScreen() {
     try {
       const parsed = JSON.parse(params.imagesEnabledCategories);
       const filtered = Array.isArray(parsed) ? parsed.filter(isMainCategory) : [];
-      // Säkerställ att mandatory-kategorier alltid ingår.
-      const withMandatory = [...new Set([...filtered, 'Film' as MainCategory, 'Sport' as MainCategory])];
-      return withMandatory.length > 0 ? withMandatory : ['Music', 'Film', 'Sport'];
+      return filtered.length > 0 ? filtered : ['Music', 'Film', 'Sport'];
     } catch {
       return ['Music', 'Film', 'Sport'];
     }
