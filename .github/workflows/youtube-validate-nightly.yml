@@ -27,11 +27,20 @@ on:
   # Manuell trigger via Actions-UI:t för att kunna köra ad-hoc utan att
   # vänta på nästa schemalagda körning (t.ex. efter manuell katalog-edit).
   workflow_dispatch:
+    inputs:
+      apply_fixes:
+        description: 'Auto-patcha YAML-filer med bästa ersättning (--apply)'
+        type: boolean
+        default: false
+      threshold:
+        description: 'Lägsta poäng för auto-patch (default 5)'
+        type: string
+        default: '5'
 
 jobs:
   validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 15
     steps:
       - name: Checkout repo
         uses: actions/checkout@v5
@@ -47,11 +56,42 @@ jobs:
         working-directory: backend
         run: npm ci
 
-      - name: Run youtube-validate
+      - name: Run youtube-autofix (validera + föreslå ersättningar)
+        id: autofix
         working-directory: backend
         env:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
-        # CLI:n exit:ar med kod 1 om något klipp är blocked/missing, vilket
-        # markerar hela jobbet rött i Actions-UI:t och triggar GitHub:s
-        # default-failure-mejl till repo owner.
-        run: npx tsx youtube/validate.ts --all
+        # autofix.ts exit:ar 1 om brutna klipp kvarstår efter ev. auto-patch,
+        # vilket markerar jobbet rött + triggar GitHub:s default-failure-mejl.
+        # Med apply_fixes=true patchas YAML automatiskt med top-scored kandidat
+        # (poäng >= threshold, inga block-reasons).
+        run: |
+          ARGS="--all"
+          if [ "${{ inputs.apply_fixes }}" = "true" ]; then
+            ARGS="$ARGS --apply --threshold ${{ inputs.threshold || '5' }}"
+          fi
+          npx tsx youtube/autofix.ts $ARGS
+
+      - name: Ladda upp rapport som CI-artefakt
+        # Körs alltid — rapporten är värdefull både vid success (tom = alla OK)
+        # och failure (innehåller lista brutna klipp + föreslagna ersättningar).
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: youtube-autofix-report
+          path: backend/output/youtube-autofix-report.json
+          if-no-files-found: ignore
+          retention-days: 30
+
+      - name: Committa auto-patchade filer (om apply_fixes=true och något ändrades)
+        if: ${{ inputs.apply_fixes == true }}
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if ! git diff --quiet backend/content/catalog/; then
+            git add backend/content/catalog/
+            git commit -m "chore: auto-replace broken YouTube clips (autofix nightly)"
+            git push
+          else
+            echo "Inga YAML-ändringar att commita."
+          fi

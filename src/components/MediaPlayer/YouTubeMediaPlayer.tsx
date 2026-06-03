@@ -94,6 +94,10 @@ export function YouTubeMediaPlayer({
   // flippar till önskat värde så useEffect fires med player redo att
   // ta emot. Reset:as per clip-byte så ny iframe-mount börjar gated.
   const [isPlayerReady, setIsPlayerReady] = useState(false);
+  // True när YouTube:s onError-callback fyrar (felkod 2/5/100/101/150).
+  // Visar "Video ej tillgänglig"-overlay i spelaren och signalerar
+  // uppåt via onError-prop så quiz.tsx kan skippa frågan.
+  const [hasError, setHasError] = useState(false);
 
   // Nunito_700Bold-fonten — matchar startskärmens appName-styling så
   // "QuizVibe"-texten under end-of-clip-loggan ser identisk ut med
@@ -110,6 +114,7 @@ export function YouTubeMediaPlayer({
     setShowTapPrompt(false);
     setIsPlayerReady(false);
     setHasEnded(false);
+    setHasError(false);
   }, [clip.videoId]);
 
   // Schemalägg tap-prompt om autoplay inte startat
@@ -165,6 +170,7 @@ export function YouTubeMediaPlayer({
 
   const handleError = useCallback(
     (err: string) => {
+      setHasError(true);
       onError?.(new Error(`YouTube embed error: ${err}`));
     },
     [onError],
@@ -220,6 +226,15 @@ export function YouTubeMediaPlayer({
           <Text style={[styles.endedBrandName, { fontFamily: brandFont }]}>
             QuizVibe
           </Text>
+        </View>
+      )}
+      {/* Error-overlay — täcker spelaren vid YouTube-fel (felkod 2/5/100/101/150).
+          Permanent (klipp borttaget / embed blockerat), till skillnad från
+          hasEnded-overlayen som är post-playback-branding. */}
+      {hasError && (
+        <View style={styles.errorOverlay} pointerEvents="none">
+          <Text style={styles.errorIcon}>⚠</Text>
+          <Text style={styles.errorTitle}>Video unavailable</Text>
         </View>
       )}
       {/* Tap-hint visas om autoplay inte hunnit starta. Använder
@@ -286,5 +301,23 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.xs,
     borderRadius: Radius.sm,
     overflow: 'hidden',
+  },
+  // Täcker hela spelaren vid YouTube-fel. Samma bg som card så ingen
+  // iframe-pixel läcker igenom. Samma centrerings-layout som endedOverlay.
+  errorOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: Colors.card,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.xs,
+  },
+  errorIcon: {
+    fontSize: 32,
+    color: Colors.textSecondary,
+  },
+  errorTitle: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.semibold,
+    color: Colors.textSecondary,
   },
 });

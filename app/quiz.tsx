@@ -707,6 +707,11 @@ export default function QuizScreen() {
   // + overlay-mount använder denna istället för raw `isConnectionUnstable`.
   const shouldLockForUnstable =
     isConnectionUnstable || stickyUnstableForQuestion;
+  // YouTube-felhantering: sätts true när spelaren rapporterar embed-fel
+  // (borttagen video, region-block, etc.). Triggar ett "Video unavailable"-kort
+  // istället för MediaPlayer och auto-advancerar till reveal efter 2.5 s.
+  // Resetas per fråga via useEffect nedan.
+  const [youtubeError, setYoutubeError] = useState(false);
   // Antal rundor sätts av host i Lobby (slider 3–20, default 10). Fallback 5
   // om param saknas — t.ex. direkt-nav till /quiz utan att gå via Lobby.
   // SEED_QUESTIONS har 5 frågor i mock; för totalRounds > 5 cyklas listan via
@@ -1633,6 +1638,7 @@ export default function QuizScreen() {
   // på nästa image-fråga oavsett om spelaren scrollat ner i föregående fråga.
   useEffect(() => {
     setScrolledToBottom(false);
+    setYoutubeError(false);
   }, [questionIndex]);
 
   // ScrollView:s onScroll → räkna avstånd från content-botten. När < 24 px
@@ -1790,6 +1796,23 @@ export default function QuizScreen() {
     }
     setPhase('awaiting');
   };
+
+  // YouTube-felhantering: kallas när MediaPlayer rapporterar embed-fel.
+  // Räknas som missad fråga (0 pts) — spelaren kunde inte se videon.
+  // Övergår till reveal-fas efter 2.5 s så rätt svar visas ändå.
+  // Gated på 'question'-fas: om felet fyrar under awaiting/reveal har
+  // score:n redan registrerats och vi ska inte dubbel-räkna.
+  // recordRoundScore är en vanlig funktion (inte useCallback) — referensen
+  // är stabil per render, ref-pattern undviker stale-closure utan dep-array.
+  const recordRoundScoreRef = useRef(recordRoundScore);
+  recordRoundScoreRef.current = recordRoundScore;
+  const handleYoutubeError = useCallback(() => {
+    if (phase !== 'question') return;
+    if (youtubeError) return;
+    setYoutubeError(true);
+    recordRoundScoreRef.current(0, false, responseSeconds);
+    setTimeout(() => setPhase('reveal'), 2500);
+  }, [phase, youtubeError, responseSeconds]);
 
   // Image-fråge-Confirm: speglar handleConfirm men för name-svar.
   // correct = opt.isCorrect (pre-baked från distractor-builderns rätt-flagga).
@@ -3372,16 +3395,25 @@ export default function QuizScreen() {
                 )}
               </View>
             ) : (
-              <MediaPlayer
-                source={mediaSource}
-                isPlaying={
-                  phase === 'question' ||
-                  phase === 'awaiting' ||
-                  phase === 'reveal'
-                }
-                showVideo={phase === 'reveal'}
-                isMuted={isAudioMutedForSelf}
-              />
+              {youtubeError ? (
+                <View style={styles.youtubeErrorCard}>
+                  <Text style={styles.youtubeErrorIcon}>⚠</Text>
+                  <Text style={styles.youtubeErrorTitle}>Video unavailable</Text>
+                  <Text style={styles.youtubeErrorSub}>Skipping to result…</Text>
+                </View>
+              ) : (
+                <MediaPlayer
+                  source={mediaSource}
+                  isPlaying={
+                    phase === 'question' ||
+                    phase === 'awaiting' ||
+                    phase === 'reveal'
+                  }
+                  showVideo={phase === 'reveal'}
+                  isMuted={isAudioMutedForSelf}
+                  onError={handleYoutubeError}
+                />
+              )}
             )}
 
             {/* Horisontell timer-progress-bar — krymper från 100% → 0% över
@@ -4114,6 +4146,29 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     borderBottomWidth: 1,
     borderBottomColor: Colors.border,
+  },
+  // Visas när YouTubeMediaPlayer rapporterar embed-fel — ersätter spelaren
+  // med en diskret felindikator i samma höjd (220 px = PLAYER_HEIGHT).
+  youtubeErrorCard: {
+    height: 220,
+    backgroundColor: Colors.card,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.xs,
+  },
+  youtubeErrorIcon: {
+    fontSize: 28,
+    color: Colors.textSecondary,
+  },
+  youtubeErrorTitle: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.semibold,
+    color: Colors.textSecondary,
+  },
+  youtubeErrorSub: {
+    fontSize: FontSize.xs,
+    color: Colors.textSecondary,
+    opacity: 0.7,
   },
   imageMediaImage: {
     width: '100%',
