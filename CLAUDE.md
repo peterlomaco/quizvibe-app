@@ -980,6 +980,72 @@ PIVOT 2026-05-29: fristående "Guess Who"-fråge-koncept — en stiliserad **AI-
 
 **Frontend-prototyp**: route `/guess-who-demo` ([app/guess-who-demo.tsx](app/guess-who-demo.tsx)) + [GuessWhoSplitView.tsx](src/components/GuessWhoSplitView.tsx) (vänster vit canvas: doodle wipe-reveal; höger mörk: blå Q med 4 ledtrådar progressivt, alla framme vid 2/3 av T). Demo-data [src/utils/guessWhoDemo.ts](src/utils/guessWhoDemo.ts). Länk i Home-footern.
 
+## Spotify DJ-läge (2026-06-04)
+
+**Arkitektur: "Backend-styrd Deep Link"** — ingen native Spotify SDK krävs. Appen öppnar Spotify-appen via `Linking.openURL('spotify:track:ID')` (React Natives inbyggda Linking-modul). Det löste den tidigare blockeraren (ingen maintained native playback-module för RN+Expo).
+
+**Flöde per Spotify-fråga (Individual Devices)**:
+1. Host broadcastar `spotify_question_ready` (trackId + djPlayerId) via `quiz_sync`-channel
+2. DJ:n ser "You are the DJ"-kort + "Start track in Spotify"-knapp
+3. DJ tappar → `openSpotifyTrack(trackId)` → Spotify-appen öppnar och spelar låten
+4. DJ broadcastar `spotify_dj_track_started` → gissarnas statustext uppdateras
+5. Gissarna ser albumomslag (Spotify Web API `/v1/tracks/{id}`) + årsväljare + timer
+6. Timer → 0 → normal reveal. DJ tar sig manuellt tillbaka till QuizVibe
+
+**OAuth-flöde** (`src/lib/spotify.ts`):
+- PKCE utan `expo-auth-session` (den paketet har trasig build i Expo SDK 54 — saknar Discovery-submodul)
+- Använder `expo-web-browser` (`WebBrowser.openAuthSessionAsync`) + `expo-crypto` för PKCE
+- Redirect URI: `quizvibeapp://spotify-callback` (registreras i Spotify Developer Dashboard)
+- Verifierar Premium-status via `/v1/me` (product === 'premium')
+- Sparar tokens i `spotify_connections`-tabellen (Supabase, migration 0015)
+
+**Supabase-tabell** (`supabase/migrations/0015_spotify_connections.sql`):
+- `spotify_connections` — OAuth-tokens + is_premium per user_id (RLS: user ser bara sina egna)
+- `lobby_players.spotify_verified` — flagga att spelare verifierat Spotify (boolean, default false)
+- `lobby_settings.spotify_enabled` — host:s val för DJ-läget (boolean, default false)
+- Appliceras manuellt via Supabase SQL editor (som övriga migrations)
+
+**DJ-rotation** (`src/utils/spotifyDJ.ts`):
+- **Track-baserad** (INTE positions-baserad): varje `TimelineQuestion` med `spotifyTrackId` satt ÄR per definition en Spotify-runda
+- `computeDJRotationPlan(totalQuestions, players)` — deterministisk, beräknad en gång i quiz.tsx `useMemo`
+- `getDJForQuestionIndex(plan, questionIndex)` — returnerar vilken spelare som är DJ
+- `openSpotifyTrack(spotifyTrackId)` — deep link + fallback till web-URL
+- `fetchSpotifyAlbumArt(trackId)` — Spotify Web API `/v1/tracks/{id}` → album art URL
+
+**Rendering i quiz.tsx** (tre grenar i mediakortet):
+1. `isSpotifyQuestion && isCurrentPlayerDJ` → **DJ-vy**: mörk grön bakgrund, "You are the DJ", "Start track in Spotify"-knapp, `canConfirm = false` (DJ svarar inte, får 0 pts)
+2. `isSpotifyQuestion && !isCurrentPlayerDJ` → **Gissare-vy**: albumomslag (async fetch) + statusrad "Waiting for DJ…" → "DJ is playing!"
+3. Övriga frågor → befintlig YouTube/Image-rendering
+
+**GetReadyIntro kö-indikator**: Spotify-frågor visas med grön kant, Spotify-ikon (vit monokrom) och "Spotify DJ"-text. Prop: `spotifyQuestionIndices?: number[]` (0-baserat) passas från quiz.tsx:s `djRotationPlan.spotifyQuestionIndices`.
+
+**SpotifyBrandIcon** (`src/components/SpotifyBrandIcon.tsx`):
+- Tre varianter: `'white'` (vit monokrom, vår default på mörk bakgrund), `'green'` (grön cirkel — KRÄVER svart/vit bakgrund), `'black'` (ljus bakgrund)
+- Per Spotify Brand Guidelines: grön ikon får bara användas på svart (#000) eller vit (#FFF) bakgrund
+
+**Katalog-konvention** — lägg till `spotifyTrackId` på songs-items i YAML:
+```yaml
+- id: dancing-queen
+  spotifyTrackId: "0GjEhVFGZW8afUYGChu3Rr"   # Spotify track ID från share-URL
+  youtubeClips: [...]                           # kan finnas eller vara tomt
+```
+Export-scriptet (`export-music-questions.ts`) inkluderar nu items med `spotifyTrackId` även om `youtubeClips` är tom (Spotify-only items). Kör `cd backend && npm run export-music-questions` efter ändringar.
+
+**41 låtar har `spotifyTrackId` (2026-06-04)**: ABBA (3st), Roxette (2), Ace of Base (2), Avicii (3), Loreen (2), Robyn (2), Swedish House Mafia, Eric Prydz, Dr. Alban, Rednex, The Cardigans, Kent, Veronica Maggio, Mando Diao, First Aid Kit, Icona Pop, Benjamin Ingrosso, Lili & Sussie + internationella klassiker (Eagles, Bob Marley, Bee Gees, Queen, Sia, Imagine Dragons, Ed Sheeran, Glass Animals, The Weeknd m.fl.).
+
+**LobbyScreen-integration**:
+- `spotifyConnected` laddas från `spotify_connections` i `useFocusEffect` — auto-aktiverar toggle om redan kopplat
+- `handleConnectSpotify()` → OAuth → auto-sätter både `spotifyConnected=true` och `spotifyEnabled=true`
+- `spotifyEnabled` skickas som URL-param till quiz.tsx: `String(spotifyEnabled && spotifyConnected)`
+- `handleStartGame`-guard: blockerar start om `spotifyEnabled && !spotifyConnected`
+
+**Env-var**: `EXPO_PUBLIC_SPOTIFY_CLIENT_ID=d9ce6568d6d64bfdbba3b92b604c6ee0` (i `.env` + `.env.example`)
+
+**Spotify Developer Dashboard** (developer.spotify.com → QuizVibe):
+- Redirect URI registrerad: `quizvibeapp://spotify-callback`
+- App-status: Development mode (max 25 test-users i User Management)
+- Peter (pbjorklund.swe@gmail.com) tillagd i User Management
+
 ## YouTube playback & curation
 
 YouTube-klippen är NOTERAT INTE bara musik — kan vara filmscener, sporthändelser, historiska/kulturella klipp. Använd generiska termer ("klippet"/"videon") i nya kommentarer; rename-passet (MUSIC_QUESTIONS → generiskt, "song"-frågetext → per-content-type, songs-katalog → media-katalog, song-meta-rad → content-type-aware) är **bundlat med detta YouTube-färdigställande-passet** — plocka inte isär.
