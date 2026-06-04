@@ -33,6 +33,9 @@ import { Player, PlayerRow } from '../components/PlayerRow';
 import { QuizVibeFriendsLogo } from '../components/QuizVibeFriendsLogo';
 import { QuizVibeLogo } from '../components/QuizVibeLogo';
 import { YouTubeBrandIcon } from '../components/YouTubeBrandIcon';
+import { SpotifyBrandIcon } from '../components/SpotifyBrandIcon';
+import { connectSpotify, disconnectSpotify } from '../lib/spotify';
+import { getSpotifyConnectionStatus, type SpotifyConnectionStatus } from '../utils/spotifyDJ';
 import { SequentialDots } from '../components/SequentialDots';
 import {
     ROUNDS_DEFAULT,
@@ -122,7 +125,7 @@ type GameMode = 'pass-the-phone' | 'individual-devices';
 // film-/innehåll i appen, utöver App Store / GDPR). Dynamisk så minimum-året
 // följer current year — 2026: max 2011, 2027: max 2012, osv.
 const CURRENT_YEAR = new Date().getFullYear();
-const MIN_BIRTH_YEAR = 1930;
+const MIN_BIRTH_YEAR = 1950;
 const MAX_BIRTH_YEAR = CURRENT_YEAR - 15;
 const BIRTH_YEARS = Array.from(
   { length: MAX_BIRTH_YEAR - MIN_BIRTH_YEAR + 1 },
@@ -1323,6 +1326,24 @@ export default function LobbyScreen() {
       // hasPremium från subscriptionStorage parallellt med profil-load.
       // Refreshas vid varje focus så återkomst från Store (efter purchase)
       // direkt unlockar Individual Devices + Max 12 utan extra refresh.
+      // Ladda Spotify-anslutningsstatus parallellt (host only).
+      if (hostMode) {
+        supabase.auth.getUser().then(({ data: { user } }) => {
+          if (!user || !active) return;
+          getSpotifyConnectionStatus(user.id).then((status: SpotifyConnectionStatus) => {
+            if (!active) return;
+            const ok = status.connected && status.isPremium;
+            setSpotifyConnected(ok);
+            setSpotifyDisplayName(status.spotifyDisplayName);
+            // Auto-aktivera DJ-toggeln om kontot redan är kopplat —
+            // toggeln återställs till false vid varje Lobby-mount men
+            // anslutningen persisteras i Supabase, så vi aktiverar den
+            // automatiskt när vi ser att kontot är kopplat.
+            if (ok) setSpotifyEnabled(true);
+          });
+        });
+      }
+
       Promise.all([
         loadProfile(),
         getLeftPlayers(roomCode),
@@ -1579,6 +1600,12 @@ export default function LobbyScreen() {
   );
   // Sketch — prototyp, ej wirad till quiz-poolen. Strukturell placeholder.
   const [sketchEnabled, setSketchEnabled] = useState(false);
+  // Spotify DJ-läge — host aktiverar, kräver kopplat Spotify Premium-konto.
+  const [spotifyEnabled, setSpotifyEnabled] = useState(false);
+  // Host:s egna Spotify-anslutningsstatus (laddas i useFocusEffect).
+  const [spotifyConnected, setSpotifyConnected] = useState(false);
+  const [spotifyDisplayName, setSpotifyDisplayName] = useState<string | null>(null);
+  const [spotifyConnecting, setSpotifyConnecting] = useState(false);
   // Kollapsbara Lobby-sektioner (samma +/− mönster som Profile-vyn). Default expanderade.
   // Alla (host OCH non-host) kommer in med Game Settings + Quiz Tuning REDAN
   // hopfällda (folded) och Players in Lobby utfälld.
@@ -1817,6 +1844,57 @@ export default function LobbyScreen() {
       setImagesEnabledCategories((prev) => ([...new Set([...prev, 'Sport'])] as MainCategory[]));
     }
   };
+  // ── Spotify DJ-handlers ───────────────────────────────────────────────
+  /**
+   * Kopplar host:ns Spotify-konto via OAuth (expo-auth-session PKCE).
+   * Uppdaterar lokal connected-state vid success.
+   */
+  const handleConnectSpotify = async () => {
+    setSpotifyConnecting(true);
+    const result = await connectSpotify();
+    setSpotifyConnecting(false);
+    if (result.ok) {
+      setSpotifyConnected(true);
+      setSpotifyDisplayName(result.user.displayName);
+      // Auto-aktivera DJ-toggeln direkt efter lyckad OAuth — annars måste
+      // användaren trycka på toggeln en extra gång manuellt efter connect.
+      setSpotifyEnabled(true);
+    }
+  };
+
+  /**
+   * Kopplar bort host:ns Spotify-konto.
+   * Stänger av Spotify DJ-läget om det var aktivt.
+   */
+  const handleDisconnectSpotify = async () => {
+    await disconnectSpotify();
+    setSpotifyConnected(false);
+    setSpotifyDisplayName(null);
+    setSpotifyEnabled(false);
+  };
+
+  /**
+   * Togglar Spotify DJ-läget. Om aktivering utan kopplat konto:
+   * erbjud att koppla direkt.
+   */
+  const handleToggleSpotifyEnabled = (val: boolean) => {
+    if (val && !spotifyConnected) {
+      Alert.alert(
+        'Connect Spotify first',
+        'You need to connect your Spotify Premium account before enabling Spotify DJ mode.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Connect Spotify',
+            onPress: handleConnectSpotify,
+          },
+        ],
+      );
+      return;
+    }
+    setSpotifyEnabled(val);
+  };
+
   // Use Packages — Basic-utbudet är alltid implicit aktivt (ingen UI). Hosten
   // kan välja till extra-paket ovanpå. Knytningen mellan packages och
   // room-code är implicit (lobby-state).
@@ -2525,6 +2603,7 @@ export default function LobbyScreen() {
         youtubeEnabledCategories,
         imagesEnabledCategories,
         sketchEnabled,
+        spotifyEnabled,
       }).catch(() => { /* loggas i mockLobbySettings */ });
     }, 300);
     return () => clearTimeout(handle);
@@ -2541,6 +2620,7 @@ export default function LobbyScreen() {
     youtubeEnabledCategories,
     imagesEnabledCategories,
     sketchEnabled,
+    spotifyEnabled,
   ]);
 
   // Realtime-tick: bumpas av lobby_players + lobby_settings-channel-
@@ -2582,6 +2662,7 @@ export default function LobbyScreen() {
         return stored.selectedExtraPackages;
       });
       setSketchEnabled(stored.sketchEnabled);
+      setSpotifyEnabled(stored.spotifyEnabled);
       // Per-source categories — coerce tom array till defaults (safe fallback).
       setYoutubeEnabledCategories((prev) => {
         const next = stored.youtubeEnabledCategories.length > 0
@@ -3199,6 +3280,21 @@ export default function LobbyScreen() {
       }
     }
 
+    // Spotify DJ-guard: om läget är aktiverat måste host:ns Spotify Premium-
+    // konto vara kopplat. Per-spelare-verifiering (spotify_verified i
+    // lobby_players) är nästa fas — V1 kräver bara host:ens koppling.
+    if (spotifyEnabled && !spotifyConnected) {
+      Alert.alert(
+        'Spotify not connected',
+        'Connect your Spotify Premium account before starting a Spotify DJ game.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Connect Spotify', onPress: handleConnectSpotify },
+        ],
+      );
+      return;
+    }
+
     // Konsumera 1 Host Game-credit per påbörjat spel — Free först, Extras
     // sedan. Blockerar start om båda är 0 (visar Store-redirect-Alert).
     // Persisterar tillbaka via saveProfile så Profile-pillen + nästa lobby-
@@ -3298,6 +3394,10 @@ export default function LobbyScreen() {
         // att frysa in i HistoryEntry så Player history visar vilket paket
         // spelet kördes med.
         selectedExtraPackages: JSON.stringify(selectedExtraPackages),
+        // Spotify DJ-läge — activeras om host slagit på toggeln i Game Connections
+        // OCH host:ns Spotify Premium-konto är kopplat. quiz.tsx beräknar
+        // DJ-rotationsplanen från turnOrder + totalRounds + frågor med spotifyTrackId.
+        spotifyEnabled: String(spotifyEnabled && spotifyConnected),
         // Skickas så Quit Game-flödet i quiz.tsx kan deactivera rummet
         // och rensa leftPlayers när host avslutar mitt i ett spel.
         roomCode,
@@ -3807,6 +3907,66 @@ export default function LobbyScreen() {
                 </View>
               </View>
 
+            </View>
+
+            {/* ── Spotify DJ-läge ────────────────────────────────────────
+                Visas under matrix-griddet som en separat rad (Spotify
+                är ett mode-toggle, inte en per-kategori-källa).
+                Host: Switch + ev. Connect/Disconnect-länk.
+                Non-host: read-only Enabled/Disabled-pill (speglar host). */}
+            <View style={styles.spotifyDJRow}>
+              <View style={styles.connectionIconWrap}>
+                {/* variant="white" — mörk kortbakgrund kräver monokrom vit
+                    per Spotifys brand guidelines (grönt bara på svart/vit bg). */}
+                <SpotifyBrandIcon size={22} variant="white" />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.connectionLabel}>Spotify DJ</Text>
+                {/* Visar kopplad Spotify-användare om host är inloggad */}
+                {hostMode && spotifyConnected && spotifyDisplayName ? (
+                  <Text style={styles.spotifyConnectedLabel}>
+                    ✓ {spotifyDisplayName}
+                  </Text>
+                ) : null}
+              </View>
+              {hostMode ? (
+                <View style={styles.spotifyHostControls}>
+                  {/* Connect/Disconnect-länk */}
+                  {spotifyEnabled ? (
+                    <Pressable
+                      onPress={spotifyConnected ? handleDisconnectSpotify : handleConnectSpotify}
+                      disabled={spotifyConnecting}
+                      hitSlop={8}
+                    >
+                      <Text style={[
+                        styles.spotifyLinkText,
+                        spotifyConnecting && { opacity: 0.5 },
+                      ]}>
+                        {spotifyConnecting
+                          ? 'Connecting…'
+                          : spotifyConnected ? 'Disconnect' : 'Connect'}
+                      </Text>
+                    </Pressable>
+                  ) : null}
+                  <Switch
+                    value={spotifyEnabled}
+                    onValueChange={handleToggleSpotifyEnabled}
+                    trackColor={{ false: '#3C3C3C', true: '#1DB954' }}
+                    thumbColor="#FFF"
+                    ios_backgroundColor={spotifyEnabled ? '#1DB954' : '#3C3C3C'}
+                  />
+                </View>
+              ) : (
+                /* Non-host: read-only pill */
+                <View style={[
+                  styles.youtubeEnabledPill,
+                  !spotifyEnabled && styles.statusPillDisabled,
+                ]}>
+                  <Text style={styles.youtubeEnabledText}>
+                    {spotifyEnabled ? 'Enabled' : 'Disabled'}
+                  </Text>
+                </View>
+              )}
             </View>
 
             {/* Use Packages — sub-block sist i Game Connections för musikpaket-val.
@@ -5774,6 +5934,31 @@ const styles = StyleSheet.create({
     // paketlistan nedanför. Pillarna shiftas vänster med samma värde via
     // en mindre connectionLabel.minWidth.
     paddingRight: 18,
+  },
+  // ── Spotify DJ-rad ───────────────────────────────────────────────────
+  spotifyDJRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    paddingRight: 18,
+    // Lite mer luft ovanför så raden skiljer sig tydligt från matrix-griddet.
+    marginTop: Spacing.xs,
+  },
+  spotifyConnectedLabel: {
+    fontSize: FontSize.xs,
+    color: '#1DB954',            // Spotify Green — bekräftar kopplat konto.
+    marginTop: 2,
+  },
+  spotifyHostControls: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    marginLeft: 'auto',
+  },
+  spotifyLinkText: {
+    fontSize: FontSize.xs,
+    color: Colors.textSecondary,
+    textDecorationLine: 'underline',
   },
   // "Profiles"-förälder-rubrik över Images/Sketch-under-togglarna.
   connectionSubHeading: {

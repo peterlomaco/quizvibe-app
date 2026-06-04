@@ -296,6 +296,7 @@ items:
     probability: 92
     wikimediaSearchHints: ["Ace of Base The Sign"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0hrBpAOgrt8RXigk83LLNE"
     youtubeClips:
       - videoId: "iqu132vTl5Y"
         startSec: 30
@@ -527,6 +528,7 @@ items:
     probability: 86
     wikimediaSearchHints: ["AC/DC Thunderstruck 1990"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "57bgtoPSgt236HzfBOd8kj"
   - id: guns-n-roses-november-rain
     displayName: "November Rain — Guns N' Roses"
     correctYear: 1992
@@ -551,12 +553,20 @@ items:
         endSec: 45
         channelTitle: "Nirvana - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: lili-sussie-oh-mama
+    displayName: "Oh Mama — Lili & Sussie"
+    correctYear: 1989
+    probability: 78
+    wikimediaSearchHints: ["Lili Sussie Oh Mama 1989"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "4orJQkF2exPD4xSFmMY00U"
   - id: roxette-the-look
     displayName: "The Look — Roxette"
     correctYear: 1989
     probability: 86
     wikimediaSearchHints: ["Roxette The Look 1989"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "79LdvxXi5JYUjhnO7v9Fi3"
     youtubeClips:
       - videoId: "--8mvZzZIcU"
         startSec: 30
@@ -569,6 +579,7 @@ items:
     probability: 86
     wikimediaSearchHints: ["Roxette Listen to Your Heart 1988"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2sDaqQj5VptFuLztuKxMSU"
     youtubeClips:
       - videoId: "jhTFCxvHVYY"
         startSec: 30
@@ -581,6 +592,7 @@ items:
     probability: 86
     wikimediaSearchHints: ["Ace of Base All That She Wants 1992"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6kWJvPfC4DgUpRsXKNa9z9"
     youtubeClips:
       - videoId: "8JqCWX-MXuk"
         startSec: 30
@@ -593,6 +605,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Dr Alban It's My Life 1992"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6bjl81yfCztuBXLC9Mqs2N"
     youtubeClips:
       - videoId: "aBJZsHDJvf0"
         startSec: 30
@@ -605,6 +618,7 @@ items:
     probability: 84
     wikimediaSearchHints: ["Rednex Cotton Eye Joe 1994"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0Jg602cHeMCnPez9baacIe"
     youtubeClips:
       - videoId: "mOYZaiDZ7BM"
         startSec: 30
@@ -617,6 +631,7 @@ items:
     probability: 84
     wikimediaSearchHints: ["The Cardigans Lovefool 1996"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "7aQjPecQdIuNd1sz3KCDhD"
     youtubeClips:
       - videoId: "c0fHs7THj4k"
         startSec: 30
@@ -677,6 +692,7 @@ items:
     probability: 86
     wikimediaSearchHints: ["Bryan Adams Summer of 69 1985"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0GONea6G2XdnHWjNZd6zt3"
   - id: u2-with-or-without-you
     displayName: "With or Without You — U2"
     correctYear: 1987

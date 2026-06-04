@@ -220,6 +220,10 @@ export const ContentItemSchema = z.object({
   // Refine längre ner blockerar kombinationen `media` + `youtubeClips`
   // så vi inte råkar ha båda samtidigt under transition-perioden.
   youtubeClips: z.array(YoutubeClipSchema).optional(),
+  // Spotify track ID — sätts manuellt av curator på låtar som ska ingå i
+  // Spotify DJ-läget. Format: 22 tecken base62 (ex. "0GjEhVFGZW8afUYGChu3Rr").
+  // Inkluderas INTE i image-items eller sport-events.
+  spotifyTrackId: z.string().optional(),
   // Peak-recognition-fönster: åren då item:t var som mest känt. Driver
   // recognition-decay-funktionen tillsammans med `audience` (= generation).
   // - Musik: typiskt peakFrom = peakTo = produktionsåret (= correctYear).

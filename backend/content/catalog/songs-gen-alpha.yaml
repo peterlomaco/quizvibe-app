@@ -362,12 +362,14 @@ items:
     probability: 83
     wikimediaSearchHints: ["Sia Cheap Thrills 2016"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3S4px9f4lceWdKf0gWciFu"
   - id: imagine-dragons-believer
     displayName: "Believer — Imagine Dragons"
     correctYear: 2017
     probability: 85
     wikimediaSearchHints: ["Imagine Dragons Believer 2017"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0pqnGHJpmpxLKifKRmU6WP"
   - id: tones-and-i-dance-monkey
     displayName: "Dance Monkey — Tones and I"
     correctYear: 2019
@@ -447,6 +449,7 @@ items:
     probability: 86
     wikimediaSearchHints: ["Ed Sheeran Perfect 2017"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0tgVpDi06FyKpA1z0VMD4v"
   - id: dua-lipa-dont-start-now
     displayName: "Don't Start Now — Dua Lipa"
     correctYear: 2019
@@ -477,6 +480,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Glass Animals Heat Waves 2020"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3USxtqRwSYz57Ewm6wWRMp"
   - id: olivia-rodrigo-good-4-u
     displayName: "Good 4 U — Olivia Rodrigo"
     correctYear: 2021
@@ -495,6 +499,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Avicii Hey Brother 2013"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0bhBKOTqLbKbJZbAB5Mdsf"
     youtubeClips:
       - videoId: "OjpX8ILe2N4"
         startSec: 30
@@ -519,6 +524,7 @@ items:
     probability: 74
     wikimediaSearchHints: ["Benjamin Ingrosso Dance You Off Eurovision 2018"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0s3P5PImfDZYWIseR3b39D"
   - id: robin-stjernberg-you
     displayName: "You — Robin Stjernberg"
     correctYear: 2013
@@ -626,6 +632,7 @@ items:
     probability: 90
     wikimediaSearchHints: ["Loreen Tattoo Eurovision 2023"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5D6Bi5sKXa8DXkUeyJyAEj"
     youtubeClips:
       - videoId: "b3vJfR81xO0"
         startSec: 5

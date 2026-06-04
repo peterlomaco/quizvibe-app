@@ -13,11 +13,15 @@
       "bundleIdentifier": "se.quizvibe.app",
       "buildNumber": "2",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "LSApplicationQueriesSchemes": ["spotify"]
       }
     },
     "android": {
       "package": "se.quizvibe.app",
+      "queries": [
+        { "package": "com.spotify.music" }
+      ],
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",

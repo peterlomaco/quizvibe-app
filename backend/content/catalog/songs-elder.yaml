@@ -23,6 +23,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Cab Calloway Minnie the Moocher"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3zlqUu9yK7fsefGsSAa86e"
   - id: fred-astaire-night-and-day
     displayName: "Night and Day — Fred Astaire"
     correctYear: 1932
@@ -205,6 +206,7 @@ items:
     correctYear: 1950
     probability: 88
     wikimediaSearchHints: ["Nat King Cole Mona Lisa 1950"]
+    spotifyTrackId: "5dae01pKNjRQtgOeAkFzPY"
     answerMethods: ["timeline"]
   - id: johnnie-ray-cry
     displayName: "Cry — Johnnie Ray"

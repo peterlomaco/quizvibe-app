@@ -124,6 +124,7 @@ items:
     probability: 92
     wikimediaSearchHints: ["ABBA Waterloo Eurovision 1974"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1TfqLAPs4K3s2rJMoCokcS"
     youtubeClips:
       - videoId: "9y-8ZiAJiQo"
         startSec: 15
@@ -139,6 +140,7 @@ items:
     probability: 92
     wikimediaSearchHints: ["Bee Gees Stayin Alive Saturday Night Fever"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "7tFiyTwD0nx5a1eklYtX2J"
     youtubeClips:
       - videoId: "I_izvAbhExY"
         startSec: 30
@@ -163,6 +165,7 @@ items:
     probability: 90
     wikimediaSearchHints: ["Queen Another One Bites the Dust"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "57JVGUAt3XNlFSqqEEZ6eP"
     youtubeClips:
       - videoId: "Y09uL2qbYCg"
         startSec: 0
@@ -334,6 +337,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["ABBA Mamma Mia 1976"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2TxCwUlqaOH3TIyJqGgR91"
     youtubeClips:
       - videoId: "KMViJKmAV4M"
         startSec: 30
@@ -516,6 +520,7 @@ items:
     probability: 84
     wikimediaSearchHints: ["Bob Marley No Woman No Cry Natty Dread 1974"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3PQLYVskjUeRmRIfECsL0X"
   - id: fleetwood-mac-dreams
     displayName: "Dreams — Fleetwood Mac"
     correctYear: 1977

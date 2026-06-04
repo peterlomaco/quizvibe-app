@@ -68,6 +68,8 @@ export interface MusicQuestion {
   audiences: MusicQuestionAudience[];
   genrePackages?: string[];
   youtubeClips: YoutubeClip[];
+  /** Spotify track ID — satt manuellt i YAML för Spotify DJ-läge. */
+  spotifyTrackId?: string;
 }
 
 export const MUSIC_QUESTIONS: MusicQuestion[] = ${JSON.stringify(questions, null, 2)};
@@ -92,8 +94,12 @@ async function main(): Promise<void> {
         skipped.push(`${item.id} (inBaseCatalog=false → reserverat för paket)`);
         continue;
       }
-      if (!item.youtubeClips || item.youtubeClips.length === 0) {
-        skipped.push(`${item.id} (no youtubeClips)`);
+      // Inkludera item om det har youtubeClips ELLER spotifyTrackId.
+      // Spotify-only items (utan YouTube-klipp) är renodlade DJ-rundor.
+      const hasYoutube = !!(item.youtubeClips && item.youtubeClips.length > 0);
+      const hasSpotify = !!item.spotifyTrackId;
+      if (!hasYoutube && !hasSpotify) {
+        skipped.push(`${item.id} (no youtubeClips and no spotifyTrackId)`);
         continue;
       }
       if (item.correctYear === undefined) {
@@ -110,23 +116,22 @@ async function main(): Promise<void> {
         correctYear: item.correctYear,
         contentSubject: subject,
         questionText: FIXED_QUESTION_TEXT[subject],
-        // Item-level audience-override har företräde över file-header. Edge-
-        // case: ny dansband-låt 2026 i songs-gen-alpha (file.audience =
-        // ['gen-alpha', 'gen-z']) kan bära item.audience = ['elder', 'gen-x',
-        // 'millennials'] för korrekt cross-gen-recognition. Saknas item-tag
-        // används file-tag som tidigare.
+        // Item-level audience-override har företräde över file-header.
         audiences: item.audience ?? file.audience,
-        // genrePackages (t.ex. ["sport"]) — bara när non-empty (minimal diff).
-        // Driver klientens crossover-filter: sport-musik under Music+Sport.
+        // genrePackages (t.ex. ["sport"]) — bara när non-empty.
         ...(item.genrePackages.length ? { genrePackages: item.genrePackages } : {}),
-        youtubeClips: item.youtubeClips.map((c) => ({
+        // Spotify track ID — bara om satt.
+        ...(item.spotifyTrackId ? { spotifyTrackId: item.spotifyTrackId } : {}),
+        // Tom array för Spotify-only items — quiz.tsx renderar Spotify DJ-vyn
+        // när youtubeClips är tom och spotifyTrackId finns.
+        youtubeClips: hasYoutube ? item.youtubeClips!.map((c) => ({
           videoId: c.videoId,
           startSec: c.startSec,
           endSec: c.endSec,
           channelTitle: c.channelTitle,
           license: c.license,
           notes: c.notes,
-        })),
+        })) : [],
       });
     }
   }

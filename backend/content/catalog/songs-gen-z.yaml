@@ -330,6 +330,7 @@ items:
     probability: 92
     wikimediaSearchHints: ["Avicii Levels 2011"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "4jzHxqxfVX26GYsaxQBJf1"
     youtubeClips:
       - videoId: "yMsKK0zNT_4"
         startSec: 5
@@ -449,6 +450,7 @@ items:
     probability: 84
     wikimediaSearchHints: ["Robyn Dancing on My Own 2010"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6aqNCrRA7vs7v6QvRpI50t"
     youtubeClips:
       - videoId: "J294A-R1Cjk"
         startSec: 30
@@ -461,6 +463,7 @@ items:
     probability: 86
     wikimediaSearchHints: ["Swedish House Mafia Don't You Worry Child 2012"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3zu2CuVTJwaZn2m4rBzaUO"
     youtubeClips:
       - videoId: "3mWbRB3Y4R8"
         startSec: 30
@@ -473,6 +476,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Eric Prydz Call on Me 2004"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1As4KC3YYpu89aBt7EqL2m"
     youtubeClips:
       - videoId: "MnyFWY0tFYc"
         startSec: 30
@@ -485,6 +489,7 @@ items:
     probability: 86
     wikimediaSearchHints: ["Loreen Euphoria Eurovision 2012"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2knr7ikPt4l7bk92qS4ZXW"
     youtubeClips:
       - videoId: "chK8XTtqEJI"
         startSec: 30
@@ -534,6 +539,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Veronica Maggio Jag kommer 2011"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3BG1x6Tw2fW75Nl3tysorH"
     youtubeClips:
       - videoId: "zNKwziMG5UI"
         startSec: 30
@@ -546,6 +552,7 @@ items:
     probability: 78
     wikimediaSearchHints: ["The Hives Hate to Say I Told You So 2000"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3HEqFZGsniU4MlK9b2PLlf"
   - id: timbuktu-alla-vill-till-himlen
     displayName: "Alla vill till himlen — Timbuktu"
     correctYear: 2005
@@ -564,6 +571,7 @@ items:
     probability: 78
     wikimediaSearchHints: ["Robyn With Every Heartbeat 2007"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0NEw29HKkDkt1yDyBJOgXe"
   - id: lady-gaga-poker-face
     displayName: "Poker Face — Lady Gaga"
     correctYear: 2008
@@ -582,6 +590,7 @@ items:
     probability: 76
     wikimediaSearchHints: ["Mando Diao Dance with Somebody 2009"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2sPAJRwxrOgfZah700s2ni"
     youtubeClips:
       - videoId: "B3SSPURxGJ0"
         startSec: 30
@@ -606,12 +615,14 @@ items:
     probability: 84
     wikimediaSearchHints: ["Rihanna Diamonds 2012"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1z9kQ14XBSN0r2v6fx4IdG"
   - id: first-aid-kit-emmylou
     displayName: "Emmylou — First Aid Kit"
     correctYear: 2012
     probability: 76
     wikimediaSearchHints: ["First Aid Kit Emmylou 2012"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2bU3gg0M8GGBs7ItBKsJX9"
     youtubeClips:
       - videoId: "nPWrX9PJAOs"
         startSec: 30
@@ -624,6 +635,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Icona Pop I Love It 2012"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3VZQshi4COChhXaz7cLP02"
     youtubeClips:
       - videoId: "ayX4RhsLyUo"
         startSec: 30

@@ -38,6 +38,11 @@ export interface LobbySettings {
   // Sketch (doodle, 4). sketchEnabled är förberedd men doodlen är INTE wirad
   // till quiz-poolen ännu (prototyp) → toggeln är strukturell. Default false.
   sketchEnabled: boolean;
+  // Spotify DJ-läge: host aktiverar → DJ-rotation körs i quiz.tsx.
+  // Kräver att alla spelare har spotify_verified = true i lobby_players.
+  // DB-kolumn: lobby_settings.spotify_enabled (migration 0015).
+  // Skrivs INTE till DB förrän migrationen körts (se settingsToRow nedan).
+  spotifyEnabled: boolean;
 }
 
 interface LobbySettingsRow {
@@ -61,6 +66,8 @@ interface LobbySettingsRow {
   images_enabled_categories?: string[];
   // Optional tills migration 0013_sketch_enabled.sql körts (tolerant read).
   sketch_enabled?: boolean;
+  // Optional tills migration 0015_spotify_connections.sql körts (tolerant read).
+  spotify_enabled?: boolean;
 }
 
 const UI_TO_DB_REGION: Record<LobbyRegion, DbRegion> = {
@@ -106,6 +113,7 @@ function rowToSettings(row: LobbySettingsRow): LobbySettings {
         ]) as unknown as MainCategory[]],
     // Tolerant: kolumnen kanske inte finns ännu (pre-migration) → default false.
     sketchEnabled: row.sketch_enabled ?? false,
+    spotifyEnabled: row.spotify_enabled ?? false,
   };
 }
 

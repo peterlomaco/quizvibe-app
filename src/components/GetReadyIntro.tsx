@@ -16,7 +16,9 @@ import {
 } from 'react-native';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
 import { MainCategory } from '../utils/mainCategory';
+import Svg, { Path } from 'react-native-svg';
 import { MediaSourceIcon } from './MediaSourceIcon';
+import { SpotifyBrandIcon } from './SpotifyBrandIcon';
 import { QuizVibeLogo } from './QuizVibeLogo';
 import { QuizVibePlayLogo } from './QuizVibePlayLogo';
 import { SequentialDots } from './SequentialDots';
@@ -105,6 +107,9 @@ interface Props {
    *  inom arrayn renderar heller ingen badge (t.ex. capital-frågor som
    *  inte mappar till V1-huvudkategori). */
   categoryByQuestion?: (MainCategory | null)[];
+  /** 0-baserade frågeindex som är Spotify DJ-rundor. Driver speciell
+   *  grön chip-rendering i kön (Spotify-ikon + "Spotify DJ"-label). */
+  spotifyQuestionIndices?: number[];
   /** Game era från Lobby — visas i Game settings-blocket. */
   eraFrom: number;
   eraTo: number;
@@ -231,6 +236,7 @@ export function GetReadyIntro({
   queueRoundNumbers,
   queueQuestionNumbers,
   categoryByQuestion,
+  spotifyQuestionIndices,
   currentRound,
   totalRounds,
   currentQuestion,
@@ -932,7 +938,12 @@ export function GetReadyIntro({
                   spelaren direkt ser att Q-play-logon är ett tap-target
                   (loggan i sig saknar typisk button-affordance som border/
                   bg). Renderas bara för host som kan tappa. */}
-              <Text style={styles.tapHereText}>Tap Here</Text>
+              <View style={styles.tapHereRow}>
+                <Text style={styles.tapHereText}>Press Play</Text>
+                <Svg width={18} height={18} viewBox="0 0 18 18">
+                  <Path d="M4 2 L16 9 L4 16 Z" fill={Colors.warning} />
+                </Svg>
+              </View>
               <Animated.View
                 style={[styles.playLogoWrap, { transform: [{ scale: playPulse }] }]}
               >
@@ -1046,16 +1057,26 @@ export function GetReadyIntro({
                   <View style={styles.mediaQueueChipsRow}>
                     {queueQuestions.map((q, i) => {
                       const source = mediaSourceByQuestion?.[q - 1];
+                      const isSpotify = spotifyQuestionIndices?.includes(q - 1) ?? false;
                       return (
-                        <View key={`mchip-${i}`} style={styles.queueChip}>
-                          <Text style={styles.queueChipNumber}>{q}</Text>
-                          <MediaSourceIcon source={source} size={16} />
+                        <View
+                          key={`mchip-${i}`}
+                          style={[styles.queueChip, isSpotify && styles.queueChipSpotify]}
+                        >
+                          <Text style={[styles.queueChipNumber, isSpotify && styles.queueChipNumberSpotify]}>
+                            {q}
+                          </Text>
+                          {isSpotify ? (
+                            <SpotifyBrandIcon size={14} variant="white" />
+                          ) : (
+                            <MediaSourceIcon source={source} size={16} />
+                          )}
                           <Text
-                            style={styles.queueChipName}
+                            style={[styles.queueChipName, isSpotify && styles.queueChipNameSpotify]}
                             numberOfLines={1}
                             ellipsizeMode="tail"
                           >
-                            {mediaSourceLabel(source)}
+                            {isSpotify ? 'Spotify DJ' : mediaSourceLabel(source)}
                           </Text>
                         </View>
                       );
@@ -2005,6 +2026,18 @@ const styles = StyleSheet.create({
     borderRadius: Radius.sm,
     backgroundColor: Colors.background,
   },
+  // Spotify DJ-chip: grön kant + mörkgrön bakgrund markerar tydligt
+  // att den frågan är en speciell DJ-runda.
+  queueChipSpotify: {
+    borderColor: '#1DB954',
+    backgroundColor: Colors.background,
+  },
+  queueChipNumberSpotify: {
+    color: '#1DB954',
+  },
+  queueChipNameSpotify: {
+    color: '#1DB954',
+  },
   // Siffran är frågenumret (queueQuestionNumbers[i]) — primary-blå för
   // att linka visuellt till Question-dot-bar:ens siffror ovan.
   queueChipNumber: {
@@ -2151,6 +2184,11 @@ const styles = StyleSheet.create({
     // texten och Play-loggan. Påverkar bara host-branchen; non-host:s
     // waitingForHostBlock är en enskild child så gap:n har ingen effekt där.
     gap: Spacing.sm,
+  },
+  tapHereRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
   tapHereText: {
     color: Colors.warning,

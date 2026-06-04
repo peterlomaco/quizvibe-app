@@ -24,9 +24,23 @@ export interface MusicQuestion {
   audiences: MusicQuestionAudience[];
   genrePackages?: string[];
   youtubeClips: YoutubeClip[];
+  /** Spotify track ID — satt manuellt i YAML för Spotify DJ-läge. */
+  spotifyTrackId?: string;
 }
 
 export const MUSIC_QUESTIONS: MusicQuestion[] = [
+  {
+    "id": "cab-calloway-minnie-the-moocher",
+    "displayName": "Minnie the Moocher — Cab Calloway",
+    "correctYear": 1931,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder"
+    ],
+    "spotifyTrackId": "3zlqUu9yK7fsefGsSAa86e",
+    "youtubeClips": []
+  },
   {
     "id": "fred-astaire-night-and-day",
     "displayName": "Night and Day — Fred Astaire",
@@ -86,6 +100,18 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (2)."
       }
     ]
+  },
+  {
+    "id": "judy-garland-over-the-rainbow",
+    "displayName": "Over the Rainbow — Judy Garland",
+    "correctYear": 1939,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "all"
+    ],
+    "spotifyTrackId": "1zzJOF5gOMXzqoUCbOg4JE",
+    "youtubeClips": []
   },
   {
     "id": "glenn-miller-in-the-mood",
@@ -226,6 +252,18 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (2)."
       }
     ]
+  },
+  {
+    "id": "nat-king-cole-mona-lisa",
+    "displayName": "Mona Lisa — Nat King Cole",
+    "correctYear": 1950,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder"
+    ],
+    "spotifyTrackId": "5dae01pKNjRQtgOeAkFzPY",
+    "youtubeClips": []
   },
   {
     "id": "bill-haley-rock-around-the-clock",
@@ -1488,6 +1526,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Eurovision"
     ],
+    "spotifyTrackId": "1TfqLAPs4K3s2rJMoCokcS",
     "youtubeClips": [
       {
         "videoId": "9y-8ZiAJiQo",
@@ -1518,6 +1557,19 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "notes": "Curerad 2026-05-29 — Ali vs Foreman highlights HD (1974)."
       }
     ]
+  },
+  {
+    "id": "bob-marley-no-woman-no-cry",
+    "displayName": "No Woman, No Cry — Bob Marley & The Wailers",
+    "correctYear": 1974,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "spotifyTrackId": "3PQLYVskjUeRmRIfECsL0X",
+    "youtubeClips": []
   },
   {
     "id": "lynyrd-skynyrd-sweet-home-alabama",
@@ -1636,6 +1688,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-x",
       "elder"
     ],
+    "spotifyTrackId": "2TxCwUlqaOH3TIyJqGgR91",
     "youtubeClips": [
       {
         "videoId": "KMViJKmAV4M",
@@ -1680,6 +1733,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "audiences": [
       "all"
     ],
+    "spotifyTrackId": "0GjEhVFGZW8afUYGChu3Rr",
     "youtubeClips": [
       {
         "videoId": "TJLAJWSEd6U",
@@ -1690,6 +1744,18 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "notes": "Official Video Remaster — rörlig MV med dans/scen. Refrängområde."
       }
     ]
+  },
+  {
+    "id": "eagles-hotel-california",
+    "displayName": "Hotel California — Eagles",
+    "correctYear": 1976,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "all"
+    ],
+    "spotifyTrackId": "4GkOfUKUqDDgoeiov8Uqyi",
+    "youtubeClips": []
   },
   {
     "id": "nadia-comaneci-montreal-1976",
@@ -1744,6 +1810,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-x",
       "elder"
     ],
+    "spotifyTrackId": "7tFiyTwD0nx5a1eklYtX2J",
     "youtubeClips": [
       {
         "videoId": "I_izvAbhExY",
@@ -2136,6 +2203,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-x",
       "elder"
     ],
+    "spotifyTrackId": "57JVGUAt3XNlFSqqEEZ6eP",
     "youtubeClips": [
       {
         "videoId": "Y09uL2qbYCg",
@@ -3037,6 +3105,19 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "bryan-adams-summer-of-69",
+    "displayName": "Summer of '69 — Bryan Adams",
+    "correctYear": 1985,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "spotifyTrackId": "0GONea6G2XdnHWjNZd6zt3",
+    "youtubeClips": []
+  },
+  {
     "id": "kikki-danielsson-bra-vibrationer",
     "displayName": "Bra vibrationer — Kikki Danielsson",
     "correctYear": 1985,
@@ -3370,6 +3451,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "millennials",
       "gen-x"
     ],
+    "spotifyTrackId": "2sDaqQj5VptFuLztuKxMSU",
     "youtubeClips": [
       {
         "videoId": "jhTFCxvHVYY",
@@ -3513,6 +3595,19 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "lili-sussie-oh-mama",
+    "displayName": "Oh Mama — Lili & Sussie",
+    "correctYear": 1989,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "spotifyTrackId": "4orJQkF2exPD4xSFmMY00U",
+    "youtubeClips": []
+  },
+  {
     "id": "madonna-like-a-prayer",
     "displayName": "Like a Prayer — Madonna",
     "correctYear": 1989,
@@ -3585,6 +3680,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "millennials",
       "gen-x"
     ],
+    "spotifyTrackId": "79LdvxXi5JYUjhnO7v9Fi3",
     "youtubeClips": [
       {
         "videoId": "--8mvZzZIcU",
@@ -3595,6 +3691,19 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "notes": "Remastered Full HD musikvideo. Officiell MV-innehåll, ersätter Topic-versionen (statisk albumkonst)."
       }
     ]
+  },
+  {
+    "id": "acdc-thunderstruck",
+    "displayName": "Thunderstruck — AC/DC",
+    "correctYear": 1990,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "spotifyTrackId": "57bgtoPSgt236HzfBOd8kj",
+    "youtubeClips": []
   },
   {
     "id": "madonna-vogue",
@@ -3861,6 +3970,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "millennials",
       "gen-x"
     ],
+    "spotifyTrackId": "6kWJvPfC4DgUpRsXKNa9z9",
     "youtubeClips": [
       {
         "videoId": "8JqCWX-MXuk",
@@ -3903,6 +4013,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "millennials",
       "gen-x"
     ],
+    "spotifyTrackId": "6bjl81yfCztuBXLC9Mqs2N",
     "youtubeClips": [
       {
         "videoId": "aBJZsHDJvf0",
@@ -4205,6 +4316,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "millennials",
       "gen-x"
     ],
+    "spotifyTrackId": "0hrBpAOgrt8RXigk83LLNE",
     "youtubeClips": [
       {
         "videoId": "iqu132vTl5Y",
@@ -4374,6 +4486,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "millennials",
       "gen-x"
     ],
+    "spotifyTrackId": "0Jg602cHeMCnPez9baacIe",
     "youtubeClips": [
       {
         "videoId": "mOYZaiDZ7BM",
@@ -4524,6 +4637,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "millennials",
       "gen-x"
     ],
+    "spotifyTrackId": "7aQjPecQdIuNd1sz3KCDhD",
     "youtubeClips": [
       {
         "videoId": "c0fHs7THj4k",
@@ -5138,6 +5252,19 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "the-hives-hate-to-say",
+    "displayName": "Hate to Say I Told You So — The Hives",
+    "correctYear": 2000,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-z",
+      "millennials"
+    ],
+    "spotifyTrackId": "3HEqFZGsniU4MlK9b2PLlf",
+    "youtubeClips": []
+  },
+  {
     "id": "alicia-keys-fallin",
     "displayName": "Fallin' — Alicia Keys",
     "correctYear": 2001,
@@ -5463,6 +5590,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-z",
       "millennials"
     ],
+    "spotifyTrackId": "1As4KC3YYpu89aBt7EqL2m",
     "youtubeClips": [
       {
         "videoId": "MnyFWY0tFYc",
@@ -5967,6 +6095,19 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "robyn-with-every-heartbeat",
+    "displayName": "With Every Heartbeat — Robyn",
+    "correctYear": 2007,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-z",
+      "millennials"
+    ],
+    "spotifyTrackId": "0NEw29HKkDkt1yDyBJOgXe",
+    "youtubeClips": []
+  },
+  {
     "id": "the-ark-the-worrying-kind",
     "displayName": "The Worrying Kind — The Ark",
     "correctYear": 2007,
@@ -6332,6 +6473,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-z",
       "millennials"
     ],
+    "spotifyTrackId": "2sPAJRwxrOgfZah700s2ni",
     "youtubeClips": [
       {
         "videoId": "B3SSPURxGJ0",
@@ -6507,6 +6649,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-z",
       "millennials"
     ],
+    "spotifyTrackId": "6aqNCrRA7vs7v6QvRpI50t",
     "youtubeClips": [
       {
         "videoId": "J294A-R1Cjk",
@@ -6568,6 +6711,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-z",
       "millennials"
     ],
+    "spotifyTrackId": "4jzHxqxfVX26GYsaxQBJf1",
     "youtubeClips": [
       {
         "videoId": "yMsKK0zNT_4",
@@ -6701,6 +6845,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-z",
       "millennials"
     ],
+    "spotifyTrackId": "3BG1x6Tw2fW75Nl3tysorH",
     "youtubeClips": [
       {
         "videoId": "zNKwziMG5UI",
@@ -6742,6 +6887,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-z",
       "millennials"
     ],
+    "spotifyTrackId": "2bU3gg0M8GGBs7ItBKsJX9",
     "youtubeClips": [
       {
         "videoId": "nPWrX9PJAOs",
@@ -6763,6 +6909,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-z",
       "millennials"
     ],
+    "spotifyTrackId": "3VZQshi4COChhXaz7cLP02",
     "youtubeClips": [
       {
         "videoId": "ayX4RhsLyUo",
@@ -6787,6 +6934,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Eurovision"
     ],
+    "spotifyTrackId": "2knr7ikPt4l7bk92qS4ZXW",
     "youtubeClips": [
       {
         "videoId": "chK8XTtqEJI",
@@ -6819,6 +6967,19 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "rihanna-diamonds",
+    "displayName": "Diamonds — Rihanna",
+    "correctYear": 2012,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-z",
+      "millennials"
+    ],
+    "spotifyTrackId": "1z9kQ14XBSN0r2v6fx4IdG",
+    "youtubeClips": []
+  },
+  {
     "id": "swedish-house-mafia-dont-you-worry-child",
     "displayName": "Don't You Worry Child — Swedish House Mafia",
     "correctYear": 2012,
@@ -6828,6 +6989,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-z",
       "millennials"
     ],
+    "spotifyTrackId": "3zu2CuVTJwaZn2m4rBzaUO",
     "youtubeClips": [
       {
         "videoId": "3mWbRB3Y4R8",
@@ -6869,6 +7031,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha",
       "gen-z"
     ],
+    "spotifyTrackId": "0bhBKOTqLbKbJZbAB5Mdsf",
     "youtubeClips": [
       {
         "videoId": "OjpX8ILe2N4",
@@ -6889,6 +7052,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "audiences": [
       "all"
     ],
+    "spotifyTrackId": "0nrRP2bk19rLc0orkWPQk2",
     "youtubeClips": [
       {
         "videoId": "2NiyrtYegso",
@@ -7450,6 +7614,19 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "sia-cheap-thrills",
+    "displayName": "Cheap Thrills — Sia",
+    "correctYear": 2016,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-alpha",
+      "gen-z"
+    ],
+    "spotifyTrackId": "3S4px9f4lceWdKf0gWciFu",
+    "youtubeClips": []
+  },
+  {
     "id": "simone-biles-rio-2016",
     "displayName": "Simone Biles 4 OS-guld i Rio",
     "correctYear": 2016,
@@ -7514,6 +7691,19 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "ed-sheeran-perfect",
+    "displayName": "Perfect — Ed Sheeran",
+    "correctYear": 2017,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-alpha",
+      "gen-z"
+    ],
+    "spotifyTrackId": "0tgVpDi06FyKpA1z0VMD4v",
+    "youtubeClips": []
+  },
+  {
     "id": "federer-australian-open-2017",
     "displayName": "Federers comeback-vinst Australian Open",
     "correctYear": 2017,
@@ -7532,6 +7722,19 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
       }
     ]
+  },
+  {
+    "id": "imagine-dragons-believer",
+    "displayName": "Believer — Imagine Dragons",
+    "correctYear": 2017,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-alpha",
+      "gen-z"
+    ],
+    "spotifyTrackId": "0pqnGHJpmpxLKifKRmU6WP",
+    "youtubeClips": []
   },
   {
     "id": "luis-fonsi-despacito",
@@ -7660,6 +7863,19 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "notes": "IIHF official channel — Canada-Sweden 2017 World Championship final highlights. Curerad 2026-05-27 via refined query."
       }
     ]
+  },
+  {
+    "id": "benjamin-ingrosso-dance-you-off",
+    "displayName": "Dance You Off — Benjamin Ingrosso",
+    "correctYear": 2018,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-alpha",
+      "gen-z"
+    ],
+    "spotifyTrackId": "0s3P5PImfDZYWIseR3b39D",
+    "youtubeClips": []
   },
   {
     "id": "drake-gods-plan",
@@ -7897,6 +8113,18 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "weeknd-blinding-lights",
+    "displayName": "Blinding Lights — The Weeknd",
+    "correctYear": 2019,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "all"
+    ],
+    "spotifyTrackId": "0VjIjW4GlUZAMYd2vXMi3b",
+    "youtubeClips": []
+  },
+  {
     "id": "bts-dynamite",
     "displayName": "Dynamite — BTS",
     "correctYear": 2020,
@@ -7956,6 +8184,19 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "notes": "World Athletics official channel — Duplantis 6.17m world record Toruń 2020. Curerad 2026-05-27 via refined query."
       }
     ]
+  },
+  {
+    "id": "glass-animals-heat-waves",
+    "displayName": "Heat Waves — Glass Animals",
+    "correctYear": 2020,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-alpha",
+      "gen-z"
+    ],
+    "spotifyTrackId": "3USxtqRwSYz57Ewm6wWRMp",
+    "youtubeClips": []
   },
   {
     "id": "harry-styles-watermelon-sugar",
@@ -8272,6 +8513,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Eurovision"
     ],
+    "spotifyTrackId": "5D6Bi5sKXa8DXkUeyJyAEj",
     "youtubeClips": [
       {
         "videoId": "b3vJfR81xO0",

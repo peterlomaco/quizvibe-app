@@ -99,6 +99,40 @@ export interface LobbyDeletedPayload {
 }
 
 /**
+ * Host signalerar att en Spotify-fråga börjar. Broadcastas precis innan
+ * fråge-fasen startar. Gissarna visar albumomslag + timer; DJ:n visar
+ * "Starta låten i Spotify"-knapp.
+ *
+ * Host beräknar DJ-tilldelningen via computeDJRotationPlan i spotifyDJ.ts
+ * och inkluderar dj_player_id i payloaden så varje klient vet om de är DJ.
+ */
+export interface SpotifyQuestionReadyPayload {
+  /** 0-baserat absolut frågeindex — klienten validerar mot lokal state. */
+  question_index: number;
+  /** Spotify track ID (ex. "4iV5W9uYEdYUVa79Axb7Rh"). */
+  spotify_track_id: string;
+  /** Visningsnamn (ex. "Dancing Queen — ABBA") för gissarnas screen. */
+  display_name: string;
+  /** Releaseåret som gissarna ska gissa. */
+  correct_year: number;
+  /** lobby_players.player_id för den utsedde DJ:n. */
+  dj_player_id: string;
+}
+
+/**
+ * DJ:n har tryckt "Starta låten i Spotify" och Spotify-appen har öppnats.
+ * Gissarnas timer och svarsblock aktiveras (de kan börja gissa nu).
+ * Broadcastas av DJ:ns klient direkt efter att openSpotifyTrack() returnerat.
+ */
+export interface SpotifyDJTrackStartedPayload {
+  /** DJ:ns lobby_players.player_id — bekräftar vem som startade. */
+  dj_player_id: string;
+  /** Spotify track ID, för att mottagare ska kunna verifiera att det stämmer
+   *  med deras lokala fråge-state. */
+  spotify_track_id: string;
+}
+
+/**
  * D-iv: host justerade audio för en specifik spelare i GetReady-vyn.
  * Incremental update — bara den ändrade spelaren broadcastas, inte hela
  * map:en. Mottagare uppdaterar sin lokala `playerAudioOverrides[player_id]`
@@ -185,6 +219,11 @@ export interface SyncChannelHandlers {
   /** Host har lämnat Final Leaderboard via Home → lobby permanent stängd.
    *  Non-host visar "Host has deleted this lobby"-popup + auto-nav Home. */
   onLobbyDeleted?: (payload: LobbyDeletedPayload) => void;
+  /** Spotify-fråga börjar. DJ:n visar "Starta i Spotify"-knapp;
+   *  gissarna förbereder albumomslags-fetch. */
+  onSpotifyQuestionReady?: (payload: SpotifyQuestionReadyPayload) => void;
+  /** DJ:n har öppnat Spotify — gissarnas timer + svar-block aktiveras. */
+  onSpotifyDJTrackStarted?: (payload: SpotifyDJTrackStartedPayload) => void;
   /** D-iv: host justerade audio för en spelare. Alla mottagare uppdaterar
    *  sin playerAudioOverrides-map; den drabbade spelarens device mute:as/
    *  unmute:as i MediaPlayer. */
@@ -234,6 +273,10 @@ export interface SyncChannel {
     payload: PlayerApprovedPlayAgainPayload,
   ) => Promise<void>;
   broadcastLobbyDeleted: (payload: LobbyDeletedPayload) => Promise<void>;
+  /** Host broadcastar start av Spotify-fråga med DJ-tilldelning. */
+  broadcastSpotifyQuestionReady: (payload: SpotifyQuestionReadyPayload) => Promise<void>;
+  /** DJ:ns klient broadcastar att Spotify-appen öppnats. */
+  broadcastSpotifyDJTrackStarted: (payload: SpotifyDJTrackStartedPayload) => Promise<void>;
   /** D-iv: host broadcastar ny audio-state för en specifik spelare. */
   broadcastPlayerAudioStateChanged: (
     payload: PlayerAudioStateChangedPayload,
@@ -364,6 +407,16 @@ export function subscribeSyncChannel(
   if (handlers.onLobbyDeleted) {
     channel.on('broadcast', { event: 'lobby_deleted' }, ({ payload }) => {
       handlers.onLobbyDeleted!(payload as LobbyDeletedPayload);
+    });
+  }
+  if (handlers.onSpotifyQuestionReady) {
+    channel.on('broadcast', { event: 'spotify_question_ready' }, ({ payload }) => {
+      handlers.onSpotifyQuestionReady!(payload as SpotifyQuestionReadyPayload);
+    });
+  }
+  if (handlers.onSpotifyDJTrackStarted) {
+    channel.on('broadcast', { event: 'spotify_dj_track_started' }, ({ payload }) => {
+      handlers.onSpotifyDJTrackStarted!(payload as SpotifyDJTrackStartedPayload);
     });
   }
   if (handlers.onPlayerAudioStateChanged) {
@@ -510,6 +563,12 @@ export function subscribeSyncChannel(
         event: 'lobby_deleted',
         payload,
       });
+    },
+    broadcastSpotifyQuestionReady: async (payload) => {
+      await channel.send({ type: 'broadcast', event: 'spotify_question_ready', payload });
+    },
+    broadcastSpotifyDJTrackStarted: async (payload) => {
+      await channel.send({ type: 'broadcast', event: 'spotify_dj_track_started', payload });
     },
     broadcastPlayerAudioStateChanged: async (payload) => {
       await channel.send({

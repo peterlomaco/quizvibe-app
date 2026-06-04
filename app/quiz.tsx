@@ -41,6 +41,15 @@ import { buildAudienceSet, filterByAudience } from '@/src/utils/audienceFilter';
 import { isMainCategory, subjectToMainCategory, itemMatchesEnabledCategories, type MainCategory } from '@/src/utils/mainCategory';
 import { clearGameStarted } from '@/src/utils/mockStartedGames';
 import { MUSIC_QUESTIONS } from '@/src/utils/musicQuestions';
+import {
+  computeDJRotationPlan,
+  getDJForQuestionIndex,
+  openSpotifyTrack,
+  fetchSpotifyAlbumArt,
+  type DJRotationPlan,
+  type SpotifyDJPlayer,
+} from '@/src/utils/spotifyDJ';
+import { SpotifyBrandIcon } from '@/src/components/SpotifyBrandIcon';
 import { savePendingLobbyPlayers } from '@/src/utils/pendingLobby';
 import { loadProfile } from '@/src/utils/profileStorage';
 import {
@@ -101,10 +110,11 @@ interface TimelineQuestion {
    *  ÄVEN under Sport-toggeln. Se itemMatchesEnabledCategories. */
   genrePackages?: readonly string[];
   // Pre-curerade YouTube-klipp för frågan. Optional — items utan klipp
-  // renderar `NoSourcePlayer`-placeholder via pickMediaSource. Real katalog
-  // (Phase 4 → riktig fråge-bank) kommer ha clips fyllda från
-  // backend/content/catalog/*.yaml.
+  // renderar `NoSourcePlayer`-placeholder via pickMediaSource.
   youtubeClips?: YoutubeClip[];
+  /** Spotify track ID — satt när frågan är en Spotify DJ-kandidat.
+   *  Driver isSpotifyQuestion + djRotationPlan i quiz-screen:en. */
+  spotifyTrackId?: string;
 }
 
 interface ImageQuestion {
@@ -158,6 +168,7 @@ const SEED_QUESTIONS: TimelineQuestion[] = MUSIC_QUESTIONS.map((q, i) => ({
   hint: q.displayName,
   genrePackages: q.genrePackages,
   youtubeClips: q.youtubeClips,
+  spotifyTrackId: q.spotifyTrackId,
 }));
 
 // Bild-frågor (Letter Grid → Final Selection-svar). category='Image' triggar
@@ -625,6 +636,8 @@ export default function QuizScreen() {
     /** JSON-stringifierad array av theme package-IDs aktiva vid spelstart.
      *  Tom array = Generic. Used för att frysa in i HistoryEntry. */
     selectedExtraPackages?: string;
+    /** 'true' om Spotify DJ-läge är aktiverat i Lobby + host:ns konto kopplat. */
+    spotifyEnabled?: string;
   }>();
   // Default assistance från URL-param — fallback om turnOrder-spelaren
   // saknar egen assistance-flagga. Per-player-värdet från turnOrder:n
@@ -653,6 +666,9 @@ export default function QuizScreen() {
   const [responseSeconds, setResponseSeconds] = useState<15 | 30 | 45 | 60>(
     initialResponseSeconds,
   );
+  // Spotify DJ-läge — aktivt om Lobby skickade spotifyEnabled=true.
+  const spotifyEnabled = (params.spotifyEnabled ?? 'false') === 'true';
+
   // D-iv: host-styrt per-spelare audio (IndDev). Saknad key i mappen
   // tolkas client-side: host=on, övriga=off. Initial-fetch sker vid
   // mount (se separat useEffect nedan); incremental updates kommer via
@@ -1082,6 +1098,77 @@ export default function QuizScreen() {
 
   const [questionIndex, setQuestionIndex] = useState(0);
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
+
+  // ── Spotify DJ-state ─────────────────────────────────────────────────
+  // albumArtUrl: hämtas async från Spotify Web API per fråga (gissarnas skärm).
+  const [spotifyAlbumArtUrl, setSpotifyAlbumArtUrl] = useState<string | null>(null);
+  // djStarted: DJ:n har tryckt "Starta i Spotify" → knapptext byts till ✓.
+  const [spotifyDJStarted, setSpotifyDJStarted] = useState(false);
+
+  /**
+   * DJ-rotationsplan — track-baserad, inte positions-baserad.
+   *
+   * Varje fråga i gameQuestions som har `spotifyTrackId` ÄR per definition
+   * en Spotify-runda. DJs roterar bland spelarna i ordning.
+   *
+   * Tidigare använde vi computeDJRotationPlan (positions-baserad) som
+   * tilldelade fasta index (t.ex. 5, 10, 15) utan att garantera att frågan
+   * på det indexet faktiskt hade spotifyTrackId → inga Spotify-rundor.
+   */
+  const djRotationPlan = useMemo<DJRotationPlan | null>(() => {
+    if (!spotifyEnabled || turnOrder.length === 0) return null;
+
+    const djPlayers: SpotifyDJPlayer[] = turnOrder.map((p) => ({
+      id: p.id,
+      name: p.name,
+      emoji: p.emoji,
+    }));
+
+    const spotifyQuestionIndices: number[] = [];
+    const djAssignments = new Map<number, SpotifyDJPlayer>();
+
+    // Gå igenom ALLA gameQuestions — varje fråga med spotifyTrackId blir
+    // automatiskt en Spotify-runda med en roterande DJ-tilldelning.
+    gameQuestions.forEach((q, i) => {
+      if (q.type === 'timeline' && q.spotifyTrackId) {
+        const djIndex = spotifyQuestionIndices.length % djPlayers.length;
+        spotifyQuestionIndices.push(i);
+        djAssignments.set(i, djPlayers[djIndex]);
+      }
+    });
+
+    if (spotifyQuestionIndices.length === 0) return null;
+    return { spotifyQuestionIndices, djAssignments };
+  }, [spotifyEnabled, turnOrder, gameQuestions]);
+
+  // Är nuvarande fråga en Spotify-fråga?
+  const currentQ = gameQuestions[questionIndex];
+  const isSpotifyQuestion =
+    !!djRotationPlan?.spotifyQuestionIndices.includes(questionIndex) &&
+    currentQ?.type === 'timeline' &&
+    !!currentQ.spotifyTrackId;
+
+  // Track ID för nuvarande Spotify-fråga (null om ej Spotify-fråga).
+  const currentSpotifyTrackId: string | null =
+    isSpotifyQuestion && currentQ?.type === 'timeline'
+      ? (currentQ.spotifyTrackId ?? null)
+      : null;
+
+  // Vilken spelare är DJ för nuvarande fråga?
+  const currentDJPlayer: SpotifyDJPlayer | null =
+    djRotationPlan && isSpotifyQuestion
+      ? getDJForQuestionIndex(djRotationPlan, questionIndex)
+      : null;
+
+  // Är JAGET DJ denna runda?
+  //   Pass-the-Phone: aktiv spelare (currentPlayerIndex) jämförs mot DJ.
+  //   Individual Devices: selfPlayerId jämförs mot DJ.
+  const isCurrentPlayerDJ: boolean = currentDJPlayer !== null && (
+    gameMode === 'pass-the-phone'
+      ? turnOrder[currentPlayerIndex]?.id === currentDJPlayer.id
+      : selfPlayerId === currentDJPlayer.id
+  );
+
   // Aktuell spelares assistance — driver svarsruta-intervallet (full=5 år,
   // standard=3 år, minimal=1 år) per rond. Faller tillbaka till fallback-
   // Assistance om turnOrder-payload saknar fältet (legacy-data).
@@ -1639,7 +1726,23 @@ export default function QuizScreen() {
   useEffect(() => {
     setScrolledToBottom(false);
     setYoutubeError(false);
+    // Spotify: nollställ album art + DJ-startad-flagga per fråga.
+    setSpotifyAlbumArtUrl(null);
+    setSpotifyDJStarted(false);
   }, [questionIndex]);
+
+  // Hämta albumomslag för Spotify-frågor (gissarnas vy).
+  // Anropas varje gång currentSpotifyTrackId ändras (= nytt frågebyte).
+  // DJ ser inte albumomslaget (de vet svaret) — men vi hämtar det ändå
+  // för reveal-fasen där alla ser det korrekt svaret.
+  useEffect(() => {
+    if (!currentSpotifyTrackId) return;
+    let cancelled = false;
+    fetchSpotifyAlbumArt(currentSpotifyTrackId).then((url) => {
+      if (!cancelled && url) setSpotifyAlbumArtUrl(url);
+    });
+    return () => { cancelled = true; };
+  }, [currentSpotifyTrackId]);
 
   // ScrollView:s onScroll → räkna avstånd från content-botten. När < 24 px
   // kvar (≈ Confirm-knappen är fully visible) → setScrolledToBottom(true) →
@@ -1695,9 +1798,13 @@ export default function QuizScreen() {
 
   // "Kan användaren confirma just nu?" — discriminerad-union-helper.
   // Musik: pendingYear satt. Bild: pendingNameOption satt.
-  const canConfirm = isImageQuestion
-    ? pendingNameOption !== null
-    : pendingYear !== null;
+  // DJ kan aldrig confirma (de svarar inte på Spotify-frågor).
+  // Övriga frågor: pending svar krävs som vanligt.
+  const canConfirm = isCurrentPlayerDJ
+    ? false
+    : isImageQuestion
+      ? pendingNameOption !== null
+      : pendingYear !== null;
 
   // Confirm-knappens scale + glow-loop. Körs medan phase === 'question' OCH
   // ett svar är preliminärt valt (knappen är tappbar). Stoppas i andra faser så
@@ -1921,6 +2028,30 @@ export default function QuizScreen() {
       setCurrentPlayerIndex((prev) => (prev + 1) % turnOrder.length);
     }
     setPhase('intro');
+  };
+
+  // ── Spotify DJ-handlers ───────────────────────────────────────────────────
+  /**
+   * DJ:n trycker "Starta låten i Spotify".
+   * 1. Öppnar Spotify-appen via deep link (Linking.openURL).
+   * 2. Markerar DJ-startad lokalt (knapptext → ✓).
+   * 3. Broadcastar spotify_dj_track_started (IndDev) så gissarnas timer-text
+   *    uppdateras från "Väntar på DJ…" → "Gissa nu!".
+   */
+  const handleStartSpotifyTrack = async () => {
+    if (!currentSpotifyTrackId || spotifyDJStarted) return;
+    const ok = await openSpotifyTrack(currentSpotifyTrackId);
+    if (ok) {
+      setSpotifyDJStarted(true);
+      if (gameMode === 'individual-devices' && syncChannelRef.current && currentDJPlayer) {
+        syncChannelRef.current
+          .broadcastSpotifyDJTrackStarted({
+            dj_player_id: currentDJPlayer.id,
+            spotify_track_id: currentSpotifyTrackId,
+          })
+          .catch(() => {});
+      }
+    }
   };
 
   // ── IndDev host-broadcast-wrappers ───────────────────────────────────────
@@ -2869,6 +3000,11 @@ export default function QuizScreen() {
         // Detta är ENDA vägen tillbaka (heartbeat-receipt räcker inte).
         setPlayerConnectionStatus((prev) => ({ ...prev, [playerId]: 'connected' }));
       },
+      // Spotify DJ: DJ:n har öppnat Spotify — uppdatera gissarnas UI-text.
+      // Scoring och timer påverkas INTE — timer löper oberoende av DJ:ns tap.
+      onSpotifyDJTrackStarted: () => {
+        setSpotifyDJStarted(true);
+      },
     });
     syncChannelRef.current = sync;
     return () => {
@@ -3090,6 +3226,7 @@ export default function QuizScreen() {
         playerCount={playerCount}
         mediaSourceByQuestion={mediaSourceByQuestion}
         categoryByQuestion={categoryByQuestion}
+        spotifyQuestionIndices={djRotationPlan?.spotifyQuestionIndices}
         eraFrom={eraFrom}
         eraTo={eraTo}
         answerResponseSeconds={responseSeconds}
@@ -3364,7 +3501,81 @@ export default function QuizScreen() {
                 tidigare UX-spec). showVideo gömmer video-frame:n under
                 question/awaiting (annars ger thumbnail visuella ledtrådar
                 till svaret) och visar den vid reveal. */}
-            {isImageQuestion ? (
+            {/* ── Spotify DJ-fråga ────────────────────────────────────────────
+                Tre renderingsgrenar beroende på roll + fas:
+                  1. DJ under question/awaiting → DJ-kort + "Starta i Spotify"-knapp
+                  2. Gissare under question/awaiting → albumomslag
+                  3. Reveal (alla) → albumomslag + reveal-overlay (samma bild)
+                Albumomslaget hämtas async i useEffect ovan; visar Q-logga
+                som platshållare tills bilden kommit in. */}
+            {isSpotifyQuestion ? (
+              isCurrentPlayerDJ ? (
+                /* ── DJ-vyn ────────────────────────────────────────────────── */
+                <View style={styles.spotifyDJCard}>
+                  <View style={styles.spotifyDJIconRow}>
+                    <SpotifyBrandIcon size={28} variant="white" />
+                    <Text style={styles.spotifyDJLabel}>You are the DJ</Text>
+                  </View>
+                  <Text style={styles.spotifyDJSublabel}>
+                    {currentDJPlayer?.name ?? ''}
+                  </Text>
+                  {/* Albumomslaget visas DOLT för DJ under question-fasen
+                      (de ska inte se det — de vet redan svaret via Spotify-appen).
+                      Vid reveal visas det precis som för alla andra. */}
+                  {(phase === 'reveal') && spotifyAlbumArtUrl ? (
+                    <Image
+                      source={{ uri: spotifyAlbumArtUrl }}
+                      style={styles.spotifyAlbumArt}
+                      resizeMode="cover"
+                    />
+                  ) : (
+                    <Pressable
+                      style={[
+                        styles.spotifyStartBtn,
+                        spotifyDJStarted && styles.spotifyStartBtnDone,
+                      ]}
+                      onPress={handleStartSpotifyTrack}
+                      disabled={spotifyDJStarted || phase === 'reveal'}
+                    >
+                      <SpotifyBrandIcon
+                        size={20}
+                        variant={spotifyDJStarted ? 'white' : 'white'}
+                      />
+                      <Text style={styles.spotifyStartBtnText}>
+                        {spotifyDJStarted ? '✓ Track started' : 'Start track in Spotify'}
+                      </Text>
+                    </Pressable>
+                  )}
+                  <Text style={styles.spotifyDJHint}>
+                    Other players will guess the year
+                  </Text>
+                </View>
+              ) : (
+                /* ── Gissare-vyn ─────────────────────────────────────────── */
+                <View style={styles.spotifyGuesserCard}>
+                  {spotifyAlbumArtUrl ? (
+                    <Image
+                      source={{ uri: spotifyAlbumArtUrl }}
+                      style={styles.spotifyAlbumArt}
+                      resizeMode="cover"
+                    />
+                  ) : (
+                    /* Platshållare tills albumomslaget laddats */
+                    <View style={styles.spotifyAlbumArtPlaceholder}>
+                      <SpotifyBrandIcon size={48} variant="white" />
+                    </View>
+                  )}
+                  <View style={styles.spotifyGuesserStatus}>
+                    <SpotifyBrandIcon size={14} variant="white" />
+                    <Text style={styles.spotifyGuesserStatusText}>
+                      {spotifyDJStarted
+                        ? `${currentDJPlayer?.name ?? 'DJ'} is playing — guess the year!`
+                        : `Waiting for ${currentDJPlayer?.name ?? 'DJ'} to start the track…`}
+                    </Text>
+                  </View>
+                </View>
+              )
+            ) : isImageQuestion ? (
               <View style={styles.imageMediaCard}>
                 {/* Fragmenterad fråga-routning: har item:t en tecknad sketch
                     (assets/quiz-sketches/<id>.webp via hasSketch) renderas den
@@ -3394,26 +3605,24 @@ export default function QuizScreen() {
                   </>
                 )}
               </View>
+            ) : youtubeError ? (
+              <View style={styles.youtubeErrorCard}>
+                <Text style={styles.youtubeErrorIcon}>⚠</Text>
+                <Text style={styles.youtubeErrorTitle}>Video unavailable</Text>
+                <Text style={styles.youtubeErrorSub}>Skipping to result…</Text>
+              </View>
             ) : (
-              {youtubeError ? (
-                <View style={styles.youtubeErrorCard}>
-                  <Text style={styles.youtubeErrorIcon}>⚠</Text>
-                  <Text style={styles.youtubeErrorTitle}>Video unavailable</Text>
-                  <Text style={styles.youtubeErrorSub}>Skipping to result…</Text>
-                </View>
-              ) : (
-                <MediaPlayer
-                  source={mediaSource}
-                  isPlaying={
-                    phase === 'question' ||
-                    phase === 'awaiting' ||
-                    phase === 'reveal'
-                  }
-                  showVideo={phase === 'reveal'}
-                  isMuted={isAudioMutedForSelf}
-                  onError={handleYoutubeError}
-                />
-              )}
+              <MediaPlayer
+                source={mediaSource}
+                isPlaying={
+                  phase === 'question' ||
+                  phase === 'awaiting' ||
+                  phase === 'reveal'
+                }
+                showVideo={phase === 'reveal'}
+                isMuted={isAudioMutedForSelf}
+                onError={handleYoutubeError}
+              />
             )}
 
             {/* Horisontell timer-progress-bar — krymper från 100% → 0% över
@@ -4146,6 +4355,96 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     borderBottomWidth: 1,
     borderBottomColor: Colors.border,
+  },
+  // ── Spotify DJ-kortet (DJ:ns vy) ──────────────────────────────────────
+  // Samma höjd-budget som YouTube-spelaren (220 px) för layout-konsistens.
+  spotifyDJCard: {
+    height: 220,
+    backgroundColor: '#0D2010',   // Mörk Spotify-grön — tydlig Spotify-kontext
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.sm,
+    paddingHorizontal: Spacing.lg,
+    borderBottomWidth: 1,
+    borderBottomColor: '#1DB954',
+  },
+  spotifyDJIconRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
+  spotifyDJLabel: {
+    fontSize: FontSize.lg,
+    fontWeight: FontWeight.bold,
+    color: '#FFFFFF',
+  },
+  spotifyDJSublabel: {
+    fontSize: FontSize.sm,
+    color: '#1DB954',
+    fontWeight: FontWeight.semibold,
+  },
+  spotifyStartBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    backgroundColor: '#1DB954',
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.xl,
+    borderRadius: Radius.md,
+    marginTop: Spacing.sm,
+  },
+  spotifyStartBtnDone: {
+    backgroundColor: '#157a38',   // Mörkare grön när startad — indikerar "klart"
+  },
+  spotifyStartBtnText: {
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.bold,
+    color: '#FFFFFF',
+  },
+  spotifyDJHint: {
+    fontSize: FontSize.xs,
+    color: 'rgba(255,255,255,0.5)',
+    marginTop: Spacing.xs,
+  },
+  // ── Spotify gissare-kortet ────────────────────────────────────────────
+  spotifyGuesserCard: {
+    height: 220,
+    backgroundColor: '#0A1A0D',   // Ännu mörkare grön för gissarens vy
+    overflow: 'hidden',
+    position: 'relative',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+  },
+  spotifyAlbumArt: {
+    width: '100%',
+    height: '100%',
+    position: 'absolute',
+  },
+  spotifyAlbumArtPlaceholder: {
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#0A1A0D',
+  },
+  spotifyGuesserStatus: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+  },
+  spotifyGuesserStatusText: {
+    fontSize: FontSize.xs,
+    color: '#FFFFFF',
+    flex: 1,
   },
   // Visas när YouTubeMediaPlayer rapporterar embed-fel — ersätter spelaren
   // med en diskret felindikator i samma höjd (220 px = PLAYER_HEIGHT).
