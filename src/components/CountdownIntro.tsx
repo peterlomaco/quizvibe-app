@@ -1,4 +1,5 @@
 import { Nunito_700Bold, useFonts } from '@expo-google-fonts/nunito';
+import * as Speech from 'expo-speech';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   Animated,
@@ -131,6 +132,23 @@ export function CountdownIntro({ onComplete, startFrom = 3, mode = 'pass-the-pho
       loopAnim?.stop();
     };
   }, [count, numberScale, numberOpacity]);
+
+  // Röst-nedräkning: mörk mansröst, djupt och släpande.
+  // pitch: 0.01 = absolut lägsta (mörkast möjligt), rate: 0.42 = långsamt.
+  // Stop anropas i cleanup (returnvärdet från useEffect) så det inte krockar
+  // med det nya speak-anropet vid count-byte. Try/catch skyddar mot saknad
+  // native-modul i dev-build.
+  useEffect(() => {
+    try {
+      console.log('speaking', count);
+      Speech.speak(count <= 0 ? 'Go' : String(count), {
+        language: 'en-US',
+        pitch: 0.01,
+        rate: 0.42,
+      });
+    } catch (e) { console.log('speech error', e); }
+    return () => { try { Speech.stop(); } catch (_) {} };
+  }, [count]);
 
   // "?" pop:as in när count går 1 → 0 + samma puls-loop som siffrorna ovan.
   // Separat Animated.Value så vi kan rendera båda elementen samtidigt under
