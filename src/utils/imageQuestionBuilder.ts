@@ -47,7 +47,11 @@ function shuffle<T>(arr: readonly T[], rng: () => number): T[] {
   return out;
 }
 
-/** Returnerar items i samma kategori vars audiences överlappar audience-set. */
+/**
+ * Returnerar items vars audiences överlappar audience-set.
+ * OBS: allItems är redan subject-filtrerat av caller (quiz.tsx) —
+ * category-filtret är redundant men behålls för bakåtkompatibilitet.
+ */
 function getCategoryPool(
   allItems: readonly ImageQuizQuestion[],
   category: ImageQuizQuestion['category'],
@@ -62,11 +66,16 @@ function getCategoryPool(
   });
 }
 
-/** Fallback: hela kategorin oavsett audience. */
+/**
+ * Fallback: hela poolen oavsett audience.
+ * Returnerar alla items (category-filter är redundant när allItems är subject-filtrerat).
+ */
 function getCategoryFallbackPool(
   allItems: readonly ImageQuizQuestion[],
   category: ImageQuizQuestion['category'],
 ): ImageQuizQuestion[] {
+  // Returnera alla items — caller har redan filtrerat på subject,
+  // så vi vill inte filtrera bort items med annan category-kodning.
   return allItems.filter((item) => item.category === category);
 }
 
