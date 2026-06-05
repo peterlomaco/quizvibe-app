@@ -72,6 +72,16 @@ export function CountdownIntro({ onComplete, startFrom = 3, mode = 'pass-the-pho
   const onCompleteRef = useRef(onComplete);
   useEffect(() => { onCompleteRef.current = onComplete; }, [onComplete]);
 
+  // Pre-warm TTS-motorn vid mount. iOS/Android TTS tar ~200–400 ms extra vid
+  // FÖRSTA anropet (audio-session + engine init) — utan detta hinner "3" visas
+  // visuellt medan rösten fortfarande startar upp, och "2"/"1"/"Go" verkar synkade
+  // eftersom motorn då redan är varm. ' ' (non-breaking space) uttalas
+  // tyst på de flesta TTS-motorer men initierar sessionen omedelbart.
+  useEffect(() => {
+    try { Speech.speak(' ', { language: 'en-US', pitch: 0.01, rate: 2.0 }); } catch (_) {}
+    return () => { try { Speech.stop(); } catch (_) {} };
+  }, []);
+
   // Huvud-countdown-logik:
   // 1) 700 ms initial paus — Q-loggan visas tom, spelaren hinner registrera vyn
   // 2) count sätts till startFrom → "3" visas + röst säger "3" synkat
