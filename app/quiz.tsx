@@ -1902,13 +1902,14 @@ export default function QuizScreen() {
   }, [phase]);
 
   // "Kan användaren confirma just nu?" — discriminerad-union-helper.
-  // Musik: pendingYear satt. Bild: pendingNameOption satt.
+  // Musik: pendingYear satt. Bild: aktiv direkt när hints visas (hintsReady)
+  // så knappen pulsar från start — spelaren väljer svar och trycker sedan Confirm.
+  // Klick utan valt svar gör ingenting (handleConfirmName-grenen checkar pendingNameOption).
   // DJ kan aldrig confirma (de svarar inte på Spotify-frågor).
-  // Övriga frågor: pending svar krävs som vanligt.
   const canConfirm = isCurrentPlayerDJ
     ? false
     : isImageQuestion
-      ? pendingNameOption !== null
+      ? hintsReady
       : pendingYear !== null;
 
   // Confirm-knappens scale + glow-loop. Körs medan phase === 'question' OCH
