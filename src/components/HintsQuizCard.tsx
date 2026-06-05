@@ -274,6 +274,7 @@ export function HintsQuizCard({
               assistance="standard"
               isRevealed={isRevealed}
               logoSize={120}
+              active={hintsActive}
             />
           </View>
         </View>

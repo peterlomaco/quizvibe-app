@@ -49,6 +49,12 @@ interface Props {
   isRevealed?: boolean;
   /** Storlek på QuizVibe-loggan med "?"-glyph (default 180). */
   logoSize?: number;
+  /**
+   * Mosaiktimern och logo-faden startar INTE förrän `active` är true.
+   * Default true (bakåtkompatibelt). Sätt till false under buffer-perioden
+   * (hintsActive=false) så mosaikborttagningen synkar med första hinten.
+   */
+  active?: boolean;
 }
 
 /**
@@ -68,6 +74,7 @@ export function ProgressiveCover({
   assistance = 'standard',
   isRevealed = false,
   logoSize = 180,
+  active = true,
 }: Props) {
   const [revealedCount, setRevealedCount] = useState(0);
   // Q-loggans opacity drivs av en separat 3-sekunds-fade istället för av
@@ -94,6 +101,7 @@ export function ProgressiveCover({
   useEffect(() => {
     setRevealedCount(0);
     if (isRevealed) return; // hanteras av nästa effect
+    if (!active) return;    // vänta tills hintsActive=true
 
     const fraction = ASSISTANCE_REVEAL_FRACTION[assistance] ?? 0.5;
     const revealDurationMs = Math.max(500, totalSeconds * fraction * 1000);
@@ -108,7 +116,7 @@ export function ProgressiveCover({
     }, intervalMs);
     return () => clearInterval(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [resetKey, assistance, totalSeconds]);
+  }, [resetKey, assistance, totalSeconds, active]);
 
   // Q-logga: linjär fade från 1 → 0 över 3 sek. Egen timer så fade-tiden
   // inte hänger på mosaik-speed (på minimal skulle reveal-driven opacity
@@ -116,6 +124,7 @@ export function ProgressiveCover({
   useEffect(() => {
     setLogoOpacity(1);
     if (isRevealed) return;
+    if (!active) return; // vänta tills hintsActive=true
     const startTime = Date.now();
     const id = setInterval(() => {
       const elapsed = Date.now() - startTime;
@@ -125,7 +134,7 @@ export function ProgressiveCover({
     }, LOGO_FADE_TICK_MS);
     return () => clearInterval(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [resetKey]);
+  }, [resetKey, active]);
 
   // Snap till alla block borta + logga osynlig vid Confirm.
   useEffect(() => {
