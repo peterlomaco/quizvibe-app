@@ -822,3 +822,10 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2026 vinnare — Bulgarien. Officiell music video."
     genrePackages: ["Eurovision"]
+  - id: nyper-mig-i-armen
+    displayName: "Nyper mig i armen — Albin Lee Meldau & Per Gessle"
+    correctYear: 2019
+    probability: 72
+    wikimediaSearchHints: ["Albin Lee Meldau Per Gessle Nyper mig i armen Swedish"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "7l5hPHj4KCzxTFVI03sui1"

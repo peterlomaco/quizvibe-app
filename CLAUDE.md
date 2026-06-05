@@ -463,10 +463,11 @@ Ersätter gamla `enabledMainCategories` + `youtubeEnabled`/`imagesEnabled`-boole
 - **Stänga av Actors/Athletes Images** → "Not applicable" popup om det är enda aktiva YT-kombinationen (Actors/Athletes utan Artists — Artists ensamt är undantag, giltigt)
 - **Stänga av Spotify** → blockeras om `imagesEnabledCategories.length === 0 && enabledColumnsCount <= 1 && !youtubeEnabledCategories.includes('Music')` (Artist/YT ensamt är OK)
 
-**quiz.tsx-filter (2026-06-05)**:
+**quiz.tsx-filter (2026-06-06)**:
 - YouTube-pool: filtreras mot `youtubeEnabledCategories` inkl. `genrePackages`-crossover.
 - Hints-pool (imagePool): alla person-items (`artist/band/actor/athlete`) är **era-agnostiska** — `correctYear` = födelseår, inte eventår; födelseår används aldrig som era-filter. Explicit `peakFrom/peakTo` används om satt.
 - Fallback: om YouTube av + imagePool tom → person-fallback utan era, INTE SEED_QUESTIONS.
+- **Bug-fix (2026-06-06)**: `youtubeEnabledCategories`/`imagesEnabledCategories` parsades med `filtered.length > 0 ? filtered : ['Music','Film','Sport']` — tom array `[]` (= YouTube/Images av) tolkades felaktigt som "använd default = allt på". Fixat: tom array är ett giltigt explicit val och fallbackar inte till default. Fallback sker bara vid JSON-parse-fel eller icke-array.
 
 **Person-type crossover (2026-06-02):** `itemMatchesEnabledCategories` i `mainCategory.ts` stöder symmetrisk crossover via `genrePackages`:
 - `genrePackages: ["sport"]` → surfar ÄVEN under Athletes/Sport
@@ -958,13 +959,34 @@ Namnet som visas (`pickNameForPrefix`): det rätta namnet om prefix matchar `cor
 
 Person-bildfrågor (juridiskt parkerade) ersätts av **Hints** — en split-view-fråga med landsflagga + upp till 15 progressiva ledtrådar. Svarsmekaniken (Letter Grid) är oförändrad.
 
+**Pool-filter (2026-06-06)**: `MIN_HINTS_REQUIRED = 10` — items med färre än 10 hints i HINTS_LIBRARY filtreras bort ur `IMAGE_SEED_QUESTIONS` och når aldrig quiz-poolen. Säkrar att alla spelbara hints-frågor har tillräckliga ledtrådar.
+
 **Layout HintsQuizCard v3** ([src/components/HintsQuizCard.tsx](src/components/HintsQuizCard.tsx)):
-- **Vänster kolumn (flex:1)**: kategori-label (uppercased, guld) + `ScrollView` med punktlista (•) av hints + ↳-subrad för klubbhistorik.
-- **Höger kolumn (110px)**: övre halvan = landsflagga med `ProgressiveCover` (`assistance='standard'` → helt synlig vid T/2) + Nationality-chip; nedre halvan = personnamn (fade-in vid `isRevealed`).
+- **Vänster kolumn (flex:1)**: kategori-rubrik `{Genre} · {Profession}` (guld, uppercase, ej understruken) + `ScrollView` med punktlista (•) av hints + ↳-subrad för klubbhistorik.
+- **Höger kolumn (110px)**: landsflagga (stor emoji, vit `flagInner`-ruta) + personnamn (fade-in vid `isRevealed`). Nationality-chip borttagen.
 - **Höjd**: matchar YouTube-player via `flex:1` i `imageMediaCard`-container (`aspectRatio: 16/9`).
 - **Timing**: alla hints synliga vid T/2 (`HINTS_ALL_OUT_FRACTION = 0.5`). Auto-scroll till senaste hint.
-- **Hint-format**: inga nummerbadges — enbart `•`-punkter. Hint-värdet är texten (t.ex. "Football player", `'"Thriller" (1982)'`). Prefix bara där kontext behövs (`Born:`, `Career:`, `Lead singer:`, `Creator:`). Konsekutiva `club`-hints grupperas under "Career History" med `↳`-subrader.
+- **Hint-format**: inga nummerbadges — enbart `•`-punkter. Konsekutiva `club`-hints grupperas under "Career History" med `↳`-subrader.
 - **Slumpmässigt urval**: `selectHints(library, 15)` i `hintsGenerator.ts` — P5-hints alltid med, P4→P1 slumpas → variation per runda.
+
+**Kategori-rubrik** (`{Genre} · {Profession}`): `categoryToGenre` + `categoryToProfession` mappar `HintCategoryLabel` → display-text:
+- `Musikartist` → `Music · Artist`, `Band` → `Music · Band`
+- `Actor` → `Film · Actor`, `Character` → `Film · Character`
+- `Athlete` → `Sport · Athlete`, `Coach` → `Sport · Coach`
+
+**Hint-filtreringspipeline** (appliceras i `BulletHint` och `ClubSubRow`):
+1. `isRedundantHint(text)` — filtrerar bort hints vars text redan framgår av rubriken (`'music artist'`, `'musician'`, `'recording artist'`).
+2. `censorSensitive(text)` — trunkerar vid känslig information (`died`, `death`, `accident`, `crash`, `diagnosed`, `cancer`, `tumor` m.fl.) och returnerar texten *före* matchningen. Returnerar `null` om inget återstår → hint hoppas över. **OBS**: trunkerar (inte kastar) så t.ex. `"Lead singer: Marie Fredriksson (died 2019)"` → `"Lead singer: Marie Fredriksson"`.
+3. `censorForAnswer(text, answer)` — trunkerar vid svarets namn (inkl. namndelar >3 tecken) → förhindrar att svaret syns i ledtråden (t.ex. `"Sir Elton John"` → `"Sir"` när svaret är "Elton John").
+
+**Hint-sortering** (`selectHints` uppdaterat): primär sortering på prioritet (P1 first → P5 last), sekundär på `TYPE_ORDER` (module-level konstant i `hintsGenerator.ts`) — hints av samma typ grupperas konsekutivt (alla `'song'`-hints samlade, alla `'album'`-hints samlade etc.).
+
+**Svarsalternativ (5 st, underkategori + genus)**:
+- `totalOptions: 5` skickas till `buildImageVariant` (ned till `buildLetterGrid`, `buildNameOptions`, `buildFullNamesList`).
+- `allItems` filtreras på `contentSubject` (t.ex. bara `'band'` för band-frågor, bara `'athlete'` för idrottar-frågor) innan `buildImageVariant` anropas.
+- **Genus-filter**: `inferGender(library)` i `hintsData.ts` härleder kön via pronomen (`he/his/him` → male, `she/her/hers` → female). Om rätt svar är manligt → distraktorpoolen filtreras till manliga items (okänt genus tillåts). Fallback-kedja: sameSubject+sameGender (≥8) → sameSubject (≥8) → hela IMAGE_QUIZ_QUESTIONS.
+
+**Slott**: `SENSITIVE_HINT_TERMS` och `REDUNDANT_HINT_TERMS` i HintsQuizCard.tsx — lägg till termer vid behov utan kodingrepp på logik.
 
 **Typ-system** ([src/utils/hintsData.ts](src/utils/hintsData.ts)):
 ```ts

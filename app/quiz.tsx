@@ -60,7 +60,7 @@ import {
   type ImageQuizQuestion,
 } from '@/src/utils/quizImageQuestions';
 import { buildImageVariant } from '@/src/utils/imageQuestionBuilder';
-import { HINTS_LIBRARY, getHintRegionScope, type HintLibrary } from '@/src/utils/hintsData';
+import { HINTS_LIBRARY, getHintRegionScope, inferGender, type HintLibrary } from '@/src/utils/hintsData';
 import { HintsQuizCard } from '@/src/components/HintsQuizCard';
 // import { getQuizImage } from '@/src/utils/quizImages';
 // ↑ Borttagen 2026-05-27 — text-rendering ersätter foto-rendering. Återintroducera
@@ -188,9 +188,14 @@ function professionFromSubject(subject: string | undefined): string {
 // Bild-frågor (Letter Grid → Final Selection-svar). category='Image' triggar
 // per-typ-rendering i question-card / mediaCard / answer-block / reveal-block.
 // Items med hints-data i HINTS_LIBRARY får library attachad vid konvertering.
-// 'unknown-region'-items (för svag igenkänning för V1) filtreras bort.
+// 'unknown-region'-items filtreras bort. Items med färre än 10 hints visas ej —
+// de saknar tillräckliga ledtrådar för en meningsfull fråga.
+const MIN_HINTS_REQUIRED = 10;
 const IMAGE_SEED_QUESTIONS: ImageQuestion[] = IMAGE_QUIZ_QUESTIONS
-  .filter((q) => getHintRegionScope(q.id) !== 'unknown-region')
+  .filter((q) =>
+    getHintRegionScope(q.id) !== 'unknown-region' &&
+    (HINTS_LIBRARY[q.id]?.hints.length ?? 0) >= MIN_HINTS_REQUIRED,
+  )
   .map((q, i, arr) => ({
     type: 'image',
     id: q.id,
@@ -768,8 +773,10 @@ export default function QuizScreen() {
     if (!params.youtubeEnabledCategories) return ['Music', 'Film', 'Sport'];
     try {
       const parsed = JSON.parse(params.youtubeEnabledCategories);
-      const filtered = Array.isArray(parsed) ? parsed.filter(isMainCategory) : [];
-      return filtered.length > 0 ? filtered : ['Music', 'Film', 'Sport'];
+      // Tom array [] är ett giltigt explicit val (= YouTube helt av).
+      // Fallback till default BARA om parse misslyckas eller inte är array.
+      if (!Array.isArray(parsed)) return ['Music', 'Film', 'Sport'];
+      return parsed.filter(isMainCategory);
     } catch {
       return ['Music', 'Film', 'Sport'];
     }
@@ -778,8 +785,9 @@ export default function QuizScreen() {
     if (!params.imagesEnabledCategories) return ['Music', 'Film', 'Sport'];
     try {
       const parsed = JSON.parse(params.imagesEnabledCategories);
-      const filtered = Array.isArray(parsed) ? parsed.filter(isMainCategory) : [];
-      return filtered.length > 0 ? filtered : ['Music', 'Film', 'Sport'];
+      // Tom array [] är ett giltigt explicit val (= Images helt av).
+      if (!Array.isArray(parsed)) return ['Music', 'Film', 'Sport'];
+      return parsed.filter(isMainCategory);
     } catch {
       return ['Music', 'Film', 'Sport'];
     }
@@ -1102,7 +1110,18 @@ export default function QuizScreen() {
         mixed.push(pool[idx]);
       }
     }
-    return mixed.length > 0 ? mixed : SEED_QUESTIONS;
+    // Nödfallback: mixed tom trots att pool-bygget körde (t.ex. alla pools
+    // oväntat tomma). Föredra bild-frågor framför YouTube-SEED när YouTube av.
+    if (mixed.length === 0) {
+      if (!youtubeEnabled) {
+        const personFallback = IMAGE_SEED_QUESTIONS.filter(
+          (q) => PERSON_SUBJECTS.has(q.source.contentSubject),
+        );
+        return personFallback.length > 0 ? personFallback : IMAGE_SEED_QUESTIONS.length > 0 ? IMAGE_SEED_QUESTIONS : SEED_QUESTIONS;
+      }
+      return SEED_QUESTIONS;
+    }
+    return mixed;
   }, [eraFrom, eraTo, turnOrder, totalRounds, youtubeEnabled, imagesEnabled, gameMode, youtubeEnabledCategories, imagesEnabledCategories, seenQuestionIds, spotifyEnabled]);
 
   // Media-källa per fråga (driver GetReadyIntro:s IndDev media-kö).
@@ -1474,12 +1493,34 @@ export default function QuizScreen() {
   // → ImageAnswerBlock skulle få ny variant-prop per frame.
   const imageVariant = useMemo<ImageQuestionVariant | null>(() => {
     if (question.type !== 'image') return null;
+    // Filtrera distraktor-pool till samma contentSubject som det rätta svaret
+    // (t.ex. bara 'band' för band-frågor, bara 'athlete' för idrottare).
+    const sameSubject = IMAGE_QUIZ_QUESTIONS.filter(
+      (q) => q.contentSubject === question.source.contentSubject,
+    );
+    // Genus-filter: om rätt svar är manligt/kvinnligt (härleds från pronomen i hints)
+    // visas bara distraktorter med samma kön. Fallback till alla om genus saknas.
+    const correctLib  = HINTS_LIBRARY[question.source.id];
+    const correctGender = correctLib ? inferGender(correctLib) : null;
+    const sameGender = correctGender
+      ? sameSubject.filter((q) => {
+          const lib = HINTS_LIBRARY[q.id];
+          if (!lib) return true; // okänt kön → tillåt som distraktor
+          const g = inferGender(lib);
+          return g === null || g === correctGender;
+        })
+      : sameSubject;
+    // Fallback till hela categorin om subjectet + genus ger för få items (< 8).
+    const itemPool = sameGender.length >= 8 ? sameGender
+      : sameSubject.length >= 8 ? sameSubject
+      : IMAGE_QUIZ_QUESTIONS;
     return buildImageVariant(
       question.source,
       currentAssistance,
       audienceSetForVariants,
-      IMAGE_QUIZ_QUESTIONS,
+      itemPool,
       DISTRACTOR_POOL_NAMES[question.source.category] ?? [],
+      5, // 5 svarsalternativ
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [question.id, currentAssistance, audienceSetForVariants]);

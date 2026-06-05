@@ -30,6 +30,26 @@ export interface MusicQuestion {
 
 export const MUSIC_QUESTIONS: MusicQuestion[] = [
   {
+    "id": "steamboat-willie-1928",
+    "displayName": "Steamboat Willie",
+    "correctYear": 1928,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "I5pG1wbRKOg",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Did You Catch This?",
+        "license": "standard",
+        "notes": "4K-remaster av Steamboat Willie (public domain sedan jan 2024). Ikononisk öppning med Mickey som visslar på ångbåten."
+      }
+    ]
+  },
+  {
     "id": "cab-calloway-minnie-the-moocher",
     "displayName": "Minnie the Moocher — Cab Calloway",
     "correctYear": 1931,
@@ -102,6 +122,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "mickeys-trailer-1938",
+    "displayName": "Mickey's Trailer",
+    "correctYear": 1938,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "aL7KlP0UcyA",
+        "startSec": 30,
+        "endSec": 60,
+        "channelTitle": "JP The Pro",
+        "license": "standard",
+        "notes": "Kalle Anka på husvagnssemester — Mickey, Donald och Langben i husvagnen (julaftonsklassiker). Hela korta filmen (7:43)."
+      }
+    ]
+  },
+  {
     "id": "judy-garland-over-the-rainbow",
     "displayName": "Over the Rainbow — Judy Garland",
     "correctYear": 1939,
@@ -130,6 +170,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Glenn Miller Orchestra - Topic",
         "license": "standard",
         "notes": "Officiell album-audio via YouTube Topic. Iconic swing-intro."
+      }
+    ]
+  },
+  {
+    "id": "bambi-1942",
+    "displayName": "Bambi",
+    "correctYear": 1942,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "YgNx5J0SROE",
+        "startSec": 5,
+        "endSec": 20,
+        "channelTitle": "Disney UK",
+        "license": "standard",
+        "notes": "Disney UK officiell Diamond Edition-trailer — Bambi i skogen, klassisk Disney-estetik."
       }
     ]
   },
@@ -282,6 +342,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "OLD TAPES",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
+    "id": "lady-and-the-tramp",
+    "displayName": "Lady and the Tramp",
+    "correctYear": 1955,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "SAoLpLXvGN0",
+        "startSec": 10,
+        "endSec": 25,
+        "channelTitle": "Disney UK",
+        "license": "standard",
+        "notes": "Disney UK officiell Blu-ray-trailer — spagetti-scen + hundar etablerade."
       }
     ]
   },
@@ -1493,6 +1573,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "robin-hood-1973",
+    "displayName": "Robin Hood",
+    "correctYear": 1973,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "rekU76GG9Sk",
+        "startSec": 0,
+        "endSec": 15,
+        "channelTitle": "Jim Margle",
+        "license": "standard",
+        "notes": "Original 1973 teatral trailer (1:00) — Robin Hood + Maid Marian etableras."
+      }
+    ]
+  },
+  {
     "id": "rolling-stones-angie",
     "displayName": "Angie — The Rolling Stones",
     "correctYear": 1973,
@@ -2390,6 +2490,22 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "notes": "Officiell NjutaFilms-trailer. Karaktärerna + kanalscenerna väl representerade."
       }
     ]
+  },
+  {
+    "id": "hasse-andersson-guld-och-groena-skogar",
+    "displayName": "Guld och gröna skogar — Hasse Andersson",
+    "correctYear": 1981,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "genrePackages": [
+      "Melodifestivalen"
+    ],
+    "spotifyTrackId": "6EnNjWkk1YX3fsTXtwO773",
+    "youtubeClips": []
   },
   {
     "id": "indiana-jones-raiders",
@@ -3921,6 +4037,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "seal-crazy",
+    "displayName": "Crazy — Seal",
+    "correctYear": 1991,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "4Fc67yQsPqQ",
+        "startSec": 5,
+        "endSec": 20,
+        "channelTitle": "Warner Records Vault",
+        "license": "standard",
+        "notes": "Officiellt musikvideo via Warner Records Vault. HD. Tillagd 2026-06-04."
+      }
+    ]
+  },
+  {
     "id": "smells-like-teen-spirit",
     "displayName": "Smells Like Teen Spirit — Nirvana",
     "correctYear": 1991,
@@ -3979,6 +4116,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Ace of Base - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
+    "id": "aladdin-1992",
+    "displayName": "Aladdin",
+    "correctYear": 1992,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "XBrfbWtmvWs",
+        "startSec": 10,
+        "endSec": 25,
+        "channelTitle": "FT Depot",
+        "license": "standard",
+        "notes": "Original teatral 1992-trailer — Aladdin + Agrabah + Genie (Robin Williams) etableras."
       }
     ]
   },
@@ -4519,6 +4676,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "the-lion-king-1994",
+    "displayName": "The Lion King",
+    "correctYear": 1994,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "lfiprM5l_cE",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Aarush Boi",
+        "license": "standard",
+        "notes": "Circle of Life-öppningsscenen (HD, 1994). Alla officiella Disney-trailers är made-for-kids-blockerade. Ersätt vid inbäddningsfel."
+      }
+    ]
+  },
+  {
     "id": "tomas-brolin-vm-1994",
     "displayName": "Tomas Brolins mål VM-94",
     "correctYear": 1994,
@@ -4993,6 +5170,39 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "mulan-1998",
+    "displayName": "Mulan",
+    "correctYear": 1998,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "sRtZaSkBp58",
+        "startSec": 10,
+        "endSec": 25,
+        "channelTitle": "Allen Theatres Inc",
+        "license": "standard",
+        "notes": "Original 1998 teatral trailer — Mulan som krigare + Make a Man Out of You-känsla."
+      }
+    ]
+  },
+  {
+    "id": "petter-vinden-har-vant",
+    "displayName": "Vinden har vänt — Petter",
+    "correctYear": 1998,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-z",
+      "millennials"
+    ],
+    "spotifyTrackId": "2XkMVyMLZhrUivl7XuhidO",
+    "youtubeClips": []
+  },
+  {
     "id": "charlotte-nilsson-tusen-och-en-natt",
     "displayName": "Tusen och en natt — Charlotte Nilsson",
     "correctYear": 1999,
@@ -5053,6 +5263,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 221,
         "channelTitle": "Lou Bega Official",
         "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "tarzan-1999",
+    "displayName": "Tarzan",
+    "correctYear": 1999,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "jc0lisHARr4",
+        "startSec": 10,
+        "endSec": 25,
+        "channelTitle": "Darth Malins",
+        "license": "standard",
+        "notes": "1999 teatral trailer — Tarzan i djungeln + Phil Collins You'll Be in My Heart-känsla."
       }
     ]
   },
@@ -5346,6 +5576,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "shrek-2001",
+    "displayName": "Shrek",
+    "correctYear": 2001,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "s9nVUOP3Oik",
+        "startSec": 10,
+        "endSec": 25,
+        "channelTitle": "Dreamworks",
+        "license": "standard",
+        "notes": "DreamWorks officiell trailer (1:48) — Shrek + Åsnon i träsket. Allsvars DreamWorks-kanal."
+      }
+    ]
+  },
+  {
     "id": "tanel-padar-everybody",
     "displayName": "Everybody — Tanel Padar, Dave Benton & 2XL",
     "correctYear": 2001,
@@ -5495,6 +5745,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "finding-nemo",
+    "displayName": "Finding Nemo",
+    "correctYear": 2003,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "6fHR58bSwpg",
+        "startSec": 20,
+        "endSec": 35,
+        "channelTitle": "Saskia Rice",
+        "license": "standard",
+        "notes": "Teatral 2003-trailer — Nemo + Marlin + undervattensvärlden etableras."
+      }
+    ]
+  },
+  {
     "id": "outkast-hey-ya",
     "displayName": "Hey Ya! — OutKast",
     "correctYear": 2003,
@@ -5512,6 +5782,30 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "MASTER RJ",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
+      }
+    ]
+  },
+  {
+    "id": "sarek-genom-eld-och-vatten",
+    "displayName": "Genom eld och vatten — Sarek",
+    "correctYear": 2003,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-z",
+      "millennials"
+    ],
+    "genrePackages": [
+      "Melodifestivalen"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "ky3bbNq818w",
+        "startSec": 12,
+        "endSec": 27,
+        "channelTitle": "Melodifestivalen Arkiv",
+        "license": "standard",
+        "notes": "Finalen Melodifestivalen 2003. Inget officiellt MV finns. Tillagd 2026-06-04."
       }
     ]
   },
@@ -6682,6 +6976,30 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "timoteij-kom",
+    "displayName": "Kom — Timoteij",
+    "correctYear": 2010,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-z",
+      "millennials"
+    ],
+    "genrePackages": [
+      "Melodifestivalen"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "wy2NXJHCFao",
+        "startSec": 8,
+        "endSec": 23,
+        "channelTitle": "Uaum",
+        "license": "standard",
+        "notes": "Musikvideo. Inget officiellt MV finns. Tillagd 2026-06-04."
+      }
+    ]
+  },
+  {
     "id": "adele-someone-like-you",
     "displayName": "Someone Like You — Adele",
     "correctYear": 2011,
@@ -7486,6 +7804,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "angry-birds",
+    "displayName": "The Angry Birds Movie",
+    "correctYear": 2016,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "e4sdQBmqnuA",
+        "startSec": 10,
+        "endSec": 25,
+        "channelTitle": "Sony Pictures Releasing UK",
+        "license": "standard",
+        "notes": "Sony Pictures UK — officiell 2016-trailer. Red + Bomb + Chuck i fokus. Ej embed-blockerad."
+      }
+    ]
+  },
+  {
     "id": "chainsmokers-closer",
     "displayName": "Closer — The Chainsmokers",
     "correctYear": 2016,
@@ -8090,6 +8428,19 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
       }
     ]
+  },
+  {
+    "id": "nyper-mig-i-armen",
+    "displayName": "Nyper mig i armen — Albin Lee Meldau & Per Gessle",
+    "correctYear": 2019,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-alpha",
+      "gen-z"
+    ],
+    "spotifyTrackId": "7l5hPHj4KCzxTFVI03sui1",
+    "youtubeClips": []
   },
   {
     "id": "tones-and-i-dance-monkey",

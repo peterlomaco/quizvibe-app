@@ -23,6 +23,14 @@ items:
         endSec: 45
         channelTitle: "Enhanced Music Videos"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (18)."
+  - id: hasse-andersson-guld-och-groena-skogar
+    displayName: "Guld och gröna skogar — Hasse Andersson"
+    correctYear: 1981
+    probability: 88
+    wikimediaSearchHints: ["Hasse Andersson Guld och gröna skogar dansband"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Melodifestivalen"]
+    spotifyTrackId: "6EnNjWkk1YX3fsTXtwO773"
   # 1982
   # Billie Jean flyttad till songs-all.yaml (cross-gen-iconic) 2026-05-22.
   - id: survivor-eye-of-the-tiger
@@ -250,6 +258,18 @@ items:
         endSec: 73
         channelTitle: "Michael Jackson - Topic"
         notes: "Officiell album-audio via YouTube Topic. Iconic guitar-riff."
+  - id: seal-crazy
+    displayName: "Crazy — Seal"
+    correctYear: 1991
+    probability: 85
+    wikimediaSearchHints: ["Seal Crazy 1991"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "4Fc67yQsPqQ"
+        startSec: 5
+        endSec: 20
+        channelTitle: "Warner Records Vault"
+        notes: "Officiellt musikvideo via Warner Records Vault. HD. Tillagd 2026-06-04."
   # 1992
   - id: snap-rhythm-is-a-dancer
     displayName: "Rhythm Is a Dancer — Snap!"

@@ -56,6 +56,13 @@ items:
         startSec: 0
         endSec: 329
         channelTitle: "Madonna"
+  - id: petter-vinden-har-vant
+    displayName: "Vinden har vänt — Petter"
+    correctYear: 1998
+    probability: 88
+    wikimediaSearchHints: ["Petter Vinden har vänt Thomas Rusiak"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "2XkMVyMLZhrUivl7XuhidO"
   # 1999
   - id: lou-bega-mambo-no-5
     displayName: "Mambo No. 5 — Lou Bega"
@@ -161,6 +168,19 @@ items:
         startSec: 0
         endSec: 194
         channelTitle: "50 Cent - Topic"
+  - id: sarek-genom-eld-och-vatten
+    displayName: "Genom eld och vatten — Sarek"
+    correctYear: 2003
+    probability: 85
+    wikimediaSearchHints: ["Sarek Genom eld och vatten Melodifestivalen 2003"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Melodifestivalen"]
+    youtubeClips:
+      - videoId: "ky3bbNq818w"
+        startSec: 12
+        endSec: 27
+        channelTitle: "Melodifestivalen Arkiv"
+        notes: "Finalen Melodifestivalen 2003. Inget officiellt MV finns. Tillagd 2026-06-04."
   # 2004
   - id: usher-yeah
     displayName: "Yeah! — Usher"
@@ -322,8 +342,21 @@ items:
         startSec: 0
         endSec: 264
         channelTitle: "Eminem - Topic"
+  - id: timoteij-kom
+    displayName: "Kom — Timoteij"
+    correctYear: 2010
+    probability: 82
+    wikimediaSearchHints: ["Timoteij Kom Melodifestivalen 2010"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Melodifestivalen"]
+    youtubeClips:
+      - videoId: "wy2NXJHCFao"
+        startSec: 8
+        endSec: 23
+        channelTitle: "Uaum"
+        notes: "Musikvideo. Inget officiellt MV finns. Tillagd 2026-06-04."
   # 2011
-  # Someone Like You flyttad till songs-all.yaml (cross-gen-iconic) 2026-05-22.
+# Someone Like You flyttad till songs-all.yaml (cross-gen-iconic) 2026-05-22.
   - id: avicii-levels
     displayName: "Levels — Avicii"
     correctYear: 2011

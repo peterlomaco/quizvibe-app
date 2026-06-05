@@ -79,10 +79,85 @@ function formatHintText(hint: HintItem): string {
   }
 }
 
+function categoryToGenre(label: string): string {
+  if (label === 'Musikartist' || label === 'Band') return 'Music';
+  if (label === 'Actor' || label === 'Character') return 'Film';
+  if (label === 'Athlete' || label === 'Coach') return 'Sport';
+  return 'Music';
+}
+
+function categoryToProfession(label: string): string {
+  if (label === 'Musikartist') return 'Artist';
+  if (label === 'Band') return 'Band';
+  if (label === 'Actor') return 'Actor';
+  if (label === 'Athlete') return 'Athlete';
+  if (label === 'Coach') return 'Coach';
+  if (label === 'Character') return 'Character';
+  return 'Artist';
+}
+
 function splitDisplayName(name: string): string[] {
   const lastSpace = name.lastIndexOf(' ');
   if (lastSpace === -1) return [name];
   return [name.slice(0, lastSpace), name.slice(lastSpace + 1)];
+}
+
+// Termer som redan framgår av rubriken (Genre · Profession) och ska filtreras bort.
+const REDUNDANT_HINT_TERMS = [
+  'music artist',
+  'musician',
+  'recording artist',
+];
+
+// Känslig information som inte ska visas som ledtråd.
+const SENSITIVE_HINT_TERMS = [
+  'died', 'death', 'passed away', 'deceased', 'dead',
+  'killed', 'murder', 'suicide', 'overdose',
+  'accident', 'crash', 'collision', 'plane crash', 'car crash',
+  'cancer', 'illness', 'disease', 'diagnosed', 'tumor', 'tumour',
+];
+
+function isRedundantHint(text: string): boolean {
+  const lower = text.toLowerCase();
+  return REDUNDANT_HINT_TERMS.some((term) => lower.includes(term));
+}
+
+/**
+ * Trunkerar texten vid det första känsliga ordet och returnerar texten dessförinnan
+ * (trimmad och utan avslutande skiljetecken/parenteser). Om inget återstår → null.
+ * Texten visas alltså UTAN den känsliga delen, inte borttagen helt.
+ */
+function censorSensitive(text: string): string | null {
+  const lower = text.toLowerCase();
+  let earliest = -1;
+  for (const term of SENSITIVE_HINT_TERMS) {
+    const idx = lower.indexOf(term);
+    if (idx !== -1 && (earliest === -1 || idx < earliest)) earliest = idx;
+  }
+  if (earliest === -1) return text;
+  const before = text.slice(0, earliest).trim().replace(/[(,:;-]+$/, '').trim();
+  return before.length > 0 ? before : null;
+}
+
+/**
+ * Kontrollerar om hint-texten innehåller svaret (displayName) och returnerar
+ * i så fall bara texten FÖRE matchningen (trimmat). Om inget återstår → null
+ * (= hinten ska hoppas över helt). Matchar case-insensitivt mot hela namnet
+ * samt eventuella för-/efternamn separat (skydd mot "Elton John" i "Sir Elton John").
+ */
+function censorForAnswer(text: string, answer: string): string | null {
+  const lower = text.toLowerCase();
+  const answerLower = answer.toLowerCase();
+  // Matcha hela svaret samt varje ord i svaret som är längre än 3 tecken
+  const terms = [answerLower, ...answerLower.split(' ').filter((w) => w.length > 3)];
+  let earliest = -1;
+  for (const term of terms) {
+    const idx = lower.indexOf(term);
+    if (idx !== -1 && (earliest === -1 || idx < earliest)) earliest = idx;
+  }
+  if (earliest === -1) return text; // inget svar i texten — visa som vanligt
+  const before = text.slice(0, earliest).trim().replace(/[,:;-]+$/, '').trim();
+  return before.length > 0 ? before : null;
 }
 
 // ── Huvud-komponent ─────────────────────────────────────────────────────────
@@ -134,9 +209,11 @@ export function HintsQuizCard({
     }).start();
   }, [isRevealed, nameAnim]);
 
-  const flag          = library ? countryToFlagEmoji(library.nationality) : '🏳️';
-  const categoryLabel = library?.categoryLabel ?? 'Person';
-  const nameParts     = splitDisplayName(displayName);
+  const flag       = library ? countryToFlagEmoji(library.nationality) : '🏳️';
+  const rawLabel   = library?.categoryLabel ?? 'Musikartist';
+  const genre      = categoryToGenre(rawLabel);
+  const profession = categoryToProfession(rawLabel);
+  const nameParts  = splitDisplayName(displayName);
 
   return (
     <View style={styles.container}>
@@ -144,7 +221,7 @@ export function HintsQuizCard({
       {/* ── Vänster: hints ───────────────────────────────── */}
       <View style={styles.hintsCol}>
         <Text style={styles.categoryLabel} numberOfLines={1}>
-          {categoryLabel}
+          {genre} · {profession}
         </Text>
         <ScrollView
           ref={scrollRef}
@@ -159,6 +236,7 @@ export function HintsQuizCard({
                 entry={entry}
                 revealedCount={revealedCount}
                 isRevealed={isRevealed}
+                answer={displayName}
               />
             ) : (
               <BulletHint
@@ -166,6 +244,7 @@ export function HintsQuizCard({
                 entry={entry}
                 revealedCount={revealedCount}
                 isRevealed={isRevealed}
+                answer={displayName}
               />
             ),
           )}
@@ -177,9 +256,6 @@ export function HintsQuizCard({
 
         {/* Flagga (övre halvan) */}
         <View style={styles.flagWrap}>
-          <View style={styles.natBadgeWrap}>
-            <Text style={styles.natBadgeText}>Nationality</Text>
-          </View>
           <View style={styles.flagInner}>
             <Text style={styles.flagEmoji}>{flag}</Text>
             <ProgressiveCover
@@ -188,7 +264,7 @@ export function HintsQuizCard({
               totalSeconds={totalSeconds}
               assistance="standard"
               isRevealed={isRevealed}
-              logoSize={44}
+              logoSize={120}
             />
           </View>
         </View>
@@ -219,10 +295,12 @@ function BulletHint({
   entry,
   revealedCount,
   isRevealed,
+  answer,
 }: {
   entry: SingleEntry;
   revealedCount: number;
   isRevealed: boolean;
+  answer: string;
 }) {
   const shown = revealedCount > entry.index || isRevealed;
   const anim  = useRef(new Animated.Value(0)).current;
@@ -233,12 +311,19 @@ function BulletHint({
 
   if (!shown) return null;
 
+  const raw        = formatHintText(entry.hint);
+  if (isRedundantHint(raw)) return null;
+  const noSensitive = censorSensitive(raw);
+  if (noSensitive === null) return null;
+  const censored    = censorForAnswer(noSensitive, answer);
+  if (censored === null) return null;
+
   const translateY = anim.interpolate({ inputRange: [0, 1], outputRange: [5, 0] });
 
   return (
     <Animated.View style={[styles.bulletRow, { opacity: anim, transform: [{ translateY }] }]}>
       <Text style={styles.bullet}>•</Text>
-      <Text style={styles.hintText} numberOfLines={2}>{formatHintText(entry.hint)}</Text>
+      <Text style={styles.hintText} numberOfLines={2}>{censored}</Text>
     </Animated.View>
   );
 }
@@ -249,10 +334,12 @@ function ClubGroup({
   entry,
   revealedCount,
   isRevealed,
+  answer,
 }: {
   entry: GroupEntry;
   revealedCount: number;
   isRevealed: boolean;
+  answer: string;
 }) {
   const headerShown = revealedCount > entry.items[0].index || isRevealed;
   const headerAnim  = useRef(new Animated.Value(0)).current;
@@ -276,25 +363,30 @@ function ClubGroup({
       {/* Klubbrader */}
       {entry.items.map(({ hint, index }) => {
         const visible = revealedCount > index || isRevealed;
-        return visible ? <ClubSubRow key={hint.id} hint={hint} /> : null;
+        return visible ? <ClubSubRow key={hint.id} hint={hint} answer={answer} /> : null;
       })}
     </View>
   );
 }
 
-function ClubSubRow({ hint }: { hint: HintItem }) {
+function ClubSubRow({ hint, answer }: { hint: HintItem; answer: string }) {
   const anim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     Animated.timing(anim, { toValue: 1, duration: 240, useNativeDriver: true }).start();
   }, [anim]);
 
+  const noSensitive = censorSensitive(hint.value);
+  if (noSensitive === null) return null;
+  const censored = censorForAnswer(noSensitive, answer);
+  if (censored === null) return null;
+
   const translateY = anim.interpolate({ inputRange: [0, 1], outputRange: [4, 0] });
 
   return (
     <Animated.View style={[styles.subRow, { opacity: anim, transform: [{ translateY }] }]}>
       <Text style={styles.subArrow}>↳</Text>
-      <Text style={[styles.hintText, styles.subHintText]} numberOfLines={1}>{hint.value}</Text>
+      <Text style={[styles.hintText, styles.subHintText]} numberOfLines={1}>{censored}</Text>
     </Animated.View>
   );
 }
@@ -318,11 +410,10 @@ const styles = StyleSheet.create({
   },
   categoryLabel: {
     color: Colors.warning,
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: FontWeight.bold,
     letterSpacing: 1.2,
     textTransform: 'uppercase',
-    textDecorationLine: 'underline',
     marginBottom: 5,
   },
   scroll: { flex: 1 },
@@ -344,14 +435,14 @@ const styles = StyleSheet.create({
   hintText: {
     flex: 1,
     color: Colors.textPrimary,
-    fontSize: 12,
+    fontSize: 16,
     fontWeight: '500',
-    lineHeight: 17,
+    lineHeight: 22,
   },
   groupHeaderText: {
     color: Colors.textSecondary,
     fontWeight: FontWeight.bold,
-    fontSize: 11,
+    fontSize: 12,
   },
 
   subRow: {
@@ -363,14 +454,14 @@ const styles = StyleSheet.create({
   },
   subArrow: {
     color: Colors.textSecondary,
-    fontSize: 10,
-    lineHeight: 16,
+    fontSize: 11,
+    lineHeight: 17,
     width: 12,
     flexShrink: 0,
   },
   subHintText: {
-    fontSize: 11,
-    lineHeight: 16,
+    fontSize: 12,
+    lineHeight: 17,
     color: Colors.textSecondary,
   },
 
@@ -410,25 +501,27 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#fff',
-    margin: 4,
-    marginTop: 2,
+    marginHorizontal: 4,
+    marginTop: 6,
+    marginBottom: 20,
     borderRadius: 2,
   },
   flagEmoji: {
-    fontSize: 52,
+    fontSize: 100,
     textAlign: 'center',
-    lineHeight: 58,
+    lineHeight: 108,
+    marginTop: -8,
+    marginLeft: -2,
   },
 
   // Personnamn — nedre halvan
   nameWrap: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     paddingHorizontal: 5,
-    paddingVertical: 4,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: Colors.border,
+    paddingTop: 4,
+    paddingBottom: 4,
   },
   nameText: {
     color: Colors.textPrimary,

@@ -291,8 +291,14 @@ items:
     displayName: "The Lion King"
     correctYear: 1994
     probability: 93
-    wikimediaSearchHints: ["The Lion King 1994 Disney film"]
+    wikimediaSearchHints: ["The Lion King 1994 Disney film Simba Mufasa"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "lfiprM5l_cE"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Aarush Boi"
+        notes: "Circle of Life-öppningsscenen (HD, 1994). Alla officiella Disney-trailers är made-for-kids-blockerade. Ersätt vid inbäddningsfel."
   - id: gladiator-2000
     displayName: "Gladiator"
     correctYear: 2000

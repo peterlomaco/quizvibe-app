@@ -9,6 +9,30 @@
 
 import type { HintItem, HintLibrary } from './hintsData';
 
+// Typ-ordning för sekundär sortering inom samma prioritetsnivå.
+// Hints av samma typ (t.ex. 'song') hamnar samlat efter varandra.
+const TYPE_ORDER: Record<string, number> = {
+  profession: 0,
+  birth_date: 1,
+  birth_place: 2,
+  creation_year: 3,
+  peak_year: 4,
+  debut: 5,
+  height: 6,
+  jersey_number: 7,
+  member_count: 8,
+  lead_singer: 9,
+  band_member: 10,
+  characteristic: 11,
+  club: 12,
+  song: 13,
+  album: 14,
+  movie: 15,
+  tv_show: 16,
+  producer: 17,
+  merit: 18,
+};
+
 function shuffleArray<T>(arr: T[]): T[] {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -23,7 +47,10 @@ export function selectHints(library: HintLibrary, count: number = 15): HintItem[
 
   // Om biblioteket är för litet — ta allt (sorterat)
   if (hints.length <= count) {
-    return [...hints].sort((a, b) => a.priority - b.priority);
+    return [...hints].sort((a, b) => {
+      if (a.priority !== b.priority) return a.priority - b.priority;
+      return (TYPE_ORDER[a.type] ?? 99) - (TYPE_ORDER[b.type] ?? 99);
+    });
   }
 
   // Gruppera per prioritet
@@ -45,8 +72,12 @@ export function selectHints(library: HintLibrary, count: number = 15): HintItem[
     selected.push(...pool.slice(0, take));
   }
 
-  // Sortera ASC: P1 visas FIRST (varm-upp), P5 visas LAST (avslöjande)
-  selected.sort((a, b) => a.priority - b.priority);
+  // Sortera primärt på prioritet (P1 FIRST → P5 LAST),
+  // sekundärt på type så att hints av samma sort hamnar efter varandra.
+  selected.sort((a, b) => {
+    if (a.priority !== b.priority) return a.priority - b.priority;
+    return (TYPE_ORDER[a.type] ?? 99) - (TYPE_ORDER[b.type] ?? 99);
+  });
 
   return selected.slice(0, count);
 }

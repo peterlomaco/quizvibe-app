@@ -382,6 +382,20 @@ export function countryToFlagEmoji(nationality: string): string {
   return FLAG_MAP[nationality.toLowerCase()] ?? '🏳️';
 }
 
+/**
+ * Härleder kön från pronomen i hints-texterna.
+ * Räknar förekomster av he/his/him (manlig) vs she/her/hers (kvinnlig).
+ * Returnerar null om otydligt eller inga pronomen hittats.
+ */
+export function inferGender(library: HintLibrary): 'male' | 'female' | null {
+  const text = library.hints.map((h) => h.value.toLowerCase()).join(' ');
+  const male = (text.match(/\b(he|his|him)\b/g) ?? []).length;
+  const female = (text.match(/\b(she|her|hers)\b/g) ?? []).length;
+  if (male > female && male > 0) return 'male';
+  if (female > male && female > 0) return 'female';
+  return null;
+}
+
 // ── Kompakt hjälp-funktion ────────────────────────────────────────────────
 
 const h = (

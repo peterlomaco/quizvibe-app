@@ -324,6 +324,7 @@ export function buildImageVariant(
   audienceSet: ReadonlySet<ImageQuestionAudience>,
   allItems: readonly ImageQuizQuestion[],
   distractorNames: readonly string[],
+  totalOptions: number = DEFAULT_TOTAL_OPTIONS,
 ): ImageQuestionVariant {
   if (assistance === 'full') {
     const nameList = buildFullNamesList({
@@ -331,6 +332,7 @@ export function buildImageVariant(
       audienceSet,
       allItems,
       distractorNames,
+      totalOptions,
     });
     return { mode: 'full-names', nameList };
   }
@@ -342,6 +344,7 @@ export function buildImageVariant(
     audienceSet,
     allItems,
     distractorNames,
+    totalOptions,
   });
   const correctPrefix = getPrefixForItem(correctItem.displayName, prefixLength);
   const optionsByPrefix: Record<string, ImageNameOption[]> = {};
@@ -353,6 +356,7 @@ export function buildImageVariant(
       audienceSet,
       allItems,
       distractorNames,
+      totalOptions,
     });
   }
   return {
