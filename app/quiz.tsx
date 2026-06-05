@@ -1251,6 +1251,15 @@ export default function QuizScreen() {
   const [phase, setPhase] = useState<'intro' | 'countdown' | 'question' | 'awaiting' | 'reveal' | 'leaderboard'>(
     turnOrder.length > 0 ? 'intro' : 'question',
   );
+  // 3 s buffringstid i början av varje fråga — ger YouTube/bild tid att ladda
+  // innan timern startar och Confirm-knappen aktiveras.
+  const [questionBuffering, setQuestionBuffering] = useState(false);
+  useEffect(() => {
+    if (phase !== 'question') { setQuestionBuffering(false); return; }
+    setQuestionBuffering(true);
+    const id = setTimeout(() => setQuestionBuffering(false), 3000);
+    return () => clearTimeout(id);
+  }, [phase, questionIndex]);
   // Sticky-unstable-latchen rensas ENDAST av handleRetryFromUnstable
   // (= explicit Retry-tap). Tidigare auto-reset på phase=intro/countdown
   // togs bort (D-iii follow-up): per design är retry ända vägen tillbaka
@@ -1714,9 +1723,9 @@ export default function QuizScreen() {
     // bekräftade. Därför ingen cleanup här som klipper intervallet vid
     // phase-byte; intervallet self-clearas när timeLeft hits 0 (eller via
     // unmount-cleanup ovan).
-    if (phase !== 'question') return;
+    if (phase !== 'question' || questionBuffering) return;
     startTimer();
-  }, [questionIndex, phase]);
+  }, [questionIndex, phase, questionBuffering]);
 
   useEffect(() => {
     // Pulsa progress-barens opacity (1 → 0.55 → 1) när ≤5s kvar för att
@@ -1855,8 +1864,8 @@ export default function QuizScreen() {
   // intro/countdown/reveal/leaderboard återställs till "30.00".
   useEffect(() => {
     const totalMs = responseSeconds * 1000;
-    if (phase !== 'question') {
-      if (phase === 'intro' || phase === 'countdown') {
+    if (phase !== 'question' || questionBuffering) {
+      if (phase === 'intro' || phase === 'countdown' || questionBuffering) {
         setDecimalElapsedMs(0);
       }
       return;
@@ -1869,7 +1878,7 @@ export default function QuizScreen() {
     tick();
     const id = setInterval(tick, 50);
     return () => clearInterval(id);
-  }, [phase, questionIndex, responseSeconds]);
+  }, [phase, questionIndex, responseSeconds, questionBuffering]);
 
   // Spara alla unika fråge-IDs i denna omgång när spelet är klart.
   // savedSeenRef förhindrar dubbelskrivning om effekten av någon anledning
@@ -1889,7 +1898,7 @@ export default function QuizScreen() {
   // Musik: pendingYear satt. Bild: pendingNameOption satt.
   // DJ kan aldrig confirma (de svarar inte på Spotify-frågor).
   // Övriga frågor: pending svar krävs som vanligt.
-  const canConfirm = isCurrentPlayerDJ
+  const canConfirm = isCurrentPlayerDJ || questionBuffering
     ? false
     : isImageQuestion
       ? pendingNameOption !== null
@@ -4076,7 +4085,14 @@ export default function QuizScreen() {
             • awaiting  → låst "Confirmed — waiting for time" */}
       {(phase === 'question' || phase === 'awaiting') && (
         <View style={styles.stickyConfirmBar}>
-          {phase === 'question' && (
+          {phase === 'question' && questionBuffering && (
+            <View style={[styles.actionBtn, styles.actionBtnAwaiting]}>
+              <Text style={styles.actionBtnAwaitingText}>
+                Loading content…
+              </Text>
+            </View>
+          )}
+          {phase === 'question' && !questionBuffering && (
             <Animated.View
               style={[
                 styles.confirmWrap,
