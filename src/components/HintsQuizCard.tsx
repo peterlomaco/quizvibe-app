@@ -187,10 +187,12 @@ export function HintsQuizCard({
 
   // Staggerad reveal — alla synliga vid T/2.
   // Startar INTE förrän hintsActive=true (buffer-period medan media laddar).
+  // isRevealed kollas FÖRE hintsActive-gaten — hints ska alltid visas vid
+  // reveal även om hintsActive blivit false (phase lämnade 'question').
   useEffect(() => {
     setRevealedCount(0);
-    if (!hintsActive) return;                           // vänta på timer-start
     if (isRevealed) { setRevealedCount(hints.length); return; }
+    if (!hintsActive) return;                           // vänta på timer-start
     if (!hints.length) return;
     const stepMs = (totalSeconds * HINTS_ALL_OUT_FRACTION * 1000) / hints.length;
     const timers = hints.map((_, i) =>
