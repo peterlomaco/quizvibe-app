@@ -1264,13 +1264,9 @@ export default function QuizScreen() {
     const id = setTimeout(() => setTimerActive(true), 2000);
     return () => { clearTimeout(id); };
   }, [phase, questionIndex, responseSeconds, timerProgressAnim]);
-  // Hints börjar visas 1 s efter quiz-vyn (1 s tidigare än timer + flagga).
-  const [hintsReady, setHintsReady] = useState(false);
-  useEffect(() => {
-    if (phase !== 'question') { setHintsReady(false); return; }
-    const id = setTimeout(() => setHintsReady(true), 1000);
-    return () => { clearTimeout(id); };
-  }, [phase, questionIndex]);
+  // Hints visas direkt när quiz-vyn öppnas (ingen delay).
+  // Flaggans mosaik har kvar sin 2 s delay via timerActive/mosaicActive.
+  const hintsReady = phase === 'question' || phase === 'awaiting' || phase === 'reveal';
   // Sticky-unstable-latchen rensas ENDAST av handleRetryFromUnstable
   // (= explicit Retry-tap). Tidigare auto-reset på phase=intro/countdown
   // togs bort (D-iii follow-up): per design är retry ända vägen tillbaka
