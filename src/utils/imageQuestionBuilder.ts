@@ -108,6 +108,10 @@ function buildLetterGrid(args: BuildLetterGridArgs): ImagePrefixOption[] {
   } = args;
 
   const correctPrefix = getPrefixForItem(correctItem.displayName, prefixLength);
+  // Ord-count för rätt svar — distraktorprefixer MÅSTE matcha annars filtreras
+  // de bort av ImageAnswerBlock.sortedGrid (word-count-filter) och vi tappar
+  // alternativ (t.ex. "MA" för Madonna filtreras bort när rätt svar är "AN LE").
+  const correctWordCount = correctPrefix.split(' ').length;
   const seen = new Set<string>([correctPrefix]);
   const distractors: string[] = [];
 
@@ -117,6 +121,7 @@ function buildLetterGrid(args: BuildLetterGridArgs): ImagePrefixOption[] {
       const prefix = getPrefixForItem(item.displayName, prefixLength);
       if (!prefix) continue;
       if (seen.has(prefix)) continue;
+      if (prefix.split(' ').length !== correctWordCount) continue; // ord-count-filter
       seen.add(prefix);
       distractors.push(prefix);
       if (distractors.length >= totalOptions - 1) return;
@@ -128,6 +133,7 @@ function buildLetterGrid(args: BuildLetterGridArgs): ImagePrefixOption[] {
       const prefix = getPrefixForItem(name, prefixLength);
       if (!prefix) continue;
       if (seen.has(prefix)) continue;
+      if (prefix.split(' ').length !== correctWordCount) continue; // ord-count-filter
       seen.add(prefix);
       distractors.push(prefix);
       if (distractors.length >= totalOptions - 1) return;
