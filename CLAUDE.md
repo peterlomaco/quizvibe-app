@@ -901,7 +901,7 @@ Edge cases:
 | `selectedYear` | `confirmedNameOption` | Låst val post-Confirm (driver reveal) |
 | `handleConfirm(year)` | `handleConfirmName(opt)` | Phase → 'awaiting' + recordRoundScore |
 
-`canConfirm`-derived: `isImageQuestion ? pendingNameOption !== null : pendingYear !== null`. Driver Confirm-knappens disabled-state och pulse-loop.
+`canConfirm`-derived: `isImageQuestion ? hintsReady : pendingYear !== null`. För image-frågor aktiveras Qonfirm-knappen **omedelbart** när hints börjar visas (hintsReady = true vid phase='question'), utan att kräva att spelaren väljer ett svar först. Klick utan `pendingNameOption` är en no-op (handleConfirmName-grenen checkar internt). För timeline-frågor krävs `pendingYear !== null` som tidigare. Driver Confirm-knappens gold-glow/pulse-loop.
 
 **RoundResult-shapen är musik-formad** (`correctYear` + `selectedYear` som number). Image-frågor sätter båda = 0; reveal-renderingen läser `question.displayName` istället för selectedYear/correctYear för image. Player History som visar selectedYear (idag i `src/components/PlayerHistorySection.tsx`) kan behöva discriminator-anpassning innan den används för image-rundor.
 
@@ -912,7 +912,10 @@ Edge cases:
 2. **Word-count-filter**: alla prefix-knappar måste matcha rätta svarets ord-count. Om rätt svar är "Astrid Lindgren" (2 ord, "AS LI") visas bara 2-ord-distractors — 1-ord items som "Avicii" filtreras bort. Garanterar visuell konsistens i grid:n.
 3. **Dedupering**: max EN prefix-knapp per begynnelsebokstav (vid "MA" och "MR" → båda börjar med 'M' behålls bara EN). Prio: prefix som matchar rätt svar; annars alfabetiskt först.
 
-Edge case för word-count-filter: om kategorin har för få items med samma ord-count som rätt svar kan grid:n bli mindre än 10 knappar. Acceptabelt MVP-trade-off; pool är generellt stor nog.
+**KRITISKT — samma filter speglas i `buildLetterGrid`** ([src/utils/imageQuestionBuilder.ts](src/utils/imageQuestionBuilder.ts)): Filtren ovan appliceras av klienten EFTER att `buildImageVariant` genererat prefix-listan. Om `buildLetterGrid` ignorerar filtren slösar den slots på prefixer som ändå tas bort. Nuläge:
+- `correctWordCount = correctPrefix.split(' ').length` — distraktorprefixer med fel ord-count hoppas över i `pickFromPool` + `pickFromDistractorPool`.
+- `usedFirstLetters = new Set([correctPrefix.charAt(0)])` — prefixer vars FÖRSTA BOKSTAV redan är tagen hoppas över (speglar klientens dedup-regel). T.ex. "The Ark" = "TH AR" tar bokstaven 'T', så "TH WH" (The Who), "TH BE" (The Beatles) etc. genereras ALDRIG som distraktorslots — de hade tagits bort av klienten ändå.
+- Dessa regler garanterar att `buildLetterGrid` alltid producerar exakt `totalOptions` prefixer som alla **överlever** klientfiltret → alltid 5 synliga svarsalternativ.
 
 **Inline Final Selection** (klient, prefix-mode): Letter Grid + Final Selection är HOPSLAGNA i samma vy — varje prefix-rad har prefix-knapp till vänster (smal, 96 px) och, när vald, det fullständiga namn-kortet till höger (`flex: 1`). Tap på annan prefix-knapp flyttar namn-kortet till den nya raden. Inget separat "Step 2"-flöde, ingen Back-knapp. Pending-name sätts direkt vid prefix-tap så Confirm-knappen i quiz.tsx blir aktiv så snart en rad valts.
 
@@ -963,11 +966,21 @@ Person-bildfrågor (juridiskt parkerade) ersätts av **Hints** — en split-view
 
 **Layout HintsQuizCard v3** ([src/components/HintsQuizCard.tsx](src/components/HintsQuizCard.tsx)):
 - **Vänster kolumn (flex:1)**: kategori-rubrik `{Genre} · {Profession}` (guld, uppercase, ej understruken) + `ScrollView` med punktlista (•) av hints + ↳-subrad för klubbhistorik.
-- **Höger kolumn (110px)**: landsflagga (stor emoji, vit `flagInner`-ruta) + personnamn (fade-in vid `isRevealed`). Nationality-chip borttagen.
+- **Höger kolumn (110px)**: landsflagga (stor emoji, vit `flagInner`-ruta) + personnamn (fade-in vid `isRevealed`). Nationality-chip borttagen. Flaggan täcks av `ProgressiveCover` med `active={mosaicActive ?? hintsActive}` — mosaiken startar 2 s in (via `timerActive/mosaicActive`), 1 s senare än hints.
 - **Höjd**: matchar YouTube-player via `flex:1` i `imageMediaCard`-container (`aspectRatio: 16/9`).
-- **Timing**: alla hints synliga vid T/2 (`HINTS_ALL_OUT_FRACTION = 0.5`). Auto-scroll till senaste hint.
+- **Timing**: alla hints synliga vid T×**2/3** (`HINTS_ALL_OUT_FRACTION = 2/3`). Auto-scroll till senaste hint.
 - **Hint-format**: inga nummerbadges — enbart `•`-punkter. Konsekutiva `club`-hints grupperas under "Career History" med `↳`-subrader.
-- **Slumpmässigt urval**: `selectHints(library, 15)` i `hintsGenerator.ts` — P5-hints alltid med, P4→P1 slumpas → variation per runda.
+- **Slumpmässigt urval**: `selectHints(library, 15)` i `hintsGenerator.ts` — P5-hints alltid med, P4→P1 slumpas → variation per runda. **Deduplicering på `value.toLowerCase().trim()`** efter sortering — samma faktatext på flera prioritetsnivåer (t.ex. "BRIT Awards" på P3 och P4) visas bara en gång.
+
+**Props** (`hintsActive`, `mosaicActive`, `isRevealed`):
+- `hintsActive?: boolean` (default true) — hint-reveal-timers startar inte förrän true. Passar `hintsReady` från quiz.tsx (omedelbart true vid `phase='question'`). Under buffer-period visas `· · ·` placeholder.
+- `mosaicActive?: boolean` — passas vidare till `ProgressiveCover` som `active={mosaicActive ?? hintsActive}`. Sätts till `timerActive` (2 s delay) i quiz.tsx för att ge flaggans mosaik längre delay än hints.
+- `isRevealed` — när true: alla hints snap:as till fullt synliga oavsett `hintsActive`.
+
+**Hints-synlighet robusthet** (monotonic maxRevealedRef):
+- `maxRevealedRef = useRef(0)` — uppdateras varje render till `Math.max(current, revealedCount)`. Aldrig minskar inom en fråga-livscykel (nollställs automatiskt vid remount via `key={questionIndex}`).
+- `displayRevealedCount = isRevealed ? hints.length : maxRevealedRef.current` — passas till BulletHint/ClubGroup istället för råa `revealedCount`. Garanterar att hints aldrig försvinner visuellt även om `revealedCount`-state av timing-skäl dippar (t.ex. när `timerActive` → false i awaiting-fas).
+- Reveal-effekten splittas i **två separata useEffects**: (1) reset på `[resetKey]` — bara vid ny fråga; (2) staggerad reveal + isRevealed-snap på `[resetKey, totalSeconds, isRevealed, hints.length, hintsActive]` — cleanup stoppar timers men nollställer ALDRIG `revealedCount`.
 
 **Kategori-rubrik** (`{Genre} · {Profession}`): `categoryToGenre` + `categoryToProfession` mappar `HintCategoryLabel` → display-text:
 - `Musikartist` → `Music · Artist`, `Band` → `Music · Band`
@@ -983,8 +996,9 @@ Person-bildfrågor (juridiskt parkerade) ersätts av **Hints** — en split-view
 
 **Svarsalternativ (5 st, underkategori + genus)**:
 - `totalOptions: 5` skickas till `buildImageVariant` (ned till `buildLetterGrid`, `buildNameOptions`, `buildFullNamesList`).
-- `allItems` filtreras på `contentSubject` (t.ex. bara `'band'` för band-frågor, bara `'athlete'` för idrottar-frågor) innan `buildImageVariant` anropas.
-- **Genus-filter**: `inferGender(library)` i `hintsData.ts` härleder kön via pronomen (`he/his/him` → male, `she/her/hers` → female). Om rätt svar är manligt → distraktorpoolen filtreras till manliga items (okänt genus tillåts). Fallback-kedja: sameSubject+sameGender (≥8) → sameSubject (≥8) → hela IMAGE_QUIZ_QUESTIONS.
+- `allItems` filtreras på `contentSubject` (t.ex. bara `'band'` för band-frågor, bara `'athlete'` för idrottar-frågor) innan `buildImageVariant` anropas. Faller **ALDRIG** tillbaka till `IMAGE_QUIZ_QUESTIONS` (alla subjects) — subject-integritet alltid.
+- **Genus-filter**: `inferGender(library)` härleder kön via pronomen. Om rätt svar är manligt/kvinnligt används `sameGender`-pool om ≥ 5 items; annars `sameSubject` (ingen genus-filtring, men alltid samma subject). Tröskeln är 5 (= `totalOptions`) inte 8 som tidigare.
+- `buildLetterGrid` garanterar alltid `totalOptions` synliga knappar via dubbla client-filter-speglingar: (1) ord-count-filter; (2) första-bokstavs-dedup (se "Letter Grid-filter" ovan).
 
 **Slott**: `SENSITIVE_HINT_TERMS` och `REDUNDANT_HINT_TERMS` i HintsQuizCard.tsx — lägg till termer vid behov utan kodingrepp på logik.
 
@@ -1179,7 +1193,7 @@ YouTube-klippen är NOTERAT INTE bara musik — kan vara filmscener, sporthände
 
 | Phase | Visas | Vad händer |
 |---|---|---|
-| `intro` | GetReadyIntro | Pass-the-phone: telefon-överlämning till nästa spelare. Visas också vid spelstart i båda lägena. Tap på Q-play-logo → `countdown`. |
+| `intro` | GetReadyIntro | Pass-the-phone: telefon-överlämning till nästa spelare. Visas också vid spelstart i båda lägena. Tap på Q-play-logo → `countdown` (omedelbart, ingen delay). |
 | `countdown` | CountdownIntro | 3-2-1-nedräkning i Q-logga, sedan "?" pop:as in i samma Q-ring efter 1:an försvinner. När hela sekvensen är klar (~4 s) → `question`. |
 | `question` | Question UI (timer-bar + media + fråge-kort + TimelineSelector + Confirm-knapp) | Timer tickar, spelaren svipar tidslinje + tappar Confirm. |
 | `awaiting` | Samma UI som `question`, TimelineSelector låst | Reveal döljs tills timer:n går till 0. Säkerställer att alla spelare får samma tidsbudget oavsett när de bekräftade — kritiskt för kommande Individual-Devices-flöde där flera spelare svarar parallellt. |
@@ -1205,7 +1219,7 @@ YouTube-klippen är NOTERAT INTE bara musik — kan vara filmscener, sporthände
 
 ## Quiz — Get Ready to Vibe intro screen
 
-Hand-off-skärmen mellan Lobby:s Start Game-tap och första quiz-frågan. [src/components/GetReadyIntro.tsx](src/components/GetReadyIntro.tsx) renderas av [app/quiz.tsx](app/quiz.tsx) som `'intro'`-fas — initial fas vid spelstart i båda lägena, OCH mellan rundor i båda lägena. Tap på Q-play-logo i intro:n → `'countdown'`-fas (3-2-1) → `'question'`-fas.
+Hand-off-skärmen mellan Lobby:s Start Game-tap och första quiz-frågan. [src/components/GetReadyIntro.tsx](src/components/GetReadyIntro.tsx) renderas av [app/quiz.tsx](app/quiz.tsx) som `'intro'`-fas — initial fas vid spelstart i båda lägena, OCH mellan rundor i båda lägena. Tap på Q-play-logo i intro:n → `'countdown'`-fas **omedelbart** (ingen delay) → `'question'`-fas.
 
 **Mode-dependent fas-flöde i `handleAdvanceToNextRound`**:
 - **Pass-the-Phone**: rotera `currentPlayerIndex` (mod `turnOrder.length`) → sätt fas till `'intro'` så "Pass-the-Phone to: <namn>" visas innan nästa fråga.
@@ -1239,7 +1253,14 @@ Hand-off-skärmen mellan Lobby:s Start Game-tap och första quiz-frågan. [src/c
 - I övrigt identisk struktur: question-dot-bar i toppen, current question-ruta med media-ikon, queue-chips för upp till 9 kommande frågor + end-of-game-markör.
 - Anledning: i PtP-grenen var queue tom när `turnOrder.length <= 1` (queue-useMemo i quiz.tsx returnerar `[]`) — full lista visades aldrig. IndDev-grenen bygger sin queue från `totalQuestions - currentQuestion` direkt, så single-player får korrekt lista oberoende av tom queue-prop.
 
-**CountdownIntro röst-nedräkning** (`expo-speech`, installerad v14.0.8): `Speech.speak()` anropas i en `useEffect` på `count`-deps. Säger "3", "2", "1" och "Go" med `pitch: 0.01` (absolut lägsta = mörkast möjligt) och `rate: 0.42` (långsamt/dramatiskt). Stop sker i useEffect-cleanup (returnvärdet) så det inte krockar med nästa speak-anrop vid count-byte — anropa aldrig `Speech.stop()` direkt innan `Speech.speak()` på iOS, det avbryter det nya anropet. Try/catch runt speak + stop skyddar mot saknad native-modul i dev-build. `console.log('speaking', count)` + `console.log('speech error', e)` är kvar för diagnostik (ta bort innan launch). Om rösten inte hörs alls: kör `npx expo run:ios` för att bygga om dev-clienten med expo-speech native-modulen inkluderad.
+**CountdownIntro röst-nedräkning** (`expo-speech`, installerad v14.0.8): Djup mansröst med `pitch: 0.01` (absolut lägsta) + `rate: 0.42` (långsamt/dramatiskt) + `language: 'en-US'`. Räknar "3", "2", "1", sedan "**Who**" (synkat med "?"-glyfen). Implementeringsdetaljer:
+
+- **`count` startar som `null`** (ingen siffra visas i Q-ringen). Efter 700 ms initial paus sätts `count = startFrom` (visuell "3" + röst "3" startar exakt synkat). Intervallet tickar sedan var 1300 ms (lugnare, mer dramatisk paus).
+- **Pre-warm** vid mount: `Speech.speak(' ', { rate: 2.0 })` initierar TTS-motorn ~700 ms innan nedräkningen börjar — eliminerar init-latensen på iOS som annars gör att "3" hörs 200–400 ms efter att siffran syns.
+- **Stop i useEffect-cleanup** (returnvärdet), ALDRIG direkt innan speak — `Speech.stop()` precis före `Speech.speak()` på iOS avbryter det nya anropet.
+- **Try/catch** runt speak + stop skyddar mot saknad native-modul i dev-build.
+- Om rösten inte hörs: kör `npx expo run:ios` (expo-speech kräver native build — fungerar ej i standard Expo Go).
+- JSX-glyf: `count !== null && count > 0` → siffra, `count === 0` → "?", `count === null` → ingenting (700 ms tom Q-ring).
 
 **CountdownIntro:s IndDev/Single Player headline** (= text ovan Q-loggan under 3-2-1-nedräkningen) splittas i två rader:
 - Rad 1: `"Get Ready to"` (FontSize.xxl bold, default systemfont).
@@ -1375,6 +1396,29 @@ Fråge-vyn i [app/quiz.tsx](app/quiz.tsx) är samma layout för `'question'`-, `
 
 **Quit Game**: bor bara i GetReadyIntro:s top-banner. Question/awaiting/reveal har ingen Quit-knapp — användaren får vänta ut timern, sedan tappar Next-tab inom feedback-kortet → nästa intro där Quit är tillgänglig.
 
+### Quiz timing-system för image-frågor (buffer + hints + mosaic)
+
+Tre separata delay-states styr vad som händer när quiz-vyn öppnas för image-frågor:
+
+| State | Delay | Styr |
+|---|---|---|
+| `hintsReady` | **0 s** (deriverad boolean: `phase==='question'\|\|'awaiting'\|\|'reveal'`) | Hints börjar visas + Qonfirm-knapp pulsar |
+| `timerActive` | **2 s** (setTimeout) | Timer bar börjar räkna ner + stopwatch startar + flaggans mosaik börjar tas bort |
+| `mosaicActive` | via `timerActive` (2 s) | Passas separat till ProgressiveCover så flagg-delay kan justeras oberoende av hints |
+
+**`timerActive`-effekten** resetting-resetter också `timeLeft = responseSeconds` och `timerProgressAnim = 1` OMEDELBART vid `phase='question'` — annars visas stale 0 eller default 30 s under buffer-perioden. `startTimer()` körs sedan 2 s senare via `setTimeout`.
+
+**`hintsReady`** är en derived boolean (inte state) — ingen re-render-overhead. `hintsActive={hintsReady}` till HintsQuizCard styr hint-reveal-timers. `mosaicActive={timerActive}` till ProgressiveCover (via HintsQuizCard `mosaicActive`-prop) styr flaggmosaiken separat.
+
+**Tidslinje per image-fråga:**
+```
+[Quiz-vy visas] → Hints dyker upp + Qonfirm pulserar guld
+      ↓ 2 sekunder
+[Timer startar] → Timer-bar räknar ner + mosaik-brickor tas bort från flaggan
+      ↓ response_seconds
+[Reveal]        → Alla hints visas + flagga helt avslöjad
+```
+
 ### Timer-arkitektur (smooth + drift-fri)
 
 Tre parallella mekanismer driver tidsvisningen oberoende av varandra:
@@ -1508,7 +1552,7 @@ Image-frågor har 10 prefix-knappar i ImageAnswerBlock — på små skärmar rym
 
 ## Shared visual components
 
-- `src/components/MorseAmbientSound.tsx` — osynlig WebView som loopar ett Morse-liknande ambient-ljud (`**- **- **- **----`) via Web Audio API. Ingen audio-fil behövs — 720 Hz sinuston genereras programmatiskt. Monteras direkt i `LobbyScreen`'s `<SafeAreaView>` (position absolute, utanför synlig yta). `allowsInlineMediaPlayback + mediaPlaybackRequiresUserAction={false}` krävs för autoplay på iOS utan user-gesture. Timings: DIT=100ms, DAH=320ms, SYM-gap=80ms, GRP-gap=240ms, END-paus=1200ms (~6s per loop). Stoppas automatiskt när komponenten avmonteras (navigation bort från Lobby).
+- `src/components/MorseAmbientSound.tsx` — osynlig WebView som spelar mjuk ambient lobby-musik via Web Audio API. **Ackordprogression Am → F → C → G** (4 × 7 s = 28 s loop). Varje not = 3 sinusvågor detunade ±5 cent för chorus/pad-tjocklek. Lowpass-filter vid 800 Hz ger varm dov klang. 2,5 s crossfade mellan ackord = sömlösa övergångar. LFO 0,05 Hz ±7 % på master-gain = subtilt "andetag". Monteras direkt i `LobbyScreen`'s `<SafeAreaView>` (position absolute left:-2, top:-2, utanför synlig yta). `allowsInlineMediaPlayback + mediaPlaybackRequiresUserAction={false}` krävs för autoplay på iOS utan user-gesture. Stoppas automatiskt när komponenten avmonteras (navigation bort från Lobby). Ingen audio-fil behövs — toner genereras procedurellt.
 
 - `src/components/QuizVibeLogo.tsx` — brand SVG used on Home and Lobby room-card (both at `size={104}`). The Q-figure (ring + tail + wifi-fan in the center) is shifted **−3 in x, −1 in y** from the original (40, 38) center so the Q+tail bounding box (24-52, 24-52) is centered in the front rounded square (16-60, 16-60, center 38, 38). Wifi-fan replaces the old single dot — three concentric 90°-arcs (radii 3 / 5 / 7, `sweep-flag=1` so they bulge upward) + a 1.5px dot, all centered at (37, 37) (= Q ring center). 90° was chosen over 120° to match the iOS status-bar wifi icon's compactness — sweep-flag=0 produced inverted (frown) arcs, easy to flip back accidentally.
 - `src/components/QuizVibeFriendsLogo.tsx` — brand-mark variant for the QuizVibe friends card on Profile. Q-form + tail + rotated squares are identical to `QuizVibeLogo`, but the wifi-pattern inside the Q ring is replaced with two profile silhouettes (head circle + body rounded-rect side-by-side). ViewBox tightened to `"13 13 54 54"` (vs `"0 0 80 80"` in `QuizVibeLogo`) to crop the empty padding around the rotated squares so visible content fills the render area at small sizes (44-52px). Q is centered at **(38, 38)** to match the squares' pre-rotation visual center, NOT (40, 40) which is the viewBox geometric mid. Default `size=44` to match other header icon-wraps on the same screen; rendered inside a `friendsIconWrap` (44×44 View) for layout-dimension safety.
@@ -1542,14 +1586,14 @@ Call-sites finns redan i: `handleRegisterSubmit`, `handleLogin`, `handleLogout`,
 
 Demo-data (`src/utils/nameQuizDemo.ts`) genererad för Millennials (1990) + standard assistance = 2-bokstavs prefix.
 
-**ProgressiveCover** ([src/components/ProgressiveCover.tsx](src/components/ProgressiveCover.tsx)) — mosaik-overlay som avslöjar bilden under sig:
-- 32×18 = 576 svarta block, 4 block tas bort per tick. Total reveal-tid styrs av `assistance`-propen: `full=0.25 × totalSeconds`, `standard=0.5 × totalSeconds`, `minimal=0.75 × totalSeconds` (mer assistance = snabbare reveal, så Full-spelaren ser bilden tydligt långt innan time-out medan Minimal-spelaren får facit först precis innan tiden tar slut)
-- Random reveal-order (Fisher-Yates shuffle) regenererad per `resetKey`-byte
-- `<QuizVibeQuestionMarkLogo>` centrerad ovanpå mosaiken, fadar 1 → 0 över exakt 3 sekunder via separat tick-loop (oberoende av mosaik-speed) — så loggan inte hänger kvar och konkurrerar med bilden under hela response-time:n vid minimal/standard-assistance
-- `key={questionIndex}` på själva ProgressiveCover (i demo-route) — tvingar full remount vid frågebyte, säkerställer att alla block är svarta från första render utan blink av förra fråges state
-- React.memo på `<Block>`-komponenten — bara de 4 block som ändras per tick re-renderas, inte alla 576
-- `isRevealed=true` → snap till alla block borta (för Confirm-flow). I demon visas bilden direkt vid Confirm; i framtida quiz-integration ska mosaik fortsätta tills timer slut även efter Confirm (öppen design-fråga, dokumenterad i konversation).
-- Original-bilden under är ALDRIG pixlad — den är skarp hela tiden, bara skymd av cover-block som plockas bort. Bilden själv klipps inte — `mediaCard` har `overflow: 'hidden'` + `aspectRatio: 16/9`.
+**ProgressiveCover** ([src/components/ProgressiveCover.tsx](src/components/ProgressiveCover.tsx)) — mosaik-overlay som avslöjar bilden/flaggan under sig:
+- 32×18 = 576 svarta block, 4 block tas bort per tick. Total reveal-tid styrs av `assistance`-propen: `full=0.25 × totalSeconds`, `standard=0.5 × totalSeconds`, `minimal=0.75 × totalSeconds`.
+- **`active?: boolean` (default true)** — mosaiktimern och logo-faden startar INTE förrän `active=true`. I HintsQuizCard passas `active={mosaicActive ?? hintsActive}` (flaggans mosaik startar 2 s in via `timerActive`). Effekterna är uppdelade i tre separata useEffects: (1) reset på `[resetKey]`; (2) mosaikintervall på `[resetKey, assistance, totalSeconds, active, isRevealed]`; (3) logo-fade på `[resetKey, active, isRevealed]`. Ingen effect nollställer `revealedCount` pga `active`-byte — mosaiken stannar kvar synlig i awaiting/reveal.
+- Random reveal-order (Fisher-Yates shuffle) regenererad per `resetKey`-byte.
+- `<QuizVibeQuestionMarkLogo>` centrerad ovanpå mosaiken, fadar 1 → 0 över exakt 3 sekunder via separat tick-loop.
+- React.memo på `<Block>`-komponenten — bara de 4 block som ändras per tick re-renderas, inte alla 576.
+- `isRevealed=true` → snap till alla block borta + logga osynlig (hanteras av separat effect på `[isRevealed]`).
+- Original-bilden under är ALDRIG pixlad — skarp hela tiden, skymd av svarta block som plockas bort.
 
 **logoSize-tweaking** för QuizVibeQuestionMarkLogo i mediaCard: 320 är empiriskt lagom för 16:9 på iPhone (~390px wide × 220px tall). 360+ klipps av top/bottom. <280 ser för litet ut.
 
