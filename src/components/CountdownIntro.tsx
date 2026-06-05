@@ -252,7 +252,7 @@ export function CountdownIntro({ onComplete, startFrom = 3, mode = 'pass-the-pho
               >
                 ?
               </Animated.Text>
-            )}
+            ) : null}
           </View>
         </View>
       </View>
