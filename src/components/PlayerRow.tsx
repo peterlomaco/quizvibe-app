@@ -6,6 +6,7 @@ import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
 import type { AssistanceLevel } from '../utils/hcp';
 import { ApproveToggle } from './ApproveToggle';
 import { Avatar } from './Avatar';
+import { SpotifyBrandIcon } from './SpotifyBrandIcon';
 import { WifiFanIcon } from './WifiFanIcon';
 
 export interface Player {
@@ -58,6 +59,8 @@ interface PlayerRowProps {
   // Utelämnad → ingen dot renderas (= Pass-the-Phone eller hasLeft).
   // 'self' = visa hardcoded grön dot (vi rendererar = vi är alive).
   peerHealth?: PeerHealth | 'self';
+  // Spotify-koppling för spelaren — true = kopplat konto (grön), false/undefined = ej kopplat (grå).
+  spotifyConnected?: boolean;
 }
 
 export function PlayerRow({
@@ -80,6 +83,7 @@ export function PlayerRow({
   onDelete,
   onEditPlayer,
   peerHealth,
+  spotifyConnected,
 }: PlayerRowProps) {
   // "Details +/-"-toggle per spelarkort — gömmer Assistance + Age-pillarna
   // tills man fäller ut. Default hopfällt (Details +).
@@ -368,6 +372,21 @@ export function PlayerRow({
       {!isHostPlayer && !isGuest && (
         <View style={styles.quizUserBorderTag} pointerEvents="none">
           <Text style={[styles.quizUserBorderTagText, { color: '#FFFFFF' }]}>QuizVibe user</Text>
+        </View>
+      )}
+
+      {/* ── Spotify-koppling-badge — uppe till höger på kortets kantlinje ── */}
+      {spotifyConnected !== undefined && (
+        <View style={[styles.spotifyBorderTag, { borderColor: spotifyConnected ? '#1DB954' : Colors.borderStrong }]} pointerEvents="none">
+          <SpotifyBrandIcon size={10} variant="white" />
+          {spotifyConnected ? (
+            <>
+              <Text style={styles.spotifyBorderTagConnected}>✓</Text>
+              <Text style={styles.spotifyBorderTagConnected}>{player.name}</Text>
+            </>
+          ) : (
+            <Text style={styles.spotifyBorderTagNone}>No connection</Text>
+          )}
         </View>
       )}
     </View>
@@ -702,5 +721,32 @@ const styles = StyleSheet.create({
   },
   deleteBtnPressed: {
     backgroundColor: Colors.borderStrong,
+  },
+  spotifyBorderTag: {
+    position: 'absolute',
+    top: -8,
+    right: Spacing.lg,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: Colors.cardElevated,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: Colors.borderStrong,
+    paddingLeft: 6,
+    paddingRight: 8,
+    paddingVertical: 2,
+    zIndex: 10,
+    elevation: 4,
+  },
+  spotifyBorderTagConnected: {
+    fontSize: 9,
+    fontWeight: FontWeight.semibold,
+    color: '#1DB954',
+  },
+  spotifyBorderTagNone: {
+    fontSize: 9,
+    fontWeight: FontWeight.semibold,
+    color: Colors.textSecondary,
   },
 });

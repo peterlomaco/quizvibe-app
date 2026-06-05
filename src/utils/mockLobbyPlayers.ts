@@ -50,6 +50,8 @@ interface LobbyPlayerRow {
   // THIS GAME LOBBY"-styling via Realtime-broadcast (Slice 3C-ii). Raden
   // tas inte bort — vi behåller den så övriga klienter renderar kortet.
   has_left: boolean;
+  // True om spelaren har ett kopplat Spotify-konto (migration 0015).
+  spotify_verified: boolean | null;
 }
 
 function rowToPlayer(row: LobbyPlayerRow): LobbyPlayer {
@@ -68,6 +70,7 @@ function rowToPlayer(row: LobbyPlayerRow): LobbyPlayer {
     approved: row.approved,
     lobbyEdited: row.lobby_edited,
     hasLeft: row.has_left,
+    spotifyConnected: row.spotify_verified ?? false,
     // Host-added guests har user_id=null i DB eftersom host saknar deras
     // auth-session vid upsert (setLobbyPlayers strippar dessutom user_id ur
     // non-host-payload:en). Self-joined guests sätter user_id=auth.uid() via
@@ -107,6 +110,7 @@ function playerToRow(
     approved: player.approved ?? false,
     turn_order: index,
     lobby_edited: player.lobbyEdited ?? false,
+    spotify_verified: player.spotifyConnected ?? null,
   };
 }
 

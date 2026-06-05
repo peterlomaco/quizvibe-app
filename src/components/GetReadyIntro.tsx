@@ -72,7 +72,7 @@ const ASSISTANCE_LABEL: Record<'minimal' | 'standard' | 'full', string> = {
 
 /** Media-källa per fråga, för IndDev:s media-source-kö. 'none' renderas som
  *  ❓ när YouTube inte är aktiv för frågan. */
-export type QuestionMediaType = 'youtube' | 'image' | 'none';
+export type QuestionMediaType = 'youtube' | 'spotify' | 'image' | 'none';
 
 interface Props {
   /** Game mode — styr vilken vy av kö-tabellen som renderas + ev. UI-text. */
@@ -1224,6 +1224,7 @@ export function GetReadyIntro({
 function mediaSourceLabel(source: QuestionMediaType | undefined): string {
   switch (source) {
     case 'youtube': return 'YouTube';
+    case 'spotify': return 'Spotify';
     case 'image': return 'Image';
     default: return 'Unknown';
   }

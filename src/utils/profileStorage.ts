@@ -78,6 +78,9 @@ export interface ProfileData {
   // Images: Film+Sport är mandatory (alltid i arrayen), Music valbar. Default = alla 3.
   youtubeEnabledCategories?: MainCategory[];
   imagesEnabledCategories?: MainCategory[];
+  // Om Spotify DJ-läget är aktiverat som standard-val i Host defaults.
+  // Optional — defaultas till false om saknas.
+  spotifyDefaultEnabled?: boolean;
 }
 
 // Dual-read mapping för profiler skapade innan rename
@@ -296,20 +299,24 @@ export async function loadProfile(): Promise<ProfileData | null> {
   if (row) {
     if (__DEV__) console.log('[profileStorage] loadProfile: found profiles row');
     let profile = rowToProfile(row as ProfileRow);
-    // Migration 0014: youtube_enabled_categories / images_enabled_categories finns
-    // inte i DB förrän migrationen körts. Merge från AsyncStorage-cache om fälten
-    // saknas i DB-raden, annars förlorar Profile-settings sin effekt vid nästa
-    // Create Game (Lobby seedar från loadProfile-resultatet).
-    if (!profile.youtubeEnabledCategories?.length || !profile.imagesEnabledCategories?.length) {
+    // Fält som INTE finns i profiles-tabellen (migration 0014 ej körd, eller
+    // fält som enbart lever i AsyncStorage) mergas alltid från cache.
+    // youtubeEnabledCategories / imagesEnabledCategories: migration 0014.
+    // spotifyDefaultEnabled: ännu inte i DB-schema.
+    {
       const cached = await loadFromAsyncStorage();
       profile = {
         ...profile,
-        youtubeEnabledCategories: profile.youtubeEnabledCategories?.length
+        // Använd !== undefined för att bevara tomma arrays ([] = explicit av)
+        // vs undefined (= aldrig konfigurerat → fall-back till default i seed).
+        youtubeEnabledCategories: profile.youtubeEnabledCategories !== undefined
           ? profile.youtubeEnabledCategories
           : cached?.youtubeEnabledCategories,
-        imagesEnabledCategories: profile.imagesEnabledCategories?.length
+        imagesEnabledCategories: profile.imagesEnabledCategories !== undefined
           ? profile.imagesEnabledCategories
           : cached?.imagesEnabledCategories,
+        // spotifyDefaultEnabled saknas i rowToProfile (ej i DB ännu) — alltid från cache.
+        spotifyDefaultEnabled: cached?.spotifyDefaultEnabled,
       };
     }
     const { data: refreshed, changed } = refreshFreeCreditsIfNeeded(profile);
@@ -407,6 +414,7 @@ async function backfillProfileFromSession(user: { id: string; email?: string; us
     enabledHostPackages: cache?.enabledHostPackages,
     youtubeEnabledCategories: cache?.youtubeEnabledCategories,
     imagesEnabledCategories: cache?.imagesEnabledCategories,
+    spotifyDefaultEnabled: cache?.spotifyDefaultEnabled,
   };
 
   // Persistera mot Supabase. Vi använder upsert eftersom raden kan ha
