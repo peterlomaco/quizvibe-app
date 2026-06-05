@@ -185,12 +185,19 @@ export function HintsQuizCard({
   );
   const renderEntries = useMemo(() => buildRenderEntries(hints), [hints]);
 
-  // Staggerad reveal — alla synliga vid T/2.
-  // Startar INTE förrän hintsActive=true (buffer-period medan media laddar).
-  // isRevealed kollas FÖRE hintsActive-gaten — hints ska alltid visas vid
-  // reveal även om hintsActive blivit false (phase lämnade 'question').
+  // Reset räknaren ENBART vid ny fråga (resetKey-byte) — aldrig pga
+  // hintsActive/phase-ändringar, annars nollställs synliga hints i awaiting/reveal.
   useEffect(() => {
     setRevealedCount(0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resetKey]);
+
+  // Staggerad reveal + isRevealed-snap.
+  // isRevealed kollas FÖRE hintsActive så att alla hints visas i reveal-fasen
+  // även om hintsActive är false (phase lämnade 'question').
+  // När hintsActive går false (awaiting/reveal) stoppas bara timers via cleanup
+  // — revealedCount rörs INTE, hints stannar kvar.
+  useEffect(() => {
     if (isRevealed) { setRevealedCount(hints.length); return; }
     if (!hintsActive) return;                           // vänta på timer-start
     if (!hints.length) return;
