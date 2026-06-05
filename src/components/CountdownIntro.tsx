@@ -81,7 +81,7 @@ export function CountdownIntro({ onComplete, startFrom = 3, mode = 'pass-the-pho
         }
         return c - 1;
       });
-    }, 1000);
+    }, 1300); // 1300 ms per steg — lugnare, mer dramatisk känsla
     return () => clearInterval(id);
   }, [startFrom]);
 
@@ -134,20 +134,27 @@ export function CountdownIntro({ onComplete, startFrom = 3, mode = 'pass-the-pho
   }, [count, numberScale, numberOpacity]);
 
   // Röst-nedräkning: mörk mansröst, djupt och släpande.
-  // pitch: 0.01 = absolut lägsta (mörkast möjligt), rate: 0.42 = långsamt.
-  // Stop anropas i cleanup (returnvärdet från useEffect) så det inte krockar
-  // med det nya speak-anropet vid count-byte. Try/catch skyddar mot saknad
-  // native-modul i dev-build.
+  // Första siffran (startFrom) fördröjs 700 ms så pop-in-animationen hinner
+  // landa innan rösten pratar — undviker att ljudet känns stressat vid start.
+  // Efterföljande siffror (2, 1, Go) har ingen fördröjning.
+  const firstSpeakDoneRef = useRef(false);
+  useEffect(() => { firstSpeakDoneRef.current = false; }, [startFrom]);
   useEffect(() => {
-    try {
-      console.log('speaking', count);
-      Speech.speak(count <= 0 ? 'Go' : String(count), {
-        language: 'en-US',
-        pitch: 0.01,
-        rate: 0.42,
-      });
-    } catch (e) { console.log('speech error', e); }
-    return () => { try { Speech.stop(); } catch (_) {} };
+    const delay = firstSpeakDoneRef.current ? 0 : 700;
+    const id = setTimeout(() => {
+      firstSpeakDoneRef.current = true;
+      try {
+        Speech.speak(count <= 0 ? 'Go' : String(count), {
+          language: 'en-US',
+          pitch: 0.01,
+          rate: 0.42,
+        });
+      } catch (_) {}
+    }, delay);
+    return () => {
+      clearTimeout(id);
+      try { Speech.stop(); } catch (_) {}
+    };
   }, [count]);
 
   // "?" pop:as in när count går 1 → 0 + samma puls-loop som siffrorna ovan.

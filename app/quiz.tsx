@@ -1251,14 +1251,14 @@ export default function QuizScreen() {
   const [phase, setPhase] = useState<'intro' | 'countdown' | 'question' | 'awaiting' | 'reveal' | 'leaderboard'>(
     turnOrder.length > 0 ? 'intro' : 'question',
   );
-  // 3 s buffringstid i början av varje fråga — ger YouTube/bild tid att ladda
-  // innan timern startar och Confirm-knappen aktiveras.
-  const [questionBuffering, setQuestionBuffering] = useState(false);
+  // Timern aktiveras 3 s efter att quiz-vyn visas — ger YouTube/bild tid att
+  // ladda innan nedräkningen börjar. Confirm-knappen är däremot omedelbart
+  // tappbar (timerActive påverkar INTE canConfirm).
+  const [timerActive, setTimerActive] = useState(false);
   useEffect(() => {
-    if (phase !== 'question') { setQuestionBuffering(false); return; }
-    setQuestionBuffering(true);
-    const id = setTimeout(() => setQuestionBuffering(false), 3000);
-    return () => clearTimeout(id);
+    if (phase !== 'question') { setTimerActive(false); return; }
+    const id = setTimeout(() => setTimerActive(true), 3000);
+    return () => { clearTimeout(id); };
   }, [phase, questionIndex]);
   // Sticky-unstable-latchen rensas ENDAST av handleRetryFromUnstable
   // (= explicit Retry-tap). Tidigare auto-reset på phase=intro/countdown
@@ -1723,9 +1723,9 @@ export default function QuizScreen() {
     // bekräftade. Därför ingen cleanup här som klipper intervallet vid
     // phase-byte; intervallet self-clearas när timeLeft hits 0 (eller via
     // unmount-cleanup ovan).
-    if (phase !== 'question' || questionBuffering) return;
+    if (phase !== 'question' || !timerActive) return;
     startTimer();
-  }, [questionIndex, phase, questionBuffering]);
+  }, [questionIndex, phase, timerActive]);
 
   useEffect(() => {
     // Pulsa progress-barens opacity (1 → 0.55 → 1) när ≤5s kvar för att
@@ -1864,8 +1864,8 @@ export default function QuizScreen() {
   // intro/countdown/reveal/leaderboard återställs till "30.00".
   useEffect(() => {
     const totalMs = responseSeconds * 1000;
-    if (phase !== 'question' || questionBuffering) {
-      if (phase === 'intro' || phase === 'countdown' || questionBuffering) {
+    if (phase !== 'question' || !timerActive) {
+      if (phase === 'intro' || phase === 'countdown' || !timerActive) {
         setDecimalElapsedMs(0);
       }
       return;
@@ -1878,7 +1878,7 @@ export default function QuizScreen() {
     tick();
     const id = setInterval(tick, 50);
     return () => clearInterval(id);
-  }, [phase, questionIndex, responseSeconds, questionBuffering]);
+  }, [phase, questionIndex, responseSeconds, timerActive]);
 
   // Spara alla unika fråge-IDs i denna omgång när spelet är klart.
   // savedSeenRef förhindrar dubbelskrivning om effekten av någon anledning
@@ -1898,7 +1898,7 @@ export default function QuizScreen() {
   // Musik: pendingYear satt. Bild: pendingNameOption satt.
   // DJ kan aldrig confirma (de svarar inte på Spotify-frågor).
   // Övriga frågor: pending svar krävs som vanligt.
-  const canConfirm = isCurrentPlayerDJ || questionBuffering
+  const canConfirm = isCurrentPlayerDJ
     ? false
     : isImageQuestion
       ? pendingNameOption !== null
@@ -2156,17 +2156,12 @@ export default function QuizScreen() {
   // Host:s Play-tap: 2 s dramatisk paus innan nedräkning startar.
   // Broadcast skickas efter samma fördröjning så host + non-host synkar.
   const handleHostStartFromGetReady = () => {
-    setTimeout(() => {
-      setPhase('countdown');
-      if (gameMode === 'individual-devices' && syncChannelRef.current) {
-        syncChannelRef.current
-          .broadcastPlayCommand({ question_index: questionIndex })
-          .catch(() => {
-            // Broadcast fail = non-host fastnar på GetReady. Logga men blocka
-            // inte host:s eget spel. Full retry-handling sker i D-vi.
-          });
-      }
-    }, 2000);
+    setPhase('countdown');
+    if (gameMode === 'individual-devices' && syncChannelRef.current) {
+      syncChannelRef.current
+        .broadcastPlayCommand({ question_index: questionIndex })
+        .catch(() => {});
+    }
   };
   // Host:s Next-tap i reveal: trigga lokal handleAdvance + broadcast.
   // isLastQuestion-fallet broadcastar next_question_index=null så non-host
@@ -4085,14 +4080,7 @@ export default function QuizScreen() {
             • awaiting  → låst "Confirmed — waiting for time" */}
       {(phase === 'question' || phase === 'awaiting') && (
         <View style={styles.stickyConfirmBar}>
-          {phase === 'question' && questionBuffering && (
-            <View style={[styles.actionBtn, styles.actionBtnAwaiting]}>
-              <Text style={styles.actionBtnAwaitingText}>
-                Loading content…
-              </Text>
-            </View>
-          )}
-          {phase === 'question' && !questionBuffering && (
+          {phase === 'question' && (
             <Animated.View
               style={[
                 styles.confirmWrap,
