@@ -138,7 +138,7 @@ export function CountdownIntro({ onComplete, startFrom = 3, mode = 'pass-the-pho
   useEffect(() => {
     if (count === null) return;
     try {
-      Speech.speak(count <= 0 ? 'Go' : String(count), {
+      Speech.speak(count <= 0 ? 'Who' : String(count), {
         language: 'en-US',
         pitch: 0.01,
         rate: 0.42,
