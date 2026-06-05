@@ -56,105 +56,85 @@ export function CountdownIntro({ onComplete, startFrom = 3, mode = 'pass-the-pho
   // load (kort flicker, acceptabel kostnad för att slippa block:a render).
   const [fontsLoaded] = useFonts({ Nunito_700Bold });
   const brandFont = fontsLoaded ? 'Nunito_700Bold' : undefined;
-  const [count, setCount] = useState(startFrom);
+  // null = pre-start (bara Q-loggan visas, ingen siffra ännu).
+  // Sätts till startFrom efter 700 ms initial-paus — visuell "3" och rösten
+  // startar exakt synkat, utan att rösten känns stressad.
+  const [count, setCount] = useState<number | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
   // Två separata pop-animationer så siffran och "?" kan röra sig oberoende.
   const numberScale = useRef(new Animated.Value(1.4)).current;
   const numberOpacity = useRef(new Animated.Value(0)).current;
   const qmarkScale = useRef(new Animated.Value(1.4)).current;
   const qmarkOpacity = useRef(new Animated.Value(0)).current;
-  // useRef för callbacken så ev. ny prop-identitet inte ändrar setInterval-deps.
-  const onCompleteRef = useRef(onComplete);
-  useEffect(() => {
-    onCompleteRef.current = onComplete;
-  }, [onComplete]);
 
-  // En tick per sekund 3 → 2 → 1 → 0. När count blir 0 byts siffran mot "?"
-  // och en uppföljande timeout (1 s) fyrar onComplete så parent växlar fas.
+  // useRef för callbacken så ev. ny prop-identitet inte ändrar deps.
+  const onCompleteRef = useRef(onComplete);
+  useEffect(() => { onCompleteRef.current = onComplete; }, [onComplete]);
+
+  // Huvud-countdown-logik:
+  // 1) 700 ms initial paus — Q-loggan visas tom, spelaren hinner registrera vyn
+  // 2) count sätts till startFrom → "3" visas + röst säger "3" synkat
+  // 3) Interval 1300 ms/steg: 3 → 2 → 1 → 0 ("?" visas) → onComplete
   useEffect(() => {
-    setCount(startFrom);
-    const id = setInterval(() => {
-      setCount((c) => {
-        if (c <= 1) {
-          clearInterval(id);
-          setTimeout(() => onCompleteRef.current(), 1000);
-          return 0;
-        }
-        return c - 1;
-      });
-    }, 1300); // 1300 ms per steg — lugnare, mer dramatisk känsla
-    return () => clearInterval(id);
+    setCount(null);
+    if (intervalRef.current) clearInterval(intervalRef.current);
+
+    const startDelay = setTimeout(() => {
+      setCount(startFrom);
+      intervalRef.current = setInterval(() => {
+        setCount((c) => {
+          if (c === null || c <= 1) {
+            if (intervalRef.current) clearInterval(intervalRef.current);
+            setTimeout(() => onCompleteRef.current(), 1000);
+            return 0;
+          }
+          return c - 1;
+        });
+      }, 1300);
+    }, 700);
+
+    return () => {
+      clearTimeout(startDelay);
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
   }, [startFrom]);
 
-  // Pop-in per siffer-byte (3, 2, 1) följt av kontinuerlig zoom-puls
-  // (1.0 ↔ 1.18) tills siffran byts. Pop-in:n körs som spring 1.4 → 1 +
-  // opacity 0 → 1 över ~250 ms; därefter fyras puls-loopen som scale-
-  // sekvens 1 → 1.18 → 1 (350 ms varje håll = ~1.4 puls per sekund).
-  // loopRef håller referens till loop-CompositeAnim:en så cleanup vid
-  // count-change kan stoppa den innan nästa cykel.
+  // Pop-in per siffer-byte (3, 2, 1) + kontinuerlig zoom-puls (1 ↔ 1.18).
   useEffect(() => {
-    if (count <= 0) return;
+    if (count === null || count <= 0) return;
     numberScale.setValue(1.4);
     numberOpacity.setValue(0);
     let loopAnim: Animated.CompositeAnimation | null = null;
     Animated.parallel([
-      Animated.spring(numberScale, {
-        toValue: 1,
-        tension: 80,
-        friction: 6,
-        useNativeDriver: true,
-      }),
-      Animated.timing(numberOpacity, {
-        toValue: 1,
-        duration: 250,
-        useNativeDriver: true,
-      }),
+      Animated.spring(numberScale, { toValue: 1, tension: 80, friction: 6, useNativeDriver: true }),
+      Animated.timing(numberOpacity, { toValue: 1, duration: 250, useNativeDriver: true }),
     ]).start(({ finished }) => {
-      // Bara starta puls-loopen om pop-in:n hann avslutas innan effekten
-      // teardown:as (vid snabb count-change kan finished=false).
       if (!finished) return;
       loopAnim = Animated.loop(
         Animated.sequence([
-          Animated.timing(numberScale, {
-            toValue: 1.18,
-            duration: 350,
-            useNativeDriver: true,
-          }),
-          Animated.timing(numberScale, {
-            toValue: 1,
-            duration: 350,
-            useNativeDriver: true,
-          }),
+          Animated.timing(numberScale, { toValue: 1.18, duration: 350, useNativeDriver: true }),
+          Animated.timing(numberScale, { toValue: 1, duration: 350, useNativeDriver: true }),
         ]),
       );
       loopAnim.start();
     });
-    return () => {
-      loopAnim?.stop();
-    };
+    return () => { loopAnim?.stop(); };
   }, [count, numberScale, numberOpacity]);
 
-  // Röst-nedräkning: mörk mansröst, djupt och släpande.
-  // Första siffran (startFrom) fördröjs 700 ms så pop-in-animationen hinner
-  // landa innan rösten pratar — undviker att ljudet känns stressat vid start.
-  // Efterföljande siffror (2, 1, Go) har ingen fördröjning.
-  const firstSpeakDoneRef = useRef(false);
-  useEffect(() => { firstSpeakDoneRef.current = false; }, [startFrom]);
+  // Röst synkad med count — ingen extra fördröjning behövs eftersom 700 ms
+  // initial-pausen redan hanteras av countdown-effekten ovan.
+  // count === null → pre-start, inget tal.
   useEffect(() => {
-    const delay = firstSpeakDoneRef.current ? 0 : 700;
-    const id = setTimeout(() => {
-      firstSpeakDoneRef.current = true;
-      try {
-        Speech.speak(count <= 0 ? 'Go' : String(count), {
-          language: 'en-US',
-          pitch: 0.01,
-          rate: 0.42,
-        });
-      } catch (_) {}
-    }, delay);
-    return () => {
-      clearTimeout(id);
-      try { Speech.stop(); } catch (_) {}
-    };
+    if (count === null) return;
+    try {
+      Speech.speak(count <= 0 ? 'Go' : String(count), {
+        language: 'en-US',
+        pitch: 0.01,
+        rate: 0.42,
+      });
+    } catch (_) {}
+    return () => { try { Speech.stop(); } catch (_) {} };
   }, [count]);
 
   // "?" pop:as in när count går 1 → 0 + samma puls-loop som siffrorna ovan.
@@ -248,7 +228,7 @@ export function CountdownIntro({ onComplete, startFrom = 3, mode = 'pass-the-pho
           {/* Glyph-overlay centrerad i logoStack — samverkar med ovanstående
               Q-shift så siffran/? landar exakt i Q-ringens visuella center. */}
           <View pointerEvents="none" style={styles.glyphOverlay}>
-            {count > 0 ? (
+            {count !== null && count > 0 ? (
               <Animated.Text
                 style={[
                   styles.glyphText,
@@ -260,7 +240,7 @@ export function CountdownIntro({ onComplete, startFrom = 3, mode = 'pass-the-pho
               >
                 {count}
               </Animated.Text>
-            ) : (
+            ) : count === 0 ? (
               <Animated.Text
                 style={[
                   styles.glyphText,
