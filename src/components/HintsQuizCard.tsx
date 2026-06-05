@@ -27,7 +27,7 @@ import { ProgressiveCover } from './ProgressiveCover';
 
 type AssistanceLevel = 'minimal' | 'standard' | 'full';
 
-const HINTS_ALL_OUT_FRACTION = 0.5;
+const HINTS_ALL_OUT_FRACTION = 2 / 3; // alla hints synliga vid T×2/3
 const MAX_HINTS = 15;
 const RIGHT_COL_W = 110; // px — flagga + namn-kolumn
 
