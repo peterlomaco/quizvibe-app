@@ -1257,9 +1257,15 @@ export default function QuizScreen() {
   const [timerActive, setTimerActive] = useState(false);
   useEffect(() => {
     if (phase !== 'question') { setTimerActive(false); return; }
+    // Återställ display OMEDELBART så rätt respons-tid och full timer-bar
+    // visas under buffer-perioden (inte stale 0 eller default 30 från
+    // förra frågan / initialt state).
+    setTimeLeft(responseSeconds);
+    timerProgressAnim.stopAnimation();
+    timerProgressAnim.setValue(1);
     const id = setTimeout(() => setTimerActive(true), 3000);
     return () => { clearTimeout(id); };
-  }, [phase, questionIndex]);
+  }, [phase, questionIndex, responseSeconds, timerProgressAnim]);
   // Sticky-unstable-latchen rensas ENDAST av handleRetryFromUnstable
   // (= explicit Retry-tap). Tidigare auto-reset på phase=intro/countdown
   // togs bort (D-iii follow-up): per design är retry ända vägen tillbaka
