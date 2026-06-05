@@ -1251,9 +1251,7 @@ export default function QuizScreen() {
   const [phase, setPhase] = useState<'intro' | 'countdown' | 'question' | 'awaiting' | 'reveal' | 'leaderboard'>(
     turnOrder.length > 0 ? 'intro' : 'question',
   );
-  // Timern aktiveras 3 s efter att quiz-vyn visas — ger YouTube/bild tid att
-  // ladda innan nedräkningen börjar. Confirm-knappen är däremot omedelbart
-  // tappbar (timerActive påverkar INTE canConfirm).
+  // Timern + flaggans mosaik aktiveras 2 s efter quiz-vyn visas.
   const [timerActive, setTimerActive] = useState(false);
   useEffect(() => {
     if (phase !== 'question') { setTimerActive(false); return; }
@@ -1266,6 +1264,13 @@ export default function QuizScreen() {
     const id = setTimeout(() => setTimerActive(true), 2000);
     return () => { clearTimeout(id); };
   }, [phase, questionIndex, responseSeconds, timerProgressAnim]);
+  // Hints börjar visas 1 s efter quiz-vyn (1 s tidigare än timer + flagga).
+  const [hintsReady, setHintsReady] = useState(false);
+  useEffect(() => {
+    if (phase !== 'question') { setHintsReady(false); return; }
+    const id = setTimeout(() => setHintsReady(true), 1000);
+    return () => { clearTimeout(id); };
+  }, [phase, questionIndex]);
   // Sticky-unstable-latchen rensas ENDAST av handleRetryFromUnstable
   // (= explicit Retry-tap). Tidigare auto-reset på phase=intro/countdown
   // togs bort (D-iii follow-up): per design är retry ända vägen tillbaka
@@ -3691,7 +3696,8 @@ export default function QuizScreen() {
                       : 1990
                   }
                   isRevealed={phase === 'reveal'}
-                  hintsActive={timerActive}
+                  hintsActive={hintsReady}
+                  mosaicActive={timerActive}
                 />
               </View>
             ) : youtubeError ? (

@@ -41,6 +41,8 @@ interface Props {
   isRevealed: boolean;
   /** Hints börjar visas när true — false under buffer-perioden (media laddar). */
   hintsActive?: boolean;
+  /** Flaggans mosaik börjar tas bort när true — kan ha längre delay än hintsActive. */
+  mosaicActive?: boolean;
 }
 
 // ── Hint-gruppering ─────────────────────────────────────────────────────────
@@ -173,6 +175,7 @@ export function HintsQuizCard({
   playerBirthYear,
   isRevealed,
   hintsActive = true,
+  mosaicActive,
 }: Props) {
   const [revealedCount, setRevealedCount] = useState(0);
   const scrollRef = useRef<ScrollView>(null);
@@ -288,7 +291,7 @@ export function HintsQuizCard({
               assistance="standard"
               isRevealed={isRevealed}
               logoSize={120}
-              active={hintsActive}
+              active={mosaicActive ?? hintsActive}
             />
           </View>
         </View>
