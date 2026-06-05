@@ -175,14 +175,6 @@ export function HintsQuizCard({
   hintsActive = true,
 }: Props) {
   const [revealedCount, setRevealedCount] = useState(0);
-  // Monotont ökande maximum — aldrig minskar inom en frågecykel.
-  // Komponent remountas (key=questionIndex) vid ny fråga så ref resettas automatiskt.
-  // Skyddar mot att hints avmonteras (BulletHint return null) om revealedCount
-  // av någon anledning dippar under ett tidigare värde.
-  const maxRevealedRef = useRef(0);
-  if (revealedCount > maxRevealedRef.current) maxRevealedRef.current = revealedCount;
-  const displayRevealedCount = isRevealed ? hints.length : maxRevealedRef.current;
-
   const scrollRef = useRef<ScrollView>(null);
   const nameAnim  = useRef(new Animated.Value(0)).current;
 
@@ -192,6 +184,13 @@ export function HintsQuizCard({
     [resetKey, library],
   );
   const renderEntries = useMemo(() => buildRenderEntries(hints), [hints]);
+
+  // Monotont ökande maximum — aldrig minskar inom en frågecykel.
+  // Måste ligga EFTER hints-useMemo eftersom displayRevealedCount använder hints.length.
+  // Komponent remountas (key=questionIndex) vid ny fråga så ref resettas automatiskt.
+  const maxRevealedRef = useRef(0);
+  if (revealedCount > maxRevealedRef.current) maxRevealedRef.current = revealedCount;
+  const displayRevealedCount = isRevealed ? hints.length : maxRevealedRef.current;
 
   // Reset räknaren ENBART vid ny fråga (resetKey-byte) — aldrig pga
   // hintsActive/phase-ändringar, annars nollställs synliga hints i awaiting/reveal.
