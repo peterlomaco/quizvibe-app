@@ -2,20 +2,21 @@ import React from 'react';
 import { View } from 'react-native';
 import { WebView } from 'react-native-webview';
 
-// Morse-liknande ambient-loop: **- **- **- **----
+// Morse-liknande ambient-loop: * * * ----
 // Genereras via Web Audio API i en osynlig WebView — inga audio-filer behövs.
-// Frekvens 720 Hz (radio-Morse-känsla), gain 0.12 (diskret ambient-nivå).
 //
-// Timings:
-//   DIT  = 100 ms  (kort pip, **)
-//   DAH  = 320 ms  (långt pip, -)
-//   DAH4 = 1280 ms (avslutande lång pip, ----)
-//   SYM  = 80 ms   (paus mellan symboler)
-//   GRP  = 240 ms  (paus mellan grupper)
-//   END  = 1200 ms (tystnad innan loop-restart)
+// Dovt/mörkt ljud via:
+//   • Låg frekvens: 390 Hz (sub-bas-register)
+//   • BiquadFilter lowpass vid 500 Hz — klipper höga övertoner, ger muffled känsla
+//   • Lång attack/release-ramp (45 ms) — mjuk, ej skarp kant
+//   • Låg gain: 0.08
 //
-// Mönster per loop (~6 s totalt):
-//   [DIT SYM DIT SYM DAH GRP] × 3  +  [DIT SYM DIT SYM DAH×4]  +  END
+// Mönster per loop (~8 s totalt):
+//   PIP   = 200 ms  (kort dovt pip)
+//   GAP   = 380 ms  (paus mellan pips — välseparerade, inte tätt Morse)
+//   DRONE = 2000 ms (lång avslutande ton)
+//   END   = 2800 ms (tystnad innan loop-restart)
+//   [ PIP GAP ] × 3  +  [ DRONE ]  +  END
 
 const HTML = `<!DOCTYPE html>
 <html>
@@ -26,42 +27,48 @@ const HTML = `<!DOCTYPE html>
   var ctx = null;
 
   function beep(t, dur) {
-    var o = ctx.createOscillator();
-    var g = ctx.createGain();
-    o.connect(g);
-    g.connect(ctx.destination);
+    var o   = ctx.createOscillator();
+    var lpf = ctx.createBiquadFilter();
+    var g   = ctx.createGain();
+
+    // Sinusvåg på låg frekvens + lowpass-filter = dov, mörk ton utan skärpa.
     o.type = 'sine';
-    o.frequency.value = 720;
-    // Mjuka in/ut-ramper (8 ms) undviker klick-artefakter.
+    o.frequency.value = 390;
+
+    lpf.type = 'lowpass';
+    lpf.frequency.value = 500;
+    lpf.Q.value = 0.8;
+
+    o.connect(lpf);
+    lpf.connect(g);
+    g.connect(ctx.destination);
+
+    // Lång ramp (45 ms) → mjuk, inte klick-aktig.
+    var R = 0.045;
     g.gain.setValueAtTime(0, t);
-    g.gain.linearRampToValueAtTime(0.12, t + 0.008);
-    g.gain.setValueAtTime(0.12, t + dur - 0.008);
+    g.gain.linearRampToValueAtTime(0.08, t + R);
+    g.gain.setValueAtTime(0.08, t + dur - R);
     g.gain.linearRampToValueAtTime(0, t + dur);
+
     o.start(t);
-    o.stop(t + dur + 0.02);
+    o.stop(t + dur + 0.05);
   }
 
   function loop() {
-    var DIT = 0.10;
-    var DAH = 0.32;
-    var SYM = 0.08;
-    var GRP = 0.24;
-    var END = 1.20;
+    var PIP   = 0.20;   // kort pip
+    var GAP   = 0.38;   // paus mellan pips
+    var DRONE = 2.00;   // lång avslutande ton
+    var END   = 2.80;   // tystnad innan restart
 
     var t = ctx.currentTime + 0.05;
-    var i;
 
-    // **- **- **-  (tre gånger)
-    for (i = 0; i < 3; i++) {
-      beep(t, DIT); t += DIT + SYM;
-      beep(t, DIT); t += DIT + SYM;
-      beep(t, DAH); t += DAH + GRP;
-    }
+    // Tre separata, välseparerade korta pips
+    beep(t, PIP); t += PIP + GAP;
+    beep(t, PIP); t += PIP + GAP;
+    beep(t, PIP); t += PIP + GAP * 0.5; // lite kortare paus innan dronen
 
-    // **---- (avslutande lång pip)
-    beep(t, DIT); t += DIT + SYM;
-    beep(t, DIT); t += DIT + SYM;
-    beep(t, DAH * 4); t += DAH * 4;
+    // Lång avslutande drone
+    beep(t, DRONE); t += DRONE;
 
     setTimeout(loop, (t - ctx.currentTime + END) * 1000);
   }
@@ -76,9 +83,7 @@ const HTML = `<!DOCTYPE html>
     }
   }
 
-  // Starta direkt — RN WebView tillämpar inte webbläsarens user-gesture-krav.
   setTimeout(start, 150);
-  // Backup om AudioContext ändå är suspended: starta vid touch.
   document.addEventListener('touchstart', start, { once: true });
 })();
 </script>
@@ -86,14 +91,13 @@ const HTML = `<!DOCTYPE html>
 </html>`;
 
 /**
- * Osynlig WebView som spelar en Morse-liknande ambient-loop i lobbyn.
- * Monteras/avmonteras med LobbyScreen — ljudet stoppas automatiskt vid
- * navigation. Inga audio-filer behövs; tonerna genereras via Web Audio API.
+ * Osynlig WebView som spelar en dov Morse-liknande ambient-loop i lobbyn.
+ * Mönster: * * * ---- (~8 s per loop). Monteras/avmonteras med LobbyScreen.
+ * Inga audio-filer behövs; tonerna genereras via Web Audio API.
  */
 export function MorseAmbientSound() {
   return (
     <View
-      // Positioneras utanför skärmens synliga yta så WebView inte påverkar layout.
       style={{
         position: 'absolute',
         left: -2,
