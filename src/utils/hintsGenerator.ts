@@ -79,5 +79,16 @@ export function selectHints(library: HintLibrary, count: number = 15): HintItem[
     return (TYPE_ORDER[a.type] ?? 99) - (TYPE_ORDER[b.type] ?? 99);
   });
 
-  return selected.slice(0, count);
+  // Deduplicera på normaliserat value — samma fakta kan finnas på flera
+  // prioritetsnivåer (t.ex. "BRIT Awards" på P3 och P4). Behåll första
+  // förekomsten (lägst prioritetsnummer = visas tidigt) och kasta resten.
+  const seenValues = new Set<string>();
+  const unique = selected.filter(h => {
+    const key = h.value.toLowerCase().trim();
+    if (seenValues.has(key)) return false;
+    seenValues.add(key);
+    return true;
+  });
+
+  return unique.slice(0, count);
 }
