@@ -2144,18 +2144,20 @@ export default function QuizScreen() {
   };
 
   // ── IndDev host-broadcast-wrappers ───────────────────────────────────────
-  // Host:s Play-tap: trigga lokal transition + broadcast så non-host:s
-  // /quiz-skärm också flyttar från GetReady → countdown.
+  // Host:s Play-tap: 2 s dramatisk paus innan nedräkning startar.
+  // Broadcast skickas efter samma fördröjning så host + non-host synkar.
   const handleHostStartFromGetReady = () => {
-    setPhase('countdown');
-    if (gameMode === 'individual-devices' && syncChannelRef.current) {
-      syncChannelRef.current
-        .broadcastPlayCommand({ question_index: questionIndex })
-        .catch(() => {
-          // Broadcast fail = non-host fastnar på GetReady. Logga men blocka
-          // inte host:s eget spel. Full retry-handling sker i D-vi.
-        });
-    }
+    setTimeout(() => {
+      setPhase('countdown');
+      if (gameMode === 'individual-devices' && syncChannelRef.current) {
+        syncChannelRef.current
+          .broadcastPlayCommand({ question_index: questionIndex })
+          .catch(() => {
+            // Broadcast fail = non-host fastnar på GetReady. Logga men blocka
+            // inte host:s eget spel. Full retry-handling sker i D-vi.
+          });
+      }
+    }, 2000);
   };
   // Host:s Next-tap i reveal: trigga lokal handleAdvance + broadcast.
   // isLastQuestion-fallet broadcastar next_question_index=null så non-host
