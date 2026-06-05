@@ -1515,7 +1515,9 @@ export default function QuizScreen() {
       (q) => q.contentSubject === question.source.contentSubject,
     );
     // Genus-filter: om rätt svar är manligt/kvinnligt (härleds från pronomen i hints)
-    // visas bara distraktorter med samma kön. Fallback till alla om genus saknas.
+    // visas bara distraktorter med samma kön. Fallback till sameSubject om genus saknas
+    // ELLER om genus-filtrerat pool < 5 (behöver minst 4 distraktorter + 1 rätt).
+    // Faller ALDRIG tillbaka till IMAGE_QUIZ_QUESTIONS — subject-integritet alltid.
     const correctLib  = HINTS_LIBRARY[question.source.id];
     const correctGender = correctLib ? inferGender(correctLib) : null;
     const sameGender = correctGender
@@ -1526,10 +1528,8 @@ export default function QuizScreen() {
           return g === null || g === correctGender;
         })
       : sameSubject;
-    // Fallback till hela categorin om subjectet + genus ger för få items (< 8).
-    const itemPool = sameGender.length >= 8 ? sameGender
-      : sameSubject.length >= 8 ? sameSubject
-      : IMAGE_QUIZ_QUESTIONS;
+    // Använd genus-pool om tillräckligt stor, annars subject-pool (aldrig alla subjects).
+    const itemPool = sameGender.length >= 5 ? sameGender : sameSubject;
     return buildImageVariant(
       question.source,
       currentAssistance,
