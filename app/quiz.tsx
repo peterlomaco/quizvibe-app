@@ -4,7 +4,6 @@ import { GetReadyIntro, type QuestionMediaType } from '@/src/components/GetReady
 import { ImageAnswerBlock } from '@/src/components/ImageAnswerBlock';
 import { InactivityCountdownBanner } from '@/src/components/InactivityCountdownBanner';
 import { MediaPlayer } from '@/src/components/MediaPlayer';
-import { ProgressiveCover } from '@/src/components/ProgressiveCover';
 import {
   generateOpponentRoundScore,
   generateOpponentTimeUsed,
@@ -61,12 +60,12 @@ import {
   type ImageQuizQuestion,
 } from '@/src/utils/quizImageQuestions';
 import { buildImageVariant } from '@/src/utils/imageQuestionBuilder';
+import { HINTS_DATA, type PersonHints } from '@/src/utils/hintsData';
+import { HintsQuizCard } from '@/src/components/HintsQuizCard';
 // import { getQuizImage } from '@/src/utils/quizImages';
 // ↑ Borttagen 2026-05-27 — text-rendering ersätter foto-rendering. Återintroducera
 // när sketches kommer (då med getQuizSketch() från assets/quiz-sketches/).
-import { NameRevealCard } from '@/src/components/NameRevealCard';
-import { SketchCanvas } from '@/src/components/SketchCanvas';
-import { hasSketch, getQuizSketch } from '@/src/utils/quizSketches';
+// NameRevealCard, SketchCanvas, hasSketch, getQuizSketch ersatta av HintsQuizCard.
 import { generateRoomCode } from '@/src/utils/roomCode';
 import { addSeenQuestionIds, loadSeenQuestionIds } from '@/src/utils/hostQuestionHistory';
 import { hasPremiumSubscription } from '@/src/utils/subscriptionStorage';
@@ -144,6 +143,11 @@ interface ImageQuestion {
    *  generation av variants via buildImageVariant() istället för pre-bakad
    *  data (sparade ~8.3 MB av JS-bundlen, refactor 2026-05-27). */
   source: ImageQuizQuestion;
+  /** Hints-data om tillgänglig — aktiverar HintsQuizCard-rendering (flagga + ledtrådar)
+   *  istället för legacy foto-rendering (juridiskt parkerad). */
+  hints?: PersonHints;
+  /** Profession-etikett härledd från contentSubject ('Actor' | 'Artist' | 'Athlete' | 'Band'). */
+  profession?: string;
 }
 
 type QuizQuestion = TimelineQuestion | ImageQuestion;
@@ -171,8 +175,19 @@ const SEED_QUESTIONS: TimelineQuestion[] = MUSIC_QUESTIONS.map((q, i) => ({
   spotifyTrackId: q.spotifyTrackId,
 }));
 
+function professionFromSubject(subject: string | undefined): string {
+  if (subject === 'artist') return 'Artist';
+  if (subject === 'band') return 'Band';
+  if (subject === 'actor') return 'Actor';
+  if (subject === 'athlete') return 'Athlete';
+  if (subject === 'city' || subject === 'country' || subject === 'place') return 'Place';
+  if (subject) return subject.charAt(0).toUpperCase() + subject.slice(1);
+  return 'Person';
+}
+
 // Bild-frågor (Letter Grid → Final Selection-svar). category='Image' triggar
 // per-typ-rendering i question-card / mediaCard / answer-block / reveal-block.
+// Items med hints-data i HINTS_DATA får hints + profession attachade vid konvertering.
 const IMAGE_SEED_QUESTIONS: ImageQuestion[] = IMAGE_QUIZ_QUESTIONS.map(
   (q, i) => ({
     type: 'image',
@@ -187,6 +202,8 @@ const IMAGE_SEED_QUESTIONS: ImageQuestion[] = IMAGE_QUIZ_QUESTIONS.map(
     peakFrom: q.peakFrom,
     peakTo: q.peakTo,
     source: q,
+    hints: HINTS_DATA[q.id],
+    profession: professionFromSubject(q.contentSubject),
   }),
 );
 
@@ -666,8 +683,12 @@ export default function QuizScreen() {
   const [responseSeconds, setResponseSeconds] = useState<15 | 30 | 45 | 60>(
     initialResponseSeconds,
   );
-  // Spotify DJ-läge — aktivt om Lobby skickade spotifyEnabled=true.
-  const spotifyEnabled = (params.spotifyEnabled ?? 'false') === 'true';
+  // Spotify DJ-läge — kräver Individual Devices (DJ lämnar appen → Spotify-appen).
+  // PtP och Single Player stöds inte: en delad enhet kan inte "lämna" appen
+  // och komma tillbaka för övriga spelares skull.
+  const spotifyEnabled =
+    (params.spotifyEnabled ?? 'false') === 'true' &&
+    gameMode === 'individual-devices';
 
   // D-iv: host-styrt per-spelare audio (IndDev). Saknad key i mappen
   // tolkas client-side: host=on, övriga=off. Initial-fetch sker vid
@@ -881,15 +902,25 @@ export default function QuizScreen() {
     const youtubePoolPreCategory: QuizQuestion[] =
       inEraAudienceMusic.length > 0 ? inEraAudienceMusic : inEraMusic;
     // ── Image-pool ────────────────────────────────────────────────────
-    // Era HÅRD: peak-recognition-fönster när det finns (artister var sällan
-    // kända det år de föddes — peak speglar host:s intent bättre). Fallback
-    // till correctYear när peak saknas. Items utan både peak OCH correctYear
-    // (t.ex. capitals/städer) är era-agnostiska och inkluderas i alla eras.
+    // Era HÅRD för icke-person-items: peak-recognition-fönster när det finns,
+    // annars correctYear för eventbaserade items (t.ex. sport-events, platser).
+    //
+    // Person-items (artist/band/actor/athlete): correctYear = födelseår, INTE
+    // eventår. Utan explicit peakFrom/peakTo är person-items ERA-AGNOSTISKA —
+    // födelseåret ska aldrig era-filtrera bort t.ex. Michael Jackson (f.1958)
+    // från ett spel med era 1980-nu. Peak används om tillgängligt.
+    const PERSON_SUBJECTS = new Set([
+      'artist', 'band', 'actor', 'character', 'athlete', 'celebrity', 'cultural-person',
+    ]);
     const inEraImages = imagesEnabled
       ? IMAGE_SEED_QUESTIONS.filter((q) => {
           if (q.peakFrom !== undefined && q.peakTo !== undefined) {
             // Interval-overlap: [eraFrom, eraTo] ∩ [peakFrom, peakTo] ≠ ∅
             return eraFrom <= q.peakTo && eraTo >= q.peakFrom;
+          }
+          // Person utan peak: era-agnostisk (födelseår är inte ett eventår).
+          if (PERSON_SUBJECTS.has(q.source.contentSubject)) {
+            return true;
           }
           if (q.correctYear !== undefined) {
             return q.correctYear >= eraFrom && q.correctYear <= eraTo;
@@ -911,20 +942,15 @@ export default function QuizScreen() {
       inEraAudienceImages.length > 0 ? inEraAudienceImages : inEraImages;
 
     // ── Per-source category-filter ───────────────────────────────────
-    // HÅRD — host:s val respekteras per källa. YouTube filtreras mot
-    // youtubeEnabledCategories; Images mot imagesEnabledCategories.
-    // Specialfall: om alla 3 aktiva för en källa (= default) skippas
-    // filtret helt så items med null mainCategory bevaras.
+    // YouTube: filtreras mot youtubeEnabledCategories (Music/Film/Sport).
+    // Guess Where?: bara platsfrågor med null mainCategory (städer/länder).
+    //   Personbilder (artist/band/actor/athlete — non-null mainCategory) är
+    //   juridiskt parkerade och aldrig inkluderade oavsett toggles.
     const isAllYoutubeCats =
       youtubeEnabledCategories.length === 3 &&
       youtubeEnabledCategories.includes('Music') &&
       youtubeEnabledCategories.includes('Film') &&
       youtubeEnabledCategories.includes('Sport');
-    const isAllImageCats =
-      imagesEnabledCategories.length === 3 &&
-      imagesEnabledCategories.includes('Music') &&
-      imagesEnabledCategories.includes('Film') &&
-      imagesEnabledCategories.includes('Sport');
     const youtubePool = isAllYoutubeCats
       ? youtubePoolPreCategory
       : youtubePoolPreCategory.filter((q) =>
@@ -934,29 +960,51 @@ export default function QuizScreen() {
             q.type === 'timeline' ? q.genrePackages : undefined,
           ),
         );
-    const imagePool = isAllImageCats
+    // Hints-pool: alla image-items renderas via HintsQuizCard (flagga + progressiva
+    // ledtrådar). Items med data i HINTS_DATA får faktiska hints; övriga visar
+    // placeholders tills backend-script populerar HINTS_DATA med Wikidata-data.
+    const isAllImageCats =
+      imagesEnabledCategories.length === 3 &&
+      imagesEnabledCategories.includes('Music') &&
+      imagesEnabledCategories.includes('Film') &&
+      imagesEnabledCategories.includes('Sport');
+    const imagePool: QuizQuestion[] = isAllImageCats
       ? imagePoolPreCategory
-      : imagePoolPreCategory.filter((q) =>
-          itemMatchesEnabledCategories(q.mainCategory, imagesEnabledCategories, undefined),
-        );
+      : imagePoolPreCategory.filter((q) => {
+          const mc = q.mainCategory;
+          return isAllImageCats ? true : mc !== null && imagesEnabledCategories.includes(mc);
+        });
+
+    // ── Spotify-pool (separat tredje pool) ──────────────────────────────
+    // Spotify-items är en delmängd av youtubePool — samma era+audience+
+    // category-filter gäller redan. Lyfts ut som egen pool när spotifyEnabled.
+    const spotifyPool: QuizQuestion[] = spotifyEnabled
+      ? youtubePool.filter((q) => q.type === 'timeline' && q.spotifyTrackId)
+      : [];
+    // Ren YouTube-pool: allt i youtubePool som INTE är Spotify.
+    const pureYoutubePool: QuizQuestion[] = spotifyEnabled
+      ? youtubePool.filter((q) => !(q.type === 'timeline' && q.spotifyTrackId))
+      : youtubePool;
 
     const playerCount = Math.max(1, turnOrder.length);
-    const hasYoutube = youtubePool.length > 0;
+    const hasSpotify = spotifyPool.length > 0;
+    const hasPureYoutube = pureYoutubePool.length > 0;
     const hasImage = imagePool.length > 0;
 
-    // Edge cases: om en pool är tom, kör bara den andra. Om båda tomma →
-    // sista-utvägs-fallback. Lobby:s pool-preflight blockar normalt detta
-    // läge vid Start Game; emergency-pathen täcker direkt-nav till /quiz
-    // utan Lobby + edge cases (Play Again med ändrade defaults osv.).
-    if (!hasYoutube && !hasImage) {
-      return SEED_QUESTIONS;
+    // Edge case: alla pooler tomma → sista-utvägs-fallback.
+    // Använd bara YouTube SEED_QUESTIONS om YouTube faktiskt är aktiverat;
+    // annars returnera bildpool ignorerandes era (era-filter kan ha tömt poolen).
+    if (!hasSpotify && !hasPureYoutube && !hasImage) {
+      if (youtubeEnabled) return SEED_QUESTIONS;
+      // YouTube av, Hints tom pga era-filter eller saknad data → visa alla
+      // person-items utan era-filter som nödlösning.
+      const fallbackImages = IMAGE_SEED_QUESTIONS.filter(
+        (q) => PERSON_SUBJECTS.has(q.source.contentSubject),
+      );
+      return fallbackImages.length > 0 ? fallbackImages : SEED_QUESTIONS;
     }
 
     // Prioritera frågor som hosten inte sett i tidigare spelomgångar.
-    // Delar upp poolen i osedda + sedda, slumpar varje grupp för sig,
-    // konkatenerar [osedda..., sedda...]. Cyklisk indexering nedan plockar
-    // då osedda frågor tills de tar slut — sedan åter sedda. Om seenQuestionIds
-    // är tom (första spelet eller inget konto) slumpas hela poolen.
     const prioritiseUnseen = (pool: QuizQuestion[]): QuizQuestion[] => {
       if (!seenQuestionIds.size) return shuffleArray(pool);
       const unseen = shuffleArray(pool.filter((q) => !seenQuestionIds.has(q.id)));
@@ -964,9 +1012,6 @@ export default function QuizScreen() {
       return [...unseen, ...seen];
     };
 
-    // Fast kategori-ordning: Musik → Film → Sport. Osedda frågor prioriteras
-    // per grupp. Pool:en är redan filtrerad per källa ovan, så tomma grupper
-    // hoppas över automatiskt.
     const CATEGORY_ORDER: MainCategory[] = ['Music', 'Film', 'Sport'];
 
     const groupByCategory = (pool: QuizQuestion[]): QuizQuestion[] => {
@@ -975,7 +1020,6 @@ export default function QuizScreen() {
         const catPool = pool.filter((q) => q.mainCategory === cat);
         if (catPool.length) result.push(...prioritiseUnseen(catPool));
       }
-      // Defensiv fallback: items utan mainCategory (capitals/places e.d.).
       const uncategorized = pool.filter(
         (q) => !q.mainCategory || !CATEGORY_ORDER.includes(q.mainCategory as MainCategory),
       );
@@ -983,83 +1027,81 @@ export default function QuizScreen() {
       return result;
     };
 
-    // YouTube: Musik-klipp → Film-klipp → Sport-klipp (osedda först per grupp).
-    // Om bilder är avaktiverade spelar intern ordning ingen roll — blanda fritt.
-    const orderedYoutubePool: QuizQuestion[] =
-      !hasYoutube ? [] :
-      !hasImage   ? prioritiseUnseen(youtubePool) :
-                    groupByCategory(youtubePool);
+    // Spotify: alltid Musik → enbart unseen-first, ingen kategori-gruppering.
+    const orderedSpotifyPool: QuizQuestion[] =
+      !hasSpotify ? [] : prioritiseUnseen(spotifyPool);
 
-    // Bilder: samma kategori-ordning (Musik → Film → Sport) som YouTube-sektionen
-    // så spelet känns konsekvent i sin resa igenom innehållstyperna.
-    // Om YouTube är avaktiverat spelar intern ordning ingen roll — blanda fritt.
+    // Ren YouTube: Musik → Film → Sport (osedda först per grupp).
+    const hasOther = hasPureYoutube || hasImage;
+    const orderedPureYoutubePool: QuizQuestion[] =
+      !hasPureYoutube ? [] :
+      !hasImage       ? prioritiseUnseen(pureYoutubePool) :
+                        groupByCategory(pureYoutubePool);
+
+    // Bilder: samma kategori-ordning som YouTube-sektionen.
     const orderedImagePool: QuizQuestion[] =
-      !hasImage   ? [] :
-      !hasYoutube ? prioritiseUnseen(imagePool) :
-                    groupByCategory(imagePool);
+      !hasImage  ? [] :
+      !hasOther  ? prioritiseUnseen(imagePool) :
+                   groupByCategory(imagePool);
 
-    // Bygg pool täckande hela spelet utan modulo-cykling i UI-laget.
-    //   Pass-the-Phone: questionsPerBlock = playerCount (alla spelare i ronden
-    //     får varsin item av samma typ).
-    //   Individual Devices: questionsPerBlock = 1 (alla spelare svarar på
-    //     samma fråga samtidigt → 1 item per rond totalt).
-    const questionsPerBlock =
-      gameMode === 'individual-devices' ? 1 : playerCount;
-    // Räkna ut hur tätt YouTube-block ska läggas in bland image-block.
-    // Baseras på faktisk pool-ratio efter filtrering: var N:e block är YouTube
-    // där N = round(imagePool / youtubePool), begränsad till [2, 4].
-    //
-    // Exempel med fullständiga pooler (327 YT, 1038 bilder):
-    //   N = round(1038 / 327) = round(3.17) = 3 → var 3:e block = ~33% YouTube
-    // Om era-filtret ger ungefär lika stora pooler (t.ex. 150 YT + 150 bilder):
-    //   N = round(1) = 1 → clampad till 2 → 50% YouTube
-    // Om YouTube är sparsamt efter filtrering (50 YT + 800 bilder):
-    //   N = round(16) → clampad till 4 → 25% YouTube
-    //
-    // Gränserna [2, 4] garanterar att YouTube aldrig dominerar (max 50%) och
-    // aldrig försvinner helt (minst 25%) oavsett hur era/audience-filtret slår.
-    const ytInterval =
-      hasYoutube && hasImage
-        ? Math.max(2, Math.min(4, Math.round(imagePool.length / youtubePool.length)))
-        : 1; // bara en typ tillgänglig — interval är irrelevant
+    const questionsPerBlock = gameMode === 'individual-devices' ? 1 : playerCount;
 
-    // Antal YouTube-block (= ronder av YouTube-typ) i spelet. Samma total som
-    // den proportionella formeln ovan gav, men nu samlade i BÖRJAN av spelet
-    // följt av alla bildrunder i SLUTET. Formel: floor((N-1)/ytInterval) + 1
-    // ger exakt lika många YouTube-block som block % ytInterval === 0 hade
-    // spridit ut — räknar hur många multiplar av ytInterval som ryms i [0, N-1].
-    const ytBlockCount =
-      hasYoutube && hasImage
-        ? Math.floor((totalRounds - 1) / ytInterval) + 1
-        : hasYoutube
+    // ── Spotify-interval ─────────────────────────────────────────────
+    // Spotify är ett "special moment" — Spotify-block sprids ut en per
+    // spotifyInterval ronder. Interval baseras på ratio
+    // (pureYT + image) / spotify, begränsat till [3, 6] så Spotify dyker
+    // upp med lagom täthet (inte dominerar, inte försvinner).
+    //
+    // Exempel med fullständiga pooler (418 YT, 836 bilder, 41 Spotify):
+    //   round((418+836)/41) = round(30.6) → clampad till 6
+    //   → 1 Spotify per 6 rundor (~17 % av spelet)
+    const spotifyInterval: number =
+      hasSpotify && (hasPureYoutube || hasImage)
+        ? Math.max(3, Math.min(6, Math.round((pureYoutubePool.length + imagePool.length) / spotifyPool.length)))
+        : 1;
+
+    const spotifyBlockCount: number =
+      hasSpotify && (hasPureYoutube || hasImage)
+        ? Math.floor((totalRounds - 1) / spotifyInterval) + 1
+        : hasSpotify
           ? totalRounds
           : 0;
 
+    // ── YouTube-interval (beräknas mot återstående rundor) ───────────
+    const remainingRounds = totalRounds - spotifyBlockCount;
+
+    const ytInterval: number =
+      hasPureYoutube && hasImage
+        ? Math.max(2, Math.min(4, Math.round(imagePool.length / pureYoutubePool.length)))
+        : 1;
+
+    const ytBlockCount: number =
+      hasPureYoutube && hasImage
+        ? Math.floor((remainingRounds - 1) / ytInterval) + 1
+        : hasPureYoutube
+          ? remainingRounds
+          : 0;
+
+    // ── Bygg mixed array: 3-fas Spotify → YouTube → Image ───────────
+    // Spotify-block samlas i BÖRJAN (special moments öppnar spelet),
+    // sedan YouTube-block, sedan bildblock.
     const mixed: QuizQuestion[] = [];
     for (let block = 0; block < totalRounds; block++) {
-      // YouTube-block först (block < ytBlockCount), sedan bilder. Om bara en
-      // typ finns används den alltid.
-      const isYoutubeBlock = hasYoutube && hasImage
-        ? block < ytBlockCount
-        : hasYoutube;
-      const pool = isYoutubeBlock ? orderedYoutubePool : orderedImagePool;
-      // Cyklisk indexering inom poolen — items kan upprepas om pool < block*players,
-      // men varje block:s spelare får olika items (det är det viktiga för
-      // round-paritet). Med unseen-first-ordningen innebär cycling att osedda
-      // items alltid plockas före sedda.
+      let pool: QuizQuestion[];
+      if (block < spotifyBlockCount) {
+        pool = orderedSpotifyPool;
+      } else if (block < spotifyBlockCount + ytBlockCount) {
+        pool = orderedPureYoutubePool;
+      } else {
+        pool = orderedImagePool;
+      }
       for (let q = 0; q < questionsPerBlock; q++) {
         const idx = (block * questionsPerBlock + q) % pool.length;
         mixed.push(pool[idx]);
       }
     }
     return mixed.length > 0 ? mixed : SEED_QUESTIONS;
-    // turnOrder (inte bara .length) i deps eftersom audience-set härleds från
-    // varje spelares age — byten av spelare inom samma längd ska re-bygga
-    // poolen. turnOrder är själv ett useMemo så objektidentiteten ändras bara
-    // när URL-params (players-json) faktiskt ändras.
-    // seenQuestionIds: uppdateras asynkront vid mount + vid spelets slut;
-    // triggerar re-beräkning som prioriterar nya osedda frågor nästa omgång.
-  }, [eraFrom, eraTo, turnOrder, totalRounds, youtubeEnabled, imagesEnabled, gameMode, youtubeEnabledCategories, imagesEnabledCategories, seenQuestionIds]);
+  }, [eraFrom, eraTo, turnOrder, totalRounds, youtubeEnabled, imagesEnabled, gameMode, youtubeEnabledCategories, imagesEnabledCategories, seenQuestionIds, spotifyEnabled]);
 
   // Media-källa per fråga (driver GetReadyIntro:s IndDev media-kö).
   // Image-frågor → 'image'; timeline-frågor (YouTube-content idag, men
@@ -1071,6 +1113,10 @@ export default function QuizScreen() {
   const mediaSourceByQuestion = useMemo<QuestionMediaType[]>(() => {
     return gameQuestions.map((q) => {
       if (q.type === 'image') return 'image';
+      // Spotify-frågor från den separata Spotify-poolen identifieras via
+      // spotifyTrackId + spotifyEnabled. Dessa hanteras av DJ-flödet, inte
+      // YouTube-spelaren — returnera 'spotify' för korrekt kö-ikon i GetReadyIntro.
+      if (spotifyEnabled && q.type === 'timeline' && q.spotifyTrackId) return 'spotify';
       const picked = pickMediaSource(
         { youtubeClips: q.youtubeClips },
         { youtubeEnabled, gameMode },
@@ -1078,7 +1124,7 @@ export default function QuizScreen() {
       if (picked.kind === 'youtube') return 'youtube';
       return 'none';
     });
-  }, [gameQuestions, youtubeEnabled, gameMode]);
+  }, [gameQuestions, youtubeEnabled, gameMode, spotifyEnabled]);
 
   // V1-huvudkategori per fråga (Music/Film/Sport). Driver GetReadyIntro:s
   // kant-skärande badge på första kö-rutan så spelaren ser i förväg vilken
@@ -3576,35 +3622,21 @@ export default function QuizScreen() {
                 </View>
               )
             ) : isImageQuestion ? (
-              <View style={styles.imageMediaCard}>
-                {/* Fragmenterad fråga-routning: har item:t en tecknad sketch
-                    (assets/quiz-sketches/<id>.webp via hasSketch) renderas den
-                    som "pencil_sketch" — SketchCanvas ritar skissen live på tom
-                    mörk canvas och sköter sin egen fasvisa reveal. Saknas sketch
-                    faller vi tillbaka till NameRevealCard + ProgressiveCover-
-                    mosaik (text-mellanlösning). */}
-                {hasSketch(question.id) ? (
-                  <SketchCanvas
-                    key={questionIndex}
-                    source={getQuizSketch(question.id)!}
-                    resetKey={questionIndex}
-                    assistance={currentAssistance}
-                    totalSeconds={responseSeconds}
-                  />
-                ) : (
-                  <>
-                    <NameRevealCard displayName={question.displayName} />
-                    <ProgressiveCover
-                      key={questionIndex}
-                      resetKey={questionIndex}
-                      profile={{ birthYear: 1990, assistance: currentAssistance }}
-                      assistance={currentAssistance}
-                      totalSeconds={responseSeconds}
-                      logoSize={220}
-                    />
-                  </>
-                )}
-              </View>
+              <HintsQuizCard
+                key={questionIndex}
+                profession={question.type === 'image' ? (question.profession ?? 'Person') : 'Person'}
+                hints={question.type === 'image' ? question.hints : undefined}
+                displayName={question.type === 'image' ? question.displayName : ''}
+                resetKey={questionIndex}
+                totalSeconds={responseSeconds}
+                assistance={currentAssistance}
+                playerBirthYear={
+                  turnOrder[currentPlayerIndex]?.age
+                    ? new Date().getFullYear() - turnOrder[currentPlayerIndex].age
+                    : 1990
+                }
+                isRevealed={phase === 'reveal'}
+              />
             ) : youtubeError ? (
               <View style={styles.youtubeErrorCard}>
                 <Text style={styles.youtubeErrorIcon}>⚠</Text>

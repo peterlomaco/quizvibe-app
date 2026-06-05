@@ -28,10 +28,12 @@ export interface LobbySettings {
   eraTo: number;
   roundsCount: number;
   selectedExtraPackages: string[];
-  // Per-source profession-category-filter (ersätter youtubeEnabled/imagesEnabled/enabledMainCategories).
+  // Per-source profession-category-filter.
   // YouTube: alla tre är valbara, min 1 krävs (guard i handleToggleYoutubeCategory).
-  // Images: Film (Actors) + Sport (Athletes) är MANDATORY — alltid i arrayen.
-  //         Music (Artists) är valbar — host kan toggla av/på.
+  // Guess Where? (platsfrågor): proxy via imagesEnabledCategories:
+  //   length > 0 = Where? aktiv (städer/länder inkluderas i quiz-pool)
+  //   length === 0 = Where? inaktiv
+  //   Personbilder ("Guess Who?") är juridiskt parkerade och aldrig i poolen.
   youtubeEnabledCategories: MainCategory[];
   imagesEnabledCategories: MainCategory[];
   // "Profiles"-källan har två under-toggles i Lobby:n: Images (foto, 1+2) och

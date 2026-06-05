@@ -1,22 +1,26 @@
 // Huvudkategori-modell — den högsta nivån av content-grouping i klienten.
 // Härleds från backend-katalogens `contentSubject` via `subjectToMainCategory`.
 //
-// V1: tre huvudkategorier (Music/Film/Sport). Items med subject som inte
-// mappar (t.ex. city/country/capital) är era-agnostiska och bär null —
-// behandlas som "always available" i kategori-filter.
+// V1: tre kategorier (Music/Film/Sport) — används uteslutande av YouTube-källan.
+//
+// Guess-källan (ersätter Images) är uppdelad i:
+//   "Who?"   — personbilder (artist/band/actor/athlete) — juridiskt parkerade, visas EJ
+//   "Where?" — platsfrågor (city/country/capital) — mainCategory=null, visas om guessWhereEnabled
+//
+// Items med null mainCategory (platser) behandlas som "always available" i
+// YouTube-filtret men inkluderas enbart i Guess Where? i image-filtret.
 //
 // Används av:
 //   - quiz.tsx + GetReadyIntro (kategori-badge på current-box)
-//   - ProfileScreen (host-default-toggle i "Main categories"-sektionen)
-//   - LobbyScreen (per-spel toggle, syncas via lobby_settings)
-//   - quiz.tsx:s gameQuestions-filter (pool-filter parallellt med audience + era)
+//   - ProfileScreen + LobbyScreen (YouTube-toggle per profession-typ)
+//   - quiz.tsx:s gameQuestions-filter
 
 export type MainCategory = 'Music' | 'Film' | 'Sport';
 
 export const MAIN_CATEGORIES: readonly MainCategory[] = ['Music', 'Film', 'Sport'] as const;
 
-// Images-källan har Film (Actors) + Sport (Athletes) som obligatoriska kategorier.
-// Bara Music (Artists) kan slås av/på av host.
+// Legacy — användes av Images-källan (ersatt av Guess-sektionen).
+// Bevaras för bakåtkompatibilitet med mockLobbySettings.ts DB-adapter.
 export const IMAGES_MANDATORY_CATEGORIES: readonly MainCategory[] = ['Film', 'Sport'] as const;
 
 /**

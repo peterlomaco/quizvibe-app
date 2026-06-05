@@ -435,47 +435,45 @@ Profile-toggle som filtrerar vilka paket som syns i Lobby:n när användaren är
   - **FREE-badge-pattern bevarad**: `pkg.free` på `MusicPackage`-interfacet är optional och styr en kantskärande FREE-badge på paket-raden (`packageRowFreeBadge` styles). Inga free-paket existerar i V1 men styling finns kvar för framtida gratis-paket.
 - **Seeding**: Lobby host-seed-effekten läser `profile.enabledHostPackages` (= tom i V1). Bara host får filterlistan (non-hosts ser endast paket som hosten faktiskt aktiverat för denna lobby via `selectedExtraPackages`).
 
-## SOURCE DASHBOARD — per-source category matrix (uppdaterad 2026-06-03)
+## SOURCE DASHBOARD — per-source category matrix (uppdaterad 2026-06-05)
 
 Ersätter gamla `enabledMainCategories` + `youtubeEnabled`/`imagesEnabled`-booleans med **per-source category-arrays**. UI-rubriken "SOURCE DASHBOARD" i både Lobby och Profile.
 
-**Datamodell**: `youtubeEnabledCategories: MainCategory[]` + `imagesEnabledCategories: MainCategory[]`. Båda kan innehålla 0–3 av Music/Film/Sport. `youtubeEnabled = youtubeEnabledCategories.length > 0`, `imagesEnabled = imagesEnabledCategories.length > 0`.
+**Datamodell**: `youtubeEnabledCategories: MainCategory[]` + `imagesEnabledCategories: MainCategory[]`. Båda kan innehålla 0–3 av Music/Film/Sport.
 
 **UI — kolumn-baserad matrix-layout** (`smGrid` i LobbyScreen + ProfileScreen):
 - **Rad 1 (rubriker)**: `[All]` | Artists | Actors | Athletes — text i varsin kolumn-stack
-- **Rad 2 (All-rad)**: All master-toggle (label-col) + Artists/Actors/Athletes kolumn-masters — grå bakgrund + rundade hörn, `paddingLeft: 29pt` på All-toggle, `paddingLeft: 6pt` (Lobby) / `4pt` (Profile) på data-toggles
-- **Rad 3 (YouTube)**: YouTube-ikon + label (112pt label-col) + switchar per kolumn
-- **Rad 4 (Auto-sync)**: `height: 10pt` spacer-cell, Actors+Athletes visar "Auto-sync"-text
-- **Rad 5 (Images)**: Q?-ikon + label + switchar per kolumn
+- **Rad 2 (All-rad)**: All master-toggle (label-col) + Artists/Actors/Athletes kolumn-masters — grå bakgrund + rundade hörn
+- **Rad 3 (YouTube)**: YouTube-ikon + label + switchar per kolumn
+- **Rad 4 (Hints)**: Q?-ikon + "Hints"-label + switchar per kolumn (ersätter tidigare "Images" + "Auto-sync"-rad)
 - Vertikala separator-linjer (borderLeft) mellan Artists/Actors/Athletes
 - `onLayout` på `smGrid` mäter exakt kolumnbredd → `smCellStyle = { width: smColWidth }` för pixel-perfekt centrering
 
-**All-rad AND-logik**: `artistsAllOn/actorsAllOn/athletesAllOn = YT && Images` (båda måste vara ON för att All-switch ska lysa grön). `allEnabled = artistsAllOn && actorsAllOn && athletesAllOn`.
+**All-rad AND-logik**: `artistsAllOn/actorsAllOn/athletesAllOn = YT && Hints` (båda ON → All-switch grön). `allEnabled = artistsAllOn && actorsAllOn && athletesAllOn && guessWhereEnabled`... **OBS (2026-06-05):** `guessWhereEnabled` finns inte längre som separat state — Hints row = `imagesEnabledCategories`-toggles precis som gamla Images-row.
 
-**Auto-sync-logik** (ny 2026-06-03):
-- **Artists**: YouTube och Images är **oberoende** — vardera kan slås av/på fritt
-- **Actors/Athletes YouTube ON** → Images auto-aktiveras (Auto-sync)
-- **Actors/Athletes Images OFF** → YouTube stängs också av (Auto-sync bidirektionell)
-- **Actors/Athletes YouTube OFF** → Images förblir oberoende styrbar
-- `useEffect` normaliserar initial state: om YT Film/Sport är ON läggs Film/Sport till Images
+**YouTube och Hints är OBEROENDE (2026-06-05)**: Auto-sync-logiken borttagen. Individuella source-switchar rör bara sin egen källa. Kolumn-"All" + master-"All" sätter fortfarande båda källorna för den kolumnen.
 
-**quiz.tsx-filter**: YouTube-pool filtreras på `youtubeEnabledCategories` inkl. `genrePackages`-crossover (sport-taggad låt visas under Athletes/YT). Images-pool filtreras utan crossover. Inga mandatory-kategorier längre (Images Film+Sport kan stängas av).
+**Source Validation-regler (2026-06-05)** — enforced vid Start Game + Spotify-av-toggle + individ-switch-toggle:
+- **Spotify på** → inga krav, alla kombinationer tillåtna
+- **Artists (Music) aktiv** → fritt, kan spelas ensamt (som Spotify)
+- **Actors/Athletes utan Artists + Spotify** → minst 2 aktiva kombinationer krävs (av max 4: YouTube Film/Sport + Hints Film/Sport)
+- **Stänga av sista Artist-switch** → blockeras om < 2 Actors/Athletes-kombinationer kvar (och Spotify av)
+- **Stänga av Actors/Athletes-switch** → blockeras om det lämnar < 2 sådana kvar (och Spotify av, Artists av)
+
+**quiz.tsx-filter (2026-06-05)**:
+- YouTube-pool: filtreras mot `youtubeEnabledCategories` inkl. `genrePackages`-crossover.
+- Hints-pool (imagePool): alla person-items (`artist/band/actor/athlete`) är **era-agnostiska** — `correctYear` = födelseår, inte eventår; födelseår används aldrig som era-filter. Explicit `peakFrom/peakTo` används om satt.
+- Fallback: om YouTube av + imagePool tom → person-fallback utan era, INTE SEED_QUESTIONS.
 
 **Person-type crossover (2026-06-02):** `itemMatchesEnabledCategories` i `mainCategory.ts` stöder symmetrisk crossover via `genrePackages`:
-- `genrePackages: ["sport"]` → item surfar ÄVEN under Athletes/Sport
-- `genrePackages: ["film"]` → item surfar ÄVEN under Actors/Film
-- `genrePackages: ["music"]` → item surfar ÄVEN under Artists/Music
-Taggas baserat på personens PRIMÄRPROFESSION. Se `memory/project_persontype_crossover.md`.
+- `genrePackages: ["sport"]` → surfar ÄVEN under Athletes/Sport
+- `genrePackages: ["film"]` → surfar ÄVEN under Actors/Film
+- `genrePackages: ["music"]` → surfar ÄVEN under Artists/Music
 
-- **Shared utility** ([src/utils/mainCategory.ts](src/utils/mainCategory.ts)): `MainCategory`, `IMAGES_MANDATORY_CATEGORIES`, `MAIN_CATEGORIES`, `defaultEnabledMainCategories()`, `isMainCategory()`, `MAIN_CATEGORY_LABELS`, `itemMatchesEnabledCategories()`, `subjectToMainCategory()`.
-- **Profile-state** `youtubeEnabledCategories?: MainCategory[]` + `imagesEnabledCategories?: MainCategory[]` på `ProfileData`. Default = alla 3. `loadProfile` merge:ar från AsyncStorage-cache om Supabase-raden saknar nya kolumner (pre-migration 0014).
-- **Lobby-state** `youtubeEnabledCategories: MainCategory[]` + `imagesEnabledCategories: MainCategory[]` på `LobbySettings`. Host-seed prio: `stored > profile > all 3`. Non-host syncar via polling. Tolerant read i `rowToSettings` (fallback mot gamla `youtube_enabled`/`images_enabled`-kolumner om migration 0014 ej körd).
-- **DB-migration**: [supabase/migrations/0014_per_source_categories.sql](supabase/migrations/0014_per_source_categories.sql) — `youtube_enabled_categories text[]` + `images_enabled_categories text[]` på `lobby_settings` + `profiles`. Appliceras manuellt via Supabase SQL editor. Gamla kolumner bevaras under övergång.
-- **Pool-filter i quiz.tsx**: YouTube-pool filtreras mot `youtubeEnabledCategories`, image-pool mot `imagesEnabledCategories`. HÅRD filter — inga fallbacks. Filter-pipeline: source-toggle → era → audience → per-source category.
-- **URL-params**: `youtubeEnabledCategories: JSON.stringify(...)` + `imagesEnabledCategories: JSON.stringify(...)`. quiz.tsx parsar med `try/catch` + `isMainCategory`-filter, fallback alla 3. Ingen mandatory Film/Sport enforcement längre.
-- **Play Again carry-over**: spread `{ ...oldSettings }` i `goToNewLobby` bär automatiskt per-source categories.
-- **Min-1-guard**: minst 1 kolumn (profession) måste alltid vara aktiv. Enforced på kolumn-master-nivå + individuella toggle-handlers.
-- **Images-guard**: `handleToggleImagesArtists` togglear enbart Music; Film+Sport alltid i arrayen.
+- **Shared utility** ([src/utils/mainCategory.ts](src/utils/mainCategory.ts)): `MainCategory`, `IMAGES_MANDATORY_CATEGORIES` (legacy), `MAIN_CATEGORIES`, `defaultEnabledMainCategories()`, `isMainCategory()`, `MAIN_CATEGORY_LABELS`, `itemMatchesEnabledCategories()`, `subjectToMainCategory()`.
+- **Profile-state** `youtubeEnabledCategories?: MainCategory[]` + `imagesEnabledCategories?: MainCategory[]` på `ProfileData`. Default = alla 3.
+- **Lobby-state** `youtubeEnabledCategories: MainCategory[]` + `imagesEnabledCategories: MainCategory[]` på `LobbySettings`. DB-migration 0014 hanterar bakåtkompatibilitet.
+- **URL-params**: `youtubeEnabledCategories: JSON.stringify(...)` + `imagesEnabledCategories: JSON.stringify(...)`. quiz.tsx parsar med `try/catch` + `isMainCategory`-filter, fallback alla 3.
 
 ## Profile — unsaved changes guard (2026-06-03)
 
@@ -945,19 +943,38 @@ Namnet som visas (`pickNameForPrefix`): det rätta namnet om prefix matchar `cor
 - **Per-spelare-filter (V2)** kan ersätta union-modellen om Peter vill — kräver per-tur-pick i round-block-loopen istället för pool-nivå-filter. Aktuellt pragmatiskt val: union-filter håller round-block-strukturen intakt och fungerar för både Pass-the-Phone och Individual Devices.
 - **Main category-filter** (Music/Film/Sport) appliceras EFTER audience-filtret i pipeline:n (= sista filter-steget innan round-block-bygget). HÅRD — inga fallbacks som strippar kategorin. Se "Main categories (Profile-toggle → Lobby-filter → quiz pool-filter)" för detaljer.
 
-## Image questions (MVP)
+## Hints questions (ersätter Image questions — 2026-06-05)
 
-Bild-pipelinen från backend till in-game-rendering:
+Person-bildfrågor (juridiskt parkerade) ersätts av **Hints** — en split-view-fråga med landsflaga + 3 progressiva ledtrådar. Svarsmekaniken (Letter Grid) är oförändrad.
 
-1. **Wikimedia-pipeline** (`backend/wikimedia/`): `wikimedia-search` föreslår källor → `wikimedia-process <id>` laddar ner + sharp-resize (max 1920×1080 / WebP q85) → `backend/output/<id>.webp`.
-2. **Asset-kopiering** till klient: webp-filer ligger i `assets/quiz-images/` (kopierade manuellt från `backend/output/`).
-3. **Require-map** ([src/utils/quizImages.ts](src/utils/quizImages.ts)): static `Record<itemId, ImageSourcePropType>` med `require()`-statements (Metro/RN kräver statiska require:s — kan inte loop:as). Lägg till en rad när nya items processas. `getQuizImage(id)` returnerar `ImageSourcePropType | null`.
-4. **Pre-baked fråga-data** ([src/utils/quizImageQuestions.ts](src/utils/quizImageQuestions.ts)): auto-genererad av `cd backend && npm run export-image-questions` ([backend/scripts/export-image-questions.ts](backend/scripts/export-image-questions.ts)). Scannar `assets/quiz-images/*.webp`, slår upp i katalog (`findItemsById`), genererar Letter Grid + distractor-options per item (för Millennials/standard-profilen). Exporterar `IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[]` + `getImageQuestionsForGeneration(gen)`-helper.
-5. **In-game-rendering** i quiz.tsx (`question.type === 'image'`-grenen):
-   - Mediakort: `<View imageMediaCard>` (16:9) med `<Image>` (`getQuizImage(question.id)`) + `<ProgressiveCover>` overlay. ProgressiveCover återanvänds som-är: `resetKey={questionIndex}`, `profile={{ birthYear: 1990, assistance: currentAssistance }}` (birthYear placeholder), `assistance={currentAssistance}` (driver reveal-fraktionen full=0.25/standard=0.5/minimal=0.75), `totalSeconds={responseSeconds}`. **`isRevealed` skickas INTE från quiz.tsx** — mosaiken fortsätter sin naturliga reveal-takt även efter Confirm istället för att snäppa till fully-revealed. Per Peter (2026-05-21): bilden ska gradvis avslöjas över hela frågans tid oavsett när spelaren bekräftat sitt svar, så early-confirmers inte förlorar mosaik-suspense och så alla spelare i ett spel ser samma reveal-tempo. För assistance × responseSeconds där fraktion × tid < tid (alltid gäller idag: full×30=7.5s, standard×30=15s, minimal×30=22.5s), är mosaiken naturligt klar långt innan timern når 0, så ingen snap-fallback behövs vid phase='reveal' heller. Demo-vyn ([app/name-quiz-demo.tsx](app/name-quiz-demo.tsx)) använder fortfarande `isRevealed={!!confirmedName}` för direkt-snap vid Confirm — separat UX för standalone-utforskning.
-   - Svarsmetod: `<ImageAnswerBlock>` ([src/components/ImageAnswerBlock.tsx](src/components/ImageAnswerBlock.tsx)) — speglar mekanik från `app/name-quiz-demo.tsx` men anpassad för phase-machinery. Intern state för `selectedPrefix` (Letter Grid → Final Selection toggle), reset:as via `resetKey={questionIndex}`-prop. Pending/confirmed-namn-state lyfts till parent (quiz.tsx) för paritet med musik-flödets pendingYear/selectedYear.
-   - **Reveal-feedback för image-frågor SKIPPAS** — den stora ✓/✗ Correct/Wrong-feedback-rutan renderas BARA för timeline (`{phase === 'reveal' && question.type === 'timeline' && ...}`). Image-frågors reveal-state syns istället direkt i ImageAnswerBlock via Correct/Wrong-badges på spelarens (och rätta) namn-kort — se "Inline Final Selection — Reveal-fas-beteende" ovan.
-   - **Frågetexten split:as i tre rader** för image-frågor när texten matchar `/^What is\s+the [Nn]ame\s+(.+)$/`-mönstret: rad 1 "What is" (FontSize.md), rad 2 "the Name" (FontSize.xxl bold headline — samma stil som musik-frågans "Which year"), rad 3 trailing-delen ("of this artist?" / "of this capital?" / "of this person?", FontSize.md). Fallback till single-line om mönstret inte matchar. Se IIFE i `questionTextWrap`-renderingen i [app/quiz.tsx](app/quiz.tsx).
+**Nya filer:**
+- `src/utils/hintsData.ts` — `PersonHints`-typ + `HINTS_DATA: Record<id, PersonHints>` (30 manuellt kuraterade items: 10 Artists, 10 Actors, 10 Athletes). `countryToFlagEmoji(nationality)` → emoji-flagga.
+- `src/components/HintsQuizCard.tsx` — split-view-komponent: vänster (landsflagga med ProgressiveCover-mosaik, profession-etikett ovan, namn avslöjas vid `isRevealed`), höger (3 numrerade ledtrådar med staggerad reveal vid 2/9T / 4/9T / 2/3T av svarstiden). `hints` prop är optional — items utan data visar "—" placeholders.
+
+**`PersonHints`-schema:**
+```ts
+{ nationality: string; birthDate?: string; birthCity?: string;
+  mainProfession: string; bibliography: HintBibEntry[] }
+// HintBibEntry = work(title,year) | club(name,from,to?) | national(caps)
+```
+
+**30 liveitems i HINTS_DATA**: michael-jackson, madonna, elvis-presley, beyonce, avicii, adele, rihanna, zara-larsson, whitney-houston, eminem (Artists) + marilyn-monroe, tom-hanks, audrey-hepburn, marlon-brando, charlie-chaplin, arnold-schwarzenegger, julia-roberts, leonardo-dicaprio, tom-cruise, meryl-streep (Actors) + michael-jordan, pele, diego-maradona, muhammad-ali, zlatan-ibrahimovic, cristiano-ronaldo, lionel-messi, serena-williams, usain-bolt, roger-federer (Athletes).
+
+**quiz.tsx-integration:**
+- `ImageQuestion` interface fick `hints?: PersonHints` + `profession?: string`.
+- `IMAGE_SEED_QUESTIONS` berikas vid konvertering: `hints: HINTS_DATA[q.id]`, `profession: professionFromSubject(q.contentSubject)`.
+- `imagePool` = `imagePoolPreCategory` (alla items); de 30 med hints-data visar HintsQuizCard, övriga visar "—" placeholders tills Wikidata-script körs.
+- Rendering: `question.type === 'image'` → alltid `<HintsQuizCard>` (gammal SketchCanvas/NameRevealCard-struktur borttagen).
+- **Era-filter-fix**: person-items (artist/band/actor/athlete) utan `peakFrom/peakTo` är era-agnostiska — `correctYear` = födelseår, inte eventår. Förhindrar att t.ex. Michael Jackson (f.1958) filtreras bort av era 1980+.
+- Fallback: om YouTube av + imagePool tom → person-fallback utan era-filter (INTE SEED_QUESTIONS).
+
+**Pre-baked fråga-data** ([src/utils/quizImageQuestions.ts](src/utils/quizImageQuestions.ts)): auto-genererad av `cd backend && npm run export-image-questions`. Exporterar `IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[]`.
+
+**Svarsmetod** (oförändrad): `<ImageAnswerBlock>` — Letter Grid → Final Selection. Reveal-feedback SKIPPAS för image-frågor; Correct/Wrong-badges i ImageAnswerBlock kommunicerar resultatet direkt. `isRevealed` skickas INTE till ProgressiveCover — mosaiken fortsätter sin naturliga reveal-takt.
+
+**Demo**: `app/guess-who-demo.tsx` (route `/guess-who-demo`) — Hints-preview med person-picker, assistance, svarstid, Replay + Reveal. `app/sketch-demo.tsx` redirectar hit. Länk i Home-footern: "Hints demo".
+
+**Nästa steg för Hints-data**: `backend/scripts/fetch-hints-data.ts` (ej skrivet) — Wikidata P569/P19/P27/P54/P1350-hämtning för att populera HINTS_DATA för alla ~800 catalog-items automatiskt.
 
 **Bild-kvalitet (MVP-fakta)**: höjt tak från 1280×720 → 1920×1080 (Q85 oförändrat) gav märkbar förbättring bara för källor med >1280px upplösning (Stockholm 1631×1080 / London 1620×1080 / Berlin 1620×1080 / Madonna 675×1080 / Messi 808×1080 etc.). Wikipedia pageimage för Astrid (402×570), Cristiano (566×650), Zlatan (332×480) och Björn Borg (622×934) är källbegränsade — för bättre kvalitet på dessa krävs explicit Commons-URL via `wikimedia-process <id> <url>`. **Aktuell pool-orientering** (mätt med `npm run measure-images`): 14 av 17 bilder är porträtt (AR 0.60–0.87, alla personer + Paris), 3 är landscape (AR 1.50, städer Berlin/London/Stockholm). MediaCard är `aspectRatio: 16/9 + resizeMode='contain'` — container-storleken matchar timeline-frågors media-area för konsistent layout mellan fråge-typer, inget klipps. Porträtt-bilder får dock signifikant letterbox vänster+höger (~60% av container-bredden) eftersom 16:9 är wider än portrait-AR; om det blir för "fattig" UX kan container framtidsbytas till en portrait-vänligare form (4:5 eller 1:1) på bekostnad av högre container.
 
@@ -978,7 +995,7 @@ PIVOT 2026-05-29: fristående "Guess Who"-fråge-koncept — en stiliserad **AI-
 
 **Skalnings-fabrik** (3 steg): (1) **Fact-checking** = Workflow `doodle-brief-factcheck` (fan-ar ut författar+gransknings-agent per namn → schema-validerade briefs; OBS StructuredOutput-compliance flaky 2026-05-29 — kan behöva retry/fix). (2) **Batch best-of-N** = `npm run doodle-batch -- --ids a,b,c | --all [--variants 3]` → N parallella Flux-pass → temp i `backend/output/doodle/review/` + HTML contact-sheet → `--approve <id> <v>` → assets → `npm run sync-quiz-sketches`. Bygger på exporterad `renderDoodleWebp` (render-only). (3) **Per-namn-workflow** (manuell): `npm run doodle-generate -- --id <id> --suffix nN` ×3-4 → Read → plocka → cp kanonisk. `--control <path>` finns för canny-recolor men parkerad (tappar likhet + ©-risk).
 
-**Frontend-prototyp**: route `/guess-who-demo` ([app/guess-who-demo.tsx](app/guess-who-demo.tsx)) + [GuessWhoSplitView.tsx](src/components/GuessWhoSplitView.tsx) (vänster vit canvas: doodle wipe-reveal; höger mörk: blå Q med 4 ledtrådar progressivt, alla framme vid 2/3 av T). Demo-data [src/utils/guessWhoDemo.ts](src/utils/guessWhoDemo.ts). Länk i Home-footern.
+**Frontend-prototyp**: [GuessWhoSplitView.tsx](src/components/GuessWhoSplitView.tsx) + [src/utils/guessWhoDemo.ts](src/utils/guessWhoDemo.ts) finns kvar som referens. **OBS**: route `/guess-who-demo` är numera Hints-demo (se "Hints questions" ovan) — GuessWhoSplitView är inte längre wired till demo eller live-quiz.
 
 ## Spotify DJ-läge (2026-06-04)
 

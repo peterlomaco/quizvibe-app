@@ -1,12 +1,9 @@
-// Standalone preview-route för "Guess Who" split-view-prototypen.
-// Temporär dev-skärm — nås via "Guess Who demo"-länk i Home-footern. Låter oss
-// se + tweaka split-reveal:en (doodle vänster + progressiva ledtrådar i Q:t
-// höger) utan att spela igenom en hel quiz. Inte wired till live-quiz ännu.
+// Hints demo — preview-route för HintsQuizCard (flagga + progressiva ledtrådar).
+// Nås via "Hints demo"-länk i Home-footern.
 
-import { GuessWhoSplitView } from '@/src/components/GuessWhoSplitView';
+import { HintsQuizCard } from '@/src/components/HintsQuizCard';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '@/src/theme';
-import { findGuessWhoDemo, GENERIC_CLUES } from '@/src/utils/guessWhoDemo';
-import { getQuizSketch, QUIZ_SKETCHES } from '@/src/utils/quizSketches';
+import { HINTS_DATA } from '@/src/utils/hintsData';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
@@ -20,21 +17,35 @@ import {
 
 type Assistance = 'minimal' | 'standard' | 'full';
 
-const SKETCH_KEYS = Object.keys(QUIZ_SKETCHES);
 const ASSIST_OPTIONS: Assistance[] = ['full', 'standard', 'minimal'];
 const TIME_OPTIONS = [15, 30, 45, 60];
 
-export default function GuessWhoDemoScreen() {
-  const [sketchKey, setSketchKey] = useState(SKETCH_KEYS[0] ?? '');
+interface DemoItem {
+  id: string;
+  label: string;
+  displayName: string;
+  profession: string;
+}
+
+const DEMO_ITEMS: DemoItem[] = [
+  { id: 'zlatan-ibrahimovic',  label: 'Zlatan',       displayName: 'Zlatan Ibrahimovic',  profession: 'Athlete' },
+  { id: 'cristiano-ronaldo',   label: 'Ronaldo',      displayName: 'Cristiano Ronaldo',   profession: 'Athlete' },
+  { id: 'lionel-messi',        label: 'Messi',        displayName: 'Lionel Messi',        profession: 'Athlete' },
+  { id: 'zara-larsson',        label: 'Zara Larsson', displayName: 'Zara Larsson',        profession: 'Artist'  },
+  { id: 'avicii',              label: 'Avicii',       displayName: 'Avicii',              profession: 'Artist'  },
+  { id: 'beyonce',             label: 'Beyoncé',      displayName: 'Beyoncé',             profession: 'Artist'  },
+  { id: 'tom-hanks',           label: 'Tom Hanks',    displayName: 'Tom Hanks',           profession: 'Actor'   },
+].filter((d) => !!HINTS_DATA[d.id]);
+
+export default function HintsDemoScreen() {
+  const [selected, setSelected] = useState<DemoItem>(DEMO_ITEMS[0]);
   const [assistance, setAssistance] = useState<Assistance>('standard');
   const [seconds, setSeconds] = useState(30);
   const [revealed, setRevealed] = useState(false);
   const [run, setRun] = useState(0);
 
-  const resetKey = `${sketchKey}-${assistance}-${seconds}-${run}`;
-  const source = getQuizSketch(sketchKey);
-  const demo = findGuessWhoDemo(sketchKey);
-  const clues = demo?.clues ?? GENERIC_CLUES;
+  const resetKey = `${selected.id}-${assistance}-${seconds}-${run}`;
+  const hints = HINTS_DATA[selected.id]!;
 
   const restart = () => {
     setRevealed(false);
@@ -47,54 +58,51 @@ export default function GuessWhoDemoScreen() {
         <Pressable onPress={() => router.replace('/')} hitSlop={8}>
           <Text style={styles.back}>← Back</Text>
         </Pressable>
-        <Text style={styles.title}>Guess Who preview</Text>
+        <Text style={styles.title}>Hints preview</Text>
         <View style={styles.topSpacer} />
       </View>
 
-      <ScrollView contentContainerStyle={styles.scroll}>
+      <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
+        {/* Hints card preview */}
         <View style={styles.card}>
-          <GuessWhoSplitView
+          <HintsQuizCard
             key={resetKey}
-            source={source}
-            clues={clues}
+            profession={selected.profession}
+            hints={hints}
+            displayName={selected.displayName}
             resetKey={resetKey}
-            assistance={assistance}
             totalSeconds={seconds}
+            assistance={assistance}
+            playerBirthYear={1990}
             isRevealed={revealed}
           />
         </View>
 
-        <Text style={styles.answerHint}>
-          Answer: {demo?.displayName ?? '(no preset for this sketch)'}
-        </Text>
         <Text style={styles.hint}>
-          Doodeln ritas fram på {assistance}-tempo; ledtrådarna 1–4 är alla framme
-          vid 2/3 av svarstiden ({Math.round((seconds * 2) / 3)}s vid {seconds}s).
+          Ledtrådarna 1–3 är alla framme vid 2/3 av svarstiden ({Math.round((seconds * 2) / 3)}s vid {seconds}s).
+          {'\n'}Mosaiken på flaggan försvinner på {assistance}-tempo.
         </Text>
 
-        <Section label="Doodle (sketch asset)">
-          {SKETCH_KEYS.map((k) => (
+        <Section label="Person">
+          {DEMO_ITEMS.map((d) => (
             <Chip
-              key={k}
-              label={k}
-              active={k === sketchKey}
-              onPress={() => {
-                setSketchKey(k);
-                restart();
-              }}
+              key={d.id}
+              label={d.label}
+              active={d.id === selected.id}
+              onPress={() => { setSelected(d); restart(); }}
             />
           ))}
         </Section>
 
-        <Section label="Assistance (draw speed)">
+        <Section label="Assistance">
           {ASSIST_OPTIONS.map((a) => (
-            <Chip key={a} label={a} active={a === assistance} onPress={() => setAssistance(a)} />
+            <Chip key={a} label={a} active={a === assistance} onPress={() => { setAssistance(a); restart(); }} />
           ))}
         </Section>
 
-        <Section label="Response time">
+        <Section label="Svarstid">
           {TIME_OPTIONS.map((t) => (
-            <Chip key={t} label={`${t}s`} active={t === seconds} onPress={() => setSeconds(t)} />
+            <Chip key={t} label={`${t}s`} active={t === seconds} onPress={() => { setSeconds(t); restart(); }} />
           ))}
         </Section>
 
@@ -125,20 +133,9 @@ function Section({ label, children }: { label: string; children: React.ReactNode
   );
 }
 
-function Chip({
-  label,
-  active,
-  onPress,
-}: {
-  label: string;
-  active: boolean;
-  onPress: () => void;
-}) {
+function Chip({ label, active, onPress }: { label: string; active: boolean; onPress: () => void }) {
   return (
-    <Pressable
-      onPress={onPress}
-      style={[styles.chip, active ? styles.chipActive : styles.chipInactive]}
-    >
+    <Pressable onPress={onPress} style={[styles.chip, active ? styles.chipActive : styles.chipInactive]}>
       <Text style={active ? styles.chipTextActive : styles.chipTextInactive}>{label}</Text>
     </Pressable>
   );
@@ -161,18 +158,11 @@ const styles = StyleSheet.create({
   scroll: { padding: Spacing.lg, gap: Spacing.lg },
   card: {
     width: '100%',
-    aspectRatio: 16 / 10,
-    backgroundColor: Colors.background,
     borderRadius: Radius.md,
     borderWidth: 1,
     borderColor: Colors.borderStrong,
     overflow: 'hidden',
-  },
-  answerHint: {
-    color: Colors.textPrimary,
-    fontSize: FontSize.sm,
-    fontWeight: FontWeight.bold,
-    textAlign: 'center',
+    backgroundColor: Colors.background,
   },
   hint: {
     color: Colors.textSecondary,
@@ -189,25 +179,13 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.sm },
-  chip: {
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.sm,
-    borderRadius: Radius.sm,
-    borderWidth: 1,
-  },
+  chip: { paddingHorizontal: Spacing.md, paddingVertical: Spacing.sm, borderRadius: Radius.sm, borderWidth: 1 },
   chipActive: { borderColor: Colors.primary, backgroundColor: Colors.primaryMuted },
   chipInactive: { borderColor: Colors.borderStrong, backgroundColor: 'transparent' },
   chipTextActive: { color: Colors.primary, fontWeight: FontWeight.bold, fontSize: FontSize.sm },
   chipTextInactive: { color: Colors.textSecondary, fontSize: FontSize.sm },
   actionRow: { flexDirection: 'row', gap: Spacing.sm, marginTop: Spacing.sm },
-  actionBtn: {
-    flex: 1,
-    height: 52,
-    borderRadius: Radius.md,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-  },
+  actionBtn: { flex: 1, height: 52, borderRadius: Radius.md, alignItems: 'center', justifyContent: 'center', borderWidth: 1 },
   replayBtn: { borderColor: Colors.primary, backgroundColor: Colors.cardElevated },
   replayText: { color: Colors.textPrimary, fontSize: FontSize.md, fontWeight: '600' },
   revealOff: { borderColor: Colors.borderStrong, backgroundColor: 'transparent' },

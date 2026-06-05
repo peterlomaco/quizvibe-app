@@ -22,6 +22,7 @@ import {
 import Svg, { Circle, Path } from 'react-native-svg';
 import { Avatar } from '../components/Avatar';
 import { YouTubeBrandIcon } from '../components/YouTubeBrandIcon';
+import { SpotifyBrandIcon } from '../components/SpotifyBrandIcon';
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { EraMarkerMinus, EraMarkerPlus } from '../components/EraSliderMarker';
@@ -60,6 +61,8 @@ import {
     type ProfileData,
     type Region,
 } from '../utils/profileStorage';
+import { connectSpotify, disconnectSpotify } from '../lib/spotify';
+import { getSpotifyConnectionStatus, type SpotifyConnectionStatus } from '../utils/spotifyDJ';
 import { hasPremiumSubscription } from '../utils/subscriptionStorage';
 import {
     defaultEnabledMainCategories,
@@ -83,7 +86,7 @@ const CATEGORIES: AvatarCategory[] = ['All', 'Basic', 'Retro', 'Music', 'Tech', 
 
 // ─── Birth year options (descending, newest first) ────────────────────────────
 const CURRENT_YEAR = new Date().getFullYear();
-const MIN_BIRTH_YEAR = 1930;
+const MIN_BIRTH_YEAR = 1950;
 // 15+ minimum age requirement (2026-06-01: höjt från 13+ pga 15+-gränsat
 // film-/innehåll i appen, utöver App Store / GDPR). Dynamisk så minimum-året
 // följer current year — 2026: max 2011, 2027: max 2012, osv.
@@ -293,9 +296,12 @@ export default function ProfileScreen() {
   // (Premium-gated) får 20. Vid byte av gameMode clampas värdet automatiskt
   // ner om det skulle hamna utanför nya max:t.
   const [roundsCount, setRoundsCount] = useState<number>(ROUNDS_DEFAULT);
-  // 20 rundor är en subscription-perk OBEROENDE av läge: Premium → 20, annars
-  // 4. (IndDev är nu gratis att välja; caps gatas separat på Premium.)
-  const roundsMax = hasPremium ? ROUNDS_MAX_INDIV : ROUNDS_MAX_PASS;
+  // 20 rundor kräver Premium OCH Individual Devices — speglar Lobby-logiken
+  // exakt. PtP och Single Player är alltid max 4 oavsett subscription.
+  const roundsMax =
+    hasPremium && gameMode === 'individual-devices' && !singlePlayerDefault
+      ? ROUNDS_MAX_INDIV
+      : ROUNDS_MAX_PASS;
   // Premium → auto-välj Max 12 och lås (Max 4 utgråas).
   // Ej premium → tvinga tillbaka till Max 4.
   useEffect(() => {
@@ -446,35 +452,44 @@ export default function ProfileScreen() {
     youtubeEnabledCategories.includes('Sport') && imagesEnabledCategories.includes('Sport');
   const sourcesAllEnabled = artistsAllOn && actorsAllOn && athletesAllOn;
   const enabledSourceColumnsCount = [artistsEnabled, actorsEnabled, athletesEnabled].filter(Boolean).length;
+  // Alias som matchar Lobby-namngivningen (används i porterade handlers).
+  const enabledColumnsCount = enabledSourceColumnsCount;
+
+  // ── Spotify-state ────────────────────────────────────────────────────
+  const [spotifyEnabled, setSpotifyEnabled] = useState(false);
+  const [spotifyConnected, setSpotifyConnected] = useState(false);
+  const [spotifyDisplayName, setSpotifyDisplayName] = useState<string | null>(null);
+  const [spotifyConnecting, setSpotifyConnecting] = useState(false);
+  // I Profile: Spotify är tillgängligt om kontot är kopplat (ingen IndDev-krav).
+  const isSpotifyAvailable = spotifyConnected;
+
   const [smColWidth, setSmColWidth] = useState(0);
   const smCellStyle = smColWidth > 0 ? { width: smColWidth } : undefined;
 
-  // En-vägs auto-sync (initial load): säkerställ att Images Film/Sport är PÅ
-  // om YT Film/Sport är PÅ.
-  useEffect(() => {
-    setImagesEnabledCategories((prev) => {
-      let next = [...prev];
-      if (youtubeEnabledCategories.includes('Film') && !next.includes('Film'))
-        next = [...next, 'Film' as MainCategory];
-      if (youtubeEnabledCategories.includes('Sport') && !next.includes('Sport'))
-        next = [...next, 'Sport' as MainCategory];
-      if (next.length === prev.length && next.every((c) => prev.includes(c))) return prev;
-      return next as MainCategory[];
-    });
-  }, [youtubeEnabledCategories]);
+  // YouTube och Hints är OBEROENDE — ingen auto-sync mellan källorna.
 
   const handleToggleAllSources = (value: boolean) => {
-    if (!value) {
+    if (!value && !spotifyEnabled) {
       Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
       return;
     }
-    setYoutubeEnabledCategories(['Music', 'Film', 'Sport']);
-    setImagesEnabledCategories(['Music', 'Film', 'Sport']);
+    setYoutubeEnabledCategories(value ? ['Music', 'Film', 'Sport'] : []);
+    setImagesEnabledCategories(value ? ['Music', 'Film', 'Sport'] : []);
+    if (value && spotifyConnected) setSpotifyEnabled(true);
   };
+
   const handleToggleArtistsColumn = (value: boolean) => {
-    if (!value && enabledSourceColumnsCount <= 1) {
-      Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
-      return;
+    if (!value && !spotifyEnabled) {
+      const remainingActorsAthletes = [
+        youtubeEnabledCategories.includes('Film'),
+        youtubeEnabledCategories.includes('Sport'),
+        imagesEnabledCategories.includes('Film'),
+        imagesEnabledCategories.includes('Sport'),
+      ].filter(Boolean).length;
+      if (remainingActorsAthletes < 2) {
+        Alert.alert('Not applicable', 'Enable at least 2 Actors/Athletes combinations before turning off Artists, or keep Spotify active.');
+        return;
+      }
     }
     setYoutubeEnabledCategories((prev) =>
       value ? ([...new Set([...prev, 'Music'])] as MainCategory[]) : prev.filter((c) => c !== 'Music'),
@@ -483,10 +498,15 @@ export default function ProfileScreen() {
       value ? ([...new Set([...prev, 'Music'])] as MainCategory[]) : prev.filter((c) => c !== 'Music'),
     );
   };
+
   const handleToggleActorsColumn = (value: boolean) => {
-    if (!value && enabledSourceColumnsCount <= 1) {
-      Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
-      return;
+    if (!value && !spotifyEnabled) {
+      const artistsActive = youtubeEnabledCategories.includes('Music') || imagesEnabledCategories.includes('Music');
+      if (!artistsActive) {
+        const remaining = [youtubeEnabledCategories.includes('Sport'), imagesEnabledCategories.includes('Sport')].filter(Boolean).length;
+        if (remaining < 2) { Alert.alert('Not applicable', 'At least 2 Actors/Athletes source combinations must remain active — or enable Artists or Spotify.'); return; }
+      }
+      if (enabledColumnsCount <= 1) { Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.'); return; }
     }
     setYoutubeEnabledCategories((prev) =>
       value ? ([...new Set([...prev, 'Film'])] as MainCategory[]) : prev.filter((c) => c !== 'Film'),
@@ -495,10 +515,15 @@ export default function ProfileScreen() {
       value ? ([...new Set([...prev, 'Film'])] as MainCategory[]) : prev.filter((c) => c !== 'Film'),
     );
   };
+
   const handleToggleAthletesColumn = (value: boolean) => {
-    if (!value && enabledSourceColumnsCount <= 1) {
-      Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
-      return;
+    if (!value && !spotifyEnabled) {
+      const artistsActive = youtubeEnabledCategories.includes('Music') || imagesEnabledCategories.includes('Music');
+      if (!artistsActive) {
+        const remaining = [youtubeEnabledCategories.includes('Film'), imagesEnabledCategories.includes('Film')].filter(Boolean).length;
+        if (remaining < 2) { Alert.alert('Not applicable', 'At least 2 Actors/Athletes source combinations must remain active — or enable Artists or Spotify.'); return; }
+      }
+      if (enabledColumnsCount <= 1) { Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.'); return; }
     }
     setYoutubeEnabledCategories((prev) =>
       value ? ([...new Set([...prev, 'Sport'])] as MainCategory[]) : prev.filter((c) => c !== 'Sport'),
@@ -507,73 +532,151 @@ export default function ProfileScreen() {
       value ? ([...new Set([...prev, 'Sport'])] as MainCategory[]) : prev.filter((c) => c !== 'Sport'),
     );
   };
+
   const handleToggleArtistsYoutube = (value: boolean) => {
-    if (!value && !imagesEnabledCategories.includes('Music') && enabledSourceColumnsCount <= 1) {
-      Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
-      return;
+    if (!value && !spotifyEnabled) {
+      const artistsWouldStillBeActive = imagesEnabledCategories.includes('Music');
+      if (!artistsWouldStillBeActive) {
+        const remainingActorsAthletes = [
+          youtubeEnabledCategories.includes('Film'),
+          youtubeEnabledCategories.includes('Sport'),
+          imagesEnabledCategories.includes('Film'),
+          imagesEnabledCategories.includes('Sport'),
+        ].filter(Boolean).length;
+        if (remainingActorsAthletes < 2) {
+          Alert.alert('Not applicable', 'Enable at least 2 Actors/Athletes combinations before turning off Artists, or keep Spotify active.');
+          return;
+        }
+      }
+      if (enabledColumnsCount <= 1 && !artistsWouldStillBeActive) {
+        Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
+        return;
+      }
     }
     setYoutubeEnabledCategories((prev) =>
       value ? ([...new Set([...prev, 'Music'])] as MainCategory[]) : prev.filter((c) => c !== 'Music'),
     );
   };
-  const handleToggleArtistsImages = (value: boolean) => {
-    if (!value && !youtubeEnabledCategories.includes('Music') && enabledSourceColumnsCount <= 1) {
-      Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
-      return;
+
+  const handleToggleArtistsGuessWho = (value: boolean) => {
+    if (!value && !spotifyEnabled) {
+      const artistsWouldStillBeActive = youtubeEnabledCategories.includes('Music');
+      if (!artistsWouldStillBeActive) {
+        const remainingActorsAthletes = [
+          youtubeEnabledCategories.includes('Film'),
+          youtubeEnabledCategories.includes('Sport'),
+          imagesEnabledCategories.includes('Film'),
+          imagesEnabledCategories.includes('Sport'),
+        ].filter(Boolean).length;
+        if (remainingActorsAthletes < 2) {
+          Alert.alert('Not applicable', 'Enable at least 2 Actors/Athletes combinations before turning off Artists, or keep Spotify active.');
+          return;
+        }
+      }
+      if (enabledColumnsCount <= 1 && !artistsWouldStillBeActive) {
+        Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
+        return;
+      }
     }
     setImagesEnabledCategories((prev) =>
       value ? ([...new Set([...prev, 'Music'])] as MainCategory[]) : prev.filter((c) => c !== 'Music'),
     );
   };
-  // Actors YouTube ON → Images auto-aktiveras. Images OFF → YouTube stängs också.
+
   const handleToggleActorsYoutube = (value: boolean) => {
-    if (!value && !imagesEnabledCategories.includes('Film') && enabledSourceColumnsCount <= 1) {
-      Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
-      return;
+    if (!value && !spotifyEnabled) {
+      const artistsActive = youtubeEnabledCategories.includes('Music') || imagesEnabledCategories.includes('Music');
+      if (!artistsActive) {
+        const remaining = [false, youtubeEnabledCategories.includes('Sport'), imagesEnabledCategories.includes('Film'), imagesEnabledCategories.includes('Sport')].filter(Boolean).length;
+        if (remaining < 2) { Alert.alert('Not applicable', 'At least 2 Actors/Athletes source combinations must remain active — or enable Artists or Spotify.'); return; }
+      }
+      if (enabledColumnsCount <= 1 && !imagesEnabledCategories.includes('Film')) { Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.'); return; }
     }
     setYoutubeEnabledCategories((prev) =>
       value ? ([...new Set([...prev, 'Film'])] as MainCategory[]) : prev.filter((c) => c !== 'Film'),
     );
-    if (value) {
-      setImagesEnabledCategories((prev) => ([...new Set([...prev, 'Film'])] as MainCategory[]));
-    }
   };
-  const handleToggleActorsImages = (value: boolean) => {
-    if (!value) {
-      if (enabledSourceColumnsCount <= 1) {
-        Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
-        return;
+
+  const handleToggleActorsGuessWho = (value: boolean) => {
+    if (!value && !spotifyEnabled) {
+      const artistsActive = youtubeEnabledCategories.includes('Music') || imagesEnabledCategories.includes('Music');
+      if (!artistsActive) {
+        const remaining = [youtubeEnabledCategories.includes('Film'), youtubeEnabledCategories.includes('Sport'), false, imagesEnabledCategories.includes('Sport')].filter(Boolean).length;
+        if (remaining < 2) { Alert.alert('Not applicable', 'At least 2 Actors/Athletes source combinations must remain active — or enable Artists or Spotify.'); return; }
       }
-      setImagesEnabledCategories((prev) => prev.filter((c) => c !== 'Film'));
-      setYoutubeEnabledCategories((prev) => prev.filter((c) => c !== 'Film'));
-    } else {
-      setImagesEnabledCategories((prev) => ([...new Set([...prev, 'Film'])] as MainCategory[]));
+      if (enabledColumnsCount <= 1 && !youtubeEnabledCategories.includes('Film')) { Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.'); return; }
     }
+    setImagesEnabledCategories((prev) =>
+      value ? ([...new Set([...prev, 'Film'])] as MainCategory[]) : prev.filter((c) => c !== 'Film'),
+    );
   };
-  // Athletes YouTube ON → Images auto-aktiveras. Images OFF → YouTube stängs också.
+
   const handleToggleAthletesYoutube = (value: boolean) => {
-    if (!value && !imagesEnabledCategories.includes('Sport') && enabledSourceColumnsCount <= 1) {
-      Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
-      return;
+    if (!value && !spotifyEnabled) {
+      const artistsActive = youtubeEnabledCategories.includes('Music') || imagesEnabledCategories.includes('Music');
+      if (!artistsActive) {
+        const remaining = [youtubeEnabledCategories.includes('Film'), imagesEnabledCategories.includes('Film'), false, imagesEnabledCategories.includes('Sport')].filter(Boolean).length;
+        if (remaining < 2) { Alert.alert('Not applicable', 'At least 2 Actors/Athletes source combinations must remain active — or enable Artists or Spotify.'); return; }
+      }
+      if (enabledColumnsCount <= 1 && !imagesEnabledCategories.includes('Sport')) { Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.'); return; }
     }
     setYoutubeEnabledCategories((prev) =>
       value ? ([...new Set([...prev, 'Sport'])] as MainCategory[]) : prev.filter((c) => c !== 'Sport'),
     );
-    if (value) {
-      setImagesEnabledCategories((prev) => ([...new Set([...prev, 'Sport'])] as MainCategory[]));
+  };
+
+  const handleToggleAthletesGuessWho = (value: boolean) => {
+    if (!value && !spotifyEnabled) {
+      const artistsActive = youtubeEnabledCategories.includes('Music') || imagesEnabledCategories.includes('Music');
+      if (!artistsActive) {
+        const remaining = [youtubeEnabledCategories.includes('Film'), imagesEnabledCategories.includes('Film'), youtubeEnabledCategories.includes('Sport'), false].filter(Boolean).length;
+        if (remaining < 2) { Alert.alert('Not applicable', 'At least 2 Actors/Athletes source combinations must remain active — or enable Artists or Spotify.'); return; }
+      }
+      if (enabledColumnsCount <= 1 && !youtubeEnabledCategories.includes('Sport')) { Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.'); return; }
+    }
+    setImagesEnabledCategories((prev) =>
+      value ? ([...new Set([...prev, 'Sport'])] as MainCategory[]) : prev.filter((c) => c !== 'Sport'),
+    );
+  };
+
+  // ── Spotify DJ-handlers ───────────────────────────────────────────────
+  const handleConnectSpotify = async () => {
+    setSpotifyConnecting(true);
+    const result = await connectSpotify();
+    setSpotifyConnecting(false);
+    if (result.ok) {
+      setSpotifyConnected(true);
+      setSpotifyDisplayName(result.user.displayName);
+      setSpotifyEnabled(true);
     }
   };
-  const handleToggleAthletesImages = (value: boolean) => {
-    if (!value) {
-      if (enabledSourceColumnsCount <= 1) {
-        Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
+
+  const handleDisconnectSpotify = async () => {
+    await disconnectSpotify();
+    setSpotifyConnected(false);
+    setSpotifyDisplayName(null);
+    setSpotifyEnabled(false);
+  };
+
+  const handleToggleSpotifyEnabled = (val: boolean) => {
+    if (!val) {
+      const hasOtherSource = youtubeEnabledCategories.length > 0 || imagesEnabledCategories.length > 0;
+      if (!hasOtherSource) {
+        Alert.alert('No active sources', 'Enable at least one YouTube or Guess Who source before disabling Spotify DJ.');
         return;
       }
-      setImagesEnabledCategories((prev) => prev.filter((c) => c !== 'Sport'));
-      setYoutubeEnabledCategories((prev) => prev.filter((c) => c !== 'Sport'));
+      if (
+        imagesEnabledCategories.length === 0 &&
+        enabledSourceColumnsCount <= 1 &&
+        !youtubeEnabledCategories.includes('Music')
+      ) {
+        Alert.alert('Not applicable', 'Only one source combination is active. Please enable another profession or source before turning this off.');
+        return;
+      }
     } else {
-      setImagesEnabledCategories((prev) => ([...new Set([...prev, 'Sport'])] as MainCategory[]));
+      setImagesEnabledCategories([...youtubeEnabledCategories] as MainCategory[]);
     }
+    setSpotifyEnabled(val);
   };
   // V1 har inga themed packages i PURCHASED_PACKAGES (parkerade till v1.1+
   // per project_launch_scope_v1) och gen-paketen är borttagna 2026-05-27.
@@ -617,7 +720,7 @@ export default function ProfileScreen() {
           // alltid stämmer. wasIncomplete-checken nedan upptäcker att fältet
           // ändrades och persisterar via defensive write.
           region: 'sweden',
-          gameEraFrom: data.gameEraFrom ?? 1981,
+          gameEraFrom: data.gameEraFrom ?? (data.birthYear != null ? Math.max(ERA_MIN, data.birthYear) : 1981),
           gameEraTo: data.gameEraTo ?? ERA_MAX,
           maxPlayers: data.maxPlayers ?? 4,
           gameMode: data.gameMode ?? 'pass-the-phone',
@@ -704,6 +807,7 @@ export default function ProfileScreen() {
         setEnabledHostPackages(augmented.enabledHostPackages ?? PURCHASED_PACKAGES.map((p) => p.id));
         setYoutubeEnabledCategories(augmented.youtubeEnabledCategories ?? defaultEnabledMainCategories());
         setImagesEnabledCategories(augmented.imagesEnabledCategories ?? defaultEnabledMainCategories());
+        setSpotifyEnabled(augmented.spotifyDefaultEnabled ?? false);
         // Snapshot av laddad state — jämförs vid navigation bort.
         savedSnapshotRef.current = JSON.stringify({
           birthYear: augmented.birthYear,
@@ -726,6 +830,22 @@ export default function ProfileScreen() {
       loadFriends().then((list) => {
         if (active) setFriends(list);
       });
+      // Spotify-anslutningsstatus — ladda vid varje focus så profilen alltid
+      // speglar det kopplade Spotify-kontot.
+      supabase.auth.getUser().then(({ data: { user } }) => {
+        if (!user || !active) return;
+        getSpotifyConnectionStatus(user.id).then((status: SpotifyConnectionStatus) => {
+          if (!active) return;
+          const ok = status.connected && status.isPremium;
+          setSpotifyConnected(ok);
+          setSpotifyDisplayName(status.spotifyDisplayName);
+          if (ok) {
+            loadProfile().then((p) => {
+              if (active) setSpotifyEnabled(p?.spotifyDefaultEnabled ?? false);
+            }).catch(() => {});
+          }
+        }).catch(() => {});
+      }).catch(() => {});
       // Subscription-status — speglar Lobby:s hasPremium-source. Load:as på
       // focus så Store-köp (subscription / unsubscribe) reflektar direkt
       // i Profile utan delay.
@@ -793,6 +913,7 @@ export default function ProfileScreen() {
         enabledHostPackages,
         youtubeEnabledCategories,
         imagesEnabledCategories,
+        spotifyDefaultEnabled: spotifyEnabled,
       });
       savedSnapshotRef.current = JSON.stringify({
         birthYear, assistance,
@@ -1342,6 +1463,52 @@ export default function ProfileScreen() {
           {/* Source Dashboard */}
           <View style={styles.field}>
             <Text style={styles.sectionLabel}>SOURCE DASHBOARD</Text>
+            {/* Spotify DJ-rad — alltid synlig, tillgänglig om konto kopplat */}
+            <View style={styles.spotifyDJRow}>
+              <View style={[styles.connectionIconWrap, { alignSelf: 'flex-start', marginTop: 1, marginLeft: -2 }]}>
+                <SpotifyBrandIcon size={22} variant="white" />
+              </View>
+              <View style={{ flex: 1, alignSelf: 'flex-start', marginTop: 6, marginLeft: -8 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                  <Text style={[styles.connectionLabel, { minWidth: 0 }]}>Spotify DJ</Text>
+                  <Pressable
+                    style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
+                    onPress={() => Alert.alert('Spotify DJ', '• Only applicable in Individual Devices mode\n\n• For Spotify music, one player at a time will be directed via QuizVibe to Spotify\n\n• All players in the same lobby must have a registered QuizVibe account with a connected Spotify account')}
+                    hitSlop={8}
+                  >
+                    <Text style={styles.infoIconText}>i</Text>
+                  </Pressable>
+                </View>
+                {spotifyConnected && spotifyDisplayName ? (
+                  <Pressable onPress={handleDisconnectSpotify} hitSlop={8}>
+                    <Text style={[styles.spotifyConnectedLabel, { textDecorationLine: 'underline' }]}>
+                      ✓ {spotifyDisplayName}
+                    </Text>
+                  </Pressable>
+                ) : (
+                  <>
+                    <Text style={styles.spotifyNoConnectionLabel}>Not activated</Text>
+                    <Pressable onPress={handleConnectSpotify} disabled={spotifyConnecting} hitSlop={8}>
+                      <Text style={[styles.spotifyLinkText, { color: '#1DB954', fontSize: FontSize.sm, marginTop: 2 }]}>
+                        {spotifyConnecting ? 'Connecting…' : 'Connect Spotify account'}
+                      </Text>
+                    </Pressable>
+                  </>
+                )}
+              </View>
+              {/* Toggle — disabled när ej kopplat */}
+              <View style={[styles.spotifyHostControls, { marginRight: -16, alignSelf: 'flex-start', marginTop: 1 }]}>
+                <Switch
+                  value={spotifyConnected && spotifyEnabled}
+                  onValueChange={spotifyConnected ? handleToggleSpotifyEnabled : undefined}
+                  disabled={!spotifyConnected}
+                  trackColor={{ false: '#3C3C3C', true: '#1DB954' }}
+                  thumbColor={spotifyConnected ? '#FFF' : '#888'}
+                  ios_backgroundColor={spotifyConnected && spotifyEnabled ? '#1DB954' : '#3C3C3C'}
+                  style={[styles.sourceMatrixSwitch, !spotifyConnected && { opacity: 0.4 }]}
+                />
+              </View>
+            </View>
             <View
               style={styles.smGrid}
               onLayout={(e) => {
@@ -1385,9 +1552,9 @@ export default function ProfileScreen() {
                     </Svg>
                     <Text style={styles.imagesQMark}>?</Text>
                   </View>
-                  <Text style={styles.sourceMatrixSourceText}>Images</Text>
+                  <Text style={styles.sourceMatrixSourceText}>Hints</Text>
                   <Pressable
-                    onPress={() => Alert.alert('Images sources', 'Artists can be toggled independently.\n\nActors & Athletes Images auto-sync with their YouTube toggle.')}
+                    onPress={() => Alert.alert('Hints', 'Person name guessing — currently being prepared. Switches are available for when the feature activates.')}
                     hitSlop={8}
                     style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
                   >
@@ -1409,7 +1576,7 @@ export default function ProfileScreen() {
                 </View>
                 <View style={[styles.smAutoCell, smCellStyle]} />
                 <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
-                  <Switch value={imagesEnabledCategories.includes('Music')} onValueChange={handleToggleArtistsImages} trackColor={{ false: PROFILE_MATRIX_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={imagesEnabledCategories.includes('Music') ? Colors.success : PROFILE_MATRIX_OFF} style={styles.profileSwitch} />
+                  <Switch value={imagesEnabledCategories.includes('Music')} onValueChange={handleToggleArtistsGuessWho} trackColor={{ false: PROFILE_MATRIX_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={imagesEnabledCategories.includes('Music') ? Colors.success : PROFILE_MATRIX_OFF} style={styles.profileSwitch} />
                 </View>
               </View>
 
@@ -1425,10 +1592,10 @@ export default function ProfileScreen() {
                   <Switch value={youtubeEnabledCategories.includes('Film')} onValueChange={handleToggleActorsYoutube} trackColor={{ false: PROFILE_MATRIX_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={youtubeEnabledCategories.includes('Film') ? Colors.success : PROFILE_MATRIX_OFF} style={styles.profileSwitch} />
                 </View>
                 <View style={[styles.smAutoCell, smCellStyle, { paddingRight: 0 }]}>
-                  <Text style={styles.autoSyncLabel}>Auto-sync</Text>
+                  {(!spotifyEnabled && !artistsEnabled && !imagesEnabledCategories.includes('Sport')) && <Text style={styles.autoSyncLabel}>Auto-sync</Text>}
                 </View>
                 <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
-                  <Switch value={imagesEnabledCategories.includes('Film')} onValueChange={handleToggleActorsImages} trackColor={{ false: PROFILE_MATRIX_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={imagesEnabledCategories.includes('Film') ? Colors.success : PROFILE_MATRIX_OFF} style={styles.profileSwitch} />
+                  <Switch value={imagesEnabledCategories.includes('Film')} onValueChange={handleToggleActorsGuessWho} trackColor={{ false: PROFILE_MATRIX_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={imagesEnabledCategories.includes('Film') ? Colors.success : PROFILE_MATRIX_OFF} style={styles.profileSwitch} />
                 </View>
               </View>
 
@@ -1444,14 +1611,15 @@ export default function ProfileScreen() {
                   <Switch value={youtubeEnabledCategories.includes('Sport')} onValueChange={handleToggleAthletesYoutube} trackColor={{ false: PROFILE_MATRIX_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={youtubeEnabledCategories.includes('Sport') ? Colors.success : PROFILE_MATRIX_OFF} style={styles.profileSwitch} />
                 </View>
                 <View style={[styles.smAutoCell, smCellStyle, { paddingRight: 0 }]}>
-                  <Text style={styles.autoSyncLabel}>Auto-sync</Text>
+                  {(!spotifyEnabled && !artistsEnabled && !imagesEnabledCategories.includes('Film')) && <Text style={styles.autoSyncLabel}>Auto-sync</Text>}
                 </View>
                 <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
-                  <Switch value={imagesEnabledCategories.includes('Sport')} onValueChange={handleToggleAthletesImages} trackColor={{ false: PROFILE_MATRIX_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={imagesEnabledCategories.includes('Sport') ? Colors.success : PROFILE_MATRIX_OFF} style={styles.profileSwitch} />
+                  <Switch value={imagesEnabledCategories.includes('Sport')} onValueChange={handleToggleAthletesGuessWho} trackColor={{ false: PROFILE_MATRIX_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={imagesEnabledCategories.includes('Sport') ? Colors.success : PROFILE_MATRIX_OFF} style={styles.profileSwitch} />
                 </View>
               </View>
 
             </View>
+
           </View>
 
           {/* Game era — adjustable år-spann för frågor. */}
@@ -4020,6 +4188,82 @@ const styles = StyleSheet.create({
   },
 
   bottomPad: { height: Spacing.xl },
+
+  // ── Source Dashboard: Spotify DJ-rad ─────────────────────────────────
+  spotifyDJRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    paddingRight: 18,
+    marginBottom: Spacing.xs,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderRadius: Radius.sm,
+    paddingVertical: 6,
+    paddingLeft: Spacing.sm,
+  },
+  spotifyConnectedLabel: {
+    fontSize: FontSize.xs,
+    color: '#1DB954',
+    marginTop: 2,
+  },
+  spotifyNoConnectionLabel: {
+    fontSize: FontSize.xs,
+    color: Colors.textSecondary,
+    marginTop: 2,
+  },
+  spotifyLinkText: {
+    fontSize: FontSize.xs,
+    color: Colors.textSecondary,
+    textDecorationLine: 'underline',
+  },
+  spotifyHostControls: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    marginLeft: 'auto',
+  },
+  spotifyAvailPill: {
+    borderWidth: 1,
+    borderRadius: Radius.sm,
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: 3,
+    minWidth: 72,
+    alignItems: 'center',
+  },
+  spotifyAvailPillOn: {
+    backgroundColor: Colors.primaryMuted,
+    borderColor: Colors.success,
+  },
+  spotifyAvailPillOff: {
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderColor: Colors.border,
+  },
+  spotifyAvailPillText: {
+    fontSize: FontSize.xs,
+    fontWeight: FontWeight.semibold,
+    color: Colors.success,
+    letterSpacing: 0.4,
+    textAlign: 'center',
+  },
+  spotifyAvailPillTextOff: {
+    color: Colors.textSecondary,
+  },
+  connectionIconWrap: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  connectionLabel: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.medium,
+    color: Colors.textPrimary,
+    minWidth: 0,
+  },
+  sourceMatrixSwitch: {
+    transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }],
+  },
 });
 
 const friendsModal = StyleSheet.create({

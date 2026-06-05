@@ -116,6 +116,9 @@ export interface LobbyPlayer extends Player {
   // av LobbyScreen:s useFocusEffect. PlayerRow renderar då greyed-out text +
   // "LEFT THIS GAME LOBBY"-label så övriga i lobby:n ser att spelaren gått.
   hasLeft?: boolean;
+  // True om spelaren har ett kopplat Spotify-konto i QuizVibe.
+  // Laddas från spotify_connections-tabellen via lobby_players.spotify_verified.
+  spotifyConnected?: boolean;
 }
 
 type GameMode = 'pass-the-phone' | 'individual-devices';
@@ -1120,8 +1123,13 @@ export default function LobbyScreen() {
       Promise.all([loadProfile(), getLobbySettings(roomCode)]).then(
         ([profile, stored]) => {
           if (cancelled) return;
+          // Om Spotify är sparad som default i profilen måste lobby starta i
+          // IndDev-läge (Spotify DJ kräver Individual Devices).
           const seedGameMode =
-            stored?.gameMode ?? profile?.gameMode ?? 'pass-the-phone';
+            stored?.gameMode ??
+            (profile?.spotifyDefaultEnabled ? 'individual-devices' : undefined) ??
+            profile?.gameMode ??
+            'pass-the-phone';
           setGameMode(seedGameMode);
           setMaxPlayers(profile?.maxPlayers ?? 4);
           setSinglePlayerDefault(
@@ -1166,21 +1174,27 @@ export default function LobbyScreen() {
             profile?.enabledHostPackages ?? PURCHASED_PACKAGES.map((p) => p.id),
           );
           // YouTube categories — prio: stored > profil > all 3.
+          // Villkor: !== undefined (ej length > 0) så att [] (explicit av) respekteras.
           const seedYtCats =
-            stored?.youtubeEnabledCategories && stored.youtubeEnabledCategories.length > 0
+            stored?.youtubeEnabledCategories !== undefined
               ? stored.youtubeEnabledCategories
-              : profile?.youtubeEnabledCategories && profile.youtubeEnabledCategories.length > 0
+              : profile?.youtubeEnabledCategories !== undefined
                 ? profile.youtubeEnabledCategories
                 : defaultEnabledMainCategories();
           setYoutubeEnabledCategories(seedYtCats);
-          // Images categories — prio: stored > profil > all 3 (incl. mandatory).
+          // Images categories — prio: stored > profil > all 3.
           const seedImgCats =
-            stored?.imagesEnabledCategories && stored.imagesEnabledCategories.length > 0
+            stored?.imagesEnabledCategories !== undefined
               ? stored.imagesEnabledCategories
-              : profile?.imagesEnabledCategories && profile.imagesEnabledCategories.length > 0
+              : profile?.imagesEnabledCategories !== undefined
                 ? profile.imagesEnabledCategories
                 : defaultEnabledMainCategories();
           setImagesEnabledCategories(seedImgCats);
+          // Spotify default — prio: stored > profil. Sätts här så toggeln
+          // är rätt seedat oavsett om Spotify-callbacken hinner före render.
+          if (!stored) {
+            setSpotifyEnabled(profile?.spotifyDefaultEnabled ?? false);
+          }
         },
       );
     }
@@ -1237,7 +1251,12 @@ export default function LobbyScreen() {
         // dem som "to be approved by host" så de ser sig själva i lobbyn
         // direkt — de behöver inte vänta på godkännande för att se rummet.
         // Fallback till en generisk "Guest"-rad om profil saknas.
-        const profile = await loadProfile();
+        const [profile, ownSpotifyStatus] = await Promise.all([
+          loadProfile(),
+          supabase.auth.getUser().then(({ data }) =>
+            data.user ? getSpotifyConnectionStatus(data.user.id) : null,
+          ).catch(() => null),
+        ]);
         const currentYear = new Date().getFullYear();
         const age = profile?.birthYear ? currentYear - profile.birthYear : undefined;
         const assistance = profile?.assistance ?? undefined;
@@ -1275,6 +1294,7 @@ export default function LobbyScreen() {
           // skriver approved=false till DB:n så host:s vy får raden i "To
           // be Approved by Host"-listan och kan välja att approva på nytt.
           approved: false,
+          spotifyConnected: ownSpotifyStatus?.connected ?? false,
         };
         setPlayers((prev) => {
           // Dedupe på id: om syncFromStore-pollen redan har dragit in
@@ -1335,11 +1355,14 @@ export default function LobbyScreen() {
             const ok = status.connected && status.isPremium;
             setSpotifyConnected(ok);
             setSpotifyDisplayName(status.spotifyDisplayName);
-            // Auto-aktivera DJ-toggeln om kontot redan är kopplat —
-            // toggeln återställs till false vid varje Lobby-mount men
-            // anslutningen persisteras i Supabase, så vi aktiverar den
-            // automatiskt när vi ser att kontot är kopplat.
-            if (ok) setSpotifyEnabled(true);
+            // Seed spotifyEnabled från profile:s sparade default (spotifyDefaultEnabled).
+            // Toggeln återställs till false vid varje Lobby-mount, men om user
+            // aktiverat Spotify som default i Profile settings ska det slå igenom här.
+            if (ok) {
+              loadProfile().then((profile) => {
+                if (active) setSpotifyEnabled(profile?.spotifyDefaultEnabled ?? false);
+              });
+            }
           });
         });
       }
@@ -1375,8 +1398,9 @@ export default function LobbyScreen() {
             // få den nuvarande user:s profil-data tilldelad — annars ser det
             // ut som att joinaren är host eftersom HOST-badge:n + ens egen
             // avatar/namn syns på det kortet.
-            const next = hostMode && profile && p.isHost ? mergeProfileIntoHost(p, profile) : p;
+            let next = hostMode && profile && p.isHost ? mergeProfileIntoHost(p, profile) : p;
             if (next.isHost) {
+              next = { ...next, spotifyConnected };
               return next.hasLeft ? { ...next, hasLeft: false } : next;
             }
             const inLeft = leftIds.includes(next.id) || dbLeftIds.has(next.id);
@@ -1606,6 +1630,9 @@ export default function LobbyScreen() {
   const [spotifyConnected, setSpotifyConnected] = useState(false);
   const [spotifyDisplayName, setSpotifyDisplayName] = useState<string | null>(null);
   const [spotifyConnecting, setSpotifyConnecting] = useState(false);
+  // Spotify DJ kräver Individual Devices — DJ lämnar appen till Spotify-appen.
+  // PtP/Single Player stöds inte (en delad enhet kan inte lämna + återvända).
+  const isSpotifyAvailable = gameMode === 'individual-devices' && !singlePlayerDefault;
   // Kollapsbara Lobby-sektioner (samma +/− mönster som Profile-vyn). Default expanderade.
   // Alla (host OCH non-host) kommer in med Game Settings + Quiz Tuning REDAN
   // hopfällda (folded) och Players in Lobby utfälld.
@@ -1657,10 +1684,10 @@ export default function LobbyScreen() {
   // Actors/Athletes: Images följer YouTube automatiskt (Auto).
   // All-master slår på alla kolumner; kolumn-masters slår på/av en kolumn.
 
-  // Kolumn är "aktiv" om minst EN källa (YT eller Images) är på.
+  // Kolumn är "aktiv" om minst EN källa (YT eller Guess Who) är på.
   const artistsEnabled =
     youtubeEnabledCategories.includes('Music') || imagesEnabledCategories.includes('Music');
-  // Artists/All är ON enbart om BÅDA YT och Images är aktiva (AND).
+  // Artists/All är ON enbart om BÅDA YT och Guess Who är aktiva (AND).
   const artistsAllOn =
     youtubeEnabledCategories.includes('Music') && imagesEnabledCategories.includes('Music');
   // Actors/Athletes: kolumn aktiv (OR) om minst en källa är på — används för min-1-guards.
@@ -1668,7 +1695,7 @@ export default function LobbyScreen() {
     youtubeEnabledCategories.includes('Film') || imagesEnabledCategories.includes('Film');
   const athletesEnabled =
     youtubeEnabledCategories.includes('Sport') || imagesEnabledCategories.includes('Sport');
-  // AND-logik: Actors/All och Athletes/All är ON enbart om BÅDA YT och Images är aktiva.
+  // AND-logik: Actors/All och Athletes/All är ON enbart om BÅDA YT och Guess Who är aktiva.
   const actorsAllOn =
     youtubeEnabledCategories.includes('Film') && imagesEnabledCategories.includes('Film');
   const athletesAllOn =
@@ -1680,35 +1707,34 @@ export default function LobbyScreen() {
   const [smColWidth, setSmColWidth] = useState(0);
   const smCellStyle = smColWidth > 0 ? { width: smColWidth } : undefined;
 
-  // En-vägs auto-sync (initial load): säkerställ att Images Film/Sport är PÅ
-  // om YT Film/Sport är PÅ — hanterar stale state från gamla sparade profiler.
-  // OBS: vi tar INTE bort Film/Sport från Images när YT stängs — Images är
-  // oberoende styrbar när YT är av (ny logik 2026-06-03).
-  useEffect(() => {
-    setImagesEnabledCategories((prev) => {
-      let next = [...prev];
-      if (youtubeEnabledCategories.includes('Film') && !next.includes('Film'))
-        next = [...next, 'Film' as MainCategory];
-      if (youtubeEnabledCategories.includes('Sport') && !next.includes('Sport'))
-        next = [...next, 'Sport' as MainCategory];
-      if (next.length === prev.length && next.every((c) => prev.includes(c))) return prev;
-      return next as MainCategory[];
-    });
-  }, [youtubeEnabledCategories]);
+  // YouTube och Hints (imagesEnabledCategories) är oberoende — ingen auto-sync.
 
   const handleToggleAllSources = (value: boolean) => {
-    if (!value) {
+    if (!value && !spotifyEnabled) {
       Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
       return;
     }
-    setYoutubeEnabledCategories(['Music', 'Film', 'Sport']);
-    setImagesEnabledCategories(['Music', 'Film', 'Sport']);
+    setYoutubeEnabledCategories(value ? ['Music', 'Film', 'Sport'] : []);
+    setImagesEnabledCategories(value ? ['Music', 'Film', 'Sport'] : []);
+    // Slå även på Spotify om host har kopplat konto + IndDev är aktivt.
+    if (value && isSpotifyAvailable && spotifyConnected) {
+      setSpotifyEnabled(true);
+    }
   };
 
   const handleToggleArtistsColumn = (value: boolean) => {
-    if (!value && enabledColumnsCount <= 1) {
-      Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
-      return;
+    if (!value && !spotifyEnabled) {
+      // Column-toggle stänger av BÅDA källorna → Artists alltid inaktiv efteråt.
+      const remainingActorsAthletes = [
+        youtubeEnabledCategories.includes('Film'),
+        youtubeEnabledCategories.includes('Sport'),
+        imagesEnabledCategories.includes('Film'),
+        imagesEnabledCategories.includes('Sport'),
+      ].filter(Boolean).length;
+      if (remainingActorsAthletes < 2) {
+        Alert.alert('Not applicable', 'Enable at least 2 Actors/Athletes combinations before turning off Artists, or keep Spotify active.');
+        return;
+      }
     }
     setYoutubeEnabledCategories((prev) =>
       value ? ([...new Set([...prev, 'Music'])] as MainCategory[]) : prev.filter((c) => c !== 'Music'),
@@ -1719,9 +1745,19 @@ export default function LobbyScreen() {
   };
 
   const handleToggleActorsColumn = (value: boolean) => {
-    if (!value && enabledColumnsCount <= 1) {
-      Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
-      return;
+    if (!value && !spotifyEnabled) {
+      const artistsActive = youtubeEnabledCategories.includes('Music') || imagesEnabledCategories.includes('Music');
+      if (!artistsActive) {
+        const remaining = [youtubeEnabledCategories.includes('Sport'), imagesEnabledCategories.includes('Sport')].filter(Boolean).length;
+        if (remaining < 2) {
+          Alert.alert('Not applicable', 'At least 2 Actors/Athletes source combinations must remain active — or enable Artists or Spotify.');
+          return;
+        }
+      }
+      if (enabledColumnsCount <= 1) {
+        Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
+        return;
+      }
     }
     setYoutubeEnabledCategories((prev) =>
       value ? ([...new Set([...prev, 'Film'])] as MainCategory[]) : prev.filter((c) => c !== 'Film'),
@@ -1732,9 +1768,19 @@ export default function LobbyScreen() {
   };
 
   const handleToggleAthletesColumn = (value: boolean) => {
-    if (!value && enabledColumnsCount <= 1) {
-      Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
-      return;
+    if (!value && !spotifyEnabled) {
+      const artistsActive = youtubeEnabledCategories.includes('Music') || imagesEnabledCategories.includes('Music');
+      if (!artistsActive) {
+        const remaining = [youtubeEnabledCategories.includes('Film'), imagesEnabledCategories.includes('Film')].filter(Boolean).length;
+        if (remaining < 2) {
+          Alert.alert('Not applicable', 'At least 2 Actors/Athletes source combinations must remain active — or enable Artists or Spotify.');
+          return;
+        }
+      }
+      if (enabledColumnsCount <= 1) {
+        Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
+        return;
+      }
     }
     setYoutubeEnabledCategories((prev) =>
       value ? ([...new Set([...prev, 'Sport'])] as MainCategory[]) : prev.filter((c) => c !== 'Sport'),
@@ -1743,11 +1789,29 @@ export default function LobbyScreen() {
       value ? ([...new Set([...prev, 'Sport'])] as MainCategory[]) : prev.filter((c) => c !== 'Sport'),
     );
   };
+
+  // YouTube och Hints är OBEROENDE — individuella source-switchar rör bara sin
+  // egen källa. Min-1-guard: blockera bara om VARKEN YouTube NOR Hints är på
+  // för den aktuella kolumnen OCH det är sista aktiva kolumnen.
 
   const handleToggleArtistsYoutube = (value: boolean) => {
-    if (!value) {
-      const artistsWouldHaveImage = imagesEnabledCategories.includes('Music');
-      if (!artistsWouldHaveImage && enabledColumnsCount <= 1) {
+    if (!value && !spotifyEnabled) {
+      // Artists inaktiv efteråt bara om Hints Music OCKSÅ är av.
+      const artistsWouldStillBeActive = imagesEnabledCategories.includes('Music');
+      if (!artistsWouldStillBeActive) {
+        const remainingActorsAthletes = [
+          youtubeEnabledCategories.includes('Film'),
+          youtubeEnabledCategories.includes('Sport'),
+          imagesEnabledCategories.includes('Film'),
+          imagesEnabledCategories.includes('Sport'),
+        ].filter(Boolean).length;
+        if (remainingActorsAthletes < 2) {
+          Alert.alert('Not applicable', 'Enable at least 2 Actors/Athletes combinations before turning off Artists, or keep Spotify active.');
+          return;
+        }
+      }
+      // Befintlig min-1-guard (sista kolumn)
+      if (enabledColumnsCount <= 1 && !artistsWouldStillBeActive) {
         Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
         return;
       }
@@ -1757,10 +1821,23 @@ export default function LobbyScreen() {
     );
   };
 
-  const handleToggleArtistsImages = (value: boolean) => {
-    if (!value) {
-      const artistsWouldHaveYt = youtubeEnabledCategories.includes('Music');
-      if (!artistsWouldHaveYt && enabledColumnsCount <= 1) {
+  const handleToggleArtistsGuessWho = (value: boolean) => {
+    if (!value && !spotifyEnabled) {
+      // Artists inaktiv efteråt bara om YouTube Music OCKSÅ är av.
+      const artistsWouldStillBeActive = youtubeEnabledCategories.includes('Music');
+      if (!artistsWouldStillBeActive) {
+        const remainingActorsAthletes = [
+          youtubeEnabledCategories.includes('Film'),
+          youtubeEnabledCategories.includes('Sport'),
+          imagesEnabledCategories.includes('Film'),
+          imagesEnabledCategories.includes('Sport'),
+        ].filter(Boolean).length;
+        if (remainingActorsAthletes < 2) {
+          Alert.alert('Not applicable', 'Enable at least 2 Actors/Athletes combinations before turning off Artists, or keep Spotify active.');
+          return;
+        }
+      }
+      if (enabledColumnsCount <= 1 && !artistsWouldStillBeActive) {
         Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
         return;
       }
@@ -1770,79 +1847,60 @@ export default function LobbyScreen() {
     );
   };
 
-  // Actors YouTube: aktiverar Images automatiskt när YT slås PÅ (auto-activation).
-  // Om YT slås AV förblir Images oberoende styrbar — stängs INTE automatiskt.
   const handleToggleActorsYoutube = (value: boolean) => {
-    if (!value) {
-      const actorsWouldHaveImages = imagesEnabledCategories.includes('Film');
-      if (!actorsWouldHaveImages && enabledColumnsCount <= 1) {
-        Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
-        return;
+    if (!value && !spotifyEnabled) {
+      const artistsActive = youtubeEnabledCategories.includes('Music') || imagesEnabledCategories.includes('Music');
+      if (!artistsActive) {
+        const remaining = [false, youtubeEnabledCategories.includes('Sport'), imagesEnabledCategories.includes('Film'), imagesEnabledCategories.includes('Sport')].filter(Boolean).length;
+        if (remaining < 2) { Alert.alert('Not applicable', 'At least 2 Actors/Athletes source combinations must remain active — or enable Artists or Spotify.'); return; }
       }
+      if (enabledColumnsCount <= 1 && !imagesEnabledCategories.includes('Film')) { Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.'); return; }
     }
     setYoutubeEnabledCategories((prev) =>
       value ? ([...new Set([...prev, 'Film'])] as MainCategory[]) : prev.filter((c) => c !== 'Film'),
     );
-    if (value) {
-      // Alltid sätt Images Film ON när YT Film aktiveras — ingen conditional
-      // check så att vi garanterat aktiverar oavsett eventuellt stale state.
-      setImagesEnabledCategories((prev) =>
-        ([...new Set([...prev, 'Film'])] as MainCategory[])
-      );
-    }
   };
 
-  // Actors Images OFF → Auto-sync: YouTube stängs också av (hela kolumnen av).
-  // Actors Images ON → enbart Images på (YouTube tvingas inte på).
-  const handleToggleActorsImages = (value: boolean) => {
-    if (!value) {
-      // Images OFF tar med sig YouTube → hela Actors-kolumnen går av.
-      if (enabledColumnsCount <= 1) {
-        Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
-        return;
+  const handleToggleActorsGuessWho = (value: boolean) => {
+    if (!value && !spotifyEnabled) {
+      const artistsActive = youtubeEnabledCategories.includes('Music') || imagesEnabledCategories.includes('Music');
+      if (!artistsActive) {
+        const remaining = [youtubeEnabledCategories.includes('Film'), youtubeEnabledCategories.includes('Sport'), false, imagesEnabledCategories.includes('Sport')].filter(Boolean).length;
+        if (remaining < 2) { Alert.alert('Not applicable', 'At least 2 Actors/Athletes source combinations must remain active — or enable Artists or Spotify.'); return; }
       }
-      setImagesEnabledCategories((prev) => prev.filter((c) => c !== 'Film'));
-      setYoutubeEnabledCategories((prev) => prev.filter((c) => c !== 'Film'));
-    } else {
-      setImagesEnabledCategories((prev) => ([...new Set([...prev, 'Film'])] as MainCategory[]));
+      if (enabledColumnsCount <= 1 && !youtubeEnabledCategories.includes('Film')) { Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.'); return; }
     }
+    setImagesEnabledCategories((prev) =>
+      value ? ([...new Set([...prev, 'Film'])] as MainCategory[]) : prev.filter((c) => c !== 'Film'),
+    );
   };
 
-  // Athletes YouTube: aktiverar Images automatiskt när YT slås PÅ (auto-activation).
-  // Om YT slås AV förblir Images oberoende styrbar.
   const handleToggleAthletesYoutube = (value: boolean) => {
-    if (!value) {
-      const athletesWouldHaveImages = imagesEnabledCategories.includes('Sport');
-      if (!athletesWouldHaveImages && enabledColumnsCount <= 1) {
-        Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
-        return;
+    if (!value && !spotifyEnabled) {
+      const artistsActive = youtubeEnabledCategories.includes('Music') || imagesEnabledCategories.includes('Music');
+      if (!artistsActive) {
+        const remaining = [youtubeEnabledCategories.includes('Film'), imagesEnabledCategories.includes('Film'), false, imagesEnabledCategories.includes('Sport')].filter(Boolean).length;
+        if (remaining < 2) { Alert.alert('Not applicable', 'At least 2 Actors/Athletes source combinations must remain active — or enable Artists or Spotify.'); return; }
       }
+      if (enabledColumnsCount <= 1 && !imagesEnabledCategories.includes('Sport')) { Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.'); return; }
     }
     setYoutubeEnabledCategories((prev) =>
       value ? ([...new Set([...prev, 'Sport'])] as MainCategory[]) : prev.filter((c) => c !== 'Sport'),
     );
-    if (value) {
-      // Alltid sätt Images Sport ON när YT Sport aktiveras — ingen conditional.
-      setImagesEnabledCategories((prev) =>
-        ([...new Set([...prev, 'Sport'])] as MainCategory[])
-      );
-    }
   };
 
-  // Athletes Images OFF → Auto-sync: YouTube stängs också av (hela kolumnen av).
-  // Athletes Images ON → enbart Images på (YouTube tvingas inte på).
-  const handleToggleAthletesImages = (value: boolean) => {
-    if (!value) {
-      // Images OFF tar med sig YouTube → hela Athletes-kolumnen går av.
-      if (enabledColumnsCount <= 1) {
-        Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
-        return;
+  const handleToggleAthletesGuessWho = (value: boolean) => {
+    if (!value && !spotifyEnabled) {
+      const artistsActive = youtubeEnabledCategories.includes('Music') || imagesEnabledCategories.includes('Music');
+      if (!artistsActive) {
+        const remaining = [youtubeEnabledCategories.includes('Film'), imagesEnabledCategories.includes('Film'), youtubeEnabledCategories.includes('Sport'), false].filter(Boolean).length;
+        if (remaining < 2) { Alert.alert('Not applicable', 'At least 2 Actors/Athletes source combinations must remain active — or enable Artists or Spotify.'); return; }
       }
-      setImagesEnabledCategories((prev) => prev.filter((c) => c !== 'Sport'));
-      setYoutubeEnabledCategories((prev) => prev.filter((c) => c !== 'Sport'));
-    } else {
-      setImagesEnabledCategories((prev) => ([...new Set([...prev, 'Sport'])] as MainCategory[]));
+      if (enabledColumnsCount <= 1 && !youtubeEnabledCategories.includes('Sport')) { Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.'); return; }
     }
+    setImagesEnabledCategories((prev) =>
+      value ? ([...new Set([...prev, 'Sport'])] as MainCategory[]) : prev.filter((c) => c !== 'Sport'),
+    );
   };
   // ── Spotify DJ-handlers ───────────────────────────────────────────────
   /**
@@ -1884,13 +1942,69 @@ export default function LobbyScreen() {
         'You need to connect your Spotify Premium account before enabling Spotify DJ mode.',
         [
           { text: 'Cancel', style: 'cancel' },
-          {
-            text: 'Connect Spotify',
-            onPress: handleConnectSpotify,
-          },
+          { text: 'Connect Spotify', onPress: handleConnectSpotify },
         ],
       );
       return;
+    }
+    if (val) {
+      // Kontrollera Spotify-status för approved non-hosts i lobbyn.
+      const approvedNonHosts = players.filter((p) => !p.isHost && !p.hasLeft && p.approved);
+      const withSpotify = approvedNonHosts.filter((p) => p.spotifyConnected);
+      const withoutSpotify = approvedNonHosts.filter((p) => !p.spotifyConnected);
+
+      if (approvedNonHosts.length > 0 && withSpotify.length === 0) {
+        // Check 1: Ingen annan spelare har Spotify kopplat.
+        Alert.alert(
+          'Spotify not applicable',
+          'No other players have Spotify connected. Please ask other players to activate their Spotify account settings.',
+        );
+        return;
+      }
+      if (withoutSpotify.length > 0) {
+        // Check 2: Några approved spelare saknar Spotify — erbjud att flytta dem till waiting.
+        Alert.alert(
+          'Not all players have Spotify',
+          `${withoutSpotify.length} approved player${withoutSpotify.length > 1 ? 's do' : ' does'} not have a Spotify account activated. They will be moved back to "To be approved" status. Proceed anyway?`,
+          [
+            { text: 'Cancel', style: 'cancel' },
+            {
+              text: 'Proceed',
+              onPress: () => {
+                setPlayers((prev) =>
+                  prev.map((p) =>
+                    withoutSpotify.some((w) => w.id === p.id) ? { ...p, approved: false } : p,
+                  ),
+                );
+                setSpotifyEnabled(true);
+              },
+            },
+          ],
+        );
+        return;
+      }
+    }
+    if (!val) {
+      // Samma regel som i handleStartGame: Artists ensamt räcker (som Spotify).
+      // För Actors/Athletes krävs ≥ 2 aktiva kombinationer om varken Spotify
+      // eller Artists är aktiv.
+      const activeNonSpotifyCount = [
+        youtubeEnabledCategories.includes('Music'),
+        youtubeEnabledCategories.includes('Film'),
+        youtubeEnabledCategories.includes('Sport'),
+        imagesEnabledCategories.includes('Music'),
+        imagesEnabledCategories.includes('Film'),
+        imagesEnabledCategories.includes('Sport'),
+      ].filter(Boolean).length;
+      const artistsActiveForSpotify =
+        youtubeEnabledCategories.includes('Music') || imagesEnabledCategories.includes('Music');
+      if (!artistsActiveForSpotify && activeNonSpotifyCount < 2) {
+        Alert.alert(
+          'Not applicable',
+          'Enable at least 2 source combinations, or enable Artists or Spotify — those can be played on their own.',
+        );
+        return;
+      }
     }
     setSpotifyEnabled(val);
   };
@@ -2010,6 +2124,7 @@ export default function LobbyScreen() {
     }
     setSinglePlayerDefault(false);
     setGameMode('pass-the-phone');
+    setSpotifyEnabled(false);
   };
 
   // Single player-val: ejecta ev. non-host-spelare (de kan inte vara med i
@@ -2019,6 +2134,7 @@ export default function LobbyScreen() {
     const ejectables = players.filter((p) => !p.isHost && !p.hasLeft);
     if (ejectables.length === 0) {
       setSinglePlayerDefault(true);
+      setSpotifyEnabled(false);
       return;
     }
     Alert.alert(
@@ -2043,6 +2159,7 @@ export default function LobbyScreen() {
             });
             setPlayers((prev) => prev.filter((p) => p.isHost));
             setSinglePlayerDefault(true);
+            setSpotifyEnabled(false);
           },
         },
       ],
@@ -2132,9 +2249,8 @@ export default function LobbyScreen() {
     !hostMode &&
     !!ownPlayerIdRef.current &&
     players.some((p) => p.id === ownPlayerIdRef.current && !!p.approved);
-  // YouTube aktiv om min 1 kategori vald; Images alltid aktiv (mandatory categories).
   const youtubeEnabled = youtubeEnabledCategories.length > 0;
-  const imagesEnabled = true;
+  // guessWhereEnabled definieras ovan i derived state-blocket (imagesEnabledCategories.length > 0).
   // displayEra speglar realtids-värdet under drag och commitat värde
   // däremellan — så box "1990 – 2020" + youngest-player-warning uppdateras
   // live medan host drar utan att vi behöver toucha lib:ns prop.
@@ -2192,16 +2308,23 @@ export default function LobbyScreen() {
     ]);
   };
   const handleSetApproved = (id: string, approved: boolean) => {
-    // D-vii block: host kan inte approva en spelare med röd connection-
-    // status. Approve toggle:n är redan disabled visuellt i UI:t men vi
-    // validerar även här som belt-and-suspenders (race conditions där
-    // status flippade röd just som host tappade).
     if (approved && lobbyPeerHealth[id] === 'unstable') {
       Alert.alert(
         'Connection unstable',
         'This player has an unstable connection. Wait for it to stabilize before approving them.',
       );
       return;
+    }
+    // Check 3: Spotify är aktiverat och spelaren saknar Spotify-konto.
+    if (approved && spotifyEnabled) {
+      const player = players.find((p) => p.id === id);
+      if (player && !player.spotifyConnected) {
+        Alert.alert(
+          'No Spotify account',
+          'This player does not have a Spotify account activated. Either ask the player to activate their Spotify account settings, or switch off Spotify DJ in Source Dashboard to approve the player.',
+        );
+        return;
+      }
     }
     setPlayers((prev) => prev.map((p) => p.id === id ? { ...p, approved } : p));
   };
@@ -2261,6 +2384,18 @@ export default function LobbyScreen() {
     );
   };
   const handleApproveAll = () => {
+    // Check 4: Spotify är aktiverat och några waiting-spelare saknar Spotify-konto.
+    if (spotifyEnabled) {
+      const waiting = players.filter((p) => !p.isHost && !p.hasLeft && !p.approved && p.hcpComplete);
+      const withoutSpotify = waiting.filter((p) => !p.spotifyConnected);
+      if (withoutSpotify.length > 0) {
+        Alert.alert(
+          'Not all players have Spotify',
+          'Not all players in the lobby have a Spotify account activated. Please ask them to activate their Spotify account settings, or switch off Spotify DJ in Source Dashboard to approve players.',
+        );
+        return;
+      }
+    }
     setPlayers((prev) => prev.map((p) => p.hcpComplete ? { ...p, approved: true } : p));
   };
 
@@ -3147,6 +3282,46 @@ export default function LobbyScreen() {
     // SEED_QUESTIONS (orörda music-items) när båda pools var tomma →
     // bypassade era + category-filter helt → user fick t.ex. Armstrong 1930
     // efter att ha valt Sport-only + 2016-2026. Fångas nu här.
+    // Spotify-only single-player guard: Spotify DJ kräver minst en annan
+    // spelare (DJ + gissare). Om Spotify är enda aktiva källa och host är
+    // ensam (single player eller inga approved non-hosts) är det ej möjligt.
+    const approvedNonHostCount = approvedPlayers.filter((p) => !p.isHost && !p.hasLeft).length;
+
+    // Min-2-regel: minst 2 aktiva val i Source Dashboard (YouTube × profession
+    // eller Hints × profession). Spotify kan spelas ensamt och räknas separat.
+    const activeNonSpotifyCount = [
+      youtubeEnabledCategories.includes('Music'),
+      youtubeEnabledCategories.includes('Film'),
+      youtubeEnabledCategories.includes('Sport'),
+      imagesEnabledCategories.includes('Music'),
+      imagesEnabledCategories.includes('Film'),
+      imagesEnabledCategories.includes('Sport'),
+    ].filter(Boolean).length;
+    // Undantag från min-2: Spotify eller Artists (Music) ensamt räcker.
+    // Min-2 gäller bara om varken Spotify eller Artists är aktiv.
+    const artistsActive =
+      youtubeEnabledCategories.includes('Music') || imagesEnabledCategories.includes('Music');
+    if (!spotifyEnabled && !artistsActive && activeNonSpotifyCount < 2) {
+      Alert.alert(
+        'Too few sources selected',
+        'Enable at least 2 source combinations for Actors/Athletes, or also enable Artists or Spotify — those can be played on their own.',
+      );
+      return;
+    }
+
+    if (
+      spotifyEnabled &&
+      youtubeEnabledCategories.length === 0 &&
+      imagesEnabledCategories.length === 0 &&
+      (singlePlayerDefault || approvedNonHostCount === 0)
+    ) {
+      Alert.alert(
+        'Spotify DJ not applicable',
+        'Spotify DJ mode is not possible for single player. Please approve other players or change source settings.',
+      );
+      return;
+    }
+
     const eraFrom = eraValues[0];
     const eraTo = eraValues[1];
     const ytCatsAll = youtubeEnabledCategories.length === 3;
@@ -3210,6 +3385,15 @@ export default function LobbyScreen() {
     const approvedNonHosts = turnOrder.filter(
       (p) => p.id !== (players.find((pp) => pp.isHost)?.id ?? ''),
     );
+    // Spotify DJ kräver minst en annan spelare — blockera single player.
+    if (spotifyEnabled && (singlePlayerDefault || approvedNonHosts.length === 0)) {
+      Alert.alert(
+        'Spotify DJ not applicable',
+        'Spotify DJ mode requires at least one other player. Please approve other players or disable Spotify DJ in Source Dashboard before starting.',
+      );
+      return;
+    }
+
     if (!singlePlayerDefault && approvedNonHosts.length === 0) {
       Alert.alert(
         'No approved players',
@@ -3781,14 +3965,85 @@ export default function LobbyScreen() {
         <View style={[styles.section, { marginTop: Spacing.sm }]}>
           <Text style={styles.sectionLabel}>SOURCE DASHBOARD</Text>
           <View style={styles.connectionsList}>
-            {/* ── Source × Category Matrix (kolumn-baserad layout) ──────
-                Kolumn-layout garanterar att varje rubrik och dess switchar
-                delar exakt samma horisontella position — radbaserad layout
-                kan ge sub-pixel-offset beroende på innehållsbredd. */}
-            {/* ── Source Dashboard: äkta kolumn-baserad layout ────────────
-                Varje profession (Artists/Actors/Athletes) är en egen
-                flex-kolumn-stack. Rubrik + alla toggles i SAMMA container
-                → garanterat identisk horisontell centrering. */}
+            {/* ── Spotify DJ-läge ─────────────────────────────────────────
+                Alltid synlig. Availability-pillen visar om Spotify DJ
+                stöds i aktuellt game mode (IndDev = grön "Enabled",
+                PtP/Single = grå "Disabled" + toggle utgråad). */}
+            <View style={styles.spotifyDJRow}>
+              <View style={[styles.connectionIconWrap, { alignSelf: 'flex-start', marginTop: 0, marginLeft: -2 }]}>
+                {/* variant="white" — mörk kortbakgrund kräver monokrom vit
+                    per Spotifys brand guidelines (grönt bara på svart/vit bg). */}
+                <SpotifyBrandIcon size={22} variant="white" />
+              </View>
+              <View style={{ flex: 1, alignSelf: 'flex-start', marginTop: 5, marginLeft: -8 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                  <Text style={[styles.connectionLabel, { minWidth: 0 }]}>Spotify DJ</Text>
+                  <Pressable
+                    style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
+                    onPress={() =>
+                      Alert.alert(
+                        'Spotify DJ',
+                        '• Only applicable in Individual Devices mode\n\n• For Spotify music, one player at a time will be directed via QuizVibe to Spotify\n\n• All players in the same lobby must have a registered QuizVibe account with a connected Spotify account',
+                      )
+                    }
+                    hitSlop={8}
+                    accessibilityLabel="Spotify DJ info"
+                  >
+                    <Text style={styles.infoIconText}>i</Text>
+                  </Pressable>
+                </View>
+                {/* Spotify-anslutningsstatus — alltid synlig för host */}
+                {hostMode ? (
+                  spotifyConnected && spotifyDisplayName ? (
+                    <Text style={styles.spotifyConnectedLabel}>✓ {spotifyDisplayName}</Text>
+                  ) : (
+                    <Text style={styles.spotifyNoConnectionLabel}>No connection activated</Text>
+                  )
+                ) : null}
+              </View>
+              {hostMode ? (
+                <View style={[styles.spotifyHostControls, { marginRight: 14, alignSelf: 'flex-start', marginTop: 1, gap: 4 }]}>
+                  {/* Availability-pill: grön "Enabled" i IndDev, grå "Disabled" i PtP/Single */}
+                  <View style={[
+                    styles.spotifyAvailPill,
+                    isSpotifyAvailable
+                      ? styles.spotifyAvailPillOn
+                      : styles.spotifyAvailPillOff,
+                  ]}>
+                    <Text style={[
+                      styles.spotifyAvailPillText,
+                      !isSpotifyAvailable && styles.spotifyAvailPillTextOff,
+                    ]}>
+                      {isSpotifyAvailable ? 'Enabled' : 'Disabled'}
+                    </Text>
+                  </View>
+                  <Switch
+                    value={isSpotifyAvailable && spotifyEnabled}
+                    onValueChange={isSpotifyAvailable ? handleToggleSpotifyEnabled : undefined}
+                    disabled={!isSpotifyAvailable}
+                    trackColor={{ false: '#3C3C3C', true: '#1DB954' }}
+                    thumbColor={isSpotifyAvailable ? '#FFF' : '#888'}
+                    ios_backgroundColor={isSpotifyAvailable && spotifyEnabled ? '#1DB954' : '#3C3C3C'}
+                    style={[
+                      styles.sourceMatrixSwitch,
+                      !isSpotifyAvailable && { opacity: 0.4 },
+                    ]}
+                  />
+                </View>
+              ) : (
+                /* Non-host: read-only pill baserat på faktisk spotifyEnabled-state */
+                <View style={[
+                  styles.youtubeEnabledPill,
+                  !spotifyEnabled && styles.statusPillDisabled,
+                ]}>
+                  <Text style={styles.youtubeEnabledText}>
+                    {spotifyEnabled ? 'Enabled' : 'Disabled'}
+                  </Text>
+                </View>
+              )}
+            </View>
+
+            {/* ── Source × Category Matrix ── */}
             <View
               style={styles.smGrid}
               onLayout={(e) => {
@@ -3833,9 +4088,9 @@ export default function LobbyScreen() {
                     </Svg>
                     <Text style={styles.imagesQMark}>?</Text>
                   </View>
-                  <Text style={styles.sourceMatrixSourceText}>Images</Text>
+                  <Text style={styles.sourceMatrixSourceText}>Hints</Text>
                   <Pressable
-                    onPress={() => Alert.alert('Images sources', 'When YouTube is enabled, Images auto-activates.\n\nWhen YouTube is off, Images can still be enabled independently.')}
+                    onPress={() => Alert.alert('Hints', 'Person name guessing — currently being prepared. Switches are available for when the feature activates.')}
                     hitSlop={8}
                     style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
                   >
@@ -3865,7 +4120,7 @@ export default function LobbyScreen() {
                 </View>
                 <View style={[styles.smAutoCell, smCellStyle]} />
                 <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
-                  <Switch value={imagesEnabledCategories.includes('Music')} onValueChange={handleToggleArtistsImages} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={imagesEnabledCategories.includes('Music') ? Colors.success : MATRIX_SWITCH_OFF} style={styles.sourceMatrixSwitch} />
+                  <Switch value={imagesEnabledCategories.includes('Music')} onValueChange={handleToggleArtistsGuessWho} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={imagesEnabledCategories.includes('Music') ? Colors.success : MATRIX_SWITCH_OFF} style={styles.sourceMatrixSwitch} />
                 </View>
               </View>
 
@@ -3881,10 +4136,10 @@ export default function LobbyScreen() {
                   <Switch value={youtubeEnabledCategories.includes('Film')} onValueChange={handleToggleActorsYoutube} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={youtubeEnabledCategories.includes('Film') ? Colors.success : MATRIX_SWITCH_OFF} style={styles.sourceMatrixSwitch} />
                 </View>
                 <View style={[styles.smAutoCell, smCellStyle]}>
-                  <Text style={styles.autoActivationLabel}>Auto-sync</Text>
+                  {(!spotifyEnabled && !artistsEnabled && !imagesEnabledCategories.includes('Sport')) && <Text style={styles.autoActivationLabel}>Auto-sync</Text>}
                 </View>
                 <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
-                  <Switch value={imagesEnabledCategories.includes('Film')} onValueChange={handleToggleActorsImages} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={imagesEnabledCategories.includes('Film') ? Colors.success : MATRIX_SWITCH_OFF} style={styles.sourceMatrixSwitch} />
+                  <Switch value={imagesEnabledCategories.includes('Film')} onValueChange={handleToggleActorsGuessWho} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={imagesEnabledCategories.includes('Film') ? Colors.success : MATRIX_SWITCH_OFF} style={styles.sourceMatrixSwitch} />
                 </View>
               </View>
 
@@ -3900,73 +4155,13 @@ export default function LobbyScreen() {
                   <Switch value={youtubeEnabledCategories.includes('Sport')} onValueChange={handleToggleAthletesYoutube} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={youtubeEnabledCategories.includes('Sport') ? Colors.success : MATRIX_SWITCH_OFF} style={styles.sourceMatrixSwitch} />
                 </View>
                 <View style={[styles.smAutoCell, smCellStyle]}>
-                  <Text style={styles.autoActivationLabel}>Auto-sync</Text>
+                  {(!spotifyEnabled && !artistsEnabled && !imagesEnabledCategories.includes('Film')) && <Text style={styles.autoActivationLabel}>Auto-sync</Text>}
                 </View>
                 <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
-                  <Switch value={imagesEnabledCategories.includes('Sport')} onValueChange={handleToggleAthletesImages} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={imagesEnabledCategories.includes('Sport') ? Colors.success : MATRIX_SWITCH_OFF} style={styles.sourceMatrixSwitch} />
+                  <Switch value={imagesEnabledCategories.includes('Sport')} onValueChange={handleToggleAthletesGuessWho} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={imagesEnabledCategories.includes('Sport') ? Colors.success : MATRIX_SWITCH_OFF} style={styles.sourceMatrixSwitch} />
                 </View>
               </View>
 
-            </View>
-
-            {/* ── Spotify DJ-läge ────────────────────────────────────────
-                Visas under matrix-griddet som en separat rad (Spotify
-                är ett mode-toggle, inte en per-kategori-källa).
-                Host: Switch + ev. Connect/Disconnect-länk.
-                Non-host: read-only Enabled/Disabled-pill (speglar host). */}
-            <View style={styles.spotifyDJRow}>
-              <View style={styles.connectionIconWrap}>
-                {/* variant="white" — mörk kortbakgrund kräver monokrom vit
-                    per Spotifys brand guidelines (grönt bara på svart/vit bg). */}
-                <SpotifyBrandIcon size={22} variant="white" />
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.connectionLabel}>Spotify DJ</Text>
-                {/* Visar kopplad Spotify-användare om host är inloggad */}
-                {hostMode && spotifyConnected && spotifyDisplayName ? (
-                  <Text style={styles.spotifyConnectedLabel}>
-                    ✓ {spotifyDisplayName}
-                  </Text>
-                ) : null}
-              </View>
-              {hostMode ? (
-                <View style={styles.spotifyHostControls}>
-                  {/* Connect/Disconnect-länk */}
-                  {spotifyEnabled ? (
-                    <Pressable
-                      onPress={spotifyConnected ? handleDisconnectSpotify : handleConnectSpotify}
-                      disabled={spotifyConnecting}
-                      hitSlop={8}
-                    >
-                      <Text style={[
-                        styles.spotifyLinkText,
-                        spotifyConnecting && { opacity: 0.5 },
-                      ]}>
-                        {spotifyConnecting
-                          ? 'Connecting…'
-                          : spotifyConnected ? 'Disconnect' : 'Connect'}
-                      </Text>
-                    </Pressable>
-                  ) : null}
-                  <Switch
-                    value={spotifyEnabled}
-                    onValueChange={handleToggleSpotifyEnabled}
-                    trackColor={{ false: '#3C3C3C', true: '#1DB954' }}
-                    thumbColor="#FFF"
-                    ios_backgroundColor={spotifyEnabled ? '#1DB954' : '#3C3C3C'}
-                  />
-                </View>
-              ) : (
-                /* Non-host: read-only pill */
-                <View style={[
-                  styles.youtubeEnabledPill,
-                  !spotifyEnabled && styles.statusPillDisabled,
-                ]}>
-                  <Text style={styles.youtubeEnabledText}>
-                    {spotifyEnabled ? 'Enabled' : 'Disabled'}
-                  </Text>
-                </View>
-              )}
             </View>
 
             {/* Use Packages — sub-block sist i Game Connections för musikpaket-val.
@@ -4343,6 +4538,7 @@ export default function LobbyScreen() {
                       : lobbyPeerHealth[player.id]
                     : undefined
                 }
+                spotifyConnected={player.spotifyConnected}
               />
             ))}
 
@@ -4396,6 +4592,7 @@ export default function LobbyScreen() {
                           : lobbyPeerHealth[player.id]
                         : undefined
                     }
+                    spotifyConnected={player.spotifyConnected}
                   />
                 ))}
               </View>
@@ -5941,12 +6138,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: Spacing.sm,
     paddingRight: 18,
-    // Lite mer luft ovanför så raden skiljer sig tydligt från matrix-griddet.
-    marginTop: Spacing.xs,
+    marginBottom: Spacing.xs,
+    // Samma box-styling som smAllToggleCell (All-raden).
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderRadius: Radius.sm,
+    paddingVertical: 6,
+    paddingLeft: Spacing.sm,
   },
   spotifyConnectedLabel: {
     fontSize: FontSize.xs,
     color: '#1DB954',            // Spotify Green — bekräftar kopplat konto.
+    marginTop: 2,
+  },
+  spotifyNoConnectionLabel: {
+    fontSize: FontSize.xs,
+    color: Colors.textSecondary,
     marginTop: 2,
   },
   spotifyHostControls: {
@@ -5959,6 +6165,33 @@ const styles = StyleSheet.create({
     fontSize: FontSize.xs,
     color: Colors.textSecondary,
     textDecorationLine: 'underline',
+  },
+  // Availability-pill för Spotify DJ-raden.
+  spotifyAvailPill: {
+    borderWidth: 1,
+    borderRadius: Radius.sm,
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: 3,
+    minWidth: 72,
+    alignItems: 'center',
+  },
+  spotifyAvailPillOn: {
+    backgroundColor: Colors.primaryMuted,
+    borderColor: Colors.success,
+  },
+  spotifyAvailPillOff: {
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderColor: Colors.border,
+  },
+  spotifyAvailPillText: {
+    fontSize: FontSize.xs,
+    fontWeight: FontWeight.semibold,
+    color: Colors.success,
+    letterSpacing: 0.4,
+    textAlign: 'center',
+  },
+  spotifyAvailPillTextOff: {
+    color: Colors.textSecondary,
   },
   // "Profiles"-förälder-rubrik över Images/Sketch-under-togglarna.
   connectionSubHeading: {
@@ -6228,7 +6461,7 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.xs,
   },
   smDataShift: {
-    paddingLeft: 6,
+    paddingLeft: 3,
   },
   smAllToggleShift: {
     paddingLeft: 18,

@@ -119,7 +119,7 @@ const REG_REGION_OPTIONS: { id: RegRegion; label: string }[] = [
 ];
 
 const CURRENT_YEAR = new Date().getFullYear();
-const MIN_BIRTH_YEAR = 1930;
+const MIN_BIRTH_YEAR = 1950;
 // 15+ minimum age requirement (2026-06-01: höjt från 13+ pga 15+-gränsat
 // film-/innehåll i appen, utöver App Store / GDPR). Dynamisk så minimum-året
 // följer current year — 2026: max 2011, 2027: max 2012, osv.
@@ -1899,6 +1899,7 @@ export default function HomeScreen() {
       region: regRegion,
       avatarSource: 'default',
       selectedAvatarId: '',
+      gameEraFrom: regParsedBirthYear,
     };
     await saveProfile(newProfile);
     setProfile(newProfile);
@@ -2130,23 +2131,7 @@ export default function HomeScreen() {
             )}
           </Pressable>
           <Text style={[styles.footerDot, { fontFamily: taglineFont }]}>·</Text>
-          {/* Temporär dev-länk: standalone preview av sketch-rit-animationen. */}
-          <Pressable onPress={() => router.push('/sketch-demo')} hitSlop={8}>
-            {({ pressed }) => (
-              <Text
-                style={[
-                  styles.footerText,
-                  styles.footerLink,
-                  { fontFamily: taglineFont },
-                  pressed && { opacity: 0.6 },
-                ]}
-              >
-                Sketch demo
-              </Text>
-            )}
-          </Pressable>
-          <Text style={[styles.footerDot, { fontFamily: taglineFont }]}>·</Text>
-          {/* Temporär dev-länk: standalone preview av Guess Who split-view-prototypen. */}
+          {/* Temporär dev-länk: Hints-preview (flagga + progressiva ledtrådar). */}
           <Pressable onPress={() => router.push('/guess-who-demo')} hitSlop={8}>
             {({ pressed }) => (
               <Text
@@ -2157,7 +2142,7 @@ export default function HomeScreen() {
                   pressed && { opacity: 0.6 },
                 ]}
               >
-                Guess Who demo
+                Hints demo
               </Text>
             )}
           </Pressable>
