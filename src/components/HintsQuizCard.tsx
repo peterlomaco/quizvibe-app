@@ -175,6 +175,14 @@ export function HintsQuizCard({
   hintsActive = true,
 }: Props) {
   const [revealedCount, setRevealedCount] = useState(0);
+  // Monotont ökande maximum — aldrig minskar inom en frågecykel.
+  // Komponent remountas (key=questionIndex) vid ny fråga så ref resettas automatiskt.
+  // Skyddar mot att hints avmonteras (BulletHint return null) om revealedCount
+  // av någon anledning dippar under ett tidigare värde.
+  const maxRevealedRef = useRef(0);
+  if (revealedCount > maxRevealedRef.current) maxRevealedRef.current = revealedCount;
+  const displayRevealedCount = isRevealed ? hints.length : maxRevealedRef.current;
+
   const scrollRef = useRef<ScrollView>(null);
   const nameAnim  = useRef(new Animated.Value(0)).current;
 
@@ -243,14 +251,14 @@ export function HintsQuizCard({
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          {!hintsActive ? (
+          {!hintsActive && !isRevealed ? (
             <Text style={styles.hintsPlaceholder}>· · ·</Text>
           ) : renderEntries.map((entry, ei) =>
             entry.kind === 'group' ? (
               <ClubGroup
                 key={`g${ei}`}
                 entry={entry}
-                revealedCount={revealedCount}
+                revealedCount={displayRevealedCount}
                 isRevealed={isRevealed}
                 answer={displayName}
               />
@@ -258,7 +266,7 @@ export function HintsQuizCard({
               <BulletHint
                 key={entry.hint.id}
                 entry={entry}
-                revealedCount={revealedCount}
+                revealedCount={displayRevealedCount}
                 isRevealed={isRevealed}
                 answer={displayName}
               />
