@@ -108,11 +108,15 @@ function buildLetterGrid(args: BuildLetterGridArgs): ImagePrefixOption[] {
   } = args;
 
   const correctPrefix = getPrefixForItem(correctItem.displayName, prefixLength);
-  // Ord-count för rätt svar — distraktorprefixer MÅSTE matcha annars filtreras
-  // de bort av ImageAnswerBlock.sortedGrid (word-count-filter) och vi tappar
-  // alternativ (t.ex. "MA" för Madonna filtreras bort när rätt svar är "AN LE").
+  // Ord-count-filter: distraktorprefixer måste matcha correctPrefix ord-count,
+  // annars filtreras de bort av ImageAnswerBlock.sortedGrid.
   const correctWordCount = correctPrefix.split(' ').length;
+  // Första-bokstavs-dedup: ImageAnswerBlock.sortedGrid tillåter MAX EN prefix
+  // per begynnelsebokstav. Vi speglar regeln här så att vi aldrig slösar
+  // ett slot på t.ex. "TH WH" (The Who) när rätt svar är "TH AR" (The Ark)
+  // — båda börjar med "T" och den ena skulle tas bort av klienten.
   const seen = new Set<string>([correctPrefix]);
+  const usedFirstLetters = new Set<string>([correctPrefix.charAt(0)]);
   const distractors: string[] = [];
 
   function pickFromPool(pool: readonly ImageQuizQuestion[]): void {
@@ -121,8 +125,10 @@ function buildLetterGrid(args: BuildLetterGridArgs): ImagePrefixOption[] {
       const prefix = getPrefixForItem(item.displayName, prefixLength);
       if (!prefix) continue;
       if (seen.has(prefix)) continue;
-      if (prefix.split(' ').length !== correctWordCount) continue; // ord-count-filter
+      if (prefix.split(' ').length !== correctWordCount) continue;
+      if (usedFirstLetters.has(prefix.charAt(0))) continue; // dedup per begynnelsebokstav
       seen.add(prefix);
+      usedFirstLetters.add(prefix.charAt(0));
       distractors.push(prefix);
       if (distractors.length >= totalOptions - 1) return;
     }
@@ -133,8 +139,10 @@ function buildLetterGrid(args: BuildLetterGridArgs): ImagePrefixOption[] {
       const prefix = getPrefixForItem(name, prefixLength);
       if (!prefix) continue;
       if (seen.has(prefix)) continue;
-      if (prefix.split(' ').length !== correctWordCount) continue; // ord-count-filter
+      if (prefix.split(' ').length !== correctWordCount) continue;
+      if (usedFirstLetters.has(prefix.charAt(0))) continue; // dedup per begynnelsebokstav
       seen.add(prefix);
+      usedFirstLetters.add(prefix.charAt(0));
       distractors.push(prefix);
       if (distractors.length >= totalOptions - 1) return;
     }
