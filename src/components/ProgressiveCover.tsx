@@ -95,14 +95,19 @@ export function ProgressiveCover({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resetKey]);
 
-  // Reset + start mosaik-timer vid resetKey/assistance-byte. Hela reveal:n
-  // körs över `fraction × totalSeconds` så att t.ex. minimal assistance håller
-  // bilden dold tills 75 % av response time gått, medan full snabbavslöjar.
+  // Reset ENBART vid ny fråga (resetKey-byte) — aldrig pga active/phase-
+  // ändringar, annars nollställs flaggan i awaiting/reveal-fas.
   useEffect(() => {
     setRevealedCount(0);
-    if (isRevealed) return; // hanteras av nästa effect
-    if (!active) return;    // vänta tills hintsActive=true
+    setLogoOpacity(1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resetKey]);
 
+  // Mosaik-timer: startar när active=true, cleanup stoppar intervallet när
+  // active går false — revealedCount rörs INTE (flaggan stannar kvar synlig).
+  useEffect(() => {
+    if (isRevealed) return; // snap-effekten hanterar detta
+    if (!active) return;
     const fraction = ASSISTANCE_REVEAL_FRACTION[assistance] ?? 0.5;
     const revealDurationMs = Math.max(500, totalSeconds * fraction * 1000);
     const ticks = Math.ceil(TOTAL_BLOCKS / BLOCKS_PER_TICK);
@@ -116,15 +121,13 @@ export function ProgressiveCover({
     }, intervalMs);
     return () => clearInterval(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [resetKey, assistance, totalSeconds, active]);
+  }, [resetKey, assistance, totalSeconds, active, isRevealed]);
 
-  // Q-logga: linjär fade från 1 → 0 över 3 sek. Egen timer så fade-tiden
-  // inte hänger på mosaik-speed (på minimal skulle reveal-driven opacity
-  // hänga kvar långt över halva response-time:n).
+  // Q-logga fade: startar när active=true, cleanup stoppar faden —
+  // logoOpacity rörs INTE när active går false (loggan stannar på sin nivå).
   useEffect(() => {
-    setLogoOpacity(1);
     if (isRevealed) return;
-    if (!active) return; // vänta tills hintsActive=true
+    if (!active) return;
     const startTime = Date.now();
     const id = setInterval(() => {
       const elapsed = Date.now() - startTime;
@@ -134,9 +137,9 @@ export function ProgressiveCover({
     }, LOGO_FADE_TICK_MS);
     return () => clearInterval(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [resetKey, active]);
+  }, [resetKey, active, isRevealed]);
 
-  // Snap till alla block borta + logga osynlig vid Confirm.
+  // Snap: alla mosaik-block borta + logga osynlig vid reveal.
   useEffect(() => {
     if (isRevealed) {
       setRevealedCount(TOTAL_BLOCKS);
