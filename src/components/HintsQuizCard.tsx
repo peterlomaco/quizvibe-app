@@ -39,6 +39,8 @@ interface Props {
   assistance: AssistanceLevel;
   playerBirthYear: number;
   isRevealed: boolean;
+  /** Hints börjar visas när true — false under buffer-perioden (media laddar). */
+  hintsActive?: boolean;
 }
 
 // ── Hint-gruppering ─────────────────────────────────────────────────────────
@@ -170,6 +172,7 @@ export function HintsQuizCard({
   assistance,
   playerBirthYear,
   isRevealed,
+  hintsActive = true,
 }: Props) {
   const [revealedCount, setRevealedCount] = useState(0);
   const scrollRef = useRef<ScrollView>(null);
@@ -182,9 +185,11 @@ export function HintsQuizCard({
   );
   const renderEntries = useMemo(() => buildRenderEntries(hints), [hints]);
 
-  // Staggerad reveal — alla synliga vid T/2
+  // Staggerad reveal — alla synliga vid T/2.
+  // Startar INTE förrän hintsActive=true (buffer-period medan media laddar).
   useEffect(() => {
     setRevealedCount(0);
+    if (!hintsActive) return;                           // vänta på timer-start
     if (isRevealed) { setRevealedCount(hints.length); return; }
     if (!hints.length) return;
     const stepMs = (totalSeconds * HINTS_ALL_OUT_FRACTION * 1000) / hints.length;
@@ -193,7 +198,7 @@ export function HintsQuizCard({
     );
     return () => timers.forEach(clearTimeout);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [resetKey, totalSeconds, isRevealed, hints.length]);
+  }, [resetKey, totalSeconds, isRevealed, hints.length, hintsActive]);
 
   // Auto-scroll till senaste hint
   useEffect(() => {
@@ -229,7 +234,9 @@ export function HintsQuizCard({
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          {renderEntries.map((entry, ei) =>
+          {!hintsActive ? (
+            <Text style={styles.hintsPlaceholder}>· · ·</Text>
+          ) : renderEntries.map((entry, ei) =>
             entry.kind === 'group' ? (
               <ClubGroup
                 key={`g${ei}`}
@@ -418,6 +425,14 @@ const styles = StyleSheet.create({
   },
   scroll: { flex: 1 },
   scrollContent: { gap: 0, paddingBottom: 2 },
+  hintsPlaceholder: {
+    flex: 1,
+    textAlign: 'center',
+    color: Colors.textSecondary,
+    fontSize: 22,
+    letterSpacing: 8,
+    marginTop: 24,
+  },
 
   bulletRow: {
     flexDirection: 'row',

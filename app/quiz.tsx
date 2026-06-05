@@ -3685,6 +3685,7 @@ export default function QuizScreen() {
                       : 1990
                   }
                   isRevealed={phase === 'reveal'}
+                  hintsActive={timerActive}
                 />
               </View>
             ) : youtubeError ? (
