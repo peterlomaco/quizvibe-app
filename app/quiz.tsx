@@ -60,7 +60,7 @@ import {
   type ImageQuizQuestion,
 } from '@/src/utils/quizImageQuestions';
 import { buildImageVariant } from '@/src/utils/imageQuestionBuilder';
-import { HINTS_DATA, type PersonHints } from '@/src/utils/hintsData';
+import { HINTS_LIBRARY, getHintRegionScope, type HintLibrary } from '@/src/utils/hintsData';
 import { HintsQuizCard } from '@/src/components/HintsQuizCard';
 // import { getQuizImage } from '@/src/utils/quizImages';
 // ↑ Borttagen 2026-05-27 — text-rendering ersätter foto-rendering. Återintroducera
@@ -145,7 +145,7 @@ interface ImageQuestion {
   source: ImageQuizQuestion;
   /** Hints-data om tillgänglig — aktiverar HintsQuizCard-rendering (flagga + ledtrådar)
    *  istället för legacy foto-rendering (juridiskt parkerad). */
-  hints?: PersonHints;
+  hints?: HintLibrary;
   /** Profession-etikett härledd från contentSubject ('Actor' | 'Artist' | 'Athlete' | 'Band'). */
   profession?: string;
 }
@@ -187,13 +187,15 @@ function professionFromSubject(subject: string | undefined): string {
 
 // Bild-frågor (Letter Grid → Final Selection-svar). category='Image' triggar
 // per-typ-rendering i question-card / mediaCard / answer-block / reveal-block.
-// Items med hints-data i HINTS_DATA får hints + profession attachade vid konvertering.
-const IMAGE_SEED_QUESTIONS: ImageQuestion[] = IMAGE_QUIZ_QUESTIONS.map(
-  (q, i) => ({
+// Items med hints-data i HINTS_LIBRARY får library attachad vid konvertering.
+// 'unknown-region'-items (för svag igenkänning för V1) filtreras bort.
+const IMAGE_SEED_QUESTIONS: ImageQuestion[] = IMAGE_QUIZ_QUESTIONS
+  .filter((q) => getHintRegionScope(q.id) !== 'unknown-region')
+  .map((q, i, arr) => ({
     type: 'image',
     id: q.id,
     questionNumber: i + 1,
-    totalQuestions: IMAGE_QUIZ_QUESTIONS.length,
+    totalQuestions: arr.length,
     category: 'Image',
     mainCategory: subjectToMainCategory(q.contentSubject),
     question: q.questionText,
@@ -202,7 +204,7 @@ const IMAGE_SEED_QUESTIONS: ImageQuestion[] = IMAGE_QUIZ_QUESTIONS.map(
     peakFrom: q.peakFrom,
     peakTo: q.peakTo,
     source: q,
-    hints: HINTS_DATA[q.id],
+    hints: HINTS_LIBRARY[q.id],
     profession: professionFromSubject(q.contentSubject),
   }),
 );
@@ -961,8 +963,8 @@ export default function QuizScreen() {
           ),
         );
     // Hints-pool: alla image-items renderas via HintsQuizCard (flagga + progressiva
-    // ledtrådar). Items med data i HINTS_DATA får faktiska hints; övriga visar
-    // placeholders tills backend-script populerar HINTS_DATA med Wikidata-data.
+    // ledtrådar). Items med data i HINTS_LIBRARY får faktiska hints; övriga visar
+    // placeholders tills backend-script populerar HINTS_LIBRARY med Wikidata-data.
     const isAllImageCats =
       imagesEnabledCategories.length === 3 &&
       imagesEnabledCategories.includes('Music') &&
@@ -3622,21 +3624,22 @@ export default function QuizScreen() {
                 </View>
               )
             ) : isImageQuestion ? (
-              <HintsQuizCard
-                key={questionIndex}
-                profession={question.type === 'image' ? (question.profession ?? 'Person') : 'Person'}
-                hints={question.type === 'image' ? question.hints : undefined}
-                displayName={question.type === 'image' ? question.displayName : ''}
-                resetKey={questionIndex}
-                totalSeconds={responseSeconds}
-                assistance={currentAssistance}
-                playerBirthYear={
-                  turnOrder[currentPlayerIndex]?.age
-                    ? new Date().getFullYear() - turnOrder[currentPlayerIndex].age
-                    : 1990
-                }
-                isRevealed={phase === 'reveal'}
-              />
+              <View style={styles.imageMediaCard}>
+                <HintsQuizCard
+                  key={questionIndex}
+                  library={question.type === 'image' ? question.hints : undefined}
+                  displayName={question.type === 'image' ? question.displayName : ''}
+                  resetKey={questionIndex}
+                  totalSeconds={responseSeconds}
+                  assistance={currentAssistance}
+                  playerBirthYear={
+                    turnOrder[currentPlayerIndex]?.age
+                      ? new Date().getFullYear() - turnOrder[currentPlayerIndex].age
+                      : 1990
+                  }
+                  isRevealed={phase === 'reveal'}
+                />
+              </View>
             ) : youtubeError ? (
               <View style={styles.youtubeErrorCard}>
                 <Text style={styles.youtubeErrorIcon}>⚠</Text>

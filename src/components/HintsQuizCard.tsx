@@ -1,242 +1,82 @@
-// HintsQuizCard — split-view för Hints-frågor (ersätter bildvisning av verkliga personer).
+// HintsQuizCard — redesign v3.
 //
-// Vänster pane (mörk bakgrund):
-//   • Profession-etikett uppe (visas från start)
-//   • Lands-flagga (emoji, fylld container med guldram + vit innerram)
-//   • ProgressiveCover mosaik-overlay på flaggan
-//   • PersonName nere — avslöjas vid isRevealed=true
+// Layout: vänster kolumn (hints) + höger kolumn (flagga + personnamn).
 //
-// Höger pane (kort med avrundade hörn):
-//   • 3 numrerade ledtrådar med staggerad reveal
-//   • Ledtråd 1 (Born + Place of Birth) vid 1/3 × 2/3 × T
-//   • Ledtråd 2 (Main Profession) vid 2/3 × 2/3 × T
-//   • Ledtråd 3 (Bibliography) vid 3/3 × 2/3 × T
+//   Vänster (flex:1): kategori-label + punktlista med hints (hela bredden utom RIGHT_COL_W).
+//   Höger (110px):    övre halvan = flagga med ProgressiveCover + Nationality-chip.
+//                     nedre halvan = personnamn (fade-in vid reveal).
+//
+// Höjd matchar PLAYER_HEIGHT (~220 px) via flex:1 i parent-containern.
+// Inga nummerbadges — enbart •-punkter och ↳ för sub-rader.
+// Konsekutiva 'club'-hints grupperas under "Career History" rubrik; varje klubb = 1 hint.
+// Alla hints synliga vid T/2 (HINTS_ALL_OUT_FRACTION = 0.5).
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Animated,
+  ScrollView,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
-import type { HintBibEntry, PersonHints } from '../utils/hintsData';
+import type { HintItem, HintLibrary } from '../utils/hintsData';
 import { countryToFlagEmoji } from '../utils/hintsData';
+import { selectHints } from '../utils/hintsGenerator';
 import { ProgressiveCover } from './ProgressiveCover';
 
 type AssistanceLevel = 'minimal' | 'standard' | 'full';
 
-// Alla 3 ledtrådar är synliga vid 2/3 av svarstiden.
-const HINTS_ALL_OUT_FRACTION = 2 / 3;
-const HINT_COUNT = 3;
+const HINTS_ALL_OUT_FRACTION = 0.5;
+const MAX_HINTS = 15;
+const RIGHT_COL_W = 110; // px — flagga + namn-kolumn
 
 interface Props {
-  /** Profession-kategori (visas ovanför flaggan). 'Actor' | 'Artist' | 'Athlete' | 'Band' */
-  profession: string;
-  /** Hints-data. Optional — visas som placeholders om saknas (data hämtas via backend-script). */
-  hints?: PersonHints;
+  library?: HintLibrary;
   displayName: string;
   resetKey: string | number;
   totalSeconds: number;
   assistance: AssistanceLevel;
   playerBirthYear: number;
-  /** true = reveal-fas: visa personens namn, snap ProgressiveCover färdig */
   isRevealed: boolean;
 }
 
-export function HintsQuizCard({
-  profession,
-  hints,
-  displayName,
-  resetKey,
-  totalSeconds,
-  assistance,
-  playerBirthYear,
-  isRevealed,
-}: Props) {
-  const [revealedCount, setRevealedCount] = useState(0);
+// ── Hint-gruppering ─────────────────────────────────────────────────────────
 
-  useEffect(() => {
-    setRevealedCount(0);
+type SingleEntry = { kind: 'single'; hint: HintItem; index: number };
+type GroupEntry  = { kind: 'group'; label: string; items: Array<{ hint: HintItem; index: number }> };
+type RenderEntry = SingleEntry | GroupEntry;
 
-    if (isRevealed) {
-      setRevealedCount(HINT_COUNT);
-      return;
+function buildRenderEntries(hints: HintItem[]): RenderEntry[] {
+  const entries: RenderEntry[] = [];
+  let i = 0;
+  while (i < hints.length) {
+    if (hints[i].type === 'club') {
+      const items: GroupEntry['items'] = [];
+      while (i < hints.length && hints[i].type === 'club') {
+        items.push({ hint: hints[i], index: i });
+        i++;
+      }
+      entries.push({ kind: 'group', label: 'Career History', items });
+    } else {
+      entries.push({ kind: 'single', hint: hints[i], index: i });
+      i++;
     }
-
-    // Ledtråd i (1-indexerad) synlig vid i/3 × 2/3 × T
-    const stepMs = (totalSeconds * HINTS_ALL_OUT_FRACTION * 1000) / HINT_COUNT;
-    const timers = Array.from({ length: HINT_COUNT }, (_, i) =>
-      setTimeout(() => setRevealedCount((c) => Math.max(c, i + 1)), stepMs * (i + 1)),
-    );
-
-    return () => timers.forEach(clearTimeout);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [resetKey, totalSeconds, isRevealed]);
-
-  const flag = hints ? countryToFlagEmoji(hints.nationality) : '🏳️';
-
-  // Dela personnamnet vid sista mellanslag för "First Name / Last Name"-split
-  const nameParts = splitDisplayName(displayName);
-
-  return (
-    <View style={styles.container}>
-      {/* ── Vänster pane — flagga ─────────────────────────────────── */}
-      <View style={styles.leftPane}>
-        {/* Profession-etikett (från start) */}
-        <Text style={styles.professionLabel} numberOfLines={1}>{profession}</Text>
-
-        {/* Flagg-container: guldram → vit innerram → flagga + mosaik */}
-        <View style={styles.flagOuter}>
-          <View style={styles.flagInner}>
-            {/* Flagga som stor emoji */}
-            <Text style={styles.flagEmoji}>{flag}</Text>
-
-            {/* Mosaik-overlay */}
-            <ProgressiveCover
-              resetKey={resetKey}
-              profile={{ birthYear: playerBirthYear, assistance }}
-              totalSeconds={totalSeconds}
-              assistance={assistance}
-            />
-          </View>
-        </View>
-
-        {/* Personnamn (avslöjas vid reveal) */}
-        <View style={styles.nameWrap}>
-          {isRevealed ? (
-            nameParts.map((part, i) => (
-              <Text key={i} style={styles.nameText} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
-                {part}
-              </Text>
-            ))
-          ) : (
-            <View style={styles.namePlaceholder} />
-          )}
-        </View>
-      </View>
-
-      {/* ── Höger pane — ledtråds-kort ───────────────────────────── */}
-      <View style={styles.rightPane}>
-        <View style={styles.hintsCard}>
-          <HintRow
-            index={1}
-            revealed={revealedCount >= 1}
-            label="Born"
-            content={hints
-              ? <HintBorn birthDate={hints.birthDate} birthCity={hints.birthCity} />
-              : <Text style={styles.hintValueText}>—</Text>}
-          />
-          <View style={styles.hintDivider} />
-          <HintRow
-            index={2}
-            revealed={revealedCount >= 2}
-            label="Main Profession"
-            content={<Text style={styles.hintValueText}>{hints?.mainProfession ?? '—'}</Text>}
-          />
-          <View style={styles.hintDivider} />
-          <HintRow
-            index={3}
-            revealed={revealedCount >= 3}
-            label="Bibliography"
-            content={hints
-              ? <HintBibliography entries={hints.bibliography} />
-              : <Text style={styles.hintValueText}>—</Text>}
-          />
-        </View>
-      </View>
-    </View>
-  );
+  }
+  return entries;
 }
 
-// ── Hjälpkomponenter ────────────────────────────────────────────────────────
-
-function HintRow({
-  index,
-  revealed,
-  label,
-  content,
-}: {
-  index: number;
-  revealed: boolean;
-  label: string;
-  content: React.ReactNode;
-}) {
-  const anim = useRef(new Animated.Value(0)).current;
-  useEffect(() => {
-    Animated.timing(anim, {
-      toValue: revealed ? 1 : 0,
-      duration: 350,
-      useNativeDriver: true,
-    }).start();
-  }, [revealed, anim]);
-
-  const translateY = anim.interpolate({ inputRange: [0, 1], outputRange: [8, 0] });
-
-  return (
-    <View style={styles.hintRow}>
-      {/* Nummerbadge */}
-      {revealed ? (
-        <View style={styles.badgeFilled}>
-          <Text style={styles.badgeFilledText}>{index}</Text>
-        </View>
-      ) : (
-        <View style={styles.badgeEmpty}>
-          <Text style={styles.badgeEmptyText}>{index}</Text>
-        </View>
-      )}
-
-      {/* Innehåll — fade + slide-in */}
-      <View style={styles.hintContentWrap}>
-        {revealed ? (
-          <Animated.View style={{ opacity: anim, transform: [{ translateY }] }}>
-            <Text style={styles.hintLabelText}>{label}</Text>
-            {content}
-          </Animated.View>
-        ) : (
-          <Text style={styles.hintPending}>• • •</Text>
-        )}
-      </View>
-    </View>
-  );
-}
-
-function HintBorn({ birthDate, birthCity }: { birthDate?: string; birthCity?: string }) {
-  return (
-    <View>
-      {birthDate ? (
-        <View style={styles.hintLabelValueRow}>
-          <Text style={styles.hintSubLabel}>Date of birth: </Text>
-          <Text style={styles.hintValueText}>{birthDate}</Text>
-        </View>
-      ) : null}
-      {birthCity ? (
-        <View style={styles.hintLabelValueRow}>
-          <Text style={styles.hintSubLabel}>Place of birth: </Text>
-          <Text style={styles.hintValueText}>"{birthCity}"</Text>
-        </View>
-      ) : null}
-    </View>
-  );
-}
-
-function HintBibliography({ entries }: { entries: HintBibEntry[] }) {
-  return (
-    <View style={{ gap: 1 }}>
-      {entries.map((e, i) => (
-        <Text key={i} style={styles.hintValueText} numberOfLines={1}>
-          {formatBibEntry(e)}
-        </Text>
-      ))}
-    </View>
-  );
-}
-
-function formatBibEntry(e: HintBibEntry): string {
-  if (e.type === 'work') return `${e.title}  ·  ${e.year}`;
-  if (e.type === 'club') return `${e.name}  ${e.from}–${e.to ?? ''}`;
-  if (e.type === 'national') return `${e.caps} national caps`;
-  return '';
+// Formatera hinttexten — de flesta hint-värden är självförklarande.
+// Bara datum och ett fåtal typer behöver kort prefix för kontext.
+function formatHintText(hint: HintItem): string {
+  switch (hint.type) {
+    case 'birth_date':    return `Born: ${hint.value}`;
+    case 'peak_year':     return `Career: ${hint.value}`;
+    case 'lead_singer':   return `Lead singer: ${hint.value}`;
+    case 'creation_year': return `Created: ${hint.value}`;
+    case 'producer':      return `Creator: ${hint.value}`;
+    default:              return hint.value;
+  }
 }
 
 function splitDisplayName(name: string): string[] {
@@ -245,171 +85,356 @@ function splitDisplayName(name: string): string[] {
   return [name.slice(0, lastSpace), name.slice(lastSpace + 1)];
 }
 
-// ── Styles ──────────────────────────────────────────────────────────────────
+// ── Huvud-komponent ─────────────────────────────────────────────────────────
 
-const FLAG_GOLD = '#8B6914';
-const FLAG_OUTER_PAD = 5;
-const FLAG_INNER_PAD = 3;
+export function HintsQuizCard({
+  library,
+  displayName,
+  resetKey,
+  totalSeconds,
+  assistance,
+  playerBirthYear,
+  isRevealed,
+}: Props) {
+  const [revealedCount, setRevealedCount] = useState(0);
+  const scrollRef = useRef<ScrollView>(null);
+  const nameAnim  = useRef(new Animated.Value(0)).current;
+
+  const hints = useMemo(
+    () => (library ? selectHints(library, MAX_HINTS) : []),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [resetKey, library],
+  );
+  const renderEntries = useMemo(() => buildRenderEntries(hints), [hints]);
+
+  // Staggerad reveal — alla synliga vid T/2
+  useEffect(() => {
+    setRevealedCount(0);
+    if (isRevealed) { setRevealedCount(hints.length); return; }
+    if (!hints.length) return;
+    const stepMs = (totalSeconds * HINTS_ALL_OUT_FRACTION * 1000) / hints.length;
+    const timers = hints.map((_, i) =>
+      setTimeout(() => setRevealedCount((c) => Math.max(c, i + 1)), stepMs * (i + 1)),
+    );
+    return () => timers.forEach(clearTimeout);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resetKey, totalSeconds, isRevealed, hints.length]);
+
+  // Auto-scroll till senaste hint
+  useEffect(() => {
+    if (revealedCount > 0) scrollRef.current?.scrollToEnd({ animated: true });
+  }, [revealedCount]);
+
+  // Personnamn fade-in
+  useEffect(() => {
+    Animated.timing(nameAnim, {
+      toValue: isRevealed ? 1 : 0,
+      duration: 380,
+      useNativeDriver: true,
+    }).start();
+  }, [isRevealed, nameAnim]);
+
+  const flag          = library ? countryToFlagEmoji(library.nationality) : '🏳️';
+  const categoryLabel = library?.categoryLabel ?? 'Person';
+  const nameParts     = splitDisplayName(displayName);
+
+  return (
+    <View style={styles.container}>
+
+      {/* ── Vänster: hints ───────────────────────────────── */}
+      <View style={styles.hintsCol}>
+        <Text style={styles.categoryLabel} numberOfLines={1}>
+          {categoryLabel}
+        </Text>
+        <ScrollView
+          ref={scrollRef}
+          style={styles.scroll}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {renderEntries.map((entry, ei) =>
+            entry.kind === 'group' ? (
+              <ClubGroup
+                key={`g${ei}`}
+                entry={entry}
+                revealedCount={revealedCount}
+                isRevealed={isRevealed}
+              />
+            ) : (
+              <BulletHint
+                key={entry.hint.id}
+                entry={entry}
+                revealedCount={revealedCount}
+                isRevealed={isRevealed}
+              />
+            ),
+          )}
+        </ScrollView>
+      </View>
+
+      {/* ── Höger: flagga + personnamn ───────────────────── */}
+      <View style={styles.rightCol}>
+
+        {/* Flagga (övre halvan) */}
+        <View style={styles.flagWrap}>
+          <View style={styles.natBadgeWrap}>
+            <Text style={styles.natBadgeText}>Nationality</Text>
+          </View>
+          <View style={styles.flagInner}>
+            <Text style={styles.flagEmoji}>{flag}</Text>
+            <ProgressiveCover
+              resetKey={resetKey}
+              profile={{ birthYear: playerBirthYear, assistance }}
+              totalSeconds={totalSeconds}
+              assistance="standard"
+              isRevealed={isRevealed}
+              logoSize={44}
+            />
+          </View>
+        </View>
+
+        {/* Personnamn (nedre halvan — visas vid reveal) */}
+        <Animated.View style={[styles.nameWrap, { opacity: nameAnim }]}>
+          {nameParts.map((part, i) => (
+            <Text
+              key={i}
+              style={styles.nameText}
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.52}
+            >
+              {part}
+            </Text>
+          ))}
+        </Animated.View>
+
+      </View>
+    </View>
+  );
+}
+
+// ── BulletHint ──────────────────────────────────────────────────────────────
+
+function BulletHint({
+  entry,
+  revealedCount,
+  isRevealed,
+}: {
+  entry: SingleEntry;
+  revealedCount: number;
+  isRevealed: boolean;
+}) {
+  const shown = revealedCount > entry.index || isRevealed;
+  const anim  = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(anim, { toValue: shown ? 1 : 0, duration: 240, useNativeDriver: true }).start();
+  }, [shown, anim]);
+
+  if (!shown) return null;
+
+  const translateY = anim.interpolate({ inputRange: [0, 1], outputRange: [5, 0] });
+
+  return (
+    <Animated.View style={[styles.bulletRow, { opacity: anim, transform: [{ translateY }] }]}>
+      <Text style={styles.bullet}>•</Text>
+      <Text style={styles.hintText} numberOfLines={2}>{formatHintText(entry.hint)}</Text>
+    </Animated.View>
+  );
+}
+
+// ── ClubGroup ───────────────────────────────────────────────────────────────
+
+function ClubGroup({
+  entry,
+  revealedCount,
+  isRevealed,
+}: {
+  entry: GroupEntry;
+  revealedCount: number;
+  isRevealed: boolean;
+}) {
+  const headerShown = revealedCount > entry.items[0].index || isRevealed;
+  const headerAnim  = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(headerAnim, { toValue: headerShown ? 1 : 0, duration: 240, useNativeDriver: true }).start();
+  }, [headerShown, headerAnim]);
+
+  if (!headerShown) return null;
+
+  const headerTY = headerAnim.interpolate({ inputRange: [0, 1], outputRange: [5, 0] });
+
+  return (
+    <View>
+      {/* Grupprubrik */}
+      <Animated.View style={[styles.bulletRow, { opacity: headerAnim, transform: [{ translateY: headerTY }] }]}>
+        <Text style={styles.bullet}>•</Text>
+        <Text style={[styles.hintText, styles.groupHeaderText]}>{entry.label}</Text>
+      </Animated.View>
+
+      {/* Klubbrader */}
+      {entry.items.map(({ hint, index }) => {
+        const visible = revealedCount > index || isRevealed;
+        return visible ? <ClubSubRow key={hint.id} hint={hint} /> : null;
+      })}
+    </View>
+  );
+}
+
+function ClubSubRow({ hint }: { hint: HintItem }) {
+  const anim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(anim, { toValue: 1, duration: 240, useNativeDriver: true }).start();
+  }, [anim]);
+
+  const translateY = anim.interpolate({ inputRange: [0, 1], outputRange: [4, 0] });
+
+  return (
+    <Animated.View style={[styles.subRow, { opacity: anim, transform: [{ translateY }] }]}>
+      <Text style={styles.subArrow}>↳</Text>
+      <Text style={[styles.hintText, styles.subHintText]} numberOfLines={1}>{hint.value}</Text>
+    </Animated.View>
+  );
+}
+
+// ── Styles ───────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     flexDirection: 'row',
-    height: 240,
+    backgroundColor: Colors.background,
   },
 
-  // ── Vänster pane ──────────────────────────────────────────────────────────
-  leftPane: {
-    flex: 4,
-    backgroundColor: Colors.background,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: Spacing.xs,
-    paddingVertical: Spacing.xs,
-    gap: Spacing.xs,
-  },
-  professionLabel: {
-    color: Colors.warning,
-    fontSize: FontSize.xs,
-    fontWeight: FontWeight.semibold,
-    letterSpacing: 1,
-    textTransform: 'uppercase',
-    textAlign: 'center',
-    textDecorationLine: 'underline',
-  },
-  flagOuter: {
+  // ── Hints-kolumn ──────────────────────────────────────────────────────────
+  hintsCol: {
     flex: 1,
-    width: '100%',
-    backgroundColor: FLAG_GOLD,
-    padding: FLAG_OUTER_PAD,
-    borderRadius: 3,
+    paddingLeft: 10,
+    paddingRight: 6,
+    paddingTop: 6,
+    paddingBottom: 4,
+  },
+  categoryLabel: {
+    color: Colors.warning,
+    fontSize: 11,
+    fontWeight: FontWeight.bold,
+    letterSpacing: 1.2,
+    textTransform: 'uppercase',
+    textDecorationLine: 'underline',
+    marginBottom: 5,
+  },
+  scroll: { flex: 1 },
+  scrollContent: { gap: 0, paddingBottom: 2 },
+
+  bulletRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    paddingVertical: 2,
+    gap: 5,
+  },
+  bullet: {
+    color: Colors.textSecondary,
+    fontSize: 12,
+    lineHeight: 17,
+    width: 10,
+    flexShrink: 0,
+  },
+  hintText: {
+    flex: 1,
+    color: Colors.textPrimary,
+    fontSize: 12,
+    fontWeight: '500',
+    lineHeight: 17,
+  },
+  groupHeaderText: {
+    color: Colors.textSecondary,
+    fontWeight: FontWeight.bold,
+    fontSize: 11,
+  },
+
+  subRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    paddingVertical: 1,
+    paddingLeft: 15,
+    gap: 4,
+  },
+  subArrow: {
+    color: Colors.textSecondary,
+    fontSize: 10,
+    lineHeight: 16,
+    width: 12,
+    flexShrink: 0,
+  },
+  subHintText: {
+    fontSize: 11,
+    lineHeight: 16,
+    color: Colors.textSecondary,
+  },
+
+  // ── Höger kolumn ──────────────────────────────────────────────────────────
+  rightCol: {
+    width: RIGHT_COL_W,
+    flexDirection: 'column',
+    borderLeftWidth: StyleSheet.hairlineWidth,
+    borderLeftColor: Colors.border,
+  },
+
+  // Flagga — övre halvan
+  flagWrap: {
+    flex: 1,
+    flexDirection: 'column',
+  },
+  natBadgeWrap: {
+    alignSelf: 'center',
+    marginTop: 4,
+    backgroundColor: Colors.cardElevated,
+    borderWidth: 1,
+    borderColor: Colors.borderStrong,
+    borderRadius: 4,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    zIndex: 2,
+  },
+  natBadgeText: {
+    color: Colors.textSecondary,
+    fontSize: 8,
+    fontWeight: '700',
+    letterSpacing: 0.4,
   },
   flagInner: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
-    padding: FLAG_INNER_PAD,
     overflow: 'hidden',
-    borderRadius: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: '#fff',
+    margin: 4,
+    marginTop: 2,
+    borderRadius: 2,
   },
   flagEmoji: {
-    fontSize: 72,
+    fontSize: 52,
     textAlign: 'center',
-    lineHeight: 80,
+    lineHeight: 58,
   },
+
+  // Personnamn — nedre halvan
   nameWrap: {
-    width: '100%',
+    flex: 1,
     alignItems: 'center',
-    minHeight: 44,
     justifyContent: 'center',
-    gap: 0,
+    paddingHorizontal: 5,
+    paddingVertical: 4,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: Colors.border,
   },
   nameText: {
     color: Colors.textPrimary,
-    fontSize: FontSize.lg,
+    fontSize: 17,
     fontWeight: FontWeight.bold,
     textAlign: 'center',
-    lineHeight: 22,
-  },
-  namePlaceholder: {
-    height: 44,
-  },
-
-  // ── Höger pane ────────────────────────────────────────────────────────────
-  rightPane: {
-    flex: 6,
-    backgroundColor: Colors.background,
-    padding: Spacing.sm,
-    justifyContent: 'center',
-  },
-  hintsCard: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: Radius.md,
-    backgroundColor: Colors.card,
-    paddingHorizontal: Spacing.sm,
-    paddingVertical: Spacing.sm,
-    justifyContent: 'space-between',
-  },
-  hintDivider: {
-    height: 1,
-    backgroundColor: Colors.border,
-    marginHorizontal: -Spacing.sm,
-  },
-
-  // Hint row
-  hintRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: Spacing.xs,
-    flex: 1,
-    paddingVertical: 2,
-  },
-  hintContentWrap: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-
-  // Badges
-  badgeFilled: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: Colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 1,
-  },
-  badgeFilledText: {
-    color: Colors.background,
-    fontSize: 10,
-    fontWeight: FontWeight.bold,
-  },
-  badgeEmpty: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    borderWidth: 1.5,
-    borderColor: Colors.borderStrong,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 1,
-  },
-  badgeEmptyText: {
-    color: Colors.textDisabled,
-    fontSize: 10,
-    fontWeight: FontWeight.bold,
-  },
-
-  // Hint text
-  hintLabelText: {
-    color: Colors.textSecondary,
-    fontSize: 9,
-    fontWeight: '700',
-    letterSpacing: 0.8,
-    textTransform: 'uppercase',
-    marginBottom: 1,
-  },
-  hintSubLabel: {
-    color: Colors.textSecondary,
-    fontSize: FontSize.xs,
-    fontWeight: FontWeight.semibold,
-  },
-  hintValueText: {
-    color: Colors.textPrimary,
-    fontSize: FontSize.xs,
-    fontWeight: FontWeight.semibold,
-    lineHeight: 16,
-  },
-  hintLabelValueRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    alignItems: 'baseline',
-  },
-  hintPending: {
-    color: Colors.textDisabled,
-    fontSize: FontSize.sm,
-    letterSpacing: 1.5,
+    lineHeight: 21,
   },
 });

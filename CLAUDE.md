@@ -954,47 +954,80 @@ Namnet som visas (`pickNameForPrefix`): det rätta namnet om prefix matchar `cor
 - **Per-spelare-filter (V2)** kan ersätta union-modellen om Peter vill — kräver per-tur-pick i round-block-loopen istället för pool-nivå-filter. Aktuellt pragmatiskt val: union-filter håller round-block-strukturen intakt och fungerar för både Pass-the-Phone och Individual Devices.
 - **Main category-filter** (Music/Film/Sport) appliceras EFTER audience-filtret i pipeline:n (= sista filter-steget innan round-block-bygget). HÅRD — inga fallbacks som strippar kategorin. Se "Main categories (Profile-toggle → Lobby-filter → quiz pool-filter)" för detaljer.
 
-## Hints questions (ersätter Image questions — 2026-06-05)
+## Hints questions (uppdaterad 2026-06-06)
 
-Person-bildfrågor (juridiskt parkerade) ersätts av **Hints** — en split-view-fråga med landsflaga + 3 progressiva ledtrådar. Svarsmekaniken (Letter Grid) är oförändrad.
+Person-bildfrågor (juridiskt parkerade) ersätts av **Hints** — en split-view-fråga med landsflagga + upp till 15 progressiva ledtrådar. Svarsmekaniken (Letter Grid) är oförändrad.
 
-**Nya filer:**
-- `src/utils/hintsData.ts` — `PersonHints`-typ + `HINTS_DATA: Record<id, PersonHints>` (30 manuellt kuraterade items: 10 Artists, 10 Actors, 10 Athletes). `countryToFlagEmoji(nationality)` → emoji-flagga.
-- `src/components/HintsQuizCard.tsx` — split-view-komponent: vänster (landsflagga med ProgressiveCover-mosaik, profession-etikett ovan, namn avslöjas vid `isRevealed`), höger (3 numrerade ledtrådar med staggerad reveal vid 2/9T / 4/9T / 2/3T av svarstiden). `hints` prop är optional — items utan data visar "—" placeholders.
+**Layout HintsQuizCard v3** ([src/components/HintsQuizCard.tsx](src/components/HintsQuizCard.tsx)):
+- **Vänster kolumn (flex:1)**: kategori-label (uppercased, guld) + `ScrollView` med punktlista (•) av hints + ↳-subrad för klubbhistorik.
+- **Höger kolumn (110px)**: övre halvan = landsflagga med `ProgressiveCover` (`assistance='standard'` → helt synlig vid T/2) + Nationality-chip; nedre halvan = personnamn (fade-in vid `isRevealed`).
+- **Höjd**: matchar YouTube-player via `flex:1` i `imageMediaCard`-container (`aspectRatio: 16/9`).
+- **Timing**: alla hints synliga vid T/2 (`HINTS_ALL_OUT_FRACTION = 0.5`). Auto-scroll till senaste hint.
+- **Hint-format**: inga nummerbadges — enbart `•`-punkter. Hint-värdet är texten (t.ex. "Football player", `'"Thriller" (1982)'`). Prefix bara där kontext behövs (`Born:`, `Career:`, `Lead singer:`, `Creator:`). Konsekutiva `club`-hints grupperas under "Career History" med `↳`-subrader.
+- **Slumpmässigt urval**: `selectHints(library, 15)` i `hintsGenerator.ts` — P5-hints alltid med, P4→P1 slumpas → variation per runda.
 
-**`PersonHints`-schema:**
+**Typ-system** ([src/utils/hintsData.ts](src/utils/hintsData.ts)):
 ```ts
-{ nationality: string; birthDate?: string; birthCity?: string;
-  mainProfession: string; bibliography: HintBibEntry[] }
-// HintBibEntry = work(title,year) | club(name,from,to?) | national(caps)
+type HintType = 'profession' | 'birth_date' | 'birth_place' | 'peak_year' | 'debut'
+              | 'song' | 'album' | 'movie' | 'tv_show' | 'lead_singer' | 'band_member'
+              | 'member_count' | 'creation_year' | 'producer' | 'characteristic'
+              | 'height' | 'jersey_number' | 'club' | 'merit';
+
+interface HintItem { id, type, label, value, priority: 1|2|3|4|5 }
+// P1 = warm-up/profession (visas FIRST)  →  P5 = allra mest ikoniskt (visas LAST, alltid med)
+
+type HintCategoryLabel = 'Musikartist' | 'Band' | 'Actor' | 'Athlete' | 'Coach' | 'Character';
+
+interface HintLibrary { categoryLabel, nationality, hints: HintItem[] }
 ```
 
-**30 liveitems i HINTS_DATA**: michael-jackson, madonna, elvis-presley, beyonce, avicii, adele, rihanna, zara-larsson, whitney-houston, eminem (Artists) + marilyn-monroe, tom-hanks, audrey-hepburn, marlon-brando, charlie-chaplin, arnold-schwarzenegger, julia-roberts, leonardo-dicaprio, tom-cruise, meryl-streep (Actors) + michael-jordan, pele, diego-maradona, muhammad-ali, zlatan-ibrahimovic, cristiano-ronaldo, lionel-messi, serena-williams, usain-bolt, roger-federer (Athletes).
+**Prioritets-system** (displayordning ASC, P1 först → P5 sist):
+- P1: warm-up, profession, generell fakta
+- P2: biografisk (födelsedag, födelseort, karriärspann)
+- P3: verk/karriärfakta (låtar, filmer, klubbar) — **HÄR KAN SLUMPEN VARIERA**
+- P4: starka identifierare (mest kända verk, ikonisk klubb)
+- P5: allra mest ikoniskt (alltid inkluderat, signaturdrag, #1-hit)
+
+**`HINTS_LIBRARY_MANUAL`** (~145 manuellt kuraterade items, 122 av 135 ej-unknown har ≥10 hints). Struktureras som `const HINTS_LIBRARY_MANUAL` + importerat `HINTS_LIBRARY_GENERATED` (auto-gen via script) → `export const HINTS_LIBRARY = { ...generated, ...manual }` (manuella åsidosätter). Kategorier inkluderar: Artists × 4 gen, Actors × 4 gen, Athletes (svenska + internationella), Band (svenska + internationella), Characters (animerade + fiktiva roller).
+
+**`HINTS_REGION_MAP`** ([src/utils/hintsData.ts](src/utils/hintsData.ts)) — lookup-tabell: item-id → `HintRegionScope`:
+```ts
+type HintRegionScope = 'sweden' | 'all' | 'nordic' | 'unknown-region';
+// 'sweden'         = stark igenkänning bland svenska spelare (DEFAULT om ej listat)
+// 'all'            = icke-svenska men hög igenkänning bland svenska spelare
+//                    → catalog region: ["sweden","global"]
+// 'nordic'         = nordisk igenkänning → visas för svenska spelare (["sweden","nordic"])
+// 'unknown-region' = för svag igenkänning för V1 → utesluts HELT från quiz + hints-gen
+```
+`getHintRegionScope(id): HintRegionScope` — helper, default `'sweden'`. Stavfel `'unkown-region'` är ett vanligt fel vid manuell redigering — kör `npx tsc --noEmit --skipLibCheck` efteråt för att fånga det.
+
+**`unknown-region`-filter i quiz** ([app/quiz.tsx](app/quiz.tsx)):
+```ts
+const IMAGE_SEED_QUESTIONS = IMAGE_QUIZ_QUESTIONS
+  .filter(q => getHintRegionScope(q.id) !== 'unknown-region')
+  .map((q, i, arr) => ({ ..., totalQuestions: arr.length }));
+```
+Items med `unknown-region` når aldrig `gameQuestions`-poolen.
+
+**`selectHints`** ([src/utils/hintsGenerator.ts](src/utils/hintsGenerator.ts)): tar `HintLibrary` + `count=15`. Alltid alla P5. Fyller upp med P4→P1 (shuffle per prioritetshink). Sorterar ASC för display (P1 first). Fisher-Yates shuffle → ny kombination varje runda.
+
+**Auto-generering** ([backend/scripts/fetch-hints-data.ts](backend/scripts/fetch-hints-data.ts)):
+- Läser alla YAML image-katalog-filer, filtrerar `unknown-region` + manuella items.
+- Wikidata API: `wbsearchentities` + `wbgetentities` → P569 (bd), P19 (bp), P27 (nationality), P106 (occupation), P54 (clubs+dates), P1618 (jersey#), P2048 (height), P166 (awards), P800 (notable works).
+- Throttle 3 req/sek (~4-10 min för full körning). `--resume` återupptar avbruten körning. `--dry` visar utan att skriva.
+- Output: `src/utils/hintsDataGenerated.ts` — `HINTS_LIBRARY_GENERATED` tom placeholder tills script körts.
+- Kör: `cd backend && npm run fetch-hints-data` (eller `fetch-hints-data-dry` / `fetch-hints-data-resume`).
+- **Stavfel-fälla**: `loadManualRegionMap` regex matchar `'unknown-region'` — stavfel `'unkown-region'` i filen ger att items EJ filtreras bort som förväntat. Kör alltid TypeScript-check efter manuell redigering av `hintsData.ts`.
+
+**Demo** ([app/guess-who-demo.tsx](app/guess-who-demo.tsx), route `/guess-who-demo`): person-picker, assistance, svarstid, Replay + Reveal. Importerar `HINTS_LIBRARY` och passerar `library={HINTS_LIBRARY[id]}` till `HintsQuizCard`.
 
 **quiz.tsx-integration:**
-- `ImageQuestion` interface fick `hints?: PersonHints` + `profession?: string`.
-- `IMAGE_SEED_QUESTIONS` berikas vid konvertering: `hints: HINTS_DATA[q.id]`, `profession: professionFromSubject(q.contentSubject)`.
-- `imagePool` = `imagePoolPreCategory` (alla items); de 30 med hints-data visar HintsQuizCard, övriga visar "—" placeholders tills Wikidata-script körs.
-- Rendering: `question.type === 'image'` → alltid `<HintsQuizCard>` (gammal SketchCanvas/NameRevealCard-struktur borttagen).
-- **Era-filter-fix**: person-items (artist/band/actor/athlete) utan `peakFrom/peakTo` är era-agnostiska — `correctYear` = födelseår, inte eventår. Förhindrar att t.ex. Michael Jackson (f.1958) filtreras bort av era 1980+.
-- Fallback: om YouTube av + imagePool tom → person-fallback utan era-filter (INTE SEED_QUESTIONS).
+- `ImageQuestion.hints?: HintLibrary` (ersatte `hints?: PersonHints`).
+- `IMAGE_SEED_QUESTIONS`: `hints: HINTS_LIBRARY[q.id]` (undefined för items utan manuell/auto-gen data → `HintsQuizCard` visar `· · ·` placeholder-rader).
+- Rendering: `question.type === 'image'` → `<View style={styles.imageMediaCard}><HintsQuizCard library={question.hints} .../></View>`.
+- Era-filter-fix bevarad: person-items utan `peakFrom/peakTo` är era-agnostiska.
 
-**Pre-baked fråga-data** ([src/utils/quizImageQuestions.ts](src/utils/quizImageQuestions.ts)): auto-genererad av `cd backend && npm run export-image-questions`. Exporterar `IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[]`.
-
-**Svarsmetod** (oförändrad): `<ImageAnswerBlock>` — Letter Grid → Final Selection. Reveal-feedback SKIPPAS för image-frågor; Correct/Wrong-badges i ImageAnswerBlock kommunicerar resultatet direkt. `isRevealed` skickas INTE till ProgressiveCover — mosaiken fortsätter sin naturliga reveal-takt.
-
-**Demo**: `app/guess-who-demo.tsx` (route `/guess-who-demo`) — Hints-preview med person-picker, assistance, svarstid, Replay + Reveal. `app/sketch-demo.tsx` redirectar hit. Länk i Home-footern: "Hints demo".
-
-**Nästa steg för Hints-data**: `backend/scripts/fetch-hints-data.ts` (ej skrivet) — Wikidata P569/P19/P27/P54/P1350-hämtning för att populera HINTS_DATA för alla ~800 catalog-items automatiskt.
-
-**Bild-kvalitet (MVP-fakta)**: höjt tak från 1280×720 → 1920×1080 (Q85 oförändrat) gav märkbar förbättring bara för källor med >1280px upplösning (Stockholm 1631×1080 / London 1620×1080 / Berlin 1620×1080 / Madonna 675×1080 / Messi 808×1080 etc.). Wikipedia pageimage för Astrid (402×570), Cristiano (566×650), Zlatan (332×480) och Björn Borg (622×934) är källbegränsade — för bättre kvalitet på dessa krävs explicit Commons-URL via `wikimedia-process <id> <url>`. **Aktuell pool-orientering** (mätt med `npm run measure-images`): 14 av 17 bilder är porträtt (AR 0.60–0.87, alla personer + Paris), 3 är landscape (AR 1.50, städer Berlin/London/Stockholm). MediaCard är `aspectRatio: 16/9 + resizeMode='contain'` — container-storleken matchar timeline-frågors media-area för konsistent layout mellan fråge-typer, inget klipps. Porträtt-bilder får dock signifikant letterbox vänster+höger (~60% av container-bredden) eftersom 16:9 är wider än portrait-AR; om det blir för "fattig" UX kan container framtidsbytas till en portrait-vänligare form (4:5 eller 1:1) på bekostnad av högre container.
-
-**Bild-motiv-policy (2026-05-25)**: alla bilder ska visa personen i sin professionella kontext — handlings-bild, inte civilklätt porträtt:
-- **Idrottare** → från match/tävling, i tävlingsdräkt, mitt i utövandet
-- **Musiker / artister / band** → från live-uppträdande, på scen med instrument/mikrofon, i artist-look
-- **Skådespelare** → från en film de spelat i (i karaktären, i scen, i kostym)
-
-Wikipedia-pageimage (default `npm run wikimedia-search <id>`) returnerar ofta porträtt-headshot — det duger oftast INTE. För att hitta en handlings-bild: scrolla artikelns övriga bilder via Commons text-search-resultaten, eller besök Wikipedia-artikeln + Commons-kategori manuellt. Använd sedan `npm run wikimedia-process <id> <url>` med explicit Commons-URL för att override:a default. **Befintliga ~17 items i `assets/quiz-images/`** curades innan policyn formaliserades — audit + ev. ersättning ska göras separat session. Se [memory/feedback_image_professional_context.md](../.claude/projects/C--Users-46725-quizvibe-app/memory/feedback_image_professional_context.md) för full motivation.
+**Svarsmetod** (oförändrad): `<ImageAnswerBlock>` — Letter Grid → Final Selection. `isRevealed` skickas till HintsQuizCard (visar namn + snappar ProgressiveCover).
 
 ## Signature Doodle + Guess Who (split-view)
 

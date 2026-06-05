@@ -3,7 +3,7 @@
 
 import { HintsQuizCard } from '@/src/components/HintsQuizCard';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '@/src/theme';
-import { HINTS_DATA } from '@/src/utils/hintsData';
+import { HINTS_LIBRARY } from '@/src/utils/hintsData';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
@@ -35,7 +35,7 @@ const DEMO_ITEMS: DemoItem[] = [
   { id: 'avicii',              label: 'Avicii',       displayName: 'Avicii',              profession: 'Artist'  },
   { id: 'beyonce',             label: 'Beyoncé',      displayName: 'Beyoncé',             profession: 'Artist'  },
   { id: 'tom-hanks',           label: 'Tom Hanks',    displayName: 'Tom Hanks',           profession: 'Actor'   },
-].filter((d) => !!HINTS_DATA[d.id]);
+].filter((d) => !!HINTS_LIBRARY[d.id]);
 
 export default function HintsDemoScreen() {
   const [selected, setSelected] = useState<DemoItem>(DEMO_ITEMS[0]);
@@ -45,7 +45,7 @@ export default function HintsDemoScreen() {
   const [run, setRun] = useState(0);
 
   const resetKey = `${selected.id}-${assistance}-${seconds}-${run}`;
-  const hints = HINTS_DATA[selected.id]!;
+  const library = HINTS_LIBRARY[selected.id];
 
   const restart = () => {
     setRevealed(false);
@@ -67,8 +67,7 @@ export default function HintsDemoScreen() {
         <View style={styles.card}>
           <HintsQuizCard
             key={resetKey}
-            profession={selected.profession}
-            hints={hints}
+            library={library}
             displayName={selected.displayName}
             resetKey={resetKey}
             totalSeconds={seconds}
@@ -79,8 +78,8 @@ export default function HintsDemoScreen() {
         </View>
 
         <Text style={styles.hint}>
-          Ledtrådarna 1–3 är alla framme vid 2/3 av svarstiden ({Math.round((seconds * 2) / 3)}s vid {seconds}s).
-          {'\n'}Mosaiken på flaggan försvinner på {assistance}-tempo.
+          Upp till 15 ledtrådar — alla framme vid T/2 ({Math.round(seconds / 2)}s vid {seconds}s).
+          {'\n'}Flaggan helt synlig vid T/2. Nytt slumpmässigt urval per omgång.
         </Text>
 
         <Section label="Person">
