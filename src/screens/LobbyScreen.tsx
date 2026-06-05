@@ -46,6 +46,7 @@ import {
     RoundsRuler,
 } from '../components/RoundsRuler';
 import { TopUserBanner } from '../components/TopUserBanner';
+import { MorseAmbientSound } from '../components/MorseAmbientSound';
 import { Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';
 import { getAvatarEmojiById } from '../utils/avatars';
 import { addFriend, loadFriends, type Friend } from '../utils/friendsStorage';
@@ -3591,6 +3592,8 @@ export default function LobbyScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
+      {/* Morse-ambient-ljud — osynlig WebView som loopar **- **- **- **---- */}
+      <MorseAmbientSound />
       {/* Top board (login status) — sticky utanför ScrollView så den följer
           med när användaren scrollar i lobbyn. Tap-beteendet är roll-
           beroende:
