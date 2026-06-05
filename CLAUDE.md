@@ -439,26 +439,29 @@ Profile-toggle som filtrerar vilka paket som syns i Lobby:n när användaren är
 
 Ersätter gamla `enabledMainCategories` + `youtubeEnabled`/`imagesEnabled`-booleans med **per-source category-arrays**. UI-rubriken "SOURCE DASHBOARD" i både Lobby och Profile.
 
-**Datamodell**: `youtubeEnabledCategories: MainCategory[]` + `imagesEnabledCategories: MainCategory[]`. Båda kan innehålla 0–3 av Music/Film/Sport.
+**Datamodell**: `youtubeEnabledCategories: MainCategory[]` + `imagesEnabledCategories: MainCategory[]` + `spotifyEnabled: boolean`. Alla tre sparas i Profile (`spotifyDefaultEnabled` i `ProfileData`) och seeds till Lobby vid Create Game.
 
-**UI — kolumn-baserad matrix-layout** (`smGrid` i LobbyScreen + ProfileScreen):
-- **Rad 1 (rubriker)**: `[All]` | Artists | Actors | Athletes — text i varsin kolumn-stack
-- **Rad 2 (All-rad)**: All master-toggle (label-col) + Artists/Actors/Athletes kolumn-masters — grå bakgrund + rundade hörn
-- **Rad 3 (YouTube)**: YouTube-ikon + label + switchar per kolumn
-- **Rad 4 (Hints)**: Q?-ikon + "Hints"-label + switchar per kolumn (ersätter tidigare "Images" + "Auto-sync"-rad)
-- Vertikala separator-linjer (borderLeft) mellan Artists/Actors/Athletes
-- `onLayout` på `smGrid` mäter exakt kolumnbredd → `smCellStyle = { width: smColWidth }` för pixel-perfekt centrering
+**UI-layout** (`smGrid` i LobbyScreen + ProfileScreen):
+- **Spotify DJ-rad** — överst, direkt under "SOURCE DASHBOARD"-rubriken. Box med `backgroundColor: rgba(255,255,255,0.06)` + `borderRadius: Radius.sm` (matchar All-radens styling). Spotify-ikon + label + info-icon + anslutningsstatus + toggle.
+- **Matrisen nedan**: Rad 1 (rubriker) | Rad 2 (All-rad) | Rad 3 (YouTube) | Rad 4 (Images) — kolumner: Artists / Actors / Athletes.
+- `onLayout` på `smGrid` mäter exakt kolumnbredd → pixel-perfekt centrering.
 
-**All-rad AND-logik**: `artistsAllOn/actorsAllOn/athletesAllOn = YT && Hints` (båda ON → All-switch grön). `allEnabled = artistsAllOn && actorsAllOn && athletesAllOn && guessWhereEnabled`... **OBS (2026-06-05):** `guessWhereEnabled` finns inte längre som separat state — Hints row = `imagesEnabledCategories`-toggles precis som gamla Images-row.
+**Auto-sync-regler (kontextberoende, 2026-06-05)**:
+- **Spotify PÅ** → YouTube och Images är HELT OBEROENDE per kolumn. Auto-sync-texten döljs. Kolumn-masters aktiverar BÅDA YT + Images (explicit "välj allt"-action).
+- **Spotify AV**:
+  - **Actors** auto-sync aktiv ENBART om `!artistsEnabled && !imagesEnabledCategories.includes('Sport')`. YT ON → Images ON; Images OFF → YT OFF (hel kolumn).
+  - **Athletes** auto-sync aktiv ENBART om `!artistsEnabled && !imagesEnabledCategories.includes('Film')`. Samma bidirektionell sync.
+  - **Artists** alltid oberoende (aldrig auto-sync).
+  - "Auto-sync"-text visas i UI ENBART när auto-sync faktiskt är aktiv.
+- **useEffect-trigger**: `[youtubeEnabledCategories, spotifyEnabled, artistsEnabled]` — triggar ON-sync även när `artistsEnabled` ändras (t.ex. Artists/Images stängs av → auto-sync kan aktiveras för Actors/Athletes).
+- **Seed-fix**: Lobby-seed använder `!== undefined` (ej `length > 0`) — tom array `[]` respekteras som explicit "alla av" vs `undefined` som "ej konfigurerat → default".
 
-**YouTube och Hints är OBEROENDE (2026-06-05)**: Auto-sync-logiken borttagen. Individuella source-switchar rör bara sin egen källa. Kolumn-"All" + master-"All" sätter fortfarande båda källorna för den kolumnen.
-
-**Source Validation-regler (2026-06-05)** — enforced vid Start Game + Spotify-av-toggle + individ-switch-toggle:
-- **Spotify på** → inga krav, alla kombinationer tillåtna
-- **Artists (Music) aktiv** → fritt, kan spelas ensamt (som Spotify)
-- **Actors/Athletes utan Artists + Spotify** → minst 2 aktiva kombinationer krävs (av max 4: YouTube Film/Sport + Hints Film/Sport)
-- **Stänga av sista Artist-switch** → blockeras om < 2 Actors/Athletes-kombinationer kvar (och Spotify av)
-- **Stänga av Actors/Athletes-switch** → blockeras om det lämnar < 2 sådana kvar (och Spotify av, Artists av)
+**Source Validation-regler** — enforced vid Start Game + Spotify-av-toggle + individ-switch-toggle:
+- **Spotify PÅ** → inga krav på YT/Images, alla kombinationer tillåtna
+- **Artists (Music) aktiv** → fritt, kan spelas ensamt
+- **Actors/Athletes utan Artists + Spotify** → minst 2 aktiva kombinationer krävs
+- **Stänga av Actors/Athletes Images** → "Not applicable" popup om det är enda aktiva YT-kombinationen (Actors/Athletes utan Artists — Artists ensamt är undantag, giltigt)
+- **Stänga av Spotify** → blockeras om `imagesEnabledCategories.length === 0 && enabledColumnsCount <= 1 && !youtubeEnabledCategories.includes('Music')` (Artist/YT ensamt är OK)
 
 **quiz.tsx-filter (2026-06-05)**:
 - YouTube-pool: filtreras mot `youtubeEnabledCategories` inkl. `genrePackages`-crossover.
@@ -867,20 +870,28 @@ Driver två konsumenter idag:
 1. **GetReadyIntro:s kategori-badge** (se "Quiz — Get Ready to Vibe intro screen" nedan). Härleds som `categoryByQuestion: (MainCategory | null)[]` useMemo parallellt med `mediaSourceByQuestion`, passas som prop.
 2. **Framtida theme-package-roadmap** — när någon kategori passerar 1000-frågor-tröskeln blir den säljbar som themed package i Store (se `memory/project_theme_package_roadmap.md`).
 
-**Pool-blandning** (`gameQuestions`) — **round-block-struktur** med tre lager av logik (2026-06-01):
+**Pool-blandning** (`gameQuestions`) — **3-pool round-block-struktur** (uppdaterad 2026-06-05):
 
-1. **Osedd-prioritering** (`src/utils/hostQuestionHistory.ts`): varje pool delas i `[...shuffleArray(unseen), ...shuffleArray(seen)]` baserat på fråge-IDs sparade i AsyncStorage per host (playerName). Sparas vid spelets slut (`phase==='leaderboard'`) och vid Quit Game. Första spelet = alla osedda = slumpad pool. Säkerställer att host får nya frågor varje omgång innan poolen cyklat runt.
+Tre separata pools: `spotifyPool` (YT-items med `spotifyTrackId` när `spotifyEnabled`), `pureYoutubePool` (övrig YT), `imagePool`. Fasordning: **Spotify → YouTube → Image**.
 
-2. **Kategori-gruppering** inom varje pool: Musik → Film → Sport (fast ordning). `prioritiseUnseen` appliceras per kategori-grupp. Ger naturlig "resa" genom innehållstyperna.
+1. **Osedd-prioritering** (`src/utils/hostQuestionHistory.ts`): varje pool delas i `[...shuffleArray(unseen), ...shuffleArray(seen)]`. Sparas vid spelets slut + Quit Game.
 
-3. **YouTube-block FÖRST, bildblock SEDAN**: `ytBlockCount = floor((totalRounds-1)/ytInterval)+1` YouTube-block samlade i början, resten bildblock. `ytInterval = max(2, min(4, round(imagePool/youtubePool)))` — proportionell ratio baserad på filtrerade pool-storlekar (med 327 YT + 1038 bilder: N≈3 → ~33% YouTube).
+2. **Kategori-gruppering** inom varje pool: Musik → Film → Sport (fast ordning per pool).
 
-Block-storlek = `turnOrder.length` (PtP) eller 1 (IndDev). Cyklisk indexering `(block * questionsPerBlock + q) % pool.length` så alla spelare i ronden får olika items.
+3. **Spotify-block FÖRST** (special moments öppnar spelet), sedan YouTube-block, sedan bildblock:
+   - `spotifyInterval = clamp(3,6, round((pureYT+image)/spotify))` — med 41 Spotify/418 YT/836 Images: interval=6 → ~1 Spotify per 6 rundor
+   - `spotifyBlockCount = floor((N-1)/spotifyInterval)+1`
+   - `remainingRounds = totalRounds - spotifyBlockCount`
+   - `ytInterval = clamp(2,4, round(imagePool/pureYoutubePool))` — mot remainingRounds
+   - `ytBlockCount = floor((remaining-1)/ytInterval)+1`
+
+Block-storlek = `turnOrder.length` (PtP) eller 1 (IndDev). Cyklisk indexering.
 
 Edge cases:
-- En pool tom: kör enbart den andra typen.
-- Båda tomma: fallback till `SEED_QUESTIONS` (respekterar main-category-filter).
-- **Individual Devices**: round-block-strukturen oförändrad. Omdesign parkerad (2026-05-11).
+- `spotifyEnabled = false` → `spotifyPool = []`, `pureYoutubePool = youtubePool` → exakt samma beteende som gamla 2-pool-strukturen.
+- Spotify-only single player → blockeras i `handleStartGame` ("Spotify DJ requires at least one other player").
+- Alla pools tomma → SEED_QUESTIONS fallback.
+- **`spotifyEnabled` gatas hårt** på `gameMode === 'individual-devices'` i quiz.tsx — PtP/Single Player aktiverar aldrig Spotify DJ oavsett param.
 
 **State-paritet musik ↔ bild**:
 | musik | bild | beskrivning |
@@ -997,7 +1008,7 @@ PIVOT 2026-05-29: fristående "Guess Who"-fråge-koncept — en stiliserad **AI-
 
 **Frontend-prototyp**: [GuessWhoSplitView.tsx](src/components/GuessWhoSplitView.tsx) + [src/utils/guessWhoDemo.ts](src/utils/guessWhoDemo.ts) finns kvar som referens. **OBS**: route `/guess-who-demo` är numera Hints-demo (se "Hints questions" ovan) — GuessWhoSplitView är inte längre wired till demo eller live-quiz.
 
-## Spotify DJ-läge (2026-06-04)
+## Spotify DJ-läge (uppdaterad 2026-06-05)
 
 **Arkitektur: "Backend-styrd Deep Link"** — ingen native Spotify SDK krävs. Appen öppnar Spotify-appen via `Linking.openURL('spotify:track:ID')` (React Natives inbyggda Linking-modul). Det löste den tidigare blockeraren (ingen maintained native playback-module för RN+Expo).
 
@@ -1050,11 +1061,18 @@ Export-scriptet (`export-music-questions.ts`) inkluderar nu items med `spotifyTr
 
 **41 låtar har `spotifyTrackId` (2026-06-04)**: ABBA (3st), Roxette (2), Ace of Base (2), Avicii (3), Loreen (2), Robyn (2), Swedish House Mafia, Eric Prydz, Dr. Alban, Rednex, The Cardigans, Kent, Veronica Maggio, Mando Diao, First Aid Kit, Icona Pop, Benjamin Ingrosso, Lili & Sussie + internationella klassiker (Eagles, Bob Marley, Bee Gees, Queen, Sia, Imagine Dragons, Ed Sheeran, Glass Animals, The Weeknd m.fl.).
 
-**LobbyScreen-integration**:
-- `spotifyConnected` laddas från `spotify_connections` i `useFocusEffect` — auto-aktiverar toggle om redan kopplat
-- `handleConnectSpotify()` → OAuth → auto-sätter både `spotifyConnected=true` och `spotifyEnabled=true`
-- `spotifyEnabled` skickas som URL-param till quiz.tsx: `String(spotifyEnabled && spotifyConnected)`
-- `handleStartGame`-guard: blockerar start om `spotifyEnabled && !spotifyConnected`
+**LobbyScreen-integration (uppdaterad 2026-06-05)**:
+- `isSpotifyAvailable = gameMode === 'individual-devices' && !singlePlayerDefault` — Spotify DJ kräver IndDev (DJ lämnar appen → Spotify). Spotify-raden alltid synlig men toggle utgråad + "Disabled"-pill i PtP/Single.
+- `spotifyEnabled` seeds från `profile.spotifyDefaultEnabled` i Promise.all-blocket; om `profile.spotifyDefaultEnabled = true` auto-seedas också `gameMode = 'individual-devices'`.
+- **handleStartGame-guards för Spotify**: (1) `spotifyEnabled && (singlePlayerDefault || approvedNonHosts.length === 0)` → "Spotify DJ not applicable — requires at least one other player". (2) Spotify-only single player (`youtubeEnabled=0, images=0, singlePlayer`) → separatguard. (3) Inga approved non-hosts med Spotify → alert. (4) Några utan Spotify → erbjud att flytta till waiting.
+- `LobbyPlayer.spotifyConnected?: boolean` — populerad från `lobby_players.spotify_verified` via `rowToPlayer`. Host-kortets `spotifyConnected` sätts från Lobby `spotifyConnected`-state i `useFocusEffect`. Non-host vid join: `getSpotifyConnectionStatus()` parallellt med `loadProfile()`.
+- **PlayerRow Spotify-badge**: border-cutting `position: absolute, top: -8, right: Spacing.lg` — Spotify-ikon + `✓ PlayerName` (grön, `#1DB954`) om kopplat, `No connection` (grå) om ej. Grön/grå kantlinje. Drivs av `spotifyConnected`-prop.
+- **Profile-integration**: `spotifyDefaultEnabled?: boolean` i `ProfileData`. `loadProfile()` mergar alltid från AsyncStorage-cache (fältet finns ej i DB ännu). `handleSave` persisterar `spotifyDefaultEnabled: spotifyEnabled`. Profile Source Dashboard har samma Spotify-rad + auto-sync-logik som Lobby.
+
+**`profileStorage.ts` fixes (2026-06-05)**:
+- `loadProfile` mergar alltid från AsyncStorage-cache (inte bara när kategorifält saknas) — täcker `spotifyDefaultEnabled` + `youtubeEnabledCategories` + `imagesEnabledCategories`.
+- Merge-villkor bytt från `length > 0` till `!== undefined` — tom array `[]` (explicit av) bevaras vs `undefined` (ej konfigurerat → fallback till default i Lobby-seed).
+- `backfillProfileFromSession` inkluderar `spotifyDefaultEnabled: cache?.spotifyDefaultEnabled`.
 
 **Env-var**: `EXPO_PUBLIC_SPOTIFY_CLIENT_ID=d9ce6568d6d64bfdbba3b92b604c6ee0` (i `.env` + `.env.example`)
 
