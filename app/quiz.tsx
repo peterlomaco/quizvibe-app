@@ -1263,7 +1263,7 @@ export default function QuizScreen() {
     setTimeLeft(responseSeconds);
     timerProgressAnim.stopAnimation();
     timerProgressAnim.setValue(1);
-    const id = setTimeout(() => setTimerActive(true), 3000);
+    const id = setTimeout(() => setTimerActive(true), 2000);
     return () => { clearTimeout(id); };
   }, [phase, questionIndex, responseSeconds, timerProgressAnim]);
   // Sticky-unstable-latchen rensas ENDAST av handleRetryFromUnstable
