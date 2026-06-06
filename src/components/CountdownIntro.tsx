@@ -21,6 +21,10 @@ interface Props {
    *  "Pass-the-Phone to: <playerName>" med avatar-box; IndDev visar bara
    *  "Get Ready to Vibe" (ingen spelar-specifik info). */
   mode?: 'pass-the-phone' | 'individual-devices';
+  /** Styr om rösten säger "Who" när nedräkningen når 0.
+   *  true (default) = säg "Who" — lämpligt för Hints-frågor (svaret = en person).
+   *  false = tyst avslut — lämpligt för YouTube/Spotify där frågan är ett år. */
+  sayWho?: boolean;
   /** Namn på spelaren som ska börja sin runda — visas ovan Q-loggan i PtP
    *  så spelarna ser vems tur det är även när nedräkningen körs. Ignoreras
    *  i IndDev. */
@@ -49,7 +53,7 @@ const GLYPH_FONT_SIZE = LOGO_SIZE * 0.28;
  * att "?" visats i ~1 s fyras `onComplete` så parent kan växla fas till
  * `'question'`.
  */
-export function CountdownIntro({ onComplete, startFrom = 3, mode = 'pass-the-phone', playerName, playerEmoji }: Props) {
+export function CountdownIntro({ onComplete, startFrom = 3, mode = 'pass-the-phone', playerName, playerEmoji, sayWho = true }: Props) {
   const isIndDev = mode === 'individual-devices';
   // Nunito 700 Bold för "QuizVibe"-brandraden — matchar startskärmens
   // appName-textformat 1:1. Faller tillbaka till systemfont under font-
@@ -135,8 +139,10 @@ export function CountdownIntro({ onComplete, startFrom = 3, mode = 'pass-the-pho
   // Röst synkad med count — ingen extra fördröjning behövs eftersom 700 ms
   // initial-pausen redan hanteras av countdown-effekten ovan.
   // count === null → pre-start, inget tal.
+  // count === 0 → "Who" om sayWho=true (Hints), annars tyst (YouTube/Spotify).
   useEffect(() => {
     if (count === null) return;
+    if (count === 0 && !sayWho) return;   // tyst avslut för år-frågor
     try {
       Speech.speak(count <= 0 ? 'Who' : String(count), {
         language: 'en-US',
@@ -145,7 +151,7 @@ export function CountdownIntro({ onComplete, startFrom = 3, mode = 'pass-the-pho
       });
     } catch (_) {}
     return () => { try { Speech.stop(); } catch (_) {} };
-  }, [count]);
+  }, [count, sayWho]);
 
   // "?" pop:as in när count går 1 → 0 + samma puls-loop som siffrorna ovan.
   // Separat Animated.Value så vi kan rendera båda elementen samtidigt under

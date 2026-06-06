@@ -3401,6 +3401,7 @@ export default function QuizScreen() {
         playerName={countdownPlayer?.name}
         playerEmoji={countdownPlayer?.emoji}
         onComplete={() => setPhase('question')}
+        sayWho={isImageQuestion}
       />
       {/* Pre-decode-trick borttaget 2026-05-27 (text-rendering = no decode). */}
       {inactivityCountdownSec !== null && (
