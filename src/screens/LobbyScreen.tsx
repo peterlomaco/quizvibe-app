@@ -1121,8 +1121,8 @@ export default function LobbyScreen() {
     // Effekten triggar både vid första mount OCH vid Play Again-återinträde
     // (component re-mountar).
     if (hostMode) {
-      Promise.all([loadProfile(), getLobbySettings(roomCode)]).then(
-        ([profile, stored]) => {
+      Promise.all([loadProfile(), getLobbySettings(roomCode), hasPremiumSubscription()]).then(
+        ([profile, stored, premium]) => {
           if (cancelled) return;
           // Om Spotify är sparad som default i profilen måste lobby starta i
           // IndDev-läge (Spotify DJ kräver Individual Devices).
@@ -1132,7 +1132,12 @@ export default function LobbyScreen() {
             profile?.gameMode ??
             'pass-the-phone';
           setGameMode(seedGameMode);
-          setMaxPlayers(profile?.maxPlayers ?? 4);
+          // Clamp mot premium-status: profilen kan ha ett stale maxPlayers=12
+          // från en tidigare session med aktiv prenumeration — utan denna
+          // clamping sätts 12 EFTER att hasPremium-clamp-effekten kört 4,
+          // och effekten re-fyrar inte eftersom hasPremium inte ändrats.
+          const rawMax = profile?.maxPlayers ?? 4;
+          setMaxPlayers(!premium && rawMax > 4 ? 4 : (rawMax as 4 | 12));
           setSinglePlayerDefault(
             stored?.singlePlayerDefault ??
               profile?.singlePlayerDefault ??
@@ -1353,12 +1358,20 @@ export default function LobbyScreen() {
           if (!user || !active) return;
           getSpotifyConnectionStatus(user.id).then((status: SpotifyConnectionStatus) => {
             if (!active) return;
-            const ok = status.connected && status.isPremium;
-            setSpotifyConnected(ok);
+            const connected = status.connected;
+            setSpotifyConnected(connected);
             setSpotifyDisplayName(status.spotifyDisplayName);
+            // Uppdatera host:s spelarkort direkt — setPlayers i Promise.all-grenen
+            // nedan fångar spotifyConnected-staten vid closure-skapande (false), inte
+            // efter att denna async-operation resolvar. Explicit patch är nödvändigt.
+            setPlayers((prev) =>
+              prev.map((p) => (p.isHost ? { ...p, spotifyConnected: connected } : p)),
+            );
             // Seed spotifyEnabled från profile:s sparade default (spotifyDefaultEnabled).
             // Toggeln återställs till false vid varje Lobby-mount, men om user
             // aktiverat Spotify som default i Profile settings ska det slå igenom här.
+            // Kräver Premium för att faktiskt aktivera DJ-läget.
+            const ok = connected && status.isPremium;
             if (ok) {
               loadProfile().then((profile) => {
                 if (active) setSpotifyEnabled(profile?.spotifyDefaultEnabled ?? false);
@@ -1401,7 +1414,10 @@ export default function LobbyScreen() {
             // avatar/namn syns på det kortet.
             let next = hostMode && profile && p.isHost ? mergeProfileIntoHost(p, profile) : p;
             if (next.isHost) {
-              next = { ...next, spotifyConnected };
+              // Rör INTE next.spotifyConnected här — det sätts av den parallella
+              // getSpotifyConnectionStatus-kedjans setPlayers-patch. Om vi skriver
+              // spotifyConnected-state (alltid false i closure vid körning) kan
+              // Promise.all-grenen vinna racet och skriva över ett redan korrekt true.
               return next.hasLeft ? { ...next, hasLeft: false } : next;
             }
             const inLeft = leftIds.includes(next.id) || dbLeftIds.has(next.id);
@@ -1527,6 +1543,17 @@ export default function LobbyScreen() {
   // appen jobbar (undviker upplevelsen av instant-cut till Home).
   const [deletingLobby, setDeletingLobby] = useState(false);
 
+  // True enbart när LobbyScreen är aktiv — stänger av MorseAmbientSound
+  // (WebView-baserat ljud) när Stack-navigatorn trycker Quiz ovanpå.
+  const [screenFocused, setScreenFocused] = useState(true);
+
+  useFocusEffect(
+    useCallback(() => {
+      setScreenFocused(true);
+      return () => setScreenFocused(false);
+    }, []),
+  );
+
   // Master "Approve All"-state — återställs automatiskt till 'no' när
   // waiting-listan blivit tom (efter approve all eller när ingen väntar).
   const [approveAllValue, setApproveAllValue] = useState<'no' | 'yes'>('no');
@@ -1591,10 +1618,10 @@ export default function LobbyScreen() {
     setMaxPlayers(hasPremium ? 12 : 4);
   }, [hostMode, hasPremium]);
 
-  // Max rundor är en subscription-perk OBEROENDE av läge: Premium → 20, annars
-  // 4. (Tidigare gav Individual Devices implicit 20; nu är IndDev gratis och
-  // 20-rundor gatas enbart på Premium.)
-  const roundsMax = hasPremium ? ROUNDS_MAX_INDIV : ROUNDS_MAX_PASS;
+  // Max rundor beror enbart på spelläge: IndDev → 20, PtP/Single → 4.
+  // Premium ger INTE fler rundor i PtP — premium-host i PtP hänvisas till
+  // att byta till IndDev för att nå 20 rundor (se onPremiumPress-alertet).
+  const roundsMax = gameMode === 'individual-devices' && !singlePlayerDefault ? ROUNDS_MAX_INDIV : ROUNDS_MAX_PASS;
   useEffect(() => {
     setRoundsCount((prev) => Math.max(ROUNDS_MIN, Math.min(roundsMax, prev)));
   }, [roundsMax]);
@@ -2120,11 +2147,51 @@ export default function LobbyScreen() {
       confirmAndRemoveGuests('Switch to Individual device?', () => {
         setSinglePlayerDefault(false);
         setGameMode('individual-devices');
+        // Premium → återställ Max 12 automatiskt (kan ha satts till 4 av PtP-bytet).
+        if (hasPremium) setMaxPlayers(12);
       });
+      return;
+    }
+    // Vid byte till PtP: maxPlayers alltid 4 (PtP-cap). Om host godkänt fler
+    // än 3 non-hosts (= totalt > 4 med host) visas popup och ALLA non-hosts
+    // ejektas — lobbyn skalas ner till enbart host.
+    const approvedNonHosts = players.filter((p) => !p.isHost && !p.hasLeft && p.approved);
+    if (approvedNonHosts.length > 3) {
+      Alert.alert(
+        'Change to Pass-the-Phone',
+        'Change from Individual Devices will remove all players from lobby. Do you want to continue?',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Continue',
+            style: 'destructive',
+            onPress: () => {
+              const allNonHosts = players.filter((p) => !p.isHost && !p.hasLeft);
+              allNonHosts.forEach((p) => {
+                markEjected(roomCode, p.id);
+                supabase
+                  .from('lobby_players')
+                  .delete()
+                  .eq('room_code', roomCode)
+                  .eq('player_id', p.id)
+                  .then(({ error }) => {
+                    if (error) console.warn('[lobbyPlayers] IndDev→PtP eject failed:', error.message);
+                  });
+              });
+              setPlayers((prev) => prev.filter((p) => p.isHost));
+              setSinglePlayerDefault(false);
+              setGameMode('pass-the-phone');
+              setMaxPlayers(4);
+              setSpotifyEnabled(false);
+            },
+          },
+        ],
+      );
       return;
     }
     setSinglePlayerDefault(false);
     setGameMode('pass-the-phone');
+    setMaxPlayers(4);
     setSpotifyEnabled(false);
   };
 
@@ -2167,20 +2234,32 @@ export default function LobbyScreen() {
     );
   };
 
-  // Players-val: Max 4 (gratis) / Max 12 (Premium). 12 kräver subscription →
-  // Store-redirect om gratis-host. Sätter maxPlayers som styr lobby-cap +
-  // hur många host kan godkänna i "Players in lobby".
+  // Players-val: Max 4 (gratis) / Max 12 (Premium).
+  // Max 12 kräver IndDev-läge (PtP/Single → info-alert) OCH Premium
+  // (gratis-host i IndDev → Store-redirect).
   const handleSelectMaxPlayers = (n: 4 | 12) => {
-    if (n === 12 && !hasPremium) {
-      Alert.alert(
-        'Premium feature',
-        'Hosting up to 12 players requires QuizVibe Premium. Get it in the Store?',
-        [
-          { text: 'Cancel', style: 'cancel' },
-          { text: 'Go to Store', onPress: () => router.push({ pathname: '/store' as const, params: { focus: 'subscription', from: '/lobby', fromCode: roomCode } }) },
-        ],
-      );
-      return;
+    if (n === 12) {
+      // Fel läge: Max 12 kräver Individual device
+      if (singlePlayerDefault || gameMode !== 'individual-devices') {
+        Alert.alert(
+          'Individual device required',
+          'Please activate Individual device to be able to select Max 12 players.',
+          [{ text: 'OK' }],
+        );
+        return;
+      }
+      // Rätt läge men inget premium → Store
+      if (!hasPremium) {
+        Alert.alert(
+          'Premium feature',
+          'Hosting up to 12 players requires QuizVibe Premium. Get it in the Store?',
+          [
+            { text: 'Cancel', style: 'cancel' },
+            { text: 'Go to Store', onPress: () => router.push({ pathname: '/store' as const, params: { focus: 'subscription', from: '/lobby', fromCode: roomCode } }) },
+          ],
+        );
+        return;
+      }
     }
     setMaxPlayers(n);
   };
@@ -3592,8 +3671,10 @@ export default function LobbyScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
-      {/* Morse-ambient-ljud — osynlig WebView som loopar **- **- **- **---- */}
-      <MorseAmbientSound />
+      {/* Morse-ambient-ljud — bara när skärmen är aktiv (avmonteras vid
+          Stack-navigation till t.ex. Quiz, annars fortsätter WebView spela
+          trots att LobbyScreen ligger kvar ouppmonterad i stacken). */}
+      {screenFocused && hostMode && <MorseAmbientSound />}
       {/* Top board (login status) — sticky utanför ScrollView så den följer
           med när användaren scrollar i lobbyn. Tap-beteendet är roll-
           beroende:
@@ -3895,19 +3976,20 @@ export default function LobbyScreen() {
             </Pressable>
           </View>
           <View style={styles.modeRow}>
-            {/* Max 4: aktiv (grön) enbart för icke-premium. Premium → alltid
-                utgråad + disabled eftersom Max 12 är auto-valt. */}
+            {/* Max 4: aktiv (grön) när maxPlayers === 4, oavsett premium.
+                Premium i IndDev → disabled (auto-låst till 12).
+                Premium i PtP → maxPlayers=4, grön, ej disabled. */}
             <TouchableOpacity
-              style={[styles.modeOption, !hasPremium && maxPlayers === 4 ? styles.modeOptionPassActive : styles.modeOptionInactive]}
+              style={[styles.modeOption, maxPlayers === 4 ? styles.modeOptionPassActive : styles.modeOptionInactive]}
               onPress={() => handleSelectMaxPlayers(4)}
-              disabled={!hostMode || hasPremium}
+              disabled={!hostMode || (hasPremium && gameMode === 'individual-devices' && !singlePlayerDefault)}
               activeOpacity={0.7}
             >
-              <Text style={[styles.modeLabel, { textAlign: 'center' }, !hasPremium && maxPlayers === 4 && styles.modeLabelActiveFree]}>
+              <Text style={[styles.modeLabel, { textAlign: 'center' }, maxPlayers === 4 && styles.modeLabelActiveFree]}>
                 Max 4 players
               </Text>
-              <View style={[styles.freeBadge, (hasPremium || maxPlayers !== 4) && styles.freeBadgeDimmed]} pointerEvents="none">
-                <Text style={[styles.freeBadgeText, (hasPremium || maxPlayers !== 4) && styles.freeBadgeTextDimmed]}>FREE</Text>
+              <View style={[styles.freeBadge, maxPlayers !== 4 && styles.freeBadgeDimmed]} pointerEvents="none">
+                <Text style={[styles.freeBadgeText, maxPlayers !== 4 && styles.freeBadgeTextDimmed]}>FREE</Text>
               </View>
             </TouchableOpacity>
             {/* Max 12: auto-valt och aktivt (guld) när premium. */}

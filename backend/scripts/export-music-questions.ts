@@ -24,13 +24,14 @@ type YoutubeContentSubject = 'song' | 'movie' | 'sport-event';
 interface ExportedMusicQuestion {
   id: string;
   displayName: string;
-  correctYear: number;
+  /** Obligatorisk för timeline-frågor; utelämnas för actor-select. */
+  correctYear?: number;
   /** Subject från katalogens contentSubject — driver frågetext-lookup på klienten.
    *  'song' för musik (songs-*.yaml), 'movie' för film (movies-*.yaml),
    *  'sport-event' för sporthändelser. Alla 3 är youtube-form. */
   contentSubject: YoutubeContentSubject;
-  /** Frågetext från FIXED_QUESTION_TEXT[contentSubject]. Inline:as i exporten
-   *  så klienten slipper rebakad lookup-tabell. */
+  /** Frågetext från FIXED_QUESTION_TEXT[contentSubject] eller override för
+   *  actor-select. Inline:as i exporten så klienten slipper rebakad lookup-tabell. */
   questionText: string;
   /** Generationer som item:et är curerat för — kopieras från file-header
    *  audience eller item-override. Driver klient-side audience-filtret. */
@@ -39,6 +40,12 @@ interface ExportedMusicQuestion {
    *  Driver klientens crossover-filter (sport-musik surfar under Music+Sport). */
   genrePackages?: string[];
   youtubeClips: ExportedYoutubeClip[];
+  /** actor-select: true = animerad film (karaktärnamn), false/utelämnat = live-action (skådespelarnamn). */
+  isAnimated?: boolean;
+  /** actor-select: godkända svar (1–2 namn; spela räcker att välja ett). */
+  correctNames?: string[];
+  /** actor-select: felaktiga svarsalternativ som visas i namnlistan. */
+  distractorNames?: string[];
 }
 
 function renderTsModule(questions: ExportedMusicQuestion[]): string {
@@ -62,7 +69,8 @@ export type YoutubeContentSubject = 'song' | 'movie' | 'sport-event';
 export interface MusicQuestion {
   id: string;
   displayName: string;
-  correctYear: number;
+  /** Finns för timeline-frågor; saknas för actor-select (film-frågor). */
+  correctYear?: number;
   contentSubject: YoutubeContentSubject;
   questionText: string;
   audiences: MusicQuestionAudience[];
@@ -70,6 +78,12 @@ export interface MusicQuestion {
   youtubeClips: YoutubeClip[];
   /** Spotify track ID — satt manuellt i YAML för Spotify DJ-läge. */
   spotifyTrackId?: string;
+  /** actor-select: true = animerad film (frågar karaktärnamn), annars skådespelarnamn. */
+  isAnimated?: boolean;
+  /** actor-select: godkända svar (räcker att välja ett). */
+  correctNames?: string[];
+  /** actor-select: felaktiga svarsalternativ. */
+  distractorNames?: string[];
 }
 
 export const MUSIC_QUESTIONS: MusicQuestion[] = ${JSON.stringify(questions, null, 2)};
@@ -102,7 +116,10 @@ async function main(): Promise<void> {
         skipped.push(`${item.id} (no youtubeClips and no spotifyTrackId)`);
         continue;
       }
-      if (item.correctYear === undefined) {
+      // actor-select items (filmer) behöver inget correctYear — svaret är
+      // ett skådespelar-/karaktärnamn, inte ett år.
+      const isActorSelect = item.answerMethods.includes('actor-select');
+      if (!isActorSelect && item.correctYear === undefined) {
         skipped.push(`${item.id} (no correctYear)`);
         continue;
       }
@@ -110,18 +127,31 @@ async function main(): Promise<void> {
       // Type-cast pga TS-narrowing — schema garanterar att youtube-form
       // bara har 'song' | 'movie' | 'sport-event'.
       const subject = file.contentSubject as 'song' | 'movie' | 'sport-event';
+      // actor-select: frågetext beror på om filmen är animerad.
+      const questionText = isActorSelect
+        ? (item.isAnimated
+            ? 'What is the name of the main character in this film?'
+            : 'Select one of the main actors in this film?')
+        : FIXED_QUESTION_TEXT[subject];
       songs.push({
         id: item.id,
         displayName: item.displayName,
-        correctYear: item.correctYear,
+        // correctYear behövs bara för timeline-frågor (scoring + display).
+        ...(item.correctYear !== undefined ? { correctYear: item.correctYear } : {}),
         contentSubject: subject,
-        questionText: FIXED_QUESTION_TEXT[subject],
+        questionText,
         // Item-level audience-override har företräde över file-header.
         audiences: item.audience ?? file.audience,
         // genrePackages (t.ex. ["sport"]) — bara när non-empty.
         ...(item.genrePackages.length ? { genrePackages: item.genrePackages } : {}),
         // Spotify track ID — bara om satt.
         ...(item.spotifyTrackId ? { spotifyTrackId: item.spotifyTrackId } : {}),
+        // actor-select-specifika fält — bara för filmfrågor.
+        ...(isActorSelect ? {
+          isAnimated: item.isAnimated ?? false,
+          correctNames: item.correctNames ?? [],
+          distractorNames: item.distractorNames ?? [],
+        } : {}),
         // Tom array för Spotify-only items — quiz.tsx renderar Spotify DJ-vyn
         // när youtubeClips är tom och spotifyTrackId finns.
         youtubeClips: hasYoutube ? item.youtubeClips!.map((c) => ({
@@ -137,7 +167,10 @@ async function main(): Promise<void> {
   }
 
   // Stable sortering på correctYear → reproducibel output över git-diff:ar.
-  songs.sort((a, b) => a.correctYear - b.correctYear || a.id.localeCompare(b.id));
+  // Actor-select items saknar correctYear; sorteras sist via Infinity-fallback.
+  songs.sort((a, b) =>
+    (a.correctYear ?? Infinity) - (b.correctYear ?? Infinity) || a.id.localeCompare(b.id),
+  );
 
   const outputPath = path.join(
     __dirname,

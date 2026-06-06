@@ -1,6 +1,7 @@
 import { ConnectionUnstableOverlay } from '@/src/components/ConnectionUnstableOverlay';
 import { CountdownIntro } from '@/src/components/CountdownIntro';
 import { GetReadyIntro, type QuestionMediaType } from '@/src/components/GetReadyIntro';
+import { ActorSelectBlock } from '@/src/components/ActorSelectBlock';
 import { ImageAnswerBlock } from '@/src/components/ImageAnswerBlock';
 import { InactivityCountdownBanner } from '@/src/components/InactivityCountdownBanner';
 import { MediaPlayer } from '@/src/components/MediaPlayer';
@@ -150,7 +151,29 @@ interface ImageQuestion {
   profession?: string;
 }
 
-type QuizQuestion = TimelineQuestion | ImageQuestion;
+interface ActorSelectQuestion {
+  type: 'actor-select';
+  id: string;
+  questionNumber: number;
+  totalQuestions: number;
+  category: string;
+  mainCategory: MainCategory | null;
+  question: string;
+  /** Filmtitel — visas i reveal-feedback. */
+  displayName: string;
+  /** True = animerad film (frågar karaktärnamn), false = live-action (skådespelarnamn). */
+  isAnimated: boolean;
+  /** Godkända svar (1–2 namn). Räcker att välja ett. */
+  correctNames: string[];
+  /** Felaktiga svarsalternativ som visas i namnlistan. */
+  distractorNames: string[];
+  /** Filmens releasår — används för era-filtrering (inte för scoring). */
+  correctYear?: number;
+  genrePackages?: readonly string[];
+  youtubeClips?: YoutubeClip[];
+}
+
+type QuizQuestion = TimelineQuestion | ImageQuestion | ActorSelectQuestion;
 
 // Frågorna kommer från backend-curerad katalog (backend/content/catalog/songs-*.yaml).
 // Regenerera src/utils/musicQuestions.ts efter katalog-ändringar med:
@@ -160,20 +183,43 @@ type QuizQuestion = TimelineQuestion | ImageQuestion;
 // map (matrisens "Fixed Question text"-kolumn) så frågetexten är härledd ur
 // `contentSubject`, inte hårdkodad här. `hint` används bara internt
 // i reveal-vyn ("Disco era") så den behålls för smak.
-const SEED_QUESTIONS: TimelineQuestion[] = MUSIC_QUESTIONS.map((q, i) => ({
-  type: 'timeline',
-  id: q.id,
-  questionNumber: i + 1,
-  totalQuestions: MUSIC_QUESTIONS.length,
-  category: 'Music',
-  mainCategory: subjectToMainCategory(q.contentSubject),
-  question: q.questionText,
-  correctYear: q.correctYear,
-  hint: q.displayName,
-  genrePackages: q.genrePackages,
-  youtubeClips: q.youtubeClips,
-  spotifyTrackId: q.spotifyTrackId,
-}));
+const SEED_QUESTIONS: (TimelineQuestion | ActorSelectQuestion)[] = MUSIC_QUESTIONS.map((q, i) => {
+  if (q.correctNames && q.correctNames.length > 0) {
+    // Film-fråga: actor-select-mekanik (skådespelar-/karaktärnamn istället för år)
+    const actorQ: ActorSelectQuestion = {
+      type: 'actor-select',
+      id: q.id,
+      questionNumber: i + 1,
+      totalQuestions: MUSIC_QUESTIONS.length,
+      category: 'Film',
+      mainCategory: subjectToMainCategory(q.contentSubject),
+      question: q.questionText,
+      displayName: q.displayName,
+      isAnimated: q.isAnimated ?? false,
+      correctNames: q.correctNames,
+      distractorNames: q.distractorNames ?? [],
+      correctYear: q.correctYear,
+      genrePackages: q.genrePackages,
+      youtubeClips: q.youtubeClips,
+    };
+    return actorQ;
+  }
+  const tq: TimelineQuestion = {
+    type: 'timeline',
+    id: q.id,
+    questionNumber: i + 1,
+    totalQuestions: MUSIC_QUESTIONS.length,
+    category: 'Music',
+    mainCategory: subjectToMainCategory(q.contentSubject),
+    question: q.questionText,
+    correctYear: q.correctYear!,
+    hint: q.displayName,
+    genrePackages: q.genrePackages,
+    youtubeClips: q.youtubeClips,
+    spotifyTrackId: q.spotifyTrackId,
+  };
+  return tq;
+});
 
 function professionFromSubject(subject: string | undefined): string {
   if (subject === 'artist') return 'Artist';
@@ -893,7 +939,9 @@ export default function QuizScreen() {
     // Era HÅRD: filtrera SEED_QUESTIONS på correctYear ∈ [eraFrom, eraTo].
     const inEraMusic = youtubeEnabled
       ? SEED_QUESTIONS.filter(
-          (q) => q.correctYear >= eraFrom && q.correctYear <= eraTo,
+          (q) => q.correctYear !== undefined
+            ? q.correctYear >= eraFrom && q.correctYear <= eraTo
+            : true,
         )
       : [];
     // Audience MJUK: filtrera era-träffarna ytterligare. MUSIC_QUESTIONS har
@@ -1312,6 +1360,10 @@ export default function QuizScreen() {
   const [pendingNameOption, setPendingNameOption] = useState<ImageNameOption | null>(null);
   const [confirmedNameOption, setConfirmedNameOption] = useState<ImageNameOption | null>(null);
 
+  // ── Actor-select-state (film-frågor) ───────────────────────────────────
+  const [pendingActorName, setPendingActorName] = useState<string | null>(null);
+  const [confirmedActorName, setConfirmedActorName] = useState<string | null>(null);
+
   // ── Multiplayer state ──────────────────────────────────────────────────
   // Per-runda-poäng (= scores för senaste avslutade fråga). Aggregerade
   // per-spelare-totals härleds från allRoundScoresHistory via gameTotals.
@@ -1500,6 +1552,7 @@ export default function QuizScreen() {
 
   const question: QuizQuestion = gameQuestions[questionIndex % gameQuestions.length];
   const isImageQuestion = question.type === 'image';
+  const isActorSelectQuestion = question.type === 'actor-select';
   const isLastQuestion = questionIndex === totalQuestions - 1;
 
   // Bygg image-variant runtime baserat på source + assistance + audience-set.
@@ -1551,8 +1604,11 @@ export default function QuizScreen() {
         {
           // Image-frågor har inga YouTube-klipp; pickMediaSource returnerar
           // då 'none' och MediaPlayer renderas inte (image-grenen ovan).
+          // Actor-select (film-frågor) har YouTube-trailer-klipp.
           youtubeClips:
-            question.type === 'timeline' ? question.youtubeClips : undefined,
+            question.type === 'timeline' || question.type === 'actor-select'
+              ? question.youtubeClips
+              : undefined,
         },
         { youtubeEnabled, gameMode },
       ),
@@ -1638,9 +1694,7 @@ export default function QuizScreen() {
     }
     if (phase === 'question') {
       // Time ran out utan Confirm — registrera ronden som missad (0 poäng,
-      // inget giltigt svar) och gå direkt till reveal. För image-frågor
-      // sätts correctYear/selectedYear=0 (RoundResult-shapen är timeline-
-      // formad; year-fälten ignoreras i image-reveal-rendering).
+      // inget giltigt svar) och gå direkt till reveal.
       if (question.type === 'timeline') {
         const defaultGuess = new Date().getFullYear() - 20;
         setSelectedYear(defaultGuess);
@@ -1658,8 +1712,8 @@ export default function QuizScreen() {
           },
         ]);
       } else {
-        // Image time-out: confirmedNameOption förblir null, reveal visar
-        // ✗ Wrong Answer + "Correct: {displayName}".
+        // Image/actor-select time-out: confirmed*-state förblir null,
+        // reveal visar ✗ Wrong Answer + rätt svar.
         setRounds((prev) => [
           ...prev,
           {
@@ -1910,7 +1964,9 @@ export default function QuizScreen() {
     ? false
     : isImageQuestion
       ? hintsReady
-      : pendingYear !== null;
+      : isActorSelectQuestion
+        ? pendingActorName !== null
+        : pendingYear !== null;
 
   // Confirm-knappens scale + glow-loop. Körs medan phase === 'question' OCH
   // ett svar är preliminärt valt (knappen är tappbar). Stoppas i andra faser så
@@ -2071,6 +2127,47 @@ export default function QuizScreen() {
     setPhase('awaiting');
   };
 
+  // Actor-select-Confirm: speglar handleConfirmName men för filmfrågor.
+  // correct = spelarens val finns i question.correctNames.
+  const handleConfirmActor = (name: string) => {
+    if (question.type !== 'actor-select') return;
+    const correct = question.correctNames.includes(name);
+    const pts = calculatePoints(correct);
+    const totalMs = responseSeconds * 1000;
+    const exactElapsedMs = Math.max(0, Date.now() - questionStartMsRef.current);
+    const exactElapsedSec = Math.min(responseSeconds, exactElapsedMs / 1000);
+    setConfirmedTimeUsed(exactElapsedSec);
+    const elapsedAtConfirm = Math.min(totalMs, Math.max(0, exactElapsedMs));
+    setDecimalElapsedMs(elapsedAtConfirm);
+    setConfirmedActorName(name);
+    setRounds((prev) => [
+      ...prev,
+      {
+        questionNumber: questionIndex + 1,
+        category: question.category,
+        question: question.question,
+        correctYear: 0,
+        selectedYear: 0,
+        correct,
+        points: pts,
+        timeUsed: exactElapsedSec,
+      },
+    ]);
+    recordRoundScore(pts, correct, exactElapsedSec);
+    if (gameMode === 'individual-devices' && selfPlayerId) {
+      setPlayerConfirms((prev) => ({ ...prev, [selfPlayerId]: exactElapsedSec }));
+      if (syncChannelRef.current) {
+        syncChannelRef.current
+          .broadcastPlayerAnswerConfirmed({
+            player_id: selfPlayerId,
+            time_used: exactElapsedSec,
+          })
+          .catch(() => {});
+      }
+    }
+    setPhase('awaiting');
+  };
+
   // ── Navigations-handlers ────────────────────────────────────────────────
 
   // Från Reveal: visa leaderboard
@@ -2089,6 +2186,8 @@ export default function QuizScreen() {
     setSelectedYear(null);
     setPendingNameOption(null);
     setConfirmedNameOption(null);
+    setPendingActorName(null);
+    setConfirmedActorName(null);
     setConfirmedTimeUsed(null);
     setStickyUnstableForQuestion(false);
     setPhase('intro');
@@ -2118,9 +2217,11 @@ export default function QuizScreen() {
     setSelectedYear(null);
     setPendingYear(null);
     setConfirmedTimeUsed(null);
-    // Reset image-fråge-state så nästa fråga (oavsett typ) startar rent.
+    // Reset image- + actor-select-state så nästa fråga (oavsett typ) startar rent.
     setPendingNameOption(null);
     setConfirmedNameOption(null);
+    setPendingActorName(null);
+    setConfirmedActorName(null);
     // Reset per-spelare-confirm-mappen så nästa frågas avatar-markörer
     // börjar från höger kant igen. hasLeft-flag:n påverkas inte.
     setPlayerConfirms({});
@@ -2321,6 +2422,8 @@ export default function QuizScreen() {
       setSelectedYear(null);
       setPendingNameOption(null);
       setConfirmedNameOption(null);
+      setPendingActorName(null);
+      setConfirmedActorName(null);
       setConfirmedTimeUsed(null);
       // Defensiv: bara från intro-phase tillåts countdown-transition.
       // Skyddar mot late-arriving broadcasts efter att non-host redan
@@ -3401,7 +3504,7 @@ export default function QuizScreen() {
         playerName={countdownPlayer?.name}
         playerEmoji={countdownPlayer?.emoji}
         onComplete={() => setPhase('question')}
-        sayWho={isImageQuestion}
+        sayWho={isImageQuestion || isActorSelectQuestion}
       />
       {/* Pre-decode-trick borttaget 2026-05-27 (text-rendering = no decode). */}
       {inactivityCountdownSec !== null && (
@@ -3712,7 +3815,11 @@ export default function QuizScreen() {
                   phase === 'awaiting' ||
                   phase === 'reveal'
                 }
-                showVideo={phase === 'reveal'}
+                // Film-trailer (actor-select) visar video alltid — spelaren
+                // ska se klippet för att gissa skådespelaren. Musik (timeline)
+                // döljer videon under frågan för att undvika år-spoilers i
+                // YouTube-titeln.
+                showVideo={isActorSelectQuestion ? true : phase === 'reveal'}
                 isMuted={isAudioMutedForSelf}
                 onError={handleYoutubeError}
               />
@@ -3994,6 +4101,23 @@ export default function QuizScreen() {
                   phase === 'awaiting' || phase === 'reveal' || shouldLockForUnstable
                 }
               />
+            ) : question.type === 'actor-select' ? (
+              <View
+                pointerEvents={shouldLockForUnstable ? 'none' : 'auto'}
+                style={shouldLockForUnstable ? { opacity: 0.4 } : undefined}
+              >
+                <ActorSelectBlock
+                  correctNames={question.correctNames}
+                  distractorNames={question.distractorNames}
+                  phase={phase}
+                  pendingName={pendingActorName}
+                  confirmedName={confirmedActorName}
+                  isTimedOut={phase === 'reveal' && confirmedActorName === null}
+                  onNameSelect={setPendingActorName}
+                  resetKey={questionIndex}
+                  assistance={currentAssistance}
+                />
+              </View>
             ) : imageVariant ? (
               // Variant byggdes runtime via `imageVariant`-useMemo ovan.
               // D-iii: ImageAnswerBlock har ingen egen disabled-prop —
@@ -4113,6 +4237,8 @@ export default function QuizScreen() {
                   if (!canConfirm || shouldLockForUnstable) return;
                   if (question.type === 'image' && pendingNameOption) {
                     handleConfirmName(pendingNameOption);
+                  } else if (question.type === 'actor-select' && pendingActorName) {
+                    handleConfirmActor(pendingActorName);
                   } else if (question.type === 'timeline' && pendingYear !== null) {
                     handleConfirm(pendingYear);
                   }

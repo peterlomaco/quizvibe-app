@@ -1,5 +1,9 @@
 # Svenska filmklassiker — kända i Sverige över generationer via bio, TV-repriser
-# och streaming. Frågetext: "Which Year was this Movie launched?"
+# och streaming.
+#
+# Frågetyp: actor-select — spelar YouTubeKlipp och ber spelaren välja
+# skådespelaren i huvudrollen bland 5-6 namnknappar.
+# "Select one of the main actors in this film?" med svenska skådespelarnamn.
 #
 # Kategori 'songs' används som approximation (CategorySchema saknar 'movies').
 # audience: fil-nivå täcker elder+gen-x+millennials som vuxit upp med dessa
@@ -16,7 +20,9 @@ items:
     correctYear: 1980
     probability: 95
     wikimediaSearchHints: ["Sällskapsresan 1980 film"]
-    answerMethods: ["timeline"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Lasse Åberg", "Stig Grybe"]
+    distractorNames: ["Magnus Härenstam", "Gösta Ekman", "Björn Skifs", "Per Oscarsson"]
     youtubeClips:
       - videoId: "3WD7f7pvoSY"
         startSec: 10
@@ -29,11 +35,13 @@ items:
     correctYear: 1981
     probability: 82
     wikimediaSearchHints: ["Göta Kanal 1981 film"]
-    answerMethods: ["timeline"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Janne Carlsson"]
+    distractorNames: ["Lasse Åberg", "Stig Grybe", "Gösta Ekman", "Allan Edwall"]
     youtubeClips:
       - videoId: "qx7zpGYSm0s"
-        startSec: 5
-        endSec: 35
+        startSec: 10
+        endSec: 40
         channelTitle: "NjutafilmsStudioS"
         notes: "Officiell NjutaFilms-trailer. Karaktärerna + kanalscenerna väl representerade."
 
@@ -42,11 +50,13 @@ items:
     correctYear: 1984
     probability: 83
     wikimediaSearchHints: ["Jönssonligan får guldfeber 1984"]
-    answerMethods: ["timeline"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Gösta Ekman"]
+    distractorNames: ["Lasse Åberg", "Stig Grybe", "Magnus Härenstam", "Per Oscarsson"]
     youtubeClips:
       - videoId: "FD3jK0gWbPc"
-        startSec: 5
-        endSec: 35
+        startSec: 10
+        endSec: 40
         channelTitle: "ZorbaMovies"
         notes: "Trailer. Jönssonligan-gänget tydliga."
 
@@ -55,11 +65,13 @@ items:
     correctYear: 1993
     probability: 82
     wikimediaSearchHints: ["Sunes sommar 1993 film"]
-    answerMethods: ["timeline"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Peter Haber"]
+    distractorNames: ["Mikael Persbrandt", "Lasse Åberg", "Gösta Ekman", "Johan Ulveson"]
     youtubeClips:
       - videoId: "88B9JxorPcI"
-        startSec: 5
-        endSec: 35
+        startSec: 10
+        endSec: 40
         channelTitle: "ZorbaMovies"
         notes: "Trailer. Familjefilm, stark igenkänning hos millennials som barn."
 
@@ -69,11 +81,13 @@ items:
     probability: 82
     audience: ["gen-x", "millennials", "gen-z"]
     wikimediaSearchHints: ["Så som i himmelen 2004 film"]
-    answerMethods: ["timeline"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Michael Nyqvist"]
+    distractorNames: ["Rolf Lassgård", "Björn Skifs", "Mikael Persbrandt", "Peter Haber"]
     youtubeClips:
       - videoId: "FT5A0rYUSVE"
-        startSec: 5
-        endSec: 40
+        startSec: 10
+        endSec: 45
         channelTitle: "NuovoCinemaGiornico"
         notes: "Originaltrailer. Oscar-nominerad svensk film. Michael Nyqvist."
 
@@ -83,11 +97,13 @@ items:
     probability: 88
     audience: ["millennials", "gen-z"]
     wikimediaSearchHints: ["Hundraåringen som klev ut 2013"]
-    answerMethods: ["timeline"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Robert Gustafsson"]
+    distractorNames: ["Rolf Lassgård", "Michael Nyqvist", "Peter Haber", "Mikael Persbrandt"]
     youtubeClips:
       - videoId: "pjiJ1cL3Uss"
-        startSec: 5
-        endSec: 40
+        startSec: 10
+        endSec: 45
         channelTitle: "Buena Vista Sverige"
         notes: "Officiell svensk trailer. Buena Vista Sverige. Robert Gustafsson."
 
@@ -97,7 +113,9 @@ items:
     probability: 90
     audience: ["millennials", "gen-z"]
     wikimediaSearchHints: ["En man som heter Ove 2015 film"]
-    answerMethods: ["timeline"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Rolf Lassgård"]
+    distractorNames: ["Robert Gustafsson", "Michael Nyqvist", "Mikael Persbrandt", "Peter Haber"]
     youtubeClips:
       - videoId: "q84plEEyGZY"
         startSec: 12

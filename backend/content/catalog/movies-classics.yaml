@@ -3,11 +3,13 @@
 # Disney+, klassiker-listor). audience: ['all'] reflekterar cross-gen-
 # recognition i V1-svensk-målgrupp. correctYear = ursprunglig release-år.
 #
-# Kategori 'songs' används som approximation eftersom CategorySchema saknar
-# 'movies'-värde — distractor-pool är irrelevant för timeline-frågor (year-
-# picker använder inga text-options).
+# Frågetyp: actor-select — spelar YouTubeKlipp och ber spelaren välja
+# skådespelaren/karaktären i huvudrollen bland 5-6 namnknappar.
+# isAnimated=true → "What is the name of the main character in this film?"
+# isAnimated=false (default) → "Select one of the main actors in this film?"
 #
-# Frågetext: "Which Year was this Movie launched?" (från FIXED_QUESTION_TEXT).
+# Kategori 'songs' används som approximation eftersom CategorySchema saknar
+# 'movies'-värde.
 audience: ["all"]
 region: ["sweden"]
 category: songs
@@ -19,7 +21,9 @@ items:
     correctYear: 1975
     probability: 90
     wikimediaSearchHints: ["Jaws 1975 film"]
-    answerMethods: ["timeline"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Roy Scheider", "Richard Dreyfuss"]
+    distractorNames: ["Robert Redford", "Dustin Hoffman", "Jack Nicholson", "Gene Hackman"]
     youtubeClips:
       - videoId: "qCzncv0ISaE"
         startSec: 30
@@ -32,79 +36,23 @@ items:
     correctYear: 1977
     probability: 95
     wikimediaSearchHints: ["Star Wars A New Hope 1977"]
-    answerMethods: ["timeline"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Mark Hamill", "Harrison Ford"]
+    distractorNames: ["Donald Sutherland", "Jack Nicholson", "Robert Redford", "Warren Beatty"]
     youtubeClips:
       - videoId: "vZ734NWnAHA"
-        startSec: 0
-        endSec: 15
+        startSec: 10
+        endSec: 25
         channelTitle: "Star Wars"
         notes: "Official Star Wars channel — A New Hope trailer. John Williams theme."
-  - id: indiana-jones-raiders
-    displayName: "Indiana Jones: Raiders of the Lost Ark"
-    correctYear: 1981
-    probability: 92
-    wikimediaSearchHints: ["Raiders of the Lost Ark 1981 Indiana Jones"]
-    answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "0xQSIdSRlAk"
-        startSec: 5
-        endSec: 20
-        channelTitle: "Paramount Movies"
-        notes: "Official Paramount Movies trailer. Raiders March-theme + boulder-scen."
-  - id: back-to-the-future
-    displayName: "Back to the Future"
-    correctYear: 1985
-    probability: 95
-    wikimediaSearchHints: ["Back to the Future 1985"]
-    answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "T_WSXXPQYeY"
-        startSec: 0
-        endSec: 15
-        channelTitle: "Universal Pictures"
-        notes: "Official Universal Pictures-klipp — Johnny B. Goode-scenen."
-  - id: jurassic-park
-    displayName: "Jurassic Park"
-    correctYear: 1993
-    probability: 95
-    wikimediaSearchHints: ["Jurassic Park 1993 film"]
-    answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "VzZN9AVBS1I"
-        startSec: 60
-        endSec: 75
-        channelTitle: "Universal Pictures At Home"
-        notes: "Official Universal Pictures-klipp 4K — iconic theme + dinosaur-reveal."
-  - id: pulp-fiction
-    displayName: "Pulp Fiction"
-    correctYear: 1994
-    probability: 88
-    wikimediaSearchHints: ["Pulp Fiction 1994 Tarantino"]
-    answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "s7EdQ4FqbhY"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Movieclips"
-        notes: "Official trailer (Movieclips) — iconic surf-rock soundtrack + ensemble-shots."
-  - id: forrest-gump
-    displayName: "Forrest Gump"
-    correctYear: 1994
-    probability: 93
-    wikimediaSearchHints: ["Forrest Gump 1994 Tom Hanks"]
-    answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "bSMxl1V8FSg"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Movieclips"
-        notes: "Movieclips 'Run, Forrest, Run!'-scenen — iconic moment + theme."
   - id: the-godfather
     displayName: "The Godfather"
     correctYear: 1972
     probability: 92
     wikimediaSearchHints: ["The Godfather 1972 Coppola"]
-    answerMethods: ["timeline"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Marlon Brando", "Al Pacino"]
+    distractorNames: ["Jack Nicholson", "Robert Redford", "Dustin Hoffman", "Steve McQueen"]
     youtubeClips:
       - videoId: "UaVTIH8mujA"
         startSec: 30
@@ -116,7 +64,9 @@ items:
     correctYear: 1976
     probability: 92
     wikimediaSearchHints: ["Rocky 1976 Stallone"]
-    answerMethods: ["timeline"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Sylvester Stallone"]
+    distractorNames: ["Burt Reynolds", "Steve McQueen", "James Caan", "Gene Hackman"]
     genrePackages: ["sport"]
     youtubeClips:
       - videoId: "-Hk-LYcavrw"
@@ -124,36 +74,213 @@ items:
         endSec: 45
         channelTitle: "Amazon MGM Studios"
         notes: "MGM Official trailer — Bill Conti's Gonna Fly Now-tema + training-montage."
+  - id: grease-1978
+    displayName: "Grease"
+    correctYear: 1978
+    probability: 88
+    wikimediaSearchHints: ["Grease 1978 film Travolta Newton-John"]
+    answerMethods: ["actor-select"]
+    correctNames: ["John Travolta", "Olivia Newton-John"]
+    distractorNames: ["Elvis Presley", "Burt Reynolds", "Farrah Fawcett", "Brooke Shields"]
+    youtubeClips:
+      - videoId: "aOpnnrS4ags"
+        startSec: 20
+        endSec: 35
+        channelTitle: "Frankie Valli and the Four Seasons"
+        notes: "Curerad 2026-05-29 — Grease-titelmelodin (Frankie Valli, TOTP 1978). Officiell artist-kanal."
+  - id: raging-bull-1980
+    displayName: "Raging Bull"
+    correctYear: 1980
+    probability: 84
+    wikimediaSearchHints: ["Raging Bull 1980 film Robert De Niro Jake LaMotta Scorsese"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Robert De Niro"]
+    distractorNames: ["Sylvester Stallone", "Jack Nicholson", "Burt Reynolds", "Jon Voight"]
+    genrePackages: ["sport"]
+    youtubeClips:
+      - videoId: "F2UKuKxCJqc"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Amazon MGM Studios"
+        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (13)."
+  - id: indiana-jones-raiders
+    displayName: "Indiana Jones: Raiders of the Lost Ark"
+    correctYear: 1981
+    probability: 92
+    wikimediaSearchHints: ["Raiders of the Lost Ark 1981 Indiana Jones"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Harrison Ford"]
+    distractorNames: ["Tom Selleck", "Mel Gibson", "Bruce Willis", "Kurt Russell"]
+    youtubeClips:
+      - videoId: "0xQSIdSRlAk"
+        startSec: 10
+        endSec: 25
+        channelTitle: "Paramount Movies"
+        notes: "Official Paramount Movies trailer. Raiders March-theme + boulder-scen."
   - id: e-t-the-extra-terrestrial
     displayName: "E.T. the Extra-Terrestrial"
     correctYear: 1982
     probability: 92
     wikimediaSearchHints: ["E.T. the Extra-Terrestrial 1982 Spielberg"]
-    answerMethods: ["timeline"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Henry Thomas", "Drew Barrymore"]
+    distractorNames: ["Macaulay Culkin", "River Phoenix", "Elijah Wood", "Jake Gyllenhaal"]
     youtubeClips:
       - videoId: "2tK7AMgLvv0"
         startSec: 15
         endSec: 30
         channelTitle: "IMAX"
         notes: "IMAX official trailer — John Williams theme + iconic bicycle/moon-scen."
+  - id: the-terminator-1984
+    displayName: "The Terminator"
+    correctYear: 1984
+    probability: 88
+    wikimediaSearchHints: ["The Terminator 1984 film Schwarzenegger Cameron"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Arnold Schwarzenegger", "Linda Hamilton"]
+    distractorNames: ["Mel Gibson", "Tom Cruise", "Bruce Willis", "Kurt Russell"]
+    youtubeClips:
+      - videoId: "nGrW-OR2uDk"
+        startSec: 15
+        endSec: 30
+        channelTitle: "Amazon MGM Studios"
+        notes: "Curerad 2026-05-29 — officiell 1984-trailer (MGM)."
+  - id: back-to-the-future
+    displayName: "Back to the Future"
+    correctYear: 1985
+    probability: 95
+    wikimediaSearchHints: ["Back to the Future 1985"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Michael J. Fox"]
+    distractorNames: ["Rob Lowe", "Tom Hanks", "Emilio Estevez", "Patrick Swayze"]
+    youtubeClips:
+      - videoId: "T_WSXXPQYeY"
+        startSec: 10
+        endSec: 25
+        channelTitle: "Universal Pictures"
+        notes: "Official Universal Pictures-klipp — Johnny B. Goode-scenen."
   - id: top-gun
     displayName: "Top Gun"
     correctYear: 1986
     probability: 90
     wikimediaSearchHints: ["Top Gun 1986 Tom Cruise"]
-    answerMethods: ["timeline"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Tom Cruise", "Val Kilmer"]
+    distractorNames: ["Kevin Bacon", "Mel Gibson", "Patrick Swayze", "Matthew Modine"]
     youtubeClips:
       - videoId: "xa_z57UatDY"
         startSec: 15
         endSec: 30
         channelTitle: "Rotten Tomatoes Classic Trailers"
         notes: "Official 1986-trailer — Danger Zone-tema + jet-action."
+  - id: field-of-dreams-1989
+    displayName: "Field of Dreams"
+    correctYear: 1989
+    probability: 82
+    wikimediaSearchHints: ["Field of Dreams 1989 film Kevin Costner baseball Iowa"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Kevin Costner"]
+    distractorNames: ["Tom Hanks", "Patrick Swayze", "Tom Cruise", "Mel Gibson"]
+    youtubeClips:
+      - videoId: "Ut06d4dptWo"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Movieclips"
+        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (13)."
+  - id: home-alone
+    displayName: "Home Alone"
+    correctYear: 1990
+    probability: 93
+    wikimediaSearchHints: ["Home Alone 1990 film Macaulay Culkin Chris Columbus"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Macaulay Culkin"]
+    distractorNames: ["Jake Lloyd", "Haley Joel Osment", "Elijah Wood", "Freddie Highmore"]
+    youtubeClips:
+      - videoId: "NOIgZYlYvyk"
+        startSec: 15
+        endSec: 30
+        channelTitle: "NOW PLAYING"
+        notes: "Home Alone (1990) officiell trailer — Kevin McCallister + booby traps etableras."
+  - id: cool-runnings-1993
+    displayName: "Cool Runnings"
+    correctYear: 1993
+    probability: 85
+    wikimediaSearchHints: ["Cool Runnings 1993 film Jamaican bobsled Disney"]
+    answerMethods: ["actor-select"]
+    correctNames: ["John Candy"]
+    distractorNames: ["Robin Williams", "Bill Murray", "Eddie Murphy", "Chris Farley"]
+    genrePackages: ["sport"]
+    youtubeClips:
+      - videoId: "3mS-l1F5Xvs"
+        startSec: 15
+        endSec: 30
+        channelTitle: "DVDizzydotcom"
+        notes: "Curerad 2026-05-29 — original 1993-trailer (1080p HD-upscale)."
+  - id: jurassic-park
+    displayName: "Jurassic Park"
+    correctYear: 1993
+    probability: 95
+    wikimediaSearchHints: ["Jurassic Park 1993 film"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Sam Neill", "Jeff Goldblum"]
+    distractorNames: ["Kevin Costner", "Mel Gibson", "Kurt Russell", "Bruce Willis"]
+    youtubeClips:
+      - videoId: "VzZN9AVBS1I"
+        startSec: 60
+        endSec: 75
+        channelTitle: "Universal Pictures At Home"
+        notes: "Official Universal Pictures-klipp 4K — iconic theme + dinosaur-reveal."
+  - id: forrest-gump
+    displayName: "Forrest Gump"
+    correctYear: 1994
+    probability: 93
+    wikimediaSearchHints: ["Forrest Gump 1994 Tom Hanks"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Tom Hanks"]
+    distractorNames: ["Kevin Costner", "Robin Williams", "Mel Gibson", "Jim Carrey"]
+    youtubeClips:
+      - videoId: "bSMxl1V8FSg"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Movieclips"
+        notes: "Movieclips 'Run, Forrest, Run!'-scenen — iconic moment + theme."
+  - id: the-lion-king-1994
+    displayName: "The Lion King"
+    correctYear: 1994
+    probability: 93
+    isAnimated: true
+    wikimediaSearchHints: ["The Lion King 1994 Disney film Simba Mufasa"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Simba"]
+    distractorNames: ["Mufasa", "Scar", "Nala", "Timon"]
+    youtubeClips:
+      - videoId: "lfiprM5l_cE"
+        startSec: 10
+        endSec: 40
+        channelTitle: "Aarush Boi"
+        notes: "Circle of Life-öppningsscenen (HD, 1994). Alla officiella Disney-trailers är made-for-kids-blockerade. Ersätt vid inbäddningsfel."
+  - id: pulp-fiction
+    displayName: "Pulp Fiction"
+    correctYear: 1994
+    probability: 88
+    wikimediaSearchHints: ["Pulp Fiction 1994 Tarantino"]
+    answerMethods: ["actor-select"]
+    correctNames: ["John Travolta", "Samuel L. Jackson"]
+    distractorNames: ["Kevin Costner", "Tom Hanks", "Nicolas Cage", "Denzel Washington"]
+    youtubeClips:
+      - videoId: "s7EdQ4FqbhY"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Movieclips"
+        notes: "Official trailer (Movieclips) — iconic surf-rock soundtrack + ensemble-shots."
   - id: titanic
     displayName: "Titanic"
     correctYear: 1997
     probability: 95
     wikimediaSearchHints: ["Titanic 1997 Cameron film"]
-    answerMethods: ["timeline"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Leonardo DiCaprio", "Kate Winslet"]
+    distractorNames: ["Brad Pitt", "Matt Damon", "Julia Roberts", "Sandra Bullock"]
     youtubeClips:
       - videoId: "I7c1etV7D7g"
         startSec: 30
@@ -165,158 +292,52 @@ items:
     correctYear: 1999
     probability: 93
     wikimediaSearchHints: ["The Matrix 1999 Wachowski"]
-    answerMethods: ["timeline"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Keanu Reeves", "Laurence Fishburne"]
+    distractorNames: ["Brad Pitt", "Nicolas Cage", "Hugh Jackman", "Will Smith"]
     youtubeClips:
       - videoId: "vKQi3bBA1y8"
         startSec: 30
         endSec: 45
         channelTitle: "Rotten Tomatoes Classic Trailers"
         notes: "Official 1999-trailer — bullet-time + Neo/Trinity-scener."
-  - id: avatar
-    displayName: "Avatar"
-    correctYear: 2009
-    probability: 93
-    wikimediaSearchHints: ["Avatar 2009 James Cameron"]
-    answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "5PSNL1qE6VY"
-        startSec: 60
-        endSec: 75
-        channelTitle: "20th Century Studios"
-        notes: "20th Century Studios official 2009-trailer — Pandora-värld, Na'vi-action."
-  # === Sport-tema-filmer expansion 2026-05-27 (rocky-1976 borttagen — dupli av existing `rocky`) ===
-  - id: raging-bull-1980
-    displayName: "Raging Bull"
-    correctYear: 1980
-    probability: 84
-    wikimediaSearchHints: ["Raging Bull 1980 film Robert De Niro Jake LaMotta Scorsese"]
-    answerMethods: ["timeline"]
-    genrePackages: ["sport"]
-    youtubeClips:
-      - videoId: "F2UKuKxCJqc"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Amazon MGM Studios"
-        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (13)."
-  - id: field-of-dreams-1989
-    displayName: "Field of Dreams"
-    correctYear: 1989
-    probability: 82
-    wikimediaSearchHints: ["Field of Dreams 1989 film Kevin Costner baseball Iowa"]
-    answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "Ut06d4dptWo"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Movieclips"
-        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (13)."
-  - id: cool-runnings-1993
-    displayName: "Cool Runnings"
-    correctYear: 1993
-    probability: 85
-    wikimediaSearchHints: ["Cool Runnings 1993 film Jamaican bobsled Disney"]
-    answerMethods: ["timeline"]
-    genrePackages: ["sport"]
-    youtubeClips:
-      - videoId: "3mS-l1F5Xvs"
-        startSec: 15
-        endSec: 30
-        channelTitle: "DVDizzydotcom"
-        notes: "Curerad 2026-05-29 — original 1993-trailer (1080p HD-upscale)."
-  - id: million-dollar-baby-2004
-    displayName: "Million Dollar Baby"
-    correctYear: 2004
-    probability: 82
-    wikimediaSearchHints: ["Million Dollar Baby 2004 film Clint Eastwood boxing"]
-    answerMethods: ["timeline"]
-    genrePackages: ["sport"]
-    youtubeClips:
-      - videoId: "5_RsHRmIRBY"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Rotten Tomatoes Classic Trailers"
-        notes: "Curerad 2026-05-29 — officiell 2004-trailer (Swank/Eastwood). Ej Ava Max-låten."
-  - id: moneyball-2011
-    displayName: "Moneyball"
-    correctYear: 2011
-    probability: 80
-    wikimediaSearchHints: ["Moneyball 2011 film Brad Pitt baseball Oakland A's"]
-    answerMethods: ["timeline"]
-    genrePackages: ["sport"]
-    youtubeClips:
-      - videoId: "-4QPVo0UIzc"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Rotten Tomatoes Trailers"
-        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
-  - id: borg-vs-mcenroe-2017
-    displayName: "Borg vs McEnroe"
-    correctYear: 2017
-    probability: 78
-    wikimediaSearchHints: ["Borg vs McEnroe 2017 film Sverrir Gudnason Wimbledon"]
-    answerMethods: ["timeline"]
-    genrePackages: ["sport"]
-    youtubeClips:
-      - videoId: "yQgWMs0TBKU"
-        startSec: 30
-        endSec: 45
-        channelTitle: "SF Studios"
-        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (13)."
-  # === Content-expansion 2026-05-29: fler cross-gen-ikoniska filmer ===
-  - id: grease-1978
-    displayName: "Grease"
-    correctYear: 1978
-    probability: 88
-    wikimediaSearchHints: ["Grease 1978 film Travolta Newton-John"]
-    answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "aOpnnrS4ags"
-        startSec: 20
-        endSec: 35
-        channelTitle: "Frankie Valli and the Four Seasons"
-        notes: "Curerad 2026-05-29 — Grease-titelmelodin (Frankie Valli, TOTP 1978). Officiell artist-kanal."
-  - id: the-terminator-1984
-    displayName: "The Terminator"
-    correctYear: 1984
-    probability: 88
-    wikimediaSearchHints: ["The Terminator 1984 film Schwarzenegger Cameron"]
-    answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "nGrW-OR2uDk"
-        startSec: 15
-        endSec: 30
-        channelTitle: "Amazon MGM Studios"
-        notes: "Curerad 2026-05-29 — officiell 1984-trailer (MGM)."
-  - id: the-lion-king-1994
-    displayName: "The Lion King"
-    correctYear: 1994
-    probability: 93
-    wikimediaSearchHints: ["The Lion King 1994 Disney film Simba Mufasa"]
-    answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "lfiprM5l_cE"
-        startSec: 0
-        endSec: 30
-        channelTitle: "Aarush Boi"
-        notes: "Circle of Life-öppningsscenen (HD, 1994). Alla officiella Disney-trailers är made-for-kids-blockerade. Ersätt vid inbäddningsfel."
   - id: gladiator-2000
     displayName: "Gladiator"
     correctYear: 2000
     probability: 90
     wikimediaSearchHints: ["Gladiator 2000 film Russell Crowe Ridley Scott"]
-    answerMethods: ["timeline"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Russell Crowe"]
+    distractorNames: ["Mel Gibson", "Tom Cruise", "Kevin Costner", "Brad Pitt"]
     youtubeClips:
       - videoId: "gDbltV8z7dQ"
-        startSec: 5
-        endSec: 20
+        startSec: 10
+        endSec: 25
         channelTitle: "Paramount Movies"
         notes: "Curerad 2026-05-29 — officiell Paramount-klipp 'My name is Maximus' (2000-filmen, ej Gladiator II)."
+  - id: snatch-2000
+    displayName: "Snatch"
+    correctYear: 2000
+    probability: 82
+    wikimediaSearchHints: ["Snatch 2000 film Guy Ritchie Brad Pitt Vinnie Jones"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Brad Pitt", "Jason Statham"]
+    distractorNames: ["Vin Diesel", "Dwayne Johnson", "Gerard Butler", "Mark Wahlberg"]
+    genrePackages: ["sport"]
+    youtubeClips:
+      - videoId: "9Jar2XkBboo"
+        startSec: 10
+        endSec: 40
+        channelTitle: "Movieclips Classic Trailers"
+        notes: "Snatch (2000) — officiell trailer. Vinnie Jones (f.d. Wimbledon FC) som Bullet Tooth Tony. genrePackages:sport → surfar under Athletes/Sport-filtret trots Film-nativ-kategori."
   - id: lotr-fellowship-2001
     displayName: "The Lord of the Rings: The Fellowship of the Ring"
     correctYear: 2001
     probability: 89
     wikimediaSearchHints: ["Lord of the Rings Fellowship of the Ring 2001 film"]
-    answerMethods: ["timeline"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Elijah Wood", "Ian McKellen"]
+    distractorNames: ["Tobey Maguire", "Daniel Radcliffe", "Brendan Fraser", "Ewan McGregor"]
     youtubeClips:
       - videoId: "V75dMMIW2B4"
         startSec: 15
@@ -328,41 +349,94 @@ items:
     correctYear: 2001
     probability: 91
     wikimediaSearchHints: ["Harry Potter Philosopher's Stone 2001 film"]
-    answerMethods: ["timeline"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Daniel Radcliffe", "Emma Watson"]
+    distractorNames: ["Tobey Maguire", "Elijah Wood", "Macaulay Culkin", "Jake Lloyd"]
     youtubeClips:
       - videoId: "iSItf2y7hgs"
         startSec: 30
         endSec: 45
         channelTitle: "ClipZone: Heroes & Villains"
         notes: "Curerad 2026-05-29 — scen ur 2001-filmen (ej 2026 HBO-reboot-teaser)."
+  - id: million-dollar-baby-2004
+    displayName: "Million Dollar Baby"
+    correctYear: 2004
+    probability: 82
+    wikimediaSearchHints: ["Million Dollar Baby 2004 film Clint Eastwood boxing"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Hilary Swank", "Clint Eastwood"]
+    distractorNames: ["Sandra Bullock", "Charlize Theron", "Tom Hanks", "Denzel Washington"]
+    genrePackages: ["sport"]
+    youtubeClips:
+      - videoId: "5_RsHRmIRBY"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Rotten Tomatoes Classic Trailers"
+        notes: "Curerad 2026-05-29 — officiell 2004-trailer (Swank/Eastwood). Ej Ava Max-låten."
   - id: the-dark-knight-2008
     displayName: "The Dark Knight"
     correctYear: 2008
     probability: 90
     wikimediaSearchHints: ["The Dark Knight 2008 film Nolan Batman"]
-    answerMethods: ["timeline"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Christian Bale", "Heath Ledger"]
+    distractorNames: ["Ben Affleck", "Robert Downey Jr.", "Hugh Jackman", "Ryan Reynolds"]
     youtubeClips:
       - videoId: "EXeTwQWrcwY"
         startSec: 15
         endSec: 30
         channelTitle: "Rotten Tomatoes Classic Trailers"
         notes: "Curerad 2026-05-29 — officiell 2008-trailer #1 (Nolan)."
+  - id: avatar
+    displayName: "Avatar"
+    correctYear: 2009
+    probability: 93
+    wikimediaSearchHints: ["Avatar 2009 James Cameron"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Sam Worthington", "Zoe Saldana"]
+    distractorNames: ["Matt Damon", "Chris Pratt", "Mila Kunis", "Scarlett Johansson"]
+    youtubeClips:
+      - videoId: "5PSNL1qE6VY"
+        startSec: 60
+        endSec: 75
+        channelTitle: "20th Century Studios"
+        notes: "20th Century Studios official 2009-trailer — Pandora-värld, Na'vi-action."
+  - id: moneyball-2011
+    displayName: "Moneyball"
+    correctYear: 2011
+    probability: 80
+    wikimediaSearchHints: ["Moneyball 2011 film Brad Pitt baseball Oakland A's"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Brad Pitt"]
+    distractorNames: ["Matt Damon", "George Clooney", "Ryan Gosling", "Christian Bale"]
+    genrePackages: ["sport"]
+    youtubeClips:
+      - videoId: "-4QPVo0UIzc"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Rotten Tomatoes Trailers"
+        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
   - id: frozen-2013
     displayName: "Frozen"
     correctYear: 2013
     probability: 91
+    isAnimated: true
     wikimediaSearchHints: ["Frozen 2013 Disney film Let It Go"]
-    answerMethods: ["timeline"]
-  - id: snatch-2000
-    displayName: "Snatch"
-    correctYear: 2000
-    probability: 82
-    wikimediaSearchHints: ["Snatch 2000 film Guy Ritchie Brad Pitt Vinnie Jones"]
-    answerMethods: ["timeline"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Elsa", "Anna"]
+    distractorNames: ["Olaf", "Kristoff", "Hans", "Sven"]
+  - id: borg-vs-mcenroe-2017
+    displayName: "Borg vs McEnroe"
+    correctYear: 2017
+    probability: 78
+    wikimediaSearchHints: ["Borg vs McEnroe 2017 film Sverrir Gudnason Wimbledon"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Sverrir Gudnason", "Shia LaBeouf"]
+    distractorNames: ["Tom Hanks", "Benedict Cumberbatch", "Michael Fassbender", "Joel Edgerton"]
     genrePackages: ["sport"]
     youtubeClips:
-      - videoId: "9Jar2XkBboo"
-        startSec: 0
-        endSec: 30
-        channelTitle: "Movieclips Classic Trailers"
-        notes: "Snatch (2000) — officiell trailer. Vinnie Jones (f.d. Wimbledon FC) som Bullet Tooth Tony. genrePackages:sport → surfar under Athletes/Sport-filtret trots Film-nativ-kategori."
+      - videoId: "yQgWMs0TBKU"
+        startSec: 30
+        endSec: 45
+        channelTitle: "SF Studios"
+        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (13)."

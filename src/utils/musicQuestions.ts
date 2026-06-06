@@ -18,7 +18,8 @@ export type YoutubeContentSubject = 'song' | 'movie' | 'sport-event';
 export interface MusicQuestion {
   id: string;
   displayName: string;
-  correctYear: number;
+  /** Finns för timeline-frågor; saknas för actor-select (film-frågor). */
+  correctYear?: number;
   contentSubject: YoutubeContentSubject;
   questionText: string;
   audiences: MusicQuestionAudience[];
@@ -26,6 +27,12 @@ export interface MusicQuestion {
   youtubeClips: YoutubeClip[];
   /** Spotify track ID — satt manuellt i YAML för Spotify DJ-läge. */
   spotifyTrackId?: string;
+  /** actor-select: true = animerad film (frågar karaktärnamn), annars skådespelarnamn. */
+  isAnimated?: boolean;
+  /** actor-select: godkända svar (räcker att välja ett). */
+  correctNames?: string[];
+  /** actor-select: felaktiga svarsalternativ. */
+  distractorNames?: string[];
 }
 
 export const MUSIC_QUESTIONS: MusicQuestion[] = [
@@ -1446,9 +1453,20 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "displayName": "The Godfather",
     "correctYear": 1972,
     "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
+    "questionText": "Select one of the main actors in this film?",
     "audiences": [
       "all"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Marlon Brando",
+      "Al Pacino"
+    ],
+    "distractorNames": [
+      "Jack Nicholson",
+      "Robert Redford",
+      "Dustin Hoffman",
+      "Steve McQueen"
     ],
     "youtubeClips": [
       {
@@ -1718,9 +1736,20 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "displayName": "Jaws",
     "correctYear": 1975,
     "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
+    "questionText": "Select one of the main actors in this film?",
     "audiences": [
       "all"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Roy Scheider",
+      "Richard Dreyfuss"
+    ],
+    "distractorNames": [
+      "Robert Redford",
+      "Dustin Hoffman",
+      "Jack Nicholson",
+      "Gene Hackman"
     ],
     "youtubeClips": [
       {
@@ -1882,12 +1911,22 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "displayName": "Rocky",
     "correctYear": 1976,
     "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
+    "questionText": "Select one of the main actors in this film?",
     "audiences": [
       "all"
     ],
     "genrePackages": [
       "sport"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Sylvester Stallone"
+    ],
+    "distractorNames": [
+      "Burt Reynolds",
+      "Steve McQueen",
+      "James Caan",
+      "Gene Hackman"
     ],
     "youtubeClips": [
       {
@@ -2041,15 +2080,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "displayName": "Star Wars: A New Hope",
     "correctYear": 1977,
     "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
+    "questionText": "Select one of the main actors in this film?",
     "audiences": [
       "all"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Mark Hamill",
+      "Harrison Ford"
+    ],
+    "distractorNames": [
+      "Donald Sutherland",
+      "Jack Nicholson",
+      "Robert Redford",
+      "Warren Beatty"
     ],
     "youtubeClips": [
       {
         "videoId": "vZ734NWnAHA",
-        "startSec": 0,
-        "endSec": 15,
+        "startSec": 10,
+        "endSec": 25,
         "channelTitle": "Star Wars",
         "license": "standard",
         "notes": "Official Star Wars channel — A New Hope trailer. John Williams theme."
@@ -2103,9 +2153,20 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "displayName": "Grease",
     "correctYear": 1978,
     "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
+    "questionText": "Select one of the main actors in this film?",
     "audiences": [
       "all"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "John Travolta",
+      "Olivia Newton-John"
+    ],
+    "distractorNames": [
+      "Elvis Presley",
+      "Burt Reynolds",
+      "Farrah Fawcett",
+      "Brooke Shields"
     ],
     "youtubeClips": [
       {
@@ -2320,12 +2381,22 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "displayName": "Raging Bull",
     "correctYear": 1980,
     "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
+    "questionText": "Select one of the main actors in this film?",
     "audiences": [
       "all"
     ],
     "genrePackages": [
       "sport"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Robert De Niro"
+    ],
+    "distractorNames": [
+      "Sylvester Stallone",
+      "Jack Nicholson",
+      "Burt Reynolds",
+      "Jon Voight"
     ],
     "youtubeClips": [
       {
@@ -2343,11 +2414,22 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "displayName": "Sällskapsresan",
     "correctYear": 1980,
     "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
+    "questionText": "Select one of the main actors in this film?",
     "audiences": [
       "elder",
       "gen-x",
       "millennials"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Lasse Åberg",
+      "Stig Grybe"
+    ],
+    "distractorNames": [
+      "Magnus Härenstam",
+      "Gösta Ekman",
+      "Björn Skifs",
+      "Per Oscarsson"
     ],
     "youtubeClips": [
       {
@@ -2474,17 +2556,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "displayName": "Göta kanal — eller vem drog ur proppen?",
     "correctYear": 1981,
     "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
+    "questionText": "Select one of the main actors in this film?",
     "audiences": [
       "elder",
       "gen-x",
       "millennials"
     ],
+    "isAnimated": false,
+    "correctNames": [
+      "Janne Carlsson"
+    ],
+    "distractorNames": [
+      "Lasse Åberg",
+      "Stig Grybe",
+      "Gösta Ekman",
+      "Allan Edwall"
+    ],
     "youtubeClips": [
       {
         "videoId": "qx7zpGYSm0s",
-        "startSec": 5,
-        "endSec": 35,
+        "startSec": 10,
+        "endSec": 40,
         "channelTitle": "NjutafilmsStudioS",
         "license": "standard",
         "notes": "Officiell NjutaFilms-trailer. Karaktärerna + kanalscenerna väl representerade."
@@ -2512,15 +2604,25 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "displayName": "Indiana Jones: Raiders of the Lost Ark",
     "correctYear": 1981,
     "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
+    "questionText": "Select one of the main actors in this film?",
     "audiences": [
       "all"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Harrison Ford"
+    ],
+    "distractorNames": [
+      "Tom Selleck",
+      "Mel Gibson",
+      "Bruce Willis",
+      "Kurt Russell"
     ],
     "youtubeClips": [
       {
         "videoId": "0xQSIdSRlAk",
-        "startSec": 5,
-        "endSec": 20,
+        "startSec": 10,
+        "endSec": 25,
         "channelTitle": "Paramount Movies",
         "license": "standard",
         "notes": "Official Paramount Movies trailer. Raiders March-theme + boulder-scen."
@@ -2595,9 +2697,20 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "displayName": "E.T. the Extra-Terrestrial",
     "correctYear": 1982,
     "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
+    "questionText": "Select one of the main actors in this film?",
     "audiences": [
       "all"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Henry Thomas",
+      "Drew Barrymore"
+    ],
+    "distractorNames": [
+      "Macaulay Culkin",
+      "River Phoenix",
+      "Elijah Wood",
+      "Jake Gyllenhaal"
     ],
     "youtubeClips": [
       {
@@ -2974,17 +3087,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "displayName": "Jönssonligan får guldfeber",
     "correctYear": 1984,
     "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
+    "questionText": "Select one of the main actors in this film?",
     "audiences": [
       "elder",
       "gen-x",
       "millennials"
     ],
+    "isAnimated": false,
+    "correctNames": [
+      "Gösta Ekman"
+    ],
+    "distractorNames": [
+      "Lasse Åberg",
+      "Stig Grybe",
+      "Magnus Härenstam",
+      "Per Oscarsson"
+    ],
     "youtubeClips": [
       {
         "videoId": "FD3jK0gWbPc",
-        "startSec": 5,
-        "endSec": 35,
+        "startSec": 10,
+        "endSec": 40,
         "channelTitle": "ZorbaMovies",
         "license": "standard",
         "notes": "Trailer. Jönssonligan-gänget tydliga."
@@ -3080,9 +3203,20 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "displayName": "The Terminator",
     "correctYear": 1984,
     "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
+    "questionText": "Select one of the main actors in this film?",
     "audiences": [
       "all"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Arnold Schwarzenegger",
+      "Linda Hamilton"
+    ],
+    "distractorNames": [
+      "Mel Gibson",
+      "Tom Cruise",
+      "Bruce Willis",
+      "Kurt Russell"
     ],
     "youtubeClips": [
       {
@@ -3184,15 +3318,25 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "displayName": "Back to the Future",
     "correctYear": 1985,
     "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
+    "questionText": "Select one of the main actors in this film?",
     "audiences": [
       "all"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Michael J. Fox"
+    ],
+    "distractorNames": [
+      "Rob Lowe",
+      "Tom Hanks",
+      "Emilio Estevez",
+      "Patrick Swayze"
     ],
     "youtubeClips": [
       {
         "videoId": "T_WSXXPQYeY",
-        "startSec": 0,
-        "endSec": 15,
+        "startSec": 10,
+        "endSec": 25,
         "channelTitle": "Universal Pictures",
         "license": "standard",
         "notes": "Official Universal Pictures-klipp — Johnny B. Goode-scenen."
@@ -3366,9 +3510,20 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "displayName": "Top Gun",
     "correctYear": 1986,
     "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
+    "questionText": "Select one of the main actors in this film?",
     "audiences": [
       "all"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Tom Cruise",
+      "Val Kilmer"
+    ],
+    "distractorNames": [
+      "Kevin Bacon",
+      "Mel Gibson",
+      "Patrick Swayze",
+      "Matthew Modine"
     ],
     "youtubeClips": [
       {
@@ -3672,9 +3827,19 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "displayName": "Field of Dreams",
     "correctYear": 1989,
     "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
+    "questionText": "Select one of the main actors in this film?",
     "audiences": [
       "all"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Kevin Costner"
+    ],
+    "distractorNames": [
+      "Tom Hanks",
+      "Patrick Swayze",
+      "Tom Cruise",
+      "Mel Gibson"
     ],
     "youtubeClips": [
       {
@@ -3820,6 +3985,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "spotifyTrackId": "57bgtoPSgt236HzfBOd8kj",
     "youtubeClips": []
+  },
+  {
+    "id": "home-alone",
+    "displayName": "Home Alone",
+    "correctYear": 1990,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "audiences": [
+      "all"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Macaulay Culkin"
+    ],
+    "distractorNames": [
+      "Jake Lloyd",
+      "Haley Joel Osment",
+      "Elijah Wood",
+      "Freddie Highmore"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "NOIgZYlYvyk",
+        "startSec": 15,
+        "endSec": 30,
+        "channelTitle": "NOW PLAYING",
+        "license": "standard",
+        "notes": "Home Alone (1990) officiell trailer — Kevin McCallister + booby traps etableras."
+      }
+    ]
   },
   {
     "id": "madonna-vogue",
@@ -4359,12 +4554,22 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "displayName": "Cool Runnings",
     "correctYear": 1993,
     "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
+    "questionText": "Select one of the main actors in this film?",
     "audiences": [
       "all"
     ],
     "genrePackages": [
       "sport"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "John Candy"
+    ],
+    "distractorNames": [
+      "Robin Williams",
+      "Bill Murray",
+      "Eddie Murphy",
+      "Chris Farley"
     ],
     "youtubeClips": [
       {
@@ -4382,9 +4587,20 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "displayName": "Jurassic Park",
     "correctYear": 1993,
     "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
+    "questionText": "Select one of the main actors in this film?",
     "audiences": [
       "all"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Sam Neill",
+      "Jeff Goldblum"
+    ],
+    "distractorNames": [
+      "Kevin Costner",
+      "Mel Gibson",
+      "Kurt Russell",
+      "Bruce Willis"
     ],
     "youtubeClips": [
       {
@@ -4426,17 +4642,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "displayName": "Sunes sommar",
     "correctYear": 1993,
     "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
+    "questionText": "Select one of the main actors in this film?",
     "audiences": [
       "elder",
       "gen-x",
       "millennials"
     ],
+    "isAnimated": false,
+    "correctNames": [
+      "Peter Haber"
+    ],
+    "distractorNames": [
+      "Mikael Persbrandt",
+      "Lasse Åberg",
+      "Gösta Ekman",
+      "Johan Ulveson"
+    ],
     "youtubeClips": [
       {
         "videoId": "88B9JxorPcI",
-        "startSec": 5,
-        "endSec": 35,
+        "startSec": 10,
+        "endSec": 40,
         "channelTitle": "ZorbaMovies",
         "license": "standard",
         "notes": "Trailer. Familjefilm, stark igenkänning hos millennials som barn."
@@ -4511,9 +4737,19 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "displayName": "Forrest Gump",
     "correctYear": 1994,
     "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
+    "questionText": "Select one of the main actors in this film?",
     "audiences": [
       "all"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Tom Hanks"
+    ],
+    "distractorNames": [
+      "Kevin Costner",
+      "Robin Williams",
+      "Mel Gibson",
+      "Jim Carrey"
     ],
     "youtubeClips": [
       {
@@ -4598,9 +4834,20 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "displayName": "Pulp Fiction",
     "correctYear": 1994,
     "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
+    "questionText": "Select one of the main actors in this film?",
     "audiences": [
       "all"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "John Travolta",
+      "Samuel L. Jackson"
+    ],
+    "distractorNames": [
+      "Kevin Costner",
+      "Tom Hanks",
+      "Nicolas Cage",
+      "Denzel Washington"
     ],
     "youtubeClips": [
       {
@@ -4680,15 +4927,25 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "displayName": "The Lion King",
     "correctYear": 1994,
     "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
+    "questionText": "What is the name of the main character in this film?",
     "audiences": [
       "all"
+    ],
+    "isAnimated": true,
+    "correctNames": [
+      "Simba"
+    ],
+    "distractorNames": [
+      "Mufasa",
+      "Scar",
+      "Nala",
+      "Timon"
     ],
     "youtubeClips": [
       {
         "videoId": "lfiprM5l_cE",
-        "startSec": 0,
-        "endSec": 30,
+        "startSec": 10,
+        "endSec": 40,
         "channelTitle": "Aarush Boi",
         "license": "standard",
         "notes": "Circle of Life-öppningsscenen (HD, 1994). Alla officiella Disney-trailers är made-for-kids-blockerade. Ersätt vid inbäddningsfel."
@@ -5026,9 +5283,20 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "displayName": "Titanic",
     "correctYear": 1997,
     "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
+    "questionText": "Select one of the main actors in this film?",
     "audiences": [
       "all"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Leonardo DiCaprio",
+      "Kate Winslet"
+    ],
+    "distractorNames": [
+      "Brad Pitt",
+      "Matt Damon",
+      "Julia Roberts",
+      "Sandra Bullock"
     ],
     "youtubeClips": [
       {
@@ -5291,9 +5559,20 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "displayName": "The Matrix",
     "correctYear": 1999,
     "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
+    "questionText": "Select one of the main actors in this film?",
     "audiences": [
       "all"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Keanu Reeves",
+      "Laurence Fishburne"
+    ],
+    "distractorNames": [
+      "Brad Pitt",
+      "Nicolas Cage",
+      "Hugh Jackman",
+      "Will Smith"
     ],
     "youtubeClips": [
       {
@@ -5372,15 +5651,25 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "displayName": "Gladiator",
     "correctYear": 2000,
     "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
+    "questionText": "Select one of the main actors in this film?",
     "audiences": [
       "all"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Russell Crowe"
+    ],
+    "distractorNames": [
+      "Mel Gibson",
+      "Tom Cruise",
+      "Kevin Costner",
+      "Brad Pitt"
     ],
     "youtubeClips": [
       {
         "videoId": "gDbltV8z7dQ",
-        "startSec": 5,
-        "endSec": 20,
+        "startSec": 10,
+        "endSec": 25,
         "channelTitle": "Paramount Movies",
         "license": "standard",
         "notes": "Curerad 2026-05-29 — officiell Paramount-klipp 'My name is Maximus' (2000-filmen, ej Gladiator II)."
@@ -5463,18 +5752,29 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "displayName": "Snatch",
     "correctYear": 2000,
     "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
+    "questionText": "Select one of the main actors in this film?",
     "audiences": [
       "all"
     ],
     "genrePackages": [
       "sport"
     ],
+    "isAnimated": false,
+    "correctNames": [
+      "Brad Pitt",
+      "Jason Statham"
+    ],
+    "distractorNames": [
+      "Vin Diesel",
+      "Dwayne Johnson",
+      "Gerard Butler",
+      "Mark Wahlberg"
+    ],
     "youtubeClips": [
       {
         "videoId": "9Jar2XkBboo",
-        "startSec": 0,
-        "endSec": 30,
+        "startSec": 10,
+        "endSec": 40,
         "channelTitle": "Movieclips Classic Trailers",
         "license": "standard",
         "notes": "Snatch (2000) — officiell trailer. Vinnie Jones (f.d. Wimbledon FC) som Bullet Tooth Tony. genrePackages:sport → surfar under Athletes/Sport-filtret trots Film-nativ-kategori."
@@ -5519,9 +5819,20 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "displayName": "Harry Potter and the Philosopher's Stone",
     "correctYear": 2001,
     "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
+    "questionText": "Select one of the main actors in this film?",
     "audiences": [
       "all"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Daniel Radcliffe",
+      "Emma Watson"
+    ],
+    "distractorNames": [
+      "Tobey Maguire",
+      "Elijah Wood",
+      "Macaulay Culkin",
+      "Jake Lloyd"
     ],
     "youtubeClips": [
       {
@@ -5560,9 +5871,20 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "displayName": "The Lord of the Rings: The Fellowship of the Ring",
     "correctYear": 2001,
     "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
+    "questionText": "Select one of the main actors in this film?",
     "audiences": [
       "all"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Elijah Wood",
+      "Ian McKellen"
+    ],
+    "distractorNames": [
+      "Tobey Maguire",
+      "Daniel Radcliffe",
+      "Brendan Fraser",
+      "Ewan McGregor"
     ],
     "youtubeClips": [
       {
@@ -5945,12 +6267,23 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "displayName": "Million Dollar Baby",
     "correctYear": 2004,
     "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
+    "questionText": "Select one of the main actors in this film?",
     "audiences": [
       "all"
     ],
     "genrePackages": [
       "sport"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Hilary Swank",
+      "Clint Eastwood"
+    ],
+    "distractorNames": [
+      "Sandra Bullock",
+      "Charlize Theron",
+      "Tom Hanks",
+      "Denzel Washington"
     ],
     "youtubeClips": [
       {
@@ -6012,17 +6345,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "displayName": "Så som i himmelen",
     "correctYear": 2004,
     "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
+    "questionText": "Select one of the main actors in this film?",
     "audiences": [
       "gen-x",
       "millennials",
       "gen-z"
     ],
+    "isAnimated": false,
+    "correctNames": [
+      "Michael Nyqvist"
+    ],
+    "distractorNames": [
+      "Rolf Lassgård",
+      "Björn Skifs",
+      "Mikael Persbrandt",
+      "Peter Haber"
+    ],
     "youtubeClips": [
       {
         "videoId": "FT5A0rYUSVE",
-        "startSec": 5,
-        "endSec": 40,
+        "startSec": 10,
+        "endSec": 45,
         "channelTitle": "NuovoCinemaGiornico",
         "license": "standard",
         "notes": "Originaltrailer. Oscar-nominerad svensk film. Michael Nyqvist."
@@ -6617,9 +6960,20 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "displayName": "The Dark Knight",
     "correctYear": 2008,
     "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
+    "questionText": "Select one of the main actors in this film?",
     "audiences": [
       "all"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Christian Bale",
+      "Heath Ledger"
+    ],
+    "distractorNames": [
+      "Ben Affleck",
+      "Robert Downey Jr.",
+      "Hugh Jackman",
+      "Ryan Reynolds"
     ],
     "youtubeClips": [
       {
@@ -6658,9 +7012,20 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "displayName": "Avatar",
     "correctYear": 2009,
     "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
+    "questionText": "Select one of the main actors in this film?",
     "audiences": [
       "all"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Sam Worthington",
+      "Zoe Saldana"
+    ],
+    "distractorNames": [
+      "Matt Damon",
+      "Chris Pratt",
+      "Mila Kunis",
+      "Scarlett Johansson"
     ],
     "youtubeClips": [
       {
@@ -7135,12 +7500,22 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "displayName": "Moneyball",
     "correctYear": 2011,
     "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
+    "questionText": "Select one of the main actors in this film?",
     "audiences": [
       "all"
     ],
     "genrePackages": [
       "sport"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Brad Pitt"
+    ],
+    "distractorNames": [
+      "Matt Damon",
+      "George Clooney",
+      "Ryan Gosling",
+      "Christian Bale"
     ],
     "youtubeClips": [
       {
@@ -7452,16 +7827,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "displayName": "Hundraåringen som klev ut genom fönstret och försvann",
     "correctYear": 2013,
     "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
+    "questionText": "Select one of the main actors in this film?",
     "audiences": [
       "millennials",
       "gen-z"
     ],
+    "isAnimated": false,
+    "correctNames": [
+      "Robert Gustafsson"
+    ],
+    "distractorNames": [
+      "Rolf Lassgård",
+      "Michael Nyqvist",
+      "Peter Haber",
+      "Mikael Persbrandt"
+    ],
     "youtubeClips": [
       {
         "videoId": "pjiJ1cL3Uss",
-        "startSec": 5,
-        "endSec": 40,
+        "startSec": 10,
+        "endSec": 45,
         "channelTitle": "Buena Vista Sverige",
         "license": "standard",
         "notes": "Officiell svensk trailer. Buena Vista Sverige. Robert Gustafsson."
@@ -7722,10 +8107,20 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "displayName": "En man som heter Ove",
     "correctYear": 2015,
     "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
+    "questionText": "Select one of the main actors in this film?",
     "audiences": [
       "millennials",
       "gen-z"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Rolf Lassgård"
+    ],
+    "distractorNames": [
+      "Robert Gustafsson",
+      "Michael Nyqvist",
+      "Mikael Persbrandt",
+      "Peter Haber"
     ],
     "youtubeClips": [
       {
@@ -8010,12 +8405,23 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "displayName": "Borg vs McEnroe",
     "correctYear": 2017,
     "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
+    "questionText": "Select one of the main actors in this film?",
     "audiences": [
       "all"
     ],
     "genrePackages": [
       "sport"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Sverrir Gudnason",
+      "Shia LaBeouf"
+    ],
+    "distractorNames": [
+      "Tom Hanks",
+      "Benedict Cumberbatch",
+      "Michael Fassbender",
+      "Joel Edgerton"
     ],
     "youtubeClips": [
       {

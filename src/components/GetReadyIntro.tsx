@@ -305,6 +305,16 @@ export function GetReadyIntro({
   // currentMediaBox (IndDev) så spelaren ser i förväg vilken typ av
   // fråga som kommer härnäst. null → ingen badge renderas (t.ex. capital).
   const currentCategory = categoryByQuestion?.[currentQuestion - 1] ?? null;
+  // Svarstyp-badge på VÄNSTER övre kant av fråge-rutan (IndDev + single player).
+  // Spotify + YT-sport + YT-musik = "Year" (årsval). YT-film + Hints = "Name"
+  // (skådespelar-/hints-namnval). null → ingen badge.
+  const currentAnswerType: 'Year' | 'Name' | null = (() => {
+    const src = mediaSourceByQuestion?.[currentQuestion - 1];
+    if (src === 'spotify') return 'Year';
+    if (src === 'youtube') return currentCategory === 'Film' ? 'Name' : 'Year';
+    if (src === 'image') return 'Name';
+    return null;
+  })();
   // I Pass-the-Phone betraktas alla som "den som ska starta" (telefonen lämnas
   // runt; vem som än håller den får trycka). I Individual Devices är det bara
   // host som kan starta — non-host ser en passiv "Waiting for Host"-ruta i
@@ -1027,6 +1037,11 @@ export function GetReadyIntro({
                   <Text style={styles.mediaLabel} numberOfLines={1}>
                     {mediaSourceLabel(mediaSourceByQuestion?.[currentQuestion - 1])}
                   </Text>
+                  {currentAnswerType && (
+                    <View style={styles.answerTypeBadge} pointerEvents="none">
+                      <Text style={styles.answerTypeBadgeText}>{currentAnswerType}</Text>
+                    </View>
+                  )}
                   {currentCategory && (
                     <View style={styles.categoryBadge} pointerEvents="none">
                       <Text style={styles.categoryBadgeText}>{currentCategory}</Text>
@@ -1135,6 +1150,11 @@ export function GetReadyIntro({
                   <Text style={styles.currentPlayerName} numberOfLines={1}>
                     {playerName}
                   </Text>
+                  {currentAnswerType && (
+                    <View style={styles.answerTypeBadge} pointerEvents="none">
+                      <Text style={styles.answerTypeBadgeText}>{currentAnswerType}</Text>
+                    </View>
+                  )}
                   {currentCategory && (
                     <View style={styles.categoryBadge} pointerEvents="none">
                       <Text style={styles.categoryBadgeText}>{currentCategory}</Text>
@@ -1928,7 +1948,7 @@ const styles = StyleSheet.create({
   // visuell hierarki mellan current-box och queue-chips.
   currentMediaNumber: {
     position: 'absolute',
-    left: Spacing.md,
+    left: Spacing.xxxl,
     fontSize: FontSize.lg,
     fontWeight: '700',
     color: Colors.primary,
@@ -2008,6 +2028,28 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     letterSpacing: 0.6,
     color: '#000',
+    textTransform: 'uppercase',
+  },
+
+  // Svarstyp-badge på VÄNSTER övre kant — speglar categoryBadge:s kant-
+  // skärande mönster (top:-9) men sitter till vänster och är blå istället
+  // för guld så de två badges läser som separata datapunkter.
+  answerTypeBadge: {
+    position: 'absolute',
+    top: -9,
+    left: Spacing.xxl,
+    backgroundColor: Colors.primary,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 4,
+    zIndex: 10,
+    elevation: 4,
+  },
+  answerTypeBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 0.6,
+    color: '#fff',
     textTransform: 'uppercase',
   },
 

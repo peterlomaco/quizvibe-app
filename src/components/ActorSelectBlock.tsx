@@ -1,0 +1,280 @@
+// Svarsblock för film-frågor med actor-select-mekanik.
+//
+// Full assistance:    visar fullständiga namn direkt som valbara knappar.
+// Standard (2-brev):  visar 2-bokstavs prefix-hint per rad; valda raden
+//                     expanderas till fullnamn (inline final selection).
+// Minimal (1-brev):   samma mönster som Standard men 1-bokstavs prefix.
+//
+// Reveal-vokabulär identisk med ImageAnswerBlock:
+//   • question  → vald rad blå border (pending)
+//   • awaiting  → vald rad gold border (confirmed, låst)
+//   • reveal    → correct grön, spelarens fel röd, timeout alla röda
+
+import { useMemo } from 'react';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Colors, FontSize, FontWeight, Radius, Spacing } from '@/src/theme';
+
+type Phase = 'intro' | 'countdown' | 'question' | 'awaiting' | 'reveal' | 'leaderboard';
+type AssistanceLevel = 'full' | 'standard' | 'minimal';
+
+const QUIZ_ERROR_RED = '#FF3B30';
+const PREFIX_BTN_WIDTH = 72;
+
+function shuffle<T>(arr: T[]): T[] {
+  const out = [...arr];
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [out[i], out[j]] = [out[j], out[i]];
+  }
+  return out;
+}
+
+// Extraherar prefix ur första ordet i ett namn.
+// "Tom Hanks" → "TO" (len=2) eller "T" (len=1).
+function prefixOf(name: string, len: number): string {
+  const firstWord = name.trim().split(/\s+/)[0];
+  const letters = firstWord.replace(/[^A-Za-zÀ-ÖØ-öø-ÿ]/g, '');
+  return letters.slice(0, len).toUpperCase();
+}
+
+interface Props {
+  correctNames: string[];
+  distractorNames: string[];
+  phase: Phase;
+  pendingName: string | null;
+  confirmedName: string | null;
+  /** True om timer gick till 0 utan att spelaren bekräftade. */
+  isTimedOut: boolean;
+  onNameSelect(name: string | null): void;
+  /** Reset:as när frågan byts — triggar ny shuffle. */
+  resetKey: string | number;
+  assistance: AssistanceLevel;
+}
+
+export function ActorSelectBlock({
+  correctNames,
+  distractorNames,
+  phase,
+  pendingName,
+  confirmedName,
+  isTimedOut,
+  onNameSelect,
+  resetKey,
+  assistance,
+}: Props) {
+  const nameList = useMemo(() => {
+    // Alltid exakt 1 rätt svar — väljer slumpmässigt bland correctNames
+    // om frågan har flera korrekta aktörer.
+    const correctName = shuffle([...correctNames])[0];
+    if (!correctName) return [];
+    const picked = shuffle([...distractorNames]).slice(0, 4);
+    return shuffle([correctName, ...picked]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resetKey]);
+
+  const isRevealing = phase === 'reveal';
+  const isLocked = phase === 'awaiting' || isRevealing;
+  const isFullMode = assistance === 'full';
+  // Prefix-längd: standard=2, minimal=1 (ignoreras i full-mode)
+  const prefixLen = assistance === 'minimal' ? 1 : 2;
+
+  return (
+    <View style={styles.container}>
+      {nameList.map((name) => {
+        const isCorrectName = correctNames.includes(name);
+        const isPlayerRow = confirmedName === name;
+        const isCorrectRevealRow = isRevealing && isCorrectName;
+        const wasPlayerCorrect = isPlayerRow && isCorrectName;
+        const showWrongForPlayer = isPlayerRow && isRevealing && !isCorrectName;
+        const showWrongTimeout = isRevealing && isTimedOut && !isCorrectName;
+        const isDimmed =
+          isRevealing && !isPlayerRow && !isCorrectRevealRow && !isTimedOut;
+
+        const isPending = !isLocked && pendingName === name;
+        const isConfirmedRow = isLocked && confirmedName === name;
+        const isSelected = isPending || isConfirmedRow;
+
+        // Kantlinje-färg (delas av prefix-knapp och namnkort)
+        let borderColor: string = Colors.border;
+        if (isPending) borderColor = Colors.primary;
+        else if (isConfirmedRow && !isRevealing) borderColor = Colors.warning;
+        else if (isCorrectRevealRow) borderColor = Colors.success;
+        else if (showWrongForPlayer || showWrongTimeout) borderColor = QUIZ_ERROR_RED;
+
+        const textColor = isDimmed ? Colors.textDisabled : Colors.textPrimary;
+        const showCorrectBadge =
+          isRevealing && (wasPlayerCorrect || (isCorrectRevealRow && isTimedOut));
+        const showWrongBadge = showWrongForPlayer || showWrongTimeout;
+
+        const onPress = () => {
+          if (isLocked) return;
+          onNameSelect(pendingName === name ? null : name);
+        };
+
+        // ── Full mode ──────────────────────────────────────────────────
+        if (isFullMode) {
+          const bg = isSelected || isCorrectRevealRow
+            ? Colors.primaryMuted
+            : Colors.cardElevated;
+          return (
+            <Pressable
+              key={name}
+              onPress={onPress}
+              style={[styles.nameButton, { borderColor, backgroundColor: bg }]}
+            >
+              <Text style={[styles.nameText, { color: textColor }]} numberOfLines={1}>
+                {name}
+              </Text>
+              {showCorrectBadge && (
+                <View style={styles.correctBadge}>
+                  <Text style={styles.correctBadgeText}>✓ Correct</Text>
+                </View>
+              )}
+              {showWrongBadge && (
+                <View style={styles.wrongBadge}>
+                  <Text style={styles.wrongBadgeText}>✗</Text>
+                </View>
+              )}
+            </Pressable>
+          );
+        }
+
+        // ── Prefix mode (Standard / Minimal) ──────────────────────────
+        // Namnkortet visas när raden är vald ELLER i reveal-fas.
+        const showNameCard = isSelected || isRevealing;
+        const prefix = prefixOf(name, prefixLen);
+        const prefixColor = isDimmed ? Colors.textDisabled : Colors.primary;
+
+        return (
+          <Pressable key={name} onPress={onPress} style={styles.prefixRow}>
+            {/* Prefix-knapp */}
+            <View
+              style={[
+                styles.prefixButton,
+                {
+                  borderColor,
+                  backgroundColor: isSelected ? Colors.primaryMuted : Colors.cardElevated,
+                },
+              ]}
+            >
+              <Text style={[styles.prefixText, { color: prefixColor }]}>{prefix}</Text>
+            </View>
+
+            {/* Namnkort — expanderas vid val/reveal */}
+            {showNameCard && (
+              <View
+                style={[
+                  styles.nameCard,
+                  { borderColor, backgroundColor: Colors.primaryMuted },
+                ]}
+              >
+                <Text style={[styles.nameText, { color: textColor }]} numberOfLines={1}>
+                  {name}
+                </Text>
+                {showCorrectBadge && (
+                  <View style={styles.correctBadge}>
+                    <Text style={styles.correctBadgeText}>✓ Correct</Text>
+                  </View>
+                )}
+                {showWrongBadge && (
+                  <View style={styles.wrongBadge}>
+                    <Text style={styles.wrongBadgeText}>✗</Text>
+                  </View>
+                )}
+              </View>
+            )}
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    gap: Spacing.xs,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+  },
+
+  // ── Full mode ────────────────────────────────────────────────────────
+  nameButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm + 2,
+    borderRadius: Radius.sm,
+    borderWidth: 1.5,
+    position: 'relative',
+    minHeight: 48,
+  },
+
+  // ── Prefix mode ──────────────────────────────────────────────────────
+  prefixRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+    minHeight: 48,
+  },
+  prefixButton: {
+    width: PREFIX_BTN_WIDTH,
+    minHeight: 48,
+    borderWidth: 1.5,
+    borderRadius: Radius.sm,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  prefixText: {
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.bold,
+    letterSpacing: 1.5,
+  },
+  nameCard: {
+    flex: 1,
+    minHeight: 48,
+    borderWidth: 1.5,
+    borderRadius: Radius.sm,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm + 2,
+    flexDirection: 'row',
+    alignItems: 'center',
+    position: 'relative',
+  },
+
+  // ── Delad ────────────────────────────────────────────────────────────
+  nameText: {
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.semibold,
+    flex: 1,
+  },
+  correctBadge: {
+    position: 'absolute',
+    top: -8,
+    right: Spacing.md,
+    backgroundColor: Colors.success,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  correctBadgeText: {
+    color: Colors.background,
+    fontSize: FontSize.xs,
+    fontWeight: FontWeight.bold,
+  },
+  wrongBadge: {
+    position: 'absolute',
+    top: -8,
+    right: Spacing.md,
+    backgroundColor: QUIZ_ERROR_RED,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 4,
+    minWidth: 24,
+    alignItems: 'center',
+  },
+  wrongBadgeText: {
+    color: '#fff',
+    fontSize: FontSize.xs,
+    fontWeight: FontWeight.bold,
+  },
+});

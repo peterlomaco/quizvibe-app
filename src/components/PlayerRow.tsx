@@ -178,20 +178,20 @@ export function PlayerRow({
               för Individual Devices. Färg: grön (ok/self), gul (slow), röd
               (unstable). hasLeft-spelare slipper indikator (de signaleras
               som "borta" via grå styling). */}
-          {peerHealth !== undefined && !hasLeft && (
-            <View style={styles.healthIconRow}>
-              <WifiFanIcon
-                size={16}
-                color={
-                  peerHealth === 'ok' || peerHealth === 'self'
-                    ? Colors.success
-                    : peerHealth === 'slow'
-                      ? Colors.warning
-                      : Colors.error
-                }
-              />
-            </View>
-          )}
+          {peerHealth !== undefined && !hasLeft && (() => {
+            const healthColor =
+              peerHealth === 'ok' || peerHealth === 'self'
+                ? Colors.success
+                : peerHealth === 'slow'
+                  ? Colors.warning
+                  : Colors.error;
+            return (
+              <View style={styles.healthIconRow}>
+                <WifiFanIcon size={16} color={healthColor} />
+                <Text style={[styles.healthLabel, { color: healthColor }]}>Internet</Text>
+              </View>
+            );
+          })()}
           {hasLeft ? (
             // Replace status-row med "LEFT THIS GAME LOBBY"-text. Ingen dot
             // (dot:en signalerar Ready/Missing-state som inte längre är
@@ -376,19 +376,14 @@ export function PlayerRow({
       )}
 
       {/* ── Spotify-koppling-badge — uppe till höger på kortets kantlinje ── */}
-      {spotifyConnected !== undefined && (
-        <View style={[styles.spotifyBorderTag, { borderColor: spotifyConnected ? '#1DB954' : Colors.borderStrong }]} pointerEvents="none">
-          <SpotifyBrandIcon size={10} variant="white" />
-          {spotifyConnected ? (
-            <>
-              <Text style={styles.spotifyBorderTagConnected}>✓</Text>
-              <Text style={styles.spotifyBorderTagConnected}>{player.name}</Text>
-            </>
-          ) : (
-            <Text style={styles.spotifyBorderTagNone}>No connection</Text>
-          )}
-        </View>
-      )}
+      <View style={[styles.spotifyBorderTag, { borderColor: spotifyConnected ? '#1DB954' : Colors.borderStrong }]} pointerEvents="none">
+        <SpotifyBrandIcon size={10} variant="white" />
+        {spotifyConnected ? (
+          <Text style={styles.spotifyBorderTagConnected}>Spotify connected</Text>
+        ) : (
+          <Text style={styles.spotifyBorderTagNone}>Spotify not connected</Text>
+        )}
+      </View>
     </View>
   );
 }
@@ -632,6 +627,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: 2,
+    gap: 4,
+  },
+  healthLabel: {
+    fontSize: FontSize.xs,
+    fontWeight: FontWeight.semibold,
+    marginTop: -5,
   },
   nameRow: {
     flexDirection: 'row',

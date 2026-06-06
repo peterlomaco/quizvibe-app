@@ -1287,7 +1287,19 @@ export default function ProfileScreen() {
 
             {/* Assistance level */}
             <View style={styles.field}>
-              <Text style={styles.fieldLabel}>Assistance level</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <Text style={styles.fieldLabel}>Assistance level</Text>
+                <Pressable
+                  style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
+                  onPress={() => Alert.alert(
+                    'Assistance level',
+                    'Full\n5-year answer window for Year questions. Full Name list — no letter prefix puzzle.\n\nStandard\n3-year answer window for Year questions. 2-letter prefix hint in Name questions.\n\nMinimal\nExact year required for Year questions. 1-letter prefix hint in Name questions (hardest).',
+                  )}
+                  hitSlop={8}
+                >
+                  <Text style={styles.infoIconText}>i</Text>
+                </Pressable>
+              </View>
               <Pressable
                 onPress={() => setAssistancePickerOpen(true)}
                 style={({ pressed }) => [

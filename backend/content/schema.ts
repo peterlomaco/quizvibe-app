@@ -135,8 +135,10 @@ export type Sensitivity = z.infer<typeof SensitivitySchema>;
 // - 'timeline'      = Når-frågan ("Vilket år föddes/bildades X?") — kräver correctYear.
 // - 'name-letters'  = Namn-svarsmodellen (Letter Grid + Final Selection)
 //                     — kräver bara displayName.
-// Ett item kan stödja båda; spel-logiken väljer per fråga.
-export const AnswerMethodSchema = z.enum(['timeline', 'name-letters']);
+// - 'actor-select'  = Film-fråga med skådespelar-/karaktär-val — kräver correctNames
+//                     + distractorNames. Spelar YouTubeKlipp + visar knapp-lista med namn.
+// Ett item kan stödja flera; spel-logiken väljer per fråga.
+export const AnswerMethodSchema = z.enum(['timeline', 'name-letters', 'actor-select']);
 export type AnswerMethod = z.infer<typeof AnswerMethodSchema>;
 
 // Pre-curerat YouTube-klipp som kan användas som frågans media istället
@@ -262,6 +264,15 @@ export const ContentItemSchema = z.object({
   // i RegionSchema (Norge, Danmark, etc.) och samma item bör visas i
   // flera. Saknar item:et `region` används fil-region som tidigare.
   region: z.array(RegionSchema).min(1).optional(),
+  // Actor-select-fält (film-frågor med skådespelar-/karaktär-val).
+  // Krävs när answerMethods inkluderar 'actor-select'.
+  // correctNames = 1-2 rätta svar (räcker att svara ett).
+  // distractorNames = 4-5 fel-svar (andra skådespelare/karaktärer).
+  // isAnimated = true → frågetext "What is the name of the main character?"
+  //              false/undefined → "Select one of the main actors in this film?"
+  isAnimated: z.boolean().optional(),
+  correctNames: z.array(z.string().min(1)).optional(),
+  distractorNames: z.array(z.string().min(1)).optional(),
   notes: z.string().optional(),
 })
   .refine(
