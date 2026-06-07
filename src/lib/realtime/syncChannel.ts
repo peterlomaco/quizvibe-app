@@ -19,6 +19,10 @@ import { connectionMonitor } from '@/src/lib/network/connectionMonitor';
 export interface PlayCommandPayload {
   /** 0-baserat. Klienten validerar att den match:ar lokal current question. */
   question_index: number;
+  /** Exakt question ID som host visar — non-host söker upp denna fråga i sin
+   *  lokala pool för att garantera att alla enheter visar samma fråga oavsett
+   *  lokal shuffle-ordning (IndDev question-sync). */
+  question_id: string;
 }
 
 export interface QuestionAdvancePayload {

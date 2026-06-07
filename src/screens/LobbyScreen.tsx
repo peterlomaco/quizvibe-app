@@ -1629,8 +1629,11 @@ export default function LobbyScreen() {
   // fulla span med låsta tickar ovanför stepperMax.
   const stepperMax = hasPremium ? roundsMax : Math.min(roundsMax, ROUNDS_MAX_PASS);
   useEffect(() => {
+    // Clamp:a bara för host — non-host ska alltid spegla host:s val utan
+    // att premium-status på non-host:s enhet begränsar visningen.
+    if (!hostMode) return;
     if (roundsCount > stepperMax) setRoundsCount(Math.max(ROUNDS_MIN, stepperMax));
-  }, [roundsCount, stepperMax]);
+  }, [hostMode, roundsCount, stepperMax]);
 
   const handleDecrementRounds = useCallback(() => {
     setRoundsCount((prev) => {
@@ -2815,6 +2818,7 @@ export default function LobbyScreen() {
       setLobbySettings(roomCode, {
         gameMode,
         singlePlayerDefault,
+        maxPlayers,
         region,
         answerResponseSeconds,
         eraFrom: eraValues[0],
@@ -2833,6 +2837,7 @@ export default function LobbyScreen() {
     roomCode,
     gameMode,
     singlePlayerDefault,
+    maxPlayers,
     region,
     answerResponseSeconds,
     eraValues,
@@ -2863,6 +2868,7 @@ export default function LobbyScreen() {
       if (cancelled || !stored) return;
       setGameMode(stored.gameMode);
       setSinglePlayerDefault(stored.singlePlayerDefault);
+      setMaxPlayers(stored.maxPlayers);
       // V1: Region är låst till 'Sweden'. Stored.region kan vara legacy
       // (Nordics/Europe/Global) — ignorera den och stå kvar på Sweden.
       setRegion('Sweden');
@@ -4127,12 +4133,12 @@ export default function LobbyScreen() {
             </TouchableOpacity>
             {/* Max 12: auto-valt och aktivt (guld) när premium. */}
             <TouchableOpacity
-              style={[styles.modeOption, maxPlayers === 12 && hasPremium ? styles.modeOptionPremiumActive : styles.modeOptionInactive]}
+              style={[styles.modeOption, maxPlayers === 12 ? styles.modeOptionPremiumActive : styles.modeOptionInactive]}
               onPress={() => handleSelectMaxPlayers(12)}
               disabled={!hostMode}
               activeOpacity={0.7}
             >
-              <Text style={[styles.modeLabel, { textAlign: 'center' }, maxPlayers === 12 && hasPremium && styles.modeLabelActivePremium]}>
+              <Text style={[styles.modeLabel, { textAlign: 'center' }, maxPlayers === 12 && styles.modeLabelActivePremium]}>
                 Max 12 players
               </Text>
               <View style={[styles.premiumBadge, !hasPremium && styles.premiumBadgeGrey]} pointerEvents="none">
@@ -4249,14 +4255,16 @@ export default function LobbyScreen() {
                   />
                 </View>
               ) : (
-                /* Non-host: read-only pill baserat på faktisk spotifyEnabled-state */
-                <View style={[
-                  styles.youtubeEnabledPill,
-                  !spotifyEnabled && styles.statusPillDisabled,
-                ]}>
-                  <Text style={styles.youtubeEnabledText}>
-                    {spotifyEnabled ? 'Enabled' : 'Disabled'}
-                  </Text>
+                /* Non-host: read-only switch speglar host:s spotifyEnabled-val */
+                <View style={{ marginRight: 14, alignSelf: 'flex-start', marginTop: 1 }}>
+                  <Switch
+                    value={spotifyEnabled}
+                    disabled
+                    trackColor={{ false: '#3C3C3C', true: '#1DB954' }}
+                    thumbColor={spotifyEnabled ? '#FFF' : '#888'}
+                    ios_backgroundColor={spotifyEnabled ? '#1DB954' : '#3C3C3C'}
+                    style={styles.sourceMatrixSwitch}
+                  />
                 </View>
               )}
             </View>
@@ -5068,16 +5076,16 @@ export default function LobbyScreen() {
                     <RoundsRuler
                       value={roundsCount}
                       min={ROUNDS_MIN}
-                      gameModeMax={stepperMax}
+                      gameModeMax={roundsMax}
                     />
                   </View>
                 </>
               )}
             </View>
 
-            {/* Game Sequence — en ruta per rund med medie-källa (topp-badge)
-                och kategori (botten-badge). Speglar quiz.tsx:s 3-pool-block-
-                logik: Spotify → YouTube → Image, baserat på aktuella inställningar. */}
+            {/* Game Sequence — ruta per rund med medie-källa och kategori.
+                Speglar quiz.tsx:s 3-pool-logik baserat på aktuella inställningar.
+                Synlig för alla (host + non-host) som read-only feedback. */}
             <View>
               <View style={styles.regionLabelRow}>
                 <Text style={styles.sectionLabel}>Game Sequence</Text>
@@ -5097,7 +5105,6 @@ export default function LobbyScreen() {
               <View style={styles.gsGrid}>
                 {gameSequencePreview.map((slot, idx) => (
                   <View key={idx} style={styles.gsBox}>
-                    {/* Nummer + källikon på samma rad */}
                     <View style={styles.gsInlineIconWrap}>
                       <Text style={styles.gsNumber}>{idx + 1}</Text>
                       {slot.source === 'spotify' ? (
@@ -5114,7 +5121,6 @@ export default function LobbyScreen() {
                         </View>
                       ) : null}
                     </View>
-                    {/* Botten-badge: kategori skär nedre kantlinjen */}
                     {slot.category != null && (
                       <View style={styles.gsCategoryWrap} pointerEvents="none">
                         <View style={styles.gsCategoryBadge}>

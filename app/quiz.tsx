@@ -261,6 +261,13 @@ const IMAGE_SEED_QUESTIONS: ImageQuestion[] = IMAGE_QUIZ_QUESTIONS
   }),
 );
 
+/** Lookup-map per question ID för IndDev-frågesynkronisering.
+ *  Non-host söker upp exakt den fråga host skickade via play_command.question_id,
+ *  oavsett lokal shuffle-ordning (seenQuestionIds skiljer sig per enhet). */
+const ALL_QUESTIONS_MAP = new Map<string, QuizQuestion>(
+  ([...SEED_QUESTIONS, ...IMAGE_SEED_QUESTIONS] as QuizQuestion[]).map((q) => [q.id, q]),
+);
+
 // Fisher-Yates-shuffle — slumpar ordningen i en ny kopia utan att muttera originalet.
 function shuffleArray<T>(arr: T[]): T[] {
   const out = [...arr];
@@ -1262,6 +1269,10 @@ export default function QuizScreen() {
 
   const [questionIndex, setQuestionIndex] = useState(0);
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
+  // IndDev-frågefixering: satt av play_command-handler på non-host sidan.
+  // Garanterar att non-host visar exakt samma fråga som host oavsett
+  // lokal shuffle-ordning (seenQuestionIds är device-specifikt).
+  const [broadcastQuestionId, setBroadcastQuestionId] = useState<string | null>(null);
 
   // ── Spotify DJ-state ─────────────────────────────────────────────────
   // albumArtUrl: hämtas async från Spotify Web API per fråga (gissarnas skärm).
@@ -1305,8 +1316,16 @@ export default function QuizScreen() {
     return { spotifyQuestionIndices, djAssignments };
   }, [spotifyEnabled, turnOrder, gameQuestions]);
 
+  // IndDev-frågefixering: non-host ersätter lokal gameQuestions[idx]-fråga
+  // med den exakta frågan host broadcastade i play_command.question_id.
+  // allQuestionsMap är module-level och innerhåller alla möjliga frågor.
+  const _broadcastOverride: QuizQuestion | null =
+    !isHost && broadcastQuestionId
+      ? (ALL_QUESTIONS_MAP.get(broadcastQuestionId) ?? null)
+      : null;
+
   // Är nuvarande fråga en Spotify-fråga?
-  const currentQ = gameQuestions[questionIndex];
+  const currentQ = _broadcastOverride ?? gameQuestions[questionIndex];
   const isSpotifyQuestion =
     !!djRotationPlan?.spotifyQuestionIndices.includes(questionIndex) &&
     currentQ?.type === 'timeline' &&
@@ -1599,7 +1618,7 @@ export default function QuizScreen() {
   // Initialiseras till 0 — visas som "00.00" innan timer:n startar.
   const [decimalElapsedMs, setDecimalElapsedMs] = useState<number>(0);
 
-  const question: QuizQuestion = gameQuestions[questionIndex % gameQuestions.length];
+  const question: QuizQuestion = _broadcastOverride ?? gameQuestions[questionIndex % gameQuestions.length];
   const isImageQuestion = question.type === 'image';
   const isActorSelectQuestion = question.type === 'actor-select';
   const isLastQuestion = questionIndex === totalQuestions - 1;
@@ -2317,7 +2336,7 @@ export default function QuizScreen() {
     setPhase('countdown');
     if (gameMode === 'individual-devices' && syncChannelRef.current) {
       syncChannelRef.current
-        .broadcastPlayCommand({ question_index: questionIndex })
+        .broadcastPlayCommand({ question_index: questionIndex, question_id: currentQ?.id ?? '' })
         .catch(() => {});
     }
   };
@@ -2445,7 +2464,7 @@ export default function QuizScreen() {
   // (etablerad en gång på mount) alltid kallar latest logic. Non-host kör
   // samma transition-funktioner som host (lokalt) — de är idempotenta.
   useEffect(() => {
-    playCommandHandlerRef.current = (qIdx) => {
+    playCommandHandlerRef.current = (qIdx, qId) => {
       // D-iii sticky-gate: om spelaren är låst i unstable-overlay (sticky
       // ELLER live-unstable) → IGNORERA play_command. Spelaren kvarstår i
       // sin nuvarande fas + overlay tills de explicit tappar Retry. Detta
@@ -2464,6 +2483,9 @@ export default function QuizScreen() {
       // setQuestionIndex är idempotent när qIdx === questionIndex, så
       // normalfallet (B var online och redan synkad) är no-op.
       setQuestionIndex(qIdx);
+      // IndDev-frågefixering: spara host:s question_id så non-host renderar
+      // exakt samma fråga oavsett lokal shuffle-ordning.
+      setBroadcastQuestionId(qId ?? null);
       // Reset answer-state så B inte ärver pending-svar från förra fråga
       // (kan finnas kvar om B retry:ade i sticky-låst tillstånd och inte
       // nådde nästa rondens normalt-rensa-path via handleAdvanceToNextRound).
@@ -3072,9 +3094,13 @@ export default function QuizScreen() {
       // värde. Idempotent när redan synkad. Skyddar mot stale-index efter
       // offline-fönster där missade play_command/question_advance inte
       // replayas av Supabase Realtime.
-      setQuestionIndex((prev) =>
-        prev === hostQuestionIndex ? prev : hostQuestionIndex,
-      );
+      setQuestionIndex((prev) => {
+        if (prev === hostQuestionIndex) return prev;
+        // Rensa broadcastQuestionId så _broadcastOverride inte pekar på en
+        // stale fråga för det nya indexet — nästa play_command sätter rätt ID.
+        setBroadcastQuestionId(null);
+        return hostQuestionIndex;
+      });
     };
   }, [isHost]);
 
@@ -3205,7 +3231,7 @@ export default function QuizScreen() {
   const syncChannelRef = useRef<SyncChannel | null>(null);
   // Refs så broadcast-listenern alltid pekar på senaste handlern (annars
   // skulle subscription:n captura stale closures vid mount).
-  const playCommandHandlerRef = useRef<(qIdx: number) => void>(() => {});
+  const playCommandHandlerRef = useRef<(qIdx: number, qId?: string) => void>(() => {});
   const questionAdvanceHandlerRef = useRef<(nextIdx: number | null) => void>(() => {});
   const playerLeftHandlerRef = useRef<(playerId: string, playerName: string) => void>(
     () => {},
@@ -3228,7 +3254,7 @@ export default function QuizScreen() {
   useEffect(() => {
     if (gameMode !== 'individual-devices' || !params.roomCode) return;
     const sync = subscribeSyncChannel(params.roomCode, selfPlayerId, {
-      onPlayCommand: (payload) => playCommandHandlerRef.current(payload.question_index),
+      onPlayCommand: (payload) => playCommandHandlerRef.current(payload.question_index, payload.question_id),
       onQuestionAdvance: (payload) =>
         questionAdvanceHandlerRef.current(payload.next_question_index),
       onPlayerLeft: (payload) =>
