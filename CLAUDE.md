@@ -881,28 +881,33 @@ Driver två konsumenter idag:
 1. **GetReadyIntro:s kategori-badge** (se "Quiz — Get Ready to Vibe intro screen" nedan). Härleds som `categoryByQuestion: (MainCategory | null)[]` useMemo parallellt med `mediaSourceByQuestion`, passas som prop.
 2. **Framtida theme-package-roadmap** — när någon kategori passerar 1000-frågor-tröskeln blir den säljbar som themed package i Store (se `memory/project_theme_package_roadmap.md`).
 
-**Pool-blandning** (`gameQuestions`) — **3-pool round-block-struktur** (uppdaterad 2026-06-05):
+**Pool-blandning** (`gameQuestions`) — **3-pool fas-struktur** (uppdaterad 2026-06-07):
 
-Tre separata pools: `spotifyPool` (YT-items med `spotifyTrackId` när `spotifyEnabled`), `pureYoutubePool` (övrig YT), `imagePool`. Fasordning: **Spotify → YouTube → Image**.
+Tre separata pools: `spotifyPool` (YT-items med `spotifyTrackId` när `spotifyEnabled`), `pureYoutubePool` (övrig YT), `imagePool`. Fasordning: **Spotify → YouTube → Hints/Image** (sekventiell, inte cyklisk).
 
-1. **Osedd-prioritering** (`src/utils/hostQuestionHistory.ts`): varje pool delas i `[...shuffleArray(unseen), ...shuffleArray(seen)]`. Sparas vid spelets slut + Quit Game.
+**Ratio per spelläge:**
+- **IndDev med Spotify**: 25% Spotify / 25% YouTube / 50% Hints
+- **PtP / Single Player** (Spotify alltid av): 50% YouTube / 50% Hints — Spotify-kvotan absorberas av YouTube om YT är aktiverat, annars av Hints.
+- Formel: `spotifyBlockCount = hasSpotify ? floor(N/4) : 0`, `ytDivisor = hasSpotify ? 4 : 2`, `ytBlockCount = hasPureYT ? floor(N/ytDivisor) : 0`, `imageBlockCount = N - spotify - yt`.
+- Hints-fallback: `!hasImage → spotify += imageCount` (eller yt om spotify saknas).
 
-2. **Kategori-gruppering** inom varje pool: Musik → Film → Sport (fast ordning per pool).
+**Block-storlek**: `turnOrder.length` (PtP) eller 1 (IndDev/Single Player).
 
-3. **Spotify-block FÖRST** (special moments öppnar spelet), sedan YouTube-block, sedan bildblock:
-   - `spotifyInterval = clamp(3,6, round((pureYT+image)/spotify))` — med 41 Spotify/418 YT/836 Images: interval=6 → ~1 Spotify per 6 rundor
-   - `spotifyBlockCount = floor((N-1)/spotifyInterval)+1`
-   - `remainingRounds = totalRounds - spotifyBlockCount`
-   - `ytInterval = clamp(2,4, round(imagePool/pureYoutubePool))` — mot remainingRounds
-   - `ytBlockCount = floor((remaining-1)/ytInterval)+1`
+**Kategori-gruppering inom varje fas** (Music → Film → Sport, fast ordning):
+- Blockantalet fördelas jämnt per aktiv kategori: `base = floor(blocks/cats)`, resten till de första kategorierna.
+- Alla block av en kategori körs i följd innan nästa kategori börjar — ALDRIG round-robin (M/F/S/M/F/S). Alltid: M·M·M → F·F → S·S.
+- Per-kategori sub-pool byggs med `prioritiseUnseen()` separat för varje kategori.
+- Gäller för **YouTube-fasen** (baserat på `youtubeEnabledCategories`) och **Hints-fasen** (baserat på `imagesEnabledCategories`).
+- Spotify-fasen har ingen kategori-split (alltid Music, körs som en flat pool).
 
-Block-storlek = `turnOrder.length` (PtP) eller 1 (IndDev). Cyklisk indexering.
+**Osedd-prioritering**: varje sub-pool delas `[...shuffleArray(unseen), ...shuffleArray(seen)]` via `prioritiseUnseen()`. Sparas vid spelets slut + Quit Game.
 
 Edge cases:
-- `spotifyEnabled = false` → `spotifyPool = []`, `pureYoutubePool = youtubePool` → exakt samma beteende som gamla 2-pool-strukturen.
+- `spotifyEnabled = false` (alltid i PtP/Single Player) → `spotifyPool = []`, `pureYoutubePool = youtubePool`.
 - Spotify-only single player → blockeras i `handleStartGame` ("Spotify DJ requires at least one other player").
 - Alla pools tomma → SEED_QUESTIONS fallback.
 - **`spotifyEnabled` gatas hårt** på `gameMode === 'individual-devices'` i quiz.tsx — PtP/Single Player aktiverar aldrig Spotify DJ oavsett param.
+- `gameSequencePreview` i LobbyScreen speglar exakt samma logik för korrekt preview-visning.
 
 **State-paritet musik ↔ bild**:
 | musik | bild | beskrivning |
