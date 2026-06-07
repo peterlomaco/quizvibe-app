@@ -21,8 +21,8 @@ items:
     probability: 95
     wikimediaSearchHints: ["Sällskapsresan 1980 film"]
     answerMethods: ["actor-select"]
-    correctNames: ["Lasse Åberg", "Stig Grybe"]
-    distractorNames: ["Magnus Härenstam", "Gösta Ekman", "Björn Skifs", "Per Oscarsson"]
+    correctNames: ["Lasse Åberg"]
+    distractorNames: ["Stig Grybe", "Magnus Härenstam", "Gösta Ekman", "Björn Skifs", "Per Oscarsson"]
     youtubeClips:
       - videoId: "3WD7f7pvoSY"
         startSec: 10

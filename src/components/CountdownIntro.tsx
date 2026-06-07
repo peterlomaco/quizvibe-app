@@ -15,8 +15,12 @@ import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
 interface Props {
   /** Anropas när nedräkningen passerat 1 → 0 OCH "?" har visats. */
   onComplete: () => void;
-  /** Sekunder att räkna ner från (default 3). */
+  /** Sekunder att räkna ner från (default 5). */
   startFrom?: number;
+  /** Lägsta count-värde där rösten börjar prata (default 3).
+   *  Visuellt visas siffror från startFrom ner, men rösten startar
+   *  först när count === voiceFrom och fortsätter 2, 1, "Who". */
+  voiceFrom?: number;
   /** Game mode — styr texten ovan Q-loggan. Pass-the-Phone visar
    *  "Pass-the-Phone to: <playerName>" med avatar-box; IndDev visar bara
    *  "Get Ready to Vibe" (ingen spelar-specifik info). */
@@ -25,6 +29,9 @@ interface Props {
    *  true (default) = säg "Who" — lämpligt för Hints-frågor (svaret = en person).
    *  false = tyst avslut — lämpligt för YouTube/Spotify där frågan är ett år. */
   sayWho?: boolean;
+  /** Om true: all röst-output stängs av (pre-warm + nedräkning + "Who").
+   *  Används för non-host i Individual Devices — bara host ska ha ljud. */
+  silent?: boolean;
   /** Namn på spelaren som ska börja sin runda — visas ovan Q-loggan i PtP
    *  så spelarna ser vems tur det är även när nedräkningen körs. Ignoreras
    *  i IndDev. */
@@ -53,7 +60,7 @@ const GLYPH_FONT_SIZE = LOGO_SIZE * 0.28;
  * att "?" visats i ~1 s fyras `onComplete` så parent kan växla fas till
  * `'question'`.
  */
-export function CountdownIntro({ onComplete, startFrom = 3, mode = 'pass-the-phone', playerName, playerEmoji, sayWho = true }: Props) {
+export function CountdownIntro({ onComplete, startFrom = 5, voiceFrom = 3, mode = 'pass-the-phone', playerName, playerEmoji, sayWho = true, silent = false }: Props) {
   const isIndDev = mode === 'individual-devices';
   // Nunito 700 Bold för "QuizVibe"-brandraden — matchar startskärmens
   // appName-textformat 1:1. Faller tillbaka till systemfont under font-
@@ -64,7 +71,8 @@ export function CountdownIntro({ onComplete, startFrom = 3, mode = 'pass-the-pho
   // Sätts till startFrom efter 700 ms initial-paus — visuell "3" och rösten
   // startar exakt synkat, utan att rösten känns stressad.
   const [count, setCount] = useState<number | null>(null);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  // Samling av alla schemalagda setTimeout-id:n — rensas vid cleanup.
+  const tickTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   // Två separata pop-animationer så siffran och "?" kan röra sig oberoende.
   const numberScale = useRef(new Animated.Value(1.4)).current;
@@ -81,38 +89,78 @@ export function CountdownIntro({ onComplete, startFrom = 3, mode = 'pass-the-pho
   // visuellt medan rösten fortfarande startar upp, och "2"/"1"/"Go" verkar synkade
   // eftersom motorn då redan är varm. ' ' (non-breaking space) uttalas
   // tyst på de flesta TTS-motorer men initierar sessionen omedelbart.
+  // Pre-warm TTS-motorn -- bara host (silent=false).
   useEffect(() => {
+    if (silent) return;
     try { Speech.speak(' ', { language: 'en-US', pitch: 0.01, rate: 2.0 }); } catch (_) {}
     return () => { try { Speech.stop(); } catch (_) {} };
-  }, []);
+  }, [silent]);
 
-  // Huvud-countdown-logik:
-  // 1) 700 ms initial paus — Q-loggan visas tom, spelaren hinner registrera vyn
-  // 2) count sätts till startFrom → "3" visas + röst säger "3" synkat
-  // 3) Interval 1300 ms/steg: 3 → 2 → 1 → 0 ("?" visas) → onComplete
+  // Huvud-countdown-logik med VOICE_LEAD_MS försprång för rösten:
+  // Rösten schemaläggs VOICE_LEAD_MS ms INNAN setCount så den kompenserar
+  // för TTS-latens (motorn är varm men speech.speak() + React-rendering
+  // lägger ihop ~80-150 ms). Använder rekursiv setTimeout istället för
+  // setInterval så varje tick kan splittas i ett röst-steg + ett visuellt steg.
   useEffect(() => {
-    setCount(null);
-    if (intervalRef.current) clearInterval(intervalRef.current);
+    const VOICE_LEAD_MS = 120;
+    const TICK_MS = 1300;
 
-    const startDelay = setTimeout(() => {
-      setCount(startFrom);
-      intervalRef.current = setInterval(() => {
-        setCount((c) => {
-          if (c === null || c <= 1) {
-            if (intervalRef.current) clearInterval(intervalRef.current);
-            setTimeout(() => onCompleteRef.current(), 1000);
-            return 0;
+    setCount(null);
+    tickTimers.current.forEach(clearTimeout);
+    tickTimers.current = [];
+
+    const addTimer = (fn: () => void, delay: number) => {
+      const id = setTimeout(fn, delay);
+      tickTimers.current.push(id);
+    };
+
+    // Schemalägg nästa nedräkningssteg rekursivt.
+    const scheduleTick = (current: number, delay: number) => {
+      addTimer(() => {
+        const next = current <= 1 ? 0 : current - 1;
+
+        // Tala VOICE_LEAD_MS ms INNAN det visuella uppdateras (bara host).
+        if (!silent && next <= voiceFrom && (next > 0 || sayWho)) {
+          try {
+            Speech.speak(next === 0 ? 'Who' : String(next), {
+              language: 'en-US',
+              pitch: 0.01,
+              rate: 0.42,
+            });
+          } catch (_) {}
+        }
+
+        // Visuell uppdatering efter röst-förspranget.
+        addTimer(() => {
+          setCount(next);
+          if (next === 0) {
+            addTimer(() => onCompleteRef.current(), 1000);
+          } else {
+            scheduleTick(next, TICK_MS - VOICE_LEAD_MS);
           }
-          return c - 1;
-        });
-      }, 1300);
+        }, VOICE_LEAD_MS);
+      }, delay);
+    };
+
+    // Starta: om startFrom självt ska talas, tala det 120 ms tidigt (580 ms
+    // in i initial-pausen) och visa det visuellt som vanligt vid 700 ms.
+    if (!silent && startFrom <= voiceFrom) {
+      addTimer(() => {
+        try {
+          Speech.speak(String(startFrom), { language: 'en-US', pitch: 0.01, rate: 0.42 });
+        } catch (_) {}
+      }, 700 - VOICE_LEAD_MS);
+    }
+    addTimer(() => {
+      setCount(startFrom);
+      scheduleTick(startFrom, TICK_MS - VOICE_LEAD_MS);
     }, 700);
 
     return () => {
-      clearTimeout(startDelay);
-      if (intervalRef.current) clearInterval(intervalRef.current);
+      tickTimers.current.forEach(clearTimeout);
+      tickTimers.current = [];
     };
-  }, [startFrom]);
+  }, [startFrom, sayWho, voiceFrom, silent]);
 
   // Pop-in per siffer-byte (3, 2, 1) + kontinuerlig zoom-puls (1 ↔ 1.18).
   useEffect(() => {
@@ -136,22 +184,6 @@ export function CountdownIntro({ onComplete, startFrom = 3, mode = 'pass-the-pho
     return () => { loopAnim?.stop(); };
   }, [count, numberScale, numberOpacity]);
 
-  // Röst synkad med count — ingen extra fördröjning behövs eftersom 700 ms
-  // initial-pausen redan hanteras av countdown-effekten ovan.
-  // count === null → pre-start, inget tal.
-  // count === 0 → "Who" om sayWho=true (Hints), annars tyst (YouTube/Spotify).
-  useEffect(() => {
-    if (count === null) return;
-    if (count === 0 && !sayWho) return;   // tyst avslut för år-frågor
-    try {
-      Speech.speak(count <= 0 ? 'Who' : String(count), {
-        language: 'en-US',
-        pitch: 0.01,
-        rate: 0.42,
-      });
-    } catch (_) {}
-    return () => { try { Speech.stop(); } catch (_) {} };
-  }, [count, sayWho]);
 
   // "?" pop:as in när count går 1 → 0 + samma puls-loop som siffrorna ovan.
   // Separat Animated.Value så vi kan rendera båda elementen samtidigt under

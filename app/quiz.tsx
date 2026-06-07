@@ -63,6 +63,7 @@ import {
 import { buildImageVariant } from '@/src/utils/imageQuestionBuilder';
 import { HINTS_LIBRARY, getHintRegionScope, inferGender, type HintLibrary } from '@/src/utils/hintsData';
 import { HintsQuizCard } from '@/src/components/HintsQuizCard';
+import { HeartbeatSound } from '@/src/components/HeartbeatSound';
 // import { getQuizImage } from '@/src/utils/quizImages';
 // ↑ Borttagen 2026-05-27 — text-rendering ersätter foto-rendering. Återintroducera
 // när sketches kommer (då med getQuizSketch() från assets/quiz-sketches/).
@@ -322,8 +323,20 @@ function isCorrect(
 // Poäng-modell: rätt svar = 1 poäng, fel = 0. Tie-break på leaderboarden
 // hanteras av sorteringen (poäng desc → avgResponseSeconds asc) — så två
 // spelare med samma antal rätt rankas efter lägst genomsnittlig svarstid.
-function calculatePoints(correct: boolean): number {
-  return correct ? 1 : 0;
+// Year-frågor (timeline):   minimal=5p, standard=3p, full=1p
+// Letter-frågor (name/film): minimal=3p, standard=2p, full=1p
+// Utan assistance (fallback): binärt 1/0
+function calculatePoints(
+  correct: boolean,
+  assistance?: AssistanceLevel,
+  questionKind?: 'year' | 'name',
+): number {
+  if (!correct) return 0;
+  if (!assistance) return 1;
+  if (questionKind === 'year') {
+    return assistance === 'minimal' ? 5 : assistance === 'standard' ? 3 : 1;
+  }
+  return assistance === 'minimal' ? 3 : assistance === 'standard' ? 2 : 1;
 }
 
 // Quiz-lokal klarröd som ersätter den globala Colors.error i tre intentional
@@ -2012,7 +2025,7 @@ export default function QuizScreen() {
     // (i useEffect:en på timeLeft nedan).
     const interval = getIntervalForAssistance(currentAssistance);
     const correct = isCorrect(year, question.correctYear, interval, eraFrom, eraTo);
-    const pts = calculatePoints(correct);
+    const pts = calculatePoints(correct, currentAssistance, 'year');
     // 2-decimals svarstid via Date.now()-diff (questionStartMsRef sätts i
     // startTimer). Cap:as till responseSeconds så ev. clock drift inte ger
     // > totalSeconds. Används både till stopwatch-display, reveal-card och
@@ -2088,7 +2101,7 @@ export default function QuizScreen() {
   const handleConfirmName = (opt: ImageNameOption) => {
     if (question.type !== 'image') return;
     const correct = opt.isCorrect;
-    const pts = calculatePoints(correct);
+    const pts = calculatePoints(correct, currentAssistance, 'name');
     const totalMs = responseSeconds * 1000;
     const exactElapsedMs = Math.max(0, Date.now() - questionStartMsRef.current);
     const exactElapsedSec = Math.min(responseSeconds, exactElapsedMs / 1000);
@@ -2132,7 +2145,7 @@ export default function QuizScreen() {
   const handleConfirmActor = (name: string) => {
     if (question.type !== 'actor-select') return;
     const correct = question.correctNames.includes(name);
-    const pts = calculatePoints(correct);
+    const pts = calculatePoints(correct, currentAssistance, 'name');
     const totalMs = responseSeconds * 1000;
     const exactElapsedMs = Math.max(0, Date.now() - questionStartMsRef.current);
     const exactElapsedSec = Math.min(responseSeconds, exactElapsedMs / 1000);
@@ -3505,6 +3518,7 @@ export default function QuizScreen() {
         playerEmoji={countdownPlayer?.emoji}
         onComplete={() => setPhase('question')}
         sayWho={isImageQuestion || isActorSelectQuestion}
+        silent={!isHost}
       />
       {/* Pre-decode-trick borttaget 2026-05-27 (text-rendering = no decode). */}
       {inactivityCountdownSec !== null && (
@@ -3696,6 +3710,11 @@ export default function QuizScreen() {
           Layout nu: [fixed-top: media+timer+question] + [ScrollView: bara
           answer-block + reveal-feedback] + [sticky-bottom: Confirm-bar]. */}
       <View style={styles.fixedTopZone}>
+        {/* Hjärtslag enbart för Hints-frågor under aktiv svarstid.
+            YT- och Spotify-frågor är tysta i quiz-vyn. */}
+        {isHost && isImageQuestion && (phase === 'question' || phase === 'awaiting') && (
+          <HeartbeatSound bpm={80} />
+        )}
         {/* phase är här narrowed till 'question' | 'awaiting' | 'reveal'
             (leaderboard fångas av early-return ovan), så ingen extra
             phase-check behövs runt question UI. */}

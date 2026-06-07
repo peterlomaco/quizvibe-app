@@ -301,13 +301,25 @@ export const MOCK_OPPONENTS: LeaderboardPlayer[] = [
 // Returnerar bara poäng+correct — timeUsed och playerId sätts av anroparen.
 // Mer assistans = lägre accuracy + lägre poäng-range (casual-spelare).
 
-// Mock-opponent-score: rätt = 1 pt, fel = 0 (samma modell som calculatePoints
-// i quiz.tsx). Assistance driver fortfarande träffsäkerhet (minimal-spelare
-// modelleras som mer skickliga i mock:en) men poäng-utfallet är binärt.
-export function generateOpponentRoundScore(assistance: AssistanceLevel): { points: number; correct: boolean } {
+// Mock-opponent-score: speglar calculatePoints i quiz.tsx.
+// questionKind='year': minimal=5, standard=3, full=1
+// questionKind='name' (default): minimal=3, standard=2, full=1
+// Assistance driver även träffsäkerhet.
+export function generateOpponentRoundScore(
+  assistance: AssistanceLevel,
+  questionKind: 'year' | 'name' = 'name',
+): { points: number; correct: boolean } {
   const accuracy = { full: 0.45, standard: 0.65, minimal: 0.78 }[assistance];
   const correct = Math.random() < accuracy;
-  return { points: correct ? 1 : 0, correct };
+  let pts = 0;
+  if (correct) {
+    if (questionKind === 'year') {
+      pts = assistance === 'minimal' ? 5 : assistance === 'standard' ? 3 : 1;
+    } else {
+      pts = assistance === 'minimal' ? 3 : assistance === 'standard' ? 2 : 1;
+    }
+  }
+  return { points: pts, correct };
 }
 
 // Mock svarstid för en motspelare (5–25 sekunder, 2-decimals-precision så

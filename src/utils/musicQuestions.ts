@@ -2422,10 +2422,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "isAnimated": false,
     "correctNames": [
-      "Lasse Åberg",
-      "Stig Grybe"
+      "Lasse Åberg"
     ],
     "distractorNames": [
+      "Stig Grybe",
       "Magnus Härenstam",
       "Gösta Ekman",
       "Björn Skifs",

@@ -25,6 +25,7 @@ import { SequentialDots } from './SequentialDots';
 import { ConnectionUnstableOverlay } from './ConnectionUnstableOverlay';
 import { useConnectionStatus } from '../lib/network/connectionMonitor';
 import { WifiFanIcon } from './WifiFanIcon';
+import { HeartbeatSound } from './HeartbeatSound';
 
 /** Minimal player-shape som GetReadyIntro behöver för att rendera namn + avatar.
  *  Speglar TurnOrderPlayer i quiz.tsx. */
@@ -448,6 +449,7 @@ export function GetReadyIntro({
 
   return (
     <SafeAreaView style={styles.safe}>
+      {isHost && <HeartbeatSound bpm={50} />}
       {/* Top-bar längst upp — Quit Game för host (river hela lobbyn) eller
           Leave Game för non-host i IndDev (lämnar bara egen plats, går till
           Home). Båda speglar TopUserBanner:s vokabulär (Colors.card bg +
@@ -583,6 +585,31 @@ export function GetReadyIntro({
             const showDisconnectedSection = disconnectedEntries.length > 0;
             return (
             <View style={styles.leaderboardBodyOverlay}>
+              {/* Scoring guide — ovanför spelarraderna, med separator nedåt. */}
+              <View style={styles.scoringBlock}>
+                <View style={styles.scoringTable}>
+                  <View style={[styles.scoringRow, { borderTopWidth: 0 }]}>
+                    <View style={styles.scoringLabelCell} />
+                    <Text style={[styles.scoringColHeader, styles.scoringColMin]}>Minimal</Text>
+                    <Text style={[styles.scoringColHeader, styles.scoringColStd]}>Standard</Text>
+                    <Text style={[styles.scoringColHeader, styles.scoringColFull]}>Full</Text>
+                  </View>
+                  <View style={styles.scoringRow}>
+                    <Text style={styles.scoringTypeLabel}>Year</Text>
+                    <Text style={[styles.scoringPts, styles.scoringColMin]}>5 pts</Text>
+                    <Text style={[styles.scoringPts, styles.scoringColStd]}>3 pts</Text>
+                    <Text style={[styles.scoringPts, styles.scoringColFull]}>1 pt</Text>
+                  </View>
+                  <View style={[styles.scoringRow, styles.scoringRowLast]}>
+                    <Text style={styles.scoringTypeLabel}>Letter</Text>
+                    <Text style={[styles.scoringPts, styles.scoringColMin]}>3 pts</Text>
+                    <Text style={[styles.scoringPts, styles.scoringColStd]}>2 pts</Text>
+                    <Text style={[styles.scoringPts, styles.scoringColFull]}>1 pt</Text>
+                  </View>
+                </View>
+              </View>
+              {/* Separator mellan scoring-guide och Player-sektionen. */}
+              <View style={styles.scoringPlayerDivider} />
               {/* Sport-tabell-layout: fixed Klubb-kolumn vänster, horisontellt
                   scroll:bar middle med detail-kolumner, fixed PTS-kolumn
                   höger. Mönster speglar fotbolls-tabell. */}
@@ -2284,5 +2311,77 @@ const styles = StyleSheet.create({
     color: Colors.warning,
     textAlign: 'center',
     letterSpacing: 0.3,
+  },
+
+  // ── Scoring guide ─────────────────────────────────────────────────────
+  scoringPlayerDivider: {
+    height: 1,
+    backgroundColor: Colors.border,
+    marginHorizontal: Spacing.md,
+    marginTop: Spacing.sm,
+    marginBottom: Spacing.sm,
+  },
+  scoringBlock: {
+    marginHorizontal: Spacing.lg,
+    marginTop: Spacing.sm,
+    backgroundColor: Colors.cardElevated,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: Radius.md,
+    paddingHorizontal: Spacing.md,
+    paddingTop: Spacing.xs + 2,
+    paddingBottom: Spacing.xs,
+  },
+  scoringTitle: {
+    fontSize: FontSize.xs,
+    fontWeight: FontWeight.semibold,
+    color: Colors.textSecondary,
+    letterSpacing: 1.0,
+    textTransform: 'uppercase',
+    marginBottom: 4,
+  },
+  scoringTable: {
+    width: '100%',
+  },
+  scoringRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderTopWidth: 1,
+    borderTopColor: Colors.border,
+    paddingVertical: 5,
+  },
+  scoringRowLast: {},
+  scoringLabelCell: {
+    flex: 2,
+  },
+  scoringTypeLabel: {
+    flex: 2,
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.semibold,
+    color: Colors.textPrimary,
+  },
+  scoringTypeSubLabel: {
+    fontSize: 10,
+    color: Colors.textSecondary,
+    marginTop: 1,
+  },
+  scoringColHeader: {
+    flex: 1,
+    textAlign: 'center',
+    fontSize: 10,
+    fontWeight: FontWeight.semibold,
+    color: Colors.textSecondary,
+    textTransform: 'uppercase',
+    letterSpacing: 0.4,
+  },
+  scoringColMin: {},
+  scoringColStd: {},
+  scoringColFull: {},
+  scoringPts: {
+    flex: 1,
+    textAlign: 'center',
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.bold,
+    color: Colors.textPrimary,
   },
 });
