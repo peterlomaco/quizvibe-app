@@ -302,12 +302,21 @@ export default function ProfileScreen() {
     hasPremium && gameMode === 'individual-devices' && !singlePlayerDefault
       ? ROUNDS_MAX_INDIV
       : ROUNDS_MAX_PASS;
-  // Premium → auto-välj Max 12 och lås (Max 4 utgråas).
-  // Ej premium → tvinga tillbaka till Max 4.
+  // Ej premium → klampas alltid till Max 4. Effekten körs både när hasPremium
+  // ändras (t.ex. sub löper ut) OCH när maxPlayers sätts till 12 från sparad
+  // profil (race-safe: efffekten fyrar vid maxPlayers-ändringen → sätter 4 →
+  // effekten fyrar igen men condition är false → stannar).
   useEffect(() => {
-    setMaxPlayers(hasPremium ? 12 : 4);
-  }, [hasPremium]);
+    if (!hasPremium && maxPlayers > 4) setMaxPlayers(4);
+  }, [hasPremium, maxPlayers]);
   const handleSelectMaxPlayers = (n: 4 | 12) => {
+    if (n === 12 && (singlePlayerDefault || gameMode !== 'individual-devices')) {
+      Alert.alert(
+        'Individual device required',
+        'Please activate Individual device mode to be able to select Max 12 players.',
+      );
+      return;
+    }
     if (n === 12 && !hasPremium) {
       Alert.alert(
         'Premium feature',
@@ -337,22 +346,32 @@ export default function ProfileScreen() {
       return next;
     });
   };
-  // När gameMode växlar (t.ex. Pass-the-Phone → Individual Devices) clampas
-  // roundsCount automatiskt så det inte hamnar utanför nya range:n. Speglar
-  // Lobby:s motsvarande clamp-effekt.
+  // Klampar roundsCount när roundsMax minskar (mode-byte, premium upphör) ELLER
+  // när roundsCount sätts till ett värde > roundsMax (t.ex. sparad profil med 12
+  // rundor från Individual Devices-läget när hasPremium=false).
+  // Konditionell setRoundsCount undviker onödiga re-renders (utan kondition
+  // skulle effekten anropa setRoundsCount vid varje roundsCount-ändring).
   useEffect(() => {
-    setRoundsCount((prev) => Math.max(ROUNDS_MIN, Math.min(roundsMax, prev)));
-  }, [roundsMax]);
+    if (roundsCount > roundsMax) {
+      setRoundsCount(Math.max(ROUNDS_MIN, roundsMax));
+    }
+  }, [roundsCount, roundsMax]);
 
   // Tre fria game mode-val (host-default). Inget premium-gate på lägesvalet —
   // subscription gatar caps (rundor/spelare) separat. Single player sätter
   // bara flaggan (inga lobby-spelare att eject:a i Profile-vyn).
   const handleSelectSingle = () => {
     setSinglePlayerDefault(true);
+    setMaxPlayers(4);
   };
   const handleSelectGameMode = (mode: GameMode) => {
     setSinglePlayerDefault(false);
     setGameMode(mode);
+    if (mode !== 'individual-devices') {
+      setMaxPlayers(4);
+    } else if (hasPremium) {
+      setMaxPlayers(12);
+    }
   };
   // En game-mode-ruta (delas av Single device- och Multiplayer-grupperna).
   // FREE-badge grön när aktiv, grå när inaktiv. Speglar Lobby.
@@ -796,13 +815,17 @@ export default function ProfileScreen() {
         setMaxPlayers(augmented.maxPlayers ?? 4);
         setGameMode(augmented.gameMode ?? 'pass-the-phone');
         setSinglePlayerDefault(augmented.singlePlayerDefault ?? false);
-        // Clamp så ett gammalt värde > nuvarande max (t.ex. om host har 8
-        // sparat från Individual Devices-läget och nu defaultar till
-        // Pass-the-Phone) inte hamnar utanför range:n.
+        // Clamp så ett gammalt värde > nuvarande max (t.ex. om host har 12
+        // rundor sparat från Individual Devices + Premium men nu saknar Premium)
+        // inte hamnar utanför range:n. initialMax tar hänsyn till BÅDE läge OCH
+        // premium-status (hasPremium kan ha laddats av den parallella async-grenen
+        // redan — om inte hanterar useEffect([roundsCount, roundsMax]) clampen).
         const savedRounds = augmented.roundsDefault ?? ROUNDS_DEFAULT;
-        const initialMax = (augmented.gameMode ?? 'pass-the-phone') === 'pass-the-phone'
-          ? ROUNDS_MAX_PASS
-          : ROUNDS_MAX_INDIV;
+        const isIndivPremium =
+          hasPremium &&
+          (augmented.gameMode ?? 'pass-the-phone') === 'individual-devices' &&
+          !(augmented.singlePlayerDefault ?? false);
+        const initialMax = isIndivPremium ? ROUNDS_MAX_INDIV : ROUNDS_MAX_PASS;
         setRoundsCount(Math.max(ROUNDS_MIN, Math.min(initialMax, savedRounds)));
         setEnabledHostPackages(augmented.enabledHostPackages ?? PURCHASED_PACKAGES.map((p) => p.id));
         setYoutubeEnabledCategories(augmented.youtubeEnabledCategories ?? defaultEnabledMainCategories());
@@ -1411,35 +1434,35 @@ export default function ProfileScreen() {
               </Pressable>
             </View>
             <View style={styles.modeRow}>
-              {/* Max 4: aktiv (grön) enbart för icke-premium. Premium → alltid
-                  utgråad + disabled eftersom Max 12 är auto-valt. */}
+              {/* Max 4: aktiv (grön) när maxPlayers===4. Disabled enbart när
+                  premium-host valt IndDev (auto-upgrades till Max 12 redan). */}
               <Pressable
                 style={({ pressed }) => [
                   styles.modeOption,
-                  !hasPremium && maxPlayers === 4 ? styles.modeOptionPassActive : styles.modeOptionInactive,
-                  pressed && !hasPremium && { opacity: 0.7 },
-                  hasPremium && { opacity: 0.45 },
+                  maxPlayers === 4 ? styles.modeOptionPassActive : styles.modeOptionInactive,
+                  pressed && { opacity: 0.7 },
+                  hasPremium && gameMode === 'individual-devices' && !singlePlayerDefault && { opacity: 0.45 },
                 ]}
-                onPress={() => !hasPremium && handleSelectMaxPlayers(4)}
-                disabled={hasPremium}
+                onPress={() => handleSelectMaxPlayers(4)}
+                disabled={hasPremium && gameMode === 'individual-devices' && !singlePlayerDefault}
               >
-                <Text style={[styles.modeLabel, { textAlign: 'center' }, !hasPremium && maxPlayers === 4 && styles.modeLabelActiveFree]}>
+                <Text style={[styles.modeLabel, { textAlign: 'center' }, maxPlayers === 4 && styles.modeLabelActiveFree]}>
                   Max 4 players
                 </Text>
-                <View style={[styles.freeBadge, (hasPremium || maxPlayers !== 4) && styles.freeBadgeDimmed]} pointerEvents="none">
-                  <Text style={[styles.freeBadgeText, (hasPremium || maxPlayers !== 4) && styles.freeBadgeTextDimmed]}>FREE</Text>
+                <View style={[styles.freeBadge, maxPlayers !== 4 && styles.freeBadgeDimmed]} pointerEvents="none">
+                  <Text style={[styles.freeBadgeText, maxPlayers !== 4 && styles.freeBadgeTextDimmed]}>FREE</Text>
                 </View>
               </Pressable>
-              {/* Max 12: auto-valt och aktivt (guld) när premium. */}
+              {/* Max 12: aktiv (guld) när maxPlayers===12. Badge grå/guld per premium-status. */}
               <Pressable
                 style={({ pressed }) => [
                   styles.modeOption,
-                  maxPlayers === 12 && hasPremium ? styles.modeOptionPremiumActive : styles.modeOptionInactive,
+                  maxPlayers === 12 ? styles.modeOptionPremiumActive : styles.modeOptionInactive,
                   pressed && { opacity: 0.7 },
                 ]}
                 onPress={() => handleSelectMaxPlayers(12)}
               >
-                <Text style={[styles.modeLabel, { textAlign: 'center' }, maxPlayers === 12 && hasPremium && styles.modeLabelActivePremium]}>
+                <Text style={[styles.modeLabel, { textAlign: 'center' }, maxPlayers === 12 && styles.modeLabelActivePremium]}>
                   Max 12 players
                 </Text>
                 <View style={[styles.premiumBadge, !hasPremium && styles.premiumBadgeGrey]} pointerEvents="none">
@@ -1604,7 +1627,7 @@ export default function ProfileScreen() {
                   <Switch value={youtubeEnabledCategories.includes('Film')} onValueChange={handleToggleActorsYoutube} trackColor={{ false: PROFILE_MATRIX_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={youtubeEnabledCategories.includes('Film') ? Colors.success : PROFILE_MATRIX_OFF} style={styles.profileSwitch} />
                 </View>
                 <View style={[styles.smAutoCell, smCellStyle, { paddingRight: 0 }]}>
-                  {(!spotifyEnabled && !artistsEnabled && !imagesEnabledCategories.includes('Sport')) && <Text style={styles.autoSyncLabel}>Auto-sync</Text>}
+                  <Text style={styles.autoSyncLabel}>{'incl\ncharacters'}</Text>
                 </View>
                 <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
                   <Switch value={imagesEnabledCategories.includes('Film')} onValueChange={handleToggleActorsGuessWho} trackColor={{ false: PROFILE_MATRIX_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={imagesEnabledCategories.includes('Film') ? Colors.success : PROFILE_MATRIX_OFF} style={styles.profileSwitch} />
@@ -1622,9 +1645,7 @@ export default function ProfileScreen() {
                 <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
                   <Switch value={youtubeEnabledCategories.includes('Sport')} onValueChange={handleToggleAthletesYoutube} trackColor={{ false: PROFILE_MATRIX_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={youtubeEnabledCategories.includes('Sport') ? Colors.success : PROFILE_MATRIX_OFF} style={styles.profileSwitch} />
                 </View>
-                <View style={[styles.smAutoCell, smCellStyle, { paddingRight: 0 }]}>
-                  {(!spotifyEnabled && !artistsEnabled && !imagesEnabledCategories.includes('Film')) && <Text style={styles.autoSyncLabel}>Auto-sync</Text>}
-                </View>
+                <View style={[styles.smAutoCell, smCellStyle, { paddingRight: 0 }]} />
                 <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
                   <Switch value={imagesEnabledCategories.includes('Sport')} onValueChange={handleToggleAthletesGuessWho} trackColor={{ false: PROFILE_MATRIX_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={imagesEnabledCategories.includes('Sport') ? Colors.success : PROFILE_MATRIX_OFF} style={styles.profileSwitch} />
                 </View>
@@ -3593,7 +3614,7 @@ const styles = StyleSheet.create({
   },
   smAutoCell: {
     alignSelf: 'stretch',
-    height: 10,
+    height: 24,
     justifyContent: 'center',
     alignItems: 'center',
   },

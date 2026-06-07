@@ -1158,15 +1158,17 @@ export default function LobbyScreen() {
           const clampTo = Math.max(ERA_TO_MIN, Math.min(ERA_MAX, eraTo));
           const clampFrom = Math.max(ERA_MIN, Math.min(eraFrom, clampTo - ERA_MIN_INTERVAL));
           setEraValues([clampFrom, clampTo]);
-          // Clamp roundsCount mot gameMode:s tak (Pass-the-Phone capas vid 4,
-          // Individual Devices vid 20) så ett gammalt sparat värde inte
-          // hamnar utanför range:n.
+          // Clamp roundsCount mot gameMode:s tak OCH premium-status.
+          // stepperMax-logiken (premium krävs för >4 i IndDev) speglas här
+          // vid load så ett gammalt sparat värde från en premium-session
+          // inte sätts > 4 när premium saknas.
           const savedRounds =
             stored?.roundsCount ?? profile?.roundsDefault ?? ROUNDS_DEFAULT;
-          const initialMax =
-            seedGameMode === 'pass-the-phone'
-              ? ROUNDS_MAX_PASS
-              : ROUNDS_MAX_INDIV;
+          const seedSinglePlayer =
+            stored?.singlePlayerDefault ?? profile?.singlePlayerDefault ?? false;
+          const isIndivPremium =
+            premium && seedGameMode === 'individual-devices' && !seedSinglePlayer;
+          const initialMax = isIndivPremium ? ROUNDS_MAX_INDIV : ROUNDS_MAX_PASS;
           setRoundsCount(
             Math.max(ROUNDS_MIN, Math.min(initialMax, savedRounds)),
           );
@@ -1618,13 +1620,17 @@ export default function LobbyScreen() {
     setMaxPlayers(hasPremium ? 12 : 4);
   }, [hostMode, hasPremium]);
 
-  // Max rundor beror enbart på spelläge: IndDev → 20, PtP/Single → 4.
+  // Max rundor beror på spelläge: IndDev → 20, PtP/Single → 4.
   // Premium ger INTE fler rundor i PtP — premium-host i PtP hänvisas till
   // att byta till IndDev för att nå 20 rundor (se onPremiumPress-alertet).
   const roundsMax = gameMode === 'individual-devices' && !singlePlayerDefault ? ROUNDS_MAX_INDIV : ROUNDS_MAX_PASS;
+  // stepperMax är taket för +/−-knapparna — kräver premium för >4 rundor.
+  // RoundsRuler:s gameModeMax=roundsMax (20) behålls för att visa bracketets
+  // fulla span med låsta tickar ovanför stepperMax.
+  const stepperMax = hasPremium ? roundsMax : Math.min(roundsMax, ROUNDS_MAX_PASS);
   useEffect(() => {
-    setRoundsCount((prev) => Math.max(ROUNDS_MIN, Math.min(roundsMax, prev)));
-  }, [roundsMax]);
+    if (roundsCount > stepperMax) setRoundsCount(Math.max(ROUNDS_MIN, stepperMax));
+  }, [roundsCount, stepperMax]);
 
   const handleDecrementRounds = useCallback(() => {
     setRoundsCount((prev) => {
@@ -1637,11 +1643,11 @@ export default function LobbyScreen() {
   }, []);
   const handleIncrementRounds = useCallback(() => {
     setRoundsCount((prev) => {
-      const next = Math.min(roundsMax, prev + ROUNDS_STEP);
+      const next = Math.min(stepperMax, prev + ROUNDS_STEP);
       if (next !== prev) void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       return next;
     });
-  }, [roundsMax]);
+  }, [stepperMax]);
   // Per-source profession-category-filter (ersätter youtubeEnabled/imagesEnabled/enabledMainCategories).
   // YouTube: alla tre valbara, min 1 krävs. Images: Film+Sport mandatory, Music valbar.
   const [youtubeEnabledCategories, setYoutubeEnabledCategories] = useState<MainCategory[]>(
@@ -2878,17 +2884,14 @@ export default function LobbyScreen() {
       });
       setSketchEnabled(stored.sketchEnabled);
       setSpotifyEnabled(stored.spotifyEnabled);
-      // Per-source categories — coerce tom array till defaults (safe fallback).
+      // Per-source categories — [] är ett giltigt "allt av"-val och får INTE
+      // coerceas till defaults. Direkt tilldelning respekterar host:s explicita val.
       setYoutubeEnabledCategories((prev) => {
-        const next = stored.youtubeEnabledCategories.length > 0
-          ? stored.youtubeEnabledCategories
-          : defaultEnabledMainCategories();
+        const next = stored.youtubeEnabledCategories;
         return prev.length === next.length && prev.every((c, i) => c === next[i]) ? prev : next;
       });
       setImagesEnabledCategories((prev) => {
-        const next = stored.imagesEnabledCategories.length > 0
-          ? stored.imagesEnabledCategories
-          : defaultEnabledMainCategories();
+        const next = stored.imagesEnabledCategories;
         return prev.length === next.length && prev.every((c, i) => c === next[i]) ? prev : next;
       });
     };
@@ -3669,6 +3672,121 @@ export default function LobbyScreen() {
     });
   };
 
+  // ── Game Sequence förhandsvisning ──────────────────────────────────────────
+  // Speglar quiz.tsx:s 3-pool-block-logik (Spotify → YouTube → Image) och
+  // härleder medie-källa + kategori per rund baserat på aktuella lobby-inställningar.
+  type GsSlot = { source: 'spotify' | 'youtube' | 'image' | 'none'; category: MainCategory | null };
+  const gameSequencePreview = useMemo<GsSlot[]>(() => {
+    const ytFiltered = MUSIC_QUESTIONS.filter(q => {
+      if (q.contentSubject === 'song') return youtubeEnabledCategories.includes('Music');
+      if (q.contentSubject === 'movie') return youtubeEnabledCategories.includes('Film');
+      if (q.contentSubject === 'sport-event') return youtubeEnabledCategories.includes('Sport');
+      return false;
+    });
+    const imgFiltered = IMAGE_QUIZ_QUESTIONS.filter(q => {
+      const s = q.contentSubject;
+      if (s === 'artist' || s === 'band') return imagesEnabledCategories.includes('Music');
+      if (s === 'actor' || s === 'character') return imagesEnabledCategories.includes('Film');
+      if (s === 'athlete') return imagesEnabledCategories.includes('Sport');
+      return false;
+    });
+    // Spotify bara i IndDev — PtP och Single Player kör utan Spotify DJ.
+    const spotifyActive = spotifyEnabled && gameMode === 'individual-devices' && !singlePlayerDefault;
+    const spotifyPool = spotifyActive ? MUSIC_QUESTIONS.filter(q => q.spotifyTrackId) : [];
+    // Ren YT-pool: ytFiltered (respekterar youtubeEnabledCategories) minus Spotify-items.
+    const pureYtPool = spotifyActive ? ytFiltered.filter(q => !q.spotifyTrackId) : ytFiltered;
+    const imagePool = imgFiltered;
+    const hasSpotify = spotifyPool.length > 0;
+    const hasPureYt = pureYtPool.length > 0;
+    const hasImage = imagePool.length > 0;
+
+    // Sekventiell fasordning: Spotify → YouTube → Hints/Image
+    // Ratio med Spotify (IndDev):  25% Spotify / 25% YouTube / 50% Hints.
+    // Ratio utan Spotify (PtP/SP): 50% YouTube / 50% Hints — Spotify-blocken
+    // absorberas av YouTube om YT är aktiverat, annars av Hints.
+    // Fallback: saknas Hints omdirigeras dess block till Spotify → YouTube.
+    let spotifyCount = hasSpotify ? Math.floor(roundsCount / 4) : 0;
+    // YouTube: 25% om Spotify aktiv, 50% om Spotify saknas.
+    const ytDivisor = hasSpotify ? 4 : 2;
+    let ytCount = hasPureYt ? Math.floor(roundsCount / ytDivisor) : 0;
+    let imageCount = roundsCount - spotifyCount - ytCount;
+
+    if (!hasImage && imageCount > 0) {
+      if (hasSpotify) spotifyCount += imageCount;
+      else if (hasPureYt) ytCount += imageCount;
+      imageCount = 0;
+    }
+
+    const slots: GsSlot[] = [];
+
+    // Fas 1: Spotify-slots
+    for (let b = 0; b < spotifyCount; b++) {
+      if (spotifyPool.length === 0) { slots.push({ source: 'none', category: null }); continue; }
+      const item = spotifyPool[b % spotifyPool.length];
+      slots.push({ source: 'spotify', category: subjectToMainCategory(item?.contentSubject) });
+    }
+
+    // Fas 2: YouTube-slots med jämn rotation per aktiverad kategori.
+    // Inom varje block gäller en kategori (Music → Film → Sport → Music …).
+    if (ytCount > 0) {
+      type YtCatEntry = { cat: MainCategory; items: typeof pureYtPool };
+      const subjectForCat: Record<MainCategory, string[]> = {
+        Music: ['song'],
+        Film: ['movie'],
+        Sport: ['sport-event'],
+      };
+      const ytCatEntries: YtCatEntry[] = (youtubeEnabledCategories as MainCategory[])
+        .map((cat) => ({
+          cat,
+          items: pureYtPool.filter((q) => subjectForCat[cat]?.includes(q.contentSubject ?? '')),
+        }))
+        .filter((e) => e.items.length > 0);
+
+      if (ytCatEntries.length > 0) {
+        const base = Math.floor(ytCount / ytCatEntries.length);
+        const remainder = ytCount % ytCatEntries.length;
+        ytCatEntries.forEach(({ cat }, catIdx) => {
+          const blocksForCat = base + (catIdx < remainder ? 1 : 0);
+          for (let b = 0; b < blocksForCat; b++) {
+            slots.push({ source: 'youtube', category: cat });
+          }
+        });
+      }
+    }
+
+    // Fas 3: Hints/Image-slots — alla block per kategori samlade (Music → Film → Sport).
+    if (imageCount > 0 && imagePool.length > 0) {
+      const imgSubjectForCat: Record<MainCategory, string[]> = {
+        Music: ['artist', 'band'],
+        Film: ['actor', 'character'],
+        Sport: ['athlete'],
+      };
+      const imgCatEntries = (imagesEnabledCategories as MainCategory[])
+        .map((cat) => ({
+          cat,
+          items: imagePool.filter((q) => imgSubjectForCat[cat]?.includes(q.contentSubject ?? '')),
+        }))
+        .filter((e) => e.items.length > 0);
+
+      if (imgCatEntries.length > 0) {
+        const base = Math.floor(imageCount / imgCatEntries.length);
+        const remainder = imageCount % imgCatEntries.length;
+        imgCatEntries.forEach(({ cat }, catIdx) => {
+          const blocksForCat = base + (catIdx < remainder ? 1 : 0);
+          for (let b = 0; b < blocksForCat; b++) {
+            slots.push({ source: 'image', category: cat });
+          }
+        });
+      } else {
+        for (let b = 0; b < imageCount; b++) {
+          slots.push({ source: 'image', category: subjectToMainCategory(imagePool[b % imagePool.length]?.contentSubject) });
+        }
+      }
+    }
+
+    return slots;
+  }, [roundsCount, youtubeEnabledCategories, imagesEnabledCategories, spotifyEnabled, gameMode, singlePlayerDefault]);
+
   return (
     <SafeAreaView style={styles.safe}>
       {/* Morse-ambient-ljud — bara när skärmen är aktiv (avmonteras vid
@@ -3923,7 +4041,22 @@ export default function LobbyScreen() {
               Multiplayer-lägena (Pass-the-Phone + Individual device) delar en
               rad. FREE-badge per ruta (grön aktiv / grå inaktiv). Read-only
               (disabled) för non-host. */}
-          <Text style={styles.gameModeGroupLabel}>Single player mode</Text>
+          <View style={styles.multiplayerLabelRow}>
+            <Text style={[styles.gameModeGroupLabel, { marginTop: 0, marginBottom: 0 }]}>Single player mode</Text>
+            <Pressable
+              style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
+              onPress={() =>
+                Alert.alert(
+                  'Single player mode',
+                  'One player only — challenge yourself.\n\nMax 4 rounds, even with a Premium subscription. Spotify not applicable for Single player mode.',
+                )
+              }
+              hitSlop={8}
+              accessibilityLabel="Single player mode info"
+            >
+              <Text style={styles.infoIconText}>i</Text>
+            </Pressable>
+          </View>
           {/* Spacer (flex 1) till höger → Single player-rutan blir halv bredd,
               vänsterställd, och linjerar med multiplayer-radens vänstra ruta. */}
           <View style={styles.modeRow}>
@@ -3940,7 +4073,7 @@ export default function LobbyScreen() {
               onPress={() =>
                 Alert.alert(
                   'Multiplayer mode',
-                  'Pass-the-Phone: Single device mode\n\nIndividual device: Multi-device mode / QuizVibe users only',
+                  'Pass-the-Phone: All players share one device. Max 4 players, even with Premium. Spotify not applicable for PtP mode.\n\nIndividual device: Each player uses their own device — registered QuizVibe accounts only. Max 4 players on Basic, max 12 players with Premium.',
                 )
               }
               hitSlop={8}
@@ -4221,7 +4354,7 @@ export default function LobbyScreen() {
                   <Switch value={youtubeEnabledCategories.includes('Film')} onValueChange={handleToggleActorsYoutube} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={youtubeEnabledCategories.includes('Film') ? Colors.success : MATRIX_SWITCH_OFF} style={styles.sourceMatrixSwitch} />
                 </View>
                 <View style={[styles.smAutoCell, smCellStyle]}>
-                  {(!spotifyEnabled && !artistsEnabled && !imagesEnabledCategories.includes('Sport')) && <Text style={styles.autoActivationLabel}>Auto-sync</Text>}
+                  <Text style={styles.autoActivationLabel}>{'incl\ncharacters'}</Text>
                 </View>
                 <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
                   <Switch value={imagesEnabledCategories.includes('Film')} onValueChange={handleToggleActorsGuessWho} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={imagesEnabledCategories.includes('Film') ? Colors.success : MATRIX_SWITCH_OFF} style={styles.sourceMatrixSwitch} />
@@ -4239,9 +4372,7 @@ export default function LobbyScreen() {
                 <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
                   <Switch value={youtubeEnabledCategories.includes('Sport')} onValueChange={handleToggleAthletesYoutube} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={youtubeEnabledCategories.includes('Sport') ? Colors.success : MATRIX_SWITCH_OFF} style={styles.sourceMatrixSwitch} />
                 </View>
-                <View style={[styles.smAutoCell, smCellStyle]}>
-                  {(!spotifyEnabled && !artistsEnabled && !imagesEnabledCategories.includes('Film')) && <Text style={styles.autoActivationLabel}>Auto-sync</Text>}
-                </View>
+                <View style={[styles.smAutoCell, smCellStyle]} />
                 <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
                   <Switch value={imagesEnabledCategories.includes('Sport')} onValueChange={handleToggleAthletesGuessWho} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={imagesEnabledCategories.includes('Sport') ? Colors.success : MATRIX_SWITCH_OFF} style={styles.sourceMatrixSwitch} />
                 </View>
@@ -4901,19 +5032,19 @@ export default function LobbyScreen() {
                       <Text style={styles.roundsGuestBoxText}>{roundsCount}</Text>
                     </View>
                     <TouchableOpacity
-                      style={[styles.roundsStepperBtn, roundsCount >= roundsMax && styles.roundsStepperBtnDisabled]}
+                      style={[styles.roundsStepperBtn, roundsCount >= stepperMax && styles.roundsStepperBtnDisabled]}
                       onPress={handleIncrementRounds}
-                      disabled={roundsCount >= roundsMax}
+                      disabled={roundsCount >= stepperMax}
                       activeOpacity={0.7}
                     >
-                      <Text style={[styles.roundsStepperBtnText, roundsCount >= roundsMax && styles.roundsStepperBtnTextDisabled]}>+</Text>
+                      <Text style={[styles.roundsStepperBtnText, roundsCount >= stepperMax && styles.roundsStepperBtnTextDisabled]}>+</Text>
                     </TouchableOpacity>
                   </View>
                   <View style={{ alignItems: 'center' }}>
                     <RoundsRuler
                       value={roundsCount}
                       min={ROUNDS_MIN}
-                      gameModeMax={roundsMax}
+                      gameModeMax={stepperMax}
                       onPremiumPress={() => {
                         // 20 rundor är en subscription-perk OBEROENDE av läge —
                         // alltid Store-upsell (IndDev är inte längre unlock:en).
@@ -4937,11 +5068,63 @@ export default function LobbyScreen() {
                     <RoundsRuler
                       value={roundsCount}
                       min={ROUNDS_MIN}
-                      gameModeMax={roundsMax}
+                      gameModeMax={stepperMax}
                     />
                   </View>
                 </>
               )}
+            </View>
+
+            {/* Game Sequence — en ruta per rund med medie-källa (topp-badge)
+                och kategori (botten-badge). Speglar quiz.tsx:s 3-pool-block-
+                logik: Spotify → YouTube → Image, baserat på aktuella inställningar. */}
+            <View>
+              <View style={styles.regionLabelRow}>
+                <Text style={styles.sectionLabel}>Game Sequence</Text>
+                <Pressable
+                  style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
+                  onPress={() =>
+                    Alert.alert(
+                      'Game Sequence',
+                      'Preview of which source (Spotify / YouTube / Image) and category (Music / Film / Sport) each round will use based on current settings.'
+                    )
+                  }
+                  hitSlop={8}
+                >
+                  <Text style={styles.infoIconText}>i</Text>
+                </Pressable>
+              </View>
+              <View style={styles.gsGrid}>
+                {gameSequencePreview.map((slot, idx) => (
+                  <View key={idx} style={styles.gsBox}>
+                    {/* Nummer + källikon på samma rad */}
+                    <View style={styles.gsInlineIconWrap}>
+                      <Text style={styles.gsNumber}>{idx + 1}</Text>
+                      {slot.source === 'spotify' ? (
+                        <SpotifyBrandIcon size={12} variant="white" />
+                      ) : slot.source === 'youtube' ? (
+                        <YouTubeBrandIcon size={14} />
+                      ) : slot.source === 'image' ? (
+                        <View style={styles.gsSourceQWrap}>
+                          <Svg width={13} height={13} viewBox="24 22 32 32">
+                            <Circle cx="40" cy="38" r="13" fill="none" stroke={Colors.primary} strokeWidth="2.5" />
+                            <Path d="M49 47 L53 51" stroke={Colors.primary} strokeWidth="2.5" strokeLinecap="round" />
+                          </Svg>
+                          <Text style={styles.gsSourceQMark}>?</Text>
+                        </View>
+                      ) : null}
+                    </View>
+                    {/* Botten-badge: kategori skär nedre kantlinjen */}
+                    {slot.category != null && (
+                      <View style={styles.gsCategoryWrap} pointerEvents="none">
+                        <View style={styles.gsCategoryBadge}>
+                          <Text style={styles.gsCategoryText}>{slot.category}</Text>
+                        </View>
+                      </View>
+                    )}
+                  </View>
+                ))}
+              </View>
             </View>
 
             {/* Answer response time */}
@@ -6565,7 +6748,7 @@ const styles = StyleSheet.create({
   },
   smAutoCell: {
     alignSelf: 'stretch',
-    height: 10,
+    height: 24,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -7169,6 +7352,81 @@ const styles = StyleSheet.create({
   },
   startHint: { fontSize: FontSize.xs, color: Colors.textSecondary, textAlign: 'center', lineHeight: 17 },
   bottomPad: { height: Spacing.xl },
+  // ── Game Sequence ──────────────────────────────────────────────────────────
+  // Ingen topp-badge längre — bara botten-badge (kategori) skär kantlinjen.
+  // rowGap 16 räcker: botten-badge 9 px under + 7 px luft till nästa rads topkant.
+  gsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    columnGap: 6,
+    rowGap: 16,
+    paddingTop: 14,
+    paddingBottom: 10,
+  },
+  gsBox: {
+    width: 56,
+    height: 36,
+    borderWidth: 1.5,
+    borderColor: Colors.border,
+    borderRadius: Radius.sm,
+    backgroundColor: Colors.cardElevated,
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+  },
+  gsNumber: {
+    fontSize: FontSize.md,
+    fontWeight: '700' as const,
+    color: Colors.textSecondary,
+    fontVariant: ['tabular-nums'] as any,
+  },
+  gsInlineIconWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  // Q-ring + "?"-overlay för Hints-källikon inuti rutan —
+  // samma viewBox och stroke som Source Dashboard:s Hints-rad men primär-blå
+  // (synligt mot den mörka box-bakgrunden Colors.cardElevated).
+  gsSourceQWrap: {
+    width: 13,
+    height: 13,
+    position: 'relative',
+  },
+  gsSourceQMark: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    textAlign: 'center',
+    lineHeight: 13,
+    color: Colors.primary,
+    fontSize: 6,
+    fontWeight: FontWeight.bold,
+  },
+  gsCategoryWrap: {
+    position: 'absolute',
+    top: -9,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    zIndex: 10,
+    elevation: 10,
+  },
+  gsCategoryBadge: {
+    backgroundColor: Colors.warning,
+    paddingHorizontal: 5,
+    paddingVertical: 1,
+    borderRadius: 3,
+  },
+  gsCategoryText: {
+    fontSize: 8,
+    fontWeight: '700' as const,
+    color: '#000',
+    letterSpacing: 0.4,
+    textTransform: 'uppercase',
+    lineHeight: 12,
+  },
 });
 
 const modal = StyleSheet.create({

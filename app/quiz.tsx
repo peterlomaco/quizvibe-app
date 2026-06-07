@@ -950,7 +950,9 @@ export default function QuizScreen() {
 
     // ── Music-pool ────────────────────────────────────────────────────
     // Era HÅRD: filtrera SEED_QUESTIONS på correctYear ∈ [eraFrom, eraTo].
-    const inEraMusic = youtubeEnabled
+    // Bygg music-pool när YT är aktivt ELLER Spotify är aktivt — Spotify DJ
+    // är en separat toggle och ska fungera även när youtubeEnabledCategories=[].
+    const inEraMusic = (youtubeEnabled || spotifyEnabled)
       ? SEED_QUESTIONS.filter(
           (q) => q.correctYear !== undefined
             ? q.correctYear >= eraFrom && q.correctYear <= eraTo
@@ -1047,12 +1049,13 @@ export default function QuizScreen() {
         });
 
     // ── Spotify-pool (separat tredje pool) ──────────────────────────────
-    // Spotify-items är en delmängd av youtubePool — samma era+audience+
-    // category-filter gäller redan. Lyfts ut som egen pool när spotifyEnabled.
+    // Byggs från pre-category-poolen (youtubePoolPreCategory) för att vara
+    // oberoende av youtubeEnabledCategories — Spotify DJ ska fungera även
+    // när YT Music är avstängt (youtubeEnabledCategories=[] eller Music saknas).
     const spotifyPool: QuizQuestion[] = spotifyEnabled
-      ? youtubePool.filter((q) => q.type === 'timeline' && q.spotifyTrackId)
+      ? youtubePoolPreCategory.filter((q) => q.type === 'timeline' && q.spotifyTrackId)
       : [];
-    // Ren YouTube-pool: allt i youtubePool som INTE är Spotify.
+    // Ren YouTube-pool: category-filtrad pool minus Spotify-items.
     const pureYoutubePool: QuizQuestion[] = spotifyEnabled
       ? youtubePool.filter((q) => !(q.type === 'timeline' && q.spotifyTrackId))
       : youtubePool;
@@ -1115,60 +1118,93 @@ export default function QuizScreen() {
       !hasOther  ? prioritiseUnseen(imagePool) :
                    groupByCategory(imagePool);
 
-    const questionsPerBlock = gameMode === 'individual-devices' ? 1 : playerCount;
+    // PtP: questionsPerBlock = antal spelare (alla svarar på olika frågor i samma block).
+    // IndDev + Single Player: questionsPerBlock = 1 (varje rund = en fråga per spelare).
+    const questionsPerBlock = (gameMode === 'individual-devices' || playerCount <= 1) ? 1 : playerCount;
 
-    // ── Spotify-interval ─────────────────────────────────────────────
-    // Spotify är ett "special moment" — Spotify-block sprids ut en per
-    // spotifyInterval ronder. Interval baseras på ratio
-    // (pureYT + image) / spotify, begränsat till [3, 6] så Spotify dyker
-    // upp med lagom täthet (inte dominerar, inte försvinner).
-    //
-    // Exempel med fullständiga pooler (418 YT, 836 bilder, 41 Spotify):
-    //   round((418+836)/41) = round(30.6) → clampad till 6
-    //   → 1 Spotify per 6 rundor (~17 % av spelet)
-    const spotifyInterval: number =
-      hasSpotify && (hasPureYoutube || hasImage)
-        ? Math.max(3, Math.min(6, Math.round((pureYoutubePool.length + imagePool.length) / spotifyPool.length)))
-        : 1;
+    // ── Sekventiell fasordning: Spotify → YouTube → Hints/Image ────────
+    // Ratio med Spotify (IndDev):  25% Spotify / 25% YouTube / 50% Hints.
+    // Ratio utan Spotify (PtP/SP): 50% YouTube / 50% Hints — Spotify-blocken
+    // absorberas av YouTube om YT är aktiverat, annars av Hints.
+    // Fallback: saknas Hints → Spotify → YouTube.
+    let spotifyBlockCount = hasSpotify ? Math.floor(totalRounds / 4) : 0;
+    // YouTube: 25% om Spotify aktiv, 50% om Spotify saknas (absorberar Spotify-blocken).
+    const ytDivisor = hasSpotify ? 4 : 2;
+    let ytBlockCount = hasPureYoutube ? Math.floor(totalRounds / ytDivisor) : 0;
+    let imageBlockCount = totalRounds - spotifyBlockCount - ytBlockCount;
 
-    const spotifyBlockCount: number =
-      hasSpotify && (hasPureYoutube || hasImage)
-        ? Math.floor((totalRounds - 1) / spotifyInterval) + 1
-        : hasSpotify
-          ? totalRounds
-          : 0;
+    if (!hasImage && imageBlockCount > 0) {
+      // Hints-block omdirigeras: Spotify i första hand → YouTube
+      if (hasSpotify) spotifyBlockCount += imageBlockCount;
+      else if (hasPureYoutube) ytBlockCount += imageBlockCount;
+      imageBlockCount = 0;
+    }
 
-    // ── YouTube-interval (beräknas mot återstående rundor) ───────────
-    const remainingRounds = totalRounds - spotifyBlockCount;
-
-    const ytInterval: number =
-      hasPureYoutube && hasImage
-        ? Math.max(2, Math.min(4, Math.round(imagePool.length / pureYoutubePool.length)))
-        : 1;
-
-    const ytBlockCount: number =
-      hasPureYoutube && hasImage
-        ? Math.floor((remainingRounds - 1) / ytInterval) + 1
-        : hasPureYoutube
-          ? remainingRounds
-          : 0;
-
-    // ── Bygg mixed array: 3-fas Spotify → YouTube → Image ───────────
-    // Spotify-block samlas i BÖRJAN (special moments öppnar spelet),
-    // sedan YouTube-block, sedan bildblock.
     const mixed: QuizQuestion[] = [];
-    for (let block = 0; block < totalRounds; block++) {
-      let pool: QuizQuestion[];
-      if (block < spotifyBlockCount) {
-        pool = orderedSpotifyPool;
-      } else if (block < spotifyBlockCount + ytBlockCount) {
-        pool = orderedPureYoutubePool;
-      } else {
-        pool = orderedImagePool;
+    const buildSequentialPhase = (pool: QuizQuestion[], count: number) => {
+      for (let block = 0; block < count; block++) {
+        for (let q = 0; q < questionsPerBlock; q++) {
+          if (pool.length === 0) continue;
+          mixed.push(pool[(block * questionsPerBlock + q) % pool.length]);
+        }
       }
-      for (let q = 0; q < questionsPerBlock; q++) {
-        const idx = (block * questionsPerBlock + q) % pool.length;
-        mixed.push(pool[idx]);
+    };
+
+    // Fas 1: Spotify
+    buildSequentialPhase(orderedSpotifyPool, spotifyBlockCount);
+
+    // Fas 2: YouTube — alla block per kategori samlade (Music → Film → Sport).
+    // Blockantalet fördelas jämnt; resten läggs på de första kategorierna.
+    // Inom en kategori körs alla block i följd med osedd-prioritering.
+    if (ytBlockCount > 0 && hasPureYoutube) {
+      const ytCatPools = (youtubeEnabledCategories as MainCategory[])
+        .map((cat) => ({
+          pool: prioritiseUnseen(
+            pureYoutubePool.filter((q) => q.mainCategory === cat),
+          ),
+        }))
+        .filter((e) => e.pool.length > 0);
+
+      if (ytCatPools.length > 0) {
+        const base = Math.floor(ytBlockCount / ytCatPools.length);
+        const remainder = ytBlockCount % ytCatPools.length;
+        ytCatPools.forEach(({ pool }, catIdx) => {
+          const blocksForCat = base + (catIdx < remainder ? 1 : 0);
+          for (let block = 0; block < blocksForCat; block++) {
+            for (let q = 0; q < questionsPerBlock; q++) {
+              if (pool.length === 0) continue;
+              mixed.push(pool[(block * questionsPerBlock + q) % pool.length]);
+            }
+          }
+        });
+      }
+    }
+
+    // Fas 3: Hints/Images — alla block per kategori samlade (Music → Film → Sport).
+    // Blockantalet fördelas jämnt per aktiv bild-kategori.
+    if (imageBlockCount > 0 && hasImage) {
+      const imgCatPools = (imagesEnabledCategories as MainCategory[])
+        .map((cat) => ({
+          pool: prioritiseUnseen(
+            imagePool.filter((q) => q.mainCategory === cat),
+          ),
+        }))
+        .filter((e) => e.pool.length > 0);
+
+      if (imgCatPools.length > 0) {
+        const base = Math.floor(imageBlockCount / imgCatPools.length);
+        const remainder = imageBlockCount % imgCatPools.length;
+        imgCatPools.forEach(({ pool }, catIdx) => {
+          const blocksForCat = base + (catIdx < remainder ? 1 : 0);
+          for (let block = 0; block < blocksForCat; block++) {
+            for (let q = 0; q < questionsPerBlock; q++) {
+              if (pool.length === 0) continue;
+              mixed.push(pool[(block * questionsPerBlock + q) % pool.length]);
+            }
+          }
+        });
+      } else {
+        buildSequentialPhase(orderedImagePool, imageBlockCount);
       }
     }
     // Nödfallback: mixed tom trots att pool-bygget körde (t.ex. alla pools
