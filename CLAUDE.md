@@ -1246,7 +1246,7 @@ Hand-off-skärmen mellan Lobby:s Start Game-tap och första quiz-frågan. [src/c
    - **Game era**: `{eraFrom} – {eraTo}` (host:s val från Lobby, fixt under hela spelet).
    - **Answer response time**: dropdown-trigger på samma rad som rubriken — visar `{N}s ▼` (`{N}s 🔒` när låst). Tap → Modal med 4 options (15s/30s/45s/60s). Quiz.tsx håller `responseSeconds` som state och passar `onAnswerResponseSecondsChange` så användaren kan justera mellan ronder.
    - **Locked-state i Pass-the-Phone**: `responseSecondsLocked = gameMode === 'pass-the-phone' && currentPlayerIndex !== 0`. När låst → tap visar info-Alert ("response time can only be changed at the start of a new round — when all players have answered the same number of questions"). Trigger:s border + text dimmas + ▼ byts till 🔒.
-3. **Current Leaderboard (utfällbar)** mellan settings och play. Default **collapsed** vid varje GetReadyIntro-mount. Tap på header → expand. Body är `position: 'absolute'` med `top: '100%'` + `zIndex: 100` + `elevation: 10` → **OVERLAY:ar** play + turordningstabellen istället för att skjuta dem nedåt. Innehållet bakom stannar på sin plats men göms tills body collapses igen. Layout: 3-kolumns sport-tabell (se "Leaderboard table" nedan).
+3. **Current Leaderboard (utfällbar)** mellan settings och play. Default **collapsed** vid varje GetReadyIntro-mount. Tap på header → expand. Body är `position: 'absolute'` med `top: '100%'` + `zIndex: 100` + `elevation: 10` → **OVERLAY:ar** play + turordningstabellen istället för att skjuta dem nedåt. Innehållet bakom stannar på sin plats men göms tills body collapses igen. Layout: 3-kolumns sport-tabell (se "Leaderboard table" nedan). **Scoring guide** visas inuti overlay:n ovanför Player-headern — 3-kolumns tabell (Year/Letter × Minimal/Standard/Full) utan rubrik, med `scoringPlayerDivider` (1 px `Colors.border`, `marginHorizontal: Spacing.md`) som separator mot spelarlistan.
 4. **Play-knapp** (centrerad): `<QuizVibePlayLogo size={140} color={Colors.warning} />` — Q-logo med play-triangel inuti Q-ringen (ersätter den gamla blå rektangulära knappen). **Gold glow** runt logon: `playLogoHalo` (absolut-positionerad bakom, `Colors.warning` bg + animated opacity 0.35 → 0.8) + iOS-only shadow med `shadowColor: Colors.warning`. Scale-pulse 1 → 1.06 över 800ms.
 
 **Kategori-badge på current-box** (2026-05-25): kant-skärande badge ovanpå `currentMediaBox` (IndDev) och `currentPlayerBox` (PtP/Single) — visar V1-huvudkategori (Music/Film/Sport) för frågan som spelas härnäst. Drivs av ny prop `categoryByQuestion: (MainCategory | null)[]` som passas från quiz.tsx. Visar `categoryByQuestion[currentQuestion - 1]` (frågan som currentQuestion pekar på = "först på tur"). Alla kategorier delar **enhetlig gold-styling** (`Colors.warning` bg + svart text, samma vokabulär som PREMIUM-badge) — per-kategori-färgning testades men gav splittrad känsla. ViewBox-position: `top: -9, right: Spacing.md` så badgen sticker ut över top-kanten på boxen utan att krocka med innehållet. null-värde i arrayn → ingen badge renderas (t.ex. capital-fråga, framtida edge case).
@@ -1266,10 +1266,15 @@ Hand-off-skärmen mellan Lobby:s Start Game-tap och första quiz-frågan. [src/c
 - I övrigt identisk struktur: question-dot-bar i toppen, current question-ruta med media-ikon, queue-chips för upp till 9 kommande frågor + end-of-game-markör.
 - Anledning: i PtP-grenen var queue tom när `turnOrder.length <= 1` (queue-useMemo i quiz.tsx returnerar `[]`) — full lista visades aldrig. IndDev-grenen bygger sin queue från `totalQuestions - currentQuestion` direkt, så single-player får korrekt lista oberoende av tom queue-prop.
 
+**Audio-gating (Individual Devices, 2026-06-07)**: allt ljud är host-only i IndDev — non-host:s enhet är tyst:
+- `HeartbeatSound` (WebView procedural heartbeat, bpm 80) renderas i `GetReadyIntro` och `quiz.tsx` gated på `isHost`. `isHost` parsas i quiz.tsx: `const isHost = (params.isHost ?? 'true') === 'true'`.
+- `CountdownIntro` tar `silent?: boolean`-prop → `silent={!isHost}`. Pre-warm-anropet + alla `Speech.speak`-anrop hoppas över när `silent=true`.
+- MorseAmbientSound i LobbyScreen var redan gated på `hostMode` — ingen ändring.
+
 **CountdownIntro röst-nedräkning** (`expo-speech`, installerad v14.0.8): Djup mansröst med `pitch: 0.01` (absolut lägsta) + `rate: 0.42` (långsamt/dramatiskt) + `language: 'en-US'`. Räknar "3", "2", "1", sedan "**Who**" (synkat med "?"-glyfen). Implementeringsdetaljer:
 
 - **`count` startar som `null`** (ingen siffra visas i Q-ringen). Efter 700 ms initial paus sätts `count = startFrom` (visuell "3" + röst "3" startar exakt synkat). Intervallet tickar sedan var 1300 ms (lugnare, mer dramatisk paus).
-- **Pre-warm** vid mount: `Speech.speak(' ', { rate: 2.0 })` initierar TTS-motorn ~700 ms innan nedräkningen börjar — eliminerar init-latensen på iOS som annars gör att "3" hörs 200–400 ms efter att siffran syns.
+- **Pre-warm** vid mount: `Speech.speak(' ', { rate: 2.0 })` (U+00A0 non-breaking space) initierar TTS-motorn ~700 ms innan nedräkningen börjar. Gated på `!silent`.
 - **Stop i useEffect-cleanup** (returnvärdet), ALDRIG direkt innan speak — `Speech.stop()` precis före `Speech.speak()` på iOS avbryter det nya anropet.
 - **Try/catch** runt speak + stop skyddar mot saknad native-modul i dev-build.
 - Om rösten inte hörs: kör `npx expo run:ios` (expo-speech kräver native build — fungerar ej i standard Expo Go).
@@ -1546,7 +1551,13 @@ Image-frågor har 10 prefix-knappar i ImageAnswerBlock — på små skärmar rym
 
 **`MUSIC_QUESTION_TEXT = 'Which year was this song released?'`** — alla mock-frågor delar denna text (själva låten är frågan via YouTube). `correctYear` + `hint` (era) per fråga är fortfarande unika så reveal-vyn varierar i hint-texten även om frågetexten är generisk.
 
-**`calculatePoints(correct)`** — binär scoring: **1 poäng vid rätt, 0 vid fel**. Tidigare var pts time-baserad (0-1000 per fråga via `1000 × (timeLeft / totalSeconds)`); modellen förenklades 2026-05-21 så pts-kolumnen visar antal rätt över spelet. **Tie-break**: spelare med samma pts rankas på lägst genomsnittlig svarstid (`avgResponseSeconds asc`). Sortering hanteras både i quiz.tsx:s `tableEntries`-derivation (för GetReadyIntro:s live-leaderboard) och i RoundLeaderboard:s `entries.sort` (för final-leaderboarden). Mock-opponent-funktionen `generateOpponentRoundScore` i [src/components/RoundLeaderboard.tsx](src/components/RoundLeaderboard.tsx) följer samma 1/0-modell (accuracy-sannolikheten per assistance behålls för att simulera olika skicklighet i testdata).
+**`calculatePoints(correct, assistance?, questionKind?)`** — assistance-nivåbaserad scoring (2026-06-07, commit `9eeae7f`). Tre parametrar:
+- `correct = false` → alltid 0 p
+- `questionKind === 'year'` (Spotify/YT-musik/YT-sport): `minimal=5`, `standard=3`, `full=1`
+- `questionKind === 'name'` (Hints/YT-film/actor-select): `minimal=3`, `standard=2`, `full=1`
+- Saknas `assistance` → binär fallback 1/0 (image-frågor utan assistance-kontext)
+
+Call-sites: `handleConfirm` (timeline) → `'year'`; `handleConfirmName` (image/Hints) → `'name'`; `handleConfirmActor` (actor-select) → `'name'`. **Tie-break** oförändrat: lägst `avgResponseSeconds` asc vid pts-lika. Mock-opponent-funktionen `generateOpponentRoundScore(assistance, questionKind)` i [src/components/RoundLeaderboard.tsx](src/components/RoundLeaderboard.tsx) följer samma tabell.
 
 **HCP-progression skalar mot binära scoring**: `calculateNewHCP` i [src/utils/hcp.ts](src/utils/hcp.ts) använder `roundHcp(pointsEarned / 2)` — så 2 rätt sänker HCP med 1, 1 rätt också 1 (0.5 rundas upp till spelarens fördel), 4 rätt med 2, etc. Tidigare divisor var 10 (matchade gamla 0-1000-modellen). HCP är ute ur launch-scope men formeln är skalad korrekt så feature:n kan återupplivas utan ytterligare beräknings-pass.
 
