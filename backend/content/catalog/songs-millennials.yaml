@@ -790,15 +790,17 @@ items:
   - id: kikki-danielsson-bra-vibrationer
     displayName: "Bra vibrationer — Kikki Danielsson"
     correctYear: 1985
-    probability: 70
+    probability: 78
     wikimediaSearchHints: ["Kikki Danielsson Bra vibrationer Eurovision 1985"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0FSlaiuv4eBrrjz05jpxz6"
     youtubeClips:
       - videoId: "OfVcmnxKfqc"
         startSec: 5
         endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 1985 vinnare. ESC 1985 performance."
+    genrePackages: ["Eurovision"]
   - id: lotta-engberg-fyra-bugg
     displayName: "Fyra bugg och en Coca Cola — Lotta Engberg"
     correctYear: 1987
@@ -1030,3 +1032,72 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1996 vinnare — Irland."
     genrePackages: ["Eurovision"]
+  - id: lotta-engberg-successchottis
+    displayName: "Succéschottis — Lotta Engberg"
+    correctYear: 1987
+    probability: 80
+    wikimediaSearchHints: ["Lotta Engberg Succéschottis 1987 Swedish schlager Fyra Bugg Coca Cola"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "6AbOYPLZy8epirlVNAOVDK"
+    youtubeClips:
+      - videoId: "cPsj6_U0dkc"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Fan upload"
+        notes: "Fan-uppladdning av studio-inspelning 1987. Inget officiellt Topic-klipp."
+  - id: niklas-stromstedt-oslagbara
+    displayName: "Oslagbara — Niklas Strömstedt"
+    correctYear: 1992
+    probability: 76
+    wikimediaSearchHints: ["Niklas Strömstedt Oslagbara 1992 Swedish pop Halvvägs till framtiden"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "6Y4TjH3wA2r76NML5BGASz"
+    youtubeClips:
+      - videoId: "0XCZUg-4iiA"
+        startSec: 0
+        endSec: 30
+        channelTitle: "WM Sweden"
+        notes: "Officiell WM Sweden. Album Halvvägs till framtiden (1992)."
+  - id: sven-ingvars-sommar-i-sverige
+    displayName: "Sommar i Sverige — Sven-Ingvars"
+    correctYear: 1994
+    probability: 80
+    wikimediaSearchHints: ["Sven-Ingvars Sommar i Sverige 1994 Swedish dansband Byns enda blondin"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "7s8EmGKCWKHsKXhhEZBdaM"
+    youtubeClips:
+      - videoId: "PQuDXSXGkAg"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Parlophone Sweden"
+        notes: "Officiell Parlophone/WM Group. Album Byns enda blondin (1994)."
+
+  - id: gyllene-tider-juni-juli-augusti
+    displayName: "Juni, juli, augusti — Gyllene Tider"
+    correctYear: 1981
+    probability: 90
+    wikimediaSearchHints: ["Gyllene Tider Swedish pop rock band Per Gessle"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Summer"]
+    spotifyTrackId: "2AXTRWWGTwgp0Ud8cPzT5S"
+    youtubeClips:
+      - videoId: "LksWsiCKqSQ"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Gyllene Tider - Topic"
+        notes: "Studio-audio från officiell Topic-kanal."
+
+  - id: kaoma-lambada
+    displayName: "Lambada — Kaoma"
+    correctYear: 1989
+    probability: 88
+    wikimediaSearchHints: ["Kaoma Lambada 1989 Brazilian French dance group"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Summer"]
+    spotifyTrackId: "6xepovPqjvrkEw9Y5AMmTm"
+    youtubeClips:
+      - videoId: "iyLdoQGBchQ"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Club Music 80"
+        notes: "Officiell musikvideo-re-upload — stabil sedan 2014."

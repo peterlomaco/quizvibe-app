@@ -175,6 +175,7 @@ items:
     wikimediaSearchHints: ["Sarek Genom eld och vatten Melodifestivalen 2003"]
     answerMethods: ["timeline"]
     genrePackages: ["Melodifestivalen"]
+    spotifyTrackId: "20NfHnLzpw6qoAKOX8BFaQ"
     youtubeClips:
       - videoId: "ky3bbNq818w"
         startSec: 12
@@ -271,7 +272,7 @@ items:
     youtubeClips:
       - videoId: "xTjwTbnX_EA"
         startSec: 15
-        endSec: 201
+        endSec: 45
         channelTitle: "Lost Panda"
   # 2008
   - id: coldplay-viva-la-vida
@@ -367,7 +368,7 @@ items:
     youtubeClips:
       - videoId: "yMsKK0zNT_4"
         startSec: 5
-        endSec: 208
+        endSec: 35
         channelTitle: "Kontor.TV"
   # 2012
   - id: psy-gangnam-style
@@ -572,7 +573,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Veronica Maggio Jag kommer 2011"]
     answerMethods: ["timeline"]
-    spotifyTrackId: "3BG1x6Tw2fW75Nl3tysorH"
+    spotifyTrackId: "5M2y8QdDepGYMsWyxhoxQU"
     youtubeClips:
       - videoId: "zNKwziMG5UI"
         startSec: 30
@@ -996,3 +997,59 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2011 vinnare — Azerbajdzjan. Officiell music video."
     genrePackages: ["Eurovision"]
+  - id: barbados-kom-hem
+    displayName: "Kom hem — Barbados"
+    correctYear: 2000
+    probability: 72
+    wikimediaSearchHints: ["Barbados Kom hem 2000 Swedish dansband Mariann Records"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "71IcKgzWI4wyjBmar9hzy5"
+    youtubeClips:
+      - videoId: "Bc-qN5hO8OM"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Barbados - Topic"
+        notes: "Officiell Topic-kanal. Studio 2000. Ersatte fan-uppladdning (7ZYGyCPVwo4)."
+  - id: kapten-rod-nar-solen-gar-ner
+    displayName: "När solen går ner — Kapten Röd"
+    correctYear: 2012
+    probability: 70
+    wikimediaSearchHints: ["Kapten Röd AKI När solen går ner 2012 Swedish hip-hop reggae"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "68GdZAAowWDac3SkdNWOwo"
+    youtubeClips:
+      - videoId: "W-BkWPk9Hqo"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Kapten Röd"
+        notes: "Officiell video. AKI feat. Kapten Röd (hip-hop/reggae)."
+
+  - id: markoolio-sommar-och-sol
+    displayName: "Sommar och sol — Markoolio"
+    correctYear: 1999
+    probability: 85
+    wikimediaSearchHints: ["Markoolio Swedish rapper singer Sommar och sol"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Summer"]
+    spotifyTrackId: "4bpqcGVSveDZ5E3rgr9v2y"
+    youtubeClips:
+      - videoId: "98ID_halfhs"
+        startSec: 0
+        endSec: 30
+        channelTitle: "SandraTornblad"
+        notes: "Musikvideo-re-upload av originalet (1999)."
+
+  - id: bellini-samba-de-janeiro
+    displayName: "Samba de Janeiro — Bellini"
+    correctYear: 1997
+    probability: 85
+    wikimediaSearchHints: ["Bellini Samba de Janeiro Eurodance 1997"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Summer"]
+    spotifyTrackId: "5aIfLbdgkbH7NbQryd1poB"
+    youtubeClips:
+      - videoId: "oKx1NuRqpeM"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Bellini_Music_Official"
+        notes: "Officiell artist-kanal Bellini_Music_Official."

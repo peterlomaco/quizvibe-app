@@ -473,6 +473,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "hamrin-semi-vm-1958",
+    "displayName": "Kurt Hamrin Sverige–Västtyskland VM-halvfinal",
+    "correctYear": 1958,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "lVZ9PFAfav8",
+        "startSec": 30,
+        "endSec": 60,
+        "channelTitle": "KEITH BARON",
+        "license": "standard",
+        "notes": "HD documentary om Sverige i VM 1958 — Hamrin-höjdpunkter. Ersatte SD-klipp (2sQQ1FovLAs)."
+      }
+    ]
+  },
+  {
     "id": "ritchie-valens-la-bamba",
     "displayName": "La Bamba — Ritchie Valens",
     "correctYear": 1958,
@@ -653,6 +673,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "lill-babs-leva-livet",
+    "displayName": "Leva livet — Lill-Babs",
+    "correctYear": 1963,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder"
+    ],
+    "spotifyTrackId": "6P40lE9SODIcT21NpmRd2I",
+    "youtubeClips": [
+      {
+        "videoId": "YT45RF2SGRw",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Universal Music Group",
+        "license": "standard",
+        "notes": "Officiell UMG-uppladdning. Studio 1963. Svensk version av It's My Party."
+      }
+    ]
+  },
+  {
     "id": "beatles-a-hard-days-night",
     "displayName": "A Hard Day's Night — The Beatles",
     "correctYear": 1964,
@@ -689,6 +730,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Frank Sinatra - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
+    "id": "lill-babs-letkis-jenka",
+    "displayName": "Letkis-Jenka — Lill-Babs",
+    "correctYear": 1964,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder"
+    ],
+    "spotifyTrackId": "2NV9sp5tl3fKrKZCFtSGBY",
+    "youtubeClips": [
+      {
+        "videoId": "eMiA3xHLXVo",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Lill-Babs - Topic",
+        "license": "standard",
+        "notes": "Officiell Topic-kanal. Studio 1964. Ersatte fan-upladdning (79kFl6Fe2fc)."
       }
     ]
   },
@@ -960,6 +1022,50 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Jimi Hendrix - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
+    "id": "lill-lindfors-en-san-karl",
+    "displayName": "En sån karl — Lill Lindfors",
+    "correctYear": 1967,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "spotifyTrackId": "0S1nTYJUNSKpuJkkG4gucV",
+    "youtubeClips": [
+      {
+        "videoId": "cJ1-WZQvBSM",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Lennart Ljung Music",
+        "license": "standard",
+        "notes": "Studio-inspelning 1967. Ersatte dead UMG-klipp (T1FKf-JZ-eM)."
+      }
+    ]
+  },
+  {
+    "id": "sven-ingvars-jag-ringer-pa-fredag",
+    "displayName": "Jag ringer på fredag — Sven-Ingvars",
+    "correctYear": 1967,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "spotifyTrackId": "4CJCKU7Vua0i1EHgwRup1q",
+    "youtubeClips": [
+      {
+        "videoId": "fxG0Gu9stiI",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Sven Ingvars - Topic",
+        "license": "standard",
+        "notes": "Officiell Topic-kanal. Studio 1967. Ersatte fan-uppladdning (z0CDj6vwQ5s)."
       }
     ]
   },
@@ -1504,6 +1610,28 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "abba-ring-ring",
+    "displayName": "Ring Ring — ABBA",
+    "correctYear": 1973,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "spotifyTrackId": "1GUpCVoNqQoriLkftXc3S3",
+    "youtubeClips": [
+      {
+        "videoId": "TL0EoXdpOqg",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "ABBA",
+        "license": "standard",
+        "notes": "Officiell music video ℗ 1973 Polar Music International AB."
+      }
+    ]
+  },
+  {
     "id": "anne-marie-david-tu-te-reconnaitras",
     "displayName": "Tu te reconnaîtras — Anne-Marie David",
     "correctYear": 1973,
@@ -1570,6 +1698,28 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "lasse-berghagen-ding-dong",
+    "displayName": "Ding Dong — Lasse Berghagen",
+    "correctYear": 1973,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "spotifyTrackId": "1oS8V9VCSuF0fgLQGMKXQY",
+    "youtubeClips": [
+      {
+        "videoId": "uhYOEoQyqT4",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Universal Music Sweden",
+        "license": "standard",
+        "notes": "Officiell UMG Sweden. Melodifestivalen 1973 (7:a plats)."
+      }
+    ]
+  },
+  {
     "id": "roberta-flack-killing-me-softly",
     "displayName": "Killing Me Softly with His Song — Roberta Flack",
     "correctYear": 1973,
@@ -1628,6 +1778,28 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "The Rolling Stones - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
+    "id": "streaplers-vad-har-du-under-blusen-rut",
+    "displayName": "Vad har du under blusen Rut — Streaplers",
+    "correctYear": 1973,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "spotifyTrackId": "7915ILGV5otD6Oq3rOcKBR",
+    "youtubeClips": [
+      {
+        "videoId": "LdZuxKYJW3I",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "WM Sweden",
+        "license": "standard",
+        "notes": "Officiell Warner Music Sweden ℗ 1973."
       }
     ]
   },
@@ -1707,6 +1879,28 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Lynyrd Skynyrd - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
+    "id": "bjorn-skifs-michelangelo",
+    "displayName": "Michelangelo — Björn Skifs",
+    "correctYear": 1975,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "spotifyTrackId": "3qChO81Z9r3KDyIj4w1m4T",
+    "youtubeClips": [
+      {
+        "videoId": "hxvDmlsjjyU",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Björn Skifs - Topic",
+        "license": "standard",
+        "notes": "Officiell Topic-kanal. Studio 1975. Ersatte TV-klipp (EOhBIaOt1oU)."
       }
     ]
   },
@@ -2170,12 +2364,12 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "youtubeClips": [
       {
-        "videoId": "aOpnnrS4ags",
-        "startSec": 20,
-        "endSec": 35,
-        "channelTitle": "Frankie Valli and the Four Seasons",
+        "videoId": "ZW0DfsCzfq4",
+        "startSec": 0,
+        "endSec": 20,
+        "channelTitle": "Kurt Harmsworth",
         "license": "standard",
-        "notes": "Curerad 2026-05-29 — Grease-titelmelodin (Frankie Valli, TOTP 1978). Officiell artist-kanal."
+        "notes": "Summer Nights-scen med Travolta + Newton-John — ikonisk strandbild."
       }
     ]
   },
@@ -2287,6 +2481,53 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 1979 vinnare — Israel."
+      }
+    ]
+  },
+  {
+    "id": "ted-gardestad-vilken-harlig-dag",
+    "displayName": "Oh, vilken härlig dag — Ted Gärdestad",
+    "correctYear": 1979,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "genrePackages": [
+      "Summer"
+    ],
+    "spotifyTrackId": "1Taqw1VEHl8Gy9qAZtRLAq",
+    "youtubeClips": [
+      {
+        "videoId": "NcqSPjcFlXc",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Ted Gärdestad - Topic",
+        "license": "standard",
+        "notes": "Studio-audio från officiell Topic-kanal."
+      }
+    ]
+  },
+  {
+    "id": "vikingarna-djingis-kan",
+    "displayName": "Djingis Kan — Vikingarna",
+    "correctYear": 1979,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "spotifyTrackId": "2BVoNm43uY07T5JKI2SjCW",
+    "youtubeClips": [
+      {
+        "videoId": "JPpB1iaDmaw",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Vikinger - Topic",
+        "license": "standard",
+        "notes": "Officiell Topic-kanal. Studio 1979. Ersatte blockerat klipp (HRn0KKd03uk)."
       }
     ]
   },
@@ -2507,6 +2748,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "wassberg-os-guld-1980",
+    "displayName": "Thomas Wassberg OS-guld 15 km (0.01 sekund!) Lake Placid",
+    "correctYear": 1980,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "ZtaY0UckhVI",
+        "startSec": 30,
+        "endSec": 55,
+        "channelTitle": "Jari Isometsä",
+        "license": "standard",
+        "notes": "HD documentary om Wassberg — inkl. OS-guld 1980 med 0.01s marginal. Ersatte SD-klipp (qj-CaxQ6bMM)."
+      }
+    ]
+  },
+  {
     "id": "bjorn-skifs-fangad-i-en-drom",
     "displayName": "Fångad i en dröm — Björn Skifs",
     "correctYear": 1981,
@@ -2580,6 +2841,31 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "NjutafilmsStudioS",
         "license": "standard",
         "notes": "Officiell NjutaFilms-trailer. Karaktärerna + kanalscenerna väl representerade."
+      }
+    ]
+  },
+  {
+    "id": "gyllene-tider-juni-juli-augusti",
+    "displayName": "Juni, juli, augusti — Gyllene Tider",
+    "correctYear": 1981,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "genrePackages": [
+      "Summer"
+    ],
+    "spotifyTrackId": "2AXTRWWGTwgp0Ud8cPzT5S",
+    "youtubeClips": [
+      {
+        "videoId": "LksWsiCKqSQ",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Gyllene Tider - Topic",
+        "license": "standard",
+        "notes": "Studio-audio från officiell Topic-kanal."
       }
     ]
   },
@@ -3387,6 +3673,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "millennials",
       "gen-x"
     ],
+    "genrePackages": [
+      "Eurovision"
+    ],
+    "spotifyTrackId": "0FSlaiuv4eBrrjz05jpxz6",
     "youtubeClips": [
       {
         "videoId": "OfVcmnxKfqc",
@@ -3472,12 +3762,12 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "youtubeClips": [
       {
-        "videoId": "-ccNkksrfls",
+        "videoId": "F-n7lWyM4Vc",
         "startSec": 0,
-        "endSec": 15,
-        "channelTitle": "Third-party upload",
+        "endSec": 20,
+        "channelTitle": "Sport Clips 4K",
         "license": "standard",
-        "notes": "Ersatte 2026-05-27 FIFA-officiellt klipp (XegYZ8y3xMY) som blockerats för embed. Tredjepartsuppladdning — re-validera periodiskt mot DMCA-takedown via youtube-validate."
+        "notes": "4K AI-enhanced highlights — Hand of God + Goal of the Century i följd. Ersatte blockerat klipp."
       }
     ]
   },
@@ -3581,6 +3871,28 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "Melodifestivalen 1987 vinnare."
+      }
+    ]
+  },
+  {
+    "id": "lotta-engberg-successchottis",
+    "displayName": "Succéschottis — Lotta Engberg",
+    "correctYear": 1987,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "spotifyTrackId": "6AbOYPLZy8epirlVNAOVDK",
+    "youtubeClips": [
+      {
+        "videoId": "cPsj6_U0dkc",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Fan upload",
+        "license": "standard",
+        "notes": "Fan-uppladdning av studio-inspelning 1987. Inget officiellt Topic-klipp."
       }
     ]
   },
@@ -3872,6 +4184,31 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Håkan Södergren - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
+    "id": "kaoma-lambada",
+    "displayName": "Lambada — Kaoma",
+    "correctYear": 1989,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "genrePackages": [
+      "Summer"
+    ],
+    "spotifyTrackId": "6xepovPqjvrkEw9Y5AMmTm",
+    "youtubeClips": [
+      {
+        "videoId": "iyLdoQGBchQ",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Club Music 80",
+        "license": "standard",
+        "notes": "Officiell musikvideo-re-upload — stabil sedan 2014."
       }
     ]
   },
@@ -4443,6 +4780,28 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "niklas-stromstedt-oslagbara",
+    "displayName": "Oslagbara — Niklas Strömstedt",
+    "correctYear": 1992,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "spotifyTrackId": "6Y4TjH3wA2r76NML5BGASz",
+    "youtubeClips": [
+      {
+        "videoId": "0XCZUg-4iiA",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "WM Sweden",
+        "license": "standard",
+        "notes": "Officiell WM Sweden. Album Halvvägs till framtiden (1992)."
+      }
+    ]
+  },
+  {
     "id": "nirvana-come-as-you-are",
     "displayName": "Come as You Are — Nirvana",
     "correctYear": 1992,
@@ -4903,6 +5262,28 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "sven-ingvars-sommar-i-sverige",
+    "displayName": "Sommar i Sverige — Sven-Ingvars",
+    "correctYear": 1994,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "spotifyTrackId": "7s8EmGKCWKHsKXhhEZBdaM",
+    "youtubeClips": [
+      {
+        "videoId": "PQuDXSXGkAg",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Parlophone Sweden",
+        "license": "standard",
+        "notes": "Officiell Parlophone/WM Group. Album Byns enda blondin (1994)."
+      }
+    ]
+  },
+  {
     "id": "sverige-vm-94-brons-bulgarien",
     "displayName": "Sverige VM-brons mot Bulgarien",
     "correctYear": 1994,
@@ -4969,6 +5350,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "MatigolVidz",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
+    "id": "cantona-kungfu-kick-1995",
+    "displayName": "Cantonas kung-fu-spark mot Crystal Palace-fan",
+    "correctYear": 1995,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "6eOCxIPkvb8",
+        "startSec": 15,
+        "endSec": 50,
+        "channelTitle": "Classic Footy Videos & Clips",
+        "license": "standard",
+        "notes": "HD — Cantonas kung-fu-spark Selhurst Park 1995. Ersatte SD-klipp (C7PSY7KYThk)."
       }
     ]
   },
@@ -5058,6 +5459,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 1995 vinnare — Norge."
+      }
+    ]
+  },
+  {
+    "id": "ali-olympic-torch-atlanta-1996",
+    "displayName": "Muhammad Ali tänder OS-elden i Atlanta",
+    "correctYear": 1996,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "WIj3t6i3Hpo",
+        "startSec": 5,
+        "endSec": 50,
+        "channelTitle": "The Game Day",
+        "license": "standard",
+        "notes": "HD — Ali tänder OS-elden Atlanta 1996. Ersatte SD Olympics-klipp (80wMMFAcweQ)."
       }
     ]
   },
@@ -5231,6 +5652,31 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 198,
         "channelTitle": "Aqua - Topic",
         "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "bellini-samba-de-janeiro",
+    "displayName": "Samba de Janeiro — Bellini",
+    "correctYear": 1997,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-z",
+      "millennials"
+    ],
+    "genrePackages": [
+      "Summer"
+    ],
+    "spotifyTrackId": "5aIfLbdgkbH7NbQryd1poB",
+    "youtubeClips": [
+      {
+        "videoId": "oKx1NuRqpeM",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Bellini_Music_Official",
+        "license": "standard",
+        "notes": "Officiell artist-kanal Bellini_Music_Official."
       }
     ]
   },
@@ -5535,6 +5981,31 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "markoolio-sommar-och-sol",
+    "displayName": "Sommar och sol — Markoolio",
+    "correctYear": 1999,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-z",
+      "millennials"
+    ],
+    "genrePackages": [
+      "Summer"
+    ],
+    "spotifyTrackId": "4bpqcGVSveDZ5E3rgr9v2y",
+    "youtubeClips": [
+      {
+        "videoId": "98ID_halfhs",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "SandraTornblad",
+        "license": "standard",
+        "notes": "Musikvideo-re-upload av originalet (1999)."
+      }
+    ]
+  },
+  {
     "id": "tarzan-1999",
     "displayName": "Tarzan",
     "correctYear": 1999,
@@ -5582,6 +6053,28 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Rotten Tomatoes Classic Trailers",
         "license": "standard",
         "notes": "Official 1999-trailer — bullet-time + Neo/Trinity-scener."
+      }
+    ]
+  },
+  {
+    "id": "barbados-kom-hem",
+    "displayName": "Kom hem — Barbados",
+    "correctYear": 2000,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-z",
+      "millennials"
+    ],
+    "spotifyTrackId": "71IcKgzWI4wyjBmar9hzy5",
+    "youtubeClips": [
+      {
+        "videoId": "Bc-qN5hO8OM",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Barbados - Topic",
+        "license": "standard",
+        "notes": "Officiell Topic-kanal. Studio 2000. Ersatte fan-uppladdning (7ZYGyCPVwo4)."
       }
     ]
   },
@@ -6120,6 +6613,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Melodifestivalen"
     ],
+    "spotifyTrackId": "20NfHnLzpw6qoAKOX8BFaQ",
     "youtubeClips": [
       {
         "videoId": "ky3bbNq818w",
@@ -6779,7 +7273,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       {
         "videoId": "xTjwTbnX_EA",
         "startSec": 15,
-        "endSec": 201,
+        "endSec": 45,
         "channelTitle": "Lost Panda",
         "license": "standard"
       }
@@ -7399,7 +7893,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       {
         "videoId": "yMsKK0zNT_4",
         "startSec": 5,
-        "endSec": 208,
+        "endSec": 35,
         "channelTitle": "Kontor.TV",
         "license": "standard"
       }
@@ -7538,7 +8032,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-z",
       "millennials"
     ],
-    "spotifyTrackId": "3BG1x6Tw2fW75Nl3tysorH",
+    "spotifyTrackId": "5M2y8QdDepGYMsWyxhoxQU",
     "youtubeClips": [
       {
         "videoId": "zNKwziMG5UI",
@@ -7611,6 +8105,28 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Icona Pop - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
+    "id": "kapten-rod-nar-solen-gar-ner",
+    "displayName": "När solen går ner — Kapten Röd",
+    "correctYear": 2012,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-z",
+      "millennials"
+    ],
+    "spotifyTrackId": "68GdZAAowWDac3SkdNWOwo",
+    "youtubeClips": [
+      {
+        "videoId": "W-BkWPk9Hqo",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Kapten Röd",
+        "license": "standard",
+        "notes": "Officiell video. AKI feat. Kapten Röd (hip-hop/reggae)."
       }
     ]
   },
@@ -7706,11 +8222,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "RM_5tJncHww",
-        "startSec": 19,
-        "endSec": 34,
+        "startSec": 0,
+        "endSec": 25,
         "channelTitle": "GOAL",
         "license": "standard",
-        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+        "notes": "GOAL-kanal. Zlatans bicycle kick mot England 14/11-2012. Ersatte blockerat klipp."
       }
     ]
   },
@@ -8401,6 +8917,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "zootopia-2016",
+    "displayName": "Zootopia",
+    "correctYear": 2016,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "audiences": [
+      "all"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Judy Hopps"
+    ],
+    "distractorNames": [
+      "Simba",
+      "Nemo",
+      "Shrek",
+      "Mulan"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "CzvH6_e2a-U",
+        "startSec": 10,
+        "endSec": 25,
+        "channelTitle": "Zero Media",
+        "license": "standard",
+        "notes": "Scen: Judy Hopps anländer till Zootopia — Try Everything (Shakira) i bakgrunden. HD trailer."
+      }
+    ]
+  },
+  {
     "id": "borg-vs-mcenroe-2017",
     "displayName": "Borg vs McEnroe",
     "correctYear": 2017,
@@ -8726,6 +9272,28 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "arvingarna-i-do",
+    "displayName": "I Do — Arvingarna",
+    "correctYear": 2019,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-alpha",
+      "gen-z"
+    ],
+    "spotifyTrackId": "0pGX4KgirIW7JAHh93rzPU",
+    "youtubeClips": [
+      {
+        "videoId": "XcXNVsNgdwg",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Arvingarna",
+        "license": "standard",
+        "notes": "Officiell video från Arvingarna-kanalen 2019."
+      }
+    ]
+  },
+  {
     "id": "billie-eilish-bad-guy",
     "displayName": "Bad Guy — Billie Eilish",
     "correctYear": 2019,
@@ -8845,8 +9413,17 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha",
       "gen-z"
     ],
-    "spotifyTrackId": "7l5hPHj4KCzxTFVI03sui1",
-    "youtubeClips": []
+    "spotifyTrackId": "2ZyaNqLNxfJcCacEb9jVoT",
+    "youtubeClips": [
+      {
+        "videoId": "vKRY_npZdNg",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "WM Sweden",
+        "license": "standard",
+        "notes": "Officiell WM Sweden. Per Gessle & Albin Lee Meldau."
+      }
+    ]
   },
   {
     "id": "tones-and-i-dance-monkey",
@@ -8879,7 +9456,16 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "all"
     ],
     "spotifyTrackId": "0VjIjW4GlUZAMYd2vXMi3b",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "4NRXx6U8ABQ",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "TheWeekndVEVO",
+        "license": "standard",
+        "notes": "Officiell VEVO-musikvideo. Neon retro 80s-känsla."
+      }
+    ]
   },
   {
     "id": "bts-dynamite",
@@ -9177,6 +9763,28 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "lucianoz-det-ar-ju-dej",
+    "displayName": "Det är ju dej jag går och väntar på — Lucianoz",
+    "correctYear": 2022,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-alpha",
+      "gen-z"
+    ],
+    "spotifyTrackId": "2sbjPQE3sS9H6i8BOmtZbr",
+    "youtubeClips": [
+      {
+        "videoId": "hGaWJ5IMf0k",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Sony Music Sweden",
+        "license": "standard",
+        "notes": "Officiell Sony Music Sweden 2022."
+      }
+    ]
+  },
+  {
     "id": "messi-world-cup-2022",
     "displayName": "Messi och Argentina vinner VM i Qatar",
     "correctYear": 2022,
@@ -9361,6 +9969,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "Melodifestivalen 2024 vinnare. ESC 2024 official music video."
+      }
+    ]
+  },
+  {
+    "id": "moregard-os-brons-paris-2024",
+    "displayName": "Truls Möregård OS-brons bordtennis Paris",
+    "correctYear": 2024,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "npkVrfT11zQ",
+        "startSec": 80,
+        "endSec": 110,
+        "channelTitle": "Kanal 5 Sverige",
+        "license": "standard",
+        "notes": "Kanal 5 Sverige — Truls Möregårds OS-brons i bordtennis Paris 2024."
       }
     ]
   },

@@ -438,3 +438,29 @@ items:
         endSec: 45
         channelTitle: "Frank Sinatra - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: lill-babs-leva-livet
+    displayName: "Leva livet — Lill-Babs"
+    correctYear: 1963
+    probability: 76
+    wikimediaSearchHints: ["Lill-Babs Leva livet 1963 Swedish schlager"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "6P40lE9SODIcT21NpmRd2I"
+    youtubeClips:
+      - videoId: "YT45RF2SGRw"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Universal Music Group"
+        notes: "Officiell UMG-uppladdning. Studio 1963. Svensk version av It's My Party."
+  - id: lill-babs-letkis-jenka
+    displayName: "Letkis-Jenka — Lill-Babs"
+    correctYear: 1964
+    probability: 74
+    wikimediaSearchHints: ["Lill-Babs Letkis-Jenka 1964 Swedish dansband schlager"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "2NV9sp5tl3fKrKZCFtSGBY"
+    youtubeClips:
+      - videoId: "eMiA3xHLXVo"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Lill-Babs - Topic"
+        notes: "Officiell Topic-kanal. Studio 1964. Ersatte fan-upladdning (79kFl6Fe2fc)."

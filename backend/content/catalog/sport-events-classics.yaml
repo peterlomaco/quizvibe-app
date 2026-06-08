@@ -54,11 +54,11 @@ items:
     wikimediaSearchHints: ["Maradona Hand of God 1986 World Cup England"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "-ccNkksrfls"
+      - videoId: "F-n7lWyM4Vc"
         startSec: 0
-        endSec: 15
-        channelTitle: "Third-party upload"
-        notes: "Ersatte 2026-05-27 FIFA-officiellt klipp (XegYZ8y3xMY) som blockerats för embed. Tredjepartsuppladdning — re-validera periodiskt mot DMCA-takedown via youtube-validate."
+        endSec: 20
+        channelTitle: "Sport Clips 4K"
+        notes: "4K AI-enhanced highlights — Hand of God + Goal of the Century i följd. Ersatte blockerat klipp."
   - id: dream-team-1992-barcelona
     displayName: "Dream Team — Barcelona OS basket"
     correctYear: 1992
@@ -393,10 +393,10 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "RM_5tJncHww"
-        startSec: 19
-        endSec: 34
+        startSec: 0
+        endSec: 25
         channelTitle: "GOAL"
-        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+        notes: "GOAL-kanal. Zlatans bicycle kick mot England 14/11-2012. Ersatte blockerat klipp."
   - id: johan-olsson-vm-50km-2013
     displayName: "Johan Olsson VM-guld 50 km Val di Fiemme"
     correctYear: 2013
@@ -576,4 +576,65 @@ items:
         endSec: 30
         channelTitle: "Deadball Diaries"
         notes: "Ikonisk fotbollsmoment — Vinnie Jones (Wimbledon) griper Gascoigne (Newcastle) 1988. Sport-kategori via contentSubject: sport-event."
+    region: ["unknown-region"]
+  - id: hamrin-semi-vm-1958
+    displayName: "Kurt Hamrin Sverige–Västtyskland VM-halvfinal"
+    correctYear: 1958
+    probability: 76
+    wikimediaSearchHints: ["Kurt Hamrin 1958 World Cup semifinal Sweden West Germany goal"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "lVZ9PFAfav8"
+        startSec: 30
+        endSec: 60
+        channelTitle: "KEITH BARON"
+        notes: "HD documentary om Sverige i VM 1958 — Hamrin-höjdpunkter. Ersatte SD-klipp (2sQQ1FovLAs)."
+  - id: wassberg-os-guld-1980
+    displayName: "Thomas Wassberg OS-guld 15 km (0.01 sekund!) Lake Placid"
+    correctYear: 1980
+    probability: 82
+    wikimediaSearchHints: ["Thomas Wassberg 1980 Lake Placid Olympics 15km gold cross country"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "ZtaY0UckhVI"
+        startSec: 30
+        endSec: 55
+        channelTitle: "Jari Isometsä"
+        notes: "HD documentary om Wassberg — inkl. OS-guld 1980 med 0.01s marginal. Ersatte SD-klipp (qj-CaxQ6bMM)."
+  - id: ali-olympic-torch-atlanta-1996
+    displayName: "Muhammad Ali tänder OS-elden i Atlanta"
+    correctYear: 1996
+    probability: 86
+    wikimediaSearchHints: ["Muhammad Ali 1996 Atlanta Olympics torch lighting ceremony"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "WIj3t6i3Hpo"
+        startSec: 5
+        endSec: 50
+        channelTitle: "The Game Day"
+        notes: "HD — Ali tänder OS-elden Atlanta 1996. Ersatte SD Olympics-klipp (80wMMFAcweQ)."
+  - id: moregard-os-brons-paris-2024
+    displayName: "Truls Möregård OS-brons bordtennis Paris"
+    correctYear: 2024
+    probability: 72
+    wikimediaSearchHints: ["Truls Möregård 2024 Paris Olympics table tennis bronze medal"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "npkVrfT11zQ"
+        startSec: 80
+        endSec: 110
+        channelTitle: "Kanal 5 Sverige"
+        notes: "Kanal 5 Sverige — Truls Möregårds OS-brons i bordtennis Paris 2024."
+  - id: cantona-kungfu-kick-1995
+    displayName: "Cantonas kung-fu-spark mot Crystal Palace-fan"
+    correctYear: 1995
+    probability: 82
+    wikimediaSearchHints: ["Eric Cantona 1995 kung fu kick Crystal Palace fan Selhurst Park"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "6eOCxIPkvb8"
+        startSec: 15
+        endSec: 50
+        channelTitle: "Classic Footy Videos & Clips"
+        notes: "HD — Cantonas kung-fu-spark Selhurst Park 1995. Ersatte SD-klipp (C7PSY7KYThk)."
     region: ["unknown-region"]

@@ -828,4 +828,36 @@ items:
     probability: 72
     wikimediaSearchHints: ["Albin Lee Meldau Per Gessle Nyper mig i armen Swedish"]
     answerMethods: ["timeline"]
-    spotifyTrackId: "7l5hPHj4KCzxTFVI03sui1"
+    spotifyTrackId: "2ZyaNqLNxfJcCacEb9jVoT"
+    youtubeClips:
+      - videoId: "vKRY_npZdNg"
+        startSec: 0
+        endSec: 30
+        channelTitle: "WM Sweden"
+        notes: "Officiell WM Sweden. Per Gessle & Albin Lee Meldau."
+  - id: arvingarna-i-do
+    displayName: "I Do — Arvingarna"
+    correctYear: 2019
+    probability: 72
+    wikimediaSearchHints: ["Arvingarna I Do 2019 Swedish dansband schlager"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "0pGX4KgirIW7JAHh93rzPU"
+    youtubeClips:
+      - videoId: "XcXNVsNgdwg"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Arvingarna"
+        notes: "Officiell video från Arvingarna-kanalen 2019."
+  - id: lucianoz-det-ar-ju-dej
+    displayName: "Det är ju dej jag går och väntar på — Lucianoz"
+    correctYear: 2022
+    probability: 70
+    wikimediaSearchHints: ["Lucianoz Det är ju dej jag går och väntar på 2022 Swedish"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "2sbjPQE3sS9H6i8BOmtZbr"
+    youtubeClips:
+      - videoId: "hGaWJ5IMf0k"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Sony Music Sweden"
+        notes: "Officiell Sony Music Sweden 2022."

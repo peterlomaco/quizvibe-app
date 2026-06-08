@@ -43,6 +43,9 @@ interface Props {
   /** Mediakälla för frågan som strax ska ställas — visas som ikon mellan
    *  playerBlock och Q-loggan. Spotify/YouTube/image/none. */
   mediaSource?: MediaSourceType | null;
+  /** Svarstyp för frågan — 'Year' eller 'Name'. Renderas som kant-skärande
+   *  badge i övre högra hörnet på mediaSource-boxen. null → ingen badge. */
+  answerType?: 'Year' | 'Name' | null;
 }
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -64,8 +67,22 @@ const GLYPH_FONT_SIZE = LOGO_SIZE * 0.28;
  * att "?" visats i ~1 s fyras `onComplete` så parent kan växla fas till
  * `'question'`.
  */
-export function CountdownIntro({ onComplete, startFrom = 5, voiceFrom = 3, mode = 'pass-the-phone', playerName, playerEmoji, mediaSource, sayWho = true, silent = false }: Props) {
+export function CountdownIntro({ onComplete, startFrom = 5, voiceFrom = 3, mode = 'pass-the-phone', playerName, playerEmoji, mediaSource, answerType = null, sayWho = true, silent = false }: Props) {
   const isIndDev = mode === 'individual-devices';
+  // Bordered box runt media-ikonen med kant-skärande Year/Name-badge.
+  // Extraherat som variabel eftersom den renderas i båda playerBlock-grenarna.
+  const mediaSourceBlock = mediaSource != null ? (
+    <View style={styles.mediaSourceWrap}>
+      <View style={styles.mediaSourceBox}>
+        <MediaSourceIcon source={mediaSource} size={80} />
+        {answerType != null && (
+          <View style={styles.answerTypeBadge} pointerEvents="none">
+            <Text style={styles.answerTypeBadgeText}>{answerType}</Text>
+          </View>
+        )}
+      </View>
+    </View>
+  ) : null;
   // Nunito 700 Bold för "QuizVibe"-brandraden — matchar startskärmens
   // appName-textformat 1:1. Faller tillbaka till systemfont under font-
   // load (kort flicker, acceptabel kostnad för att slippa block:a render).
@@ -246,11 +263,7 @@ export function CountdownIntro({ onComplete, startFrom = 5, voiceFrom = 3, mode 
             <Text style={[styles.getReadyBrandHeadline, brandFont && { fontFamily: brandFont }]}>
               QuizVibe
             </Text>
-            {mediaSource != null && (
-              <View style={styles.mediaSourceWrap}>
-                <MediaSourceIcon source={mediaSource} size={80} />
-              </View>
-            )}
+            {mediaSourceBlock}
           </View>
         ) : playerName ? (
           <View style={styles.playerBlock}>
@@ -265,11 +278,7 @@ export function CountdownIntro({ onComplete, startFrom = 5, voiceFrom = 3, mode 
                 {playerName}
               </Text>
             </View>
-            {mediaSource != null && (
-              <View style={styles.mediaSourceWrap}>
-                <MediaSourceIcon source={mediaSource} size={80} />
-              </View>
-            )}
+            {mediaSourceBlock}
           </View>
         ) : null}
         <View style={styles.logoStack}>
@@ -445,6 +454,34 @@ const styles = StyleSheet.create({
   mediaSourceWrap: {
     alignItems: 'center',
     marginTop: Spacing.sm,
+  },
+  // Bordered box runt medie-ikonen — position:relative så Year/Name-badge
+  // kan sticka ut över kantlinjen med position:absolute. overflow INTE hidden.
+  mediaSourceBox: {
+    position: 'relative',
+    borderWidth: 1.5,
+    borderColor: Colors.primary,
+    borderRadius: Radius.md,
+    padding: Spacing.sm,
+  },
+  // Kant-skärande Year/Name-badge — speglar GetReadyIntro:s answerTypeBadge.
+  answerTypeBadge: {
+    position: 'absolute',
+    top: -8,
+    right: Spacing.sm,
+    backgroundColor: Colors.primary,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 4,
+    zIndex: 10,
+    elevation: 4,
+  },
+  answerTypeBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 0.6,
+    color: '#fff',
+    textTransform: 'uppercase',
   },
   logoStack: {
     width: LOGO_SIZE,

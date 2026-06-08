@@ -108,6 +108,10 @@ interface Props {
    *  inom arrayn renderar heller ingen badge (t.ex. capital-frågor som
    *  inte mappar till V1-huvudkategori). */
   categoryByQuestion?: (MainCategory | null)[];
+  /** Svarstyp per fråga — 'Year' (timeline) eller 'Name' (actor-select/image).
+   *  Driver blå badge på currentMediaBox/currentPlayerBox i IndDev + Single.
+   *  Om prop saknas faller logiken tillbaka till kategori-heuristik. */
+  answerTypeByQuestion?: ('Year' | 'Name')[];
   /** 0-baserade frågeindex som är Spotify DJ-rundor. Driver speciell
    *  grön chip-rendering i kön (Spotify-ikon + "Spotify DJ"-label). */
   spotifyQuestionIndices?: number[];
@@ -237,6 +241,7 @@ export function GetReadyIntro({
   queueRoundNumbers,
   queueQuestionNumbers,
   categoryByQuestion,
+  answerTypeByQuestion,
   spotifyQuestionIndices,
   currentRound,
   totalRounds,
@@ -302,9 +307,15 @@ export function GetReadyIntro({
   // fråga som kommer härnäst. null → ingen badge renderas (t.ex. capital).
   const currentCategory = categoryByQuestion?.[currentQuestion - 1] ?? null;
   // Svarstyp-badge på VÄNSTER övre kant av fråge-rutan (IndDev + single player).
-  // Spotify + YT-sport + YT-musik = "Year" (årsval). YT-film + Hints = "Name"
-  // (skådespelar-/hints-namnval). null → ingen badge.
+  // Prefererar answerTypeByQuestion (per-fråga, från quiz.tsx) framför kategori-
+  // heuristik — så YT/Film-frågor med answerMethods:["timeline"] visar "Year"
+  // och YT/Film-frågor med answerMethods:["actor-select"] visar "Name".
+  // Fallback-heuristik om prop saknas: Spotify/YT-musik/YT-sport → "Year",
+  // YT-film/Hints → "Name".
   const currentAnswerType: 'Year' | 'Name' | null = (() => {
+    const explicit = answerTypeByQuestion?.[currentQuestion - 1];
+    if (explicit != null) return explicit;
+    // Legacy-fallback om prop inte passas.
     const src = mediaSourceByQuestion?.[currentQuestion - 1];
     if (src === 'spotify') return 'Year';
     if (src === 'youtube') return currentCategory === 'Film' ? 'Name' : 'Year';
@@ -1918,7 +1929,7 @@ const styles = StyleSheet.create({
   // sig över hela kolumnens bredd minus ev. spacing.
   colPlayerCurrentWrap: {
     paddingVertical: Spacing.xs,
-    paddingHorizontal: Spacing.sm,
+    paddingHorizontal: 0,
   },
   cellHeader: {
     paddingVertical: Spacing.xs,
@@ -2078,7 +2089,7 @@ const styles = StyleSheet.create({
   answerTypeBadge: {
     position: 'absolute',
     top: -9,
-    left: Spacing.xxl,
+    left: Spacing.md,
     backgroundColor: Colors.primary,
     paddingHorizontal: 8,
     paddingVertical: 2,

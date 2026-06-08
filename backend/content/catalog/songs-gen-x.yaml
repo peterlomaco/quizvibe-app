@@ -786,3 +786,109 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1980 vinnare — Irland."
     genrePackages: ["Eurovision"]
+  - id: lill-lindfors-en-san-karl
+    displayName: "En sån karl — Lill Lindfors"
+    correctYear: 1967
+    probability: 74
+    wikimediaSearchHints: ["Lill Lindfors En sån karl 1967 Swedish schlager"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "0S1nTYJUNSKpuJkkG4gucV"
+    youtubeClips:
+      - videoId: "cJ1-WZQvBSM"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Lennart Ljung Music"
+        notes: "Studio-inspelning 1967. Ersatte dead UMG-klipp (T1FKf-JZ-eM)."
+  - id: sven-ingvars-jag-ringer-pa-fredag
+    displayName: "Jag ringer på fredag — Sven-Ingvars"
+    correctYear: 1967
+    probability: 78
+    wikimediaSearchHints: ["Sven-Ingvars Jag ringer på fredag 1967 dansband"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "4CJCKU7Vua0i1EHgwRup1q"
+    youtubeClips:
+      - videoId: "fxG0Gu9stiI"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Sven Ingvars - Topic"
+        notes: "Officiell Topic-kanal. Studio 1967. Ersatte fan-uppladdning (z0CDj6vwQ5s)."
+  - id: abba-ring-ring
+    displayName: "Ring Ring — ABBA"
+    correctYear: 1973
+    probability: 85
+    wikimediaSearchHints: ["ABBA Ring Ring 1973 debut single Polar Music"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "1GUpCVoNqQoriLkftXc3S3"
+    youtubeClips:
+      - videoId: "TL0EoXdpOqg"
+        startSec: 0
+        endSec: 30
+        channelTitle: "ABBA"
+        notes: "Officiell music video ℗ 1973 Polar Music International AB."
+  - id: lasse-berghagen-ding-dong
+    displayName: "Ding Dong — Lasse Berghagen"
+    correctYear: 1973
+    probability: 76
+    wikimediaSearchHints: ["Lasse Berghagen Ding Dong 1973 Melodifestivalen Swedish schlager"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "1oS8V9VCSuF0fgLQGMKXQY"
+    youtubeClips:
+      - videoId: "uhYOEoQyqT4"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Universal Music Sweden"
+        notes: "Officiell UMG Sweden. Melodifestivalen 1973 (7:a plats)."
+  - id: streaplers-vad-har-du-under-blusen-rut
+    displayName: "Vad har du under blusen Rut — Streaplers"
+    correctYear: 1973
+    probability: 74
+    wikimediaSearchHints: ["Streaplers Vad har du under blusen Rut 1973 Swedish dansband"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "7915ILGV5otD6Oq3rOcKBR"
+    youtubeClips:
+      - videoId: "LdZuxKYJW3I"
+        startSec: 0
+        endSec: 30
+        channelTitle: "WM Sweden"
+        notes: "Officiell Warner Music Sweden ℗ 1973."
+  - id: bjorn-skifs-michelangelo
+    displayName: "Michelangelo — Björn Skifs"
+    correctYear: 1975
+    probability: 76
+    wikimediaSearchHints: ["Björn Skifs Michelangelo 1975 Swedish pop schlager"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "3qChO81Z9r3KDyIj4w1m4T"
+    youtubeClips:
+      - videoId: "hxvDmlsjjyU"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Björn Skifs - Topic"
+        notes: "Officiell Topic-kanal. Studio 1975. Ersatte TV-klipp (EOhBIaOt1oU)."
+  - id: vikingarna-djingis-kan
+    displayName: "Djingis Kan — Vikingarna"
+    correctYear: 1979
+    probability: 78
+    wikimediaSearchHints: ["Vikingarna Djingis Kan 1979 Swedish dansband Kramgoa låtar"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "2BVoNm43uY07T5JKI2SjCW"
+    youtubeClips:
+      - videoId: "JPpB1iaDmaw"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Vikinger - Topic"
+        notes: "Officiell Topic-kanal. Studio 1979. Ersatte blockerat klipp (HRn0KKd03uk)."
+
+  - id: ted-gardestad-vilken-harlig-dag
+    displayName: "Oh, vilken härlig dag — Ted Gärdestad"
+    correctYear: 1979
+    probability: 88
+    wikimediaSearchHints: ["Ted Gärdestad Swedish singer songwriter Sol vind och vatten"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Summer"]
+    spotifyTrackId: "1Taqw1VEHl8Gy9qAZtRLAq"
+    youtubeClips:
+      - videoId: "NcqSPjcFlXc"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Ted Gärdestad - Topic"
+        notes: "Studio-audio från officiell Topic-kanal."

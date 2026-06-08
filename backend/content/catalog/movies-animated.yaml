@@ -1,0 +1,175 @@
+# Animerade filmer — kända bland svenska familjer 1940-2020.
+# audience: ['all'] för cross-gen igenkänning (Disney/Pixar-klassiker).
+# correctYear = ursprunglig release-år (inte remake-år).
+# category: songs är approximation — CategorySchema saknar 'animated-movie'.
+# Frågetext: "Which Year was this Movie launched?"
+#
+# Kalle Anka = Mickey's Trailer (1938), Musse Pigg = Steamboat Willie (1928).
+# Båda är korta filmer (~8 min) som ingår i det svenska julaftonsutbudet.
+audience: ["all"]
+region: ["sweden"]
+category: songs
+contentForm: youtube
+contentSubject: movie
+items:
+  # === Peters 7 + Lejonkungen (hanteras i movies-classics.yaml) ===
+
+  - id: angry-birds
+    displayName: "The Angry Birds Movie"
+    correctYear: 2016
+    probability: 82
+    wikimediaSearchHints: ["The Angry Birds Movie 2016 animated Sony"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "e4sdQBmqnuA"
+        startSec: 10
+        endSec: 25
+        channelTitle: "Sony Pictures Releasing UK"
+        notes: "Sony Pictures UK — officiell 2016-trailer. Red + Bomb + Chuck i fokus. Ej embed-blockerad."
+
+  - id: steamboat-willie-1928
+    displayName: "Steamboat Willie"
+    correctYear: 1928
+    probability: 80
+    wikimediaSearchHints: ["Steamboat Willie 1928 Mickey Mouse Disney animated short"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "I5pG1wbRKOg"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Did You Catch This?"
+        notes: "4K-remaster av Steamboat Willie (public domain sedan jan 2024). Ikononisk öppning med Mickey som visslar på ångbåten."
+
+  - id: mickeys-trailer-1938
+    displayName: "Mickey's Trailer"
+    correctYear: 1938
+    probability: 82
+    wikimediaSearchHints: ["Mickey's Trailer 1938 Disney Donald Duck Goofy camping caravan"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "aL7KlP0UcyA"
+        startSec: 30
+        endSec: 60
+        channelTitle: "JP The Pro"
+        notes: "Kalle Anka på husvagnssemester — Mickey, Donald och Langben i husvagnen (julaftonsklassiker). Hela korta filmen (7:43)."
+
+  - id: robin-hood-1973
+    displayName: "Robin Hood"
+    correctYear: 1973
+    probability: 84
+    wikimediaSearchHints: ["Robin Hood 1973 Disney animated film fox"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "rekU76GG9Sk"
+        startSec: 0
+        endSec: 15
+        channelTitle: "Jim Margle"
+        notes: "Original 1973 teatral trailer (1:00) — Robin Hood + Maid Marian etableras."
+
+  - id: lady-and-the-tramp
+    displayName: "Lady and the Tramp"
+    correctYear: 1955
+    probability: 82
+    wikimediaSearchHints: ["Lady and the Tramp 1955 Disney animated film cocker spaniel"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "SAoLpLXvGN0"
+        startSec: 10
+        endSec: 25
+        channelTitle: "Disney UK"
+        notes: "Disney UK officiell Blu-ray-trailer — spagetti-scen + hundar etablerade."
+
+  - id: shrek-2001
+    displayName: "Shrek"
+    correctYear: 2001
+    probability: 90
+    wikimediaSearchHints: ["Shrek 2001 DreamWorks animated film ogre"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "s9nVUOP3Oik"
+        startSec: 10
+        endSec: 25
+        channelTitle: "Dreamworks"
+        notes: "DreamWorks officiell trailer (1:48) — Shrek + Åsnon i träsket. Allsvars DreamWorks-kanal."
+
+  # === 5 extra animerade filmer ===
+
+  - id: bambi-1942
+    displayName: "Bambi"
+    correctYear: 1942
+    probability: 86
+    wikimediaSearchHints: ["Bambi 1942 Disney animated film deer forest"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "YgNx5J0SROE"
+        startSec: 5
+        endSec: 20
+        channelTitle: "Disney UK"
+        notes: "Disney UK officiell Diamond Edition-trailer — Bambi i skogen, klassisk Disney-estetik."
+
+  - id: finding-nemo
+    displayName: "Finding Nemo"
+    correctYear: 2003
+    probability: 90
+    wikimediaSearchHints: ["Finding Nemo 2003 Pixar animated clownfish Great Barrier Reef"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "6fHR58bSwpg"
+        startSec: 20
+        endSec: 35
+        channelTitle: "Saskia Rice"
+        notes: "Teatral 2003-trailer — Nemo + Marlin + undervattensvärlden etableras."
+
+  - id: aladdin-1992
+    displayName: "Aladdin"
+    correctYear: 1992
+    probability: 88
+    wikimediaSearchHints: ["Aladdin 1992 Disney animated film Genie Robin Williams Agrabah"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "XBrfbWtmvWs"
+        startSec: 10
+        endSec: 25
+        channelTitle: "FT Depot"
+        notes: "Original teatral 1992-trailer — Aladdin + Agrabah + Genie (Robin Williams) etableras."
+
+  - id: mulan-1998
+    displayName: "Mulan"
+    correctYear: 1998
+    probability: 84
+    wikimediaSearchHints: ["Mulan 1998 Disney animated film China warrior"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "sRtZaSkBp58"
+        startSec: 10
+        endSec: 25
+        channelTitle: "Allen Theatres Inc"
+        notes: "Original 1998 teatral trailer — Mulan som krigare + Make a Man Out of You-känsla."
+
+  - id: tarzan-1999
+    displayName: "Tarzan"
+    correctYear: 1999
+    probability: 82
+    wikimediaSearchHints: ["Tarzan 1999 Disney animated Phil Collins jungle"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "jc0lisHARr4"
+        startSec: 10
+        endSec: 25
+        channelTitle: "Darth Malins"
+        notes: "1999 teatral trailer — Tarzan i djungeln + Phil Collins You'll Be in My Heart-känsla."
+
+  - id: zootopia-2016
+    displayName: "Zootopia"
+    correctYear: 2016
+    probability: 86
+    wikimediaSearchHints: ["Zootopia 2016 Disney animated film bunny cop fox"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Judy Hopps"]
+    distractorNames: ["Simba", "Nemo", "Shrek", "Mulan"]
+    youtubeClips:
+      - videoId: "CzvH6_e2a-U"
+        startSec: 10
+        endSec: 25
+        channelTitle: "Zero Media"
+        notes: "Scen: Judy Hopps anländer till Zootopia — Try Everything (Shakira) i bakgrunden. HD trailer."

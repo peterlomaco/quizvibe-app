@@ -888,7 +888,7 @@ Driver två konsumenter idag:
 1. **GetReadyIntro:s kategori-badge** (se "Quiz — Get Ready to Vibe intro screen" nedan). Härleds som `categoryByQuestion: (MainCategory | null)[]` useMemo parallellt med `mediaSourceByQuestion`, passas som prop.
 2. **Framtida theme-package-roadmap** — när någon kategori passerar 1000-frågor-tröskeln blir den säljbar som themed package i Store (se `memory/project_theme_package_roadmap.md`).
 
-**Pool-blandning** (`gameQuestions`) — **3-pool fas-struktur** (uppdaterad 2026-06-07):
+**Pool-blandning** (`gameQuestions`) — **3-pool fas-struktur** (uppdaterad 2026-06-08):
 
 Tre separata pools: `spotifyPool` (YT-items med `spotifyTrackId` när `spotifyEnabled`), `pureYoutubePool` (övrig YT), `imagePool`. Fasordning: **Spotify → YouTube → Hints/Image** (sekventiell, inte cyklisk).
 
@@ -900,14 +900,46 @@ Tre separata pools: `spotifyPool` (YT-items med `spotifyTrackId` när `spotifyEn
 
 **Block-storlek**: `turnOrder.length` (PtP) eller 1 (IndDev/Single Player).
 
-**Kategori-gruppering inom varje fas** (Music → Film → Sport, fast ordning):
-- Blockantalet fördelas jämnt per aktiv kategori: `base = floor(blocks/cats)`, resten till de första kategorierna.
-- Alla block av en kategori körs i följd innan nästa kategori börjar — ALDRIG round-robin (M/F/S/M/F/S). Alltid: M·M·M → F·F → S·S.
-- Per-kategori sub-pool byggs med `prioritiseUnseen()` separat för varje kategori.
-- Gäller för **YouTube-fasen** (baserat på `youtubeEnabledCategories`) och **Hints-fasen** (baserat på `imagesEnabledCategories`).
-- Spotify-fasen har ingen kategori-split (alltid Music, körs som en flat pool).
+**Epok-viktad urval (YouTube-fas + Image-fas, 2026-06-08)**: ersätter `prioritiseUnseen()`-flat-shuffle för Fas 2 och Fas 3. Implementeras i [`src/utils/epochAllocation.ts`](src/utils/epochAllocation.ts).
 
-**Osedd-prioritering**: varje sub-pool delas `[...shuffleArray(unseen), ...shuffleArray(seen)]` via `prioritiseUnseen()`. Sparas vid spelets slut + Quit Game.
+5 epoker med **per-år-vikter** (källa: produktkalkylblad 2026-06-08):
+| Epok | År | Per-år-vikt |
+|---|---|---|
+| E1 | ≤1964 | 0.115 |
+| E2 | 1965–1980 | 0.225 |
+| E3 | 1981–1996 | 0.25 |
+| E4 | 1997–2012 | 0.22 |
+| E5 | 2013+ | 0.19 |
+
+**`getActiveEpochs(eraFrom, eraTo)`** — år-proportionell viktning: `effectiveWeight = overlappingYears × perYearWeight`, sedan normalisering. Epoker utan överlapp exkluderas. Exempel: eraFrom=1976, eraTo=1999 → E2 5år×0.225=1.125, E3 16år×0.25=4.0, E4 3år×0.22=0.66 → normWeights 0.194/0.691/0.114 → N=10 ger 2/7/1 frågor.
+
+**`allocateByEpoch(N, activeEpochs)`** — Largest Remainder Method (Hamilton-metoden): garanterar `sum === N` exakt. Avrundningsproblem löses via decimal-rest-sortering.
+
+**Era-filtrering av poolerna** (HÅRD, görs FÖRE `buildEpochPhase`):
+- YouTube-frågor: `correctYear ∈ [eraFrom, eraTo]` — strikt. Inga YouTube-frågor utanför spannet.
+- Image/Hints — **person-items** (artist/band/actor/athlete/etc.): **era-agnostiska** — alltid inkluderade oavsett era. Motivering: `correctYear = födelseår`, inte eventår; Michael Jackson (f.1958) ska inte filtreras bort i ett 1980-nu-spel.
+- Image/Hints — icke-person-items (sport-events, platser): strikt `correctYear ∈ [eraFrom, eraTo]`.
+- Items med `peakFrom/peakTo`: interval-overlap `eraFrom <= peakTo && eraTo >= peakFrom`.
+
+**`buildEpochPhase` bucketing** (rad 281 i [epochAllocation.ts](src/utils/epochAllocation.ts)): använder epokens fulla gränser (`e.start <= year && e.end >= year`), inte [eraFrom, eraTo]. Säkert eftersom YouTube-poolen är förifiltrad; person-images med epochYear utanför aktiva epoker hamnar i `agnosticPool` (overflow, fylls in sist).
+
+**`imageEpochYear`** (i quiz.tsx): `peakFrom/peakTo` midpoint om satt, annars `correctYear + 25` (födelseår + 25 = karriärspeak-proxy). Returnerar `null` → `agnosticPool`.
+
+**Pass-the-Phone — per-spelare affinitets-tilldelning** (körs inuti `buildEpochPhase`):
+1. `playerQuotas(N, players)` — LRM: jämn fördelning, max |quota_i − quota_j| ≤ 1.
+2. `assignQuestionsToPlayers` — greedy: `affinityScore = genMatch × 10000 + yearDist` (generationsmatch väger tyngst; födelseårs-närmhet bryter ties).
+3. `buildPtPSequence` — omordnar tilldelningar till PtP-turordningslots.
+
+**IndDev / Single Player**: `buildEpochPhase` returnerar frågor direkt i epokordning (E1→E5), ingen spelar-tilldelning.
+
+**Fallback** (inuti `buildEpochPhase`): om en epok töms lånas från epoken med färst extra-lån (tie-break: högst normWeight). Era-agnostiska overflow-items (`agnosticPool`) fylls in sist.
+
+**`hostQuestionHistory.ts` — session-baserad 20-sessions rullande historik (v2, 2026-06-08)**:
+- Lagrar `SessionHistory = { sessions: { id: string; qIds: string[] }[] }`, max 20 sessioner.
+- `addSessionRecord(qIds)` lägger till ny session, trimmar till 20.
+- `loadSeenQuestionIds()` returnerar `Set<string>` av alla IDs från de 20 senaste sessionerna.
+- Migration från v1 (flat `Set<string>`) — importeras som en syntetisk session vid första v2-load.
+- Per-spelare-nyckel: `@quizvibe/seenQuestionIds/v2/<playerName.toLowerCase()>`.
 
 Edge cases:
 - `spotifyEnabled = false` (alltid i PtP/Single Player) → `spotifyPool = []`, `pureYoutubePool = youtubePool`.

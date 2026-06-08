@@ -69,7 +69,9 @@ import { HeartbeatSound } from '@/src/components/HeartbeatSound';
 // när sketches kommer (då med getQuizSketch() från assets/quiz-sketches/).
 // NameRevealCard, SketchCanvas, hasSketch, getQuizSketch ersatta av HintsQuizCard.
 import { generateRoomCode } from '@/src/utils/roomCode';
-import { addSeenQuestionIds, loadSeenQuestionIds } from '@/src/utils/hostQuestionHistory';
+import { addSeenQuestionIds, addSessionRecord, loadSeenQuestionIds } from '@/src/utils/hostQuestionHistory';
+import { buildEpochPhase, getActiveEpochs, type EpochPlayer, type EpochQuestion } from '@/src/utils/epochAllocation';
+import { getGenerationKeyFromBirthYear } from '@/src/utils/mockPurchasedPackages';
 import { hasPremiumSubscription } from '@/src/utils/subscriptionStorage';
 import { supabase } from '@/src/utils/supabase';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -1085,137 +1087,105 @@ export default function QuizScreen() {
       return fallbackImages.length > 0 ? fallbackImages : SEED_QUESTIONS;
     }
 
-    // Prioritera frågor som hosten inte sett i tidigare spelomgångar.
-    const prioritiseUnseen = (pool: QuizQuestion[]): QuizQuestion[] => {
-      if (!seenQuestionIds.size) return shuffleArray(pool);
-      const unseen = shuffleArray(pool.filter((q) => !seenQuestionIds.has(q.id)));
-      const seen = shuffleArray(pool.filter((q) => seenQuestionIds.has(q.id)));
-      return [...unseen, ...seen];
-    };
+    // ── Epok-viktad frågeurval (ersätter prioritiseUnseen + kategori-gruppering) ──
+    //
+    // PtP (questionsPerBlock > 1): frågor tilldelas spelare via födelseårs-affinitet
+    // och ordnas om till turordnings-slots.
+    // IndDev / Single Player (questionsPerBlock = 1): epok-ordning utan spelar-
+    // tilldelning — alla spelare ser identiska frågor simultant.
 
-    const CATEGORY_ORDER: MainCategory[] = ['Music', 'Film', 'Sport'];
-
-    const groupByCategory = (pool: QuizQuestion[]): QuizQuestion[] => {
-      const result: QuizQuestion[] = [];
-      for (const cat of CATEGORY_ORDER) {
-        const catPool = pool.filter((q) => q.mainCategory === cat);
-        if (catPool.length) result.push(...prioritiseUnseen(catPool));
-      }
-      const uncategorized = pool.filter(
-        (q) => !q.mainCategory || !CATEGORY_ORDER.includes(q.mainCategory as MainCategory),
-      );
-      if (uncategorized.length) result.push(...prioritiseUnseen(uncategorized));
-      return result;
-    };
-
-    // Spotify: alltid Musik → enbart unseen-first, ingen kategori-gruppering.
-    const orderedSpotifyPool: QuizQuestion[] =
-      !hasSpotify ? [] : prioritiseUnseen(spotifyPool);
-
-    // Ren YouTube: Musik → Film → Sport (osedda först per grupp).
-    const hasOther = hasPureYoutube || hasImage;
-    const orderedPureYoutubePool: QuizQuestion[] =
-      !hasPureYoutube ? [] :
-      !hasImage       ? prioritiseUnseen(pureYoutubePool) :
-                        groupByCategory(pureYoutubePool);
-
-    // Bilder: samma kategori-ordning som YouTube-sektionen.
-    const orderedImagePool: QuizQuestion[] =
-      !hasImage  ? [] :
-      !hasOther  ? prioritiseUnseen(imagePool) :
-                   groupByCategory(imagePool);
-
-    // PtP: questionsPerBlock = antal spelare (alla svarar på olika frågor i samma block).
-    // IndDev + Single Player: questionsPerBlock = 1 (varje rund = en fråga per spelare).
     const questionsPerBlock = (gameMode === 'individual-devices' || playerCount <= 1) ? 1 : playerCount;
+    const isPtP = questionsPerBlock > 1;
+    const activeEpochs = getActiveEpochs(eraFrom, eraTo);
 
-    // ── Sekventiell fasordning: Spotify → YouTube → Hints/Image ────────
+    const currentYear = new Date().getFullYear();
+    const epochPlayers: EpochPlayer[] = turnOrder.map((p) => {
+      const birthYear = currentYear - (p.age ?? 35);
+      return {
+        id: p.id,
+        birthYear,
+        generation: getGenerationKeyFromBirthYear(birthYear) ?? 'millennials',
+      };
+    });
+    const turnOrderIds = turnOrder.map((p) => p.id);
+
+    // Epoch year för YouTube-frågor: correctYear är utgivningsåret → direkt lookup.
+    const youtubeEpochYear = (q: EpochQuestion): number | null =>
+      q.correctYear !== undefined ? q.correctYear : null;
+
+    // Epoch year för Image/Hints-frågor: peakFrom/peakTo midpoint om satt,
+    // annars birthYear (correctYear) + 25 som proxy för karriärspeak.
+    const imageEpochYear = (q: EpochQuestion): number | null => {
+      if (q.peakFrom !== undefined && q.peakTo !== undefined) {
+        return Math.round((q.peakFrom + q.peakTo) / 2);
+      }
+      if (q.correctYear !== undefined) {
+        return q.correctYear + 25;
+      }
+      return null;
+    };
+
+    // ── Fas-storlekar (Spotify / YouTube / Image) ──
     // Ratio med Spotify (IndDev):  25% Spotify / 25% YouTube / 50% Hints.
-    // Ratio utan Spotify (PtP/SP): 50% YouTube / 50% Hints — Spotify-blocken
-    // absorberas av YouTube om YT är aktiverat, annars av Hints.
-    // Fallback: saknas Hints → Spotify → YouTube.
+    // Ratio utan Spotify (PtP/SP): 50% YouTube / 50% Hints.
     let spotifyBlockCount = hasSpotify ? Math.floor(totalRounds / 4) : 0;
-    // YouTube: 25% om Spotify aktiv, 50% om Spotify saknas (absorberar Spotify-blocken).
     const ytDivisor = hasSpotify ? 4 : 2;
     let ytBlockCount = hasPureYoutube ? Math.floor(totalRounds / ytDivisor) : 0;
     let imageBlockCount = totalRounds - spotifyBlockCount - ytBlockCount;
 
     if (!hasImage && imageBlockCount > 0) {
-      // Hints-block omdirigeras: Spotify i första hand → YouTube
       if (hasSpotify) spotifyBlockCount += imageBlockCount;
       else if (hasPureYoutube) ytBlockCount += imageBlockCount;
       imageBlockCount = 0;
     }
 
-    const mixed: QuizQuestion[] = [];
-    const buildSequentialPhase = (pool: QuizQuestion[], count: number) => {
-      for (let block = 0; block < count; block++) {
-        for (let q = 0; q < questionsPerBlock; q++) {
-          if (pool.length === 0) continue;
-          mixed.push(pool[(block * questionsPerBlock + q) % pool.length]);
-        }
-      }
-    };
+    // Fas 1: Spotify — unseen-first shuffle, inget epok-filter (alltid Music).
+    const spotifyTotal = spotifyBlockCount * questionsPerBlock;
+    const spotifySeq: QuizQuestion[] = (() => {
+      if (!hasSpotify || spotifyTotal === 0) return [];
+      const unseen = shuffleArray(spotifyPool.filter((q) => !seenQuestionIds.has(q.id)));
+      const seen = shuffleArray(spotifyPool.filter((q) => seenQuestionIds.has(q.id)));
+      const ordered = [...unseen, ...seen];
+      const out: QuizQuestion[] = [];
+      for (let i = 0; i < spotifyTotal; i++) out.push(ordered[i % ordered.length]);
+      return out;
+    })();
 
-    // Fas 1: Spotify
-    buildSequentialPhase(orderedSpotifyPool, spotifyBlockCount);
+    // Fas 2: YouTube — epok-viktad urval.
+    const ytTotal = ytBlockCount * questionsPerBlock;
+    const ytSeq: QuizQuestion[] =
+      hasPureYoutube && ytTotal > 0
+        ? buildEpochPhase<QuizQuestion>({
+            pool: pureYoutubePool,
+            totalQuestions: ytTotal,
+            activeEpochs,
+            recentIds: seenQuestionIds,
+            isPtP,
+            players: epochPlayers,
+            turnOrderIds,
+            getEpochYear: youtubeEpochYear,
+          })
+        : [];
 
-    // Fas 2: YouTube — alla block per kategori samlade (Music → Film → Sport).
-    // Blockantalet fördelas jämnt; resten läggs på de första kategorierna.
-    // Inom en kategori körs alla block i följd med osedd-prioritering.
-    if (ytBlockCount > 0 && hasPureYoutube) {
-      const ytCatPools = (youtubeEnabledCategories as MainCategory[])
-        .map((cat) => ({
-          pool: prioritiseUnseen(
-            pureYoutubePool.filter((q) => q.mainCategory === cat),
-          ),
-        }))
-        .filter((e) => e.pool.length > 0);
+    // Fas 3: Image/Hints — epok-viktad urval.
+    const imgTotal = imageBlockCount * questionsPerBlock;
+    const imgSeq: QuizQuestion[] =
+      hasImage && imgTotal > 0
+        ? buildEpochPhase<QuizQuestion>({
+            pool: imagePool,
+            totalQuestions: imgTotal,
+            activeEpochs,
+            recentIds: seenQuestionIds,
+            isPtP,
+            players: epochPlayers,
+            turnOrderIds,
+            getEpochYear: imageEpochYear,
+          })
+        : [];
 
-      if (ytCatPools.length > 0) {
-        const base = Math.floor(ytBlockCount / ytCatPools.length);
-        const remainder = ytBlockCount % ytCatPools.length;
-        ytCatPools.forEach(({ pool }, catIdx) => {
-          const blocksForCat = base + (catIdx < remainder ? 1 : 0);
-          for (let block = 0; block < blocksForCat; block++) {
-            for (let q = 0; q < questionsPerBlock; q++) {
-              if (pool.length === 0) continue;
-              mixed.push(pool[(block * questionsPerBlock + q) % pool.length]);
-            }
-          }
-        });
-      }
-    }
+    const mixed: QuizQuestion[] = [...spotifySeq, ...ytSeq, ...imgSeq];
 
-    // Fas 3: Hints/Images — alla block per kategori samlade (Music → Film → Sport).
-    // Blockantalet fördelas jämnt per aktiv bild-kategori.
-    if (imageBlockCount > 0 && hasImage) {
-      const imgCatPools = (imagesEnabledCategories as MainCategory[])
-        .map((cat) => ({
-          pool: prioritiseUnseen(
-            imagePool.filter((q) => q.mainCategory === cat),
-          ),
-        }))
-        .filter((e) => e.pool.length > 0);
-
-      if (imgCatPools.length > 0) {
-        const base = Math.floor(imageBlockCount / imgCatPools.length);
-        const remainder = imageBlockCount % imgCatPools.length;
-        imgCatPools.forEach(({ pool }, catIdx) => {
-          const blocksForCat = base + (catIdx < remainder ? 1 : 0);
-          for (let block = 0; block < blocksForCat; block++) {
-            for (let q = 0; q < questionsPerBlock; q++) {
-              if (pool.length === 0) continue;
-              mixed.push(pool[(block * questionsPerBlock + q) % pool.length]);
-            }
-          }
-        });
-      } else {
-        buildSequentialPhase(orderedImagePool, imageBlockCount);
-      }
-    }
-    // Nödfallback: mixed tom trots att pool-bygget körde (t.ex. alla pools
-    // oväntat tomma). Föredra bild-frågor framför YouTube-SEED när YouTube av.
+    // Nödfallback: alla pools tomma (t.ex. source-toggle av + era utan träffar).
     if (mixed.length === 0) {
       if (!youtubeEnabled) {
         const personFallback = IMAGE_SEED_QUESTIONS.filter(
@@ -1265,6 +1235,18 @@ export default function QuizScreen() {
   // (idrottare som varit med i film / sport-tema-filmer).
   const categoryByQuestion = useMemo<(MainCategory | null)[]>(() => {
     return gameQuestions.map((q) => q.mainCategory);
+  }, [gameQuestions]);
+
+  // Svarstyp per fråga ('Year' | 'Name') — driver GetReadyIntro:s blå badge.
+  // Härleds från faktisk question-typ (actor-select/image → 'Name', timeline → 'Year')
+  // istället för från kategori (Film var alltid 'Name' vilket var fel för
+  // movie-items med answerMethods: ["timeline"]).
+  const answerTypeByQuestion = useMemo<('Year' | 'Name')[]>(() => {
+    return gameQuestions.map((q) => {
+      if (q.type === 'actor-select') return 'Name';
+      if (q.type === 'image') return 'Name';
+      return 'Year';
+    });
   }, [gameQuestions]);
 
   const [questionIndex, setQuestionIndex] = useState(0);
@@ -2104,7 +2086,7 @@ export default function QuizScreen() {
     if (phase !== 'leaderboard' || savedSeenRef.current) return;
     savedSeenRef.current = true;
     const playedIds = [...new Set(gameQuestions.map((q) => q.id))];
-    addSeenQuestionIds(playedIds).then(() =>
+    addSessionRecord(playedIds).then(() =>
       setSeenQuestionIds((prev) => new Set([...prev, ...playedIds])),
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -3259,7 +3241,7 @@ export default function QuizScreen() {
               const playedIds = [
                 ...new Set(gameQuestions.slice(0, questionIndex).map((q) => q.id)),
               ];
-              await addSeenQuestionIds(playedIds);
+              await addSessionRecord(playedIds);
             }
             const code = params.roomCode;
             if (code) {
@@ -3647,6 +3629,7 @@ export default function QuizScreen() {
         playerCount={playerCount}
         mediaSourceByQuestion={mediaSourceByQuestion}
         categoryByQuestion={categoryByQuestion}
+        answerTypeByQuestion={answerTypeByQuestion}
         spotifyQuestionIndices={djRotationPlan?.spotifyQuestionIndices}
         eraFrom={eraFrom}
         eraTo={eraTo}
@@ -3719,6 +3702,7 @@ export default function QuizScreen() {
         playerName={countdownPlayer?.name}
         playerEmoji={countdownPlayer?.emoji}
         mediaSource={mediaSourceByQuestion[questionIndex] ?? null}
+        answerType={answerTypeByQuestion[questionIndex] ?? null}
         onComplete={() => setPhase('question')}
         sayWho={isImageQuestion || isActorSelectQuestion}
         silent={!isHost}

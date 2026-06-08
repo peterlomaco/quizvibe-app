@@ -83,11 +83,11 @@ items:
     correctNames: ["John Travolta", "Olivia Newton-John"]
     distractorNames: ["Elvis Presley", "Burt Reynolds", "Farrah Fawcett", "Brooke Shields"]
     youtubeClips:
-      - videoId: "aOpnnrS4ags"
-        startSec: 20
-        endSec: 35
-        channelTitle: "Frankie Valli and the Four Seasons"
-        notes: "Curerad 2026-05-29 — Grease-titelmelodin (Frankie Valli, TOTP 1978). Officiell artist-kanal."
+      - videoId: "ZW0DfsCzfq4"
+        startSec: 0
+        endSec: 20
+        channelTitle: "Kurt Harmsworth"
+        notes: "Summer Nights-scen med Travolta + Newton-John — ikonisk strandbild."
   - id: raging-bull-1980
     displayName: "Raging Bull"
     correctYear: 1980
