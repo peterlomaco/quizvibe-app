@@ -201,6 +201,11 @@ export function YouTubeMediaPlayer({
         initialPlayerParams={{
           controls: false,
           rel: false,
+          // mute=true i iframe-URL:en → iOS tillåter muted autoplay utan
+          // user-gesture (IndDev non-host saknar gesture-context vid
+          // play_command-broadcast). mute/volume-propen ovan hanterar
+          // reaktiva ändringar efter onReady, men initialstate sätts här.
+          mute: isMuted,
           // `start` = curerad startpunkt. Används bl.a. för att hoppa förbi
           // intro-titelkort som annars skulle avslöja svaret (ToS-tillåtet —
           // vi väljer bara när uppspelningen börjar, inte modifierar videon).

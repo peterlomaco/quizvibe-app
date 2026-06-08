@@ -221,11 +221,11 @@ function profileToRow(userId: string, email: string, p: ProfileData): ProfileRow
     game_mode: p.gameMode ?? 'pass-the-phone',
     single_player_default: p.singlePlayerDefault ?? false,
     enabled_host_packages: p.enabledHostPackages ?? [],
-    // Gamla kolumn bevaras för bakåt-kompatibilitet (migration 0014 behövs för nya kolumner).
+    // Gamla kolumn bevaras för bakåt-kompatibilitet.
     enabled_main_categories: defaultEnabledMainCategories(),
-    // Migration 0014: per-source category-kolumner (ej i DB ännu — skrivs när kolumnerna finns).
-    // youtube_enabled_categories: p.youtubeEnabledCategories ?? defaultEnabledMainCategories(),
-    // images_enabled_categories: p.imagesEnabledCategories ?? defaultImagesEnabledCategories(),
+    // Migration 0014 applicerad — skriver per-source category-kolumner till profiles-tabellen.
+    youtube_enabled_categories: p.youtubeEnabledCategories ?? defaultEnabledMainCategories(),
+    images_enabled_categories: p.imagesEnabledCategories ?? defaultEnabledMainCategories(),
     rounds_count: p.roundsDefault ?? 4,
   };
 }
@@ -299,10 +299,10 @@ export async function loadProfile(): Promise<ProfileData | null> {
   if (row) {
     if (__DEV__) console.log('[profileStorage] loadProfile: found profiles row');
     let profile = rowToProfile(row as ProfileRow);
-    // Fält som INTE finns i profiles-tabellen (migration 0014 ej körd, eller
-    // fält som enbart lever i AsyncStorage) mergas alltid från cache.
-    // youtubeEnabledCategories / imagesEnabledCategories: migration 0014.
-    // spotifyDefaultEnabled: ännu inte i DB-schema.
+    // Fält som enbart lever i AsyncStorage mergas in (spotifyDefaultEnabled saknar DB-kolumn).
+    // youtubeEnabledCategories / imagesEnabledCategories: skrivs nu till DB (migration 0014
+    // applicerad) — men merge-logiken nedan bevaras som belt-and-suspenders-fallback.
+    // spotifyDefaultEnabled: ingen DB-kolumn ännu — alltid från cache.
     {
       const cached = await loadFromAsyncStorage();
       profile = {

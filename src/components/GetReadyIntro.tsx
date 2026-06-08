@@ -270,11 +270,9 @@ export function GetReadyIntro({
   // gömms. Blink-pulsen på "nästa fråga"-rutan gäller alla tre lägen
   // (Single, PtP, IndDev) — den lever utanför denna gating.
   const isSinglePlayer = !isIndDev && playerCount === 1;
-  // D-iv: audio-trigger visas bara för host i IndDev och bara om vi har
-  // en spelarlista att visa toggles för. Pass-the-Phone har gemensam
-  // enhet → alltid ljud på → ingen trigger.
-  const showAudioTrigger =
-    isIndDev && isHost && !!allPlayers && allPlayers.length > 0;
+  // D-iv: audio-trigger visas bara för host i IndDev. Pass-the-Phone har
+  // gemensam enhet → alltid ljud på → ingen trigger.
+  const showAudioTrigger = isIndDev && isHost && !!hostPlayerId;
   // Helper: vad är effektiv audio-state för en spelare just nu? Saknad
   // key i overrides-mappen → default-policy: host on, övriga off.
   const audioOnForPlayer = (playerId: string): boolean => {
@@ -283,11 +281,8 @@ export function GetReadyIntro({
     }
     return playerId === hostPlayerId;
   };
-  // Räkna hur många som har audio på (för "N on"-summering i trigger).
-  const audioOnCount = (allPlayers ?? []).reduce(
-    (acc, p) => acc + (audioOnForPlayer(p.id) ? 1 : 0),
-    0,
-  );
+  // Host:s effektiva audio-state — driver trigger-text + HeartbeatSound-gating.
+  const hostAudioOn = hostPlayerId ? audioOnForPlayer(hostPlayerId) : true;
   const [audioModalOpen, setAudioModalOpen] = useState(false);
   // D-iii: bad-connection-overlay. Visning styrs av parent (quiz.tsx) via
   // `unstableLocked`-prop när satt — det inkluderar sticky-latch-logiken
@@ -449,7 +444,7 @@ export function GetReadyIntro({
 
   return (
     <SafeAreaView style={styles.safe}>
-      {isHost && <HeartbeatSound bpm={50} />}
+      {isHost && hostAudioOn && <HeartbeatSound bpm={50} />}
       {/* Top-bar längst upp — Quit Game för host (river hela lobbyn) eller
           Leave Game för non-host i IndDev (lämnar bara egen plats, går till
           Home). Båda speglar TopUserBanner:s vokabulär (Colors.card bg +
@@ -535,14 +530,14 @@ export function GetReadyIntro({
               öppna modalen. */}
           {showAudioTrigger && (
             <View style={styles.responseDropdownRow}>
-              <Text style={styles.settingsRow}>Audio per player:</Text>
+              <Text style={styles.settingsRow}>Audio:</Text>
               <TouchableOpacity
                 style={styles.responseDropdownTrigger}
                 onPress={() => setAudioModalOpen(true)}
                 activeOpacity={0.7}
               >
                 <Text style={styles.responseDropdownTriggerText}>
-                  {audioOnCount} on
+                  {hostAudioOn ? 'On' : 'Off'}
                 </Text>
                 <Text style={styles.responseDropdownChevron}>▼</Text>
               </TouchableOpacity>
@@ -870,12 +865,9 @@ export function GetReadyIntro({
             style={styles.audioPanel}
             onPress={(e) => e.stopPropagation()}
           >
-            <Text style={styles.dropdownTitle}>Audio per player</Text>
-            <Text style={styles.audioHint}>
-              Toggle which devices play audio. Default: host on, others muted.
-            </Text>
+            <Text style={styles.dropdownTitle}>Audio</Text>
             <ScrollView style={styles.audioList} showsVerticalScrollIndicator={false}>
-              {(allPlayers ?? []).map((player) => {
+              {(allPlayers ?? []).filter((p) => p.id === hostPlayerId).map((player) => {
                 const audioOn = audioOnForPlayer(player.id);
                 const isHostRow = player.id === hostPlayerId;
                 return (

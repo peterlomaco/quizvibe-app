@@ -849,6 +849,12 @@ Glöm inte lägga till nya stores här när de skapas — annars läcker stale d
 - modeDescription ("Players take turns…" / "Each player plays…") — gated.
 - Approve-toggle, trash-knapp, edit-handlers — gated på `hostMode`.
 - RoundsRuler:s klammer + PREMIUM-badge — gated på `onPremiumPress`-prop (saknas för non-host = read-only-läge), MEN locked-tickarnas grå-styling behålls så non-host ser host:s rätts-cap.
+- **Spotify DJ-raden** — non-host ser en read-only **disabled Switch** (on/off beroende på `spotifyEnabled`) istället för en Enabled/Disabled-pill. Speglar Supabase Realtime-synkad `spotifyEnabled`-state utan att erbjuda toggle-interaktion. Styling: `trackColor={{ false: '#3C3C3C', true: '#1DB954' }}`, `thumbColor={spotifyEnabled ? '#FFF' : '#888'}`, `ios_backgroundColor`-synkar med `trackColor`.
+
+**Tre non-host-sync-buggar fixade (2026-06-07)**:
+1. **`stepperMax`-clamp effekt** — `useEffect` som clampar `roundsCount` till `stepperMax` är nu gated på `if (!hostMode) return` + `hostMode` i deps-arrayen. Tidigare körde klampningen på non-host:s enhet och satte `roundsCount` till `ROUNDS_MAX_PASS=4` (eftersom `hasPremium=false` + IndDev-check → `stepperMax=4`), vilket överskrev den synkade `roundsCount` från host. Non-host satte roundsCount till 4 trots att host valde 12.
+2. **Non-host RoundsRuler `gameModeMax`-prop** — skickar nu `roundsMax` (= `ROUNDS_MAX_INDIV=20` i IndDev) istället för `stepperMax` (= `4` för non-host som har `hasPremium=false`). Tidigare visade non-host:s slider alltid max 4 tick-marks oavsett host:s val. Med `roundsMax` visas rätt tick-range + host:s val syns korrekt i slider:n.
+3. **Max 12-rutan aktiv-villkor** — tar bort `&& hasPremium` från `modeOptionPremiumActive`-check. Villkoret är nu bara `maxPlayers === 12` (oavsett `hasPremium`). Tidigare visade non-host:s Max 12-ruta grå "inaktiv"-styling även när host aktivt valt Max 12 (eftersom `hasPremium=false` på non-host:s enhet). `hasPremium` styr fortfarande badge-färgen (guld vs grå) men inte radens aktiv-styling.
 
 **Single-player-toggle ON ejectar non-hosts** — när host bockar i singlePlayerDefault iterar handler:n `players` och anropar `markEjected(roomCode, p.id)` för varje `!p.isHost && !p.hasLeft`, sedan `setPlayers((prev) => prev.filter((p) => p.isHost))` så host:s vy tömmer non-hosts direkt. Non-host:s polling fyrar ejectpopup → Home. Uncheck:n "återanställer" inte ejectade — det är en envägs-action; uncheck:n bara återställer Game Mode till Pass-the-Phone (maxPlayers auto-syncar till 4 via gameMode-deriverings-effekten).
 
@@ -1146,7 +1152,7 @@ Export-scriptet (`export-music-questions.ts`) inkluderar nu items med `spotifyTr
 **41 låtar har `spotifyTrackId` (2026-06-04)**: ABBA (3st), Roxette (2), Ace of Base (2), Avicii (3), Loreen (2), Robyn (2), Swedish House Mafia, Eric Prydz, Dr. Alban, Rednex, The Cardigans, Kent, Veronica Maggio, Mando Diao, First Aid Kit, Icona Pop, Benjamin Ingrosso, Lili & Sussie + internationella klassiker (Eagles, Bob Marley, Bee Gees, Queen, Sia, Imagine Dragons, Ed Sheeran, Glass Animals, The Weeknd m.fl.).
 
 **LobbyScreen-integration (uppdaterad 2026-06-05)**:
-- `isSpotifyAvailable = gameMode === 'individual-devices' && !singlePlayerDefault` — Spotify DJ kräver IndDev (DJ lämnar appen → Spotify). Spotify-raden alltid synlig men toggle utgråad + "Disabled"-pill i PtP/Single.
+- `isSpotifyAvailable = gameMode === 'individual-devices' && !singlePlayerDefault` — Spotify DJ kräver IndDev (DJ lämnar appen → Spotify). Spotify-raden alltid synlig men toggle utgråad + "Disabled"-pill i PtP/Single (host-vy). **Non-host** ser en read-only `<Switch disabled value={spotifyEnabled}>` med Spotify-grön (`#1DB954`) eller grå track — ingen Enabled/Disabled-pill.
 - `spotifyEnabled` seeds från `profile.spotifyDefaultEnabled` i Promise.all-blocket; om `profile.spotifyDefaultEnabled = true` auto-seedas också `gameMode = 'individual-devices'`.
 - **handleStartGame-guards för Spotify**: (1) `spotifyEnabled && (singlePlayerDefault || approvedNonHosts.length === 0)` → "Spotify DJ not applicable — requires at least one other player". (2) Spotify-only single player (`youtubeEnabled=0, images=0, singlePlayer`) → separatguard. (3) Inga approved non-hosts med Spotify → alert. (4) Några utan Spotify → erbjud att flytta till waiting.
 - `LobbyPlayer.spotifyConnected?: boolean` — populerad från `lobby_players.spotify_verified` via `rowToPlayer`. Host-kortets `spotifyConnected` sätts från Lobby `spotifyConnected`-state i `useFocusEffect`. Non-host vid join: `getSpotifyConnectionStatus()` parallellt med `loadProfile()`.
@@ -1239,6 +1245,26 @@ Hand-off-skärmen mellan Lobby:s Start Game-tap och första quiz-frågan. [src/c
 **Mode-dependent fas-flöde i `handleAdvanceToNextRound`**:
 - **Pass-the-Phone**: rotera `currentPlayerIndex` (mod `turnOrder.length`) → sätt fas till `'intro'` så "Pass-the-Phone to: <namn>" visas innan nästa fråga.
 - **Individual Devices**: ingen player-rotation (alla på egna devices) → sätt fas till `'intro'` så host får ny Play-tap som kontrollerar speltempot för nästa fråga. Non-host ser passiv "Waiting for Host to start quiz"-ruta i intro:n via `GetReadyIntro`:s `isHost`-prop; host:s Play-tap broadcastar `play_command` via `quiz_sync:<roomCode>`-channel ([src/lib/realtime/syncChannel.ts](src/lib/realtime/syncChannel.ts)) så non-host:s phase också går till countdown. Host:s Next-tap i reveal broadcastar motsvarande `question_advance` så alla devices återgår till intro samtidigt.
+
+**IndDev question-sync — alla enheter visar exakt samma fråga (2026-06-07):**
+
+Root cause för fråge-desync i IndDev: `gameQuestions` byggs via `prioritiseUnseen(pool)` som anropar `shuffleArray(Math.random())` — icke-deterministisk, ger olika ordning per enhet. Dessutom är `seenQuestionIds` per-enhet (AsyncStorage), så seen/unseen-uppdelningen skiljer sig.
+
+Lösning: host broadcastar `question_id` i `play_command`-payloaden. Non-host pinnerar exakt den frågan via en module-level lookup-map:
+
+```ts
+// Module-level lookup-map (app/quiz.tsx)
+const ALL_QUESTIONS_MAP = new Map<string, QuizQuestion>(
+  ([...SEED_QUESTIONS, ...IMAGE_SEED_QUESTIONS] as QuizQuestion[]).map((q) => [q.id, q]),
+);
+```
+
+- **`PlayCommandPayload.question_id: string`** ([syncChannel.ts](src/lib/realtime/syncChannel.ts)) — host skickar `currentQ.id` i broadcasten.
+- **`broadcastQuestionId: string | null`** state — non-host sparar mottaget `question_id`; null på host.
+- **`_broadcastOverride: QuizQuestion | null`** — deriverad: `!isHost && broadcastQuestionId ? ALL_QUESTIONS_MAP.get(broadcastQuestionId) ?? null : null`. Ersätter `gameQuestions[questionIndex]` om satt.
+- **`currentQ`** och **`question`** constants läser `_broadcastOverride ?? gameQuestions[questionIndex]` — non-host visar alltid exakt host:s fråga oavsett lokal shuffle-ordning.
+- **Heal-on-reconnect** (`hostActivePing`-effekten): clearar `broadcastQuestionId` via `setBroadcastQuestionId(null)` när force-synkad `questionIndex` ändras — undviker stale override efter reconnect.
+- Non-host:s lokala `gameQuestions`-pool och `seenQuestionIds`-tracking är opåverkade — de används fortfarande för att bestämma lokal spelordning om `_broadcastOverride` är null (t.ex. PtP).
 
 **Timer-gate**: `useEffect` som anropar `startTimer()` är gated på `phase === 'question'` (entry från countdown). Cleanup i den effekten klippper INTE intervallet vid `question → awaiting`-transition — kritiskt så timer:n fortsätter ticka oberoende av phase-byte. Self-clearing sker i `setInterval`-handler:n när `timeLeft = 0`. Separat unmount-only useEffect cleanup:ar timer:n vid Quit Game.
 
@@ -1388,6 +1414,8 @@ Båda knappar `flex: 1` så footer-raden fylls 50/50 med Spacing.sm gap mellan; 
 - Läser `getLobbySettings(params.roomCode)` (= OLD room) och `setLobbySettings(newCode, { ...oldSettings, answerResponseSeconds: responseSeconds })`. responseSeconds override:as eftersom host kan ha justerat mid-game via GetReadyIntro:s dropdown.
 - Alla andra fält (`gameMode`, `singlePlayerDefault`, `region`, `eraFrom/To`, `roundsCount`, `selectedExtraPackages`, `youtubeEnabledCategories`, `imagesEnabledCategories`) bärs över oförändrade från gamla rummet.
 - Vid `keepSettings=false` (Start fresh): ingen `setLobbySettings`-skrivning → LobbyScreen:s host-seed-effekt fyller med profil-defaults vid mount.
+
+**`playerToRow` NOT NULL-fälla (fix 2026-06-08)**: `playerToRow` i `mockLobbyPlayers.ts` mappade `spotifyConnected` via `player.spotifyConnected ?? null`. Carry-over-spelarna som byggs i `goToNewLobby` har inget `spotifyConnected`-fält → `undefined ?? null = null` skickas som `spotify_verified` i UPSERT:en → `lobby_players.spotify_verified NOT NULL`-constrainten avvisar raden → HELA carry-over-skrivningen failar tyst (`.catch(() => {})` svalde felet). Resultat: noll carry-over-rader i DB → non-host:s `syncFromStore` fick `undefined` från `getLobbyPlayers` → `selfApproved = false` → "started without me"-popup. **Fix**: `playerToRow` ändrad till `player.spotifyConnected ?? false` — `undefined`/`null` ger nu alltid `false` (validt boolean-värde). Relaterade skyddsändringar: (1) `goToNewLobby`:s `.catch(() => {})` → `console.warn` så DB-fel syns i loggar; (2) `syncFromStore`-game-started-checken fick `null`/`undefined`-guard på `getLobbyPlayers`-resultatet — popup:en fyrar bara när en definitiv rad med `approved=false` finns, aldrig på tvetydigt underlag.
 
 **Start Fresh-fix: host-id MÅSTE vara `'1'`** — carry-over-objektet i `reusePlayers=false`-grenen sätter `id: '1'` (matchar `SEED_PLAYERS[0].id` i LobbyScreen). Buggen tidigare: id var hardcoded `'you'`, vilket inte matchade seed-host:en. LobbyScreen:s mount-sekvens sätter först `players = [SEED_PLAYERS[0]]` (Alex K., id='1') och `useEffect`-skrivningen till `lobby_players` exekverar INNAN `consumePendingLobbyPlayers()` ersatte state med carry-over:n (id='you'). Resultat: TVÅ host-rader i DB:n (`id='1'` Alex K. + `id='you'` HostName) eftersom `setLobbyPlayers` UPSERT:ar utan att DELETE:a stale rader. Host:s lokala state hade bara 'you' så host:s vy visade 2 spelare (host + non-host), men non-host läste DB via polling och fick BÅDA host-raderna + sig själv = 3 spelare inklusive en fantom "Alex K." på leaderboard + timeline-banner. Genom att matcha id='1' träffar carry-over-skrivningen SAMMA DB-rad som seedet → bara name/emoji uppdateras, ingen extra host-rad.
 

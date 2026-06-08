@@ -110,7 +110,7 @@ function playerToRow(
     approved: player.approved ?? false,
     turn_order: index,
     lobby_edited: player.lobbyEdited ?? false,
-    spotify_verified: player.spotifyConnected ?? null,
+    spotify_verified: player.spotifyConnected ?? false,
   };
 }
 
@@ -222,6 +222,35 @@ export async function upsertOwnLobbyPlayer(code: string, player: LobbyPlayer): P
     .upsert(row, { onConflict: 'room_code,player_id' });
   if (error) {
     console.warn('[lobbyPlayers] upsertOwnLobbyPlayer failed:', error.message);
+  }
+}
+
+/**
+ * Carry-over join: non-host claim:ar en pre-seedad rad (skriven av host:s
+ * goToNewLobby). Gör bara UPDATE på user_id + has_left utan att röra
+ * `approved` — undviker att non-host:s join skriver över host:s eventuella
+ * pre-approval (UPSERT med approved:false skulle annars clobba approved:true
+ * om host hann approva innan UPSETn landed).
+ *
+ * Anropas istället för upsertOwnLobbyPlayer när carryOverPlayerId är satt.
+ */
+export async function claimCarryOverLobbyPlayer(
+  code: string,
+  playerId: string,
+): Promise<void> {
+  if (!code || !playerId) return;
+  const normalized = normalizeCode(code);
+  await ensureAuthSession();
+  const { data: userResp } = await supabase.auth.getUser();
+  const userId = userResp.user?.id ?? null;
+  if (!userId) return;
+  const { error } = await supabase
+    .from('lobby_players')
+    .update({ user_id: userId, has_left: false })
+    .eq('room_code', normalized)
+    .eq('player_id', playerId);
+  if (error) {
+    console.warn('[lobbyPlayers] claimCarryOverLobbyPlayer failed:', error.message);
   }
 }
 

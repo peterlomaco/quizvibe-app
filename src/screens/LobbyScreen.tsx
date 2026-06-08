@@ -54,7 +54,7 @@ import { MIN_HCP, calculateInitialHCP } from '../utils/hcp';
 import { addLeftPlayer, getLeftPlayers, removeLeftPlayer } from '../utils/leftPlayers';
 import { deactivateRoom, getRoomMeta, markRoomGameStarted, roomExists, setRoomMaxPlayers, setRoomPlayerCount } from '../utils/mockActiveRooms';
 import { clearEjected, isEjected, markEjected } from '../utils/ejectedPlayers';
-import { clearLobbyPlayers, getLobbyPlayers, markOwnPlayerLeft, setLobbyPlayers, upsertOwnLobbyPlayer } from '../utils/mockLobbyPlayers';
+import { claimCarryOverLobbyPlayer, clearLobbyPlayers, getLobbyPlayers, markOwnPlayerLeft, setLobbyPlayers, upsertOwnLobbyPlayer } from '../utils/mockLobbyPlayers';
 import { clearLobbySettings, getLobbySettings, setLobbySettings } from '../utils/mockLobbySettings';
 import { defaultEnabledMainCategories, subjectToMainCategory, type MainCategory } from '../utils/mainCategory';
 import { MUSIC_QUESTIONS } from '../utils/musicQuestions';
@@ -995,6 +995,7 @@ export default function LobbyScreen() {
     guestName,
     guestBirthYear,
     guestAssistance,
+    carryOverPlayerId,
   } = useLocalSearchParams<{
     code: string;
     isHost: string;
@@ -1002,6 +1003,10 @@ export default function LobbyScreen() {
     guestName?: string;
     guestBirthYear?: string;
     guestAssistance?: string;
+    /** Play Again carry-over: non-host:s player_id från föregående spel.
+     *  Sätts av quiz.tsx vid navigation → LobbyScreen hoppar DB-beroende
+     *  dup-detection och ärver rätt id direkt. */
+    carryOverPlayerId?: string;
   }>();
   // Om ingen kod skickas (t.ex. om man öppnar lobby-tabben direkt) genereras en.
   // useMemo ser till att koden är stabil över re-renders.
@@ -1277,15 +1282,26 @@ export default function LobbyScreen() {
         // den nya lobbyn — om non-host sedan har skickats till Home (för
         // att de inte hann tappa Approve) och loggar in via Room Code,
         // skulle ett färskt joinerId annars skapa en TVÅA-rad i host:s vy.
-        // Genom att återanvända id:t blir upsertOwnLobbyPlayer en UPDATE
-        // av den befintliga raden istället för en INSERT.
-        const existingPlayers = await getLobbyPlayers(roomCode);
-        const existingMatch = existingPlayers?.find(
-          (p) =>
-            !p.isHost &&
-            p.name.trim().toLowerCase() === myPlayerName.toLowerCase(),
-        );
-        const joinerId = existingMatch?.id ?? `joiner-${Date.now()}`;
+        // Genom att återanvända id:t träffar DB-skrivningen befintlig rad
+        // istället för att skapa en ny INSERT.
+        // Play Again carry-over: quiz.tsx skickar med non-host:s tidigare
+        // player_id i URL-param. Använd det direkt utan DB-query — undviker
+        // Supabase-replikeringsfördröjning där getLobbyPlayers returnerar tom
+        // lista (host:s setLobbyPlayers-skrivning inte synkad än) och vi
+        // annars hade genererat ett nytt joiner-${Date.now()}-id, vilket ger
+        // två DB-rader med samma playerName och bryter approval-synken.
+        let joinerId: string;
+        if (carryOverPlayerId?.trim()) {
+          joinerId = carryOverPlayerId.trim();
+        } else {
+          const existingPlayers = await getLobbyPlayers(roomCode);
+          const existingMatch = existingPlayers?.find(
+            (p) =>
+              !p.isHost &&
+              p.name.trim().toLowerCase() === myPlayerName.toLowerCase(),
+          );
+          joinerId = existingMatch?.id ?? `joiner-${Date.now()}`;
+        }
         ownPlayerIdRef.current = joinerId;
         const joiner: LobbyPlayer = {
           id: joinerId,
@@ -1296,11 +1312,11 @@ export default function LobbyScreen() {
           age,
           assistance,
           hcpComplete,
-          // ALLTID false — non-host måste re-approvas av host vid varje
-          // join, även om de varit approved i en tidigare session och nu
-          // re-joinar via dup-detection (ärvt player_id). upsertOwnLobbyPlayer
-          // skriver approved=false till DB:n så host:s vy får raden i "To
-          // be Approved by Host"-listan och kan välja att approva på nytt.
+          // Lokalt alltid false — non-host måste re-approvas av host.
+          // Carry-over-path: claimCarryOverLobbyPlayer rör inte approved i
+          // DB:n, så host:s ev. pre-approval (approved=true) bevaras i DB.
+          // syncFromStore:n hämtar sedan det riktiga DB-värdet och uppdaterar
+          // lokal state → non-host ser sig själv approved utan clobbing-race.
           approved: false,
           spotifyConnected: ownSpotifyStatus?.connected ?? false,
         };
@@ -1311,23 +1327,40 @@ export default function LobbyScreen() {
           // insert:a en TVÅA-rad. Annars race-fall: poll:en plockar in
           // raden → vi insert:ar → två rader med samma id syns kort tills
           // nästa poll skriver över local state.
+          //
+          // Bevara approved från prev om den redan är satt till true.
+          // Race: Promise.all-awaiten (~200-500ms) ger syncFromStore tid att
+          // köra och sätta approved=true via Realtime/polling. Om vi
+          // sedan skriver joiner.approved=false clobbar vi det värdet och
+          // non-host ser sig fortfarande som "To be Approved" tills nästa
+          // syncFromStore-körning (0-2s). Med denna override bevaras
+          // approved=true om host hann approva under väntetiden.
+          const existing = prev.find((p) => p.id === joinerId);
+          const joinerWithApproval = { ...joiner, approved: existing?.approved ?? joiner.approved };
           const filtered = prev.filter((p) => p.id !== joinerId);
           const hostIdx = filtered.findIndex((p) => p.isHost);
           const insertAt = hostIdx === -1 ? 0 : hostIdx + 1;
           const next = [...filtered];
-          next.splice(insertAt, 0, joiner);
+          next.splice(insertAt, 0, joinerWithApproval);
           return next;
         });
         // Publicera egen rad till lobby_players så host:s Realtime-channel
-        // får broadcast och hen ser den nya spelaren direkt i sin vy. När
-        // joinerId redan finns i tabellen blir det en UPDATE (samma id,
-        // ny payload) — inget ny rad skapas.
-        upsertOwnLobbyPlayer(roomCode, joiner).catch(() => { /* loggas i lobbyPlayers */ });
+        // får broadcast och hen ser den nya spelaren direkt i sin vy.
+        // Carry-over-path: raden är redan pre-skriven av host (goToNewLobby).
+        // Använd claimCarryOverLobbyPlayer (UPDATE user_id + has_left) istället
+        // för upsertOwnLobbyPlayer — undviker att skriva approved=false och
+        // därmed clobba host:s eventuella pre-approval på carry-over-raden.
+        // Regular-path: UPSERT som tidigare (INSERT eller UPDATE hela raden).
+        if (carryOverPlayerId?.trim()) {
+          claimCarryOverLobbyPlayer(roomCode, joinerId).catch(() => { /* loggas i lobbyPlayers */ });
+        } else {
+          upsertOwnLobbyPlayer(roomCode, joiner).catch(() => { /* loggas i lobbyPlayers */ });
+        }
         // Rensa ev. stale leftPlayers-snapshot för det ärvda player_id:t.
-        // Kritiskt när dup-detection ovan har ärvt OLD-id:t från en tidigare
-        // Leave Game: AsyncStorage:s leftIds får annars syncFromStore:s
-        // self-injection att felaktigt sätta hasLeft=true trots att DB:s
-        // has_left nu är false (via upsertOwnLobbyPlayer:s explicit-set).
+        // Kritiskt när id:t ärvts från en tidigare Leave Game: AsyncStorage:s
+        // leftIds får annars syncFromStore:s self-injection att felaktigt sätta
+        // hasLeft=true trots att DB:s has_left nu är false (satt av
+        // claimCarryOverLobbyPlayer eller upsertOwnLobbyPlayer).
         // Resultat utan denna rad: re-join via invite/code → spelaren
         // renderas inte (vårt hasLeft-filter exkluderar dem).
         removeLeftPlayer(roomCode, joinerId).catch(() => { /* loggas i leftPlayers */ });
@@ -1340,7 +1373,7 @@ export default function LobbyScreen() {
       if (seedHost) ownPlayerIdRef.current = seedHost.id;
     });
     return () => { cancelled = true; };
-  }, [code, guestMode, guestName, guestBirthYear, guestAssistance, hostMode]);
+  }, [code, guestMode, guestName, guestBirthYear, guestAssistance, hostMode, carryOverPlayerId]);
 
   // Varje gång Lobby får fokus (t.ex. man kommer tillbaka från Profile-tabben):
   // ladda sparad profil och uppdatera host-spelarkortet med profilens värden.
@@ -2969,10 +3002,21 @@ export default function LobbyScreen() {
       if (cancelled || !stored) return;
       setPlayers((prev) => {
         const localIds = new Set(prev.map((p) => p.id));
+        // Namn-dedup mot lokala state: Play Again carry-over kan ge en race
+        // där non-host:s code-only-join inte hittade carry-over-raden i DB
+        // (Supabase-propagering hann inte) → non-host insertade en ny rad
+        // med nytt id. DB har då två rader: carry-over-id + ny-id. Utan
+        // namnfilter läser fetchNewJoiners in ny-id-raden som "ny joiner"
+        // (carry-over-id finns i localIds men inte ny-id) → host ser 2 kort.
+        const localNames = new Set(
+          prev.filter((p) => !p.isHost).map((p) => p.name.trim().toLowerCase()),
+        );
         // Hoppa över rader som är host-typade (host:s eget kort hanteras
         // separat via mergeProfileIntoHost) — vi vill bara plocka in nya
         // joiners (registered/guest/manual som ännu inte är i lokal state).
-        const newJoiners = stored.filter((p) => !p.isHost && !localIds.has(p.id));
+        const newJoiners = stored.filter(
+          (p) => !p.isHost && !localIds.has(p.id) && !localNames.has(p.name.trim().toLowerCase()),
+        );
         if (newJoiners.length === 0) return prev;
         const hostIdx = prev.findIndex((p) => p.isHost);
         const insertAt = hostIdx === -1 ? prev.length : hostIdx + 1;
@@ -2981,9 +3025,10 @@ export default function LobbyScreen() {
         return next;
       });
     };
-    // Syncar non-host-fält som non-host:en själv kan skriva via sin egen
-    // upsertOwnLobbyPlayer: `hasLeft` (markOwnPlayerLeft + reset vid re-join)
-    // OCH `approved` (re-join resetar till false så host måste re-approva).
+    // Syncar non-host-fält som non-host:en själv kan skriva till DB:n:
+    // `hasLeft` (markOwnPlayerLeft + reset vid re-join). `approved` läses
+    // hit-vägen — carry-over-join rör INTE approved i DB, så host:s eventuella
+    // approval (approved=true) syns hit via denna sync (fetchNewJoiners).
     //
     // Utan approved-sync skulle host:s useEffect [players]-trigger (från
     // hasLeft-ändringen) köra setLobbyPlayers som bulk-UPSERT:ar lokala
@@ -3073,7 +3118,7 @@ export default function LobbyScreen() {
       // Eject-check FÖRST: om host har trashat den här spelaren visar vi
       // popup och avbryter sync:en (player-listan ska inte uppdateras vidare
       // när användaren ändå snart kastas ut till Home).
-      const ownId = ownPlayerIdRef.current;
+      let ownId = ownPlayerIdRef.current;
       if (ownId && isEjected(roomCode, ownId)) {
         if (!cancelled) setPlayerEjectedDetected(true);
         return;
@@ -3098,7 +3143,47 @@ export default function LobbyScreen() {
           getLobbySettings(roomCode),
         ]);
         if (cancelled) return;
-        const selfApproved = !!playersStored?.find((p) => p.id === ownId)?.approved;
+        // ID-heal (game-started-path): Play Again-race kan ge att ownId
+        // (joiner-DATE, approved=false) finns i DB medan carry-over-ID (samma
+        // namn, approved=true) också finns. Adoptera carry-over-ID:t INNAN
+        // selfApproved-checken nedan så vi inte felaktigt skickar non-host
+        // till "started without me"-popup trots att host godkänt dem.
+        if (ownId) {
+          const ownRowInStored = playersStored?.find((p) => p.id === ownId);
+          if (!ownRowInStored?.approved) {
+            const selfNameLower = ownRowInStored?.name?.trim().toLowerCase();
+            if (selfNameLower) {
+              const approvedAlt = playersStored?.find(
+                (p) =>
+                  !p.isHost &&
+                  p.id !== ownId &&
+                  p.name.trim().toLowerCase() === selfNameLower &&
+                  p.approved,
+              );
+              if (approvedAlt) {
+                ownPlayerIdRef.current = approvedAlt.id;
+                ownId = approvedAlt.id;
+              }
+            }
+          }
+        }
+        // Guard: null = DB-fel, undefined = inga rader ännu (carry-over-skrivningen
+        // har inte propagerat eller misslyckades). Båda är tvetydiga — bränn INTE
+        // popup:en på oklart underlag, låt nästa poll avgöra.
+        // Vanligaste orsak till undefined: migration 0015 (spotify_verified) ej
+        // applicerad → setLobbyPlayers UPSERT kraschar tyst i goToNewLobby →
+        // inga carry-over-rader i DB → getLobbyPlayers returnerar undefined.
+        if (playersStored == null) {
+          return;
+        }
+        // Hittade rader men vår rad saknas — kan vara propagerings-delay.
+        // Vi har redan försökt ID-heal ovan; om inget hittats hoppar vi över
+        // och låter nästa poll försöka igen.
+        const selfRow = playersStored.find((p) => p.id === ownId);
+        if (!selfRow) {
+          return;
+        }
+        const selfApproved = !!selfRow.approved;
         if (!selfApproved) {
           if (!cancelled) setStartedWithoutMeDetected(true);
           return;
@@ -3240,11 +3325,51 @@ export default function LobbyScreen() {
         }
       }
       setPlayers((prev) => {
-        const ownId = ownPlayerIdRef.current;
+        let ownId = ownPlayerIdRef.current;
+        // ID-heal: Play Again-race kan ge att ownId (joiner-DATE) antingen
+        // saknas helt i approvedFromHost, ELLER finns men med approved=false
+        // medan carry-over-ID (samma namn, approved=true) också finns.
+        // Adoptera carry-over-id:t i båda fallen så approved-status och
+        // game-start-checken hittar rätt rad.
+        const ownRowInHost = ownId ? approvedFromHost.find((p) => p.id === ownId) : null;
+        const needsHeal =
+          ownId && (!ownRowInHost || (!ownRowInHost.isHost && !ownRowInHost.approved));
+        if (needsHeal) {
+          const selfRow = ownRowInHost ?? prev.find((p) => p.id === ownId);
+          if (selfRow) {
+            const selfNameLower = selfRow.name.trim().toLowerCase();
+            const approvedAlt = approvedFromHost.find(
+              (p) =>
+                !p.isHost &&
+                p.id !== ownId &&
+                p.name.trim().toLowerCase() === selfNameLower &&
+                p.approved,
+            );
+            if (approvedAlt) {
+              ownPlayerIdRef.current = approvedAlt.id;
+              ownId = approvedAlt.id;
+            }
+          }
+        }
+        // Name-dedup: Play Again carry-over kan ge två rader med samma namn
+        // men olika id i DB (race: host:s Supabase-write hann inte propagera
+        // när non-host:s code-only-join körde → ny id insertad bredvid
+        // carry-over-raden). Spelarnamn är unika i en lobby → säkert att deduplicera.
+        // Prio: behåll raden vars id matchar ownId; annars första förekomsten.
+        const nameSeenMap = new Map<string, LobbyPlayer>();
+        for (const p of approvedFromHost) {
+          const key = p.name.trim().toLowerCase();
+          if (!nameSeenMap.has(key)) {
+            nameSeenMap.set(key, p);
+          } else if (ownId && p.id === ownId) {
+            nameSeenMap.set(key, p);
+          }
+        }
+        const deduped: LobbyPlayer[] = [...nameSeenMap.values()];
         const selfInHostList = ownId
-          ? approvedFromHost.some((p) => p.id === ownId)
+          ? deduped.some((p) => p.id === ownId)
           : false;
-        let next: LobbyPlayer[] = approvedFromHost;
+        let next: LobbyPlayer[] = deduped;
         if (ownId && !selfInHostList) {
           // Hämta senaste self-data från DB-stored (inte prev local state)
           // så approved/age/etc. reflekterar host:s nyligen synkade ändringar.
@@ -3256,6 +3381,11 @@ export default function LobbyScreen() {
             // Applicera hasLeft från BÅDA källor (DB has_left + AsyncStorage)
             // även på self-rad så cross-device-broadcast slår igenom.
             const hasLeft = !!selfRow.hasLeft || leftIds.has(selfRow.id);
+            // Ta bort eventuell carry-over-rad med samma namn (uppstår när
+            // race-condition + self-inject kombineras: carry-over-raden låg
+            // i `deduped` men ownId-raden fanns inte → namn-kollidering vid inject).
+            const selfNameLower = selfRow.name.trim().toLowerCase();
+            next = next.filter((p) => p.name.trim().toLowerCase() !== selfNameLower);
             next = [...next, { ...selfRow, hasLeft }];
           }
         }
@@ -3610,16 +3740,25 @@ export default function LobbyScreen() {
       }
     }
 
-    // Markera rumkoden som "game-started" innan navigation — non-host:s
-    // polling-effekt detekterar detta och visar "Host started game without
-    // this user"-popup till spelare som inte hunnit bli approved. Måste
-    // sättas FÖRE router.push så non-host:s nästa poll fångar det medan
-    // host:s component fortfarande är monterad (vid host:s blur clearas
-    // ingen state — markeringen lever till någon lifecycle-cleanup).
+    // Säkerställ att DB:n har approved-state INNAN game_started sätts.
+    // Race: host:s useEffect([players]) kallar setLobbyPlayers fire-and-
+    // forget. Om host godkände en spelare och direkt tryckte Start Game kan
+    // UPSERT:en (approved=true) ligga in-flight när markRoomGameStarted
+    // committar. Non-host:s syncFromStore detectar då game_started=true +
+    // läser approved=false → "started without me"-popup trots att host
+    // faktiskt approvade spelaren. Explicit await här garanterar att
+    // approved:true är i DB innan game_started=true sätts.
+    await setLobbyPlayers(roomCode, players);
+
+    // Markera rumkoden som "game-started" — non-host:s Realtime-subscription
+    // (rooms-tabellen nu i publikationen via migration 0020) + 2s-polling
+    // detekterar detta. Måste komma EFTER setLobbyPlayers ovan så approved-
+    // state är committed när syncFromStore läser det.
     markGameStarted(roomCode);
     // Server-side flagga: rooms.game_started=true så isActiveRoom returnerar
     // false för nya joiners (rummet är inte längre joinbart). Fire-and-forget
-    // — UI:t fortsätter inte vänta på DB-roundtrip.
+    // — UI:t väntar inte på roundtrip efter att vi redan explict awaitat
+    // setLobbyPlayers ovan.
     markRoomGameStarted(roomCode).catch(() => { /* loggas i mockActiveRooms */ });
     // Rensa pending invites för det här rummet — host startar spelet, så
     // alla mottagare som ännu inte accepterat ska INTE längre se inviten

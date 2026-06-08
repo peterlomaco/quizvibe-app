@@ -376,6 +376,25 @@ const FLAG_MAP: Record<string, string> = {
   cameroon: '🇨🇲',
   ghana: '🇬🇭',
   jamaica: '🇯🇲',
+  chile: '🇨🇱',
+  uruguay: '🇺🇾',
+  ireland: '🇮🇪',
+  serbia: '🇷🇸',
+  'south-africa': '🇿🇦',
+  israel: '🇮🇱',
+  togo: '🇹🇬',
+  venezuela: '🇻🇪',
+  ecuador: '🇪🇨',
+  peru: '🇵🇪',
+  scotland: '🏴󠁧󠁢󠁳󠁣󠁴󠁿',
+  wales: '🏴󠁧󠁢󠁷󠁬󠁳󠁿',
+  romania: '🇷🇴',
+  hungary: '🇭🇺',
+  slovakia: '🇸🇰',
+  'north-macedonia': '🇲🇰',
+  albania: '🇦🇱',
+  morocco: '🇲🇦',
+  algeria: '🇩🇿',
 };
 
 export function countryToFlagEmoji(nationality: string): string {
@@ -393,6 +412,42 @@ export function inferGender(library: HintLibrary): 'male' | 'female' | null {
   const female = (text.match(/\b(she|her|hers)\b/g) ?? []).length;
   if (male > female && male > 0) return 'male';
   if (female > male && female > 0) return 'female';
+  return null;
+}
+
+/** Returnerar nationaliteten direkt från library (normaliserad sträng). */
+export function inferNationality(library: HintLibrary): string | null {
+  return library.nationality ?? null;
+}
+
+// Sport-nyckelord → kanonisk sport-identifierare. Profession-värden
+// i hints matchar dessa prefix/substrings case-insensitivt.
+const SPORT_KEYWORD_MAP: Array<[string, string]> = [
+  ['football player', 'football'],
+  ['basketball player', 'basketball'],
+  ['tennis player', 'tennis'],
+  ['ice hockey', 'ice-hockey'],
+  ['cross-country skier', 'skiing'],
+  ['alpine skier', 'skiing'],
+  ['biathlete', 'biathlon'],
+  ['sprinter', 'athletics'],
+  ['pole vault', 'athletics'],
+  ['professional golfer', 'golf'],
+  ['boxer', 'boxing'],
+];
+
+/**
+ * Härleder sport-typ från profession-hinten i library.
+ * Söker igenom profession-hints (type='profession') och matchar mot
+ * SPORT_KEYWORD_MAP. Returnerar null om ingen match.
+ */
+export function inferSport(library: HintLibrary): string | null {
+  const profHint = library.hints.find((h) => h.type === 'profession');
+  if (!profHint) return null;
+  const val = profHint.value.toLowerCase();
+  for (const [keyword, sport] of SPORT_KEYWORD_MAP) {
+    if (val.includes(keyword)) return sport;
+  }
   return null;
 }
 
@@ -3009,8 +3064,77 @@ const HINTS_LIBRARY_MANUAL: Record<string, HintLibrary> = {
 
 }; // end HINTS_LIBRARY_MANUAL
 
-// HINTS_LIBRARY: auto-genererade hints + manuellt kuraterade (manuella åsidosätter).
-export const HINTS_LIBRARY: Record<string, HintLibrary> = {
-  ...HINTS_LIBRARY_GENERATED,
-  ...HINTS_LIBRARY_MANUAL,
+// Nationality-override för items där auto-gen (Wikidata P27) returnerade 'unknown'.
+// Appliceras EFTER merge av generated + manual så manuellt kuraterade behöver inte upprepa detta.
+const NATIONALITY_OVERRIDES: Record<string, string> = {
+  // Svenska artister/band
+  'a-teens': 'sweden',        'alesso': 'sweden',         'bo-kaspers-orkester': 'sweden',
+  'cornelis-vreeswijk': 'sweden', 'daniel-andersson': 'sweden', 'daniel-stahl': 'sweden',
+  'darin': 'sweden',          'familjen': 'sweden',       'first-aid-kit': 'sweden',
+  'freestyle': 'sweden',      'galantis': 'sweden',       'hep-stars': 'sweden',
+  'hurula': 'sweden',         'jordan-larsson': 'sweden', 'larz-kristerz': 'sweden',
+  'lasse-stefanz': 'sweden',  'lisa-nilsson': 'sweden',   'lolita-pop': 'sweden',
+  'ludmila-engquist': 'sweden', 'mariette': 'sweden',     'mauro-scocco': 'sweden',
+  'nationalteatern': 'sweden', 'orup': 'sweden',          'patrik-sjoberg': 'sweden',
+  'ratata': 'sweden',         'stefan-holm': 'sweden',    'sten-and-stanley': 'sweden',
+  'swedish-house-mafia': 'sweden', 'tages': 'sweden',     'the-soundtrack-of-our-lives': 'sweden',
+  'thomas-johansson-tennis': 'sweden', 'timbuktu': 'sweden', 'titiyo': 'sweden',
+  'tjuvjakt': 'sweden',       'tobias-karlsson-handball': 'sweden', 'vikingarna': 'sweden',
+  'vilhelm-blomgren': 'sweden', 'vincent-pontare': 'sweden',
+  // Norska
+  'aha': 'norway',            'wenche-myhre': 'norway',   'ylvis': 'norway',
+  // Danska
+  'anne-linnet': 'denmark',   'morten-olsen': 'denmark',  'sanne-salomonsen': 'denmark',
+  // Finska
+  'lordi': 'finland',         'nightwish': 'finland',
+  // Nederländska
+  'clarence-seedorf': 'netherlands', 'cody-gakpo': 'netherlands', 'dirk-kuyt': 'netherlands',
+  'edgar-davids': 'netherlands', 'frank-rijkaard': 'netherlands', 'frenkie-de-jong': 'netherlands',
+  'guus-hiddink': 'netherlands', 'johan-cruyff': 'netherlands', 'louis-van-gaal': 'netherlands',
+  'marco-van-basten': 'netherlands', 'memphis-depay': 'netherlands', 'patrick-kluivert': 'netherlands',
+  'robin-van-persie': 'netherlands', 'ruud-gullit': 'netherlands', 'virgil-van-dijk': 'netherlands',
+  'wesley-sneijder': 'netherlands',
+  // Brittiska
+  'annie-lennox': 'uk',       'arctic-monkeys': 'uk',     'bee-gees': 'uk',
+  'black-sabbath': 'uk',      'coldplay': 'uk',           'dua-lipa': 'uk',
+  'eurythmics': 'uk',         'fleetwood-mac': 'uk',      'genesis': 'uk',
+  'led-zeppelin': 'uk',       'pink-floyd': 'uk',         'spice-girls': 'uk',
+  'the-police': 'uk',         'the-smiths': 'uk',         'wham': 'uk',
+  // Amerikanska
+  'backstreet-boys': 'usa',   'eagles': 'usa',            'edward-norton': 'usa',
+  'green-day': 'usa',         'guns-n-roses': 'usa',      'journey': 'usa',
+  'kiss': 'usa',              'maroon-5': 'usa',          'metallica': 'usa',
+  'nicki-minaj': 'usa',       'the-doors': 'usa',
+  // Brasilianska
+  'bebeto': 'brazil',         'fred': 'brazil',           'marcelo': 'brazil',
+  'oscar': 'brazil',          'ronaldinho': 'brazil',
+  // Spanska
+  'pedro-rodriguez': 'spain', 'raul': 'spain',            'xavi': 'spain',
+  // Tyska
+  'franz-beckenbauer': 'germany',
+  // Chilenska
+  'alexis-sanchez': 'chile',  'arturo-vidal': 'chile',
+  // Uruguayanska
+  'diego-forlan': 'uruguay',  'edinson-cavani': 'uruguay', 'luis-suarez': 'uruguay',
+  // Övriga latinamerikanska
+  'james-rodriguez': 'colombia', 'guillermo-ochoa': 'mexico', 'salma-hayek': 'mexico',
+  // Europeiska
+  'maneskin': 'italy',        'jaromir-jagr': 'czechia',  'novak-djokovic': 'serbia',
+  'pepe': 'portugal',         'u2': 'ireland',            'daft-punk': 'france',
+  // Afrika / Mellanöstern / Asien
+  'didier-drogba': 'ivory-coast', 'emmanuel-adebayor': 'togo',
+  'charlize-theron': 'south-africa', 'netta-barzilai': 'israel',
+  'yao-ming': 'china',
 };
+
+// HINTS_LIBRARY: auto-genererade hints + manuellt kuraterade (manuella åsidosätter).
+// Nationality-overrides appliceras sist för att täcka 'unknown'-fall i generated-filen.
+export const HINTS_LIBRARY: Record<string, HintLibrary> = Object.fromEntries(
+  Object.entries({
+    ...HINTS_LIBRARY_GENERATED,
+    ...HINTS_LIBRARY_MANUAL,
+  }).map(([id, lib]) => {
+    const override = NATIONALITY_OVERRIDES[id];
+    return [id, override && lib.nationality === 'unknown' ? { ...lib, nationality: override } : lib];
+  }),
+);

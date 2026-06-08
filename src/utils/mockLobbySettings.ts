@@ -22,6 +22,7 @@ export type LobbyAnswerResponse = 15 | 30 | 45 | 60;
 export interface LobbySettings {
   gameMode: LobbyGameMode;
   singlePlayerDefault: boolean;
+  maxPlayers: 4 | 12;
   region: LobbyRegion;
   answerResponseSeconds: LobbyAnswerResponse;
   eraFrom: number;
@@ -42,8 +43,7 @@ export interface LobbySettings {
   sketchEnabled: boolean;
   // Spotify DJ-läge: host aktiverar → DJ-rotation körs i quiz.tsx.
   // Kräver att alla spelare har spotify_verified = true i lobby_players.
-  // DB-kolumn: lobby_settings.spotify_enabled (migration 0015).
-  // Skrivs INTE till DB förrän migrationen körts (se settingsToRow nedan).
+  // DB-kolumn: lobby_settings.spotify_enabled (migration 0015 måste vara applicerad).
   spotifyEnabled: boolean;
 }
 
@@ -51,6 +51,8 @@ interface LobbySettingsRow {
   room_code: string;
   game_mode: LobbyGameMode;
   single_player_default: boolean;
+  // Optional tills migration 0019_lobby_settings_max_players.sql körts.
+  max_players?: number;
   region: DbRegion;
   answer_response_seconds: LobbyAnswerResponse;
   era_from: number;
@@ -90,26 +92,27 @@ function rowToSettings(row: LobbySettingsRow): LobbySettings {
   // annars fall-back mot gamla bool-kolumner + defaultvärden.
   const ytCatsRaw = row.youtube_enabled_categories;
   const imgCatsRaw = row.images_enabled_categories;
-  const ytCats = ytCatsRaw ? ytCatsRaw.filter(isMainCategory) as MainCategory[] : null;
-  const imgCats = imgCatsRaw ? imgCatsRaw.filter(isMainCategory) as MainCategory[] : null;
+  // null = kolumnen saknas (pre-migration 0014) → använd legacy-fallback.
+  // [] = kolumnen finns men host har explicit stängt av allt → respektera [].
+  const ytCats = ytCatsRaw != null ? ytCatsRaw.filter(isMainCategory) as MainCategory[] : null;
+  const imgCats = imgCatsRaw != null ? imgCatsRaw.filter(isMainCategory) as MainCategory[] : null;
   return {
     gameMode: row.game_mode,
     singlePlayerDefault: row.single_player_default,
+    maxPlayers: row.max_players === 12 ? 12 : 4,
     region: DB_TO_UI_REGION[row.region],
     answerResponseSeconds: row.answer_response_seconds,
     eraFrom: row.era_from,
     eraTo: row.era_to,
     roundsCount: row.rounds_count,
     selectedExtraPackages: row.selected_extra_packages,
-    // Ny kolumn finns → använd direkt. Saknas (pre-migration) → fall-back:
-    // youtube: all-on om youtube_enabled=true (gammal data), annars tom array.
-    youtubeEnabledCategories: ytCats && ytCats.length > 0
+    // Kolumn finns (migration 0014) → använd direkt, inkl. [] (explicit av).
+    // Saknas (null, pre-migration) → fall-back mot legacy bool-kolumn.
+    youtubeEnabledCategories: ytCats !== null
       ? ytCats
       : (row.youtube_enabled !== false ? defaultEnabledMainCategories() : []),
-    // images: mandatory-kategorier + Music om youtube_enabled-equiv för images.
-    imagesEnabledCategories: imgCats && imgCats.length > 0
+    imagesEnabledCategories: imgCats !== null
       ? imgCats
-      // Säkerställ att mandatory-kategorier alltid finns även i fallback.
       : [...new Set([...IMAGES_MANDATORY_CATEGORIES,
           ...(row.images_enabled !== false ? (['Music'] as MainCategory[]) : []),
         ]) as unknown as MainCategory[]],
@@ -124,6 +127,7 @@ function settingsToRow(code: string, s: LobbySettings): LobbySettingsRow {
     room_code: code,
     game_mode: s.gameMode,
     single_player_default: s.singlePlayerDefault,
+    max_players: s.maxPlayers,
     region: UI_TO_DB_REGION[s.region],
     answer_response_seconds: s.answerResponseSeconds,
     era_from: s.eraFrom,
@@ -140,11 +144,12 @@ function settingsToRow(code: string, s: LobbySettings): LobbySettingsRow {
     // kolumn skulle faila HELA settings-skrivningen → bryta all lobby-sync.
     // sketch_enabled: s.sketchEnabled,
     //
-    // Migration 0014: per-source category-kolumner.
-    // OBS: kommenterade TILLS migration körs (se supabase/migrations/0014_per_source_categories.sql).
-    // Aktivera efter: ALTER TABLE lobby_settings ADD COLUMN youtube_enabled_categories text[], ...
-    // youtube_enabled_categories: [...s.youtubeEnabledCategories],
-    // images_enabled_categories: [...s.imagesEnabledCategories],
+    // Migration 0014 aktiverat — per-source category-kolumner skrivs nu.
+    youtube_enabled_categories: [...s.youtubeEnabledCategories],
+    images_enabled_categories: [...s.imagesEnabledCategories],
+    // Migration 0015: spotify_enabled-kolumn. Kräver att migration körs
+    // i Supabase manuellt — se supabase/migrations/0015_spotify_connections.sql.
+    spotify_enabled: s.spotifyEnabled,
   };
 }
 

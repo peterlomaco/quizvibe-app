@@ -18,7 +18,7 @@ import {
 import { SequentialDots } from '@/src/components/SequentialDots';
 import { StopwatchIcon } from '@/src/components/StopwatchIcon';
 import { useConnectionStatus } from '@/src/lib/network/connectionMonitor';
-import { subscribeSyncChannel, type SyncChannel } from '@/src/lib/realtime/syncChannel';
+import { subscribeSyncChannel, type SyncChannel, type PlayerScoreRecordedPayload } from '@/src/lib/realtime/syncChannel';
 import type { LobbyPlayer } from '@/src/screens/LobbyScreen';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '@/src/theme';
 import { track } from '@/src/utils/analytics';
@@ -61,7 +61,7 @@ import {
   type ImageQuizQuestion,
 } from '@/src/utils/quizImageQuestions';
 import { buildImageVariant } from '@/src/utils/imageQuestionBuilder';
-import { HINTS_LIBRARY, getHintRegionScope, inferGender, type HintLibrary } from '@/src/utils/hintsData';
+import { HINTS_LIBRARY, getHintRegionScope, inferGender, inferNationality, inferSport, type HintLibrary } from '@/src/utils/hintsData';
 import { HintsQuizCard } from '@/src/components/HintsQuizCard';
 import { HeartbeatSound } from '@/src/components/HeartbeatSound';
 // import { getQuizImage } from '@/src/utils/quizImages';
@@ -1355,8 +1355,13 @@ export default function QuizScreen() {
   // Aktuell spelares assistance — driver svarsruta-intervallet (full=5 år,
   // standard=3 år, minimal=1 år) per rond. Faller tillbaka till fallback-
   // Assistance om turnOrder-payload saknar fältet (legacy-data).
-  const currentAssistance: AssistanceLevel =
-    turnOrder[currentPlayerIndex]?.assistance ?? fallbackAssistance;
+  // IndDev: currentPlayerIndex är alltid 0 (host) — vi slår upp via
+  // selfPlayerId istället så varje enhet får sin egna spelares assistance.
+  const currentAssistance: AssistanceLevel = (
+    gameMode === 'individual-devices' && selfPlayerId
+      ? turnOrder.find((p) => p.id === selfPlayerId)
+      : turnOrder[currentPlayerIndex]
+  )?.assistance ?? fallbackAssistance;
   // Initial fas är 'intro' när vi har en turordning (gäller båda lägena vid
   // spelstart). Faller tillbaka till 'question' om payload saknas/parse-failar.
   // 'countdown' fas:as in efter intro:n när användaren tappar play-knappen —
@@ -1367,6 +1372,16 @@ export default function QuizScreen() {
   const [phase, setPhase] = useState<'intro' | 'countdown' | 'question' | 'awaiting' | 'reveal' | 'leaderboard'>(
     turnOrder.length > 0 ? 'intro' : 'question',
   );
+  // Synkron mirror av phase-state. Uppdateras vid varje render (ingen delay).
+  // Används av confirm-handlers för att undvika stale-closure-race mot
+  // useEffect([timeLeft]) — om setPhase('awaiting') anropats men React inte
+  // hunnit re-rendera ser closure-baserad phase-check fortfarande 'question'.
+  const phaseRef = useRef(phase);
+  phaseRef.current = phase;
+  // Skyddar mot double-scoring per fråga oavsett React-batching/scheduling.
+  // Sätts true av första anropet till recordRoundScore; resetas i
+  // handleAdvanceToNextRound när nästa fråga börjar.
+  const hasRecordedScoreForCurrentQuestionRef = useRef(false);
   // Timern + flaggans mosaik aktiveras 2 s efter quiz-vyn visas.
   const [timerActive, setTimerActive] = useState(false);
   useEffect(() => {
@@ -1630,27 +1645,78 @@ export default function QuizScreen() {
   // → ImageAnswerBlock skulle få ny variant-prop per frame.
   const imageVariant = useMemo<ImageQuestionVariant | null>(() => {
     if (question.type !== 'image') return null;
-    // Filtrera distraktor-pool till samma contentSubject som det rätta svaret
-    // (t.ex. bara 'band' för band-frågor, bara 'athlete' för idrottare).
+
+    const POOL_THRESHOLD = 5; // behöver minst 4 distraktorter + 1 rätt
+
+    // Basnivå: samma contentSubject (t.ex. bara 'athlete' för idrottare).
+    // Faller ALDRIG tillbaka till IMAGE_QUIZ_QUESTIONS — subject-integritet alltid.
     const sameSubject = IMAGE_QUIZ_QUESTIONS.filter(
       (q) => q.contentSubject === question.source.contentSubject,
     );
-    // Genus-filter: om rätt svar är manligt/kvinnligt (härleds från pronomen i hints)
-    // visas bara distraktorter med samma kön. Fallback till sameSubject om genus saknas
-    // ELLER om genus-filtrerat pool < 5 (behöver minst 4 distraktorter + 1 rätt).
-    // Faller ALDRIG tillbaka till IMAGE_QUIZ_QUESTIONS — subject-integritet alltid.
-    const correctLib  = HINTS_LIBRARY[question.source.id];
+
+    const correctLib = HINTS_LIBRARY[question.source.id];
+
+    // Genus-filter: EXAKT köns-match, okänt kön (null) och saknad lib exkluderas.
     const correctGender = correctLib ? inferGender(correctLib) : null;
     const sameGender = correctGender
       ? sameSubject.filter((q) => {
           const lib = HINTS_LIBRARY[q.id];
-          if (!lib) return true; // okänt kön → tillåt som distraktor
-          const g = inferGender(lib);
-          return g === null || g === correctGender;
+          if (!lib) return false;
+          return inferGender(lib) === correctGender;
         })
       : sameSubject;
-    // Använd genus-pool om tillräckligt stor, annars subject-pool (aldrig alla subjects).
-    const itemPool = sameGender.length >= 5 ? sameGender : sameSubject;
+
+    // Nationalitets-filter på sameGender-basen.
+    const correctNationality = correctLib ? inferNationality(correctLib) : null;
+    const sameNationalityAndGender = correctNationality
+      ? sameGender.filter((q) => {
+          const lib = HINTS_LIBRARY[q.id];
+          if (!lib) return false;
+          return inferNationality(lib) === correctNationality;
+        })
+      : null;
+
+    let itemPool: typeof sameSubject;
+
+    if (question.source.contentSubject === 'athlete') {
+      // Idrottare: lager-kedja med sport + nationalitet + kön (striktast → lösast).
+      const correctSport = correctLib ? inferSport(correctLib) : null;
+
+      const sameSportAndGender = correctSport
+        ? sameGender.filter((q) => {
+            const lib = HINTS_LIBRARY[q.id];
+            if (!lib) return false;
+            return inferSport(lib) === correctSport;
+          })
+        : null;
+
+      const sameSportAndNationalityAndGender =
+        sameSportAndGender && sameNationalityAndGender
+          ? sameSportAndGender.filter((q) => sameNationalityAndGender.includes(q))
+          : null;
+
+      if (sameSportAndNationalityAndGender && sameSportAndNationalityAndGender.length >= POOL_THRESHOLD) {
+        itemPool = sameSportAndNationalityAndGender; // sport + land + kön
+      } else if (sameNationalityAndGender && sameNationalityAndGender.length >= POOL_THRESHOLD) {
+        itemPool = sameNationalityAndGender; // land + kön
+      } else if (sameSportAndGender && sameSportAndGender.length >= POOL_THRESHOLD) {
+        itemPool = sameSportAndGender; // sport + kön
+      } else if (sameGender.length >= POOL_THRESHOLD) {
+        itemPool = sameGender; // kön
+      } else {
+        itemPool = sameSubject; // subject-fallback
+      }
+    } else {
+      // Artister, skådespelare, band etc.: nationalitet + kön, sedan kön, sedan subject.
+      if (sameNationalityAndGender && sameNationalityAndGender.length >= POOL_THRESHOLD) {
+        itemPool = sameNationalityAndGender; // land + kön
+      } else if (sameGender.length >= POOL_THRESHOLD) {
+        itemPool = sameGender; // kön
+      } else {
+        itemPool = sameSubject; // subject-fallback
+      }
+    }
+
     return buildImageVariant(
       question.source,
       currentAssistance,
@@ -1807,6 +1873,9 @@ export default function QuizScreen() {
   // och delar denna enhet (en spelare i taget). Direkt-nav till /quiz utan
   // turnOrder simulerar fortfarande mock-motspelare för gameplay-testning.
   const recordRoundScore = (yourPoints: number, yourCorrect: boolean, yourTimeUsed: number) => {
+    // Förhindra double-scoring per fråga (race: handleConfirm* + useEffect([timeLeft])).
+    if (hasRecordedScoreForCurrentQuestionRef.current) return;
+    hasRecordedScoreForCurrentQuestionRef.current = true;
     // Vilken spelare attribueras score:n till?
     //   • Pass-the-Phone: turnOrder[currentPlayerIndex] — aktiv spelare
     //     roterar mellan ronder, alla scoreposter går till "current"-rad:n.
@@ -1843,6 +1912,20 @@ export default function QuizScreen() {
     }
     setCurrentRoundScores(allScores);
     setAllRoundScoresHistory((prev) => [...prev, allScores]);
+    // Broadcast score till andra IndDev-enheter så deras leaderboard
+    // uppdateras med vår post. broadcast.self: false gör att vi aldrig
+    // tar emot vårt eget event — ingen double-count-risk.
+    if (gameMode === 'individual-devices' && syncChannelRef.current) {
+      syncChannelRef.current
+        .broadcastPlayerScoreRecorded({
+          player_id: activePlayerId,
+          question_index: questionIndex,
+          points: yourPoints,
+          correct: yourCorrect,
+          time_used: yourTimeUsed,
+        })
+        .catch(() => {});
+    }
   };
 
   useEffect(() => {
@@ -1994,7 +2077,11 @@ export default function QuizScreen() {
   useEffect(() => {
     const totalMs = responseSeconds * 1000;
     if (phase !== 'question' || !timerActive) {
-      if (phase === 'intro' || phase === 'countdown' || !timerActive) {
+      // Nollställ bara vid ny frågestart (intro/countdown) eller under
+      // 2-sekunders-bufferten (phase='question' men timerActive ännu false).
+      // INTE vid 'awaiting'/'reveal' — då är värdet fryst på confirm-momentet
+      // och ska inte skrivas över.
+      if (phase === 'intro' || phase === 'countdown' || (phase === 'question' && !timerActive)) {
         setDecimalElapsedMs(0);
       }
       return;
@@ -2072,7 +2159,11 @@ export default function QuizScreen() {
   }, [phase, canConfirm, confirmPulse, confirmGlow]);
 
   const handleConfirm = (year: number) => {
-    // Defensiv guard: handleConfirm är timeline-specifik (year-baserad).
+    // Defensiv guard: bara aktiv i question-fasen. Använder phaseRef (inte
+    // closure-phase) för att fånga race-fallet där setPhase('awaiting') redan
+    // anropats av en concurrent handler men React inte hunnit re-rendera.
+    if (phaseRef.current !== 'question') return;
+    // handleConfirm är timeline-specifik (year-baserad).
     // Image-frågor anropar handleConfirmName istället. Skydd mot fel-binding i UI.
     if (question.type !== 'timeline') return;
     // Timer:n stoppas INTE — alla spelare får samma tidsbudget oavsett när
@@ -2154,6 +2245,7 @@ export default function QuizScreen() {
   // Image-fråge-Confirm: speglar handleConfirm men för name-svar.
   // correct = opt.isCorrect (pre-baked från distractor-builderns rätt-flagga).
   const handleConfirmName = (opt: ImageNameOption) => {
+    if (phaseRef.current !== 'question') return;
     if (question.type !== 'image') return;
     const correct = opt.isCorrect;
     const pts = calculatePoints(correct, currentAssistance, 'name');
@@ -2198,6 +2290,7 @@ export default function QuizScreen() {
   // Actor-select-Confirm: speglar handleConfirmName men för filmfrågor.
   // correct = spelarens val finns i question.correctNames.
   const handleConfirmActor = (name: string) => {
+    if (phaseRef.current !== 'question') return;
     if (question.type !== 'actor-select') return;
     const correct = question.correctNames.includes(name);
     const pts = calculatePoints(correct, currentAssistance, 'name');
@@ -2277,6 +2370,12 @@ export default function QuizScreen() {
   // lokala Next-tap kallar utan arg → faller tillbaka till +1 (host är
   // alltid canonical så drift kan inte uppstå).
   const handleAdvanceToNextRound = (explicitNextIndex?: number) => {
+    // Stäng av eventuellt kvarvarande timer-intervall från föregående fråga.
+    // startTimer() clearklar normalt det gamla intervallet, men om spelaren
+    // tryckte Next innan timer nådde 0 kan intervallet fortfarande vara aktivt.
+    if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
+    // Återställ scoring-latch för nästa fråga.
+    hasRecordedScoreForCurrentQuestionRef.current = false;
     if (explicitNextIndex !== undefined) {
       setQuestionIndex(explicitNextIndex);
     } else {
@@ -2543,6 +2642,27 @@ export default function QuizScreen() {
     responseSecondsChangedHandlerRef.current = (seconds) => {
       setResponseSeconds(seconds);
     };
+    // Mottagare av player_score_recorded: en annan IndDev-spelare har
+    // svarat. Lägg in deras RoundScore i lokal allRoundScoresHistory
+    // så liveLeaderboard + final leaderboard visar komplett bild.
+    playerScoreRecordedHandlerRef.current = (payload) => {
+      // Ignorera egna scores (broadcast.self: false garanterar detta, men
+      // defensiv guard mot edge-case om selfPlayerId ändrar sig).
+      if (payload.player_id === selfPlayerId) return;
+      // Deduplication: samma spelare + samma frågeindex = samma broadcast.
+      const key = `${payload.player_id}_${payload.question_index}`;
+      if (receivedRemoteScoreKeysRef.current.has(key)) return;
+      receivedRemoteScoreKeysRef.current.add(key);
+      setAllRoundScoresHistory((prev) => [
+        ...prev,
+        [{
+          playerId: payload.player_id,
+          points: payload.points,
+          correct: payload.correct,
+          timeUsed: payload.time_used,
+        }],
+      ]);
+    };
   });
 
   // Spara det avslutade spelet till AsyncStorage (görs när final leaderboard visas).
@@ -2715,9 +2835,14 @@ export default function QuizScreen() {
     // Färsk leftPlayers-store + lobbyPlayers-store + ejected-store för nya
     // koden — undviker stale test-data och garanterar att non-host:s polling
     // startar tomt utan eject-status från en tidigare session.
+    // VIKTIGT: clearLobbyPlayers MÅSTE awaitas innan setLobbyPlayers nedan.
+    // Utan await kan DELETE:n resolva EFTER att UPSERT:en committed och då
+    // rensa de nyskapade raderna — non-host hittar då 0 rader i DB.
+    // (För ett nytt kod är DELETE en no-op men latens gör att den kan
+    // landa sent och träffa UPSERT:ens rader om de skrevs snabbare.)
     clearLeftPlayers(newCode);
-    clearLobbyPlayers(newCode);
-    clearLobbySettings(newCode);
+    await clearLobbyPlayers(newCode);
+    await clearLobbySettings(newCode);
     clearEjected(newCode);
     clearGameStarted(newCode);
     // KRITISKT race-fix: skriv carry-over-listan DIREKT till lobby_players
@@ -2732,10 +2857,13 @@ export default function QuizScreen() {
       // approved-data; id:t är rumspecifikt). Faktiskt — vi vill BEHÅLLA
       // id:t exakt så non-host:s ownPlayerId från quiz-sessionen mappar
       // direkt till sin rad i nya rummet via dup-detection-fixet.
-      await setLobbyPlayers(newCode, carryOverPlayers).catch(() => {
-        // Tyst — vid fail fall:er host:s LobbyScreen-useEffect tillbaka
-        // till sin egen write, så nya lobbyn fungerar ändå (dock med
-        // potentiell race för non-host).
+      await setLobbyPlayers(newCode, carryOverPlayers).catch((err) => {
+        // Loggas explicit — tyst fail här ger att non-host:s syncFromStore
+        // returnerar undefined från getLobbyPlayers och felaktigt triggar
+        // "started without me"-popup när host sedan startar spelet.
+        // Vanligaste orsaken: migration 0015 (spotify_verified-kolumn)
+        // inte applicerad i Supabase → upsert kraschar på okänd kolumn.
+        console.warn('[goToNewLobby] setLobbyPlayers carry-over failed:', err);
       });
     }
     // Carry-over av game-settings när host valt "Yes, keep them" + "Keep
@@ -2985,7 +3113,13 @@ export default function QuizScreen() {
   // Back-knapp inte tar tillbaka till Final Leaderboard.
   useEffect(() => {
     if (awaitingNewLobby && nextLobbyCode) {
-      router.replace(`/lobby?code=${nextLobbyCode}&isHost=false`);
+      // selfPlayerId är carry-over-id:t i nya lobbyn (goToNewLobby bevarar
+      // samma p.id). LobbyScreen använder det för att hoppa över DB-beroende
+      // dup-detection och direkt ärva rätt player_id — undviker race där
+      // Supabase-replikering ännu inte synkat när non-host:s getLobbyPlayers
+      // anropas, vilket annars ger ett ny joiner-DATE-id och två DB-rader.
+      const carryOverParam = selfPlayerId ? `&carryOverPlayerId=${encodeURIComponent(selfPlayerId)}` : '';
+      router.replace(`/lobby?code=${nextLobbyCode}&isHost=false${carryOverParam}`);
     }
   }, [awaitingNewLobby, nextLobbyCode]);
 
@@ -3242,6 +3376,11 @@ export default function QuizScreen() {
   const responseSecondsChangedHandlerRef = useRef<(seconds: 15 | 30 | 45 | 60) => void>(
     () => {},
   );
+  // Cross-device score-aggregering: dedup-set + handler-ref för inkommande
+  // remote scores i IndDev-läget. Resetas aldrig manuellt (ett spel per
+  // quiz.tsx-mount; ny instans → nytt Set).
+  const receivedRemoteScoreKeysRef = useRef<Set<string>>(new Set());
+  const playerScoreRecordedHandlerRef = useRef<(payload: PlayerScoreRecordedPayload) => void>(() => {});
   // D-iii: per-peer connection-status. Drivs av två separata signaler:
   //   - watchdog (15s silence från remote sender) → 'disconnected'
   //   - player_rejoined-event (sender:s explicit Retry-tap) → 'connected'
@@ -3286,6 +3425,7 @@ export default function QuizScreen() {
       onSpotifyDJTrackStarted: () => {
         setSpotifyDJStarted(true);
       },
+      onPlayerScoreRecorded: (payload) => playerScoreRecordedHandlerRef.current(payload),
     });
     syncChannelRef.current = sync;
     return () => {
@@ -3774,7 +3914,7 @@ export default function QuizScreen() {
       <View style={styles.fixedTopZone}>
         {/* Hjärtslag enbart för Hints-frågor under aktiv svarstid.
             YT- och Spotify-frågor är tysta i quiz-vyn. */}
-        {isHost && isImageQuestion && (phase === 'question' || phase === 'awaiting') && (
+        {isHost && !isAudioMutedForSelf && isImageQuestion && (phase === 'question' || phase === 'awaiting') && (
           <HeartbeatSound bpm={80} />
         )}
         {/* phase är här narrowed till 'question' | 'awaiting' | 'reveal'
@@ -3872,11 +4012,13 @@ export default function QuizScreen() {
                   resetKey={questionIndex}
                   totalSeconds={responseSeconds}
                   assistance={currentAssistance}
-                  playerBirthYear={
-                    turnOrder[currentPlayerIndex]?.age
-                      ? new Date().getFullYear() - turnOrder[currentPlayerIndex].age
-                      : 1990
-                  }
+                  playerBirthYear={(() => {
+                    const p =
+                      gameMode === 'individual-devices' && selfPlayerId
+                        ? turnOrder.find((tp) => tp.id === selfPlayerId)
+                        : turnOrder[currentPlayerIndex];
+                    return p?.age ? new Date().getFullYear() - p.age : 1990;
+                  })()}
                   isRevealed={phase === 'reveal'}
                   hintsActive={hintsReady}
                   mosaicActive={timerActive}

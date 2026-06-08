@@ -204,6 +204,27 @@ export interface PlayerRejoinedPayload {
   sender_id: string;
 }
 
+/**
+ * En spelare har svarat och fått sin score registrerad för den aktuella
+ * frågan. Broadcastas av VARJE klient i IndDev-läget direkt efter att
+ * `recordRoundScore` kört — mottagarna lägger in posten i sin lokala
+ * `allRoundScoresHistory` så alla enheter ser hela leaderboard-bilden.
+ *
+ * `broadcast.self: false` garanterar att sändarens klient ALDRIG tar
+ * emot sitt eget event (ingen double-count-risk). `question_index` driver
+ * idempotent dedup på mottagarsidan.
+ */
+export interface PlayerScoreRecordedPayload {
+  /** Lobby_players.player_id för spelaren som just scorade. */
+  player_id: string;
+  /** 0-baserat absolut frågeindex. Används för dedup (samma event kan
+   *  dupliceras vid reconnect-replay). */
+  question_index: number;
+  points: number;
+  correct: boolean;
+  time_used: number;
+}
+
 export type PlayerConnectionStatus = 'connected' | 'disconnected';
 
 export interface SyncChannelHandlers {
@@ -254,6 +275,11 @@ export interface SyncChannelHandlers {
    * spelaren tillbaka från 'disconnected' till 'connected' i UI:n.
    */
   onPlayerRejoined?: (playerId: string) => void;
+  /**
+   * En annan spelare i IndDev har svarat och registrerat sin score.
+   * Merge:as in i lokal `allRoundScoresHistory` för komplett leaderboard.
+   */
+  onPlayerScoreRecorded?: (payload: PlayerScoreRecordedPayload) => void;
 }
 
 export interface SyncChannel {
@@ -294,6 +320,12 @@ export interface SyncChannel {
    * 'disconnected' till 'connected' i sin playerConnectionStatus-map.
    */
   broadcastPlayerRejoined: (payload: PlayerRejoinedPayload) => Promise<void>;
+  /**
+   * Broadcasta att vi just scorat en fråga i IndDev. Alla mottagare
+   * lägger till vår RoundScore i sin lokala `allRoundScoresHistory`
+   * så leaderboarden är komplett på alla enheter.
+   */
+  broadcastPlayerScoreRecorded: (payload: PlayerScoreRecordedPayload) => Promise<void>;
   /**
    * Rensar per-sender lastSeen + lastReported så watchdog:n börjar om från
    * scratch. Anropas av quiz.tsx när lokal monitor återgår från unstable
@@ -459,6 +491,15 @@ export function subscribeSyncChannel(
       handlers.onPlayerRejoined!(p.sender_id);
     });
   }
+  // player_score_recorded: en annan IndDev-spelare har svarat. Mottagaren
+  // mergar in score:n i sin lokala allRoundScoresHistory för komplett
+  // leaderboard. broadcast.self: false garanterar att sändarens egna klient
+  // ALDRIG tar emot sitt eget event.
+  if (handlers.onPlayerScoreRecorded) {
+    channel.on('broadcast', { event: 'player_score_recorded' }, ({ payload }) => {
+      handlers.onPlayerScoreRecorded!(payload as PlayerScoreRecordedPayload);
+    });
+  }
 
   // Subscribe-callback rapporterar channel-state till connectionMonitor.
   // SUBSCRIBED → ok. CHANNEL_ERROR/TIMED_OUT/CLOSED → error. DETTA är
@@ -594,6 +635,9 @@ export function subscribeSyncChannel(
         event: 'player_rejoined',
         payload,
       });
+    },
+    broadcastPlayerScoreRecorded: async (payload) => {
+      await channel.send({ type: 'broadcast', event: 'player_score_recorded', payload });
     },
     resetPeerTracking: () => {
       lastSeenBySender.clear();
