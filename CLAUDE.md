@@ -364,7 +364,7 @@ Five top-level collapsible sections — all use the same tappable-header pattern
 - Lobby har dessutom `clampEraToPlayer`-warning ovanpå (gulvarning om youngest player är född efter `to`); Profile har inget motsvarande eftersom inga spelare finns i kontext. Lobby:s clamp använder redan `toYear - 10` som adjustedFrom så det aligned:ar mot 10-års-minimum.
 - Profile:s `loadProfile`-effect clampar `gameEraFrom`/`gameEraTo` till nuvarande range (`Math.max(ERA_MIN, ...)` / `Math.min(ERA_MAX, ...)`) så äldre profiler från tiden då ERA_MIN var 1900 inte hamnar i ett tillstånd där rutan visar t.ex. "1925" medan thumben sitter låst på 1930.
 
-**Answer response time** (`answerResponseSeconds: 15 | 30 | 45 | 60`, default 30) = how long players have to answer a question. Distinct from how long question media (song/video/image) plays.
+**Answer response time** (`answerResponseSeconds: 30 | 45 | 60`, default 30) = how long players have to answer a question. Distinct from how long question media (song/video/image) plays. Minimum is 30s (15s option removed 2026-06-08); type `LobbyAnswerResponse` in `mockLobbySettings.ts`, `AnswerResponseSeconds` in `GetReadyIntro.tsx`, and `ResponseSecondsChangedPayload.seconds` in `syncChannel.ts` all reflect this.
 
 **TopUserBanner pill on Profile** opens a logout sheet via `logoutModalVisible` state — mirrors Home's `profileMenu` for the logged-in case (header with avatar emoji + Player Name + green "Logged in" status + Create Game + Join Game + Store + Log out + **Delete Account** + Cancel). After logout: `clearProfile()` + analytics + `router.replace('/')` to Home.
 
@@ -876,6 +876,7 @@ Glöm inte lägga till nya stores här när de skapas — annars läcker stale d
 
 - **TimelineQuestion** — musik-fråga. `correctYear`, `youtubeClips?`. Svar via `TimelineSelector` (year-scroll), scoring via `isCorrect(year, correctYear, interval, eraFrom, eraTo)`. Mediakort = `MediaPlayer` (YouTube).
 - **ImageQuestion** — bild-fråga. `displayName`, `letterGrid`, `optionsByPrefix`, `correctPrefix`, `prefixLength`. Svar via `ImageAnswerBlock` (Letter Grid → Final Selection), scoring via `pendingNameOption.isCorrect`. Mediakort = bild + `ProgressiveCover`.
+- **ActorSelectQuestion** (`contentSubject: 'actor'`) — film-fråga med skådespelar-svarsval. `displayName` = filmens titel, `correctYear` = filmens utgivningsår, `correctNames` (rätta skådisar) + `distractorNames` (felaktiga). Svar via `<ActorSelectBlock>` ([src/components/ActorSelectBlock.tsx](src/components/ActorSelectBlock.tsx)) som delar Letter Grid/full-names-mönster med `ImageAnswerBlock`. **Reveal-vyn** (2026-06-08): det rätta skådespelar-namnet visas med grön ram + filmens titel och år som undertitel i `nameStack`-kolumn (`movieTitle` + `movieYear` props från quiz.tsx). `displayName` → `movieTitle`, `correctYear` → `movieYear` i call-siten. Scorer via `handleConfirmActor` med `questionKind='name'`.
 
 **MainCategory-tagging** (2026-05-25): båda typer bär ett `mainCategory: MainCategory | null`-fält där `MainCategory = 'Music' | 'Film' | 'Sport'`. Härleds vid SEED-conversion via `subjectToMainCategory(contentSubject)`-helpern i quiz.tsx:
 - `song / artist / band` → **Music**
@@ -1275,7 +1276,7 @@ const ALL_QUESTIONS_MAP = new Map<string, QuizQuestion>(
    - `<QuizVibeLogo size={96} />` (utan tidigare "GET READY TO VIBE"-overlay).
    - **"Game settings"**-rubrik (FontSize.lg, bold).
    - **Game era**: `{eraFrom} – {eraTo}` (host:s val från Lobby, fixt under hela spelet).
-   - **Answer response time**: dropdown-trigger på samma rad som rubriken — visar `{N}s ▼` (`{N}s 🔒` när låst). Tap → Modal med 4 options (15s/30s/45s/60s). Quiz.tsx håller `responseSeconds` som state och passar `onAnswerResponseSecondsChange` så användaren kan justera mellan ronder.
+   - **Answer response time**: dropdown-trigger på samma rad som rubriken — visar `{N}s ▼` (`{N}s 🔒` när låst). Tap → Modal med 3 options (30s/45s/60s) — 15s-alternativet borttaget 2026-06-08. Quiz.tsx håller `responseSeconds` som state och passar `onAnswerResponseSecondsChange` så användaren kan justera mellan ronder.
    - **Locked-state i Pass-the-Phone**: `responseSecondsLocked = gameMode === 'pass-the-phone' && currentPlayerIndex !== 0`. När låst → tap visar info-Alert ("response time can only be changed at the start of a new round — when all players have answered the same number of questions"). Trigger:s border + text dimmas + ▼ byts till 🔒.
 3. **Current Leaderboard (utfällbar)** mellan settings och play. Default **collapsed** vid varje GetReadyIntro-mount. Tap på header → expand. Body är `position: 'absolute'` med `top: '100%'` + `zIndex: 100` + `elevation: 10` → **OVERLAY:ar** play + turordningstabellen istället för att skjuta dem nedåt. Innehållet bakom stannar på sin plats men göms tills body collapses igen. Layout: 3-kolumns sport-tabell (se "Leaderboard table" nedan). **Scoring guide** visas inuti overlay:n ovanför Player-headern — 3-kolumns tabell (Year/Letter × Minimal/Standard/Full) utan rubrik, med `scoringPlayerDivider` (1 px `Colors.border`, `marginHorizontal: Spacing.md`) som separator mot spelarlistan.
 4. **Play-knapp** (centrerad): `<QuizVibePlayLogo size={140} color={Colors.warning} />` — Q-logo med play-triangel inuti Q-ringen (ersätter den gamla blå rektangulära knappen). **Gold glow** runt logon: `playLogoHalo` (absolut-positionerad bakom, `Colors.warning` bg + animated opacity 0.35 → 0.8) + iOS-only shadow med `shadowColor: Colors.warning`. Scale-pulse 1 → 1.06 över 800ms.
@@ -1594,7 +1595,7 @@ Call-sites: `handleConfirm` (timeline) → `'year'`; `handleConfirmName` (image/
 
 **HCP-progression skalar mot binära scoring**: `calculateNewHCP` i [src/utils/hcp.ts](src/utils/hcp.ts) använder `roundHcp(pointsEarned / 2)` — så 2 rätt sänker HCP med 1, 1 rätt också 1 (0.5 rundas upp till spelarens fördel), 4 rätt med 2, etc. Tidigare divisor var 10 (matchade gamla 0-1000-modellen). HCP är ute ur launch-scope men formeln är skalad korrekt så feature:n kan återupplivas utan ytterligare beräknings-pass.
 
-**Answer response time** (`responseSeconds: 15 | 30 | 45 | 60`) är dynamisk state i quiz.tsx, justerbar via GetReadyIntro:s dropdown. Används överallt där 30 tidigare var hardcoded:
+**Answer response time** (`responseSeconds: 30 | 45 | 60`) är dynamisk state i quiz.tsx, justerbar via GetReadyIntro:s dropdown. Används överallt där 30 tidigare var hardcoded:
 - `startTimer`: `setTimeLeft(responseSeconds)` + `Animated.timing.duration: responseSeconds * 1000`.
 - `decimalElapsedMs`-tick + cap: `responseSeconds * 1000`.
 - `handleConfirm`: `responseSeconds - timeLeft` för timeUsed (loggas i RoundResult för leaderboard-AVG/LAST-kolumner; påverkar INTE pts-räkningen längre).
