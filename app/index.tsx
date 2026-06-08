@@ -1891,6 +1891,12 @@ export default function HomeScreen() {
       Alert.alert('Registration failed', 'Could not create account. Please try again.');
       return;
     }
+    // Beräkna default game era: från starten av spelarens generation till
+    // slutet av generation+2 (A=1950-64, B=1965-80, C=1981-96, D=1997-2012, E=2013-2026).
+    const _regCurrentYear = new Date().getFullYear();
+    const _genEndYears = [1964, 1980, 1996, 2012, _regCurrentYear];
+    const _genIdx = regParsedBirthYear <= 1964 ? 0 : regParsedBirthYear <= 1980 ? 1 : regParsedBirthYear <= 1996 ? 2 : regParsedBirthYear <= 2012 ? 3 : 4;
+    const _defaultEraTo = _genEndYears[Math.min(_genIdx + 2, 4)];
     const newProfile: ProfileData = {
       playerName: normalizedPlayerName,
       email: trimmedEmail,
@@ -1900,6 +1906,9 @@ export default function HomeScreen() {
       avatarSource: 'default',
       selectedAvatarId: '',
       gameEraFrom: regParsedBirthYear,
+      gameEraTo: _defaultEraTo,
+      gameMode: 'pass-the-phone',
+      singlePlayerDefault: false,
     };
     await saveProfile(newProfile);
     setProfile(newProfile);

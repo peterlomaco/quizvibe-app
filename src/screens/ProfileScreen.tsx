@@ -729,17 +729,23 @@ export default function ProfileScreen() {
         // augmented-profilen EN gång så samma värden används för både
         // setState OCH eventuellt saveProfile-write nedan; annars skulle
         // randomAdultBirthYear() ge olika värden vid varje reload.
+        // Beräkna default game era: från starten av spelarens generation till
+        // slutet av generation+2 (A=ERA_MIN-64, B=1965-80, C=1981-96, D=1997-2012, E=2013-ERA_MAX).
+        const resolvedBirthYear = data.birthYear ?? randomAdultBirthYear();
+        const _genEndYears = [1964, 1980, 1996, 2012, ERA_MAX];
+        const _genIdx = resolvedBirthYear <= 1964 ? 0 : resolvedBirthYear <= 1980 ? 1 : resolvedBirthYear <= 1996 ? 2 : resolvedBirthYear <= 2012 ? 3 : 4;
+        const _defaultEraTo = _genEndYears[Math.min(_genIdx + 2, 4)];
         const augmented: ProfileData = {
           ...data,
-          birthYear: data.birthYear ?? randomAdultBirthYear(),
+          birthYear: resolvedBirthYear,
           assistance: data.assistance ?? 'standard',
           // V1: bara Sweden. Coerce sparad 'nordics'/'global' (från innan
           // v1-launch-scopet) till 'sweden' så UI:t och persisterad state
           // alltid stämmer. wasIncomplete-checken nedan upptäcker att fältet
           // ändrades och persisterar via defensive write.
           region: 'sweden',
-          gameEraFrom: data.gameEraFrom ?? (data.birthYear != null ? Math.max(ERA_MIN, data.birthYear) : 1981),
-          gameEraTo: data.gameEraTo ?? ERA_MAX,
+          gameEraFrom: data.gameEraFrom ?? resolvedBirthYear,
+          gameEraTo: data.gameEraTo ?? _defaultEraTo,
           maxPlayers: data.maxPlayers ?? 4,
           gameMode: data.gameMode ?? 'pass-the-phone',
           singlePlayerDefault: data.singlePlayerDefault ?? false,
