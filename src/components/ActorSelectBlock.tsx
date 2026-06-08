@@ -49,6 +49,10 @@ interface Props {
   /** Reset:as när frågan byts — triggar ny shuffle. */
   resetKey: string | number;
   assistance: AssistanceLevel;
+  /** Filmtitel — visas under rätt namn i reveal. */
+  movieTitle?: string;
+  /** Filmens releasår — visas bredvid filmtiteln i reveal. */
+  movieYear?: number;
 }
 
 export function ActorSelectBlock({
@@ -61,6 +65,8 @@ export function ActorSelectBlock({
   onNameSelect,
   resetKey,
   assistance,
+  movieTitle,
+  movieYear,
 }: Props) {
   const nameList = useMemo(() => {
     // Alltid exakt 1 rätt svar — väljer slumpmässigt bland correctNames
@@ -116,15 +122,23 @@ export function ActorSelectBlock({
           const bg = isSelected || isCorrectRevealRow
             ? Colors.primaryMuted
             : Colors.cardElevated;
+          const showMovieMeta = isCorrectRevealRow && movieTitle;
           return (
             <Pressable
               key={name}
               onPress={onPress}
               style={[styles.nameButton, { borderColor, backgroundColor: bg }]}
             >
-              <Text style={[styles.nameText, { color: textColor }]} numberOfLines={1}>
-                {name}
-              </Text>
+              <View style={showMovieMeta ? styles.nameStack : undefined}>
+                <Text style={[styles.nameText, { color: textColor }]} numberOfLines={1}>
+                  {name}
+                </Text>
+                {showMovieMeta && (
+                  <Text style={styles.movieMeta} numberOfLines={1}>
+                    {movieTitle}{movieYear ? ` · ${movieYear}` : ''}
+                  </Text>
+                )}
+              </View>
               {showCorrectBadge && (
                 <View style={styles.correctBadge}>
                   <Text style={styles.correctBadgeText}>✓ Correct</Text>
@@ -168,9 +182,20 @@ export function ActorSelectBlock({
                   { borderColor, backgroundColor: Colors.primaryMuted },
                 ]}
               >
-                <Text style={[styles.nameText, { color: textColor }]} numberOfLines={1}>
-                  {name}
-                </Text>
+                {isCorrectRevealRow && movieTitle ? (
+                  <View style={styles.nameStack}>
+                    <Text style={[styles.nameText, { color: textColor }]} numberOfLines={1}>
+                      {name}
+                    </Text>
+                    <Text style={styles.movieMeta} numberOfLines={1}>
+                      {movieTitle}{movieYear ? ` · ${movieYear}` : ''}
+                    </Text>
+                  </View>
+                ) : (
+                  <Text style={[styles.nameText, { color: textColor }]} numberOfLines={1}>
+                    {name}
+                  </Text>
+                )}
                 {showCorrectBadge && (
                   <View style={styles.correctBadge}>
                     <Text style={styles.correctBadgeText}>✓ Correct</Text>
@@ -246,6 +271,16 @@ const styles = StyleSheet.create({
     fontSize: FontSize.md,
     fontWeight: FontWeight.semibold,
     flex: 1,
+  },
+  nameStack: {
+    flex: 1,
+    flexDirection: 'column',
+    gap: 2,
+  },
+  movieMeta: {
+    fontSize: FontSize.xs,
+    color: Colors.textSecondary,
+    lineHeight: 14,
   },
   correctBadge: {
     position: 'absolute',

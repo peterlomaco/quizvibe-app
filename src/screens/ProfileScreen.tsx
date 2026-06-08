@@ -150,9 +150,8 @@ const REGION_FLAGS: Record<string, string> = { sweden: '🇸🇪', Sweden: '🇸
 
 // Hur länge spelarna har på sig att svara på en fråga (skiljer sig från
 // hur länge själva frågematerialet — låt/video/bild — spelas upp).
-type AnswerResponse = 15 | 30 | 45 | 60;
+type AnswerResponse = 30 | 45 | 60;
 const ANSWER_RESPONSE_OPTIONS: { id: AnswerResponse; label: string }[] = [
-  { id: 15, label: '15 seconds' },
   { id: 30, label: '30 seconds' },
   { id: 45, label: '45 seconds' },
   { id: 60, label: '60 seconds' },
@@ -1828,7 +1827,7 @@ export default function ProfileScreen() {
               </Pressable>
             </View>
             <View style={styles.responseRow}>
-              {([15, 30, 45, 60] as const).map((sec) => {
+              {([30, 45, 60] as const).map((sec) => {
                 const isActive = answerResponseSeconds === sec;
                 return (
                   <Pressable

@@ -2130,22 +2130,6 @@ export default function HomeScreen() {
               </Text>
             )}
           </Pressable>
-          <Text style={[styles.footerDot, { fontFamily: taglineFont }]}>·</Text>
-          {/* Temporär dev-länk: Hints-preview (flagga + progressiva ledtrådar). */}
-          <Pressable onPress={() => router.push('/guess-who-demo')} hitSlop={8}>
-            {({ pressed }) => (
-              <Text
-                style={[
-                  styles.footerText,
-                  styles.footerLink,
-                  { fontFamily: taglineFont },
-                  pressed && { opacity: 0.6 },
-                ]}
-              >
-                Hints demo
-              </Text>
-            )}
-          </Pressable>
         </View>
       </View>
 

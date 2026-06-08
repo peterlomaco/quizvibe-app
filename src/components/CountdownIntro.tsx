@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import Svg, { Circle, Path, Rect } from 'react-native-svg';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
+import { MediaSourceIcon, MediaSourceType } from './MediaSourceIcon';
 
 interface Props {
   /** Anropas när nedräkningen passerat 1 → 0 OCH "?" har visats. */
@@ -39,6 +40,9 @@ interface Props {
   /** Avatar-emoji för spelaren — renderas i playerName-boxen som visuellt
    *  matchar GetReadyIntro:s currentPlayerBox (avatar + namn på rad). PtP-only. */
   playerEmoji?: string;
+  /** Mediakälla för frågan som strax ska ställas — visas som ikon mellan
+   *  playerBlock och Q-loggan. Spotify/YouTube/image/none. */
+  mediaSource?: MediaSourceType | null;
 }
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -60,7 +64,7 @@ const GLYPH_FONT_SIZE = LOGO_SIZE * 0.28;
  * att "?" visats i ~1 s fyras `onComplete` så parent kan växla fas till
  * `'question'`.
  */
-export function CountdownIntro({ onComplete, startFrom = 5, voiceFrom = 3, mode = 'pass-the-phone', playerName, playerEmoji, sayWho = true, silent = false }: Props) {
+export function CountdownIntro({ onComplete, startFrom = 5, voiceFrom = 3, mode = 'pass-the-phone', playerName, playerEmoji, mediaSource, sayWho = true, silent = false }: Props) {
   const isIndDev = mode === 'individual-devices';
   // Nunito 700 Bold för "QuizVibe"-brandraden — matchar startskärmens
   // appName-textformat 1:1. Faller tillbaka till systemfont under font-
@@ -242,6 +246,11 @@ export function CountdownIntro({ onComplete, startFrom = 5, voiceFrom = 3, mode 
             <Text style={[styles.getReadyBrandHeadline, brandFont && { fontFamily: brandFont }]}>
               QuizVibe
             </Text>
+            {mediaSource != null && (
+              <View style={styles.mediaSourceWrap}>
+                <MediaSourceIcon source={mediaSource} size={80} />
+              </View>
+            )}
           </View>
         ) : playerName ? (
           <View style={styles.playerBlock}>
@@ -256,6 +265,11 @@ export function CountdownIntro({ onComplete, startFrom = 5, voiceFrom = 3, mode 
                 {playerName}
               </Text>
             </View>
+            {mediaSource != null && (
+              <View style={styles.mediaSourceWrap}>
+                <MediaSourceIcon source={mediaSource} size={80} />
+              </View>
+            )}
           </View>
         ) : null}
         <View style={styles.logoStack}>
@@ -425,6 +439,12 @@ const styles = StyleSheet.create({
     fontWeight: FontWeight.bold,
     color: Colors.textPrimary,
     letterSpacing: 0.4,
+  },
+  // Mediakälla-ikon under playerBlock (PtP: under playerBox; IndDev: under
+  // QuizVibe-rubriken). Centrerad med liten vertikal separation från sin label.
+  mediaSourceWrap: {
+    alignItems: 'center',
+    marginTop: Spacing.sm,
   },
   logoStack: {
     width: LOGO_SIZE,

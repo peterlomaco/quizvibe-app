@@ -46,8 +46,8 @@ export interface PlayerAnswerConfirmedPayload {
 }
 
 export interface ResponseSecondsChangedPayload {
-  /** Host:s nya val. Speglar Lobby:s val-set (15/30/45/60). */
-  seconds: 15 | 30 | 45 | 60;
+  /** Host:s nya val. Speglar Lobby:s val-set (30/45/60). */
+  seconds: 30 | 45 | 60;
 }
 
 /**

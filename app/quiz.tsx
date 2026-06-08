@@ -747,13 +747,13 @@ export default function QuizScreen() {
   const selfPlayerId = params.selfPlayerId ?? '';
   // Initial answerResponseSeconds från Lobby-param. Spelaren kan justera
   // mellan ronder via GetReadyIntro:s settings-block, så vi håller värdet
-  // som state istället för konst. Endast 15/30/45/60 är giltiga (= host:s
+  // som state istället för konst. Endast 30/45/60 är giltiga (= host:s
   // val i Lobby), default 30 om paramet saknas vid direkt-nav.
   const initialResponseSeconds = (() => {
     const parsed = parseInt(String(params.answerResponseSeconds ?? '30'), 10);
-    return [15, 30, 45, 60].includes(parsed) ? (parsed as 15 | 30 | 45 | 60) : 30;
+    return [30, 45, 60].includes(parsed) ? (parsed as 30 | 45 | 60) : 30;
   })();
-  const [responseSeconds, setResponseSeconds] = useState<15 | 30 | 45 | 60>(
+  const [responseSeconds, setResponseSeconds] = useState<30 | 45 | 60>(
     initialResponseSeconds,
   );
   // Spotify DJ-läge — kräver Individual Devices (DJ lämnar appen → Spotify-appen).
@@ -3373,7 +3373,7 @@ export default function QuizScreen() {
   const playerAnswerConfirmedHandlerRef = useRef<
     (playerId: string, timeUsed: number) => void
   >(() => {});
-  const responseSecondsChangedHandlerRef = useRef<(seconds: 15 | 30 | 45 | 60) => void>(
+  const responseSecondsChangedHandlerRef = useRef<(seconds: 30 | 45 | 60) => void>(
     () => {},
   );
   // Cross-device score-aggregering: dedup-set + handler-ref för inkommande
@@ -3718,6 +3718,7 @@ export default function QuizScreen() {
         mode={gameMode}
         playerName={countdownPlayer?.name}
         playerEmoji={countdownPlayer?.emoji}
+        mediaSource={mediaSourceByQuestion[questionIndex] ?? null}
         onComplete={() => setPhase('question')}
         sayWho={isImageQuestion || isActorSelectQuestion}
         silent={!isHost}
@@ -4339,6 +4340,8 @@ export default function QuizScreen() {
                   onNameSelect={setPendingActorName}
                   resetKey={questionIndex}
                   assistance={currentAssistance}
+                  movieTitle={question.displayName}
+                  movieYear={question.correctYear}
                 />
               </View>
             ) : imageVariant ? (

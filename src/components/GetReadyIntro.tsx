@@ -36,8 +36,8 @@ export interface IntroPlayer {
   avatarUri?: string;
 }
 
-export type AnswerResponseSeconds = 15 | 30 | 45 | 60;
-const RESPONSE_SECONDS_OPTIONS: AnswerResponseSeconds[] = [15, 30, 45, 60];
+export type AnswerResponseSeconds = 30 | 45 | 60;
+const RESPONSE_SECONDS_OPTIONS: AnswerResponseSeconds[] = [30, 45, 60];
 
 /** Live-leaderboard-rad. Sortering ligger hos parent (poäng desc, ties
  *  brutna av lägsta avg response time). */
@@ -326,7 +326,12 @@ export function GetReadyIntro({
   // Dot-bar progress: rad-rektangulära pillar i två rader vid >10 dots,
   // en rad vid ≤10. total alltid jämn (Lobby:s ROUNDS_STEP=2 × heltal
   // players), så splitten blir alltid total/2 + total/2.
-  const renderDotBar = (total: number, filled: number, label: string) => {
+  const renderDotBar = (
+    total: number,
+    filled: number,
+    label: string,
+    iconsByDot?: (QuestionMediaType | null)[],
+  ) => {
     const halfSplit = total > 10;
     const topCount = halfSplit ? total / 2 : total;
     const bottomCount = halfSplit ? total / 2 : 0;
@@ -339,12 +344,17 @@ export function GetReadyIntro({
     const renderDot = (globalIdx: number) => {
       const isFilled = globalIdx < filled;
       const isCurrent = label === 'Question' && globalIdx === filled - 1;
+      const icon = iconsByDot?.[globalIdx] ?? null;
       const style = [
         styles.progressDot,
         isFilled && styles.progressDotFilled,
+        icon != null && styles.progressDotRow,
       ];
-      const numberLabel = (
-        <Text style={styles.progressDotNumber}>{globalIdx + 1}</Text>
+      const content = (
+        <>
+          <Text style={styles.progressDotNumber}>{globalIdx + 1}</Text>
+          {icon != null && <MediaSourceIcon source={icon} size={14} />}
+        </>
       );
       if (isCurrent) {
         return (
@@ -352,13 +362,13 @@ export function GetReadyIntro({
             key={`pdot-${label}-${globalIdx}`}
             style={[style, { opacity: nextBlink }]}
           >
-            {numberLabel}
+            {content}
           </Animated.View>
         );
       }
       return (
         <View key={`pdot-${label}-${globalIdx}`} style={style}>
-          {numberLabel}
+          {content}
         </View>
       );
     };
@@ -1147,7 +1157,19 @@ export function GetReadyIntro({
           // separator-raden i kön behålls eftersom det är enda visuella
           // signal för round-byten i listan nu.
           <View style={styles.tableBlock}>
-            {!isSinglePlayer && renderDotBar(totalRounds, currentRound, 'Rounds')}
+            {!isSinglePlayer && renderDotBar(
+              totalRounds,
+              currentRound,
+              'Rounds',
+              mediaSourceByQuestion
+                ? (() => {
+                    const turnIdx = (currentQuestion - 1) % Math.max(1, playerCount);
+                    return Array.from({ length: totalRounds }, (_, r) =>
+                      mediaSourceByQuestion[r * playerCount + turnIdx] ?? null,
+                    );
+                  })()
+                : undefined,
+            )}
             {renderDotBar(totalQuestions, currentQuestion, 'Question')}
 
             <View style={[styles.tableRow, styles.tableHeaderRow]}>
@@ -2175,6 +2197,12 @@ const styles = StyleSheet.create({
   progressDotFilled: {
     backgroundColor: Colors.primaryMuted,
     borderColor: Colors.primary,
+  },
+  // Rad-layout när mediaikonen visas inuti dot:en (Rounds-baren).
+  progressDotRow: {
+    flexDirection: 'row',
+    gap: 4,
+    paddingHorizontal: 6,
   },
   // Siffra inuti varje dot (1-baserad globalIdx). Blå-tonad så den läses
   // mot både unfilled (transparent bg) och filled (primaryMuted bg) — primary

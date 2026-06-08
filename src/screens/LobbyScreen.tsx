@@ -1511,7 +1511,7 @@ export default function LobbyScreen() {
   // Hur länge spelarna har på sig att svara på en fråga (sekunder). Ingen
   // Lobby-UI än — propageras vidare till quiz.tsx via handleStartGame så
   // host:s profil-default följer med in i spelet.
-  const [answerResponseSeconds, setAnswerResponseSeconds] = useState<15 | 30 | 45 | 60>(30);
+  const [answerResponseSeconds, setAnswerResponseSeconds] = useState<30 | 45 | 60>(30);
   // gameMode-state declareras längre ner — se rad ~751.
   const [regionModalOpen, setRegionModalOpen] = useState(false);
 
@@ -5289,7 +5289,7 @@ export default function LobbyScreen() {
                   (disabled={!hostMode}). Default-värdet seeds från host:s
                   profil via host-seed-effekten ovan. */}
               <View style={styles.responseRow}>
-                {([15, 30, 45, 60] as const).map((sec) => {
+                {([30, 45, 60] as const).map((sec) => {
                   const isActive = answerResponseSeconds === sec;
                   return (
                     <Pressable

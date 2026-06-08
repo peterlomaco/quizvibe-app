@@ -17,7 +17,7 @@ export type LobbyGameMode = 'pass-the-phone' | 'individual-devices';
 // constraint. Adapter-funktionerna nedan översätter mellan.
 export type LobbyRegion = 'Sweden' | 'Nordics' | 'Europe' | 'Global';
 type DbRegion = 'sweden' | 'nordics' | 'europe' | 'global';
-export type LobbyAnswerResponse = 15 | 30 | 45 | 60;
+export type LobbyAnswerResponse = 30 | 45 | 60;
 
 export interface LobbySettings {
   gameMode: LobbyGameMode;

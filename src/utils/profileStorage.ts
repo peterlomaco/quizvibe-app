@@ -47,7 +47,7 @@ export interface ProfileData {
   // Hur länge spelarna har på sig att svara på en fråga (i sekunder).
   // Skiljer sig från hur länge frågematerialet (låt/video/bild) spelas upp.
   // Optional för bakåtkompatibilitet — defaultas till 30 i UI.
-  answerResponseSeconds?: 15 | 30 | 45 | 60;
+  answerResponseSeconds?: 30 | 45 | 60;
   // Game era — år-spann för frågor (host-default vid skapande av spel).
   // Optional för bakåtkompatibilitet — defaultas till [1980, 2010] i UI.
   gameEraFrom?: number;
@@ -160,7 +160,7 @@ interface ProfileRow {
   game_credits: number;
   free_game_credits: number;
   last_free_credits_refresh_date: string | null;
-  answer_response_seconds: 15 | 30 | 45 | 60;
+  answer_response_seconds: 30 | 45 | 60;
   game_era_from: number | null;
   game_era_to: number | null;
   max_players: 4 | 12;
