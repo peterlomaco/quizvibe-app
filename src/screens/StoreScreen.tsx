@@ -112,34 +112,6 @@ const SUBSCRIPTION_TIERS: SubscriptionTier[] = [
     priceAmount: 79,
     pricePerMonth: '79 kr / month',
   },
-  {
-    id: 'sub-3mth',
-    productId: 'pkg_sub_quarterly_v2',
-    label: '3 months',
-    price: '199 kr',
-    priceAmount: 199,
-    pricePerMonth: '~66 kr / month',
-    savePct: 16,
-  },
-  {
-    id: 'sub-6mth',
-    productId: 'pkg_sub_halfyear',
-    label: '6 months',
-    price: '279 kr',
-    priceAmount: 279,
-    pricePerMonth: '~47 kr / month',
-    savePct: 41,
-  },
-  {
-    id: 'sub-year',
-    productId: 'pkg_sub_yearly',
-    label: '12 months',
-    price: '399 kr',
-    priceAmount: 399,
-    pricePerMonth: '~33 kr / month',
-    badge: 'BEST VALUE',
-    savePct: 58,
-  },
 ];
 
 interface SubscriptionFeature {

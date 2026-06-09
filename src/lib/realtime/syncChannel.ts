@@ -23,6 +23,11 @@ export interface PlayCommandPayload {
    *  lokala pool för att garantera att alla enheter visar samma fråga oavsett
    *  lokal shuffle-ordning (IndDev question-sync). */
   question_id: string;
+  /** Alla fråge-IDs i host:s spel-ordning (index = questionIndex 0..N-1).
+   *  Används av non-host för att visa korrekta media-source-ikoner i GetReady-kön
+   *  oavsett lokal shuffle-ordning. Inkluderas i varje play_command så
+   *  reconnecting players alltid har aktuell sekvens. */
+  all_question_ids?: string[];
 }
 
 export interface QuestionAdvancePayload {
@@ -137,6 +142,16 @@ export interface SpotifyDJTrackStartedPayload {
 }
 
 /**
+ * DJ:n har tryckt "Start track in Spotify" och Spotify-appen öppnats.
+ * Broadcastas INNAN DJ trycker "Activate timer" så gissarnas step-guide
+ * kan hoppa från steg 1 → steg 2.
+ */
+export interface SpotifyDJOpenedAppPayload {
+  /** DJ:ns lobby_players.player_id. */
+  dj_player_id: string;
+}
+
+/**
  * D-iv: host justerade audio för en specifik spelare i GetReady-vyn.
  * Incremental update — bara den ändrade spelaren broadcastas, inte hela
  * map:en. Mottagare uppdaterar sin lokala `playerAudioOverrides[player_id]`
@@ -177,6 +192,19 @@ export interface HostActivePingPayload {
   /** Host:s aktuella questionIndex (0-baserat). Mottagare alignar lokal
    *  state mot detta värde — idempotent när redan synkad. */
   question_index: number;
+}
+
+/**
+ * Host broadcastar hela fråge-sekvensen en gång vid quiz-mount, 800ms
+ * efter subscribe:n (för att non-host hunnit subscriba). Används av
+ * non-host för att beräkna korrekta media-source-ikoner i GetReady-kön
+ * från och med FÖRSTA GetReady-skärmen (innan första play_command).
+ *
+ * play_command bär samma data i all_question_ids för reconnect-fall.
+ */
+export interface GameSequenceInitPayload {
+  /** Alla fråge-IDs i host:s spel-ordning (index = questionIndex 0..N-1). */
+  all_question_ids: string[];
 }
 
 /**
@@ -247,6 +275,9 @@ export interface SyncChannelHandlers {
   /** Spotify-fråga börjar. DJ:n visar "Starta i Spotify"-knapp;
    *  gissarna förbereder albumomslags-fetch. */
   onSpotifyQuestionReady?: (payload: SpotifyQuestionReadyPayload) => void;
+  /** DJ:n har tryckt "Start track in Spotify" — gissarnas step-guide hoppar
+   *  från steg 1 till steg 2 (innan timer aktiveras). */
+  onSpotifyDJOpenedApp?: (payload: SpotifyDJOpenedAppPayload) => void;
   /** DJ:n har öppnat Spotify — gissarnas timer + svar-block aktiveras. */
   onSpotifyDJTrackStarted?: (payload: SpotifyDJTrackStartedPayload) => void;
   /** D-iv: host justerade audio för en spelare. Alla mottagare uppdaterar
@@ -258,6 +289,12 @@ export interface SyncChannelHandlers {
    *  klienten resetar sin lastHostActivityAt-ref och eventuell pågående
    *  inactivity-countdown avbryts. */
   onHostActivePing?: (payload: HostActivePingPayload) => void;
+  /**
+   * Host broadcastar hela fråge-sekvensen vid quiz-mount (800ms delay).
+   * Non-host sätter broadcastAllQuestionIds → korrekta media-source-ikoner
+   * i GetReady-kön från första GetReady-skärmen.
+   */
+  onGameSequenceInit?: (payload: GameSequenceInitPayload) => void;
   /**
    * Fyrar när en remote spelares heartbeat-state övergår till
    * 'disconnected' (= vi har inte hört från sender:n på >15s, efter att
@@ -305,6 +342,8 @@ export interface SyncChannel {
   broadcastLobbyDeleted: (payload: LobbyDeletedPayload) => Promise<void>;
   /** Host broadcastar start av Spotify-fråga med DJ-tilldelning. */
   broadcastSpotifyQuestionReady: (payload: SpotifyQuestionReadyPayload) => Promise<void>;
+  /** DJ:ns klient broadcastar att "Start track in Spotify" tryckts (innan timer). */
+  broadcastSpotifyDJOpenedApp: (payload: SpotifyDJOpenedAppPayload) => Promise<void>;
   /** DJ:ns klient broadcastar att Spotify-appen öppnats. */
   broadcastSpotifyDJTrackStarted: (payload: SpotifyDJTrackStartedPayload) => Promise<void>;
   /** D-iv: host broadcastar ny audio-state för en specifik spelare. */
@@ -335,6 +374,8 @@ export interface SyncChannel {
    * förrän först en heartbeat tagits emot OCH sedan saknats >15s.
    */
   resetPeerTracking: () => void;
+  /** Host broadcastar hela fråge-sekvensen vid quiz-mount. */
+  broadcastGameSequenceInit: (payload: GameSequenceInitPayload) => Promise<void>;
   unsubscribe: () => void;
 }
 
@@ -450,6 +491,11 @@ export function subscribeSyncChannel(
       handlers.onSpotifyQuestionReady!(payload as SpotifyQuestionReadyPayload);
     });
   }
+  if (handlers.onSpotifyDJOpenedApp) {
+    channel.on('broadcast', { event: 'spotify_dj_opened_app' }, ({ payload }) => {
+      handlers.onSpotifyDJOpenedApp!(payload as SpotifyDJOpenedAppPayload);
+    });
+  }
   if (handlers.onSpotifyDJTrackStarted) {
     channel.on('broadcast', { event: 'spotify_dj_track_started' }, ({ payload }) => {
       handlers.onSpotifyDJTrackStarted!(payload as SpotifyDJTrackStartedPayload);
@@ -463,6 +509,11 @@ export function subscribeSyncChannel(
   if (handlers.onHostActivePing) {
     channel.on('broadcast', { event: 'host_active_ping' }, ({ payload }) => {
       handlers.onHostActivePing!(payload as HostActivePingPayload);
+    });
+  }
+  if (handlers.onGameSequenceInit) {
+    channel.on('broadcast', { event: 'game_sequence_init' }, ({ payload }) => {
+      handlers.onGameSequenceInit!(payload as GameSequenceInitPayload);
     });
   }
   // Heartbeat-receiver: per-sender-tracking. Markera bara lastSeen —
@@ -612,6 +663,9 @@ export function subscribeSyncChannel(
     broadcastSpotifyQuestionReady: async (payload) => {
       await channel.send({ type: 'broadcast', event: 'spotify_question_ready', payload });
     },
+    broadcastSpotifyDJOpenedApp: async (payload) => {
+      await channel.send({ type: 'broadcast', event: 'spotify_dj_opened_app', payload });
+    },
     broadcastSpotifyDJTrackStarted: async (payload) => {
       await channel.send({ type: 'broadcast', event: 'spotify_dj_track_started', payload });
     },
@@ -638,6 +692,9 @@ export function subscribeSyncChannel(
     },
     broadcastPlayerScoreRecorded: async (payload) => {
       await channel.send({ type: 'broadcast', event: 'player_score_recorded', payload });
+    },
+    broadcastGameSequenceInit: async (payload) => {
+      await channel.send({ type: 'broadcast', event: 'game_sequence_init', payload });
     },
     resetPeerTracking: () => {
       lastSeenBySender.clear();

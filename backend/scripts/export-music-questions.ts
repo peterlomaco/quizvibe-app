@@ -39,6 +39,9 @@ interface ExportedMusicQuestion {
   /** Genre/tema-paket-taggar (t.ex. ["sport"]). Emittas bara när non-empty.
    *  Driver klientens crossover-filter (sport-musik surfar under Music+Sport). */
   genrePackages?: string[];
+  /** Geografisk igenkännings-scope. Item-level overridar fil-header.
+   *  'unknown-region' = ej i base-pool (reserverat för host-paket). */
+  region: string[];
   youtubeClips: ExportedYoutubeClip[];
   /** actor-select: true = animerad film (karaktärnamn), false/utelämnat = live-action (skådespelarnamn). */
   isAnimated?: boolean;
@@ -75,6 +78,9 @@ export interface MusicQuestion {
   questionText: string;
   audiences: MusicQuestionAudience[];
   genrePackages?: string[];
+  /** Geografisk igenkännings-scope. Item-level overridar fil-header.
+   *  'unknown-region' = ej i base-pool; filtreras bort i SEED_QUESTIONS. */
+  region: string[];
   youtubeClips: YoutubeClip[];
   /** Spotify track ID — satt manuellt i YAML för Spotify DJ-läge. */
   spotifyTrackId?: string;
@@ -142,6 +148,9 @@ async function main(): Promise<void> {
         questionText,
         // Item-level audience-override har företräde över file-header.
         audiences: item.audience ?? file.audience,
+        // Item-level region-override har företräde över fil-header.
+        // 'unknown-region' → filtreras bort i SEED_QUESTIONS på klienten.
+        region: item.region ?? file.region,
         // genrePackages (t.ex. ["sport"]) — bara när non-empty.
         ...(item.genrePackages.length ? { genrePackages: item.genrePackages } : {}),
         // Spotify track ID — bara om satt.

@@ -115,6 +115,9 @@ interface Props {
   /** 0-baserade frågeindex som är Spotify DJ-rundor. Driver speciell
    *  grön chip-rendering i kön (Spotify-ikon + "Spotify DJ"-label). */
   spotifyQuestionIndices?: number[];
+  /** Namn på DJ:n för frågan som visas härnäst (currentQuestion - 1).
+   *  Undefined om frågan inte är en Spotify-runda. */
+  nextDJName?: string;
   /** Game era från Lobby — visas i Game settings-blocket. */
   eraFrom: number;
   eraTo: number;
@@ -243,6 +246,7 @@ export function GetReadyIntro({
   categoryByQuestion,
   answerTypeByQuestion,
   spotifyQuestionIndices,
+  nextDJName,
   currentRound,
   totalRounds,
   currentQuestion,
@@ -289,6 +293,27 @@ export function GetReadyIntro({
   // Host:s effektiva audio-state — driver trigger-text + HeartbeatSound-gating.
   const hostAudioOn = hostPlayerId ? audioOnForPlayer(hostPlayerId) : true;
   const [audioModalOpen, setAudioModalOpen] = useState(false);
+  // Interceptar play-knappens onPress i IndDev för att varna host om
+  // disconnected peers INNAN nästa fråga startar.
+  const handlePlayPress = () => {
+    if (isIndDev && isHost && playerConnectionStatus) {
+      const disconnectedCount = Object.values(playerConnectionStatus).filter(
+        (s) => s === 'disconnected',
+      ).length;
+      if (disconnectedCount > 0) {
+        Alert.alert(
+          'Unstable network',
+          'Some players seem to have unstable network. These will not participate in next question. Play anyway?',
+          [
+            { text: 'Cancel', style: 'cancel' },
+            { text: 'Play anyway', onPress: onReady },
+          ],
+        );
+        return;
+      }
+    }
+    onReady();
+  };
   // D-iii: bad-connection-overlay. Visning styrs av parent (quiz.tsx) via
   // `unstableLocked`-prop när satt — det inkluderar sticky-latch-logiken
   // som persisterar genom phase-byten tills Retry trycks. När prop:en är
@@ -1003,7 +1028,7 @@ export function GetReadyIntro({
                 />
                 <TouchableOpacity
                   activeOpacity={0.85}
-                  onPress={onReady}
+                  onPress={handlePlayPress}
                   accessibilityLabel={`${playerName} press to start your turn`}
                   style={styles.playLogoTouchable}
                 >
@@ -1077,6 +1102,11 @@ export function GetReadyIntro({
                   <Text style={styles.mediaLabel} numberOfLines={1}>
                     {mediaSourceLabel(mediaSourceByQuestion?.[currentQuestion - 1])}
                   </Text>
+                  {nextDJName && (
+                    <Text style={styles.nextDJLabel} numberOfLines={1}>
+                      Next DJ will be {nextDJName}
+                    </Text>
+                  )}
                   {currentAnswerType && (
                     <View style={styles.answerTypeBadge} pointerEvents="none">
                       <Text style={styles.answerTypeBadgeText}>{currentAnswerType}</Text>
@@ -2016,6 +2046,14 @@ const styles = StyleSheet.create({
     color: Colors.textPrimary,
     letterSpacing: 0.3,
     textAlign: 'center',
+  },
+  nextDJLabel: {
+    fontSize: FontSize.xs,
+    fontWeight: FontWeight.semibold,
+    color: '#1DB954',
+    textAlign: 'center',
+    flexShrink: 1,
+    marginTop: 2,
   },
   // ── Kö-chips-rad (delas av IndDev + PtP) ─────────────────────────────
   // Vänster-packad rad: chips med 4pt gap mellan, slutmarkören inline efter

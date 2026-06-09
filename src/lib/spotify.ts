@@ -36,9 +36,11 @@ const CLIENT_ID = process.env.EXPO_PUBLIC_SPOTIFY_CLIENT_ID ?? '';
 const REDIRECT_URI = 'quizvibeapp://spotify-callback';
 
 const SCOPES = [
-  'user-read-private',       // Krävs för att läsa product (premium/free)
-  'user-read-email',         // Visat e-post i connect-bekräftelsen
-  'app-remote-control',      // Framtida: fjärrstyrning om native bridge byggs
+  'user-read-private',       // Krävs för att läsa product (premium/free) via /v1/me
+  'user-read-email',         // Visad e-post i connect-bekräftelsen
+  // 'app-remote-control' borttagen — kräver Spotifys explicita produktionsgodkännande
+  // och behövs inte eftersom vi öppnar låtar via deep link (spotify:track:ID),
+  // inte via Spotify SDK. Att inkludera den kan göra att /v1/me returnerar 403.
 ].join(' ');
 
 const SPOTIFY_ACCOUNTS_BASE = 'https://accounts.spotify.com';
@@ -113,16 +115,23 @@ export async function connectSpotify(): Promise<ConnectSpotifyResult> {
     scope: SCOPES,
     code_challenge_method: 'S256',
     code_challenge: codeChallenge,
-    show_dialog: 'false',   // Visa inte Spotify-dialogen igen om redan inloggad.
+    show_dialog: 'false',
   });
   const authUrl = `${SPOTIFY_ACCOUNTS_BASE}/authorize?${params.toString()}`;
 
   // Öppna systembrowser. Expo hanterar callback via app-scheme och stänger
   // browsern automatiskt (WebBrowser.maybeCompleteAuthSession() ovan).
   const result = await WebBrowser.openAuthSessionAsync(authUrl, REDIRECT_URI);
+  console.log(
+    '[spotify] openAuthSessionAsync →',
+    result.type,
+    result.type === 'success' ? result.url?.substring(0, 120) : '',
+  );
 
   if (result.type !== 'success' || !result.url) {
-    // Användaren stängde browsern utan att logga in.
+    // Användaren stängde browsern utan att logga in, ELLER scheme-mismatch
+    // (t.ex. Expo Go istället för dev-build — 'quizvibeapp://' fungerar ej i Expo Go).
+    console.warn('[spotify] Browser avslutades utan callback, type:', result.type);
     return { ok: false, reason: 'cancelled' };
   }
 
@@ -134,14 +143,23 @@ export async function connectSpotify(): Promise<ConnectSpotifyResult> {
     console.warn('[spotify] Callback saknar code, error:', error);
     return { ok: false, reason: error === 'access_denied' ? 'cancelled' : 'exchange_failed' };
   }
+  console.log('[spotify] Code OK, byter mot tokens…');
 
   // Byt code mot tokens.
   const tokens = await exchangeCodeForTokens(code, codeVerifier);
-  if (!tokens) return { ok: false, reason: 'exchange_failed' };
+  if (!tokens) {
+    console.error('[spotify] exchangeCodeForTokens returnerade null');
+    return { ok: false, reason: 'exchange_failed' };
+  }
+  console.log('[spotify] Tokens OK, hämtar /v1/me…');
 
   // Hämta user-info + verifiera Premium.
   const spotifyUser = await fetchSpotifyMe(tokens.accessToken);
-  if (!spotifyUser) return { ok: false, reason: 'api_error' };
+  if (!spotifyUser) {
+    console.error('[spotify] fetchSpotifyMe returnerade null');
+    return { ok: false, reason: 'api_error' };
+  }
+  console.log('[spotify] /v1/me OK, isPremium:', spotifyUser.isPremium, 'displayName:', spotifyUser.displayName);
 
   if (!spotifyUser.isPremium) {
     Alert.alert(
@@ -153,7 +171,9 @@ export async function connectSpotify(): Promise<ConnectSpotifyResult> {
   }
 
   // Spara till Supabase.
+  console.log('[spotify] Sparar till Supabase…');
   await saveSpotifyConnection(spotifyUser, tokens);
+  console.log('[spotify] saveSpotifyConnection klar → returnerar ok:true');
 
   return { ok: true, user: spotifyUser };
 }
@@ -209,7 +229,11 @@ async function fetchSpotifyMe(accessToken: string): Promise<SpotifyUser | null> 
     const res = await fetch(`${SPOTIFY_API_BASE}/me`, {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
-    if (!res.ok) return null;
+    if (!res.ok) {
+      const body = await res.text().catch(() => '');
+      console.error('[spotify] /v1/me HTTP', res.status, body.substring(0, 200));
+      return null;
+    }
     const data = await res.json();
     return {
       spotifyUserId: data.id,

@@ -118,7 +118,6 @@ export function getDJForQuestionIndex(
 // ── Spotify Deep Link ─────────────────────────────────────────────────
 
 const SPOTIFY_URI_SCHEME = 'spotify:track:';
-const SPOTIFY_WEB_FALLBACK = 'https://open.spotify.com/track/';
 
 /**
  * Öppnar Spotify-appen på rätt låt via deep link.
@@ -136,21 +135,13 @@ const SPOTIFY_WEB_FALLBACK = 'https://open.spotify.com/track/';
  */
 export async function openSpotifyTrack(spotifyTrackId: string): Promise<boolean> {
   const nativeUri = `${SPOTIFY_URI_SCHEME}${spotifyTrackId}`;
-  const webFallback = `${SPOTIFY_WEB_FALLBACK}${spotifyTrackId}`;
 
   try {
-    // canOpenURL kräver att 'spotify' är i LSApplicationQueriesSchemes (Info.plist)
-    // och i Android queries-blocket (AndroidManifest.xml). Expo hanterar detta
-    // via app.json-konfigurationen (se "Expo-konfiguration" nedan).
-    const canOpen = await Linking.canOpenURL(nativeUri);
-
-    if (canOpen) {
-      await Linking.openURL(nativeUri);
-      return true;
-    }
-
-    // Spotify inte installerat → webbfallback (iOS frågar om App Store-öppning)
-    await Linking.openURL(webFallback);
+    // Kör direkt openURL utan canOpenURL-gate — canOpenURL returnerar alltid false
+    // i Expo Go eftersom LSApplicationQueriesSchemes i app.json bara gäller
+    // dev-/standalone-builds. Direktanrop låter OS:t hantera: Spotify öppnar om
+    // installerat, annars visar systemet ett "no app" varningsdialogruta.
+    await Linking.openURL(nativeUri);
     return true;
   } catch (err) {
     console.warn('[spotifyDJ] openSpotifyTrack failed:', err);

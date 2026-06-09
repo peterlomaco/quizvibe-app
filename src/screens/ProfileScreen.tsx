@@ -666,6 +666,12 @@ export default function ProfileScreen() {
       setSpotifyConnected(true);
       setSpotifyDisplayName(result.user.displayName);
       setSpotifyEnabled(true);
+    } else if (result.reason !== 'not_premium' && result.reason !== 'cancelled') {
+      Alert.alert(
+        'Spotify connection failed',
+        `Could not connect Spotify account (${result.reason}). Check your internet connection and try again.`,
+        [{ text: 'OK' }],
+      );
     }
   };
 

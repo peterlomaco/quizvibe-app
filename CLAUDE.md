@@ -290,6 +290,15 @@ Helpers exporteras: `appendPlayerNameLetter`, `appendPlayerNameDigit`, `backspac
 
 Default Assistance='standard', Region='global' on the Register form so the user can submit immediately after Year of birth — both fields show under a "Use default or select prefered setup" hint.
 
+**Registration host-defaults** (sätts i `handleRegisterSubmit` i [app/index.tsx](app/index.tsx) och speglas i ProfileScreen:s auto-augment för ofullständiga profiler):
+- `gameMode: 'pass-the-phone'`, `singlePlayerDefault: false` — Pass-the-Phone är default-läge.
+- `roundsDefault: 4` (ROUNDS_DEFAULT) — 4 rundor.
+- `answerResponseSeconds: 30` — 30 sekunders svarstid.
+- `youtubeEnabledCategories` + `imagesEnabledCategories`: alla 3 (Music/Film/Sport) — allt aktiverat.
+- `spotifyDefaultEnabled: false` — Spotify av.
+- **`gameEraFrom`**: spelarens födelseår.
+- **`gameEraTo`**: slutet av spelarens generation + 2 steg framåt. Generationer (A–E): A=≤1964, B=1965–80, C=1981–96, D=1997–2012, E=2013–ERA_MAX. Exempel: född 1977 (gen B) → era_to = 2012 (D); född 1985 (gen C) → era_to = ERA_MAX (E). Implementerat via `_genEndYears=[1964,1980,1996,2012,currentYear]`, `min(genIdx+2, 4)`.
+
 **Year of birth-caps**: Profile, Register-form och Guest-form har gemensamma cap:ar `MIN_BIRTH_YEAR = 1930`, `MAX_BIRTH_YEAR = CURRENT_YEAR - 15` (dynamisk — 15+ minimum ålder; höjt från 13+ 2026-06-01 pga 15+-gränsat film-/innehåll i appen, utöver App Store / GDPR). Endpoints renderas via `formatBirthYear`-helper som lägger till "or earlier" på 1930 och "or later" på MAX_BIRTH_YEAR — representerar öppna intervall (alla födda ≤1930 / ≥CURRENT_YEAR-15). `formatBirthYear` används både i picker-listan och i selector-trigger-texten så framing är konsistent. Profile + Register + Guest delar samma `BIRTH_YEARS`-array och format-helper (Profile har egen kopia eftersom den lever i en annan fil — håll dem synkade vid framtida ändringar). LobbyScreen har egen kopia med samma formel.
 
 **Password** (Register-form): `REG_PASSWORD_MIN_LENGTH = 6`, `REG_PASSWORD_MAX_LENGTH = 32`. Placeholder + maxLength + format-hint ("Format: min 6-32 characters") under fältet deriveras från konstanterna. Min 6 = NIST-baseline så användare inte tvingas migrera vid backend-integration. Max 32 = under bcrypt:s 72-byte-cap med marginal + täcker alla realistiska lösenord/passphrases utan att blåsa upp testytan.
@@ -544,7 +553,7 @@ Four sections in `src/screens/StoreScreen.tsx` under header **"Add QuizVibe Prem
 1. **Basic plan** — single card with FREE badge (border-cutting pattern, green) + green ACTIVE pill in card-right. Headline `"2 (+2 bonus) Host Games / day"` med `numberOfLines={1}` + `adjustsFontSizeToFit` + `minimumFontScale={0.75}` så texten inte wrap:as på smala skärmar. "+ Unlimited games as invited player" + "Refreshes every day at midnight CET" sublines.
 2. ~~**Customized Host Packages**~~ — **PARKERAD till v1.1+** (scope-beslut 2026-05-23). `PACKAGE_TIERS = []` så hela sektionen är gömd (`packagesSection = null` när tom). Themed packages-render-logiken finns kvar i koden för enkel re-aktivering: lägg tillbaka items i `PACKAGE_TIERS` + `PURCHASED_PACKAGES` så dyker sektionen upp igen utan andra ändringar. För V1 har user **inga paket alls** — gen-paket-konceptet togs bort 2026-05-27 så det enda quiz-styr-mekanismen är Main categories-toggle:n (Music/Film/Sport) + Game era + Game Connections-källor.
 3. **Credit packages** — 3 one-time-purchase tiers (5/10/20 Host Games at 19/29/49 kr). Save% computed against the smallest tier; BEST VALUE badge on the 20-game tier.
-4. **QuizVibe membership plans** — 5-feature comparison list (Premium left / Basic right per row) inside a feature card, then 4 subscription tiers (1mth/3mth/6mth/12mth at 79/199/279/399 kr). All auto-renewal (footnote: "Cancel anytime in your App Store or Google Play account."). BEST VALUE on annual (399 kr/12mth ≈ 33 kr/month, save 58% vs monthly).
+4. **QuizVibe membership plans** — 5-feature comparison list (Premium left / Basic right per row) inside a feature card, then **1 subscription tier (1mth at 79 kr, 2026-06-09)** — de tre längre planerna (3mth/6mth/12mth) togs bort. `SUBSCRIPTION_TIERS`-arrayn har nu bara ett objekt (`sub-1mth`). `SubscriptionTier.badge?` och `savePct?` är optional så inga kraschar. Auto-renewal-fotnoten finns kvar.
 
 Shared `CreditTierCard`, `PackageTierCard` and `SubscriptionTierCard` mirror the same layout (left: headline + per-game/per-month subline + optional save%; right: price + Buy/Subscribe button).
 
@@ -1275,6 +1284,8 @@ YouTube-klippen är NOTERAT INTE bara musik — kan vara filmscener, sporthände
 
 Hand-off-skärmen mellan Lobby:s Start Game-tap och första quiz-frågan. [src/components/GetReadyIntro.tsx](src/components/GetReadyIntro.tsx) renderas av [app/quiz.tsx](app/quiz.tsx) som `'intro'`-fas — initial fas vid spelstart i båda lägena, OCH mellan rundor i båda lägena. Tap på Q-play-logo i intro:n → `'countdown'`-fas **omedelbart** (ingen delay) → `'question'`-fas.
 
+**Unstable network-popup (2026-06-09)**: i IndDev, när host tappar Play-knappen, kontrolleras `playerConnectionStatus` (Record\<string, 'connected'|'disconnected'\>) mot antalet `'disconnected'`-peers. Om ≥1 disconnected → Alert "Some players seem to have unstable network. These will not participate in next question. Play anyway?" med Cancel + "Play anyway". `handlePlayPress`-wrappern runt `onReady` i [GetReadyIntro.tsx](src/components/GetReadyIntro.tsx) hanterar detta — PtP/host saknar `playerConnectionStatus`-prop och kör alltid `onReady()` direkt.
+
 **Mode-dependent fas-flöde i `handleAdvanceToNextRound`**:
 - **Pass-the-Phone**: rotera `currentPlayerIndex` (mod `turnOrder.length`) → sätt fas till `'intro'` så "Pass-the-Phone to: <namn>" visas innan nästa fråga.
 - **Individual Devices**: ingen player-rotation (alla på egna devices) → sätt fas till `'intro'` så host får ny Play-tap som kontrollerar speltempot för nästa fråga. Non-host ser passiv "Waiting for Host to start quiz"-ruta i intro:n via `GetReadyIntro`:s `isHost`-prop; host:s Play-tap broadcastar `play_command` via `quiz_sync:<roomCode>`-channel ([src/lib/realtime/syncChannel.ts](src/lib/realtime/syncChannel.ts)) så non-host:s phase också går till countdown. Host:s Next-tap i reveal broadcastar motsvarande `question_advance` så alla devices återgår till intro samtidigt.
@@ -1445,8 +1456,14 @@ Båda knappar `flex: 1` så footer-raden fylls 50/50 med Spacing.sm gap mellan; 
 
 **Settings carry-over** (när `keepSettings=true`):
 - Läser `getLobbySettings(params.roomCode)` (= OLD room) och `setLobbySettings(newCode, { ...oldSettings, answerResponseSeconds: responseSeconds })`. responseSeconds override:as eftersom host kan ha justerat mid-game via GetReadyIntro:s dropdown.
-- Alla andra fält (`gameMode`, `singlePlayerDefault`, `region`, `eraFrom/To`, `roundsCount`, `selectedExtraPackages`, `youtubeEnabledCategories`, `imagesEnabledCategories`) bärs över oförändrade från gamla rummet.
+- Alla fält bärs över via `...oldSettings` inkl. **`spotifyEnabled`** — se "Spotify carry-over"-fix nedan.
 - Vid `keepSettings=false` (Start fresh): ingen `setLobbySettings`-skrivning → LobbyScreen:s host-seed-effekt fyller med profil-defaults vid mount.
+
+**Spotify carry-over-bugg (fix 2026-06-09)** — två felkällor fixade i LobbyScreen:s host-seed + useFocusEffect:
+1. **Seed-effekten** (URL-params useEffect, `if (stored)` -blocket): satte INTE `setSpotifyEnabled` från `stored.spotifyEnabled` när carry-over-inställningar fanns — bara `selectedExtraPackages` + `sketchEnabled` togs. Fix: `if (stored) { ...; setSpotifyEnabled(stored.spotifyEnabled); }`.
+2. **useFocusEffect Spotify-callback**: ringde alltid `setSpotifyEnabled(profile?.spotifyDefaultEnabled ?? false)` (= false) efter att `getSpotifyConnectionStatus` bekräftat connection + premium — överskrev carry-over-värdet. Fix: callback laddar nu `getLobbySettings(roomCode)` parallellt med `loadProfile()` och använder `lobbySt?.spotifyEnabled ?? profile?.spotifyDefaultEnabled ?? false` (prefer stored, fallback profil).
+
+**`spotifyConnected` i `TurnOrderPlayer` (fix 2026-06-09)**: fältet `spotifyConnected?: boolean` lagt till i `TurnOrderPlayer`-typen i quiz.tsx. Host:s `handleStartGame` och non-host:s game-started-detection inkluderar nu `spotifyConnected: p.spotifyConnected ?? false` i turnOrder-mappningen. `goToNewLobby`'s `carryOverPlayers` slår upp `spotifyConnected` via `turnOrder.find(t => t.id === p.id)?.spotifyConnected` så Spotify-badge på spelarkortet i nästa lobby visar korrekt "Spotify connected" (grönt) efter Play Again + Keep players.
 
 **`playerToRow` NOT NULL-fälla (fix 2026-06-08)**: `playerToRow` i `mockLobbyPlayers.ts` mappade `spotifyConnected` via `player.spotifyConnected ?? null`. Carry-over-spelarna som byggs i `goToNewLobby` har inget `spotifyConnected`-fält → `undefined ?? null = null` skickas som `spotify_verified` i UPSERT:en → `lobby_players.spotify_verified NOT NULL`-constrainten avvisar raden → HELA carry-over-skrivningen failar tyst (`.catch(() => {})` svalde felet). Resultat: noll carry-over-rader i DB → non-host:s `syncFromStore` fick `undefined` från `getLobbyPlayers` → `selfApproved = false` → "started without me"-popup. **Fix**: `playerToRow` ändrad till `player.spotifyConnected ?? false` — `undefined`/`null` ger nu alltid `false` (validt boolean-värde). Relaterade skyddsändringar: (1) `goToNewLobby`:s `.catch(() => {})` → `console.warn` så DB-fel syns i loggar; (2) `syncFromStore`-game-started-checken fick `null`/`undefined`-guard på `getLobbyPlayers`-resultatet — popup:en fyrar bara när en definitiv rad med `approved=false` finns, aldrig på tvetydigt underlag.
 

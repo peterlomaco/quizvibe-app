@@ -1182,6 +1182,7 @@ export default function LobbyScreen() {
           if (stored) {
             setSelectedExtraPackages(stored.selectedExtraPackages);
             setSketchEnabled(stored.sketchEnabled);
+            setSpotifyEnabled(stored.spotifyEnabled);
           }
           setEnabledHostPackages(
             profile?.enabledHostPackages ?? PURCHASED_PACKAGES.map((p) => p.id),
@@ -1402,15 +1403,21 @@ export default function LobbyScreen() {
             setPlayers((prev) =>
               prev.map((p) => (p.isHost ? { ...p, spotifyConnected: connected } : p)),
             );
-            // Seed spotifyEnabled från profile:s sparade default (spotifyDefaultEnabled).
-            // Toggeln återställs till false vid varje Lobby-mount, men om user
-            // aktiverat Spotify som default i Profile settings ska det slå igenom här.
-            // Kräver Premium för att faktiskt aktivera DJ-läget.
+            // Seed spotifyEnabled — prio: carry-over stored lobby setting >
+            // profil-default. Kräver Premium + connected för att aktivera DJ-läget.
             const ok = connected && status.isPremium;
             if (ok) {
-              loadProfile().then((profile) => {
-                if (active) setSpotifyEnabled(profile?.spotifyDefaultEnabled ?? false);
-              });
+              Promise.all([loadProfile(), getLobbySettings(roomCode)]).then(
+                ([profile, lobbySt]) => {
+                  if (!active) return;
+                  // Prefer carry-over value if lobby_settings redan finns (Play Again
+                  // + Keep Settings skriver spotifyEnabled till nya rumkoden via
+                  // goToNewLobby). Faller tillbaka till profil-default för fresh lobbies.
+                  const shouldEnable =
+                    lobbySt?.spotifyEnabled ?? profile?.spotifyDefaultEnabled ?? false;
+                  setSpotifyEnabled(shouldEnable);
+                },
+              );
             }
           });
         });
@@ -1987,6 +1994,14 @@ export default function LobbyScreen() {
       // Auto-aktivera DJ-toggeln direkt efter lyckad OAuth — annars måste
       // användaren trycka på toggeln en extra gång manuellt efter connect.
       setSpotifyEnabled(true);
+    } else if (result.reason !== 'not_premium' && result.reason !== 'cancelled') {
+      // not_premium har sin egen alert i connectSpotify(); cancelled = user stängde med avsikt.
+      // Alla andra fel visas explicit så felet blir synligt (annars är det tyst).
+      Alert.alert(
+        'Spotify connection failed',
+        `Could not connect Spotify account (${result.reason}). Check your internet connection and try again.`,
+        [{ text: 'OK' }],
+      );
     }
   };
 
@@ -3222,6 +3237,7 @@ export default function LobbyScreen() {
               avatarUri: p.avatarUri,
               assistance: p.assistance ?? 'standard',
               age: p.age,
+              spotifyConnected: p.spotifyConnected ?? false,
             }));
           router.replace({
             pathname: '/quiz',
@@ -3249,6 +3265,9 @@ export default function LobbyScreen() {
               // host-path:en så HistoryEntry får samma data oavsett vilken
               // enhet som triggade navigation till /quiz.
               selectedExtraPackages: JSON.stringify(settingsStored?.selectedExtraPackages ?? []),
+              // Spotify DJ-läge måste matchas med host:s värde så non-host
+              // behandlar Spotify-frågor korrekt (timer gating, mediaSource).
+              spotifyEnabled: String(settingsStored?.spotifyEnabled ?? false),
               roomCode,
             },
           });
@@ -3549,12 +3568,18 @@ export default function LobbyScreen() {
     const imgCatsAll = imagesEnabledCategories.length === 3;
     const matchesImgCat = (mc: MainCategory | null) =>
       imgCatsAll ? true : mc !== null && imagesEnabledCategories.includes(mc);
-    const hasMusicHit = youtubeEnabled && MUSIC_QUESTIONS.some(
-      (q) =>
-        q.correctYear >= eraFrom &&
-        q.correctYear <= eraTo &&
-        matchesYtCat(subjectToMainCategory(q.contentSubject)),
-    );
+    const hasSpotifyHit =
+      spotifyEnabled &&
+      MUSIC_QUESTIONS.some((q) => !!q.spotifyTrackId && q.correctYear >= eraFrom && q.correctYear <= eraTo);
+    const hasMusicHit =
+      hasSpotifyHit ||
+      (youtubeEnabled &&
+        MUSIC_QUESTIONS.some(
+          (q) =>
+            q.correctYear >= eraFrom &&
+            q.correctYear <= eraTo &&
+            matchesYtCat(subjectToMainCategory(q.contentSubject)),
+        ));
     const hasImageHit = IMAGE_QUIZ_QUESTIONS.some((q) => {
       let inEra = true;
       if (q.peakFrom !== undefined && q.peakTo !== undefined) {
@@ -3588,6 +3613,7 @@ export default function LobbyScreen() {
         // när det är deras tur. Default 'standard' om saknas.
         assistance: p.assistance ?? 'standard',
         age: p.age,
+        spotifyConnected: p.spotifyConnected ?? false,
       }));
 
     if (turnOrder.length === 0) {
