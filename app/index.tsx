@@ -1269,7 +1269,7 @@ export default function HomeScreen() {
   const [regBirthYearText, setRegBirthYearText] = useState('');
   // Default-värden: användaren kan registrera direkt efter year of birth.
   // Assistance och Region är förvalda men kan ändras via picker:erna.
-  const [regAssistance, setRegAssistance] = useState<AssistanceLevel>('standard');
+  const [regAssistance, setRegAssistance] = useState<AssistanceLevel>('full');
   const [regRegion, setRegRegion] = useState<RegRegion>('sweden');
   const [regYearPickerOpen, setRegYearPickerOpen] = useState(false);
   const [regAssistancePickerOpen, setRegAssistancePickerOpen] = useState(false);

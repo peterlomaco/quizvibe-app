@@ -302,24 +302,14 @@ export const MOCK_OPPONENTS: LeaderboardPlayer[] = [
 // Mer assistans = lägre accuracy + lägre poäng-range (casual-spelare).
 
 // Mock-opponent-score: speglar calculatePoints i quiz.tsx.
-// questionKind='year': minimal=5, standard=3, full=1
-// questionKind='name' (default): minimal=3, standard=2, full=1
-// Assistance driver även träffsäkerhet.
+// Rätt svar = 1p oavsett assistance; assistance styr bara träffsäkerhet.
 export function generateOpponentRoundScore(
   assistance: AssistanceLevel,
   questionKind: 'year' | 'name' = 'name',
 ): { points: number; correct: boolean } {
   const accuracy = { full: 0.45, standard: 0.65, minimal: 0.78 }[assistance];
   const correct = Math.random() < accuracy;
-  let pts = 0;
-  if (correct) {
-    if (questionKind === 'year') {
-      pts = assistance === 'minimal' ? 5 : assistance === 'standard' ? 3 : 1;
-    } else {
-      pts = assistance === 'minimal' ? 3 : assistance === 'standard' ? 2 : 1;
-    }
-  }
-  return { points: pts, correct };
+  return { points: correct ? 1 : 0, correct };
 }
 
 // Mock svarstid för en motspelare (5–25 sekunder, 2-decimals-precision så

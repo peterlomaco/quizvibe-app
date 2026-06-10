@@ -340,20 +340,13 @@ function isCorrect(
 // Poäng-modell: rätt svar = 1 poäng, fel = 0. Tie-break på leaderboarden
 // hanteras av sorteringen (poäng desc → avgResponseSeconds asc) — så två
 // spelare med samma antal rätt rankas efter lägst genomsnittlig svarstid.
-// Year-frågor (timeline):   minimal=5p, standard=3p, full=1p
-// Letter-frågor (name/film): minimal=3p, standard=2p, full=1p
-// Utan assistance (fallback): binärt 1/0
 function calculatePoints(
   correct: boolean,
   assistance?: AssistanceLevel,
   questionKind?: 'year' | 'name',
 ): number {
   if (!correct) return 0;
-  if (!assistance) return 1;
-  if (questionKind === 'year') {
-    return assistance === 'minimal' ? 5 : assistance === 'standard' ? 3 : 1;
-  }
-  return assistance === 'minimal' ? 3 : assistance === 'standard' ? 2 : 1;
+  return 1;
 }
 
 // Quiz-lokal klarröd som ersätter den globala Colors.error i tre intentional

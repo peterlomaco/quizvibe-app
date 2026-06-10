@@ -1612,7 +1612,7 @@ export default function ProfileScreen() {
               {/* Artists kolumn */}
               <View style={styles.smDataStack}>
                 <View style={[styles.smHeaderCell, smCellStyle]}>
-                  <Text style={styles.sourceMatrixHeaderText}>Artists</Text>
+                  <Text style={styles.sourceMatrixHeaderText}>Music</Text>
                 </View>
                 <View style={[styles.smAllToggleCell, smCellStyle, styles.smDataShift]}>
                   <Switch value={artistsAllOn} onValueChange={handleToggleArtistsColumn} trackColor={{ false: PROFILE_MATRIX_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={artistsAllOn ? Colors.success : PROFILE_MATRIX_OFF} style={styles.profileSwitch} />
@@ -1629,7 +1629,7 @@ export default function ProfileScreen() {
               {/* Actors kolumn */}
               <View style={[styles.smDataStack, styles.sourceMatrixColSep]}>
                 <View style={[styles.smHeaderCell, smCellStyle]}>
-                  <Text style={styles.sourceMatrixHeaderText}>Actors</Text>
+                  <Text style={styles.sourceMatrixHeaderText}>Film</Text>
                 </View>
                 <View style={[styles.smAllToggleCell, smCellStyle, styles.smDataShift]}>
                   <Switch value={actorsAllOn} onValueChange={handleToggleActorsColumn} trackColor={{ false: PROFILE_MATRIX_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={actorsAllOn ? Colors.success : PROFILE_MATRIX_OFF} style={styles.profileSwitch} />
@@ -1648,7 +1648,7 @@ export default function ProfileScreen() {
               {/* Athletes kolumn */}
               <View style={[styles.smDataStack, styles.sourceMatrixColSep]}>
                 <View style={[styles.smHeaderCell, smCellStyle]}>
-                  <Text style={styles.sourceMatrixHeaderText}>Athletes</Text>
+                  <Text style={styles.sourceMatrixHeaderText}>Sport</Text>
                 </View>
                 <View style={[styles.smAllToggleCell, smCellStyle, styles.smDataShift, { borderTopRightRadius: Radius.sm, borderBottomRightRadius: Radius.sm }]}>
                   <Switch value={athletesAllOn} onValueChange={handleToggleAthletesColumn} trackColor={{ false: PROFILE_MATRIX_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={athletesAllOn ? Colors.success : PROFILE_MATRIX_OFF} style={styles.profileSwitch} />

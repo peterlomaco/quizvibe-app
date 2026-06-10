@@ -288,7 +288,7 @@ Helpers exporteras: `appendPlayerNameLetter`, `appendPlayerNameDigit`, `backspac
 
 `handleLogin` accepts **Player Name OR email** as identifier — if input contains `@`, the email-prefix is derived as the saved `playerName` (mock; real auth will resolve email → playerName via backend lookup).
 
-Default Assistance='standard', Region='global' on the Register form so the user can submit immediately after Year of birth — both fields show under a "Use default or select prefered setup" hint.
+Default Assistance='full', Region='sweden' on the Register form so the user can submit immediately after Year of birth — both fields show under a "Use default or select prefered setup" hint.
 
 **Registration host-defaults** (sätts i `handleRegisterSubmit` i [app/index.tsx](app/index.tsx) och speglas i ProfileScreen:s auto-augment för ofullständiga profiler):
 - `gameMode: 'pass-the-phone'`, `singlePlayerDefault: false` — Pass-the-Phone är default-läge.
@@ -309,7 +309,7 @@ Default Assistance='standard', Region='global' on the Register form so the user 
 
 `handleLogin` accepts **Player Name OR email** as identifier — if input contains `@`, the email-prefix is derived as the saved `playerName` (mock; real auth will resolve email → playerName via backend lookup).
 
-Default Assistance='standard', Region='global' on the Register form so the user can submit immediately after Year of birth — both fields show under a "Use default or select prefered setup" hint.
+Default Assistance='full', Region='sweden' on the Register form so the user can submit immediately after Year of birth — both fields show under a "Use default or select prefered setup" hint.
 
 **Year of birth-caps**: Profile, Register-form och Guest-form har gemensamma cap:ar `MIN_BIRTH_YEAR = 1930`, `MAX_BIRTH_YEAR = CURRENT_YEAR - 15` (dynamisk — 15+ minimum ålder; höjt från 13+ 2026-06-01 pga 15+-gränsat film-/innehåll i appen, utöver App Store / GDPR). Endpoints renderas via `formatBirthYear`-helper som lägger till "or earlier" på 1930 och "or later" på MAX_BIRTH_YEAR — representerar öppna intervall (alla födda ≤1930 / ≥CURRENT_YEAR-15). `formatBirthYear` används både i picker-listan och i selector-trigger-texten så framing är konsistent. Profile + Register + Guest delar samma `BIRTH_YEARS`-array och format-helper (Profile har egen kopia eftersom den lever i en annan fil — håll dem synkade vid framtida ändringar). LobbyScreen har egen kopia med samma formel.
 
@@ -462,7 +462,7 @@ Ersätter gamla `enabledMainCategories` + `youtubeEnabled`/`imagesEnabled`-boole
 
 **UI-layout** (`smGrid` i LobbyScreen + ProfileScreen):
 - **Spotify DJ-rad** — överst, direkt under "SOURCE DASHBOARD"-rubriken. Box med `backgroundColor: rgba(255,255,255,0.06)` + `borderRadius: Radius.sm` (matchar All-radens styling). Spotify-ikon + label + info-icon + anslutningsstatus + toggle.
-- **Matrisen nedan**: Rad 1 (rubriker) | Rad 2 (All-rad) | Rad 3 (YouTube) | Rad 4 (Images) — kolumner: Artists / Actors / Athletes.
+- **Matrisen nedan**: Rad 1 (rubriker) | Rad 2 (All-rad) | Rad 3 (YouTube) | Rad 4 (Images) — kolumner: **Music / Film / Sport** (displaynamn i UI; internt mappade mot `artists/actors/athletes`).
 - `onLayout` på `smGrid` mäter exakt kolumnbredd → pixel-perfekt centrering.
 
 **Auto-sync-regler (kontextberoende, 2026-06-05)**:
@@ -618,7 +618,7 @@ Non-host-vyn använder fortfarande default `hasSubscription={false}` → grå st
 
 ## Lobby — Game Settings card
 
-Game Mode and SOURCE AND PROFESSIONS share a single bordered card (`gameSettingsBorder` in `LobbyScreen.tsx`) — they're treated as one "spelregler"-grupp. Order inside SOURCE AND PROFESSIONS: Source × Profession matrix (kolumn-baserad: Artists/Actors/Athletes som kolumner, YouTube/Images som rader) → "Customized Host packages" sub-block (`usePackagesBlock`).
+Game Mode and SOURCE AND PROFESSIONS share a single bordered card (`gameSettingsBorder` in `LobbyScreen.tsx`) — they're treated as one "spelregler"-grupp. Order inside SOURCE AND PROFESSIONS: Source × Profession matrix (kolumn-baserad: Music/Film/Sport som kolumner (displaynamn), YouTube/Images som rader) → "Customized Host packages" sub-block (`usePackagesBlock`).
 
 **Source × Profession matrix** (2026-06-03, ersätter separata YouTube/Images-rader + Main categories-block): kolumn-baserad layout (`sourceMatrixDataCol`) med professionstyperna (Artists/Actors/Athletes) som kolumner och källorna (YouTube/Images) som rader. YouTube-raden har ⓘ-info-ikon, Images-raden har Q-ikon med "?" + ⓘ. Images Actors+Athletes har låsta switchar med 🔒 på tummen. Se "SOURCE AND PROFESSIONS" ovan för full spec. `sketchEnabled`-state + `mockLobbySettings`/DB-plumbing (`sketch_enabled`-kolumn, migration `0013`) lämnas som död plumbing (default AV).
 
@@ -1194,7 +1194,7 @@ Export-scriptet (`export-music-questions.ts`) inkluderar nu items med `spotifyTr
 **41 låtar har `spotifyTrackId` (2026-06-04)**: ABBA (3st), Roxette (2), Ace of Base (2), Avicii (3), Loreen (2), Robyn (2), Swedish House Mafia, Eric Prydz, Dr. Alban, Rednex, The Cardigans, Kent, Veronica Maggio, Mando Diao, First Aid Kit, Icona Pop, Benjamin Ingrosso, Lili & Sussie + internationella klassiker (Eagles, Bob Marley, Bee Gees, Queen, Sia, Imagine Dragons, Ed Sheeran, Glass Animals, The Weeknd m.fl.).
 
 **LobbyScreen-integration (uppdaterad 2026-06-05)**:
-- `isSpotifyAvailable = gameMode === 'individual-devices' && !singlePlayerDefault` — Spotify DJ kräver IndDev (DJ lämnar appen → Spotify). Spotify-raden alltid synlig men toggle utgråad + "Disabled"-pill i PtP/Single (host-vy). **Non-host** ser en read-only `<Switch disabled value={spotifyEnabled}>` med Spotify-grön (`#1DB954`) eller grå track — ingen Enabled/Disabled-pill.
+- `isSpotifyAvailable = gameMode === 'individual-devices' && !singlePlayerDefault` — Spotify DJ kräver IndDev. Spotify-raden alltid synlig men toggle utgråad i PtP/Single. **Non-host** ser en read-only `<Switch disabled value={spotifyEnabled}>` med grön/grå track + **"Connect Spotify account"-länk** (tappbar) direkt under connection-status-texten. Vid lyckad connect skrivs `spotifyConnected: true` tillbaka via `upsertOwnLobbyPlayer` + lokal `setPlayers`-update → PlayerRow Spotify-badge uppdateras utan reload. Disconnect-flödet speglar detta med `spotifyConnected: false`.
 - `spotifyEnabled` seeds från `profile.spotifyDefaultEnabled` i Promise.all-blocket; om `profile.spotifyDefaultEnabled = true` auto-seedas också `gameMode = 'individual-devices'`.
 - **handleStartGame-guards för Spotify**: (1) `spotifyEnabled && (singlePlayerDefault || approvedNonHosts.length === 0)` → "Spotify DJ not applicable — requires at least one other player". (2) Spotify-only single player (`youtubeEnabled=0, images=0, singlePlayer`) → separatguard. (3) Inga approved non-hosts med Spotify → alert. (4) Några utan Spotify → erbjud att flytta till waiting.
 - `LobbyPlayer.spotifyConnected?: boolean` — populerad från `lobby_players.spotify_verified` via `rowToPlayer`. Host-kortets `spotifyConnected` sätts från Lobby `spotifyConnected`-state i `useFocusEffect`. Non-host vid join: `getSpotifyConnectionStatus()` parallellt med `loadProfile()`.
@@ -1321,7 +1321,7 @@ const ALL_QUESTIONS_MAP = new Map<string, QuizQuestion>(
    - **Game era**: `{eraFrom} – {eraTo}` (host:s val från Lobby, fixt under hela spelet).
    - **Answer response time**: dropdown-trigger på samma rad som rubriken — visar `{N}s ▼` (`{N}s 🔒` när låst). Tap → Modal med 3 options (30s/45s/60s) — 15s-alternativet borttaget 2026-06-08. Quiz.tsx håller `responseSeconds` som state och passar `onAnswerResponseSecondsChange` så användaren kan justera mellan ronder.
    - **Locked-state i Pass-the-Phone**: `responseSecondsLocked = gameMode === 'pass-the-phone' && currentPlayerIndex !== 0`. När låst → tap visar info-Alert ("response time can only be changed at the start of a new round — when all players have answered the same number of questions"). Trigger:s border + text dimmas + ▼ byts till 🔒.
-3. **Current Leaderboard (utfällbar)** mellan settings och play. Default **collapsed** vid varje GetReadyIntro-mount. Tap på header → expand. Body är `position: 'absolute'` med `top: '100%'` + `zIndex: 100` + `elevation: 10` → **OVERLAY:ar** play + turordningstabellen istället för att skjuta dem nedåt. Innehållet bakom stannar på sin plats men göms tills body collapses igen. Layout: 3-kolumns sport-tabell (se "Leaderboard table" nedan). **Scoring guide** visas inuti overlay:n ovanför Player-headern — 3-kolumns tabell (Year/Letter × Minimal/Standard/Full) utan rubrik, med `scoringPlayerDivider` (1 px `Colors.border`, `marginHorizontal: Spacing.md`) som separator mot spelarlistan.
+3. **Current Leaderboard (utfällbar)** mellan settings och play. Default **collapsed** vid varje GetReadyIntro-mount. Tap på header → expand. Body är `position: 'absolute'` med `top: '100%'` + `zIndex: 100` + `elevation: 10` → **OVERLAY:ar** play + turordningstabellen istället för att skjuta dem nedåt. Innehållet bakom stannar på sin plats men göms tills body collapses igen. Layout: 3-kolumns sport-tabell (se "Leaderboard table" nedan). **Scoring guide** visas inuti overlay:n ovanför Player-headern — enkel 2-rads tabell (Year: 1 pt / Letter: 1 pt) utan rubrik och utan Minimal/Standard/Full-kolumner (scoring är binär), med `scoringPlayerDivider` (1 px `Colors.border`, `marginHorizontal: Spacing.md`) som separator mot spelarlistan.
 4. **Play-knapp** (centrerad): `<QuizVibePlayLogo size={140} color={Colors.warning} />` — Q-logo med play-triangel inuti Q-ringen (ersätter den gamla blå rektangulära knappen). **Gold glow** runt logon: `playLogoHalo` (absolut-positionerad bakom, `Colors.warning` bg + animated opacity 0.35 → 0.8) + iOS-only shadow med `shadowColor: Colors.warning`. Scale-pulse 1 → 1.06 över 800ms.
 
 **Kategori-badge på current-box** (2026-05-25): kant-skärande badge ovanpå `currentMediaBox` (IndDev) och `currentPlayerBox` (PtP/Single) — visar V1-huvudkategori (Music/Film/Sport) för frågan som spelas härnäst. Drivs av ny prop `categoryByQuestion: (MainCategory | null)[]` som passas från quiz.tsx. Visar `categoryByQuestion[currentQuestion - 1]` (frågan som currentQuestion pekar på = "först på tur"). Alla kategorier delar **enhetlig gold-styling** (`Colors.warning` bg + svart text, samma vokabulär som PREMIUM-badge) — per-kategori-färgning testades men gav splittrad känsla. ViewBox-position: `top: -9, right: Spacing.md` så badgen sticker ut över top-kanten på boxen utan att krocka med innehållet. null-värde i arrayn → ingen badge renderas (t.ex. capital-fråga, framtida edge case).
@@ -1634,13 +1634,7 @@ Image-frågor har 10 prefix-knappar i ImageAnswerBlock — på små skärmar rym
 
 **`MUSIC_QUESTION_TEXT = 'Which year was this song released?'`** — alla mock-frågor delar denna text (själva låten är frågan via YouTube). `correctYear` + `hint` (era) per fråga är fortfarande unika så reveal-vyn varierar i hint-texten även om frågetexten är generisk.
 
-**`calculatePoints(correct, assistance?, questionKind?)`** — assistance-nivåbaserad scoring (2026-06-07, commit `9eeae7f`). Tre parametrar:
-- `correct = false` → alltid 0 p
-- `questionKind === 'year'` (Spotify/YT-musik/YT-sport): `minimal=5`, `standard=3`, `full=1`
-- `questionKind === 'name'` (Hints/YT-film/actor-select): `minimal=3`, `standard=2`, `full=1`
-- Saknas `assistance` → binär fallback 1/0 (image-frågor utan assistance-kontext)
-
-Call-sites: `handleConfirm` (timeline) → `'year'`; `handleConfirmName` (image/Hints) → `'name'`; `handleConfirmActor` (actor-select) → `'name'`. **Tie-break** oförändrat: lägst `avgResponseSeconds` asc vid pts-lika. Mock-opponent-funktionen `generateOpponentRoundScore(assistance, questionKind)` i [src/components/RoundLeaderboard.tsx](src/components/RoundLeaderboard.tsx) följer samma tabell.
+**`calculatePoints(correct, assistance?, questionKind?)`** — binär scoring: `correct ? 1 : 0` oavsett assistance och frågetyp. Assistance styr bara träffsäkerhet (via `generateOpponentRoundScore`-accuracy-tabellen), INTE poängvärdet per rätt svar. **Tie-break**: lägst `avgResponseSeconds` asc vid pts-lika. Mock-opponent-funktionen `generateOpponentRoundScore(assistance, questionKind)` i [src/components/RoundLeaderboard.tsx](src/components/RoundLeaderboard.tsx) returnerar `{ points: correct ? 1 : 0, correct }` — accuracy-tabell: `full=0.45, standard=0.65, minimal=0.78`.
 
 **HCP-progression skalar mot binära scoring**: `calculateNewHCP` i [src/utils/hcp.ts](src/utils/hcp.ts) använder `roundHcp(pointsEarned / 2)` — så 2 rätt sänker HCP med 1, 1 rätt också 1 (0.5 rundas upp till spelarens fördel), 4 rätt med 2, etc. Tidigare divisor var 10 (matchade gamla 0-1000-modellen). HCP är ute ur launch-scope men formeln är skalad korrekt så feature:n kan återupplivas utan ytterligare beräknings-pass.
 

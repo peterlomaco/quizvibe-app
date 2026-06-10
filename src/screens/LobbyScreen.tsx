@@ -1994,6 +1994,20 @@ export default function LobbyScreen() {
       // Auto-aktivera DJ-toggeln direkt efter lyckad OAuth — annars måste
       // användaren trycka på toggeln en extra gång manuellt efter connect.
       setSpotifyEnabled(true);
+      // Non-host: synka spotify_verified=true till lobby_players så host:s
+      // polling ser Spotify-badge:n uppdateras direkt utan reload.
+      if (!hostMode) {
+        const ownId = ownPlayerIdRef.current;
+        if (ownId) {
+          setPlayers((prev) =>
+            prev.map((p) => (p.id === ownId ? { ...p, spotifyConnected: true } : p)),
+          );
+          const ownPlayer = players.find((p) => p.id === ownId);
+          if (ownPlayer) {
+            upsertOwnLobbyPlayer(roomCode, { ...ownPlayer, spotifyConnected: true }).catch(() => {});
+          }
+        }
+      }
     } else if (result.reason !== 'not_premium' && result.reason !== 'cancelled') {
       // not_premium har sin egen alert i connectSpotify(); cancelled = user stängde med avsikt.
       // Alla andra fel visas explicit så felet blir synligt (annars är det tyst).
@@ -2014,6 +2028,19 @@ export default function LobbyScreen() {
     setSpotifyConnected(false);
     setSpotifyDisplayName(null);
     setSpotifyEnabled(false);
+    // Non-host: synka spotify_verified=false till lobby_players.
+    if (!hostMode) {
+      const ownId = ownPlayerIdRef.current;
+      if (ownId) {
+        setPlayers((prev) =>
+          prev.map((p) => (p.id === ownId ? { ...p, spotifyConnected: false } : p)),
+        );
+        const ownPlayer = players.find((p) => p.id === ownId);
+        if (ownPlayer) {
+          upsertOwnLobbyPlayer(roomCode, { ...ownPlayer, spotifyConnected: false }).catch(() => {});
+        }
+      }
+    }
   };
 
   /**
@@ -4381,14 +4408,34 @@ export default function LobbyScreen() {
                     <Text style={styles.infoIconText}>i</Text>
                   </Pressable>
                 </View>
-                {/* Spotify-anslutningsstatus — alltid synlig för host */}
-                {hostMode ? (
-                  spotifyConnected && spotifyDisplayName ? (
-                    <Text style={styles.spotifyConnectedLabel}>✓ {spotifyDisplayName}</Text>
-                  ) : (
-                    <Text style={styles.spotifyNoConnectionLabel}>No connection activated</Text>
-                  )
-                ) : null}
+                {/* Spotify-anslutningsstatus + connect-länk för alla */}
+                {spotifyConnected && spotifyDisplayName ? (
+                  <Pressable
+                    onPress={handleDisconnectSpotify}
+                    hitSlop={8}
+                    style={({ pressed }) => [{ opacity: pressed ? 0.7 : 1 }]}
+                  >
+                    <Text style={[styles.spotifyConnectedLabel, { textDecorationLine: 'underline' }]}>
+                      ✓ {spotifyDisplayName}
+                    </Text>
+                  </Pressable>
+                ) : (
+                  <>
+                    <Text style={styles.spotifyNoConnectionLabel}>
+                      {hostMode ? 'No connection activated' : 'Not connected'}
+                    </Text>
+                    <Pressable
+                      onPress={handleConnectSpotify}
+                      disabled={spotifyConnecting}
+                      hitSlop={8}
+                      style={({ pressed }) => [{ opacity: pressed ? 0.7 : 1 }]}
+                    >
+                      <Text style={styles.spotifyLinkText}>
+                        {spotifyConnecting ? 'Connecting…' : 'Connect Spotify account'}
+                      </Text>
+                    </Pressable>
+                  </>
+                )}
               </View>
               {hostMode ? (
                 <View style={[styles.spotifyHostControls, { marginRight: 14, alignSelf: 'flex-start', marginTop: 1, gap: 4 }]}>
@@ -4493,7 +4540,7 @@ export default function LobbyScreen() {
               {/* ── Artists kolumn-stack ── */}
               <View style={styles.smDataStack}>
                 <View style={[styles.smHeaderCell, smCellStyle]}>
-                  <Text style={styles.sourceMatrixHeaderText}>Artists</Text>
+                  <Text style={styles.sourceMatrixHeaderText}>Music</Text>
                 </View>
                 <View style={[styles.smAllToggleCell, smCellStyle, styles.smDataShift]}>
                   <Switch
@@ -4518,7 +4565,7 @@ export default function LobbyScreen() {
               {/* ── Actors kolumn-stack ── */}
               <View style={[styles.smDataStack, styles.sourceMatrixColSep]}>
                 <View style={[styles.smHeaderCell, smCellStyle]}>
-                  <Text style={styles.sourceMatrixHeaderText}>Actors</Text>
+                  <Text style={styles.sourceMatrixHeaderText}>Film</Text>
                 </View>
                 <View style={[styles.smAllToggleCell, smCellStyle, styles.smDataShift]}>
                   <Switch value={actorsAllOn} onValueChange={hostMode ? handleToggleActorsColumn : undefined} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={actorsAllOn ? Colors.success : MATRIX_SWITCH_OFF} style={styles.sourceMatrixSwitch} />
@@ -4537,7 +4584,7 @@ export default function LobbyScreen() {
               {/* ── Athletes kolumn-stack ── */}
               <View style={[styles.smDataStack, styles.sourceMatrixColSep]}>
                 <View style={[styles.smHeaderCell, smCellStyle]}>
-                  <Text style={styles.sourceMatrixHeaderText}>Athletes</Text>
+                  <Text style={styles.sourceMatrixHeaderText}>Sport</Text>
                 </View>
                 <View style={[styles.smAllToggleCell, smCellStyle, styles.smDataShift, { borderTopRightRadius: Radius.sm, borderBottomRightRadius: Radius.sm }]}>
                   <Switch value={athletesAllOn} onValueChange={hostMode ? handleToggleAthletesColumn : undefined} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={athletesAllOn ? Colors.success : MATRIX_SWITCH_OFF} style={styles.sourceMatrixSwitch} />

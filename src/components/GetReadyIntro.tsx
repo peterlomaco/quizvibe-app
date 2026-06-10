@@ -629,22 +629,12 @@ export function GetReadyIntro({
               {/* Scoring guide — ovanför spelarraderna, med separator nedåt. */}
               <View style={styles.scoringBlock}>
                 <View style={styles.scoringTable}>
-                  <View style={[styles.scoringRow, { borderTopWidth: 0 }]}>
-                    <View style={styles.scoringLabelCell} />
-                    <Text style={[styles.scoringColHeader, styles.scoringColMin]}>Minimal</Text>
-                    <Text style={[styles.scoringColHeader, styles.scoringColStd]}>Standard</Text>
-                    <Text style={[styles.scoringColHeader, styles.scoringColFull]}>Full</Text>
-                  </View>
                   <View style={styles.scoringRow}>
                     <Text style={styles.scoringTypeLabel}>Year</Text>
-                    <Text style={[styles.scoringPts, styles.scoringColMin]}>5 pts</Text>
-                    <Text style={[styles.scoringPts, styles.scoringColStd]}>3 pts</Text>
                     <Text style={[styles.scoringPts, styles.scoringColFull]}>1 pt</Text>
                   </View>
                   <View style={[styles.scoringRow, styles.scoringRowLast]}>
                     <Text style={styles.scoringTypeLabel}>Letter</Text>
-                    <Text style={[styles.scoringPts, styles.scoringColMin]}>3 pts</Text>
-                    <Text style={[styles.scoringPts, styles.scoringColStd]}>2 pts</Text>
                     <Text style={[styles.scoringPts, styles.scoringColFull]}>1 pt</Text>
                   </View>
                 </View>
