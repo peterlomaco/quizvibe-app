@@ -8811,10 +8811,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "all"
     ],
     "region": [
-      "sweden"
+      "unknown-region"
     ],
     "genrePackages": [
-      "sport"
+      "sport",
+      "football"
     ],
     "youtubeClips": [
       {
@@ -10333,33 +10334,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "salvador-sobral-amar-pelos-dois",
-    "displayName": "Amar pelos dois — Salvador Sobral",
-    "correctYear": 2017,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "gen-alpha",
-      "gen-z"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "Eurovision"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "ymFVfzu-2mw",
-        "startSec": 5,
-        "endSec": 20,
-        "channelTitle": "Eurovision Song Contest",
-        "license": "standard",
-        "notes": "ESC 2017 vinnare — Portugal. Officiell music video."
-      }
-    ]
-  },
-  {
     "id": "shape-of-you",
     "displayName": "Shape of You — Ed Sheeran",
     "correctYear": 2017,
@@ -10755,8 +10729,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "4NRXx6U8ABQ",
-        "startSec": 0,
-        "endSec": 30,
+        "startSec": 30,
+        "endSec": 45,
         "channelTitle": "TheWeekndVEVO",
         "license": "standard",
         "notes": "Officiell VEVO-musikvideo. Neon retro 80s-känsla."

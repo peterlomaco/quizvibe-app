@@ -718,19 +718,6 @@ items:
         channelTitle: "Jamala"
         notes: "ESC 2016 vinnare — Ukraina. Officiell music video."
     genrePackages: ["Eurovision"]
-  - id: salvador-sobral-amar-pelos-dois
-    displayName: "Amar pelos dois — Salvador Sobral"
-    correctYear: 2017
-    probability: 78
-    wikimediaSearchHints: ["Salvador Sobral Amar pelos dois Eurovision 2017 Portugal"]
-    answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "ymFVfzu-2mw"
-        startSec: 5
-        endSec: 20
-        channelTitle: "Eurovision Song Contest"
-        notes: "ESC 2017 vinnare — Portugal. Officiell music video."
-    genrePackages: ["Eurovision"]
   - id: netta-toy
     displayName: "Toy — Netta"
     correctYear: 2018
