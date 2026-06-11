@@ -879,11 +879,13 @@ Glöm inte lägga till nya stores här när de skapas — annars läcker stale d
 
 **Scroll-to-top vid lobby-entry** — `mainScrollRef` på lobby:s primär-ScrollView. URL-params-effekten (samma som hanterar fresh entry från host/guest/registered-flow) anropar `mainScrollRef.current?.scrollTo({ y: 0, animated: false })` i en `requestAnimationFrame`-wrapper vid varje fresh entry. Krävs eftersom Stack-navigatorn kan återanvända samma route-instans och ärva tidigare scroll-position — utan denna landar guest-användare som joinar via Join Game mitt på sidan istället för vid headern.
 
-**Gold-glowing CTA-position** (Start Game / Waiting for Host) — båda renderas på samma plats i `startSection` och delar visuell vokabulär (gold halo + scale-pulse). Implementation:
+**Gold-glowing CTA-position** (Start Game / Waiting for Host) — båda renderas på samma plats i `startSection` och delar visuell vokabulär (gold halo + scale-pulse). Implementation (uppdaterad 2026-06-11):
 - En enda `Animated.Value`-pair (`startGlow`, `startPulse`) körs i `Animated.loop` utan `hostMode`-gating — bara en ruta renderas åt gången per role, så animationen är "billig dubbelproduktion" oavsett.
-- Host: `Pressable` med "Start Game"-text i `Colors.background` (mörk på guld).
-- Non-host: `View` med "Waiting for Host to Start Game" + `<SequentialDots color={Colors.background} />`.
-- Båda ärver styling från `startGameWrap` + `startGameHalo` + `startGameButton`. Waiting-rutan override:ar bara `flexDirection: 'row'` via `waitingForHostBox`-stilen.
+- Host: `<TouchableOpacity onPress={() => handleStartGame()}>` med `<QuizVibePlayLogo size={140} color={Colors.warning} />` — identisk knapp som GetReadyIntro:s Play-knapp. Label "Start Game" ovanför (`fontSize: 22, letterSpacing: 0.5` — matchar GetReadyIntro:s `tapHereText` exakt).
+- Non-host: `<View pointerEvents="none">` med samma `QuizVibePlayLogo` + "Waiting for Host to Start Game" + `<SequentialDots color={Colors.warning} />`.
+- Båda ärver styling från `startGameWrap` + `startGameHalo` + `startGameLogoTouch`. `startGameButton` och `waitingForHostBox` är borttagna.
+- **Layout-wrapper**: `startSection` + `customizeSectionHeader` är wrappad i en enda `<View style={{ gap: 0 }}>` så ScrollView:ns `gap: Spacing.xl` (24px) bara appliceras EN gång mot Players-blocket ovanför — annars fick varje delElement 24px gap och totalen blev ~96px.
+- **"Customize QuizVibe"-rutan**: `borderRadius: Radius.md` (rundade hörn), `fontSize: FontSize.lg` (matchar sektionsrubriker), `marginTop: Spacing.md` (12px luft ovanför).
 
 ## Quiz — frågetyper (discriminerad union)
 
