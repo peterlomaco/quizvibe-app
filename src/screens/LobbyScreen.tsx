@@ -4253,6 +4253,7 @@ export default function LobbyScreen() {
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
                 <Text style={styles.multiplayerBracketLabel}>Single mode</Text>
                 <Pressable
+                  style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
                   onPress={() =>
                     Alert.alert(
                       'Single player mode',
