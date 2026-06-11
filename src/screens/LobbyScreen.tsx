@@ -4250,7 +4250,20 @@ export default function LobbyScreen() {
             {/* Bracket under "Single player" */}
             <View style={{ flex: 1, alignItems: 'center' }}>
               <View style={styles.multiplayerBracket} />
-              <Text style={styles.multiplayerBracketLabel}>Single player mode</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                <Text style={styles.multiplayerBracketLabel}>Single mode</Text>
+                <Pressable
+                  onPress={() =>
+                    Alert.alert(
+                      'Single player mode',
+                      'One player only — challenge yourself.\n\nMax 4 rounds, even with a Premium subscription. Spotify not applicable for Single player mode.',
+                    )
+                  }
+                  hitSlop={8}
+                >
+                  <Text style={styles.infoIconText}>i</Text>
+                </Pressable>
+              </View>
             </View>
             {/* Bracket under "Pass-the-Phone" + "Individual device" */}
             <View style={{ flex: 2, alignItems: 'center' }}>
