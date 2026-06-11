@@ -380,7 +380,9 @@ export default function ProfileScreen() {
   };
   // En game-mode-ruta (delas av Single device- och Multiplayer-grupperna).
   // FREE-badge grön när aktiv, grå när inaktiv. Speglar Lobby.
-  const renderModeBox = (key: 'single' | 'ptp' | 'indiv', label: string, smallText?: boolean) => {
+  // redIndiv: om true färgas "Individual device"-rutan röd när inaktiv (används
+  // bara i Number of Rounds quick-select, INTE i Game Settings/Game Mode).
+  const renderModeBox = (key: 'single' | 'ptp' | 'indiv', label: string, smallText?: boolean, redIndiv?: boolean) => {
     const isActive =
       key === 'single'
         ? singlePlayerDefault
@@ -401,7 +403,7 @@ export default function ProfileScreen() {
         }
       >
         <Text
-          style={[styles.modeLabel, { textAlign: 'center' }, smallText && { fontSize: FontSize.xs }, isActive && styles.modeLabelActiveFree]}
+          style={[styles.modeLabel, { textAlign: 'center' }, smallText && { fontSize: FontSize.xs }, isActive && styles.modeLabelActiveFree, redIndiv && key === 'indiv' && !isActive && { color: Colors.error }]}
           numberOfLines={2}
         >
           {label}
@@ -1414,29 +1416,51 @@ export default function ProfileScreen() {
               Premium triggar Store-omdirigering. */}
           <View style={styles.field}>
             <Text style={styles.sectionLabel}>Game Mode</Text>
-            {/* Game mode — tre FRIA val (host-default): Single player + Pass-
-                the-Phone + Individual device. Inget premium-gate på lägesvalet;
-                subscription gatar caps (rundor/spelare) separat. FREE-badge per
-                ruta (grön aktiv, grå inaktiv). Speglar Lobby. */}
-            <Text style={styles.gameModeGroupLabel}>Single player mode</Text>
-            <View style={styles.modeRow}>
-              {renderModeBox('single', 'Single player')}
-              <View style={{ flex: 1 }} />
+            {/* Tre rutor i en rad + bracket-etiketter undertill — speglar Lobby. */}
+            <View style={[styles.modeRow, { marginTop: Spacing.sm }]}>
+              {renderModeBox('single', 'Single player', true)}
+              {renderModeBox('ptp', 'Pass-the-Phone', true)}
+              {renderModeBox('indiv', 'Individual device', true)}
             </View>
-
-            <View style={styles.multiplayerLabelRow}>
-              <Text style={[styles.gameModeGroupLabel, { marginTop: 0, marginBottom: 0 }]}>Multiplayer mode</Text>
-              <Pressable
-                style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                onPress={() => Alert.alert('Multiplayer mode', 'Pass-the-Phone: Single device mode\n\nIndividual device: Multi-device mode / QuizVibe users only')}
-                hitSlop={8}
-              >
-                <Text style={styles.infoIconText}>i</Text>
-              </Pressable>
-            </View>
-            <View style={styles.modeRow}>
-              {renderModeBox('ptp', 'Pass-the-Phone')}
-              {renderModeBox('indiv', 'Individual device')}
+            <View style={{ flexDirection: 'row', gap: Spacing.sm, marginTop: 2 }}>
+              {/* Bracket under "Single player" */}
+              <View style={{ flex: 1, alignItems: 'center' }}>
+                <View style={styles.multiplayerBracket} />
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 6 }}>
+                  <Text style={styles.multiplayerBracketLabel}>Single mode</Text>
+                  <Pressable
+                    style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
+                    onPress={() =>
+                      Alert.alert(
+                        'Single player mode',
+                        'One player only — challenge yourself.\n\nMax 4 rounds, even with a Premium subscription. Spotify not applicable for Single player mode.',
+                      )
+                    }
+                    hitSlop={8}
+                  >
+                    <Text style={styles.infoIconText}>i</Text>
+                  </Pressable>
+                </View>
+              </View>
+              {/* Bracket under "Pass-the-Phone" + "Individual device" */}
+              <View style={{ flex: 2, alignItems: 'center' }}>
+                <View style={styles.multiplayerBracket} />
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 6 }}>
+                  <Text style={styles.multiplayerBracketLabel}>Multiplayer</Text>
+                  <Pressable
+                    style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
+                    onPress={() =>
+                      Alert.alert(
+                        'Multiplayer mode',
+                        'Pass-the-Phone: All players share one device. Max 4 players, even with Premium. Spotify not applicable for PtP mode.\n\nIndividual device: Each player uses their own device — registered QuizVibe accounts only. Max 4 players on Basic, max 12 players with Premium.',
+                      )
+                    }
+                    hitSlop={8}
+                  >
+                    <Text style={styles.infoIconText}>i</Text>
+                  </Pressable>
+                </View>
+              </View>
             </View>
 
             {/* Players — max antal spelare (Max 4 gratis / Max 12 Premium). */}
@@ -1808,7 +1832,9 @@ export default function ProfileScreen() {
                   roundsCount >= roundsMax && styles.roundsStepperBtnDisabled,
                   pressed && roundsCount < roundsMax && { opacity: 0.7 },
                 ]}
-                onPress={handleIncrementRounds}
+                onPress={roundsCount >= roundsMax && !hasPremium
+                  ? () => router.push('/store?focus=subscription&from=/profile')
+                  : handleIncrementRounds}
               >
                 <Text
                   style={[
@@ -1819,6 +1845,15 @@ export default function ProfileScreen() {
                   +
                 </Text>
               </Pressable>
+              {roundsCount >= roundsMax && (
+                <TouchableOpacity
+                  onPress={() => router.push('/store?focus=subscription&from=/profile')}
+                  activeOpacity={0.7}
+                  style={{ backgroundColor: hasPremium ? '#F5A623' : '#6B7280', borderRadius: 4, paddingHorizontal: 8, paddingVertical: 2, marginLeft: 4 }}
+                >
+                  <Text style={{ fontSize: 10, fontWeight: '700', color: hasPremium ? '#000' : '#FFF', letterSpacing: 0.6 }}>PREMIUM</Text>
+                </TouchableOpacity>
+              )}
             </View>
             <View style={{ alignItems: 'center' }}>
               <RoundsRuler
@@ -1827,17 +1862,17 @@ export default function ProfileScreen() {
                 gameModeMax={roundsMax}
                 onPremiumPress={() => router.push('/store?focus=subscription&from=/profile')}
                 hasSubscription={hasPremium}
+                indivActive={!singlePlayerDefault && gameMode === 'individual-devices'}
               />
             </View>
           </View>
 
           {/* Game mode quick-select — under RoundsRuler för snabb mode-byte */}
           <View style={styles.field}>
-            <Text style={styles.sectionLabel}>Game Mode</Text>
             <View style={styles.modeRow}>
               {renderModeBox('single', 'Single player', true)}
               {renderModeBox('ptp', 'Pass-the-Phone', true)}
-              {renderModeBox('indiv', 'Individual device', true)}
+              {renderModeBox('indiv', 'Individual device', true, true)}
             </View>
           </View>
 

@@ -2356,7 +2356,9 @@ export default function LobbyScreen() {
 
   // En game-mode-ruta (delas av Single device- och Multiplayer-grupperna).
   // FREE-badge grön när aktiv, grå när inaktiv. disabled för non-host.
-  const renderModeBox = (key: 'single' | 'ptp' | 'indiv', label: string, smallText?: boolean) => {
+  // redIndiv: om true färgas "Individual device"-rutan röd när inaktiv (används
+  // bara i Number of Rounds quick-select, INTE i Game Settings/Game Mode).
+  const renderModeBox = (key: 'single' | 'ptp' | 'indiv', label: string, smallText?: boolean, redIndiv?: boolean) => {
     const isActive =
       key === 'single'
         ? singlePlayerDefault
@@ -2375,7 +2377,7 @@ export default function LobbyScreen() {
         activeOpacity={0.7}
       >
         <Text
-          style={[styles.modeLabel, { textAlign: 'center' }, smallText && { fontSize: FontSize.xs }, isActive && styles.modeLabelActiveFree]}
+          style={[styles.modeLabel, { textAlign: 'center' }, smallText && { fontSize: FontSize.xs }, isActive && styles.modeLabelActiveFree, redIndiv && key === 'indiv' && !isActive && { color: Colors.error }]}
           numberOfLines={2}
         >
           {label}
@@ -4241,7 +4243,7 @@ export default function LobbyScreen() {
           </Text>
 
           {/* Tre rutor i en rad + bracket-etiketter undertill */}
-          <View style={styles.modeRow}>
+          <View style={[styles.modeRow, { marginTop: Spacing.sm }]}>
             {renderModeBox('single', 'Single player', true)}
             {renderModeBox('ptp', 'Pass-the-Phone', true)}
             {renderModeBox('indiv', 'Individual device', true)}
@@ -5255,11 +5257,22 @@ export default function LobbyScreen() {
                     </View>
                     <TouchableOpacity
                       style={[styles.roundsStepperBtn, roundsCount >= stepperMax && styles.roundsStepperBtnDisabled]}
-                      onPress={handleIncrementRounds}
+                      onPress={roundsCount >= stepperMax && !hasPremium
+                        ? () => router.push({ pathname: '/store' as const, params: { focus: 'subscription', from: '/lobby', fromCode: roomCode } })
+                        : handleIncrementRounds}
                       activeOpacity={0.7}
                     >
                       <Text style={[styles.roundsStepperBtnText, roundsCount >= stepperMax && styles.roundsStepperBtnTextDisabled]}>+</Text>
                     </TouchableOpacity>
+                    {roundsCount >= stepperMax && (
+                      <TouchableOpacity
+                        onPress={() => router.push({ pathname: '/store' as const, params: { focus: 'subscription', from: '/lobby', fromCode: roomCode } })}
+                        activeOpacity={0.7}
+                        style={{ backgroundColor: hasPremium ? '#F5A623' : '#6B7280', borderRadius: 4, paddingHorizontal: 8, paddingVertical: 2, marginLeft: 4 }}
+                      >
+                        <Text style={{ fontSize: 10, fontWeight: '700', color: hasPremium ? '#000' : '#FFF', letterSpacing: 0.6 }}>PREMIUM</Text>
+                      </TouchableOpacity>
+                    )}
                   </View>
                   <View style={{ alignItems: 'center' }}>
                     <RoundsRuler
@@ -5272,13 +5285,14 @@ export default function LobbyScreen() {
                         router.push({ pathname: '/store' as const, params: { focus: 'subscription', from: '/lobby', fromCode: roomCode } });
                       }}
                       hasSubscription={hasPremium}
+                      indivActive={!singlePlayerDefault && gameMode === 'individual-devices'}
                     />
                   </View>
                   {/* Game mode quick-select — under RoundsRuler för snabb mode-byte */}
                   <View style={[styles.modeRow, { marginTop: Spacing.sm }]}>
                     {renderModeBox('single', 'Single player', true)}
                     {renderModeBox('ptp', 'Pass-the-Phone', true)}
-                    {renderModeBox('indiv', 'Individual device', true)}
+                    {renderModeBox('indiv', 'Individual device', true, true)}
                   </View>
                 </>
               ) : (

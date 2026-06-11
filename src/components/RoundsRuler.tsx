@@ -47,13 +47,14 @@ const RULER_WIDTH = 280;
  * också allt unlocked eftersom IndDev:s rounds-cap är 20 och locked-zonen
  * inte renderas.
  */
-export function RoundsRuler({ value, min, gameModeMax, onPremiumPress, hasSubscription = false, applicable = true }: {
+export function RoundsRuler({ value, min, gameModeMax, onPremiumPress, hasSubscription = false, applicable = true, indivActive = false }: {
   value: number;
   min: number;
   gameModeMax: number;
   onPremiumPress?: () => void;
   hasSubscription?: boolean;
   applicable?: boolean;
+  indivActive?: boolean;
 }) {
   // Klammer + ticks visas "unlocked" bara när BÅDA villkoren stämmer:
   // user äger premium OCH feature:n gäller i nuvarande mode. Annars grå.
@@ -180,8 +181,8 @@ export function RoundsRuler({ value, min, gameModeMax, onPremiumPress, hasSubscr
               }}
               pointerEvents="box-none"
             >
-              {/* "Individual device +" i vit text framför PREMIUM-badgen. */}
-              <Text style={roundsRulerStyles.individualDeviceText} numberOfLines={1}>
+              {/* "Individual device +" — grön när IndDev aktivt, röd annars. */}
+              <Text style={[roundsRulerStyles.individualDeviceText, { color: indivActive ? Colors.success : Colors.error }]} numberOfLines={1}>
                 Individual device +
               </Text>
               {/* hasBracket => interactive => onPremiumPress definierad. Säkert
@@ -271,11 +272,11 @@ const roundsRulerStyles = StyleSheet.create({
     color: '#000',
     letterSpacing: 0.6,
   },
-  // "Individual device +" i vit text framför PREMIUM-badgen under klammern.
+  // "Individual device +" framför PREMIUM-badgen under klammern.
+  // Färg sätts inline (grön/röd beroende på indivActive) — ingen statisk färg här.
   individualDeviceText: {
     fontSize: 10,
     fontWeight: '700',
-    color: '#FFFFFF',
     letterSpacing: 0.3,
   },
   // Explainer-text ovanför klammern när feature:n inte gäller här. Diskret
