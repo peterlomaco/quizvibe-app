@@ -1685,12 +1685,18 @@ export default function LobbyScreen() {
     });
   }, []);
   const handleIncrementRounds = useCallback(() => {
+    if (roundsCount >= stepperMax) {
+      if (singlePlayerDefault || gameMode === 'pass-the-phone') {
+        Alert.alert('More rounds not available', 'More than 4 rounds is only available with both Individual device and Premium activated.');
+      }
+      return;
+    }
     setRoundsCount((prev) => {
       const next = Math.min(stepperMax, prev + ROUNDS_STEP);
       if (next !== prev) void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       return next;
     });
-  }, [stepperMax]);
+  }, [stepperMax, roundsCount, singlePlayerDefault, gameMode]);
   // Per-source profession-category-filter (ersätter youtubeEnabled/imagesEnabled/enabledMainCategories).
   // YouTube: alla tre valbara, min 1 krävs. Images: Film+Sport mandatory, Music valbar.
   const [youtubeEnabledCategories, setYoutubeEnabledCategories] = useState<MainCategory[]>(
@@ -2350,7 +2356,7 @@ export default function LobbyScreen() {
 
   // En game-mode-ruta (delas av Single device- och Multiplayer-grupperna).
   // FREE-badge grön när aktiv, grå när inaktiv. disabled för non-host.
-  const renderModeBox = (key: 'single' | 'ptp' | 'indiv', label: string) => {
+  const renderModeBox = (key: 'single' | 'ptp' | 'indiv', label: string, smallText?: boolean) => {
     const isActive =
       key === 'single'
         ? singlePlayerDefault
@@ -2369,7 +2375,7 @@ export default function LobbyScreen() {
         activeOpacity={0.7}
       >
         <Text
-          style={[styles.modeLabel, { textAlign: 'center' }, isActive && styles.modeLabelActiveFree]}
+          style={[styles.modeLabel, { textAlign: 'center' }, smallText && { fontSize: FontSize.xs }, isActive && styles.modeLabelActiveFree]}
           numberOfLines={2}
         >
           {label}
@@ -5254,7 +5260,6 @@ export default function LobbyScreen() {
                     <TouchableOpacity
                       style={[styles.roundsStepperBtn, roundsCount >= stepperMax && styles.roundsStepperBtnDisabled]}
                       onPress={handleIncrementRounds}
-                      disabled={roundsCount >= stepperMax}
                       activeOpacity={0.7}
                     >
                       <Text style={[styles.roundsStepperBtnText, roundsCount >= stepperMax && styles.roundsStepperBtnTextDisabled]}>+</Text>
@@ -5272,6 +5277,12 @@ export default function LobbyScreen() {
                       }}
                       hasSubscription={hasPremium}
                     />
+                  </View>
+                  {/* Game mode quick-select — under RoundsRuler för snabb mode-byte */}
+                  <View style={[styles.modeRow, { marginTop: Spacing.sm }]}>
+                    {renderModeBox('single', 'Single player', true)}
+                    {renderModeBox('ptp', 'Pass-the-Phone', true)}
+                    {renderModeBox('indiv', 'Individual device', true)}
                   </View>
                 </>
               ) : (
