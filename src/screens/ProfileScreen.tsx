@@ -339,6 +339,12 @@ export default function ProfileScreen() {
     });
   };
   const handleIncrementRounds = () => {
+    if (roundsCount >= roundsMax) {
+      if (singlePlayerDefault || gameMode === 'pass-the-phone') {
+        Alert.alert('More rounds not available', 'More than 4 rounds is only available with both Individual device and Premium activated.');
+      }
+      return;
+    }
     setRoundsCount((prev) => {
       const next = Math.min(roundsMax, prev + ROUNDS_STEP);
       if (next !== prev) void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -1803,7 +1809,6 @@ export default function ProfileScreen() {
                   pressed && roundsCount < roundsMax && { opacity: 0.7 },
                 ]}
                 onPress={handleIncrementRounds}
-                disabled={roundsCount >= roundsMax}
               >
                 <Text
                   style={[
