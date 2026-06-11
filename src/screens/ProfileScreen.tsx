@@ -374,7 +374,7 @@ export default function ProfileScreen() {
   };
   // En game-mode-ruta (delas av Single device- och Multiplayer-grupperna).
   // FREE-badge grön när aktiv, grå när inaktiv. Speglar Lobby.
-  const renderModeBox = (key: 'single' | 'ptp' | 'indiv', label: string) => {
+  const renderModeBox = (key: 'single' | 'ptp' | 'indiv', label: string, smallText?: boolean) => {
     const isActive =
       key === 'single'
         ? singlePlayerDefault
@@ -395,7 +395,7 @@ export default function ProfileScreen() {
         }
       >
         <Text
-          style={[styles.modeLabel, { textAlign: 'center' }, isActive && styles.modeLabelActiveFree]}
+          style={[styles.modeLabel, { textAlign: 'center' }, smallText && { fontSize: FontSize.xs }, isActive && styles.modeLabelActiveFree]}
           numberOfLines={2}
         >
           {label}
@@ -1830,9 +1830,9 @@ export default function ProfileScreen() {
           <View style={styles.field}>
             <Text style={styles.sectionLabel}>Game Mode</Text>
             <View style={styles.modeRow}>
-              {renderModeBox('single', 'Single player')}
-              {renderModeBox('ptp', 'Pass-the-Phone')}
-              {renderModeBox('indiv', 'Individual device')}
+              {renderModeBox('single', 'Single player', true)}
+              {renderModeBox('ptp', 'Pass-the-Phone', true)}
+              {renderModeBox('indiv', 'Individual device', true)}
             </View>
           </View>
 
