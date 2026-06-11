@@ -4240,55 +4240,23 @@ export default function LobbyScreen() {
             Game Mode
           </Text>
 
-          {/* Game mode — grupperat i två rader istället för tre rutor bredvid
-              varandra (för trångt). Single device får egen full-bredds-ruta;
-              Multiplayer-lägena (Pass-the-Phone + Individual device) delar en
-              rad. FREE-badge per ruta (grön aktiv / grå inaktiv). Read-only
-              (disabled) för non-host. */}
-          <View style={styles.multiplayerLabelRow}>
-            <Text style={[styles.gameModeGroupLabel, { marginTop: 0, marginBottom: 0 }]}>Single player mode</Text>
-            <Pressable
-              style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-              onPress={() =>
-                Alert.alert(
-                  'Single player mode',
-                  'One player only — challenge yourself.\n\nMax 4 rounds, even with a Premium subscription. Spotify not applicable for Single player mode.',
-                )
-              }
-              hitSlop={8}
-              accessibilityLabel="Single player mode info"
-            >
-              <Text style={styles.infoIconText}>i</Text>
-            </Pressable>
-          </View>
-          {/* Spacer (flex 1) till höger → Single player-rutan blir halv bredd,
-              vänsterställd, och linjerar med multiplayer-radens vänstra ruta. */}
+          {/* Tre rutor i en rad + bracket-etiketter undertill */}
           <View style={styles.modeRow}>
-            {renderModeBox('single', 'Single player')}
-            <View style={{ flex: 1 }} />
+            {renderModeBox('single', 'Single player', true)}
+            {renderModeBox('ptp', 'Pass-the-Phone', true)}
+            {renderModeBox('indiv', 'Individual device', true)}
           </View>
-
-          {/* Multiplayer mode-rubrik + info-ikon. Beskrivningstexten för PtP/
-              IndDev ligger numera i info-ikonens popup istället för under rutorna. */}
-          <View style={styles.multiplayerLabelRow}>
-            <Text style={[styles.gameModeGroupLabel, { marginTop: 0, marginBottom: 0 }]}>Multiplayer mode</Text>
-            <Pressable
-              style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-              onPress={() =>
-                Alert.alert(
-                  'Multiplayer mode',
-                  'Pass-the-Phone: All players share one device. Max 4 players, even with Premium. Spotify not applicable for PtP mode.\n\nIndividual device: Each player uses their own device — registered QuizVibe accounts only. Max 4 players on Basic, max 12 players with Premium.',
-                )
-              }
-              hitSlop={8}
-              accessibilityLabel="Multiplayer mode info"
-            >
-              <Text style={styles.infoIconText}>i</Text>
-            </Pressable>
-          </View>
-          <View style={styles.modeRow}>
-            {renderModeBox('ptp', 'Pass-the-Phone')}
-            {renderModeBox('indiv', 'Individual device')}
+          <View style={{ flexDirection: 'row', gap: Spacing.sm, marginTop: 2 }}>
+            {/* Bracket under "Single player" */}
+            <View style={{ flex: 1, alignItems: 'center' }}>
+              <View style={styles.multiplayerBracket} />
+              <Text style={styles.multiplayerBracketLabel}>Single player mode</Text>
+            </View>
+            {/* Bracket under "Pass-the-Phone" + "Individual device" */}
+            <View style={{ flex: 2, alignItems: 'center' }}>
+              <View style={styles.multiplayerBracket} />
+              <Text style={styles.multiplayerBracketLabel}>Multiplayer</Text>
+            </View>
           </View>
 
           {/* Players — max antal spelare. Max 4 gratis, Max 12 Premium. Styr
