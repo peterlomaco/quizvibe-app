@@ -4269,7 +4269,21 @@ export default function LobbyScreen() {
             {/* Bracket under "Pass-the-Phone" + "Individual device" */}
             <View style={{ flex: 2, alignItems: 'center' }}>
               <View style={styles.multiplayerBracket} />
-              <Text style={styles.multiplayerBracketLabel}>Multiplayer</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                <Text style={styles.multiplayerBracketLabel}>Multiplayer</Text>
+                <Pressable
+                  style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
+                  onPress={() =>
+                    Alert.alert(
+                      'Multiplayer mode',
+                      'Pass-the-Phone: All players share one device. Max 4 players, even with Premium. Spotify not applicable for PtP mode.\n\nIndividual device: Each player uses their own device — registered QuizVibe accounts only. Max 4 players on Basic, max 12 players with Premium.',
+                    )
+                  }
+                  hitSlop={8}
+                >
+                  <Text style={styles.infoIconText}>i</Text>
+                </Pressable>
+              </View>
             </View>
           </View>
 
