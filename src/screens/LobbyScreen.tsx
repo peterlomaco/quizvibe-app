@@ -32,6 +32,7 @@ import { useLobbyPeerHealth } from '../lib/realtime/lobbyHealthChannel';
 import { Player, PlayerRow } from '../components/PlayerRow';
 import { QuizVibeFriendsLogo } from '../components/QuizVibeFriendsLogo';
 import { QuizVibeLogo } from '../components/QuizVibeLogo';
+import { QuizVibePlayLogo } from '../components/QuizVibePlayLogo';
 import { YouTubeBrandIcon } from '../components/YouTubeBrandIcon';
 import { SpotifyBrandIcon } from '../components/SpotifyBrandIcon';
 import { connectSpotify, disconnectSpotify } from '../lib/spotify';
@@ -4190,6 +4191,272 @@ export default function LobbyScreen() {
           )}
         </Card>
 
+        {/* ── Players in Lobby ─────────────────────────────────── */}
+        <View style={styles.section}>
+          {/* Kollapsbar sektionsrubrik (samma +/− mönster som Profile). */}
+          <TouchableOpacity
+            onPress={() => setPlayersExpanded(!playersExpanded)}
+            activeOpacity={0.7}
+            style={styles.sectionHeaderRow}
+            hitSlop={8}
+          >
+            <Text style={styles.sectionHeaderEmoji}>👥</Text>
+            <Text style={styles.sectionHeaderTitle}>Players in Lobby</Text>
+            <View style={styles.sectionToggleBox}>
+              <Text style={styles.sectionChevron}>{playersExpanded ? '−' : '+'}</Text>
+            </View>
+            {/* Röd "Players Waiting"-signal till höger om +/− när det finns
+                spelare som väntar på godkännande. Försvinner när alla är godkända. */}
+            {waitingForApproval.length > 0 && (
+              <BlinkingLabel style={styles.playersWaitingLabel}>
+                Players Waiting
+              </BlinkingLabel>
+            )}
+          </TouchableOpacity>
+          {!playersExpanded && <View style={styles.sectionDivider} />}
+          {playersExpanded && (<>
+          {/* Approved-räknaren + "+ Add Guest" flyttade ned till egen rad
+              under rubriken (2026-06-01), högerställd med lite toppluft. */}
+          {/* Approved-kapacitetsmätare: "Approved"-rubrik + N rutor (N = maxPlayers,
+              4 i Pass-the-Phone/Max 4, 12 i Individual Devices/Max 12). Rutorna
+              speglar GetReady:s rounds-dots: filled (lit) = godkänd spelare (host
+              alltid med = ruta 1), blinkande = väntar på godkännande, tom = ledig
+              plats. Sista rutan visar "max N". */}
+          <View style={[styles.sectionRow, styles.playersMetaRow]}>
+            <Text style={styles.approvedLabel}>Approved</Text>
+            <View style={styles.approvedBoxesGrid}>
+              {(() => {
+                const approvedCount = approvedPlayers.filter((p) => !p.hasLeft).length;
+                const waitingCount = waitingForApproval.length;
+                // 4 rutor i bredd → 4 spelare = 1 rad, 12 spelare = 3 rader
+                // (ruta 5 hamnar under ruta 1, ruta 6 under ruta 2 osv.).
+                const COLS = 4;
+                const renderBox = (i: number) => {
+                  const isFilled = i < approvedCount;
+                  const isBlinking = !isFilled && i < approvedCount + waitingCount;
+                  const isLast = i === maxPlayers - 1;
+                  const boxStyle = [
+                    styles.approvedBox,
+                    (isFilled || isBlinking) && styles.approvedBoxFilled,
+                  ];
+                  // Sista rutan: "max" på en rad och siffran (4/12) på raden under.
+                  const content = isLast ? (
+                    <View style={styles.approvedBoxMaxStack}>
+                      <Text style={styles.approvedBoxMaxLabel} numberOfLines={1}>max</Text>
+                      <Text style={styles.approvedBoxMaxNum} numberOfLines={1}>{maxPlayers}</Text>
+                    </View>
+                  ) : (
+                    <Text
+                      style={styles.approvedBoxNumber}
+                      numberOfLines={1}
+                      adjustsFontSizeToFit
+                      minimumFontScale={0.6}
+                    >
+                      {i + 1}
+                    </Text>
+                  );
+                  // ApprovedBox äger sin egen blink-loop (start/stopp via prop)
+                  // så övergången fast sken ↔ blinkande fungerar pålitligt.
+                  return (
+                    <ApprovedBox key={i} blinking={isBlinking} style={boxStyle}>
+                      {content}
+                    </ApprovedBox>
+                  );
+                };
+                const rowCount = Math.ceil(maxPlayers / COLS);
+                return Array.from({ length: rowCount }).map((_, r) => (
+                  <View key={r} style={styles.approvedBoxesGridRow}>
+                    {Array.from({ length: COLS }).map((_, c) => {
+                      const i = r * COLS + c;
+                      // Osynlig spacer på ev. ofull sista rad så kolumnerna
+                      // linjerar (maxPlayers=4/12 = alltid full, men robust).
+                      return i < maxPlayers ? renderBox(i) : (
+                        <View key={`sp-${c}`} style={styles.approvedBoxSpacer} />
+                      );
+                    })}
+                  </View>
+                ));
+              })()}
+            </View>
+            {hostMode && gameMode === 'pass-the-phone' && (
+              <TouchableOpacity style={styles.addBtn} onPress={handleOpenAddPlayer}>
+                <Text style={styles.addBtnText}>+ Add Guest</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+
+          {gameMode === 'pass-the-phone' && approvedPlayers.length > 0 && (
+            <Text style={styles.turnOrderHint}>
+              {hostMode
+                ? 'Turn order — top plays first. Use ↑↓ to reorder.'
+                : 'Playing order — selected by Host'}
+            </Text>
+          )}
+
+          <View style={styles.playerBoard}>
+            {/* Approved spelare = i spelet, har turn-nummer.
+                Host ser toggle på övriga approved (men inte sig själv). */}
+            {approvedPlayers.map((player, index) => (
+              <PlayerRow
+                key={player.id}
+                player={player}
+                index={players.indexOf(player)}
+                onMoveUp={hostMode && !player.hasLeft ? () => movePlayer(player.id, 'up') : undefined}
+                onMoveDown={hostMode && !player.hasLeft ? () => movePlayer(player.id, 'down') : undefined}
+                canMoveUp={hostMode && index > 0}
+                canMoveDown={hostMode && index < approvedPlayers.length - 1}
+                hcpComplete={player.hcpComplete}
+                age={player.age}
+                assistance={player.assistance}
+                isHostPlayer={player.isHost}
+                isGuest={player.type === 'guest'}
+                turnNumber={gameMode === 'pass-the-phone' ? index + 1 : undefined}
+                showApproveToggle={hostMode && !player.isHost && !player.hasLeft}
+                approved={true}
+                onApproveChange={(next) => handleSetApproved(player.id, next)}
+                hasLeft={player.hasLeft}
+                onEditPlayer={hostMode && !player.hasLeft ? () => openPlayerEdit(player.id) : undefined}
+                peerHealth={
+                  gameMode === 'individual-devices'
+                    ? player.id === ownPlayerIdRef.current
+                      ? 'self'
+                      : lobbyPeerHealth[player.id]
+                    : undefined
+                }
+                spotifyConnected={player.spotifyConnected}
+              />
+            ))}
+
+            {/* Waiting-for-approval section: divider + master toggle + spelarkort */}
+            {waitingForApproval.length > 0 && (
+              <View style={styles.waitingSection}>
+                <Text style={styles.waitingSectionLabel}>
+                  To be Approved by Host
+                </Text>
+
+                {/* Master "Approve All"-toggle — bara host ser/använder den.
+                    Drar host till Yes godkänns alla aktuellt väntande spelare. */}
+                {hostMode && waitingForApproval.length > 0 && (
+                  <View style={styles.approveAllRow}>
+                    <ApproveToggle
+                      label="Approve All"
+                      value={approveAllValue}
+                      onChange={(next) => {
+                        setApproveAllValue(next);
+                        if (next === 'yes') {
+                          handleApproveAll();
+                          // Reset till 'no' så toggleln åter visas i No-läge
+                          // när nya spelare hamnar i listan i framtiden.
+                          setTimeout(() => setApproveAllValue('no'), 400);
+                        }
+                      }}
+                    />
+                  </View>
+                )}
+
+                {waitingForApproval.map((player) => (
+                  <PlayerRow
+                    key={player.id}
+                    player={player}
+                    index={players.indexOf(player)}
+                    hcpComplete={player.hcpComplete}
+                    age={player.age}
+                    assistance={player.assistance}
+                    isHostPlayer={false}
+                    isGuest={player.type === 'guest'}
+                    showApproveToggle={hostMode && !player.hasLeft}
+                    approved={false}
+                    onApproveChange={(next) => handleSetApproved(player.id, next)}
+                    hasLeft={player.hasLeft}
+                    onDelete={hostMode ? () => handleDeletePlayer(player.id) : undefined}
+                    onEditPlayer={hostMode && !player.hasLeft ? () => openPlayerEdit(player.id) : undefined}
+                    peerHealth={
+                      gameMode === 'individual-devices'
+                        ? player.id === ownPlayerIdRef.current
+                          ? 'self'
+                          : lobbyPeerHealth[player.id]
+                        : undefined
+                    }
+                    spotifyConnected={player.spotifyConnected}
+                  />
+                ))}
+              </View>
+            )}
+
+          </View>
+          </>)}
+        </View>
+
+        {/* Start Game + Customize-rubrik wrappad i en enda View så ScrollViewns
+            gap: Spacing.xl bara appliceras EN gång mot Players-blocket ovanför,
+            inte per delElement. */}
+        <View style={{ gap: 0 }}>
+          {/* ── Start game ────────────────────────────────────────
+              Host-only — non-host kan inte trigga spelstart. När backend
+              kommer in pushas alla godkända spelare in i quizet via socket-
+              event som host:s Start Game-tap fyrar. */}
+          {hostMode && (
+            <View style={styles.startSection}>
+              {/* "Start Game"-label ovanför play-loggan — speglar GetReadyIntro:s
+                  "Press Play"-rad men med lobby-specifik text. */}
+              <View style={styles.startGameLabelRow}>
+                <Text style={styles.startGameLabelText}>Start Game</Text>
+              </View>
+              {/* Gold-glowing Q-play-logo — identisk animering och stil som
+                  GetReadyIntro:s play-knapp. */}
+              <Animated.View
+                style={[styles.startGameWrap, { transform: [{ scale: startPulse }] }]}
+              >
+                <Animated.View
+                  style={[styles.startGameHalo, { opacity: startGlow }]}
+                  pointerEvents="none"
+                />
+                <TouchableOpacity
+                  activeOpacity={0.85}
+                  onPress={() => handleStartGame()}
+                  style={styles.startGameLogoTouch}
+                >
+                  <QuizVibePlayLogo size={140} color={Colors.warning} />
+                </TouchableOpacity>
+              </Animated.View>
+            </View>
+          )}
+
+          {/* Non-host: status-ruta i samma layout-position som host:s
+              Start Game-knapp. Sekventiella prickar signalerar att appen
+              lever och väntar på host:ens spelstart. Gold-glowing visuellt
+              språk speglar host:s Start Game-knapp så båda roller har samma
+              "ready"-vibe i CTA-positionen. */}
+          {!hostMode && (
+            <View style={styles.startSection}>
+              <View style={styles.startGameLabelRow}>
+                <Text style={[styles.startGameLabelText, { color: Colors.textSecondary }]}>
+                  Waiting for Host to Start Game
+                </Text>
+                <SequentialDots color={Colors.warning} />
+              </View>
+              <Animated.View
+                style={[styles.startGameWrap, { transform: [{ scale: startPulse }] }]}
+              >
+                <Animated.View
+                  style={[styles.startGameHalo, { opacity: startGlow }]}
+                  pointerEvents="none"
+                />
+                <View style={styles.startGameLogoTouch} pointerEvents="none">
+                  <QuizVibePlayLogo size={140} color={Colors.warning} />
+                </View>
+              </Animated.View>
+            </View>
+          )}
+
+          {/* ── Customize QuizVibe header ─────────────────────────────
+              Visuell grupp-rubrik som signalerar att Game Settings och
+              Quiz Tuning är host-kontrollerade spel-anpassningar. */}
+          <View style={styles.customizeSectionHeader}>
+            <Text style={styles.customizeSectionHeaderText}>Customize QuizVibe</Text>
+          </View>
+        </View>
+
         {/* Game Settings — sitter mellan room code-kortet och Game Mode-kortet.
             Wrappad i styles.section (samma som Players/Quiz Tuning) så header→
             divider-avståndet styrs av section-gap och blir identiskt för alla tre. */}
@@ -4846,202 +5113,6 @@ export default function LobbyScreen() {
         )}{/* /gameSettingsBorder */}
         </View>{/* /Game Settings section */}
 
-        {/* ── Players in Lobby ─────────────────────────────────── */}
-        <View style={styles.section}>
-          {/* Kollapsbar sektionsrubrik (samma +/− mönster som Profile). */}
-          <TouchableOpacity
-            onPress={() => setPlayersExpanded(!playersExpanded)}
-            activeOpacity={0.7}
-            style={styles.sectionHeaderRow}
-            hitSlop={8}
-          >
-            <Text style={styles.sectionHeaderEmoji}>👥</Text>
-            <Text style={styles.sectionHeaderTitle}>Players in Lobby</Text>
-            <View style={styles.sectionToggleBox}>
-              <Text style={styles.sectionChevron}>{playersExpanded ? '−' : '+'}</Text>
-            </View>
-            {/* Röd "Players Waiting"-signal till höger om +/− när det finns
-                spelare som väntar på godkännande. Försvinner när alla är godkända. */}
-            {waitingForApproval.length > 0 && (
-              <BlinkingLabel style={styles.playersWaitingLabel}>
-                Players Waiting
-              </BlinkingLabel>
-            )}
-          </TouchableOpacity>
-          {!playersExpanded && <View style={styles.sectionDivider} />}
-          {playersExpanded && (<>
-          {/* Approved-räknaren + "+ Add Guest" flyttade ned till egen rad
-              under rubriken (2026-06-01), högerställd med lite toppluft. */}
-          {/* Approved-kapacitetsmätare: "Approved"-rubrik + N rutor (N = maxPlayers,
-              4 i Pass-the-Phone/Max 4, 12 i Individual Devices/Max 12). Rutorna
-              speglar GetReady:s rounds-dots: filled (lit) = godkänd spelare (host
-              alltid med = ruta 1), blinkande = väntar på godkännande, tom = ledig
-              plats. Sista rutan visar "max N". */}
-          <View style={[styles.sectionRow, styles.playersMetaRow]}>
-            <Text style={styles.approvedLabel}>Approved</Text>
-            <View style={styles.approvedBoxesGrid}>
-              {(() => {
-                const approvedCount = approvedPlayers.filter((p) => !p.hasLeft).length;
-                const waitingCount = waitingForApproval.length;
-                // 4 rutor i bredd → 4 spelare = 1 rad, 12 spelare = 3 rader
-                // (ruta 5 hamnar under ruta 1, ruta 6 under ruta 2 osv.).
-                const COLS = 4;
-                const renderBox = (i: number) => {
-                  const isFilled = i < approvedCount;
-                  const isBlinking = !isFilled && i < approvedCount + waitingCount;
-                  const isLast = i === maxPlayers - 1;
-                  const boxStyle = [
-                    styles.approvedBox,
-                    (isFilled || isBlinking) && styles.approvedBoxFilled,
-                  ];
-                  // Sista rutan: "max" på en rad och siffran (4/12) på raden under.
-                  const content = isLast ? (
-                    <View style={styles.approvedBoxMaxStack}>
-                      <Text style={styles.approvedBoxMaxLabel} numberOfLines={1}>max</Text>
-                      <Text style={styles.approvedBoxMaxNum} numberOfLines={1}>{maxPlayers}</Text>
-                    </View>
-                  ) : (
-                    <Text
-                      style={styles.approvedBoxNumber}
-                      numberOfLines={1}
-                      adjustsFontSizeToFit
-                      minimumFontScale={0.6}
-                    >
-                      {i + 1}
-                    </Text>
-                  );
-                  // ApprovedBox äger sin egen blink-loop (start/stopp via prop)
-                  // så övergången fast sken ↔ blinkande fungerar pålitligt.
-                  return (
-                    <ApprovedBox key={i} blinking={isBlinking} style={boxStyle}>
-                      {content}
-                    </ApprovedBox>
-                  );
-                };
-                const rowCount = Math.ceil(maxPlayers / COLS);
-                return Array.from({ length: rowCount }).map((_, r) => (
-                  <View key={r} style={styles.approvedBoxesGridRow}>
-                    {Array.from({ length: COLS }).map((_, c) => {
-                      const i = r * COLS + c;
-                      // Osynlig spacer på ev. ofull sista rad så kolumnerna
-                      // linjerar (maxPlayers=4/12 = alltid full, men robust).
-                      return i < maxPlayers ? renderBox(i) : (
-                        <View key={`sp-${c}`} style={styles.approvedBoxSpacer} />
-                      );
-                    })}
-                  </View>
-                ));
-              })()}
-            </View>
-            {hostMode && gameMode === 'pass-the-phone' && (
-              <TouchableOpacity style={styles.addBtn} onPress={handleOpenAddPlayer}>
-                <Text style={styles.addBtnText}>+ Add Guest</Text>
-              </TouchableOpacity>
-            )}
-          </View>
-
-          {gameMode === 'pass-the-phone' && approvedPlayers.length > 0 && (
-            <Text style={styles.turnOrderHint}>
-              {hostMode
-                ? 'Turn order — top plays first. Use ↑↓ to reorder.'
-                : 'Playing order — selected by Host'}
-            </Text>
-          )}
-
-          <View style={styles.playerBoard}>
-            {/* Approved spelare = i spelet, har turn-nummer.
-                Host ser toggle på övriga approved (men inte sig själv). */}
-            {approvedPlayers.map((player, index) => (
-              <PlayerRow
-                key={player.id}
-                player={player}
-                index={players.indexOf(player)}
-                onMoveUp={hostMode && !player.hasLeft ? () => movePlayer(player.id, 'up') : undefined}
-                onMoveDown={hostMode && !player.hasLeft ? () => movePlayer(player.id, 'down') : undefined}
-                canMoveUp={hostMode && index > 0}
-                canMoveDown={hostMode && index < approvedPlayers.length - 1}
-                hcpComplete={player.hcpComplete}
-                age={player.age}
-                assistance={player.assistance}
-                isHostPlayer={player.isHost}
-                isGuest={player.type === 'guest'}
-                turnNumber={gameMode === 'pass-the-phone' ? index + 1 : undefined}
-                showApproveToggle={hostMode && !player.isHost && !player.hasLeft}
-                approved={true}
-                onApproveChange={(next) => handleSetApproved(player.id, next)}
-                hasLeft={player.hasLeft}
-                onEditPlayer={hostMode && !player.hasLeft ? () => openPlayerEdit(player.id) : undefined}
-                peerHealth={
-                  gameMode === 'individual-devices'
-                    ? player.id === ownPlayerIdRef.current
-                      ? 'self'
-                      : lobbyPeerHealth[player.id]
-                    : undefined
-                }
-                spotifyConnected={player.spotifyConnected}
-              />
-            ))}
-
-            {/* Waiting-for-approval section: divider + master toggle + spelarkort */}
-            {waitingForApproval.length > 0 && (
-              <View style={styles.waitingSection}>
-                <Text style={styles.waitingSectionLabel}>
-                  To be Approved by Host
-                </Text>
-
-                {/* Master "Approve All"-toggle — bara host ser/använder den.
-                    Drar host till Yes godkänns alla aktuellt väntande spelare. */}
-                {hostMode && waitingForApproval.length > 0 && (
-                  <View style={styles.approveAllRow}>
-                    <ApproveToggle
-                      label="Approve All"
-                      value={approveAllValue}
-                      onChange={(next) => {
-                        setApproveAllValue(next);
-                        if (next === 'yes') {
-                          handleApproveAll();
-                          // Reset till 'no' så toggleln åter visas i No-läge
-                          // när nya spelare hamnar i listan i framtiden.
-                          setTimeout(() => setApproveAllValue('no'), 400);
-                        }
-                      }}
-                    />
-                  </View>
-                )}
-
-                {waitingForApproval.map((player) => (
-                  <PlayerRow
-                    key={player.id}
-                    player={player}
-                    index={players.indexOf(player)}
-                    hcpComplete={player.hcpComplete}
-                    age={player.age}
-                    assistance={player.assistance}
-                    isHostPlayer={false}
-                    isGuest={player.type === 'guest'}
-                    showApproveToggle={hostMode && !player.hasLeft}
-                    approved={false}
-                    onApproveChange={(next) => handleSetApproved(player.id, next)}
-                    hasLeft={player.hasLeft}
-                    onDelete={hostMode ? () => handleDeletePlayer(player.id) : undefined}
-                    onEditPlayer={hostMode && !player.hasLeft ? () => openPlayerEdit(player.id) : undefined}
-                    peerHealth={
-                      gameMode === 'individual-devices'
-                        ? player.id === ownPlayerIdRef.current
-                          ? 'self'
-                          : lobbyPeerHealth[player.id]
-                        : undefined
-                    }
-                    spotifyConnected={player.spotifyConnected}
-                  />
-                ))}
-              </View>
-            )}
-
-          </View>
-          </>)}
-        </View>
-
         {/* ── Quiz Settings ─────────────────────────────────────
             Game Era + Number of Rounds delar en gemensam ram
             (quizSettingsBorder, samma stil som gameSettingsBorder).
@@ -5410,58 +5481,6 @@ export default function LobbyScreen() {
           </View>
           )}
         </View>
-
-        {/* ── Start game ────────────────────────────────────────
-            Host-only — non-host kan inte trigga spelstart. När backend
-            kommer in pushas alla godkända spelare in i quizet via socket-
-            event som host:s Start Game-tap fyrar. */}
-        {hostMode && (
-          <View style={styles.startSection}>
-            {/* Gold-glowing CTA. Animated halo-View + iOS gold-shadow ger
-                cross-platform glow (Android har ingen shadowColor-support, då
-                bär halo:n hela glow-effekten). Mörk text mot gold-bg matchar
-                era-slider-thumb-mönstret (Colors.background-glyph på guld). */}
-            <Animated.View
-              style={[styles.startGameWrap, { transform: [{ scale: startPulse }] }]}
-            >
-              <Animated.View
-                style={[styles.startGameHalo, { opacity: startGlow }]}
-                pointerEvents="none"
-              />
-              <Pressable
-                onPress={() => handleStartGame()}
-                style={({ pressed }) => [
-                  styles.startGameButton,
-                  pressed && { opacity: 0.85 },
-                ]}
-              >
-                <Text style={styles.startGameLabel}>Start Game</Text>
-              </Pressable>
-            </Animated.View>
-          </View>
-        )}
-
-        {/* Non-host: status-ruta i samma layout-position som host:s
-            Start Game-knapp. Sekventiella prickar signalerar att appen
-            lever och väntar på host:ens spelstart. Gold-glowing visuellt
-            språk speglar host:s Start Game-knapp så båda roller har samma
-            "ready"-vibe i CTA-positionen. */}
-        {!hostMode && (
-          <View style={styles.startSection}>
-            <Animated.View
-              style={[styles.startGameWrap, { transform: [{ scale: startPulse }] }]}
-            >
-              <Animated.View
-                style={[styles.startGameHalo, { opacity: startGlow }]}
-                pointerEvents="none"
-              />
-              <View style={[styles.startGameButton, styles.waitingForHostBox]}>
-                <Text style={styles.waitingForHostText}>Waiting for Host to Start Game</Text>
-                <SequentialDots color={Colors.background} />
-              </View>
-            </Animated.View>
-          </View>
-        )}
 
         <View style={styles.bottomPad} />
       </ScrollView>
@@ -7270,6 +7289,19 @@ const styles = StyleSheet.create({
   // Kollapsbar sektionsrubrik — speglar Profile-vyns header-mönster (ledande
   // ikon + Typography.title bold + +/−-toggle-box). paddingHorizontal: xs så
   // rubriken linjerar i vänsterkant med övriga sektioner. 2026-06-01.
+  customizeSectionHeader: {
+    backgroundColor: '#374151',
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.sm,
+    borderRadius: Radius.md,
+    marginTop: Spacing.md,
+  },
+  customizeSectionHeaderText: {
+    fontSize: FontSize.lg,
+    fontWeight: FontWeight.bold,
+    color: '#FFFFFF',
+    letterSpacing: 0.5,
+  },
   sectionHeaderRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -7501,7 +7533,7 @@ const styles = StyleSheet.create({
   regionTrigger: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, backgroundColor: Colors.background, borderRadius: Radius.md, borderWidth: 1, borderColor: Colors.borderStrong, paddingHorizontal: Spacing.lg, paddingVertical: Spacing.md },
   regionTriggerText: { flex: 1, fontSize: FontSize.md, fontWeight: FontWeight.medium, color: Colors.textPrimary },
 
-  startSection: { gap: Spacing.md },
+  startSection: { gap: 0, alignItems: 'center' },
   // Answer response time-rad: 4 knappar (15/30/45/60s) på en rad. Active-
   // varianten speglar Number of Rounds:s blå-bordred ruta (primaryBorder +
   // primaryMuted bg) så Quiz Settings-blocket har konsekvent färgvokabulär.
@@ -7535,54 +7567,49 @@ const styles = StyleSheet.create({
     color: Colors.textPrimary,
     fontWeight: FontWeight.bold,
   },
-  // Gold-glowing Start Game-knapp (host-only). Wrap håller position-context
-  // för halo:n; halo är absolut-positionerad ruta som extender utanför
-  // knappens kanter och får opacity-pulserad bakgrundsfärg så glow:en lyser
-  // genom utan att klippas av knappens egen border-radius.
+  // Q-play-logo Start Game — identisk layout som GetReadyIntro:s play-knapp.
+  // Wrap är 140×140 centrerad; halo extender 14px utanför loggan med guld-glow.
   startGameWrap: {
     position: 'relative',
-    alignSelf: 'stretch',
-  },
-  startGameHalo: {
-    position: 'absolute',
-    top: -8,
-    left: -8,
-    right: -8,
-    bottom: -8,
-    borderRadius: Radius.md + 4,
-    backgroundColor: Colors.warning,
-  },
-  startGameButton: {
-    height: 52,
-    borderRadius: Radius.md,
-    backgroundColor: Colors.warning,
+    width: 140,
+    height: 140,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: Spacing.xl,
     shadowColor: Colors.warning,
     shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.85,
+    shadowOpacity: 0.6,
     shadowRadius: 18,
     elevation: 12,
   },
-  startGameLabel: {
-    fontSize: FontSize.xl,
+  startGameHalo: {
+    position: 'absolute',
+    top: 14,
+    left: 14,
+    right: 14,
+    bottom: 14,
+    borderRadius: Radius.xl,
+    backgroundColor: Colors.warning,
+  },
+  startGameLogoTouch: {
+    width: 140,
+    height: 140,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  // "Start Game"-label + pil ovanför play-loggan (speglar GetReadyIntro:s tapHereRow).
+  startGameLabelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: Spacing.sm,
+  },
+  startGameLabelText: {
+    fontSize: 22,
     fontWeight: FontWeight.bold,
-    color: Colors.background,
-    letterSpacing: 0.6,
+    color: Colors.warning,
+    letterSpacing: 0.5,
   },
 
-  // Waiting-ruta för non-host — speglar Button:s base-mått (52px höjd,
-  // Radius.md) men styls som en passiv status-pillar med subtila brand-
-  // toner: primaryMuted bg + primaryBorder kant + textPrimary text.
-  // Layouten är row så texten + SequentialDots står på samma rad.
-  // Override på startGameButton för Waiting-rutan: byt till row-layout så
-  // text + SequentialDots står sida vid sida. Bg/glow/storlek ärvs från
-  // startGameButton (gold-bg + iOS shadow). Kombineras via stil-array i
-  // render: [styles.startGameButton, styles.waitingForHostBox].
-  waitingForHostBox: {
-    flexDirection: 'row',
-  },
   waitingForHostText: {
     fontSize: FontSize.md,
     fontWeight: FontWeight.bold,
