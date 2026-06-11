@@ -1829,13 +1829,8 @@ export default function ProfileScreen() {
           {/* Game mode quick-select — under RoundsRuler för snabb mode-byte */}
           <View style={styles.field}>
             <Text style={styles.sectionLabel}>Game Mode</Text>
-            <Text style={styles.gameModeGroupLabel}>Single player mode</Text>
             <View style={styles.modeRow}>
               {renderModeBox('single', 'Single player')}
-              <View style={{ flex: 1 }} />
-            </View>
-            <Text style={[styles.gameModeGroupLabel, { marginTop: Spacing.sm }]}>Multiplayer mode</Text>
-            <View style={styles.modeRow}>
               {renderModeBox('ptp', 'Pass-the-Phone')}
               {renderModeBox('indiv', 'Individual device')}
             </View>
