@@ -616,6 +616,12 @@ Non-host-vyn använder fortfarande default `hasSubscription={false}` → grå st
 - **Free host**: bevarar default Store-upsell-routing (`/store?focus=subscription&from=/lobby&fromCode={roomCode}`).
 - **Premium-host i IndDev**: bracket + PREMIUM-badge döljs (`gameModeMax === ROUNDS_MAX_INDIV` → ingen locked-zone att rendera).
 
+**`RoundsRuler.indivActive`-prop** (tillagd 2026-06-11): `indivActive?: boolean` (default false) — styr färgen på "Individual device +"-texten inuti klammern: `Colors.success` (grön) när IndDev aktivt, `Colors.error` (röd) annars. Passas från Lobby + Profile som `!singlePlayerDefault && gameMode === 'individual-devices'`.
+
+**`renderModeBox` 4:e `redIndiv`-param** (Lobby + Profile, 2026-06-11): valfri boolesk 4:e parameter. Styr om IndDev-rutan (`key === 'indiv'`) ska få röd text i inaktivt läge. Passas bara `true` i **Number of Rounds quick-select**-raden; Game Mode/Game Settings-raderna skickar inget 4:e argument — IndDev-rutan behåller grå standardfärg i Game Mode-sektionen.
+
+**PREMIUM-badge bredvid stepper "+"** (Lobby + Profile, 2026-06-11): visas inline till höger om "+"-knappen när `roundsCount >= stepperMax` (Lobby) / `roundsCount >= roundsMax` (Profile). Exakt samma badge-styling som klammerbadgen under RoundsRuler: `backgroundColor: hasPremium ? '#F5A623' : '#6B7280'`, text `color: hasPremium ? '#000' : '#FFF'`, `borderRadius: 4`, `paddingHorizontal: 8 / paddingVertical: 2`, `fontSize: 10 / fontWeight: '700' / letterSpacing: 0.6`. Tap på badge → Store/subscription. "+" vid cap utan premium: `onPress` navigerar till Store istället för att vara dead no-op. Badge försvinner naturligt i IndDev + premium (då `stepperMax = 20` och `roundsCount < 20` efter köp).
+
 ## Lobby — Game Settings card
 
 Game Mode and SOURCE AND PROFESSIONS share a single bordered card (`gameSettingsBorder` in `LobbyScreen.tsx`) — they're treated as one "spelregler"-grupp. Order inside SOURCE AND PROFESSIONS: Source × Profession matrix (kolumn-baserad: Music/Film/Sport som kolumner (displaynamn), YouTube/Images som rader) → "Customized Host packages" sub-block (`usePackagesBlock`).
