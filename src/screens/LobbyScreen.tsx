@@ -4250,7 +4250,7 @@ export default function LobbyScreen() {
             {/* Bracket under "Single player" */}
             <View style={{ flex: 1, alignItems: 'center' }}>
               <View style={styles.multiplayerBracket} />
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 12 }}>
                 <Text style={styles.multiplayerBracketLabel}>Single mode</Text>
                 <Pressable
                   style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
@@ -4269,7 +4269,7 @@ export default function LobbyScreen() {
             {/* Bracket under "Pass-the-Phone" + "Individual device" */}
             <View style={{ flex: 2, alignItems: 'center' }}>
               <View style={styles.multiplayerBracket} />
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 12 }}>
                 <Text style={styles.multiplayerBracketLabel}>Multiplayer</Text>
                 <Pressable
                   style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
@@ -6592,7 +6592,7 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 4,
   },
   multiplayerBracketLabel: {
-    marginTop: 12,
+    marginTop: 0,
     fontSize: 11,
     fontWeight: '700',
     color: Colors.textSecondary,
