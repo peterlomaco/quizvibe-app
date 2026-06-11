@@ -6592,7 +6592,7 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 4,
   },
   multiplayerBracketLabel: {
-    marginTop: 6,
+    marginTop: 12,
     fontSize: 11,
     fontWeight: '700',
     color: Colors.textSecondary,
