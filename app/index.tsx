@@ -40,6 +40,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Alert,
   Animated,
+  Dimensions,
   Easing,
   Keyboard,
   KeyboardAvoidingView,
@@ -54,6 +55,8 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+const SCREEN_HEIGHT = Dimensions.get('window').height;
+
 // ─── Join Modal ───────────────────────────────────────────────────────────────
 
 type JoinStep = 'choose' | 'code' | 'invites' | 'guest';
@@ -1370,7 +1373,7 @@ export default function HomeScreen() {
         setRegPassword('');
         setRegPasswordConfirmed(false);
         setRegBirthYearText('');
-        setRegAssistance('standard');
+        setRegAssistance('full');
         setRegRegion('sweden');
         setRegYearPickerOpen(false);
         setRegAssistancePickerOpen(false);
@@ -1434,7 +1437,7 @@ export default function HomeScreen() {
       setRegPassword('');
       setRegPasswordConfirmed(false);
       setRegBirthYearText('');
-      setRegAssistance('standard');
+      setRegAssistance('full');
       setRegRegion('sweden');
       setRegYearPickerOpen(false);
       setRegAssistancePickerOpen(false);
@@ -1458,7 +1461,7 @@ export default function HomeScreen() {
       setRegPassword('');
       setRegPasswordConfirmed(false);
       setRegBirthYearText('');
-      setRegAssistance('standard');
+      setRegAssistance('full');
       setRegRegion('sweden');
       setRegYearPickerOpen(false);
       setRegAssistancePickerOpen(false);
@@ -1954,11 +1957,16 @@ export default function HomeScreen() {
       {/* ── Top board (login status) ─────────────────────────── */}
       <TopUserBanner profile={profile} onPress={() => setProfileMenuVisible(true)} />
 
-      <View style={styles.container}>
+      <ScrollView
+        style={styles.containerScroll}
+        contentContainerStyle={styles.container}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
 
         {/* ── Brand ──────────────────────────────────────────── */}
         <View style={styles.brandSection}>
-          <QuizVibeLogo size={140} />
+          <QuizVibeLogo size={SCREEN_HEIGHT < 600 ? 100 : 140} />
           <Text style={[styles.appName, { fontFamily: appNameFont }]}>
             QuizVibe
           </Text>
@@ -2140,7 +2148,7 @@ export default function HomeScreen() {
             )}
           </Pressable>
         </View>
-      </View>
+      </ScrollView>
 
       <JoinModal
         visible={joinVisible}
@@ -2623,7 +2631,7 @@ export default function HomeScreen() {
                   // flexShrink: 1 låter ScrollView:n krympa när PlayerName:s
                   // custom CodeKeyboard tar plats nedanför; maxHeight 320 är
                   // tak när keyboardet inte är uppe.
-                  style={{ flexShrink: 1, maxHeight: 320 }}
+                  style={{ flexShrink: 1, maxHeight: SCREEN_HEIGHT < 600 ? 200 : 320 }}
                   contentContainerStyle={{ gap: Spacing.md }}
                 >
                   {/* Email — först ut. Aktiveringslänk skickas hit efter Register. */}
@@ -3104,21 +3112,22 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
+  containerScroll: { flex: 1 },
   container: {
-    flex: 1,
+    flexGrow: 1,
     paddingHorizontal: Spacing.lg,
-    paddingTop: Spacing.xxl,
+    paddingTop: SCREEN_HEIGHT < 600 ? Spacing.md : Spacing.xxl,
     paddingBottom: Spacing.lg,
     justifyContent: 'space-between',
   },
 
-  brandSection: { alignItems: 'center', gap: Spacing.sm },
+  brandSection: { alignItems: 'center', gap: SCREEN_HEIGHT < 600 ? 2 : Spacing.sm },
   appName: {
-    fontSize: 38,
+    fontSize: SCREEN_HEIGHT < 600 ? 30 : 38,
     fontWeight: '700',
     color: Colors.textPrimary,
     letterSpacing: -0.5,
-    marginTop: Spacing.sm,
+    marginTop: SCREEN_HEIGHT < 600 ? 2 : Spacing.sm,
   },
   tagline: {
     fontSize: 15,
@@ -3205,7 +3214,9 @@ const modal = StyleSheet.create({
   // när chrome+keyboard sammanlagt skulle överskrida sheet:s maxhöjd.
   sheet: {
     backgroundColor: Colors.card, borderTopLeftRadius: 24, borderTopRightRadius: 24,
-    padding: Spacing.xl, gap: Spacing.md, borderWidth: 1, borderColor: Colors.border,
+    padding: SCREEN_HEIGHT < 600 ? Spacing.md : Spacing.xl,
+    gap: SCREEN_HEIGHT < 600 ? Spacing.sm : Spacing.md,
+    borderWidth: 1, borderColor: Colors.border,
     maxHeight: '90%',
   },
   title: { fontSize: 20, fontWeight: '700', color: Colors.textPrimary, textAlign: 'center' },
