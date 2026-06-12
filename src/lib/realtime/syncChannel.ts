@@ -152,6 +152,16 @@ export interface SpotifyDJOpenedAppPayload {
 }
 
 /**
+ * DJ:n har tryckt "End DJ – handover to Host" i reveal-fasen.
+ * Broadcastas till alla enheter så host:s Next-knapp låses upp och
+ * non-hosts byter från "Waiting for DJ…" till "Waiting for host…".
+ */
+export interface SpotifyDJHandoverPayload {
+  /** DJ:ns lobby_players.player_id. */
+  dj_player_id: string;
+}
+
+/**
  * D-iv: host justerade audio för en specifik spelare i GetReady-vyn.
  * Incremental update — bara den ändrade spelaren broadcastas, inte hela
  * map:en. Mottagare uppdaterar sin lokala `playerAudioOverrides[player_id]`
@@ -280,6 +290,8 @@ export interface SyncChannelHandlers {
   onSpotifyDJOpenedApp?: (payload: SpotifyDJOpenedAppPayload) => void;
   /** DJ:n har öppnat Spotify — gissarnas timer + svar-block aktiveras. */
   onSpotifyDJTrackStarted?: (payload: SpotifyDJTrackStartedPayload) => void;
+  /** DJ:n har tryckt "End DJ – handover to Host" i reveal-fasen. */
+  onSpotifyDJHandover?: (payload: SpotifyDJHandoverPayload) => void;
   /** D-iv: host justerade audio för en spelare. Alla mottagare uppdaterar
    *  sin playerAudioOverrides-map; den drabbade spelarens device mute:as/
    *  unmute:as i MediaPlayer. */
@@ -346,6 +358,8 @@ export interface SyncChannel {
   broadcastSpotifyDJOpenedApp: (payload: SpotifyDJOpenedAppPayload) => Promise<void>;
   /** DJ:ns klient broadcastar att Spotify-appen öppnats. */
   broadcastSpotifyDJTrackStarted: (payload: SpotifyDJTrackStartedPayload) => Promise<void>;
+  /** DJ:n broadcastar att hen överlämnar till host efter reveal. */
+  broadcastSpotifyDJHandover: (payload: SpotifyDJHandoverPayload) => Promise<void>;
   /** D-iv: host broadcastar ny audio-state för en specifik spelare. */
   broadcastPlayerAudioStateChanged: (
     payload: PlayerAudioStateChangedPayload,
@@ -499,6 +513,11 @@ export function subscribeSyncChannel(
   if (handlers.onSpotifyDJTrackStarted) {
     channel.on('broadcast', { event: 'spotify_dj_track_started' }, ({ payload }) => {
       handlers.onSpotifyDJTrackStarted!(payload as SpotifyDJTrackStartedPayload);
+    });
+  }
+  if (handlers.onSpotifyDJHandover) {
+    channel.on('broadcast', { event: 'spotify_dj_handover' }, ({ payload }) => {
+      handlers.onSpotifyDJHandover!(payload as SpotifyDJHandoverPayload);
     });
   }
   if (handlers.onPlayerAudioStateChanged) {
@@ -668,6 +687,9 @@ export function subscribeSyncChannel(
     },
     broadcastSpotifyDJTrackStarted: async (payload) => {
       await channel.send({ type: 'broadcast', event: 'spotify_dj_track_started', payload });
+    },
+    broadcastSpotifyDJHandover: async (payload) => {
+      await channel.send({ type: 'broadcast', event: 'spotify_dj_handover', payload });
     },
     broadcastPlayerAudioStateChanged: async (payload) => {
       await channel.send({

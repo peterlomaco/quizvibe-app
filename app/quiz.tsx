@@ -74,6 +74,8 @@ import { buildEpochPhase, getActiveEpochs, type EpochPlayer, type EpochQuestion 
 import { getGenerationKeyFromBirthYear } from '@/src/utils/mockPurchasedPackages';
 import { hasPremiumSubscription } from '@/src/utils/subscriptionStorage';
 import { supabase } from '@/src/utils/supabase';
+import { fetchSpotifyTrackInfo, pauseSpotifyPlayback, resumeSpotifyPlayback, type SpotifyTrackInfo } from '@/src/lib/spotify';
+import { SpotifyNowPlayingOverlay } from '@/src/components/SpotifyNowPlayingOverlay';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
@@ -361,15 +363,34 @@ const SPOTIFY_DJ_STEPS = [
   'Go to Spotify and start the song',
   'Return here, activate the timer and let the music play during the countdown',
   'DJ keeps playing in Spotify',
-  'Time ends - DJ stop the music - continue with game',
+  'Time ends - DJ stop the music - DJ close Spotify [r]"X"[/r]',
+  'DJ handover to Host - continue with Game',
 ] as const;
 
 const SPOTIFY_GUESSER_STEPS = [
   'DJ start the song in Spotify',
   'DJ start the timer - listen and guess the year',
   'DJ keeps playing in Spotify',
-  'Time ends - DJ stop the music - continue with game',
+  'Time ends - DJ stop the music - DJ close Spotify [r]"X"[/r]',
+  'DJ handover to Host - continue with Game',
 ] as const;
+
+/** Parsar [r]...[/r]-markeringar i step-strängar och renderar dem i rött. */
+function renderStepText(text: string): React.ReactNode {
+  if (!text.includes('[r]')) return text;
+  const parts = text.split(/(\[r\].*?\[\/r\])/);
+  return parts.map((part, i) => {
+    const match = part.match(/^\[r\](.*?)\[\/r\]$/);
+    if (match) {
+      return (
+        <Text key={i} style={{ color: '#FF3B30', fontWeight: '700' }}>
+          {match[1]}
+        </Text>
+      );
+    }
+    return part;
+  });
+}
 
 // ─── Mått ─────────────────────────────────────────────────────────────────────
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -1327,6 +1348,20 @@ export default function QuizScreen() {
   const [spotifyDJOpenedAppBroadcast, setSpotifyDJOpenedAppBroadcast] = useState(false);
   // djStarted: DJ:n har tryckt "Activate timer" → broadcast skickas, timer startar.
   const [spotifyDJStarted, setSpotifyDJStarted] = useState(false);
+  // DJ har tryckt "End DJ – handover to Host" i reveal-fasen → låser upp host:s Next-knapp.
+  const [djHandedOver, setDjHandedOver] = useState(false);
+  // DJ har tryckt × på overlay → aktiverar steg 5 i guiden (utan att låsa upp host:s Next ännu).
+  const [djDismissedOverlay, setDjDismissedOverlay] = useState(false);
+  // Now Playing overlay — visas när DJ återvänder från Spotify-appen.
+  const [showNowPlayingOverlay, setShowNowPlayingOverlay] = useState(false);
+  const [nowPlayingTrackInfo, setNowPlayingTrackInfo] = useState<SpotifyTrackInfo | null>(null);
+  const [spotifyIsPlaying, setSpotifyIsPlaying] = useState(true);
+  // Speglar för AppState-listener (undviker stale closures).
+  const spotifyDJOpenedAppRef = useRef(false);
+  const spotifyDJStartedRef = useRef(false);
+  // currentSpotifyTrackId-spegel + bakgrunds-detektion för overlay-logik.
+  const currentSpotifyTrackIdRef = useRef<string | null>(null);
+  const wentToBackgroundRef = useRef(false);
   // Timeout-fas för Spotify-frågor:
   //   null     = ej Spotify-fråga eller timeout ej aktuell
   //   waiting  = Fas 1: väntar på DJ (0–240 s, ingen synlig nedräkning)
@@ -1933,6 +1968,20 @@ export default function QuizScreen() {
     }
   }, [timeLeft]);
 
+  // Spegla Spotify DJ-state till refs så AppState-listener aldrig läser stale closures.
+  useEffect(() => { spotifyDJOpenedAppRef.current = spotifyDJOpenedApp; }, [spotifyDJOpenedApp]);
+  useEffect(() => { spotifyDJStartedRef.current = spotifyDJStarted; }, [spotifyDJStarted]);
+  useEffect(() => { currentSpotifyTrackIdRef.current = currentSpotifyTrackId; }, [currentSpotifyTrackId]);
+
+  // Pre-hämta track-info så snart frågan är en Spotify-fråga — overlay-data
+  // är klar för alla spelare när de återvänder från Spotify-appen.
+  useEffect(() => {
+    if (!currentSpotifyTrackId) return;
+    fetchSpotifyTrackInfo(currentSpotifyTrackId).then((info) => {
+      if (info) setNowPlayingTrackInfo(info);
+    });
+  }, [currentSpotifyTrackId]);
+
   // AppState-lyssnare: när appen återvänder till förgrunden (t.ex. DJ som
   // kommit tillbaka från Spotify) synkas timern mot real elapsed time.
   // iOS throttlar setInterval + Animated.timing i bakgrunden → lokal timer
@@ -1941,6 +1990,16 @@ export default function QuizScreen() {
   useEffect(() => {
     const sub = AppState.addEventListener('change', (nextState) => {
       if (nextState !== 'active') return;
+
+      // Visa Now Playing-overlay när DJ:n återvänder från Spotify-appen.
+      if (
+        spotifyDJOpenedAppRef.current &&
+        !spotifyDJStartedRef.current &&
+        phaseRef.current === 'question'
+      ) {
+        setShowNowPlayingOverlay(true);
+      }
+
       const currentPhase = phaseRef.current;
       if (currentPhase !== 'question' && currentPhase !== 'awaiting') return;
       if (questionStartMsRef.current === 0) return;
@@ -2206,11 +2265,16 @@ export default function QuizScreen() {
     setSpotifyDJOpenedApp(false);
     setSpotifyDJOpenedAppBroadcast(false);
     setSpotifyDJStarted(false);
+    setDjHandedOver(false);
+    setDjDismissedOverlay(false);
     setSpotifyWaitPhase(null);
     setSpotifyTimeoutSeconds(60);
     // Nollställ broadcastDJPlayerId så föregående frågas DJ-tilldelning
     // inte läcker in i nästa fråga (non-host hämtar ny via spotify_question_ready).
     setBroadcastDJPlayerId(null);
+    // Rensa track-info vid frågebyte (overlay stängs bara av DJ via ×-knappen).
+    setNowPlayingTrackInfo(null);
+    setSpotifyIsPlaying(true);
   }, [questionIndex]);
 
   // ScrollView:s onScroll → räkna avstånd från content-botten. När < 24 px
@@ -2599,6 +2663,16 @@ export default function QuizScreen() {
    *   Startar timern med 2 s delay på alla enheter (lokalt via setState,
    *   remote via onSpotifyDJTrackStarted-listenern).
    */
+  const handleSpotifyPlayPause = async () => {
+    if (spotifyIsPlaying) {
+      const ok = await pauseSpotifyPlayback();
+      if (ok) setSpotifyIsPlaying(false);
+    } else {
+      const ok = await resumeSpotifyPlayback();
+      if (ok) setSpotifyIsPlaying(true);
+    }
+  };
+
   const handleActivateTimer = () => {
     if (!currentSpotifyTrackId || spotifyDJStarted) return;
     setSpotifyDJStarted(true);
@@ -2613,6 +2687,16 @@ export default function QuizScreen() {
           dj_player_id: currentDJPlayer.id,
           spotify_track_id: currentSpotifyTrackId,
         })
+        .catch(() => {});
+    }
+  };
+
+  // DJ:n överlämnar till host i reveal-fasen — låser upp host:s Next-knapp.
+  const handleDJHandover = () => {
+    setDjHandedOver(true);
+    if (gameMode === 'individual-devices' && syncChannelRef.current && currentDJPlayer) {
+      syncChannelRef.current
+        .broadcastSpotifyDJHandover({ dj_player_id: currentDJPlayer.id })
         .catch(() => {});
     }
   };
@@ -3652,6 +3736,9 @@ export default function QuizScreen() {
           setTimeout(() => setTimerActive(true), 2000);
         }
       },
+      onSpotifyDJHandover: () => {
+        setDjHandedOver(true);
+      },
       onPlayerScoreRecorded: (payload) => playerScoreRecordedHandlerRef.current(payload),
       // Non-host: host broadcastar hela fråge-sekvensen ~800ms efter quiz-mount.
       // Sätter broadcastAllQuestionIds → effectiveMediaSourceByQuestion → korrekta
@@ -4203,7 +4290,7 @@ export default function QuizScreen() {
               isCurrentPlayerDJ ? (
                 /* ── DJ-vyn: ett kort, huvud-knapp ändrar steg ─────────── */
                 (() => {
-                  const djStep = !spotifyDJOpenedApp ? 0 : !spotifyDJStarted ? 1 : phase === 'reveal' ? 3 : 2;
+                  const djStep = !spotifyDJOpenedApp ? 0 : !spotifyDJStarted ? 1 : djDismissedOverlay ? 4 : phase === 'reveal' ? 3 : 2;
                   return (
                     <View style={styles.spotifyDJCard}>
                       <View style={styles.spotifyDJIconRow}>
@@ -4221,7 +4308,7 @@ export default function QuizScreen() {
                                   {isDone ? '✓' : i + 1}
                                 </Text>
                               </View>
-                              <Text style={[styles.spotifyGuideText, { flex: 0 }, isActive && styles.spotifyGuideTextActive, isDone && styles.spotifyGuideTextDone]}>{step}</Text>
+                              <Text style={[styles.spotifyGuideText, { flex: 0 }, isActive && styles.spotifyGuideTextActive, isDone && styles.spotifyGuideTextDone]}>{renderStepText(step)}</Text>
                             </View>
                           );
                         })}
@@ -4256,6 +4343,7 @@ export default function QuizScreen() {
                   {spotifyWaitPhase !== 'skipped' && spotifyWaitPhase !== 'countdown' && (() => {
                     const activeStep = !spotifyDJOpenedAppBroadcast ? 0
                       : !spotifyDJStarted ? 1
+                      : djHandedOver ? 4
                       : phase !== 'reveal' ? 2
                       : 3;
                     return (
@@ -4270,7 +4358,7 @@ export default function QuizScreen() {
                                   {isDone ? '✓' : i + 1}
                                 </Text>
                               </View>
-                              <Text style={[styles.spotifyGuideText, { flex: 0 }, isActive && styles.spotifyGuideTextActive, isDone && styles.spotifyGuideTextDone]}>{step}</Text>
+                              <Text style={[styles.spotifyGuideText, { flex: 0 }, isActive && styles.spotifyGuideTextActive, isDone && styles.spotifyGuideTextDone]}>{renderStepText(step)}</Text>
                             </View>
                           );
                         })}
@@ -4601,13 +4689,6 @@ export default function QuizScreen() {
                       <SpotifyBrandIcon size={30} variant="white" />
                     </View>
                   </Pressable>
-                ) : !spotifyDJStarted ? (
-                  <Pressable
-                    style={[styles.spotifyDJActionBtn, { flex: 0, width: '50%' }]}
-                    onPress={handleActivateTimer}
-                  >
-                    <Text style={[styles.spotifyDJActionBtnText, { fontSize: FontSize.xl }]}>Activate timer</Text>
-                  </Pressable>
                 ) : null}
               </View>
             )}
@@ -4744,20 +4825,7 @@ export default function QuizScreen() {
             • awaiting  → låst "Confirmed — waiting for time" */}
       {(phase === 'question' || phase === 'awaiting' || (phase === 'reveal' && isSpotifyQuestion && isCurrentPlayerDJ)) && (
         <View style={styles.stickyConfirmBar}>
-          {isSpotifyQuestion && isCurrentPlayerDJ ? (
-            /* DJ: "Open Spotify" alltid synlig efter timer aktiverats (steg 0+1 i scroll-zonen) */
-            spotifyDJStarted ? (
-              <View style={[styles.spotifyDJActions, { marginBottom: Spacing.lg * 2 }]}>
-                <Pressable
-                  style={[styles.spotifyDJActionBtn, { flex: 0, width: '50%' }]}
-                  onPress={() => Linking.openURL('spotify:').catch(() => {})}
-                >
-                  <SpotifyBrandIcon size={20} variant="white" />
-                  <Text style={styles.spotifyDJActionBtnText}>Open Spotify</Text>
-                </Pressable>
-              </View>
-            ) : null
-          ) : (
+          {isSpotifyQuestion && isCurrentPlayerDJ ? null : (
             <>
               {phase === 'question' && (
                 <Animated.View
@@ -4848,7 +4916,19 @@ export default function QuizScreen() {
           istället för Next-tab. */}
       {phase === 'reveal' && (
         <View style={rv.revealNextAbsolute} pointerEvents="box-none">
-          {gameMode === 'individual-devices' && !isHost ? (
+          {/* Spotify DJ-handover-steg: väntar på att DJ trycker "End DJ" innan host kan gå vidare */}
+          {isSpotifyQuestion && !djHandedOver ? (
+            isCurrentPlayerDJ ? (
+              <TouchableOpacity style={rv.djHandoverBtn} onPress={handleDJHandover} activeOpacity={0.85}>
+                <Text style={rv.djHandoverBtnText}>End DJ — handover to Host</Text>
+              </TouchableOpacity>
+            ) : (
+              <View style={rv.waitingForHostPill}>
+                <Text style={rv.waitingForHostPillText}>Waiting for DJ to handover to Host</Text>
+                <SequentialDots color={Colors.textSecondary} />
+              </View>
+            )
+          ) : gameMode === 'individual-devices' && !isHost ? (
             <View style={rv.waitingForHostPill}>
               <Text style={rv.waitingForHostPillText}>Waiting for host</Text>
               <SequentialDots color={Colors.textSecondary} />
@@ -4903,6 +4983,21 @@ export default function QuizScreen() {
           ut sin runda. canRetry = sticky-latched MEN connection åter OK.
           När fortfarande live-unstable visas grå "Waiting for connection…"-
           text istället. */}
+      <SpotifyNowPlayingOverlay
+        visible={showNowPlayingOverlay && isCurrentPlayerDJ}
+        trackName={nowPlayingTrackInfo?.trackName ?? ((currentQ?.type === 'timeline' ? currentQ.hint : undefined)?.split(' — ')[0] ?? '')}
+        artistName={nowPlayingTrackInfo?.artistName ?? ((currentQ?.type === 'timeline' ? currentQ.hint : undefined)?.split(' — ')[1] ?? '')}
+        albumArtUrl={nowPlayingTrackInfo?.albumArtUrl ?? null}
+        isPlaying={spotifyIsPlaying}
+        onPlayPause={handleSpotifyPlayPause}
+        canActivate={isCurrentPlayerDJ && !spotifyDJStarted}
+        onActivate={handleActivateTimer}
+        canDismiss={phase !== 'question'}
+        onDismiss={() => {
+          setShowNowPlayingOverlay(false);
+          if (isCurrentPlayerDJ) setDjDismissedOverlay(true);
+        }}
+      />
       <ConnectionUnstableOverlay
         visible={shouldLockForUnstable}
         onRetry={!isHost ? handleRetryFromUnstable : undefined}
@@ -5760,6 +5855,22 @@ const rv = StyleSheet.create({
     fontSize: 13,
     fontWeight: '600',
     color: Colors.textSecondary,
+    letterSpacing: 0.3,
+  },
+  djHandoverBtn: {
+    height: 56,
+    paddingHorizontal: Spacing.lg,
+    borderRadius: Radius.md,
+    backgroundColor: Colors.cardElevated,
+    borderWidth: 1,
+    borderColor: '#1DB954',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  djHandoverBtnText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#1DB954',
     letterSpacing: 0.3,
   },
 });
