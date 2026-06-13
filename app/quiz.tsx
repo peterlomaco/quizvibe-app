@@ -1412,6 +1412,8 @@ export default function QuizScreen() {
     return gameQuestions.map((q) => {
       if (q.type === 'actor-select') return 'Name';
       if (q.type === 'image') return 'Name';
+      // Film-trailers (timeline/youtube, mainCategory Film) svaras med filmens namn → 'Name'
+      if (q.type === 'timeline' && q.mainCategory === 'Film') return 'Name';
       return 'Year';
     });
   }, [gameQuestions]);
@@ -1430,6 +1432,7 @@ export default function QuizScreen() {
       const q = ALL_QUESTIONS_MAP.get(id);
       if (!q) return 'Year';
       if (q.type === 'actor-select' || q.type === 'image') return 'Name';
+      if (q.type === 'timeline' && q.mainCategory === 'Film') return 'Name';
       return 'Year';
     });
   }, [isHost, broadcastAllQuestionIds, answerTypeByQuestion]);
