@@ -185,7 +185,8 @@ type QuizQuestion = TimelineQuestion | ImageQuestion | ActorSelectQuestion;
 // Frågorna kommer från backend-curerad katalog (backend/content/catalog/songs-*.yaml).
 // Regenerera src/utils/musicQuestions.ts efter katalog-ändringar med:
 //   cd backend && npm run export-music-questions
-// Items utan youtubeClips filtreras bort av export-scriptet.
+// Items med spotifyTrackId men tomma youtubeClips är Spotify-only — de filtreras
+// bort ur pureYoutubePool när Spotify är av (se pureYoutubePool-definitionen nedan).
 // `questionText` bakas in i exporten via backend-schemats FIXED_QUESTION_TEXT-
 // map (matrisens "Fixed Question text"-kolumn) så frågetexten är härledd ur
 // `contentSubject`, inte hårdkodad här. `hint` används bara internt
@@ -362,18 +363,95 @@ const QUIZ_ERROR_RED = '#FF3B30';
 const SPOTIFY_DJ_STEPS = [
   'Go to Spotify and start the song',
   'Return here, activate the timer and let the music play during the countdown',
-  'DJ keeps playing in Spotify',
-  'Time ends - DJ stop the music - DJ close Spotify [r]"X"[/r]',
+  'DJ keeps playing in Spotify - wait until the countdown finish',
+  'DJ stops the music - DJ close Spotify in 5sec [r]"X"[/r]',
   'DJ handover to Host - continue with Game',
 ] as const;
 
 const SPOTIFY_GUESSER_STEPS = [
   'DJ start the song in Spotify',
   'DJ start the timer - listen and guess the year',
-  'DJ keeps playing in Spotify',
-  'Time ends - DJ stop the music - DJ close Spotify [r]"X"[/r]',
+  'DJ keeps playing in Spotify - wait until the countdown finish',
+  'DJ stops the music - DJ close Spotify in 5sec [r]"X"[/r]',
   'DJ handover to Host - continue with Game',
 ] as const;
+
+/**
+ * Bygger en frågesekvens där varje block av `questionsPerBlock` frågor
+ * tillhör exakt samma mainCategory (source+kategori-konsistens per block).
+ * Används i Pass-the-Phone så alla spelare i samma runda får t.ex.
+ * YouTube/Music — inte YouTube/Music, YouTube/Film, Hints/Sport i blandning.
+ *
+ * Icke-PtP (questionsPerBlock ≤ 1): delegerar direkt till buildEpochPhase.
+ */
+function buildCategoryAlignedPhase<T extends QuizQuestion>(opts: {
+  pool: T[];
+  totalBlocks: number;
+  questionsPerBlock: number;
+  activeEpochs: ReturnType<typeof getActiveEpochs>;
+  recentIds: Set<string>;
+  isPtP: boolean;
+  players: EpochPlayer[];
+  turnOrderIds: string[];
+  getEpochYear: (q: EpochQuestion) => number | null;
+}): T[] {
+  const {
+    pool, totalBlocks, questionsPerBlock, activeEpochs,
+    recentIds, isPtP, players, turnOrderIds, getEpochYear,
+  } = opts;
+  const totalQuestions = totalBlocks * questionsPerBlock;
+  if (totalQuestions === 0 || pool.length === 0) return [];
+
+  // Icke-PtP: inga block att kategorisera — delegera direkt.
+  if (!isPtP || questionsPerBlock <= 1) {
+    return buildEpochPhase<T>({
+      pool, totalQuestions, activeEpochs, recentIds, isPtP, players, turnOrderIds, getEpochYear,
+    });
+  }
+
+  // Gruppera frågor per mainCategory (null-frågor hamnar i '_other').
+  const catMap = new Map<string, T[]>();
+  for (const q of pool) {
+    const key = q.mainCategory ?? '_other';
+    if (!catMap.has(key)) catMap.set(key, []);
+    catMap.get(key)!.push(q);
+  }
+
+  // Proportionell block-allokering per kategori (Largest Remainder Method).
+  const cats = [...catMap.keys()];
+  const catSizes = cats.map((c) => catMap.get(c)!.length);
+  const totalPoolSize = catSizes.reduce((a, b) => a + b, 0);
+  if (totalPoolSize === 0) return [];
+
+  const rawAllocs = catSizes.map((sz) => (sz / totalPoolSize) * totalBlocks);
+  const floors = rawAllocs.map(Math.floor);
+  const remainder = totalBlocks - floors.reduce((a, b) => a + b, 0);
+  const byDecimal = rawAllocs
+    .map((v, i) => ({ i, d: v - floors[i] }))
+    .sort((a, b) => b.d - a.d);
+  for (let k = 0; k < remainder; k++) floors[byDecimal[k].i]++;
+
+  // Bygg sekvens per kategori och konkatenera (kategoriernas block är alltid
+  // multiplar av questionsPerBlock → inom-block-konsistens garanterad).
+  const result: T[] = [];
+  for (let i = 0; i < cats.length; i++) {
+    const catBlocks = floors[i];
+    if (catBlocks === 0) continue;
+    const catPool = catMap.get(cats[i])!;
+    const catSeq = buildEpochPhase<T>({
+      pool: catPool,
+      totalQuestions: catBlocks * questionsPerBlock,
+      activeEpochs,
+      recentIds,
+      isPtP,
+      players,
+      turnOrderIds,
+      getEpochYear,
+    });
+    result.push(...catSeq);
+  }
+  return result;
+}
 
 /** Parsar [r]...[/r]-markeringar i step-strängar och renderar dem i rött. */
 function renderStepText(text: string): React.ReactNode {
@@ -1103,9 +1181,18 @@ export default function QuizScreen() {
       ? youtubePoolPreCategory.filter((q) => q.type === 'timeline' && q.spotifyTrackId)
       : [];
     // Ren YouTube-pool: category-filtrad pool minus Spotify-items.
+    // När Spotify är AV: filtrera bort Spotify-only items (har spotifyTrackId men
+    // tomma youtubeClips) — de kan inte spelas utan Spotify-appen.
     const pureYoutubePool: QuizQuestion[] = spotifyEnabled
       ? youtubePool.filter((q) => !(q.type === 'timeline' && q.spotifyTrackId))
-      : youtubePool;
+      : youtubePool.filter(
+          (q) =>
+            !(
+              q.type === 'timeline' &&
+              q.spotifyTrackId &&
+              (!q.youtubeClips || q.youtubeClips.length === 0)
+            ),
+        );
 
     const playerCount = Math.max(1, turnOrder.length);
     const hasSpotify = spotifyPool.length > 0;
@@ -1192,13 +1279,14 @@ export default function QuizScreen() {
       return shuffleArray(spotifyPool).slice(0, spotifyTotal);
     })();
 
-    // Fas 2: YouTube — epok-viktad urval.
-    const ytTotal = ytBlockCount * questionsPerBlock;
+    // Fas 2: YouTube — kategori-alignerade block (PtP: alla spelare i ett
+    // block får samma mainCategory, t.ex. alla YouTube/Music i samma runda).
     const ytSeq: QuizQuestion[] =
-      hasPureYoutube && ytTotal > 0
-        ? buildEpochPhase<QuizQuestion>({
+      hasPureYoutube && ytBlockCount > 0
+        ? buildCategoryAlignedPhase<QuizQuestion>({
             pool: pureYoutubePool,
-            totalQuestions: ytTotal,
+            totalBlocks: ytBlockCount,
+            questionsPerBlock,
             activeEpochs,
             recentIds: seenQuestionIds,
             isPtP,
@@ -1208,13 +1296,13 @@ export default function QuizScreen() {
           })
         : [];
 
-    // Fas 3: Image/Hints — epok-viktad urval.
-    const imgTotal = imageBlockCount * questionsPerBlock;
+    // Fas 3: Image/Hints — kategori-alignerade block.
     const imgSeq: QuizQuestion[] =
-      hasImage && imgTotal > 0
-        ? buildEpochPhase<QuizQuestion>({
+      hasImage && imageBlockCount > 0
+        ? buildCategoryAlignedPhase<QuizQuestion>({
             pool: imagePool,
-            totalQuestions: imgTotal,
+            totalBlocks: imageBlockCount,
+            questionsPerBlock,
             activeEpochs,
             recentIds: seenQuestionIds,
             isPtP,
@@ -1327,6 +1415,24 @@ export default function QuizScreen() {
       return 'Year';
     });
   }, [gameQuestions]);
+
+  // Non-host override: bygg category + answerType från host:s auktoritativa fråge-sekvens
+  // (broadcastAllQuestionIds) via ALL_QUESTIONS_MAP. Utan detta visar non-host felaktiga
+  // kategori-/svarstyp-badges i GetReady (lokal shuffle ≠ host:s ordning).
+  const effectiveCategoryByQuestion = useMemo<(MainCategory | null)[]>(() => {
+    if (isHost || !broadcastAllQuestionIds) return categoryByQuestion;
+    return broadcastAllQuestionIds.map((id) => ALL_QUESTIONS_MAP.get(id)?.mainCategory ?? null);
+  }, [isHost, broadcastAllQuestionIds, categoryByQuestion]);
+
+  const effectiveAnswerTypeByQuestion = useMemo<('Year' | 'Name')[]>(() => {
+    if (isHost || !broadcastAllQuestionIds) return answerTypeByQuestion;
+    return broadcastAllQuestionIds.map((id) => {
+      const q = ALL_QUESTIONS_MAP.get(id);
+      if (!q) return 'Year';
+      if (q.type === 'actor-select' || q.type === 'image') return 'Name';
+      return 'Year';
+    });
+  }, [isHost, broadcastAllQuestionIds, answerTypeByQuestion]);
 
   const [questionIndex, setQuestionIndex] = useState(0);
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
@@ -1975,11 +2081,21 @@ export default function QuizScreen() {
 
   // Pre-hämta track-info så snart frågan är en Spotify-fråga — overlay-data
   // är klar för alla spelare när de återvänder från Spotify-appen.
+  // Cancellation-guard krävs eftersom gameQuestions kan reberäknas ~50 ms
+  // efter mount (seenQuestionIds laddas från AsyncStorage) och ändra
+  // currentSpotifyTrackId — utan guarden kan en stale fetch för den gamla
+  // track-ID:n resolva sist och skriva fel låt-info till nowPlayingTrackInfo.
   useEffect(() => {
-    if (!currentSpotifyTrackId) return;
+    if (!currentSpotifyTrackId) {
+      setNowPlayingTrackInfo(null);
+      return;
+    }
+    let cancelled = false;
+    setNowPlayingTrackInfo(null);
     fetchSpotifyTrackInfo(currentSpotifyTrackId).then((info) => {
-      if (info) setNowPlayingTrackInfo(info);
+      if (!cancelled && info) setNowPlayingTrackInfo(info);
     });
+    return () => { cancelled = true; };
   }, [currentSpotifyTrackId]);
 
   // AppState-lyssnare: när appen återvänder till förgrunden (t.ex. DJ som
@@ -2666,7 +2782,15 @@ export default function QuizScreen() {
   const handleSpotifyPlayPause = async () => {
     if (spotifyIsPlaying) {
       const ok = await pauseSpotifyPlayback();
-      if (ok) setSpotifyIsPlaying(false);
+      if (ok) {
+        setSpotifyIsPlaying(false);
+      } else {
+        Alert.alert(
+          'Cannot control Spotify',
+          'Use "Open in Spotify to control music" below to pause directly in the Spotify app.',
+          [{ text: 'OK' }],
+        );
+      }
     } else {
       const ok = await resumeSpotifyPlayback();
       if (ok) setSpotifyIsPlaying(true);
@@ -3990,8 +4114,8 @@ export default function QuizScreen() {
         totalQuestions={totalQuestions}
         playerCount={playerCount}
         mediaSourceByQuestion={effectiveMediaSourceByQuestion}
-        categoryByQuestion={categoryByQuestion}
-        answerTypeByQuestion={answerTypeByQuestion}
+        categoryByQuestion={effectiveCategoryByQuestion}
+        answerTypeByQuestion={effectiveAnswerTypeByQuestion}
         spotifyQuestionIndices={effectiveSpotifyQuestionIndices}
         nextDJName={nextDJName}
         eraFrom={eraFrom}
@@ -4065,7 +4189,7 @@ export default function QuizScreen() {
         playerName={countdownPlayer?.name}
         playerEmoji={countdownPlayer?.emoji}
         mediaSource={effectiveMediaSourceByQuestion[questionIndex] ?? null}
-        answerType={answerTypeByQuestion[questionIndex] ?? null}
+        answerType={effectiveAnswerTypeByQuestion[questionIndex] ?? null}
         onComplete={() => setPhase('question')}
         sayWho={isImageQuestion || isActorSelectQuestion}
         silent={!isHost}
@@ -4997,6 +5121,11 @@ export default function QuizScreen() {
           setShowNowPlayingOverlay(false);
           if (isCurrentPlayerDJ) setDjDismissedOverlay(true);
         }}
+        onOpenSpotify={
+          currentSpotifyTrackId
+            ? () => openSpotifyTrack(currentSpotifyTrackId)
+            : undefined
+        }
       />
       <ConnectionUnstableOverlay
         visible={shouldLockForUnstable}
