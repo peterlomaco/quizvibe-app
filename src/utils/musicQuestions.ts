@@ -5622,7 +5622,15 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "football"
     ],
     "spotifyTrackId": "6gAPl8snSQiUoAOpLUDIqA",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "l7jul-JdOJE",
+        "startSec": 10,
+        "endSec": 50,
+        "channelTitle": "Svenne Rubins - Topic",
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "sverige-em-1992-semifinal",

@@ -91,8 +91,13 @@ items:
     probability: 82
     wikimediaSearchHints: ["Svenne Rubins Långa bollar på Bengt 1992 fotboll"]
     answerMethods: ["timeline"]
-    genrePackages: ["sport", "football"]
     spotifyTrackId: "6gAPl8snSQiUoAOpLUDIqA"
+    youtubeClips:
+      - videoId: "l7jul-JdOJE"
+        startSec: 10
+        endSec: 50
+        channelTitle: "Svenne Rubins - Topic"
+    genrePackages: ["sport", "football"]
   # ── Svenska hockey-låtar ──
   - id: hakan-sodergren-nu-tar-vi-dom
     displayName: "Nu tar vi dom — Håkan Södergren & Ishockeylandslaget"
