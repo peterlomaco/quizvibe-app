@@ -19,6 +19,8 @@ Status mot den 4-stegs-plan vi följer för content-bygge inför launch:
 - **B**) Server-side asset-hosting (Supabase Storage / CDN) — assets på 73 MB i bundle. Aktiveras post-launch eller när bundle-storlek närmar sig App Store cellular-limit (200 MB).
 - **C**) webp q85 → q75 reprocess (~30% storleksbesparing utan synbar kvalitetsförlust) — opportunistic kvalitets-justering om tid finns.
 
+**Pool-status (2026-06-13): ~800 bildfrågor + 473 musikfrågor.** Catalog-additions 2026-06-13: Stevie Wonder "I Just Called to Say I Love You" (1984, Spotify + YT Topic), Tomas Ledin "Vi är på gång" (correctYear 1983 ← rättat från 2006, nytt YT-klipp), Tomas Ledin "Hon gör allt för att göra mig lycklig" (1980, Spotify + YT Topic), spotifyTrackId tillagd på Tomas Ledin "Just nu!" (1980). Spotify-ID uppdaterade: Avicii Levels, Loreen Euphoria, Loreen Tattoo. endSec lagt till på 4 klipp (ed-sheeran-perfect, rihanna-diamonds, bob-marley-no-woman-no-cry, bryan-adams-summer-of-69).
+
 **Pool-status (2026-06-03, efter logo-blur-curation: ~800 bildfrågor + 401 YT-frågor. ~990 webp-filer i assets.)** Logo-blur-curation-pass: ~85 athlete-bilder borttagna (logotyper ej hanterbara), ~150 bilder blurrade (face-protect/logo-only/manuellt). Pipeline: `backend/scripts/logo-blur/blur_logos.py` (OwL-ViT + EasyOCR + MediaPipe face-protect). Se `memory/project_logo_blur_pipeline.md`. Region-taggning: ~39 athletes `["sweden","global"]`, 5 athletes `["sweden","nordic"]`.**
 
 **Pool-status (2026-06-03, innan logo-blur: 890 bildfrågor + 401 YT-frågor. ~1069 webp-filer i assets.)** YT-valideringspass 2026-06-03: totalt 420 → 401 frågor efter genomgång (−19 netto: +11 svenska filmer, −34 borttagna, +6 bytta klipp, +diverse startSec-justeringar). Ny fil: `movies-sweden.yaml` (7 validerade svenska filmklassiker med YT-trailers). ESC-taggning: ~67 items fick `genrePackages: ["Eurovision"]` för framtida Eurovision host-paket. `unknown-region` lagt till i RegionSchema. Valideringsverktyg: `backend/output/youtube-validation.html` (klickbar HTML med alla klipp per kategori + "Senaste ändringar"-flik).
@@ -1184,6 +1186,32 @@ PIVOT 2026-05-29: fristående "Guess Who"-fråge-koncept — en stiliserad **AI-
 1. `isSpotifyQuestion && isCurrentPlayerDJ` → **DJ-vy**: mörk grön bakgrund, "You are the DJ", "Start track in Spotify"-knapp, `canConfirm = false` (DJ svarar inte, får 0 pts)
 2. `isSpotifyQuestion && !isCurrentPlayerDJ` → **Gissare-vy**: albumomslag (async fetch) + statusrad "Waiting for DJ…" → "DJ is playing!"
 3. Övriga frågor → befintlig YouTube/Image-rendering
+
+**`SpotifyNowPlayingOverlay`** ([src/components/SpotifyNowPlayingOverlay.tsx](src/components/SpotifyNowPlayingOverlay.tsx)) — slide-up bottom-sheet som visas ovanpå quiz-vyn när en Spotify-fråga är aktiv:
+- Innehåller: albumomslag (56×56, fallback Spotify-ikon) + spårnamn + artistnamn + play/pause-knapp (SVG Rect-pause / Polygon-play) + dismiss-X (SVG Lines, `strokeWidth=5`) + "Activate Timer"-knapp (grön, bara för aktiva DJ:n via `canActivate`-prop).
+- **`canDismiss` prop** (default `true`): skickas från quiz.tsx som `phase !== 'question'` — X-knappen kan inte aktiveras förrän svarstiden gått ut.
+- **`showDismiss = canDismiss && !isPlaying`**: X-glyfen är osynlig (`dismissGlyphHidden: opacity 0`) tills DJ pausat låten. Om DJ startar om → glyfen försvinner igen.
+- **Pulserande X** (native driver): `Animated.loop(sequence([1→1.2 800ms, 1.2→1 800ms]))` på `dismissPulse` Animated.Value — körs bara när `showDismiss=true`, stoppas annars med `dismissPulse.setValue(1)`.
+- SVG imports: `import Svg, { Line, Polygon, Rect } from 'react-native-svg'`.
+
+**DJ-handover — tvåflagge-mönster** i quiz.tsx:
+- **`djDismissedOverlay`**: sätts `true` när DJ tappar × → aktiverar guide-steg 5 ("End DJ — handover to Host").
+- **`djHandedOver`**: sätts `true` när DJ trycker "End DJ"-knappen i reveal-fasen → låser upp host:s Next-knapp.
+- Separationen är nödvändig: om `onDismiss` direkt satte `djHandedOver=true` skulle `!djHandedOver`-villkoret dölja "End DJ"-knappen innan DJ hunnit trycka den.
+- Båda flaggor resetas i questionIndex-effekten.
+
+**`djStep`-beräkning**:
+```ts
+const djStep = !spotifyDJOpenedApp ? 0
+  : !spotifyDJStarted ? 1
+  : djDismissedOverlay ? 4
+  : phase === 'reveal' ? 3
+  : 2;
+```
+
+**Guide-steg-arrayer** (`SPOTIFY_DJ_STEPS` / `SPOTIFY_GUESSER_STEPS`, 5 steg, `as const`). Steg 4 innehåller `[r]"X"[/r]`-markup för inline röd text. `renderStepText(text)` (module-level helper i quiz.tsx) parsar `[r]...[/r]`-segment och returnerar `<Text style={{ color: '#FF3B30', fontWeight: '700' }}>` för de matchade delarna.
+
+**Reveal-fas DJ handover-block** (`rv.revealNextAbsolute`): när `isSpotifyQuestion && !djHandedOver` visas antingen "End DJ — handover to Host"-knapp (DJ-enhet) eller "Waiting for DJ to handover to Host" + SequentialDots (gissare). DJ:s knapp-tap broadcastar `broadcastSpotifyDJHandover()` → `djHandedOver=true` på alla enheter → host:s vanliga Next-knapp visas.
 
 **GetReadyIntro kö-indikator**: Spotify-frågor visas med grön kant, Spotify-ikon (vit monokrom) och "Spotify DJ"-text. Prop: `spotifyQuestionIndices?: number[]` (0-baserat) passas från quiz.tsx:s `djRotationPlan.spotifyQuestionIndices`.
 

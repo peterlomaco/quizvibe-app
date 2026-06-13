@@ -364,7 +364,7 @@ items:
     probability: 92
     wikimediaSearchHints: ["Avicii Levels 2011"]
     answerMethods: ["timeline"]
-    spotifyTrackId: "4jzHxqxfVX26GYsaxQBJf1"
+    spotifyTrackId: "5UqCQaDshqbIk3pkhy4Pjg"
     youtubeClips:
       - videoId: "yMsKK0zNT_4"
         startSec: 5
@@ -523,7 +523,7 @@ items:
     probability: 86
     wikimediaSearchHints: ["Loreen Euphoria Eurovision 2012"]
     answerMethods: ["timeline"]
-    spotifyTrackId: "2knr7ikPt4l7bk92qS4ZXW"
+    spotifyTrackId: "1xN7BpTAWnZkuSLOtRP6Qc"
     youtubeClips:
       - videoId: "chK8XTtqEJI"
         startSec: 30
@@ -649,6 +649,11 @@ items:
     probability: 84
     wikimediaSearchHints: ["Rihanna Diamonds 2012"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "LyKYV_7vs6k"
+        startSec: 10
+        endSec: 55
+        channelTitle: "PremiunMusicHD"
     spotifyTrackId: "1z9kQ14XBSN0r2v6fx4IdG"
   - id: first-aid-kit-emmylou
     displayName: "Emmylou — First Aid Kit"
@@ -1053,3 +1058,27 @@ items:
         endSec: 30
         channelTitle: "Bellini_Music_Official"
         notes: "Officiell artist-kanal Bellini_Music_Official."
+  - id: rolandz-jajamen
+    displayName: "Jajamen — Rolandz"
+    correctYear: 2010
+    probability: 80
+    audience: ["gen-x", "millennials"]
+    wikimediaSearchHints: ["Rolandz Jajamen 2010 Swedish dansband"]
+    answerMethods: ["timeline"]
+    genrePackages: ["dansband"]
+    spotifyTrackId: "6kKJbnWfmVUKnhqa8n17xT"
+  - id: hadise-dum-tek-tek
+    displayName: "Dum Tek Tek — Hadise"
+    correctYear: 2009
+    probability: 76
+    region: ["unknown-region"]
+    wikimediaSearchHints: ["Hadise Dum Tek Tek Turkey Eurovision 2009"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Eurovision"]
+    spotifyTrackId: "3Gp3YziRNAbiCDzGV5E6Xm"
+    youtubeClips:
+      - videoId: "TzKgojZqO5Y"
+        startSec: 50
+        endSec: 65
+        channelTitle: "Hadise"
+        notes: "Official music video. ESC 2009 Turkey entry."

@@ -2052,6 +2052,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "sweden"
     ],
+    "genrePackages": [
+      "dansband"
+    ],
     "spotifyTrackId": "7915ILGV5otD6Oq3rOcKBR",
     "youtubeClips": [
       {
@@ -2129,7 +2132,15 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "spotifyTrackId": "3PQLYVskjUeRmRIfECsL0X",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "TfNymCvydHc",
+        "startSec": 5,
+        "endSec": 50,
+        "channelTitle": "Bob Marley",
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "lynyrd-skynyrd-sweet-home-alabama",
@@ -3105,6 +3116,30 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "tomas-ledin-hon-gor-allt",
+    "displayName": "Hon gör allt för att göra mig lycklig — Tomas Ledin",
+    "correctYear": 1980,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "spotifyTrackId": "7DlTA5LRD6UVYeDwqbbojP",
+    "youtubeClips": [
+      {
+        "videoId": "epuLWrb6AUA",
+        "startSec": 5,
+        "endSec": 50,
+        "channelTitle": "Tomas Ledin - Topic",
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "tomas-ledin-just-nu",
     "displayName": "Just nu! — Tomas Ledin",
     "correctYear": 1980,
@@ -3120,6 +3155,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Eurovision"
     ],
+    "spotifyTrackId": "5O3XbSZu25WqsNpRakQd6T",
     "youtubeClips": [
       {
         "videoId": "khv8TygskVU",
@@ -3740,6 +3776,31 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "tomas-ledin-vi-ar-pa-gang",
+    "displayName": "Vi är på gång — Tomas Ledin",
+    "correctYear": 1983,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "all"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "sport"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "z-tEuBTbobc",
+        "startSec": 5,
+        "endSec": 50,
+        "channelTitle": "uutiiset",
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "carl-lewis-los-angeles-1984",
     "displayName": "Carl Lewis tar 4 OS-guld Los Angeles",
     "correctYear": 1984,
@@ -3968,6 +4029,30 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "stevie-wonder-i-just-called",
+    "displayName": "I Just Called to Say I Love You — Stevie Wonder",
+    "correctYear": 1984,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "spotifyTrackId": "7yhYeVOti4KCNRQhBE2qFj",
+    "youtubeClips": [
+      {
+        "videoId": "58RgLQ_0Ars",
+        "startSec": 10,
+        "endSec": 55,
+        "channelTitle": "Stevie Wonder - Topic",
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "the-terminator-1984",
     "displayName": "The Terminator",
     "correctYear": 1984,
@@ -4168,7 +4253,15 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "spotifyTrackId": "0GONea6G2XdnHWjNZd6zt3",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "9f06QZCVUHg",
+        "startSec": 10,
+        "endSec": 55,
+        "channelTitle": "Bryan Adams",
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "kikki-danielsson-bra-vibrationer",
@@ -5513,6 +5606,25 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "svenne-rubins-langa-bollar-pa-bengt",
+    "displayName": "Långa Bollar På Bengt — Svenne Rubins",
+    "correctYear": 1992,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "all"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "sport",
+      "football"
+    ],
+    "spotifyTrackId": "6gAPl8snSQiUoAOpLUDIqA",
+    "youtubeClips": []
+  },
+  {
     "id": "sverige-em-1992-semifinal",
     "displayName": "Sverige semifinal hemma-EM mot Tyskland",
     "correctYear": 1992,
@@ -5667,7 +5779,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-x"
     ],
     "region": [
-      "sweden"
+      "unknown-region"
     ],
     "genrePackages": [
       "Eurovision"
@@ -6824,29 +6936,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "SandraTornblad",
         "license": "standard",
         "notes": "Musikvideo-re-upload av originalet (1999)."
-      }
-    ]
-  },
-  {
-    "id": "tarzan-1999",
-    "displayName": "Tarzan",
-    "correctYear": 1999,
-    "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
-    "audiences": [
-      "all"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "jc0lisHARr4",
-        "startSec": 10,
-        "endSec": 25,
-        "channelTitle": "Darth Malins",
-        "license": "standard",
-        "notes": "1999 teatral trailer — Tarzan i djungeln + Phil Collins You'll Be in My Heart-känsla."
       }
     ]
   },
@@ -8111,32 +8200,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "tomas-ledin-vi-ar-pa-gang",
-    "displayName": "Vi är på gång — Tomas Ledin",
-    "correctYear": 2006,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "all"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "sport"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "XVpjr3arHBM",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Tomas Ledin - Topic",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
-      }
-    ]
-  },
-  {
     "id": "tre-kronor-os-turin-2006",
     "displayName": "Tre Kronor OS-guld Turin",
     "correctYear": 2006,
@@ -8605,6 +8668,34 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "hadise-dum-tek-tek",
+    "displayName": "Dum Tek Tek — Hadise",
+    "correctYear": 2009,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-z",
+      "millennials"
+    ],
+    "region": [
+      "unknown-region"
+    ],
+    "genrePackages": [
+      "Eurovision"
+    ],
+    "spotifyTrackId": "3Gp3YziRNAbiCDzGV5E6Xm",
+    "youtubeClips": [
+      {
+        "videoId": "TzKgojZqO5Y",
+        "startSec": 50,
+        "endSec": 65,
+        "channelTitle": "Hadise",
+        "license": "standard",
+        "notes": "Official music video. ESC 2009 Turkey entry."
+      }
+    ]
+  },
+  {
     "id": "lady-gaga-bad-romance",
     "displayName": "Bad Romance — Lady Gaga",
     "correctYear": 2009,
@@ -8881,6 +8972,25 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "rolandz-jajamen",
+    "displayName": "Jajamen — Rolandz",
+    "correctYear": 2010,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "millennials"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "dansband"
+    ],
+    "spotifyTrackId": "6kKJbnWfmVUKnhqa8n17xT",
+    "youtubeClips": []
+  },
+  {
     "id": "shakira-waka-waka",
     "displayName": "Waka Waka (This Time for Africa) — Shakira",
     "correctYear": 2010,
@@ -8966,7 +9076,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "sweden"
     ],
-    "spotifyTrackId": "4jzHxqxfVX26GYsaxQBJf1",
+    "spotifyTrackId": "5UqCQaDshqbIk3pkhy4Pjg",
     "youtubeClips": [
       {
         "videoId": "yMsKK0zNT_4",
@@ -9254,7 +9364,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Eurovision"
     ],
-    "spotifyTrackId": "2knr7ikPt4l7bk92qS4ZXW",
+    "spotifyTrackId": "1xN7BpTAWnZkuSLOtRP6Qc",
     "youtubeClips": [
       {
         "videoId": "chK8XTtqEJI",
@@ -9303,7 +9413,15 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "spotifyTrackId": "1z9kQ14XBSN0r2v6fx4IdG",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "LyKYV_7vs6k",
+        "startSec": 10,
+        "endSec": 55,
+        "channelTitle": "PremiunMusicHD",
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "swedish-house-mafia-dont-you-worry-child",
@@ -10050,6 +10168,34 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "laleh-bara-fa-va-mig-sjalv",
+    "displayName": "Bara Få Va Mig Själv — Laleh",
+    "correctYear": 2016,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-alpha",
+      "gen-z"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "100% svenska"
+    ],
+    "spotifyTrackId": "2FnUyLhe7sjXgnZlK9sc0z",
+    "youtubeClips": [
+      {
+        "videoId": "tzln6GO4yHY",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Laleh",
+        "license": "standard",
+        "notes": "Official music video. 85M+ streams."
+      }
+    ]
+  },
+  {
     "id": "leicester-premier-league-2016",
     "displayName": "Leicester City vinner Premier League",
     "correctYear": 2016,
@@ -10086,7 +10232,15 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "spotifyTrackId": "3S4px9f4lceWdKf0gWciFu",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "HbzZPpWr4MI",
+        "startSec": 0,
+        "endSec": 45,
+        "channelTitle": "Sia - Topic",
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "simone-biles-rio-2016",
@@ -10219,7 +10373,15 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "spotifyTrackId": "0tgVpDi06FyKpA1z0VMD4v",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "2Vv-BfVoq4g",
+        "startSec": 15,
+        "endSec": 60,
+        "channelTitle": "Ed Sheeran",
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "federer-australian-open-2017",
@@ -10440,6 +10602,25 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
       }
     ]
+  },
+  {
+    "id": "fuego-eleni-foureira",
+    "displayName": "Fuego — Eleni Foureira",
+    "correctYear": 2018,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-alpha",
+      "gen-z"
+    ],
+    "region": [
+      "unknown-region"
+    ],
+    "genrePackages": [
+      "Eurovision"
+    ],
+    "spotifyTrackId": "22ppznuzVF9LKamaaqMMqu",
+    "youtubeClips": []
   },
   {
     "id": "lady-gaga-bradley-cooper-shallow",
@@ -10690,6 +10871,34 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "spirit-in-the-sky-keiino",
+    "displayName": "Spirit in the Sky — KEiiNO",
+    "correctYear": 2019,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-alpha",
+      "gen-z"
+    ],
+    "region": [
+      "unknown-region"
+    ],
+    "genrePackages": [
+      "Eurovision"
+    ],
+    "spotifyTrackId": "7B7O5jgFpWfc9orZw6FN4K",
+    "youtubeClips": [
+      {
+        "videoId": "Ovt7YGHAj8I",
+        "startSec": 40,
+        "endSec": 55,
+        "channelTitle": "KEiiNO",
+        "license": "standard",
+        "notes": "Official music video. ESC 2019 Norway entry."
+      }
+    ]
+  },
+  {
     "id": "tones-and-i-dance-monkey",
     "displayName": "Dance Monkey — Tones and I",
     "correctYear": 2019,
@@ -10759,6 +10968,25 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "license": "standard"
       }
     ]
+  },
+  {
+    "id": "dotter-bulletproof",
+    "displayName": "Bulletproof — Dotter",
+    "correctYear": 2020,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-alpha",
+      "gen-z"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Eurovision"
+    ],
+    "spotifyTrackId": "4RcEx6TvICENelSh3O7gvu",
+    "youtubeClips": []
   },
   {
     "id": "dua-lipa-levitating",
@@ -10862,6 +11090,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Eurovision"
     ],
+    "spotifyTrackId": "19LiotxKSVs7FeVMEdHz63",
     "youtubeClips": [
       {
         "videoId": "7EpSBDPlZn4",
@@ -10870,6 +11099,34 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "Melodifestivalen 2020 vinnare. ESC 2020 official video."
+      }
+    ]
+  },
+  {
+    "id": "el-diablo-elena-tsagkrinou",
+    "displayName": "El Diablo — Elena Tsagkrinou",
+    "correctYear": 2021,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-alpha",
+      "gen-z"
+    ],
+    "region": [
+      "unknown-region"
+    ],
+    "genrePackages": [
+      "Eurovision"
+    ],
+    "spotifyTrackId": "4TAttqXwjj56xZQVKvlX0K",
+    "youtubeClips": [
+      {
+        "videoId": "ZHeydRCBPNs",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Elena Tsagkrinou",
+        "license": "standard",
+        "notes": "Official music video. ESC 2021 Cyprus entry."
       }
     ]
   },
@@ -11208,7 +11465,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Eurovision"
     ],
-    "spotifyTrackId": "5D6Bi5sKXa8DXkUeyJyAEj",
+    "spotifyTrackId": "1DmW5Ep6ywYwxc2HMT5BG6",
     "youtubeClips": [
       {
         "videoId": "b3vJfR81xO0",
@@ -11266,6 +11523,25 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
       }
     ]
+  },
+  {
+    "id": "europapa-joost-klein",
+    "displayName": "Europapa — Joost Klein",
+    "correctYear": 2024,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-alpha",
+      "gen-z"
+    ],
+    "region": [
+      "unknown-region"
+    ],
+    "genrePackages": [
+      "Eurovision"
+    ],
+    "spotifyTrackId": "0uHrMbMv3c78398pIANDqR",
+    "youtubeClips": []
   },
   {
     "id": "lady-gaga-bruno-mars-die-with-a-smile",

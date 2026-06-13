@@ -520,6 +520,11 @@ items:
     probability: 84
     wikimediaSearchHints: ["Bob Marley No Woman No Cry Natty Dread 1974"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "TfNymCvydHc"
+        startSec: 5
+        endSec: 50
+        channelTitle: "Bob Marley"
     spotifyTrackId: "3PQLYVskjUeRmRIfECsL0X"
   - id: fleetwood-mac-dreams
     displayName: "Dreams — Fleetwood Mac"
@@ -648,6 +653,7 @@ items:
     probability: 70
     wikimediaSearchHints: ["Tomas Ledin Just nu Eurovision 1980"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5O3XbSZu25WqsNpRakQd6T"
     youtubeClips:
       - videoId: "khv8TygskVU"
         startSec: 5
@@ -655,6 +661,18 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 1980 vinnare."
     genrePackages: ["Eurovision"]
+  - id: tomas-ledin-hon-gor-allt
+    displayName: "Hon gör allt för att göra mig lycklig — Tomas Ledin"
+    correctYear: 1980
+    probability: 68
+    wikimediaSearchHints: ["Tomas Ledin Hon gör allt för att göra mig lycklig"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "7DlTA5LRD6UVYeDwqbbojP"
+    youtubeClips:
+      - videoId: "epuLWrb6AUA"
+        startSec: 5
+        endSec: 50
+        channelTitle: "Tomas Ledin - Topic"
   # ===== Eurovision Song Contest vinnare =====
   - id: dana-all-kinds-of-everything
     displayName: "All Kinds of Everything — Dana"
@@ -844,6 +862,7 @@ items:
     probability: 74
     wikimediaSearchHints: ["Streaplers Vad har du under blusen Rut 1973 Swedish dansband"]
     answerMethods: ["timeline"]
+    genrePackages: ["dansband"]
     spotifyTrackId: "7915ILGV5otD6Oq3rOcKBR"
     youtubeClips:
       - videoId: "LdZuxKYJW3I"

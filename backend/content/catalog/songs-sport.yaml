@@ -68,16 +68,15 @@ items:
     genrePackages: ["sport"]
   - id: tomas-ledin-vi-ar-pa-gang
     displayName: "Vi är på gång — Tomas Ledin"
-    correctYear: 2006
+    correctYear: 1983
     probability: 78
-    wikimediaSearchHints: ["Tomas Ledin Vi är på gång VM 2006"]
+    wikimediaSearchHints: ["Tomas Ledin Vi är på gång 1983 Melodifestivalen"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "XVpjr3arHBM"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Tomas Ledin - Topic"
-        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      - videoId: "z-tEuBTbobc"
+        startSec: 5
+        endSec: 50
+        channelTitle: "uutiiset"
     genrePackages: ["sport"]
   - id: friends-in-need-alla-vi
     displayName: "Alla vi — Friends In Need"
@@ -86,6 +85,14 @@ items:
     wikimediaSearchHints: ["Dr Alban Björn Borg Tomas Brolin Alla vi 1999"]
     answerMethods: ["timeline"]
     genrePackages: ["sport"]
+  - id: svenne-rubins-langa-bollar-pa-bengt
+    displayName: "Långa Bollar På Bengt — Svenne Rubins"
+    correctYear: 1992
+    probability: 82
+    wikimediaSearchHints: ["Svenne Rubins Långa bollar på Bengt 1992 fotboll"]
+    answerMethods: ["timeline"]
+    genrePackages: ["sport", "football"]
+    spotifyTrackId: "6gAPl8snSQiUoAOpLUDIqA"
   # ── Svenska hockey-låtar ──
   - id: hakan-sodergren-nu-tar-vi-dom
     displayName: "Nu tar vi dom — Håkan Södergren & Ishockeylandslaget"

@@ -362,6 +362,11 @@ items:
     probability: 83
     wikimediaSearchHints: ["Sia Cheap Thrills 2016"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "HbzZPpWr4MI"
+        startSec: 0
+        endSec: 45
+        channelTitle: "Sia - Topic"
     spotifyTrackId: "3S4px9f4lceWdKf0gWciFu"
   - id: imagine-dragons-believer
     displayName: "Believer — Imagine Dragons"
@@ -449,6 +454,11 @@ items:
     probability: 86
     wikimediaSearchHints: ["Ed Sheeran Perfect 2017"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "2Vv-BfVoq4g"
+        startSec: 15
+        endSec: 60
+        channelTitle: "Ed Sheeran"
     spotifyTrackId: "0tgVpDi06FyKpA1z0VMD4v"
   - id: dua-lipa-dont-start-now
     displayName: "Don't Start Now — Dua Lipa"
@@ -593,6 +603,7 @@ items:
     probability: 78
     wikimediaSearchHints: ["The Mamas Move Eurovision 2020"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "19LiotxKSVs7FeVMEdHz63"
     youtubeClips:
       - videoId: "7EpSBDPlZn4"
         startSec: 5
@@ -632,7 +643,7 @@ items:
     probability: 90
     wikimediaSearchHints: ["Loreen Tattoo Eurovision 2023"]
     answerMethods: ["timeline"]
-    spotifyTrackId: "5D6Bi5sKXa8DXkUeyJyAEj"
+    spotifyTrackId: "1DmW5Ep6ywYwxc2HMT5BG6"
     youtubeClips:
       - videoId: "b3vJfR81xO0"
         startSec: 5
@@ -848,3 +859,73 @@ items:
         endSec: 30
         channelTitle: "Sony Music Sweden"
         notes: "Officiell Sony Music Sweden 2022."
+  - id: fuego-eleni-foureira
+    displayName: "Fuego — Eleni Foureira"
+    correctYear: 2018
+    probability: 80
+    region: ["unknown-region"]
+    wikimediaSearchHints: ["Eleni Foureira Fuego Cyprus Eurovision 2018"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Eurovision"]
+    spotifyTrackId: "22ppznuzVF9LKamaaqMMqu"
+  - id: spirit-in-the-sky-keiino
+    displayName: "Spirit in the Sky — KEiiNO"
+    correctYear: 2019
+    probability: 78
+    region: ["unknown-region"]
+    wikimediaSearchHints: ["KEiiNO Spirit in the Sky Norway Eurovision 2019"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Eurovision"]
+    spotifyTrackId: "7B7O5jgFpWfc9orZw6FN4K"
+    youtubeClips:
+      - videoId: "Ovt7YGHAj8I"
+        startSec: 40
+        endSec: 55
+        channelTitle: "KEiiNO"
+        notes: "Official music video. ESC 2019 Norway entry."
+  - id: dotter-bulletproof
+    displayName: "Bulletproof — Dotter"
+    correctYear: 2020
+    probability: 76
+    wikimediaSearchHints: ["Dotter Bulletproof Melodifestivalen 2020 Swedish"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Eurovision"]
+    spotifyTrackId: "4RcEx6TvICENelSh3O7gvu"
+  - id: el-diablo-elena-tsagkrinou
+    displayName: "El Diablo — Elena Tsagkrinou"
+    correctYear: 2021
+    probability: 80
+    region: ["unknown-region"]
+    wikimediaSearchHints: ["Elena Tsagkrinou El Diablo Cyprus Eurovision 2021"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Eurovision"]
+    spotifyTrackId: "4TAttqXwjj56xZQVKvlX0K"
+    youtubeClips:
+      - videoId: "ZHeydRCBPNs"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Elena Tsagkrinou"
+        notes: "Official music video. ESC 2021 Cyprus entry."
+  - id: europapa-joost-klein
+    displayName: "Europapa — Joost Klein"
+    correctYear: 2024
+    probability: 82
+    region: ["unknown-region"]
+    wikimediaSearchHints: ["Joost Klein Europapa Netherlands Eurovision 2024"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Eurovision"]
+    spotifyTrackId: "0uHrMbMv3c78398pIANDqR"
+  - id: laleh-bara-fa-va-mig-sjalv
+    displayName: "Bara Få Va Mig Själv — Laleh"
+    correctYear: 2016
+    probability: 88
+    wikimediaSearchHints: ["Laleh Bara få vara mig själv 2016 Swedish Kristaller"]
+    answerMethods: ["timeline"]
+    genrePackages: ["100% svenska"]
+    spotifyTrackId: "2FnUyLhe7sjXgnZlK9sc0z"
+    youtubeClips:
+      - videoId: "tzln6GO4yHY"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Laleh"
+        notes: "Official music video. 85M+ streams."

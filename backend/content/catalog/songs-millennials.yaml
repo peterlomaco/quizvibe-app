@@ -706,12 +706,29 @@ items:
         endSec: 45
         channelTitle: "George Michael - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: stevie-wonder-i-just-called
+    displayName: "I Just Called to Say I Love You — Stevie Wonder"
+    correctYear: 1984
+    probability: 86
+    wikimediaSearchHints: ["Stevie Wonder I Just Called to Say I Love You 1984"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "7yhYeVOti4KCNRQhBE2qFj"
+    youtubeClips:
+      - videoId: "58RgLQ_0Ars"
+        startSec: 10
+        endSec: 55
+        channelTitle: "Stevie Wonder - Topic"
   - id: bryan-adams-summer-of-69
     displayName: "Summer of '69 — Bryan Adams"
     correctYear: 1985
     probability: 86
     wikimediaSearchHints: ["Bryan Adams Summer of 69 1985"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "9f06QZCVUHg"
+        startSec: 10
+        endSec: 55
+        channelTitle: "Bryan Adams"
     spotifyTrackId: "0GONea6G2XdnHWjNZd6zt3"
   - id: u2-with-or-without-you
     displayName: "With or Without You — U2"
@@ -986,6 +1003,7 @@ items:
     probability: 68
     wikimediaSearchHints: ["Niamh Kavanagh In Your Eyes Eurovision 1993 Ireland"]
     answerMethods: ["timeline"]
+    region: ["unknown-region"]
     youtubeClips:
       - videoId: "pysQioMtrAU"
         startSec: 5
