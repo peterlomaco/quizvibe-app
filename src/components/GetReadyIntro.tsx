@@ -433,6 +433,8 @@ export function GetReadyIntro({
   // mellan-ronder spawnar vi nya GetReadyIntro-instanser så state nollställs
   // — det är önskat: leaderboarden börjar collapsed varje gång intro:n visas.
   const [leaderboardOpen, setLeaderboardOpen] = useState(false);
+  const [settingsExpanded, setSettingsExpanded] = useState(false);
+  const [queueExpanded, setQueueExpanded] = useState(false);
   // Trigger:n hanterar locked vs unlocked separat — locked → info-Alert,
   // unlocked → öppna dropdown.
   const handleResponseTriggerPress = () => {
@@ -525,69 +527,84 @@ export function GetReadyIntro({
       <View style={styles.settingsBlock}>
         <QuizVibeLogo size={LOGO_SIZE} />
         <View style={styles.settingsTextWrap}>
-          <Text style={styles.settingsTitle}>Game settings</Text>
-          <View style={styles.responseDropdownRow}>
-            <Text style={styles.settingsRow}>Game era:</Text>
-            <View style={styles.settingsValueBox}>
-              <Text style={styles.settingsValueBoxText}>
-                {eraFrom} – {eraTo}
+          <TouchableOpacity
+            style={styles.settingsTitleRow}
+            onPress={() => setSettingsExpanded((v) => !v)}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.settingsTitle}>Game settings</Text>
+            <View style={styles.settingsToggleBox}>
+              <Text style={styles.settingsToggleGlyph}>
+                {settingsExpanded ? '−' : '+'}
               </Text>
             </View>
-          </View>
-          <View style={styles.responseDropdownRow}>
-            <Text style={styles.settingsRow}>Answer response time:</Text>
-            {responseSecondsReadOnly ? (
-              // Non-host i IndDev: bara värdet som ren text. Inget tap-mål,
-              // ingen chevron, ingen 🔒. Host bestämmer värdet.
-              <Text style={styles.responseDropdownReadOnlyText}>
-                {answerResponseSeconds}s
-              </Text>
-            ) : (
-              <TouchableOpacity
-                style={[
-                  styles.responseDropdownTrigger,
-                  responseSecondsLocked && styles.responseDropdownTriggerLocked,
-                ]}
-                onPress={handleResponseTriggerPress}
-                activeOpacity={0.7}
-              >
-                <Text
-                  style={[
-                    styles.responseDropdownTriggerText,
-                    responseSecondsLocked && styles.responseDropdownTriggerTextLocked,
-                  ]}
-                >
-                  {answerResponseSeconds}s
-                </Text>
-                <Text
-                  style={[
-                    styles.responseDropdownChevron,
-                    responseSecondsLocked && styles.responseDropdownTriggerTextLocked,
-                  ]}
-                >
-                  {responseSecondsLocked ? '🔒' : '▼'}
-                </Text>
-              </TouchableOpacity>
-            )}
-          </View>
-          {/* D-iv: audio-trigger — bara host i IndDev. Tap öppnar modal
-              med per-spelare on/off-toggle. Trigger-texten visar live-
-              summering "N on" så host kan snabbt se status utan att
-              öppna modalen. */}
-          {showAudioTrigger && (
-            <View style={styles.responseDropdownRow}>
-              <Text style={styles.settingsRow}>Audio:</Text>
-              <TouchableOpacity
-                style={styles.responseDropdownTrigger}
-                onPress={() => setAudioModalOpen(true)}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.responseDropdownTriggerText}>
-                  {hostAudioOn ? 'On' : 'Off'}
-                </Text>
-                <Text style={styles.responseDropdownChevron}>▼</Text>
-              </TouchableOpacity>
-            </View>
+          </TouchableOpacity>
+          {settingsExpanded && (
+            <>
+              <View style={styles.responseDropdownRow}>
+                <Text style={styles.settingsRow}>Game era:</Text>
+                <View style={styles.settingsValueBox}>
+                  <Text style={styles.settingsValueBoxText}>
+                    {eraFrom} – {eraTo}
+                  </Text>
+                </View>
+              </View>
+              <View style={styles.responseDropdownRow}>
+                <Text style={styles.settingsRow}>Answer response time:</Text>
+                {responseSecondsReadOnly ? (
+                  // Non-host i IndDev: bara värdet som ren text. Inget tap-mål,
+                  // ingen chevron, ingen 🔒. Host bestämmer värdet.
+                  <Text style={styles.responseDropdownReadOnlyText}>
+                    {answerResponseSeconds}s
+                  </Text>
+                ) : (
+                  <TouchableOpacity
+                    style={[
+                      styles.responseDropdownTrigger,
+                      responseSecondsLocked && styles.responseDropdownTriggerLocked,
+                    ]}
+                    onPress={handleResponseTriggerPress}
+                    activeOpacity={0.7}
+                  >
+                    <Text
+                      style={[
+                        styles.responseDropdownTriggerText,
+                        responseSecondsLocked && styles.responseDropdownTriggerTextLocked,
+                      ]}
+                    >
+                      {answerResponseSeconds}s
+                    </Text>
+                    <Text
+                      style={[
+                        styles.responseDropdownChevron,
+                        responseSecondsLocked && styles.responseDropdownTriggerTextLocked,
+                      ]}
+                    >
+                      {responseSecondsLocked ? '🔒' : '▼'}
+                    </Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+              {/* D-iv: audio-trigger — bara host i IndDev. Tap öppnar modal
+                  med per-spelare on/off-toggle. Trigger-texten visar live-
+                  summering "N on" så host kan snabbt se status utan att
+                  öppna modalen. */}
+              {showAudioTrigger && (
+                <View style={styles.responseDropdownRow}>
+                  <Text style={styles.settingsRow}>Audio:</Text>
+                  <TouchableOpacity
+                    style={styles.responseDropdownTrigger}
+                    onPress={() => setAudioModalOpen(true)}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={styles.responseDropdownTriggerText}>
+                      {hostAudioOn ? 'On' : 'Off'}
+                    </Text>
+                    <Text style={styles.responseDropdownChevron}>▼</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            </>
           )}
         </View>
       </View>
@@ -1129,48 +1146,64 @@ export function GetReadyIntro({
               const isEndOfGame = lastChipQ === totalQuestions;
               return (
                 <>
-                  <View style={styles.mediaQueueChipsRow}>
-                    {queueQuestions.map((q, i) => {
-                      const source = mediaSourceByQuestion?.[q - 1];
-                      const isSpotify = spotifyQuestionIndices?.includes(q - 1) ?? false;
-                      return (
-                        <View
-                          key={`mchip-${i}`}
-                          style={[styles.queueChip, isSpotify && styles.queueChipSpotify]}
-                        >
-                          <Text style={[styles.queueChipNumber, isSpotify && styles.queueChipNumberSpotify]}>
-                            {q}
-                          </Text>
-                          {isSpotify ? (
-                            <SpotifyBrandIcon size={14} variant="white" />
-                          ) : (
-                            <MediaSourceIcon source={source} size={16} />
-                          )}
-                          <Text
-                            style={[styles.queueChipName, isSpotify && styles.queueChipNameSpotify]}
-                            numberOfLines={1}
-                            ellipsizeMode="tail"
-                          >
-                            {isSpotify ? 'Spotify DJ' : mediaSourceLabel(source)}
-                          </Text>
-                        </View>
-                      );
-                    })}
-                    {isEndOfGame && (
-                      <Text
-                        style={styles.endOfGameInline}
-                        numberOfLines={1}
-                        adjustsFontSizeToFit
-                        minimumFontScale={0.8}
-                      >
-                        🏁  End of Game
+                  <TouchableOpacity
+                    style={styles.queueToggleRow}
+                    onPress={() => setQueueExpanded((v) => !v)}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={styles.queueToggleLabel}>Playing queue</Text>
+                    <View style={styles.settingsToggleBox}>
+                      <Text style={styles.settingsToggleGlyph}>
+                        {queueExpanded ? '−' : '+'}
                       </Text>
-                    )}
-                  </View>
-                  {!isEndOfGame && (
-                    <View style={styles.endOfGameRow}>
-                      <Text style={styles.endOfGameText}>+ more questions</Text>
                     </View>
+                  </TouchableOpacity>
+                  {queueExpanded && (
+                    <>
+                      <View style={styles.mediaQueueChipsRow}>
+                        {queueQuestions.map((q, i) => {
+                          const source = mediaSourceByQuestion?.[q - 1];
+                          const isSpotify = spotifyQuestionIndices?.includes(q - 1) ?? false;
+                          return (
+                            <View
+                              key={`mchip-${i}`}
+                              style={[styles.queueChip, isSpotify && styles.queueChipSpotify]}
+                            >
+                              <Text style={[styles.queueChipNumber, isSpotify && styles.queueChipNumberSpotify]}>
+                                {q}
+                              </Text>
+                              {isSpotify ? (
+                                <SpotifyBrandIcon size={14} variant="white" />
+                              ) : (
+                                <MediaSourceIcon source={source} size={16} />
+                              )}
+                              <Text
+                                style={[styles.queueChipName, isSpotify && styles.queueChipNameSpotify]}
+                                numberOfLines={1}
+                                ellipsizeMode="tail"
+                              >
+                                {isSpotify ? 'Spotify DJ' : mediaSourceLabel(source)}
+                              </Text>
+                            </View>
+                          );
+                        })}
+                        {isEndOfGame && (
+                          <Text
+                            style={styles.endOfGameInline}
+                            numberOfLines={1}
+                            adjustsFontSizeToFit
+                            minimumFontScale={0.8}
+                          >
+                            🏁  End of Game
+                          </Text>
+                        )}
+                      </View>
+                      {!isEndOfGame && (
+                        <View style={styles.endOfGameRow}>
+                          <Text style={styles.endOfGameText}>+ more questions</Text>
+                        </View>
+                      )}
+                    </>
                   )}
                 </>
               );
@@ -1253,36 +1286,52 @@ export function GetReadyIntro({
               const isEndOfGame = totalQuestions - lastChipQ <= 0;
               return (
                 <>
-                  <View style={styles.mediaQueueChipsRow}>
-                    {visibleQueue.map((p, i) => (
-                      <View key={`chip-${i}`} style={styles.queueChip}>
-                        <Text style={styles.queueChipNumber}>
-                          {queueQuestionNumbers[i]}
-                        </Text>
-                        <Text
-                          style={styles.queueChipName}
-                          numberOfLines={1}
-                          ellipsizeMode="tail"
-                        >
-                          {p.name}
-                        </Text>
-                      </View>
-                    ))}
-                    {isEndOfGame && (
-                      <Text
-                        style={styles.endOfGameInline}
-                        numberOfLines={1}
-                        adjustsFontSizeToFit
-                        minimumFontScale={0.8}
-                      >
-                        🏁  End of Game
+                  <TouchableOpacity
+                    style={styles.queueToggleRow}
+                    onPress={() => setQueueExpanded((v) => !v)}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={styles.queueToggleLabel}>Playing queue</Text>
+                    <View style={styles.settingsToggleBox}>
+                      <Text style={styles.settingsToggleGlyph}>
+                        {queueExpanded ? '−' : '+'}
                       </Text>
-                    )}
-                  </View>
-                  {!isEndOfGame && (
-                    <View style={styles.endOfGameRow}>
-                      <Text style={styles.endOfGameText}>+ more questions</Text>
                     </View>
+                  </TouchableOpacity>
+                  {queueExpanded && (
+                    <>
+                      <View style={styles.mediaQueueChipsRow}>
+                        {visibleQueue.map((p, i) => (
+                          <View key={`chip-${i}`} style={styles.queueChip}>
+                            <Text style={styles.queueChipNumber}>
+                              {queueQuestionNumbers[i]}
+                            </Text>
+                            <Text
+                              style={styles.queueChipName}
+                              numberOfLines={1}
+                              ellipsizeMode="tail"
+                            >
+                              {p.name}
+                            </Text>
+                          </View>
+                        ))}
+                        {isEndOfGame && (
+                          <Text
+                            style={styles.endOfGameInline}
+                            numberOfLines={1}
+                            adjustsFontSizeToFit
+                            minimumFontScale={0.8}
+                          >
+                            🏁  End of Game
+                          </Text>
+                        )}
+                      </View>
+                      {!isEndOfGame && (
+                        <View style={styles.endOfGameRow}>
+                          <Text style={styles.endOfGameText}>+ more questions</Text>
+                        </View>
+                      )}
+                    </>
                   )}
                 </>
               );
@@ -1380,7 +1429,7 @@ const styles = StyleSheet.create({
   // andrum från skärm-kanterna.
   settingsBlock: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     alignSelf: 'center',
     gap: Spacing.sm,
     paddingHorizontal: Spacing.lg,
@@ -1393,12 +1442,45 @@ const styles = StyleSheet.create({
     // response time:"-labeln (~140pt) + 90pt value-box + Spacing.sm gap.
     minWidth: 240,
   },
+  settingsTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    marginBottom: 4,
+  },
+  queueToggleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    gap: Spacing.sm,
+    paddingVertical: Spacing.xs,
+  },
+  queueToggleLabel: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.medium,
+    color: Colors.textSecondary,
+    letterSpacing: 0.3,
+  },
+  settingsToggleBox: {
+    width: 26,
+    height: 26,
+    borderWidth: 1,
+    borderColor: Colors.borderStrong,
+    borderRadius: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  settingsToggleGlyph: {
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.bold,
+    color: Colors.textPrimary,
+    lineHeight: 22,
+  },
   settingsTitle: {
     fontSize: FontSize.lg,
     fontWeight: FontWeight.bold,
     color: Colors.textPrimary,
     letterSpacing: 0.4,
-    marginBottom: 4,
   },
   settingsRow: {
     fontSize: FontSize.sm,

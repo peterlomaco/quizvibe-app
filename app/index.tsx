@@ -165,9 +165,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
   const [code, setCode] = useState('');
   const [guestName, setGuestName] = useState('');
   const [guestBirthYearText, setGuestBirthYearText] = useState('');
-  // Default-värde: användaren kan gå direkt till Room Code efter year of birth.
-  // Assistance kan ändras via assistance-knapparna men har förvalt 'standard'.
-  const [guestAssistance, setGuestAssistance] = useState<AssistanceLevel>('standard');
+  const [guestAssistance, setGuestAssistance] = useState<AssistanceLevel>('full');
   const [yearPickerOpen, setYearPickerOpen] = useState(false);
   const [playerNameStatus, setPlayerNameStatus] = useState<PlayerNameStatus>('idle');
   const [invites, setInvites] = useState<WaitingInvite[]>([]);
@@ -294,7 +292,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
       setCode('');
       setGuestName('');
       setGuestBirthYearText('');
-      setGuestAssistance('standard');
+      setGuestAssistance('full');
       setYearPickerOpen(false);
       setPlayerNameStatus('idle');
       setStep(initialStep);

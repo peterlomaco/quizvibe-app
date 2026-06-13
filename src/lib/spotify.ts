@@ -36,8 +36,9 @@ const CLIENT_ID = process.env.EXPO_PUBLIC_SPOTIFY_CLIENT_ID ?? '';
 const REDIRECT_URI = 'quizvibeapp://spotify-callback';
 
 const SCOPES = [
-  'user-read-private',       // Krävs för att läsa product (premium/free) via /v1/me
-  'user-read-email',         // Visad e-post i connect-bekräftelsen
+  'user-read-private',           // Krävs för att läsa product (premium/free) via /v1/me
+  'user-read-email',             // Visad e-post i connect-bekräftelsen
+  'user-modify-playback-state',  // Pausa/starta uppspelning via Web API (DJ-overlay)
   // 'app-remote-control' borttagen — kräver Spotifys explicita produktionsgodkännande
   // och behövs inte eftersom vi öppnar låtar via deep link (spotify:track:ID),
   // inte via Spotify SDK. Att inkludera den kan göra att /v1/me returnerar 403.
@@ -363,4 +364,84 @@ export async function disconnectSpotify(): Promise<void> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return;
   await supabase.from('spotify_connections').delete().eq('user_id', user.id);
+}
+
+// ── Playback control ─────────────────────────────────────────────────
+
+/**
+ * Pausar pågående uppspelning på DJ:ns aktiva Spotify-enhet.
+ * Kräver user-modify-playback-state-scope + Premium.
+ */
+export async function pauseSpotifyPlayback(): Promise<boolean> {
+  const token = await getValidAccessToken();
+  if (!token) return false;
+  try {
+    const res = await fetch(`${SPOTIFY_API_BASE}/me/player/pause`, {
+      method: 'PUT',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    // 204 = success, 403 = not premium, 404 = no active device
+    return res.status === 204 || res.status === 200;
+  } catch (err) {
+    console.error('[spotify] pauseSpotifyPlayback threw:', err);
+    return false;
+  }
+}
+
+/**
+ * Återupptar uppspelning på DJ:ns aktiva Spotify-enhet (utan att starta om låten).
+ * Kräver user-modify-playback-state-scope + Premium.
+ */
+export async function resumeSpotifyPlayback(): Promise<boolean> {
+  const token = await getValidAccessToken();
+  if (!token) return false;
+  try {
+    const res = await fetch(`${SPOTIFY_API_BASE}/me/player/play`, {
+      method: 'PUT',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return res.status === 204 || res.status === 200;
+  } catch (err) {
+    console.error('[spotify] resumeSpotifyPlayback threw:', err);
+    return false;
+  }
+}
+
+// ── Track-info ────────────────────────────────────────────────────────
+
+export interface SpotifyTrackInfo {
+  trackId: string;
+  trackName: string;
+  artistName: string;
+  albumArtUrl: string | null;
+  durationMs: number;
+}
+
+/**
+ * GET /v1/tracks/{id} — hämtar track-metadata utan extra scopes.
+ * Ingen user-read-currently-playing behövs; fungerar med befintliga tokens.
+ */
+export async function fetchSpotifyTrackInfo(trackId: string): Promise<SpotifyTrackInfo | null> {
+  const token = await getValidAccessToken();
+  if (!token) return null;
+  try {
+    const res = await fetch(`${SPOTIFY_API_BASE}/tracks/${encodeURIComponent(trackId)}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) {
+      console.warn('[spotify] fetchSpotifyTrackInfo HTTP', res.status);
+      return null;
+    }
+    const data = await res.json();
+    return {
+      trackId: data.id,
+      trackName: data.name,
+      artistName: (data.artists as Array<{ name: string }>).map((a) => a.name).join(', '),
+      albumArtUrl: data.album?.images?.[0]?.url ?? null,
+      durationMs: data.duration_ms ?? 0,
+    };
+  } catch (err) {
+    console.error('[spotify] fetchSpotifyTrackInfo threw:', err);
+    return null;
+  }
 }

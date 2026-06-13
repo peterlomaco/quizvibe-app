@@ -9,7 +9,16 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "lint": "expo lint",
-    "postinstall": "patch-package"
+    "postinstall": "patch-package",
+    "youtube-search": "cd backend && npm run youtube-search --",
+    "youtube-validate": "cd backend && npm run youtube-validate",
+    "youtube-autofix": "cd backend && npm run youtube-autofix",
+    "export-music-questions": "cd backend && npm run export-music-questions",
+    "export-image-questions": "cd backend && npm run export-image-questions",
+    "review-quiz-images": "cd backend && npm run review-quiz-images",
+    "wikimedia-search": "cd backend && npm run wikimedia-search --",
+    "wikimedia-process": "cd backend && npm run wikimedia-process --",
+    "fetch-hints-data": "cd backend && npm run fetch-hints-data"
   },
   "dependencies": {
     "@expo-google-fonts/nunito": "^0.4.2",

@@ -152,12 +152,6 @@ items:
     probability: 82
     wikimediaSearchHints: ["Tarzan 1999 Disney animated Phil Collins jungle"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "jc0lisHARr4"
-        startSec: 10
-        endSec: 25
-        channelTitle: "Darth Malins"
-        notes: "1999 teatral trailer — Tarzan i djungeln + Phil Collins You'll Be in My Heart-känsla."
 
   - id: zootopia-2016
     displayName: "Zootopia"

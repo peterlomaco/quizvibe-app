@@ -414,9 +414,7 @@ function AddPlayerModal({ visible, onClose, onAdd, takenGuestLetters }: {
 }) {
   const [name, setName] = useState('');
   const [birthYear, setBirthYear] = useState<number | null>(null);
-  // Default 'standard' så användaren kan submit:a direkt efter year-pick
-  // (samma framing som Join-as-Guest-formen — "Use default or select prefered setup").
-  const [assistance, setAssistance] = useState<AddPlayerAssistance>('standard');
+  const [assistance, setAssistance] = useState<AddPlayerAssistance>('full');
   const [yearPickerOpen, setYearPickerOpen] = useState(false);
   const [playerNameStatus, setPlayerNameStatus] = useState<AddPlayerNameStatus>('idle');
   const [playerNameKbMode, setPlayerNameKbMode] = useState<'letter' | 'digit'>('letter');
@@ -434,7 +432,7 @@ function AddPlayerModal({ visible, onClose, onAdd, takenGuestLetters }: {
       const t = setTimeout(() => {
         setName('');
         setBirthYear(null);
-        setAssistance('standard');
+        setAssistance('full');
         setYearPickerOpen(false);
         setPlayerNameStatus('idle');
         setPlayerNameFocused(false);
@@ -1239,9 +1237,7 @@ export default function LobbyScreen() {
           age,
           assistance,
           hcpComplete: true,
-          // Explicit false så de hamnar i "To be Approved by Host"-listan
-          // direkt vid join, istället för att vänta på att host bjuder in.
-          approved: false,
+          approved: true,
         };
         // Sätt in gästen direkt efter host (index 1) så de syns högt upp.
         setPlayers((prev) => {
@@ -1314,12 +1310,7 @@ export default function LobbyScreen() {
           age,
           assistance,
           hcpComplete,
-          // Lokalt alltid false — non-host måste re-approvas av host.
-          // Carry-over-path: claimCarryOverLobbyPlayer rör inte approved i
-          // DB:n, så host:s ev. pre-approval (approved=true) bevaras i DB.
-          // syncFromStore:n hämtar sedan det riktiga DB-värdet och uppdaterar
-          // lokal state → non-host ser sig själv approved utan clobbing-race.
-          approved: false,
+          approved: true,
           spotifyConnected: ownSpotifyStatus?.connected ?? false,
         };
         setPlayers((prev) => {
@@ -1354,7 +1345,9 @@ export default function LobbyScreen() {
         // därmed clobba host:s eventuella pre-approval på carry-over-raden.
         // Regular-path: UPSERT som tidigare (INSERT eller UPDATE hela raden).
         if (carryOverPlayerId?.trim()) {
+          // claim sätter user_id + has_left=false; separat upsert skriver approved=true.
           claimCarryOverLobbyPlayer(roomCode, joinerId).catch(() => { /* loggas i lobbyPlayers */ });
+          upsertOwnLobbyPlayer(roomCode, joiner).catch(() => { /* loggas i lobbyPlayers */ });
         } else {
           upsertOwnLobbyPlayer(roomCode, joiner).catch(() => { /* loggas i lobbyPlayers */ });
         }
@@ -1723,8 +1716,19 @@ export default function LobbyScreen() {
   const [gameSettingsExpanded, setGameSettingsExpanded] = useState(false);
   // Host kommer in med Players in Lobby hopfälld (likt Game Settings + Quiz
   // Tuning); non-host får den utfälld så de direkt ser spelarlistan.
-  const [playersExpanded, setPlayersExpanded] = useState(!hostMode);
+  const [playersExpanded, setPlayersExpanded] = useState(false);
+  const [newPlayerJoined, setNewPlayerJoined] = useState(false);
   const [quizTuningExpanded, setQuizTuningExpanded] = useState(false);
+  const [customizeExpanded, setCustomizeExpanded] = useState(false);
+  useEffect(() => {
+    if (customizeExpanded) {
+      // Ge layouten 150 ms att mätas klart innan vi scrollar till botten.
+      const t = setTimeout(() => {
+        mainScrollRef.current?.scrollToEnd({ animated: true });
+      }, 150);
+      return () => clearTimeout(t);
+    }
+  }, [customizeExpanded]);
 
   // Scroll-hint-pil i nederkant (samma som quiz.tsx:s namn-fråge-pil) — guidar
   // användaren att scrolla ner till Start Game-knappen. Blink-puls + auto-göm
@@ -2414,6 +2418,24 @@ export default function LobbyScreen() {
     [players],
   );
   const waitingForApproval = players.filter((p) => !isPlayerApproved(p) && !p.hasLeft);
+
+  // Notify host när Players in Lobby är hopfällt och en ny spelare ansluter.
+  const prevNonHostApprovedRef = useRef(-1);
+  useEffect(() => {
+    const count = approvedPlayers.filter((p) => !p.isHost).length;
+    if (prevNonHostApprovedRef.current === -1) {
+      prevNonHostApprovedRef.current = count;
+      return;
+    }
+    if (!playersExpanded && count > prevNonHostApprovedRef.current) {
+      setNewPlayerJoined(true);
+    }
+    prevNonHostApprovedRef.current = count;
+  }, [approvedPlayers.length, playersExpanded]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (playersExpanded) setNewPlayerJoined(false);
+  }, [playersExpanded]);
+
   // Driver "Waiting for approval"-mellansteget för non-host. När host inte
   // har godkänt mig än ska jag inte se lobby:n överhuvudtaget — bara en
   // status-skärm. Polling-effekten ovan plockar upp host:s approve-toggle
@@ -2472,6 +2494,7 @@ export default function LobbyScreen() {
         name,
         emoji: '👤',
         isReady: true,
+        approved: true,
         type: 'guest',
         age,
         assistance,
@@ -4212,6 +4235,11 @@ export default function LobbyScreen() {
                 Players Waiting
               </BlinkingLabel>
             )}
+            {!playersExpanded && newPlayerJoined && (
+              <BlinkingLabel style={styles.playersWaitingLabel}>
+                New Player joined
+              </BlinkingLabel>
+            )}
           </TouchableOpacity>
           {!playersExpanded && <View style={styles.sectionDivider} />}
           {playersExpanded && (<>
@@ -4387,6 +4415,9 @@ export default function LobbyScreen() {
           </>)}
         </View>
 
+        {/* Top-spacer för non-host: delar utrymmet lika ovan/nedan waiting-sektionen */}
+        {!hostMode && <View style={{ flex: 1 }} />}
+
         {/* Start Game + Customize-rubrik wrappad i en enda View så ScrollViewns
             gap: Spacing.xl bara appliceras EN gång mot Players-blocket ovanför,
             inte per delElement. */}
@@ -4449,13 +4480,24 @@ export default function LobbyScreen() {
             </View>
           )}
 
-          {/* ── Customize QuizVibe header ─────────────────────────────
-              Visuell grupp-rubrik som signalerar att Game Settings och
-              Quiz Tuning är host-kontrollerade spel-anpassningar. */}
-          <View style={styles.customizeSectionHeader}>
-            <Text style={styles.customizeSectionHeaderText}>Customize QuizVibe</Text>
-          </View>
         </View>
+
+        {/* Bottom-spacer för non-host: lika stor som top-spacern → waiting-sektionen centreras */}
+        {!hostMode && <View style={{ flex: 1 }} />}
+
+        {/* ── Customize QuizVibe — kollapsbar, synlig för host OCH non-host ── */}
+        <TouchableOpacity
+          onPress={() => setCustomizeExpanded((v) => !v)}
+          activeOpacity={0.7}
+          style={styles.customizeSectionHeader}
+        >
+          <Text style={styles.customizeSectionHeaderText}>Customize QuizVibe</Text>
+          <View style={styles.sectionToggleBox}>
+            <Text style={styles.sectionChevron}>{customizeExpanded ? '−' : '+'}</Text>
+          </View>
+        </TouchableOpacity>
+
+        {customizeExpanded && (<>
 
         {/* Game Settings — sitter mellan room code-kortet och Game Mode-kortet.
             Wrappad i styles.section (samma som Players/Quiz Tuning) så header→
@@ -5482,6 +5524,8 @@ export default function LobbyScreen() {
           )}
         </View>
 
+        </>)}{/* /customizeExpanded */}
+
         <View style={styles.bottomPad} />
       </ScrollView>
 
@@ -6035,7 +6079,7 @@ const styles = StyleSheet.create({
 
   safe: { flex: 1, backgroundColor: Colors.background },
   scroll: { flex: 1 },
-  content: { paddingHorizontal: Spacing.lg, paddingTop: Spacing.xl, paddingBottom: Spacing.xxl, gap: Spacing.xl },
+  content: { paddingHorizontal: Spacing.lg, paddingTop: Spacing.xl, paddingBottom: Spacing.xxl, gap: Spacing.xl, flexGrow: 1 },
 
   // Lobby-header — title vänster, Host Game Credits-pill höger.
   header: {
@@ -7290,11 +7334,14 @@ const styles = StyleSheet.create({
   // ikon + Typography.title bold + +/−-toggle-box). paddingHorizontal: xs så
   // rubriken linjerar i vänsterkant med övriga sektioner. 2026-06-01.
   customizeSectionHeader: {
-    backgroundColor: '#374151',
+    backgroundColor: Colors.card,
     paddingHorizontal: Spacing.lg,
     paddingVertical: Spacing.sm,
     borderRadius: Radius.md,
     marginTop: Spacing.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
   },
   customizeSectionHeaderText: {
     fontSize: FontSize.lg,

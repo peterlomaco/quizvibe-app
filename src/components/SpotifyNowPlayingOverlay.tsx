@@ -1,10 +1,11 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Line, Polygon, Rect } from 'react-native-svg';
 import { Colors, FontSize, Radius, Spacing } from '@/src/theme';
 import { SpotifyBrandIcon } from '@/src/components/SpotifyBrandIcon';
 
 const SPOTIFY_GREEN = '#1DB954';
+const DISMISS_DELAY = 5;
 
 interface Props {
   visible: boolean;
@@ -19,6 +20,8 @@ interface Props {
   onDismiss: () => void;
   /** Tillåt att stänga overlayen — false tills svarstiden gått ut. */
   canDismiss?: boolean;
+  /** Öppnar Spotify-appen direkt — fallback om Web API-kontroll inte fungerar. */
+  onOpenSpotify?: () => void;
 }
 
 export function SpotifyNowPlayingOverlay({
@@ -32,15 +35,41 @@ export function SpotifyNowPlayingOverlay({
   onActivate,
   onDismiss,
   canDismiss = true,
+  onOpenSpotify,
 }: Props) {
   const slideAnim = useRef(new Animated.Value(240)).current;
   const opacityAnim = useRef(new Animated.Value(0)).current;
   const dismissPulse = useRef(new Animated.Value(1)).current;
 
-  const showDismiss = canDismiss && !isPlaying;
+  // null = countdown not started, 5→1 = counting, 0 = countdown done (X visible)
+  const [dismissCountdown, setDismissCountdown] = useState<number | null>(null);
 
+  const showDismiss = canDismiss && !isPlaying;
+  const showDismissX = dismissCountdown === 0;
+  const isCountingDown = dismissCountdown !== null && dismissCountdown > 0;
+
+  // Start countdown when conditions first become true; reset when conditions break.
   useEffect(() => {
     if (showDismiss) {
+      setDismissCountdown(DISMISS_DELAY);
+    } else {
+      setDismissCountdown(null);
+    }
+  }, [showDismiss]);
+
+  // Tick countdown down by 1 each second until 0.
+  useEffect(() => {
+    if (dismissCountdown === null || dismissCountdown === 0) return;
+    const t = setTimeout(
+      () => setDismissCountdown((prev) => (prev !== null && prev > 0 ? prev - 1 : prev)),
+      1000,
+    );
+    return () => clearTimeout(t);
+  }, [dismissCountdown]);
+
+  // Pulse only when X is actually shown.
+  useEffect(() => {
+    if (showDismissX) {
       const loop = Animated.loop(
         Animated.sequence([
           Animated.timing(dismissPulse, { toValue: 1.2, duration: 800, useNativeDriver: true }),
@@ -52,7 +81,7 @@ export function SpotifyNowPlayingOverlay({
     } else {
       dismissPulse.setValue(1);
     }
-  }, [showDismiss, dismissPulse]);
+  }, [showDismissX, dismissPulse]);
 
   useEffect(() => {
     if (visible) {
@@ -100,18 +129,31 @@ export function SpotifyNowPlayingOverlay({
             </Svg>
           )}
         </Pressable>
-        <Pressable onPress={showDismiss ? onDismiss : undefined} style={styles.dismiss} hitSlop={12}>
-          <Animated.View style={[!showDismiss && styles.dismissGlyphHidden, { transform: [{ scale: dismissPulse }] }]}>
-            <Svg width={36} height={36} viewBox="0 0 36 36">
-              <Line x1="6" y1="6" x2="30" y2="30" stroke="#FF3B30" strokeWidth={5} strokeLinecap="round" />
-              <Line x1="30" y1="6" x2="6" y2="30" stroke="#FF3B30" strokeWidth={5} strokeLinecap="round" />
-            </Svg>
-          </Animated.View>
+        {/* Dismiss-slot: visar nedräkning 5→1 innan X visas */}
+        <Pressable onPress={showDismissX ? onDismiss : undefined} style={styles.dismiss} hitSlop={12}>
+          {isCountingDown ? (
+            <Text style={styles.dismissCountdownText}>{dismissCountdown}</Text>
+          ) : (
+            <Animated.View
+              style={[!showDismissX && styles.dismissGlyphHidden, { transform: [{ scale: dismissPulse }] }]}
+            >
+              <Svg width={36} height={36} viewBox="0 0 36 36">
+                <Line x1="6" y1="6" x2="30" y2="30" stroke="#FF3B30" strokeWidth={5} strokeLinecap="round" />
+                <Line x1="30" y1="6" x2="6" y2="30" stroke="#FF3B30" strokeWidth={5} strokeLinecap="round" />
+              </Svg>
+            </Animated.View>
+          )}
         </Pressable>
       </View>
       {canActivate && (
         <Pressable style={styles.activateBtn} onPress={onActivate}>
           <Text style={styles.activateBtnText}>Activate Timer</Text>
+        </Pressable>
+      )}
+      {onOpenSpotify && (
+        <Pressable style={styles.openSpotify} onPress={onOpenSpotify} hitSlop={8}>
+          <SpotifyBrandIcon size={13} variant="white" />
+          <Text style={styles.openSpotifyText}> Open in Spotify to control music</Text>
         </Pressable>
       )}
     </Animated.View>
@@ -177,9 +219,21 @@ const styles = StyleSheet.create({
   },
   dismiss: {
     padding: Spacing.lg,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 36 + Spacing.lg * 2,
   },
   dismissGlyphHidden: {
     opacity: 0,
+  },
+  dismissCountdownText: {
+    color: Colors.textSecondary,
+    fontSize: FontSize.xl,
+    fontWeight: '700',
+    width: 36,
+    height: 36,
+    textAlign: 'center',
+    lineHeight: 36,
   },
   activateBtn: {
     backgroundColor: SPOTIFY_GREEN,
