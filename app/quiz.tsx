@@ -1597,9 +1597,25 @@ export default function QuizScreen() {
   const [timerActive, setTimerActive] = useState(false);
   useEffect(() => {
     if (phase !== 'question') { setTimerActive(false); return; }
-    // Återställ display OMEDELBART så rätt respons-tid och full timer-bar
-    // visas under buffer-perioden (inte stale 0 eller default 30 från
-    // förra frågan / initialt state).
+    // Non-host i IndDev: om host:s timer redan har startat när question-fasen
+    // sätts (t.ex. appen vaknade upp från bakgrunden under nedräkning och
+    // AppState-lyssnaren satte setPhase('question') direkt) — visa korrekt
+    // återstående tid OMEDELBART istället för full responseSeconds.
+    if (!isHost && hostTimerStartAtRef.current > 0) {
+      const now = Date.now();
+      const timerStartAt = hostTimerStartAtRef.current;
+      if (now >= timerStartAt) {
+        const elapsed = Math.floor((now - timerStartAt) / 1000);
+        const adjustedLeft = Math.max(0, responseSeconds - elapsed);
+        setTimeLeft(adjustedLeft);
+        timerProgressAnim.stopAnimation();
+        timerProgressAnim.setValue(adjustedLeft / responseSeconds);
+        if (isSpotifyQuestion) return;
+        const id = setTimeout(() => setTimerActive(true), 2000);
+        return () => { clearTimeout(id); };
+      }
+    }
+    // Normal path: återställ display till full tid under buffer-perioden.
     setTimeLeft(responseSeconds);
     timerProgressAnim.stopAnimation();
     timerProgressAnim.setValue(1);
@@ -1608,7 +1624,7 @@ export default function QuizScreen() {
     if (isSpotifyQuestion) return;
     const id = setTimeout(() => setTimerActive(true), 2000);
     return () => { clearTimeout(id); };
-  }, [phase, questionIndex, responseSeconds, timerProgressAnim, isSpotifyQuestion]);
+  }, [phase, questionIndex, responseSeconds, timerProgressAnim, isSpotifyQuestion, isHost]);
   // Hints visas direkt när quiz-vyn öppnas (ingen delay).
   // Flaggans mosaik har kvar sin 2 s delay via timerActive/mosaicActive.
   const hintsReady = phase === 'question' || phase === 'awaiting' || phase === 'reveal';
@@ -1996,6 +2012,12 @@ export default function QuizScreen() {
   // svarstiden med 2 decimaler vid Confirm. setInterval ger bara sekund-
   // precision så vi måste timestampa separat med Date.now().
   const questionStartMsRef = useRef<number>(0);
+  // Wall-clock ms för när host:s timer startade (= play_command.timer_start_at).
+  // Sätts av playCommandHandler:n på non-host:s enhet. Används vid iOS
+  // foreground-återkomst (AppState 'active') för att beräkna korrekt
+  // återstående tid om appen vaknade upp under countdown/question-fasen.
+  // Resetas till 0 vid questionIndex-byte så stale värde aldrig läcker.
+  const hostTimerStartAtRef = useRef<number>(0);
   // Smooth bar-progress 1 → 0 över exakt 30 s, animerad via Animated.timing
   // med RAF (requestAnimationFrame). Körs OBEROENDE av setInterval-baserade
   // sekund-räknaren så bar:en aldrig "fryser" eller stepar — kritiskt för
@@ -2006,16 +2028,27 @@ export default function QuizScreen() {
 
   const startTimer = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
-    setTimeLeft(responseSeconds);
-    questionStartMsRef.current = Date.now();
+    // Non-host i IndDev: beräkna korrekt återstående tid baserat på host:s
+    // timer_start_at om appen vaknade upp under countdown och vi missade
+    // starten. Utan denna korrigering börjar timern alltid om från full
+    // responseSeconds fastän host redan räknat ner en bit.
+    let effectiveSeconds: number = responseSeconds;
+    if (!isHost && hostTimerStartAtRef.current > 0) {
+      const elapsed = Math.floor((Date.now() - hostTimerStartAtRef.current) / 1000);
+      if (elapsed > 0) {
+        effectiveSeconds = Math.max(0, responseSeconds - elapsed);
+      }
+    }
+    setTimeLeft(effectiveSeconds);
+    questionStartMsRef.current = Date.now() - (responseSeconds - effectiveSeconds) * 1000;
     // Native-driver kan inte hantera procentuell width, så useNativeDriver:
     // false. Animated.timing schemaläggs ändå via RAF så bar:en uppdateras
     // varje frame oberoende av setInterval-tick:n eller övriga JS-händelser.
     timerProgressAnim.stopAnimation();
-    timerProgressAnim.setValue(1);
+    timerProgressAnim.setValue(effectiveSeconds / responseSeconds);
     Animated.timing(timerProgressAnim, {
       toValue: 0,
-      duration: responseSeconds * 1000,
+      duration: effectiveSeconds * 1000,
       easing: Easing.linear,
       useNativeDriver: false,
     }).start();
@@ -2028,7 +2061,7 @@ export default function QuizScreen() {
         return prev - 1;
       });
     }, 1000);
-  }, [questionIndex, timerProgressAnim, responseSeconds]);
+  }, [questionIndex, timerProgressAnim, responseSeconds, isHost]);
 
   // Unmount-cleanup så timern inte läcker om component unmounts (t.ex.
   // Quit Game mid-question). Lever utanför phase-baserade effects.
@@ -2130,6 +2163,25 @@ export default function QuizScreen() {
         setShowNowPlayingOverlay(true);
       }
 
+      // Non-host i IndDev: om appen vaknade upp under countdown och host:s
+      // timer redan har startat → hoppa direkt till question-fasen med
+      // korrekt återstående tid. Undviker att de frysta countdown-tick:arna
+      // eldar av snabbt och sedan startar timern om från full responseSeconds.
+      if (!isHost && hostTimerStartAtRef.current > 0 && phaseRef.current === 'countdown') {
+        const now = Date.now();
+        const timerStartAt = hostTimerStartAtRef.current;
+        if (now >= timerStartAt) {
+          const elapsed = Math.floor((now - timerStartAt) / 1000);
+          const adjustedLeft = Math.max(0, responseSeconds - elapsed);
+          timerProgressAnim.stopAnimation();
+          timerProgressAnim.setValue(adjustedLeft / responseSeconds);
+          setTimeLeft(adjustedLeft);
+          setTimerActive(true);
+          setPhase('question');
+          return;
+        }
+      }
+
       const currentPhase = phaseRef.current;
       if (currentPhase !== 'question' && currentPhase !== 'awaiting') return;
       if (questionStartMsRef.current === 0) return;
@@ -2160,7 +2212,7 @@ export default function QuizScreen() {
       }
     });
     return () => sub.remove();
-  }, [responseSeconds, timerProgressAnim]);
+  }, [responseSeconds, timerProgressAnim, isHost]);
 
   // Registrera score:n för en avslutad fråga. I Pass-the-Phone (eller när
   // turnOrder är satt) skapar vi en post för ENDAST den aktiva spelaren —
@@ -2739,6 +2791,7 @@ export default function QuizScreen() {
     // beräknar elapsed >> responseSeconds → timer hoppar till 0 direkt.
     hasRecordedScoreForCurrentQuestionRef.current = false;
     questionStartMsRef.current = 0;
+    hostTimerStartAtRef.current = 0;
     if (explicitNextIndex !== undefined) {
       setQuestionIndex(explicitNextIndex);
     } else {
@@ -2867,6 +2920,11 @@ export default function QuizScreen() {
   // Host:s Play-tap: 2 s dramatisk paus innan nedräkning startar.
   // Broadcast skickas efter samma fördröjning så host + non-host synkar.
   const handleHostStartFromGetReady = () => {
+    // Beräkna exakt när non-host:s timer kommer att starta:
+    // countdown: 700 ms initial paus + 5 × 1300 ms tick (5→4→3→2→1→0) +
+    // 1000 ms "?"-display = 7200 ms. Plus timerActive-delay 2000 ms = 10200 ms.
+    // +300 ms marginal för JS-timer-drift → 10500 ms.
+    const timerStartAt = Date.now() + 10500;
     setPhase('countdown');
     if (gameMode === 'individual-devices' && syncChannelRef.current) {
       syncChannelRef.current
@@ -2874,6 +2932,7 @@ export default function QuizScreen() {
           question_index: questionIndex,
           question_id: currentQ?.id ?? '',
           all_question_ids: gameQuestions.map((q) => q.id),
+          timer_start_at: timerStartAt,
         })
         .catch(() => {});
     }
@@ -3008,7 +3067,7 @@ export default function QuizScreen() {
   // (etablerad en gång på mount) alltid kallar latest logic. Non-host kör
   // samma transition-funktioner som host (lokalt) — de är idempotenta.
   useEffect(() => {
-    playCommandHandlerRef.current = (qIdx, qId, allIds) => {
+    playCommandHandlerRef.current = (qIdx, qId, allIds, timerStartAt) => {
       // D-iii sticky-gate: om spelaren är låst i unstable-overlay (sticky
       // ELLER live-unstable) → IGNORERA play_command. Spelaren kvarstår i
       // sin nuvarande fas + overlay tills de explicit tappar Retry. Detta
@@ -3032,6 +3091,13 @@ export default function QuizScreen() {
       setBroadcastQuestionId(qId ?? null);
       // Spara host:s kompletta fråge-sekvens för korrekt GetReady-kö-ikoner.
       if (allIds && allIds.length > 0) setBroadcastAllQuestionIds(allIds);
+      // Spara host:s timer-starttid för iOS-bakgrunds-återsynk. Non-host som
+      // vaknar upp från bakgrunden under countdown/question-fasen beräknar
+      // korrekt återstående tid via hostTimerStartAtRef. Resetas av
+      // questionIndex-effekten vid nästa fråga.
+      if (!isHost && timerStartAt) {
+        hostTimerStartAtRef.current = timerStartAt;
+      }
       // Reset answer-state så B inte ärver pending-svar från förra fråga
       // (kan finnas kvar om B retry:ade i sticky-låst tillstånd och inte
       // nådde nästa rondens normalt-rensa-path via handleAdvanceToNextRound).
@@ -3593,6 +3659,16 @@ export default function QuizScreen() {
   const hostActivePingHandlerRef = useRef<(questionIndex: number) => void>(
     () => {},
   );
+  // Handler för host_rejoined: fyrar på non-host när HOST:s uppkoppling
+  // återupprättats. Drainer pending score-kön så host:s leaderboard
+  // får resultat som host kan ha missat under sitt offline-fönster.
+  const hostRejoinedHandlerRef = useRef<() => void>(() => {});
+  // Handler för watchdog-baserad peer-reconnect (onPeerReconnected).
+  // Fyrar på BÅDA enheterna när watchdog:n detekterar att en peer som
+  // var 'disconnected' nu har fresh heartbeat igen.
+  // Host: broadcastar host_rejoined → non-host drainer scores.
+  // Non-host: drainer scores direkt + broadcastar player_rejoined.
+  const peerReconnectedHandlerRef = useRef<(senderId: string) => void>(() => {});
   // Synkron mirror av awaitingNewLobby så lobby-ready-handler:n kan
   // läsa den AKTUELLA värden vid event-ankomst utan att vara beroende
   // av att useEffect:en hunnit uppdatera handler-closure:n. Skyddar mot
@@ -3687,6 +3763,55 @@ export default function QuizScreen() {
         setBroadcastDJPlayerId(null);
         return hostQuestionIndex;
       });
+    };
+    hostRejoinedHandlerRef.current = () => {
+      // Host:s uppkoppling återupprättad — draina pending score-kön så
+      // host:s leaderboard får resultat host kan ha missat under offline-fönstret.
+      // Mottagarsidan (host) deduplicerar via receivedRemoteScoreKeysRef → idempotent.
+      const toRetry = [...pendingScoreBroadcastsRef.current];
+      pendingScoreBroadcastsRef.current = [];
+      for (const payload of toRetry) {
+        syncChannelRef.current?.broadcastPlayerScoreRecorded(payload).catch(() => {
+          pendingScoreBroadcastsRef.current.push(payload);
+        });
+      }
+      // Broadcastas även player_rejoined så host:s playerConnectionStatus
+      // flippar oss tillbaka till 'connected' — kompletterar score-draining
+      // med explicit reconnect-signal.
+      if (selfPlayerId) {
+        syncChannelRef.current
+          ?.broadcastPlayerRejoined({ sender_id: selfPlayerId })
+          .catch(() => {});
+      }
+    };
+    peerReconnectedHandlerRef.current = (senderId: string) => {
+      // Watchdog detekterade att en peer som var 'disconnected' nu har
+      // fresh heartbeat. playerConnectionStatus är redan uppdaterad av
+      // onPlayerConnectionChange-callbacken i subscribeSyncChannel.
+      if (isHost && gameMode === 'individual-devices' && selfPlayerId) {
+        // Host: broadcastas host_rejoined → non-host drainer sina pending
+        // scores och broadcastar player_rejoined.
+        // Använder selfPlayerId, senderId ignoreras (vi bryr oss inte om
+        // vilken peer som kom tillbaka — alla non-hosts drainer vid mottagning).
+        void senderId;
+        syncChannelRef.current
+          ?.broadcastHostRejoined({ sender_id: selfPlayerId })
+          .catch(() => {});
+      } else if (!isHost && gameMode === 'individual-devices' && selfPlayerId) {
+        // Non-host: host kommit tillbaka (senderId = host:s player ID).
+        // Draina pending scores direkt + broadcastas player_rejoined så
+        // host:s playerConnectionStatus flippar oss till 'connected'.
+        const toRetry = [...pendingScoreBroadcastsRef.current];
+        pendingScoreBroadcastsRef.current = [];
+        for (const payload of toRetry) {
+          syncChannelRef.current?.broadcastPlayerScoreRecorded(payload).catch(() => {
+            pendingScoreBroadcastsRef.current.push(payload);
+          });
+        }
+        syncChannelRef.current
+          ?.broadcastPlayerRejoined({ sender_id: selfPlayerId })
+          .catch(() => {});
+      }
     };
   }, [isHost]);
 
@@ -3817,7 +3942,7 @@ export default function QuizScreen() {
   const syncChannelRef = useRef<SyncChannel | null>(null);
   // Refs så broadcast-listenern alltid pekar på senaste handlern (annars
   // skulle subscription:n captura stale closures vid mount).
-  const playCommandHandlerRef = useRef<(qIdx: number, qId?: string, allIds?: string[]) => void>(() => {});
+  const playCommandHandlerRef = useRef<(qIdx: number, qId?: string, allIds?: string[], timerStartAt?: number) => void>(() => {});
   const questionAdvanceHandlerRef = useRef<(payload: QuestionAdvancePayload) => void>(() => {});
   const playerLeftHandlerRef = useRef<(playerId: string, playerName: string) => void>(
     () => {},
@@ -3849,7 +3974,7 @@ export default function QuizScreen() {
   useEffect(() => {
     if (gameMode !== 'individual-devices' || !params.roomCode) return;
     const sync = subscribeSyncChannel(params.roomCode, selfPlayerId, {
-      onPlayCommand: (payload) => playCommandHandlerRef.current(payload.question_index, payload.question_id, payload.all_question_ids),
+      onPlayCommand: (payload) => playCommandHandlerRef.current(payload.question_index, payload.question_id, payload.all_question_ids, payload.timer_start_at),
       onQuestionAdvance: (payload) => questionAdvanceHandlerRef.current(payload),
       onPlayerLeft: (payload) =>
         playerLeftHandlerRef.current(payload.player_id, payload.player_name),
@@ -3875,6 +4000,8 @@ export default function QuizScreen() {
         // Detta är ENDA vägen tillbaka (heartbeat-receipt räcker inte).
         setPlayerConnectionStatus((prev) => ({ ...prev, [playerId]: 'connected' }));
       },
+      onHostRejoined: () => hostRejoinedHandlerRef.current(),
+      onPeerReconnected: (senderId) => peerReconnectedHandlerRef.current(senderId),
       // Spotify: host broadcastar vem som är DJ för denna fråga.
       // Non-host sparar dj_player_id — används av isCurrentPlayerDJ
       // istället för lokalt beräknat djRotationPlan (fel pga annan shuffle).
@@ -3966,6 +4093,14 @@ export default function QuizScreen() {
     if (wasUnstable && isOk) {
       setPlayerConnectionStatus({});
       syncChannelRef.current?.resetPeerTracking();
+      if (isHost && gameMode === 'individual-devices' && selfPlayerId) {
+        // Host återansluten — signalera till non-hosts att draina sina
+        // pending score-köer. Non-hosts re-broadcastar allt de skickat
+        // sedan spelet startade; mottagarsidan (host) deduplicerar.
+        syncChannelRef.current
+          ?.broadcastHostRejoined({ sender_id: selfPlayerId })
+          .catch(() => {});
+      }
       if (!isHost && gameMode === 'individual-devices' && selfPlayerId) {
         // Re-broadcasta scores som kan ha tappats under offline-perioden.
         // Körs före player_rejoined så host:s leaderboard uppdateras

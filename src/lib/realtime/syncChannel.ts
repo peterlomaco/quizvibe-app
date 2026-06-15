@@ -28,6 +28,12 @@ export interface PlayCommandPayload {
    *  oavsett lokal shuffle-ordning. Inkluderas i varje play_command så
    *  reconnecting players alltid har aktuell sekvens. */
   all_question_ids?: string[];
+  /** Wall-clock ms (Date.now()) för när host:s timer kommer att starta —
+   *  700ms initial paus + 5×1300ms tick + 1000ms ?-display + 2000ms timerActive-delay
+   *  = ~10200ms + 300ms marginal = ~10500ms efter broadcasten.
+   *  Non-host använder detta för att återsynka sin timer korrekt om de vaknar
+   *  upp från iOS-bakgrund under nedräknings- eller fråge-fasen. */
+  timer_start_at?: number;
 }
 
 export interface QuestionAdvancePayload {
@@ -245,6 +251,21 @@ export interface PlayerRejoinedPayload {
 }
 
 /**
+ * Host signalerar att DERAS uppkoppling just återupprättats (connection.status
+ * gick från 'unstable' → 'ok'). Non-host:ar som tagit emot detta event vet
+ * att host kan ha missat deras player_score_recorded-broadcasts under offline-
+ * fönstret och skickar om sina pending scores.
+ *
+ * Symmetriskt med player_rejoined (non-host → host): precis som non-host
+ * drainer sin pending-kö och skickar player_rejoined vid sin reconnect,
+ * triggar detta event samma drain på non-host:arnas sida vid HOST:s reconnect.
+ */
+export interface HostRejoinedPayload {
+  /** Host:s lobby_players.player_id. Informativt. */
+  sender_id: string;
+}
+
+/**
  * En spelare har svarat och fått sin score registrerad för den aktuella
  * frågan. Broadcastas av VARJE klient i IndDev-läget direkt efter att
  * `recordRoundScore` kört — mottagarna lägger in posten i sin lokala
@@ -327,6 +348,21 @@ export interface SyncChannelHandlers {
    */
   onPlayerRejoined?: (playerId: string) => void;
   /**
+   * Fyrar när host broadcastat `host_rejoined` — host:s uppkoppling just
+   * återupprättats. Non-host:ar drainer sin pending score-kö vid mottagning
+   * så host:s leaderboard får resultat host kan ha missat under offline-fönstret.
+   */
+  onHostRejoined?: (senderId: string) => void;
+  /**
+   * Fyrar när watchdog:n detekterar att en peer kommit tillbaka efter att ha
+   * markerts som 'disconnected' — dvs. vi tar emot ett nytt heartbeat från dem
+   * inom PEER_TIMEOUT_MS efter att de var tysta. Kompletterar `onPlayerRejoined`
+   * (som kräver explicit Retry-tap) med watchdog-baserad auto-recovery.
+   * Används av host för att broadcastas `host_rejoined` → non-host drainer scores.
+   * Används av non-host för att draina pending scores + broadcastas `player_rejoined`.
+   */
+  onPeerReconnected?: (senderId: string) => void;
+  /**
    * En annan spelare i IndDev har svarat och registrerat sin score.
    * Merge:as in i lokal `allRoundScoresHistory` för komplett leaderboard.
    */
@@ -375,6 +411,11 @@ export interface SyncChannel {
    * 'disconnected' till 'connected' i sin playerConnectionStatus-map.
    */
   broadcastPlayerRejoined: (payload: PlayerRejoinedPayload) => Promise<void>;
+  /**
+   * Host broadcastar "min uppkoppling är återupprättad" vid wasUnstable→ok.
+   * Non-host:ar skickar om sina pending scores på mottagning.
+   */
+  broadcastHostRejoined: (payload: HostRejoinedPayload) => Promise<void>;
   /**
    * Broadcasta att vi just scorat en fråga i IndDev. Alla mottagare
    * lägger till vår RoundScore i sin lokala `allRoundScoresHistory`
@@ -563,6 +604,12 @@ export function subscribeSyncChannel(
       handlers.onPlayerRejoined!(p.sender_id);
     });
   }
+  if (handlers.onHostRejoined) {
+    channel.on('broadcast', { event: 'host_rejoined' }, ({ payload }) => {
+      const p = payload as HostRejoinedPayload;
+      handlers.onHostRejoined!(p.sender_id);
+    });
+  }
   // player_score_recorded: en annan IndDev-spelare har svarat. Mottagaren
   // mergar in score:n i sin lokala allRoundScoresHistory för komplett
   // leaderboard. broadcast.self: false garanterar att sändarens egna klient
@@ -606,24 +653,27 @@ export function subscribeSyncChannel(
     : null;
 
   // Per-sender watchdog: var 5:e sek kolla varje känd sender:s lastSeen.
-  // Om gap > 15s OCH vi tidigare rapporterat dem som connected (= vi har
-  // hört från dem minst en gång) → markera disconnected och fyra callback.
-  // Vid recovery (nästa heartbeat in) flyttas de tillbaka till connected
-  // av heartbeat-handlern ovan.
+  // Disconnect: gap > 15s OCH status !== 'disconnected' → markera + callback.
+  // Reconnect: gap <= 15s OCH status === 'disconnected' → flip 'connected' +
+  //   callback + onPeerReconnected (trigger score-drain på mottagarsidan).
+  // Obs: "vid recovery flyttas de tillbaka av heartbeat-handlern" i gamla
+  // kommentaren var FEL — heartbeat uppdaterar bara lastSeen, inte status.
   const watchdogInterval = setInterval(() => {
     const now = Date.now();
     lastSeenBySender.forEach((seenAt, senderId) => {
       const gap = now - seenAt;
       const currentStatus = lastReportedStatus.get(senderId);
       if (gap > PEER_TIMEOUT_MS && currentStatus !== 'disconnected') {
-        // Första gången vi ser en disconnect: rapportera och latcha.
-        // Om vi aldrig rapporterat status för denna sender är det första
-        // event:et — då rapporterar vi 'disconnected' direkt utan
-        // implicit 'connected' först. Det är OK; den första-mottagna-
-        // heartbeat:en har redan satt lastSeen → om vi nu har gap > 15s
-        // betyder det att vi tappat dem direkt efter första kontakt.
+        // Disconnect: tystnad > 15s sedan senaste heartbeat.
         lastReportedStatus.set(senderId, 'disconnected');
         handlers.onPlayerConnectionChange?.(senderId, 'disconnected');
+      } else if (gap <= PEER_TIMEOUT_MS && currentStatus === 'disconnected') {
+        // Reconnect: var 'disconnected' men vi tar nu emot fresh heartbeat.
+        // Flip status → 'connected' + notifiera quiz.tsx via onPeerReconnected
+        // (quiz.tsx broadcastar host_rejoined / drainer pending scores).
+        lastReportedStatus.set(senderId, 'connected');
+        handlers.onPlayerConnectionChange?.(senderId, 'connected');
+        handlers.onPeerReconnected?.(senderId);
       }
     });
   }, PEER_WATCHDOG_MS);
@@ -711,6 +761,13 @@ export function subscribeSyncChannel(
       await channel.send({
         type: 'broadcast',
         event: 'player_rejoined',
+        payload,
+      });
+    },
+    broadcastHostRejoined: async (payload) => {
+      await channel.send({
+        type: 'broadcast',
+        event: 'host_rejoined',
         payload,
       });
     },
