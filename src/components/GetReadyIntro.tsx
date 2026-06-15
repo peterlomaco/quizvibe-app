@@ -25,6 +25,7 @@ import { SequentialDots } from './SequentialDots';
 import { ConnectionUnstableOverlay } from './ConnectionUnstableOverlay';
 import { useConnectionStatus } from '../lib/network/connectionMonitor';
 import { WifiFanIcon } from './WifiFanIcon';
+import { WifiOffIcon } from './WifiOffIcon';
 import { HeartbeatSound } from './HeartbeatSound';
 
 /** Minimal player-shape som GetReadyIntro behöver för att rendera namn + avatar.
@@ -60,6 +61,8 @@ export interface LeaderboardLiveEntry {
   /** Senaste 5 frågornas utfall, ÄLDST → NYAST. true = rätt, false = fel.
    *  Tomt array om inga ronder spelade ännu. */
   lastFiveResults: boolean[];
+  /** Antal frågor som spelaren missade pga dålig uppkoppling. */
+  connectionErrors: number;
   /** Spelaren har lämnat spelet via Leave Game. Mid-row-stats ersätts av
    *  "Has left the game"-text och PTS-kolumnen visar streck. */
   hasLeft?: boolean;
@@ -700,7 +703,7 @@ export function GetReadyIntro({
                   {showDisconnectedSection && (
                     <>
                       <View style={[styles.lbCell, styles.lbDisconnectedSeparator]}>
-                        <WifiFanIcon size={14} color={Colors.textSecondary} />
+                        <WifiFanIcon size={14} color={Colors.error} />
                         <Text style={styles.lbDisconnectedSeparatorText} numberOfLines={1}>
                           Connection unstable
                         </Text>
@@ -753,6 +756,9 @@ export function GetReadyIntro({
                       <Text style={[styles.lbMidHeader, styles.lbColR]}>Q</Text>
                       <Text style={[styles.lbMidHeader, styles.lbColCheck]}>✓</Text>
                       <Text style={[styles.lbMidHeader, styles.lbColCheck]}>✗</Text>
+                      <View style={[styles.lbColConnErr, { alignItems: 'center', justifyContent: 'center' }]}>
+                        <WifiOffIcon size={17} />
+                      </View>
                       <Text style={[styles.lbMidHeader, styles.lbColTime]}>AVG</Text>
                       <Text style={[styles.lbMidHeader, styles.lbColTime]}>LAST</Text>
                       <Text style={[styles.lbMidHeader, styles.lbColLast5]}>
@@ -800,6 +806,9 @@ export function GetReadyIntro({
                             ]}
                           >
                             {entry.incorrectAnswers}
+                          </Text>
+                          <Text style={[styles.lbMidCell, styles.lbColConnErr, entry.connectionErrors > 0 ? styles.lbWrongText : styles.lbConnErrZero]}>
+                            {entry.connectionErrors > 0 ? String(entry.connectionErrors) : '—'}
                           </Text>
                           <Text style={[styles.lbMidCell, styles.lbColTime]}>
                             {entry.playedRounds > 0
@@ -1366,7 +1375,7 @@ function mediaSourceLabel(source: QuestionMediaType | undefined): string {
   switch (source) {
     case 'youtube': return 'YouTube';
     case 'spotify': return 'Spotify';
-    case 'image': return 'Image';
+    case 'image': return 'Hints';
     default: return 'Unknown';
   }
 }
@@ -1725,6 +1734,8 @@ const styles = StyleSheet.create({
   lbColCheck: { width: 22 },
   lbColTime: { width: 60 },
   lbColLast5: { width: 96 },
+  lbColConnErr: { width: 36 },
+  lbConnErrZero: { color: Colors.textSecondary },
   lbCorrectText: { color: Colors.success, fontWeight: FontWeight.semibold },
   lbWrongText: { color: Colors.error, fontWeight: FontWeight.semibold },
 
@@ -1757,7 +1768,7 @@ const styles = StyleSheet.create({
   lbDisconnectedSeparatorText: {
     fontSize: FontSize.xs,
     fontWeight: FontWeight.bold,
-    color: Colors.textSecondary,
+    color: Colors.error,
     letterSpacing: 0.6,
     textTransform: 'uppercase',
     flexShrink: 1,
@@ -2102,7 +2113,7 @@ const styles = StyleSheet.create({
   // visuell hierarki mellan current-box och queue-chips.
   currentMediaNumber: {
     position: 'absolute',
-    left: Spacing.xxxl,
+    left: Spacing.xxl,
     fontSize: FontSize.lg,
     fontWeight: '700',
     color: Colors.primary,

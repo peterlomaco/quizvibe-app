@@ -18,7 +18,7 @@ import {
 import { SequentialDots } from '@/src/components/SequentialDots';
 import { StopwatchIcon } from '@/src/components/StopwatchIcon';
 import { useConnectionStatus } from '@/src/lib/network/connectionMonitor';
-import { subscribeSyncChannel, type SyncChannel, type PlayerScoreRecordedPayload } from '@/src/lib/realtime/syncChannel';
+import { subscribeSyncChannel, type SyncChannel, type PlayerScoreRecordedPayload, type QuestionAdvancePayload } from '@/src/lib/realtime/syncChannel';
 import type { LobbyPlayer } from '@/src/screens/LobbyScreen';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '@/src/theme';
 import { track } from '@/src/utils/analytics';
@@ -361,7 +361,7 @@ const QUIZ_ERROR_RED = '#FF3B30';
 
 // ─── Spotify-instruktionsguide (DJ + gissare) ─────────────────────────────────
 const SPOTIFY_DJ_STEPS = [
-  'Go to Spotify and start the song',
+  'Go to Spotify and start track',
   'Return here, activate the timer and let the music play during the countdown',
   'DJ keeps playing in Spotify - wait until the countdown finish',
   'DJ stops the music - DJ close Spotify in 5sec [r]"X"[/r]',
@@ -369,7 +369,7 @@ const SPOTIFY_DJ_STEPS = [
 ] as const;
 
 const SPOTIFY_GUESSER_STEPS = [
-  'DJ start the song in Spotify',
+  'DJ start track in Spotify',
   'DJ start the timer - listen and guess the year',
   'DJ keeps playing in Spotify - wait until the countdown finish',
   'DJ stops the music - DJ close Spotify in 5sec [r]"X"[/r]',
@@ -935,6 +935,10 @@ export default function QuizScreen() {
   // + overlay-mount använder denna istället för raw `isConnectionUnstable`.
   const shouldLockForUnstable =
     isConnectionUnstable || stickyUnstableForQuestion;
+  // Ref-mirror av shouldLockForUnstable så timeout-useEffect (deps [timeLeft])
+  // kan läsa aktuellt värde utan stale-closure-problem.
+  const shouldLockForUnstableRef = useRef(false);
+  shouldLockForUnstableRef.current = shouldLockForUnstable;
   // YouTube-felhantering: sätts true när spelaren rapporterar embed-fel
   // (borttagen video, region-block, etc.). Triggar ett "Video unavailable"-kort
   // istället för MediaPlayer och auto-advancerar till reveal efter 2.5 s.
@@ -1789,7 +1793,14 @@ export default function QuizScreen() {
         hasLeft: leftPlayerIds.has(p.id),
       };
     });
-    return entries.sort((a, b) => {
+    // connectionErrors = antal frågor spelaren missat jämfört med den som
+    // spelat flest. Om A spelat 3 och B spelat 2 → B får 1 i wifi-kolumnen.
+    const maxRounds = entries.reduce((m, e) => Math.max(m, e.playedRounds), 0);
+    const entriesWithErrors = entries.map((e) => ({
+      ...e,
+      connectionErrors: Math.max(0, maxRounds - e.playedRounds),
+    }));
+    return entriesWithErrors.sort((a, b) => {
       // 1. Pts desc — flest poäng vinner
       if (b.points !== a.points) return b.points - a.points;
       // 2. Spelare med 0 spelade ronder får avgResponseSeconds=0 vilket
@@ -2072,7 +2083,7 @@ export default function QuizScreen() {
           },
         ]);
       }
-      recordRoundScore(0, false, responseSeconds);
+      recordRoundScore(0, false, responseSeconds, shouldLockForUnstableRef.current);
       setPhase('reveal');
     }
   }, [timeLeft]);
@@ -2156,7 +2167,7 @@ export default function QuizScreen() {
   // mock-motspelare auto-genereras inte eftersom alla spelare är riktiga
   // och delar denna enhet (en spelare i taget). Direkt-nav till /quiz utan
   // turnOrder simulerar fortfarande mock-motspelare för gameplay-testning.
-  const recordRoundScore = (yourPoints: number, yourCorrect: boolean, yourTimeUsed: number) => {
+  const recordRoundScore = (yourPoints: number, yourCorrect: boolean, yourTimeUsed: number, connectionError?: boolean) => {
     // Förhindra double-scoring per fråga (race: handleConfirm* + useEffect([timeLeft])).
     if (hasRecordedScoreForCurrentQuestionRef.current) return;
     hasRecordedScoreForCurrentQuestionRef.current = true;
@@ -2179,6 +2190,7 @@ export default function QuizScreen() {
       points: yourPoints,
       correct: yourCorrect,
       timeUsed: yourTimeUsed,
+      ...(connectionError ? { connectionError: true } : {}),
     };
     let allScores: RoundScore[] = [yourScore];
     // Mock-motspelare genereras BARA vid direkt-nav (tom turnOrder).
@@ -2200,14 +2212,18 @@ export default function QuizScreen() {
     // uppdateras med vår post. broadcast.self: false gör att vi aldrig
     // tar emot vårt eget event — ingen double-count-risk.
     if (gameMode === 'individual-devices' && syncChannelRef.current) {
+      const scorePayload: PlayerScoreRecordedPayload = {
+        player_id: activePlayerId,
+        question_index: questionIndex,
+        points: yourPoints,
+        correct: yourCorrect,
+        time_used: yourTimeUsed,
+      };
+      // Spara alltid i pending-kön — vid reconnect skickas alla om.
+      // Dedup-nyckeln player_id+question_index på mottagarsidan gör re-send säkert.
+      pendingScoreBroadcastsRef.current.push(scorePayload);
       syncChannelRef.current
-        .broadcastPlayerScoreRecorded({
-          player_id: activePlayerId,
-          question_index: questionIndex,
-          points: yourPoints,
-          correct: yourCorrect,
-          time_used: yourTimeUsed,
-        })
+        .broadcastPlayerScoreRecorded(scorePayload)
         .catch(() => {});
     }
   };
@@ -2838,7 +2854,10 @@ export default function QuizScreen() {
     // Broadcast till non-hosts i IndDev så även de går till nästa fråga.
     if (gameMode === 'individual-devices' && syncChannelRef.current) {
       syncChannelRef.current
-        .broadcastQuestionAdvance({ next_question_index: questionIndex + 1 })
+        .broadcastQuestionAdvance({
+          next_question_index: questionIndex + 1,
+          all_question_ids: gameQuestionsRef.current.map((q) => q.id),
+        })
         .catch(() => {});
     }
     setTimeout(() => { handleAdvanceToNextRoundRef.current?.(); }, 800);
@@ -2867,7 +2886,10 @@ export default function QuizScreen() {
     handleAdvanceToNextRound();
     if (gameMode === 'individual-devices' && syncChannelRef.current) {
       syncChannelRef.current
-        .broadcastQuestionAdvance({ next_question_index: questionIndex + 1 })
+        .broadcastQuestionAdvance({
+          next_question_index: questionIndex + 1,
+          all_question_ids: gameQuestionsRef.current.map((q) => q.id),
+        })
         .catch(() => {});
     }
   };
@@ -2876,7 +2898,10 @@ export default function QuizScreen() {
     handleShowLeaderboard();
     if (gameMode === 'individual-devices' && syncChannelRef.current) {
       syncChannelRef.current
-        .broadcastQuestionAdvance({ next_question_index: null })
+        .broadcastQuestionAdvance({
+          next_question_index: null,
+          all_question_ids: gameQuestionsRef.current.map((q) => q.id),
+        })
         .catch(() => {});
     }
   };
@@ -3022,7 +3047,10 @@ export default function QuizScreen() {
       // advancerat (t.ex. via reconnect i D-vi senare).
       setPhase((current) => (current === 'intro' ? 'countdown' : current));
     };
-    questionAdvanceHandlerRef.current = (nextIdx) => {
+    questionAdvanceHandlerRef.current = (payload) => {
+      const { next_question_index: nextIdx, all_question_ids: allIds } = payload;
+      // Uppdatera auktoritativ frågesekvens om host skickade med den.
+      if (allIds && allIds.length > 0) setBroadcastAllQuestionIds(allIds);
       if (nextIdx === null) {
         handleShowLeaderboard();
       } else {
@@ -3790,7 +3818,7 @@ export default function QuizScreen() {
   // Refs så broadcast-listenern alltid pekar på senaste handlern (annars
   // skulle subscription:n captura stale closures vid mount).
   const playCommandHandlerRef = useRef<(qIdx: number, qId?: string, allIds?: string[]) => void>(() => {});
-  const questionAdvanceHandlerRef = useRef<(nextIdx: number | null) => void>(() => {});
+  const questionAdvanceHandlerRef = useRef<(payload: QuestionAdvancePayload) => void>(() => {});
   const playerLeftHandlerRef = useRef<(playerId: string, playerName: string) => void>(
     () => {},
   );
@@ -3805,6 +3833,10 @@ export default function QuizScreen() {
   // quiz.tsx-mount; ny instans → nytt Set).
   const receivedRemoteScoreKeysRef = useRef<Set<string>>(new Set());
   const playerScoreRecordedHandlerRef = useRef<(payload: PlayerScoreRecordedPayload) => void>(() => {});
+  // Pending-kö för score-broadcasts som kan ha tappats under offline-period.
+  // Broadcasten körs omedelbart + sparas här; vid reconnect skickas alla om.
+  // Mottagarsidan deduplicerar via player_id+question_index — omskick är säkert.
+  const pendingScoreBroadcastsRef = useRef<PlayerScoreRecordedPayload[]>([]);
   // D-iii: per-peer connection-status. Drivs av två separata signaler:
   //   - watchdog (15s silence från remote sender) → 'disconnected'
   //   - player_rejoined-event (sender:s explicit Retry-tap) → 'connected'
@@ -3818,8 +3850,7 @@ export default function QuizScreen() {
     if (gameMode !== 'individual-devices' || !params.roomCode) return;
     const sync = subscribeSyncChannel(params.roomCode, selfPlayerId, {
       onPlayCommand: (payload) => playCommandHandlerRef.current(payload.question_index, payload.question_id, payload.all_question_ids),
-      onQuestionAdvance: (payload) =>
-        questionAdvanceHandlerRef.current(payload.next_question_index),
+      onQuestionAdvance: (payload) => questionAdvanceHandlerRef.current(payload),
       onPlayerLeft: (payload) =>
         playerLeftHandlerRef.current(payload.player_id, payload.player_name),
       onPlayerAnswerConfirmed: (payload) =>
@@ -3925,6 +3956,9 @@ export default function QuizScreen() {
   // flicker). Reset:n täcker både UI-map:en + syncChannel:s interna
   // lastSeen/lastReported så watchdog:n inte fyrar gammal disconnect-
   // status igen.
+  // Non-host: broadcasta även player_rejoined automatiskt vid recovery
+  // så host:s leaderboard flippar tillbaka till 'connected' direkt.
+  // Heartbeat-receipt räcker inte per design — explicit signal krävs.
   const prevConnectionStatusRef = useRef<'ok' | 'unstable'>('ok');
   useEffect(() => {
     const wasUnstable = prevConnectionStatusRef.current === 'unstable';
@@ -3932,6 +3966,22 @@ export default function QuizScreen() {
     if (wasUnstable && isOk) {
       setPlayerConnectionStatus({});
       syncChannelRef.current?.resetPeerTracking();
+      if (!isHost && gameMode === 'individual-devices' && selfPlayerId) {
+        // Re-broadcasta scores som kan ha tappats under offline-perioden.
+        // Körs före player_rejoined så host:s leaderboard uppdateras
+        // med poäng innan reconnect-signalen flippar statusen till 'connected'.
+        const toRetry = [...pendingScoreBroadcastsRef.current];
+        pendingScoreBroadcastsRef.current = [];
+        for (const payload of toRetry) {
+          syncChannelRef.current?.broadcastPlayerScoreRecorded(payload).catch(() => {
+            // Om retry också failar, lägg tillbaka i kön.
+            pendingScoreBroadcastsRef.current.push(payload);
+          });
+        }
+        syncChannelRef.current
+          ?.broadcastPlayerRejoined({ sender_id: selfPlayerId })
+          .catch(() => {});
+      }
     }
     prevConnectionStatusRef.current = connection.status;
   }, [connection.status]);
@@ -4143,7 +4193,10 @@ export default function QuizScreen() {
         leaderboard={liveLeaderboard}
         // D-iii: per-peer connection-status driver disconnect-ikon framför
         // namnet i live-leaderboard. Tom map = ingen indikator.
-        playerConnectionStatus={playerConnectionStatus}
+        // Om lokal enhet är offline kan vi inte bedöma andras status —
+        // heartbeats tappas och watchdog:n fyrar för alla peers. Skicka
+        // tom map så ingen annan felaktigt visas under "Connection Unstable".
+        playerConnectionStatus={connection.status === 'unstable' ? {} : playerConnectionStatus}
         // D-iii: unstable-overlay i intro-fasen styrs av sticky-latch +
         // live-monitor, så B fastnar i overlay genom alla phase-byten
         // tills Retry trycks. Bara non-host får Retry-knappen (host kan

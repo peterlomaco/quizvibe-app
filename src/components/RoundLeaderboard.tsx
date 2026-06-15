@@ -4,6 +4,7 @@ import { Dimensions, Pressable, ScrollView, StyleSheet, Text, View } from 'react
 import Svg, { Circle, G, Path } from 'react-native-svg';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
 import { QuizVibeQAvatar } from './QuizVibeQAvatar';
+import { WifiOffIcon } from './WifiOffIcon';
 
 // Final Leaderboard bakgrunds-Q + pokal. Q-SVG:n är ~90% av skärmbredden så
 // figuren dominerar mid-screen-arean utan att överlappa Home/Play Again-
@@ -273,6 +274,8 @@ export interface RoundScore {
   points: number;
   correct: boolean;
   timeUsed: number; // sekunder
+  /** true när frågan missades pga dålig uppkoppling (non-host unstableLocked). */
+  connectionError?: boolean;
 }
 
 export interface HcpChange {
@@ -407,7 +410,14 @@ export function RoundLeaderboard({
         hasLeft: !!p.hasLeft,
       };
     });
-    return entries.sort((a, b) => {
+    // connectionErrors = antal frågor spelaren missat jämfört med den som
+    // spelat flest. Om A spelat 3 och B spelat 2 → B får 1 i wifi-kolumnen.
+    const maxRounds = entries.reduce((m, e) => Math.max(m, e.playedRounds), 0);
+    const entriesWithErrors = entries.map((e) => ({
+      ...e,
+      connectionErrors: Math.max(0, maxRounds - e.playedRounds),
+    }));
+    return entriesWithErrors.sort((a, b) => {
       // 1. Pts desc — flest poäng vinner
       if (b.points !== a.points) return b.points - a.points;
       // 2. Spelare med 0 spelade ronder får avgResponseSeconds=0 vilket
@@ -489,6 +499,9 @@ export function RoundLeaderboard({
               <Text style={[styles.lbMidHeader, styles.lbColR]}>Q</Text>
               <Text style={[styles.lbMidHeader, styles.lbColCheck]}>✓</Text>
               <Text style={[styles.lbMidHeader, styles.lbColCheck]}>✗</Text>
+              <View style={[styles.lbColConnErr, { alignItems: 'center', justifyContent: 'center' }]}>
+                <WifiOffIcon size={17} />
+              </View>
               <Text style={[styles.lbMidHeader, styles.lbColTime]}>AVG</Text>
               <Text style={[styles.lbMidHeader, styles.lbColTime]}>LAST</Text>
               <Text style={[styles.lbMidHeader, styles.lbColLast5]}>Last 5</Text>
@@ -525,6 +538,9 @@ export function RoundLeaderboard({
                     ]}
                   >
                     {entry.incorrectAnswers}
+                  </Text>
+                  <Text style={[styles.lbMidCell, styles.lbColConnErr, entry.connectionErrors > 0 ? styles.lbWrongText : styles.lbConnErrZero]}>
+                    {entry.connectionErrors > 0 ? String(entry.connectionErrors) : '—'}
                   </Text>
                   <Text style={[styles.lbMidCell, styles.lbColTime]}>
                     {entry.playedRounds > 0
@@ -928,6 +944,8 @@ const styles = StyleSheet.create({
   lbColCheck: { width: 22 },
   lbColTime: { width: 60 },
   lbColLast5: { width: 96 },
+  lbColConnErr: { width: 36 },
+  lbConnErrZero: { color: Colors.textSecondary },
   lbCorrectText: { color: Colors.success, fontWeight: FontWeight.semibold },
   lbWrongText: { color: Colors.error, fontWeight: FontWeight.semibold },
   // "Has left the game"-rad ersätter Q/✓/✗/AVG/LAST/Last-5 för spelare som

@@ -11696,33 +11696,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "duplantis-bop",
-    "displayName": "Bop — Armand Duplantis",
-    "correctYear": 2025,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "sport"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "Ze_ZuiE1gAk",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Mondo - Topic",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
-      }
-    ]
-  },
-  {
     "id": "jj-wasted-love",
     "displayName": "Wasted Love — JJ",
     "correctYear": 2025,

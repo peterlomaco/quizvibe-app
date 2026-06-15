@@ -4886,9 +4886,7 @@ export default function LobbyScreen() {
                 <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
                   <Switch value={youtubeEnabledCategories.includes('Film')} onValueChange={handleToggleActorsYoutube} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={youtubeEnabledCategories.includes('Film') ? Colors.success : MATRIX_SWITCH_OFF} style={styles.sourceMatrixSwitch} />
                 </View>
-                <View style={[styles.smAutoCell, smCellStyle]}>
-                  <Text style={styles.autoActivationLabel}>{'incl\ncharacters'}</Text>
-                </View>
+                <View style={[styles.smAutoCell, smCellStyle]} />
                 <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
                   <Switch value={imagesEnabledCategories.includes('Film')} onValueChange={handleToggleActorsGuessWho} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={imagesEnabledCategories.includes('Film') ? Colors.success : MATRIX_SWITCH_OFF} style={styles.sourceMatrixSwitch} />
                 </View>
@@ -7050,7 +7048,7 @@ const styles = StyleSheet.create({
   },
   smAutoCell: {
     alignSelf: 'stretch',
-    height: 24,
+    height: 8,
     justifyContent: 'center',
     alignItems: 'center',
   },

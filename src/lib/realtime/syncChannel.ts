@@ -33,6 +33,8 @@ export interface PlayCommandPayload {
 export interface QuestionAdvancePayload {
   /** null = sista frågan, gå till leaderboard. Annars next question index (0-baserat). */
   next_question_index: number | null;
+  /** Host:s auktoritativa frågesekvens — skickas med varje advance så non-host håller sig synkad vid reconnect. */
+  all_question_ids?: string[];
 }
 
 export interface PlayerLeftPayload {

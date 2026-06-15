@@ -1667,9 +1667,7 @@ export default function ProfileScreen() {
                 <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
                   <Switch value={youtubeEnabledCategories.includes('Film')} onValueChange={handleToggleActorsYoutube} trackColor={{ false: PROFILE_MATRIX_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={youtubeEnabledCategories.includes('Film') ? Colors.success : PROFILE_MATRIX_OFF} style={styles.profileSwitch} />
                 </View>
-                <View style={[styles.smAutoCell, smCellStyle, { paddingRight: 0 }]}>
-                  <Text style={styles.autoSyncLabel}>{'incl\ncharacters'}</Text>
-                </View>
+                <View style={[styles.smAutoCell, smCellStyle, { paddingRight: 0 }]} />
                 <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
                   <Switch value={imagesEnabledCategories.includes('Film')} onValueChange={handleToggleActorsGuessWho} trackColor={{ false: PROFILE_MATRIX_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={imagesEnabledCategories.includes('Film') ? Colors.success : PROFILE_MATRIX_OFF} style={styles.profileSwitch} />
                 </View>
@@ -3675,7 +3673,7 @@ const styles = StyleSheet.create({
   },
   smAutoCell: {
     alignSelf: 'stretch',
-    height: 24,
+    height: 8,
     justifyContent: 'center',
     alignItems: 'center',
   },

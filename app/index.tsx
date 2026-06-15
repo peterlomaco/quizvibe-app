@@ -10,6 +10,7 @@ import { clearLeftPlayers } from '@/src/utils/leftPlayers';
 import { clearEjected } from '@/src/utils/ejectedPlayers';
 import { clearLobbyPlayers, getLobbyPlayers } from '@/src/utils/mockLobbyPlayers';
 import { clearLobbySettings, getLobbySettings } from '@/src/utils/mockLobbySettings';
+import { getSpotifyConnectionStatus } from '@/src/utils/spotifyDJ';
 import { clearGameStarted } from '@/src/utils/mockStartedGames';
 import { getRoomMeta, isActiveRoom, isLobbyFull, isOwnLobby, registerActiveRoom } from '@/src/utils/mockActiveRooms';
 import {
@@ -414,6 +415,21 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     // Capacity-check: om host:s lobby redan är full visar vi popup med text
     // som beror på Free vs Premium-host. Användaren stannar i join-formuläret.
     if (await checkLobbyCapacity(code)) return;
+    // Spotify-check: om lobbyn kräver Spotify måste spelaren ha det kopplat.
+    const lobbySettings = await getLobbySettings(code);
+    if (lobbySettings?.spotifyEnabled) {
+      const { data: { user } } = await supabase.auth.getUser();
+      const spotifyOk = user
+        ? await getSpotifyConnectionStatus(user.id).then(s => s.connected && s.isPremium)
+        : false;
+      if (!spotifyOk) {
+        Alert.alert(
+          "This lobby require Spotify connection",
+          "Spotify is required. Please connect your Spotify account to QuizVibe user or ask Host to remove Spotify in Source dashboard",
+        );
+        return;
+      }
+    }
     onClose();
     router.push({ pathname: '/lobby', params: { code, isHost: 'false' } });
   };
@@ -600,6 +616,15 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
       Alert.alert(
         'Registered account required',
         "This is an Individual device game. Guests can't join — register or log in to play on your own device.",
+      );
+      return;
+    }
+    // Spotify-check: guests har aldrig Spotify kopplat (inget konto) —
+    // blockera direkt om lobbyn kräver det.
+    if (roomSettings?.spotifyEnabled) {
+      Alert.alert(
+        "This lobby require Spotify connection",
+        "Spotify is required. Please connect your Spotify account to QuizVibe user or ask Host to remove Spotify in Source dashboard",
       );
       return;
     }

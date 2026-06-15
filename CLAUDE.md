@@ -889,6 +889,12 @@ Glöm inte lägga till nya stores här när de skapas — annars läcker stale d
 - **Layout-wrapper**: `startSection` + `customizeSectionHeader` är wrappad i en enda `<View style={{ gap: 0 }}>` så ScrollView:ns `gap: Spacing.xl` (24px) bara appliceras EN gång mot Players-blocket ovanför — annars fick varje delElement 24px gap och totalen blev ~96px.
 - **"Customize QuizVibe"-rutan**: `borderRadius: Radius.md` (rundade hörn), `fontSize: FontSize.lg` (matchar sektionsrubriker), `marginTop: Spacing.md` (12px luft ovanför).
 
+**Lobby section-collapse default + non-host layout (2026-06-13)**:
+- **`playersExpanded` defaultar till `false`** för BÅDA host och non-host (`useState(false)`) — var tidigare `useState(!hostMode)` så host startade med sektionen öppen. Nu startar alla med Players in Lobby kollapsad.
+- **"New Player joined" BlinkingLabel** visas i Players-sektionens header när `!playersExpanded && newPlayerJoined`. `newPlayerJoined` sätts `true` i en `useEffect` som jämför `approvedPlayers.filter(p => !p.isHost).length` mot föregående värde via `prevNonHostApprovedRef` — notifikationen syns bara när sektionen är ihopfälld och en ny spelare godkänts. Resetas i separat `useEffect` på `[playersExpanded]` när sektionen öppnas. Befintlig "Players Waiting"-BlinkingLabel är separat och opåverkad.
+- **Non-host centrering av "Waiting for Host"**: två `<View style={{ flex: 1 }} />`-spacers placeras ovanför och nedanför `startSection`-wrap:en i ScrollView:n. `styles.content` har `flexGrow: 1` på `contentContainerStyle` (tidigare saknade) så content-containern fyller hela skärmhöjden — utan detta har `flex: 1`-children inget att expandera in i. Resultatet: "Waiting for Host to Start Game" + play-ikonet centreras vertikalt i utrymmet mellan Players och Customize.
+- **"Customize QuizVibe" är kollapsbar** längst ner i lobbyn, synlig för BOTH host och non-host. Innehåller Game Settings- och Quiz Tuning-sektionerna inuti. Styrs av `customizeExpanded`-state. En `useEffect` på `[customizeExpanded]` anropar `mainScrollRef.current?.scrollToEnd({ animated: true })` med 150 ms fördröjning vid expand. Header-styling: `backgroundColor: Colors.card`, `+/−`-toggle.
+
 ## Quiz — frågetyper (discriminerad union)
 
 `quiz.tsx` håller frågorna i en **discriminerad union** `QuizQuestion = TimelineQuestion | ImageQuestion` (diskriminator: `type: 'timeline' | 'image'`):
