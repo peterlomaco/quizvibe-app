@@ -305,17 +305,31 @@ export async function loadProfile(): Promise<ProfileData | null> {
     // spotifyDefaultEnabled: ingen DB-kolumn ännu — alltid från cache.
     {
       const cached = await loadFromAsyncStorage();
+      // youtubeEnabledCategories / imagesEnabledCategories: Supabase är
+      // ALLTID auktoritativ källa för dessa fält (om migration 0014 är
+      // applicerad och kolumnen finns). Rationale: saveProfile() skriver
+      // till Supabase SIST (efter AS), medan loadProfile():s fire-and-forget
+      // cache-back skriver till AS utan await. Det skapar en race-condition
+      // där en tidig loadProfile()-anrop (LP1) startar sitt fire-and-forget
+      // med gamla data, och sedan kompletterar EFTER att user:s saveProfile()
+      // har lagt ny data i AS — LP1:s write raderar user:s save i AS.
+      // Supabase påverkas aldrig av fire-and-forget och speglar alltid
+      // den senaste explicita saveProfile()-körningen, dvs. user:s korrekta
+      // val. Fallback till AS om Supabase saknar kolumnen (migration 0014
+      // inte applicerad ännu, supabaseYT = undefined).
+      // spotifyDefaultEnabled: ingen DB-kolumn — alltid från AS-cache.
+      const supabaseYT = profile.youtubeEnabledCategories;
+      const supabaseImg = profile.imagesEnabledCategories;
       profile = {
         ...profile,
-        // Använd !== undefined för att bevara tomma arrays ([] = explicit av)
-        // vs undefined (= aldrig konfigurerat → fall-back till default i seed).
-        youtubeEnabledCategories: profile.youtubeEnabledCategories !== undefined
-          ? profile.youtubeEnabledCategories
-          : cached?.youtubeEnabledCategories,
-        imagesEnabledCategories: profile.imagesEnabledCategories !== undefined
-          ? profile.imagesEnabledCategories
-          : cached?.imagesEnabledCategories,
-        // spotifyDefaultEnabled saknas i rowToProfile (ej i DB ännu) — alltid från cache.
+        youtubeEnabledCategories:
+          supabaseYT && supabaseYT.length > 0
+            ? supabaseYT
+            : cached?.youtubeEnabledCategories,
+        imagesEnabledCategories:
+          supabaseImg && supabaseImg.length > 0
+            ? supabaseImg
+            : cached?.imagesEnabledCategories,
         spotifyDefaultEnabled: cached?.spotifyDefaultEnabled,
       };
     }
