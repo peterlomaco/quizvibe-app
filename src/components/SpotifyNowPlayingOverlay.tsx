@@ -1,3 +1,9 @@
+// ── FUTURE VERSION 2 — Automated API Flow (archived component) ──────────────────
+// SpotifyNowPlayingOverlay visade albumomslag + play/pause-kontroller när DJ:n
+// återvände från Spotify-appen. I V1-flödet öppnar DJ:n Spotify manuellt och
+// gissarna aktiverar timern själva — denna overlay behövs ej. Behållen för V2
+// när Web API play/pause-kontroll återaktiveras.
+// ────────────────────────────────────────────────────────────────────────────────
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Line, Polygon, Rect } from 'react-native-svg';
@@ -116,21 +122,25 @@ export function SpotifyNowPlayingOverlay({
           <Text style={styles.trackName} numberOfLines={1}>{trackName}</Text>
           <Text style={styles.artistName} numberOfLines={1}>{artistName}</Text>
         </View>
-        {/* Play / Pause-knapp */}
-        <Pressable onPress={onPlayPause} style={styles.playPauseBtn} hitSlop={8}>
-          {isPlaying ? (
-            <Svg width={28} height={28} viewBox="0 0 28 28">
-              <Rect x="5" y="4" width="7" height="20" rx="2" fill={Colors.textSecondary} />
-              <Rect x="16" y="4" width="7" height="20" rx="2" fill={Colors.textSecondary} />
-            </Svg>
-          ) : (
-            <Svg width={28} height={28} viewBox="0 0 28 28">
-              <Polygon points="6,3 24,14 6,25" fill={Colors.textSecondary} />
-            </Svg>
-          )}
-        </Pressable>
-        {/* Dismiss-slot: visar nedräkning 5→1 innan X visas */}
-        <Pressable onPress={showDismissX ? onDismiss : undefined} style={styles.dismiss} hitSlop={12}>
+        {/* Play / Pause-knapp — döljs permanent när dismiss-X väl visats */}
+        {!showDismissX && (
+          <Pressable onPress={onPlayPause} style={styles.playPauseBtn} hitSlop={8}>
+            {isPlaying ? (
+              <Svg width={28} height={28} viewBox="0 0 28 28">
+                <Rect x="5" y="4" width="7" height="20" rx="2" fill={Colors.textSecondary} />
+                <Rect x="16" y="4" width="7" height="20" rx="2" fill={Colors.textSecondary} />
+              </Svg>
+            ) : (
+              <Svg width={28} height={28} viewBox="0 0 28 28">
+                <Polygon points="6,3 24,14 6,25" fill={Colors.textSecondary} />
+              </Svg>
+            )}
+          </Pressable>
+        )}
+        {/* Dismiss-slot: visar nedräkning 5→1 innan X visas.
+            hitSlop=0 — padding: Spacing.lg ger redan >56px tappyta.
+            Utan hitSlop undviks överlapp med playPauseBtn:s hitSlop=8. */}
+        <Pressable onPress={showDismissX ? onDismiss : undefined} style={styles.dismiss}>
           {isCountingDown ? (
             <Text style={styles.dismissCountdownText}>{dismissCountdown}</Text>
           ) : (
@@ -150,7 +160,7 @@ export function SpotifyNowPlayingOverlay({
           <Text style={styles.activateBtnText}>Activate Timer</Text>
         </Pressable>
       )}
-      {onOpenSpotify && (
+      {showDismissX && onOpenSpotify && (
         <Pressable style={styles.openSpotify} onPress={onOpenSpotify} hitSlop={8}>
           <SpotifyBrandIcon size={13} variant="white" />
           <Text style={styles.openSpotifyText}> Open in Spotify to control music</Text>

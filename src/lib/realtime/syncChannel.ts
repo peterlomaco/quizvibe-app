@@ -147,6 +147,11 @@ export interface SpotifyDJTrackStartedPayload {
   /** Spotify track ID, för att mottagare ska kunna verifiera att det stämmer
    *  med deras lokala fråge-state. */
   spotify_track_id: string;
+  /** Wall-clock ms när timern faktiskt kommer starta (Date.now() + 2000ms delay).
+   *  Mottagare uppdaterar hostTimerStartAtRef med detta värde så startTimer()
+   *  inte kompenserar för stale tid från play_command (som skickades 20-60 s
+   *  innan DJ tryckte "Activate Timer"). */
+  timer_start_at?: number;
 }
 
 /**
@@ -210,6 +215,9 @@ export interface HostActivePingPayload {
   /** Host:s aktuella questionIndex (0-baserat). Mottagare alignar lokal
    *  state mot detta värde — idempotent när redan synkad. */
   question_index: number;
+  /** Host:s kompletta frågesekvens. Non-host sätter broadcastAllQuestionIds
+   *  om den fortfarande är null — täcker mid-game reload-scenariot. */
+  all_question_ids?: string[];
 }
 
 /**

@@ -45,6 +45,7 @@ import {
   computeDJRotationPlan,
   getDJForQuestionIndex,
   openSpotifyTrack,
+  openSpotifyApp,
   type DJRotationPlan,
   type SpotifyDJPlayer,
 } from '@/src/utils/spotifyDJ';
@@ -74,8 +75,10 @@ import { buildEpochPhase, getActiveEpochs, type EpochPlayer, type EpochQuestion 
 import { getGenerationKeyFromBirthYear } from '@/src/utils/mockPurchasedPackages';
 import { hasPremiumSubscription } from '@/src/utils/subscriptionStorage';
 import { supabase } from '@/src/utils/supabase';
-import { fetchSpotifyTrackInfo, pauseSpotifyPlayback, resumeSpotifyPlayback, type SpotifyTrackInfo } from '@/src/lib/spotify';
-import { SpotifyNowPlayingOverlay } from '@/src/components/SpotifyNowPlayingOverlay';
+// ── FUTURE VERSION 2 — Automated API Flow (archived imports) ─────────────────────
+// import { fetchSpotifyTrackInfo, getLastKnownSpotifyProgressMs, pauseSpotifyPlayback, resumeSpotifyPlayback, type SpotifyTrackInfo } from '@/src/lib/spotify';
+// import { SpotifyNowPlayingOverlay } from '@/src/components/SpotifyNowPlayingOverlay';
+// ─────────────────────────────────────────────────────────────────────────────────
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
@@ -359,21 +362,25 @@ function calculatePoints(
 // inte skriker. Quiz-vyn vill däremot ha en distinkt urgency-röd.
 const QUIZ_ERROR_RED = '#FF3B30';
 
-// ─── Spotify-instruktionsguide (DJ + gissare) ─────────────────────────────────
+// ─── Spotify-instruktionsguide (DJ / timer-aktiverare / gissare) ──────────────
+// V1-flöde: DJ stannar i Spotify hela rundan. Host (eller reserv) aktiverar
+// timern. Vanliga gissare lyssnar och svarar.
 const SPOTIFY_DJ_STEPS = [
-  'Go to Spotify and start track',
-  'Return here, activate the timer and let the music play during the countdown',
-  'DJ keeps playing in Spotify - wait until the countdown finish',
-  'DJ stops the music - DJ close Spotify in 5sec [r]"X"[/r]',
-  'DJ handover to Host - continue with Game',
+  'Open Spotify and start the track',
+  'Timer is activated by the other players (non-DJs)',
+  'Stay in Spotify during the song is played and timer is running',
+  'Players inform when timer ends — stop the track in Spotify and confirm the track has been stopped',
+  'Press End DJ - handover to Host / Next button below',
 ] as const;
 
-const SPOTIFY_GUESSER_STEPS = [
+// Visas för ALLA icke-DJ-spelare (timer-aktiverare + vanliga gissare delar
+// exakt samma steg-lista — timer-aktiverare får dessutom "Activate Timer"-knapp).
+const SPOTIFY_NON_DJ_STEPS = [
   'DJ start track in Spotify',
-  'DJ start the timer - listen and guess the year',
-  'DJ keeps playing in Spotify - wait until the countdown finish',
-  'DJ stops the music - DJ close Spotify in 5sec [r]"X"[/r]',
-  'DJ handover to Host - continue with Game',
+  'One of the non-DJs start the timer',
+  'Timer counting down and all players confirm their guess',
+  'Timer ends — inform the DJ who will stop the track in Spotify',
+  'DJ handover next step to Host',
 ] as const;
 
 /**
@@ -1371,7 +1378,11 @@ export default function QuizScreen() {
   // (broadcastAllQuestionIds) via ALL_QUESTIONS_MAP. Utan detta visar non-host felaktiga
   // ikoner i GetReady-kön (lokal shuffle ≠ host:s ordning).
   const effectiveMediaSourceByQuestion = useMemo<QuestionMediaType[]>(() => {
-    if (isHost || !broadcastAllQuestionIds) return mediaSourceByQuestion;
+    if (isHost) return mediaSourceByQuestion;
+    // Innan host:s fråge-sekvens ankommit (broadcastAllQuestionIds null):
+    // returnera tom array så inga ikoner visas hellre än att visa fel ikoner
+    // baserade på lokal shuffle-ordning (som skiljer sig från host:s).
+    if (!broadcastAllQuestionIds) return [];
     return broadcastAllQuestionIds.map((id) => {
       const q = ALL_QUESTIONS_MAP.get(id);
       if (!q) return 'none';
@@ -1426,12 +1437,18 @@ export default function QuizScreen() {
   // (broadcastAllQuestionIds) via ALL_QUESTIONS_MAP. Utan detta visar non-host felaktiga
   // kategori-/svarstyp-badges i GetReady (lokal shuffle ≠ host:s ordning).
   const effectiveCategoryByQuestion = useMemo<(MainCategory | null)[]>(() => {
-    if (isHost || !broadcastAllQuestionIds) return categoryByQuestion;
+    if (isHost) return categoryByQuestion;
+    // Innan host:s fråge-sekvens ankommit: returnera tom array → inga badges
+    // visas hellre än fel badge från lokal shuffle.
+    if (!broadcastAllQuestionIds) return [];
     return broadcastAllQuestionIds.map((id) => ALL_QUESTIONS_MAP.get(id)?.mainCategory ?? null);
   }, [isHost, broadcastAllQuestionIds, categoryByQuestion]);
 
   const effectiveAnswerTypeByQuestion = useMemo<('Year' | 'Name')[]>(() => {
-    if (isHost || !broadcastAllQuestionIds) return answerTypeByQuestion;
+    if (isHost) return answerTypeByQuestion;
+    // Innan host:s fråge-sekvens ankommit: returnera tom array → inga badges
+    // visas hellre än fel svarstyp från lokal shuffle.
+    if (!broadcastAllQuestionIds) return [];
     return broadcastAllQuestionIds.map((id) => {
       const q = ALL_QUESTIONS_MAP.get(id);
       if (!q) return 'Year';
@@ -1465,16 +1482,27 @@ export default function QuizScreen() {
   const [djHandedOver, setDjHandedOver] = useState(false);
   // DJ har tryckt × på overlay → aktiverar steg 5 i guiden (utan att låsa upp host:s Next ännu).
   const [djDismissedOverlay, setDjDismissedOverlay] = useState(false);
-  // Now Playing overlay — visas när DJ återvänder från Spotify-appen.
-  const [showNowPlayingOverlay, setShowNowPlayingOverlay] = useState(false);
-  const [nowPlayingTrackInfo, setNowPlayingTrackInfo] = useState<SpotifyTrackInfo | null>(null);
-  const [spotifyIsPlaying, setSpotifyIsPlaying] = useState(true);
+  // ── FUTURE VERSION 2 — Automated API Flow (archived states) ─────────────────────
+  // const [showNowPlayingOverlay, setShowNowPlayingOverlay] = useState(false);
+  // const [nowPlayingTrackInfo, setNowPlayingTrackInfo] = useState<SpotifyTrackInfo | null>(null);
+  // const [spotifyIsPlaying, setSpotifyIsPlaying] = useState(true);
+  // ─────────────────────────────────────────────────────────────────────────────────
   // Speglar för AppState-listener (undviker stale closures).
   const spotifyDJOpenedAppRef = useRef(false);
   const spotifyDJStartedRef = useRef(false);
-  // currentSpotifyTrackId-spegel + bakgrunds-detektion för overlay-logik.
+  // currentSpotifyTrackId-spegel.
   const currentSpotifyTrackIdRef = useRef<string | null>(null);
-  const wentToBackgroundRef = useRef(false);
+  // Sätts synkront av onSpotifyDJTrackStarted (payload.timer_start_at).
+  // Skiljs från hostTimerStartAtRef som även sätts av play_command —
+  // detta är ENBART Spotify-timerns start-timestamp, aldrig play_command-tid.
+  const spotifyTimerStartAtRef = useRef<number>(0);
+  // ── FUTURE VERSION 2 — Automated API Flow (archived refs) ────────────────────────
+  // const wentToBackgroundRef = useRef(false);
+  // const spotifyKeepAliveRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  // const spotifyWentToFallbackRef = useRef(false);
+  // const spotifyIsPlayingRef = useRef(true);
+  // const spotifyPausePositionMsRef = useRef(0);
+  // ─────────────────────────────────────────────────────────────────────────────────
   // Timeout-fas för Spotify-frågor:
   //   null     = ej Spotify-fråga eller timeout ej aktuell
   //   waiting  = Fas 1: väntar på DJ (0–240 s, ingen synlig nedräkning)
@@ -1482,6 +1510,9 @@ export default function QuizScreen() {
   //   skipped  = låten hoppades över; "Track skipped" visas 2,5 s
   const [spotifyWaitPhase, setSpotifyWaitPhase] = useState<'waiting' | 'countdown' | 'skipped' | null>(null);
   const [spotifyTimeoutSeconds, setSpotifyTimeoutSeconds] = useState(60);
+  // ── FUTURE VERSION 2 — Automated API Flow (archived) ─────────────────────────────
+  // const [spotifyPausePositionMs, setSpotifyPausePositionMs] = useState(0);
+  // ─────────────────────────────────────────────────────────────────────────────────
 
   /**
    * DJ-rotationsplan — track-baserad, inte positions-baserad.
@@ -1562,6 +1593,20 @@ export default function QuizScreen() {
       ? turnOrder[currentPlayerIndex]?.id === effectiveDJId
       : selfPlayerId === effectiveDJId
   );
+
+  // Vem aktiverar timern i V1-flödet?
+  //   Normalt: Host (om Host INTE är DJ) — Host hör musiken och trycker.
+  //   Reserv: om Host är DJ → den högst rangordnade icke-DJ-spelaren i turnOrder.
+  //   Alla andra: vanlig gissare, tittar och svarar.
+  const hostIsTheDJ: boolean = effectiveDJId !== null && turnOrder[0]?.id === effectiveDJId;
+  const reserveTimerActivatorId: string | undefined = hostIsTheDJ
+    ? turnOrder.find((p) => p.id !== effectiveDJId)?.id
+    : undefined;
+  const isTimerActivator: boolean =
+    isSpotifyQuestion &&
+    gameMode === 'individual-devices' &&
+    !isCurrentPlayerDJ &&
+    (hostIsTheDJ ? selfPlayerId === reserveTimerActivatorId : isHost);
 
   // Aktuell spelares assistance — driver svarsruta-intervallet (full=5 år,
   // standard=3 år, minimal=1 år) per rond. Faller tillbaka till fallback-
@@ -1845,6 +1890,10 @@ export default function QuizScreen() {
   // Lobby:s Start Game-CTA + GetReady:s play-knapp.
   const confirmPulse = useRef(new Animated.Value(1)).current;
   const confirmGlow = useRef(new Animated.Value(0.4)).current;
+  // "Activate Timer"-knappens scale-pulse för timer-aktiveraren i
+  // Spotify-frågor. Aktiv medan knappen är synlig (pre-timer + DJ öppnat
+  // Spotify). Stoppas direkt när timer startat (knappen försvinner).
+  const activateTimerPulse = useRef(new Animated.Value(1)).current;
   // Next-tab:ens scale-pulse på reveal-vyn. Speglar startskärmens primary-
   // CTA-pulse (1 ↔ 1.03 over 900ms). Körs kontinuerligt — vid mount och
   // framåt — eftersom tab:en bara renderas i reveal-fasen ändå.
@@ -2125,25 +2174,24 @@ export default function QuizScreen() {
   useEffect(() => { spotifyDJOpenedAppRef.current = spotifyDJOpenedApp; }, [spotifyDJOpenedApp]);
   useEffect(() => { spotifyDJStartedRef.current = spotifyDJStarted; }, [spotifyDJStarted]);
   useEffect(() => { currentSpotifyTrackIdRef.current = currentSpotifyTrackId; }, [currentSpotifyTrackId]);
+  // ── FUTURE VERSION 2 — Automated API Flow (archived ref-sync effects) ─────────────
+  // useEffect(() => { spotifyIsPlayingRef.current = spotifyIsPlaying; }, [spotifyIsPlaying]);
+  // useEffect(() => { spotifyPausePositionMsRef.current = spotifyPausePositionMs; }, [spotifyPausePositionMs]);
+  // ─────────────────────────────────────────────────────────────────────────────────
 
-  // Pre-hämta track-info så snart frågan är en Spotify-fråga — overlay-data
-  // är klar för alla spelare när de återvänder från Spotify-appen.
-  // Cancellation-guard krävs eftersom gameQuestions kan reberäknas ~50 ms
-  // efter mount (seenQuestionIds laddas från AsyncStorage) och ändra
-  // currentSpotifyTrackId — utan guarden kan en stale fetch för den gamla
-  // track-ID:n resolva sist och skriva fel låt-info till nowPlayingTrackInfo.
-  useEffect(() => {
-    if (!currentSpotifyTrackId) {
-      setNowPlayingTrackInfo(null);
-      return;
-    }
-    let cancelled = false;
-    setNowPlayingTrackInfo(null);
-    fetchSpotifyTrackInfo(currentSpotifyTrackId).then((info) => {
-      if (!cancelled && info) setNowPlayingTrackInfo(info);
-    });
-    return () => { cancelled = true; };
-  }, [currentSpotifyTrackId]);
+  // ── FUTURE VERSION 2 — Automated API Flow (archived track-info fetch) ────────────
+  // Pre-hämtar track-info så snart frågan är en Spotify-fråga — overlay-data klar
+  // för alla spelare när de återvänder från Spotify-appen. Reaktiveras i V2.
+  // useEffect(() => {
+  //   if (!currentSpotifyTrackId) { setNowPlayingTrackInfo(null); return; }
+  //   let cancelled = false;
+  //   setNowPlayingTrackInfo(null);
+  //   fetchSpotifyTrackInfo(currentSpotifyTrackId).then((info) => {
+  //     if (!cancelled && info) setNowPlayingTrackInfo(info);
+  //   });
+  //   return () => { cancelled = true; };
+  // }, [currentSpotifyTrackId]);
+  // ─────────────────────────────────────────────────────────────────────────────────
 
   // AppState-lyssnare: när appen återvänder till förgrunden (t.ex. DJ som
   // kommit tillbaka från Spotify) synkas timern mot real elapsed time.
@@ -2154,14 +2202,31 @@ export default function QuizScreen() {
     const sub = AppState.addEventListener('change', (nextState) => {
       if (nextState !== 'active') return;
 
+      // ── FUTURE VERSION 2 — Automated API Flow (archived AppState blocks) ──────────
       // Visa Now Playing-overlay när DJ:n återvänder från Spotify-appen.
-      if (
-        spotifyDJOpenedAppRef.current &&
-        !spotifyDJStartedRef.current &&
-        phaseRef.current === 'question'
-      ) {
-        setShowNowPlayingOverlay(true);
-      }
+      // if (
+      //   spotifyDJOpenedAppRef.current &&
+      //   !spotifyDJStartedRef.current &&
+      //   phaseRef.current === 'question'
+      // ) {
+      //   setShowNowPlayingOverlay(true);
+      // }
+      //
+      // Auto-resume: DJ återvände från Spotify-appen efter fallback-länk.
+      // if (
+      //   spotifyWentToFallbackRef.current &&
+      //   !spotifyIsPlayingRef.current &&
+      //   phaseRef.current === 'question' &&
+      //   currentSpotifyTrackIdRef.current
+      // ) {
+      //   spotifyWentToFallbackRef.current = false;
+      //   const trackId = currentSpotifyTrackIdRef.current;
+      //   const positionMs = spotifyPausePositionMsRef.current;
+      //   resumeSpotifyPlayback(trackId, positionMs).then((ok) => {
+      //     if (ok) setSpotifyIsPlaying(true);
+      //   });
+      // }
+      // ─────────────────────────────────────────────────────────────────────────────
 
       // Non-host i IndDev: om appen vaknade upp under countdown och host:s
       // timer redan har startat → hoppa direkt till question-fasen med
@@ -2180,6 +2245,50 @@ export default function QuizScreen() {
           setPhase('question');
           return;
         }
+      }
+
+      // ── Spotify DJ return: timer-sync när DJ återvänder från Spotify-appen ──
+      // spotifyDJOpenedAppRef = true ENBART på DJ:ns enhet (sätts när DJ
+      // trycker "Start track in Spotify"). spotifyTimerStartAtRef sätts synkront
+      // av onSpotifyDJTrackStarted-payloaden → korrekt wall-clock-referens
+      // oavsett om React:s setState-batching hann köra medan appen var bakgrunds.
+      // Scenario 1: iOS frös setTimerActive-setTimeout → timerActive=false →
+      //   startTimer() kördes aldrig → questionStartMsRef=0 → general path
+      //   returnerar tidigt → timer visas som "full 30s" istället för korrekt pos.
+      // Scenario 2: timern gick ut medan DJ var i Spotify → phase='reveal'
+      //   på icke-DJ-enheter men DJ:ns phase är fortfarande 'question' →
+      //   DJ ser timer börja om från början när de återvänder.
+      if (spotifyDJOpenedAppRef.current && spotifyTimerStartAtRef.current > 0) {
+        const elapsedSec = (Date.now() - spotifyTimerStartAtRef.current) / 1000;
+        if (elapsedSec >= responseSeconds) {
+          // Timer har redan gått ut — sätt timeLeft=0 om vi fortfarande är i
+          // question/awaiting. timeLeft-useEffect:n sköter setPhase('reveal')
+          // inkl. score-registrering för timeout-fallet.
+          if (phaseRef.current === 'question' || phaseRef.current === 'awaiting') {
+            if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
+            timerProgressAnim.stopAnimation();
+            timerProgressAnim.setValue(0);
+            setTimeLeft(0);
+          }
+          // phase='reveal' eller senare → ingenting att göra.
+        } else {
+          // Timer tickar fortfarande — synka position.
+          const remaining: number = responseSeconds - elapsedSec;
+          timerProgressAnim.stopAnimation();
+          timerProgressAnim.setValue(remaining / responseSeconds);
+          Animated.timing(timerProgressAnim, {
+            toValue: 0,
+            duration: remaining * 1000,
+            easing: Easing.linear,
+            useNativeDriver: false,
+          }).start();
+          setTimeLeft(Math.ceil(remaining));
+          // setTimerActive(true) triggar startTimer()-useEffect:n som
+          // kompenserar elapsed via hostTimerStartAtRef → idempotent.
+          // Om timerActive redan är true blir det en React no-op.
+          setTimerActive(true);
+        }
+        return;
       }
 
       const currentPhase = phaseRef.current;
@@ -2213,6 +2322,31 @@ export default function QuizScreen() {
     });
     return () => sub.remove();
   }, [responseSeconds, timerProgressAnim, isHost]);
+
+  // Spotify DJ — timer-sync via spotifyDJStarted state-ändring.
+  // AppState 'active' fyrar INNAN Supabase Realtime-broadcastens JS-hanterare
+  // kör, så spotifyTimerStartAtRef kan vara 0 första gången DJ återvänder från
+  // Spotify-appen. Denna effect triggar direkt när state-uppdateringen appliceras
+  // — vilket garanterat sker EFTER spotifyTimerStartAtRef satts synkront i
+  // broadcasthanteraren. Fungerar som fallback för första återkomsten;
+  // andra och efterföljande återkomster hanteras av AppState-path:en ovan.
+  useEffect(() => {
+    if (!spotifyDJStarted || !spotifyDJOpenedApp) return;
+    if (spotifyTimerStartAtRef.current === 0) return;
+    if (phaseRef.current !== 'question' && phaseRef.current !== 'awaiting') return;
+    const elapsedSec = (Date.now() - spotifyTimerStartAtRef.current) / 1000;
+    if (elapsedSec >= responseSeconds) {
+      // Timer gick ut medan DJ var i Spotify-appen.
+      if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
+      timerProgressAnim.stopAnimation();
+      timerProgressAnim.setValue(0);
+      setTimeLeft(0);
+    } else {
+      // Timer tickar fortfarande — setTimerActive(true) triggar startTimer()
+      // som kompenserar elapsed via hostTimerStartAtRef.
+      setTimerActive(true);
+    }
+  }, [spotifyDJStarted, spotifyDJOpenedApp, responseSeconds, timerProgressAnim]);
 
   // Registrera score:n för en avslutad fråga. I Pass-the-Phone (eller när
   // turnOrder är satt) skapar vi en post för ENDAST den aktiva spelaren —
@@ -2459,9 +2593,16 @@ export default function QuizScreen() {
     // Nollställ broadcastDJPlayerId så föregående frågas DJ-tilldelning
     // inte läcker in i nästa fråga (non-host hämtar ny via spotify_question_ready).
     setBroadcastDJPlayerId(null);
-    // Rensa track-info vid frågebyte (overlay stängs bara av DJ via ×-knappen).
-    setNowPlayingTrackInfo(null);
-    setSpotifyIsPlaying(true);
+    // ── FUTURE VERSION 2 — Automated API Flow (archived questionIndex resets) ──────
+    // setNowPlayingTrackInfo(null);
+    // setSpotifyIsPlaying(true);
+    // setSpotifyPausePositionMs(0);
+    // if (spotifyKeepAliveRef.current !== null) {
+    //   clearInterval(spotifyKeepAliveRef.current);
+    //   spotifyKeepAliveRef.current = null;
+    // }
+    // spotifyWentToFallbackRef.current = false;
+    // ─────────────────────────────────────────────────────────────────────────────
   }, [questionIndex]);
 
   // ScrollView:s onScroll → räkna avstånd från content-botten. När < 24 px
@@ -2567,6 +2708,31 @@ export default function QuizScreen() {
       glowLoop.stop();
     };
   }, [phase, canConfirm, confirmPulse, confirmGlow]);
+
+  // Pulse-loop för "Activate Timer"-knappen i Spotify-frågor (sticky bottom bar).
+  // Aktiv enbart när: timer-aktiverare + Spotify-fråga + DJ öppnat + !spotifyDJStarted.
+  useEffect(() => {
+    if (
+      !isTimerActivator ||
+      !isSpotifyQuestion ||
+      spotifyDJStarted ||
+      phase !== 'question' ||
+      !spotifyDJOpenedAppBroadcast ||
+      spotifyWaitPhase === 'skipped'
+    ) {
+      activateTimerPulse.stopAnimation();
+      activateTimerPulse.setValue(1);
+      return;
+    }
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(activateTimerPulse, { toValue: 1.05, duration: 900, useNativeDriver: true }),
+        Animated.timing(activateTimerPulse, { toValue: 1, duration: 900, useNativeDriver: true }),
+      ]),
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [isTimerActivator, isSpotifyQuestion, spotifyDJStarted, phase, spotifyDJOpenedAppBroadcast, spotifyWaitPhase, activateTimerPulse]);
 
   const handleConfirm = (year: number) => {
     // Defensiv guard: bara aktiv i question-fasen. Använder phaseRef (inte
@@ -2792,6 +2958,7 @@ export default function QuizScreen() {
     hasRecordedScoreForCurrentQuestionRef.current = false;
     questionStartMsRef.current = 0;
     hostTimerStartAtRef.current = 0;
+    spotifyTimerStartAtRef.current = 0;
     if (explicitNextIndex !== undefined) {
       setQuestionIndex(explicitNextIndex);
     } else {
@@ -2844,37 +3011,48 @@ export default function QuizScreen() {
     }
   };
 
-  /**
-   * Steg 2 (tvåstegs-flöde):
-   *   DJ har återvänt till QuizVibe och bekräftar att låten spelas.
-   *   Broadcastar spotify_dj_track_started → gissarnas status uppdateras.
-   *   Startar timern med 2 s delay på alla enheter (lokalt via setState,
-   *   remote via onSpotifyDJTrackStarted-listenern).
-   */
-  const handleSpotifyPlayPause = async () => {
-    if (spotifyIsPlaying) {
-      const ok = await pauseSpotifyPlayback();
-      if (ok) {
-        setSpotifyIsPlaying(false);
-      } else {
-        Alert.alert(
-          'Cannot control Spotify',
-          'Use "Open in Spotify to control music" below to pause directly in the Spotify app.',
-          [{ text: 'OK' }],
-        );
-      }
-    } else {
-      const ok = await resumeSpotifyPlayback();
-      if (ok) setSpotifyIsPlaying(true);
-    }
-  };
+  // ── FUTURE VERSION 2 — Automated API Flow (archived handleSpotifyPlayPause) ──────
+  // Fjärrstyrning av Spotify via Web API (PUT /me/player/pause + play).
+  // Reaktiveras i V2 när remote play/pause-kontroll behövs.
+  // const handleSpotifyPlayPause = () => {
+  //   if (spotifyIsPlaying) {
+  //     setSpotifyIsPlaying(false);
+  //     pauseSpotifyPlayback().then((ok) => {
+  //       if (ok) {
+  //         setSpotifyPausePositionMs(getLastKnownSpotifyProgressMs() ?? 0);
+  //         if (spotifyKeepAliveRef.current !== null) clearInterval(spotifyKeepAliveRef.current);
+  //         spotifyKeepAliveRef.current = setInterval(() => { pauseSpotifyPlayback().catch(() => {}); }, 2500);
+  //       } else {
+  //         setSpotifyIsPlaying(true);
+  //         if (currentSpotifyTrackIdRef.current) openSpotifyTrack(currentSpotifyTrackIdRef.current);
+  //       }
+  //     });
+  //   } else {
+  //     if (spotifyKeepAliveRef.current !== null) { clearInterval(spotifyKeepAliveRef.current); spotifyKeepAliveRef.current = null; }
+  //     setSpotifyIsPlaying(true);
+  //     const trackId = currentSpotifyTrackIdRef.current ?? undefined;
+  //     resumeSpotifyPlayback(trackId, spotifyPausePositionMs).then((ok) => {
+  //       if (!ok) setSpotifyIsPlaying(false);
+  //     });
+  //   }
+  // };
+  // ─────────────────────────────────────────────────────────────────────────────────
 
   const handleActivateTimer = () => {
     if (!currentSpotifyTrackId || spotifyDJStarted) return;
     setSpotifyDJStarted(true);
     // Avbryt eventuell timeout-fas (DJ aktiverade i tid).
     setSpotifyWaitPhase(null);
+    // Beräkna exakt när timern startar (2000 ms delay till setTimerActive).
+    // Används för synk på mottagarsidan OCH för non-host DJ:s egna enhet
+    // (de tar aldrig emot sin egna broadcast via broadcast.self:false).
+    const timerStartAt = Date.now() + 2000;
     if (phaseRef.current === 'question') {
+      // Non-host DJ: uppdatera hostTimerStartAtRef lokalt så startTimer()
+      // inte kompenserar för stale play_command-tid (~30 s tillbaka i tiden).
+      if (!isHost) {
+        hostTimerStartAtRef.current = timerStartAt;
+      }
       setTimeout(() => setTimerActive(true), 2000);
     }
     if (gameMode === 'individual-devices' && syncChannelRef.current && currentDJPlayer) {
@@ -2882,6 +3060,7 @@ export default function QuizScreen() {
         .broadcastSpotifyDJTrackStarted({
           dj_player_id: currentDJPlayer.id,
           spotify_track_id: currentSpotifyTrackId,
+          timer_start_at: timerStartAt,
         })
         .catch(() => {});
     }
@@ -3003,6 +3182,9 @@ export default function QuizScreen() {
         // D-vi: bär questionIndex så non-host som missat broadcasts under
         // offline kan sync:a vid nästa mottagna ping (heal-on-reconnect).
         question_index: questionIndex,
+        // Bär hela frågesekvensen så non-host som reloaded mid-game kan
+        // sätta broadcastAllQuestionIds och se rätt GetReady-ikoner.
+        all_question_ids: gameQuestionsRef.current.map((q) => q.id),
       })
       .catch(() => {});
   }, [gameMode, isHost, selfPlayerId, questionIndex]);
@@ -3656,9 +3838,9 @@ export default function QuizScreen() {
   // lastHostActivityRef när host bevisar liv. Host själv får aldrig
   // detta event (Realtime undertrycker self-echo). D-vi-utökning:
   // signaturen tar host:s questionIndex för heal-on-reconnect-sync.
-  const hostActivePingHandlerRef = useRef<(questionIndex: number) => void>(
-    () => {},
-  );
+  const hostActivePingHandlerRef = useRef<
+    (questionIndex: number, allQuestionIds?: string[]) => void
+  >(() => {});
   // Handler för host_rejoined: fyrar på non-host när HOST:s uppkoppling
   // återupprättats. Drainer pending score-kön så host:s leaderboard
   // får resultat som host kan ha missat under sitt offline-fönster.
@@ -3745,12 +3927,21 @@ export default function QuizScreen() {
         { cancelable: false },
       );
     };
-    hostActivePingHandlerRef.current = (hostQuestionIndex: number) => {
+    hostActivePingHandlerRef.current = (
+      hostQuestionIndex: number,
+      allQuestionIds?: string[],
+    ) => {
       // Host:s broadcast bekräftar liv → non-host resetar gap-tracker.
       // Detta är den ENDA vägen lastHostActivityRef uppdateras på
       // non-host-sidan; idle non-host:s tap dock påverkar inte ref:en
       // (vi spårar host:s aktivitet, inte vår egen).
       lastHostActivityRef.current = Date.now();
+      // Heal-on-reconnect för GetReady-ikonerna: om broadcastAllQuestionIds
+      // fortfarande är null (t.ex. efter mid-game reload) sätter vi den från
+      // ping-payloaden. play_command gör samma sak men fyrar bara vid Play-tap.
+      if (allQuestionIds && allQuestionIds.length > 0) {
+        setBroadcastAllQuestionIds((prev) => prev ?? allQuestionIds);
+      }
       // D-vi heal-on-reconnect: sync questionIndex mot host:s canonical
       // värde. Idempotent när redan synkad. Skyddar mot stale-index efter
       // offline-fönster där missade play_command/question_advance inte
@@ -3991,7 +4182,7 @@ export default function QuizScreen() {
       onPlayerAudioStateChanged: (payload) =>
         playerAudioStateChangedHandlerRef.current(payload.player_id, payload.audio_on),
       onHostActivePing: (payload) =>
-        hostActivePingHandlerRef.current(payload.question_index),
+        hostActivePingHandlerRef.current(payload.question_index, payload.all_question_ids),
       onPlayerConnectionChange: (playerId, status) => {
         setPlayerConnectionStatus((prev) => ({ ...prev, [playerId]: status }));
       },
@@ -4014,9 +4205,19 @@ export default function QuizScreen() {
       },
       // Spotify DJ: DJ:n har öppnat Spotify och broadcastat.
       // Avbryt timeout-fas, uppdatera UI och starta timern med 2 s delay.
-      onSpotifyDJTrackStarted: () => {
+      // Uppdatera hostTimerStartAtRef med DJ:ns faktiska timer_start_at —
+      // utan detta används stale play_command-tid (~30 s sedan) → startTimer()
+      // kompenserar för en elapsed-tid som inte existerar → timern börjar
+      // halvvägs eller direkt på 0.
+      onSpotifyDJTrackStarted: (payload) => {
         setSpotifyDJStarted(true);
         setSpotifyWaitPhase(null);
+        if (payload.timer_start_at) {
+          hostTimerStartAtRef.current = payload.timer_start_at;
+          // Spotify-specifik ref — används av AppState DJ-return-kompensation
+          // för att skilja Spotify-timern från play_command-tidens stämpel.
+          spotifyTimerStartAtRef.current = payload.timer_start_at;
+        }
         if (phaseRef.current === 'question') {
           setTimeout(() => setTimerActive(true), 2000);
         }
@@ -4036,21 +4237,27 @@ export default function QuizScreen() {
     });
     syncChannelRef.current = sync;
 
-    // Host: broadcasta hela fråge-sekvensen 800ms efter subscribe så
+    // Host: broadcasta hela fråge-sekvensen vid 800ms, 2500ms och 5000ms
+    // efter subscribe. Tre sändningar täcker (a) normalt race-fönster,
+    // (b) sen subscription, (c) non-host som reloader och subscribar sent.
     // non-hosts hinner subscriba i sin tur och ta emot eventet.
-    let initBroadcastTimer: ReturnType<typeof setTimeout> | null = null;
+    // play_command skickar också all_question_ids så dubbelts är ofarligt.
+    const initBroadcastTimers: ReturnType<typeof setTimeout>[] = [];
     if (isHost) {
-      initBroadcastTimer = setTimeout(() => {
+      const sendSequence = () => {
         sync
           .broadcastGameSequenceInit({
             all_question_ids: gameQuestionsRef.current.map((q) => q.id),
           })
           .catch(() => {});
-      }, 800);
+      };
+      initBroadcastTimers.push(setTimeout(sendSequence, 800));
+      initBroadcastTimers.push(setTimeout(sendSequence, 2500));
+      initBroadcastTimers.push(setTimeout(sendSequence, 5000));
     }
 
     return () => {
-      if (initBroadcastTimer) clearTimeout(initBroadcastTimer);
+      initBroadcastTimers.forEach(clearTimeout);
       sync.unsubscribe();
       syncChannelRef.current = null;
     };
@@ -4592,20 +4799,24 @@ export default function QuizScreen() {
                 tidigare UX-spec). showVideo gömmer video-frame:n under
                 question/awaiting (annars ger thumbnail visuella ledtrådar
                 till svaret) och visar den vid reveal. */}
-            {/* ── Spotify DJ-fråga ────────────────────────────────────────────
-                Två renderingsgrenar:
-                  DJ (isCurrentPlayerDJ): ett enda kort med huvud-knapp som
-                    byter label/action varje steg — alltid på samma ställe.
-                    Steg 0: "Start track in Spotify"  (öppnar Spotify)
-                    Steg 1: "Activate timer"           (startar timern)
-                    Steg 2: "Open Spotify"             (stäng av låten)
-                    Steg 3: ingen knapp               (reveal, klart)
-                  Gissare/host: Q-logo med status-text + guide. */}
+            {/* ── Spotify DJ-fråga (V1 — Interactive DJ & Player Flow) ──────────
+                V1-flöde: DJ stannar i Spotify hela rundan. Host (eller reserv)
+                aktiverar timern. Vanliga gissare lyssnar och svarar.
+                Tre roller:
+                  DJ (isCurrentPlayerDJ): steg-guide + "Start track in Spotify"-
+                    knapp. Stannar i Spotify tills gruppen kallar tid.
+                    Steg 0: "Start track in Spotify"
+                    Steg 1: "Stay in Spotify" (timer ej startad)
+                    Steg 2: "Timer counting down" (timer aktiv)
+                    Steg 3: "Pause and come back" (reveal)
+                    Steg 4: "End DJ" tryckt (djHandedOver)
+                  Timer-aktiverare (isTimerActivator): Q-logo + "Activate Timer".
+                  Vanlig gissare: Q-logo, väntar på att timern aktiveras. */}
             {isSpotifyQuestion ? (
               isCurrentPlayerDJ ? (
-                /* ── DJ-vyn: ett kort, huvud-knapp ändrar steg ─────────── */
+                /* ── DJ-vyn: steg-guide ────────────────────────────────── */
                 (() => {
-                  const djStep = !spotifyDJOpenedApp ? 0 : !spotifyDJStarted ? 1 : djDismissedOverlay ? 4 : phase === 'reveal' ? 3 : 2;
+                  const djStep = !spotifyDJOpenedApp ? 0 : !spotifyDJStarted ? 1 : djHandedOver ? 4 : djDismissedOverlay ? 4 : phase === 'reveal' ? 3 : 2;
                   return (
                     <View style={styles.spotifyDJCard}>
                       <View style={styles.spotifyDJIconRow}>
@@ -4635,18 +4846,20 @@ export default function QuizScreen() {
                 /* ── Q-logo-vyn (gissare + host) ────────────────────────── */
                 <View style={styles.spotifyQLogoCard}>
                   <QuizVibeLogo size={90} />
-                  <View style={styles.spotifyStatusRow}>
-                    <SpotifyBrandIcon size={14} variant="white" />
-                    <Text style={styles.spotifyStatusText}>
-                      {spotifyWaitPhase === 'skipped'
-                        ? 'Track skipped — DJ didn\'t start'
-                        : spotifyWaitPhase === 'countdown'
-                          ? `DJ not responding — skipping in ${spotifyTimeoutSeconds}s…`
-                          : spotifyDJStarted
-                            ? `${currentDJPlayer?.name ?? 'DJ'} is now playing — guess the year!`
-                            : `Waiting — ${currentDJPlayer?.name ?? 'DJ'} will start Spotify and activate timer`}
-                    </Text>
-                  </View>
+                  {/* Status-rad: visas bara vid error-states + djStep=0 (väntar på DJ).
+                      Övriga steg kommuniceras via den numrerade guide-listan nedan. */}
+                  {(spotifyWaitPhase === 'skipped' || spotifyWaitPhase === 'countdown' || !spotifyDJOpenedAppBroadcast) && (
+                    <View style={styles.spotifyStatusRow}>
+                      <SpotifyBrandIcon size={14} variant="white" />
+                      <Text style={styles.spotifyStatusText}>
+                        {spotifyWaitPhase === 'skipped'
+                          ? 'Track skipped — DJ didn\'t start'
+                          : spotifyWaitPhase === 'countdown'
+                            ? `DJ not responding — skipping in ${spotifyTimeoutSeconds}s…`
+                            : `Waiting — ${currentDJPlayer?.name ?? 'DJ'} will start Spotify`}
+                      </Text>
+                    </View>
+                  )}
                   {isHost && spotifyWaitPhase !== 'skipped' && phase === 'question' && (
                     <Pressable
                       onPress={handleHostSkipSpotifyQuestion}
@@ -4655,6 +4868,8 @@ export default function QuizScreen() {
                       <Text style={styles.spotifySkipBtnText}>Skip question  →</Text>
                     </Pressable>
                   )}
+                  {/* "Activate Timer"-knappen är borttagen härifrån — den
+                      visas nu som stor sticky CTA i botten av skärmen. */}
                   {spotifyWaitPhase !== 'skipped' && spotifyWaitPhase !== 'countdown' && (() => {
                     const activeStep = !spotifyDJOpenedAppBroadcast ? 0
                       : !spotifyDJStarted ? 1
@@ -4663,7 +4878,7 @@ export default function QuizScreen() {
                       : 3;
                     return (
                       <View style={styles.spotifyGuideSection}>
-                        {SPOTIFY_GUESSER_STEPS.map((step, i) => {
+                        {SPOTIFY_NON_DJ_STEPS.map((step, i) => {
                           const isDone = i < activeStep;
                           const isActive = i === activeStep;
                           return (
@@ -4892,12 +5107,9 @@ export default function QuizScreen() {
               </Animated.View>
             </View>
 
-            {/* 2-decimal countdown under timer-bar:en. Sitter i en glowing
-                box vars border + halo färgas av timerColor (primary → warning
-                → error). Halo:n pulserar i opacity för cross-platform glow.
-                Integer i timerColor (huvudvärde), decimal i textSecondary
-                (finish) så hierarkin är tydlig. */}
-            <View style={styles.decimalTimerWrap}>
+            {/* 2-decimal countdown under timer-bar:en. Döljs för DJ på Spotify-
+                frågor — DJ svarar inte och har ingen svarstid att visa. */}
+            {!(isSpotifyQuestion && isCurrentPlayerDJ) && <View style={styles.decimalTimerWrap}>
               <Animated.View
                 pointerEvents="none"
                 style={[
@@ -4918,7 +5130,7 @@ export default function QuizScreen() {
                   .{String(Math.floor((decimalElapsedMs % 1000) / 10)).padStart(2, '0')}
                 </Text>
               </View>
-            </View>
+            </View>}
 
             <View style={styles.questionCard}>
               {/* Top-rad: Question-räkneverk vänster + Answering-pillen höger.
@@ -4991,10 +5203,61 @@ export default function QuizScreen() {
                 • image    → ImageAnswerBlock (Letter Grid → Final Selection)
                 Disabled-states följer phase: båda låsta i awaiting + reveal
                 så svar inte kan ändras efter Confirm. */}
+            {/* DJ correct-year-ruta: direkt under question-card, utanför scroll-zonen */}
+            {phase === 'reveal' && question.type === 'timeline' && isCurrentPlayerDJ && isSpotifyQuestion && !djDismissedOverlay && (
+              <View style={rv.container}>
+                <Animated.View
+                  style={[
+                    rv.feedbackCard,
+                    rv.feedbackCorrect,
+                    { transform: [{ scale: revealScale }], opacity: revealOpacity },
+                  ]}
+                >
+                  <Text style={rv.feedbackCorrectYear}>
+                    Correct year:{' '}
+                    <Text style={rv.feedbackCorrectYearBold}>{question.correctYear}</Text>
+                  </Text>
+                  {question.hint && (
+                    <Text style={rv.feedbackSongMeta} numberOfLines={1} ellipsizeMode="tail">
+                      {question.hint}
+                    </Text>
+                  )}
+                </Animated.View>
+              </View>
+            )}
             {/* DJ-vy i scroll-zonen: steg 0 + 1 centrerade där TimelineSelector annars sitter */}
-            {question.type === 'timeline' && isCurrentPlayerDJ && phase === 'question' && (
-              <View style={styles.spotifyDJScrollZone}>
-                {!spotifyDJOpenedApp ? (
+            {question.type === 'timeline' && isCurrentPlayerDJ && (phase === 'question' || (phase === 'reveal' && !djDismissedOverlay)) && (
+              <View style={[styles.spotifyDJScrollZone, phase === 'reveal' && { paddingTop: Spacing.xl }]}>
+                {phase === 'reveal' ? (
+                  // Reveal-fas för DJ: Open Spotify (fortsätt uppspelning) + OR + bekräfta stopp
+                  <>
+                    <Animated.View style={{ transform: [{ scale: nextTabPulse }] }}>
+                      <Pressable
+                        style={[styles.spotifyDJActionBtn, { flex: 0, paddingHorizontal: Spacing.xl }]}
+                        onPress={() => openSpotifyApp()}
+                      >
+                        <SpotifyBrandIcon size={20} variant="white" />
+                        <Text style={styles.spotifyDJActionBtnText}>Open Spotify</Text>
+                      </Pressable>
+                    </Animated.View>
+                    <Text style={styles.djOrSeparatorText}>OR</Text>
+                    <Animated.View style={{ transform: [{ scale: nextTabPulse }] }}>
+                      <TouchableOpacity
+                        style={styles.djStopConfirmInlineBtn}
+                        onPress={() => {
+                          setDjDismissedOverlay(true);
+                          // Host behöver inte trycka "End DJ" separat — handover sker direkt.
+                          // Non-host DJ får "End DJ"-knappen via revealNextAbsolute istället.
+                          if (isHost) handleDJHandover();
+                        }}
+                        activeOpacity={0.85}
+                      >
+                        <Text style={styles.djStopConfirmInlineBtnText}>Spotify song has been stopped</Text>
+                      </TouchableOpacity>
+                    </Animated.View>
+                  </>
+                ) : !spotifyDJOpenedApp ? (
+                  // djStep=0: primär CTA — öppna Spotify och starta spåret
                   <Pressable
                     style={[styles.spotifyDJActionBtn, { flex: 0, width: '50%' }]}
                     onPress={handleStartSpotifyTrack}
@@ -5004,10 +5267,21 @@ export default function QuizScreen() {
                       <SpotifyBrandIcon size={30} variant="white" />
                     </View>
                   </Pressable>
-                ) : null}
+                ) : (
+                  // djStep=1 eller 2: DJ har öppnat Spotify men råkat navigera
+                  // tillbaka till QuizVibe — använd openSpotifyApp (inte openSpotifyTrack)
+                  // så låten INTE startar om från början utan fortsätter spelas.
+                  <Pressable
+                    style={[styles.spotifyDJActionBtn, { flex: 0, paddingHorizontal: Spacing.xl }]}
+                    onPress={() => openSpotifyApp()}
+                  >
+                    <SpotifyBrandIcon size={20} variant="white" />
+                    <Text style={styles.spotifyDJActionBtnText}>Open Spotify</Text>
+                  </Pressable>
+                )}
               </View>
             )}
-            {question.type === 'timeline' && !isCurrentPlayerDJ ? (
+            {question.type === 'timeline' && !isCurrentPlayerDJ && (!isSpotifyQuestion || spotifyDJStarted) ? (
               <TimelineSelector
                 key={`${questionIndex}-${currentAssistance}`}
                 assistance={currentAssistance}
@@ -5072,6 +5346,7 @@ export default function QuizScreen() {
                     badges direkt på spelarens (och rätta) namn-kort istället
                     så reveal-state syns inline i svarsrutan. */}
             {phase === 'reveal' && question.type === 'timeline' && (() => {
+              if (isSpotifyQuestion && isCurrentPlayerDJ) return null; // visas i scroll-zonen ovan
               if (selectedYear === null) return null;
               const interval = getIntervalForAssistance(currentAssistance);
               const wasCorrect = isCorrect(
@@ -5138,9 +5413,30 @@ export default function QuizScreen() {
           Fas-medveten action-knapp:
             • question  → Confirm (blå glow + pulse)
             • awaiting  → låst "Confirmed — waiting for time" */}
-      {(phase === 'question' || phase === 'awaiting' || (phase === 'reveal' && isSpotifyQuestion && isCurrentPlayerDJ)) && (
+      {(phase === 'question' || phase === 'awaiting' || (phase === 'reveal' && isSpotifyQuestion && isCurrentPlayerDJ)) &&
+        /* Dölj sticky-bar för icke-DJ Spotify pre-timer när det inte finns
+           något att visa (reguljär gissare har ingen action-knapp förrän
+           timern startat). Timer-aktiveraren däremot får "Activate Timer". */
+        !(isSpotifyQuestion && !isCurrentPlayerDJ && !spotifyDJStarted && phase === 'question' &&
+          !(isTimerActivator && spotifyDJOpenedAppBroadcast && spotifyWaitPhase !== 'skipped')) && (
         <View style={styles.stickyConfirmBar}>
-          {isSpotifyQuestion && isCurrentPlayerDJ ? null : (
+          {isSpotifyQuestion && isCurrentPlayerDJ ? null :
+            isSpotifyQuestion && !isCurrentPlayerDJ && !spotifyDJStarted ? (
+              /* Non-DJ Spotify pre-timer: timer-aktiveraren ser stor grön
+                 "Activate Timer"-CTA. Reguljära gissare filtrerades bort av
+                 outer gate ovan och når aldrig denna gren. */
+              isTimerActivator && spotifyDJOpenedAppBroadcast && spotifyWaitPhase !== 'skipped' && phase === 'question' ? (
+                <Animated.View style={{ transform: [{ scale: activateTimerPulse }], width: '100%' }}>
+                  <Pressable
+                    style={styles.spotifyActivateTimerBtnLarge}
+                    onPress={handleActivateTimer}
+                    activeOpacity={0.85}
+                  >
+                    <Text style={styles.spotifyActivateTimerBtnLargeText}>Activate Timer</Text>
+                  </Pressable>
+                </Animated.View>
+              ) : null
+            ) : (
             <>
               {phase === 'question' && (
                 <Animated.View
@@ -5234,9 +5530,13 @@ export default function QuizScreen() {
           {/* Spotify DJ-handover-steg: väntar på att DJ trycker "End DJ" innan host kan gå vidare */}
           {isSpotifyQuestion && !djHandedOver ? (
             isCurrentPlayerDJ ? (
-              <TouchableOpacity style={rv.djHandoverBtn} onPress={handleDJHandover} activeOpacity={0.85}>
-                <Text style={rv.djHandoverBtnText}>End DJ — handover to Host</Text>
-              </TouchableOpacity>
+              djDismissedOverlay ? (
+                <Animated.View style={{ transform: [{ scale: nextTabPulse }] }}>
+                  <TouchableOpacity style={rv.djHandoverBtn} onPress={handleDJHandover} activeOpacity={0.85}>
+                    <Text style={rv.djHandoverBtnText}>End DJ — handover to Host</Text>
+                  </TouchableOpacity>
+                </Animated.View>
+              ) : null /* knappar ligger i scroll-zonen ovan */
             ) : (
               <View style={rv.waitingForHostPill}>
                 <Text style={rv.waitingForHostPillText}>Waiting for DJ to handover to Host</Text>
@@ -5298,26 +5598,20 @@ export default function QuizScreen() {
           ut sin runda. canRetry = sticky-latched MEN connection åter OK.
           När fortfarande live-unstable visas grå "Waiting for connection…"-
           text istället. */}
+      {/* ── FUTURE VERSION 2 — Automated API Flow (archived JSX) ─────────────────────
       <SpotifyNowPlayingOverlay
         visible={showNowPlayingOverlay && isCurrentPlayerDJ}
-        trackName={nowPlayingTrackInfo?.trackName ?? ((currentQ?.type === 'timeline' ? currentQ.hint : undefined)?.split(' — ')[0] ?? '')}
-        artistName={nowPlayingTrackInfo?.artistName ?? ((currentQ?.type === 'timeline' ? currentQ.hint : undefined)?.split(' — ')[1] ?? '')}
+        trackName={nowPlayingTrackInfo?.trackName ?? ''}
+        artistName={nowPlayingTrackInfo?.artistName ?? ''}
         albumArtUrl={nowPlayingTrackInfo?.albumArtUrl ?? null}
         isPlaying={spotifyIsPlaying}
         onPlayPause={handleSpotifyPlayPause}
-        canActivate={isCurrentPlayerDJ && !spotifyDJStarted}
+        canActivate={false}
         onActivate={handleActivateTimer}
         canDismiss={phase !== 'question'}
-        onDismiss={() => {
-          setShowNowPlayingOverlay(false);
-          if (isCurrentPlayerDJ) setDjDismissedOverlay(true);
-        }}
-        onOpenSpotify={
-          currentSpotifyTrackId
-            ? () => openSpotifyTrack(currentSpotifyTrackId)
-            : undefined
-        }
+        onDismiss={() => { setShowNowPlayingOverlay(false); if (isCurrentPlayerDJ) setDjDismissedOverlay(true); }}
       />
+      ── END FUTURE VERSION 2 ──────────────────────────────────────────────────── */}
       <ConnectionUnstableOverlay
         visible={shouldLockForUnstable}
         onRetry={!isHost ? handleRetryFromUnstable : undefined}
@@ -5579,6 +5873,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'flex-start',
     paddingTop: 72,
+    gap: Spacing.sm,
+  },
+  djStopConfirmInlineBtn: {
+    height: 56,
+    paddingHorizontal: Spacing.xl,
+    borderRadius: Radius.md,
+    backgroundColor: '#1DB954',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  djStopConfirmInlineBtnText: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#000',
+    letterSpacing: 0.2,
+  },
+  djOrSeparatorText: {
+    fontSize: FontSize.sm,
+    fontWeight: '500',
+    color: Colors.textSecondary,
+    textAlign: 'center',
+    letterSpacing: 0.5,
   },
   // ── DJ-handlingsknappar i stickyConfirmBar ───────────────────────────
   spotifyDJActions: {
@@ -5698,6 +6014,37 @@ const styles = StyleSheet.create({
     fontSize: FontSize.sm,
     fontWeight: FontWeight.semibold,
     color: Colors.textSecondary,
+  },
+  spotifyActivateTimerBtn: {
+    marginTop: Spacing.md,
+    backgroundColor: '#1DB954',
+    borderRadius: Radius.md,
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.xl,
+    alignSelf: 'center',
+  },
+  spotifyActivateTimerBtnText: {
+    color: Colors.background,
+    fontSize: FontSize.md,
+    fontWeight: '700',
+    letterSpacing: 0.3,
+  },
+  // Stor sticky-bottom-version av "Activate Timer" (ersätter den lilla knappen
+  // som låg inne i non-DJ-kortet). Full bredd + generös padding för tydlig CTA.
+  spotifyActivateTimerBtnLarge: {
+    backgroundColor: '#1DB954',
+    borderRadius: Radius.md,
+    paddingVertical: Spacing.lg,
+    paddingHorizontal: Spacing.xl,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+  },
+  spotifyActivateTimerBtnLargeText: {
+    color: Colors.background,
+    fontSize: FontSize.lg,
+    fontWeight: '700',
+    letterSpacing: 0.4,
   },
   // Visas när YouTubeMediaPlayer rapporterar embed-fel — ersätter spelaren
   // med en diskret felindikator i samma höjd (220 px = PLAYER_HEIGHT).
@@ -6181,17 +6528,15 @@ const rv = StyleSheet.create({
     height: 56,
     paddingHorizontal: Spacing.lg,
     borderRadius: Radius.md,
-    backgroundColor: Colors.cardElevated,
-    borderWidth: 1,
-    borderColor: '#1DB954',
+    backgroundColor: '#1DB954',
     alignItems: 'center',
     justifyContent: 'center',
   },
   djHandoverBtnText: {
     fontSize: 15,
-    fontWeight: '600',
-    color: '#1DB954',
-    letterSpacing: 0.3,
+    fontWeight: '700',
+    color: '#000',
+    letterSpacing: 0.2,
   },
 });
 

@@ -38,6 +38,9 @@ const REDIRECT_URI = 'quizvibeapp://spotify-callback';
 const SCOPES = [
   'user-read-private',           // Krävs för att läsa product (premium/free) via /v1/me
   'user-read-email',             // Visad e-post i connect-bekräftelsen
+  'user-read-playback-state',    // Krävs för GET /me/player — hämta aktiv device_id vid
+                                 // pause-retry (deep link startar uppspelning utan API-session
+                                 // → första PUT /me/player/pause ger 404 utan device_id).
   'user-modify-playback-state',  // Pausa/starta uppspelning via Web API (DJ-overlay)
   // 'app-remote-control' borttagen — kräver Spotifys explicita produktionsgodkännande
   // och behövs inte eftersom vi öppnar låtar via deep link (spotify:track:ID),
@@ -291,6 +294,13 @@ async function saveSpotifyConnection(
  * fetchSpotifyAlbumArt i spotifyDJ.ts).
  */
 export async function getValidAccessToken(): Promise<string | null> {
+  // Returnera minnescachat token direkt om det fortfarande är giltigt —
+  // eliminerar auth.getUser() + DB-select (2 nätverksanrop) vid varje
+  // play/pause-kommando.
+  if (_memCachedToken && Date.now() < _memCachedTokenExpiresAt - TOKEN_REFRESH_MARGIN_MS) {
+    return _memCachedToken;
+  }
+
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
 
@@ -305,11 +315,18 @@ export async function getValidAccessToken(): Promise<string | null> {
   const expiresAt = new Date(data.token_expires_at).getTime();
   const needsRefresh = expiresAt - Date.now() < TOKEN_REFRESH_MARGIN_MS;
 
-  if (!needsRefresh) return data.access_token;
+  if (!needsRefresh) {
+    _memCachedToken = data.access_token;
+    _memCachedTokenExpiresAt = expiresAt;
+    return data.access_token;
+  }
 
   // Förnya via Spotifys token-endpoint.
   const refreshed = await refreshAccessToken(data.refresh_token);
   if (!refreshed) return null;
+
+  _memCachedToken = refreshed.accessToken;
+  _memCachedTokenExpiresAt = refreshed.expiresAt.getTime();
 
   // Uppdatera tabellen med nya tokens.
   await supabase
@@ -366,7 +383,164 @@ export async function disconnectSpotify(): Promise<void> {
   await supabase.from('spotify_connections').delete().eq('user_id', user.id);
 }
 
-// ── Playback control ─────────────────────────────────────────────────
+// In-memory token-cache (aktiv i V1 + V2) — används av getValidAccessToken ovan.
+// Eliminerar Supabase-nätverksanrop vid varje API-anrop; cachas 58+ min.
+let _memCachedToken: string | null = null;
+let _memCachedTokenExpiresAt: number = 0; // Unix ms
+
+// ── FUTURE VERSION 2 — Automated Playback Control (archived) ─────────────────────
+// I V1-flödet öppnar DJ:n Spotify manuellt via deep link (openSpotifyTrack i
+// spotifyDJ.ts). Dessa funktioner styr uppspelning via Spotify Web API
+// (PUT /me/player/play, PUT /me/player/pause) — reaktiveras i V2.
+// Importraden i quiz.tsx är arkiverad med // prefix så de kallas ej från V1.
+//
+
+/**
+ * Hämtar device_id för den enhet som för närvarande spelar i Spotify.
+ * Kräver user-read-playback-state-scope (tillagd 2026-06-16).
+ * Returnerar null om ingen enhet är aktiv eller vid nätverksfel.
+ *
+ * Används som fallback-argument i pause/resume när det första anropet
+ * (utan device_id) returnerar 404 — deep link–startad uppspelning
+ * registreras inte alltid som API-session förrän device_id skickas explicit.
+ */
+// Senast kända device_id sparas i minnet. GET /me/player kan returnera 204 (ingen aktiv
+// session) om Spotify pausats en stund, men device_id förblir giltigt för att
+// PUT /me/player/play?device_id=xxx ska kunna resumar från pausad position.
+let _cachedSpotifyDeviceId: string | null = null;
+let _cachedSpotifyProgressMs: number | null = null; // position (ms) vid senaste GET
+let _cachedSpotifyTrackUri: string | null = null;   // "spotify:track:ID" vid senaste GET
+
+/**
+ * Returnerar position (ms) fångad under senaste pause-anropets parallella GET.
+ * Anropas av quiz.tsx direkt efter pauseSpotifyPlayback() och sparas i state
+ * för att skickas till resumeSpotifyPlayback() — undviker att låten startar om.
+ */
+export function getLastKnownSpotifyProgressMs(): number | null {
+  return _cachedSpotifyProgressMs;
+}
+
+async function getSpotifyDeviceId(token: string): Promise<string | null> {
+  try {
+    const res = await fetch(`${SPOTIFY_API_BASE}/me/player`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (res.status === 200) {
+      const data = await res.json();
+      const id = (data?.device?.id as string | undefined) ?? null;
+      if (id) {
+        _cachedSpotifyDeviceId = id;
+        const pm = data?.progress_ms;
+        if (typeof pm === 'number') _cachedSpotifyProgressMs = pm;
+        const uri = data?.item?.uri;
+        if (typeof uri === 'string') _cachedSpotifyTrackUri = uri;
+        return id;
+      }
+    }
+
+    // Försök 2: GET /me/player/devices — returnerar ALLA enheter inkl. pausade.
+    // GET /me/player ger 204 (tom body) när ingen aktiv session finns,
+    // men /me/player/devices listar fortfarande alla tillgängliga enheter.
+    const devRes = await fetch(`${SPOTIFY_API_BASE}/me/player/devices`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (devRes.ok) {
+      const devData = await devRes.json();
+      const devices = (devData?.devices ?? []) as Array<{ id: string; is_active: boolean }>;
+      const preferred = devices.find((d) => d.is_active) ?? devices[0];
+      if (preferred?.id) {
+        _cachedSpotifyDeviceId = preferred.id;
+        return preferred.id;
+      }
+    }
+
+    // Sista utväg: senast kände device_id. Spotify minns paused-kontexten på
+    // enheten även om API:t tillfälligt inte rapporterar aktiv session.
+    return _cachedSpotifyDeviceId;
+  } catch {
+    return _cachedSpotifyDeviceId;
+  }
+}
+
+/** Väntar N millisekunder (används i retry-loopar). */
+const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+
+/**
+ * Kör en pause- eller play-PUT mot Spotify Web API.
+ * PUT och GET /me/player körs parallellt för att minimera fördröjning.
+ * Om PUT ger 404 provas Transfer Playback (PUT /me/player med play:true)
+ * följt av play-med-URI som slutgiltig fallback.
+ */
+async function spotifyPlaybackPut(
+  token: string,
+  endpoint: 'pause' | 'play',
+  trackId?: string,
+  positionMs?: number,
+): Promise<boolean> {
+  const base = `${SPOTIFY_API_BASE}/me/player/${endpoint}`;
+  const authHeader = { Authorization: `Bearer ${token}` };
+  const opts: RequestInit = { method: 'PUT', headers: authHeader };
+
+  for (let round = 0; round < 2; round++) {
+    if (round > 0) await sleep(1000);
+
+    const [res, deviceId] = await Promise.all([
+      fetch(base, opts).catch((): null => null),
+      getSpotifyDeviceId(token),
+    ]);
+
+    if (!res) continue;
+    if (res.status === 200 || res.status === 202 || res.status === 204) return true;
+    if (res.status === 403) return false;
+    if (res.status !== 404) continue;
+
+    if (!deviceId) continue;
+
+    if (endpoint === 'play') {
+      // Steg 1: Transfer Playback — väcker suspenderad iOS Spotify-app och
+      // återupptar från exakt pausad position (inget URI behövs, appen minns).
+      try {
+        const transferRes = await fetch(`${SPOTIFY_API_BASE}/me/player`, {
+          method: 'PUT',
+          headers: { ...authHeader, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ device_ids: [deviceId], play: true }),
+        });
+        if (transferRes.status === 200 || transferRes.status === 202 || transferRes.status === 204) return true;
+        if (transferRes.status === 403) return false;
+      } catch {
+        // network-fel, fortsätt till URI-fallback
+      }
+      // Steg 2: Play med explicit URI + position_ms som sista utväg.
+      const trackUri = trackId
+        ? `spotify:track:${trackId}`
+        : (_cachedSpotifyTrackUri ?? null);
+      if (trackUri) {
+        const resolvedPositionMs = positionMs != null ? positionMs : (_cachedSpotifyProgressMs ?? 0);
+        try {
+          const r = await fetch(`${base}?device_id=${encodeURIComponent(deviceId)}`, {
+            method: 'PUT',
+            headers: { ...authHeader, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ uris: [trackUri], position_ms: resolvedPositionMs }),
+          });
+          if (r.status === 200 || r.status === 202 || r.status === 204) return true;
+          if (r.status === 403) return false;
+        } catch {
+          // fall through to next round
+        }
+      }
+    } else {
+      // pause-endpoint: skicka med explicit device_id vid 404.
+      try {
+        const r = await fetch(`${base}?device_id=${encodeURIComponent(deviceId)}`, opts);
+        if (r.status === 200 || r.status === 202 || r.status === 204) return true;
+        if (r.status === 403) return false;
+      } catch {
+        // fall through to next round
+      }
+    }
+  }
+  return false;
+}
 
 /**
  * Pausar pågående uppspelning på DJ:ns aktiva Spotify-enhet.
@@ -375,37 +549,20 @@ export async function disconnectSpotify(): Promise<void> {
 export async function pauseSpotifyPlayback(): Promise<boolean> {
   const token = await getValidAccessToken();
   if (!token) return false;
-  try {
-    const res = await fetch(`${SPOTIFY_API_BASE}/me/player/pause`, {
-      method: 'PUT',
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    // 204 = success, 403 = not premium, 404 = no active device
-    return res.status === 204 || res.status === 200;
-  } catch (err) {
-    console.error('[spotify] pauseSpotifyPlayback threw:', err);
-    return false;
-  }
+  return spotifyPlaybackPut(token, 'pause');
 }
 
 /**
- * Återupptar uppspelning på DJ:ns aktiva Spotify-enhet (utan att starta om låten).
+ * Återupptar uppspelning på DJ:ns aktiva Spotify-enhet från pausad position.
  * Kräver user-modify-playback-state-scope + Premium.
  */
-export async function resumeSpotifyPlayback(): Promise<boolean> {
+export async function resumeSpotifyPlayback(trackId?: string, positionMs?: number): Promise<boolean> {
   const token = await getValidAccessToken();
   if (!token) return false;
-  try {
-    const res = await fetch(`${SPOTIFY_API_BASE}/me/player/play`, {
-      method: 'PUT',
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    return res.status === 204 || res.status === 200;
-  } catch (err) {
-    console.error('[spotify] resumeSpotifyPlayback threw:', err);
-    return false;
-  }
+  return spotifyPlaybackPut(token, 'play', trackId, positionMs);
 }
+
+// ── END FUTURE VERSION 2 — Automated Playback Control ────────────────────────────
 
 // ── Track-info ────────────────────────────────────────────────────────
 

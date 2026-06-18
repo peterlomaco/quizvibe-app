@@ -153,6 +153,28 @@ export async function openSpotifyTrack(spotifyTrackId: string): Promise<boolean>
   }
 }
 
+/**
+ * Öppnar Spotify-appen och tar den till förgrunden WITHOUT att starta om
+ * det aktuella spåret. Använd när låten redan spelas och DJ bara behöver
+ * navigera tillbaka till Spotify (t.ex. fallback-knappen under frågan eller
+ * "Open Spotify" under reveal för att stoppa låten).
+ *
+ * `spotify:` (utan track-ID) activerar appen men ändrar inte uppspelning.
+ */
+export async function openSpotifyApp(): Promise<boolean> {
+  try {
+    await Linking.openURL('spotify:');
+    return true;
+  } catch (err) {
+    console.warn('[spotifyDJ] openSpotifyApp failed:', err);
+    Alert.alert(
+      'Kunde inte öppna Spotify',
+      'Kontrollera att Spotify är installerat och försök igen.',
+    );
+    return false;
+  }
+}
+
 // ── Albumomslag (för gissarnas skärmar) ──────────────────────────────
 
 /**

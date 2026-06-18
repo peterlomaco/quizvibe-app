@@ -1035,6 +1035,12 @@ export default function LobbyScreen() {
   // (true men nu missing → trigga eject-popup). Resetas vid rumkods-byte
   // i mount-useEffect:n.
   const selfEverInStoredRef = useRef(false);
+  // Markeras true när seed-effektens Promise.all är klar. Debounce-effekten
+  // skriver INTE till setLobbySettings förrän seeding är klar — annars kan
+  // debounce:n skriva med default-värden (spotifyEnabled=false) 300 ms
+  // innan Promise.all resolvar och skapa en "stored"-post som sedan vinner
+  // mot profil-defaults i if (!stored)-grenen.
+  const lobbySeededRef = useRef(false);
   // Guard mot dubbel-navigation till /quiz när game_started detekteras.
   // Polling-effekten fyrar både via Realtime-tick OCH 2s-interval — utan
   // denna ref skulle vi anropa router.push flera gånger innan unmount.
@@ -1114,6 +1120,7 @@ export default function LobbyScreen() {
     ownPlayerIdRef.current = null;
     selfEverInStoredRef.current = false;
     navigatedToQuizRef.current = false;
+    lobbySeededRef.current = false;
     // Host: seed lobby-wide settings. Prio-ordning:
     //   1. lobby_settings (`stored`) — finns redan i DB om host nyss kom
     //      via "Play again + Keep settings"-flowet (quiz.tsx skrev över
@@ -1208,6 +1215,12 @@ export default function LobbyScreen() {
           if (!stored) {
             setSpotifyEnabled(profile?.spotifyDefaultEnabled ?? false);
           }
+          // Tillåt debounce-effekten att skriva till setLobbySettings nu när
+          // alla initiala värden är satta. Utan denna guard kan debounce:n
+          // hinna skriva med default-värden (spotifyEnabled=false) INNAN
+          // Promise.all resolvar — och skapa en "stored"-post som vinner
+          // mot profil-defaults i if (!stored)-grenen ovan.
+          lobbySeededRef.current = true;
         },
       );
     }
@@ -2920,7 +2933,11 @@ export default function LobbyScreen() {
   // i fel sluttillstånd. 300ms idle räknas som "användaren stoppade" →
   // sista state-snapshot:en skrivs då.
   useEffect(() => {
-    if (!hostMode) return;
+    // Skriver inte förrän seed-effekten är klar (lobbySeededRef.current = true).
+    // Utan denna guard hinner debounce:n skriva med default-värden 300 ms
+    // INNAN Promise.all resolvar — skapar en "stored"-post med spotifyEnabled=false
+    // som sedan vinner mot profil-defaults i seed-effektens if (!stored)-gren.
+    if (!hostMode || !lobbySeededRef.current) return;
     const handle = setTimeout(() => {
       setLobbySettings(roomCode, {
         gameMode,
@@ -3126,9 +3143,15 @@ export default function LobbyScreen() {
           if (!updated) return p;
           const nextHasLeft = !!updated.hasLeft;
           const nextApproved = !!updated.approved;
-          if (!!p.hasLeft === nextHasLeft && !!p.approved === nextApproved) return p;
+          const nextSpotifyConnected = !!updated.spotifyConnected;
+          if (
+            !!p.hasLeft === nextHasLeft &&
+            !!p.approved === nextApproved &&
+            !!p.spotifyConnected === nextSpotifyConnected
+          )
+            return p;
           changed = true;
-          return { ...p, hasLeft: nextHasLeft, approved: nextApproved };
+          return { ...p, hasLeft: nextHasLeft, approved: nextApproved, spotifyConnected: nextSpotifyConnected };
         });
         return changed ? next : prev;
       });

@@ -1201,9 +1201,8 @@ PIVOT 2026-05-29: fristående "Guess Who"-fråge-koncept — en stiliserad **AI-
 - SVG imports: `import Svg, { Line, Polygon, Rect } from 'react-native-svg'`.
 
 **DJ-handover — tvåflagge-mönster** i quiz.tsx:
-- **`djDismissedOverlay`**: sätts `true` när DJ tappar × → aktiverar guide-steg 5 ("End DJ — handover to Host").
-- **`djHandedOver`**: sätts `true` när DJ trycker "End DJ"-knappen i reveal-fasen → låser upp host:s Next-knapp.
-- Separationen är nödvändig: om `onDismiss` direkt satte `djHandedOver=true` skulle `!djHandedOver`-villkoret dölja "End DJ"-knappen innan DJ hunnit trycka den.
+- **`djDismissedOverlay`**: sätts `true` när DJ trycker "Spotify song has been stopped" → döljer scroll-zonens knappar, aktiverar guide-steg 5.
+- **`djHandedOver`**: sätts `true` → låser upp host:s Next-knapp. **Host-DJ: sätts direkt** i "Spotify song has been stopped"-handlern (ingen extra "End DJ"-knapp). **Non-host-DJ: kräver separat "End DJ — handover to Host"-knapp-tap** i `revealNextAbsolute`.
 - Båda flaggor resetas i questionIndex-effekten.
 
 **`djStep`-beräkning**:
@@ -1215,9 +1214,18 @@ const djStep = !spotifyDJOpenedApp ? 0
   : 2;
 ```
 
-**Guide-steg-arrayer** (`SPOTIFY_DJ_STEPS` / `SPOTIFY_GUESSER_STEPS`, 5 steg, `as const`). Steg 4 innehåller `[r]"X"[/r]`-markup för inline röd text. `renderStepText(text)` (module-level helper i quiz.tsx) parsar `[r]...[/r]`-segment och returnerar `<Text style={{ color: '#FF3B30', fontWeight: '700' }}>` för de matchade delarna.
+**Guide-steg-arrayer** (`SPOTIFY_DJ_STEPS` / `SPOTIFY_GUESSER_STEPS`, 5 steg, `as const`). Steg 5 (index 4): `'Press End DJ - handover to Host / Next button below'`. Steg 4 innehåller `[r]"X"[/r]`-markup för inline röd text. `renderStepText(text)` (module-level helper i quiz.tsx) parsar `[r]...[/r]`-segment och returnerar `<Text style={{ color: '#FF3B30', fontWeight: '700' }}>` för de matchade delarna.
 
-**Reveal-fas DJ handover-block** (`rv.revealNextAbsolute`): när `isSpotifyQuestion && !djHandedOver` visas antingen "End DJ — handover to Host"-knapp (DJ-enhet) eller "Waiting for DJ to handover to Host" + SequentialDots (gissare). DJ:s knapp-tap broadcastar `broadcastSpotifyDJHandover()` → `djHandedOver=true` på alla enheter → host:s vanliga Next-knapp visas.
+**Reveal-fas DJ handover-block** (`rv.revealNextAbsolute`):
+- **Non-host DJ + `djDismissedOverlay`**: pulserande "End DJ — handover to Host"-knapp (via `nextTabPulse`). Tap → `broadcastSpotifyDJHandover()` → `djHandedOver=true` på alla enheter → host:s Next-knapp visas.
+- **Host DJ**: "End DJ"-knappen visas aldrig — `djHandedOver` sätts direkt vid "Spotify song has been stopped". Host ser direkt den pulserande Next-knappen.
+- **Non-host gissare**: "Waiting for DJ to handover to Host" + SequentialDots tills `djHandedOver`.
+
+**Reveal-fas scroll-zon för DJ** (när `!djDismissedOverlay`): Correct year-ruta direkt under question-card (utanför scroll-zonen som separat element), sedan scroll-zonen med: pulserande "Open Spotify"-knapp + "OR"-separator + pulserande "Spotify song has been stopped"-knapp. Båda knappar wrappar `<Animated.View style={{ transform: [{ scale: nextTabPulse }] }}>`.
+
+**`openSpotifyApp()` vs `openSpotifyTrack(id)`** (i `src/utils/spotifyDJ.ts`):
+- `openSpotifyTrack(id)` → `spotify:track:<id>` → startar låten **från början**. Används BARA av "Start track in Spotify" (steg 0, första gången).
+- `openSpotifyApp()` → `spotify:` → tar Spotify till förgrunden **utan att röra uppspelning**. Används av alla fallback "Open Spotify"-knappar (steg 1/2 under frågan + reveal-fasens knapp) så låten inte startas om från början när DJ navigerar tillbaka.
 
 **GetReadyIntro kö-indikator**: Spotify-frågor visas med grön kant, Spotify-ikon (vit monokrom) och "Spotify DJ"-text. Prop: `spotifyQuestionIndices?: number[]` (0-baserat) passas från quiz.tsx:s `djRotationPlan.spotifyQuestionIndices`.
 
@@ -1359,6 +1367,16 @@ Non-host:s GetReady-kö visade ibland fel kategori-badge (t.ex. SPORT istället 
 - **`broadcastAllQuestionIds: string[] | null`** state (quiz.tsx) — host:s auktoritativa frågesekvens som hela frågeordningen för non-host. Sätts av `game_sequence_init` + `play_command` + nu även `question_advance`.
 - **`QuestionAdvancePayload.all_question_ids?: string[]`** ([syncChannel.ts](src/lib/realtime/syncChannel.ts)) — adderat 2026-06-15. Alla tre `broadcastQuestionAdvance`-call-sites (`handleHostSkipSpotifyQuestion`, `handleHostAdvanceFromReveal`, `handleHostShowLeaderboard`) skickar `gameQuestionsRef.current.map(q => q.id)`. Non-host:s handler uppdaterar `broadcastAllQuestionIds` vid varje advance → kön håller sig synkad även vid reconnect.
 - **`effectiveMediaSourceByQuestion`**, **`effectiveCategoryByQuestion`**, **`effectiveAnswerTypeByQuestion`** — tre useMemos i quiz.tsx: om `isHost || !broadcastAllQuestionIds` → pass-through från lokala arrayer; annars map:as från `broadcastAllQuestionIds` via `ALL_QUESTIONS_MAP`. Passas som props till GetReadyIntro istället för de lokala arrayerna. Fallback till lokal array används under race-fönstret innan första `broadcastAllQuestionIds` ankommer (var "nästan alltid rätt" enligt Peter).
+
+**IndDev timer-sync vid iOS-bakgrunds-återkomst (fix 2026-06-15)**: iOS fryser JS-tråden (`setTimeout`/`setInterval`) när appen backgroundas. Non-host som lämnar appen under countdown:en och kommer tillbaka fick full `responseSeconds` kvar istället för det faktiska återstående. Fix: host broadcastar `timer_start_at` (wall-clock `Date.now()` ms) i `play_command`-payloaden — non-host kan beräkna korrekt tid kvar oavsett när JS-körningen återupptas.
+
+- **`PlayCommandPayload.timer_start_at?: number`** ([syncChannel.ts](src/lib/realtime/syncChannel.ts)) — wall-clock ms för när host:s timer förväntas starta. Beräknas i `handleHostStartFromGetReady` som `Date.now() + 10500`: 700ms initial paus + 5×1300ms tick (startFrom=5) + 1000ms ?-display + 2000ms timerActive-delay = 10200ms + 300ms marginal.
+- **`hostTimerStartAtRef`** (useRef\<number\>, quiz.tsx) — non-host lagrar mottaget `timer_start_at` här. Resetas till 0 i `handleAdvanceToNextRound` så stale värde aldrig läcker till nästa fråga.
+- **Tre platser där elapsed-kompensation appliceras** (täcker alla resume-scenarion):
+  1. **AppState-listener** (`'active'`-branch): om `phase === 'countdown'` och `Date.now() >= hostTimerStartAtRef.current` → beräkna `adjustedLeft`, sätt phase till `'question'` direkt (hoppar countdown-resten).
+  2. **Phase-effekten** (on `phase === 'question'`): visar korrekt `adjustedLeft` som initial `timeLeft` + sätter `timerProgressAnim` till rätt fraktion.
+  3. **`startTimer()`**: beräknar `effectiveSeconds = Math.max(0, responseSeconds - elapsed)` och sätter `questionStartMsRef` med bakåtkompensation (`Date.now() - (responseSeconds - effectiveSeconds) * 1000`) så svarstidsmätningen är korrekt i leaderboardens AVG/LAST.
+- **TypeScript-gotcha**: `let effectiveSeconds: number = responseSeconds` — explicit `: number`-annotation krävs eftersom `responseSeconds: 30 | 45 | 60` annars infereras som literal union-typ och `Math.max()` returnerar `number` vilket inte är assignable.
 
 **Timer-gate**: `useEffect` som anropar `startTimer()` är gated på `phase === 'question'` (entry från countdown). Cleanup i den effekten klippper INTE intervallet vid `question → awaiting`-transition — kritiskt så timer:n fortsätter ticka oberoende av phase-byte. Self-clearing sker i `setInterval`-handler:n när `timeLeft = 0`. Separat unmount-only useEffect cleanup:ar timer:n vid Quit Game.
 
