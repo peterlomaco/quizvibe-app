@@ -282,7 +282,9 @@ Helpers exporteras: `appendPlayerNameLetter`, `appendPlayerNameDigit`, `backspac
 
 **Register-formen auto-fyller INTE PlayerName** (efter sessionsbeslut): fältet startar tomt. Användaren måste typa själv eller trycka Auto-generate. Guest-formen och AddPlayerModal auto-fyller fortfarande vid open via `prefix: 'Guest'`-pathen.
 
-**`validatePlayerName(name)` / `validateAddPlayerName(name)`** kontrollerar i ordning: (1) `isPlayerNameFormatValid`, (2) `hasBlockedLetterLead`, (3) `containsProfanity`, (4) uniqueness mot mock taken-lista. Returnerar `'available' | 'taken' | 'invalid'`. UI status-type: `PlayerNameStatus = 'idle' | 'checking' | 'available' | 'taken' | 'invalid'`.
+**`validatePlayerName(name)` / `validateAddPlayerName(name, existingNames?)`** kontrollerar i ordning: (1) `isPlayerNameFormatValid`, (2) `hasBlockedLetterLead`, (3) `containsProfanity`, (4) uniqueness mot mock taken-lista, (5) `existingNames`-Set (AddPlayerModal: befintliga lobbyspelare inkl. host). Returnerar `'available' | 'taken' | 'invalid'`. UI status-type: `PlayerNameStatus = 'idle' | 'checking' | 'available' | 'taken' | 'invalid'`.
+
+**Async Supabase uniqueness-check** (2026-06-22): både Register-formens `handleRegCheckPlayerName` och AddPlayerModal:s `handleCheckPlayerName` är async. Efter att lokal validering godkänt anropas `lookupEmailByPlayerName(normalized)` (Supabase RPC) — returnerar email om namnet är registrerat → `'taken'`. Vid nätverksfel faller det tillbaka till `'available'`. Detta förhindrar att man registrerar eller lägger till en guest med ett redan taget PlayerName.
 
 **Field-labels** (Register + JoinModal guest): "Player Name - Letter-digit format". **Format-hint under fältet** (alla tre forms): "Format: 1-{PLAYER_NAME_MAX_LETTERS} letters, 0-{PLAYER_NAME_MAX_DIGITS} digits" — deriveras från konstanterna så framtida ändringar slår igenom automatiskt.
 
@@ -758,7 +760,7 @@ Non-host gets a **read-only view** of the player list:
 - Assistance level (Full/Standard/Minimal-knapprad), default `'standard'` — låst tills Year valt. "Use default or select prefered setup"-hint ovanför.
 - Submit "Add to Lobby" enable:as bara när formuläret är giltigt (Player Name available + Year valt).
 
-**`TAKEN_PLAYER_NAMES_LOBBY`** är en lokal mock-Set (samma värden som hemskärmens `TAKEN_PLAYER_NAMES` i `app/index.tsx`). **Avsiktlig duplicering** tills riktig backend-uniqueness-check kommer in — call sites bryts ut då. Samma sak för `validateAddPlayerName`/`formatAddPlayerBirthYear`-helpers (lokala kopior av Home-skärmens motsvarigheter).
+**`TAKEN_PLAYER_NAMES_LOBBY`** är en lokal mock-Set (samma värden som hemskärmens `TAKEN_PLAYER_NAMES` i `app/index.tsx`). Används som snabb första lokal check. Den riktiga uniqueness-checken sker via `lookupEmailByPlayerName` (Supabase RPC) som körs async efter lokal validering godkänt — se "Async Supabase uniqueness-check" ovan. `validateAddPlayerName` tar dessutom `existingNames?: Set<string>` som skickas in från call-siten med alla aktiva lobbyspelares namn (case-insensitive) — förhindrar dublett mot host eller annan spelare i lobbyn.
 
 **Capacity-check** sker i två lägen:
 - **Vid + Add Player-knappens onPress** (`handleOpenAddPlayer`): `isLobbyAtCapacity()` (= `players.filter(p => !p.hasLeft).length >= maxPlayers`) → om full visas Alert direkt och modalen öppnas inte. Skyddar host från att slösa tid på att fylla i formuläret.
