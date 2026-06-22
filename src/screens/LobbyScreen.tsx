@@ -84,7 +84,7 @@ import {
   PLAYER_NAME_MAX_LETTERS,
 } from '../utils/playerName';
 import { containsProfanity } from '../utils/profanity';
-import { loadProfile, saveProfile, type ProfileData, type Region as ProfileRegion } from '../utils/profileStorage';
+import { loadProfile, lookupEmailByPlayerName, saveProfile, type ProfileData, type Region as ProfileRegion } from '../utils/profileStorage';
 import { hasPremiumSubscription } from '../utils/subscriptionStorage';
 import { ROOM_CODE_DIGITS, ROOM_CODE_LEADING_LETTERS, formatRoomCode, generateRoomCode } from '../utils/roomCode';
 import { addInvite, clearWaitingInvitesForRoom } from '../utils/waitingInvites';
@@ -382,7 +382,7 @@ const TAKEN_PLAYER_NAMES_LOBBY = new Set([
 
 type AddPlayerNameStatus = 'idle' | 'checking' | 'available' | 'taken' | 'invalid';
 
-function validateAddPlayerName(name: string): 'available' | 'taken' | 'invalid' {
+function validateAddPlayerName(name: string, existingNames?: Set<string>): 'available' | 'taken' | 'invalid' {
   const trimmed = name.trim();
   // Format: Abcdef- eller Abcdef-1234567 (1-10 letters + dash + 0-7 digits).
   if (!isPlayerNameFormatValid(trimmed)) return 'invalid';
@@ -392,6 +392,8 @@ function validateAddPlayerName(name: string): 'available' | 'taken' | 'invalid' 
   // Reserverat: brand-namnet "quizvibe" (case-insensitive) får inte ingå.
   if (containsBlockedLetterSubstring(trimmed)) return 'invalid';
   if (TAKEN_PLAYER_NAMES_LOBBY.has(trimmed.toLowerCase())) return 'taken';
+  // Kollar mot befintliga spelare i lobbyn (case-insensitive).
+  if (existingNames?.has(trimmed.toLowerCase())) return 'taken';
   return 'available';
 }
 
@@ -403,7 +405,7 @@ function formatAddPlayerBirthYear(year: number): string {
   return String(year);
 }
 
-function AddPlayerModal({ visible, onClose, onAdd, takenGuestLetters }: {
+function AddPlayerModal({ visible, onClose, onAdd, takenGuestLetters, existingNames }: {
   visible: boolean;
   onClose: () => void;
   onAdd: (name: string, age: number, assistance: AddPlayerAssistance) => void;
@@ -411,6 +413,8 @@ function AddPlayerModal({ visible, onClose, onAdd, takenGuestLetters }: {
    *  i lobbyn (t.ex. {'A', 'C'} om GuestA + GuestC redan finns). Filtreras
    *  bort vid auto-genereringen så två guests inte får samma versal-bokstav. */
   takenGuestLetters?: Set<string>;
+  /** Alla nuvarande spelarnamn i lobbyn (lowercase) — förhindrar dubletter. */
+  existingNames?: Set<string>;
 }) {
   const [name, setName] = useState('');
   const [birthYear, setBirthYear] = useState<number | null>(null);
@@ -469,7 +473,7 @@ function AddPlayerModal({ visible, onClose, onAdd, takenGuestLetters }: {
   const assistanceUnlocked = yearUnlocked && birthYear !== null;
   const isFormValid = playerNameStatus === 'available' && birthYear !== null;
 
-  const handleCheckPlayerName = () => {
+  const handleCheckPlayerName = async () => {
     const trimmed = name.trim();
     if (!trimmed) return;
     // Auto-inserta dash om användaren bara typat letters innan Check.
@@ -477,10 +481,19 @@ function AddPlayerModal({ visible, onClose, onAdd, takenGuestLetters }: {
     if (normalized !== name) setName(normalized);
     Keyboard.dismiss();
     setPlayerNameStatus('checking');
-    // Mock-latens — byt mot riktigt API-anrop när backend finns.
-    setTimeout(() => {
-      setPlayerNameStatus(validateAddPlayerName(normalized));
-    }, 600);
+    // Snabb lokal validering (format + profanity + lobby-dubletter).
+    const localResult = validateAddPlayerName(normalized, existingNames);
+    if (localResult !== 'available') {
+      setPlayerNameStatus(localResult);
+      return;
+    }
+    // Riktigt uniqueness-check mot Supabase: om namnet finns → 'taken'.
+    try {
+      const existing = await lookupEmailByPlayerName(normalized);
+      setPlayerNameStatus(existing ? 'taken' : 'available');
+    } catch {
+      setPlayerNameStatus('available');
+    }
   };
 
   const handleRemoveName = () => {
@@ -1720,6 +1733,7 @@ export default function LobbyScreen() {
   const [spotifyConnected, setSpotifyConnected] = useState(false);
   const [spotifyDisplayName, setSpotifyDisplayName] = useState<string | null>(null);
   const [spotifyConnecting, setSpotifyConnecting] = useState(false);
+  const [spotifyGuideVisible, setSpotifyGuideVisible] = useState(false);
   // Spotify DJ kräver Individual Devices — DJ lämnar appen till Spotify-appen.
   // PtP/Single Player stöds inte (en delad enhet kan inte lämna + återvända).
   const isSpotifyAvailable = gameMode === 'individual-devices' && !singlePlayerDefault;
@@ -2047,24 +2061,37 @@ export default function LobbyScreen() {
    * Kopplar bort host:ns Spotify-konto.
    * Stänger av Spotify DJ-läget om det var aktivt.
    */
-  const handleDisconnectSpotify = async () => {
-    await disconnectSpotify();
-    setSpotifyConnected(false);
-    setSpotifyDisplayName(null);
-    setSpotifyEnabled(false);
-    // Non-host: synka spotify_verified=false till lobby_players.
-    if (!hostMode) {
-      const ownId = ownPlayerIdRef.current;
-      if (ownId) {
-        setPlayers((prev) =>
-          prev.map((p) => (p.id === ownId ? { ...p, spotifyConnected: false } : p)),
-        );
-        const ownPlayer = players.find((p) => p.id === ownId);
-        if (ownPlayer) {
-          upsertOwnLobbyPlayer(roomCode, { ...ownPlayer, spotifyConnected: false }).catch(() => {});
-        }
-      }
-    }
+  const handleDisconnectSpotify = () => {
+    Alert.alert(
+      'Disconnect Spotify',
+      'Do you want to disconnect your Spotify account?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Disconnect',
+          style: 'destructive',
+          onPress: async () => {
+            await disconnectSpotify();
+            setSpotifyConnected(false);
+            setSpotifyDisplayName(null);
+            setSpotifyEnabled(false);
+            // Non-host: synka spotify_verified=false till lobby_players.
+            if (!hostMode) {
+              const ownId = ownPlayerIdRef.current;
+              if (ownId) {
+                setPlayers((prev) =>
+                  prev.map((p) => (p.id === ownId ? { ...p, spotifyConnected: false } : p)),
+                );
+                const ownPlayer = players.find((p) => p.id === ownId);
+                if (ownPlayer) {
+                  upsertOwnLobbyPlayer(roomCode, { ...ownPlayer, spotifyConnected: false }).catch(() => {});
+                }
+              }
+            }
+          },
+        },
+      ],
+    );
   };
 
   /**
@@ -4729,17 +4756,17 @@ export default function LobbyScreen() {
               </View>
               <View style={{ flex: 1, alignSelf: 'flex-start', marginTop: 5, marginLeft: -8 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                  <Text style={[styles.connectionLabel, { minWidth: 0 }]}>Spotify DJ</Text>
+                  <Text style={[styles.connectionLabel, { minWidth: 0 }]}>Spotify</Text>
                   <Pressable
                     style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
                     onPress={() =>
                       Alert.alert(
-                        'Spotify DJ',
+                        'Spotify',
                         '• Only applicable in Individual Devices mode\n\n• For Spotify music, one player at a time will be directed via QuizVibe to Spotify\n\n• All players in the same lobby must have a registered QuizVibe account with a connected Spotify account',
                       )
                     }
                     hitSlop={8}
-                    accessibilityLabel="Spotify DJ info"
+                    accessibilityLabel="Spotify info"
                   >
                     <Text style={styles.infoIconText}>i</Text>
                   </Pressable>
@@ -4758,7 +4785,13 @@ export default function LobbyScreen() {
                 ) : (
                   <>
                     <Text style={styles.spotifyNoConnectionLabel}>
-                      {hostMode ? 'No connection activated' : 'Not connected'}
+                      {'Not activated / '}
+                      <Text
+                        style={styles.spotifyGuideLinkText}
+                        onPress={() => setSpotifyGuideVisible(true)}
+                      >
+                        Guide How to connect
+                      </Text>
                     </Text>
                     <Pressable
                       onPress={handleConnectSpotify}
@@ -4766,7 +4799,7 @@ export default function LobbyScreen() {
                       hitSlop={8}
                       style={({ pressed }) => [{ opacity: pressed ? 0.7 : 1 }]}
                     >
-                      <Text style={styles.spotifyLinkText}>
+                      <Text style={[styles.spotifyLinkText, { color: '#1DB954', fontSize: FontSize.sm, marginTop: 2 }]}>
                         {spotifyConnecting ? 'Connecting…' : 'Connect Spotify account'}
                       </Text>
                     </Pressable>
@@ -4774,21 +4807,23 @@ export default function LobbyScreen() {
                 )}
               </View>
               {hostMode ? (
-                <View style={[styles.spotifyHostControls, { marginRight: 14, alignSelf: 'flex-start', marginTop: 1, gap: 4 }]}>
-                  {/* Availability-pill: grön "Enabled" i IndDev, grå "Disabled" i PtP/Single */}
-                  <View style={[
-                    styles.spotifyAvailPill,
-                    isSpotifyAvailable
-                      ? styles.spotifyAvailPillOn
-                      : styles.spotifyAvailPillOff,
-                  ]}>
-                    <Text style={[
-                      styles.spotifyAvailPillText,
-                      !isSpotifyAvailable && styles.spotifyAvailPillTextOff,
+                <View style={[styles.spotifyHostControls, { marginRight: spotifyConnected ? 14 : -16, alignSelf: 'flex-start', marginTop: 1, gap: 4 }]}>
+                  {/* Availability-pill: visas bara när Spotify är kopplat — annars tar pillen för mycket horisontellt utrymme och "Not activated"-texten tvingas ned på ny rad */}
+                  {spotifyConnected && (
+                    <View style={[
+                      styles.spotifyAvailPill,
+                      isSpotifyAvailable
+                        ? styles.spotifyAvailPillOn
+                        : styles.spotifyAvailPillOff,
                     ]}>
-                      {isSpotifyAvailable ? 'Enabled' : 'Disabled'}
-                    </Text>
-                  </View>
+                      <Text style={[
+                        styles.spotifyAvailPillText,
+                        !isSpotifyAvailable && styles.spotifyAvailPillTextOff,
+                      ]}>
+                        {isSpotifyAvailable ? 'Enabled' : 'Disabled'}
+                      </Text>
+                    </View>
+                  )}
                   <Switch
                     value={isSpotifyAvailable && spotifyEnabled}
                     onValueChange={isSpotifyAvailable ? handleToggleSpotifyEnabled : undefined}
@@ -5028,7 +5063,14 @@ export default function LobbyScreen() {
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={styles.addPackageBtn}
-                      onPress={() => router.push({ pathname: '/store' as const, params: { focus: 'packages-only', from: '/lobby', fromCode: roomCode } })}
+                      onPress={() => Alert.alert(
+                        'Premium feature',
+                        'Add Host packages for customized Quiz experience. Go to Store?',
+                        [
+                          { text: 'Cancel', style: 'cancel' },
+                          { text: 'Go to Store', onPress: () => router.push({ pathname: '/store' as const, params: { focus: 'packages-only', from: '/lobby', fromCode: roomCode } }) },
+                        ],
+                      )}
                       activeOpacity={0.7}
                     >
                       <Text style={styles.modeLabel}>+ Add Host packages</Text>
@@ -5392,7 +5434,14 @@ export default function LobbyScreen() {
                     <TouchableOpacity
                       style={[styles.roundsStepperBtn, roundsCount >= stepperMax && styles.roundsStepperBtnDisabled]}
                       onPress={roundsCount >= stepperMax && !hasPremium
-                        ? () => router.push({ pathname: '/store' as const, params: { focus: 'subscription', from: '/lobby', fromCode: roomCode } })
+                        ? () => Alert.alert(
+                            'Premium feature',
+                            'Host more than 4 rounds require QuizVibe Premium. Go to Store?',
+                            [
+                              { text: 'Cancel', style: 'cancel' },
+                              { text: 'Go to Store', onPress: () => router.push({ pathname: '/store' as const, params: { focus: 'subscription', from: '/lobby', fromCode: roomCode } }) },
+                            ],
+                          )
                         : handleIncrementRounds}
                       activeOpacity={0.7}
                     >
@@ -5400,7 +5449,14 @@ export default function LobbyScreen() {
                     </TouchableOpacity>
                     {roundsCount >= stepperMax && (
                       <TouchableOpacity
-                        onPress={() => router.push({ pathname: '/store' as const, params: { focus: 'subscription', from: '/lobby', fromCode: roomCode } })}
+                        onPress={() => Alert.alert(
+                          'Premium feature',
+                          'Host more than 4 rounds require QuizVibe Premium. Go to Store?',
+                          [
+                            { text: 'Cancel', style: 'cancel' },
+                            { text: 'Go to Store', onPress: () => router.push({ pathname: '/store' as const, params: { focus: 'subscription', from: '/lobby', fromCode: roomCode } }) },
+                          ],
+                        )}
                         activeOpacity={0.7}
                         style={{ backgroundColor: hasPremium ? '#F5A623' : '#6B7280', borderRadius: 4, paddingHorizontal: 8, paddingVertical: 2, marginLeft: 4 }}
                       >
@@ -5414,16 +5470,21 @@ export default function LobbyScreen() {
                       min={ROUNDS_MIN}
                       gameModeMax={stepperMax}
                       onPremiumPress={() => {
-                        // 20 rundor är en subscription-perk OBEROENDE av läge —
-                        // alltid Store-upsell (IndDev är inte längre unlock:en).
-                        router.push({ pathname: '/store' as const, params: { focus: 'subscription', from: '/lobby', fromCode: roomCode } });
+                        Alert.alert(
+                          'Premium feature',
+                          'Host more than 4 rounds require QuizVibe Premium. Get in Store?',
+                          [
+                            { text: 'Cancel', style: 'cancel' },
+                            { text: 'Go to Store', onPress: () => router.push({ pathname: '/store' as const, params: { focus: 'subscription', from: '/lobby', fromCode: roomCode } }) },
+                          ],
+                        );
                       }}
                       hasSubscription={hasPremium}
                       indivActive={!singlePlayerDefault && gameMode === 'individual-devices'}
                     />
                   </View>
                   {/* Game mode quick-select — under RoundsRuler för snabb mode-byte */}
-                  <View style={[styles.modeRow, { marginTop: Spacing.sm }]}>
+                  <View style={[styles.modeRow, { marginTop: Spacing.lg }]}>
                     {renderModeBox('single', 'Single player', true)}
                     {renderModeBox('ptp', 'Pass-the-Phone', true)}
                     {renderModeBox('indiv', 'Individual device', true, true)}
@@ -5547,6 +5608,14 @@ export default function LobbyScreen() {
 
         </>)}{/* /customizeExpanded */}
 
+        <TouchableOpacity
+          onPress={() => mainScrollRef.current?.scrollTo({ y: 0, animated: true })}
+          activeOpacity={0.7}
+          style={styles.toTopBtn}
+        >
+          <BlinkingLabel style={styles.toTopLabel}>Back to the top ↑</BlinkingLabel>
+        </TouchableOpacity>
+
         <View style={styles.bottomPad} />
       </ScrollView>
 
@@ -5564,7 +5633,13 @@ export default function LobbyScreen() {
       )}
 
       {/* Alla modaler utanför ScrollView */}
-      <AddPlayerModal visible={addModalVisible} onClose={() => setAddModalVisible(false)} onAdd={handleAddPlayer} takenGuestLetters={takenGuestLetters} />
+      <AddPlayerModal
+        visible={addModalVisible}
+        onClose={() => setAddModalVisible(false)}
+        onAdd={handleAddPlayer}
+        takenGuestLetters={takenGuestLetters}
+        existingNames={new Set(players.filter(p => !p.hasLeft).map(p => p.name.trim().toLowerCase()))}
+      />
 
       {/* ── Player-edit-sheet (host-only) ──────────────────────────
           Bottom-sheet där host kan redigera Assistance level, Competition
@@ -5958,6 +6033,54 @@ export default function LobbyScreen() {
               <Text style={styles.deletingText}>Please Wait — Deleting this Lobby</Text>
               <WaveDots />
             </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* ── Spotify connection guide modal ──────────────────────────────
+          Visas när användaren tappar "Guide How to connect" i Spotify-raden.
+          Förklarar steg-för-steg hur man kopplar Spotify Premium till QuizVibe. */}
+      <Modal
+        visible={spotifyGuideVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setSpotifyGuideVisible(false)}
+      >
+        <View style={styles.spotifyGuideOverlay}>
+          <Pressable
+            style={styles.spotifyGuideBackdrop}
+            onPress={() => setSpotifyGuideVisible(false)}
+          />
+          <View style={styles.spotifyGuideSheet}>
+            <Text style={styles.spotifyGuideTitle}>
+              How to connect your Spotify Premium account to QuizVibe
+            </Text>
+            <View style={styles.spotifyGuideSteps}>
+              <View style={styles.spotifyGuideStep}>
+                <Text style={styles.spotifyGuideStepNumber}>1</Text>
+                <Text style={styles.spotifyGuideStepText}>
+                  You need a Spotify Premium account
+                </Text>
+              </View>
+              <View style={styles.spotifyGuideStep}>
+                <Text style={styles.spotifyGuideStepNumber}>2</Text>
+                <Text style={styles.spotifyGuideStepText}>
+                  Click Connect Spotify account and accept to connect your Spotify to QuizVibe
+                </Text>
+              </View>
+              <View style={styles.spotifyGuideStep}>
+                <Text style={styles.spotifyGuideStepNumber}>3</Text>
+                <Text style={styles.spotifyGuideStepText}>
+                  Your QuizVibe account is connected to your Spotify account – now your user are ready to play Spotify music in the Individual device mode
+                </Text>
+              </View>
+            </View>
+            <Pressable
+              style={({ pressed }) => [styles.spotifyGuideCloseBtn, pressed && { opacity: 0.8 }]}
+              onPress={() => setSpotifyGuideVisible(false)}
+            >
+              <Text style={styles.spotifyGuideCloseBtnText}>Got it</Text>
+            </Pressable>
           </View>
         </View>
       </Modal>
@@ -6741,10 +6864,85 @@ const styles = StyleSheet.create({
     color: '#1DB954',            // Spotify Green — bekräftar kopplat konto.
     marginTop: 2,
   },
+  spotifyNotActivatedRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: 4,
+    marginTop: 2,
+  },
   spotifyNoConnectionLabel: {
     fontSize: FontSize.xs,
     color: Colors.textSecondary,
-    marginTop: 2,
+  },
+  spotifyGuideLinkText: {
+    fontSize: FontSize.xs,
+    color: '#1DB954',
+    textDecorationLine: 'underline',
+  },
+  spotifyGuideOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  spotifyGuideBackdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+  },
+  spotifyGuideSheet: {
+    width: '88%',
+    backgroundColor: Colors.cardElevated,
+    borderRadius: Radius.md,
+    padding: Spacing.lg,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    gap: Spacing.md,
+  },
+  spotifyGuideTitle: {
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.bold,
+    color: Colors.textPrimary,
+    lineHeight: 22,
+  },
+  spotifyGuideSteps: {
+    gap: Spacing.md,
+  },
+  spotifyGuideStep: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+    alignItems: 'flex-start',
+  },
+  spotifyGuideStepNumber: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#1DB954',
+    fontSize: FontSize.xs,
+    fontWeight: FontWeight.bold,
+    color: '#000',
+    textAlign: 'center',
+    lineHeight: 24,
+    flexShrink: 0,
+  },
+  spotifyGuideStepText: {
+    flex: 1,
+    fontSize: FontSize.sm,
+    color: Colors.textSecondary,
+    lineHeight: 20,
+  },
+  spotifyGuideCloseBtn: {
+    height: 44,
+    borderRadius: Radius.md,
+    backgroundColor: '#1DB954',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: Spacing.xs,
+  },
+  spotifyGuideCloseBtnText: {
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.bold,
+    color: '#000',
+    letterSpacing: 0.3,
   },
   spotifyHostControls: {
     flexDirection: 'row',
@@ -7322,17 +7520,19 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     borderRadius: 10,
-    borderWidth: 1,
-    borderColor: Colors.textSecondary,
+    borderWidth: 0.5,
+    borderColor: '#FFFFFF',
+    backgroundColor: Colors.primaryDark,
     alignItems: 'center',
     justifyContent: 'center',
   },
   infoIconText: {
-    fontSize: 12,
+    fontFamily: 'Georgia',
+    fontSize: 13,
     fontWeight: '700',
     fontStyle: 'italic',
-    color: Colors.textSecondary,
-    lineHeight: 14,
+    color: '#FFFFFF',
+    lineHeight: 15,
   },
   connectionLabel: {
     fontSize: FontSize.sm,
@@ -7686,6 +7886,8 @@ const styles = StyleSheet.create({
   },
   startHint: { fontSize: FontSize.xs, color: Colors.textSecondary, textAlign: 'center', lineHeight: 17 },
   bottomPad: { height: Spacing.xl },
+  toTopBtn: { alignItems: 'center', paddingVertical: Spacing.md },
+  toTopLabel: { fontSize: FontSize.sm, color: Colors.warning, letterSpacing: 0.5 },
   // ── Game Sequence ──────────────────────────────────────────────────────────
   // Ingen topp-badge längre — bara botten-badge (kategori) skär kantlinjen.
   // rowGap 16 räcker: botten-badge 9 px under + 7 px luft till nästa rads topkant.

@@ -486,6 +486,7 @@ export default function ProfileScreen() {
   const [spotifyConnected, setSpotifyConnected] = useState(false);
   const [spotifyDisplayName, setSpotifyDisplayName] = useState<string | null>(null);
   const [spotifyConnecting, setSpotifyConnecting] = useState(false);
+  const [spotifyGuideVisible, setSpotifyGuideVisible] = useState(false);
   // I Profile: Spotify är tillgängligt om kontot är kopplat (ingen IndDev-krav).
   const isSpotifyAvailable = spotifyConnected;
 
@@ -683,11 +684,24 @@ export default function ProfileScreen() {
     }
   };
 
-  const handleDisconnectSpotify = async () => {
-    await disconnectSpotify();
-    setSpotifyConnected(false);
-    setSpotifyDisplayName(null);
-    setSpotifyEnabled(false);
+  const handleDisconnectSpotify = () => {
+    Alert.alert(
+      'Disconnect Spotify',
+      'Do you want to disconnect your Spotify account?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Disconnect',
+          style: 'destructive',
+          onPress: async () => {
+            await disconnectSpotify();
+            setSpotifyConnected(false);
+            setSpotifyDisplayName(null);
+            setSpotifyEnabled(false);
+          },
+        },
+      ],
+    );
   };
 
   const handleToggleSpotifyEnabled = (val: boolean) => {
@@ -1546,10 +1560,10 @@ export default function ProfileScreen() {
               </View>
               <View style={{ flex: 1, alignSelf: 'flex-start', marginTop: 6, marginLeft: -8 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                  <Text style={[styles.connectionLabel, { minWidth: 0 }]}>Spotify DJ</Text>
+                  <Text style={[styles.connectionLabel, { minWidth: 0 }]}>Spotify</Text>
                   <Pressable
                     style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                    onPress={() => Alert.alert('Spotify DJ', '• Only applicable in Individual Devices mode\n\n• For Spotify music, one player at a time will be directed via QuizVibe to Spotify\n\n• All players in the same lobby must have a registered QuizVibe account with a connected Spotify account')}
+                    onPress={() => Alert.alert('Spotify', '• Only applicable in Individual Devices mode\n\n• For Spotify music, one player at a time will be directed via QuizVibe to Spotify\n\n• All players in the same lobby must have a registered QuizVibe account with a connected Spotify account')}
                     hitSlop={8}
                   >
                     <Text style={styles.infoIconText}>i</Text>
@@ -1563,8 +1577,18 @@ export default function ProfileScreen() {
                   </Pressable>
                 ) : (
                   <>
-                    <Text style={styles.spotifyNoConnectionLabel}>Not activated</Text>
-                    <Pressable onPress={handleConnectSpotify} disabled={spotifyConnecting} hitSlop={8}>
+                    <Text style={styles.spotifyNoConnectionLabel}>
+                      {'Not activated / '}
+                      <Text
+                        style={styles.spotifyGuideLinkText}
+                        onPress={() => setSpotifyGuideVisible(true)}
+                      >
+                        Guide How to connect
+                      </Text>
+                    </Text>
+                    <Pressable onPress={handleConnectSpotify} disabled={spotifyConnecting} hitSlop={8}
+                      style={({ pressed }) => [{ opacity: pressed ? 0.7 : 1 }]}
+                    >
                       <Text style={[styles.spotifyLinkText, { color: '#1DB954', fontSize: FontSize.sm, marginTop: 2 }]}>
                         {spotifyConnecting ? 'Connecting…' : 'Connect Spotify account'}
                       </Text>
@@ -1831,7 +1855,14 @@ export default function ProfileScreen() {
                   pressed && roundsCount < roundsMax && { opacity: 0.7 },
                 ]}
                 onPress={roundsCount >= roundsMax && !hasPremium
-                  ? () => router.push('/store?focus=subscription&from=/profile')
+                  ? () => Alert.alert(
+                      'Premium feature',
+                      'Host more than 4 rounds require QuizVibe Premium. Go to Store?',
+                      [
+                        { text: 'Cancel', style: 'cancel' },
+                        { text: 'Go to Store', onPress: () => router.push('/store?focus=subscription&from=/profile') },
+                      ],
+                    )
                   : handleIncrementRounds}
               >
                 <Text
@@ -1845,7 +1876,14 @@ export default function ProfileScreen() {
               </Pressable>
               {roundsCount >= roundsMax && (
                 <TouchableOpacity
-                  onPress={() => router.push('/store?focus=subscription&from=/profile')}
+                  onPress={() => Alert.alert(
+                    'Premium feature',
+                    'Host more than 4 rounds require QuizVibe Premium. Go to Store?',
+                    [
+                      { text: 'Cancel', style: 'cancel' },
+                      { text: 'Go to Store', onPress: () => router.push('/store?focus=subscription&from=/profile') },
+                    ],
+                  )}
                   activeOpacity={0.7}
                   style={{ backgroundColor: hasPremium ? '#F5A623' : '#6B7280', borderRadius: 4, paddingHorizontal: 8, paddingVertical: 2, marginLeft: 4 }}
                 >
@@ -1858,7 +1896,14 @@ export default function ProfileScreen() {
                 value={roundsCount}
                 min={ROUNDS_MIN}
                 gameModeMax={roundsMax}
-                onPremiumPress={() => router.push('/store?focus=subscription&from=/profile')}
+                onPremiumPress={() => Alert.alert(
+                  'Premium feature',
+                  'Host more than 4 rounds require QuizVibe Premium. Go to Store?',
+                  [
+                    { text: 'Cancel', style: 'cancel' },
+                    { text: 'Go to Store', onPress: () => router.push('/store?focus=subscription&from=/profile') },
+                  ],
+                )}
                 hasSubscription={hasPremium}
                 indivActive={!singlePlayerDefault && gameMode === 'individual-devices'}
               />
@@ -1965,7 +2010,14 @@ export default function ProfileScreen() {
                 styles.addPackageBtn,
                 pressed && { opacity: 0.7 },
               ]}
-              onPress={() => router.push('/store?focus=packages-only&from=/profile')}
+              onPress={() => Alert.alert(
+                'Premium feature',
+                'Add Host packages for customized Quiz experience. Go to Store?',
+                [
+                  { text: 'Cancel', style: 'cancel' },
+                  { text: 'Go to Store', onPress: () => router.push('/store?focus=packages-only&from=/profile') },
+                ],
+              )}
             >
               <Text style={styles.modeLabel}>+ Add Host packages</Text>
               <View
@@ -2713,6 +2765,54 @@ export default function ProfileScreen() {
           </View>
         </View>
       </Modal>
+
+      {/* ── Spotify connection guide modal ──────────────────────────────
+          Visas när användaren tappar "Guide How to connect" i Spotify-raden. */}
+      <Modal
+        visible={spotifyGuideVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setSpotifyGuideVisible(false)}
+      >
+        <View style={styles.spotifyGuideOverlay}>
+          <Pressable
+            style={styles.spotifyGuideBackdrop}
+            onPress={() => setSpotifyGuideVisible(false)}
+          />
+          <View style={styles.spotifyGuideSheet}>
+            <Text style={styles.spotifyGuideTitle}>
+              How to connect your Spotify Premium account to QuizVibe
+            </Text>
+            <View style={styles.spotifyGuideSteps}>
+              <View style={styles.spotifyGuideStep}>
+                <Text style={styles.spotifyGuideStepNumber}>1</Text>
+                <Text style={styles.spotifyGuideStepText}>
+                  You need a Spotify Premium account
+                </Text>
+              </View>
+              <View style={styles.spotifyGuideStep}>
+                <Text style={styles.spotifyGuideStepNumber}>2</Text>
+                <Text style={styles.spotifyGuideStepText}>
+                  Click Connect Spotify account and accept to connect your Spotify to QuizVibe
+                </Text>
+              </View>
+              <View style={styles.spotifyGuideStep}>
+                <Text style={styles.spotifyGuideStepNumber}>3</Text>
+                <Text style={styles.spotifyGuideStepText}>
+                  Your QuizVibe account is connected to your Spotify account – now your user are ready to play Spotify music in the Individual device mode
+                </Text>
+              </View>
+            </View>
+            <Pressable
+              style={({ pressed }) => [styles.spotifyGuideCloseBtn, pressed && { opacity: 0.8 }]}
+              onPress={() => setSpotifyGuideVisible(false)}
+            >
+              <Text style={styles.spotifyGuideCloseBtnText}>Got it</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+
     </SafeAreaView>
   );
 }
@@ -3905,17 +4005,19 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     borderRadius: 10,
-    borderWidth: 1,
-    borderColor: Colors.textSecondary,
+    borderWidth: 0.5,
+    borderColor: '#FFFFFF',
+    backgroundColor: Colors.primaryDark,
     alignItems: 'center',
     justifyContent: 'center',
   },
   infoIconText: {
-    fontSize: 12,
+    fontFamily: 'Georgia',
+    fontSize: 13,
     fontWeight: '700',
     fontStyle: 'italic',
-    color: Colors.textSecondary,
-    lineHeight: 14,
+    color: '#FFFFFF',
+    lineHeight: 15,
   },
   // Speglar Lobby:s purchasedPackageBox + purchasedPackageBoxActive 1:1
   // — fixed width 204, xs-padding vertikalt, primary border + elevated bg
@@ -4355,6 +4457,82 @@ const styles = StyleSheet.create({
   },
   sourceMatrixSwitch: {
     transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }],
+  },
+  spotifyNotActivatedRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: 4,
+    marginTop: 2,
+  },
+  spotifyGuideLinkText: {
+    fontSize: FontSize.xs,
+    color: '#1DB954',
+    textDecorationLine: 'underline',
+  },
+  spotifyGuideOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  spotifyGuideBackdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+  },
+  spotifyGuideSheet: {
+    width: '88%',
+    backgroundColor: Colors.cardElevated,
+    borderRadius: Radius.md,
+    padding: Spacing.lg,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    gap: Spacing.md,
+  },
+  spotifyGuideTitle: {
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.bold,
+    color: Colors.textPrimary,
+    lineHeight: 22,
+  },
+  spotifyGuideSteps: {
+    gap: Spacing.md,
+  },
+  spotifyGuideStep: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+    alignItems: 'flex-start',
+  },
+  spotifyGuideStepNumber: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#1DB954',
+    fontSize: FontSize.xs,
+    fontWeight: FontWeight.bold,
+    color: '#000',
+    textAlign: 'center',
+    lineHeight: 24,
+    flexShrink: 0,
+  },
+  spotifyGuideStepText: {
+    flex: 1,
+    fontSize: FontSize.sm,
+    color: Colors.textSecondary,
+    lineHeight: 20,
+  },
+  spotifyGuideCloseBtn: {
+    height: 44,
+    borderRadius: Radius.md,
+    backgroundColor: '#1DB954',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: Spacing.xs,
+  },
+  spotifyGuideCloseBtnText: {
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.bold,
+    color: '#000',
+    letterSpacing: 0.3,
   },
 });
 

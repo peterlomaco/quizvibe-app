@@ -1778,7 +1778,7 @@ export default function HomeScreen() {
     regPasswordConfirmed &&
     regParsedBirthYear !== null;
 
-  const handleRegCheckPlayerName = () => {
+  const handleRegCheckPlayerName = async () => {
     const trimmed = regPlayerName.trim();
     if (!trimmed) return;
     // Auto-inserta dash om användaren bara typat letters innan Check —
@@ -1787,9 +1787,20 @@ export default function HomeScreen() {
     if (normalized !== regPlayerName) setRegPlayerName(normalized);
     Keyboard.dismiss();
     setRegPlayerNameStatus('checking');
-    setTimeout(() => {
-      setRegPlayerNameStatus(validatePlayerName(normalized));
-    }, 600);
+    // Snabb lokal validering (format + profanity + mock-blocklist).
+    const localResult = validatePlayerName(normalized);
+    if (localResult !== 'available') {
+      setRegPlayerNameStatus(localResult);
+      return;
+    }
+    // Riktigt uniqueness-check mot Supabase: om namnet finns → 'taken'.
+    try {
+      const existing = await lookupEmailByPlayerName(normalized);
+      setRegPlayerNameStatus(existing ? 'taken' : 'available');
+    } catch {
+      // Vid nätverksfel: faller tillbaka på lokal validering (godkänd).
+      setRegPlayerNameStatus('available');
+    }
   };
 
   // Rensa namnet och låt användaren skriva eget. Status faller till 'idle'
