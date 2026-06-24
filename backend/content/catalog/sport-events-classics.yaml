@@ -270,12 +270,7 @@ items:
     probability: 86
     wikimediaSearchHints: ["Sweden Bulgaria 1994 World Cup third place playoff"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "EcE842FxpQk"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Football Flashback 6"
-        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+    # youtubeClips borttagna 2026-06-22: titeln på EcE842FxpQk visade "199…" — spoilade decennium. Ersättningsklipp krävs.
   - id: tomas-brolin-vm-1994
     displayName: "Tomas Brolins mål VM-94"
     correctYear: 1994
@@ -312,12 +307,7 @@ items:
     probability: 72
     wikimediaSearchHints: ["Annika Sorenstam 2002 Kraft Nabisco Championship win"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "vjB0zk5P2SA"
-        startSec: 6600
-        endSec: 6615
-        channelTitle: "LPGA"
-        notes: "LPGA official full final round replay (119 min) — start ~110 min in vid playoff mot Liselotte Neumann. Curerad 2026-05-27 via refined query. Replace med dedikerat highlight-klipp om sådant hittas."
+    # youtubeClips borttagna 2026-06-22: titeln på vjB0zk5P2SA visade "2002" — spoilade rätt svar. Dedikerat highlight-klipp utan år i titeln krävs.
   - id: stefan-holm-os-guld-2004
     displayName: "Stefan Holm OS-guld höjdhopp Aten"
     correctYear: 2004
@@ -330,18 +320,13 @@ items:
         endSec: 45
         channelTitle: "MaramaGitz"
         notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
-  - id: christian-olsson-tresteg-2004
-    displayName: "Christian Olsson OS-guld tresteg Aten"
-    correctYear: 2004
+  - id: christian-olsson-em-tresteg-2006
+    displayName: "Christian Olsson EM-guld tresteg Göteborg"
+    correctYear: 2006
     probability: 82
-    wikimediaSearchHints: ["Christian Olsson 2004 Athens Olympics triple jump gold"]
+    wikimediaSearchHints: ["Christian Olsson 2006 European Championships triple jump gold Gothenburg"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "6zEKGJenFhY"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Biketommy999"
-        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+    # youtubeClips saknas: alla HD-klipp har "2006" i titeln. Ersättningsklipp utan år i titeln krävs.
   - id: zlatan-heel-italy-em-2004
     displayName: "Zlatans häl-mål mot Italien EM-04"
     correctYear: 2004
@@ -360,18 +345,13 @@ items:
         endSec: 20
         channelTitle: "Radiosporten"
         notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
-  - id: anja-parson-os-guld-slalom-2006
-    displayName: "Anja Pärson OS-guld slalom Torino"
-    correctYear: 2006
+  - id: anja-parson-vm-slalom-are-2007
+    displayName: "Anja Pärson VM-guld slalom Åre"
+    correctYear: 2007
     probability: 82
-    wikimediaSearchHints: ["Anja Parson 2006 Turin Olympics slalom gold"]
+    wikimediaSearchHints: ["Anja Parson 2007 Alpine Ski World Championships slalom gold Are Sweden"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "-JcJcrFEAjw"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Biketommy999"
-        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+    # youtubeClips saknas: alla HD-klipp har "2007" i titeln. Ersättningsklipp utan år i titeln krävs.
   - id: phelps-beijing-8-guld-2008
     displayName: "Michael Phelps 8 OS-guld Peking"
     correctYear: 2008
@@ -403,12 +383,7 @@ items:
     probability: 70
     wikimediaSearchHints: ["Johan Olsson 2013 World Championship 50km cross country gold"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "cX3k5BdCc6k"
-        startSec: 30
-        endSec: 45
-        channelTitle: "VMValdifiemme2013"
-        notes: "Refined query 2026-05-27 — 'AMAZING Johan Olsson Men's 50 Km Val di Fiemme 2013'."
+    # youtubeClips borttagna 2026-06-22: cX3k5BdCc6k från kanalen "VMValdifiemme2013" — titeln löd "...Val di Fiemme 2013". Kanalnamnet och titeln visade båda 2013. Ersättningsklipp krävs.
   - id: kalla-os-guld-stafett-2014
     displayName: "Charlotte Kalla OS-guld stafett Sochi"
     correctYear: 2014

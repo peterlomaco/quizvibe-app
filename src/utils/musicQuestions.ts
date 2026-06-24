@@ -6127,29 +6127,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "sverige-vm-94-brons-bulgarien",
-    "displayName": "Sverige VM-brons mot Bulgarien",
-    "correctYear": 1994,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "audiences": [
-      "all"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "EcE842FxpQk",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Football Flashback 6",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
-      }
-    ]
-  },
-  {
     "id": "the-lion-king-1994",
     "displayName": "The Lion King",
     "correctYear": 1994,
@@ -7505,29 +7482,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "sorenstam-kraft-nabisco-2002",
-    "displayName": "Annika Sörenstam vinner Kraft Nabisco",
-    "correctYear": 2002,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "audiences": [
-      "all"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "vjB0zk5P2SA",
-        "startSec": 6600,
-        "endSec": 6615,
-        "channelTitle": "LPGA",
-        "license": "standard",
-        "notes": "LPGA official full final round replay (119 min) — start ~110 min in vid playoff mot Liselotte Neumann. Curerad 2026-05-27 via refined query. Replace med dedikerat highlight-klipp om sådant hittas."
-      }
-    ]
-  },
-  {
     "id": "50-cent-in-da-club",
     "displayName": "In da Club — 50 Cent",
     "correctYear": 2003,
@@ -7673,29 +7627,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "The White Stripes",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
-      }
-    ]
-  },
-  {
-    "id": "christian-olsson-tresteg-2004",
-    "displayName": "Christian Olsson OS-guld tresteg Aten",
-    "correctYear": 2004,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "audiences": [
-      "all"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "6zEKGJenFhY",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Biketommy999",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
       }
     ]
   },
@@ -8084,29 +8015,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Timbuktu - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
-      }
-    ]
-  },
-  {
-    "id": "anja-parson-os-guld-slalom-2006",
-    "displayName": "Anja Pärson OS-guld slalom Torino",
-    "correctYear": 2006,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "audiences": [
-      "all"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "-JcJcrFEAjw",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Biketommy999",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
       }
     ]
   },
@@ -9633,29 +9541,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Buena Vista Sverige",
         "license": "standard",
         "notes": "Officiell svensk trailer. Buena Vista Sverige. Robert Gustafsson."
-      }
-    ]
-  },
-  {
-    "id": "johan-olsson-vm-50km-2013",
-    "displayName": "Johan Olsson VM-guld 50 km Val di Fiemme",
-    "correctYear": 2013,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "audiences": [
-      "all"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "cX3k5BdCc6k",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "VMValdifiemme2013",
-        "license": "standard",
-        "notes": "Refined query 2026-05-27 — 'AMAZING Johan Olsson Men's 50 Km Val di Fiemme 2013'."
       }
     ]
   },
