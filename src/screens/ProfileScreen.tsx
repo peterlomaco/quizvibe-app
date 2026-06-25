@@ -2283,6 +2283,9 @@ export default function ProfileScreen() {
               Privacy Policy and Terms open in a secure in-app browser.
               FAQ is handled inside the app.
             </Text>
+            <Text style={styles.legalDisclaimer}>
+              QuizVibe is an independent app and is not affiliated with, sponsored by, or officially endorsed by Spotify AB or Google LLC.
+            </Text>
           </View>
         )}
 
@@ -3356,6 +3359,13 @@ const styles = StyleSheet.create({
     marginTop: Spacing.sm,
     marginBottom: Spacing.xs,
   },
+  legalDisclaimer: {
+    ...Typography.caption,
+    color: Colors.textSecondary,
+    marginTop: Spacing.xs,
+    marginBottom: Spacing.xs,
+    fontStyle: 'italic',
+  },
 
   // QuizVibe friends card (header upptill, full-bredd-knapp i underkant)
   friendsCard: {
@@ -4005,9 +4015,9 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     borderRadius: 10,
-    borderWidth: 0.5,
-    borderColor: '#FFFFFF',
-    backgroundColor: Colors.primaryDark,
+    borderWidth: 1,
+    borderColor: Colors.success,
+    backgroundColor: '#6B7280',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -4016,7 +4026,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '700',
     fontStyle: 'italic',
-    color: '#FFFFFF',
+    color: Colors.success,
     lineHeight: 15,
   },
   // Speglar Lobby:s purchasedPackageBox + purchasedPackageBoxActive 1:1
