@@ -631,18 +631,6 @@ items:
         endSec: 45
         channelTitle: "Mando Diao - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
-  - id: katy-perry-firework
-    displayName: "Firework — Katy Perry"
-    correctYear: 2010
-    probability: 84
-    wikimediaSearchHints: ["Katy Perry Firework 2010"]
-    answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "lmHSLBnzB0M"
-        startSec: 5
-        endSec: 20
-        channelTitle: "Katy Perry - Topic"
-        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: rihanna-diamonds
     displayName: "Diamonds — Rihanna"
     correctYear: 2012
@@ -1082,3 +1070,29 @@ items:
         endSec: 65
         channelTitle: "Hadise"
         notes: "Official music video. ESC 2009 Turkey entry."
+  - id: southside-spinners-luvstruck
+    displayName: "Luvstruck — Southside Spinners"
+    correctYear: 2000
+    probability: 78
+    wikimediaSearchHints: ["Southside Spinners Luvstruck 2000 trance dance"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "5kW0BW8B5hjrbpe0OuFUr9"
+    youtubeClips:
+      - videoId: "FOfXUmOiUDg"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Southside Spinners"
+        notes: "Official video 2000."
+  - id: antique-die-for-you
+    displayName: "(I Would) Die for You — Antique"
+    correctYear: 2001
+    probability: 76
+    wikimediaSearchHints: ["Antique Die for You Eurovision 2001 Greece Swedish-Greek duo"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Eurovision"]
+    youtubeClips:
+      - videoId: "VVLfuW3KiLY"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Antique"
+        notes: "Official music video. ESC 2001 Greece entry (3rd place)."

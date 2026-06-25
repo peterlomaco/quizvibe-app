@@ -911,3 +911,30 @@ items:
         endSec: 30
         channelTitle: "Ted Gärdestad - Topic"
         notes: "Studio-audio från officiell Topic-kanal."
+  - id: neil-diamond-girl-youll-be-a-woman-soon
+    displayName: "Girl, You'll Be a Woman Soon — Neil Diamond"
+    correctYear: 1967
+    probability: 82
+    wikimediaSearchHints: ["Neil Diamond Girl You'll Be a Woman Soon 1967"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "1BmVQ5RGqqtF5cnsv6cQYu"
+    youtubeClips:
+      - videoId: "qGvMjgLXBi0"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Neil Diamond"
+        notes: "Neil Diamond - Girl You'll Be a Woman Soon (1967)."
+  - id: lasse-berghagen-en-kvall-i-juni
+    displayName: "En kväll i juni — Lasse Berghagen"
+    correctYear: 1975
+    probability: 80
+    wikimediaSearchHints: ["Lasse Berghagen En kväll i juni 1975 Swedish schlager"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Summer"]
+    spotifyTrackId: "6xYeTISkTw4S9K9hJgr1KJ"
+    youtubeClips:
+      - videoId: "RS1P0GhjmnQ"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Lasse Berghagen - Topic"
+        notes: "Studio-inspelning. WM Sweden (Warner Music Sweden) officiell upload."

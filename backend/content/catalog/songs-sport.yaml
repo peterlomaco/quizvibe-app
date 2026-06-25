@@ -196,3 +196,57 @@ items:
     wikimediaSearchHints: ["Mondo Armand Duplantis Bop 2025"]
     answerMethods: ["timeline"]
     genrePackages: ["pkg-sport"]
+  # ── Fotbollsatmosfär ──
+  - id: blur-song-2
+    displayName: "Song 2 — Blur"
+    correctYear: 1997
+    probability: 88
+    wikimediaSearchHints: ["Blur Song 2 1997 British rock"]
+    answerMethods: ["timeline"]
+    genrePackages: ["sport", "football"]
+    youtubeClips:
+      - videoId: "SSbBvKaM6sk"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Blur"
+        notes: "Official music video."
+  - id: zombie-nation-kernkraft-400
+    displayName: "Kernkraft 400 — Zombie Nation"
+    correctYear: 1999
+    probability: 86
+    wikimediaSearchHints: ["Zombie Nation Kernkraft 400 1999 techno dance"]
+    answerMethods: ["timeline"]
+    genrePackages: ["sport", "football"]
+    youtubeClips:
+      - videoId: "SxhwbXYe1XE"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Zombie Nation"
+        notes: "Official video 1999."
+  - id: dario-g-carnaval-de-paris
+    displayName: "Carnaval de Paris — Dario G"
+    correctYear: 1998
+    probability: 84
+    wikimediaSearchHints: ["Dario G Carnaval de Paris 1998 France World Cup anthem"]
+    answerMethods: ["timeline"]
+    genrePackages: ["sport", "football"]
+    spotifyTrackId: "59mdyQniSaNFeXaKMGu9RB"
+    youtubeClips:
+      - videoId: "dLB56lFYlBI"
+        startSec: 5
+        endSec: 35
+        channelTitle: "Dario G"
+        notes: "Official music video. FIFA World Cup France 1998 anthem."
+  - id: planet-funk-chase-the-sun
+    displayName: "Chase the Sun — Planet Funk"
+    correctYear: 2001
+    probability: 82
+    wikimediaSearchHints: ["Planet Funk Chase the Sun 2001 dance electronic"]
+    answerMethods: ["timeline"]
+    genrePackages: ["sport", "football"]
+    youtubeClips:
+      - videoId: "2ZlJLzKzRGA"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Planet Funk"
+        notes: "Official video 2001."

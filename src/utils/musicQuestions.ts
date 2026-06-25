@@ -1204,6 +1204,31 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "neil-diamond-girl-youll-be-a-woman-soon",
+    "displayName": "Girl, You'll Be a Woman Soon — Neil Diamond",
+    "correctYear": 1967,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "spotifyTrackId": "1BmVQ5RGqqtF5cnsv6cQYu",
+    "youtubeClips": [
+      {
+        "videoId": "qGvMjgLXBi0",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Neil Diamond",
+        "license": "standard",
+        "notes": "Neil Diamond - Girl You'll Be a Woman Soon (1967)."
+      }
+    ]
+  },
+  {
     "id": "sven-ingvars-jag-ringer-pa-fredag",
     "displayName": "Jag ringer på fredag — Sven-Ingvars",
     "correctYear": 1967,
@@ -2246,6 +2271,34 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Universal Pictures",
         "license": "standard",
         "notes": "Official Universal Pictures-klipp — 'Bigger Boat'-scenen i 4K HDR."
+      }
+    ]
+  },
+  {
+    "id": "lasse-berghagen-en-kvall-i-juni",
+    "displayName": "En kväll i juni — Lasse Berghagen",
+    "correctYear": 1975,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Summer"
+    ],
+    "spotifyTrackId": "6xYeTISkTw4S9K9hJgr1KJ",
+    "youtubeClips": [
+      {
+        "videoId": "RS1P0GhjmnQ",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Lasse Berghagen - Topic",
+        "license": "standard",
+        "notes": "Studio-inspelning. WM Sweden (Warner Music Sweden) officiell upload."
       }
     ]
   },
@@ -4041,7 +4094,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "sweden"
     ],
-    "spotifyTrackId": "7yhYeVOti4KCNRQhBE2qFj",
+    "spotifyTrackId": "2W8J9Gfw5q8tSvsuWSnMBl",
     "youtubeClips": [
       {
         "videoId": "58RgLQ_0Ars",
@@ -6555,6 +6608,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "blur-song-2",
+    "displayName": "Song 2 — Blur",
+    "correctYear": 1997,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "all"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "sport",
+      "football"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "SSbBvKaM6sk",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Blur",
+        "license": "standard",
+        "notes": "Official music video."
+      }
+    ]
+  },
+  {
     "id": "celine-dion-my-heart-will-go-on",
     "displayName": "My Heart Will Go On — Celine Dion",
     "correctYear": 1997,
@@ -6708,6 +6788,34 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 1998 vinnare — Israel."
+      }
+    ]
+  },
+  {
+    "id": "dario-g-carnaval-de-paris",
+    "displayName": "Carnaval de Paris — Dario G",
+    "correctYear": 1998,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "all"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "sport",
+      "football"
+    ],
+    "spotifyTrackId": "59mdyQniSaNFeXaKMGu9RB",
+    "youtubeClips": [
+      {
+        "videoId": "dLB56lFYlBI",
+        "startSec": 5,
+        "endSec": 35,
+        "channelTitle": "Dario G",
+        "license": "standard",
+        "notes": "Official music video. FIFA World Cup France 1998 anthem."
       }
     ]
   },
@@ -6959,6 +7067,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "zombie-nation-kernkraft-400",
+    "displayName": "Kernkraft 400 — Zombie Nation",
+    "correctYear": 1999,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "all"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "sport",
+      "football"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "SxhwbXYe1XE",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Zombie Nation",
+        "license": "standard",
+        "notes": "Official video 1999."
+      }
+    ]
+  },
+  {
     "id": "barbados-kom-hem",
     "displayName": "Kom hem — Barbados",
     "correctYear": 2000,
@@ -7204,6 +7339,31 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "southside-spinners-luvstruck",
+    "displayName": "Luvstruck — Southside Spinners",
+    "correctYear": 2000,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-z",
+      "millennials"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "spotifyTrackId": "5kW0BW8B5hjrbpe0OuFUr9",
+    "youtubeClips": [
+      {
+        "videoId": "FOfXUmOiUDg",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Southside Spinners",
+        "license": "standard",
+        "notes": "Official video 2000."
+      }
+    ]
+  },
+  {
     "id": "the-hives-hate-to-say",
     "displayName": "Hate to Say I Told You So — The Hives",
     "correctYear": 2000,
@@ -7239,6 +7399,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 211,
         "channelTitle": "Bussin",
         "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "antique-die-for-you",
+    "displayName": "(I Would) Die for You — Antique",
+    "correctYear": 2001,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-z",
+      "millennials"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Eurovision"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "VVLfuW3KiLY",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Antique",
+        "license": "standard",
+        "notes": "Official music video. ESC 2001 Greece entry (3rd place)."
       }
     ]
   },
@@ -7331,6 +7518,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Movieclips",
         "license": "standard",
         "notes": "Curerad 2026-05-29 — officiell 2001-trailer #1 (Movieclips)."
+      }
+    ]
+  },
+  {
+    "id": "planet-funk-chase-the-sun",
+    "displayName": "Chase the Sun — Planet Funk",
+    "correctYear": 2001,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "all"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "sport",
+      "football"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "2ZlJLzKzRGA",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Planet Funk",
+        "license": "standard",
+        "notes": "Official video 2001."
       }
     ]
   },
@@ -8781,30 +8995,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 264,
         "channelTitle": "Eminem - Topic",
         "license": "standard"
-      }
-    ]
-  },
-  {
-    "id": "katy-perry-firework",
-    "displayName": "Firework — Katy Perry",
-    "correctYear": 2010,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "gen-z",
-      "millennials"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "lmHSLBnzB0M",
-        "startSec": 5,
-        "endSec": 20,
-        "channelTitle": "Katy Perry - Topic",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
       }
     ]
   },
@@ -11246,29 +11436,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Sony Music Sweden",
         "license": "standard",
         "notes": "Officiell Sony Music Sweden 2022."
-      }
-    ]
-  },
-  {
-    "id": "messi-world-cup-2022",
-    "displayName": "Messi och Argentina vinner VM i Qatar",
-    "correctYear": 2022,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "audiences": [
-      "all"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "otlAmUJ5wfw",
-        "startSec": 0,
-        "endSec": 15,
-        "channelTitle": "cfcfootball",
-        "license": "standard",
-        "notes": "Curerad 2026-05-29 — Messis reaktion på VM-vinsten 2022 (FIFA-officiella var blockerade)."
       }
     ]
   },
