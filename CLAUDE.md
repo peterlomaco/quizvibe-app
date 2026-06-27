@@ -332,6 +332,7 @@ Register-formen har komplex keyboard-hantering eftersom Email/Password använder
 - **Tightare sheet padding/gap på korta skärmar**: BÅDA `modal.sheet` (JoinModal) och `profileMenu.sheet` (Register) använder nu `SCREEN_HEIGHT < 700` (var `< 600`) för padding `md` istället för `xl` + gap `sm` istället för `md`.
 - **Dölj titel + subtitel medan custom-keyboardet är uppe** på korta skärmar (`SCREEN_HEIGHT < 700 && (playerNameFocused || focusedCodeIdx !== null)` för guest; `SCREEN_HEIGHT < 700 && regPlayerNameFocused` för Register). Frigör ~70 px. Resultat: ScrollView:n får ~162 px → PlayerName-fältet syns ovanför keyboardet.
 - **Guest-form scroll-to-field** (saknades — Register hade det redan): `guestScrollRef` scrollar PlayerName (första fältet) till `y:0` vid focus, Room Code (sista fältet) till `scrollToEnd()`. Se `memory/project_codekeyboard_short_screens.md`. **OBS**: TestFlight-byggen har JS inbäddad från byggtid → kräver ny build för att se fixen (testa via Expo Go / dev build för live JS).
+- **Verifierat fungerande** på äldre iOS-telefon av Peter 2026-06-27 — PlayerName-fältet syns nu ovanför keyboardet i både guest- och Register-flödet.
 
 **KAV behavior är `"padding"`, INTE `"height"`**: `behavior="height"` har en känd iOS-bugg där KAV:n ibland fastnar i shrunk-läge efter att tangentbordet stängts → sheet:en blir liten även utan keyboard. Stick to padding.
 
