@@ -178,6 +178,11 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
 
   // Refs till de 6 cells för rumkoden — för auto-fokus framåt och bakåt.
   const codeRefs = useRef<Array<TextInput | null>>([]);
+  // Ref till guest-formens ScrollView så vi kan scrolla det fokuserade
+  // fältet till syn när det custom CodeKeyboardet öppnas. På korta skärmar
+  // (äldre iPhones) krymper ScrollView:n så det aktiva fältet annars hamnar
+  // utanför den synliga ytan ovanför tangentbordet.
+  const guestScrollRef = useRef<ScrollView>(null);
   // Refs till PlayerName-fältens två separata TextInputs (split-field UI).
   // Letter-fältet är default-fokus efter Remove; digit-fältet kan fokuseras
   // bara när letter-sektionen har minst 1 tecken.
@@ -839,12 +844,24 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
 
           {step === 'guest' && (
             <>
-              <Text style={modal.title}>Join as Guest</Text>
-              <Text style={modal.subtitle}>Tap a field to fill in your details</Text>
+              {/* På korta skärmar (< 700 px) göms titel + subtitel medan det
+                  custom CodeKeyboardet är uppe, så fältet som skrivs in ryms
+                  ovanför tangentbordet. På högre skärmar visas de alltid. */}
+              {!(SCREEN_HEIGHT < 700 && (playerNameFocused || focusedCodeIdx !== null)) && (
+                <>
+                  <Text style={modal.title}>Join as Guest</Text>
+                  <Text style={modal.subtitle}>Tap a field to fill in your details</Text>
+                </>
+              )}
 
               <ScrollView
+                ref={guestScrollRef}
                 keyboardShouldPersistTaps="handled"
-                style={{ flexShrink: 1, maxHeight: 420 }}
+                // flexShrink: 1 låter ScrollView:n krympa när PlayerName- eller
+                // Room Code-fältets custom CodeKeyboard tar plats nedanför.
+                // maxHeight sänks på korta skärmar (äldre iPhones) så fält +
+                // tangentbord ryms inom sheet:ens maxHeight (90 %).
+                style={{ flexShrink: 1, maxHeight: SCREEN_HEIGHT < 700 ? 240 : 420 }}
                 contentContainerStyle={{ gap: Spacing.md }}
               >
                 {/* PlayerName — split-field: [Letters] – [Digits] [Check].
@@ -881,6 +898,11 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                         setFocusedCodeIdx(null);
                         setPlayerNameKbMode('letter');
                         setPlayerNameFocused(true);
+                        // Scrolla PlayerName (formens första fält) till toppen
+                        // så det syns ovanför CodeKeyboardet på korta skärmar.
+                        requestAnimationFrame(() => {
+                          guestScrollRef.current?.scrollTo({ y: 0, animated: true });
+                        });
                       }}
                       onBlur={() => setPlayerNameFocused(false)}
                     />
@@ -916,6 +938,9 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                         setFocusedCodeIdx(null);
                         setPlayerNameKbMode('digit');
                         setPlayerNameFocused(true);
+                        requestAnimationFrame(() => {
+                          guestScrollRef.current?.scrollTo({ y: 0, animated: true });
+                        });
                       }}
                       onBlur={() => setPlayerNameFocused(false)}
                     />
@@ -1111,7 +1136,15 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                               // CodeKeyboard (custom in-app) sköter input,
                               // handleCellFocus enforcar sekventiell fokus.
                               showSoftInputOnFocus={false}
-                              onFocus={() => handleCellFocus(i)}
+                              onFocus={() => {
+                                handleCellFocus(i);
+                                // Room Code är formens sista fält — scrolla ned
+                                // så det syns ovanför CodeKeyboardet på korta
+                                // skärmar.
+                                requestAnimationFrame(() => {
+                                  guestScrollRef.current?.scrollToEnd({ animated: true });
+                                });
+                              }}
                               autoCapitalize={isLetterCell ? 'characters' : 'none'}
                               autoCorrect={false}
                               spellCheck={false}
@@ -2647,8 +2680,14 @@ export default function HomeScreen() {
                   <Text style={profileMenu.backText}>← Back</Text>
                 </TouchableOpacity>
 
-                <Text style={profileMenu.title}>Register</Text>
-                <Text style={profileMenu.subtitle}>Set up your profile to start playing</Text>
+                {/* På korta skärmar göms titel + subtitel medan PlayerName:s
+                    custom CodeKeyboard är uppe, så fältet ryms ovanför det. */}
+                {!(SCREEN_HEIGHT < 700 && regPlayerNameFocused) && (
+                  <>
+                    <Text style={profileMenu.title}>Register</Text>
+                    <Text style={profileMenu.subtitle}>Set up your profile to start playing</Text>
+                  </>
+                )}
 
                 <ScrollView
                   ref={regScrollRef}
@@ -3248,8 +3287,10 @@ const modal = StyleSheet.create({
   // när chrome+keyboard sammanlagt skulle överskrida sheet:s maxhöjd.
   sheet: {
     backgroundColor: Colors.card, borderTopLeftRadius: 24, borderTopRightRadius: 24,
-    padding: SCREEN_HEIGHT < 600 ? Spacing.md : Spacing.xl,
-    gap: SCREEN_HEIGHT < 600 ? Spacing.sm : Spacing.md,
+    // Tightare padding/gap på korta skärmar (< 700 px = iPhone SE/8 m.fl.) så
+    // fält + custom CodeKeyboard ryms inom maxHeight (90 %).
+    padding: SCREEN_HEIGHT < 700 ? Spacing.md : Spacing.xl,
+    gap: SCREEN_HEIGHT < 700 ? Spacing.sm : Spacing.md,
     borderWidth: 1, borderColor: Colors.border,
     maxHeight: '90%',
   },
@@ -3595,9 +3636,11 @@ const profileMenu = StyleSheet.create({
     backgroundColor: Colors.card,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
-    padding: Spacing.xl,
-    paddingBottom: Spacing.xxl,
-    gap: Spacing.md,
+    // Tightare padding/gap på korta skärmar (< 700 px) så Register-formens
+    // fält + custom CodeKeyboard ryms inom maxHeight (90 %).
+    padding: SCREEN_HEIGHT < 700 ? Spacing.md : Spacing.xl,
+    paddingBottom: SCREEN_HEIGHT < 700 ? Spacing.lg : Spacing.xxl,
+    gap: SCREEN_HEIGHT < 700 ? Spacing.sm : Spacing.md,
     borderWidth: 1,
     borderColor: Colors.border,
     maxHeight: '90%',

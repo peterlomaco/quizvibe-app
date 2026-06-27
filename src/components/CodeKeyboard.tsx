@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Dimensions, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Colors, Radius, Spacing } from '../theme';
 import { DIGIT_CHARSET, LETTER_CHARSET } from '../utils/roomCode';
 
@@ -22,10 +22,22 @@ import { DIGIT_CHARSET, LETTER_CHARSET } from '../utils/roomCode';
  * fri-text-fält (PlayerName) skickas `letterCharset` = fullt A–Z (26).
  * Digit-charsetet är alltid `DIGIT_CHARSET` (0–9).
  */
-const KEY_HEIGHT = 44;
-const KEY_GAP = 8;
-const VPADDING = 12;
+// Responsiv höjd-skalning så tangentbordet ryms tillsammans med det aktiva
+// fältet på äldre/kortare iOS-telefoner (iPhone SE/8 = 667 px, SE1 = 568 px).
+// På normala skärmar (≥ 700 px) behålls den fulla 44 px-tap-target-höjden.
+// På korta skärmar krymper key-höjd + gap + padding så hela formuläret +
+// tangentbordet får plats inom modal-sheetens maxHeight (90 %) — annars
+// kollapsar den flexShrink:1-ScrollView som håller fälten till ~0 px och
+// användaren ser inte vad de skriver in.
+const SCREEN_H = Dimensions.get('window').height;
+const COMPACT = SCREEN_H < 700;
+const VERY_COMPACT = SCREEN_H < 600;
+
+const KEY_HEIGHT = VERY_COMPACT ? 30 : COMPACT ? 36 : 44;
+const KEY_GAP = COMPACT ? 6 : 8;
+const VPADDING = COMPACT ? 8 : 12;
 const HPADDING = 8;
+const MARGIN_TOP = COMPACT ? Spacing.sm : Spacing.md;
 const LETTER_COLS = 6;
 const DIGIT_COLS = 5;  // 10 digits / 5 cols = 2 rows ("12345" / "67890")
 
@@ -151,7 +163,7 @@ const styles = StyleSheet.create({
     borderRadius: Radius.md,
     borderWidth: 1,
     borderColor: Colors.border,
-    marginTop: Spacing.md,
+    marginTop: MARGIN_TOP,
   },
   grid: {
     flex: 1,
