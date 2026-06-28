@@ -26,10 +26,11 @@ interface Props {
    *  "Pass-the-Phone to: <playerName>" med avatar-box; IndDev visar bara
    *  "Get Ready to Vibe" (ingen spelar-specifik info). */
   mode?: 'pass-the-phone' | 'individual-devices';
-  /** Styr om rösten säger "Who" när nedräkningen når 0.
-   *  true (default) = säg "Who" — lämpligt för Hints-frågor (svaret = en person).
-   *  false = tyst avslut — lämpligt för YouTube/Spotify där frågan är ett år. */
-  sayWho?: boolean;
+  /** Ord som talas när nedräkningen når 0 (= när "?" visas).
+   *  "Who"  — Hints-frågor (svaret är en person).
+   *  "When" — Timeline/år-frågor (svaret är ett år).
+   *  undefined → tyst avslut (Spotify m.fl.). */
+  finalWord?: 'Who' | 'When';
   /** Om true: all röst-output stängs av (pre-warm + nedräkning + "Who").
    *  Används för non-host i Individual Devices — bara host ska ha ljud. */
   silent?: boolean;
@@ -67,7 +68,7 @@ const GLYPH_FONT_SIZE = LOGO_SIZE * 0.28;
  * att "?" visats i ~1 s fyras `onComplete` så parent kan växla fas till
  * `'question'`.
  */
-export function CountdownIntro({ onComplete, startFrom = 5, voiceFrom = 3, mode = 'pass-the-phone', playerName, playerEmoji, mediaSource, answerType = null, sayWho = true, silent = false }: Props) {
+export function CountdownIntro({ onComplete, startFrom = 5, voiceFrom = 3, mode = 'pass-the-phone', playerName, playerEmoji, mediaSource, answerType = null, finalWord, silent = false }: Props) {
   const isIndDev = mode === 'individual-devices';
   // Bordered box runt media-ikonen med kant-skärande Year/Name-badge.
   // Extraherat som variabel eftersom den renderas i båda playerBlock-grenarna.
@@ -141,9 +142,9 @@ export function CountdownIntro({ onComplete, startFrom = 5, voiceFrom = 3, mode 
         const next = current <= 1 ? 0 : current - 1;
 
         // Tala VOICE_LEAD_MS ms INNAN det visuella uppdateras (bara host).
-        if (!silent && next <= voiceFrom && (next > 0 || sayWho)) {
+        if (!silent && next <= voiceFrom && (next > 0 || finalWord != null)) {
           try {
-            Speech.speak(next === 0 ? 'Who' : String(next), {
+            Speech.speak(next === 0 ? (finalWord ?? 'Who') : String(next), {
               language: 'en-US',
               pitch: 0.01,
               rate: 0.42,
@@ -181,7 +182,7 @@ export function CountdownIntro({ onComplete, startFrom = 5, voiceFrom = 3, mode 
       tickTimers.current.forEach(clearTimeout);
       tickTimers.current = [];
     };
-  }, [startFrom, sayWho, voiceFrom, silent]);
+  }, [startFrom, finalWord, voiceFrom, silent]);
 
   // Pop-in per siffer-byte (3, 2, 1) + kontinuerlig zoom-puls (1 ↔ 1.18).
   useEffect(() => {

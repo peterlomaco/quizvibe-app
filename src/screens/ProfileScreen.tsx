@@ -1185,7 +1185,7 @@ export default function ProfileScreen() {
                 </View>
               </View>
             )}
-            <Text style={styles.creditsLabel}>Host Game Credits</Text>
+            <Text style={styles.creditsLabel} numberOfLines={1} ellipsizeMode="tail">Host Game Credits</Text>
             <View style={styles.creditsValueRow}>
               <Text style={styles.creditsKey}>Free:</Text>
               <Text style={[styles.creditsValue, styles.creditsValueFree]}>{freeGameCredits}</Text>
@@ -1552,7 +1552,7 @@ export default function ProfileScreen() {
 
           {/* Source Dashboard */}
           <View style={styles.field}>
-            <Text style={styles.sectionLabel}>SOURCE DASHBOARD</Text>
+            <Text style={styles.sectionLabel}>SOURCE MIXERBOARD</Text>
             {/* Spotify DJ-rad — alltid synlig, tillgänglig om konto kopplat */}
             <View style={styles.spotifyDJRow}>
               <View style={[styles.connectionIconWrap, { alignSelf: 'flex-start', marginTop: 1, marginLeft: -2 }]}>
@@ -3138,7 +3138,8 @@ const styles = StyleSheet.create({
     // skärande PREMIUM-badge (top:-7) inte överlappar "HOST GAME CREDITS"-
     // texten ovanför.
     gap: 8,
-    minWidth: 210,
+    minWidth: 160,
+    flexShrink: 1,
     // position:relative + overflow:visible krävs så absoluta Unlimited-
     // badgen (creditsMembershipBadgeWrap, top:-8) kan sticka upp över
     // top-bordern utan att klippas. Speglar Lobby:s pill exakt.

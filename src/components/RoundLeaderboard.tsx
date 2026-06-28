@@ -1,6 +1,6 @@
 import { Nunito_700Bold, useFonts } from '@expo-google-fonts/nunito';
 import React, { useMemo } from 'react';
-import { Dimensions, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Animated, Dimensions, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, G, Path } from 'react-native-svg';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
 import { QuizVibeQAvatar } from './QuizVibeQAvatar';
@@ -204,7 +204,23 @@ function PlayAgainButton({
 }) {
   const [width, setWidth] = React.useState(0);
   const twoLine = lines.length > 1;
+  const pulse = React.useRef(new Animated.Value(1)).current;
+  React.useEffect(() => {
+    if (disabled) {
+      pulse.setValue(1);
+      return;
+    }
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulse, { toValue: 1.04, duration: 700, useNativeDriver: true }),
+        Animated.timing(pulse, { toValue: 1,    duration: 700, useNativeDriver: true }),
+      ]),
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [disabled, pulse]);
   return (
+    <Animated.View style={{ flex: 1, transform: [{ scale: pulse }] }}>
     <Pressable
       onPress={disabled ? undefined : onPress}
       onLayout={(e) => setWidth(e.nativeEvent.layout.width)}
@@ -248,6 +264,7 @@ function PlayAgainButton({
         </View>
       )}
     </Pressable>
+    </Animated.View>
   );
 }
 

@@ -43,6 +43,9 @@ interface Props {
   hintsActive?: boolean;
   /** Flaggans mosaik börjar tas bort när true — kan ha längre delay än hintsActive. */
   mosaicActive?: boolean;
+  /** contentSubject från katalog-YAML ('artist'|'band'|'actor'|'athlete' osv.)
+   *  Styr kategori-rubrikens primära label och möjliggör crossover-text. */
+  contentSubject?: string;
 }
 
 // ── Hint-gruppering ─────────────────────────────────────────────────────────
@@ -100,6 +103,18 @@ function categoryToProfession(label: string): string {
   return 'Artist';
 }
 
+// Mappar contentSubject (från YAML-katalogen) till HintCategoryLabel-ekvivalent
+// så att quiz-frågans kontext styr kategorirubrikens primära label.
+function contentSubjectToHintLabel(subject: string): string | null {
+  switch (subject) {
+    case 'artist':  return 'Musikartist';
+    case 'band':    return 'Band';
+    case 'actor':   return 'Actor';
+    case 'athlete': return 'Athlete';
+    default:        return null; // city, country, place → faller tillbaka på library.categoryLabel
+  }
+}
+
 function splitDisplayName(name: string): string[] {
   const lastSpace = name.lastIndexOf(' ');
   if (lastSpace === -1) return [name];
@@ -112,6 +127,43 @@ const REDUNDANT_HINT_TERMS = [
   'musician',
   'recording artist',
 ];
+
+// Hint-typer som alltid filtreras bort — flaggan visar redan nationalitet/land.
+// OBS: birth_place filtreras INTE här — city-only värden ska visas.
+// Landnamn fångas istället av NATIONALITY_TERMS-textfiltret nedan.
+const NATIONALITY_HINT_TYPES: string[] = [];
+
+// Nationalitets- och landsord som inte ska synas i ledtrådar.
+// Flaggan kommunicerar redan detta — dupliceringen är en onödig ledtråd.
+const NATIONALITY_TERMS = [
+  // Adjektiv (engelska)
+  'swedish', 'american', 'british', 'english', 'french', 'german',
+  'italian', 'spanish', 'norwegian', 'danish', 'finnish', 'canadian',
+  'australian', 'dutch', 'belgian', 'swiss', 'portuguese', 'polish',
+  'hungarian', 'romanian', 'czech', 'greek', 'turkish', 'japanese',
+  'chinese', 'korean', 'brazilian', 'argentinian', 'argentinean', 'mexican',
+  'south african', 'nigerian', 'jamaican', 'cuban', 'irish',
+  'scottish', 'welsh', 'russian', 'ukrainian', 'austrian', 'colombian',
+  'peruvian', 'chilean', 'venezuelan', 'ecuadorian', 'uruguayan',
+  // Landnamn
+  'sweden', 'united states', 'great britain', 'united kingdom', 'england',
+  'france', 'germany', 'italy', 'spain', 'norway', 'denmark', 'finland',
+  'canada', 'australia', 'netherlands', 'holland', 'belgium', 'switzerland',
+  'portugal', 'poland', 'hungary', 'romania', 'czech republic', 'czechia',
+  'greece', 'turkey', 'japan', 'china', 'south korea', 'north korea',
+  'brazil', 'argentina', 'mexico', 'south africa', 'nigeria',
+  'jamaica', 'cuba', 'ireland', 'scotland', 'wales', 'russia', 'ukraine', 'austria',
+  'colombia', 'peru', 'chile', 'venezuela', 'ecuador', 'uruguay',
+];
+
+function isNationalityHint(hint: { type: string }, formattedText: string): boolean {
+  if (NATIONALITY_HINT_TYPES.includes(hint.type)) return true;
+  const lower = formattedText.toLowerCase();
+  return NATIONALITY_TERMS.some((term) => {
+    const re = new RegExp(`\\b${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`);
+    return re.test(lower);
+  });
+}
 
 // Känslig information som inte ska visas som ledtråd.
 const SENSITIVE_HINT_TERMS = [
@@ -152,12 +204,16 @@ function censorSensitive(text: string): string | null {
 function censorForAnswer(text: string, answer: string): string | null {
   const lower = text.toLowerCase();
   const answerLower = answer.toLowerCase();
-  // Matcha hela svaret samt varje ord i svaret som är längre än 3 tecken
+  // Matcha hela svaret samt varje ord i svaret som är längre än 3 tecken.
+  // Använder ordgräns (\b) för att undvika falskt träffar inne i sammansatta ord
+  // t.ex. "Tider" från "Gyllene Tider" ska INTE matcha inuti "Sommartider".
   const terms = [answerLower, ...answerLower.split(' ').filter((w) => w.length > 3)];
   let earliest = -1;
   for (const term of terms) {
-    const idx = lower.indexOf(term);
-    if (idx !== -1 && (earliest === -1 || idx < earliest)) earliest = idx;
+    const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const re = new RegExp(`\\b${escaped}\\b`, 'i');
+    const match = re.exec(lower);
+    if (match && (earliest === -1 || match.index < earliest)) earliest = match.index;
   }
   if (earliest === -1) return text; // inget svar i texten — visa som vanligt
   const before = text.slice(0, earliest).trim().replace(/[,:;-]+$/, '').trim();
@@ -176,10 +232,20 @@ export function HintsQuizCard({
   isRevealed,
   hintsActive = true,
   mosaicActive,
+  contentSubject,
 }: Props) {
   const [revealedCount, setRevealedCount] = useState(0);
   const scrollRef = useRef<ScrollView>(null);
   const nameAnim  = useRef(new Animated.Value(0)).current;
+
+  // Latch: när mosaicActive väl blivit true fortsätter mosaikunderlaget
+  // tas bort även om mosaicActive sedan sätts till false (phase → awaiting/reveal).
+  // Resetas bara när frågan byts (resetKey).
+  const [mosaicEverStarted, setMosaicEverStarted] = useState(false);
+  useEffect(() => { setMosaicEverStarted(false); }, [resetKey]);
+  useEffect(() => {
+    if (mosaicActive === true) setMosaicEverStarted(true);
+  }, [mosaicActive]);
 
   const hints = useMemo(
     () => (library ? selectHints(library, MAX_HINTS) : []),
@@ -233,11 +299,19 @@ export function HintsQuizCard({
     }).start();
   }, [isRevealed, nameAnim]);
 
-  const flag       = library ? countryToFlagEmoji(library.nationality) : '🏳️';
-  const rawLabel   = library?.categoryLabel ?? 'Musikartist';
-  const genre      = categoryToGenre(rawLabel);
-  const profession = categoryToProfession(rawLabel);
-  const nameParts  = splitDisplayName(displayName);
+  const flag          = library ? countryToFlagEmoji(library.nationality) : '🏳️';
+  const libraryLabel  = library?.categoryLabel ?? 'Musikartist';
+  // Frågans kontext (contentSubject) avgör primär label — override:ar library:ns categoryLabel
+  // när de skiljer sig (crossover-fall: artist som även är känd skådespelare etc.).
+  const subjectLabel  = contentSubject ? contentSubjectToHintLabel(contentSubject) : null;
+  const primaryLabel  = subjectLabel ?? libraryLabel;
+  const genre         = categoryToGenre(primaryLabel);
+  const profession    = categoryToProfession(primaryLabel);
+  // Crossover: visa "also known as X" när quiz-kontexten skiljer sig från library-etiketten.
+  const crossoverProf = (subjectLabel && subjectLabel !== libraryLabel)
+    ? categoryToProfession(libraryLabel)
+    : null;
+  const nameParts     = splitDisplayName(displayName);
 
   return (
     <View style={styles.container}>
@@ -245,7 +319,7 @@ export function HintsQuizCard({
       {/* ── Vänster: hints ───────────────────────────────── */}
       <View style={styles.hintsCol}>
         <Text style={styles.categoryLabel} numberOfLines={1}>
-          {genre} · {profession}
+          {genre} · {profession}{crossoverProf ? ` also known as ${crossoverProf}` : ''}
         </Text>
         <ScrollView
           ref={scrollRef}
@@ -291,7 +365,7 @@ export function HintsQuizCard({
               assistance="standard"
               isRevealed={isRevealed}
               logoSize={120}
-              active={mosaicActive ?? hintsActive}
+              active={mosaicEverStarted || (mosaicActive ?? hintsActive)}
             />
           </View>
         </View>
@@ -340,6 +414,7 @@ function BulletHint({
 
   const raw        = formatHintText(entry.hint);
   if (isRedundantHint(raw)) return null;
+  if (isNationalityHint(entry.hint, raw)) return null;
   const noSensitive = censorSensitive(raw);
   if (noSensitive === null) return null;
   const censored    = censorForAnswer(noSensitive, answer);
@@ -430,6 +505,7 @@ const styles = StyleSheet.create({
   // ── Hints-kolumn ──────────────────────────────────────────────────────────
   hintsCol: {
     flex: 1,
+    overflow: 'hidden',
     paddingLeft: 10,
     paddingRight: 6,
     paddingTop: 6,

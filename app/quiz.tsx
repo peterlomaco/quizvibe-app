@@ -70,7 +70,7 @@ import { HeartbeatSound } from '@/src/components/HeartbeatSound';
 // när sketches kommer (då med getQuizSketch() från assets/quiz-sketches/).
 // NameRevealCard, SketchCanvas, hasSketch, getQuizSketch ersatta av HintsQuizCard.
 import { generateRoomCode } from '@/src/utils/roomCode';
-import { addSeenQuestionIds, addSessionRecord, loadSeenQuestionIds } from '@/src/utils/hostQuestionHistory';
+import { addSeenQuestionIds, addSessionRecord, loadSeenQuestionIds, loadLastSessionIds } from '@/src/utils/hostQuestionHistory';
 import { buildEpochPhase, getActiveEpochs, type EpochPlayer, type EpochQuestion } from '@/src/utils/epochAllocation';
 import { getGenerationKeyFromBirthYear } from '@/src/utils/mockPurchasedPackages';
 import { hasPremiumSubscription } from '@/src/utils/subscriptionStorage';
@@ -389,7 +389,7 @@ const SPOTIFY_NON_DJ_STEPS = [
  * Används i Pass-the-Phone så alla spelare i samma runda får t.ex.
  * YouTube/Music — inte YouTube/Music, YouTube/Film, Hints/Sport i blandning.
  *
- * Icke-PtP (questionsPerBlock ≤ 1): delegerar direkt till buildEpochPhase.
+ * Gäller alla lägen (PtP och IndDev): vid enstaka kategori delegeras direkt.
  */
 function buildCategoryAlignedPhase<T extends QuizQuestion>(opts: {
   pool: T[];
@@ -397,6 +397,7 @@ function buildCategoryAlignedPhase<T extends QuizQuestion>(opts: {
   questionsPerBlock: number;
   activeEpochs: ReturnType<typeof getActiveEpochs>;
   recentIds: Set<string>;
+  lastSessionIds?: Set<string>;
   isPtP: boolean;
   players: EpochPlayer[];
   turnOrderIds: string[];
@@ -404,17 +405,10 @@ function buildCategoryAlignedPhase<T extends QuizQuestion>(opts: {
 }): T[] {
   const {
     pool, totalBlocks, questionsPerBlock, activeEpochs,
-    recentIds, isPtP, players, turnOrderIds, getEpochYear,
+    recentIds, lastSessionIds, isPtP, players, turnOrderIds, getEpochYear,
   } = opts;
   const totalQuestions = totalBlocks * questionsPerBlock;
   if (totalQuestions === 0 || pool.length === 0) return [];
-
-  // Icke-PtP: inga block att kategorisera — delegera direkt.
-  if (!isPtP || questionsPerBlock <= 1) {
-    return buildEpochPhase<T>({
-      pool, totalQuestions, activeEpochs, recentIds, isPtP, players, turnOrderIds, getEpochYear,
-    });
-  }
 
   // Gruppera frågor per mainCategory (null-frågor hamnar i '_other').
   const catMap = new Map<string, T[]>();
@@ -424,13 +418,21 @@ function buildCategoryAlignedPhase<T extends QuizQuestion>(opts: {
     catMap.get(key)!.push(q);
   }
 
-  // Proportionell block-allokering per kategori (Largest Remainder Method).
   const cats = [...catMap.keys()];
-  const catSizes = cats.map((c) => catMap.get(c)!.length);
-  const totalPoolSize = catSizes.reduce((a, b) => a + b, 0);
-  if (totalPoolSize === 0) return [];
 
-  const rawAllocs = catSizes.map((sz) => (sz / totalPoolSize) * totalBlocks);
+  // Enstaka kategori eller inget att fördela — delegera direkt utan overhead.
+  if (cats.length <= 1) {
+    return buildEpochPhase<T>({
+      pool, totalQuestions, activeEpochs, recentIds, lastSessionIds, isPtP, players, turnOrderIds, getEpochYear,
+    });
+  }
+
+  // Lika vikt per kategori (Largest Remainder Method).
+  // Viktigt: INTE pool-storleks-proportionell — annars vinner alltid den
+  // större kategorin vid lågt antal rundor (t.ex. 2 rundor YT/Music + YT/Sport
+  // → Music-poolen är 10× större → båda frågorna blir Music). Lika vikt
+  // säkerställer att varje vald kategori representeras oavsett pool-storlek.
+  const rawAllocs = cats.map(() => totalBlocks / cats.length);
   const floors = rawAllocs.map(Math.floor);
   const remainder = totalBlocks - floors.reduce((a, b) => a + b, 0);
   const byDecimal = rawAllocs
@@ -438,8 +440,10 @@ function buildCategoryAlignedPhase<T extends QuizQuestion>(opts: {
     .sort((a, b) => b.d - a.d);
   for (let k = 0; k < remainder; k++) floors[byDecimal[k].i]++;
 
-  // Bygg sekvens per kategori och konkatenera (kategoriernas block är alltid
-  // multiplar av questionsPerBlock → inom-block-konsistens garanterad).
+  // Bygg sekvens per kategori och konkatenera.
+  // Trim till närmaste multipel av questionsPerBlock: om buildEpochPhase returnerar
+  // färre frågor än begärt (pool-exhaustion) skulle ett partiellt block annars
+  // blanda kategorier vid nästa kategoris start.
   const result: T[] = [];
   for (let i = 0; i < cats.length; i++) {
     const catBlocks = floors[i];
@@ -450,12 +454,14 @@ function buildCategoryAlignedPhase<T extends QuizQuestion>(opts: {
       totalQuestions: catBlocks * questionsPerBlock,
       activeEpochs,
       recentIds,
+      lastSessionIds,
       isPtP,
       players,
       turnOrderIds,
       getEpochYear,
     });
-    result.push(...catSeq);
+    const aligned = catSeq.slice(0, Math.floor(catSeq.length / questionsPerBlock) * questionsPerBlock);
+    result.push(...aligned);
   }
   return result;
 }
@@ -479,6 +485,9 @@ function renderStepText(text: string): React.ReactNode {
 
 // ─── Mått ─────────────────────────────────────────────────────────────────────
 const SCREEN_WIDTH = Dimensions.get('window').width;
+const SCREEN_H = Dimensions.get('window').height;
+// Matchar YouTubeMediaPlayer:s responsiva PLAYER_HEIGHT (samma trösklar).
+const QUIZ_PLAYER_HEIGHT = SCREEN_H < 600 ? 150 : SCREEN_H < 700 ? 185 : 220;
 
 // ITEM_WIDTH (avstånd mellan ticks) sätts dynamiskt per assistance-nivå inuti komponenten:
 // Full: tät (≥10 år synliga), Standard: medium (≥8), Minimal: gles (4–5 syns)
@@ -1066,6 +1075,7 @@ export default function QuizScreen() {
   // hinner trycka Play i GetReadyIntro).
   // MÅSTE deklareras FÖRE gameQuestions-useMemo (TDZ-fel annars).
   const [seenQuestionIds, setSeenQuestionIds] = useState<Set<string>>(new Set());
+  const [lastSessionIds, setLastSessionIds] = useState<Set<string>>(new Set());
   const savedSeenRef = useRef(false);
 
   const gameQuestions = useMemo<QuizQuestion[]>(() => {
@@ -1300,6 +1310,7 @@ export default function QuizScreen() {
             questionsPerBlock,
             activeEpochs,
             recentIds: seenQuestionIds,
+            lastSessionIds,
             isPtP,
             players: epochPlayers,
             turnOrderIds,
@@ -1316,6 +1327,7 @@ export default function QuizScreen() {
             questionsPerBlock,
             activeEpochs,
             recentIds: seenQuestionIds,
+            lastSessionIds,
             isPtP,
             players: epochPlayers,
             turnOrderIds,
@@ -1336,7 +1348,7 @@ export default function QuizScreen() {
       return SEED_QUESTIONS;
     }
     return mixed;
-  }, [eraFrom, eraTo, turnOrder, totalRounds, youtubeEnabled, imagesEnabled, gameMode, youtubeEnabledCategories, imagesEnabledCategories, seenQuestionIds, spotifyEnabled]);
+  }, [eraFrom, eraTo, turnOrder, totalRounds, youtubeEnabled, imagesEnabled, gameMode, youtubeEnabledCategories, imagesEnabledCategories, seenQuestionIds, lastSessionIds, spotifyEnabled]);
 
   // Synkron ref som alltid pekar på aktuell gameQuestions — används av
   // game_sequence_init-broadcasten utan att göra subscription-effekten
@@ -1634,6 +1646,8 @@ export default function QuizScreen() {
   // hunnit re-rendera ser closure-baserad phase-check fortfarande 'question'.
   const phaseRef = useRef(phase);
   phaseRef.current = phase;
+  const questionIndexRef = useRef(questionIndex);
+  questionIndexRef.current = questionIndex;
   // Skyddar mot double-scoring per fråga oavsett React-batching/scheduling.
   // Sätts true av första anropet till recordRoundScore; resetas i
   // handleAdvanceToNextRound när nästa fråga börjar.
@@ -1753,6 +1767,7 @@ export default function QuizScreen() {
   // räkna om med korrekt unseen-prioritering.
   useEffect(() => {
     loadSeenQuestionIds().then(setSeenQuestionIds);
+    loadLastSessionIds().then(setLastSessionIds);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -1922,6 +1937,7 @@ export default function QuizScreen() {
   const question: QuizQuestion = _broadcastOverride ?? gameQuestions[questionIndex % gameQuestions.length];
   const isImageQuestion = question.type === 'image';
   const isActorSelectQuestion = question.type === 'actor-select';
+  const isTimelineQuestion = question.type === 'timeline';
   const isLastQuestion = questionIndex === totalQuestions - 1;
 
   // Bygg image-variant runtime baserat på source + assistance + audience-set.
@@ -2655,9 +2671,12 @@ export default function QuizScreen() {
     if (phase !== 'leaderboard' || savedSeenRef.current) return;
     savedSeenRef.current = true;
     const playedIds = [...new Set(gameQuestions.map((q) => q.id))];
-    addSessionRecord(playedIds).then(() =>
-      setSeenQuestionIds((prev) => new Set([...prev, ...playedIds])),
-    );
+    addSessionRecord(playedIds).then(() => {
+      setSeenQuestionIds((prev) => new Set([...prev, ...playedIds]));
+      // Uppdatera lastSessionIds direkt så Play Again i samma session
+      // omedelbart exkluderar den nyss spelade omgångens frågor.
+      setLastSessionIds(new Set(playedIds));
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase]);
 
@@ -3185,9 +3204,12 @@ export default function QuizScreen() {
         // Bär hela frågesekvensen så non-host som reloaded mid-game kan
         // sätta broadcastAllQuestionIds och se rätt GetReady-ikoner.
         all_question_ids: gameQuestionsRef.current.map((q) => q.id),
+        // Belt-and-suspenders: non-host som missat play_command kan
+        // catch-upa via fase-informationen i nästa ping.
+        phase,
       })
       .catch(() => {});
-  }, [gameMode, isHost, selfPlayerId, questionIndex]);
+  }, [gameMode, isHost, selfPlayerId, questionIndex, phase]);
 
   // D-v: shutdown vid 10 min host-inaktivitet. Host river rummet
   // (deactivateRoom + clear all stores) så stale data inte ärver in
@@ -3839,7 +3861,7 @@ export default function QuizScreen() {
   // detta event (Realtime undertrycker self-echo). D-vi-utökning:
   // signaturen tar host:s questionIndex för heal-on-reconnect-sync.
   const hostActivePingHandlerRef = useRef<
-    (questionIndex: number, allQuestionIds?: string[]) => void
+    (questionIndex: number, allQuestionIds?: string[], hostPhase?: string) => void
   >(() => {});
   // Handler för host_rejoined: fyrar på non-host när HOST:s uppkoppling
   // återupprättats. Drainer pending score-kön så host:s leaderboard
@@ -3930,6 +3952,7 @@ export default function QuizScreen() {
     hostActivePingHandlerRef.current = (
       hostQuestionIndex: number,
       allQuestionIds?: string[],
+      hostPhase?: string,
     ) => {
       // Host:s broadcast bekräftar liv → non-host resetar gap-tracker.
       // Detta är den ENDA vägen lastHostActivityRef uppdateras på
@@ -3954,6 +3977,18 @@ export default function QuizScreen() {
         setBroadcastDJPlayerId(null);
         return hostQuestionIndex;
       });
+      // Belt-and-suspenders catch-up: om host är bortom intro men non-host
+      // fastnat i 'intro' (t.ex. sticky-latch rensat men play_command redan
+      // tappat) triggar nästa ping en fas-transition. Kräver att sticky är
+      // rensat (= non-host tappat Retry) och att nätet är stabilt igen.
+      if (
+        hostPhase &&
+        (hostPhase === 'countdown' || hostPhase === 'question') &&
+        !stickyUnstableForQuestion &&
+        !isConnectionUnstable
+      ) {
+        setPhase((current) => (current === 'intro' ? 'countdown' : current));
+      }
     };
     hostRejoinedHandlerRef.current = () => {
       // Host:s uppkoppling återupprättad — draina pending score-kön så
@@ -4182,7 +4217,7 @@ export default function QuizScreen() {
       onPlayerAudioStateChanged: (payload) =>
         playerAudioStateChangedHandlerRef.current(payload.player_id, payload.audio_on),
       onHostActivePing: (payload) =>
-        hostActivePingHandlerRef.current(payload.question_index, payload.all_question_ids),
+        hostActivePingHandlerRef.current(payload.question_index, payload.all_question_ids, payload.phase),
       onPlayerConnectionChange: (playerId, status) => {
         setPlayerConnectionStatus((prev) => ({ ...prev, [playerId]: status }));
       },
@@ -4190,6 +4225,27 @@ export default function QuizScreen() {
         // Explicit Retry-tap från remote spelare → flippa till 'connected'.
         // Detta är ENDA vägen tillbaka (heartbeat-receipt räcker inte).
         setPlayerConnectionStatus((prev) => ({ ...prev, [playerId]: 'connected' }));
+        // Del 1-fix: om host redan är i countdown/question re-broadcastar vi
+        // play_command med 500 ms fördröjning. Fördröjningen krävs för att
+        // ge React tid att rendera setStickyUnstableForQuestion(false) i
+        // handleRetryFromUnstable — annars har playCommandHandlerRef-closure:n
+        // fortfarande stickyUnstableForQuestion=true och ignorerar broadcasten.
+        if (isHost && syncChannelRef.current) {
+          const currentPhase = phaseRef.current;
+          if (currentPhase === 'countdown' || currentPhase === 'question') {
+            const idx = questionIndexRef.current;
+            const qId = gameQuestionsRef.current[idx]?.id ?? '';
+            const allIds = gameQuestionsRef.current.map((q) => q.id);
+            setTimeout(() => {
+              syncChannelRef.current?.broadcastPlayCommand({
+                question_index: idx,
+                question_id: qId,
+                all_question_ids: allIds,
+                timer_start_at: undefined,
+              }).catch(() => {});
+            }, 500);
+          }
+        }
       },
       onHostRejoined: () => hostRejoinedHandlerRef.current(),
       onPeerReconnected: (senderId) => peerReconnectedHandlerRef.current(senderId),
@@ -4589,7 +4645,7 @@ export default function QuizScreen() {
         mediaSource={effectiveMediaSourceByQuestion[questionIndex] ?? null}
         answerType={effectiveAnswerTypeByQuestion[questionIndex] ?? null}
         onComplete={() => setPhase('question')}
-        sayWho={isImageQuestion || isActorSelectQuestion}
+        finalWord={isImageQuestion || isActorSelectQuestion ? 'Who' : isTimelineQuestion ? 'When' : undefined}
         silent={!isHost}
       />
       {/* Pre-decode-trick borttaget 2026-05-27 (text-rendering = no decode). */}
@@ -4903,6 +4959,7 @@ export default function QuizScreen() {
                   key={questionIndex}
                   library={question.type === 'image' ? question.hints : undefined}
                   displayName={question.type === 'image' ? question.displayName : ''}
+                  contentSubject={question.type === 'image' ? question.source.contentSubject : undefined}
                   resetKey={questionIndex}
                   totalSeconds={responseSeconds}
                   assistance={currentAssistance}
@@ -6047,9 +6104,9 @@ const styles = StyleSheet.create({
     letterSpacing: 0.4,
   },
   // Visas när YouTubeMediaPlayer rapporterar embed-fel — ersätter spelaren
-  // med en diskret felindikator i samma höjd (220 px = PLAYER_HEIGHT).
+  // med en diskret felindikator i samma höjd som QUIZ_PLAYER_HEIGHT.
   youtubeErrorCard: {
-    height: 220,
+    height: QUIZ_PLAYER_HEIGHT,
     backgroundColor: Colors.card,
     alignItems: 'center',
     justifyContent: 'center',

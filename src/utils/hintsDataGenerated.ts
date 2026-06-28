@@ -6881,7 +6881,7 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     { id: 'jn', type: 'jersey_number', label: 'Jersey number', value: '#9', priority: 3 },
     { id: 'ht', type: 'height', label: 'Height', value: '188 cm', priority: 3 },
     { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Member of the Order of the British Empire', priority: 5 },
-    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Q134890847', priority: 4 },
+    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'European Golden Shoe (2023–24) — 36 goals in debut Bundesliga season', priority: 4 },
     ],
   },
 
@@ -9375,8 +9375,8 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     { id: 'club3', type: 'club', label: 'Club', value: 'Fc Barcelona (2001–2004)', priority: 3 },
     { id: 'club4', type: 'club', label: 'Club', value: 'Borussia Mönchengladbach (1993–1999)', priority: 3 },
     { id: 'ht', type: 'height', label: 'Height', value: '185 cm', priority: 3 },
-    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Guldbollen', priority: 5 },
-    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Guldbollen', priority: 4 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Guldbollen 2001', priority: 5 },
+    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Guldbollen 1995', priority: 4 },
     ],
   },
 
@@ -9573,7 +9573,7 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     { id: 'club3', type: 'club', label: 'Club', value: 'Linköpings FC (2010–2011)', priority: 3 },
     { id: 'club4', type: 'club', label: 'Club', value: 'Kristianstads DFF (2012–2012)', priority: 3 },
     { id: 'ht', type: 'height', label: 'Height', value: '165 cm', priority: 3 },
-    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Q112261716', priority: 5 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: "Golden Foot Award (2022) — first women's player to receive this honour", priority: 5 },
     ],
   },
 

@@ -218,6 +218,9 @@ export interface HostActivePingPayload {
   /** Host:s kompletta frågesekvens. Non-host sätter broadcastAllQuestionIds
    *  om den fortfarande är null — täcker mid-game reload-scenariot. */
   all_question_ids?: string[];
+  /** Host:s aktuella fas ('intro'/'countdown'/'question' etc.). Non-host som
+   *  kommit ur sticky-unstable-låst läge kan catch-upa via detta fält. */
+  phase?: string;
 }
 
 /**

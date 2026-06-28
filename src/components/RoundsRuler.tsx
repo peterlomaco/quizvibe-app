@@ -133,36 +133,30 @@ export function RoundsRuler({ value, min, gameModeMax, onPremiumPress, hasSubscr
       </View>
       {hasBracket && (
         <>
-          {/* Explainer-text ovanför klammern — renderas bara när feature:n
-              inte gäller i nuvarande mode (typiskt PtP där premium inte
-              unlock:ar långa spel). Talar om vilket mode som faktiskt
-              använder funktionen. Wrap:en är absolutpositionerad över
-              klammerns horisontella span (bracketLeft → bracketWidth) så
-              texten centreras EXAKT ovanför klammern, inte mitt på hela
-              ruler-bredden. height + marginTop reserverar layout-platsen
-              som flow-element så bracket-blocket hamnar under texten. */}
-          {!applicable && (
-            <View style={{ marginTop: 4, height: 16, position: 'relative' }}>
-              <View
-                style={{
-                  position: 'absolute',
-                  left: bracketLeft,
-                  width: bracketWidth,
-                  alignItems: 'center',
-                }}
-              >
-                <Text style={roundsRulerStyles.applicableHint}>
-                  Applicable for Individual device mode
-                </Text>
-              </View>
+          {/* Label ovanför klammern — förklarar kravet för >4 rundor.
+              Absolutpositionerad över klammerns horisontella span så texten
+              centreras exakt ovanför klammern. height + marginTop reserverar
+              layout-platsen som flow-element så bracket-blocket hamnar under. */}
+          <View style={{ marginTop: 4, height: 10, position: 'relative' }}>
+            <View
+              style={{
+                position: 'absolute',
+                left: bracketLeft,
+                width: bracketWidth,
+                alignItems: 'center',
+              }}
+            >
+              <Text style={roundsRulerStyles.requiredHint}>
+                Required to apply more than 4 rounds:
+              </Text>
             </View>
-          )}
+          </View>
           {/* height tar plats för bracket (top 0, height 10) + premium-badge
               (top 14, ~18px hög) → ~32px. Bracket är absolutpositionerad så
               wrapper:n behöver explicit höjd för att inte kollapsa. Badgen
               sitter i en absolutpositionerad centrerad wrapper över samma
               bracket-bredd så den auto-centrerar oavsett innehållsbredd. */}
-          <View style={{ marginTop: 4, height: 34 }}>
+          <View style={{ marginTop: 0, height: 34 }}>
             <View style={[roundsRulerStyles.bracket, {
               left: bracketLeft,
               width: bracketWidth,
@@ -179,7 +173,6 @@ export function RoundsRuler({ value, min, gameModeMax, onPremiumPress, hasSubscr
                 justifyContent: 'center',
                 gap: 4,
               }}
-              pointerEvents="box-none"
             >
               {/* "Individual device +" — grön när IndDev aktivt, röd annars. */}
               <Text style={[roundsRulerStyles.individualDeviceText, { color: indivActive ? Colors.success : Colors.error }]} numberOfLines={1}>
@@ -192,6 +185,7 @@ export function RoundsRuler({ value, min, gameModeMax, onPremiumPress, hasSubscr
               <TouchableOpacity
                 activeOpacity={0.7}
                 onPress={onPremiumPress}
+                hitSlop={8}
                 style={[roundsRulerStyles.premiumBadge, { backgroundColor: badgeBg }]}
               >
                 <Text style={[roundsRulerStyles.premiumBadgeText, { color: badgeTextColor }]}>
@@ -279,14 +273,12 @@ const roundsRulerStyles = StyleSheet.create({
     fontWeight: '700',
     letterSpacing: 0.3,
   },
-  // Explainer-text ovanför klammern när feature:n inte gäller här. Diskret
-  // textSecondary, samma typografi som RoundsRuler:s tick-text för
-  // visuell sammanhållning.
-  applicableHint: {
-    fontSize: 11,
+  // Label ovanför klammern — förklarar kravet för >4 rundor.
+  requiredHint: {
+    fontSize: 10,
     fontWeight: '500',
     color: Colors.textSecondary,
-    letterSpacing: 0.3,
+    letterSpacing: 0.2,
     textAlign: 'center',
   },
 });

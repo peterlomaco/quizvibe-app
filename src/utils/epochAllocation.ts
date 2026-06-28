@@ -58,6 +58,9 @@ export interface BuildEpochPhaseParams<T extends EpochQuestion> {
   totalQuestions: number;
   activeEpochs: ActiveEpoch[];
   recentIds: Set<string>;
+  /** IDs från den senaste sessionen — undviks i princip alltid (hög exkluderingspriority).
+   *  Väljs bara som absolut sista utväg när alla andra alternativ är uttömda. */
+  lastSessionIds?: Set<string>;
   /** true = Pass-the-Phone (assigns questions to players, reorders into turn slots).
    *  false = IndDev / Single Player (epoch order, no player assignment). */
   isPtP: boolean;
@@ -267,7 +270,7 @@ export function buildPtPSequence<T extends EpochQuestion>(
 export function buildEpochPhase<T extends EpochQuestion>(
   params: BuildEpochPhaseParams<T>,
 ): T[] {
-  const { pool, totalQuestions, activeEpochs, recentIds, isPtP, players, turnOrderIds, getEpochYear } = params;
+  const { pool, totalQuestions, activeEpochs, recentIds, lastSessionIds, isPtP, players, turnOrderIds, getEpochYear } = params;
 
   if (totalQuestions <= 0 || pool.length === 0 || activeEpochs.length === 0) return [];
 
@@ -283,32 +286,39 @@ export function buildEpochPhase<T extends EpochQuestion>(
     epochBuckets.get(epoch.id)!.push(q);
   }
 
-  // ── Step 2: Split buckets into unseen/seen, shuffle each independently ─
-  const epochPools = new Map<EpochId, { unseen: T[]; seen: T[]; extraDraws: number }>();
+  // ── Step 2: 3-tier split per bucket, shuffle each tier independently ───
+  // Tier 1 (fresh):      inte sedd i NÅGOT av de senaste 20 sessionerna
+  // Tier 2 (older-seen): sedd tidigare men INTE i senaste sessionen
+  // Tier 3 (last-sess):  sedd i senaste sessionen — väljs nästan aldrig
+  const lastIds = lastSessionIds ?? new Set<string>();
+  const epochPools = new Map<EpochId, { unseen: T[]; seen: T[]; lastSession: T[]; extraDraws: number }>();
   for (const [epochId, bucket] of epochBuckets.entries()) {
-    const unseen = shuffleArr(bucket.filter((q) => !recentIds.has(q.id)));
-    const seen = shuffleArr(bucket.filter((q) => recentIds.has(q.id)));
-    epochPools.set(epochId, { unseen, seen, extraDraws: 0 });
+    const unseen      = shuffleArr(bucket.filter((q) => !recentIds.has(q.id) && !lastIds.has(q.id)));
+    const seen        = shuffleArr(bucket.filter((q) => recentIds.has(q.id) && !lastIds.has(q.id)));
+    const lastSession = shuffleArr(bucket.filter((q) => lastIds.has(q.id)));
+    epochPools.set(epochId, { unseen, seen, lastSession, extraDraws: 0 });
   }
 
   // ── Step 3: Allocate total questions across epochs (LRM) ───────────────
   const allocation = allocateByEpoch(totalQuestions, activeEpochs);
   const epochNormWeights = new Map(activeEpochs.map((e) => [e.id, e.normWeight]));
 
-  // Pop one question from an epoch pool (unseen before seen)
+  // Pop one question from an epoch pool (fresh → older-seen → last-session)
   const popFromPool = (epochId: EpochId): T | undefined => {
     const ep = epochPools.get(epochId);
     if (!ep) return undefined;
     if (ep.unseen.length > 0) return ep.unseen.shift();
     if (ep.seen.length > 0) return ep.seen.shift();
+    if (ep.lastSession.length > 0) return ep.lastSession.shift();
     return undefined;
   };
 
   // Fallback: borrow from epoch with fewest extra-draws.
+  // Föredrar epoker med fresh/older-seen items (undviker last-session).
   // Tie-break: highest normWeight (epoch "deserves" more questions).
   const fallbackQuestion = (excludeId: EpochId): T | undefined => {
     const candidates = [...epochPools.entries()]
-      .filter(([id, ep]) => id !== excludeId && (ep.unseen.length + ep.seen.length) > 0)
+      .filter(([id, ep]) => id !== excludeId && (ep.unseen.length + ep.seen.length + ep.lastSession.length) > 0)
       .sort(([aId, aEp], [bId, bEp]) => {
         const normA = epochNormWeights.get(aId) ?? 0;
         const normB = epochNormWeights.get(bId) ?? 0;

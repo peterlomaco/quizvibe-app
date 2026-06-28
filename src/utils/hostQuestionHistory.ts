@@ -79,6 +79,20 @@ export async function loadSeenQuestionIds(): Promise<Set<string>> {
   }
 }
 
+// Returnerar IDs enbart från den SENASTE sessionen.
+// Används som "hård exkludering" i buildEpochPhase — frågor från förra spelet
+// visas i princip aldrig direkt igen (om poolen tillåter det).
+export async function loadLastSessionIds(): Promise<Set<string>> {
+  try {
+    const history = await loadSessionHistory();
+    if (history.sessions.length === 0) return new Set();
+    const last = history.sessions[history.sessions.length - 1];
+    return new Set<string>(last.qIds);
+  } catch {
+    return new Set();
+  }
+}
+
 // Sparar en ny spelomgång. Håller max MAX_SESSIONS sessioner (äldsta tas bort).
 export async function addSessionRecord(qIds: string[]): Promise<void> {
   if (!qIds.length) return;

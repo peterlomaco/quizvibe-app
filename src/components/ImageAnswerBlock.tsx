@@ -11,8 +11,9 @@
 //                 Vid fel/time-out renderas dessutom rätta namnet separat med
 //                 grön border + Correct-badge så facit syns inline.
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
+  Animated,
   Pressable,
   StyleSheet,
   Text,
@@ -234,6 +235,20 @@ function PrefixView({
     setSelectedPrefix(null);
   }, [resetKey]);
 
+  // Blink-animation för prefix-knappar som ännu inte valts.
+  // Gemensam Animated.Value — alla knappar blinkar synkroniserat.
+  const blinkAnim = useRef(new Animated.Value(1)).current;
+  useEffect(() => {
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(blinkAnim, { toValue: 0.35, duration: 480, useNativeDriver: true }),
+        Animated.timing(blinkAnim, { toValue: 1,    duration: 480, useNativeDriver: true }),
+      ]),
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [blinkAnim]);
+
   // Letter Grid-bygge med tre filter (i ordning):
   //   1. Längd-filter: prefixens första ord måste ha ≥ variantens prefixLength.
   //      Skydd mot edge case där distractor-pool-namn med kort displayName ger
@@ -404,41 +419,52 @@ function PrefixView({
           const isPrefixDimmed =
             isRevealing && !isPlayerRow && !isCorrectRevealRow && !isWrongRevealRow;
 
+          // Prefix-knapparna blinkar (opacity) tills spelaren tryckt på dem
+          // — 1–2-bokstavskombinationerna är svåra att läsa och blinken
+          // lockar spelaren att inse att de är tappbara.
+          const shouldBlink = !isPrefixSelected && !isPrefixLocked && phase === 'question';
+
+          // "click"-etiketten till höger — visas för alla ej-valda prefix
+          // i question-fasen. Ersätts av nameCard så snart spelaren tryckt.
+          const showClickHint = !nameOpt && phase === 'question' && !isLocked && !isWrongRevealRow;
+
           return (
             <View key={opt.prefix} style={styles.prefixRow}>
-              <Pressable
-                onPress={() => handlePrefixPress(opt.prefix)}
-                disabled={isPrefixLocked}
-                style={({ pressed }) => [
-                  styles.prefixButton,
-                  isPrefixSelected && !isLocked && styles.prefixButtonActive,
-                  isPrefixSelected && isLocked && styles.prefixButtonLocked,
-                  isPrefixCorrectReveal && styles.prefixButtonCorrectReveal,
-                  isWrongRevealRow && styles.prefixButtonWrongReveal,
-                  pressed && styles.prefixButtonPressed,
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.prefixText,
-                    isPrefixSelected && !isLocked && styles.prefixTextActive,
-                    isPrefixSelected && isLocked && styles.prefixTextLocked,
-                    isPrefixCorrectReveal && styles.prefixTextCorrectReveal,
-                    isWrongRevealRow && styles.prefixTextWrongReveal,
-                    isPrefixDimmed && styles.prefixTextDimmed,
+              <Animated.View style={shouldBlink ? { opacity: blinkAnim } : undefined}>
+                <Pressable
+                  onPress={() => handlePrefixPress(opt.prefix)}
+                  disabled={isPrefixLocked}
+                  style={({ pressed }) => [
+                    styles.prefixButton,
+                    isPrefixSelected && !isLocked && styles.prefixButtonActive,
+                    isPrefixSelected && isLocked && styles.prefixButtonLocked,
+                    isPrefixCorrectReveal && styles.prefixButtonCorrectReveal,
+                    isWrongRevealRow && styles.prefixButtonWrongReveal,
+                    pressed && styles.prefixButtonPressed,
                   ]}
                 >
-                  {opt.prefix}
-                </Text>
-                {/* ×-badge på prefix-knappen själv (inget nameCard renderas
-                    för wrong-reveal-rader i prefix-mode). Border-cutting via
-                    top:-8/right:-6 så badgen sitter på knappens hörn. */}
-                {badgeType === 'wrongReveal' && (
-                  <Text style={[styles.wrongIconBadge, styles.wrongIconBadgePrefix]}>
-                    ×
+                  <Text
+                    style={[
+                      styles.prefixText,
+                      isPrefixSelected && !isLocked && styles.prefixTextActive,
+                      isPrefixSelected && isLocked && styles.prefixTextLocked,
+                      isPrefixCorrectReveal && styles.prefixTextCorrectReveal,
+                      isWrongRevealRow && styles.prefixTextWrongReveal,
+                      isPrefixDimmed && styles.prefixTextDimmed,
+                    ]}
+                  >
+                    {opt.prefix}
                   </Text>
-                )}
-              </Pressable>
+                  {/* ×-badge på prefix-knappen själv (inget nameCard renderas
+                      för wrong-reveal-rader i prefix-mode). Border-cutting via
+                      top:-8/right:-6 så badgen sitter på knappens hörn. */}
+                  {badgeType === 'wrongReveal' && (
+                    <Text style={[styles.wrongIconBadge, styles.wrongIconBadgePrefix]}>
+                      ×
+                    </Text>
+                  )}
+                </Pressable>
+              </Animated.View>
               {nameOpt && (
                 <View style={[styles.nameCard, nameCardStyle]}>
                   <Text style={[styles.nameText, nameTextStyle]}>
@@ -454,6 +480,11 @@ function PrefixView({
                       Wrong
                     </Text>
                   )}
+                </View>
+              )}
+              {showClickHint && (
+                <View style={styles.clickHintWrap}>
+                  <Text style={styles.clickHintText}>click</Text>
                 </View>
               )}
             </View>
@@ -707,5 +738,20 @@ const styles = StyleSheet.create({
   },
   fullNameTextDimmed: {
     color: Colors.textDisabled,
+  },
+
+  // "click"-etikett till höger om prefix-knapper som ännu inte valts.
+  // Visas bara i question-fasen; ersätts av nameCard när spelaren tryckt.
+  clickHintWrap: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingLeft: Spacing.sm,
+  },
+  clickHintText: {
+    color: Colors.textSecondary,
+    fontSize: FontSize.sm,
+    fontWeight: '600',
+    fontStyle: 'italic',
+    letterSpacing: 0.5,
   },
 });

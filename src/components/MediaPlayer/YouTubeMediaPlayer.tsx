@@ -35,7 +35,7 @@
 
 import { Nunito_700Bold, useFonts } from '@expo-google-fonts/nunito';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Dimensions, StyleSheet, Text, View } from 'react-native';
 import YoutubePlayer from 'react-native-youtube-iframe';
 import { QuizVibeLogo } from '@/src/components/QuizVibeLogo';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '@/src/theme';
@@ -53,12 +53,14 @@ interface Props {
   onError?: (error: Error) => void;
 }
 
+// Responsiv spelar-höjd — reduceras på korta skärmar så quiz-vyn får
+// tillräckligt med utrymme för TimelineSelector/ImageAnswerBlock i sin
+// ScrollView. Trösklarna matchar CodeKeyboard-mönstret (< 600 / < 700).
 // 220 (var 200) — YouTube-iframe:s bottenrow (share-knapp, YouTube-logo,
 // "related video"-thumbnail som dyker upp vid pause) klipptes av kortets
-// overflow:hidden vid 200. 220 ger bottenchrome:n breathing room utan att
-// rubba 16:9-känslan för själva video-frame:n. Justera om bottom-rowen
-// fortfarande ser kramad ut på enheter med annan DPR.
-const PLAYER_HEIGHT = 220;
+// overflow:hidden vid 200.
+const { height: _SCREEN_H } = Dimensions.get('window');
+const PLAYER_HEIGHT = _SCREEN_H < 600 ? 150 : _SCREEN_H < 700 ? 185 : 220;
 // Hur länge vi väntar på att autoplay ska starta innan vi visar tap-prompt.
 // För kort = prompt blinkar onödigt på iOS-versioner som tillåter autoplay
 // (YouTube-state-events kommer typiskt unstarted → buffering → playing och

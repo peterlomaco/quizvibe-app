@@ -4123,7 +4123,7 @@ export default function LobbyScreen() {
                   </View>
                 </View>
               )}
-              <Text style={styles.creditsLabel}>Host Game Credits</Text>
+              <Text style={styles.creditsLabel} numberOfLines={1} ellipsizeMode="tail">Host Game Credits</Text>
               <View style={styles.creditsValueRow}>
                 <Text style={styles.creditsKey}>Free:</Text>
                 <Text style={[styles.creditsValue, styles.creditsValueFree]}>{freeGameCredits}</Text>
@@ -4742,7 +4742,7 @@ export default function LobbyScreen() {
             med färgade brand-badges (kompakt list-format). marginTop ger lite
             extra luft mellan Game Mode-beskrivningen och denna rubrik. */}
         <View style={[styles.section, { marginTop: Spacing.sm }]}>
-          <Text style={styles.sectionLabel}>SOURCE DASHBOARD</Text>
+          <Text style={styles.sectionLabel}>SOURCE MIXERBOARD</Text>
           <View style={styles.connectionsList}>
             {/* ── Spotify DJ-läge ─────────────────────────────────────────
                 Alltid synlig. Availability-pillen visar om Spotify DJ
@@ -6259,7 +6259,8 @@ const styles = StyleSheet.create({
     // skärande PREMIUM-badge (top:-7) inte överlappar "HOST GAME CREDITS"-
     // texten ovanför.
     gap: 8,
-    minWidth: 210,
+    minWidth: 160,
+    flexShrink: 1,
     position: 'relative',
   },
   // Gold-framed-variant av pillen när host har aktiv membership-prenu-
@@ -7520,9 +7521,9 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     borderRadius: 10,
-    borderWidth: 0.5,
-    borderColor: '#FFFFFF',
-    backgroundColor: Colors.primaryDark,
+    borderWidth: 1,
+    borderColor: Colors.success,
+    backgroundColor: '#6B7280',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -7531,7 +7532,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '700',
     fontStyle: 'italic',
-    color: '#FFFFFF',
+    color: Colors.success,
     lineHeight: 15,
   },
   connectionLabel: {

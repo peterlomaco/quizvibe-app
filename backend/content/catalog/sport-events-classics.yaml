@@ -527,18 +527,6 @@ items:
         endSec: 45
         channelTitle: "Sky Sports Retro"
         notes: "Curerad 2026-05-29 — ögonblicket Leicester blev mästare 2016 (Sky Sports)."
-  - id: messi-world-cup-2022
-    displayName: "Messi och Argentina vinner VM i Qatar"
-    correctYear: 2022
-    probability: 88
-    wikimediaSearchHints: ["Messi Argentina World Cup 2022 Qatar final"]
-    answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "otlAmUJ5wfw"
-        startSec: 0
-        endSec: 15
-        channelTitle: "cfcfootball"
-        notes: "Curerad 2026-05-29 — Messis reaktion på VM-vinsten 2022 (FIFA-officiella var blockerade)."
   - id: vinnie-jones-gascoigne-grab
     displayName: "Vinnie Jones griper Gascoigne — det berömda greppet"
     correctYear: 1988
