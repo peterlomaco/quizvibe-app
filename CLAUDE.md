@@ -465,14 +465,14 @@ Profile-toggle som filtrerar vilka paket som syns i Lobby:n när användaren är
   - **FREE-badge-pattern bevarad**: `pkg.free` på `MusicPackage`-interfacet är optional och styr en kantskärande FREE-badge på paket-raden (`packageRowFreeBadge` styles). Inga free-paket existerar i V1 men styling finns kvar för framtida gratis-paket.
 - **Seeding**: Lobby host-seed-effekten läser `profile.enabledHostPackages` (= tom i V1). Bara host får filterlistan (non-hosts ser endast paket som hosten faktiskt aktiverat för denna lobby via `selectedExtraPackages`).
 
-## SOURCE DASHBOARD — per-source category matrix (uppdaterad 2026-06-05)
+## SOURCE MIXERBOARD — per-source category matrix (uppdaterad 2026-06-05)
 
-Ersätter gamla `enabledMainCategories` + `youtubeEnabled`/`imagesEnabled`-booleans med **per-source category-arrays**. UI-rubriken "SOURCE DASHBOARD" i både Lobby och Profile.
+Ersätter gamla `enabledMainCategories` + `youtubeEnabled`/`imagesEnabled`-booleans med **per-source category-arrays**. UI-rubriken "SOURCE MIXERBOARD" i både Lobby och Profile.
 
 **Datamodell**: `youtubeEnabledCategories: MainCategory[]` + `imagesEnabledCategories: MainCategory[]` + `spotifyEnabled: boolean`. Alla tre sparas i Profile (`spotifyDefaultEnabled` i `ProfileData`) och seeds till Lobby vid Create Game.
 
 **UI-layout** (`smGrid` i LobbyScreen + ProfileScreen):
-- **Spotify DJ-rad** — överst, direkt under "SOURCE DASHBOARD"-rubriken. Box med `backgroundColor: rgba(255,255,255,0.06)` + `borderRadius: Radius.sm` (matchar All-radens styling). Spotify-ikon + label + info-icon + anslutningsstatus + toggle.
+- **Spotify DJ-rad** — överst, direkt under "SOURCE MIXERBOARD"-rubriken. Box med `backgroundColor: rgba(255,255,255,0.06)` + `borderRadius: Radius.sm` (matchar All-radens styling). Spotify-ikon + label + info-icon + anslutningsstatus + toggle.
 - **Matrisen nedan**: Rad 1 (rubriker) | Rad 2 (All-rad) | Rad 3 (YouTube) | Rad 4 (Hints) — kolumner: **Music / Film / Sport** (displaynamn i UI; internt mappade mot `artists/actors/athletes`). `smAutoCell` (spacer mellan YouTube- och Hints-raderna) är `height: 8` — tunn spacer, ingen label-text (borttagen 2026-06-15).
 - `onLayout` på `smGrid` mäter exakt kolumnbredd → pixel-perfekt centrering.
 
@@ -1380,6 +1380,10 @@ Non-host:s GetReady-kö visade ibland fel kategori-badge (t.ex. SPORT istället 
 - **`QuestionAdvancePayload.all_question_ids?: string[]`** ([syncChannel.ts](src/lib/realtime/syncChannel.ts)) — adderat 2026-06-15. Alla tre `broadcastQuestionAdvance`-call-sites (`handleHostSkipSpotifyQuestion`, `handleHostAdvanceFromReveal`, `handleHostShowLeaderboard`) skickar `gameQuestionsRef.current.map(q => q.id)`. Non-host:s handler uppdaterar `broadcastAllQuestionIds` vid varje advance → kön håller sig synkad även vid reconnect.
 - **`effectiveMediaSourceByQuestion`**, **`effectiveCategoryByQuestion`**, **`effectiveAnswerTypeByQuestion`** — tre useMemos i quiz.tsx: om `isHost || !broadcastAllQuestionIds` → pass-through från lokala arrayer; annars map:as från `broadcastAllQuestionIds` via `ALL_QUESTIONS_MAP`. Passas som props till GetReadyIntro istället för de lokala arrayerna. Fallback till lokal array används under race-fönstret innan första `broadcastAllQuestionIds` ankommer (var "nästan alltid rätt" enligt Peter).
 
+**IndDev non-host fastnar i GetReady efter nätverksglitch (fix 2026-06-28)**: "Sticky latch"-bugg på äldre/marginalfull iOS i IndDev. Flöde: WiFi-glitch → `isConnectionUnstable=true` → `stickyUnstableForQuestion=true` (latch, rensar INTE automatiskt) → `ConnectionUnstableOverlay` visas → host trycker Play → `play_command`-broadcastet ignoreras av non-hostens `playCommandHandlerRef` pga latch → non-host fastnar i 'intro'. Retry (`handleRetryFromUnstable`) rensade latch men host re-broadcastade INTE för samma fråga. **Två-delad fix:**
+- **Del 1 (primär)** — `onPlayerRejoined`-handler i quiz.tsx: om host är i `countdown`/`question` re-broadcastas `play_command` med **500 ms fördröjning** (React behöver committa `setStickyUnstableForQuestion(false)` innan ny broadcast ankommer till non-host:s closure). `questionIndexRef` (ny mutable ref parallellt med befintlig `phaseRef`) ger closure-säker access.
+- **Del 2 (belt-and-suspenders)** — `HostActivePingPayload.phase?: string` (syncChannel.ts): varje `hostActivePing` bär host:s fas. Non-hostens ping-handler catch-up:ar `'intro' → 'countdown'` när host är past intro + sticky är rensat + connection är stabil.
+
 **IndDev timer-sync vid iOS-bakgrunds-återkomst (fix 2026-06-15)**: iOS fryser JS-tråden (`setTimeout`/`setInterval`) när appen backgroundas. Non-host som lämnar appen under countdown:en och kommer tillbaka fick full `responseSeconds` kvar istället för det faktiska återstående. Fix: host broadcastar `timer_start_at` (wall-clock `Date.now()` ms) i `play_command`-payloaden — non-host kan beräkna korrekt tid kvar oavsett när JS-körningen återupptas.
 
 - **`PlayCommandPayload.timer_start_at?: number`** ([syncChannel.ts](src/lib/realtime/syncChannel.ts)) — wall-clock ms för när host:s timer förväntas starta. Beräknas i `handleHostStartFromGetReady` som `Date.now() + 10500`: 700ms initial paus + 5×1300ms tick (startFrom=5) + 1000ms ?-display + 2000ms timerActive-delay = 10200ms + 300ms marginal.
@@ -1426,7 +1430,7 @@ Non-host:s GetReady-kö visade ibland fel kategori-badge (t.ex. SPORT istället 
 - `CountdownIntro` tar `silent?: boolean`-prop → `silent={!isHost}`. Pre-warm-anropet + alla `Speech.speak`-anrop hoppas över när `silent=true`.
 - MorseAmbientSound i LobbyScreen var redan gated på `hostMode` — ingen ändring.
 
-**CountdownIntro röst-nedräkning** (`expo-speech`, installerad v14.0.8): Djup mansröst med `pitch: 0.01` (absolut lägsta) + `rate: 0.42` (långsamt/dramatiskt) + `language: 'en-US'`. Räknar "3", "2", "1", sedan "**Who**" (synkat med "?"-glyfen). Implementeringsdetaljer:
+**CountdownIntro röst-nedräkning** (`expo-speech`, installerad v14.0.8): Djup mansröst med `pitch: 0.01` (absolut lägsta) + `rate: 0.42` (långsamt/dramatiskt) + `language: 'en-US'`. Räknar "3", "2", "1", sedan ett sista ord synkat med "?"-glyfen. `finalWord?: 'Who' | 'When'`-prop (default `'Who'`): **Bildgissar-frågor (image/hints)** → `'Who'`; **Årtals-frågor (timeline) + Spotify-frågor** → `'When'` (quiz.tsx härled `currentQ.type === 'timeline' || isSpotifyQ` → `finalWord='When'`). Implementeringsdetaljer:
 
 - **`count` startar som `null`** (ingen siffra visas i Q-ringen). Efter 700 ms initial paus sätts `count = startFrom` (visuell "3" + röst "3" startar exakt synkat). Intervallet tickar sedan var 1300 ms (lugnare, mer dramatisk paus).
 - **Pre-warm** vid mount: `Speech.speak(' ', { rate: 2.0 })` (U+00A0 non-breaking space) initierar TTS-motorn ~700 ms innan nedräkningen börjar. Gated på `!silent`.
