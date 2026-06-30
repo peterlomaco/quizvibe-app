@@ -6,6 +6,7 @@ import {
   hasEntitlement,
   logOutPurchases,
 } from '@/src/lib/iap';
+import { BottomBanner } from '@/src/components/BottomBanner';
 import { Colors } from '@/src/theme';
 import { setPremiumActive } from '@/src/utils/subscriptionStorage';
 import { supabase } from '@/src/utils/supabase';
@@ -90,6 +91,7 @@ export default function RootLayout() {
         <Stack.Screen name="sketch-demo" />
         <Stack.Screen name="guess-who-demo" />
       </Stack>
+      <BottomBanner />
     </GestureHandlerRootView>
   );
 }

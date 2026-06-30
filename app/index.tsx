@@ -3190,7 +3190,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     paddingHorizontal: Spacing.lg,
     paddingTop: SCREEN_HEIGHT < 600 ? Spacing.md : Spacing.xxl,
-    paddingBottom: Spacing.lg,
+    paddingBottom: Spacing.lg + 52, // + BOTTOM_BANNER_HEIGHT
     justifyContent: 'space-between',
   },
 

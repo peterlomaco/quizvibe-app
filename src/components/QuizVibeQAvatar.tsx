@@ -5,6 +5,8 @@ import { Colors } from '../theme';
 
 interface Props {
   size?: number;
+  /** Färg på alla brand-element (ring, svans, inre glyph). Default Colors.primary. */
+  color?: string;
   /**
    * Innehåll inom Q-ringen. 'smile' = öga-öga-glad mun (default, används i
    * TopUserBanner och Profile-headers). 'wifi' = Spotify-stilade sound-wave-
@@ -26,7 +28,7 @@ interface Props {
  * den används inline i avatar-storlek snarare än som full brand-mark —
  * Q + svans + ansikte/wifi räcker som visuell signal.
  */
-export function QuizVibeQAvatar({ size = 44, variant = 'smile' }: Props) {
+export function QuizVibeQAvatar({ size = 44, variant = 'smile', color = Colors.primary }: Props) {
   // ViewBox expanderas för wifi-variant så top-bågen (som extends utanför
   // Q-ringen, samma som QuizVibeLogo) inte klipps. Smile-variant behåller
   // sin tätare viewBox för bakåtkompatibilitet med befintliga call-sites.
@@ -40,43 +42,36 @@ export function QuizVibeQAvatar({ size = 44, variant = 'smile' }: Props) {
           cy={38}
           r={13}
           fill="none"
-          stroke={Colors.primary}
+          stroke={color}
           strokeWidth={3}
         />
         {/* Q-svans */}
         <Path
           d="M47 47 L53 53"
-          stroke={Colors.primary}
+          stroke={color}
           strokeWidth={3}
           strokeLinecap="round"
         />
         {variant === 'wifi' ? (
-          // Spotify-stilade sound-wave-arcs matchande QuizVibeLogo:s wifi-
-          // pattern. Verbatim coords från logo (cx=37, cy=37) translaterade
-          // +1x +1y till avatar:s Q-center (38, 38). Rotation 25° kring
-          // nya centern. Top-bågen (radie 12) extends ovanför Q-ringen —
-          // viewBox utökad till y=21 så top-arc-apex (efter rotation
-          // ~y=22.5) inte klipps. Strokes 1.8 matchar logo:s vikt;
-          // strokeLinecap round mjukar ändarna.
           <G transform="rotate(25 38 38)">
             <Path
               d="M 30 24 A 12 12 0 0 1 46 24"
               fill="none"
-              stroke={Colors.primary}
+              stroke={color}
               strokeWidth={1.8}
               strokeLinecap="round"
             />
             <Path
               d="M 32 31 A 9 9 0 0 1 44 31"
               fill="none"
-              stroke={Colors.primary}
+              stroke={color}
               strokeWidth={1.8}
               strokeLinecap="round"
             />
             <Path
               d="M 34 35 A 6 6 0 0 1 42 35"
               fill="none"
-              stroke={Colors.primary}
+              stroke={color}
               strokeWidth={1.8}
               strokeLinecap="round"
             />
@@ -84,14 +79,13 @@ export function QuizVibeQAvatar({ size = 44, variant = 'smile' }: Props) {
         ) : (
           <>
             {/* Vänster öga */}
-            <Circle cx={34} cy={34} r={1.5} fill={Colors.primary} />
+            <Circle cx={34} cy={34} r={1.5} fill={color} />
             {/* Höger öga */}
-            <Circle cx={42} cy={34} r={1.5} fill={Colors.primary} />
-            {/* Glad mun – kvadratisk Q-curve med kontrollpunkten under
-                start/slut så bågen bukar nedåt (smile). */}
+            <Circle cx={42} cy={34} r={1.5} fill={color} />
+            {/* Glad mun */}
             <Path
               d="M 33 39 Q 38 43 43 39"
-              stroke={Colors.primary}
+              stroke={color}
               strokeWidth={1.5}
               fill="none"
               strokeLinecap="round"

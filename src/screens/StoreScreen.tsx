@@ -741,7 +741,7 @@ const styles = StyleSheet.create({
   content: {
     paddingHorizontal: Spacing.lg,
     paddingTop: Spacing.xl,
-    paddingBottom: Spacing.xxl,
+    paddingBottom: Spacing.xxl + 52, // + BOTTOM_BANNER_HEIGHT
     gap: Spacing.xl,
   },
 
