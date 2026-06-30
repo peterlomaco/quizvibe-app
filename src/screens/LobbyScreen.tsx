@@ -1,10 +1,12 @@
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
 import * as Haptics from 'expo-haptics';
+import * as Speech from 'expo-speech';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Alert,
   Animated,
+  Easing,
   Keyboard,
   KeyboardAvoidingView,
   Modal,
@@ -971,21 +973,23 @@ function ApprovedBox({
 function BlinkingLabel({
   style,
   children,
+  duration = 600,
 }: {
   style: StyleProp<TextStyle>;
   children: React.ReactNode;
+  duration?: number;
 }) {
   const opacity = useRef(new Animated.Value(1)).current;
   useEffect(() => {
     const loop = Animated.loop(
       Animated.sequence([
-        Animated.timing(opacity, { toValue: 0.3, duration: 600, useNativeDriver: true }),
-        Animated.timing(opacity, { toValue: 1, duration: 600, useNativeDriver: true }),
+        Animated.timing(opacity, { toValue: 0.3, duration, useNativeDriver: true }),
+        Animated.timing(opacity, { toValue: 1, duration, useNativeDriver: true }),
       ]),
     );
     loop.start();
     return () => loop.stop();
-  }, [opacity]);
+  }, [opacity, duration]);
   return (
     <Animated.Text style={[style, { opacity }]} numberOfLines={1}>
       {children}
@@ -1066,19 +1070,28 @@ export default function LobbyScreen() {
   // kör onödig animation.
   const startGlow = useRef(new Animated.Value(0.4)).current;
   const startPulse = useRef(new Animated.Value(1)).current;
-  // Opacity-pulse för "Music. Film. Sport."-taglinen i room code-kortet.
-  const taglineFade = useRef(new Animated.Value(1)).current;
 
+  // Cross-fade host-badge: "You are the host" → "Invite friends" → "Or play single game"
+  const hostBadgeOp0 = useRef(new Animated.Value(1)).current;
+  const hostBadgeOp1 = useRef(new Animated.Value(0)).current;
+  const hostBadgeOp2 = useRef(new Animated.Value(0)).current;
+  const hostBadgeIdxRef = useRef(0);
   useEffect(() => {
-    const fadeLoop = Animated.loop(
-      Animated.sequence([
-        Animated.timing(taglineFade, { toValue: 0.15, duration: 1600, useNativeDriver: true }),
-        Animated.timing(taglineFade, { toValue: 1, duration: 1600, useNativeDriver: true }),
-      ]),
-    );
-    fadeLoop.start();
-    return () => fadeLoop.stop();
-  }, [taglineFade]);
+    if (!hostMode) return;
+    const opacities = [hostBadgeOp0, hostBadgeOp1, hostBadgeOp2];
+    const easing = Easing.bezier(0.4, 0, 0.2, 1);
+    const cycle = () => {
+      const current = hostBadgeIdxRef.current;
+      const next = (current + 1) % opacities.length;
+      Animated.parallel([
+        Animated.timing(opacities[current], { toValue: 0, duration: 2600, easing, useNativeDriver: true }),
+        Animated.timing(opacities[next], { toValue: 1, duration: 2600, easing, useNativeDriver: true }),
+      ]).start();
+      hostBadgeIdxRef.current = next;
+    };
+    const interval = setInterval(cycle, 5000);
+    return () => clearInterval(interval);
+  }, [hostMode, hostBadgeOp0, hostBadgeOp1, hostBadgeOp2]);
 
   useEffect(() => {
     // Animationen körs för båda host (Start Game-knappen) och non-host
@@ -1436,6 +1449,8 @@ export default function LobbyScreen() {
                   const shouldEnable =
                     lobbySt?.spotifyEnabled ?? profile?.spotifyDefaultEnabled ?? false;
                   setSpotifyEnabled(shouldEnable);
+                  setSpotifyAnswerYear(lobbySt?.spotifyAnswerYear ?? profile?.spotifyAnswerYear ?? true);
+                  setSpotifyAnswerName(lobbySt?.spotifyAnswerName ?? profile?.spotifyAnswerName ?? true);
                 },
               );
             }
@@ -1609,12 +1624,35 @@ export default function LobbyScreen() {
   // (WebView-baserat ljud) när Stack-navigatorn trycker Quiz ovanpå.
   const [screenFocused, setScreenFocused] = useState(true);
 
+  // Ambient-ljud startar 2.5 s efter att host-välkomst-rösten sagt "QuizVibe".
+  const [showAmbient, setShowAmbient] = useState(false);
+  // Engångsskydd så välkomst-rösten bara spelas en gång per lobby-session.
+  const hasSpokeRef = useRef(false);
+
   useFocusEffect(
     useCallback(() => {
       setScreenFocused(true);
       return () => setScreenFocused(false);
     }, []),
   );
+
+  // Välkomst-röst "QuizVibe" när host kliver in i lobbyn — en gång per session.
+  useEffect(() => {
+    if (!hostMode || hasSpokeRef.current) return;
+    hasSpokeRef.current = true;
+    try {
+      Speech.speak('Quiz ... Vibe', {
+        language: 'en-US',
+        pitch: 0.7,
+        rate: 0.14,
+      });
+    } catch {
+      // expo-speech saknas i Expo Go — tyst fallback
+    }
+    const t = setTimeout(() => setShowAmbient(true), 6000);
+    return () => clearTimeout(t);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hostMode]);
 
   // Master "Approve All"-state — återställs automatiskt till 'no' när
   // waiting-listan blivit tom (efter approve all eller när ingen väntar).
@@ -1729,6 +1767,8 @@ export default function LobbyScreen() {
   const [sketchEnabled, setSketchEnabled] = useState(false);
   // Spotify DJ-läge — host aktiverar, kräver kopplat Spotify Premium-konto.
   const [spotifyEnabled, setSpotifyEnabled] = useState(false);
+  const [spotifyAnswerYear, setSpotifyAnswerYear] = useState(true);
+  const [spotifyAnswerName, setSpotifyAnswerName] = useState(true);
   // Host:s egna Spotify-anslutningsstatus (laddas i useFocusEffect).
   const [spotifyConnected, setSpotifyConnected] = useState(false);
   const [spotifyDisplayName, setSpotifyDisplayName] = useState<string | null>(null);
@@ -2980,6 +3020,8 @@ export default function LobbyScreen() {
         imagesEnabledCategories,
         sketchEnabled,
         spotifyEnabled,
+        spotifyAnswerYear,
+        spotifyAnswerName,
       }).catch(() => { /* loggas i mockLobbySettings */ });
     }, 300);
     return () => clearTimeout(handle);
@@ -2998,6 +3040,8 @@ export default function LobbyScreen() {
     imagesEnabledCategories,
     sketchEnabled,
     spotifyEnabled,
+    spotifyAnswerYear,
+    spotifyAnswerName,
   ]);
 
   // Realtime-tick: bumpas av lobby_players + lobby_settings-channel-
@@ -3041,6 +3085,8 @@ export default function LobbyScreen() {
       });
       setSketchEnabled(stored.sketchEnabled);
       setSpotifyEnabled(stored.spotifyEnabled);
+      setSpotifyAnswerYear(stored.spotifyAnswerYear);
+      setSpotifyAnswerName(stored.spotifyAnswerName);
       // Per-source categories — [] är ett giltigt "allt av"-val och får INTE
       // coerceas till defaults. Direkt tilldelning respekterar host:s explicita val.
       setYoutubeEnabledCategories((prev) => {
@@ -3945,6 +3991,8 @@ export default function LobbyScreen() {
         // OCH host:ns Spotify Premium-konto är kopplat. quiz.tsx beräknar
         // DJ-rotationsplanen från turnOrder + totalRounds + frågor med spotifyTrackId.
         spotifyEnabled: String(spotifyEnabled && spotifyConnected),
+        spotifyAnswerYear: String(spotifyAnswerYear),
+        spotifyAnswerName: String(spotifyAnswerName),
         // Skickas så Quit Game-flödet i quiz.tsx kan deactivera rummet
         // och rensa leftPlayers när host avslutar mitt i ett spel.
         roomCode,
@@ -4072,7 +4120,7 @@ export default function LobbyScreen() {
       {/* Morse-ambient-ljud — bara när skärmen är aktiv (avmonteras vid
           Stack-navigation till t.ex. Quiz, annars fortsätter WebView spela
           trots att LobbyScreen ligger kvar ouppmonterad i stacken). */}
-      {screenFocused && hostMode && <MorseAmbientSound />}
+      {screenFocused && hostMode && showAmbient && <MorseAmbientSound />}
       {/* Top board (login status) — sticky utanför ScrollView så den följer
           med när användaren scrollar i lobbyn. Tap-beteendet är roll-
           beroende:
@@ -4178,21 +4226,18 @@ export default function LobbyScreen() {
               Lobby", uppe i högra hörnet (host saknar credits-pill där så
               utrymmet är fritt). Host visar den ovanför room code-kortet. */}
           {!hostMode && (
-            <Animated.Text
-              style={[styles.headerTagline, { opacity: taglineFade }]}
-              numberOfLines={1}
-            >
+            <Text style={styles.headerTagline} numberOfLines={1}>
               Music. Film. Sport.
-            </Animated.Text>
+            </Text>
           )}
         </View>
 
         {/* Brand-tagline (glowing gold, opacity-pulse) — host visar den OVANFÖR
             room code-kortet; non-host visar den i headern (se ovan). */}
         {hostMode && (
-          <Animated.Text style={[styles.roomTagline, { opacity: taglineFade }]}>
+          <Text style={styles.roomTagline}>
             Music. Film. Sport.
-          </Animated.Text>
+          </Text>
         )}
 
         <Card style={styles.roomCard} padding={Spacing.xl}>
@@ -4220,14 +4265,25 @@ export default function LobbyScreen() {
               <Text style={styles.roomLabelGuestAbsolute}>Room Code</Text>
             </>
           )}
-          {/* "You are the host" som centrerad rubrik över Room Code (ingen
-              kantlinje-ruta längre) — kungakrona-ikon före texten. */}
+          {/* Host-badge med tre cross-fadande fraser:
+              "You are the host" (blå) → "Invite friends" (guld) → "Or play single game" (guld) */}
           {hostMode && (
-            <View style={styles.hostBadge}>
-              <Svg width={18} height={18} viewBox="0 0 24 24">
-                <Path d="M5 16L3 6l5 4 4-6 4 6 5-4-2 10H5zm0 2h14v2H5v-2z" fill={Colors.primary} />
-              </Svg>
-              <Text style={styles.hostBadgeText}>You are the host</Text>
+            <View style={[styles.hostBadge, { position: 'relative' }]}>
+              {/* Index 0 — "You are the host" (blå, starts visible) */}
+              <Animated.View style={[styles.hostBadgeInner, { opacity: hostBadgeOp0 }]}>
+                <Svg width={18} height={18} viewBox="0 0 24 24">
+                  <Path d="M5 16L3 6l5 4 4-6 4 6 5-4-2 10H5zm0 2h14v2H5v-2z" fill={Colors.primary} />
+                </Svg>
+                <Text style={styles.hostBadgeText}>You are the host</Text>
+              </Animated.View>
+              {/* Index 1 — "Invite friends" (guld, overlay) */}
+              <Animated.View style={[styles.hostBadgeInner, styles.hostBadgeOverlay, { opacity: hostBadgeOp1 }]}>
+                <Text style={styles.hostBadgeTextGold}>Invite friends</Text>
+              </Animated.View>
+              {/* Index 2 — "Or play single game" (guld, overlay) */}
+              <Animated.View style={[styles.hostBadgeInner, styles.hostBadgeOverlay, { opacity: hostBadgeOp2 }]}>
+                <Text style={styles.hostBadgeTextGold}>Or play single game</Text>
+              </Animated.View>
             </View>
           )}
           <View style={[styles.roomCodeRow, !hostMode && styles.roomCodeRowGuestSpacing, hostMode && styles.roomCodeRowHostSpacing]}>
@@ -4259,7 +4315,7 @@ export default function LobbyScreen() {
           {/* Share invite är host-only — bara host bjuder in nya spelare */}
           {hostMode && (
             <TouchableOpacity onPress={handleOpenShareModal} style={styles.shareBtn}>
-              <Text style={styles.shareBtnText}>↑ Share invite</Text>
+              <Text style={styles.shareBtnText}>↑ Share invite to friends</Text>
             </TouchableOpacity>
           )}
         </Card>
@@ -4478,16 +4534,18 @@ export default function LobbyScreen() {
               event som host:s Start Game-tap fyrar. */}
           {hostMode && (
             <View style={styles.startSection}>
-              {/* "Start Game"-label ovanför play-loggan — speglar GetReadyIntro:s
-                  "Press Play"-rad men med lobby-specifik text. */}
-              <View style={styles.startGameLabelRow}>
-                <Text style={styles.startGameLabelText}>Start Game</Text>
-              </View>
-              {/* Gold-glowing Q-play-logo — identisk animering och stil som
-                  GetReadyIntro:s play-knapp. */}
+              {/* Yttre + inre ring, label och logo samlade i en wrap */}
               <Animated.View
                 style={[styles.startGameWrap, { transform: [{ scale: startPulse }] }]}
               >
+                {/* Yttre ring */}
+                <View style={styles.startGameRingOuter} pointerEvents="none" />
+                {/* Inre ring */}
+                <View style={styles.startGameRingInner} pointerEvents="none" />
+                {/* "Start Game"-label innanför ringarna */}
+                <View style={styles.startGameLabelRow}>
+                  <BlinkingLabel style={styles.startGameLabelText}>Start Game</BlinkingLabel>
+                </View>
                 <Animated.View
                   style={[styles.startGameHalo, { opacity: startGlow }]}
                   pointerEvents="none"
@@ -4748,7 +4806,8 @@ export default function LobbyScreen() {
                 Alltid synlig. Availability-pillen visar om Spotify DJ
                 stöds i aktuellt game mode (IndDev = grön "Enabled",
                 PtP/Single = grå "Disabled" + toggle utgråad). */}
-            <View style={styles.spotifyDJRow}>
+            <View style={{ backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: Radius.sm, marginBottom: Spacing.xs, paddingBottom: spotifyEnabled ? 6 : 0 }}>
+            <View style={[styles.spotifyDJRow, { backgroundColor: undefined, borderRadius: undefined, marginBottom: 0 }]}>
               <View style={[styles.connectionIconWrap, { alignSelf: 'flex-start', marginTop: 0, marginLeft: -2 }]}>
                 {/* variant="white" — mörk kortbakgrund kräver monokrom vit
                     per Spotifys brand guidelines (grönt bara på svart/vit bg). */}
@@ -4850,6 +4909,51 @@ export default function LobbyScreen() {
                   />
                 </View>
               )}
+            </View>
+
+            {/* ── Spotify answer type toggles (synliga bara när Spotify är aktiverat) ── */}
+            {spotifyEnabled && (
+              <View style={{ flexDirection: 'row', alignItems: 'center', paddingRight: 18, paddingTop: 2, paddingBottom: 2 }}>
+                <View style={{ marginLeft: 'auto', marginRight: spotifyConnected ? 14 : -16, flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                    <Text style={{ fontSize: FontSize.sm, fontWeight: FontWeight.medium, color: Colors.textSecondary }}>Year</Text>
+                    <Switch
+                      value={spotifyAnswerYear}
+                      disabled={!hostMode}
+                      onValueChange={(v) => {
+                        if (!v && !spotifyAnswerName) {
+                          Alert.alert('At least one answer type required', 'At least one Spotify answer type must be enabled.');
+                          return;
+                        }
+                        setSpotifyAnswerYear(v);
+                      }}
+                      trackColor={{ false: Colors.error, true: Colors.success }}
+                      thumbColor="#FFF"
+                      ios_backgroundColor={spotifyAnswerYear ? Colors.success : Colors.error}
+                      style={styles.sourceMatrixSwitch}
+                    />
+                  </View>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                    <Text style={{ fontSize: FontSize.sm, fontWeight: FontWeight.medium, color: Colors.textSecondary }}>Name</Text>
+                    <Switch
+                      value={spotifyAnswerName}
+                      disabled={!hostMode}
+                      onValueChange={(v) => {
+                        if (!v && !spotifyAnswerYear) {
+                          Alert.alert('At least one answer type required', 'At least one Spotify answer type must be enabled.');
+                          return;
+                        }
+                        setSpotifyAnswerName(v);
+                      }}
+                      trackColor={{ false: Colors.error, true: Colors.success }}
+                      thumbColor="#FFF"
+                      ios_backgroundColor={spotifyAnswerName ? Colors.success : Colors.error}
+                      style={styles.sourceMatrixSwitch}
+                    />
+                  </View>
+                </View>
+              </View>
+            )}
             </View>
 
             {/* ── Source × Category Matrix ── */}
@@ -5613,7 +5717,9 @@ export default function LobbyScreen() {
           activeOpacity={0.7}
           style={styles.toTopBtn}
         >
-          <BlinkingLabel style={styles.toTopLabel}>Back to the top ↑</BlinkingLabel>
+          <View style={styles.toTopBox}>
+            <BlinkingLabel style={styles.toTopLabel} duration={1800}>Back to the top ↑</BlinkingLabel>
+          </View>
         </TouchableOpacity>
 
         <View style={styles.bottomPad} />
@@ -6232,18 +6338,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     gap: Spacing.md,
   },
-  // Non-host: "Music. Film. Sport." på samma rad som Game Lobby (höger). Mindre
-  // än room-card-varianten + glowing gold, så den ryms i headern.
+  // Non-host: "Music. Film. Sport." på samma rad som Game Lobby (höger).
   headerTagline: {
     flexShrink: 1,
     fontSize: 19,
     fontWeight: FontWeight.semibold,
-    color: Colors.warning,
+    color: Colors.textSecondary,
     letterSpacing: 0.2,
     textAlign: 'right',
-    textShadowColor: Colors.warning,
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 8,
   },
   // Speglar Profile:s creditsPill 1:1 (samma styling, samma layout) så
   // pillen ser identisk ut i båda vyerna och användaren känner igen den.
@@ -6376,9 +6478,12 @@ const styles = StyleSheet.create({
   },
   screenTitle: { fontSize: 24, fontWeight: '700', color: Colors.textPrimary },
 
-  // "You are the host" — centrerad rubrik (ingen pill/kantlinje) över Room Code.
-  hostBadge: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, alignSelf: 'center', marginTop: -Spacing.sm, marginBottom: Spacing.sm },
+  // "You are the host" — centrerad rubrik med cross-fade animation.
+  hostBadge: { alignSelf: 'stretch', marginTop: -Spacing.sm, marginBottom: Spacing.sm, height: 26 },
+  hostBadgeInner: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 },
+  hostBadgeOverlay: { position: 'absolute', top: 0, left: 0, right: 0 },
   hostBadgeText: { fontSize: FontSize.lg, fontWeight: FontWeight.bold, color: Colors.primary },
+  hostBadgeTextGold: { fontSize: FontSize.lg, fontWeight: FontWeight.bold, color: Colors.warning },
 
   // paddingBottom override:ar Card:ens uniforma Spacing.xl-padding → minskar
   // avståndet mellan Share invite-rutan och kortets nederkant.
@@ -6513,15 +6618,11 @@ const styles = StyleSheet.create({
   roomTagline: {
     marginTop: 0,
     marginBottom: 0,
-    // Samma storlek som non-host:ens headerTagline (2026-06-01).
     fontSize: 19,
     fontWeight: FontWeight.semibold,
-    color: Colors.warning,
+    color: Colors.textSecondary,
     letterSpacing: 0.2,
     textAlign: 'center',
-    textShadowColor: Colors.warning,
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 10,
   },
 
   section: { gap: Spacing.sm },
@@ -7522,8 +7623,8 @@ const styles = StyleSheet.create({
     height: 20,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: Colors.success,
-    backgroundColor: '#6B7280',
+    borderColor: Colors.textSecondary,
+    backgroundColor: 'transparent',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -7532,7 +7633,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '700',
     fontStyle: 'italic',
-    color: Colors.success,
+    color: Colors.warning,
     lineHeight: 15,
   },
   connectionLabel: {
@@ -7836,12 +7937,9 @@ const styles = StyleSheet.create({
     color: Colors.textPrimary,
     fontWeight: FontWeight.bold,
   },
-  // Q-play-logo Start Game — identisk layout som GetReadyIntro:s play-knapp.
-  // Wrap är 140×140 centrerad; halo extender 14px utanför loggan med guld-glow.
+  // Start Game wrap — auto-höjd så label + logo ryms; ringarna positioneras relativt hela wrappern.
   startGameWrap: {
     position: 'relative',
-    width: 140,
-    height: 140,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: Colors.warning,
@@ -7849,15 +7947,40 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.6,
     shadowRadius: 18,
     elevation: 12,
+    paddingHorizontal: 28,
+    paddingTop: 16,
+    paddingBottom: 16,
   },
   startGameHalo: {
     position: 'absolute',
-    top: 14,
-    left: 14,
-    right: 14,
-    bottom: 14,
+    bottom: 30,
+    left: 42,
+    right: 42,
+    height: 112,
     borderRadius: Radius.xl,
     backgroundColor: Colors.warning,
+  },
+  // Yttre ring — omsluter hela wrappern (label + logo)
+  startGameRingOuter: {
+    position: 'absolute',
+    top: -14,
+    left: -14,
+    right: -14,
+    bottom: -14,
+    borderRadius: 40,
+    borderWidth: 2.5,
+    borderColor: Colors.warning,
+  },
+  // Inre ring — tätare intill wrappern
+  startGameRingInner: {
+    position: 'absolute',
+    top: -6,
+    left: -6,
+    right: -6,
+    bottom: -6,
+    borderRadius: 32,
+    borderWidth: 2.5,
+    borderColor: Colors.warning,
   },
   startGameLogoTouch: {
     width: 140,
@@ -7888,7 +8011,13 @@ const styles = StyleSheet.create({
   startHint: { fontSize: FontSize.xs, color: Colors.textSecondary, textAlign: 'center', lineHeight: 17 },
   bottomPad: { height: Spacing.xl },
   toTopBtn: { alignItems: 'center', paddingVertical: Spacing.md },
-  toTopLabel: { fontSize: FontSize.sm, color: Colors.warning, letterSpacing: 0.5 },
+  toTopBox: {
+    backgroundColor: Colors.borderStrong,
+    borderRadius: Radius.sm,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.xs,
+  },
+  toTopLabel: { fontSize: FontSize.sm, color: Colors.textPrimary, letterSpacing: 0.5 },
   // ── Game Sequence ──────────────────────────────────────────────────────────
   // Ingen topp-badge längre — bara botten-badge (kategori) skär kantlinjen.
   // rowGap 16 räcker: botten-badge 9 px under + 7 px luft till nästa rads topkant.

@@ -45,6 +45,9 @@ export interface LobbySettings {
   // Kräver att alla spelare har spotify_verified = true i lobby_players.
   // DB-kolumn: lobby_settings.spotify_enabled (migration 0015 måste vara applicerad).
   spotifyEnabled: boolean;
+  // Spotify-svarstyper (tolerant fallback via ?? true — ingen DB-migration krävs för V1).
+  spotifyAnswerYear: boolean;
+  spotifyAnswerName: boolean;
 }
 
 interface LobbySettingsRow {
@@ -72,6 +75,9 @@ interface LobbySettingsRow {
   sketch_enabled?: boolean;
   // Optional tills migration 0015_spotify_connections.sql körts (tolerant read).
   spotify_enabled?: boolean;
+  // Spotify-svarstyper. Optional tills kolumnerna lagts till (tolerant read via ?? true).
+  spotify_answer_year?: boolean;
+  spotify_answer_name?: boolean;
 }
 
 const UI_TO_DB_REGION: Record<LobbyRegion, DbRegion> = {
@@ -119,6 +125,9 @@ function rowToSettings(row: LobbySettingsRow): LobbySettings {
     // Tolerant: kolumnen kanske inte finns ännu (pre-migration) → default false.
     sketchEnabled: row.sketch_enabled ?? false,
     spotifyEnabled: row.spotify_enabled ?? false,
+    // Tolerant: kolumner kanske inte finns ännu → default true (båda aktiva).
+    spotifyAnswerYear: row.spotify_answer_year ?? true,
+    spotifyAnswerName: row.spotify_answer_name ?? true,
   };
 }
 
@@ -150,6 +159,12 @@ function settingsToRow(code: string, s: LobbySettings): LobbySettingsRow {
     // Migration 0015: spotify_enabled-kolumn. Kräver att migration körs
     // i Supabase manuellt — se supabase/migrations/0015_spotify_connections.sql.
     spotify_enabled: s.spotifyEnabled,
+    // Spotify answer-type-kolumner. Kolumnerna saknas i DB tills migration körs.
+    // Kommenterat ut (samma mönster som sketch_enabled) — en upsert mot okänd
+    // kolumn failor HELA settings-skrivningen → bryter all lobby-sync.
+    // rowToSettings läser via ?? true så default-beteendet (båda aktiva) gäller.
+    // spotify_answer_year: s.spotifyAnswerYear,
+    // spotify_answer_name: s.spotifyAnswerName,
   };
 }
 

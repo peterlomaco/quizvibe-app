@@ -483,6 +483,8 @@ export default function ProfileScreen() {
 
   // ── Spotify-state ────────────────────────────────────────────────────
   const [spotifyEnabled, setSpotifyEnabled] = useState(false);
+  const [spotifyAnswerYear, setSpotifyAnswerYear] = useState(true);
+  const [spotifyAnswerName, setSpotifyAnswerName] = useState(true);
   const [spotifyConnected, setSpotifyConnected] = useState(false);
   const [spotifyDisplayName, setSpotifyDisplayName] = useState<string | null>(null);
   const [spotifyConnecting, setSpotifyConnecting] = useState(false);
@@ -864,6 +866,8 @@ export default function ProfileScreen() {
         setYoutubeEnabledCategories(augmented.youtubeEnabledCategories ?? defaultEnabledMainCategories());
         setImagesEnabledCategories(augmented.imagesEnabledCategories ?? defaultEnabledMainCategories());
         setSpotifyEnabled(augmented.spotifyDefaultEnabled ?? false);
+        setSpotifyAnswerYear(augmented.spotifyAnswerYear ?? true);
+        setSpotifyAnswerName(augmented.spotifyAnswerName ?? true);
         // Snapshot av laddad state — jämförs vid navigation bort.
         savedSnapshotRef.current = JSON.stringify({
           birthYear: augmented.birthYear,
@@ -897,7 +901,11 @@ export default function ProfileScreen() {
           setSpotifyDisplayName(status.spotifyDisplayName);
           if (ok) {
             loadProfile().then((p) => {
-              if (active) setSpotifyEnabled(p?.spotifyDefaultEnabled ?? false);
+              if (active) {
+                setSpotifyEnabled(p?.spotifyDefaultEnabled ?? false);
+                setSpotifyAnswerYear(p?.spotifyAnswerYear ?? true);
+                setSpotifyAnswerName(p?.spotifyAnswerName ?? true);
+              }
             }).catch(() => {});
           }
         }).catch(() => {});
@@ -970,6 +978,8 @@ export default function ProfileScreen() {
         youtubeEnabledCategories,
         imagesEnabledCategories,
         spotifyDefaultEnabled: spotifyEnabled,
+        spotifyAnswerYear,
+        spotifyAnswerName,
       });
       savedSnapshotRef.current = JSON.stringify({
         birthYear, assistance,
@@ -1554,7 +1564,8 @@ export default function ProfileScreen() {
           <View style={styles.field}>
             <Text style={styles.sectionLabel}>SOURCE MIXERBOARD</Text>
             {/* Spotify DJ-rad — alltid synlig, tillgänglig om konto kopplat */}
-            <View style={styles.spotifyDJRow}>
+            <View style={{ backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: Radius.sm, marginBottom: Spacing.xs, paddingBottom: spotifyEnabled ? 6 : 0 }}>
+            <View style={[styles.spotifyDJRow, { backgroundColor: undefined, borderRadius: undefined, marginBottom: 0 }]}>
               <View style={[styles.connectionIconWrap, { alignSelf: 'flex-start', marginTop: 1, marginLeft: -2 }]}>
                 <SpotifyBrandIcon size={22} variant="white" />
               </View>
@@ -1608,6 +1619,47 @@ export default function ProfileScreen() {
                   style={[styles.sourceMatrixSwitch, !spotifyConnected && { opacity: 0.4 }]}
                 />
               </View>
+            </View>
+            {spotifyEnabled && (
+              <View style={{ flexDirection: 'row', alignItems: 'center', paddingRight: 18, paddingTop: 2, paddingBottom: 2 }}>
+                <View style={{ marginLeft: 'auto', marginRight: -16, flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                    <Text style={{ fontSize: FontSize.sm, fontWeight: FontWeight.medium, color: Colors.textSecondary }}>Year</Text>
+                    <Switch
+                      value={spotifyAnswerYear}
+                      onValueChange={(v) => {
+                        if (!v && !spotifyAnswerName) {
+                          Alert.alert('At least one answer type required', 'At least one Spotify answer type must be enabled.');
+                          return;
+                        }
+                        setSpotifyAnswerYear(v);
+                      }}
+                      trackColor={{ false: Colors.error, true: Colors.success }}
+                      thumbColor="#FFF"
+                      ios_backgroundColor={spotifyAnswerYear ? Colors.success : Colors.error}
+                      style={styles.sourceMatrixSwitch}
+                    />
+                  </View>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                    <Text style={{ fontSize: FontSize.sm, fontWeight: FontWeight.medium, color: Colors.textSecondary }}>Name</Text>
+                    <Switch
+                      value={spotifyAnswerName}
+                      onValueChange={(v) => {
+                        if (!v && !spotifyAnswerYear) {
+                          Alert.alert('At least one answer type required', 'At least one Spotify answer type must be enabled.');
+                          return;
+                        }
+                        setSpotifyAnswerName(v);
+                      }}
+                      trackColor={{ false: Colors.error, true: Colors.success }}
+                      thumbColor="#FFF"
+                      ios_backgroundColor={spotifyAnswerName ? Colors.success : Colors.error}
+                      style={styles.sourceMatrixSwitch}
+                    />
+                  </View>
+                </View>
+              </View>
+            )}
             </View>
             <View
               style={styles.smGrid}
@@ -4017,8 +4069,8 @@ const styles = StyleSheet.create({
     height: 20,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: Colors.success,
-    backgroundColor: '#6B7280',
+    borderColor: Colors.textSecondary,
+    backgroundColor: 'transparent',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -4027,7 +4079,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '700',
     fontStyle: 'italic',
-    color: Colors.success,
+    color: Colors.warning,
     lineHeight: 15,
   },
   // Speglar Lobby:s purchasedPackageBox + purchasedPackageBoxActive 1:1

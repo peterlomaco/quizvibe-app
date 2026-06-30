@@ -465,14 +465,14 @@ Profile-toggle som filtrerar vilka paket som syns i Lobby:n när användaren är
   - **FREE-badge-pattern bevarad**: `pkg.free` på `MusicPackage`-interfacet är optional och styr en kantskärande FREE-badge på paket-raden (`packageRowFreeBadge` styles). Inga free-paket existerar i V1 men styling finns kvar för framtida gratis-paket.
 - **Seeding**: Lobby host-seed-effekten läser `profile.enabledHostPackages` (= tom i V1). Bara host får filterlistan (non-hosts ser endast paket som hosten faktiskt aktiverat för denna lobby via `selectedExtraPackages`).
 
-## SOURCE MIXERBOARD — per-source category matrix (uppdaterad 2026-06-05)
+## SOURCE MIXERBOARD — per-source category matrix (uppdaterad 2026-07-01)
 
 Ersätter gamla `enabledMainCategories` + `youtubeEnabled`/`imagesEnabled`-booleans med **per-source category-arrays**. UI-rubriken "SOURCE MIXERBOARD" i både Lobby och Profile.
 
 **Datamodell**: `youtubeEnabledCategories: MainCategory[]` + `imagesEnabledCategories: MainCategory[]` + `spotifyEnabled: boolean`. Alla tre sparas i Profile (`spotifyDefaultEnabled` i `ProfileData`) och seeds till Lobby vid Create Game.
 
 **UI-layout** (`smGrid` i LobbyScreen + ProfileScreen):
-- **Spotify DJ-rad** — överst, direkt under "SOURCE MIXERBOARD"-rubriken. Box med `backgroundColor: rgba(255,255,255,0.06)` + `borderRadius: Radius.sm` (matchar All-radens styling). Spotify-ikon + label + info-icon + anslutningsstatus + toggle.
+- **Spotify DJ-rad** — överst, direkt under "SOURCE MIXERBOARD"-rubriken. Box med `backgroundColor: rgba(255,255,255,0.06)` + `borderRadius: Radius.sm` (matchar All-radens styling). Spotify-ikon + label + info-icon + anslutningsstatus + toggle. Direkt under (när `spotifyEnabled`): **Year + Name-switchar på samma rad** (gröna vid på, röda vid av — matchar övriga Mixerboard-switchar). Validering: minst en av dem måste vara aktiv (Alert om försök att stänga av båda). **DB-gotcha**: `spotify_answer_year`/`spotify_answer_name` saknar DB-migration → skrivs INTE i `settingsToRow` (kommenterade ut precis som `sketch_enabled`) — `rowToSettings` läser via `?? true` som tolerant fallback.
 - **Matrisen nedan**: Rad 1 (rubriker) | Rad 2 (All-rad) | Rad 3 (YouTube) | Rad 4 (Hints) — kolumner: **Music / Film / Sport** (displaynamn i UI; internt mappade mot `artists/actors/athletes`). `smAutoCell` (spacer mellan YouTube- och Hints-raderna) är `height: 8` — tunn spacer, ingen label-text (borttagen 2026-06-15).
 - `onLayout` på `smGrid` mäter exakt kolumnbredd → pixel-perfekt centrering.
 
@@ -900,7 +900,8 @@ Glöm inte lägga till nya stores här när de skapas — annars läcker stale d
 
 **Lobby section-collapse default + non-host layout (2026-06-13)**:
 - **`playersExpanded` defaultar till `false`** för BÅDA host och non-host (`useState(false)`) — var tidigare `useState(!hostMode)` så host startade med sektionen öppen. Nu startar alla med Players in Lobby kollapsad.
-- **"New Player joined" BlinkingLabel** visas i Players-sektionens header när `!playersExpanded && newPlayerJoined`. `newPlayerJoined` sätts `true` i en `useEffect` som jämför `approvedPlayers.filter(p => !p.isHost).length` mot föregående värde via `prevNonHostApprovedRef` — notifikationen syns bara när sektionen är ihopfälld och en ny spelare godkänts. Resetas i separat `useEffect` på `[playersExpanded]` när sektionen öppnas. Befintlig "Players Waiting"-BlinkingLabel är separat och opåverkad.
+- **"New Player joined" BlinkingLabel** (2026-06-30): visas i Players-sektionens header när `!playersExpanded && newPlayerJoined && waitingForApproval.length === 0`. Färg: **grön** (`Colors.success`) — signalerar att alla nyligen joinade spelare redan är godkända och inga väntar. `newPlayerJoined` sätts `true` i en `useEffect` som jämför `approvedPlayers.filter(p => !p.isHost).length` mot föregående värde via `prevNonHostApprovedRef` — notifikationen syns bara när sektionen är ihopfälld och en ny spelare godkänts. Resetas i separat `useEffect` på `[playersExpanded]` när sektionen öppnas. **Ömsesidigt exklusiv med "Players Waiting"**: "Players Waiting" (röd, `Colors.error`) visas när `waitingForApproval.length > 0`; "New Player joined" visas BARA när `length === 0`. Aldrig båda synliga samtidigt.
+- **Re-join-policy (godkännande)**: non-hosts auto-godkänns **enbart vid första anslutningen** till en lobby. Om en non-host lämnar (Leave Game) och sedan ansluter till samma lobby igen via rumkoden måste host godkänna dem manuellt — `approved` i DB återspeglar den tidigare host-åtgärden och sätts inte automatiskt till `true` igen.
 - **Non-host centrering av "Waiting for Host"**: två `<View style={{ flex: 1 }} />`-spacers placeras ovanför och nedanför `startSection`-wrap:en i ScrollView:n. `styles.content` har `flexGrow: 1` på `contentContainerStyle` (tidigare saknade) så content-containern fyller hela skärmhöjden — utan detta har `flex: 1`-children inget att expandera in i. Resultatet: "Waiting for Host to Start Game" + play-ikonet centreras vertikalt i utrymmet mellan Players och Customize.
 - **"Customize QuizVibe" är kollapsbar** längst ner i lobbyn, synlig för BOTH host och non-host. Innehåller Game Settings- och Quiz Tuning-sektionerna inuti. Styrs av `customizeExpanded`-state. En `useEffect` på `[customizeExpanded]` anropar `mainScrollRef.current?.scrollToEnd({ animated: true })` med 150 ms fördröjning vid expand. Header-styling: `backgroundColor: Colors.card`, `+/−`-toggle.
 
@@ -1789,7 +1790,29 @@ Demo-data (`src/utils/nameQuizDemo.ts`) genererad för Millennials (1990) + stan
 - [src/components/CountdownIntro.tsx](src/components/CountdownIntro.tsx) — 3-2-1-nedräkning mellan tap på play-knappen i intro:n och fråge-vyn. Stor `CountdownQLogo` centrerad (size 360 px på fullbreds-skärmar). Siffran (3, 2, 1) och `?`-glyfen pop:as in i Q-ringen via overlay-Animated.Text med spring-scale 1.4 → 1 + opacity 0 → 1, **följt av en kontinuerlig zoom-puls 1 ↔ 1.18 (350 ms varje håll, ~1.4 puls/sek)** tills siffran byts. Loop:n stoppas i useEffect cleanup vid count-byte så nästa siffrans pop-in inte krockar med den gamla loopen. Total tid ~4 s. **Q-loggan shift:as `LOGO_SIZE * 0.0375` åt höger** via en absolute-positionerad wrap-View så Q-ringens center (SVG-koord (37, 37) = 46.25 % av LOGO_SIZE) hamnar exakt på 50 % horisontellt under glyph-overlay:ns centrerade siffra/?. **PlayerName-block ovan loggan**: `Pass-the-Phone to:`-label + framed box (`primaryMuted` bg + `Colors.primary` border + Radius.md, padding sm/lg) som matchar GetReadyIntro:s `currentPlayerBox` 1:1 — avatar (40×40 cirkel) + namn (FontSize.xxl bold) i row-layout. `playerEmoji?: string`-prop skickas in från quiz.tsx via `turnOrder[currentPlayerIndex]?.emoji`. `playerBlock.gap = Spacing.xl` ger luftig separation mellan label-rad och box.
 - [src/components/StopwatchIcon.tsx](src/components/StopwatchIcon.tsx) — modern sport-stopwatch SVG (rund kropp, top crown-knapp, sido-knapp diagonal, tick-mark vid 12-position, visare mot 1-2-positionen, center-pivot). `color`-prop styr alla element. ViewBox 24×24, default size 24. Används i quiz-skärmens decimal-stopwatch under timer-bar:en — ersätter den tidigare ⏱-emojin som rendereades inkonsekvent över plattformar.
 - [src/components/ProgressiveCover.tsx](src/components/ProgressiveCover.tsx) — mosaik-reveal-cover (se "Name-answer model — demo route"). Tar `assistance`-prop som styr reveal-fraktion: `full=0.25`, `standard=0.5`, `minimal=0.75` av `totalSeconds` (mer assistance = snabbare reveal). Q-loggan fadar oberoende av mosaiken — alltid helt borta efter 3 s via separat tick-loop.
-- [src/components/QuizVibeQAvatar.tsx](src/components/QuizVibeQAvatar.tsx) — Q-only brand-mark (utan rounded-square-bakgrunder) med valbart innehåll. `variant: 'smile' | 'wifi'` (default `'smile'`): smile = ögon + glad mun (default i TopUserBanner, Profile, Home, Avatar-fallback); wifi = Spotify-stilade sound-wave-arcs (3 koncentriska arcs roterade 25°, samma som QuizVibeLogo). ViewBox expanderas för wifi (`"21 21 36 36"`) så top-arc inte klipps. Används i Final Leaderboard:s Home-knapp där wifi-varianten valdes för brand-konsistens med start-skärmens logga.
+- [src/components/QuizVibeQAvatar.tsx](src/components/QuizVibeQAvatar.tsx) — Q-only brand-mark (utan rounded-square-bakgrunder) med valbart innehåll. `variant: 'smile' | 'wifi'` (default `'smile'`): smile = ögon + glad mun (default i TopUserBanner, Profile, Home, Avatar-fallback); wifi = Spotify-stilade sound-wave-arcs (3 koncentriska arcs roterade 25°, samma som QuizVibeLogo). ViewBox expanderas för wifi (`"21 21 36 36"`) så top-arc inte klipps. Används i Final Leaderboard:s Home-knapp där wifi-varianten valdes för brand-konsistens med start-skärmens logga. **`color?: string`-prop** (tillagd 2026-06-30): styr SVG-färg på alla element, default `Colors.primary`. Används av BottomBanner för aktiv (guld) vs inaktiv (grå) tab-färg.
+
+## BottomBanner — global tab-navigation (2026-06-30)
+
+[src/components/BottomBanner.tsx](src/components/BottomBanner.tsx) — sticky bottom tab-bar synlig på `/`, `/profile` och `/store`. Renderas i `app/_layout.tsx` utanför Stack-navigatorn så den alltid ligger ovanpå innehållet.
+
+**Layout**: `position: 'absolute', bottom: 0` + `backgroundColor: '#000'`. Innehåller en 1px `Colors.border`-avdelarline + en rad med tre tabs. Höjd `BOTTOM_BANNER_HEIGHT = 52` (exporteras för scroll-padding i screens). `paddingBottom: insets.bottom` via `useSafeAreaInsets` täcker home-indicator-zonen.
+
+**Tab-design**: ikon + text på **samma rad** (`flexDirection: 'row'`, `gap: 6`). Inga border-ramar eller bakgrundsfärger på tabbar — aktiv tab markeras **enbart** med guld (`Colors.warning`) på ikon och text. Inaktiv = `Colors.textSecondary`.
+
+**Ikonval per tab**:
+- Home → `<QuizVibeQAvatar size={26} variant="wifi" />`
+- Profile → `<QuizVibeQAvatar size={26} variant="smile" />`
+- Store → `<ShoppingCartIcon size={22} />`
+
+**`SHOW_ON = ['/', '/profile', '/store']`** — returnerar `null` för alla andra routes (lobby, quiz, getready etc.).
+
+**Scroll-padding**: alla tre screens lägger till `+ 52` (BOTTOM_BANNER_HEIGHT) i sin `paddingBottom` så scroll-innehållet inte döljs bakom bannern:
+- `app/index.tsx`: `Spacing.lg + 52`
+- `src/screens/ProfileScreen.tsx`: `Spacing.xxl + 52`
+- `src/screens/StoreScreen.tsx`: `Spacing.xxl + 52`
+
+**Navigation**: `router.replace()` (ingen history-stack) via expo-router. Aktiv route detekteras via `usePathname()`.
 
 ## Home — pulserande tagline
 
