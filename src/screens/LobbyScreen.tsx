@@ -4285,8 +4285,8 @@ export default function LobbyScreen() {
                 Players Waiting
               </BlinkingLabel>
             )}
-            {!playersExpanded && newPlayerJoined && (
-              <BlinkingLabel style={styles.playersWaitingLabel}>
+            {!playersExpanded && newPlayerJoined && waitingForApproval.length === 0 && (
+              <BlinkingLabel style={[styles.playersWaitingLabel, { color: Colors.success }]}>
                 New Player joined
               </BlinkingLabel>
             )}

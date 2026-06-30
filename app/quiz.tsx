@@ -65,6 +65,7 @@ import { buildImageVariant } from '@/src/utils/imageQuestionBuilder';
 import { HINTS_LIBRARY, getHintRegionScope, inferGender, inferNationality, inferSport, type HintLibrary } from '@/src/utils/hintsData';
 import { HintsQuizCard } from '@/src/components/HintsQuizCard';
 import { HeartbeatSound } from '@/src/components/HeartbeatSound';
+import { MorseAmbientSound } from '@/src/components/MorseAmbientSound';
 // import { getQuizImage } from '@/src/utils/quizImages';
 // ↑ Borttagen 2026-05-27 — text-rendering ersätter foto-rendering. Återintroducera
 // när sketches kommer (då med getQuizSketch() från assets/quiz-sketches/).
@@ -4627,6 +4628,8 @@ export default function QuizScreen() {
       {inactivityCountdownSec !== null && (
         <InactivityCountdownBanner secondsLeft={inactivityCountdownSec} />
       )}
+      {/* Ambient-slinga fortsätter sömlöst från Lobby-ljud under GetReady — ingen pulsering. */}
+      {isHost && !isAudioMutedForSelf && <MorseAmbientSound />}
       </View>
     );
   }
@@ -4843,7 +4846,7 @@ export default function QuizScreen() {
         {isHost && !isAudioMutedForSelf && isImageQuestion && (phase === 'question' || phase === 'awaiting') && (
           <HeartbeatSound bpm={80} />
         )}
-        {/* phase är här narrowed till 'question' | 'awaiting' | 'reveal'
+          {/* phase är här narrowed till 'question' | 'awaiting' | 'reveal'
             (leaderboard fångas av early-return ovan), så ingen extra
             phase-check behövs runt question UI. */}
             {/* MediaPlayer — provider-agnostisk dispatcher som väljer rätt

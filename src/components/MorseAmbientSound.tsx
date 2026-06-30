@@ -119,7 +119,7 @@ const HTML = `<!DOCTYPE html>
     osc.connect(lpf);
     lpf.connect(g);
     g.connect(master);
-    g.gain.value = 0.07;
+    g.gain.value = 0.14;
     osc.start();
   }
 
@@ -133,7 +133,7 @@ const HTML = `<!DOCTYPE html>
     if (ctx) return;
     ctx    = new (window.AudioContext || window.webkitAudioContext)();
     master = ctx.createGain();
-    master.gain.value = 0.52;
+    master.gain.value = 0.78;
     master.connect(ctx.destination);
 
     delay = buildDelay();
@@ -142,7 +142,7 @@ const HTML = `<!DOCTYPE html>
     var lfo  = ctx.createOscillator();
     var lfoG = ctx.createGain();
     lfo.frequency.value = 0.015;
-    lfoG.gain.value = 0.06;
+    lfoG.gain.value = 0.09;
     lfo.connect(lfoG);
     lfoG.connect(master.gain);
     lfo.start();

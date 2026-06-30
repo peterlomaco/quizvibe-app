@@ -495,7 +495,7 @@ export function GetReadyIntro({
 
   return (
     <SafeAreaView style={styles.safe}>
-      {isHost && hostAudioOn && <HeartbeatSound bpm={50} />}
+      {/* HeartbeatSound ersatt av MorseAmbientSound-fortsättning monterad i quiz.tsx (phase==='intro') */}
       {/* Top-bar längst upp — Quit Game för host (river hela lobbyn) eller
           Leave Game för non-host i IndDev (lämnar bara egen plats, går till
           Home). Båda speglar TopUserBanner:s vokabulär (Colors.card bg +
