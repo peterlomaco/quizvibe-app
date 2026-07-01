@@ -109,6 +109,19 @@ items:
         startSec: 0
         endSec: 273
         channelTitle: "Coldplay"
+  - id: dr-dre-the-next-episode
+    displayName: "The Next Episode — Dr. Dre ft. Snoop Dogg"
+    correctYear: 2000
+    probability: 88
+    wikimediaSearchHints: ["Dr Dre The Next Episode 2001"]
+    answerMethods: ["timeline"]
+    genrePackages: ["hiphop"]
+    spotifyTrackId: "4LwU4Vp6od3Sb08CsP99GC"
+    youtubeClips:
+      - videoId: "f0dkQGfha3A"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Dr. Dre"
   # 2001
   - id: lady-marmalade-2001
     displayName: "Lady Marmalade — Christina Aguilera, Lil' Kim, Mýa & Pink"
@@ -163,6 +176,8 @@ items:
     probability: 90
     wikimediaSearchHints: ["50 Cent In da Club Get Rich or Die Tryin"]
     answerMethods: ["timeline"]
+    genrePackages: ["hiphop"]
+    spotifyTrackId: "7iL6o9tox1zgHpKUfh9vuC"
     youtubeClips:
       - videoId: "_VXUiAJi5KY"
         startSec: 0

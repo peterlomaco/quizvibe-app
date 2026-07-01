@@ -766,6 +766,19 @@ items:
         endSec: 45
         channelTitle: "Kent - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: nas-if-i-ruled-the-world
+    displayName: "If I Ruled the World — Nas ft. Lauryn Hill"
+    correctYear: 1996
+    probability: 85
+    wikimediaSearchHints: ["Nas If I Ruled the World 1996 It Was Written"]
+    answerMethods: ["timeline"]
+    genrePackages: ["hiphop"]
+    spotifyTrackId: "5PQmSHzWnlgG4EBuIqjac2"
+    youtubeClips:
+      - videoId: "o2gwGy1ZIMg"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Nas"
   - id: bjorn-skifs-fangad-i-en-drom
     displayName: "Fångad i en dröm — Björn Skifs"
     correctYear: 1981

@@ -20,13 +20,14 @@ items:
     probability: 88
     wikimediaSearchHints: ["Glenmark Eriksson Strömstedt När vi gräver guld i USA 1994"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3iAJRvvn8pywXZtvBNNP71"
     youtubeClips:
       - videoId: "7YOzs-dD8qU"
         startSec: 30
         endSec: 45
         channelTitle: "Glenmark Eriksson Strömstedt - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
-    genrePackages: ["sport"]
+    genrePackages: ["sport", "football"]
   - id: nick-borgen-den-glider-in
     displayName: "Den glider in — Nick Borgen"
     correctYear: 1995
@@ -46,13 +47,13 @@ items:
     probability: 80
     wikimediaSearchHints: ["Markoolio Mera mål EM 2000"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "08oSaHoJ7jrFv1kd74ZRT2"
     youtubeClips:
-      - videoId: "nhEewGN6ePQ"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Markoolio - Topic"
-        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
-    genrePackages: ["sport"]
+      - videoId: "iqMDJSZMDQY"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Markoolio"
+    genrePackages: ["sport", "football"]
   - id: markoolio-in-med-bollen
     displayName: "In med bollen — Markoolio"
     correctYear: 2004
@@ -98,6 +99,76 @@ items:
         endSec: 50
         channelTitle: "Svenne Rubins - Topic"
     genrePackages: ["sport", "football"]
+  - id: dj-otzi-sweet-caroline
+    displayName: "Sweet Caroline — DJ Ötzi"
+    correctYear: 2019
+    probability: 84
+    wikimediaSearchHints: ["DJ Ötzi Sweet Caroline cover"]
+    answerMethods: ["timeline"]
+    genrePackages: ["sport", "football"]
+    spotifyTrackId: "3HTgmcqR7nYtD7EmJ4hOLi"
+    youtubeClips:
+      - videoId: "LVrlbGIIgbw"
+        startSec: 0
+        endSec: 30
+        channelTitle: "DJ Ötzi"
+  - id: edivibz-gul-och-bla
+    displayName: "Gul och blå — Edivibz"
+    correctYear: 2018
+    probability: 76
+    wikimediaSearchHints: ["Edivibz Gul och blå Sverige fotboll"]
+    answerMethods: ["timeline"]
+    genrePackages: ["sport", "football"]
+    spotifyTrackId: "5AGNs0W1DKuYWzGa9ilP1K"
+    youtubeClips:
+      - videoId: "qbSOPAk3KCw"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Edivibz"
+  - id: anis-don-demina-flaggan-i-topp
+    displayName: "Flaggan i topp — Anis Don Demina"
+    correctYear: 2021
+    probability: 78
+    wikimediaSearchHints: ["Anis Don Demina Flaggan i topp Sverige fotboll"]
+    answerMethods: ["timeline"]
+    genrePackages: ["sport", "football"]
+    spotifyTrackId: "7w2sCUWVAop5sTmikAdhCD"
+    youtubeClips:
+      - videoId: "ajZxDhowQ8g"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Anis Don Demina"
+  - id: miss-li-varan-sang
+    displayName: "Våran sång — Miss Li"
+    correctYear: 2018
+    probability: 76
+    wikimediaSearchHints: ["Miss Li Våran sång Sverige fotboll VM 2018"]
+    answerMethods: ["timeline"]
+    genrePackages: ["sport", "football"]
+    spotifyTrackId: "1p0RjMued7Tmm0o7CjzoHY"
+    youtubeClips: []
+  - id: bolaget-det-ligger-nat-i-luften
+    displayName: "Det ligger nåt i luften — Bolaget"
+    correctYear: 1994
+    probability: 78
+    wikimediaSearchHints: ["Bolaget Det ligger nåt i luften Sverige fotboll"]
+    answerMethods: ["timeline"]
+    genrePackages: ["sport", "football"]
+    spotifyTrackId: "4okV0gcEkY1BlqQNDvaQCw"
+    youtubeClips:
+      - videoId: "81EOq-abbOw"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Bolaget"
+  - id: brandsta-all-in-for-sverige
+    displayName: "All in för Sverige — Brandsta"
+    correctYear: 2018
+    probability: 74
+    wikimediaSearchHints: ["Brandsta All in för Sverige fotboll"]
+    answerMethods: ["timeline"]
+    genrePackages: ["sport", "football"]
+    spotifyTrackId: "3AGFGLUAhu0Cwv1Mkea3d4"
+    youtubeClips: []
   # ── Svenska hockey-låtar ──
   - id: hakan-sodergren-nu-tar-vi-dom
     displayName: "Nu tar vi dom — Håkan Södergren & Ishockeylandslaget"
@@ -187,6 +258,15 @@ items:
         channelTitle: "David Guetta"
         notes: "Officiell MV från David Guettas kanal. UEFA EURO 2016 Official Song. Ersätter Topic-versionen."
     genrePackages: ["sport"]
+  - id: bono-we-are-the-people
+    displayName: "We Are the People — Martin Garrix ft. Bono & The Edge"
+    correctYear: 2021
+    probability: 80
+    wikimediaSearchHints: ["Martin Garrix Bono Edge We Are the People UEFA Euro 2020"]
+    answerMethods: ["timeline"]
+    genrePackages: ["sport", "football"]
+    spotifyTrackId: "2iL0W5qi0ivZ9WRXbZ74cS"
+    youtubeClips: []
   # ── Idrottare som gjort musik ──
   - id: duplantis-bop
     displayName: "Bop — Armand Duplantis"
