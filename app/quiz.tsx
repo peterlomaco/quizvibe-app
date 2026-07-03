@@ -53,6 +53,7 @@ import { QuizVibeLogo } from '@/src/components/QuizVibeLogo';
 import { SpotifyBrandIcon } from '@/src/components/SpotifyBrandIcon';
 import { savePendingLobbyPlayers } from '@/src/utils/pendingLobby';
 import { loadProfile } from '@/src/utils/profileStorage';
+import { recordQuestionAnswer } from '@/src/utils/questionStats';
 import {
   IMAGE_QUIZ_QUESTIONS,
   DISTRACTOR_POOL_NAMES,
@@ -897,6 +898,29 @@ export default function QuizScreen() {
   const spotifyEnabled =
     (params.spotifyEnabled ?? 'false') === 'true' &&
     gameMode === 'individual-devices';
+  const spotifyAnswerYear = (params.spotifyAnswerYear ?? 'true') === 'true';
+  const spotifyAnswerName = (params.spotifyAnswerName ?? 'true') === 'true';
+
+  // Deterministisk svarstyp per Spotify-fråga baserat på Spotify-frågens ordinalposition.
+  // Båda aktiva → alternerande per "Spotify-runda" = turnOrder.length Spotify-frågor.
+  // Alla spelare möter samma svarstyp tills alla spelat lika många Spotify-låtar.
+  // Spotify-ordinalposition räknas direkt från gameQuestions (djRotationPlan deklareras
+  // efter detta useMemo och kan inte refereras här).
+  function resolveSpotifyAnswerType(questionIdx: number): 'year' | 'name' {
+    if (spotifyAnswerYear && spotifyAnswerName) {
+      let spotifyOrdinal = 0;
+      for (let i = 0; i < questionIdx && i < gameQuestions.length; i++) {
+        const q = gameQuestions[i];
+        if (q.type === 'timeline' && (q as { spotifyTrackId?: string }).spotifyTrackId) {
+          spotifyOrdinal++;
+        }
+      }
+      const numPlayers = Math.max(1, turnOrder.length);
+      const spotifyRound = Math.floor(spotifyOrdinal / numPlayers);
+      return spotifyRound % 2 === 0 ? 'year' : 'name';
+    }
+    return spotifyAnswerName ? 'name' : 'year';
+  }
 
   // D-iv: host-styrt per-spelare audio (IndDev). Saknad key i mappen
   // tolkas client-side: host=on, övriga=off. Initial-fetch sker vid
@@ -1386,6 +1410,12 @@ export default function QuizScreen() {
   // baserad på lokal shuffle-ordning som skiljer sig från host:s).
   // Deklareras här (innan effectiveMediaSourceByQuestion-memo:t som refererar det).
   const [broadcastAllQuestionIds, setBroadcastAllQuestionIds] = useState<string[] | null>(null);
+  // Host:s spotifyAnswerYear/Name-inställningar, broadcastade till non-host via
+  // game_sequence_init / play_command / question_advance så GetReady-kön kan visa
+  // rätt Year/Name-badge för kommande Spotify-frågor utan att använda non-hostens
+  // egna profil-inställningar.
+  const [broadcastHostSpotifyAnswerYear, setBroadcastHostSpotifyAnswerYear] = useState<boolean | null>(null);
+  const [broadcastHostSpotifyAnswerName, setBroadcastHostSpotifyAnswerName] = useState<boolean | null>(null);
 
   // Non-host override: bygg mediaSourceByQuestion från host:s auktoritativa fråge-sekvens
   // (broadcastAllQuestionIds) via ALL_QUESTIONS_MAP. Utan detta visar non-host felaktiga
@@ -1437,14 +1467,19 @@ export default function QuizScreen() {
   // istället för från kategori (Film var alltid 'Name' vilket var fel för
   // movie-items med answerMethods: ["timeline"]).
   const answerTypeByQuestion = useMemo<('Year' | 'Name')[]>(() => {
-    return gameQuestions.map((q) => {
+    return gameQuestions.map((q, qIdx) => {
       if (q.type === 'actor-select') return 'Name';
       if (q.type === 'image') return 'Name';
       // Film-trailers (timeline/youtube, mainCategory Film) svaras med filmens namn → 'Name'
       if (q.type === 'timeline' && q.mainCategory === 'Film') return 'Name';
+      // Spotify Name-frågor → 'Name' badge i GetReadyIntro-kön
+      if (q.type === 'timeline' && (q as { spotifyTrackId?: string }).spotifyTrackId) {
+        return resolveSpotifyAnswerType(qIdx) === 'name' ? 'Name' : 'Year';
+      }
       return 'Year';
     });
-  }, [gameQuestions]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gameQuestions, spotifyAnswerYear, spotifyAnswerName, gameMode, turnOrder.length]);
 
   // Non-host override: bygg category + answerType från host:s auktoritativa fråge-sekvens
   // (broadcastAllQuestionIds) via ALL_QUESTIONS_MAP. Utan detta visar non-host felaktiga
@@ -1462,14 +1497,37 @@ export default function QuizScreen() {
     // Innan host:s fråge-sekvens ankommit: returnera tom array → inga badges
     // visas hellre än fel svarstyp från lokal shuffle.
     if (!broadcastAllQuestionIds) return [];
-    return broadcastAllQuestionIds.map((id) => {
+    // Använd host:s broadcastade inställningar om tillgängliga, annars egna värden
+    // (egna värden stämmer för PtP där broadcast aldrig sker).
+    const effectiveAnswerYear = broadcastHostSpotifyAnswerYear ?? spotifyAnswerYear;
+    const effectiveAnswerName = broadcastHostSpotifyAnswerName ?? spotifyAnswerName;
+    return broadcastAllQuestionIds.map((id, qIdx) => {
       const q = ALL_QUESTIONS_MAP.get(id);
       if (!q) return 'Year';
       if (q.type === 'actor-select' || q.type === 'image') return 'Name';
       if (q.type === 'timeline' && q.mainCategory === 'Film') return 'Name';
+      if (q.type === 'timeline' && (q as { spotifyTrackId?: string }).spotifyTrackId) {
+        if (effectiveAnswerYear && effectiveAnswerName) {
+          // Räkna bara Spotify-frågor FÖRE denna position — exakt samma logik som
+          // host:s resolveSpotifyAnswerType (spotifyOrdinal / numPlayers).
+          // Att använda qIdx / qPerBlock ger fel svar eftersom qIdx räknar
+          // ALLA frågor, inte bara Spotify-frågorna.
+          let spotifyOrdinal = 0;
+          for (let i = 0; i < qIdx; i++) {
+            const qi = ALL_QUESTIONS_MAP.get(broadcastAllQuestionIds[i]);
+            if (qi?.type === 'timeline' && (qi as { spotifyTrackId?: string }).spotifyTrackId) {
+              spotifyOrdinal++;
+            }
+          }
+          const numPlayers = Math.max(1, turnOrder.length);
+          const spotifyRound = Math.floor(spotifyOrdinal / numPlayers);
+          return spotifyRound % 2 === 0 ? 'Year' : 'Name';
+        }
+        return effectiveAnswerName ? 'Name' : 'Year';
+      }
       return 'Year';
     });
-  }, [isHost, broadcastAllQuestionIds, answerTypeByQuestion]);
+  }, [isHost, broadcastAllQuestionIds, answerTypeByQuestion, broadcastHostSpotifyAnswerYear, broadcastHostSpotifyAnswerName, spotifyAnswerYear, spotifyAnswerName, gameMode, turnOrder.length]);
 
   const [questionIndex, setQuestionIndex] = useState(0);
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
@@ -1656,7 +1714,14 @@ export default function QuizScreen() {
   // Timern + flaggans mosaik aktiveras 2 s efter quiz-vyn visas.
   const [timerActive, setTimerActive] = useState(false);
   useEffect(() => {
-    if (phase !== 'question') { setTimerActive(false); return; }
+    if (phase !== 'question') {
+      // Spotify-frågor: om non-host redan confirmat (phase='awaiting') och DJ:n
+      // ännu inte aktiverat timern, låt timerActive vara oförändrad (false) —
+      // onSpotifyDJTrackStarted-handleren sätter setTimerActive(true) när DJ
+      // aktiverar. Om vi kallar setTimerActive(false) här avbryter vi det.
+      if (!(isSpotifyQuestion && phase === 'awaiting')) setTimerActive(false);
+      return;
+    }
     // Non-host i IndDev: om host:s timer redan har startat när question-fasen
     // sätts (t.ex. appen vaknade upp från bakgrunden under nedräkning och
     // AppState-lyssnaren satte setPhase('question') direkt) — visa korrekt
@@ -1670,7 +1735,15 @@ export default function QuizScreen() {
         setTimeLeft(adjustedLeft);
         timerProgressAnim.stopAnimation();
         timerProgressAnim.setValue(adjustedLeft / responseSeconds);
-        if (isSpotifyQuestion) return;
+        // Spotify: starta bara timer om DJ redan har aktiverat — annars vänta på
+        // spotify_dj_track_started-broadcaset. Edge case: DJ aktiverade INNAN
+        // non-host:s countdown var klar → onSpotifyDJTrackStarted satte
+        // spotifyDJStarted=true men hoppade setTimeout (phaseRef='countdown') →
+        // nu är vi i question-fasen och timern har aldrig startats.
+        if (isSpotifyQuestion) {
+          if (spotifyDJStarted) setTimeout(() => setTimerActive(true), 2000);
+          return;
+        }
         const id = setTimeout(() => setTimerActive(true), 2000);
         return () => { clearTimeout(id); };
       }
@@ -1681,10 +1754,15 @@ export default function QuizScreen() {
     timerProgressAnim.setValue(1);
     // Spotify-frågor: timern startas INTE automatiskt — den aktiveras först
     // när DJ broadcastar spotify_dj_track_started + 2 s delay.
-    if (isSpotifyQuestion) return;
+    // Edge case: om DJ redan har aktiverat (spotifyDJStarted=true) och non-host
+    // precis lämnat countdown-fasen, starta timern direkt.
+    if (isSpotifyQuestion) {
+      if (spotifyDJStarted) setTimeout(() => setTimerActive(true), 2000);
+      return;
+    }
     const id = setTimeout(() => setTimerActive(true), 2000);
     return () => { clearTimeout(id); };
-  }, [phase, questionIndex, responseSeconds, timerProgressAnim, isSpotifyQuestion, isHost]);
+  }, [phase, questionIndex, responseSeconds, timerProgressAnim, isSpotifyQuestion, isHost, spotifyDJStarted]);
   // Hints visas direkt när quiz-vyn öppnas (ingen delay).
   // Flaggans mosaik har kvar sin 2 s delay via timerActive/mosaicActive.
   const hintsReady = phase === 'question' || phase === 'awaiting' || phase === 'reveal';
@@ -1712,6 +1790,10 @@ export default function QuizScreen() {
   }, [turnOrder, currentPlayerIndex, totalQuestions, questionIndex]);
   const [timeLeft, setTimeLeft] = useState(30);
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
+  // Låst korrekthetsbedömning från handleConfirm — används i reveal-kortet
+  // istället för att räkna om från selectedYear (som kan bli null om ett
+  // play_command anländer efter confirm men innan reveal renderas).
+  const [confirmedCorrect, setConfirmedCorrect] = useState<boolean | null>(null);
   // Senaste valda år från TimelineSelector (uppdateras vid varje scroll-tick).
   // Quiz-skärmens egna Confirm-knapp läser detta när användaren trycker submit.
   const [pendingYear, setPendingYear] = useState<number | null>(null);
@@ -1736,6 +1818,14 @@ export default function QuizScreen() {
   // ── Actor-select-state (film-frågor) ───────────────────────────────────
   const [pendingActorName, setPendingActorName] = useState<string | null>(null);
   const [confirmedActorName, setConfirmedActorName] = useState<string | null>(null);
+
+  // ── Spotify Name-answer state ─────────────────────────────────────────
+  // answer_type broadcastas av host i spotify_question_ready; non-host sparar här.
+  // spotifyNameVariant byggs runtime via useEffect (buildImageVariant på artistnamnet).
+  const [broadcastSpotifyAnswerType, setBroadcastSpotifyAnswerType] =
+    useState<'year' | 'name' | null>(null);
+  const [spotifyNameVariant, setSpotifyNameVariant] =
+    useState<ImageQuestionVariant | null>(null);
 
   // ── Multiplayer state ──────────────────────────────────────────────────
   // Per-runda-poäng (= scores för senaste avslutade fråga). Aggregerade
@@ -1941,6 +2031,21 @@ export default function QuizScreen() {
   const isTimelineQuestion = question.type === 'timeline';
   const isLastQuestion = questionIndex === totalQuestions - 1;
 
+  // Svarstyp för pågående Spotify-fråga. Non-host använder broadcastad typ från host;
+  // host (eller PtP) beräknar deterministiskt via resolveSpotifyAnswerType med Spotify-ordinal.
+  const currentSpotifyAnswerType: 'year' | 'name' | null = isSpotifyQuestion
+    ? (!isHost && broadcastSpotifyAnswerType !== null
+        ? broadcastSpotifyAnswerType
+        : resolveSpotifyAnswerType(questionIndex))
+    : null;
+  const isSpotifyNameQuestion = isSpotifyQuestion && currentSpotifyAnswerType === 'name';
+
+  // Artistnamn extraherat från hint-fältet (format "Title — Artist").
+  const derivedArtistName: string | null =
+    isSpotifyNameQuestion && currentQ?.type === 'timeline'
+      ? (currentQ.hint?.split(' — ').pop()?.trim() ?? null)
+      : null;
+
   // Bygg image-variant runtime baserat på source + assistance + audience-set.
   // Memo:as på question-id + assistance så shuffle/distractor-pick körs ENDAST
   // när frågan byts eller spelarens assistance ändras (= turnordnings-rotation
@@ -2030,6 +2135,40 @@ export default function QuizScreen() {
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [question.id, currentAssistance, audienceSetForVariants]);
+
+  // Bygg Letter Grid-variant för Spotify Name-frågor.
+  // Kör som useEffect (inte useMemo) eftersom derivedArtistName är en string
+  // som inte är ett stabilt dep för useMemo-chaining.
+  useEffect(() => {
+    if (!isSpotifyNameQuestion || !derivedArtistName) {
+      setSpotifyNameVariant(null);
+      return;
+    }
+    const artistPool = IMAGE_SEED_QUESTIONS.filter(
+      (q) => q.contentSubject === 'artist' || q.contentSubject === 'band',
+    );
+    const syntheticItem: ImageQuizQuestion = {
+      id: `spotify-name-${questionIndex}`,
+      displayName: derivedArtistName,
+      category: 'artists',
+      audiences: ['all'] as ImageQuizQuestion['audiences'],
+      contentSubject: 'artist',
+      type: 'image',
+      region: ['sweden'],
+      probability: 100,
+      source: { category: 'artists' } as ImageQuizQuestion['source'],
+    } as ImageQuizQuestion;
+    const variant = buildImageVariant(
+      syntheticItem,
+      currentAssistance,
+      audienceSetForVariants,
+      artistPool,
+      DISTRACTOR_POOL_NAMES['artists'] ?? [],
+      5,
+    );
+    setSpotifyNameVariant(variant);
+  }, [questionIndex, isSpotifyNameQuestion, currentAssistance, derivedArtistName, audienceSetForVariants]);
+
   // Aktiv media-källa för aktuell fråga. Returneras `kind: 'none'` om
   // host stängt av alla källor eller frågan saknar curerade klipp —
   // MediaPlayer renderar då NoSourcePlayer-placeholder istället för att
@@ -2152,6 +2291,7 @@ export default function QuizScreen() {
       if (question.type === 'timeline') {
         const defaultGuess = new Date().getFullYear() - 20;
         setSelectedYear(defaultGuess);
+        setConfirmedCorrect(false);
         setRounds((prev) => [
           ...prev,
           {
@@ -2374,6 +2514,13 @@ export default function QuizScreen() {
     // Förhindra double-scoring per fråga (race: handleConfirm* + useEffect([timeLeft])).
     if (hasRecordedScoreForCurrentQuestionRef.current) return;
     hasRecordedScoreForCurrentQuestionRef.current = true;
+    // Samla in svar-statistik per fråga (% rätt globalt) — fire-and-forget.
+    // Används i framtida svårighetsgradsstyrning. Hoppas över vid direkt-nav
+    // (tom turnOrder = mock-test-läge) för att inte skeva statistiken med
+    // auto-genererade mock-svar.
+    if (currentQ && turnOrder.length > 0) {
+      recordQuestionAnswer(currentQ.id, yourCorrect);
+    }
     // Vilken spelare attribueras score:n till?
     //   • Pass-the-Phone: turnOrder[currentPlayerIndex] — aktiv spelare
     //     roterar mellan ronder, alla scoreposter går till "current"-rad:n.
@@ -2438,9 +2585,19 @@ export default function QuizScreen() {
     // bekräftade. Därför ingen cleanup här som klipper intervallet vid
     // phase-byte; intervallet self-clearas när timeLeft hits 0 (eller via
     // unmount-cleanup ovan).
-    if (phase !== 'question' || !timerActive) return;
+    if (!timerActive) return;
+    // Normalt: startar bara i 'question'. Spotify-undantag: om non-host
+    // confirmat (phase='awaiting') INNAN DJ aktiverat, startar timern när
+    // timerActive sätts true av onSpotifyDJTrackStarted-handleren.
+    if (phase !== 'question' && !(isSpotifyQuestion && phase === 'awaiting')) return;
+    // Spotify/awaiting-undantaget: starta bara om timern INTE redan körs.
+    // Utan denna guard anropas startTimer() igen när host confirmar (phase
+    // question→awaiting) vilket startar om nedräkningen från början.
+    // Undantaget ska bara fyra när timerActive sätts true medan phase='awaiting'
+    // (non-host confirmat INNAN DJ aktiverat trackingen).
+    if (phase === 'awaiting' && timerRef.current !== null) return;
     startTimer();
-  }, [questionIndex, phase, timerActive]);
+  }, [questionIndex, phase, timerActive, isSpotifyQuestion]);
 
   // ── Spotify DJ timeout ──────────────────────────────────────────────────
   // Ref till handleAdvanceToNextRound för att undvika stale closure i
@@ -2462,6 +2619,7 @@ export default function QuizScreen() {
         display_name: q.hint,
         correct_year: q.correctYear,
         dj_player_id: currentDJPlayer.id,
+        answer_type: resolveSpotifyAnswerType(questionIndex),
       })
       .catch(() => {});
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -2610,6 +2768,11 @@ export default function QuizScreen() {
     // Nollställ broadcastDJPlayerId så föregående frågas DJ-tilldelning
     // inte läcker in i nästa fråga (non-host hämtar ny via spotify_question_ready).
     setBroadcastDJPlayerId(null);
+    setBroadcastSpotifyAnswerType(null);
+    // spotifyNameVariant nollställs av build-effekten (rad 2138) via sin
+    // early-return-guard när isSpotifyNameQuestion blir false — ingen
+    // explicit reset här behövs och den orsakade att varianten nulle:ades
+    // efter att build-effekten byggt den (effects körs i registrerings-ordning).
     // ── FUTURE VERSION 2 — Automated API Flow (archived questionIndex resets) ──────
     // setNowPlayingTrackInfo(null);
     // setSpotifyIsPlaying(true);
@@ -2688,11 +2851,13 @@ export default function QuizScreen() {
   // DJ kan aldrig confirma (de svarar inte på Spotify-frågor).
   const canConfirm = isCurrentPlayerDJ
     ? false
-    : isImageQuestion
-      ? hintsReady
-      : isActorSelectQuestion
-        ? pendingActorName !== null
-        : pendingYear !== null;
+    : isSpotifyNameQuestion
+      ? pendingNameOption !== null
+      : isImageQuestion
+        ? hintsReady
+        : isActorSelectQuestion
+          ? pendingActorName !== null
+          : pendingYear !== null;
 
   // Confirm-knappens scale + glow-loop. Körs medan phase === 'question' OCH
   // ett svar är preliminärt valt (knappen är tappbar). Stoppas i andra faser så
@@ -2767,6 +2932,7 @@ export default function QuizScreen() {
     // (i useEffect:en på timeLeft nedan).
     const interval = getIntervalForAssistance(currentAssistance);
     const correct = isCorrect(year, question.correctYear, interval, eraFrom, eraTo);
+    setConfirmedCorrect(correct);
     const pts = calculatePoints(correct, currentAssistance, 'year');
     // 2-decimals svarstid via Date.now()-diff (questionStartMsRef sätts i
     // startTimer). Cap:as till responseSeconds så ev. clock drift inte ger
@@ -2842,7 +3008,7 @@ export default function QuizScreen() {
   // correct = opt.isCorrect (pre-baked från distractor-builderns rätt-flagga).
   const handleConfirmName = (opt: ImageNameOption) => {
     if (phaseRef.current !== 'question') return;
-    if (question.type !== 'image') return;
+    if (question.type !== 'image' && !isSpotifyNameQuestion) return;
     const correct = opt.isCorrect;
     const pts = calculatePoints(correct, currentAssistance, 'name');
     const totalMs = responseSeconds * 1000;
@@ -2941,6 +3107,7 @@ export default function QuizScreen() {
   const handleRetryFromUnstable = () => {
     setPendingYear(null);
     setSelectedYear(null);
+    setConfirmedCorrect(null);
     setPendingNameOption(null);
     setConfirmedNameOption(null);
     setPendingActorName(null);
@@ -2985,6 +3152,7 @@ export default function QuizScreen() {
       setQuestionIndex((prev) => prev + 1);
     }
     setSelectedYear(null);
+    setConfirmedCorrect(null);
     setPendingYear(null);
     setConfirmedTimeUsed(null);
     // Reset image- + actor-select-state så nästa fråga (oavsett typ) startar rent.
@@ -3067,7 +3235,7 @@ export default function QuizScreen() {
     // Används för synk på mottagarsidan OCH för non-host DJ:s egna enhet
     // (de tar aldrig emot sin egna broadcast via broadcast.self:false).
     const timerStartAt = Date.now() + 2000;
-    if (phaseRef.current === 'question') {
+    if (phaseRef.current === 'question' || phaseRef.current === 'awaiting') {
       // Non-host DJ: uppdatera hostTimerStartAtRef lokalt så startTimer()
       // inte kompenserar för stale play_command-tid (~30 s tillbaka i tiden).
       if (!isHost) {
@@ -3109,6 +3277,8 @@ export default function QuizScreen() {
         .broadcastQuestionAdvance({
           next_question_index: questionIndex + 1,
           all_question_ids: gameQuestionsRef.current.map((q) => q.id),
+          spotify_answer_year: spotifyAnswerYear,
+          spotify_answer_name: spotifyAnswerName,
         })
         .catch(() => {});
     }
@@ -3132,6 +3302,9 @@ export default function QuizScreen() {
           question_id: currentQ?.id ?? '',
           all_question_ids: gameQuestions.map((q) => q.id),
           timer_start_at: timerStartAt,
+          spotify_answer_year: spotifyAnswerYear,
+          spotify_answer_name: spotifyAnswerName,
+          dj_player_id: currentDJPlayer?.id,
         })
         .catch(() => {});
     }
@@ -3147,6 +3320,8 @@ export default function QuizScreen() {
         .broadcastQuestionAdvance({
           next_question_index: questionIndex + 1,
           all_question_ids: gameQuestionsRef.current.map((q) => q.id),
+          spotify_answer_year: spotifyAnswerYear,
+          spotify_answer_name: spotifyAnswerName,
         })
         .catch(() => {});
     }
@@ -3159,6 +3334,8 @@ export default function QuizScreen() {
         .broadcastQuestionAdvance({
           next_question_index: null,
           all_question_ids: gameQuestionsRef.current.map((q) => q.id),
+          spotify_answer_year: spotifyAnswerYear,
+          spotify_answer_name: spotifyAnswerName,
         })
         .catch(() => {});
     }
@@ -3308,6 +3485,7 @@ export default function QuizScreen() {
       // nådde nästa rondens normalt-rensa-path via handleAdvanceToNextRound).
       setPendingYear(null);
       setSelectedYear(null);
+      setConfirmedCorrect(null);
       setPendingNameOption(null);
       setConfirmedNameOption(null);
       setPendingActorName(null);
@@ -3319,9 +3497,16 @@ export default function QuizScreen() {
       setPhase((current) => (current === 'intro' ? 'countdown' : current));
     };
     questionAdvanceHandlerRef.current = (payload) => {
-      const { next_question_index: nextIdx, all_question_ids: allIds } = payload;
+      const {
+        next_question_index: nextIdx,
+        all_question_ids: allIds,
+        spotify_answer_year: say,
+        spotify_answer_name: san,
+      } = payload;
       // Uppdatera auktoritativ frågesekvens om host skickade med den.
       if (allIds && allIds.length > 0) setBroadcastAllQuestionIds(allIds);
+      if (say !== undefined) setBroadcastHostSpotifyAnswerYear(say);
+      if (san !== undefined) setBroadcastHostSpotifyAnswerName(san);
       if (nextIdx === null) {
         handleShowLeaderboard();
       } else {
@@ -4201,7 +4386,15 @@ export default function QuizScreen() {
   useEffect(() => {
     if (gameMode !== 'individual-devices' || !params.roomCode) return;
     const sync = subscribeSyncChannel(params.roomCode, selfPlayerId, {
-      onPlayCommand: (payload) => playCommandHandlerRef.current(payload.question_index, payload.question_id, payload.all_question_ids, payload.timer_start_at),
+      onPlayCommand: (payload) => {
+        // Synka host:s Spotify-svarstyps-inställningar för GetReady-kö-badge.
+        if (payload.spotify_answer_year !== undefined) setBroadcastHostSpotifyAnswerYear(payload.spotify_answer_year);
+        if (payload.spotify_answer_name !== undefined) setBroadcastHostSpotifyAnswerName(payload.spotify_answer_name);
+        // Sätt DJ-spelarens id tidigt (vid countdown-start) så non-host inte
+        // behöver vänta på det separata spotify_question_ready-broadcastet.
+        if (payload.dj_player_id) setBroadcastDJPlayerId(payload.dj_player_id);
+        playCommandHandlerRef.current(payload.question_index, payload.question_id, payload.all_question_ids, payload.timer_start_at);
+      },
       onQuestionAdvance: (payload) => questionAdvanceHandlerRef.current(payload),
       onPlayerLeft: (payload) =>
         playerLeftHandlerRef.current(payload.player_id, payload.player_name),
@@ -4243,6 +4436,9 @@ export default function QuizScreen() {
                 question_id: qId,
                 all_question_ids: allIds,
                 timer_start_at: undefined,
+                spotify_answer_year: spotifyAnswerYear,
+                spotify_answer_name: spotifyAnswerName,
+                dj_player_id: currentDJPlayer?.id,
               }).catch(() => {});
             }, 500);
           }
@@ -4255,6 +4451,7 @@ export default function QuizScreen() {
       // istället för lokalt beräknat djRotationPlan (fel pga annan shuffle).
       onSpotifyQuestionReady: (payload) => {
         setBroadcastDJPlayerId(payload.dj_player_id);
+        if (payload.answer_type) setBroadcastSpotifyAnswerType(payload.answer_type);
       },
       // Spotify DJ: DJ:n tryckte "Start track in Spotify" → stega guesser-guide 0→1.
       onSpotifyDJOpenedApp: () => {
@@ -4275,7 +4472,10 @@ export default function QuizScreen() {
           // för att skilja Spotify-timern från play_command-tidens stämpel.
           spotifyTimerStartAtRef.current = payload.timer_start_at;
         }
-        if (phaseRef.current === 'question') {
+        // Starta timer för non-host oavsett om de redan confirmat (awaiting)
+        // eller inte hunnit (question). Utan 'awaiting'-grenen fastnar non-host
+        // som confirmat INNAN DJ aktiverat för alltid i awaiting-fasen.
+        if (phaseRef.current === 'question' || phaseRef.current === 'awaiting') {
           setTimeout(() => setTimerActive(true), 2000);
         }
       },
@@ -4289,6 +4489,8 @@ export default function QuizScreen() {
       onGameSequenceInit: (payload) => {
         if (!isHost && payload.all_question_ids?.length > 0) {
           setBroadcastAllQuestionIds(payload.all_question_ids);
+          if (payload.spotify_answer_year !== undefined) setBroadcastHostSpotifyAnswerYear(payload.spotify_answer_year);
+          if (payload.spotify_answer_name !== undefined) setBroadcastHostSpotifyAnswerName(payload.spotify_answer_name);
         }
       },
     });
@@ -4305,6 +4507,8 @@ export default function QuizScreen() {
         sync
           .broadcastGameSequenceInit({
             all_question_ids: gameQuestionsRef.current.map((q) => q.id),
+            spotify_answer_year: spotifyAnswerYear,
+            spotify_answer_name: spotifyAnswerName,
           })
           .catch(() => {});
       };
@@ -4432,7 +4636,10 @@ export default function QuizScreen() {
     if (!hostId) return;
     const isHostDisconnected = playerConnectionStatus[hostId] === 'disconnected';
     const inReveal = phase === 'reveal';
-    if (isHostDisconnected && inReveal && !hostDisconnectGraceActive) {
+    // Supprimera grace-timern om DJ:n (host) redan startat Spotify-låten —
+    // host är AVSIKTLIGT utanför QuizVibe för att spela låten. Non-host
+    // ska stanna i reveal och vänta tills host kommer tillbaka.
+    if (isHostDisconnected && inReveal && !hostDisconnectGraceActive && !spotifyDJStarted) {
       hostDisconnectGraceStartRef.current = Date.now();
       setHostDisconnectGraceActive(true);
     } else if (
@@ -4450,6 +4657,7 @@ export default function QuizScreen() {
     playerConnectionStatus,
     phase,
     hostDisconnectGraceActive,
+    spotifyDJStarted,
   ]);
 
   // D-vi: tick-effect — kör ENDAST när grace är aktiv. Var 250ms räknas
@@ -4648,8 +4856,8 @@ export default function QuizScreen() {
         mediaSource={effectiveMediaSourceByQuestion[questionIndex] ?? null}
         answerType={effectiveAnswerTypeByQuestion[questionIndex] ?? null}
         onComplete={() => setPhase('question')}
-        finalWord={isImageQuestion || isActorSelectQuestion ? 'Who' : isTimelineQuestion ? 'When' : undefined}
-        silent={!isHost}
+        finalWord={isImageQuestion || isActorSelectQuestion || isSpotifyNameQuestion ? 'Who' : isTimelineQuestion ? 'When' : undefined}
+        silent={!isHost || isAudioMutedForSelf}
       />
       {/* Pre-decode-trick borttaget 2026-05-27 (text-rendering = no decode). */}
       {inactivityCountdownSec !== null && (
@@ -4997,7 +5205,7 @@ export default function QuizScreen() {
                 // döljer videon under frågan för att undvika år-spoilers i
                 // YouTube-titeln.
                 showVideo={isActorSelectQuestion ? true : phase === 'reveal'}
-                isMuted={isAudioMutedForSelf}
+                isMuted={!isHost}
                 onError={handleYoutubeError}
               />
             )}
@@ -5221,9 +5429,22 @@ export default function QuizScreen() {
                     highlightas; resterande förekomster (sällsynt) lämnas
                     orörda. */}
                 {(() => {
-                  const match = question.question.match(
+                  // Spotify Name-frågor har fel bakat questionText ("Which Year…")
+                  // eftersom de är song-items. Visa rätt text för svarstypen.
+                  const displayQuestionText = isSpotifyNameQuestion
+                    ? 'What is the Name of this Artist/Band?'
+                    : question.question;
+                  const match = displayQuestionText.match(
                     /^(.*?)\b(Year|Name|City|Country)\b(.*)$/i,
                   );
+                  // Spotify-frågor: kompakt en-rad-format (mer plats åt prefix-rutor)
+                  const isSpotifyQ = isSpotifyQuestion || isSpotifyNameQuestion;
+                  const compactText = isSpotifyQ
+                    ? { fontSize: 16, lineHeight: 22 }
+                    : undefined;
+                  const compactHeadline = isSpotifyQ
+                    ? { fontSize: 24 }
+                    : undefined;
                   if (match) {
                     const [, before, keyword, after] = match;
                     // Tvinga versal begynnelsebokstav på keyword oavsett hur det
@@ -5233,15 +5454,15 @@ export default function QuizScreen() {
                     const capitalized =
                       keyword.charAt(0).toUpperCase() + keyword.slice(1).toLowerCase();
                     return (
-                      <Text style={styles.questionText}>
+                      <Text style={[styles.questionText, compactText]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
                         {before}
-                        <Text style={styles.questionTextHeadline}>{capitalized}</Text>
+                        <Text style={[styles.questionTextHeadline, compactHeadline]}>{capitalized}</Text>
                         {after}
                       </Text>
                     );
                   }
                   return (
-                    <Text style={styles.questionText}>{question.question}</Text>
+                    <Text style={[styles.questionText, compactText]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>{displayQuestionText}</Text>
                   );
                 })()}
               </View>
@@ -5264,27 +5485,6 @@ export default function QuizScreen() {
                 Disabled-states följer phase: båda låsta i awaiting + reveal
                 så svar inte kan ändras efter Confirm. */}
             {/* DJ correct-year-ruta: direkt under question-card, utanför scroll-zonen */}
-            {phase === 'reveal' && question.type === 'timeline' && isCurrentPlayerDJ && isSpotifyQuestion && !djDismissedOverlay && (
-              <View style={rv.container}>
-                <Animated.View
-                  style={[
-                    rv.feedbackCard,
-                    rv.feedbackCorrect,
-                    { transform: [{ scale: revealScale }], opacity: revealOpacity },
-                  ]}
-                >
-                  <Text style={rv.feedbackCorrectYear}>
-                    Correct year:{' '}
-                    <Text style={rv.feedbackCorrectYearBold}>{question.correctYear}</Text>
-                  </Text>
-                  {question.hint && (
-                    <Text style={rv.feedbackSongMeta} numberOfLines={1} ellipsizeMode="tail">
-                      {question.hint}
-                    </Text>
-                  )}
-                </Animated.View>
-              </View>
-            )}
             {/* DJ-vy i scroll-zonen: steg 0 + 1 centrerade där TimelineSelector annars sitter */}
             {question.type === 'timeline' && isCurrentPlayerDJ && (phase === 'question' || (phase === 'reveal' && !djDismissedOverlay)) && (
               <View style={[styles.spotifyDJScrollZone, phase === 'reveal' && { paddingTop: Spacing.xl }]}>
@@ -5328,9 +5528,9 @@ export default function QuizScreen() {
                     </View>
                   </Pressable>
                 ) : (
-                  // djStep=1 eller 2: DJ har öppnat Spotify men råkat navigera
-                  // tillbaka till QuizVibe — använd openSpotifyApp (inte openSpotifyTrack)
-                  // så låten INTE startar om från början utan fortsätter spelas.
+                  // djStep=1 eller 2: DJ har öppnat Spotify och navigerat tillbaka — använd
+                  // openSpotifyApp (inte openSpotifyTrack) så låten INTE startar om från
+                  // början utan fortsätter spelas.
                   <Pressable
                     style={[styles.spotifyDJActionBtn, { flex: 0, paddingHorizontal: Spacing.xl }]}
                     onPress={() => openSpotifyApp()}
@@ -5341,7 +5541,25 @@ export default function QuizScreen() {
                 )}
               </View>
             )}
-            {question.type === 'timeline' && !isCurrentPlayerDJ && (!isSpotifyQuestion || spotifyDJStarted) ? (
+            {isSpotifyNameQuestion && spotifyNameVariant && !isCurrentPlayerDJ && (spotifyDJStarted || phase === 'reveal') ? (
+              // Spotify Name-fråga: gissa artistnamnet via Letter Grid.
+              // Döljs helt tills DJ aktiverat timern (spotifyDJStarted=true).
+              // reveal-grenen visas alltid (isTimedOut-hantering inuti komponenten).
+              <View
+                pointerEvents={shouldLockForUnstable ? 'none' : 'auto'}
+                style={shouldLockForUnstable ? { opacity: 0.4 } : undefined}
+              >
+                <ImageAnswerBlock
+                  question={spotifyNameVariant}
+                  phase={phase}
+                  pendingName={pendingNameOption}
+                  confirmedName={confirmedNameOption}
+                  isTimedOut={phase === 'reveal' && confirmedNameOption === null}
+                  onNameSelect={setPendingNameOption}
+                  resetKey={`spotify-name-${questionIndex}-${currentAssistance}`}
+                />
+              </View>
+            ) : question.type === 'timeline' && !isCurrentPlayerDJ && !isSpotifyNameQuestion && (!isSpotifyQuestion || spotifyDJStarted || effectiveDJId === null) ? (
               <TimelineSelector
                 key={`${questionIndex}-${currentAssistance}`}
                 assistance={currentAssistance}
@@ -5405,17 +5623,45 @@ export default function QuizScreen() {
                   • image:    SKIPPAS — ImageAnswerBlock renderar Correct/Wrong-
                     badges direkt på spelarens (och rätta) namn-kort istället
                     så reveal-state syns inline i svarsrutan. */}
-            {phase === 'reveal' && question.type === 'timeline' && (() => {
-              if (isSpotifyQuestion && isCurrentPlayerDJ) return null; // visas i scroll-zonen ovan
-              if (selectedYear === null) return null;
-              const interval = getIntervalForAssistance(currentAssistance);
-              const wasCorrect = isCorrect(
-                selectedYear,
-                question.correctYear,
-                interval,
-                eraFrom,
-                eraTo,
+            {phase === 'reveal' && isSpotifyNameQuestion && isCurrentPlayerDJ && question.type === 'timeline' && (() => {
+              // DJ på Spotify/Name-fråga: Letter Grid visas inte för DJ →
+              // rendera ett reveal-kort med artistnamnet.
+              const artistName = question.hint?.split(' — ').pop()?.trim() ?? null;
+              if (!artistName) return null;
+              const hintTitle = question.hint ?? '';
+              return (
+                <View style={rv.container}>
+                  <Animated.View
+                    style={[
+                      rv.feedbackCard,
+                      rv.feedbackCorrect,
+                      { transform: [{ scale: revealScale }], opacity: revealOpacity },
+                    ]}
+                  >
+                    <Text style={rv.feedbackCorrectYear}>
+                      {'Correct Name: '}
+                      <Text style={rv.feedbackCorrectYearBold}>{artistName}</Text>
+                    </Text>
+                    <Text style={rv.feedbackSongMeta} numberOfLines={1} ellipsizeMode="tail">
+                      {`${question.correctYear} · ${hintTitle}`}
+                    </Text>
+                  </Animated.View>
+                </View>
               );
+            })()}
+            {phase === 'reveal' && question.type === 'timeline' && (() => {
+              // Name-svar (non-DJ): ImageAnswerBlock renderar inline reveal (badges per prefix-rad) → skippa kort
+              // DJ på Spotify/Name renderas av blocket ovanför
+              if (isSpotifyNameQuestion) return null;
+              if (!isSpotifyQuestion && !isSpotifyNameQuestion && selectedYear === null) return null;
+
+              // confirmedCorrect sätts i handleConfirm och vid time-out — robust
+              // mot att selectedYear nollställs av play_command-reset efter confirm.
+              const wasCorrect = isCurrentPlayerDJ ? true : (confirmedCorrect ?? false);
+
+              // Spotify/Name → visa "Correct: [Artist]", Spotify/Year → "Correct year: [Year]"
+              // Gäller för ALLA (DJ och non-DJ). isSpotifyNameQuestion fångas tidigt ovan
+              // men Spotify/Year når hit och ska behandlas identiskt med vanlig Year-fråga.
               const correctLabel = 'Correct year:';
               const correctValue = String(question.correctYear);
               return (
@@ -5427,7 +5673,7 @@ export default function QuizScreen() {
                       { transform: [{ scale: revealScale }], opacity: revealOpacity },
                     ]}
                   >
-                    {!(isSpotifyQuestion && isCurrentPlayerDJ && !wasCorrect) && (
+                    {!isCurrentPlayerDJ && (
                       <Text
                         style={[
                           rv.feedbackBadge,
@@ -5462,6 +5708,12 @@ export default function QuizScreen() {
                 </View>
               );
             })()}
+
+            {/* Per-spelare reveal-summary med unfold-logik.
+                Deriveras från allRoundScoresHistory (inte currentRoundScores) så:
+                  • IndDev: remote scores ankommer via sync och uppdaterar history → listan
+                    uppdateras live allteftersom andra spelares svar tas emot.
+                  • PtP: visar varje spelares senaste svar oavsett vilken fråga de svarade. */}
 
       </ScrollView>
       {/* Sticky Confirm/Awaiting-bar — ligger UTANFÖR ScrollView så Confirm-
@@ -5518,7 +5770,9 @@ export default function QuizScreen() {
                 ]}
                 onPress={() => {
                   if (!canConfirm || shouldLockForUnstable) return;
-                  if (question.type === 'image' && pendingNameOption) {
+                  if (isSpotifyNameQuestion && pendingNameOption) {
+                    handleConfirmName(pendingNameOption);
+                  } else if (question.type === 'image' && pendingNameOption) {
                     handleConfirmName(pendingNameOption);
                   } else if (question.type === 'actor-select' && pendingActorName) {
                     handleConfirmActor(pendingActorName);
