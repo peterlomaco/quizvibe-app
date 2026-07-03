@@ -1352,6 +1352,10 @@ export default function LobbyScreen() {
           approved: true,
           spotifyConnected: ownSpotifyStatus?.connected ?? false,
         };
+        // Sätt non-host:s egna Spotify-anslutningsstatus så Source Mixerboard
+        // visar rätt (samma som host-pathen gör i useFocusEffect nedan).
+        setSpotifyConnected(ownSpotifyStatus?.connected ?? false);
+        setSpotifyDisplayName(ownSpotifyStatus?.spotifyDisplayName ?? null);
         setPlayers((prev) => {
           // Dedupe på id: om syncFromStore-pollen redan har dragit in
           // carry-over-raden (med samma id efter dup-detection-fixet) så
@@ -1641,10 +1645,10 @@ export default function LobbyScreen() {
     if (!hostMode || hasSpokeRef.current) return;
     hasSpokeRef.current = true;
     try {
-      Speech.speak('Quiz ... Vibe', {
+      Speech.speak('QuizVibe', {
         language: 'en-US',
-        pitch: 0.7,
-        rate: 0.14,
+        pitch: 0.85,
+        rate: 0.32,
       });
     } catch {
       // expo-speech saknas i Expo Go — tyst fallback
@@ -2072,18 +2076,19 @@ export default function LobbyScreen() {
       // Auto-aktivera DJ-toggeln direkt efter lyckad OAuth — annars måste
       // användaren trycka på toggeln en extra gång manuellt efter connect.
       setSpotifyEnabled(true);
+      // Uppdatera spelarkortet direkt efter lyckad OAuth.
+      const ownId = ownPlayerIdRef.current;
+      if (ownId) {
+        setPlayers((prev) =>
+          prev.map((p) => (p.id === ownId ? { ...p, spotifyConnected: true } : p)),
+        );
+      }
       // Non-host: synka spotify_verified=true till lobby_players så host:s
       // polling ser Spotify-badge:n uppdateras direkt utan reload.
-      if (!hostMode) {
-        const ownId = ownPlayerIdRef.current;
-        if (ownId) {
-          setPlayers((prev) =>
-            prev.map((p) => (p.id === ownId ? { ...p, spotifyConnected: true } : p)),
-          );
-          const ownPlayer = players.find((p) => p.id === ownId);
-          if (ownPlayer) {
-            upsertOwnLobbyPlayer(roomCode, { ...ownPlayer, spotifyConnected: true }).catch(() => {});
-          }
+      if (!hostMode && ownId) {
+        const ownPlayer = players.find((p) => p.id === ownId);
+        if (ownPlayer) {
+          upsertOwnLobbyPlayer(roomCode, { ...ownPlayer, spotifyConnected: true }).catch(() => {});
         }
       }
     } else if (result.reason !== 'not_premium' && result.reason !== 'cancelled') {

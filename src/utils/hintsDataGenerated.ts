@@ -211,7 +211,7 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Västerviks church parish', priority: 2 },
     { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Lisebergsapplåden', priority: 5 },
     { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Kristallen Honorary Award', priority: 4 },
-    { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Q112765145', priority: 4 },
+    { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Hans Majestät Konungens medalj i guld av 8:e storleken i högblått band', priority: 4 },
     { id: 'work0', type: 'movie', label: 'Notable film', value: '"Fem myror är fler än fyra elefanter"', priority: 4 },
     ],
   },
@@ -225,7 +225,7 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Örgryte', priority: 2 },
     { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Litteris et Artibus', priority: 5 },
     { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Karamelodiktstipendiet', priority: 4 },
-    { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Q10684980', priority: 4 },
+    { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Svenska Dagbladets Poppepris', priority: 4 },
     ],
   },
 
@@ -248,7 +248,7 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     hints: [
     { id: 'prof', type: 'profession', label: 'Profession', value: 'Film director', priority: 1 },
     { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'February 5, 1928', priority: 2 },
-    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Q10562781', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Linköping', priority: 2 },
     { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Litteris et Artibus', priority: 5 },
     { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Honorary award of the municipality of Linköping', priority: 4 },
     { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Lisebergsapplåden', priority: 4 },
@@ -278,7 +278,7 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Stocksund', priority: 2 },
     { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Litteris et Artibus', priority: 5 },
     { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Melodifestivalen Hall of Fame', priority: 4 },
-    { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Q10541530', priority: 4 },
+    { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Jussi Björlingstipendiet', priority: 4 },
     ],
   },
 
@@ -964,7 +964,7 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     hints: [
     { id: 'prof', type: 'profession', label: 'Profession', value: 'Television actor', priority: 1 },
     { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'June 13, 1951', priority: 2 },
-    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Göteborgs Kristine församling', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Göteborg', priority: 2 },
     { id: 'ht', type: 'height', label: 'Height', value: '191 cm', priority: 3 },
     { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Amanda Award for Best Actor', priority: 5 },
     { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Kanon Award for best actor in a leading role', priority: 4 },
@@ -1100,7 +1100,7 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     hints: [
     { id: 'prof', type: 'profession', label: 'Profession', value: 'Actor', priority: 1 },
     { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'February 13, 1950', priority: 2 },
-    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Q10659429', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Lund', priority: 2 },
     { id: 'work0', type: 'movie', label: 'Notable film', value: '"Fem myror är fler än fyra elefanter"', priority: 4 },
     ],
   },
@@ -1668,7 +1668,6 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'September 27, 1972', priority: 2 },
     { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Los Angeles', priority: 2 },
     { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Academy Award for Best Actress', priority: 5 },
-    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Q41043454', priority: 4 },
     { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Crystal Award', priority: 4 },
     ],
   },
@@ -1736,7 +1735,7 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     hints: [
     { id: 'prof', type: 'profession', label: 'Profession', value: 'Actor', priority: 1 },
     { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'August 25, 1976', priority: 2 },
-    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Vällingby församling', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Stockholm', priority: 2 },
     { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Satellite Award for Best Cast – Television Series', priority: 5 },
     { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Golden Globe Awards', priority: 4 },
     { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Actor Awards', priority: 4 },
@@ -1790,7 +1789,7 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     hints: [
     { id: 'prof', type: 'profession', label: 'Profession', value: 'Actor', priority: 1 },
     { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'October 3, 1988', priority: 2 },
-    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Johannebergs församling', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Göteborg', priority: 2 },
     { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Academy Award for Best Supporting Actress', priority: 5 },
     { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Guldbagge Award for Best Actress in a Leading Role', priority: 4 },
     { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Actor Awards', priority: 4 },
@@ -1834,7 +1833,7 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     hints: [
     { id: 'prof', type: 'profession', label: 'Profession', value: 'Actor', priority: 1 },
     { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'December 20, 1964', priority: 2 },
-    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Q10544406', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Katrineholm', priority: 2 },
     { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Karamelodiktstipendiet', priority: 5 },
     { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Guldmasken', priority: 4 },
     { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Guldmasken', priority: 4 },
@@ -1888,7 +1887,7 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Hedvig Eleonora parish', priority: 2 },
     { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Litteris et Artibus', priority: 5 },
     { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Eugene O\'Neill Award', priority: 4 },
-    { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Q108798071', priority: 4 },
+    { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'LO:s kulturpris', priority: 4 },
     ],
   },
 
@@ -1964,7 +1963,7 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     hints: [
     { id: 'prof', type: 'profession', label: 'Profession', value: 'Actor', priority: 1 },
     { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'February 23, 1951', priority: 2 },
-    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Q115052170', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Partille', priority: 2 },
     { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Karamelodiktstipendiet', priority: 5 },
     { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Karl Gerhards Hederspris', priority: 4 },
     { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Guldbagge Award for Best Actress in a Supporting Role', priority: 4 },
@@ -1980,7 +1979,7 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Gothenburg', priority: 2 },
     { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Karamelodiktstipendiet', priority: 5 },
     { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Litteris et Artibus', priority: 4 },
-    { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Q18332954', priority: 4 },
+    { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Stora retorikpriset', priority: 4 },
     ],
   },
 
@@ -1990,10 +1989,10 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     hints: [
     { id: 'prof', type: 'profession', label: 'Profession', value: 'Actor', priority: 1 },
     { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'June 20, 1943', priority: 2 },
-    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Västra Skrävlinge församling', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Malmö', priority: 2 },
     { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Edvardpriset', priority: 5 },
     { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Piraten award', priority: 4 },
-    { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Q10684980', priority: 4 },
+    { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Svenska Dagbladets Poppepris', priority: 4 },
     ],
   },
 
@@ -2016,7 +2015,7 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     hints: [
     { id: 'prof', type: 'profession', label: 'Profession', value: 'Film director', priority: 1 },
     { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'February 5, 1950', priority: 2 },
-    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Johannebergs församling', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Göteborg', priority: 2 },
     ],
   },
 
@@ -2076,7 +2075,7 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     hints: [
     { id: 'prof', type: 'profession', label: 'Profession', value: 'Writer', priority: 1 },
     { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'March 11, 1971', priority: 2 },
-    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Q10660414', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Salem', priority: 2 },
     { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Litteris et Artibus', priority: 5 },
     { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Ludvig Nordström Prize', priority: 4 },
     { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Kurt Linders stipendium', priority: 4 },
@@ -2340,8 +2339,8 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'February 19, 1986', priority: 2 },
     { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Sweden', priority: 2 },
     { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Tändstickan', priority: 5 },
-    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Q135000259', priority: 4 },
-    { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Q22910276', priority: 4 },
+    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Bästa nykomling på Svenska Standupgalan', priority: 4 },
+    { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Tôrparpriset', priority: 4 },
     ],
   },
 
@@ -2882,8 +2881,8 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     hints: [
     { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer', priority: 1 },
     { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'March 9, 1938', priority: 2 },
-    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Järvsö församling', priority: 2 },
-    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Q112765145', priority: 5 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Järvsö', priority: 2 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Hans Majestät Konungens medalj i guld av 8:e storleken i högblått band', priority: 5 },
     { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'H. M. The King\'s Medal', priority: 4 },
     ],
   },
@@ -2907,8 +2906,8 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     hints: [
     { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer', priority: 1 },
     { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'February 25, 1952', priority: 2 },
-    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Q10658490', priority: 2 },
-    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Q118864691', priority: 5 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Rätan', priority: 2 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Grammis för årets hederspris', priority: 5 },
     { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Pro Finlandia Medal of the Order of the Lion of Finland', priority: 4 },
     ],
   },
@@ -2922,7 +2921,7 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Stockholm', priority: 2 },
     { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Karamelodiktstipendiet', priority: 5 },
     { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Tigertassen', priority: 4 },
-    { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Q10543665', priority: 4 },
+    { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Karl Gerhard-sällskapet', priority: 4 },
     { id: 'work0', type: 'song', label: 'Notable work', value: '"Vittring"', priority: 4 },
     { id: 'work1', type: 'song', label: 'Notable work', value: '"Vild och skild"', priority: 4 },
     ],
@@ -3261,7 +3260,6 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     hints: [
     { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer-songwriter', priority: 1 },
     { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'June 14, 1961', priority: 2 },
-    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Q2057625', priority: 2 },
     { id: 'work0', type: 'song', label: 'Notable work', value: '"Arthur\'s Whisky"', priority: 4 },
     ],
   },
@@ -3479,7 +3477,7 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     hints: [
     { id: 'prof', type: 'profession', label: 'Profession', value: 'Writer', priority: 1 },
     { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'June 9, 1960', priority: 2 },
-    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Umeå stadsförsamling', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Umeå', priority: 2 },
     { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Rockbjörnen', priority: 5 },
     { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Melodifestivalen Hall of Fame', priority: 4 },
     { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Pro Finlandia Medal of the Order of the Lion of Finland', priority: 4 },
@@ -3521,7 +3519,7 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     hints: [
     { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer', priority: 1 },
     { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'July 29, 1971', priority: 2 },
-    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Hägerstens församling', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Stockholm', priority: 2 },
     { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Rockbjörnen', priority: 5 },
     { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Ulla Billquist Scholarship', priority: 4 },
     { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Grammis', priority: 4 },
@@ -3559,7 +3557,7 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Stockholm', priority: 2 },
     { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Karamelodiktstipendiet', priority: 5 },
     { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Bellman Prize of the City of Stockholm', priority: 4 },
-    { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Q10659525', priority: 4 },
+    { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'SKAP:s stipendiefond till Evert Taubes minne', priority: 4 },
     ],
   },
 
@@ -3633,7 +3631,7 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     { id: 'prof', type: 'profession', label: 'Profession', value: 'Schlager singer', priority: 1 },
     { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'March 5, 1963', priority: 2 },
     { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Överkalix', priority: 2 },
-    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Q120764583', priority: 5 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Guldklaven för årets sångerska', priority: 5 },
     ],
   },
 
@@ -4477,8 +4475,8 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer', priority: 1 },
     { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'October 29, 1987', priority: 2 },
     { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Viken church parish', priority: 2 },
-    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Q10680191', priority: 5 },
-    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Q118799190', priority: 4 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Platinagitarren', priority: 5 },
+    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Grammis för årets artist', priority: 4 },
     { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Musikexportpriset', priority: 4 },
     ],
   },
@@ -4491,7 +4489,7 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'March 18, 1986', priority: 2 },
     { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Sofia church parish', priority: 2 },
     { id: 'ht', type: 'height', label: 'Height', value: '171 cm', priority: 3 },
-    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Q10680191', priority: 5 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Platinagitarren', priority: 5 },
     ],
   },
 
@@ -4571,8 +4569,8 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     { id: 'prof', type: 'profession', label: 'Profession', value: 'Composer', priority: 1 },
     { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'October 19, 1975', priority: 2 },
     { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Engelbrekt church parish', priority: 2 },
-    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Q10680191', priority: 5 },
-    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Q118864592', priority: 4 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Platinagitarren', priority: 5 },
+    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Grammis för årets textförfattare', priority: 4 },
     { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'P3 Guld Award for Performer of the year', priority: 4 },
     { id: 'work0', type: 'song', label: 'Notable work', value: '"Om du lämnade mig nu"', priority: 4 },
     ],
@@ -4650,7 +4648,7 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'July 3, 1992', priority: 2 },
     { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Huddinge Municipality', priority: 2 },
     { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'ALIS Award', priority: 5 },
-    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Q118799190', priority: 4 },
+    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Grammis för årets artist', priority: 4 },
     { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'blog award', priority: 4 },
     ],
   },
@@ -4672,7 +4670,7 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer', priority: 1 },
     { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'June 10, 1982', priority: 2 },
     { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Bandar-e Anzali', priority: 2 },
-    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Q10680191', priority: 5 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Platinagitarren', priority: 5 },
     { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Litteris et Artibus', priority: 4 },
     { id: 'work0', type: 'song', label: 'Notable work', value: '"Live Tomorrow"', priority: 4 },
     ],
@@ -4708,7 +4706,7 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Sollentuna parish', priority: 2 },
     { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'P3 Gold Awards', priority: 5 },
     { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Grammis for Newcomer of the Year', priority: 4 },
-    { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Q118864592', priority: 4 },
+    { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Grammis för årets textförfattare', priority: 4 },
     ],
   },
 
@@ -4779,8 +4777,8 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     hints: [
     { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer', priority: 1 },
     { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'November 9, 1986', priority: 2 },
-    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'S:t Nikolai församling', priority: 2 },
-    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Q10405198', priority: 5 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Halmstad', priority: 2 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Alice Babs jazzstipendium', priority: 5 },
     { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'P3 Guld Award for Performer of the year', priority: 4 },
     ],
   },
@@ -4792,7 +4790,7 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer', priority: 1 },
     { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'April 4, 1997', priority: 2 },
     { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Torslanda', priority: 2 },
-    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Q118799190', priority: 5 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Grammis för årets artist', priority: 5 },
     { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'P3 Gold Award for Song of the Year', priority: 4 },
     { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Guldmicken', priority: 4 },
     ],
@@ -4807,7 +4805,7 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Borlänge', priority: 2 },
     { id: 'club0', type: 'club', label: 'Club', value: 'Ornäs BK', priority: 4 },
     { id: 'club1', type: 'club', label: 'Club', value: 'Forssa BK', priority: 3 },
-    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Q135907483', priority: 5 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Borlänge kommuns kulturpris', priority: 5 },
     ],
   },
 
@@ -4818,8 +4816,8 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     { id: 'prof', type: 'profession', label: 'Profession', value: 'Composer', priority: 1 },
     { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'March 16, 1970', priority: 2 },
     { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Eskilstuna', priority: 2 },
-    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Q118864592', priority: 5 },
-    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Q118799214', priority: 4 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Grammis för årets textförfattare', priority: 5 },
+    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Grammis för årets kompositör', priority: 4 },
     ],
   },
 
@@ -4876,7 +4874,7 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     hints: [
     { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer', priority: 1 },
     { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'April 27, 1990', priority: 2 },
-    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Revesjö församling', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Borås', priority: 2 },
     ],
   },
 
@@ -4956,7 +4954,7 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     hints: [
     { id: 'prof', type: 'profession', label: 'Profession', value: 'Rapper', priority: 1 },
     { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'August 25, 1985', priority: 2 },
-    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Spånga-Kista församling', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Stockholm', priority: 2 },
     ],
   },
 
@@ -5126,7 +5124,7 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer', priority: 1 },
     { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'April 15, 1942', priority: 2 },
     { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Solna', priority: 2 },
-    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Q108798071', priority: 5 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'LO:s kulturpris', priority: 5 },
     ],
   },
 
@@ -5155,7 +5153,7 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer', priority: 1 },
     { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'July 31, 1965', priority: 2 },
     { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Uppsala Cathedral Assembly', priority: 2 },
-    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Q118799190', priority: 5 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Grammis för årets artist', priority: 5 },
     ],
   },
 
@@ -5185,7 +5183,7 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     hints: [
     { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer', priority: 1 },
     { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'December 11, 1991', priority: 2 },
-    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Hägerstens församling', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Stockholm', priority: 2 },
     { id: 'work0', type: 'song', label: 'Notable work', value: '"This Is My Life"', priority: 4 },
     { id: 'work1', type: 'song', label: 'Notable work', value: '"Just Another Christmas"', priority: 4 },
     { id: 'work2', type: 'song', label: 'Notable work', value: '"Ashes to Ashes"', priority: 3 },
@@ -5199,7 +5197,7 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     hints: [
     { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer', priority: 1 },
     { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'March 9, 1992', priority: 2 },
-    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Nacka församling', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Nacka', priority: 2 },
     { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Grammis for Newcomer of the Year', priority: 5 },
     { id: 'work0', type: 'song', label: 'Notable work', value: '"Hold Me Closer"', priority: 4 },
     { id: 'work1', type: 'song', label: 'Notable work', value: '"Best of Me"', priority: 4 },
@@ -5225,7 +5223,7 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     hints: [
     { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer-songwriter', priority: 1 },
     { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'July 12, 1995', priority: 2 },
-    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Q10602963', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Norrtälje', priority: 2 },
     ],
   },
 
@@ -5813,9 +5811,9 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     { id: 'club3', type: 'club', label: 'Club', value: 'IFK Göteborg (1978–1983)', priority: 3 },
     { id: 'club4', type: 'club', label: 'Club', value: 'Liverpool F.C. (1989–1992)', priority: 3 },
     { id: 'ht', type: 'height', label: 'Height', value: '184 cm', priority: 3 },
-    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Q10726701', priority: 5 },
-    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Q10549123', priority: 4 },
-    { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Q10549123', priority: 4 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Årets ärkeängel', priority: 5 },
+    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Kristallkulan', priority: 4 },
+    { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Kristallkulan', priority: 4 },
     ],
   },
 
@@ -6375,7 +6373,6 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     { id: 'club3', type: 'club', label: 'Club', value: 'Udinese Calcio (1961–1963)', priority: 3 },
     { id: 'club4', type: 'club', label: 'Club', value: 'Italy men\'s national association football team (1968–1983)', priority: 3 },
     { id: 'ht', type: 'height', label: 'Height', value: '182 cm', priority: 3 },
-    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Q44726364', priority: 5 },
     { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Commander of the Order of Merit of the Italian Republic', priority: 4 },
     { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Grand Officer of the Order of Merit of the Italian Republic', priority: 4 },
     ],
@@ -6631,9 +6628,9 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     { id: 'club3', type: 'club', label: 'Club', value: 'Östers IF (1999–1999)', priority: 3 },
     { id: 'club4', type: 'club', label: 'Club', value: 'Sweden men\'s national football team (1981–1997)', priority: 3 },
     { id: 'ht', type: 'height', label: 'Height', value: '186 cm', priority: 3 },
-    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Q10726701', priority: 5 },
-    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Q10549123', priority: 4 },
-    { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Q10549123', priority: 4 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Årets ärkeängel', priority: 5 },
+    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Kristallkulan', priority: 4 },
+    { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Kristallkulan', priority: 4 },
     ],
   },
 
@@ -6827,7 +6824,7 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     hints: [
     { id: 'prof', type: 'profession', label: 'Profession', value: 'Cross-country skier', priority: 1 },
     { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'July 22, 1987', priority: 2 },
-    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Q10708003', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Tärendö', priority: 2 },
     { id: 'ht', type: 'height', label: 'Height', value: '162 cm', priority: 3 },
     { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Holmenkollen Medal', priority: 5 },
     { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'honorary doctor of Luleå University of Technology', priority: 4 },
@@ -6977,7 +6974,7 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'February 2, 1983', priority: 2 },
     { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Sjömarken', priority: 2 },
     { id: 'ht', type: 'height', label: 'Height', value: '178 cm', priority: 3 },
-    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Q10524027', priority: 5 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Karlskrona idrottspris', priority: 5 },
     ],
   },
 
@@ -7120,7 +7117,7 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     hints: [
     { id: 'prof', type: 'profession', label: 'Profession', value: 'Association football player', priority: 1 },
     { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'March 19, 1985', priority: 2 },
-    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Q18291538', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Helsingborg', priority: 2 },
     { id: 'club0', type: 'club', label: 'Club', value: 'Stattena IF (2001–2004)', priority: 4 },
     { id: 'club1', type: 'club', label: 'Club', value: 'Linköpings FC (2004–2009)', priority: 3 },
     { id: 'club2', type: 'club', label: 'Club', value: 'Philadelphia Independence (2010–2010)', priority: 3 },
@@ -7128,7 +7125,7 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     { id: 'club4', type: 'club', label: 'Club', value: 'FC Rosengård (2011–2011)', priority: 3 },
     { id: 'jn', type: 'jersey_number', label: 'Jersey number', value: '#17', priority: 3 },
     { id: 'ht', type: 'height', label: 'Height', value: '173 cm', priority: 3 },
-    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Q116767014', priority: 5 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Hans Majestät Konungens medalj av 5:e storleken i högblått band', priority: 5 },
     ],
   },
 
@@ -7149,7 +7146,7 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     hints: [
     { id: 'prof', type: 'profession', label: 'Profession', value: 'Cross-country skier', priority: 1 },
     { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'November 25, 1985', priority: 2 },
-    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Q10559571', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Skövde', priority: 2 },
     { id: 'ht', type: 'height', label: 'Height', value: '183 cm', priority: 3 },
     ],
   },
@@ -7175,7 +7172,7 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     { id: 'club1', type: 'club', label: 'Club', value: 'Lima SKG', priority: 3 },
     { id: 'club2', type: 'club', label: 'Club', value: 'Team Ragde Charge', priority: 3 },
     { id: 'ht', type: 'height', label: 'Height', value: '174 cm', priority: 3 },
-    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Q117086457', priority: 5 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Hans Majestät Konungens medalj för förtjänster om svensk idrott', priority: 5 },
     ],
   },
 
@@ -7369,7 +7366,7 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     hints: [
     { id: 'prof', type: 'profession', label: 'Profession', value: 'Handball player', priority: 1 },
     { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'July 10, 1986', priority: 2 },
-    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Q10602529', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Lund', priority: 2 },
     { id: 'club0', type: 'club', label: 'Club', value: 'THW Kiel', priority: 4 },
     { id: 'club1', type: 'club', label: 'Club', value: 'Sweden men\'s national handball team', priority: 3 },
     { id: 'ht', type: 'height', label: 'Height', value: '189 cm', priority: 3 },
@@ -7670,7 +7667,7 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     hints: [
     { id: 'prof', type: 'profession', label: 'Profession', value: 'Association football player', priority: 1 },
     { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'April 25, 2000', priority: 2 },
-    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Spånga-Kista församling', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Stockholm', priority: 2 },
     { id: 'club0', type: 'club', label: 'Club', value: 'Sweden national under-17 football team (2015–2017)', priority: 4 },
     { id: 'club1', type: 'club', label: 'Club', value: 'Juventus FC (2020–2023)', priority: 3 },
     { id: 'club2', type: 'club', label: 'Club', value: 'Tottenham Hotspur F.C. (2022–2023)', priority: 3 },
@@ -8952,8 +8949,8 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     { id: 'club4', type: 'club', label: 'Club', value: 'ACF Fiorentina (1953–1955)', priority: 3 },
     { id: 'ht', type: 'height', label: 'Height', value: '175 cm', priority: 3 },
     { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Guldbollen', priority: 5 },
-    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Q10549123', priority: 4 },
-    { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Q116992899', priority: 4 },
+    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Kristallkulan', priority: 4 },
+    { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Hedersmakrillen', priority: 4 },
     ],
   },
 
@@ -8969,8 +8966,8 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     { id: 'club2', type: 'club', label: 'Club', value: 'PSV Eindhoven (1972–1975)', priority: 3 },
     { id: 'club3', type: 'club', label: 'Club', value: 'IFK Göteborg (1975–1978)', priority: 3 },
     { id: 'club4', type: 'club', label: 'Club', value: 'Minnesota Kicks (1979–1980)', priority: 3 },
-    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Q10726701', priority: 5 },
-    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Q10549123', priority: 4 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Årets ärkeängel', priority: 5 },
+    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Kristallkulan', priority: 4 },
     { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Guldbollen', priority: 4 },
     ],
   },
@@ -9066,7 +9063,7 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     { id: 'club4', type: 'club', label: 'Club', value: 'Panathinaikos F.C. (2013–2017)', priority: 3 },
     { id: 'jn', type: 'jersey_number', label: 'Jersey number', value: '#9', priority: 3 },
     { id: 'ht', type: 'height', label: 'Height', value: '184 cm', priority: 3 },
-    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Q10726701', priority: 5 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Årets ärkeängel', priority: 5 },
     ],
   },
 
@@ -9083,8 +9080,8 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     { id: 'club3', type: 'club', label: 'Club', value: 'IFK Göteborg (1996–1997)', priority: 3 },
     { id: 'club4', type: 'club', label: 'Club', value: 'Sheffield Wednesday F.C. (1997–2000)', priority: 3 },
     { id: 'ht', type: 'height', label: 'Height', value: '181 cm', priority: 3 },
-    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Q10726701', priority: 5 },
-    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Q10549123', priority: 4 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Årets ärkeängel', priority: 5 },
+    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Kristallkulan', priority: 4 },
     ],
   },
 
@@ -9136,8 +9133,8 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     { id: 'club3', type: 'club', label: 'Club', value: 'Real Sociedad (1996–1998)', priority: 3 },
     { id: 'club4', type: 'club', label: 'Club', value: 'IFK Göteborg (1995–1996)', priority: 3 },
     { id: 'jn', type: 'jersey_number', label: 'Jersey number', value: '#7', priority: 3 },
-    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Q10726701', priority: 5 },
-    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Q10549123', priority: 4 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Årets ärkeängel', priority: 5 },
+    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Kristallkulan', priority: 4 },
     ],
   },
 
@@ -9271,7 +9268,7 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     hints: [
     { id: 'prof', type: 'profession', label: 'Profession', value: 'Politician', priority: 1 },
     { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'December 30, 1884', priority: 2 },
-    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Ovansjö församling', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Sandviken', priority: 2 },
     ],
   },
 
@@ -9393,8 +9390,8 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     { id: 'club3', type: 'club', label: 'Club', value: 'IFK Göteborg (1983–1989)', priority: 3 },
     { id: 'club4', type: 'club', label: 'Club', value: 'Sheffield Wednesday F.C. (1989–1994)', priority: 3 },
     { id: 'ht', type: 'height', label: 'Height', value: '179 cm', priority: 3 },
-    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Q10726701', priority: 5 },
-    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Q10549123', priority: 4 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Årets ärkeängel', priority: 5 },
+    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Kristallkulan', priority: 4 },
     { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Guldbollen', priority: 4 },
     ],
   },
@@ -9490,7 +9487,7 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     hints: [
     { id: 'prof', type: 'profession', label: 'Profession', value: 'Speed skater', priority: 1 },
     { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'April 25, 1996', priority: 2 },
-    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Q10512757', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Göteborg', priority: 2 },
     { id: 'ht', type: 'height', label: 'Height', value: '184 cm', priority: 3 },
     { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Oscar Mathisen Award', priority: 5 },
     ],
@@ -9814,7 +9811,6 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     nationality: 'unknown',
     hints: [
     { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
-    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Q3334517', priority: 5 },
     { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'NRJ Music Award for International Group/Duo/Troupe of the Year', priority: 4 },
     { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'NRJ Music Award for International Group/Duo/Troupe of the Year', priority: 4 },
     ],
@@ -9962,7 +9958,7 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     nationality: 'unknown',
     hints: [
     { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
-    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Q118799190', priority: 5 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Grammis för årets artist', priority: 5 },
     ],
   },
 
@@ -10003,7 +9999,7 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     nationality: 'unknown',
     hints: [
     { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
-    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Q118801611', priority: 5 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Grammis för årets elektro/dans', priority: 5 },
     { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Musikexportpriset', priority: 4 },
     { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'MTV Europe Music Award for Best Swedish Act', priority: 4 },
     ],
@@ -10014,9 +10010,9 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     nationality: 'unknown',
     hints: [
     { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
-    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Q120763132', priority: 5 },
-    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Q120763132', priority: 4 },
-    { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Q120763132', priority: 4 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Guldklaven för årets dansband', priority: 5 },
+    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Guldklaven för årets dansband', priority: 4 },
+    { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Guldklaven för årets dansband', priority: 4 },
     ],
   },
 
@@ -10091,9 +10087,9 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     nationality: 'unknown',
     hints: [
     { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
-    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Q120763132', priority: 5 },
-    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Q120763700', priority: 4 },
-    { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Q120763700', priority: 4 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Guldklaven för årets dansband', priority: 5 },
+    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Guldklaven för årets album', priority: 4 },
+    { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Guldklaven för årets album', priority: 4 },
     ],
   },
 

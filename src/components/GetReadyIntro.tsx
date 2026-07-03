@@ -630,9 +630,11 @@ export function GetReadyIntro({
             <Text style={styles.leaderboardHeaderTitle}>
               {`🏆  Current Leaderboard - ${playerCount} ${playerCount === 1 ? 'Player' : 'Players'}`}
             </Text>
-            <Text style={styles.leaderboardHeaderChevron}>
-              {leaderboardOpen ? '▾' : '▸'}
-            </Text>
+            <View style={styles.leaderboardToggleBox}>
+              <Text style={styles.leaderboardToggleGlyph}>
+                {leaderboardOpen ? '−' : '+'}
+              </Text>
+            </View>
           </TouchableOpacity>
           {leaderboardOpen && (() => {
             // D-iii: dela upp i två sektioner. Disconnected (men inte hasLeft)
@@ -1010,31 +1012,33 @@ export function GetReadyIntro({
         <View style={styles.playBlock}>
           {canStartGame ? (
             <>
-              {/* "Tap Here"-affordance — gold text ovanför play-loggan så
-                  spelaren direkt ser att Q-play-logon är ett tap-target
-                  (loggan i sig saknar typisk button-affordance som border/
-                  bg). Renderas bara för host som kan tappa. */}
-              <View style={styles.tapHereRow}>
-                <Text style={styles.tapHereText}>Press Play</Text>
-                <Svg width={18} height={18} viewBox="0 0 18 18">
-                  <Path d="M4 2 L16 9 L4 16 Z" fill={Colors.warning} />
-                </Svg>
-              </View>
+              {/* Yttre wrapper omfamnar text + logo — ringar sitter här
+                  så de aldrig skär in i "Press Play"-texten ovanför. */}
               <Animated.View
-                style={[styles.playLogoWrap, { transform: [{ scale: playPulse }] }]}
+                style={[styles.playOuterWrap, { transform: [{ scale: playPulse }] }]}
               >
-                <Animated.View
-                  style={[styles.playLogoHalo, { opacity: playGlow }]}
-                  pointerEvents="none"
-                />
-                <TouchableOpacity
-                  activeOpacity={0.85}
-                  onPress={handlePlayPress}
-                  accessibilityLabel={`${playerName} press to start your turn`}
-                  style={styles.playLogoTouchable}
-                >
-                  <QuizVibePlayLogo size={PLAY_BUTTON_SIZE} color={Colors.warning} />
-                </TouchableOpacity>
+                <View style={styles.playRingOuter} pointerEvents="none" />
+                <View style={styles.playRingInner} pointerEvents="none" />
+                <View style={styles.tapHereRow}>
+                  <Text style={styles.tapHereText}>Press Play</Text>
+                  <Svg width={18} height={18} viewBox="0 0 18 18">
+                    <Path d="M4 2 L16 9 L4 16 Z" fill={Colors.warning} />
+                  </Svg>
+                </View>
+                <View style={styles.playLogoWrap}>
+                  <Animated.View
+                    style={[styles.playLogoHalo, { opacity: playGlow }]}
+                    pointerEvents="none"
+                  />
+                  <TouchableOpacity
+                    activeOpacity={0.85}
+                    onPress={handlePlayPress}
+                    accessibilityLabel={`${playerName} press to start your turn`}
+                    style={styles.playLogoTouchable}
+                  >
+                    <QuizVibePlayLogo size={PLAY_BUTTON_SIZE} color={Colors.warning} />
+                  </TouchableOpacity>
+                </View>
               </Animated.View>
             </>
           ) : (
@@ -1094,8 +1098,14 @@ export function GetReadyIntro({
                 tap-handling i boxen. */}
             <View style={styles.tableRow}>
               <View style={[styles.colPlayer, styles.colPlayerCurrentWrap]}>
-                <View style={styles.currentMediaBox}>
-                  <Text style={styles.currentMediaNumber}>{currentQuestion}</Text>
+                <View style={[
+                  styles.currentMediaBox,
+                  (spotifyQuestionIndices?.includes(currentQuestion - 1) ?? false) && styles.currentMediaBoxSpotify,
+                ]}>
+                  <Text style={[
+                    styles.currentMediaNumber,
+                    (spotifyQuestionIndices?.includes(currentQuestion - 1) ?? false) && styles.currentMediaNumberSpotify,
+                  ]}>{currentQuestion}</Text>
                   <MediaSourceIcon
                     source={mediaSourceByQuestion?.[currentQuestion - 1]}
                     size={28}
@@ -1176,7 +1186,7 @@ export function GetReadyIntro({
                                 numberOfLines={1}
                                 ellipsizeMode="tail"
                               >
-                                {isSpotify ? 'Spotify DJ' : mediaSourceLabel(source)}
+                                {isSpotify ? 'Spotify' : mediaSourceLabel(source)}
                               </Text>
                             </View>
                           );
@@ -1591,9 +1601,20 @@ const styles = StyleSheet.create({
     color: Colors.textPrimary,
     letterSpacing: 0.4,
   },
-  leaderboardHeaderChevron: {
-    fontSize: FontSize.md,
+  leaderboardToggleBox: {
+    width: 26,
+    height: 26,
+    borderRadius: Radius.sm,
+    borderWidth: 1,
+    borderColor: Colors.borderStrong,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  leaderboardToggleGlyph: {
+    fontSize: 18,
+    fontWeight: FontWeight.bold,
     color: Colors.textSecondary,
+    lineHeight: 20,
   },
   // Body-overlay: absolute under header (top: '100%') så den FLOATAR ovanpå
   // play + turordningstabell istället för att skjuta dem nedåt. Solid bg
@@ -2234,9 +2255,16 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
   },
   queueChipNumberSpotify: {
-    color: '#1DB954',
+    color: '#FFFFFF',
   },
   queueChipNameSpotify: {
+    color: '#FFFFFF',
+  },
+  currentMediaBoxSpotify: {
+    borderColor: '#1DB954',
+    backgroundColor: 'rgba(29,185,84,0.12)',
+  },
+  currentMediaNumberSpotify: {
     color: '#1DB954',
   },
   // Siffran är frågenumret (queueQuestionNumbers[i]) — primary-blå för
@@ -2429,6 +2457,33 @@ const styles = StyleSheet.create({
     height: PLAY_BUTTON_SIZE,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  playOuterWrap: {
+    position: 'relative',
+    alignItems: 'center',
+    paddingHorizontal: 28,
+    paddingTop: 16,
+    paddingBottom: 16,
+  },
+  playRingOuter: {
+    position: 'absolute',
+    top: -14,
+    left: -14,
+    right: -14,
+    bottom: -14,
+    borderRadius: 40,
+    borderWidth: 2.5,
+    borderColor: Colors.warning,
+  },
+  playRingInner: {
+    position: 'absolute',
+    top: -6,
+    left: -6,
+    right: -6,
+    bottom: -6,
+    borderRadius: 32,
+    borderWidth: 2.5,
+    borderColor: Colors.warning,
   },
   // Non-host:s waiting-vy i Individual Devices: samma gold-halo'd Q-play-logo
   // som host, plus en text-rad under loggan med "Waiting - Host will start

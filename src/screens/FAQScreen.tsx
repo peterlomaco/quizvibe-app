@@ -37,7 +37,7 @@ const FAQ_CATEGORIES: FaqCategory[] = [
     items: [
       {
         q: 'What is QuizVibe?',
-        a: 'A social quiz game where you guess years on music clips and names on images. Play with friends in the same room (Pass-the-Phone) or on separate phones (Individual Devices, Premium).',
+        a: 'A social quiz game where you guess years on music clips and names on images. Play with friends in the same room (Pass-the-Phone) or on separate phones (Individual Devices — free for everyone).',
       },
       {
         q: 'Do I need an account to play?',
@@ -45,11 +45,19 @@ const FAQ_CATEGORIES: FaqCategory[] = [
       },
       {
         q: 'What is the age minimum?',
-        a: '13 years (App Store / GDPR baseline). You provide a year at registration which we use to match the generation that fits your recognition.',
+        a: '15 years. The content in QuizVibe includes material rated for ages 15 and above. You provide a year of birth at registration which we use to match the generation category that fits your recognition — we do not store your actual age, only the generation category you play as.',
       },
       {
         q: 'How do I get started fastest?',
-        a: '(1) Tap Create Game on the Home screen, (2) share the Room Code with friends or invite them from the Lobby, (3) approve players who join, (4) tap Start Game. You get 4 Free Host Game Credits per day during the launch period.',
+        a: '(1) Tap Create Game on the Home screen, (2) share the Room Code with friends or invite them from the Lobby, (3) approve players who join, (4) tap Start Game. You get 2 Free Host Game Credits per day.',
+      },
+      {
+        q: 'Does QuizVibe work on Android?',
+        a: 'QuizVibe is currently developed for iOS only and is available on the App Store. An Android version is not available at this time.',
+      },
+      {
+        q: 'Does QuizVibe work on older iPhones?',
+        a: 'QuizVibe requires a reasonably recent version of iOS. On older iPhones or older iOS versions some layout elements may not display correctly and the overall game experience may be reduced. For the best experience we recommend keeping iOS updated to the latest version.',
       },
     ],
   },
@@ -60,7 +68,7 @@ const FAQ_CATEGORIES: FaqCategory[] = [
     items: [
       {
         q: 'What is the difference between Pass-the-Phone and Individual Devices?',
-        a: 'Pass-the-Phone (free): all players share one phone and take turns — the quiz pauses between rounds so you can pass it on. Individual Devices (Premium): each player has their own phone and answers the same question in parallel.',
+        a: 'Pass-the-Phone (free): all players share one phone and take turns — the quiz pauses between rounds so you can pass it on. Individual Devices (free): each player has their own phone and answers the same question in parallel.',
       },
       {
         q: 'What is Single Player mode?',
@@ -75,8 +83,8 @@ const FAQ_CATEGORIES: FaqCategory[] = [
         a: 'Max 4 players per room for free Hosts. Premium Hosts can have up to 12 players.',
       },
       {
-        q: 'Why does Individual Devices require Premium?',
-        a: 'IndDev requires more infrastructure (synchronized question distribution + parallel scoring) which drives ongoing costs. The Premium subscription covers that. Pass-the-Phone works great for free for any multiplayer in the same room.',
+        q: 'Does Individual Devices require Premium?',
+        a: 'No — Individual Devices is free for all registered users. Premium unlocks extra capacity: up to 12 players per room and up to 20 rounds per game (instead of the free limit of 4 players and 4 rounds in Pass-the-Phone).',
       },
     ],
   },
@@ -133,7 +141,7 @@ const FAQ_CATEGORIES: FaqCategory[] = [
     items: [
       {
         q: 'What are Free vs Extras credits?',
-        a: 'Free credits refresh automatically every midnight CET — the free baseline plan. During the V1 launch period you receive 2 additional bonus Free credits per day, totaling 4 Free credits daily. Extras are credits you buy in the Store (5, 10, or 20 packs). When you tap Start Game, Free credits are consumed first, then Extras.',
+        a: 'Free credits refresh automatically every midnight CET — the free baseline plan. You get 2 Free credits per day. Extras are credits you buy in the Store (5, 10, or 20 packs). When you tap Start Game, Free credits are consumed first, then Extras.',
       },
       {
         q: 'When do I get my daily free credits?',
@@ -156,7 +164,7 @@ const FAQ_CATEGORIES: FaqCategory[] = [
     items: [
       {
         q: 'What is included in Premium?',
-        a: 'Unlimited Host Games (no daily cap), up to 12 players per Lobby, the Individual Devices mode (everyone on their own phone), and longer quiz games (up to 20 rounds instead of 4).',
+        a: 'Unlimited Host Games (no daily cap), up to 12 players per Lobby, and longer quiz games (up to 20 rounds instead of 4). Individual Devices is free for all users.',
       },
       {
         q: 'How do I restore purchases on a new phone?',
@@ -195,7 +203,7 @@ const FAQ_CATEGORIES: FaqCategory[] = [
       },
       {
         q: 'What data is saved about me?',
-        a: 'Player Name, email, the year you choose to play as (this determines which generation\'s content you receive — it does not need to be your actual birth year), selected settings (assistance level, host defaults), friends you have added, and game history (points + response times). No location data, no contacts, no social media links. Full list in the Privacy Policy.',
+        a: 'Player Name, email, the generation category you play as (Elder / Gen X / Millennials / Gen Z / Gen Alpha — this determines which content you receive and does not need to reflect your actual age), selected settings (assistance level, host defaults), friends you have added, and game history (points + response times). Your actual age or date of birth is never stored. No location data, no contacts, no social media links. Full list in the Privacy Policy.',
       },
       {
         q: 'How do I stop friends from seeing me?',

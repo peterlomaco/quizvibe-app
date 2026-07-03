@@ -954,6 +954,15 @@ export default function ProfileScreen() {
   )?.label;
 
   const handleSave = async (section: 'defaults' | 'host' | 'packages') => {
+    // Spotify DJ kräver Individual Devices-läge — blockera om Spotify är på
+    // men mode-valet inte är IndDev (PtP, Single Player eller IndDev off).
+    if (spotifyEnabled && (gameMode !== 'individual-devices' || singlePlayerDefault)) {
+      Alert.alert(
+        'Spotify requires Individual Devices',
+        'Spotify DJ mode is only available in Individual Devices mode. Please change the Game Mode or turn off Spotify.',
+      );
+      return;
+    }
     try {
       await saveProfile({
         playerName,

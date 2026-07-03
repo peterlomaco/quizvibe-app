@@ -28,12 +28,20 @@ export interface PlayCommandPayload {
    *  oavsett lokal shuffle-ordning. Inkluderas i varje play_command så
    *  reconnecting players alltid har aktuell sekvens. */
   all_question_ids?: string[];
+  /** Host:s Spotify-svarstyps-inställningar — synkas med varje play_command för reconnect-fall. */
+  spotify_answer_year?: boolean;
+  spotify_answer_name?: boolean;
   /** Wall-clock ms (Date.now()) för när host:s timer kommer att starta —
    *  700ms initial paus + 5×1300ms tick + 1000ms ?-display + 2000ms timerActive-delay
    *  = ~10200ms + 300ms marginal = ~10500ms efter broadcasten.
    *  Non-host använder detta för att återsynka sin timer korrekt om de vaknar
    *  upp från iOS-bakgrund under nedräknings- eller fråge-fasen. */
   timer_start_at?: number;
+  /** DJ-spelarens player_id för denna Spotify-fråga. Skickas med play_command
+   *  (som ankommer vid countdown-start, ~10 s INNAN spelaren behöver trycka
+   *  "Start track in Spotify") så non-host inte behöver vänta på det separata
+   *  spotify_question_ready-broadcastet som ankommer senare. */
+  dj_player_id?: string;
 }
 
 export interface QuestionAdvancePayload {
@@ -41,6 +49,9 @@ export interface QuestionAdvancePayload {
   next_question_index: number | null;
   /** Host:s auktoritativa frågesekvens — skickas med varje advance så non-host håller sig synkad vid reconnect. */
   all_question_ids?: string[];
+  /** Host:s Spotify-svarstyps-inställningar — synkas vid varje advance för reconnect-fall. */
+  spotify_answer_year?: boolean;
+  spotify_answer_name?: boolean;
 }
 
 export interface PlayerLeftPayload {
@@ -134,6 +145,8 @@ export interface SpotifyQuestionReadyPayload {
   correct_year: number;
   /** lobby_players.player_id för den utsedde DJ:n. */
   dj_player_id: string;
+  /** Svarstyp för denna fråga: 'year' = TimelineSelector, 'name' = Letter Grid. */
+  answer_type: 'year' | 'name';
 }
 
 /**
@@ -234,6 +247,10 @@ export interface HostActivePingPayload {
 export interface GameSequenceInitPayload {
   /** Alla fråge-IDs i host:s spel-ordning (index = questionIndex 0..N-1). */
   all_question_ids: string[];
+  /** Host:s Spotify-svarstyps-inställningar — krävs av non-host för att beräkna
+   *  rätt Year/Name-badge för kommande Spotify-frågor i GetReady-kön. */
+  spotify_answer_year?: boolean;
+  spotify_answer_name?: boolean;
 }
 
 /**
