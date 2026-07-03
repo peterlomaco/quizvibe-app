@@ -1,0 +1,60 @@
+# Sommar-låtar — kurerade för kommande "Summer"-host-paketet. Varje item bär
+# genrePackages: ["Summer"]. HELA filen är paket-exklusiv: region
+# unknown-region på fil-headern filtrerar bort items ur V1-baspoolen
+# (quiz.tsx rad ~204) tills paketet aktiveras via genrePackages-mekanismen.
+#
+# audience: ["all"] — sommarhits känns igen tvärs generationer.
+# correctYear = originalrelease-år (INTE Spotify-samlingsskivans år —
+# Sommarkort ligger t.ex. på "Cornelis Bästa" 2004 på Spotify men
+# originalreleasen är 1987 på "Eldorado – äventyret fortsätter...").
+audience: ["all"]
+region: ["unknown-region"]
+category: songs
+contentForm: youtube
+contentSubject: song
+items:
+  - id: cornelis-vreeswijk-sommarkort
+    displayName: "Sommarkort (En stund på jorden) — Cornelis Vreeswijk"
+    correctYear: 1987
+    probability: 80
+    wikimediaSearchHints: ["Cornelis Vreeswijk Sommarkort En stund på jorden"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Summer"]
+    spotifyTrackId: "5lRvBRQJFVWZGRqDm7YkL4"
+    youtubeClips: []
+  - id: ace-of-base-cruel-summer
+    displayName: "Cruel Summer — Ace of Base"
+    correctYear: 1998
+    probability: 82
+    wikimediaSearchHints: ["Ace of Base Cruel Summer 1998"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Summer"]
+    spotifyTrackId: "4AxVXHgv0clBuS4dl4S7Gw"
+    youtubeClips: []
+  - id: mungo-jerry-in-the-summertime
+    displayName: "In the Summertime — Mungo Jerry"
+    correctYear: 1970
+    probability: 84
+    wikimediaSearchHints: ["Mungo Jerry In the Summertime 1970"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Summer"]
+    spotifyTrackId: "2uzlv8PjqsVvF1DhEahyhy"
+    youtubeClips: []
+  - id: fresh-prince-summertime
+    displayName: "Summertime — DJ Jazzy Jeff & The Fresh Prince"
+    correctYear: 1991
+    probability: 82
+    wikimediaSearchHints: ["DJ Jazzy Jeff Fresh Prince Summertime 1991"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Summer", "hiphop"]
+    spotifyTrackId: "20XdEFyaUR9C7aDIdq2OAd"
+    youtubeClips: []
+  - id: inner-circle-sweat
+    displayName: "Sweat (A La La La Long) — Inner Circle"
+    correctYear: 1992
+    probability: 84
+    wikimediaSearchHints: ["Inner Circle Sweat A La La La Long 1992"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Summer"]
+    spotifyTrackId: "24Si0Kw3pu2RxX1jrbBg5A"
+    youtubeClips: []

@@ -1132,3 +1132,54 @@ items:
         endSec: 30
         channelTitle: "Club Music 80"
         notes: "Officiell musikvideo-re-upload — stabil sedan 2014."
+  - id: elton-john-im-still-standing
+    displayName: "I'm Still Standing — Elton John"
+    correctYear: 1983
+    probability: 83
+    wikimediaSearchHints: ["Elton John I'm Still Standing 1983 Too Low for Zero"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "MJ_aPtt4U8M"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Elton John"
+        notes: "Official music video."
+  - id: thomas-di-leva-vi-har-bara-varandra
+    displayName: "Vi har bara varandra — Thomas Di Leva"
+    correctYear: 1988
+    probability: 80
+    wikimediaSearchHints: ["Thomas Di Leva Vi har bara varandra 1988 Swedish pop"]
+    answerMethods: ["timeline"]
+    genrePackages: ["100% svenska"]
+    youtubeClips:
+      - videoId: "KH_kDfdwf8A"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Thomas Di Leva"
+        notes: "Official video."
+  - id: ronny-ragge-de-e-sommar
+    displayName: "De e sommar — Ronny & Ragge"
+    correctYear: 1989
+    probability: 82
+    wikimediaSearchHints: ["Ronny Ragge De e sommar 1989 Swedish summer"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Summer"]
+    spotifyTrackId: "0EWaUpAQtTWET3E14ye6ZV"
+    youtubeClips:
+      - videoId: "K9KiSm1fyMk"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Ronny & Ragge"
+        notes: "Official video."
+  - id: scatman-john-scatman
+    displayName: "Scatman (Ski-Ba-Bop-Ba-Dop-Bop) — Scatman John"
+    correctYear: 1994
+    probability: 86
+    wikimediaSearchHints: ["Scatman John Scatman 1994 Ski-Ba-Bop-Ba-Dop-Bop"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "Hy8kmNEo1i8"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Scatman John"
+        notes: "Official music video."

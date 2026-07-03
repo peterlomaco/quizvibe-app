@@ -51,6 +51,7 @@ import {
 } from '@/src/utils/spotifyDJ';
 import { QuizVibeLogo } from '@/src/components/QuizVibeLogo';
 import { SpotifyBrandIcon } from '@/src/components/SpotifyBrandIcon';
+import { getSpotifyArtistMeta, type SpotifyArtistMeta } from '@/src/utils/spotifyArtistMeta';
 import { savePendingLobbyPlayers } from '@/src/utils/pendingLobby';
 import { loadProfile } from '@/src/utils/profileStorage';
 import { recordQuestionAnswer } from '@/src/utils/questionStats';
@@ -285,6 +286,33 @@ const IMAGE_SEED_QUESTIONS: ImageQuestion[] = IMAGE_QUIZ_QUESTIONS
 const ALL_QUESTIONS_MAP = new Map<string, QuizQuestion>(
   ([...SEED_QUESTIONS, ...IMAGE_SEED_QUESTIONS] as QuizQuestion[]).map((q) => [q.id, q]),
 );
+
+/** Distraktor-kandidater för Spotify/Name-frågor: alla artister ur musik-
+ *  katalogen med spotifyTrackId som har kuraterad meta (typ/kön/land) i
+ *  SPOTIFY_ARTIST_META. Kompletterar bild-poolens artist/band-items så
+ *  relevans-filtreringen har tillräckligt med t.ex. svenska kvinnliga
+ *  soloartister eller amerikanska band att välja bland. Dedup på lowercase-
+ *  namn; canonical casing tas från katalogens displayName ("Title — Artist"). */
+const SPOTIFY_ARTIST_CANDIDATES: { name: string; meta: SpotifyArtistMeta }[] = (() => {
+  const seen = new Set<string>();
+  const out: { name: string; meta: SpotifyArtistMeta }[] = [];
+  for (const q of MUSIC_QUESTIONS) {
+    if (!q.spotifyTrackId) continue;
+    const artist = q.displayName?.split(' — ').pop()?.trim();
+    if (!artist) continue;
+    // Meta slås upp på FULLA strängen (tabellen nycklar collabs på full form),
+    // men kandidat-NAMNET strippas på featured-delen — "Jay-Z ft. Alicia Keys"
+    // blir distraktorn "Jay-Z" (ett ft.-namn som svarsalternativ läser konstigt).
+    const meta = getSpotifyArtistMeta(artist);
+    if (!meta) continue;
+    const candName = artist.split(/\s+(?:ft\.?|feat\.?)\s+/i)[0]?.trim() || artist;
+    const key = candName.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push({ name: candName, meta });
+  }
+  return out;
+})();
 
 // Fisher-Yates-shuffle — slumpar ordningen i en ny kopia utan att muttera originalet.
 function shuffleArray<T>(arr: T[]): T[] {
@@ -2139,30 +2167,112 @@ export default function QuizScreen() {
   // Bygg Letter Grid-variant för Spotify Name-frågor.
   // Kör som useEffect (inte useMemo) eftersom derivedArtistName är en string
   // som inte är ett stabilt dep för useMemo-chaining.
+  //
+  // Relevans-filtrering (2026-07-03): distraktorerna lager-filtreras mot den
+  // kuraterade SPOTIFY_ARTIST_META-tabellen så alternativen matchar rätt svar
+  // i typ (band vs solo), land och kön — en svensk kvinnlig soloartist får
+  // andra svenska kvinnliga soloartister, ett amerikanskt band andra
+  // amerikanska band. Kandidater = bild-poolens artist/band-items
+  // (nationalitet via HINTS_LIBRARY, kön via meta-tabellen — inferGender är
+  // opålitlig för artister, låttext-pronomen ger fel kön) + övriga Spotify-
+  // artister ur musik-katalogen (syntetiska items med kuraterad meta).
+  // Lager striktast → lösast med minst 4 distraktorer per lager; saknar rätt
+  // svar meta används hela artist+band-poolen (tidigare beteende).
+  // OBS: tidigare version filtrerade IMAGE_SEED_QUESTIONS på ett contentSubject-
+  // fält som inte finns på ImageQuestion-toppnivån (ligger i q.source) → tom
+  // pool, alla distraktorer kom från generiska DISTRACTOR_POOL_NAMES. Fixat.
   useEffect(() => {
     if (!isSpotifyNameQuestion || !derivedArtistName) {
       setSpotifyNameVariant(null);
       return;
     }
-    const artistPool = IMAGE_SEED_QUESTIONS.filter(
-      (q) => q.contentSubject === 'artist' || q.contentSubject === 'band',
-    );
+    const correctKey = derivedArtistName.trim().toLowerCase();
+    const correctMeta = getSpotifyArtistMeta(derivedArtistName);
+
+    type SpotifyNameCandidate = {
+      item: ImageQuizQuestion;
+      type: 'artist' | 'band';
+      country: string | null;
+      gender: 'male' | 'female' | 'mixed' | null;
+    };
+    const seenNames = new Set<string>([correctKey]);
+    const candidates: SpotifyNameCandidate[] = [];
+
+    for (const q of IMAGE_SEED_QUESTIONS) {
+      const src = q.source;
+      if (src.contentSubject !== 'artist' && src.contentSubject !== 'band') continue;
+      const nameKey = src.displayName.trim().toLowerCase();
+      if (seenNames.has(nameKey)) continue;
+      seenNames.add(nameKey);
+      const meta = getSpotifyArtistMeta(src.displayName);
+      const lib = HINTS_LIBRARY[src.id];
+      candidates.push({
+        item: src,
+        type: src.contentSubject,
+        country: meta?.country ?? (lib ? inferNationality(lib) : null),
+        gender: meta?.gender ?? null,
+      });
+    }
+    for (const cand of SPOTIFY_ARTIST_CANDIDATES) {
+      const nameKey = cand.name.toLowerCase();
+      if (seenNames.has(nameKey)) continue;
+      seenNames.add(nameKey);
+      candidates.push({
+        item: {
+          id: `spotify-cand-${nameKey.replace(/[^a-z0-9åäö]+/g, '-')}`,
+          displayName: cand.name,
+          category: 'artists',
+          contentSubject: cand.meta.type,
+          audiences: ['all' as ImageQuestionAudience],
+          questionText: '',
+        },
+        type: cand.meta.type,
+        country: cand.meta.country,
+        gender: cand.meta.gender,
+      });
+    }
+
+    // Lager-filter, striktast → lösast. Kön jämförs bara när BÅDA sidor har
+    // värde ('mixed' matchar 'mixed'). För ICKE-svenska artister skjuts två
+    // "internationellt"-lager in före den fria typ-mixen — annars får t.ex.
+    // Eagles (USA-band) svenska dansband som alternativ när USA-poolen är
+    // för tunn (utländskt band → andra utländska band är mer trovärdigt).
+    const MIN_DISTRACTORS = 4;
+    let pool: SpotifyNameCandidate[] = candidates;
+    if (correctMeta) {
+      const genderMatch = (g: SpotifyNameCandidate['gender']) =>
+        correctMeta.gender !== null && g === correctMeta.gender;
+      const isIntl = (c: SpotifyNameCandidate) => c.country !== null && c.country !== 'sweden';
+      const layers = [
+        candidates.filter(
+          (c) => c.type === correctMeta.type && c.country === correctMeta.country && genderMatch(c.gender),
+        ),
+        candidates.filter((c) => c.type === correctMeta.type && c.country === correctMeta.country),
+        ...(correctMeta.country !== 'sweden'
+          ? [
+              candidates.filter((c) => c.type === correctMeta.type && isIntl(c) && genderMatch(c.gender)),
+              candidates.filter((c) => c.type === correctMeta.type && isIntl(c)),
+            ]
+          : []),
+        candidates.filter((c) => c.type === correctMeta.type && genderMatch(c.gender)),
+        candidates.filter((c) => c.type === correctMeta.type),
+      ];
+      pool = layers.find((l) => l.length >= MIN_DISTRACTORS) ?? candidates;
+    }
+
     const syntheticItem: ImageQuizQuestion = {
       id: `spotify-name-${questionIndex}`,
       displayName: derivedArtistName,
       category: 'artists',
-      audiences: ['all'] as ImageQuizQuestion['audiences'],
-      contentSubject: 'artist',
-      type: 'image',
-      region: ['sweden'],
-      probability: 100,
-      source: { category: 'artists' } as ImageQuizQuestion['source'],
-    } as ImageQuizQuestion;
+      contentSubject: correctMeta?.type ?? 'artist',
+      audiences: ['all' as ImageQuestionAudience],
+      questionText: '',
+    };
     const variant = buildImageVariant(
       syntheticItem,
       currentAssistance,
       audienceSetForVariants,
-      artistPool,
+      pool.map((c) => c.item),
       DISTRACTOR_POOL_NAMES['artists'] ?? [],
       5,
     );

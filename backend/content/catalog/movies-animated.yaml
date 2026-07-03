@@ -157,6 +157,7 @@ items:
     displayName: "Zootopia"
     correctYear: 2016
     probability: 86
+    isAnimated: true
     wikimediaSearchHints: ["Zootopia 2016 Disney animated film bunny cop fox"]
     answerMethods: ["actor-select"]
     correctNames: ["Judy Hopps"]

@@ -35,6 +35,18 @@ items:
         endSec: 45
         channelTitle: "Olympics"
         notes: "Olympics official channel — Spitz 7 OS-guld München 1972."
+  - id: salming-canada-cup-ovation-1976
+    displayName: "Stående ovationer till Börje Salming — Canada Cup"
+    correctYear: 1976
+    probability: 85
+    wikimediaSearchHints: ["Borje Salming Canada Cup 1976 standing ovation"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "AQiLxrw2twA"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Nostalgi"
+        notes: "Peter-curerat 2026-07-02. OBS: videotiteln innehåller året (1976) — spoiler-risk enligt R1-policy."
   - id: miracle-on-ice-1980
     displayName: "Miracle on Ice — USA besegrar Sovjet"
     correctYear: 1980
@@ -54,11 +66,11 @@ items:
     wikimediaSearchHints: ["Maradona Hand of God 1986 World Cup England"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "F-n7lWyM4Vc"
+      - videoId: "-ccNkksrfls"
         startSec: 0
-        endSec: 20
-        channelTitle: "Sport Clips 4K"
-        notes: "4K AI-enhanced highlights — Hand of God + Goal of the Century i följd. Ersatte blockerat klipp."
+        endSec: 30
+        channelTitle: "ClassicEngland"
+        notes: "Peter-curerat 2026-07-02, ersatte Sport Clips 4K-klippet (F-n7lWyM4Vc). OBS: videotiteln innehåller året (1986) — spoiler-risk enligt R1-policy."
   - id: dream-team-1992-barcelona
     displayName: "Dream Team — Barcelona OS basket"
     correctYear: 1992

@@ -114,7 +114,7 @@ items:
         channelTitle: "DJ Ötzi"
   - id: edivibz-gul-och-bla
     displayName: "Gul och blå — Edivibz"
-    correctYear: 2018
+    correctYear: 2026
     probability: 76
     wikimediaSearchHints: ["Edivibz Gul och blå Sverige fotboll"]
     answerMethods: ["timeline"]
@@ -129,6 +129,7 @@ items:
     displayName: "Flaggan i topp — Anis Don Demina"
     correctYear: 2021
     probability: 78
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Anis Don Demina Flaggan i topp Sverige fotboll"]
     answerMethods: ["timeline"]
     genrePackages: ["sport", "football"]
@@ -162,8 +163,9 @@ items:
         channelTitle: "Bolaget"
   - id: brandsta-all-in-for-sverige
     displayName: "All in för Sverige — Brandsta"
-    correctYear: 2018
+    correctYear: 2026
     probability: 74
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Brandsta All in för Sverige fotboll"]
     answerMethods: ["timeline"]
     genrePackages: ["sport", "football"]

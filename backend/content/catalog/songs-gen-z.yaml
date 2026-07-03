@@ -512,7 +512,7 @@ items:
     probability: 86
     wikimediaSearchHints: ["Swedish House Mafia Don't You Worry Child 2012"]
     answerMethods: ["timeline"]
-    spotifyTrackId: "2V65y3PX4DkRhy1djlxd9p"
+    spotifyTrackId: "3zu2CuVTJwaZn2m4rBzaUO"
     youtubeClips:
       - videoId: "3mWbRB3Y4R8"
         startSec: 30
@@ -1111,3 +1111,64 @@ items:
         endSec: 30
         channelTitle: "Antique"
         notes: "Official music video. ESC 2001 Greece entry (3rd place)."
+  - id: eminem-my-name-is
+    displayName: "My Name Is — Eminem"
+    correctYear: 1999
+    probability: 86
+    wikimediaSearchHints: ["Eminem My Name Is 1999 Slim Shady LP hip hop"]
+    answerMethods: ["timeline"]
+    genrePackages: ["hiphop"]
+    spotifyTrackId: "75IN3CtuZwTHTnZvYM4qnJ"
+    youtubeClips:
+      - videoId: "EAKfXCRmhq8"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Eminem"
+        notes: "Official music video."
+  - id: outkast-ms-jackson
+    displayName: "Ms. Jackson — OutKast"
+    correctYear: 2000
+    probability: 84
+    wikimediaSearchHints: ["OutKast Ms. Jackson 2000 Stankonia hip hop"]
+    answerMethods: ["timeline"]
+    genrePackages: ["hiphop"]
+    youtubeClips:
+      - videoId: "EUVo8epKwv0"
+        startSec: 0
+        endSec: 30
+        channelTitle: "OutKast"
+        notes: "Official music video."
+  - id: cajsa-stina-akerstrom-fragorna-om-nar
+    displayName: "Frågorna om när — Cajsa Stina Åkerström"
+    correctYear: 2001
+    probability: 75
+    wikimediaSearchHints: ["Cajsa Stina Åkerström Frågorna om när 2001 Swedish"]
+    answerMethods: ["timeline"]
+    genrePackages: ["100% svenska"]
+    spotifyTrackId: "1QJcdzMUidsBaMTHoZZRGn"
+  - id: gunther-ding-ding-dong
+    displayName: "Ding Ding Dong — Günther"
+    correctYear: 2004
+    probability: 78
+    wikimediaSearchHints: ["Günther Ding Ding Dong 2004 Swedish eurodance"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "2LELFaNglE9B5xlcmd4qtQ"
+    youtubeClips:
+      - videoId: "uUYplyWPKGk"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Günther"
+        notes: "Official music video."
+  - id: jay-z-empire-state-of-mind
+    displayName: "Empire State of Mind — Jay-Z ft. Alicia Keys"
+    correctYear: 2009
+    probability: 85
+    wikimediaSearchHints: ["Jay-Z Alicia Keys Empire State of Mind 2009 New York"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "2igwFfvr1OAGX9SKDCPBwO"
+    youtubeClips:
+      - videoId: "cUmX8n_4W-Y"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Jay-Z"
+        notes: "Official music video."

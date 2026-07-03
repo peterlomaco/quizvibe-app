@@ -610,7 +610,8 @@ items:
         endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 2020 vinnare. ESC 2020 official video."
-    genrePackages: ["Eurovision"]
+    genrePackages: ["Eurovision", "Melodifestivalen"]
+    inBaseCatalog: false
   - id: tusse-voices
     displayName: "Voices — Tusse"
     correctYear: 2021
@@ -929,3 +930,28 @@ items:
         endSec: 45
         channelTitle: "Laleh"
         notes: "Official music video. 85M+ streams."
+  - id: ylvis-the-fox
+    displayName: "The Fox (What Does the Fox Say?) — Ylvis"
+    correctYear: 2013
+    probability: 88
+    wikimediaSearchHints: ["Ylvis The Fox What Does the Fox Say 2013 Norwegian viral"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "5HOpkTTVcmZHnthgyxrIL8"
+    youtubeClips:
+      - videoId: "jofNR_WkoCE"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Ylvis"
+        notes: "Official music video. Viral hit 2013."
+  - id: ronny-ragge-baby-shark
+    displayName: "Baby Shark — Ronny & Ragge"
+    correctYear: 2018
+    probability: 72
+    wikimediaSearchHints: ["Ronny Ragge Baby Shark Swedish version 2018"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "R93ce4FZGbc"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Ronny & Ragge"
+        notes: "Swedish version."

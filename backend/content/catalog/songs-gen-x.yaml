@@ -938,3 +938,11 @@ items:
         endSec: 30
         channelTitle: "Lasse Berghagen - Topic"
         notes: "Studio-inspelning. WM Sweden (Warner Music Sweden) officiell upload."
+  - id: sugarhill-gang-rappers-delight
+    displayName: "Rapper's Delight — Sugarhill Gang"
+    correctYear: 1979
+    probability: 85
+    wikimediaSearchHints: ["Sugarhill Gang Rapper's Delight 1979 hip hop"]
+    answerMethods: ["timeline"]
+    genrePackages: ["hiphop"]
+    spotifyTrackId: "2XbwFs07dfm2MGQuYmRMZT"

@@ -1542,6 +1542,24 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "mungo-jerry-in-the-summertime",
+    "displayName": "In the Summertime — Mungo Jerry",
+    "correctYear": 1970,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "all"
+    ],
+    "region": [
+      "unknown-region"
+    ],
+    "genrePackages": [
+      "Summer"
+    ],
+    "spotifyTrackId": "2uzlv8PjqsVvF1DhEahyhy",
+    "youtubeClips": []
+  },
+  {
     "id": "simon-garfunkel-bridge-over-troubled-water",
     "displayName": "Bridge Over Troubled Water — Simon & Garfunkel",
     "correctYear": 1970,
@@ -2504,6 +2522,29 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "salming-canada-cup-ovation-1976",
+    "displayName": "Stående ovationer till Börje Salming — Canada Cup",
+    "correctYear": 1976,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "AQiLxrw2twA",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Nostalgi",
+        "license": "standard",
+        "notes": "Peter-curerat 2026-07-02. OBS: videotiteln innehåller året (1976) — spoiler-risk enligt R1-policy."
+      }
+    ]
+  },
+  {
     "id": "bee-gees-stayin-alive",
     "displayName": "Stayin' Alive — Bee Gees",
     "correctYear": 1977,
@@ -2898,6 +2939,25 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "notes": "ESC 1979 vinnare — Israel."
       }
     ]
+  },
+  {
+    "id": "sugarhill-gang-rappers-delight",
+    "displayName": "Rapper's Delight — Sugarhill Gang",
+    "correctYear": 1979,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "hiphop"
+    ],
+    "spotifyTrackId": "2XbwFs07dfm2MGQuYmRMZT",
+    "youtubeClips": []
   },
   {
     "id": "ted-gardestad-vilken-harlig-dag",
@@ -3757,6 +3817,30 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "elton-john-im-still-standing",
+    "displayName": "I'm Still Standing — Elton John",
+    "correctYear": 1983,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "MJ_aPtt4U8M",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Elton John",
+        "license": "standard",
+        "notes": "Official music video."
+      }
+    ]
+  },
+  {
     "id": "eurythmics-sweet-dreams",
     "displayName": "Sweet Dreams (Are Made of This) — Eurythmics",
     "correctYear": 1983,
@@ -4430,12 +4514,12 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "youtubeClips": [
       {
-        "videoId": "F-n7lWyM4Vc",
+        "videoId": "-ccNkksrfls",
         "startSec": 0,
-        "endSec": 20,
-        "channelTitle": "Sport Clips 4K",
+        "endSec": 30,
+        "channelTitle": "ClassicEngland",
         "license": "standard",
-        "notes": "4K AI-enhanced highlights — Hand of God + Goal of the Century i följd. Ersatte blockerat klipp."
+        "notes": "Peter-curerat 2026-07-02, ersatte Sport Clips 4K-klippet (F-n7lWyM4Vc). OBS: videotiteln innehåller året (1986) — spoiler-risk enligt R1-policy."
       }
     ]
   },
@@ -4499,6 +4583,24 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "notes": "Official 1986-trailer — Danger Zone-tema + jet-action."
       }
     ]
+  },
+  {
+    "id": "cornelis-vreeswijk-sommarkort",
+    "displayName": "Sommarkort (En stund på jorden) — Cornelis Vreeswijk",
+    "correctYear": 1987,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "all"
+    ],
+    "region": [
+      "unknown-region"
+    ],
+    "genrePackages": [
+      "Summer"
+    ],
+    "spotifyTrackId": "5lRvBRQJFVWZGRqDm7YkL4",
+    "youtubeClips": []
   },
   {
     "id": "johnny-logan-hold-me-now",
@@ -4747,6 +4849,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Roxette - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
+    "id": "thomas-di-leva-vi-har-bara-varandra",
+    "displayName": "Vi har bara varandra — Thomas Di Leva",
+    "correctYear": 1988,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "100% svenska"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "KH_kDfdwf8A",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Thomas Di Leva",
+        "license": "standard",
+        "notes": "Official video."
       }
     ]
   },
@@ -5026,6 +5155,34 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "ronny-ragge-de-e-sommar",
+    "displayName": "De e sommar — Ronny & Ragge",
+    "correctYear": 1989,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Summer"
+    ],
+    "spotifyTrackId": "0EWaUpAQtTWET3E14ye6ZV",
+    "youtubeClips": [
+      {
+        "videoId": "K9KiSm1fyMk",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Ronny & Ragge",
+        "license": "standard",
+        "notes": "Official video."
+      }
+    ]
+  },
+  {
     "id": "roxette-the-look",
     "displayName": "The Look — Roxette",
     "correctYear": 1989,
@@ -5247,6 +5404,25 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "notes": "Melodifestivalen 1991 vinnare, ESC-vinnare 1991."
       }
     ]
+  },
+  {
+    "id": "fresh-prince-summertime",
+    "displayName": "Summertime — DJ Jazzy Jeff & The Fresh Prince",
+    "correctYear": 1991,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "all"
+    ],
+    "region": [
+      "unknown-region"
+    ],
+    "genrePackages": [
+      "Summer",
+      "hiphop"
+    ],
+    "spotifyTrackId": "20XdEFyaUR9C7aDIdq2OAd",
+    "youtubeClips": []
   },
   {
     "id": "metallica-enter-sandman",
@@ -5557,6 +5733,24 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
       }
     ]
+  },
+  {
+    "id": "inner-circle-sweat",
+    "displayName": "Sweat (A La La La Long) — Inner Circle",
+    "correctYear": 1992,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "all"
+    ],
+    "region": [
+      "unknown-region"
+    ],
+    "genrePackages": [
+      "Summer"
+    ],
+    "spotifyTrackId": "24Si0Kw3pu2RxX1jrbBg5A",
+    "youtubeClips": []
   },
   {
     "id": "linda-martin-why-me",
@@ -5940,6 +6134,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "bolaget-det-ligger-nat-i-luften",
+    "displayName": "Det ligger nåt i luften — Bolaget",
+    "correctYear": 1994,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "all"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "sport",
+      "football"
+    ],
+    "spotifyTrackId": "4okV0gcEkY1BlqQNDvaQCw",
+    "youtubeClips": [
+      {
+        "videoId": "81EOq-abbOw",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Bolaget",
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "cranberries-zombie",
     "displayName": "Zombie — The Cranberries",
     "correctYear": 1994,
@@ -6032,8 +6253,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "sport"
+      "sport",
+      "football"
     ],
+    "spotifyTrackId": "3iAJRvvn8pywXZtvBNNP71",
     "youtubeClips": [
       {
         "videoId": "7YOzs-dD8qU",
@@ -6151,6 +6374,30 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Rednex Videos",
         "license": "standard",
         "notes": "Officiell musikvideo, Rednex Videos-kanalen. HD. Ersätter Topic-versionen."
+      }
+    ]
+  },
+  {
+    "id": "scatman-john-scatman",
+    "displayName": "Scatman (Ski-Ba-Bop-Ba-Dop-Bop) — Scatman John",
+    "correctYear": 1994,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "Hy8kmNEo1i8",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Scatman John",
+        "license": "standard",
+        "notes": "Official music video."
       }
     ]
   },
@@ -6509,6 +6756,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "nas-if-i-ruled-the-world",
+    "displayName": "If I Ruled the World — Nas ft. Lauryn Hill",
+    "correctYear": 1996,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "hiphop"
+    ],
+    "spotifyTrackId": "5PQmSHzWnlgG4EBuIqjac2",
+    "youtubeClips": [
+      {
+        "videoId": "o2gwGy1ZIMg",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Nas",
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "oasis-dont-look-back-in-anger",
     "displayName": "Don't Look Back in Anger — Oasis",
     "correctYear": 1996,
@@ -6717,6 +6991,24 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "notes": "Official 25th Anniversary trailer — Celine Dion theme + iconic scenes."
       }
     ]
+  },
+  {
+    "id": "ace-of-base-cruel-summer",
+    "displayName": "Cruel Summer — Ace of Base",
+    "correctYear": 1998,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "all"
+    ],
+    "region": [
+      "unknown-region"
+    ],
+    "genrePackages": [
+      "Summer"
+    ],
+    "spotifyTrackId": "4AxVXHgv0clBuS4dl4S7Gw",
+    "youtubeClips": []
   },
   {
     "id": "baby-one-more-time",
@@ -6982,6 +7274,34 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "eminem-my-name-is",
+    "displayName": "My Name Is — Eminem",
+    "correctYear": 1999,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-z",
+      "millennials"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "hiphop"
+    ],
+    "spotifyTrackId": "75IN3CtuZwTHTnZvYM4qnJ",
+    "youtubeClips": [
+      {
+        "videoId": "EAKfXCRmhq8",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Eminem",
+        "license": "standard",
+        "notes": "Official music video."
+      }
+    ]
+  },
+  {
     "id": "lou-bega-mambo-no-5",
     "displayName": "Mambo No. 5 — Lou Bega",
     "correctYear": 1999,
@@ -7189,6 +7509,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "dr-dre-the-next-episode",
+    "displayName": "The Next Episode — Dr. Dre ft. Snoop Dogg",
+    "correctYear": 2000,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-z",
+      "millennials"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "hiphop"
+    ],
+    "spotifyTrackId": "4LwU4Vp6od3Sb08CsP99GC",
+    "youtubeClips": [
+      {
+        "videoId": "f0dkQGfha3A",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Dr. Dre",
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "gladiator-2000",
     "displayName": "Gladiator",
     "correctYear": 2000,
@@ -7234,16 +7581,17 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "sport"
+      "sport",
+      "football"
     ],
+    "spotifyTrackId": "08oSaHoJ7jrFv1kd74ZRT2",
     "youtubeClips": [
       {
-        "videoId": "nhEewGN6ePQ",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Markoolio - Topic",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+        "videoId": "iqMDJSZMDQY",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Markoolio",
+        "license": "standard"
       }
     ]
   },
@@ -7271,6 +7619,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 2000 vinnare — Danmark."
+      }
+    ]
+  },
+  {
+    "id": "outkast-ms-jackson",
+    "displayName": "Ms. Jackson — OutKast",
+    "correctYear": 2000,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-z",
+      "millennials"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "hiphop"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "EUVo8epKwv0",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "OutKast",
+        "license": "standard",
+        "notes": "Official music video."
       }
     ]
   },
@@ -7428,6 +7803,25 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "notes": "Official music video. ESC 2001 Greece entry (3rd place)."
       }
     ]
+  },
+  {
+    "id": "cajsa-stina-akerstrom-fragorna-om-nar",
+    "displayName": "Frågorna om när — Cajsa Stina Åkerström",
+    "correctYear": 2001,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-z",
+      "millennials"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "100% svenska"
+    ],
+    "spotifyTrackId": "1QJcdzMUidsBaMTHoZZRGn",
+    "youtubeClips": []
   },
   {
     "id": "harry-potter-philosophers-stone-2001",
@@ -7708,6 +8102,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "sweden"
     ],
+    "genrePackages": [
+      "hiphop"
+    ],
+    "spotifyTrackId": "7iL6o9tox1zgHpKUfh9vuC",
     "youtubeClips": [
       {
         "videoId": "_VXUiAJi5KY",
@@ -7866,6 +8264,31 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eric Prydz - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
+    "id": "gunther-ding-ding-dong",
+    "displayName": "Ding Ding Dong — Günther",
+    "correctYear": 2004,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-z",
+      "millennials"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "spotifyTrackId": "2LELFaNglE9B5xlcmd4qtQ",
+    "youtubeClips": [
+      {
+        "videoId": "uUYplyWPKGk",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Günther",
+        "license": "standard",
+        "notes": "Official music video."
       }
     ]
   },
@@ -8822,6 +9245,31 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Hadise",
         "license": "standard",
         "notes": "Official music video. ESC 2009 Turkey entry."
+      }
+    ]
+  },
+  {
+    "id": "jay-z-empire-state-of-mind",
+    "displayName": "Empire State of Mind — Jay-Z ft. Alicia Keys",
+    "correctYear": 2009,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-z",
+      "millennials"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "spotifyTrackId": "2igwFfvr1OAGX9SKDCPBwO",
+    "youtubeClips": [
+      {
+        "videoId": "cUmX8n_4W-Y",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Jay-Z",
+        "license": "standard",
+        "notes": "Official music video."
       }
     ]
   },
@@ -9783,6 +10231,31 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "ylvis-the-fox",
+    "displayName": "The Fox (What Does the Fox Say?) — Ylvis",
+    "correctYear": 2013,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-alpha",
+      "gen-z"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "spotifyTrackId": "5HOpkTTVcmZHnthgyxrIL8",
+    "youtubeClips": [
+      {
+        "videoId": "jofNR_WkoCE",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Ylvis",
+        "license": "standard",
+        "notes": "Official music video. Viral hit 2013."
+      }
+    ]
+  },
+  {
     "id": "conchita-wurst-rise-like-a-phoenix",
     "displayName": "Rise Like a Phoenix — Conchita Wurst",
     "correctYear": 2014,
@@ -10377,14 +10850,14 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "displayName": "Zootopia",
     "correctYear": 2016,
     "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
+    "questionText": "What is the name of the main character in this film?",
     "audiences": [
       "all"
     ],
     "region": [
       "sweden"
     ],
-    "isAnimated": false,
+    "isAnimated": true,
     "correctNames": [
       "Judy Hopps"
     ],
@@ -10752,6 +11225,25 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "miss-li-varan-sang",
+    "displayName": "Våran sång — Miss Li",
+    "correctYear": 2018,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "all"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "sport",
+      "football"
+    ],
+    "spotifyTrackId": "1p0RjMued7Tmm0o7CjzoHY",
+    "youtubeClips": []
+  },
+  {
     "id": "netta-toy",
     "displayName": "Toy — Netta",
     "correctYear": 2018,
@@ -10775,6 +11267,30 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 2018 vinnare — Israel. Officiell music video."
+      }
+    ]
+  },
+  {
+    "id": "ronny-ragge-baby-shark",
+    "displayName": "Baby Shark — Ronny & Ragge",
+    "correctYear": 2018,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-alpha",
+      "gen-z"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "R93ce4FZGbc",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Ronny & Ragge",
+        "license": "standard",
+        "notes": "Swedish version."
       }
     ]
   },
@@ -10822,6 +11338,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "startSec": 0,
         "endSec": 195,
         "channelTitle": "7clouds",
+        "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "dj-otzi-sweet-caroline",
+    "displayName": "Sweet Caroline — DJ Ötzi",
+    "correctYear": 2019,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "all"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "sport",
+      "football"
+    ],
+    "spotifyTrackId": "3HTgmcqR7nYtD7EmJ4hOLi",
+    "youtubeClips": [
+      {
+        "videoId": "LVrlbGIIgbw",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "DJ Ötzi",
         "license": "standard"
       }
     ]
@@ -11158,32 +11701,50 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "the-mamas-move",
-    "displayName": "Move — The Mamas",
-    "correctYear": 2020,
+    "id": "anis-don-demina-flaggan-i-topp",
+    "displayName": "Flaggan i topp — Anis Don Demina",
+    "correctYear": 2021,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "all"
+    ],
+    "region": [
+      "unknown-region"
+    ],
+    "genrePackages": [
+      "sport",
+      "football"
+    ],
+    "spotifyTrackId": "7w2sCUWVAop5sTmikAdhCD",
+    "youtubeClips": [
+      {
+        "videoId": "ajZxDhowQ8g",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Anis Don Demina",
+        "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "bono-we-are-the-people",
+    "displayName": "We Are the People — Martin Garrix ft. Bono & The Edge",
+    "correctYear": 2021,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "all"
     ],
     "region": [
       "sweden"
     ],
     "genrePackages": [
-      "Eurovision"
+      "sport",
+      "football"
     ],
-    "spotifyTrackId": "19LiotxKSVs7FeVMEdHz63",
-    "youtubeClips": [
-      {
-        "videoId": "7EpSBDPlZn4",
-        "startSec": 5,
-        "endSec": 20,
-        "channelTitle": "Eurovision Song Contest",
-        "license": "standard",
-        "notes": "Melodifestivalen 2020 vinnare. ESC 2020 official video."
-      }
-    ]
+    "spotifyTrackId": "2iL0W5qi0ivZ9WRXbZ74cS",
+    "youtubeClips": []
   },
   {
     "id": "el-diablo-elena-tsagkrinou",
@@ -11802,6 +12363,25 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "brandsta-all-in-for-sverige",
+    "displayName": "All in för Sverige — Brandsta",
+    "correctYear": 2026,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "all"
+    ],
+    "region": [
+      "unknown-region"
+    ],
+    "genrePackages": [
+      "sport",
+      "football"
+    ],
+    "spotifyTrackId": "3AGFGLUAhu0Cwv1Mkea3d4",
+    "youtubeClips": []
+  },
+  {
     "id": "dara-bangaranga",
     "displayName": "Bangaranga — DARA",
     "correctYear": 2026,
@@ -11825,6 +12405,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 2026 vinnare — Bulgarien. Officiell music video."
+      }
+    ]
+  },
+  {
+    "id": "edivibz-gul-och-bla",
+    "displayName": "Gul och blå — Edivibz",
+    "correctYear": 2026,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "all"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "sport",
+      "football"
+    ],
+    "spotifyTrackId": "5AGNs0W1DKuYWzGa9ilP1K",
+    "youtubeClips": [
+      {
+        "videoId": "qbSOPAk3KCw",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Edivibz",
+        "license": "standard"
       }
     ]
   },
