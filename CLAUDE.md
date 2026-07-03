@@ -1831,6 +1831,25 @@ Demo-data (`src/utils/nameQuizDemo.ts`) genererad för Millennials (1990) + stan
 
 **Navigation**: `router.replace()` (ingen history-stack) via expo-router. Aktiv route detekteras via `usePathname()`.
 
+**Login-gated (2026-07-03)**: bannern visas ENBART när en profil finns (samma definition som Home:s `isLoggedIn = !!profile`). BottomBanner håller eget `loggedIn`-state — den lever i `_layout` utanför screen-trädet så `useFocusEffect` fungerar inte; istället lyssnar den på tre signaler och reload:ar profilen vid var och en: (1) **`subscribeProfileChanges`** från [profileStorage.ts](src/utils/profileStorage.ts) — lättviktig in-memory event-bus (`Set<listener>`) som `saveProfile` (register) och `clearProfile` (logout/delete account) notifierar; kritisk eftersom `clearProfile` körs EFTER `supabase.auth.signOut` så en SIGNED_OUT-triggad reload kan hinna läsa stale AsyncStorage-cache. (2) **Supabase `onAuthStateChange`** — SIGNED_IN fyrar vid login (profilen läses då från Supabase innan lokala cachen skrivits). (3) **pathname-byten** — belt-and-suspenders vid navigation. Konsekvens: utloggade users når inte Store via bannern — medvetet (köp kräver konto ändå; RevenueCat kopplas till Supabase-user).
+
+## Home — login-state layout (2026-07-03)
+
+Startskärmens actions-sektion i [app/index.tsx](app/index.tsx) renderas olika per login-läge. Färgtema: **grönt = registered-path, grått = guest-path, gold = inloggade user-actions**.
+
+**Utloggad** (uppifrån):
+- **Ingen TopUserBanner** (gated på `isLoggedIn` — "Register or Login"-pillen var redundant mot knappen nedan) och **ingen BottomBanner** (se BottomBanner-sektionen).
+- Grön **"QUIZVIBE USER"**-rubrik (`userSectionHeader`, `Colors.success`, overline-stil utan ruta/bakgrund) + **Register or Login** — helgrön knapp (`gameBtnRegister`: bg + border `Colors.success`), pulserande, kant-skärande FREE-badge med **vit kantlinje** (`homeFreeBadgeRegister`) så badgen syns mot knappens gröna bakgrund.
+- Grå **"GUEST / NON-REGISTERED USER"**-rubrik (`guestSectionHeader`, `#6B7280`, `marginTop: Spacing.xl` för sektions-separation) + **Join with Room Code — guest** + **Play as guest** — båda helgrå (`gameBtnGuest`: bg + border `#6B7280` = PREMIUM-grey), pulserande, FREE-badge (grön bg + grön kant + vit text via `homeFreeBadge`, kant-skärande `top: -8, right: Spacing.lg`).
+- **Start New Game + Join with Room Code — user är HELT dolda** — de tidigare 🔒-låsta varianterna och "Register and Log in to unlock..."-hinten är borttagna (`createGameHint`-stylen kvar som död CSS).
+
+**Inloggad**:
+- TopUserBanner + BottomBanner synliga.
+- **Start New Game** + **Join with Room Code — user** i **gold** (`gameBtnUser`: bg + border `Colors.warning` + svart text via `gameBtnUserText`, per appens gold-badge-konvention), pulserande.
+- Guest-rubriken + "Join with Room Code — guest" är borta; **endast "Play as guest" kvar** (grå, pulserande, INGEN FREE-badge — badgen hör till utloggat läge). Inloggade spelare ska kunna spela som guest; knappen öppnar samma `openJoin('guest')`-flöde och guest-formens guards (own-lobby-check, IndDev-block) gäller fortsatt.
+
+Båda guest-knapparna öppnar `openJoin('guest')`. "Play as guest"-knappen (och guest-join i utloggat läge) döljs visuellt när Join-modalen är öppen (`opacity: 0` + `pointerEvents: 'none'`, layout-utrymmet bevaras) så modal-sheetens ovankant inte avslöjar dem bakom.
+
 ## Home — pulserande tagline
 
 Tre taglines som cross-fadar under brand-loggan på Home-skärmen ([app/index.tsx](app/index.tsx)): `"Challenge yourself. Play together."` → `"Invite Friends. Socialize."` → `"Music. Film. Sport."`. Module-level `TAGLINES`-array driver array av per-text Animated.Value (initierad så index 0 startar på opacity 1). Cycle var 6000ms: parallell `Animated.parallel`-fade där nuvarande text fadar till 0 och nästa till 1, duration 2600ms med `Easing.bezier(0.4, 0, 0.2, 1)` (Material Design standard ease — mjuk accel/decel). useNativeDriver: true så opacity körs på native-tråden. Render: alla TAGLINES alltid renderade i samma wrap (`alignSelf: 'stretch'` + `position: 'relative'`), index 0 i flow definierar wrap-höjden, index 1+ är absolut-positionerade ovanpå via `taglineOverlay` så de delar exakt samma position. Cycle-loop använder `taglineIdxRef` för att spåra current index över React-renders utan att triggera re-renders.

@@ -2022,7 +2022,13 @@ export default function HomeScreen() {
     <SafeAreaView style={styles.safe}>
 
       {/* ── Top board (login status) ─────────────────────────── */}
-      <TopUserBanner profile={profile} onPress={() => setProfileMenuVisible(true)} />
+      {/* Döljs helt när utloggad — "Register or Login"-pillen var redundant
+          mot den gröna Register or Login-knappen i actions-sektionen som är
+          primär CTA för utloggade. Visas när profil finns (login-pill med
+          avatar + PlayerName → profil-menyn). */}
+      {isLoggedIn && (
+        <TopUserBanner profile={profile} onPress={() => setProfileMenuVisible(true)} />
+      )}
 
       <ScrollView
         style={styles.containerScroll}
@@ -2063,129 +2069,178 @@ export default function HomeScreen() {
 
         {/* ── Primary actions ───────────────────────────────── */}
         {/* Knappordning (uppifrån):
-              1. Register or Login (bara när utloggad — pulse:ar som primär CTA)
-              2. Create Game
-              3. Join with Room Code — user
-              4. Join with Room Code — guest (längst ned)
+              1. Register or Login (bara när utloggad — pulse:ar som primär CTA,
+                 grön kantlinje)
+              2. Create Game (bara när inloggad)
+              3. Join with Room Code — user (bara när inloggad)
+              4. Guest-rutan + Join with Room Code — guest + Play as guest
             Pulse följer "primär åtgärd för aktuellt login-state":
-              - utloggad → Register or Login pulserar (primär path)
+              - utloggad → Register or Login + båda guest-knapparna pulserar
               - inloggad → Create + Join (registered) pulserar */}
         <View style={styles.actionsSection}>
           {/* Register or Login — bara när utloggad. Primär CTA → leder till
-              profile-menyn (samma destination som locked Create/Join). */}
+              profile-menyn. Grön kantlinje särskiljer den från de blå
+              guest-knapparna. "QuizVibe user"-rubriken ovanför speglar
+              Guest-rubrikens ruta men i grönt (matchar knappens kantlinje). */}
           {!isLoggedIn && (
+            <>
+              <Text style={[styles.userSectionHeader, { fontFamily: taglineFont }]}>
+                QuizVibe user
+              </Text>
+              <Animated.View style={{ transform: [{ scale: pulse }] }}>
+                <TouchableOpacity
+                  style={[styles.gameBtn, styles.gameBtnRegister]}
+                  activeOpacity={0.85}
+                  onPress={() => setProfileMenuVisible(true)}
+                >
+                  <Text
+                    style={[
+                      styles.gameBtnText,
+                      { fontFamily: fontsLoaded ? 'Nunito_600SemiBold' : undefined },
+                    ]}
+                    numberOfLines={1}
+                    adjustsFontSizeToFit
+                  >
+                    Register or Login
+                  </Text>
+                  {/* FREE-badge — vit kantlinje så den syns mot knappens
+                      gröna bakgrund. */}
+                  <View
+                    style={[styles.homeFreeBadge, styles.homeFreeBadgeRegister]}
+                    pointerEvents="none"
+                  >
+                    <Text style={styles.homeFreeBadgeText}>FREE</Text>
+                  </View>
+                </TouchableOpacity>
+              </Animated.View>
+            </>
+          )}
+
+          {/* Create Game — döljs helt när utloggad (tidigare 🔒-låst variant).
+              Gold-tema för inloggade users (samma vokabulär som appens
+              gold-CTA:er — Start Game-loggan, PREMIUM-badges). */}
+          {isLoggedIn && (
             <Animated.View style={{ transform: [{ scale: pulse }] }}>
               <TouchableOpacity
-                style={styles.gameBtn}
+                style={[styles.gameBtn, styles.gameBtnUser]}
                 activeOpacity={0.85}
-                onPress={() => setProfileMenuVisible(true)}
+                onPress={handleCreateGame}
               >
                 <Text
                   style={[
                     styles.gameBtnText,
+                    styles.gameBtnUserText,
                     { fontFamily: fontsLoaded ? 'Nunito_600SemiBold' : undefined },
                   ]}
-                  numberOfLines={1}
-                  adjustsFontSizeToFit
                 >
-                  Register or Login
+                  Start New Game
                 </Text>
               </TouchableOpacity>
             </Animated.View>
           )}
 
-          {/* Create Game (låst när utloggad) */}
-          <Animated.View
-            style={isLoggedIn ? { transform: [{ scale: pulse }] } : undefined}
-          >
-            <TouchableOpacity
-              style={[styles.gameBtn, !isLoggedIn && styles.gameBtnDisabled]}
-              activeOpacity={0.85}
-              onPress={isLoggedIn ? handleCreateGame : () => setProfileMenuVisible(true)}
-            >
-              <Text
-                style={[
-                  styles.gameBtnText,
-                  !isLoggedIn && styles.gameBtnTextDisabled,
-                  { fontFamily: fontsLoaded ? 'Nunito_600SemiBold' : undefined },
-                ]}
+          {/* Join with Room Code — user — döljs helt när utloggad. */}
+          {isLoggedIn && (
+            <Animated.View style={{ transform: [{ scale: pulse }] }}>
+              <TouchableOpacity
+                style={[styles.gameBtn, styles.gameBtnUser]}
+                activeOpacity={0.85}
+                onPress={() => openJoin('choose', { hideGuest: true })}
               >
-                {isLoggedIn ? 'Start New Game' : '🔒 Start New Game'}
-              </Text>
-            </TouchableOpacity>
-          </Animated.View>
+                <Text
+                  style={[
+                    styles.gameBtnText,
+                    styles.gameBtnUserText,
+                    { fontFamily: fontsLoaded ? 'Nunito_600SemiBold' : undefined },
+                  ]}
+                  numberOfLines={1}
+                  adjustsFontSizeToFit
+                >
+                  Join with Room Code — user
+                </Text>
+              </TouchableOpacity>
+            </Animated.View>
+          )}
 
-          {/* Join with Room Code — user (låst när utloggad) */}
-          <Animated.View
-            style={isLoggedIn ? { transform: [{ scale: pulse }] } : undefined}
-          >
-            <TouchableOpacity
-              style={[styles.gameBtn, !isLoggedIn && styles.gameBtnDisabled]}
-              activeOpacity={0.85}
-              onPress={
-                isLoggedIn
-                  ? () => openJoin('choose', { hideGuest: true })
-                  : () => setProfileMenuVisible(true)
-              }
-            >
-              <Text
+          {/* Guest-sektionen (rubrik + två knappar) — döljs HELT när
+              inloggad (registered users använder Join with Room Code —
+              user). Knapparna döljs visuellt när Join-modalen är öppen så
+              att modal-sheetens rundade ovankant inte avslöjar dem bakom;
+              layout-utrymmet bevaras med opacity/pointerEvents så övriga
+              element inte hoppar. */}
+          {!isLoggedIn && (
+            <>
+              {/* Guest-rubrik i grå text — separerar guest-pathen från
+                  registered-åtgärderna ovan. */}
+              <Text style={[styles.guestSectionHeader, { fontFamily: taglineFont }]}>
+                Guest / non-registered user
+              </Text>
+
+              {/* Join with Room Code — guest. Pulserar (primär spel-path
+                  för guests). */}
+              <Animated.View
                 style={[
-                  styles.gameBtnText,
-                  !isLoggedIn && styles.gameBtnTextDisabled,
-                  { fontFamily: fontsLoaded ? 'Nunito_600SemiBold' : undefined },
+                  joinVisible && { opacity: 0 },
+                  { transform: [{ scale: pulse }] },
                 ]}
-                numberOfLines={1}
-                adjustsFontSizeToFit
+                pointerEvents={joinVisible ? 'none' : 'auto'}
               >
-                {isLoggedIn
-                  ? 'Join with Room Code — user'
-                  : '🔒 Join with Room Code — user'}
-              </Text>
-            </TouchableOpacity>
-          </Animated.View>
+                <TouchableOpacity
+                  style={[styles.gameBtn, styles.gameBtnGuest]}
+                  activeOpacity={0.85}
+                  onPress={() => openJoin('guest')}
+                >
+                  <Text
+                    style={[
+                      styles.gameBtnText,
+                      { fontFamily: fontsLoaded ? 'Nunito_600SemiBold' : undefined },
+                    ]}
+                    numberOfLines={1}
+                    adjustsFontSizeToFit
+                  >
+                    Join with Room Code — guest
+                  </Text>
+                  <View style={styles.homeFreeBadge} pointerEvents="none">
+                    <Text style={styles.homeFreeBadgeText}>FREE</Text>
+                  </View>
+                </TouchableOpacity>
+              </Animated.View>
+            </>
+          )}
 
-          {/* "Guest"-rubrik separerar guest-pathen från de tre registered-
-              åtgärderna ovan. Overline-stil (uppercase + letterSpacing +
-              textSecondary) signalerar att det är en sub-sektions-label. */}
-          <Text style={[styles.guestSectionHeader, { fontFamily: taglineFont }]}>
-            Guest
-          </Text>
-
-          {/* Join with Room Code — guest (längst ned, utgråad när inloggad — då
-              används registered). Döljs visuellt när Join-modalen är öppen
-              så att modal-sheetens rundade ovankant inte avslöjar knappen
-              bakom. Layout-utrymmet bevaras med opacity/pointerEvents så
-              övriga knappar inte hoppar.
-              Ingen pulse — Register or Login är primär CTA när utloggad. */}
+          {/* Play as guest — synlig i BÅDA login-lägena (inloggade spelare
+              ska också kunna spela som guest). Pulserar alltid. Utloggad:
+              FREE-badge (del av guest-sektionen). Inloggad: ingen badge,
+              ingen Guest-rubrik ovanför. Öppnar guest-join-flödet. */}
           <Animated.View
-            style={[joinVisible && { opacity: 0 }]}
+            style={[
+              joinVisible && { opacity: 0 },
+              { transform: [{ scale: pulse }] },
+            ]}
             pointerEvents={joinVisible ? 'none' : 'auto'}
           >
             <TouchableOpacity
-              style={[styles.gameBtn, isLoggedIn && styles.gameBtnDisabled]}
+              style={[styles.gameBtn, styles.gameBtnGuest]}
               activeOpacity={0.85}
               onPress={() => openJoin('guest')}
-              disabled={isLoggedIn}
             >
               <Text
                 style={[
                   styles.gameBtnText,
-                  isLoggedIn && styles.gameBtnTextDisabled,
                   { fontFamily: fontsLoaded ? 'Nunito_600SemiBold' : undefined },
                 ]}
                 numberOfLines={1}
                 adjustsFontSizeToFit
               >
-                Join with Room Code — guest
+                Play as guest
               </Text>
+              {!isLoggedIn && (
+                <View style={styles.homeFreeBadge} pointerEvents="none">
+                  <Text style={styles.homeFreeBadgeText}>FREE</Text>
+                </View>
+              )}
             </TouchableOpacity>
           </Animated.View>
-
-          {!isLoggedIn && (
-            <Text style={[styles.createGameHint, { fontFamily: taglineFont }]}>
-              Register and Log in to unlock the locked options
-            </Text>
-          )}
         </View>
 
         {/* ── Footer ─────────────────────────────────────────── */}
@@ -3251,6 +3306,53 @@ const styles = StyleSheet.create({
   gameBtnTextDisabled: {
     color: Colors.textSecondary,
   },
+  // Register or Login-knappen — helgrön (bg + kant) så den särskiljs från
+  // guest-knapparna nedanför och matchar "QuizVibe user"-rubrikens ruta.
+  gameBtnRegister: {
+    backgroundColor: Colors.success,
+    borderColor: Colors.success,
+  },
+  // Inloggade user-knapparna (Start New Game + Join with Room Code — user)
+  // — helgold (Colors.warning, bg + kant) med svart text per appens
+  // gold-badge-konvention (PREMIUM-badges, GetReady-kategori-badge).
+  gameBtnUser: {
+    backgroundColor: Colors.warning,
+    borderColor: Colors.warning,
+  },
+  gameBtnUserText: {
+    color: '#000000',
+  },
+  // Guest-knapparna (Join with Room Code — guest + Play as guest) — helgrå
+  // (bg + kant) i samma grå ton som Guest-rubrikens ruta (#6B7280).
+  gameBtnGuest: {
+    backgroundColor: '#6B7280',
+    borderColor: '#6B7280',
+  },
+  // Kant-skärande FREE-badge på startskärmens tre knappar (utloggat läge).
+  // Grön bg + grön kant (guest-knapparna); Register-varianten byter till
+  // vit kant så badgen syns mot knappens gröna bakgrund.
+  homeFreeBadge: {
+    position: 'absolute',
+    top: -8,
+    right: Spacing.lg,
+    backgroundColor: Colors.success,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: Colors.success,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    zIndex: 10,
+    elevation: 4,
+  },
+  homeFreeBadgeRegister: {
+    borderColor: '#FFFFFF',
+  },
+  homeFreeBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    letterSpacing: 0.6,
+  },
   createGameHint: {
     fontSize: 12,
     color: Colors.textSecondary,
@@ -3258,17 +3360,27 @@ const styles = StyleSheet.create({
     marginTop: -Spacing.sm,
     fontStyle: 'italic',
   },
-  // "Guest"-rubrik som separerar Join with Room Code — guest-knappen från de
-  // tre registered-action-knapparna ovan. Overline-stil för att signalera
-  // att det är en sub-sektions-label, inte en del av en knapp.
-  guestSectionHeader: {
+  // "QuizVibe user"-rubriken ovanför Register or Login — grön text utan
+  // ruta (matchar knappens gröna färgtema).
+  userSectionHeader: {
     fontSize: 12,
     fontWeight: '700',
-    color: Colors.textSecondary,
+    color: Colors.success,
     letterSpacing: 1.2,
     textTransform: 'uppercase',
     textAlign: 'center',
-    marginTop: Spacing.sm,
+  },
+  // Guest-rubriken — grå text utan ruta, i samma grå ton som
+  // guest-knapparna (#6B7280). Separerar guest-pathen från
+  // registered-action-knapparna ovan.
+  guestSectionHeader: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#6B7280',
+    letterSpacing: 1.2,
+    textTransform: 'uppercase',
+    textAlign: 'center',
+    marginTop: Spacing.xl,
   },
   footer: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: Spacing.sm, paddingTop: Spacing.sm },
   footerText: { fontSize: 12, color: Colors.textSecondary },

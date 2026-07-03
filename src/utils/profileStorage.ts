@@ -81,6 +81,10 @@ export interface ProfileData {
   // Om Spotify DJ-läget är aktiverat som standard-val i Host defaults.
   // Optional — defaultas till false om saknas.
   spotifyDefaultEnabled?: boolean;
+  // Spotify-svarstyper. Båda true = alternerar per frågeindex (Year / Name).
+  // Minst en måste vara true när Spotify är aktiverat.
+  spotifyAnswerYear?: boolean;   // default true
+  spotifyAnswerName?: boolean;   // default true
 }
 
 // Dual-read mapping för profiler skapade innan rename
@@ -236,6 +240,28 @@ async function getCurrentUser() {
   return data.user;
 }
 
+// ── Profil-change-notifier ──────────────────────────────────────────────
+// Lättviktig in-memory event-bus så komponenter utanför screen-trädet
+// (BottomBanner i app/_layout.tsx) kan reagera på login/logout utan
+// polling. useFocusEffect fungerar inte där (ingen route-focus), och
+// Supabase auth-events räcker inte ensamt — clearProfile körs EFTER
+// signOut i logout-flödet, så en SIGNED_OUT-triggad reload kan hinna
+// läsa stale AsyncStorage-cache. Notify:n från clearProfile stänger
+// det fönstret.
+type ProfileChangeListener = () => void;
+const profileChangeListeners = new Set<ProfileChangeListener>();
+
+export function subscribeProfileChanges(listener: ProfileChangeListener): () => void {
+  profileChangeListeners.add(listener);
+  return () => {
+    profileChangeListeners.delete(listener);
+  };
+}
+
+function notifyProfileChanged(): void {
+  profileChangeListeners.forEach((fn) => fn());
+}
+
 /**
  * Skriver profilen lokalt + (om session finns) till Supabase. AsyncStorage
  * skrivs alltid först som optimistisk cache så UI-läsare ser uppdateringen
@@ -252,6 +278,7 @@ export async function saveProfile(data: ProfileData): Promise<void> {
     console.warn('[profileStorage] Failed to save profile to AsyncStorage:', err);
     throw err;
   }
+  notifyProfileChanged();
   const user = await getCurrentUser();
   if (!user) return;
   const row = profileToRow(user.id, user.email ?? '', data);
@@ -299,10 +326,10 @@ export async function loadProfile(): Promise<ProfileData | null> {
   if (row) {
     if (__DEV__) console.log('[profileStorage] loadProfile: found profiles row');
     let profile = rowToProfile(row as ProfileRow);
-    // Fält som enbart lever i AsyncStorage mergas in (spotifyDefaultEnabled saknar DB-kolumn).
+    // Fält som enbart lever i AsyncStorage mergas in (saknar DB-kolumn).
     // youtubeEnabledCategories / imagesEnabledCategories: skrivs nu till DB (migration 0014
     // applicerad) — men merge-logiken nedan bevaras som belt-and-suspenders-fallback.
-    // spotifyDefaultEnabled: ingen DB-kolumn ännu — alltid från cache.
+    // spotifyDefaultEnabled + spotifyAnswerYear + spotifyAnswerName: ingen DB-kolumn — alltid från cache.
     {
       const cached = await loadFromAsyncStorage();
       // youtubeEnabledCategories / imagesEnabledCategories: Supabase är
@@ -331,6 +358,8 @@ export async function loadProfile(): Promise<ProfileData | null> {
             ? supabaseImg
             : cached?.imagesEnabledCategories,
         spotifyDefaultEnabled: cached?.spotifyDefaultEnabled,
+        spotifyAnswerYear: cached?.spotifyAnswerYear,
+        spotifyAnswerName: cached?.spotifyAnswerName,
       };
     }
     const { data: refreshed, changed } = refreshFreeCreditsIfNeeded(profile);
@@ -429,6 +458,8 @@ async function backfillProfileFromSession(user: { id: string; email?: string; us
     youtubeEnabledCategories: cache?.youtubeEnabledCategories,
     imagesEnabledCategories: cache?.imagesEnabledCategories,
     spotifyDefaultEnabled: cache?.spotifyDefaultEnabled,
+    spotifyAnswerYear: cache?.spotifyAnswerYear,
+    spotifyAnswerName: cache?.spotifyAnswerName,
   };
 
   // Persistera mot Supabase. Vi använder upsert eftersom raden kan ha
@@ -456,6 +487,7 @@ export async function clearProfile(): Promise<void> {
   } catch (err) {
     console.warn('[profileStorage] Failed to clear profile from AsyncStorage:', err);
   }
+  notifyProfileChanged();
 }
 
 /**
