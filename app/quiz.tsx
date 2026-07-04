@@ -896,6 +896,11 @@ export default function QuizScreen() {
     selectedExtraPackages?: string;
     /** 'true' om Spotify DJ-läge är aktiverat i Lobby + host:ns konto kopplat. */
     spotifyEnabled?: string;
+    /** Host:s Spotify-svarstyper ('true'/'false', default 'true'). Båda true
+     *  = alternerar Year/Name per Spotify-fråga. Minst en är alltid true
+     *  (enforced av Lobby/Profile-validering). */
+    spotifyAnswerYear?: string;
+    spotifyAnswerName?: string;
     /** 'true' om spelets host är en guest (lobbyn skapad via "Start Game as
      *  Guest"). Sätts på ALLA enheter (host-path + non-host-path) — döljer
      *  Play Again på final leaderboard och skippar Player history-skrivning. */
@@ -1866,6 +1871,18 @@ export default function QuizScreen() {
   // Sätts true av första anropet till recordRoundScore; resetas i
   // handleAdvanceToNextRound när nästa fråga börjar.
   const hasRecordedScoreForCurrentQuestionRef = useRef(false);
+  // Wall-clock-stämpel (ms) för när host:s timer förväntas starta — sätts av
+  // play_command:s timer_start_at. Non-host använder den för att beräkna
+  // återstående tid om appen vaknade upp under countdown/question-fasen.
+  // Resetas till 0 vid questionIndex-byte så stale värde aldrig läcker.
+  const hostTimerStartAtRef = useRef<number>(0);
+  // Smooth bar-progress 1 → 0 över exakt 30 s, animerad via Animated.timing
+  // med RAF (requestAnimationFrame). Körs OBEROENDE av setInterval-baserade
+  // sekund-räknaren så bar:en aldrig "fryser" eller stepar — kritiskt för
+  // upplevelsen att tiden flyter på även medan handleConfirm batchar
+  // setStates och React re-renderar action-knappen. Krävs för Individual-
+  // Devices-flödet där flera spelare confirmar vid olika tidpunkter.
+  const timerProgressAnim = useRef(new Animated.Value(1)).current;
   // Timern + flaggans mosaik aktiveras 2 s efter quiz-vyn visas.
   const [timerActive, setTimerActive] = useState(false);
   useEffect(() => {
@@ -2454,19 +2471,9 @@ export default function QuizScreen() {
   // svarstiden med 2 decimaler vid Confirm. setInterval ger bara sekund-
   // precision så vi måste timestampa separat med Date.now().
   const questionStartMsRef = useRef<number>(0);
-  // Wall-clock ms för när host:s timer startade (= play_command.timer_start_at).
-  // Sätts av playCommandHandler:n på non-host:s enhet. Används vid iOS
-  // foreground-återkomst (AppState 'active') för att beräkna korrekt
-  // återstående tid om appen vaknade upp under countdown/question-fasen.
-  // Resetas till 0 vid questionIndex-byte så stale värde aldrig läcker.
-  const hostTimerStartAtRef = useRef<number>(0);
-  // Smooth bar-progress 1 → 0 över exakt 30 s, animerad via Animated.timing
-  // med RAF (requestAnimationFrame). Körs OBEROENDE av setInterval-baserade
-  // sekund-räknaren så bar:en aldrig "fryser" eller stepar — kritiskt för
-  // upplevelsen att tiden flyter på även medan handleConfirm batchar
-  // setStates och React re-renderar action-knappen. Krävs för Individual-
-  // Devices-flödet där flera spelare confirmar vid olika tidpunkter.
-  const timerProgressAnim = useRef(new Animated.Value(1)).current;
+  // OBS: hostTimerStartAtRef + timerProgressAnim är deklarerade högre upp
+  // (vid timerActive-state:t) eftersom timerActive-effekten använder dem —
+  // TS2448 (use before declaration) annars.
 
   const startTimer = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
@@ -6121,13 +6128,14 @@ export default function QuizScreen() {
                  outer gate ovan och når aldrig denna gren. */
               isTimerActivator && spotifyDJOpenedAppBroadcast && spotifyWaitPhase !== 'skipped' && phase === 'question' ? (
                 <Animated.View style={{ transform: [{ scale: activateTimerPulse }], width: '100%' }}>
-                  <Pressable
+                  {/* TouchableOpacity (inte Pressable) — activeOpacity finns bara här. */}
+                  <TouchableOpacity
                     style={styles.spotifyActivateTimerBtnLarge}
                     onPress={handleActivateTimer}
                     activeOpacity={0.85}
                   >
                     <Text style={styles.spotifyActivateTimerBtnLargeText}>Activate Timer</Text>
-                  </Pressable>
+                  </TouchableOpacity>
                 </Animated.View>
               ) : null
             ) : (

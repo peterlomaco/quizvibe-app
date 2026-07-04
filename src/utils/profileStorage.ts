@@ -172,6 +172,10 @@ interface ProfileRow {
   single_player_default: boolean;
   enabled_host_packages: string[];
   enabled_main_categories: string[];
+  // Migration 0014: per-source category-kolumner. Optional + nullable så
+  // rows från en DB utan migrationen (eller med NULL) fortfarande parsar.
+  youtube_enabled_categories?: string[] | null;
+  images_enabled_categories?: string[] | null;
   rounds_count: number;
 }
 
@@ -196,8 +200,8 @@ function rowToProfile(row: ProfileRow): ProfileData {
     enabledHostPackages: row.enabled_host_packages,
     // Dual-read: läs nya per-source-fält om de finns, annars migrera från
     // gamla enabled_main_categories (alla tre → båda sources all-on; annars defaults).
-    youtubeEnabledCategories: ((row as any).youtube_enabled_categories as string[] | undefined)?.filter(isMainCategory) as MainCategory[] | undefined,
-    imagesEnabledCategories: ((row as any).images_enabled_categories as string[] | undefined)?.filter(isMainCategory) as MainCategory[] | undefined,
+    youtubeEnabledCategories: row.youtube_enabled_categories?.filter(isMainCategory) as MainCategory[] | undefined,
+    imagesEnabledCategories: row.images_enabled_categories?.filter(isMainCategory) as MainCategory[] | undefined,
     roundsDefault: row.rounds_count,
   };
 }

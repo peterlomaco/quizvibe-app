@@ -3845,12 +3845,19 @@ export default function LobbyScreen() {
       imgCatsAll ? true : mc !== null && imagesEnabledCategories.includes(mc);
     const hasSpotifyHit =
       spotifyEnabled &&
-      MUSIC_QUESTIONS.some((q) => !!q.spotifyTrackId && q.correctYear >= eraFrom && q.correctYear <= eraTo);
+      MUSIC_QUESTIONS.some(
+        (q) =>
+          !!q.spotifyTrackId &&
+          q.correctYear !== undefined &&
+          q.correctYear >= eraFrom &&
+          q.correctYear <= eraTo,
+      );
     const hasMusicHit =
       hasSpotifyHit ||
       (youtubeEnabled &&
         MUSIC_QUESTIONS.some(
           (q) =>
+            q.correctYear !== undefined &&
             q.correctYear >= eraFrom &&
             q.correctYear <= eraTo &&
             matchesYtCat(subjectToMainCategory(q.contentSubject)),
