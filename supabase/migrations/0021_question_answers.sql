@@ -47,3 +47,8 @@ select
   )                                                               as correct_pct
 from question_answers
 group by question_id;
+
+-- Vyer omfattas inte av RLS (körs med ägarens rättigheter) — utan denna
+-- revoke kan klienter läsa aggregatet via PostgREST trots select-deny-
+-- policyn på rådatan. service_role påverkas inte (kringgår grants).
+revoke select on question_difficulty from anon, authenticated;
