@@ -29,8 +29,9 @@ import {
   PLAYER_NAME_MAX_DIGITS,
   PLAYER_NAME_MAX_LETTERS,
 } from '@/src/utils/playerName';
+import { ensureAuthSession, signInWithPlayerName } from '@/src/utils/auth';
 import { containsProfanity } from '@/src/utils/profanity';
-import { clearProfile, loadProfile, lookupEmailByPlayerName, saveProfile, type ProfileData } from '@/src/utils/profileStorage';
+import { clearProfile, loadProfile, playerNameExists, saveProfile, type ProfileData } from '@/src/utils/profileStorage';
 import { hasPremiumSubscription } from '@/src/utils/subscriptionStorage';
 import { supabase } from '@/src/utils/supabase';
 import { formatRoomCode, generateRoomCode, isBlockedLetterPair, isLetterCellIndex, ROOM_CODE_DIGITS, ROOM_CODE_LEADING_LETTERS, ROOM_CODE_LENGTH, ROOM_CODE_TRAILING_LETTERS } from '@/src/utils/roomCode';
@@ -60,7 +61,7 @@ const SCREEN_HEIGHT = Dimensions.get('window').height;
 
 // ─── Join Modal ───────────────────────────────────────────────────────────────
 
-type JoinStep = 'choose' | 'code' | 'invites' | 'guest';
+type JoinStep = 'choose' | 'code' | 'invites' | 'guest' | 'guest-host';
 
 interface JoinModalProps {
   visible: boolean;
@@ -461,6 +462,11 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     parsedBirthYear !== null &&
     code.length === ROOM_CODE_LENGTH;
 
+  // Guest-host-formen saknar rumkod (koden genereras vid submit) —
+  // giltig så fort namnet validerats och år valts.
+  const isGuestHostFormValid =
+    playerNameStatus === 'available' && parsedBirthYear !== null;
+
   const handleCheckPlayerName = () => {
     const trimmed = guestName.trim();
     if (!trimmed) return;
@@ -578,11 +584,16 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
   // 'idle' via handleGuestNameChange och kräver Check innan formuläret går vidare.
   useEffect(() => {
     const wasGuest = prevGuestStepRef.current;
-    prevGuestStepRef.current = step === 'guest';
-    if (step === 'guest' && !wasGuest && guestName === '') {
+    const inGuestStep = step === 'guest' || step === 'guest-host';
+    prevGuestStepRef.current = inGuestStep;
+    if (inGuestStep && !wasGuest && guestName === '') {
       let cancelled = false;
       (async () => {
-        const lobbyPlayers = await getLobbyPlayers(code).catch(() => null);
+        // Guest-host-steget har ingen rumkod ännu — ingen lobby att
+        // exkludera letters mot, så lookup:en hoppas över helt.
+        const lobbyPlayers = step === 'guest'
+          ? await getLobbyPlayers(code).catch(() => null)
+          : null;
         if (cancelled) return;
         const excludeLetters = extractTakenGuestLetters(
           (lobbyPlayers ?? []).map((p) => p.name),
@@ -669,6 +680,59 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     });
   };
 
+  // "Start Game as Guest" — guest-HOST-flödet. Speglar HomeScreen:s
+  // handleCreateGame minus credit-gaten (guest hosts förbrukar aldrig
+  // credits; begränsningen ligger i lobbyns låsta settings + att Play
+  // Again saknas — nytt spel kräver att hela proceduren görs om).
+  // Fungerar för både utloggade och inloggade users — en inloggad user
+  // som väljer denna väg spelar under Guest-identiteten, inte sin profil.
+  const handleStartGameAsGuestHost = async () => {
+    if (!isGuestHostFormValid || parsedBirthYear === null) return;
+    // Anon-session KRÄVS före registerActiveRoom — utan Supabase-session
+    // no-op:ar room-INSERT:en tyst (mockActiveRooms varnar bara) och
+    // joiners skulle få "Room not found" på en kod hosten sitter i.
+    // ensureAuthSession är idempotent: inloggade users behåller sin
+    // riktiga session, utloggade får en anonym via anon-signup.
+    const user = await ensureAuthSession();
+    if (!user) {
+      Alert.alert(
+        'Could not start',
+        'Please check your connection and try again.',
+      );
+      return;
+    }
+    const hostName = normalizePlayerName(guestName.trim());
+    const newCode = generateRoomCode();
+    // Guest host är alltid Free-nivå: max 4 spelare, ingen premium.
+    await registerActiveRoom(newCode, {
+      maxPlayers: 4,
+      hostIsPremium: false,
+      currentPlayerCount: 1,
+      hostPlayerName: hostName,
+      gameStarted: false,
+    });
+    // Samma fresh-slate-cleanup som handleCreateGame — se kommentaren där.
+    clearLeftPlayers(newCode);
+    clearLobbyPlayers(newCode);
+    clearLobbySettings(newCode);
+    clearEjected(newCode);
+    clearGameStarted(newCode);
+    const autofilled = /^Guest[A-Z]-\d{7}$/.test(guestName.trim());
+    track('guest_name_created', { autofilled, assistance: 'full' });
+    track('room_code_created', { guestHost: true });
+    onClose();
+    router.push({
+      pathname: '/lobby',
+      params: {
+        code: newCode,
+        isHost: 'true',
+        guestHost: 'true',
+        guestName: hostName,
+        guestBirthYear: String(parsedBirthYear),
+      },
+    });
+  };
+
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <KeyboardAvoidingView
@@ -679,11 +743,11 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
           {step !== 'choose' && (
             <TouchableOpacity
               onPress={() => {
-                // Guest-flödet är meant som en snabb-väg: chooser:s
+                // Guest-flödena är meant som snabb-vägar: chooser:s
                 // andra alternativ (Room Code / Waiting Invites) är inte
                 // relevanta för någon som valt guest. Back stänger
                 // modalen istället för att leda tillbaka till chooser:n.
-                if (step === 'guest') {
+                if (step === 'guest' || step === 'guest-host') {
                   onClose();
                 } else {
                   setStep('choose');
@@ -842,15 +906,25 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
             </>
           )}
 
-          {step === 'guest' && (
+          {(step === 'guest' || step === 'guest-host') && (
             <>
-              {/* På korta skärmar (< 700 px) göms titel + subtitel medan det
+              {/* Guest-JOIN och guest-HOST delar samma form-stomme (PlayerName
+                  split-field + Year of birth) — samma state/handlers. Delarna
+                  som skiljer (titel, assistance, room code, fasta settings-
+                  rader, submit) gate:as på step nedan.
+                  På korta skärmar (< 700 px) göms titel + subtitel medan det
                   custom CodeKeyboardet är uppe, så fältet som skrivs in ryms
                   ovanför tangentbordet. På högre skärmar visas de alltid. */}
               {!(SCREEN_HEIGHT < 700 && (playerNameFocused || focusedCodeIdx !== null)) && (
                 <>
-                  <Text style={modal.title}>Join as Guest</Text>
-                  <Text style={modal.subtitle}>Tap a field to fill in your details</Text>
+                  <Text style={modal.title}>
+                    {step === 'guest-host' ? 'Start Game as Guest' : 'Join as Guest'}
+                  </Text>
+                  <Text style={modal.subtitle}>
+                    {step === 'guest-host'
+                      ? 'Host a game without an account'
+                      : 'Tap a field to fill in your details'}
+                  </Text>
                 </>
               )}
 
@@ -1056,6 +1130,26 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                   </TouchableOpacity>
                 </View>
 
+                {/* Guest-HOST: Response time + Assistance är hårdkodade
+                    (60s / Full) — visas som read-only info-rader istället
+                    för väljare. Inga rumkods-celler (koden genereras vid
+                    submit i handleStartGameAsGuestHost). */}
+                {step === 'guest-host' && (
+                  <View style={modal.fieldGroup}>
+                    <Text style={modal.fieldLabel}>Fixed Guest settings</Text>
+                    <View style={modal.guestFixedRow}>
+                      <Text style={modal.guestFixedLabel}>Answer response time</Text>
+                      <Text style={modal.guestFixedValue}>60s</Text>
+                    </View>
+                    <View style={modal.guestFixedRow}>
+                      <Text style={modal.guestFixedLabel}>Assistance level</Text>
+                      <Text style={modal.guestFixedValue}>Full</Text>
+                    </View>
+                  </View>
+                )}
+
+                {step === 'guest' && (
+                <>
                 {/* Assistance level (låst tills year valt). Default 'standard'
                     är förvalt, så användaren kan gå direkt till Room Code. */}
                 <Text
@@ -1160,6 +1254,8 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                     })()}
                   </View>
                 </View>
+                </>
+                )}
               </ScrollView>
 
               {focusedCodeIdx !== null && (
@@ -1183,16 +1279,29 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                   modeToggleDisabled={playerNameKbMode === 'letter' && guestName.length === 0}
                 />
               )}
-              <TouchableOpacity
-                style={[
-                  modal.joinBtn,
-                  !isGuestFormValid && modal.joinBtnDisabled,
-                ]}
-                onPress={handleJoinAsGuest}
-                disabled={!isGuestFormValid}
-              >
-                <Text style={modal.joinBtnText}>Join as Guest</Text>
-              </TouchableOpacity>
+              {step === 'guest' ? (
+                <TouchableOpacity
+                  style={[
+                    modal.joinBtn,
+                    !isGuestFormValid && modal.joinBtnDisabled,
+                  ]}
+                  onPress={handleJoinAsGuest}
+                  disabled={!isGuestFormValid}
+                >
+                  <Text style={modal.joinBtnText}>Join as Guest</Text>
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  style={[
+                    modal.joinBtn,
+                    !isGuestHostFormValid && modal.joinBtnDisabled,
+                  ]}
+                  onPress={handleStartGameAsGuestHost}
+                  disabled={!isGuestHostFormValid}
+                >
+                  <Text style={modal.joinBtnText}>Start Game as Guest</Text>
+                </TouchableOpacity>
+              )}
             </>
           )}
 
@@ -1680,32 +1789,35 @@ export default function HomeScreen() {
     const identifierRaw = loginMode === 'playerName' ? loginPlayerName : loginEmail;
     const trimmed = identifierRaw.trim();
     if (!trimmed || !loginPassword.trim()) return;
-    let email = trimmed;
     let identifierMethod: 'email' | 'player_name' = 'email';
+    let userId: string;
     if (loginMode === 'playerName') {
+      // Login-via-PlayerName görs helt server-side (Edge Function
+      // 'login-by-name') så email:en aldrig returneras till klienten —
+      // stänger email-enumereringsläckan (security review Nivå 1 punkt 1).
       const normalized = normalizePlayerName(trimmed);
-      const looked = await lookupEmailByPlayerName(normalized);
-      if (!looked) {
+      const result = await signInWithPlayerName(normalized, loginPassword);
+      if (!result.ok) {
+        // Generiskt fel för både "namnet finns inte" och "fel lösenord"
+        // (function:n skiljer inte på dem — anti-enumerering).
         Alert.alert(
           'Login failed',
-          `No account found for Player Name "${normalized}". Check the spelling, or switch to Email mode and use the email you registered with.`,
+          'Invalid Player Name or password. Please check, or switch to Email mode and use the email you registered with.',
         );
         return;
       }
-      email = looked;
+      userId = result.user.id;
       identifierMethod = 'player_name';
-    }
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password: loginPassword,
-    });
-    if (error) {
-      Alert.alert('Login failed', 'Invalid PlayerName/Email or password. Please check');
-      return;
-    }
-    if (!data.user) {
-      Alert.alert('Login failed', 'Could not sign in. Please try again.');
-      return;
+    } else {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: trimmed,
+        password: loginPassword,
+      });
+      if (error || !data.user) {
+        Alert.alert('Login failed', 'Invalid PlayerName/Email or password. Please check');
+        return;
+      }
+      userId = data.user.id;
     }
     // Profilen läses nu från Supabase (eller backfillas från user_metadata
     // om profiles-raden saknas — pre-Fas-2-user). loadProfile sköter dual-
@@ -1717,7 +1829,7 @@ export default function HomeScreen() {
     const traits: Record<string, string | number | boolean | null> = {};
     if (profile?.assistance) traits.assistance = profile.assistance;
     if (profile?.region) traits.region = profile.region;
-    identify(data.user.id, traits);
+    identify(userId, traits);
     track('user_logged_in', { method: identifierMethod });
     setProfileMenuVisible(false);
   };
@@ -1828,8 +1940,8 @@ export default function HomeScreen() {
     }
     // Riktigt uniqueness-check mot Supabase: om namnet finns → 'taken'.
     try {
-      const existing = await lookupEmailByPlayerName(normalized);
-      setRegPlayerNameStatus(existing ? 'taken' : 'available');
+      const exists = await playerNameExists(normalized);
+      setRegPlayerNameStatus(exists ? 'taken' : 'available');
     } catch {
       // Vid nätverksfel: faller tillbaka på lokal validering (godkänd).
       setRegPlayerNameStatus('available');
@@ -2073,7 +2185,7 @@ export default function HomeScreen() {
                  grön kantlinje)
               2. Create Game (bara när inloggad)
               3. Join with Room Code — user (bara när inloggad)
-              4. Guest-rutan + Join with Room Code — guest + Play as guest
+              4. Guest-rutan + Join with Room Code — guest + Start Game as Guest
             Pulse följer "primär åtgärd för aktuellt login-state":
               - utloggad → Register or Login + båda guest-knapparna pulserar
               - inloggad → Create + Join (registered) pulserar */}
@@ -2084,7 +2196,10 @@ export default function HomeScreen() {
               Guest-rubrikens ruta men i grönt (matchar knappens kantlinje). */}
           {!isLoggedIn && (
             <>
-              <Text style={[styles.userSectionHeader, { fontFamily: taglineFont }]}>
+              {/* appNameFont (Nunito_700Bold) — en explicit fontFamily
+                  override:ar fontWeight på iOS, så bold kräver bold-filen
+                  (taglineFont = 400Regular renderade rubriken tunn). */}
+              <Text style={[styles.userSectionHeader, { fontFamily: appNameFont }]}>
                 QuizVibe user
               </Text>
               <Animated.View style={{ transform: [{ scale: pulse }] }}>
@@ -2135,6 +2250,11 @@ export default function HomeScreen() {
                 >
                   Start New Game
                 </Text>
+                {/* "QuizVibe USER"-badge — brand-blå (loggans Colors.primary)
+                    med vit kant så den syns mot den gyllene knapp-bakgrunden. */}
+                <View style={[styles.homeFreeBadge, styles.homeUserBadge]} pointerEvents="none">
+                  <Text style={styles.homeFreeBadgeText}>QuizVibe USER</Text>
+                </View>
               </TouchableOpacity>
             </Animated.View>
           )}
@@ -2158,6 +2278,10 @@ export default function HomeScreen() {
                 >
                   Join with Room Code — user
                 </Text>
+                {/* Samma "QuizVibe USER"-badge som Start New Game ovan. */}
+                <View style={[styles.homeFreeBadge, styles.homeUserBadge]} pointerEvents="none">
+                  <Text style={styles.homeFreeBadgeText}>QuizVibe USER</Text>
+                </View>
               </TouchableOpacity>
             </Animated.View>
           )}
@@ -2172,7 +2296,8 @@ export default function HomeScreen() {
             <>
               {/* Guest-rubrik i grå text — separerar guest-pathen från
                   registered-åtgärderna ovan. */}
-              <Text style={[styles.guestSectionHeader, { fontFamily: taglineFont }]}>
+              {/* appNameFont av samma skäl som QuizVibe user-rubriken ovan. */}
+              <Text style={[styles.guestSectionHeader, { fontFamily: appNameFont }]}>
                 Guest / non-registered user
               </Text>
 
@@ -2208,21 +2333,25 @@ export default function HomeScreen() {
             </>
           )}
 
-          {/* Play as guest — synlig i BÅDA login-lägena (inloggade spelare
-              ska också kunna spela som guest). Pulserar alltid. Utloggad:
-              FREE-badge (del av guest-sektionen). Inloggad: ingen badge,
-              ingen Guest-rubrik ovanför. Öppnar guest-join-flödet. */}
+          {/* Start Game as Guest — synlig i BÅDA login-lägena (inloggade
+              spelare ska också kunna hosta som guest). Pulserar alltid.
+              "TRIAL version"-badge i båda lägena. Öppnar guest-HOST-formen
+              (begränsad registrering → lobby som host). Inloggad: extra
+              marginTop (Spacing.xl, samma sektions-separation som guest-
+              rubriken i utloggat läge) så knappen distanseras från de
+              gyllene user-knapparna ovanför — trial-vägen är sekundär. */}
           <Animated.View
             style={[
               joinVisible && { opacity: 0 },
               { transform: [{ scale: pulse }] },
+              isLoggedIn && { marginTop: Spacing.xl },
             ]}
             pointerEvents={joinVisible ? 'none' : 'auto'}
           >
             <TouchableOpacity
               style={[styles.gameBtn, styles.gameBtnGuest]}
               activeOpacity={0.85}
-              onPress={() => openJoin('guest')}
+              onPress={() => openJoin('guest-host')}
             >
               <Text
                 style={[
@@ -2232,13 +2361,14 @@ export default function HomeScreen() {
                 numberOfLines={1}
                 adjustsFontSizeToFit
               >
-                Play as guest
+                Start Game as Guest
               </Text>
-              {!isLoggedIn && (
-                <View style={styles.homeFreeBadge} pointerEvents="none">
-                  <Text style={styles.homeFreeBadgeText}>FREE</Text>
-                </View>
-              )}
+              {/* "Trial version"-badge visas i BÅDA login-lägena (ersatte den
+                  utloggat-gated FREE-badgen 2026-07-03) — guest-hostade spel
+                  är den nedskalade prova-på-varianten oavsett login-status. */}
+              <View style={styles.homeFreeBadge} pointerEvents="none">
+                <Text style={styles.homeFreeBadgeText}>TRIAL version</Text>
+              </View>
             </TouchableOpacity>
           </Animated.View>
         </View>
@@ -3322,7 +3452,7 @@ const styles = StyleSheet.create({
   gameBtnUserText: {
     color: '#000000',
   },
-  // Guest-knapparna (Join with Room Code — guest + Play as guest) — helgrå
+  // Guest-knapparna (Join with Room Code — guest + Start Game as Guest) — helgrå
   // (bg + kant) i samma grå ton som Guest-rubrikens ruta (#6B7280).
   gameBtnGuest: {
     backgroundColor: '#6B7280',
@@ -3338,11 +3468,23 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.success,
     borderRadius: 4,
     borderWidth: 1,
-    borderColor: Colors.success,
+    // Vit kant på ALLA Home-badges (2026-07-03, var Colors.success) —
+    // gör homeFreeBadgeRegister/homeUserBadge:s borderColor-overrides
+    // redundanta men de behålls (homeUserBadge sätter även bg).
+    borderColor: '#FFFFFF',
     paddingHorizontal: 8,
     paddingVertical: 2,
     zIndex: 10,
     elevation: 4,
+  },
+  // "QuizVibe USER"-badgen på de gyllene user-knapparna — grön
+  // (Colors.success, registered-path-färgen) bg + vit kant så den syns
+  // mot guld. Blå nyanser (primary + primaryDark) testades 2026-07-03
+  // men grönt valdes — knyter an till "QuizVibe user"-rubriken i
+  // utloggat läge.
+  homeUserBadge: {
+    backgroundColor: Colors.success,
+    borderColor: '#FFFFFF',
   },
   homeFreeBadgeRegister: {
     borderColor: '#FFFFFF',
@@ -3485,6 +3627,29 @@ const modal = StyleSheet.create({
     letterSpacing: 0.4,
     textTransform: 'uppercase',
     paddingHorizontal: Spacing.xs,
+  },
+  // Guest-host-formens read-only settings-rader (Response time 60s +
+  // Assistance Full). Bordered rad som speglar yearTrigger-vokabulären
+  // men utan tap-affordance — värdet är fast.
+  guestFixedRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: Radius.sm,
+    backgroundColor: Colors.card,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+  },
+  guestFixedLabel: {
+    fontSize: 14,
+    color: Colors.textSecondary,
+  },
+  guestFixedValue: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: Colors.textPrimary,
   },
 
   // PlayerName-rad: input + Check-knapp inline

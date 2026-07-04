@@ -395,6 +395,18 @@ export interface SyncChannelHandlers {
    * Merge:as in i lokal `allRoundScoresHistory` för komplett leaderboard.
    */
   onPlayerScoreRecorded?: (payload: PlayerScoreRecordedPayload) => void;
+  /**
+   * Valfritt membership-predikat. Om satt droppar vi player-id-bärande
+   * events (player_left, player_score_recorded, player_answer_confirmed,
+   * player_approved_play_again) vars id INTE finns i lobby-rostern — stoppar
+   * forged/okända ids från en fientlig klient. Fail-open när det saknas.
+   *
+   * OBS: detta autentiserar INTE avsändaren. Supabase broadcast signerar
+   * inte sender-identitet, så en angripare kan fortfarande sända ett
+   * well-formed event med ett RIKTIGT player_id (synligt via lobby_players).
+   * Full sender-auth kräver Supabase broadcast-authorization (separat item).
+   */
+  isKnownSender?: (playerId: string) => boolean;
 }
 
 export interface SyncChannel {
@@ -472,6 +484,209 @@ const PEER_TIMEOUT_MS = 15_000;
  *  latens innan disconnect detektion; acceptabelt vs overhead av tätare ticks. */
 const PEER_WATCHDOG_MS = 5_000;
 
+// ── Payload-validering ──────────────────────────────────────────────────
+// Broadcast-payloads kommer från andra klienter över en OAUTENTISERAD
+// Realtime-channel — vem som helst med rumkoden kan subscribe:a OCH sända.
+// Tidigare castades payloaden rått (`as XPayload`) utan runtime-koll, så en
+// fientlig eller buggig klient kunde skicka fel typer, out-of-range-index
+// eller ett poisonat timer_start_at och krascha/störa spelet på andra
+// enheter. Vi validerar därför varje payload strukturellt + range-checkar
+// innan handlern körs; ogiltiga events droppas (loggas som warning).
+//
+// Detta autentiserar INTE avsändaren (se isKnownSender-noten). Målet här är
+// att garantera väl-formade, rimliga värden så ingen hostil/trasig payload
+// kan orsaka odefinierat beteende — exakta spel-regler (t.ex. att points
+// verkligen är 0/1, eller att index < antal frågor) ägs av quiz.tsx-handlern
+// som har den lokala speldatan.
+
+const MAX_QUESTION_INDEX = 10_000; // sanity-cap; riktig bound (< antal frågor) görs i quiz.tsx
+const MAX_QUESTION_IDS = 500; // sanity-cap på sekvenslängd
+const MAX_STRING_LEN = 512; // sanity-cap på fria strängfält
+const TIMER_WINDOW_MS = 60_000; // timer_start_at får avvika ±60s från now (legit är ~+10.5s framåt)
+const MAX_TIME_USED_SEC = 3600;
+const MAX_POINTS = 1000;
+
+function isObj(v: unknown): v is Record<string, unknown> {
+  return typeof v === 'object' && v !== null;
+}
+function str(v: unknown): v is string {
+  return typeof v === 'string' && v.length > 0 && v.length <= MAX_STRING_LEN;
+}
+function num(v: unknown): v is number {
+  return typeof v === 'number' && Number.isFinite(v);
+}
+function index(v: unknown): v is number {
+  return typeof v === 'number' && Number.isInteger(v) && v >= 0 && v <= MAX_QUESTION_INDEX;
+}
+/** Valfri boolean → behåll om boolean, annars undefined (strip). */
+function optBool(v: unknown): boolean | undefined {
+  return typeof v === 'boolean' ? v : undefined;
+}
+/** Valfri sträng → behåll om giltig icke-tom sträng inom cap, annars undefined. */
+function optStr(v: unknown): string | undefined {
+  return str(v) ? v : undefined;
+}
+/** Valfri all_question_ids → array av icke-tomma strängar inom cap, annars undefined. */
+function optIds(v: unknown): string[] | undefined {
+  if (!Array.isArray(v) || v.length === 0 || v.length > MAX_QUESTION_IDS) return undefined;
+  return v.every((x) => str(x)) ? (v as string[]) : undefined;
+}
+/** Valfri timer_start_at → behåll om inom ±TIMER_WINDOW_MS från now, annars
+ *  undefined så konsumenten faller tillbaka på sin default-timing istället för
+ *  att agera på ett poisonat (stale/far-future) värde. */
+function optTimerStart(v: unknown): number | undefined {
+  if (typeof v !== 'number' || !Number.isFinite(v)) return undefined;
+  const delta = v - Date.now();
+  return delta >= -TIMER_WINDOW_MS && delta <= TIMER_WINDOW_MS ? v : undefined;
+}
+
+function vPlayCommand(raw: unknown): PlayCommandPayload | null {
+  if (!isObj(raw) || !index(raw.question_index) || !str(raw.question_id)) return null;
+  return {
+    question_index: raw.question_index,
+    question_id: raw.question_id,
+    all_question_ids: optIds(raw.all_question_ids),
+    spotify_answer_year: optBool(raw.spotify_answer_year),
+    spotify_answer_name: optBool(raw.spotify_answer_name),
+    timer_start_at: optTimerStart(raw.timer_start_at),
+    dj_player_id: optStr(raw.dj_player_id),
+  };
+}
+function vQuestionAdvance(raw: unknown): QuestionAdvancePayload | null {
+  if (!isObj(raw)) return null;
+  const nqi = raw.next_question_index;
+  if (nqi !== null && !index(nqi)) return null;
+  return {
+    next_question_index: nqi as number | null,
+    all_question_ids: optIds(raw.all_question_ids),
+    spotify_answer_year: optBool(raw.spotify_answer_year),
+    spotify_answer_name: optBool(raw.spotify_answer_name),
+  };
+}
+function vPlayerLeft(raw: unknown): PlayerLeftPayload | null {
+  if (!isObj(raw) || !str(raw.player_id)) return null;
+  return { player_id: raw.player_id, player_name: optStr(raw.player_name) ?? '' };
+}
+function vPlayerAnswerConfirmed(raw: unknown): PlayerAnswerConfirmedPayload | null {
+  if (!isObj(raw) || !str(raw.player_id) || !num(raw.time_used)) return null;
+  if (raw.time_used < 0 || raw.time_used > MAX_TIME_USED_SEC) return null;
+  return { player_id: raw.player_id, time_used: raw.time_used };
+}
+function vResponseSecondsChanged(raw: unknown): ResponseSecondsChangedPayload | null {
+  if (!isObj(raw)) return null;
+  const s = raw.seconds;
+  if (s !== 30 && s !== 45 && s !== 60) return null;
+  return { seconds: s };
+}
+function vPlayAgainInitiated(raw: unknown): PlayAgainInitiatedPayload | null {
+  if (!isObj(raw) || !str(raw.sender_id)) return null;
+  return { sender_id: raw.sender_id };
+}
+function vPlayAgainLobbyReady(raw: unknown): PlayAgainLobbyReadyPayload | null {
+  if (!isObj(raw) || !str(raw.room_code)) return null;
+  return { room_code: raw.room_code };
+}
+function vPlayerApprovedPlayAgain(raw: unknown): PlayerApprovedPlayAgainPayload | null {
+  if (!isObj(raw) || !str(raw.player_id)) return null;
+  return { player_id: raw.player_id };
+}
+function vLobbyDeleted(raw: unknown): LobbyDeletedPayload | null {
+  if (!isObj(raw) || !str(raw.room_code)) return null;
+  return { room_code: raw.room_code };
+}
+function vSpotifyQuestionReady(raw: unknown): SpotifyQuestionReadyPayload | null {
+  if (
+    !isObj(raw) ||
+    !index(raw.question_index) ||
+    !str(raw.spotify_track_id) ||
+    !str(raw.display_name) ||
+    !num(raw.correct_year) ||
+    !str(raw.dj_player_id)
+  )
+    return null;
+  if (raw.answer_type !== 'year' && raw.answer_type !== 'name') return null;
+  if (raw.correct_year < 1000 || raw.correct_year > 3000) return null;
+  return {
+    question_index: raw.question_index,
+    spotify_track_id: raw.spotify_track_id,
+    display_name: raw.display_name,
+    correct_year: raw.correct_year,
+    dj_player_id: raw.dj_player_id,
+    answer_type: raw.answer_type,
+  };
+}
+function vSpotifyDJOpenedApp(raw: unknown): SpotifyDJOpenedAppPayload | null {
+  if (!isObj(raw) || !str(raw.dj_player_id)) return null;
+  return { dj_player_id: raw.dj_player_id };
+}
+function vSpotifyDJTrackStarted(raw: unknown): SpotifyDJTrackStartedPayload | null {
+  if (!isObj(raw) || !str(raw.dj_player_id) || !str(raw.spotify_track_id)) return null;
+  return {
+    dj_player_id: raw.dj_player_id,
+    spotify_track_id: raw.spotify_track_id,
+    timer_start_at: optTimerStart(raw.timer_start_at),
+  };
+}
+function vSpotifyDJHandover(raw: unknown): SpotifyDJHandoverPayload | null {
+  if (!isObj(raw) || !str(raw.dj_player_id)) return null;
+  return { dj_player_id: raw.dj_player_id };
+}
+function vPlayerAudioStateChanged(raw: unknown): PlayerAudioStateChangedPayload | null {
+  if (!isObj(raw) || !str(raw.player_id) || typeof raw.audio_on !== 'boolean') return null;
+  return { player_id: raw.player_id, audio_on: raw.audio_on };
+}
+function vHostActivePing(raw: unknown): HostActivePingPayload | null {
+  if (!isObj(raw) || !str(raw.sender_id) || !index(raw.question_index)) return null;
+  return {
+    sender_id: raw.sender_id,
+    question_index: raw.question_index,
+    all_question_ids: optIds(raw.all_question_ids),
+    phase: optStr(raw.phase),
+  };
+}
+function vGameSequenceInit(raw: unknown): GameSequenceInitPayload | null {
+  if (!isObj(raw)) return null;
+  const ids = optIds(raw.all_question_ids);
+  if (!ids) return null;
+  return {
+    all_question_ids: ids,
+    spotify_answer_year: optBool(raw.spotify_answer_year),
+    spotify_answer_name: optBool(raw.spotify_answer_name),
+  };
+}
+function vNetworkHeartbeat(raw: unknown): NetworkHeartbeatPayload | null {
+  if (!isObj(raw) || !str(raw.sender_id)) return null;
+  return { sender_id: raw.sender_id };
+}
+function vPlayerRejoined(raw: unknown): PlayerRejoinedPayload | null {
+  if (!isObj(raw) || !str(raw.sender_id)) return null;
+  return { sender_id: raw.sender_id };
+}
+function vHostRejoined(raw: unknown): HostRejoinedPayload | null {
+  if (!isObj(raw) || !str(raw.sender_id)) return null;
+  return { sender_id: raw.sender_id };
+}
+function vPlayerScoreRecorded(raw: unknown): PlayerScoreRecordedPayload | null {
+  if (
+    !isObj(raw) ||
+    !str(raw.player_id) ||
+    !index(raw.question_index) ||
+    !num(raw.points) ||
+    typeof raw.correct !== 'boolean' ||
+    !num(raw.time_used)
+  )
+    return null;
+  if (raw.points < 0 || raw.points > MAX_POINTS) return null;
+  if (raw.time_used < 0 || raw.time_used > MAX_TIME_USED_SEC) return null;
+  return {
+    player_id: raw.player_id,
+    question_index: raw.question_index,
+    points: raw.points,
+    correct: raw.correct,
+    time_used: raw.time_used,
+  };
+}
+
 /**
  * Subscribe till `quiz_sync:<roomCode>`-channel. Bägge host och non-host
  * kan subscribe:a — `broadcast.self: false` är default i Supabase Realtime
@@ -526,86 +741,70 @@ export function subscribeSyncChannel(
   // ÄNDRING. Annars skulle watchdog:n spamma 'disconnected' var 5:e sek.
   const lastReportedStatus: Map<string, PlayerConnectionStatus> = new Map();
 
-  if (handlers.onPlayCommand) {
-    channel.on('broadcast', { event: 'play_command' }, ({ payload }) => {
-      handlers.onPlayCommand!(payload as PlayCommandPayload);
+  // ── Validerad event-wiring ──────────────────────────────────────────
+  // Varje broadcast valideras strukturellt + range-checkas (se validator-
+  // sektionen ovan) innan handlern körs. Ogiltiga payloads droppas + loggas.
+  const onEvent = <T>(
+    event: string,
+    validate: (raw: unknown) => T | null,
+    handler: (p: T) => void,
+  ) => {
+    channel.on('broadcast', { event }, ({ payload }) => {
+      const valid = validate(payload);
+      if (valid === null) {
+        console.warn(`[syncChannel] dropped invalid '${event}' payload`);
+        return;
+      }
+      handler(valid);
     });
-  }
-  if (handlers.onQuestionAdvance) {
-    channel.on('broadcast', { event: 'question_advance' }, ({ payload }) => {
-      handlers.onQuestionAdvance!(payload as QuestionAdvancePayload);
+  };
+
+  // Membership-guard: valfri. Om quiz.tsx passar isKnownSender droppar vi
+  // player-id-bärande events vars id inte finns i lobby-rostern (stoppar
+  // forged/okända ids). Fail-open när predikatet saknas.
+  const known = (id: string, event: string): boolean => {
+    if (!handlers.isKnownSender || handlers.isKnownSender(id)) return true;
+    console.warn(`[syncChannel] dropped '${event}' from unknown sender ${id}`);
+    return false;
+  };
+
+  if (handlers.onPlayCommand) onEvent('play_command', vPlayCommand, handlers.onPlayCommand);
+  if (handlers.onQuestionAdvance)
+    onEvent('question_advance', vQuestionAdvance, handlers.onQuestionAdvance);
+  if (handlers.onPlayerLeft)
+    onEvent('player_left', vPlayerLeft, (p) => {
+      if (known(p.player_id, 'player_left')) handlers.onPlayerLeft!(p);
     });
-  }
-  if (handlers.onPlayerLeft) {
-    channel.on('broadcast', { event: 'player_left' }, ({ payload }) => {
-      handlers.onPlayerLeft!(payload as PlayerLeftPayload);
+  if (handlers.onPlayerAnswerConfirmed)
+    onEvent('player_answer_confirmed', vPlayerAnswerConfirmed, (p) => {
+      if (known(p.player_id, 'player_answer_confirmed')) handlers.onPlayerAnswerConfirmed!(p);
     });
-  }
-  if (handlers.onPlayerAnswerConfirmed) {
-    channel.on('broadcast', { event: 'player_answer_confirmed' }, ({ payload }) => {
-      handlers.onPlayerAnswerConfirmed!(payload as PlayerAnswerConfirmedPayload);
+  if (handlers.onResponseSecondsChanged)
+    onEvent('response_seconds_changed', vResponseSecondsChanged, handlers.onResponseSecondsChanged);
+  if (handlers.onPlayAgainInitiated)
+    onEvent('play_again_initiated', vPlayAgainInitiated, handlers.onPlayAgainInitiated);
+  if (handlers.onPlayAgainLobbyReady)
+    onEvent('play_again_lobby_ready', vPlayAgainLobbyReady, handlers.onPlayAgainLobbyReady);
+  if (handlers.onPlayerApprovedPlayAgain)
+    onEvent('player_approved_play_again', vPlayerApprovedPlayAgain, (p) => {
+      if (known(p.player_id, 'player_approved_play_again')) handlers.onPlayerApprovedPlayAgain!(p);
     });
-  }
-  if (handlers.onResponseSecondsChanged) {
-    channel.on('broadcast', { event: 'response_seconds_changed' }, ({ payload }) => {
-      handlers.onResponseSecondsChanged!(payload as ResponseSecondsChangedPayload);
-    });
-  }
-  if (handlers.onPlayAgainInitiated) {
-    channel.on('broadcast', { event: 'play_again_initiated' }, ({ payload }) => {
-      handlers.onPlayAgainInitiated!(payload as PlayAgainInitiatedPayload);
-    });
-  }
-  if (handlers.onPlayAgainLobbyReady) {
-    channel.on('broadcast', { event: 'play_again_lobby_ready' }, ({ payload }) => {
-      handlers.onPlayAgainLobbyReady!(payload as PlayAgainLobbyReadyPayload);
-    });
-  }
-  if (handlers.onPlayerApprovedPlayAgain) {
-    channel.on('broadcast', { event: 'player_approved_play_again' }, ({ payload }) => {
-      handlers.onPlayerApprovedPlayAgain!(payload as PlayerApprovedPlayAgainPayload);
-    });
-  }
-  if (handlers.onLobbyDeleted) {
-    channel.on('broadcast', { event: 'lobby_deleted' }, ({ payload }) => {
-      handlers.onLobbyDeleted!(payload as LobbyDeletedPayload);
-    });
-  }
-  if (handlers.onSpotifyQuestionReady) {
-    channel.on('broadcast', { event: 'spotify_question_ready' }, ({ payload }) => {
-      handlers.onSpotifyQuestionReady!(payload as SpotifyQuestionReadyPayload);
-    });
-  }
-  if (handlers.onSpotifyDJOpenedApp) {
-    channel.on('broadcast', { event: 'spotify_dj_opened_app' }, ({ payload }) => {
-      handlers.onSpotifyDJOpenedApp!(payload as SpotifyDJOpenedAppPayload);
-    });
-  }
-  if (handlers.onSpotifyDJTrackStarted) {
-    channel.on('broadcast', { event: 'spotify_dj_track_started' }, ({ payload }) => {
-      handlers.onSpotifyDJTrackStarted!(payload as SpotifyDJTrackStartedPayload);
-    });
-  }
-  if (handlers.onSpotifyDJHandover) {
-    channel.on('broadcast', { event: 'spotify_dj_handover' }, ({ payload }) => {
-      handlers.onSpotifyDJHandover!(payload as SpotifyDJHandoverPayload);
-    });
-  }
-  if (handlers.onPlayerAudioStateChanged) {
-    channel.on('broadcast', { event: 'player_audio_state_changed' }, ({ payload }) => {
-      handlers.onPlayerAudioStateChanged!(payload as PlayerAudioStateChangedPayload);
-    });
-  }
-  if (handlers.onHostActivePing) {
-    channel.on('broadcast', { event: 'host_active_ping' }, ({ payload }) => {
-      handlers.onHostActivePing!(payload as HostActivePingPayload);
-    });
-  }
-  if (handlers.onGameSequenceInit) {
-    channel.on('broadcast', { event: 'game_sequence_init' }, ({ payload }) => {
-      handlers.onGameSequenceInit!(payload as GameSequenceInitPayload);
-    });
-  }
+  if (handlers.onLobbyDeleted) onEvent('lobby_deleted', vLobbyDeleted, handlers.onLobbyDeleted);
+  if (handlers.onSpotifyQuestionReady)
+    onEvent('spotify_question_ready', vSpotifyQuestionReady, handlers.onSpotifyQuestionReady);
+  if (handlers.onSpotifyDJOpenedApp)
+    onEvent('spotify_dj_opened_app', vSpotifyDJOpenedApp, handlers.onSpotifyDJOpenedApp);
+  if (handlers.onSpotifyDJTrackStarted)
+    onEvent('spotify_dj_track_started', vSpotifyDJTrackStarted, handlers.onSpotifyDJTrackStarted);
+  if (handlers.onSpotifyDJHandover)
+    onEvent('spotify_dj_handover', vSpotifyDJHandover, handlers.onSpotifyDJHandover);
+  if (handlers.onPlayerAudioStateChanged)
+    onEvent('player_audio_state_changed', vPlayerAudioStateChanged, handlers.onPlayerAudioStateChanged);
+  if (handlers.onHostActivePing)
+    onEvent('host_active_ping', vHostActivePing, handlers.onHostActivePing);
+  if (handlers.onGameSequenceInit)
+    onEvent('game_sequence_init', vGameSequenceInit, handlers.onGameSequenceInit);
+
   // Heartbeat-receiver: per-sender-tracking. Markera bara lastSeen —
   // INGEN auto-'connected'-callback ens om sender:n tidigare var
   // disconnected. Per design (D-iii): återanslutning kräver explicit
@@ -614,8 +813,8 @@ export function subscribeSyncChannel(
   // Retry-knappen, och då ska A:s leaderboard fortsatt visa dem som
   // 'disconnected'.
   channel.on('broadcast', { event: 'network_heartbeat' }, ({ payload }) => {
-    const p = payload as NetworkHeartbeatPayload;
-    if (!p.sender_id || p.sender_id === selfPlayerId) return;
+    const p = vNetworkHeartbeat(payload);
+    if (!p || p.sender_id === selfPlayerId) return;
     lastSeenBySender.set(p.sender_id, Date.now());
   });
   // player_rejoined-receiver: explicit "jag är tillbaka"-signal som B
@@ -625,8 +824,8 @@ export function subscribeSyncChannel(
   // inte fyrar gammal disconnect-callback igen.
   if (handlers.onPlayerRejoined) {
     channel.on('broadcast', { event: 'player_rejoined' }, ({ payload }) => {
-      const p = payload as PlayerRejoinedPayload;
-      if (!p.sender_id || p.sender_id === selfPlayerId) return;
+      const p = vPlayerRejoined(payload);
+      if (!p || p.sender_id === selfPlayerId) return;
       lastSeenBySender.set(p.sender_id, Date.now());
       lastReportedStatus.set(p.sender_id, 'connected');
       handlers.onPlayerRejoined!(p.sender_id);
@@ -634,7 +833,8 @@ export function subscribeSyncChannel(
   }
   if (handlers.onHostRejoined) {
     channel.on('broadcast', { event: 'host_rejoined' }, ({ payload }) => {
-      const p = payload as HostRejoinedPayload;
+      const p = vHostRejoined(payload);
+      if (!p) return;
       handlers.onHostRejoined!(p.sender_id);
     });
   }
@@ -642,11 +842,10 @@ export function subscribeSyncChannel(
   // mergar in score:n i sin lokala allRoundScoresHistory för komplett
   // leaderboard. broadcast.self: false garanterar att sändarens egna klient
   // ALDRIG tar emot sitt eget event.
-  if (handlers.onPlayerScoreRecorded) {
-    channel.on('broadcast', { event: 'player_score_recorded' }, ({ payload }) => {
-      handlers.onPlayerScoreRecorded!(payload as PlayerScoreRecordedPayload);
+  if (handlers.onPlayerScoreRecorded)
+    onEvent('player_score_recorded', vPlayerScoreRecorded, (p) => {
+      if (known(p.player_id, 'player_score_recorded')) handlers.onPlayerScoreRecorded!(p);
     });
-  }
 
   // Subscribe-callback rapporterar channel-state till connectionMonitor.
   // SUBSCRIBED → ok. CHANNEL_ERROR/TIMED_OUT/CLOSED → error. DETTA är

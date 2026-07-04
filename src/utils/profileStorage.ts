@@ -491,22 +491,23 @@ export async function clearProfile(): Promise<void> {
 }
 
 /**
- * Slår upp email för ett givet playerName via Supabase RPC. Används av
- * login-flödet när user skriver in PlayerName istället för email — vi
- * översätter det till email på serversidan och kallar sedan
- * signInWithPassword som vanligt.
+ * Kollar om ett playerName redan är registrerat — driver uniqueness-checken
+ * i Register-formen + Add Player-modalen. Returnerar bara en boolean; ingen
+ * email eller annan profil-data läcker (till skillnad från den tidigare
+ * lookup_email_by_player_name-RPC:n, som togs bort som email-enumererings-
+ * fix i migration 0022).
  *
- * Returnerar null om playerName inte finns. RPC:n är `security definer`
- * så anonyma klienter får kalla den utan att kunna SELECT:a profiles-
- * tabellen direkt (vilket skulle leaka data).
+ * player_name är citext så matchningen är case-insensitiv (samma semantik
+ * som uniqueness-constrainten). Fail-open (false = "ledigt") vid nätverksfel
+ * så lokal validering avgör — matchar tidigare catch-beteende.
  */
-export async function lookupEmailByPlayerName(playerName: string): Promise<string | null> {
-  const { data, error } = await supabase.rpc('lookup_email_by_player_name', {
+export async function playerNameExists(playerName: string): Promise<boolean> {
+  const { data, error } = await supabase.rpc('player_name_exists', {
     p_name: playerName,
   });
   if (error) {
-    console.warn('[profileStorage] lookup_email_by_player_name failed:', error.message);
-    return null;
+    console.warn('[profileStorage] player_name_exists failed:', error.message);
+    return false;
   }
-  return typeof data === 'string' ? data : null;
+  return data === true;
 }

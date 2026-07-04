@@ -867,6 +867,10 @@ type TurnOrderPlayer = {
   assistance?: AssistanceLevel;
   age?: number;
   spotifyConnected?: boolean;
+  // guest/registered från lobby_players — behövs av goToNewLobby:s
+  // carry-over så raderna återskapas med korrekt type. Host-radens 'guest'
+  // är non-host-enheternas detekteringssignal för guest-hostade spel.
+  type?: 'registered' | 'guest';
 };
 
 export default function QuizScreen() {
@@ -892,6 +896,17 @@ export default function QuizScreen() {
     selectedExtraPackages?: string;
     /** 'true' om Spotify DJ-läge är aktiverat i Lobby + host:ns konto kopplat. */
     spotifyEnabled?: string;
+    /** 'true' om spelets host är en guest (lobbyn skapad via "Start Game as
+     *  Guest"). Sätts på ALLA enheter (host-path + non-host-path) — döljer
+     *  Play Again på final leaderboard och skippar Player history-skrivning. */
+    guestHost?: string;
+    /** Guest-identitet (bara host-enheten i guest-hostade spel) — behövs av
+     *  goToNewLobby för att återskapa guest-lobbyn vid Play Again. */
+    guestName?: string;
+    guestBirthYear?: string;
+    /** Antal replays guest-hosten redan förbrukat ('0' default). Max 1 —
+     *  vid '1' visar Final Leaderboard bara Home. */
+    guestReplays?: string;
   }>();
   // Default assistance från URL-param — fallback om turnOrder-spelaren
   // saknar egen assistance-flagga. Per-player-värdet från turnOrder:n
@@ -904,6 +919,15 @@ export default function QuizScreen() {
   // 'true' så direkt-nav (utan Lobby) behåller host-beteende (Quit Game-
   // knapp etc.) — speglar tidigare implicit-host-antagande.
   const isHost = (params.isHost ?? 'true') === 'true';
+  // True när spelets HOST är en guest (oavsett vilken enhet detta är —
+  // på non-host-enheter betyder flaggan "spelets host är guest", inte
+  // "jag är host"). Guest-hostade spel skriver ingen Player history och
+  // har max 1 Play Again-replay (räknas via guestReplaysUsed nedan).
+  const isGuestHostGame = params.guestHost === 'true';
+  // Förbrukade replays (0 = första spelet → Play Again visas; >=1 = detta
+  // ÄR replayn → Final Leaderboard visar bara Home). Bara satt på host-
+  // enheten; non-host styrs istället av hostInitiatedPlayAgain-broadcasten.
+  const guestReplaysUsed = parseInt(params.guestReplays ?? '0', 10) || 0;
   // Det egna player_id:t (= lobby_players.player_id) som Lobby skickade.
   // Används av non-host:s Leave-flöde för att broadcasta `player_left` så
   // host:s skärm kan visa popup + markera spelaren som hasLeft i leader-
@@ -1286,6 +1310,109 @@ export default function QuizScreen() {
       return fallbackImages.length > 0 ? fallbackImages : SEED_QUESTIONS;
     }
 
+    // ── Guest-hostat spel: slumpad käll-mix (Peters trial-design 2026-07-04) ──
+    // Ersätter fas/epok-allokeringen nedan. Mixerboarden är guest-låst
+    // (alla kategorier ON) så poolerna är ofiltrerade; källvariationen
+    // skapas istället här. IndDev-korrekthet krävs bara på HOST-enheten —
+    // non-host renderar exakt hostens frågor via broadcast question_ids.
+    if (isGuestHostGame) {
+      // Spotify i guest-spel (50/50-slant, kräver IndDev — spotifyEnabled
+      // är redan hårt gated på gameMode==='individual-devices'):
+      //   • rounds == players (2-2 eller 4-4) → HELA spelet blir Spotify.
+      //   • 2 spelare + 4 rundor → PARTIELLT: exakt 2 Spotify-frågor
+      //     (insprängda på slumpade positioner bland viktade dragningar).
+      // I båda fallen ger DJ-round-robin (djRotationPlan) varje spelare
+      // exakt en DJ-tur. Slanten (50 %) avgör per spel om Spotify alls
+      // spelas — övriga spel kör ren viktad käll-slump.
+      const fullSpotifyEligible =
+        spotifyEnabled &&
+        totalRounds === turnOrder.length &&
+        spotifyPool.length >= totalRounds;
+      const partialSpotifyEligible =
+        spotifyEnabled &&
+        turnOrder.length === 2 &&
+        totalRounds === 4 &&
+        spotifyPool.length >= 2;
+      let guestSpotifyCount = 0;
+      if ((fullSpotifyEligible || partialSpotifyEligible) && Math.random() < 0.5) {
+        guestSpotifyCount = fullSpotifyEligible ? totalRounds : 2;
+      }
+      if (fullSpotifyEligible && guestSpotifyCount === totalRounds) {
+        return shuffleArray(spotifyPool).slice(0, totalRounds);
+      }
+      // Viktad OBEROENDE dragning per fråga över 6 källa×kategori-celler.
+      // Hints-tungt (75 %) med YouTube-inslag (25 %) — maximerar upplevd
+      // variation i korta 2-4-frågors trial-spel. Vid partiellt Spotify-
+      // spel dras (guestTotal − 2) frågor här och Spotify-frågorna sprängs
+      // in efteråt.
+      const byCat = (pool: QuizQuestion[], cat: MainCategory) =>
+        pool.filter((q) => q.mainCategory === cat);
+      const cells = [
+        { pool: byCat(pureYoutubePool, 'Music'), weight: 0.15 },
+        { pool: byCat(pureYoutubePool, 'Film'), weight: 0.05 },
+        { pool: byCat(pureYoutubePool, 'Sport'), weight: 0.05 },
+        { pool: byCat(imagePool, 'Music'), weight: 0.25 },
+        { pool: byCat(imagePool, 'Film'), weight: 0.2 },
+        { pool: byCat(imagePool, 'Sport'), weight: 0.3 },
+      ];
+      // Totalt antal frågor = rundor × block-storlek (PtP: en fråga per
+      // spelare och runda; IndDev/Single: en per runda) — speglar
+      // questionsPerBlock-formeln i ordinarie flödet nedan.
+      const guestQpb =
+        gameMode === 'individual-devices' || playerCount <= 1 ? 1 : playerCount;
+      const guestTotal = totalRounds * guestQpb;
+      // Partiellt Spotify-spel: reservera slots för Spotify-frågorna —
+      // viktade dragningen fyller bara resten.
+      const weightedTotal = guestTotal - guestSpotifyCount;
+      const picked = new Set<string>();
+      const drawn: QuizQuestion[] = [];
+      for (let i = 0; i < weightedTotal; i++) {
+        // Dedupe + renormalisering: celler vars pool är uttömd utesluts och
+        // vikterna omfördelas proportionellt över resterande.
+        const avail = cells
+          .map((c) => ({ weight: c.weight, pool: c.pool.filter((q) => !picked.has(q.id)) }))
+          .filter((c) => c.pool.length > 0);
+        let pickPool: QuizQuestion[];
+        if (avail.length === 0) {
+          // Alla celler uttömda (mycket små pooler) → dra ur samlade
+          // poolen utan dedupe hellre än att korta spelet.
+          pickPool = [...pureYoutubePool, ...imagePool];
+          if (pickPool.length === 0) break;
+        } else {
+          const totalW = avail.reduce((sum, c) => sum + c.weight, 0);
+          let r = Math.random() * totalW;
+          let chosen = avail[avail.length - 1];
+          for (const c of avail) {
+            r -= c.weight;
+            if (r <= 0) {
+              chosen = c;
+              break;
+            }
+          }
+          pickPool = chosen.pool;
+        }
+        const q = pickPool[Math.floor(Math.random() * pickPool.length)];
+        picked.add(q.id);
+        drawn.push(q);
+      }
+      // Partiellt Spotify-spel: spräng in Spotify-frågorna på slumpade
+      // positioner i den viktade sekvensen. DJ-round-robin scannar
+      // gameQuestions i ordning och tilldelar DJ per Spotify-fråga —
+      // positionerna spelar ingen roll för att båda spelarna ska få
+      // varsin DJ-tur.
+      if (guestSpotifyCount > 0) {
+        const spotifyPicks = shuffleArray(spotifyPool).slice(0, guestSpotifyCount);
+        for (const sq of spotifyPicks) {
+          const pos = Math.floor(Math.random() * (drawn.length + 1));
+          drawn.splice(pos, 0, sq);
+        }
+      }
+      if (drawn.length > 0) return drawn;
+      // Defensivt: inget kunde dras (borde inte hända — all-tomt-fallbacken
+      // ovan har redan hanterat helt tomma pooler) → fall igenom till
+      // ordinarie allokering.
+    }
+
     // ── Epok-viktad frågeurval (ersätter prioritiseUnseen + kategori-gruppering) ──
     //
     // PtP (questionsPerBlock > 1): frågor tilldelas spelare via födelseårs-affinitet
@@ -1401,7 +1528,7 @@ export default function QuizScreen() {
       return SEED_QUESTIONS;
     }
     return mixed;
-  }, [eraFrom, eraTo, turnOrder, totalRounds, youtubeEnabled, imagesEnabled, gameMode, youtubeEnabledCategories, imagesEnabledCategories, seenQuestionIds, lastSessionIds, spotifyEnabled]);
+  }, [eraFrom, eraTo, turnOrder, totalRounds, youtubeEnabled, imagesEnabled, gameMode, youtubeEnabledCategories, imagesEnabledCategories, seenQuestionIds, lastSessionIds, spotifyEnabled, isGuestHostGame]);
 
   // Synkron ref som alltid pekar på aktuell gameQuestions — används av
   // game_sequence_init-broadcasten utan att göra subscription-effekten
@@ -2348,8 +2475,16 @@ export default function QuizScreen() {
     // starten. Utan denna korrigering börjar timern alltid om från full
     // responseSeconds fastän host redan räknat ner en bit.
     let effectiveSeconds: number = responseSeconds;
-    if (!isHost && hostTimerStartAtRef.current > 0) {
-      const elapsed = Math.floor((Date.now() - hostTimerStartAtRef.current) / 1000);
+    // Host-sidan kompenserar OCKSÅ — men BARA mot Spotify-timerns stämpel
+    // (host-DJ som återvänder från Spotify-appen efter att reserve-
+    // aktiveraren startat timern). play_command-stämpeln är host:s egen
+    // och ska inte kompenseras — därav den separata Spotify-ref:en.
+    // Utan denna gren startade host-DJ:ns timer om från FULL tid vid heal.
+    const timerSyncAt = !isHost
+      ? hostTimerStartAtRef.current
+      : spotifyTimerStartAtRef.current;
+    if (timerSyncAt > 0) {
+      const elapsed = Math.floor((Date.now() - timerSyncAt) / 1000);
       if (elapsed > 0) {
         effectiveSeconds = Math.max(0, responseSeconds - elapsed);
       }
@@ -3345,6 +3480,10 @@ export default function QuizScreen() {
     // Används för synk på mottagarsidan OCH för non-host DJ:s egna enhet
     // (de tar aldrig emot sin egna broadcast via broadcast.self:false).
     const timerStartAt = Date.now() + 2000;
+    // Spara stämpeln på aktiverarens egen enhet — driver heartbeat-
+    // re-broadcasten nedan (DJ:n kan ha missat original-broadcasten om
+    // Realtime-socketen dog medan appen låg i Spotify-bakgrunden).
+    spotifyTimerStartAtRef.current = timerStartAt;
     if (phaseRef.current === 'question' || phaseRef.current === 'awaiting') {
       // Non-host DJ: uppdatera hostTimerStartAtRef lokalt så startTimer()
       // inte kompenserar för stale play_command-tid (~30 s tillbaka i tiden).
@@ -3363,6 +3502,37 @@ export default function QuizScreen() {
         .catch(() => {});
     }
   };
+
+  // ── Spotify timer-heartbeat (aktiverarens enhet) ─────────────────────────
+  // DJ:n är i Spotify-appen när timern startas — iOS fryser JS och Realtime-
+  // socketen kan dö i bakgrunden, så original-broadcasten av
+  // spotify_dj_track_started kan missas HELT av DJ:ns enhet (Realtime
+  // replayar inte missade meddelanden vid re-subscribe). Utan heal fastnar
+  // DJ:n i question-fasen med still-stående timer → hela spelet blockas
+  // eftersom DJ:n (ofta host) äger Next-knappen. Aktiveraren re-broadcastar
+  // därför start-stämpeln var 5:e sekund tills frågan avancerar
+  // (questionIndex-dep → cleanup). Mottagar-handlern är idempotent
+  // (setSpotifyDJStarted(true) + samma ref-värden + timerActive-no-op) så
+  // redan synkade enheter påverkas inte; en återvändande DJ healar inom
+  // ~5 s via onSpotifyDJTrackStarted → elapsed-kompenserad startTimer
+  // eller timeLeft=0 → reveal om tiden redan gått ut.
+  useEffect(() => {
+    if (gameMode !== 'individual-devices') return;
+    if (!isSpotifyQuestion || !spotifyDJStarted || isCurrentPlayerDJ) return;
+    if (!isTimerActivator) return;
+    const id = setInterval(() => {
+      if (spotifyTimerStartAtRef.current === 0) return;
+      if (!currentSpotifyTrackId || !currentDJPlayer || !syncChannelRef.current) return;
+      syncChannelRef.current
+        .broadcastSpotifyDJTrackStarted({
+          dj_player_id: currentDJPlayer.id,
+          spotify_track_id: currentSpotifyTrackId,
+          timer_start_at: spotifyTimerStartAtRef.current,
+        })
+        .catch(() => {});
+    }, 5000);
+    return () => clearInterval(id);
+  }, [gameMode, isSpotifyQuestion, spotifyDJStarted, isCurrentPlayerDJ, isTimerActivator, questionIndex, currentSpotifyTrackId, currentDJPlayer]);
 
   // DJ:n överlämnar till host i reveal-fasen — låser upp host:s Next-knapp.
   const handleDJHandover = () => {
@@ -3593,14 +3763,28 @@ export default function QuizScreen() {
       // Reset answer-state så B inte ärver pending-svar från förra fråga
       // (kan finnas kvar om B retry:ade i sticky-låst tillstånd och inte
       // nådde nästa rondens normalt-rensa-path via handleAdvanceToNextRound).
-      setPendingYear(null);
-      setSelectedYear(null);
-      setConfirmedCorrect(null);
-      setPendingNameOption(null);
-      setConfirmedNameOption(null);
-      setPendingActorName(null);
-      setConfirmedActorName(null);
-      setConfirmedTimeUsed(null);
+      //
+      // GATED på phase='intro' (2026-07-03) — speglar setPhase-guarden nedan.
+      // En sen/re-broadcastad play_command (t.ex. rejoin-heal:ens 500ms-
+      // re-broadcast när någon enhets nätverk flappar mid-fråga) som anländer
+      // i question/awaiting/reveal får ALDRIG wipe:a ett redan bekräftat
+      // svar. Utan guarden raderades confirmedNameOption efter Confirm på
+      // Spotify/Name-frågor → reveal:en renderade som time-out (ingen
+      // gold-ram runt bekräftade raden). Samma wipe låg bakom det tidigare
+      // selectedYear-symptomet som confirmedCorrect-statet workaround:ade.
+      // Retry-fallet som resetten skyddar mot täcks fortsatt:
+      // handleRetryFromUnstable sätter phase='intro' innan nästa
+      // play_command tas emot, så resetten fyrar där den ska.
+      if (phaseRef.current === 'intro') {
+        setPendingYear(null);
+        setSelectedYear(null);
+        setConfirmedCorrect(null);
+        setPendingNameOption(null);
+        setConfirmedNameOption(null);
+        setPendingActorName(null);
+        setConfirmedActorName(null);
+        setConfirmedTimeUsed(null);
+      }
       // Defensiv: bara från intro-phase tillåts countdown-transition.
       // Skyddar mot late-arriving broadcasts efter att non-host redan
       // advancerat (t.ex. via reconnect i D-vi senare).
@@ -3711,7 +3895,10 @@ export default function QuizScreen() {
     // från quiz-state vid kall-tiden (= värden som faktiskt användes
     // i spelet). Tom rounds-array (shouldn't happen men defensiv) →
     // skippa append:n så vi inte spammar 0/NaN-entries.
-    if (rounds.length > 0) {
+    // Guest-hostade spel skrivs ALDRIG till Player history — även när en
+    // inloggad user spelat som guest (guest-spel är anonyma per design).
+    // saveLatestResult ovan behålls (bara använd direkt efter spelet).
+    if (rounds.length > 0 && !isGuestHostGame) {
       const totalTime = rounds.reduce((sum, r) => sum + (r.timeUsed ?? 0), 0);
       const correctAnswers = rounds.filter((r) => r.correct).length;
       const profile = await loadProfile();
@@ -3765,6 +3952,7 @@ export default function QuizScreen() {
         assistance: fallbackAssistance,
         total_points: totalPoints,
         rounds_played: rounds.length,
+        guest_host: isGuestHostGame,
       });
     }
   }, [phase, isLastQuestion]);
@@ -3780,9 +3968,17 @@ export default function QuizScreen() {
     // Ladda host-profilen FÖRE players-listan byggs så host:s riktiga
     // playerName + avatar bär in i carry-over (annars hade host:s rad i
     // nya lobby:n stått som 'You'/🎮 tills mergeProfileIntoHost hann fyra).
-    const profile = await loadProfile();
-    const hostName = profile?.playerName?.trim() || 'You';
-    const hostEmoji = profile ? getAvatarEmojiById(profile.selectedAvatarId) : '🎮';
+    // Guest host: skippa profilen HELT — replay-lobbyn ska bära guest-
+    // identiteten (guestName/👤) även om en profil råkar finnas på enheten.
+    const profile = isGuestHostGame ? null : await loadProfile();
+    const hostName = isGuestHostGame
+      ? (params.guestName?.trim() || turnOrder[0]?.name || 'Guest')
+      : profile?.playerName?.trim() || 'You';
+    const hostEmoji = isGuestHostGame
+      ? '👤'
+      : profile
+        ? getAvatarEmojiById(profile.selectedAvatarId)
+        : '🎮';
     // Bygg carry-over-listan UTANFÖR if/else så vi kan referera den senare
     // för att skriva direkt till lobby_players-tabellen (innan broadcast)
     // — annars hinner inte host:s LobbyScreen mounta + skriva via useEffect
@@ -3794,19 +3990,29 @@ export default function QuizScreen() {
       // false` så de hamnar i "To be approved by Host"-listan i nya
       // lobbyn — host måste re-approva dem innan nästa Start Game.
       // Host själv är alltid implicit approved.
-      carryOverPlayers = allPlayers.map((p) => ({
-        id: p.id,
-        name: p.isYou ? hostName : p.name,
-        emoji: p.isYou ? hostEmoji : p.emoji,
-        isReady: true,
-        type: 'registered' as const,
-        age: keepSettings || p.isYou ? p.age : 30,
-        assistance: keepSettings || p.isYou ? p.assistance : 'standard',
-        hcpComplete: true,
-        isHost: p.isHost ?? false,
-        approved: !!p.isHost,
-        spotifyConnected: turnOrder.find((t) => t.id === p.id)?.spotifyConnected ?? false,
-      }));
+      carryOverPlayers = allPlayers.map((p) => {
+        const turnEntry = turnOrder.find((t) => t.id === p.id);
+        // type carry:as från turnOrder (LobbyScreen skickar med den sedan
+        // 2026-07-04). Host-raden i guest-hostade spel FORCERAS 'guest' —
+        // det är non-host-enheternas detekteringssignal (storedHostIsGuest
+        // nycklar på host-radens type) för att dölja Play Again i replayn.
+        // Fallback 'registered' bevarar tidigare beteende för gamla payloads.
+        const carriedType: 'registered' | 'guest' =
+          isGuestHostGame && p.isHost ? 'guest' : turnEntry?.type ?? 'registered';
+        return {
+          id: p.id,
+          name: p.isYou ? hostName : p.name,
+          emoji: p.isYou ? hostEmoji : p.emoji,
+          isReady: true,
+          type: carriedType,
+          age: keepSettings || p.isYou ? p.age : 30,
+          assistance: keepSettings || p.isYou ? p.assistance : 'standard',
+          hcpComplete: true,
+          isHost: p.isHost ?? false,
+          approved: !!p.isHost,
+          spotifyConnected: turnEntry?.spotifyConnected ?? false,
+        };
+      });
       await savePendingLobbyPlayers(carryOverPlayers);
     } else {
       // Tom lobby förutom host. **KRITISKT**: host:s id MÅSTE vara `'1'`
@@ -3826,9 +4032,10 @@ export default function QuizScreen() {
         name: hostName,
         emoji: hostEmoji,
         isReady: true,
-        type: 'registered',
+        // Guest host: type 'guest' även på fresh-raden (detekteringssignal).
+        type: isGuestHostGame ? 'guest' : 'registered',
         age,
-        assistance: fallbackAssistance,
+        assistance: isGuestHostGame ? 'full' : fallbackAssistance,
         hcpComplete: true,
         isHost: true,
       }];
@@ -3843,10 +4050,12 @@ export default function QuizScreen() {
     // TODO (subscription): byt hardcoded `false` mot riktig profile.isPremium.
     const initialCount = reusePlayers ? Math.max(1, allPlayers.length) : 1;
     await registerActiveRoom(newCode, {
-      maxPlayers: profile?.maxPlayers ?? 4,
+      // Guest host är alltid Free-nivå: max 4, ingen premium; hostPlayerName
+      // = guest-namnet så own-lobby-detekteringen fungerar för replayn.
+      maxPlayers: isGuestHostGame ? 4 : profile?.maxPlayers ?? 4,
       hostIsPremium: false,
       currentPlayerCount: initialCount,
-      hostPlayerName: profile?.playerName ?? '',
+      hostPlayerName: isGuestHostGame ? hostName : profile?.playerName ?? '',
       gameStarted: false,
     });
     // Färsk leftPlayers-store + lobbyPlayers-store + ejected-store för nya
@@ -3917,6 +4126,27 @@ export default function QuizScreen() {
         .broadcastPlayAgainLobbyReady({ room_code: newCode })
         .catch(() => {});
     }
+    if (isGuestHostGame) {
+      // Replay-lobbyn förblir guest-hostad: guest-identiteten + räknaren
+      // (+1) följer med så nästa Final Leaderboard visar bara Home.
+      // guestBirthYear-fallback: härled från host-kortets age om paramet
+      // saknas (äldre payloads) — LobbyScreen kräver värdet för host-kortet.
+      const birthYearParam =
+        params.guestBirthYear?.trim() ||
+        String(new Date().getFullYear() - (turnOrder[0]?.age ?? 30));
+      router.replace({
+        pathname: '/lobby',
+        params: {
+          code: newCode,
+          isHost: 'true',
+          guestHost: 'true',
+          guestName: hostName,
+          guestBirthYear: birthYearParam,
+          guestReplays: String(guestReplaysUsed + 1),
+        },
+      });
+      return;
+    }
     router.replace(`/lobby?code=${newCode}&isHost=true`);
   };
 
@@ -3956,6 +4186,9 @@ export default function QuizScreen() {
   };
 
   const handlePlayAgain = async () => {
+    // Guest host har max 1 replay — knappen är redan dold vid >= 1 (Round-
+    // Leaderboard), detta är belt-and-suspenders mot oväntade call-paths.
+    if (isGuestHostGame && guestReplaysUsed >= 1) return;
     // Broadcasta intent IMMEDIATELY innan vi öppnar dialogerna — non-host:s
     // "Approve Play Again"-knapp ska lysa upp så snart host tappat, oavsett
     // hur lång tid host tar på sig i credit-gate-popupen eller re-use-
@@ -3974,30 +4207,35 @@ export default function QuizScreen() {
     // jämför mot aktuellt värde. Bättre att fånga det här innan vi visar
     // re-use-players-prompten — annars fyller man i 2 alerts och får sedan
     // blockaden i Lobby:n vid Start Game.
-    const [freshProfile, hasPremium] = await Promise.all([
-      loadProfile(),
-      hasPremiumSubscription(),
-    ]);
-    // Membership = obegränsade host-spel; ingen gate. Lobby:s handleStartGame
-    // skippar också deduktionen så Free/Extras-saldon förblir orörda.
-    if (!hasPremium) {
-      const free = freshProfile?.freeGameCredits ?? 0;
-      const extras = freshProfile?.gameCredits ?? 0;
-      if (free === 0 && extras === 0) {
-        Alert.alert(
-          'Out of Host Game Credits',
-          'You have no credits left for today. Buy extra credits in Store, wait for the daily refresh at midnight CET, or upgrade to a QuizVibe membership for unlimited host games.',
-          [
-            { text: 'Cancel', style: 'cancel' },
-            // Pushar Store UTAN `from=...`-paramet så Store:s Back-knapp fall:er
-            // till `router.back()` istället för `router.replace(from)`. Det
-            // bevarar /quiz på root Stack:en med Final Leaderboard-state intakt
-            // — annars hade replace:n unmountat Quiz-komponenten och spelaren
-            // skulle landa på en tom /quiz-vy efter köpet.
-            { text: 'Go to Store', onPress: () => router.push('/store?focus=credits') },
-          ],
-        );
-        return;
+    // Guest host: gaten skippas HELT — guest-spel förbrukar aldrig credits,
+    // och en inloggad user som spelar som guest ska varken blockeras av
+    // eller belasta sitt eget saldo.
+    if (!isGuestHostGame) {
+      const [freshProfile, hasPremium] = await Promise.all([
+        loadProfile(),
+        hasPremiumSubscription(),
+      ]);
+      // Membership = obegränsade host-spel; ingen gate. Lobby:s handleStartGame
+      // skippar också deduktionen så Free/Extras-saldon förblir orörda.
+      if (!hasPremium) {
+        const free = freshProfile?.freeGameCredits ?? 0;
+        const extras = freshProfile?.gameCredits ?? 0;
+        if (free === 0 && extras === 0) {
+          Alert.alert(
+            'Out of Host Game Credits',
+            'You have no credits left for today. Buy extra credits in Store, wait for the daily refresh at midnight CET, or upgrade to a QuizVibe membership for unlimited host games.',
+            [
+              { text: 'Cancel', style: 'cancel' },
+              // Pushar Store UTAN `from=...`-paramet så Store:s Back-knapp fall:er
+              // till `router.back()` istället för `router.replace(from)`. Det
+              // bevarar /quiz på root Stack:en med Final Leaderboard-state intakt
+              // — annars hade replace:n unmountat Quiz-komponenten och spelaren
+              // skulle landa på en tom /quiz-vy efter köpet.
+              { text: 'Go to Store', onPress: () => router.push('/store?focus=credits') },
+            ],
+          );
+          return;
+        }
       }
     }
 
@@ -4013,8 +4251,15 @@ export default function QuizScreen() {
     // tillbaka till Final Leaderboard utan att tvingas till Reset/Keep.
     if (gameMode === 'pass-the-phone') {
       const isSinglePlayer = turnOrder.length === 1;
+      // Guest host: skippa Keep/Reset-settings-prompten — guest-lobbyns
+      // settings är i praktiken låsta (60s/Full/full era) så frågan är
+      // meningslös; carry:a alltid (keepSettings=true).
       if (isSinglePlayer) {
-        askKeepSettingsThenGo(true);
+        if (isGuestHostGame) {
+          goToNewLobby(true, true);
+        } else {
+          askKeepSettingsThenGo(true);
+        }
       } else {
         Alert.alert(
           'Re-use all players?',
@@ -4022,7 +4267,11 @@ export default function QuizScreen() {
           [
             { text: 'Cancel', style: 'cancel' },
             { text: 'Start fresh', onPress: () => goToNewLobby(false) },
-            { text: 'Yes, keep them', onPress: () => askKeepSettingsThenGo() },
+            {
+              text: 'Yes, keep them',
+              onPress: () =>
+                isGuestHostGame ? goToNewLobby(true, true) : askKeepSettingsThenGo(),
+            },
           ],
         );
       }
@@ -4493,9 +4742,24 @@ export default function QuizScreen() {
   const [playerConnectionStatus, setPlayerConnectionStatus] = useState<
     Record<string, 'connected' | 'disconnected'>
   >({});
+  // Roster-ref för broadcast sender-validering (syncChannel isKnownSender).
+  // Håller aktuella turnOrder-player-ids så en fientlig klient inte kan
+  // injicera player-id-bärande events (fake score/leave/approval) för ett id
+  // som inte finns i lobbyn. Ref (inte state) så predikatet är stabilt utan
+  // att re-subscribe:a channel:n vid varje roster-ändring.
+  const turnOrderIdSetRef = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    turnOrderIdSetRef.current = new Set(turnOrder.map((p) => p.id));
+  }, [turnOrder]);
   useEffect(() => {
     if (gameMode !== 'individual-devices' || !params.roomCode) return;
     const sync = subscribeSyncChannel(params.roomCode, selfPlayerId, {
+      // Droppar player-id-bärande events vars id inte är i lobbyn. Fail-open
+      // tills rostern populerats (undviker false-drop på tidiga events).
+      isKnownSender: (id: string) => {
+        const set = turnOrderIdSetRef.current;
+        return set.size === 0 || set.has(id);
+      },
       onPlayCommand: (payload) => {
         // Synka host:s Spotify-svarstyps-inställningar för GetReady-kö-badge.
         if (payload.spotify_answer_year !== undefined) setBroadcastHostSpotifyAnswerYear(payload.spotify_answer_year);
@@ -4999,6 +5263,8 @@ export default function QuizScreen() {
           onApprovePlayAgain={handleApprovePlayAgain}
           isLastRound={isLastQuestion}
           isHost={isHost}
+          guestHost={isGuestHostGame}
+          guestReplaysUsed={guestReplaysUsed}
           hostInitiatedPlayAgain={hostInitiatedPlayAgain}
           allRoundScoresHistory={allRoundScoresHistory}
           hcpChanges={isLastQuestion ? playerHcpChanges : undefined}
@@ -5099,7 +5365,13 @@ export default function QuizScreen() {
                         allApproved
                           ? () => {
                               setPlayAgainModalVisible(false);
-                              askKeepSettingsThenGo();
+                              // Guest host: hoppa Keep/Reset-prompten —
+                              // settings är låsta, carry:a alltid.
+                              if (isGuestHostGame) {
+                                goToNewLobby(true, true);
+                              } else {
+                                askKeepSettingsThenGo();
+                              }
                             }
                           : undefined
                       }

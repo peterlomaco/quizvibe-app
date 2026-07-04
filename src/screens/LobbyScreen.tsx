@@ -86,7 +86,7 @@ import {
   PLAYER_NAME_MAX_LETTERS,
 } from '../utils/playerName';
 import { containsProfanity } from '../utils/profanity';
-import { loadProfile, lookupEmailByPlayerName, saveProfile, type ProfileData, type Region as ProfileRegion } from '../utils/profileStorage';
+import { loadProfile, playerNameExists, saveProfile, type ProfileData, type Region as ProfileRegion } from '../utils/profileStorage';
 import { hasPremiumSubscription } from '../utils/subscriptionStorage';
 import { ROOM_CODE_DIGITS, ROOM_CODE_LEADING_LETTERS, formatRoomCode, generateRoomCode } from '../utils/roomCode';
 import { addInvite, clearWaitingInvitesForRoom } from '../utils/waitingInvites';
@@ -491,8 +491,8 @@ function AddPlayerModal({ visible, onClose, onAdd, takenGuestLetters, existingNa
     }
     // Riktigt uniqueness-check mot Supabase: om namnet finns → 'taken'.
     try {
-      const existing = await lookupEmailByPlayerName(normalized);
-      setPlayerNameStatus(existing ? 'taken' : 'available');
+      const exists = await playerNameExists(normalized);
+      setPlayerNameStatus(exists ? 'taken' : 'available');
     } catch {
       setPlayerNameStatus('available');
     }
@@ -1008,17 +1008,28 @@ export default function LobbyScreen() {
     code,
     isHost,
     asGuest,
+    guestHost,
     guestName,
     guestBirthYear,
     guestAssistance,
+    guestReplays,
     carryOverPlayerId,
   } = useLocalSearchParams<{
     code: string;
     isHost: string;
     asGuest?: string;
+    /** 'true' när lobbyn skapats via "Start Game as Guest" — hosten spelar
+     *  under Guest-identitet (guestName/guestBirthYear) utan profil.
+     *  Driver isGuestHost som låser settings-UI:t + skippar credit-gaten. */
+    guestHost?: string;
     guestName?: string;
     guestBirthYear?: string;
     guestAssistance?: string;
+    /** Antal Play Again-replays guest-hosten redan förbrukat ('0' default).
+     *  Sätts till '1' av quiz.tsx:s goToNewLobby när guest host trycker
+     *  Play Again — forwardas till quiz så Final Leaderboard kan dölja
+     *  Play Again efter den andra spelomgången (max 1 replay). */
+    guestReplays?: string;
     /** Play Again carry-over: non-host:s player_id från föregående spel.
      *  Sätts av quiz.tsx vid navigation → LobbyScreen hoppar DB-beroende
      *  dup-detection och ärver rätt id direkt. */
@@ -1033,6 +1044,12 @@ export default function LobbyScreen() {
   // i URL-params. Driver TopUserBanner:s guest-pill samt tap-handler-
   // branchen som öppnar Leave-room-sheet:n istället för Profile-tabben.
   const isGuestInRoom = guestMode && !!guestName?.trim();
+  // Guest HOST — lobbyn skapades via "Start Game as Guest". Hosten spelar
+  // under Guest-identitet (även om en profil råkar finnas på enheten).
+  // Låser settings till fasta värden (60s, Full, max 4 rundor/spelare,
+  // fulla era-spannet, inga paket), döljer credits-pill + Share invite
+  // och skippar credit-gaten i handleStartGame.
+  const isGuestHost = hostMode && guestHost === 'true' && !!guestName?.trim();
 
   // Initial = tom; mount-useEffect på [code, guestMode, ..., hostMode] sätter
   // till [SEED_PLAYERS[0]] för host eller [] för non-host. SEED_PLAYERS som
@@ -1141,8 +1158,33 @@ export default function LobbyScreen() {
     // till rooms-tabellen → joiners ser "Lobby is full" direkt. Mock-spelarna
     // (Sam L./Jordan M./Casey P.) lämnas i SEED_PLAYERS-konstanten för
     // ev. framtida QA-användning men injiceras inte längre automatiskt.
+    // Guest host: seed:a host-kortet direkt från guest-params istället för
+    // SEED_PLAYERS — ingen profil-merge sker (mergeProfileIntoHost är gated
+    // på !isGuestHost). id '1' behålls: host-kort-maskineriet (bl.a. Start
+    // Fresh-carry-over i quiz.tsx) antar SEED_PLAYERS[0].id === '1'.
+    // type 'guest' på host-raden är signalen non-host-enheter använder för
+    // att detektera guest-hostat spel (döljer Play Again på final leaderboard).
     // Non-host: starta med tom lista — polling/Realtime fyller i host:s lista.
-    setPlayers(hostMode ? [SEED_PLAYERS[0]] : []);
+    setPlayers(
+      hostMode
+        ? isGuestHost
+          ? [{
+              id: '1',
+              name: guestName!.trim(),
+              emoji: '👤',
+              isReady: true,
+              type: 'guest',
+              age: guestBirthYear
+                ? CURRENT_YEAR - parseInt(guestBirthYear, 10)
+                : undefined,
+              assistance: 'full',
+              hcpComplete: true,
+              isHost: true,
+              approved: true,
+            }]
+          : [SEED_PLAYERS[0]]
+        : [],
+    );
     ownPlayerIdRef.current = null;
     selfEverInStoredRef.current = false;
     navigatedToQuizRef.current = false;
@@ -1157,7 +1199,41 @@ export default function LobbyScreen() {
     //      år, ROUNDS_DEFAULT, 30 sek) som hard-baseline.
     // Effekten triggar både vid första mount OCH vid Play Again-återinträde
     // (component re-mountar).
-    if (hostMode) {
+    if (isGuestHost) {
+      // Guest host: ingen PROFIL-läsning — även en inloggad user som valt
+      // "Start Game as Guest" ska få guest-värdena, inte sina host-defaults.
+      // Stored lobby_settings LÄSES däremot för de guest-VARIABLA fälten
+      // (gameMode/singlePlayerDefault/roundsCount/spotifyEnabled) så
+      // "Play Again + keep players" bevarar guest-hostens val — quiz.tsx:s
+      // goToNewLobby skriver carry-over-settings till nya rumkoden innan
+      // navigation. Fresh lobby saknar stored-rad → defaults nedan.
+      // Låsta fält förblir ALLTID hårdkodade (maxPlayers 4, 60s, full era,
+      // inga paket, alla source-kategorier ON — Mixerboard är guest-låst).
+      getLobbySettings(roomCode).then((stored) => {
+        if (cancelled) return;
+        setGameMode(stored?.gameMode ?? 'pass-the-phone');
+        setSinglePlayerDefault(stored?.singlePlayerDefault ?? false);
+        setMaxPlayers(4);
+        setRegion('Sweden');
+        setAnswerResponseSeconds(60);
+        setEraValues([ERA_MIN, ERA_MAX]);
+        // Clampa mot guest-utbudet {2, 4} — defensivt mot oväntade värden.
+        setRoundsCount(
+          stored?.roundsCount === 2 ? 2 : stored?.roundsCount === 4 ? 4 : ROUNDS_DEFAULT,
+        );
+        setSelectedExtraPackages([]);
+        setSketchEnabled(false);
+        // Spotify-carry: connection re-verifieras av "Spotify not connected"-
+        // guarden i handleStartGame — ingen egen reconnect-koll behövs här.
+        setSpotifyEnabled(stored?.spotifyEnabled ?? false);
+        setEnabledHostPackages([]);
+        setYoutubeEnabledCategories(defaultEnabledMainCategories());
+        setImagesEnabledCategories(defaultEnabledMainCategories());
+        // Släpp debounce-skrivningen till lobby_settings så non-hosts ser
+        // de fasta värdena via sin settings-sync.
+        lobbySeededRef.current = true;
+      });
+    } else if (hostMode) {
       Promise.all([loadProfile(), getLobbySettings(roomCode), hasPremiumSubscription()]).then(
         ([profile, stored, premium]) => {
           if (cancelled) return;
@@ -1411,7 +1487,7 @@ export default function LobbyScreen() {
       if (seedHost) ownPlayerIdRef.current = seedHost.id;
     });
     return () => { cancelled = true; };
-  }, [code, guestMode, guestName, guestBirthYear, guestAssistance, hostMode, carryOverPlayerId]);
+  }, [code, guestMode, guestName, guestBirthYear, guestAssistance, hostMode, isGuestHost, carryOverPlayerId]);
 
   // Varje gång Lobby får fokus (t.ex. man kommer tillbaka från Profile-tabben):
   // ladda sparad profil och uppdatera host-spelarkortet med profilens värden.
@@ -1442,8 +1518,10 @@ export default function LobbyScreen() {
             );
             // Seed spotifyEnabled — prio: carry-over stored lobby setting >
             // profil-default. Kräver Premium + connected för att aktivera DJ-läget.
+            // Guest host: hoppa över seedingen — Spotify startar alltid AV
+            // (guest togglar på manuellt i Source Mixerboard om önskat).
             const ok = connected && status.isPremium;
-            if (ok) {
+            if (ok && !isGuestHost) {
               Promise.all([loadProfile(), getLobbySettings(roomCode)]).then(
                 ([profile, lobbySt]) => {
                   if (!active) return;
@@ -1469,7 +1547,10 @@ export default function LobbyScreen() {
         hasPremiumSubscription(),
       ]).then(([profile, leftSnapshots, stored, premium]) => {
         if (!active) return;
-        setHasPremium(premium);
+        // Guest host är alltid Free-nivå — en inloggad premium-user som
+        // valt "Start Game as Guest" ska inte få premium-auto-beteenden
+        // (Max 12-autolås i IndDev, 20-runders stepper, etc.).
+        setHasPremium(isGuestHost ? false : premium);
         // Speglar Profile:s credits-pill — refresh-logiken i loadProfile
         // top-up:ar `freeGameCredits` till FREE_CREDITS_DAILY_CAP vid första
         // load efter midnatt CET, så lobbyn visar alltid aktuellt värde.
@@ -1493,7 +1574,9 @@ export default function LobbyScreen() {
             // få den nuvarande user:s profil-data tilldelad — annars ser det
             // ut som att joinaren är host eftersom HOST-badge:n + ens egen
             // avatar/namn syns på det kortet.
-            let next = hostMode && profile && p.isHost ? mergeProfileIntoHost(p, profile) : p;
+            // Guest host: merge:a ALDRIG profilen — host-kortet bär guest-
+            // identiteten (guestName/ålder/Full) även om en profil finns.
+            let next = hostMode && !isGuestHost && profile && p.isHost ? mergeProfileIntoHost(p, profile) : p;
             if (next.isHost) {
               // Rör INTE next.spotifyConnected här — det sätts av den parallella
               // getSpotifyConnectionStatus-kedjans setPlayers-patch. Om vi skriver
@@ -1531,7 +1614,7 @@ export default function LobbyScreen() {
       return () => {
         active = false;
       };
-    }, [roomCode]),
+    }, [roomCode, isGuestHost]),
   );
   const [addModalVisible, setAddModalVisible] = useState(false);
   const ROOM_LOGO_SIZE = 104;
@@ -1868,7 +1951,20 @@ export default function LobbyScreen() {
 
   // YouTube och Hints (imagesEnabledCategories) är oberoende — ingen auto-sync.
 
+  // Guest host: Mixerboarden är LÅST (alla kategorier ON, källor slumpas
+  // per fråga i quiz.tsx) — bara Spotify på/av är valbart. Switcharna
+  // renderas ENABLED (disabled-Switch sväljer tap → ingen Alert skulle
+  // kunna fyras) men onValueChange pekar hit istället för settern, så
+  // värdet snappar tillbaka visuellt (samma mönster som Year/Name-
+  // togglarna). Registrerings-trigger per Peters trial-design 2026-07-04.
+  const guestLockAlert = () =>
+    Alert.alert(
+      'Locked for Guest Host',
+      'Activation/deactivation only applicable by QuizVibe users Host',
+    );
+
   const handleToggleAllSources = (value: boolean) => {
+    if (isGuestHost) { guestLockAlert(); return; }
     if (!value && !spotifyEnabled) {
       Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
       return;
@@ -1882,6 +1978,7 @@ export default function LobbyScreen() {
   };
 
   const handleToggleArtistsColumn = (value: boolean) => {
+    if (isGuestHost) { guestLockAlert(); return; }
     if (!value && !spotifyEnabled) {
       // Column-toggle stänger av BÅDA källorna → Artists alltid inaktiv efteråt.
       const remainingActorsAthletes = [
@@ -1904,6 +2001,7 @@ export default function LobbyScreen() {
   };
 
   const handleToggleActorsColumn = (value: boolean) => {
+    if (isGuestHost) { guestLockAlert(); return; }
     if (!value && !spotifyEnabled) {
       const artistsActive = youtubeEnabledCategories.includes('Music') || imagesEnabledCategories.includes('Music');
       if (!artistsActive) {
@@ -1927,6 +2025,7 @@ export default function LobbyScreen() {
   };
 
   const handleToggleAthletesColumn = (value: boolean) => {
+    if (isGuestHost) { guestLockAlert(); return; }
     if (!value && !spotifyEnabled) {
       const artistsActive = youtubeEnabledCategories.includes('Music') || imagesEnabledCategories.includes('Music');
       if (!artistsActive) {
@@ -1954,6 +2053,7 @@ export default function LobbyScreen() {
   // för den aktuella kolumnen OCH det är sista aktiva kolumnen.
 
   const handleToggleArtistsYoutube = (value: boolean) => {
+    if (isGuestHost) { guestLockAlert(); return; }
     if (!value && !spotifyEnabled) {
       // Artists inaktiv efteråt bara om Hints Music OCKSÅ är av.
       const artistsWouldStillBeActive = imagesEnabledCategories.includes('Music');
@@ -1981,6 +2081,7 @@ export default function LobbyScreen() {
   };
 
   const handleToggleArtistsGuessWho = (value: boolean) => {
+    if (isGuestHost) { guestLockAlert(); return; }
     if (!value && !spotifyEnabled) {
       // Artists inaktiv efteråt bara om YouTube Music OCKSÅ är av.
       const artistsWouldStillBeActive = youtubeEnabledCategories.includes('Music');
@@ -2007,6 +2108,7 @@ export default function LobbyScreen() {
   };
 
   const handleToggleActorsYoutube = (value: boolean) => {
+    if (isGuestHost) { guestLockAlert(); return; }
     if (!value && !spotifyEnabled) {
       const artistsActive = youtubeEnabledCategories.includes('Music') || imagesEnabledCategories.includes('Music');
       if (!artistsActive) {
@@ -2021,6 +2123,7 @@ export default function LobbyScreen() {
   };
 
   const handleToggleActorsGuessWho = (value: boolean) => {
+    if (isGuestHost) { guestLockAlert(); return; }
     if (!value && !spotifyEnabled) {
       const artistsActive = youtubeEnabledCategories.includes('Music') || imagesEnabledCategories.includes('Music');
       if (!artistsActive) {
@@ -2035,6 +2138,7 @@ export default function LobbyScreen() {
   };
 
   const handleToggleAthletesYoutube = (value: boolean) => {
+    if (isGuestHost) { guestLockAlert(); return; }
     if (!value && !spotifyEnabled) {
       const artistsActive = youtubeEnabledCategories.includes('Music') || imagesEnabledCategories.includes('Music');
       if (!artistsActive) {
@@ -2049,6 +2153,7 @@ export default function LobbyScreen() {
   };
 
   const handleToggleAthletesGuessWho = (value: boolean) => {
+    if (isGuestHost) { guestLockAlert(); return; }
     if (!value && !spotifyEnabled) {
       const artistsActive = youtubeEnabledCategories.includes('Music') || imagesEnabledCategories.includes('Music');
       if (!artistsActive) {
@@ -3398,13 +3503,23 @@ export default function LobbyScreen() {
               assistance: p.assistance ?? 'standard',
               age: p.age,
               spotifyConnected: p.spotifyConnected ?? false,
+              type: p.type,
             }));
+          // Guest-hostat spel detekteras via host-radens type i lobby_players
+          // (guest host seedar sitt kort med type 'guest'; registrerade hosts
+          // får alltid 'registered' via mergeProfileIntoHost). Ingen DB-
+          // migration behövs — gamla lobbies resolvar false. quiz.tsx döljer
+          // Play Again på final leaderboard när flaggan är satt.
+          const storedHostIsGuest = (playersStored ?? []).some(
+            (p) => p.isHost && p.type === 'guest',
+          );
           router.replace({
             pathname: '/quiz',
             params: {
               assistance: 'standard',
               age: '32',
               gameMode: effectiveGameMode,
+              guestHost: String(storedHostIsGuest),
               // Non-host-vägen från Realtime-driven game-started-detection.
               // quiz.tsx använder isHost för att rendera Leave Game-knapp
               // istället för Quit Game-knapp i GetReadyIntro/CountdownIntro.
@@ -3774,6 +3889,10 @@ export default function LobbyScreen() {
         assistance: p.assistance ?? 'standard',
         age: p.age,
         spotifyConnected: p.spotifyConnected ?? false,
+        // type följer med så goToNewLobby:s carry-over kan återskapa raderna
+        // med korrekt guest/registered — host-radens 'guest' är non-host-
+        // enheternas detekteringssignal för guest-hostade spel.
+        type: p.type,
       }));
 
     if (turnOrder.length === 0) {
@@ -3889,40 +4008,45 @@ export default function LobbyScreen() {
     // Persisterar tillbaka via saveProfile så Profile-pillen + nästa lobby-
     // session ser den uppdaterade siffran. Spread:ar in tidigare profil-
     // fields (...profile) så vi inte stripper andra sparade settings.
-    const profile = await loadProfile();
-    if (!profile) {
-      Alert.alert('Sign in required', 'Log in or register before starting a game.');
-      return;
-    }
-    const free = profile.freeGameCredits ?? 0;
-    const extras = profile.gameCredits ?? 0;
-    // Membership = obegränsade host-spel; ingen gate, ingen deduktion.
-    // Free + Extras lämnas helt orörda så pillen behåller sina värden om
-    // membership skulle gå ut senare och behovet av credits återuppstår.
-    if (!hasPremium) {
-      if (free === 0 && extras === 0) {
-        Alert.alert(
-          'Out of Host Game Credits',
-          'You have no credits left for today. Buy extra credits in Store, wait for the daily refresh at midnight CET, or upgrade to a QuizVibe membership for unlimited host games.',
-          [
-            { text: 'Cancel', style: 'cancel' },
-            { text: 'Go to Store', onPress: () => router.push({ pathname: '/store' as const, params: { focus: 'credits', from: '/lobby', fromCode: roomCode } }) },
-          ],
-        );
+    // Guest host: HELA blocket skippas — ingen profil krävs ("Sign in
+    // required" vore fel), inga credits förbrukas. Begränsningen ligger i
+    // de låsta lobby-inställningarna + max 1 Play Again-replay.
+    if (!isGuestHost) {
+      const profile = await loadProfile();
+      if (!profile) {
+        Alert.alert('Sign in required', 'Log in or register before starting a game.');
         return;
       }
-      const nextFree = free > 0 ? free - 1 : 0;
-      const nextExtras = free > 0 ? extras : extras - 1;
-      try {
-        await saveProfile({ ...profile, freeGameCredits: nextFree, gameCredits: nextExtras });
-        // Lokal state-sync så pillen i lobby-headern uppdateras direkt
-        // (annars hade den gamla siffran legat kvar tills nästa fokus-load).
-        setFreeGameCredits(nextFree);
-        setGameCredits(nextExtras);
-      } catch {
-        // Tyst — låt spelet börja även om persist-write skulle failla. Nästa
-        // load reflekterar då fortfarande gamla värdet, vilket är säkrare än
-        // att blockera spelstart helt på en AsyncStorage-glitch.
+      const free = profile.freeGameCredits ?? 0;
+      const extras = profile.gameCredits ?? 0;
+      // Membership = obegränsade host-spel; ingen gate, ingen deduktion.
+      // Free + Extras lämnas helt orörda så pillen behåller sina värden om
+      // membership skulle gå ut senare och behovet av credits återuppstår.
+      if (!hasPremium) {
+        if (free === 0 && extras === 0) {
+          Alert.alert(
+            'Out of Host Game Credits',
+            'You have no credits left for today. Buy extra credits in Store, wait for the daily refresh at midnight CET, or upgrade to a QuizVibe membership for unlimited host games.',
+            [
+              { text: 'Cancel', style: 'cancel' },
+              { text: 'Go to Store', onPress: () => router.push({ pathname: '/store' as const, params: { focus: 'credits', from: '/lobby', fromCode: roomCode } }) },
+            ],
+          );
+          return;
+        }
+        const nextFree = free > 0 ? free - 1 : 0;
+        const nextExtras = free > 0 ? extras : extras - 1;
+        try {
+          await saveProfile({ ...profile, freeGameCredits: nextFree, gameCredits: nextExtras });
+          // Lokal state-sync så pillen i lobby-headern uppdateras direkt
+          // (annars hade den gamla siffran legat kvar tills nästa fokus-load).
+          setFreeGameCredits(nextFree);
+          setGameCredits(nextExtras);
+        } catch {
+          // Tyst — låt spelet börja även om persist-write skulle failla. Nästa
+          // load reflekterar då fortfarande gamla värdet, vilket är säkrare än
+          // att blockera spelstart helt på en AsyncStorage-glitch.
+        }
       }
     }
 
@@ -3956,9 +4080,27 @@ export default function LobbyScreen() {
     router.push({
       pathname: '/quiz',
       params: {
-        assistance: 'standard',
-        age: '32',
+        // Guest host: fallback-assistance/age speglar guest-identiteten
+        // (Full + ålder från guestBirthYear) istället för de generiska
+        // 'standard'/'32'. turnOrder-hostens kort bär redan samma värden.
+        assistance: isGuestHost ? 'full' : 'standard',
+        age: isGuestHost && guestBirthYear
+          ? String(CURRENT_YEAR - parseInt(guestBirthYear, 10))
+          : '32',
         gameMode,
+        // Guest-hostat spel — quiz.tsx döljer Play Again på final
+        // leaderboard + skippar Player history-skrivningen.
+        guestHost: String(isGuestHost),
+        // Guest-identitet + replay-räknare vidare till quiz så guest-hostens
+        // Play Again (goToNewLobby) kan återskapa lobbyn utan profil och
+        // Final Leaderboard kan dölja Play Again efter max 1 replay.
+        ...(isGuestHost
+          ? {
+              guestName: guestName ?? '',
+              guestBirthYear: guestBirthYear ?? '',
+              guestReplays: guestReplays ?? '0',
+            }
+          : {}),
         // Host-vägen från Start Game-tap. quiz.tsx använder detta för att
         // rendera Quit Game-knapp (river hela rummet) istället för Leave
         // Game-knapp (bara non-host:s egen utväg).
@@ -4135,7 +4277,11 @@ export default function LobbyScreen() {
           • Non-host (både guest och registrerade): öppnar Leave Game Lobby-
             sheet:n så de kan ta sig ur rummet utan att lämna appen. */}
       <TopUserBanner
-        guestName={isGuestInRoom ? guestName : undefined}
+        guestName={isGuestInRoom || isGuestHost ? guestName : undefined}
+        // Guest host: forcera controlled mode med profile=null — annars
+        // self-loadar bannern en ev. inloggad users profil och visar deras
+        // registrerade pill istället för guest-identiteten.
+        profile={isGuestHost ? null : undefined}
         onPress={
           hostMode
             ? () => setHostDeleteSheetVisible(true)
@@ -4159,8 +4305,9 @@ export default function LobbyScreen() {
               pill exakt (samma styling, samma värden via loadProfile-source).
               Tap navigerar till Store. Värdena uppdateras vid varje fokus
               på Lobby så de följer Profile:s state utan delay. Renderas inte
-              för non-host (de är inte host i detta spel → credits irrelevanta). */}
-          {hostMode && (
+              för non-host (de är inte host i detta spel → credits irrelevanta)
+              eller guest host (credits förbrukas aldrig → pill irrelevant). */}
+          {hostMode && !isGuestHost && (
             <Pressable
               style={({ pressed }) => [
                 styles.creditsPill,
@@ -4317,8 +4464,10 @@ export default function LobbyScreen() {
               </View>
             </View>
           </View>
-          {/* Share invite är host-only — bara host bjuder in nya spelare */}
-          {hostMode && (
+          {/* Share invite är host-only — bara host bjuder in nya spelare.
+              Guest host: dold — friends-invites kräver registrerat konto;
+              guests delar rumkoden muntligt istället. */}
+          {hostMode && !isGuestHost && (
             <TouchableOpacity onPress={handleOpenShareModal} style={styles.shareBtn}>
               <Text style={styles.shareBtnText}>↑ Share invite to friends</Text>
             </TouchableOpacity>
@@ -4739,7 +4888,7 @@ export default function LobbyScreen() {
             <TouchableOpacity
               style={[styles.modeOption, maxPlayers === 4 ? styles.modeOptionPassActive : styles.modeOptionInactive]}
               onPress={() => handleSelectMaxPlayers(4)}
-              disabled={!hostMode || (hasPremium && gameMode === 'individual-devices' && !singlePlayerDefault)}
+              disabled={!hostMode || isGuestHost || (hasPremium && gameMode === 'individual-devices' && !singlePlayerDefault)}
               activeOpacity={0.7}
             >
               <Text style={[styles.modeLabel, { textAlign: 'center' }, maxPlayers === 4 && styles.modeLabelActiveFree]}>
@@ -4749,21 +4898,33 @@ export default function LobbyScreen() {
                 <Text style={[styles.freeBadgeText, maxPlayers !== 4 && styles.freeBadgeTextDimmed]}>FREE</Text>
               </View>
             </TouchableOpacity>
-            {/* Max 12: auto-valt och aktivt (guld) när premium. */}
-            <TouchableOpacity
-              style={[styles.modeOption, maxPlayers === 12 ? styles.modeOptionPremiumActive : styles.modeOptionInactive]}
-              onPress={() => handleSelectMaxPlayers(12)}
-              disabled={!hostMode}
-              activeOpacity={0.7}
-            >
-              <Text style={[styles.modeLabel, { textAlign: 'center' }, maxPlayers === 12 && styles.modeLabelActivePremium]}>
-                Max 12 players
-              </Text>
-              <View style={[styles.premiumBadge, !hasPremium && styles.premiumBadgeGrey]} pointerEvents="none">
-                <Text style={[styles.premiumBadgeText, !hasPremium && styles.premiumBadgeTextGrey]}>PREMIUM</Text>
-              </View>
-            </TouchableOpacity>
+            {/* Max 12: auto-valt och aktivt (guld) när premium.
+                Guest host: rutan renderas inte alls — Max 4 är enda valet;
+                en not under förklarar Premium-vägen. */}
+            {!isGuestHost && (
+              <TouchableOpacity
+                style={[styles.modeOption, maxPlayers === 12 ? styles.modeOptionPremiumActive : styles.modeOptionInactive]}
+                onPress={() => handleSelectMaxPlayers(12)}
+                disabled={!hostMode}
+                activeOpacity={0.7}
+              >
+                <Text style={[styles.modeLabel, { textAlign: 'center' }, maxPlayers === 12 && styles.modeLabelActivePremium]}>
+                  Max 12 players
+                </Text>
+                <View style={[styles.premiumBadge, !hasPremium && styles.premiumBadgeGrey]} pointerEvents="none">
+                  <Text style={[styles.premiumBadgeText, !hasPremium && styles.premiumBadgeTextGrey]}>PREMIUM</Text>
+                </View>
+              </TouchableOpacity>
+            )}
+            {/* Spacer så Max 4-rutan behåller halv bredd när Max 12 är dold
+                (speglar Single player-rutans vänsterställnings-mönster). */}
+            {isGuestHost && <View style={{ flex: 1 }} />}
           </View>
+          {isGuestHost && (
+            <Text style={styles.guestHostNote}>
+              Upto 12 players option for registered Quizvibe users with Premium
+            </Text>
+          )}
 
         </View>
 
@@ -4926,6 +5087,9 @@ export default function LobbyScreen() {
                       value={spotifyAnswerYear}
                       disabled={!hostMode}
                       onValueChange={(v) => {
+                        // Guest host: Year/Name är låsta (båda ON) — bara
+                        // Spotify på/av är guest-valbart.
+                        if (isGuestHost) { guestLockAlert(); return; }
                         if (!v && !spotifyAnswerName) {
                           Alert.alert('At least one answer type required', 'At least one Spotify answer type must be enabled.');
                           return;
@@ -4935,7 +5099,7 @@ export default function LobbyScreen() {
                       trackColor={{ false: Colors.error, true: Colors.success }}
                       thumbColor="#FFF"
                       ios_backgroundColor={spotifyAnswerYear ? Colors.success : Colors.error}
-                      style={styles.sourceMatrixSwitch}
+                      style={[styles.sourceMatrixSwitch, isGuestHost && { opacity: 0.45 }]}
                     />
                   </View>
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
@@ -4944,6 +5108,8 @@ export default function LobbyScreen() {
                       value={spotifyAnswerName}
                       disabled={!hostMode}
                       onValueChange={(v) => {
+                        // Guest host: låst — se Year-switchen ovan.
+                        if (isGuestHost) { guestLockAlert(); return; }
                         if (!v && !spotifyAnswerYear) {
                           Alert.alert('At least one answer type required', 'At least one Spotify answer type must be enabled.');
                           return;
@@ -4953,7 +5119,7 @@ export default function LobbyScreen() {
                       trackColor={{ false: Colors.error, true: Colors.success }}
                       thumbColor="#FFF"
                       ios_backgroundColor={spotifyAnswerName ? Colors.success : Colors.error}
-                      style={styles.sourceMatrixSwitch}
+                      style={[styles.sourceMatrixSwitch, isGuestHost && { opacity: 0.45 }]}
                     />
                   </View>
                 </View>
@@ -4983,7 +5149,7 @@ export default function LobbyScreen() {
                     trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }}
                     thumbColor="#FFF"
                     ios_backgroundColor={allEnabled ? Colors.success : MATRIX_SWITCH_OFF}
-                    style={styles.sourceMatrixSwitch}
+                    style={[styles.sourceMatrixSwitch, isGuestHost && { opacity: 0.45 }]}
                   />
                 </View>
                 <View style={styles.smLabelSourceCell}>
@@ -5030,15 +5196,15 @@ export default function LobbyScreen() {
                     trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }}
                     thumbColor="#FFF"
                     ios_backgroundColor={artistsAllOn ? Colors.success : MATRIX_SWITCH_OFF}
-                    style={styles.sourceMatrixSwitch}
+                    style={[styles.sourceMatrixSwitch, isGuestHost && { opacity: 0.45 }]}
                   />
                 </View>
                 <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
-                  <Switch value={youtubeEnabledCategories.includes('Music')} onValueChange={handleToggleArtistsYoutube} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={youtubeEnabledCategories.includes('Music') ? Colors.success : MATRIX_SWITCH_OFF} style={styles.sourceMatrixSwitch} />
+                  <Switch value={youtubeEnabledCategories.includes('Music')} onValueChange={handleToggleArtistsYoutube} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={youtubeEnabledCategories.includes('Music') ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, isGuestHost && { opacity: 0.45 }]} />
                 </View>
                 <View style={[styles.smAutoCell, smCellStyle]} />
                 <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
-                  <Switch value={imagesEnabledCategories.includes('Music')} onValueChange={handleToggleArtistsGuessWho} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={imagesEnabledCategories.includes('Music') ? Colors.success : MATRIX_SWITCH_OFF} style={styles.sourceMatrixSwitch} />
+                  <Switch value={imagesEnabledCategories.includes('Music')} onValueChange={handleToggleArtistsGuessWho} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={imagesEnabledCategories.includes('Music') ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, isGuestHost && { opacity: 0.45 }]} />
                 </View>
               </View>
 
@@ -5048,14 +5214,14 @@ export default function LobbyScreen() {
                   <Text style={styles.sourceMatrixHeaderText}>Film</Text>
                 </View>
                 <View style={[styles.smAllToggleCell, smCellStyle, styles.smDataShift]}>
-                  <Switch value={actorsAllOn} onValueChange={hostMode ? handleToggleActorsColumn : undefined} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={actorsAllOn ? Colors.success : MATRIX_SWITCH_OFF} style={styles.sourceMatrixSwitch} />
+                  <Switch value={actorsAllOn} onValueChange={hostMode ? handleToggleActorsColumn : undefined} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={actorsAllOn ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, isGuestHost && { opacity: 0.45 }]} />
                 </View>
                 <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
-                  <Switch value={youtubeEnabledCategories.includes('Film')} onValueChange={handleToggleActorsYoutube} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={youtubeEnabledCategories.includes('Film') ? Colors.success : MATRIX_SWITCH_OFF} style={styles.sourceMatrixSwitch} />
+                  <Switch value={youtubeEnabledCategories.includes('Film')} onValueChange={handleToggleActorsYoutube} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={youtubeEnabledCategories.includes('Film') ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, isGuestHost && { opacity: 0.45 }]} />
                 </View>
                 <View style={[styles.smAutoCell, smCellStyle]} />
                 <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
-                  <Switch value={imagesEnabledCategories.includes('Film')} onValueChange={handleToggleActorsGuessWho} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={imagesEnabledCategories.includes('Film') ? Colors.success : MATRIX_SWITCH_OFF} style={styles.sourceMatrixSwitch} />
+                  <Switch value={imagesEnabledCategories.includes('Film')} onValueChange={handleToggleActorsGuessWho} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={imagesEnabledCategories.includes('Film') ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, isGuestHost && { opacity: 0.45 }]} />
                 </View>
               </View>
 
@@ -5065,14 +5231,14 @@ export default function LobbyScreen() {
                   <Text style={styles.sourceMatrixHeaderText}>Sport</Text>
                 </View>
                 <View style={[styles.smAllToggleCell, smCellStyle, styles.smDataShift, { borderTopRightRadius: Radius.sm, borderBottomRightRadius: Radius.sm }]}>
-                  <Switch value={athletesAllOn} onValueChange={hostMode ? handleToggleAthletesColumn : undefined} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={athletesAllOn ? Colors.success : MATRIX_SWITCH_OFF} style={styles.sourceMatrixSwitch} />
+                  <Switch value={athletesAllOn} onValueChange={hostMode ? handleToggleAthletesColumn : undefined} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={athletesAllOn ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, isGuestHost && { opacity: 0.45 }]} />
                 </View>
                 <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
-                  <Switch value={youtubeEnabledCategories.includes('Sport')} onValueChange={handleToggleAthletesYoutube} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={youtubeEnabledCategories.includes('Sport') ? Colors.success : MATRIX_SWITCH_OFF} style={styles.sourceMatrixSwitch} />
+                  <Switch value={youtubeEnabledCategories.includes('Sport')} onValueChange={handleToggleAthletesYoutube} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={youtubeEnabledCategories.includes('Sport') ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, isGuestHost && { opacity: 0.45 }]} />
                 </View>
                 <View style={[styles.smAutoCell, smCellStyle]} />
                 <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
-                  <Switch value={imagesEnabledCategories.includes('Sport')} onValueChange={handleToggleAthletesGuessWho} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={imagesEnabledCategories.includes('Sport') ? Colors.success : MATRIX_SWITCH_OFF} style={styles.sourceMatrixSwitch} />
+                  <Switch value={imagesEnabledCategories.includes('Sport')} onValueChange={handleToggleAthletesGuessWho} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={imagesEnabledCategories.includes('Sport') ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, isGuestHost && { opacity: 0.45 }]} />
                 </View>
               </View>
 
@@ -5170,37 +5336,52 @@ export default function LobbyScreen() {
                         </Text>
                       </View>
                     </TouchableOpacity>
-                    <TouchableOpacity
-                      style={styles.addPackageBtn}
-                      onPress={() => Alert.alert(
-                        'Premium feature',
-                        'Add Host packages for customized Quiz experience. Go to Store?',
-                        [
-                          { text: 'Cancel', style: 'cancel' },
-                          { text: 'Go to Store', onPress: () => router.push({ pathname: '/store' as const, params: { focus: 'packages-only', from: '/lobby', fromCode: roomCode } }) },
-                        ],
-                      )}
-                      activeOpacity={0.7}
-                    >
-                      <Text style={styles.modeLabel}>+ Add Host packages</Text>
-                      <View
-                        style={[styles.premiumBadge, styles.premiumBadgeGrey]}
-                        pointerEvents="none"
+                    {/* Guest host: köp-CTA:n döljs (paket kräver registrerat
+                        konto + Premium) — spacer bevarar Generic:s halva bredd. */}
+                    {isGuestHost ? (
+                      <View style={{ flex: 1 }} />
+                    ) : (
+                      <TouchableOpacity
+                        style={styles.addPackageBtn}
+                        onPress={() => Alert.alert(
+                          'Premium feature',
+                          'Add Host packages for customized Quiz experience. Go to Store?',
+                          [
+                            { text: 'Cancel', style: 'cancel' },
+                            { text: 'Go to Store', onPress: () => router.push({ pathname: '/store' as const, params: { focus: 'packages-only', from: '/lobby', fromCode: roomCode } }) },
+                          ],
+                        )}
+                        activeOpacity={0.7}
                       >
-                        <Text style={[styles.premiumBadgeText, styles.premiumBadgeTextGrey]}>
-                          PREMIUM
-                        </Text>
-                      </View>
-                    </TouchableOpacity>
+                        <Text style={styles.modeLabel}>+ Add Host packages</Text>
+                        <View
+                          style={[styles.premiumBadge, styles.premiumBadgeGrey]}
+                          pointerEvents="none"
+                        >
+                          <Text style={[styles.premiumBadgeText, styles.premiumBadgeTextGrey]}>
+                            PREMIUM
+                          </Text>
+                        </View>
+                      </TouchableOpacity>
+                    )}
                   </View>
                 );
               })()}
+
+              {/* Guest host: paket-listan (wrappern nedan) ersätts av en not. */}
+              {isGuestHost && (
+                <Text style={styles.guestHostNote}>
+                  No customized Host packages available for Guest users
+                </Text>
+              )}
 
               {/* Yttre svart container som omsluter Buy CTA + paketlistan —
                   speglar modeToggle:s padding (3), gap (4), borderRadius (md)
                   och Colors.background-bakgrund. Det ger Buy CTA samma
                   inre avstånd från ramen som Individual Devices har i
-                  Game Mode-toggeln. */}
+                  Game Mode-toggeln. Guest host: hela wrappern göms —
+                  noten ovanför kommunicerar att paket inte är tillgängliga. */}
+              {!isGuestHost && (
               <View style={styles.extraPackagesWrapper}>
                 {/* Sub-rubrik högst upp i wrappern. För host introducerar den
                     de egna köpta paketen; för icke-host listas de paket hosten
@@ -5320,6 +5501,7 @@ export default function LobbyScreen() {
                 })()}
 
               </View>
+              )}
             </View>
           </View>
         </View>
@@ -5389,7 +5571,14 @@ export default function LobbyScreen() {
                   <Text style={styles.eraGuestBoxText}>{displayEra[0]} – {displayEra[1]}</Text>
                 </View>
               </View>
-              {hostMode && (
+              {/* Guest host: era är låst till fulla spannet — ingen slider,
+                  bara info-not under display-boxen. */}
+              {isGuestHost && (
+                <Text style={styles.guestHostNote}>
+                  change Game era not available for Guest user
+                </Text>
+              )}
+              {hostMode && !isGuestHost && (
                 <View style={{ alignItems: 'center', position: 'relative', width: SLIDER_WIDTH, alignSelf: 'center' }}>
                   <MultiSlider
                     // values-propen hålls STABIL under drag (= committed
@@ -5506,8 +5695,8 @@ export default function LobbyScreen() {
                   <DecadeMarks />
                 </View>
               )}
-              {hostMode && eraAtToFloor && <View style={styles.eraWarning}><Text style={styles.eraWarningText}>⚠️ To-year can not be earlier than 1980</Text></View>}
-              {hostMode && eraAtMinInterval && <View style={styles.eraWarning}><Text style={styles.eraWarningText}>⚠️ Min interval 15 years</Text></View>}
+              {hostMode && !isGuestHost && eraAtToFloor && <View style={styles.eraWarning}><Text style={styles.eraWarningText}>⚠️ To-year can not be earlier than 1980</Text></View>}
+              {hostMode && !isGuestHost && eraAtMinInterval && <View style={styles.eraWarning}><Text style={styles.eraWarningText}>⚠️ Min interval 15 years</Text></View>}
               {eraWarning && <View style={styles.eraWarning}><Text style={styles.eraWarningText}>⚠️ {eraWarning}</Text></View>}
             </View>
 
@@ -5525,8 +5714,42 @@ export default function LobbyScreen() {
               </View>
               {/* Siffran ramas in i samma blå-bordred ruta för både host och
                   non-host. Host får -/+ knappar på sidorna och RoundsRuler
-                  under för att stega och se intervallet. */}
-              {hostMode ? (
+                  under för att stega och se intervallet.
+                  Guest host: ENDAST två val-rutor (2/4) — stepper, ruler och
+                  game-mode quick-select renderas inte alls. */}
+              {isGuestHost ? (
+                <>
+                  <View style={[styles.modeRow, { marginTop: Spacing.sm }]}>
+                    {([2, 4] as const).map((n) => {
+                      const isActive = roundsCount === n;
+                      return (
+                        <TouchableOpacity
+                          key={n}
+                          style={[
+                            styles.modeOption,
+                            isActive ? styles.modeOptionPassActive : styles.modeOptionInactive,
+                          ]}
+                          onPress={() => setRoundsCount(n)}
+                          activeOpacity={0.7}
+                        >
+                          <Text
+                            style={[
+                              styles.modeLabel,
+                              { textAlign: 'center' },
+                              isActive && styles.modeLabelActiveFree,
+                            ]}
+                          >
+                            {n} rounds
+                          </Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+                  <Text style={styles.guestHostNote}>
+                    Upto 20 rounds option for registered Quizvibe users with Premium
+                  </Text>
+                </>
+              ) : hostMode ? (
                 <>
                   <View style={styles.roundsStepperRow}>
                     <TouchableOpacity
@@ -5639,6 +5862,30 @@ export default function LobbyScreen() {
                   <Text style={styles.infoIconText}>i</Text>
                 </Pressable>
               </View>
+              {/* Guest host: källorna slumpas per fråga vid spelstart (viktad
+                  dragning i quiz.tsx) — previewn KAN inte veta utfallet, så
+                  slots renderas som "?" + en förklarande not. Ärligare än
+                  att spegla en fördelning som inte kommer stämma. */}
+              {isGuestHost ? (
+                <>
+                  <View style={styles.gsGrid}>
+                    {Array.from({ length: roundsCount }, (_, idx) => (
+                      <View key={idx} style={styles.gsBox}>
+                        <View style={styles.gsInlineIconWrap}>
+                          <Text style={styles.gsNumber}>{idx + 1}</Text>
+                          {/* Fristående ?-glyf (gsSourceQMark är absolut-
+                              positionerad för Q-ring-wrappen och funkar
+                              inte utanför den). */}
+                          <Text style={styles.gsRandomMark}>?</Text>
+                        </View>
+                      </View>
+                    ))}
+                  </View>
+                  <Text style={styles.guestHostNote}>
+                    Sources randomized for Guest games
+                  </Text>
+                </>
+              ) : (
               <View style={styles.gsGrid}>
                 {gameSequencePreview.map((slot, idx) => (
                   <View key={idx} style={styles.gsBox}>
@@ -5668,6 +5915,7 @@ export default function LobbyScreen() {
                   </View>
                 ))}
               </View>
+              )}
             </View>
 
             {/* Answer response time */}
@@ -5685,19 +5933,21 @@ export default function LobbyScreen() {
               {/* 4-knapps-rad (15/30/45/60). Renderas för alla i lobbyn så
                   non-host ser host:s val i real-tid; bara host kan ändra
                   (disabled={!hostMode}). Default-värdet seeds från host:s
-                  profil via host-seed-effekten ovan. */}
+                  profil via host-seed-effekten ovan.
+                  Guest host: ENDAST 60s-knappen renderas (aktiv, ej ändringsbar)
+                  — 30s/45s-alternativen finns inte ens som dimmade val. */}
               <View style={styles.responseRow}>
-                {([30, 45, 60] as const).map((sec) => {
+                {(isGuestHost ? ([60] as const) : ([30, 45, 60] as const)).map((sec) => {
                   const isActive = answerResponseSeconds === sec;
                   return (
                     <Pressable
                       key={sec}
                       onPress={() => setAnswerResponseSeconds(sec)}
-                      disabled={!hostMode}
+                      disabled={!hostMode || isGuestHost}
                       style={({ pressed }) => [
                         styles.responseBtn,
                         isActive ? styles.responseBtnActive : styles.responseBtnInactive,
-                        pressed && hostMode && { opacity: 0.85 },
+                        pressed && hostMode && !isGuestHost && { opacity: 0.85 },
                       ]}
                     >
                       <Text style={[
@@ -5710,6 +5960,11 @@ export default function LobbyScreen() {
                   );
                 })}
               </View>
+              {isGuestHost && (
+                <Text style={styles.guestHostNote}>
+                  Option to select 30s or 45s not available for Guest user
+                </Text>
+              )}
             </View>
           </View>
           )}
@@ -5811,9 +6066,26 @@ export default function LobbyScreen() {
               </View>
 
               {/* Assistance level — host får fritt välja valfri nivå (lättare
-                  som svårare) från spelarens default. Ingen riktnings-låsning. */}
+                  som svårare) från spelarens default. Ingen riktnings-låsning.
+                  Guest host som editerar SITT EGET kort: assistance är låst
+                  till Full — visa statisk chip + not istället för knappraden.
+                  Andra spelares kort editeras fritt även av guest host. */}
               <View style={playerEditSheet.fieldGroup}>
                 <Text style={playerEditSheet.fieldLabel}>Assistance Level</Text>
+                {isGuestHost && playerEditTarget?.isHost ? (
+                  <>
+                    <View style={playerEditSheet.skillRow}>
+                      <View style={[playerEditSheet.skillBtn, playerEditSheet.skillBtnActive]}>
+                        <Text style={[playerEditSheet.skillBtnText, playerEditSheet.skillBtnTextActive]}>
+                          Full
+                        </Text>
+                      </View>
+                    </View>
+                    <Text style={styles.guestHostNote}>
+                      Assistance level fixed to Full for Guest host
+                    </Text>
+                  </>
+                ) : (
                 <View style={playerEditSheet.skillRow}>
                   {(['full', 'standard', 'minimal'] as const).map((opt) => {
                     const isSelected = editAssistance === opt;
@@ -5838,6 +6110,7 @@ export default function LobbyScreen() {
                     );
                   })}
                 </View>
+                )}
               </View>
 
               {/* HCP — bara för registrerade spelare. Guest:s HCP
@@ -7904,6 +8177,14 @@ const styles = StyleSheet.create({
   },
   eraWarning: { backgroundColor: Colors.warningMuted, borderRadius: Radius.sm, padding: Spacing.sm, borderWidth: 1, borderColor: Colors.warningBorder, marginTop: Spacing.sm },
   eraWarningText: { fontSize: FontSize.xs, color: Colors.warning, lineHeight: 17 },
+  // Info-not under låsta settings i guest-host-lobbyn ("change Game era not
+  // available for Guest user" etc.). Delad stil för alla guest-host-noter.
+  guestHostNote: {
+    fontSize: FontSize.xs,
+    color: Colors.textSecondary,
+    marginTop: Spacing.xs,
+    textAlign: 'center',
+  },
 
   regionTrigger: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, backgroundColor: Colors.background, borderRadius: Radius.md, borderWidth: 1, borderColor: Colors.borderStrong, paddingHorizontal: Spacing.lg, paddingVertical: Spacing.md },
   regionTriggerText: { flex: 1, fontSize: FontSize.md, fontWeight: FontWeight.medium, color: Colors.textPrimary },
@@ -8073,6 +8354,13 @@ const styles = StyleSheet.create({
     lineHeight: 13,
     color: Colors.primary,
     fontSize: 6,
+    fontWeight: FontWeight.bold,
+  },
+  // Fristående "?"-glyf för guest-hostens randomiserade Game Sequence-
+  // slots (källan avgörs först vid spelstart av den viktade dragningen).
+  gsRandomMark: {
+    color: Colors.primary,
+    fontSize: 13,
     fontWeight: FontWeight.bold,
   },
   gsCategoryWrap: {

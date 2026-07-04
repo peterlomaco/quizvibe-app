@@ -104,6 +104,57 @@ export async function ensureAuthSession(): Promise<User | null> {
 }
 
 /**
+ * Login-via-PlayerName utan att exponera email:en klient-side.
+ *
+ * Anropar Edge Function 'login-by-name' som slår upp email:en server-side,
+ * kör signInWithPassword, och returnerar session-tokens (aldrig email:en).
+ * Tokens sätts via setSession så klient-state blir identisk med ett vanligt
+ * signInWithPassword-flöde.
+ *
+ * Ersätter det tidigare klient-flödet (lookupEmailByPlayerName +
+ * signInWithPassword) som läckte email givet ett öppet synligt PlayerName.
+ *
+ * Function:n returnerar ett generiskt 'invalid_credentials' för BÅDE
+ * "namnet finns inte" och "fel lösenord" — ingen enumerering. Returnerar
+ * { ok: false, reason } vid alla fel; call-site visar ett generiskt
+ * "Invalid PlayerName or password"-meddelande.
+ */
+export async function signInWithPlayerName(
+  playerName: string,
+  password: string,
+): Promise<{ ok: true; user: User } | { ok: false; reason: string }> {
+  try {
+    const { data, error } = await supabase.functions.invoke<{
+      access_token?: string;
+      refresh_token?: string;
+      user?: User;
+      error?: string;
+    }>('login-by-name', { method: 'POST', body: { playerName, password } });
+
+    if (error) {
+      console.warn('[auth] login-by-name invoke failed:', error.message);
+      return { ok: false, reason: error.message ?? 'invoke_failed' };
+    }
+    if (data?.error || !data?.access_token || !data?.refresh_token) {
+      return { ok: false, reason: data?.error ?? 'invalid_credentials' };
+    }
+
+    const { data: setData, error: setError } = await supabase.auth.setSession({
+      access_token: data.access_token,
+      refresh_token: data.refresh_token,
+    });
+    if (setError || !setData.user) {
+      console.warn('[auth] setSession failed:', setError?.message);
+      return { ok: false, reason: setError?.message ?? 'session_failed' };
+    }
+    return { ok: true, user: setData.user };
+  } catch (err) {
+    console.warn('[auth] signInWithPlayerName threw:', err);
+    return { ok: false, reason: 'network_error' };
+  }
+}
+
+/**
  * Permanent radering av inloggad user — driver "Delete Account"-knappen
  * i Profile-skärmens logout-sheet. Krav från Apple App Store Guideline
  * 5.1.1(v): apps med kontoflow måste erbjuda in-app deletion.

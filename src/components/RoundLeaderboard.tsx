@@ -357,6 +357,8 @@ export function RoundLeaderboard({
   onApprovePlayAgain,
   isLastRound,
   isHost = true,
+  guestHost = false,
+  guestReplaysUsed = 0,
   hostInitiatedPlayAgain = false,
   allRoundScoresHistory,
 }: {
@@ -381,6 +383,15 @@ export function RoundLeaderboard({
    *  på hostInitiatedPlayAgain. Default true (= Pass-the-Phone-fallet
    *  + bakåt-kompat för befintliga call-sites). */
   isHost?: boolean;
+  /** True när spelets host är en guest ("Start Game as Guest"-lobby).
+   *  Guest hosts har max 1 Play Again-replay: omgång 1 (guestReplaysUsed=0)
+   *  visar Play Again + not; omgång 2 (>=1) visar bara Home. Non-host i
+   *  guest-spel ser Home tills hostInitiatedPlayAgain — då gold Approve
+   *  (aldrig den dimmade "Activated by Host"-placeholdern). */
+  guestHost?: boolean;
+  /** Antal replays guest-hosten förbrukat (bara meningsfullt på host-
+   *  enheten; non-host styrs av hostInitiatedPlayAgain). Default 0. */
+  guestReplaysUsed?: number;
   /** Non-host: host har tappat Play Again → button lights up. Ignored
    *  för host. */
   hostInitiatedPlayAgain?: boolean;
@@ -699,7 +710,43 @@ export function RoundLeaderboard({
             ? playAgainHeight
             : playAgainHeight - TRIANGLE_HALF_H;
           const homeHeight = bottomY;
+          // Guest-hostat spel — max 1 replay:
+          //   • Host, omgång 2 (guestReplaysUsed >= 1): bara Home.
+          //   • Non-host: bara Home TILLS hostInitiatedPlayAgain-broadcasten
+          //     anländer — då faller vi igenom till gold Approve-grenen.
+          //     Den dimmade "Activated by Host"-placeholdern renderas ALDRIG
+          //     i guest-spel (den bär ingen information här: på omgång 2
+          //     broadcastar host aldrig, så Home-only är rätt slutläge utan
+          //     att non-host behöver känna till replay-räknaren).
+          //   • Host, omgång 1: faller igenom till normal blå Play Again +
+          //     "Replay only possible 1 time..."-not (renderas nedan).
+          if (guestHost && (isHost ? guestReplaysUsed >= 1 : !hostInitiatedPlayAgain)) {
+            return (
+              <View style={styles.finalActions}>
+                <Pressable
+                  onPress={onGoHome}
+                  style={({ pressed }) => [
+                    styles.finalHomeBtn,
+                    { height: PLAY_AGAIN_BUTTON_HEIGHT_COMPACT },
+                    pressed && { opacity: 0.7 },
+                  ]}
+                >
+                  <QuizVibeQAvatar size={32} variant="wifi" />
+                  <Text style={styles.finalHomeBtnText}>Home</Text>
+                </Pressable>
+              </View>
+            );
+          }
           return (
+            <>
+              {/* Guest host omgång 1: replay-begränsningen kommuniceras
+                  ovanför knapparna (Peters copy). Bara host-enheten — non-
+                  host känner inte till räknaren. */}
+              {guestHost && isHost && guestReplaysUsed === 0 && (
+                <Text style={styles.guestReplayNote}>
+                  Replay only possible 1 time for Guest Hosts
+                </Text>
+              )}
             <View style={styles.finalActions}>
               {/* Home-knapp — höjden = bottomY så Home:s underkant linjerar
                   exakt med rektangel-outline-botten + chevron-spetsens y i
@@ -754,6 +801,7 @@ export function RoundLeaderboard({
                 />
               )}
             </View>
+            </>
           );
         })()
       ) : (
@@ -1072,6 +1120,14 @@ const styles = StyleSheet.create({
     fontWeight: FontWeight.semibold,
     color: Colors.primary,
     letterSpacing: 0.3,
+  },
+  // Replay-begränsnings-not för guest hosts (omgång 1) — liten grå rad
+  // ovanför footer-knapparna, speglar LobbyScreen:s guestHostNote-stil.
+  guestReplayNote: {
+    fontSize: FontSize.xs,
+    color: Colors.textSecondary,
+    textAlign: 'center',
+    marginBottom: Spacing.sm,
   },
   // Play Again — same height as Home men ingen egen border eller bg;
   // PlayAgainLoopBorder-SVG:n absolut-positioneras innanför och fungerar
