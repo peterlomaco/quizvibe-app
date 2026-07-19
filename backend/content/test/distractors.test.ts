@@ -241,7 +241,7 @@ describe('buildNameOptions', () => {
     const correct = findItemsById(catalog, 'cristiano-ronaldo')[0].item;
     const args = {
       catalog,
-      category: 'athletes' as const,
+      category: 'sport' as const,
       playerGeneration: 'gen-alpha' as const,
       correctItem: correct,
       selectedPrefix: 'CR',
@@ -257,7 +257,7 @@ describe('buildNameOptions', () => {
     const correct = findItemsById(catalog, 'lionel-messi')[0].item;
     const options = buildNameOptions({
       catalog,
-      category: 'athletes',
+      category: 'sport',
       playerGeneration: 'millennials',
       correctItem: correct,
       selectedPrefix: 'ZL',

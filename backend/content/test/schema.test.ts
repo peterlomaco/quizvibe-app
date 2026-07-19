@@ -15,7 +15,7 @@ describe('content catalog', () => {
     expect(categories.has('artists')).toBe(true);
     expect(categories.has('songs')).toBe(true);
     expect(categories.has('actors')).toBe(true);
-    expect(categories.has('athletes')).toBe(true);
+    expect(categories.has('sport')).toBe(true);
     // persons-* raderade vid politiker-purge:n (2026-05-21) — items
     // omkategoriserade till artists/actors/athletes eller strikna.
     expect(categories.has('persons')).toBe(false);
@@ -171,6 +171,7 @@ describe('schema rejection', () => {
   it('rejects file with timeline item missing correctYear', () => {
     const result = ContentFileSchema.safeParse({
       audience: ['millennials'],
+      region: ['sweden'],
       category: 'persons',
       contentForm: 'image',
       contentSubject: 'cultural-person',
@@ -191,6 +192,7 @@ describe('schema rejection', () => {
   it('accepts file with name-letters-only item without correctYear', () => {
     const result = ContentFileSchema.safeParse({
       audience: ['all'],
+      region: ['sweden'],
       category: 'capitals',
       contentForm: 'image',
       contentSubject: 'city',
@@ -328,6 +330,7 @@ describe('schema rejection', () => {
   it('rejects duplicate item ids in a file', () => {
     const result = ContentFileSchema.safeParse({
       audience: ['millennials'],
+      region: ['sweden'],
       category: 'persons',
       contentForm: 'image',
       contentSubject: 'cultural-person',
@@ -356,6 +359,7 @@ describe('schema rejection', () => {
     // refinen från matrisen avvisa filen.
     const result = ContentFileSchema.safeParse({
       audience: ['all'],
+      region: ['sweden'],
       category: 'songs',
       contentForm: 'image',
       contentSubject: 'song',
@@ -393,6 +397,7 @@ describe('schema rejection', () => {
     for (const { form, subject } of validPairs) {
       const result = ContentFileSchema.safeParse({
         audience: ['all'],
+        region: ['sweden'],
         category: 'persons',
         contentForm: form,
         contentSubject: subject,

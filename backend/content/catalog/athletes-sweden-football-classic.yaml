@@ -1,7 +1,7 @@
 # Svenska fotbollsspelare — klassisk era
 audience: ["elder", "gen-x"]
 region: ["sweden"]
-category: persons
+category: sport
 contentForm: image
 contentSubject: athlete
 items:
@@ -12,6 +12,7 @@ items:
     wikimediaSearchHints: ["Gunnar Gren Swedish footballer"]
     answerMethods: ["timeline", "name-letters"]
     sensitivity: standard
+    genrePackages: ["football"]
 
   - id: bjorn-nordqvist
     displayName: Björn Nordqvist
@@ -20,6 +21,7 @@ items:
     wikimediaSearchHints: ["Björn Nordqvist Swedish footballer"]
     answerMethods: ["timeline", "name-letters"]
     sensitivity: standard
+    genrePackages: ["football"]
 
   - id: conny-torstensson
     displayName: Conny Torstensson
@@ -28,6 +30,7 @@ items:
     wikimediaSearchHints: ["Conny Torstensson Swedish footballer"]
     answerMethods: ["timeline", "name-letters"]
     sensitivity: standard
+    genrePackages: ["football"]
 
   - id: ralf-edstrom
     displayName: Ralf Edström
@@ -36,6 +39,7 @@ items:
     wikimediaSearchHints: ["Ralf Edström Swedish footballer"]
     answerMethods: ["timeline", "name-letters"]
     sensitivity: standard
+    genrePackages: ["football"]
 
   - id: torbjorn-nilsson
     displayName: Torbjörn Nilsson
@@ -44,6 +48,7 @@ items:
     wikimediaSearchHints: ["Torbjörn Nilsson Swedish footballer"]
     answerMethods: ["timeline", "name-letters"]
     sensitivity: standard
+    genrePackages: ["football"]
 
   - id: glenn-stromberg
     displayName: Glenn Strömberg
@@ -52,3 +57,4 @@ items:
     wikimediaSearchHints: ["Glenn Strömberg Swedish footballer"]
     answerMethods: ["timeline", "name-letters"]
     sensitivity: standard
+    genrePackages: ["football"]

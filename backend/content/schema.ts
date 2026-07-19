@@ -48,12 +48,12 @@ export type Region = z.infer<typeof RegionSchema>;
 
 export const CategorySchema = z.enum([
   'persons',   // @deprecated — kvar för bakåtkompabilitet; nya filer ska
-               // använda 'actors'/'athletes'/'artists' beroende på subject.
+               // använda 'actors'/'sport'/'artists' beroende på subject.
   'capitals',
   'artists',
   'songs',
   'actors',    // Skådespelare (image, subject=actor).
-  'athletes',  // Idrottare (image, subject=athlete).
+  'sport',     // Idrottare (image, subject=athlete). Hette 'athletes' t.o.m. 2026-07-19.
 ]);
 export type Category = z.infer<typeof CategorySchema>;
 

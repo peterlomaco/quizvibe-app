@@ -64,14 +64,14 @@ const CFG: Record<string, FileCfg> = {
   },
   'athletes-sweden-classic': {
     audience: '["elder", "gen-x"]',
-    category: 'athletes',
+    category: 'sport',
     subject: 'athlete',
     header:
       '# Svenska idrottare kända för elder + Gen X. Tillagda 2026-06-01.',
   },
   'athletes-sweden-modern': {
     audience: '["millennials", "gen-z"]',
-    category: 'athletes',
+    category: 'sport',
     subject: 'athlete',
     header:
       '# Svenska idrottare kända för Millennials + Gen Z. Tillagda 2026-06-01.',

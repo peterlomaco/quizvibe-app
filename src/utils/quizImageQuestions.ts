@@ -61,7 +61,7 @@ export type ImageCategory =
   | 'artists'
   | 'songs'
   | 'actors'
-  | 'athletes';
+  | 'sport';
 
 export interface ImageQuizQuestion {
   id: string;
@@ -217,7 +217,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "alain-prost",
     "displayName": "Alain Prost",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1955,
     "audiences": [
@@ -229,7 +229,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "alan-shearer",
     "displayName": "Alan Shearer",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1970,
     "audiences": [
@@ -267,7 +267,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "albin-ekdal",
     "displayName": "Albin Ekdal",
-    "category": "persons",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1989,
     "audiences": [
@@ -302,7 +302,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "alessandro-del-piero",
     "displayName": "Alessandro Del Piero",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1974,
     "audiences": [
@@ -314,7 +314,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "alessandro-nesta",
     "displayName": "Alessandro Nesta",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1976,
     "audiences": [
@@ -338,7 +338,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "alex-morgan",
     "displayName": "Alex Morgan",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1989,
     "audiences": [
@@ -351,7 +351,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "alexander-isak",
     "displayName": "Alexander Isak",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1999,
     "audiences": [
@@ -403,7 +403,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "alexis-sanchez",
     "displayName": "Alexis Sanchez",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1988,
     "audiences": [
@@ -416,7 +416,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "alf-ramsey",
     "displayName": "Alf Ramsey",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1920,
     "audiences": [
@@ -519,7 +519,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "anders-svensson",
     "displayName": "Anders Svensson",
-    "category": "persons",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1976,
     "audiences": [
@@ -531,7 +531,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "andre-agassi",
     "displayName": "Andre Agassi",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1970,
     "audiences": [
@@ -543,7 +543,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "andrea-pirlo",
     "displayName": "Andrea Pirlo",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1979,
     "audiences": [
@@ -556,7 +556,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "andreas-andersson",
     "displayName": "Andreas Andersson",
-    "category": "persons",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1971,
     "audiences": [
@@ -568,7 +568,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "andreas-granqvist",
     "displayName": "Andreas Granqvist",
-    "category": "persons",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1985,
     "audiences": [
@@ -580,7 +580,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "andreas-isaksson",
     "displayName": "Andreas Isaksson",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1981,
     "audiences": [
@@ -593,7 +593,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "andreas-palicka",
     "displayName": "Andreas Palicka",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1986,
     "audiences": [
@@ -606,7 +606,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "andriy-shevchenko",
     "displayName": "Andriy Shevchenko",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1976,
     "audiences": [
@@ -619,7 +619,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "andy-murray",
     "displayName": "Andy Murray",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1987,
     "audiences": [
@@ -632,7 +632,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "angel-di-maria",
     "displayName": "Ángel Di María",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1988,
     "audiences": [
@@ -658,7 +658,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "anja-parson",
     "displayName": "Anja Pärson",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1981,
     "audiences": [
@@ -744,7 +744,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "annika-sorenstam",
     "displayName": "Annika Sörenstam",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1970,
     "audiences": [
@@ -770,7 +770,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "antoine-griezmann",
     "displayName": "Antoine Griezmann",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1991,
     "audiences": [
@@ -829,7 +829,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "armand-duplantis",
     "displayName": "Armand Duplantis",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1999,
     "audiences": [
@@ -866,7 +866,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "arturo-vidal",
     "displayName": "Arturo Vidal",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1987,
     "audiences": [
@@ -891,7 +891,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "ashley-cole",
     "displayName": "Ashley Cole",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1980,
     "audiences": [
@@ -954,7 +954,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "ayrton-senna",
     "displayName": "Ayrton Senna",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1960,
     "audiences": [
@@ -1049,7 +1049,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "bebeto",
     "displayName": "Bebeto",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1964,
     "audiences": [
@@ -1123,7 +1123,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "berti-vogts",
     "displayName": "Berti Vogts",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1946,
     "audiences": [
@@ -1235,7 +1235,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "bjorn-borg",
     "displayName": "Björn Borg",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1956,
     "audiences": [
@@ -1247,7 +1247,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "bjorn-daehlie",
     "displayName": "Bjørn Dæhlie",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1967,
     "audiences": [
@@ -1272,7 +1272,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "bjorn-nordqvist",
     "displayName": "Björn Nordqvist",
-    "category": "persons",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1942,
     "audiences": [
@@ -1330,7 +1330,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "bobby-charlton",
     "displayName": "Bobby Charlton",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1937,
     "audiences": [
@@ -1342,7 +1342,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "bobby-moore",
     "displayName": "Bobby Moore",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1941,
     "audiences": [
@@ -1380,7 +1380,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "borje-salming",
     "displayName": "Börje Salming",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1951,
     "audiences": [
@@ -1498,7 +1498,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "bruno-fernandes",
     "displayName": "Bruno Fernandes",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1994,
     "audiences": [
@@ -1537,7 +1537,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "bukayo-saka",
     "displayName": "Bukayo Saka",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 2001,
     "audiences": [
@@ -1563,7 +1563,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "cafu-falcao",
     "displayName": "Cafu Falcao",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1953,
     "audiences": [
@@ -1602,7 +1602,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "carl-lewis",
     "displayName": "Carl Lewis",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1961,
     "audiences": [
@@ -1614,7 +1614,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "carlos-alberto-parreira",
     "displayName": "Carlos Alberto Parreira",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1943,
     "audiences": [
@@ -1650,7 +1650,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "carolina-kluft",
     "displayName": "Carolina Klüft",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1983,
     "audiences": [
@@ -1674,7 +1674,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "caroline-seger",
     "displayName": "Caroline Seger",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1985,
     "audiences": [
@@ -1714,7 +1714,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "cesare-maldini",
     "displayName": "Cesare Maldini",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1932,
     "audiences": [
@@ -1726,7 +1726,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "cesc-fabregas",
     "displayName": "Cesc Fabregas",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1987,
     "audiences": [
@@ -1753,7 +1753,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "charles-barkley",
     "displayName": "Charles Barkley",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1963,
     "audiences": [
@@ -1792,7 +1792,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "charlotte-kalla",
     "displayName": "Charlotte Kalla",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1987,
     "audiences": [
@@ -1879,7 +1879,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "christian-olsson",
     "displayName": "Christian Olsson",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1980,
     "audiences": [
@@ -1891,7 +1891,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "christian-pulisic",
     "displayName": "Christian Pulisic",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1998,
     "audiences": [
@@ -1904,7 +1904,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "christian-wilhelmsson",
     "displayName": "Christian Wilhelmsson",
-    "category": "persons",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1979,
     "audiences": [
@@ -1968,7 +1968,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "clarence-seedorf",
     "displayName": "Clarence Seedorf",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1976,
     "audiences": [
@@ -1981,7 +1981,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "claudio-taffarel",
     "displayName": "Claudio Taffarel",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1966,
     "audiences": [
@@ -2004,7 +2004,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "cody-gakpo",
     "displayName": "Cody Gakpo",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1999,
     "audiences": [
@@ -2043,7 +2043,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "connor-mcdavid",
     "displayName": "Connor McDavid",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1997,
     "audiences": [
@@ -2080,7 +2080,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "cristiano-ronaldo",
     "displayName": "Cristiano Ronaldo",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1985,
     "audiences": [
@@ -2128,7 +2128,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "dani-alves",
     "displayName": "Dani Alves",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1983,
     "audiences": [
@@ -2152,7 +2152,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "daniel-alfredsson",
     "displayName": "Daniel Alfredsson",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1972,
     "audiences": [
@@ -2188,7 +2188,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "daniel-passarella",
     "displayName": "Daniel Passarella",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1953,
     "audiences": [
@@ -2213,7 +2213,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "daniel-sedin",
     "displayName": "Daniel Sedin",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1980,
     "audiences": [
@@ -2226,7 +2226,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "daniel-stahl",
     "displayName": "Daniel Ståhl",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "peakFrom": 2019,
     "peakTo": 2024,
@@ -2239,7 +2239,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "daniele-de-rossi",
     "displayName": "Daniele De Rossi",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1983,
     "audiences": [
@@ -2287,7 +2287,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "david-beckham",
     "displayName": "David Beckham",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1975,
     "audiences": [
@@ -2325,7 +2325,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "david-trezeguet",
     "displayName": "David Trezeguet",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1977,
     "audiences": [
@@ -2338,7 +2338,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "david-villa",
     "displayName": "David Villa",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1981,
     "audiences": [
@@ -2364,7 +2364,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "declan-rice",
     "displayName": "Declan Rice",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1999,
     "audiences": [
@@ -2377,7 +2377,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "deco",
     "displayName": "Deco",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1977,
     "audiences": [
@@ -2390,7 +2390,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "dejan-kulusevski",
     "displayName": "Dejan Kulusevski",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 2000,
     "audiences": [
@@ -2403,7 +2403,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "demetrio-albertini",
     "displayName": "Demetrio Albertini",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1971,
     "audiences": [
@@ -2480,7 +2480,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "didier-deschamps",
     "displayName": "Didier Deschamps",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1968,
     "audiences": [
@@ -2492,7 +2492,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "didier-drogba",
     "displayName": "Didier Drogba",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1978,
     "audiences": [
@@ -2505,7 +2505,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "diego-costa",
     "displayName": "Diego Costa",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1988,
     "audiences": [
@@ -2518,7 +2518,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "diego-forlan",
     "displayName": "Diego Forlan",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1979,
     "audiences": [
@@ -2531,7 +2531,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "diego-maradona",
     "displayName": "Diego Maradona",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1960,
     "audiences": [
@@ -2543,7 +2543,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "diego-simeone",
     "displayName": "Diego Simeone",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1970,
     "audiences": [
@@ -2556,7 +2556,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "dino-zoff",
     "displayName": "Dino Zoff",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1942,
     "audiences": [
@@ -2568,7 +2568,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "dirk-kuyt",
     "displayName": "Dirk Kuyt",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1980,
     "audiences": [
@@ -2657,7 +2657,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "dunga",
     "displayName": "Dunga",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1963,
     "audiences": [
@@ -2756,7 +2756,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "eden-hazard",
     "displayName": "Eden Hazard",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1991,
     "audiences": [
@@ -2769,7 +2769,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "edgar-davids",
     "displayName": "Edgar Davids",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1973,
     "audiences": [
@@ -2781,7 +2781,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "edinson-cavani",
     "displayName": "Edinson Cavani",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1987,
     "audiences": [
@@ -2860,7 +2860,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "emil-forsberg",
     "displayName": "Emil Forsberg",
-    "category": "persons",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1991,
     "audiences": [
@@ -2872,7 +2872,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "emil-krafth",
     "displayName": "Emil Krafth",
-    "category": "persons",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1994,
     "audiences": [
@@ -2884,7 +2884,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "emilio-butragueno",
     "displayName": "Emilio Butragueno",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1963,
     "audiences": [
@@ -2907,7 +2907,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "emma-green",
     "displayName": "Emma Green",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "peakFrom": 2005,
     "peakTo": 2014,
@@ -2947,7 +2947,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "emmanuel-adebayor",
     "displayName": "Emmanuel Adebayor",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1984,
     "audiences": [
@@ -2973,7 +2973,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "eric-cantona",
     "displayName": "Eric Cantona",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1966,
     "audiences": [
@@ -3033,7 +3033,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "erik-karlsson",
     "displayName": "Erik Karlsson",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1990,
     "audiences": [
@@ -3057,7 +3057,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "erling-haaland",
     "displayName": "Erling Haaland",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 2000,
     "audiences": [
@@ -3083,7 +3083,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "esteban-cambiasso",
     "displayName": "Esteban Cambiasso",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1980,
     "audiences": [
@@ -3107,7 +3107,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "eusebio",
     "displayName": "Eusébio",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1942,
     "audiences": [
@@ -3272,7 +3272,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "fernando-hierro",
     "displayName": "Fernando Hierro",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1968,
     "audiences": [
@@ -3333,7 +3333,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "floyd-mayweather",
     "displayName": "Floyd Mayweather",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1977,
     "audiences": [
@@ -3346,7 +3346,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "frank-lampard",
     "displayName": "Frank Lampard",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1978,
     "audiences": [
@@ -3372,7 +3372,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "frank-rijkaard",
     "displayName": "Frank Rijkaard",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1962,
     "audiences": [
@@ -3397,7 +3397,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "franz-beckenbauer",
     "displayName": "Franz Beckenbauer",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1945,
     "audiences": [
@@ -3409,7 +3409,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "fred",
     "displayName": "Fred",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1983,
     "audiences": [
@@ -3422,7 +3422,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "freddie-ljungberg",
     "displayName": "Freddie Ljungberg",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1977,
     "audiences": [
@@ -3435,7 +3435,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "frenkie-de-jong",
     "displayName": "Frenkie De Jong",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1997,
     "audiences": [
@@ -3448,7 +3448,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "frida-karlsson",
     "displayName": "Frida Karlsson",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1999,
     "audiences": [
@@ -3472,7 +3472,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "gareth-bale",
     "displayName": "Gareth Bale",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1989,
     "audiences": [
@@ -3522,7 +3522,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "gennaro-gattuso",
     "displayName": "Gennaro Gattuso",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1978,
     "audiences": [
@@ -3535,7 +3535,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "george-best",
     "displayName": "George Best",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1946,
     "audiences": [
@@ -3547,7 +3547,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "george-foreman",
     "displayName": "George Foreman",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1949,
     "audiences": [
@@ -3572,7 +3572,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "gerard-pique",
     "displayName": "Gerard Piqué",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1987,
     "audiences": [
@@ -3585,7 +3585,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "gerd-muller",
     "displayName": "Gerd Müller",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1945,
     "audiences": [
@@ -3597,7 +3597,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "glenn-hoddle",
     "displayName": "Glenn Hoddle",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1957,
     "audiences": [
@@ -3609,7 +3609,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "glenn-hysen",
     "displayName": "Glenn Hysén",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1959,
     "audiences": [
@@ -3621,7 +3621,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "glenn-stromberg",
     "displayName": "Glenn Strömberg",
-    "category": "persons",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1960,
     "audiences": [
@@ -3659,7 +3659,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "gonzalo-higuain",
     "displayName": "Gonzalo Higuain",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1987,
     "audiences": [
@@ -3672,7 +3672,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "goran-ivanisevic",
     "displayName": "Goran Ivanišević",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1971,
     "audiences": [
@@ -3734,7 +3734,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "guillermo-ochoa",
     "displayName": "Guillermo Ochoa",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1985,
     "audiences": [
@@ -3747,7 +3747,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "gunnar-gren",
     "displayName": "Gunnar Gren",
-    "category": "persons",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1920,
     "audiences": [
@@ -3759,7 +3759,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "gunnar-nordahl",
     "displayName": "Gunnar Nordahl",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1921,
     "audiences": [
@@ -3822,7 +3822,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "gustav-svensson",
     "displayName": "Gustav Svensson",
-    "category": "persons",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1987,
     "audiences": [
@@ -3834,7 +3834,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "guus-hiddink",
     "displayName": "Guus Hiddink",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1946,
     "audiences": [
@@ -3961,7 +3961,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "harry-kane",
     "displayName": "Harry Kane",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1993,
     "audiences": [
@@ -3974,7 +3974,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "harry-kewell",
     "displayName": "Harry Kewell",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1978,
     "audiences": [
@@ -4000,7 +4000,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "hector-cuper",
     "displayName": "Héctor Cúper",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1955,
     "audiences": [
@@ -4049,7 +4049,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "henrik-larsson",
     "displayName": "Henrik Larsson",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1971,
     "audiences": [
@@ -4061,7 +4061,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "henrik-lundqvist",
     "displayName": "Henrik Lundqvist",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1982,
     "audiences": [
@@ -4074,7 +4074,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "henrik-stenson",
     "displayName": "Henrik Stenson",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1976,
     "audiences": [
@@ -4087,7 +4087,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "henrik-zetterberg",
     "displayName": "Henrik Zetterberg",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1980,
     "audiences": [
@@ -4111,7 +4111,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "hidetoshi-nakata",
     "displayName": "Hidetoshi Nakata",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1977,
     "audiences": [
@@ -4137,7 +4137,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "hugo-lloris",
     "displayName": "Hugo Lloris",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1986,
     "audiences": [
@@ -4150,7 +4150,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "hugo-sanchez",
     "displayName": "Hugo Sanchez",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1958,
     "audiences": [
@@ -4175,7 +4175,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "ian-rush",
     "displayName": "Ian Rush",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1961,
     "audiences": [
@@ -4200,7 +4200,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "iker-casillas",
     "displayName": "Iker Casillas",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1981,
     "audiences": [
@@ -4227,7 +4227,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "ingemar-stenmark",
     "displayName": "Ingemar Stenmark",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1956,
     "audiences": [
@@ -4278,7 +4278,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "ivan-rakitic",
     "displayName": "Ivan Rakitic",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1988,
     "audiences": [
@@ -4304,7 +4304,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "jairzinho",
     "displayName": "Jairzinho",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1944,
     "audiences": [
@@ -4316,7 +4316,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "jakob-ingebrigtsen",
     "displayName": "Jakob Ingebrigtsen",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 2000,
     "audiences": [
@@ -4355,7 +4355,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "james-rodriguez",
     "displayName": "James Rodriguez",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1991,
     "audiences": [
@@ -4381,7 +4381,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "jamie-carragher",
     "displayName": "Jamie Carragher",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1978,
     "audiences": [
@@ -4394,7 +4394,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "jan-ceulemans",
     "displayName": "Jan Ceulemans",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1957,
     "audiences": [
@@ -4417,7 +4417,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "jan-ove-waldner",
     "displayName": "Jan-Ove Waldner",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1965,
     "audiences": [
@@ -4442,7 +4442,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "jaromir-jagr",
     "displayName": "Jaromír Jágr",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1972,
     "audiences": [
@@ -4454,7 +4454,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "javier-hernandez",
     "displayName": "Javier Hernandez",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1988,
     "audiences": [
@@ -4467,7 +4467,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "javier-mascherano",
     "displayName": "Javier Mascherano",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1984,
     "audiences": [
@@ -4480,7 +4480,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "javier-zanetti",
     "displayName": "Javier Zanetti",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1973,
     "audiences": [
@@ -4559,7 +4559,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "jenny-rissveds",
     "displayName": "Jenny Rissveds",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "peakFrom": 2016,
     "peakTo": 2024,
@@ -4596,7 +4596,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "jesper-parnevik",
     "displayName": "Jesper Parnevik",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1965,
     "audiences": [
@@ -4646,7 +4646,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "jimmy-durmaz",
     "displayName": "Jimmy Durmaz",
-    "category": "persons",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1989,
     "audiences": [
@@ -4658,7 +4658,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "joachim-bjorklund",
     "displayName": "Joachim Björklund",
-    "category": "persons",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1971,
     "audiences": [
@@ -4670,7 +4670,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "joachim-low",
     "displayName": "Joachim Löw",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1960,
     "audiences": [
@@ -4693,7 +4693,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "joao-felix",
     "displayName": "João Félix",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1999,
     "audiences": [
@@ -4733,7 +4733,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "joe-frazier",
     "displayName": "Joe Frazier",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1944,
     "audiences": [
@@ -4785,7 +4785,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "johan-cruyff",
     "displayName": "Johan Cruyff",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1947,
     "audiences": [
@@ -4810,7 +4810,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "johan-mjallby",
     "displayName": "Johan Mjällby",
-    "category": "persons",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1971,
     "audiences": [
@@ -4888,7 +4888,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "john-mcenroe",
     "displayName": "John McEnroe",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1959,
     "audiences": [
@@ -4900,7 +4900,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "john-terry",
     "displayName": "John Terry",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1980,
     "audiences": [
@@ -4966,7 +4966,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "jordan-larsson",
     "displayName": "Jordan Larsson",
-    "category": "persons",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1997,
     "audiences": [
@@ -4978,7 +4978,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "jorgen-persson",
     "displayName": "Jörgen Persson",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1966,
     "audiences": [
@@ -5017,7 +5017,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "juan-mata",
     "displayName": "Juan Mata",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1988,
     "audiences": [
@@ -5030,7 +5030,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "jude-bellingham",
     "displayName": "Jude Bellingham",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 2003,
     "audiences": [
@@ -5069,7 +5069,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "julio-cesar",
     "displayName": "Julio Cesar",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1979,
     "audiences": [
@@ -5082,7 +5082,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "jurgen-klinsmann",
     "displayName": "Jurgen Klinsmann",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1964,
     "audiences": [
@@ -5094,7 +5094,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "just-fontaine",
     "displayName": "Just Fontaine",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1933,
     "audiences": [
@@ -5132,7 +5132,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "kajsa-bergqvist",
     "displayName": "Kajsa Bergqvist",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "peakFrom": 2002,
     "peakTo": 2006,
@@ -5145,7 +5145,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "kaka",
     "displayName": "Kaká",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1982,
     "audiences": [
@@ -5170,7 +5170,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "karl-heinz-rummenigge",
     "displayName": "Karl Heinz Rummenigge",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1955,
     "audiences": [
@@ -5182,7 +5182,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "karsten-warholm",
     "displayName": "Karsten Warholm",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1996,
     "audiences": [
@@ -5195,7 +5195,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "katarina-witt",
     "displayName": "Katarina Witt",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1965,
     "audiences": [
@@ -5288,7 +5288,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "kennet-andersson",
     "displayName": "Kennet Andersson",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "peakFrom": 1994,
     "peakTo": 1998,
@@ -5301,7 +5301,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "kenny-dalglish",
     "displayName": "Kenny Dalglish",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1951,
     "audiences": [
@@ -5350,7 +5350,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "kevin-de-bruyne",
     "displayName": "Kevin De Bruyne",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1991,
     "audiences": [
@@ -5374,7 +5374,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "kim-andersson",
     "displayName": "Kim Andersson",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1982,
     "audiences": [
@@ -5398,7 +5398,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "kim-kallstrom",
     "displayName": "Kim Källström",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "peakFrom": 2005,
     "peakTo": 2016,
@@ -5446,7 +5446,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "kobe-bryant",
     "displayName": "Kobe Bryant",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1978,
     "audiences": [
@@ -5459,7 +5459,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "kosovare-asllani",
     "displayName": "Kosovare Asllani",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "peakFrom": 2012,
     "peakTo": 2024,
@@ -5509,7 +5509,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "kurt-hamrin",
     "displayName": "Kurt Hamrin",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "peakFrom": 1958,
     "peakTo": 1967,
@@ -5533,7 +5533,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "kylian-mbappe",
     "displayName": "Kylian Mbappé",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1998,
     "audiences": [
@@ -5583,7 +5583,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "lars-lagerback",
     "displayName": "Lars Lagerbäck",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1948,
     "audiences": [
@@ -5737,7 +5737,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "lennox-lewis",
     "displayName": "Lennox Lewis",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1965,
     "audiences": [
@@ -5801,7 +5801,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "lewis-hamilton",
     "displayName": "Lewis Hamilton",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1985,
     "audiences": [
@@ -5908,7 +5908,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "lionel-messi",
     "displayName": "Lionel Messi",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1987,
     "audiences": [
@@ -6007,7 +6007,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "ljubomir-vranjes",
     "displayName": "Ljubomir Vranjes",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1973,
     "audiences": [
@@ -6069,7 +6069,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "lothar-matthaus",
     "displayName": "Lothar Matthaus",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1961,
     "audiences": [
@@ -6092,7 +6092,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "lotta-schelin",
     "displayName": "Lotta Schelin",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "peakFrom": 2008,
     "peakTo": 2016,
@@ -6118,7 +6118,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "louis-van-gaal",
     "displayName": "Louis van Gaal",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1951,
     "audiences": [
@@ -6130,7 +6130,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "lucas-bergvall",
     "displayName": "Lucas Bergvall",
-    "category": "persons",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 2006,
     "audiences": [
@@ -6142,7 +6142,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "ludvig-aberg",
     "displayName": "Ludvig Åberg",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1999,
     "audiences": [
@@ -6155,7 +6155,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "luis-figo",
     "displayName": "Luis Figo",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1972,
     "audiences": [
@@ -6167,7 +6167,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "luis-suarez",
     "displayName": "Luis Suarez",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1987,
     "audiences": [
@@ -6180,7 +6180,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "luka-modric",
     "displayName": "Luka Modrić",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1985,
     "audiences": [
@@ -6217,7 +6217,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "magdalena-forsberg",
     "displayName": "Magdalena Forsberg",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1967,
     "audiences": [
@@ -6229,7 +6229,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "magic-johnson",
     "displayName": "Magic Johnson",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1959,
     "audiences": [
@@ -6265,7 +6265,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "magnus-wislander",
     "displayName": "Magnus Wislander",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1965,
     "audiences": [
@@ -6340,7 +6340,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "manuel-neuer",
     "displayName": "Manuel Neuer",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1986,
     "audiences": [
@@ -6366,7 +6366,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "marcello-lippi",
     "displayName": "Marcello Lippi",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1948,
     "audiences": [
@@ -6378,7 +6378,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "marcelo",
     "displayName": "Marcelo",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1988,
     "audiences": [
@@ -6391,7 +6391,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "marco-van-basten",
     "displayName": "Marco van Basten",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1964,
     "audiences": [
@@ -6403,7 +6403,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "marcus-allback",
     "displayName": "Marcus Allbäck",
-    "category": "persons",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1973,
     "audiences": [
@@ -6415,7 +6415,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "marcus-berg",
     "displayName": "Marcus Berg",
-    "category": "persons",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1986,
     "audiences": [
@@ -6427,7 +6427,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "marcus-hellner",
     "displayName": "Marcus Hellner",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1985,
     "audiences": [
@@ -6601,7 +6601,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "markus-naslund",
     "displayName": "Markus Näslund",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1973,
     "audiences": [
@@ -6637,7 +6637,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "martin-dahlin",
     "displayName": "Martin Dahlin",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1968,
     "audiences": [
@@ -6649,7 +6649,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "martin-odegaard",
     "displayName": "Martin Ødegaard",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1998,
     "audiences": [
@@ -6662,7 +6662,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "martina-navratilova",
     "displayName": "Martina Navratilova",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1956,
     "audiences": [
@@ -6700,7 +6700,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "mats-naslund",
     "displayName": "Mats Näslund",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1959,
     "audiences": [
@@ -6712,7 +6712,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "mats-sundin",
     "displayName": "Mats Sundin",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1971,
     "audiences": [
@@ -6724,7 +6724,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "mats-wilander",
     "displayName": "Mats Wilander",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1964,
     "audiences": [
@@ -6750,7 +6750,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "mattias-andersson",
     "displayName": "Mattias Andersson",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1978,
     "audiences": [
@@ -6813,7 +6813,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "memphis-depay",
     "displayName": "Memphis Depay",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1994,
     "audiences": [
@@ -6876,7 +6876,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "michael-jordan",
     "displayName": "Michael Jordan",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1963,
     "audiences": [
@@ -6901,7 +6901,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "michael-owen",
     "displayName": "Michael Owen",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1979,
     "audiences": [
@@ -6914,7 +6914,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "michael-schumacher",
     "displayName": "Michael Schumacher",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1969,
     "audiences": [
@@ -6926,7 +6926,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "michel-torneus",
     "displayName": "Michel Tornéus",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "peakFrom": 2012,
     "peakTo": 2016,
@@ -6952,7 +6952,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "mikael-lustig",
     "displayName": "Mikael Lustig",
-    "category": "persons",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1986,
     "audiences": [
@@ -6991,7 +6991,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "mikaela-lauren",
     "displayName": "Mikaela Laurén",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "peakFrom": 2010,
     "peakTo": 2018,
@@ -7004,7 +7004,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "mikaela-shiffrin",
     "displayName": "Mikaela Shiffrin",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1995,
     "audiences": [
@@ -7054,7 +7054,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "miroslav-klose",
     "displayName": "Miroslav Klose",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1978,
     "audiences": [
@@ -7091,7 +7091,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "mohamed-salah",
     "displayName": "Mohamed Salah",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1992,
     "audiences": [
@@ -7126,7 +7126,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "morten-olsen",
     "displayName": "Morten Olsen",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1949,
     "audiences": [
@@ -7138,7 +7138,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "muhammad-ali",
     "displayName": "Muhammad Ali",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1942,
     "audiences": [
@@ -7150,7 +7150,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "nani",
     "displayName": "Nani",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1986,
     "audiences": [
@@ -7239,7 +7239,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "neymar",
     "displayName": "Neymar",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1992,
     "audiences": [
@@ -7252,7 +7252,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "ngolo-kante",
     "displayName": "Ngolo Kante",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1991,
     "audiences": [
@@ -7278,7 +7278,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "nicklas-lidstrom",
     "displayName": "Nicklas Lidström",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1970,
     "audiences": [
@@ -7290,7 +7290,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "niclas-alexandersson",
     "displayName": "Niclas Alexandersson",
-    "category": "persons",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1971,
     "audiences": [
@@ -7351,7 +7351,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "nils-liedholm",
     "displayName": "Nils Liedholm",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1922,
     "audiences": [
@@ -7377,7 +7377,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "nils-van-der-poel",
     "displayName": "Nils van der Poel",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "peakFrom": 2021,
     "peakTo": 2022,
@@ -7444,7 +7444,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "novak-djokovic",
     "displayName": "Novak Djokovic",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1987,
     "audiences": [
@@ -7470,7 +7470,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "ola-toivonen",
     "displayName": "Ola Toivonen",
-    "category": "persons",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1986,
     "audiences": [
@@ -7482,7 +7482,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "olga-korbut",
     "displayName": "Olga Korbut",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1955,
     "audiences": [
@@ -7494,7 +7494,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "oliver-kahn",
     "displayName": "Oliver Kahn",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1969,
     "audiences": [
@@ -7530,7 +7530,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "olof-mellberg",
     "displayName": "Olof Mellberg",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "peakFrom": 2001,
     "peakTo": 2012,
@@ -7567,7 +7567,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "oscar",
     "displayName": "Oscar",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1991,
     "audiences": [
@@ -7580,7 +7580,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "oscar-wendt",
     "displayName": "Oscar Wendt",
-    "category": "persons",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1985,
     "audiences": [
@@ -7627,7 +7627,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "otto-rehhagel",
     "displayName": "Otto Rehhagel",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1938,
     "audiences": [
@@ -7665,7 +7665,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "paolo-maldini",
     "displayName": "Paolo Maldini",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1968,
     "audiences": [
@@ -7677,7 +7677,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "paolo-rossi",
     "displayName": "Paolo Rossi",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1956,
     "audiences": [
@@ -7689,7 +7689,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "patrick-kluivert",
     "displayName": "Patrick Kluivert",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1976,
     "audiences": [
@@ -7715,7 +7715,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "patrick-vieira",
     "displayName": "Patrick Vieira",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1976,
     "audiences": [
@@ -7728,7 +7728,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "patrik-andersson",
     "displayName": "Patrik Andersson",
-    "category": "persons",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1971,
     "audiences": [
@@ -7751,7 +7751,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "patrik-sjoberg",
     "displayName": "Patrik Sjöberg",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1965,
     "audiences": [
@@ -7802,7 +7802,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "paul-pogba",
     "displayName": "Paul Pogba",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1993,
     "audiences": [
@@ -7828,7 +7828,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "pedro-rodriguez",
     "displayName": "Pedro Rodriguez",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1987,
     "audiences": [
@@ -7841,7 +7841,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "pele",
     "displayName": "Pelé",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1940,
     "audiences": [
@@ -7867,7 +7867,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "pepe",
     "displayName": "Pepe",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1983,
     "audiences": [
@@ -7926,7 +7926,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "pernilla-wiberg",
     "displayName": "Pernilla Wiberg",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1970,
     "audiences": [
@@ -7938,7 +7938,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "pete-sampras",
     "displayName": "Pete Sampras",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1971,
     "audiences": [
@@ -7964,7 +7964,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "peter-forsberg",
     "displayName": "Peter Forsberg",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1973,
     "audiences": [
@@ -8026,7 +8026,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "petr-cech",
     "displayName": "Petr Cech",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1982,
     "audiences": [
@@ -8087,7 +8087,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "phil-foden",
     "displayName": "Phil Foden",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 2000,
     "audiences": [
@@ -8220,7 +8220,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "rafael-nadal",
     "displayName": "Rafael Nadal",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1986,
     "audiences": [
@@ -8233,7 +8233,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "ralf-edstrom",
     "displayName": "Ralf Edström",
-    "category": "persons",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1952,
     "audiences": [
@@ -8245,7 +8245,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "raphael-varane",
     "displayName": "Raphael Varane",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1993,
     "audiences": [
@@ -8258,7 +8258,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "raul",
     "displayName": "Raul",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1977,
     "audiences": [
@@ -8284,7 +8284,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "raymond-domenech",
     "displayName": "Raymond Domenech",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1952,
     "audiences": [
@@ -8337,7 +8337,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "ricardo-quaresma",
     "displayName": "Ricardo Quaresma",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1983,
     "audiences": [
@@ -8401,7 +8401,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "rio-ferdinand",
     "displayName": "Rio Ferdinand",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1978,
     "audiences": [
@@ -8414,7 +8414,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "rivaldo",
     "displayName": "Rivaldo",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1972,
     "audiences": [
@@ -8426,7 +8426,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "robbie-keane",
     "displayName": "Robbie Keane",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1980,
     "audiences": [
@@ -8505,7 +8505,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "robert-lewandowski",
     "displayName": "Robert Lewandowski",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1988,
     "audiences": [
@@ -8544,7 +8544,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "roberto-baggio",
     "displayName": "Roberto Baggio",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1967,
     "audiences": [
@@ -8556,7 +8556,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "roberto-donadoni",
     "displayName": "Roberto Donadoni",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1963,
     "audiences": [
@@ -8579,7 +8579,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "robin-olsen",
     "displayName": "Robin Olsen",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "peakFrom": 2018,
     "peakTo": 2024,
@@ -8592,7 +8592,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "robin-soderling",
     "displayName": "Robin Söderling",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "peakFrom": 2009,
     "peakTo": 2011,
@@ -8618,7 +8618,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "robin-van-persie",
     "displayName": "Robin Van Persie",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1983,
     "audiences": [
@@ -8670,7 +8670,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "roger-federer",
     "displayName": "Roger Federer",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1981,
     "audiences": [
@@ -8683,7 +8683,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "roland-nilsson",
     "displayName": "Roland Nilsson",
-    "category": "persons",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1963,
     "audiences": [
@@ -8722,7 +8722,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "romelu-lukaku",
     "displayName": "Romelu Lukaku",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1993,
     "audiences": [
@@ -8735,7 +8735,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "ronaldinho",
     "displayName": "Ronaldinho",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1980,
     "audiences": [
@@ -8750,7 +8750,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "ronaldo-nazario",
     "displayName": "Ronaldo Nazário",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1976,
     "audiences": [
@@ -8800,7 +8800,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "ruud-gullit",
     "displayName": "Ruud Gullit",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1962,
     "audiences": [
@@ -8812,7 +8812,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "ryan-giggs",
     "displayName": "Ryan Giggs",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1973,
     "audiences": [
@@ -8963,7 +8963,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "sara-sjostrom",
     "displayName": "Sarah Sjöström",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1993,
     "audiences": [
@@ -9038,7 +9038,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "sebastian-larsson",
     "displayName": "Sebastian Larsson",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "peakFrom": 2008,
     "peakTo": 2020,
@@ -9077,7 +9077,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "sepp-maier",
     "displayName": "Sepp Maier",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1944,
     "audiences": [
@@ -9089,7 +9089,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "serena-williams",
     "displayName": "Serena Williams",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1981,
     "audiences": [
@@ -9102,7 +9102,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "sergio-aguero",
     "displayName": "Sergio Aguero",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1988,
     "audiences": [
@@ -9115,7 +9115,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "sergio-busquets",
     "displayName": "Sergio Busquets",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1988,
     "audiences": [
@@ -9204,7 +9204,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "sidney-crosby",
     "displayName": "Sidney Crosby",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1987,
     "audiences": [
@@ -9302,7 +9302,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "stefan-edberg",
     "displayName": "Stefan Edberg",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1966,
     "audiences": [
@@ -9314,7 +9314,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "stefan-holm",
     "displayName": "Stefan Holm",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1976,
     "audiences": [
@@ -9326,7 +9326,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "stefan-lovgren",
     "displayName": "Stefan Lövgren",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1970,
     "audiences": [
@@ -9373,7 +9373,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "steven-gerrard",
     "displayName": "Steven Gerrard",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1980,
     "audiences": [
@@ -9412,7 +9412,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "stina-nilsson",
     "displayName": "Stina Nilsson",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1993,
     "audiences": [
@@ -9451,7 +9451,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "susanna-kallur",
     "displayName": "Susanna Kallur",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "peakFrom": 2006,
     "peakTo": 2008,
@@ -9488,7 +9488,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "sven-goran-eriksson",
     "displayName": "Sven-Göran Eriksson",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1948,
     "audiences": [
@@ -9585,7 +9585,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "teddy-lucic",
     "displayName": "Teddy Lučić",
-    "category": "persons",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1977,
     "audiences": [
@@ -9687,7 +9687,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "thiago-silva",
     "displayName": "Thiago Silva",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1984,
     "audiences": [
@@ -9700,7 +9700,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "thierry-henry",
     "displayName": "Thierry Henry",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1977,
     "audiences": [
@@ -9713,7 +9713,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "thomas-johansson-tennis",
     "displayName": "Thomas Johansson",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "peakFrom": 2002,
     "peakTo": 2005,
@@ -9726,7 +9726,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "thomas-muller",
     "displayName": "Thomas Muller",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1989,
     "audiences": [
@@ -9739,7 +9739,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "thomas-ravelli",
     "displayName": "Thomas Ravelli",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1959,
     "audiences": [
@@ -9751,7 +9751,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "tim-cahill",
     "displayName": "Tim Cahill",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1979,
     "audiences": [
@@ -9764,7 +9764,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "tim-howard",
     "displayName": "Tim Howard",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1979,
     "audiences": [
@@ -9812,7 +9812,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "tobias-karlsson-handball",
     "displayName": "Tobias Karlsson",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "peakFrom": 2008,
     "peakTo": 2020,
@@ -9825,7 +9825,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "tobias-linderoth",
     "displayName": "Tobias Linderoth",
-    "category": "persons",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1979,
     "audiences": [
@@ -9837,7 +9837,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "tom-brady",
     "displayName": "Tom Brady",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1977,
     "audiences": [
@@ -9929,7 +9929,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "tomas-brolin",
     "displayName": "Tomas Brolin",
-    "category": "persons",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1969,
     "audiences": [
@@ -9989,7 +9989,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "toni-kroos",
     "displayName": "Toni Kroos",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1990,
     "audiences": [
@@ -10002,7 +10002,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "torbjorn-nilsson",
     "displayName": "Torbjörn Nilsson",
-    "category": "persons",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1960,
     "audiences": [
@@ -10062,7 +10062,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "truls-moregardh",
     "displayName": "Truls Möregårdh",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 2002,
     "audiences": [
@@ -10137,7 +10137,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "usain-bolt",
     "displayName": "Usain Bolt",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1986,
     "audiences": [
@@ -10163,7 +10163,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "venus-williams",
     "displayName": "Venus Williams",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1980,
     "audiences": [
@@ -10187,7 +10187,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "vicente-del-bosque",
     "displayName": "Vicente del Bosque",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1950,
     "audiences": [
@@ -10199,7 +10199,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "victor-hedman",
     "displayName": "Victor Hedman",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1990,
     "audiences": [
@@ -10223,7 +10223,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "victor-lindelof",
     "displayName": "Victor Lindelöf",
-    "category": "persons",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1994,
     "audiences": [
@@ -10246,7 +10246,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "viktor-gyokeres",
     "displayName": "Viktor Gyökeres",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "peakFrom": 2022,
     "peakTo": 2024,
@@ -10296,7 +10296,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "virgil-van-dijk",
     "displayName": "Virgil van Dijk",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1991,
     "audiences": [
@@ -10309,7 +10309,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "wayne-gretzky",
     "displayName": "Wayne Gretzky",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1961,
     "audiences": [
@@ -10321,7 +10321,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "wayne-rooney",
     "displayName": "Wayne Rooney",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1985,
     "audiences": [
@@ -10345,7 +10345,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "wesley-sneijder",
     "displayName": "Wesley Sneijder",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1984,
     "audiences": [
@@ -10423,7 +10423,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "xabi-alonso",
     "displayName": "Xabi Alonso",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1981,
     "audiences": [
@@ -10436,7 +10436,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "xavi",
     "displayName": "Xavi",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1980,
     "audiences": [
@@ -10449,7 +10449,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "yao-ming",
     "displayName": "Yao Ming",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1980,
     "audiences": [
@@ -10510,7 +10510,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "zinedine-zidane",
     "displayName": "Zinédine Zidane",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1972,
     "audiences": [
@@ -10522,7 +10522,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   {
     "id": "zlatan-ibrahimovic",
     "displayName": "Zlatan Ibrahimović",
-    "category": "athletes",
+    "category": "sport",
     "contentSubject": "athlete",
     "correctYear": 1981,
     "audiences": [

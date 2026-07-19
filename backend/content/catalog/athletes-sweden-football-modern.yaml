@@ -1,7 +1,7 @@
 # Svenska fotbollsspelare — modern era
 audience: ["gen-x", "millennials"]
 region: ["sweden"]
-category: persons
+category: sport
 contentForm: image
 contentSubject: athlete
 items:
@@ -12,6 +12,7 @@ items:
     wikimediaSearchHints: ["Tomas Brolin Swedish footballer"]
     answerMethods: ["timeline", "name-letters"]
     sensitivity: standard
+    genrePackages: ["football"]
 
   - id: marcus-allback
     displayName: Marcus Allbäck
@@ -20,6 +21,7 @@ items:
     wikimediaSearchHints: ["Marcus Allbäck Swedish footballer"]
     answerMethods: ["timeline", "name-letters"]
     sensitivity: standard
+    genrePackages: ["football"]
 
   - id: marcus-berg
     displayName: Marcus Berg
@@ -28,6 +30,7 @@ items:
     wikimediaSearchHints: ["Marcus Berg Swedish footballer"]
     answerMethods: ["timeline", "name-letters"]
     sensitivity: standard
+    genrePackages: ["football"]
 
   - id: niclas-alexandersson
     displayName: Niclas Alexandersson
@@ -36,6 +39,7 @@ items:
     wikimediaSearchHints: ["Niclas Alexandersson Swedish footballer"]
     answerMethods: ["timeline", "name-letters"]
     sensitivity: standard
+    genrePackages: ["football"]
 
   - id: mikael-lustig
     displayName: Mikael Lustig
@@ -44,6 +48,7 @@ items:
     wikimediaSearchHints: ["Mikael Lustig Swedish footballer"]
     answerMethods: ["timeline", "name-letters"]
     sensitivity: standard
+    genrePackages: ["football"]
 
   - id: andreas-granqvist
     displayName: Andreas Granqvist
@@ -52,6 +57,7 @@ items:
     wikimediaSearchHints: ["Andreas Granqvist Swedish footballer"]
     answerMethods: ["timeline", "name-letters"]
     sensitivity: standard
+    genrePackages: ["football"]
 
   - id: hakan-mild
     displayName: Håkan Mild
@@ -60,6 +66,7 @@ items:
     wikimediaSearchHints: ["Håkan Mild Swedish footballer"]
     answerMethods: ["timeline", "name-letters"]
     sensitivity: standard
+    genrePackages: ["football"]
 
   - id: joachim-bjorklund
     displayName: Joachim Björklund
@@ -68,6 +75,7 @@ items:
     wikimediaSearchHints: ["Joachim Björklund Swedish footballer"]
     answerMethods: ["timeline", "name-letters"]
     sensitivity: standard
+    genrePackages: ["football"]
 
   - id: teddy-lucic
     displayName: Teddy Lučić
@@ -76,6 +84,7 @@ items:
     wikimediaSearchHints: ["Teddy Lučić Swedish footballer"]
     answerMethods: ["timeline", "name-letters"]
     sensitivity: standard
+    genrePackages: ["football"]
 
   - id: christian-wilhelmsson
     displayName: Christian Wilhelmsson
@@ -84,6 +93,7 @@ items:
     wikimediaSearchHints: ["Christian Wilhelmsson Swedish footballer"]
     answerMethods: ["timeline", "name-letters"]
     sensitivity: standard
+    genrePackages: ["football"]
 
   - id: tobias-linderoth
     displayName: Tobias Linderoth
@@ -92,6 +102,7 @@ items:
     wikimediaSearchHints: ["Tobias Linderoth Swedish footballer"]
     answerMethods: ["timeline", "name-letters"]
     sensitivity: standard
+    genrePackages: ["football"]
 
   - id: daniel-andersson
     displayName: Daniel Andersson
@@ -100,6 +111,7 @@ items:
     wikimediaSearchHints: ["Daniel Andersson Swedish footballer"]
     answerMethods: ["timeline", "name-letters"]
     sensitivity: standard
+    genrePackages: ["football"]
 
   - id: ola-toivonen
     displayName: Ola Toivonen
@@ -108,6 +120,7 @@ items:
     wikimediaSearchHints: ["Ola Toivonen Swedish footballer"]
     answerMethods: ["timeline", "name-letters"]
     sensitivity: standard
+    genrePackages: ["football"]
 
   - id: albin-ekdal
     displayName: Albin Ekdal
@@ -116,6 +129,7 @@ items:
     wikimediaSearchHints: ["Albin Ekdal Swedish footballer"]
     answerMethods: ["timeline", "name-letters"]
     sensitivity: standard
+    genrePackages: ["football"]
 
   - id: jimmy-durmaz
     displayName: Jimmy Durmaz
@@ -124,6 +138,7 @@ items:
     wikimediaSearchHints: ["Jimmy Durmaz Swedish footballer"]
     answerMethods: ["timeline", "name-letters"]
     sensitivity: standard
+    genrePackages: ["football"]
 
   - id: andreas-andersson
     displayName: Andreas Andersson
@@ -132,6 +147,7 @@ items:
     wikimediaSearchHints: ["Andreas Andersson Swedish footballer"]
     answerMethods: ["timeline", "name-letters"]
     sensitivity: standard
+    genrePackages: ["football"]
 
   - id: oscar-wendt
     displayName: Oscar Wendt
@@ -140,6 +156,7 @@ items:
     wikimediaSearchHints: ["Oscar Wendt Swedish footballer"]
     answerMethods: ["timeline", "name-letters"]
     sensitivity: standard
+    genrePackages: ["football"]
 
   - id: lucas-bergvall
     displayName: Lucas Bergvall
@@ -148,6 +165,7 @@ items:
     wikimediaSearchHints: ["Lucas Bergvall Swedish footballer"]
     answerMethods: ["timeline", "name-letters"]
     sensitivity: standard
+    genrePackages: ["football"]
 
   - id: isak-hien
     displayName: Isak Hien
@@ -156,6 +174,7 @@ items:
     wikimediaSearchHints: ["Isak Hien Swedish footballer"]
     answerMethods: ["timeline", "name-letters"]
     sensitivity: standard
+    genrePackages: ["football"]
 
   - id: jordan-larsson
     displayName: Jordan Larsson
@@ -164,6 +183,7 @@ items:
     wikimediaSearchHints: ["Jordan Larsson Swedish footballer"]
     answerMethods: ["timeline", "name-letters"]
     sensitivity: standard
+    genrePackages: ["football"]
 
   - id: emil-krafth
     displayName: Emil Krafth
@@ -172,6 +192,7 @@ items:
     wikimediaSearchHints: ["Emil Krafth Swedish footballer"]
     answerMethods: ["timeline", "name-letters"]
     sensitivity: standard
+    genrePackages: ["football"]
 
   - id: gustav-svensson
     displayName: Gustav Svensson
@@ -180,6 +201,7 @@ items:
     wikimediaSearchHints: ["Gustav Svensson Swedish footballer"]
     answerMethods: ["timeline", "name-letters"]
     sensitivity: standard
+    genrePackages: ["football"]
 
   - id: patrik-andersson
     displayName: Patrik Andersson
@@ -188,6 +210,7 @@ items:
     wikimediaSearchHints: ["Patrik Andersson Swedish footballer"]
     answerMethods: ["timeline", "name-letters"]
     sensitivity: standard
+    genrePackages: ["football"]
 
   - id: roland-nilsson
     displayName: Roland Nilsson
@@ -196,6 +219,7 @@ items:
     wikimediaSearchHints: ["Roland Nilsson Swedish footballer"]
     answerMethods: ["timeline", "name-letters"]
     sensitivity: standard
+    genrePackages: ["football"]
 
   - id: anders-svensson
     displayName: Anders Svensson
@@ -204,6 +228,7 @@ items:
     wikimediaSearchHints: ["Anders Svensson Swedish footballer"]
     answerMethods: ["timeline", "name-letters"]
     sensitivity: standard
+    genrePackages: ["football"]
 
   - id: jonas-thern
     displayName: Jonas Thern
@@ -212,6 +237,7 @@ items:
     wikimediaSearchHints: ["Jonas Thern Swedish footballer"]
     answerMethods: ["timeline", "name-letters"]
     sensitivity: standard
+    genrePackages: ["football"]
 
   - id: johan-mjallby
     displayName: Johan Mjällby
@@ -220,6 +246,7 @@ items:
     wikimediaSearchHints: ["Johan Mjällby Swedish footballer"]
     answerMethods: ["timeline", "name-letters"]
     sensitivity: standard
+    genrePackages: ["football"]
 
   - id: emil-forsberg
     displayName: Emil Forsberg
@@ -228,6 +255,7 @@ items:
     wikimediaSearchHints: ["Emil Forsberg Swedish footballer"]
     answerMethods: ["timeline", "name-letters"]
     sensitivity: standard
+    genrePackages: ["football"]
 
   - id: victor-lindelof
     displayName: Victor Lindelöf
@@ -236,3 +264,4 @@ items:
     wikimediaSearchHints: ["Victor Lindelöf Swedish footballer"]
     answerMethods: ["timeline", "name-letters"]
     sensitivity: standard
+    genrePackages: ["football"]

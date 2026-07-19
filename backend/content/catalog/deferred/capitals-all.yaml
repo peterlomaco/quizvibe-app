@@ -2,6 +2,7 @@
 # Capitals använder bara name-letters-svarsmodellen — ingen timeline-fråga
 # eftersom grundläggning/etablering ger otydliga årtal för dessa städer.
 audience: ["all"]
+region: ["sweden"]
 category: capitals
 contentForm: image
 contentSubject: city

@@ -5,6 +5,7 @@
 # Country-items är era-agnostiska (samma som capitals) — ingen correctYear,
 # endast name-letters-svarsmodell.
 audience: ["all"]
+region: ["sweden"]
 category: capitals
 contentForm: image
 contentSubject: country

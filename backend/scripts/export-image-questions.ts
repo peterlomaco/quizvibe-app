@@ -167,7 +167,7 @@ export type ImageCategory =
   | 'artists'
   | 'songs'
   | 'actors'
-  | 'athletes';
+  | 'sport';
 
 export interface ImageQuizQuestion {
   id: string;

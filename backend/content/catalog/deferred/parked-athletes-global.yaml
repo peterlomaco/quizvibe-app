@@ -3,7 +3,7 @@
 # kör export-image-questions + uppdatera quizImages.ts
 audience: ["all"]
 region: ["global"]
-category: persons
+category: sport
 contentForm: image
 contentSubject: athlete
 items:
