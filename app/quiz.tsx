@@ -396,7 +396,7 @@ const QUIZ_ERROR_RED = '#FF3B30';
 // V1-flöde: DJ stannar i Spotify hela rundan. Host (eller reserv) aktiverar
 // timern. Vanliga gissare lyssnar och svarar.
 const SPOTIFY_DJ_STEPS = [
-  'Open Spotify and start the track',
+  'Open Spotify and start the track — if it does not start automatically, press Play in Spotify',
   'Timer is activated by the other players (non-DJs)',
   'Stay in Spotify during the song is played and timer is running',
   'Players inform when timer ends — stop the track in Spotify and confirm the track has been stopped',
@@ -1025,18 +1025,10 @@ export default function QuizScreen() {
   // host:s monitor-recovery clearar overlay:n direkt eftersom host driver
   // broadcast-flödet och kan inte bail:a mid-game (det skulle frysa alla
   // andra devices i reveal). Host:s blip är därför rent live-state-driven.
+  // OBS: latch-effekten + shouldLockForUnstable-deriveringen ligger längre
+  // ner (efter Spotify DJ-state) — de behöver isDJAwayInSpotify-undantaget
+  // som kräver isCurrentPlayerDJ/spotifyDJOpenedApp.
   const [stickyUnstableForQuestion, setStickyUnstableForQuestion] = useState(false);
-  useEffect(() => {
-    if (isConnectionUnstable && !isHost) setStickyUnstableForQuestion(true);
-  }, [isConnectionUnstable, isHost]);
-  // Derived: drivs av OR mellan live-state och sticky-latch. Allt UI-disable
-  // + overlay-mount använder denna istället för raw `isConnectionUnstable`.
-  const shouldLockForUnstable =
-    isConnectionUnstable || stickyUnstableForQuestion;
-  // Ref-mirror av shouldLockForUnstable så timeout-useEffect (deps [timeLeft])
-  // kan läsa aktuellt värde utan stale-closure-problem.
-  const shouldLockForUnstableRef = useRef(false);
-  shouldLockForUnstableRef.current = shouldLockForUnstable;
   // YouTube-felhantering: sätts true när spelaren rapporterar embed-fel
   // (borttagen video, region-block, etc.). Triggar ett "Video unavailable"-kort
   // istället för MediaPlayer och auto-advancerar till reveal efter 2.5 s.
@@ -1810,6 +1802,14 @@ export default function QuizScreen() {
     djRotationPlan && isSpotifyQuestion
       ? getDJForQuestionIndex(djRotationPlan, questionIndex)
       : null;
+  // Synkron ref-spegel (fix 2026-07-27): subscribe-callbacken (registrerad
+  // EN gång på mount) läser DJ-id:t via denna ref istället för closure-värdet.
+  // Utan ref:en bar host:s rejoin-re-broadcast av play_command MOUNT-tidens
+  // dj_player_id (= fråga 0:s DJ = host) — när en senare frågas non-host-DJ
+  // återvände från Spotify (flap → player_rejoined → 500ms-re-broadcast)
+  // demoterades den till gissare mitt i sin egen DJ-runda och fick svars-UI.
+  const currentDJPlayerRef = useRef<SpotifyDJPlayer | null>(null);
+  currentDJPlayerRef.current = currentDJPlayer;
 
   // Är JAGET DJ denna runda?
   //   Host: använder lokalt beräknat currentDJPlayer (djRotationPlan är korrekt på host).
@@ -1838,6 +1838,35 @@ export default function QuizScreen() {
     gameMode === 'individual-devices' &&
     !isCurrentPlayerDJ &&
     (hostIsTheDJ ? selfPlayerId === reserveTimerActivatorId : isHost);
+
+  // DJ:n är AVSIKTLIGT utanför QuizVibe — de tappade "Start track in Spotify"
+  // och är i Spotify-appen för att spela låten. Backgroundingen får connection-
+  // monitorn att rapportera unstable när appen vaknar (frusna heartbeats /
+  // Realtime-socket-död i bakgrunden), men det är INTE ett nätverksfel. Utan
+  // undantaget latchade sticky-unstable på non-host-DJ:n vid återkomsten →
+  // "Reconnecting…"-overlay → OK-tap → phase 'intro' → host:s play_command-
+  // rebroadcast → NY countdown mitt i frågan, osynkat med host som väntar i
+  // question-vyn på att aktivera timern. Host-DJ drabbades aldrig (latchen är
+  // !isHost-gated). Speglar D-vi-undantaget för host-disconnect-grace
+  // (spotifyDJStarted). Nollställs per fråga via questionIndex-effektens
+  // setSpotifyDJOpenedApp(false) — genuina nätverksfel latchar igen då.
+  const isDJAwayInSpotify =
+    isSpotifyQuestion && isCurrentPlayerDJ && spotifyDJOpenedApp;
+  useEffect(() => {
+    if (isConnectionUnstable && !isHost && !isDJAwayInSpotify) {
+      setStickyUnstableForQuestion(true);
+    }
+  }, [isConnectionUnstable, isHost, isDJAwayInSpotify]);
+  // Derived: drivs av OR mellan live-state och sticky-latch. Allt UI-disable
+  // + overlay-mount använder denna istället för raw `isConnectionUnstable`.
+  // DJ-away-undantaget suppressar även live-overlay-flashen (2s hysteresis)
+  // när DJ:n återvänder från Spotify.
+  const shouldLockForUnstable =
+    (isConnectionUnstable || stickyUnstableForQuestion) && !isDJAwayInSpotify;
+  // Ref-mirror av shouldLockForUnstable så timeout-useEffect (deps [timeLeft])
+  // kan läsa aktuellt värde utan stale-closure-problem.
+  const shouldLockForUnstableRef = useRef(false);
+  shouldLockForUnstableRef.current = shouldLockForUnstable;
 
   // Aktuell spelares assistance — driver svarsruta-intervallet (full=5 år,
   // standard=3 år, minimal=1 år) per rond. Faller tillbaka till fallback-
@@ -3748,6 +3777,24 @@ export default function QuizScreen() {
       if (stickyUnstableForQuestion || isConnectionUnstable) {
         return;
       }
+      // New-question-heal (fix 2026-07-27): en play_command för en ANNAN
+      // fråga än den lokala betyder att question_advance missades (frozen
+      // JS vid låst skärm / droppad Realtime-broadcast — replayas aldrig).
+      // Enheten står då kvar i FÖRRA frågans fas (awaiting/reveal) medan
+      // index/question-id/dj-id healas nedan → utan fas-heal renderas nya
+      // frågans data i gammal fas (symptom: DJ-kortet "You are the DJ"
+      // utan "Start track in Spotify"-knapp — scroll-zonens DJ-CTA kräver
+      // phase='question'). Vid isNewQuestion kör vi samma per-frågas-reset
+      // som handleAdvanceToNextRound skulle ha gjort + tvingar fas-maskinen
+      // in i countdown längst ned.
+      const isNewQuestion = questionIndexRef.current !== qIdx;
+      if (isNewQuestion && phaseRef.current !== 'intro') {
+        if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
+        hasRecordedScoreForCurrentQuestionRef.current = false;
+        questionStartMsRef.current = 0;
+        spotifyTimerStartAtRef.current = 0;
+        setPlayerConfirms({});
+      }
       // Sync questionIndex från broadcast — kritiskt för reconnect-fallet:
       // om B var offline under host:s tidigare question_advance kan B:s
       // lokala questionIndex vara stale (peka på en gammal fråga). Host:s
@@ -3782,7 +3829,11 @@ export default function QuizScreen() {
       // Retry-fallet som resetten skyddar mot täcks fortsatt:
       // handleRetryFromUnstable sätter phase='intro' innan nästa
       // play_command tas emot, så resetten fyrar där den ska.
-      if (phaseRef.current === 'intro') {
+      // isNewQuestion-fallet (2026-07-27) resettar också: det bekräftade
+      // svaret tillhör FÖRRA frågan vars score redan är registrerad —
+      // 2026-07-03-skyddet (samma-frågas sena re-broadcast wipe:ar inte)
+      // bevaras eftersom isNewQuestion då är false.
+      if (phaseRef.current === 'intro' || isNewQuestion) {
         setPendingYear(null);
         setSelectedYear(null);
         setConfirmedCorrect(null);
@@ -3792,10 +3843,11 @@ export default function QuizScreen() {
         setConfirmedActorName(null);
         setConfirmedTimeUsed(null);
       }
-      // Defensiv: bara från intro-phase tillåts countdown-transition.
-      // Skyddar mot late-arriving broadcasts efter att non-host redan
-      // advancerat (t.ex. via reconnect i D-vi senare).
-      setPhase((current) => (current === 'intro' ? 'countdown' : current));
+      // Defensiv: från intro-phase tillåts countdown-transition (normal-
+      // flödet). isNewQuestion (2026-07-27) tvingar dessutom transition
+      // från stale awaiting/reveal när enheten missat question_advance —
+      // late-arriving re-broadcasts för SAMMA fråga blockeras fortsatt.
+      setPhase((current) => (current === 'intro' || isNewQuestion ? 'countdown' : current));
     };
     questionAdvanceHandlerRef.current = (payload) => {
       const {
@@ -4209,7 +4261,8 @@ export default function QuizScreen() {
     }
 
     // Host Game Credits-gate (samma som Home:s Create Game + Lobby:s Start
-    // Game): blockera Play Again om både Free och Extras är 0. loadProfile()
+    // Game): blockera Play Again om Free är 0 (engångsköpta Extras borttagna
+    // 2026-07-07 — Premium är enda vägen förbi dags-cappen). loadProfile()
     // refreshar Free-saldot vid första load efter midnatt CET så vi alltid
     // jämför mot aktuellt värde. Bättre att fånga det här innan vi visar
     // re-use-players-prompten — annars fyller man i 2 alerts och får sedan
@@ -4223,14 +4276,13 @@ export default function QuizScreen() {
         hasPremiumSubscription(),
       ]);
       // Membership = obegränsade host-spel; ingen gate. Lobby:s handleStartGame
-      // skippar också deduktionen så Free/Extras-saldon förblir orörda.
+      // skippar också deduktionen så Free-saldot förblir orört.
       if (!hasPremium) {
         const free = freshProfile?.freeGameCredits ?? 0;
-        const extras = freshProfile?.gameCredits ?? 0;
-        if (free === 0 && extras === 0) {
+        if (free === 0) {
           Alert.alert(
             'Out of Host Game Credits',
-            'You have no credits left for today. Buy extra credits in Store, wait for the daily refresh at midnight CET, or upgrade to a QuizVibe membership for unlimited host games.',
+            'You have used your free host games for today. Wait for the daily refresh at midnight CET, or upgrade to QuizVibe Premium for unlimited host games.',
             [
               { text: 'Cancel', style: 'cancel' },
               // Pushar Store UTAN `from=...`-paramet så Store:s Back-knapp fall:er
@@ -4238,7 +4290,7 @@ export default function QuizScreen() {
               // bevarar /quiz på root Stack:en med Final Leaderboard-state intakt
               // — annars hade replace:n unmountat Quiz-komponenten och spelaren
               // skulle landa på en tom /quiz-vy efter köpet.
-              { text: 'Go to Store', onPress: () => router.push('/store?focus=credits') },
+              { text: 'Go to Store', onPress: () => router.push('/store?focus=subscription') },
             ],
           );
           return;
@@ -4521,25 +4573,52 @@ export default function QuizScreen() {
       // värde. Idempotent när redan synkad. Skyddar mot stale-index efter
       // offline-fönster där missade play_command/question_advance inte
       // replayas av Supabase Realtime.
+      // didDrift beräknas FÖRE setState (2026-07-27) — driver fas-heal nedan.
+      const didDrift = questionIndexRef.current !== hostQuestionIndex;
       setQuestionIndex((prev) => {
         if (prev === hostQuestionIndex) return prev;
         // Rensa broadcastQuestionId + broadcastDJPlayerId så _broadcastOverride och
         // isCurrentPlayerDJ inte pekar på stale data — nästa play_command + spotify_question_ready sätter rätt.
         setBroadcastQuestionId(null);
         setBroadcastDJPlayerId(null);
+        // Nollställ timer-refs (fix 2026-07-18): en enhet som missade
+        // question_advance (frozen/låst) heal:as hit med FÖRRA frågans
+        // timer-stämplar kvar i refs — questionIndex-effekten resetar bara
+        // state, inte refs (handleAdvanceToNextRound körs inte i heal-vägen).
+        // Utan reset ger startTimer:s/timerActive-effektens elapsed-
+        // kompensation timeLeft=0 direkt vid nästa question-entry (stämpeln
+        // är minuter gammal) → omedelbar timeout + reveal. Nästa
+        // play_command/spotify_dj_track_started sätter färska stämplar.
+        hostTimerStartAtRef.current = 0;
+        spotifyTimerStartAtRef.current = 0;
+        // Fix 2026-07-27: även scoring-latch + lokal timerstämpel — annars
+        // blockeras nya frågans scoring av förra frågans latch, och
+        // AppState-resume räknar elapsed mot en minuter-gammal stämpel.
+        hasRecordedScoreForCurrentQuestionRef.current = false;
+        questionStartMsRef.current = 0;
         return hostQuestionIndex;
       });
       // Belt-and-suspenders catch-up: om host är bortom intro men non-host
       // fastnat i 'intro' (t.ex. sticky-latch rensat men play_command redan
       // tappat) triggar nästa ping en fas-transition. Kräver att sticky är
       // rensat (= non-host tappat Retry) och att nätet är stabilt igen.
+      // Fix 2026-07-27: vid didDrift (frozen enhet som missade BÅDE
+      // question_advance OCH play_command) räddas även stale awaiting/
+      // reveal — utan detta renderas nya frågans data i förra frågans fas
+      // (DJ-kort utan Start-knapp). Samma-frågas pingar (didDrift=false)
+      // rör som tidigare bara intro → countdown.
       if (
         hostPhase &&
         (hostPhase === 'countdown' || hostPhase === 'question') &&
         !stickyUnstableForQuestion &&
         !isConnectionUnstable
       ) {
-        setPhase((current) => (current === 'intro' ? 'countdown' : current));
+        setPhase((current) =>
+          current === 'intro' ||
+          (didDrift && (current === 'awaiting' || current === 'reveal' || current === 'question'))
+            ? 'countdown'
+            : current,
+        );
       }
     };
     hostRejoinedHandlerRef.current = () => {
@@ -4819,7 +4898,11 @@ export default function QuizScreen() {
                 timer_start_at: undefined,
                 spotify_answer_year: spotifyAnswerYear,
                 spotify_answer_name: spotifyAnswerName,
-                dj_player_id: currentDJPlayer?.id,
+                // VIA REF (fix 2026-07-27): denna callback registreras EN gång
+                // på mount — closure-läsning av currentDJPlayer gav MOUNT-tidens
+                // DJ (fråga 0 = host) och demoterade en senare frågas non-host-DJ
+                // till gissare när deras Spotify-flap triggade re-broadcasten.
+                dj_player_id: currentDJPlayerRef.current?.id,
               }).catch(() => {});
             }, 500);
           }
@@ -4845,6 +4928,25 @@ export default function QuizScreen() {
       // kompenserar för en elapsed-tid som inte existerar → timern börjar
       // halvvägs eller direkt på 0.
       onSpotifyDJTrackStarted: (payload) => {
+        // Stale-guard (fix 2026-07-18): aktiverarens 5s-heartbeat kan överleva
+        // ett frågebyte — om aktiverarens enhet var backgroundad/låst vid
+        // question_advance missas broadcasten (Realtime replayar inte), och
+        // när enheten väcks fyrar det frusna intervallet FÖRE ping-heal:en
+        // hunnit synka questionIndex → FÖRRA frågans timer_start_at (minuter
+        // gammal) broadcastas. Utan guard latchade mottagaren stale
+        // spotifyDJStarted=true + stale hostTimerStartAtRef → timern auto-
+        // aktiverades vid question-entry → startTimer:s elapsed-kompensation
+        // gav timeLeft=0 → omedelbar timeout + reveal INNAN någon aktiverat
+        // timern. Track-ID:t i payloaden identifierar frågan — mismatch mot
+        // aktuell fråga = stale → ignorera. Ref:en (inte state) läses eftersom
+        // handlern registreras en gång ([isHost]-deps) och closure:n annars
+        // vore frusen.
+        if (
+          !currentSpotifyTrackIdRef.current ||
+          payload.spotify_track_id !== currentSpotifyTrackIdRef.current
+        ) {
+          return;
+        }
         setSpotifyDJStarted(true);
         setSpotifyWaitPhase(null);
         if (payload.timer_start_at) {
@@ -5490,7 +5592,7 @@ export default function QuizScreen() {
                                   {isDone ? '✓' : i + 1}
                                 </Text>
                               </View>
-                              <Text style={[styles.spotifyGuideText, { flex: 0 }, isActive && styles.spotifyGuideTextActive, isDone && styles.spotifyGuideTextDone]}>{renderStepText(step)}</Text>
+                              <Text style={[styles.spotifyGuideText, { flex: 0, flexShrink: 1 }, isActive && styles.spotifyGuideTextActive, isDone && styles.spotifyGuideTextDone]}>{renderStepText(step)}</Text>
                             </View>
                           );
                         })}
@@ -5544,7 +5646,7 @@ export default function QuizScreen() {
                                   {isDone ? '✓' : i + 1}
                                 </Text>
                               </View>
-                              <Text style={[styles.spotifyGuideText, { flex: 0 }, isActive && styles.spotifyGuideTextActive, isDone && styles.spotifyGuideTextDone]}>{renderStepText(step)}</Text>
+                              <Text style={[styles.spotifyGuideText, { flex: 0, flexShrink: 1 }, isActive && styles.spotifyGuideTextActive, isDone && styles.spotifyGuideTextDone]}>{renderStepText(step)}</Text>
                             </View>
                           );
                         })}
@@ -5874,8 +5976,12 @@ export default function QuizScreen() {
                 Disabled-states följer phase: båda låsta i awaiting + reveal
                 så svar inte kan ändras efter Confirm. */}
             {/* DJ correct-year-ruta: direkt under question-card, utanför scroll-zonen */}
-            {/* DJ-vy i scroll-zonen: steg 0 + 1 centrerade där TimelineSelector annars sitter */}
-            {question.type === 'timeline' && isCurrentPlayerDJ && (phase === 'question' || (phase === 'reveal' && !djDismissedOverlay)) && (
+            {/* DJ-vy i scroll-zonen: steg 0 + 1 centrerade där TimelineSelector annars sitter.
+                'awaiting' ingår som render-försvar (2026-07-27): en DJ kan aldrig
+                legitimt nå awaiting (canConfirm=false för DJ), men om fas-maskinen
+                fastnar i stale awaiting (missad question_advance) ska DJ-CTA:n ändå
+                visas — DJ-enhetens fas är i praktiken irrelevant för DJ-rollen. */}
+            {question.type === 'timeline' && isCurrentPlayerDJ && (phase === 'question' || phase === 'awaiting' || (phase === 'reveal' && !djDismissedOverlay)) && (
               <View style={[styles.spotifyDJScrollZone, phase === 'reveal' && { paddingTop: Spacing.xl }]}>
                 {phase === 'reveal' ? (
                   // Reveal-fas för DJ: Open Spotify (fortsätt uppspelning) + OR + bekräfta stopp

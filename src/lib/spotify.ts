@@ -1,9 +1,26 @@
 /**
- * Spotify OAuth 2.0 PKCE + Premium-verifiering
+ * ══════════════════════════════════════════════════════════════════════
+ * HELA MODULEN ÄR ARKIVERAD — FUTURE VERSION 2 (Plan B-beslut 2026-07-22)
+ * ══════════════════════════════════════════════════════════════════════
  *
- * Kräver INGA native modules — använder expo-web-browser (systembrowser
- * för OAuth-flödet) + expo-crypto (PKCE). expo-auth-session används INTE
- * (paketet har en trasig build i Expo SDK 54 — saknar Discovery-submodul).
+ * Juristens svar på LEGAL-INTEGRATIONS-BRIEF.md: Spotify API-användning
+ * (även enbart OAuth + Premium-verifiering via GET /v1/me) är INTE
+ * preferred för V1. V1 kör istället "Plan B": ren URL-länk
+ * (spotify:track:<id> / https://open.spotify.com/track/<id>) via
+ * openSpotifyTrack i src/utils/spotifyDJ.ts — inga API-anrop, ingen
+ * OAuth, inget Spotify Premium-krav. DJ-behörighet är self-attest
+ * ("Spotify user"-toggle i Profile/Lobby), inte konto-verifiering.
+ *
+ * INGEN aktiv V1-kod importerar denna modul. spotify_connections-tabellen
+ * är droppad (migration 0025). Vid V2-reaktivering (om Spotify godkänner):
+ *   • återskapa spotify_connections (se migration 0015)
+ *   • lägg tillbaka playback-scopes i SCOPES (trimmade 2026-07-07)
+ *   • återaktivera WebBrowser.maybeCompleteAuthSession() nedan
+ *
+ * Ursprunglig arkitektur: OAuth 2.0 PKCE + Premium-verifiering.
+ * Kräver INGA native modules — expo-web-browser (systembrowser för
+ * OAuth-flödet) + expo-crypto (PKCE). expo-auth-session används INTE
+ * (trasig build i Expo SDK 54 — saknar Discovery-submodul).
  *
  * Flöde:
  *   1. connectSpotify()   — öppnar systembrowser → Spotify-inloggning
@@ -21,9 +38,10 @@ import * as Crypto from 'expo-crypto';
 import { Alert } from 'react-native';
 import { supabase } from '@/src/utils/supabase';
 
-// Stänger systembrowsern automatiskt om den är öppen vid app-mount.
-// Behövs för att hantera edge case där appen återupptas mitt i OAuth-flödet.
-WebBrowser.maybeCompleteAuthSession();
+// (ARKIVERAD modul-side-effect) Stänger systembrowsern automatiskt om den är
+// öppen vid app-mount — behövs bara för OAuth-flödet. Utkommenterad så modulen
+// är side-effect-fri om den råkar bundlas trots att inget importerar den.
+// WebBrowser.maybeCompleteAuthSession();
 
 // ── Konstanter ───────────────────────────────────────────────────────
 
@@ -35,13 +53,14 @@ const CLIENT_ID = process.env.EXPO_PUBLIC_SPOTIFY_CLIENT_ID ?? '';
 // Expo Go-dev-server använder en annan URI (se kommentar i .env.example).
 const REDIRECT_URI = 'quizvibeapp://spotify-callback';
 
+// V1-SCOPE-TRIM (2026-07-07): endast kontoverifiering. Playback-scopes
+// ('user-read-playback-state', 'user-modify-playback-state') borttagna —
+// de behövs bara för det arkiverade V2-flödet (Automated Playback Control,
+// se archived-blocket nedan) och ska INTE begäras i V1 per juridiskt underlag
+// (LEGAL-INTEGRATIONS-BRIEF.md). Återinför dem när V2-blocket reaktiveras.
 const SCOPES = [
   'user-read-private',           // Krävs för att läsa product (premium/free) via /v1/me
   'user-read-email',             // Visad e-post i connect-bekräftelsen
-  'user-read-playback-state',    // Krävs för GET /me/player — hämta aktiv device_id vid
-                                 // pause-retry (deep link startar uppspelning utan API-session
-                                 // → första PUT /me/player/pause ger 404 utan device_id).
-  'user-modify-playback-state',  // Pausa/starta uppspelning via Web API (DJ-overlay)
   // 'app-remote-control' borttagen — kräver Spotifys explicita produktionsgodkännande
   // och behövs inte eftersom vi öppnar låtar via deep link (spotify:track:ID),
   // inte via Spotify SDK. Att inkludera den kan göra att /v1/me returnerar 403.
@@ -393,6 +412,10 @@ let _memCachedTokenExpiresAt: number = 0; // Unix ms
 // spotifyDJ.ts). Dessa funktioner styr uppspelning via Spotify Web API
 // (PUT /me/player/play, PUT /me/player/pause) — reaktiveras i V2.
 // Importraden i quiz.tsx är arkiverad med // prefix så de kallas ej från V1.
+// OBS vid reaktivering: 'user-read-playback-state' + 'user-modify-playback-state'
+// måste läggas tillbaka i SCOPES (trimmade 2026-07-07) — utan dem ger dessa
+// endpoints 403 på nya tokens, och redan anslutna användare måste re-connecta
+// för att få tokens med de utökade scopesen.
 //
 
 /**
@@ -564,7 +587,11 @@ export async function resumeSpotifyPlayback(trackId?: string, positionMs?: numbe
 
 // ── END FUTURE VERSION 2 — Automated Playback Control ────────────────────────────
 
-// ── Track-info ────────────────────────────────────────────────────────
+// ── FUTURE VERSION 2 — Track-info (archived) ─────────────────────────
+// Hämtar spårmetadata (titel/artist/albumomslag) via Web API för det
+// arkiverade NowPlaying-overlayet i quiz.tsx. Anropas INTE i V1 — allt som
+// visas vid facit (titel/artist/år) kommer från vår egen fråge-katalog,
+// inget Spotify-innehåll hämtas eller renderas (per LEGAL-INTEGRATIONS-BRIEF.md).
 
 export interface SpotifyTrackInfo {
   trackId: string;
@@ -602,3 +629,5 @@ export async function fetchSpotifyTrackInfo(trackId: string): Promise<SpotifyTra
     return null;
   }
 }
+
+// ── END FUTURE VERSION 2 — Track-info ────────────────────────────────────────────

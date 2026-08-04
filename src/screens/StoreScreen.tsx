@@ -47,35 +47,12 @@ interface CreditTier {
   savePct?: number;
 }
 
-const CREDIT_TIERS: CreditTier[] = [
-  {
-    id: 'credits-5',
-    productId: 'pkg_credits_5',
-    games: 5,
-    price: '19 kr',
-    priceAmount: 19,
-    pricePerGame: '3.80 kr / game',
-  },
-  {
-    id: 'credits-10',
-    productId: 'pkg_credits_10',
-    games: 10,
-    price: '29 kr',
-    priceAmount: 29,
-    pricePerGame: '2.90 kr / game',
-    savePct: 24,
-  },
-  {
-    id: 'credits-20',
-    productId: 'pkg_credits_20',
-    games: 20,
-    price: '49 kr',
-    priceAmount: 49,
-    pricePerGame: '2.45 kr / game',
-    badge: 'BEST VALUE',
-    savePct: 36,
-  },
-];
+// Engångsköpta Host Game Credits BORTTAGNA ur V1 (2026-07-07) — enda köpet
+// är Premium-abonnemanget. Tom array döljer hela Credit packages-sektionen
+// (creditsSection → null, samma parkerings-mönster som PACKAGE_TIERS).
+// CreditTierCard + handleBuyCredits finns kvar som död kod för ev. framtida
+// re-aktivering; tidigare tiers: 5/19kr, 10/29kr, 20/49kr (pkg_credits_5/10/20).
+const CREDIT_TIERS: CreditTier[] = [];
 
 // Customized Host Packages — extra-content som hosten kan köpa per styck.
 // IDn matchar `PURCHASED_PACKAGES` i `src/utils/mockPurchasedPackages.ts`
@@ -123,30 +100,33 @@ const SUBSCRIPTION_FEATURES: SubscriptionFeature[] = [
   { premium: 'Unlimited Host Games', basic: '2 + 2 launch bonus games per day' },
   { premium: 'Max 20 rounds per game', basic: 'Max 4 rounds per game' },
   { premium: 'Invite up to 12 players per Game', basic: '4 players' },
+  { premium: 'All Extra Host packages included', basic: 'Generic content only' },
 ];
 
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
 export default function StoreScreen() {
-  // `?focus=…` styr render-ordning. Tre lägen + default:
+  // `?focus=…` styr render-ordning. Lägen + default:
   //   • subscription — Subscriptions överst, sedan Basic → Packages → Credits.
   //     Sätts av PREMIUM-tap på Individual Devices och Rounds-rulern (båda
-  //     subscription-gated features). Individual Devices unlock:ar implicit
+  //     subscription-gated features), Host Game Credits-pillen och "Out of
+  //     Host Game Credits"-popupen. Individual Devices unlock:ar implicit
   //     12-spelar-cap via gameMode-deriverad maxPlayers sedan 2026-05-25.
-  //   • packages — Packages överst, sedan Basic, sedan "Other"-rubrik
-  //     följt av Credits → Subscriptions. Sätts av "+ Add host packages"-CTA
-  //     (Lobby Game Connections + Profile Customized Host packages).
-  //   • credits — Credits överst, sedan Basic, sedan "Other"-rubrik följt av
-  //     Subscriptions → Packages. Sätts av Host Game Credits-pillen,
-  //     Extras-rutans köp-popup och "Out of Host Game Credits"-popup.
+  //   • credits (LEGACY 2026-07-07) — engångsköpta credits borttagna;
+  //     ev. kvarvarande/stale credits-deeplinks mappas till subscription.
+  //   • packages / packages-only (LEGACY 2026-07-07) — paket säljs inte
+  //     styckvis längre (Extra packages ingår i Premium-abonnemanget);
+  //     stale packages-deeplinks mappas också till subscription.
   //   • default (utan param) — Basic → Credits → Packages → Subscriptions.
   const { focus, from, fromCode } = useLocalSearchParams<{
     focus?: string;
     from?: string;
     fromCode?: string;
   }>();
-  const focusMode: 'subscription' | 'packages' | 'packages-only' | 'credits' | 'default' =
-    focus === 'subscription' || focus === 'packages' || focus === 'packages-only' || focus === 'credits' ? focus : 'default';
+  const focusMode: 'subscription' | 'default' =
+    focus === 'credits' || focus === 'packages' || focus === 'packages-only' || focus === 'subscription'
+      ? 'subscription'
+      : 'default';
 
   const router = useRouter();
   // Back-knappens beteende: föredra router.back() när vi har navigation-
@@ -238,6 +218,10 @@ export default function StoreScreen() {
   // Apple's native purchase-modal visas direkt utan vår egen "Confirm
   // purchase"-Alert (Apple's modal är confirmation:en). Vi triggar bara
   // purchasePackage() → väntar på resultat → bumpar lokala state.
+  //
+  // handleBuyCredits är DÖD KOD sedan 2026-07-07 (CREDIT_TIERS tom —
+  // engångsköp borttagna, enda köpet är Premium-abonnemanget). Behålls
+  // för ev. framtida re-aktivering via CREDIT_TIERS-arrayn.
   const handleBuyCredits = async (tier: CreditTier) => {
     const pkg = packageByProductId[tier.productId];
     if (!pkg) {
@@ -359,7 +343,11 @@ export default function StoreScreen() {
   };
 
   // Sektionerna deklareras som JSX-konstanter så ordningen kan flippas
-  // utan duplicering. `focusMode` styr ordningen + "Other"-rubrik-position.
+  // utan duplicering. `focusMode` styr ordningen.
+  // otherHeading är OANVÄND sedan 2026-07-07 (packages/credits-fokus-lägena
+  // som använde "Other"-separatorn är legacy-mappade till subscription) —
+  // parkerad för ev. framtida fokus-läge med sekundär-sektioner.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const otherHeading = (
     <View style={styles.otherHeadingWrap}>
       <Text style={styles.otherHeading}>Other</Text>
@@ -394,24 +382,14 @@ export default function StoreScreen() {
     </View>
   );
 
-  // Customized Host Packages-sektionen. När PACKAGE_TIERS är tom (= inget
-  // köpbart paket i V1) göms sektionen i de fokus-lägen som BLANDAR den med
-  // andra sektioner — ingen poäng att visa en tom rubrik bredvid Credits/
-  // Subscriptions. I `packages-only`-läget (Profile + Lobby "+ Add Host
-  // packages"-CTA) är paket primärfokus → render istället en empty-state-
-  // text så user förstår varför sidan är tom istället för att tro att den
-  // crashat. När paket läggs in i PACKAGE_TIERS aktiveras båda fallen
-  // automatiskt utan att UI:t behöver ändras.
-  const isPackagesOnly = focusMode === 'packages-only';
+  // Customized Host Packages-sektionen — DÖD sedan 2026-07-07: Extra
+  // packages säljs inte styckvis längre utan INGÅR i Premium-abonnemanget
+  // (se SUBSCRIPTION_FEATURES-raden "All Extra Host packages included").
+  // PACKAGE_TIERS är tom → sektionen renderas aldrig; render-koden +
+  // PackageTierCard + handleBuyPackage behålls som parkerad kod ifall
+  // styckförsäljning skulle återinföras.
   const packagesSection = PACKAGE_TIERS.length === 0
-    ? (isPackagesOnly ? (
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Customized Host Packages</Text>
-          <Text style={styles.packagesEmptyText}>
-            No Extra Host packages available at the moment.
-          </Text>
-        </View>
-      ) : null)
+    ? null
     : (
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Customized Host Packages</Text>
@@ -430,7 +408,9 @@ export default function StoreScreen() {
       </View>
     );
 
-  const creditsSection = (
+  // Tom CREDIT_TIERS (engångsköp borttagna 2026-07-07) → hela sektionen
+  // göms. Render-koden kvar för enkel re-aktivering via arrayn.
+  const creditsSection = CREDIT_TIERS.length === 0 ? null : (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>Credit packages</Text>
       <Text style={styles.sectionSubtitle}>
@@ -526,7 +506,7 @@ export default function StoreScreen() {
         <View style={styles.header}>
           <Text style={styles.screenTitle}>Add QuizVibe Premium</Text>
           <Text style={styles.screenSubtitle}>
-            Extra Host Game credits, or unlimited Host games with QuizVibe membership plans
+            Unlimited Host games and premium features with QuizVibe membership plans
           </Text>
         </View>
 
@@ -536,29 +516,6 @@ export default function StoreScreen() {
             {basicSection}
             {packagesSection}
             {creditsSection}
-          </>
-        )}
-        {focusMode === 'packages' && (
-          <>
-            {packagesSection}
-            {basicSection}
-            {otherHeading}
-            {creditsSection}
-            {subscriptionSection}
-          </>
-        )}
-        {focusMode === 'packages-only' && (
-          <>
-            {packagesSection}
-          </>
-        )}
-        {focusMode === 'credits' && (
-          <>
-            {creditsSection}
-            {basicSection}
-            {otherHeading}
-            {subscriptionSection}
-            {packagesSection}
           </>
         )}
         {focusMode === 'default' && (

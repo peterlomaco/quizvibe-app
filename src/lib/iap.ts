@@ -52,9 +52,12 @@ export const ENTITLEMENTS = {
 
 export type EntitlementKey = (typeof ENTITLEMENTS)[keyof typeof ENTITLEMENTS];
 
-// Mappning från RC product-identifiers → consumable credit-mängd. Sätt
-// upp product-ID:n i RC Dashboard så de matchar nycklarna nedan, sedan
-// uppdatera värdena efter Store-skärmens tier-design (5/10/20).
+// LEGACY (2026-07-07): engångsköpta credit-packs borttagna ur V1 — Store
+// säljer enbart Premium-abonnemanget, så denna mappning är död kod (enda
+// konsumenten är StoreScreen.handleBuyCredits som är onåbar med tom
+// CREDIT_TIERS). Behålls för ev. framtida re-aktivering; ta även bort/
+// pausa produkterna i App Store Connect + RC Dashboard så de inte ligger
+// köpbara utan UI.
 //
 // När en consumable purchase lyckas läser vi product-ID:n och bumpar
 // profile.gameCredits med motsvarande värde — RC själv spårar inte

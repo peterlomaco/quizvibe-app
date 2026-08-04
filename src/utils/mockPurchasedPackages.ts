@@ -1,11 +1,18 @@
 /**
- * Mockad lista över extra-paket användaren har köpt via QuizVibe Store.
- * Tom array = inga köpta paket → CTA i Profile/Lobby visar Store-länk.
+ * Katalog över extra-paket (Customized Host packages).
  *
- * Stand-in tills Store-integrationen kopplas in. Konventionen att
- * exportera samma struktur som ett kommande API-anrop skulle returnera
- * gör att call-sites kan stanna oförändrade när mock:en byts ut mot
- * `loadPurchasedPackages()` (eller motsvarande) mot riktigt backend.
+ * OMARBETAT 2026-07-07: paket säljs INTE styckvis längre — ALLA paket i
+ * katalogen INGÅR i Premium-abonnemanget. Namnet PURCHASED_PACKAGES är
+ * legacy (behålls för minimal diff) men semantiken är numera "katalogen
+ * av premium-inkluderade paket". Synlighet/aktivering styrs av:
+ *   • Lobby: paketlistan visas bara för inloggad host med Premium som
+ *     startat lobbyn som QuizVibe-user (ej guest host); paketen auto-
+ *     aktiveras vid lobby-seed ("Activate Extra package"-knappen).
+ *   • Profile: listan (enabledHostPackages-toggles) visas bara med Premium.
+ *
+ * Konventionen att exportera samma struktur som ett kommande API-anrop
+ * skulle returnera gör att call-sites kan stanna oförändrade när mock:en
+ * byts ut mot riktigt backend.
  *
  * V1-scope (2026-05-27): inga themed packages än (Hip Hop / Rock /
  * Film & Actors-mfl. parkerade till v1.1+). Tidigare auto-tilldelade

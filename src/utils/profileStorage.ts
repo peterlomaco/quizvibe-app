@@ -29,15 +29,18 @@ export interface ProfileData {
   region: Region | null;
   avatarSource: AvatarSource;
   selectedAvatarId: string;
-  // Antal extra Host Game-credits användaren har kvar av sina KÖPTA paket
-  // (5/10/20-tiers från Store). Bumpas vid purchase, dras vid Create Game när
-  // freeGameCredits är slut. Optional för bakåtkompatibilitet.
+  // LEGACY (2026-07-07): engångsköpta Extras-credits borttagna ur V1 —
+  // Store säljer inte 5/10/20-paketen längre och varken UI, gates eller
+  // deduktion läser fältet. Kvar i typen (+ persistens-passthrough) så
+  // gamla sparade saldon inte nollas och ev. framtida re-aktivering
+  // slipper migration.
   gameCredits?: number;
   // Antal Host Game-credits användaren har kvar av de GRATIS som följer med
-  // Basic-planen / kampanj-bonus. Konsumeras före gameCredits vid Create Game.
-  // Optional för bakåtkompatibilitet — defaultas till FREE_CREDITS_DAILY_CAP
-  // i UI och fylls på automatiskt till samma cap vid första profil-load efter
-  // midnatt CET (se refreshFreeCreditsIfNeeded).
+  // Basic-planen (2 per dag). Konsumeras vid Start Game (om ej Premium —
+  // Premium = unlimited, ingen deduktion). Optional för bakåtkompatibilitet
+  // — defaultas till FREE_CREDITS_DAILY_CAP i UI och fylls på automatiskt
+  // till samma cap vid första profil-load efter midnatt CET
+  // (se refreshFreeCreditsIfNeeded).
   freeGameCredits?: number;
   // ISO-datum (YYYY-MM-DD i Europe/Stockholm-tidszon) för senaste auto-
   // refresh av freeGameCredits. Används av refreshFreeCreditsIfNeeded i
@@ -85,6 +88,11 @@ export interface ProfileData {
   // Minst en måste vara true när Spotify är aktiverat.
   spotifyAnswerYear?: boolean;   // default true
   spotifyAnswerName?: boolean;   // default true
+  // Self-attest (Plan B 2026-07-22): user har manuellt bekräftat att den har
+  // Spotify-appen på enheten ("Spotify user"-toggle i Profile). Ersätter
+  // OAuth-verifieringen — ingen DB-kolumn, lever enbart i AsyncStorage-cachen.
+  // Default false. Seedar lobby_players.spotify_verified vid join/host.
+  spotifyAppConfirmed?: boolean;
 }
 
 // Dual-read mapping för profiler skapade innan rename
@@ -99,7 +107,7 @@ const LEGACY_SKILL_TO_ASSISTANCE: Record<string, AssistanceLevel> = {
 // Daily-cap för fria Host Games. Top-up till MAX 2 vid midnatt CET via
 // refreshFreeCreditsIfNeeded (anropas i loadProfile). Topp-up:en är aldrig
 // destruktiv — om saldot redan är ≥ 2 (t.ex. efter en kampanj-bonus) lämnas
-// det orört. Konsumeras före gameCredits vid Create Game.
+// det orört. Konsumeras vid Start Game (Premium = unlimited, ingen deduktion).
 export const FREE_CREDITS_DAILY_CAP = 2;
 
 /**
@@ -364,6 +372,7 @@ export async function loadProfile(): Promise<ProfileData | null> {
         spotifyDefaultEnabled: cached?.spotifyDefaultEnabled,
         spotifyAnswerYear: cached?.spotifyAnswerYear,
         spotifyAnswerName: cached?.spotifyAnswerName,
+        spotifyAppConfirmed: cached?.spotifyAppConfirmed,
       };
     }
     const { data: refreshed, changed } = refreshFreeCreditsIfNeeded(profile);
@@ -464,6 +473,7 @@ async function backfillProfileFromSession(user: { id: string; email?: string; us
     spotifyDefaultEnabled: cache?.spotifyDefaultEnabled,
     spotifyAnswerYear: cache?.spotifyAnswerYear,
     spotifyAnswerName: cache?.spotifyAnswerName,
+    spotifyAppConfirmed: cache?.spotifyAppConfirmed,
   };
 
   // Persistera mot Supabase. Vi använder upsert eftersom raden kan ha

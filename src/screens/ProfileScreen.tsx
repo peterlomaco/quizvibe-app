@@ -61,8 +61,8 @@ import {
     type ProfileData,
     type Region,
 } from '../utils/profileStorage';
-import { connectSpotify, disconnectSpotify } from '../lib/spotify';
-import { getSpotifyConnectionStatus, type SpotifyConnectionStatus } from '../utils/spotifyDJ';
+// Spotify OAuth-imports borttagna (Plan B 2026-07-22) — self-attest via
+// ProfileData.spotifyAppConfirmed ersätter connectSpotify/getSpotifyConnectionStatus.
 import { hasPremiumSubscription } from '../utils/subscriptionStorage';
 import {
     defaultEnabledMainCategories,
@@ -253,6 +253,10 @@ export default function ProfileScreen() {
   const [birthYear, setBirthYear]         = useState<number | null>(null);
   const [assistance, setAssistance]       = useState<AssistanceLevel | null>(null);
   const [region, setRegion]               = useState<Region | null>(null);
+  // gameCredits (engångsköpta Extras) är LEGACY sedan 2026-07-07 — visas
+  // inte i UI och köps inte i Store längre. State:n finns kvar enbart som
+  // save-passthrough så ett ev. gammalt sparat saldo inte nollas av
+  // handleSave (profilen skrivs som hel blob).
   const [gameCredits, setGameCredits]     = useState<number>(0);
   const [freeGameCredits, setFreeGameCredits] = useState<number>(0);
   // Datum för senaste auto-refresh av freeGameCredits (CET, "YYYY-MM-DD").
@@ -485,11 +489,12 @@ export default function ProfileScreen() {
   const [spotifyEnabled, setSpotifyEnabled] = useState(false);
   const [spotifyAnswerYear, setSpotifyAnswerYear] = useState(true);
   const [spotifyAnswerName, setSpotifyAnswerName] = useState(true);
+  // Self-attest (Plan B 2026-07-22): "Spotify user"-togglens värde. Behåller
+  // namnet spotifyConnected (minimal diff) men betyder numera "user har
+  // manuellt bekräftat att den har Spotify-appen" — ingen OAuth-verifiering.
   const [spotifyConnected, setSpotifyConnected] = useState(false);
-  const [spotifyDisplayName, setSpotifyDisplayName] = useState<string | null>(null);
-  const [spotifyConnecting, setSpotifyConnecting] = useState(false);
   const [spotifyGuideVisible, setSpotifyGuideVisible] = useState(false);
-  // I Profile: Spotify är tillgängligt om kontot är kopplat (ingen IndDev-krav).
+  // I Profile: Spotify DJ-defaulten är valbar om usern attestat "Spotify user".
   const isSpotifyAvailable = spotifyConnected;
 
   const [smColWidth, setSmColWidth] = useState(0);
@@ -669,41 +674,12 @@ export default function ProfileScreen() {
   };
 
   // ── Spotify DJ-handlers ───────────────────────────────────────────────
-  const handleConnectSpotify = async () => {
-    setSpotifyConnecting(true);
-    const result = await connectSpotify();
-    setSpotifyConnecting(false);
-    if (result.ok) {
-      setSpotifyConnected(true);
-      setSpotifyDisplayName(result.user.displayName);
-      setSpotifyEnabled(true);
-    } else if (result.reason !== 'not_premium' && result.reason !== 'cancelled') {
-      Alert.alert(
-        'Spotify connection failed',
-        `Could not connect Spotify account (${result.reason}). Check your internet connection and try again.`,
-        [{ text: 'OK' }],
-      );
-    }
-  };
-
-  const handleDisconnectSpotify = () => {
-    Alert.alert(
-      'Disconnect Spotify',
-      'Do you want to disconnect your Spotify account?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Disconnect',
-          style: 'destructive',
-          onPress: async () => {
-            await disconnectSpotify();
-            setSpotifyConnected(false);
-            setSpotifyDisplayName(null);
-            setSpotifyEnabled(false);
-          },
-        },
-      ],
-    );
+  // Self-attest (Plan B 2026-07-22): "Spotify user"-toggeln ersätter OAuth-
+  // connect/disconnect. Av → DJ-defaulten stängs också av (den är gated på
+  // attesten). Persisteras som spotifyAppConfirmed via Save Host settings.
+  const handleToggleSpotifyUser = (val: boolean) => {
+    setSpotifyConnected(val);
+    if (!val) setSpotifyEnabled(false);
   };
 
   const handleToggleSpotifyEnabled = (val: boolean) => {
@@ -890,25 +866,15 @@ export default function ProfileScreen() {
       loadFriends().then((list) => {
         if (active) setFriends(list);
       });
-      // Spotify-anslutningsstatus — ladda vid varje focus så profilen alltid
-      // speglar det kopplade Spotify-kontot.
-      supabase.auth.getUser().then(({ data: { user } }) => {
-        if (!user || !active) return;
-        getSpotifyConnectionStatus(user.id).then((status: SpotifyConnectionStatus) => {
-          if (!active) return;
-          const ok = status.connected && status.isPremium;
-          setSpotifyConnected(ok);
-          setSpotifyDisplayName(status.spotifyDisplayName);
-          if (ok) {
-            loadProfile().then((p) => {
-              if (active) {
-                setSpotifyEnabled(p?.spotifyDefaultEnabled ?? false);
-                setSpotifyAnswerYear(p?.spotifyAnswerYear ?? true);
-                setSpotifyAnswerName(p?.spotifyAnswerName ?? true);
-              }
-            }).catch(() => {});
-          }
-        }).catch(() => {});
+      // Spotify self-attest + DJ-defaults — läses från profilen (Plan B:
+      // ingen OAuth-status att slå upp; spotifyAppConfirmed är källan).
+      loadProfile().then((p) => {
+        if (!active) return;
+        const attested = p?.spotifyAppConfirmed ?? false;
+        setSpotifyConnected(attested);
+        setSpotifyEnabled(attested ? (p?.spotifyDefaultEnabled ?? false) : false);
+        setSpotifyAnswerYear(p?.spotifyAnswerYear ?? true);
+        setSpotifyAnswerName(p?.spotifyAnswerName ?? true);
       }).catch(() => {});
       // Subscription-status — speglar Lobby:s hasPremium-source. Load:as på
       // focus så Store-köp (subscription / unsubscribe) reflektar direkt
@@ -989,6 +955,7 @@ export default function ProfileScreen() {
         spotifyDefaultEnabled: spotifyEnabled,
         spotifyAnswerYear,
         spotifyAnswerName,
+        spotifyAppConfirmed: spotifyConnected,
       });
       savedSnapshotRef.current = JSON.stringify({
         birthYear, assistance,
@@ -1123,11 +1090,11 @@ export default function ProfileScreen() {
 
   // Create Game-genväg från logout-sheet:n. Identisk logik som Home-
   // skärmens handleCreateGame — credit-gate först (Out of Host Game
-  // Credits-popup om Free + Extras = 0 och user inte har Premium), sedan
-  // generera kod, registrera rum, rensa stale mock-stores, tracka event
-  // och navigera till /lobby. Inlinad här istället för delad utility
-  // tills en tredje call-site dyker upp (då lyfter vi till en delad
-  // helper i src/utils/).
+  // Credits-popup om Free = 0 och user inte har Premium; engångsköpta
+  // Extras borttagna 2026-07-07), sedan generera kod, registrera rum,
+  // rensa stale mock-stores, tracka event och navigera till /lobby.
+  // Inlinad här istället för delad utility tills en tredje call-site
+  // dyker upp (då lyfter vi till en delad helper i src/utils/).
   const handleCreateGame = async () => {
     const [freshProfile, freshHasPremium] = await Promise.all([
       loadProfile(),
@@ -1135,14 +1102,13 @@ export default function ProfileScreen() {
     ]);
     if (!freshHasPremium) {
       const free = freshProfile?.freeGameCredits ?? 0;
-      const extras = freshProfile?.gameCredits ?? 0;
-      if (free === 0 && extras === 0) {
+      if (free === 0) {
         Alert.alert(
           'Out of Host Game Credits',
-          'You have no credits left for today. Buy extra credits in Store, wait for the daily refresh at midnight CET, or upgrade to a QuizVibe membership for unlimited host games.',
+          'You have used your free host games for today. Wait for the daily refresh at midnight CET, or upgrade to QuizVibe Premium for unlimited host games.',
           [
             { text: 'Cancel', style: 'cancel' },
-            { text: 'Go to Store', onPress: () => router.push('/store?focus=credits&from=/profile') },
+            { text: 'Go to Store', onPress: () => router.push('/store?focus=subscription&from=/profile') },
           ],
         );
         return;
@@ -1195,7 +1161,7 @@ export default function ProfileScreen() {
               hasPremium && styles.creditsPillMembership,
               pressed && { opacity: 0.85 },
             ]}
-            onPress={() => router.push('/store?focus=credits&from=/profile')}
+            onPress={() => router.push('/store?focus=subscription&from=/profile')}
           >
             {hasPremium && (
               <View style={styles.creditsMembershipBadgeWrap} pointerEvents="none">
@@ -1205,58 +1171,12 @@ export default function ProfileScreen() {
               </View>
             )}
             <Text style={styles.creditsLabel} numberOfLines={1} ellipsizeMode="tail">Host Game Credits</Text>
+            {/* Extras-rutan borttagen 2026-07-07 — engångsköpta credits finns
+                inte längre (V1 säljer enbart Premium-abonnemang). Pillen
+                visar bara Free-saldot; Premium markeras via UNLIMITED-badgen. */}
             <View style={styles.creditsValueRow}>
               <Text style={styles.creditsKey}>Free:</Text>
               <Text style={[styles.creditsValue, styles.creditsValueFree]}>{freeGameCredits}</Text>
-              {/* Extras-ruta — egen Pressable inom pillen, gold-bordred
-                  + gold PREMIUM-pill när extras > 0, grey-bordred + grey
-                  PREMIUM-pill när 0. Tap visar Store-redirect-Alert
-                  (separat handler från pillens onPress; nested Pressable
-                  i RN konsumerar tap så outer onPress inte fyrar). */}
-              <Pressable
-                style={({ pressed }) => [
-                  styles.creditsExtrasBox,
-                  gameCredits > 0
-                    ? styles.creditsExtrasBoxActive
-                    : styles.creditsExtrasBoxInactive,
-                  pressed && { opacity: 0.7 },
-                ]}
-                onPress={() =>
-                  Alert.alert(
-                    'Extra Host Game Credits',
-                    gameCredits > 0
-                      ? `You have ${gameCredits} extra credit${gameCredits === 1 ? '' : 's'}. Buy more in Store?`
-                      : 'You have no extra credits. Buy some in Store?',
-                    [
-                      { text: 'Cancel', style: 'cancel' },
-                      { text: 'Go to Store', onPress: () => router.push('/store?focus=credits&from=/profile') },
-                    ],
-                  )
-                }
-              >
-                <Text style={styles.creditsKey}>Extras:</Text>
-                <Text style={[styles.creditsValue, styles.creditsValueExtras]}>{gameCredits}</Text>
-                <View
-                  style={[
-                    styles.creditsExtrasPremiumBadge,
-                    gameCredits > 0
-                      ? styles.creditsExtrasPremiumBadgeActive
-                      : styles.creditsExtrasPremiumBadgeInactive,
-                  ]}
-                  pointerEvents="none"
-                >
-                  <Text
-                    style={[
-                      styles.creditsExtrasPremiumBadgeText,
-                      gameCredits > 0
-                        ? styles.creditsExtrasPremiumBadgeTextActive
-                        : styles.creditsExtrasPremiumBadgeTextInactive,
-                    ]}
-                  >
-                    PREMIUM
-                  </Text>
-                </View>
-              </Pressable>
             </View>
           </Pressable>
         </View>
@@ -1583,38 +1503,35 @@ export default function ProfileScreen() {
                   <Text style={[styles.connectionLabel, { minWidth: 0 }]}>Spotify</Text>
                   <Pressable
                     style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                    onPress={() => Alert.alert('Spotify', '• Only applicable in Individual Devices mode\n\n• For Spotify music, one player at a time will be directed via QuizVibe to Spotify\n\n• All players in the same lobby must have a registered QuizVibe account with a connected Spotify account')}
+                    onPress={() => Alert.alert('Spotify', '• Only applicable in Individual Devices mode\n\n• For Spotify music, one player at a time (the DJ) will be directed via QuizVibe to Spotify\n\n• The DJ needs the Spotify app on their device — free or Premium (Premium recommended: Spotify Free may play ads and may not always play the exact track)')}
                     hitSlop={8}
                   >
                     <Text style={styles.infoIconText}>i</Text>
                   </Pressable>
                 </View>
-                {spotifyConnected && spotifyDisplayName ? (
-                  <Pressable onPress={handleDisconnectSpotify} hitSlop={8}>
-                    <Text style={[styles.spotifyConnectedLabel, { textDecorationLine: 'underline' }]}>
-                      ✓ {spotifyDisplayName}
-                    </Text>
-                  </Pressable>
-                ) : (
-                  <>
-                    <Text style={styles.spotifyNoConnectionLabel}>
-                      {'Not activated / '}
-                      <Text
-                        style={styles.spotifyGuideLinkText}
-                        onPress={() => setSpotifyGuideVisible(true)}
-                      >
-                        Guide How to connect
-                      </Text>
-                    </Text>
-                    <Pressable onPress={handleConnectSpotify} disabled={spotifyConnecting} hitSlop={8}
-                      style={({ pressed }) => [{ opacity: pressed ? 0.7 : 1 }]}
-                    >
-                      <Text style={[styles.spotifyLinkText, { color: '#1DB954', fontSize: FontSize.sm, marginTop: 2 }]}>
-                        {spotifyConnecting ? 'Connecting…' : 'Connect Spotify account'}
-                      </Text>
-                    </Pressable>
-                  </>
-                )}
+                {/* Self-attest "Spotify user"-toggle (Plan B 2026-07-22) — ersätter
+                    OAuth-connect. Default AV; gated DJ-defaulten till höger. */}
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 2 }}>
+                  <Text style={spotifyConnected ? styles.spotifyConnectedLabel : styles.spotifyNoConnectionLabel}>
+                    Spotify user
+                  </Text>
+                  <Switch
+                    value={spotifyConnected}
+                    onValueChange={handleToggleSpotifyUser}
+                    trackColor={{ false: '#3C3C3C', true: '#1DB954' }}
+                    thumbColor="#FFF"
+                    ios_backgroundColor={spotifyConnected ? '#1DB954' : '#3C3C3C'}
+                    style={styles.sourceMatrixSwitch}
+                  />
+                </View>
+                <Text style={styles.spotifyNoConnectionLabel}>
+                  <Text
+                    style={styles.spotifyGuideLinkText}
+                    onPress={() => setSpotifyGuideVisible(true)}
+                  >
+                    Guide How Spotify DJ works
+                  </Text>
+                </Text>
               </View>
               {/* Toggle — disabled när ej kopplat */}
               <View style={[styles.spotifyHostControls, { marginRight: -16, alignSelf: 'flex-start', marginTop: 1 }]}>
@@ -2061,36 +1978,48 @@ export default function ProfileScreen() {
 
         {customizedPackagesExpanded && (
           <View style={styles.preview}>
-            {/* Add-knappen — modeOption-baserad styling så storlek + form
-                matchar Individual Devices-knappen. PREMIUM-badge i grå
-                (icke-köpt) variant tills Store-integrationen kan flagga
-                purchase-status; tap → Store med subscriptions överst (PREMIUM-
-                badge:n signalerar premium-feature). */}
+            {/* "Activate Extra package"-knappen (2026-07-07 — ersatte
+                "+ Add Host packages"-Store-CTAn; paket säljs inte styckvis
+                längre utan INGÅR i Premium-abonnemanget). Gold badge när
+                user har Premium, grå annars. Tap: Premium → info-Alert om
+                att paketen ingår; ej Premium → Store-upsell (subscription). */}
             <Pressable
               style={({ pressed }) => [
                 styles.addPackageBtn,
                 pressed && { opacity: 0.7 },
               ]}
-              onPress={() => Alert.alert(
-                'Premium feature',
-                'Add Host packages for customized Quiz experience. Go to Store?',
-                [
-                  { text: 'Cancel', style: 'cancel' },
-                  { text: 'Go to Store', onPress: () => router.push('/store?focus=packages-only&from=/profile') },
-                ],
-              )}
+              onPress={() =>
+                hasPremium
+                  ? Alert.alert(
+                      'Included with Premium',
+                      'Extra Host packages are included in your Premium subscription. Use the toggles below to choose which packages are available when you host.',
+                    )
+                  : Alert.alert(
+                      'Premium feature',
+                      'Extra Host packages for a customized quiz experience are included with QuizVibe Premium. Get it in the Store?',
+                      [
+                        { text: 'Cancel', style: 'cancel' },
+                        { text: 'Go to Store', onPress: () => router.push('/store?focus=subscription&from=/profile') },
+                      ],
+                    )
+              }
             >
-              <Text style={styles.modeLabel}>+ Add Host packages</Text>
+              <Text style={styles.modeLabel}>Activate Extra package</Text>
               <View
-                style={[styles.premiumBadge, styles.premiumBadgeGrey]}
+                style={[styles.premiumBadge, !hasPremium && styles.premiumBadgeGrey]}
                 pointerEvents="none"
               >
-                <Text style={[styles.premiumBadgeText, styles.premiumBadgeTextGrey]}>
+                <Text style={[styles.premiumBadgeText, !hasPremium && styles.premiumBadgeTextGrey]}>
                   PREMIUM
                 </Text>
               </View>
             </Pressable>
 
+            {/* Paketlistan + Save visas BARA för Premium (2026-07-07) —
+                paketen ingår i abonnemanget; utan Premium finns inget att
+                konfigurera (grå badge på knappen är lås-signalen). */}
+            {hasPremium && (
+            <>
             {/* Sub-rubrik på egen rad. Select all-toggle hamnar på en
                 separat rad nedanför, högerställd så switchen linjerar
                 med per-paket-switcharna i listan. V1: PURCHASED_PACKAGES
@@ -2214,6 +2143,8 @@ export default function ProfileScreen() {
               onPress={() => handleSave('packages')}
               variant={savedSection === 'packages' ? 'secondary' : 'primary'}
             />
+            </>
+            )}
           </View>
         )}
 
@@ -2830,8 +2761,9 @@ export default function ProfileScreen() {
         </View>
       </Modal>
 
-      {/* ── Spotify connection guide modal ──────────────────────────────
-          Visas när användaren tappar "Guide How to connect" i Spotify-raden. */}
+      {/* ── Spotify DJ guide modal ──────────────────────────────────────
+          Visas när användaren tappar "Guide How Spotify DJ works" i Spotify-
+          raden. Plan B (2026-07-22): ingen kontokoppling — bara Spotify-appen. */}
       <Modal
         visible={spotifyGuideVisible}
         transparent
@@ -2845,25 +2777,25 @@ export default function ProfileScreen() {
           />
           <View style={styles.spotifyGuideSheet}>
             <Text style={styles.spotifyGuideTitle}>
-              How to connect your Spotify Premium account to QuizVibe
+              How Spotify DJ works
             </Text>
             <View style={styles.spotifyGuideSteps}>
               <View style={styles.spotifyGuideStep}>
                 <Text style={styles.spotifyGuideStepNumber}>1</Text>
                 <Text style={styles.spotifyGuideStepText}>
-                  You need a Spotify Premium account
+                  Have the Spotify app installed on your device — free or Premium (Premium recommended: Spotify Free may play ads and may not always play the exact track)
                 </Text>
               </View>
               <View style={styles.spotifyGuideStep}>
                 <Text style={styles.spotifyGuideStepNumber}>2</Text>
                 <Text style={styles.spotifyGuideStepText}>
-                  Click Connect Spotify account and accept to connect your Spotify to QuizVibe
+                  Switch on the Spotify user toggle to confirm you have the Spotify app — now you are ready to play Spotify music in Individual device mode
                 </Text>
               </View>
               <View style={styles.spotifyGuideStep}>
                 <Text style={styles.spotifyGuideStepNumber}>3</Text>
                 <Text style={styles.spotifyGuideStepText}>
-                  Your QuizVibe account is connected to your Spotify account – now your user are ready to play Spotify music in the Individual device mode
+                  When you are the DJ, tap Start track in Spotify — the song opens in your Spotify app. If it does not start automatically, press Play in Spotify
                 </Text>
               </View>
             </View>

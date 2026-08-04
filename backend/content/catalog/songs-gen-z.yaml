@@ -601,7 +601,7 @@ items:
     probability: 78
     wikimediaSearchHints: ["The Hives Hate to Say I Told You So 2000"]
     answerMethods: ["timeline"]
-    spotifyTrackId: "3HEqFZGsniU4MlK9b2PLlf"
+    spotifyTrackId: "6xxXrNJnnsQNLdgNk8S4y8" # bytt 2026-07-18 — gamla ID:t 404:ade (track borttagen/relinkad av Spotify)
   - id: timbuktu-alla-vill-till-himlen
     displayName: "Alla vill till himlen — Timbuktu"
     correctYear: 2005

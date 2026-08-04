@@ -3098,7 +3098,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "sweden"
     ],
-    "spotifyTrackId": "57JVGUAt3XNlFSqqEEZ6eP",
+    "spotifyTrackId": "5HkFTCxSeJ3kGNyQJbT4rJ",
     "youtubeClips": [
       {
         "videoId": "Y09uL2qbYCg",
@@ -7751,7 +7751,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "sweden"
     ],
-    "spotifyTrackId": "3HEqFZGsniU4MlK9b2PLlf",
+    "spotifyTrackId": "6xxXrNJnnsQNLdgNk8S4y8",
     "youtubeClips": []
   },
   {

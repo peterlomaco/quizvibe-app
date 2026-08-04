@@ -37,8 +37,10 @@ import { QuizVibeLogo } from '../components/QuizVibeLogo';
 import { QuizVibePlayLogo } from '../components/QuizVibePlayLogo';
 import { YouTubeBrandIcon } from '../components/YouTubeBrandIcon';
 import { SpotifyBrandIcon } from '../components/SpotifyBrandIcon';
-import { connectSpotify, disconnectSpotify } from '../lib/spotify';
-import { getSpotifyConnectionStatus, type SpotifyConnectionStatus } from '../utils/spotifyDJ';
+// Spotify OAuth-imports borttagna (Plan B 2026-07-22) — handleConnectSpotify/
+// handleDisconnectSpotify är numera lokala self-attest-handlers utan API.
+// Spotify OAuth-status-import borttagen (Plan B 2026-07-22) — self-attest via
+// profile.spotifyAppConfirmed ersätter getSpotifyConnectionStatus.
 import { SequentialDots } from '../components/SequentialDots';
 import {
     ROUNDS_DEFAULT,
@@ -120,8 +122,9 @@ export interface LobbyPlayer extends Player {
   // av LobbyScreen:s useFocusEffect. PlayerRow renderar då greyed-out text +
   // "LEFT THIS GAME LOBBY"-label så övriga i lobby:n ser att spelaren gått.
   hasLeft?: boolean;
-  // True om spelaren har ett kopplat Spotify-konto i QuizVibe.
-  // Laddas från spotify_connections-tabellen via lobby_players.spotify_verified.
+  // True om spelaren har self-attestat att den har Spotify-appen (Plan B
+  // 2026-07-22 — ingen OAuth). Syncas via lobby_players.spotify_verified;
+  // källan är profile.spotifyAppConfirmed eller lobby-radens attest-tap.
   spotifyConnected?: boolean;
 }
 
@@ -1223,8 +1226,8 @@ export default function LobbyScreen() {
         );
         setSelectedExtraPackages([]);
         setSketchEnabled(false);
-        // Spotify-carry: connection re-verifieras av "Spotify not connected"-
-        // guarden i handleStartGame — ingen egen reconnect-koll behövs här.
+        // Spotify-carry: attesten re-verifieras av "Spotify not confirmed"-
+        // guarden i handleStartGame — ingen egen koll behövs här.
         setSpotifyEnabled(stored?.spotifyEnabled ?? false);
         setEnabledHostPackages([]);
         setYoutubeEnabledCategories(defaultEnabledMainCategories());
@@ -1287,14 +1290,28 @@ export default function LobbyScreen() {
           );
           // Per-source categories + extra-paket från stored (carry-over) om finns,
           // annars profil-default, annars all 3 (defensive fallback).
+          // Extra-paket (2026-07-07 — Premium-inkluderade, ej styckköp):
+          //   • stored (Play Again + Keep settings) VINNER — inkl. ett
+          //     medvetet tomt Generic-val — men klampas mot premium-status
+          //     (utgången premium → []) och profilens enabledHostPackages.
+          //   • fresh lobby + premium → auto-aktivera alla enabled paket.
+          //   • ej premium → selection förblir [] (Generic).
+          const catalogIds = PURCHASED_PACKAGES.map((p) => p.id);
+          const enabledIds = (profile?.enabledHostPackages ?? catalogIds).filter(
+            (id) => catalogIds.includes(id),
+          );
           if (stored) {
-            setSelectedExtraPackages(stored.selectedExtraPackages);
+            setSelectedExtraPackages(
+              premium
+                ? stored.selectedExtraPackages.filter((id) => enabledIds.includes(id))
+                : [],
+            );
             setSketchEnabled(stored.sketchEnabled);
             setSpotifyEnabled(stored.spotifyEnabled);
+          } else if (premium) {
+            setSelectedExtraPackages(enabledIds);
           }
-          setEnabledHostPackages(
-            profile?.enabledHostPackages ?? PURCHASED_PACKAGES.map((p) => p.id),
-          );
+          setEnabledHostPackages(enabledIds);
           // YouTube categories — prio: stored > profil > all 3.
           // Villkor: !== undefined (ej length > 0) så att [] (explicit av) respekteras.
           const seedYtCats =
@@ -1377,12 +1394,9 @@ export default function LobbyScreen() {
         // dem som "to be approved by host" så de ser sig själva i lobbyn
         // direkt — de behöver inte vänta på godkännande för att se rummet.
         // Fallback till en generisk "Guest"-rad om profil saknas.
-        const [profile, ownSpotifyStatus] = await Promise.all([
-          loadProfile(),
-          supabase.auth.getUser().then(({ data }) =>
-            data.user ? getSpotifyConnectionStatus(data.user.id) : null,
-          ).catch(() => null),
-        ]);
+        // Spotify self-attest läses ur profilen (Plan B — ingen OAuth-status).
+        const profile = await loadProfile();
+        const ownSpotifyAttested = profile?.spotifyAppConfirmed ?? false;
         const currentYear = new Date().getFullYear();
         const age = profile?.birthYear ? currentYear - profile.birthYear : undefined;
         const assistance = profile?.assistance ?? undefined;
@@ -1426,12 +1440,11 @@ export default function LobbyScreen() {
           assistance,
           hcpComplete,
           approved: true,
-          spotifyConnected: ownSpotifyStatus?.connected ?? false,
+          spotifyConnected: ownSpotifyAttested,
         };
-        // Sätt non-host:s egna Spotify-anslutningsstatus så Source Mixerboard
-        // visar rätt (samma som host-pathen gör i useFocusEffect nedan).
-        setSpotifyConnected(ownSpotifyStatus?.connected ?? false);
-        setSpotifyDisplayName(ownSpotifyStatus?.spotifyDisplayName ?? null);
+        // Sätt non-host:s egna Spotify-attest så Source Mixerboard visar
+        // rätt (samma som host-pathen gör i useFocusEffect nedan).
+        setSpotifyConnected(ownSpotifyAttested);
         setPlayers((prev) => {
           // Dedupe på id: om syncFromStore-pollen redan har dragit in
           // carry-over-raden (med samma id efter dup-detection-fixet) så
@@ -1501,42 +1514,35 @@ export default function LobbyScreen() {
       // hasPremium från subscriptionStorage parallellt med profil-load.
       // Refreshas vid varje focus så återkomst från Store (efter purchase)
       // direkt unlockar Individual Devices + Max 12 utan extra refresh.
-      // Ladda Spotify-anslutningsstatus parallellt (host only).
+      // Ladda Spotify-self-attest ur profilen (Plan B — ingen OAuth-status).
       if (hostMode) {
-        supabase.auth.getUser().then(({ data: { user } }) => {
-          if (!user || !active) return;
-          getSpotifyConnectionStatus(user.id).then((status: SpotifyConnectionStatus) => {
-            if (!active) return;
-            const connected = status.connected;
-            setSpotifyConnected(connected);
-            setSpotifyDisplayName(status.spotifyDisplayName);
-            // Uppdatera host:s spelarkort direkt — setPlayers i Promise.all-grenen
-            // nedan fångar spotifyConnected-staten vid closure-skapande (false), inte
-            // efter att denna async-operation resolvar. Explicit patch är nödvändigt.
-            setPlayers((prev) =>
-              prev.map((p) => (p.isHost ? { ...p, spotifyConnected: connected } : p)),
-            );
-            // Seed spotifyEnabled — prio: carry-over stored lobby setting >
-            // profil-default. Kräver Premium + connected för att aktivera DJ-läget.
-            // Guest host: hoppa över seedingen — Spotify startar alltid AV
-            // (guest togglar på manuellt i Source Mixerboard om önskat).
-            const ok = connected && status.isPremium;
-            if (ok && !isGuestHost) {
-              Promise.all([loadProfile(), getLobbySettings(roomCode)]).then(
-                ([profile, lobbySt]) => {
-                  if (!active) return;
-                  // Prefer carry-over value if lobby_settings redan finns (Play Again
-                  // + Keep Settings skriver spotifyEnabled till nya rumkoden via
-                  // goToNewLobby). Faller tillbaka till profil-default för fresh lobbies.
-                  const shouldEnable =
-                    lobbySt?.spotifyEnabled ?? profile?.spotifyDefaultEnabled ?? false;
-                  setSpotifyEnabled(shouldEnable);
-                  setSpotifyAnswerYear(lobbySt?.spotifyAnswerYear ?? profile?.spotifyAnswerYear ?? true);
-                  setSpotifyAnswerName(lobbySt?.spotifyAnswerName ?? profile?.spotifyAnswerName ?? true);
-                },
-              );
-            }
-          });
+        loadProfile().then((prof) => {
+          if (!active) return;
+          const attested = prof?.spotifyAppConfirmed ?? false;
+          setSpotifyConnected(attested);
+          // Uppdatera host:s spelarkort direkt — setPlayers i Promise.all-grenen
+          // nedan fångar spotifyConnected-staten vid closure-skapande (false), inte
+          // efter att denna async-operation resolvar. Explicit patch är nödvändigt.
+          setPlayers((prev) =>
+            prev.map((p) => (p.isHost ? { ...p, spotifyConnected: attested } : p)),
+          );
+          // Seed spotifyEnabled — prio: carry-over stored lobby setting >
+          // profil-default. Kräver self-attest för att aktivera DJ-läget.
+          // Guest host: hoppa över seedingen — Spotify startar alltid AV
+          // (guest togglar på manuellt i Source Mixerboard om önskat).
+          if (attested && !isGuestHost) {
+            getLobbySettings(roomCode).then((lobbySt) => {
+              if (!active) return;
+              // Prefer carry-over value if lobby_settings redan finns (Play Again
+              // + Keep Settings skriver spotifyEnabled till nya rumkoden via
+              // goToNewLobby). Faller tillbaka till profil-default för fresh lobbies.
+              const shouldEnable =
+                lobbySt?.spotifyEnabled ?? prof?.spotifyDefaultEnabled ?? false;
+              setSpotifyEnabled(shouldEnable);
+              setSpotifyAnswerYear(lobbySt?.spotifyAnswerYear ?? prof?.spotifyAnswerYear ?? true);
+              setSpotifyAnswerName(lobbySt?.spotifyAnswerName ?? prof?.spotifyAnswerName ?? true);
+            });
+          }
         });
       }
 
@@ -1551,11 +1557,34 @@ export default function LobbyScreen() {
         // valt "Start Game as Guest" ska inte få premium-auto-beteenden
         // (Max 12-autolås i IndDev, 20-runders stepper, etc.).
         setHasPremium(isGuestHost ? false : premium);
+        // Premium-övergångar mid-session för extra-paket (2026-07-07 —
+        // paketen ingår i Premium): fyrar bara på en OBSERVERAD övergång
+        // (prevPremiumRef init:as till null så första focus-tick aldrig
+        // feltolkas som upgrade och clobbar ett medvetet Generic-carry-
+        // over). Gated på lobbySeededRef så seed-effekten förblir
+        // auktoritativ för initialt state.
+        //   • premium tappad (lapse/expiry) → töm selection (Generic).
+        //   • premium köpt mid-session (Store-besök → tillbaka) →
+        //     auto-aktivera BARA om selection är tom.
+        if (hostMode) {
+          const effPremium = isGuestHost ? false : premium;
+          if (lobbySeededRef.current && prevPremiumRef.current !== null) {
+            const catIds = PURCHASED_PACKAGES.map((p) => p.id);
+            const enIds = (profile?.enabledHostPackages ?? catIds).filter((id) =>
+              catIds.includes(id),
+            );
+            if (!effPremium && prevPremiumRef.current) {
+              setSelectedExtraPackages([]);
+            } else if (effPremium && !prevPremiumRef.current) {
+              setSelectedExtraPackages((prev) => (prev.length === 0 ? enIds : prev));
+            }
+          }
+          prevPremiumRef.current = effPremium;
+        }
         // Speglar Profile:s credits-pill — refresh-logiken i loadProfile
         // top-up:ar `freeGameCredits` till FREE_CREDITS_DAILY_CAP vid första
         // load efter midnatt CET, så lobbyn visar alltid aktuellt värde.
         setFreeGameCredits(profile?.freeGameCredits ?? 0);
-        setGameCredits(profile?.gameCredits ?? 0);
         setPlayers((prev) => {
           const leftIds = leftSnapshots.map((s) => s.id);
           // DB has_left-set (Slice 3C-ii cross-device). OR:as med AsyncStorage-
@@ -1579,7 +1608,7 @@ export default function LobbyScreen() {
             let next = hostMode && !isGuestHost && profile && p.isHost ? mergeProfileIntoHost(p, profile) : p;
             if (next.isHost) {
               // Rör INTE next.spotifyConnected här — det sätts av den parallella
-              // getSpotifyConnectionStatus-kedjans setPlayers-patch. Om vi skriver
+              // spotify-attest-kedjans setPlayers-patch. Om vi skriver
               // spotifyConnected-state (alltid false i closure vid körning) kan
               // Promise.all-grenen vinna racet och skriva över ett redan korrekt true.
               return next.hasLeft ? { ...next, hasLeft: false } : next;
@@ -1667,12 +1696,12 @@ export default function LobbyScreen() {
   // tillbaka till Home.
   const [guestLeaveSheetVisible, setGuestLeaveSheetVisible] = useState(false);
 
-  // Host Game Credits — speglar Profile:s credits-pill exakt. Värdena läses
+  // Host Game Credits — speglar Profile:s credits-pill exakt. Värdet läses
   // från sparad profil i useFocusEffect:n nedan så lobbyn alltid visar
   // samma siffra som Profile (och uppdateras direkt om användaren spenderat
-  // / fyllts på via daily refresh / shoppat extras i Store mellan tab-byten).
+  // / fyllts på via daily refresh mellan tab-byten). Engångsköpta Extras
+  // (gameCredits) borttagna 2026-07-07 — bara Free + Premium/UNLIMITED kvar.
   const [freeGameCredits, setFreeGameCredits] = useState<number>(0);
-  const [gameCredits, setGameCredits] = useState<number>(0);
 
   // Host delete-lobby sheet — bara aktiv när hostMode är på. Tap på TopUserBanner-
   // pillen öppnar sheet:n istället för att navigera till Profile (host:s
@@ -1773,6 +1802,11 @@ export default function LobbyScreen() {
   // Driver BÅDA Individual Devices-unlock OCH Max 12-unlock. TODO (Store
   // integration): byt subscriptionStorage mot RevenueCat entitlement-check.
   const [hasPremium, setHasPremium] = useState(false);
+  // Senast OBSERVERADE premium-status i focus-effekten — driver mid-session-
+  // övergångar för extra-paketen (auto-aktivera vid köp, töm vid lapse).
+  // null = "inte observerad än" så första focus-tick aldrig feltolkas som
+  // en upgrade (se premium-övergångs-blocket i useFocusEffect).
+  const prevPremiumRef = useRef<boolean | null>(null);
 
   // Sync lobby-state till mockActiveRooms-registry så join-flödet
   // (handleJoinWithCode / handleJoinAsGuest i index.tsx) kan validera
@@ -1852,14 +1886,15 @@ export default function LobbyScreen() {
   );
   // Sketch — prototyp, ej wirad till quiz-poolen. Strukturell placeholder.
   const [sketchEnabled, setSketchEnabled] = useState(false);
-  // Spotify DJ-läge — host aktiverar, kräver kopplat Spotify Premium-konto.
+  // Spotify DJ-läge — host aktiverar. Plan B (2026-07-22): ingen OAuth,
+  // inget Premium-krav — DJ:n behöver bara Spotify-appen (self-attest).
   const [spotifyEnabled, setSpotifyEnabled] = useState(false);
   const [spotifyAnswerYear, setSpotifyAnswerYear] = useState(true);
   const [spotifyAnswerName, setSpotifyAnswerName] = useState(true);
-  // Host:s egna Spotify-anslutningsstatus (laddas i useFocusEffect).
+  // Egen Spotify-self-attest ("jag har Spotify-appen") — seedas från
+  // profile.spotifyAppConfirmed i useFocusEffect; namnet spotifyConnected
+  // behållet för minimal diff mot OAuth-eran.
   const [spotifyConnected, setSpotifyConnected] = useState(false);
-  const [spotifyDisplayName, setSpotifyDisplayName] = useState<string | null>(null);
-  const [spotifyConnecting, setSpotifyConnecting] = useState(false);
   const [spotifyGuideVisible, setSpotifyGuideVisible] = useState(false);
   // Spotify DJ kräver Individual Devices — DJ lämnar appen till Spotify-appen.
   // PtP/Single Player stöds inte (en delad enhet kan inte lämna + återvända).
@@ -2168,76 +2203,74 @@ export default function LobbyScreen() {
   };
   // ── Spotify DJ-handlers ───────────────────────────────────────────────
   /**
-   * Kopplar host:ns Spotify-konto via OAuth (expo-auth-session PKCE).
-   * Uppdaterar lokal connected-state vid success.
+   * Self-attest (Plan B 2026-07-22): bekräftar att usern har Spotify-appen
+   * på enheten — ersätter OAuth-connect. Behåller samma side-effects som
+   * OAuth-versionen (spelarkort + spotify_verified-sync) och persisterar
+   * dessutom attesten till profilen så Profile-toggeln speglar den.
    */
   const handleConnectSpotify = async () => {
-    setSpotifyConnecting(true);
-    const result = await connectSpotify();
-    setSpotifyConnecting(false);
-    if (result.ok) {
-      setSpotifyConnected(true);
-      setSpotifyDisplayName(result.user.displayName);
-      // Auto-aktivera DJ-toggeln direkt efter lyckad OAuth — annars måste
-      // användaren trycka på toggeln en extra gång manuellt efter connect.
-      setSpotifyEnabled(true);
-      // Uppdatera spelarkortet direkt efter lyckad OAuth.
-      const ownId = ownPlayerIdRef.current;
-      if (ownId) {
-        setPlayers((prev) =>
-          prev.map((p) => (p.id === ownId ? { ...p, spotifyConnected: true } : p)),
-        );
-      }
-      // Non-host: synka spotify_verified=true till lobby_players så host:s
-      // polling ser Spotify-badge:n uppdateras direkt utan reload.
-      if (!hostMode && ownId) {
-        const ownPlayer = players.find((p) => p.id === ownId);
-        if (ownPlayer) {
-          upsertOwnLobbyPlayer(roomCode, { ...ownPlayer, spotifyConnected: true }).catch(() => {});
-        }
-      }
-    } else if (result.reason !== 'not_premium' && result.reason !== 'cancelled') {
-      // not_premium har sin egen alert i connectSpotify(); cancelled = user stängde med avsikt.
-      // Alla andra fel visas explicit så felet blir synligt (annars är det tyst).
-      Alert.alert(
-        'Spotify connection failed',
-        `Could not connect Spotify account (${result.reason}). Check your internet connection and try again.`,
-        [{ text: 'OK' }],
+    setSpotifyConnected(true);
+    // Auto-aktivera DJ-toggeln direkt efter attest (host) — annars måste
+    // användaren trycka på toggeln en extra gång manuellt efteråt.
+    if (hostMode) setSpotifyEnabled(true);
+    // Uppdatera spelarkortet direkt.
+    const ownId = ownPlayerIdRef.current;
+    if (ownId) {
+      setPlayers((prev) =>
+        prev.map((p) => (p.id === ownId ? { ...p, spotifyConnected: true } : p)),
       );
     }
+    // Non-host: synka spotify_verified=true till lobby_players så host:s
+    // polling ser Spotify-badge:n uppdateras direkt utan reload.
+    if (!hostMode && ownId) {
+      const ownPlayer = players.find((p) => p.id === ownId);
+      if (ownPlayer) {
+        upsertOwnLobbyPlayer(roomCode, { ...ownPlayer, spotifyConnected: true }).catch(() => {});
+      }
+    }
+    // Persistera attesten till profilen (registrerade users) så den överlever
+    // lobbyn och seedar nästa join. Guests har ingen profil — no-op via null.
+    loadProfile().then((profile) => {
+      if (profile) {
+        saveProfile({ ...profile, spotifyAppConfirmed: true }).catch(() => {});
+      }
+    }).catch(() => {});
   };
 
   /**
-   * Kopplar bort host:ns Spotify-konto.
+   * Tar bort self-attesten ("jag har inte Spotify ändå").
    * Stänger av Spotify DJ-läget om det var aktivt.
    */
   const handleDisconnectSpotify = () => {
     Alert.alert(
-      'Disconnect Spotify',
-      'Do you want to disconnect your Spotify account?',
+      'Remove Spotify confirmation',
+      'Do you want to remove your "I have Spotify" confirmation?',
       [
         { text: 'Cancel', style: 'cancel' },
         {
-          text: 'Disconnect',
+          text: 'Remove',
           style: 'destructive',
           onPress: async () => {
-            await disconnectSpotify();
             setSpotifyConnected(false);
-            setSpotifyDisplayName(null);
             setSpotifyEnabled(false);
+            const ownId = ownPlayerIdRef.current;
+            if (ownId) {
+              setPlayers((prev) =>
+                prev.map((p) => (p.id === ownId ? { ...p, spotifyConnected: false } : p)),
+              );
+            }
             // Non-host: synka spotify_verified=false till lobby_players.
-            if (!hostMode) {
-              const ownId = ownPlayerIdRef.current;
-              if (ownId) {
-                setPlayers((prev) =>
-                  prev.map((p) => (p.id === ownId ? { ...p, spotifyConnected: false } : p)),
-                );
-                const ownPlayer = players.find((p) => p.id === ownId);
-                if (ownPlayer) {
-                  upsertOwnLobbyPlayer(roomCode, { ...ownPlayer, spotifyConnected: false }).catch(() => {});
-                }
+            if (!hostMode && ownId) {
+              const ownPlayer = players.find((p) => p.id === ownId);
+              if (ownPlayer) {
+                upsertOwnLobbyPlayer(roomCode, { ...ownPlayer, spotifyConnected: false }).catch(() => {});
               }
             }
+            loadProfile().then((profile) => {
+              if (profile) {
+                saveProfile({ ...profile, spotifyAppConfirmed: false }).catch(() => {});
+              }
+            }).catch(() => {});
           },
         },
       ],
@@ -2245,40 +2278,40 @@ export default function LobbyScreen() {
   };
 
   /**
-   * Togglar Spotify DJ-läget. Om aktivering utan kopplat konto:
-   * erbjud att koppla direkt.
+   * Togglar Spotify DJ-läget. Om aktivering utan self-attest:
+   * erbjud att bekräfta direkt.
    */
   const handleToggleSpotifyEnabled = (val: boolean) => {
     if (val && !spotifyConnected) {
       Alert.alert(
-        'Connect Spotify first',
-        'You need to connect your Spotify Premium account before enabling Spotify DJ mode.',
+        'Confirm Spotify first',
+        'Confirm that you have the Spotify app on this device before enabling Spotify DJ mode. No Spotify account connection is needed — the song opens in your own Spotify app.',
         [
           { text: 'Cancel', style: 'cancel' },
-          { text: 'Connect Spotify', onPress: handleConnectSpotify },
+          { text: 'I have Spotify', onPress: handleConnectSpotify },
         ],
       );
       return;
     }
     if (val) {
-      // Kontrollera Spotify-status för approved non-hosts i lobbyn.
+      // Kontrollera Spotify-attest för approved non-hosts i lobbyn.
       const approvedNonHosts = players.filter((p) => !p.isHost && !p.hasLeft && p.approved);
       const withSpotify = approvedNonHosts.filter((p) => p.spotifyConnected);
       const withoutSpotify = approvedNonHosts.filter((p) => !p.spotifyConnected);
 
       if (approvedNonHosts.length > 0 && withSpotify.length === 0) {
-        // Check 1: Ingen annan spelare har Spotify kopplat.
+        // Check 1: Ingen annan spelare har bekräftat Spotify.
         Alert.alert(
           'Spotify not applicable',
-          'No other players have Spotify connected. Please ask other players to activate their Spotify account settings.',
+          'No other players have confirmed Spotify. Please ask other players to confirm they have the Spotify app (in their Spotify settings row).',
         );
         return;
       }
       if (withoutSpotify.length > 0) {
-        // Check 2: Några approved spelare saknar Spotify — erbjud att flytta dem till waiting.
+        // Check 2: Några approved spelare saknar Spotify-attest — erbjud att flytta dem till waiting.
         Alert.alert(
           'Not all players have Spotify',
-          `${withoutSpotify.length} approved player${withoutSpotify.length > 1 ? 's do' : ' does'} not have a Spotify account activated. They will be moved back to "To be approved" status. Proceed anyway?`,
+          `${withoutSpotify.length} approved player${withoutSpotify.length > 1 ? 's have' : ' has'} not confirmed the Spotify app. They will be moved back to "To be approved" status. Proceed anyway?`,
           [
             { text: 'Cancel', style: 'cancel' },
             {
@@ -2701,13 +2734,13 @@ export default function LobbyScreen() {
       );
       return;
     }
-    // Check 3: Spotify är aktiverat och spelaren saknar Spotify-konto.
+    // Check 3: Spotify är aktiverat och spelaren saknar Spotify-attest.
     if (approved && spotifyEnabled) {
       const player = players.find((p) => p.id === id);
       if (player && !player.spotifyConnected) {
         Alert.alert(
-          'No Spotify account',
-          'This player does not have a Spotify account activated. Either ask the player to activate their Spotify account settings, or switch off Spotify DJ in Source Dashboard to approve the player.',
+          'No Spotify confirmed',
+          'This player has not confirmed the Spotify app. Either ask the player to confirm Spotify in their settings row, or switch off Spotify DJ in Source Dashboard to approve the player.',
         );
         return;
       }
@@ -2770,14 +2803,14 @@ export default function LobbyScreen() {
     );
   };
   const handleApproveAll = () => {
-    // Check 4: Spotify är aktiverat och några waiting-spelare saknar Spotify-konto.
+    // Check 4: Spotify är aktiverat och några waiting-spelare saknar Spotify-attest.
     if (spotifyEnabled) {
       const waiting = players.filter((p) => !p.isHost && !p.hasLeft && !p.approved && p.hcpComplete);
       const withoutSpotify = waiting.filter((p) => !p.spotifyConnected);
       if (withoutSpotify.length > 0) {
         Alert.alert(
           'Not all players have Spotify',
-          'Not all players in the lobby have a Spotify account activated. Please ask them to activate their Spotify account settings, or switch off Spotify DJ in Source Dashboard to approve players.',
+          'Not all players in the lobby have confirmed the Spotify app. Please ask them to confirm Spotify in their settings row, or switch off Spotify DJ in Source Dashboard to approve players.',
         );
         return;
       }
@@ -3000,6 +3033,35 @@ export default function LobbyScreen() {
     );
   };
 
+  // Delad delete-mekanik för host:en — används av BÅDE "Delete this Game
+  // Lobby"-flödet OCH guest-hostens "Activate Extra package → register"-
+  // flöde (2026-07-07). Deaktiverar rummet + rensar mock-stores, visar
+  // loading-overlay ~1.6s och kör sedan onDone (navigation).
+  // Speglar EXAKT tidigare handleDeleteLobby-beteende (clearLeftPlayers
+  // ingår medvetet INTE — anropades inte tidigare heller).
+  const performLobbyDelete = async (onDone: () => void) => {
+    // Deaktivera rummet direkt så non-hosts polling-detection
+    // upptäcker det inom ~2s (även medan host:s loading-overlay
+    // visas — det är realistiskt async-beteende).
+    await deactivateRoom(roomCode);
+    clearLobbyPlayers(roomCode);
+    clearLobbySettings(roomCode);
+    clearEjected(roomCode);
+    clearGameStarted(roomCode);
+    // Visa loading-overlay i ~1.6s innan navigation. Ger host:en
+    // visuell feedback att appen processar och matchar real-
+    // backend-känsla där en DELETE-request tar några hundra ms.
+    // VIKTIGT: stäng overlay:n EXPLICIT innan navigation. Stack-
+    // navigatorn kan bevara Modal-state över route-replace —
+    // utan dismiss skulle Modal:en stå kvar synlig ovanpå Home-
+    // skärmen efter navigationen.
+    setDeletingLobby(true);
+    setTimeout(() => {
+      setDeletingLobby(false);
+      onDone();
+    }, 1600);
+  };
+
   // Två-stegs delete-flow för host:en (motsvarighet till non-host:s
   // leave-flow). Yes → deactivateRoom() tar bort koden från ACTIVE_ROOM_
   // CODES, vilket gör att:
@@ -3019,28 +3081,7 @@ export default function LobbyScreen() {
         {
           text: 'Yes',
           style: 'destructive',
-          onPress: async () => {
-            // Deaktivera rummet direkt så non-hosts polling-detection
-            // upptäcker det inom ~2s (även medan host:s loading-overlay
-            // visas — det är realistiskt async-beteende).
-            await deactivateRoom(roomCode);
-            clearLobbyPlayers(roomCode);
-            clearLobbySettings(roomCode);
-            clearEjected(roomCode);
-            clearGameStarted(roomCode);
-            // Visa loading-overlay i ~1.6s innan navigation. Ger host:en
-            // visuell feedback att appen processar och matchar real-
-            // backend-känsla där en DELETE-request tar några hundra ms.
-            // VIKTIGT: stäng overlay:n EXPLICIT innan navigation. Stack-
-            // navigatorn kan bevara Modal-state över route-replace —
-            // utan dismiss skulle Modal:en stå kvar synlig ovanpå Home-
-            // skärmen efter navigationen.
-            setDeletingLobby(true);
-            setTimeout(() => {
-              setDeletingLobby(false);
-              router.replace('/');
-            }, 1600);
-          },
+          onPress: () => performLobbyDelete(() => router.replace('/')),
         },
       ],
     );
@@ -3995,26 +4036,28 @@ export default function LobbyScreen() {
       }
     }
 
-    // Spotify DJ-guard: om läget är aktiverat måste host:ns Spotify Premium-
-    // konto vara kopplat. Per-spelare-verifiering (spotify_verified i
-    // lobby_players) är nästa fas — V1 kräver bara host:ens koppling.
+    // Spotify DJ-guard: om läget är aktiverat måste host ha self-attestat
+    // Spotify-appen (Plan B — ingen kontokoppling, inget Premium-krav).
     if (spotifyEnabled && !spotifyConnected) {
       Alert.alert(
-        'Spotify not connected',
-        'Connect your Spotify Premium account before starting a Spotify DJ game.',
+        'Spotify not confirmed',
+        'Confirm that you have the Spotify app on this device before starting a Spotify DJ game.',
         [
           { text: 'Cancel', style: 'cancel' },
-          { text: 'Connect Spotify', onPress: handleConnectSpotify },
+          { text: 'I have Spotify', onPress: handleConnectSpotify },
         ],
       );
       return;
     }
 
-    // Konsumera 1 Host Game-credit per påbörjat spel — Free först, Extras
-    // sedan. Blockerar start om båda är 0 (visar Store-redirect-Alert).
-    // Persisterar tillbaka via saveProfile så Profile-pillen + nästa lobby-
-    // session ser den uppdaterade siffran. Spread:ar in tidigare profil-
-    // fields (...profile) så vi inte stripper andra sparade settings.
+    // Konsumera 1 Free Host Game-credit per påbörjat spel (2 gratis/dag,
+    // top-up vid midnatt CET). Blockerar start om Free är 0 och host saknar
+    // Premium (visar Store-redirect-Alert mot subscription). Engångsköpta
+    // Extras-credits togs bort 2026-07-07 — Premium-abonnemang är enda
+    // vägen förbi dags-cappen. Persisterar tillbaka via saveProfile så
+    // Profile-pillen + nästa lobby-session ser den uppdaterade siffran.
+    // Spread:ar in tidigare profil-fields (...profile) så vi inte stripper
+    // andra sparade settings.
     // Guest host: HELA blocket skippas — ingen profil krävs ("Sign in
     // required" vore fel), inga credits förbrukas. Begränsningen ligger i
     // de låsta lobby-inställningarna + max 1 Play Again-replay.
@@ -4025,30 +4068,27 @@ export default function LobbyScreen() {
         return;
       }
       const free = profile.freeGameCredits ?? 0;
-      const extras = profile.gameCredits ?? 0;
       // Membership = obegränsade host-spel; ingen gate, ingen deduktion.
-      // Free + Extras lämnas helt orörda så pillen behåller sina värden om
-      // membership skulle gå ut senare och behovet av credits återuppstår.
+      // Free lämnas helt orört så pillen behåller sitt värde om membership
+      // skulle gå ut senare och dags-cappen återuppstår.
       if (!hasPremium) {
-        if (free === 0 && extras === 0) {
+        if (free === 0) {
           Alert.alert(
             'Out of Host Game Credits',
-            'You have no credits left for today. Buy extra credits in Store, wait for the daily refresh at midnight CET, or upgrade to a QuizVibe membership for unlimited host games.',
+            'You have used your free host games for today. Wait for the daily refresh at midnight CET, or upgrade to QuizVibe Premium for unlimited host games.',
             [
               { text: 'Cancel', style: 'cancel' },
-              { text: 'Go to Store', onPress: () => router.push({ pathname: '/store' as const, params: { focus: 'credits', from: '/lobby', fromCode: roomCode } }) },
+              { text: 'Go to Store', onPress: () => router.push({ pathname: '/store' as const, params: { focus: 'subscription', from: '/lobby', fromCode: roomCode } }) },
             ],
           );
           return;
         }
-        const nextFree = free > 0 ? free - 1 : 0;
-        const nextExtras = free > 0 ? extras : extras - 1;
+        const nextFree = free - 1;
         try {
-          await saveProfile({ ...profile, freeGameCredits: nextFree, gameCredits: nextExtras });
+          await saveProfile({ ...profile, freeGameCredits: nextFree });
           // Lokal state-sync så pillen i lobby-headern uppdateras direkt
           // (annars hade den gamla siffran legat kvar tills nästa fokus-load).
           setFreeGameCredits(nextFree);
-          setGameCredits(nextExtras);
         } catch {
           // Tyst — låt spelet börja även om persist-write skulle failla. Nästa
           // load reflekterar då fortfarande gamla värdet, vilket är säkrare än
@@ -4142,8 +4182,9 @@ export default function LobbyScreen() {
         // spelet kördes med.
         selectedExtraPackages: JSON.stringify(selectedExtraPackages),
         // Spotify DJ-läge — activeras om host slagit på toggeln i Game Connections
-        // OCH host:ns Spotify Premium-konto är kopplat. quiz.tsx beräknar
-        // DJ-rotationsplanen från turnOrder + totalRounds + frågor med spotifyTrackId.
+        // OCH host har self-attestat Spotify-appen (Plan B — ingen kontokoppling).
+        // quiz.tsx beräknar DJ-rotationsplanen från turnOrder + totalRounds +
+        // frågor med spotifyTrackId.
         spotifyEnabled: String(spotifyEnabled && spotifyConnected),
         spotifyAnswerYear: String(spotifyAnswerYear),
         spotifyAnswerName: String(spotifyAnswerName),
@@ -4321,7 +4362,7 @@ export default function LobbyScreen() {
                 hasPremium && styles.creditsPillMembership,
                 pressed && { opacity: 0.85 },
               ]}
-              onPress={() => router.push({ pathname: '/store' as const, params: { focus: 'credits', from: '/lobby', fromCode: roomCode } })}
+              onPress={() => router.push({ pathname: '/store' as const, params: { focus: 'subscription', from: '/lobby', fromCode: roomCode } })}
             >
               {hasPremium && (
                 <View style={styles.creditsMembershipBadgeWrap} pointerEvents="none">
@@ -4331,53 +4372,12 @@ export default function LobbyScreen() {
                 </View>
               )}
               <Text style={styles.creditsLabel} numberOfLines={1} ellipsizeMode="tail">Host Game Credits</Text>
+              {/* Extras-rutan borttagen 2026-07-07 — engångsköpta credits finns
+                  inte längre (V1 säljer enbart Premium-abonnemang). Pillen
+                  visar bara Free-saldot; Premium markeras via UNLIMITED-badgen. */}
               <View style={styles.creditsValueRow}>
                 <Text style={styles.creditsKey}>Free:</Text>
                 <Text style={[styles.creditsValue, styles.creditsValueFree]}>{freeGameCredits}</Text>
-                <Pressable
-                  style={({ pressed }) => [
-                    styles.creditsExtrasBox,
-                    gameCredits > 0
-                      ? styles.creditsExtrasBoxActive
-                      : styles.creditsExtrasBoxInactive,
-                    pressed && { opacity: 0.7 },
-                  ]}
-                  onPress={() =>
-                    Alert.alert(
-                      'Extra Host Game Credits',
-                      gameCredits > 0
-                        ? `You have ${gameCredits} extra credit${gameCredits === 1 ? '' : 's'}. Buy more in Store?`
-                        : 'You have no extra credits. Buy some in Store?',
-                      [
-                        { text: 'Cancel', style: 'cancel' },
-                        { text: 'Go to Store', onPress: () => router.push({ pathname: '/store' as const, params: { focus: 'credits', from: '/lobby', fromCode: roomCode } }) },
-                      ],
-                    )
-                  }
-                >
-                  <Text style={styles.creditsKey}>Extras:</Text>
-                  <Text style={[styles.creditsValue, styles.creditsValueExtras]}>{gameCredits}</Text>
-                  <View
-                    style={[
-                      styles.creditsExtrasPremiumBadge,
-                      gameCredits > 0
-                        ? styles.creditsExtrasPremiumBadgeActive
-                        : styles.creditsExtrasPremiumBadgeInactive,
-                    ]}
-                    pointerEvents="none"
-                  >
-                    <Text
-                      style={[
-                        styles.creditsExtrasPremiumBadgeText,
-                        gameCredits > 0
-                          ? styles.creditsExtrasPremiumBadgeTextActive
-                          : styles.creditsExtrasPremiumBadgeTextInactive,
-                      ]}
-                    >
-                      PREMIUM
-                    </Text>
-                  </View>
-                </Pressable>
               </View>
             </Pressable>
           )}
@@ -4994,7 +4994,7 @@ export default function LobbyScreen() {
                     onPress={() =>
                       Alert.alert(
                         'Spotify',
-                        '• Only applicable in Individual Devices mode\n\n• For Spotify music, one player at a time will be directed via QuizVibe to Spotify\n\n• All players in the same lobby must have a registered QuizVibe account with a connected Spotify account',
+                        '• Only applicable in Individual Devices mode\n\n• For Spotify music, one player at a time (the DJ) will be directed via QuizVibe to Spotify\n\n• The DJ needs the Spotify app on their device — free or Premium (Premium recommended: Spotify Free may play ads and may not always play the exact track)',
                       )
                     }
                     hitSlop={8}
@@ -5003,36 +5003,36 @@ export default function LobbyScreen() {
                     <Text style={styles.infoIconText}>i</Text>
                   </Pressable>
                 </View>
-                {/* Spotify-anslutningsstatus + connect-länk för alla */}
-                {spotifyConnected && spotifyDisplayName ? (
+                {/* Spotify self-attest (Plan B 2026-07-22): bekräfta/ta bort
+                    "jag har Spotify-appen" — ersätter OAuth-connect-länken. */}
+                {spotifyConnected ? (
                   <Pressable
                     onPress={handleDisconnectSpotify}
                     hitSlop={8}
                     style={({ pressed }) => [{ opacity: pressed ? 0.7 : 1 }]}
                   >
                     <Text style={[styles.spotifyConnectedLabel, { textDecorationLine: 'underline' }]}>
-                      ✓ {spotifyDisplayName}
+                      ✓ Spotify user
                     </Text>
                   </Pressable>
                 ) : (
                   <>
                     <Text style={styles.spotifyNoConnectionLabel}>
-                      {'Not activated / '}
+                      {'Not confirmed / '}
                       <Text
                         style={styles.spotifyGuideLinkText}
                         onPress={() => setSpotifyGuideVisible(true)}
                       >
-                        Guide How to connect
+                        Guide How it works
                       </Text>
                     </Text>
                     <Pressable
                       onPress={handleConnectSpotify}
-                      disabled={spotifyConnecting}
                       hitSlop={8}
                       style={({ pressed }) => [{ opacity: pressed ? 0.7 : 1 }]}
                     >
                       <Text style={[styles.spotifyLinkText, { color: '#1DB954', fontSize: FontSize.sm, marginTop: 2 }]}>
-                        {spotifyConnecting ? 'Connecting…' : 'Connect Spotify account'}
+                        I have the Spotify app
                       </Text>
                     </Pressable>
                   </>
@@ -5281,18 +5281,19 @@ export default function LobbyScreen() {
 
               {/* Två-knapps-rad direkt under rubriken — vänster: "Generic"-
                   ruta med FREE-badge som signalerar att lobby:n kör basic
-                  innehåll utan extra-paket; höger: "+ Add host packages" som
-                  navigerar till Store. Båda halvbreda (flex: 1 + gap: 4 i
-                  raden). Generic lyser grön när inga extra-paket är valda
-                  ELLER när alla tillgängliga paket är valda; dämpas till grå
-                  vid partial selection. Host-only — guests ska varken se
-                  köp-knappen eller Generic-toggle:n. */}
+                  innehåll utan extra-paket; höger: "Activate Extra package"
+                  med PREMIUM-badge (2026-07-07 — ersatte "+ Add Host
+                  packages"-Store-CTAn; paket säljs inte styckvis längre utan
+                  INGÅR i Premium-abonnemanget). Båda halvbreda (flex: 1 +
+                  gap: 4 i raden). Generic lyser grön när inga extra-paket är
+                  valda; dämpas till grå när paket är aktiva. Host-only. */}
               {hostMode && (() => {
                 // Generic är aktiv (grön) när inga extra-paket är valda.
                 // Så fort minst ett paket är valt — inklusive Select all-
                 // läget — dämpas Generic till grå (paketen är nu i bruk
                 // istället för bara basic-utbudet).
                 const isGenericActive = selectedExtraPackages.length === 0;
+                const isPackagesActive = selectedExtraPackages.length > 0;
                 const handleGenericPress = () => {
                   if (isGenericActive) return;
                   // Minst ett paket valt → fråga innan vi rensar selection.
@@ -5308,6 +5309,57 @@ export default function LobbyScreen() {
                     ],
                   );
                 };
+                // Activate-knappens tap-beteende per roll:
+                //   • Guest host → register-popup (Yes raderar lobbyn +
+                //     öppnar Register-formuläret på Home). Inloggad guest
+                //     host landar i inloggade menyn istället (register-
+                //     steget är gated !isLoggedIn på Home) — acceptabelt.
+                //   • Inloggad utan Premium → Store-upsell (subscription).
+                //   • Premium + Generic aktivt → re-aktivera alla paket
+                //     (tom V1-katalog → coming soon-Alert).
+                //   • Premium + paket redan aktiva → no-op (speglar
+                //     Generic-knappens active-no-op).
+                const handleActivatePress = () => {
+                  if (isGuestHost) {
+                    Alert.alert(
+                      'Premium feature',
+                      'Extra packages are only available for QuizVibe users with Premium. Do you want to register as a QuizVibe user? Please be aware this Game Lobby will be deleted.',
+                      [
+                        { text: 'Cancel', style: 'cancel' },
+                        {
+                          text: 'Yes',
+                          style: 'destructive',
+                          onPress: () =>
+                            performLobbyDelete(() =>
+                              router.replace({ pathname: '/', params: { openRegister: '1' } }),
+                            ),
+                        },
+                      ],
+                    );
+                    return;
+                  }
+                  if (!hasPremium) {
+                    Alert.alert(
+                      'Premium feature',
+                      'Extra Host packages for a customized quiz experience are included with QuizVibe Premium. Get it in the Store?',
+                      [
+                        { text: 'Cancel', style: 'cancel' },
+                        { text: 'Go to Store', onPress: () => router.push({ pathname: '/store' as const, params: { focus: 'subscription', from: '/lobby', fromCode: roomCode } }) },
+                      ],
+                    );
+                    return;
+                  }
+                  if (isPackagesActive) return;
+                  if (availablePackages.length === 0) {
+                    Alert.alert(
+                      'No Extra packages available',
+                      'New Extra Host packages are coming soon and will be included in your Premium subscription.',
+                    );
+                    return;
+                  }
+                  setSelectedExtraPackages(availablePackages.map((p) => p.id));
+                };
+                const activateIsActive = hasPremium && isPackagesActive;
                 return (
                   <View style={styles.packageActionsRow}>
                     <TouchableOpacity
@@ -5343,34 +5395,39 @@ export default function LobbyScreen() {
                         </Text>
                       </View>
                     </TouchableOpacity>
-                    {/* Guest host: köp-CTA:n döljs (paket kräver registrerat
-                        konto + Premium) — spacer bevarar Generic:s halva bredd. */}
-                    {isGuestHost ? (
-                      <View style={{ flex: 1 }} />
-                    ) : (
-                      <TouchableOpacity
-                        style={styles.addPackageBtn}
-                        onPress={() => Alert.alert(
-                          'Premium feature',
-                          'Add Host packages for customized Quiz experience. Go to Store?',
-                          [
-                            { text: 'Cancel', style: 'cancel' },
-                            { text: 'Go to Store', onPress: () => router.push({ pathname: '/store' as const, params: { focus: 'packages-only', from: '/lobby', fromCode: roomCode } }) },
-                          ],
-                        )}
-                        activeOpacity={0.7}
+                    <TouchableOpacity
+                      style={[
+                        styles.addPackageBtn,
+                        activateIsActive && styles.activatePackageBtnActive,
+                      ]}
+                      onPress={handleActivatePress}
+                      activeOpacity={activateIsActive ? 1 : 0.7}
+                    >
+                      <Text
+                        style={[
+                          styles.modeLabel,
+                          activateIsActive && styles.modeLabelActivePremium,
+                        ]}
                       >
-                        <Text style={styles.modeLabel}>+ Add Host packages</Text>
-                        <View
-                          style={[styles.premiumBadge, styles.premiumBadgeGrey]}
-                          pointerEvents="none"
+                        Activate Extra package
+                      </Text>
+                      <View
+                        style={[
+                          styles.premiumBadge,
+                          !hasPremium && styles.premiumBadgeGrey,
+                        ]}
+                        pointerEvents="none"
+                      >
+                        <Text
+                          style={[
+                            styles.premiumBadgeText,
+                            !hasPremium && styles.premiumBadgeTextGrey,
+                          ]}
                         >
-                          <Text style={[styles.premiumBadgeText, styles.premiumBadgeTextGrey]}>
-                            PREMIUM
-                          </Text>
-                        </View>
-                      </TouchableOpacity>
-                    )}
+                          PREMIUM
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
                   </View>
                 );
               })()}
@@ -5378,17 +5435,20 @@ export default function LobbyScreen() {
               {/* Guest host: paket-listan (wrappern nedan) ersätts av en not. */}
               {isGuestHost && (
                 <Text style={styles.guestHostNote}>
-                  No customized Host packages available for Guest users
+                  Extra packages only available for registered QuizVibe users with Premium
                 </Text>
               )}
 
-              {/* Yttre svart container som omsluter Buy CTA + paketlistan —
-                  speglar modeToggle:s padding (3), gap (4), borderRadius (md)
-                  och Colors.background-bakgrund. Det ger Buy CTA samma
-                  inre avstånd från ramen som Individual Devices har i
-                  Game Mode-toggeln. Guest host: hela wrappern göms —
-                  noten ovanför kommunicerar att paket inte är tillgängliga. */}
-              {!isGuestHost && (
+              {/* Yttre svart container som omsluter paketlistan — speglar
+                  modeToggle:s padding (3), gap (4), borderRadius (md) och
+                  Colors.background-bakgrund. Synlighet (2026-07-07): paket-
+                  listan visas för host ENDAST när hosten är inloggad QuizVibe-
+                  user med Premium (paket ingår i Premium — ej styckköp).
+                  Guest host: noten ovanför kommunicerar låset. Ej-Premium
+                  host: inget under knapp-raden (grå PREMIUM-badge är lås-
+                  signalen, samma mönster som Max 12). Non-host: oförändrat —
+                  ser hostens aktiva paket. */}
+              {(!hostMode || (!isGuestHost && hasPremium)) && (
               <View style={styles.extraPackagesWrapper}>
                 {/* Sub-rubrik högst upp i wrappern. För host introducerar den
                     de egna köpta paketen; för icke-host listas de paket hosten
@@ -5435,7 +5495,7 @@ export default function LobbyScreen() {
                   if (sorted.length === 0) {
                     return (
                       <Text style={styles.noExtraPackagesText}>
-                        {hostMode ? 'No customized package purchased' : 'No extra packages active in this lobby'}
+                        {hostMode ? 'No Extra packages available yet' : 'No extra packages active in this lobby'}
                       </Text>
                     );
                   }
@@ -6428,9 +6488,9 @@ export default function LobbyScreen() {
         </View>
       </Modal>
 
-      {/* ── Spotify connection guide modal ──────────────────────────────
-          Visas när användaren tappar "Guide How to connect" i Spotify-raden.
-          Förklarar steg-för-steg hur man kopplar Spotify Premium till QuizVibe. */}
+      {/* ── Spotify DJ guide modal ──────────────────────────────────────
+          Visas när användaren tappar "Guide How it works" i Spotify-raden.
+          Plan B (2026-07-22): ingen kontokoppling — bara Spotify-appen. */}
       <Modal
         visible={spotifyGuideVisible}
         transparent
@@ -6444,25 +6504,25 @@ export default function LobbyScreen() {
           />
           <View style={styles.spotifyGuideSheet}>
             <Text style={styles.spotifyGuideTitle}>
-              How to connect your Spotify Premium account to QuizVibe
+              How Spotify DJ works
             </Text>
             <View style={styles.spotifyGuideSteps}>
               <View style={styles.spotifyGuideStep}>
                 <Text style={styles.spotifyGuideStepNumber}>1</Text>
                 <Text style={styles.spotifyGuideStepText}>
-                  You need a Spotify Premium account
+                  Have the Spotify app installed on your device — free or Premium (Premium recommended: Spotify Free may play ads and may not always play the exact track)
                 </Text>
               </View>
               <View style={styles.spotifyGuideStep}>
                 <Text style={styles.spotifyGuideStepNumber}>2</Text>
                 <Text style={styles.spotifyGuideStepText}>
-                  Click Connect Spotify account and accept to connect your Spotify to QuizVibe
+                  Tap "I have the Spotify app" to confirm — now you are ready to play Spotify music in Individual device mode
                 </Text>
               </View>
               <View style={styles.spotifyGuideStep}>
                 <Text style={styles.spotifyGuideStepNumber}>3</Text>
                 <Text style={styles.spotifyGuideStepText}>
-                  Your QuizVibe account is connected to your Spotify account – now your user are ready to play Spotify music in the Individual device mode
+                  When you are the DJ, tap Start track in Spotify — the song opens in your Spotify app. If it does not start automatically, press Play in Spotify
                 </Text>
               </View>
             </View>
@@ -7758,6 +7818,13 @@ const styles = StyleSheet.create({
   // som Pass-the-Phone aktiv i Game Mode-toggle:n).
   genericBtnActive: {
     borderColor: Colors.success,
+    backgroundColor: Colors.primaryMuted,
+  },
+  // Aktiv-stil för "Activate Extra package"-knappen (2026-07-07): guld
+  // kant när Premium-hostens paket är aktiva — Generic/Activate bildar
+  // ett grönt⟷guld-par som speglar Max 4 / Max 12-rutorna.
+  activatePackageBtnActive: {
+    borderColor: '#F5A623',
     backgroundColor: Colors.primaryMuted,
   },
   // Yttre wrapper kring sub-rubriken, paketlistan och Buy CTA. Geometrin

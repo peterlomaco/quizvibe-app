@@ -10,7 +10,6 @@ import { clearLeftPlayers } from '@/src/utils/leftPlayers';
 import { clearEjected } from '@/src/utils/ejectedPlayers';
 import { clearLobbyPlayers, getLobbyPlayers } from '@/src/utils/mockLobbyPlayers';
 import { clearLobbySettings, getLobbySettings } from '@/src/utils/mockLobbySettings';
-import { getSpotifyConnectionStatus } from '@/src/utils/spotifyDJ';
 import { clearGameStarted } from '@/src/utils/mockStartedGames';
 import { getRoomMeta, isActiveRoom, isLobbyFull, isOwnLobby, registerActiveRoom } from '@/src/utils/mockActiveRooms';
 import {
@@ -421,21 +420,9 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     // Capacity-check: om host:s lobby redan är full visar vi popup med text
     // som beror på Free vs Premium-host. Användaren stannar i join-formuläret.
     if (await checkLobbyCapacity(code)) return;
-    // Spotify-check: om lobbyn kräver Spotify måste spelaren ha det kopplat.
-    const lobbySettings = await getLobbySettings(code);
-    if (lobbySettings?.spotifyEnabled) {
-      const { data: { user } } = await supabase.auth.getUser();
-      const spotifyOk = user
-        ? await getSpotifyConnectionStatus(user.id).then(s => s.connected && s.isPremium)
-        : false;
-      if (!spotifyOk) {
-        Alert.alert(
-          "This lobby require Spotify connection",
-          "Spotify is required. Please connect your Spotify account to QuizVibe user or ask Host to remove Spotify in Source dashboard",
-        );
-        return;
-      }
-    }
+    // Spotify pre-join-gate borttagen (Plan B 2026-07-22): ingen OAuth att
+    // verifiera — spelaren self-attestar Spotify i lobbyn, och host:s
+    // approve-guards blockerar oattesterade spelare i Spotify-spel.
     onClose();
     router.push({ pathname: '/lobby', params: { code, isHost: 'false' } });
   };
@@ -635,15 +622,9 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
       );
       return;
     }
-    // Spotify-check: guests har aldrig Spotify kopplat (inget konto) —
-    // blockera direkt om lobbyn kräver det.
-    if (roomSettings?.spotifyEnabled) {
-      Alert.alert(
-        "This lobby require Spotify connection",
-        "Spotify is required. Please connect your Spotify account to QuizVibe user or ask Host to remove Spotify in Source dashboard",
-      );
-      return;
-    }
+    // Spotify pre-join-gate borttagen (Plan B 2026-07-22): inget konto krävs —
+    // guests kan self-attesta Spotify i lobbyn. (Spotify DJ är dessutom
+    // IndDev-only, så guest-fallet fångas redan av IndDev-blocket ovan.)
     // Own-lobby-check: jämför mot guestName (identiteten användaren joinar
     // med via guest-formen) ELLER currentPlayerName (om inloggad). Fångar
     // både den inloggade-på-två-enheter-fallen och den explicita "joina egen
@@ -1403,6 +1384,10 @@ export default function HomeScreen() {
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [profileMenuVisible, setProfileMenuVisible] = useState(false);
   const [profileMenuStep, setProfileMenuStep] = useState<'menu' | 'login' | 'register' | 'forgot'>('menu');
+  // Pending-flagga för ?openRegister=1-deeplinken (guest-hostens "Activate
+  // Extra package"-flöde från Lobby). Sätts av param-effekten nedan och
+  // konsumeras av open-side reset-effekten som annars forcerar step='menu'.
+  const openRegisterPendingRef = useRef(false);
   const [loginPlayerName, setLoginPlayerName] = useState('');
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
@@ -1584,7 +1569,13 @@ export default function HomeScreen() {
   // regEmail bli kvar om man tryckte Cancel + Register snabbt.
   useEffect(() => {
     if (profileMenuVisible) {
-      setProfileMenuStep('menu');
+      // openRegister-deeplink (2026-07-07): guest-hostens "Activate Extra
+      // package → register"-flöde i Lobby navigerar hit med ?openRegister=1.
+      // Utan ref-hand-off:en skulle denna reset forcera step tillbaka till
+      // 'menu' och register-formuläret aldrig visas. Ref:en rensas direkt
+      // så nästa normala öppning startar på 'menu' som vanligt.
+      setProfileMenuStep(openRegisterPendingRef.current ? 'register' : 'menu');
+      openRegisterPendingRef.current = false;
       setLoginPlayerName('');
       setLoginEmail('');
       setLoginMode('playerName');
@@ -1663,7 +1654,7 @@ export default function HomeScreen() {
   // användaren landar direkt på registered-user join-flödet (hideGuest:true)
   // utan att se Home flicker. router.setParams clearar paramen efter open
   // så framtida fokus utan param inte trigggar modalen igen.
-  const localParams = useLocalSearchParams<{ openJoinRegistered?: string }>();
+  const localParams = useLocalSearchParams<{ openJoinRegistered?: string; openRegister?: string }>();
   useFocusEffect(
     useCallback(() => {
       if (localParams.openJoinRegistered === '1') {
@@ -1671,6 +1662,22 @@ export default function HomeScreen() {
         router.setParams({ openJoinRegistered: undefined });
       }
     }, [localParams.openJoinRegistered]),
+  );
+
+  // Auto-open Register-formuläret när Home entras med `?openRegister=1` —
+  // guest-hostens "Activate Extra package"-popup i Lobby (Yes raderar lobbyn
+  // och skickar hit). Ref:en konsumeras av open-side reset-effekten ovan som
+  // annars hade forcerat step till 'menu'. OBS: register-steget renderas bara
+  // för !isLoggedIn — en INLOGGAD guest host landar därför i den inloggade
+  // menyn istället (acceptabelt: hen har redan ett konto).
+  useFocusEffect(
+    useCallback(() => {
+      if (localParams.openRegister === '1') {
+        openRegisterPendingRef.current = true;
+        setProfileMenuVisible(true);
+        router.setParams({ openRegister: undefined });
+      }
+    }, [localParams.openRegister]),
   );
 
   const [fontsLoaded] = useFonts({
@@ -1689,28 +1696,28 @@ export default function HomeScreen() {
   }, []);
 
   const handleCreateGame = async () => {
-    // Host Game Credits-gate: blockera Create Game om både Free och Extras
-    // är 0. loadProfile() top-up:ar Free-saldot vid första load efter
-    // midnatt CET (refreshFreeCreditsIfNeeded), så vi alltid jämför mot
-    // aktuellt värde. Speglar samma blockad i LobbyScreen.handleStartGame —
-    // skillnaden här är att vi gateas ut REDAN på Home så användaren inte
+    // Host Game Credits-gate: blockera Create Game om Free är 0 (engångs-
+    // köpta Extras borttagna 2026-07-07 — Premium är enda vägen förbi
+    // dags-cappen). loadProfile() top-up:ar Free-saldot vid första load
+    // efter midnatt CET (refreshFreeCreditsIfNeeded), så vi alltid jämför
+    // mot aktuellt värde. Speglar samma blockad i LobbyScreen.handleStartGame
+    // — skillnaden här är att vi gateas ut REDAN på Home så användaren inte
     // ens hinner skapa en lobby de inte kan starta.
     const [freshProfile, hasPremium] = await Promise.all([
       loadProfile(),
       hasPremiumSubscription(),
     ]);
     // Membership = obegränsade host-spel; ingen gate. Lobby:s handleStartGame
-    // skippar också deduktionen så Free/Extras-saldon förblir orörda.
+    // skippar också deduktionen så Free-saldot förblir orört.
     if (!hasPremium) {
       const free = freshProfile?.freeGameCredits ?? 0;
-      const extras = freshProfile?.gameCredits ?? 0;
-      if (free === 0 && extras === 0) {
+      if (free === 0) {
         Alert.alert(
           'Out of Host Game Credits',
-          'You have no credits left for today. Buy extra credits in Store, wait for the daily refresh at midnight CET, or upgrade to a QuizVibe membership for unlimited host games.',
+          'You have used your free host games for today. Wait for the daily refresh at midnight CET, or upgrade to QuizVibe Premium for unlimited host games.',
           [
             { text: 'Cancel', style: 'cancel' },
-            { text: 'Go to Store', onPress: () => router.push('/store?focus=credits&from=/') },
+            { text: 'Go to Store', onPress: () => router.push('/store?focus=subscription&from=/') },
           ],
         );
         return;

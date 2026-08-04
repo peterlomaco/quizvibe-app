@@ -1,12 +1,14 @@
 /**
  * Spotify DJ-rotation + Deep Link
  *
- * Arkitektur: "Backend-styrd Deep Link via Supabase"
- *
- * Ingen native Spotify SDK — bara:
- *   • Linking.openURL('spotify:track:ID')   ← öppnar Spotify-appen
- *   • Supabase REST/Realtime               ← synkroniserar DJ-state
- *   • Spotify Web API /v1/tracks/{id}      ← hämtar albumomslag
+ * Arkitektur V1 (Plan B, jurist-beslut 2026-07-22): REN URL — inga Spotify
+ * API-anrop, ingen OAuth, inget Premium-krav.
+ *   • Linking.openURL('spotify:track:ID')   ← öppnar Spotify-appen (fallback:
+ *     https://open.spotify.com/track/ID — web player / App Store-prompt)
+ *   • Supabase REST/Realtime               ← synkroniserar DJ-state (vår egen DB)
+ * DJ-behörighet är SELF-ATTEST ("Spotify user"-toggle) — OAuth-verifieringen
+ * (getSpotifyConnectionStatus + src/lib/spotify.ts) är ARKIVERAD till V2,
+ * liksom albumomslag via Web API. Se LEGAL-INTEGRATIONS-BRIEF.md.
  *
  * DJ-rotation är DETERMINISTISK och behöver ingen DB-rad:
  *   djIndex = spotifyQuestionIndex % playerCount
@@ -14,15 +16,16 @@
  * Vad som händer per Spotify-fråga (Individual Devices):
  *   1. Host broadcastar spotify_question_ready (inkl. trackId + djPlayerId).
  *   2. DJ:n ser "Starta låten i Spotify"-knapp → openSpotifyTrack().
- *   3. Gissarna ser albumomslag (fetchSpotifyAlbumArt) + timer + årsväljare.
+ *   3. Gissarna ser timer + årsväljare/svarsalternativ (inget Spotify-innehåll i V1).
  *   4. DJ broadcastar spotify_dj_track_started när Spotify öppnat.
- *   5. Vid timer=0 → normal reveal-fas.
+ *   5. Vid timer=0 → normal reveal-fas (titel/artist/år från vår egen katalog).
  *   6. DJ byter manuellt tillbaka till QuizVibe → trycker "Nästa fråga".
  */
 
 import { Linking, Alert } from 'react-native';
-import { supabase } from '@/src/utils/supabase';
-import { getValidAccessToken } from '@/src/lib/spotify';
+// ARKIVERADE imports (FUTURE VERSION 2 — används bara av arkiverade block nedan):
+// import { supabase } from '@/src/utils/supabase';
+// import { getValidAccessToken } from '@/src/lib/spotify';
 
 // ── Typer ────────────────────────────────────────────────────────────
 
@@ -45,19 +48,22 @@ export interface SpotifyQuestionMeta {
   spotifyTrackId: string;
   /** Visningsnamn på låten (från katalogen, ex. "Dancing Queen — ABBA"). */
   displayName: string;
-  /** Albumomslag-URL, hämtad via fetchSpotifyAlbumArt. Null tills klar. */
+  /** Albumomslag-URL (FUTURE V2 — fetchSpotifyAlbumArt arkiverad; alltid null i V1). */
   albumArtUrl: string | null;
   /** Spelarens correctYear (= releaseår som ska gissas). */
   correctYear: number;
 }
 
-/** Status för en spelares Spotify-anslutning från spotify_connections-tabellen. */
-export interface SpotifyConnectionStatus {
-  connected: boolean;
-  isPremium: boolean;
-  spotifyDisplayName: string | null;
-  tokenExpiresAt: Date | null;
-}
+// (FUTURE VERSION 2) Status för en spelares Spotify-anslutning från
+// spotify_connections-tabellen — arkiverad tillsammans med
+// getSpotifyConnectionStatus nedan. I V1 är "connected" ersatt av
+// self-attest-flaggan spotifyAppConfirmed (ProfileData) / spotify_verified.
+// export interface SpotifyConnectionStatus {
+//   connected: boolean;
+//   isPremium: boolean;
+//   spotifyDisplayName: string | null;
+//   tokenExpiresAt: Date | null;
+// }
 
 // ── DJ-rotation ───────────────────────────────────────────────────────
 
@@ -118,20 +124,25 @@ export function getDJForQuestionIndex(
 // ── Spotify Deep Link ─────────────────────────────────────────────────
 
 const SPOTIFY_URI_SCHEME = 'spotify:track:';
+const SPOTIFY_WEB_URL_BASE = 'https://open.spotify.com/track/';
 
 /**
- * Öppnar Spotify-appen på rätt låt via deep link.
+ * Öppnar Spotify-appen på rätt låt via deep link — REN URL, inget API-anrop
+ * (Plan B per juridiskt underlag). Autoplay är inte garanterat: Spotify styr
+ * om låten auto-startar eller om DJ:n måste trycka Play — timer-aktiveraren
+ * i quiz-flödet absorberar båda fallen.
  *
  * Kräver inga native modules — använder RN:s inbyggda Linking.
  * iOS: 'spotify:track:ID' hanteras av OS:s URL-scheme-router → Spotify öppnar.
  * Android: samma (Spotify registrerar intent-filtret).
  *
- * Om Spotify inte är installerat: faller tillbaka till webbläsaren som
- * erbjuder att öppna App Store/Google Play.
+ * Om native-schemat misslyckas (Spotify ej installerat / scheme blockerat):
+ * fallback till https://open.spotify.com/track/<id> — öppnar web player
+ * eller App Store/Google Play-prompt.
  *
  * @param spotifyTrackId  Spotify track ID (ex. "4iV5W9uYEdYUVa79Axb7Rh"),
  *                        INTE full URI ("spotify:track:...").
- * @returns true om openURL lyckades, false om felet var fatalt.
+ * @returns true om någon av URL-öppningarna lyckades, false om båda föll.
  */
 export async function openSpotifyTrack(spotifyTrackId: string): Promise<boolean> {
   const nativeUri = `${SPOTIFY_URI_SCHEME}${spotifyTrackId}`;
@@ -144,12 +155,18 @@ export async function openSpotifyTrack(spotifyTrackId: string): Promise<boolean>
     await Linking.openURL(nativeUri);
     return true;
   } catch (err) {
-    console.warn('[spotifyDJ] openSpotifyTrack failed:', err);
-    Alert.alert(
-      'Kunde inte öppna Spotify',
-      'Kontrollera att Spotify är installerat och försök igen.',
-    );
-    return false;
+    console.warn('[spotifyDJ] openSpotifyTrack native scheme failed:', err);
+    try {
+      await Linking.openURL(`${SPOTIFY_WEB_URL_BASE}${spotifyTrackId}`);
+      return true;
+    } catch (webErr) {
+      console.warn('[spotifyDJ] openSpotifyTrack web fallback failed:', webErr);
+      Alert.alert(
+        'Kunde inte öppna Spotify',
+        'Kontrollera att Spotify är installerat och försök igen.',
+      );
+      return false;
+    }
   }
 }
 
@@ -175,62 +192,70 @@ export async function openSpotifyApp(): Promise<boolean> {
   }
 }
 
-// ── Albumomslag (för gissarnas skärmar) ──────────────────────────────
+// ── FUTURE VERSION 2 — Albumomslag (archived) ────────────────────────
+// Anropas INTE i V1 — inget Spotify-innehåll (omslag/metadata) hämtas
+// eller visas i appen (per LEGAL-INTEGRATIONS-BRIEF.md). Behålls för
+// enkel V2-reaktivering av gissarnas albumomslags-vy.
 
 /**
  * Hämtar albumomslagets URL via Spotify Web API.
  * Hämtar token automatiskt via getValidAccessToken (inkl. refresh-logik).
  * Returnerar den största tillgängliga bilden (index 0 = störst).
  *
- * Anropas av gissarnas klienter strax innan Spotify-frågan börjar visas.
+ * (V2-flöde) Anropas av gissarnas klienter strax innan Spotify-frågan visas.
  * DJ:n ser inte albumomslaget (de vet redan svaret).
- *
- * @param spotifyTrackId  Spotify track ID (ex. "4iV5W9uYEdYUVa79Axb7Rh").
- * @returns URL-sträng, eller null vid fel / saknad token.
  */
-export async function fetchSpotifyAlbumArt(spotifyTrackId: string): Promise<string | null> {
-  const accessToken = await getValidAccessToken();
-  if (!accessToken) return null;
-  try {
-    const res = await fetch(`https://api.spotify.com/v1/tracks/${spotifyTrackId}`, {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    });
-    if (!res.ok) return null;
-    const data = await res.json();
-    const images: Array<{ url: string; width: number; height: number }> =
-      data?.album?.images ?? [];
-    return images[0]?.url ?? null;
-  } catch {
-    return null;
-  }
-}
+// export async function fetchSpotifyAlbumArt(spotifyTrackId: string): Promise<string | null> {
+//   const accessToken = await getValidAccessToken();
+//   if (!accessToken) return null;
+//   try {
+//     const res = await fetch(`https://api.spotify.com/v1/tracks/${spotifyTrackId}`, {
+//       headers: { Authorization: `Bearer ${accessToken}` },
+//     });
+//     if (!res.ok) return null;
+//     const data = await res.json();
+//     const images: Array<{ url: string; width: number; height: number }> =
+//       data?.album?.images ?? [];
+//     return images[0]?.url ?? null;
+//   } catch {
+//     return null;
+//   }
+// }
 
-// ── Supabase: hämta anslutningsstatus ────────────────────────────────
+// ── END FUTURE VERSION 2 — Albumomslag ───────────────────────────────
+
+// ── FUTURE VERSION 2 — OAuth-anslutningsstatus (archived 2026-07-22) ─
+// Plan B: ingen OAuth i V1 — spotify_connections-tabellen är droppad
+// (migration 0025). "Har spelaren Spotify?" är i V1 en self-attest-flagga
+// (ProfileData.spotifyAppConfirmed → lobby_players.spotify_verified),
+// inte ett DB-lookup. Reaktiveras tillsammans med src/lib/spotify.ts i V2.
 
 /**
- * Läser spelarens Spotify-anslutningsstatus från spotify_connections-tabellen.
- * Används i Lobby-skärmen för att visa "Connect Spotify"-CTA eller grön bock.
+ * (V2) Läser spelarens Spotify-anslutningsstatus från spotify_connections.
+ * Användes i Lobby/Profile för att visa "Connect Spotify"-CTA eller grön bock.
  */
-export async function getSpotifyConnectionStatus(
-  userId: string,
-): Promise<SpotifyConnectionStatus> {
-  const { data } = await supabase
-    .from('spotify_connections')
-    .select('is_premium, spotify_display_name, token_expires_at')
-    .eq('user_id', userId)
-    .maybeSingle();
+// export async function getSpotifyConnectionStatus(
+//   userId: string,
+// ): Promise<SpotifyConnectionStatus> {
+//   const { data } = await supabase
+//     .from('spotify_connections')
+//     .select('is_premium, spotify_display_name, token_expires_at')
+//     .eq('user_id', userId)
+//     .maybeSingle();
+//
+//   if (!data) {
+//     return { connected: false, isPremium: false, spotifyDisplayName: null, tokenExpiresAt: null };
+//   }
+//
+//   return {
+//     connected: true,
+//     isPremium: data.is_premium,
+//     spotifyDisplayName: data.spotify_display_name,
+//     tokenExpiresAt: data.token_expires_at ? new Date(data.token_expires_at) : null,
+//   };
+// }
 
-  if (!data) {
-    return { connected: false, isPremium: false, spotifyDisplayName: null, tokenExpiresAt: null };
-  }
-
-  return {
-    connected: true,
-    isPremium: data.is_premium,
-    spotifyDisplayName: data.spotify_display_name,
-    tokenExpiresAt: data.token_expires_at ? new Date(data.token_expires_at) : null,
-  };
-}
+// ── END FUTURE VERSION 2 — OAuth-anslutningsstatus ───────────────────
 
 // ── Expo-konfiguration (läs detta innan du testar) ────────────────────
 //

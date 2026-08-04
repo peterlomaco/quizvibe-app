@@ -140,8 +140,8 @@ const FAQ_CATEGORIES: FaqCategory[] = [
     title: 'Host Game Credits',
     items: [
       {
-        q: 'What are Free vs Extras credits?',
-        a: 'Free credits refresh automatically every midnight CET — the free baseline plan. You get 2 Free credits per day. Extras are credits you buy in the Store (5, 10, or 20 packs). When you tap Start Game, Free credits are consumed first, then Extras.',
+        q: 'What are Host Game Credits?',
+        a: 'Each game you start as Host consumes 1 credit. You get 2 free credits per day — they refresh automatically every midnight CET. With a Premium subscription you have unlimited host games and no credits are consumed. Joining and playing in games hosted by others is always unlimited and free.',
       },
       {
         q: 'When do I get my daily free credits?',
@@ -149,7 +149,7 @@ const FAQ_CATEGORIES: FaqCategory[] = [
       },
       {
         q: 'What happens when I have 0 credits left?',
-        a: 'Start Game is blocked with a popup giving you two options: wait for the next daily refresh, or go to the Store to buy Extras credits or a Premium subscription (unlimited host games).',
+        a: 'Start Game is blocked with a popup giving you two options: wait for the next daily refresh at midnight CET, or upgrade to a Premium subscription in the Store (unlimited host games).',
       },
       {
         q: 'Are credits spent if my game is interrupted?',

@@ -375,13 +375,15 @@ export function PlayerRow({
         </View>
       )}
 
-      {/* ── Spotify-koppling-badge — uppe till höger på kortets kantlinje ── */}
+      {/* ── Spotify-attest-badge — uppe till höger på kortets kantlinje.
+          Plan B (2026-07-22): visar spelarens self-attest ("jag har Spotify-
+          appen"), inte en OAuth-koppling. ── */}
       <View style={[styles.spotifyBorderTag, { borderColor: spotifyConnected ? '#1DB954' : Colors.borderStrong }]} pointerEvents="none">
         <SpotifyBrandIcon size={10} variant="white" />
         {spotifyConnected ? (
-          <Text style={styles.spotifyBorderTagConnected}>Spotify connected</Text>
+          <Text style={styles.spotifyBorderTagConnected}>Spotify ready</Text>
         ) : (
-          <Text style={styles.spotifyBorderTagNone}>Spotify not connected</Text>
+          <Text style={styles.spotifyBorderTagNone}>No Spotify</Text>
         )}
       </View>
     </View>

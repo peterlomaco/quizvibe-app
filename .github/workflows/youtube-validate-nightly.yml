@@ -72,6 +72,15 @@ jobs:
           fi
           npx tsx youtube/autofix.ts $ARGS
 
+      - name: Run spotify-validate (döda track-ID:n → "Something went wrong" i appen)
+        # Körs även om youtube-steget failade — de två validerar oberoende
+        # kataloger. Spotify oEmbed är publik: ingen API-nyckel, ingen kvot.
+        # Exit 1 om något spotifyTrackId 404:ar (track borttagen/relinkad av
+        # Spotify) — byt ID i YAML + kör export-music-questions.
+        if: always()
+        working-directory: backend
+        run: npm run spotify-validate
+
       - name: Ladda upp rapport som CI-artefakt
         # Körs alltid — rapporten är värdefull både vid success (tom = alla OK)
         # och failure (innehåller lista brutna klipp + föreslagna ersättningar).
