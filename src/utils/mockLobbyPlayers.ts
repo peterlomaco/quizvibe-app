@@ -52,6 +52,10 @@ interface LobbyPlayerRow {
   has_left: boolean;
   // True om spelaren har ett kopplat Spotify-konto (migration 0015).
   spotify_verified: boolean | null;
+  // OBS: kolumnen `seen_question_ids` (migration 0026) ingår MEDVETET INTE
+  // i denna row-shape eller i playerToRow — den skrivs enbart via
+  // updateOwnSeenQuestionIds (targeted UPDATE) så host:s bulk-UPSERT aldrig
+  // clobbar den, och så en icke-applicerad migration inte bryter lobby-join.
 }
 
 function rowToPlayer(row: LobbyPlayerRow): LobbyPlayer {
@@ -323,6 +327,79 @@ export async function getLobbyPlayers(code: string): Promise<LobbyPlayer[] | und
     return null;
   }
   return data && data.length > 0 ? (data as LobbyPlayerRow[]).map(rowToPlayer) : undefined;
+}
+
+/**
+ * Cross-player seen-historik (migration 0026). Formen som lagras i
+ * lobby_players.seen_question_ids (jsonb) och som host-sidan unionerar.
+ */
+export interface SeenQuestionsSnapshot {
+  /** Fråge-IDs från spelarens senaste 20 spel (cap 500, nyaste behålls). */
+  seen: string[];
+  /** Fråge-IDs enbart från spelarens SENASTE spel (hård exkludering). */
+  last: string[];
+}
+
+/**
+ * Publicera egen 20-sessions fråge-historik till egen lobby_players-rad.
+ * Targeted UPDATE på (room_code, player_id, user_id) — RLS "player can
+ * update own row" täcker; belt-and-suspenders-eq som markOwnPlayerLeft.
+ * Fire-and-forget-vänlig: om migration 0026 inte är applicerad failar bara
+ * denna UPDATE (console.warn), aldrig join-flödet.
+ */
+export async function updateOwnSeenQuestionIds(
+  code: string,
+  playerId: string,
+  snapshot: SeenQuestionsSnapshot,
+): Promise<void> {
+  if (!code || !playerId) return;
+  const normalized = normalizeCode(code);
+  await ensureAuthSession();
+  const { data: userResp } = await supabase.auth.getUser();
+  const userId = userResp.user?.id;
+  if (!userId) return;
+  const { error } = await supabase
+    .from('lobby_players')
+    .update({ seen_question_ids: snapshot })
+    .eq('room_code', normalized)
+    .eq('player_id', playerId)
+    .eq('user_id', userId);
+  if (error) {
+    console.warn('[lobbyPlayers] updateOwnSeenQuestionIds failed:', error.message);
+  }
+}
+
+/**
+ * Host: läs alla deltagares publicerade seen-historik för rummet och
+ * returnera union:en. null vid query-fel (t.ex. migration ej applicerad)
+ * eller när ingen deltagare publicerat något — caller hoppar då bara över
+ * peer-exkluderingen (host:s egen historik gäller ändå).
+ */
+export async function getLobbySeenQuestionIds(
+  code: string,
+): Promise<SeenQuestionsSnapshot | null> {
+  if (!code) return null;
+  const normalized = normalizeCode(code);
+  const { data, error } = await supabase
+    .from('lobby_players')
+    .select('seen_question_ids')
+    .eq('room_code', normalized);
+  if (error) {
+    console.warn('[lobbyPlayers] getLobbySeenQuestionIds query failed:', error.message);
+    return null;
+  }
+  const seen = new Set<string>();
+  const last = new Set<string>();
+  for (const row of (data ?? []) as { seen_question_ids?: unknown }[]) {
+    const v = row.seen_question_ids;
+    if (!v || typeof v !== 'object') continue;
+    const s = (v as { seen?: unknown }).seen;
+    const l = (v as { last?: unknown }).last;
+    if (Array.isArray(s)) s.forEach((x) => { if (typeof x === 'string' && x) seen.add(x); });
+    if (Array.isArray(l)) l.forEach((x) => { if (typeof x === 'string' && x) last.add(x); });
+  }
+  if (seen.size === 0 && last.size === 0) return null;
+  return { seen: [...seen], last: [...last] };
 }
 
 /**

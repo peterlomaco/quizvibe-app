@@ -35,19 +35,18 @@ async function resolveKey(prefix: string): Promise<string | null> {
   }
 }
 
-// Läs v2-historik, med migration från v1 om v2 saknas.
-async function loadSessionHistory(): Promise<SessionHistory> {
+// Läs v2-historik för explicita nycklar, med migration från v1 om v2 saknas.
+async function loadHistoryForKeys(
+  v2Key: string,
+  v1Key: string | null,
+): Promise<SessionHistory> {
   try {
-    const v2Key = await resolveKey(SESSION_KEY_PREFIX);
-    if (!v2Key) return { sessions: [] };
-
     const raw = await AsyncStorage.getItem(v2Key);
     if (raw) {
       return JSON.parse(raw) as SessionHistory;
     }
 
     // Migration: importera v1 flat Set som en syntetisk session
-    const v1Key = await resolveKey(SEEN_KEY_PREFIX);
     if (v1Key) {
       const v1Raw = await AsyncStorage.getItem(v1Key);
       if (v1Raw) {
@@ -66,6 +65,34 @@ async function loadSessionHistory(): Promise<SessionHistory> {
   } catch {
     return { sessions: [] };
   }
+}
+
+// Läs v2-historik för inloggade profilen.
+async function loadSessionHistory(): Promise<SessionHistory> {
+  const v2Key = await resolveKey(SESSION_KEY_PREFIX);
+  if (!v2Key) return { sessions: [] };
+  const v1Key = await resolveKey(SEEN_KEY_PREFIX);
+  return loadHistoryForKeys(v2Key, v1Key);
+}
+
+// Session-append under en explicit v2-nyckel. Delas av addSessionRecord
+// (profil-baserad) och addSessionRecordForNames (explicita playerNames).
+async function appendSessionForKey(
+  v2Key: string,
+  v1Key: string | null,
+  qIds: string[],
+): Promise<void> {
+  try {
+    const history = await loadHistoryForKeys(v2Key, v1Key);
+    const newSession: SessionRecord = {
+      id: String(Date.now()),
+      qIds: [...new Set(qIds)], // dedupera inom sessionen
+    };
+    const sessions = [...history.sessions, newSession];
+    // Håll fönstret — ta bort äldsta om för många
+    const trimmed = sessions.slice(-MAX_SESSIONS);
+    await AsyncStorage.setItem(v2Key, JSON.stringify({ sessions: trimmed }));
+  } catch {}
 }
 
 // Returnerar alla fråge-IDs från de senaste MAX_SESSIONS sessionerna som ett Set.
@@ -99,18 +126,41 @@ export async function addSessionRecord(qIds: string[]): Promise<void> {
   try {
     const v2Key = await resolveKey(SESSION_KEY_PREFIX);
     if (!v2Key) return;
+    const v1Key = await resolveKey(SEEN_KEY_PREFIX);
+    await appendSessionForKey(v2Key, v1Key, qIds);
+  } catch {}
+}
 
-    const history = await loadSessionHistory();
-    const newSession: SessionRecord = {
-      id: String(Date.now()),
-      qIds: [...new Set(qIds)], // dedupera inom sessionen
-    };
-
-    const sessions = [...history.sessions, newSession];
-    // Håll fönstret — ta bort äldsta om för många
-    const trimmed = sessions.slice(-MAX_SESSIONS);
-
-    await AsyncStorage.setItem(v2Key, JSON.stringify({ sessions: trimmed }));
+// Sparar en spelomgång under EXPLICITA playerName-nycklar (Pass-the-Phone:
+// alla registrerade deltagare delar host-enheten, men resolveKey ser bara
+// den inloggade profilen). Skriver `@quizvibe/seenQuestionIds/v2/<name>` för
+// varje namn så deltagarnas historik finns på enheten om de senare loggar
+// in/hostar där. Inloggade profilens eget namn hoppas över — det skrivs
+// redan av addSessionRecord (dubbelskrivning skulle konsumera två av de
+// 20 sessions-slotten för samma spel).
+export async function addSessionRecordForNames(
+  names: string[],
+  qIds: string[],
+): Promise<void> {
+  if (!qIds.length || !names.length) return;
+  try {
+    let ownName: string | null = null;
+    try {
+      const profile = await loadProfile();
+      ownName = profile?.playerName?.toLowerCase() ?? null;
+    } catch {}
+    const unique = [
+      ...new Set(
+        names
+          .map((n) => n.trim().toLowerCase())
+          .filter((n) => n.length > 0 && n !== ownName),
+      ),
+    ];
+    await Promise.all(
+      unique.map((n) =>
+        appendSessionForKey(`${SESSION_KEY_PREFIX}${n}`, `${SEEN_KEY_PREFIX}${n}`, qIds),
+      ),
+    );
   } catch {}
 }
 

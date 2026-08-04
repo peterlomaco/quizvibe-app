@@ -314,6 +314,23 @@ export interface PlayerScoreRecordedPayload {
   time_used: number;
 }
 
+/**
+ * Non-host skickar sin lokala fråge-historik (rullande 20-sessions-fönstret
+ * från hostQuestionHistory) till host direkt vid quiz-mount. Host unionerar
+ * ALLA spelares historik och exkluderar frågor som NÅGON deltagare sett i
+ * sina senaste 20 spel — så samma låt inte återkommer bara för att en annan
+ * spelare hostar nästa spel. Broadcastas med retries (host är redan
+ * subscribed eftersom host mountar quiz före non-hosts navigerar in).
+ */
+export interface PlayerSeenQuestionsPayload {
+  /** Avsändarens lobby_players.player_id. */
+  player_id: string;
+  /** Fråge-IDs från avsändarens senaste 20 sessioner (trimmad till cap). */
+  seen_q_ids: string[];
+  /** Fråge-IDs enbart från avsändarens SENASTE session (hård exkludering). */
+  last_q_ids: string[];
+}
+
 export type PlayerConnectionStatus = 'connected' | 'disconnected';
 
 export interface SyncChannelHandlers {
@@ -396,6 +413,13 @@ export interface SyncChannelHandlers {
    */
   onPlayerScoreRecorded?: (payload: PlayerScoreRecordedPayload) => void;
   /**
+   * En non-host har skickat sin lokala fråge-historik (20-sessions-fönstret).
+   * Host unionerar in i peer-seen-set:en som exkluderar frågor någon
+   * deltagare redan sett — ignoreras efter att spelet startat (pool-rebuild
+   * mitt i spelet skulle byta aktuell fråga).
+   */
+  onPlayerSeenQuestions?: (payload: PlayerSeenQuestionsPayload) => void;
+  /**
    * Valfritt membership-predikat. Om satt droppar vi player-id-bärande
    * events (player_left, player_score_recorded, player_answer_confirmed,
    * player_approved_play_again) vars id INTE finns i lobby-rostern — stoppar
@@ -462,6 +486,12 @@ export interface SyncChannel {
    * så leaderboarden är komplett på alla enheter.
    */
   broadcastPlayerScoreRecorded: (payload: PlayerScoreRecordedPayload) => Promise<void>;
+  /**
+   * Non-host broadcastar sin lokala fråge-historik till host vid quiz-mount
+   * så host:s pool-bygge kan exkludera frågor NÅGON deltagare sett i sina
+   * senaste 20 spel.
+   */
+  broadcastPlayerSeenQuestions: (payload: PlayerSeenQuestionsPayload) => Promise<void>;
   /**
    * Rensar per-sender lastSeen + lastReported så watchdog:n börjar om från
    * scratch. Anropas av quiz.tsx när lokal monitor återgår från unstable
@@ -666,6 +696,17 @@ function vHostRejoined(raw: unknown): HostRejoinedPayload | null {
   if (!isObj(raw) || !str(raw.sender_id)) return null;
   return { sender_id: raw.sender_id };
 }
+function vPlayerSeenQuestions(raw: unknown): PlayerSeenQuestionsPayload | null {
+  if (!isObj(raw) || !str(raw.player_id)) return null;
+  // optIds returnerar undefined för tom/ogiltig array — behandla som tom
+  // lista istället för att droppa hela payloaden (last_q_ids kan t.ex. vara
+  // giltig även när seen_q_ids saknas hos en ny spelare).
+  return {
+    player_id: raw.player_id,
+    seen_q_ids: optIds(raw.seen_q_ids) ?? [],
+    last_q_ids: optIds(raw.last_q_ids) ?? [],
+  };
+}
 function vPlayerScoreRecorded(raw: unknown): PlayerScoreRecordedPayload | null {
   if (
     !isObj(raw) ||
@@ -846,6 +887,12 @@ export function subscribeSyncChannel(
     onEvent('player_score_recorded', vPlayerScoreRecorded, (p) => {
       if (known(p.player_id, 'player_score_recorded')) handlers.onPlayerScoreRecorded!(p);
     });
+  // player_seen_questions: non-host:s fråge-historik → host:s peer-union.
+  // Player-id-bärande → membership-guard som övriga sådana events.
+  if (handlers.onPlayerSeenQuestions)
+    onEvent('player_seen_questions', vPlayerSeenQuestions, (p) => {
+      if (known(p.player_id, 'player_seen_questions')) handlers.onPlayerSeenQuestions!(p);
+    });
 
   // Subscribe-callback rapporterar channel-state till connectionMonitor.
   // SUBSCRIBED → ok. CHANNEL_ERROR/TIMED_OUT/CLOSED → error. DETTA är
@@ -1000,6 +1047,9 @@ export function subscribeSyncChannel(
     },
     broadcastPlayerScoreRecorded: async (payload) => {
       await channel.send({ type: 'broadcast', event: 'player_score_recorded', payload });
+    },
+    broadcastPlayerSeenQuestions: async (payload) => {
+      await channel.send({ type: 'broadcast', event: 'player_seen_questions', payload });
     },
     broadcastGameSequenceInit: async (payload) => {
       await channel.send({ type: 'broadcast', event: 'game_sequence_init', payload });

@@ -299,6 +299,19 @@ export function buildEpochPhase<T extends EpochQuestion>(
     epochPools.set(epochId, { unseen, seen, lastSession, extraDraws: 0 });
   }
 
+  // ── Step 2b: samma 3-tier-split + shuffle för era-agnostiska poolen ────
+  // Utan detta konsumerades agnosticPool i KATALOG-ordning (deterministisk —
+  // två fresh hosts fick samma överflödes-sekvens) och utan seen-hänsyn (en
+  // last-session-fråga kunde väljas trots att osedda fanns). Vanligt läge
+  // vid smala Game Era-fönster där många person/Hints-items hamnar utanför
+  // aktiva epoker. splice-in-place så shift()-konsumenterna nedan är orörda.
+  const orderedAgnostic = [
+    ...shuffleArr(agnosticPool.filter((q) => !recentIds.has(q.id) && !lastIds.has(q.id))),
+    ...shuffleArr(agnosticPool.filter((q) => recentIds.has(q.id) && !lastIds.has(q.id))),
+    ...shuffleArr(agnosticPool.filter((q) => lastIds.has(q.id))),
+  ];
+  agnosticPool.splice(0, agnosticPool.length, ...orderedAgnostic);
+
   // ── Step 3: Allocate total questions across epochs (LRM) ───────────────
   const allocation = allocateByEpoch(totalQuestions, activeEpochs);
   const epochNormWeights = new Map(activeEpochs.map((e) => [e.id, e.normWeight]));

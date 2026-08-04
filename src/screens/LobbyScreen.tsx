@@ -59,7 +59,9 @@ import { MIN_HCP, calculateInitialHCP } from '../utils/hcp';
 import { addLeftPlayer, getLeftPlayers, removeLeftPlayer } from '../utils/leftPlayers';
 import { deactivateRoom, getRoomMeta, markRoomGameStarted, roomExists, setRoomMaxPlayers, setRoomPlayerCount } from '../utils/mockActiveRooms';
 import { clearEjected, isEjected, markEjected } from '../utils/ejectedPlayers';
-import { claimCarryOverLobbyPlayer, clearLobbyPlayers, getLobbyPlayers, markOwnPlayerLeft, setLobbyPlayers, upsertOwnLobbyPlayer } from '../utils/mockLobbyPlayers';
+import { claimCarryOverLobbyPlayer, clearLobbyPlayers, getLobbyPlayers, getLobbySeenQuestionIds, markOwnPlayerLeft, setLobbyPlayers, updateOwnSeenQuestionIds, upsertOwnLobbyPlayer } from '../utils/mockLobbyPlayers';
+import { loadLastSessionIds, loadSeenQuestionIds } from '../utils/hostQuestionHistory';
+import { setPendingPeerSeenIds } from '../utils/pendingSeenQuestions';
 import { clearLobbySettings, getLobbySettings, setLobbySettings } from '../utils/mockLobbySettings';
 import { defaultEnabledMainCategories, subjectToMainCategory, type MainCategory } from '../utils/mainCategory';
 import { MUSIC_QUESTIONS } from '../utils/musicQuestions';
@@ -877,6 +879,26 @@ function AddPlayerModal({ visible, onClose, onAdd, takenGuestLetters, existingNa
  * (300ms upp+ner + 600ms vila) men startas med 150ms-offset så de ser
  * ut att rulla som en våg från vänster till höger.
  */
+// Cross-player seen-historik: publicera enhetens lokala 20-sessions fråge-
+// historik till egen lobby_players-rad (migration 0026) så host kan
+// exkludera frågor som NÅGON deltagare sett i sina senaste 20 spel — även i
+// Pass-the-Phone där ingen quiz_sync-broadcast-channel finns. Guests utan
+// profil har tom historik → skippas (kolumnen förblir NULL). Fire-and-forget:
+// join-flödet blockas aldrig; saknad migration ger bara en console.warn i
+// updateOwnSeenQuestionIds. Cap 500 ids (slice(-500) behåller nyaste —
+// Set-iteration = insertion order = äldsta session först).
+function publishOwnSeenHistory(roomCode: string, playerId: string): void {
+  Promise.all([loadSeenQuestionIds(), loadLastSessionIds()])
+    .then(([seen, last]) => {
+      if (seen.size === 0 && last.size === 0) return;
+      return updateOwnSeenQuestionIds(roomCode, playerId, {
+        seen: [...seen].slice(-500),
+        last: [...last].slice(-500),
+      });
+    })
+    .catch(() => {});
+}
+
 function WaveDots() {
   const dot1 = useRef(new Animated.Value(0)).current;
   const dot2 = useRef(new Animated.Value(0)).current;
@@ -1382,6 +1404,10 @@ export default function LobbyScreen() {
         // Publicera egen rad till lobby_players så host:s Realtime-channel
         // får broadcast och hen ser den nya spelaren direkt i sin vy.
         upsertOwnLobbyPlayer(roomCode, guestPlayer).catch(() => { /* loggas i lobbyPlayers */ });
+        // Publicera enhetens fråge-historik för cross-player-exkludering.
+        // Guest-join på en enhet med inloggad profil publicerar profilens
+        // historik (samma människa); enhet utan profil → tom → no-op.
+        publishOwnSeenHistory(roomCode, guestPlayerId);
         // Rensa ev. stale leftPlayers-snapshot för det här player_id:t. Guest
         // får alltid fresh id så normalt finns inget att rensa, men anropet
         // är idempotent och håller koden symmetrisk med code-only-pathen.
@@ -1483,6 +1509,9 @@ export default function LobbyScreen() {
         } else {
           upsertOwnLobbyPlayer(roomCode, joiner).catch(() => { /* loggas i lobbyPlayers */ });
         }
+        // Publicera enhetens fråge-historik för cross-player-exkludering
+        // (registrerade users har 20-sessions-historik lokalt; tom → no-op).
+        publishOwnSeenHistory(roomCode, joinerId);
         // Rensa ev. stale leftPlayers-snapshot för det ärvda player_id:t.
         // Kritiskt när id:t ärvts från en tidigare Leave Game: AsyncStorage:s
         // leftIds får annars syncFromStore:s self-injection att felaktigt sätta
@@ -4106,6 +4135,16 @@ export default function LobbyScreen() {
     // faktiskt approvade spelaren. Explicit await här garanterar att
     // approved:true är i DB innan game_started=true sätts.
     await setLobbyPlayers(roomCode, players);
+
+    // Cross-player seen-historik: läs alla deltagares publicerade 20-spels-
+    // historik ur lobby_players och lämna union:en till quiz.tsx via
+    // in-memory-store (host-enheten bygger den auktoritativa fråge-poolen).
+    // Primär väg för Pass-the-Phone (ingen quiz_sync-channel där);
+    // belt-and-suspenders i IndDev där player_seen_questions-broadcasten är
+    // fast-path. null (query-fel/migration saknas/inget publicerat) → skip —
+    // host:s egen lokala historik gäller ändå i quiz.tsx.
+    const peerSeen = await getLobbySeenQuestionIds(roomCode);
+    if (peerSeen) setPendingPeerSeenIds(roomCode, peerSeen);
 
     // Markera rumkoden som "game-started" — non-host:s Realtime-subscription
     // (rooms-tabellen nu i publikationen via migration 0020) + 2s-polling

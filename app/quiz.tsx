@@ -73,7 +73,8 @@ import { MorseAmbientSound } from '@/src/components/MorseAmbientSound';
 // när sketches kommer (då med getQuizSketch() från assets/quiz-sketches/).
 // NameRevealCard, SketchCanvas, hasSketch, getQuizSketch ersatta av HintsQuizCard.
 import { generateRoomCode } from '@/src/utils/roomCode';
-import { addSeenQuestionIds, addSessionRecord, loadSeenQuestionIds, loadLastSessionIds } from '@/src/utils/hostQuestionHistory';
+import { addSeenQuestionIds, addSessionRecord, addSessionRecordForNames, loadSeenQuestionIds, loadLastSessionIds } from '@/src/utils/hostQuestionHistory';
+import { consumePendingPeerSeenIds } from '@/src/utils/pendingSeenQuestions';
 import { buildEpochPhase, getActiveEpochs, type EpochPlayer, type EpochQuestion } from '@/src/utils/epochAllocation';
 import { getGenerationKeyFromBirthYear } from '@/src/utils/mockPurchasedPackages';
 import { hasPremiumSubscription } from '@/src/utils/subscriptionStorage';
@@ -448,7 +449,12 @@ function buildCategoryAlignedPhase<T extends QuizQuestion>(opts: {
     catMap.get(key)!.push(q);
   }
 
-  const cats = [...catMap.keys()];
+  // Shufflas — annars är kategori-ordningen deterministisk (Map insertion
+  // order = pool-ordning): Music-blocken hamnade alltid först OCH remainder-
+  // blocken gick alltid till första kategorin (stable sort på lika decimaler
+  // i LRM:en nedan). Shuffle randomiserar både vilken kategori som får extra
+  // block och i vilken ordning kategori-blocken spelas.
+  const cats = shuffleArray([...catMap.keys()]);
 
   // Enstaka kategori eller inget att fördela — delegera direkt utan overhead.
   if (cats.length <= 1) {
@@ -1152,6 +1158,29 @@ export default function QuizScreen() {
   const [lastSessionIds, setLastSessionIds] = useState<Set<string>>(new Set());
   const savedSeenRef = useRef(false);
 
+  // Cross-player-historik: frågor som NÅGON deltagare sett i sina senaste
+  // 20 spel unioneras in här och exkluderas ur host:s pool-bygge — samma
+  // låt ska inte återkomma bara för att en annan spelare hostar nästa spel.
+  // Två tillförselvägar:
+  //   (a) lobby_players.seen_question_ids (migration 0026) — joiners
+  //       publicerar sin historik vid lobby-join; host unionerar vid Start
+  //       Game och lämnar över via pendingSeenQuestions-storen (konsumeras
+  //       i mount-effekten nedan). Enda vägen i Pass-the-Phone.
+  //   (b) `player_seen_questions`-broadcast (IndDev fast-path) — non-hosts
+  //       broadcastar vid quiz-mount; broadcasts som ankommer efter
+  //       spelstart ignoreras (se handler) så poolen aldrig byggs om mitt
+  //       i ett pågående spel.
+  const [peerSeenIds, setPeerSeenIds] = useState<Set<string>>(new Set());
+  const [peerLastIds, setPeerLastIds] = useState<Set<string>>(new Set());
+  const combinedSeenIds = useMemo(
+    () => (peerSeenIds.size === 0 ? seenQuestionIds : new Set([...seenQuestionIds, ...peerSeenIds])),
+    [seenQuestionIds, peerSeenIds],
+  );
+  const combinedLastIds = useMemo(
+    () => (peerLastIds.size === 0 ? lastSessionIds : new Set([...lastSessionIds, ...peerLastIds])),
+    [lastSessionIds, peerLastIds],
+  );
+
   const gameQuestions = useMemo<QuizQuestion[]>(() => {
     // Filter-hierarki (i ordning, från hård → mjuk):
     //   1. Source-toggle (youtubeEnabled / imagesEnabled) — HÅRD. Host:s val.
@@ -1298,13 +1327,14 @@ export default function QuizScreen() {
     // Använd bara YouTube SEED_QUESTIONS om YouTube faktiskt är aktiverat;
     // annars returnera bildpool ignorerandes era (era-filter kan ha tömt poolen).
     if (!hasSpotify && !hasPureYoutube && !hasImage) {
-      if (youtubeEnabled) return SEED_QUESTIONS;
+      // Shufflas — även nödfallback ska vara slumpad, inte katalog-ordning.
+      if (youtubeEnabled) return shuffleArray(SEED_QUESTIONS);
       // YouTube av, Hints tom pga era-filter eller saknad data → visa alla
       // person-items utan era-filter som nödlösning.
       const fallbackImages = IMAGE_SEED_QUESTIONS.filter(
         (q) => PERSON_SUBJECTS.has(q.source.contentSubject),
       );
-      return fallbackImages.length > 0 ? fallbackImages : SEED_QUESTIONS;
+      return fallbackImages.length > 0 ? shuffleArray(fallbackImages) : shuffleArray(SEED_QUESTIONS);
     }
 
     // ── Guest-hostat spel: slumpad käll-mix (Peters trial-design 2026-07-04) ──
@@ -1465,16 +1495,29 @@ export default function QuizScreen() {
       imageBlockCount = 0;
     }
 
-    // Fas 1: Spotify — hård uteslutning av senaste 20 sessionernas låtar.
+    // Fas 1: Spotify — hård uteslutning av senaste 20 sessionernas låtar,
+    // för ALLA deltagare (combinedSeenIds = egen + peers historik).
     // Fallback till hela poolen (slumpad) om för få osedda finns.
     const spotifyTotal = spotifyBlockCount * questionsPerBlock;
     const spotifySeq: QuizQuestion[] = (() => {
       if (!hasSpotify || spotifyTotal === 0) return [];
-      const fresh = shuffleArray(spotifyPool.filter((q) => !seenQuestionIds.has(q.id)));
+      const fresh = shuffleArray(
+        spotifyPool.filter((q) => !combinedSeenIds.has(q.id) && !combinedLastIds.has(q.id)),
+      );
       // Tillräckligt med osedda? Använd bara dem.
       if (fresh.length >= spotifyTotal) return fresh.slice(0, spotifyTotal);
-      // För få osedda → blanda hela poolen slumpmässigt och fyll ut.
-      return shuffleArray(spotifyPool).slice(0, spotifyTotal);
+      // För få osedda → använd ALLA osedda först och fyll upp med slumpade
+      // sedda (senaste sessionens låtar allra sist). Tidigare reshufflades
+      // HELA poolen här, vilket kunde välja enbart sedda låtar trots att
+      // osedda fanns kvar — det bröt 20-spels-logiken i exakt det läge den
+      // behövdes som mest (liten era-filtrerad pool).
+      const seenNotLast = shuffleArray(
+        spotifyPool.filter((q) => combinedSeenIds.has(q.id) && !combinedLastIds.has(q.id)),
+      );
+      const lastSession = shuffleArray(
+        spotifyPool.filter((q) => combinedLastIds.has(q.id)),
+      );
+      return [...fresh, ...seenNotLast, ...lastSession].slice(0, spotifyTotal);
     })();
 
     // Fas 2: YouTube — kategori-alignerade block (PtP: alla spelare i ett
@@ -1486,8 +1529,8 @@ export default function QuizScreen() {
             totalBlocks: ytBlockCount,
             questionsPerBlock,
             activeEpochs,
-            recentIds: seenQuestionIds,
-            lastSessionIds,
+            recentIds: combinedSeenIds,
+            lastSessionIds: combinedLastIds,
             isPtP,
             players: epochPlayers,
             turnOrderIds,
@@ -1503,8 +1546,8 @@ export default function QuizScreen() {
             totalBlocks: imageBlockCount,
             questionsPerBlock,
             activeEpochs,
-            recentIds: seenQuestionIds,
-            lastSessionIds,
+            recentIds: combinedSeenIds,
+            lastSessionIds: combinedLastIds,
             isPtP,
             players: epochPlayers,
             turnOrderIds,
@@ -1515,17 +1558,20 @@ export default function QuizScreen() {
     const mixed: QuizQuestion[] = [...spotifySeq, ...ytSeq, ...imgSeq];
 
     // Nödfallback: alla pools tomma (t.ex. source-toggle av + era utan träffar).
+    // Shufflas — även nödfallback ska vara slumpad, inte katalog-ordning.
     if (mixed.length === 0) {
       if (!youtubeEnabled) {
         const personFallback = IMAGE_SEED_QUESTIONS.filter(
           (q) => PERSON_SUBJECTS.has(q.source.contentSubject),
         );
-        return personFallback.length > 0 ? personFallback : IMAGE_SEED_QUESTIONS.length > 0 ? IMAGE_SEED_QUESTIONS : SEED_QUESTIONS;
+        return shuffleArray<QuizQuestion>(
+          personFallback.length > 0 ? personFallback : IMAGE_SEED_QUESTIONS.length > 0 ? IMAGE_SEED_QUESTIONS : SEED_QUESTIONS,
+        );
       }
-      return SEED_QUESTIONS;
+      return shuffleArray(SEED_QUESTIONS);
     }
     return mixed;
-  }, [eraFrom, eraTo, turnOrder, totalRounds, youtubeEnabled, imagesEnabled, gameMode, youtubeEnabledCategories, imagesEnabledCategories, seenQuestionIds, lastSessionIds, spotifyEnabled, isGuestHostGame]);
+  }, [eraFrom, eraTo, turnOrder, totalRounds, youtubeEnabled, imagesEnabled, gameMode, youtubeEnabledCategories, imagesEnabledCategories, combinedSeenIds, combinedLastIds, spotifyEnabled, isGuestHostGame]);
 
   // Synkron ref som alltid pekar på aktuell gameQuestions — används av
   // game_sequence_init-broadcasten utan att göra subscription-effekten
@@ -2053,13 +2099,58 @@ export default function QuizScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Ladda Host:s tidigare sedda fråge-IDs från AsyncStorage. Sker asynkront
+  // Ladda egna tidigare sedda fråge-IDs från AsyncStorage. Sker asynkront
   // men klart innan spelaren hinner trycka Play i GetReadyIntro (~50 ms).
   // Uppdaterar seenQuestionIds vilket triggerar gameQuestions-useMemo att
   // räkna om med korrekt unseen-prioritering.
+  //
+  // Non-host i IndDev: skicka dessutom historiken till host via
+  // `player_seen_questions` så host:s pool exkluderar frågor NÅGON
+  // deltagare sett i sina senaste 20 spel. Tre sändningar (retry-mönster
+  // som game_sequence_init) täcker subscribe-races — host är normalt redan
+  // subscribed eftersom host mountar quiz före non-hosts navigerar in.
+  // Payload-cap 500 ids (syncChannel MAX_QUESTION_IDS); slice(-500) behåller
+  // de NYASTE (Set-iteration = insertion order = äldsta session först).
   useEffect(() => {
-    loadSeenQuestionIds().then(setSeenQuestionIds);
-    loadLastSessionIds().then(setLastSessionIds);
+    // Konsumera peer-historik-union:en som host:s handleStartGame stash:ade
+    // vid Start Game (lobby_players.seen_question_ids-vägen — enda vägen i
+    // Pass-the-Phone, komplement till broadcasten i IndDev). Endast satt på
+    // host-enheten; non-host/direkt-nav får null → no-op.
+    const pendingPeer = consumePendingPeerSeenIds(params.roomCode ?? '');
+    if (pendingPeer) {
+      if (pendingPeer.seen.length > 0) {
+        setPeerSeenIds((prev) => new Set([...prev, ...pendingPeer.seen]));
+      }
+      if (pendingPeer.last.length > 0) {
+        setPeerLastIds((prev) => new Set([...prev, ...pendingPeer.last]));
+      }
+    }
+    let seenBroadcastTimers: ReturnType<typeof setTimeout>[] = [];
+    Promise.all([loadSeenQuestionIds(), loadLastSessionIds()]).then(([seen, last]) => {
+      setSeenQuestionIds(seen);
+      setLastSessionIds(last);
+      if (
+        !isHost &&
+        gameMode === 'individual-devices' &&
+        selfPlayerId &&
+        (seen.size > 0 || last.size > 0)
+      ) {
+        const payload = {
+          player_id: selfPlayerId,
+          seen_q_ids: [...seen].slice(-500),
+          last_q_ids: [...last].slice(-500),
+        };
+        const send = () => {
+          syncChannelRef.current?.broadcastPlayerSeenQuestions(payload).catch(() => {});
+        };
+        seenBroadcastTimers = [
+          setTimeout(send, 300),
+          setTimeout(send, 1800),
+          setTimeout(send, 4500),
+        ];
+      }
+    });
+    return () => seenBroadcastTimers.forEach(clearTimeout);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -3115,7 +3206,29 @@ export default function QuizScreen() {
   useEffect(() => {
     if (phase !== 'leaderboard' || savedSeenRef.current) return;
     savedSeenRef.current = true;
-    const playedIds = [...new Set(gameQuestions.map((q) => q.id))];
+    // KRITISKT (fix 2026-08-04): på NON-HOST i IndDev är gameQuestions den
+    // LOKALA slumpordningen — de faktiskt spelade frågorna är host:s sekvens
+    // (broadcastAllQuestionIds). Att spara lokala shufflen gav non-host en
+    // felaktig historik → när samma spelare hostade nästa spel kunde exakt
+    // samma låt återkomma trots 20-sessions-fönstret.
+    const effectivePlayedIds =
+      !isHost && broadcastAllQuestionIds && broadcastAllQuestionIds.length > 0
+        ? broadcastAllQuestionIds
+        : gameQuestions.map((q) => q.id);
+    const playedIds = [...new Set(effectivePlayedIds)];
+    // Pass-the-Phone: alla registrerade deltagare spelade på DENNA enhet —
+    // skriv sessionen även under deras playerName-nycklar så historiken
+    // finns här om de senare loggar in/hostar på samma enhet. Egen profil
+    // skippas internt (skrivs av addSessionRecord nedan). Guests utan konto
+    // filtreras bort — deras historik kan inte valideras.
+    if (gameMode !== 'individual-devices' && turnOrder.length > 1) {
+      const registeredNames = turnOrder
+        .filter((p) => p.type === 'registered' && p.name)
+        .map((p) => p.name);
+      if (registeredNames.length > 0) {
+        addSessionRecordForNames(registeredNames, playedIds).catch(() => {});
+      }
+    }
     addSessionRecord(playedIds).then(() => {
       setSeenQuestionIds((prev) => new Set([...prev, ...playedIds]));
       // Uppdatera lastSessionIds direkt så Play Again i samma session
@@ -4694,6 +4807,16 @@ export default function QuizScreen() {
                 ...new Set(gameQuestions.slice(0, questionIndex).map((q) => q.id)),
               ];
               await addSessionRecord(playedIds);
+              // PtP: skriv även under registrerade deltagares playerName-
+              // nycklar (samma rationale som leaderboard-recordingen).
+              if (gameMode !== 'individual-devices' && turnOrder.length > 1) {
+                const registeredNames = turnOrder
+                  .filter((p) => p.type === 'registered' && p.name)
+                  .map((p) => p.name);
+                if (registeredNames.length > 0) {
+                  addSessionRecordForNames(registeredNames, playedIds).catch(() => {});
+                }
+              }
             }
             const code = params.roomCode;
             if (code) {
@@ -4728,6 +4851,18 @@ export default function QuizScreen() {
           text: 'Leave game',
           style: 'destructive',
           onPress: () => {
+            // Spara frågor som hunnit visas (spegling av Quit Games recording,
+            // men mot host:s faktiska sekvens — lokala gameQuestions är bara
+            // en shuffle-ordning på non-host). Fire-and-forget så navigation
+            // aldrig blockas.
+            if (questionIndex > 0) {
+              const sourceIds =
+                broadcastAllQuestionIds && broadcastAllQuestionIds.length > 0
+                  ? broadcastAllQuestionIds
+                  : gameQuestions.map((q) => q.id);
+              const shownIds = [...new Set(sourceIds.slice(0, questionIndex))];
+              addSessionRecord(shownIds).catch(() => {});
+            }
             if (
               gameMode === 'individual-devices' &&
               syncChannelRef.current &&
@@ -4966,6 +5101,21 @@ export default function QuizScreen() {
         setDjHandedOver(true);
       },
       onPlayerScoreRecorded: (payload) => playerScoreRecordedHandlerRef.current(payload),
+      // Cross-player-historik: non-host skickar sin 20-sessions-historik vid
+      // quiz-mount. Merge:as ENDAST innan spelet startat (host står i intro
+      // på fråga 0) — senare ankomst (t.ex. reconnect-re-broadcast) ignoreras
+      // så gameQuestions-useMemo:n aldrig bygger om poolen mitt i ett spel
+      // (rebuild skulle byta den aktiva frågan under fötterna på spelarna).
+      onPlayerSeenQuestions: (payload) => {
+        if (!isHost) return;
+        if (phaseRef.current !== 'intro' || questionIndexRef.current !== 0) return;
+        if (payload.seen_q_ids.length > 0) {
+          setPeerSeenIds((prev) => new Set([...prev, ...payload.seen_q_ids]));
+        }
+        if (payload.last_q_ids.length > 0) {
+          setPeerLastIds((prev) => new Set([...prev, ...payload.last_q_ids]));
+        }
+      },
       // Non-host: host broadcastar hela fråge-sekvensen ~800ms efter quiz-mount.
       // Sätter broadcastAllQuestionIds → effectiveMediaSourceByQuestion → korrekta
       // GetReady-kö-ikoner redan på FÖRSTA GetReady-skärmen (innan play_command).

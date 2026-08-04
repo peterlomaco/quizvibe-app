@@ -1,0 +1,24 @@
+-- 0026: Cross-player seen-question-historik för quiz-poolens exkludering.
+--
+-- Varje joinande spelare publicerar sin lokala 20-sessions fråge-historik
+-- till SIN EGEN lobby_players-rad vid join, som jsonb:
+--   { "seen": ["q-id", ...], "last": ["q-id", ...] }
+--   seen = alla fråge-IDs från spelarens senaste 20 spel (cap 500)
+--   last = fråge-IDs enbart från spelarens SENASTE spel (hård exkludering)
+--
+-- Skrivs via targeted UPDATE (updateOwnSeenQuestionIds i mockLobbyPlayers.ts)
+-- — befintlig RLS-policy "player can update own row" täcker (user_id =
+-- auth.uid()). Kolumnen ingår MEDVETET INTE i playerToRow/upsert-payloads så
+-- host:s bulk-UPSERT aldrig clobbar den, och så att en icke-applicerad
+-- migration bara failar den isolerade UPDATE:n (console.warn) utan att bryta
+-- lobby-join.
+--
+-- Host läser alla rader vid Start Game (getLobbySeenQuestionIds) och
+-- unionerar → frågor som NÅGON deltagare sett i sina senaste 20 spel
+-- exkluderas ur pool-bygget. Primär väg för Pass-the-Phone (ingen
+-- quiz_sync-broadcast-channel där); belt-and-suspenders i IndDev där
+-- player_seen_questions-broadcasten är fast-path.
+--
+-- Guests utan profil har ingen lokal historik → kolumnen förblir NULL.
+alter table public.lobby_players
+  add column if not exists seen_question_ids jsonb;
