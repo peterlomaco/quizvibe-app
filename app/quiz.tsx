@@ -53,7 +53,8 @@ import { QuizVibeLogo } from '@/src/components/QuizVibeLogo';
 import { SpotifyBrandIcon } from '@/src/components/SpotifyBrandIcon';
 import { getSpotifyArtistMeta, type SpotifyArtistMeta } from '@/src/utils/spotifyArtistMeta';
 import { savePendingLobbyPlayers } from '@/src/utils/pendingLobby';
-import { loadProfile } from '@/src/utils/profileStorage';
+import { generatePlayerName } from '@/src/utils/playerName';
+import { loadProfile, type ProfileData } from '@/src/utils/profileStorage';
 import { recordQuestionAnswer } from '@/src/utils/questionStats';
 import {
   IMAGE_QUIZ_QUESTIONS,
@@ -4136,17 +4137,29 @@ export default function QuizScreen() {
   // - Övriga registrerade: defaults till standard/30 så Lobby:s profile-merge
   //   senare kan fylla i deras profil-värden vid mount.
   // - Guests: defaults till standard/30 så host får redigera om i Lobby.
-  const goToNewLobby = async (reusePlayers: boolean, keepSettings: boolean = true) => {
+  const goToNewLobby = async (
+    reusePlayers: boolean,
+    keepSettings: boolean = true,
+    guestOverride?: { guestName: string; guestBirthYear: number },
+  ) => {
+    // `guestOverride` (credit-gate:ns "Restart as Guest"): tvingar NYA
+    // lobbyn till guest-host-läge även när DETTA spel hostades av en
+    // registrerad user. Spelarna bärs över som vanligt — bara värd-
+    // identiteten byts till den auto-genererade Guest-identiteten så
+    // spelet blir gratis (inga credits) och ingen Game History skrivs.
+    const asGuestHost = isGuestHostGame || guestOverride != null;
     // Ladda host-profilen FÖRE players-listan byggs så host:s riktiga
     // playerName + avatar bär in i carry-over (annars hade host:s rad i
     // nya lobby:n stått som 'You'/🎮 tills mergeProfileIntoHost hann fyra).
     // Guest host: skippa profilen HELT — replay-lobbyn ska bära guest-
     // identiteten (guestName/👤) även om en profil råkar finnas på enheten.
-    const profile = isGuestHostGame ? null : await loadProfile();
-    const hostName = isGuestHostGame
-      ? (params.guestName?.trim() || turnOrder[0]?.name || 'Guest')
-      : profile?.playerName?.trim() || 'You';
-    const hostEmoji = isGuestHostGame
+    const profile = asGuestHost ? null : await loadProfile();
+    const hostName = guestOverride
+      ? guestOverride.guestName
+      : isGuestHostGame
+        ? (params.guestName?.trim() || turnOrder[0]?.name || 'Guest')
+        : profile?.playerName?.trim() || 'You';
+    const hostEmoji = asGuestHost
       ? '👤'
       : profile
         ? getAvatarEmojiById(profile.selectedAvatarId)
@@ -4170,7 +4183,7 @@ export default function QuizScreen() {
         // nycklar på host-radens type) för att dölja Play Again i replayn.
         // Fallback 'registered' bevarar tidigare beteende för gamla payloads.
         const carriedType: 'registered' | 'guest' =
-          isGuestHostGame && p.isHost ? 'guest' : turnEntry?.type ?? 'registered';
+          asGuestHost && p.isHost ? 'guest' : turnEntry?.type ?? 'registered';
         return {
           id: p.id,
           name: p.isYou ? hostName : p.name,
@@ -4178,7 +4191,15 @@ export default function QuizScreen() {
           isReady: true,
           type: carriedType,
           age: keepSettings || p.isYou ? p.age : 30,
-          assistance: keepSettings || p.isYou ? p.assistance : 'standard',
+          // Guest host:s eget kort är alltid Full assistance (låst i
+          // LobbyScreen:s guest-host player-edit) — forcera vid Restart
+          // as Guest så carry-over:n inte bär in registrerade värdet.
+          assistance:
+            asGuestHost && p.isYou
+              ? 'full'
+              : keepSettings || p.isYou
+                ? p.assistance
+                : 'standard',
           hcpComplete: true,
           isHost: p.isHost ?? false,
           approved: !!p.isHost,
@@ -4205,9 +4226,9 @@ export default function QuizScreen() {
         emoji: hostEmoji,
         isReady: true,
         // Guest host: type 'guest' även på fresh-raden (detekteringssignal).
-        type: isGuestHostGame ? 'guest' : 'registered',
+        type: asGuestHost ? 'guest' : 'registered',
         age,
-        assistance: isGuestHostGame ? 'full' : fallbackAssistance,
+        assistance: asGuestHost ? 'full' : fallbackAssistance,
         hcpComplete: true,
         isHost: true,
       }];
@@ -4224,10 +4245,10 @@ export default function QuizScreen() {
     await registerActiveRoom(newCode, {
       // Guest host är alltid Free-nivå: max 4, ingen premium; hostPlayerName
       // = guest-namnet så own-lobby-detekteringen fungerar för replayn.
-      maxPlayers: isGuestHostGame ? 4 : profile?.maxPlayers ?? 4,
+      maxPlayers: asGuestHost ? 4 : profile?.maxPlayers ?? 4,
       hostIsPremium: false,
       currentPlayerCount: initialCount,
-      hostPlayerName: isGuestHostGame ? hostName : profile?.playerName ?? '',
+      hostPlayerName: asGuestHost ? hostName : profile?.playerName ?? '',
       gameStarted: false,
     });
     // Färsk leftPlayers-store + lobbyPlayers-store + ejected-store för nya
@@ -4294,18 +4315,33 @@ export default function QuizScreen() {
     // hänger non-host kvar på lock-overlay tills timeout/manual exit, men
     // host:s egna nav-flow får aldrig blockas.
     if (gameMode === 'individual-devices' && syncChannelRef.current) {
+      // auto_join när spelarna carry:as över: deras pre-seedade rader finns
+      // redan i nya lobbyn så non-hosts ska följa med direkt även om de
+      // inte hunnit tappa Approve. Kritiskt för credit-gate:ns "Restart as
+      // Guest" som bypassar approval-modalen helt — utan flaggan hade alla
+      // non-hosts fått "Host has already started a new Game"-popupen → Home
+      // trots att host ser dem i nya lobbyn. I den normala "Yes, keep
+      // them"-vägen är flaggan en no-op (alla har redan Approve-tappat).
       await syncChannelRef.current
-        .broadcastPlayAgainLobbyReady({ room_code: newCode })
+        .broadcastPlayAgainLobbyReady({
+          room_code: newCode,
+          auto_join: reusePlayers ? true : undefined,
+        })
         .catch(() => {});
     }
-    if (isGuestHostGame) {
+    if (asGuestHost) {
       // Replay-lobbyn förblir guest-hostad: guest-identiteten + räknaren
       // (+1) följer med så nästa Final Leaderboard visar bara Home.
       // guestBirthYear-fallback: härled från host-kortets age om paramet
       // saknas (äldre payloads) — LobbyScreen kräver värdet för host-kortet.
-      const birthYearParam =
-        params.guestBirthYear?.trim() ||
-        String(new Date().getFullYear() - (turnOrder[0]?.age ?? 30));
+      // Restart as Guest (guestOverride): birth year kommer från profilen
+      // och räknaren startar på 0 — detta ÄR guest-spelets första omgång,
+      // så guest-hosten får därefter max 1 Play Again precis som Home:s
+      // "Start Game as Guest"-flöde.
+      const birthYearParam = guestOverride
+        ? String(guestOverride.guestBirthYear)
+        : params.guestBirthYear?.trim() ||
+          String(new Date().getFullYear() - (turnOrder[0]?.age ?? 30));
       router.replace({
         pathname: '/lobby',
         params: {
@@ -4314,7 +4350,7 @@ export default function QuizScreen() {
           guestHost: 'true',
           guestName: hostName,
           guestBirthYear: birthYearParam,
-          guestReplays: String(guestReplaysUsed + 1),
+          guestReplays: guestOverride ? '0' : String(guestReplaysUsed + 1),
         },
       });
       return;
@@ -4357,6 +4393,36 @@ export default function QuizScreen() {
     );
   };
 
+  // Credit-gate-utvägen "Restart as Guest": kör hela Play Again-carry-over-
+  // maskineriet (goToNewLobby med reusePlayers=true) men med guestOverride
+  // så NYA lobbyn blir guest-hostad. Alla spelare från detta spel följer
+  // med (non-hosts hamnar i "To be approved" som vanligt); värd-identiteten
+  // byts till en auto-genererad Guest-identitet — inga credits dras och
+  // ingen Game History skrivs. Enda skillnaden mot user-hostad Play Again:
+  // guest host får max 1 replay (guestReplays-räknaren startar på 0 här).
+  const restartAsGuestHost = async (profile: ProfileData | null) => {
+    // Guest-identitet: auto-genererat GuestX-1234567-namn (samma format som
+    // Home:s guest-host-form auto-fyller). Birth year tas från profilen så
+    // age-baserad content-filtrering förblir rimlig; fallback 30 år.
+    const guestHostName = generatePlayerName(new Set(), { prefix: 'Guest' });
+    const guestBirthYear =
+      profile?.birthYear ?? new Date().getFullYear() - 30;
+    track('guest_name_created', { autofilled: true, assistance: 'full' });
+    track('room_code_created', { guestHost: true, fromCreditGate: true });
+    // keepSettings=true: guest-seed:en i LobbyScreen klampar ändå till de
+    // guest-låsta värdena (60s/full era/rounds {2,4}) och tar bara de
+    // guest-VARIABLA fälten (gameMode, singlePlayerDefault, roundsCount,
+    // spotifyEnabled) från carry-over:n. goToNewLobby:s IndDev-broadcast
+    // (play_again_lobby_ready) routar non-hosts som tappat Approve direkt
+    // till nya lobbyn; övriga får "Host has already started a new Game"-
+    // popupen → Home och kan joina igen via nya koden (dup-detection
+    // matchar deras pre-seedade rad).
+    await goToNewLobby(true, true, {
+      guestName: guestHostName,
+      guestBirthYear,
+    });
+  };
+
   const handlePlayAgain = async () => {
     // Guest host har max 1 replay — knappen är redan dold vid >= 1 (Round-
     // Leaderboard), detta är belt-and-suspenders mot oväntade call-paths.
@@ -4393,17 +4459,32 @@ export default function QuizScreen() {
       if (!hasPremium) {
         const free = freshProfile?.freeGameCredits ?? 0;
         if (free === 0) {
+          // Tre-vägs-popup (iOS Alert max 3 knappar):
+          // 1. Purchase subscription → Store (unlimited host games + Game
+          //    History fortsätter sparas på profilen).
+          // 2. Restart as Guest → guest-hostad lobby med ALLA spelare
+          //    carry:ade från detta spel; gratis men ingen Game History
+          //    skrivs och max 1 replay därefter.
+          // 3. Exit → stäng popupen, stanna på Final Leaderboard (Home-
+          //    knappen finns kvar där som utväg).
           Alert.alert(
             'Out of Host Game Credits',
-            'You have used your free host games for today. Wait for the daily refresh at midnight CET, or upgrade to QuizVibe Premium for unlimited host games.',
+            'You have used your free host games for today. Add unlimited Host games and keep storing Game History on your profile with QuizVibe Premium — or restart as Guest (no Game History stored).',
             [
-              { text: 'Cancel', style: 'cancel' },
               // Pushar Store UTAN `from=...`-paramet så Store:s Back-knapp fall:er
               // till `router.back()` istället för `router.replace(from)`. Det
               // bevarar /quiz på root Stack:en med Final Leaderboard-state intakt
               // — annars hade replace:n unmountat Quiz-komponenten och spelaren
               // skulle landa på en tom /quiz-vy efter köpet.
-              { text: 'Go to Store', onPress: () => router.push('/store?focus=subscription') },
+              {
+                text: 'Purchase subscription',
+                onPress: () => router.push('/store?focus=subscription'),
+              },
+              {
+                text: 'Restart as Guest',
+                onPress: () => restartAsGuestHost(freshProfile),
+              },
+              { text: 'Exit', style: 'cancel' },
             ],
           );
           return;
@@ -4563,7 +4644,9 @@ export default function QuizScreen() {
 
   // Refs för broadcast-handlers — captureras av syncChannel-subscribe:n.
   const playAgainInitiatedHandlerRef = useRef<() => void>(() => {});
-  const playAgainLobbyReadyHandlerRef = useRef<(code: string) => void>(() => {});
+  const playAgainLobbyReadyHandlerRef = useRef<
+    (code: string, autoJoin?: boolean) => void
+  >(() => {});
   const playerApprovedPlayAgainHandlerRef = useRef<(playerId: string) => void>(
     () => {},
   );
@@ -4610,11 +4693,17 @@ export default function QuizScreen() {
     playAgainInitiatedHandlerRef.current = () => {
       if (!isHost) setHostInitiatedPlayAgain(true);
     };
-    playAgainLobbyReadyHandlerRef.current = (code: string) => {
+    playAgainLobbyReadyHandlerRef.current = (code: string, autoJoin?: boolean) => {
       if (isHost) return;
-      if (awaitingNewLobbyRef.current) {
+      if (awaitingNewLobbyRef.current || autoJoin) {
         // Non-host har tappat Approve och väntar med lock-overlay —
         // sätt koden så useEffect:en navigerar oss till nya lobbyn.
+        // auto_join-fallet: host carry:ade över spelarna men bypassade
+        // approval-gaten (Restart as Guest) — vår rad finns redan pre-
+        // seedad i nya lobbyn så vi följer med UTAN Approve-tap. Sätt
+        // awaitingNewLobby=true så navigations-effekten (som kräver båda
+        // state-bits) fyrar; no-op om redan satt.
+        setAwaitingNewLobby(true);
         setNextLobbyCode(code);
       } else if (!hostStartedWithoutMeAlertedRef.current) {
         // Non-host har INTE hunnit tappa Approve men host startar redan
@@ -4999,7 +5088,7 @@ export default function QuizScreen() {
         responseSecondsChangedHandlerRef.current(payload.seconds),
       onPlayAgainInitiated: () => playAgainInitiatedHandlerRef.current(),
       onPlayAgainLobbyReady: (payload) =>
-        playAgainLobbyReadyHandlerRef.current(payload.room_code),
+        playAgainLobbyReadyHandlerRef.current(payload.room_code, payload.auto_join),
       onPlayerApprovedPlayAgain: (payload) =>
         playerApprovedPlayAgainHandlerRef.current(payload.player_id),
       onLobbyDeleted: () => lobbyDeletedHandlerRef.current(),
@@ -5731,6 +5820,18 @@ export default function QuizScreen() {
                         <SpotifyBrandIcon size={28} variant="white" />
                         <Text style={styles.spotifyDJLabel}>You are the DJ</Text>
                       </View>
+                      {/* Låttitel + artist för DJ:n. Ingen spoiler-risk — DJ:n
+                          svarar aldrig (canConfirm=false) och ser ändå låten i
+                          Spotify. Kritisk när autoplay misslyckas (varm Spotify-
+                          session, typiskt direkt efter Play Again när förra
+                          spelets låt ligger kvar pausad i mini-playern): utan
+                          titeln vet DJ:n inte VILKEN låt som ska sökas/startas
+                          manuellt i Spotify. */}
+                      {currentQ?.type === 'timeline' && currentQ.hint ? (
+                        <Text style={styles.spotifyDJTrackText}>
+                          Track: {currentQ.hint}
+                        </Text>
+                      ) : null}
                       <View style={styles.spotifyGuideSection}>
                         {SPOTIFY_DJ_STEPS.map((step, i) => {
                           const isDone = i < djStep;
@@ -6172,10 +6273,27 @@ export default function QuizScreen() {
                       <SpotifyBrandIcon size={30} variant="white" />
                     </View>
                   </Pressable>
+                ) : !spotifyDJStarted ? (
+                  // djStep=1: DJ har öppnat Spotify men timern är INTE aktiverad
+                  // än. Re-öppna TRACK-länken (inte bara appen): om autoplay
+                  // misslyckades — typiskt varm Spotify-session direkt efter
+                  // Play Again där förra spelets låt ligger kvar pausad i mini-
+                  // playern — behöver DJ:n en väg tillbaka till rätt låt-sida.
+                  // Omstart från början är ofarlig innan timern aktiverats
+                  // (gissarnas klocka har inte börjat ticka).
+                  <Pressable
+                    style={[styles.spotifyDJActionBtn, { flex: 0, paddingHorizontal: Spacing.xl }]}
+                    onPress={() => {
+                      if (currentSpotifyTrackId) openSpotifyTrack(currentSpotifyTrackId);
+                    }}
+                  >
+                    <SpotifyBrandIcon size={20} variant="white" />
+                    <Text style={styles.spotifyDJActionBtnText}>Open track in Spotify</Text>
+                  </Pressable>
                 ) : (
-                  // djStep=1 eller 2: DJ har öppnat Spotify och navigerat tillbaka — använd
-                  // openSpotifyApp (inte openSpotifyTrack) så låten INTE startar om från
-                  // början utan fortsätter spelas.
+                  // djStep=2: timern rullar — använd openSpotifyApp (inte
+                  // openSpotifyTrack) så låten INTE startar om från början
+                  // utan fortsätter spelas.
                   <Pressable
                     style={[styles.spotifyDJActionBtn, { flex: 0, paddingHorizontal: Spacing.xl }]}
                     onPress={() => openSpotifyApp()}
@@ -6811,6 +6929,12 @@ const styles = StyleSheet.create({
     fontSize: FontSize.lg,
     fontWeight: FontWeight.bold,
     color: '#FFFFFF',
+  },
+  spotifyDJTrackText: {
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.semibold,
+    color: '#1DB954',
+    textAlign: 'center',
   },
   spotifyStartBtn: {
     flexDirection: 'row',

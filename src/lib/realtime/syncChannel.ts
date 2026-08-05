@@ -96,6 +96,12 @@ export interface PlayAgainInitiatedPayload {
 export interface PlayAgainLobbyReadyPayload {
   /** Den nya rumkoden non-host ska navigera till. */
   room_code: string;
+  /** true när spelarna carry:as över till nya lobbyn OCH host bypassade
+   *  approval-gaten (t.ex. credit-gate:ns "Restart as Guest"). Non-hosts
+   *  ska då följa med direkt även utan Approve-tap — deras pre-seedade
+   *  rad finns redan i nya lobbyn. Utan flaggan (Start fresh) visas
+   *  "Host has already started a new Game"-popupen → Home som tidigare. */
+  auto_join?: boolean;
 }
 
 /**
@@ -614,7 +620,12 @@ function vPlayAgainInitiated(raw: unknown): PlayAgainInitiatedPayload | null {
 }
 function vPlayAgainLobbyReady(raw: unknown): PlayAgainLobbyReadyPayload | null {
   if (!isObj(raw) || !str(raw.room_code)) return null;
-  return { room_code: raw.room_code };
+  return {
+    room_code: raw.room_code,
+    // Optional bool — allt annat än exakt true tolkas som frånvarande så
+    // äldre payloads utan fältet beter sig som tidigare.
+    auto_join: raw.auto_join === true ? true : undefined,
+  };
 }
 function vPlayerApprovedPlayAgain(raw: unknown): PlayerApprovedPlayAgainPayload | null {
   if (!isObj(raw) || !str(raw.player_id)) return null;
