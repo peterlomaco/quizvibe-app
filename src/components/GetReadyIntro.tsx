@@ -282,6 +282,12 @@ export function GetReadyIntro({
   onPlayerAudioChange,
 }: Props) {
   const isIndDev = mode === 'individual-devices';
+  // Non-host i IndDev innan host:s fråge-sekvens (broadcastAllQuestionIds)
+  // ankommit: quiz.tsx skickar då TOM mediaSourceByQuestion-array (hellre än
+  // fel ikoner från lokal shuffle). Rendera "Waiting for question data…"
+  // med tickande prickar istället för ❓/"Unknown"-fallback.
+  const questionDataPending =
+    isIndDev && !isHost && (mediaSourceByQuestion?.length ?? 0) === 0;
   // Single Player körs som Pass-the-Phone med exakt 1 spelare. I den vyn är
   // round-konceptet meningslöst (1 spelare ⇒ rounds = questions), så
   // Rounds-dotbar, Round-separators i kö och Round-del i footer-texten
@@ -1116,24 +1122,35 @@ export function GetReadyIntro({
                     styles.currentMediaNumber,
                     (spotifyQuestionIndices?.includes(currentQuestion - 1) ?? false) && styles.currentMediaNumberSpotify,
                   ]}>{currentQuestion}</Text>
-                  <MediaSourceIcon
-                    source={mediaSourceByQuestion?.[currentQuestion - 1]}
-                    size={28}
-                  />
-                  <Text style={styles.mediaLabel} numberOfLines={1}>
-                    {mediaSourceLabel(mediaSourceByQuestion?.[currentQuestion - 1])}
-                  </Text>
+                  {questionDataPending ? (
+                    <View style={styles.waitingForDataRow}>
+                      <Text style={styles.waitingForDataText}>
+                        Waiting for question data
+                      </Text>
+                      <SequentialDots color={Colors.textSecondary} />
+                    </View>
+                  ) : (
+                    <>
+                      <MediaSourceIcon
+                        source={mediaSourceByQuestion?.[currentQuestion - 1]}
+                        size={28}
+                      />
+                      <Text style={styles.mediaLabel} numberOfLines={1}>
+                        {mediaSourceLabel(mediaSourceByQuestion?.[currentQuestion - 1])}
+                      </Text>
+                    </>
+                  )}
                   {nextDJName && (
                     <Text style={styles.nextDJLabel} numberOfLines={1}>
-                      Next DJ will be {nextDJName}
+                      Next DJ: {nextDJName}
                     </Text>
                   )}
-                  {currentAnswerType && (
+                  {!questionDataPending && currentAnswerType && (
                     <View style={styles.answerTypeBadge} pointerEvents="none">
                       <Text style={styles.answerTypeBadgeText}>{currentAnswerType}</Text>
                     </View>
                   )}
-                  {currentCategory && (
+                  {!questionDataPending && currentCategory && (
                     <View style={styles.categoryBadge} pointerEvents="none">
                       <Text style={styles.categoryBadgeText}>{currentCategory}</Text>
                     </View>
@@ -1172,7 +1189,16 @@ export function GetReadyIntro({
                       </Text>
                     </View>
                   </TouchableOpacity>
-                  {queueExpanded && (
+                  {queueExpanded && questionDataPending ? (
+                    // Non-host väntar på host:s fråge-sekvens — chips skulle
+                    // bara visa ❓/"Unknown" per fråga. Visa väntetext istället.
+                    <View style={styles.waitingForDataRow}>
+                      <Text style={styles.waitingForDataText}>
+                        Waiting for question data
+                      </Text>
+                      <SequentialDots color={Colors.textSecondary} />
+                    </View>
+                  ) : queueExpanded ? (
                     <>
                       <View style={styles.mediaQueueChipsRow}>
                         {queueQuestions.map((q, i) => {
@@ -1218,7 +1244,7 @@ export function GetReadyIntro({
                         </View>
                       )}
                     </>
-                  )}
+                  ) : null}
                 </>
               );
             })() : (
@@ -1415,6 +1441,20 @@ const styles = StyleSheet.create({
     fontWeight: FontWeight.semibold,
     color: Colors.textSecondary,
     letterSpacing: 0.4,
+  },
+  // Non-host i IndDev innan host:s fråge-sekvens ankommit — "Waiting for
+  // question data" + SequentialDots istället för ❓/"Unknown". Används i
+  // BÅDA current question-boxen och Playing queue-sektionen.
+  waitingForDataRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: Spacing.sm,
+  },
+  waitingForDataText: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.semibold,
+    color: Colors.textSecondary,
   },
   quitBtn: {
     paddingHorizontal: Spacing.md,
