@@ -398,7 +398,7 @@ const QUIZ_ERROR_RED = '#FF3B30';
 // V1-flöde: DJ stannar i Spotify hela rundan. Host (eller reserv) aktiverar
 // timern. Vanliga gissare lyssnar och svarar.
 const SPOTIFY_DJ_STEPS = [
-  'Open Spotify and start the track — if it does not start automatically, press Play in Spotify',
+  'Open Spotify and track via button, if it does not start automatically, find the specific track in the playlist and press play in Spotify',
   'Timer is activated by the other players (non-DJs)',
   'Stay in Spotify during the song is played and timer is running',
   'Players inform when timer ends — stop the track in Spotify and confirm the track has been stopped',
@@ -414,6 +414,56 @@ const SPOTIFY_NON_DJ_STEPS = [
   'Timer ends — inform the DJ who will stop the track in Spotify',
   'DJ handover next step to Host',
 ] as const;
+
+/** Track-kort för DJ:n — grön ram med "Track"-rubrik centrerad överst,
+ *  därunder artist och titel på varsin rad. `hint`-formatet från katalogen
+ *  är "Titel — Artist" (em-dash-separerad); saknas separatorn visas hela
+ *  strängen som titel utan artist-rad. Renderas bara på DJ:ns enhet
+ *  (ingen spoiler-risk — DJ:n svarar aldrig och ser ändå låten i Spotify). */
+function DJTrackCard({
+  hint,
+  children,
+}: {
+  hint?: string | null;
+  children?: React.ReactNode;
+}) {
+  const parts = hint ? hint.split(' — ') : [];
+  const artist = parts.length > 1 ? parts[parts.length - 1] : null;
+  const title = parts.length > 1 ? parts.slice(0, -1).join(' — ') : hint ?? null;
+  return (
+    <View style={styles.spotifyTrackCard}>
+      {children}
+      {title ? (
+        <>
+          {artist ? (
+            <>
+              <Text style={[styles.spotifyTrackCardFieldLabel, styles.spotifyTrackCardFirstLabel]}>
+                Artist
+              </Text>
+              <Text style={styles.spotifyTrackCardArtist}>{artist}</Text>
+            </>
+          ) : null}
+          <Text
+            style={[
+              styles.spotifyTrackCardFieldLabel,
+              !artist && styles.spotifyTrackCardFirstLabel,
+            ]}
+          >
+            Title
+          </Text>
+          <Text style={styles.spotifyTrackCardTitle}>{title}</Text>
+          <View style={styles.spotifyTrackCardWarnRow}>
+            <Text style={styles.spotifyTrackCardWarnIcon}>⚠️</Text>
+            <Text style={styles.spotifyTrackCardWarnText}>
+              Please make sure you play exactly this Track as DJ
+            </Text>
+            <Text style={styles.spotifyTrackCardWarnIcon}>⚠️</Text>
+          </View>
+        </>
+      ) : null}
+    </View>
+  );
+}
 
 /**
  * Bygger en frågesekvens där varje block av `questionsPerBlock` frågor
@@ -2297,6 +2347,12 @@ export default function QuizScreen() {
   // CTA-pulse (1 ↔ 1.03 over 900ms). Körs kontinuerligt — vid mount och
   // framåt — eftersom tab:en bara renderas i reveal-fasen ändå.
   const nextTabPulse = useRef(new Animated.Value(1)).current;
+  // Glow + scale-pulse på DJ:ns "Start track in Spotify"-CTA — Spotify-grön
+  // halo bakom knappen (animated opacity) + 1 ↔ 1.05 scale. Loopen körs
+  // kontinuerligt; knappen är ändå bara monterad vid djStep=0 (samma
+  // konvention som nextTabPulse).
+  const djStartPulse = useRef(new Animated.Value(1)).current;
+  const djStartGlow = useRef(new Animated.Value(0.4)).current;
   // Blinkande "scroll for more"-indicator i botten på image-frågor. Prefix-
   // gridens 10 rader + Confirm-knappen ryms inte på en skärm — pilen
   // signalerar till spelaren att fortsätta scrolla. Opacity-loop 1 ↔ 0.3
@@ -3109,6 +3165,24 @@ export default function QuizScreen() {
     loop.start();
     return () => loop.stop();
   }, [nextTabPulse]);
+
+  // DJ-start-CTA:ns glow + pulse (se deklarationskommentaren vid djStartPulse).
+  useEffect(() => {
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.parallel([
+          Animated.timing(djStartPulse, { toValue: 1.05, duration: 700, useNativeDriver: true }),
+          Animated.timing(djStartGlow, { toValue: 0.85, duration: 700, useNativeDriver: true }),
+        ]),
+        Animated.parallel([
+          Animated.timing(djStartPulse, { toValue: 1, duration: 700, useNativeDriver: true }),
+          Animated.timing(djStartGlow, { toValue: 0.4, duration: 700, useNativeDriver: true }),
+        ]),
+      ]),
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [djStartPulse, djStartGlow]);
 
   // Scroll-hint-pulse på image-frågor (1 ↔ 0.3 opacity, 600ms varje håll).
   // Snabbare cadence än övriga pulses så down-chevronen blinkar tydligare och
@@ -5820,18 +5894,6 @@ export default function QuizScreen() {
                         <SpotifyBrandIcon size={28} variant="white" />
                         <Text style={styles.spotifyDJLabel}>You are the DJ</Text>
                       </View>
-                      {/* Låttitel + artist för DJ:n. Ingen spoiler-risk — DJ:n
-                          svarar aldrig (canConfirm=false) och ser ändå låten i
-                          Spotify. Kritisk när autoplay misslyckas (varm Spotify-
-                          session, typiskt direkt efter Play Again när förra
-                          spelets låt ligger kvar pausad i mini-playern): utan
-                          titeln vet DJ:n inte VILKEN låt som ska sökas/startas
-                          manuellt i Spotify. */}
-                      {currentQ?.type === 'timeline' && currentQ.hint ? (
-                        <Text style={styles.spotifyDJTrackText}>
-                          Track: {currentQ.hint}
-                        </Text>
-                      ) : null}
                       <View style={styles.spotifyGuideSection}>
                         {SPOTIFY_DJ_STEPS.map((step, i) => {
                           const isDone = i < djStep;
@@ -6263,16 +6325,30 @@ export default function QuizScreen() {
                     </Animated.View>
                   </>
                 ) : !spotifyDJOpenedApp ? (
-                  // djStep=0: primär CTA — öppna Spotify och starta spåret
-                  <Pressable
-                    style={[styles.spotifyDJActionBtn, { flex: 0, width: '50%' }]}
-                    onPress={handleStartSpotifyTrack}
-                  >
-                    <Text style={[styles.spotifyDJActionBtnText, { fontSize: FontSize.xl }]}>Start track in Spotify</Text>
-                    <View style={{ marginLeft: -16 }}>
-                      <SpotifyBrandIcon size={30} variant="white" />
-                    </View>
-                  </Pressable>
+                  // djStep=0: primär CTA — öppna Spotify och starta spåret.
+                  // Låttitel + artist direkt under knappen. Ingen spoiler-risk —
+                  // DJ:n svarar aldrig (canConfirm=false) och ser ändå låten i
+                  // Spotify. Kritisk när autoplay misslyckas (varm Spotify-
+                  // session, typiskt direkt efter Play Again när förra spelets
+                  // låt ligger kvar pausad i mini-playern): utan titeln vet
+                  // DJ:n inte VILKEN låt som ska sökas/startas manuellt.
+                  <DJTrackCard hint={currentQ?.type === 'timeline' ? currentQ.hint : null}>
+                    <Animated.View style={{ width: '50%', transform: [{ scale: djStartPulse }] }}>
+                      <Animated.View
+                        pointerEvents="none"
+                        style={[styles.djStartHalo, { opacity: djStartGlow }]}
+                      />
+                      <Pressable
+                        style={[styles.spotifyDJActionBtn, { flex: 0 }]}
+                        onPress={handleStartSpotifyTrack}
+                      >
+                        <Text style={[styles.spotifyDJActionBtnText, { fontSize: FontSize.xl }]}>Start track in Spotify</Text>
+                        <View style={{ marginLeft: -16 }}>
+                          <SpotifyBrandIcon size={30} variant="white" />
+                        </View>
+                      </Pressable>
+                    </Animated.View>
+                  </DJTrackCard>
                 ) : !spotifyDJStarted ? (
                   // djStep=1: DJ har öppnat Spotify men timern är INTE aktiverad
                   // än. Re-öppna TRACK-länken (inte bara appen): om autoplay
@@ -6281,26 +6357,32 @@ export default function QuizScreen() {
                   // playern — behöver DJ:n en väg tillbaka till rätt låt-sida.
                   // Omstart från början är ofarlig innan timern aktiverats
                   // (gissarnas klocka har inte börjat ticka).
-                  <Pressable
-                    style={[styles.spotifyDJActionBtn, { flex: 0, paddingHorizontal: Spacing.xl }]}
-                    onPress={() => {
-                      if (currentSpotifyTrackId) openSpotifyTrack(currentSpotifyTrackId);
-                    }}
-                  >
-                    <SpotifyBrandIcon size={20} variant="white" />
-                    <Text style={styles.spotifyDJActionBtnText}>Open track in Spotify</Text>
-                  </Pressable>
+                  <DJTrackCard hint={currentQ?.type === 'timeline' ? currentQ.hint : null}>
+                    <Pressable
+                      style={[styles.spotifyDJActionBtn, { flex: 0, paddingHorizontal: Spacing.xl }]}
+                      onPress={() => {
+                        if (currentSpotifyTrackId) openSpotifyTrack(currentSpotifyTrackId);
+                      }}
+                    >
+                      <SpotifyBrandIcon size={20} variant="white" />
+                      <Text style={styles.spotifyDJActionBtnText}>Open track in Spotify</Text>
+                    </Pressable>
+                  </DJTrackCard>
                 ) : (
                   // djStep=2: timern rullar — använd openSpotifyApp (inte
                   // openSpotifyTrack) så låten INTE startar om från början
-                  // utan fortsätter spelas.
-                  <Pressable
-                    style={[styles.spotifyDJActionBtn, { flex: 0, paddingHorizontal: Spacing.xl }]}
-                    onPress={() => openSpotifyApp()}
-                  >
-                    <SpotifyBrandIcon size={20} variant="white" />
-                    <Text style={styles.spotifyDJActionBtnText}>Open Spotify</Text>
-                  </Pressable>
+                  // utan fortsätter spelas. Samma track-kort-ram med artist +
+                  // titel som steg 0/1 så DJ:n hela tiden ser vilken låt som
+                  // ska spelas.
+                  <DJTrackCard hint={currentQ?.type === 'timeline' ? currentQ.hint : null}>
+                    <Pressable
+                      style={[styles.spotifyDJActionBtn, { flex: 0, paddingHorizontal: Spacing.xl }]}
+                      onPress={() => openSpotifyApp()}
+                    >
+                      <SpotifyBrandIcon size={20} variant="white" />
+                      <Text style={styles.spotifyDJActionBtnText}>Open Spotify</Text>
+                    </Pressable>
+                  </DJTrackCard>
                 )}
               </View>
             )}
@@ -6930,10 +7012,66 @@ const styles = StyleSheet.create({
     fontWeight: FontWeight.bold,
     color: '#FFFFFF',
   },
-  spotifyDJTrackText: {
+  spotifyTrackCard: {
+    borderWidth: 1.5,
+    borderColor: '#1DB954',
+    borderRadius: Radius.md,
+    // Symmetrisk luft kring pulserande "Start track in Spotify"-knappen:
+    // samma avstånd ovanför (paddingTop) som nedanför (spotifyTrackCard-
+    // FirstLabel.marginTop) så knappen hamnar mitt emellan ramens överkant
+    // och "Artist"-rubriken.
+    paddingTop: Spacing.xl * 1.5,
+    paddingBottom: Spacing.md,
+    paddingHorizontal: Spacing.lg,
+    alignItems: 'center',
+    gap: 2,
+    alignSelf: 'stretch',
+  },
+  spotifyTrackCardFieldLabel: {
+    fontSize: FontSize.xs,
+    fontWeight: FontWeight.semibold,
+    color: Colors.textSecondary,
+    textAlign: 'center',
+    marginTop: Spacing.sm,
+  },
+  // Första rubriken under CTA-knappen — speglar kortets paddingTop så
+  // knappen centreras vertikalt mellan ram-överkant och "Artist"-rubriken.
+  spotifyTrackCardFirstLabel: {
+    marginTop: Spacing.xl * 1.5,
+  },
+  spotifyTrackCardWarnRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.xs,
+    marginTop: Spacing.sm,
+    borderWidth: 1.5,
+    borderColor: Colors.warning,
+    borderRadius: Radius.md,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.md,
+  },
+  spotifyTrackCardWarnIcon: {
+    fontSize: FontSize.md,
+  },
+  spotifyTrackCardWarnText: {
+    flexShrink: 1,
+    maxWidth: Math.round(Dimensions.get('window').width * (2 / 3)),
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.medium,
+    color: Colors.warning,
+    textAlign: 'center',
+  },
+  spotifyTrackCardArtist: {
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.bold,
+    color: '#FFFFFF',
+    textAlign: 'center',
+  },
+  spotifyTrackCardTitle: {
     fontSize: FontSize.md,
     fontWeight: FontWeight.semibold,
-    color: '#1DB954',
+    color: '#FFFFFF',
     textAlign: 'center',
   },
   spotifyStartBtn: {
@@ -6956,7 +7094,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'flex-start',
-    paddingTop: 72,
+    paddingTop: Spacing.md,
     gap: Spacing.sm,
   },
   djStopConfirmInlineBtn: {
@@ -6986,6 +7124,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: Spacing.xs,
     width: '100%',
+  },
+  // Grön glow-halo bakom "Start track in Spotify"-CTA:n — speglar
+  // confirmHalo-mönstret (absolut-positionerad bakom, animated opacity).
+  djStartHalo: {
+    position: 'absolute',
+    top: -6,
+    left: -6,
+    right: -6,
+    bottom: -6,
+    borderRadius: Radius.md + 6,
+    backgroundColor: '#1DB954',
   },
   spotifyDJActionBtn: {
     flex: 1,
