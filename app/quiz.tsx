@@ -5619,6 +5619,15 @@ export default function QuizScreen() {
         // ingen wrapping (alla på samma enhet). Non-host i IndDev får
         // ändå inte tryck — knappen är dold via isHost-prop nedan.
         onReady={handleHostStartFromGetReady}
+        // IndDev: enhetens egen spelare visas högerställd i top-bannern.
+        // selfPlayerId sätts av båda Lobby-navigations-paths; host-fallback
+        // till turnOrder[0] täcker direkt-nav/legacy-payload utan id.
+        selfPlayerName={
+          gameMode === 'individual-devices'
+            ? (turnOrder.find((p) => p.id === selfPlayerId) ??
+                (isHost ? turnOrder[0] : undefined))?.name
+            : undefined
+        }
         isHost={isHost}
         // Host får Quit Game (river rummet); non-host får Leave Game
         // (lämnar bara egen plats). Båda går ALDRIG via samma codepath

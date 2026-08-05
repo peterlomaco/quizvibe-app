@@ -136,6 +136,11 @@ interface Props {
    *  renderas inte leaderboard-blocket. */
   leaderboard?: LeaderboardLiveEntry[];
   onReady: () => void;
+  /** IndDev: PlayerName för spelaren som använder DENNA enhet. Visas
+   *  högerställd i top-bannern (samma rad som Quit/Leave Game). Renderas
+   *  bara i Individual Devices-läget — PtP delar enhet så "device-ägare"
+   *  saknar mening där. */
+  selfPlayerName?: string;
   /** Optional: visar Quit Game-knappen längst upp som river lobby:n. Host-only. */
   onQuit?: () => void;
   /** Optional: visar Leave Game-knappen längst upp för non-host (IndDev).
@@ -263,6 +268,7 @@ export function GetReadyIntro({
   responseSecondsLocked = false,
   leaderboard,
   onReady,
+  selfPlayerName,
   onQuit,
   onLeave,
   isHost = true,
@@ -500,25 +506,29 @@ export function GetReadyIntro({
           Leave Game för non-host i IndDev (lämnar bara egen plats, går till
           Home). Båda speglar TopUserBanner:s vokabulär (Colors.card bg +
           borderBottom). onQuit har företräde om båda är satta. */}
-      {onQuit ? (
+      {onQuit || onLeave ? (
         <View style={styles.quitBar}>
           <TouchableOpacity
             style={styles.quitBtn}
-            onPress={onQuit}
-            accessibilityLabel="Quit Game"
+            onPress={onQuit ?? onLeave}
+            accessibilityLabel={onQuit ? 'Quit Game' : 'Leave Game'}
           >
-            <Text style={styles.quitBtnText}>Quit Game</Text>
+            <Text style={styles.quitBtnText}>
+              {onQuit ? 'Quit Game' : 'Leave Game'}
+            </Text>
           </TouchableOpacity>
-        </View>
-      ) : onLeave ? (
-        <View style={styles.quitBar}>
-          <TouchableOpacity
-            style={styles.quitBtn}
-            onPress={onLeave}
-            accessibilityLabel="Leave Game"
-          >
-            <Text style={styles.quitBtnText}>Leave Game</Text>
-          </TouchableOpacity>
+          {/* IndDev: enhetens egen spelare högerställd i bannern — speglar
+              TopUserBanner:s login-pill-position så användaren alltid ser
+              vilken identitet enheten spelar som. */}
+          {isIndDev && selfPlayerName ? (
+            <Text
+              style={styles.selfPlayerText}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              Player Name: {selfPlayerName}
+            </Text>
+          ) : null}
         </View>
       ) : null}
 
@@ -1383,17 +1393,28 @@ const styles = StyleSheet.create({
 
   // ── Top banner med Quit Game vänsterställd ─────────────────────────────
   // Full-bredd-band överst på skärmen i samma vokabulär som TopUserBanner
-  // (Colors.card bg + borderBottom). Quit Game-pillen sitter till vänster
-  // via flex-row + ingen justifyContent-override (default flex-start).
+  // (Colors.card bg + borderBottom). Quit/Leave-pillen sitter till vänster;
+  // space-between skjuter selfPlayerPill (IndDev, enhetens egen spelare)
+  // till höger. Utan pill (PtP) stannar knappen vänster som förut.
   quitBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'flex-start',
+    justifyContent: 'space-between',
     paddingHorizontal: Spacing.lg,
     paddingVertical: Spacing.sm + 2,
     backgroundColor: Colors.card,
     borderBottomWidth: 1,
     borderBottomColor: Colors.border,
+  },
+  // IndDev: enhetens spelarnamn i bannerns högerkant — ren grå text utan
+  // ram/bakgrund. maxWidth skyddar mot överlapp med Quit/Leave-knappen
+  // vid långa PlayerNames (upp till 10 letters + 7 digits).
+  selfPlayerText: {
+    maxWidth: '55%',
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.semibold,
+    color: Colors.textSecondary,
+    letterSpacing: 0.4,
   },
   quitBtn: {
     paddingHorizontal: Spacing.md,
