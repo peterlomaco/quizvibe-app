@@ -23,6 +23,18 @@ items:
     answerMethods: ["timeline"]
     # Klipp borttaget 2026-05-29 — FIFA-kanalen blockerar embedded playback
     # ("Videon ej tillgänglig"). Re-curera från icke-FIFA highlights-källa.
+  - id: johansson-patterson-title-1959
+    displayName: "Ingemar Johansson besegrar Floyd Patterson — VM-titeln i tungvikt"
+    correctYear: 1959
+    probability: 85
+    wikimediaSearchHints: ["Ingemar Johansson Floyd Patterson 1959 heavyweight title"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "qfU54_O6cXI"
+        startSec: 0
+        endSec: 30
+        channelTitle: "FRIZALZ"
+        notes: "Peter-curerat + validerat i in-app-spelaren 2026-08-05. YouTube Short (vertikalt format, svarta kanter i 16:9-spelaren OK). Ingen årtals-spoiler i titeln."
   - id: spitz-1972-munich-olympics
     displayName: "Mark Spitz tar 7 OS-guld i München"
     correctYear: 1972
@@ -46,7 +58,7 @@ items:
         startSec: 0
         endSec: 30
         channelTitle: "Nostalgi"
-        notes: "Peter-curerat 2026-07-02. OBS: videotiteln innehåller året (1976) — spoiler-risk enligt R1-policy."
+        notes: "Peter-curerat + validerat i in-app-spelaren 2026-08-05 — årtalet i videotiteln syns EJ i appens spelare, godkänt trots år-i-titel."
   - id: miracle-on-ice-1980
     displayName: "Miracle on Ice — USA besegrar Sovjet"
     correctYear: 1980
@@ -70,7 +82,7 @@ items:
         startSec: 0
         endSec: 30
         channelTitle: "ClassicEngland"
-        notes: "Peter-curerat 2026-07-02, ersatte Sport Clips 4K-klippet (F-n7lWyM4Vc). OBS: videotiteln innehåller året (1986) — spoiler-risk enligt R1-policy."
+        notes: "Peter-curerat + validerat i in-app-spelaren 2026-08-05, ersatte Sport Clips 4K-klippet (F-n7lWyM4Vc) — årtalet i videotiteln syns EJ i appens spelare, godkänt trots år-i-titel."
   - id: dream-team-1992-barcelona
     displayName: "Dream Team — Barcelona OS basket"
     correctYear: 1992

@@ -614,6 +614,29 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "johansson-patterson-title-1959",
+    "displayName": "Ingemar Johansson besegrar Floyd Patterson — VM-titeln i tungvikt",
+    "correctYear": 1959,
+    "contentSubject": "sport-event",
+    "questionText": "Which Year did this happen?",
+    "audiences": [
+      "all"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "qfU54_O6cXI",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "FRIZALZ",
+        "license": "standard",
+        "notes": "Peter-curerat + validerat i in-app-spelaren 2026-08-05. YouTube Short (vertikalt format, svarta kanter i 16:9-spelaren OK). Ingen årtals-spoiler i titeln."
+      }
+    ]
+  },
+  {
     "id": "ray-charles-whatd-i-say",
     "displayName": "What'd I Say — Ray Charles",
     "correctYear": 1959,
@@ -2540,7 +2563,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 30,
         "channelTitle": "Nostalgi",
         "license": "standard",
-        "notes": "Peter-curerat 2026-07-02. OBS: videotiteln innehåller året (1976) — spoiler-risk enligt R1-policy."
+        "notes": "Peter-curerat + validerat i in-app-spelaren 2026-08-05 — årtalet i videotiteln syns EJ i appens spelare, godkänt trots år-i-titel."
       }
     ]
   },
@@ -4519,7 +4542,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 30,
         "channelTitle": "ClassicEngland",
         "license": "standard",
-        "notes": "Peter-curerat 2026-07-02, ersatte Sport Clips 4K-klippet (F-n7lWyM4Vc). OBS: videotiteln innehåller året (1986) — spoiler-risk enligt R1-policy."
+        "notes": "Peter-curerat + validerat i in-app-spelaren 2026-08-05, ersatte Sport Clips 4K-klippet (F-n7lWyM4Vc) — årtalet i videotiteln syns EJ i appens spelare, godkänt trots år-i-titel."
       }
     ]
   },
