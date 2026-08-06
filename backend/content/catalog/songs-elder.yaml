@@ -23,7 +23,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Cab Calloway Minnie the Moocher"]
     answerMethods: ["timeline"]
-    spotifyTrackId: "3zlqUu9yK7fsefGsSAa86e"
+    spotifyTrackId: "7GASUbWzEnJKfgg4lz65qY"
   - id: fred-astaire-night-and-day
     displayName: "Night and Day — Fred Astaire"
     correctYear: 1932
@@ -457,7 +457,7 @@ items:
     probability: 74
     wikimediaSearchHints: ["Lill-Babs Letkis-Jenka 1964 Swedish dansband schlager"]
     answerMethods: ["timeline"]
-    spotifyTrackId: "2NV9sp5tl3fKrKZCFtSGBY"
+    spotifyTrackId: "0ifb42ld8ZGWoVyydt18l7"
     youtubeClips:
       - videoId: "eMiA3xHLXVo"
         startSec: 0

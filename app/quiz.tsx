@@ -52,6 +52,7 @@ import {
 import { QuizVibeLogo } from '@/src/components/QuizVibeLogo';
 import { SpotifyBrandIcon } from '@/src/components/SpotifyBrandIcon';
 import { getSpotifyArtistMeta, type SpotifyArtistMeta } from '@/src/utils/spotifyArtistMeta';
+import { SPOTIFY_ALBUM_CONTEXT } from '@/src/utils/spotifyAlbumContext';
 import { savePendingLobbyPlayers } from '@/src/utils/pendingLobby';
 import { generatePlayerName } from '@/src/utils/playerName';
 import { loadProfile, type ProfileData } from '@/src/utils/profileStorage';
@@ -422,14 +423,20 @@ const SPOTIFY_NON_DJ_STEPS = [
  *  (ingen spoiler-risk — DJ:n svarar aldrig och ser ändå låten i Spotify). */
 function DJTrackCard({
   hint,
+  trackId,
   children,
 }: {
   hint?: string | null;
+  trackId?: string | null;
   children?: React.ReactNode;
 }) {
   const parts = hint ? hint.split(' — ') : [];
   const artist = parts.length > 1 ? parts[parts.length - 1] : null;
   const title = parts.length > 1 ? parts.slice(0, -1).join(' — ') : hint ?? null;
+  // Album-kontext (auto-genererad av backend:s spotify-album-audit): var i
+  // tracklistan deep-linken landar — "Track 5 of 30" hjälper DJ:n hitta rätt
+  // rad när autoplay uteblir och Spotify visar hela albumet/samlingen.
+  const albumCtx = trackId ? SPOTIFY_ALBUM_CONTEXT[trackId] : undefined;
   return (
     <View style={styles.spotifyTrackCard}>
       {children}
@@ -452,6 +459,11 @@ function DJTrackCard({
             Title
           </Text>
           <Text style={styles.spotifyTrackCardTitle}>{title}</Text>
+          {albumCtx ? (
+            <Text style={styles.spotifyTrackCardPosition}>
+              Track {albumCtx.position} of {albumCtx.total}
+            </Text>
+          ) : null}
           <View style={styles.spotifyTrackCardWarnRow}>
             <Text style={styles.spotifyTrackCardWarnIcon}>⚠️</Text>
             <Text style={styles.spotifyTrackCardWarnText}>
@@ -6341,7 +6353,7 @@ export default function QuizScreen() {
                   // session, typiskt direkt efter Play Again när förra spelets
                   // låt ligger kvar pausad i mini-playern): utan titeln vet
                   // DJ:n inte VILKEN låt som ska sökas/startas manuellt.
-                  <DJTrackCard hint={currentQ?.type === 'timeline' ? currentQ.hint : null}>
+                  <DJTrackCard hint={currentQ?.type === 'timeline' ? currentQ.hint : null} trackId={currentSpotifyTrackId}>
                     <Animated.View style={{ width: '50%', transform: [{ scale: djStartPulse }] }}>
                       <Animated.View
                         pointerEvents="none"
@@ -6366,7 +6378,7 @@ export default function QuizScreen() {
                   // playern — behöver DJ:n en väg tillbaka till rätt låt-sida.
                   // Omstart från början är ofarlig innan timern aktiverats
                   // (gissarnas klocka har inte börjat ticka).
-                  <DJTrackCard hint={currentQ?.type === 'timeline' ? currentQ.hint : null}>
+                  <DJTrackCard hint={currentQ?.type === 'timeline' ? currentQ.hint : null} trackId={currentSpotifyTrackId}>
                     <Pressable
                       style={[styles.spotifyDJActionBtn, { flex: 0, paddingHorizontal: Spacing.xl }]}
                       onPress={() => {
@@ -6383,7 +6395,7 @@ export default function QuizScreen() {
                   // utan fortsätter spelas. Samma track-kort-ram med artist +
                   // titel som steg 0/1 så DJ:n hela tiden ser vilken låt som
                   // ska spelas.
-                  <DJTrackCard hint={currentQ?.type === 'timeline' ? currentQ.hint : null}>
+                  <DJTrackCard hint={currentQ?.type === 'timeline' ? currentQ.hint : null} trackId={currentSpotifyTrackId}>
                     <Pressable
                       style={[styles.spotifyDJActionBtn, { flex: 0, paddingHorizontal: Spacing.xl }]}
                       onPress={() => openSpotifyApp()}
@@ -7047,6 +7059,13 @@ const styles = StyleSheet.create({
   // knappen centreras vertikalt mellan ram-överkant och "Artist"-rubriken.
   spotifyTrackCardFirstLabel: {
     marginTop: Spacing.xl * 1.5,
+  },
+  spotifyTrackCardPosition: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.semibold,
+    color: '#1DB954',
+    textAlign: 'center',
+    marginTop: Spacing.xs,
   },
   spotifyTrackCardWarnRow: {
     flexDirection: 'row',

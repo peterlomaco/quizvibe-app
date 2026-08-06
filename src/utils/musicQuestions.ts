@@ -74,7 +74,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "sweden"
     ],
-    "spotifyTrackId": "3zlqUu9yK7fsefGsSAa86e",
+    "spotifyTrackId": "7GASUbWzEnJKfgg4lz65qY",
     "youtubeClips": []
   },
   {
@@ -879,7 +879,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "sweden"
     ],
-    "spotifyTrackId": "2NV9sp5tl3fKrKZCFtSGBY",
+    "spotifyTrackId": "0ifb42ld8ZGWoVyydt18l7",
     "youtubeClips": [
       {
         "videoId": "eMiA3xHLXVo",
@@ -1264,7 +1264,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "sweden"
     ],
-    "spotifyTrackId": "4CJCKU7Vua0i1EHgwRup1q",
+    "spotifyTrackId": "19vrvFgXDghcRpCf5zrbFA",
     "youtubeClips": [
       {
         "videoId": "fxG0Gu9stiI",
@@ -3264,7 +3264,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "sweden"
     ],
-    "spotifyTrackId": "7DlTA5LRD6UVYeDwqbbojP",
+    "spotifyTrackId": "2eG2VJ3CiHs43XYBRIRQ45",
     "youtubeClips": [
       {
         "videoId": "epuLWrb6AUA",
@@ -3291,7 +3291,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Eurovision"
     ],
-    "spotifyTrackId": "5O3XbSZu25WqsNpRakQd6T",
+    "spotifyTrackId": "2Hx61KuedgBKOaJ1GfflJe",
     "youtubeClips": [
       {
         "videoId": "khv8TygskVU",
@@ -9359,7 +9359,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "sweden"
     ],
-    "spotifyTrackId": "2sPAJRwxrOgfZah700s2ni",
+    "spotifyTrackId": "28qkNp9shSV8AQrBwxZf48",
     "youtubeClips": [
       {
         "videoId": "B3SSPURxGJ0",
@@ -10061,7 +10061,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "sweden"
     ],
-    "spotifyTrackId": "0bhBKOTqLbKbJZbAB5Mdsf",
+    "spotifyTrackId": "4lhqb6JvbHId48OUJGwymk",
     "youtubeClips": [
       {
         "videoId": "OjpX8ILe2N4",
