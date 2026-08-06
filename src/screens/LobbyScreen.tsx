@@ -1739,6 +1739,12 @@ export default function LobbyScreen() {
   // gör roomCode inaktiv via deactivateRoom() — kvarvarande non-hosts
   // får då en deletion-popup via polling-detection längre ner.
   const [hostDeleteSheetVisible, setHostDeleteSheetVisible] = useState(false);
+  // "No approved players"-dialog vid Start Game i multiplayer-läge utan
+  // godkända non-hosts. Custom Modal (inte Alert) eftersom "Approve
+  // players"-knappen ska kunna renderas utgråad/disabled när det inte
+  // finns några andra spelare alls i lobbyn — native Alert kan inte
+  // disable:a enskilda knappar.
+  const [noApprovedModalVisible, setNoApprovedModalVisible] = useState(false);
   // True när non-host har upptäckt att rummet blivit deaktiverat (host
   // har raderat lobby:n). Triggar Alert:en "This Game Lobby has been
   // deleted by Host" → OK-knappen tar dem till Home.
@@ -3996,17 +4002,7 @@ export default function LobbyScreen() {
     }
 
     if (!singlePlayerDefault && approvedNonHosts.length === 0) {
-      Alert.alert(
-        'No approved players',
-        'You have not approved any other players. Either approve players or switch to single player mode.',
-        [
-          { text: 'Approve players', style: 'cancel' },
-          {
-            text: 'Switch to single player',
-            onPress: () => setSinglePlayerDefault(true),
-          },
-        ],
-      );
+      setNoApprovedModalVisible(true);
       return;
     }
 
@@ -6495,6 +6491,87 @@ export default function LobbyScreen() {
         </View>
       </Modal>
 
+      {/* ── "No approved players"-dialog (Start Game-guard) ───────────
+          Custom centrerad dialog istället för Alert så "Approve players"
+          kan vara utgråad när det inte finns några andra spelare alls i
+          lobbyn (varken godkända eller väntande). Cancel stänger bara
+          dialogen — host står kvar i lobbyn oförändrat. */}
+      <Modal
+        visible={noApprovedModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setNoApprovedModalVisible(false)}
+      >
+        <View style={styles.noApprovedOverlay}>
+          <Pressable
+            style={styles.guestLeaveBackdrop}
+            onPress={() => setNoApprovedModalVisible(false)}
+          />
+          <View style={styles.noApprovedCard}>
+            <Text style={styles.noApprovedTitle}>No approved players</Text>
+            <Text style={styles.noApprovedMessage}>
+              You have not approved any other players. Either approve players
+              or switch to single player mode.
+            </Text>
+
+            <Pressable
+              style={({ pressed }) => [
+                styles.noApprovedBtn,
+                pressed && { opacity: 0.85 },
+              ]}
+              onPress={() => {
+                setNoApprovedModalVisible(false);
+                setSinglePlayerDefault(true);
+              }}
+            >
+              <Text style={styles.noApprovedBtnText}>
+                Switch to single player
+              </Text>
+            </Pressable>
+
+            {(() => {
+              // Utgråad när inga andra spelare finns i lobbyn — det finns
+              // då ingen att godkänna. hasLeft-spelare räknas inte.
+              const hasOtherPlayers = players.some(
+                (p) => !p.isHost && !p.hasLeft,
+              );
+              return (
+                <Pressable
+                  disabled={!hasOtherPlayers}
+                  style={({ pressed }) => [
+                    styles.noApprovedBtn,
+                    !hasOtherPlayers && styles.noApprovedBtnDisabled,
+                    pressed && hasOtherPlayers && { opacity: 0.85 },
+                  ]}
+                  onPress={() => {
+                    // Stäng dialogen + öppna Players-sektionen så host
+                    // landar direkt vid listan med väntande spelare.
+                    setNoApprovedModalVisible(false);
+                    setPlayersExpanded(true);
+                  }}
+                >
+                  <Text
+                    style={[
+                      styles.noApprovedBtnText,
+                      !hasOtherPlayers && styles.noApprovedBtnTextDisabled,
+                    ]}
+                  >
+                    Approve players
+                  </Text>
+                </Pressable>
+              );
+            })()}
+
+            <Pressable
+              style={styles.guestLeaveCancelBtn}
+              onPress={() => setNoApprovedModalVisible(false)}
+            >
+              <Text style={styles.guestLeaveCancelText}>Cancel</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+
       {/* ── Deleting-lobby loading-overlay ────────────────────────────
           Visar processing-feedback under tiden mellan host:s Yes-
           konfirmation och navigation till Home. cancelable:false så
@@ -6671,6 +6748,57 @@ const styles = StyleSheet.create({
   guestLeaveCancelText: {
     fontSize: 14,
     color: Colors.textSecondary,
+  },
+
+  // "No approved players"-dialog — centrerad card-dialog (ersätter
+  // native Alert som inte kan grå-ut enskilda knappar). Delar backdrop-
+  // och Cancel-styling med guestLeave-sheeten.
+  noApprovedOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: Spacing.xl,
+  },
+  noApprovedCard: {
+    backgroundColor: Colors.card,
+    borderRadius: Radius.md,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    padding: Spacing.xl,
+    gap: Spacing.md,
+  },
+  noApprovedTitle: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: Colors.textPrimary,
+    textAlign: 'center',
+  },
+  noApprovedMessage: {
+    fontSize: 14,
+    lineHeight: 20,
+    color: Colors.textSecondary,
+    textAlign: 'center',
+    marginBottom: Spacing.sm,
+  },
+  noApprovedBtn: {
+    height: 52,
+    borderRadius: Radius.md,
+    backgroundColor: Colors.cardElevated,
+    borderWidth: 1,
+    borderColor: Colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  noApprovedBtnDisabled: {
+    backgroundColor: 'transparent',
+    borderColor: Colors.borderStrong,
+  },
+  noApprovedBtnText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.textPrimary,
+  },
+  noApprovedBtnTextDisabled: {
+    color: Colors.textDisabled,
   },
 
   // Deleting-lobby loading-overlay — täcker hela skärmen med dimmad
