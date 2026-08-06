@@ -247,8 +247,14 @@ function profileToRow(userId: string, email: string, p: ProfileData): ProfileRow
 }
 
 // Hämtar current session.user. null = ingen session (= guest/pre-login).
+// Anonyma sessioner (guests får en via ensureAuthSession för RLS-writes)
+// räknas OCKSÅ som "ingen user" — en guest är inte inloggad och ska varken
+// läsa/skriva profiles-rader eller trigga backfillProfileFromSession (som
+// annars byggde en fantom-profil med tomt playerName → Home/BottomBanner
+// visade inloggat läge för guests som ejectats tillbaka till Home).
 async function getCurrentUser() {
   const { data } = await supabase.auth.getUser();
+  if (data.user?.is_anonymous) return null;
   return data.user;
 }
 
@@ -412,6 +418,15 @@ async function loadFromAsyncStorage(): Promise<ProfileData | null> {
     if (raw.assistance === undefined && typeof raw.skill === 'string') {
       raw.assistance = LEGACY_SKILL_TO_ASSISTANCE[raw.skill] ?? null;
       delete raw.skill;
+    }
+    // Fantom-cache-sanering: en tidigare bugg lät anon-sessioner (guests)
+    // backfilla en profil med tomt playerName hit → guests såg inloggat
+    // läge på Home. Legitima profiler har alltid playerName (Register
+    // validerar non-empty) — tomt namn = bogus rad, rensa och returnera
+    // utloggat läge.
+    if (typeof raw.playerName !== 'string' || raw.playerName.trim() === '') {
+      AsyncStorage.removeItem(PROFILE_KEY).catch(() => { /* best-effort */ });
+      return null;
     }
     // Auto-refresh fria credits vid första load efter midnatt CET. Skriv
     // tillbaka direkt om top-up skedde så storage konvergerar.
