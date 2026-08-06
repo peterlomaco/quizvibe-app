@@ -7,6 +7,7 @@ import {
   Alert,
   Animated,
   Easing,
+  Image,
   Keyboard,
   KeyboardAvoidingView,
   Modal,
@@ -53,7 +54,7 @@ import {
 import { TopUserBanner } from '../components/TopUserBanner';
 import { MorseAmbientSound } from '../components/MorseAmbientSound';
 import { Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';
-import { getAvatarEmojiById } from '../utils/avatars';
+import { AVATARS, getAvatarEmojiById } from '../utils/avatars';
 import { addFriend, loadFriends, type Friend } from '../utils/friendsStorage';
 import { MIN_HCP, calculateInitialHCP } from '../utils/hcp';
 import { addLeftPlayer, getLeftPlayers, removeLeftPlayer } from '../utils/leftPlayers';
@@ -1391,7 +1392,9 @@ export default function LobbyScreen() {
           age,
           assistance,
           hcpComplete: true,
-          approved: true,
+          // Ny joiner landar UNAPPROVED — host får join-approval-popupen
+          // (eller auto-approvar via friends-listan för registrerade).
+          approved: false,
         };
         // Sätt in gästen direkt efter host (index 1) så de syns högt upp.
         setPlayers((prev) => {
@@ -1444,11 +1447,12 @@ export default function LobbyScreen() {
         // annars hade genererat ett nytt joiner-${Date.now()}-id, vilket ger
         // två DB-rader med samma playerName och bryter approval-synken.
         let joinerId: string;
+        let existingMatch: LobbyPlayer | undefined;
         if (carryOverPlayerId?.trim()) {
           joinerId = carryOverPlayerId.trim();
         } else {
           const existingPlayers = await getLobbyPlayers(roomCode);
-          const existingMatch = existingPlayers?.find(
+          existingMatch = existingPlayers?.find(
             (p) =>
               !p.isHost &&
               p.name.trim().toLowerCase() === myPlayerName.toLowerCase(),
@@ -1456,6 +1460,14 @@ export default function LobbyScreen() {
           joinerId = existingMatch?.id ?? `joiner-${Date.now()}`;
         }
         ownPlayerIdRef.current = joinerId;
+        // Approved-policy: carry-over (Play Again) är pre-approvad av host:s
+        // goToNewLobby (approved=true på alla carry-over-rader) — matcha den
+        // så upsert:en nedan inte clobbar. Regular join ärver ev. tidigare
+        // approval från befintlig DB-rad, annars false — host approvar via
+        // join-approval-popupen (eller auto-approve via friends-listan).
+        const joinerApproved = carryOverPlayerId?.trim()
+          ? true
+          : existingMatch?.approved ?? false;
         const joiner: LobbyPlayer = {
           id: joinerId,
           name: myPlayerName,
@@ -1465,7 +1477,7 @@ export default function LobbyScreen() {
           age,
           assistance,
           hcpComplete,
-          approved: true,
+          approved: joinerApproved,
           spotifyConnected: ownSpotifyAttested,
         };
         // Sätt non-host:s egna Spotify-attest så Source Mixerboard visar
@@ -1705,6 +1717,13 @@ export default function LobbyScreen() {
   // Share invite modal
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [friends, setFriends] = useState<Friend[]>([]);
+  // Host:s friends-lista, laddad vid lobby-mount (inte lazy som `friends`
+  // ovan som fylls först när Share-modalen öppnas). Driver auto-approve av
+  // joiners som redan är friends. `null` = ännu inte laddad — join-watcher-
+  // effekten väntar tills load:en är klar så en friend aldrig råkar få
+  // popupen pga en load-race. Guest host (ingen profil) → loadFriends
+  // returnerar [] → auto-approve matchar aldrig.
+  const hostFriendsRef = useRef<Friend[] | null>(null);
   const [invitedFriendIds, setInvitedFriendIds] = useState<Set<string>>(new Set());
   // Input för "Add by Player Name"-raden i Share invite — speglar Profile:s
   // friends-modal så host kan lägga till en QuizVibe friend direkt från lobby
@@ -1745,6 +1764,23 @@ export default function LobbyScreen() {
   // finns några andra spelare alls i lobbyn — native Alert kan inte
   // disable:a enskilda knappar.
   const [noApprovedModalVisible, setNoApprovedModalVisible] = useState(false);
+  // Join-approval-popup (host): kö av player-ids som väntar på hostens
+  // beslut. En modal åt gången — first-in-first-out; actions (Approve /
+  // Approve+AddFriend / Deny / Later) shiftar kön. promptedIdsRef håller
+  // ids som redan fått popup (eller auto-approvats) så samma spelare inte
+  // re-promptas i loop; ids prunas när spelaren lämnar (hasLeft) eller
+  // försvinner ur players[] så en genuin rejoin promptar igen.
+  const [joinPopupQueue, setJoinPopupQueue] = useState<string[]>([]);
+  const promptedIdsRef = useRef<Set<string>>(new Set());
+  // Ids som HOST explicit har un-approvat (ApproveToggle av, D-vii unstable-
+  // demote). Friend-auto-approve respekterar setet — en friend host medvetet
+  // flyttat till waiting re-approvas ALDRIG tyst. Utan setet kan watchern
+  // inte skilja host-intent från en stale DB→local-sync (syncNonHostFields
+  // kan läsa joiner:s approved=false INNAN hostens bulk-write committat och
+  // downgradea en nyss auto-approvad friend — watchern self-heal:ar det
+  // fallet genom att re-approva friends som INTE finns i setet). Rensas när
+  // spelaren blir approved (valfri väg) eller lämnar.
+  const hostUnapprovedIdsRef = useRef<Set<string>>(new Set());
   // True när non-host har upptäckt att rummet blivit deaktiverat (host
   // har raderat lobby:n). Triggar Alert:en "This Game Lobby has been
   // deleted by Host" → OK-knappen tar dem till Home.
@@ -2018,6 +2054,36 @@ export default function LobbyScreen() {
   // centrering oavsett flex-beräkningsfel i Yoga/React Native.
   const [smColWidth, setSmColWidth] = useState(0);
   const smCellStyle = smColWidth > 0 ? { width: smColWidth } : undefined;
+  // Höger-marginaler som centrerar Spotify-radens switchar på Sport-kolumnens
+  // switch-mittlinje i matrisen nedanför. Härledd formel (smColWidth/2 från
+  // högerkanten) gav per-enhets-residualer (kolumn-separatorer, cell-padding,
+  // flex-avrundning) — därför MÄTS Sport-cellens faktiska position via
+  // measureLayout mot grid:en istället (exakt på alla enheter).
+  const SPOTIFY_SWITCH_W = 51; // RN Switch-layoutbredd (transform-scale påverkar inte layoutboxen)
+  const [smGridW, setSmGridW] = useState(0);
+  // Sport-switchens center härleds via ONLAYOUT-kedja (stack-x i grid +
+  // cell-center i stack). OBS: measureLayout användes först men är opålitlig
+  // på Fabric/new arch — silent no-op via error-callbacken, vilket lämnade
+  // fallback-marginaler som bara råkade aligna på vissa skärmbredder
+  // (414pt ok, 390pt ~4.5pt fel). onLayout fyrar alltid.
+  const [sportStackX, setSportStackX] = useState(0);
+  const [sportCellCenter, setSportCellCenter] = useState(0);
+  // Cellens alignItems:'center' + paddingLeft 3 → switch-center = cellcenter + 1.5.
+  const sportSwitchCenter = sportStackX + sportCellCenter + 1.5;
+  const haveSportMeasure = smGridW > 0 && sportStackX > 0 && sportCellCenter > 0;
+  // DJ-/Year-Name-raderna har paddingRight 18; negativ margin får äta av den
+  // på smala skärmar. Attest-ramen: paddingRight 4 + border 1 innanför
+  // marginalen. Fallback tills onLayout-mätningarna landat.
+  // −4 = konstant bias (debug-linje-verifierad 2026-08-06: mätningen träffar
+  // Sport-kolumnens center exakt på båda enheterna, men Spotify-switcharna
+  // låg ~3–4pt vänster om linjen på BÅDA — switch-layoutbreddens antagande
+  // är några pt för smalt).
+  const spotifySwitchMR = haveSportMeasure
+    ? Math.round(smGridW - sportSwitchCenter - 18 - SPOTIFY_SWITCH_W / 2) - 4
+    : 0;
+  const spotifyAttestMR = haveSportMeasure
+    ? Math.max(0, Math.round(smGridW - sportSwitchCenter - 2 - 1 - SPOTIFY_SWITCH_W / 2) - 4)
+    : 28;
 
   // YouTube och Hints (imagesEnabledCategories) är oberoende — ingen auto-sync.
 
@@ -2444,27 +2510,29 @@ export default function LobbyScreen() {
   // (PtP→IndDev). DB DELETE krävs — utan det skulle host:s fetchNewJoiners-
   // sync re-injektera guests nästa state-ändring (setLobbyPlayers är
   // UPSERT-only).
-  // Individual device kräver att ALLA spelare är registrerade QuizVibe-users
-  // (guests kan inte vara med — varken host-tillagda eller självanslutna via
-  // guest-form). Vid byte till IndDev tas alla icke-registrerade bort. Host
-  // exkluderas alltid (host är alltid registrerad/synthetic). markEjected +
-  // DB-DELETE så självanslutna guests får eject-popup på sin enhet.
+  // Individual device: endast HOST-TILLAGDA guests blockeras (de saknar egen
+  // enhet — ingen mobil kan visa frågor/skicka svar för dem). Självanslutna
+  // guests HAR egen enhet + anon-session och får vara med (policy-ändring
+  // 2026-08-06, ersätter 2026-06-01-regeln som blockade alla guests). Vid
+  // byte till IndDev tas bara addedByHost-spelare bort. markEjected +
+  // DB-DELETE (belt-and-suspenders — host-tillagda har ingen egen enhet
+  // som kan visa eject-popupen, men raden måste bort ur DB).
   const confirmAndRemoveGuests = (title: string, applySwitch: () => void) => {
-    const guests = players.filter((p) => !p.isHost && p.type !== 'registered');
+    const guests = players.filter((p) => !p.isHost && p.addedByHost);
     if (guests.length === 0) {
       applySwitch();
       return;
     }
     Alert.alert(
       title,
-      'Individual device games require every player to have a registered QuizVibe account. Guest players will be removed.',
+      'Guest players added by the Host will be removed — they have no device of their own. Ask them to join with their own device instead.',
       [
         { text: 'Cancel', style: 'cancel' },
         {
           text: 'Switch & remove',
           style: 'destructive',
           onPress: () => {
-            setPlayers((prev) => prev.filter((p) => p.isHost || p.type === 'registered'));
+            setPlayers((prev) => prev.filter((p) => p.isHost || !p.addedByHost));
             applySwitch();
             guests.forEach((p) => {
               markEjected(roomCode, p.id);
@@ -2694,6 +2762,78 @@ export default function LobbyScreen() {
     if (playersExpanded) setNewPlayerJoined(false);
   }, [playersExpanded]);
 
+  // ── Join-approval-popup + friend-auto-approve (host) ──────────────────
+  // Watcher på players[]: varje NY unapproved non-host får antingen
+  // (a) tyst auto-approve om hen är registrerad OCH redan finns på hostens
+  // friends-lista (case-insensitive playerName-match) — gröna "New Player
+  // joined"-blinken signalerar; eller (b) en plats i join-popup-kön så host
+  // får Approve / Approve+AddFriend / Deny / Later-modalen. Effekt-driven
+  // (inte hookad i fetchNewJoiners) så samma väg täcker Realtime-INSERT,
+  // mount-fetchen OCH rejoin (hasLeft→false via syncNonHostFields) enhetligt.
+  useEffect(() => {
+    if (!hostMode) return;
+    // Vänta tills friends-listan laddats — annars kan en friend hinna få
+    // popupen pga en load-race.
+    const hostFriends = hostFriendsRef.current;
+    if (hostFriends === null) return;
+    // Pruna: ids vars spelare försvunnit eller lämnat (hasLeft) tas bort ur
+    // prompted-setet så en genuin rejoin promptar igen. Kön rensas från
+    // stale ids (borta, lämnade eller approvade via annan väg — t.ex.
+    // ApproveToggle:n medan popupen låg i kö).
+    const activeIds = new Set(players.filter((p) => !p.hasLeft).map((p) => p.id));
+    promptedIdsRef.current.forEach((id) => {
+      if (!activeIds.has(id)) promptedIdsRef.current.delete(id);
+    });
+    // hostUnapprovedIdsRef rensas när spelaren är approved (valfri väg) eller
+    // borta — ett senare join-varv börjar då med rent intent-state.
+    hostUnapprovedIdsRef.current.forEach((id) => {
+      const p = players.find((x) => x.id === id);
+      if (!p || p.hasLeft || p.approved) hostUnapprovedIdsRef.current.delete(id);
+    });
+    setJoinPopupQueue((prev) => {
+      const next = prev.filter((id) => {
+        const p = players.find((x) => x.id === id);
+        return !!p && !p.hasLeft && !p.approved;
+      });
+      return next.length === prev.length ? prev : next;
+    });
+    // Auto-approve friends eller enqueue nya unapproved joiners.
+    players.forEach((p) => {
+      if (p.isHost || p.hasLeft || p.approved) return;
+      const isFriend =
+        p.type === 'registered' &&
+        hostFriends.some(
+          (f) => f.playerName.toLowerCase() === p.name.trim().toLowerCase(),
+        );
+      // Samma guards som handleSetApproved — blockeras tyst approve faller
+      // spelaren tillbaka till popupen där Approve-tappen visar guard-Alerten.
+      const passesSilentGuards =
+        lobbyPeerHealth[p.id] !== 'unstable' &&
+        (!spotifyEnabled || !!p.spotifyConnected);
+      if (isFriend && passesSilentGuards && !hostUnapprovedIdsRef.current.has(p.id)) {
+        // Tyst auto-approve. MEDVETET inte gated på promptedIdsRef — om en
+        // stale DB→local-sync (syncNonHostFields hann läsa joiner-radens
+        // approved=false innan hostens bulk-write committat) downgradear en
+        // nyss auto-approvad friend self-heal:ar nästa effekt-cykel genom
+        // att re-approva. Hostens explicita un-approves respekteras via
+        // hostUnapprovedIdsRef-checken ovan. DB-skrivning sker via host:s
+        // bulk-write-effekt på [players] (setLobbyPlayers).
+        promptedIdsRef.current.add(p.id);
+        setPlayers((prev) =>
+          prev.map((x) => (x.id === p.id ? { ...x, approved: true } : x)),
+        );
+        return;
+      }
+      if (promptedIdsRef.current.has(p.id)) return;
+      promptedIdsRef.current.add(p.id);
+      setJoinPopupQueue((prev) => (prev.includes(p.id) ? prev : [...prev, p.id]));
+    });
+    // `friends` i deps: hostFriendsRef är en ref (triggar ingen re-run) —
+    // mount-load:en sätter ref + setFriends ihop, så deps-membern garanterar
+    // att watchern körs om när listan blir laddad även om players[] inte
+    // ändrats sedan dess (joiner som hann in före loadFriends-resolven).
+  }, [players, hostMode, spotifyEnabled, lobbyPeerHealth, friends]);
+
   // Driver "Waiting for approval"-mellansteget för non-host. När host inte
   // har godkänt mig än ska jag inte se lobby:n överhuvudtaget — bara en
   // status-skärm. Polling-effekten ovan plockar upp host:s approve-toggle
@@ -2728,8 +2868,8 @@ export default function LobbyScreen() {
     // guests manuellt. De måste joina med sitt eget registrerade konto.
     if (gameMode === 'individual-devices' && !singlePlayerDefault) {
       Alert.alert(
-        'Registered accounts required',
-        "Individual device games can't include guest players. Ask players to join with their own registered QuizVibe account, or switch game mode.",
+        'Own device required',
+        "Players can't be added manually in Individual device games — every player needs their own device. Ask them to join with the room code instead, or switch game mode.",
       );
       return;
     }
@@ -2761,13 +2901,16 @@ export default function LobbyScreen() {
       },
     ]);
   };
-  const handleSetApproved = (id: string, approved: boolean) => {
+  // Returnerar true när approve-ändringen applicerades, false när en guard
+  // blockerade (Alert visad). Join-popup-handlers använder returvärdet för
+  // att hålla popupen öppen vid guard-block; ApproveToggle-sites ignorerar det.
+  const handleSetApproved = (id: string, approved: boolean): boolean => {
     if (approved && lobbyPeerHealth[id] === 'unstable') {
       Alert.alert(
         'Connection unstable',
         'This player has an unstable connection. Wait for it to stabilize before approving them.',
       );
-      return;
+      return false;
     }
     // Check 3: Spotify är aktiverat och spelaren saknar Spotify-attest.
     if (approved && spotifyEnabled) {
@@ -2777,10 +2920,15 @@ export default function LobbyScreen() {
           'No Spotify confirmed',
           'This player has not confirmed the Spotify app. Either ask the player to confirm Spotify in their settings row, or switch off Spotify DJ in Source Dashboard to approve the player.',
         );
-        return;
+        return false;
       }
     }
+    // Registrera host-intent så friend-auto-approve-watchern inte tyst
+    // re-approvar en friend som host medvetet togglat till waiting.
+    if (approved) hostUnapprovedIdsRef.current.delete(id);
+    else hostUnapprovedIdsRef.current.add(id);
     setPlayers((prev) => prev.map((p) => p.id === id ? { ...p, approved } : p));
+    return true;
   };
 
   // D-vii auto-un-approve: när en non-host:s peerHealth transitionerar
@@ -2794,12 +2942,39 @@ export default function LobbyScreen() {
       if (health !== 'unstable') return;
       const player = players.find((p) => p.id === playerId);
       if (!player || player.isHost || !player.approved) return;
+      // Registrera som host-intent — dokumenterad D-vii-semantik är att
+      // host manuellt re-approvar när uppkopplingen är stable igen; utan
+      // detta skulle friend-auto-approve-watchern tyst re-approva friends
+      // så fort peerHealth blir stable.
+      hostUnapprovedIdsRef.current.add(playerId);
       // Idempotent: setPlayers no-op:ar när raden redan är unapproved.
       setPlayers((prev) =>
         prev.map((p) => (p.id === playerId ? { ...p, approved: false } : p)),
       );
     });
   }, [lobbyPeerHealth, hostMode, gameMode, players]);
+
+  // Delad eject-body: används av trash-flowet (efter confirm-Alert) och av
+  // join-popupens Deny (utan extra confirm — popupen ÄR beslutet).
+  const ejectPlayer = (id: string) => {
+    // 1. Markera ejected i in-memory store så non-host:s lokala
+    //    polling-detektion fortfarande triggar popupen (för spelare
+    //    på SAMMA device, t.ex. simulator-multi-instance-test).
+    markEjected(roomCode, id);
+    // 2. Filter bort raden från host:s local state.
+    setPlayers((prev) => prev.filter((p) => p.id !== id));
+    // 3. DELETE raden från lobby_players-DB:n. Realtime DELETE-event
+    //    broadcastas till non-host:s subscription → triggar Device B:s
+    //    eject-popup cross-device. Fire-and-forget.
+    supabase
+      .from('lobby_players')
+      .delete()
+      .eq('room_code', roomCode)
+      .eq('player_id', id)
+      .then(({ error }) => {
+        if (error) console.warn('[lobbyPlayers] eject delete failed:', error.message);
+      });
+  };
 
   // Papperskorg-flow: bara host kan radera, bara på waiting-spelare.
   // Visar confirm-popup; vid bekräftelse filtreras spelaren bort ur
@@ -2811,32 +2986,51 @@ export default function LobbyScreen() {
       'Are you sure you want to delete this Player from this Lobby?',
       [
         { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: () => {
-            // 1. Markera ejected i in-memory store så non-host:s lokala
-            //    polling-detektion fortfarande triggar popupen (för spelare
-            //    på SAMMA device, t.ex. simulator-multi-instance-test).
-            markEjected(roomCode, id);
-            // 2. Filter bort raden från host:s local state.
-            setPlayers((prev) => prev.filter((p) => p.id !== id));
-            // 3. DELETE raden från lobby_players-DB:n. Realtime DELETE-event
-            //    broadcastas till non-host:s subscription → triggar Device B:s
-            //    eject-popup cross-device. Fire-and-forget.
-            supabase
-              .from('lobby_players')
-              .delete()
-              .eq('room_code', roomCode)
-              .eq('player_id', id)
-              .then(({ error }) => {
-                if (error) console.warn('[lobbyPlayers] eject delete failed:', error.message);
-              });
-          },
-        },
+        { text: 'Delete', style: 'destructive', onPress: () => ejectPlayer(id) },
       ],
     );
   };
+
+  // ── Join-approval-popup handlers (host) ───────────────────────────────
+  // Aktuell popup-spelare = första id i kön som fortfarande är kvar,
+  // aktiv och unapproved — stale entries (approvade via toggle, lämnade)
+  // auto-skippas via derivationen + watcher-effektens kö-prune.
+  const joinPopupPlayer =
+    players.find(
+      (p) => p.id === joinPopupQueue[0] && !p.hasLeft && !p.approved,
+    ) ?? null;
+  const advanceJoinPopup = () => setJoinPopupQueue((prev) => prev.slice(1));
+  const handleJoinPopupApprove = () => {
+    if (!joinPopupPlayer) return;
+    // Guard-block (peer health / Spotify) → Alert visas och popupen står
+    // kvar så host fortfarande kan välja Deny/Later.
+    if (handleSetApproved(joinPopupPlayer.id, true)) advanceJoinPopup();
+  };
+  const handleJoinPopupApproveAndFriend = () => {
+    if (!joinPopupPlayer) return;
+    const p = joinPopupPlayer;
+    if (!handleSetApproved(p.id, true)) return;
+    advanceJoinPopup();
+    // Fire-and-forget: addFriend dedupar case-insensitive på playerName.
+    // Reverse emoji→avatarId-lookup (emojis är unika i AVATARS-listan);
+    // guest-emoji 👤 saknas där → undefined, vilket är OK för Friend-shapen.
+    const avatarId = AVATARS.find((a) => a.emoji === p.emoji)?.id;
+    addFriend(p.name, avatarId)
+      .then((updated) => {
+        hostFriendsRef.current = updated;
+        setFriends(updated);
+      })
+      .catch(() => { /* friends-skrivning loggas i friendsStorage */ });
+  };
+  const handleJoinPopupDeny = () => {
+    if (!joinPopupPlayer) return;
+    ejectPlayer(joinPopupPlayer.id);
+    advanceJoinPopup();
+  };
+  // Later: spelaren ligger kvar i "To be Approved by Host"-listan för
+  // manuell approve via ApproveToggle:n; id:t stannar i promptedIdsRef så
+  // ingen re-prompt-loop uppstår.
+  const handleJoinPopupLater = () => advanceJoinPopup();
   const handleApproveAll = () => {
     // Check 4: Spotify är aktiverat och några waiting-spelare saknar Spotify-attest.
     if (spotifyEnabled) {
@@ -3002,6 +3196,7 @@ export default function LobbyScreen() {
     setShareModalOpen(true);
     const list = await loadFriends();
     setFriends(list);
+    hostFriendsRef.current = list;
   };
 
   // Lägg till en QuizVibe friend direkt från Share invite-modalen. Speglar
@@ -3013,6 +3208,9 @@ export default function LobbyScreen() {
     if (!newFriendPlayerName.trim()) return;
     const updated = await addFriend(newFriendPlayerName);
     setFriends(updated);
+    // Håll auto-approve-listan i sync så en nyligen tillagd friend som
+    // joinar direkt efteråt auto-approvas utan popup.
+    hostFriendsRef.current = updated;
     setNewFriendPlayerName('');
   };
 
@@ -3333,6 +3531,22 @@ export default function LobbyScreen() {
       supabase.removeChannel(channel);
     };
   }, [hostMode, roomCode]);
+
+  // Host: ladda friends-listan vid mount så join-watcher-effekten kan
+  // auto-approva joiners som redan är friends. Speglas även in i `friends`-
+  // state så Share-modalen visar samma lista utan extra load.
+  useEffect(() => {
+    if (!hostMode) return;
+    let cancelled = false;
+    loadFriends().then((list) => {
+      if (cancelled) return;
+      hostFriendsRef.current = list;
+      setFriends(list);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [hostMode]);
 
   // Realtime-channel (host): detekterar nya joiners via INSERT-event på
   // lobby_players. När en joiner INSERT:ar sin rad fyrar Realtime → host
@@ -4036,16 +4250,16 @@ export default function LobbyScreen() {
     // där, gateas bort. Host:s egen status är aldrig 'unstable' i
     // map:en (self exkluderas från useLobbyPeerHealth-returvärdet).
     if (gameMode === 'individual-devices') {
-      // Individual device kräver registrerade konton för alla — guests
-      // (självanslutna eller host-tillagda) får inte vara med. Defensiv guard
-      // ifall en guest hann joina via kod efter mode-bytet.
+      // IndDev: host-tillagda guests saknar egen enhet och kan inte spela.
+      // Självanslutna guests är OK (egen enhet, policy 2026-08-06). Defensiv
+      // guard ifall en host-tillagd guest överlevt mode-bytet.
       const guestPlayer = approvedPlayers.find(
-        (p) => !p.isHost && !p.hasLeft && p.type !== 'registered',
+        (p) => !p.isHost && !p.hasLeft && p.addedByHost,
       );
       if (guestPlayer) {
         Alert.alert(
-          'Registered accounts required',
-          `Individual device games require every player to have a registered QuizVibe account. Remove ${guestPlayer.name} (guest) or switch game mode before starting.`,
+          'Own device required',
+          `${guestPlayer.name} was added by the Host and has no device of their own. Remove them or switch game mode before starting an Individual device game.`,
         );
         return;
       }
@@ -4823,7 +5037,7 @@ export default function LobbyScreen() {
                   onPress={() =>
                     Alert.alert(
                       'Multiplayer mode',
-                      'Pass-the-Phone: All players share one device. Max 4 players, even with Premium. Spotify not applicable for PtP mode.\n\nIndividual device: Each player uses their own device — registered QuizVibe accounts only. Max 4 players on Basic, max 12 players with Premium.',
+                      'Pass-the-Phone: All players share one device. Max 4 players, even with Premium. Spotify not applicable for PtP mode.\n\nIndividual device: Each player uses their own device. Max 4 players on Basic, max 12 players with Premium.',
                     )
                   }
                   hitSlop={8}
@@ -4947,6 +5161,49 @@ export default function LobbyScreen() {
                 stöds i aktuellt game mode (IndDev = grön "Enabled",
                 PtP/Single = grå "Disabled" + toggle utgråad). */}
             <View style={{ backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: Radius.sm, marginBottom: Spacing.xs, paddingBottom: spotifyEnabled ? 6 : 0 }}>
+            {/* Attest-kontroll ("I have Spotify app..." + switch) — egen rad
+                ÖVERST i boxen, ovanför ikon/rubrik-raden, synlig i BÅDA
+                attest-lägen. Switchen är controlled på spotifyConnected:
+                ON → handleConnectSpotify, OFF → handleDisconnectSpotify
+                (Cancel i disconnect-alerten lämnar den kvar i ON). Grå ram
+                runt text + switch så de läses som EN kontroll. */}
+            {/* marginRight: 28 + paddingRight: 4 → attest-switchens högerkant
+                hamnar 32px från boxkanten = samma kolumn som DJ-switchen i
+                rubrikraden (spotifyDJRow paddingRight 18 + controls margin 14).
+                Texten flex: 1 skjuter switchen mot ramens högerkant. */}
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 4,
+                marginLeft: Spacing.sm,
+                marginRight: spotifyAttestMR,
+                marginTop: 6,
+                borderWidth: 1,
+                // Ramfärg speglar attest-läget: grön = Yes, röd = No.
+                borderColor: spotifyConnected ? Colors.success : Colors.error,
+                borderRadius: Radius.sm,
+                paddingLeft: Spacing.sm,
+                // Smal höger-padding (2) — vid 4 slog attest-marginalens
+                // 0-golv i på 390pt-skärmar och switchen fastnade ~2pt vänster.
+                paddingRight: 2,
+                paddingVertical: 2,
+              }}
+            >
+              <Text
+                style={[styles.spotifyLinkText, { color: Colors.textPrimary, fontSize: FontSize.sm, flex: 1, textDecorationLine: 'none' }]}
+              >
+                I have Spotify App on this device
+              </Text>
+              <Switch
+                value={spotifyConnected}
+                onValueChange={(v) => (v ? handleConnectSpotify() : handleDisconnectSpotify())}
+                trackColor={{ false: '#3C3C3C', true: '#1DB954' }}
+                thumbColor="#FFF"
+                ios_backgroundColor={spotifyConnected ? '#1DB954' : '#3C3C3C'}
+                style={styles.sourceMatrixSwitch}
+              />
+            </View>
             <View style={[styles.spotifyDJRow, { backgroundColor: undefined, borderRadius: undefined, marginBottom: 0 }]}>
               <View style={[styles.connectionIconWrap, { alignSelf: 'flex-start', marginTop: 0, marginLeft: -2 }]}>
                 {/* variant="white" — mörk kortbakgrund kräver monokrom vit
@@ -4961,7 +5218,11 @@ export default function LobbyScreen() {
                     onPress={() =>
                       Alert.alert(
                         'Spotify',
-                        '• Only applicable in Individual Devices mode\n\n• For Spotify music, one player at a time (the DJ) will be directed via QuizVibe to Spotify\n\n• The DJ needs the Spotify app on their device — free or Premium (Premium recommended: Spotify Free may play ads and may not always play the exact track)',
+                        '• Only applicable in Individual Devices mode\n\n• For Spotify music, one player at a time (the DJ) will be directed via QuizVibe to Spotify\n\n• The DJ needs the Spotify app on their device — free or Premium',
+                        [
+                          { text: 'Guide How it works', onPress: () => setSpotifyGuideVisible(true) },
+                          { text: 'Close', style: 'cancel' },
+                        ],
                       )
                     }
                     hitSlop={8}
@@ -4971,42 +5232,20 @@ export default function LobbyScreen() {
                   </Pressable>
                 </View>
                 {/* Spotify self-attest (Plan B 2026-07-22): bekräfta/ta bort
-                    "jag har Spotify-appen" — ersätter OAuth-connect-länken. */}
-                {spotifyConnected ? (
-                  <Pressable
-                    onPress={handleDisconnectSpotify}
-                    hitSlop={8}
-                    style={({ pressed }) => [{ opacity: pressed ? 0.7 : 1 }]}
-                  >
-                    <Text style={[styles.spotifyConnectedLabel, { textDecorationLine: 'underline' }]}>
-                      ✓ Spotify user
-                    </Text>
-                  </Pressable>
-                ) : (
-                  <>
-                    <Text style={styles.spotifyNoConnectionLabel}>
-                      {'Not confirmed / '}
-                      <Text
-                        style={styles.spotifyGuideLinkText}
-                        onPress={() => setSpotifyGuideVisible(true)}
-                      >
-                        Guide How it works
-                      </Text>
-                    </Text>
-                    <Pressable
-                      onPress={handleConnectSpotify}
-                      hitSlop={8}
-                      style={({ pressed }) => [{ opacity: pressed ? 0.7 : 1 }]}
-                    >
-                      <Text style={[styles.spotifyLinkText, { color: '#1DB954', fontSize: FontSize.sm, marginTop: 2 }]}>
-                        I have the Spotify app
-                      </Text>
-                    </Pressable>
-                  </>
-                )}
+                    "jag har Spotify-appen" via attest-switchen ÖVERST i boxen.
+                    Även självanslutna guests får attesta (policy 2026-08-06:
+                    de har egen enhet och får spela IndDev + Spotify).
+                    Ingen status-text — attest-switchens läge bär statusen.
+                    Guide-länken nås via info-ikonens popup ("Guide How it
+                    works"-knappen). */}
               </View>
               {hostMode ? (
-                <View style={[styles.spotifyHostControls, { marginRight: spotifyConnected ? 14 : -16, alignSelf: 'flex-start', marginTop: 1, gap: 4 }]}>
+                // Konstant marginRight (14) — växlade tidigare 14/-16 på
+                // attest-state vilket fick DJ-switchen att "hoppa" 30px när
+                // attest-switchen slogs på/av. Pillen dyker upp till VÄNSTER
+                // om switchen (radens högerkant ligger fast) så switchens
+                // position är stabil i båda lägen.
+                <View style={[styles.spotifyHostControls, { marginRight: spotifySwitchMR, alignSelf: 'flex-start', marginTop: 1, gap: 4 }]}>
                   {/* Availability-pill: visas bara när Spotify är kopplat — annars tar pillen för mycket horisontellt utrymme och "Not activated"-texten tvingas ned på ny rad */}
                   {spotifyConnected && (
                     <View style={[
@@ -5038,7 +5277,7 @@ export default function LobbyScreen() {
                 </View>
               ) : (
                 /* Non-host: read-only switch speglar host:s spotifyEnabled-val */
-                <View style={{ marginRight: 14, alignSelf: 'flex-start', marginTop: 1 }}>
+                <View style={{ marginRight: spotifySwitchMR, alignSelf: 'flex-start', marginTop: 1 }}>
                   <Switch
                     value={spotifyEnabled}
                     disabled
@@ -5053,8 +5292,13 @@ export default function LobbyScreen() {
 
             {/* ── Spotify answer type toggles (synliga bara när Spotify är aktiverat) ── */}
             {spotifyEnabled && (
-              <View style={{ flexDirection: 'row', alignItems: 'center', paddingRight: 18, paddingTop: 2, paddingBottom: 2 }}>
-                <View style={{ marginLeft: 'auto', marginRight: spotifyConnected ? 14 : -16, flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              // paddingLeft: 34 = samma x som "Spotify"-rubriken ovanför
+              // (8 row-padding − 2 ikon-margin + 28 ikon + 8 gap − 8
+              // kolumn-margin). "Type:" pinnas vänster; switch-gruppen
+              // behåller höger-ankring via marginLeft: 'auto'.
+              <View style={{ flexDirection: 'row', alignItems: 'center', paddingLeft: 34, paddingRight: 18, paddingTop: 2, paddingBottom: 2 }}>
+                <Text style={{ fontSize: FontSize.sm, fontWeight: FontWeight.medium, color: Colors.textSecondary }}>Type:</Text>
+                <View style={{ marginLeft: 'auto', marginRight: spotifySwitchMR, flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                     <Text style={{ fontSize: FontSize.sm, fontWeight: FontWeight.medium, color: Colors.textSecondary }}>Year</Text>
                     <Switch
@@ -5105,7 +5349,9 @@ export default function LobbyScreen() {
             <View
               style={styles.smGrid}
               onLayout={(e) => {
-                const w = Math.round((e.nativeEvent.layout.width - 112) / 3);
+                const fullW = e.nativeEvent.layout.width;
+                if (fullW > 0 && fullW !== smGridW) setSmGridW(fullW);
+                const w = Math.round((fullW - 112) / 3);
                 if (w > 0 && w !== smColWidth) setSmColWidth(w);
               }}
             >
@@ -5200,14 +5446,20 @@ export default function LobbyScreen() {
               </View>
 
               {/* ── Athletes kolumn-stack ── */}
-              <View style={[styles.smDataStack, styles.sourceMatrixColSep]}>
+              <View
+                style={[styles.smDataStack, styles.sourceMatrixColSep]}
+                onLayout={(e) => setSportStackX(e.nativeEvent.layout.x)}
+              >
                 <View style={[styles.smHeaderCell, smCellStyle]}>
                   <Text style={styles.sourceMatrixHeaderText}>Sport</Text>
                 </View>
                 <View style={[styles.smAllToggleCell, smCellStyle, styles.smDataShift, { borderTopRightRadius: Radius.sm, borderBottomRightRadius: Radius.sm }]}>
                   <Switch value={athletesAllOn} onValueChange={hostMode ? handleToggleAthletesColumn : undefined} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={athletesAllOn ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, isGuestHost && { opacity: 0.45 }]} />
                 </View>
-                <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
+                <View
+                  onLayout={(e) => setSportCellCenter(e.nativeEvent.layout.x + e.nativeEvent.layout.width / 2)}
+                  style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}
+                >
                   <Switch value={youtubeEnabledCategories.includes('Sport')} onValueChange={handleToggleAthletesYoutube} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={youtubeEnabledCategories.includes('Sport') ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, isGuestHost && { opacity: 0.45 }]} />
                 </View>
                 <View style={[styles.smAutoCell, smCellStyle]} />
@@ -6572,6 +6824,98 @@ export default function LobbyScreen() {
         </View>
       </Modal>
 
+      {/* ── Join-approval-popup (host) ────────────────────────────────
+          Visas automatiskt när en ny unapproved joiner upptäcks (via
+          watcher-effekten på players[]). En modal åt gången — kön i
+          joinPopupQueue shiftas av varje action. "Approve + Add to
+          Friend list" bara för registrerade joiners (guest-namn är
+          efemära) och aldrig för guest host (ingen friends-lista).
+          Backdrop/Android-back = Later (spelaren ligger kvar i "To be
+          Approved by Host"-listan). */}
+      <Modal
+        visible={hostMode && !!joinPopupPlayer}
+        transparent
+        animationType="fade"
+        onRequestClose={handleJoinPopupLater}
+      >
+        <View style={styles.noApprovedOverlay}>
+          <Pressable
+            style={styles.guestLeaveBackdrop}
+            onPress={handleJoinPopupLater}
+          />
+          {joinPopupPlayer && (
+            <View style={styles.noApprovedCard}>
+              <View style={styles.joinApprovalHeader}>
+                <View style={styles.joinApprovalAvatar}>
+                  {joinPopupPlayer.avatarUri ? (
+                    <Image
+                      source={{ uri: joinPopupPlayer.avatarUri }}
+                      style={styles.joinApprovalAvatarImg}
+                    />
+                  ) : (
+                    <Text style={styles.joinApprovalAvatarEmoji}>
+                      {joinPopupPlayer.emoji ?? '👤'}
+                    </Text>
+                  )}
+                </View>
+                <Text style={styles.joinApprovalName} numberOfLines={1}>
+                  {joinPopupPlayer.name}
+                </Text>
+              </View>
+              <Text style={styles.noApprovedMessage}>
+                wants to join this lobby
+                {joinPopupQueue.length > 1
+                  ? ` · +${joinPopupQueue.length - 1} more waiting`
+                  : ''}
+              </Text>
+
+              {joinPopupPlayer.type === 'registered' && !isGuestHost && (
+                <Pressable
+                  style={({ pressed }) => [
+                    styles.noApprovedBtn,
+                    pressed && { opacity: 0.85 },
+                  ]}
+                  onPress={handleJoinPopupApproveAndFriend}
+                >
+                  <Text style={styles.noApprovedBtnText}>
+                    Approve + Add to Friend list
+                  </Text>
+                </Pressable>
+              )}
+
+              <Pressable
+                style={({ pressed }) => [
+                  styles.noApprovedBtn,
+                  pressed && { opacity: 0.85 },
+                ]}
+                onPress={handleJoinPopupApprove}
+              >
+                <Text style={styles.noApprovedBtnText}>Approve</Text>
+              </Pressable>
+
+              <Pressable
+                style={({ pressed }) => [
+                  styles.joinApprovalDenyBtn,
+                  pressed && { opacity: 0.85 },
+                ]}
+                onPress={handleJoinPopupDeny}
+              >
+                <Text style={styles.joinApprovalDenyText}>
+                  Deny — remove from lobby
+                </Text>
+              </Pressable>
+
+              <Pressable
+                style={styles.guestLeaveCancelBtn}
+                onPress={handleJoinPopupLater}
+              >
+                <Text style={styles.guestLeaveCancelText}>Later</Text>
+              </Pressable>
+            </View>
+          )}
+        </View>
+      </Modal>
+
       {/* ── Deleting-lobby loading-overlay ────────────────────────────
           Visar processing-feedback under tiden mellan host:s Yes-
           konfirmation och navigation till Home. cancelable:false så
@@ -6613,7 +6957,7 @@ export default function LobbyScreen() {
               <View style={styles.spotifyGuideStep}>
                 <Text style={styles.spotifyGuideStepNumber}>1</Text>
                 <Text style={styles.spotifyGuideStepText}>
-                  Have the Spotify app installed on your device — free or Premium (Premium recommended: Spotify Free may play ads and may not always play the exact track)
+                  Have the Spotify app installed on your device — free or Premium
                 </Text>
               </View>
               <View style={styles.spotifyGuideStep}>
@@ -6799,6 +7143,55 @@ const styles = StyleSheet.create({
   },
   noApprovedBtnTextDisabled: {
     color: Colors.textDisabled,
+  },
+
+  // Join-approval-popup — delar overlay/card/knapp-vokabulär med
+  // noApproved-dialogen ovan. Header = avatar-cirkel + joiner-namn;
+  // Deny-knappen är en röd outline-variant av noApprovedBtn.
+  joinApprovalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.sm,
+  },
+  joinApprovalAvatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: Colors.cardElevated,
+    borderWidth: 1,
+    borderColor: Colors.primaryBorder,
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  joinApprovalAvatarImg: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+  },
+  joinApprovalAvatarEmoji: {
+    fontSize: 22,
+  },
+  joinApprovalName: {
+    flexShrink: 1,
+    fontSize: 17,
+    fontWeight: '700',
+    color: Colors.textPrimary,
+  },
+  joinApprovalDenyBtn: {
+    height: 52,
+    borderRadius: Radius.md,
+    backgroundColor: 'transparent',
+    borderWidth: 1.5,
+    borderColor: Colors.error,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  joinApprovalDenyText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.error,
   },
 
   // Deleting-lobby loading-overlay — täcker hela skärmen med dimmad

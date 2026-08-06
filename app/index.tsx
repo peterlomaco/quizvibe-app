@@ -9,7 +9,7 @@ import { getAvatarEmojiById } from '@/src/utils/avatars';
 import { clearLeftPlayers } from '@/src/utils/leftPlayers';
 import { clearEjected } from '@/src/utils/ejectedPlayers';
 import { clearLobbyPlayers, getLobbyPlayers } from '@/src/utils/mockLobbyPlayers';
-import { clearLobbySettings, getLobbySettings } from '@/src/utils/mockLobbySettings';
+import { clearLobbySettings } from '@/src/utils/mockLobbySettings';
 import { clearGameStarted } from '@/src/utils/mockStartedGames';
 import { getRoomMeta, isActiveRoom, isLobbyFull, isOwnLobby, registerActiveRoom } from '@/src/utils/mockActiveRooms';
 import {
@@ -612,17 +612,10 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
       );
       return;
     }
-    // Individual device-spel kräver registrerat QuizVibe-konto för alla —
-    // guests kan inte joina. Blocka redan här på Home innan navigation.
-    const roomSettings = await getLobbySettings(code);
-    if (roomSettings?.gameMode === 'individual-devices') {
-      Alert.alert(
-        'Registered account required',
-        "This is an Individual device game. Guests can't join — register or log in to play on your own device.",
-      );
-      return;
-    }
-    // Spotify pre-join-gate borttagen (Plan B 2026-07-22): inget konto krävs —
+    // IndDev-blocket för självanslutna guests borttaget (policy 2026-08-06):
+    // guests med egen enhet får joina IndDev-lobbies. Endast host-TILLAGDA
+    // guests är blockerade från IndDev (de saknar enhet) — enforcas i Lobby.
+// Spotify pre-join-gate borttagen (Plan B 2026-07-22): inget konto krävs —
     // guests kan self-attesta Spotify i lobbyn. (Spotify DJ är dessutom
     // IndDev-only, så guest-fallet fångas redan av IndDev-blocket ovan.)
     // Own-lobby-check: jämför mot guestName (identiteten användaren joinar

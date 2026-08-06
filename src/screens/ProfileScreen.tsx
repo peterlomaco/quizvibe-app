@@ -1405,7 +1405,7 @@ export default function ProfileScreen() {
                     onPress={() =>
                       Alert.alert(
                         'Multiplayer mode',
-                        'Pass-the-Phone: All players share one device. Max 4 players, even with Premium. Spotify not applicable for PtP mode.\n\nIndividual device: Each player uses their own device — registered QuizVibe accounts only. Max 4 players on Basic, max 12 players with Premium.',
+                        'Pass-the-Phone: All players share one device. Max 4 players, even with Premium. Spotify not applicable for PtP mode.\n\nIndividual device: Each player uses their own device. Max 4 players on Basic, max 12 players with Premium.',
                       )
                     }
                     hitSlop={8}
@@ -1503,7 +1503,10 @@ export default function ProfileScreen() {
                   <Text style={[styles.connectionLabel, { minWidth: 0 }]}>Spotify</Text>
                   <Pressable
                     style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                    onPress={() => Alert.alert('Spotify', '• Only applicable in Individual Devices mode\n\n• For Spotify music, one player at a time (the DJ) will be directed via QuizVibe to Spotify\n\n• The DJ needs the Spotify app on their device — free or Premium (Premium recommended: Spotify Free may play ads and may not always play the exact track)')}
+                    onPress={() => Alert.alert('Spotify', '• Only applicable in Individual Devices mode\n\n• For Spotify music, one player at a time (the DJ) will be directed via QuizVibe to Spotify\n\n• The DJ needs the Spotify app on their device — free or Premium', [
+                      { text: 'Guide How it works', onPress: () => setSpotifyGuideVisible(true) },
+                      { text: 'Close', style: 'cancel' },
+                    ])}
                     hitSlop={8}
                   >
                     <Text style={styles.infoIconText}>i</Text>
@@ -1524,14 +1527,8 @@ export default function ProfileScreen() {
                     style={styles.sourceMatrixSwitch}
                   />
                 </View>
-                <Text style={styles.spotifyNoConnectionLabel}>
-                  <Text
-                    style={styles.spotifyGuideLinkText}
-                    onPress={() => setSpotifyGuideVisible(true)}
-                  >
-                    Guide How Spotify DJ works
-                  </Text>
-                </Text>
+                {/* Guide-länken nås via info-ikonens popup ("Guide How it
+                    works"-knappen) — inline-länken borttagen 2026-08-06. */}
               </View>
               {/* Toggle — disabled när ej kopplat */}
               <View style={[styles.spotifyHostControls, { marginRight: -16, alignSelf: 'flex-start', marginTop: 1 }]}>
@@ -1547,7 +1544,10 @@ export default function ProfileScreen() {
               </View>
             </View>
             {spotifyEnabled && (
-              <View style={{ flexDirection: 'row', alignItems: 'center', paddingRight: 18, paddingTop: 2, paddingBottom: 2 }}>
+              // paddingLeft: 34 = samma x som "Spotify"-rubriken ovanför
+              // (speglar Lobbys Type:-rad).
+              <View style={{ flexDirection: 'row', alignItems: 'center', paddingLeft: 34, paddingRight: 18, paddingTop: 2, paddingBottom: 2 }}>
+                <Text style={{ fontSize: FontSize.sm, fontWeight: FontWeight.medium, color: Colors.textSecondary }}>Type:</Text>
                 <View style={{ marginLeft: 'auto', marginRight: -16, flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                     <Text style={{ fontSize: FontSize.sm, fontWeight: FontWeight.medium, color: Colors.textSecondary }}>Year</Text>
@@ -2783,7 +2783,7 @@ export default function ProfileScreen() {
               <View style={styles.spotifyGuideStep}>
                 <Text style={styles.spotifyGuideStepNumber}>1</Text>
                 <Text style={styles.spotifyGuideStepText}>
-                  Have the Spotify app installed on your device — free or Premium (Premium recommended: Spotify Free may play ads and may not always play the exact track)
+                  Have the Spotify app installed on your device — free or Premium
                 </Text>
               </View>
               <View style={styles.spotifyGuideStep}>

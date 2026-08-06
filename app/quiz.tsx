@@ -4257,10 +4257,12 @@ export default function QuizScreen() {
     // ev. pre-seeded matchande rad → race ger duplicate-row.
     let carryOverPlayers: LobbyPlayer[];
     if (reusePlayers) {
-      // Behåll alla spelare från detta spel. Non-hosts får `approved:
-      // false` så de hamnar i "To be approved by Host"-listan i nya
-      // lobbyn — host måste re-approva dem innan nästa Start Game.
-      // Host själv är alltid implicit approved.
+      // Behåll alla spelare från detta spel. ALLA carry-over-spelare
+      // (friends eller ej) auto-approvas i nya lobbyn — de var redan
+      // godkända i spelet som just avslutades, så ingen re-approval
+      // behövs (Peter-beslut 2026-08-06). LobbyScreen:s code-only-join
+      // matchar med approved=true på carry-over-branchen så joiner:s
+      // egen upsert inte clobbar.
       carryOverPlayers = allPlayers.map((p) => {
         const turnEntry = turnOrder.find((t) => t.id === p.id);
         // type carry:as från turnOrder (LobbyScreen skickar med den sedan
@@ -4288,7 +4290,7 @@ export default function QuizScreen() {
                 : 'standard',
           hcpComplete: true,
           isHost: p.isHost ?? false,
-          approved: !!p.isHost,
+          approved: true,
           spotifyConnected: turnEntry?.spotifyConnected ?? false,
         };
       });
