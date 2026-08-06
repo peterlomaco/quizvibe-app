@@ -4721,77 +4721,9 @@ export default function LobbyScreen() {
           </>)}
         </View>
 
-        {/* Top-spacer för non-host: delar utrymmet lika ovan/nedan waiting-sektionen */}
-        {!hostMode && <View style={{ flex: 1 }} />}
-
-        {/* Start Game + Customize-rubrik wrappad i en enda View så ScrollViewns
-            gap: Spacing.xl bara appliceras EN gång mot Players-blocket ovanför,
-            inte per delElement. */}
-        <View style={{ gap: 0 }}>
-          {/* ── Start game ────────────────────────────────────────
-              Host-only — non-host kan inte trigga spelstart. När backend
-              kommer in pushas alla godkända spelare in i quizet via socket-
-              event som host:s Start Game-tap fyrar. */}
-          {hostMode && (
-            <View style={styles.startSection}>
-              {/* Yttre + inre ring, label och logo samlade i en wrap */}
-              <Animated.View
-                style={[styles.startGameWrap, { transform: [{ scale: startPulse }] }]}
-              >
-                {/* Yttre ring */}
-                <View style={styles.startGameRingOuter} pointerEvents="none" />
-                {/* Inre ring */}
-                <View style={styles.startGameRingInner} pointerEvents="none" />
-                {/* "Start Game"-label innanför ringarna */}
-                <View style={styles.startGameLabelRow}>
-                  <BlinkingLabel style={styles.startGameLabelText}>Start Game</BlinkingLabel>
-                </View>
-                <Animated.View
-                  style={[styles.startGameHalo, { opacity: startGlow }]}
-                  pointerEvents="none"
-                />
-                <TouchableOpacity
-                  activeOpacity={0.85}
-                  onPress={() => handleStartGame()}
-                  style={styles.startGameLogoTouch}
-                >
-                  <QuizVibePlayLogo size={140} color={Colors.warning} />
-                </TouchableOpacity>
-              </Animated.View>
-            </View>
-          )}
-
-          {/* Non-host: status-ruta i samma layout-position som host:s
-              Start Game-knapp. Sekventiella prickar signalerar att appen
-              lever och väntar på host:ens spelstart. Gold-glowing visuellt
-              språk speglar host:s Start Game-knapp så båda roller har samma
-              "ready"-vibe i CTA-positionen. */}
-          {!hostMode && (
-            <View style={styles.startSection}>
-              <View style={styles.startGameLabelRow}>
-                <Text style={[styles.startGameLabelText, { color: Colors.textSecondary }]}>
-                  Waiting for Host to Start Game
-                </Text>
-                <SequentialDots color={Colors.warning} />
-              </View>
-              <Animated.View
-                style={[styles.startGameWrap, { transform: [{ scale: startPulse }] }]}
-              >
-                <Animated.View
-                  style={[styles.startGameHalo, { opacity: startGlow }]}
-                  pointerEvents="none"
-                />
-                <View style={styles.startGameLogoTouch} pointerEvents="none">
-                  <QuizVibePlayLogo size={140} color={Colors.warning} />
-                </View>
-              </Animated.View>
-            </View>
-          )}
-
-        </View>
-
-        {/* Bottom-spacer för non-host: lika stor som top-spacern → waiting-sektionen centreras */}
-        {!hostMode && <View style={{ flex: 1 }} />}
+        {/* Start Game-boxen ligger numera som sticky bottom-bar utanför
+            ScrollView:n (se efter </ScrollView>) så den alltid är synlig
+            under scroll. */}
 
         {/* ── Customize QuizVibe — kollapsbar, synlig för host OCH non-host ── */}
         <TouchableOpacity
@@ -6091,8 +6023,63 @@ export default function LobbyScreen() {
         <View style={styles.bottomPad} />
       </ScrollView>
 
-      {/* Scroll-hint-pil — guidar ner till Start Game-knappen. Samma som
-          quiz.tsx:s namn-fråge-pil (blink-puls, auto-göm vid botten). */}
+      {/* ── Start Game — sticky bottom-bar ──────────────────────────
+          Ligger utanför ScrollView:n så den alltid är synlig oavsett
+          scroll-position. Kompakt row-layout (label + play-logo på samma
+          rad, logo 64 istället för 140) så baren tar minimal höjd.
+          Host: tappbar → handleStartGame. Non-host: passiv väntetext med
+          samma gold-glowing visuella språk. */}
+      <View style={styles.startStickyBar}>
+        {/* Gul glödande yta som fyller hela baren runt Start Game-pillen.
+            Opaciteten pulsar via samma startGlow-loop som logo-halon så
+            hela bottenzonen andas i takt med CTA:n. */}
+        <Animated.View
+          style={[styles.startStickyBarGlow, { opacity: startGlow }]}
+          pointerEvents="none"
+        />
+        {hostMode ? (
+          <Animated.View
+            style={[styles.startGameCompactWrap, { transform: [{ scale: startPulse }] }]}
+          >
+            <TouchableOpacity
+              activeOpacity={0.85}
+              onPress={() => handleStartGame()}
+              style={styles.startGameCompactRow}
+            >
+              <BlinkingLabel style={styles.startGameCompactLabel}>Start Game</BlinkingLabel>
+              <View style={styles.startGameCompactLogoWrap}>
+                <Animated.View
+                  style={[styles.startGameCompactHalo, { opacity: startGlow }]}
+                  pointerEvents="none"
+                />
+                <QuizVibePlayLogo size={64} color={Colors.warning} />
+              </View>
+            </TouchableOpacity>
+          </Animated.View>
+        ) : (
+          <Animated.View
+            style={[styles.startGameCompactWrap, { transform: [{ scale: startPulse }] }]}
+          >
+            <View style={styles.startGameCompactRow} pointerEvents="none">
+              <View style={styles.startGameWaitTextWrap}>
+                <Text style={styles.startGameWaitText}>Waiting for Host to Start Game</Text>
+                <SequentialDots color={Colors.warning} />
+              </View>
+              <View style={styles.startGameCompactLogoWrap}>
+                <Animated.View
+                  style={[styles.startGameCompactHalo, { opacity: startGlow }]}
+                  pointerEvents="none"
+                />
+                <QuizVibePlayLogo size={64} color={Colors.warning} />
+              </View>
+            </View>
+          </Animated.View>
+        )}
+      </View>
+
+      {/* Scroll-hint-pil — guidar ner i lobby-innehållet. Samma som
+          quiz.tsx:s namn-fråge-pil (blink-puls, auto-göm vid botten).
+          bottom är höjd upp så pillen svävar OVANFÖR sticky Start Game-baren. */}
       {scrollHintScrollable && !scrollHintAtBottom && (
         <Animated.View
           style={[lobbyScrollHintStyles.wrap, { opacity: scrollHintOpacity }]}
@@ -6585,7 +6572,9 @@ export default function LobbyScreen() {
 const lobbyScrollHintStyles = StyleSheet.create({
   wrap: {
     position: 'absolute',
-    bottom: Spacing.lg,
+    // Sticky Start Game-baren är ~96 px hög — pillen placeras strax ovanför
+    // så den inte täcker Start Game-CTA:n.
+    bottom: 104,
     left: 0,
     right: 0,
     alignItems: 'center',
@@ -8399,6 +8388,88 @@ const styles = StyleSheet.create({
     fontWeight: FontWeight.bold,
     color: Colors.warning,
     letterSpacing: 0.5,
+  },
+
+  // ── Sticky Start Game-bar (kompakt) ─────────────────────────────
+  // Baren pinnas under ScrollView:n (sibling i SafeAreaView) så Start
+  // Game alltid är synlig. Row-layout med logo 64 håller höjden nere
+  // (~96 px totalt vs ~230 px för gamla stacked-layouten).
+  startStickyBar: {
+    position: 'relative',
+    borderTopWidth: 1,
+    borderTopColor: Colors.warning,
+    backgroundColor: Colors.background,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.sm,
+    alignItems: 'center',
+    // Gold-glow uppåt så baren "lyser" mot scroll-innehållet ovanför.
+    shadowColor: Colors.warning,
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.5,
+    shadowRadius: 12,
+    elevation: 10,
+  },
+  // Gul yta som täcker hela baren (bakom pillen). Animated opacity
+  // (startGlow 0.4 ↔ 0.85) ger pulserande glöd; pillen har egen mörk
+  // bg + guld-border så den förblir läsbar ovanpå.
+  startStickyBarGlow: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: Colors.warning,
+  },
+  startGameCompactWrap: {
+    borderRadius: 999,
+    borderWidth: 2,
+    borderColor: Colors.warning,
+    shadowColor: Colors.warning,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.6,
+    shadowRadius: 12,
+    elevation: 8,
+    backgroundColor: Colors.background,
+  },
+  startGameCompactRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.md,
+    paddingLeft: Spacing.xl,
+    paddingRight: Spacing.md,
+    paddingVertical: 4,
+  },
+  startGameCompactLabel: {
+    fontSize: 20,
+    fontWeight: FontWeight.bold,
+    color: Colors.warning,
+    letterSpacing: 0.5,
+  },
+  // Halo bara bakom logon (inte texten) så labeln förblir läsbar när
+  // glow-opaciteten pulsar upp mot 0.85.
+  startGameCompactLogoWrap: {
+    width: 64,
+    height: 64,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  startGameCompactHalo: {
+    position: 'absolute',
+    top: 10,
+    bottom: 10,
+    left: 10,
+    right: 10,
+    borderRadius: 999,
+    backgroundColor: Colors.warning,
+  },
+  startGameWaitTextWrap: {
+    flexShrink: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  startGameWaitText: {
+    flexShrink: 1,
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.bold,
+    color: Colors.textSecondary,
+    letterSpacing: 0.3,
   },
 
   waitingForHostText: {
