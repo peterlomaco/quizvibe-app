@@ -5,12 +5,12 @@ description: How QuizVibe collects, uses, and protects your information.
 
 # Privacy Policy
 
-**Last updated:** 2026-05-23
+**Last updated:** 2026-08-07
 **Effective date:** Upon app launch on the Apple App Store
 
 This Privacy Policy explains how **QuizVibe** ("we", "us", "the app") collects, uses, and protects your information when you use our mobile application. We've tried to write it in plain English with the legal anchor points clearly marked.
 
-QuizVibe is operated by **Peter Björklund**, an individual residing in Sweden. For any privacy-related questions or requests, contact us at: **infoquizvibe@gmail.com**.
+QuizVibe is operated by **Lomaco AB** (org. no. 559388-9511), a limited company (aktiebolag) registered in Sweden. For any privacy-related questions or requests, contact us at: **infoquizvibe@gmail.com**.
 
 ---
 
@@ -30,12 +30,12 @@ The rest of this document is the full version.
 
 | | |
 |---|---|
-| **Operator** | Peter Björklund, individual residing in Sweden |
+| **Operator** | Lomaco AB (org. no. 559388-9511), registered in Sweden |
 | **Contact email** | infoquizvibe@gmail.com |
 | **App name** | QuizVibe |
 | **Platforms** | Apple App Store (iOS) |
 
-We are not a registered company; QuizVibe is currently operated as a personal project. If this changes, we will update this policy and notify users via the app.
+Lomaco AB is the data controller for the personal data described in this policy. If our company information changes, we will update this policy and notify users via the app.
 
 For data protection requests, complaints, or questions about how we handle your information, email us at infoquizvibe@gmail.com. We aim to respond within 30 days as required by GDPR Article 12.
 
@@ -138,7 +138,7 @@ GitHub's Privacy Policy: https://docs.github.com/en/site-policy/privacy-policies
 | Lobby state (room codes, player list) | Auto-deleted 24 hours after the lobby was created. |
 | Analytics events (anonymized) | 90 days, then aggregated and de-identified for long-term retention. |
 | IP addresses (rate-limit tracking) | 1 hour, then automatically purged. |
-| In-app purchase records | 7 years (Swedish accounting law requirement for businesses; even though we are a personal project, we follow this conservatively). |
+| In-app purchase records | 7 years (Swedish accounting law requirement — Bokföringslagen). |
 
 ---
 

@@ -209,6 +209,10 @@ const FAQ_CATEGORIES: FaqCategory[] = [
         q: 'How do I stop friends from seeing me?',
         a: 'You don\'t need to approve friends — other players add you by typing your exact Player Name. To be "invisible" to a specific friend, ask them to remove you from their Friends list (you can also remove them from yours).',
       },
+      {
+        q: 'Who is behind QuizVibe?',
+        a: 'QuizVibe is operated by Lomaco AB (org. no. 559388-9511), a company registered in Sweden. Contact: infoquizvibe@gmail.com. Full details are in the Privacy Policy and Terms of Service under Legal.',
+      },
     ],
   },
   {

@@ -5,12 +5,12 @@ description: The rules for using QuizVibe.
 
 # Terms of Service
 
-**Last updated:** 2026-05-23
+**Last updated:** 2026-08-07
 **Effective date:** Upon app launch on the Apple App Store
 
 These Terms of Service ("Terms") govern your use of the **QuizVibe** mobile application ("the app", "we", "us"). By downloading, installing, or using the app, you agree to these Terms. If you don't agree, please don't use the app.
 
-QuizVibe is operated by **Peter Björklund**, an individual residing in Sweden. For questions about these Terms, contact us at: **infoquizvibe@gmail.com**.
+QuizVibe is operated by **Lomaco AB** (org. no. 559388-9511), a limited company (aktiebolag) registered in Sweden. For questions about these Terms, contact us at: **infoquizvibe@gmail.com**.
 
 ---
 
@@ -32,12 +32,12 @@ The rest of this document is the full version.
 
 | | |
 |---|---|
-| **Operator** | Peter Björklund, individual residing in Sweden |
+| **Operator** | Lomaco AB (org. no. 559388-9511), registered in Sweden |
 | **Contact email** | infoquizvibe@gmail.com |
 | **App name** | QuizVibe |
 | **Platforms** | Apple App Store (iOS) |
 
-We are not a registered company; QuizVibe is currently operated as a personal project. If this changes, we will update these Terms and notify users via the app.
+QuizVibe is provided by Lomaco AB, a Swedish limited company (aktiebolag). If our company information changes, we will update these Terms and notify users via the app.
 
 ---
 

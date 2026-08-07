@@ -10,7 +10,7 @@ A music + culture quiz app for iOS. This page hosts our public legal documents a
 ## Legal
 
 - [Privacy Policy](legal/privacy/) — how we handle your data
-- ~~Terms of Service~~ — coming soon
+- [Terms of Service](legal/terms/) — the rules for using QuizVibe
 
 ## Contact
 
@@ -18,4 +18,4 @@ For all questions, requests, or feedback: **infoquizvibe@gmail.com**
 
 ---
 
-*Operated by Peter Björklund, an individual residing in Sweden.*
+*Operated by Lomaco AB (org. no. 559388-9511), registered in Sweden.*
