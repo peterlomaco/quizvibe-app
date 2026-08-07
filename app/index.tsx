@@ -2250,11 +2250,6 @@ export default function HomeScreen() {
                 >
                   Start New Game
                 </Text>
-                {/* "Game Results - Saved"-badge — brand-blå med vit kant så
-                    den syns mot den gyllene knapp-bakgrunden. */}
-                <View style={[styles.homeFreeBadge, styles.homeUserBadge]} pointerEvents="none">
-                  <Text style={styles.homeFreeBadgeText}>Game Results - Saved</Text>
-                </View>
               </TouchableOpacity>
             </Animated.View>
           )}
@@ -2278,10 +2273,6 @@ export default function HomeScreen() {
                 >
                   Join with Room Code — user
                 </Text>
-                {/* Samma "Game Results - Saved"-badge som Start New Game ovan. */}
-                <View style={[styles.homeFreeBadge, styles.homeUserBadge]} pointerEvents="none">
-                  <Text style={styles.homeFreeBadgeText}>Game Results - Saved</Text>
-                </View>
               </TouchableOpacity>
             </Animated.View>
           )}
@@ -2365,7 +2356,7 @@ export default function HomeScreen() {
                 Start Game as Guest
               </Text>
               {/* Badge per login-läge: inloggad → "Game Results - Not Saved"
-                  i brand-blå (samma homeUserBadge-stil som user-knapparna);
+                  i grått (samma homeUserBadge-stil som user-knapparna);
                   utloggad → FREE i grönt (matchar övriga guest-/register-
                   knappar). */}
               <View
@@ -3484,13 +3475,12 @@ const styles = StyleSheet.create({
     zIndex: 10,
     elevation: 4,
   },
-  // "Game Results - Saved"-badgen på de gyllene user-knapparna —
-  // brand-blå (Colors.primary, samma färg som QuizVibe-loggan) bg +
-  // vit kant så den syns mot guld. Bytt från grön 2026-08-06. Delas
-  // med "Game Results - Not Saved"-badgen på Start Game as Guest i
-  // inloggat läge.
+  // "Game Results - Not Saved"-badgen på Start Game as Guest i
+  // inloggat läge — grå bg (samma PREMIUM-grå som guest-knapparna) +
+  // vit kant. User-knapparnas "Game Results - Saved"-badges togs bort
+  // 2026-08-07.
   homeUserBadge: {
-    backgroundColor: Colors.primary,
+    backgroundColor: '#6B7280',
     borderColor: '#FFFFFF',
   },
   homeFreeBadgeRegister: {
