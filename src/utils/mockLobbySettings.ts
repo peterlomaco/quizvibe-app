@@ -12,7 +12,7 @@
 import { supabase } from './supabase';
 import { MainCategory, defaultEnabledMainCategories, isMainCategory, IMAGES_MANDATORY_CATEGORIES } from './mainCategory';
 
-export type LobbyGameMode = 'pass-the-phone' | 'individual-devices';
+export type LobbyGameMode = 'pass-the-phone' | 'individual-devices' | 'remote-1v1';
 // UI använder capitalized strings; DB lagrar lowercase enligt CHECK-
 // constraint. Adapter-funktionerna nedan översätter mellan.
 export type LobbyRegion = 'Sweden' | 'Nordics' | 'Europe' | 'Global';
@@ -22,7 +22,8 @@ export type LobbyAnswerResponse = 30 | 45 | 60;
 export interface LobbySettings {
   gameMode: LobbyGameMode;
   singlePlayerDefault: boolean;
-  maxPlayers: 4 | 12;
+  // 2 = Remote 1v1 (låst), 4 = Basic, 12 = Premium IndDev.
+  maxPlayers: 2 | 4 | 12;
   region: LobbyRegion;
   answerResponseSeconds: LobbyAnswerResponse;
   eraFrom: number;
@@ -105,7 +106,7 @@ function rowToSettings(row: LobbySettingsRow): LobbySettings {
   return {
     gameMode: row.game_mode,
     singlePlayerDefault: row.single_player_default,
-    maxPlayers: row.max_players === 12 ? 12 : 4,
+    maxPlayers: row.max_players === 12 ? 12 : row.max_players === 2 ? 2 : 4,
     region: DB_TO_UI_REGION[row.region],
     answerResponseSeconds: row.answer_response_seconds,
     eraFrom: row.era_from,

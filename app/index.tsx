@@ -4,6 +4,7 @@ import { QuizVibeQAvatar } from '@/src/components/QuizVibeQAvatar';
 import { ShoppingCartIcon } from '@/src/components/ShoppingCartIcon';
 import { TopUserBanner } from '@/src/components/TopUserBanner';
 import { Colors, Radius, Spacing } from '@/src/theme';
+import Svg, { Circle, Rect as SvgRect, Text as SvgText } from 'react-native-svg';
 import { identify, resetIdentity, track } from '@/src/utils/analytics';
 import { getAvatarEmojiById } from '@/src/utils/avatars';
 import { clearLeftPlayers } from '@/src/utils/leftPlayers';
@@ -12,6 +13,8 @@ import { clearLobbyPlayers, getLobbyPlayers } from '@/src/utils/mockLobbyPlayers
 import { clearLobbySettings } from '@/src/utils/mockLobbySettings';
 import { clearGameStarted } from '@/src/utils/mockStartedGames';
 import { getRoomMeta, isActiveRoom, isLobbyFull, isOwnLobby, registerActiveRoom } from '@/src/utils/mockActiveRooms';
+import { buildRemoteQuizParams, getMatchByRoomCode, getOwnUserId, splitMatchForUser } from '@/src/utils/remoteMatches';
+import { MyMatchesSection } from '@/src/components/MyMatchesSection';
 import {
   appendPlayerNameDigit,
   appendPlayerNameLetter,
@@ -75,6 +78,10 @@ interface JoinModalProps {
   // samma playerName som host:s, blockas join (samma user försöker joina
   // sin egen lobby från en andra enhet). null när ingen är inloggad.
   currentPlayerName?: string | null;
+  // Lobbytyp vald i inline-väljaren (HostTypeOptions) INNAN guest-host-
+  // formen öppnades ('1v1' → renodlad Remote 1v1-lobby). Konsumeras av
+  // handleStartGameAsGuestHost som skickar lobbyType-param till /lobby.
+  guestHostLobbyType?: HostLobbyType;
 }
 
 type AssistanceLevel = 'minimal' | 'standard' | 'full';
@@ -161,7 +168,7 @@ async function checkLobbyCapacity(code: string): Promise<boolean> {
   return true;
 }
 
-function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false, currentPlayerName }: JoinModalProps) {
+function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false, currentPlayerName, guestHostLobbyType = 'standard' }: JoinModalProps) {
   const [step, setStep] = useState<JoinStep>(initialStep);
   const [code, setCode] = useState('');
   const [guestName, setGuestName] = useState('');
@@ -404,6 +411,28 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     // den expired/game-started) visar vi Alert och stannar i formuläret
     // istället för att navigera.
     if (!(await isActiveRoom(code))) {
+      // Remote 1v1-återinträde: rummet kan vara stängt (game_started) eller
+      // dött (24h-expiry) medan MATCHEN lever sin egen 48h-livscykel. Om
+      // koden pekar på en aktiv remote-match där JAG är deltagare (RLS
+      // filtrerar) → gå direkt till solo-quizen (resume vid första
+      // obesvarade frågan) istället för "Room not found".
+      const remoteMatch = await getMatchByRoomCode(code);
+      if (remoteMatch) {
+        const userId = await getOwnUserId();
+        const my = userId ? splitMatchForUser(remoteMatch, userId) : null;
+        if (my) {
+          if (my.me.finishedAt != null) {
+            Alert.alert(
+              'Already played',
+              'You have already played your questions in this 1vs1 match. Check "1vs1 Matches" for the result.',
+            );
+            return;
+          }
+          onClose();
+          router.push({ pathname: '/quiz', params: buildRemoteQuizParams(my) });
+          return;
+        }
+      }
       Alert.alert(
         'Room not found',
         'There is no Room code activated with this combination',
@@ -678,13 +707,23 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     const hostName = normalizePlayerName(guestName.trim());
     const newCode = generateRoomCode();
     // Guest host är alltid Free-nivå: max 4 spelare, ingen premium.
-    await registerActiveRoom(newCode, {
+    // Returvärdet MÅSTE kontrolleras — en tyst no-op (session-glitch/
+    // nätverksfel) ger annars en fantom-lobby som joiners inte hittar
+    // ("Room not found"-buggen 2026-08-07).
+    const roomRegistered = await registerActiveRoom(newCode, {
       maxPlayers: 4,
       hostIsPremium: false,
       currentPlayerCount: 1,
       hostPlayerName: hostName,
       gameStarted: false,
     });
+    if (!roomRegistered) {
+      Alert.alert(
+        'Could not create game lobby',
+        'The room could not be registered. Check your connection and try again.',
+      );
+      return;
+    }
     // Samma fresh-slate-cleanup som handleCreateGame — se kommentaren där.
     clearLeftPlayers(newCode);
     clearLobbyPlayers(newCode);
@@ -703,6 +742,9 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
         guestHost: 'true',
         guestName: hostName,
         guestBirthYear: String(parsedBirthYear),
+        // Renodlad 1vs1-lobby: valet gjordes i inline-väljaren på Home INNAN
+        // guest-formen öppnades. LobbyScreen-seeden forcerar remote-1v1.
+        ...(guestHostLobbyType === '1v1' ? { lobbyType: '1v1' } : {}),
       },
     });
   };
@@ -1358,6 +1400,216 @@ function ChoiceRow({
   );
 }
 
+// ─── Lobbytyp-väljare (Start New Game / Start Game as Guest) ─────────────────
+// Renodlad 1vs1-lobby (2026-08-07): vägvalet mellan vanlig lobby och 1vs1-
+// lobby görs HÄR på Home istället för via en Game Mode-ruta inne i lobbyn.
+// Delas av BÅDA host-vägarna (registrerad + guest host) — samma sheet-/
+// ChoiceRow-vokabulär som JoinModal:s choose-steg.
+export type HostLobbyType = 'standard' | '1v1';
+
+/** 1vs1-ikonen: två profil-silhuetter med ett stort guld-"vs" lagt OVANPÅ
+ *  dem (texten täcker mitten av båda figurerna — de syns alltså inte i sin
+ *  helhet, vilket är avsikten).
+ *
+ *  Silhuetterna efterliknar QuizVibeFriendsLogo:s ("QuizVibe Community and
+ *  Friends" i Profile) — huvud-cirkel + rundad kropp i samma proportioner
+ *  (r : bredd : höjd : mellanrum = 2 : 6 : 5 : 1), uppskalade ×3.
+ *
+ *  "vs" ritas SIST (= överst i SVG:s måleriordning) och renderas två gånger:
+ *  först en tjock kontur i kortets bakgrundsfärg som "halo", sedan guld-
+ *  fyllningen — så texten separeras tydligt från de blå figurerna under. */
+function VersusIcon({ height = 40 }: { height?: number }) {
+  // viewBox 56×46 → bredd/höjd-kvot ~1.22.
+  const width = height * (56 / 46);
+  return (
+    <Svg width={width} height={height} viewBox="0 0 56 46">
+      {/* Vänster person — huvud (r 6) + kropp (17×14, rx 6), 3 luft emellan. */}
+      <Circle cx={18} cy={16} r={6} fill={Colors.primary} />
+      <SvgRect x={9.5} y={25} width={17} height={14} rx={6} fill={Colors.primary} />
+      {/* Höger person — bara 3 enheters glapp mot den vänstra så "vs" nedan
+          hamnar tvärs över båda. */}
+      <Circle cx={38} cy={16} r={6} fill={Colors.primary} />
+      <SvgRect x={29.5} y={25} width={17} height={14} rx={6} fill={Colors.primary} />
+      {/* "vs" ovanpå — halo först, sedan guld-fyllningen. Liten (15) och
+          ihoptryckt i bredd (textLength 15 + spacingAndGlyphs) så texten
+          bara täcker mitten av silhuetterna. */}
+      <SvgText
+        x={28}
+        y={32}
+        fontSize={15}
+        fontWeight="bold"
+        fill={Colors.cardElevated}
+        stroke={Colors.cardElevated}
+        strokeWidth={4}
+        textAnchor="middle"
+        textLength={15}
+        lengthAdjust="spacingAndGlyphs"
+      >
+        vs
+      </SvgText>
+      <SvgText
+        x={28}
+        y={32}
+        fontSize={15}
+        fontWeight="bold"
+        fill={Colors.warning}
+        textAnchor="middle"
+        textLength={15}
+        lengthAdjust="spacingAndGlyphs"
+      >
+        vs
+      </SvgText>
+    </Svg>
+  );
+}
+
+/** Ikon för "Single & Multiplayer mode": **Here&Now** på tre rader —
+ *  "Here" överst och "Now" underst i blått, med ett guld-"&" i mitten.
+ *  &-tecknet ritas SIST så det lägger sig ovanpå och täcker en del av både
+ *  "Here" och "Now" (samma överlapps-idé som VersusIcon:s "vs"). Halo i
+ *  kortets bakgrundsfärg separerar &-tecknet från orden under.
+ *  Blå ord + guld accent speglar VersusIcon (blå silhuetter, guld "vs"). */
+function HereNowIcon({ height = 60 }: { height?: number }) {
+  // viewBox 56×46 → samma proportioner som VersusIcon så de två val-
+  // rutornas ikoner väger lika i ikon-kolumnen.
+  const width = height * (56 / 46);
+  return (
+    <Svg width={width} height={height} viewBox="0 0 56 46">
+      <SvgText x={28} y={18} fontSize={15} fontWeight="bold" fill={Colors.primary} textAnchor="middle">
+        Here
+      </SvgText>
+      <SvgText x={28} y={44} fontSize={15} fontWeight="bold" fill={Colors.primary} textAnchor="middle">
+        Now
+      </SvgText>
+      {/* "&" ovanpå — halo först, sedan guld-fyllningen. textLength trycker
+          ihop tecknet i bredd så det inte breder ut sig över orden. */}
+      <SvgText
+        x={28}
+        y={33}
+        fontSize={18}
+        fontWeight="bold"
+        fill={Colors.cardElevated}
+        stroke={Colors.cardElevated}
+        strokeWidth={4}
+        textAnchor="middle"
+        textLength={11}
+        lengthAdjust="spacingAndGlyphs"
+      >
+        &amp;
+      </SvgText>
+      <SvgText
+        x={28}
+        y={33}
+        fontSize={18}
+        fontWeight="bold"
+        fill={Colors.warning}
+        textAnchor="middle"
+        textLength={11}
+        lengthAdjust="spacingAndGlyphs"
+      >
+        &amp;
+      </SvgText>
+    </Svg>
+  );
+}
+
+/** Inline-utfällning under Start-knappen (Peter 2026-08-07 rev 2: ingen
+ *  separat modal — alternativen är en del av knappen och fälls ut under
+ *  den). `accentColor` ärvs från knappen ovanför (guld för inloggad,
+ *  grå för guest) så panelen läses som knappens förlängning. */
+function HostTypeOptions({
+  accentColor, onSelect,
+}: {
+  accentColor: string;
+  onSelect: (lobbyType: HostLobbyType) => void;
+}) {
+  return (
+    <View style={hostTypeStyles.panel}>
+      <HostTypeOptionRow
+        accentColor={accentColor}
+        icon={<HereNowIcon height={60} />}
+        label="Local Play"
+        subtitle="Single & Multiplayer mode"
+        onPress={() => onSelect('standard')}
+      />
+      <HostTypeOptionRow
+        accentColor={accentColor}
+        icon={<VersusIcon height={60} />}
+        label="Remote Play"
+        subtitle="1vs1"
+        onPress={() => onSelect('1v1')}
+      />
+    </View>
+  );
+}
+
+function HostTypeOptionRow({
+  accentColor, icon, label, subtitle, onPress,
+}: {
+  accentColor: string;
+  icon: React.ReactNode;
+  label: string;
+  subtitle: string;
+  onPress: () => void;
+}) {
+  return (
+    <TouchableOpacity
+      style={[hostTypeStyles.row, { borderColor: accentColor }]}
+      onPress={onPress}
+      activeOpacity={0.7}
+    >
+      <View style={hostTypeStyles.iconWrap}>{icon}</View>
+      <View style={{ flex: 1 }}>
+        <Text style={hostTypeStyles.label}>{label}</Text>
+        <Text style={hostTypeStyles.subtitle}>{subtitle}</Text>
+      </View>
+      <Text style={[hostTypeStyles.arrow, { color: accentColor }]}>›</Text>
+    </TouchableOpacity>
+  );
+}
+
+const hostTypeStyles = StyleSheet.create({
+  // Panelen sitter direkt under knappen (litet gap) och är något indragen
+  // så den visuellt hänger ihop med — men är underordnad — knappen.
+  panel: {
+    marginTop: 6,
+    marginHorizontal: Spacing.sm,
+    gap: Spacing.sm,
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.md,
+    minHeight: 92,
+    borderWidth: 1.5,
+    borderRadius: Radius.md,
+    backgroundColor: Colors.cardElevated,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.md,
+  },
+  iconWrap: {
+    // 80 rymmer VersusIcon:s bredd vid height 60 (60 × 56/46 ≈ 73).
+    width: 80,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  label: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: Colors.textPrimary,
+    letterSpacing: 0.2,
+  },
+  subtitle: {
+    fontSize: 13,
+    color: Colors.textSecondary,
+    marginTop: 4,
+    lineHeight: 18,
+  },
+  arrow: {
+    fontSize: 28,
+  },
+});
+
 // ─── Home Screen ──────────────────────────────────────────────────────────────
 
 // Pulserande tagline-array. Renderingen växlar mellan dessa tre strängar
@@ -1374,6 +1626,12 @@ export default function HomeScreen() {
   const [joinVisible, setJoinVisible] = useState(false);
   const [joinInitialStep, setJoinInitialStep] = useState<JoinStep>('choose');
   const [joinHideGuest, setJoinHideGuest] = useState(false);
+  // Lobbytyp-väljaren — fälls ut INLINE under Start-knappen (ingen modal).
+  // Värdet säger vilken knapp som är expanderad; valet leder sedan till
+  // handleCreateGame (registrerad) resp. guest-host-formen med
+  // guestLobbyType satt (konsumeras av handleStartGameAsGuestHost via prop).
+  const [hostTypeExpanded, setHostTypeExpanded] = useState<'none' | 'registered' | 'guest'>('none');
+  const [guestLobbyType, setGuestLobbyType] = useState<HostLobbyType>('standard');
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [profileMenuVisible, setProfileMenuVisible] = useState(false);
   const [profileMenuStep, setProfileMenuStep] = useState<'menu' | 'login' | 'register' | 'forgot'>('menu');
@@ -1688,7 +1946,10 @@ export default function HomeScreen() {
     ).start();
   }, []);
 
-  const handleCreateGame = async () => {
+  // lobbyType kommer från inline-väljaren ("Single & Multiplayer mode"
+  // vs "1vs1 Matches") — '1v1' skickas som lobbyType-param till LobbyScreen
+  // vars seed forcerar gameMode='remote-1v1' (renodlad 1vs1-lobby).
+  const handleCreateGame = async (lobbyType: HostLobbyType = 'standard') => {
     // Host Game Credits-gate: blockera Create Game om Free är 0 (engångs-
     // köpta Extras borttagna 2026-07-07 — Premium är enda vägen förbi
     // dags-cappen). loadProfile() top-up:ar Free-saldot vid första load
@@ -1725,13 +1986,23 @@ export default function HomeScreen() {
     // hostIsPremium driver lobby-capacity-popupens text (Free host: "or to
     // upgrade", Premium host: "Host need to remove players"). Använder
     // subscriptionStorage:s flagga som loadProfile-effekten precis läste in.
-    await registerActiveRoom(code, {
+    // Returvärdet MÅSTE kontrolleras — en tyst no-op (utloggad host/
+    // nätverksfel) ger annars en fantom-lobby som joiners inte hittar
+    // ("Room not found"-buggen 2026-08-07).
+    const roomRegistered = await registerActiveRoom(code, {
       maxPlayers: freshProfile?.maxPlayers ?? profile?.maxPlayers ?? 4,
       hostIsPremium: hasPremium,
       currentPlayerCount: 1,
       hostPlayerName: freshProfile?.playerName ?? profile?.playerName ?? '',
       gameStarted: false,
     });
+    if (!roomRegistered) {
+      Alert.alert(
+        'Could not create game lobby',
+        'The room could not be registered. Check your connection and that you are signed in, then try again.',
+      );
+      return;
+    }
     // Säkerställ att leftPlayers-storen är tom för den nya koden så
     // ingen stale test-data smyger in i den färska lobby:n och felaktigt
     // markerar nån som "LEFT THIS GAME LOBBY". Samma princip för mock-
@@ -1743,7 +2014,14 @@ export default function HomeScreen() {
     clearEjected(code);
     clearGameStarted(code);
     track('room_code_created');
-    router.push({ pathname: '/lobby', params: { code, isHost: 'true' } });
+    router.push({
+      pathname: '/lobby',
+      params: {
+        code,
+        isHost: 'true',
+        ...(lobbyType === '1v1' ? { lobbyType: '1v1' } : {}),
+      },
+    });
   };
 
   // Mock-login: sparar en minimal profil med användarens playerName.
@@ -2194,7 +2472,7 @@ export default function HomeScreen() {
               profile-menyn. Grön kantlinje särskiljer den från de blå
               guest-knapparna. "QuizVibe user"-rubriken ovanför speglar
               Guest-rubrikens ruta men i grönt (matchar knappens kantlinje). */}
-          {!isLoggedIn && (
+          {!isLoggedIn && hostTypeExpanded === 'none' && (
             <>
               {/* appNameFont (Nunito_700Bold) — en explicit fontFamily
                   override:ar fontWeight på iOS, så bold kräver bold-filen
@@ -2234,28 +2512,46 @@ export default function HomeScreen() {
           {/* Create Game — döljs helt när utloggad (tidigare 🔒-låst variant).
               Gold-tema för inloggade users (samma vokabulär som appens
               gold-CTA:er — Start Game-loggan, PREMIUM-badges). */}
-          {isLoggedIn && (
-            <Animated.View style={{ transform: [{ scale: pulse }] }}>
-              <TouchableOpacity
-                style={[styles.gameBtn, styles.gameBtnUser]}
-                activeOpacity={0.85}
-                onPress={handleCreateGame}
-              >
-                <Text
-                  style={[
-                    styles.gameBtnText,
-                    styles.gameBtnUserText,
-                    { fontFamily: fontsLoaded ? 'Nunito_600SemiBold' : undefined },
-                  ]}
+          {isLoggedIn && hostTypeExpanded !== 'guest' && (
+            <View>
+              {/* Pulsen ligger BARA på knappen — den utfällda panelen ska
+                  stå still. Tap togglar utfällningen av lobbytyp-valen.
+                  Övriga Home-knappar döljs medan panelen är utfälld så
+                  valet står ensamt (Peter 2026-08-07). */}
+              <Animated.View style={{ transform: [{ scale: hostTypeExpanded === 'registered' ? 1 : pulse }] }}>
+                <TouchableOpacity
+                  style={[styles.gameBtn, styles.gameBtnUser]}
+                  activeOpacity={0.85}
+                  onPress={() =>
+                    setHostTypeExpanded((prev) => (prev === 'registered' ? 'none' : 'registered'))
+                  }
                 >
-                  Start New Game
-                </Text>
-              </TouchableOpacity>
-            </Animated.View>
+                  <Text
+                    style={[
+                      styles.gameBtnText,
+                      styles.gameBtnUserText,
+                      { fontFamily: fontsLoaded ? 'Nunito_600SemiBold' : undefined },
+                    ]}
+                  >
+                    Start New Game
+                  </Text>
+                </TouchableOpacity>
+              </Animated.View>
+              {hostTypeExpanded === 'registered' && (
+                <HostTypeOptions
+                  accentColor={Colors.warning}
+                  onSelect={(lobbyType) => {
+                    setHostTypeExpanded('none');
+                    void handleCreateGame(lobbyType);
+                  }}
+                />
+              )}
+            </View>
           )}
 
-          {/* Join with Room Code — user — döljs helt när utloggad. */}
-          {isLoggedIn && (
+          {/* Join with Room Code — user — döljs helt när utloggad ELLER när
+              någon lobbytyp-utfällning är aktiv. */}
+          {isLoggedIn && hostTypeExpanded === 'none' && (
             <Animated.View style={{ transform: [{ scale: pulse }] }}>
               <TouchableOpacity
                 style={[styles.gameBtn, styles.gameBtnUser]}
@@ -2279,11 +2575,11 @@ export default function HomeScreen() {
 
           {/* Guest-sektionen (rubrik + två knappar) — döljs HELT när
               inloggad (registered users använder Join with Room Code —
-              user). Knapparna döljs visuellt när Join-modalen är öppen så
-              att modal-sheetens rundade ovankant inte avslöjar dem bakom;
-              layout-utrymmet bevaras med opacity/pointerEvents så övriga
-              element inte hoppar. */}
-          {!isLoggedIn && (
+              user) ELLER när en lobbytyp-utfällning är aktiv. Knapparna
+              döljs visuellt när Join-modalen är öppen så att modal-sheetens
+              rundade ovankant inte avslöjar dem bakom; layout-utrymmet
+              bevaras med opacity/pointerEvents så övriga element inte hoppar. */}
+          {!isLoggedIn && hostTypeExpanded === 'none' && (
             <>
               {/* Guest-rubrik i grå text — separerar guest-pathen från
                   registered-åtgärderna ovan. */}
@@ -2332,44 +2628,77 @@ export default function HomeScreen() {
               marginTop (Spacing.xl, samma sektions-separation som guest-
               rubriken i utloggat läge) så knappen distanseras från de
               gyllene user-knapparna ovanför — trial-vägen är sekundär. */}
-          <Animated.View
+          {/* Döljs helt när "Start New Game"-utfällningen är aktiv (valet
+              ska stå ensamt). */}
+          {hostTypeExpanded !== 'registered' && (
+          <View
             style={[
               joinVisible && { opacity: 0 },
-              { transform: [{ scale: pulse }] },
-              isLoggedIn && { marginTop: Spacing.xl },
+              isLoggedIn && hostTypeExpanded === 'none' && { marginTop: Spacing.xl },
             ]}
             pointerEvents={joinVisible ? 'none' : 'auto'}
           >
-            <TouchableOpacity
-              style={[styles.gameBtn, styles.gameBtnGuest]}
-              activeOpacity={0.85}
-              onPress={() => openJoin('guest-host')}
+            {/* Pulsen ligger BARA på knappen — utfälld panel står still. */}
+            <Animated.View
+              style={{ transform: [{ scale: hostTypeExpanded === 'guest' ? 1 : pulse }] }}
             >
-              <Text
-                style={[
-                  styles.gameBtnText,
-                  { fontFamily: fontsLoaded ? 'Nunito_600SemiBold' : undefined },
-                ]}
-                numberOfLines={1}
-                adjustsFontSizeToFit
+              <TouchableOpacity
+                style={[styles.gameBtn, styles.gameBtnGuest]}
+                activeOpacity={0.85}
+                onPress={() =>
+                  setHostTypeExpanded((prev) => (prev === 'guest' ? 'none' : 'guest'))
+                }
               >
-                Start Game as Guest
-              </Text>
-              {/* Badge per login-läge: inloggad → "Game Results - Not Saved"
-                  i grått (samma homeUserBadge-stil som user-knapparna);
-                  utloggad → FREE i grönt (matchar övriga guest-/register-
-                  knappar). */}
-              <View
-                style={[styles.homeFreeBadge, isLoggedIn && styles.homeUserBadge]}
-                pointerEvents="none"
-              >
-                <Text style={styles.homeFreeBadgeText}>
-                  {isLoggedIn ? 'Game Results - Not Saved' : 'FREE'}
+                <Text
+                  style={[
+                    styles.gameBtnText,
+                    { fontFamily: fontsLoaded ? 'Nunito_600SemiBold' : undefined },
+                  ]}
+                  numberOfLines={1}
+                  adjustsFontSizeToFit
+                >
+                  Start Game as Guest
                 </Text>
-              </View>
-            </TouchableOpacity>
-          </Animated.View>
+                {/* Badge per login-läge: inloggad → "Game Results - Not Saved"
+                    i grått (samma homeUserBadge-stil som user-knapparna);
+                    utloggad → FREE i grönt (matchar övriga guest-/register-
+                    knappar). */}
+                <View
+                  style={[styles.homeFreeBadge, isLoggedIn && styles.homeUserBadge]}
+                  pointerEvents="none"
+                >
+                  <Text style={styles.homeFreeBadgeText}>
+                    {isLoggedIn ? 'Game Results - Not Saved' : 'FREE'}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            </Animated.View>
+            {hostTypeExpanded === 'guest' && (
+              <HostTypeOptions
+                accentColor="#6B7280"
+                onSelect={(lobbyType) => {
+                  setHostTypeExpanded('none');
+                  setGuestLobbyType(lobbyType);
+                  openJoin('guest-host');
+                }}
+              />
+            )}
+          </View>
+          )}
         </View>
+
+        {/* ── 1vs1 Matches ─────────────────────────────────────
+            Huvudknapp för Remote 1v1-dueller — navigerar till den
+            dedikerade /my-matches-skärmen där matcherna listas. Renderar
+            sig själv bara när användaren har matcher — annars null.
+            Gold-accent + "Your turn"-subtitel när en match väntar.
+            Döljs (som övriga Home-knappar) medan en lobbytyp-utfällning
+            är aktiv så valet står ensamt. */}
+        {hostTypeExpanded === 'none' && (
+          <View style={{ marginTop: Spacing.xl }}>
+            <MyMatchesSection />
+          </View>
+        )}
 
         {/* ── Footer ─────────────────────────────────────────── */}
         {/* "FAQ" är tappbar Pressable som öppnar /faq?from=/. About- och
@@ -2406,7 +2735,11 @@ export default function HomeScreen() {
         initialStep={joinInitialStep}
         hideGuest={joinHideGuest}
         currentPlayerName={profile?.playerName ?? null}
+        guestHostLobbyType={guestLobbyType}
       />
+
+      {/* Lobbytyp-väljaren är INLINE under respektive Start-knapp
+          (HostTypeOptions) — ingen separat modal. */}
 
       {/* ── Profile-meny ─────────────────────────────────────── */}
       {/* När utloggad: Register / Log in. När inloggad: Log out.

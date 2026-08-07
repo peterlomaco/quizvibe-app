@@ -79,8 +79,9 @@ const ASSISTANCE_LABEL: Record<'minimal' | 'standard' | 'full', string> = {
 export type QuestionMediaType = 'youtube' | 'spotify' | 'image' | 'none';
 
 interface Props {
-  /** Game mode — styr vilken vy av kö-tabellen som renderas + ev. UI-text. */
-  mode?: 'pass-the-phone' | 'individual-devices';
+  /** Game mode — styr vilken vy av kö-tabellen som renderas + ev. UI-text.
+   *  'remote-1v1' beter sig som single-player (self-paced solo-session). */
+  mode?: 'pass-the-phone' | 'individual-devices' | 'remote-1v1';
   /** Spelaren som ska börja sin runda — visas i Pass-the-Phone-rutan.
    *  I IndDev döljs current-player-raden helt; bara queue-tabellen renderas. */
   currentPlayer: IntroPlayer;
@@ -365,14 +366,17 @@ export function GetReadyIntro({
   // I Pass-the-Phone betraktas alla som "den som ska starta" (telefonen lämnas
   // runt; vem som än håller den får trycka). I Individual Devices är det bara
   // host som kan starta — non-host ser en passiv "Waiting for Host"-ruta i
-  // samma position som Play-knappen skulle suttit.
-  const canStartGame = mode === 'pass-the-phone' || isHost;
+  // samma position som Play-knappen skulle suttit. Remote 1v1 är self-paced
+  // solo — BÅDA spelarna startar sina egna frågor oavsett isHost.
+  const canStartGame = mode === 'pass-the-phone' || mode === 'remote-1v1' || isHost;
   // Answer response time-fältet är read-only för non-host i Individual
   // Devices (host bestämmer värdet i Lobby OCH justerar det här mellan
   // ronder). PtP-läget har alltid alla på samma device, så där spelar
   // isHost ingen roll — där styrs editability istället av responseSecondsLocked
-  // (mid-round = låst).
-  const responseSecondsReadOnly = mode === 'individual-devices' && !isHost;
+  // (mid-round = låst). Remote 1v1: ALLTID read-only för båda — värdet är
+  // låst i match-snapshotten; lokala ändringar skulle göra duellen orättvis.
+  const responseSecondsReadOnly =
+    mode === 'remote-1v1' || (mode === 'individual-devices' && !isHost);
 
   // Dot-bar progress: rad-rektangulära pillar i två rader vid >10 dots,
   // en rad vid ≤10. total alltid jämn (Lobby:s ROUNDS_STEP=2 × heltal

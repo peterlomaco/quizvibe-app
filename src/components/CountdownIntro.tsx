@@ -25,7 +25,7 @@ interface Props {
   /** Game mode — styr texten ovan Q-loggan. Pass-the-Phone visar
    *  "Pass-the-Phone to: <playerName>" med avatar-box; IndDev visar bara
    *  "Get Ready to Vibe" (ingen spelar-specifik info). */
-  mode?: 'pass-the-phone' | 'individual-devices';
+  mode?: 'pass-the-phone' | 'individual-devices' | 'remote-1v1';
   /** Ord som talas när nedräkningen når 0 (= när "?" visas).
    *  "Who"  — Hints-frågor (svaret är en person).
    *  "When" — Timeline/år-frågor (svaret är ett år).
@@ -69,7 +69,9 @@ const GLYPH_FONT_SIZE = LOGO_SIZE * 0.28;
  * `'question'`.
  */
 export function CountdownIntro({ onComplete, startFrom = 5, voiceFrom = 3, mode = 'pass-the-phone', playerName, playerEmoji, mediaSource, answerType = null, finalWord, silent = false }: Props) {
-  const isIndDev = mode === 'individual-devices';
+  // Remote 1v1 delar IndDev:s headline ("Get Ready to QuizVibe") — varje
+  // spelare sitter på egen enhet, ingen specifik spelare att namnge.
+  const isIndDev = mode === 'individual-devices' || mode === 'remote-1v1';
   // Bordered box runt media-ikonen med kant-skärande Year/Name-badge.
   // Extraherat som variabel eftersom den renderas i båda playerBlock-grenarna.
   const mediaSourceBlock = mediaSource != null ? (

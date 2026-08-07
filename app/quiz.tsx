@@ -16,6 +16,7 @@ import {
   type RoundScore,
 } from '@/src/components/RoundLeaderboard';
 import { SequentialDots } from '@/src/components/SequentialDots';
+import { RemoteMatchResultPanel } from '@/src/components/RemoteMatchResultPanel';
 import { StopwatchIcon } from '@/src/components/StopwatchIcon';
 import { useConnectionStatus } from '@/src/lib/network/connectionMonitor';
 import { subscribeSyncChannel, type SyncChannel, type PlayerScoreRecordedPayload, type QuestionAdvancePayload } from '@/src/lib/realtime/syncChannel';
@@ -25,6 +26,14 @@ import { track } from '@/src/utils/analytics';
 import { getAvatarEmojiById } from '@/src/utils/avatars';
 import { clearEjected } from '@/src/utils/ejectedPlayers';
 import { appendGameHistoryEntry, saveLatestResult, type GameResult, type HistoryEntry, type RoundResult } from '@/src/utils/gameResults';
+import {
+  cancelRemoteMatch,
+  finalizePlayer,
+  getMatch,
+  getMyAnswers,
+  persistQuestionSequence,
+  upsertAnswer,
+} from '@/src/utils/remoteMatches';
 import { clearLeftPlayers } from '@/src/utils/leftPlayers';
 import { pickMediaSource, type YoutubeClip } from '@/src/utils/mediaSource';
 import { deactivateRoom, registerActiveRoom } from '@/src/utils/mockActiveRooms';
@@ -946,8 +955,12 @@ export default function QuizScreen() {
   const params = useLocalSearchParams<{
     assistance?: string;
     age?: string;
-    gameMode?: 'pass-the-phone' | 'individual-devices';
+    gameMode?: 'pass-the-phone' | 'individual-devices' | 'remote-1v1';
     isHost?: string;
+    // Remote 1v1: server-side match-id (remote_matches.id) — sätts av
+    // Lobby:s handleStartGame (host) resp. Play now-prompten / My 1v1
+    // Matches (motståndare). Driver sekvens-auktoritet + answer-persistens.
+    remoteMatchId?: string;
     selfPlayerId?: string;
     players?: string;
     roundsCount?: string;
@@ -1002,6 +1015,11 @@ export default function QuizScreen() {
   // ÄR replayn → Final Leaderboard visar bara Home). Bara satt på host-
   // enheten; non-host styrs istället av hostInitiatedPlayAgain-broadcasten.
   const guestReplaysUsed = parseInt(params.guestReplays ?? '0', 10) || 0;
+  // Remote 1v1: server-side match-id (remote_matches). Solo-session —
+  // frågesekvensen är auktoritativ i DB (question_ids), varje svar skrivs
+  // till remote_match_answers och slutresultatet finaliseras via RPC.
+  const remoteMatchId = params.remoteMatchId ?? null;
+  const isRemote = gameMode === 'remote-1v1' && !!remoteMatchId;
   // Det egna player_id:t (= lobby_players.player_id) som Lobby skickade.
   // Används av non-host:s Leave-flöde för att broadcasta `player_left` så
   // host:s skärm kan visa popup + markera spelaren som hasLeft i leader-
@@ -1168,17 +1186,33 @@ export default function QuizScreen() {
     }
   }, [params.players]);
 
+  // ── Remote 1v1: auktoritativ frågesekvens från remote_matches ────────
+  // null tills init-effekten (efter gameQuestionsRef) hämtat/persisterat
+  // question_ids. När satt override:ar den HELA gameQuestions-bygget så
+  // båda spelare (och host-resume efter app-kill) renderar exakt samma
+  // sekvens — lokal Math.random-shuffle används bara för host:s FÖRSTA
+  // persist. remoteSessionReady sätts när även resume-seeden är klar;
+  // render-gaten blockerar spelstart tills dess.
+  const [remoteQuestionIds, setRemoteQuestionIds] = useState<string[] | null>(null);
+  const [remoteSessionReady, setRemoteSessionReady] = useState(false);
+  const remoteInitRanRef = useRef(false);
+
   // En "runda" = ett varv där alla spelare svarar en gång.
   //   Pass-the-Phone: spelarna turas om på samma enhet → 1 fråga per spelare
   //     per runda → totalQuestions = rundor × spelare. 4×4 = 16 frågor.
   //   Individual Devices: alla spelare svarar på SAMMA fråga samtidigt på
   //     egna enheter → 1 fråga per runda totalt → totalQuestions = rundor.
+  //   Remote 1v1: solo-session (turnOrder = [self]) → rundor × 1 = rundor;
+  //     clampas mot sekvens-längden om ids saknas i klientens katalog
+  //     (app-version-skew mellan host och motståndare).
   // Math.max(1, ...) skyddar fallback-fallet då turnOrder är tom (direkt-nav
   // till /quiz utan Lobby).
   const totalQuestions =
-    gameMode === 'individual-devices'
-      ? totalRounds
-      : totalRounds * Math.max(1, turnOrder.length);
+    gameMode === 'remote-1v1' && remoteQuestionIds
+      ? Math.max(1, Math.min(totalRounds, remoteQuestionIds.length))
+      : gameMode === 'individual-devices'
+        ? totalRounds
+        : totalRounds * Math.max(1, turnOrder.length);
 
   // Pool av frågor för spelet, organiserad i ROUND-BLOCKS:
   //
@@ -1245,6 +1279,14 @@ export default function QuizScreen() {
   );
 
   const gameQuestions = useMemo<QuizQuestion[]>(() => {
+    // Remote 1v1 med känd sekvens: DB:n är source of truth. Ids som saknas
+    // i klientens katalog (app-version-skew) filtreras — bättre färre
+    // frågor än crash; totalQuestions clampas mot längden nedan.
+    if (gameMode === 'remote-1v1' && remoteQuestionIds) {
+      return remoteQuestionIds
+        .map((id) => ALL_QUESTIONS_MAP.get(id))
+        .filter((q): q is QuizQuestion => q !== undefined);
+    }
     // Filter-hierarki (i ordning, från hård → mjuk):
     //   1. Source-toggle (youtubeEnabled / imagesEnabled) — HÅRD. Host:s val.
     //   2. Era (correctYear ∈ [eraFrom, eraTo]) — HÅRD. Host:s val.
@@ -1634,13 +1676,121 @@ export default function QuizScreen() {
       return shuffleArray(SEED_QUESTIONS);
     }
     return mixed;
-  }, [eraFrom, eraTo, turnOrder, totalRounds, youtubeEnabled, imagesEnabled, gameMode, youtubeEnabledCategories, imagesEnabledCategories, combinedSeenIds, combinedLastIds, spotifyEnabled, isGuestHostGame]);
+  }, [eraFrom, eraTo, turnOrder, totalRounds, youtubeEnabled, imagesEnabled, gameMode, youtubeEnabledCategories, imagesEnabledCategories, combinedSeenIds, combinedLastIds, spotifyEnabled, isGuestHostGame, remoteQuestionIds]);
 
   // Synkron ref som alltid pekar på aktuell gameQuestions — används av
   // game_sequence_init-broadcasten utan att göra subscription-effekten
   // beroende av gameQuestions (vilket skulle orsaka re-subscribe).
   const gameQuestionsRef = useRef<typeof gameQuestions>(gameQuestions);
   useEffect(() => { gameQuestionsRef.current = gameQuestions; }, [gameQuestions]);
+
+  // ── Remote 1v1 init: sekvens-auktoritet + resume ─────────────────────
+  // Körs EN gång vid mount (efter gameQuestionsRef-syncen ovan):
+  //   1. Hämta matchen. question_ids null + host → persistera den lokalt
+  //      genererade sekvensen EN gång (RPC-guard: question_ids IS NULL —
+  //      en host-resume kan aldrig skriva över med ny shuffle).
+  //   2. Polla tills sekvensen finns (motståndare kan ha navigerat in
+  //      sekunder före host:s persist-write).
+  //   3. Resume: seeda rounds/allRoundScoresHistory/questionIndex från
+  //      egna remote_match_answers så en app-kill mitt i matchen återupptas
+  //      vid första obesvarade frågan. Allt besvarat → direkt leaderboard.
+  useEffect(() => {
+    if (!isRemote || !remoteMatchId) return;
+    if (remoteInitRanRef.current) return;
+    remoteInitRanRef.current = true;
+    let cancelled = false;
+    (async () => {
+      let match = await getMatch(remoteMatchId);
+      if (cancelled) return;
+      if (match && !match.questionIds && isHost) {
+        const localIds = gameQuestionsRef.current
+          .slice(0, totalRounds)
+          .map((q) => q.id);
+        if (localIds.length > 0) {
+          await persistQuestionSequence(remoteMatchId, localIds);
+        }
+        match = await getMatch(remoteMatchId);
+      }
+      // Host kan ha avbrutit matchen (Quit Game → status 'cancelled')
+      // mellan motståndarens navigation och denna fetch — visa kvittot
+      // och skicka hem istället för att fastna i "Preparing"-spinnern.
+      const bailIfCancelled = (m: typeof match): boolean => {
+        if (m?.status !== 'cancelled') return false;
+        Alert.alert(
+          'Lobby deleted by Host',
+          'The Host has cancelled this 1vs1 match.',
+          [{ text: 'OK', onPress: () => router.replace('/') }],
+          { cancelable: false },
+        );
+        return true;
+      };
+      if (bailIfCancelled(match)) return;
+      // Vänta in sekvensen (host-persist in-flight eller motståndare-race).
+      while (!cancelled && (!match || !match.questionIds || match.questionIds.length === 0)) {
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+        if (cancelled) return;
+        match = await getMatch(remoteMatchId);
+        if (bailIfCancelled(match)) return;
+      }
+      if (cancelled || !match?.questionIds) return;
+      const ids = match.questionIds.filter((id) => ALL_QUESTIONS_MAP.has(id));
+      if (ids.length === 0) {
+        // Katalog-skew: inga av matchens frågor finns i denna app-version.
+        Alert.alert(
+          'Update required',
+          'This match uses questions from a newer app version. Update QuizVibe to play it.',
+          [{ text: 'OK', onPress: () => router.replace('/') }],
+          { cancelable: false },
+        );
+        return;
+      }
+      setRemoteQuestionIds(ids);
+      // Resume-seed från egna svar (idempotent upsert per question_index).
+      const answers = await getMyAnswers(remoteMatchId);
+      if (cancelled) return;
+      const byIndex = new Map(answers.map((a) => [a.questionIndex, a]));
+      let firstUnanswered = 0;
+      while (byIndex.has(firstUnanswered)) firstUnanswered++;
+      if (firstUnanswered > 0) {
+        const seedScores: RoundScore[][] = [];
+        const seedRounds: RoundResult[] = [];
+        for (let i = 0; i < firstUnanswered; i++) {
+          const a = byIndex.get(i)!;
+          const q = ALL_QUESTIONS_MAP.get(a.questionId);
+          seedScores.push([{
+            playerId: selfPlayerId || 'you',
+            points: a.points,
+            correct: a.correct,
+            timeUsed: a.timeUsedSeconds,
+          }]);
+          seedRounds.push({
+            questionNumber: i + 1,
+            category: q?.category ?? 'songs',
+            question: q?.question ?? '',
+            correctYear: q?.type === 'timeline' ? q.correctYear : 0,
+            selectedYear: 0,
+            correct: a.correct,
+            points: a.points,
+            timeUsed: a.timeUsedSeconds,
+          });
+        }
+        setAllRoundScoresHistory(seedScores);
+        setRounds(seedRounds);
+        const total = Math.max(1, Math.min(totalRounds, ids.length));
+        if (firstUnanswered >= total) {
+          // Alla frågor redan besvarade — hoppa direkt till slutskärmen.
+          // Leaderboard-effekten kör finalize (idempotent server-side).
+          setQuestionIndex(total - 1);
+          setPhase('leaderboard');
+        } else {
+          setQuestionIndex(firstUnanswered);
+        }
+      }
+      setRemoteSessionReady(true);
+    })();
+    return () => { cancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isRemote, remoteMatchId, isHost]);
 
   // Media-källa per fråga (driver GetReadyIntro:s IndDev media-kö).
   // Image-frågor → 'image'; timeline-frågor (YouTube-content idag, men
@@ -2645,6 +2795,9 @@ export default function QuizScreen() {
   // overrides-mappen; default-policyn kickar in vid saknad key.
   const isAudioMutedForSelf = useMemo(() => {
     if (gameMode === 'pass-the-phone') return false;
+    // Remote 1v1: solo-session på egen enhet — ljudet spelas ALLTID lokalt
+    // (ingen host-only-audio-policy; IndDev:s override-map gäller inte här).
+    if (gameMode === 'remote-1v1') return false;
     if (!selfPlayerId) return false;
     if (Object.prototype.hasOwnProperty.call(playerAudioOverrides, selfPlayerId)) {
       return !playerAudioOverrides[selfPlayerId];
@@ -2972,8 +3125,10 @@ export default function QuizScreen() {
     //     gjorde att non-host:s egen rad visade 0 i played rounds/correct/
     //     avg/pts genom hela spelet.
     //   • Direkt-nav utan turnOrder: 'you' som sista fallback.
+    // Remote 1v1 attribueras som IndDev — solo-session där selfPlayerId
+    // ÄR den enda spelaren (turnOrder = [self], ingen rotation).
     const activePlayerId =
-      gameMode === 'individual-devices' && selfPlayerId
+      (gameMode === 'individual-devices' || gameMode === 'remote-1v1') && selfPlayerId
         ? selfPlayerId
         : (turnOrder[currentPlayerIndex]?.id ?? 'you');
     const yourScore: RoundScore = {
@@ -2999,6 +3154,19 @@ export default function QuizScreen() {
     }
     setCurrentRoundScores(allScores);
     setAllRoundScoresHistory((prev) => [...prev, allScores]);
+    // Remote 1v1: persistera svaret server-side (fire-and-forget). Unique-
+    // constrainten (match_id, user_id, question_index) gör skrivningen
+    // idempotent — retry/dubbelanrop dubbelräknar aldrig. Driver resume +
+    // motståndarens resultat-jämförelse.
+    if (isRemote && remoteMatchId && currentQ) {
+      void upsertAnswer(remoteMatchId, {
+        questionIndex,
+        questionId: currentQ.id,
+        correct: yourCorrect,
+        points: yourPoints,
+        timeUsedSeconds: yourTimeUsed,
+      });
+    }
     // Broadcast score till andra IndDev-enheter så deras leaderboard
     // uppdateras med vår post. broadcast.self: false gör att vi aldrig
     // tar emot vårt eget event — ingen double-count-risk.
@@ -4157,7 +4325,10 @@ export default function QuizScreen() {
     // Guest-hostade spel skrivs ALDRIG till Player history — även när en
     // inloggad user spelat som guest (guest-spel är anonyma per design).
     // saveLatestResult ovan behålls (bara använd direkt efter spelet).
-    if (rounds.length > 0 && !isGuestHostGame) {
+    // Remote 1v1 skrivs INTE heller hit — server-tabellerna (remote_matches)
+    // är remote-historikkällan (visas i "1vs1 Duels"-blocket i Player
+    // History); en AsyncStorage-append hade dubbelräknat spelet.
+    if (rounds.length > 0 && !isGuestHostGame && !isRemote) {
       const totalTime = rounds.reduce((sum, r) => sum + (r.timeUsed ?? 0), 0);
       const correctAnswers = rounds.filter((r) => r.correct).length;
       const profile = await loadProfile();
@@ -4207,11 +4378,29 @@ export default function QuizScreen() {
 
       setPlayerHcpChanges(changes);
       saveFinalGame();
+      // Remote 1v1: finalisera egen spelarrad server-side. Sista finishern
+      // triggar atomisk vinnarberäkning i RPC:n (radlås — ingen klient-race).
+      // Idempotent: redan avgjord match (walkover-sweep) → no-op.
+      if (isRemote && remoteMatchId) {
+        const flat = allRoundScoresHistory.flat();
+        const totalPts = flat.reduce((sum, s) => sum + s.points, 0);
+        const correctCount = flat.filter((s) => s.correct).length;
+        const avg =
+          flat.length > 0
+            ? Math.round((flat.reduce((sum, s) => sum + s.timeUsed, 0) / flat.length) * 1000) / 1000
+            : null;
+        void finalizePlayer(remoteMatchId, {
+          totalPoints: totalPts,
+          correctAnswers: correctCount,
+          avgResponseSeconds: avg,
+        });
+      }
       track('game_completed', {
         assistance: fallbackAssistance,
         total_points: totalPoints,
         rounds_played: rounds.length,
         guest_host: isGuestHostGame,
+        remote_1v1: isRemote,
       });
     }
   }, [phase, isLastQuestion]);
@@ -4330,7 +4519,9 @@ export default function QuizScreen() {
     // korrigerar countet om SEED_PLAYERS injiceras eller spelare flyttas.
     // TODO (subscription): byt hardcoded `false` mot riktig profile.isPremium.
     const initialCount = reusePlayers ? Math.max(1, allPlayers.length) : 1;
-    await registerActiveRoom(newCode, {
+    // Returvärdet MÅSTE kontrolleras — en tyst no-op ger en fantom-lobby
+    // som joiners inte hittar ("Room not found"-buggen 2026-08-07).
+    const roomRegistered = await registerActiveRoom(newCode, {
       // Guest host är alltid Free-nivå: max 4, ingen premium; hostPlayerName
       // = guest-namnet så own-lobby-detekteringen fungerar för replayn.
       maxPlayers: asGuestHost ? 4 : profile?.maxPlayers ?? 4,
@@ -4339,6 +4530,13 @@ export default function QuizScreen() {
       hostPlayerName: asGuestHost ? hostName : profile?.playerName ?? '',
       gameStarted: false,
     });
+    if (!roomRegistered) {
+      Alert.alert(
+        'Could not create game lobby',
+        'The new room could not be registered. Check your connection and try again.',
+      );
+      return;
+    }
     // Färsk leftPlayers-store + lobbyPlayers-store + ejected-store för nya
     // koden — undviker stale test-data och garanterar att non-host:s polling
     // startar tomt utan eject-status från en tidigare session.
@@ -4970,7 +5168,14 @@ export default function QuizScreen() {
   const handleQuitGame = () => {
     Alert.alert(
       'Quit game?',
-      'This will end the game and close the lobby for everyone. You will return to the start screen.',
+      // Remote 1v1: host:s Quit AVBRYTER matchen — status 'cancelled' via
+      // cancel_remote_match-RPC:n. Matchen BEHÅLLS och visas för båda
+      // spelarna som "Lobby deleted by Host" i 1vs1 Matches + Player
+      // history (Peter-krav 2026-08-07 rev 2). Motståndarens resume-
+      // semantik gäller bara deras EGEN Leave (handleLeaveGame nedan).
+      isRemote
+        ? 'This will cancel the 1vs1 match for BOTH players. It will be shown as "Lobby deleted by Host" and cannot be resumed.'
+        : 'This will end the game and close the lobby for everyone. You will return to the start screen.',
       [
         { text: 'Cancel', style: 'cancel' },
         {
@@ -4994,6 +5199,14 @@ export default function QuizScreen() {
                   addSessionRecordForNames(registeredNames, playedIds).catch(() => {});
                 }
               }
+            }
+            // Remote 1v1: markera matchen 'cancelled' server-side (RPC:n
+            // validerar att callern är host + att matchen är active).
+            // Await:as så UPDATE:n hinner committa innan Home mountar och
+            // My Matches-sektionen laddar — raden ska direkt visa
+            // "Lobby deleted by Host" istället för "Waiting for...".
+            if (isRemote && remoteMatchId) {
+              await cancelRemoteMatch(remoteMatchId);
             }
             const code = params.roomCode;
             if (code) {
@@ -5021,7 +5234,9 @@ export default function QuizScreen() {
   const handleLeaveGame = () => {
     Alert.alert(
       'Leave game?',
-      'You will return to the start screen. The game continues for the other players.',
+      isRemote
+        ? 'Your answers so far are saved. You can resume this 1vs1 match within 48 hours via "1vs1 Matches" on the Home screen.'
+        : 'You will return to the start screen. The game continues for the other players.',
       [
         { text: 'Cancel', style: 'cancel' },
         {
@@ -5514,6 +5729,24 @@ export default function QuizScreen() {
   const stopwatchColor =
     phase === 'question' ? timerColor : STOPWATCH_AWAITING_COLOR;
 
+  // Remote 1v1-gate: blockera ALLT spel-UI tills den auktoritativa fråge-
+  // sekvensen laddats från remote_matches + ev. resume-seed är klar. Utan
+  // gaten skulle den lokala shuffle-ordningen hinna visas (och i värsta
+  // fall spelas) innan DB-sekvensen ersätter den. Fönstret är normalt
+  // <1-2 s (host persisterar vid sin quiz-mount).
+  if (isRemote && (!remoteQuestionIds || !remoteSessionReady)) {
+    return (
+      <SafeAreaView style={styles.safe}>
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: Spacing.md }}>
+          <Text style={{ color: Colors.textPrimary, fontSize: FontSize.lg, fontWeight: '600' }}>
+            Preparing 1vs1 match
+          </Text>
+          <SequentialDots color={Colors.warning} />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   // Get-Ready-skärmen renderas före quiz-UI:t. Vid spelstart för båda lägena,
   // och mellan rundor för Pass-the-phone (ej Individual Devices). Faller
   // tillbaka till 'You' om turnOrder skulle vara tom (defensiv — initial
@@ -5655,8 +5888,9 @@ export default function QuizScreen() {
       {inactivityCountdownSec !== null && (
         <InactivityCountdownBanner secondsLeft={inactivityCountdownSec} />
       )}
-      {/* Ambient-slinga fortsätter sömlöst från Lobby-ljud under GetReady — ingen pulsering. */}
-      {isHost && !isAudioMutedForSelf && <MorseAmbientSound />}
+      {/* Ambient-slinga fortsätter sömlöst från Lobby-ljud under GetReady — ingen pulsering.
+          Remote 1v1: ljud lokalt på varje enhet (solo-session) — inte host-gated. */}
+      {(isHost || gameMode === 'remote-1v1') && !isAudioMutedForSelf && <MorseAmbientSound />}
       </View>
     );
   }
@@ -5676,7 +5910,7 @@ export default function QuizScreen() {
         answerType={effectiveAnswerTypeByQuestion[questionIndex] ?? null}
         onComplete={() => setPhase('question')}
         finalWord={isImageQuestion || isActorSelectQuestion || isSpotifyNameQuestion ? 'Who' : isTimelineQuestion ? 'When' : undefined}
-        silent={!isHost || isAudioMutedForSelf}
+        silent={!(isHost || gameMode === 'remote-1v1') || isAudioMutedForSelf}
       />
       {/* Pre-decode-trick borttaget 2026-05-27 (text-rendering = no decode). */}
       {inactivityCountdownSec !== null && (
@@ -5696,6 +5930,12 @@ export default function QuizScreen() {
         {inactivityCountdownSec !== null && (
           <InactivityCountdownBanner secondsLeft={inactivityCountdownSec} />
         )}
+        {/* Remote 1v1: duellstatus/resultat ovanför leaderboarden — visar
+            "Waiting for opponent" (live via Realtime) eller W/L/D-banner
+            med server-beräknat resultat. */}
+        {isRemote && remoteMatchId && isLastQuestion && (
+          <RemoteMatchResultPanel matchId={remoteMatchId} />
+        )}
         <RoundLeaderboard
           players={gamePlayers}
           roundScores={currentRoundScores}
@@ -5708,8 +5948,11 @@ export default function QuizScreen() {
           onApprovePlayAgain={handleApprovePlayAgain}
           isLastRound={isLastQuestion}
           isHost={isHost}
-          guestHost={isGuestHostGame}
-          guestReplaysUsed={guestReplaysUsed}
+          // Remote 1v1: Play Again döljs (asynkron duell har ingen replay-
+          // koppling — nytt spel skapas från Lobby). guestHost=true +
+          // replaysUsed=1 återanvänder guest-flödets "bara Home"-footer.
+          guestHost={isGuestHostGame || isRemote}
+          guestReplaysUsed={isRemote ? 1 : guestReplaysUsed}
           hostInitiatedPlayAgain={hostInitiatedPlayAgain}
           allRoundScoresHistory={allRoundScoresHistory}
           hcpChanges={isLastQuestion ? playerHcpChanges : undefined}
@@ -5878,7 +6121,7 @@ export default function QuizScreen() {
       <View style={styles.fixedTopZone}>
         {/* Hjärtslag enbart för Hints-frågor under aktiv svarstid.
             YT- och Spotify-frågor är tysta i quiz-vyn. */}
-        {isHost && !isAudioMutedForSelf && isImageQuestion && (phase === 'question' || phase === 'awaiting') && (
+        {(isHost || gameMode === 'remote-1v1') && !isAudioMutedForSelf && isImageQuestion && (phase === 'question' || phase === 'awaiting') && (
           <HeartbeatSound bpm={80} />
         )}
           {/* phase är här narrowed till 'question' | 'awaiting' | 'reveal'

@@ -10,7 +10,7 @@ import { supabase } from '../utils/supabase';
 
 export const BOTTOM_BANNER_HEIGHT = 52;
 
-const SHOW_ON = ['/', '/profile', '/store'];
+const SHOW_ON = ['/', '/profile', '/store', '/my-matches'];
 
 interface TabItemProps {
   icon: React.ReactNode;

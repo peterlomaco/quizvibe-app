@@ -23,7 +23,7 @@ import { supabase } from './supabase';
 
 export interface RoomMeta {
   // Host:s valda max-spelare-cap (4 = Basic/Free, 12 = Premium-tier).
-  maxPlayers: 4 | 12;
+  maxPlayers: 2 | 4 | 12;
   // Avgör popup-meddelandet när lobbyn är full. Free → "or to upgrade"-CTA,
   // Premium → "remove players"-only. Hardcodad till false från Create Game
   // tills riktig subscription-state finns på ProfileData.
@@ -59,7 +59,7 @@ interface RoomRow {
   code: string;
   host_user_id: string;
   host_player_name: string;
-  max_players: 4 | 12;
+  max_players: 2 | 4 | 12;
   host_is_premium: boolean;
   current_player_count: number;
   game_started: boolean;
@@ -87,15 +87,20 @@ function normalizeCode(code: string): string {
  * auth.uid(). Re-registrera samma kod (sällsynt — Play Again ska alltid
  * generera ny kod) skriver över via upsert.
  *
- * Returnerar void; caster loggar ev. errors. Idempotent.
+ * Returnerar TRUE när rummet faktiskt skrevs till DB, FALSE vid saknad
+ * session eller upsert-fel (loggas som warn). Call-sites SKA kontrollera
+ * returvärdet och visa Alert + abort:a navigationen vid false — annars
+ * hamnar host i en fantom-lobby som joiners inte hittar ("Room not
+ * found"-buggen 2026-08-07: tyst no-op → host såg normal lobby lokalt
+ * medan rums-raden aldrig existerade). Idempotent.
  */
-export async function registerActiveRoom(code: string, meta: RoomMeta): Promise<void> {
+export async function registerActiveRoom(code: string, meta: RoomMeta): Promise<boolean> {
   const normalized = normalizeCode(code);
   const { data: userResp } = await supabase.auth.getUser();
   const user = userResp.user;
   if (!user) {
     console.warn('[activeRooms] registerActiveRoom called without session — host must be signed in.');
-    return;
+    return false;
   }
   const { error } = await supabase.from('rooms').upsert({
     code: normalized,
@@ -109,7 +114,9 @@ export async function registerActiveRoom(code: string, meta: RoomMeta): Promise<
   });
   if (error) {
     console.warn('[activeRooms] registerActiveRoom failed:', error.message);
+    return false;
   }
+  return true;
 }
 
 /**
@@ -276,7 +283,7 @@ export async function setRoomPlayerCount(code: string, count: number): Promise<v
  * aktuella val så join-flödets full-check baseras på samma cap som UI:t
  * visar. No-op på test-seeds och okända koder.
  */
-export async function setRoomMaxPlayers(code: string, maxPlayers: 4 | 12): Promise<void> {
+export async function setRoomMaxPlayers(code: string, maxPlayers: 2 | 4 | 12): Promise<void> {
   if (!code) return;
   const normalized = normalizeCode(code);
   if (TEST_ROOM_SEEDS.has(normalized)) return;

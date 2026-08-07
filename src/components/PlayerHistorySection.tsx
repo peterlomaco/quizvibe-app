@@ -4,6 +4,8 @@ import Svg, { Path } from 'react-native-svg';
 import { useFocusEffect } from 'expo-router';
 import { Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';
 import { loadGameHistory, type HistoryEntry } from '../utils/gameResults';
+import { getMyMatches, type MyRemoteMatch } from '../utils/remoteMatches';
+import { supabase } from '../utils/supabase';
 
 // Player history-sektionen visar en minimal lista över alla spel
 // användaren har spelat. Per spel: datum / totalpoäng / snittpoäng per
@@ -67,6 +69,10 @@ export function PlayerHistorySection() {
   // Subsequent re-focuses respekterar user:s explicita toggling.
   const [expandedMonths, setExpandedMonths] = useState<Set<string>>(new Set());
   const didInitMonthExpansionRef = useRef(false);
+  // Remote 1v1-dueller (avgjorda) — server-side historik ur remote_matches.
+  // Endast för REGISTRERADE sessioner (anon guest-sessioner får ingen
+  // duell-historik per produktkrav; deras matcher städas av server-cron).
+  const [duels, setDuels] = useState<MyRemoteMatch[]>([]);
 
   // Re-load varje gång Profile får fokus så listan speglar senaste
   // append:en (Quiz → Final Leaderboard → Home → Profile).
@@ -85,9 +91,37 @@ export function PlayerHistorySection() {
           didInitMonthExpansionRef.current = true;
         }
       });
+      // 1v1-duellhistorik: bara avgjorda matcher, bara registrerade sessioner.
+      (async () => {
+        const { data } = await supabase.auth.getSession();
+        const user = data.session?.user as { is_anonymous?: boolean } | undefined;
+        if (!user || user.is_anonymous) {
+          if (active) setDuels([]);
+          return;
+        }
+        const mine = await getMyMatches();
+        if (!active) return;
+        setDuels(mine.filter((m) => m.match.status !== 'active'));
+      })();
       return () => { active = false; };
     }, []),
   );
+
+  // Head-to-head-aggregat per motståndare: "vs Anna: 3-1-0" (W-L-D).
+  // Nycklas på motståndarens userId (stabil över namn-byten); void- och
+  // cancelled-matcher exkluderas ur aggregatet (inget resultat att räkna).
+  const headToHead = useMemo(() => {
+    const map = new Map<string, { name: string; w: number; l: number; d: number }>();
+    for (const { match, me, opponent } of duels) {
+      if (!opponent || match.result === 'void' || match.status === 'cancelled') continue;
+      const entry = map.get(opponent.userId) ?? { name: opponent.playerName, w: 0, l: 0, d: 0 };
+      if (match.result === 'draw') entry.d += 1;
+      else if (match.winnerUserId === me.userId) entry.w += 1;
+      else entry.l += 1;
+      map.set(opponent.userId, entry);
+    }
+    return [...map.values()].sort((a, b) => b.w + b.l + b.d - (a.w + a.l + a.d));
+  }, [duels]);
 
   const monthGroups = useMemo(() => groupByMonth(history), [history]);
 
@@ -192,6 +226,69 @@ export function PlayerHistorySection() {
               </View>
             )}
           </View>
+
+          {/* ── 1vs1 Duels — Remote 1v1-historik (server-side) ──────────
+              Renderas bara för registrerade users med minst en avgjord
+              duell. Aggregat per motståndare överst ("vs Anna: 3-1-0"),
+              sedan per-match-rader (motståndare · resultat · poäng · datum). */}
+          {duels.length > 0 && (
+            <View style={[styles.card, { marginTop: Spacing.md }]}>
+              <Text style={styles.cardTitle}>1vs1 Duels: {duels.length}</Text>
+              {headToHead.length > 0 && (
+                <View style={styles.duelAggWrap}>
+                  {headToHead.map((h) => (
+                    <Text key={h.name} style={styles.duelAggText}>
+                      vs {h.name}: <Text style={styles.duelAggRecord}>{h.w}-{h.l}-{h.d}</Text>
+                    </Text>
+                  ))}
+                </View>
+              )}
+              <View style={styles.gameList}>
+                {duels.map(({ match, me, opponent }, i) => {
+                  const oppName = opponent?.playerName ?? 'Opponent';
+                  const isCancelled = match.status === 'cancelled';
+                  const isVoid = match.result === 'void';
+                  const isDraw = match.result === 'draw';
+                  const iWon = match.winnerUserId === me.userId;
+                  const resultLabel = isCancelled
+                    ? 'Cancelled'
+                    : isVoid ? 'Void' : isDraw ? 'Draw' : iWon ? 'Won' : 'Lost';
+                  const resultColor = isCancelled || isVoid
+                    ? Colors.textSecondary
+                    : isDraw
+                      ? Colors.textPrimary
+                      : iWon
+                        ? Colors.success
+                        : Colors.error;
+                  const when = new Date(match.finishedAt ?? match.startedAt);
+                  const dateLabel = Number.isNaN(when.getTime())
+                    ? ''
+                    : when.toLocaleDateString('en', { month: 'short', day: 'numeric' });
+                  return (
+                    <React.Fragment key={match.id}>
+                      <View style={styles.duelRow}>
+                        <View style={{ flex: 1, gap: 2 }}>
+                          <Text style={styles.duelOpponent} numberOfLines={1}>
+                            vs {oppName}
+                          </Text>
+                          <Text style={styles.duelMeta}>
+                            {isCancelled
+                              ? 'Lobby deleted by Host'
+                              : isVoid
+                                ? 'No one finished in time'
+                                : `${me.totalPoints}–${opponent?.totalPoints ?? 0}${match.result === 'walkover' ? ' · walkover' : ''}`}
+                            {dateLabel ? ` · ${dateLabel}` : ''}
+                          </Text>
+                        </View>
+                        <Text style={[styles.duelResult, { color: resultColor }]}>{resultLabel}</Text>
+                      </View>
+                      {i < duels.length - 1 && <View style={styles.divider} />}
+                    </React.Fragment>
+                  );
+                })}
+              </View>
+            </View>
+          )}
         </>
       )}
     </View>
@@ -332,6 +429,38 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: Colors.separator,
     marginVertical: Spacing.sm,
+  },
+
+  // ── 1vs1 Duels-blocket ──────────────────────────────────────────────
+  duelAggWrap: {
+    gap: 2,
+    marginBottom: Spacing.sm,
+  },
+  duelAggText: {
+    fontSize: FontSize.sm,
+    color: Colors.textSecondary,
+  },
+  duelAggRecord: {
+    color: Colors.primary,
+    fontWeight: FontWeight.bold,
+  },
+  duelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
+  duelOpponent: {
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.semibold,
+    color: Colors.textPrimary,
+  },
+  duelMeta: {
+    fontSize: FontSize.xs,
+    color: Colors.textSecondary,
+  },
+  duelResult: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.bold,
   },
 
   // Månads-grupp (collapsible sub-block inom card). Tunna styles —

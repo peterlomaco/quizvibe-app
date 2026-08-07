@@ -64,6 +64,7 @@ import { claimCarryOverLobbyPlayer, clearLobbyPlayers, getLobbyPlayers, getLobby
 import { loadLastSessionIds, loadSeenQuestionIds } from '../utils/hostQuestionHistory';
 import { setPendingPeerSeenIds } from '../utils/pendingSeenQuestions';
 import { clearLobbySettings, getLobbySettings, setLobbySettings } from '../utils/mockLobbySettings';
+import { createRemoteMatch, getMatchByRoomCode, getOwnUserId } from '../utils/remoteMatches';
 import { defaultEnabledMainCategories, subjectToMainCategory, type MainCategory } from '../utils/mainCategory';
 import { MUSIC_QUESTIONS } from '../utils/musicQuestions';
 import { IMAGE_QUIZ_QUESTIONS } from '../utils/quizImageQuestions';
@@ -93,6 +94,7 @@ import {
 import { containsProfanity } from '../utils/profanity';
 import { loadProfile, playerNameExists, saveProfile, type ProfileData, type Region as ProfileRegion } from '../utils/profileStorage';
 import { hasPremiumSubscription } from '../utils/subscriptionStorage';
+import * as Clipboard from 'expo-clipboard';
 import { ROOM_CODE_DIGITS, ROOM_CODE_LEADING_LETTERS, formatRoomCode, generateRoomCode } from '../utils/roomCode';
 import { addInvite, clearWaitingInvitesForRoom } from '../utils/waitingInvites';
 
@@ -131,7 +133,7 @@ export interface LobbyPlayer extends Player {
   spotifyConnected?: boolean;
 }
 
-type GameMode = 'pass-the-phone' | 'individual-devices';
+type GameMode = 'pass-the-phone' | 'individual-devices' | 'remote-1v1';
 
 // Year-of-birth gränser (samma som registreringsformuläret för gäster) ....
 // 15+ minimum age requirement (2026-06-01: höjt från 13+ pga 15+-gränsat
@@ -1040,6 +1042,7 @@ export default function LobbyScreen() {
     guestAssistance,
     guestReplays,
     carryOverPlayerId,
+    lobbyType,
   } = useLocalSearchParams<{
     code: string;
     isHost: string;
@@ -1060,6 +1063,11 @@ export default function LobbyScreen() {
      *  Sätts av quiz.tsx vid navigation → LobbyScreen hoppar DB-beroende
      *  dup-detection och ärver rätt id direkt. */
     carryOverPlayerId?: string;
+    /** '1v1' när lobbyn skapades via HostTypeModal-valet "1vs1 Matches" på
+     *  Home (registrerad ELLER guest host). Seedar gameMode='remote-1v1'
+     *  hårt — den renodlade 1vs1-lobbyn visar ingen Game Mode-sektion så
+     *  läget kan aldrig bytas inne i lobbyn. */
+    lobbyType?: string;
   }>();
   // Om ingen kod skickas (t.ex. om man öppnar lobby-tabben direkt) genereras en.
   // useMemo ser till att koden är stabil över re-renders.
@@ -1076,6 +1084,11 @@ export default function LobbyScreen() {
   // fulla era-spannet, inga paket), döljer credits-pill + Share invite
   // och skippar credit-gaten i handleStartGame.
   const isGuestHost = hostMode && guestHost === 'true' && !!guestName?.trim();
+  // Renodlad 1vs1-lobby (2026-08-07): skapades via "1vs1 Matches"-valet på
+  // Home. Driver den forcerade remote-1v1-seeden (host-sidan). UI-gating
+  // sker däremot på gameMode === 'remote-1v1' (state) så non-host — som får
+  // gameMode via settings-syncen — döljer samma sektioner utan egen param.
+  const is1v1Lobby = lobbyType === '1v1';
 
   // Initial = tom; mount-useEffect på [code, guestMode, ..., hostMode] sätter
   // till [SEED_PLAYERS[0]] för host eller [] för non-host. SEED_PLAYERS som
@@ -1237,9 +1250,21 @@ export default function LobbyScreen() {
       // inga paket, alla source-kategorier ON — Mixerboard är guest-låst).
       getLobbySettings(roomCode).then((stored) => {
         if (cancelled) return;
-        setGameMode(stored?.gameMode ?? 'pass-the-phone');
-        setSinglePlayerDefault(stored?.singlePlayerDefault ?? false);
-        setMaxPlayers(4);
+        // Renodlad 1vs1-lobby: mode forceras av Home-valet — stored/default
+        // ignoreras. Standard-lobby: stale 'remote-1v1' coercas till PtP
+        // (remote kan inte längre väljas inne i lobbyn).
+        setGameMode(
+          is1v1Lobby
+            ? 'remote-1v1'
+            : (stored?.gameMode ?? 'pass-the-phone') === 'remote-1v1'
+              ? 'pass-the-phone'
+              : stored?.gameMode ?? 'pass-the-phone',
+        );
+        // 1v1: singlePlayerDefault MÅSTE vara false — alla remote-guards
+        // (start-knapp-swap, handleStartGame, maxPlayers-effekten) är
+        // gated på `gameMode === 'remote-1v1' && !singlePlayerDefault`.
+        setSinglePlayerDefault(is1v1Lobby ? false : stored?.singlePlayerDefault ?? false);
+        setMaxPlayers(is1v1Lobby ? 2 : 4);
         setRegion('Sweden');
         setAnswerResponseSeconds(60);
         setEraValues([ERA_MIN, ERA_MAX]);
@@ -1265,22 +1290,40 @@ export default function LobbyScreen() {
           if (cancelled) return;
           // Om Spotify är sparad som default i profilen måste lobby starta i
           // IndDev-läge (Spotify DJ kräver Individual Devices).
-          const seedGameMode =
+          // Renodlad 1vs1-lobby (lobbyType='1v1' från Home-valet): mode
+          // forceras till remote-1v1 — stored/profil ignoreras. Standard-
+          // lobby: stale 'remote-1v1' (t.ex. gammal profil-default från
+          // innan Remote-rutan togs bort) coercas till Pass-the-Phone.
+          const rawSeedGameMode =
             stored?.gameMode ??
             (profile?.spotifyDefaultEnabled ? 'individual-devices' : undefined) ??
             profile?.gameMode ??
             'pass-the-phone';
+          const seedGameMode: GameMode = is1v1Lobby
+            ? 'remote-1v1'
+            : rawSeedGameMode === 'remote-1v1'
+              ? 'pass-the-phone'
+              : rawSeedGameMode;
           setGameMode(seedGameMode);
           // Clamp mot premium-status: profilen kan ha ett stale maxPlayers=12
           // från en tidigare session med aktiv prenumeration — utan denna
           // clamping sätts 12 EFTER att hasPremium-clamp-effekten kört 4,
           // och effekten re-fyrar inte eftersom hasPremium inte ändrats.
-          const rawMax = profile?.maxPlayers ?? 4;
-          setMaxPlayers(!premium && rawMax > 4 ? 4 : (rawMax as 4 | 12));
+          // Remote 1v1: alltid låst till 2 (host + 1 motståndare).
+          if (seedGameMode === 'remote-1v1') {
+            setMaxPlayers(2);
+          } else {
+            const rawMax = profile?.maxPlayers ?? 4;
+            setMaxPlayers(!premium && rawMax > 4 ? 4 : rawMax === 2 ? 4 : (rawMax as 4 | 12));
+          }
+          // 1v1: singlePlayerDefault MÅSTE vara false — alla remote-guards
+          // är gated på `gameMode === 'remote-1v1' && !singlePlayerDefault`.
           setSinglePlayerDefault(
-            stored?.singlePlayerDefault ??
-              profile?.singlePlayerDefault ??
-              false,
+            is1v1Lobby
+              ? false
+              : stored?.singlePlayerDefault ??
+                profile?.singlePlayerDefault ??
+                false,
           );
           // V1: bara Sweden — eventuella stored/profile-värden som inte är
           // Sweden ignoreras (legacy från Nordics/Europe/Global-tiden).
@@ -1330,7 +1373,8 @@ export default function LobbyScreen() {
                 : [],
             );
             setSketchEnabled(stored.sketchEnabled);
-            setSpotifyEnabled(stored.spotifyEnabled);
+            // 1v1: Spotify är aldrig tillgängligt (kortet göms) — forcera av.
+            setSpotifyEnabled(is1v1Lobby ? false : stored.spotifyEnabled);
           } else if (premium) {
             setSelectedExtraPackages(enabledIds);
           }
@@ -1354,8 +1398,9 @@ export default function LobbyScreen() {
           setImagesEnabledCategories(seedImgCats);
           // Spotify default — prio: stored > profil. Sätts här så toggeln
           // är rätt seedat oavsett om Spotify-callbacken hinner före render.
+          // 1v1: alltid av (Spotify-kortet göms i renodlade 1vs1-lobbyn).
           if (!stored) {
-            setSpotifyEnabled(profile?.spotifyDefaultEnabled ?? false);
+            setSpotifyEnabled(is1v1Lobby ? false : profile?.spotifyDefaultEnabled ?? false);
           }
           // Tillåt debounce-effekten att skriva till setLobbySettings nu när
           // alla initiala värden är satta. Utan denna guard kan debounce:n
@@ -1571,7 +1616,9 @@ export default function LobbyScreen() {
           // profil-default. Kräver self-attest för att aktivera DJ-läget.
           // Guest host: hoppa över seedingen — Spotify startar alltid AV
           // (guest togglar på manuellt i Source Mixerboard om önskat).
-          if (attested && !isGuestHost) {
+          // 1v1-lobby: hoppa också över — Spotify-kortet göms helt och
+          // spotifyEnabled ska förbli false (profil-defaulten får inte läcka in).
+          if (attested && !isGuestHost && !is1v1Lobby) {
             getLobbySettings(roomCode).then((lobbySt) => {
               if (!active) return;
               // Prefer carry-over value if lobby_settings redan finns (Play Again
@@ -1867,7 +1914,7 @@ export default function LobbyScreen() {
 
   // Max antal spelare per spel — 4 = Basic (gratis), 12 = Premium.
   // Lobby-local state; speglar Profile:s host-default-toggle.
-  const [maxPlayers, setMaxPlayers] = useState<4 | 12>(4);
+  const [maxPlayers, setMaxPlayers] = useState<2 | 4 | 12>(4);
   // Premium-state laddas från subscriptionStorage i useFocusEffect så vi
   // re-checkar efter återkomst från Store (mock-purchase aktiverar flaggan).
   // Driver BÅDA Individual Devices-unlock OCH Max 12-unlock. TODO (Store
@@ -1905,10 +1952,11 @@ export default function LobbyScreen() {
   // maxPlayers sätts nu explicit via Players-toggeln (Max 4 / Max 12).
   // Premium → auto-välj Max 12 och lås (Max 4 utgråas).
   // Ej premium → tvinga tillbaka till Max 4.
+  // Remote 1v1 → ALLTID 2 (host + 1 motståndare) oavsett premium.
   useEffect(() => {
     if (!hostMode) return;
-    setMaxPlayers(hasPremium ? 12 : 4);
-  }, [hostMode, hasPremium]);
+    setMaxPlayers(gameMode === 'remote-1v1' ? 2 : hasPremium ? 12 : 4);
+  }, [hostMode, hasPremium, gameMode]);
 
   // Max rundor beror på spelläge: IndDev → 20, PtP/Single → 4.
   // Premium ger INTE fler rundor i PtP — premium-host i PtP hänvisas till
@@ -1936,7 +1984,7 @@ export default function LobbyScreen() {
   }, []);
   const handleIncrementRounds = useCallback(() => {
     if (roundsCount >= stepperMax) {
-      if (singlePlayerDefault || gameMode === 'pass-the-phone') {
+      if (singlePlayerDefault || gameMode === 'pass-the-phone' || gameMode === 'remote-1v1') {
         Alert.alert('More rounds not available', 'More than 4 rounds is only available with both Individual device and Premium activated.');
       }
       return;
@@ -2556,9 +2604,9 @@ export default function LobbyScreen() {
     );
   };
 
-  // Game mode-val: tre fria lägen (single / PtP / IndDev). IndDev är INTE
-  // längre premium-gated — alla tre är gratis att välja. Subscription gatar
-  // istället caps (rundor/spelare), inte lägesvalet.
+  // Game mode-val: fyra fria lägen (single / PtP / Remote 1v1 / IndDev).
+  // IndDev är INTE längre premium-gated — alla är gratis att välja.
+  // Subscription gatar istället caps (rundor/spelare), inte lägesvalet.
   const handleSelectMode = (mode: GameMode) => {
     if (mode === gameMode && !singlePlayerDefault) return;
     // Vid byte till Individual device: varna om host har manuellt tillagda
@@ -2571,6 +2619,55 @@ export default function LobbyScreen() {
         // Premium → återställ Max 12 automatiskt (kan ha satts till 4 av PtP-bytet).
         if (hasPremium) setMaxPlayers(12);
       });
+      return;
+    }
+    // Remote (1vs1): DÖD KOD sedan 2026-08-07 — Remote-rutan togs bort ur
+    // lobbyns Game Mode-val (1vs1 nås via "1vs1 Matches"-valet på Home som
+    // seedar mode direkt, utan denna handler). Grenen behålls orörd ifall
+    // in-lobby-byte till 1vs1 skulle återinföras.
+    if (mode === 'remote-1v1') {
+      const applyRemote = () => {
+        setSinglePlayerDefault(false);
+        setGameMode('remote-1v1');
+        setMaxPlayers(2);
+        setSpotifyEnabled(false);
+      };
+      const selfJoinedNonHosts = players.filter(
+        (p) => !p.isHost && !p.hasLeft && !p.addedByHost,
+      );
+      if (selfJoinedNonHosts.length > 1) {
+        Alert.alert(
+          'Switch to Remote (1vs1)?',
+          'Remote 1vs1 allows only 1 opponent. All players will be removed from the lobby — invite ONE opponent again after switching.',
+          [
+            { text: 'Cancel', style: 'cancel' },
+            {
+              text: 'Continue',
+              style: 'destructive',
+              onPress: () => {
+                const allNonHosts = players.filter((p) => !p.isHost && !p.hasLeft);
+                allNonHosts.forEach((p) => {
+                  markEjected(roomCode, p.id);
+                  supabase
+                    .from('lobby_players')
+                    .delete()
+                    .eq('room_code', roomCode)
+                    .eq('player_id', p.id)
+                    .then(({ error }) => {
+                      if (error) console.warn('[lobbyPlayers] Remote-switch eject failed:', error.message);
+                    });
+                });
+                setPlayers((prev) => prev.filter((p) => p.isHost));
+                applyRemote();
+              },
+            },
+          ],
+        );
+        return;
+      }
+      // ≤1 självansluten motståndare — behåll den; rensa ev. host-tillagda
+      // guests via samma confirm-flöde som IndDev.
+      confirmAndRemoveGuests('Switch to Remote (1vs1)?', applyRemote);
       return;
     }
     // Vid byte till PtP: maxPlayers alltid 4 (PtP-cap). Om host godkänt fler
@@ -2689,20 +2786,24 @@ export default function LobbyScreen() {
   // FREE-badge grön när aktiv, grå när inaktiv. disabled för non-host.
   // redIndiv: om true färgas "Individual device"-rutan röd när inaktiv (används
   // bara i Number of Rounds quick-select, INTE i Game Settings/Game Mode).
-  const renderModeBox = (key: 'single' | 'ptp' | 'indiv', label: string, smallText?: boolean, redIndiv?: boolean) => {
+  const renderModeBox = (key: 'single' | 'ptp' | 'remote' | 'indiv', label: string, smallText?: boolean, redIndiv?: boolean) => {
     const isActive =
       key === 'single'
         ? singlePlayerDefault
         : key === 'ptp'
           ? !singlePlayerDefault && gameMode === 'pass-the-phone'
-          : !singlePlayerDefault && gameMode === 'individual-devices';
+          : key === 'remote'
+            ? !singlePlayerDefault && gameMode === 'remote-1v1'
+            : !singlePlayerDefault && gameMode === 'individual-devices';
     return (
       <TouchableOpacity
         style={[styles.modeOption, isActive ? styles.modeOptionPassActive : styles.modeOptionInactive]}
         onPress={() =>
           key === 'single'
             ? handleSelectSingle()
-            : handleSelectMode(key === 'ptp' ? 'pass-the-phone' : 'individual-devices')
+            : handleSelectMode(
+                key === 'ptp' ? 'pass-the-phone' : key === 'remote' ? 'remote-1v1' : 'individual-devices',
+              )
         }
         disabled={!hostMode}
         activeOpacity={0.7}
@@ -2864,12 +2965,12 @@ export default function LobbyScreen() {
   // Tryck på "+ Add Player" — blockera redan här om lobbyn är full så
   // host inte slösar tid på att fylla i formuläret.
   const handleOpenAddPlayer = () => {
-    // Individual device kräver registrerade konton — host kan inte lägga till
-    // guests manuellt. De måste joina med sitt eget registrerade konto.
-    if (gameMode === 'individual-devices' && !singlePlayerDefault) {
+    // Individual device + Remote 1v1 kräver egen enhet — host kan inte lägga
+    // till guests manuellt. De måste joina med egen enhet via room code.
+    if ((gameMode === 'individual-devices' || gameMode === 'remote-1v1') && !singlePlayerDefault) {
       Alert.alert(
         'Own device required',
-        "Players can't be added manually in Individual device games — every player needs their own device. Ask them to join with the room code instead, or switch game mode.",
+        "Players can't be added manually in this game mode — every player needs their own device. Ask them to join with the room code instead, or switch game mode.",
       );
       return;
     }
@@ -3775,10 +3876,65 @@ export default function LobbyScreen() {
         // Approved spelare: nästa steg beror på gameMode.
         // - Pass-the-Phone: bara host spelar på sin telefon → vänligare
         //   popup "Host has started... use the Host device".
+        // - Remote 1v1: asynkron duell — motståndaren väljer själv Play now
+        //   (solo-quiz direkt) eller Play later (Home → 1vs1 Matches,
+        //   48h-fönster).
         // - Individual Devices: alla approved spelare spelar på sin egen
         //   enhet → navigera till /quiz med derived turnOrder.
         if (effectiveGameMode === 'pass-the-phone') {
           if (!cancelled) setPassThePhoneStartedDetected(true);
+          return;
+        }
+        if (effectiveGameMode === 'remote-1v1') {
+          if (navigatedToQuizRef.current || cancelled) return;
+          const match = await getMatchByRoomCode(roomCode);
+          // Matchen kan ännu inte ha propagerat (host skapar den precis före
+          // game_started-flaggan) — låt nästa 2s-poll försöka igen.
+          if (!match || cancelled) return;
+          navigatedToQuizRef.current = true;
+          const selfTurnOrder = [{
+            id: selfRow.id,
+            name: selfRow.name,
+            emoji: selfRow.emoji,
+            avatarUri: selfRow.avatarUri,
+            assistance: selfRow.assistance ?? 'standard',
+            age: selfRow.age,
+            spotifyConnected: false,
+            type: selfRow.type,
+          }];
+          const goPlayNow = () => {
+            router.replace({
+              pathname: '/quiz',
+              params: {
+                assistance: selfRow.assistance ?? 'standard',
+                age: selfRow.age != null ? String(selfRow.age) : '32',
+                gameMode: 'remote-1v1',
+                remoteMatchId: match.id,
+                guestHost: 'false',
+                isHost: 'false',
+                selfPlayerId: ownId ?? '',
+                players: JSON.stringify(selfTurnOrder),
+                roundsCount: String(match.settings.roundsCount),
+                answerResponseSeconds: String(match.settings.answerResponseSeconds),
+                eraFrom: String(match.settings.eraFrom),
+                eraTo: String(match.settings.eraTo),
+                youtubeEnabledCategories: JSON.stringify(match.settings.youtubeEnabledCategories),
+                imagesEnabledCategories: JSON.stringify(match.settings.imagesEnabledCategories),
+                selectedExtraPackages: JSON.stringify(match.settings.selectedExtraPackages),
+                spotifyEnabled: 'false',
+                roomCode,
+              },
+            });
+          };
+          Alert.alert(
+            '1vs1 match started',
+            'Host has started the 1vs1 match. You have 48 hours to play your questions — now or later via "1vs1 Matches" on the Home screen.',
+            [
+              { text: 'Play later', style: 'cancel', onPress: () => router.replace('/') },
+              { text: 'Play now', onPress: goPlayNow },
+            ],
+            { cancelable: false },
+          );
           return;
         }
         if (!navigatedToQuizRef.current && !cancelled) {
@@ -4059,6 +4215,28 @@ export default function LobbyScreen() {
   // namespacade Waiting Invites-inbox (friend.playerName som nyckel).
   // Använder hostens profil-playerName/avatar som "from"-data.
   const handleInviteFriend = async (friend: Friend) => {
+    // Remote 1v1-regel: max 4 obesvarade invites per host. Räknas via
+    // sender-läs-policyn på waiting_invites (migration 0027 DEL 7 —
+    // from_user_id = auth.uid()). Accepterade invites raderas (removeInvite)
+    // och faller ur räkningen. Query-fel → fail-open (spam-taket är en
+    // mjuk produktregel, inte säkerhetskritiskt — DB-rate-limiten på 50/h
+    // ligger kvar som hård gräns).
+    if (gameMode === 'remote-1v1' && !singlePlayerDefault) {
+      const userId = await getOwnUserId();
+      if (userId) {
+        const { count, error } = await supabase
+          .from('waiting_invites')
+          .select('id', { count: 'exact', head: true })
+          .eq('from_user_id', userId);
+        if (!error && (count ?? 0) >= 4) {
+          Alert.alert(
+            'Invitation limit reached',
+            'You already have 4 unanswered 1vs1 invitations. Wait for an answer or for old invitations to expire before sending more.',
+          );
+          return;
+        }
+      }
+    }
     const profile = await loadProfile();
     const fromPlayerName = profile?.playerName?.trim() || 'Host';
     await addInvite(friend.playerName, {
@@ -4275,6 +4453,48 @@ export default function LobbyScreen() {
       }
     }
 
+    // Remote 1v1-guards: exakt 1 approved motståndare krävs, motståndaren
+    // måste ha egen enhet (user_id i lobby_players — self-joined spelare har
+    // alltid det via upsertOwnLobbyPlayer; host-tillagda guests har null).
+    // user_id:t behövs för remote_match_players-raden (server-side identitet
+    // som överlever rummets 24h-expiry).
+    let remoteOpponent: LobbyPlayer | null = null;
+    let remoteOpponentUserId: string | null = null;
+    if (gameMode === 'remote-1v1' && !singlePlayerDefault) {
+      const activeApprovedNonHosts = approvedPlayers.filter((p) => !p.isHost && !p.hasLeft);
+      if (activeApprovedNonHosts.length !== 1) {
+        Alert.alert(
+          'Remote 1vs1 requires exactly 1 opponent',
+          activeApprovedNonHosts.length === 0
+            ? 'Invite and approve one opponent before starting the match.'
+            : 'Remove players until exactly one approved opponent remains.',
+        );
+        return;
+      }
+      remoteOpponent = activeApprovedNonHosts[0];
+      if (remoteOpponent.addedByHost) {
+        Alert.alert(
+          'Own device required',
+          `${remoteOpponent.name} was added by the Host and has no device of their own. Remote 1vs1 opponents must join with their own device.`,
+        );
+        return;
+      }
+      const { data: oppRow, error: oppErr } = await supabase
+        .from('lobby_players')
+        .select('user_id')
+        .eq('room_code', roomCode)
+        .eq('player_id', remoteOpponent.id)
+        .maybeSingle();
+      remoteOpponentUserId = (oppRow?.user_id as string | null) ?? null;
+      if (oppErr || !remoteOpponentUserId) {
+        Alert.alert(
+          'Cannot start match',
+          `${remoteOpponent.name}'s device session could not be verified. Ask them to re-join with the room code, then try again.`,
+        );
+        return;
+      }
+    }
+
     // Spotify DJ-guard: om läget är aktiverat måste host ha self-attestat
     // Spotify-appen (Plan B — ingen kontokoppling, inget Premium-krav).
     if (spotifyEnabled && !spotifyConnected) {
@@ -4346,6 +4566,66 @@ export default function LobbyScreen() {
     // approved:true är i DB innan game_started=true sätts.
     await setLobbyPlayers(roomCode, players);
 
+    // Remote 1v1: skapa den server-side matchen (remote_matches + 2 spelar-
+    // rader) INNAN game_started broadcastas — motståndarens enhet slår upp
+    // matchen via room_code när starten detekteras. Frågesekvensen skrivs
+    // separat av host:s quiz-mount (set_remote_match_questions).
+    let remoteMatchId: string | null = null;
+    if (gameMode === 'remote-1v1' && !singlePlayerDefault && remoteOpponent && remoteOpponentUserId) {
+      const hostRow = players.find((p) => p.isHost);
+      const hostUserId = await getOwnUserId();
+      if (!hostUserId) {
+        Alert.alert('Cannot start match', 'No active session. Check your connection and try again.');
+        return;
+      }
+      remoteMatchId = await createRemoteMatch(
+        roomCode,
+        {
+          roundsCount,
+          answerResponseSeconds,
+          eraFrom: eraValues[0],
+          eraTo: eraValues[1],
+          youtubeEnabledCategories,
+          imagesEnabledCategories,
+          selectedExtraPackages,
+        },
+        [
+          {
+            userId: hostUserId,
+            playerName: hostRow?.name ?? 'Host',
+            isHost: true,
+            playerType: isGuestHost ? 'guest' : 'registered',
+            assistance: hostRow?.assistance ?? 'standard',
+            age: hostRow?.age ?? null,
+          },
+          {
+            userId: remoteOpponentUserId,
+            playerName: remoteOpponent.name,
+            isHost: false,
+            playerType: remoteOpponent.type === 'registered' ? 'registered' : 'guest',
+            assistance: remoteOpponent.assistance ?? 'standard',
+            age: remoteOpponent.age ?? null,
+          },
+        ],
+      );
+      if (!remoteMatchId) {
+        // Best-effort credit-återbetalning — matchen kunde inte skapas så
+        // spelet startar inte; hostens dragna credit ska inte gå förlorad.
+        if (!isGuestHost && !hasPremium) {
+          try {
+            const p2 = await loadProfile();
+            if (p2) {
+              const restored = (p2.freeGameCredits ?? 0) + 1;
+              await saveProfile({ ...p2, freeGameCredits: restored });
+              setFreeGameCredits(restored);
+            }
+          } catch { /* tyst — pillen självkorrigerar vid nästa load */ }
+        }
+        Alert.alert('Cannot start match', 'The 1vs1 match could not be created. Check your connection and try again.');
+        return;
+      }
+    }
+
     // Cross-player seen-historik: läs alla deltagares publicerade 20-spels-
     // historik ur lobby_players och lämna union:en till quiz.tsx via
     // in-memory-store (host-enheten bygger den auktoritativa fråge-poolen).
@@ -4406,7 +4686,15 @@ export default function LobbyScreen() {
         // men inkluderat för symmetri så framtida features kan referensa
         // ownId utan att behöva ändra Lobby:n.
         selfPlayerId: ownPlayerIdRef.current ?? turnOrder[0]?.id ?? '',
-        players: JSON.stringify(turnOrder),
+        // Remote 1v1: host spelar SOLO på sin enhet — turnOrder innehåller
+        // bara host:s egen rad (motståndaren spelar sin egen session senare).
+        // remoteMatchId driver sekvens-persistens + answer-skrivningar i quiz.
+        players: JSON.stringify(
+          remoteMatchId && remoteOpponent
+            ? turnOrder.filter((t) => t.id !== remoteOpponent.id)
+            : turnOrder,
+        ),
+        ...(remoteMatchId ? { remoteMatchId } : {}),
         roundsCount: String(roundsCount),
         // Tidsgränsen per fråga från host:s profil (default 30 sek). Quiz
         // använder den för timer-bar:en + reveal-trigger.
@@ -4992,6 +5280,27 @@ export default function LobbyScreen() {
             färg som startskärmens knappar — så att det aktuella host-valet
             tydligt sticker ut utan att se ut som en interaktiv toggle.
             marginTop ger lite extra luft mellan kortets överkant och rubriken. */}
+        {gameMode === 'remote-1v1' ? (
+          /* Renodlad 1vs1-lobby (2026-08-07): inga Game Mode-val och ingen
+             Players-sektion — lobbytypen är låst via Home-valet och antalet
+             spelare är alltid 2. En statisk grön indikator visar typen.
+             Gating på gameMode-STATE (inte lobbyType-param) så non-host —
+             som får gameMode via settings-syncen — ser samma renodlade vy. */
+          <View style={[styles.section, { marginTop: Spacing.xs }]}>
+            <Text style={styles.sectionLabel}>Game Mode</Text>
+            <View style={[styles.modeRow, { marginTop: Spacing.sm }]}>
+              <View style={[styles.modeOption, styles.modeOptionPassActive]}>
+                <Text style={[styles.modeLabel, { textAlign: 'center' }, styles.modeLabelActiveFree]}>
+                  1vs1 Match — 2 players
+                </Text>
+                <View style={styles.freeBadge} pointerEvents="none">
+                  <Text style={styles.freeBadgeText}>FREE</Text>
+                </View>
+              </View>
+              <View style={{ flex: 1 }} />
+            </View>
+          </View>
+        ) : (
         <View style={[styles.section, { marginTop: Spacing.xs }]}>
           {/* Non-host: skriv "GAME MODE - MULTIPLAYER" inline istället för
               klammer + label under toggle:n nedan. Båda delar samma
@@ -5001,11 +5310,11 @@ export default function LobbyScreen() {
             Game Mode
           </Text>
 
-          {/* Tre rutor i en rad + bracket-etiketter undertill */}
+          {/* Rad 1: Single player ensam (flex-spacer håller samma box-bredd
+              som treboxraden nedan) + bracket-etikett under. */}
           <View style={[styles.modeRow, { marginTop: Spacing.sm }]}>
             {renderModeBox('single', 'Single player', true)}
-            {renderModeBox('ptp', 'Pass-the-Phone', true)}
-            {renderModeBox('indiv', 'Individual device', true)}
+            <View style={{ flex: 2 }} />
           </View>
           <View style={{ flexDirection: 'row', gap: Spacing.sm, marginTop: 2 }}>
             {/* Bracket under "Single player" */}
@@ -5027,8 +5336,18 @@ export default function LobbyScreen() {
                 </Pressable>
               </View>
             </View>
-            {/* Bracket under "Pass-the-Phone" + "Individual device" */}
-            <View style={{ flex: 2, alignItems: 'center' }}>
+            <View style={{ flex: 2 }} />
+          </View>
+
+          {/* Rad 2: multiplayer-lägena (PtP / IndDev) + gemensam bracket-
+              etikett under raden. Remote (1vs1) togs bort 2026-08-07 —
+              1vs1 nås enbart via "1vs1 Matches"-valet på Home. */}
+          <View style={[styles.modeRow, { marginTop: Spacing.md }]}>
+            {renderModeBox('ptp', 'Pass-the-Phone', true)}
+            {renderModeBox('indiv', 'Individual device', true)}
+          </View>
+          <View style={{ flexDirection: 'row', gap: Spacing.sm, marginTop: 2 }}>
+            <View style={{ flex: 1, alignItems: 'center' }}>
               <View style={styles.multiplayerBracket} />
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 6 }}>
                 <Text style={styles.multiplayerBracketLabel}>Multiplayer</Text>
@@ -5037,7 +5356,7 @@ export default function LobbyScreen() {
                   onPress={() =>
                     Alert.alert(
                       'Multiplayer mode',
-                      'Pass-the-Phone: All players share one device. Max 4 players, even with Premium. Spotify not applicable for PtP mode.\n\nIndividual device: Each player uses their own device. Max 4 players on Basic, max 12 players with Premium.',
+                      'Pass-the-Phone: All players share one device. Max 4 players, even with Premium. Spotify not applicable for PtP mode.\n\nIndividual device: Each player uses their own device. Max 4 players on Basic, max 12 players with Premium.\n\nLooking for 1vs1? Remote duels are started from the Home screen — tap Start New Game and pick "1vs1 Matches".',
                     )
                   }
                   hitSlop={8}
@@ -5060,7 +5379,7 @@ export default function LobbyScreen() {
               onPress={() =>
                 Alert.alert(
                   'Players',
-                  'Max 4 players - use as standard and applicable for all Single and Multiplayer modes.\n\nMax 12 players - only applicable with Individual device mode',
+                  'Max 4 players - use as standard and applicable for all Single and Multiplayer modes.\n\nMax 12 players - only applicable with Individual device mode.',
                 )
               }
               hitSlop={8}
@@ -5069,6 +5388,9 @@ export default function LobbyScreen() {
               <Text style={styles.infoIconText}>i</Text>
             </Pressable>
           </View>
+          {/* "2 players (1vs1)"-indikatorn borttagen härifrån 2026-08-07 —
+              hela Game Mode+Players-sektionen renderas bara i standard-
+              lobbies numera (remote-fallet visar sin egen indikator ovan). */}
           <View style={styles.modeRow}>
             {/* Max 4: aktiv (grön) när maxPlayers === 4, oavsett premium.
                 Premium i IndDev → disabled (auto-låst till 12).
@@ -5115,6 +5437,7 @@ export default function LobbyScreen() {
           )}
 
         </View>
+        )}
 
         {/* ── Region Scope ──────────────────────────────────────
             Host-satt spelregel (vilken kulturell kontext frågorna
@@ -5157,9 +5480,12 @@ export default function LobbyScreen() {
           <Text style={styles.sectionLabel}>SOURCE MIXERBOARD</Text>
           <View style={styles.connectionsList}>
             {/* ── Spotify DJ-läge ─────────────────────────────────────────
-                Alltid synlig. Availability-pillen visar om Spotify DJ
+                Synlig i alla lägen UTOM renodlade 1vs1-lobbyn (Spotify är
+                aldrig tillämpligt i asynkrona dueller — kortet göms helt,
+                inkl. attest-raden). Availability-pillen visar om Spotify DJ
                 stöds i aktuellt game mode (IndDev = grön "Enabled",
                 PtP/Single = grå "Disabled" + toggle utgråad). */}
+            {gameMode !== 'remote-1v1' && (
             <View style={{ backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: Radius.sm, marginBottom: Spacing.xs, paddingBottom: spotifyEnabled ? 6 : 0 }}>
             {/* Attest-kontroll ("I have Spotify app..." + switch) — egen rad
                 ÖVERST i boxen, ovanför ikon/rubrik-raden, synlig i BÅDA
@@ -5344,6 +5670,7 @@ export default function LobbyScreen() {
               </View>
             )}
             </View>
+            )}
 
             {/* ── Source × Category Matrix ── */}
             <View
@@ -6051,7 +6378,7 @@ export default function LobbyScreen() {
                     </View>
                     <TouchableOpacity
                       style={[styles.roundsStepperBtn, roundsCount >= stepperMax && styles.roundsStepperBtnDisabled]}
-                      onPress={roundsCount >= stepperMax && !hasPremium
+                      onPress={roundsCount >= stepperMax && !hasPremium && gameMode !== 'remote-1v1'
                         ? () => Alert.alert(
                             'Premium feature',
                             'Host more than 4 rounds require QuizVibe Premium. Go to Store?',
@@ -6060,12 +6387,18 @@ export default function LobbyScreen() {
                               { text: 'Go to Store', onPress: () => router.push({ pathname: '/store' as const, params: { focus: 'subscription', from: '/lobby', fromCode: roomCode } }) },
                             ],
                           )
+                        // Remote 1v1 vid cap → handleIncrementRounds visar den
+                        // ärliga "More rounds not available"-alerten (Premium
+                        // ger INTE fler rundor i 1vs1).
                         : handleIncrementRounds}
                       activeOpacity={0.7}
                     >
                       <Text style={[styles.roundsStepperBtnText, roundsCount >= stepperMax && styles.roundsStepperBtnTextDisabled]}>+</Text>
                     </TouchableOpacity>
-                    {roundsCount >= stepperMax && (
+                    {/* PREMIUM-badgen göms i 1v1-lobbyn — remote är hårt
+                        cappad på 4 rundor oavsett Premium (upsell vore
+                        missvisande). */}
+                    {roundsCount >= stepperMax && gameMode !== 'remote-1v1' && (
                       <TouchableOpacity
                         onPress={() => Alert.alert(
                           'Premium feature',
@@ -6087,7 +6420,10 @@ export default function LobbyScreen() {
                       value={roundsCount}
                       min={ROUNDS_MIN}
                       gameModeMax={stepperMax}
-                      onPremiumPress={() => {
+                      // 1v1: ingen premium-klammer/badge (onPremiumPress
+                      // utelämnad → RoundsRuler döljer dem) — remote är
+                      // alltid max 4 rundor, ingen Premium-väg förbi.
+                      onPremiumPress={gameMode === 'remote-1v1' ? undefined : () => {
                         Alert.alert(
                           'Premium feature',
                           'Host more than 4 rounds require QuizVibe Premium. Get in Store?',
@@ -6101,12 +6437,23 @@ export default function LobbyScreen() {
                       indivActive={!singlePlayerDefault && gameMode === 'individual-devices'}
                     />
                   </View>
-                  {/* Game mode quick-select — under RoundsRuler för snabb mode-byte */}
-                  <View style={[styles.modeRow, { marginTop: Spacing.lg }]}>
-                    {renderModeBox('single', 'Single player', true)}
-                    {renderModeBox('ptp', 'Pass-the-Phone', true)}
-                    {renderModeBox('indiv', 'Individual device', true, true)}
-                  </View>
+                  {/* Game mode quick-select — under RoundsRuler för snabb mode-byte.
+                      Två rader som huvud-Game Mode-sektionen: Single ensam,
+                      sedan PtP / IndDev. Göms HELT i renodlade 1vs1-lobbyn
+                      (mode är låst där); Remote-rutan borttagen 2026-08-07
+                      (1vs1 nås via Home-valet). */}
+                  {gameMode !== 'remote-1v1' && (
+                    <>
+                      <View style={[styles.modeRow, { marginTop: Spacing.lg }]}>
+                        {renderModeBox('single', 'Single player', true)}
+                        <View style={{ flex: 2 }} />
+                      </View>
+                      <View style={[styles.modeRow, { marginTop: Spacing.sm }]}>
+                        {renderModeBox('ptp', 'Pass-the-Phone', true)}
+                        {renderModeBox('indiv', 'Individual device', true, true)}
+                      </View>
+                    </>
+                  )}
                 </>
               ) : (
                 // Non-host: samma rounds-display + ruler + klammer/Premium-
@@ -6285,7 +6632,37 @@ export default function LobbyScreen() {
           style={[styles.startStickyBarGlow, { opacity: startGlow }]}
           pointerEvents="none"
         />
-        {hostMode ? (
+        {hostMode && gameMode === 'remote-1v1' && !singlePlayerDefault &&
+         approvedPlayers.filter((p) => !p.isHost).length === 0 ? (
+          /* Remote 1vs1 utan approved motståndare: Start Game ersätts av
+             "Copy room code and send to friend" — host delar koden själv
+             via Messages/WhatsApp/Messenger (clipboard, ingen OS-share). */
+          <Animated.View
+            style={[styles.startGameCompactWrap, { transform: [{ scale: startPulse }] }]}
+          >
+            <TouchableOpacity
+              activeOpacity={0.85}
+              onPress={async () => {
+                try {
+                  await Clipboard.setStringAsync(
+                    `I want to invite you to Quizvibe Game 1vs1 matches. Please login to Quizvibe and join this Room Code ${formatRoomCode(roomCode)}`,
+                  );
+                  Alert.alert(
+                    'Room code copied',
+                    'Paste the invitation into Messages, WhatsApp or Messenger and send it to your opponent. Start Game appears when your opponent has joined and been approved.',
+                  );
+                } catch {
+                  Alert.alert('Copy failed', `Share this Room Code manually: ${formatRoomCode(roomCode)}`);
+                }
+              }}
+              style={styles.startGameCompactRow}
+            >
+              <BlinkingLabel style={[styles.startGameCompactLabel, { fontSize: FontSize.md }]}>
+                Copy room code and send to friend
+              </BlinkingLabel>
+            </TouchableOpacity>
+          </Animated.View>
+        ) : hostMode ? (
           <Animated.View
             style={[styles.startGameCompactWrap, { transform: [{ scale: startPulse }] }]}
           >

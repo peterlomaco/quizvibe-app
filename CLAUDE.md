@@ -424,6 +424,8 @@ Five top-level collapsible sections — all use the same tappable-header pattern
 
 ## Game Mode + Players (Profile + Lobby)
 
+**UPPDATERAD 2026-08-07 (rev 3): layouten är TVÅ rader (Single ensam på rad 1; PtP + IndDev på rad 2). Remote (1vs1) visas INTE som Game Mode-ruta — 1vs1 väljs via HostTypeModal på Home ("Start New Game"/"Start Game as Guest" → "Single & Multiplayer mode" eller "1vs1 Matches") och får en egen renodlad lobby-vy — se sektionen "Remote 1v1" nedan.** Beskrivningen nedan (2026-06-01) gäller i övrigt oförändrat för Single/PtP/IndDev.
+
 **OMARBETAD 2026-06-01.** Game Mode-sektionen är nu **tre fria val-rutor** (inte checkbox + 2 rutor) grupperade i två rader + en separat **Players**-sektion. Layouten är identisk i Lobby (per-spel, host editerar / non-host read-only via `disabled`) och Profile (host-default). Render-helper `renderModeBox(key, label)` i båda filerna; styles `gameModeGroupLabel` (grå grupprubrik), `modeRow` (transparent flex-row, ingen segment-container), `modeOption` (fristående bordered box, **fast höjd 38** = samma som Generic/`addPackageBtn`). Tidigare `modeToggle`-container + `singlePlayerRow`/`singlePlayerCheckbox`/`multiplayerBracket*`-styles lämnade som död kod.
 
 Struktur (per skiss):
@@ -451,6 +453,47 @@ Struktur (per skiss):
 Max 4-rutan har FREE-badge (grön aktiv), Max 12-rutan PREMIUM-badge (`premiumBadge` guld med subscription / `premiumBadgeGrey` grå utan). `maxPlayers` styr lobby-cappen + hur många host kan godkänna i "Players in lobby".
 
 Persisteras som `singlePlayerDefault?: boolean` + `maxPlayers` på `ProfileData`. Lobby seeds från profil/stored i host-mount-effekten.
+
+## Remote 1v1 (`'remote-1v1'`) — asynkron duell (2026-08-07)
+
+**Fjärde spelläget**: exakt 2 spelare (host + 1 motståndare) svarar på SAMMA frågesekvens oberoende av varandra, på egna enheter, inom **48h** från matchstart. Ingen realtime-sync under spel (all syncChannel-logik är IndDev-gated och triggar aldrig). Ljud spelas LOKALT på varje enhet (audio-gates i quiz.tsx har `isHost || gameMode === 'remote-1v1'`). Inga Spotify-frågor. Max 4 rundor (PtP-cap). Credits dras som övriga host-lägen; guest host gratis. Både inloggade och guests kan spela (anon-sessioner ger auth.uid → RLS fungerar).
+
+**Renodlad 1vs1-lobby + Home-lobbytyp-val (2026-08-07 rev 3 — ERSÄTTER Game Mode-ruta-vägen)**: 1vs1 väljs numera PÅ HOME — "Start New Game" OCH "Start Game as Guest" öppnar **`HostTypeModal`** ([app/index.tsx](app/index.tsx), sheet + ChoiceRow-mönstret) med valen **"Single & Multiplayer mode"** och **"1vs1 Matches"**. 1v1-valet skickar `lobbyType: '1v1'`-param till `/lobby` (registrerad: `handleCreateGame(lobbyType)`; guest: `guestLobbyType`-state → `JoinModal.guestHostLobbyType`-prop → `handleStartGameAsGuestHost`). LobbyScreen: `is1v1Lobby = lobbyType === '1v1'` forcerar seeden (`gameMode='remote-1v1'`, `singlePlayerDefault=false`, `maxPlayers=2`, `spotifyEnabled=false` — även focus-effektens Spotify-seed är 1v1-gated). **Renodlad lobby-vy** (gating på `gameMode === 'remote-1v1'`-STATE så non-host via settings-syncen ser samma): Game Mode+Players-sektionen ersätts av statisk grön **"1vs1 Match — 2 players"**-indikator, Spotify-blocket i SOURCE MIXERBOARD göms helt (inkl. attest-raden), game-mode quick-select under RoundsRuler göms, rounds-stepperns Premium-upsell/badge/klammer göms (remote är hårt cappad på 4 — `handleIncrementRounds` visar ärliga "More rounds not available"). **Remote-rutan är BORTTAGEN** ur vanliga lobbyns Game Mode-val (rad 2 = PtP + IndDev; två-radslayouten kvar) och ur Profile:s host-defaults (båda ställena) — stale sparad `'remote-1v1'`-default **coercas till `'pass-the-phone'`** vid Profile-load (inkl. snapshot-spegeln) och i båda lobby-seed-grenarna. `handleSelectMode`:s remote-gren är dokumenterad DÖD KOD. Multiplayer-info-Alerts (Lobby + Profile) hänvisar till Home-valet för 1vs1.
+
+**Äldre UI-layout-notis (rev 1–2, delvis stale)**: `renderModeBox`-key-union `'single' | 'ptp' | 'remote' | 'indiv'` finns kvar ('remote'-grenen är död). `maxPlayers` låses till **2** via blanket-effekten (`gameMode === 'remote-1v1' ? 2 : hasPremium ? 12 : 4`). DB-CHECKs breddade till `max_players in (2,4,12)` (rooms/lobby_settings/profiles) + `game_mode in (..., 'remote-1v1')` — **migration `0027_remote_1v1.sql`, appliceras manuellt via SQL Editor**.
+
+**Server-side persistens (migration 0027)** — första spelläget med riktig DB-spelpersistens:
+- `remote_matches` — match-livscykel: `room_code` (text-SNAPSHOT utan FK — matchen överlever rummets 24h-expiry), `status ('active'|'finished'|'expired_walkover'|'void'|'cancelled')` (`'cancelled'` tillagd i **migration `0028_remote_match_cancel.sql`**), `question_ids jsonb` (null tills host persisterat), settings-snapshot (rounds/response/era/categories/packages), `deadline_at (+48h)`, `winner_user_id`, `result ('decided'|'draw'|'walkover'|'void')`.
+- `remote_match_players` — pk (match_id, user_id), snapshot av namn/typ/assistance/ålder + `finished_at`/totals (sätts ENBART av finalize-RPC).
+- `remote_match_answers` — per-fråga-svar, `unique (match_id, user_id, question_index)` = idempotent upsert → resume-säker.
+- **Klienten kan ALDRIG skriva status/vinnare/sekvens direkt** — inga INSERT/UPDATE-policyer på match/players; allt går via SECURITY DEFINER-RPC:er: `create_remote_match`, `set_remote_match_questions` (guard `question_ids IS NULL` — host-resume kan inte re-shuffla), `finalize_remote_match_player` (radlås → atomisk vinnarberäkning: pts desc → avg asc → draw). RLS-rekursion på players-tabellen löst via definer-helpern `is_remote_match_participant`.
+- pg_cron: `remote-1v1-deadline-sweep` (timvis; 1 klar → walkover, 0 → void) + `remote-1v1-guest-cleanup` (nattlig; guest-only-matcher raderas 24h efter avslut — registrerad-vs-guest BEHÅLLS för den registrerades historik). Realtime-publication på `remote_matches` driver My Matches + slutskärmens live-flip.
+- `waiting_invites` fick sender-läs-policy (`from_user_id = auth.uid()`) så max-4-invites-räkningen fungerar.
+
+**API-lager**: [src/utils/remoteMatches.ts](src/utils/remoteMatches.ts) — CRUD + RPC-wrappers + `subscribeToMatch`/`subscribeToMyMatches` (Realtime) + `splitMatchForUser` (me/opponent-split) + `buildRemoteQuizParams` (bygger /quiz-params från match-snapshotten för My Matches-tap + kod-återinträde — ALDRIG från lobby_settings som kan vara död).
+
+**Lobby-flöde** ([LobbyScreen.tsx](src/screens/LobbyScreen.tsx)):
+- `handleSelectMode('remote-1v1')`: >1 självansluten non-host → Alert + ejecta alla; annars `confirmAndRemoveGuests` (host-tillagda guests blockeras, samma regel som IndDev — även "+ Add Player"-gaten). Sätter maxPlayers 2 + spotifyEnabled false.
+- **Start-knapp-swap**: 0 approved motståndare → sticky-barens Start Game ersätts av **"Copy room code and send to friend"** (`expo-clipboard`; text `I want to invite you to Quizvibe Game 1vs1 matches. Please login to Quizvibe and join this Room Code AB-23-XY` via formatRoomCode). Exakt 1 approved → normal Start Game.
+- **Max 4 obesvarade invites per host** (remote-only, klient-guard i `handleInviteFriend` via sender-räkning; DB-rate-limiten 50/h ligger kvar som hård gräns).
+- `handleStartGame`: remote-guard (exakt 1 approved motståndare + motståndarens `lobby_players.user_id` måste finnas) → efter `setLobbyPlayers` skapas matchen via `createRemoteMatch` (misslyckas → best-effort credit-refund + Alert). Navigation: `players=[hostSelfOnly]` + `remoteMatchId`-param.
+- **Non-host game-started-detection**: ny gren FÖRE PtP-grenen — hämtar matchen via `getMatchByRoomCode` (retry via 2s-poll tills host:s create propagerat) → Alert "1vs1 match started" med **Play now** (→ solo-quiz med match-settings) / **Play later** (→ Home, matchen syns i 1vs1 Matches).
+
+**Quiz-session** ([app/quiz.tsx](app/quiz.tsx)): `isRemote = gameMode === 'remote-1v1' && !!remoteMatchId`. Solo self-paced (turnOrder=[self] → questionsPerBlock 1; GetReadyIntro `canStartGame` true för remote oavsett isHost; responseSeconds ALLTID read-only — låst i match-snapshotten).
+- **Sekvens-auktoritet**: init-effekt (efter gameQuestionsRef) hämtar matchen; `question_ids` null + host → persistera lokala sekvensen EN gång; annars poll tills satt. `gameQuestions`-useMemo:n har remote-override överst: `remoteQuestionIds.map(id => ALL_QUESTIONS_MAP.get(id))` — host-resume och motståndare renderar identiskt. Render-gate ("Preparing 1vs1 match") blockerar allt spel-UI tills sekvens + resume-seed är klara. `totalQuestions` clampas mot sekvens-längden (katalog-skew → ids filtreras, saknas ALLA → "Update required"-Alert).
+- **Per-fråga-skrivning**: `recordRoundScore` → fire-and-forget `upsertAnswer` (idempotent). **Resume**: mount-seed från `getMyAnswers` → `rounds`/`allRoundScoresHistory`/`questionIndex` = första obesvarade; allt besvarat → direkt leaderboard. Quit/Leave-Alerts har remote-copy ("answers saved — resume within 48h via 1vs1 Matches").
+- **Avslut**: leaderboard-effekten anropar `finalizePlayer` (sista finishern triggar vinnarberäkningen server-side). `appendGameHistoryEntry` SKIPPAS för remote (server-tabellerna är historikkällan — annars dubbelräkning i Player History). Final-footern återanvänder guest-flödets "bara Home" (`guestHost=true + guestReplaysUsed=1` → Play Again dold).
+- **Slutskärm**: [RemoteMatchResultPanel](src/components/RemoteMatchResultPanel.tsx) ovanför RoundLeaderboard — "Waiting for {opponent} — Xh left" (live via `subscribeToMatch`) eller W/L/D-banner + poäng. Delas med My Matches-resultatmodalen.
+
+**Home + My Matches-skärmen**: [MyMatchesSection](src/components/MyMatchesSection.tsx) på Home (mellan actions och footer) är **EN huvudknapp "1vs1 Matches"** (gameBtn-lik; gold-kant + "Your turn in N matches"-subtitel när någon match väntar, annars "N matches"; renderar null utan matcher) som navigerar till den dedikerade skärmen **[/my-matches](app/my-matches.tsx)** → [src/screens/MyMatchesScreen.tsx](src/screens/MyMatchesScreen.tsx) (thin re-export-mönstret; registrerad i [_layout.tsx](app/_layout.tsx)). Skärmen: TopUserBanner med `backLabel="Back"` → Home, match-rader med statusar Your turn (guld, tap → spela) / Waiting for opponent / Won/Lost/Draw (tap → resultat-modal med RemoteMatchResultPanel) / Void / Lobby deleted by Host, empty-state, realtime + focus-reload. **Guests ser ENBART `status='active'`** (ingen historik-kravet; servern städar guest-only-matcher). **Kod-återinträde**: `handleJoinWithCode` — när `isActiveRoom` failar testas `getMatchByRoomCode` (deltagare + active) → direkt till quiz-resume istället för "Room not found"; redan färdigspelad → "Already played"-Alert.
+
+**Player History** ([PlayerHistorySection.tsx](src/components/PlayerHistorySection.tsx)): "1vs1 Duels"-block (endast registrerade sessioner, ej anon) — head-to-head-aggregat per motståndare ("vs Anna: 3-1-0" W-L-D, nycklat på userId, void exkluderas) + per-match-rader (motståndare · poäng · W/L/D · datum) från `getMyMatches()` filtrerat på avgjorda.
+
+**Host:s Quit Game avbryter matchen (2026-08-07 rev 2, migration 0028)**: `cancel_remote_match`-RPC:n (SECURITY DEFINER — caller måste vara matchens host, bara `status='active'`) sätter `status='cancelled'` + `finished_at=now()`. Matchen BEHÅLLS och visas för BÅDA spelarna som **"Lobby deleted by Host"** — i My Matches-raden (även för guests, undantag från active-only-filtret; cron städar guest-only 24h efter), i RemoteMatchResultPanel och i Player History-duellraden ("Cancelled", exkluderas ur head-to-head-aggregatet som void). Motståndarens Leave behåller resume-semantiken. quiz-init-effekten bail:ar med "Lobby deleted by Host"-Alert → Home om motståndaren navigerar in i en avbruten match. finalize/deadline-sweep opererar bara på `status='active'` → cancelled kan varken bli walkover eller återuppstå.
+
+**Realtime-kanal-gotcha (fix 2026-08-07)**: kanalnamn i `subscribeToMatch`/`subscribeToMyMatches` MÅSTE vara unika per prenumerations-INSTANS (module-level räknare) — `supabase.channel(<samma namn>)` returnerar befintlig instans och `.on()` efter `subscribe()` KASTAR ("cannot add postgres_changes callbacks after subscribe"). Vid `router.replace` mountas nya skärmen INNAN gamla avmonteras → statiskt namn kraschade Home. Samma register-tysta-fel-klass: `registerActiveRoom` returnerar numera boolean och ALLA fyra create-sites (Home, guest-host, Profile, Play Again) Alert:ar + abort:ar vid false — tidigare tyst no-op gav fantom-lobby ("Room not found" för joiners).
+
+**Kända begränsningar V1**: ingen push-notis när motståndaren spelat klart (Realtime kräver att appen är öppen); `selfPlayerId` är syntetiskt `'remote-self'` vid My Matches-/kod-återinträde (konsekvent inom sessionen — attribution håller).
 
 ## Customized Host packages (Premium-inkluderade; Profile-toggle → Lobby-filter)
 
@@ -1853,12 +1896,13 @@ Demo-data (`src/utils/nameQuizDemo.ts`) genererad för Millennials (1990) + stan
 - Profile → `<QuizVibeQAvatar size={26} variant="smile" />`
 - Store → `<ShoppingCartIcon size={22} />`
 
-**`SHOW_ON = ['/', '/profile', '/store']`** — returnerar `null` för alla andra routes (lobby, quiz, getready etc.).
+**`SHOW_ON = ['/', '/profile', '/store', '/my-matches']`** (`/my-matches` tillagd 2026-08-07) — returnerar `null` för alla andra routes (lobby, quiz, getready etc.). På `/my-matches` är ingen av de tre tabbarna aktiv-markerad (grå ikoner — vyn är en egen destination).
 
 **Scroll-padding**: alla tre screens lägger till `+ 52` (BOTTOM_BANNER_HEIGHT) i sin `paddingBottom` så scroll-innehållet inte döljs bakom bannern:
 - `app/index.tsx`: `Spacing.lg + 52`
 - `src/screens/ProfileScreen.tsx`: `Spacing.xxl + 52`
 - `src/screens/StoreScreen.tsx`: `Spacing.xxl + 52`
+- `src/screens/MyMatchesScreen.tsx`: `Spacing.lg + BOTTOM_BANNER_HEIGHT` (importerar konstanten)
 
 **Navigation**: `router.replace()` (ingen history-stack) via expo-router. Aktiv route detekteras via `usePathname()`.
 

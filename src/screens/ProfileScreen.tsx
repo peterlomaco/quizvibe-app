@@ -278,7 +278,7 @@ export default function ProfileScreen() {
   const draggingEraThumbRef = useRef<0 | 1 | null>(null);
   const eraDragStartValuesRef = useRef<[number, number]>([1981, ERA_MAX]);
   // Max antal spelare per spel — 4 = Basic (gratis), 12 = Premium.
-  const [maxPlayers, setMaxPlayers] = useState<4 | 12>(4);
+  const [maxPlayers, setMaxPlayers] = useState<2 | 4 | 12>(4);
   // Default game mode (host-default) — 'pass-the-phone' (gratis) eller
   // 'individual-devices' (Premium).
   const [gameMode, setGameMode] = useState<GameMode>('pass-the-phone');
@@ -344,7 +344,7 @@ export default function ProfileScreen() {
   };
   const handleIncrementRounds = () => {
     if (roundsCount >= roundsMax) {
-      if (singlePlayerDefault || gameMode === 'pass-the-phone') {
+      if (singlePlayerDefault || gameMode === 'pass-the-phone' || gameMode === 'remote-1v1') {
         Alert.alert('More rounds not available', 'More than 4 rounds is only available with both Individual device and Premium activated.');
       }
       return;
@@ -386,13 +386,15 @@ export default function ProfileScreen() {
   // FREE-badge grön när aktiv, grå när inaktiv. Speglar Lobby.
   // redIndiv: om true färgas "Individual device"-rutan röd när inaktiv (används
   // bara i Number of Rounds quick-select, INTE i Game Settings/Game Mode).
-  const renderModeBox = (key: 'single' | 'ptp' | 'indiv', label: string, smallText?: boolean, redIndiv?: boolean) => {
+  const renderModeBox = (key: 'single' | 'ptp' | 'remote' | 'indiv', label: string, smallText?: boolean, redIndiv?: boolean) => {
     const isActive =
       key === 'single'
         ? singlePlayerDefault
         : key === 'ptp'
           ? !singlePlayerDefault && gameMode === 'pass-the-phone'
-          : !singlePlayerDefault && gameMode === 'individual-devices';
+          : key === 'remote'
+            ? !singlePlayerDefault && gameMode === 'remote-1v1'
+            : !singlePlayerDefault && gameMode === 'individual-devices';
     return (
       <Pressable
         style={({ pressed }) => [
@@ -403,7 +405,9 @@ export default function ProfileScreen() {
         onPress={() =>
           key === 'single'
             ? handleSelectSingle()
-            : handleSelectGameMode(key === 'ptp' ? 'pass-the-phone' : 'individual-devices')
+            : handleSelectGameMode(
+                key === 'ptp' ? 'pass-the-phone' : key === 'remote' ? 'remote-1v1' : 'individual-devices',
+              )
         }
       >
         <Text
@@ -824,7 +828,15 @@ export default function ProfileScreen() {
           setEraValues([clampFrom, clampTo]);
         }
         setMaxPlayers(augmented.maxPlayers ?? 4);
-        setGameMode(augmented.gameMode ?? 'pass-the-phone');
+        // Stale-coerce: 'remote-1v1' kan ligga sparad som host-default från
+        // innan Remote-rutan togs bort (2026-08-07 — 1vs1 väljs numera per
+        // spel via Home-valet, inte som profil-default). Utan coerce skulle
+        // profilen fastna i ett läge utan synlig/valbar ruta.
+        const loadedGameMode =
+          (augmented.gameMode ?? 'pass-the-phone') === 'remote-1v1'
+            ? 'pass-the-phone'
+            : augmented.gameMode ?? 'pass-the-phone';
+        setGameMode(loadedGameMode);
         setSinglePlayerDefault(augmented.singlePlayerDefault ?? false);
         // Clamp så ett gammalt värde > nuvarande max (t.ex. om host har 12
         // rundor sparat från Individual Devices + Premium men nu saknar Premium)
@@ -845,16 +857,19 @@ export default function ProfileScreen() {
         setSpotifyAnswerYear(augmented.spotifyAnswerYear ?? true);
         setSpotifyAnswerName(augmented.spotifyAnswerName ?? true);
         // Snapshot av laddad state — jämförs vid navigation bort.
+        // gameMode speglar den COERCADE staten (inte rå augmented) så en
+        // stale 'remote-1v1'-profil inte fastnar i evig "unsaved changes".
         savedSnapshotRef.current = JSON.stringify({
           birthYear: augmented.birthYear,
           assistance: augmented.assistance,
           gameEraFrom: augmented.gameEraFrom ?? 1981,
           gameEraTo: augmented.gameEraTo ?? ERA_MAX,
-          gameMode: augmented.gameMode ?? 'pass-the-phone',
+          gameMode: loadedGameMode,
           singlePlayerDefault: augmented.singlePlayerDefault ?? false,
           maxPlayers: augmented.maxPlayers ?? 4,
           roundsCount: Math.max(ROUNDS_MIN, Math.min(
-            (augmented.gameMode ?? 'pass-the-phone') === 'pass-the-phone' ? ROUNDS_MAX_PASS : ROUNDS_MAX_INDIV,
+            // Bara IndDev får 20-cappen — PtP OCH Remote 1v1 är max 4.
+            (augmented.gameMode ?? 'pass-the-phone') === 'individual-devices' ? ROUNDS_MAX_INDIV : ROUNDS_MAX_PASS,
             augmented.roundsDefault ?? ROUNDS_DEFAULT,
           )),
           answerResponseSeconds: augmented.answerResponseSeconds ?? 30,
@@ -1115,13 +1130,22 @@ export default function ProfileScreen() {
       }
     }
     const code = generateRoomCode();
-    await registerActiveRoom(code, {
+    // Returvärdet MÅSTE kontrolleras — en tyst no-op ger en fantom-lobby
+    // som joiners inte hittar ("Room not found"-buggen 2026-08-07).
+    const roomRegistered = await registerActiveRoom(code, {
       maxPlayers: freshProfile?.maxPlayers ?? 4,
       hostIsPremium: freshHasPremium,
       currentPlayerCount: 1,
       hostPlayerName: freshProfile?.playerName ?? '',
       gameStarted: false,
     });
+    if (!roomRegistered) {
+      Alert.alert(
+        'Could not create game lobby',
+        'The room could not be registered. Check your connection and that you are signed in, then try again.',
+      );
+      return;
+    }
     clearLeftPlayers(code);
     clearLobbyPlayers(code);
     clearLobbySettings(code);
@@ -1369,11 +1393,11 @@ export default function ProfileScreen() {
               Premium triggar Store-omdirigering. */}
           <View style={styles.field}>
             <Text style={styles.sectionLabel}>Game Mode</Text>
-            {/* Tre rutor i en rad + bracket-etiketter undertill — speglar Lobby. */}
+            {/* Rad 1: Single player ensam + bracket. Rad 2: PtP / Remote (1vs1)
+                / IndDev + gemensam Multiplayer-bracket — speglar Lobby. */}
             <View style={[styles.modeRow, { marginTop: Spacing.sm }]}>
               {renderModeBox('single', 'Single player', true)}
-              {renderModeBox('ptp', 'Pass-the-Phone', true)}
-              {renderModeBox('indiv', 'Individual device', true)}
+              <View style={{ flex: 2 }} />
             </View>
             <View style={{ flexDirection: 'row', gap: Spacing.sm, marginTop: 2 }}>
               {/* Bracket under "Single player" */}
@@ -1395,8 +1419,17 @@ export default function ProfileScreen() {
                   </Pressable>
                 </View>
               </View>
-              {/* Bracket under "Pass-the-Phone" + "Individual device" */}
-              <View style={{ flex: 2, alignItems: 'center' }}>
+              <View style={{ flex: 2 }} />
+            </View>
+            {/* Remote (1vs1) borttagen 2026-08-07 — 1vs1 är ingen host-
+                default längre; läget väljs per spel via Home-valet. */}
+            <View style={[styles.modeRow, { marginTop: Spacing.md }]}>
+              {renderModeBox('ptp', 'Pass-the-Phone', true)}
+              {renderModeBox('indiv', 'Individual device', true)}
+            </View>
+            <View style={{ flexDirection: 'row', gap: Spacing.sm, marginTop: 2 }}>
+              {/* Bracket under multiplayer-raden (PtP + Remote + IndDev) */}
+              <View style={{ flex: 1, alignItems: 'center' }}>
                 <View style={styles.multiplayerBracket} />
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 6 }}>
                   <Text style={styles.multiplayerBracketLabel}>Multiplayer</Text>
@@ -1405,7 +1438,7 @@ export default function ProfileScreen() {
                     onPress={() =>
                       Alert.alert(
                         'Multiplayer mode',
-                        'Pass-the-Phone: All players share one device. Max 4 players, even with Premium. Spotify not applicable for PtP mode.\n\nIndividual device: Each player uses their own device. Max 4 players on Basic, max 12 players with Premium.',
+                        'Pass-the-Phone: All players share one device. Max 4 players, even with Premium. Spotify not applicable for PtP mode.\n\nIndividual device: Each player uses their own device. Max 4 players on Basic, max 12 players with Premium.\n\nLooking for 1vs1? Remote duels are started from the Home screen — tap Start New Game and pick "1vs1 Matches".',
                       )
                     }
                     hitSlop={8}
@@ -1421,12 +1454,15 @@ export default function ProfileScreen() {
               <Text style={[styles.sectionLabel, { marginTop: 0, marginBottom: 0 }]}>Players</Text>
               <Pressable
                 style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                onPress={() => Alert.alert('Players', 'Max 4 players - use as standard and applicable for all Single and Multiplayer modes.\n\nMax 12 players - only applicable with Individual device mode')}
+                onPress={() => Alert.alert('Players', 'Max 4 players - use as standard and applicable for all Single and Multiplayer modes.\n\nMax 12 players - only applicable with Individual device mode.')}
                 hitSlop={8}
               >
                 <Text style={styles.infoIconText}>i</Text>
               </Pressable>
             </View>
+            {/* "2 players (1vs1)"-indikatorn borttagen 2026-08-07 — remote är
+                inte längre en profil-default (stale-coerce vid load garanterar
+                att gameMode aldrig är 'remote-1v1' här). */}
             <View style={styles.modeRow}>
               {/* Max 4: aktiv (grön) när maxPlayers===4. Disabled enbart när
                   premium-host valt IndDev (auto-upgrades till Max 12 redan). */}
@@ -1888,10 +1924,14 @@ export default function ProfileScreen() {
             </View>
           </View>
 
-          {/* Game mode quick-select — under RoundsRuler för snabb mode-byte */}
+          {/* Game mode quick-select — under RoundsRuler för snabb mode-byte.
+              Två rader som huvud-Game Mode-sektionen. */}
           <View style={styles.field}>
             <View style={styles.modeRow}>
               {renderModeBox('single', 'Single player', true)}
+              <View style={{ flex: 2 }} />
+            </View>
+            <View style={[styles.modeRow, { marginTop: Spacing.sm }]}>
               {renderModeBox('ptp', 'Pass-the-Phone', true)}
               {renderModeBox('indiv', 'Individual device', true, true)}
             </View>

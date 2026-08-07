@@ -22,7 +22,7 @@ export interface MediaSourceOptions {
   /** Host har YouTube aktiverad i Lobby:ns Game Connections. */
   youtubeEnabled: boolean;
   /** Spel-läge — bibehållet i typen för framtida källor som kan vara mode-beroende. */
-  gameMode: 'pass-the-phone' | 'individual-devices';
+  gameMode: 'pass-the-phone' | 'individual-devices' | 'remote-1v1';
 }
 
 // Fråge-shape som pickMediaSource konsumerar. Subset av TimelineQuestion —

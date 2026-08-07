@@ -17,7 +17,7 @@ const PROFILE_KEY = '@quizvibe/profile/v1';
 export type AssistanceLevel = 'minimal' | 'standard' | 'full';
 export type Region = 'sweden' | 'nordics' | 'global';
 export type AvatarSource = 'upload' | 'choose' | 'default';
-export type GameMode = 'pass-the-phone' | 'individual-devices';
+export type GameMode = 'pass-the-phone' | 'individual-devices' | 'remote-1v1';
 
 export interface ProfileData {
   playerName: string;
@@ -56,9 +56,10 @@ export interface ProfileData {
   gameEraFrom?: number;
   gameEraTo?: number;
   // Max antal spelare per spel (host-default). 4 = gratis Basic-plan,
-  // 12 = kräver Premium-paket. Optional för bakåtkompatibilitet —
-  // defaultas till 4 i UI.
-  maxPlayers?: 4 | 12;
+  // 12 = kräver Premium-paket, 2 = låst värde för Remote 1v1-läget
+  // (sätts av Lobby-seedningen, sparas normalt inte som profil-default).
+  // Optional för bakåtkompatibilitet — defaultas till 4 i UI.
+  maxPlayers?: 2 | 4 | 12;
   // Default game mode (host-default). 'pass-the-phone' = en delad enhet
   // (gratis), 'individual-devices' = parallellt spel (kräver Premium).
   // Optional för bakåtkompatibilitet — defaultas till 'pass-the-phone' i UI.
@@ -175,7 +176,7 @@ interface ProfileRow {
   answer_response_seconds: 30 | 45 | 60;
   game_era_from: number | null;
   game_era_to: number | null;
-  max_players: 4 | 12;
+  max_players: 2 | 4 | 12;
   game_mode: GameMode;
   single_player_default: boolean;
   enabled_host_packages: string[];
