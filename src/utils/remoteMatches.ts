@@ -388,6 +388,31 @@ export async function getMyAnswers(matchId: string): Promise<RemoteAnswer[]> {
 }
 
 /**
+ * Match-id:n där JAG har minst ett registrerat svar. Driver "Not started"
+ * vs "Ongoing"-uppdelningen i 1vs1 Games-vyn — `finishedAt` räcker inte
+ * (den är null både för "aldrig börjat" och "påbörjad men inte klar").
+ *
+ * En enda query över alla matcher (RLS begränsar redan till egna rader);
+ * `matchIds` skickas som filter så vi inte drar in svar från matcher som
+ * inte visas i listan.
+ */
+export async function getMyAnsweredMatchIds(matchIds: string[]): Promise<Set<string>> {
+  if (matchIds.length === 0) return new Set();
+  const userId = await getOwnUserId();
+  if (!userId) return new Set();
+  const { data, error } = await supabase
+    .from('remote_match_answers')
+    .select('match_id')
+    .eq('user_id', userId)
+    .in('match_id', matchIds);
+  if (error) {
+    console.warn('[remoteMatches] getMyAnsweredMatchIds failed:', error.message);
+    return new Set();
+  }
+  return new Set(((data as { match_id: string }[]) ?? []).map((r) => r.match_id));
+}
+
+/**
  * Bygger /quiz-router-params för att spela/återuppta en remote-match
  * UTAN lobby-kontext (1vs1 Matches-tap eller kod-återinträde efter att
  * rummet dött). Settings rehydreras från match-snapshotten — ALDRIG från

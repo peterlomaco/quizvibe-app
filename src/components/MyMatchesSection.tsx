@@ -1,4 +1,4 @@
-// "1vs1 Games" — Home-huvudknapp för Remote 1v1-dueller.
+// "Remote Play History" — Home-huvudknapp för Remote 1v1-dueller.
 //
 // EN knapp på Home (Peter 2026-08-07 rev 2): tap → navigerar till den
 // dedikerade /my-matches-skärmen där matcherna listas (ingen inline-
@@ -14,13 +14,15 @@
 //
 // Gäster (anon-session): räknar aktiva + host-avbrutna matcher (avgjorda
 // resultat är dolda för gäster — ingen historik-kravet). Registrerade
-// räknar allt. Renderar null när användaren inte har några matcher alls.
+// räknar allt. Renderar null när användaren inte har några matcher alls —
+// knappen dyker alltså upp först när det finns en duell att visa (Peter
+// 2026-08-07; det tidigare `alwaysShow`-läget för inloggade är borttaget).
 //
 // Live-uppdatering via subscribeToMyMatches + refetch vid varje
 // Home-focus (spelaren kan komma tillbaka från quiz/my-matches).
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { router, useFocusEffect } from 'expo-router';
+import { router, useFocusEffect, usePathname } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Animated, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
@@ -55,6 +57,10 @@ function buildSignature(list: MyRemoteMatch[]): string {
 }
 
 export function MyMatchesSection() {
+  // Var knappen renderas ('/' på Home, '/profile' i Player history) —
+  // skickas med som `from` så /my-matches Back-knapp går tillbaka hit
+  // istället för alltid till Home (samma mönster som Store-skärmen).
+  const pathname = usePathname();
   const [matches, setMatches] = useState<MyRemoteMatch[]>([]);
   const [isGuestSession, setIsGuestSession] = useState(false);
   const [seenSignature, setSeenSignature] = useState<string | null>(null);
@@ -95,9 +101,9 @@ export function MyMatchesSection() {
       setSeenSignature(signature);
       const key = seenKeyRef.current;
       if (key) void AsyncStorage.setItem(key, signature).catch(() => {});
-      router.push('/my-matches');
+      router.push({ pathname: '/my-matches', params: { from: pathname || '/' } });
     },
-    [],
+    [pathname],
   );
 
   useFocusEffect(
@@ -137,10 +143,10 @@ export function MyMatchesSection() {
           flex-cell hade förskjutits när etiketten dyker upp).
           pointerEvents none → taps går vidare till knappen. */}
       <View style={styles.titleOverlay} pointerEvents="none">
-        <Text style={styles.mainBtnTitle}>1vs1 Games</Text>
+        <Text style={styles.mainBtnTitle}>Remote Play History</Text>
       </View>
       {/* Samma 1vs1-märke som Home:s "Remote Play"-val (blå silhuetter +
-          guld-"vs" med halo) så duell-läget har EN ikon i appen. marginLeft
+          guld-wifi emellan) så duell-läget har EN ikon i appen. marginLeft
           skjuter in den från vänsterkanten så den inte klistrar sig mot
           rutans ram. */}
       <View style={{ marginLeft: Spacing.md }}>
@@ -152,10 +158,12 @@ export function MyMatchesSection() {
       {/* Blinkande "New update" + pil i guld — speglar Lobby:s "New Player
           joined"-signal så samma visuella språk används för "något har hänt"
           över skärmarna. Båda delar samma opacity-värde så de blinkar i takt.
-          Utan update: ingen etikett, fast vit pil. */}
+          Utan update: ingen etikett, fast vit pil. Etiketten sätts på TVÅ
+          rader ("New" / "update") så den tar mindre bredd och titeln
+          behåller sitt utrymme i mitten av knappen. */}
       {hasUpdate && (
-        <Animated.Text style={[styles.newUpdateLabel, { opacity: blink }]} numberOfLines={1}>
-          New update
+        <Animated.Text style={[styles.newUpdateLabel, { opacity: blink }]} numberOfLines={2}>
+          {'New\nupdate'}
         </Animated.Text>
       )}
       <Animated.Text
@@ -221,6 +229,10 @@ const styles = StyleSheet.create({
     fontSize: FontSize.sm,
     fontWeight: '600',
     color: Colors.warning,
+    // Tight radavstånd + centrering så tvåradaren håller sig inom
+    // knappens höjd (56) och läser som ETT märke.
+    lineHeight: 15,
+    textAlign: 'center',
   },
   // Absolut-fyllande wrapper som centrerar titeln i hela knappen — flex-
   // centrering är plattformsoberoende (till skillnad från textAlignVertical

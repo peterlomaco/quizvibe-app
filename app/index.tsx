@@ -425,7 +425,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
           if (my.me.finishedAt != null) {
             Alert.alert(
               'Already played',
-              'You have already played your questions in this 1vs1 match. Check "1vs1 Games" for the result.',
+              'You have already played your questions in this 1vs1 match. Check "Remote Play History" for the result.',
             );
             return;
           }
@@ -1409,18 +1409,17 @@ function ChoiceRow({
 export type HostLobbyType = 'standard' | '1v1';
 
 // VersusIcon (två silhuetter + guld-"vs") bor i src/components/VersusIcon.tsx
-// sedan 2026-08-07 — delas med "1vs1 Games"-knappen på Home (MyMatchesSection)
+// sedan 2026-08-07 — delas med "Remote Play History"-knappen på Home (MyMatchesSection)
 // så duell-läget har EN ikon i appen.
 
 /** Ikon för "Single & Multiplayer mode": **Here&Now** på tre rader —
  *  "Here" överst och "Now" underst i blått, med ett guld-"&" i mitten.
  *  &-tecknet ritas SIST så det lägger sig ovanpå och täcker en del av både
- *  "Here" och "Now" (samma överlapps-idé som VersusIcon:s "vs"). Halo i
- *  kortets bakgrundsfärg separerar &-tecknet från orden under.
- *  Blå ord + guld accent speglar VersusIcon (blå silhuetter, guld "vs"). */
+ *  "Here" och "Now". Halo i kortets bakgrundsfärg separerar &-tecknet från
+ *  orden under. Blått speglar VersusIcon:s blå silhuetter. */
 function HereNowIcon({ height = 60 }: { height?: number }) {
-  // viewBox 56×46 → samma proportioner som VersusIcon så de två val-
-  // rutornas ikoner väger lika i ikon-kolumnen.
+  // viewBox 56×46 — VersusIcon är sedan 2026-08-07 något bredare (64×46);
+  // ikon-kolumnen (iconWrap) centrerar båda så de väger jämnt ändå.
   const width = height * (56 / 46);
   return (
     <Svg width={width} height={height} viewBox="0 0 56 46">
@@ -1485,7 +1484,7 @@ function HostTypeOptions({
         accentColor={accentColor}
         icon={<VersusIcon height={60} />}
         label="Remote Play"
-        subtitle="1vs1"
+        subtitle="1vs1 — challenge friends remotely"
         onPress={() => onSelect('1v1')}
       />
     </View>
@@ -1537,8 +1536,8 @@ const hostTypeStyles = StyleSheet.create({
     paddingVertical: Spacing.md,
   },
   iconWrap: {
-    // 80 rymmer VersusIcon:s bredd vid height 60 (60 × 56/46 ≈ 73).
-    width: 80,
+    // 88 rymmer VersusIcon:s bredd vid height 60 (60 × 64/46 ≈ 84).
+    width: 88,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -2544,12 +2543,12 @@ export default function HomeScreen() {
             </Animated.View>
           )}
 
-          {/* 1vs1 Games — inloggat läge: grupperas med de gyllene user-
+          {/* Remote Play History — inloggat läge: grupperas med de gyllene user-
               knapparna ovanför (naturlig actionsSection-gap, ingen extra
               marginTop) så den hamnar OVANFÖR guest-rubriken nedan.
               Utloggade guests får den kvar sist på skärmen (se blocket
               efter actionsSection). Renderar sig själv bara när användaren
-              har matcher — annars null. */}
+              har minst en 1vs1-match — annars null. */}
           {isLoggedIn && hostTypeExpanded === 'none' && <MyMatchesSection />}
 
           {/* Guest-sektionen (rubrik + två knappar) — döljs HELT när
@@ -2683,7 +2682,7 @@ export default function HomeScreen() {
           )}
         </View>
 
-        {/* ── 1vs1 Games (utloggad/guest) ───────────────────────
+        {/* ── Remote Play History (utloggad/guest) ──────────────
             Huvudknapp för Remote 1v1-dueller — navigerar till den
             dedikerade /my-matches-skärmen där matcherna listas. Renderar
             sig själv bara när användaren har matcher — annars null.

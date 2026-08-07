@@ -5235,7 +5235,7 @@ export default function QuizScreen() {
     Alert.alert(
       'Leave game?',
       isRemote
-        ? 'Your answers so far are saved. You can resume this 1vs1 match within 48 hours via "1vs1 Games" on the Home screen.'
+        ? 'Your answers so far are saved. You can resume this 1vs1 match within 48 hours via "Remote Play History" on the Home screen.'
         : 'You will return to the start screen. The game continues for the other players.',
       [
         { text: 'Cancel', style: 'cancel' },

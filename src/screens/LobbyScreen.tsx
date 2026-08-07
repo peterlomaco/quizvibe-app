@@ -94,8 +94,7 @@ import {
 import { containsProfanity } from '../utils/profanity';
 import { loadProfile, playerNameExists, saveProfile, type ProfileData, type Region as ProfileRegion } from '../utils/profileStorage';
 import { hasPremiumSubscription } from '../utils/subscriptionStorage';
-import * as Clipboard from 'expo-clipboard';
-import { ROOM_CODE_DIGITS, ROOM_CODE_LEADING_LETTERS, formatRoomCode, generateRoomCode } from '../utils/roomCode';
+import { ROOM_CODE_DIGITS, ROOM_CODE_LEADING_LETTERS, generateRoomCode } from '../utils/roomCode';
 import { addInvite, clearWaitingInvitesForRoom } from '../utils/waitingInvites';
 
 export interface LobbyPlayer extends Player {
@@ -1127,27 +1126,13 @@ export default function LobbyScreen() {
   const startGlow = useRef(new Animated.Value(0.4)).current;
   const startPulse = useRef(new Animated.Value(1)).current;
 
-  // Cross-fade host-badge: "You are the host" → "Invite friends" → "Or play single game"
+  // Cross-fade host-badge: "You are the host" → "Invite friends" → "Single
+  // or multiplayer game". I 1vs1-lobbyn hoppas den tredje frasen över —
+  // varken single player eller fler än 2 spelare finns där (Peter 2026-08-07).
   const hostBadgeOp0 = useRef(new Animated.Value(1)).current;
   const hostBadgeOp1 = useRef(new Animated.Value(0)).current;
   const hostBadgeOp2 = useRef(new Animated.Value(0)).current;
   const hostBadgeIdxRef = useRef(0);
-  useEffect(() => {
-    if (!hostMode) return;
-    const opacities = [hostBadgeOp0, hostBadgeOp1, hostBadgeOp2];
-    const easing = Easing.bezier(0.4, 0, 0.2, 1);
-    const cycle = () => {
-      const current = hostBadgeIdxRef.current;
-      const next = (current + 1) % opacities.length;
-      Animated.parallel([
-        Animated.timing(opacities[current], { toValue: 0, duration: 2600, easing, useNativeDriver: true }),
-        Animated.timing(opacities[next], { toValue: 1, duration: 2600, easing, useNativeDriver: true }),
-      ]).start();
-      hostBadgeIdxRef.current = next;
-    };
-    const interval = setInterval(cycle, 5000);
-    return () => clearInterval(interval);
-  }, [hostMode, hostBadgeOp0, hostBadgeOp1, hostBadgeOp2]);
 
   useEffect(() => {
     // Animationen körs för båda host (Start Game-knappen) och non-host
@@ -1818,6 +1803,14 @@ export default function LobbyScreen() {
   // re-promptas i loop; ids prunas när spelaren lämnar (hasLeft) eller
   // försvinner ur players[] så en genuin rejoin promptar igen.
   const [joinPopupQueue, setJoinPopupQueue] = useState<string[]>([]);
+
+  // "1vs1 match started"-popup (custom modal istället för native Alert så
+  // rubriken "Play" kan stå OVANFÖR knapparna "Now"/"Later"). Delas av
+  // host:s Start Game-väg och non-host:s game-started-detektering — båda
+  // sätter bara message + playNow-callback.
+  const [remoteStartPrompt, setRemoteStartPrompt] = useState<
+    { message: string; playNow: () => void } | null
+  >(null);
   const promptedIdsRef = useRef<Set<string>>(new Set());
   // Ids som HOST explicit har un-approvat (ApproveToggle av, D-vii unstable-
   // demote). Friend-auto-approve respekterar setet — en friend host medvetet
@@ -1894,6 +1887,32 @@ export default function LobbyScreen() {
 
   // Game mode toggle (Pass-the-Phone vs Multiplayer Individual Devices)
   const [gameMode, setGameMode] = useState<GameMode>('pass-the-phone');
+
+  // Host-badgens cross-fade-loop (Animated.Values deklareras längre upp).
+  // Ligger här nere eftersom den tredje frasens TEXT beror på `gameMode`
+  // ("1vs1 challenge" i remote-lobbyn, annars "Single or multiplayer game").
+  useEffect(() => {
+    if (!hostMode) return;
+    const opacities = [hostBadgeOp0, hostBadgeOp1, hostBadgeOp2];
+    // Nollställ cykeln vid lägesbyte så fasen alltid startar på
+    // "You are the host".
+    hostBadgeIdxRef.current = 0;
+    hostBadgeOp0.setValue(1);
+    hostBadgeOp1.setValue(0);
+    hostBadgeOp2.setValue(0);
+    const easing = Easing.bezier(0.4, 0, 0.2, 1);
+    const cycle = () => {
+      const current = hostBadgeIdxRef.current;
+      const next = (current + 1) % opacities.length;
+      Animated.parallel([
+        Animated.timing(opacities[current], { toValue: 0, duration: 2600, easing, useNativeDriver: true }),
+        Animated.timing(opacities[next], { toValue: 1, duration: 2600, easing, useNativeDriver: true }),
+      ]).start();
+      hostBadgeIdxRef.current = next;
+    };
+    const interval = setInterval(cycle, 5000);
+    return () => clearInterval(interval);
+  }, [hostMode, gameMode, hostBadgeOp0, hostBadgeOp1, hostBadgeOp2]);
 
   // D-vii: per-peer connection-health via `lobby_health:<roomCode>`-
   // channel. Heartbeats var 5s, 3-tier-tier computed lokalt (ok < 7s,
@@ -3926,15 +3945,11 @@ export default function LobbyScreen() {
               },
             });
           };
-          Alert.alert(
-            '1vs1 match started',
-            'Host has started the 1vs1 match. You have 48 hours to play your questions — now or later via "1vs1 Games" on the Home screen.',
-            [
-              { text: 'Play later', style: 'cancel', onPress: () => router.replace('/') },
-              { text: 'Play now', onPress: goPlayNow },
-            ],
-            { cancelable: false },
-          );
+          setRemoteStartPrompt({
+            message:
+              'Host has started the 1vs1 match. You have 48 hours to play your questions — now or later via "Remote Play History" on the Home screen.',
+            playNow: goPlayNow,
+          });
           return;
         }
         if (!navigatedToQuizRef.current && !cancelled) {
@@ -4653,8 +4668,11 @@ export default function LobbyScreen() {
     // Realtime DELETE-events propageras till mottagarnas JoinModal-sub:ar.
     clearWaitingInvitesForRoom(roomCode).catch(() => { /* loggas i waitingInvites */ });
 
-    router.push({
-      pathname: '/quiz',
+    // Navigations-payloaden byggs först — i remote-läget visas en popup
+    // ("Play now" / "Play later") innan den används, precis som motståndaren
+    // får när starten detekteras.
+    const quizNav = {
+      pathname: '/quiz' as const,
       params: {
         // Guest host: fallback-assistance/age speglar guest-identiteten
         // (Full + ålder från guestBirthYear) istället för de generiska
@@ -4729,7 +4747,20 @@ export default function LobbyScreen() {
         // och rensa leftPlayers när host avslutar mitt i ett spel.
         roomCode,
       },
-    });
+    };
+
+    // Remote 1v1: host spelar sin session self-paced inom 48h, precis som
+    // motståndaren — samma popup som non-host får när starten detekteras.
+    if (remoteMatchId) {
+      setRemoteStartPrompt({
+        message:
+          'The 1vs1 match has been created. You have 48 hours to play your questions — now or later via "Remote Play History" on the Home screen.',
+        playNow: () => router.push(quizNav),
+      });
+      return;
+    }
+
+    router.push(quizNav);
   };
 
   // ── Game Sequence förhandsvisning ──────────────────────────────────────────
@@ -4962,7 +4993,9 @@ export default function LobbyScreen() {
             </>
           )}
           {/* Host-badge med tre cross-fadande fraser:
-              "You are the host" (blå) → "Invite friends" (guld) → "Or play single game" (guld) */}
+              "You are the host" (blå) → "Invite friends" (guld) → lägesberoende
+              tredje fras (guld): "1vs1 challenge" i remote-lobbyn, annars
+              "Single or multiplayer game". */}
           {hostMode && (
             <View style={[styles.hostBadge, { position: 'relative' }]}>
               {/* Index 0 — "You are the host" (blå, starts visible) */}
@@ -4976,9 +5009,12 @@ export default function LobbyScreen() {
               <Animated.View style={[styles.hostBadgeInner, styles.hostBadgeOverlay, { opacity: hostBadgeOp1 }]}>
                 <Text style={styles.hostBadgeTextGold}>Invite friends</Text>
               </Animated.View>
-              {/* Index 2 — "Or play single game" (guld, overlay) */}
+              {/* Index 2 (guld, overlay) — lägesberoende text: 1vs1-lobbyn
+                  visar "1vs1 challenge", övriga "Single or multiplayer game". */}
               <Animated.View style={[styles.hostBadgeInner, styles.hostBadgeOverlay, { opacity: hostBadgeOp2 }]}>
-                <Text style={styles.hostBadgeTextGold}>Or play single game</Text>
+                <Text style={styles.hostBadgeTextGold}>
+                  {gameMode === 'remote-1v1' ? '1vs1 challenge' : 'Single or multiplayer game'}
+                </Text>
               </Animated.View>
             </View>
           )}
@@ -5066,7 +5102,9 @@ export default function LobbyScreen() {
                 const renderBox = (i: number) => {
                   const isFilled = i < approvedCount;
                   const isBlinking = !isFilled && i < approvedCount + waitingCount;
-                  const isLast = i === maxPlayers - 1;
+                  // Sista rutan får "max N"-stacken — utom i 1vs1-lobbyn där
+                  // taket alltid är 2 och rutan bara visar siffran "2".
+                  const isLast = i === maxPlayers - 1 && gameMode !== 'remote-1v1';
                   const boxStyle = [
                     styles.approvedBox,
                     (isFilled || isBlinking) && styles.approvedBoxFilled,
@@ -5156,6 +5194,7 @@ export default function LobbyScreen() {
                     : undefined
                 }
                 spotifyConnected={player.spotifyConnected}
+                showSpotifyBadge={gameMode !== 'remote-1v1'}
               />
             ))}
 
@@ -5210,6 +5249,7 @@ export default function LobbyScreen() {
                         : undefined
                     }
                     spotifyConnected={player.spotifyConnected}
+                    showSpotifyBadge={gameMode !== 'remote-1v1'}
                   />
                 ))}
               </View>
@@ -5291,7 +5331,7 @@ export default function LobbyScreen() {
             <View style={[styles.modeRow, { marginTop: Spacing.sm }]}>
               <View style={[styles.modeOption, styles.modeOptionPassActive]}>
                 <Text style={[styles.modeLabel, { textAlign: 'center' }, styles.modeLabelActiveFree]}>
-                  1vs1 Match — 2 players
+                  Remote play — 1vs1
                 </Text>
                 <View style={styles.freeBadge} pointerEvents="none">
                   <Text style={styles.freeBadgeText}>FREE</Text>
@@ -6643,33 +6683,36 @@ export default function LobbyScreen() {
         />
         {hostMode && gameMode === 'remote-1v1' && !singlePlayerDefault &&
          approvedPlayers.filter((p) => !p.isHost).length === 0 ? (
-          /* Remote 1vs1 utan approved motståndare: Start Game ersätts av
-             "Copy room code and send to friend" — host delar koden själv
-             via Messages/WhatsApp/Messenger (clipboard, ingen OS-share). */
+          /* Remote 1vs1 utan approved motståndare: Start Game ersätts av en
+             HELT PASSIV väntetext (Peter 2026-08-07) — samma vokabulär som
+             non-host:s "Waiting for Host to Start Game". Host delar koden
+             via Share invite eller rumkoden i kortet ovan; baren byter till
+             Start Game så fort motståndaren joinat och godkänts. */
           <Animated.View
             style={[styles.startGameCompactWrap, { transform: [{ scale: startPulse }] }]}
           >
-            <TouchableOpacity
-              activeOpacity={0.85}
-              onPress={async () => {
-                try {
-                  await Clipboard.setStringAsync(
-                    `I want to invite you to Quizvibe Game 1vs1 matches. Please login to Quizvibe and join this Room Code ${formatRoomCode(roomCode)}`,
-                  );
-                  Alert.alert(
-                    'Room code copied',
-                    'Paste the invitation into Messages, WhatsApp or Messenger and send it to your opponent. Start Game appears when your opponent has joined and been approved.',
-                  );
-                } catch {
-                  Alert.alert('Copy failed', `Share this Room Code manually: ${formatRoomCode(roomCode)}`);
-                }
-              }}
-              style={styles.startGameCompactRow}
-            >
-              <BlinkingLabel style={[styles.startGameCompactLabel, { fontSize: FontSize.md }]}>
-                Copy room code and send to friend
-              </BlinkingLabel>
-            </TouchableOpacity>
+            <View style={styles.startGameCompactRow} pointerEvents="none">
+              <View style={styles.startGameWaitTextWrap}>
+                <Text
+                  style={styles.startGameWaitTextLarge}
+                  numberOfLines={1}
+                  adjustsFontSizeToFit
+                  minimumFontScale={0.75}
+                >
+                  Wait for friend to join
+                </Text>
+                {/* Grå prickar — samma dämpade färg som texten så hela
+                    väntestatusen läses som en enhet. */}
+                <SequentialDots color={Colors.textSecondary} />
+              </View>
+              <View style={styles.startGameCompactLogoWrap}>
+                <Animated.View
+                  style={[styles.startGameCompactHalo, { opacity: startGlow }]}
+                  pointerEvents="none"
+                />
+                <QuizVibePlayLogo size={64} color={Colors.warning} />
+              </View>
+            </View>
           </Animated.View>
         ) : hostMode ? (
           <Animated.View
@@ -6697,7 +6740,8 @@ export default function LobbyScreen() {
             <View style={styles.startGameCompactRow} pointerEvents="none">
               <View style={styles.startGameWaitTextWrap}>
                 <Text style={styles.startGameWaitText}>Waiting for Host to Start Game</Text>
-                <SequentialDots color={Colors.warning} />
+                {/* Grå prickar — samma dämpade färg som texten. */}
+                <SequentialDots color={Colors.textSecondary} />
               </View>
               <View style={styles.startGameCompactLogoWrap}>
                 <Animated.View
@@ -7302,6 +7346,60 @@ export default function LobbyScreen() {
         </View>
       </Modal>
 
+      {/* ── "Remote Play started — 1vs1"-popup ────────────────────────
+          Custom modal (inte native Alert) så rubriken "Play" kan stå
+          ovanför knapp-raden. Samma card-vokabulär som noApproved-/
+          join-approval-dialogerna. Ingen backdrop-dismiss och ingen
+          Android-back-stängning — spelaren MÅSTE välja Now eller Later
+          (matchen är redan skapad server-side i båda fallen). */}
+      <Modal
+        visible={!!remoteStartPrompt}
+        transparent
+        animationType="fade"
+        onRequestClose={() => { /* måste välja Now/Later */ }}
+      >
+        <View style={styles.noApprovedOverlay}>
+          <View style={styles.guestLeaveBackdrop} pointerEvents="none" />
+          {remoteStartPrompt && (
+            <View style={styles.noApprovedCard}>
+              <Text style={styles.noApprovedTitle}>Remote Play started — 1vs1</Text>
+              <Text style={styles.noApprovedMessage}>{remoteStartPrompt.message}</Text>
+              <Text style={styles.remoteStartPlayLabel}>Play</Text>
+              <View style={styles.remoteStartBtnRow}>
+                <Pressable
+                  style={({ pressed }) => [
+                    styles.noApprovedBtn,
+                    styles.remoteStartBtn,
+                    pressed && { opacity: 0.85 },
+                  ]}
+                  onPress={() => {
+                    const go = remoteStartPrompt.playNow;
+                    setRemoteStartPrompt(null);
+                    go();
+                  }}
+                >
+                  <Text style={styles.noApprovedBtnText}>Now</Text>
+                </Pressable>
+                <Pressable
+                  style={({ pressed }) => [
+                    styles.noApprovedBtn,
+                    styles.remoteStartBtn,
+                    styles.remoteStartLaterBtn,
+                    pressed && { opacity: 0.85 },
+                  ]}
+                  onPress={() => {
+                    setRemoteStartPrompt(null);
+                    router.replace('/');
+                  }}
+                >
+                  <Text style={styles.noApprovedBtnText}>Later</Text>
+                </Pressable>
+              </View>
+            </View>
+          )}
+        </View>
+      </Modal>
+
       {/* ── Deleting-lobby loading-overlay ────────────────────────────
           Visar processing-feedback under tiden mellan host:s Yes-
           konfirmation och navigation till Home. cancelable:false så
@@ -7529,6 +7627,28 @@ const styles = StyleSheet.create({
   },
   noApprovedBtnTextDisabled: {
     color: Colors.textDisabled,
+  },
+
+  // "1vs1 match started"-popupens knapp-rad. "Play"-rubriken står som
+  // egen rad ovanför de två 50/50-knapparna (Now = primär blå outline,
+  // Later = dämpad grå outline).
+  remoteStartPlayLabel: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: Colors.textPrimary,
+    textAlign: 'center',
+    letterSpacing: 0.3,
+  },
+  remoteStartBtnRow: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+  },
+  remoteStartBtn: {
+    flex: 1,
+  },
+  remoteStartLaterBtn: {
+    backgroundColor: 'transparent',
+    borderColor: Colors.borderStrong,
   },
 
   // Join-approval-popup — delar overlay/card/knapp-vokabulär med
@@ -9377,6 +9497,19 @@ const styles = StyleSheet.create({
     fontWeight: FontWeight.bold,
     color: Colors.textSecondary,
     letterSpacing: 0.3,
+  },
+  // 1vs1-lobbyns "Wait for friend to join": samma typografiska mått som
+  // startGameCompactLabel (Start Game) så pillen får exakt samma storlek
+  // som när motståndaren anslutit och baren byter till Start Game. Färgen
+  // är dämpad så läget ändå läses som passivt. (Non-host:s längre
+  // "Waiting for Host to Start Game" behåller md-storleken ovan — den
+  // hade wrappat till två rader vid 20 px.)
+  startGameWaitTextLarge: {
+    flexShrink: 1,
+    fontSize: 20,
+    fontWeight: FontWeight.bold,
+    color: Colors.textSecondary,
+    letterSpacing: 0.5,
   },
 
   waitingForHostText: {

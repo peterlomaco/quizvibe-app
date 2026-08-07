@@ -61,6 +61,9 @@ interface PlayerRowProps {
   peerHealth?: PeerHealth | 'self';
   // Spotify-koppling för spelaren — true = kopplat konto (grön), false/undefined = ej kopplat (grå).
   spotifyConnected?: boolean;
+  // Visa Spotify-attest-badgen? Default true. 1vs1-lobbyn skickar false —
+  // remote-läget har inga Spotify-frågor.
+  showSpotifyBadge?: boolean;
 }
 
 export function PlayerRow({
@@ -84,6 +87,7 @@ export function PlayerRow({
   onEditPlayer,
   peerHealth,
   spotifyConnected,
+  showSpotifyBadge = true,
 }: PlayerRowProps) {
   // "Details +/-"-toggle per spelarkort — gömmer Assistance + Age-pillarna
   // tills man fäller ut. Default hopfällt (Details +).
@@ -377,15 +381,19 @@ export function PlayerRow({
 
       {/* ── Spotify-attest-badge — uppe till höger på kortets kantlinje.
           Plan B (2026-07-22): visar spelarens self-attest ("jag har Spotify-
-          appen"), inte en OAuth-koppling. ── */}
-      <View style={[styles.spotifyBorderTag, { borderColor: spotifyConnected ? '#1DB954' : Colors.borderStrong }]} pointerEvents="none">
-        <SpotifyBrandIcon size={10} variant="white" />
-        {spotifyConnected ? (
-          <Text style={styles.spotifyBorderTagConnected}>Spotify ready</Text>
-        ) : (
-          <Text style={styles.spotifyBorderTagNone}>No Spotify</Text>
-        )}
-      </View>
+          appen"), inte en OAuth-koppling. Döljs helt i 1vs1-lobbyn
+          (showSpotifyBadge=false) — Spotify-frågor finns inte i remote-
+          läget, så badgen vore brus. ── */}
+      {showSpotifyBadge && (
+        <View style={[styles.spotifyBorderTag, { borderColor: spotifyConnected ? '#1DB954' : Colors.borderStrong }]} pointerEvents="none">
+          <SpotifyBrandIcon size={10} variant="white" />
+          {spotifyConnected ? (
+            <Text style={styles.spotifyBorderTagConnected}>Spotify ready</Text>
+          ) : (
+            <Text style={styles.spotifyBorderTagNone}>No Spotify</Text>
+          )}
+        </View>
+      )}
     </View>
   );
 }
