@@ -3,8 +3,9 @@ import { QuizVibeLogo } from '@/src/components/QuizVibeLogo';
 import { QuizVibeQAvatar } from '@/src/components/QuizVibeQAvatar';
 import { ShoppingCartIcon } from '@/src/components/ShoppingCartIcon';
 import { TopUserBanner } from '@/src/components/TopUserBanner';
+import { VersusIcon } from '@/src/components/VersusIcon';
 import { Colors, Radius, Spacing } from '@/src/theme';
-import Svg, { Circle, Rect as SvgRect, Text as SvgText } from 'react-native-svg';
+import Svg, { Text as SvgText } from 'react-native-svg';
 import { identify, resetIdentity, track } from '@/src/utils/analytics';
 import { getAvatarEmojiById } from '@/src/utils/avatars';
 import { clearLeftPlayers } from '@/src/utils/leftPlayers';
@@ -424,7 +425,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
           if (my.me.finishedAt != null) {
             Alert.alert(
               'Already played',
-              'You have already played your questions in this 1vs1 match. Check "1vs1 Matches" for the result.',
+              'You have already played your questions in this 1vs1 match. Check "1vs1 Games" for the result.',
             );
             return;
           }
@@ -934,7 +935,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
               {!(SCREEN_HEIGHT < 700 && (playerNameFocused || focusedCodeIdx !== null)) && (
                 <>
                   <Text style={modal.title}>
-                    {step === 'guest-host' ? 'Start Game as Guest' : 'Join as Guest'}
+                    {step === 'guest-host' ? 'Start Game - Guest login' : 'Join as Guest'}
                   </Text>
                   <Text style={modal.subtitle}>
                     {step === 'guest-host'
@@ -1315,7 +1316,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                   onPress={handleStartGameAsGuestHost}
                   disabled={!isGuestHostFormValid}
                 >
-                  <Text style={modal.joinBtnText}>Start Game as Guest</Text>
+                  <Text style={modal.joinBtnText}>Start Game - Guest login</Text>
                 </TouchableOpacity>
               )}
             </>
@@ -1407,61 +1408,9 @@ function ChoiceRow({
 // ChoiceRow-vokabulär som JoinModal:s choose-steg.
 export type HostLobbyType = 'standard' | '1v1';
 
-/** 1vs1-ikonen: två profil-silhuetter med ett stort guld-"vs" lagt OVANPÅ
- *  dem (texten täcker mitten av båda figurerna — de syns alltså inte i sin
- *  helhet, vilket är avsikten).
- *
- *  Silhuetterna efterliknar QuizVibeFriendsLogo:s ("QuizVibe Community and
- *  Friends" i Profile) — huvud-cirkel + rundad kropp i samma proportioner
- *  (r : bredd : höjd : mellanrum = 2 : 6 : 5 : 1), uppskalade ×3.
- *
- *  "vs" ritas SIST (= överst i SVG:s måleriordning) och renderas två gånger:
- *  först en tjock kontur i kortets bakgrundsfärg som "halo", sedan guld-
- *  fyllningen — så texten separeras tydligt från de blå figurerna under. */
-function VersusIcon({ height = 40 }: { height?: number }) {
-  // viewBox 56×46 → bredd/höjd-kvot ~1.22.
-  const width = height * (56 / 46);
-  return (
-    <Svg width={width} height={height} viewBox="0 0 56 46">
-      {/* Vänster person — huvud (r 6) + kropp (17×14, rx 6), 3 luft emellan. */}
-      <Circle cx={18} cy={16} r={6} fill={Colors.primary} />
-      <SvgRect x={9.5} y={25} width={17} height={14} rx={6} fill={Colors.primary} />
-      {/* Höger person — bara 3 enheters glapp mot den vänstra så "vs" nedan
-          hamnar tvärs över båda. */}
-      <Circle cx={38} cy={16} r={6} fill={Colors.primary} />
-      <SvgRect x={29.5} y={25} width={17} height={14} rx={6} fill={Colors.primary} />
-      {/* "vs" ovanpå — halo först, sedan guld-fyllningen. Liten (15) och
-          ihoptryckt i bredd (textLength 15 + spacingAndGlyphs) så texten
-          bara täcker mitten av silhuetterna. */}
-      <SvgText
-        x={28}
-        y={32}
-        fontSize={15}
-        fontWeight="bold"
-        fill={Colors.cardElevated}
-        stroke={Colors.cardElevated}
-        strokeWidth={4}
-        textAnchor="middle"
-        textLength={15}
-        lengthAdjust="spacingAndGlyphs"
-      >
-        vs
-      </SvgText>
-      <SvgText
-        x={28}
-        y={32}
-        fontSize={15}
-        fontWeight="bold"
-        fill={Colors.warning}
-        textAnchor="middle"
-        textLength={15}
-        lengthAdjust="spacingAndGlyphs"
-      >
-        vs
-      </SvgText>
-    </Svg>
-  );
-}
+// VersusIcon (två silhuetter + guld-"vs") bor i src/components/VersusIcon.tsx
+// sedan 2026-08-07 — delas med "1vs1 Games"-knappen på Home (MyMatchesSection)
+// så duell-läget har EN ikon i appen.
 
 /** Ikon för "Single & Multiplayer mode": **Here&Now** på tre rader —
  *  "Here" överst och "Now" underst i blått, med ett guld-"&" i mitten.
@@ -1949,34 +1898,47 @@ export default function HomeScreen() {
   // lobbyType kommer från inline-väljaren ("Single & Multiplayer mode"
   // vs "1vs1 Matches") — '1v1' skickas som lobbyType-param till LobbyScreen
   // vars seed forcerar gameMode='remote-1v1' (renodlad 1vs1-lobby).
-  const handleCreateGame = async (lobbyType: HostLobbyType = 'standard') => {
-    // Host Game Credits-gate: blockera Create Game om Free är 0 (engångs-
-    // köpta Extras borttagna 2026-07-07 — Premium är enda vägen förbi
-    // dags-cappen). loadProfile() top-up:ar Free-saldot vid första load
-    // efter midnatt CET (refreshFreeCreditsIfNeeded), så vi alltid jämför
-    // mot aktuellt värde. Speglar samma blockad i LobbyScreen.handleStartGame
-    // — skillnaden här är att vi gateas ut REDAN på Home så användaren inte
-    // ens hinner skapa en lobby de inte kan starta.
+  // Host Game Credits-gate: blockerar host-flödet om Free är 0 (engångs-
+  // köpta Extras borttagna 2026-07-07 — Premium är enda vägen förbi
+  // dags-cappen). loadProfile() top-up:ar Free-saldot vid första load
+  // efter midnatt CET (refreshFreeCreditsIfNeeded), så vi alltid jämför
+  // mot aktuellt värde. Speglar samma blockad i LobbyScreen.handleStartGame
+  // — skillnaden här är att vi gateas ut REDAN på Home så användaren inte
+  // ens hinner skapa en lobby de inte kan starta.
+  //
+  // Returnerar profil + premium-status när det är fritt fram (så anroparen
+  // slipper läsa om dem), annars null EFTER att ha visat popupen.
+  // Anropas från TVÅ ställen: (a) "Start New Game"-knappens tap — så
+  // popupen kommer direkt istället för först efter Local/Remote-valet
+  // (Peter 2026-08-07); (b) handleCreateGame som backstop.
+  const checkHostCredits = async (): Promise<{
+    freshProfile: Awaited<ReturnType<typeof loadProfile>>;
+    hasPremium: boolean;
+  } | null> => {
     const [freshProfile, hasPremium] = await Promise.all([
       loadProfile(),
       hasPremiumSubscription(),
     ]);
     // Membership = obegränsade host-spel; ingen gate. Lobby:s handleStartGame
     // skippar också deduktionen så Free-saldot förblir orört.
-    if (!hasPremium) {
-      const free = freshProfile?.freeGameCredits ?? 0;
-      if (free === 0) {
-        Alert.alert(
-          'Out of Host Game Credits',
-          'You have used your free host games for today. Wait for the daily refresh at midnight CET, or upgrade to QuizVibe Premium for unlimited host games.',
-          [
-            { text: 'Cancel', style: 'cancel' },
-            { text: 'Go to Store', onPress: () => router.push('/store?focus=subscription&from=/') },
-          ],
-        );
-        return;
-      }
+    if (!hasPremium && (freshProfile?.freeGameCredits ?? 0) === 0) {
+      Alert.alert(
+        'Out of Host Game Credits',
+        'You have used your free host games for today. Wait for the daily refresh at midnight CET, or upgrade to QuizVibe Premium for unlimited host games.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Go to Store', onPress: () => router.push('/store?focus=subscription&from=/') },
+        ],
+      );
+      return null;
     }
+    return { freshProfile, hasPremium };
+  };
+
+  const handleCreateGame = async (lobbyType: HostLobbyType = 'standard') => {
+    const credits = await checkHostCredits();
+    if (!credits) return;
+    const { freshProfile, hasPremium } = credits;
 
     const code = generateRoomCode();
     // Registrera koden i Supabase rooms-tabellen + lagra host:s metadata så
@@ -2522,9 +2484,18 @@ export default function HomeScreen() {
                 <TouchableOpacity
                   style={[styles.gameBtn, styles.gameBtnUser]}
                   activeOpacity={0.85}
-                  onPress={() =>
-                    setHostTypeExpanded((prev) => (prev === 'registered' ? 'none' : 'registered'))
-                  }
+                  onPress={() => {
+                    // Collapse behöver ingen check. Vid expand körs credit-
+                    // gaten FÖRST så "Out of Host Game Credits" visas direkt
+                    // på knappen istället för efter Local/Remote-valet.
+                    if (hostTypeExpanded === 'registered') {
+                      setHostTypeExpanded('none');
+                      return;
+                    }
+                    void checkHostCredits().then((credits) => {
+                      if (credits) setHostTypeExpanded('registered');
+                    });
+                  }}
                 >
                   <Text
                     style={[
@@ -2567,11 +2538,19 @@ export default function HomeScreen() {
                   numberOfLines={1}
                   adjustsFontSizeToFit
                 >
-                  Join with Room Code — user
+                  Join with Room Code
                 </Text>
               </TouchableOpacity>
             </Animated.View>
           )}
+
+          {/* 1vs1 Games — inloggat läge: grupperas med de gyllene user-
+              knapparna ovanför (naturlig actionsSection-gap, ingen extra
+              marginTop) så den hamnar OVANFÖR guest-rubriken nedan.
+              Utloggade guests får den kvar sist på skärmen (se blocket
+              efter actionsSection). Renderar sig själv bara när användaren
+              har matcher — annars null. */}
+          {isLoggedIn && hostTypeExpanded === 'none' && <MyMatchesSection />}
 
           {/* Guest-sektionen (rubrik + två knappar) — döljs HELT när
               inloggad (registered users använder Join with Room Code —
@@ -2585,7 +2564,7 @@ export default function HomeScreen() {
                   registered-åtgärderna ovan. */}
               {/* appNameFont av samma skäl som QuizVibe user-rubriken ovan. */}
               <Text style={[styles.guestSectionHeader, { fontFamily: appNameFont }]}>
-                Guest / non-registered user
+                Guest login / Non-registered
               </Text>
 
               {/* Join with Room Code — guest. Pulserar (primär spel-path
@@ -2610,7 +2589,7 @@ export default function HomeScreen() {
                     numberOfLines={1}
                     adjustsFontSizeToFit
                   >
-                    Join with Room Code — guest
+                    Join with Room Code
                   </Text>
                   <View style={styles.homeFreeBadge} pointerEvents="none">
                     <Text style={styles.homeFreeBadgeText}>FREE</Text>
@@ -2620,9 +2599,9 @@ export default function HomeScreen() {
             </>
           )}
 
-          {/* Start Game as Guest — synlig i BÅDA login-lägena (inloggade
+          {/* Start New Game (guest-host) — synlig i BÅDA login-lägena (inloggade
               spelare ska också kunna hosta som guest). Pulserar alltid.
-              Badge: "Game Results - Not Saved" inloggad / FREE utloggad.
+              Badge: "Guest data - not saved" inloggad / FREE utloggad.
               Öppnar guest-HOST-formen
               (begränsad registrering → lobby som host). Inloggad: extra
               marginTop (Spacing.xl, samma sektions-separation som guest-
@@ -2638,6 +2617,23 @@ export default function HomeScreen() {
             ]}
             pointerEvents={joinVisible ? 'none' : 'auto'}
           >
+            {/* Inloggat läge saknar guest-sektionens rubrik ovanför (den
+                renderas bara i !isLoggedIn-blocket) — utan den skulle en
+                ensam "Start Game"-knapp vara tvetydig intill de gyllene
+                user-knapparna. Rendera samma grå rubrik här. marginTop 0
+                eftersom wrappern redan bär sektions-separationen (xl);
+                marginBottom matchar actionsSection:s gap så rytmen blir
+                identisk med utloggat läge. */}
+            {isLoggedIn && hostTypeExpanded === 'none' && (
+              <Text
+                style={[
+                  styles.guestSectionHeader,
+                  { fontFamily: appNameFont, marginTop: 0, marginBottom: Spacing.md },
+                ]}
+              >
+                Guest login / Non-registered
+              </Text>
+            )}
             {/* Pulsen ligger BARA på knappen — utfälld panel står still. */}
             <Animated.View
               style={{ transform: [{ scale: hostTypeExpanded === 'guest' ? 1 : pulse }] }}
@@ -2657,9 +2653,9 @@ export default function HomeScreen() {
                   numberOfLines={1}
                   adjustsFontSizeToFit
                 >
-                  Start Game as Guest
+                  Start New Game
                 </Text>
-                {/* Badge per login-läge: inloggad → "Game Results - Not Saved"
+                {/* Badge per login-läge: inloggad → "Guest data - not saved"
                     i grått (samma homeUserBadge-stil som user-knapparna);
                     utloggad → FREE i grönt (matchar övriga guest-/register-
                     knappar). */}
@@ -2668,7 +2664,7 @@ export default function HomeScreen() {
                   pointerEvents="none"
                 >
                   <Text style={styles.homeFreeBadgeText}>
-                    {isLoggedIn ? 'Game Results - Not Saved' : 'FREE'}
+                    {isLoggedIn ? 'Guest data - not saved' : 'FREE'}
                   </Text>
                 </View>
               </TouchableOpacity>
@@ -2687,14 +2683,16 @@ export default function HomeScreen() {
           )}
         </View>
 
-        {/* ── 1vs1 Matches ─────────────────────────────────────
+        {/* ── 1vs1 Games (utloggad/guest) ───────────────────────
             Huvudknapp för Remote 1v1-dueller — navigerar till den
             dedikerade /my-matches-skärmen där matcherna listas. Renderar
             sig själv bara när användaren har matcher — annars null.
-            Gold-accent + "Your turn"-subtitel när en match väntar.
+            Blinkande "New update" + guld-pil när något ändrats.
+            Inloggade får den högre upp (inuti actionsSection, ovanför
+            guest-rubriken); här ligger guest-varianten kvar sist.
             Döljs (som övriga Home-knappar) medan en lobbytyp-utfällning
             är aktiv så valet står ensamt. */}
-        {hostTypeExpanded === 'none' && (
+        {!isLoggedIn && hostTypeExpanded === 'none' && (
           <View style={{ marginTop: Spacing.xl }}>
             <MyMatchesSection />
           </View>
@@ -3808,7 +3806,7 @@ const styles = StyleSheet.create({
     zIndex: 10,
     elevation: 4,
   },
-  // "Game Results - Not Saved"-badgen på Start Game as Guest i
+  // "Guest data - not saved"-badgen på Start Game - Guest login i
   // inloggat läge — grå bg (samma PREMIUM-grå som guest-knapparna) +
   // vit kant. User-knapparnas "Game Results - Saved"-badges togs bort
   // 2026-08-07.

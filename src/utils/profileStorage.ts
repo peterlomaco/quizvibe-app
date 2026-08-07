@@ -36,7 +36,7 @@ export interface ProfileData {
   // slipper migration.
   gameCredits?: number;
   // Antal Host Game-credits användaren har kvar av de GRATIS som följer med
-  // Basic-planen (2 per dag). Konsumeras vid Start Game (om ej Premium —
+  // Basic-planen (4 per dag). Konsumeras vid Start Game (om ej Premium —
   // Premium = unlimited, ingen deduktion). Optional för bakåtkompatibilitet
   // — defaultas till FREE_CREDITS_DAILY_CAP i UI och fylls på automatiskt
   // till samma cap vid första profil-load efter midnatt CET
@@ -105,11 +105,12 @@ const LEGACY_SKILL_TO_ASSISTANCE: Record<string, AssistanceLevel> = {
   expert: 'minimal',
 };
 
-// Daily-cap för fria Host Games. Top-up till MAX 2 vid midnatt CET via
+// Daily-cap för fria Host Games. Top-up till MAX 4 vid midnatt CET via
 // refreshFreeCreditsIfNeeded (anropas i loadProfile). Topp-up:en är aldrig
-// destruktiv — om saldot redan är ≥ 2 (t.ex. efter en kampanj-bonus) lämnas
+// destruktiv — om saldot redan är ≥ 4 (t.ex. efter en kampanj-bonus) lämnas
 // det orört. Konsumeras vid Start Game (Premium = unlimited, ingen deduktion).
-export const FREE_CREDITS_DAILY_CAP = 2;
+// Höjt 2 → 4 (Peter 2026-08-07) — Store visar "Basic: 4 games per day".
+export const FREE_CREDITS_DAILY_CAP = 4;
 
 /**
  * Returnerar dagens datum i Europe/Stockholm-tidszon som "YYYY-MM-DD".

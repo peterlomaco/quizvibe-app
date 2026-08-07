@@ -1,6 +1,6 @@
-// 1vs1 Matches — egen skärm som listar användarens Remote 1v1-dueller.
+// 1vs1 Games — egen skärm som listar användarens Remote 1v1-dueller.
 //
-// Nås via huvudknappen "1vs1 Matches" på Home (MyMatchesSection — knappen
+// Nås via huvudknappen "1vs1 Games" på Home (MyMatchesSection — knappen
 // navigerar hit istället för att fälla ut listan inline, Peter 2026-08-07).
 // Radstatusar:
 //   • "Your turn"             — jag har frågor kvar (tap → spela/återuppta)
@@ -84,7 +84,7 @@ export default function MyMatchesScreen() {
     <SafeAreaView style={styles.safe}>
       <TopUserBanner onBackPress={() => router.replace('/')} backLabel="Back" />
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.screenTitle}>1vs1 Matches</Text>
+        <Text style={styles.screenTitle}>1vs1 Games</Text>
         <Text style={styles.screenSubtitle}>
           Remote duels — each player answers on their own device within 48 hours.
         </Text>

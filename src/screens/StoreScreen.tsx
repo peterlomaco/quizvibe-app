@@ -72,7 +72,7 @@ const PACKAGE_TIERS: PackageTier[] = [];
 interface SubscriptionTier {
   id: string;
   productId: string;         // App Store Connect product ID (för RC-lookup)
-  label: string;             // "1 month", "3 months", etc.
+  label: string;             // "Monthly subscription", "3 months", etc.
   price: string;             // fallback-display
   priceAmount: number;       // för analytics
   pricePerMonth: string;     // "79 kr / month" eller "~66 kr / month"
@@ -84,7 +84,7 @@ const SUBSCRIPTION_TIERS: SubscriptionTier[] = [
   {
     id: 'sub-1mth',
     productId: 'pkg_sub_monthly',
-    label: '1 month',
+    label: 'Monthly subscription',
     price: '79 kr',
     priceAmount: 79,
     pricePerMonth: '79 kr / month',
@@ -97,7 +97,7 @@ interface SubscriptionFeature {
 }
 
 const SUBSCRIPTION_FEATURES: SubscriptionFeature[] = [
-  { premium: 'Unlimited Host Games', basic: '2 + 2 launch bonus games per day' },
+  { premium: 'Host Game Credits Unlimited', basic: '4 games per day' },
   { premium: 'Max 20 rounds per game', basic: 'Max 4 rounds per game' },
   { premium: 'Invite up to 12 players per Game', basic: '4 players' },
   { premium: 'All Extra Host packages included', basic: 'Generic content only' },
@@ -354,6 +354,11 @@ export default function StoreScreen() {
     </View>
   );
 
+  // Basic plan-sektionen är BORTTAGEN ur Store-vyn 2026-08-07 (Peter) —
+  // Store ska bara sälja Premium, gratis-planen behöver ingen egen ruta.
+  // Renderas inte i något focusMode; JSX:n parkeras här (samma mönster som
+  // otherHeading/PACKAGE_TIERS) ifall den ska tillbaka.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const basicSection = (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>Basic plan</Text>
@@ -369,7 +374,7 @@ export default function StoreScreen() {
               adjustsFontSizeToFit
               minimumFontScale={0.75}
             >
-              2 (+2 bonus) Host Games / day
+              4 Host Games / day
             </Text>
             <Text style={styles.tierSubline}>+ Unlimited games as invited player</Text>
             <Text style={styles.tierSubline}>Refreshes every day at midnight CET</Text>
@@ -433,10 +438,9 @@ export default function StoreScreen() {
 
   const subscriptionSection = (
     <View style={styles.section}>
-      <Text style={styles.sectionTitle}>QuizVibe membership plans</Text>
-      <Text style={styles.sectionSubtitle}>
-        Unlimited host games + premium features.
-      </Text>
+      {/* Skärmens topprubrik sedan headern togs bort — screenTitle-storlek
+          (samma typografi som "Add QuizVibe Premium" hade). */}
+      <Text style={styles.screenTitle}>QuizVibe membership</Text>
 
       {/* Feature-lista med Premium-vs-Basic-jämförelse per rad. */}
       <View style={styles.featureList}>
@@ -502,25 +506,18 @@ export default function StoreScreen() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        {/* ── Screen header ────────────────────────────────────── */}
-        <View style={styles.header}>
-          <Text style={styles.screenTitle}>Add QuizVibe Premium</Text>
-          <Text style={styles.screenSubtitle}>
-            Unlimited Host games and premium features with QuizVibe membership plans
-          </Text>
-        </View>
-
+        {/* Skärm-headern ("Add QuizVibe Premium" + undertext) togs bort
+            2026-08-07 (Peter) — "QuizVibe membership plans" är nu skärmens
+            enda topprubrik och bär screenTitle-typografin. */}
         {focusMode === 'subscription' && (
           <>
             {subscriptionSection}
-            {basicSection}
             {packagesSection}
             {creditsSection}
           </>
         )}
         {focusMode === 'default' && (
           <>
-            {basicSection}
             {creditsSection}
             {packagesSection}
             {subscriptionSection}
@@ -647,7 +644,10 @@ function SubscriptionTierCard({
   onBuy: () => void;
 }) {
   const isHighlight = tier.badge === 'BEST VALUE';
-  const accent = isHighlight ? Colors.warning : Colors.primary;
+  // Guld på Subscribe-knappen (Peter 2026-08-07) — samma premium-vokabulär
+  // som PREMIUM-badges och Start Game-CTA:n. buyBtnText är redan mörk
+  // (Colors.background), vilket ger rätt kontrast mot guld.
+  const accent = Colors.warning;
 
   return (
     <View style={[styles.tierCard, isHighlight && { borderColor: accent }]}>
@@ -656,18 +656,28 @@ function SubscriptionTierCard({
           <Text style={styles.tierBadgeText}>{tier.badge}</Text>
         </View>
       )}
-      <View style={styles.tierContent}>
+      {/* flex-start (istället för tierContent:s center) → prisets översta
+          rad linjerar med "Monthly subscription"-rubriken. Båda är 18px så
+          baslinjerna hamnar på samma höjd. */}
+      <View style={[styles.tierContent, { alignItems: 'flex-start' }]}>
         <View style={styles.tierLeft}>
           <Text style={styles.tierHeadline}>{tier.label}</Text>
-          <Text style={styles.tierSubline}>{tier.pricePerMonth}</Text>
+          {/* pricePerMonth-sublinen borttagen 2026-08-07 — perioden visas
+              nu direkt vid priset ("79 kr / month") till höger. */}
           {tier.savePct !== undefined && (
             <Text style={[styles.tierSave, { color: accent }]}>
               Save {tier.savePct}%
             </Text>
           )}
         </View>
-        <View style={styles.tierRight}>
-          <Text style={styles.tierPrice}>{displayPrice}</Text>
+        {/* alignItems center (istället för tierRight:s flex-end) → priset
+            centreras över Subscribe-knappen i stället för att högerställas
+            mot kortets kant. */}
+        <View style={[styles.tierRight, { alignItems: 'center' }]}>
+          {/* "/ month" hängs på RC:s lokaliserade pris (eller fallbacken)
+              sedan den separata pricePerMonth-sublinen togs bort — perioden
+              måste framgå vid priset för att abonnemanget ska vara tydligt. */}
+          <Text style={styles.tierPrice}>{displayPrice} / month</Text>
           <Pressable
             onPress={onBuy}
             disabled={disabled}
@@ -679,7 +689,9 @@ function SubscriptionTierCard({
             ]}
           >
             {isPurchasing ? (
-              <ActivityIndicator size="small" color="#FFF" />
+              // Mörk spinner (samma färg som knapptexten) — vit syns dåligt
+              // mot guld.
+              <ActivityIndicator size="small" color={Colors.background} />
             ) : (
               <Text style={styles.buyBtnText}>Subscribe</Text>
             )}

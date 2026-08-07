@@ -3928,7 +3928,7 @@ export default function LobbyScreen() {
           };
           Alert.alert(
             '1vs1 match started',
-            'Host has started the 1vs1 match. You have 48 hours to play your questions — now or later via "1vs1 Matches" on the Home screen.',
+            'Host has started the 1vs1 match. You have 48 hours to play your questions — now or later via "1vs1 Games" on the Home screen.',
             [
               { text: 'Play later', style: 'cancel', onPress: () => router.replace('/') },
               { text: 'Play now', onPress: goPlayNow },
@@ -5356,7 +5356,7 @@ export default function LobbyScreen() {
                   onPress={() =>
                     Alert.alert(
                       'Multiplayer mode',
-                      'Pass-the-Phone: All players share one device. Max 4 players, even with Premium. Spotify not applicable for PtP mode.\n\nIndividual device: Each player uses their own device. Max 4 players on Basic, max 12 players with Premium.\n\nLooking for 1vs1? Remote duels are started from the Home screen — tap Start New Game and pick "1vs1 Matches".',
+                      'Pass-the-Phone: All players share one device. Max 4 players, even with Premium. Spotify not applicable for PtP mode.\n\nIndividual device: Each player uses their own device. Max 4 players on Basic, max 12 players with Premium.\n\nLooking for 1vs1? Remote duels are started from the Home screen — tap Start New Game and pick "Remote Play".',
                     )
                   }
                   hitSlop={8}
@@ -5796,6 +5796,15 @@ export default function LobbyScreen() {
               </View>
 
             </View>
+
+            {/* 1vs1: Spotify-kortet göms helt (se toppen av mixerboarden) —
+                noten sitter under hela matrisen, ovanför Customized Host
+                packages, så det inte läses som en bugg att raden saknas. */}
+            {gameMode === 'remote-1v1' && (
+              <Text style={styles.guestHostNote}>
+                Spotify is not available in 1vs1 Games
+              </Text>
+            )}
 
             {/* Use Packages — sub-block sist i Game Connections för musikpaket-val.
                 Basic-utbudet är alltid implicit aktivt (ingen synlig chip);

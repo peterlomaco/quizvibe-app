@@ -1438,7 +1438,7 @@ export default function ProfileScreen() {
                     onPress={() =>
                       Alert.alert(
                         'Multiplayer mode',
-                        'Pass-the-Phone: All players share one device. Max 4 players, even with Premium. Spotify not applicable for PtP mode.\n\nIndividual device: Each player uses their own device. Max 4 players on Basic, max 12 players with Premium.\n\nLooking for 1vs1? Remote duels are started from the Home screen — tap Start New Game and pick "1vs1 Matches".',
+                        'Pass-the-Phone: All players share one device. Max 4 players, even with Premium. Spotify not applicable for PtP mode.\n\nIndividual device: Each player uses their own device. Max 4 players on Basic, max 12 players with Premium.\n\nLooking for 1vs1? Remote duels are started from the Home screen — tap Start New Game and pick "Remote Play".',
                       )
                     }
                     hitSlop={8}
@@ -2239,6 +2239,37 @@ export default function ProfileScreen() {
           >
             <Text style={styles.friendsBtnText}>+ Add QuizVibe Friends</Text>
           </Pressable>
+
+          {/* Inline lista över sparade vänner — en rad per friend. Speglar
+              modalens friendRow-layout (avatar + namn + ×) så listan känns
+              som samma vy. Modalens lista är kvar oförändrad. */}
+          {friends.length > 0 && (
+            <View style={styles.friendsList}>
+              {friends.map((friend, i) => (
+                <View key={friend.id}>
+                  {i > 0 && <View style={styles.friendsListDivider} />}
+                  <View style={styles.friendsListRow}>
+                    <Text style={styles.friendsListEmoji}>
+                      {getAvatarEmojiById(friend.avatarId)}
+                    </Text>
+                    <Text style={styles.friendsListName} numberOfLines={1}>
+                      {friend.playerName}
+                    </Text>
+                    <Pressable
+                      onPress={() => handleRemoveFriend(friend.id)}
+                      hitSlop={10}
+                      style={({ pressed }) => [
+                        styles.friendsListRemoveBtn,
+                        pressed && { opacity: 0.6 },
+                      ]}
+                    >
+                      <Text style={styles.friendsListRemoveText}>×</Text>
+                    </Pressable>
+                  </View>
+                </View>
+              ))}
+            </View>
+          )}
         </View>
           </>
         )}
@@ -3470,6 +3501,49 @@ const styles = StyleSheet.create({
     fontWeight: FontWeight.bold,
     color: '#FFFFFF',
     letterSpacing: 0.3,
+  },
+  // Inline friends-lista under knappen. Mörkare yta (background) inuti
+  // kortet så raderna läses som en egen lista, inte som del av kortet.
+  friendsList: {
+    backgroundColor: Colors.background,
+    borderRadius: Radius.md,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    paddingHorizontal: Spacing.md,
+  },
+  friendsListRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.md,
+    paddingVertical: Spacing.sm,
+  },
+  friendsListEmoji: {
+    fontSize: 20,
+    width: 30,
+    textAlign: 'center',
+  },
+  friendsListName: {
+    flex: 1,
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.medium,
+    color: Colors.textPrimary,
+  },
+  friendsListRemoveBtn: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    backgroundColor: Colors.cardElevated,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  friendsListRemoveText: {
+    fontSize: 17,
+    color: Colors.textSecondary,
+    lineHeight: 19,
+  },
+  friendsListDivider: {
+    height: 1,
+    backgroundColor: Colors.separator,
   },
 
   // Preview card — vertical container: [columns row] + [Save button]
