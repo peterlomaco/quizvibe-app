@@ -461,7 +461,7 @@ function DJTrackCard({
           <Text style={styles.spotifyTrackCardTitle}>{title}</Text>
           {albumCtx ? (
             <Text style={styles.spotifyTrackCardPosition}>
-              Track {albumCtx.position} of {albumCtx.total}
+              Track position in Spotify: {albumCtx.position} of {albumCtx.total}
             </Text>
           ) : null}
           <View style={styles.spotifyTrackCardWarnRow}>
