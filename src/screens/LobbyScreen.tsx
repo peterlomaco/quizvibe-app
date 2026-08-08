@@ -66,6 +66,7 @@ import { loadLastSessionIds, loadSeenQuestionIds } from '../utils/hostQuestionHi
 import { setPendingPeerSeenIds } from '../utils/pendingSeenQuestions';
 import { clearLobbySettings, getLobbySettings, setLobbySettings } from '../utils/mockLobbySettings';
 import { createRemoteMatch, getMatchByRoomCode, getOwnUserId } from '../utils/remoteMatches';
+import { saveLobby } from '../utils/savedLobbies';
 import { defaultEnabledMainCategories, subjectToMainCategory, type MainCategory } from '../utils/mainCategory';
 import { MUSIC_QUESTIONS } from '../utils/musicQuestions';
 import { IMAGE_QUIZ_QUESTIONS } from '../utils/quizImageQuestions';
@@ -3393,6 +3394,45 @@ export default function LobbyScreen() {
     setNewFriendPlayerName('');
   };
 
+  // Remote 1v1-lobby (inte single player). Gatar "Save 1vs1 – Play later"
+  // i BÅDA TopUserBanner-sheetsen — läget är det enda där lobbyn är värd
+  // att spara: rummet lever 24h och matchen är asynkron ändå.
+  const isRemoteLobby = gameMode === 'remote-1v1' && !singlePlayerDefault;
+
+  /**
+   * "Save 1vs1 – Play later" — sparar LOBBYN (inte matchen) lokalt för den
+   * här användaren och går till Home. Posten dyker upp i Remote Play
+   * History under "Not started"; tap:en där tar spelaren tillbaka in i
+   * lobbyn så länge rummet lever (24h).
+   *
+   * Medvetet INTE samma sak som Leave/Delete:
+   *  • Non-host markeras ALDRIG som `hasLeft` — de behåller sin plats i
+   *    rostern så host fortfarande kan trycka Start Game.
+   *  • Host raderar INTE rummet — rooms-raden lever vidare till sin
+   *    24h-deadline och koden är fortsatt joinbar.
+   * Ingen match skapas och ingen credit dras — det sker först vid Start Game.
+   */
+  const handleSaveRemoteLobby = async (fromHostSheet: boolean) => {
+    if (fromHostSheet) setHostDeleteSheetVisible(false);
+    else setGuestLeaveSheetVisible(false);
+    // Motståndaren = den andra aktiva parten sett från den som sparar.
+    // Bara till radens undertext; null när ingen hunnit joina ännu.
+    const counterpart = hostMode
+      ? players.find((p) => !p.isHost && !p.hasLeft)
+      : players.find((p) => p.isHost);
+    await saveLobby({
+      roomCode,
+      isHost: hostMode,
+      opponentName: counterpart?.name ?? null,
+      savedAt: new Date().toISOString(),
+    });
+    Alert.alert(
+      '1vs1 lobby saved',
+      'Find it under "Remote Play History" on the Home screen, with status Not started. The lobby stays open for 24 hours.',
+      [{ text: 'OK', onPress: () => router.replace('/') }],
+    );
+  };
+
   // Två-stegs leave-flow för non-hosts (både gäster och registrerade
   // spelare som joinat via kod):
   // 1) Sheet:n stängs.
@@ -3405,7 +3445,11 @@ export default function LobbyScreen() {
     setGuestLeaveSheetVisible(false);
     Alert.alert(
       'Leave this Game Lobby?',
-      'You will be directed to Home page and Guest Player data will be lost.',
+      // Remote 1v1 spelas bara av QuizVibe-users — där finns ingen
+      // guest-data att förlora, så meddelandet säger bara vad som händer.
+      isRemoteLobby
+        ? 'You will be removed from this Game Lobby.'
+        : 'You will be directed to Home page and Guest Player data will be lost.',
       [
         { text: 'No', style: 'cancel' },
         {
@@ -7257,6 +7301,22 @@ export default function LobbyScreen() {
               );
             })()}
 
+            {/* Remote 1v1: spara lobbyn istället för att lämna den —
+                spelaren behåller sin plats i rostern och hittar lobbyn
+                igen under Remote Play History → Not started. Ligger ovanför
+                den röda destruktiva knappen. */}
+            {isRemoteLobby && (
+              <Pressable
+                style={({ pressed }) => [
+                  styles.saveLobbyBtn,
+                  pressed && { opacity: 0.85 },
+                ]}
+                onPress={() => { void handleSaveRemoteLobby(false); }}
+              >
+                <Text style={styles.saveLobbyBtnText}>Save 1vs1 — Play later</Text>
+              </Pressable>
+            )}
+
             <Pressable
               style={({ pressed }) => [
                 styles.guestLeaveBtn,
@@ -7310,6 +7370,21 @@ export default function LobbyScreen() {
                 </View>
               );
             })()}
+
+            {/* Remote 1v1: host kan parkera lobbyn istället för att radera
+                den — rummet lever kvar sina 24h och koden är fortsatt
+                joinbar, så motståndaren hinner ansluta under tiden. */}
+            {isRemoteLobby && (
+              <Pressable
+                style={({ pressed }) => [
+                  styles.saveLobbyBtn,
+                  pressed && { opacity: 0.85 },
+                ]}
+                onPress={() => { void handleSaveRemoteLobby(true); }}
+              >
+                <Text style={styles.saveLobbyBtnText}>Save 1vs1 — Play later</Text>
+              </Pressable>
+            )}
 
             <Pressable
               style={({ pressed }) => [
@@ -7726,6 +7801,24 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: Colors.error,
+  },
+  // "Save 1vs1 — Play later" (remote-lobbies) — exakt samma geometri och
+  // typografi som guestLeaveBtn/guestLeaveBtnText nedanför, men i grönt:
+  // åtgärden är bevarande, inte destruktiv. Grön ram + ljus grön botten +
+  // stark grön text speglar den rödas ram/botten/text-uppdelning.
+  saveLobbyBtn: {
+    height: 52,
+    borderRadius: Radius.md,
+    backgroundColor: Colors.successMuted,
+    borderWidth: 1,
+    borderColor: Colors.success,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  saveLobbyBtnText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.success,
   },
   guestLeaveCancelBtn: {
     alignItems: 'center',

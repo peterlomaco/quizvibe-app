@@ -46,6 +46,10 @@ export interface RoomMeta {
   // 300ms-debounce:ade lobby_settings-skrivningen. Optional i typen:
   // rum skapade före 0031 saknar kolumnen och resolvar till false.
   isRemote1v1?: boolean;
+  // Rummets 24h-deadline (ISO). Driver "Time left"-texten på sparade
+  // 1vs1-lobbies i Remote Play History. Optional: test-seedsen nedan har
+  // ingen expiry och lämnar fältet undefined.
+  expiresAt?: string;
 }
 
 // Dev/test-seeds som lagras lokalt i minnet (inte i DB) så de alltid är
@@ -82,6 +86,7 @@ function rowToMeta(row: RoomRow): RoomMeta {
     hostPlayerName: row.host_player_name,
     gameStarted: row.game_started,
     isRemote1v1: row.is_remote_1v1 ?? false,
+    expiresAt: row.expires_at,
   };
 }
 

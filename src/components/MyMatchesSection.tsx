@@ -35,6 +35,7 @@ import {
   subscribeToMyMatches,
   type MyRemoteMatch,
 } from '../utils/remoteMatches';
+import { getSavedLobbies } from '../utils/savedLobbies';
 
 // Per-user-namespacad nyckel (samma mönster som friends/gameHistory) så
 // User A:s "sett"-snapshot inte tystar signalen för User B på samma device.
@@ -75,15 +76,22 @@ export function MyMatchesSection({ full = false }: { full?: boolean } = {}) {
   const pathname = usePathname();
   const [matches, setMatches] = useState<MyRemoteMatch[]>([]);
   const [isGuestSession, setIsGuestSession] = useState(false);
+  const [savedCount, setSavedCount] = useState(0);
   const [seenSignature, setSeenSignature] = useState<string | null>(null);
   const seenKeyRef = useRef<string | null>(null);
 
   const reload = useCallback(async () => {
-    const [{ data: sessionData }, anon, mine] = await Promise.all([
+    const [{ data: sessionData }, anon, mine, saved] = await Promise.all([
       supabase.auth.getSession(),
       isAnonymousSession(),
       getMyMatches(),
+      getSavedLobbies(),
     ]);
+    // Sparade lobbies ("Save 1vs1 – Play later") räknas som innehåll så
+    // knappen dyker upp även innan någon match skapats. Ingen prune här —
+    // /my-matches äger städningen mot rooms-raden; en död post ger på sin
+    // höjd en extra knapp tills spelaren öppnat listan en gång.
+    setSavedCount(saved.length);
     // Sessionen läses fortfarande direkt eftersom vi behöver user.id till
     // "sett"-nyckeln nedan; guest-avgörandet går via den delade helpern.
     const user = sessionData.session?.user as { id?: string } | undefined;
@@ -135,6 +143,9 @@ export function MyMatchesSection({ full = false }: { full?: boolean } = {}) {
   // FÖRE spärren kan ha kvar legacy-rader som annars hade renderat knappen
   // på Home. De löper ut på sin 48h-deadline och sveps av cron:en.
   const visible = isGuestSession ? [] : matches;
+  // Sparade lobbies är kontobundna (storen nycklas på playerName) — samma
+  // guard som matcherna så en anon-session aldrig får ingången.
+  const visibleSavedCount = isGuestSession ? 0 : savedCount;
 
   // Något har hänt sedan spelaren senast öppnade listan → blinkande signal.
   // seenSignature === null = ingen user-id (kan inte namespace:a) → tyst.
@@ -145,7 +156,7 @@ export function MyMatchesSection({ full = false }: { full?: boolean } = {}) {
   // Hooks måste köras före den villkorliga return:en nedan.
   const blink = useBlink(hasUpdate);
 
-  if (visible.length === 0) return null;
+  if (visible.length === 0 && visibleSavedCount === 0) return null;
 
   return (
     <TouchableOpacity

@@ -14,6 +14,15 @@
 // båda fallen) — därför hämtas mina svarade match-id:n i en extra query
 // (getMyAnsweredMatchIds) parallellt med matchlistan.
 //
+// SPARADE LOBBIES (Peter 2026-08-08): överst i "Not started" ligger även
+// lobbies som spelaren parkerat via "Save 1vs1 – Play later" i lobbyns
+// TopUserBanner-sheet. De är INTE matcher — ingen remote_matches-rad finns
+// ännu — utan lokala genvägar (savedLobbies.ts) tillbaka in i ett rum som
+// lever server-side i 24h. Tap:en går till /lobby, inte /quiz. Varje reload
+// prunar dem mot rooms-raden: saknas den (raderad/utgången) eller är
+// game_started satt (då finns en riktig match som tar över raden) raderas
+// posten ur storen.
+//
 // Radstatusar:
 //   • "Your turn"             — jag har frågor kvar (tap → spela/återuppta)
 //   • "Waiting for opponent"  — jag är klar, motståndaren spelar inom 48h
@@ -47,6 +56,8 @@ import { RemoteMatchResultPanel } from '../components/RemoteMatchResultPanel';
 import { VersusIcon } from '../components/VersusIcon';
 import { Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';
 import { isAnonymousSession } from '../utils/auth';
+import { getLobbyPlayers } from '../utils/mockLobbyPlayers';
+import { getRoomMeta } from '../utils/mockActiveRooms';
 import {
   buildRemoteQuizParams,
   formatPlayerLabel,
@@ -55,6 +66,8 @@ import {
   subscribeToMyMatches,
   type MyRemoteMatch,
 } from '../utils/remoteMatches';
+import { formatRoomCode } from '../utils/roomCode';
+import { getSavedLobbies, removeSavedLobby, type SavedLobby } from '../utils/savedLobbies';
 
 function hoursLeft(deadlineAt: string): number {
   return Math.max(0, Math.ceil((new Date(deadlineAt).getTime() - Date.now()) / 3_600_000));
@@ -67,6 +80,12 @@ function formatDate(iso: string): string {
   const dd = String(d.getDate()).padStart(2, '0');
   return `${d.getFullYear()}-${mm}-${dd}`;
 }
+
+/**
+ * Sparad lobby berikad med rummets 24h-deadline (läses från rooms-raden
+ * vid varje reload — den lagrade posten känner bara till när den sparades).
+ */
+type SavedLobbyRow = SavedLobby & { expiresAt?: string };
 
 /** Sektionerna i listan — ordningen här är renderingsordningen. */
 type SectionKey = 'notStarted' | 'ongoing' | 'history';
@@ -85,6 +104,10 @@ export default function MyMatchesScreen() {
   const { from } = useLocalSearchParams<{ from?: string }>();
   const backTo = from === '/profile' ? '/profile' : '/';
   const [matches, setMatches] = useState<MyRemoteMatch[]>([]);
+  // Lobbies spelaren parkerat via "Save 1vs1 – Play later" i lobbyns
+  // TopUserBanner-sheet. Ingen match finns ännu — de renderas som egna
+  // rader överst i "Not started" och tap:en går tillbaka in i lobbyn.
+  const [savedLobbies, setSavedLobbies] = useState<SavedLobbyRow[]>([]);
   const [answeredIds, setAnsweredIds] = useState<Set<string>>(new Set());
   const [isGuestSession, setIsGuestSession] = useState(false);
   const [loaded, setLoaded] = useState(false);
@@ -112,17 +135,47 @@ export default function MyMatchesScreen() {
   }, []);
 
   const reload = useCallback(async () => {
-    const [anon, mine] = await Promise.all([
+    const [anon, mine, saved] = await Promise.all([
       isAnonymousSession(),
       getMyMatches(),
+      getSavedLobbies(),
     ]);
     // Bara aktiva matcher behöver svarslookupen (historiken grupperas på
     // status) — håller queryn liten.
     const answered = await getMyAnsweredMatchIds(
       mine.filter((m) => m.match.status === 'active').map((m) => m.match.id),
     );
+    // Sparade lobbies prunas mot rooms-raden, som äger sanningen: saknas
+    // metan är rummet raderat eller utgånget (24h), och `gameStarted`
+    // betyder att host tryckt Start Game — då finns en riktig matchrad som
+    // tar över raden i listan. Bortprunade poster raderas ur storen så de
+    // inte städas om vid varje focus.
+    const roomStates = await Promise.all(
+      saved.map(async (s) => {
+        const [meta, roster] = await Promise.all([
+          getRoomMeta(s.roomCode),
+          // Motparten läses om varje gång: host kan ha sparat en tom lobby
+          // och fått en motståndare efteråt. Faller tillbaka på namnet som
+          // sparades om rostern inte går att läsa.
+          getLobbyPlayers(s.roomCode),
+        ]);
+        const counterpart = s.isHost
+          ? roster?.find((p) => !p.isHost && !p.hasLeft)
+          : roster?.find((p) => p.isHost);
+        return { saved: s, meta, opponentName: counterpart?.name ?? s.opponentName };
+      }),
+    );
+    const liveSaved: SavedLobbyRow[] = [];
+    for (const { saved: s, meta, opponentName } of roomStates) {
+      if (meta && !meta.gameStarted) {
+        liveSaved.push({ ...s, opponentName, expiresAt: meta.expiresAt });
+      } else {
+        void removeSavedLobby(s.roomCode);
+      }
+    }
     setIsGuestSession(anon);
     setMatches(mine);
+    setSavedLobbies(liveSaved);
     setAnsweredIds(answered);
     setLoaded(true);
   }, []);
@@ -145,6 +198,11 @@ export default function MyMatchesScreen() {
   const visible = isGuestSession
     ? matches.filter((m) => m.match.status === 'active' || m.match.status === 'cancelled')
     : matches;
+
+  // Sparade lobbies är per definition kontobundna (Remote 1v1 är
+  // users-only, och storen nycklas på playerName) — anon-sessioner ser
+  // dem aldrig. Guarden är defensiv mot legacy-state på delade enheter.
+  const visibleSaved = isGuestSession ? [] : savedLobbies;
 
   // Gruppering: aktiv + inga egna svar → Not started; aktiv i övrigt
   // (påbörjad ELLER klar och väntar på motståndaren) → Ongoing; allt
@@ -234,6 +292,45 @@ export default function MyMatchesScreen() {
     );
   };
 
+  /**
+   * Sparad lobby — ingen match finns ännu, så raden bär rumskoden och
+   * (om någon hunnit joina) motparten. Tap → tillbaka in i lobbyn med
+   * samma params som den ursprungliga ingången: host återtar sin lobby
+   * (lobbyType styr den forcerade 1v1-seeden), motståndaren går in som
+   * non-host och får settings via lobby_settings-synken.
+   */
+  const renderSavedRow = (s: SavedLobbyRow) => {
+    const h = s.expiresAt ? hoursLeft(s.expiresAt) : null;
+    return (
+      <TouchableOpacity
+        key={`saved-${s.roomCode}`}
+        style={[styles.row, styles.rowSaved]}
+        activeOpacity={0.7}
+        onPress={() =>
+          router.push({
+            pathname: '/lobby',
+            params: {
+              code: s.roomCode,
+              isHost: String(s.isHost),
+              ...(s.isHost ? { lobbyType: '1v1' } : {}),
+            },
+          })
+        }
+      >
+        <View style={styles.rowText}>
+          <Text style={styles.opponentName} numberOfLines={1}>
+            Saved lobby: {formatRoomCode(s.roomCode)}
+          </Text>
+          <Text style={[styles.statusText, { color: Colors.primary }]} numberOfLines={1}>
+            {s.opponentName ? `With: ${s.opponentName}` : 'Waiting for opponent to join'}
+            {h != null ? ` · Lobby open ${h} ${h === 1 ? 'hour' : 'hours'}` : ''}
+          </Text>
+        </View>
+        <Text style={[styles.chevron, { color: Colors.primary }]}>›</Text>
+      </TouchableOpacity>
+    );
+  };
+
   // Historiken grupperas per motståndar-USER-ID, inte namn — en spelare
   // kan möta samma konto både under dess riktiga namn och under ett Guest
   // alias, och det ska ändå bli EN grupp. Etiketten tas från senaste
@@ -286,6 +383,10 @@ export default function MyMatchesScreen() {
   const renderSection = (key: SectionKey) => {
     const rows = sections[key];
     const isOpen = expanded[key];
+    // Sparade lobbies (ingen match ännu) hör hemma överst i "Not started"
+    // och räknas in i sektionens antal.
+    const saved = key === 'notStarted' ? visibleSaved : [];
+    const total = rows.length + saved.length;
     return (
       <View key={key} style={styles.section}>
         <Pressable
@@ -299,14 +400,15 @@ export default function MyMatchesScreen() {
           <View style={styles.sectionToggleBox}>
             <Text style={styles.sectionChevron}>{isOpen ? '−' : '+'}</Text>
           </View>
-          <Text style={styles.sectionCount}>{rows.length}</Text>
+          <Text style={styles.sectionCount}>{total}</Text>
         </Pressable>
         {/* Grått skiljestreck — bara i ihopfällt läge (som i Profile);
             utfälld sektion separeras av sina egna match-rader. */}
         {!isOpen && <View style={styles.sectionDivider} />}
         {isOpen && (
           <View style={styles.list}>
-            {rows.length === 0 ? (
+            {saved.map(renderSavedRow)}
+            {total === 0 ? (
               <Text style={styles.sectionEmptyText}>No matches here.</Text>
             ) : key === 'history' ? (
               // Historiken grupperas per motståndare — en utfällbar
@@ -337,7 +439,7 @@ export default function MyMatchesScreen() {
           Remote duels — each player answers on their own device within 48 hours.
         </Text>
 
-        {loaded && visible.length === 0 && (
+        {loaded && visible.length === 0 && visibleSaved.length === 0 && (
           <Text style={styles.emptyText}>
             No 1vs1 matches yet. Tap &quot;Start New Game&quot; on Home, choose
             Remote Play (1vs1) and invite a friend to start your first duel.
@@ -346,7 +448,7 @@ export default function MyMatchesScreen() {
 
         {/* Sektionerna renderas alltid när användaren har minst en match —
             en tom sektion visar "No matches here." när den fälls ut. */}
-        {visible.length > 0 && (
+        {(visible.length > 0 || visibleSaved.length > 0) && (
           <View style={styles.sections}>
             {(['notStarted', 'ongoing', 'history'] as SectionKey[]).map(renderSection)}
           </View>
@@ -510,6 +612,12 @@ const styles = StyleSheet.create({
   },
   rowYourTurn: {
     borderColor: Colors.warning,
+  },
+  // Sparad lobby (ingen match ännu) — blå kant skiljer den från de gyllene
+  // "din tur"-raderna: här ska spelaren tillbaka in i LOBBYN, inte in i ett
+  // quiz.
+  rowSaved: {
+    borderColor: Colors.primary,
   },
   rowText: {
     flex: 1,
