@@ -1435,8 +1435,10 @@ export default function LobbyScreen() {
           // Remote 1v1: gemensam hjälpnivå. Carry-over (Play Again) vinner,
           // annars produktdefaulten Full — MEDVETET inte hostens personliga
           // profil-assistance: nivån gäller båda spelarna, så hostens egen
-          // inställning ska inte tyst påtvingas motståndaren.
+          // inställning ska inte tyst påtvingas motståndaren. Switchen är av
+          // i en ny lobby (opt-in) men bärs över vid Play Again.
           setRemoteAssistance(stored?.remoteAssistance ?? 'full');
+          setMutualAssistanceEnabled(stored?.mutualAssistanceEnabled ?? false);
           // Tillåt debounce-effekten att skriva till setLobbySettings nu när
           // alla initiala värden är satta. Utan denna guard kan debounce:n
           // hinna skriva med default-värden (spotifyEnabled=false) INNAN
@@ -2106,11 +2108,15 @@ export default function LobbyScreen() {
   const [spotifyAnswerName, setSpotifyAnswerName] = useState(true);
   // Remote 1v1: EN gemensam hjälpnivå för båda spelarna (default Full).
   // Assistance är annars personligt, men i en duell där båda kör samma
-  // frågesekvens var för sig blir olika nivåer inte jämförbart — därför
-  // väljer host en nivå som skrivs till båda remote_match_players-raderna
-  // vid Start Game. Ignoreras helt i lokala lägen.
+  // frågesekvens var för sig blir olika nivåer inte jämförbart — därför KAN
+  // host låsa båda till samma nivå, som då skrivs till båda
+  // remote_match_players-raderna vid Start Game. Ignoreras i lokala lägen.
   const [remoteAssistance, setRemoteAssistance] =
     useState<LobbyRemoteAssistance>('full');
+  // ...men det är OPT-IN: switchen är AV när lobbyn skapas, och först när
+  // host slår på den blir nivå-valet aktivt. Av → varje spelare kör sin egen
+  // personliga nivå (samma modell som lokala lägen).
+  const [mutualAssistanceEnabled, setMutualAssistanceEnabled] = useState(false);
   // Egen Spotify-self-attest ("jag har Spotify-appen") — seedas från
   // profile.spotifyAppConfirmed i useFocusEffect; namnet spotifyConnected
   // behållet för minimal diff mot OAuth-eran.
@@ -3420,6 +3426,11 @@ export default function LobbyScreen() {
   // i BÅDA TopUserBanner-sheetsen — läget är det enda där lobbyn är värd
   // att spara: rummet lever 24h och matchen är asynkron ändå.
   const isRemoteLobby = gameMode === 'remote-1v1' && !singlePlayerDefault;
+  // Gemensam hjälpnivå gäller bara när BÅDE lobbyn är remote OCH host slagit
+  // på switchen. Är den av beter sig assistance precis som i lokala lägen
+  // (per spelarkort), så alla per-spelare-vägar (player-edit, PlayerRow-pill,
+  // turnOrder-assistance) ska då lämnas orörda.
+  const mutualAssistanceActive = isRemoteLobby && mutualAssistanceEnabled;
 
   /**
    * "Save 1vs1 – Play later" — sparar LOBBYN (inte matchen) lokalt för den
@@ -3664,6 +3675,7 @@ export default function LobbyScreen() {
         spotifyAnswerYear,
         spotifyAnswerName,
         remoteAssistance,
+        mutualAssistanceEnabled,
       }).catch(() => { /* loggas i mockLobbySettings */ });
     }, 300);
     return () => clearTimeout(handle);
@@ -3685,6 +3697,7 @@ export default function LobbyScreen() {
     spotifyAnswerYear,
     spotifyAnswerName,
     remoteAssistance,
+    mutualAssistanceEnabled,
   ]);
 
   // Realtime-tick: bumpas av lobby_players + lobby_settings-channel-
@@ -3750,8 +3763,10 @@ export default function LobbyScreen() {
       setSpotifyEnabled(stored.spotifyEnabled);
       setSpotifyAnswerYear(stored.spotifyAnswerYear);
       setSpotifyAnswerName(stored.spotifyAnswerName);
-      // Remote 1v1: hostens gemensamma hjälpnivå (read-only för non-host).
+      // Remote 1v1: hostens gemensamma hjälpnivå + om den alls är påslagen
+      // (read-only för non-host).
       setRemoteAssistance(stored.remoteAssistance);
+      setMutualAssistanceEnabled(stored.mutualAssistanceEnabled);
       // Per-source categories — [] är ett giltigt "allt av"-val och får INTE
       // coerceas till defaults. Direkt tilldelning respekterar host:s explicita val.
       setYoutubeEnabledCategories((prev) => {
@@ -4841,18 +4856,21 @@ export default function LobbyScreen() {
         // Motståndarens auth-status går inte att se klient-side — där är
         // LobbyPlayer.type bästa gissningen tills 0029 är applicerad.
         //
-        // assistance: BÅDA raderna får hostens gemensamma `remoteAssistance`
-        // (inte spelarnas personliga nivåer). Match-snapshotten är sanningen
-        // under spel — quiz-params härleds ur den både via
-        // buildRemoteQuizParams (1vs1 Matches / kod-återinträde) och via
-        // lobbyns game-started-detektering — så duellen körs på lika villkor.
+        // assistance: med "Mutual assistance level" PÅ får BÅDA raderna
+        // hostens gemensamma `remoteAssistance`; är switchen av behåller
+        // varje spelare sin egen nivå. Match-snapshotten är sanningen under
+        // spel — quiz-params härleds ur den både via buildRemoteQuizParams
+        // (1vs1 Matches / kod-återinträde) och via lobbyns game-started-
+        // detektering — så det som skrivs här är det som faktiskt gäller.
         [
           {
             userId: hostUserId,
             playerName: hostRow?.name ?? 'Host',
             isHost: true,
             playerType: hostIsAnonymous ? 'guest' : 'registered',
-            assistance: remoteAssistance,
+            assistance: mutualAssistanceEnabled
+              ? remoteAssistance
+              : hostRow?.assistance ?? 'standard',
             age: hostRow?.age ?? null,
           },
           {
@@ -4860,7 +4878,9 @@ export default function LobbyScreen() {
             playerName: remoteOpponent.name,
             isHost: false,
             playerType: remoteOpponent.type === 'registered' ? 'registered' : 'guest',
-            assistance: remoteAssistance,
+            assistance: mutualAssistanceEnabled
+              ? remoteAssistance
+              : remoteOpponent.assistance ?? 'standard',
             age: remoteOpponent.age ?? null,
           },
         ],
@@ -4919,9 +4939,14 @@ export default function LobbyScreen() {
         // Guest host: fallback-assistance/age speglar guest-identiteten
         // (Full + ålder från guestBirthYear) istället för de generiska
         // 'standard'/'32'. turnOrder-hostens kort bär redan samma värden.
-        // Remote 1v1: hostens gemensamma nivå vinner — samma värde som skrevs
-        // till båda remote_match_players-raderna.
-        assistance: remoteMatchId ? remoteAssistance : isGuestHost ? 'full' : 'standard',
+        // Remote 1v1 med Mutual assistance på: hostens gemensamma nivå vinner
+        // — samma värde som skrevs till båda remote_match_players-raderna.
+        assistance:
+          remoteMatchId && mutualAssistanceEnabled
+            ? remoteAssistance
+            : isGuestHost
+              ? 'full'
+              : 'standard',
         age: isGuestHost && guestBirthYear
           ? String(CURRENT_YEAR - parseInt(guestBirthYear, 10))
           : '32',
@@ -4954,13 +4979,16 @@ export default function LobbyScreen() {
         //
         // OBS: quiz.tsx läser assistance PRIMÄRT ur turnOrder-raden
         // (`turnOrder[currentPlayerIndex]?.assistance`) och bara sekundärt ur
-        // `params.assistance` — så den gemensamma nivån måste sättas HÄR,
-        // annars kör host vidare på sin personliga profilnivå.
+        // `params.assistance` — så med Mutual assistance på måste den
+        // gemensamma nivån sättas HÄR, annars kör host vidare på sin
+        // personliga profilnivå.
         players: JSON.stringify(
           remoteMatchId && remoteOpponent
             ? turnOrder
                 .filter((t) => t.id !== remoteOpponent.id)
-                .map((t) => ({ ...t, assistance: remoteAssistance }))
+                .map((t) =>
+                  mutualAssistanceEnabled ? { ...t, assistance: remoteAssistance } : t,
+                )
             : turnOrder,
         ),
         ...(remoteMatchId ? { remoteMatchId } : {}),
@@ -5428,7 +5456,7 @@ export default function LobbyScreen() {
                 canMoveDown={hostMode && index < approvedPlayers.length - 1}
                 hcpComplete={player.hcpComplete}
                 age={player.age}
-                assistance={isRemoteLobby ? remoteAssistance : player.assistance}
+                assistance={mutualAssistanceActive ? remoteAssistance : player.assistance}
                 isHostPlayer={player.isHost}
                 isGuest={player.type === 'guest'}
                 accountPlayerName={player.accountPlayerName}
@@ -5484,7 +5512,7 @@ export default function LobbyScreen() {
                     index={players.indexOf(player)}
                     hcpComplete={player.hcpComplete}
                     age={player.age}
-                    assistance={isRemoteLobby ? remoteAssistance : player.assistance}
+                    assistance={mutualAssistanceActive ? remoteAssistance : player.assistance}
                     isHostPlayer={false}
                     isGuest={player.type === 'guest'}
                     accountPlayerName={player.accountPlayerName}
@@ -5593,61 +5621,83 @@ export default function LobbyScreen() {
               <View style={{ flex: 1 }} />
             </View>
 
-            {/* Gemensam hjälpnivå för BÅDA spelarna. I lokala lägen är
-                assistance personligt (per spelarkort), men här svarar båda
-                på samma frågesekvens var för sig — olika nivåer skulle göra
-                duellen ojämförbar. Renderas för alla men bara host kan ändra
-                (samma host-vs-non-host-mönster som resten av Game Settings). */}
-            <View style={[styles.playersLabelRow, { marginTop: Spacing.lg }]}>
-              <Text style={[styles.sectionLabel, { marginTop: 0, marginBottom: 0 }]}>
-                Assistance level
-              </Text>
+            {/* Mutual assistance level — OPT-IN. Assistance är normalt
+                personligt (per spelarkort), men eftersom båda här svarar på
+                samma frågesekvens var för sig kan host välja att låsa båda
+                till EN nivå. Switchen är av när lobbyn skapas; nivå-rutorna
+                visas först när den slås på. Renderas för alla men bara host
+                kan ändra (samma mönster som resten av Game Settings). */}
+            <View
+              style={[
+                styles.mutualAssistanceRow,
+                { borderColor: mutualAssistanceEnabled ? Colors.success : Colors.borderStrong },
+              ]}
+            >
+              <Text style={styles.mutualAssistanceLabel}>Mutual assistance level</Text>
               <Pressable
                 style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
                 onPress={() =>
                   Alert.alert(
-                    'Assistance level',
-                    'In a 1vs1 match both players answer the same questions on their own devices, so both play with the SAME assistance level — the Host picks it here.\n\nFull: the full names are listed, just pick the right one.\nStandard: 2-letter hints, then pick the name.\nMinimal: 1-letter hints, then pick the name.\n\nIt also sets how wide the year interval is on Year questions.',
+                    'Mutual assistance level',
+                    'Off: each player plays with their own personal assistance level.\n\nOn: both players get the SAME level — the one the Host picks below. In a 1vs1 match both answer the same questions on their own devices, so a shared level makes the duel directly comparable.\n\nFull: the full names are listed, just pick the right one.\nStandard: 2-letter hints, then pick the name.\nMinimal: 1-letter hints, then pick the name.\n\nIt also sets how wide the year interval is on Year questions.',
                   )
                 }
                 hitSlop={8}
-                accessibilityLabel="Assistance level info"
+                accessibilityLabel="Mutual assistance level info"
               >
                 <Text style={styles.infoIconText}>i</Text>
               </Pressable>
+              <Switch
+                value={mutualAssistanceEnabled}
+                onValueChange={setMutualAssistanceEnabled}
+                disabled={!hostMode}
+                trackColor={{ false: '#3C3C3C', true: Colors.success }}
+                thumbColor="#FFF"
+                ios_backgroundColor={mutualAssistanceEnabled ? Colors.success : '#3C3C3C'}
+                style={styles.sourceMatrixSwitch}
+              />
             </View>
-            <View style={[styles.modeRow, { marginTop: Spacing.sm }]}>
-              {REMOTE_ASSISTANCE_OPTIONS.map((opt) => {
-                const isSelected = remoteAssistance === opt.id;
-                return (
-                  <TouchableOpacity
-                    key={opt.id}
-                    style={[
-                      styles.modeOption,
-                      isSelected ? styles.modeOptionPassActive : styles.modeOptionInactive,
-                    ]}
-                    onPress={() => setRemoteAssistance(opt.id)}
-                    disabled={!hostMode}
-                    activeOpacity={0.7}
-                  >
-                    <Text
-                      style={[
-                        styles.modeLabel,
-                        { textAlign: 'center' },
-                        isSelected && styles.modeLabelActiveFree,
-                      ]}
-                    >
-                      {opt.label}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-            <Text style={styles.remoteAssistanceNote}>
-              {hostMode
-                ? 'Applies to both players in this 1vs1 match.'
-                : 'Selected by the Host — applies to both players.'}
-            </Text>
+            {mutualAssistanceEnabled && (
+              <>
+                <View style={[styles.modeRow, { marginTop: Spacing.sm }]}>
+                  {REMOTE_ASSISTANCE_OPTIONS.map((opt) => {
+                    const isSelected = remoteAssistance === opt.id;
+                    return (
+                      <TouchableOpacity
+                        key={opt.id}
+                        style={[
+                          styles.modeOption,
+                          isSelected ? styles.modeOptionPassActive : styles.modeOptionInactive,
+                        ]}
+                        onPress={() => setRemoteAssistance(opt.id)}
+                        disabled={!hostMode}
+                        activeOpacity={0.7}
+                      >
+                        <Text
+                          style={[
+                            styles.modeLabel,
+                            { textAlign: 'center' },
+                            isSelected && styles.modeLabelActiveFree,
+                          ]}
+                        >
+                          {opt.label}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+                <Text style={styles.remoteAssistanceNote}>
+                  {hostMode
+                    ? 'Applies to both players in this 1vs1 match.'
+                    : 'Selected by the Host — applies to both players.'}
+                </Text>
+              </>
+            )}
+            {!mutualAssistanceEnabled && (
+              <Text style={styles.remoteAssistanceNote}>
+                Each player plays with their own assistance level.
+              </Text>
+            )}
           </View>
         ) : (
         <View style={[styles.section, { marginTop: Spacing.xs }]}>
@@ -7152,11 +7202,13 @@ export default function LobbyScreen() {
                   Andra spelares kort editeras fritt även av guest host. */}
               <View style={playerEditSheet.fieldGroup}>
                 <Text style={playerEditSheet.fieldLabel}>Assistance Level</Text>
-                {isRemoteLobby ? (
-                  /* Remote 1v1: nivån är gemensam för båda spelarna och sätts
-                     i Game Mode-sektionen — per-spelare-val här skulle bara
-                     skrivas över av match-snapshotten vid Start Game. Visa
-                     den gällande nivån statiskt + peka på rätt kontroll. */
+                {mutualAssistanceActive ? (
+                  /* Remote 1v1 med Mutual assistance PÅ: nivån är gemensam och
+                     sätts i Game Mode-sektionen — per-spelare-val här skulle
+                     bara skrivas över av match-snapshotten vid Start Game. Visa
+                     den gällande nivån statiskt + peka på rätt kontroll.
+                     Är switchen AV faller vi igenom till den vanliga
+                     per-spelare-raden nedan. */
                   <>
                     <View style={playerEditSheet.skillRow}>
                       <View style={[playerEditSheet.skillBtn, playerEditSheet.skillBtnActive]}>
@@ -9691,6 +9743,27 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     marginTop: Spacing.xs,
     textAlign: 'center',
+  },
+
+  // "Mutual assistance level"-raden i 1vs1-lobbyn: label + info-ikon + switch
+  // i en ram vars färg speglar läget (grön = på, grå = av) — samma
+  // "text + switch läses som EN kontroll"-mönster som Spotify-attestraden.
+  mutualAssistanceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginTop: Spacing.lg,
+    borderWidth: 1,
+    borderRadius: Radius.sm,
+    paddingLeft: Spacing.sm,
+    paddingRight: 2,
+    paddingVertical: 2,
+  },
+  mutualAssistanceLabel: {
+    flex: 1,
+    fontSize: FontSize.sm,
+    color: Colors.textPrimary,
+    fontWeight: FontWeight.medium,
   },
 
   // Not under 1vs1-lobbyns Assistance level-rad — förtydligar att nivån

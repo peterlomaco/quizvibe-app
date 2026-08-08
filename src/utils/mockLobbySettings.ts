@@ -63,9 +63,17 @@ export interface LobbySettings {
   spotifyAnswerYear: boolean;
   spotifyAnswerName: boolean;
   // Remote 1v1: gemensam hjälpnivå för BÅDA spelarna. Default 'full'.
+  // Gäller BARA när mutualAssistanceEnabled är true — annars kör varje spelare
+  // sin egen personliga nivå (samma modell som i lokala lägen).
   // DB-kolumn: lobby_settings.remote_assistance (migration 0033) — skrivs via
   // en SEPARAT targeted UPDATE, inte i settingsToRow (se setLobbySettings).
   remoteAssistance: LobbyRemoteAssistance;
+  // Remote 1v1: har host slagit på "Mutual assistance level"-switchen?
+  // Default FALSE — av när lobbyn skapas; host aktiverar den medvetet för att
+  // låsa båda spelarna till samma nivå. DB-kolumn:
+  // lobby_settings.remote_assistance_enabled (migration 0034), skrivs i samma
+  // targeted UPDATE som remote_assistance.
+  mutualAssistanceEnabled: boolean;
 }
 
 interface LobbySettingsRow {
@@ -99,6 +107,9 @@ interface LobbySettingsRow {
   // Optional tills migration 0033_lobby_settings_remote_assistance.sql körts
   // (tolerant read → 'full' som default).
   remote_assistance?: string | null;
+  // Optional tills migration 0034_lobby_settings_mutual_assistance.sql körts
+  // (tolerant read → false = switchen av, vilket är produktdefaulten).
+  remote_assistance_enabled?: boolean | null;
 }
 
 const UI_TO_DB_REGION: Record<LobbyRegion, DbRegion> = {
@@ -153,6 +164,8 @@ function rowToSettings(row: LobbySettingsRow): LobbySettings {
     remoteAssistance: isRemoteAssistance(row.remote_assistance)
       ? row.remote_assistance
       : 'full',
+    // Tolerant: kolumnen saknas pre-migration 0034 → false (switchen av).
+    mutualAssistanceEnabled: row.remote_assistance_enabled === true,
   };
 }
 
@@ -222,19 +235,23 @@ export async function setLobbySettings(code: string, settings: LobbySettings): P
     console.warn('[lobbySettings] setLobbySettings upsert failed:', error.message);
     return;
   }
-  // Remote 1v1: gemensam hjälpnivå skrivs SEPARAT (se settingsToRow för varför).
-  // Bara i remote-lobbies — lokala lägen har per-spelare-assistance och ska
-  // varken betala för en extra round-trip eller röra kolumnen. Saknas
-  // kolumnen (migration 0033 ej körd) blir det en console.warn och ingenting
-  // annat: raden ovan är redan committad, och rowToSettings defaultar 'full'.
+  // Remote 1v1: mutual-assistance-fälten skrivs SEPARAT (se settingsToRow för
+  // varför). Bara i remote-lobbies — lokala lägen har per-spelare-assistance
+  // och ska varken betala för en extra round-trip eller röra kolumnerna.
+  // Saknas kolumnerna (migration 0033/0034 ej körda) blir det en console.warn
+  // och ingenting annat: raden ovan är redan committad, och rowToSettings
+  // defaultar till 'full' + switch av.
   if (settings.gameMode !== 'remote-1v1') return;
   const { error: raError } = await supabase
     .from('lobby_settings')
-    .update({ remote_assistance: settings.remoteAssistance })
+    .update({
+      remote_assistance: settings.remoteAssistance,
+      remote_assistance_enabled: settings.mutualAssistanceEnabled,
+    })
     .eq('room_code', normalized);
   if (raError) {
     console.warn(
-      '[lobbySettings] remote_assistance update failed (migration 0033 applied?):',
+      '[lobbySettings] mutual assistance update failed (migrations 0033/0034 applied?):',
       raError.message,
     );
   }
