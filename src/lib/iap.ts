@@ -22,12 +22,24 @@
 //     aktiv så länge sub är giltig. Mappa till profile.hasPremium-derivering.
 // ─────────────────────────────────────────────────────────────────────
 
+import Constants, { ExecutionEnvironment } from 'expo-constants';
 import { Platform } from 'react-native';
 import Purchases, {
   type CustomerInfo,
   type PurchasesOffering,
   type PurchasesPackage,
 } from 'react-native-purchases';
+
+// Expo Go saknar RevenueCats native-modul. SDK:n faller då tillbaka på sin
+// browser-implementation, som `console.error`:ar "Invalid API key. The native
+// store is not available when running inside Expo Go..." INNAN den kastar —
+// vår try/catch nedan hindrar kraschen men hinner aldrig tysta loggen, så
+// Peter fick en röd ERROR-banner vid varje app-start. Vi hoppar därför över
+// configure helt i Expo Go; alla övriga IAP-anrop no-op:ar redan via sina
+// !configured-guards. I dev-/standalone-builds (native-modulen finns) körs
+// allt som vanligt.
+const IS_EXPO_GO =
+  Constants.executionEnvironment === ExecutionEnvironment.StoreClient;
 
 // Public API-key från RevenueCat Dashboard (Project Settings → API Keys).
 // iOS-keyen börjar med 'appl_...'. Android-keyen ('goog_...') sätts först
@@ -69,6 +81,7 @@ export const CREDIT_PRODUCT_AMOUNTS: Record<string, number> = {
 };
 
 let configured = false;
+let warnedExpoGo = false;
 
 /**
  * Konfigurerar RevenueCat-SDK vid app-start. Idempotent — säkert att anropa
@@ -80,6 +93,15 @@ let configured = false;
  * ut, anropa logOutPurchases för att resetta tillbaka till anonym RC user.
  */
 export async function configurePurchases(userId?: string): Promise<void> {
+  if (IS_EXPO_GO) {
+    // En enda informations-rad per app-session, inte per anrop (configure
+    // körs igen vid login/logout).
+    if (__DEV__ && !warnedExpoGo) {
+      warnedExpoGo = true;
+      console.log('[iap] Expo Go — IAP inaktiv. Kör dev-build för att testa köp.');
+    }
+    return;
+  }
   if (Platform.OS === 'ios') {
     if (!IOS_API_KEY) {
       console.warn(
