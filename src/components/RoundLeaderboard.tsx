@@ -384,6 +384,8 @@ export function RoundLeaderboard({
   belowTable,
   remote1v1 = false,
   onStartNewGame,
+  startNewGameLocked = false,
+  onStartNewGameLockedPress,
 }: {
   players: LeaderboardPlayer[];
   /** Behållen för API-bakåtkompabilitet — tabellen aggregerar allt från
@@ -434,6 +436,14 @@ export function RoundLeaderboard({
    *  Home enda vägen vidare och spelaren måste ta omvägen via startsidan
    *  för att utmana igen. Utelämnas → knappen renderas inte alls. */
   onStartNewGame?: (lobbyType: HostLobbyType) => void;
+  /**
+   * Remote 1v1: true medan motståndaren fortfarande har frågor kvar att
+   * spela. Knappen renderas då grå/inaktiv och tapp:en expanderar INTE
+   * utfällningen — den kallar `onStartNewGameLockedPress` i stället, så
+   * call-siten äger förklaringen.
+   */
+  startNewGameLocked?: boolean;
+  onStartNewGameLockedPress?: () => void;
 }) {
   // Nunito 700 Bold för Final Leaderboard:s "QuizVibe"-vattenstämpel-text
   // under Q+pokal-loggan. Matchar startskärmens appName-textformat 1:1.
@@ -768,13 +778,33 @@ export function RoundLeaderboard({
           ensamt (samma mönster som Home döljer sina övriga knappar). */}
       {isLastRound && onStartNewGame && (
         <View style={styles.startNewGameWrap}>
+          {/* Låst läge (remote: motståndaren spelar fortfarande) — grå
+              knapp, ingen utfällning. Tapp:en är kvar och förklarar varför
+              i stället för att vara en död yta. */}
           <Pressable
-            onPress={() => setStartNewGameExpanded((prev) => !prev)}
-            style={({ pressed }) => [styles.startNewGameBtn, pressed && { opacity: 0.85 }]}
+            onPress={() => {
+              if (startNewGameLocked) {
+                onStartNewGameLockedPress?.();
+                return;
+              }
+              setStartNewGameExpanded((prev) => !prev);
+            }}
+            style={({ pressed }) => [
+              styles.startNewGameBtn,
+              startNewGameLocked && styles.startNewGameBtnLocked,
+              pressed && { opacity: 0.85 },
+            ]}
           >
-            <Text style={styles.startNewGameBtnText}>Start New Game</Text>
+            <Text
+              style={[
+                styles.startNewGameBtnText,
+                startNewGameLocked && styles.startNewGameBtnTextLocked,
+              ]}
+            >
+              Start New Game
+            </Text>
           </Pressable>
-          {startNewGameExpanded && (
+          {startNewGameExpanded && !startNewGameLocked && (
             <HostTypeOptions
               accentColor={Colors.warning}
               onSelect={(lobbyType) => {
@@ -1224,6 +1254,15 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: '600',
     color: '#000000',
+  },
+  // Låst läge: samma geometri, grå palett (samma vokabulär som PREMIUM-
+  // badgens grå = "inte tillgängligt ännu", inte "fel").
+  startNewGameBtnLocked: {
+    backgroundColor: Colors.cardElevated,
+    borderColor: Colors.borderStrong,
+  },
+  startNewGameBtnTextLocked: {
+    color: Colors.textDisabled,
   },
   // Home-knapp: Q-logo VÄNSTER om "Home"-text på samma rad. Bg matchar
   // leaderboard-tabellens dataradsbg (Colors.card) så knappen visuellt knyter

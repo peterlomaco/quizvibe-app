@@ -5468,6 +5468,10 @@ export default function QuizScreen() {
   // live om motståndaren blir klar medan slutskärmen står uppe.
   const [remoteOpponentSummary, setRemoteOpponentSummary] =
     useState<RemoteMatchPlayer | null>(null);
+  // Matchen är avgjord server-side (finished / walkover / void / forfeited /
+  // cancelled). Då finns inget mer att vänta in även om motståndaren aldrig
+  // spelade klart — "Start New Game" ska låsas upp.
+  const [remoteMatchEnded, setRemoteMatchEnded] = useState(false);
   useEffect(() => {
     if (!isRemote || !remoteMatchId || phase !== 'leaderboard') return;
     let cancelled = false;
@@ -5476,6 +5480,7 @@ export default function QuizScreen() {
       if (cancelled || !m || !myId) return;
       const opp = m.players.find((p) => p.userId !== myId) ?? null;
       setRemoteOpponentSummary(opp?.finishedAt ? opp : null);
+      setRemoteMatchEnded(m.status !== 'active');
     };
     void load();
     const unsubscribe = subscribeToMatch(remoteMatchId, () => { void load(); });
@@ -6278,6 +6283,20 @@ export default function QuizScreen() {
             isRemote && isLastQuestion && !isGuestHostGame
               ? handleStartNewGameFromFinal
               : undefined
+          }
+          // ...men låst tills duellen faktiskt är avgjord. Den som blir klar
+          // först ska inte kunna starta nästa match medan motståndaren
+          // fortfarande spelar sin halva (48h-fönstret). Upplåst så fort
+          // motståndaren finaliserat ELLER matchen avslutats på annat sätt
+          // (walkover / void / forfeit) — då finns inget kvar att vänta på.
+          startNewGameLocked={
+            isRemote && !remoteOpponentSummary && !remoteMatchEnded
+          }
+          onStartNewGameLockedPress={() =>
+            Alert.alert(
+              'Waiting for your opponent',
+              'You can start a new game as soon as both players have finished this match.',
+            )
           }
           // Remote 1v1: duellstatus/resultat i en EGEN sektion UNDER
           // leaderboarden — den som når slutskärmen först ser sitt eget
