@@ -18,6 +18,19 @@ export type LobbyGameMode = 'pass-the-phone' | 'individual-devices' | 'remote-1v
 export type LobbyRegion = 'Sweden' | 'Nordics' | 'Europe' | 'Global';
 type DbRegion = 'sweden' | 'nordics' | 'europe' | 'global';
 export type LobbyAnswerResponse = 30 | 45 | 60;
+/**
+ * Remote 1v1 spelar båda deltagarna SAMMA frågesekvens var för sig — då måste
+ * de också ha samma hjälpnivå, annars är duellen inte jämförbar. Host väljer
+ * en gemensam nivå i 1vs1-lobbyn och den skrivs till BÅDA
+ * `remote_match_players.assistance`-raderna vid Start Game. I lokala lägen är
+ * assistance fortsatt per spelare (personlig inställning) och detta fält
+ * ignoreras.
+ */
+export type LobbyRemoteAssistance = 'full' | 'standard' | 'minimal';
+
+export function isRemoteAssistance(v: unknown): v is LobbyRemoteAssistance {
+  return v === 'full' || v === 'standard' || v === 'minimal';
+}
 
 export interface LobbySettings {
   gameMode: LobbyGameMode;
@@ -49,6 +62,10 @@ export interface LobbySettings {
   // Spotify-svarstyper (tolerant fallback via ?? true — ingen DB-migration krävs för V1).
   spotifyAnswerYear: boolean;
   spotifyAnswerName: boolean;
+  // Remote 1v1: gemensam hjälpnivå för BÅDA spelarna. Default 'full'.
+  // DB-kolumn: lobby_settings.remote_assistance (migration 0033) — skrivs via
+  // en SEPARAT targeted UPDATE, inte i settingsToRow (se setLobbySettings).
+  remoteAssistance: LobbyRemoteAssistance;
 }
 
 interface LobbySettingsRow {
@@ -79,6 +96,9 @@ interface LobbySettingsRow {
   // Spotify-svarstyper. Optional tills kolumnerna lagts till (tolerant read via ?? true).
   spotify_answer_year?: boolean;
   spotify_answer_name?: boolean;
+  // Optional tills migration 0033_lobby_settings_remote_assistance.sql körts
+  // (tolerant read → 'full' som default).
+  remote_assistance?: string | null;
 }
 
 const UI_TO_DB_REGION: Record<LobbyRegion, DbRegion> = {
@@ -129,6 +149,10 @@ function rowToSettings(row: LobbySettingsRow): LobbySettings {
     // Tolerant: kolumner kanske inte finns ännu → default true (båda aktiva).
     spotifyAnswerYear: row.spotify_answer_year ?? true,
     spotifyAnswerName: row.spotify_answer_name ?? true,
+    // Tolerant: kolumnen saknas pre-migration 0033 → 'full' (produktdefault).
+    remoteAssistance: isRemoteAssistance(row.remote_assistance)
+      ? row.remote_assistance
+      : 'full',
   };
 }
 
@@ -166,6 +190,12 @@ function settingsToRow(code: string, s: LobbySettings): LobbySettingsRow {
     // rowToSettings läser via ?? true så default-beteendet (båda aktiva) gäller.
     // spotify_answer_year: s.spotifyAnswerYear,
     // spotify_answer_name: s.spotifyAnswerName,
+    //
+    // remote_assistance ingår MEDVETET INTE här — den skrivs av en separat
+    // targeted UPDATE i setLobbySettings (bara i remote-lobbies). Skulle den
+    // ligga i upsert-payloaden och migration 0033 inte vara körd skulle HELA
+    // settings-skrivningen faila → all lobby-sync bryts, även i lokala lägen.
+    // Samma skäl som sketch_enabled/spotify_answer_* ovan.
   };
 }
 
@@ -190,6 +220,23 @@ export async function setLobbySettings(code: string, settings: LobbySettings): P
     .upsert(row, { onConflict: 'room_code' });
   if (error) {
     console.warn('[lobbySettings] setLobbySettings upsert failed:', error.message);
+    return;
+  }
+  // Remote 1v1: gemensam hjälpnivå skrivs SEPARAT (se settingsToRow för varför).
+  // Bara i remote-lobbies — lokala lägen har per-spelare-assistance och ska
+  // varken betala för en extra round-trip eller röra kolumnen. Saknas
+  // kolumnen (migration 0033 ej körd) blir det en console.warn och ingenting
+  // annat: raden ovan är redan committad, och rowToSettings defaultar 'full'.
+  if (settings.gameMode !== 'remote-1v1') return;
+  const { error: raError } = await supabase
+    .from('lobby_settings')
+    .update({ remote_assistance: settings.remoteAssistance })
+    .eq('room_code', normalized);
+  if (raError) {
+    console.warn(
+      '[lobbySettings] remote_assistance update failed (migration 0033 applied?):',
+      raError.message,
+    );
   }
 }
 

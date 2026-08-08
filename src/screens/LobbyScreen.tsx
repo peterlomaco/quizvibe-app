@@ -64,7 +64,7 @@ import { clearEjected, isEjected, markEjected } from '../utils/ejectedPlayers';
 import { claimCarryOverLobbyPlayer, clearLobbyPlayers, getLobbyPlayers, getLobbySeenQuestionIds, markOwnPlayerLeft, publishOwnAccountName, setLobbyPlayers, updateOwnSeenQuestionIds, upsertOwnLobbyPlayer } from '../utils/mockLobbyPlayers';
 import { loadLastSessionIds, loadSeenQuestionIds } from '../utils/hostQuestionHistory';
 import { setPendingPeerSeenIds } from '../utils/pendingSeenQuestions';
-import { clearLobbySettings, getLobbySettings, setLobbySettings } from '../utils/mockLobbySettings';
+import { clearLobbySettings, getLobbySettings, setLobbySettings, type LobbyRemoteAssistance } from '../utils/mockLobbySettings';
 import { createRemoteMatch, getMatchByRoomCode, getOwnUserId } from '../utils/remoteMatches';
 import { saveLobby } from '../utils/savedLobbies';
 import { defaultEnabledMainCategories, subjectToMainCategory, type MainCategory } from '../utils/mainCategory';
@@ -387,6 +387,18 @@ type AddPlayerAssistance = 'minimal' | 'standard' | 'full';
 const ADD_PLAYER_ASSISTANCE_OPTIONS: { id: AddPlayerAssistance; label: string }[] = [
   { id: 'full',     label: 'Full' },
   { id: 'standard', label: 'Standard' },
+  { id: 'minimal',  label: 'Minimal' },
+];
+
+// Remote 1v1: gemensam hjälpnivå för båda spelarna (host väljer i lobbyn).
+// Mellannivån heter "Medium" HÄR men "Standard" i övriga appen (Profile,
+// Add Player, player-edit, leaderboard-metaraden) — Peters formulering
+// 2026-08-08. Det underliggande värdet är samma `'standard'`, så bara
+// etiketten skiljer. Ska hela appen byta till "Medium" är det ett separat
+// rename-pass över ASSISTANCE_LABEL + ADD_PLAYER_ASSISTANCE_OPTIONS m.fl.
+const REMOTE_ASSISTANCE_OPTIONS: { id: LobbyRemoteAssistance; label: string }[] = [
+  { id: 'full',     label: 'Full' },
+  { id: 'standard', label: 'Medium' },
   { id: 'minimal',  label: 'Minimal' },
 ];
 
@@ -1422,6 +1434,11 @@ export default function LobbyScreen() {
           if (!stored) {
             setSpotifyEnabled(is1v1Lobby ? false : profile?.spotifyDefaultEnabled ?? false);
           }
+          // Remote 1v1: gemensam hjälpnivå. Carry-over (Play Again) vinner,
+          // annars produktdefaulten Full — MEDVETET inte hostens personliga
+          // profil-assistance: nivån gäller båda spelarna, så hostens egen
+          // inställning ska inte tyst påtvingas motståndaren.
+          setRemoteAssistance(stored?.remoteAssistance ?? 'full');
           // Tillåt debounce-effekten att skriva till setLobbySettings nu när
           // alla initiala värden är satta. Utan denna guard kan debounce:n
           // hinna skriva med default-värden (spotifyEnabled=false) INNAN
@@ -2089,6 +2106,13 @@ export default function LobbyScreen() {
   const [spotifyEnabled, setSpotifyEnabled] = useState(false);
   const [spotifyAnswerYear, setSpotifyAnswerYear] = useState(true);
   const [spotifyAnswerName, setSpotifyAnswerName] = useState(true);
+  // Remote 1v1: EN gemensam hjälpnivå för båda spelarna (default Full).
+  // Assistance är annars personligt, men i en duell där båda kör samma
+  // frågesekvens var för sig blir olika nivåer inte jämförbart — därför
+  // väljer host en nivå som skrivs till båda remote_match_players-raderna
+  // vid Start Game. Ignoreras helt i lokala lägen.
+  const [remoteAssistance, setRemoteAssistance] =
+    useState<LobbyRemoteAssistance>('full');
   // Egen Spotify-self-attest ("jag har Spotify-appen") — seedas från
   // profile.spotifyAppConfirmed i useFocusEffect; namnet spotifyConnected
   // behållet för minimal diff mot OAuth-eran.
@@ -3641,6 +3665,7 @@ export default function LobbyScreen() {
         spotifyEnabled,
         spotifyAnswerYear,
         spotifyAnswerName,
+        remoteAssistance,
       }).catch(() => { /* loggas i mockLobbySettings */ });
     }, 300);
     return () => clearTimeout(handle);
@@ -3661,6 +3686,7 @@ export default function LobbyScreen() {
     spotifyEnabled,
     spotifyAnswerYear,
     spotifyAnswerName,
+    remoteAssistance,
   ]);
 
   // Realtime-tick: bumpas av lobby_players + lobby_settings-channel-
@@ -3726,6 +3752,8 @@ export default function LobbyScreen() {
       setSpotifyEnabled(stored.spotifyEnabled);
       setSpotifyAnswerYear(stored.spotifyAnswerYear);
       setSpotifyAnswerName(stored.spotifyAnswerName);
+      // Remote 1v1: hostens gemensamma hjälpnivå (read-only för non-host).
+      setRemoteAssistance(stored.remoteAssistance);
       // Per-source categories — [] är ett giltigt "allt av"-val och får INTE
       // coerceas till defaults. Direkt tilldelning respekterar host:s explicita val.
       setYoutubeEnabledCategories((prev) => {
@@ -4058,12 +4086,22 @@ export default function LobbyScreen() {
           // game_started-flaggan) — låt nästa 2s-poll försöka igen.
           if (!match || cancelled) return;
           navigatedToQuizRef.current = true;
+          // Assistance tas ur MATCH-snapshotten, inte ur lobby_players: i
+          // remote gäller hostens gemensamma nivå för båda spelarna, och
+          // create_remote_match skrev samma värde på båda raderna. Egen rad
+          // först, annars motpartens (identiska), annars lobby-raden som
+          // fallback för matcher skapade före den gemensamma nivån infördes.
+          const matchAssistance =
+            match.players.find((p) => p.userId === ownId)?.assistance ??
+            match.players[0]?.assistance ??
+            selfRow.assistance ??
+            'standard';
           const selfTurnOrder = [{
             id: selfRow.id,
             name: selfRow.name,
             emoji: selfRow.emoji,
             avatarUri: selfRow.avatarUri,
-            assistance: selfRow.assistance ?? 'standard',
+            assistance: matchAssistance,
             age: selfRow.age,
             spotifyConnected: false,
             type: selfRow.type,
@@ -4072,7 +4110,7 @@ export default function LobbyScreen() {
             router.replace({
               pathname: '/quiz',
               params: {
-                assistance: selfRow.assistance ?? 'standard',
+                assistance: matchAssistance,
                 age: selfRow.age != null ? String(selfRow.age) : '32',
                 gameMode: 'remote-1v1',
                 remoteMatchId: match.id,
@@ -4804,13 +4842,19 @@ export default function LobbyScreen() {
         // raderar guest-retention-cron:en deras avgjorda match efter 24h.
         // Motståndarens auth-status går inte att se klient-side — där är
         // LobbyPlayer.type bästa gissningen tills 0029 är applicerad.
+        //
+        // assistance: BÅDA raderna får hostens gemensamma `remoteAssistance`
+        // (inte spelarnas personliga nivåer). Match-snapshotten är sanningen
+        // under spel — quiz-params härleds ur den både via
+        // buildRemoteQuizParams (1vs1 Matches / kod-återinträde) och via
+        // lobbyns game-started-detektering — så duellen körs på lika villkor.
         [
           {
             userId: hostUserId,
             playerName: hostRow?.name ?? 'Host',
             isHost: true,
             playerType: hostIsAnonymous ? 'guest' : 'registered',
-            assistance: hostRow?.assistance ?? 'standard',
+            assistance: remoteAssistance,
             age: hostRow?.age ?? null,
           },
           {
@@ -4818,7 +4862,7 @@ export default function LobbyScreen() {
             playerName: remoteOpponent.name,
             isHost: false,
             playerType: remoteOpponent.type === 'registered' ? 'registered' : 'guest',
-            assistance: remoteOpponent.assistance ?? 'standard',
+            assistance: remoteAssistance,
             age: remoteOpponent.age ?? null,
           },
         ],
@@ -4877,7 +4921,9 @@ export default function LobbyScreen() {
         // Guest host: fallback-assistance/age speglar guest-identiteten
         // (Full + ålder från guestBirthYear) istället för de generiska
         // 'standard'/'32'. turnOrder-hostens kort bär redan samma värden.
-        assistance: isGuestHost ? 'full' : 'standard',
+        // Remote 1v1: hostens gemensamma nivå vinner — samma värde som skrevs
+        // till båda remote_match_players-raderna.
+        assistance: remoteMatchId ? remoteAssistance : isGuestHost ? 'full' : 'standard',
         age: isGuestHost && guestBirthYear
           ? String(CURRENT_YEAR - parseInt(guestBirthYear, 10))
           : '32',
@@ -4907,9 +4953,16 @@ export default function LobbyScreen() {
         // Remote 1v1: host spelar SOLO på sin enhet — turnOrder innehåller
         // bara host:s egen rad (motståndaren spelar sin egen session senare).
         // remoteMatchId driver sekvens-persistens + answer-skrivningar i quiz.
+        //
+        // OBS: quiz.tsx läser assistance PRIMÄRT ur turnOrder-raden
+        // (`turnOrder[currentPlayerIndex]?.assistance`) och bara sekundärt ur
+        // `params.assistance` — så den gemensamma nivån måste sättas HÄR,
+        // annars kör host vidare på sin personliga profilnivå.
         players: JSON.stringify(
           remoteMatchId && remoteOpponent
-            ? turnOrder.filter((t) => t.id !== remoteOpponent.id)
+            ? turnOrder
+                .filter((t) => t.id !== remoteOpponent.id)
+                .map((t) => ({ ...t, assistance: remoteAssistance }))
             : turnOrder,
         ),
         ...(remoteMatchId ? { remoteMatchId } : {}),
@@ -5377,7 +5430,7 @@ export default function LobbyScreen() {
                 canMoveDown={hostMode && index < approvedPlayers.length - 1}
                 hcpComplete={player.hcpComplete}
                 age={player.age}
-                assistance={player.assistance}
+                assistance={isRemoteLobby ? remoteAssistance : player.assistance}
                 isHostPlayer={player.isHost}
                 isGuest={player.type === 'guest'}
                 accountPlayerName={player.accountPlayerName}
@@ -5433,7 +5486,7 @@ export default function LobbyScreen() {
                     index={players.indexOf(player)}
                     hcpComplete={player.hcpComplete}
                     age={player.age}
-                    assistance={player.assistance}
+                    assistance={isRemoteLobby ? remoteAssistance : player.assistance}
                     isHostPlayer={false}
                     isGuest={player.type === 'guest'}
                     accountPlayerName={player.accountPlayerName}
@@ -5541,6 +5594,62 @@ export default function LobbyScreen() {
               </View>
               <View style={{ flex: 1 }} />
             </View>
+
+            {/* Gemensam hjälpnivå för BÅDA spelarna. I lokala lägen är
+                assistance personligt (per spelarkort), men här svarar båda
+                på samma frågesekvens var för sig — olika nivåer skulle göra
+                duellen ojämförbar. Renderas för alla men bara host kan ändra
+                (samma host-vs-non-host-mönster som resten av Game Settings). */}
+            <View style={[styles.playersLabelRow, { marginTop: Spacing.lg }]}>
+              <Text style={[styles.sectionLabel, { marginTop: 0, marginBottom: 0 }]}>
+                Assistance level
+              </Text>
+              <Pressable
+                style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
+                onPress={() =>
+                  Alert.alert(
+                    'Assistance level',
+                    'In a 1vs1 match both players answer the same questions on their own devices, so both play with the SAME assistance level — the Host picks it here.\n\nFull: the full names are listed, just pick the right one.\nMedium: 2-letter hints, then pick the name.\nMinimal: 1-letter hints, then pick the name.\n\nIt also sets how wide the year interval is on Year questions.',
+                  )
+                }
+                hitSlop={8}
+                accessibilityLabel="Assistance level info"
+              >
+                <Text style={styles.infoIconText}>i</Text>
+              </Pressable>
+            </View>
+            <View style={[styles.modeRow, { marginTop: Spacing.sm }]}>
+              {REMOTE_ASSISTANCE_OPTIONS.map((opt) => {
+                const isSelected = remoteAssistance === opt.id;
+                return (
+                  <TouchableOpacity
+                    key={opt.id}
+                    style={[
+                      styles.modeOption,
+                      isSelected ? styles.modeOptionPassActive : styles.modeOptionInactive,
+                    ]}
+                    onPress={() => setRemoteAssistance(opt.id)}
+                    disabled={!hostMode}
+                    activeOpacity={0.7}
+                  >
+                    <Text
+                      style={[
+                        styles.modeLabel,
+                        { textAlign: 'center' },
+                        isSelected && styles.modeLabelActiveFree,
+                      ]}
+                    >
+                      {opt.label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+            <Text style={styles.remoteAssistanceNote}>
+              {hostMode
+                ? 'Applies to both players in this 1vs1 match.'
+                : 'Selected by the Host — applies to both players.'}
+            </Text>
           </View>
         ) : (
         <View style={[styles.section, { marginTop: Spacing.xs }]}>
@@ -7045,7 +7154,27 @@ export default function LobbyScreen() {
                   Andra spelares kort editeras fritt även av guest host. */}
               <View style={playerEditSheet.fieldGroup}>
                 <Text style={playerEditSheet.fieldLabel}>Assistance Level</Text>
-                {isGuestHost && playerEditTarget?.isHost ? (
+                {isRemoteLobby ? (
+                  /* Remote 1v1: nivån är gemensam för båda spelarna och sätts
+                     i Game Mode-sektionen — per-spelare-val här skulle bara
+                     skrivas över av match-snapshotten vid Start Game. Visa
+                     den gällande nivån statiskt + peka på rätt kontroll. */
+                  <>
+                    <View style={playerEditSheet.skillRow}>
+                      <View style={[playerEditSheet.skillBtn, playerEditSheet.skillBtnActive]}>
+                        <Text style={[playerEditSheet.skillBtnText, playerEditSheet.skillBtnTextActive]}>
+                          {REMOTE_ASSISTANCE_OPTIONS.find((o) => o.id === remoteAssistance)?.label
+                            ?? 'Full'}
+                        </Text>
+                      </View>
+                    </View>
+                    <Text style={styles.guestHostNote}>
+                      {hostMode
+                        ? 'Shared by both players — change it under Game Mode.'
+                        : 'Shared by both players — selected by the Host.'}
+                    </Text>
+                  </>
+                ) : isGuestHost && playerEditTarget?.isHost ? (
                   <>
                     <View style={playerEditSheet.skillRow}>
                       <View style={[playerEditSheet.skillBtn, playerEditSheet.skillBtnActive]}>
@@ -9560,6 +9689,15 @@ const styles = StyleSheet.create({
   // Info-not under låsta settings i guest-host-lobbyn ("change Game era not
   // available for Guest user" etc.). Delad stil för alla guest-host-noter.
   guestHostNote: {
+    fontSize: FontSize.xs,
+    color: Colors.textSecondary,
+    marginTop: Spacing.xs,
+    textAlign: 'center',
+  },
+
+  // Not under 1vs1-lobbyns Assistance level-rad — förtydligar att nivån
+  // gäller BÅDA spelarna (till skillnad från lokala lägen där den är personlig).
+  remoteAssistanceNote: {
     fontSize: FontSize.xs,
     color: Colors.textSecondary,
     marginTop: Spacing.xs,
