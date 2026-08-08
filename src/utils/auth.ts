@@ -104,6 +104,33 @@ export async function ensureAuthSession(): Promise<User | null> {
 }
 
 /**
+ * true = "ren guest" — anon-session utan QuizVibe-konto.
+ *
+ * Anon-sessioner har ett riktigt auth.uid() och rollen `authenticated`
+ * (så RLS fungerar), men `is_anonymous: true` i JWT:n och skriver ALDRIG
+ * någon `profiles`-rad (profileStorage.getCurrentUser vägrar för anon).
+ * Det är alltså den enda pålitliga klient-signalen för "har konto".
+ *
+ * Fail-safe: returnerar true vid fel/ingen session, så en misslyckad
+ * uppslagning LÅSER konto-gatade features istället för att öppna dem.
+ *
+ * Skiljer sig från `isGuestHost`/`LobbyPlayer.type === 'guest'` som bara
+ * säger HUR spelaren gick in i lobbyn — en registrerad user som hostar
+ * som Guest är INTE anonym.
+ */
+export async function isAnonymousSession(): Promise<boolean> {
+  try {
+    const { data } = await supabase.auth.getSession();
+    const user = data.session?.user as (User & { is_anonymous?: boolean }) | undefined;
+    if (!user) return true;
+    return !!user.is_anonymous;
+  } catch (err) {
+    console.warn('[auth] isAnonymousSession threw:', err);
+    return true;
+  }
+}
+
+/**
  * Login-via-PlayerName utan att exponera email:en klient-side.
  *
  * Anropar Edge Function 'login-by-name' som slår upp email:en server-side,

@@ -83,6 +83,70 @@ interface JoinModalProps {
   // formen öppnades ('1v1' → renodlad Remote 1v1-lobby). Konsumeras av
   // handleStartGameAsGuestHost som skickar lobbyType-param till /lobby.
   guestHostLobbyType?: HostLobbyType;
+  // Öppnar "Register or Login" när guest-läge träffar en Remote 1vs1-gate.
+  // `context` styr förklaringstexten: 'join' (rumskoden visade sig vara en
+  // 1v1-match) vs 'host' (guest-host med stale '1v1'). `draft` bär de
+  // ifyllda guest-fälten så formen kan återställas om spelaren trycker
+  // Cancel. Auth-formuläret lever i HomeScreen, därav callbacken.
+  onRemoteAccountRequired?: (context: RemoteBlockContext, draft?: GuestJoinDraft) => void;
+  // Återställer guest-formens fält när modalen öppnas — sätts av HomeScreen
+  // när spelaren tryckt Cancel i auth-formuläret efter en Remote 1vs1-gate.
+  // Rumskoden återställs INTE (se GuestJoinDraft).
+  initialGuestDraft?: GuestJoinDraft | null;
+}
+
+/**
+ * Upsell när guest-läge stöter på Remote 1vs1. Läget spelas ENBART mellan
+ * två QuizVibe-users (rev 3, 2026-08-08) — både en ren guest och en
+ * registrerad user som spelar som Guest är utestängda.
+ *
+ * Två kontexter med olika copy, eftersom spelaren behöver veta VAD som
+ * hände, inte bara vilken policy som gäller:
+ *   'join' — de knappade in en rumskod som visade sig vara en 1v1-match.
+ *            Leder med rummet, inte med regeln.
+ *   'host' — de försökte VÄLJA Remote Play i guest-panelen.
+ *
+ * Module-level så både HomeScreen och JoinModal kan visa exakt samma copy;
+ * register-navigationen injiceras eftersom den bara finns i HomeScreen.
+ */
+type RemoteBlockContext = 'join' | 'host';
+
+/**
+ * Förklaringstexten som ersätter "Sign in to create and join games" som
+ * subtitel i "Register or Login"-formuläret när spelaren kom dit via en
+ * Remote 1vs1-gate. Ingen Alert i vägen (Peter 2026-08-08): tapp på en
+ * blockerad knapp går DIREKT till formuläret, och texten här förklarar
+ * varför de hamnade där.
+ */
+/**
+ * Väntetid mellan att en RN-modal stängs och nästa öppnas. Två `<Modal>`
+ * kan inte vara presenterade samtidigt — öppnar man den andra innan den
+ * första fade:at ut sväljer iOS den tyst. `animationType="fade"` tar ~300ms;
+ * 350 ger marginal. Samma storleksordning som modal-resetens 300ms-timeout.
+ */
+const MODAL_SWAP_DELAY_MS = 350;
+
+const REMOTE_BLOCK_NOTICE: Record<RemoteBlockContext, string> = {
+  join: 'This Room Code belongs to a Remote 1vs1 match. Remote duels can only be played between QuizVibe users — register a free account or log in to join.',
+  host: 'Remote 1vs1 matches can only be played between QuizVibe users. Register a free account or log in to host a 1vs1 match.',
+};
+
+function isRemoteBlockContext(value: unknown): value is RemoteBlockContext {
+  return value === 'join' || value === 'host';
+}
+
+/**
+ * Ifyllda guest-formulärsfält som bevaras när en Remote 1vs1-gate tar
+ * spelaren till "Register or Login". Trycker de Cancel återställs formen
+ * med dessa värden så de slipper fylla i allt igen.
+ *
+ * Rumskoden ingår MEDVETET INTE — den koden var ju just den de INTE fick
+ * joina, så fältet ska stå tomt och redo för en ny kod.
+ */
+interface GuestJoinDraft {
+  guestName: string;
+  guestBirthYearText: string;
+  guestAssistance: AssistanceLevel;
 }
 
 type AssistanceLevel = 'minimal' | 'standard' | 'full';
@@ -169,7 +233,7 @@ async function checkLobbyCapacity(code: string): Promise<boolean> {
   return true;
 }
 
-function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false, currentPlayerName, guestHostLobbyType = 'standard' }: JoinModalProps) {
+function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false, currentPlayerName, guestHostLobbyType = 'standard', onRemoteAccountRequired, initialGuestDraft }: JoinModalProps) {
   const [step, setStep] = useState<JoinStep>(initialStep);
   const [code, setCode] = useState('');
   const [guestName, setGuestName] = useState('');
@@ -298,22 +362,29 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
   // bad om. Reset på öppning (inte stängning) så att state alltid är färskt
   // även om användaren stänger och öppnar igen snabbt — under fade-out
   // behåller modalen senaste UI-state, vilket är önskvärt visuellt.
-  // Reset:ar även prevGuestStepRef så Player Name-autofill alltid triggar
-  // vid nästa entry till guest-steget (oavsett om det sker via chooser
-  // eller initialStep='guest' direkt från Home-skärmens Join-as-Guest-knapp).
+  // Reset:ar även prevGuestStepRef så Player Name-autofill triggar vid
+  // nästa entry till guest-steget (oavsett om det sker via chooser eller
+  // initialStep='guest' direkt från Home-skärmens Join-as-Guest-knapp) —
+  // UTOM när ett initialGuestDraft återställs, se nedan.
   useEffect(() => {
     if (visible) {
+      // `initialGuestDraft` återställer guest-fälten efter en Remote
+      // 1vs1-gate + Cancel i auth-formuläret — spelaren ska slippa fylla i
+      // namn/födelseår igen. Koden nollställs alltid (den koden var ju just
+      // den de inte fick joina). prevGuestStepRef sätts till true i det
+      // läget så auto-genereringen av PlayerName INTE skriver över det
+      // återställda namnet.
       setCode('');
-      setGuestName('');
-      setGuestBirthYearText('');
-      setGuestAssistance('full');
+      setGuestName(initialGuestDraft?.guestName ?? '');
+      setGuestBirthYearText(initialGuestDraft?.guestBirthYearText ?? '');
+      setGuestAssistance(initialGuestDraft?.guestAssistance ?? 'full');
       setYearPickerOpen(false);
       setPlayerNameStatus('idle');
       setStep(initialStep);
       setFocusedCodeIdx(null);
-      prevGuestStepRef.current = false;
+      prevGuestStepRef.current = !!initialGuestDraft;
     }
-  }, [visible, initialStep]);
+  }, [visible, initialStep, initialGuestDraft]);
 
   // Ladda invites när modalen öppnas — vi behöver längden redan på chooser-steget
   // för att kunna visa rätt enabled/disabled-läge på "Join Waiting Invites".
@@ -645,7 +716,34 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     // IndDev-blocket för självanslutna guests borttaget (policy 2026-08-06):
     // guests med egen enhet får joina IndDev-lobbies. Endast host-TILLAGDA
     // guests är blockerade från IndDev (de saknar enhet) — enforcas i Lobby.
-// Spotify pre-join-gate borttagen (Plan B 2026-07-22): inget konto krävs —
+    //
+    // Remote 1vs1-gate (2026-08-08): läget spelas ENBART av QuizVibe-users
+    // mot varandra. Guest-formen är per definition guest-läge, så den
+    // blockeras ALLTID mot 1v1-lobbies — även om enheten råkar ha en
+    // inloggad profil (en registrerad user som spelar som Guest är lika
+    // utestängd som en ren guest).
+    //
+    // Signalen läses från rooms-raden (`is_remote_1v1`, migration 0031),
+    // INTE från lobby_settings.game_mode: rums-raden skrivs atomiskt vid
+    // skapandet innan någon join är möjlig, medan lobby_settings skrivs
+    // genom en 300ms-debounce och gjorde gaten fail-open i ~1s efter att
+    // lobbyn skapats. Nu finns ingen race — svaret är alltid definitivt.
+    //
+    // Rum skapade FÖRE 0031 saknar kolumnen och resolvar till false; de
+    // fångas av lobby-backstoppen och försvinner själva inom 24h
+    // (expires_at). Ingen backfill behövs.
+    const roomMeta = await getRoomMeta(code);
+    if (roomMeta?.isRemote1v1) {
+      // Skicka med de ifyllda fälten så Cancel i auth-formuläret kan
+      // återställa guest-formen i stället för att kasta bort allt.
+      onRemoteAccountRequired?.('join', {
+        guestName,
+        guestBirthYearText,
+        guestAssistance,
+      });
+      return;
+    }
+    // Spotify pre-join-gate borttagen (Plan B 2026-07-22): inget konto krävs —
     // guests kan self-attesta Spotify i lobbyn. (Spotify DJ är dessutom
     // IndDev-only, så guest-fallet fångas redan av IndDev-blocket ovan.)
     // Own-lobby-check: jämför mot guestName (identiteten användaren joinar
@@ -692,6 +790,15 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
   // som väljer denna väg spelar under Guest-identiteten, inte sin profil.
   const handleStartGameAsGuestHost = async () => {
     if (!isGuestHostFormValid || parsedBirthYear === null) return;
+    // Belt-and-suspenders: Remote 1vs1 spelas enbart av QuizVibe-users mot
+    // varandra, så guest-hosting når det ALDRIG — oavsett om enheten har en
+    // inloggad profil. Panelens Remote-rad är redan låst (utloggad) eller
+    // helt dold (inloggad), men guestLobbyType är sessions-state så en
+    // stale '1v1' får inte slinka igenom hit.
+    if (guestHostLobbyType === '1v1') {
+      onRemoteAccountRequired?.('host');
+      return;
+    }
     // Anon-session KRÄVS före registerActiveRoom — utan Supabase-session
     // no-op:ar room-INSERT:en tyst (mockActiveRooms varnar bara) och
     // joiners skulle få "Room not found" på en kod hosten sitter i.
@@ -717,6 +824,9 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
       currentPlayerCount: 1,
       hostPlayerName: hostName,
       gameStarted: false,
+      // Guest-hosting når aldrig Remote 1vs1 — guarden ovan returnerar för
+      // '1v1' (läget är QuizVibe-users-only). Alltid en standard-lobby.
+      isRemote1v1: false,
     });
     if (!roomRegistered) {
       Alert.alert(
@@ -743,9 +853,9 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
         guestHost: 'true',
         guestName: hostName,
         guestBirthYear: String(parsedBirthYear),
-        // Renodlad 1vs1-lobby: valet gjordes i inline-väljaren på Home INNAN
-        // guest-formen öppnades. LobbyScreen-seeden forcerar remote-1v1.
-        ...(guestHostLobbyType === '1v1' ? { lobbyType: '1v1' } : {}),
+        // Ingen lobbyType-param: guest-hosting når aldrig Remote 1vs1 (läget
+        // är QuizVibe-users-only sedan 2026-08-08 och guarden ovan
+        // returnerar för '1v1'), så en guest-host-lobby är alltid standard.
       },
     });
   };
@@ -1466,10 +1576,39 @@ function HereNowIcon({ height = 60 }: { height?: number }) {
  *  den). `accentColor` ärvs från knappen ovanför (guld för inloggad,
  *  grå för guest) så panelen läses som knappens förlängning. */
 function HostTypeOptions({
-  accentColor, onSelect,
+  accentColor, onSelect, remoteMode = 'available', onRemoteLockedPress, localBadge,
 }: {
   accentColor: string;
   onSelect: (lobbyType: HostLobbyType) => void;
+  /**
+   * Remote 1vs1 spelas ENBART av QuizVibe-users mot varandra (Peter
+   * 2026-08-08) — det finns ingen guest-variant av läget. Raden har
+   * därför tre öden beroende på vem som tittar:
+   *
+   *   'available' — normal, valbar. Registrerade "Start New Game".
+   *   'locked'    — UTLOGGAD guest: dimmad + grön "QuizVibe user"-badge,
+   *                 tap → register-upsell. Visas (inte göms) för
+   *                 upptäckbarhet — guests ska se att läget finns och vad
+   *                 som krävs.
+   *   'hidden'    — INLOGGAD user i guest-panelen: raden renderas inte
+   *                 alls. De har redan konto (en "account required"-badge
+   *                 vore nonsens) och valet skulle skapa en guest-remote-
+   *                 match, vilket inte längre existerar.
+   */
+  remoteMode?: 'available' | 'locked' | 'hidden';
+  onRemoteLockedPress?: () => void;
+  /**
+   * Badge på Local Play-raden. Sätts av guest-call-siten så knappens egen
+   * badge kan gömmas vid utfällning utan att informationen försvinner:
+   * utloggad → grön "FREE", inloggad → grå "No Data Saved" (lokala
+   * guest-spel skriver ingen Player History). Utelämnas av den
+   * registrerade call-siten — där kostar hosting credits och spelen
+   * sparas, så ingendera badge stämmer.
+   *
+   * Sätts bara på Local Play — Remote Play-raden bär antingen sin egen
+   * "QuizVibe user"-badge ('locked') eller renderas inte alls ('hidden').
+   */
+  localBadge?: { text: string; muted?: boolean };
 }) {
   return (
     <View style={hostTypeStyles.panel}>
@@ -1478,40 +1617,88 @@ function HostTypeOptions({
         icon={<HereNowIcon height={60} />}
         label="Local Play"
         subtitle="Single & Multiplayer mode"
+        badgeText={localBadge?.text}
+        badgeMuted={localBadge?.muted}
         onPress={() => onSelect('standard')}
       />
-      <HostTypeOptionRow
-        accentColor={accentColor}
-        icon={<VersusIcon height={60} />}
-        label="Remote Play"
-        subtitle="1vs1 — challenge friends remotely"
-        onPress={() => onSelect('1v1')}
-      />
+      {remoteMode !== 'hidden' && (
+        <HostTypeOptionRow
+          accentColor={accentColor}
+          icon={<VersusIcon height={60} />}
+          label="Remote Play"
+          // Samma subtitel oavsett låst/olåst — "QuizVibe user"-badgen bär
+          // kontokravet, subtiteln får beskriva vad läget ÄR.
+          subtitle="1vs1 — challenge friends remotely"
+          locked={remoteMode === 'locked'}
+          badgeText={remoteMode === 'locked' ? 'QuizVibe user' : undefined}
+          onPress={() => {
+            if (remoteMode === 'locked') {
+              onRemoteLockedPress?.();
+              return;
+            }
+            onSelect('1v1');
+          }}
+        />
+      )}
     </View>
   );
 }
 
 function HostTypeOptionRow({
-  accentColor, icon, label, subtitle, onPress,
+  accentColor, icon, label, subtitle, onPress, locked = false, badgeText, badgeMuted = false,
 }: {
   accentColor: string;
   icon: React.ReactNode;
   label: string;
   subtitle: string;
   onPress: () => void;
+  /** Kontogatad rad: dimmas, men förblir tappbar så tryck kan visa
+   *  upsell:en istället för att välja läget. Badgen sätts separat via
+   *  `badgeText` — dimning och badge är oberoende. */
+  locked?: boolean;
+  /** Kant-skärande badge i övre högra hörnet ("FREE", "QuizVibe user",
+   *  "No Data Saved"). Dimmas ALDRIG — den ska förbli läsbar på en låst
+   *  rad. */
+  badgeText?: string;
+  /** Grå badge (`#6B7280`) i stället för grön — speglar `homeUserBadge`
+   *  på knapparna ovanför. Används för varningar ("No Data Saved"), medan
+   *  grönt är för det som är gratis/upplåsande. */
+  badgeMuted?: boolean;
 }) {
   return (
     <TouchableOpacity
-      style={[hostTypeStyles.row, { borderColor: accentColor }]}
+      style={[
+        hostTypeStyles.row,
+        { borderColor: locked ? Colors.borderStrong : accentColor },
+        locked && hostTypeStyles.rowLocked,
+      ]}
       onPress={onPress}
       activeOpacity={0.7}
     >
-      <View style={hostTypeStyles.iconWrap}>{icon}</View>
-      <View style={{ flex: 1 }}>
+      {/* Dimningen ligger på INNEHÅLLET, inte på raden — badgen ska förbli
+          helt läsbar. */}
+      <View style={[hostTypeStyles.iconWrap, locked && hostTypeStyles.lockedDim]}>{icon}</View>
+      <View style={[{ flex: 1 }, locked && hostTypeStyles.lockedDim]}>
         <Text style={hostTypeStyles.label}>{label}</Text>
         <Text style={hostTypeStyles.subtitle}>{subtitle}</Text>
       </View>
-      <Text style={[hostTypeStyles.arrow, { color: accentColor }]}>›</Text>
+      <Text
+        style={[
+          hostTypeStyles.arrow,
+          { color: locked ? Colors.borderStrong : accentColor },
+          locked && hostTypeStyles.lockedDim,
+        ]}
+      >
+        ›
+      </Text>
+      {!!badgeText && (
+        <View
+          style={[hostTypeStyles.rowBadge, badgeMuted && hostTypeStyles.rowBadgeMuted]}
+          pointerEvents="none"
+        >
+          <Text style={hostTypeStyles.rowBadgeText}>{badgeText}</Text>
+        </View>
+      )}
     </TouchableOpacity>
   );
 }
@@ -1534,6 +1721,38 @@ const hostTypeStyles = StyleSheet.create({
     backgroundColor: Colors.cardElevated,
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.md,
+  },
+  // Kant-skärande badge kräver relative + INGEN overflow:hidden på raden
+  // (samma mönster som HOST/GUEST i PlayerRow och FREE/PREMIUM-badgarna).
+  rowLocked: {
+    position: 'relative',
+    backgroundColor: Colors.card,
+  },
+  lockedDim: {
+    opacity: 0.45,
+  },
+  // Grön + vit kant = Home:s badge-konvention (FREE / "QuizVibe USER" på
+  // knapparna ovanför). På den låsta Remote-raden signalerar grönt VAD som
+  // låser upp den, inte "avstängd".
+  rowBadge: {
+    position: 'absolute',
+    top: -8,
+    right: Spacing.md,
+    backgroundColor: Colors.success,
+    borderWidth: 1,
+    borderColor: Colors.textPrimary,
+    borderRadius: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+  },
+  rowBadgeMuted: {
+    backgroundColor: '#6B7280',
+  },
+  rowBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 0.6,
+    color: '#FFF',
   },
   iconWrap: {
     // 88 rymmer VersusIcon:s bredd vid height 60 (60 × 64/46 ≈ 84).
@@ -1587,6 +1806,18 @@ export default function HomeScreen() {
   // Extra package"-flöde från Lobby). Sätts av param-effekten nedan och
   // konsumeras av open-side reset-effekten som annars forcerar step='menu'.
   const openRegisterPendingRef = useRef(false);
+  // Kontextuell subtitel i "Register or Login"-formuläret. null = default
+  // ("Sign in to create and join games"). Sätts via ref-hand-off av
+  // Remote 1vs1-gaterna; konsumeras av open-side-resetet nedan.
+  const pendingAuthNoticeRef = useRef<string | null>(null);
+  const [authNotice, setAuthNotice] = useState<string | null>(null);
+  // Guest-formens ifyllda fält när en Remote 1vs1-gate tog över. Sätts av
+  // handleRemoteAccountRequired och konsumeras av auth-formulärets Cancel,
+  // som då återöppnar guest-formen i stället för att lämna spelaren på Home.
+  // Nollas när modalen stängs på något ANNAT sätt (lyckad register/login) —
+  // då är guest-vägen inte längre relevant.
+  const pendingGuestJoinDraftRef = useRef<GuestJoinDraft | null>(null);
+  const [guestJoinDraft, setGuestJoinDraft] = useState<GuestJoinDraft | null>(null);
   const [loginPlayerName, setLoginPlayerName] = useState('');
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
@@ -1775,6 +2006,12 @@ export default function HomeScreen() {
       // så nästa normala öppning startar på 'menu' som vanligt.
       setProfileMenuStep(openRegisterPendingRef.current ? 'register' : 'menu');
       openRegisterPendingRef.current = false;
+      // Samma ref-hand-off för den kontextuella subtiteln: satt av
+      // Remote 1vs1-gaterna precis före setProfileMenuVisible(true).
+      // Null:as här när den saknas så en vanlig öppning alltid visar
+      // default-texten.
+      setAuthNotice(pendingAuthNoticeRef.current);
+      pendingAuthNoticeRef.current = null;
       setLoginPlayerName('');
       setLoginEmail('');
       setLoginMode('playerName');
@@ -1848,12 +2085,72 @@ export default function HomeScreen() {
     setJoinVisible(true);
   };
 
+  /**
+   * Remote 1vs1-gate → öppna "Register or Login"-formuläret DIREKT (ingen
+   * Alert emellan, Peter 2026-08-08). Formulärets subtitel byts ut mot
+   * `REMOTE_BLOCK_NOTICE[context]` så spelaren förstår varför de hamnade
+   * där — det är den enda förklaringen som visas.
+   *
+   * Landar på MENU-steget (Welcome to QuizVibe → Register / Log in), INTE
+   * på register-steget: en guest som blockas kan mycket väl redan ha ett
+   * konto och bara vara utloggad. Därför sätts `openRegisterPendingRef`
+   * medvetet INTE här (till skillnad från guest-host-registreringen, som
+   * vet att kontot saknas).
+   *
+   * Ref-hand-off i stället för rakt setState eftersom open-side-resetet
+   * körs EFTER att modalen blivit synlig och annars hade nollat noticen —
+   * exakt samma mönster som openRegisterPendingRef.
+   *
+   * ⚠ MODAL-SWAP: båda gaterna kan fyra medan JoinModal är ÖPPEN
+   * (guest-formens "Join as Guest" och guest-host-formens submit). Två RN
+   * `<Modal>` kan inte presenteras samtidigt — iOS sväljer den andra TYST,
+   * så användaren ser "ingenting händer". JoinModal måste därför stängas
+   * FÖRST och profileMenu öppnas efter att fade-ut:en hunnit klart.
+   * Delayen hoppas över när JoinModal inte var öppen (låsta Remote
+   * Play-radens tap sker direkt på Home) så det vanliga fallet är instant.
+   */
+  const handleRemoteAccountRequired = useCallback(
+    (context: RemoteBlockContext, draft?: GuestJoinDraft) => {
+      pendingAuthNoticeRef.current = REMOTE_BLOCK_NOTICE[context];
+      pendingGuestJoinDraftRef.current = draft ?? null;
+      setHostTypeExpanded('none');
+      if (joinVisible) {
+        setJoinVisible(false);
+        // Spegla JoinModal:s onClose — annars läcker ett '1v1'-val vidare.
+        setGuestLobbyType('standard');
+        setTimeout(() => setProfileMenuVisible(true), MODAL_SWAP_DELAY_MS);
+        return;
+      }
+      setProfileMenuVisible(true);
+    },
+    [joinVisible],
+  );
+
+  /**
+   * Cancel i auth-formuläret. Kom spelaren hit från guest-formens Remote
+   * 1vs1-gate återöppnas den formen med fälten ifyllda (ny rumskod kan
+   * skrivas in, eller Back → Home) i stället för att dumpa dem på Home.
+   * Annars vanlig stängning.
+   *
+   * RN kan inte visa två modaler samtidigt, så guest-formen kan inte ligga
+   * kvar "bakom" auth-formuläret — den återskapas i stället, vilket ser
+   * likadant ut för användaren.
+   */
+  const handleAuthFormCancel = useCallback(() => {
+    const draft = pendingGuestJoinDraftRef.current;
+    pendingGuestJoinDraftRef.current = null;
+    setProfileMenuVisible(false);
+    if (!draft) return;
+    setGuestJoinDraft(draft);
+    setTimeout(() => openJoin('guest'), MODAL_SWAP_DELAY_MS);
+  }, []);
+
   // Auto-open JoinModal när Home entras med `?openJoinRegistered=1` i routen.
   // Används av Profile-skärmens "Join Game"-knapp i logout-sheet:n så
   // användaren landar direkt på registered-user join-flödet (hideGuest:true)
   // utan att se Home flicker. router.setParams clearar paramen efter open
   // så framtida fokus utan param inte trigggar modalen igen.
-  const localParams = useLocalSearchParams<{ openJoinRegistered?: string; openRegister?: string }>();
+  const localParams = useLocalSearchParams<{ openJoinRegistered?: string; openRegister?: string; openAuth?: string }>();
   useFocusEffect(
     useCallback(() => {
       if (localParams.openJoinRegistered === '1') {
@@ -1877,6 +2174,24 @@ export default function HomeScreen() {
         router.setParams({ openRegister: undefined });
       }
     }, [localParams.openRegister]),
+  );
+
+  // Auto-open "Register or Login"-formuläret (profileMenu:ns menu-steg) när
+  // Home entras med `?openAuth=join|host` — Lobby-backstoppen för Remote
+  // 1vs1. Paramets värde ÄR kontexten, så samma förklarings-subtitel visas
+  // som när gaten träffas direkt på Home.
+  //
+  // Skiljer sig från openRegister genom att INTE sätta pending-ref:en: en
+  // guest som blockas från 1vs1 kan mycket väl redan HA ett konto, så de ska
+  // få välja Register ELLER Log in i stället för att tvingas registrera.
+  useFocusEffect(
+    useCallback(() => {
+      if (isRemoteBlockContext(localParams.openAuth)) {
+        pendingAuthNoticeRef.current = REMOTE_BLOCK_NOTICE[localParams.openAuth];
+        setProfileMenuVisible(true);
+        router.setParams({ openAuth: undefined });
+      }
+    }, [localParams.openAuth]),
   );
 
   const [fontsLoaded] = useFonts({
@@ -1950,12 +2265,17 @@ export default function HomeScreen() {
     // Returvärdet MÅSTE kontrolleras — en tyst no-op (utloggad host/
     // nätverksfel) ger annars en fantom-lobby som joiners inte hittar
     // ("Room not found"-buggen 2026-08-07).
+    const isRemote1v1 = lobbyType === '1v1';
     const roomRegistered = await registerActiveRoom(code, {
-      maxPlayers: freshProfile?.maxPlayers ?? profile?.maxPlayers ?? 4,
+      // Remote 1vs1 är alltid exakt 2 spelare. Sätts redan här (i stället
+      // för att vänta på LobbyScreen:s setRoomMaxPlayers-effekt) så
+      // kapacitetskollen vid join är korrekt från första sekunden.
+      maxPlayers: isRemote1v1 ? 2 : freshProfile?.maxPlayers ?? profile?.maxPlayers ?? 4,
       hostIsPremium: hasPremium,
       currentPlayerCount: 1,
       hostPlayerName: freshProfile?.playerName ?? profile?.playerName ?? '',
       gameStarted: false,
+      isRemote1v1,
     });
     if (!roomRegistered) {
       Alert.alert(
@@ -2657,7 +2977,12 @@ export default function HomeScreen() {
                 {/* Badge per login-läge: inloggad → "No Data Saved"
                     i grått (samma homeUserBadge-stil som user-knapparna);
                     utloggad → FREE i grönt (matchar övriga guest-/register-
-                    knappar). */}
+                    knappar).
+
+                    Göms när utfällningen är öppen: då bär Local Play/Remote
+                    Play sina egna badges och en badge på föräldern blir
+                    dubbelinformation. */}
+                {hostTypeExpanded !== 'guest' && (
                 <View
                   style={[styles.homeFreeBadge, isLoggedIn && styles.homeUserBadge]}
                   pointerEvents="none"
@@ -2666,11 +2991,19 @@ export default function HomeScreen() {
                     {isLoggedIn ? 'No Data Saved' : 'FREE'}
                   </Text>
                 </View>
+                )}
               </TouchableOpacity>
             </Animated.View>
             {hostTypeExpanded === 'guest' && (
               <HostTypeOptions
                 accentColor="#6B7280"
+                remoteMode={isLoggedIn ? 'hidden' : 'locked'}
+                onRemoteLockedPress={() => handleRemoteAccountRequired('host')}
+                localBadge={
+                  isLoggedIn
+                    ? { text: 'No Data Saved', muted: true }
+                    : { text: 'FREE' }
+                }
                 onSelect={(lobbyType) => {
                   setHostTypeExpanded('none');
                   setGuestLobbyType(lobbyType);
@@ -2728,11 +3061,23 @@ export default function HomeScreen() {
 
       <JoinModal
         visible={joinVisible}
-        onClose={() => setJoinVisible(false)}
+        onClose={() => {
+          setJoinVisible(false);
+          // Nollställ lobbytypen när guest-host-formen stängs — annars
+          // lever ett tidigare '1v1'-val kvar i sessions-state och kan
+          // följa med in i ett senare guest-host-flöde.
+          setGuestLobbyType('standard');
+          // Draften är förbrukad när formen väl öppnats med den; utan detta
+          // skulle ett senare, orelaterat Join-as-Guest återuppliva gamla
+          // fält.
+          setGuestJoinDraft(null);
+        }}
         initialStep={joinInitialStep}
         hideGuest={joinHideGuest}
         currentPlayerName={profile?.playerName ?? null}
         guestHostLobbyType={guestLobbyType}
+        onRemoteAccountRequired={handleRemoteAccountRequired}
+        initialGuestDraft={guestJoinDraft}
       />
 
       {/* Lobbytyp-väljaren är INLINE under respektive Start-knapp
@@ -2830,7 +3175,13 @@ export default function HomeScreen() {
             {!isLoggedIn && profileMenuStep === 'menu' && (
               <>
                 <Text style={profileMenu.title}>Welcome to QuizVibe</Text>
-                <Text style={profileMenu.subtitle}>Sign in to create and join games</Text>
+                {/* Kontextuell subtitel: Remote 1vs1-gaterna skickar in en
+                    förklaring via authNotice (de visar ingen Alert, så detta
+                    är enda stället spelaren får veta varför de hamnade här).
+                    Annars default-texten. */}
+                <Text style={profileMenu.subtitle}>
+                  {authNotice ?? 'Sign in to create and join games'}
+                </Text>
 
                 <View style={profileMenu.btnWithBadge}>
                   <TouchableOpacity
@@ -3573,7 +3924,7 @@ export default function HomeScreen() {
 
             <TouchableOpacity
               style={profileMenu.cancelBtn}
-              onPress={() => setProfileMenuVisible(false)}
+              onPress={handleAuthFormCancel}
             >
               <Text style={profileMenu.cancelText}>Cancel</Text>
             </TouchableOpacity>
@@ -3876,7 +4227,9 @@ const modal = StyleSheet.create({
     maxHeight: '90%',
   },
   title: { fontSize: 20, fontWeight: '700', color: Colors.textPrimary, textAlign: 'center' },
-  subtitle: { fontSize: 14, color: Colors.textSecondary, textAlign: 'center' },
+  // lineHeight krävs sedan subtiteln kan bära Remote 1vs1-gaternas
+  // förklaringstext (~3 rader) i stället för default-enraddaren.
+  subtitle: { fontSize: 14, color: Colors.textSecondary, textAlign: 'center', lineHeight: 20 },
   input: {
     height: 52, borderRadius: Radius.md, backgroundColor: Colors.background,
     borderWidth: 1, borderColor: Colors.borderStrong, paddingHorizontal: Spacing.lg,

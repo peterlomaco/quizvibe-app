@@ -31,6 +31,11 @@ interface PlayerRowProps {
   // När spelaren är gäst: visa "Guest HCP"-badge istället för räknad HCP.
   // Hur Guest HCP faktiskt räknas är inte definierat ännu.
   isGuest?: boolean;
+  // QuizVibe-kontots playerName när spelaren deltar under ett Guest alias
+  // — renderas som "QuizVibe: Anna-42" under namnet så övriga ser vilket
+  // konto som sitter bakom guest-namnet. Jämförs mot player.name här så
+  // display-regeln bor på ETT ställe: matchar de är det inget alias.
+  accountPlayerName?: string;
   // Turn number 1..N. When set, a numbered badge is shown to indicate
   // play order in Pass-the-Phone mode. #1 = goes first.
   turnNumber?: number;
@@ -78,6 +83,7 @@ export function PlayerRow({
   assistance,
   isHostPlayer,
   isGuest,
+  accountPlayerName,
   turnNumber,
   showApproveToggle,
   approved,
@@ -178,6 +184,17 @@ export function PlayerRow({
           <View style={styles.nameRow}>
             <Text style={[styles.name, hasLeft && styles.textLeft]} numberOfLines={1}>{player.name}</Text>
           </View>
+          {/* Guest alias — kontot bakom guest-namnet. Visas bara när det
+              faktiskt skiljer sig från visningsnamnet. */}
+          {!!accountPlayerName?.trim() &&
+            accountPlayerName.trim().toLowerCase() !== player.name.trim().toLowerCase() && (
+              <Text
+                style={[styles.accountAlias, hasLeft && styles.textLeft]}
+                numberOfLines={1}
+              >
+                QuizVibe: {accountPlayerName.trim()}
+              </Text>
+            )}
           {/* Wifi-ikon direkt under playername — connection-health-indikator
               för Individual Devices. Färg: grön (ok/self), gul (slow), röd
               (unstable). hasLeft-spelare slipper indikator (de signaleras
@@ -643,6 +660,14 @@ const styles = StyleSheet.create({
     fontSize: FontSize.xs,
     fontWeight: FontWeight.semibold,
     marginTop: -5,
+  },
+  // Guest alias-raden under namnet. Dämpad + xs så den läses som metadata,
+  // inte som ett andra namn.
+  accountAlias: {
+    fontSize: FontSize.xs,
+    fontWeight: FontWeight.medium,
+    color: Colors.textSecondary,
+    marginTop: 1,
   },
   nameRow: {
     flexDirection: 'row',

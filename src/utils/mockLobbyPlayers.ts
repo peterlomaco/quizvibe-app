@@ -52,6 +52,11 @@ interface LobbyPlayerRow {
   has_left: boolean;
   // True om spelaren har ett kopplat Spotify-konto (migration 0015).
   spotify_verified: boolean | null;
+  // Kontonamnet bakom ett Guest alias (migration 0030). Optional eftersom
+  // äldre rader / icke-applicerad migration saknar kolumnen. Skrivs BARA
+  // av publishOwnAccountName (targeted UPDATE på egen rad) — ingår inte i
+  // playerToRow, se noten om has_left/seen_question_ids nedan.
+  account_player_name?: string | null;
   // OBS: kolumnen `seen_question_ids` (migration 0026) ingår MEDVETET INTE
   // i denna row-shape eller i playerToRow — den skrivs enbart via
   // updateOwnSeenQuestionIds (targeted UPDATE) så host:s bulk-UPSERT aldrig
@@ -75,6 +80,7 @@ function rowToPlayer(row: LobbyPlayerRow): LobbyPlayer {
     lobbyEdited: row.lobby_edited,
     hasLeft: row.has_left,
     spotifyConnected: row.spotify_verified ?? false,
+    accountPlayerName: row.account_player_name ?? undefined,
     // Host-added guests har user_id=null i DB eftersom host saknar deras
     // auth-session vid upsert (setLobbyPlayers strippar dessutom user_id ur
     // non-host-payload:en). Self-joined guests sätter user_id=auth.uid() via
@@ -366,6 +372,43 @@ export async function updateOwnSeenQuestionIds(
     .eq('user_id', userId);
   if (error) {
     console.warn('[lobbyPlayers] updateOwnSeenQuestionIds failed:', error.message);
+  }
+}
+
+/**
+ * Publicerar spelarens EGET QuizVibe-kontonamn på sin egen lobby-rad så
+ * övriga i lobbyn ser vilket konto som ligger bakom ett Guest alias
+ * (migration 0030). `profiles` är own-row-only i RLS — ingen annan klient
+ * kan slå upp namnet, därför måste ägaren själv publicera det.
+ *
+ * `accountName` null/tom (ren guest utan konto) → no-op, kolumnen förblir
+ * null och inget alias renderas.
+ *
+ * Targeted UPDATE scoped på room_code + player_id + user_id (samma mönster
+ * som updateOwnSeenQuestionIds/markOwnPlayerLeft) så host:s bulk-UPSERT
+ * aldrig kan clobba värdet. Fel loggas men kastas aldrig — en
+ * icke-applicerad migration ska inte bryta lobby-join:en.
+ */
+export async function publishOwnAccountName(
+  code: string,
+  playerId: string,
+  accountName: string | null | undefined,
+): Promise<void> {
+  const trimmed = accountName?.trim();
+  if (!code || !playerId || !trimmed) return;
+  const normalized = normalizeCode(code);
+  await ensureAuthSession();
+  const { data: userResp } = await supabase.auth.getUser();
+  const userId = userResp.user?.id;
+  if (!userId) return;
+  const { error } = await supabase
+    .from('lobby_players')
+    .update({ account_player_name: trimmed })
+    .eq('room_code', normalized)
+    .eq('player_id', playerId)
+    .eq('user_id', userId);
+  if (error) {
+    console.warn('[lobbyPlayers] publishOwnAccountName failed:', error.message);
   }
 }
 

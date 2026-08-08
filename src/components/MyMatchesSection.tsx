@@ -29,6 +29,7 @@ import { Animated, StyleSheet, Text, TouchableOpacity, View } from 'react-native
 import { Colors, FontSize, Radius, Spacing } from '../theme';
 import { VersusIcon } from './VersusIcon';
 import { supabase } from '../utils/supabase';
+import { isAnonymousSession } from '../utils/auth';
 import {
   getMyMatches,
   subscribeToMyMatches,
@@ -78,14 +79,14 @@ export function MyMatchesSection({ full = false }: { full?: boolean } = {}) {
   const seenKeyRef = useRef<string | null>(null);
 
   const reload = useCallback(async () => {
-    const [{ data: sessionData }, mine] = await Promise.all([
+    const [{ data: sessionData }, anon, mine] = await Promise.all([
       supabase.auth.getSession(),
+      isAnonymousSession(),
       getMyMatches(),
     ]);
-    const user = sessionData.session?.user as
-      | { id?: string; is_anonymous?: boolean }
-      | undefined;
-    const anon = !!user?.is_anonymous;
+    // Sessionen läses fortfarande direkt eftersom vi behöver user.id till
+    // "sett"-nyckeln nedan; guest-avgörandet går via den delade helpern.
+    const user = sessionData.session?.user as { id?: string } | undefined;
     setIsGuestSession(anon);
     setMatches(mine);
 
@@ -128,9 +129,12 @@ export function MyMatchesSection({ full = false }: { full?: boolean } = {}) {
     return unsubscribe;
   }, [reload]);
 
-  const visible = isGuestSession
-    ? matches.filter((m) => m.match.status === 'active' || m.match.status === 'cancelled')
-    : matches;
+  // Ren guest (anon-session, inget QuizVibe-konto) ser INGEN 1vs1-ingång
+  // alls (Peter 2026-08-08). Remote 1v1 kräver konto sedan samma datum —
+  // rena guests kan inte längre skapa matcher, men anon-sessioner från
+  // FÖRE spärren kan ha kvar legacy-rader som annars hade renderat knappen
+  // på Home. De löper ut på sin 48h-deadline och sveps av cron:en.
+  const visible = isGuestSession ? [] : matches;
 
   // Något har hänt sedan spelaren senast öppnade listan → blinkande signal.
   // seenSignature === null = ingen user-id (kan inte namespace:a) → tyst.

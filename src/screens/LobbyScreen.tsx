@@ -54,13 +54,14 @@ import {
 import { TopUserBanner } from '../components/TopUserBanner';
 import { MorseAmbientSound } from '../components/MorseAmbientSound';
 import { Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';
+import { isAnonymousSession } from '../utils/auth';
 import { AVATARS, getAvatarEmojiById } from '../utils/avatars';
 import { addFriend, loadFriends, type Friend } from '../utils/friendsStorage';
 import { MIN_HCP, calculateInitialHCP } from '../utils/hcp';
 import { addLeftPlayer, getLeftPlayers, removeLeftPlayer } from '../utils/leftPlayers';
 import { deactivateRoom, getRoomMeta, markRoomGameStarted, roomExists, setRoomMaxPlayers, setRoomPlayerCount } from '../utils/mockActiveRooms';
 import { clearEjected, isEjected, markEjected } from '../utils/ejectedPlayers';
-import { claimCarryOverLobbyPlayer, clearLobbyPlayers, getLobbyPlayers, getLobbySeenQuestionIds, markOwnPlayerLeft, setLobbyPlayers, updateOwnSeenQuestionIds, upsertOwnLobbyPlayer } from '../utils/mockLobbyPlayers';
+import { claimCarryOverLobbyPlayer, clearLobbyPlayers, getLobbyPlayers, getLobbySeenQuestionIds, markOwnPlayerLeft, publishOwnAccountName, setLobbyPlayers, updateOwnSeenQuestionIds, upsertOwnLobbyPlayer } from '../utils/mockLobbyPlayers';
 import { loadLastSessionIds, loadSeenQuestionIds } from '../utils/hostQuestionHistory';
 import { setPendingPeerSeenIds } from '../utils/pendingSeenQuestions';
 import { clearLobbySettings, getLobbySettings, setLobbySettings } from '../utils/mockLobbySettings';
@@ -130,6 +131,13 @@ export interface LobbyPlayer extends Player {
   // 2026-07-22 — ingen OAuth). Syncas via lobby_players.spotify_verified;
   // källan är profile.spotifyAppConfirmed eller lobby-radens attest-tap.
   spotifyConnected?: boolean;
+  // QuizVibe-kontots playerName när spelaren deltar under ett Guest alias
+  // ("GuestA-1234567" i lobbyn, men kontot är "Anna-42"). Publiceras av
+  // spelaren själv via publishOwnAccountName → lobby_players
+  // .account_player_name (migration 0030); `profiles` är own-row-only i
+  // RLS så ingen annan klient kan slå upp namnet. undefined = spelaren
+  // använder sitt kontonamn, eller är en ren guest utan konto.
+  accountPlayerName?: string;
 }
 
 type GameMode = 'pass-the-phone' | 'individual-devices' | 'remote-1v1';
@@ -901,6 +909,32 @@ function publishOwnSeenHistory(roomCode: string, playerId: string): void {
     .catch(() => {});
 }
 
+/**
+ * Guest alias: publicera det inloggade kontots playerName på egen
+ * lobby_players-rad (migration 0030) så övriga i lobbyn ser vilket konto
+ * som sitter bakom ett guest-namn. `profiles` är own-row-only i RLS —
+ * ingen annan klient kan slå upp namnet, ägaren måste publicera det.
+ *
+ * Publiceras ALLTID när en profil finns; renderingen (PlayerRow) avgör om
+ * det faktiskt är ett alias genom att jämföra mot visningsnamnet. Det
+ * håller display-regeln på ETT ställe och gör att aliaset dyker upp rätt
+ * även om host döper om spelaren i efterhand.
+ *
+ * Ren guest (ingen profil) → no-op, kolumnen förblir null.
+ * Fire-and-forget: aliaset är kosmetiskt och får aldrig blockera join.
+ * MÅSTE anropas efter att egen rad finns i DB (UPDATE:n träffar annars
+ * 0 rader) — därav kedjning på upsert/setLobbyPlayers-promisen.
+ */
+function publishOwnAccountAlias(roomCode: string, playerId: string): void {
+  loadProfile()
+    .then((profile) => {
+      const account = profile?.playerName?.trim();
+      if (!account) return;
+      return publishOwnAccountName(roomCode, playerId, account);
+    })
+    .catch(() => {});
+}
+
 function WaveDots() {
   const dot1 = useRef(new Animated.Value(0)).current;
   const dot2 = useRef(new Animated.Value(0)).current;
@@ -1436,7 +1470,12 @@ export default function LobbyScreen() {
         });
         // Publicera egen rad till lobby_players så host:s Realtime-channel
         // får broadcast och hen ser den nya spelaren direkt i sin vy.
-        upsertOwnLobbyPlayer(roomCode, guestPlayer).catch(() => { /* loggas i lobbyPlayers */ });
+        upsertOwnLobbyPlayer(roomCode, guestPlayer)
+          // Guest alias: en INLOGGAD user som joinar via guest-formen
+          // publicerar sitt kontonamn så host ser vem det är. Kedjat på
+          // upsert:en så raden garanterat finns när UPDATE:n körs.
+          .then(() => publishOwnAccountAlias(roomCode, guestPlayerId))
+          .catch(() => { /* loggas i lobbyPlayers */ });
         // Publicera enhetens fråge-historik för cross-player-exkludering.
         // Guest-join på en enhet med inloggad profil publicerar profilens
         // historik (samma människa); enhet utan profil → tom → no-op.
@@ -1547,9 +1586,13 @@ export default function LobbyScreen() {
         if (carryOverPlayerId?.trim()) {
           // claim sätter user_id + has_left=false; separat upsert skriver approved=true.
           claimCarryOverLobbyPlayer(roomCode, joinerId).catch(() => { /* loggas i lobbyPlayers */ });
-          upsertOwnLobbyPlayer(roomCode, joiner).catch(() => { /* loggas i lobbyPlayers */ });
+          upsertOwnLobbyPlayer(roomCode, joiner)
+            .then(() => publishOwnAccountAlias(roomCode, joinerId))
+            .catch(() => { /* loggas i lobbyPlayers */ });
         } else {
-          upsertOwnLobbyPlayer(roomCode, joiner).catch(() => { /* loggas i lobbyPlayers */ });
+          upsertOwnLobbyPlayer(roomCode, joiner)
+            .then(() => publishOwnAccountAlias(roomCode, joinerId))
+            .catch(() => { /* loggas i lobbyPlayers */ });
         }
         // Publicera enhetens fråge-historik för cross-player-exkludering
         // (registrerade users har 20-sessions-historik lokalt; tom → no-op).
@@ -1680,6 +1723,13 @@ export default function LobbyScreen() {
             // identiteten (guestName/ålder/Full) även om en profil finns.
             let next = hostMode && !isGuestHost && profile && p.isHost ? mergeProfileIntoHost(p, profile) : p;
             if (next.isHost) {
+              // Guest alias på host:s EGET kort: en inloggad user som hostar
+              // som Guest visar guest-namnet men ska visa kontot under.
+              // Sätts lokalt (profilen finns ju här) i stället för att
+              // vänta på DB-roundtrip — kortet ägs lokalt av host.
+              if (hostMode && isGuestHost && profile?.playerName) {
+                next = { ...next, accountPlayerName: profile.playerName };
+              }
               // Rör INTE next.spotifyConnected här — det sätts av den parallella
               // spotify-attest-kedjans setPlayers-patch. Om vi skriver
               // spotifyConnected-state (alltid false i closure vid körning) kan
@@ -1836,6 +1886,15 @@ export default function LobbyScreen() {
   // playerEjectedDetected eftersom det rör en helt annan trigger (Start
   // Game vs trash-knappen).
   const [startedWithoutMeDetected, setStartedWithoutMeDetected] = useState(false);
+  // True när en REN guest (anon-session, inget QuizVibe-konto) hamnat i en
+  // Remote 1vs1-lobby. Backstop för Home:s fail-open join-gate — remote-
+  // matcher lagras i 48h och kräver ett konto. Ref:en gör ejectet
+  // idempotent så 2s-pollen inte kan trigga markOwnPlayerLeft flera gånger.
+  const [remoteGuestBlockedDetected, setRemoteGuestBlockedDetected] = useState(false);
+  const remoteGuestEjectedRef = useRef(false);
+  // One-shot-guard: host publicerar sitt Guest alias en gång per lobby
+  // (players-sync-effekten körs vid varje ändring).
+  const hostAliasPublishedRef = useRef(false);
   // Approved non-host i Pass-the-Phone-lobby: host startar → bara host
   // spelar på sin telefon. Non-host får informativ popup ("använd host-
   // device:n"). Skiljs från startedWithoutMeDetected (oapprovaderad)
@@ -3491,7 +3550,19 @@ export default function LobbyScreen() {
   // över host:s snapshot. Fire-and-forget — UI:t väntar inte på roundtrip.
   useEffect(() => {
     if (!hostMode) return;
-    setLobbyPlayers(roomCode, players).catch(() => { /* loggas i mockLobbyPlayers */ });
+    setLobbyPlayers(roomCode, players)
+      .then(() => {
+        // Guest alias för host: en INLOGGAD user som hostar som Guest
+        // publicerar sitt kontonamn så joiners ser vem värden är. En gång
+        // per lobby — effekten körs vid varje players-ändring, och
+        // kolumnen ändras aldrig under lobbyns livstid.
+        if (hostAliasPublishedRef.current) return;
+        const hostId = players.find((p) => p.isHost)?.id;
+        if (!hostId) return;
+        hostAliasPublishedRef.current = true;
+        publishOwnAccountAlias(roomCode, hostId);
+      })
+      .catch(() => { /* loggas i mockLobbyPlayers */ });
   }, [hostMode, roomCode, players]);
 
   // Host: skriv host-settings (gameMode, region, era, rounds, response time,
@@ -3565,6 +3636,26 @@ export default function LobbyScreen() {
     const syncFromStore = async () => {
       const stored = await getLobbySettings(roomCode);
       if (cancelled || !stored) return;
+      // Remote 1vs1-backstop (2026-08-08): läget spelas ENBART av
+      // QuizVibe-users mot varandra. Home:s guest-join-gate är fail-open
+      // under fönstret innan hostens settings-skrivning landat, så vi
+      // ejectar guest-läge här så fort gameMode resolvat. Gatan är på
+      // guest-LÄGE (isGuestInRoom), inte på anon-session: en registrerad
+      // user som joinat via guest-formen spelar också som Guest och är
+      // lika utestängd. Körs före all state-spegling så vi inte renderar
+      // en 1v1-lobby för någon som ändå ska ut.
+      // Redan ejectad → sluta spegla settings helt medan popup:en visas.
+      if (remoteGuestEjectedRef.current) return;
+      if (stored.gameMode === 'remote-1v1' && isGuestInRoom) {
+        if (cancelled) return;
+        remoteGuestEjectedRef.current = true;
+        // Städa den egna raden först så ingen orphan blir kvar i lobbyn
+        // (samma ordning som Leave-flödet).
+        const ownId = ownPlayerIdRef.current;
+        if (ownId) await markOwnPlayerLeft(roomCode, ownId).catch(() => {});
+        setRemoteGuestBlockedDetected(true);
+        return;
+      }
       setGameMode(stored.gameMode);
       setSinglePlayerDefault(stored.singlePlayerDefault);
       setMaxPlayers(stored.maxPlayers);
@@ -3608,7 +3699,7 @@ export default function LobbyScreen() {
       cancelled = true;
       clearInterval(interval);
     };
-  }, [hostMode, roomCode, realtimeTick]);
+  }, [hostMode, roomCode, realtimeTick, isGuestInRoom]);
 
   // Realtime-channel (non-host): prenumererar på lobby_players + lobby_settings
   // postgres_changes-events filtrerade på vårt roomCode. Vid varje event
@@ -3737,14 +3828,26 @@ export default function LobbyScreen() {
           const nextHasLeft = !!updated.hasLeft;
           const nextApproved = !!updated.approved;
           const nextSpotifyConnected = !!updated.spotifyConnected;
+          // Guest alias publiceras av spelaren själv en kort stund EFTER
+          // deras upsert, så fetchNewJoiners hinner ofta läsa raden innan
+          // kolumnen är satt (och plockar sedan aldrig upp den igen —
+          // spelaren är då redan i localIds). Konvergera den här istället.
+          const nextAccountName = updated.accountPlayerName;
           if (
             !!p.hasLeft === nextHasLeft &&
             !!p.approved === nextApproved &&
-            !!p.spotifyConnected === nextSpotifyConnected
+            !!p.spotifyConnected === nextSpotifyConnected &&
+            p.accountPlayerName === nextAccountName
           )
             return p;
           changed = true;
-          return { ...p, hasLeft: nextHasLeft, approved: nextApproved, spotifyConnected: nextSpotifyConnected };
+          return {
+            ...p,
+            hasLeft: nextHasLeft,
+            approved: nextApproved,
+            spotifyConnected: nextSpotifyConnected,
+            accountPlayerName: nextAccountName,
+          };
         });
         return changed ? next : prev;
       });
@@ -4201,6 +4304,27 @@ export default function LobbyScreen() {
     );
   }, [playerEjectedDetected]);
 
+  // Remote-1vs1-popup: guest-läge hamnade i en 1v1-lobby (Home:s gate är
+  // fail-open innan hostens debounced settings-skrivning landat). Samma
+  // situation som Home:s 'join'-gate → IDENTISK copy, håll dem i sync.
+  // cancelable:false och BÅDA knapparna lämnar lobbyn — spelaren kan inte
+  // vara kvar här. CTA:n använder ?openAuth=1-deeplinken som öppnar
+  // "Register or Login"-formuläret på Home (profileMenu:ns menu-steg) —
+  // INTE ?openRegister=1, som hoppar direkt till registrering; en guest
+  // som blockas här kan redan ha ett konto och bara vara utloggad.
+  useEffect(() => {
+    if (!remoteGuestBlockedDetected) return;
+    Alert.alert(
+      'Remote 1vs1 Room',
+      'This Room Code belongs to a Remote 1vs1 match. Remote duels can only be played between QuizVibe users — register a free account or log in to join.',
+      [
+        { text: 'OK', onPress: () => router.replace('/') },
+        { text: 'Register or Login', onPress: () => router.replace('/?openAuth=join') },
+      ],
+      { cancelable: false },
+    );
+  }, [remoteGuestBlockedDetected]);
+
   // Started-without-me-popup: när host tryckt Start Game utan att approverat
   // den här spelaren. Speglar samma cancelable:false + OK→Home-mönster.
   useEffect(() => {
@@ -4476,6 +4600,17 @@ export default function LobbyScreen() {
     let remoteOpponent: LobbyPlayer | null = null;
     let remoteOpponentUserId: string | null = null;
     if (gameMode === 'remote-1v1' && !singlePlayerDefault) {
+      // Sista linjen före matchraden skrivs: Remote 1vs1 spelas ENBART av
+      // QuizVibe-users mot varandra (2026-08-08). Guest-läge ska aldrig nå
+      // hit — Home-gaten + lobby-backstoppen fångar det — men detta är den
+      // enda punkten där en felaktig match faktiskt skulle persisteras.
+      if (isGuestHost) {
+        Alert.alert(
+          'QuizVibe account required',
+          'Remote 1vs1 matches can only be played between QuizVibe users. Register or sign in to host a 1vs1 match.',
+        );
+        return;
+      }
       const activeApprovedNonHosts = approvedPlayers.filter((p) => !p.isHost && !p.hasLeft);
       if (activeApprovedNonHosts.length !== 1) {
         Alert.alert(
@@ -4491,6 +4626,15 @@ export default function LobbyScreen() {
         Alert.alert(
           'Own device required',
           `${remoteOpponent.name} was added by the Host and has no device of their own. Remote 1vs1 opponents must join with their own device.`,
+        );
+        return;
+      }
+      // Motståndar-sidan av users-only-regeln: `type === 'guest'` betyder
+      // att de gick in via guest-formen, oavsett om enheten har ett konto.
+      if (remoteOpponent.type === 'guest') {
+        Alert.alert(
+          'QuizVibe account required',
+          `${remoteOpponent.name} joined as a Guest. Remote 1vs1 matches can only be played between QuizVibe users.`,
         );
         return;
       }
@@ -4588,6 +4732,7 @@ export default function LobbyScreen() {
     let remoteMatchId: string | null = null;
     if (gameMode === 'remote-1v1' && !singlePlayerDefault && remoteOpponent && remoteOpponentUserId) {
       const hostRow = players.find((p) => p.isHost);
+      const hostIsAnonymous = await isAnonymousSession();
       const hostUserId = await getOwnUserId();
       if (!hostUserId) {
         Alert.alert('Cannot start match', 'No active session. Check your connection and try again.');
@@ -4604,12 +4749,23 @@ export default function LobbyScreen() {
           imagesEnabledCategories,
           selectedExtraPackages,
         },
+        // playerType är enbart en FALLBACK för databaser där migration
+        // 0029 ännu inte körts — därifrån härleder servern själv både
+        // player_type och account_player_name (Guest alias) ur
+        // profiles-raden och ignorerar det vi skickar.
+        //
+        // Host-raden får INTE använda isGuestHost: den säger bara HUR
+        // spelaren gick in i lobbyn. En registrerad user som hostar som
+        // Guest HAR ett konto och måste skrivas som 'registered', annars
+        // raderar guest-retention-cron:en deras avgjorda match efter 24h.
+        // Motståndarens auth-status går inte att se klient-side — där är
+        // LobbyPlayer.type bästa gissningen tills 0029 är applicerad.
         [
           {
             userId: hostUserId,
             playerName: hostRow?.name ?? 'Host',
             isHost: true,
-            playerType: isGuestHost ? 'guest' : 'registered',
+            playerType: hostIsAnonymous ? 'guest' : 'registered',
             assistance: hostRow?.assistance ?? 'standard',
             age: hostRow?.age ?? null,
           },
@@ -5180,6 +5336,7 @@ export default function LobbyScreen() {
                 assistance={player.assistance}
                 isHostPlayer={player.isHost}
                 isGuest={player.type === 'guest'}
+                accountPlayerName={player.accountPlayerName}
                 turnNumber={gameMode === 'pass-the-phone' ? index + 1 : undefined}
                 showApproveToggle={hostMode && !player.isHost && !player.hasLeft}
                 approved={true}
@@ -5235,6 +5392,7 @@ export default function LobbyScreen() {
                     assistance={player.assistance}
                     isHostPlayer={false}
                     isGuest={player.type === 'guest'}
+                    accountPlayerName={player.accountPlayerName}
                     showApproveToggle={hostMode && !player.hasLeft}
                     approved={false}
                     onApproveChange={(next) => handleSetApproved(player.id, next)}

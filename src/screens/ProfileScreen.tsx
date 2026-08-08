@@ -1138,6 +1138,9 @@ export default function ProfileScreen() {
       currentPlayerCount: 1,
       hostPlayerName: freshProfile?.playerName ?? '',
       gameStarted: false,
+      // Profile:s Create Game-genväg skapar alltid en standard-lobby;
+      // Remote 1vs1 väljs bara via Home:s HostTypeOptions-utfällning.
+      isRemote1v1: false,
     });
     if (!roomRegistered) {
       Alert.alert(

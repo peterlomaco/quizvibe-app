@@ -35,9 +35,18 @@ export interface RemoteMatchSettings {
 
 export interface RemoteMatchPlayer {
   userId: string;
+  /** Namnet spelaren spelade under — kan vara ett Guest alias. */
   playerName: string;
   isHost: boolean;
+  /** Server-härledd (migration 0029): 'registered' iff en profiles-rad finns. */
   playerType: 'registered' | 'guest';
+  /**
+   * QuizVibe-kontots player_name när spelaren spelade under ett Guest
+   * alias — så motståndaren ser vem de faktiskt mötte. null när
+   * display-namnet redan är kontonamnet (eller inget konto finns).
+   * Använd `formatPlayerLabel` istället för att läsa fältet direkt.
+   */
+  accountPlayerName: string | null;
   assistance: string | null;
   age: number | null;
   /** null = spelaren har inte spelat klart (eller aldrig börjat). */
@@ -73,11 +82,31 @@ export interface MyRemoteMatch {
 /** Input till createRemoteMatch — speglar RPC:ns players-jsonb-shape. */
 export interface NewRemoteMatchPlayer {
   userId: string;
+  /** Namnet spelaren spelar under (kan vara ett Guest alias). */
   playerName: string;
   isHost: boolean;
-  playerType: 'registered' | 'guest';
+  /**
+   * IGNORERAS av servern sedan migration 0029 — RPC:n härleder
+   * player_type + account_player_name själv genom att slå upp
+   * profiles-raden för user_id. Fältet finns kvar som dokumentation av
+   * klientens avsikt (och för äldre databaser utan 0029 applicerad).
+   */
+  playerType?: 'registered' | 'guest';
   assistance?: string | null;
   age?: number | null;
+}
+
+/**
+ * Visningsnamn för en matchdeltagare. Spelade de under ett Guest alias
+ * visas kontot inom parentes så motståndaren ser vem de faktiskt mötte:
+ * `GuestA-1234567 (Anna-42)`. Annars bara namnet.
+ */
+export function formatPlayerLabel(
+  p: Pick<RemoteMatchPlayer, 'playerName' | 'accountPlayerName'> | null | undefined,
+  fallback = 'Opponent',
+): string {
+  if (!p) return fallback;
+  return p.accountPlayerName ? `${p.playerName} (${p.accountPlayerName})` : p.playerName;
 }
 
 export interface RemoteAnswer {
@@ -96,6 +125,8 @@ interface RemoteMatchPlayerRow {
   player_name: string;
   is_host: boolean;
   player_type: 'registered' | 'guest';
+  /** Optional: kolumnen kom i migration 0029 — äldre rader saknar den. */
+  account_player_name?: string | null;
   assistance: string | null;
   age: number | null;
   finished_at: string | null;
@@ -130,6 +161,7 @@ function rowToPlayer(r: RemoteMatchPlayerRow): RemoteMatchPlayer {
     playerName: r.player_name,
     isHost: r.is_host,
     playerType: r.player_type,
+    accountPlayerName: r.account_player_name ?? null,
     assistance: r.assistance,
     age: r.age,
     finishedAt: r.finished_at,
@@ -205,7 +237,9 @@ export async function createRemoteMatch(
       user_id: p.userId,
       player_name: p.playerName,
       is_host: p.isHost,
-      player_type: p.playerType,
+      // Fallback för pre-0029-databaser; ignoreras av den nya RPC:n som
+      // härleder player_type + account_player_name ur profiles.
+      player_type: p.playerType ?? null,
       assistance: p.assistance ?? null,
       age: p.age ?? null,
     })),

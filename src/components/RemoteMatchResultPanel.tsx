@@ -14,6 +14,7 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { Colors, FontSize, Radius, Spacing } from '../theme';
 import {
+  formatPlayerLabel,
   getMatch,
   getOwnUserId,
   splitMatchForUser,
@@ -65,7 +66,9 @@ export function RemoteMatchResultPanel({ matchId }: Props) {
   if (!my) return null;
 
   const { match, me, opponent } = my;
-  const oppName = opponent?.playerName ?? 'Opponent';
+  // Guest alias → "GuestA-1234567 (Anna-42)" så det syns vilket konto som
+  // ligger bakom namnet (delad helper med My Matches-listan).
+  const oppName = formatPlayerLabel(opponent);
 
   // Pågående: motståndaren har inte spelat klart ännu.
   if (match.status === 'active') {

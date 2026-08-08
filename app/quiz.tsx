@@ -4529,6 +4529,10 @@ export default function QuizScreen() {
       currentPlayerCount: initialCount,
       hostPlayerName: asGuestHost ? hostName : profile?.playerName ?? '',
       gameStarted: false,
+      // Remote 1vs1 har ingen Play Again (final-footern kör guest-flödets
+      // "bara Home" via guestHost={isRemote}), så goToNewLobby nås aldrig
+      // från en remote-match — den nya lobbyn är alltid standard.
+      isRemote1v1: false,
     });
     if (!roomRegistered) {
       Alert.alert(

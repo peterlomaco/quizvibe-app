@@ -40,6 +40,12 @@ export interface RoomMeta {
   // Non-host:s Realtime-subscription på rooms-tabellen läser detta för att
   // navigera approved spelare till /quiz när host startar (Slice 3C-i).
   gameStarted: boolean;
+  // True när lobbyn skapades som Remote 1vs1 (migration 0031). Sätts vid
+  // registerActiveRoom — alltså ATOMISKT vid skapandet, innan någon join är
+  // möjlig — så join-gates kan avgöra lobbytypen utan att vänta på den
+  // 300ms-debounce:ade lobby_settings-skrivningen. Optional i typen:
+  // rum skapade före 0031 saknar kolumnen och resolvar till false.
+  isRemote1v1?: boolean;
 }
 
 // Dev/test-seeds som lagras lokalt i minnet (inte i DB) så de alltid är
@@ -64,6 +70,8 @@ interface RoomRow {
   current_player_count: number;
   game_started: boolean;
   expires_at: string;
+  // Optional: kolumnen kom i migration 0031 — äldre rader saknar den.
+  is_remote_1v1?: boolean | null;
 }
 
 function rowToMeta(row: RoomRow): RoomMeta {
@@ -73,6 +81,7 @@ function rowToMeta(row: RoomRow): RoomMeta {
     currentPlayerCount: row.current_player_count,
     hostPlayerName: row.host_player_name,
     gameStarted: row.game_started,
+    isRemote1v1: row.is_remote_1v1 ?? false,
   };
 }
 
@@ -110,6 +119,9 @@ export async function registerActiveRoom(code: string, meta: RoomMeta): Promise<
     host_is_premium: meta.hostIsPremium,
     current_player_count: meta.currentPlayerCount,
     game_started: false,
+    // Lobbytypen skrivs HÄR, atomiskt med rums-raden, så join-gates slipper
+    // vänta på hostens debounce:ade lobby_settings-skrivning (migration 0031).
+    is_remote_1v1: meta.isRemote1v1 ?? false,
     expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
   });
   if (error) {

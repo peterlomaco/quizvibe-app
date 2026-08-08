@@ -46,9 +46,10 @@ import { BOTTOM_BANNER_HEIGHT } from '../components/BottomBanner';
 import { RemoteMatchResultPanel } from '../components/RemoteMatchResultPanel';
 import { VersusIcon } from '../components/VersusIcon';
 import { Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';
-import { supabase } from '../utils/supabase';
+import { isAnonymousSession } from '../utils/auth';
 import {
   buildRemoteQuizParams,
+  formatPlayerLabel,
   getMyAnsweredMatchIds,
   getMyMatches,
   subscribeToMyMatches,
@@ -104,17 +105,17 @@ export default function MyMatchesScreen() {
     setExpanded((prev) => ({ ...prev, [key]: !prev[key] }));
   }, []);
 
-  const toggleOpponent = useCallback((oppName: string) => {
-    setExpandedOpponents((prev) => ({ ...prev, [oppName]: !prev[oppName] }));
+  // Nyckeln är motståndarens user-id (inte namnet) så en spelare som bytt
+  // mellan kontonamn och Guest alias inte splittas i två grupper.
+  const toggleOpponent = useCallback((oppKey: string) => {
+    setExpandedOpponents((prev) => ({ ...prev, [oppKey]: !prev[oppKey] }));
   }, []);
 
   const reload = useCallback(async () => {
-    const [{ data: sessionData }, mine] = await Promise.all([
-      supabase.auth.getSession(),
+    const [anon, mine] = await Promise.all([
+      isAnonymousSession(),
       getMyMatches(),
     ]);
-    const anon = !!(sessionData.session?.user as { is_anonymous?: boolean } | undefined)
-      ?.is_anonymous;
     // Bara aktiva matcher behöver svarslookupen (historiken grupperas på
     // status) — håller queryn liten.
     const answered = await getMyAnsweredMatchIds(
@@ -168,7 +169,9 @@ export default function MyMatchesScreen() {
 
   const renderRow = (m: MyRemoteMatch, section: SectionKey) => {
     const { match, me, opponent } = m;
-    const oppName = opponent?.playerName ?? 'Opponent';
+    // Guest alias visas som "GuestA-1234567 (Anna-42)" så man ser vilket
+    // konto man faktiskt mötte även när motståndaren spelade som Guest.
+    const oppName = formatPlayerLabel(opponent);
     const myTurn = match.status === 'active' && me.finishedAt == null;
     const waiting = match.status === 'active' && me.finishedAt != null;
 
@@ -231,31 +234,36 @@ export default function MyMatchesScreen() {
     );
   };
 
-  // Historiken grupperas per motståndar-PlayerName. Grupperna sorteras
-  // alfabetiskt; inom en grupp ligger senast skapade matchen överst.
-  const historyGroups = new Map<string, MyRemoteMatch[]>();
+  // Historiken grupperas per motståndar-USER-ID, inte namn — en spelare
+  // kan möta samma konto både under dess riktiga namn och under ett Guest
+  // alias, och det ska ändå bli EN grupp. Etiketten tas från senaste
+  // matchen i gruppen. Grupperna sorteras alfabetiskt på etiketten; inom
+  // en grupp ligger senast skapade matchen överst.
+  const historyGroups = new Map<string, { label: string; rows: MyRemoteMatch[] }>();
   for (const m of sections.history) {
-    const oppName = m.opponent?.playerName ?? 'Opponent';
-    const list = historyGroups.get(oppName);
-    if (list) list.push(m);
-    else historyGroups.set(oppName, [m]);
+    const key = m.opponent?.userId ?? 'unknown-opponent';
+    const group = historyGroups.get(key);
+    if (group) group.rows.push(m);
+    else historyGroups.set(key, { label: formatPlayerLabel(m.opponent), rows: [m] });
   }
   // Inom varje grupp: senast skapade matchen överst.
-  for (const list of historyGroups.values()) {
-    list.sort((a, b) => new Date(b.match.startedAt).getTime() - new Date(a.match.startedAt).getTime());
+  for (const group of historyGroups.values()) {
+    group.rows.sort(
+      (a, b) => new Date(b.match.startedAt).getTime() - new Date(a.match.startedAt).getTime(),
+    );
   }
   const historyByOpponent = [...historyGroups.entries()].sort((a, b) =>
-    a[0].localeCompare(b[0], 'sv'),
+    a[1].label.localeCompare(b[1].label, 'sv'),
   );
 
   // Underrubrik per motståndare i historiken — samma +/−-vokabulär som
   // sektionsrubrikerna men en snäpp mindre och indragen.
-  const renderOpponentGroup = (oppName: string, rows: MyRemoteMatch[]) => {
-    const isOpen = expandedOpponents[oppName] ?? false;
+  const renderOpponentGroup = (oppKey: string, oppName: string, rows: MyRemoteMatch[]) => {
+    const isOpen = expandedOpponents[oppKey] ?? false;
     return (
-      <View key={oppName} style={styles.opponentGroup}>
+      <View key={oppKey} style={styles.opponentGroup}>
         <Pressable
-          onPress={() => toggleOpponent(oppName)}
+          onPress={() => toggleOpponent(oppKey)}
           style={({ pressed }) => [styles.subHeaderRow, pressed && { opacity: 0.7 }]}
           hitSlop={8}
         >
@@ -302,9 +310,9 @@ export default function MyMatchesScreen() {
               <Text style={styles.sectionEmptyText}>No matches here.</Text>
             ) : key === 'history' ? (
               // Historiken grupperas per motståndare — en utfällbar
-              // underrubrik per PlayerName (alfabetisk ordning).
-              historyByOpponent.map(([oppName, oppRows]) =>
-                renderOpponentGroup(oppName, oppRows),
+              // underrubrik per konto (alfabetisk ordning på etiketten).
+              historyByOpponent.map(([oppKey, group]) =>
+                renderOpponentGroup(oppKey, group.label, group.rows),
               )
             ) : (
               rows.map((m) => renderRow(m, key))
