@@ -72,9 +72,19 @@ function HereNowIcon({ height = 60 }: { height?: number }) {
  *  grå för guest) så panelen läses som knappens förlängning. */
 export function HostTypeOptions({
   accentColor, onSelect, remoteMode = 'available', onRemoteLockedPress, localBadge,
+  localLocked = false, onLocalLockedPress,
 }: {
   accentColor: string;
   onSelect: (lobbyType: HostLobbyType) => void;
+  /**
+   * Local Play-raden dimmad + otappbar-som-val. Används av Final
+   * Leaderboard:s re-match-flöde: host har bjudit in föregående spelare och
+   * måste vänta tills alla godkänt innan lobbyn får skapas. Raden förblir
+   * tappbar så trycket kan förklara väntan (`onLocalLockedPress`) i stället
+   * för att vara en död yta — samma mönster som den låsta Remote-raden.
+   */
+  localLocked?: boolean;
+  onLocalLockedPress?: () => void;
   /**
    * Remote 1vs1 spelas ENBART av QuizVibe-users mot varandra (Peter
    * 2026-08-08) — det finns ingen guest-variant av läget. Raden har
@@ -114,7 +124,14 @@ export function HostTypeOptions({
         subtitle="Single & Multiplayer mode"
         badgeText={localBadge?.text}
         badgeMuted={localBadge?.muted}
-        onPress={() => onSelect('standard')}
+        locked={localLocked}
+        onPress={() => {
+          if (localLocked) {
+            onLocalLockedPress?.();
+            return;
+          }
+          onSelect('standard');
+        }}
       />
       {remoteMode !== 'hidden' && (
         <HostTypeOptionRow

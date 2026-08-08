@@ -386,6 +386,12 @@ export function RoundLeaderboard({
   onStartNewGame,
   startNewGameLocked = false,
   onStartNewGameLockedPress,
+  onStartNewGamePress,
+  startNewGameExpanded: startNewGameExpandedProp,
+  localPlayLocked = false,
+  onLocalPlayLockedPress,
+  hideRemotePlay = false,
+  startNewGameNote,
 }: {
   players: LeaderboardPlayer[];
   /** Behållen för API-bakåtkompabilitet — tabellen aggregerar allt från
@@ -434,7 +440,10 @@ export function RoundLeaderboard({
    *  utfällning (Local Play / Remote Play) som Home:s knapp. Sätts av
    *  remote 1v1-slutskärmen, där Play Again inte finns — utan den vore
    *  Home enda vägen vidare och spelaren måste ta omvägen via startsidan
-   *  för att utmana igen. Utelämnas → knappen renderas inte alls. */
+   *  för att utmana igen — OCH (2026-08-08) av host:s lokala slutskärm, där
+   *  knappen ERSÄTTER Play Again. Är den satt för en host renderas ingen
+   *  Play Again-knapp i footern (Home står ensam där).
+   *  Utelämnas → knappen renderas inte alls. */
   onStartNewGame?: (lobbyType: HostLobbyType) => void;
   /**
    * Remote 1v1: true medan motståndaren fortfarande har frågor kvar att
@@ -444,6 +453,28 @@ export function RoundLeaderboard({
    */
   startNewGameLocked?: boolean;
   onStartNewGameLockedPress?: () => void;
+  /**
+   * Sätts av lokala re-match-flödet: tappet fäller INTE ut lägesvalet
+   * direkt utan lämnas till call-siten, som först frågar "Invite Players
+   * from previous Game?" och sedan öppnar panelen via
+   * `startNewGameExpanded`. Utelämnas (remote-fallet) → komponenten togglar
+   * panelen själv.
+   */
+  onStartNewGamePress?: () => void;
+  /** Kontrollerat läge för utfällningen. Utelämnas → internt state. */
+  startNewGameExpanded?: boolean;
+  /**
+   * Local Play-raden grå + otappbar-som-val: host har bjudit in föregående
+   * spelare och alla har ännu inte godkänt re-matchen.
+   */
+  localPlayLocked?: boolean;
+  onLocalPlayLockedPress?: () => void;
+  /** Dölj Remote Play i utfällningen (re-match:en är per definition lokal —
+   *  carry-over av lokala spelare hör inte hemma i en 1vs1-duell). */
+  hideRemotePlay?: boolean;
+  /** Statusrad under utfällningen ("Waiting for 1 of 2 players to approve"
+   *  / "✓ All players have approved"). */
+  startNewGameNote?: React.ReactNode;
 }) {
   // Nunito 700 Bold för Final Leaderboard:s "QuizVibe"-vattenstämpel-text
   // under Q+pokal-loggan. Matchar startskärmens appName-textformat 1:1.
@@ -452,7 +483,14 @@ export function RoundLeaderboard({
   const brandFont = fontsLoaded ? 'Nunito_700Bold' : undefined;
   // "Start New Game"-knappens inline-utfällning (samma mönster som Home:
   // tap togglar panelen, valet stänger den och lämnar över till callbacken).
-  const [startNewGameExpanded, setStartNewGameExpanded] = useState(false);
+  // Kontrollerbart utifrån: lokala re-match-flödet skjuter in invite-frågan
+  // mellan tapp och utfällning och äger därför öppet/stängt-läget själv.
+  const [internalStartNewGameExpanded, setInternalStartNewGameExpanded] =
+    useState(false);
+  const isStartNewGameControlled = startNewGameExpandedProp !== undefined;
+  const startNewGameExpanded = isStartNewGameControlled
+    ? startNewGameExpandedProp
+    : internalStartNewGameExpanded;
   // Aggregera per-spelare-statistik (samma struktur som GetReadyIntro:s
   // live-leaderboard så det är lätt att jämföra). Sortering: poäng desc →
   // avg response asc (ties brutna av snabbaste genomsnitt).
@@ -770,10 +808,21 @@ export function RoundLeaderboard({
           knapparna alltid syns även när tabellen scrollar. justifyContent:
           'flex-end' höger-ställer Home + Play Again i ändan av raden. */}
       <View style={styles.stickyFooter}>
+      {/* Guest host, omgång 1: replay-begränsningen kommuniceras överst i
+          footern (Peters copy). Bara host-enheten — non-host känner inte
+          till räknaren. Låg sedan 2026-08-08 inuti Play Again-grenen, men
+          guest hosts kör numera "Start New Game"-flödet och tar därför
+          Home-only-grenen; noten hör till knappen, inte till grenen. */}
+      {isLastRound && guestHost && isHost && guestReplaysUsed === 0 && (
+        <Text style={styles.guestReplayNote}>
+          Replay only possible 1 time for Guest Hosts
+        </Text>
+      )}
       {/* Gold "Start New Game" med samma inline-utfällning som Home:s knapp
-          (Local Play / Remote Play). Renderas bara när call-siten skickar
-          onStartNewGame — idag remote 1v1-slutskärmen, som saknar Play
-          Again. Panelen fälls ut UNDER knappen precis som på Home, och
+          (Local Play / Remote Play). Renderas när call-siten skickar
+          onStartNewGame: remote 1v1-slutskärmen (som saknar Play Again) och
+          — sedan 2026-08-08 — host:s lokala slutskärm, där knappen ERSÄTTER
+          Play Again. Panelen fälls ut UNDER knappen precis som på Home, och
           medan den är utfälld göms Home/Play Again-raden så valet står
           ensamt (samma mönster som Home döljer sina övriga knappar). */}
       {isLastRound && onStartNewGame && (
@@ -787,7 +836,13 @@ export function RoundLeaderboard({
                 onStartNewGameLockedPress?.();
                 return;
               }
-              setStartNewGameExpanded((prev) => !prev);
+              // Lokala re-match-flödet: call-siten frågar först "Invite
+              // Players from previous Game?" och öppnar panelen därefter.
+              if (onStartNewGamePress) {
+                onStartNewGamePress();
+                return;
+              }
+              setInternalStartNewGameExpanded((prev) => !prev);
             }}
             style={({ pressed }) => [
               styles.startNewGameBtn,
@@ -805,13 +860,23 @@ export function RoundLeaderboard({
             </Text>
           </Pressable>
           {startNewGameExpanded && !startNewGameLocked && (
-            <HostTypeOptions
-              accentColor={Colors.warning}
-              onSelect={(lobbyType) => {
-                setStartNewGameExpanded(false);
-                onStartNewGame(lobbyType);
-              }}
-            />
+            <>
+              <HostTypeOptions
+                accentColor={Colors.warning}
+                remoteMode={hideRemotePlay ? 'hidden' : 'available'}
+                localLocked={localPlayLocked}
+                onLocalLockedPress={onLocalPlayLockedPress}
+                onSelect={(lobbyType) => {
+                  if (!isStartNewGameControlled) {
+                    setInternalStartNewGameExpanded(false);
+                  }
+                  onStartNewGame(lobbyType);
+                }}
+              />
+              {!!startNewGameNote && (
+                <View style={styles.startNewGameNote}>{startNewGameNote}</View>
+              )}
+            </>
           )}
         </View>
       )}
@@ -846,7 +911,15 @@ export function RoundLeaderboard({
           //     att non-host behöver känna till replay-räknaren).
           //   • Host, omgång 1: faller igenom till normal blå Play Again +
           //     "Replay only possible 1 time..."-not (renderas nedan).
-          if (guestHost && (isHost ? guestReplaysUsed >= 1 : !hostInitiatedPlayAgain)) {
+          // "Start New Game" ERSÄTTER Play Again för host:en när call-siten
+          // skickar onStartNewGame (remote 1v1 + lokala re-match-flödet) —
+          // footer-raden blir då Home-only och det gula knappen ovanför är
+          // vägen vidare.
+          const hostUsesStartNewGame = isHost && !!onStartNewGame;
+          if (
+            hostUsesStartNewGame ||
+            (guestHost && (isHost ? guestReplaysUsed >= 1 : !hostInitiatedPlayAgain))
+          ) {
             return (
               <View style={styles.finalActions}>
                 <Pressable
@@ -865,14 +938,6 @@ export function RoundLeaderboard({
           }
           return (
             <>
-              {/* Guest host omgång 1: replay-begränsningen kommuniceras
-                  ovanför knapparna (Peters copy). Bara host-enheten — non-
-                  host känner inte till räknaren. */}
-              {guestHost && isHost && guestReplaysUsed === 0 && (
-                <Text style={styles.guestReplayNote}>
-                  Replay only possible 1 time for Guest Hosts
-                </Text>
-              )}
             <View style={styles.finalActions}>
               {/* Home-knapp — höjden = bottomY så Home:s underkant linjerar
                   exakt med rektangel-outline-botten + chevron-spetsens y i
@@ -906,7 +971,7 @@ export function RoundLeaderboard({
                    warning/premium-färgen för att signalera "actionable" och
                    skilja från host:s vanliga blå Play again. */
                 <PlayAgainButton
-                  lines={['Approve', 'Play again']}
+                  lines={['Approve', 're-match']}
                   color={Colors.warning}
                   onPress={onApprovePlayAgain}
                   disabled={false}
@@ -917,7 +982,7 @@ export function RoundLeaderboard({
                 /* Non-host innan host tappat: dämpad two-line + "Activated by
                     Host"-badge kant-skärande i top-position. */
                 <PlayAgainButton
-                  lines={['Approve', 'Play again']}
+                  lines={['Approve', 're-match']}
                   color={Colors.textSecondary}
                   onPress={undefined}
                   disabled={true}
@@ -1249,6 +1314,12 @@ const styles = StyleSheet.create({
     borderColor: Colors.warning,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  // Statusrad under lobbytyp-panelen (re-match: väntar på godkännanden).
+  startNewGameNote: {
+    marginTop: Spacing.sm,
+    marginHorizontal: Spacing.sm,
+    alignItems: 'center',
   },
   startNewGameBtnText: {
     fontSize: 17,

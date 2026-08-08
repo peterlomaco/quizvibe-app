@@ -1124,9 +1124,11 @@ export default function LobbyScreen() {
   const isGuestInRoom = guestMode && !!guestName?.trim();
   // Guest HOST — lobbyn skapades via "Start Game as Guest". Hosten spelar
   // under Guest-identitet (även om en profil råkar finnas på enheten).
-  // Låser settings till fasta värden (60s, Full, max 4 rundor/spelare,
-  // fulla era-spannet, inga paket), döljer credits-pill + Share invite
-  // och skippar credit-gaten i handleStartGame.
+  // Låser settings till fasta värden (max 4 rundor/spelare, fulla
+  // era-spannet, inga paket, Mixerboard pinnad ON), döljer credits-pill +
+  // Share invite och skippar credit-gaten i handleStartGame.
+  // Svarstid (30/45/60) och assistance (Full/Standard/Minimal) är FRIA
+  // sedan 2026-08-08 — bara Game era är fast av spelinställningarna.
   const isGuestHost = hostMode && guestHost === 'true' && !!guestName?.trim();
   // Renodlad 1vs1-lobby (2026-08-07): skapades via "1vs1 Matches"-valet på
   // Home. Driver den forcerade remote-1v1-seeden (host-sidan). UI-gating
@@ -1246,7 +1248,13 @@ export default function LobbyScreen() {
               age: guestBirthYear
                 ? CURRENT_YEAR - parseInt(guestBirthYear, 10)
                 : undefined,
-              assistance: 'full',
+              // Nivån väljs på Home:s guest-host-form (och kan sedan ändras
+              // i player-edit-sheeten) — var hårdkodad 'full' t.o.m.
+              // 2026-08-08. Fallback 'full' för äldre payloads utan param.
+              assistance:
+                guestAssistance === 'standard' || guestAssistance === 'minimal'
+                  ? guestAssistance
+                  : 'full',
               hcpComplete: true,
               isHost: true,
               approved: true,
@@ -1276,8 +1284,9 @@ export default function LobbyScreen() {
       // "Play Again + keep players" bevarar guest-hostens val — quiz.tsx:s
       // goToNewLobby skriver carry-over-settings till nya rumkoden innan
       // navigation. Fresh lobby saknar stored-rad → defaults nedan.
-      // Låsta fält förblir ALLTID hårdkodade (maxPlayers 4, 60s, full era,
-      // inga paket, alla source-kategorier ON — Mixerboard är guest-låst).
+      // Låsta fält förblir ALLTID hårdkodade (maxPlayers 4, full era, inga
+      // paket, alla source-kategorier ON — Mixerboard är guest-låst).
+      // answerResponseSeconds är guest-VARIABEL sedan 2026-08-08 (30/45/60).
       getLobbySettings(roomCode).then((stored) => {
         if (cancelled) return;
         // Renodlad 1vs1-lobby: mode forceras av Home-valet — stored/default
@@ -1296,7 +1305,17 @@ export default function LobbyScreen() {
         setSinglePlayerDefault(is1v1Lobby ? false : stored?.singlePlayerDefault ?? false);
         setMaxPlayers(is1v1Lobby ? 2 : 4);
         setRegion('Sweden');
-        setAnswerResponseSeconds(60);
+        // Clampa mot utbudet {30, 45, 60} — defensivt mot oväntade värden
+        // (och mot 15s-alternativet som togs bort 2026-06-08). Fresh guest-
+        // lobby defaultar till 30s (Peter 2026-08-08); carry-over av 45/60
+        // från föregående guest-lobby respekteras.
+        setAnswerResponseSeconds(
+          stored?.answerResponseSeconds === 45
+            ? 45
+            : stored?.answerResponseSeconds === 60
+              ? 60
+              : 30,
+        );
         setEraValues([ERA_MIN, ERA_MAX]);
         // Clampa mot guest-utbudet {2, 4} — defensivt mot oväntade värden.
         setRoundsCount(
@@ -4937,15 +4956,17 @@ export default function LobbyScreen() {
       pathname: '/quiz' as const,
       params: {
         // Guest host: fallback-assistance/age speglar guest-identiteten
-        // (Full + ålder från guestBirthYear) istället för de generiska
-        // 'standard'/'32'. turnOrder-hostens kort bär redan samma värden.
+        // (host-kortets valda nivå + ålder från guestBirthYear) istället för
+        // de generiska 'standard'/'32'. turnOrder-hostens kort bär samma
+        // värden. Nivån var låst till Full t.o.m. 2026-08-08 — sedan dess
+        // väljer guest host fritt via player-edit-sheeten.
         // Remote 1v1 med Mutual assistance på: hostens gemensamma nivå vinner
         // — samma värde som skrevs till båda remote_match_players-raderna.
         assistance:
           remoteMatchId && mutualAssistanceEnabled
             ? remoteAssistance
             : isGuestHost
-              ? 'full'
+              ? turnOrder.find((p) => p.id === '1')?.assistance ?? 'full'
               : 'standard',
         age: isGuestHost && guestBirthYear
           ? String(CURRENT_YEAR - parseInt(guestBirthYear, 10))
@@ -6971,24 +6992,24 @@ export default function LobbyScreen() {
                   <Text style={styles.infoIconText}>i</Text>
                 </Pressable>
               </View>
-              {/* 4-knapps-rad (15/30/45/60). Renderas för alla i lobbyn så
+              {/* 3-knapps-rad (30/45/60). Renderas för alla i lobbyn så
                   non-host ser host:s val i real-tid; bara host kan ändra
                   (disabled={!hostMode}). Default-värdet seeds från host:s
                   profil via host-seed-effekten ovan.
-                  Guest host: ENDAST 60s-knappen renderas (aktiv, ej ändringsbar)
-                  — 30s/45s-alternativen finns inte ens som dimmade val. */}
+                  Guest host har SAMMA val sedan 2026-08-08 (Peter) — tidigare
+                  var raden låst till 60s. */}
               <View style={styles.responseRow}>
-                {(isGuestHost ? ([60] as const) : ([30, 45, 60] as const)).map((sec) => {
+                {([30, 45, 60] as const).map((sec) => {
                   const isActive = answerResponseSeconds === sec;
                   return (
                     <Pressable
                       key={sec}
                       onPress={() => setAnswerResponseSeconds(sec)}
-                      disabled={!hostMode || isGuestHost}
+                      disabled={!hostMode}
                       style={({ pressed }) => [
                         styles.responseBtn,
                         isActive ? styles.responseBtnActive : styles.responseBtnInactive,
-                        pressed && hostMode && !isGuestHost && { opacity: 0.85 },
+                        pressed && hostMode && { opacity: 0.85 },
                       ]}
                     >
                       <Text style={[
@@ -7001,11 +7022,6 @@ export default function LobbyScreen() {
                   );
                 })}
               </View>
-              {isGuestHost && (
-                <Text style={styles.guestHostNote}>
-                  Option to select 30s or 45s not available for Guest user
-                </Text>
-              )}
             </View>
           </View>
           )}
@@ -7197,9 +7213,8 @@ export default function LobbyScreen() {
 
               {/* Assistance level — host får fritt välja valfri nivå (lättare
                   som svårare) från spelarens default. Ingen riktnings-låsning.
-                  Guest host som editerar SITT EGET kort: assistance är låst
-                  till Full — visa statisk chip + not istället för knappraden.
-                  Andra spelares kort editeras fritt även av guest host. */}
+                  Gäller sedan 2026-08-08 även guest host:s EGET kort (var
+                  tidigare låst till Full med statisk chip + not). */}
               <View style={playerEditSheet.fieldGroup}>
                 <Text style={playerEditSheet.fieldLabel}>Assistance Level</Text>
                 {mutualAssistanceActive ? (
@@ -7222,19 +7237,6 @@ export default function LobbyScreen() {
                       {hostMode
                         ? 'Shared by both players — change it under Game Mode.'
                         : 'Shared by both players — selected by the Host.'}
-                    </Text>
-                  </>
-                ) : isGuestHost && playerEditTarget?.isHost ? (
-                  <>
-                    <View style={playerEditSheet.skillRow}>
-                      <View style={[playerEditSheet.skillBtn, playerEditSheet.skillBtnActive]}>
-                        <Text style={[playerEditSheet.skillBtnText, playerEditSheet.skillBtnTextActive]}>
-                          Full
-                        </Text>
-                      </View>
-                    </View>
-                    <Text style={styles.guestHostNote}>
-                      Assistance level fixed to Full for Guest host
                     </Text>
                   </>
                 ) : (

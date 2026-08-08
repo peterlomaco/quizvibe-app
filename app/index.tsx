@@ -841,7 +841,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     clearEjected(newCode);
     clearGameStarted(newCode);
     const autofilled = /^Guest[A-Z]-\d{7}$/.test(guestName.trim());
-    track('guest_name_created', { autofilled, assistance: 'full' });
+    track('guest_name_created', { autofilled, assistance: guestAssistance });
     track('room_code_created', { guestHost: true });
     onClose();
     router.push({
@@ -852,6 +852,9 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
         guestHost: 'true',
         guestName: hostName,
         guestBirthYear: String(parsedBirthYear),
+        // Guest host väljer assistance på formen sedan 2026-08-08 (var
+        // hårdkodad Full) — seedar host-kortet i LobbyScreen.
+        guestAssistance,
         // Ingen lobbyType-param: guest-hosting når aldrig Remote 1vs1 (läget
         // är QuizVibe-users-only sedan 2026-08-08 och guarden ovan
         // returnerar för '1v1'), så en guest-host-lobby är alltid standard.
@@ -1256,28 +1259,16 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                   </TouchableOpacity>
                 </View>
 
-                {/* Guest-HOST: Response time + Assistance är hårdkodade
-                    (60s / Full) — visas som read-only info-rader istället
-                    för väljare. Inga rumkods-celler (koden genereras vid
-                    submit i handleStartGameAsGuestHost). */}
-                {step === 'guest-host' && (
-                  <View style={modal.fieldGroup}>
-                    <Text style={modal.fieldLabel}>Fixed Guest settings</Text>
-                    <View style={modal.guestFixedRow}>
-                      <Text style={modal.guestFixedLabel}>Answer response time</Text>
-                      <Text style={modal.guestFixedValue}>60s</Text>
-                    </View>
-                    <View style={modal.guestFixedRow}>
-                      <Text style={modal.guestFixedLabel}>Assistance level</Text>
-                      <Text style={modal.guestFixedValue}>Full</Text>
-                    </View>
-                  </View>
-                )}
-
-                {step === 'guest' && (
-                <>
-                {/* Assistance level (låst tills year valt). Default 'standard'
-                    är förvalt, så användaren kan gå direkt till Room Code. */}
+                {/* Assistance level (låst tills year valt). Default 'full'
+                    är förvalt, så användaren kan gå direkt till Room Code.
+                    Delas av guest-JOIN och guest-HOST sedan 2026-08-08 —
+                    guest host var tidigare låst till Full (visades som en
+                    read-only "Fixed Guest settings"-ruta tillsammans med
+                    60s svarstid). Guest host väljer numera BÅDA fritt:
+                    nivån här, svarstiden i lobbyn. Kvar som fast för guest
+                    host är enbart Game era (fulla spannet).
+                    Guest-HOST har inga rumkods-celler — koden genereras vid
+                    submit i handleStartGameAsGuestHost. */}
                 <Text
                   style={[
                     modal.statusHint,
@@ -1322,6 +1313,8 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                   </View>
                 </View>
 
+                {step === 'guest' && (
+                <>
                 {/* Room code — 3 bokstäver + bindestreck + 2 siffror +
                     1 trailing bokstav. Cell 0–2 och 5 visar bokstavs-
                     tangentbord, 3–4 sifferkeypad.
