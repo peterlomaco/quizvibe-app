@@ -1,7 +1,9 @@
 // Remote 1v1 — duellstatus/resultat-panel.
 //
-// Visas ovanför Final Leaderboard i quiz.tsx när ett Remote 1v1-spel
-// avslutats, och i 1vs1 Matches-resultatvyn på Home. Hämtar matchen +
+// Visas som egen sektion UNDER Final Leaderboard i quiz.tsx när ett
+// Remote 1v1-spel avslutats (spelaren ser sitt eget resultat överst,
+// motståndar-statusen därunder), och i 1vs1 Matches-resultatvyn på
+// Home. Hämtar matchen +
 // prenumererar på Realtime-UPDATE:s så "Waiting for opponent" flippar
 // till W/L/D-banner live när motståndaren spelar klart (finalize-RPC:n
 // uppdaterar remote_matches → postgres_changes → refetch).
@@ -55,7 +57,6 @@ export function RemoteMatchResultPanel({ matchId }: Props) {
   if (loading) {
     return (
       <View style={styles.card}>
-        <Text style={styles.title}>1vs1 Duel</Text>
         <View style={styles.waitRow}>
           <Text style={styles.waitText}>Loading match</Text>
           <SequentialDots color={Colors.textSecondary} />
@@ -75,7 +76,6 @@ export function RemoteMatchResultPanel({ matchId }: Props) {
     const opponentDone = opponent?.finishedAt != null;
     return (
       <View style={styles.card}>
-        <Text style={styles.title}>1vs1 Duel</Text>
         {opponentDone ? (
           // Motståndaren klar men jag inte finaliserad än (transient) —
           // realtime-refetchen flippar till resultat-läget strax.
@@ -86,7 +86,7 @@ export function RemoteMatchResultPanel({ matchId }: Props) {
         ) : (
           <>
             <View style={styles.waitRow}>
-              <Text style={styles.waitText}>Waiting for {oppName} to play</Text>
+              <Text style={styles.waitText}>Waiting for Player: {oppName} to play</Text>
               <SequentialDots color={Colors.warning} />
             </View>
             <Text style={styles.subText}>
@@ -106,14 +106,8 @@ export function RemoteMatchResultPanel({ matchId }: Props) {
     const iWon = match.winnerUserId === me.userId;
     return (
       <View style={[styles.card, iWon ? styles.cardWin : styles.cardLose]}>
-        <Text style={styles.title}>1vs1 Duel</Text>
         <Text style={[styles.banner, iWon ? styles.bannerWin : styles.bannerLose]}>
-          {iWon ? 'You won — walkover!' : 'You quit the match'}
-        </Text>
-        <Text style={styles.subText}>
-          {iWon
-            ? `${oppName} quit the match before finishing.`
-            : `${oppName} wins by walkover.`}
+          {iWon ? 'You won — walkover' : 'You lost — you quit the match'}
         </Text>
       </View>
     );
@@ -123,7 +117,6 @@ export function RemoteMatchResultPanel({ matchId }: Props) {
   if (match.status === 'cancelled') {
     return (
       <View style={[styles.card, styles.cardNeutral]}>
-        <Text style={styles.title}>1vs1 Duel</Text>
         <Text style={styles.neutralBanner}>Lobby deleted by Host</Text>
       </View>
     );
@@ -133,7 +126,6 @@ export function RemoteMatchResultPanel({ matchId }: Props) {
   if (match.result === 'void') {
     return (
       <View style={[styles.card, styles.cardNeutral]}>
-        <Text style={styles.title}>1vs1 Duel</Text>
         <Text style={styles.neutralBanner}>Match void — neither player finished in time</Text>
       </View>
     );
@@ -142,22 +134,20 @@ export function RemoteMatchResultPanel({ matchId }: Props) {
   const iWon = match.winnerUserId === me.userId;
   const isDraw = match.result === 'draw';
   const isWalkover = match.result === 'walkover';
+  // Enbart utfallet — poäng och rätt/fel läses av i leaderboard-tabellen
+  // ovanför, så boxen upprepar dem inte.
   const bannerText = isDraw
     ? "It's a draw!"
     : iWon
       ? isWalkover
-        ? 'You won — walkover!'
-        : 'You won!'
+        ? 'You won — walkover'
+        : 'You won'
       : isWalkover
-        ? `${oppName} won — walkover`
-        : `${oppName} won`;
-  const scoreLine = opponent
-    ? `You ${me.totalPoints} — ${opponent.totalPoints} ${oppName}`
-    : `You ${me.totalPoints}`;
+        ? 'You lost — walkover'
+        : 'You lost';
 
   return (
     <View style={[styles.card, isDraw ? styles.cardNeutral : iWon ? styles.cardWin : styles.cardLose]}>
-      <Text style={styles.title}>1vs1 Duel</Text>
       <Text
         style={[
           styles.banner,
@@ -166,12 +156,6 @@ export function RemoteMatchResultPanel({ matchId }: Props) {
       >
         {bannerText}
       </Text>
-      <Text style={styles.scoreLine}>{scoreLine}</Text>
-      {!isWalkover && opponent && (
-        <Text style={styles.subText}>
-          Correct answers: you {me.correctAnswers} — {opponent.correctAnswers} {oppName}
-        </Text>
-      )}
     </View>
   );
 }
@@ -180,6 +164,7 @@ const styles = StyleSheet.create({
   card: {
     marginHorizontal: Spacing.lg,
     marginTop: Spacing.md,
+    marginBottom: Spacing.md,
     padding: Spacing.md,
     borderRadius: Radius.md,
     borderWidth: 1.5,
@@ -190,13 +175,6 @@ const styles = StyleSheet.create({
   cardWin: { borderColor: Colors.success },
   cardLose: { borderColor: Colors.error },
   cardNeutral: { borderColor: Colors.borderStrong },
-  title: {
-    fontSize: FontSize.xs,
-    fontWeight: '700',
-    letterSpacing: 1.2,
-    textTransform: 'uppercase',
-    color: Colors.textSecondary,
-  },
   waitRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -218,11 +196,6 @@ const styles = StyleSheet.create({
     fontSize: FontSize.md,
     fontWeight: '600',
     color: Colors.textSecondary,
-  },
-  scoreLine: {
-    fontSize: FontSize.lg,
-    fontWeight: '700',
-    color: Colors.textPrimary,
   },
   subText: {
     fontSize: FontSize.sm,

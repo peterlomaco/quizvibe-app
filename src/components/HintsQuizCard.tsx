@@ -23,6 +23,7 @@ import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
 import type { HintItem, HintLibrary } from '../utils/hintsData';
 import { countryToFlagEmoji } from '../utils/hintsData';
 import { selectHints } from '../utils/hintsGenerator';
+import { createSeededRng } from '../utils/seededRandom';
 import { ProgressiveCover } from './ProgressiveCover';
 
 type AssistanceLevel = 'minimal' | 'standard' | 'full';
@@ -46,6 +47,13 @@ interface Props {
   /** contentSubject från katalog-YAML ('artist'|'band'|'actor'|'athlete' osv.)
    *  Styr kategori-rubrikens primära label och möjliggör crossover-text. */
   contentSubject?: string;
+  /**
+   * Deterministisk seed för hint-urvalet. Sätts i Remote 1v1 (`matchId:questionId`)
+   * så båda spelarna får EXAKT samma ledtrådar i samma sekvens — de spelar
+   * frågan var för sig på egna enheter utan sync-kanal. Utelämnad → Math.random
+   * (ny variation per runda, korrekt för lokala lägen där alla ser samma skärm).
+   */
+  hintsSeed?: string;
 }
 
 // ── Hint-gruppering ─────────────────────────────────────────────────────────
@@ -233,6 +241,7 @@ export function HintsQuizCard({
   hintsActive = true,
   mosaicActive,
   contentSubject,
+  hintsSeed,
 }: Props) {
   const [revealedCount, setRevealedCount] = useState(0);
   const scrollRef = useRef<ScrollView>(null);
@@ -248,9 +257,12 @@ export function HintsQuizCard({
   }, [mosaicActive]);
 
   const hints = useMemo(
-    () => (library ? selectHints(library, MAX_HINTS) : []),
+    () =>
+      library
+        ? selectHints(library, MAX_HINTS, hintsSeed ? createSeededRng(hintsSeed) : undefined)
+        : [],
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [resetKey, library],
+    [resetKey, library, hintsSeed],
   );
   const renderEntries = useMemo(() => buildRenderEntries(hints), [hints]);
 

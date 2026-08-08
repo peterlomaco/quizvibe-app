@@ -340,6 +340,13 @@ function buildFullNamesList(args: BuildFullNamesListArgs): ImageNameOption[] {
  *
  * Caller passar `allItems` = hela `IMAGE_QUIZ_QUESTIONS`-listan + `distractorNames`
  * = `DISTRACTOR_POOL_NAMES[correctItem.category]` så samma fil utan extra-imports.
+ *
+ * `rng` styr all shuffle/urval. Default `Math.random`. Remote 1v1 passar in en
+ * seedad RNG (`createSeededRng('<matchId>:<questionId>')`) så båda spelarnas
+ * enheter genererar EXAKT samma svarsalternativ i samma ordning — de spelar
+ * frågan var för sig utan sync-kanal, så determinism är enda garantin.
+ * OBS: identiskt utfall kräver även identisk `audienceSet` (och `assistance`,
+ * som styr vilket variant-läge som byggs).
  */
 export function buildImageVariant(
   correctItem: ImageQuizQuestion,
@@ -348,6 +355,7 @@ export function buildImageVariant(
   allItems: readonly ImageQuizQuestion[],
   distractorNames: readonly string[],
   totalOptions: number = DEFAULT_TOTAL_OPTIONS,
+  rng: () => number = Math.random,
 ): ImageQuestionVariant {
   if (assistance === 'full') {
     const nameList = buildFullNamesList({
@@ -356,6 +364,7 @@ export function buildImageVariant(
       allItems,
       distractorNames,
       totalOptions,
+      rng,
     });
     return { mode: 'full-names', nameList };
   }
@@ -368,6 +377,7 @@ export function buildImageVariant(
     allItems,
     distractorNames,
     totalOptions,
+    rng,
   });
   const correctPrefix = getPrefixForItem(correctItem.displayName, prefixLength);
   const optionsByPrefix: Record<string, ImageNameOption[]> = {};
@@ -380,6 +390,7 @@ export function buildImageVariant(
       allItems,
       distractorNames,
       totalOptions,
+      rng,
     });
   }
   return {

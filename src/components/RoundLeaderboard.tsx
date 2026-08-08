@@ -1,9 +1,11 @@
 import { Nunito_700Bold, useFonts } from '@expo-google-fonts/nunito';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Animated, Dimensions, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, G, Path } from 'react-native-svg';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
+import { HostTypeOptions, type HostLobbyType } from './HostTypeOptions';
 import { QuizVibeQAvatar } from './QuizVibeQAvatar';
+import { VersusIcon } from './VersusIcon';
 import { WifiOffIcon } from './WifiOffIcon';
 
 // Final Leaderboard bakgrunds-Q + pokal. Q-SVG:n är ~90% av skärmbredden så
@@ -272,12 +274,30 @@ function PlayAgainButton({
 
 export type AssistanceLevel = 'minimal' | 'standard' | 'full';
 
+/**
+ * Färdigaggregerad statistik för en spelare vars per-fråga-svar INTE finns
+ * i allRoundScoresHistory. Remote 1v1 använder det för motståndaren:
+ * `remote_match_answers` är RLS-skyddad per user, så bara summary-raden
+ * (poäng/rätt/snittid) är läsbar. Fält vi saknar underlag för — LAST och
+ * Last 5 — renderas som '—' respektive tomma prickar.
+ */
+export interface LeaderboardSummaryStats {
+  playedRounds: number;
+  correctAnswers: number;
+  avgResponseSeconds: number | null;
+  points: number;
+}
+
 export interface LeaderboardPlayer {
   id: string;
   name: string;
   emoji: string;
-  assistance: AssistanceLevel;
-  age: number;
+  /** Optional: remote-motståndarens rad kan sakna dem (meta-raden hoppas
+   *  då över istället för att visa "Age 0"). */
+  assistance?: AssistanceLevel;
+  age?: number;
+  /** Sätts istället för att aggregera ur allRoundScoresHistory. */
+  summaryStats?: LeaderboardSummaryStats;
   isYou?: boolean;
   isHost?: boolean;
   /** Spelaren har lämnat spelet via Leave Game (non-host i Individual
@@ -361,6 +381,9 @@ export function RoundLeaderboard({
   guestReplaysUsed = 0,
   hostInitiatedPlayAgain = false,
   allRoundScoresHistory,
+  belowTable,
+  remote1v1 = false,
+  onStartNewGame,
 }: {
   players: LeaderboardPlayer[];
   /** Behållen för API-bakåtkompabilitet — tabellen aggregerar allt från
@@ -397,17 +420,54 @@ export function RoundLeaderboard({
   hostInitiatedPlayAgain?: boolean;
   allRoundScoresHistory: RoundScore[][];
   hcpChanges?: Record<string, HcpChange>;
+  /** Extra sektion som renderas UNDER tabellen, inuti scroll-innehållet
+   *  (dvs ovanför sticky-footern). Remote 1v1 skickar hit sin duell-panel
+   *  ("Waiting for Player: X to play" / W-L-D-resultat) så spelarens eget
+   *  resultat står överst och motståndar-statusen kommer efter. */
+  belowTable?: React.ReactNode;
+  /** Remote 1v1 — rubriken blir "Final Leaderboard - 1vs1" med duell-
+   *  ikonen (samma VersusIcon som Home:s Remote Play + 1vs1 Matches). */
+  remote1v1?: boolean;
+  /** Gold "Start New Game"-knapp ovanför footer-knapparna med SAMMA inline-
+   *  utfällning (Local Play / Remote Play) som Home:s knapp. Sätts av
+   *  remote 1v1-slutskärmen, där Play Again inte finns — utan den vore
+   *  Home enda vägen vidare och spelaren måste ta omvägen via startsidan
+   *  för att utmana igen. Utelämnas → knappen renderas inte alls. */
+  onStartNewGame?: (lobbyType: HostLobbyType) => void;
 }) {
   // Nunito 700 Bold för Final Leaderboard:s "QuizVibe"-vattenstämpel-text
   // under Q+pokal-loggan. Matchar startskärmens appName-textformat 1:1.
   // Faller tillbaka till systemfont under font-load.
   const [fontsLoaded] = useFonts({ Nunito_700Bold });
   const brandFont = fontsLoaded ? 'Nunito_700Bold' : undefined;
+  // "Start New Game"-knappens inline-utfällning (samma mönster som Home:
+  // tap togglar panelen, valet stänger den och lämnar över till callbacken).
+  const [startNewGameExpanded, setStartNewGameExpanded] = useState(false);
   // Aggregera per-spelare-statistik (samma struktur som GetReadyIntro:s
   // live-leaderboard så det är lätt att jämföra). Sortering: poäng desc →
   // avg response asc (ties brutna av snabbaste genomsnitt).
   const tableEntries = useMemo(() => {
     const entries = players.map((p) => {
+      // Förberäknad rad (remote-motståndaren) — vi har ingen per-fråga-
+      // historik att aggregera, så statistiken kommer färdig utifrån.
+      if (p.summaryStats) {
+        const s = p.summaryStats;
+        return {
+          playerId: p.id,
+          name: p.name,
+          emoji: p.emoji,
+          age: p.age,
+          assistance: p.assistance,
+          points: s.points,
+          playedRounds: s.playedRounds,
+          correctAnswers: s.correctAnswers,
+          incorrectAnswers: Math.max(0, s.playedRounds - s.correctAnswers),
+          avgResponseSeconds: s.avgResponseSeconds ?? 0,
+          lastResponseSeconds: null as number | null,
+          lastFiveResults: [] as boolean[],
+          hasLeft: !!p.hasLeft,
+        };
+      }
       const playerScores = allRoundScoresHistory.flatMap((round) =>
         round.filter((s) => s.playerId === p.id),
       );
@@ -468,9 +528,15 @@ export function RoundLeaderboard({
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.headerRow}>
-          <Text style={styles.headerTitle}>
-            {isLastRound ? 'Final Leaderboard' : 'Leaderboard'}
-          </Text>
+          {/* Remote 1v1 får duell-ikonen bredvid rubriken så slutskärmen
+              matchar Home:s "Remote Play" + 1vs1 Matches-vokabulär. */}
+          <View style={styles.headerTitleRow}>
+            <Text style={styles.headerTitle}>
+              {isLastRound ? 'Final Leaderboard' : 'Leaderboard'}
+              {remote1v1 ? ' - 1vs1' : ''}
+            </Text>
+            {remote1v1 && <VersusIcon height={26} />}
+          </View>
           {/* Round X of Y-undertitel renderas bara vid icke-sista ronder.
               Final-vyn döljer den helt så bara huvudrubriken syns längst upp. */}
           {!isLastRound && (
@@ -571,7 +637,7 @@ export function RoundLeaderboard({
                     {entry.connectionErrors > 0 ? String(entry.connectionErrors) : '—'}
                   </Text>
                   <Text style={[styles.lbMidCell, styles.lbColTime]}>
-                    {entry.playedRounds > 0
+                    {entry.playedRounds > 0 && entry.avgResponseSeconds > 0
                       ? `${entry.avgResponseSeconds.toFixed(2)}s`
                       : '—'}
                   </Text>
@@ -626,6 +692,11 @@ export function RoundLeaderboard({
           ))}
         </View>
       </View>
+
+      {/* Extra sektion under tabellen (Remote 1v1-duellpanelen). Ligger inuti
+          scroll-innehållet så den hamnar mellan leaderboarden och sticky-
+          footern istället för under Home/Play Again-knapparna. */}
+      {belowTable}
       </ScrollView>
 
       {/* Bakgrunds-Q med pokal-ikon som transparent vattenstämpel ÖVER
@@ -689,7 +760,32 @@ export function RoundLeaderboard({
           knapparna alltid syns även när tabellen scrollar. justifyContent:
           'flex-end' höger-ställer Home + Play Again i ändan av raden. */}
       <View style={styles.stickyFooter}>
-      {isLastRound ? (
+      {/* Gold "Start New Game" med samma inline-utfällning som Home:s knapp
+          (Local Play / Remote Play). Renderas bara när call-siten skickar
+          onStartNewGame — idag remote 1v1-slutskärmen, som saknar Play
+          Again. Panelen fälls ut UNDER knappen precis som på Home, och
+          medan den är utfälld göms Home/Play Again-raden så valet står
+          ensamt (samma mönster som Home döljer sina övriga knappar). */}
+      {isLastRound && onStartNewGame && (
+        <View style={styles.startNewGameWrap}>
+          <Pressable
+            onPress={() => setStartNewGameExpanded((prev) => !prev)}
+            style={({ pressed }) => [styles.startNewGameBtn, pressed && { opacity: 0.85 }]}
+          >
+            <Text style={styles.startNewGameBtnText}>Start New Game</Text>
+          </Pressable>
+          {startNewGameExpanded && (
+            <HostTypeOptions
+              accentColor={Colors.warning}
+              onSelect={(lobbyType) => {
+                setStartNewGameExpanded(false);
+                onStartNewGame(lobbyType);
+              }}
+            />
+          )}
+        </View>
+      )}
+      {startNewGameExpanded ? null : isLastRound ? (
         (() => {
           // Två separata höjd-värden:
           //   playAgainHeight = Pressable:s touchable area
@@ -901,6 +997,15 @@ const styles = StyleSheet.create({
     alignItems: 'baseline',
     justifyContent: 'space-between',
   },
+  // Rubrik + ev. duell-ikon på samma rad. 'center' (inte 'baseline') så
+  // VersusIcon:s SVG-box linjerar mot textens mitt istället för att hänga
+  // under baslinjen.
+  headerTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    flexShrink: 1,
+  },
   // Matchar Lobby:s screenTitle (24 / 700) så Final Leaderboard-rubriken
   // läser i samma vikt och hierarki som "Game Lobby" i lobby-vyn.
   headerTitle: {
@@ -1098,6 +1203,27 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: Spacing.sm,
     alignItems: 'flex-start',
+  },
+  // "Start New Game"-blocket (knapp + ev. utfälld lobbytyp-panel). Marginal
+  // nedåt skiljer det från Home/Play Again-raden när panelen är infälld.
+  startNewGameWrap: {
+    marginBottom: Spacing.sm,
+  },
+  // Speglar Home:s gameBtn + gameBtnUser 1:1 (höjd 56, gold bg + gold kant,
+  // svart text) så knappen läses som exakt samma CTA som på startskärmen.
+  startNewGameBtn: {
+    height: 56,
+    borderRadius: Radius.md,
+    backgroundColor: Colors.warning,
+    borderWidth: 1,
+    borderColor: Colors.warning,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  startNewGameBtnText: {
+    fontSize: 17,
+    fontWeight: '600',
+    color: '#000000',
   },
   // Home-knapp: Q-logo VÄNSTER om "Home"-text på samma rad. Bg matchar
   // leaderboard-tabellens dataradsbg (Colors.card) så knappen visuellt knyter

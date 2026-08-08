@@ -33,16 +33,27 @@ const TYPE_ORDER: Record<string, number> = {
   merit: 18,
 };
 
-function shuffleArray<T>(arr: T[]): T[] {
+function shuffleArray<T>(arr: T[], rng: () => number): T[] {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
+    const j = Math.floor(rng() * (i + 1));
     [a[i], a[j]] = [a[j], a[i]];
   }
   return a;
 }
 
-export function selectHints(library: HintLibrary, count: number = 15): HintItem[] {
+/**
+ * `rng` styr vilka hints som lottas in (och i vilken ordning inom samma
+ * prioritet+typ). Default `Math.random` = ny variation per runda. Remote 1v1
+ * passar in en seedad RNG (se `createSeededRng`) så BÅDA spelarna får exakt
+ * samma ledtrådar i samma sekvens — de spelar samma fråga var för sig och
+ * måste ha identiskt underlag.
+ */
+export function selectHints(
+  library: HintLibrary,
+  count: number = 15,
+  rng: () => number = Math.random,
+): HintItem[] {
   const { hints } = library;
 
   // Om biblioteket är för litet — ta allt (sorterat)
@@ -62,12 +73,12 @@ export function selectHints(library: HintLibrary, count: number = 15): HintItem[
   const selected: HintItem[] = [];
 
   // P5 inkluderas alltid (de allra mest ikoniska ledtrådarna)
-  selected.push(...shuffleArray(buckets[5]));
+  selected.push(...shuffleArray(buckets[5], rng));
 
   // Fyll resterande platser med slumpmässigt urval från P4 → P1
   for (const p of [4, 3, 2, 1] as const) {
     if (selected.length >= count) break;
-    const pool = shuffleArray(buckets[p]);
+    const pool = shuffleArray(buckets[p], rng);
     const take = Math.min(pool.length, count - selected.length);
     selected.push(...pool.slice(0, take));
   }

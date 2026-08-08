@@ -34,6 +34,7 @@ import {
   getMyAnswers,
   getOwnUserId,
   subscribeToMatch,
+  type RemoteMatchPlayer,
   persistQuestionSequence,
   upsertAnswer,
 } from '@/src/utils/remoteMatches';
@@ -78,6 +79,7 @@ import {
   type ImageQuizQuestion,
 } from '@/src/utils/quizImageQuestions';
 import { buildImageVariant } from '@/src/utils/imageQuestionBuilder';
+import { createSeededRng } from '@/src/utils/seededRandom';
 import { HINTS_LIBRARY, getHintRegionScope, inferGender, inferNationality, inferSport, type HintLibrary } from '@/src/utils/hintsData';
 import { HintsQuizCard } from '@/src/components/HintsQuizCard';
 import { HeartbeatSound } from '@/src/components/HeartbeatSound';
@@ -1023,6 +1025,23 @@ export default function QuizScreen() {
   // till remote_match_answers och slutresultatet finaliseras via RPC.
   const remoteMatchId = params.remoteMatchId ?? null;
   const isRemote = gameMode === 'remote-1v1' && !!remoteMatchId;
+  // Remote 1v1: BÅDA deltagarnas åldrar (ur match-snapshotten). Behövs eftersom
+  // `turnOrder` i remote bara innehåller spelaren själv — utan detta bygger de
+  // två enheterna olika audience-set (= olika distraktor-pool) och därmed olika
+  // svarsalternativ på samma fråga. Se audienceSetForVariants nedan.
+  const [remoteMatchAges, setRemoteMatchAges] = useState<number[] | null>(null);
+  /**
+   * Deterministisk seed för allt slumpat innehåll i en remote-fråga (hint-urval,
+   * svarsalternativ, deras ordning). Båda enheterna kör samma kod med samma
+   * seed → identiskt underlag, trots att det inte finns någon sync-kanal under
+   * spelet. Returnerar undefined i lokala lägen (alla ser samma skärm där, och
+   * variation per runda är önskvärd).
+   */
+  const seedForRemoteQuestion = useCallback(
+    (questionId: string): string | undefined =>
+      isRemote && remoteMatchId ? `${remoteMatchId}:${questionId}` : undefined,
+    [isRemote, remoteMatchId],
+  );
   // Det egna player_id:t (= lobby_players.player_id) som Lobby skickade.
   // Används av non-host:s Leave-flöde för att broadcasta `player_left` så
   // host:s skärm kan visa popup + markera spelaren som hasLeft i leader-
@@ -1244,10 +1263,19 @@ export default function QuizScreen() {
   // Audience-set lyfts ut som top-level useMemo så det kan återanvändas
   // av image-variant-builderns runtime-generation (gameQuestions räknar
   // ut samma värde internt — pekar tillsammans mot samma sak).
-  const audienceSetForVariants = useMemo(
-    () => buildAudienceSet(turnOrder) as Set<ImageQuestionAudience>,
-    [turnOrder],
-  );
+  // Remote 1v1: bygg set:et ur BÅDA deltagarnas åldrar (ur match-snapshotten)
+  // istället för turnOrder, som där bara innehåller spelaren själv. Annars får
+  // en 1985-född och en 2001-född olika audience-set → olika distraktor-pool →
+  // olika svarsalternativ på exakt samma fråga. Innan snapshotten hämtats
+  // (remoteMatchAges === null) faller vi tillbaka på turnOrder; render-gaten
+  // ("Preparing 1vs1 match") håller kvar spel-UI:t tills init-effekten är klar,
+  // så ingen variant hinner byggas på det provisoriska set:et.
+  const audienceSetForVariants = useMemo(() => {
+    if (isRemote && remoteMatchAges) {
+      return buildAudienceSet(remoteMatchAges.map((age) => ({ age }))) as Set<ImageQuestionAudience>;
+    }
+    return buildAudienceSet(turnOrder) as Set<ImageQuestionAudience>;
+  }, [turnOrder, isRemote, remoteMatchAges]);
 
   // Fråge-IDs som hosten sett i tidigare omgångar — laddas från AsyncStorage
   // vid mount. Används av gameQuestions-useMemo för att ordna osedda frågor
@@ -1753,6 +1781,13 @@ export default function QuizScreen() {
         if (await bailIfEnded(match)) return;
       }
       if (cancelled || !match?.questionIds) return;
+      // Båda deltagarnas åldrar → gemensamt audience-set för variant-bygget
+      // (se audienceSetForVariants). Sätts FÖRE remoteSessionReady så första
+      // frågans alternativ byggs på det match-breda set:et direkt.
+      const ages = match.players
+        .map((p) => p.age)
+        .filter((a): a is number => typeof a === 'number');
+      setRemoteMatchAges(ages);
       const ids = match.questionIds.filter((id) => ALL_QUESTIONS_MAP.has(id));
       if (ids.length === 0) {
         // Katalog-skew: inga av matchens frågor finns i denna app-version.
@@ -1900,15 +1935,16 @@ export default function QuizScreen() {
   }, [gameQuestions]);
 
   // Svarstyp per fråga ('Year' | 'Name') — driver GetReadyIntro:s blå badge.
-  // Härleds från faktisk question-typ (actor-select/image → 'Name', timeline → 'Year')
-  // istället för från kategori (Film var alltid 'Name' vilket var fel för
-  // movie-items med answerMethods: ["timeline"]).
+  // Härleds från faktisk question-typ, INTE från mainCategory: en Film-fråga
+  // är 'Name' bara om den blev en `actor-select` (= katalog-item med
+  // `correctNames`). Film-items UTAN correctNames blir vanliga timeline-frågor
+  // med årsväljare — t.ex. "The Angry Birds Movie" ("Which Year was this Movie
+  // launched?"). Den gamla `mainCategory === 'Film' → 'Name'`-regeln gav dem
+  // fel badge (Name) medan nedräkningen sa "When" och svaret var ett år.
   const answerTypeByQuestion = useMemo<('Year' | 'Name')[]>(() => {
     return gameQuestions.map((q, qIdx) => {
       if (q.type === 'actor-select') return 'Name';
       if (q.type === 'image') return 'Name';
-      // Film-trailers (timeline/youtube, mainCategory Film) svaras med filmens namn → 'Name'
-      if (q.type === 'timeline' && q.mainCategory === 'Film') return 'Name';
       // Spotify Name-frågor → 'Name' badge i GetReadyIntro-kön
       if (q.type === 'timeline' && (q as { spotifyTrackId?: string }).spotifyTrackId) {
         return resolveSpotifyAnswerType(qIdx) === 'name' ? 'Name' : 'Year';
@@ -1943,8 +1979,9 @@ export default function QuizScreen() {
     return broadcastAllQuestionIds.map((id, qIdx) => {
       const q = ALL_QUESTIONS_MAP.get(id);
       if (!q) return 'Year';
+      // Se answerTypeByQuestion ovan: ingen mainCategory-baserad Film-regel —
+      // Film-timeline-frågor (utan correctNames) svaras med år.
       if (q.type === 'actor-select' || q.type === 'image') return 'Name';
-      if (q.type === 'timeline' && q.mainCategory === 'Film') return 'Name';
       if (q.type === 'timeline' && (q as { spotifyTrackId?: string }).spotifyTrackId) {
         if (effectiveAnswerYear && effectiveAnswerName) {
           // Räkna bara Spotify-frågor FÖRE denna position — exakt samma logik som
@@ -2664,6 +2701,10 @@ export default function QuizScreen() {
       }
     }
 
+    // Remote 1v1: seedad RNG så båda spelarnas enheter genererar identiska
+    // alternativ i identisk ordning (ingen sync-kanal under spelet).
+    const variantSeed = seedForRemoteQuestion(question.id);
+
     return buildImageVariant(
       question.source,
       currentAssistance,
@@ -2671,9 +2712,10 @@ export default function QuizScreen() {
       itemPool,
       DISTRACTOR_POOL_NAMES[question.source.category] ?? [],
       5, // 5 svarsalternativ
+      variantSeed ? createSeededRng(variantSeed) : undefined,
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [question.id, currentAssistance, audienceSetForVariants]);
+  }, [question.id, currentAssistance, audienceSetForVariants, seedForRemoteQuestion]);
 
   // Bygg Letter Grid-variant för Spotify Name-frågor.
   // Kör som useEffect (inte useMemo) eftersom derivedArtistName är en string
@@ -3170,7 +3212,7 @@ export default function QuizScreen() {
     // Mock-motspelare genereras BARA vid direkt-nav (tom turnOrder).
     if (turnOrder.length === 0) {
       const opponentScores: RoundScore[] = MOCK_OPPONENTS.map((opp) => {
-        const gen = generateOpponentRoundScore(opp.assistance);
+        const gen = generateOpponentRoundScore(opp.assistance ?? 'standard');
         return {
           playerId: opp.id,
           points: gen.points,
@@ -4881,7 +4923,13 @@ export default function QuizScreen() {
         .broadcastLobbyDeleted({ room_code: params.roomCode })
         .catch(() => {});
     }
-    if (isHost && params.roomCode) {
+    // Remote 1v1: host:s Home från Final Leaderboard avslutar INTE matchen.
+    // Motståndaren har 48h på sig och kan mycket väl inte ha börjat spela än
+    // — raderar vi rummet här får de "Game has been deleted by Host" och
+    // förlorar sin omgång. Matchen är auktoritativ (remote_matches lever
+    // oberoende av rooms-raden, som cron:en städar vid sin 24h-expiry), så
+    // host bara navigerar hem och väntar på resultatet i 1vs1 Matches.
+    if (isHost && !isRemote && params.roomCode) {
       // Cleanup-bunten speglar Quit Game-flödet — stänger rummet i Supabase
       // (server-side flagga + RLS-stäng) och rensar alla per-rum-mock-stores.
       try {
@@ -4896,6 +4944,75 @@ export default function QuizScreen() {
       clearGameStarted(params.roomCode);
     }
     router.replace('/');
+  };
+
+  // ── "Start New Game" från Final Leaderboard (remote 1v1) ────────────────
+  // Remote-slutskärmen har ingen Play Again (asynkron duell — nytt spel
+  // skapas alltid från en ny lobby), så spelaren fick tidigare gå via Home
+  // för att utmana igen. Knappen speglar Home:s "Start New Game" inklusive
+  // Local/Remote-utfällningen; det här är dess handler och den speglar
+  // handleCreateGame i app/index.tsx steg för steg (credit-gate →
+  // registerActiveRoom → per-rum-cleanup → lobby).
+  //
+  // OBS: den PÅGÅENDE matchens rum lämnas orört (samma resonemang som i
+  // handleGoHome ovan) — motståndaren har 48h på sig och rooms-raden
+  // städas av 24h-expiry, så vi får inte deactivate:a den här.
+  const handleStartNewGameFromFinal = async (lobbyType: 'standard' | '1v1') => {
+    const [freshProfile, premium] = await Promise.all([
+      loadProfile(),
+      hasPremiumSubscription(),
+    ]);
+    // Credit-gate: Premium = obegränsat, annars krävs Free-saldo. Samma
+    // copy + Store-deeplink som Home så upplevelsen är identisk.
+    if (!premium && (freshProfile?.freeGameCredits ?? 0) === 0) {
+      Alert.alert(
+        'Out of Host Game Credits',
+        'You have used your free host games for today. Wait for the daily refresh at midnight CET, or upgrade to QuizVibe Premium for unlimited host games.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Go to Store', onPress: () => router.push('/store?focus=subscription&from=/') },
+        ],
+      );
+      return;
+    }
+    const code = generateRoomCode();
+    const newIsRemote1v1 = lobbyType === '1v1';
+    // Returvärdet MÅSTE kontrolleras — tyst no-op ger en fantom-lobby som
+    // joiners inte hittar ("Room not found"-buggen 2026-08-07).
+    const roomRegistered = await registerActiveRoom(code, {
+      // Remote 1vs1 är alltid exakt 2 spelare — sätts redan här så
+      // kapacitetskollen vid join är korrekt från första sekunden.
+      maxPlayers: newIsRemote1v1 ? 2 : freshProfile?.maxPlayers ?? 4,
+      hostIsPremium: premium,
+      currentPlayerCount: 1,
+      hostPlayerName: freshProfile?.playerName ?? '',
+      gameStarted: false,
+      isRemote1v1: newIsRemote1v1,
+    });
+    if (!roomRegistered) {
+      Alert.alert(
+        'Could not create game lobby',
+        'The room could not be registered. Check your connection and that you are signed in, then try again.',
+      );
+      return;
+    }
+    // Fresh slate för den nya koden så ingen stale per-rum-data smyger in.
+    clearLeftPlayers(code);
+    clearLobbyPlayers(code);
+    clearLobbySettings(code);
+    clearEjected(code);
+    clearGameStarted(code);
+    track('room_code_created');
+    // replace (inte push) — det avslutade spelet ska inte ligga kvar bakom
+    // den nya lobbyn i navigationsstacken.
+    router.replace({
+      pathname: '/lobby',
+      params: {
+        code,
+        isHost: 'true',
+        ...(newIsRemote1v1 ? { lobbyType: '1v1' } : {}),
+      },
+    });
   };
 
   // ── Non-host Play Again-flöde ───────────────────────────────────────────
@@ -5340,6 +5457,59 @@ export default function QuizScreen() {
     return unsubscribe;
   }, [isRemote, remoteMatchId]);
 
+  // ── Remote 1v1: motståndarens rad på Final Leaderboard ───────────────
+  // Duellen är asynkron, så motståndarens resultat finns bara server-side.
+  // Deras per-fråga-svar är RLS-skyddade (`remote_match_answers` filtrerar
+  // på user_id) — vi läser summary-raden ur `remote_match_players` och
+  // matar in den som en förberäknad leaderboard-rad. Raden dyker upp först
+  // när de faktiskt spelat klart (finishedAt satt); tills dess är
+  // leaderboarden en-radig och duellpanelen under den säger "Waiting for
+  // Player: X to play". Realtime-prenumerationen gör att raden poppar in
+  // live om motståndaren blir klar medan slutskärmen står uppe.
+  const [remoteOpponentSummary, setRemoteOpponentSummary] =
+    useState<RemoteMatchPlayer | null>(null);
+  useEffect(() => {
+    if (!isRemote || !remoteMatchId || phase !== 'leaderboard') return;
+    let cancelled = false;
+    const load = async () => {
+      const [m, myId] = await Promise.all([getMatch(remoteMatchId), getOwnUserId()]);
+      if (cancelled || !m || !myId) return;
+      const opp = m.players.find((p) => p.userId !== myId) ?? null;
+      setRemoteOpponentSummary(opp?.finishedAt ? opp : null);
+    };
+    void load();
+    const unsubscribe = subscribeToMatch(remoteMatchId, () => { void load(); });
+    return () => {
+      cancelled = true;
+      unsubscribe();
+    };
+  }, [isRemote, remoteMatchId, phase]);
+
+  // Spelarlista till Final Leaderboard. Identisk med gamePlayers utom i
+  // remote-fallet där motståndarens summary-rad läggs till som #2 (eller
+  // #1 — tabellen sorterar på poäng som vanligt).
+  const leaderboardPlayers: LeaderboardPlayer[] = useMemo(() => {
+    if (!remoteOpponentSummary) return gamePlayers;
+    const opp = remoteOpponentSummary;
+    return [
+      ...gamePlayers,
+      {
+        id: `remote-opponent-${opp.userId}`,
+        name: formatPlayerLabel(opp),
+        emoji: '👤',
+        assistance: (opp.assistance as AssistanceLevel | null) ?? undefined,
+        age: opp.age ?? undefined,
+        summaryStats: {
+          // De har finaliserat → hela sekvensen är besvarad.
+          playedRounds: totalQuestions,
+          correctAnswers: opp.correctAnswers,
+          avgResponseSeconds: opp.avgResponseSeconds,
+          points: opp.totalPoints,
+        },
+      },
+    ];
+  }, [gamePlayers, remoteOpponentSummary, totalQuestions]);
+
   // Frågor som hunnit visas i den här sessionen — skrivs till seen-
   // historiken så de inte återkommer direkt i NÄSTA spel. I remote är
   // `gameQuestions` matchens auktoritativa sekvens (remote-override i
@@ -5418,9 +5588,15 @@ export default function QuizScreen() {
   // delete:n och navigerar bort själv, så vi behöver inte poppa något åt
   // dem. Samma defensive channel-cleanup-pattern som LobbyScreen så
   // remount inte racear med stale-subscribed-channels.
+  //
+  // EJ i Remote 1v1: där är rums-raden bara en genväg till lobbyn, medan
+  // remote_matches äger spelets livscykel (48h). Rummet kan försvinna av
+  // skäl som inte alls avslutar matchen (host går Home, 24h-expiry) och
+  // gör det dessutom vid host:s forfeit — där motståndaren ska få
+  // walkover-popupen via subscribeToMatch, inte "deleted by Host".
   const [hostDeletedDetected, setHostDeletedDetected] = useState(false);
   useEffect(() => {
-    if (isHost || !params.roomCode) return;
+    if (isHost || isRemote || !params.roomCode) return;
     const code = params.roomCode;
     const topic = `realtime:quiz_room:${code}`;
     supabase.getChannels()
@@ -5437,7 +5613,7 @@ export default function QuizScreen() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [isHost, params.roomCode]);
+  }, [isHost, isRemote, params.roomCode]);
 
   useEffect(() => {
     if (!hostDeletedDetected) return;
@@ -6070,14 +6246,10 @@ export default function QuizScreen() {
         {inactivityCountdownSec !== null && (
           <InactivityCountdownBanner secondsLeft={inactivityCountdownSec} />
         )}
-        {/* Remote 1v1: duellstatus/resultat ovanför leaderboarden — visar
-            "Waiting for opponent" (live via Realtime) eller W/L/D-banner
-            med server-beräknat resultat. */}
-        {isRemote && remoteMatchId && isLastQuestion && (
-          <RemoteMatchResultPanel matchId={remoteMatchId} />
-        )}
         <RoundLeaderboard
-          players={gamePlayers}
+          // Remote: motståndarens summary-rad ingår när de spelat klart, så
+          // slutskärmen visar en riktig #1/#2-tabell med båda spelarna.
+          players={leaderboardPlayers}
           roundScores={currentRoundScores}
           totalsByPlayerId={gameTotals}
           roundNumber={questionIndex + 1}
@@ -6096,6 +6268,27 @@ export default function QuizScreen() {
           hostInitiatedPlayAgain={hostInitiatedPlayAgain}
           allRoundScoresHistory={allRoundScoresHistory}
           hcpChanges={isLastQuestion ? playerHcpChanges : undefined}
+          remote1v1={isRemote}
+          // Remote 1v1: gold "Start New Game" + Local/Remote-utfällning
+          // (samma som Home) eftersom Play Again inte finns här. Bara på
+          // sista frågans slutskärm och aldrig för guest hosts — remote
+          // spelas enbart av QuizVibe-users, och lokal guest-host får
+          // fortsatt sin egen "bara Home"-footer.
+          onStartNewGame={
+            isRemote && isLastQuestion && !isGuestHostGame
+              ? handleStartNewGameFromFinal
+              : undefined
+          }
+          // Remote 1v1: duellstatus/resultat i en EGEN sektion UNDER
+          // leaderboarden — den som når slutskärmen först ser sitt eget
+          // resultat överst och därunder "Waiting for Player: X to play"
+          // (live via Realtime) som flippar till W/L/D-banner när
+          // motståndaren spelat klart.
+          belowTable={
+            isRemote && remoteMatchId && isLastQuestion ? (
+              <RemoteMatchResultPanel matchId={remoteMatchId} />
+            ) : undefined
+          }
         />
         {/* Lock-overlay för non-host som tappat Approve Play Again men där
             host ännu inte hunnit skapa nya lobbyn. cancelable: false →
@@ -6394,6 +6587,7 @@ export default function QuizScreen() {
                   isRevealed={phase === 'reveal'}
                   hintsActive={hintsReady}
                   mosaicActive={timerActive}
+                  hintsSeed={seedForRemoteQuestion(question.id)}
                 />
               </View>
             ) : youtubeError ? (
@@ -6842,6 +7036,7 @@ export default function QuizScreen() {
                   assistance={currentAssistance}
                   movieTitle={question.displayName}
                   movieYear={question.correctYear}
+                  optionsSeed={seedForRemoteQuestion(question.id)}
                 />
               </View>
             ) : imageVariant ? (

@@ -13,6 +13,7 @@
 import { useMemo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '@/src/theme';
+import { createSeededRng } from '@/src/utils/seededRandom';
 
 type Phase = 'intro' | 'countdown' | 'question' | 'awaiting' | 'reveal' | 'leaderboard';
 type AssistanceLevel = 'full' | 'standard' | 'minimal';
@@ -20,10 +21,10 @@ type AssistanceLevel = 'full' | 'standard' | 'minimal';
 const QUIZ_ERROR_RED = '#FF3B30';
 const PREFIX_BTN_WIDTH = 72;
 
-function shuffle<T>(arr: T[]): T[] {
+function shuffle<T>(arr: T[], rng: () => number): T[] {
   const out = [...arr];
   for (let i = out.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
+    const j = Math.floor(rng() * (i + 1));
     [out[i], out[j]] = [out[j], out[i]];
   }
   return out;
@@ -53,6 +54,12 @@ interface Props {
   movieTitle?: string;
   /** Filmens releasår — visas bredvid filmtiteln i reveal. */
   movieYear?: number;
+  /**
+   * Deterministisk seed för svarsalternativen. Sätts i Remote 1v1
+   * (`matchId:questionId`) så båda spelarna får samma namn i samma ordning —
+   * de spelar frågan var för sig utan sync-kanal. Utelämnad → Math.random.
+   */
+  optionsSeed?: string;
 }
 
 export function ActorSelectBlock({
@@ -67,16 +74,18 @@ export function ActorSelectBlock({
   assistance,
   movieTitle,
   movieYear,
+  optionsSeed,
 }: Props) {
   const nameList = useMemo(() => {
+    const rng = optionsSeed ? createSeededRng(optionsSeed) : Math.random;
     // Alltid exakt 1 rätt svar — väljer slumpmässigt bland correctNames
     // om frågan har flera korrekta aktörer.
-    const correctName = shuffle([...correctNames])[0];
+    const correctName = shuffle([...correctNames], rng)[0];
     if (!correctName) return [];
-    const picked = shuffle([...distractorNames]).slice(0, 4);
-    return shuffle([correctName, ...picked]);
+    const picked = shuffle([...distractorNames], rng).slice(0, 4);
+    return shuffle([correctName, ...picked], rng);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [resetKey]);
+  }, [resetKey, optionsSeed]);
 
   const isRevealing = phase === 'reveal';
   const isLocked = phase === 'awaiting' || isRevealing;
