@@ -254,12 +254,20 @@ export default function MyMatchesScreen() {
     } else if (match.result === 'draw') {
       statusText = `Draw ${me.totalPoints}–${opponent?.totalPoints ?? 0}`;
       statusColor = Colors.textPrimary;
-    } else if (match.winnerUserId === me.userId) {
-      statusText = `You won ${me.totalPoints}–${opponent?.totalPoints ?? 0}${match.result === 'walkover' ? ' (walkover)' : ''}`;
-      statusColor = Colors.success;
     } else {
-      statusText = `${oppName} won ${opponent?.totalPoints ?? 0}–${me.totalPoints}${match.result === 'walkover' ? ' (walkover)' : ''}`;
-      statusColor = Colors.error;
+      // Walkover-suffix: skilj "motståndaren gav upp" ('forfeited') från
+      // "tiden gick ut" ('expired_walkover') — båda bär result='walkover'.
+      const iWon = match.winnerUserId === me.userId;
+      const suffix =
+        match.status === 'forfeited'
+          ? iWon ? ' (opponent quit)' : ' (you quit)'
+          : match.result === 'walkover'
+            ? ' (walkover)'
+            : '';
+      statusText = iWon
+        ? `You won ${me.totalPoints}–${opponent?.totalPoints ?? 0}${suffix}`
+        : `${oppName} won ${opponent?.totalPoints ?? 0}–${me.totalPoints}${suffix}`;
+      statusColor = iWon ? Colors.success : Colors.error;
     }
 
     return (

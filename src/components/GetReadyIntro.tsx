@@ -147,6 +147,20 @@ interface Props {
   /** Optional: visar Leave Game-knappen längst upp för non-host (IndDev).
    *  Renderas BARA om onQuit inte är satt. */
   onLeave?: () => void;
+  /** Remote 1v1: ANDRA utvägen — lämnar men sparar svaren så matchen kan
+   *  återupptas inom 48h. Gäller BÅDA rollerna (host + motståndare) —
+   *  remote-matchen lever server-side och är frikopplad från lobby:ns
+   *  livscykel.
+   *
+   *  Sätts den flyttas top-baren till LOBBY-mönstret: ingen knapp i
+   *  vänsterkanten, bara en spelar-pill i högerkanten (spegel av
+   *  TopUserBanner) vars tap öppnar en bottom-sheet med Save & Exit /
+   *  Quit / Cancel — precis som lobbyns pill öppnar leave/delete-sheeten. */
+  onSaveExit?: () => void;
+  /** Override av den destruktiva utvägens label (default 'Quit Game' /
+   *  'Leave Game'). Remote 1v1 använder 'Quit match' eftersom knappen där
+   *  betyder "ge upp — motståndaren vinner på walkover", inte "riv lobbyn". */
+  quitLabel?: string;
   /** Är användaren host? Styr om Play-knappen renderas (host i båda lägen +
    *  alla i Pass-the-Phone) eller om "Waiting for Host to start quiz"-rutan
    *  visas i Play-knappens position (non-host i Individual Devices).
@@ -272,6 +286,8 @@ export function GetReadyIntro({
   selfPlayerName,
   onQuit,
   onLeave,
+  onSaveExit,
+  quitLabel,
   isHost = true,
   playerConnectionStatus,
   unstableLocked,
@@ -283,6 +299,11 @@ export function GetReadyIntro({
   onPlayerAudioChange,
 }: Props) {
   const isIndDev = mode === 'individual-devices';
+  // Remote 1v1 (= onSaveExit satt): top-baren följer lobbyns mönster —
+  // tappbar spelar-pill i högerkanten som öppnar en bottom-sheet med båda
+  // utvägarna + Cancel, istället för nakna knappar i banner-raden.
+  const hasExitSheet = !!onSaveExit;
+  const [exitSheetVisible, setExitSheetVisible] = useState(false);
   // Non-host i IndDev innan host:s fråge-sekvens (broadcastAllQuestionIds)
   // ankommit: quiz.tsx skickar då TOM mediaSourceByQuestion-array (hellre än
   // fel ikoner från lokal shuffle). Rendera "Waiting for question data…"
@@ -515,22 +536,56 @@ export function GetReadyIntro({
       {/* Top-bar längst upp — Quit Game för host (river hela lobbyn) eller
           Leave Game för non-host i IndDev (lämnar bara egen plats, går till
           Home). Båda speglar TopUserBanner:s vokabulär (Colors.card bg +
-          borderBottom). onQuit har företräde om båda är satta. */}
-      {onQuit || onLeave ? (
+          borderBottom). onQuit har företräde om båda är satta.
+          Remote 1v1 skickar BÅDA rollerna samma par: onQuit ('Quit match'
+          via quitLabel = ge upp → walkover) + onSaveExit (pausa, resume
+          inom 48h). */}
+      {onQuit || onLeave || onSaveExit ? (
         <View style={styles.quitBar}>
-          <TouchableOpacity
-            style={styles.quitBtn}
-            onPress={onQuit ?? onLeave}
-            accessibilityLabel={onQuit ? 'Quit Game' : 'Leave Game'}
-          >
-            <Text style={styles.quitBtnText}>
-              {onQuit ? 'Quit Game' : 'Leave Game'}
-            </Text>
-          </TouchableOpacity>
-          {/* IndDev: enhetens egen spelare högerställd i bannern — speglar
-              TopUserBanner:s login-pill-position så användaren alltid ser
-              vilken identitet enheten spelar som. */}
-          {isIndDev && selfPlayerName ? (
+          {/* Vänsterkant: den destruktiva utvägen som naken knapp — bara i
+              LOKALA lägen. Remote 1v1 har inget här; dess båda utvägar bor
+              i sheeten bakom spelar-pillen till höger. Tom View håller
+              space-between så höger-slotten stannar i högerkanten. */}
+          {!hasExitSheet && (onQuit || onLeave) ? (
+            <TouchableOpacity
+              style={styles.quitBtn}
+              onPress={onQuit ?? onLeave}
+              accessibilityLabel={quitLabel ?? (onQuit ? 'Quit Game' : 'Leave Game')}
+            >
+              <Text style={styles.quitBtnText}>
+                {quitLabel ?? (onQuit ? 'Quit Game' : 'Leave Game')}
+              </Text>
+            </TouchableOpacity>
+          ) : (
+            <View />
+          )}
+          {/* Högerkant — två ömsesidigt uteslutande innehåll (Remote 1v1 är
+              aldrig IndDev, så de kan aldrig krocka om samma slot):
+                • Remote 1v1: spelar-pill som öppnar utvägs-sheeten.
+                  Speglar lobbyns TopUserBanner-pill 1:1 (avatar + namn,
+                  primaryMuted-fyllning) så interaktionen känns igen.
+                • IndDev: enhetens egen spelare som ren text — informativ,
+                  inte tappbar. */}
+          {hasExitSheet ? (
+            <TouchableOpacity
+              style={styles.playerPill}
+              activeOpacity={0.7}
+              onPress={() => setExitSheetVisible(true)}
+              accessibilityLabel="Game options"
+            >
+              {currentPlayer.avatarUri ? (
+                <Image
+                  source={{ uri: currentPlayer.avatarUri }}
+                  style={styles.playerPillAvatar}
+                />
+              ) : (
+                <Text style={styles.playerPillIcon}>{currentPlayer.emoji ?? '👤'}</Text>
+              )}
+              <Text style={styles.playerPillText} numberOfLines={1}>
+                {currentPlayer.name}
+              </Text>
+            </TouchableOpacity>
+          ) : isIndDev && selfPlayerName ? (
             <Text
               style={styles.selfPlayerText}
               numberOfLines={1}
@@ -541,6 +596,75 @@ export function GetReadyIntro({
           ) : null}
         </View>
       ) : null}
+
+      {/* ── Remote 1v1: utvägs-sheet ─────────────────────────────────
+          Speglar lobbyns guest-leave/host-delete-sheet 1:1 (header med
+          avatar + namn + status, bevarande grön knapp ovanför den röda
+          destruktiva, Cancel underst). Sheeten stängs FÖRE handlern körs
+          — de visar egna confirm-Alerts, och en Alert som presenteras
+          medan en RN-Modal fortfarande är uppe kan sväljas på iOS. */}
+      <Modal
+        visible={exitSheetVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setExitSheetVisible(false)}
+      >
+        <View style={styles.exitSheetOverlay}>
+          <Pressable
+            style={styles.exitSheetBackdrop}
+            onPress={() => setExitSheetVisible(false)}
+          />
+          <View style={styles.exitSheet}>
+            <View style={styles.exitSheetHeader}>
+              {currentPlayer.avatarUri ? (
+                <Image
+                  source={{ uri: currentPlayer.avatarUri }}
+                  style={styles.exitSheetHeaderAvatar}
+                />
+              ) : (
+                <Text style={styles.exitSheetHeaderEmoji}>
+                  {currentPlayer.emoji ?? '👤'}
+                </Text>
+              )}
+              <View style={{ flex: 1 }}>
+                <Text style={styles.exitSheetHeaderName}>{currentPlayer.name}</Text>
+                <Text style={styles.exitSheetHeaderStatus}>1vs1 Match</Text>
+              </View>
+            </View>
+
+            <Pressable
+              style={({ pressed }) => [styles.saveExitBtn, pressed && { opacity: 0.85 }]}
+              onPress={() => {
+                setExitSheetVisible(false);
+                onSaveExit?.();
+              }}
+            >
+              <Text style={styles.saveExitBtnText}>Save &amp; Exit</Text>
+            </Pressable>
+
+            {onQuit || onLeave ? (
+              <Pressable
+                style={({ pressed }) => [styles.exitSheetQuitBtn, pressed && { opacity: 0.85 }]}
+                onPress={() => {
+                  setExitSheetVisible(false);
+                  (onQuit ?? onLeave)?.();
+                }}
+              >
+                <Text style={styles.exitSheetQuitBtnText}>
+                  {quitLabel ?? (onQuit ? 'Quit Game' : 'Leave Game')}
+                </Text>
+              </Pressable>
+            ) : null}
+
+            <Pressable
+              style={styles.exitSheetCancelBtn}
+              onPress={() => setExitSheetVisible(false)}
+            >
+              <Text style={styles.exitSheetCancelText}>Cancel</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
 
       {/* ── Game settings-block: centrerad logo + settings-info till höger.
           Visar Game era (host:s val i Lobby, fixt under hela spelet) och
@@ -1474,6 +1598,86 @@ const styles = StyleSheet.create({
     color: Colors.error,
     letterSpacing: 0.4,
   },
+  // Remote 1v1: spelar-pill i bannerns högerkant — spegel av
+  // TopUserBanner:s loginPill (avatar + namn, primaryMuted-fyllning +
+  // primaryBorder). Tap öppnar utvägs-sheeten.
+  playerPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.xs + 2,
+    borderRadius: Radius.full,
+    borderWidth: 1,
+    borderColor: Colors.primaryBorder,
+    backgroundColor: Colors.primaryMuted,
+    maxWidth: '65%',
+  },
+  playerPillIcon: { fontSize: 16 },
+  playerPillAvatar: { width: 20, height: 20, borderRadius: 10 },
+  playerPillText: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.semibold,
+    color: Colors.primary,
+    flexShrink: 1,
+  },
+
+  // ── Utvägs-sheet (Remote 1v1) — geometrin speglar lobbyns
+  //    guestLeave*-sheet så de två känns som samma komponent.
+  exitSheetOverlay: { flex: 1, justifyContent: 'flex-end' },
+  exitSheetBackdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  exitSheet: {
+    backgroundColor: Colors.card,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    padding: Spacing.xl,
+    paddingBottom: Spacing.xxl,
+    gap: Spacing.md,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  exitSheetHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.md,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.sm,
+    backgroundColor: Colors.background,
+    borderRadius: Radius.md,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  exitSheetHeaderEmoji: { fontSize: 28, width: 40, textAlign: 'center' },
+  exitSheetHeaderAvatar: { width: 40, height: 40, borderRadius: 20 },
+  exitSheetHeaderName: { fontSize: 16, fontWeight: '700', color: Colors.textPrimary },
+  exitSheetHeaderStatus: { fontSize: 12, color: Colors.textSecondary, marginTop: 2 },
+  // Bevarande action → grön, exakt samma geometri/typografi som den röda
+  // nedanför (speglar lobbyns saveLobbyBtn vs guestLeaveBtn).
+  saveExitBtn: {
+    height: 52,
+    borderRadius: Radius.md,
+    backgroundColor: Colors.successMuted,
+    borderWidth: 1,
+    borderColor: Colors.success,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  saveExitBtnText: { fontSize: 16, fontWeight: '600', color: Colors.success },
+  exitSheetQuitBtn: {
+    height: 52,
+    borderRadius: Radius.md,
+    backgroundColor: 'rgba(255,107,107,0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,107,107,0.4)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  exitSheetQuitBtnText: { fontSize: 16, fontWeight: '600', color: Colors.error },
+  exitSheetCancelBtn: { alignItems: 'center', paddingVertical: Spacing.sm },
+  exitSheetCancelText: { fontSize: 14, color: Colors.textSecondary },
   container: {
     flex: 1,
     // Tight paddingTop (var Spacing.xxxl * 2 = 96px) så play-knappen +

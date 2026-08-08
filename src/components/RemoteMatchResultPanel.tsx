@@ -98,7 +98,28 @@ export function RemoteMatchResultPanel({ matchId }: Props) {
     );
   }
 
-  // Host avbröt matchen (Quit Game) — inget resultat, bara kvittot.
+  // En spelare tryckte "Quit match" — motståndaren vinner på walkover.
+  // Egen branch före den generiska walkover-texten så copyn kan säga
+  // "opponent quit" istället för det tvetydiga "walkover" (som annars
+  // också betyder "tiden gick ut").
+  if (match.status === 'forfeited') {
+    const iWon = match.winnerUserId === me.userId;
+    return (
+      <View style={[styles.card, iWon ? styles.cardWin : styles.cardLose]}>
+        <Text style={styles.title}>1vs1 Duel</Text>
+        <Text style={[styles.banner, iWon ? styles.bannerWin : styles.bannerLose]}>
+          {iWon ? 'You won — walkover!' : 'You quit the match'}
+        </Text>
+        <Text style={styles.subText}>
+          {iWon
+            ? `${oppName} quit the match before finishing.`
+            : `${oppName} wins by walkover.`}
+        </Text>
+      </View>
+    );
+  }
+
+  // Host avbröt matchen (äldre cancel-väg) — inget resultat, bara kvittot.
   if (match.status === 'cancelled') {
     return (
       <View style={[styles.card, styles.cardNeutral]}>

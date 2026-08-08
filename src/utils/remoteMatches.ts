@@ -20,7 +20,17 @@ import { supabase } from './supabase';
 
 // 'cancelled' = host tryckte Quit Game mitt i matchen (migration 0028) —
 // visas för båda spelarna som "Lobby deleted by Host", inget W/L/D.
-export type RemoteMatchStatus = 'active' | 'finished' | 'expired_walkover' | 'void' | 'cancelled';
+// 'forfeited' = en DELTAGARE (host eller motståndare) tryckte "Quit match"
+// mitt i (migration 0032) — motståndaren vinner på walkover. Skild från
+// 'expired_walkover' (deadline passerade) så UI kan säga "opponent left"
+// istället för "ran out of time"; båda bär result = 'walkover'.
+export type RemoteMatchStatus =
+  | 'active'
+  | 'finished'
+  | 'expired_walkover'
+  | 'void'
+  | 'cancelled'
+  | 'forfeited';
 export type RemoteMatchResult = 'decided' | 'draw' | 'walkover' | 'void';
 
 export interface RemoteMatchSettings {
@@ -309,6 +319,26 @@ export async function cancelRemoteMatch(matchId: string): Promise<void> {
   const { error } = await supabase.rpc('cancel_remote_match', { p_match_id: matchId });
   if (error) {
     console.warn('[remoteMatches] cancelRemoteMatch failed:', error.message);
+  }
+}
+
+/**
+ * DELTAGARE (host ELLER motståndare) ger upp en pågående match — "Quit
+ * match" i quiz-vyn. RPC:n sätter status='forfeited' + result='walkover'
+ * med MOTSTÅNDAREN som vinnare, och aggregerar callerns hittills sparade
+ * svar in i deras spelarrad så resultatvyn kan visa delpoängen.
+ *
+ * Skild från `cancelRemoteMatch` (host-only, avbryter UTAN vinnare) och
+ * från deadline-sweepens 'expired_walkover' (tiden gick ut) — alla tre är
+ * terminala men bär olika UI-copy.
+ *
+ * Bara när matchen är 'active'. Idempotent — avgjorda resultat kan aldrig
+ * skrivas över. Kräver migration 0032_remote_match_forfeit.sql.
+ */
+export async function forfeitRemoteMatch(matchId: string): Promise<void> {
+  const { error } = await supabase.rpc('forfeit_remote_match', { p_match_id: matchId });
+  if (error) {
+    console.warn('[remoteMatches] forfeitRemoteMatch failed:', error.message);
   }
 }
 

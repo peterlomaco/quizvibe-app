@@ -27,10 +27,13 @@ import { getAvatarEmojiById } from '@/src/utils/avatars';
 import { clearEjected } from '@/src/utils/ejectedPlayers';
 import { appendGameHistoryEntry, saveLatestResult, type GameResult, type HistoryEntry, type RoundResult } from '@/src/utils/gameResults';
 import {
-  cancelRemoteMatch,
   finalizePlayer,
+  forfeitRemoteMatch,
+  formatPlayerLabel,
   getMatch,
   getMyAnswers,
+  getOwnUserId,
+  subscribeToMatch,
   persistQuestionSequence,
   upsertAnswer,
 } from '@/src/utils/remoteMatches';
@@ -1711,26 +1714,43 @@ export default function QuizScreen() {
         }
         match = await getMatch(remoteMatchId);
       }
-      // Host kan ha avbrutit matchen (Quit Game → status 'cancelled')
-      // mellan motståndarens navigation och denna fetch — visa kvittot
-      // och skicka hem istället för att fastna i "Preparing"-spinnern.
-      const bailIfCancelled = (m: typeof match): boolean => {
-        if (m?.status !== 'cancelled') return false;
-        Alert.alert(
-          'Lobby deleted by Host',
-          'The Host has cancelled this 1vs1 match.',
-          [{ text: 'OK', onPress: () => router.replace('/') }],
-          { cancelable: false },
-        );
+      // Matchen kan ha avslutats mellan navigationen och denna fetch —
+      // motståndaren tryckte "Quit match" (status 'forfeited') eller host
+      // avbröt via den äldre cancel-vägen ('cancelled'). Visa kvittot och
+      // skicka hem istället för att fastna i "Preparing"-spinnern.
+      const bailIfEnded = async (m: typeof match): Promise<boolean> => {
+        if (!m || m.status === 'active') return false;
+        let title = 'Match ended';
+        let body = 'This 1vs1 match is no longer active.';
+        if (m.status === 'cancelled') {
+          title = 'Lobby deleted by Host';
+          body = 'The Host has cancelled this 1vs1 match.';
+        } else if (m.status === 'forfeited') {
+          const myId = await getOwnUserId();
+          const iWon = !!myId && m.winnerUserId === myId;
+          title = iWon ? 'You won — walkover!' : 'Match ended';
+          body = iWon
+            ? 'Your opponent quit the match, so you win by walkover.'
+            : 'You quit this 1vs1 match — it cannot be resumed.';
+        } else if (m.questionIds && m.questionIds.length > 0) {
+          // finished/void/expired_walkover MED sekvens: låt resume-seeden
+          // ta över (allt besvarat → direkt leaderboard + resultatpanel).
+          return false;
+        }
+        // ...utan sekvens finns inget att spela — bail istället för att
+        // fastna i poll-loopen nedan (som väntar på question_ids).
+        Alert.alert(title, body, [{ text: 'OK', onPress: () => router.replace('/') }], {
+          cancelable: false,
+        });
         return true;
       };
-      if (bailIfCancelled(match)) return;
+      if (await bailIfEnded(match)) return;
       // Vänta in sekvensen (host-persist in-flight eller motståndare-race).
       while (!cancelled && (!match || !match.questionIds || match.questionIds.length === 0)) {
         await new Promise((resolve) => setTimeout(resolve, 2000));
         if (cancelled) return;
         match = await getMatch(remoteMatchId);
-        if (bailIfCancelled(match)) return;
+        if (await bailIfEnded(match)) return;
       }
       if (cancelled || !match?.questionIds) return;
       const ids = match.questionIds.filter((id) => ALL_QUESTIONS_MAP.has(id));
@@ -1832,7 +1852,13 @@ export default function QuizScreen() {
   // (broadcastAllQuestionIds) via ALL_QUESTIONS_MAP. Utan detta visar non-host felaktiga
   // ikoner i GetReady-kön (lokal shuffle ≠ host:s ordning).
   const effectiveMediaSourceByQuestion = useMemo<QuestionMediaType[]>(() => {
-    if (isHost) return mediaSourceByQuestion;
+    // isRemote: `gameQuestions` ÄR matchens auktoritativa sekvens för BÅDA
+    // roller (remote-override:n mappar remote_matches.question_ids), och
+    // render-gaten släpper inte fram GetReadyIntro innan den laddats. Utan
+    // detta undantag hamnar remote-motståndaren i broadcast-grenen nedan —
+    // men remote har ingen sync-channel, så broadcastAllQuestionIds förblir
+    // null och kön fastnade på ❓/"Unknown".
+    if (isHost || isRemote) return mediaSourceByQuestion;
     // Innan host:s fråge-sekvens ankommit (broadcastAllQuestionIds null):
     // returnera tom array så inga ikoner visas hellre än att visa fel ikoner
     // baserade på lokal shuffle-ordning (som skiljer sig från host:s).
@@ -1845,7 +1871,7 @@ export default function QuizScreen() {
       const picked = pickMediaSource({ youtubeClips: q.youtubeClips }, { youtubeEnabled, gameMode });
       return picked.kind === 'youtube' ? 'youtube' : ('none' as QuestionMediaType);
     });
-  }, [isHost, broadcastAllQuestionIds, mediaSourceByQuestion, spotifyEnabled, youtubeEnabled, gameMode]);
+  }, [isHost, isRemote, broadcastAllQuestionIds, mediaSourceByQuestion, spotifyEnabled, youtubeEnabled, gameMode]);
 
   // Härledd spotifyQuestionIndices för GetReadyIntro — baserad på effectiveMediaSourceByQuestion
   // så non-host ser korrekta Spotify-chip-ikoner i kön.
@@ -1896,15 +1922,17 @@ export default function QuizScreen() {
   // (broadcastAllQuestionIds) via ALL_QUESTIONS_MAP. Utan detta visar non-host felaktiga
   // kategori-/svarstyp-badges i GetReady (lokal shuffle ≠ host:s ordning).
   const effectiveCategoryByQuestion = useMemo<(MainCategory | null)[]>(() => {
-    if (isHost) return categoryByQuestion;
+    // isRemote-undantaget: se effectiveMediaSourceByQuestion ovan.
+    if (isHost || isRemote) return categoryByQuestion;
     // Innan host:s fråge-sekvens ankommit: returnera tom array → inga badges
     // visas hellre än fel badge från lokal shuffle.
     if (!broadcastAllQuestionIds) return [];
     return broadcastAllQuestionIds.map((id) => ALL_QUESTIONS_MAP.get(id)?.mainCategory ?? null);
-  }, [isHost, broadcastAllQuestionIds, categoryByQuestion]);
+  }, [isHost, isRemote, broadcastAllQuestionIds, categoryByQuestion]);
 
   const effectiveAnswerTypeByQuestion = useMemo<('Year' | 'Name')[]>(() => {
-    if (isHost) return answerTypeByQuestion;
+    // isRemote-undantaget: se effectiveMediaSourceByQuestion ovan.
+    if (isHost || isRemote) return answerTypeByQuestion;
     // Innan host:s fråge-sekvens ankommit: returnera tom array → inga badges
     // visas hellre än fel svarstyp från lokal shuffle.
     if (!broadcastAllQuestionIds) return [];
@@ -1938,7 +1966,7 @@ export default function QuizScreen() {
       }
       return 'Year';
     });
-  }, [isHost, broadcastAllQuestionIds, answerTypeByQuestion, broadcastHostSpotifyAnswerYear, broadcastHostSpotifyAnswerName, spotifyAnswerYear, spotifyAnswerName, gameMode, turnOrder.length]);
+  }, [isHost, isRemote, broadcastAllQuestionIds, answerTypeByQuestion, broadcastHostSpotifyAnswerYear, broadcastHostSpotifyAnswerName, spotifyAnswerYear, spotifyAnswerName, gameMode, turnOrder.length]);
 
   const [questionIndex, setQuestionIndex] = useState(0);
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
@@ -5169,17 +5197,13 @@ export default function QuizScreen() {
   // LobbyScreen — deactiverar rumkoden i mockActiveRooms (så ev. ifyllda
   // join-koder börjar visa "Room not found") och rensar leftPlayers-store:n
   // för koden så ingen stale-data ärver in när koden ev. återanvänds.
+  // LOKALA lägen only (Single/PtP/IndDev) — Remote 1v1 har sitt eget par
+  // utvägar (handleRemoteForfeit / handleRemoteSaveExit nedan) eftersom
+  // matchen lever server-side och är frikopplad från lobby:ns livscykel.
   const handleQuitGame = () => {
     Alert.alert(
       'Quit game?',
-      // Remote 1v1: host:s Quit AVBRYTER matchen — status 'cancelled' via
-      // cancel_remote_match-RPC:n. Matchen BEHÅLLS och visas för båda
-      // spelarna som "Lobby deleted by Host" i 1vs1 Matches + Player
-      // history (Peter-krav 2026-08-07 rev 2). Motståndarens resume-
-      // semantik gäller bara deras EGEN Leave (handleLeaveGame nedan).
-      isRemote
-        ? 'This will cancel the 1vs1 match for BOTH players. It will be shown as "Lobby deleted by Host" and cannot be resumed.'
-        : 'This will end the game and close the lobby for everyone. You will return to the start screen.',
+      'This will end the game and close the lobby for everyone. You will return to the start screen.',
       [
         { text: 'Cancel', style: 'cancel' },
         {
@@ -5203,14 +5227,6 @@ export default function QuizScreen() {
                   addSessionRecordForNames(registeredNames, playedIds).catch(() => {});
                 }
               }
-            }
-            // Remote 1v1: markera matchen 'cancelled' server-side (RPC:n
-            // validerar att callern är host + att matchen är active).
-            // Await:as så UPDATE:n hinner committa innan Home mountar och
-            // My Matches-sektionen laddar — raden ska direkt visa
-            // "Lobby deleted by Host" istället för "Waiting for...".
-            if (isRemote && remoteMatchId) {
-              await cancelRemoteMatch(remoteMatchId);
             }
             const code = params.roomCode;
             if (code) {
@@ -5238,9 +5254,7 @@ export default function QuizScreen() {
   const handleLeaveGame = () => {
     Alert.alert(
       'Leave game?',
-      isRemote
-        ? 'Your answers so far are saved. You can resume this 1vs1 match within 48 hours via "Remote Play History" on the Home screen.'
-        : 'You will return to the start screen. The game continues for the other players.',
+      'You will return to the start screen. The game continues for the other players.',
       [
         { text: 'Cancel', style: 'cancel' },
         {
@@ -5273,6 +5287,123 @@ export default function QuizScreen() {
                 })
                 .catch(() => {});
             }
+            router.replace('/');
+          },
+        },
+      ],
+    );
+  };
+
+  // ── Remote 1v1: två utvägar ur quiz-vyn, IDENTISKA för host och
+  //    motståndare (Peter 2026-08-08). Matchen lever i remote_matches och
+  //    är frikopplad från rummet, så det finns ingen anledning att host:s
+  //    utväg ska vara mer destruktiv än motståndarens:
+  //      • "Quit match"  → ger upp; motståndaren vinner på WALKOVER.
+  //      • "Save & Exit" → pausar; återupptas inom 48h via 1vs1 Matches.
+  //    Host:s äldre "cancel hela matchen"-väg (cancel_remote_match, 0028)
+  //    nås inte längre härifrån — RPC:n + API-wrappern finns kvar för
+  //    äldre klienter/admin men är dormant i UI:t.
+
+  // Sätts INNAN forfeit-RPC:n så min EGEN UPDATE inte triggar
+  // walkover-popupen nedan på min egen enhet (Realtime pushar tillbaka
+  // till avsändaren också, och router.replace hinner inte alltid först).
+  const selfForfeitedRef = useRef(false);
+
+  // Motståndaren tryckte "Quit match" medan JAG fortfarande sitter i
+  // quiz-vyn → forfeit-RPC:ns UPDATE på remote_matches pushas hit via
+  // postgres_changes (samma kanal som slutskärmens resultatpanel).
+  // Symmetriskt för båda roller: den som är kvar får kvittot direkt
+  // istället för att upptäcka walkovern först i 1vs1 Matches.
+  // `alerted`-guarden gör den idempotent — Realtime kan leverera samma
+  // UPDATE fler än en gång vid reconnect.
+  const opponentQuitAlertedRef = useRef(false);
+  useEffect(() => {
+    if (!isRemote || !remoteMatchId) return;
+    const unsubscribe = subscribeToMatch(remoteMatchId, () => {
+      void (async () => {
+        if (selfForfeitedRef.current || opponentQuitAlertedRef.current) return;
+        const m = await getMatch(remoteMatchId);
+        if (!m || m.status !== 'forfeited') return;
+        // Bara två deltagare — är det inte jag som gav upp är det
+        // motståndaren, och då är jag vinnaren.
+        opponentQuitAlertedRef.current = true;
+        const myId = await getOwnUserId();
+        const opp = m.players.find((p) => p.userId !== myId);
+        Alert.alert(
+          'Walk over',
+          `${formatPlayerLabel(opp, 'Your opponent')} has left this game — you win by walkover.`,
+          [{ text: 'OK', onPress: () => router.replace('/') }],
+          { cancelable: false },
+        );
+      })();
+    });
+    return unsubscribe;
+  }, [isRemote, remoteMatchId]);
+
+  // Frågor som hunnit visas i den här sessionen — skrivs till seen-
+  // historiken så de inte återkommer direkt i NÄSTA spel. I remote är
+  // `gameQuestions` matchens auktoritativa sekvens (remote-override i
+  // useMemo:n) för båda roller, så ingen broadcast-preferens behövs.
+  const recordRemoteQuestionsShown = async () => {
+    if (questionIndex <= 0) return;
+    const shownIds = [
+      ...new Set(gameQuestions.slice(0, questionIndex).map((q) => q.id)),
+    ];
+    await addSessionRecord(shownIds).catch(() => {});
+  };
+
+  // Quit match: ge upp. forfeit_remote_match sätter status 'forfeited' +
+  // result 'walkover' med MOTSTÅNDAREN som vinnare och aggregerar mina
+  // hittills sparade svar till en delpoäng. Await:as så UPDATE:n hinner
+  // committa innan Home mountar och 1vs1 Matches laddar.
+  const handleRemoteForfeit = () => {
+    Alert.alert(
+      'Quit game?',
+      'You give up this 1vs1 match. Your opponent wins by walkover, and the match cannot be resumed.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Quit game',
+          style: 'destructive',
+          onPress: async () => {
+            selfForfeitedRef.current = true;
+            await recordRemoteQuestionsShown();
+            if (remoteMatchId) {
+              await forfeitRemoteMatch(remoteMatchId);
+            }
+            // Bara host äger rummet — matchen är terminal, så koden ska
+            // inte ligga kvar joinbar. Motståndaren rör aldrig rums-
+            // livscykeln (samma regel som i lokala lägen).
+            const code = params.roomCode;
+            if (isHost && code) {
+              await deactivateRoom(code);
+              clearLeftPlayers(code);
+              clearLobbyPlayers(code);
+              clearLobbySettings(code);
+              clearEjected(code);
+              clearGameStarted(code);
+            }
+            router.replace('/');
+          },
+        },
+      ],
+    );
+  };
+
+  // Save & Exit: pausa. Svaren ligger redan server-side (upsertAnswer per
+  // fråga, idempotent per question_index) så resume-seeden i init-effekten
+  // plockar upp vid första obesvarade frågan. Inget rums-cleanup ens för
+  // host — båda ska kunna komma tillbaka.
+  const handleRemoteSaveExit = () => {
+    Alert.alert(
+      'Save & Exit?',
+      'Your answers so far are saved. Resume this 1vs1 match within 48 hours via "1vs1 Matches" on the Home screen.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Save & Exit',
+          onPress: async () => {
+            await recordRemoteQuestionsShown();
             router.replace('/');
           },
         },
@@ -5880,11 +6011,16 @@ export default function QuizScreen() {
             : undefined
         }
         isHost={isHost}
-        // Host får Quit Game (river rummet); non-host får Leave Game
-        // (lämnar bara egen plats). Båda går ALDRIG via samma codepath
-        // för cleanup eftersom non-host inte ska avsluta spelet för andra.
-        onQuit={isHost ? handleQuitGame : undefined}
-        onLeave={!isHost ? handleLeaveGame : undefined}
+        // LOKALA lägen: host får Quit Game (river rummet); non-host får
+        // Leave Game (lämnar bara egen plats). Båda går ALDRIG via samma
+        // codepath för cleanup eftersom non-host inte ska avsluta spelet
+        // för andra.
+        // REMOTE 1v1: båda rollerna får samma par — "Quit match"
+        // (walkover åt motståndaren) + "Save & Exit" (resume inom 48h).
+        onQuit={isRemote ? handleRemoteForfeit : isHost ? handleQuitGame : undefined}
+        onLeave={!isRemote && !isHost ? handleLeaveGame : undefined}
+        onSaveExit={isRemote ? handleRemoteSaveExit : undefined}
+        quitLabel={isRemote ? 'Quit Game' : undefined}
       />
       {/* Pre-decode-trick borttaget 2026-05-27 — text-rendering kräver ingen
           asset-decode. När AI-tecknade sketches kommer på plats behöver vi
