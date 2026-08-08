@@ -391,14 +391,12 @@ const ADD_PLAYER_ASSISTANCE_OPTIONS: { id: AddPlayerAssistance; label: string }[
 ];
 
 // Remote 1v1: gemensam hjälpnivå för båda spelarna (host väljer i lobbyn).
-// Mellannivån heter "Medium" HÄR men "Standard" i övriga appen (Profile,
-// Add Player, player-edit, leaderboard-metaraden) — Peters formulering
-// 2026-08-08. Det underliggande värdet är samma `'standard'`, så bara
-// etiketten skiljer. Ska hela appen byta till "Medium" är det ett separat
-// rename-pass över ASSISTANCE_LABEL + ADD_PLAYER_ASSISTANCE_OPTIONS m.fl.
+// Etiketterna speglar MEDVETET resten av appen (Profile, Add Player,
+// player-edit, leaderboard-metaraden) — samma nivå ska heta samma sak
+// överallt. Håll listan i synk med ADD_PLAYER_ASSISTANCE_OPTIONS ovan.
 const REMOTE_ASSISTANCE_OPTIONS: { id: LobbyRemoteAssistance; label: string }[] = [
   { id: 'full',     label: 'Full' },
-  { id: 'standard', label: 'Medium' },
+  { id: 'standard', label: 'Standard' },
   { id: 'minimal',  label: 'Minimal' },
 ];
 
@@ -5609,7 +5607,7 @@ export default function LobbyScreen() {
                 onPress={() =>
                   Alert.alert(
                     'Assistance level',
-                    'In a 1vs1 match both players answer the same questions on their own devices, so both play with the SAME assistance level — the Host picks it here.\n\nFull: the full names are listed, just pick the right one.\nMedium: 2-letter hints, then pick the name.\nMinimal: 1-letter hints, then pick the name.\n\nIt also sets how wide the year interval is on Year questions.',
+                    'In a 1vs1 match both players answer the same questions on their own devices, so both play with the SAME assistance level — the Host picks it here.\n\nFull: the full names are listed, just pick the right one.\nStandard: 2-letter hints, then pick the name.\nMinimal: 1-letter hints, then pick the name.\n\nIt also sets how wide the year interval is on Year questions.',
                   )
                 }
                 hitSlop={8}
