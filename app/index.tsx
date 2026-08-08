@@ -2600,7 +2600,7 @@ export default function HomeScreen() {
 
           {/* Start New Game (guest-host) — synlig i BÅDA login-lägena (inloggade
               spelare ska också kunna hosta som guest). Pulserar alltid.
-              Badge: "Guest data - not saved" inloggad / FREE utloggad.
+              Badge: "No Data Saved" inloggad / FREE utloggad.
               Öppnar guest-HOST-formen
               (begränsad registrering → lobby som host). Inloggad: extra
               marginTop (Spacing.xl, samma sektions-separation som guest-
@@ -2654,7 +2654,7 @@ export default function HomeScreen() {
                 >
                   Start New Game
                 </Text>
-                {/* Badge per login-läge: inloggad → "Guest data - not saved"
+                {/* Badge per login-läge: inloggad → "No Data Saved"
                     i grått (samma homeUserBadge-stil som user-knapparna);
                     utloggad → FREE i grönt (matchar övriga guest-/register-
                     knappar). */}
@@ -2663,7 +2663,7 @@ export default function HomeScreen() {
                   pointerEvents="none"
                 >
                   <Text style={styles.homeFreeBadgeText}>
-                    {isLoggedIn ? 'Guest data - not saved' : 'FREE'}
+                    {isLoggedIn ? 'No Data Saved' : 'FREE'}
                   </Text>
                 </View>
               </TouchableOpacity>
@@ -3805,7 +3805,7 @@ const styles = StyleSheet.create({
     zIndex: 10,
     elevation: 4,
   },
-  // "Guest data - not saved"-badgen på Start Game - Guest login i
+  // "No Data Saved"-badgen på Start Game - Guest login i
   // inloggat läge — grå bg (samma PREMIUM-grå som guest-knapparna) +
   // vit kant. User-knapparnas "Game Results - Saved"-badges togs bort
   // 2026-08-07.

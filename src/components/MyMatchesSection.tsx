@@ -56,7 +56,18 @@ function buildSignature(list: MyRemoteMatch[]): string {
     .join('|');
 }
 
-export function MyMatchesSection() {
+/**
+ * @param full  Bred variant: full bredd med centrerad "Remote Play
+ *   History"-titel. Används ENBART av Profile → Player history.
+ *
+ * DEFAULT är den smala varianten (Peter 2026-08-08): en tredjedel av
+ * skärmbredden, högerställd, utan titel-text — bara ikon + "New update" +
+ * pil. Defaulten är medvetet den smala: Home har flera render-grenar
+ * (inloggad/guest) och en framtida gren som glömmer proppen ska få den
+ * smala rutan, inte råka återinföra den breda.
+ */
+export function MyMatchesSection({ full = false }: { full?: boolean } = {}) {
+  const compact = !full;
   // Var knappen renderas ('/' på Home, '/profile' i Player history) —
   // skickas med som `from` så /my-matches Back-knapp går tillbaka hit
   // istället för alltid till Home (samma mönster som Store-skärmen).
@@ -134,41 +145,50 @@ export function MyMatchesSection() {
 
   return (
     <TouchableOpacity
-      style={styles.mainBtn}
+      style={[styles.mainBtn, compact && styles.mainBtnCompact]}
       activeOpacity={0.8}
       onPress={() => handlePress(signature)}
     >
-      {/* Titeln är absolut-centrerad i hela knappen så den sitter still
-          oavsett om "New update"-etiketten visas eller inte (en vanlig
-          flex-cell hade förskjutits när etiketten dyker upp).
+      {/* Full variant (Profile): titeln är absolut-centrerad i hela knappen
+          så den sitter still oavsett om "New update"-etiketten visas eller
+          inte (en vanlig flex-cell hade förskjutits när etiketten dyker upp).
           pointerEvents none → taps går vidare till knappen. */}
-      <View style={styles.titleOverlay} pointerEvents="none">
-        <Text style={styles.mainBtnTitle}>Remote Play History</Text>
-      </View>
+      {!compact && (
+        <View style={styles.titleOverlay} pointerEvents="none">
+          <Text style={styles.mainBtnTitle}>Remote Play History</Text>
+        </View>
+      )}
       {/* Samma 1vs1-märke som Home:s "Remote Play"-val (blå silhuetter +
           guld-wifi emellan) så duell-läget har EN ikon i appen. marginLeft
           skjuter in den från vänsterkanten så den inte klistrar sig mot
-          rutans ram. */}
-      <View style={{ marginLeft: Spacing.md }}>
-        <VersusIcon height={30} />
+          rutans ram — mindre inskjut i compact (Peter 2026-08-08) eftersom
+          rutan där bara är en tredjedel bred. */}
+      <View style={{ marginLeft: compact ? Spacing.sm : Spacing.md }}>
+        <VersusIcon height={compact ? 22 : 30} />
       </View>
-      {/* Spacer → "New update" + pilen grupperas högerställt medan titeln
-          ligger kvar centrerad. */}
-      <View style={{ flex: 1 }} />
+      {/* Spacer i full variant → "New update" + pilen grupperas högerställt
+          medan titeln ligger kvar centrerad. Compact använder
+          justifyContent: space-between istället. */}
+      {!compact && <View style={{ flex: 1 }} />}
       {/* Blinkande "New update" + pil i guld — speglar Lobby:s "New Player
           joined"-signal så samma visuella språk används för "något har hänt"
           över skärmarna. Båda delar samma opacity-värde så de blinkar i takt.
           Utan update: ingen etikett, fast vit pil. Etiketten sätts på TVÅ
-          rader ("New" / "update") så den tar mindre bredd och titeln
-          behåller sitt utrymme i mitten av knappen. */}
+          rader ("New" / "update") så den tar mindre bredd. */}
       {hasUpdate && (
-        <Animated.Text style={[styles.newUpdateLabel, { opacity: blink }]} numberOfLines={2}>
+        <Animated.Text
+          style={[styles.newUpdateLabel, compact && styles.newUpdateLabelCompact, { opacity: blink }]}
+          numberOfLines={2}
+          adjustsFontSizeToFit={compact}
+          minimumFontScale={0.75}
+        >
           {'New\nupdate'}
         </Animated.Text>
       )}
       <Animated.Text
         style={[
           styles.chevron,
+          compact && styles.chevronCompact,
           hasUpdate && { color: Colors.warning, opacity: blink },
         ]}
       >
@@ -223,6 +243,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.sm,
   },
+  // Compact (Home, Peter 2026-08-08): smal ruta högerställd på skärmen —
+  // utan titeln behövs bara ikon + signal + pil, så knappen tar en
+  // tredjedel av bredden och ligger kvar på samma höjd i flödet.
+  mainBtnCompact: {
+    width: '33.33%',
+    alignSelf: 'flex-end',
+    justifyContent: 'space-between',
+    gap: 4,
+    paddingHorizontal: 6,
+  },
   // Gold-signal när någon match ändrat tillstånd sedan senaste besök.
   // Samma typografi som Lobby:s playersWaitingLabel.
   newUpdateLabel: {
@@ -233,6 +263,13 @@ const styles = StyleSheet.create({
     // knappens höjd (56) och läser som ETT märke.
     lineHeight: 15,
     textAlign: 'center',
+  },
+  // Mindre typografi + flexShrink så etiketten ger vika i den smala
+  // compact-rutan istället för att trycka ut pilen.
+  newUpdateLabelCompact: {
+    fontSize: FontSize.xs,
+    lineHeight: 13,
+    flexShrink: 1,
   },
   // Absolut-fyllande wrapper som centrerar titeln i hela knappen — flex-
   // centrering är plattformsoberoende (till skillnad från textAlignVertical
@@ -253,5 +290,8 @@ const styles = StyleSheet.create({
   chevron: {
     fontSize: 24,
     color: Colors.textPrimary,
+  },
+  chevronCompact: {
+    fontSize: 22,
   },
 });

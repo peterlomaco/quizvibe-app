@@ -201,7 +201,7 @@ export function PlayerHistorySection() {
               inte här. Renderar sig själv bara när användaren har minst
               en 1vs1-match. */}
           <View style={{ marginTop: Spacing.md }}>
-            <MyMatchesSection />
+            <MyMatchesSection full />
           </View>
         </>
       )}
