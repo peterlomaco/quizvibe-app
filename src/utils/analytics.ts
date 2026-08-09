@@ -28,7 +28,13 @@ export type AnalyticsEventName =
   | 'game_completed'
 
   // Monetization
-  | 'purchase_completed';
+  | 'purchase_completed'
+  // Launch-kampanjen: user tryckte "Free" i Store och startade/förnyade en
+  // gratismånad Premium. MEDVETET skilt från `purchase_completed` — inga
+  // pengar byter ägare, så 0 kr-claims ska inte hamna i revenue-mätningen.
+  // `renewal: true` är den intressanta siffran (kom de tillbaka för en
+  // andra månad?).
+  | 'free_premium_claimed';
 
 export type AnalyticsProps = Record<string, string | number | boolean | null>;
 

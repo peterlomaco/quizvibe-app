@@ -23,6 +23,13 @@ import {
 import { Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';
 import { track } from '../utils/analytics';
 import { loadProfile, saveProfile } from '../utils/profileStorage';
+import {
+  claimFreePremium,
+  formatPromoDate,
+  getFreePremiumExpiry,
+  hasActiveFreePremium,
+  isOfferWindowOpen,
+} from '../utils/promoPremium';
 import { setPremiumActive } from '../utils/subscriptionStorage';
 
 // ─── Tier-data ────────────────────────────────────────────────────────────────
@@ -192,6 +199,44 @@ export default function StoreScreen() {
     };
   }, []);
 
+  // ─── Free Premium launch promo ────────────────────────────────────────
+  // Två oberoende klockor (se src/utils/promoPremium.ts):
+  //   offerOpen   — erbjudandet är öppet ⇒ visa Free-kortet i stället för
+  //                 79 kr-kortet. Styrs av Peter via Supabase.
+  //   claimActive — DEN HÄR enhetens gratismånad är igång ⇒ visa ACTIVE-
+  //                 pillen utan knapp. Oberoende av offerOpen, så en
+  //                 pågående månad överlever att erbjudandet stängs.
+  //
+  // Skärmen läser INTE hasPremiumSubscription() — en betald prenumerant
+  // och en promo-user ska se olika saker, och promo-claimen är det enda
+  // Store kan agera på.
+  const [offerOpen, setOfferOpen] = useState(false);
+  const [claimActive, setClaimActive] = useState(false);
+  const [promoExpiry, setPromoExpiry] = useState<Date | null>(null);
+  const [claiming, setClaiming] = useState(false);
+
+  const loadPromoState = async () => {
+    const [open, active, expiry] = await Promise.all([
+      isOfferWindowOpen(),
+      hasActiveFreePremium(),
+      getFreePremiumExpiry(),
+    ]);
+    return { open, active, expiry };
+  };
+
+  useEffect(() => {
+    let cancelled = false;
+    loadPromoState().then(({ open, active, expiry }) => {
+      if (cancelled) return;
+      setOfferOpen(open);
+      setClaimActive(active);
+      setPromoExpiry(expiry);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   // Lookup-tabell product-ID → RC PurchasesPackage. När RC har laddat
   // offerings:n låter vi det vara source of truth för pris-display. Innan
   // load (eller om RC-key saknas i .env) faller call-sites tillbaka till
@@ -312,6 +357,36 @@ export default function StoreScreen() {
     Alert.alert(
       fromLobby ? title : 'Subscription activated',
       body,
+      [{ text: 'OK', onPress: handleBack }],
+    );
+  };
+
+  // Free Premium-kampanjen: startar (eller förnyar) en gratismånad. Inget
+  // IAP-anrop inblandat — inga pengar byter ägare, så StoreKit ska inte
+  // och får inte vara med. Det gör också att flödet funkar i Expo Go.
+  //
+  // Knappen som anropar detta renderas bara när offerOpen && !claimActive,
+  // så förnyelse kan aldrig ske i förtid.
+  const handleClaimFreePremium = async () => {
+    const isRenewal = promoExpiry !== null;
+
+    setClaiming(true);
+    await claimFreePremium();
+    const { open, active, expiry } = await loadPromoState();
+    setOfferOpen(open);
+    setClaimActive(active);
+    setPromoExpiry(expiry);
+    setClaiming(false);
+
+    track('free_premium_claimed', {
+      renewal: isRenewal,
+      expires_at: expiry?.toISOString() ?? null,
+    });
+
+    const until = expiry ? formatPromoDate(expiry) : 'next month';
+    Alert.alert(
+      'QuizVibe Premium activated',
+      `Free until ${until}. No payment and no auto-renewal — come back and tap Free again when it ends to continue.`,
       [{ text: 'OK', onPress: handleBack }],
     );
   };
@@ -455,24 +530,56 @@ export default function StoreScreen() {
         ))}
       </View>
 
-      {/* Pris-tiers */}
-      <View style={styles.tierList}>
-        {SUBSCRIPTION_TIERS.map((tier) => (
-          <SubscriptionTierCard
-            key={tier.id}
-            tier={tier}
-            displayPrice={getDisplayPrice(tier.productId, tier.price)}
-            isPurchasing={purchasing === tier.id}
-            disabled={purchasing !== null}
-            onBuy={() => handleBuySubscription(tier)}
+      {/* Pris-tiers. Under launch-kampanjen (offerOpen) ersätts hela
+          betal-tiern av Free-kortet — 79 kr-kortet ska INTE synas alls.
+          När Peter stänger erbjudandet återgår detta till dagens vy. */}
+      {offerOpen ? (
+        <View style={styles.tierList}>
+          <PromoTierCard
+            expiry={promoExpiry}
+            claimActive={claimActive}
+            isClaiming={claiming}
+            onClaim={handleClaimFreePremium}
           />
-        ))}
-      </View>
+        </View>
+      ) : (
+        <View style={styles.tierList}>
+          {SUBSCRIPTION_TIERS.map((tier) => (
+            <SubscriptionTierCard
+              key={tier.id}
+              tier={tier}
+              displayPrice={getDisplayPrice(tier.productId, tier.price)}
+              isPurchasing={purchasing === tier.id}
+              disabled={purchasing !== null}
+              onBuy={() => handleBuySubscription(tier)}
+            />
+          ))}
+        </View>
+      )}
 
-      <Text style={styles.autoRenewNote}>
-        All subscriptions auto-renew. Cancel anytime in your App Store
-        or Google Play account.
-      </Text>
+      {offerOpen ? (
+        // "All subscriptions auto-renew" är faktiskt FEL under kampanjen
+        // och får inte shippa som-är — gratismånaden förnyas inte själv.
+        <Text style={styles.autoRenewNote}>
+          Free for one month. No payment and no auto-renewal. Tap Free again
+          after it ends to continue.
+        </Text>
+      ) : (
+        <>
+          <Text style={styles.autoRenewNote}>
+            All subscriptions auto-renew. Cancel anytime in your App Store
+            or Google Play account.
+          </Text>
+          {/* Erbjudandet är stängt men den här enheten har en gratismånad
+              kvar (grandfathering). Utan denna rad skulle de se en
+              Subscribe-CTA utan att förstå varför de redan har Premium. */}
+          {claimActive && promoExpiry && (
+            <Text style={styles.autoRenewNote}>
+              Your free month is active until {formatPromoDate(promoExpiry)}.
+            </Text>
+          )}
+        </>
+      )}
 
       {/* Restore Purchases — Apple App Store-krav. Användare som
           installerade om appen eller bytte device kan återställa tidigare
@@ -622,6 +729,76 @@ function CreditTierCard({
               <Text style={styles.buyBtnText}>Buy</Text>
             )}
           </Pressable>
+        </View>
+      </View>
+    </View>
+  );
+}
+
+// ─── Free Premium promo card ──────────────────────────────────────────────────
+
+// Launch-kampanjens kort. Speglar SubscriptionTierCard:s geometri men har
+// inget pris och ingen "/ month"-suffix — det finns ingen prenumeration att
+// förnya, bara en månad som tar slut.
+//
+// Två lägen:
+//   claimActive=false → gold "Free"-knapp (samma accent som Subscribe).
+//   claimActive=true  → grön ACTIVE-pill, INGEN knapp. Månaden kan inte
+//                       startas om i förtid; knappen kommer tillbaka först
+//                       när den lapsat.
+function PromoTierCard({
+  expiry,
+  claimActive,
+  isClaiming,
+  onClaim,
+}: {
+  expiry: Date | null;
+  claimActive: boolean;
+  isClaiming: boolean;
+  onClaim: () => void;
+}) {
+  const accent = Colors.warning;
+
+  return (
+    // Grön kort-styling FÖRST när månaden är igång — grönt betyder "aktiv"
+    // i resten av appen, och att måla kortet grönt innan man tryckt Free
+    // hade läst som att man redan hade det.
+    <View style={[styles.tierCard, claimActive && styles.tierCardActive]}>
+      {/* Kantskärande FREE-badge, samma vokabulär som resten av appen. */}
+      <View style={styles.freeBadge}>
+        <Text style={styles.freeBadgeText}>FREE</Text>
+      </View>
+      <View style={[styles.tierContent, { alignItems: 'flex-start' }]}>
+        <View style={styles.tierLeft}>
+          <Text style={styles.tierHeadline}>Single month — no auto-renewal</Text>
+          {claimActive && expiry && (
+            <Text style={styles.tierSubline}>Free until {formatPromoDate(expiry)}</Text>
+          )}
+        </View>
+        <View style={[styles.tierRight, { alignItems: 'center' }]}>
+          {claimActive ? (
+            <View style={styles.activePill}>
+              <Text style={styles.activePillText}>ACTIVE</Text>
+            </View>
+          ) : (
+            <Pressable
+              onPress={onClaim}
+              disabled={isClaiming}
+              style={({ pressed }) => [
+                styles.buyBtn,
+                { backgroundColor: accent },
+                pressed && { opacity: 0.85 },
+                isClaiming && { opacity: 0.5 },
+              ]}
+            >
+              {isClaiming ? (
+                // Mörk spinner — vit syns dåligt mot guld.
+                <ActivityIndicator size="small" color={Colors.background} />
+              ) : (
+                <Text style={styles.buyBtnText}>Free</Text>
+              )}
+            </Pressable>
+          )}
         </View>
       </View>
     </View>

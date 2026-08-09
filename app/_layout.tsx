@@ -8,6 +8,7 @@ import {
 } from '@/src/lib/iap';
 import { BottomBanner } from '@/src/components/BottomBanner';
 import { Colors } from '@/src/theme';
+import { refreshOfferConfig } from '@/src/utils/promoPremium';
 import { setPremiumActive } from '@/src/utils/subscriptionStorage';
 import { supabase } from '@/src/utils/supabase';
 import { Stack } from 'expo-router';
@@ -29,6 +30,15 @@ export default function RootLayout() {
   // tystnar Premium-features i appen utan att kräva manual refresh.
   useEffect(() => {
     let cancelled = false;
+
+    // Free Premium-kampanjens av/på-läge bor i Supabase (app_config) så den
+    // kan stängas utan App Store-release. Fire-and-forget: misslyckas
+    // hämtningen används den cachade konfigen, annars den bakade
+    // backstop-datumet. Rör INTE premium-flaggan nedan — kampanjen
+    // utvärderas vid läsning i hasPremiumSubscription(), aldrig genom att
+    // skriva till samma nyckel (den skulle wipas av raderna nedan).
+    void refreshOfferConfig();
+
     (async () => {
       await configurePurchases();
       if (cancelled) return;
