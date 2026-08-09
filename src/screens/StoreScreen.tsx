@@ -764,13 +764,12 @@ function PromoTierCard({
     // i resten av appen, och att måla kortet grönt innan man tryckt Free
     // hade läst som att man redan hade det.
     <View style={[styles.tierCard, claimActive && styles.tierCardActive]}>
-      {/* Kantskärande FREE-badge, samma vokabulär som resten av appen. */}
-      <View style={styles.freeBadge}>
-        <Text style={styles.freeBadgeText}>FREE</Text>
-      </View>
+      {/* Ingen FREE-badge här — knappen säger redan "Free" och kortet är
+          det enda i sektionen, så badgen blev bara upprepning. */}
       <View style={[styles.tierContent, { alignItems: 'flex-start' }]}>
         <View style={styles.tierLeft}>
-          <Text style={styles.tierHeadline}>Single month — no auto-renewal</Text>
+          <Text style={styles.tierHeadline}>Single month</Text>
+          <Text style={styles.tierSubline}>no auto-renewal</Text>
           {claimActive && expiry && (
             <Text style={styles.tierSubline}>Free until {formatPromoDate(expiry)}</Text>
           )}
