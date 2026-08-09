@@ -22,7 +22,6 @@
 //     aktiv så länge sub är giltig. Mappa till profile.hasPremium-derivering.
 // ─────────────────────────────────────────────────────────────────────
 
-import Constants, { ExecutionEnvironment } from 'expo-constants';
 import { Platform } from 'react-native';
 import Purchases, {
   type CustomerInfo,
@@ -38,8 +37,10 @@ import Purchases, {
 // configure helt i Expo Go; alla övriga IAP-anrop no-op:ar redan via sina
 // !configured-guards. I dev-/standalone-builds (native-modulen finns) körs
 // allt som vanligt.
-const IS_EXPO_GO =
-  Constants.executionEnvironment === ExecutionEnvironment.StoreClient;
+//
+// IS_EXPO_GO bodde tidigare här som lokal const — flyttad till runtimeEnv
+// när Spotify-install-checken behövde exakt samma detektering.
+import { IS_EXPO_GO } from '@/src/utils/runtimeEnv';
 
 // Public API-key från RevenueCat Dashboard (Project Settings → API Keys).
 // iOS-keyen börjar med 'appl_...'. Android-keyen ('goog_...') sätts först

@@ -97,6 +97,7 @@ import { containsProfanity } from '../utils/profanity';
 import { loadProfile, playerNameExists, saveProfile, type ProfileData, type Region as ProfileRegion } from '../utils/profileStorage';
 import { hasPremiumSubscription } from '../utils/subscriptionStorage';
 import { ROOM_CODE_DIGITS, ROOM_CODE_LEADING_LETTERS, generateRoomCode } from '../utils/roomCode';
+import { checkSpotifyInstalled } from '../utils/spotifyDJ';
 import { addInvite, clearWaitingInvitesForRoom } from '../utils/waitingInvites';
 
 export interface LobbyPlayer extends Player {
@@ -946,6 +947,27 @@ function publishOwnAccountAlias(roomCode: string, playerId: string): void {
     .catch(() => {});
 }
 
+/**
+ * Alert.alert som en await-bar Promise<boolean>. Används för guards inuti
+ * redan-async flöden (t.ex. handleStartGame) där vi vill avbryta på Cancel
+ * utan att lägga till en parameter + rekursion à la ptpConfirmed — och utan
+ * att riskera Pressable-event-fällan där ett syntetiskt event landar i ett
+ * defaultat argument. Dismiss (Android back) räknas som Cancel.
+ */
+function confirmAsync(title: string, message: string, confirmLabel: string): Promise<boolean> {
+  return new Promise((resolve) => {
+    Alert.alert(
+      title,
+      message,
+      [
+        { text: 'Cancel', style: 'cancel', onPress: () => resolve(false) },
+        { text: confirmLabel, onPress: () => resolve(true) },
+      ],
+      { cancelable: true, onDismiss: () => resolve(false) },
+    );
+  });
+}
+
 function WaveDots() {
   const dot1 = useRef(new Animated.Value(0)).current;
   const dot2 = useRef(new Animated.Value(0)).current;
@@ -1529,9 +1551,27 @@ export default function LobbyScreen() {
         // dem som "to be approved by host" så de ser sig själva i lobbyn
         // direkt — de behöver inte vänta på godkännande för att se rummet.
         // Fallback till en generisk "Guest"-rad om profil saknas.
-        // Spotify self-attest läses ur profilen (Plan B — ingen OAuth-status).
+        // Spotify self-attest läses ur profilen (Plan B — ingen OAuth-status)
+        // och install-verifieras mot DENNA enhet innan den skrivs till lobbyn.
+        //
+        // Profil-flaggan kan vara månader gammal — usern kan ha avinstallerat
+        // Spotify sedan dess. Checken körs lokalt (enda stället den KAN köras)
+        // men resultatet når host via lobby_players.spotify_verified → deras
+        // spelarkort visar "Spotify ready"/"No Spotify" på verifierad grund.
+        //
+        // ENDAST NEDGRADERING: attesterad + saknas → av. Installerad men
+        // INTE attesterad → fortsatt av. Toggeln bär avsikt, inte bara
+        // förmåga — någon kan ha Spotify installerat och ändå inte vilja ha
+        // DJ-rollen (barnets konto, mobildata, vill inte lämna appen).
+        //
+        // Nedgraderingen skrivs MEDVETET inte tillbaka till profilen: lobby-
+        // raden speglar nuläget, profil-toggeln speglar avsikten. Usern ser
+        // attest-switchen av med röd ram och kan slå på den igen, vilket går
+        // via handleConnectSpotify och dess "Turn on anyway"-varning.
         const profile = await loadProfile();
-        const ownSpotifyAttested = profile?.spotifyAppConfirmed ?? false;
+        const spotifyInstallCheck = await checkSpotifyInstalled();
+        const ownSpotifyAttested =
+          (profile?.spotifyAppConfirmed ?? false) && spotifyInstallCheck !== 'not-found';
         const currentYear = new Date().getFullYear();
         const age = profile?.birthYear ? currentYear - profile.birthYear : undefined;
         const assistance = profile?.assistance ?? undefined;
@@ -1667,9 +1707,20 @@ export default function LobbyScreen() {
       // direkt unlockar Individual Devices + Max 12 utan extra refresh.
       // Ladda Spotify-self-attest ur profilen (Plan B — ingen OAuth-status).
       if (hostMode) {
-        loadProfile().then((prof) => {
+        loadProfile().then(async (prof) => {
           if (!active) return;
-          const attested = prof?.spotifyAppConfirmed ?? false;
+          // Install-verifiera profil-attesten mot denna enhet — samma
+          // nedgraderings-regel som non-host-joinen ovan (attesterad +
+          // saknas → av; installerad utan attest → fortsatt av; ingen
+          // återskrivning till profilen). Nedgraderingen gatar även
+          // spotifyEnabled-seeden nedan, så en host utan Spotify inte
+          // tyst startar en lobby med DJ-läget påslaget.
+          const installCheck = await checkSpotifyInstalled();
+          // Andra active-guard: awaiten ovan öppnar ett nytt fönster där
+          // skärmen kan ha tappat fokus innan vi hinner sätta state.
+          if (!active) return;
+          const attested =
+            (prof?.spotifyAppConfirmed ?? false) && installCheck !== 'not-found';
           setSpotifyConnected(attested);
           // Uppdatera host:s spelarkort direkt — setPlayers i Promise.all-grenen
           // nedan fångar spotifyConnected-staten vid closure-skapande (false), inte
@@ -2478,12 +2529,16 @@ export default function LobbyScreen() {
   };
   // ── Spotify DJ-handlers ───────────────────────────────────────────────
   /**
-   * Self-attest (Plan B 2026-07-22): bekräftar att usern har Spotify-appen
+   * Applicerar self-attesten (Plan B 2026-07-22): usern har Spotify-appen
    * på enheten — ersätter OAuth-connect. Behåller samma side-effects som
    * OAuth-versionen (spelarkort + spotify_verified-sync) och persisterar
    * dessutom attesten till profilen så Profile-toggeln speglar den.
+   *
+   * Anropa INTE direkt från UI — gå via handleConnectSpotify nedan, som
+   * install-verifierar först. Denna är utbruten just för att verifierings-
+   * vägen och "Turn on anyway"-vägen ska dela exakt samma side-effects.
    */
-  const handleConnectSpotify = async () => {
+  const applySpotifyAttest = () => {
     setSpotifyConnected(true);
     // Auto-aktivera DJ-toggeln direkt efter attest (host) — annars måste
     // användaren trycka på toggeln en extra gång manuellt efteråt.
@@ -2510,6 +2565,32 @@ export default function LobbyScreen() {
         saveProfile({ ...profile, spotifyAppConfirmed: true }).catch(() => {});
       }
     }).catch(() => {});
+  };
+
+  /**
+   * Verifierar att Spotify-appen finns på enheten innan attesten appliceras.
+   *
+   * Alla tre attest-ingångar går genom denna funktion — switchen i Source
+   * Mixerboard samt "I have Spotify"-knapparna i handleToggleSpotifyEnabled
+   * och handleStartGame — så checken behöver bara sitta här.
+   *
+   * FAIL-OPEN: 'installed' och 'unknown' (Expo Go / OS-fel) appliceras tyst.
+   * Bara 'not-found' varnar, och användaren kan alltid köra vidare ändå.
+   */
+  const handleConnectSpotify = async () => {
+    const installed = await checkSpotifyInstalled();
+    if (installed !== 'not-found') {
+      applySpotifyAttest();
+      return;
+    }
+    Alert.alert(
+      'Spotify not found on this device',
+      "We couldn't find the Spotify app on this device. You need it installed to be the DJ in a Spotify game.",
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Turn on anyway', onPress: applySpotifyAttest },
+      ],
+    );
   };
 
   /**
@@ -4780,6 +4861,26 @@ export default function LobbyScreen() {
         ],
       );
       return;
+    }
+
+    // Pre-flight: host ÄR attesterad, men stämmer attesten fortfarande?
+    // Täcker fallen som join-verifieringen missar — Spotify avinstallerat
+    // efter att lobbyn öppnades, eller attest satt via "Turn on anyway".
+    // Host är alltid en av DJ:arna (rotationen börjar på turnOrder[0]), så
+    // en felaktig attest här kostar hela lobbyn 240s tyst väntan + 60s
+    // nedräkning + auto-skip på hostens DJ-runda.
+    //
+    // MÅSTE ligga före credit-blocket nedan — per regeln att alla guards
+    // körs före credit-deduktionen så en avbruten start aldrig kostar en credit.
+    if (spotifyEnabled && spotifyConnected) {
+      if ((await checkSpotifyInstalled()) === 'not-found') {
+        const proceed = await confirmAsync(
+          'Spotify not found on this device',
+          "You've confirmed Spotify, but we can't find the app on this device. As host you'll be one of the DJs — without Spotify your DJ round will be skipped.",
+          'Start anyway',
+        );
+        if (!proceed) return;
+      }
     }
 
     // Konsumera 1 Free Host Game-credit per påbörjat spel (2 gratis/dag,
@@ -7860,8 +7961,14 @@ export default function LobbyScreen() {
               </View>
               <View style={styles.spotifyGuideStep}>
                 <Text style={styles.spotifyGuideStepNumber}>2</Text>
+                {/* Citerar attest-radens EXAKTA label (se spotifyLinkText-raden
+                    i Source Mixerboard) — texten sa tidigare Tap "I have the
+                    Spotify app", vilket varken matchade labeln eller att
+                    kontrollen är en switch. Sträng-expression i stället för
+                    JSX-text så citattecknen inte triggar
+                    react/no-unescaped-entities. */}
                 <Text style={styles.spotifyGuideStepText}>
-                  Tap "I have the Spotify app" to confirm — now you are ready to play Spotify music in Individual device mode
+                  {'Switch on "I have Spotify App on this device" to confirm — now you are ready to play Spotify music in Individual device mode'}
                 </Text>
               </View>
               <View style={styles.spotifyGuideStep}>

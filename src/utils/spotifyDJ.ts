@@ -23,6 +23,7 @@
  */
 
 import { Linking, Alert } from 'react-native';
+import { IS_EXPO_GO } from '@/src/utils/runtimeEnv';
 // ARKIVERADE imports (FUTURE VERSION 2 — används bara av arkiverade block nedan):
 // import { supabase } from '@/src/utils/supabase';
 // import { getValidAccessToken } from '@/src/lib/spotify';
@@ -126,6 +127,51 @@ export function getDJForQuestionIndex(
 const SPOTIFY_URI_SCHEME = 'spotify:track:';
 const SPOTIFY_WEB_URL_BASE = 'https://open.spotify.com/track/';
 
+// ── Install-verifiering (self-attest-stöd) ────────────────────────────
+
+/**
+ * Tre lägen — MEDVETET inte en boolean. Med bara true/false skulle `false`
+ * betyda BÅDE "Spotify saknas" och "vi kan inte avgöra", och eftersom
+ * canOpenURL alltid returnerar false i Expo Go skulle varje legitim
+ * användare blockeras under utveckling.
+ */
+export type SpotifyInstallCheck = 'installed' | 'not-found' | 'unknown';
+
+/**
+ * Kollar om Spotify-appen finns på DENNA enhet.
+ *
+ * Detta är INTE ett Spotify-API-anrop — `canOpenURL` är en ren OS-fråga
+ * ("finns någon installerad app som registrerat detta URL-schema?") som
+ * aldrig kontaktar Spotifys servrar. Samma juridiska kategori som deep
+ * linken själv (Plan B), noll policy-exponering.
+ *
+ * Kräver native-konfiguration som redan finns i app.json:
+ *   • iOS:     ios.infoPlist.LSApplicationQueriesSchemes = ["spotify"]
+ *   • Android: android.queries = [{ package: "com.spotify.music" }]
+ * Utan dem returnerar canOpenURL alltid false (iOS 9+ / Android 11+).
+ *
+ * VAD DEN INTE KAN AVGÖRA: om användaren är inloggad, har ett konto eller
+ * har Premium. Det kräver Web API:t, vilket är förbjudet för quiz-appar
+ * (Spotify Developer Policy §III.2). Installation är ändå det enda som
+ * faktiskt gatar DJ-rollen i Plan B — inget Premium-krav finns.
+ *
+ * Anropare ska ALLTID fail-open: 'installed' och 'unknown' passerar tyst,
+ * bara 'not-found' varnar — och användaren måste kunna köra vidare ändå.
+ */
+export async function checkSpotifyInstalled(): Promise<SpotifyInstallCheck> {
+  // Expo Go har sin egen Info.plist utan vårt scheme → canOpenURL är alltid
+  // false där, oavsett om Spotify faktiskt är installerat. "Vet ej", inte "nej".
+  if (IS_EXPO_GO) return 'unknown';
+  try {
+    return (await Linking.canOpenURL('spotify:')) ? 'installed' : 'not-found';
+  } catch (err) {
+    // Ett kastat undantag säger inget om installationen — behandla som okänt
+    // så ett oväntat OS-fel aldrig låser ute en användare som HAR Spotify.
+    console.warn('[spotifyDJ] checkSpotifyInstalled failed:', err);
+    return 'unknown';
+  }
+}
+
 /**
  * Öppnar Spotify-appen på rätt låt via deep link — REN URL, inget API-anrop
  * (Plan B per juridiskt underlag). Autoplay är inte garanterat: Spotify styr
@@ -152,6 +198,11 @@ export async function openSpotifyTrack(spotifyTrackId: string): Promise<boolean>
     // i Expo Go eftersom LSApplicationQueriesSchemes i app.json bara gäller
     // dev-/standalone-builds. Direktanrop låter OS:t hantera: Spotify öppnar om
     // installerat, annars visar systemet ett "no app" varningsdialogruta.
+    //
+    // OBS skillnaden mot checkSpotifyInstalled() ovan: DEEP LINKEN gatar aldrig
+    // (en felaktig false här hade gjort funktionen omöjlig att använda i Expo Go),
+    // medan ATTEST-toggeln gatar via checkSpotifyInstalled — den kan fail-open:a
+    // på 'unknown' och behåller därför sin träffsäkerhet i riktiga builds.
     await Linking.openURL(nativeUri);
     return true;
   } catch (err) {

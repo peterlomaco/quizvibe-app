@@ -77,6 +77,7 @@ import { clearLobbyPlayers } from '../utils/mockLobbyPlayers';
 import { clearLobbySettings } from '../utils/mockLobbySettings';
 import { clearGameStarted } from '../utils/mockStartedGames';
 import { generateRoomCode } from '../utils/roomCode';
+import { checkSpotifyInstalled } from '../utils/spotifyDJ';
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
@@ -681,9 +682,39 @@ export default function ProfileScreen() {
   // Self-attest (Plan B 2026-07-22): "Spotify user"-toggeln ersätter OAuth-
   // connect/disconnect. Av → DJ-defaulten stängs också av (den är gated på
   // attesten). Persisteras som spotifyAppConfirmed via Save Host settings.
-  const handleToggleSpotifyUser = (val: boolean) => {
+  //
+  // Applicerar attesten. Utbruten så att direkt-vägen och "Turn on anyway"-
+  // vägen i handleToggleSpotifyUser delar exakt samma side-effects.
+  const applySpotifyUserToggle = (val: boolean) => {
     setSpotifyConnected(val);
     if (!val) setSpotifyEnabled(false);
+  };
+
+  const handleToggleSpotifyUser = async (val: boolean) => {
+    // Av-vägen verifierar inget — man får alltid ta tillbaka sin attest.
+    if (!val) {
+      applySpotifyUserToggle(false);
+      return;
+    }
+    // På-vägen: verifiera att Spotify-appen faktiskt finns på enheten.
+    // FAIL-OPEN — 'installed' och 'unknown' (Expo Go / OS-fel) passerar tyst.
+    const installed = await checkSpotifyInstalled();
+    if (installed !== 'not-found') {
+      applySpotifyUserToggle(true);
+      return;
+    }
+    // Bara 'not-found' varnar, och användaren kan alltid köra vidare ändå
+    // (t.ex. om de tänker installera Spotify innan de spelar). Cancel rör
+    // inte staten → den kontrollerade Switchen snäpper tillbaka av sig själv,
+    // samma mönster som Year/Name-guardsen.
+    Alert.alert(
+      'Spotify not found on this device',
+      "We couldn't find the Spotify app on this device. You need it installed to be the DJ in a Spotify game.",
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Turn on anyway', onPress: () => applySpotifyUserToggle(true) },
+      ],
+    );
   };
 
   const handleToggleSpotifyEnabled = (val: boolean) => {
@@ -883,6 +914,13 @@ export default function ProfileScreen() {
       });
       // Spotify self-attest + DJ-defaults — läses från profilen (Plan B:
       // ingen OAuth-status att slå upp; spotifyAppConfirmed är källan).
+      //
+      // MEDVETET ingen install-verifiering här (till skillnad från lobby-
+      // joinen): Profile-toggeln visar användarens SPARADE AVSIKT, lobby-
+      // raden visar verifierat nuläge. Nedgraderade vi vid load skulle ett
+      // efterföljande "Save Host settings" tyst radera avsikten. Checken
+      // körs i stället när användaren aktivt slår PÅ toggeln
+      // (handleToggleSpotifyUser) och vid lobby-join/Start Game.
       loadProfile().then((p) => {
         if (!active) return;
         const attested = p?.spotifyAppConfirmed ?? false;
