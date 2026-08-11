@@ -206,28 +206,94 @@ export function parseIsoDuration(iso: string): number {
 }
 
 /**
- * Sammanställ orsaker till att en video är olämplig som clip-källa.
- * Returnerar tom array om videon är OK. Används av validate-CLI och
- * suggest-CLI för enhetlig rapportering.
+ * Regioner vi faktiskt levererar innehåll till. V1 är Sverige-only
+ * (se memory/project_v1_v2_region_strategy) — lägg till 'NO','DK','FI'
+ * m.fl. när V2 öppnar nordic/global, så klassas region-block mot de
+ * marknaderna automatiskt som hårda.
+ */
+export const SERVED_REGIONS: readonly string[] = ['SE'];
+
+/**
+ * 'hard' = klippet går INTE att spela för våra spelare (spelaren visar
+ * "Video unavailable"). 'soft' = spelas fint men är sämre kvalitet eller
+ * begränsat på en marknad vi inte levererar till.
+ *
+ * Skillnaden finns för att nightly-cron:en ska kunna gå grön när inget är
+ * trasigt. Innan uppdelningen exit:ade validate/autofix 1 på ALLA flaggor
+ * — och eftersom ~17 klipp permanent flaggas för SD eller BY/RU-block var
+ * jobbet rött varje natt sedan 2026-05-22. Riktiga fel (3 raderade videor)
+ * drunknade i bruset.
+ */
+export type ClipIssueSeverity = 'hard' | 'soft';
+
+export interface ClipIssue {
+  reason: string;
+  severity: ClipIssueSeverity;
+}
+
+/**
+ * Sammanställ problem med en video som clip-källa, klassade per severity.
+ * Returnerar tom array om videon är OK.
+ */
+export function getClipIssues(details: YoutubeVideoDetails): ClipIssue[] {
+  const issues: ClipIssue[] = [];
+  const hard = (reason: string) => issues.push({ reason, severity: 'hard' });
+  const soft = (reason: string) => issues.push({ reason, severity: 'soft' });
+
+  // Hårda: bryter uppspelning i den inbäddade spelaren.
+  if (!details.embeddable) hard('not embeddable');
+  if (details.privacyStatus !== 'public') hard(`privacy=${details.privacyStatus}`);
+  // Åldersgrindat innehåll vägrar spela i embeds — alltid hårt.
+  if (details.ageRestricted) hard('age-restricted');
+
+  // Region-block: bara block som träffar en marknad vi levererar till är
+  // hårda. BY/RU-block är regel snarare än undantag (label-sanktioner) och
+  // påverkar inte svenska spelare.
+  const blocked = details.blockedRegions ?? [];
+  const blockedServed = SERVED_REGIONS.filter((r) => blocked.includes(r));
+  if (blockedServed.length > 0) {
+    hard(`blocked in ${blockedServed.join('/')} (${blocked.length} region(s) total)`);
+  } else if (blocked.length > 0) {
+    soft(`blocked in ${blocked.length} region(s), none served`);
+  }
+
+  // Allow-list: videon spelas BARA i de uppräknade regionerna. Saknas vår
+  // marknad är klippet lika dött som ett explicit block. Kontrollerades
+  // inte alls före 2026-08-10 — en allow-list utan SE passerade tyst och
+  // gav "Video unavailable" i appen.
+  const allowed = details.allowedRegions;
+  if (allowed && allowed.length > 0) {
+    const missing = SERVED_REGIONS.filter((r) => !allowed.includes(r));
+    if (missing.length > 0) {
+      hard(`allow-list excludes ${missing.join('/')} (${allowed.length} region(s) allowed)`);
+    }
+  }
+
+  // Mjuka: spelas, men sämre. made-for-kids begränsar YouTube-funktioner
+  // (kommentarer, personaliserade annonser) men blockerar inte embeds.
+  if (details.madeForKids) soft('made for kids');
+  // HD-gate: SD-källor är 360-480p och syns tydligt pixliga i 220px-spelaren.
+  // 'unknown' flaggas INTE — vi vill inte regressa existerande klipp om
+  // API-svaret saknar fältet (defensiv).
+  if (details.definition === 'sd') soft('SD resolution');
+
+  return issues;
+}
+
+/** Bara de problem som faktiskt bryter uppspelning för våra spelare. */
+export function getHardClipIssues(details: YoutubeVideoDetails): ClipIssue[] {
+  return getClipIssues(details).filter((i) => i.severity === 'hard');
+}
+
+/**
+ * Platt lista över alla problem-orsaker, oavsett severity. Bakåtkompatibel
+ * yta för suggest/batch-pick/topic-pick som bara rapporterar text till
+ * curatorn. Nya anropare bör använda getClipIssues och respektera severity.
  */
 export function getClipBlockReasons(
   details: YoutubeVideoDetails,
 ): string[] {
-  const reasons: string[] = [];
-  if (!details.embeddable) reasons.push('not embeddable');
-  if (details.privacyStatus !== 'public') {
-    reasons.push(`privacy=${details.privacyStatus}`);
-  }
-  if (details.ageRestricted) reasons.push('age-restricted');
-  if (details.madeForKids) reasons.push('made for kids');
-  if (details.blockedRegions && details.blockedRegions.length > 0) {
-    reasons.push(`blocked in ${details.blockedRegions.length} region(s)`);
-  }
-  // HD-gate: SD-källor är 360-480p på YouTube och syns tydligt pixliga
-  // i 220px-spelaren. 'unknown' blockas INTE — vi vill inte regressa
-  // existerande klipp om API-svaret saknar fältet (defensiv).
-  if (details.definition === 'sd') reasons.push('SD resolution');
-  return reasons;
+  return getClipIssues(details).map((i) => i.reason);
 }
 
 function resolveApiKey(override?: string): string {

@@ -163,11 +163,13 @@ items:
     answerMethods: ["timeline"]
     spotifyTrackId: "5HkFTCxSeJ3kGNyQJbT4rJ" # bytt 2026-07-18 — gamla ID:t 404:ade (track borttagen/relinkad av Spotify)
     youtubeClips:
-      - videoId: "Y09uL2qbYCg"
+      - videoId: "rY0WxgSXdEE"
         startSec: 0
         endSec: 15
-        channelTitle: "Queen - Topic"
-        notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
+        channelTitle: "Queen Official"
+        notes: "Bytt 2026-08-10: gamla klippet (Y09uL2qbYCg, Queen - Topic) hade
+          allow-list utan SE → 'Video unavailable' i Sverige. Officiell remaster
+          från rättsinnehavarens kanal, HD, blockerad enbart i RU."
   # Expansion 2026-05-26: 16 nya iconic items för 1965-1978 så density blir
   # 2/år (matchar songs-millennials/gen-z/gen-alpha). Bohemian Rhapsody +
   # Hotel California + Dancing Queen utelämnade — finns i songs-all.yaml.
@@ -347,11 +349,15 @@ items:
     wikimediaSearchHints: ["Queen We Will Rock You News of the World"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "vDRVTnbuGec"
+      - videoId: "-tJYN-eG1zk"
         startSec: 0
         endSec: 15
-        channelTitle: "Queen - Topic"
-        notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
+        channelTitle: "Queen Official"
+        notes: "Bytt 2026-08-10: gamla klippet (vDRVTnbuGec, Queen - Topic) hade
+          allow-list utan SE → 'Video unavailable' i Sverige. Officiell video.
+          SD valdes MEDVETET framför HD-remastern (ipDEXJHEfTI) vars titel lyder
+          '1978 Edit' — årtal i titelraden spoilar/vilseleder en Year-fråga
+          (rätt svar är 1977)."
     genrePackages: ["sport"]
   - id: village-people-ymca
     displayName: "Y.M.C.A. — Village People"
@@ -541,11 +547,13 @@ items:
     wikimediaSearchHints: ["Queen We Are the Champions 1977"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "lxHuY6DgSJQ"
+      - videoId: "04854XqcfCY"
         startSec: 30
         endSec: 45
-        channelTitle: "Queen - Topic"
-        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+        channelTitle: "Queen Official"
+        notes: "Bytt 2026-08-10: gamla klippet (lxHuY6DgSJQ, Queen - Topic) hade
+          allow-list utan SE → 'Video unavailable' i Sverige. Officiell remaster
+          från rättsinnehavarens kanal, HD, blockerad enbart i RU."
     genrePackages: ["sport"]
   - id: police-roxanne
     displayName: "Roxanne — The Police"

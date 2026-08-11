@@ -4,6 +4,7 @@ import {
   getVideoDetails,
   parseIsoDuration,
   getClipBlockReasons,
+  getClipIssues,
   YoutubeVideoDetails,
 } from '../client';
 
@@ -439,5 +440,69 @@ describe('getClipBlockReasons', () => {
     expect(
       getClipBlockReasons(baseDetails({ definition: 'unknown' })),
     ).toEqual([]);
+  });
+
+  // ─── severity-uppdelning ───────────────────────────────────────────────
+  //
+  // Avgör om nightly-cron:en går röd. Hårt = spelaren visar "Video
+  // unavailable" för en svensk spelare. Mjukt = spelas fint, bara sämre.
+  describe('getClipIssues severity', () => {
+    const hardOf = (d: YoutubeVideoDetails) =>
+      getClipIssues(d).filter((i) => i.severity === 'hard').map((i) => i.reason);
+    const softOf = (d: YoutubeVideoDetails) =>
+      getClipIssues(d).filter((i) => i.severity === 'soft').map((i) => i.reason);
+
+    it('treats a clean video as having no issues at all', () => {
+      expect(getClipIssues(baseDetails())).toEqual([]);
+    });
+
+    it('treats non-embeddable, non-public and age-restricted as hard', () => {
+      expect(hardOf(baseDetails({ embeddable: false }))).toContain('not embeddable');
+      expect(hardOf(baseDetails({ privacyStatus: 'unlisted' })).length).toBe(1);
+      expect(hardOf(baseDetails({ ageRestricted: true }))).toContain('age-restricted');
+    });
+
+    it('treats SD and made-for-kids as soft (they still play)', () => {
+      const d = baseDetails({ definition: 'sd', madeForKids: true });
+      expect(hardOf(d)).toEqual([]);
+      expect(softOf(d)).toEqual(
+        expect.arrayContaining(['SD resolution', 'made for kids']),
+      );
+    });
+
+    it('treats a block that misses our served regions as soft', () => {
+      // BY/RU-block är label-sanktioner — irrelevanta för svenska spelare.
+      const d = baseDetails({ blockedRegions: ['BY', 'RU'] });
+      expect(hardOf(d)).toEqual([]);
+      expect(softOf(d)[0]).toContain('none served');
+    });
+
+    it('treats a block that includes SE as hard', () => {
+      const d = baseDetails({ blockedRegions: ['BY', 'RU', 'SE'] });
+      expect(hardOf(d)[0]).toContain('SE');
+      expect(softOf(d)).toEqual([]);
+    });
+
+    it('treats an allow-list without SE as hard', () => {
+      // Regressionsskydd: allowedRegions kontrollerades inte alls före
+      // 2026-08-10 — en US-only-video passerade tyst och gav
+      // "Video unavailable" i appen.
+      const d = baseDetails({ allowedRegions: ['US', 'CA'] });
+      expect(hardOf(d)[0]).toContain('allow-list excludes SE');
+    });
+
+    it('accepts an allow-list that includes SE', () => {
+      expect(getClipIssues(baseDetails({ allowedRegions: ['SE', 'NO'] }))).toEqual([]);
+    });
+
+    it('keeps getClipBlockReasons reporting both severities', () => {
+      // Bakåtkompatibel yta för suggest/batch-pick — curatorn ska se allt.
+      const reasons = getClipBlockReasons(
+        baseDetails({ definition: 'sd', embeddable: false }),
+      );
+      expect(reasons).toEqual(
+        expect.arrayContaining(['not embeddable', 'SD resolution']),
+      );
+    });
   });
 });

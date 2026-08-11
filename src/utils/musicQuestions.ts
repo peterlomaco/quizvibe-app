@@ -2652,12 +2652,12 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "youtubeClips": [
       {
-        "videoId": "lxHuY6DgSJQ",
+        "videoId": "04854XqcfCY",
         "startSec": 30,
         "endSec": 45,
-        "channelTitle": "Queen - Topic",
+        "channelTitle": "Queen Official",
         "license": "standard",
-        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+        "notes": "Bytt 2026-08-10: gamla klippet (lxHuY6DgSJQ, Queen - Topic) hade allow-list utan SE → 'Video unavailable' i Sverige. Officiell remaster från rättsinnehavarens kanal, HD, blockerad enbart i RU."
       }
     ]
   },
@@ -2679,12 +2679,12 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "youtubeClips": [
       {
-        "videoId": "vDRVTnbuGec",
+        "videoId": "-tJYN-eG1zk",
         "startSec": 0,
         "endSec": 15,
-        "channelTitle": "Queen - Topic",
+        "channelTitle": "Queen Official",
         "license": "standard",
-        "notes": "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
+        "notes": "Bytt 2026-08-10: gamla klippet (vDRVTnbuGec, Queen - Topic) hade allow-list utan SE → 'Video unavailable' i Sverige. Officiell video. SD valdes MEDVETET framför HD-remastern (ipDEXJHEfTI) vars titel lyder '1978 Edit' — årtal i titelraden spoilar/vilseleder en Year-fråga (rätt svar är 1977)."
       }
     ]
   },
@@ -3091,12 +3091,12 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "spotifyTrackId": "5HkFTCxSeJ3kGNyQJbT4rJ",
     "youtubeClips": [
       {
-        "videoId": "Y09uL2qbYCg",
+        "videoId": "rY0WxgSXdEE",
         "startSec": 0,
         "endSec": 15,
-        "channelTitle": "Queen - Topic",
+        "channelTitle": "Queen Official",
         "license": "standard",
-        "notes": "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
+        "notes": "Bytt 2026-08-10: gamla klippet (Y09uL2qbYCg, Queen - Topic) hade allow-list utan SE → 'Video unavailable' i Sverige. Officiell remaster från rättsinnehavarens kanal, HD, blockerad enbart i RU."
       }
     ]
   },

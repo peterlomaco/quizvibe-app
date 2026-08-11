@@ -1,19 +1,36 @@
 # Nightly validation av YouTube-klippen i backend/content/catalog/*.yaml
-# mot YouTube Data API v3. Fångar klipp som blivit:
-#   - missing (videoId borttagen / privat)
-#   - blocked (region-restriction adderad, age-gate, embeddable=false,
-#     definition nedgraderad till SD)
+# mot YouTube Data API v3.
+#
+# JOBBET GÅR RÖTT ENBART VID HÅRDA FEL — dvs klipp som faktiskt inte spelas
+# för våra spelare:
+#   - videoId raderad / privat
+#   - embeddable=false eller age-restricted
+#   - region-block ELLER allow-list som utesluter en marknad i
+#     SERVED_REGIONS (backend/youtube/client.ts — V1 = ['SE'])
+#
+# Mjuka anmärkningar (SD-upplösning, block i regioner vi inte levererar
+# till, made-for-kids) skrivs ut under NOTES men fäller INTE jobbet och
+# triggar ingen ersättningssökning.
+#
+# Bakgrund: t.o.m. 2026-08-10 räknades varje flagga som fel. Eftersom ~20
+# klipp permanent flaggas för SD eller BY/RU-block var jobbet rött VARJE
+# natt sedan 2026-05-22 — och när tre videor faktiskt raderades såg mejlet
+# exakt likadant ut som de 80 föregående. Larmet var värdelöst tills det
+# skilde på "trasigt" och "inte perfekt". Rör inte den uppdelningen utan
+# att tänka igenom vad ett rött mejl ska betyda.
+#
+# VIKTIGT vid V2: när nordic/global öppnas MÅSTE SERVED_REGIONS utökas,
+# annars klassas block mot de nya marknaderna tyst som mjuka.
 #
 # Re-uploads (MASTER RJ, prod. ovr, SLAYERO MUSIC, thelanoz video Comeback)
 # är inte original-rättsinnehavarens uppladdningar — kan tas ner via
 # copyright-claim utan förvarning. Nightly cron ger oss tidig signal innan
 # en användare träffar ett brutet klipp i appen.
 #
-# Pre-launch krav:
-#   1. YOUTUBE_API_KEY adderas som repo secret
-#      (Settings → Secrets and variables → Actions → New repository secret)
-#   2. Verifiera att första körningen lyckas — kolla Actions-fliken
-#   3. Failure-notifikationer: GitHub mejlar repo owner by default. Lägg
+# Setup (klart sedan 2026-05-22):
+#   1. YOUTUBE_API_KEY ligger som repo secret
+#      (Settings → Secrets and variables → Actions)
+#   2. Failure-notifikationer: GitHub mejlar repo owner by default. Lägg
 #      ev. till Slack/Discord-webhook senare om vi vill ha mer aggressiv
 #      notifiering.
 

@@ -24,6 +24,7 @@ import {
   searchVideos,
   getVideoDetails,
   getClipBlockReasons,
+  getClipIssues,
   type YoutubeVideoDetails,
   type YoutubeSearchResult,
 } from './client';
@@ -36,7 +37,7 @@ interface BrokenClip {
   itemId: string;
   displayName: string;
   clip: YoutubeClip;
-  status: 'blocked' | 'missing';
+  status: 'broken' | 'missing';
   reasons: string[];
 }
 
@@ -54,7 +55,7 @@ interface AutofixEntry {
   itemId: string;
   displayName: string;
   oldVideoId: string;
-  status: 'blocked' | 'missing';
+  status: 'broken' | 'missing';
   reasons: string[];
   replacement: Replacement | null;
   applied: boolean;
@@ -154,10 +155,20 @@ function patchYamlVideoId(
 
 const VIDEOS_BATCH = 50;
 
+/**
+ * Returnerar bara klipp med HÅRDA fel — de som faktiskt inte spelas för
+ * våra spelare. Mjuka anmärkningar (SD, block i icke-levererad region)
+ * räknas separat och triggar varken ersättningssökning eller exit 1.
+ *
+ * Före 2026-08-10 räknades varje flagga som "bruten", vilket gjorde att
+ * körningen sökte ersättningar för ~20 fullt spelbara klipp varje natt
+ * (~2 000 quota-enheter) och alltid exit:ade 1.
+ */
 async function findBrokenClips(
   items: Array<{ filename: string; item: ContentItem }>,
-): Promise<BrokenClip[]> {
+): Promise<{ broken: BrokenClip[]; softNoted: number }> {
   const refs: BrokenClip[] = [];
+  let softNoted = 0;
 
   // Samla alla clips
   const allRefs: Array<{ filename: string; item: ContentItem; clip: YoutubeClip }> = [];
@@ -167,7 +178,7 @@ async function findBrokenClips(
       allRefs.push({ filename, item, clip });
     }
   }
-  if (allRefs.length === 0) return [];
+  if (allRefs.length === 0) return { broken: [], softNoted: 0 };
 
   console.log(`Validerar ${allRefs.length} klipp mot YouTube Data API...`);
 
@@ -195,18 +206,22 @@ async function findBrokenClips(
       });
       continue;
     }
-    const reasons = getClipBlockReasons(details);
+    const issues = getClipIssues(details);
+    const hard = issues.filter((i) => i.severity === 'hard').map((i) => i.reason);
+    const soft = issues.filter((i) => i.severity === 'soft').map((i) => i.reason);
     if (
       details.durationSec > 0 &&
       clip.endSec > details.durationSec
     ) {
-      reasons.push(`endSec=${clip.endSec} exceeds duration ${details.durationSec}s`);
+      hard.push(`endSec=${clip.endSec} exceeds duration ${details.durationSec}s`);
     }
-    if (reasons.length > 0) {
-      refs.push({ filename, itemId: item.id, displayName: item.displayName, clip, status: 'blocked', reasons });
+    if (hard.length > 0) {
+      refs.push({ filename, itemId: item.id, displayName: item.displayName, clip, status: 'broken', reasons: hard });
+    } else if (soft.length > 0) {
+      softNoted++;
     }
   }
-  return refs;
+  return { broken: refs, softNoted };
 }
 
 // ─── Ersättningssökning ──────────────────────────────────────────────────────
@@ -369,10 +384,16 @@ async function main(): Promise<void> {
     }
   }
 
-  // 1. Hitta brutna klipp
-  const broken = await findBrokenClips(items);
+  // 1. Hitta brutna klipp (bara hårda fel — se findBrokenClips)
+  const { broken, softNoted } = await findBrokenClips(items);
+  if (softNoted > 0) {
+    console.log(
+      `  ${softNoted} klipp har mjuka anmärkningar (SD / block i regioner vi ` +
+        `inte levererar till) — spelas normalt, ingen åtgärd krävs.`,
+    );
+  }
   if (!broken.length) {
-    console.log(`\n✓ Alla klipp OK (${items.length} items, inga brutna hittades)`);
+    console.log(`\n✓ Alla klipp spelbara (${items.length} items, inga brutna hittades)`);
     saveReport([]);
     return;
   }
@@ -416,7 +437,9 @@ async function main(): Promise<void> {
   printSummary(entries);
   saveReport(entries);
 
-  // Exit 1 om det finns brutna klipp som varken auto-patchades eller saknar ersättning
+  // Exit 1 om det finns HÅRT brutna klipp som inte auto-patchades. Mjuka
+  // anmärkningar når aldrig hit (filtreras i findBrokenClips), så en grön
+  // körning betyder numera "inget är trasigt" — inte "inget är flaggat".
   const unfixed = entries.filter((e) => !e.applied);
   if (unfixed.length > 0) process.exit(1);
 }

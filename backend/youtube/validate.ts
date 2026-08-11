@@ -1,18 +1,22 @@
 // CLI: validera att alla `youtubeClips` i katalogen fortfarande är giltiga
-// (embeddable, public, ej age-restricted, ej globalt region-blockerade).
+// (embeddable, public, ej age-restricted, spelbara i SERVED_REGIONS).
 //
 // Kör med: npm run youtube-validate
 //   eller: npm run youtube-validate -- --file persons-millennials.yaml
 //   eller: npm run youtube-validate -- <item-id>
 //
-// Tänkt CI-användning: kör nightly + flagga clips som börjat fallera så de
-// kan kureras om innan användare träffar dem i spelet.
+// Exit 1 BARA vid hårda fel (klippet spelas inte för våra spelare). Mjuka
+// anmärkningar — SD-upplösning, block i regioner vi inte levererar till —
+// rapporteras under NOTES men fäller inte körningen. Se getClipIssues i
+// ./client för severity-reglerna och varför uppdelningen finns.
+//
+// CI: körs nightly via .github/workflows/youtube-validate-nightly.yml.
 
 import { loadCatalog, findItemsById } from '../content/registry';
 import { ContentItem, YoutubeClip } from '../content/schema';
 import {
   getVideoDetails,
-  getClipBlockReasons,
+  getClipIssues,
   YoutubeVideoDetails,
 } from './client';
 
@@ -25,8 +29,14 @@ interface ClipReference {
 
 interface ClipReport {
   ref: ClipReference;
-  status: 'ok' | 'blocked' | 'missing';
-  reasons: string[];
+  /**
+   * 'missing'/'broken' = hårt fel, klippet spelas inte för våra spelare →
+   * exit 1. 'warn' = bara mjuka anmärkningar (SD, block i icke-levererad
+   * region) → rapporteras men fäller inte körningen. 'ok' = rent.
+   */
+  status: 'ok' | 'warn' | 'broken' | 'missing';
+  hardReasons: string[];
+  softReasons: string[];
   details?: YoutubeVideoDetails;
 }
 
@@ -68,24 +78,29 @@ async function validateBatch(refs: ClipReference[]): Promise<ClipReport[]> {
       reports.push({
         ref,
         status: 'missing',
-        reasons: ['video not found (deleted or private)'],
+        hardReasons: ['video not found (deleted or private)'],
+        softReasons: [],
       });
       continue;
     }
-    const reasons = getClipBlockReasons(details);
-    // Klipp-specifik validation: startSec/endSec inom video-längd
+    const issues = getClipIssues(details);
+    const hardReasons = issues.filter((i) => i.severity === 'hard').map((i) => i.reason);
+    const softReasons = issues.filter((i) => i.severity === 'soft').map((i) => i.reason);
+    // Klipp-specifik validation: startSec/endSec inom video-längd. Hårt —
+    // spelaren skulle söka förbi videons slut.
     if (
       details.durationSec > 0 &&
       ref.clip.endSec > details.durationSec
     ) {
-      reasons.push(
+      hardReasons.push(
         `endSec=${ref.clip.endSec} exceeds video length ${details.durationSec}s`,
       );
     }
     reports.push({
       ref,
-      status: reasons.length === 0 ? 'ok' : 'blocked',
-      reasons,
+      status: hardReasons.length > 0 ? 'broken' : softReasons.length > 0 ? 'warn' : 'ok',
+      hardReasons,
+      softReasons,
       details,
     });
   }
@@ -98,24 +113,42 @@ function printReport(reports: ClipReport[]): void {
     return;
   }
   const ok = reports.filter((r) => r.status === 'ok');
-  const blocked = reports.filter((r) => r.status === 'blocked');
+  const warn = reports.filter((r) => r.status === 'warn');
+  const broken = reports.filter((r) => r.status === 'broken');
   const missing = reports.filter((r) => r.status === 'missing');
 
   console.log(
     `\nValidated ${reports.length} clip(s): ` +
-      `${ok.length} OK, ${blocked.length} blocked, ${missing.length} missing.`,
+      `${ok.length} OK, ${warn.length} notes, ` +
+      `${broken.length} broken, ${missing.length} missing.`,
   );
 
-  if (blocked.length || missing.length) {
+  // Hårda fel först — det är dessa som fäller körningen och kräver åtgärd.
+  if (broken.length || missing.length) {
     console.log(
-      '\n──────────────────────────── ISSUES ────────────────────────────',
+      '\n──────────────────────── BROKEN (blocking) ─────────────────────',
     );
-    for (const r of [...missing, ...blocked]) {
-      const tag = r.status === 'missing' ? 'MISSING' : 'BLOCKED';
+    for (const r of [...missing, ...broken]) {
+      const tag = r.status === 'missing' ? 'MISSING' : 'BROKEN';
       console.log(
         `  [${tag}] ${r.ref.itemId} (${r.ref.filename}) → ${r.ref.clip.videoId}`,
       );
-      console.log(`    reasons: ${r.reasons.join(', ')}`);
+      console.log(`    reasons: ${r.hardReasons.join(', ')}`);
+    }
+  }
+
+  // Mjuka anmärkningar syns fortfarande, men fäller inte jobbet. Håller
+  // nightly-mejlet tyst tills något faktiskt går sönder.
+  const withNotes = [...broken, ...warn].filter((r) => r.softReasons.length > 0);
+  if (withNotes.length) {
+    console.log(
+      '\n──────────────────── NOTES (non-blocking) ──────────────────────',
+    );
+    for (const r of withNotes) {
+      console.log(
+        `  [NOTE] ${r.ref.itemId} (${r.ref.filename}) → ${r.ref.clip.videoId}`,
+      );
+      console.log(`    ${r.softReasons.join(', ')}`);
     }
   }
 
@@ -194,7 +227,12 @@ async function main(): Promise<void> {
   const reports = await validateBatch(refs);
   printReport(reports);
 
-  const failed = reports.filter((r) => r.status !== 'ok').length;
+  // Exit 1 BARA på hårda fel. Mjuka anmärkningar (SD, block i regioner vi
+  // inte levererar till) är permanenta för delar av katalogen och fällde
+  // tidigare jobbet varje natt — vilket gjorde nightly-mejlet värdelöst.
+  const failed = reports.filter(
+    (r) => r.status === 'broken' || r.status === 'missing',
+  ).length;
   if (failed > 0) process.exit(1);
 }
 
