@@ -41,9 +41,8 @@ import {
  * verifiera. Tom lista → bara sökfältet visas.
  */
 const PENDING_VERIFICATION: string[] = [
-  'queen-we-are-the-champions',
-  'queen-we-will-rock-you',
-  'queen-another-one-bites-the-dust',
+  // Tomt = inget väntar. De tre Queen-klippen från 4307df8 verifierades
+  // 2026-08-11 (ljud, startpunkt och titelrad OK på enhet).
 ];
 
 type PlayerStatus = 'idle' | 'loading' | 'ready' | 'ended' | 'error';
