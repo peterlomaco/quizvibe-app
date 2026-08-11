@@ -135,6 +135,47 @@ function isRemoteBlockContext(value: unknown): value is RemoteBlockContext {
 }
 
 /**
+ * Jämförelsen bakom info-ikonen intill "QuizVibe user"-rubriken på Home.
+ * Svarar på "vad får jag som registrerad user som en Guest inte får?".
+ *
+ * `user` / `guest` är antingen `true` (grön ✓), `false` (grå ✗) eller en
+ * kort värde-sträng när skillnaden är ett tak snarare än av/på. Håll
+ * strängarna korta — kolumnerna är smala.
+ *
+ * MEDVETET: tabellen listar bara det GRATIS kontot mot Guest. Allt som
+ * kräver betalning ligger i `PREMIUM_FEATURES` nedan och nås via raden
+ * "Premium option" — inga asterisker i värde-kolumnerna (Peter 2026-08-09).
+ *
+ * Källor för värdena: Remote 1vs1 är users-only; guest-hostade spel skriver
+ * ingen Player history; guest host är låst till fast Game era / inga Extra
+ * packages / max 1 Play Again; free host = 2 credits/dag (guest = ogated
+ * men trial-begränsat spel).
+ */
+const USER_VS_GUEST_ROWS: { label: string; user: boolean | string; guest: boolean | string }[] = [
+  { label: 'Local play — Single, Pass-the-Phone, Individual devices', user: true, guest: true },
+  { label: 'Remote play — 1vs1 matches', user: true, guest: false },
+  { label: 'Saved results & player history', user: true, guest: false },
+  { label: 'Friends list & in-app invites', user: true, guest: false },
+  { label: 'Choose Game era', user: true, guest: false },
+  { label: 'Host games per day', user: '2 free', guest: 'Trial' },
+  { label: 'Play again after a game', user: true, guest: '1 time' },
+  { label: 'Premium option', user: true, guest: false },
+];
+
+/**
+ * Vad Premium-abonnemanget lägger till ovanpå det gratis kontot. Listas
+ * SEPARAT under jämförelsetabellen så gratis-kontots rader inte blandas
+ * ihop med betalda tak. Spegla StoreScreen:s SUBSCRIPTION_FEATURES vid
+ * ändring.
+ */
+const PREMIUM_FEATURES: string[] = [
+  'Unlimited host games — no daily limit',
+  'Up to 12 players (Individual devices mode)',
+  'Up to 20 rounds (Individual devices mode)',
+  'All Extra Host packages included',
+];
+
+/**
  * Ifyllda guest-formulärsfält som bevaras när en Remote 1vs1-gate tar
  * spelaren till "Register or Login". Trycker de Cancel återställs formen
  * med dessa värden så de slipper fylla i allt igen.
@@ -1525,6 +1566,10 @@ export default function HomeScreen() {
   // guestLobbyType satt (konsumeras av handleStartGameAsGuestHost via prop).
   const [hostTypeExpanded, setHostTypeExpanded] = useState<'none' | 'registered' | 'guest'>('none');
   const [guestLobbyType, setGuestLobbyType] = useState<HostLobbyType>('standard');
+  // Info-modalen bakom "i"-ikonerna intill BÅDA sektionsrubrikerna
+  // ("QuizVibe user" + "Guest login / Non-registered") — jämförelse
+  // user vs guest (USER_VS_GUEST_ROWS + PREMIUM_FEATURES).
+  const [compareInfoVisible, setCompareInfoVisible] = useState(false);
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [profileMenuVisible, setProfileMenuVisible] = useState(false);
   const [profileMenuStep, setProfileMenuStep] = useState<'menu' | 'login' | 'register' | 'forgot'>('menu');
@@ -2484,9 +2529,24 @@ export default function HomeScreen() {
               {/* appNameFont (Nunito_700Bold) — en explicit fontFamily
                   override:ar fontWeight på iOS, så bold kräver bold-filen
                   (taglineFont = 400Regular renderade rubriken tunn). */}
-              <Text style={[styles.userSectionHeader, { fontFamily: appNameFont }]}>
-                QuizVibe user
-              </Text>
+              {/* Rubrik + info-ikon på samma rad. Ikonen öppnar
+                  jämförelsen user vs guest (USER_VS_GUEST_ROWS). Samma
+                  ikon sitter på Guest-rubriken nedan och öppnar samma
+                  modal — skillnaden ska kunna läsas från båda hållen. */}
+              <View style={styles.sectionHeaderRow}>
+                <Text style={[styles.userSectionHeader, { fontFamily: appNameFont }]}>
+                  QuizVibe user
+                </Text>
+                <Pressable
+                  onPress={() => setCompareInfoVisible(true)}
+                  hitSlop={10}
+                  style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
+                  accessibilityRole="button"
+                  accessibilityLabel="What is included as a QuizVibe user compared to Guest"
+                >
+                  <Text style={styles.infoIconText}>i</Text>
+                </Pressable>
+              </View>
               <Animated.View style={{ transform: [{ scale: pulse }] }}>
                 <TouchableOpacity
                   style={[styles.gameBtn, styles.gameBtnRegister]}
@@ -2607,10 +2667,25 @@ export default function HomeScreen() {
             <>
               {/* Guest-rubrik i grå text — separerar guest-pathen från
                   registered-åtgärderna ovan. */}
-              {/* appNameFont av samma skäl som QuizVibe user-rubriken ovan. */}
-              <Text style={[styles.guestSectionHeader, { fontFamily: appNameFont }]}>
-                Guest login / Non-registered
-              </Text>
+              {/* appNameFont av samma skäl som QuizVibe user-rubriken ovan.
+                  Sektions-marginalen (guestSectionHeader.marginTop) flyttas
+                  till radwrappern så rubrik + ikon centreras som en enhet. */}
+              <View style={[styles.sectionHeaderRow, { marginTop: Spacing.xl }]}>
+                <Text
+                  style={[styles.guestSectionHeader, { fontFamily: appNameFont, marginTop: 0 }]}
+                >
+                  Guest login / Non-registered
+                </Text>
+                <Pressable
+                  onPress={() => setCompareInfoVisible(true)}
+                  hitSlop={10}
+                  style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
+                  accessibilityRole="button"
+                  accessibilityLabel="What is included as a Guest compared to a QuizVibe user"
+                >
+                  <Text style={styles.infoIconText}>i</Text>
+                </Pressable>
+              </View>
 
               {/* Join with Room Code — guest. Pulserar (primär spel-path
                   för guests). */}
@@ -2670,14 +2745,22 @@ export default function HomeScreen() {
                 marginBottom matchar actionsSection:s gap så rytmen blir
                 identisk med utloggat läge. */}
             {isLoggedIn && hostTypeExpanded === 'none' && (
-              <Text
-                style={[
-                  styles.guestSectionHeader,
-                  { fontFamily: appNameFont, marginTop: 0, marginBottom: Spacing.md },
-                ]}
-              >
-                Guest login / Non-registered
-              </Text>
+              <View style={[styles.sectionHeaderRow, { marginBottom: Spacing.md }]}>
+                <Text
+                  style={[styles.guestSectionHeader, { fontFamily: appNameFont, marginTop: 0 }]}
+                >
+                  Guest login / Non-registered
+                </Text>
+                <Pressable
+                  onPress={() => setCompareInfoVisible(true)}
+                  hitSlop={10}
+                  style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
+                  accessibilityRole="button"
+                  accessibilityLabel="What is included as a Guest compared to a QuizVibe user"
+                >
+                  <Text style={styles.infoIconText}>i</Text>
+                </Pressable>
+              </View>
             )}
             {/* Pulsen ligger BARA på knappen — utfälld panel står still. */}
             <Animated.View
@@ -3767,7 +3850,84 @@ export default function HomeScreen() {
           )}
         </KeyboardAvoidingView>
       </Modal>
+
+      {/* ── QuizVibe user vs Guest ─────────────────────────────
+          Öppnas av info-ikonen intill BÅDA sektionsrubrikerna
+          ("QuizVibe user" + "Guest login / Non-registered").
+          Bottom-sheet i samma vokabulär som profileMenu/JoinModal.
+          ScrollView inuti eftersom raderna + Premium-listan kan bli
+          högre än 90 % viewport på korta skärmar. */}
+      <Modal
+        visible={compareInfoVisible}
+        animationType="fade"
+        transparent
+        onRequestClose={() => setCompareInfoVisible(false)}
+      >
+        <Pressable style={modal.overlay} onPress={() => setCompareInfoVisible(false)}>
+          {/* Tap inuti sheet:en ska INTE stänga — egen Pressable som
+              sväljer trycket. */}
+          <Pressable style={modal.sheet} onPress={() => {}}>
+            <Text style={modal.title}>QuizVibe user vs Guest</Text>
+            <Text style={modal.subtitle}>Registration is free.</Text>
+            <ScrollView style={{ flexShrink: 1 }} showsVerticalScrollIndicator={false}>
+              <View style={styles.compareHeaderRow}>
+                <View style={styles.compareLabelCell} />
+                <Text style={[styles.compareColHead, styles.compareColHeadUser]}>USER</Text>
+                <Text style={styles.compareColHead}>GUEST</Text>
+              </View>
+              {USER_VS_GUEST_ROWS.map((row) => (
+                <View key={row.label} style={styles.compareRow}>
+                  <Text style={[styles.compareLabelCell, styles.compareLabel]}>{row.label}</Text>
+                  <CompareCell value={row.user} positive />
+                  <CompareCell value={row.guest} />
+                </View>
+              ))}
+              {/* Premium listas SEPARAT — tabellen ovan gäller det gratis
+                  kontot, så inga betalda tak blandas in där. */}
+              <Text style={styles.compareSectionHead}>With QuizVibe Premium</Text>
+              {PREMIUM_FEATURES.map((feature) => (
+                <View key={feature} style={styles.compareBulletRow}>
+                  <Text style={styles.compareBulletMark}>✓</Text>
+                  <Text style={styles.compareBulletText}>{feature}</Text>
+                </View>
+              ))}
+              <Text style={styles.compareFootnote}>
+                Joining other players&apos; games is always free — host credits are only
+                used when you host.
+              </Text>
+            </ScrollView>
+            <TouchableOpacity onPress={() => setCompareInfoVisible(false)} style={modal.cancelBtn}>
+              <Text style={modal.cancelText}>Close</Text>
+            </TouchableOpacity>
+          </Pressable>
+        </Pressable>
+      </Modal>
     </SafeAreaView>
+  );
+}
+
+/**
+ * En cell i user/guest-jämförelsen. Boolean → ✓ (grön i user-kolumnen,
+ * annars neutral) / ✗ (grå). Sträng → värdet som text (t.ex. "Up to 12*").
+ */
+function CompareCell({ value, positive }: { value: boolean | string; positive?: boolean }) {
+  if (typeof value === 'string') {
+    return <Text style={[styles.compareValueCell, styles.compareValueText]}>{value}</Text>;
+  }
+  return (
+    <Text
+      style={[
+        styles.compareValueCell,
+        styles.compareMark,
+        value
+          ? positive
+            ? styles.compareMarkYesUser
+            : styles.compareMarkYes
+          : styles.compareMarkNo,
+      ]}
+    >
+      {value ? '✓' : '✗'}
+    </Text>
   );
 }
 
@@ -3905,6 +4065,95 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: -Spacing.sm,
     fontStyle: 'italic',
+  },
+  // Sektionsrubrik + info-ikon centrerade som en enhet. Delas av
+  // "QuizVibe user"- och Guest-rubriken. Rubrikens egen marginTop måste
+  // nollas på call-siten och flyttas hit, annars förskjuts bara texten
+  // inuti raden i stället för hela blocket.
+  sectionHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.sm,
+  },
+  // Info-knapp ("i" i cirkel) — samma vokabulär som Lobby-skärmens
+  // infoIconBtn så alla info-affordances i appen ser lika ut.
+  infoIconBtn: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: Colors.textSecondary,
+    backgroundColor: 'transparent',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  infoIconText: {
+    fontFamily: 'Georgia',
+    fontSize: 13,
+    fontWeight: '700',
+    fontStyle: 'italic',
+    color: Colors.warning,
+    lineHeight: 15,
+  },
+  // ── user vs guest-jämförelsen (info-modalen) ─────────────────────
+  compareHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingBottom: Spacing.xs,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+  },
+  compareRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: Spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+  },
+  // Label tar resterande bredd; värde-kolumnerna är fixa så ✓/✗ linjerar
+  // under sina rubriker oavsett hur långa etiketterna blir.
+  compareLabelCell: { flex: 1, paddingRight: Spacing.sm },
+  compareLabel: { fontSize: 13, color: Colors.textPrimary, lineHeight: 17 },
+  compareValueCell: { width: 72, textAlign: 'center' },
+  compareColHead: {
+    width: 72,
+    textAlign: 'center',
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 0.8,
+    color: Colors.textSecondary,
+  },
+  compareColHeadUser: { color: Colors.success },
+  compareMark: { fontSize: 16, fontWeight: '700' },
+  compareMarkYesUser: { color: Colors.success },
+  compareMarkYes: { color: Colors.textSecondary },
+  compareMarkNo: { color: Colors.textDisabled },
+  compareValueText: { fontSize: 12, fontWeight: '600', color: Colors.textSecondary },
+  // Rubrik + punktlista för Premium-blocket under jämförelsetabellen.
+  // Gold matchar PREMIUM-badgarnas färgspråk i resten av appen.
+  compareSectionHead: {
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 0.8,
+    textTransform: 'uppercase',
+    color: Colors.warning,
+    marginTop: Spacing.lg,
+    marginBottom: Spacing.xs,
+  },
+  compareBulletRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: Spacing.sm,
+    paddingVertical: 3,
+  },
+  compareBulletMark: { fontSize: 13, fontWeight: '700', color: Colors.warning, lineHeight: 17 },
+  compareBulletText: { flex: 1, fontSize: 13, color: Colors.textPrimary, lineHeight: 17 },
+  compareFootnote: {
+    fontSize: 11,
+    color: Colors.textSecondary,
+    lineHeight: 15,
+    marginTop: Spacing.md,
   },
   // "QuizVibe user"-rubriken ovanför Register or Login — grön text utan
   // ruta (matchar knappens gröna färgtema).

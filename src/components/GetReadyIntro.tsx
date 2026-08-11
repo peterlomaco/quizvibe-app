@@ -194,6 +194,12 @@ interface Props {
   /** D-iv: callback när host togglar audio för en spelare. Parent skriver
    *  till lobby_settings + broadcastar via syncChannel. */
   onPlayerAudioChange?: (playerId: string, audioOn: boolean) => void;
+  /** Remote 1v1: enhetens EGET ljud (YouTube-klipp, ambient, hjärtslag).
+   *  Remote saknar live-sync under spel, så audio kan bara ägas lokalt —
+   *  ingen per-spelare-map som i IndDev. Default på; raden renderas bara
+   *  när onSelfAudioChange är satt. */
+  selfAudioOn?: boolean;
+  onSelfAudioChange?: (audioOn: boolean) => void;
 }
 
 /** Liten avatar-cell som visas före spelarnamnet — uri-bild om finns, annars
@@ -239,13 +245,20 @@ const avatarStyles = StyleSheet.create({
 });
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
+const SCREEN_HEIGHT = Dimensions.get('window').height;
+// Kort-skärms-trösklar — samma som CodeKeyboard och QUIZ_PLAYER_HEIGHT i
+// quiz.tsx. 700: iPhone SE2/SE3 (667) + iPhone 8 (667). 600: iPhone SE1 (568).
+// ScrollView:n ovan gör att inget längre kapas, men kompakteringen minskar
+// hur mycket spelaren behöver scrolla för att nå play-knappen.
+const COMPACT = SCREEN_HEIGHT < 700;
+const VERY_COMPACT = SCREEN_HEIGHT < 600;
 // Brand-logon i Game settings-blocket. Mindre än tidigare corner-logo
 // (140) eftersom den nu sitter inline med settings-text till höger.
-const LOGO_SIZE = Math.min(96, SCREEN_WIDTH - 200);
+const LOGO_SIZE = Math.min(COMPACT ? 76 : 96, SCREEN_WIDTH - 200);
 // Storleken på Q-play-loggan + halo:n bakom. SVG:n har transparent padding så
 // halo-insetten räknas mot den synliga square-kanten (~16px-margin runt logon).
-const PLAY_BUTTON_SIZE = 140;
-const PLAY_HALO_INSET = 14;
+const PLAY_BUTTON_SIZE = VERY_COMPACT ? 108 : COMPACT ? 122 : 140;
+const PLAY_HALO_INSET = Math.round(PLAY_BUTTON_SIZE * 0.1);
 // Avatar-storlek i tabellradens Player-kolumn — samma för current och kö
 // så alla rader linjerar lodrätt.
 const QUEUE_AVATAR_SIZE = 32;
@@ -297,6 +310,8 @@ export function GetReadyIntro({
   hostPlayerId,
   playerAudioOverrides,
   onPlayerAudioChange,
+  selfAudioOn = true,
+  onSelfAudioChange,
 }: Props) {
   const isIndDev = mode === 'individual-devices';
   // Remote 1v1 (= onSaveExit satt): top-baren följer lobbyns mönster —
@@ -319,6 +334,9 @@ export function GetReadyIntro({
   // D-iv: audio-trigger visas bara för host i IndDev. Pass-the-Phone har
   // gemensam enhet → alltid ljud på → ingen trigger.
   const showAudioTrigger = isIndDev && isHost && !!hostPlayerId;
+  // Remote 1v1: egen Audio-rad som togglar ENHETENS eget ljud direkt (ingen
+  // modal — det finns bara en spelare per enhet att styra).
+  const showSelfAudioToggle = mode === 'remote-1v1' && !!onSelfAudioChange;
   // Helper: vad är effektiv audio-state för en spelare just nu? Saknad
   // key i overrides-mappen → default-policy: host on, övriga off.
   const audioOnForPlayer = (playerId: string): boolean => {
@@ -666,6 +684,18 @@ export function GetReadyIntro({
         </View>
       </Modal>
 
+      {/* Allt under top-baren ligger i en ScrollView. Utan den kapades
+          botten-innehållet (spelar-namn, kö-chips, "+ more questions") rakt
+          av på korta skärmar (iPhone SE/8) — settings + leaderboard +
+          play-knapp + tabell är tillsammans högre än ~570 pt och det fanns
+          ingen väg att nå resten. flexGrow:1 på content-containern gör att
+          layouten är oförändrad på höga skärmar (innehållet fyller höjden
+          som förut) och bara börjar scrolla när det faktiskt inte får plats. */}
+      <ScrollView
+        style={styles.scrollArea}
+        contentContainerStyle={styles.scrollAreaContent}
+        showsVerticalScrollIndicator={false}
+      >
       {/* ── Game settings-block: centrerad logo + settings-info till höger.
           Visar Game era (host:s val i Lobby, fixt under hela spelet) och
           Answer response time (justerbar — se RESPONSE_SECONDS_OPTIONS-
@@ -748,6 +778,26 @@ export function GetReadyIntro({
                       {hostAudioOn ? 'On' : 'Off'}
                     </Text>
                     <Text style={styles.responseDropdownChevron}>▼</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+              {/* Remote 1v1: ljudet ägs lokalt av varje enhet (ingen live-sync
+                  under spel), så raden togglar bara MIN uppspelning. Default
+                  på — tap växlar direkt utan mellanliggande modal. */}
+              {showSelfAudioToggle && (
+                <View style={styles.responseDropdownRow}>
+                  <Text style={styles.settingsRow}>Audio:</Text>
+                  <TouchableOpacity
+                    style={styles.responseDropdownTrigger}
+                    onPress={() => onSelfAudioChange?.(!selfAudioOn)}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={styles.responseDropdownTriggerText}>
+                      {selfAudioOn ? 'On' : 'Off'}
+                    </Text>
+                    <Text style={styles.selfAudioGlyph}>
+                      {selfAudioOn ? '🔊' : '🔇'}
+                    </Text>
                   </TouchableOpacity>
                 </View>
               )}
@@ -1515,6 +1565,7 @@ export function GetReadyIntro({
           </View>
         )}
       </View>
+      </ScrollView>
       {/* D-iii: bad-connection-overlay. Modal renderar fullscreen ovanpå allt
           (inkl. play-knappen + quit-bar), så användaren kan inte starta
           spelet eller ändra response time medan kanalen är unstable.
@@ -1678,8 +1729,22 @@ const styles = StyleSheet.create({
   exitSheetQuitBtnText: { fontSize: 16, fontWeight: '600', color: Colors.error },
   exitSheetCancelBtn: { alignItems: 'center', paddingVertical: Spacing.sm },
   exitSheetCancelText: { fontSize: 14, color: Colors.textSecondary },
-  container: {
+  // Scroll-zonen som håller settings + leaderboard + play + kö-tabell.
+  // flexGrow:1 på contentContainer (och på `container` nedan i stället för
+  // flex:1) gör att innehållet fyller skärmen när det får plats och växer
+  // förbi den — och blir scroll:bart — när det inte gör det.
+  scrollArea: {
     flex: 1,
+  },
+  scrollAreaContent: {
+    flexGrow: 1,
+    paddingBottom: Spacing.lg,
+  },
+  container: {
+    // flexGrow (inte flex:1) — se scrollAreaContent ovan. flex:1 hade gett
+    // flexBasis:0 + shrink inuti ScrollView:n, vilket klämmer ihop blocket
+    // i stället för att låta det växa och scrolla.
+    flexGrow: 1,
     // Tight paddingTop (var Spacing.xxxl * 2 = 96px) så play-knappen +
     // tableBlock + chip-grid + "+ more questions"-raden ryms inom
     // skärmens höjd även vid lång kö (4 rondor × 3+ spelare → chip-grid
@@ -1691,9 +1756,9 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'center',
     paddingHorizontal: Spacing.lg,
-    paddingTop: 40,
+    paddingTop: COMPACT ? 20 : 40,
     paddingBottom: Spacing.sm,
-    gap: Spacing.xxl,
+    gap: COMPACT ? Spacing.lg : Spacing.xxl,
   },
 
   // ── Game settings-block ────────────────────────────────────────────────
@@ -1824,6 +1889,11 @@ const styles = StyleSheet.create({
   responseDropdownChevron: {
     fontSize: 10,
     color: Colors.primary,
+  },
+  // Remote-Audio-radens högtalar-glyf. Egen fontSize — chevron-stilens 10 px
+  // är för litet för en emoji (den ärver ändå inte color).
+  selfAudioGlyph: {
+    fontSize: 13,
   },
   // Non-host:s read-only-rendering av Answer response time. Bara värdet
   // som primary-fet text — ingen border/bg/chevron/lock-ikon.

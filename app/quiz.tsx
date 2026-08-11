@@ -601,6 +601,24 @@ const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_H = Dimensions.get('window').height;
 // Matchar YouTubeMediaPlayer:s responsiva PLAYER_HEIGHT (samma trösklar).
 const QUIZ_PLAYER_HEIGHT = SCREEN_H < 600 ? 150 : SCREEN_H < 700 ? 185 : 220;
+// Kort-skärms-kompaktering av fråge-vyns fixed-top-zon (media + timer +
+// stopwatch + frågekort). Samma trösklar som ovan: 700 = iPhone SE2/SE3/8
+// (667), 600 = iPhone SE1 (568).
+//
+// Varför: layouten är [fixed-top] + [ScrollView: svarsalternativ] +
+// [sticky Confirm-bar]. fixed-top har naturlig höjd och krymper inte
+// (flexShrink default 0 i RN) medan ScrollView:n har flex:1 (= flexBasis 0
+// + shrink), så när summan överstiger skärmhöjden är det ALLTID scroll-
+// zonen som kollapsar — till ~30 px på en SE. Spelaren såg då en enda
+// halv svarsrad och kunde inte scrolla (det fanns ingen scroll-yta att ta
+// tag i). Kompakteringen frigör ~120 px så scroll-zonen får en användbar
+// höjd; flexShrink på hints-/bild-kortet är sista-utvägs-ventilen.
+const QUIZ_COMPACT = SCREEN_H < 700;
+const QUIZ_VERY_COMPACT = SCREEN_H < 600;
+// Höjd på hints-/bild-kortet. Normalt 16:9 av skärmbredden (≈211 px på
+// 375 pt) — cappas på korta skärmar. Kortets innehåll (hint-lista) har egen
+// intern scroll, så en lägre höjd tappar inget innehåll.
+const QUIZ_IMAGE_CARD_H = QUIZ_VERY_COMPACT ? 124 : QUIZ_COMPACT ? 158 : null;
 
 // ITEM_WIDTH (avstånd mellan ticks) sätts dynamiskt per assistance-nivå inuti komponenten:
 // Full: tät (≥10 år synliga), Standard: medium (≥8), Minimal: gles (4–5 syns)
@@ -1095,6 +1113,11 @@ export default function QuizScreen() {
   // isAudioMutedForSelf-compute:n längre ner kan läsa state utan TDZ.
   const [playerAudioOverrides, setPlayerAudioOverridesState] =
     useState<PlayerAudioOverrides>({});
+  // Remote 1v1: varje spelare kör en egen solo-session på sin egen enhet, så
+  // IndDev:s host-styrda overrides-map gäller inte här — ljudet ägs lokalt och
+  // är PÅ som default på BÅDA enheterna. Spelaren kan stänga av det själv via
+  // Audio-raden i GetReadyIntro:s Game settings (session-lokalt, inte sparat).
+  const [remoteAudioOn, setRemoteAudioOn] = useState(true);
   // D-v: host-inactivity-watchdog. lastHostActivityRef speglar (a) host:s
   // egna tap-tid när isHost=true eller (b) senast mottagna host_active_ping
   // när isHost=false. Båda håller fönstret på "9 min utan host-aktivitet
@@ -2865,15 +2888,16 @@ export default function QuizScreen() {
   // overrides-mappen; default-policyn kickar in vid saknad key.
   const isAudioMutedForSelf = useMemo(() => {
     if (gameMode === 'pass-the-phone') return false;
-    // Remote 1v1: solo-session på egen enhet — ljudet spelas ALLTID lokalt
-    // (ingen host-only-audio-policy; IndDev:s override-map gäller inte här).
-    if (gameMode === 'remote-1v1') return false;
+    // Remote 1v1: solo-session på egen enhet — ljudet spelas lokalt på BÅDA
+    // enheterna (ingen host-only-audio-policy; IndDev:s override-map gäller
+    // inte här). Default på; spelaren äger sin egen mute via remoteAudioOn.
+    if (gameMode === 'remote-1v1') return !remoteAudioOn;
     if (!selfPlayerId) return false;
     if (Object.prototype.hasOwnProperty.call(playerAudioOverrides, selfPlayerId)) {
       return !playerAudioOverrides[selfPlayerId];
     }
     return !isHost;
-  }, [gameMode, selfPlayerId, playerAudioOverrides, isHost]);
+  }, [gameMode, selfPlayerId, playerAudioOverrides, isHost, remoteAudioOn]);
   // Aktuell spelares namn i Pass-the-Phone-rotationen — visas subtilt i fråge-
   // kortet ("Answering: {namn}"). Skip:as för Individual Devices (varje
   // spelare är på sin egen enhet och vet redan vem de är).
@@ -6298,6 +6322,12 @@ export default function QuizScreen() {
         hostPlayerId={hostPlayerId}
         playerAudioOverrides={playerAudioOverrides}
         onPlayerAudioChange={handlePlayerAudioChange}
+        // Remote 1v1: enhetens eget ljud. Raden renderas bara när callbacken
+        // finns, så lokala lägen (PtP/IndDev) är orörda.
+        selfAudioOn={remoteAudioOn}
+        onSelfAudioChange={
+          gameMode === 'remote-1v1' ? setRemoteAudioOn : undefined
+        }
         // I IndDev wrappar vi onReady så host:s tap också broadcastar
         // play_command till non-host:s enheter. Pass-the-Phone behöver
         // ingen wrapping (alla på samma enhet). Non-host i IndDev får
@@ -6823,7 +6853,10 @@ export default function QuizScreen() {
                 // döljer videon under frågan för att undvika år-spoilers i
                 // YouTube-titeln.
                 showVideo={isActorSelectQuestion ? true : phase === 'reveal'}
-                isMuted={!isHost}
+                // isAudioMutedForSelf (INTE !isHost): remote 1v1 spelar ljud
+                // lokalt på båda enheterna, PtP delar enhet, och i IndDev är
+                // det host:s per-spelare-override som avgör.
+                isMuted={isAudioMutedForSelf}
                 onError={handleYoutubeError}
               />
             )}
@@ -7007,7 +7040,7 @@ export default function QuizScreen() {
                 {/* Wrap-View med integer-höjd centrerar SVG:n vertikalt
                     relativt den stora sekund-siffran (38 px lineHeight). */}
                 <View style={styles.decimalTimerIconWrap}>
-                  <StopwatchIcon size={32} color={stopwatchColor} />
+                  <StopwatchIcon size={QUIZ_COMPACT ? 26 : 32} color={stopwatchColor} />
                 </View>
                 <Text style={[styles.decimalTimerInt, { color: stopwatchColor }]}>
                   {String(Math.floor(decimalElapsedMs / 1000)).padStart(2, '0')}
@@ -7647,7 +7680,10 @@ const styles = StyleSheet.create({
   // (utanför ScrollView). gap: md ger samma luftiga avstånd mellan elementen
   // som tidigare ScrollView.contentContainerStyle.content.
   fixedTopZone: {
-    gap: Spacing.md,
+    gap: QUIZ_COMPACT ? Spacing.sm : Spacing.md,
+    // Får krympa som sista utväg (mot minHeight på imageMediaCard) så
+    // scroll-zonen nedanför aldrig hamnar på 0 px höjd.
+    flexShrink: 1,
   },
   // Scroll-zonen — wrappar bara svar-block + ev. reveal-feedback. flex: 1 så
   // den expanderar till resterande höjd mellan fixed-top och sticky-Confirm.
@@ -7799,7 +7835,13 @@ const styles = StyleSheet.create({
   // med liten letterbox topp+botten. ProgressiveCover-mosaiken täcker hela
   // containern via absoluteFill.
   imageMediaCard: {
-    aspectRatio: 16 / 9,
+    // Kort skärm → fast (lägre) höjd i stället för 16:9, se
+    // QUIZ_IMAGE_CARD_H. flexShrink + minHeight är ventilen om fixed-top-
+    // zonen ändå blir för hög (t.ex. ett ovanligt högt frågekort): kortet
+    // ger då efter i stället för att svars-scrollzonen kollapsar till 0.
+    ...(QUIZ_IMAGE_CARD_H ? { height: QUIZ_IMAGE_CARD_H } : { aspectRatio: 16 / 9 }),
+    flexShrink: 1,
+    minHeight: 110,
     backgroundColor: Colors.card,
     overflow: 'hidden',
     borderBottomWidth: 1,
@@ -7807,7 +7849,7 @@ const styles = StyleSheet.create({
   },
   // ── Spotify DJ-kortet (DJ:ns vy, innan start) ─────────────────────────
   spotifyDJCard: {
-    minHeight: 220,
+    minHeight: QUIZ_PLAYER_HEIGHT,
     backgroundColor: '#0D2010',
     alignItems: 'center',
     justifyContent: 'center',
@@ -7985,7 +8027,7 @@ const styles = StyleSheet.create({
   },
   // ── Q-logo-kortet (gissare + DJ efter start) ──────────────────────────
   spotifyQLogoCard: {
-    minHeight: 220,
+    minHeight: QUIZ_PLAYER_HEIGHT,
     backgroundColor: Colors.card,
     alignItems: 'center',
     justifyContent: 'flex-start',
@@ -8226,16 +8268,16 @@ const styles = StyleSheet.create({
     borderRadius: 32,
   },
   timerRing: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    width: QUIZ_COMPACT ? 46 : 56,
+    height: QUIZ_COMPACT ? 46 : 56,
+    borderRadius: QUIZ_COMPACT ? 23 : 28,
     borderWidth: 2,
     backgroundColor: Colors.cardElevated,
     alignItems: 'center',
     justifyContent: 'center',
   },
   timerRingNum: {
-    fontSize: 24,
+    fontSize: QUIZ_COMPACT ? 20 : 24,
     fontWeight: FontWeight.bold,
     fontVariant: ['tabular-nums'],
     letterSpacing: 0.2,
@@ -8269,28 +8311,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
     paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.sm,
+    paddingVertical: QUIZ_COMPACT ? Spacing.xs : Spacing.sm,
     borderRadius: Radius.lg,
     borderWidth: 2,
     backgroundColor: Colors.cardElevated,
   },
-  // Wrap runt SVG-ikonen — höjden matchar integer-textens lineHeight (40)
+  // Wrap runt SVG-ikonen — höjden matchar integer-textens lineHeight
   // så ikonens visuella mitt linjerar exakt med siffrans visuella mitt.
   decimalTimerIconWrap: {
-    width: 32,
-    height: 40,
+    width: QUIZ_COMPACT ? 26 : 32,
+    height: QUIZ_COMPACT ? 32 : 40,
     alignItems: 'center',
     justifyContent: 'center',
   },
   decimalTimerInt: {
-    fontSize: 38,
+    fontSize: QUIZ_COMPACT ? 30 : 38,
     fontWeight: FontWeight.bold,
     fontVariant: ['tabular-nums'],
     letterSpacing: -0.5,
-    lineHeight: 40,
+    lineHeight: QUIZ_COMPACT ? 32 : 40,
   },
   decimalTimerDec: {
-    fontSize: 22,
+    fontSize: QUIZ_COMPACT ? 18 : 22,
     fontWeight: FontWeight.semibold,
     fontVariant: ['tabular-nums'],
     letterSpacing: -0.3,
@@ -8299,7 +8341,9 @@ const styles = StyleSheet.create({
   questionCard: {
     backgroundColor: Colors.card, borderRadius: Radius.lg,
     borderWidth: 1, borderColor: Colors.border,
-    paddingHorizontal: Spacing.lg, paddingVertical: Spacing.md, gap: Spacing.xs,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: QUIZ_COMPACT ? Spacing.sm : Spacing.md,
+    gap: Spacing.xs,
     marginHorizontal: Spacing.lg,
     // minHeight borttagen — keyword-highlight ger naturlig 1-2-rads-höjd
     // (~70-90px) istället för tidigare fixed 140px.
@@ -8349,12 +8393,18 @@ const styles = StyleSheet.create({
   // Country). Renderas via <Text> nested i parent <Text>, så text-flowet
   // håller orden tillsammans på samma rad/wrap-ningsformat.
   questionTextHeadline: {
-    fontSize: 30,
+    fontSize: QUIZ_COMPACT ? 24 : 30,
     fontWeight: FontWeight.bold,
     color: Colors.textPrimary,
     letterSpacing: 0.3,
   },
-  questionText: { fontSize: 18, fontWeight: FontWeight.semibold, color: Colors.textPrimary, lineHeight: 30, textAlign: 'center' },
+  questionText: {
+    fontSize: QUIZ_COMPACT ? 16 : 18,
+    fontWeight: FontWeight.semibold,
+    color: Colors.textPrimary,
+    lineHeight: QUIZ_COMPACT ? 26 : 30,
+    textAlign: 'center',
+  },
 
   // Action-knapp (Confirm / Next Round / Final Leaderboard) — paddningen
   // matchar TimelineSelector:s wrapper så knappen står i samma kolumn.
@@ -8368,13 +8418,13 @@ const styles = StyleSheet.create({
   // ger luft runt knappen så den inte limmar mot border-top:en.
   stickyConfirmBar: {
     paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.md,
+    paddingVertical: QUIZ_COMPACT ? Spacing.sm : Spacing.md,
     backgroundColor: Colors.background,
     borderTopWidth: 1,
     borderTopColor: Colors.border,
   },
   actionBtn: {
-    height: 56,
+    height: QUIZ_COMPACT ? 48 : 56,
     borderRadius: Radius.md,
     alignItems: 'center',
     justifyContent: 'center',
@@ -8602,10 +8652,11 @@ const rv = StyleSheet.create({
 const scrollHintStyles = StyleSheet.create({
   wrap: {
     position: 'absolute',
-    // Bottom: sitter ovanför sticky Confirm-bar:n (~88px hög: 56 button + 32
-    // paddingVertical). Tidigare Spacing.lg räckte när Confirm var inuti
-    // ScrollView, men nu skulle pilen krocka med sticky-bar:n.
-    bottom: 96,
+    // Bottom: sitter ovanför sticky Confirm-bar:n (~81px hög: 56 button + 24
+    // paddingVertical + border; ~65px i kompakt läge). Tidigare Spacing.lg
+    // räckte när Confirm var inuti ScrollView, men nu skulle pilen krocka
+    // med sticky-bar:n.
+    bottom: QUIZ_COMPACT ? 78 : 96,
     left: 0,
     right: 0,
     alignItems: 'center',
