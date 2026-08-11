@@ -1154,30 +1154,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "beatles-all-you-need-is-love",
-    "displayName": "All You Need Is Love — The Beatles",
-    "correctYear": 1967,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "gen-x",
-      "elder"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "Lm9Uy7_EqNc",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "MusicClub80s",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
-      }
-    ]
-  },
-  {
     "id": "jimi-hendrix-purple-haze",
     "displayName": "Purple Haze — Jimi Hendrix",
     "correctYear": 1967,
@@ -2459,16 +2435,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "spotifyTrackId": "0GjEhVFGZW8afUYGChu3Rr",
-    "youtubeClips": [
-      {
-        "videoId": "TJLAJWSEd6U",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "MASTER RJ",
-        "license": "standard",
-        "notes": "Official Video Remaster — rörlig MV med dans/scen. Refrängområde."
-      }
-    ]
+    "youtubeClips": []
   },
   {
     "id": "eagles-hotel-california",
@@ -6157,33 +6124,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "bolaget-det-ligger-nat-i-luften",
-    "displayName": "Det ligger nåt i luften — Bolaget",
-    "correctYear": 1994,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "all"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "sport",
-      "football"
-    ],
-    "spotifyTrackId": "4okV0gcEkY1BlqQNDvaQCw",
-    "youtubeClips": [
-      {
-        "videoId": "81EOq-abbOw",
-        "startSec": 0,
-        "endSec": 30,
-        "channelTitle": "Bolaget",
-        "license": "standard"
-      }
-    ]
-  },
-  {
     "id": "cranberries-zombie",
     "displayName": "Zombie — The Cranberries",
     "correctYear": 1994,
@@ -6479,29 +6419,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Aarush Boi",
         "license": "standard",
         "notes": "Circle of Life-öppningsscenen (HD, 1994). Alla officiella Disney-trailers är made-for-kids-blockerade. Ersätt vid inbäddningsfel."
-      }
-    ]
-  },
-  {
-    "id": "tomas-brolin-vm-1994",
-    "displayName": "Tomas Brolins mål VM-94",
-    "correctYear": 1994,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "audiences": [
-      "all"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "GMpUuXe9uzM",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "MatigolVidz",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
       }
     ]
   },
@@ -6826,30 +6743,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Oasis - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
-      }
-    ]
-  },
-  {
-    "id": "spice-girls-wannabe",
-    "displayName": "Wannabe — Spice Girls",
-    "correctYear": 1996,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "millennials",
-      "gen-x"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "tscL_I2v7pU",
-        "startSec": 5,
-        "endSec": 20,
-        "channelTitle": "Spice Girls - Topic",
-        "license": "standard",
-        "notes": "Officiell album-audio via YouTube Topic. Iconic 'I'll tell you what I want'-intro."
       }
     ]
   },
@@ -7313,16 +7206,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "hiphop"
     ],
     "spotifyTrackId": "75IN3CtuZwTHTnZvYM4qnJ",
-    "youtubeClips": [
-      {
-        "videoId": "EAKfXCRmhq8",
-        "startSec": 0,
-        "endSec": 30,
-        "channelTitle": "Eminem",
-        "license": "standard",
-        "notes": "Official music video."
-      }
-    ]
+    "youtubeClips": []
   },
   {
     "id": "lou-bega-mambo-no-5",
@@ -8304,16 +8188,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "spotifyTrackId": "2LELFaNglE9B5xlcmd4qtQ",
-    "youtubeClips": [
-      {
-        "videoId": "uUYplyWPKGk",
-        "startSec": 0,
-        "endSec": 30,
-        "channelTitle": "Günther",
-        "license": "standard",
-        "notes": "Official music video."
-      }
-    ]
+    "youtubeClips": []
   },
   {
     "id": "lena-philipsson-det-gor-ont",
@@ -10447,29 +10322,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "tre-kronor-os-silver-sochi-2014",
-    "displayName": "Tre Kronor OS-silver Sochi (mot Kanada)",
-    "correctYear": 2014,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "audiences": [
-      "all"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "3e7FyDCxxL4",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Expressen",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
-      }
-    ]
-  },
-  {
     "id": "adele-hello",
     "displayName": "Hello — Adele",
     "correctYear": 2015,
@@ -12071,29 +11923,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "frida-karlsson-vm-planica-2023",
-    "displayName": "Frida Karlsson VM-medalj Planica",
-    "correctYear": 2023,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "audiences": [
-      "all"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "A8W64l14zCI",
-        "startSec": 0,
-        "endSec": 13,
-        "channelTitle": "Nordic Skiing And Running Club",
-        "license": "standard",
-        "notes": "Refined query 2026-05-27 — Frida Karlsson Tour de Ski 2023 first win, 13s clip."
-      }
-    ]
-  },
-  {
     "id": "loreen-tattoo",
     "displayName": "Tattoo — Loreen",
     "correctYear": 2023,
@@ -12382,6 +12211,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "Melodifestivalen 2025 vinnare. ESC 2025 official music video."
+      }
+    ]
+  },
+  {
+    "id": "bolaget-det-ligger-nat-i-luften",
+    "displayName": "Det ligger nåt i luften — Bolaget",
+    "correctYear": 2026,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "all"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "sport",
+      "football"
+    ],
+    "spotifyTrackId": "4okV0gcEkY1BlqQNDvaQCw",
+    "youtubeClips": [
+      {
+        "videoId": "81EOq-abbOw",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Bolaget",
+        "license": "standard"
       }
     ]
   },

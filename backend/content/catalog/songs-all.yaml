@@ -62,12 +62,9 @@ items:
     # Hitta ID:t via Spotify: öppna låten → Share → Copy Song Link
     # → URL-en är https://open.spotify.com/track/<ID-HIT>
     spotifyTrackId: "0GjEhVFGZW8afUYGChu3Rr"
-    youtubeClips:
-      - videoId: "TJLAJWSEd6U"
-        startSec: 30
-        endSec: 45
-        channelTitle: "MASTER RJ"
-        notes: "Official Video Remaster — rörlig MV med dans/scen. Refrängområde."
+    # youtubeClips borttagna 2026-08-10: TJLAJWSEd6U (MASTER RJ, re-upload) blev
+    # region-blockerad i 249 länder inkl. SE → "Video unavailable" i spelaren.
+    # Lever vidare som Spotify-only DJ-runda. Ersättningsklipp krävs.
   - id: michael-jackson-billie-jean
     displayName: "Billie Jean — Michael Jackson"
     correctYear: 1982

@@ -40,12 +40,8 @@ items:
     probability: 90
     wikimediaSearchHints: ["The Beatles All You Need Is Love"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "Lm9Uy7_EqNc"
-        startSec: 30
-        endSec: 45
-        channelTitle: "MusicClub80s"
-        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
+    # youtubeClips borttagna 2026-08-10: Lm9Uy7_EqNc (MusicClub80s, re-upload) är
+    # raderad/privat → "Video unavailable" i spelaren. Ersättningsklipp krävs.
   - id: beatles-hey-jude
     displayName: "Hey Jude — The Beatles"
     correctYear: 1968

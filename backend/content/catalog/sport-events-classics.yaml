@@ -301,12 +301,8 @@ items:
     probability: 78
     wikimediaSearchHints: ["Tomas Brolin 1994 World Cup goal Sweden"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "GMpUuXe9uzM"
-        startSec: 30
-        endSec: 45
-        channelTitle: "MatigolVidz"
-        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+    # youtubeClips borttagna 2026-08-10: GMpUuXe9uzM (MatigolVidz, re-upload) är
+    # raderad/privat → "Video unavailable" i spelaren. Ersättningsklipp krävs.
   - id: ravelli-vm-94-rumanien
     displayName: "Ravelli stoppar Rumäniens straffar VM-94"
     correctYear: 1994
@@ -426,12 +422,8 @@ items:
     probability: 76
     wikimediaSearchHints: ["Sweden Canada 2014 Sochi Olympics hockey final silver"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "3e7FyDCxxL4"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Expressen"
-        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+    # youtubeClips borttagna 2026-08-10: 3e7FyDCxxL4 (Expressen) visade Frida Karlsson
+    # (längdskidor), inte hockeyfinalen Sverige–Kanada. Fel event. Ersättningsklipp krävs.
   - id: simone-biles-rio-2016
     displayName: "Simone Biles 4 OS-guld i Rio"
     correctYear: 2016
@@ -499,12 +491,8 @@ items:
     probability: 70
     wikimediaSearchHints: ["Frida Karlsson 2023 Planica World Championship medal"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "A8W64l14zCI"
-        startSec: 0
-        endSec: 13
-        channelTitle: "Nordic Skiing And Running Club"
-        notes: "Refined query 2026-05-27 — Frida Karlsson Tour de Ski 2023 first win, 13s clip."
+    # youtubeClips borttagna 2026-08-10: A8W64l14zCI (Nordic Skiing And Running Club)
+    # hade pålagd musik som störde uppspelningen. Ersättningsklipp krävs.
   # === Content-expansion 2026-05-29: fler cross-gen-ikoniska sport-händelser ===
   - id: ali-rumble-jungle-1974
     displayName: "Muhammad Ali 'Rumble in the Jungle' mot Foreman"

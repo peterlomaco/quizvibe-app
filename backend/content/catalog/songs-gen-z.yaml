@@ -1119,12 +1119,9 @@ items:
     answerMethods: ["timeline"]
     genrePackages: ["hiphop"]
     spotifyTrackId: "75IN3CtuZwTHTnZvYM4qnJ"
-    youtubeClips:
-      - videoId: "EAKfXCRmhq8"
-        startSec: 0
-        endSec: 30
-        channelTitle: "Eminem"
-        notes: "Official music video."
+    # youtubeClips borttagna 2026-08-10: EAKfXCRmhq8 (Eminem, officiell kanal) har
+    # embedding avstängd → "Video unavailable" i spelaren. Lever vidare som
+    # Spotify-only DJ-runda. Ersättningsklipp krävs.
   - id: outkast-ms-jackson
     displayName: "Ms. Jackson — OutKast"
     correctYear: 2000
@@ -1153,12 +1150,9 @@ items:
     wikimediaSearchHints: ["Günther Ding Ding Dong 2004 Swedish eurodance"]
     answerMethods: ["timeline"]
     spotifyTrackId: "2LELFaNglE9B5xlcmd4qtQ"
-    youtubeClips:
-      - videoId: "uUYplyWPKGk"
-        startSec: 0
-        endSec: 30
-        channelTitle: "Günther"
-        notes: "Official music video."
+    # youtubeClips borttagna 2026-08-10: uUYplyWPKGk (Günther) är raderad/privat →
+    # "Video unavailable" i spelaren. Lever vidare som Spotify-only DJ-runda.
+    # Ersättningsklipp krävs.
   - id: jay-z-empire-state-of-mind
     displayName: "Empire State of Mind — Jay-Z ft. Alicia Keys"
     correctYear: 2009

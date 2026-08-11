@@ -367,12 +367,9 @@ items:
     probability: 90
     wikimediaSearchHints: ["Spice Girls Wannabe"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "tscL_I2v7pU"
-        startSec: 5
-        endSec: 20
-        channelTitle: "Spice Girls - Topic"
-        notes: "Officiell album-audio via YouTube Topic. Iconic 'I'll tell you what I want'-intro."
+    # youtubeClips borttagna 2026-08-10: tscL_I2v7pU (Spice Girls - Topic) blev
+    # region-blockerad i 249 länder inkl. SE → "Video unavailable" i spelaren.
+    # Ersättningsklipp krävs.
   - id: los-del-rio-macarena
     displayName: "Macarena — Los del Río"
     correctYear: 1996

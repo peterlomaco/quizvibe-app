@@ -150,7 +150,9 @@ items:
     youtubeClips: []
   - id: bolaget-det-ligger-nat-i-luften
     displayName: "Det ligger nåt i luften — Bolaget"
-    correctYear: 1994
+    # correctYear rättat 1994 -> 2026 (2026-08-10): TV4:s officiella VM-låt,
+    # släppt 2026-06-03 (Warner Music). 1994 var en felaktig gissning vid tillägget.
+    correctYear: 2026
     probability: 78
     wikimediaSearchHints: ["Bolaget Det ligger nåt i luften Sverige fotboll"]
     answerMethods: ["timeline"]
