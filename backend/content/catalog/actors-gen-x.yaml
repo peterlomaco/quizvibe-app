@@ -12,6 +12,7 @@ items:
     peakFrom: 1970
     peakTo: 2000
     probability: 89
+    region: ["global"]
     wikimediaSearchHints: ["Arnold Schwarzenegger"]
     answerMethods: ["timeline", "name-letters"]
   - id: lasse-aberg
@@ -28,6 +29,7 @@ items:
     peakFrom: 1990
     peakTo: 2020
     probability: 92
+    region: ["global"]
     wikimediaSearchHints: ["Julia Roberts actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: leonardo-dicaprio
@@ -36,6 +38,7 @@ items:
     peakFrom: 1997
     peakTo: 2026
     probability: 96
+    region: ["global"]
     wikimediaSearchHints: ["Leonardo DiCaprio"]
     answerMethods: ["timeline", "name-letters"]
   - id: tom-cruise
@@ -44,6 +47,7 @@ items:
     peakFrom: 1985
     peakTo: 2015
     probability: 92
+    region: ["global"]
     wikimediaSearchHints: ["Tom Cruise actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: meryl-streep
@@ -52,6 +56,7 @@ items:
     peakFrom: 1972
     peakTo: 2002
     probability: 88
+    region: ["global"]
     wikimediaSearchHints: ["Meryl Streep actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: robin-williams
@@ -60,6 +65,7 @@ items:
     peakFrom: 1974
     peakTo: 2004
     probability: 90
+    region: ["global"]
     wikimediaSearchHints: ["Robin Williams actor comedian"]
     answerMethods: ["timeline", "name-letters"]
   - id: robert-de-niro
@@ -68,6 +74,7 @@ items:
     peakFrom: 1966
     peakTo: 1996
     probability: 88
+    region: ["global"]
     wikimediaSearchHints: ["Robert De Niro actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: jim-carrey
@@ -76,6 +83,7 @@ items:
     peakFrom: 1985
     peakTo: 2015
     probability: 88
+    region: ["global"]
     wikimediaSearchHints: ["Jim Carrey actor comedian"]
     answerMethods: ["timeline", "name-letters"]
   - id: bruce-willis
@@ -84,6 +92,7 @@ items:
     peakFrom: 1978
     peakTo: 2008
     probability: 88
+    region: ["global"]
     wikimediaSearchHints: ["Bruce Willis actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: sigourney-weaver
@@ -92,6 +101,7 @@ items:
     peakFrom: 1972
     peakTo: 2002
     probability: 80
+    region: ["global"]
     wikimediaSearchHints: ["Sigourney Weaver actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: jack-nicholson
@@ -100,6 +110,7 @@ items:
     peakFrom: 1960
     peakTo: 1990
     probability: 88
+    region: ["global"]
     wikimediaSearchHints: ["Jack Nicholson actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: al-pacino
@@ -108,6 +119,7 @@ items:
     peakFrom: 1963
     peakTo: 1993
     probability: 90
+    region: ["global"]
     wikimediaSearchHints: ["Al Pacino actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: anthony-hopkins
@@ -116,6 +128,7 @@ items:
     peakFrom: 1960
     peakTo: 1990
     probability: 85
+    region: ["global"]
     wikimediaSearchHints: ["Anthony Hopkins actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: robert-redford
@@ -124,6 +137,7 @@ items:
     peakFrom: 1959
     peakTo: 1989
     probability: 85
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Robert Redford actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: paul-newman
@@ -132,6 +146,7 @@ items:
     peakFrom: 1948
     peakTo: 1978
     probability: 82
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Paul Newman actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: gene-hackman
@@ -140,6 +155,7 @@ items:
     peakFrom: 1953
     peakTo: 1983
     probability: 80
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Gene Hackman actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: dustin-hoffman
@@ -148,6 +164,7 @@ items:
     peakFrom: 1960
     peakTo: 1990
     probability: 85
+    region: ["global"]
     wikimediaSearchHints: ["Dustin Hoffman actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: diane-keaton
@@ -156,6 +173,7 @@ items:
     peakFrom: 1969
     peakTo: 1999
     probability: 82
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Diane Keaton actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: susan-sarandon
@@ -164,6 +182,7 @@ items:
     peakFrom: 1969
     peakTo: 1999
     probability: 82
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Susan Sarandon actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: goldie-hawn
@@ -172,6 +191,7 @@ items:
     peakFrom: 1968
     peakTo: 1998
     probability: 82
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Goldie Hawn actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: liam-neeson
@@ -180,6 +200,7 @@ items:
     peakFrom: 1975
     peakTo: 2005
     probability: 88
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Liam Neeson actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: tom-selleck
@@ -188,6 +209,7 @@ items:
     peakFrom: 1968
     peakTo: 1998
     probability: 82
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Tom Selleck actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: whoopi-goldberg
@@ -196,6 +218,7 @@ items:
     peakFrom: 1978
     peakTo: 2008
     probability: 85
+    region: ["global"]
     wikimediaSearchHints: ["Whoopi Goldberg actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: eddie-murphy
@@ -204,6 +227,7 @@ items:
     peakFrom: 1984
     peakTo: 2014
     probability: 88
+    region: ["global"]
     wikimediaSearchHints: ["Eddie Murphy actor comedian"]
     answerMethods: ["timeline", "name-letters"]
   - id: denzel-washington
@@ -212,6 +236,7 @@ items:
     peakFrom: 1977
     peakTo: 2007
     probability: 90
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Denzel Washington actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: samuel-l-jackson
@@ -220,6 +245,7 @@ items:
     peakFrom: 1971
     peakTo: 2001
     probability: 90
+    region: ["global"]
     wikimediaSearchHints: ["Samuel L Jackson actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: kevin-costner
@@ -228,6 +254,7 @@ items:
     peakFrom: 1978
     peakTo: 2008
     probability: 85
+    region: ["global"]
     wikimediaSearchHints: ["Kevin Costner actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: john-travolta
@@ -236,6 +263,7 @@ items:
     peakFrom: 1977
     peakTo: 2007
     probability: 88
+    region: ["global"]
     wikimediaSearchHints: ["John Travolta actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: patrick-swayze
@@ -244,6 +272,7 @@ items:
     peakFrom: 1975
     peakTo: 2005
     probability: 82
+    region: ["global"]
     wikimediaSearchHints: ["Patrick Swayze actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: pierce-brosnan
@@ -252,6 +281,7 @@ items:
     peakFrom: 1976
     peakTo: 2006
     probability: 85
+    region: ["global"]
     wikimediaSearchHints: ["Pierce Brosnan actor James Bond"]
     answerMethods: ["timeline", "name-letters"]
   - id: rowan-atkinson
@@ -260,6 +290,7 @@ items:
     peakFrom: 1978
     peakTo: 2008
     probability: 90
+    region: ["global"]
     wikimediaSearchHints: ["Rowan Atkinson Mr Bean"]
     answerMethods: ["timeline", "name-letters"]
   - id: hugh-grant
@@ -268,6 +299,7 @@ items:
     peakFrom: 1983
     peakTo: 2013
     probability: 85
+    region: ["global"]
     wikimediaSearchHints: ["Hugh Grant actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: daniel-craig
@@ -276,6 +308,7 @@ items:
     peakFrom: 1991
     peakTo: 2021
     probability: 88
+    region: ["global"]
     wikimediaSearchHints: ["Daniel Craig actor James Bond"]
     answerMethods: ["timeline", "name-letters"]
   - id: jeff-goldblum
@@ -284,6 +317,7 @@ items:
     peakFrom: 1975
     peakTo: 2005
     probability: 80
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Jeff Goldblum actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: joe-pesci
@@ -292,6 +326,7 @@ items:
     peakFrom: 1966
     peakTo: 1996
     probability: 78
+    region: ["global"]
     wikimediaSearchHints: ["Joe Pesci actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: bill-murray
@@ -300,6 +335,7 @@ items:
     peakFrom: 1973
     peakTo: 2003
     probability: 85
+    region: ["global"]
     wikimediaSearchHints: ["Bill Murray actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: michael-douglas
@@ -308,6 +344,7 @@ items:
     peakFrom: 1967
     peakTo: 1997
     probability: 82
+    region: ["global"]
     wikimediaSearchHints: ["Michael Douglas actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: michael-keaton
@@ -316,10 +353,11 @@ items:
     peakFrom: 1974
     peakTo: 2004
     probability: 82
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Michael Keaton actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: gary-oldman
-    region: ["global"]
+    region: ["unknown-region"]
     displayName: "Gary Oldman"
     correctYear: 1958
     peakFrom: 1981
@@ -333,6 +371,7 @@ items:
     peakFrom: 1959
     peakTo: 1989
     probability: 80
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Burt Reynolds actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: sharon-stone
@@ -341,6 +380,7 @@ items:
     peakFrom: 1981
     peakTo: 2011
     probability: 82
+    region: ["global"]
     wikimediaSearchHints: ["Sharon Stone actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: demi-moore
@@ -349,6 +389,7 @@ items:
     peakFrom: 1985
     peakTo: 2015
     probability: 85
+    region: ["global"]
     wikimediaSearchHints: ["Demi Moore actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: halle-berry
@@ -357,6 +398,7 @@ items:
     peakFrom: 1989
     peakTo: 2019
     probability: 88
+    region: ["global"]
     wikimediaSearchHints: ["Halle Berry actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: salma-hayek
@@ -365,6 +407,7 @@ items:
     peakFrom: 1989
     peakTo: 2019
     probability: 85
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Salma Hayek actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: owen-wilson
@@ -373,6 +416,7 @@ items:
     peakFrom: 1991
     peakTo: 2021
     probability: 82
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Owen Wilson actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: vince-vaughn
@@ -381,6 +425,7 @@ items:
     peakFrom: 1993
     peakTo: 2023
     probability: 78
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Vince Vaughn actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: robert-duvall
@@ -389,10 +434,11 @@ items:
     peakFrom: 1954
     peakTo: 1984
     probability: 78
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Robert Duvall actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: faye-dunaway
-    region: ["global"]
+    region: ["unknown-region"]
     displayName: "Faye Dunaway"
     correctYear: 1941
     peakFrom: 1964
@@ -406,6 +452,7 @@ items:
     peakFrom: 1981
     peakTo: 2011
     probability: 80
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Kevin Bacon actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: nicolas-cage
@@ -414,6 +461,7 @@ items:
     peakFrom: 1987
     peakTo: 2017
     probability: 85
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Nicolas Cage actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: john-cleese
@@ -422,6 +470,7 @@ items:
     peakFrom: 1962
     peakTo: 1992
     probability: 88
+    region: ["global"]
     wikimediaSearchHints: ["John Cleese actor Monty Python"]
     answerMethods: ["timeline", "name-letters"]
   - id: jodie-foster
@@ -430,6 +479,7 @@ items:
     peakFrom: 1985
     peakTo: 2015
     probability: 88
+    region: ["global"]
     wikimediaSearchHints: ["Jodie Foster actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: stellan-skarsgard
@@ -506,7 +556,7 @@ items:
     wikimediaSearchHints: ["Vinnie Jones English footballer actor Lock Stock Snatch"]
     answerMethods: ["timeline", "name-letters"]
   - id: brian-bosworth
-    region: ["global"]
+    region: ["unknown-region"]
     displayName: "Brian Bosworth"
     correctYear: 1965
     peakFrom: 1988
@@ -536,6 +586,7 @@ items:
     peakFrom: 1985
     peakTo: 2015
     probability: 74
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Eva Remaeus Swedish actress Sune-mamma"]
     answerMethods: ["timeline", "name-letters"]
   # === Batch C 2026-05-27 — international gen-x skådespelare ===
@@ -546,6 +597,7 @@ items:
     peakFrom: 1988
     peakTo: 2018
     probability: 86
+    region: ["global"]
     wikimediaSearchHints: ["Ben Stiller actor Zoolander Meet the Parents Night at the Museum"]
     answerMethods: ["timeline", "name-letters"]
   - id: paul-rudd
@@ -554,5 +606,6 @@ items:
     peakFrom: 1992
     peakTo: 2022
     probability: 84
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Paul Rudd actor Ant-Man Friends Anchorman"]
     answerMethods: ["timeline", "name-letters"]

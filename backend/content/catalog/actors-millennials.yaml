@@ -14,6 +14,7 @@ items:
     peakFrom: 1992
     peakTo: 2022
     probability: 87
+    region: ["global"]
     wikimediaSearchHints: ["Jennifer Aniston"]
     answerMethods: ["timeline", "name-letters"]
   - id: margot-robbie
@@ -22,6 +23,7 @@ items:
     peakFrom: 2013
     peakTo: 2026
     probability: 90
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Margot Robbie actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: emma-stone
@@ -30,6 +32,7 @@ items:
     peakFrom: 2011
     peakTo: 2026
     probability: 88
+    region: ["global"]
     wikimediaSearchHints: ["Emma Stone actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: florence-pugh
@@ -38,6 +41,7 @@ items:
     peakFrom: 2019
     peakTo: 2026
     probability: 80
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Florence Pugh actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: brad-pitt
@@ -46,6 +50,7 @@ items:
     peakFrom: 1986
     peakTo: 2016
     probability: 92
+    region: ["global"]
     wikimediaSearchHints: ["Brad Pitt actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: will-smith
@@ -54,6 +59,7 @@ items:
     peakFrom: 1991
     peakTo: 2021
     probability: 92
+    region: ["global"]
     wikimediaSearchHints: ["Will Smith actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: johnny-depp
@@ -62,6 +68,7 @@ items:
     peakFrom: 1986
     peakTo: 2016
     probability: 90
+    region: ["global"]
     wikimediaSearchHints: ["Johnny Depp actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: robert-downey-jr
@@ -70,6 +77,7 @@ items:
     peakFrom: 1988
     peakTo: 2018
     probability: 92
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Robert Downey Jr actor Iron Man"]
     answerMethods: ["timeline", "name-letters"]
   - id: sandra-bullock
@@ -78,6 +86,7 @@ items:
     peakFrom: 1987
     peakTo: 2017
     probability: 90
+    region: ["global"]
     wikimediaSearchHints: ["Sandra Bullock actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: reese-witherspoon
@@ -86,6 +95,7 @@ items:
     peakFrom: 1999
     peakTo: 2026
     probability: 85
+    region: ["global"]
     wikimediaSearchHints: ["Reese Witherspoon actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: christian-bale
@@ -94,6 +104,7 @@ items:
     peakFrom: 1997
     peakTo: 2026
     probability: 88
+    region: ["global"]
     wikimediaSearchHints: ["Christian Bale actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: matt-damon
@@ -102,6 +113,7 @@ items:
     peakFrom: 1993
     peakTo: 2023
     probability: 90
+    region: ["global"]
     wikimediaSearchHints: ["Matt Damon actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: ben-affleck
@@ -110,6 +122,7 @@ items:
     peakFrom: 1995
     peakTo: 2025
     probability: 88
+    region: ["global"]
     wikimediaSearchHints: ["Ben Affleck actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: ryan-gosling
@@ -118,6 +131,7 @@ items:
     peakFrom: 2003
     peakTo: 2026
     probability: 88
+    region: ["global"]
     wikimediaSearchHints: ["Ryan Gosling actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: cate-blanchett
@@ -126,6 +140,7 @@ items:
     peakFrom: 1992
     peakTo: 2022
     probability: 85
+    region: ["global"]
     wikimediaSearchHints: ["Cate Blanchett actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: kate-winslet
@@ -134,6 +149,7 @@ items:
     peakFrom: 1998
     peakTo: 2026
     probability: 90
+    region: ["global"]
     wikimediaSearchHints: ["Kate Winslet actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: nicole-kidman
@@ -142,6 +158,7 @@ items:
     peakFrom: 1990
     peakTo: 2020
     probability: 90
+    region: ["global"]
     wikimediaSearchHints: ["Nicole Kidman actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: charlize-theron
@@ -150,6 +167,7 @@ items:
     peakFrom: 1998
     peakTo: 2026
     probability: 85
+    region: ["global"]
     wikimediaSearchHints: ["Charlize Theron actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: penelope-cruz
@@ -158,6 +176,7 @@ items:
     peakFrom: 1997
     peakTo: 2026
     probability: 82
+    region: ["global"]
     wikimediaSearchHints: ["Penelope Cruz actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: adam-sandler
@@ -166,6 +185,7 @@ items:
     peakFrom: 1989
     peakTo: 2019
     probability: 85
+    region: ["global"]
     wikimediaSearchHints: ["Adam Sandler actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: will-ferrell
@@ -174,6 +194,7 @@ items:
     peakFrom: 1990
     peakTo: 2020
     probability: 82
+    region: ["global"]
     wikimediaSearchHints: ["Will Ferrell actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: mark-wahlberg
@@ -182,6 +203,7 @@ items:
     peakFrom: 1994
     peakTo: 2024
     probability: 85
+    region: ["global"]
     wikimediaSearchHints: ["Mark Wahlberg actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: channing-tatum
@@ -190,6 +212,7 @@ items:
     peakFrom: 2003
     peakTo: 2026
     probability: 82
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Channing Tatum actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: joaquin-phoenix
@@ -198,6 +221,7 @@ items:
     peakFrom: 1997
     peakTo: 2026
     probability: 88
+    region: ["global"]
     wikimediaSearchHints: ["Joaquin Phoenix actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: edward-norton
@@ -206,6 +230,7 @@ items:
     peakFrom: 1992
     peakTo: 2022
     probability: 80
+    region: ["global"]
     wikimediaSearchHints: ["Edward Norton actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: dwayne-johnson
@@ -214,10 +239,11 @@ items:
     peakFrom: 1995
     peakTo: 2025
     probability: 92
+    region: ["global"]
     wikimediaSearchHints: ["Dwayne Johnson actor Rock"]
     answerMethods: ["timeline", "name-letters"]
   - id: chris-evans
-    region: ["global"]
+    region: ["unknown-region"]
     displayName: "Chris Evans"
     correctYear: 1981
     peakFrom: 2004
@@ -231,6 +257,7 @@ items:
     peakFrom: 2007
     peakTo: 2026
     probability: 90
+    region: ["global"]
     wikimediaSearchHints: ["Scarlett Johansson actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: jennifer-lawrence
@@ -239,6 +266,7 @@ items:
     peakFrom: 2013
     peakTo: 2026
     probability: 88
+    region: ["global"]
     wikimediaSearchHints: ["Jennifer Lawrence actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: eva-mendes
@@ -247,6 +275,7 @@ items:
     peakFrom: 1997
     peakTo: 2026
     probability: 78
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Eva Mendes actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: kate-hudson
@@ -255,6 +284,7 @@ items:
     peakFrom: 2002
     peakTo: 2026
     probability: 80
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Kate Hudson actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: cameron-diaz
@@ -263,6 +293,7 @@ items:
     peakFrom: 1995
     peakTo: 2025
     probability: 88
+    region: ["global"]
     wikimediaSearchHints: ["Cameron Diaz actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: gwyneth-paltrow
@@ -271,6 +302,7 @@ items:
     peakFrom: 1995
     peakTo: 2025
     probability: 85
+    region: ["global"]
     wikimediaSearchHints: ["Gwyneth Paltrow actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: uma-thurman
@@ -279,10 +311,11 @@ items:
     peakFrom: 1993
     peakTo: 2023
     probability: 85
+    region: ["global"]
     wikimediaSearchHints: ["Uma Thurman actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: jessica-chastain
-    region: ["global"]
+    region: ["unknown-region"]
     displayName: "Jessica Chastain"
     correctYear: 1977
     peakFrom: 2000
@@ -291,7 +324,7 @@ items:
     wikimediaSearchHints: ["Jessica Chastain actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: amy-adams
-    region: ["global"]
+    region: ["unknown-region"]
     displayName: "Amy Adams"
     correctYear: 1974
     peakFrom: 1997
@@ -305,6 +338,7 @@ items:
     peakFrom: 1994
     peakTo: 2024
     probability: 88
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Ewan McGregor actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: bradley-cooper
@@ -313,10 +347,11 @@ items:
     peakFrom: 1998
     peakTo: 2026
     probability: 85
+    region: ["global"]
     wikimediaSearchHints: ["Bradley Cooper actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: tom-hiddleston
-    region: ["global"]
+    region: ["unknown-region"]
     displayName: "Tom Hiddleston"
     correctYear: 1981
     peakFrom: 2004
@@ -330,10 +365,11 @@ items:
     peakFrom: 2008
     peakTo: 2026
     probability: 88
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Keira Knightley actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: anne-hathaway
-    region: ["global"]
+    region: ["unknown-region"]
     displayName: "Anne Hathaway"
     correctYear: 1982
     peakFrom: 2005
@@ -390,7 +426,7 @@ items:
     wikimediaSearchHints: ["Alicia Vikander Swedish actress Ex Machina Danish Girl Tomb Raider"]
     answerMethods: ["timeline", "name-letters"]
   - id: rebecca-ferguson
-    region: ["global"]
+    region: ["unknown-region"]
     displayName: "Rebecca Ferguson"
     correctYear: 1983
     peakFrom: 2006

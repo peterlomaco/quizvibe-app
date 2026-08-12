@@ -59,6 +59,7 @@ export const SPOTIFY_ARTIST_META: Record<string, SpotifyArtistMeta> = {
   'veronica maggio': { type: 'artist', gender: 'female', country: 'sweden' },
   'cajsa stina åkerström': { type: 'artist', gender: 'female', country: 'sweden' },
   'dotter': { type: 'artist', gender: 'female', country: 'sweden' },
+  'orup': { type: 'artist', gender: 'male', country: 'sweden' },
 
   // ── Svenska band/duos/grupper ──
   'abba': { type: 'band', gender: 'mixed', country: 'sweden' },
@@ -102,6 +103,10 @@ export const SPOTIFY_ARTIST_META: Record<string, SpotifyArtistMeta> = {
   'imagine dragons': { type: 'band', gender: 'male', country: 'usa' },
   'sugarhill gang': { type: 'band', gender: 'male', country: 'usa' },
   'dj jazzy jeff & the fresh prince': { type: 'band', gender: 'male', country: 'usa' },
+  'lady gaga': { type: 'artist', gender: 'female', country: 'usa' },
+  'lionel richie': { type: 'artist', gender: 'male', country: 'usa' },
+  'lady gaga & bruno mars': { type: 'artist', gender: 'mixed', country: 'usa' },
+  'marvin gaye & tammi terrell': { type: 'artist', gender: 'mixed', country: 'usa' },
 
   // ── UK ──
   'ed sheeran': { type: 'artist', gender: 'male', country: 'uk' },
@@ -110,11 +115,15 @@ export const SPOTIFY_ARTIST_META: Record<string, SpotifyArtistMeta> = {
   'mungo jerry': { type: 'band', gender: 'male', country: 'uk' },
   'queen': { type: 'band', gender: 'male', country: 'uk' },
   'dario g': { type: 'artist', gender: 'male', country: 'uk' },
+  'bonnie tyler': { type: 'artist', gender: 'female', country: 'uk' },
+  'the rolling stones': { type: 'band', gender: 'male', country: 'uk' },
+  'the who': { type: 'band', gender: 'male', country: 'uk' },
 
   // ── Övriga världen ──
   'ac/dc': { type: 'band', gender: 'male', country: 'australia' },
   'sia': { type: 'artist', gender: 'female', country: 'australia' },
   'bryan adams': { type: 'artist', gender: 'male', country: 'canada' },
+  'bryan adams & melanie c': { type: 'artist', gender: 'mixed', country: 'canada' },
   'the weeknd': { type: 'artist', gender: 'male', country: 'canada' },
   'rihanna': { type: 'artist', gender: 'female', country: 'barbados' },
   'bob marley & the wailers': { type: 'band', gender: 'male', country: 'jamaica' },
@@ -123,6 +132,7 @@ export const SPOTIFY_ARTIST_META: Record<string, SpotifyArtistMeta> = {
   'keiino': { type: 'band', gender: 'mixed', country: 'norway' },
   'dj ötzi': { type: 'artist', gender: 'male', country: 'austria' },
   'bellini': { type: 'band', gender: 'mixed', country: 'germany' },
+  'r.i.o.': { type: 'band', gender: 'male', country: 'germany' },
   'kaoma': { type: 'band', gender: 'mixed', country: 'france' },
   'joost klein': { type: 'artist', gender: 'male', country: 'netherlands' },
   'martin garrix ft. bono & the edge': { type: 'artist', gender: 'male', country: 'netherlands' },

@@ -28,6 +28,7 @@ items:
     displayName: "Night and Day — Fred Astaire"
     correctYear: 1932
     probability: 78
+    region: ["global"]
     wikimediaSearchHints: ["Fred Astaire Night and Day Cole Porter"]
     answerMethods: ["timeline"]
     youtubeClips:
@@ -36,11 +37,11 @@ items:
         endSec: 45
         channelTitle: "Music Video Vault"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
-    region: ["unknown-region"]
   - id: ethel-waters-stormy-weather
     displayName: "Stormy Weather — Ethel Waters"
     correctYear: 1933
     probability: 78
+    region: ["global"]
     wikimediaSearchHints: ["Ethel Waters Stormy Weather 1933"]
     answerMethods: ["timeline"]
     youtubeClips:
@@ -49,7 +50,6 @@ items:
         endSec: 45
         channelTitle: "American Musical Theater Archives"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
-    region: ["unknown-region"]
   - id: cole-porter-anything-goes
     displayName: "Anything Goes — Cole Porter"
     correctYear: 1934
@@ -129,6 +129,7 @@ items:
     displayName: "Swinging on a Star — Bing Crosby"
     correctYear: 1944
     probability: 78
+    region: ["global"]
     wikimediaSearchHints: ["Bing Crosby Swinging on a Star Going My Way"]
     answerMethods: ["timeline"]
     youtubeClips:
@@ -137,11 +138,11 @@ items:
         endSec: 45
         channelTitle: "Classic Mood Experience"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
-    region: ["unknown-region"]
   - id: doris-day-sentimental-journey
     displayName: "Sentimental Journey — Doris Day"
     correctYear: 1945
     probability: 80
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Doris Day Sentimental Journey Les Brown"]
     answerMethods: ["timeline"]
     youtubeClips:
@@ -150,7 +151,6 @@ items:
         endSec: 45
         channelTitle: "Doris Day - Topic"
         notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
-    region: ["unknown-region"]
   - id: nat-king-cole-the-christmas-song
     displayName: "The Christmas Song — Nat King Cole"
     correctYear: 1946
@@ -167,6 +167,7 @@ items:
     displayName: "Almost Like Being in Love — Frank Sinatra"
     correctYear: 1947
     probability: 75
+    region: ["global"]
     wikimediaSearchHints: ["Frank Sinatra Almost Like Being in Love Brigadoon"]
     answerMethods: ["timeline"]
     youtubeClips:
@@ -175,7 +176,6 @@ items:
         endSec: 45
         channelTitle: "Micah Gwinn"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
-    region: ["unknown-region"]
   - id: nat-king-cole-nature-boy
     displayName: "Nature Boy — Nat King Cole"
     correctYear: 1948
@@ -192,6 +192,7 @@ items:
     displayName: "Some Enchanted Evening — Perry Como"
     correctYear: 1949
     probability: 78
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Perry Como Some Enchanted Evening South Pacific"]
     answerMethods: ["timeline"]
     youtubeClips:
@@ -200,7 +201,6 @@ items:
         endSec: 45
         channelTitle: "Perry Como - Topic"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (2)."
-    region: ["unknown-region"]
   - id: nat-king-cole-mona-lisa
     displayName: "Mona Lisa — Nat King Cole"
     correctYear: 1950

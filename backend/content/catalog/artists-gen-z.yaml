@@ -9,6 +9,7 @@ items:
     displayName: "Billie Eilish"
     correctYear: 2001
     probability: 95
+    region: ["global"]
     wikimediaSearchHints: ["Billie Eilish"]
     answerMethods: ["timeline", "name-letters"]
   - id: taylor-swift
@@ -17,22 +18,25 @@ items:
     peakFrom: 2008
     peakTo: 2026
     probability: 95
+    region: ["global"]
     wikimediaSearchHints: ["Taylor Swift"]
     answerMethods: ["timeline", "name-letters"]
   - id: drake
     displayName: "Drake"
     correctYear: 1986
     probability: 94
+    region: ["global"]
     wikimediaSearchHints: ["Drake rapper"]
     answerMethods: ["timeline", "name-letters"]
   - id: ariana-grande
     displayName: "Ariana Grande"
     correctYear: 1993
     probability: 92
+    region: ["global"]
     wikimediaSearchHints: ["Ariana Grande"]
     answerMethods: ["timeline", "name-letters"]
   - id: travis-scott
-    region: ["global"]
+    region: ["unknown-region"]
     displayName: "Travis Scott"
     correctYear: 1991
     probability: 88
@@ -44,6 +48,7 @@ items:
     peakFrom: 2011
     peakTo: 2024
     probability: 94
+    region: ["global"]
     wikimediaSearchHints: ["Ed Sheeran singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: the-weeknd
@@ -52,6 +57,7 @@ items:
     peakFrom: 2012
     peakTo: 2024
     probability: 90
+    region: ["global"]
     wikimediaSearchHints: ["The Weeknd singer", "Abel Tesfaye"]
     answerMethods: ["timeline", "name-letters"]
   - id: olivia-rodrigo
@@ -60,6 +66,7 @@ items:
     peakFrom: 2021
     peakTo: 2024
     probability: 85
+    region: ["global"]
     wikimediaSearchHints: ["Olivia Rodrigo singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: bad-bunny
@@ -68,6 +75,7 @@ items:
     peakFrom: 2018
     peakTo: 2024
     probability: 85
+    region: ["global"]
     wikimediaSearchHints: ["Bad Bunny rapper", "Benito Martinez Ocasio"]
     answerMethods: ["timeline", "name-letters"]
   - id: dua-lipa
@@ -76,6 +84,7 @@ items:
     peakFrom: 2015
     peakTo: 2024
     probability: 90
+    region: ["global"]
     wikimediaSearchHints: ["Dua Lipa singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: harry-styles
@@ -84,6 +93,7 @@ items:
     peakFrom: 2010
     peakTo: 2024
     probability: 88
+    region: ["global"]
     wikimediaSearchHints: ["Harry Styles singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: post-malone
@@ -92,6 +102,7 @@ items:
     peakFrom: 2015
     peakTo: 2024
     probability: 85
+    region: ["global"]
     wikimediaSearchHints: ["Post Malone rapper"]
     answerMethods: ["timeline", "name-letters"]
   - id: loreen
@@ -100,6 +111,7 @@ items:
     peakFrom: 2012
     peakTo: 2024
     probability: 82
+    region: ["global"]
     wikimediaSearchHints: ["Loreen singer Sweden Eurovision"]
     answerMethods: ["timeline", "name-letters"]
   - id: justin-bieber
@@ -108,6 +120,7 @@ items:
     peakFrom: 2009
     peakTo: 2024
     probability: 92
+    region: ["global"]
     wikimediaSearchHints: ["Justin Bieber singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: selena-gomez
@@ -116,6 +129,7 @@ items:
     peakFrom: 2009
     peakTo: 2024
     probability: 88
+    region: ["global"]
     wikimediaSearchHints: ["Selena Gomez singer actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: miley-cyrus
@@ -124,6 +138,7 @@ items:
     peakFrom: 2006
     peakTo: 2024
     probability: 90
+    region: ["global"]
     wikimediaSearchHints: ["Miley Cyrus singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: demi-lovato
@@ -132,6 +147,7 @@ items:
     peakFrom: 2008
     peakTo: 2024
     probability: 82
+    region: ["global"]
     wikimediaSearchHints: ["Demi Lovato singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: kendrick-lamar
@@ -140,6 +156,7 @@ items:
     peakFrom: 2011
     peakTo: 2024
     probability: 88
+    region: ["global"]
     wikimediaSearchHints: ["Kendrick Lamar rapper"]
     answerMethods: ["timeline", "name-letters"]
   - id: doja-cat
@@ -148,6 +165,7 @@ items:
     peakFrom: 2018
     peakTo: 2024
     probability: 85
+    region: ["global"]
     wikimediaSearchHints: ["Doja Cat singer rapper"]
     answerMethods: ["timeline", "name-letters"]
   - id: sza
@@ -156,6 +174,7 @@ items:
     peakFrom: 2017
     peakTo: 2024
     probability: 82
+    region: ["unknown-region"]
     wikimediaSearchHints: ["SZA singer Solana Rowe"]
     answerMethods: ["timeline", "name-letters"]
   - id: nicki-minaj
@@ -164,6 +183,7 @@ items:
     peakFrom: 2010
     peakTo: 2024
     probability: 85
+    region: ["global"]
     wikimediaSearchHints: ["Nicki Minaj rapper"]
     answerMethods: ["timeline", "name-letters"]
   - id: frank-ocean
@@ -172,6 +192,7 @@ items:
     peakFrom: 2012
     peakTo: 2024
     probability: 78
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Frank Ocean singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: shawn-mendes
@@ -180,6 +201,7 @@ items:
     peakFrom: 2014
     peakTo: 2024
     probability: 85
+    region: ["global"]
     wikimediaSearchHints: ["Shawn Mendes singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: camila-cabello
@@ -188,6 +210,7 @@ items:
     peakFrom: 2014
     peakTo: 2024
     probability: 80
+    region: ["global"]
     wikimediaSearchHints: ["Camila Cabello singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: megan-thee-stallion
@@ -196,6 +219,7 @@ items:
     peakFrom: 2018
     peakTo: 2024
     probability: 78
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Megan Thee Stallion rapper"]
     answerMethods: ["timeline", "name-letters"]
   - id: sabrina-carpenter
@@ -204,6 +228,7 @@ items:
     peakFrom: 2014
     peakTo: 2024
     probability: 78
+    region: ["global"]
     wikimediaSearchHints: ["Sabrina Carpenter singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: lewis-capaldi
@@ -212,6 +237,7 @@ items:
     peakFrom: 2017
     peakTo: 2024
     probability: 80
+    region: ["global"]
     wikimediaSearchHints: ["Lewis Capaldi singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: lil-nas-x
@@ -220,12 +246,14 @@ items:
     peakFrom: 2018
     peakTo: 2024
     probability: 80
+    region: ["global"]
     wikimediaSearchHints: ["Lil Nas X rapper"]
     answerMethods: ["timeline", "name-letters"]
   - id: netta-barzilai
     displayName: "Netta Barzilai"
     correctYear: 1993
     probability: 74
+    region: ["unknown-region"]
     peakFrom: 2018
     peakTo: 2023
     wikimediaSearchHints: ["Netta Barzilai Israeli singer Eurovision 2018"]

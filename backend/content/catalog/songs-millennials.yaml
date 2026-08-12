@@ -195,7 +195,7 @@ items:
         startSec: 45
         endSec: 60
         channelTitle: "Enhanced Music Videos"
-        notes: "Remastered Full HD musikvideo. Officiell MV-innehåll, bättre bildkvalitet än Topic-versionen (statisk albumkonst)."
+        notes: "Remastered Full HD musikvideo. Officiell MV-innehåll, bättre bildkvalitet än Topic-versionen (statisk albumkonst). Peters officiella Madonna-klipp 79fzeNUqQbQ testat 2026-08-11 men behållet detta — det officiella är SD + region-blockat i 2 länder (dock ej SE)."
   - id: phil-collins-another-day-in-paradise
     displayName: "Another Day in Paradise — Phil Collins"
     correctYear: 1989
@@ -751,18 +751,6 @@ items:
         endSec: 45
         channelTitle: "Oasis - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
-  - id: kent-music-non-stop
-    displayName: "Music Non Stop — Kent"
-    correctYear: 1996
-    probability: 78
-    wikimediaSearchHints: ["Kent Music Non Stop 1996"]
-    answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "HJXsv1UIDmQ"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Kent - Topic"
-        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: nas-if-i-ruled-the-world
     displayName: "If I Ruled the World — Nas ft. Lauryn Hill"
     correctYear: 1996
@@ -974,13 +962,15 @@ items:
     probability: 68
     wikimediaSearchHints: ["Riva Rock Me Eurovision 1989 Yugoslavia"]
     answerMethods: ["timeline"]
+    genrePackages: ["Eurovision"]
     youtubeClips:
       - videoId: "ZWwmCT7P3VE"
         startSec: 5
         endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1989 vinnare — Jugoslavien."
-    region: ["unknown-region"]
+    region: ["europe"]
+    inBaseCatalog: false
   - id: toto-cutugno-insieme
     displayName: "Insieme: 1992 — Toto Cutugno"
     correctYear: 1990
@@ -1013,7 +1003,8 @@ items:
     probability: 68
     wikimediaSearchHints: ["Niamh Kavanagh In Your Eyes Eurovision 1993 Ireland"]
     answerMethods: ["timeline"]
-    region: ["unknown-region"]
+    region: ["europe"]
+    inBaseCatalog: false
     youtubeClips:
       - videoId: "pysQioMtrAU"
         startSec: 5
@@ -1180,3 +1171,103 @@ items:
         endSec: 30
         channelTitle: "Scatman John"
         notes: "Official music video."
+  # === Tillägg 2026-08-11 (Peters lista) ===
+  - id: lionel-richie-all-night-long
+    displayName: "All Night Long (All Night) — Lionel Richie"
+    correctYear: 1983
+    probability: 84
+    wikimediaSearchHints: ["Lionel Richie All Night Long 1983 Cant Slow Down"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "4czNORk5MjW5WOn98bki32"
+    youtubeClips: []
+  - id: bonnie-tyler-total-eclipse-of-the-heart
+    displayName: "Total Eclipse of the Heart — Bonnie Tyler"
+    correctYear: 1983
+    probability: 88
+    wikimediaSearchHints: ["Bonnie Tyler Total Eclipse of the Heart 1983"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "63nyotHMEI8PrEZB2FL4DZ"
+    youtubeClips: []
+  - id: bryan-adams-heaven
+    displayName: "Heaven — Bryan Adams"
+    correctYear: 1984
+    probability: 84
+    wikimediaSearchHints: ["Bryan Adams Heaven 1984 Reckless"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "4dhPbGPssNpV6pSEtgTmO7"
+    youtubeClips:
+      - videoId: "3eT464L1YRA"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Bryan Adams"
+        notes: "Officiell musikvideo, artistens egen kanal. Peter-kurerad 2026-08-11."
+    notes: "correctYear = albumet Reckless (1984), valt av Peter 2026-08-11. Laten fanns tekniskt sett redan pa soundtracket till A Night in Heaven (1983) men den releasen ar for obskyr for att vara ett rimligt quizsvar. Singeln kom forst i april 1985 (da den blev en hit)."
+  - id: cyndi-lauper-true-colors
+    displayName: "True Colors — Cyndi Lauper"
+    correctYear: 1986
+    probability: 84
+    wikimediaSearchHints: ["Cyndi Lauper True Colors 1986"]
+    answerMethods: ["timeline"]
+    youtubeClips: []
+    notes: "SAKNAR MEDIA - Peter angav ingen lank (YT-lanken i listan gick till Girls Just Want to Have Fun, som redan finns i katalogen). Alla Spotify-traffar jag hittade ar samlingsskivor (2017/2019). Behover kurerat track-ID eller YT-klipp innan export."
+  - id: guns-n-roses-sweet-child-o-mine
+    displayName: "Sweet Child o' Mine — Guns N' Roses"
+    correctYear: 1987
+    probability: 90
+    region: ["global"]
+    inBaseCatalog: false
+    wikimediaSearchHints: ["Guns N Roses Sweet Child o Mine Appetite for Destruction"]
+    answerMethods: ["timeline"]
+    genrePackages: ["rock"]
+    youtubeClips:
+      - videoId: "qoflJn7zkFM"
+        startSec: 0
+        endSec: 30
+        channelTitle: "7clouds Rock"
+        notes: "Lyric-video, katalogens standard-lyric-kanal. Peter-kurerad 2026-08-11."
+    notes: "correctYear = albumet Appetite for Destruction (21 juli 1987), forsta gangen laten gick att hora. Singeln kom forst 3 juni 1988."
+  - id: orup-da-star-pojkarna-pa-rad
+    displayName: "Då står pojkarna på rad — Orup"
+    correctYear: 1989
+    probability: 82
+    region: ["sweden"]
+    inBaseCatalog: false
+    wikimediaSearchHints: ["Orup Då står pojkarna på rad 1989 Orup 2"]
+    answerMethods: ["timeline"]
+    genrePackages: ["100% svenska"]
+    spotifyTrackId: "0fN96hLpE08LmXFfS5VmdE"
+    youtubeClips: []
+  - id: orup-magaluf
+    displayName: "Magaluf — Orup"
+    correctYear: 1992
+    probability: 82
+    region: ["sweden"]
+    inBaseCatalog: false
+    wikimediaSearchHints: ["Orup Magaluf 1992 Stockholm och andra ställen"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Summer", "100% svenska"]
+    spotifyTrackId: "39ADGrzCrbWwTFlhDcsf9P"
+    youtubeClips: []
+  - id: shakespears-sister-stay
+    displayName: "Stay — Shakespears Sister"
+    correctYear: 1992
+    probability: 78
+    wikimediaSearchHints: ["Shakespears Sister Stay 1992 Hormonally Yours"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "YCYaALgW80c"
+        startSec: 0
+        endSec: 30
+        channelTitle: "London Records"
+        notes: "Officiell musikvideo, label-kanal. Peter-kurerad 2026-08-11."
+  - id: orup-flickan-ovanpa
+    displayName: "Flickan ovanpå — Orup"
+    correctYear: 1996
+    probability: 78
+    region: ["sweden"]
+    inBaseCatalog: false
+    wikimediaSearchHints: ["Orup Flickan ovanpå 1996"]
+    answerMethods: ["timeline"]
+    genrePackages: ["100% svenska"]
+    spotifyTrackId: "6WhseDHUvM0lOk5oavjztk"
+    youtubeClips: []

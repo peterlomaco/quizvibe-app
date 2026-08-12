@@ -87,7 +87,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "elder"
     ],
     "region": [
-      "unknown-region"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -110,7 +110,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "elder"
     ],
     "region": [
-      "unknown-region"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -240,7 +240,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "elder"
     ],
     "region": [
-      "unknown-region"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -309,7 +309,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "elder"
     ],
     "region": [
-      "unknown-region"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -1106,30 +1106,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "rolling-stones-paint-it-black",
-    "displayName": "Paint It Black — The Rolling Stones",
-    "correctYear": 1966,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "gen-x",
-      "elder"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "170sceOWWXc",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "The Rolling Stones - Topic",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
-      }
-    ]
-  },
-  {
     "id": "aretha-franklin-respect",
     "displayName": "Respect — Aretha Franklin",
     "correctYear": 1967,
@@ -1201,6 +1177,22 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "notes": "Studio-inspelning 1967. Ersatte dead UMG-klipp (T1FKf-JZ-eM)."
       }
     ]
+  },
+  {
+    "id": "marvin-gaye-tammi-terrell-aint-no-mountain-high-enough",
+    "displayName": "Ain't No Mountain High Enough — Marvin Gaye & Tammi Terrell",
+    "correctYear": 1967,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "spotifyTrackId": "7tqhbajSfrz2F7E1Z75ASX",
+    "youtubeClips": []
   },
   {
     "id": "neil-diamond-girl-youll-be-a-woman-soon",
@@ -1493,30 +1485,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "dana-all-kinds-of-everything",
-    "displayName": "All Kinds of Everything — Dana",
-    "correctYear": 1970,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "gen-x",
-      "elder"
-    ],
-    "region": [
-      "unknown-region"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "sZ8W9oOgjM4",
-        "startSec": 5,
-        "endSec": 20,
-        "channelTitle": "Eurovision Song Contest",
-        "license": "standard",
-        "notes": "ESC 1970 vinnare — Irland."
-      }
-    ]
-  },
-  {
     "id": "elton-john-your-song",
     "displayName": "Your Song — Elton John",
     "correctYear": 1970,
@@ -1539,24 +1507,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
       }
     ]
-  },
-  {
-    "id": "mungo-jerry-in-the-summertime",
-    "displayName": "In the Summertime — Mungo Jerry",
-    "correctYear": 1970,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "all"
-    ],
-    "region": [
-      "unknown-region"
-    ],
-    "genrePackages": [
-      "Summer"
-    ],
-    "spotifyTrackId": "2uzlv8PjqsVvF1DhEahyhy",
-    "youtubeClips": []
   },
   {
     "id": "simon-garfunkel-bridge-over-troubled-water",
@@ -2462,7 +2412,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "all"
     ],
     "region": [
-      "unknown-region"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -2558,6 +2508,22 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (18)."
       }
     ]
+  },
+  {
+    "id": "bonnie-tyler-its-a-heartache",
+    "displayName": "It's a Heartache — Bonnie Tyler",
+    "correctYear": 1977,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "spotifyTrackId": "1Y7VG310Lf5IYP7sVOob4X",
+    "youtubeClips": []
   },
   {
     "id": "fleetwood-mac-dreams",
@@ -2876,30 +2842,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "PRIVADO 80s",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (10)."
-      }
-    ]
-  },
-  {
-    "id": "acdc-highway-to-hell",
-    "displayName": "Highway to Hell — AC/DC",
-    "correctYear": 1979,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "gen-x",
-      "elder"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "ikFFVfObwss",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "AC/DC - Topic",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
       }
     ]
   },
@@ -3732,6 +3674,22 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "bonnie-tyler-total-eclipse-of-the-heart",
+    "displayName": "Total Eclipse of the Heart — Bonnie Tyler",
+    "correctYear": 1983,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "spotifyTrackId": "63nyotHMEI8PrEZB2FL4DZ",
+    "youtubeClips": []
+  },
+  {
     "id": "bowie-lets-dance",
     "displayName": "Let's Dance — David Bowie",
     "correctYear": 1983,
@@ -3879,6 +3837,22 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "lionel-richie-all-night-long",
+    "displayName": "All Night Long (All Night) — Lionel Richie",
+    "correctYear": 1983,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "spotifyTrackId": "4czNORk5MjW5WOn98bki32",
+    "youtubeClips": []
+  },
+  {
     "id": "police-every-breath-you-take",
     "displayName": "Every Breath You Take — The Police",
     "correctYear": 1983,
@@ -3928,6 +3902,31 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "bryan-adams-heaven",
+    "displayName": "Heaven — Bryan Adams",
+    "correctYear": 1984,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "spotifyTrackId": "4dhPbGPssNpV6pSEtgTmO7",
+    "youtubeClips": [
+      {
+        "videoId": "3eT464L1YRA",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Bryan Adams",
+        "license": "standard",
+        "notes": "Officiell musikvideo, artistens egen kanal. Peter-kurerad 2026-08-11."
+      }
+    ]
+  },
+  {
     "id": "carl-lewis-los-angeles-1984",
     "displayName": "Carl Lewis tar 4 OS-guld Los Angeles",
     "correctYear": 1984,
@@ -3937,7 +3936,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "all"
     ],
     "region": [
-      "unknown-region"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -4575,24 +4574,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "cornelis-vreeswijk-sommarkort",
-    "displayName": "Sommarkort (En stund på jorden) — Cornelis Vreeswijk",
-    "correctYear": 1987,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "all"
-    ],
-    "region": [
-      "unknown-region"
-    ],
-    "genrePackages": [
-      "Summer"
-    ],
-    "spotifyTrackId": "5lRvBRQJFVWZGRqDm7YkL4",
-    "youtubeClips": []
-  },
-  {
     "id": "johnny-logan-hold-me-now",
     "displayName": "Hold Me Now — Johnny Logan",
     "correctYear": 1987,
@@ -4930,7 +4911,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "all"
     ],
     "region": [
-      "unknown-region"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -5092,7 +5073,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 60,
         "channelTitle": "Enhanced Music Videos",
         "license": "standard",
-        "notes": "Remastered Full HD musikvideo. Officiell MV-innehåll, bättre bildkvalitet än Topic-versionen (statisk albumkonst)."
+        "notes": "Remastered Full HD musikvideo. Officiell MV-innehåll, bättre bildkvalitet än Topic-versionen (statisk albumkonst). Peters officiella Madonna-klipp 79fzeNUqQbQ testat 2026-08-11 men behållet detta — det officiella är SD + region-blockat i 2 länder (dock ej SE)."
       }
     ]
   },
@@ -5117,30 +5098,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Phil Collins",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (3)."
-      }
-    ]
-  },
-  {
-    "id": "riva-rock-me",
-    "displayName": "Rock Me — Riva",
-    "correctYear": 1989,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "millennials",
-      "gen-x"
-    ],
-    "region": [
-      "unknown-region"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "ZWwmCT7P3VE",
-        "startSec": 5,
-        "endSec": 20,
-        "channelTitle": "Eurovision Song Contest",
-        "license": "standard",
-        "notes": "ESC 1989 vinnare — Jugoslavien."
       }
     ]
   },
@@ -5394,25 +5351,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "notes": "Melodifestivalen 1991 vinnare, ESC-vinnare 1991."
       }
     ]
-  },
-  {
-    "id": "fresh-prince-summertime",
-    "displayName": "Summertime — DJ Jazzy Jeff & The Fresh Prince",
-    "correctYear": 1991,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "all"
-    ],
-    "region": [
-      "unknown-region"
-    ],
-    "genrePackages": [
-      "Summer",
-      "hiphop"
-    ],
-    "spotifyTrackId": "20XdEFyaUR9C7aDIdq2OAd",
-    "youtubeClips": []
   },
   {
     "id": "metallica-enter-sandman",
@@ -5725,24 +5663,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "inner-circle-sweat",
-    "displayName": "Sweat (A La La La Long) — Inner Circle",
-    "correctYear": 1992,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "all"
-    ],
-    "region": [
-      "unknown-region"
-    ],
-    "genrePackages": [
-      "Summer"
-    ],
-    "spotifyTrackId": "24Si0Kw3pu2RxX1jrbBg5A",
-    "youtubeClips": []
-  },
-  {
     "id": "linda-martin-why-me",
     "displayName": "Why Me? — Linda Martin",
     "correctYear": 1992,
@@ -5815,6 +5735,30 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Nirvana - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
+    "id": "shakespears-sister-stay",
+    "displayName": "Stay — Shakespears Sister",
+    "correctYear": 1992,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "YCYaALgW80c",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "London Records",
+        "license": "standard",
+        "notes": "Officiell musikvideo, label-kanal. Peter-kurerad 2026-08-11."
       }
     ]
   },
@@ -6010,33 +5954,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Universal Pictures At Home",
         "license": "standard",
         "notes": "Official Universal Pictures-klipp 4K — iconic theme + dinosaur-reveal."
-      }
-    ]
-  },
-  {
-    "id": "niamh-kavanagh-in-your-eyes",
-    "displayName": "In Your Eyes — Niamh Kavanagh",
-    "correctYear": 1993,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "millennials",
-      "gen-x"
-    ],
-    "region": [
-      "unknown-region"
-    ],
-    "genrePackages": [
-      "Eurovision"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "pysQioMtrAU",
-        "startSec": 5,
-        "endSec": 20,
-        "channelTitle": "Eurovision Song Contest",
-        "license": "standard",
-        "notes": "ESC 1993 vinnare — Irland."
       }
     ]
   },
@@ -6432,7 +6349,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "all"
     ],
     "region": [
-      "unknown-region"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -6618,30 +6535,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 1996 vinnare — Irland."
-      }
-    ]
-  },
-  {
-    "id": "kent-music-non-stop",
-    "displayName": "Music Non Stop — Kent",
-    "correctYear": 1996,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "millennials",
-      "gen-x"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "HJXsv1UIDmQ",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Kent - Topic",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
       }
     ]
   },
@@ -6875,6 +6768,54 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "kent-om-du-var-har",
+    "displayName": "Om du var här — Kent",
+    "correctYear": 1997,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-z",
+      "millennials"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "gicVQ52huT0",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "kentchannel",
+        "license": "standard",
+        "notes": "Bandets egen kanal. Peter-kurerad 2026-08-11."
+      }
+    ]
+  },
+  {
+    "id": "the-verve-bitter-sweet-symphony",
+    "displayName": "Bitter Sweet Symphony — The Verve",
+    "correctYear": 1997,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-z",
+      "millennials"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "F2fGReDlQa0",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Frank Rovers",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-11. OBS: re-upload, inte officiell VEVO-kanal - hogre takedown-risk, nightly autofix-cron plockar upp om den forsvinner."
+      }
+    ]
+  },
+  {
     "id": "titanic",
     "displayName": "Titanic",
     "correctYear": 1997,
@@ -6909,24 +6850,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "ace-of-base-cruel-summer",
-    "displayName": "Cruel Summer — Ace of Base",
-    "correctYear": 1998,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "all"
-    ],
-    "region": [
-      "unknown-region"
-    ],
-    "genrePackages": [
-      "Summer"
-    ],
-    "spotifyTrackId": "4AxVXHgv0clBuS4dl4S7Gw",
-    "youtubeClips": []
-  },
-  {
     "id": "baby-one-more-time",
     "displayName": "...Baby One More Time — Britney Spears",
     "correctYear": 1998,
@@ -6948,6 +6871,22 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "notes": "Official 4K 60FPS Video — rörlig MV (skoluniform-scen). 'Oh baby baby' + första vers."
       }
     ]
+  },
+  {
+    "id": "bryan-adams-when-youre-gone",
+    "displayName": "When You're Gone — Bryan Adams & Melanie C",
+    "correctYear": 1998,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-z",
+      "millennials"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "spotifyTrackId": "7p9dd71JR2ucoAuO1Sy0VZ",
+    "youtubeClips": []
   },
   {
     "id": "cher-believe",
@@ -7064,7 +7003,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "all"
     ],
     "region": [
-      "unknown-region"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -7207,6 +7146,30 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "spotifyTrackId": "75IN3CtuZwTHTnZvYM4qnJ",
     "youtubeClips": []
+  },
+  {
+    "id": "kent-music-non-stop",
+    "displayName": "Music Non Stop — Kent",
+    "correctYear": 1999,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-z",
+      "millennials"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "HJXsv1UIDmQ",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Kent - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
   },
   {
     "id": "lou-bega-mambo-no-5",
@@ -8934,6 +8897,22 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "lady-gaga-just-dance",
+    "displayName": "Just Dance — Lady Gaga",
+    "correctYear": 2008,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-z",
+      "millennials"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "spotifyTrackId": "5vQXxfGn1bjv5WESrYVVpw",
+    "youtubeClips": []
+  },
+  {
     "id": "lady-gaga-poker-face",
     "displayName": "Poker Face — Lady Gaga",
     "correctYear": 2008,
@@ -8967,7 +8946,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "all"
     ],
     "region": [
-      "unknown-region"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -9115,34 +9094,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "World Athletics",
         "license": "standard",
         "notes": "World Athletics official channel — Berlin 2009 100m WR 9.58s."
-      }
-    ]
-  },
-  {
-    "id": "hadise-dum-tek-tek",
-    "displayName": "Dum Tek Tek — Hadise",
-    "correctYear": 2009,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "gen-z",
-      "millennials"
-    ],
-    "region": [
-      "unknown-region"
-    ],
-    "genrePackages": [
-      "Eurovision"
-    ],
-    "spotifyTrackId": "3Gp3YziRNAbiCDzGV5E6Xm",
-    "youtubeClips": [
-      {
-        "videoId": "TzKgojZqO5Y",
-        "startSec": 50,
-        "endSec": 65,
-        "channelTitle": "Hadise",
-        "license": "standard",
-        "notes": "Official music video. ESC 2009 Turkey entry."
       }
     ]
   },
@@ -9341,33 +9292,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 264,
         "channelTitle": "Eminem - Topic",
         "license": "standard"
-      }
-    ]
-  },
-  {
-    "id": "knaan-wavin-flag",
-    "displayName": "Wavin' Flag — K'naan",
-    "correctYear": 2010,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "all"
-    ],
-    "region": [
-      "unknown-region"
-    ],
-    "genrePackages": [
-      "sport",
-      "football"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "NENQMda7Mbs",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "K'NAAN - Topic",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
       }
     ]
   },
@@ -10683,7 +10607,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "all"
     ],
     "region": [
-      "unknown-region"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -11035,25 +10959,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "fuego-eleni-foureira",
-    "displayName": "Fuego — Eleni Foureira",
-    "correctYear": 2018,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "gen-alpha",
-      "gen-z"
-    ],
-    "region": [
-      "unknown-region"
-    ],
-    "genrePackages": [
-      "Eurovision"
-    ],
-    "spotifyTrackId": "22ppznuzVF9LKamaaqMMqu",
-    "youtubeClips": []
-  },
-  {
     "id": "lady-gaga-bradley-cooper-shallow",
     "displayName": "Shallow — Lady Gaga & Bradley Cooper",
     "correctYear": 2018,
@@ -11372,34 +11277,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "spirit-in-the-sky-keiino",
-    "displayName": "Spirit in the Sky — KEiiNO",
-    "correctYear": 2019,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "gen-alpha",
-      "gen-z"
-    ],
-    "region": [
-      "unknown-region"
-    ],
-    "genrePackages": [
-      "Eurovision"
-    ],
-    "spotifyTrackId": "7B7O5jgFpWfc9orZw6FN4K",
-    "youtubeClips": [
-      {
-        "videoId": "Ovt7YGHAj8I",
-        "startSec": 40,
-        "endSec": 55,
-        "channelTitle": "KEiiNO",
-        "license": "standard",
-        "notes": "Official music video. ESC 2019 Norway entry."
-      }
-    ]
-  },
-  {
     "id": "tones-and-i-dance-monkey",
     "displayName": "Dance Monkey — Tones and I",
     "correctYear": 2019,
@@ -11576,33 +11453,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "anis-don-demina-flaggan-i-topp",
-    "displayName": "Flaggan i topp — Anis Don Demina",
-    "correctYear": 2021,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "all"
-    ],
-    "region": [
-      "unknown-region"
-    ],
-    "genrePackages": [
-      "sport",
-      "football"
-    ],
-    "spotifyTrackId": "7w2sCUWVAop5sTmikAdhCD",
-    "youtubeClips": [
-      {
-        "videoId": "ajZxDhowQ8g",
-        "startSec": 0,
-        "endSec": 30,
-        "channelTitle": "Anis Don Demina",
-        "license": "standard"
-      }
-    ]
-  },
-  {
     "id": "bono-we-are-the-people",
     "displayName": "We Are the People — Martin Garrix ft. Bono & The Edge",
     "correctYear": 2021,
@@ -11620,34 +11470,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "spotifyTrackId": "2iL0W5qi0ivZ9WRXbZ74cS",
     "youtubeClips": []
-  },
-  {
-    "id": "el-diablo-elena-tsagkrinou",
-    "displayName": "El Diablo — Elena Tsagkrinou",
-    "correctYear": 2021,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "gen-alpha",
-      "gen-z"
-    ],
-    "region": [
-      "unknown-region"
-    ],
-    "genrePackages": [
-      "Eurovision"
-    ],
-    "spotifyTrackId": "4TAttqXwjj56xZQVKvlX0K",
-    "youtubeClips": [
-      {
-        "videoId": "ZHeydRCBPNs",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Elena Tsagkrinou",
-        "license": "standard",
-        "notes": "Official music video. ESC 2021 Cyprus entry."
-      }
-    ]
   },
   {
     "id": "kid-laroi-justin-bieber-stay",
@@ -11998,25 +11820,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "europapa-joost-klein",
-    "displayName": "Europapa — Joost Klein",
-    "correctYear": 2024,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "gen-alpha",
-      "gen-z"
-    ],
-    "region": [
-      "unknown-region"
-    ],
-    "genrePackages": [
-      "Eurovision"
-    ],
-    "spotifyTrackId": "0uHrMbMv3c78398pIANDqR",
-    "youtubeClips": []
-  },
-  {
     "id": "lady-gaga-bruno-mars-die-with-a-smile",
     "displayName": "Die With a Smile — Lady Gaga & Bruno Mars",
     "correctYear": 2024,
@@ -12029,6 +11832,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "sweden"
     ],
+    "spotifyTrackId": "7nEHTOQJqKCx7Dvgng3l8t",
     "youtubeClips": [
       {
         "videoId": "sQtWPcAyL6g",
@@ -12240,25 +12044,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "license": "standard"
       }
     ]
-  },
-  {
-    "id": "brandsta-all-in-for-sverige",
-    "displayName": "All in för Sverige — Brandsta",
-    "correctYear": 2026,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "all"
-    ],
-    "region": [
-      "unknown-region"
-    ],
-    "genrePackages": [
-      "sport",
-      "football"
-    ],
-    "spotifyTrackId": "3AGFGLUAhu0Cwv1Mkea3d4",
-    "youtubeClips": []
   },
   {
     "id": "dara-bangaranga",

@@ -129,7 +129,8 @@ items:
     displayName: "Flaggan i topp — Anis Don Demina"
     correctYear: 2021
     probability: 78
-    region: ["unknown-region"]
+    region: ["sweden"]
+    inBaseCatalog: false
     wikimediaSearchHints: ["Anis Don Demina Flaggan i topp Sverige fotboll"]
     answerMethods: ["timeline"]
     genrePackages: ["sport", "football"]
@@ -167,7 +168,8 @@ items:
     displayName: "All in för Sverige — Brandsta"
     correctYear: 2026
     probability: 74
-    region: ["unknown-region"]
+    region: ["sweden"]
+    inBaseCatalog: false
     wikimediaSearchHints: ["Brandsta All in för Sverige fotboll"]
     answerMethods: ["timeline"]
     genrePackages: ["sport", "football"]
@@ -226,7 +228,8 @@ items:
     displayName: "Wavin' Flag — K'naan"
     correctYear: 2010
     probability: 82
-    region: ["unknown-region"]
+    region: ["global"]
+    inBaseCatalog: false
     wikimediaSearchHints: ["K'naan Wavin' Flag 2010 World Cup"]
     answerMethods: ["timeline"]
     youtubeClips:

@@ -189,8 +189,12 @@ items:
     displayName: "Paint It Black — The Rolling Stones"
     correctYear: 1966
     probability: 85
+    region: ["global"]
+    inBaseCatalog: false
     wikimediaSearchHints: ["Rolling Stones Paint It Black 1966"]
     answerMethods: ["timeline"]
+    genrePackages: ["rock"]
+    spotifyTrackId: "63T7DJ1AFDD6Bn8VzG6JE8"
     youtubeClips:
       - videoId: "170sceOWWXc"
         startSec: 30
@@ -571,8 +575,12 @@ items:
     displayName: "Highway to Hell — AC/DC"
     correctYear: 1979
     probability: 86
+    region: ["global"]
+    inBaseCatalog: false
     wikimediaSearchHints: ["AC/DC Highway to Hell 1979"]
     answerMethods: ["timeline"]
+    genrePackages: ["rock"]
+    spotifyTrackId: "2zYzyRzz6pRmhPzyfMEC8s"
     youtubeClips:
       - videoId: "ikFFVfObwss"
         startSec: 30
@@ -684,13 +692,15 @@ items:
     probability: 64
     wikimediaSearchHints: ["Dana All Kinds of Everything Eurovision 1970 Ireland"]
     answerMethods: ["timeline"]
+    genrePackages: ["Eurovision"]
     youtubeClips:
       - videoId: "sZ8W9oOgjM4"
         startSec: 5
         endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1970 vinnare — Irland."
-    region: ["unknown-region"]
+    region: ["europe"]
+    inBaseCatalog: false
   - id: severine-un-banc-un-arbre
     displayName: "Un banc, un arbre, une rue — Séverine"
     correctYear: 1971
@@ -950,3 +960,39 @@ items:
     answerMethods: ["timeline"]
     genrePackages: ["hiphop"]
     spotifyTrackId: "2XbwFs07dfm2MGQuYmRMZT"
+  # === Tillägg 2026-08-11 (Peters lista) ===
+  - id: marvin-gaye-tammi-terrell-aint-no-mountain-high-enough
+    displayName: "Ain't No Mountain High Enough — Marvin Gaye & Tammi Terrell"
+    correctYear: 1967
+    probability: 84
+    wikimediaSearchHints: ["Marvin Gaye Tammi Terrell Ain't No Mountain High Enough 1967"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "7tqhbajSfrz2F7E1Z75ASX"
+    youtubeClips: []
+  - id: the-who-behind-blue-eyes
+    displayName: "Behind Blue Eyes — The Who"
+    correctYear: 1971
+    probability: 80
+    region: ["global"]
+    inBaseCatalog: false
+    wikimediaSearchHints: ["The Who Behind Blue Eyes 1971 Whos Next"]
+    answerMethods: ["timeline"]
+    genrePackages: ["rock"]
+    spotifyTrackId: "0cKk8BKEi7zXbdrYdyqBP5"
+    youtubeClips: []
+  - id: bonnie-tyler-its-a-heartache
+    displayName: "It's a Heartache — Bonnie Tyler"
+    correctYear: 1977
+    probability: 82
+    wikimediaSearchHints: ["Bonnie Tyler Its a Heartache 1977"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "1Y7VG310Lf5IYP7sVOob4X"
+    youtubeClips: []
+  - id: bette-midler-the-rose
+    displayName: "The Rose — Bette Midler"
+    correctYear: 1979
+    probability: 80
+    wikimediaSearchHints: ["Bette Midler The Rose 1979 soundtrack"]
+    answerMethods: ["timeline"]
+    youtubeClips: []
+    notes: "SAKNAR MEDIA - Peter angav ingen lank. Alla Spotify-traffar jag hittade ar samlingsskivor (2008/2009/2015), vilket bryter mot single-release-regeln for deep-link-kontext. Behover kurerat track-ID eller YT-klipp innan den exporteras."

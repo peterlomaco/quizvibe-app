@@ -57,19 +57,27 @@ export interface HintLibrary {
 
 // ── Region scope ─────────────────────────────────────────────────────────
 //
-// 'sweden'  = visas enbart för svenska spelare (V1-default)
-// 'all'     = visas för alla spelare — globalt kända + stark svensk igenkänning
-//             (= catalog region: ["sweden","global"])
-// 'global'  = visas EJ för V1-svenska spelare (ren global-pool)
+// ⚠ @deprecated SEDAN 2026-08-11 — RÖR INTE FÖR ATT ÄNDRA REGION.
 //
-// Används:
-//   • Som referens vid catalog-YAML-taggning (region-fältet per item)
-//   • Av fetch-hints-data.ts för att prioritera vilka items som auto-genereras
-//   • Av getHintRegionScope(id) helper
-
-// 'nordic' = visas för svenska + nordiska spelare (catalog-YAML: ["sweden","nordic"])
-//            Svenska spelare ser nordic-items automatiskt — "sweden" ingår alltid i nordic-items region-array.
-export type HintRegionScope = 'sweden' | 'all' | 'nordic' | 'unknown-region';
+// Region för bild-items bor numera i katalogens `region:`-fält, precis som
+// för musik-items, och exporteras till quizImageQuestions.ts. Det finns
+// alltså EN källa igen. Vill du ändra en regionstagg: redigera
+// backend/content/catalog/*.yaml och kör `npm run export-image-questions`.
+//
+// Den här map:en behölls vid migrationen som historiskt underlag — dess 506
+// beslut kopierades in i katalogen (0 items bytte synlighet). Ingen kod läser
+// den längre; `getHintRegionScope` finns kvar som oanvänd accessor och kan
+// raderas när migrationen suttit ett par releaser.
+//
+// Vokabuläret nedan föregår hierarkin global ⊃ europe ⊃ nordic ⊃ sweden;
+// 'all' var alias för 'global'.
+export type HintRegionScope =
+  | 'global'
+  | 'europe'
+  | 'nordic'
+  | 'sweden'
+  | 'all'
+  | 'unknown-region';
 
 // Lookup-tabell: item-id → region scope.
 // Items som INTE finns här defaultar till 'sweden'.
@@ -81,6 +89,19 @@ export type HintRegionScope = 'sweden' | 'all' | 'nordic' | 'unknown-region';
 //   'unknown-region' = för svag igenkänning för V1 → hoppas över i hints-gen
 //                      och inkluderas EJ i quizet
 export const HINTS_REGION_MAP: Record<string, HintRegionScope> = {
+
+  // ── Region-review 2026-08-11 (Peters genomgång): items som saknade
+  //    entry här men var taggade 'global' i katalogen under den gamla
+  //    innebörden. Nivåerna följer hierarkin global ⊃ europe ⊃ nordic ⊃ sweden.
+  'james-stewart': 'unknown-region', // James Stewart
+  'brian-bosworth': 'unknown-region', // Brian Bosworth
+  'rebecca-ferguson': 'unknown-region', // Rebecca Ferguson
+  'evin-ahmad': 'unknown-region', // Evin Ahmad
+  'moa-gammel': 'unknown-region', // Moa Gammel
+  'cleo': 'unknown-region', // Cleo
+  'aronchupa': 'europe', // AronChupa
+  'viktor-gyokeres': 'europe', // Viktor Gyökeres
+
 
   // ════════════════════════════════════════════════════════════════════════
   // 'all' — ICKE-SVENSKA men stark igenkänning bland svenska spelare
@@ -123,7 +144,7 @@ export const HINTS_REGION_MAP: Record<string, HintRegionScope> = {
 
   // ── Artister / gen-z ───────────────────────────────────────────────────
   'billie-eilish': 'all',    'taylor-swift': 'all',     'drake': 'all',
-  'ariana-grande': 'all',    'travis-scott': 'all',     'ed-sheeran': 'all',
+  'ariana-grande': 'all',    'travis-scott': 'unknown-region',     'ed-sheeran': 'all',
   'the-weeknd': 'all',       'olivia-rodrigo': 'all',   'bad-bunny': 'all',
   'dua-lipa': 'all',         'harry-styles': 'all',     'post-malone': 'all',
   'justin-bieber': 'all',    'selena-gomez': 'all',     'miley-cyrus': 'all',
@@ -154,7 +175,7 @@ export const HINTS_REGION_MAP: Record<string, HintRegionScope> = {
   'patrick-swayze': 'all',   'pierce-brosnan': 'all',   'rowan-atkinson': 'all',
   'hugh-grant': 'all',       'daniel-craig': 'all',     'jeff-goldblum': 'unknown-region',
   'joe-pesci': 'all',        'bill-murray': 'all',      'michael-douglas': 'all',
-  'gary-oldman': 'all',      'demi-moore': 'all',       'halle-berry': 'all',
+  'gary-oldman': 'unknown-region',      'demi-moore': 'all',       'halle-berry': 'all',
   'john-cleese': 'all',      'jodie-foster': 'all',     'ben-stiller': 'all',
   'paul-rudd': 'unknown-region',
 
@@ -167,7 +188,7 @@ export const HINTS_REGION_MAP: Record<string, HintRegionScope> = {
   'kate-winslet': 'all',     'nicole-kidman': 'all',    'charlize-theron': 'all',
   'penelope-cruz': 'all',    'adam-sandler': 'all',     'will-ferrell': 'all',
   'mark-wahlberg': 'all',    'joaquin-phoenix': 'all',  'edward-norton': 'all',
-  'dwayne-johnson': 'all',   'chris-evans': 'all',      'scarlett-johansson': 'all',
+  'dwayne-johnson': 'all',   'chris-evans': 'unknown-region',      'scarlett-johansson': 'all',
   'jennifer-lawrence': 'all', 'cameron-diaz': 'all',    'gwyneth-paltrow': 'all',
   'uma-thurman': 'all',      'ewan-mcgregor': 'unknown-region',    'bradley-cooper': 'all',
   'tom-hiddleston': 'unknown-region',   'keira-knightley': 'unknown-region',  'anne-hathaway': 'unknown-region',
@@ -177,56 +198,56 @@ export const HINTS_REGION_MAP: Record<string, HintRegionScope> = {
   'emma-watson': 'unknown-region',      'robert-pattinson': 'unknown-region', 'kristen-stewart': 'unknown-region',
 
   // ── Idrottare / elder+gen-x ────────────────────────────────────────────
-  'muhammad-ali': 'all',     'pele': 'all',             'diego-maradona': 'all',
-  'magic-johnson': 'all',    'michael-jordan': 'all',   'carl-lewis': 'all',
-  'wayne-gretzky': 'all',    'martina-navratilova': 'all', 'john-mcenroe': 'all',
+  'muhammad-ali': 'global',     'pele': 'global',             'diego-maradona': 'global',
+  'magic-johnson': 'global',    'michael-jordan': 'global',   'carl-lewis': 'all',
+  'wayne-gretzky': 'global',    'martina-navratilova': 'all', 'john-mcenroe': 'global',
   'johan-cruyff': 'all',     'franz-beckenbauer': 'all', 'george-best': 'all',
-  'paolo-maldini': 'all',    'roberto-baggio': 'all',   'marco-van-basten': 'all',
-  'katarina-witt': 'all',    'bjorn-daehlie': 'all',    'ayrton-senna': 'all',
-  'alain-prost': 'all',      'michael-schumacher': 'all', 'zinedine-zidane': 'all',
+  'paolo-maldini': 'global',    'roberto-baggio': 'global',   'marco-van-basten': 'global',
+  'katarina-witt': 'unknown-region',    'bjorn-daehlie': 'all',    'ayrton-senna': 'all',
+  'alain-prost': 'all',      'michael-schumacher': 'global', 'zinedine-zidane': 'global',
   'andre-agassi': 'all',     'pete-sampras': 'all',     'david-beckham': 'all',
-  'ronaldinho': 'all',       'goran-ivanisevic': 'all', 'george-foreman': 'all',
-  'eric-cantona': 'all',     'ruud-gullit': 'all',      'lothar-matthaus': 'all',
+  'ronaldinho': 'global',       'goran-ivanisevic': 'all', 'george-foreman': 'all',
+  'eric-cantona': 'global',     'ruud-gullit': 'global',      'lothar-matthaus': 'global',
   'rivaldo': 'all',          'alan-shearer': 'all',     'oliver-kahn': 'all',
   'frank-rijkaard': 'all',   'edgar-davids': 'all',     'alessandro-del-piero': 'all',
-  'ryan-giggs': 'all',       'luis-figo': 'all',        'jurgen-klinsmann': 'all',
+  'ryan-giggs': 'global',       'luis-figo': 'global',        'jurgen-klinsmann': 'global',
   'hristo-stoichkov': 'all', 'didier-deschamps': 'all', 'bebeto': 'unknown-region',
-  'paolo-rossi': 'all',      'gerd-muller': 'all',      'olga-korbut': 'unknown-region',
-  'jaromir-jagr': 'all',     'ole-einar-bjorndalen': 'all', 'marit-bjorgen': 'all',
+  'paolo-rossi': 'europe',      'gerd-muller': 'all',      'olga-korbut': 'unknown-region',
+  'jaromir-jagr': 'global',     'ole-einar-bjorndalen': 'all', 'marit-bjorgen': 'all',
   'jean-pierre-papin': 'all', 'brian-laudrup': 'all',
 
   // ── Idrottare / modern ─────────────────────────────────────────────────
-  'cristiano-ronaldo': 'all', 'lionel-messi': 'all',    'serena-williams': 'all',
-  'usain-bolt': 'all',        'roger-federer': 'all',   'zlatan-ibrahimovic': 'all',
-  'tom-brady': 'all',         'lewis-hamilton': 'all',  'rafael-nadal': 'all',
-  'novak-djokovic': 'all',    'kylian-mbappe': 'all',   'kobe-bryant': 'all',
-  'erling-haaland': 'all',    'harry-kane': 'all',      'robert-lewandowski': 'all',
-  'luka-modric': 'all',       'andy-murray': 'all',     'mikaela-shiffrin': 'all',
+  'cristiano-ronaldo': 'global', 'lionel-messi': 'global',    'serena-williams': 'all',
+  'usain-bolt': 'global',        'roger-federer': 'all',   'zlatan-ibrahimovic': 'global',
+  'tom-brady': 'all',         'lewis-hamilton': 'global',  'rafael-nadal': 'global',
+  'novak-djokovic': 'all',    'kylian-mbappe': 'all',   'kobe-bryant': 'global',
+  'erling-haaland': 'all',    'harry-kane': 'global',      'robert-lewandowski': 'global',
+  'luka-modric': 'global',       'andy-murray': 'all',     'mikaela-shiffrin': 'all',
   'alex-morgan': 'all',       'karsten-warholm': 'nordic', 'jakob-ingebrigtsen': 'nordic',
-  'xavi': 'unknown-region',              'yao-ming': 'unknown-region',        'venus-williams': 'all',
-  'sidney-crosby': 'all',     'connor-mcdavid': 'all',  'neymar': 'all',
+  'xavi': 'unknown-region',              'yao-ming': 'unknown-region',        'venus-williams': 'global',
+  'sidney-crosby': 'global',     'connor-mcdavid': 'all',  'neymar': 'all',
   'iker-casillas': 'all',     'toni-kroos': 'unknown-region',      'manuel-neuer': 'all',
-  'floyd-mayweather': 'all',  'wayne-rooney': 'all',    'kaka': 'all',
+  'floyd-mayweather': 'all',  'wayne-rooney': 'global',    'kaka': 'all',
   'andrea-pirlo': 'all',      'thierry-henry': 'all',   'david-villa': 'unknown-region',
-  'didier-drogba': 'all',     'gerard-pique': 'unknown-region',    'kevin-de-bruyne': 'all',
-  'antoine-griezmann': 'all', 'virgil-van-dijk': 'all', 'gareth-bale': 'all',
-  'martin-odegaard': 'all',   'ronaldo-nazario': 'all', 'miroslav-klose': 'all',
+  'didier-drogba': 'all',     'gerard-pique': 'unknown-region',    'kevin-de-bruyne': 'global',
+  'antoine-griezmann': 'all', 'virgil-van-dijk': 'global', 'gareth-bale': 'all',
+  'martin-odegaard': 'all',   'ronaldo-nazario': 'global', 'miroslav-klose': 'all',
   'thomas-muller': 'all',     'steven-gerrard': 'all',  'frank-lampard': 'all',
   'xabi-alonso': 'all',       'raul': 'all',            'luis-suarez': 'all',
   'eden-hazard': 'all',       'patrick-vieira': 'all',  'andriy-shevchenko': 'all',
-  'petr-cech': 'all',         'wesley-sneijder': 'unknown-region', 'robin-van-persie': 'all',
-  'clarence-seedorf': 'all',  'patrick-kluivert': 'all', 'john-terry': 'all',
+  'petr-cech': 'global',         'wesley-sneijder': 'unknown-region', 'robin-van-persie': 'all',
+  'clarence-seedorf': 'all',  'patrick-kluivert': 'global', 'john-terry': 'all',
   'rio-ferdinand': 'all',     'michael-owen': 'all',    'cesc-fabregas': 'all',
-  'ngolo-kante': 'all',       'paul-pogba': 'all',      'sergio-aguero': 'all',
+  'ngolo-kante': 'all',       'paul-pogba': 'global',      'sergio-aguero': 'all',
   'jude-bellingham': 'all',   'phil-foden': 'all',      'bukayo-saka': 'all',
-  'declan-rice': 'all',       'bruno-fernandes': 'all', 'mohamed-salah': 'all',
-  'hidetoshi-nakata': 'unknown-region',  'james-rodriguez': 'unknown-region', 'alexis-sanchez': 'unknown-region',
+  'declan-rice': 'all',       'bruno-fernandes': 'all', 'mohamed-salah': 'global',
+  'hidetoshi-nakata': 'global',  'james-rodriguez': 'unknown-region', 'alexis-sanchez': 'unknown-region',
   'diego-simeone': 'unknown-region',
 
   'lindsey-vonn': 'all',
 
   // ── Svenska idrottare med global räckvidd ('all') ─────────────────────
-  'bjorn-borg': 'all',        'stefan-edberg': 'all',   'mats-wilander': 'all',
+  'bjorn-borg': 'global',        'stefan-edberg': 'all',   'mats-wilander': 'all',
   'ingemar-stenmark': 'all',  'peter-forsberg': 'all',  'mats-sundin': 'all',
   'nicklas-lidstrom': 'all',  'annika-sorenstam': 'all', 'armand-duplantis': 'all',
   'freddie-ljungberg': 'all', 'henrik-larsson': 'all',
@@ -252,7 +273,7 @@ export const HINTS_REGION_MAP: Record<string, HintRegionScope> = {
   'lasse-tennander': 'unknown-region', 'iggy-pop': 'unknown-region',
   'patti-smith': 'unknown-region',     'belinda-carlisle': 'unknown-region',
   'toni-braxton': 'unknown-region',    'ne-yo': 'unknown-region',
-  'll-cool-j': 'unknown-region',       'lauryn-hill': 'all',
+  'll-cool-j': 'global',       'lauryn-hill': 'all',
   'marc-anthony': 'unknown-region',    'hurula': 'unknown-region',
   'john-dahlback': 'unknown-region',   'erik-lundin': 'unknown-region',
   'sza': 'unknown-region',             'frank-ocean': 'unknown-region',
@@ -283,12 +304,12 @@ export const HINTS_REGION_MAP: Record<string, HintRegionScope> = {
   'morten-olsen': 'unknown-region',    'berti-vogts': 'unknown-region',
   'cesare-maldini': 'unknown-region',  'hector-cuper': 'unknown-region',
   'carlos-alberto-parreira': 'unknown-region', 'vicente-del-bosque': 'unknown-region',
-  'joachim-low': 'unknown-region',     'marcello-lippi': 'unknown-region',
+  'joachim-low': 'europe',     'marcello-lippi': 'unknown-region',
   'dino-zoff': 'unknown-region',       'guus-hiddink': 'unknown-region',
-  'jan-ceulemans': 'unknown-region',   'hugo-sanchez': 'unknown-region',
+  'jan-ceulemans': 'europe',   'hugo-sanchez': 'unknown-region',
   'karl-heinz-rummenigge': 'unknown-region', 'sepp-maier': 'unknown-region',
   'javier-zanetti': 'unknown-region',  'dunga': 'unknown-region',
-  'bobby-moore': 'unknown-region',     'jairzinho': 'unknown-region',
+  'bobby-moore': 'unknown-region',     'jairzinho': 'global',
   'daniel-passarella': 'unknown-region', 'alf-ramsey': 'unknown-region',
   'just-fontaine': 'unknown-region',   'otto-rehhagel': 'unknown-region',
   'louis-van-gaal': 'unknown-region',  'tim-cahill': 'unknown-region',
@@ -296,7 +317,7 @@ export const HINTS_REGION_MAP: Record<string, HintRegionScope> = {
   'ivan-rakitic': 'unknown-region',    'dirk-kuyt': 'unknown-region',
   'gennaro-gattuso': 'unknown-region', 'alessandro-nesta': 'unknown-region',
   'ashley-cole': 'unknown-region',     'robbie-keane': 'unknown-region',
-  'david-trezeguet': 'unknown-region', 'ricardo-quaresma': 'unknown-region',
+  'david-trezeguet': 'unknown-region', 'ricardo-quaresma': 'global',
   'pepe': 'unknown-region',            'deco': 'unknown-region',
   'daniele-de-rossi': 'unknown-region', 'pedro-rodriguez': 'unknown-region',
   'juan-mata': 'unknown-region',       'diego-costa': 'unknown-region',

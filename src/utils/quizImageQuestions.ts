@@ -77,6 +77,9 @@ export interface ImageQuizQuestion {
   peakTo?: number;
   /** Vilka generationer item:t passar för (driver per-spelare-pool på klienten). */
   audiences: ImageQuestionAudience[];
+  /** Region-hierarki global ⊃ europe ⊃ nordic ⊃ land — se src/utils/regionScope.ts.
+   *  'unknown-region' når ingen spelare. */
+  region: string[];
   questionText: string;
 }
 
@@ -90,6 +93,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "all"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this band?"
   },
   {
@@ -101,6 +107,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "all"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this band?"
   },
   {
@@ -111,6 +120,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1973,
     "audiences": [
       "all"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this band?"
   },
@@ -124,6 +136,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "millennials",
       "gen-z"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -139,6 +154,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -153,6 +171,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -163,6 +184,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1983,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -177,6 +201,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "millennials"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -188,6 +215,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "millennials"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -198,6 +228,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1982,
     "audiences": [
       "all"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this band?"
   },
@@ -212,6 +245,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -224,6 +260,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -235,6 +274,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -249,6 +291,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -262,6 +307,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -274,6 +322,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-x",
       "millennials"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -284,6 +335,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1987,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -297,6 +351,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "all"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this band?"
   },
   {
@@ -308,6 +365,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -322,6 +382,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -332,6 +395,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1991,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -346,6 +412,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -359,6 +428,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -369,6 +441,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1986,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -384,6 +459,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -398,6 +476,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -411,6 +492,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -422,6 +506,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -435,6 +522,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2024,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -450,6 +540,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -460,6 +553,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1924,
     "audiences": [
       "elder"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -473,6 +569,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "millennials",
       "gen-z"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -488,6 +587,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -500,6 +602,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -514,6 +619,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -526,6 +634,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-x",
       "millennials"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -537,6 +648,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -551,6 +665,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -563,6 +680,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-x",
       "millennials"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -574,6 +694,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x",
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -588,6 +711,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -600,6 +726,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z",
       "gen-alpha"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -614,6 +743,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -626,6 +758,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z",
       "gen-alpha"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -640,6 +775,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -652,6 +790,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 1965,
     "audiences": [
       "elder"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -666,6 +807,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -679,6 +823,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -690,6 +837,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "millennials"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -700,6 +850,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1978,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -715,6 +868,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -725,6 +881,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1953,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -739,6 +898,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -751,6 +913,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z",
       "gen-alpha"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -765,6 +930,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -778,6 +946,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -788,6 +959,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 2002,
     "audiences": [
       "all"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this band?"
   },
@@ -802,6 +976,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -813,6 +990,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-z"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -823,6 +1003,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1944,
     "audiences": [
       "elder"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -837,6 +1020,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -850,6 +1036,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -860,6 +1049,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1993,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "europe"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -874,6 +1066,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -885,6 +1080,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2023,
     "audiences": [
       "all"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this band?"
   },
@@ -899,6 +1097,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -911,6 +1112,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 1967,
     "audiences": [
       "elder"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -925,6 +1129,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "millennials"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -938,6 +1145,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "millennials"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -948,6 +1158,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1977,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -961,6 +1174,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -971,6 +1187,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1993,
     "audiences": [
       "all"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this band?"
   },
@@ -985,6 +1204,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-z"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -998,6 +1220,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -1008,6 +1233,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1932,
     "audiences": [
       "elder"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -1022,6 +1250,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -1033,6 +1264,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "millennials"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -1043,6 +1277,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1960,
     "audiences": [
       "all"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this band?"
   },
@@ -1056,6 +1293,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -1066,6 +1306,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1958,
     "audiences": [
       "all"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this band?"
   },
@@ -1079,6 +1322,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2024,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -1094,6 +1340,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -1107,6 +1356,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -1117,6 +1369,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1997,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -1129,6 +1384,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -1143,6 +1401,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -1153,6 +1414,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1981,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -1168,6 +1432,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -1181,6 +1448,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -1193,6 +1463,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2003,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -1208,6 +1481,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -1219,6 +1495,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-z"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -1229,6 +1508,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1947,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -1242,6 +1524,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -1253,6 +1538,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -1267,6 +1555,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -1279,6 +1570,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -1289,6 +1583,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1947,
     "audiences": [
       "elder"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -1301,6 +1598,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "all"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this band?"
   },
   {
@@ -1311,6 +1611,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1991,
     "audiences": [
       "all"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this band?"
   },
@@ -1325,6 +1628,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -1337,6 +1643,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -1348,6 +1657,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -1362,6 +1674,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -1375,6 +1690,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -1386,6 +1704,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -1399,6 +1720,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2024,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -1414,6 +1738,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -1428,6 +1755,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -1440,6 +1770,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2018,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -1454,6 +1787,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "millennials"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -1466,6 +1802,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 1980,
     "audiences": [
       "elder"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -1480,6 +1819,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -1492,6 +1834,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2008,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -1506,6 +1851,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -1518,6 +1866,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2024,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -1532,6 +1883,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -1544,6 +1898,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z",
       "gen-alpha"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -1558,6 +1915,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -1569,6 +1929,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -1584,6 +1947,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -1597,6 +1963,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-z"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -1608,6 +1977,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -1621,6 +1993,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -1631,6 +2006,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1966,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -1645,6 +2023,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -1658,6 +2039,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -1668,6 +2052,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1974,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -1681,6 +2068,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z",
       "gen-alpha"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -1696,6 +2086,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -1709,6 +2102,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "millennials"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -1720,6 +2116,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -1733,6 +2132,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z",
       "gen-alpha"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -1748,6 +2150,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -1759,6 +2164,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -1772,6 +2180,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 1940,
     "audiences": [
       "elder"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -1787,6 +2198,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -1800,6 +2214,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -1810,6 +2227,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1974,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -1824,6 +2244,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -1834,6 +2257,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1991,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -1849,6 +2275,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -1859,6 +2288,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1950,
     "audiences": [
       "elder"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -1874,6 +2306,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -1885,6 +2320,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -1899,6 +2337,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -1910,6 +2351,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x",
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -1924,6 +2368,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "millennials"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -1936,6 +2383,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2017,
     "audiences": [
       "elder"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -1950,6 +2400,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -1962,6 +2415,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -1976,6 +2432,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -1988,6 +2447,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -1998,6 +2460,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1985,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -2012,6 +2477,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -2022,6 +2490,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1996,
     "audiences": [
       "all"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this band?"
   },
@@ -2038,6 +2509,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-x",
       "gen-z"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -2050,6 +2524,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z",
       "gen-alpha"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -2064,6 +2541,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -2074,6 +2554,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1937,
     "audiences": [
       "elder"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -2088,6 +2571,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -2101,6 +2587,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -2112,6 +2601,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "all"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this band?"
   },
   {
@@ -2122,6 +2614,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1954,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -2136,6 +2631,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -2146,6 +2644,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1983,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -2158,6 +2659,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -2172,6 +2676,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -2182,6 +2689,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1980,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -2194,6 +2704,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -2208,6 +2721,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-z"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -2220,6 +2736,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z",
       "gen-alpha"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -2234,6 +2753,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -2247,6 +2769,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -2258,6 +2783,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "millennials"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -2268,6 +2796,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1987,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -2282,6 +2813,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -2293,6 +2827,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -2307,6 +2844,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -2319,6 +2859,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "millennials",
       "gen-z"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -2333,6 +2876,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -2345,6 +2891,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z",
       "gen-alpha"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -2359,6 +2908,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -2371,6 +2923,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z",
       "gen-alpha"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -2385,6 +2940,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -2398,6 +2956,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -2409,6 +2970,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -2423,6 +2987,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-z"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -2435,6 +3002,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2015,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -2449,6 +3019,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -2461,6 +3034,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2024,
     "audiences": [
       "elder"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -2475,6 +3051,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -2486,6 +3065,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -2500,6 +3082,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -2512,6 +3097,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z",
       "gen-alpha"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -2526,6 +3114,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -2537,6 +3128,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -2551,6 +3145,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -2562,6 +3159,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -2576,6 +3176,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -2588,6 +3191,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2024,
     "audiences": [
       "gen-z"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -2602,6 +3208,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -2614,6 +3223,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2010,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -2628,6 +3240,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -2638,6 +3253,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1986,
     "audiences": [
       "gen-z"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -2652,6 +3270,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-z"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -2663,6 +3284,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -2676,6 +3300,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 1990,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -2691,6 +3318,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -2703,6 +3333,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-x",
       "millennials"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -2714,6 +3347,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "millennials"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -2724,6 +3360,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1971,
     "audiences": [
       "all"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this band?"
   },
@@ -2738,6 +3377,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-z"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -2750,6 +3392,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2014,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -2764,6 +3409,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -2775,6 +3423,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -2788,6 +3439,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z",
       "gen-alpha"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -2803,6 +3457,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -2815,6 +3472,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 1966,
     "audiences": [
       "elder"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -2829,6 +3489,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -2841,6 +3504,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2024,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -2855,6 +3521,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -2866,6 +3535,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x",
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -2879,6 +3551,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-x",
       "millennials"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -2891,6 +3566,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -2901,6 +3579,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1972,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -2914,6 +3595,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "millennials",
       "gen-z"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -2929,6 +3613,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -2941,6 +3628,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2017,
     "audiences": [
       "gen-z"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -2955,6 +3645,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -2968,6 +3661,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "millennials"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -2979,6 +3675,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -2993,6 +3692,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -3006,6 +3708,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -3017,6 +3722,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "millennials"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -3027,6 +3735,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1990,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -3041,6 +3752,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -3051,6 +3765,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1985,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -3065,6 +3782,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -3077,6 +3797,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -3091,6 +3814,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -3101,6 +3827,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1980,
     "audiences": [
       "all"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this band?"
   },
@@ -3114,6 +3843,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -3124,6 +3856,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1960,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -3137,6 +3872,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "millennials",
       "gen-z"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -3152,6 +3890,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -3165,6 +3906,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -3175,6 +3919,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1890,
     "audiences": [
       "elder"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -3188,6 +3935,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "millennials",
       "gen-z"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -3203,6 +3953,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -3217,6 +3970,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -3227,6 +3983,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 2002,
     "audiences": [
       "all"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this band?"
   },
@@ -3241,6 +4000,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -3253,6 +4015,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 1994,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -3267,6 +4032,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -3278,6 +4046,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -3292,6 +4063,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-z"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -3303,6 +4077,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "all"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this band?"
   },
   {
@@ -3313,6 +4090,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1967,
     "audiences": [
       "all"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this band?"
   },
@@ -3328,6 +4108,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -3340,6 +4123,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z",
       "gen-alpha"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -3354,6 +4140,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -3367,6 +4156,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-z"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -3378,6 +4170,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -3392,6 +4187,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -3403,6 +4201,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -3417,6 +4218,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -3429,6 +4233,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z",
       "gen-alpha"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -3443,6 +4250,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -3456,6 +4266,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -3466,6 +4279,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 2007,
     "audiences": [
       "all"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this band?"
   },
@@ -3480,6 +4296,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -3492,6 +4311,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2011,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -3506,6 +4328,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -3516,6 +4341,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1967,
     "audiences": [
       "all"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this band?"
   },
@@ -3530,6 +4358,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -3542,6 +4373,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -3553,6 +4387,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -3567,6 +4404,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -3580,6 +4420,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -3591,6 +4434,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -3604,6 +4450,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -3616,6 +4465,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -3627,6 +4479,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -3641,6 +4496,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -3653,6 +4511,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 1998,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -3667,6 +4528,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -3678,6 +4542,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -3692,6 +4559,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -3705,6 +4575,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -3715,6 +4588,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1986,
     "audiences": [
       "all"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this band?"
   },
@@ -3729,6 +4605,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -3742,6 +4621,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -3754,6 +4636,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -3765,6 +4650,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -3779,6 +4667,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -3789,6 +4680,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1985,
     "audiences": [
       "all"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this band?"
   },
@@ -3802,6 +4696,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -3817,6 +4714,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -3828,6 +4728,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x",
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -3841,6 +4744,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -3853,6 +4759,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2024,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -3868,6 +4777,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -3879,6 +4791,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "all"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this band?"
   },
   {
@@ -3889,6 +4804,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1974,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -3903,6 +4821,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -3916,6 +4837,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -3928,6 +4852,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "millennials",
       "gen-z"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -3943,6 +4870,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -3955,6 +4885,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2023,
     "audiences": [
       "elder"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -3969,6 +4902,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -3981,6 +4917,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z",
       "gen-alpha"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -3995,6 +4934,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-z"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -4007,6 +4949,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -4017,6 +4962,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1972,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -4031,6 +4979,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -4044,6 +4995,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -4055,6 +5009,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -4069,6 +5026,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -4081,6 +5041,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z",
       "gen-alpha"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -4095,6 +5058,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -4105,6 +5071,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1964,
     "audiences": [
       "all"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this band?"
   },
@@ -4119,6 +5088,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -4131,6 +5103,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2013,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -4145,6 +5120,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -4156,6 +5134,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -4170,6 +5151,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -4181,6 +5165,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -4195,6 +5182,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -4207,6 +5197,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z",
       "gen-alpha"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -4222,6 +5215,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -4233,6 +5229,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -4247,6 +5246,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -4259,6 +5261,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 1975,
     "audiences": [
       "elder"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -4273,6 +5278,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -4285,6 +5293,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z",
       "gen-alpha"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -4299,6 +5310,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -4310,6 +5324,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -4324,6 +5341,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "nordic"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -4336,6 +5356,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2006,
     "audiences": [
       "elder"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -4350,6 +5373,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -4362,6 +5388,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z",
       "gen-alpha"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -4376,6 +5405,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -4389,6 +5421,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -4401,6 +5436,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "europe"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -4411,6 +5449,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1966,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -4423,6 +5464,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -4437,6 +5481,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -4448,6 +5495,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -4462,6 +5512,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -4475,6 +5528,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -4486,6 +5542,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -4500,6 +5559,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "millennials"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -4512,6 +5574,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2005,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -4527,6 +5592,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -4541,6 +5609,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -4553,6 +5624,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2024,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -4567,6 +5641,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -4577,6 +5654,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1981,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -4591,6 +5671,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -4602,6 +5685,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -4617,6 +5703,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -4627,6 +5716,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1973,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -4641,6 +5733,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -4652,6 +5747,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x",
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -4665,6 +5763,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-x",
       "millennials"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -4677,6 +5778,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "europe"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -4687,6 +5791,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1970,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -4700,6 +5807,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z",
       "gen-alpha"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -4715,6 +5825,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -4728,6 +5841,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -4739,6 +5855,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -4752,6 +5871,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 1996,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -4767,6 +5889,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -4780,6 +5905,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -4791,6 +5919,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -4805,6 +5936,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -4816,6 +5950,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x",
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -4830,6 +5967,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -4842,6 +5982,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -4857,6 +6000,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -4869,6 +6015,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 1992,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -4883,6 +6032,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "millennials"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -4894,6 +6046,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -4908,6 +6063,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -4921,6 +6079,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -4933,6 +6094,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 1976,
     "audiences": [
       "elder"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -4948,6 +6112,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -4961,6 +6128,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -4973,6 +6143,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-x",
       "millennials"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -4984,6 +6157,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -4999,6 +6175,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -5011,6 +6190,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-x",
       "millennials",
       "gen-z"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this band?"
   },
@@ -5025,6 +6207,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -5037,6 +6222,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z",
       "gen-alpha"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -5051,6 +6239,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -5063,6 +6254,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2020,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -5077,6 +6271,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -5089,6 +6286,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -5100,6 +6300,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -5114,6 +6317,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-z"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -5126,6 +6332,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2020,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -5140,6 +6349,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -5153,6 +6365,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -5165,6 +6380,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -5176,6 +6394,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -5190,6 +6411,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "nordic"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -5201,6 +6425,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -5214,6 +6441,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2024,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -5229,6 +6459,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -5243,6 +6476,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -5255,6 +6491,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 1981,
     "audiences": [
       "elder"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -5270,6 +6509,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -5282,6 +6524,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2024,
     "audiences": [
       "gen-z"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -5296,6 +6541,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -5308,6 +6556,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -5318,6 +6569,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1990,
     "audiences": [
       "all"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this band?"
   },
@@ -5332,6 +6586,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -5344,6 +6601,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2008,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -5358,6 +6618,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -5368,6 +6631,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1952,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -5382,6 +6648,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -5392,6 +6661,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1988,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -5406,6 +6678,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -5417,6 +6692,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -5427,6 +6705,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1973,
     "audiences": [
       "all"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this band?"
   },
@@ -5441,6 +6722,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -5453,6 +6737,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z",
       "gen-alpha"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -5467,6 +6754,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -5479,6 +6769,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2026,
     "audiences": [
       "gen-z"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -5493,6 +6786,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -5503,6 +6799,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1967,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -5517,6 +6816,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -5527,6 +6829,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1991,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -5541,6 +6846,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -5553,6 +6861,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2024,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -5567,6 +6878,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "millennials"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -5577,6 +6891,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1982,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -5590,6 +6907,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -5601,6 +6921,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "millennials"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -5611,6 +6934,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1990,
     "audiences": [
       "all"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this band?"
   },
@@ -5625,6 +6951,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -5635,6 +6964,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1945,
     "audiences": [
       "elder"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -5649,6 +6981,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -5660,6 +6995,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "all"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this band?"
   },
   {
@@ -5670,6 +7008,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1948,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -5684,6 +7025,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "millennials"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -5694,6 +7038,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1968,
     "audiences": [
       "all"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this band?"
   },
@@ -5708,6 +7055,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -5721,6 +7071,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -5731,6 +7084,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1966,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -5743,6 +7099,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -5757,6 +7116,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -5769,6 +7131,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2016,
     "audiences": [
       "elder"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -5783,6 +7148,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -5795,6 +7163,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2024,
     "audiences": [
       "gen-z"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -5809,6 +7180,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -5821,6 +7195,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2005,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -5835,6 +7212,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-z"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -5846,6 +7226,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -5856,6 +7239,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1940,
     "audiences": [
       "elder"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -5870,6 +7256,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -5880,6 +7269,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1985,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -5892,6 +7284,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "millennials"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -5902,6 +7297,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1987,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -5916,6 +7314,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -5929,6 +7330,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -5939,6 +7343,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1971,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -5951,6 +7358,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "millennials"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -5961,6 +7371,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1970,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -5975,6 +7388,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -5987,6 +7403,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "millennials",
       "gen-z"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -6002,6 +7421,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -6013,6 +7435,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x",
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -6027,6 +7452,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "millennials"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -6040,6 +7468,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -6050,6 +7481,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1992,
     "audiences": [
       "all"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this band?"
   },
@@ -6064,6 +7498,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-z"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -6076,6 +7513,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -6086,6 +7526,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1963,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -6100,6 +7543,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -6113,6 +7559,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -6125,6 +7574,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -6136,6 +7588,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x",
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -6150,6 +7605,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -6161,6 +7619,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -6175,6 +7636,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -6188,6 +7652,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -6198,6 +7665,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1986,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -6212,6 +7682,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -6224,6 +7697,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -6235,6 +7711,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -6249,6 +7728,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -6259,6 +7741,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1954,
     "audiences": [
       "elder"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -6271,6 +7756,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -6285,6 +7773,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-x",
       "millennials"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -6298,6 +7789,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -6308,6 +7802,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1999,
     "audiences": [
       "all"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this band?"
   },
@@ -6324,6 +7821,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-alpha"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this band?"
   },
   {
@@ -6334,6 +7834,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1986,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -6348,6 +7851,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -6361,6 +7867,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "millennials"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -6372,6 +7881,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -6386,6 +7898,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -6397,6 +7912,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -6410,6 +7928,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-x",
       "millennials"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -6421,6 +7942,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x",
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -6434,6 +7958,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z",
       "gen-alpha"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -6449,6 +7976,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-alpha",
       "millennials"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this band?"
   },
   {
@@ -6462,6 +7992,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -6477,6 +8010,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -6489,6 +8025,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -6503,6 +8042,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "millennials"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -6513,6 +8055,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1950,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -6525,6 +8070,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -6536,6 +8084,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "millennials"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -6546,6 +8097,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1983,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -6559,6 +8113,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 1962,
     "audiences": [
       "elder"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -6574,6 +8131,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -6584,6 +8144,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1975,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -6596,6 +8159,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "millennials"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -6607,6 +8173,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -6621,6 +8190,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -6631,6 +8203,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1994,
     "audiences": [
       "all"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this band?"
   },
@@ -6643,6 +8218,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -6657,6 +8235,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -6668,6 +8249,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -6682,6 +8266,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -6695,6 +8282,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "millennials"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -6706,6 +8296,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -6719,6 +8312,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -6730,6 +8326,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -6745,6 +8344,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -6757,6 +8359,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z",
       "gen-alpha"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -6771,6 +8376,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -6783,6 +8391,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2011,
     "audiences": [
       "elder"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -6797,6 +8408,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-z"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -6807,6 +8421,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1987,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -6821,6 +8438,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -6834,6 +8454,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -6844,6 +8467,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1981,
     "audiences": [
       "all"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this band?"
   },
@@ -6858,6 +8484,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -6871,6 +8500,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -6882,6 +8514,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -6896,6 +8531,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -6909,6 +8547,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -6920,6 +8561,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -6934,6 +8578,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -6947,6 +8594,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -6958,6 +8608,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x",
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -6973,6 +8626,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -6985,6 +8641,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2016,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -6999,6 +8658,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -7011,6 +8673,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z",
       "gen-alpha"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -7025,6 +8690,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-z"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -7038,6 +8706,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-z"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -7048,6 +8719,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1991,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -7062,6 +8736,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -7072,6 +8749,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1982,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -7086,6 +8766,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -7099,6 +8782,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -7110,6 +8796,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "millennials"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -7120,6 +8809,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1937,
     "audiences": [
       "elder"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -7133,6 +8825,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -7144,6 +8839,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -7158,6 +8856,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -7171,6 +8872,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -7181,6 +8885,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1968,
     "audiences": [
       "all"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this band?"
   },
@@ -7195,6 +8902,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "millennials"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -7207,6 +8917,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2024,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -7221,6 +8934,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -7233,6 +8949,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2023,
     "audiences": [
       "gen-z"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -7247,6 +8966,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -7259,6 +8981,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z",
       "gen-alpha"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -7273,6 +8998,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-z"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -7284,6 +9012,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -7297,6 +9028,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-x",
       "millennials"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -7309,6 +9043,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2017,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -7324,6 +9061,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -7334,6 +9074,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1996,
     "audiences": [
       "all"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this band?"
   },
@@ -7346,6 +9089,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -7357,6 +9103,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -7372,6 +9121,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -7385,6 +9137,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -7397,6 +9152,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2026,
     "audiences": [
       "gen-z"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -7412,6 +9170,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -7424,6 +9185,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2024,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -7439,6 +9203,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -7451,6 +9218,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z",
       "gen-alpha"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -7465,6 +9235,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -7476,6 +9249,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x",
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -7489,6 +9265,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -7500,6 +9279,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -7514,6 +9296,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-z"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -7524,6 +9309,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1934,
     "audiences": [
       "elder"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -7538,6 +9326,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -7551,6 +9342,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -7561,6 +9355,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1958,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -7575,6 +9372,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -7587,6 +9387,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-x",
       "millennials"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -7597,6 +9400,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1983,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -7611,6 +9417,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -7621,6 +9430,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1989,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -7633,6 +9445,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -7647,6 +9462,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -7660,6 +9478,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -7672,6 +9493,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -7683,6 +9507,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "europe"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -7697,6 +9524,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -7709,6 +9539,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2005,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -7723,6 +9556,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -7735,6 +9571,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-x",
       "millennials"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -7745,6 +9584,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1971,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -7757,6 +9599,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -7771,6 +9616,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -7783,6 +9631,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2024,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -7797,6 +9648,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -7809,6 +9663,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z",
       "gen-alpha"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -7823,6 +9680,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -7836,6 +9696,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -7847,6 +9710,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -7862,6 +9728,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -7875,6 +9744,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -7886,6 +9758,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -7896,6 +9771,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1979,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -7910,6 +9788,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -7920,6 +9801,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1967,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -7933,6 +9817,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -7944,6 +9831,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -7959,6 +9849,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -7970,6 +9863,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -7984,6 +9880,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -7994,6 +9893,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1953,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -8008,6 +9910,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -8020,6 +9925,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2006,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -8034,6 +9942,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -8045,6 +9956,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "millennials"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -8055,6 +9969,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1974,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -8069,6 +9986,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "millennials"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -8081,6 +10001,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2020,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -8095,6 +10018,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -8107,6 +10033,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2006,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -8121,6 +10050,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "millennials"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -8132,6 +10064,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "all"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this band?"
   },
   {
@@ -8142,6 +10077,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1951,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -8156,6 +10094,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-z"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -8169,6 +10110,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -8179,6 +10123,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1947,
     "audiences": [
       "elder"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -8191,6 +10138,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -8201,6 +10151,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1970,
     "audiences": [
       "all"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this band?"
   },
@@ -8215,6 +10168,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -8228,6 +10184,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -8239,6 +10198,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -8253,6 +10215,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -8265,6 +10230,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z",
       "gen-alpha"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -8279,6 +10247,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -8290,6 +10261,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -8305,6 +10279,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -8319,6 +10296,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -8331,6 +10311,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -8345,6 +10328,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -8357,6 +10343,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2024,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -8371,6 +10360,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -8381,6 +10373,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1988,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -8396,6 +10391,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -8409,6 +10407,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -8420,6 +10421,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -8434,6 +10438,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -8447,6 +10454,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "millennials"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -8459,6 +10469,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 1996,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -8474,6 +10487,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -8486,6 +10502,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 1984,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -8500,6 +10519,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -8512,6 +10534,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z",
       "gen-alpha"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -8526,6 +10551,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-z"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -8539,6 +10567,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -8550,6 +10581,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -8563,6 +10597,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -8573,6 +10610,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1990,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -8587,6 +10627,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -8599,6 +10642,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "millennials",
       "gen-z"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -8613,6 +10659,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -8625,6 +10674,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z",
       "gen-alpha"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -8639,6 +10691,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -8651,6 +10706,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2018,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -8665,6 +10723,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -8678,6 +10739,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -8689,6 +10753,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x",
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -8702,6 +10769,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2008,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -8717,6 +10787,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -8729,6 +10802,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z",
       "gen-alpha"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -8745,6 +10821,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -8757,6 +10836,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z",
       "gen-alpha"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -8771,6 +10853,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -8781,6 +10866,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1986,
     "audiences": [
       "all"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this band?"
   },
@@ -8795,6 +10883,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -8807,6 +10898,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -8818,6 +10912,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -8833,6 +10930,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -8843,6 +10943,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1994,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -8857,6 +10960,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-z"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -8869,6 +10975,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2019,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -8883,6 +10992,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -8895,6 +11007,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2024,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -8909,6 +11024,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -8921,6 +11039,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2001,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -8936,6 +11057,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -8947,6 +11071,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "millennials"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -8957,6 +11084,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1955,
     "audiences": [
       "elder"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -8971,6 +11101,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -8981,6 +11114,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1981,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -8996,6 +11132,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -9008,6 +11147,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2024,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -9022,6 +11164,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -9032,6 +11177,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1983,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -9046,6 +11194,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -9058,6 +11209,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "millennials",
       "gen-z"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -9072,6 +11226,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-z"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -9083,6 +11240,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -9097,6 +11257,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -9109,6 +11272,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z",
       "gen-alpha"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -9123,6 +11289,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -9135,6 +11304,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2024,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -9149,6 +11321,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -9162,6 +11337,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-z"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -9172,6 +11350,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1973,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -9186,6 +11367,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -9198,6 +11382,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2024,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -9212,6 +11399,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -9225,6 +11415,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -9235,6 +11428,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1969,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -9249,6 +11445,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -9262,6 +11461,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "millennials"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -9272,6 +11474,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1972,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -9286,6 +11491,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -9296,6 +11504,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1994,
     "audiences": [
       "all"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this band?"
   },
@@ -9309,6 +11520,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -9321,6 +11535,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -9332,6 +11549,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -9346,6 +11566,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -9357,6 +11580,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "all"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this band?"
   },
   {
@@ -9367,6 +11593,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1982,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -9381,6 +11610,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -9393,6 +11625,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2024,
     "audiences": [
       "elder"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -9407,6 +11642,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -9419,6 +11657,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z",
       "gen-alpha"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -9433,6 +11674,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -9445,6 +11689,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 1999,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -9459,6 +11706,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -9472,6 +11722,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -9482,6 +11735,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1934,
     "audiences": [
       "elder"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -9494,6 +11750,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -9508,6 +11767,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -9518,6 +11780,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 2008,
     "audiences": [
       "all"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this band?"
   },
@@ -9532,6 +11797,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-z"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -9545,6 +11813,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -9555,6 +11826,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1963,
     "audiences": [
       "all"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this band?"
   },
@@ -9569,6 +11843,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-z"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -9579,6 +11856,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1956,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -9592,6 +11872,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-x",
       "millennials"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -9602,6 +11885,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1957,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -9614,6 +11900,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "all"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this band?"
   },
   {
@@ -9624,6 +11913,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1965,
     "audiences": [
       "all"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this band?"
   },
@@ -9636,6 +11928,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "all"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this band?"
   },
   {
@@ -9646,6 +11941,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1977,
     "audiences": [
       "all"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this band?"
   },
@@ -9658,6 +11956,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "all"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this band?"
   },
   {
@@ -9668,6 +11969,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1995,
     "audiences": [
       "all"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this band?"
   },
@@ -9682,6 +11986,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-z"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -9694,6 +12001,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z",
       "gen-alpha"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -9708,6 +12018,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -9720,6 +12033,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "millennials",
       "gen-z"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -9734,6 +12050,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -9745,6 +12064,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -9759,6 +12081,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -9772,6 +12097,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -9782,6 +12110,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1975,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -9796,6 +12127,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -9806,6 +12140,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1967,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -9820,6 +12157,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -9831,6 +12171,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x",
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -9845,6 +12188,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -9858,6 +12204,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -9870,6 +12219,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2020,
     "audiences": [
       "elder"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -9885,6 +12237,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -9897,6 +12252,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2024,
     "audiences": [
       "elder"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -9911,6 +12269,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -9924,6 +12285,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -9936,6 +12300,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-x",
       "millennials"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -9946,6 +12313,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1952,
     "audiences": [
       "elder"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -9960,6 +12330,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -9970,6 +12343,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1948,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -9984,6 +12360,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "millennials"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -9997,6 +12376,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -10008,6 +12390,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -10022,6 +12407,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "elder",
       "gen-x"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -10032,6 +12420,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1987,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -10046,6 +12437,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "millennials"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -10056,6 +12450,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1991,
     "audiences": [
       "gen-z"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -10070,6 +12467,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -10083,6 +12483,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "millennials"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -10094,6 +12497,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "all"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this band?"
   },
   {
@@ -10104,6 +12510,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1949,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -10117,6 +12526,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -10132,6 +12544,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -10144,6 +12559,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z",
       "gen-alpha"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -10158,6 +12576,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "millennials"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -10171,6 +12592,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -10181,6 +12605,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1981,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -10193,6 +12620,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "unknown-region"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -10207,6 +12637,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -10217,6 +12650,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1996,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -10230,6 +12666,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-x",
       "millennials"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -10240,6 +12679,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1958,
     "audiences": [
       "all"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this band?"
   },
@@ -10254,6 +12696,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "europe"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -10267,6 +12712,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -10277,6 +12725,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1987,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -10291,6 +12742,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -10304,6 +12758,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -10315,6 +12772,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -10329,6 +12789,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -10339,6 +12802,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1947,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -10353,6 +12819,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -10363,6 +12832,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1981,
     "audiences": [
       "all"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this band?"
   },
@@ -10377,6 +12849,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-x"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -10389,6 +12864,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2008,
     "audiences": [
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this actor?"
   },
@@ -10404,6 +12882,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -10418,6 +12899,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "global"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -10430,6 +12914,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z",
       "gen-alpha"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -10444,6 +12931,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -10457,6 +12947,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "gen-z",
       "gen-alpha"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this athlete?"
   },
   {
@@ -10467,6 +12960,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 2000,
     "audiences": [
       "all"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this band?"
   },
@@ -10481,6 +12977,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z"
     ],
+    "region": [
+      "sweden"
+    ],
     "questionText": "What is the Name of this Artist?"
   },
   {
@@ -10491,6 +12990,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1997,
     "audiences": [
       "millennials"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this Artist?"
   },
@@ -10505,6 +13007,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "gen-z"
     ],
+    "region": [
+      "unknown-region"
+    ],
     "questionText": "What is the Name of this actor?"
   },
   {
@@ -10516,6 +13021,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "audiences": [
       "elder",
       "gen-x"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   },
@@ -10529,6 +13037,9 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "millennials",
       "gen-z",
       "gen-alpha"
+    ],
+    "region": [
+      "global"
     ],
     "questionText": "What is the Name of this athlete?"
   }

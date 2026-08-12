@@ -20,6 +20,7 @@ items:
     displayName: "Jaws"
     correctYear: 1975
     probability: 90
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Jaws 1975 film"]
     answerMethods: ["actor-select"]
     correctNames: ["Roy Scheider", "Richard Dreyfuss"]
@@ -30,7 +31,6 @@ items:
         endSec: 45
         channelTitle: "Universal Pictures"
         notes: "Official Universal Pictures-klipp — 'Bigger Boat'-scenen i 4K HDR."
-    region: ["unknown-region"]
   - id: star-wars-new-hope
     displayName: "Star Wars: A New Hope"
     correctYear: 1977

@@ -305,27 +305,20 @@ interface CatalogItem {
   region: string[]; // effektiv region (fil-default eller item-override)
 }
 
-// Avgör om ett items region ska inkluderas.
-// Inkludera: "sweden" finns i region ELLER "nordic" (swedish players see it in v2)
-// Exkludera: enbart ["global"], ["unknown-region"] — visas ej för svenska V1-spelare.
+// Avgör om ett items region ska inkluderas — speglar hierarkin
+// global ⊃ europe ⊃ nordic ⊃ sweden (se backend/content/schema.ts).
+// Uppdaterad 2026-08-11: tidigare exkluderade den här funktionen 'global'
+// eftersom taggen då betydde "visas EJ för svensk spelare". Med den nya
+// innebörden ("igenkänt överallt → ingår i varje region scope") når 'global'
+// tvärtom ALLA spelare. Endast 'unknown-region' når ingen.
+const SWEDEN_REACH = ['global', 'europe', 'nordic', 'sweden'];
 function isRegionIncluded(region: string[]): boolean {
-  return region.includes('sweden') || region.includes('nordic');
+  return region.some((r) => SWEDEN_REACH.includes(r));
 }
 
-// Läs HINTS_REGION_MAP från src/utils/hintsData.ts för att veta vilken
-// region-scope varje manuellt kuraterat item har.
-// OBS: vi importerar inte TS-filen direkt i scriptet (circular + tsx overhead).
-// Istället parsar vi HINTS_REGION_MAP inline med en regex-extraktion.
-function loadManualRegionMap(hintsDataFile: string): Record<string, string> {
-  const map: Record<string, string> = {};
-  if (!fs.existsSync(hintsDataFile)) return map;
-  const content = fs.readFileSync(hintsDataFile, 'utf-8');
-  // Matcha rader som:  'some-id': 'sweden'  |  'some-id': 'all'  |  'some-id': 'global'
-  for (const m of content.matchAll(/'([\w-]+)':\s+'(sweden|all|nordic|global|unknown-region)'/g)) {
-    map[m[1]] = m[2];
-  }
-  return map;
-}
+// (loadManualRegionMap borttagen 2026-08-11 — parsade HINTS_REGION_MAP ur
+//  src/utils/hintsData.ts som en andra region-sanning. Region läses nu ur
+//  katalogens `region:`-fält, samma källa som allt annat.)
 
 const ContentItemSchema = z.object({
   id: z.string(),
@@ -508,9 +501,6 @@ async function main() {
   const manualIdsFile = path.join(scriptDir, '..', '..', 'src', 'utils', 'hintsData.ts');
   const manualIds = loadExistingIds(manualIdsFile);
 
-  // HINTS_REGION_MAP från hintsData.ts — styr region-filter för auto-gen
-  const manualRegionMap = loadManualRegionMap(manualIdsFile);
-
   // Befintliga genererade hints (för --resume)
   const existingGeneratedIds = isResume ? loadExistingIds(outputFile) : new Set<string>();
 
@@ -530,9 +520,10 @@ async function main() {
   const itemsToProcess = targetItems.filter((item) => {
     if (manualIds.has(item.id)) return false;            // redan manuellt kuraterat
     if (existingGeneratedIds.has(item.id)) return false; // redan auto-genererat
-    // Om itemet är taggat 'unknown-region' i HINTS_REGION_MAP → skip
-    const scope = manualRegionMap[item.id];
-    if (scope === 'unknown-region' || scope === 'global') return false;
+    // Region läses numera ur KATALOGEN (migration 2026-08-11) — inte längre
+    // ur HINTS_REGION_MAP, som var en andra, divergerande sanning.
+    // 'unknown-region' når ingen spelare → ingen idé att generera hints.
+    if (!isRegionIncluded(item.region)) return false;
     return true;
   });
   console.log(`${itemsToProcess.length} items to process (${manualIds.size} manual, ${existingGeneratedIds.size} already generated).`);

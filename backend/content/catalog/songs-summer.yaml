@@ -1,14 +1,16 @@
 # Sommar-låtar — kurerade för kommande "Summer"-host-paketet. Varje item bär
-# genrePackages: ["Summer"]. HELA filen är paket-exklusiv: region
-# unknown-region på fil-headern filtrerar bort items ur V1-baspoolen
-# (quiz.tsx rad ~204) tills paketet aktiveras via genrePackages-mekanismen.
+# genrePackages: ["Summer"]. HELA filen är paket-exklusiv, men sedan
+# 2026-08-11 via `inBaseCatalog: false` per item i stället för den gamla
+# `region: ["unknown-region"]`-hacken på fil-headern. Region bär nu ren
+# geografi: "global" = igenkänt överallt (ingår i varje region scope),
+# "sweden" = enbart svensk igenkänning (Cornelis Sommarkort).
 #
 # audience: ["all"] — sommarhits känns igen tvärs generationer.
 # correctYear = originalrelease-år (INTE Spotify-samlingsskivans år —
 # Sommarkort ligger t.ex. på "Cornelis Bästa" 2004 på Spotify men
 # originalreleasen är 1987 på "Eldorado – äventyret fortsätter...").
 audience: ["all"]
-region: ["unknown-region"]
+region: ["global"]
 category: songs
 contentForm: youtube
 contentSubject: song
@@ -17,6 +19,8 @@ items:
     displayName: "Sommarkort (En stund på jorden) — Cornelis Vreeswijk"
     correctYear: 1987
     probability: 80
+    region: ["sweden"]
+    inBaseCatalog: false
     wikimediaSearchHints: ["Cornelis Vreeswijk Sommarkort En stund på jorden"]
     answerMethods: ["timeline"]
     genrePackages: ["Summer"]
@@ -26,6 +30,8 @@ items:
     displayName: "Cruel Summer — Ace of Base"
     correctYear: 1998
     probability: 82
+    region: ["europe"]
+    inBaseCatalog: false
     wikimediaSearchHints: ["Ace of Base Cruel Summer 1998"]
     answerMethods: ["timeline"]
     genrePackages: ["Summer"]
@@ -35,6 +41,8 @@ items:
     displayName: "In the Summertime — Mungo Jerry"
     correctYear: 1970
     probability: 84
+    region: ["global"]
+    inBaseCatalog: false
     wikimediaSearchHints: ["Mungo Jerry In the Summertime 1970"]
     answerMethods: ["timeline"]
     genrePackages: ["Summer"]
@@ -44,6 +52,8 @@ items:
     displayName: "Summertime — DJ Jazzy Jeff & The Fresh Prince"
     correctYear: 1991
     probability: 82
+    region: ["global"]
+    inBaseCatalog: false
     wikimediaSearchHints: ["DJ Jazzy Jeff Fresh Prince Summertime 1991"]
     answerMethods: ["timeline"]
     genrePackages: ["Summer", "hiphop"]
@@ -53,8 +63,26 @@ items:
     displayName: "Sweat (A La La La Long) — Inner Circle"
     correctYear: 1992
     probability: 84
+    region: ["europe"]
+    inBaseCatalog: false
     wikimediaSearchHints: ["Inner Circle Sweat A La La La Long 1992"]
     answerMethods: ["timeline"]
     genrePackages: ["Summer"]
     spotifyTrackId: "24Si0Kw3pu2RxX1jrbBg5A"
     youtubeClips: []
+  - id: rio-shine-on
+    displayName: "Shine On — R.I.O."
+    correctYear: 2008
+    probability: 76
+    region: ["europe"]
+    inBaseCatalog: false
+    wikimediaSearchHints: ["R.I.O. Shine On 2008 eurodance"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Summer"]
+    spotifyTrackId: "7yIGRf80h3Kwi4GfwJUiQl"
+    youtubeClips:
+      - videoId: "OhLOOdI23bE"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Kontor.TV"
+        notes: "Officiell label-kanal. Peter-kurerad 2026-08-11."

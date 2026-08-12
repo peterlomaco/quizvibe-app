@@ -164,6 +164,7 @@ items:
     displayName: "Nadia Comăneci perfekta 10:or i Montreal"
     correctYear: 1976
     probability: 82
+    region: ["global"]
     wikimediaSearchHints: ["Nadia Comaneci 1976 Montreal Olympics perfect 10"]
     answerMethods: ["timeline"]
     youtubeClips:
@@ -172,7 +173,6 @@ items:
         endSec: 45
         channelTitle: "Olympics"
         notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
-    region: ["unknown-region"]
   - id: stenmark-os-guld-slalom-1980
     displayName: "Stenmark OS-guld slalom Lake Placid"
     correctYear: 1980
@@ -213,6 +213,7 @@ items:
     displayName: "Carl Lewis tar 4 OS-guld Los Angeles"
     correctYear: 1984
     probability: 82
+    region: ["global"]
     wikimediaSearchHints: ["Carl Lewis 1984 Los Angeles Olympics four gold medals"]
     answerMethods: ["timeline"]
     youtubeClips:
@@ -221,7 +222,6 @@ items:
         endSec: 45
         channelTitle: "How To Run Faster - By Performance Lab"
         notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
-    region: ["unknown-region"]
   - id: tre-kronor-vm-1987-vien
     displayName: "Tre Kronor VM-guld Wien"
     correctYear: 1987
@@ -376,6 +376,7 @@ items:
     displayName: "Michael Phelps 8 OS-guld Peking"
     correctYear: 2008
     probability: 92
+    region: ["global"]
     wikimediaSearchHints: ["Michael Phelps 2008 Beijing Olympics eight gold medals"]
     answerMethods: ["timeline"]
     youtubeClips:
@@ -384,7 +385,6 @@ items:
         endSec: 30
         channelTitle: "Bao Highlights"
         notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
-    region: ["unknown-region"]
   - id: zlatan-bicycle-kick-england-2012
     displayName: "Zlatans bicycle kick mot England"
     correctYear: 2012
@@ -428,6 +428,7 @@ items:
     displayName: "Simone Biles 4 OS-guld i Rio"
     correctYear: 2016
     probability: 85
+    region: ["global"]
     wikimediaSearchHints: ["Simone Biles 2016 Rio Olympics four gold medals gymnastics"]
     answerMethods: ["timeline"]
     youtubeClips:
@@ -436,7 +437,6 @@ items:
         endSec: 45
         channelTitle: "TNT Sports"
         notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
-    region: ["unknown-region"]
   - id: tre-kronor-vm-2017-koln
     displayName: "Tre Kronor VM-guld Köln"
     correctYear: 2017
@@ -518,6 +518,7 @@ items:
     displayName: "Michael Jordans 'Last Shot' i NBA-finalen"
     correctYear: 1998
     probability: 80
+    region: ["global"]
     wikimediaSearchHints: ["Michael Jordan Last Shot 1998 NBA Finals Bulls Jazz"]
     answerMethods: ["timeline"]
     youtubeClips:
@@ -526,7 +527,6 @@ items:
         endSec: 20
         channelTitle: "Coach Clank"
         notes: "Curerad 2026-05-29 — Jordans iconic last shot, 1998 NBA Finals (NBA-officiella var region-blockerade)."
-    region: ["unknown-region"]
   - id: leicester-premier-league-2016
     displayName: "Leicester City vinner Premier League"
     correctYear: 2016
@@ -543,6 +543,7 @@ items:
     displayName: "Vinnie Jones griper Gascoigne — det berömda greppet"
     correctYear: 1988
     probability: 76
+    region: ["global"]
     wikimediaSearchHints: ["Vinnie Jones Paul Gascoigne grab 1988 football"]
     answerMethods: ["timeline"]
     youtubeClips:
@@ -551,7 +552,6 @@ items:
         endSec: 30
         channelTitle: "Deadball Diaries"
         notes: "Ikonisk fotbollsmoment — Vinnie Jones (Wimbledon) griper Gascoigne (Newcastle) 1988. Sport-kategori via contentSubject: sport-event."
-    region: ["unknown-region"]
   - id: hamrin-semi-vm-1958
     displayName: "Kurt Hamrin Sverige–Västtyskland VM-halvfinal"
     correctYear: 1958
@@ -604,6 +604,7 @@ items:
     displayName: "Cantonas kung-fu-spark mot Crystal Palace-fan"
     correctYear: 1995
     probability: 82
+    region: ["global"]
     wikimediaSearchHints: ["Eric Cantona 1995 kung fu kick Crystal Palace fan Selhurst Park"]
     answerMethods: ["timeline"]
     youtubeClips:
@@ -612,4 +613,3 @@ items:
         endSec: 50
         channelTitle: "Classic Footy Videos & Clips"
         notes: "HD — Cantonas kung-fu-spark Selhurst Park 1995. Ersatte SD-klipp (C7PSY7KYThk)."
-    region: ["unknown-region"]

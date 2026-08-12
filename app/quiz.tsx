@@ -80,7 +80,8 @@ import {
 } from '@/src/utils/quizImageQuestions';
 import { buildImageVariant } from '@/src/utils/imageQuestionBuilder';
 import { createSeededRng } from '@/src/utils/seededRandom';
-import { HINTS_LIBRARY, getHintRegionScope, inferGender, inferNationality, inferSport, type HintLibrary } from '@/src/utils/hintsData';
+import { HINTS_LIBRARY, inferGender, inferNationality, inferSport, type HintLibrary } from '@/src/utils/hintsData';
+import { isItemInRegionScope, PLAYER_COUNTRY } from '@/src/utils/regionScope';
 import { HintsQuizCard } from '@/src/components/HintsQuizCard';
 import { HeartbeatSound } from '@/src/components/HeartbeatSound';
 import { MorseAmbientSound } from '@/src/components/MorseAmbientSound';
@@ -215,11 +216,11 @@ type QuizQuestion = TimelineQuestion | ImageQuestion | ActorSelectQuestion;
 // `contentSubject`, inte hårdkodad här. `hint` används bara internt
 // i reveal-vyn ("Disco era") så den behålls för smak.
 //
-// 'unknown-region'-items filtreras bort — dessa är reserverade för host-paket
-// och ska aldrig visas i base-poolen för en svensk spelare (speglar samma
-// filter som IMAGE_SEED_QUESTIONS använder med getHintRegionScope).
+// Region-filter via hierarkin global ⊃ europe ⊃ nordic ⊃ <land> (se
+// src/utils/regionScope.ts). Itemet visas om spelarens land ligger inom
+// itemets region-nivå; 'unknown-region' når ingen och faller därför bort.
 const SEED_QUESTIONS: (TimelineQuestion | ActorSelectQuestion)[] = MUSIC_QUESTIONS
-  .filter((q) => !q.region.includes('unknown-region'))
+  .filter((q) => isItemInRegionScope(q.region, PLAYER_COUNTRY))
   .map((q, i, arr) => {
   if (q.correctNames && q.correctNames.length > 0) {
     // Film-fråga: actor-select-mekanik (skådespelar-/karaktärnamn istället för år)
@@ -271,12 +272,14 @@ function professionFromSubject(subject: string | undefined): string {
 // Bild-frågor (Letter Grid → Final Selection-svar). category='Image' triggar
 // per-typ-rendering i question-card / mediaCard / answer-block / reveal-block.
 // Items med hints-data i HINTS_LIBRARY får library attachad vid konvertering.
-// 'unknown-region'-items filtreras bort. Items med färre än 10 hints visas ej —
-// de saknar tillräckliga ledtrådar för en meningsfull fråga.
+// Region-filter via EXAKT samma regel och samma datakälla som SEED_QUESTIONS:
+// katalogens `region`, numera exporterad även för bild-items (migration
+// 2026-08-11). Items med färre än 10 hints visas ej — de saknar tillräckliga
+// ledtrådar för en meningsfull fråga.
 const MIN_HINTS_REQUIRED = 10;
 const IMAGE_SEED_QUESTIONS: ImageQuestion[] = IMAGE_QUIZ_QUESTIONS
   .filter((q) =>
-    getHintRegionScope(q.id) !== 'unknown-region' &&
+    isItemInRegionScope(q.region, PLAYER_COUNTRY) &&
     (HINTS_LIBRARY[q.id]?.hints.length ?? 0) >= MIN_HINTS_REQUIRED,
   )
   .map((q, i, arr) => ({
@@ -2800,6 +2803,9 @@ export default function QuizScreen() {
           category: 'artists',
           contentSubject: cand.meta.type,
           audiences: ['all' as ImageQuestionAudience],
+          // Syntetiskt distraktor-item — når aldrig region-filtret, men
+          // ImageQuizQuestion kräver fältet. 'global' = neutralt/bredast.
+          region: ['global'],
           questionText: '',
         },
         type: cand.meta.type,
@@ -2842,6 +2848,9 @@ export default function QuizScreen() {
       category: 'artists',
       contentSubject: correctMeta?.type ?? 'artist',
       audiences: ['all' as ImageQuestionAudience],
+      // Syntetiskt item för Spotify/Name-svarsblocket — passerar aldrig
+      // region-filtret, men fältet krävs av typen.
+      region: ['global'],
       questionText: '',
     };
     const variant = buildImageVariant(

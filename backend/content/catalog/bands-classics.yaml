@@ -13,18 +13,21 @@ items:
     displayName: "ABBA"
     correctYear: 1972
     probability: 98
+    region: ["global"]
     wikimediaSearchHints: ["ABBA band Sweden"]
     answerMethods: ["timeline", "name-letters"]
   - id: beatles
     displayName: "The Beatles"
     correctYear: 1960
     probability: 98
+    region: ["global"]
     wikimediaSearchHints: ["The Beatles band"]
     answerMethods: ["timeline", "name-letters"]
   - id: queen
     displayName: "Queen"
     correctYear: 1970
     probability: 96
+    region: ["global"]
     wikimediaSearchHints: ["Queen rock band Freddie Mercury"]
     answerMethods: ["timeline", "name-letters"]
   - id: pink-floyd
@@ -43,6 +46,7 @@ items:
     displayName: "AC/DC"
     correctYear: 1973
     probability: 90
+    region: ["global"]
     wikimediaSearchHints: ["AC/DC band rock"]
     answerMethods: ["timeline", "name-letters"]
   - id: u2
@@ -175,6 +179,7 @@ items:
     displayName: "Roxette"
     correctYear: 1986
     probability: 92
+    region: ["global"]
     wikimediaSearchHints: ["Roxette band Sweden"]
     answerMethods: ["timeline", "name-letters"]
   - id: kent

@@ -14,6 +14,7 @@ items:
     peakFrom: 2016
     peakTo: 2026
     probability: 85
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Millie Bobby Brown actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: zendaya
@@ -22,6 +23,7 @@ items:
     peakFrom: 2016
     peakTo: 2026
     probability: 88
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Zendaya actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: daniel-radcliffe
@@ -30,6 +32,7 @@ items:
     peakFrom: 2001
     peakTo: 2011
     probability: 90
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Daniel Radcliffe actor Harry Potter"]
     answerMethods: ["timeline", "name-letters"]
   - id: emma-watson
@@ -38,6 +41,7 @@ items:
     peakFrom: 2001
     peakTo: 2017
     probability: 92
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Emma Watson actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: robert-pattinson
@@ -46,10 +50,11 @@ items:
     peakFrom: 2009
     peakTo: 2026
     probability: 88
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Robert Pattinson actor Twilight"]
     answerMethods: ["timeline", "name-letters"]
   - id: kristen-stewart
-    region: ["global"]
+    region: ["unknown-region"]
     displayName: "Kristen Stewart"
     correctYear: 1990
     peakFrom: 2013
@@ -58,7 +63,7 @@ items:
     wikimediaSearchHints: ["Kristen Stewart actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: finn-wolfhard
-    region: ["global"]
+    region: ["unknown-region"]
     displayName: "Finn Wolfhard"
     correctYear: 2002
     peakFrom: 2016
@@ -67,7 +72,7 @@ items:
     wikimediaSearchHints: ["Finn Wolfhard actor Stranger Things"]
     answerMethods: ["timeline", "name-letters"]
   - id: noah-schnapp
-    region: ["global"]
+    region: ["unknown-region"]
     displayName: "Noah Schnapp"
     correctYear: 2004
     peakFrom: 2016

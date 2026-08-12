@@ -1,6 +1,15 @@
 import { describe, it, expect } from 'vitest';
 import { loadCatalog, findItemsForAudience, findItemsById } from '../registry';
-import { ContentItemSchema, ContentFileSchema, YoutubeClipSchema } from '../schema';
+import {
+  ContentItemSchema,
+  ContentFileSchema,
+  YoutubeClipSchema,
+  RegionSchema,
+  REGION_ANCESTRY,
+  REGION_COUNTRIES,
+  REGION_TIERS,
+  isItemInRegionScope,
+} from '../schema';
 
 describe('content catalog', () => {
   it('loads all yaml files without validation errors', () => {
@@ -561,5 +570,52 @@ describe('ContentItem with youtubeClips', () => {
       ],
     });
     expect(result.success).toBe(false);
+  });
+});
+
+describe('region hierarchy (global ⊃ europe ⊃ nordic ⊃ land)', () => {
+  it('en svensk spelare når varje nivå i kedjan', () => {
+    for (const tag of ['global', 'europe', 'nordic', 'sweden']) {
+      expect(isItemInRegionScope([tag], 'sweden')).toBe(true);
+    }
+  });
+
+  it('unknown-region når INGET land — itemet hålls utanför allt innehåll', () => {
+    for (const country of REGION_COUNTRIES) {
+      expect(isItemInRegionScope(['unknown-region'], country)).toBe(false);
+    }
+  });
+
+  it('en region-array räcker om NÅGON tagg är inom räckhåll', () => {
+    expect(isItemInRegionScope(['unknown-region', 'global'], 'sweden')).toBe(true);
+    expect(isItemInRegionScope([], 'sweden')).toBe(false);
+  });
+
+  it('varje land har en kedja som slutar med sig självt och börjar med global', () => {
+    for (const country of REGION_COUNTRIES) {
+      const chain = REGION_ANCESTRY[country];
+      expect(chain[0]).toBe('global');
+      expect(chain[chain.length - 1]).toBe(country);
+      // Kedjan får bara innehålla giltiga region-taggar.
+      for (const tag of chain) expect(RegionSchema.safeParse(tag).success).toBe(true);
+    }
+  });
+
+  it('aggregerings-nivåer är aldrig länder', () => {
+    for (const tier of REGION_TIERS) {
+      expect(REGION_COUNTRIES).not.toContain(tier);
+    }
+  });
+
+  it('alla katalog-taggar är giltiga region-värden', () => {
+    const { files } = loadCatalog();
+    for (const file of files.values()) {
+      for (const tag of file.region) expect(RegionSchema.safeParse(tag).success).toBe(true);
+      for (const item of file.items) {
+        for (const tag of item.region ?? []) {
+          expect(RegionSchema.safeParse(tag).success).toBe(true);
+        }
+      }
+    }
   });
 });

@@ -104,7 +104,7 @@ items:
     wikimediaSearchHints: ["Alba August"]
     answerMethods: ["name-letters"]
   - id: evin-ahmad
-    region: ["global"]
+    region: ["unknown-region"]
     displayName: "Evin Ahmad"
     probability: 60
     peakFrom: 2017
@@ -133,7 +133,7 @@ items:
     wikimediaSearchHints: ["Erik Johansson skådespelare"]
     answerMethods: ["name-letters"]
   - id: moa-gammel
-    region: ["global"]
+    region: ["unknown-region"]
     displayName: "Moa Gammel"
     probability: 58
     peakFrom: 2008

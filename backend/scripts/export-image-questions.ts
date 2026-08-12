@@ -44,6 +44,10 @@ interface ExportedQuestion {
   peakFrom?: number;
   peakTo?: number;
   audiences: Audience[];
+  /** Region-hierarki global ⊃ europe ⊃ nordic ⊃ land. Item-level overridar
+   *  fil-headern. Sedan 2026-08-11 ENDA källan för bild-items region —
+   *  HINTS_REGION_MAP:s region-roll är retirerad. */
+  region: string[];
   questionText: string;
 }
 
@@ -73,6 +77,11 @@ function buildExportedQuestion(
   // contentSubject från första träffen (alltid samma per item-id om duplicerad).
   // Item-level audience-override per fil-träff har företräde.
   const audiencesSet = new Set<Audience>();
+  // Region unionen över alla träffar, samma princip som audience.
+  // Migrationen 2026-08-11 skrev identisk region till alla kopior av ett id,
+  // så unionen är i praktiken ett enda värde — men union är rätt semantik
+  // om en framtida curation låter kopiorna gå isär.
+  const regionSet = new Set<string>();
   let category: Category | null = null;
   let contentSubject: ContentSubject | null = null;
   for (const match of matches) {
@@ -82,6 +91,7 @@ function buildExportedQuestion(
     if (!contentSubject) contentSubject = file.contentSubject;
     const effectiveAudience = match.item.audience ?? file.audience;
     for (const a of effectiveAudience) audiencesSet.add(a);
+    for (const r of match.item.region ?? file.region) regionSet.add(r);
   }
   if (!category || !contentSubject) return null;
 
@@ -96,6 +106,7 @@ function buildExportedQuestion(
     ...(item.peakFrom !== undefined ? { peakFrom: item.peakFrom } : {}),
     ...(item.peakTo !== undefined ? { peakTo: item.peakTo } : {}),
     audiences: Array.from(audiencesSet),
+    region: Array.from(regionSet),
     questionText: FIXED_QUESTION_TEXT[contentSubject],
   };
 }
@@ -183,6 +194,9 @@ export interface ImageQuizQuestion {
   peakTo?: number;
   /** Vilka generationer item:t passar för (driver per-spelare-pool på klienten). */
   audiences: ImageQuestionAudience[];
+  /** Region-hierarki global ⊃ europe ⊃ nordic ⊃ land — se src/utils/regionScope.ts.
+   *  'unknown-region' når ingen spelare. */
+  region: string[];
   questionText: string;
 }
 

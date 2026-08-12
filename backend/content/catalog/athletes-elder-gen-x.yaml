@@ -10,21 +10,21 @@ contentSubject: athlete
 items:
   - id: bjorn-borg
     displayName: "Björn Borg"
-    region: ["sweden", "global"]
+    region: ["global"]
     correctYear: 1956
     probability: 97
     wikimediaSearchHints: ["Björn Borg tennis"]
     answerMethods: ["timeline", "name-letters"]
   - id: muhammad-ali
     displayName: "Muhammad Ali"
-    region: ["sweden", "global"]
+    region: ["global"]
     correctYear: 1942
     probability: 98
     wikimediaSearchHints: ["Muhammad Ali boxer"]
     answerMethods: ["timeline", "name-letters"]
   - id: pele
     displayName: "Pelé"
-    region: ["sweden", "global"]
+    region: ["global"]
     correctYear: 1940
     probability: 98
     wikimediaSearchHints: ["Pelé footballer"]
@@ -32,7 +32,7 @@ items:
     genrePackages: ["pkg-fifa-wc"]
   - id: diego-maradona
     displayName: "Diego Maradona"
-    region: ["sweden", "global"]
+    region: ["global"]
     correctYear: 1960
     probability: 96
     wikimediaSearchHints: ["Diego Maradona"]
@@ -40,14 +40,14 @@ items:
     genrePackages: ["pkg-fifa-wc"]
   - id: magic-johnson
     displayName: "Magic Johnson"
-    region: ["sweden", "global"]
+    region: ["global"]
     correctYear: 1959
     probability: 90
     wikimediaSearchHints: ["Magic Johnson basketball"]
     answerMethods: ["timeline", "name-letters"]
   - id: michael-jordan
     displayName: "Michael Jordan"
-    region: ["sweden", "global"]
+    region: ["global"]
     correctYear: 1963
     probability: 99
     wikimediaSearchHints: ["Michael Jordan basketball"]
@@ -56,17 +56,19 @@ items:
     displayName: "Carl Lewis"
     correctYear: 1961
     probability: 85
+    region: ["global"]
     wikimediaSearchHints: ["Carl Lewis athlete"]
     answerMethods: ["timeline", "name-letters"]
   - id: peter-forsberg
     displayName: "Peter Forsberg"
     correctYear: 1973
     probability: 92
+    region: ["global"]
     wikimediaSearchHints: ["Peter Forsberg ice hockey"]
     answerMethods: ["timeline", "name-letters"]
   - id: wayne-gretzky
     displayName: "Wayne Gretzky"
-    region: ["sweden", "global"]
+    region: ["global"]
     correctYear: 1961
     probability: 88
     wikimediaSearchHints: ["Wayne Gretzky ice hockey"]
@@ -75,11 +77,12 @@ items:
     displayName: "Martina Navratilova"
     correctYear: 1956
     probability: 85
+    region: ["global"]
     wikimediaSearchHints: ["Martina Navratilova tennis"]
     answerMethods: ["timeline", "name-letters"]
   - id: john-mcenroe
     displayName: "John McEnroe"
-    region: ["sweden", "global"]
+    region: ["global"]
     correctYear: 1959
     probability: 88
     wikimediaSearchHints: ["John McEnroe tennis"]
@@ -88,18 +91,21 @@ items:
     displayName: "Stefan Edberg"
     correctYear: 1966
     probability: 90
+    region: ["global"]
     wikimediaSearchHints: ["Stefan Edberg tennis Sweden"]
     answerMethods: ["timeline", "name-letters"]
   - id: mats-wilander
     displayName: "Mats Wilander"
     correctYear: 1964
     probability: 88
+    region: ["global"]
     wikimediaSearchHints: ["Mats Wilander tennis Sweden"]
     answerMethods: ["timeline", "name-letters"]
   - id: johan-cruyff
     displayName: "Johan Cruyff"
     correctYear: 1947
     probability: 90
+    region: ["global"]
     wikimediaSearchHints: ["Johan Cruyff footballer Netherlands"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
@@ -107,6 +113,7 @@ items:
     displayName: "Franz Beckenbauer"
     correctYear: 1945
     probability: 88
+    region: ["global"]
     wikimediaSearchHints: ["Franz Beckenbauer footballer Germany"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
@@ -114,12 +121,13 @@ items:
     displayName: "George Best"
     correctYear: 1946
     probability: 85
+    region: ["global"]
     wikimediaSearchHints: ["George Best footballer Manchester United"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: paolo-maldini
     displayName: "Paolo Maldini"
-    region: ["sweden", "global"]
+    region: ["global"]
     correctYear: 1968
     probability: 85
     wikimediaSearchHints: ["Paolo Maldini footballer Milan"]
@@ -127,7 +135,7 @@ items:
     genrePackages: ["pkg-fifa-wc"]
   - id: roberto-baggio
     displayName: "Roberto Baggio"
-    region: ["sweden", "global"]
+    region: ["global"]
     correctYear: 1967
     probability: 85
     wikimediaSearchHints: ["Roberto Baggio footballer Italy"]
@@ -135,7 +143,7 @@ items:
     genrePackages: ["pkg-fifa-wc"]
   - id: marco-van-basten
     displayName: "Marco van Basten"
-    region: ["sweden", "global"]
+    region: ["global"]
     correctYear: 1964
     probability: 85
     wikimediaSearchHints: ["Marco van Basten footballer Netherlands"]
@@ -144,18 +152,21 @@ items:
     displayName: "Ingemar Stenmark"
     correctYear: 1956
     probability: 95
+    region: ["global"]
     wikimediaSearchHints: ["Ingemar Stenmark skier Sweden"]
     answerMethods: ["timeline", "name-letters"]
   - id: joe-frazier
     displayName: "Joe Frazier"
     correctYear: 1944
     probability: 82
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Joe Frazier boxer"]
     answerMethods: ["timeline", "name-letters"]
   - id: bobby-charlton
     displayName: "Bobby Charlton"
     correctYear: 1937
     probability: 82
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Bobby Charlton footballer England"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
@@ -163,6 +174,7 @@ items:
     displayName: "Eusébio"
     correctYear: 1942
     probability: 82
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Eusébio footballer Portugal"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
@@ -182,18 +194,19 @@ items:
     displayName: "Henrik Larsson"
     correctYear: 1971
     probability: 90
+    region: ["global"]
     wikimediaSearchHints: ["Henrik Larsson footballer Sweden Celtic"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: olga-korbut
-    region: ["global"]
+    region: ["unknown-region"]
     displayName: "Olga Korbut"
     correctYear: 1955
     probability: 78
     wikimediaSearchHints: ["Olga Korbut gymnast Soviet"]
     answerMethods: ["timeline", "name-letters"]
   - id: katarina-witt
-    region: ["global"]
+    region: ["unknown-region"]
     displayName: "Katarina Witt"
     correctYear: 1965
     probability: 82
@@ -201,7 +214,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
   - id: bjorn-daehlie
     displayName: "Bjørn Dæhlie"
-    region: ["sweden", "nordic"]
+    region: ["global"]
     correctYear: 1967
     probability: 85
     wikimediaSearchHints: ["Bjørn Dæhlie skier Norway"]
@@ -210,24 +223,26 @@ items:
     displayName: "Ayrton Senna"
     correctYear: 1960
     probability: 92
+    region: ["global"]
     wikimediaSearchHints: ["Ayrton Senna Formula 1 Brazil"]
     answerMethods: ["timeline", "name-letters"]
   - id: alain-prost
     displayName: "Alain Prost"
     correctYear: 1955
     probability: 82
+    region: ["global"]
     wikimediaSearchHints: ["Alain Prost Formula 1 France"]
     answerMethods: ["timeline", "name-letters"]
   - id: michael-schumacher
     displayName: "Michael Schumacher"
-    region: ["sweden", "global"]
+    region: ["global"]
     correctYear: 1969
     probability: 95
     wikimediaSearchHints: ["Michael Schumacher Formula 1"]
     answerMethods: ["timeline", "name-letters"]
   - id: zinedine-zidane
     displayName: "Zinédine Zidane"
-    region: ["sweden", "global"]
+    region: ["global"]
     correctYear: 1972
     probability: 92
     wikimediaSearchHints: ["Zinedine Zidane footballer France"]
@@ -237,35 +252,40 @@ items:
     displayName: "Andre Agassi"
     correctYear: 1970
     probability: 92
+    region: ["global"]
     wikimediaSearchHints: ["Andre Agassi tennis"]
     answerMethods: ["timeline", "name-letters"]
   - id: pete-sampras
     displayName: "Pete Sampras"
     correctYear: 1971
     probability: 90
+    region: ["global"]
     wikimediaSearchHints: ["Pete Sampras tennis"]
     answerMethods: ["timeline", "name-letters"]
   - id: charles-barkley
     displayName: "Charles Barkley"
     correctYear: 1963
     probability: 82
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Charles Barkley basketball"]
     answerMethods: ["timeline", "name-letters"]
   - id: lennox-lewis
     displayName: "Lennox Lewis"
     correctYear: 1965
     probability: 80
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Lennox Lewis boxer"]
     answerMethods: ["timeline", "name-letters"]
   - id: david-beckham
     displayName: "David Beckham"
     correctYear: 1975
     probability: 96
+    region: ["global"]
     wikimediaSearchHints: ["David Beckham footballer"]
     answerMethods: ["timeline", "name-letters"]
   - id: ronaldinho
     displayName: "Ronaldinho"
-    region: ["sweden", "global"]
+    region: ["global"]
     correctYear: 1980
     probability: 92
     wikimediaSearchHints: ["Ronaldinho footballer Brazil"]
@@ -274,6 +294,7 @@ items:
     displayName: "Kenny Dalglish"
     correctYear: 1951
     probability: 78
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Kenny Dalglish footballer Liverpool"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
@@ -281,6 +302,7 @@ items:
     displayName: "Ian Rush"
     correctYear: 1961
     probability: 75
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Ian Rush footballer Liverpool"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
@@ -288,6 +310,7 @@ items:
     displayName: "Mats Sundin"
     correctYear: 1971
     probability: 90
+    region: ["global"]
     wikimediaSearchHints: ["Mats Sundin hockey Sweden Maple Leafs"]
     answerMethods: ["timeline", "name-letters"]
   - id: patrik-sjoberg
@@ -307,6 +330,7 @@ items:
     displayName: "Nicklas Lidström"
     correctYear: 1970
     probability: 86
+    region: ["global"]
     wikimediaSearchHints: ["Nicklas Lidstrom Detroit Red Wings defenseman Sweden"]
     answerMethods: ["timeline", "name-letters"]
   - id: daniel-alfredsson
@@ -348,7 +372,7 @@ items:
   # === Batch C 2026-05-27 — international legends ===
   - id: jaromir-jagr
     displayName: "Jaromír Jágr"
-    region: ["sweden", "global"]
+    region: ["global"]
     correctYear: 1972
     probability: 84
     wikimediaSearchHints: ["Jaromir Jagr Czech hockey player Pittsburgh Penguins"]
@@ -357,12 +381,14 @@ items:
     displayName: "Goran Ivanišević"
     correctYear: 1971
     probability: 78
+    region: ["global"]
     wikimediaSearchHints: ["Goran Ivanisevic Croatian tennis player Wimbledon 2001"]
     answerMethods: ["timeline", "name-letters"]
   - id: george-foreman
     displayName: "George Foreman"
     correctYear: 1949
     probability: 84
+    region: ["global"]
     wikimediaSearchHints: ["George Foreman boxer heavyweight champion Rumble in the Jungle"]
     answerMethods: ["timeline", "name-letters"]
   - id: jan-ove-waldner
@@ -398,7 +424,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
   - id: eric-cantona
     displayName: "Eric Cantona"
-    region: ["sweden", "global"]
+    region: ["global"]
     correctYear: 1966
     probability: 88
     wikimediaSearchHints: ["Eric Cantona French footballer Manchester United"]
@@ -429,12 +455,13 @@ items:
     displayName: "Bebeto"
     correctYear: 1964
     probability: 80
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Bebeto Brazilian footballer 1994 World Cup celebration"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: paolo-rossi
     displayName: "Paolo Rossi"
-    region: ["sweden", "global"]
+    region: ["europe"]
     correctYear: 1956
     probability: 82
     wikimediaSearchHints: ["Paolo Rossi Italian striker 1982 World Cup golden boot"]
@@ -444,6 +471,7 @@ items:
     displayName: "Bobby Moore"
     correctYear: 1941
     probability: 84
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Bobby Moore English football captain 1966 World Cup"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
@@ -451,6 +479,7 @@ items:
     displayName: "Gerd Müller"
     correctYear: 1945
     probability: 84
+    region: ["global"]
     wikimediaSearchHints: ["Gerd Müller German striker 1974 World Cup Bayern Munich"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
@@ -467,6 +496,7 @@ items:
     displayName: "Daniel Passarella"
     correctYear: 1953
     probability: 80
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Daniel Passarella Argentina captain 1978 World Cup"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
@@ -474,11 +504,12 @@ items:
     displayName: "Alf Ramsey"
     correctYear: 1920
     probability: 78
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Alf Ramsey England coach 1966 World Cup"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: just-fontaine
-    region: ["global"]
+    region: ["unknown-region"]
     displayName: "Just Fontaine"
     correctYear: 1933
     probability: 78
@@ -489,6 +520,7 @@ items:
     displayName: "Otto Rehhagel"
     correctYear: 1938
     probability: 78
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Otto Rehhagel German coach Greece Euro 2004"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
@@ -496,6 +528,7 @@ items:
     displayName: "Louis van Gaal"
     correctYear: 1951
     probability: 84
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Louis van Gaal Dutch coach 2014 World Cup third place"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
@@ -503,6 +536,7 @@ items:
     displayName: "Guus Hiddink"
     correctYear: 1946
     probability: 82
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Guus Hiddink Dutch coach South Korea 2002 World Cup semifinal"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
@@ -524,6 +558,7 @@ items:
     displayName: "Raymond Domenech"
     correctYear: 1952
     probability: 72
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Raymond Domenech French coach 2006 World Cup final"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
@@ -531,6 +566,7 @@ items:
     displayName: "Morten Olsen"
     correctYear: 1949
     probability: 74
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Morten Olsen Danish coach Denmark 2002 2010 World Cup"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
@@ -538,6 +574,7 @@ items:
     displayName: "Berti Vogts"
     correctYear: 1946
     probability: 76
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Berti Vogts German coach Euro 1996 champion"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
@@ -545,6 +582,7 @@ items:
     displayName: "Cesare Maldini"
     correctYear: 1932
     probability: 74
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Cesare Maldini Italian coach 1998 World Cup father Paolo"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
@@ -552,6 +590,7 @@ items:
     displayName: "Héctor Cúper"
     correctYear: 1955
     probability: 68
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Héctor Cúper Argentine coach Egypt 2018 World Cup"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
@@ -560,6 +599,7 @@ items:
     displayName: "Didier Deschamps"
     correctYear: 1968
     probability: 86
+    region: ["global"]
     wikimediaSearchHints: ["Didier Deschamps French coach 2018 World Cup champion captain 1998"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
@@ -567,6 +607,7 @@ items:
     displayName: "Carlos Alberto Parreira"
     correctYear: 1943
     probability: 76
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Carlos Alberto Parreira Brazilian coach 1994 World Cup champion"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
@@ -574,12 +615,13 @@ items:
     displayName: "Vicente del Bosque"
     correctYear: 1950
     probability: 82
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Vicente del Bosque Spanish coach 2010 World Cup champion"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: joachim-low
     displayName: "Joachim Löw"
-    region: ["sweden", "global"]
+    region: ["europe"]
     correctYear: 1960
     probability: 86
     wikimediaSearchHints: ["Joachim Löw Jogi German coach 2014 World Cup champion"]
@@ -589,6 +631,7 @@ items:
     displayName: "Marcello Lippi"
     correctYear: 1948
     probability: 82
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Marcello Lippi Italian coach 2006 World Cup champion"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
@@ -597,12 +640,13 @@ items:
     displayName: "Dino Zoff"
     correctYear: 1942
     probability: 84
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Dino Zoff Italian goalkeeper captain 1982 World Cup"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: ruud-gullit
     displayName: "Ruud Gullit"
-    region: ["sweden", "global"]
+    region: ["global"]
     correctYear: 1962
     probability: 86
     wikimediaSearchHints: ["Ruud Gullit Dutch footballer AC Milan Netherlands 1988"]
@@ -610,7 +654,7 @@ items:
     genrePackages: ["pkg-fifa-wc"]
   - id: lothar-matthaus
     displayName: "Lothar Matthaus"
-    region: ["sweden", "global"]
+    region: ["global"]
     correctYear: 1961
     probability: 78
     wikimediaSearchHints: ["Lothar Matthaus footballer national team"]
@@ -620,6 +664,7 @@ items:
     displayName: "Rivaldo"
     correctYear: 1972
     probability: 78
+    region: ["global"]
     wikimediaSearchHints: ["Rivaldo footballer national team"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
@@ -627,6 +672,7 @@ items:
     displayName: "Alan Shearer"
     correctYear: 1970
     probability: 78
+    region: ["global"]
     wikimediaSearchHints: ["Alan Shearer footballer national team"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
@@ -634,6 +680,7 @@ items:
     displayName: "Javier Zanetti"
     correctYear: 1973
     probability: 78
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Javier Zanetti footballer national team"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
@@ -641,11 +688,12 @@ items:
     displayName: "Dunga"
     correctYear: 1963
     probability: 78
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Dunga footballer national team"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: jan-ceulemans
-    region: ["global"]
+    region: ["europe"]
     displayName: "Jan Ceulemans"
     correctYear: 1957
     probability: 78
@@ -653,7 +701,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: hugo-sanchez
-    region: ["global"]
+    region: ["unknown-region"]
     displayName: "Hugo Sanchez"
     correctYear: 1958
     probability: 78
@@ -664,6 +712,7 @@ items:
     displayName: "Oliver Kahn"
     correctYear: 1969
     probability: 78
+    region: ["global"]
     wikimediaSearchHints: ["Oliver Kahn footballer national team"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
@@ -671,6 +720,7 @@ items:
     displayName: "Karl Heinz Rummenigge"
     correctYear: 1955
     probability: 78
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Karl Heinz Rummenigge footballer national team"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
@@ -678,6 +728,7 @@ items:
     displayName: "Sepp Maier"
     correctYear: 1944
     probability: 78
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Sepp Maier footballer national team"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
@@ -685,6 +736,7 @@ items:
     displayName: "Frank Rijkaard"
     correctYear: 1962
     probability: 78
+    region: ["global"]
     wikimediaSearchHints: ["Frank Rijkaard footballer national team"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
@@ -692,6 +744,7 @@ items:
     displayName: "Edgar Davids"
     correctYear: 1973
     probability: 78
+    region: ["global"]
     wikimediaSearchHints: ["Edgar Davids footballer national team"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
@@ -699,12 +752,13 @@ items:
     displayName: "Alessandro Del Piero"
     correctYear: 1974
     probability: 78
+    region: ["global"]
     wikimediaSearchHints: ["Alessandro Del Piero footballer national team"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: ryan-giggs
     displayName: "Ryan Giggs"
-    region: ["sweden", "global"]
+    region: ["global"]
     correctYear: 1973
     probability: 78
     wikimediaSearchHints: ["Ryan Giggs footballer national team"]
@@ -712,7 +766,7 @@ items:
     genrePackages: ["pkg-fifa-wc"]
   - id: luis-figo
     displayName: "Luis Figo"
-    region: ["sweden", "global"]
+    region: ["global"]
     correctYear: 1972
     probability: 78
     wikimediaSearchHints: ["Luis Figo footballer national team"]
@@ -721,7 +775,7 @@ items:
   # pierre-littbarski removed 2026-05-27 — Peter rejected current webp.
   - id: jurgen-klinsmann
     displayName: "Jurgen Klinsmann"
-    region: ["sweden", "global"]
+    region: ["global"]
     correctYear: 1964
     probability: 78
     wikimediaSearchHints: ["Jurgen Klinsmann footballer national team"]
@@ -746,6 +800,7 @@ items:
     displayName: "Demetrio Albertini"
     correctYear: 1971
     probability: 78
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Demetrio Albertini footballer national team"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
@@ -753,6 +808,7 @@ items:
     displayName: "Roberto Donadoni"
     correctYear: 1963
     probability: 78
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Roberto Donadoni footballer national team"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
@@ -760,6 +816,7 @@ items:
     displayName: "Emilio Butragueno"
     correctYear: 1963
     probability: 78
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Emilio Butragueno footballer national team"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
@@ -767,6 +824,7 @@ items:
     displayName: "Fernando Hierro"
     correctYear: 1968
     probability: 78
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Fernando Hierro footballer national team"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
@@ -774,6 +832,7 @@ items:
     displayName: "Glenn Hoddle"
     correctYear: 1957
     probability: 78
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Glenn Hoddle footballer national team"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
@@ -782,6 +841,7 @@ items:
     displayName: "Cafu Falcao"
     correctYear: 1953
     probability: 78
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Cafu Falcao footballer national team"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
@@ -789,6 +849,7 @@ items:
     displayName: "Claudio Taffarel"
     correctYear: 1966
     probability: 78
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Claudio Taffarel footballer national team"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]

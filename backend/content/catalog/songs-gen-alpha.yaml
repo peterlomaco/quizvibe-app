@@ -2,9 +2,14 @@
 # samtidigt så audience inkluderar båda. Cap:ad vid 2024 (release-år).
 # 2025/2026-items borttagna tills åren har vägt sig kulturellt.
 #
-# Policy: correctYear = singel-release-år (= det år frågan svarsbaseras på).
-# Detta orsakar några år-justeringar mot Peters ursprungslista som ibland
-# favoriserar kulturellt-iconic-år (chart-peak):
+# Policy (reviderad 2026-08-11 av Peter): correctYear = det år låten FÖRSTA
+# GÅNGEN gick att lyssna på — vilken release som än kom först. Album före
+# singel ⇒ albumåret vinner (t.ex. "Sweet Child o' Mine" = 1987 = Appetite
+# for Destruction, inte 1988 = singeln). Tidigare löd regeln "singel-release-
+# år"; för items i DENNA fil gav båda reglerna samma svar eftersom singlarna
+# nedan alla föregick sina album.
+#
+# Chart-peak är fortsatt ALDRIG svaret — det är releasen som räknas:
 #   - "Old Town Road" — Lil Nas X: dec 2018 release (ej mainstream-2019-peak)
 #   - "Blinding Lights" — The Weeknd: nov 2019 release (ej 2020-peak)
 #   - "APT." — ROSÉ & Bruno Mars: okt 2024 release (ej 2025-peak)
@@ -313,6 +318,7 @@ items:
     wikimediaSearchHints: ["Lady Gaga Bruno Mars Die With a Smile"]
     answerMethods: ["timeline"]
     notes: "Singel-release 16 aug 2024; toppade Billboard 2025."
+    spotifyTrackId: "7nEHTOQJqKCx7Dvgng3l8t"
     youtubeClips:
       - videoId: "sQtWPcAyL6g"
         startSec: 0
@@ -864,7 +870,8 @@ items:
     displayName: "Fuego — Eleni Foureira"
     correctYear: 2018
     probability: 80
-    region: ["unknown-region"]
+    region: ["europe"]
+    inBaseCatalog: false
     wikimediaSearchHints: ["Eleni Foureira Fuego Cyprus Eurovision 2018"]
     answerMethods: ["timeline"]
     genrePackages: ["Eurovision"]
@@ -873,7 +880,8 @@ items:
     displayName: "Spirit in the Sky — KEiiNO"
     correctYear: 2019
     probability: 78
-    region: ["unknown-region"]
+    region: ["europe"]
+    inBaseCatalog: false
     wikimediaSearchHints: ["KEiiNO Spirit in the Sky Norway Eurovision 2019"]
     answerMethods: ["timeline"]
     genrePackages: ["Eurovision"]
@@ -896,7 +904,8 @@ items:
     displayName: "El Diablo — Elena Tsagkrinou"
     correctYear: 2021
     probability: 80
-    region: ["unknown-region"]
+    region: ["europe"]
+    inBaseCatalog: false
     wikimediaSearchHints: ["Elena Tsagkrinou El Diablo Cyprus Eurovision 2021"]
     answerMethods: ["timeline"]
     genrePackages: ["Eurovision"]
@@ -911,7 +920,8 @@ items:
     displayName: "Europapa — Joost Klein"
     correctYear: 2024
     probability: 82
-    region: ["unknown-region"]
+    region: ["europe"]
+    inBaseCatalog: false
     wikimediaSearchHints: ["Joost Klein Europapa Netherlands Eurovision 2024"]
     answerMethods: ["timeline"]
     genrePackages: ["Eurovision"]

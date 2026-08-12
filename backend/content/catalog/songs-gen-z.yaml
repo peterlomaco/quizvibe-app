@@ -1074,7 +1074,8 @@ items:
     displayName: "Dum Tek Tek — Hadise"
     correctYear: 2009
     probability: 76
-    region: ["unknown-region"]
+    region: ["europe"]
+    inBaseCatalog: false
     wikimediaSearchHints: ["Hadise Dum Tek Tek Turkey Eurovision 2009"]
     answerMethods: ["timeline"]
     genrePackages: ["Eurovision"]
@@ -1166,3 +1167,59 @@ items:
         endSec: 30
         channelTitle: "Jay-Z"
         notes: "Official music video."
+  # === Tillägg 2026-08-11 (Peters lista) ===
+  # Flyttad hit från songs-millennials.yaml 2026-08-11: correctYear rättat
+  # 1996 → 1999 (låten fanns först på singeln "Musik non stop" 15 nov 1999
+  # / albumet Hagnesta Hill 6 dec 1999), vilket flyttar den till gen-z-eran.
+  - id: kent-music-non-stop
+    displayName: "Music Non Stop — Kent"
+    correctYear: 1999
+    probability: 78
+    wikimediaSearchHints: ["Kent Musik non stop 1999 Hagnesta Hill"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "HJXsv1UIDmQ"
+        startSec: 30
+        endSec: 45
+        channelTitle: "Kent - Topic"
+        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: kent-om-du-var-har
+    displayName: "Om du var här — Kent"
+    correctYear: 1997
+    probability: 80
+    wikimediaSearchHints: ["Kent Om du var här 1997 Isola"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "gicVQ52huT0"
+        startSec: 0
+        endSec: 30
+        channelTitle: "kentchannel"
+        notes: "Bandets egen kanal. Peter-kurerad 2026-08-11."
+  - id: the-verve-bitter-sweet-symphony
+    displayName: "Bitter Sweet Symphony — The Verve"
+    correctYear: 1997
+    probability: 84
+    wikimediaSearchHints: ["The Verve Bitter Sweet Symphony 1997 Urban Hymns"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "F2fGReDlQa0"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Frank Rovers"
+        notes: "Peter-kurerad 2026-08-11. OBS: re-upload, inte officiell VEVO-kanal - hogre takedown-risk, nightly autofix-cron plockar upp om den forsvinner."
+  - id: bryan-adams-when-youre-gone
+    displayName: "When You're Gone — Bryan Adams & Melanie C"
+    correctYear: 1998
+    probability: 80
+    wikimediaSearchHints: ["Bryan Adams Melanie C When Youre Gone 1998"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "7p9dd71JR2ucoAuO1Sy0VZ"
+    youtubeClips: []
+  - id: lady-gaga-just-dance
+    displayName: "Just Dance — Lady Gaga"
+    correctYear: 2008
+    probability: 88
+    wikimediaSearchHints: ["Lady Gaga Just Dance 2008 The Fame"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "5vQXxfGn1bjv5WESrYVVpw"
+    youtubeClips: []

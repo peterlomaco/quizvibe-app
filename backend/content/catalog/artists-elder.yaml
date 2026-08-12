@@ -14,6 +14,7 @@ items:
     peakFrom: 1956
     peakTo: 1977
     probability: 98
+    region: ["global"]
     wikimediaSearchHints: ["Elvis Presley"]
     answerMethods: ["timeline", "name-letters"]
   - id: frank-sinatra
@@ -22,6 +23,7 @@ items:
     peakFrom: 1940
     peakTo: 1990
     probability: 92
+    region: ["global"]
     wikimediaSearchHints: ["Frank Sinatra singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: nat-king-cole
@@ -30,6 +32,7 @@ items:
     peakFrom: 1945
     peakTo: 1965
     probability: 85
+    region: ["global"]
     wikimediaSearchHints: ["Nat King Cole singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: louis-armstrong
@@ -38,6 +41,7 @@ items:
     peakFrom: 1925
     peakTo: 1971
     probability: 88
+    region: ["global"]
     wikimediaSearchHints: ["Louis Armstrong jazz trumpet"]
     answerMethods: ["timeline", "name-letters"]
   - id: ray-charles
@@ -46,6 +50,7 @@ items:
     peakFrom: 1955
     peakTo: 2004
     probability: 88
+    region: ["global"]
     wikimediaSearchHints: ["Ray Charles musician"]
     answerMethods: ["timeline", "name-letters"]
   - id: bob-dylan
@@ -54,6 +59,7 @@ items:
     peakFrom: 1962
     peakTo: 2020
     probability: 90
+    region: ["global"]
     wikimediaSearchHints: ["Bob Dylan singer songwriter"]
     answerMethods: ["timeline", "name-letters"]
   - id: james-brown
@@ -62,6 +68,7 @@ items:
     peakFrom: 1956
     peakTo: 2006
     probability: 85
+    region: ["global"]
     wikimediaSearchHints: ["James Brown singer Godfather of Soul"]
     answerMethods: ["timeline", "name-letters"]
   - id: stevie-wonder
@@ -70,6 +77,7 @@ items:
     peakFrom: 1963
     peakTo: 2020
     probability: 88
+    region: ["global"]
     wikimediaSearchHints: ["Stevie Wonder"]
     answerMethods: ["timeline", "name-letters"]
   - id: tina-turner
@@ -78,6 +86,7 @@ items:
     peakFrom: 1960
     peakTo: 2023
     probability: 88
+    region: ["global"]
     wikimediaSearchHints: ["Tina Turner singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: diana-ross
@@ -86,6 +95,7 @@ items:
     peakFrom: 1965
     peakTo: 2024
     probability: 85
+    region: ["global"]
     wikimediaSearchHints: ["Diana Ross singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: marvin-gaye
@@ -94,6 +104,7 @@ items:
     peakFrom: 1961
     peakTo: 1984
     probability: 82
+    region: ["global"]
     wikimediaSearchHints: ["Marvin Gaye singer Motown"]
     answerMethods: ["timeline", "name-letters"]
   - id: otis-redding
@@ -102,6 +113,7 @@ items:
     peakFrom: 1962
     peakTo: 1967
     probability: 78
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Otis Redding soul singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: dolly-parton
@@ -110,10 +122,11 @@ items:
     peakFrom: 1967
     peakTo: 2024
     probability: 88
+    region: ["global"]
     wikimediaSearchHints: ["Dolly Parton singer country"]
     answerMethods: ["timeline", "name-letters"]
   - id: carole-king
-    region: ["global"]
+    region: ["unknown-region"]
     displayName: "Carole King"
     correctYear: 1942
     peakFrom: 1971
@@ -127,6 +140,7 @@ items:
     peakFrom: 1967
     peakTo: 2016
     probability: 80
+    region: ["global"]
     wikimediaSearchHints: ["Leonard Cohen singer songwriter"]
     answerMethods: ["timeline", "name-letters"]
   - id: roy-orbison
@@ -135,6 +149,7 @@ items:
     peakFrom: 1956
     peakTo: 1988
     probability: 78
+    region: ["global"]
     wikimediaSearchHints: ["Roy Orbison singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: aretha-franklin
@@ -143,6 +158,7 @@ items:
     peakFrom: 1961
     peakTo: 2018
     probability: 92
+    region: ["global"]
     wikimediaSearchHints: ["Aretha Franklin singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: little-richard
@@ -151,6 +167,7 @@ items:
     peakFrom: 1955
     peakTo: 2020
     probability: 82
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Little Richard musician"]
     answerMethods: ["timeline", "name-letters"]
   - id: dean-martin
@@ -159,6 +176,7 @@ items:
     peakFrom: 1946
     peakTo: 1995
     probability: 82
+    region: ["global"]
     wikimediaSearchHints: ["Dean Martin singer actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: sammy-davis-jr
@@ -167,6 +185,7 @@ items:
     peakFrom: 1949
     peakTo: 1990
     probability: 78
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Sammy Davis Jr singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: tom-jones
@@ -175,10 +194,11 @@ items:
     peakFrom: 1964
     peakTo: 2024
     probability: 85
+    region: ["global"]
     wikimediaSearchHints: ["Tom Jones singer Welsh"]
     answerMethods: ["timeline", "name-letters"]
   - id: patsy-cline
-    region: ["global"]
+    region: ["unknown-region"]
     displayName: "Patsy Cline"
     correctYear: 1932
     peakFrom: 1957
@@ -192,6 +212,7 @@ items:
     peakFrom: 1957
     peakTo: 1959
     probability: 82
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Buddy Holly singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: sam-cooke
@@ -200,6 +221,7 @@ items:
     peakFrom: 1957
     peakTo: 1964
     probability: 78
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Sam Cooke singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: chuck-berry
@@ -208,6 +230,7 @@ items:
     peakFrom: 1955
     peakTo: 2017
     probability: 88
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Chuck Berry musician"]
     answerMethods: ["timeline", "name-letters"]
   - id: ella-fitzgerald
@@ -216,6 +239,7 @@ items:
     peakFrom: 1935
     peakTo: 1993
     probability: 85
+    region: ["global"]
     wikimediaSearchHints: ["Ella Fitzgerald singer jazz"]
     answerMethods: ["timeline", "name-letters"]
   - id: harry-belafonte
@@ -224,6 +248,7 @@ items:
     peakFrom: 1953
     peakTo: 2023
     probability: 78
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Harry Belafonte singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: donna-summer
@@ -232,6 +257,7 @@ items:
     peakFrom: 1974
     peakTo: 2012
     probability: 85
+    region: ["global"]
     wikimediaSearchHints: ["Donna Summer disco singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: lionel-richie
@@ -240,6 +266,7 @@ items:
     peakFrom: 1968
     peakTo: 2024
     probability: 90
+    region: ["global"]
     wikimediaSearchHints: ["Lionel Richie singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: barbra-streisand
@@ -248,6 +275,7 @@ items:
     peakFrom: 1963
     peakTo: 2024
     probability: 88
+    region: ["global"]
     wikimediaSearchHints: ["Barbra Streisand singer"]
     answerMethods: ["timeline", "name-letters"]
   # === Svenska expansion 2026-05-27 ===
@@ -369,6 +397,7 @@ items:
     peakFrom: 1962
     peakTo: 2024
     probability: 90
+    region: ["global"]
     wikimediaSearchHints: ["Mick Jagger Rolling Stones singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: steven-tyler
@@ -377,5 +406,6 @@ items:
     peakFrom: 1973
     peakTo: 2024
     probability: 85
+    region: ["global"]
     wikimediaSearchHints: ["Steven Tyler Aerosmith singer"]
     answerMethods: ["timeline", "name-letters"]

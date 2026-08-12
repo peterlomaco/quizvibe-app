@@ -12,6 +12,7 @@ items:
     peakFrom: 1942
     peakTo: 1978
     probability: 85
+    region: ["global"]
     wikimediaSearchHints: ["Ingrid Bergman actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: marilyn-monroe
@@ -20,6 +21,7 @@ items:
     peakFrom: 1950
     peakTo: 1962
     probability: 82
+    region: ["global"]
     wikimediaSearchHints: ["Marilyn Monroe"]
     answerMethods: ["timeline", "name-letters"]
   - id: tom-hanks
@@ -28,6 +30,7 @@ items:
     peakFrom: 1988
     peakTo: 2020
     probability: 95
+    region: ["global"]
     wikimediaSearchHints: ["Tom Hanks actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: audrey-hepburn
@@ -36,6 +39,7 @@ items:
     peakFrom: 1953
     peakTo: 1967
     probability: 90
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Audrey Hepburn"]
     answerMethods: ["timeline", "name-letters"]
   - id: katharine-hepburn
@@ -44,6 +48,7 @@ items:
     peakFrom: 1933
     peakTo: 1981
     probability: 82
+    region: ["global"]
     wikimediaSearchHints: ["Katharine Hepburn actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: sean-connery
@@ -52,6 +57,7 @@ items:
     peakFrom: 1962
     peakTo: 1990
     probability: 90
+    region: ["global"]
     wikimediaSearchHints: ["Sean Connery actor James Bond"]
     answerMethods: ["timeline", "name-letters"]
   - id: humphrey-bogart
@@ -60,6 +66,7 @@ items:
     peakFrom: 1941
     peakTo: 1956
     probability: 82
+    region: ["global"]
     wikimediaSearchHints: ["Humphrey Bogart actor Casablanca"]
     answerMethods: ["timeline", "name-letters"]
   - id: james-dean
@@ -68,10 +75,11 @@ items:
     peakFrom: 1955
     peakTo: 1955
     probability: 82
+    region: ["global"]
     wikimediaSearchHints: ["James Dean actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: james-stewart
-    region: ["global"]
+    region: ["unknown-region"]
     displayName: "James Stewart"
     correctYear: 1908
     peakFrom: 1939
@@ -85,6 +93,7 @@ items:
     peakFrom: 1938
     peakTo: 1962
     probability: 80
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Bette Davis actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: charlie-chaplin
@@ -93,10 +102,11 @@ items:
     peakFrom: 1918
     peakTo: 1940
     probability: 90
+    region: ["global"]
     wikimediaSearchHints: ["Charlie Chaplin actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: spencer-tracy
-    region: ["global"]
+    region: ["unknown-region"]
     displayName: "Spencer Tracy"
     correctYear: 1900
     peakFrom: 1937
@@ -110,6 +120,7 @@ items:
     peakFrom: 1951
     peakTo: 1979
     probability: 88
+    region: ["global"]
     wikimediaSearchHints: ["Marlon Brando actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: grace-kelly
@@ -118,6 +129,7 @@ items:
     peakFrom: 1952
     peakTo: 1956
     probability: 85
+    region: ["global"]
     wikimediaSearchHints: ["Grace Kelly actress princess"]
     answerMethods: ["timeline", "name-letters"]
   - id: elizabeth-taylor
@@ -126,6 +138,7 @@ items:
     peakFrom: 1944
     peakTo: 1966
     probability: 85
+    region: ["global"]
     wikimediaSearchHints: ["Elizabeth Taylor actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: john-wayne
@@ -134,6 +147,7 @@ items:
     peakFrom: 1939
     peakTo: 1976
     probability: 85
+    region: ["global"]
     wikimediaSearchHints: ["John Wayne actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: greta-garbo
@@ -142,6 +156,7 @@ items:
     peakFrom: 1926
     peakTo: 1941
     probability: 80
+    region: ["global"]
     wikimediaSearchHints: ["Greta Garbo actress Sweden"]
     answerMethods: ["timeline", "name-letters"]
   - id: shirley-temple
@@ -150,6 +165,7 @@ items:
     peakFrom: 1934
     peakTo: 1940
     probability: 80
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Shirley Temple child actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: judi-dench
@@ -158,6 +174,7 @@ items:
     peakFrom: 1995
     peakTo: 2013
     probability: 82
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Judi Dench actress"]
     answerMethods: ["timeline", "name-letters"]
   # === Svenska expansion 2026-05-27 ===
@@ -167,6 +184,7 @@ items:
     peakFrom: 1957
     peakTo: 2011
     probability: 84
+    region: ["global"]
     wikimediaSearchHints: ["Max von Sydow Swedish actor Bergman Exorcist"]
     answerMethods: ["timeline", "name-letters"]
   - id: anita-ekberg

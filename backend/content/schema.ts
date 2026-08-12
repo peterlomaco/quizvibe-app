@@ -19,32 +19,70 @@ export const AudienceSchema = z.union([
 ]);
 export type Audience = z.infer<typeof AudienceSchema>;
 
-// Region = kulturell igenkännings-scope. V1-katalogen kuras för svensk
-// igenkänning så alla items default-taggas `["sweden"]`. Vi expanderar
-// land för land — när vi senare lägger till Norge utökas enum:en med
-// `'norway'` och relevanta items får multi-tag (`["sweden", "norway"]`).
-// Aggregations som "nordics" eller "global" introduceras INTE från start;
-// de kan eventuellt läggas till senare när vi har tillräckligt många
-// länder att gruppera, men då som separata explicit-curering-tags
-// (inte automatiska från geografisk närhet). Item-level region overrider
-// fil-headerns region-tag (parallell pattern som audience-override).
+// ── Regionmodell: en STRIKT HIERARKI (bredast → smalast) ──────────────────
 //
-// Filter-semantik: visa item om item.region intersects player.region.
-// Player default-region = 'sweden' i V1.
+//     global  ⊃  europe  ⊃  nordic  ⊃  <land>          (i dag bara 'sweden')
+//
+// Ett items `region`-tagg anger hur BRETT det är igenkänt. En SPELARE har
+// ett land (= sitt region scope). Itemet visas om spelarens land ligger
+// inom itemets region-nivå:
+//
+//   region: ["global"]  → alla länder, överallt
+//   region: ["europe"]  → alla europeiska länder (i dag bara Sverige)
+//   region: ["nordic"]  → alla nordiska länder (i dag bara Sverige)
+//   region: ["sweden"]  → enbart spelare med region scope Sweden
+//   region: ["unknown-region"] → INGEN spelare. Placeringen är ännu inte
+//                       beslutad, så itemet hålls utanför allt innehåll
+//                       tills det får en riktig tagg.
+//
+// Följd i V1 (bara Sverige finns): global/europe/nordic/sweden är alla
+// synliga för spelaren; unknown-region är det inte. Skillnaden mellan
+// nivåerna aktiveras först när fler länder läggs till — se REGION_ANCESTRY.
+//
+// Item-level region overrider fil-headerns region-tag (samma mönster som
+// audience-override).
 export const RegionSchema = z.enum([
+  'global',
+  'europe',
+  'nordic',
   'sweden',
-  'nordic',            // Skandinaviska/nordiska items — igenkänning i Sverige + Norge + Danmark
-                       // + Finland + Island. Items med region:["sweden","nordic"] visas för
-                       // svenska spelare i V1 OCH för nordiska spelare i V2+.
-  'global',            // Internationellt erkänd men ej specifikt Sverige-fokuserad i V1.
-                       // Items med region:["global"] visas ej för svensk spelare
-                       // (filter: item.region ∩ player.region — "sweden"∩"global"=∅).
-                       // Aktiveras när global expansion öppnas i V2+.
-  'unknown-region',    // Reserverat för host-paket-items (t.ex. Eurovision) som inte
-                       // primärt är Sverige-fokuserade men inte heller globalt erkända.
-                       // Filtreras bort i V1-baspool; aktiveras via genrePackages-paket.
+  'unknown-region',
 ]);
 export type Region = z.infer<typeof RegionSchema>;
+
+/** Aggregerings-nivåer — INTE länder. Kan aldrig vara en spelares scope. */
+export const REGION_TIERS = ['global', 'europe', 'nordic'] as const;
+
+/** Länder en spelare kan ha som region scope. Utöka land för land. */
+export const REGION_COUNTRIES = ['sweden'] as const;
+export type RegionCountry = (typeof REGION_COUNTRIES)[number];
+
+/**
+ * Vilka region-taggar som når ett givet land, bredast → smalast.
+ *
+ * NÄR DU LÄGGER TILL ETT LAND: lägg till det i `REGION_COUNTRIES`, i
+ * `RegionSchema` och här med sin fulla kedja. Exempel:
+ *   norway:  ['global', 'europe', 'nordic', 'norway']
+ *   germany: ['global', 'europe', 'germany']    // europeiskt men ej nordiskt
+ *   japan:   ['global', 'japan']                // varken europeiskt el. nordiskt
+ *
+ * 'unknown-region' står MEDVETET inte i någon kedja — därför når den ingen.
+ */
+export const REGION_ANCESTRY: Record<RegionCountry, readonly Region[]> = {
+  sweden: ['global', 'europe', 'nordic', 'sweden'],
+};
+
+/**
+ * Är itemet synligt för en spelare i `country`?
+ * Sant om NÅGON av itemets region-taggar finns i landets kedja.
+ */
+export function isItemInRegionScope(
+  itemRegions: readonly string[],
+  country: RegionCountry,
+): boolean {
+  const reachable: readonly string[] = REGION_ANCESTRY[country];
+  return itemRegions.some((r) => reachable.includes(r));
+}
 
 export const CategorySchema = z.enum([
   'persons',   // @deprecated — kvar för bakåtkompabilitet; nya filer ska

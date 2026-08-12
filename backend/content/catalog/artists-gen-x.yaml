@@ -11,6 +11,7 @@ items:
     peakFrom: 1979
     peakTo: 2009
     probability: 98
+    region: ["global"]
     wikimediaSearchHints: ["Michael Jackson"]
     answerMethods: ["timeline", "name-letters"]
   - id: madonna
@@ -19,6 +20,7 @@ items:
     peakFrom: 1984
     peakTo: 2007
     probability: 96
+    region: ["global"]
     wikimediaSearchHints: ["Madonna singer"]
     answerMethods: ["timeline", "name-letters"]
   # Metallica (band) flyttad till framtida bands-classics-utbyggnad (band-subject)
@@ -33,6 +35,7 @@ items:
     displayName: "Kurt Cobain"
     correctYear: 1967
     probability: 85
+    region: ["global"]
     wikimediaSearchHints: ["Kurt Cobain Nirvana"]
     answerMethods: ["timeline", "name-letters"]
   - id: bruce-springsteen
@@ -41,6 +44,7 @@ items:
     peakFrom: 1975
     peakTo: 2020
     probability: 88
+    region: ["global"]
     wikimediaSearchHints: ["Bruce Springsteen singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: whitney-houston
@@ -49,6 +53,7 @@ items:
     peakFrom: 1985
     peakTo: 2012
     probability: 92
+    region: ["global"]
     wikimediaSearchHints: ["Whitney Houston singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: prince
@@ -57,6 +62,7 @@ items:
     peakFrom: 1979
     peakTo: 2016
     probability: 90
+    region: ["global"]
     wikimediaSearchHints: ["Prince musician Purple Rain"]
     answerMethods: ["timeline", "name-letters"]
   - id: david-bowie
@@ -65,6 +71,7 @@ items:
     peakFrom: 1969
     peakTo: 2016
     probability: 90
+    region: ["global"]
     wikimediaSearchHints: ["David Bowie musician"]
     answerMethods: ["timeline", "name-letters"]
   - id: cher
@@ -73,6 +80,7 @@ items:
     peakFrom: 1965
     peakTo: 2024
     probability: 85
+    region: ["global"]
     wikimediaSearchHints: ["Cher singer actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: rod-stewart
@@ -81,6 +89,7 @@ items:
     peakFrom: 1969
     peakTo: 2024
     probability: 85
+    region: ["global"]
     wikimediaSearchHints: ["Rod Stewart singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: eric-clapton
@@ -89,6 +98,7 @@ items:
     peakFrom: 1963
     peakTo: 2024
     probability: 88
+    region: ["global"]
     wikimediaSearchHints: ["Eric Clapton guitarist"]
     answerMethods: ["timeline", "name-letters"]
   - id: phil-collins
@@ -97,6 +107,7 @@ items:
     peakFrom: 1981
     peakTo: 2020
     probability: 85
+    region: ["global"]
     wikimediaSearchHints: ["Phil Collins singer drummer"]
     answerMethods: ["timeline", "name-letters"]
   - id: elton-john
@@ -105,6 +116,7 @@ items:
     peakFrom: 1970
     peakTo: 2024
     probability: 95
+    region: ["global"]
     wikimediaSearchHints: ["Elton John singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: cyndi-lauper
@@ -113,6 +125,7 @@ items:
     peakFrom: 1983
     peakTo: 2024
     probability: 82
+    region: ["global"]
     wikimediaSearchHints: ["Cyndi Lauper singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: annie-lennox
@@ -121,6 +134,7 @@ items:
     peakFrom: 1980
     peakTo: 2024
     probability: 80
+    region: ["global"]
     wikimediaSearchHints: ["Annie Lennox singer Eurythmics"]
     answerMethods: ["timeline", "name-letters"]
   - id: george-michael
@@ -129,6 +143,7 @@ items:
     peakFrom: 1982
     peakTo: 2016
     probability: 88
+    region: ["global"]
     wikimediaSearchHints: ["George Michael singer Wham"]
     answerMethods: ["timeline", "name-letters"]
   - id: kate-bush
@@ -137,6 +152,7 @@ items:
     peakFrom: 1978
     peakTo: 2024
     probability: 80
+    region: ["global"]
     wikimediaSearchHints: ["Kate Bush singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: sting
@@ -145,6 +161,7 @@ items:
     peakFrom: 1977
     peakTo: 2024
     probability: 88
+    region: ["global"]
     wikimediaSearchHints: ["Sting musician Police"]
     answerMethods: ["timeline", "name-letters"]
   - id: boy-george
@@ -153,6 +170,7 @@ items:
     peakFrom: 1981
     peakTo: 2024
     probability: 80
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Boy George Culture Club"]
     answerMethods: ["timeline", "name-letters"]
   - id: lenny-kravitz
@@ -161,6 +179,7 @@ items:
     peakFrom: 1989
     peakTo: 2024
     probability: 82
+    region: ["global"]
     wikimediaSearchHints: ["Lenny Kravitz musician"]
     answerMethods: ["timeline", "name-letters"]
   - id: iggy-pop
@@ -169,6 +188,7 @@ items:
     peakFrom: 1969
     peakTo: 2024
     probability: 78
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Iggy Pop musician"]
     answerMethods: ["timeline", "name-letters"]
   - id: patti-smith
@@ -177,6 +197,7 @@ items:
     peakFrom: 1975
     peakTo: 2024
     probability: 75
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Patti Smith singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: ozzy-osbourne
@@ -185,6 +206,7 @@ items:
     peakFrom: 1968
     peakTo: 2024
     probability: 85
+    region: ["global"]
     wikimediaSearchHints: ["Ozzy Osbourne musician Black Sabbath"]
     answerMethods: ["timeline", "name-letters"]
   - id: alanis-morissette
@@ -193,6 +215,7 @@ items:
     peakFrom: 1995
     peakTo: 2024
     probability: 82
+    region: ["global"]
     wikimediaSearchHints: ["Alanis Morissette singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: belinda-carlisle
@@ -201,6 +224,7 @@ items:
     peakFrom: 1978
     peakTo: 2024
     probability: 72
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Belinda Carlisle Go-Gos"]
     answerMethods: ["timeline", "name-letters"]
   - id: tom-petty
@@ -209,6 +233,7 @@ items:
     peakFrom: 1976
     peakTo: 2017
     probability: 82
+    region: ["global"]
     wikimediaSearchHints: ["Tom Petty musician Heartbreakers"]
     answerMethods: ["timeline", "name-letters"]
   - id: barry-white
@@ -217,6 +242,7 @@ items:
     peakFrom: 1973
     peakTo: 2003
     probability: 82
+    region: ["global"]
     wikimediaSearchHints: ["Barry White singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: rick-astley
@@ -225,6 +251,7 @@ items:
     peakFrom: 1987
     peakTo: 2024
     probability: 82
+    region: ["global"]
     wikimediaSearchHints: ["Rick Astley singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: ricky-martin
@@ -233,6 +260,7 @@ items:
     peakFrom: 1991
     peakTo: 2024
     probability: 85
+    region: ["global"]
     wikimediaSearchHints: ["Ricky Martin singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: gloria-estefan
@@ -241,6 +269,7 @@ items:
     peakFrom: 1984
     peakTo: 2024
     probability: 82
+    region: ["global"]
     wikimediaSearchHints: ["Gloria Estefan singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: seal
@@ -249,6 +278,7 @@ items:
     peakFrom: 1990
     peakTo: 2024
     probability: 82
+    region: ["global"]
     wikimediaSearchHints: ["Seal singer Henry Olusegun"]
     answerMethods: ["timeline", "name-letters"]
   - id: bonnie-tyler
@@ -257,6 +287,7 @@ items:
     peakFrom: 1976
     peakTo: 2024
     probability: 82
+    region: ["global"]
     wikimediaSearchHints: ["Bonnie Tyler singer Welsh"]
     answerMethods: ["timeline", "name-letters"]
   - id: kylie-minogue
@@ -265,6 +296,7 @@ items:
     peakFrom: 1987
     peakTo: 2024
     probability: 90
+    region: ["global"]
     wikimediaSearchHints: ["Kylie Minogue singer Australia"]
     answerMethods: ["timeline", "name-letters"]
   - id: neneh-cherry
@@ -389,6 +421,7 @@ items:
     displayName: "Lasse Tennander"
     correctYear: 1948
     probability: 68
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Lasse Tennander Swedish singer songwriter rock"]
     answerMethods: ["timeline", "name-letters"]
   - id: orup
@@ -479,6 +512,7 @@ items:
     peakFrom: 1991
     peakTo: 2024
     probability: 85
+    region: ["global"]
     wikimediaSearchHints: ["Dave Grohl Foo Fighters singer guitarist"]
     answerMethods: ["timeline", "name-letters"]
   - id: joey-tempest

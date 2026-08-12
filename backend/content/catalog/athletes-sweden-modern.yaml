@@ -56,7 +56,7 @@ items:
     answerMethods: ["name-letters"]
   - id: viktor-gyokeres
     displayName: "Viktor Gyökeres"
-    region: ["sweden", "global"]
+    region: ["europe"]
     probability: 78
     peakFrom: 2022
     peakTo: 2024
