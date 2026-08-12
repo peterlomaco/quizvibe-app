@@ -103,10 +103,15 @@ interface SubscriptionFeature {
   basic: string;
 }
 
+/**
+ * ⚠ ORDAGRANN SPEGEL av `PREMIUM_FEATURES` i [app/index.tsx](app/index.tsx)
+ * (Home:ns "QuizVibe user vs Guest"-info-modal renderar samma strängar i
+ * samma kort-layout). Ändra ALLTID båda.
+ */
 const SUBSCRIPTION_FEATURES: SubscriptionFeature[] = [
   { premium: 'Host Game Credits Unlimited', basic: '4 games per day' },
-  { premium: 'Max 20 rounds per game', basic: 'Max 4 rounds per game' },
-  { premium: 'Invite up to 12 players per Game', basic: '4 players' },
+  { premium: '20 rounds per game (Individual device)', basic: 'Max 4 rounds per game' },
+  { premium: 'Invite 12 players per game (Individual device)', basic: 'Max 4 players' },
   { premium: 'All Extra Host packages included', basic: 'Generic content only' },
 ];
 

@@ -148,8 +148,10 @@ function isRemoteBlockContext(value: unknown): value is RemoteBlockContext {
  *
  * Källor för värdena: Remote 1vs1 är users-only; guest-hostade spel skriver
  * ingen Player history; guest host är låst till fast Game era / inga Extra
- * packages / max 1 Play Again; free host = 2 credits/dag (guest = ogated
- * men trial-begränsat spel).
+ * packages / max 1 Play Again; free host = FREE_CREDITS_DAILY_CAP (4) —
+ * både grant vid registrering och daglig top-up-cap, samma siffra som
+ * Store:s "Basic: 4 games per day". Guest = ogated men trial-begränsat
+ * spel.
  */
 const USER_VS_GUEST_ROWS: { label: string; user: boolean | string; guest: boolean | string }[] = [
   { label: 'Local play — Single, Pass-the-Phone, Individual devices', user: true, guest: true },
@@ -157,22 +159,25 @@ const USER_VS_GUEST_ROWS: { label: string; user: boolean | string; guest: boolea
   { label: 'Saved results & player history', user: true, guest: false },
   { label: 'Friends list & in-app invites', user: true, guest: false },
   { label: 'Choose Game era', user: true, guest: false },
-  { label: 'Host games per day', user: '2 free', guest: 'Trial' },
-  { label: 'Play again after a game', user: true, guest: '1 time' },
+  { label: 'Host games per day', user: '4 free', guest: 'Trial' },
+  { label: 'Re-play possible', user: true, guest: '1 time' },
   { label: 'Premium option', user: true, guest: false },
 ];
 
 /**
  * Vad Premium-abonnemanget lägger till ovanpå det gratis kontot. Listas
  * SEPARAT under jämförelsetabellen så gratis-kontots rader inte blandas
- * ihop med betalda tak. Spegla StoreScreen:s SUBSCRIPTION_FEATURES vid
- * ändring.
+ * ihop med betalda tak.
+ *
+ * ⚠ ORDAGRANN SPEGEL av StoreScreen:s `SUBSCRIPTION_FEATURES` — samma
+ * strängar, samma ordning, samma Premium-vs-Basic-rendering (Peter
+ * 2026-08-12: sektionen ska se ut som i Store). Ändra ALLTID båda.
  */
-const PREMIUM_FEATURES: string[] = [
-  'Unlimited host games — no daily limit',
-  'Up to 12 players (Individual devices mode)',
-  'Up to 20 rounds (Individual devices mode)',
-  'All Extra Host packages included',
+const PREMIUM_FEATURES: { premium: string; basic: string }[] = [
+  { premium: 'Host Game Credits Unlimited', basic: '4 games per day' },
+  { premium: '20 rounds per game (Individual device)', basic: 'Max 4 rounds per game' },
+  { premium: 'Invite 12 players per game (Individual device)', basic: 'Max 4 players' },
+  { premium: 'All Extra Host packages included', basic: 'Generic content only' },
 ];
 
 /**
@@ -3883,14 +3888,21 @@ export default function HomeScreen() {
                 </View>
               ))}
               {/* Premium listas SEPARAT — tabellen ovan gäller det gratis
-                  kontot, så inga betalda tak blandas in där. */}
+                  kontot, så inga betalda tak blandas in där.
+                  Kortet speglar StoreScreen:s featureList 1:1 (grön ✓ +
+                  Premium-rad + "Basic: …"-underrad i en bordered card). */}
               <Text style={styles.compareSectionHead}>With QuizVibe Premium</Text>
-              {PREMIUM_FEATURES.map((feature) => (
-                <View key={feature} style={styles.compareBulletRow}>
-                  <Text style={styles.compareBulletMark}>✓</Text>
-                  <Text style={styles.compareBulletText}>{feature}</Text>
-                </View>
-              ))}
+              <View style={styles.premiumFeatureList}>
+                {PREMIUM_FEATURES.map((feature) => (
+                  <View key={feature.premium} style={styles.premiumFeatureRow}>
+                    <Text style={styles.premiumFeatureCheck}>✓</Text>
+                    <View style={styles.premiumFeatureTextWrap}>
+                      <Text style={styles.premiumFeaturePremium}>{feature.premium}</Text>
+                      <Text style={styles.premiumFeatureBasic}>Basic: {feature.basic}</Text>
+                    </View>
+                  </View>
+                ))}
+              </View>
               <Text style={styles.compareFootnote}>
                 Joining other players&apos; games is always free — host credits are only
                 used when you host.
@@ -4141,14 +4153,48 @@ const styles = StyleSheet.create({
     marginTop: Spacing.lg,
     marginBottom: Spacing.xs,
   },
-  compareBulletRow: {
+  // Premium-listan i info-modalen — ORDAGRANN spegel av StoreScreen:s
+  // featureList/featureRow/featureCheck/featureTextWrap/featurePremium/
+  // featureBasic. Theme-tokens är utskrivna som råa värden eftersom den
+  // här filen inte importerar FontSize/FontWeight (FontSize.md=15,
+  // sm=13, xs=11; FontWeight.bold='700', medium='500').
+  premiumFeatureList: {
+    backgroundColor: Colors.card,
+    borderRadius: Radius.md,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.md,
+    gap: Spacing.sm,
+    marginBottom: Spacing.xs,
+  },
+  premiumFeatureRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: Spacing.sm,
-    paddingVertical: 3,
   },
-  compareBulletMark: { fontSize: 13, fontWeight: '700', color: Colors.warning, lineHeight: 17 },
-  compareBulletText: { flex: 1, fontSize: 13, color: Colors.textPrimary, lineHeight: 17 },
+  premiumFeatureCheck: {
+    fontSize: 15,
+    color: Colors.success,
+    fontWeight: '700',
+    width: 16,
+    marginTop: 1,
+  },
+  premiumFeatureTextWrap: {
+    flex: 1,
+    gap: 2,
+  },
+  premiumFeaturePremium: {
+    fontSize: 13,
+    color: Colors.textPrimary,
+    fontWeight: '500',
+    lineHeight: 20,
+  },
+  premiumFeatureBasic: {
+    fontSize: 11,
+    color: Colors.textSecondary,
+    lineHeight: 16,
+  },
   compareFootnote: {
     fontSize: 11,
     color: Colors.textSecondary,
