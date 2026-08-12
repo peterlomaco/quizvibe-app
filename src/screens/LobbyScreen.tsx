@@ -5843,11 +5843,13 @@ export default function LobbyScreen() {
             Game Mode
           </Text>
 
-          {/* Rad 1: Single player ensam (flex-spacer håller samma box-bredd
-              som treboxraden nedan) + bracket-etikett under. */}
+          {/* Tre rutor i EN rad + bracket-etiketter undertill. Layouten
+              splittades tillfälligt i två rader när Remote (1vs1) låg här;
+              återställd 2026-08-12 när Remote flyttades till Home-valet. */}
           <View style={[styles.modeRow, { marginTop: Spacing.sm }]}>
             {renderModeBox('single', 'Single player', true)}
-            <View style={{ flex: 2 }} />
+            {renderModeBox('ptp', 'Pass-the-Phone', true)}
+            {renderModeBox('indiv', 'Individual device', true)}
           </View>
           <View style={{ flexDirection: 'row', gap: Spacing.sm, marginTop: 2 }}>
             {/* Bracket under "Single player" */}
@@ -5869,18 +5871,9 @@ export default function LobbyScreen() {
                 </Pressable>
               </View>
             </View>
-            <View style={{ flex: 2 }} />
-          </View>
-
-          {/* Rad 2: multiplayer-lägena (PtP / IndDev) + gemensam bracket-
-              etikett under raden. Remote (1vs1) togs bort 2026-08-07 —
-              1vs1 nås enbart via "1vs1 Matches"-valet på Home. */}
-          <View style={[styles.modeRow, { marginTop: Spacing.md }]}>
-            {renderModeBox('ptp', 'Pass-the-Phone', true)}
-            {renderModeBox('indiv', 'Individual device', true)}
-          </View>
-          <View style={{ flexDirection: 'row', gap: Spacing.sm, marginTop: 2 }}>
-            <View style={{ flex: 1, alignItems: 'center' }}>
+            {/* Bracket under "Pass-the-Phone" + "Individual device" —
+                flex:2 så den spänner över båda rutorna. */}
+            <View style={{ flex: 2, alignItems: 'center' }}>
               <View style={styles.multiplayerBracket} />
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 6 }}>
                 <Text style={styles.multiplayerBracketLabel}>Multiplayer</Text>
@@ -6980,17 +6973,14 @@ export default function LobbyScreen() {
                     />
                   </View>
                   {/* Game mode quick-select — under RoundsRuler för snabb mode-byte.
-                      Två rader som huvud-Game Mode-sektionen: Single ensam,
-                      sedan PtP / IndDev. Göms HELT i renodlade 1vs1-lobbyn
-                      (mode är låst där); Remote-rutan borttagen 2026-08-07
-                      (1vs1 nås via Home-valet). */}
+                      EN rad med tre rutor, som huvud-Game Mode-sektionen.
+                      Göms HELT i renodlade 1vs1-lobbyn (mode är låst där);
+                      Remote-rutan borttagen 2026-08-07 (1vs1 nås via
+                      Home-valet). */}
                   {gameMode !== 'remote-1v1' && (
                     <>
                       <View style={[styles.modeRow, { marginTop: Spacing.lg }]}>
                         {renderModeBox('single', 'Single player', true)}
-                        <View style={{ flex: 2 }} />
-                      </View>
-                      <View style={[styles.modeRow, { marginTop: Spacing.sm }]}>
                         {renderModeBox('ptp', 'Pass-the-Phone', true)}
                         {renderModeBox('indiv', 'Individual device', true, true)}
                       </View>

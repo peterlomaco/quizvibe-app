@@ -1436,11 +1436,13 @@ export default function ProfileScreen() {
               Premium triggar Store-omdirigering. */}
           <View style={styles.field}>
             <Text style={styles.sectionLabel}>Game Mode</Text>
-            {/* Rad 1: Single player ensam + bracket. Rad 2: PtP / Remote (1vs1)
-                / IndDev + gemensam Multiplayer-bracket — speglar Lobby. */}
+            {/* Tre rutor i EN rad + bracket-etiketter undertill — speglar
+                Lobby. Layouten splittades tillfälligt i två rader när Remote
+                (1vs1) låg här; återställd 2026-08-12. */}
             <View style={[styles.modeRow, { marginTop: Spacing.sm }]}>
               {renderModeBox('single', 'Single player', true)}
-              <View style={{ flex: 2 }} />
+              {renderModeBox('ptp', 'Pass-the-Phone', true)}
+              {renderModeBox('indiv', 'Individual device', true)}
             </View>
             <View style={{ flexDirection: 'row', gap: Spacing.sm, marginTop: 2 }}>
               {/* Bracket under "Single player" */}
@@ -1462,17 +1464,9 @@ export default function ProfileScreen() {
                   </Pressable>
                 </View>
               </View>
-              <View style={{ flex: 2 }} />
-            </View>
-            {/* Remote (1vs1) borttagen 2026-08-07 — 1vs1 är ingen host-
-                default längre; läget väljs per spel via Home-valet. */}
-            <View style={[styles.modeRow, { marginTop: Spacing.md }]}>
-              {renderModeBox('ptp', 'Pass-the-Phone', true)}
-              {renderModeBox('indiv', 'Individual device', true)}
-            </View>
-            <View style={{ flexDirection: 'row', gap: Spacing.sm, marginTop: 2 }}>
-              {/* Bracket under multiplayer-raden (PtP + Remote + IndDev) */}
-              <View style={{ flex: 1, alignItems: 'center' }}>
+              {/* Bracket under "Pass-the-Phone" + "Individual device" —
+                  flex:2 så den spänner över båda rutorna. */}
+              <View style={{ flex: 2, alignItems: 'center' }}>
                 <View style={styles.multiplayerBracket} />
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 6 }}>
                   <Text style={styles.multiplayerBracketLabel}>Multiplayer</Text>
@@ -1968,13 +1962,10 @@ export default function ProfileScreen() {
           </View>
 
           {/* Game mode quick-select — under RoundsRuler för snabb mode-byte.
-              Två rader som huvud-Game Mode-sektionen. */}
+              EN rad med tre rutor, som huvud-Game Mode-sektionen. */}
           <View style={styles.field}>
             <View style={styles.modeRow}>
               {renderModeBox('single', 'Single player', true)}
-              <View style={{ flex: 2 }} />
-            </View>
-            <View style={[styles.modeRow, { marginTop: Spacing.sm }]}>
               {renderModeBox('ptp', 'Pass-the-Phone', true)}
               {renderModeBox('indiv', 'Individual device', true, true)}
             </View>
