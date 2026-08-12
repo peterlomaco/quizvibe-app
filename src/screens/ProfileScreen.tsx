@@ -1235,7 +1235,9 @@ export default function ProfileScreen() {
                 </View>
               </View>
             )}
-            <Text style={styles.creditsLabel} numberOfLines={1} ellipsizeMode="tail">Host Game Credits</Text>
+            {/* 2 rader — labeln wrappar i stället för att kapas när pillen är
+                trång (Display Zoom / stor Dynamic Type). Speglar Lobby. */}
+            <Text style={styles.creditsLabel} numberOfLines={2} ellipsizeMode="tail">Host Game Credits</Text>
             {/* Extras-rutan borttagen 2026-07-07 — engångsköpta credits finns
                 inte längre (V1 säljer enbart Premium-abonnemang). Pillen
                 visar bara Free-saldot; Premium markeras via UNLIMITED-badgen. */}
@@ -3286,6 +3288,7 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     letterSpacing: 0.6,
     textTransform: 'uppercase',
+    textAlign: 'center',
   },
   creditsValueRow: {
     flexDirection: 'row',

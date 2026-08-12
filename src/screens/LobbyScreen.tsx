@@ -6,6 +6,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Alert,
   Animated,
+  Dimensions,
   Easing,
   Image,
   Keyboard,
@@ -148,6 +149,14 @@ type GameMode = 'pass-the-phone' | 'individual-devices' | 'remote-1v1';
 // 15+ minimum age requirement (2026-06-01: höjt från 13+ pga 15+-gränsat
 // film-/innehåll i appen, utöver App Store / GDPR). Dynamisk så minimum-året
 // följer current year — 2026: max 2011, 2027: max 2012, osv.
+// Smal skärm = iPhone SE1 (320 pt) ELLER valfri iPhone med iOS Display Zoom
+// påslaget (SE2/8 rapporterar då 320 pt i stället för 375). Headern
+// "Game Lobby" + Host Game Credits-pillen kräver ~306 pt på en rad med
+// default-storlekarna, vilket klipper pillens högerkant på 288 pt
+// tillgänglig bredd. Se `header` / `screenTitle` / `creditsPill`.
+const SCREEN_WIDTH = Dimensions.get('window').width;
+const NARROW_SCREEN = SCREEN_WIDTH < 360;
+
 const CURRENT_YEAR = new Date().getFullYear();
 const MIN_BIRTH_YEAR = 1950;
 const MAX_BIRTH_YEAR = CURRENT_YEAR - 15;
@@ -5340,7 +5349,10 @@ export default function LobbyScreen() {
                   </View>
                 </View>
               )}
-              <Text style={styles.creditsLabel} numberOfLines={1} ellipsizeMode="tail">Host Game Credits</Text>
+              {/* 2 rader tillåtna: labeln wrappar ("HOST GAME / CREDITS")
+                  i stället för att kapas till "HOST GAME CRE…" när pillen
+                  är trång — t.ex. vid Display Zoom eller stor Dynamic Type. */}
+              <Text style={styles.creditsLabel} numberOfLines={2} ellipsizeMode="tail">Host Game Credits</Text>
               {/* Extras-rutan borttagen 2026-07-07 — engångsköpta credits finns
                   inte längre (V1 säljer enbart Premium-abonnemang). Pillen
                   visar bara Free-saldot; Premium markeras via UNLIMITED-badgen. */}
@@ -8276,6 +8288,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: Spacing.md,
+    // Sista-utvägs-ventil: får raden ändå inte plats (stor Dynamic Type
+    // ovanpå Display Zoom) hoppar credits-pillen ned på egen rad i stället
+    // för att klippas i högerkanten. `marginLeft: 'auto'` på pillen håller
+    // den högerställd i BÅDA fallen (space-between räcker bara på en rad).
+    flexWrap: 'wrap',
+    rowGap: Spacing.sm,
   },
   // Non-host: "Music. Film. Sport." på samma rad som Game Lobby (höger).
   headerTagline: {
@@ -8293,15 +8311,20 @@ const styles = StyleSheet.create({
     borderRadius: Radius.md,
     borderWidth: 1,
     borderColor: Colors.primaryBorder,
-    paddingHorizontal: Spacing.md,
+    paddingHorizontal: NARROW_SCREEN ? Spacing.sm : Spacing.md,
     paddingVertical: Spacing.xs + 2,
     alignItems: 'center',
     // Större gap mellan label och values-row så Extras-boxens kant-
     // skärande PREMIUM-badge (top:-7) inte överlappar "HOST GAME CREDITS"-
     // texten ovanför.
     gap: 8,
-    minWidth: 160,
+    // 160 pt + 24 pt padding + 24 px-titeln spränger 288 pt-raden på en
+    // 320 pt-skärm → pillens högerkant klipptes. 140 räcker för labeln
+    // ("HOST GAME CREDITS" ≈ 116 pt vid 10 px + 0.6 letterSpacing).
+    minWidth: NARROW_SCREEN ? 140 : 160,
     flexShrink: 1,
+    // Håller pillen högerställd även när headern wrappar (se `header`).
+    marginLeft: 'auto',
     position: 'relative',
   },
   // Gold-framed-variant av pillen när host har aktiv membership-prenu-
@@ -8343,6 +8366,7 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     letterSpacing: 0.6,
     textTransform: 'uppercase',
+    textAlign: 'center',
   },
   creditsValueRow: {
     flexDirection: 'row',
@@ -8415,7 +8439,14 @@ const styles = StyleSheet.create({
   creditsExtrasPremiumBadgeTextInactive: {
     color: '#FFF',
   },
-  screenTitle: { fontSize: 24, fontWeight: '700', color: Colors.textPrimary },
+  // flexShrink så titeln ger efter före pillen när raden är trång; 20 px på
+  // smala skärmar frigör ~22 pt så pillen får plats i sin helhet.
+  screenTitle: {
+    fontSize: NARROW_SCREEN ? 20 : 24,
+    fontWeight: '700',
+    color: Colors.textPrimary,
+    flexShrink: 1,
+  },
 
   // "You are the host" — centrerad rubrik med cross-fade animation.
   hostBadge: { alignSelf: 'stretch', marginTop: -Spacing.sm, marginBottom: Spacing.sm, height: 26 },
