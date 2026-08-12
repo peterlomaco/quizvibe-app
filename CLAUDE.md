@@ -19,7 +19,13 @@ Status mot den 4-stegs-plan vi följer för content-bygge inför launch:
 - **B**) Server-side asset-hosting (Supabase Storage / CDN) — assets på 73 MB i bundle. Aktiveras post-launch eller när bundle-storlek närmar sig App Store cellular-limit (200 MB).
 - **C**) webp q85 → q75 reprocess (~30% storleksbesparing utan synbar kvalitetsförlust) — opportunistic kvalitets-justering om tid finns.
 
-**Pool-status (2026-07-03): ~800 bildfrågor + 499 musikfrågor.** Curation-pass 2026-07-03: (a) **Brandsta – All in för Sverige** correctYear rättat 2018 → 2026. (b) **Paket-exklusiva fotbollslåtar**: `brandsta-all-in-for-sverige` + `anis-don-demina-flaggan-i-topp` fick `region: ["unknown-region"]` — utesluts ur baspoolen, ingår enbart i kommande fotbollspaket via befintlig `genrePackages: ["sport", "football"]` (samma mönster som `knaan-wavin-flag`). (c) **Ny fil `songs-summer.yaml`** — 5 kurerade Spotify-only-items för kommande "Summer"-host-paket, HELA filen paket-exklusiv via `region: ["unknown-region"]` på fil-headern: Cornelis Vreeswijk – Sommarkort (1987, originalår — INTE Spotify-samlingens 2004), Ace of Base – Cruel Summer (1998), Mungo Jerry – In the Summertime (1970), DJ Jazzy Jeff & The Fresh Prince – Summertime (1991, även `"hiphop"`-tagg), Inner Circle – Sweat (1992). OBS: "Summer"-taggen finns även på 7 baspool-items (Markoolio, Gyllene Tider, Ted Gärdestad, Lasse Berghagen, Bellini, Kaoma, Ronny & Ragge) — de ligger i BÅDE baspool och paket; items kan vara i båda eller bara paket per schema-modellen. (d) **Spotify/Name distraktor-relevans** — se "Spotify/Name — distraktor-relevans" i Spotify DJ-sektionen.
+**Pool-status (2026-08-11, commit `b7b4c7d`): 671 spelbara bildfrågor (836 exporterade) + 484 spelbara musikfrågor (487 exporterade), plus 32 paket-gatade items.** Content-pass: 16 nya spelbara låtar (Orup ×3, Bryan Adams ×2, Bonnie Tyler ×2, Marvin Gaye/Tammi Terrell, The Who, Lionel Richie, Guns N' Roses, Shakespears Sister, Kent, The Verve, Lady Gaga, R.I.O.) + 2 staged utan media (Bette Midler *The Rose*, Cyndi Lauper *True Colors* — saknar kurerad Spotify-/YT-länk, flaggade i `notes`). Befintliga items berikades i stället för att dubbleras (Paint It Black, Highway to Hell, Die With a Smile).
+
+**Ny år-policy (Peter 2026-08-11): `correctYear` = det år låten FÖRSTA GÅNGEN gick att höra — inte singel-releasen.** Album före singel ⇒ albumåret vinner. Ersätter den tidigare "singel-release-år"-regeln. Följder: Sweet Child o' Mine 1988 → 1987 (Appetite for Destruction), `kent-music-non-stop` 1996 → 1999 (var rent felaktigt; flyttad till `songs-gen-z.yaml` eftersom filnamn = release-era). ⚠ **Resten av katalogen är taggad under den GAMLA regeln** — en retroaktiv genomgång av album-före-singel-fall är inte gjord (känt exempel: `guns-n-roses-november-rain` = 1992, men Use Your Illusion I kom sep 1991).
+
+**Region-modellen omarbetad + konsoliderad till EN källa** — se "Region-modellen" nedan. `unknown-region` används INTE längre som paket-grind (det är `inBaseCatalog: false` nu), och bild-items läser inte längre `HINTS_REGION_MAP`.
+
+**Pool-status (2026-07-03): ~800 bildfrågor + 499 musikfrågor.** ⚠ Punkt (b) och (c) nedan beskriver `region: ["unknown-region"]` som paket-grind — det mönstret är ERSATT av `inBaseCatalog: false` (2026-08-11). Curation-pass 2026-07-03: (a) **Brandsta – All in för Sverige** correctYear rättat 2018 → 2026. (b) **Paket-exklusiva fotbollslåtar**: `brandsta-all-in-for-sverige` + `anis-don-demina-flaggan-i-topp` fick `region: ["unknown-region"]` — utesluts ur baspoolen, ingår enbart i kommande fotbollspaket via befintlig `genrePackages: ["sport", "football"]` (samma mönster som `knaan-wavin-flag`). (c) **Ny fil `songs-summer.yaml`** — 5 kurerade Spotify-only-items för kommande "Summer"-host-paket, HELA filen paket-exklusiv via `region: ["unknown-region"]` på fil-headern: Cornelis Vreeswijk – Sommarkort (1987, originalår — INTE Spotify-samlingens 2004), Ace of Base – Cruel Summer (1998), Mungo Jerry – In the Summertime (1970), DJ Jazzy Jeff & The Fresh Prince – Summertime (1991, även `"hiphop"`-tagg), Inner Circle – Sweat (1992). OBS: "Summer"-taggen finns även på 7 baspool-items (Markoolio, Gyllene Tider, Ted Gärdestad, Lasse Berghagen, Bellini, Kaoma, Ronny & Ragge) — de ligger i BÅDE baspool och paket; items kan vara i båda eller bara paket per schema-modellen. (d) **Spotify/Name distraktor-relevans** — se "Spotify/Name — distraktor-relevans" i Spotify DJ-sektionen.
 
 **Pool-status (2026-06-25): ~800 bildfrågor + 473 musikfrågor.** Curation-pass 2026-06-25: 9 nya musikfrågor tillagda. Fotbollspaket (songs-sport.yaml, `genrePackages: ["sport","football"]`): Blur – Song 2 (1997), Zombie Nation – Kernkraft 400 (1999), Dario G – Carnaval de Paris (1998, Spotify+YT), Planet Funk – Chase the Sun (2001). songs-gen-x.yaml: Neil Diamond – Girl, You'll Be a Woman Soon (1967, Spotify+YT), Lasse Berghagen – En kväll i juni (1975, Spotify+YT). songs-gen-z.yaml: Southside Spinners – Luvstruck (2000, Spotify+YT), Antique – (I Would) Die for You (2001, YT, `genrePackages: ["Eurovision"]`). songs-millennials.yaml: Stevie Wonder – I Just Called to Say I Love You Spotify-ID uppdaterat till `2W8J9Gfw5q8tSvsuWSnMBl`. Curation-pass 2026-06-24: 5 YT-klipp borttagna ur `sport-events-classics.yaml` pga år synligt i videotiteln (spoilar svaret) — `sverige-vm-94-brons-bulgarien`, `sorenstam-kraft-nabisco-2002`, `johan-olsson-vm-50km-2013` kvarstår utan klipp tills ersättning hittas. 2 items korrigerade till rätt event (gamla klipp visade fel sporthändelse): `christian-olsson-tresteg-2004` → `christian-olsson-em-tresteg-2006` (EM Göteborg, correctYear 2006); `anja-parson-os-guld-slalom-2006` → `anja-parson-vm-slalom-are-2007` (VM Åre, correctYear 2007). Tidigare (2026-06-13): 473 musikfrågor — Stevie Wonder "I Just Called to Say I Love You" (1984, Spotify + YT Topic), Tomas Ledin "Vi är på gång" (correctYear 1983 ← rättat från 2006, nytt YT-klipp), Tomas Ledin "Hon gör allt för att göra mig lycklig" (1980, Spotify + YT Topic), spotifyTrackId tillagd på Tomas Ledin "Just nu!" (1980). Spotify-ID uppdaterade: Avicii Levels, Loreen Euphoria, Loreen Tattoo. endSec lagt till på 4 klipp (ed-sheeran-perfect, rihanna-diamonds, bob-marley-no-woman-no-cry, bryan-adams-summer-of-69).
 
@@ -171,11 +177,51 @@ Mönstret avspeglar att föregående generation typiskt har stark recognition f�
 
 **Item-level audience-override** (2026-05-22): items kan bära ett eget `audience: ['elder' | 'gen-x' | ...]`-fält som overrider fil-headerns audience. Edge-case-fix när item-recognition inte sammanfaller med fil-buckets — t.ex. en ny dansband-låt från 2026 i `songs-gen-alpha.yaml` (file-audience `['gen-alpha', 'gen-z']`) som faktiskt är `['elder', 'gen-x', 'millennials']`-recognized. Saknas item-tag används file-tag (= 90%-fallet). Export-scripten (`export-music-questions.ts` + `export-image-questions.ts`) emittar `audiences: item.audience ?? file.audience` så klient-filtret (`audienceFilter.ts`) tar emot effective audience oavsett källa. Schema: `ContentItemSchema.audience: z.array(AudienceSchema).min(1).optional()`. Se `memory/project_audience_tagging.md` för curator-checklista (när override:a fil-tag?).
 
-**Region-tag** (2026-05-26, utökat 2026-06-02+03, utökat 2026-06-03 logo-blur-pass): `RegionSchema` har nu **FYRA** värden: `'sweden'`, `'nordic'`, `'global'` och `'unknown-region'`. Alla catalog-filer har `region: ["sweden"]` på fil-headern (V1-default). **`region: ["sweden", "nordic"]`** (item-level) = skandinavisk/nordisk igenkänning — visas för svenska spelare i V1 + nordiska spelare i V2+ (exempel: Erling Haaland, Björn Dæhlie, Jakob Ingebrigtsen, Karsten Warholm, Martin Ødegaard). **`region: ["sweden", "global"]`** (item-level) = världskänd som OCKSÅ har stark svensk igenkänning — visas för svenska spelare i V1 + globala spelare i V2+ (exempel: Messi, Ronaldo, Zlatan, Michael Jordan, Muhammad Ali, ~39 globala idrottare taggade i logo-blur-curation-passet 2026-06-03). **`region: ["global"]`** (item-level, standalone) = visas EJ för V1-spelaren. **`region: ["unknown-region"]`** (2026-06-03) = reserverat för host-paket-items. Tanken i förlängningen är att tagga alla länder/regioner där ett item har igenkänning (multi-region) — detta designas i V2+. **Curator-regel**: DEFAULT till fil-headerns `region: ["sweden"]`. Lägg `["sweden", "nordic"]` för nordisk igenkänning, `["sweden", "global"]` för globalt erkänd med stark svensk igenkänning, `["global"]` för globalt utan Sverige-fokus, `["unknown-region"]` för host-paket-content. Filter-semantik: visa item om `item.region` intersects `player.region`. Se `memory/project_v1_v2_region_strategy.md` för full spec.
+**Region-modellen — STRIKT HIERARKI (omarbetad 2026-08-11, commit `b7b4c7d`)**
+
+```
+global  ⊃  europe  ⊃  nordic  ⊃  <land>          (i dag bara 'sweden')
+```
+
+Ett items `region`-tagg säger hur **brett** det är igenkänt. En **spelare** har ett **land**. Itemet visas om spelarens land ligger inom itemets nivå — alltså **INTE** den gamla "intersects"-regeln.
+
+| Tagg | Når |
+|---|---|
+| `["global"]` | alla länder, överallt |
+| `["europe"]` | alla europeiska länder (i dag bara Sverige) |
+| `["nordic"]` | alla nordiska länder (i dag bara Sverige) |
+| `["sweden"]` | enbart spelare med region scope Sweden |
+| `["unknown-region"]` | **ingen** — placeringen är inte beslutad, itemet hålls utanför allt innehåll |
+
+⚠ **`global` betyder MOTSATSEN mot före 2026-08-11.** Gammal innebörd: "ej Sverige-fokuserad → visas EJ för svensk spelare". Ny innebörd: "igenkänt överallt → ingår i VARJE region scope". Det är nu den **bredaste** taggen, inte den smalaste. 97 items omtaggades i migrationen; hittar du en kommentar eller ett memory som påstår det gamla är den stale.
+
+⚠ **Multi-tag är utdöende.** `["sweden","global"]` är REDUNDANT — `global` når redan Sverige. Skriv **EN nivå** per item. (Filtret tolererar arrays: itemet syns om NÅGON tagg är inom räckhåll.)
+
+**Implementation** — hierarkin är en **land → kedja**-tabell, inte parvisa regler, så nytt land = en rad:
+
+```ts
+// backend/content/schema.ts  +  src/utils/regionScope.ts (klient-spegel — HÅLL I SYNK)
+export const REGION_ANCESTRY: Record<RegionCountry, readonly Region[]> = {
+  sweden: ['global', 'europe', 'nordic', 'sweden'],
+  // norway:  ['global', 'europe', 'nordic', 'norway']
+  // germany: ['global', 'europe', 'germany']   // europeiskt, ej nordiskt
+  // japan:   ['global', 'japan']               // varken eller
+};
+isItemInRegionScope(itemRegions, country)  // true om någon tagg finns i kedjan
+```
+`'unknown-region'` står **medvetet inte i någon kedja** — därför når den ingen, utan special-case. 6 tester i `backend/content/test/schema.test.ts` låser beteendet.
+
+**Curator-regel**: default fil-headerns `region: ["sweden"]`. Välj annars EN nivå efter faktisk igenkänningsbredd. Använd `unknown-region` när itemet inte är tillräckligt känt — det är rätt tagg för "duger inte till poolen än", INTE en smalare geografi.
+
+**Paket-exklusivitet hör INTE hit.** Tidigare hackade vi `region: ["unknown-region"]` för att hålla paket-items utanför baspoolen. Använd **`inBaseCatalog: false`** i stället (+ `genrePackages`), så bär `region` ren geografi. Noll unknown-region används som paket-grind i dag.
+
+**`PLAYER_COUNTRY` är hårdkodat `'sweden'`** i [regionScope.ts](src/utils/regionScope.ts). **Spelarens land är ännu inte wire:at** — varken `ProfileData.region` (`'sweden'|'nordics'|'global'`) eller Lobby:ns "Region Scope" (Sweden/Nordics/Europe/Global) är ett LAND; båda beskriver hur brett innehållet ska vara. En av dem måste bli en riktig landväljare innan hierarkin gör skillnad i spelet. Följd i V1: global/europe/nordic/sweden är alla synliga, unknown-region är det inte.
+
+Se `memory/project_v1_v2_region_strategy.md` (skriven under den gamla modellen — läs med ovanstående som facit).
 
 **Sportevent + YouTube** är aktiverad i matrisen ("Which Year did this happen?") — `sport-events-classics.yaml` har 50 items (ned från 56 efter valideringspass 2026-06-03). Movie-subject: `movies-classics.yaml` (29 items, globala filmklassiker) + **`movies-sweden.yaml`** (7 items, validerade svenska filmklassiker med YT-trailers: Sällskapsresan, Göta Kanal, Jönssonligan, Sunes Sommar, Så som i himmelen, Hundraåringen, En man som heter Ove).
 
-**Eurovision host-paket (förberett 2026-06-03)**: ~67 YT-items har `genrePackages: ["Eurovision"]` — alla ESC-vinnare + svenska ESC-bidrag i katalogen är taggade. Items med `region: ["unknown-region"]` är de som inte primärt tillhör svensk pool men ingår i Eurovision-paketet. Svenska ESC-bidrag behåller `region: ["sweden"]` (visas i baspool) och har dessutom Eurovision-taggen. Paketet aktiveras via `PURCHASED_PACKAGES` i `mockPurchasedPackages.ts` när det ska säljas — inga klient-ändringar krävs. **ESC live-klipp startSec-konvention**: alla ~78 clips från `channelTitle: "Eurovision Song Contest"` har `startSec: 5` (hoppar förbi typisk publikjubel + landannonsering i introt). Undantag: manuellt kurerade clips med egna värden (t.ex. Eric Saade 35s, Ruslana 50s) behålls orörda.
+**Eurovision host-paket (förberett 2026-06-03)**: ~67 YT-items har `genrePackages: ["Eurovision"]` — alla ESC-vinnare + svenska ESC-bidrag i katalogen är taggade. **Uppdaterat 2026-08-11**: de 8 icke-svenska ESC-items:en är numera `region: ["europe"]` + `inBaseCatalog: false` (paket-grinden ligger på `inBaseCatalog`, inte på region — se region-modellen ovan). De 68 svenska ESC-bidragen behåller `region: ["sweden"]` och ligger kvar i baspoolen, med Eurovision-taggen ovanpå. Paketet aktiveras via `PURCHASED_PACKAGES` i `mockPurchasedPackages.ts` när det ska säljas — inga klient-ändringar krävs. **ESC live-klipp startSec-konvention**: alla ~78 clips från `channelTitle: "Eurovision Song Contest"` har `startSec: 5` (hoppar förbi typisk publikjubel + landannonsering i introt). Undantag: manuellt kurerade clips med egna värden (t.ex. Eric Saade 35s, Ruslana 50s) behålls orörda.
 
 **Struktur**:
 - `backend/content/catalog/*.yaml` — innehållslistor per generation × kategori. 5 generations-grupper: `elder` (Silent + Boomers, 1925-1964), `gen-x`, `millennials`, `gen-z`, `gen-alpha` + `'all'` (baseline). Fil-headern är `audience + category + contentForm + contentSubject + items`. Items har: `id` (kebab-case), `displayName`, `correctYear?` (optional för image-frågor; required om answerMethods inkluderar `'timeline'`), `probability` (0-100), `wikimediaSearchHints[]`, `answerMethods: ('timeline'|'name-letters')[]`, `sensitivity: 'standard'|'sensitive'`. **Live-katalogen efter politiker-purge (2026-05-21): 18 filer / 182 items** (artists × 4 gen + actors × 3 gen + athletes × 2 + songs × 5 gen + songs-all + capitals × 3). Deferred-mappen (`catalog/deferred/`) är tom men bevaras för framtida items. **Innehållspolicy**: politiker (Hitler, Stalin, Churchill, Kennedy, FDR, Obama, Palme, Persson, JFK, etc.) + aktivister (Greta Thunberg) + bredare "cultural-person"/"celebrity"-buckets (Astrid Lindgren, Ingmar Bergman, MrBeast, PewDiePie, Kim Kardashian, Kylie Jenner, Mark Zuckerberg, Steve Jobs) togs bort vid politiker-purge:n 2026-05-21. Kvarvarande person-bilder är `artist` (musiker), `actor` (skådespelare), `athlete` (idrottare) + ev. `character` (fiktiva — parkerade pga ©). **Fiktiva karaktärer (Elsa, Spider-Man, Mario, Sonic, Peppa Pig, Bluey, Wednesday Addams) togs bort 2026-05-10** — officiella karaktärs-illustrationer är upphovsrättsskyddade och kan inte användas i kommersiell quiz-app utan licens. Återinför ev. via skaparen (Miyamoto → Mario, Idina Menzel → Elsa).
@@ -1303,34 +1349,32 @@ interface HintLibrary { categoryLabel, nationality, hints: HintItem[] }
 
 **`HINTS_LIBRARY_MANUAL`** (~145 manuellt kuraterade items, 122 av 135 ej-unknown har ≥10 hints). Struktureras som `const HINTS_LIBRARY_MANUAL` + importerat `HINTS_LIBRARY_GENERATED` (auto-gen via script) → `export const HINTS_LIBRARY = { ...generated, ...manual }` (manuella åsidosätter). Kategorier inkluderar: Artists × 4 gen, Actors × 4 gen, Athletes (svenska + internationella), Band (svenska + internationella), Characters (animerade + fiktiva roller).
 
-**`HINTS_REGION_MAP`** ([src/utils/hintsData.ts](src/utils/hintsData.ts)) — lookup-tabell: item-id → `HintRegionScope`:
-```ts
-type HintRegionScope = 'sweden' | 'all' | 'nordic' | 'unknown-region';
-// 'sweden'         = stark igenkänning bland svenska spelare (DEFAULT om ej listat)
-// 'all'            = icke-svenska men hög igenkänning bland svenska spelare
-//                    → catalog region: ["sweden","global"]
-// 'nordic'         = nordisk igenkänning → visas för svenska spelare (["sweden","nordic"])
-// 'unknown-region' = för svag igenkänning för V1 → utesluts HELT från quiz + hints-gen
-```
-`getHintRegionScope(id): HintRegionScope` — helper, default `'sweden'`. Stavfel `'unkown-region'` är ett vanligt fel vid manuell redigering — kör `npx tsc --noEmit --skipLibCheck` efteråt för att fånga det.
+**`HINTS_REGION_MAP` är @deprecated sedan 2026-08-11 — RÖR DEN INTE FÖR ATT ÄNDRA REGION.**
 
-**`unknown-region`-filter i quiz** ([app/quiz.tsx](app/quiz.tsx)):
-```ts
-const IMAGE_SEED_QUESTIONS = IMAGE_QUIZ_QUESTIONS
-  .filter(q => getHintRegionScope(q.id) !== 'unknown-region')
-  .map((q, i, arr) => ({ ..., totalQuestions: arr.length }));
-```
-Items med `unknown-region` når aldrig `gameQuestions`-poolen.
+Bild-items hade tidigare **TVÅ** region-sanningar: katalogens `region:` exporterades aldrig, så klienten läste `HINTS_REGION_MAP` i stället. 411 av 487 items motsade varandra (t.ex. Tom Hanks `["sweden"]` i katalogen men `global` i spelet; Audrey Hepburn `["sweden"]` i katalogen men helt utesluten). Fältet man naturligt redigerade var det som inte gjorde något.
+
+**Migrationen** (commit `b7b4c7d`) gjorde katalogen till enda källan:
+1. 488 items fick sin levande region skriven till katalog-YAML:en.
+2. `export-image-questions.ts` emittar nu `region` (union över fil-träffar, samma princip som `audiences`).
+3. [quiz.tsx](app/quiz.tsx) filtrerar bild-items med **exakt samma anrop** som musik-items:
+   ```ts
+   IMAGE_QUIZ_QUESTIONS.filter(q => isItemInRegionScope(q.region, PLAYER_COUNTRY) && …)
+   ```
+4. `fetch-hints-data.ts` läser katalogens `item.region`; dess `loadManualRegionMap`-regexskrapning är borttagen.
+
+Verifierat: **836/836 bild-frågor hade identisk synlighet före/efter.**
+
+**Ändra region → redigera `backend/content/catalog/*.yaml` + kör `npm run export-image-questions`.** Map:en ligger kvar som historiskt underlag; ingen kod läser den, och `getHintRegionScope` är en oanvänd accessor som kan raderas när migrationen suttit ett par releaser. `HintRegionScope`-typen har `'all'` som deprecated alias för `'global'`.
 
 **`selectHints`** ([src/utils/hintsGenerator.ts](src/utils/hintsGenerator.ts)): tar `HintLibrary` + `count=15`. Alltid alla P5. Fyller upp med P4→P1 (shuffle per prioritetshink). Sorterar ASC för display (P1 first). Fisher-Yates shuffle → ny kombination varje runda.
 
 **Auto-generering** ([backend/scripts/fetch-hints-data.ts](backend/scripts/fetch-hints-data.ts)):
-- Läser alla YAML image-katalog-filer, filtrerar `unknown-region` + manuella items.
+- Läser alla YAML image-katalog-filer, filtrerar bort manuella items + allt som inte når en spelare (`isRegionIncluded` speglar hierarkin: `global/europe/nordic/sweden` inkluderas, `unknown-region` inte).
 - Wikidata API: `wbsearchentities` + `wbgetentities` → P569 (bd), P19 (bp), P27 (nationality), P106 (occupation), P54 (clubs+dates), P1618 (jersey#), P2048 (height), P166 (awards), P800 (notable works).
 - Throttle 3 req/sek (~4-10 min för full körning). `--resume` återupptar avbruten körning. `--dry` visar utan att skriva.
 - Output: `src/utils/hintsDataGenerated.ts` — `HINTS_LIBRARY_GENERATED` tom placeholder tills script körts.
 - Kör: `cd backend && npm run fetch-hints-data` (eller `fetch-hints-data-dry` / `fetch-hints-data-resume`).
-- **Stavfel-fälla**: `loadManualRegionMap` regex matchar `'unknown-region'` — stavfel `'unkown-region'` i filen ger att items EJ filtreras bort som förväntat. Kör alltid TypeScript-check efter manuell redigering av `hintsData.ts`.
+- **Bugg fixad 2026-08-11**: `isRegionIncluded` exkluderade `'global'` enligt taggens GAMLA innebörd och hade hoppat över hints-generering för alla 312 globalt igenkända items. (Den tidigare noterade stavfels-fällan kring `loadManualRegionMap` är obsolet — funktionen är borttagen.)
 
 **Demo** ([app/guess-who-demo.tsx](app/guess-who-demo.tsx), route `/guess-who-demo`): person-picker, assistance, svarstid, Replay + Reveal. Importerar `HINTS_LIBRARY` och passerar `library={HINTS_LIBRARY[id]}` till `HintsQuizCard`.
 
