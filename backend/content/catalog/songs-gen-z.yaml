@@ -1034,7 +1034,7 @@ items:
 
   - id: markoolio-sommar-och-sol
     displayName: "Sommar och sol — Markoolio"
-    correctYear: 1999
+    correctYear: 1998
     probability: 85
     wikimediaSearchHints: ["Markoolio Swedish rapper singer Sommar och sol"]
     answerMethods: ["timeline"]
@@ -1088,7 +1088,7 @@ items:
         notes: "Official music video. ESC 2009 Turkey entry."
   - id: southside-spinners-luvstruck
     displayName: "Luvstruck — Southside Spinners"
-    correctYear: 2000
+    correctYear: 1998
     probability: 78
     wikimediaSearchHints: ["Southside Spinners Luvstruck 2000 trance dance"]
     answerMethods: ["timeline"]

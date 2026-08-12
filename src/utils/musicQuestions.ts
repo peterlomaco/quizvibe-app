@@ -4601,6 +4601,22 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "lili-sussie-oh-mama",
+    "displayName": "Oh Mama — Lili & Sussie",
+    "correctYear": 1987,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "spotifyTrackId": "4orJQkF2exPD4xSFmMY00U",
+    "youtubeClips": []
+  },
+  {
     "id": "lotta-engberg-fyra-bugg",
     "displayName": "Fyra bugg och en Coca Cola — Lotta Engberg",
     "correctYear": 1987,
@@ -5036,22 +5052,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "notes": "Officiell musikvideo-re-upload — stabil sedan 2014."
       }
     ]
-  },
-  {
-    "id": "lili-sussie-oh-mama",
-    "displayName": "Oh Mama — Lili & Sussie",
-    "correctYear": 1989,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "millennials",
-      "gen-x"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "spotifyTrackId": "4orJQkF2exPD4xSFmMY00U",
-    "youtubeClips": []
   },
   {
     "id": "madonna-like-a-prayer",
@@ -7040,6 +7040,34 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "markoolio-sommar-och-sol",
+    "displayName": "Sommar och sol — Markoolio",
+    "correctYear": 1998,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-z",
+      "millennials"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Summer"
+    ],
+    "spotifyTrackId": "4bpqcGVSveDZ5E3rgr9v2y",
+    "youtubeClips": [
+      {
+        "videoId": "98ID_halfhs",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "SandraTornblad",
+        "license": "standard",
+        "notes": "Musikvideo-re-upload av originalet (1999)."
+      }
+    ]
+  },
+  {
     "id": "mulan-1998",
     "displayName": "Mulan",
     "correctYear": 1998,
@@ -7077,6 +7105,31 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "spotifyTrackId": "2XkMVyMLZhrUivl7XuhidO",
     "youtubeClips": []
+  },
+  {
+    "id": "southside-spinners-luvstruck",
+    "displayName": "Luvstruck — Southside Spinners",
+    "correctYear": 1998,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-z",
+      "millennials"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "spotifyTrackId": "5kW0BW8B5hjrbpe0OuFUr9",
+    "youtubeClips": [
+      {
+        "videoId": "FOfXUmOiUDg",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Southside Spinners",
+        "license": "standard",
+        "notes": "Official video 2000."
+      }
+    ]
   },
   {
     "id": "charlotte-nilsson-tusen-och-en-natt",
@@ -7191,34 +7244,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 221,
         "channelTitle": "Lou Bega Official",
         "license": "standard"
-      }
-    ]
-  },
-  {
-    "id": "markoolio-sommar-och-sol",
-    "displayName": "Sommar och sol — Markoolio",
-    "correctYear": 1999,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "gen-z",
-      "millennials"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "Summer"
-    ],
-    "spotifyTrackId": "4bpqcGVSveDZ5E3rgr9v2y",
-    "youtubeClips": [
-      {
-        "videoId": "98ID_halfhs",
-        "startSec": 0,
-        "endSec": 30,
-        "channelTitle": "SandraTornblad",
-        "license": "standard",
-        "notes": "Musikvideo-re-upload av originalet (1999)."
       }
     ]
   },
@@ -7580,31 +7605,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Movieclips Classic Trailers",
         "license": "standard",
         "notes": "Snatch (2000) — officiell trailer. Vinnie Jones (f.d. Wimbledon FC) som Bullet Tooth Tony. genrePackages:sport → surfar under Athletes/Sport-filtret trots Film-nativ-kategori."
-      }
-    ]
-  },
-  {
-    "id": "southside-spinners-luvstruck",
-    "displayName": "Luvstruck — Southside Spinners",
-    "correctYear": 2000,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "gen-z",
-      "millennials"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "spotifyTrackId": "5kW0BW8B5hjrbpe0OuFUr9",
-    "youtubeClips": [
-      {
-        "videoId": "FOfXUmOiUDg",
-        "startSec": 0,
-        "endSec": 30,
-        "channelTitle": "Southside Spinners",
-        "license": "standard",
-        "notes": "Official video 2000."
       }
     ]
   },
