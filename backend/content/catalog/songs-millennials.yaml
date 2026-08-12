@@ -560,7 +560,7 @@ items:
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: nirvana-come-as-you-are
     displayName: "Come as You Are — Nirvana"
-    correctYear: 1992
+    correctYear: 1991
     probability: 84
     wikimediaSearchHints: ["Nirvana Come as You Are 1992"]
     answerMethods: ["timeline"]
@@ -579,7 +579,7 @@ items:
     spotifyTrackId: "4orJQkF2exPD4xSFmMY00U"
   - id: roxette-the-look
     displayName: "The Look — Roxette"
-    correctYear: 1989
+    correctYear: 1988
     probability: 86
     wikimediaSearchHints: ["Roxette The Look 1989"]
     answerMethods: ["timeline"]
@@ -717,7 +717,7 @@ items:
         channelTitle: "Stevie Wonder - Topic"
   - id: bryan-adams-summer-of-69
     displayName: "Summer of '69 — Bryan Adams"
-    correctYear: 1985
+    correctYear: 1984
     probability: 86
     wikimediaSearchHints: ["Bryan Adams Summer of 69 1985"]
     answerMethods: ["timeline"]

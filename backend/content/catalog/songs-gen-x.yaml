@@ -426,7 +426,7 @@ items:
         notes: "Curerad 2026-05-29 — officiell album-audio via YouTube Topic (2024 remaster av 1972-originalet, ej Rock Aid Armenia-versionen)."
   - id: fleetwood-mac-go-your-own-way
     displayName: "Go Your Own Way — Fleetwood Mac"
-    correctYear: 1977
+    correctYear: 1976
     probability: 82
     wikimediaSearchHints: ["Fleetwood Mac Go Your Own Way 1977"]
     answerMethods: ["timeline"]
@@ -913,7 +913,7 @@ items:
 
   - id: ted-gardestad-vilken-harlig-dag
     displayName: "Oh, vilken härlig dag — Ted Gärdestad"
-    correctYear: 1979
+    correctYear: 1973
     probability: 88
     wikimediaSearchHints: ["Ted Gärdestad Swedish singer songwriter Sol vind och vatten"]
     answerMethods: ["timeline"]

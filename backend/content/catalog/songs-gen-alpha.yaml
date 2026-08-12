@@ -54,7 +54,7 @@ items:
   # 2014
   - id: pharrell-williams-happy
     displayName: "Happy — Pharrell Williams"
-    correctYear: 2014
+    correctYear: 2013
     probability: 92
     wikimediaSearchHints: ["Pharrell Williams Happy Despicable Me 2"]
     answerMethods: ["timeline"]

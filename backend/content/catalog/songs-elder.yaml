@@ -89,7 +89,7 @@ items:
   # Over the Rainbow flyttad till songs-all.yaml (cross-gen-iconic) 2026-05-22.
   - id: glenn-miller-in-the-mood
     displayName: "In the Mood — Glenn Miller"
-    correctYear: 1940
+    correctYear: 1939
     probability: 90
     wikimediaSearchHints: ["Glenn Miller In the Mood 1940"]
     answerMethods: ["timeline"]

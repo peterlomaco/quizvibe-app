@@ -103,7 +103,7 @@ items:
         notes: "4K Remastered 60FPS — rörlig MV (cheerleaders/gymnastiksal). Ikonisk riff-intro."
   - id: whitney-houston-i-will-always-love-you
     displayName: "I Will Always Love You — Whitney Houston"
-    correctYear: 1993
+    correctYear: 1992
     probability: 95
     wikimediaSearchHints: ["Whitney Houston I Will Always Love You Bodyguard"]
     answerMethods: ["timeline"]

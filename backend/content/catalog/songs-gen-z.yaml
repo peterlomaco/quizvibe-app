@@ -111,7 +111,7 @@ items:
         channelTitle: "Coldplay"
   - id: dr-dre-the-next-episode
     displayName: "The Next Episode — Dr. Dre ft. Snoop Dogg"
-    correctYear: 2000
+    correctYear: 1999
     probability: 88
     wikimediaSearchHints: ["Dr Dre The Next Episode 2001"]
     answerMethods: ["timeline"]
@@ -435,7 +435,7 @@ items:
         notes: "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
   - id: the-killers-mr-brightside
     displayName: "Mr. Brightside — The Killers"
-    correctYear: 2004
+    correctYear: 2003
     probability: 86
     wikimediaSearchHints: ["The Killers Mr Brightside 2004"]
     answerMethods: ["timeline"]

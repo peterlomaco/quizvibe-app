@@ -170,24 +170,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "judy-garland-over-the-rainbow",
-    "displayName": "Over the Rainbow — Judy Garland",
-    "correctYear": 1939,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "all"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "spotifyTrackId": "1zzJOF5gOMXzqoUCbOg4JE",
-    "youtubeClips": []
-  },
-  {
     "id": "glenn-miller-in-the-mood",
     "displayName": "In the Mood — Glenn Miller",
-    "correctYear": 1940,
+    "correctYear": 1939,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
@@ -206,6 +191,21 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "notes": "Officiell album-audio via YouTube Topic. Iconic swing-intro."
       }
     ]
+  },
+  {
+    "id": "judy-garland-over-the-rainbow",
+    "displayName": "Over the Rainbow — Judy Garland",
+    "correctYear": 1939,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "all"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "spotifyTrackId": "1zzJOF5gOMXzqoUCbOg4JE",
+    "youtubeClips": []
   },
   {
     "id": "bambi-1942",
@@ -2060,6 +2060,34 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "ted-gardestad-vilken-harlig-dag",
+    "displayName": "Oh, vilken härlig dag — Ted Gärdestad",
+    "correctYear": 1973,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Summer"
+    ],
+    "spotifyTrackId": "1Taqw1VEHl8Gy9qAZtRLAq",
+    "youtubeClips": [
+      {
+        "videoId": "NcqSPjcFlXc",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Ted Gärdestad - Topic",
+        "license": "standard",
+        "notes": "Studio-audio från officiell Topic-kanal."
+      }
+    ]
+  },
+  {
     "id": "abba-waterloo",
     "displayName": "Waterloo — ABBA",
     "correctYear": 1974,
@@ -2403,6 +2431,30 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": []
   },
   {
+    "id": "fleetwood-mac-go-your-own-way",
+    "displayName": "Go Your Own Way — Fleetwood Mac",
+    "correctYear": 1976,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "oiosqtFLBBA",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Fleetwood Mac",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (3)."
+      }
+    ]
+  },
+  {
     "id": "nadia-comaneci-montreal-1976",
     "displayName": "Nadia Comăneci perfekta 10:or i Montreal",
     "correctYear": 1976,
@@ -2546,30 +2598,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "FLEETWOOD MAC - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
-      }
-    ]
-  },
-  {
-    "id": "fleetwood-mac-go-your-own-way",
-    "displayName": "Go Your Own Way — Fleetwood Mac",
-    "correctYear": 1977,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "gen-x",
-      "elder"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "oiosqtFLBBA",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Fleetwood Mac",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (3)."
       }
     ]
   },
@@ -2890,34 +2918,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "spotifyTrackId": "2XbwFs07dfm2MGQuYmRMZT",
     "youtubeClips": []
-  },
-  {
-    "id": "ted-gardestad-vilken-harlig-dag",
-    "displayName": "Oh, vilken härlig dag — Ted Gärdestad",
-    "correctYear": 1979,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "gen-x",
-      "elder"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "Summer"
-    ],
-    "spotifyTrackId": "1Taqw1VEHl8Gy9qAZtRLAq",
-    "youtubeClips": [
-      {
-        "videoId": "NcqSPjcFlXc",
-        "startSec": 0,
-        "endSec": 30,
-        "channelTitle": "Ted Gärdestad - Topic",
-        "license": "standard",
-        "notes": "Studio-audio från officiell Topic-kanal."
-      }
-    ]
   },
   {
     "id": "vikingarna-djingis-kan",
@@ -3927,6 +3927,30 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "bryan-adams-summer-of-69",
+    "displayName": "Summer of '69 — Bryan Adams",
+    "correctYear": 1984,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "spotifyTrackId": "0GONea6G2XdnHWjNZd6zt3",
+    "youtubeClips": [
+      {
+        "videoId": "9f06QZCVUHg",
+        "startSec": 10,
+        "endSec": 55,
+        "channelTitle": "Bryan Adams",
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "carl-lewis-los-angeles-1984",
     "displayName": "Carl Lewis tar 4 OS-guld Los Angeles",
     "correctYear": 1984,
@@ -4362,30 +4386,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 1985 vinnare — Norge."
-      }
-    ]
-  },
-  {
-    "id": "bryan-adams-summer-of-69",
-    "displayName": "Summer of '69 — Bryan Adams",
-    "correctYear": 1985,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "millennials",
-      "gen-x"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "spotifyTrackId": "0GONea6G2XdnHWjNZd6zt3",
-    "youtubeClips": [
-      {
-        "videoId": "9f06QZCVUHg",
-        "startSec": 10,
-        "endSec": 55,
-        "channelTitle": "Bryan Adams",
-        "license": "standard"
       }
     ]
   },
@@ -4840,6 +4840,31 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "roxette-the-look",
+    "displayName": "The Look — Roxette",
+    "correctYear": 1988,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "spotifyTrackId": "79LdvxXi5JYUjhnO7v9Fi3",
+    "youtubeClips": [
+      {
+        "videoId": "--8mvZzZIcU",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Enhanced Music Videos",
+        "license": "standard",
+        "notes": "Remastered Full HD musikvideo. Officiell MV-innehåll, ersätter Topic-versionen (statisk albumkonst)."
+      }
+    ]
+  },
+  {
     "id": "thomas-di-leva-vi-har-bara-varandra",
     "displayName": "Vi har bara varandra — Thomas Di Leva",
     "correctYear": 1988,
@@ -5130,31 +5155,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "roxette-the-look",
-    "displayName": "The Look — Roxette",
-    "correctYear": 1989,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "millennials",
-      "gen-x"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "spotifyTrackId": "79LdvxXi5JYUjhnO7v9Fi3",
-    "youtubeClips": [
-      {
-        "videoId": "--8mvZzZIcU",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Enhanced Music Videos",
-        "license": "standard",
-        "notes": "Remastered Full HD musikvideo. Officiell MV-innehåll, ersätter Topic-versionen (statisk albumkonst)."
-      }
-    ]
-  },
-  {
     "id": "acdc-thunderstruck",
     "displayName": "Thunderstruck — AC/DC",
     "correctYear": 1990,
@@ -5421,6 +5421,30 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Michael Jackson - Topic",
         "license": "standard",
         "notes": "Officiell album-audio via YouTube Topic. Iconic guitar-riff."
+      }
+    ]
+  },
+  {
+    "id": "nirvana-come-as-you-are",
+    "displayName": "Come as You Are — Nirvana",
+    "correctYear": 1991,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "f1IdyrhOrGs",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Nirvana - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
       }
     ]
   },
@@ -5739,30 +5763,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "nirvana-come-as-you-are",
-    "displayName": "Come as You Are — Nirvana",
-    "correctYear": 1992,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "millennials",
-      "gen-x"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "f1IdyrhOrGs",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Nirvana - Topic",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
-      }
-    ]
-  },
-  {
     "id": "shakespears-sister-stay",
     "displayName": "Stay — Shakespears Sister",
     "correctYear": 1992,
@@ -5857,6 +5857,29 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "hejatysklanduuups",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
+    "id": "whitney-houston-i-will-always-love-you",
+    "displayName": "I Will Always Love You — Whitney Houston",
+    "correctYear": 1992,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "all"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "tP0zj220CbQ",
+        "startSec": 0,
+        "endSec": 15,
+        "channelTitle": "Whitney Houston - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
       }
     ]
   },
@@ -6014,29 +6037,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "ZorbaMovies",
         "license": "standard",
         "notes": "Trailer. Familjefilm, stark igenkänning hos millennials som barn."
-      }
-    ]
-  },
-  {
-    "id": "whitney-houston-i-will-always-love-you",
-    "displayName": "I Will Always Love You — Whitney Houston",
-    "correctYear": 1993,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "all"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "tP0zj220CbQ",
-        "startSec": 0,
-        "endSec": 15,
-        "channelTitle": "Whitney Houston - Topic",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
       }
     ]
   },
@@ -7159,6 +7159,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "dr-dre-the-next-episode",
+    "displayName": "The Next Episode — Dr. Dre ft. Snoop Dogg",
+    "correctYear": 1999,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-z",
+      "millennials"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "hiphop"
+    ],
+    "spotifyTrackId": "4LwU4Vp6od3Sb08CsP99GC",
+    "youtubeClips": [
+      {
+        "videoId": "f0dkQGfha3A",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Dr. Dre",
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "eiffel-65-blue",
     "displayName": "Blue (Da Ba Dee) — Eiffel 65",
     "correctYear": 1999,
@@ -7399,33 +7426,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "startSec": 0,
         "endSec": 273,
         "channelTitle": "Coldplay",
-        "license": "standard"
-      }
-    ]
-  },
-  {
-    "id": "dr-dre-the-next-episode",
-    "displayName": "The Next Episode — Dr. Dre ft. Snoop Dogg",
-    "correctYear": 2000,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "gen-z",
-      "millennials"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "hiphop"
-    ],
-    "spotifyTrackId": "4LwU4Vp6od3Sb08CsP99GC",
-    "youtubeClips": [
-      {
-        "videoId": "f0dkQGfha3A",
-        "startSec": 0,
-        "endSec": 30,
-        "channelTitle": "Dr. Dre",
         "license": "standard"
       }
     ]
@@ -8089,6 +8089,30 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "the-killers-mr-brightside",
+    "displayName": "Mr. Brightside — The Killers",
+    "correctYear": 2003,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-z",
+      "millennials"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "yVLRhZiZ5Wc",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Rock Preservation Society",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
+      }
+    ]
+  },
+  {
     "id": "white-stripes-seven-nation-army",
     "displayName": "Seven Nation Army — The White Stripes",
     "correctYear": 2003,
@@ -8345,30 +8369,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "MaramaGitz",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
-      }
-    ]
-  },
-  {
-    "id": "the-killers-mr-brightside",
-    "displayName": "Mr. Brightside — The Killers",
-    "correctYear": 2004,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "gen-z",
-      "millennials"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "yVLRhZiZ5Wc",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Rock Preservation Society",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
       }
     ]
   },
@@ -10005,6 +10005,29 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "pharrell-williams-happy",
+    "displayName": "Happy — Pharrell Williams",
+    "correctYear": 2013,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-alpha",
+      "gen-z"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "jv-pYB0Qw9A",
+        "startSec": 0,
+        "endSec": 238,
+        "channelTitle": "AnimeOracle",
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "robin-stjernberg-you",
     "displayName": "You — Robin Stjernberg",
     "correctYear": 2013,
@@ -10172,29 +10195,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Mark Ronson - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
-      }
-    ]
-  },
-  {
-    "id": "pharrell-williams-happy",
-    "displayName": "Happy — Pharrell Williams",
-    "correctYear": 2014,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "gen-alpha",
-      "gen-z"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "jv-pYB0Qw9A",
-        "startSec": 0,
-        "endSec": 238,
-        "channelTitle": "AnimeOracle",
-        "license": "standard"
       }
     ]
   },
