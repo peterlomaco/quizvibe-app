@@ -14,7 +14,7 @@ import { VersusIcon } from '@/src/components/VersusIcon';
 export type HostLobbyType = 'standard' | '1v1';
 
 // VersusIcon (två silhuetter + guld-"vs") bor i src/components/VersusIcon.tsx
-// sedan 2026-08-07 — delas med "Remote Play History"-knappen på Home (MyMatchesSection)
+// sedan 2026-08-07 — delas med "1vs1"-knappen på Home (MyMatchesSection)
 // så duell-läget har EN ikon i appen.
 
 /** Ikon för "Single & Multiplayer mode": **Here&Now** på tre rader —

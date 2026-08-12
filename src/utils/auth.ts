@@ -29,6 +29,7 @@
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { User } from '@supabase/supabase-js';
+import { clearProfile } from './profileStorage';
 import { supabase } from './supabase';
 
 // In-flight Promise så samtidiga anrop (t.ex. både handleJoinAsGuest och
@@ -232,6 +233,13 @@ export async function deleteAccount(): Promise<
       // local storage kan rensas senare via reinstall om det skulle behövas.
       console.warn('[auth] AsyncStorage cleanup failed after delete:', storageErr);
     }
+
+    // multiRemove ovan går förbi clearProfile och rör därför varken den
+    // synkrona profil-spegeln eller profil-notifiern. Utan detta anrop
+    // skulle en re-mountad Home/banner seeda inloggat läge från en stale
+    // spegel och sedan hoppa till utloggat. Idempotent (removeItem på en
+    // redan borttagen nyckel är en no-op).
+    await clearProfile();
 
     // Rensa Supabase session-token. signOut är best-effort — om den
     // failar har user fortfarande en stale token lokalt men auth-user:n

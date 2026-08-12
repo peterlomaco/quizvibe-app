@@ -1,6 +1,6 @@
-// Remote Play History — egen skärm som listar användarens Remote 1v1-dueller.
+// 1vs1 History — egen skärm som listar användarens Remote 1v1-dueller.
 //
-// Nås via huvudknappen "Remote Play History" på Home (MyMatchesSection — knappen
+// Nås via huvudknappen "1vs1" på Home (MyMatchesSection — knappen
 // navigerar hit istället för att fälla ut listan inline, Peter 2026-08-07).
 //
 // Matcherna grupperas i tre kollapsbara sektioner (samma +/−-mönster som
@@ -438,9 +438,9 @@ export default function MyMatchesScreen() {
       <TopUserBanner onBackPress={() => router.replace(backTo)} backLabel="Back" />
       <ScrollView contentContainerStyle={styles.content}>
         {/* Rubrik + 1vs1-märket (två blå silhuetter förbundna av prickar)
-            direkt efter — samma ikon som Home:s "Remote Play History"-knapp. */}
+            direkt efter — samma ikon som Home:s "1vs1"-knapp. */}
         <View style={styles.screenTitleRow}>
-          <Text style={styles.screenTitle}>Remote Play History</Text>
+          <Text style={styles.screenTitle}>1vs1 History</Text>
           <VersusIcon height={30} />
         </View>
         <Text style={styles.screenSubtitle}>

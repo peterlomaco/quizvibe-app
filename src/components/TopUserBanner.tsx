@@ -3,7 +3,7 @@ import React, { useCallback, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Colors, Radius, Spacing } from '../theme';
 import { getAvatarEmojiById } from '../utils/avatars';
-import { loadProfile, type ProfileData } from '../utils/profileStorage';
+import { getCachedProfile, loadProfile, type ProfileData } from '../utils/profileStorage';
 import { QuizVibeQAvatar } from './QuizVibeQAvatar';
 import { GearIcon } from './GearIcon';
 
@@ -59,13 +59,19 @@ interface Props {
  * playerName/avatar i Profile-tabben och sedan kommer tillbaka.
  */
 export function TopUserBanner({ onPress, onBackPress, backLabel = 'Home', profile: profileProp, guestName }: Props) {
-  const [internalProfile, setInternalProfile] = useState<ProfileData | null>(null);
+  // Seedas från den synkrona profil-spegeln så en re-mountad skärm inte
+  // visar "Register or Login"-pillen medan loadProfile:s roundtrip pågår.
+  const [internalProfile, setInternalProfile] = useState<ProfileData | null>(
+    () => getCachedProfile() ?? null,
+  );
   const isControlled = profileProp !== undefined;
 
   useFocusEffect(
     useCallback(() => {
       if (isControlled) return;
       let active = true;
+      const cached = getCachedProfile();
+      if (cached !== undefined) setInternalProfile(cached);
       loadProfile().then((data) => {
         if (active) setInternalProfile(data);
       });

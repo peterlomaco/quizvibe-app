@@ -1,4 +1,7 @@
-// "Remote Play History" — Home-huvudknapp för Remote 1v1-dueller.
+// 1vs1-ingången — Home-huvudknapp för Remote 1v1-dueller. Labeln skiljer
+// sig per variant (Peter 2026-08-12): compact (Home) visar "1vs1", full
+// (Profile → Player history) visar "1vs1 History". Alert-copy i Lobby +
+// Home hänvisar till "1vs1" eftersom det är vad spelaren ser på Home.
 //
 // EN knapp på Home (Peter 2026-08-07 rev 2): tap → navigerar till den
 // dedikerade /my-matches-skärmen där matcherna listas (ingen inline-
@@ -170,16 +173,26 @@ export function MyMatchesSection({ full = false }: { full?: boolean } = {}) {
           pointerEvents none → taps går vidare till knappen. */}
       {!compact && (
         <View style={styles.titleOverlay} pointerEvents="none">
-          <Text style={styles.mainBtnTitle}>Remote Play History</Text>
+          <Text style={styles.mainBtnTitle}>1vs1 History</Text>
         </View>
       )}
       {/* Samma 1vs1-märke som Home:s "Remote Play"-val (blå silhuetter +
           guld-wifi emellan) så duell-läget har EN ikon i appen. marginLeft
           skjuter in den från vänsterkanten så den inte klistrar sig mot
-          rutans ram — mindre inskjut i compact (Peter 2026-08-08) eftersom
-          rutan där bara är en tredjedel bred. */}
-      <View style={{ marginLeft: compact ? Spacing.sm : Spacing.md }}>
+          rutans ram.
+
+          Compact bär dessutom en "1vs1"-etikett direkt efter ikonen (Peter
+          2026-08-12) — ikon + text grupperas i EN nod så knappens
+          space-between fördelar [ikon+text] · [New update] · [pil] i stället
+          för att spreta isär ikonen och etiketten. */}
+      <View
+        style={[
+          styles.iconGroup,
+          { marginLeft: compact ? Spacing.sm : Spacing.md },
+        ]}
+      >
         <VersusIcon height={compact ? 22 : 30} />
+        {compact && <Text style={styles.compactLabel}>1vs1</Text>}
       </View>
       {/* Spacer i full variant → "New update" + pilen grupperas högerställt
           medan titeln ligger kvar centrerad. Compact använder
@@ -258,15 +271,30 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.sm,
   },
-  // Compact (Home, Peter 2026-08-08): smal ruta högerställd på skärmen —
-  // utan titeln behövs bara ikon + signal + pil, så knappen tar en
-  // tredjedel av bredden och ligger kvar på samma höjd i flödet.
+  // Compact (Home): halv skärmbredd, högerställd (Peter 2026-08-12 — var
+  // en tredjedel utan text-etikett). Knappen ligger kvar på samma höjd i
+  // flödet; bara bredden växer, så resten av Home-layouten är orörd.
   mainBtnCompact: {
-    width: '33.33%',
+    width: '50%',
     alignSelf: 'flex-end',
     justifyContent: 'space-between',
     gap: 4,
     paddingHorizontal: 6,
+  },
+  // Ikon + "1vs1"-etikett som EN vänsterställd grupp.
+  iconGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  // Speglar mainBtnTitle-typografin (full-variantens rubrik) så de två
+  // varianterna låter likadant — bara mindre eftersom compact-rutan delar
+  // bredden med "New update"-signalen och pilen.
+  compactLabel: {
+    fontSize: FontSize.md,
+    fontWeight: '600',
+    color: Colors.textPrimary,
+    letterSpacing: 0.3,
   },
   // Gold-signal när någon match ändrat tillstånd sedan senaste besök.
   // Samma typografi som Lobby:s playersWaitingLabel.

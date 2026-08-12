@@ -3570,7 +3570,7 @@ export default function LobbyScreen() {
     });
     Alert.alert(
       '1vs1 lobby saved',
-      'Find it under "Remote Play History" on the Home screen, with status Not started. The lobby stays open for 24 hours.',
+      'Find it under "1vs1" on the Home screen, with status Not started. The lobby stays open for 24 hours.',
       [{ text: 'OK', onPress: () => router.replace('/') }],
     );
   };
@@ -4254,7 +4254,7 @@ export default function LobbyScreen() {
           };
           setRemoteStartPrompt({
             message:
-              'Host has started the 1vs1 match. You have 48 hours to play your questions — now or later via "Remote Play History" on the Home screen.',
+              'Host has started the 1vs1 match. You have 48 hours to play your questions — now or later via "1vs1" on the Home screen.',
             playNow: goPlayNow,
           });
           return;
@@ -5164,7 +5164,7 @@ export default function LobbyScreen() {
     if (remoteMatchId) {
       setRemoteStartPrompt({
         message:
-          'The 1vs1 match has been created. You have 48 hours to play your questions — now or later via "Remote Play History" on the Home screen.',
+          'The 1vs1 match has been created. You have 48 hours to play your questions — now or later via "1vs1" on the Home screen.',
         playNow: () => router.push(quizNav),
       });
       return;

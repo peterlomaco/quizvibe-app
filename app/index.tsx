@@ -33,7 +33,7 @@ import {
 } from '@/src/utils/playerName';
 import { ensureAuthSession, signInWithPlayerName } from '@/src/utils/auth';
 import { containsProfanity } from '@/src/utils/profanity';
-import { clearProfile, loadProfile, playerNameExists, saveProfile, type ProfileData } from '@/src/utils/profileStorage';
+import { clearProfile, getCachedProfile, loadProfile, playerNameExists, saveProfile, type ProfileData } from '@/src/utils/profileStorage';
 import { hasPremiumSubscription } from '@/src/utils/subscriptionStorage';
 import { supabase } from '@/src/utils/supabase';
 import { formatRoomCode, generateRoomCode, isBlockedLetterPair, isLetterCellIndex, ROOM_CODE_DIGITS, ROOM_CODE_LEADING_LETTERS, ROOM_CODE_LENGTH, ROOM_CODE_TRAILING_LETTERS } from '@/src/utils/roomCode';
@@ -541,7 +541,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
           if (my.me.finishedAt != null) {
             Alert.alert(
               'Already played',
-              'You have already played your questions in this 1vs1 match. Check "Remote Play History" for the result.',
+              'You have already played your questions in this 1vs1 match. Check "1vs1" on the Home screen for the result.',
             );
             return;
           }
@@ -1575,7 +1575,11 @@ export default function HomeScreen() {
   // ("QuizVibe user" + "Guest login / Non-registered") — jämförelse
   // user vs guest (USER_VS_GUEST_ROWS + PREMIUM_FEATURES).
   const [compareInfoVisible, setCompareInfoVisible] = useState(false);
-  const [profile, setProfile] = useState<ProfileData | null>(null);
+  // Seedas från den synkrona profil-spegeln, INTE från null: Home nås alltid
+  // via router.replace('/') (= full re-mount), och med null-start renderades
+  // utloggat läge under hela loadProfile:s Supabase-roundtrip innan det
+  // hoppade till inloggat. Spegeln ger rätt läge redan på första framen.
+  const [profile, setProfile] = useState<ProfileData | null>(() => getCachedProfile() ?? null);
   const [profileMenuVisible, setProfileMenuVisible] = useState(false);
   const [profileMenuStep, setProfileMenuStep] = useState<'menu' | 'login' | 'register' | 'forgot'>('menu');
   // Pending-flagga för ?openRegister=1-deeplinken (guest-hostens "Activate
@@ -1844,6 +1848,11 @@ export default function HomeScreen() {
   useFocusEffect(
     useCallback(() => {
       let active = true;
+      // Synk-spegeln först (kan ha hunnit hydreras efter mount-seedningen),
+      // sedan den auktoritativa async-laddningen. `undefined` = ännu inte
+      // hydrerad → rör inte state, annars hade vi blinkat "utloggad".
+      const cached = getCachedProfile();
+      if (cached !== undefined) setProfile(cached);
       loadProfile().then((data) => {
         if (active) setProfile(data);
       });

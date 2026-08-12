@@ -5,7 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { QuizVibeQAvatar } from './QuizVibeQAvatar';
 import { ShoppingCartIcon } from './ShoppingCartIcon';
 import { Colors, FontSize, Radius, Spacing } from '../theme';
-import { loadProfile, subscribeProfileChanges } from '../utils/profileStorage';
+import { getCachedProfile, loadProfile, subscribeProfileChanges } from '../utils/profileStorage';
 import { supabase } from '../utils/supabase';
 
 export const BOTTOM_BANNER_HEIGHT = 52;
@@ -46,7 +46,10 @@ export function BottomBanner() {
   //   2. supabase auth-events — SIGNED_IN fyrar vid login (profilen läses
   //      då från Supabase innan lokala cachen hunnit skrivas).
   //   3. pathname-byten — belt-and-suspenders vid navigation.
-  const [loggedIn, setLoggedIn] = useState(false);
+  //   4. den synkrona profil-spegeln (getCachedProfile) som seed — annars
+  //      försvann bannern under varje route-bytes loadProfile-roundtrip och
+  //      poppade tillbaka en stund senare.
+  const [loggedIn, setLoggedIn] = useState(() => !!getCachedProfile());
 
   useEffect(() => {
     let cancelled = false;
@@ -54,6 +57,10 @@ export function BottomBanner() {
       const profile = await loadProfile();
       if (!cancelled) setLoggedIn(!!profile);
     };
+    // Spegeln först (synkront), sedan den auktoritativa laddningen.
+    // `undefined` = ohydrerad → rör inte state.
+    const cached = getCachedProfile();
+    if (cached !== undefined) setLoggedIn(!!cached);
     void refresh();
     const unsubscribeProfile = subscribeProfileChanges(() => {
       void refresh();

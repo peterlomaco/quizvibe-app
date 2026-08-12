@@ -260,6 +260,44 @@ async function getCurrentUser() {
   return data.user;
 }
 
+// ── Synkron profil-spegel (login-state utan flimmer) ────────────────────
+// `undefined` = ännu inte hydrerad (vi VET inte om användaren är inloggad),
+// `null` = utloggad, objekt = inloggad.
+//
+// Varför: Home nås ALLTID via router.replace('/') (BottomBanner, Profile,
+// Store, FAQ, Lobby) vilket är en full re-mount — skärmens `profile`-state
+// börjar då om på null medan loadProfile() gör en Supabase-roundtrip
+// (auth.getUser + profiles-select). Under den väntan renderades utloggat
+// läge, som sedan hoppade till inloggat. Spegeln låter en re-mountad skärm
+// rendera rätt läge redan på första framen.
+let cachedProfile: ProfileData | null | undefined = undefined;
+
+/**
+ * Senast kända profil, synkront. Returnerar `undefined` när spegeln ännu
+ * inte hydrerats — call-sites ska då INTE tolka det som "utloggad" utan
+ * vänta in loadProfile().
+ */
+export function getCachedProfile(): ProfileData | null | undefined {
+  return cachedProfile;
+}
+
+// Värm spegeln från AsyncStorage direkt vid modul-load så även app-cold-start
+// har rätt läge innan första skärm-renderingen. En riktig loadProfile() som
+// hinner före vinner (guarden nedan) — den har färskare data.
+// loadFromAsyncStorage används (i stället för en egen getItem) så legacy-
+// migrationerna (nickname→playerName, skill→assistance) och fantom-cache-
+// saneringen gäller även spegeln — annars kunde en legacy-profil rendera
+// tomt playerName på första framen.
+void (async () => {
+  try {
+    const cached = await loadFromAsyncStorage();
+    // En riktig loadProfile() kan ha hunnit före — den har färskare data.
+    if (cachedProfile === undefined) cachedProfile = cached;
+  } catch {
+    // Best-effort — loadProfile() hydrerar spegeln ändå strax efter.
+  }
+})();
+
 // ── Profil-change-notifier ──────────────────────────────────────────────
 // Lättviktig in-memory event-bus så komponenter utanför screen-trädet
 // (BottomBanner i app/_layout.tsx) kan reagera på login/logout utan
@@ -298,6 +336,7 @@ export async function saveProfile(data: ProfileData): Promise<void> {
     console.warn('[profileStorage] Failed to save profile to AsyncStorage:', err);
     throw err;
   }
+  cachedProfile = data;
   notifyProfileChanged();
   const user = await getCurrentUser();
   if (!user) return;
@@ -319,6 +358,13 @@ export async function saveProfile(data: ProfileData): Promise<void> {
  * raden, returnera.
  */
 export async function loadProfile(): Promise<ProfileData | null> {
+  const profile = await loadProfileFresh();
+  // Håll den synkrona spegeln färsk så nästa skärm-mount slipper flimra.
+  cachedProfile = profile;
+  return profile;
+}
+
+async function loadProfileFresh(): Promise<ProfileData | null> {
   const user = await getCurrentUser();
 
   // Pre-login: bara AsyncStorage (guest-mode/legacy).
@@ -518,6 +564,7 @@ export async function clearProfile(): Promise<void> {
   } catch (err) {
     console.warn('[profileStorage] Failed to clear profile from AsyncStorage:', err);
   }
+  cachedProfile = null;
   notifyProfileChanged();
 }
 
