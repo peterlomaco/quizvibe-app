@@ -194,7 +194,7 @@ items:
   # 2020
   - id: harry-styles-watermelon-sugar
     displayName: "Watermelon Sugar — Harry Styles"
-    correctYear: 2020
+    correctYear: 2019
     probability: 88
     wikimediaSearchHints: ["Harry Styles Watermelon Sugar Fine Line"]
     answerMethods: ["timeline"]
@@ -364,7 +364,7 @@ items:
         notes: "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
   - id: sia-cheap-thrills
     displayName: "Cheap Thrills — Sia"
-    correctYear: 2016
+    correctYear: 2015
     probability: 83
     wikimediaSearchHints: ["Sia Cheap Thrills 2016"]
     answerMethods: ["timeline"]
@@ -480,7 +480,7 @@ items:
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (18)."
   - id: lewis-capaldi-someone-you-loved
     displayName: "Someone You Loved — Lewis Capaldi"
-    correctYear: 2019
+    correctYear: 2018
     probability: 82
     wikimediaSearchHints: ["Lewis Capaldi Someone You Loved 2019"]
     answerMethods: ["timeline"]

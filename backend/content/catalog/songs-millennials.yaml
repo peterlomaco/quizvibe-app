@@ -299,7 +299,7 @@ items:
   # I Will Always Love You flyttad till songs-all.yaml (cross-gen-iconic) 2026-05-22.
   - id: 4-non-blondes-whats-up
     displayName: "What's Up? — 4 Non Blondes"
-    correctYear: 1993
+    correctYear: 1992
     probability: 85
     wikimediaSearchHints: ["4 Non Blondes What's Up"]
     answerMethods: ["timeline"]
@@ -312,7 +312,7 @@ items:
   # 1994
   - id: ace-of-base-the-sign
     displayName: "The Sign — Ace of Base"
-    correctYear: 1994
+    correctYear: 1993
     probability: 92
     wikimediaSearchHints: ["Ace of Base The Sign"]
     answerMethods: ["timeline"]
@@ -469,7 +469,7 @@ items:
         notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: scorpions-wind-of-change
     displayName: "Wind of Change — Scorpions"
-    correctYear: 1991
+    correctYear: 1990
     probability: 83
     wikimediaSearchHints: ["Scorpions Wind of Change 1991"]
     answerMethods: ["timeline"]

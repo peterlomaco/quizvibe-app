@@ -2159,6 +2159,31 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "abba-mamma-mia",
+    "displayName": "Mamma Mia — ABBA",
+    "correctYear": 1975,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "spotifyTrackId": "2TxCwUlqaOH3TIyJqGgR91",
+    "youtubeClips": [
+      {
+        "videoId": "KMViJKmAV4M",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "ABBA - Topic",
+        "license": "standard",
+        "notes": "Curerad 2026-05-29 — officiell album-audio via YouTube Topic (ABBA studio-version, ej film-soundtrack)."
+      }
+    ]
+  },
+  {
     "id": "bjorn-skifs-michelangelo",
     "displayName": "Michelangelo — Björn Skifs",
     "correctYear": 1975,
@@ -2317,31 +2342,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 1975 vinnare — Nederländerna."
-      }
-    ]
-  },
-  {
-    "id": "abba-mamma-mia",
-    "displayName": "Mamma Mia — ABBA",
-    "correctYear": 1976,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "gen-x",
-      "elder"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "spotifyTrackId": "2TxCwUlqaOH3TIyJqGgR91",
-    "youtubeClips": [
-      {
-        "videoId": "KMViJKmAV4M",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "ABBA - Topic",
-        "license": "standard",
-        "notes": "Curerad 2026-05-29 — officiell album-audio via YouTube Topic (ABBA studio-version, ej film-soundtrack)."
       }
     ]
   },
@@ -5254,6 +5254,30 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "scorpions-wind-of-change",
+    "displayName": "Wind of Change — Scorpions",
+    "correctYear": 1990,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "F_-ZuVy76yg",
+        "startSec": 0,
+        "endSec": 15,
+        "channelTitle": "Scorpions - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
     "id": "sinead-oconnor-nothing-compares-2-u",
     "displayName": "Nothing Compares 2 U — Sinéad O'Connor",
     "correctYear": 1990,
@@ -5425,30 +5449,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "scorpions-wind-of-change",
-    "displayName": "Wind of Change — Scorpions",
-    "correctYear": 1991,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "millennials",
-      "gen-x"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "F_-ZuVy76yg",
-        "startSec": 0,
-        "endSec": 15,
-        "channelTitle": "Scorpions - Topic",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
-      }
-    ]
-  },
-  {
     "id": "seal-crazy",
     "displayName": "Crazy — Seal",
     "correctYear": 1991,
@@ -5515,6 +5515,30 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Daniel Risarp",
         "license": "standard",
         "notes": "Refined query 2026-05-27 — 'Mats Sundin avgör när Tre Kronor tar VM guld 1991'."
+      }
+    ]
+  },
+  {
+    "id": "4-non-blondes-whats-up",
+    "displayName": "What's Up? — 4 Non Blondes",
+    "correctYear": 1992,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "B6GdsRIbTSk",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "4 Non Blondes - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
       }
     ]
   },
@@ -5837,8 +5861,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "4-non-blondes-whats-up",
-    "displayName": "What's Up? — 4 Non Blondes",
+    "id": "ace-of-base-the-sign",
+    "displayName": "The Sign — Ace of Base",
     "correctYear": 1993,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
@@ -5849,14 +5873,15 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "sweden"
     ],
+    "spotifyTrackId": "0hrBpAOgrt8RXigk83LLNE",
     "youtubeClips": [
       {
-        "videoId": "B6GdsRIbTSk",
+        "videoId": "iqu132vTl5Y",
         "startSec": 30,
         "endSec": 45,
-        "channelTitle": "4 Non Blondes - Topic",
+        "channelTitle": "Ace of Base",
         "license": "standard",
-        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (18)."
       }
     ]
   },
@@ -6012,31 +6037,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Whitney Houston - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
-      }
-    ]
-  },
-  {
-    "id": "ace-of-base-the-sign",
-    "displayName": "The Sign — Ace of Base",
-    "correctYear": 1994,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "millennials",
-      "gen-x"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "spotifyTrackId": "0hrBpAOgrt8RXigk83LLNE",
-    "youtubeClips": [
-      {
-        "videoId": "iqu132vTl5Y",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Ace of Base",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (18)."
       }
     ]
   },
@@ -10330,6 +10330,30 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "sia-cheap-thrills",
+    "displayName": "Cheap Thrills — Sia",
+    "correctYear": 2015,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-alpha",
+      "gen-z"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "spotifyTrackId": "3S4px9f4lceWdKf0gWciFu",
+    "youtubeClips": [
+      {
+        "videoId": "HbzZPpWr4MI",
+        "startSec": 0,
+        "endSec": 45,
+        "channelTitle": "Sia - Topic",
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "wiz-khalifa-charlie-puth-see-you-again",
     "displayName": "See You Again — Wiz Khalifa & Charlie Puth",
     "correctYear": 2015,
@@ -10570,30 +10594,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Sky Sports Retro",
         "license": "standard",
         "notes": "Curerad 2026-05-29 — ögonblicket Leicester blev mästare 2016 (Sky Sports)."
-      }
-    ]
-  },
-  {
-    "id": "sia-cheap-thrills",
-    "displayName": "Cheap Thrills — Sia",
-    "correctYear": 2016,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "gen-alpha",
-      "gen-z"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "spotifyTrackId": "3S4px9f4lceWdKf0gWciFu",
-    "youtubeClips": [
-      {
-        "videoId": "HbzZPpWr4MI",
-        "startSec": 0,
-        "endSec": 45,
-        "channelTitle": "Sia - Topic",
-        "license": "standard"
       }
     ]
   },
@@ -10982,6 +10982,30 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "lewis-capaldi-someone-you-loved",
+    "displayName": "Someone You Loved — Lewis Capaldi",
+    "correctYear": 2018,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-alpha",
+      "gen-z"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "pRIZohFFOMo",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Lewis Capaldi - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
     "id": "lil-nas-x-old-town-road",
     "displayName": "Old Town Road — Lil Nas X",
     "correctYear": 2018,
@@ -11201,6 +11225,29 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "harry-styles-watermelon-sugar",
+    "displayName": "Watermelon Sugar — Harry Styles",
+    "correctYear": 2019,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-alpha",
+      "gen-z"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "dZwffaluIgg",
+        "startSec": 0,
+        "endSec": 178,
+        "channelTitle": "Dan Music",
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "john-lundvik-too-late-for-love",
     "displayName": "Too Late for Love — John Lundvik",
     "correctYear": 2019,
@@ -11224,30 +11271,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "Melodifestivalen 2019 vinnare. ESC 2019 official video."
-      }
-    ]
-  },
-  {
-    "id": "lewis-capaldi-someone-you-loved",
-    "displayName": "Someone You Loved — Lewis Capaldi",
-    "correctYear": 2019,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "gen-alpha",
-      "gen-z"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "pRIZohFFOMo",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Lewis Capaldi - Topic",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
       }
     ]
   },
@@ -11428,29 +11451,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "spotifyTrackId": "3USxtqRwSYz57Ewm6wWRMp",
     "youtubeClips": []
-  },
-  {
-    "id": "harry-styles-watermelon-sugar",
-    "displayName": "Watermelon Sugar — Harry Styles",
-    "correctYear": 2020,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "gen-alpha",
-      "gen-z"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "dZwffaluIgg",
-        "startSec": 0,
-        "endSec": 178,
-        "channelTitle": "Dan Music",
-        "license": "standard"
-      }
-    ]
   },
   {
     "id": "bono-we-are-the-people",

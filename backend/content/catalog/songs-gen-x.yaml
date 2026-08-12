@@ -335,7 +335,7 @@ items:
         notes: "Curerad 2026-05-29 — officiell album-audio via YouTube Topic (1975 studio-version)."
   - id: abba-mamma-mia
     displayName: "Mamma Mia — ABBA"
-    correctYear: 1976
+    correctYear: 1975
     probability: 82
     wikimediaSearchHints: ["ABBA Mamma Mia 1976"]
     answerMethods: ["timeline"]
