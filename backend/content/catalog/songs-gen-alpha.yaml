@@ -2,12 +2,13 @@
 # samtidigt så audience inkluderar båda. Cap:ad vid 2024 (release-år).
 # 2025/2026-items borttagna tills åren har vägt sig kulturellt.
 #
-# Policy (reviderad 2026-08-11 av Peter): correctYear = det år låten FÖRSTA
-# GÅNGEN gick att lyssna på — vilken release som än kom först. Album före
-# singel ⇒ albumåret vinner (t.ex. "Sweet Child o' Mine" = 1987 = Appetite
-# for Destruction, inte 1988 = singeln). Tidigare löd regeln "singel-release-
-# år"; för items i DENNA fil gav båda reglerna samma svar eftersom singlarna
-# nedan alla föregick sina album.
+# Policy (reviderad 2026-08-11 av Peter): correctYear = året för DEN HÄR
+# ARTISTENS första release av spåret — album eller singel, det som kom
+# först (t.ex. "Sweet Child o' Mine" = 1987 = Appetite for Destruction,
+# inte 1988 = singeln). En tidigare inspelning av en ANNAN artist räknas
+# INTE — itemet är artistens inspelning, inte kompositionen. Tidigare löd
+# regeln "singel-release-år"; för items i DENNA fil gav båda reglerna
+# samma svar eftersom singlarna nedan alla föregick sina album.
 #
 # Chart-peak är fortsatt ALDRIG svaret — det är releasen som räknas:
 #   - "Old Town Road" — Lil Nas X: dec 2018 release (ej mainstream-2019-peak)
