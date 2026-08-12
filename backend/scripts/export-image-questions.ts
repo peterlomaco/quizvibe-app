@@ -24,6 +24,7 @@ import {
   FIXED_QUESTION_TEXT,
 } from '../content/schema';
 import { loadDistractorPool } from '../content/distractor-pool';
+import { HINTS_LIBRARY } from '../../src/utils/hintsData';
 
 const ASSETS_DIR = path.join(__dirname, '..', '..', 'assets', 'quiz-images');
 const OUTPUT_PATH = path.join(
@@ -218,10 +219,40 @@ export function getImageQuestionsForGeneration(
 `;
 }
 
+/**
+ * Katalog-items som har ett tillräckligt stort hints-bibliotek men saknar
+ * webp. De ska ändå exporteras: sedan person-bilderna parkerades juridiskt
+ * renderar en "image"-fråga bara flagga + ledtrådar (HintsQuizCard) och rör
+ * aldrig bildfilen — `getQuizImage` är utkommenterad i quiz.tsx. Webp-listan
+ * ensam är alltså en kvarleva som tyst höll nytt hints-innehåll utanför
+ * poolen (6 golfare + 2 fotbollsspelare när det här skrevs 2026-08-12).
+ *
+ * Tröskeln speglar MIN_HINTS_REQUIRED i quiz.tsx — items under den filtreras
+ * ändå bort på klienten.
+ */
+function listHintOnlyIds(catalog: ReturnType<typeof loadCatalog>, withImages: string[]): string[] {
+  const MIN_HINTS_REQUIRED = 10;
+  const haveImage = new Set(withImages);
+  const ids = new Set<string>();
+  for (const file of catalog.files.values()) {
+    if (file.contentForm !== 'image') continue;
+    for (const item of file.items) {
+      if (haveImage.has(item.id)) continue;
+      if ((HINTS_LIBRARY[item.id]?.hints.length ?? 0) >= MIN_HINTS_REQUIRED) ids.add(item.id);
+    }
+  }
+  return [...ids].sort();
+}
+
 async function main(): Promise<void> {
   const catalog = loadCatalog();
-  const ids = listLocalImageIds();
-  console.log(`Found ${ids.length} local images in assets/quiz-images/`);
+  const imageIds = listLocalImageIds();
+  const hintOnlyIds = listHintOnlyIds(catalog, imageIds);
+  const ids = [...imageIds, ...hintOnlyIds].sort();
+  console.log(`Found ${imageIds.length} local images in assets/quiz-images/`);
+  if (hintOnlyIds.length > 0) {
+    console.log(`+ ${hintOnlyIds.length} hints-only items utan webp: ${hintOnlyIds.join(', ')}`);
+  }
 
   const questions: ExportedQuestion[] = [];
   for (const id of ids) {

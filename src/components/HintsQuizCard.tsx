@@ -20,9 +20,10 @@ import {
   View,
 } from 'react-native';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
-import type { HintItem, HintLibrary } from '../utils/hintsData';
+import type { HintLibrary } from '../utils/hintsData';
 import { countryToFlagEmoji } from '../utils/hintsData';
 import { selectHints } from '../utils/hintsGenerator';
+import { resolveHints, type ResolvedHint } from '../utils/hintsText';
 import { createSeededRng } from '../utils/seededRandom';
 import { ProgressiveCover } from './ProgressiveCover';
 
@@ -58,17 +59,17 @@ interface Props {
 
 // ── Hint-gruppering ─────────────────────────────────────────────────────────
 
-type SingleEntry = { kind: 'single'; hint: HintItem; index: number };
-type GroupEntry  = { kind: 'group'; label: string; items: Array<{ hint: HintItem; index: number }> };
+type SingleEntry = { kind: 'single'; hint: ResolvedHint; index: number };
+type GroupEntry  = { kind: 'group'; label: string; items: { hint: ResolvedHint; index: number }[] };
 type RenderEntry = SingleEntry | GroupEntry;
 
-function buildRenderEntries(hints: HintItem[]): RenderEntry[] {
+function buildRenderEntries(hints: ResolvedHint[]): RenderEntry[] {
   const entries: RenderEntry[] = [];
   let i = 0;
   while (i < hints.length) {
-    if (hints[i].type === 'club') {
+    if (hints[i].hint.type === 'club') {
       const items: GroupEntry['items'] = [];
-      while (i < hints.length && hints[i].type === 'club') {
+      while (i < hints.length && hints[i].hint.type === 'club') {
         items.push({ hint: hints[i], index: i });
         i++;
       }
@@ -79,19 +80,6 @@ function buildRenderEntries(hints: HintItem[]): RenderEntry[] {
     }
   }
   return entries;
-}
-
-// Formatera hinttexten — de flesta hint-värden är självförklarande.
-// Bara datum och ett fåtal typer behöver kort prefix för kontext.
-function formatHintText(hint: HintItem): string {
-  switch (hint.type) {
-    case 'birth_date':    return `Born: ${hint.value}`;
-    case 'peak_year':     return `Career: ${hint.value}`;
-    case 'lead_singer':   return `Lead singer: ${hint.value}`;
-    case 'creation_year': return `Created: ${hint.value}`;
-    case 'producer':      return `Creator: ${hint.value}`;
-    default:              return hint.value;
-  }
 }
 
 function categoryToGenre(label: string): string {
@@ -129,104 +117,8 @@ function splitDisplayName(name: string): string[] {
   return [name.slice(0, lastSpace), name.slice(lastSpace + 1)];
 }
 
-// Termer som redan framgår av rubriken (Genre · Profession) och ska filtreras bort.
-const REDUNDANT_HINT_TERMS = [
-  'music artist',
-  'musician',
-  'recording artist',
-];
-
-// Hint-typer som alltid filtreras bort — flaggan visar redan nationalitet/land.
-// OBS: birth_place filtreras INTE här — city-only värden ska visas.
-// Landnamn fångas istället av NATIONALITY_TERMS-textfiltret nedan.
-const NATIONALITY_HINT_TYPES: string[] = [];
-
-// Nationalitets- och landsord som inte ska synas i ledtrådar.
-// Flaggan kommunicerar redan detta — dupliceringen är en onödig ledtråd.
-const NATIONALITY_TERMS = [
-  // Adjektiv (engelska)
-  'swedish', 'american', 'british', 'english', 'french', 'german',
-  'italian', 'spanish', 'norwegian', 'danish', 'finnish', 'canadian',
-  'australian', 'dutch', 'belgian', 'swiss', 'portuguese', 'polish',
-  'hungarian', 'romanian', 'czech', 'greek', 'turkish', 'japanese',
-  'chinese', 'korean', 'brazilian', 'argentinian', 'argentinean', 'mexican',
-  'south african', 'nigerian', 'jamaican', 'cuban', 'irish',
-  'scottish', 'welsh', 'russian', 'ukrainian', 'austrian', 'colombian',
-  'peruvian', 'chilean', 'venezuelan', 'ecuadorian', 'uruguayan',
-  // Landnamn
-  'sweden', 'united states', 'great britain', 'united kingdom', 'england',
-  'france', 'germany', 'italy', 'spain', 'norway', 'denmark', 'finland',
-  'canada', 'australia', 'netherlands', 'holland', 'belgium', 'switzerland',
-  'portugal', 'poland', 'hungary', 'romania', 'czech republic', 'czechia',
-  'greece', 'turkey', 'japan', 'china', 'south korea', 'north korea',
-  'brazil', 'argentina', 'mexico', 'south africa', 'nigeria',
-  'jamaica', 'cuba', 'ireland', 'scotland', 'wales', 'russia', 'ukraine', 'austria',
-  'colombia', 'peru', 'chile', 'venezuela', 'ecuador', 'uruguay',
-];
-
-function isNationalityHint(hint: { type: string }, formattedText: string): boolean {
-  if (NATIONALITY_HINT_TYPES.includes(hint.type)) return true;
-  const lower = formattedText.toLowerCase();
-  return NATIONALITY_TERMS.some((term) => {
-    const re = new RegExp(`\\b${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`);
-    return re.test(lower);
-  });
-}
-
-// Känslig information som inte ska visas som ledtråd.
-const SENSITIVE_HINT_TERMS = [
-  'died', 'death', 'passed away', 'deceased', 'dead',
-  'killed', 'murder', 'suicide', 'overdose',
-  'accident', 'crash', 'collision', 'plane crash', 'car crash',
-  'cancer', 'illness', 'disease', 'diagnosed', 'tumor', 'tumour',
-];
-
-function isRedundantHint(text: string): boolean {
-  const lower = text.toLowerCase();
-  return REDUNDANT_HINT_TERMS.some((term) => lower.includes(term));
-}
-
-/**
- * Trunkerar texten vid det första känsliga ordet och returnerar texten dessförinnan
- * (trimmad och utan avslutande skiljetecken/parenteser). Om inget återstår → null.
- * Texten visas alltså UTAN den känsliga delen, inte borttagen helt.
- */
-function censorSensitive(text: string): string | null {
-  const lower = text.toLowerCase();
-  let earliest = -1;
-  for (const term of SENSITIVE_HINT_TERMS) {
-    const idx = lower.indexOf(term);
-    if (idx !== -1 && (earliest === -1 || idx < earliest)) earliest = idx;
-  }
-  if (earliest === -1) return text;
-  const before = text.slice(0, earliest).trim().replace(/[(,:;-]+$/, '').trim();
-  return before.length > 0 ? before : null;
-}
-
-/**
- * Kontrollerar om hint-texten innehåller svaret (displayName) och returnerar
- * i så fall bara texten FÖRE matchningen (trimmat). Om inget återstår → null
- * (= hinten ska hoppas över helt). Matchar case-insensitivt mot hela namnet
- * samt eventuella för-/efternamn separat (skydd mot "Elton John" i "Sir Elton John").
- */
-function censorForAnswer(text: string, answer: string): string | null {
-  const lower = text.toLowerCase();
-  const answerLower = answer.toLowerCase();
-  // Matcha hela svaret samt varje ord i svaret som är längre än 3 tecken.
-  // Använder ordgräns (\b) för att undvika falskt träffar inne i sammansatta ord
-  // t.ex. "Tider" från "Gyllene Tider" ska INTE matcha inuti "Sommartider".
-  const terms = [answerLower, ...answerLower.split(' ').filter((w) => w.length > 3)];
-  let earliest = -1;
-  for (const term of terms) {
-    const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const re = new RegExp(`\\b${escaped}\\b`, 'i');
-    const match = re.exec(lower);
-    if (match && (earliest === -1 || match.index < earliest)) earliest = match.index;
-  }
-  if (earliest === -1) return text; // inget svar i texten — visa som vanligt
-  const before = text.slice(0, earliest).trim().replace(/[,:;-]+$/, '').trim();
-  return before.length > 0 ? before : null;
-}
+// Text-pipelinen (filter, censur, radanpassning, dedup) bor i
+// src/utils/hintsText.ts — se resolveHints där.
 
 // ── Huvud-komponent ─────────────────────────────────────────────────────────
 
@@ -259,10 +151,13 @@ export function HintsQuizCard({
   const hints = useMemo(
     () =>
       library
-        ? selectHints(library, MAX_HINTS, hintsSeed ? createSeededRng(hintsSeed) : undefined)
+        ? resolveHints(
+            selectHints(library, MAX_HINTS, hintsSeed ? createSeededRng(hintsSeed) : undefined),
+            displayName,
+          )
         : [],
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [resetKey, library, hintsSeed],
+    [resetKey, library, hintsSeed, displayName],
   );
   const renderEntries = useMemo(() => buildRenderEntries(hints), [hints]);
 
@@ -348,15 +243,13 @@ export function HintsQuizCard({
                 entry={entry}
                 revealedCount={displayRevealedCount}
                 isRevealed={isRevealed}
-                answer={displayName}
               />
             ) : (
               <BulletHint
-                key={entry.hint.id}
+                key={entry.hint.hint.id}
                 entry={entry}
                 revealedCount={displayRevealedCount}
                 isRevealed={isRevealed}
-                answer={displayName}
               />
             ),
           )}
@@ -408,12 +301,10 @@ function BulletHint({
   entry,
   revealedCount,
   isRevealed,
-  answer,
 }: {
   entry: SingleEntry;
   revealedCount: number;
   isRevealed: boolean;
-  answer: string;
 }) {
   const shown = revealedCount > entry.index || isRevealed;
   const anim  = useRef(new Animated.Value(0)).current;
@@ -424,20 +315,12 @@ function BulletHint({
 
   if (!shown) return null;
 
-  const raw        = formatHintText(entry.hint);
-  if (isRedundantHint(raw)) return null;
-  if (isNationalityHint(entry.hint, raw)) return null;
-  const noSensitive = censorSensitive(raw);
-  if (noSensitive === null) return null;
-  const censored    = censorForAnswer(noSensitive, answer);
-  if (censored === null) return null;
-
   const translateY = anim.interpolate({ inputRange: [0, 1], outputRange: [5, 0] });
 
   return (
     <Animated.View style={[styles.bulletRow, { opacity: anim, transform: [{ translateY }] }]}>
       <Text style={styles.bullet}>•</Text>
-      <Text style={styles.hintText} numberOfLines={2}>{censored}</Text>
+      <Text style={styles.hintText} numberOfLines={1}>{entry.hint.text}</Text>
     </Animated.View>
   );
 }
@@ -448,12 +331,10 @@ function ClubGroup({
   entry,
   revealedCount,
   isRevealed,
-  answer,
 }: {
   entry: GroupEntry;
   revealedCount: number;
   isRevealed: boolean;
-  answer: string;
 }) {
   const headerShown = revealedCount > entry.items[0].index || isRevealed;
   const headerAnim  = useRef(new Animated.Value(0)).current;
@@ -477,30 +358,25 @@ function ClubGroup({
       {/* Klubbrader */}
       {entry.items.map(({ hint, index }) => {
         const visible = revealedCount > index || isRevealed;
-        return visible ? <ClubSubRow key={hint.id} hint={hint} answer={answer} /> : null;
+        return visible ? <ClubSubRow key={hint.hint.id} text={hint.text} /> : null;
       })}
     </View>
   );
 }
 
-function ClubSubRow({ hint, answer }: { hint: HintItem; answer: string }) {
+function ClubSubRow({ text }: { text: string }) {
   const anim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     Animated.timing(anim, { toValue: 1, duration: 240, useNativeDriver: true }).start();
   }, [anim]);
 
-  const noSensitive = censorSensitive(hint.value);
-  if (noSensitive === null) return null;
-  const censored = censorForAnswer(noSensitive, answer);
-  if (censored === null) return null;
-
   const translateY = anim.interpolate({ inputRange: [0, 1], outputRange: [4, 0] });
 
   return (
     <Animated.View style={[styles.subRow, { opacity: anim, transform: [{ translateY }] }]}>
       <Text style={styles.subArrow}>↳</Text>
-      <Text style={[styles.hintText, styles.subHintText]} numberOfLines={1}>{censored}</Text>
+      <Text style={[styles.hintText, styles.subHintText]} numberOfLines={1}>{text}</Text>
     </Animated.View>
   );
 }

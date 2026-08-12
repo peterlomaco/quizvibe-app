@@ -1,0 +1,70 @@
+# Svenska proffsgolfare. Tillagda 2026-08-12 (Peters lista).
+#
+# Golfarna spänner över gen-x → gen-z, så fil-headern sätter en mittendefault
+# och varje item bär en egen `audience`-override efter när personen var som
+# mest omtalad. Tre golfare ligger redan i andra filer (jesper-parnevik i
+# athletes-elder-gen-x.yaml, henrik-stenson + ludvig-aberg i
+# athletes-modern.yaml) och upprepas INTE här.
+audience: ["gen-x", "millennials"]
+region: ["sweden"]
+category: sport
+contentForm: image
+contentSubject: athlete
+items:
+  # ── Damer ────────────────────────────────────────────────────────────────
+  - id: liselotte-neumann
+    displayName: "Liselotte Neumann"
+    correctYear: 1966
+    audience: ["gen-x", "elder"]
+    probability: 62
+    peakFrom: 1988
+    peakTo: 1998
+    wikimediaSearchHints: ["Liselotte Neumann golfer LPGA"]
+    answerMethods: ["name-letters"]
+  - id: helen-alfredsson
+    displayName: "Helen Alfredsson"
+    correctYear: 1965
+    audience: ["gen-x", "elder"]
+    probability: 60
+    peakFrom: 1992
+    peakTo: 2008
+    wikimediaSearchHints: ["Helen Alfredsson golfer LPGA"]
+    answerMethods: ["name-letters"]
+  - id: anna-nordqvist
+    displayName: "Anna Nordqvist"
+    correctYear: 1987
+    audience: ["millennials", "gen-x"]
+    probability: 66
+    peakFrom: 2009
+    peakTo: 2021
+    wikimediaSearchHints: ["Anna Nordqvist golfer LPGA"]
+    answerMethods: ["name-letters"]
+  - id: linn-grant
+    displayName: "Linn Grant"
+    correctYear: 1999
+    audience: ["gen-z", "millennials"]
+    probability: 58
+    peakFrom: 2022
+    peakTo: 2025
+    wikimediaSearchHints: ["Linn Grant golfer LPGA"]
+    answerMethods: ["name-letters"]
+
+  # ── Herrar ───────────────────────────────────────────────────────────────
+  - id: robert-karlsson
+    displayName: "Robert Karlsson"
+    correctYear: 1969
+    audience: ["gen-x", "millennials"]
+    probability: 58
+    peakFrom: 2006
+    peakTo: 2010
+    wikimediaSearchHints: ["Robert Karlsson golfer European Tour"]
+    answerMethods: ["name-letters"]
+  - id: alexander-noren
+    displayName: "Alexander Norén"
+    correctYear: 1982
+    audience: ["millennials", "gen-x"]
+    probability: 64
+    peakFrom: 2016
+    peakTo: 2018
+    wikimediaSearchHints: ["Alexander Noren golfer European Tour"]
+    answerMethods: ["name-letters"]

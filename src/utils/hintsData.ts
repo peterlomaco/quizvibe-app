@@ -3047,6 +3047,199 @@ const HINTS_LIBRARY_MANUAL: Record<string, HintLibrary> = {
     ],
   },
 
+  // ── SVENSKA PROFFSGOLFARE (Peters lista 2026-08-12) ───────────────────────
+  //
+  // Alla nio är kurerade efter Hints-kriterierna:
+  //   • Inga nationalitetsord i värdena — flaggan visar redan landet. Därför
+  //     "The Open" (inte "British Open") och "Women's Open title" (inte
+  //     "Women's British Open"); 'british' hade filtrerat bort hela raden.
+  //   • Värdena hålls under HINT_MAX_CHARS (25) så de ryms på en rad utan
+  //     ellips.
+  //   • Svarets namn förekommer aldrig i ett värde (censorForAnswer skulle
+  //     kapa raden) — därför t.ex. "Son of a famous comedian" om Parnevik.
+  //   • Prioritet: P1 uppvärmning → P5 mest ikoniskt (visas sist).
+  // Ingen 'club'-typ används — golf har ingen klubbkarriär att lista.
+
+  'anna-nordqvist': {
+    categoryLabel: 'Athlete',
+    nationality: 'sweden',
+    hints: [
+      h('prof',  'profession',     'Profession',    'Professional golfer',      1),
+      h('tour',  'characteristic', 'Tour',          'Plays on the LPGA Tour',   1),
+      h('bd',    'birth_date',     'Date of birth', 'June 10, 1987',            2),
+      h('bp',    'birth_place',    'Place of birth','Eskilstuna',               2),
+      h('pk',    'peak_year',      'Career peak',   '2009 – 2021',              2),
+      h('deb',   'debut',          'Turned pro',    'Turned pro in 2008',       2),
+      h('ht',    'height',         'Height',        '180 cm',                   3),
+      h('col',   'merit',          'College',       'NCAA champion 2008',       3),
+      h('wins',  'merit',          'Tour wins',     'Nine LPGA Tour wins',      3),
+      h('sol',   'characteristic', 'Team golf',     'Solheim Cup since 2009',   3),
+      h('maj1',  'merit',          'Major',         'LPGA Championship 2009',   4),
+      h('maj2',  'merit',          'Major',         'Evian Championship 2017',  4),
+      h('maj3',  'merit',          'Major',         "AIG Women's Open 2021",    5),
+      h('sig',   'characteristic', 'Signature',     'Three major titles',       5),
+    ],
+  },
+
+  'liselotte-neumann': {
+    categoryLabel: 'Athlete',
+    nationality: 'sweden',
+    hints: [
+      h('prof',  'profession',     'Profession',    'Professional golfer',      1),
+      h('tour',  'characteristic', 'Tour',          'Plays on the LPGA Tour',   1),
+      h('bd',    'birth_date',     'Date of birth', 'May 20, 1966',             2),
+      h('bp',    'birth_place',    'Place of birth','Finspång',                 2),
+      h('pk',    'peak_year',      'Career peak',   '1988 – 1998',              2),
+      h('deb',   'debut',          'Turned pro',    'Turned pro in 1985',       2),
+      h('roy',   'merit',          'Award',         'Rookie of the Year 1988',  3),
+      h('wins',  'merit',          'Tour wins',     '13 LPGA Tour wins',        3),
+      h('sol',   'characteristic', 'Team golf',     'First Solheim Cup, 1990',  3),
+      h('maj2',  'merit',          'Major',         "Women's Open title 1994",  4),
+      h('maj1',  'merit',          'Major',         "U.S. Women's Open 1988",   5),
+      h('sig',   'characteristic', 'Signature',     'Won a major as a rookie',  5),
+    ],
+  },
+
+  'helen-alfredsson': {
+    categoryLabel: 'Athlete',
+    nationality: 'sweden',
+    hints: [
+      h('prof',  'profession',     'Profession',    'Professional golfer',      1),
+      h('tour',  'characteristic', 'Tour',          'Plays on the LPGA Tour',   1),
+      h('bd',    'birth_date',     'Date of birth', 'April 9, 1965',            2),
+      h('bp',    'birth_place',    'Place of birth','Gothenburg',               2),
+      h('pk',    'peak_year',      'Career peak',   '1992 – 2008',              2),
+      h('deb',   'debut',          'Turned pro',    'Turned pro in 1989',       2),
+      h('roy',   'merit',          'Award',         'Rookie of the Year 1992',  3),
+      h('wins',  'merit',          'Tour wins',     'Seven LPGA Tour wins',     3),
+      h('sol',   'characteristic', 'Team golf',     'Solheim Cup since 1990',   3),
+      h('temp',  'characteristic', 'Reputation',    'Known for fiery temper',   4),
+      h('maj1',  'merit',          'Major',         'Dinah Shore title 1993',   4),
+      h('kn',    'characteristic', 'Nickname',      'Nickname: Alfie',          5),
+      h('sig',   'characteristic', 'Signature',     'Major champion in 1993',   5),
+    ],
+  },
+
+  'linn-grant': {
+    categoryLabel: 'Athlete',
+    nationality: 'sweden',
+    hints: [
+      h('prof',  'profession',     'Profession',    'Professional golfer',       1),
+      h('tour',  'characteristic', 'Tour',          'Plays on the LPGA Tour',    1),
+      h('bd',    'birth_date',     'Date of birth', 'July 15, 1999',             2),
+      h('bp',    'birth_place',    'Place of birth','Helsingborg',               2),
+      h('pk',    'peak_year',      'Career peak',   '2022 – present',            2),
+      h('deb',   'debut',          'Turned pro',    'Turned pro in 2021',        2),
+      h('col',   'characteristic', 'College',       'Played at Arizona State',   3),
+      h('om',    'merit',          'Award',         'Order of Merit 2022',       3),
+      h('sol',   'merit',          'Team golf',     'Solheim Cup 2023, 2024',    3),
+      h('lpga',  'merit',          'Tour win',      'Dana Open winner 2024',     4),
+      h('mix',   'characteristic', 'Milestone',     'Won a mixed-field event',   4),
+      h('maj1',  'merit',          'Breakthrough',  'Scandinavian Mixed 2022',   5),
+      h('sig',   'characteristic', 'Signature',     'First female tour winner',  5),
+    ],
+  },
+
+  'jesper-parnevik': {
+    categoryLabel: 'Athlete',
+    nationality: 'sweden',
+    hints: [
+      h('prof',  'profession',     'Profession',    'Professional golfer',      1),
+      h('tour',  'characteristic', 'Tour',          'Plays on the PGA Tour',    1),
+      h('bd',    'birth_date',     'Date of birth', 'March 7, 1965',            2),
+      h('bp',    'birth_place',    'Place of birth','Danderyd',                 2),
+      h('pk',    'peak_year',      'Career peak',   '1994 – 2002',              2),
+      h('deb',   'debut',          'Turned pro',    'Turned pro in 1986',       2),
+      h('wins',  'merit',          'Tour wins',     'Five PGA Tour wins',       3),
+      h('ryd',   'merit',          'Team golf',     'Ryder Cup 1997, 1999',     3),
+      h('trs',   'characteristic', 'Style',         'Wore bright trousers',     3),
+      h('sand',  'characteristic', 'Quirk',         'Ate volcanic sand',        4),
+      h('open',  'merit',          'Major',         'Runner-up at The Open',    4),
+      h('cap',   'characteristic', 'Signature',     'Upturned cap brim',        5),
+      h('fam',   'characteristic', 'Family',        'Son of a famous comedian', 5),
+    ],
+  },
+
+  'ludvig-aberg': {
+    categoryLabel: 'Athlete',
+    nationality: 'sweden',
+    hints: [
+      h('prof',  'profession',     'Profession',    'Professional golfer',      1),
+      h('tour',  'characteristic', 'Tour',          'Plays on the PGA Tour',    1),
+      h('bd',    'birth_date',     'Date of birth', 'November 16, 1999',        2),
+      h('bp',    'birth_place',    'Place of birth','Eslöv',                    2),
+      h('pk',    'peak_year',      'Career peak',   '2023 – present',           2),
+      h('deb',   'debut',          'Turned pro',    'Turned pro in 2023',       2),
+      h('col',   'characteristic', 'College',       'Played for Texas Tech',    3),
+      h('win1',  'merit',          'Tour win',      'European Masters 2023',    3),
+      h('win2',  'merit',          'Tour win',      'RSM Classic 2023',         3),
+      h('ryd',   'merit',          'Team golf',     'Ryder Cup debut in 2023',  4),
+      h('fast',  'characteristic', 'Milestone',     'Ryder Cup before a major', 4),
+      h('mas',   'merit',          'Major',         'Masters runner-up 2024',   5),
+      h('sig',   'characteristic', 'Signature',     'Rose to the world top 10', 5),
+    ],
+  },
+
+  'henrik-stenson': {
+    categoryLabel: 'Athlete',
+    nationality: 'sweden',
+    hints: [
+      h('prof',  'profession',     'Profession',    'Professional golfer',      1),
+      h('tour',  'characteristic', 'Tour',          'Plays on the PGA Tour',    1),
+      h('bd',    'birth_date',     'Date of birth', 'April 5, 1976',            2),
+      h('bp',    'birth_place',    'Place of birth','Gothenburg',               2),
+      h('pk',    'peak_year',      'Career peak',   '2013 – 2016',              2),
+      h('deb',   'debut',          'Turned pro',    'Turned pro in 1998',       2),
+      h('ht',    'height',         'Height',        '188 cm',                   3),
+      h('fed',   'merit',          'Award',         'FedEx Cup winner 2013',    3),
+      h('dub',   'merit',          'Award',         'Race to Dubai 2013',       3),
+      h('wood',  'characteristic', 'Trademark',     'Famous for his 3-wood',    3),
+      h('oly',   'merit',          'Olympics',      'Olympic silver in 2016',   4),
+      h('kn',    'characteristic', 'Nickname',      'Nickname: The Iceman',     4),
+      h('maj1',  'merit',          'Major',         'The Open champion 2016',   5),
+      h('sig',   'characteristic', 'Signature',     'Closed a major with 63',   5),
+    ],
+  },
+
+  'alexander-noren': {
+    categoryLabel: 'Athlete',
+    nationality: 'sweden',
+    hints: [
+      h('prof',  'profession',     'Profession',    'Professional golfer',      1),
+      h('tour',  'characteristic', 'Tour',          'Plays on the PGA Tour',    1),
+      h('bd',    'birth_date',     'Date of birth', 'July 15, 1982',            2),
+      h('bp',    'birth_place',    'Place of birth','Stockholm',                2),
+      h('pk',    'peak_year',      'Career peak',   '2016 – 2018',              2),
+      h('deb',   'debut',          'Turned pro',    'Turned pro in 2005',       2),
+      h('col',   'characteristic', 'College',       'Played at Oklahoma St',    3),
+      h('wins',  'merit',          'Tour wins',     '10 European Tour wins',    3),
+      h('work',  'characteristic', 'Reputation',    'Known for long practice',  3),
+      h('ryd',   'merit',          'Team golf',     'Ryder Cup team in 2018',   4),
+      h('bmw',   'merit',          'Tour win',      'BMW PGA winner 2017',      4),
+      h('four',  'merit',          'Season',        'Four wins in one season',  5),
+      h('rank',  'characteristic', 'Signature',     'Reached world No. 8',      5),
+    ],
+  },
+
+  'robert-karlsson': {
+    categoryLabel: 'Athlete',
+    nationality: 'sweden',
+    hints: [
+      h('prof',  'profession',     'Profession',    'Professional golfer',      1),
+      h('tour',  'characteristic', 'Tour',          'Played the European Tour', 1),
+      h('bd',    'birth_date',     'Date of birth', 'September 3, 1969',        2),
+      h('bp',    'birth_place',    'Place of birth','Sundbyberg',               2),
+      h('pk',    'peak_year',      'Career peak',   '2006 – 2010',              2),
+      h('deb',   'debut',          'Turned pro',    'Turned pro in 1989',       2),
+      h('ht',    'height',         'Height',        '196 cm',                   3),
+      h('wins',  'merit',          'Tour wins',     '11 European Tour wins',    3),
+      h('tall',  'characteristic', 'Physique',      'One of the tallest pros',  3),
+      h('vice',  'characteristic', 'Later career',  'Became a vice-captain',    4),
+      h('ryd',   'merit',          'Team golf',     'Ryder Cup 2006, 2008',     4),
+      h('om',    'merit',          'Award',         'Order of Merit 2008',      5),
+    ],
+  },
+
 }; // end HINTS_LIBRARY_MANUAL
 
 // Nationality-override för items där auto-gen (Wikidata P27) returnerade 'unknown'.

@@ -18,7 +18,8 @@
     "review-quiz-images": "cd backend && npm run review-quiz-images",
     "wikimedia-search": "cd backend && npm run wikimedia-search --",
     "wikimedia-process": "cd backend && npm run wikimedia-process --",
-    "fetch-hints-data": "cd backend && npm run fetch-hints-data"
+    "fetch-hints-data": "cd backend && npm run fetch-hints-data",
+    "fetch-person-gender": "cd backend && npm run fetch-person-gender"
   },
   "dependencies": {
     "@expo-google-fonts/nunito": "^0.4.2",

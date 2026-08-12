@@ -434,6 +434,23 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "questionText": "What is the Name of this athlete?"
   },
   {
+    "id": "alexander-noren",
+    "displayName": "Alexander Norén",
+    "category": "sport",
+    "contentSubject": "athlete",
+    "correctYear": 1982,
+    "peakFrom": 2016,
+    "peakTo": 2018,
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "questionText": "What is the Name of this athlete?"
+  },
+  {
     "id": "alexander-rybak",
     "displayName": "Alexander Rybak",
     "category": "artists",
@@ -827,6 +844,23 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
+  },
+  {
+    "id": "anna-nordqvist",
+    "displayName": "Anna Nordqvist",
+    "category": "sport",
+    "contentSubject": "athlete",
+    "correctYear": 1987,
+    "peakFrom": 2009,
+    "peakTo": 2021,
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "questionText": "What is the Name of this athlete?"
   },
   {
     "id": "anna-sahlene",
@@ -1502,7 +1536,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   },
   {
     "id": "bjorn-afzelius",
-    "displayName": "BjÃ¶rn Afzelius",
+    "displayName": "Björn Afzelius",
     "category": "artists",
     "contentSubject": "artist",
     "correctYear": 1947,
@@ -2000,7 +2034,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   },
   {
     "id": "carola-haggkvist",
-    "displayName": "Carola HÃ¤ggkvist",
+    "displayName": "Carola Häggkvist",
     "category": "artists",
     "contentSubject": "artist",
     "correctYear": 1966,
@@ -4811,6 +4845,21 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "questionText": "What is the Name of this Artist?"
   },
   {
+    "id": "hakan-mild",
+    "displayName": "Håkan Mild",
+    "category": "sport",
+    "contentSubject": "athlete",
+    "correctYear": 1971,
+    "audiences": [
+      "gen-x",
+      "millennials"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "questionText": "What is the Name of this athlete?"
+  },
+  {
     "id": "halle-berry",
     "displayName": "Halle Berry",
     "category": "actors",
@@ -4955,8 +5004,25 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "questionText": "What is the Name of this athlete?"
   },
   {
+    "id": "helen-alfredsson",
+    "displayName": "Helen Alfredsson",
+    "category": "sport",
+    "contentSubject": "athlete",
+    "correctYear": 1965,
+    "peakFrom": 1992,
+    "peakTo": 2008,
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "questionText": "What is the Name of this athlete?"
+  },
+  {
     "id": "helen-sjoholm",
-    "displayName": "Helen SjÃ¶holm",
+    "displayName": "Helen Sjöholm",
     "category": "artists",
     "contentSubject": "artist",
     "correctYear": 1972,
@@ -6134,6 +6200,21 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "questionText": "What is the Name of this actor?"
   },
   {
+    "id": "jonas-thern",
+    "displayName": "Jonas Thern",
+    "category": "sport",
+    "contentSubject": "athlete",
+    "correctYear": 1967,
+    "audiences": [
+      "gen-x",
+      "millennials"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "questionText": "What is the Name of this athlete?"
+  },
+  {
     "id": "jordan-larsson",
     "displayName": "Jordan Larsson",
     "category": "sport",
@@ -7290,6 +7371,23 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "questionText": "What is the Name of this Artist?"
   },
   {
+    "id": "linn-grant",
+    "displayName": "Linn Grant",
+    "category": "sport",
+    "contentSubject": "athlete",
+    "correctYear": 1999,
+    "peakFrom": 2022,
+    "peakTo": 2025,
+    "audiences": [
+      "gen-z",
+      "millennials"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "questionText": "What is the Name of this athlete?"
+  },
+  {
     "id": "linnea-henriksson",
     "displayName": "Linnéa Henriksson",
     "category": "artists",
@@ -7376,6 +7474,23 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "sweden"
     ],
     "questionText": "What is the Name of this Artist?"
+  },
+  {
+    "id": "liselotte-neumann",
+    "displayName": "Liselotte Neumann",
+    "category": "sport",
+    "contentSubject": "athlete",
+    "correctYear": 1966,
+    "peakFrom": 1988,
+    "peakTo": 1998,
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "questionText": "What is the Name of this athlete?"
   },
   {
     "id": "little-richard",
@@ -9082,7 +9197,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   },
   {
     "id": "niklas-stromstedt",
-    "displayName": "Niklas StrÃ¶mstedt",
+    "displayName": "Niklas Strömstedt",
     "category": "artists",
     "contentSubject": "artist",
     "correctYear": 1958,
@@ -10131,7 +10246,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   },
   {
     "id": "py-backman",
-    "displayName": "Py BÃ¤ckman",
+    "displayName": "Py Bäckman",
     "category": "artists",
     "contentSubject": "artist",
     "correctYear": 1947,
@@ -10523,6 +10638,23 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "sweden"
     ],
     "questionText": "What is the Name of this actor?"
+  },
+  {
+    "id": "robert-karlsson",
+    "displayName": "Robert Karlsson",
+    "category": "sport",
+    "contentSubject": "athlete",
+    "correctYear": 1969,
+    "peakFrom": 2006,
+    "peakTo": 2010,
+    "audiences": [
+      "gen-x",
+      "millennials"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "questionText": "What is the Name of this athlete?"
   },
   {
     "id": "robert-lewandowski",
@@ -11422,7 +11554,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   },
   {
     "id": "sissel-kyrkjebo",
-    "displayName": "Sissel KyrkjebÃ¸",
+    "displayName": "Sissel Kyrkjebø",
     "category": "artists",
     "contentSubject": "artist",
     "correctYear": 1969,
@@ -11850,7 +11982,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   },
   {
     "id": "ted-gardestad",
-    "displayName": "Ted GÃ¤rdestad",
+    "displayName": "Ted Gärdestad",
     "category": "artists",
     "contentSubject": "artist",
     "correctYear": 1956,
@@ -11879,7 +12011,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   },
   {
     "id": "thastrom",
-    "displayName": "ThÃ¥strÃ¶m",
+    "displayName": "Thåström",
     "category": "artists",
     "contentSubject": "artist",
     "correctYear": 1957,
@@ -12337,7 +12469,7 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
   },
   {
     "id": "tommy-korberg",
-    "displayName": "Tommy KÃ¶rberg",
+    "displayName": "Tommy Körberg",
     "category": "artists",
     "contentSubject": "artist",
     "correctYear": 1948,

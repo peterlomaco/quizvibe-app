@@ -1,4 +1,4 @@
-﻿# Musikartister kÃ¤nda fÃ¶r Gen X.
+# Musikartister kända för Gen X.
 audience: ["gen-x"]
 region: ["sweden"]
 category: artists
@@ -24,12 +24,12 @@ items:
     wikimediaSearchHints: ["Madonna singer"]
     answerMethods: ["timeline", "name-letters"]
   # Metallica (band) flyttad till framtida bands-classics-utbyggnad (band-subject)
-  # â€” solo-artist-filen ska bara ha solister.
+  # — solo-artist-filen ska bara ha solister.
   - id: carola-haggkvist
-    displayName: "Carola HÃ¤ggkvist"
+    displayName: "Carola Häggkvist"
     correctYear: 1966
     probability: 88
-    wikimediaSearchHints: ["Carola HÃ¤ggkvist", "Carola singer Sweden"]
+    wikimediaSearchHints: ["Carola Häggkvist", "Carola singer Sweden"]
     answerMethods: ["timeline", "name-letters"]
   - id: kurt-cobain
     displayName: "Kurt Cobain"
@@ -324,25 +324,25 @@ items:
     displayName: "Lena Philipsson"
     correctYear: 1966
     probability: 78
-    wikimediaSearchHints: ["Lena Philipsson Swedish singer Eurovision Det gÃ¶r ont"]
+    wikimediaSearchHints: ["Lena Philipsson Swedish singer Eurovision Det gör ont"]
     answerMethods: ["timeline", "name-letters"]
   - id: eva-dahlgren
     displayName: "Eva Dahlgren"
     correctYear: 1960
     probability: 75
-    wikimediaSearchHints: ["Eva Dahlgren Swedish singer Vem tÃ¤nder stjÃ¤rnorna"]
+    wikimediaSearchHints: ["Eva Dahlgren Swedish singer Vem tänder stjärnorna"]
     answerMethods: ["timeline", "name-letters"]
   - id: ulf-lundell
     displayName: "Ulf Lundell"
     correctYear: 1949
     probability: 78
-    wikimediaSearchHints: ["Ulf Lundell Swedish singer Ã–ppna landskap"]
+    wikimediaSearchHints: ["Ulf Lundell Swedish singer Öppna landskap"]
     answerMethods: ["timeline", "name-letters"]
   - id: lisa-nilsson
     displayName: "Lisa Nilsson"
     correctYear: 1970
     probability: 78
-    wikimediaSearchHints: ["Lisa Nilsson Swedish singer Himlen runt hÃ¶rnet"]
+    wikimediaSearchHints: ["Lisa Nilsson Swedish singer Himlen runt hörnet"]
     answerMethods: ["timeline", "name-letters"]
   - id: titiyo
     displayName: "Titiyo"
@@ -363,29 +363,29 @@ items:
     wikimediaSearchHints: ["Charlotte Perrelli Swedish singer Eurovision Take Me to Your Heaven"]
     answerMethods: ["timeline", "name-letters"]
   - id: sissel-kyrkjebo
-    displayName: "Sissel KyrkjebÃ¸"
+    displayName: "Sissel Kyrkjebø"
     correctYear: 1969
     probability: 76
-    wikimediaSearchHints: ["Sissel KyrkjebÃ¸ Norwegian soprano singer Titanic"]
+    wikimediaSearchHints: ["Sissel Kyrkjebø Norwegian soprano singer Titanic"]
     answerMethods: ["timeline", "name-letters"]
-  # === Vemod-batch 2026-05-27 â€” svenska gen-x trubadurer/rock/Eurovision ===
+  # === Vemod-batch 2026-05-27 — svenska gen-x trubadurer/rock/Eurovision ===
   - id: ted-gardestad
-    displayName: "Ted GÃ¤rdestad"
+    displayName: "Ted Gärdestad"
     correctYear: 1956
     probability: 86
-    wikimediaSearchHints: ["Ted GÃ¤rdestad Swedish singer Sol vind och vatten"]
+    wikimediaSearchHints: ["Ted Gärdestad Swedish singer Sol vind och vatten"]
     answerMethods: ["timeline", "name-letters"]
   - id: bjorn-afzelius
-    displayName: "BjÃ¶rn Afzelius"
+    displayName: "Björn Afzelius"
     correctYear: 1947
     probability: 78
-    wikimediaSearchHints: ["BjÃ¶rn Afzelius Swedish singer Hoola Bandoola Band"]
+    wikimediaSearchHints: ["Björn Afzelius Swedish singer Hoola Bandoola Band"]
     answerMethods: ["timeline", "name-letters"]
   - id: thastrom
-    displayName: "ThÃ¥strÃ¶m"
+    displayName: "Thåström"
     correctYear: 1957
     probability: 84
-    wikimediaSearchHints: ["ThÃ¥strÃ¶m Swedish singer Ebba GrÃ¶n Imperiet Joakim ThÃ¥strÃ¶m"]
+    wikimediaSearchHints: ["Thåström Swedish singer Ebba Grön Imperiet Joakim Thåström"]
     answerMethods: ["timeline", "name-letters"]
   - id: dan-hylander
     displayName: "Dan Hylander"
@@ -394,10 +394,10 @@ items:
     wikimediaSearchHints: ["Dan Hylander Swedish singer Raj Montana Band"]
     answerMethods: ["timeline", "name-letters"]
   - id: py-backman
-    displayName: "Py BÃ¤ckman"
+    displayName: "Py Bäckman"
     correctYear: 1947
     probability: 72
-    wikimediaSearchHints: ["Py BÃ¤ckman Swedish singer songwriter Eldorado"]
+    wikimediaSearchHints: ["Py Bäckman Swedish singer songwriter Eldorado"]
     answerMethods: ["timeline", "name-letters"]
   - id: marie-bergman
     displayName: "Marie Bergman"
@@ -412,10 +412,10 @@ items:
     wikimediaSearchHints: ["Kikki Danielsson Swedish singer dansband Eurovision Bra vibrationer"]
     answerMethods: ["timeline", "name-letters"]
   - id: tommy-korberg
-    displayName: "Tommy KÃ¶rberg"
+    displayName: "Tommy Körberg"
     correctYear: 1948
     probability: 80
-    wikimediaSearchHints: ["Tommy KÃ¶rberg Swedish singer Chess Eurovision"]
+    wikimediaSearchHints: ["Tommy Körberg Swedish singer Chess Eurovision"]
     answerMethods: ["timeline", "name-letters"]
   - id: lasse-tennander
     displayName: "Lasse Tennander"
@@ -431,10 +431,10 @@ items:
     wikimediaSearchHints: ["Orup Swedish singer Magnus Bonnier Stockholm"]
     answerMethods: ["timeline", "name-letters"]
   - id: niklas-stromstedt
-    displayName: "Niklas StrÃ¶mstedt"
+    displayName: "Niklas Strömstedt"
     correctYear: 1958
     probability: 76
-    wikimediaSearchHints: ["Niklas StrÃ¶mstedt Swedish singer Sista morgonen"]
+    wikimediaSearchHints: ["Niklas Strömstedt Swedish singer Sista morgonen"]
     answerMethods: ["timeline", "name-letters"]
   - id: peter-lemarc
     displayName: "Peter LeMarc"
@@ -452,9 +452,9 @@ items:
     displayName: "Jan Johansen"
     correctYear: 1966
     probability: 74
-    wikimediaSearchHints: ["Jan Johansen Swedish singer Eurovision Se pÃ¥ mig 1995"]
+    wikimediaSearchHints: ["Jan Johansen Swedish singer Eurovision Se på mig 1995"]
     answerMethods: ["timeline", "name-letters"]
-  # === Bred batch 2026-05-27 â€” gen-x dansband/r&b/vemod/cross-nordic ===
+  # === Bred batch 2026-05-27 — gen-x dansband/r&b/vemod/cross-nordic ===
   - id: lotta-engberg
     displayName: "Lotta Engberg"
     correctYear: 1963
@@ -473,7 +473,7 @@ items:
     probability: 72
     wikimediaSearchHints: ["Anne Linnet Danish singer Marquis de Sade"]
     answerMethods: ["timeline", "name-letters"]
-  # === Batch B 2026-05-27 â€” kvinnliga svenska sÃ¥ngerskor ===
+  # === Batch B 2026-05-27 — kvinnliga svenska sångerskor ===
   - id: pernilla-wahlgren
     displayName: "Pernilla Wahlgren"
     correctYear: 1967
@@ -481,10 +481,10 @@ items:
     wikimediaSearchHints: ["Pernilla Wahlgren Swedish singer Tabu Piccadilly Circus"]
     answerMethods: ["timeline", "name-letters"]
   - id: helen-sjoholm
-    displayName: "Helen SjÃ¶holm"
+    displayName: "Helen Sjöholm"
     correctYear: 1972
     probability: 82
-    wikimediaSearchHints: ["Helen SjÃ¶holm Swedish singer Kristina frÃ¥n DuvemÃ¥la"]
+    wikimediaSearchHints: ["Helen Sjöholm Swedish singer Kristina från Duvemåla"]
     answerMethods: ["timeline", "name-letters"]
   - id: jill-johnson
     displayName: "Jill Johnson"
@@ -496,15 +496,15 @@ items:
     displayName: "Shirley Clamp"
     correctYear: 1973
     probability: 76
-    wikimediaSearchHints: ["Shirley Clamp Swedish singer Min kÃ¤rlek Eurovision"]
+    wikimediaSearchHints: ["Shirley Clamp Swedish singer Min kärlek Eurovision"]
     answerMethods: ["timeline", "name-letters"]
-  # === Batch C 2026-05-27 â€” international solo gen-x + svensk gen-x ===
-  # (george-michael borttagen â€” dupli av existing i samma fil)
+  # === Batch C 2026-05-27 — international solo gen-x + svensk gen-x ===
+  # (george-michael borttagen — dupli av existing i samma fil)
   - id: caroline-af-ugglas
     displayName: "Caroline af Ugglas"
     correctYear: 1974
     probability: 76
-    wikimediaSearchHints: ["Caroline af Ugglas Swedish singer Eurovision En enkel sÃ¥ng"]
+    wikimediaSearchHints: ["Caroline af Ugglas Swedish singer Eurovision En enkel sång"]
     answerMethods: ["timeline", "name-letters"]
   - id: dave-grohl
     displayName: "Dave Grohl"

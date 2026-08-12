@@ -30,6 +30,7 @@
     "fetch-hints-data": "tsx scripts/fetch-hints-data.ts",
     "fetch-hints-data-dry": "tsx scripts/fetch-hints-data.ts --dry",
     "fetch-hints-data-resume": "tsx scripts/fetch-hints-data.ts --resume",
+    "fetch-person-gender": "tsx scripts/fetch-person-gender.ts",
     "build": "tsc"
   },
   "dependencies": {

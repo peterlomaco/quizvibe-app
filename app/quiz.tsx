@@ -81,6 +81,7 @@ import {
 import { buildImageVariant } from '@/src/utils/imageQuestionBuilder';
 import { createSeededRng } from '@/src/utils/seededRandom';
 import { HINTS_LIBRARY, inferGender, inferNationality, inferSport, type HintLibrary } from '@/src/utils/hintsData';
+import { buildHintsDistractorPool } from '@/src/utils/hintsDistractorPool';
 import { isItemInRegionScope, PLAYER_COUNTRY } from '@/src/utils/regionScope';
 import { HintsQuizCard } from '@/src/components/HintsQuizCard';
 import { HeartbeatSound } from '@/src/components/HeartbeatSound';
@@ -2656,76 +2657,13 @@ export default function QuizScreen() {
   const imageVariant = useMemo<ImageQuestionVariant | null>(() => {
     if (question.type !== 'image') return null;
 
-    const POOL_THRESHOLD = 5; // behöver minst 4 distraktorter + 1 rätt
-
-    // Basnivå: samma contentSubject (t.ex. bara 'athlete' för idrottare).
-    // Faller ALDRIG tillbaka till IMAGE_QUIZ_QUESTIONS — subject-integritet alltid.
-    const sameSubject = IMAGE_QUIZ_QUESTIONS.filter(
-      (q) => q.contentSubject === question.source.contentSubject,
+    // Lager-kedjan (subject → kön → land/sport) bor i hintsDistractorPool.ts
+    // så köns-regeln kan testas utan React. genderLocked = alla items i poolen
+    // har samma kön som rätt svar.
+    const { itemPool, genderLocked } = buildHintsDistractorPool(
+      question.source,
+      IMAGE_QUIZ_QUESTIONS,
     );
-
-    const correctLib = HINTS_LIBRARY[question.source.id];
-
-    // Genus-filter: EXAKT köns-match, okänt kön (null) och saknad lib exkluderas.
-    const correctGender = correctLib ? inferGender(correctLib) : null;
-    const sameGender = correctGender
-      ? sameSubject.filter((q) => {
-          const lib = HINTS_LIBRARY[q.id];
-          if (!lib) return false;
-          return inferGender(lib) === correctGender;
-        })
-      : sameSubject;
-
-    // Nationalitets-filter på sameGender-basen.
-    const correctNationality = correctLib ? inferNationality(correctLib) : null;
-    const sameNationalityAndGender = correctNationality
-      ? sameGender.filter((q) => {
-          const lib = HINTS_LIBRARY[q.id];
-          if (!lib) return false;
-          return inferNationality(lib) === correctNationality;
-        })
-      : null;
-
-    let itemPool: typeof sameSubject;
-
-    if (question.source.contentSubject === 'athlete') {
-      // Idrottare: lager-kedja med sport + nationalitet + kön (striktast → lösast).
-      const correctSport = correctLib ? inferSport(correctLib) : null;
-
-      const sameSportAndGender = correctSport
-        ? sameGender.filter((q) => {
-            const lib = HINTS_LIBRARY[q.id];
-            if (!lib) return false;
-            return inferSport(lib) === correctSport;
-          })
-        : null;
-
-      const sameSportAndNationalityAndGender =
-        sameSportAndGender && sameNationalityAndGender
-          ? sameSportAndGender.filter((q) => sameNationalityAndGender.includes(q))
-          : null;
-
-      if (sameSportAndNationalityAndGender && sameSportAndNationalityAndGender.length >= POOL_THRESHOLD) {
-        itemPool = sameSportAndNationalityAndGender; // sport + land + kön
-      } else if (sameNationalityAndGender && sameNationalityAndGender.length >= POOL_THRESHOLD) {
-        itemPool = sameNationalityAndGender; // land + kön
-      } else if (sameSportAndGender && sameSportAndGender.length >= POOL_THRESHOLD) {
-        itemPool = sameSportAndGender; // sport + kön
-      } else if (sameGender.length >= POOL_THRESHOLD) {
-        itemPool = sameGender; // kön
-      } else {
-        itemPool = sameSubject; // subject-fallback
-      }
-    } else {
-      // Artister, skådespelare, band etc.: nationalitet + kön, sedan kön, sedan subject.
-      if (sameNationalityAndGender && sameNationalityAndGender.length >= POOL_THRESHOLD) {
-        itemPool = sameNationalityAndGender; // land + kön
-      } else if (sameGender.length >= POOL_THRESHOLD) {
-        itemPool = sameGender; // kön
-      } else {
-        itemPool = sameSubject; // subject-fallback
-      }
-    }
 
     // Remote 1v1: seedad RNG så båda spelarnas enheter genererar identiska
     // alternativ i identisk ordning (ingen sync-kanal under spelet).
@@ -2736,7 +2674,10 @@ export default function QuizScreen() {
       currentAssistance,
       audienceSetForVariants,
       itemPool,
-      DISTRACTOR_POOL_NAMES[question.source.category] ?? [],
+      // Den generiska namn-poolen (påhittade namn + artistnamn utan katalog-
+      // post) har inget känt kön — den skulle bryta köns-låsningen och stängs
+      // därför av när den gäller. Utan lås är den kvar som sista utfyllnad.
+      genderLocked ? [] : DISTRACTOR_POOL_NAMES[question.source.category] ?? [],
       5, // 5 svarsalternativ
       variantSeed ? createSeededRng(variantSeed) : undefined,
     );
