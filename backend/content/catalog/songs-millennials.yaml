@@ -1708,3 +1708,15 @@ items:
         endSec: 30
         notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
     notes: "correctYear = singeln (20 juni 1989), veckan fore albumet Cosmic Thing (27 juni 1989) — bada 1989 oavsett vilken som raknas."
+  - id: madonna-express-yourself
+    displayName: "Express Yourself — Madonna"
+    correctYear: 1989
+    probability: 82
+    wikimediaSearchHints: ["Madonna Express Yourself 1989 Like a Prayer"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "GsVcUzP_O_8"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
+    notes: "correctYear = albumet Like a Prayer (21 mars 1989), forsta gangen laten gick att hora. Singeln kom 9 maj 1989. Samma album som itemet madonna-like-a-prayer, aven det 1989."
