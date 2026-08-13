@@ -1417,6 +1417,18 @@ items:
         startSec: 0
         endSec: 30
         notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
+  - id: yes-owner-of-a-lonely-heart
+    displayName: "Owner of a Lonely Heart — Yes"
+    correctYear: 1983
+    probability: 80
+    wikimediaSearchHints: ["Yes Owner of a Lonely Heart 1983 90125"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "SVOuYquXuuc"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
+    notes: "correctYear = singeln (okt 1983), knappt en manad fore albumet 90125 (7 nov 1983) — bada vagarna ger 1983. Laten toppade Billboard Hot 100 forst i jan 1984; chart-peak ar aldrig svaret."
   # --- 1984 ---
   - id: laura-branigan-self-control
     displayName: "Self Control — Laura Branigan"
