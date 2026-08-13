@@ -10,10 +10,12 @@
 //      aldrig når Supabase. Att stänga erbjudandet kräver alltså INGEN
 //      App Store-release.
 //
-//   2. CLAIM (per enhet) — EN användares gratismånad. Startar när de
+//   2. CLAIM (per KONTO) — EN användares gratismånad. Startar när de
 //      trycker "Free" i Store, tar slut en kalendermånad senare. Vill de
 //      fortsätta går de tillbaka till Store och trycker "Free" igen.
 //      Ingen gräns för antal förnyelser så länge offer window är öppet.
+//      Claimen lagras lokalt men stämplas med kontots playerName, så den
+//      följer KONTOT och inte telefonen — se CLAIM_KEY nedan.
 //
 // `hasActiveFreePremium` läser MEDVETET bara klocka 2. Det är det som
 // "grandfathar" en pågående månad förbi erbjudandets slut: stänger Peter
@@ -32,6 +34,7 @@
 // ─────────────────────────────────────────────────────────────────────
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getCachedProfile, loadProfile } from './profileStorage';
 import { supabase } from './supabase';
 
 // ─── Offer window (klocka 1) ──────────────────────────────────────────
@@ -52,8 +55,21 @@ const OFFER_CONFIG_KEY = 'free_premium_promo';
 /** Cache av senast hämtade remote-konfig. Överlever app-omstarter. */
 const OFFER_CACHE_KEY = '@quizvibe/promo/offerConfig/v1';
 
-/** Tidsstämpel (ISO) för när användaren senast tryckte "Free". */
-const CLAIM_KEY = '@quizvibe/promo/freePremiumClaimedAt/v1';
+/**
+ * Gratismånadens claim: `{ claimedAt, owner }` som JSON.
+ *
+ * ⚠ `owner` (= playerName, lowercased) är INTE kosmetik. AsyncStorage är
+ * per ENHET, medan gratismånaden tillhör ett KONTO. Utan ägarstämpeln ärvde
+ * varje nytt konto som registrerades på samma telefon den förra användarens
+ * månad — ett nyregistrerat konto visade "Unlimited" i credits-pillen i
+ * stället för "Free: 4" (Peter 2026-08-13). Nyckeln är därför BUMPAD till v2:
+ * v1-poster var råa ISO-strängar utan ägare, går inte att tillskriva någon
+ * och ska inte migreras — de dör tyst med den gamla nyckeln.
+ *
+ * Ägarstämpeln är också skälet till att claimen INTE rensas vid logout:
+ * loggar samma konto in igen matchar ägaren och månaden finns kvar.
+ */
+const CLAIM_KEY = '@quizvibe/promo/freePremiumClaim/v2';
 
 /** Gratismånadens längd. En kalendermånad — se addMonthsClamped. */
 export const FREE_PREMIUM_CLAIM_MONTHS = 1;
@@ -157,37 +173,88 @@ function addMonthsClamped(from: Date, months: number): Date {
   return result;
 }
 
-/**
- * Startar (eller förnyar) gratismånaden. Förnyelse är samma anrop — den
- * skriver bara över tidsstämpeln, så månaden räknas om från nu.
- *
- * Anropas ENBART från Store:s Free-knapp, som i sin tur bara är tappbar
- * när canClaimFreePremium() är true.
- */
-export async function claimFreePremium(): Promise<void> {
+interface ClaimRecord {
+  /** ISO-tidsstämpel för när "Free" trycktes. */
+  claimedAt: string;
+  /** playerName (lowercased) på kontot som tryckte. */
+  owner: string;
+}
+
+function parseClaim(raw: string | null): ClaimRecord | null {
+  if (!raw) return null;
   try {
-    await AsyncStorage.setItem(CLAIM_KEY, new Date().toISOString());
-  } catch (err) {
-    console.warn('[promoPremium] claimFreePremium failed:', err);
+    const parsed = JSON.parse(raw) as { claimedAt?: unknown; owner?: unknown };
+    if (!parsed || typeof parsed !== 'object') return null;
+    if (typeof parsed.claimedAt !== 'string' || Number.isNaN(new Date(parsed.claimedAt).getTime())) {
+      return null;
+    }
+    if (typeof parsed.owner !== 'string' || !parsed.owner) return null;
+    return { claimedAt: parsed.claimedAt, owner: parsed.owner };
+  } catch {
+    // Trasig payload → fail-closed. En claim vi inte kan tillskriva ett
+    // konto får aldrig låsa upp Premium.
+    return null;
   }
 }
 
 /**
- * När den nuvarande gratismånaden tar slut, eller null om användaren
- * aldrig tryckt "Free".
+ * Inloggat playerName (lowercased), eller null om ingen är inloggad.
+ *
+ * Läser i första hand den SYNKRONA profil-spegeln så det vanliga fallet är
+ * gratis. `undefined` = spegeln ännu ohydrerad (cold start) — då, och bara
+ * då, betalar vi för en riktig loadProfile(). Se profileStorage:
+ * `undefined` får ALDRIG tolkas som utloggad.
+ */
+async function resolveCurrentOwner(): Promise<string | null> {
+  const cached = getCachedProfile();
+  const profile = cached === undefined ? await loadProfile() : cached;
+  const name = profile?.playerName?.trim();
+  return name ? name.toLowerCase() : null;
+}
+
+/**
+ * Startar (eller förnyar) gratismånaden för det INLOGGADE kontot.
+ * Förnyelse är samma anrop — den skriver bara över tidsstämpeln, så
+ * månaden räknas om från nu.
+ *
+ * Returnerar false om ingen är inloggad: månaden hör till ett konto, inte
+ * till telefonen, så det finns ingen att skriva den på. Store:s Free-knapp
+ * (enda anroparen) visar då en upsell i stället för att låtsas lyckas.
+ */
+export async function claimFreePremium(): Promise<boolean> {
+  const owner = await resolveCurrentOwner();
+  if (!owner) return false;
+  try {
+    const record: ClaimRecord = { claimedAt: new Date().toISOString(), owner };
+    await AsyncStorage.setItem(CLAIM_KEY, JSON.stringify(record));
+    return true;
+  } catch (err) {
+    console.warn('[promoPremium] claimFreePremium failed:', err);
+    return false;
+  }
+}
+
+/**
+ * När DEN INLOGGADE användarens gratismånad tar slut, eller null om de
+ * aldrig tryckt "Free". En claim som tillhör ett annat konto på samma
+ * enhet returnerar null — den är inte deras att se eller förnya.
  */
 export async function getFreePremiumExpiry(): Promise<Date | null> {
   try {
-    const raw = await AsyncStorage.getItem(CLAIM_KEY);
-    if (!raw) return null;
-    const claimedAt = new Date(raw);
-    if (Number.isNaN(claimedAt.getTime())) return null;
-    return addMonthsClamped(claimedAt, FREE_PREMIUM_CLAIM_MONTHS);
+    const claim = parseClaim(await AsyncStorage.getItem(CLAIM_KEY));
+    if (!claim) return null;
+    if (claim.owner !== (await resolveCurrentOwner())) return null;
+    return addMonthsClamped(new Date(claim.claimedAt), FREE_PREMIUM_CLAIM_MONTHS);
   } catch (err) {
     console.warn('[promoPremium] getFreePremiumExpiry failed:', err);
     return null;
   }
 }
+
+// Ingen explicit clear-funktion behövs: ägarstämpeln gör claimen inert för
+// alla andra konton, och Delete Account nukar hela `@quizvibe/*`-prefixet
+// (se auth.deleteAccount). Rensa den ALDRIG vid logout — då skulle någon
+// som bara loggar ut och in igen förlora sin pågående månad.
 
 /**
  * True om en gratismånad är igång just nu.

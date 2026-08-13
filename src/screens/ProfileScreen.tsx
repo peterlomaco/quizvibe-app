@@ -53,6 +53,7 @@ import {
 import { PURCHASED_PACKAGES, type MusicPackage } from '../utils/mockPurchasedPackages';
 import {
     clearProfile,
+    getCachedProfile,
     loadProfile,
     saveProfile,
     type AssistanceLevel,
@@ -63,7 +64,7 @@ import {
 } from '../utils/profileStorage';
 // Spotify OAuth-imports borttagna (Plan B 2026-07-22) — self-attest via
 // ProfileData.spotifyAppConfirmed ersätter connectSpotify/getSpotifyConnectionStatus.
-import { hasPremiumSubscription } from '../utils/subscriptionStorage';
+import { getCachedPremium, hasPremiumSubscription } from '../utils/subscriptionStorage';
 import {
     defaultEnabledMainCategories,
     type MainCategory,
@@ -259,7 +260,12 @@ export default function ProfileScreen() {
   // save-passthrough så ett ev. gammalt sparat saldo inte nollas av
   // handleSave (profilen skrivs som hel blob).
   const [gameCredits, setGameCredits]     = useState<number>(0);
-  const [freeGameCredits, setFreeGameCredits] = useState<number>(0);
+  // Seedas från den synkrona profil-spegeln så pillen inte renderar en frame
+  // med "Free: 0" (läses som "slut på credits") innan loadProfile hinner.
+  // Kall spegel → 0 som förut. Speglar Lobby.
+  const [freeGameCredits, setFreeGameCredits] = useState<number>(
+    () => getCachedProfile()?.freeGameCredits ?? 0,
+  );
   // Datum för senaste auto-refresh av freeGameCredits (CET, "YYYY-MM-DD").
   // Sparas tillsammans med freeGameCredits så loadProfile kan avgöra om
   // top-up till FREE_CREDITS_DAILY_CAP behövs vid nästa load. Saknas på
@@ -293,7 +299,11 @@ export default function ProfileScreen() {
   // med Lobby:s motsvarande hasPremium-state via samma subscriptionStorage-
   // helper. Load:as i useFocusEffect nedan så Profile speglar köp som
   // gjorts i Store utan delay.
-  const [hasPremium, setHasPremium] = useState(false);
+  //
+  // Seedas från den SYNKRONA spegeln så första framen redan är rätt — annars
+  // blinkar credits-pillen låst läge (grå PREMIUM + "Free: N") innan den
+  // async läsningen hinner. Speglar Lobby; se getCachedPremium.
+  const [hasPremium, setHasPremium] = useState(() => getCachedPremium() ?? false);
   // Default antal rundor (host-default). Speglar Lobby:s rounds-stepper +
   // RoundsRuler. Capas av gameMode — Pass-the-Phone (inkl. single-player
   // ovanpå PtP) är ALLTID max 4 oavsett subscription; Individual Devices
@@ -1064,6 +1074,30 @@ export default function ProfileScreen() {
     );
   };
 
+  // Tap på Host Game Credits-pillen. Utan prenumeration frågar vi först —
+  // pillen sitter i headern och nås lätt av misstag. Med prenumeration finns
+  // inget att sälja, så då är tappet en ren genväg till Store. Speglar Lobby;
+  // ändra alltid båda. guardedNavigate ligger utanpå så osparade profil-
+  // ändringar fortfarande fångas på vägen ut (Profile-specifikt).
+  const goToStoreFromCredits = () => {
+    guardedNavigate(() => router.push('/store?focus=subscription&from=/profile'));
+  };
+
+  const handleCreditsPillPress = () => {
+    if (hasPremium) {
+      goToStoreFromCredits();
+      return;
+    }
+    Alert.alert(
+      'Go to Store?',
+      'QuizVibe Premium gives you unlimited host games — no daily limit.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Go to Store', onPress: goToStoreFromCredits },
+      ],
+    );
+  };
+
   const previewCaption =
     source === 'upload'  ? 'Custom photo'
     : source === 'default' ? 'Default image'
@@ -1226,24 +1260,34 @@ export default function ProfileScreen() {
               hasPremium && styles.creditsPillMembership,
               pressed && { opacity: 0.85 },
             ]}
-            onPress={() => router.push('/store?focus=subscription&from=/profile')}
+            onPress={handleCreditsPillPress}
           >
-            {hasPremium && (
-              <View style={styles.creditsMembershipBadgeWrap} pointerEvents="none">
-                <View style={styles.creditsMembershipBadge}>
-                  <Text style={styles.creditsMembershipBadgeText}>UNLIMITED</Text>
-                </View>
+            {/* Badgen renderas ALLTID — guld när prenumerationen är aktiv,
+                grå när den inte är det (samma lås-signal som Max 12-rutan och
+                Rounds-rulern). Speglar Lobby. */}
+            <View style={styles.creditsMembershipBadgeWrap} pointerEvents="none">
+              <View style={[styles.creditsMembershipBadge, !hasPremium && styles.creditsMembershipBadgeGrey]}>
+                <Text style={[styles.creditsMembershipBadgeText, !hasPremium && styles.creditsMembershipBadgeTextGrey]}>PREMIUM</Text>
               </View>
-            )}
+            </View>
             {/* 2 rader — labeln wrappar i stället för att kapas när pillen är
                 trång (Display Zoom / stor Dynamic Type). Speglar Lobby. */}
             <Text style={styles.creditsLabel} numberOfLines={2} ellipsizeMode="tail">Host Game Credits</Text>
             {/* Extras-rutan borttagen 2026-07-07 — engångsköpta credits finns
                 inte längre (V1 säljer enbart Premium-abonnemang). Pillen
-                visar bara Free-saldot; Premium markeras via UNLIMITED-badgen. */}
+                visar Free-saldot för gratis-hosts; Premium-hosts drar aldrig
+                credits (handleStartGame skippar deduktionen) så saldot är
+                irrelevant för dem — de får "Unlimited" i guld i stället.
+                Speglar Lobby 1:1. */}
             <View style={styles.creditsValueRow}>
-              <Text style={styles.creditsKey}>Free:</Text>
-              <Text style={[styles.creditsValue, styles.creditsValueFree]}>{freeGameCredits}</Text>
+              {hasPremium ? (
+                <Text style={[styles.creditsValue, styles.creditsValueUnlimited]}>Unlimited</Text>
+              ) : (
+                <>
+                  <Text style={styles.creditsKey}>Free:</Text>
+                  <Text style={[styles.creditsValue, styles.creditsValueFree]}>{freeGameCredits}</Text>
+                </>
+              )}
             </View>
           </Pressable>
         </View>
@@ -3273,6 +3317,15 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
     color: '#000',
   },
+  // Låst variant — grå bg + vit text. Samma vokabulär som premiumBadgeGrey
+  // på Max 12-rutan och Rounds-rulerns badge, så "grått = ej upplåst" läses
+  // likadant överallt i appen.
+  creditsMembershipBadgeGrey: {
+    backgroundColor: '#6B7280',
+  },
+  creditsMembershipBadgeTextGrey: {
+    color: '#FFF',
+  },
   creditsLabel: {
     fontSize: 10,
     fontWeight: FontWeight.semibold,
@@ -3304,6 +3357,11 @@ const styles = StyleSheet.create({
   // och 1st-place-färgen i RoundLeaderboard för visuell konsistens.
   creditsValueFree: {
     color: Colors.success,
+  },
+  // Premium-hostens "Unlimited" — samma guld som PREMIUM-badgen + pillens
+  // ram, så hela pillen läses som ett guld-tema när prenumerationen är aktiv.
+  creditsValueUnlimited: {
+    color: '#F5A623',
   },
   creditsValueExtras: {
     color: '#F5A623',

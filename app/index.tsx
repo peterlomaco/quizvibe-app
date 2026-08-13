@@ -34,7 +34,7 @@ import {
 import { ensureAuthSession, signInWithPlayerName } from '@/src/utils/auth';
 import { containsProfanity } from '@/src/utils/profanity';
 import { clearProfile, getCachedProfile, loadProfile, playerNameExists, saveProfile, type ProfileData } from '@/src/utils/profileStorage';
-import { hasPremiumSubscription } from '@/src/utils/subscriptionStorage';
+import { clearPremiumSubscription, hasPremiumSubscription } from '@/src/utils/subscriptionStorage';
 import { supabase } from '@/src/utils/supabase';
 import { formatRoomCode, generateRoomCode, isBlockedLetterPair, isLetterCellIndex, ROOM_CODE_DIGITS, ROOM_CODE_LEADING_LETTERS, ROOM_CODE_LENGTH, ROOM_CODE_TRAILING_LETTERS } from '@/src/utils/roomCode';
 import { loadInvites, removeInvite, type WaitingInvite } from '@/src/utils/waitingInvites';
@@ -2437,6 +2437,16 @@ export default function HomeScreen() {
       singlePlayerDefault: false,
     };
     await saveProfile(newProfile);
+    // Ett nyregistrerat konto har per definition ingen prenumeration. Den
+    // lokala premium-spegeln är per ENHET, så utan denna rensning ärvde det
+    // nya kontot ett tidigare kontos `true` och visade "Unlimited" i
+    // credits-pillen i stället för "Free: 4" (Peter 2026-08-13).
+    // Självläkande: har Apple-ID:t en giltig prenumeration sätter
+    // RevenueCats customer-info-listener i app/_layout.tsx tillbaka den
+    // direkt efter att SIGNED_IN kopplat RC till den nya user-id:n.
+    // (Kampanjens gratismånad hanteras separat — den är ägarstämplad, se
+    // promoPremium.CLAIM_KEY.)
+    await clearPremiumSubscription();
     setProfile(newProfile);
     identify(data.user.id, { assistance: regAssistance, region: regRegion });
     track('user_registered', { assistance: regAssistance, region: regRegion });

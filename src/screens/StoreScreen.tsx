@@ -30,7 +30,7 @@ import {
   hasActiveFreePremium,
   isOfferWindowOpen,
 } from '../utils/promoPremium';
-import { setPremiumActive } from '../utils/subscriptionStorage';
+import { refreshPremiumMirror, setPremiumActive } from '../utils/subscriptionStorage';
 
 // ─── Tier-data ────────────────────────────────────────────────────────────────
 // Tier-konstanter mappar mot App Store Connect-products via `productId`.
@@ -376,7 +376,24 @@ export default function StoreScreen() {
     const isRenewal = promoExpiry !== null;
 
     setClaiming(true);
-    await claimFreePremium();
+    const claimed = await claimFreePremium();
+    if (!claimed) {
+      // Gratismånaden hör till ett konto, inte till telefonen — utan
+      // inloggad profil finns ingen att skriva den på. Bör inte kunna nås
+      // i praktiken (Store nås från inloggade menyer) men fail:ar synligt
+      // i stället för att låtsas lyckas.
+      setClaiming(false);
+      Alert.alert(
+        'Sign in required',
+        'Register or log in to your QuizVibe account to activate your free month.',
+      );
+      return;
+    }
+    // Gratismånaden lever i promoPremiums egen nyckel och passerar aldrig
+    // setPremiumActive, så den synkrona premium-spegeln måste räknas om
+    // explicit. Utan detta seedar nästa skärm-mount (Lobby/Profile) låst
+    // läge och blinkar om till Premium först när dess async läsning hinner.
+    await refreshPremiumMirror();
     const { open, active, expiry } = await loadPromoState();
     setOfferOpen(open);
     setClaimActive(active);

@@ -95,8 +95,8 @@ import {
   PLAYER_NAME_MAX_LETTERS,
 } from '../utils/playerName';
 import { containsProfanity } from '../utils/profanity';
-import { loadProfile, playerNameExists, saveProfile, type ProfileData, type Region as ProfileRegion } from '../utils/profileStorage';
-import { hasPremiumSubscription } from '../utils/subscriptionStorage';
+import { getCachedProfile, loadProfile, playerNameExists, saveProfile, type ProfileData, type Region as ProfileRegion } from '../utils/profileStorage';
+import { getCachedPremium, hasPremiumSubscription } from '../utils/subscriptionStorage';
 import { ROOM_CODE_DIGITS, ROOM_CODE_LEADING_LETTERS, generateRoomCode } from '../utils/roomCode';
 import { checkSpotifyInstalled } from '../utils/spotifyDJ';
 import { addInvite, clearWaitingInvitesForRoom } from '../utils/waitingInvites';
@@ -1927,8 +1927,15 @@ export default function LobbyScreen() {
   // från sparad profil i useFocusEffect:n nedan så lobbyn alltid visar
   // samma siffra som Profile (och uppdateras direkt om användaren spenderat
   // / fyllts på via daily refresh mellan tab-byten). Engångsköpta Extras
-  // (gameCredits) borttagna 2026-07-07 — bara Free + Premium/UNLIMITED kvar.
-  const [freeGameCredits, setFreeGameCredits] = useState<number>(0);
+  // (gameCredits) borttagna 2026-07-07 — bara Free + Premium/Unlimited kvar.
+  //
+  // Seedas från den synkrona profil-spegeln av samma skäl som hasPremium
+  // nedan: `useState(0)` renderade en frame med "Free: 0", vilket läser som
+  // "slut på credits". Är spegeln kall (undefined/null) står 0 kvar som förut
+  // tills focus-effektens loadProfile hinner.
+  const [freeGameCredits, setFreeGameCredits] = useState<number>(
+    () => getCachedProfile()?.freeGameCredits ?? 0,
+  );
 
   // Host delete-lobby sheet — bara aktiv när hostMode är på. Tap på TopUserBanner-
   // pillen öppnar sheet:n istället för att navigera till Profile (host:s
@@ -2094,12 +2101,47 @@ export default function LobbyScreen() {
   // re-checkar efter återkomst från Store (mock-purchase aktiverar flaggan).
   // Driver BÅDA Individual Devices-unlock OCH Max 12-unlock. TODO (Store
   // integration): byt subscriptionStorage mot RevenueCat entitlement-check.
-  const [hasPremium, setHasPremium] = useState(false);
+  //
+  // Seedas från den SYNKRONA spegeln så första framen redan är rätt. Med
+  // `useState(false)` renderade en Premium-host en frame av låst läge —
+  // credits-pillen blinkade grå PREMIUM + "Free: 4" innan den hoppade till
+  // guld + "Unlimited" (Peter 2026-08-13). `undefined` (kall start) → false,
+  // fail-closed; focus-effektens async läsning korrigerar direkt efter.
+  const [hasPremium, setHasPremium] = useState(() => getCachedPremium() ?? false);
   // Senast OBSERVERADE premium-status i focus-effekten — driver mid-session-
   // övergångar för extra-paketen (auto-aktivera vid köp, töm vid lapse).
   // null = "inte observerad än" så första focus-tick aldrig feltolkas som
   // en upgrade (se premium-övergångs-blocket i useFocusEffect).
   const prevPremiumRef = useRef<boolean | null>(null);
+
+  // Tap på Host Game Credits-pillen. Utan prenumeration frågar vi först —
+  // pillen sitter i headern och nås lätt av misstag, och att slängas ur
+  // lobbyn till Store mitt i en pågående lobby-setup är en dyr felnavigering.
+  // Med prenumeration finns inget att sälja, så då är tappet en ren genväg
+  // till Store utan mellansteg.
+  // ⚠ Måste ligga EFTER hasPremium-deklarationen — deps-arrayen evalueras
+  // direkt vid render, så en placering ovanför ger TDZ-ReferenceError.
+  const goToStoreFromCredits = useCallback(() => {
+    router.push({
+      pathname: '/store' as const,
+      params: { focus: 'subscription', from: '/lobby', fromCode: roomCode },
+    });
+  }, [roomCode]);
+
+  const handleCreditsPillPress = useCallback(() => {
+    if (hasPremium) {
+      goToStoreFromCredits();
+      return;
+    }
+    Alert.alert(
+      'Go to Store?',
+      'QuizVibe Premium gives you unlimited host games — no daily limit.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Go to Store', onPress: goToStoreFromCredits },
+      ],
+    );
+  }, [hasPremium, goToStoreFromCredits]);
 
   // Sync lobby-state till mockActiveRooms-registry så join-flödet
   // (handleJoinWithCode / handleJoinAsGuest i index.tsx) kan validera
@@ -5340,25 +5382,36 @@ export default function LobbyScreen() {
                 hasPremium && styles.creditsPillMembership,
                 pressed && { opacity: 0.85 },
               ]}
-              onPress={() => router.push({ pathname: '/store' as const, params: { focus: 'subscription', from: '/lobby', fromCode: roomCode } })}
+              onPress={handleCreditsPillPress}
             >
-              {hasPremium && (
-                <View style={styles.creditsMembershipBadgeWrap} pointerEvents="none">
-                  <View style={styles.creditsMembershipBadge}>
-                    <Text style={styles.creditsMembershipBadgeText}>UNLIMITED</Text>
-                  </View>
+              {/* Badgen renderas ALLTID — guld när prenumerationen är aktiv,
+                  grå när den inte är det (samma lås-signal som Max 12-rutan
+                  och Rounds-rulern). Tidigare doldes den helt utan Premium,
+                  vilket gjorde att pillen inte antydde att det fanns något
+                  att låsa upp. */}
+              <View style={styles.creditsMembershipBadgeWrap} pointerEvents="none">
+                <View style={[styles.creditsMembershipBadge, !hasPremium && styles.creditsMembershipBadgeGrey]}>
+                  <Text style={[styles.creditsMembershipBadgeText, !hasPremium && styles.creditsMembershipBadgeTextGrey]}>PREMIUM</Text>
                 </View>
-              )}
+              </View>
               {/* 2 rader tillåtna: labeln wrappar ("HOST GAME / CREDITS")
                   i stället för att kapas till "HOST GAME CRE…" när pillen
                   är trång — t.ex. vid Display Zoom eller stor Dynamic Type. */}
               <Text style={styles.creditsLabel} numberOfLines={2} ellipsizeMode="tail">Host Game Credits</Text>
               {/* Extras-rutan borttagen 2026-07-07 — engångsköpta credits finns
                   inte längre (V1 säljer enbart Premium-abonnemang). Pillen
-                  visar bara Free-saldot; Premium markeras via UNLIMITED-badgen. */}
+                  visar Free-saldot för gratis-hosts; Premium-hosts drar aldrig
+                  credits (handleStartGame skippar deduktionen) så saldot är
+                  irrelevant för dem — de får "Unlimited" i guld i stället. */}
               <View style={styles.creditsValueRow}>
-                <Text style={styles.creditsKey}>Free:</Text>
-                <Text style={[styles.creditsValue, styles.creditsValueFree]}>{freeGameCredits}</Text>
+                {hasPremium ? (
+                  <Text style={[styles.creditsValue, styles.creditsValueUnlimited]}>Unlimited</Text>
+                ) : (
+                  <>
+                    <Text style={styles.creditsKey}>Free:</Text>
+                    <Text style={[styles.creditsValue, styles.creditsValueFree]}>{freeGameCredits}</Text>
+                  </>
+                )}
               </View>
             </Pressable>
           )}
@@ -8350,6 +8403,15 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
     color: '#000',
   },
+  // Låst variant — grå bg + vit text. Samma vokabulär som premiumBadgeGrey
+  // på Max 12-rutan och Rounds-rulerns badge, så "grått = ej upplåst" läses
+  // likadant överallt i appen.
+  creditsMembershipBadgeGrey: {
+    backgroundColor: '#6B7280',
+  },
+  creditsMembershipBadgeTextGrey: {
+    color: '#FFF',
+  },
   creditsLabel: {
     fontSize: 10,
     fontWeight: FontWeight.semibold,
@@ -8376,6 +8438,11 @@ const styles = StyleSheet.create({
   },
   creditsValueFree: {
     color: Colors.success,
+  },
+  // Premium-hostens "Unlimited" — samma guld som PREMIUM-badgen + pillens
+  // ram, så hela pillen läses som ett guld-tema när prenumerationen är aktiv.
+  creditsValueUnlimited: {
+    color: '#F5A623',
   },
   creditsValueExtras: {
     color: '#F5A623',
