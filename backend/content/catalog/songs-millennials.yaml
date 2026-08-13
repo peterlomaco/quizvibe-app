@@ -1671,3 +1671,16 @@ items:
         endSec: 30
         notes: "Peter-kurerad 2026-08-14. Videotitel verifierad: 'Kylie Minogue - The Loco-motion - Official Video' — den internationella 1988-versionen."
     notes: "correctYear = 1988 ars internationella ominspelning (The Loco-Motion), den som slog i Sverige och den klippet visar. Hennes australiska original 'Locomotion' kom juli 1987 — samma undantagsresonemang som a-ha Take on Me. Ar-policy: Little Eva (1962) och Grand Funk (1974) ar ANDRA artister och raknas inte."
+  # --- 1989 ---
+  - id: b52s-love-shack
+    displayName: "Love Shack — The B-52's"
+    correctYear: 1989
+    probability: 82
+    wikimediaSearchHints: ["The B-52s Love Shack 1989 Cosmic Thing"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "9SOryJvTAGs"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
+    notes: "correctYear = singeln (20 juni 1989), veckan fore albumet Cosmic Thing (27 juni 1989) — bada 1989 oavsett vilken som raknas."
