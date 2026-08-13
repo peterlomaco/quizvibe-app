@@ -1689,6 +1689,18 @@ items:
         endSec: 60
         notes: "Peter-kurerad 2026-08-14, startSec angiven av Peter. Kanal ej verifierad."
     notes: "correctYear = singeln (12 okt 1987), strax fore albumet Faith (30 okt 1987)."
+  - id: george-harrison-got-my-mind-set-on-you
+    displayName: "Got My Mind Set on You — George Harrison"
+    correctYear: 1987
+    probability: 78
+    wikimediaSearchHints: ["George Harrison Got My Mind Set on You 1987 Cloud Nine"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "OnggBmaY4D4"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-08-14. Videotitel verifierad: '\"Got My Mind Set On You\" Version 2 (From the album \"Cloud 9\")' — Peter angav ingen lattitel, harledd ur klippet. Titeln rojer albumnamnet men inte aret."
+    notes: "correctYear = singeln (12 okt 1987), fore albumet Cloud Nine (2 nov 1987). Ar-policy: laten ar en cover — James Ray spelade in originalet 1962 — men en tidigare inspelning av en ANNAN artist raknas inte, sa svaret ar Harrisons egen inspelning 1987."
   - id: whitesnake-here-i-go-again
     displayName: "Here I Go Again — Whitesnake"
     correctYear: 1987
@@ -1735,3 +1747,15 @@ items:
         endSec: 30
         notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
     notes: "correctYear = albumet Like a Prayer (21 mars 1989), forsta gangen laten gick att hora. Singeln kom 9 maj 1989. Samma album som itemet madonna-like-a-prayer, aven det 1989."
+  - id: tina-turner-the-best
+    displayName: "The Best — Tina Turner"
+    correctYear: 1989
+    probability: 84
+    wikimediaSearchHints: ["Tina Turner The Best Simply the Best 1989 Foreign Affair"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "GC5E8ie2pdM"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
+    notes: "correctYear = singeln (aug 1989), fore albumet Foreign Affair (13 sept 1989). Ar-policy: laten ar en cover — Bonnie Tyler spelade in originalet 1988 pa Hide Your Heart — men en tidigare inspelning av en ANNAN artist raknas inte, sa svaret ar Tinas egen inspelning 1989."

@@ -5421,6 +5421,29 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "george-harrison-got-my-mind-set-on-you",
+    "displayName": "Got My Mind Set on You — George Harrison",
+    "correctYear": 1987,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "OnggBmaY4D4",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-14. Videotitel verifierad: '\"Got My Mind Set On You\" Version 2 (From the album \"Cloud 9\")' — Peter angav ingen lattitel, harledd ur klippet. Titeln rojer albumnamnet men inte aret."
+      }
+    ]
+  },
+  {
     "id": "george-michael-faith",
     "displayName": "Faith — George Michael",
     "correctYear": 1987,
@@ -6113,6 +6136,29 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Ronny & Ragge",
         "license": "standard",
         "notes": "Official video."
+      }
+    ]
+  },
+  {
+    "id": "tina-turner-the-best",
+    "displayName": "The Best — Tina Turner",
+    "correctYear": 1989,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "GC5E8ie2pdM",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-14. Kanal ej verifierad."
       }
     ]
   },
