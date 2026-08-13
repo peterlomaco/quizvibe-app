@@ -350,6 +350,7 @@ items:
     displayName: "We Will Rock You — Queen"
     correctYear: 1977
     probability: 88
+    region: ["global"]
     wikimediaSearchHints: ["Queen We Will Rock You News of the World"]
     answerMethods: ["timeline"]
     youtubeClips:
@@ -559,6 +560,33 @@ items:
           allow-list utan SE → 'Video unavailable' i Sverige. Officiell remaster
           från rättsinnehavarens kanal, HD, blockerad enbart i RU."
     genrePackages: ["sport"]
+  - id: boney-m-ma-baker
+    displayName: "Ma Baker — Boney M."
+    correctYear: 1977
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Boney M Ma Baker 1977"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "Czhn1ZuhsMg"
+        startSec: 15
+        endSec: 45
+        channelTitle: "Harry22"
+        notes: "Peter-kurerad 2026-08-12. OBS: privat re-upload av musikvideon — ej rättsinnehavare. Spelbar i SE 2026-08-12; takedown-risk kvarstår."
+    notes: "correctYear = singeln (juni 1977), fore albumet Love for Sale (aug 1977)."
+  - id: earth-wind-and-fire-september
+    displayName: "September — Earth, Wind & Fire"
+    correctYear: 1978
+    probability: 88
+    region: ["global"]
+    wikimediaSearchHints: ["Earth Wind and Fire September 1978"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "aqZxIL4YE2I"
+        startSec: 15
+        endSec: 45
+        channelTitle: "7clouds"
+        notes: "Peter-kurerad 2026-08-12. 7clouds lyric-video — katalogens standard-lyric-kanal (samma som Toto/Africa och GNR)."
   - id: police-roxanne
     displayName: "Roxanne — The Police"
     correctYear: 1978

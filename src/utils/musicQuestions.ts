@@ -208,6 +208,72 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": []
   },
   {
+    "id": "the-wizard-of-oz-1939",
+    "displayName": "The Wizard of Oz",
+    "correctYear": 1939,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "audiences": [
+      "all"
+    ],
+    "region": [
+      "global"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Judy Garland"
+    ],
+    "distractorNames": [
+      "Shirley Temple",
+      "Vivien Leigh",
+      "Katharine Hepburn",
+      "Ingrid Bergman"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "FfpF8UUVTeM",
+        "startSec": 5,
+        "endSec": 35,
+        "channelTitle": "Warner On Demand",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-12. Officiell WB-trailer, titeln avslöjar varken skådespelare eller år."
+      }
+    ]
+  },
+  {
+    "id": "citizen-kane-1941",
+    "displayName": "Citizen Kane",
+    "correctYear": 1941,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "audiences": [
+      "all"
+    ],
+    "region": [
+      "global"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Orson Welles"
+    ],
+    "distractorNames": [
+      "Humphrey Bogart",
+      "James Stewart",
+      "Cary Grant",
+      "Gary Cooper"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "fXf2LGhW66M",
+        "startSec": 5,
+        "endSec": 35,
+        "channelTitle": "Mackenzie Parker",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-12. OBS: fan-gjord 'modern trailer' på privat kanal — ej rättsinnehavare. Takedown-risk, byt till officiellt klipp när sådant hittas."
+      }
+    ]
+  },
+  {
     "id": "bambi-1942",
     "displayName": "Bambi",
     "correctYear": 1942,
@@ -227,6 +293,40 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Disney UK",
         "license": "standard",
         "notes": "Disney UK officiell Diamond Edition-trailer — Bambi i skogen, klassisk Disney-estetik."
+      }
+    ]
+  },
+  {
+    "id": "casablanca-1942",
+    "displayName": "Casablanca",
+    "correctYear": 1942,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "audiences": [
+      "all"
+    ],
+    "region": [
+      "global"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Humphrey Bogart",
+      "Ingrid Bergman"
+    ],
+    "distractorNames": [
+      "Cary Grant",
+      "James Stewart",
+      "Katharine Hepburn",
+      "Greta Garbo"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "0V1eoBH0Zcw",
+        "startSec": 5,
+        "endSec": 35,
+        "channelTitle": "thecoolidge",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-12. Original-trailer i HD, titeln avslöjar varken skådespelare eller år."
       }
     ]
   },
@@ -382,6 +482,40 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "spotifyTrackId": "5dae01pKNjRQtgOeAkFzPY",
     "youtubeClips": []
+  },
+  {
+    "id": "singin-in-the-rain-1952",
+    "displayName": "Singin' in the Rain",
+    "correctYear": 1952,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "audiences": [
+      "all"
+    ],
+    "region": [
+      "global"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Gene Kelly",
+      "Debbie Reynolds"
+    ],
+    "distractorNames": [
+      "Fred Astaire",
+      "Frank Sinatra",
+      "Audrey Hepburn",
+      "Grace Kelly"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "D-NJHUasYVA",
+        "startSec": 5,
+        "endSec": 35,
+        "channelTitle": "Park Circus",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-12. Officiell Park Circus-trailer (rättighetsdistributör), ren titel."
+      }
+    ]
   },
   {
     "id": "bill-haley-rock-around-the-clock",
@@ -1102,6 +1236,39 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "PhilGoodFactor1",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
+    "id": "the-good-the-bad-and-the-ugly-1966",
+    "displayName": "The Good, the Bad and the Ugly",
+    "correctYear": 1966,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "audiences": [
+      "all"
+    ],
+    "region": [
+      "global"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Clint Eastwood"
+    ],
+    "distractorNames": [
+      "Charles Bronson",
+      "Steve McQueen",
+      "Lee Marvin",
+      "Yul Brynner"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "WCN5JJY_wiA",
+        "startSec": 5,
+        "endSec": 35,
+        "channelTitle": "Rotten Tomatoes Classic Trailers",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-12. Videotiteln lyder '... Official Trailer #1 - Clint Eastwood Movie (1966) HD'. Peter bedömde 2026-08-13 att slutet av titelraden inte hinner läsas i spelaren och BEHÖLL klippet medvetet — flagga inte om som spoiler. OBS att det som står där är rätt SKÅDESPELARE (frågan är actor-select, svaret = Clint Eastwood), inte bara årtalet. Vill man ta bort risken utan att byta klipp: sätt correctNames till Eli Wallach / Lee Van Cleef (också huvudroller, står inte i titeln)."
       }
     ]
   },
@@ -2562,6 +2729,30 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "boney-m-ma-baker",
+    "displayName": "Ma Baker — Boney M.",
+    "correctYear": 1977,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "Czhn1ZuhsMg",
+        "startSec": 15,
+        "endSec": 45,
+        "channelTitle": "Harry22",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-12. OBS: privat re-upload av musikvideon — ej rättsinnehavare. Spelbar i SE 2026-08-12; takedown-risk kvarstår."
+      }
+    ]
+  },
+  {
     "id": "bonnie-tyler-its-a-heartache",
     "displayName": "It's a Heartache — Bonnie Tyler",
     "correctYear": 1977,
@@ -2666,7 +2857,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "elder"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
       "sport"
@@ -2737,6 +2928,30 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Chic - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
+    "id": "earth-wind-and-fire-september",
+    "displayName": "September — Earth, Wind & Fire",
+    "correctYear": 1978,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "aqZxIL4YE2I",
+        "startSec": 15,
+        "endSec": 45,
+        "channelTitle": "7clouds",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-12. 7clouds lyric-video — katalogens standard-lyric-kanal (samma som Toto/Africa och GNR)."
       }
     ]
   },
@@ -3111,6 +3326,40 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "HD Retro Trailers",
         "license": "standard",
         "notes": "HD originaltrailer. Uno Svenningsson + Lasse Åberg ikonisk öppning."
+      }
+    ]
+  },
+  {
+    "id": "star-wars-empire-strikes-back-1980",
+    "displayName": "Star Wars: The Empire Strikes Back",
+    "correctYear": 1980,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "audiences": [
+      "all"
+    ],
+    "region": [
+      "global"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Mark Hamill",
+      "Harrison Ford"
+    ],
+    "distractorNames": [
+      "Kurt Russell",
+      "Christopher Reeve",
+      "Michael Douglas",
+      "Richard Dreyfuss"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "JNwNXF9Y6kY",
+        "startSec": 5,
+        "endSec": 35,
+        "channelTitle": "Star Wars",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-12. Officiella Star Wars-kanalen, ren titel utan skådespelar- eller års-spoiler."
       }
     ]
   },
@@ -3565,7 +3814,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "all"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -3751,7 +4000,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-x"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -3760,7 +4009,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 15,
         "channelTitle": "Cyndi Lauper - Topic",
         "license": "standard",
-        "notes": "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
+        "notes": "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100). BEHÅLLET 2026-08-12: Peters förslag Q2ahfQoB9EY är en privat re-upload; Topic är rättsinnehavarens kanal."
       }
     ]
   },
@@ -4342,7 +4591,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "all"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "isAnimated": false,
     "correctNames": [
@@ -4361,7 +4610,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 25,
         "channelTitle": "Universal Pictures",
         "license": "standard",
-        "notes": "Official Universal Pictures-klipp — Johnny B. Goode-scenen."
+        "notes": "Official Universal Pictures-klipp — Johnny B. Goode-scenen. BEHÅLLET 2026-08-12: Peters förslag 2LnShmQ_hLc är en privat re-upload av teaser-trailern; rättsinnehavarens klipp är stabilare."
       }
     ]
   },
@@ -4442,6 +4691,30 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "whitney-houston-how-will-i-know",
+    "displayName": "How Will I Know — Whitney Houston",
+    "correctYear": 1985,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "TO-Tk84ATjw",
+        "startSec": 15,
+        "endSec": 45,
+        "channelTitle": "Accelerate",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-12. Lyric-video på privat kanal — ej rättsinnehavare. Spelbar i SE 2026-08-12; takedown-risk kvarstår."
+      }
+    ]
+  },
+  {
     "id": "bon-jovi-livin-on-a-prayer",
     "displayName": "Livin' on a Prayer — Bon Jovi",
     "correctYear": 1986,
@@ -4452,16 +4725,16 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-x"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
-        "videoId": "YBdyc1WDlBQ",
-        "startSec": 45,
+        "videoId": "lDK9QqIzhwk",
+        "startSec": 30,
         "endSec": 60,
-        "channelTitle": "Jon Bon Jovi - Topic",
+        "channelTitle": "BonJoviVEVO",
         "license": "standard",
-        "notes": "Officiell album-audio via YouTube Topic. 'Whoaa, we're halfway there'-refräng."
+        "notes": "Peter-kurerad 2026-08-12 — ersatte Topic-audion (YBdyc1WDlBQ) med officiella musikvideon på BonJoviVEVO."
       }
     ]
   },
@@ -4486,29 +4759,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "EUROPE - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
-      }
-    ]
-  },
-  {
-    "id": "maradona-hand-of-god",
-    "displayName": "Maradona Hand of God",
-    "correctYear": 1986,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "audiences": [
-      "all"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "-ccNkksrfls",
-        "startSec": 0,
-        "endSec": 30,
-        "channelTitle": "ClassicEngland",
-        "license": "standard",
-        "notes": "Peter-curerat + validerat i in-app-spelaren 2026-08-05, ersatte Sport Clips 4K-klippet (F-n7lWyM4Vc) — årtalet i videotiteln syns EJ i appens spelare, godkänt trots år-i-titel."
       }
     ]
   },
@@ -4679,16 +4929,16 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-x"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
-        "videoId": "3BFTio5296w",
+        "videoId": "dQw4w9WgXcQ",
         "startSec": 15,
-        "endSec": 30,
-        "channelTitle": "Rick Astley - Topic",
+        "endSec": 45,
+        "channelTitle": "Rick Astley",
         "license": "standard",
-        "notes": "Officiell album-audio via YouTube Topic (2022 Remaster). Iconic 'Never gonna give you up'-hook."
+        "notes": "Peter-kurerad 2026-08-12 — ersatte Topic-audion (3BFTio5296w) med officiella musikvideon (4K Remaster) på artistens egen kanal."
       }
     ]
   },
@@ -4750,7 +5000,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-x"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -4759,7 +5009,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 15,
         "channelTitle": "Whitney Houston - Topic",
         "license": "standard",
-        "notes": "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
+        "notes": "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100). BEHÅLLET 2026-08-12: Peters förslag QzZ-mtE1EHc är en privat re-upload; Topic är rättsinnehavarens kanal."
       }
     ]
   },
@@ -6185,7 +6435,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "all"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "isAnimated": false,
     "correctNames": [
@@ -6205,7 +6455,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 45,
         "channelTitle": "Movieclips",
         "license": "standard",
-        "notes": "Official trailer (Movieclips) — iconic surf-rock soundtrack + ensemble-shots."
+        "notes": "Official trailer (Movieclips) — iconic surf-rock soundtrack + ensemble-shots. BEHÅLLET 2026-08-12: Peters förslag tGpTpVyI_OQ (Miramax) har titeln 'John Travolta, Uma Thurman, Samuel L. Jackson' = direkt spoiler för actor-select."
       }
     ]
   },
@@ -6548,7 +6798,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "all"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "genrePackages": [
       "sport"
@@ -6575,7 +6825,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-x"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -6584,7 +6834,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 45,
         "channelTitle": "Los Del Río - Topic",
         "license": "standard",
-        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100). BEHÅLLET 2026-08-12: Peters förslag gwWRjvwlLKg är en privat re-upload; Topic är rättsinnehavarens kanal."
       }
     ]
   },
@@ -6659,6 +6909,30 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 198,
         "channelTitle": "Aqua - Topic",
         "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "backstreet-boys-everybody",
+    "displayName": "Everybody (Backstreet's Back) — Backstreet Boys",
+    "correctYear": 1997,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-z",
+      "millennials"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "iUfaW-Utn8Y",
+        "startSec": 15,
+        "endSec": 45,
+        "channelTitle": "MASTER RJ",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-12. ⚠ MASTER RJ är SAMMA re-upload-kanal vars klipp (TJLAJWSEd6U, Thriller) blev region-blockerat i 249 länder inkl. SE 2026-08-10. Spelbar i SE 2026-08-12, men kanalen har redan fallerat en gång — prioritera officiellt ersättningsklipp."
       }
     ]
   },
@@ -7761,7 +8035,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "all"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "isAnimated": false,
     "correctNames": [
@@ -7776,12 +8050,12 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "youtubeClips": [
       {
-        "videoId": "V75dMMIW2B4",
-        "startSec": 15,
-        "endSec": 30,
-        "channelTitle": "Movieclips",
+        "videoId": "_nZdmwHrcnw",
+        "startSec": 5,
+        "endSec": 35,
+        "channelTitle": "Warner Bros. Entertainment",
         "license": "standard",
-        "notes": "Curerad 2026-05-29 — officiell 2001-trailer #1 (Movieclips)."
+        "notes": "Peter-kurerad 2026-08-12 — ersatte Movieclips-trailern (V75dMMIW2B4) med rättsinnehavarens 4K Ultra HD-klipp."
       }
     ]
   },
@@ -8158,6 +8432,40 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eric Prydz - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
+    "id": "eternal-sunshine-of-the-spotless-mind-2004",
+    "displayName": "Eternal Sunshine of the Spotless Mind",
+    "correctYear": 2004,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "audiences": [
+      "all"
+    ],
+    "region": [
+      "global"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Jim Carrey",
+      "Kate Winslet"
+    ],
+    "distractorNames": [
+      "Adam Sandler",
+      "Ben Stiller",
+      "Cameron Diaz",
+      "Julia Roberts"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "86NjzbHhZOE",
+        "startSec": 5,
+        "endSec": 35,
+        "channelTitle": "Max Caulfield",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-12. OBS: privat kanal-uppladdning av trailern — ej rättsinnehavare. Takedown-risk, byt till officiellt klipp när sådant hittas."
       }
     ]
   },
@@ -9386,6 +9694,40 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 202,
         "channelTitle": "7clouds",
         "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "the-social-network-2010",
+    "displayName": "The Social Network",
+    "correctYear": 2010,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "audiences": [
+      "all"
+    ],
+    "region": [
+      "global"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Jesse Eisenberg",
+      "Andrew Garfield"
+    ],
+    "distractorNames": [
+      "Michael Cera",
+      "Joseph Gordon-Levitt",
+      "Shia LaBeouf",
+      "Anton Yelchin"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "rBCNU0XT9GY",
+        "startSec": 5,
+        "endSec": 35,
+        "channelTitle": "Sony Pictures Releasing UK",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-12. Officiell Sony-trailer. Titeln innehåller '15 October 2010' men frågan är actor-select, så året är inte svaret — får INTE bytas till timeline utan nytt klipp."
       }
     ]
   },

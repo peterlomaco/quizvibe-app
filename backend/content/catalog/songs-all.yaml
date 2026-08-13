@@ -69,6 +69,7 @@ items:
     displayName: "Billie Jean — Michael Jackson"
     correctYear: 1982
     probability: 95
+    region: ["global"]
     wikimediaSearchHints: ["Michael Jackson Billie Jean"]
     answerMethods: ["timeline"]
     youtubeClips:

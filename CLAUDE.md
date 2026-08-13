@@ -25,6 +25,8 @@ Status mot den 4-stegs-plan vi följer för content-bygge inför launch:
 
 **En tidigare inspelning av en ANNAN artist räknas INTE.** Itemet är artistens inspelning, inte kompositionen. Sinatras *Fly Me to the Moon* är 1964 även om låten spelades in 1954; Ray Charles *Georgia on My Mind* är 1960 även om Hoagy Carmichael skrev och spelade in den 1930. Följande åtta är GRANSKADE och avvisade av exakt det skälet — flagga dem inte igen: `Fly Me to the Moon` (1954), `At Last` (1942), `Georgia on My Mind` (1930), `Nothing Compares 2 U` (The Family 1985), `Suspicious Minds` (Mark James 1968), `Killing Me Softly` (Lori Lieberman 1972), `En kväll i juni` (Tre Profiler 1971 — Berghagens egen kom 1975), `Save Your Kisses for Me` (singel mars 1976).
 
+**Dokumenterat undantag: `van-halen-jump` = 1984.** Singeln kom 21 dec 1983, tolv dagar före albumet *1984* (9 jan 1984), så policyn ger strikt 1983 — men låten är allmänt förknippad med albumet och en spelare skulle uppfatta 1983 som fel. Peter beslutade 1984 (2026-08-13). Ändra inte till 1983.
+
 **Dokumenterat undantag: `a-ha-take-on-me` = 1985.** a-ha släppte en egen originalversion okt 1984 (Tony Mansfield-produktionen, floppade); 1985 års Alan Tarney-inspelning är den som blev hit och den vi spelar. Peter beslutade 1985 (2026-08-11). Ändra inte till 1984.
 
 **Retroaktiv audit genomförd 2026-08-11 (commits `3c486d7`, `d13fd5d`, `46bc023`): 20 år rättade av 401 sånger.** Två pass: MusicBrainz (`recording`-sök, tidigaste release) och därefter Wikipedia-infobox-skrapning som ÄVEN följer album-länken — det senare har klart bäst recall och är metoden att återanvända. MB ensamt missade t.ex. Sweet Child o' Mine. **50 sånger är fortfarande okontrollerade** (ingen matchande Wikipedia-artikel — mest dansband och nischade spår). Rapport: `backend/output/year-audit.md`.
@@ -227,9 +229,23 @@ isItemInRegionScope(itemRegions, country)  // true om någon tagg finns i kedjan
 
 **Paket-exklusivitet hör INTE hit.** Tidigare hackade vi `region: ["unknown-region"]` för att hålla paket-items utanför baspoolen. Använd **`inBaseCatalog: false`** i stället (+ `genrePackages`), så bär `region` ren geografi. Noll unknown-region används som paket-grind i dag.
 
+⚠ **`genrePackages` ensamt döljer INGENTING.** `inBaseCatalog` defaultar till `true`, så enbart taggen betyder "ligger kvar i baspoolen OCH dyker upp när paketet släpps" (så är t.ex. `queen-we-will-rock-you` base + `sport`). Paket-exklusivt kräver BÅDA fälten.
+
+**`hiphop`-taggen är medvetet i blandat läge (Peter 2026-08-13).** `mc-hammer-u-cant-touch-this` är paket-exklusiv (`inBaseCatalog: false`), medan de sex äldre hiphop-items:en (`sugarhill-gang-rappers-delight`, `nas-if-i-ruled-the-world`, `dr-dre-the-next-episode`, `50-cent-in-da-club`, `eminem-my-name-is`, `outkast-ms-jackson`) ligger kvar i baspoolen. Det är INTE en bugg att städa — de sex ska lyftas ur baspoolen först när hiphop-paketet faktiskt byggs. **Lös alltså INTE inkonsekvensen genom att ta bort MC Hammers `inBaseCatalog: false`.** `rock` är däremot helt paket-exklusivt redan i dag.
+
 **`PLAYER_COUNTRY` är hårdkodat `'sweden'`** i [regionScope.ts](src/utils/regionScope.ts). **Spelarens land är ännu inte wire:at** — varken `ProfileData.region` (`'sweden'|'nordics'|'global'`) eller Lobby:ns "Region Scope" (Sweden/Nordics/Europe/Global) är ett LAND; båda beskriver hur brett innehållet ska vara. En av dem måste bli en riktig landväljare innan hierarkin gör skillnad i spelet. Följd i V1: global/europe/nordic/sweden är alla synliga, unknown-region är det inte.
 
 Se `memory/project_v1_v2_region_strategy.md` (skriven under den gamla modellen — läs med ovanstående som facit).
+
+**Film-items: Name som standard, Year bara som spoiler-undantag (Peter 2026-08-13).** Ett filmklipp har **exakt ETT** svarsläge, fast per klipp — aldrig båda:
+- **`answerMethods: ["actor-select"]`** = default. Frågan blir "Select one of the main actors in this film?".
+- **`answerMethods: ["timeline"]`** = undantag, används när klippets YouTube-titel röjer huvudrollsinnehavaren men INTE året. Frågan blir "Which Year was this Movie launched?".
+
+⚠ **Sätt ALDRIG `["actor-select", "timeline"]` på ett film-item.** Ett kort pass 2026-08-13 taggade 23 filmer så inför en tänkt runtime-växling mellan Year/Name; den modellen är förkastad och taggningen återställd. Det ska inte finnas någon växling under spel, ingen lobby-toggle och ingen slump.
+
+**Ingen kod behövs för att byta läge** — mekaniken finns redan: `export-music-questions.ts` emitterar `correctNames`/`isAnimated`/`distractorNames` bara när `answerMethods` innehåller `'actor-select'`, och låter annars `questionText` falla tillbaka på `FIXED_QUESTION_TEXT['movie']`. Klientens `SEED_QUESTIONS` grenar i sin tur på om `correctNames` kom med. Byt värdet i YAML + kör `npm run export-music-questions`, så följer frågetext, GetReadyIntro-badge och nedräkningsordet ("When"/"Who") med automatiskt. `correctNames` kan lämnas kvar i YAML — den exporteras helt enkelt inte i timeline-läget.
+
+**Röjer titeln BÅDA (år + skådespelare) → byt klipp, inte läge.** Att flippa till Year hjälper inte då. OBS att YouTube-spelaren **kapar långa titlar**, så en träff i titeln inte automatiskt är ett problem: Peter verifierade 2026-08-13 i appen att `cool-runnings-1993` (titel 65 tecken, namnet vid 55) och `the-good-the-bad-and-the-ugly-1966` (84 tecken, namnet vid 54) INTE visar namnet för spelaren. Det avgörande är om hela titeln får plats — **korta titlar är de farliga**. Testa i spelaren innan ett klipp döms ut.
 
 **Sportevent + YouTube** är aktiverad i matrisen ("Which Year did this happen?") — `sport-events-classics.yaml` har 50 items (ned från 56 efter valideringspass 2026-06-03). Movie-subject: `movies-classics.yaml` (29 items, globala filmklassiker) + **`movies-sweden.yaml`** (7 items, validerade svenska filmklassiker med YT-trailers: Sällskapsresan, Göta Kanal, Jönssonligan, Sunes Sommar, Så som i himmelen, Hundraåringen, En man som heter Ove).
 

@@ -180,6 +180,7 @@ items:
     displayName: "Nu tar vi dom — Håkan Södergren & Ishockeylandslaget"
     correctYear: 1989
     probability: 84
+    region: ["sweden"]
     wikimediaSearchHints: ["Håkan Södergren Nu tar vi dom hockey-VM 1989"]
     answerMethods: ["timeline"]
     youtubeClips:
@@ -202,6 +203,7 @@ items:
     displayName: "Three Lions — Baddiel, Skinner & The Lightning Seeds"
     correctYear: 1996
     probability: 80
+    region: ["europe"]
     wikimediaSearchHints: ["Lightning Seeds Three Lions Football's Coming Home 1996"]
     answerMethods: ["timeline"]
     youtubeClips:

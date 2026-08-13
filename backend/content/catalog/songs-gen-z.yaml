@@ -1047,6 +1047,20 @@ items:
         channelTitle: "SandraTornblad"
         notes: "Musikvideo-re-upload av originalet (1999)."
 
+  - id: backstreet-boys-everybody
+    displayName: "Everybody (Backstreet's Back) — Backstreet Boys"
+    correctYear: 1997
+    probability: 86
+    region: ["global"]
+    wikimediaSearchHints: ["Backstreet Boys Everybody Backstreet's Back 1997"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "iUfaW-Utn8Y"
+        startSec: 15
+        endSec: 45
+        channelTitle: "MASTER RJ"
+        notes: "Peter-kurerad 2026-08-12. ⚠ MASTER RJ är SAMMA re-upload-kanal vars klipp (TJLAJWSEd6U, Thriller) blev region-blockerat i 249 länder inkl. SE 2026-08-10. Spelbar i SE 2026-08-12, men kanalen har redan fallerat en gång — prioritera officiellt ersättningsklipp."
+    notes: "correctYear = albumet Backstreet's Back / singeln, bada aug 1997."
   - id: bellini-samba-de-janeiro
     displayName: "Samba de Janeiro — Bellini"
     correctYear: 1997

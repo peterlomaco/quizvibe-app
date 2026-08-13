@@ -71,18 +71,10 @@ items:
         endSec: 75
         channelTitle: "MCB Highlights"
         notes: "Miracle on Ice 1980 — USA-USSR hockey highlights. Mid-game action."
-  - id: maradona-hand-of-god
-    displayName: "Maradona Hand of God"
-    correctYear: 1986
-    probability: 95
-    wikimediaSearchHints: ["Maradona Hand of God 1986 World Cup England"]
-    answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "-ccNkksrfls"
-        startSec: 0
-        endSec: 30
-        channelTitle: "ClassicEngland"
-        notes: "Peter-curerat + validerat i in-app-spelaren 2026-08-05, ersatte Sport Clips 4K-klippet (F-n7lWyM4Vc) — årtalet i videotiteln syns EJ i appens spelare, godkänt trots år-i-titel."
+  # maradona-hand-of-god BORTTAGET 2026-08-13 (Peter): årtalet i videotiteln
+  # spoilar Year-svaret. Detta RIVER det tidigare godkännandet 2026-08-05
+  # ("syns EJ i appens spelare") — lägg inte tillbaka itemet utan ett klipp
+  # vars titel saknar årtal.
   - id: dream-team-1992-barcelona
     displayName: "Dream Team — Barcelona OS basket"
     correctYear: 1992

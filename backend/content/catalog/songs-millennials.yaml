@@ -95,6 +95,38 @@ items:
         endSec: 45
         channelTitle: "LatinHype"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
+  - id: van-halen-jump
+    displayName: "Jump — Van Halen"
+    correctYear: 1984
+    probability: 84
+    region: ["global"]
+    inBaseCatalog: false
+    wikimediaSearchHints: ["Van Halen Jump 1984 album"]
+    answerMethods: ["timeline"]
+    genrePackages: ["rock"]
+    youtubeClips:
+      - videoId: "SwYN7mTi6HM"
+        startSec: 15
+        endSec: 45
+        channelTitle: "Van Halen"
+        notes: "Peter-kurerad 2026-08-12. Officiella musikvideon på bandets egen kanal."
+    notes: "DOKUMENTERAT UNDANTAG fran ar-policyn: Peter beslutade 1984 (2026-08-13). Singeln kom 21 dec 1983, tolv dagar fore albumet 1984 (9 jan 1984), sa policyn 'tidigaste release av artistens egen inspelning' ger strikt 1983 — men laten ar allmant forknippad med albumet 1984 och spelaren skulle uppfatta 1983 som fel. Andra INTE till 1983 vid framtida ar-audit."
+  - id: billy-idol-rebel-yell
+    displayName: "Rebel Yell — Billy Idol"
+    correctYear: 1983
+    probability: 78
+    region: ["global"]
+    inBaseCatalog: false
+    wikimediaSearchHints: ["Billy Idol Rebel Yell 1983 album"]
+    answerMethods: ["timeline"]
+    genrePackages: ["rock"]
+    youtubeClips:
+      - videoId: "zkTqiuNj6xI"
+        startSec: 15
+        endSec: 45
+        channelTitle: "Austech"
+        notes: "Peter-kurerad 2026-08-12. Videotiteln innehåller '1983' men först långt in i raden ('Billy Idol - Rebel Yell - Official Video 1983 - 4K Remaster') — Peter bedömde 2026-08-13 att den delen inte hinner läsas i spelaren. Klippet BEHÅLLS medvetet; flagga inte om som spoiler. Privat re-upload (ej rättsinnehavare) — takedown-risk kvarstår."
+    notes: "correctYear = albumet Rebel Yell (nov 1983); singeln kom jan 1984."
   # 1985
   - id: a-ha-take-on-me
     displayName: "Take on Me — a-ha"
@@ -108,6 +140,20 @@ items:
         endSec: 45
         channelTitle: "a-ha - Topic"
         notes: "Officiell album-audio via YouTube Topic. Iconic synth-hook."
+  - id: whitney-houston-how-will-i-know
+    displayName: "How Will I Know — Whitney Houston"
+    correctYear: 1985
+    probability: 82
+    region: ["global"]
+    wikimediaSearchHints: ["Whitney Houston How Will I Know 1985"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "TO-Tk84ATjw"
+        startSec: 15
+        endSec: 45
+        channelTitle: "Accelerate"
+        notes: "Peter-kurerad 2026-08-12. Lyric-video på privat kanal — ej rättsinnehavare. Spelbar i SE 2026-08-12; takedown-risk kvarstår."
+    notes: "correctYear = debutalbumet Whitney Houston (feb 1985); singeln kom nov 1985."
   - id: usa-for-africa-we-are-the-world
     displayName: "We Are the World — USA for Africa"
     correctYear: 1985
@@ -137,27 +183,29 @@ items:
     displayName: "Livin' on a Prayer — Bon Jovi"
     correctYear: 1986
     probability: 90
+    region: ["global"]
     wikimediaSearchHints: ["Bon Jovi Livin on a Prayer"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "YBdyc1WDlBQ"
-        startSec: 45
+      - videoId: "lDK9QqIzhwk"
+        startSec: 30
         endSec: 60
-        channelTitle: "Jon Bon Jovi - Topic"
-        notes: "Officiell album-audio via YouTube Topic. 'Whoaa, we're halfway there'-refräng."
+        channelTitle: "BonJoviVEVO"
+        notes: "Peter-kurerad 2026-08-12 — ersatte Topic-audion (YBdyc1WDlBQ) med officiella musikvideon på BonJoviVEVO."
   # 1987
   - id: rick-astley-never-gonna-give-you-up
     displayName: "Never Gonna Give You Up — Rick Astley"
     correctYear: 1987
     probability: 90
+    region: ["global"]
     wikimediaSearchHints: ["Rick Astley Never Gonna Give You Up"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "3BFTio5296w"
+      - videoId: "dQw4w9WgXcQ"
         startSec: 15
-        endSec: 30
-        channelTitle: "Rick Astley - Topic"
-        notes: "Officiell album-audio via YouTube Topic (2022 Remaster). Iconic 'Never gonna give you up'-hook."
+        endSec: 45
+        channelTitle: "Rick Astley"
+        notes: "Peter-kurerad 2026-08-12 — ersatte Topic-audion (3BFTio5296w) med officiella musikvideon (4K Remaster) på artistens egen kanal."
   # 1988
   - id: bobby-mcferrin-dont-worry-be-happy
     displayName: "Don't Worry, Be Happy — Bobby McFerrin"
@@ -221,6 +269,22 @@ items:
         endSec: 15
         channelTitle: "Sinéad O'Connor - Topic"
         notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
+  - id: mc-hammer-u-cant-touch-this
+    displayName: "U Can't Touch This — MC Hammer"
+    correctYear: 1990
+    probability: 84
+    region: ["global"]
+    inBaseCatalog: false
+    wikimediaSearchHints: ["MC Hammer U Can't Touch This 1990"]
+    answerMethods: ["timeline"]
+    genrePackages: ["hiphop"]
+    youtubeClips:
+      - videoId: "q8WSdypJ4WA"
+        startSec: 15
+        endSec: 45
+        channelTitle: "Petter Oliveira"
+        notes: "Peter-kurerad 2026-08-12. Privat re-upload av musikvideon — ej rättsinnehavare. Spelbar i SE 2026-08-12; takedown-risk kvarstår."
+    notes: "correctYear = singeln (jan 1990), strax fore albumet Please Hammer Don't Hurt 'Em (feb 1990)."
   - id: madonna-vogue
     displayName: "Vogue — Madonna"
     correctYear: 1990
@@ -374,6 +438,7 @@ items:
     displayName: "Macarena — Los del Río"
     correctYear: 1996
     probability: 88
+    region: ["global"]
     wikimediaSearchHints: ["Los del Rio Macarena Bayside Boys"]
     answerMethods: ["timeline"]
     youtubeClips:
@@ -381,7 +446,7 @@ items:
         startSec: 30
         endSec: 45
         channelTitle: "Los Del Río - Topic"
-        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100). BEHÅLLET 2026-08-12: Peters förslag gwWRjvwlLKg är en privat re-upload; Topic är rättsinnehavarens kanal."
   # === Content-expansion 2026-05-29: fler ikoniska 80-90-tals-låtar ===
   - id: journey-dont-stop-believin
     displayName: "Don't Stop Believin' — Journey"
@@ -411,6 +476,7 @@ items:
     displayName: "Girls Just Want to Have Fun — Cyndi Lauper"
     correctYear: 1983
     probability: 86
+    region: ["global"]
     wikimediaSearchHints: ["Cyndi Lauper Girls Just Want to Have Fun 1983"]
     answerMethods: ["timeline"]
     youtubeClips:
@@ -418,7 +484,7 @@ items:
         startSec: 0
         endSec: 15
         channelTitle: "Cyndi Lauper - Topic"
-        notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
+        notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100). BEHÅLLET 2026-08-12: Peters förslag Q2ahfQoB9EY är en privat re-upload; Topic är rättsinnehavarens kanal."
   - id: eurythmics-sweet-dreams
     displayName: "Sweet Dreams (Are Made of This) — Eurythmics"
     correctYear: 1983
@@ -435,6 +501,7 @@ items:
     displayName: "I Wanna Dance with Somebody — Whitney Houston"
     correctYear: 1987
     probability: 87
+    region: ["global"]
     wikimediaSearchHints: ["Whitney Houston I Wanna Dance with Somebody 1987"]
     answerMethods: ["timeline"]
     youtubeClips:
@@ -442,7 +509,7 @@ items:
         startSec: 0
         endSec: 15
         channelTitle: "Whitney Houston - Topic"
-        notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
+        notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100). BEHÅLLET 2026-08-12: Peters förslag QzZ-mtE1EHc är en privat re-upload; Topic är rättsinnehavarens kanal."
   - id: rem-losing-my-religion
     displayName: "Losing My Religion — R.E.M."
     correctYear: 1991
@@ -1210,6 +1277,22 @@ items:
     answerMethods: ["timeline"]
     youtubeClips: []
     notes: "SAKNAR MEDIA - Peter angav ingen lank (YT-lanken i listan gick till Girls Just Want to Have Fun, som redan finns i katalogen). Alla Spotify-traffar jag hittade ar samlingsskivor (2017/2019). Behover kurerat track-ID eller YT-klipp innan export."
+  - id: def-leppard-pour-some-sugar-on-me
+    displayName: "Pour Some Sugar on Me — Def Leppard"
+    correctYear: 1987
+    probability: 84
+    region: ["global"]
+    inBaseCatalog: false
+    wikimediaSearchHints: ["Def Leppard Pour Some Sugar on Me Hysteria"]
+    answerMethods: ["timeline"]
+    genrePackages: ["rock"]
+    youtubeClips:
+      - videoId: "0UIB9Y4OFPs"
+        startSec: 30
+        endSec: 60
+        channelTitle: "DEF LEPPARD"
+        notes: "Peter-kurerad 2026-08-12. Officiella musikvideon på bandets egen kanal."
+    notes: "correctYear = albumet Hysteria (3 aug 1987), forsta gangen laten gick att hora. UK-singeln kom sept 1987, US-singeln forst april 1988."
   - id: guns-n-roses-sweet-child-o-mine
     displayName: "Sweet Child o' Mine — Guns N' Roses"
     correctYear: 1987
