@@ -1433,14 +1433,17 @@ items:
     displayName: "Gimme All Your Lovin' — ZZ Top"
     correctYear: 1983
     probability: 78
+    region: ["global"]
+    inBaseCatalog: false
     wikimediaSearchHints: ["ZZ Top Gimme All Your Lovin 1983 Eliminator"]
     answerMethods: ["timeline"]
+    genrePackages: ["rock"]
     youtubeClips:
       - videoId: "Ae829mFAGGE"
         startSec: 0
         endSec: 30
         notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
-    notes: "correctYear = 1983 (albumet Eliminator 23 mars 1983, ledande singel samma var) — bada vagarna ger 1983. Ligger i baspoolen; Peter angav inget paket, till skillnad fran Def Leppard och Guns N' Roses som ar rock-paket-exklusiva."
+    notes: "correctYear = 1983 (albumet Eliminator 23 mars 1983, ledande singel samma var) — bada vagarna ger 1983. Paket-exklusiv per Peters beslut 2026-08-14, samma monster som def-leppard-pour-some-sugar-on-me och guns-n-roses-sweet-child-o-mine (genrePackages + inBaseCatalog: false)."
   # --- 1984 ---
   - id: laura-branigan-self-control
     displayName: "Self Control — Laura Branigan"
