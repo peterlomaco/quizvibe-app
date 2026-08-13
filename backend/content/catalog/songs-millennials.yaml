@@ -53,11 +53,11 @@ items:
     wikimediaSearchHints: ["The Police Every Breath You Take"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "6cucosmPj-A"
+      - videoId: "LPr3N4AMXNQ"
         startSec: 0
         endSec: 15
-        channelTitle: "The Police - Topic"
-        notes: "Officiell album-audio via YouTube Topic. Iconic guitar-arpeggio-intro."
+        channelTitle: "ThePoliceVEVO"
+        notes: "Peter-kurerad 2026-08-14. Officiella musikvideon — ersatte Topic-audion (statisk albumkonst)."
   - id: irene-cara-flashdance-what-a-feeling
     displayName: "Flashdance... What a Feeling — Irene Cara"
     correctYear: 1983
@@ -135,11 +135,11 @@ items:
     wikimediaSearchHints: ["a-ha Take on Me 1985"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "MIgK3zOk0zg"
+      - videoId: "djV11Xbc914"
         startSec: 30
         endSec: 45
-        channelTitle: "a-ha - Topic"
-        notes: "Officiell album-audio via YouTube Topic. Iconic synth-hook."
+        channelTitle: "a-ha"
+        notes: "Peter-kurerad 2026-08-14. Officiella rotoscope-musikvideon på bandets egen kanal — ersatte Topic-audion (statisk albumkonst)."
   - id: whitney-houston-how-will-i-know
     displayName: "How Will I Know — Whitney Houston"
     correctYear: 1985
@@ -239,11 +239,11 @@ items:
     wikimediaSearchHints: ["Madonna Like a Prayer"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "MMNTbnLrBK8"
-        startSec: 45
-        endSec: 60
-        channelTitle: "Enhanced Music Videos"
-        notes: "Remastered Full HD musikvideo. Officiell MV-innehåll, bättre bildkvalitet än Topic-versionen (statisk albumkonst). Peters officiella Madonna-klipp 79fzeNUqQbQ testat 2026-08-11 men behållet detta — det officiella är SD + region-blockat i 2 länder (dock ej SE)."
+      - videoId: "79fzeNUqQbQ"
+        startSec: 12
+        endSec: 42
+        channelTitle: "Madonna"
+        notes: "Peter-kurerad 2026-08-14 med explicit startSec 12 — ersatte den privata re-uploaden 'Enhanced Music Videos'. AVVÄGNING: detta officiella klipp är SD och region-blockat i 2 länder (dock EJ Sverige), vilket var skälet att det valdes bort 2026-08-11. Peter begärde det igen 2026-08-14; rättsinnehavarens kanal väger tyngre än takedown-risken i en privat re-upload."
   - id: phil-collins-another-day-in-paradise
     displayName: "Another Day in Paradise — Phil Collins"
     correctYear: 1989
@@ -292,11 +292,11 @@ items:
     wikimediaSearchHints: ["Madonna Vogue"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "sbP6knug7Js"
+      - videoId: "GuJQSAiODqI"
         startSec: 30
         endSec: 45
-        channelTitle: "MVIDEO4K"
-        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (15)."
+        channelTitle: "Madonna"
+        notes: "Peter-kurerad 2026-08-14. Officiella musikvideon på artistens egen kanal — ersatte den privata re-uploaden 'MVIDEO4K' (takedown-risk)."
   # 1991
   - id: bryan-adams-everything-i-do
     displayName: "(Everything I Do) I Do It for You — Bryan Adams"
@@ -577,11 +577,11 @@ items:
     wikimediaSearchHints: ["Prince Purple Rain 1984"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "iSBVeZrDfGY"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Prince - Topic"
-        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      - videoId: "TvnYmWpD_T8"
+        startSec: 70
+        endSec: 100
+        channelTitle: "Prince"
+        notes: "Peter-kurerad 2026-08-14 med explicit startSec 70. Videotitel verifierad: 'Prince - Purple Rain (Official Video)' — ersatte Topic-audion (statisk albumkonst)."
   - id: wham-last-christmas
     displayName: "Last Christmas — Wham!"
     correctYear: 1984
@@ -753,11 +753,11 @@ items:
     wikimediaSearchHints: ["Tina Turner What's Love Got to Do with It 1984"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "1avX1lX7gSs"
+      - videoId: "oGpFcHTxjZs"
         startSec: 30
         endSec: 45
-        channelTitle: "Tina Turner - Topic"
-        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+        channelTitle: "Tina Turner"
+        notes: "Peter-kurerad 2026-08-14. Officiella musikvideon — ersatte Topic-audion (statisk albumkonst)."
   - id: george-michael-careless-whisper
     displayName: "Careless Whisper — George Michael"
     correctYear: 1984
@@ -1354,3 +1354,320 @@ items:
     genrePackages: ["100% svenska"]
     spotifyTrackId: "6WhseDHUvM0lOk5oavjztk"
     youtubeClips: []
+  # === Tillagg 2026-08-14 (Peters 80-talslista) ===
+  # --- 1981 ---
+  - id: phil-collins-in-the-air-tonight
+    displayName: "In the Air Tonight — Phil Collins"
+    correctYear: 1981
+    probability: 88
+    wikimediaSearchHints: ["Phil Collins In the Air Tonight 1981 Face Value"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "YkADj0TPrJA"
+        startSec: 5
+        endSec: 35
+        notes: "Peter-kurerad 2026-08-14, startSec angiven av Peter. Kanal ej verifierad."
+    notes: "correctYear = singeln (5 jan 1981), strax fore albumet Face Value (13 feb 1981)."
+  - id: human-league-dont-you-want-me
+    displayName: "Don't You Want Me — The Human League"
+    correctYear: 1981
+    probability: 84
+    wikimediaSearchHints: ["The Human League Dont You Want Me 1981 Dare"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "8fKR23rWI6g"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
+    notes: "correctYear = albumet Dare (okt 1981), forsta gangen laten gick att hora. Singeln kom i nov 1981."
+  # --- 1982 ---
+  - id: prince-1999
+    displayName: "1999 — Prince"
+    correctYear: 1982
+    probability: 84
+    wikimediaSearchHints: ["Prince 1999 album 1982"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "rblt2EtFfC4"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
+    notes: "correctYear = singeln (sept 1982), strax fore albumet 1999 (okt 1982). OBS: latens titel ar sjalv ett artal men INTE svaret — svaret ar 1982."
+  - id: prince-little-red-corvette
+    displayName: "Little Red Corvette — Prince"
+    correctYear: 1982
+    probability: 80
+    wikimediaSearchHints: ["Prince Little Red Corvette 1982 1999 album"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "v0KpfrJE4zw"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
+    notes: "correctYear = albumet 1999 (okt 1982), forsta gangen laten gick att hora. Singeln kom forst i feb 1983."
+  # --- 1983 ---
+  - id: rufus-chaka-khan-aint-nobody
+    displayName: "Ain't Nobody — Rufus and Chaka Khan"
+    correctYear: 1983
+    probability: 80
+    wikimediaSearchHints: ["Rufus Chaka Khan Aint Nobody 1983 Stompin at the Savoy"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "BNirQXe8HOA"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
+  # --- 1984 ---
+  - id: laura-branigan-self-control
+    displayName: "Self Control — Laura Branigan"
+    correctYear: 1984
+    probability: 82
+    wikimediaSearchHints: ["Laura Branigan Self Control 1984"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "RP0_8J7uxhs"
+        startSec: 30
+        endSec: 60
+        notes: "Peter-kurerad 2026-08-14, startSec angiven av Peter. Kanal ej verifierad."
+  - id: foreigner-i-want-to-know-what-love-is
+    displayName: "I Want to Know What Love Is — Foreigner"
+    correctYear: 1984
+    probability: 84
+    wikimediaSearchHints: ["Foreigner I Want to Know What Love Is 1984 Agent Provocateur"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "r3Pr1_v7hsw"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
+    notes: "correctYear = singeln (19 nov 1984), strax fore albumet Agent Provocateur (6 dec 1984)."
+  - id: queen-i-want-to-break-free
+    displayName: "I Want to Break Free — Queen"
+    correctYear: 1984
+    probability: 88
+    wikimediaSearchHints: ["Queen I Want to Break Free 1984 The Works"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "f4Mc-NYPHaQ"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
+    notes: "correctYear = albumet The Works (feb 1984), forsta gangen laten gick att hora. Singeln kom i april 1984."
+  - id: talk-talk-its-my-life
+    displayName: "It's My Life — Talk Talk"
+    correctYear: 1984
+    probability: 76
+    wikimediaSearchHints: ["Talk Talk Its My Life 1984"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "cFH5JgyZK1I"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
+    notes: "correctYear = singeln (jan 1984), strax fore albumet It's My Life (4 feb 1984). OBS: katalogen har aven It's My Life av Bon Jovi (2000) och Dr. Alban (1992) — separata later, ej dubbletter."
+  - id: prince-when-doves-cry
+    displayName: "When Doves Cry — Prince and the Revolution"
+    correctYear: 1984
+    probability: 84
+    wikimediaSearchHints: ["Prince When Doves Cry 1984 Purple Rain"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "UG3VcCAlUgE"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-08-14. Videotitel verifierad: 'Prince and the Revolution - When Doves Cry (Official Music Video)' — Peter angav ingen latttitel i listan, harledd ur klippet."
+    notes: "correctYear = singeln (16 maj 1984), fore albumet Purple Rain (25 juni 1984)."
+  # --- 1985 ---
+  - id: madonna-into-the-groove
+    displayName: "Into the Groove — Madonna"
+    correctYear: 1985
+    probability: 86
+    wikimediaSearchHints: ["Madonna Into the Groove 1985 Desperately Seeking Susan"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "52iW3lcpK5M"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
+    notes: "correctYear = 1985 (filmen Desperately Seeking Susan + singeln, bada 1985)."
+  - id: bowie-jagger-dancing-in-the-street
+    displayName: "Dancing in the Street — David Bowie & Mick Jagger"
+    correctYear: 1985
+    probability: 80
+    wikimediaSearchHints: ["David Bowie Mick Jagger Dancing in the Street 1985 Live Aid"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "opRRax4ph3E"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
+    notes: "correctYear = 1985 (valgorenhetssingel for Live Aid, aug 1985). Ar-policy: en tidigare inspelning av en ANNAN artist raknas inte — Martha and the Vandellas original (1964) ar alltsa INTE svaret."
+  - id: kate-bush-running-up-that-hill
+    displayName: "Running Up That Hill — Kate Bush"
+    correctYear: 1985
+    probability: 84
+    wikimediaSearchHints: ["Kate Bush Running Up That Hill 1985 Hounds of Love"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "wp43OdtAAkM"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
+    notes: "correctYear = singeln (aug 1985), strax fore albumet Hounds of Love (sept 1985). Stranger Things-aterkomsten 2022 ar inte relevant for arsvaret."
+  - id: eddie-murphy-party-all-the-time
+    displayName: "Party All the Time — Eddie Murphy"
+    correctYear: 1985
+    probability: 74
+    wikimediaSearchHints: ["Eddie Murphy Party All the Time 1985 How Could It Be"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "loFlGLLWdp8"
+        startSec: 45
+        endSec: 75
+        notes: "Peter-kurerad 2026-08-14, startSec angiven av Peter. Kanal ej verifierad."
+  - id: david-lee-roth-california-girls
+    displayName: "California Girls — David Lee Roth"
+    correctYear: 1985
+    probability: 72
+    wikimediaSearchHints: ["David Lee Roth California Girls 1985 Crazy from the Heat"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "53LZ0-m-8Vg"
+        startSec: 100
+        endSec: 130
+        notes: "Peter-kurerad 2026-08-14, startSec angiven av Peter. Kanal ej verifierad."
+    notes: "correctYear = EP:n Crazy from the Heat (jan 1985). Ar-policy: Beach Boys original (1965) ar en ANNAN artist och raknas inte."
+  - id: dire-straits-walk-of-life
+    displayName: "Walk of Life — Dire Straits"
+    correctYear: 1985
+    probability: 82
+    wikimediaSearchHints: ["Dire Straits Walk of Life 1985 Brothers in Arms"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "ekXJtcxsT20"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
+    notes: "correctYear = albumet Brothers in Arms (13 maj 1985), forsta gangen laten gick att hora. Singeln kom i nov 1985."
+  - id: pet-shop-boys-west-end-girls
+    displayName: "West End Girls — Pet Shop Boys"
+    correctYear: 1985
+    probability: 80
+    wikimediaSearchHints: ["Pet Shop Boys West End Girls 1985"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "p3j2NYZ8FKs"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
+    notes: "correctYear = 1985 ars ominspelning (singel okt 1985), den som blev hit och den vi spelar. Bandets egen Bobby-O-version fran april 1984 floppade — samma undantagsresonemang som a-ha Take on Me. Albumet Please kom 1986."
+  # --- 1986 ---
+  - id: madonna-la-isla-bonita
+    displayName: "La Isla Bonita — Madonna"
+    correctYear: 1986
+    probability: 84
+    wikimediaSearchHints: ["Madonna La Isla Bonita 1986 True Blue"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "zpzdgmqIHOQ"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
+    notes: "correctYear = albumet True Blue (juni 1986), forsta gangen laten gick att hora. Singeln kom forst i feb 1987."
+  - id: peter-cetera-glory-of-love
+    displayName: "Glory of Love — Peter Cetera"
+    correctYear: 1986
+    probability: 76
+    wikimediaSearchHints: ["Peter Cetera Glory of Love 1986 Karate Kid Part II"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "yQHhqDRn4_c"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
+    notes: "correctYear = singeln (maj 1986), fore albumet Solitude/Solitaire (juli 1986)."
+  - id: prince-kiss
+    displayName: "Kiss — Prince and the Revolution"
+    correctYear: 1986
+    probability: 84
+    region: ["global"]
+    inBaseCatalog: false
+    wikimediaSearchHints: ["Prince Kiss 1986 Parade"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Love & Peace"]
+    youtubeClips:
+      - videoId: "H9tEvfIsDyo"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
+    notes: "correctYear = singeln (5 feb 1986), fore albumet Parade (31 mars 1986). Paket-exklusiv per Peters 'Package: Love & Peace' — samma monster som rock-paketet (genrePackages + inBaseCatalog: false)."
+  # --- 1987 ---
+  - id: starship-nothings-gonna-stop-us-now
+    displayName: "Nothing's Gonna Stop Us Now — Starship"
+    correctYear: 1987
+    probability: 84
+    wikimediaSearchHints: ["Starship Nothings Gonna Stop Us Now 1987 Mannequin"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "3wxyN3z9PL4"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
+    notes: "correctYear = singeln (feb 1987, temalat till filmen Mannequin), fore albumet No Protection (aug 1987)."
+  - id: fleetwood-mac-everywhere
+    displayName: "Everywhere — Fleetwood Mac"
+    correctYear: 1987
+    probability: 80
+    wikimediaSearchHints: ["Fleetwood Mac Everywhere 1987 Tango in the Night"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "YF1R0hc5Q2I"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
+    notes: "correctYear = albumet Tango in the Night (april 1987), forsta gangen laten gick att hora. Singeln kom i nov 1987."
+  - id: fleetwood-mac-seven-wonders
+    displayName: "Seven Wonders — Fleetwood Mac"
+    correctYear: 1987
+    probability: 74
+    wikimediaSearchHints: ["Fleetwood Mac Seven Wonders 1987 Tango in the Night"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "9b4F_ppjnKU"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
+    notes: "correctYear = albumet Tango in the Night (april 1987); singeln kom i maj 1987."
+  - id: george-michael-faith
+    displayName: "Faith — George Michael"
+    correctYear: 1987
+    probability: 84
+    wikimediaSearchHints: ["George Michael Faith 1987"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "i2hLL_UNUSo"
+        startSec: 30
+        endSec: 60
+        notes: "Peter-kurerad 2026-08-14, startSec angiven av Peter. Kanal ej verifierad."
+    notes: "correctYear = singeln (12 okt 1987), strax fore albumet Faith (30 okt 1987)."
+  - id: whitesnake-here-i-go-again
+    displayName: "Here I Go Again — Whitesnake"
+    correctYear: 1987
+    probability: 80
+    wikimediaSearchHints: ["Whitesnake Here I Go Again 1987"]
+    answerMethods: ["timeline"]
+    youtubeClips: []
+    notes: "SAKNAR MEDIA — Peter angav ingen lank (bara 'startsec60'). Behover kurerat YT-klipp innan den kan exporteras; satt startSec: 60 nar klippet laggs in. correctYear = 1987 ars ominspelning, den som blev hit och den vi spelar; bandets egen original fran albumet Saints & Sinners (1982) ar betydligt mindre kand — samma undantagsresonemang som a-ha Take on Me."
+  # --- 1988 ---
+  - id: kylie-minogue-the-loco-motion
+    displayName: "The Loco-Motion — Kylie Minogue"
+    correctYear: 1988
+    probability: 82
+    wikimediaSearchHints: ["Kylie Minogue The Loco-Motion 1988"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "POWsFzSFLCE"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-08-14. Videotitel verifierad: 'Kylie Minogue - The Loco-motion - Official Video' — den internationella 1988-versionen."
+    notes: "correctYear = 1988 ars internationella ominspelning (The Loco-Motion), den som slog i Sverige och den klippet visar. Hennes australiska original 'Locomotion' kom juli 1987 — samma undantagsresonemang som a-ha Take on Me. Ar-policy: Little Eva (1962) och Grand Funk (1974) ar ANDRA artister och raknas inte."

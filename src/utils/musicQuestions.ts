@@ -2908,6 +2908,29 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "blondie-heart-of-glass",
+    "displayName": "Heart of Glass — Blondie",
+    "correctYear": 1978,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "WGU_4-5RaxU",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-14 ur hans 80-talsspellista. Kanal ej verifierad."
+      }
+    ]
+  },
+  {
     "id": "chic-le-freak",
     "displayName": "Le Freak — Chic",
     "correctYear": 1978,
@@ -3179,6 +3202,29 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Wimbledon",
         "license": "standard",
         "notes": "Wimbledon official channel — 1980 tie-break i fjärde set (18-16 till McEnroe). Mid-tiebreak."
+      }
+    ]
+  },
+  {
+    "id": "george-benson-give-me-the-night",
+    "displayName": "Give Me the Night — George Benson",
+    "correctYear": 1980,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-x",
+      "elder"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "FIF7wKJb2iU",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-14 ur hans 80-talsspellista. Kanal ej verifierad."
       }
     ]
   },
@@ -3618,6 +3664,29 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": []
   },
   {
+    "id": "human-league-dont-you-want-me",
+    "displayName": "Don't You Want Me — The Human League",
+    "correctYear": 1981,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "8fKR23rWI6g",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-14. Kanal ej verifierad."
+      }
+    ]
+  },
+  {
     "id": "indiana-jones-raiders",
     "displayName": "Indiana Jones: Raiders of the Lost Ark",
     "correctYear": 1981,
@@ -3695,6 +3764,29 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Enhanced Music Videos",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (18)."
+      }
+    ]
+  },
+  {
+    "id": "phil-collins-in-the-air-tonight",
+    "displayName": "In the Air Tonight — Phil Collins",
+    "correctYear": 1981,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "YkADj0TPrJA",
+        "startSec": 5,
+        "endSec": 35,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-14, startSec angiven av Peter. Kanal ej verifierad."
       }
     ]
   },
@@ -3848,6 +3940,52 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 1982 vinnare — Tyskland."
+      }
+    ]
+  },
+  {
+    "id": "prince-1999",
+    "displayName": "1999 — Prince",
+    "correctYear": 1982,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "rblt2EtFfC4",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-14. Kanal ej verifierad."
+      }
+    ]
+  },
+  {
+    "id": "prince-little-red-corvette",
+    "displayName": "Little Red Corvette — Prince",
+    "correctYear": 1982,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "v0KpfrJE4zw",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-14. Kanal ej verifierad."
       }
     ]
   },
@@ -4116,12 +4254,35 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "youtubeClips": [
       {
-        "videoId": "6cucosmPj-A",
+        "videoId": "LPr3N4AMXNQ",
         "startSec": 0,
         "endSec": 15,
-        "channelTitle": "The Police - Topic",
+        "channelTitle": "ThePoliceVEVO",
         "license": "standard",
-        "notes": "Officiell album-audio via YouTube Topic. Iconic guitar-arpeggio-intro."
+        "notes": "Peter-kurerad 2026-08-14. Officiella musikvideon — ersatte Topic-audion (statisk albumkonst)."
+      }
+    ]
+  },
+  {
+    "id": "rufus-chaka-khan-aint-nobody",
+    "displayName": "Ain't Nobody — Rufus and Chaka Khan",
+    "correctYear": 1983,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "BNirQXe8HOA",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-14. Kanal ej verifierad."
       }
     ]
   },
@@ -4219,6 +4380,29 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "How To Run Faster - By Performance Lab",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
+    "id": "foreigner-i-want-to-know-what-love-is",
+    "displayName": "I Want to Know What Love Is — Foreigner",
+    "correctYear": 1984,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "r3Pr1_v7hsw",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-14. Kanal ej verifierad."
       }
     ]
   },
@@ -4332,6 +4516,29 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "laura-branigan-self-control",
+    "displayName": "Self Control — Laura Branigan",
+    "correctYear": 1984,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "RP0_8J7uxhs",
+        "startSec": 30,
+        "endSec": 60,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-14, startSec angiven av Peter. Kanal ej verifierad."
+      }
+    ]
+  },
+  {
     "id": "madonna-like-a-virgin",
     "displayName": "Like a Virgin — Madonna",
     "correctYear": 1984,
@@ -4370,12 +4577,58 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "youtubeClips": [
       {
-        "videoId": "iSBVeZrDfGY",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Prince - Topic",
+        "videoId": "TvnYmWpD_T8",
+        "startSec": 70,
+        "endSec": 100,
+        "channelTitle": "Prince",
         "license": "standard",
-        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+        "notes": "Peter-kurerad 2026-08-14 med explicit startSec 70. Videotitel verifierad: 'Prince - Purple Rain (Official Video)' — ersatte Topic-audion (statisk albumkonst)."
+      }
+    ]
+  },
+  {
+    "id": "prince-when-doves-cry",
+    "displayName": "When Doves Cry — Prince and the Revolution",
+    "correctYear": 1984,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "UG3VcCAlUgE",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-14. Videotitel verifierad: 'Prince and the Revolution - When Doves Cry (Official Music Video)' — Peter angav ingen latttitel i listan, harledd ur klippet."
+      }
+    ]
+  },
+  {
+    "id": "queen-i-want-to-break-free",
+    "displayName": "I Want to Break Free — Queen",
+    "correctYear": 1984,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "f4Mc-NYPHaQ",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-14. Kanal ej verifierad."
       }
     ]
   },
@@ -4452,6 +4705,51 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "talk-talk-its-my-life",
+    "displayName": "It's My Life — Talk Talk",
+    "correctYear": 1984,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "cFH5JgyZK1I",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-14. Kanal ej verifierad."
+      }
+    ]
+  },
+  {
+    "id": "the-karate-kid-1984",
+    "displayName": "The Karate Kid",
+    "correctYear": 1984,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "audiences": [
+      "all"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "bgBy0_y-Ktw",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-14. Videotitel verifierad: 'The Karate Kid: Crane Kick Final Fight Scene (Ralph Macchio, William Zabka)'."
+      }
+    ]
+  },
+  {
     "id": "the-terminator-1984",
     "displayName": "The Terminator",
     "correctYear": 1984,
@@ -4500,12 +4798,12 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "youtubeClips": [
       {
-        "videoId": "1avX1lX7gSs",
+        "videoId": "oGpFcHTxjZs",
         "startSec": 30,
         "endSec": 45,
-        "channelTitle": "Tina Turner - Topic",
+        "channelTitle": "Tina Turner",
         "license": "standard",
-        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+        "notes": "Peter-kurerad 2026-08-14. Officiella musikvideon — ersatte Topic-audion (statisk albumkonst)."
       }
     ]
   },
@@ -4572,12 +4870,12 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "youtubeClips": [
       {
-        "videoId": "MIgK3zOk0zg",
+        "videoId": "djV11Xbc914",
         "startSec": 30,
         "endSec": 45,
-        "channelTitle": "a-ha - Topic",
+        "channelTitle": "a-ha",
         "license": "standard",
-        "notes": "Officiell album-audio via YouTube Topic. Iconic synth-hook."
+        "notes": "Peter-kurerad 2026-08-14. Officiella rotoscope-musikvideon på bandets egen kanal — ersatte Topic-audion (statisk albumkonst)."
       }
     ]
   },
@@ -4639,6 +4937,121 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "bowie-jagger-dancing-in-the-street",
+    "displayName": "Dancing in the Street — David Bowie & Mick Jagger",
+    "correctYear": 1985,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "opRRax4ph3E",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-14. Kanal ej verifierad."
+      }
+    ]
+  },
+  {
+    "id": "david-lee-roth-california-girls",
+    "displayName": "California Girls — David Lee Roth",
+    "correctYear": 1985,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "53LZ0-m-8Vg",
+        "startSec": 100,
+        "endSec": 130,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-14, startSec angiven av Peter. Kanal ej verifierad."
+      }
+    ]
+  },
+  {
+    "id": "dire-straits-walk-of-life",
+    "displayName": "Walk of Life — Dire Straits",
+    "correctYear": 1985,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "ekXJtcxsT20",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-14. Kanal ej verifierad."
+      }
+    ]
+  },
+  {
+    "id": "eddie-murphy-party-all-the-time",
+    "displayName": "Party All the Time — Eddie Murphy",
+    "correctYear": 1985,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "loFlGLLWdp8",
+        "startSec": 45,
+        "endSec": 75,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-14, startSec angiven av Peter. Kanal ej verifierad."
+      }
+    ]
+  },
+  {
+    "id": "kate-bush-running-up-that-hill",
+    "displayName": "Running Up That Hill — Kate Bush",
+    "correctYear": 1985,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "wp43OdtAAkM",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-14. Kanal ej verifierad."
+      }
+    ]
+  },
+  {
     "id": "kikki-danielsson-bra-vibrationer",
     "displayName": "Bra vibrationer — Kikki Danielsson",
     "correctYear": 1985,
@@ -4663,6 +5076,52 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "Melodifestivalen 1985 vinnare. ESC 1985 performance."
+      }
+    ]
+  },
+  {
+    "id": "madonna-into-the-groove",
+    "displayName": "Into the Groove — Madonna",
+    "correctYear": 1985,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "52iW3lcpK5M",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-14. Kanal ej verifierad."
+      }
+    ]
+  },
+  {
+    "id": "pet-shop-boys-west-end-girls",
+    "displayName": "West End Girls — Pet Shop Boys",
+    "correctYear": 1985,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "p3j2NYZ8FKs",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-14. Kanal ej verifierad."
       }
     ]
   },
@@ -4763,6 +5222,52 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "madonna-la-isla-bonita",
+    "displayName": "La Isla Bonita — Madonna",
+    "correctYear": 1986,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "zpzdgmqIHOQ",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-14. Kanal ej verifierad."
+      }
+    ]
+  },
+  {
+    "id": "peter-cetera-glory-of-love",
+    "displayName": "Glory of Love — Peter Cetera",
+    "correctYear": 1986,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "yQHhqDRn4_c",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-14. Kanal ej verifierad."
+      }
+    ]
+  },
+  {
     "id": "sandra-kim-jaime-la-vie",
     "displayName": "J'aime la vie — Sandra Kim",
     "correctYear": 1986,
@@ -4820,6 +5325,75 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Rotten Tomatoes Classic Trailers",
         "license": "standard",
         "notes": "Official 1986-trailer — Danger Zone-tema + jet-action."
+      }
+    ]
+  },
+  {
+    "id": "fleetwood-mac-everywhere",
+    "displayName": "Everywhere — Fleetwood Mac",
+    "correctYear": 1987,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "YF1R0hc5Q2I",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-14. Kanal ej verifierad."
+      }
+    ]
+  },
+  {
+    "id": "fleetwood-mac-seven-wonders",
+    "displayName": "Seven Wonders — Fleetwood Mac",
+    "correctYear": 1987,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "9b4F_ppjnKU",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-14. Kanal ej verifierad."
+      }
+    ]
+  },
+  {
+    "id": "george-michael-faith",
+    "displayName": "Faith — George Michael",
+    "correctYear": 1987,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "i2hLL_UNUSo",
+        "startSec": 30,
+        "endSec": 60,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-14, startSec angiven av Peter. Kanal ej verifierad."
       }
     ]
   },
@@ -4943,6 +5517,29 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "starship-nothings-gonna-stop-us-now",
+    "displayName": "Nothing's Gonna Stop Us Now — Starship",
+    "correctYear": 1987,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "3wxyN3z9PL4",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-14. Kanal ej verifierad."
+      }
+    ]
+  },
+  {
     "id": "tre-kronor-vm-1987-vien",
     "displayName": "Tre Kronor VM-guld Wien",
     "correctYear": 1987,
@@ -5061,6 +5658,29 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 1988 vinnare — Schweiz."
+      }
+    ]
+  },
+  {
+    "id": "kylie-minogue-the-loco-motion",
+    "displayName": "The Loco-Motion — Kylie Minogue",
+    "correctYear": 1988,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "POWsFzSFLCE",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-14. Videotitel verifierad: 'Kylie Minogue - The Loco-motion - Official Video' — den internationella 1988-versionen."
       }
     ]
   },
@@ -5343,12 +5963,12 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "youtubeClips": [
       {
-        "videoId": "MMNTbnLrBK8",
-        "startSec": 45,
-        "endSec": 60,
-        "channelTitle": "Enhanced Music Videos",
+        "videoId": "79fzeNUqQbQ",
+        "startSec": 12,
+        "endSec": 42,
+        "channelTitle": "Madonna",
         "license": "standard",
-        "notes": "Remastered Full HD musikvideo. Officiell MV-innehåll, bättre bildkvalitet än Topic-versionen (statisk albumkonst). Peters officiella Madonna-klipp 79fzeNUqQbQ testat 2026-08-11 men behållet detta — det officiella är SD + region-blockat i 2 länder (dock ej SE)."
+        "notes": "Peter-kurerad 2026-08-14 med explicit startSec 12 — ersatte den privata re-uploaden 'Enhanced Music Videos'. AVVÄGNING: detta officiella klipp är SD och region-blockat i 2 länder (dock EJ Sverige), vilket var skälet att det valdes bort 2026-08-11. Peter begärde det igen 2026-08-14; rättsinnehavarens kanal väger tyngre än takedown-risken i en privat re-upload."
       }
     ]
   },
@@ -5468,12 +6088,12 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "youtubeClips": [
       {
-        "videoId": "sbP6knug7Js",
+        "videoId": "GuJQSAiODqI",
         "startSec": 30,
         "endSec": 45,
-        "channelTitle": "MVIDEO4K",
+        "channelTitle": "Madonna",
         "license": "standard",
-        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (15)."
+        "notes": "Peter-kurerad 2026-08-14. Officiella musikvideon på artistens egen kanal — ersatte den privata re-uploaden 'MVIDEO4K' (takedown-risk)."
       }
     ]
   },
@@ -6107,6 +6727,39 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "hejatysklanduuups",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
+    "id": "the-bodyguard-1992",
+    "displayName": "The Bodyguard",
+    "correctYear": 1992,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "audiences": [
+      "all"
+    ],
+    "region": [
+      "global"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Kevin Costner",
+      "Whitney Houston"
+    ],
+    "distractorNames": [
+      "Tom Cruise",
+      "Mel Gibson",
+      "Julia Roberts",
+      "Demi Moore"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "v4qauDAr_hA",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-14. Videotitel verifierad: 'The Bodyguard - Theatrical Trailer' — avslojar varken skadespelare eller ar."
       }
     ]
   },
@@ -7406,6 +8059,29 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "bloodhound-gang-the-bad-touch",
+    "displayName": "The Bad Touch — Bloodhound Gang",
+    "correctYear": 1999,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-z",
+      "millennials"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "-6U_QctZg94",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-14. Kanal ej verifierad."
+      }
+    ]
+  },
+  {
     "id": "charlotte-nilsson-tusen-och-en-natt",
     "displayName": "Tusen och en natt — Charlotte Nilsson",
     "correctYear": 1999,
@@ -7738,6 +8414,29 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "kylie-minogue-spinning-around",
+    "displayName": "Spinning Around — Kylie Minogue",
+    "correctYear": 2000,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-z",
+      "millennials"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "t1DWBKk5xHQ",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-14. Kanal ej verifierad."
+      }
+    ]
+  },
+  {
     "id": "markoolio-mera-mal",
     "displayName": "Mera mål — Markoolio",
     "correctYear": 2000,
@@ -7998,6 +8697,29 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "ClipZone: Heroes & Villains",
         "license": "standard",
         "notes": "Curerad 2026-05-29 — scen ur 2001-filmen (ej 2026 HBO-reboot-teaser)."
+      }
+    ]
+  },
+  {
+    "id": "kylie-minogue-cant-get-you-out-of-my-head",
+    "displayName": "Can't Get You Out of My Head — Kylie Minogue",
+    "correctYear": 2001,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "gen-z",
+      "millennials"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "c18441Eh_WE",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-14. Kanal ej verifierad."
       }
     ]
   },

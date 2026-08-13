@@ -1024,3 +1024,27 @@ items:
     answerMethods: ["timeline"]
     youtubeClips: []
     notes: "SAKNAR MEDIA - Peter angav ingen lank. Alla Spotify-traffar jag hittade ar samlingsskivor (2008/2009/2015), vilket bryter mot single-release-regeln for deep-link-kontext. Behover kurerat track-ID eller YT-klipp innan den exporteras."
+  # === Tillagg 2026-08-14 (Peters 80-talslista, titlar fore 1981) ===
+  - id: blondie-heart-of-glass
+    displayName: "Heart of Glass — Blondie"
+    correctYear: 1978
+    probability: 84
+    wikimediaSearchHints: ["Blondie Heart of Glass 1978 Parallel Lines"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "WGU_4-5RaxU"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-08-14 ur hans 80-talsspellista. Kanal ej verifierad."
+    notes: "correctYear = albumet Parallel Lines (23 sept 1978), forsta gangen laten gick att hora. Singeln kom forst i jan 1979."
+  - id: george-benson-give-me-the-night
+    displayName: "Give Me the Night — George Benson"
+    correctYear: 1980
+    probability: 76
+    wikimediaSearchHints: ["George Benson Give Me the Night 1980"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "FIF7wKJb2iU"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-08-14 ur hans 80-talsspellista. Kanal ej verifierad."

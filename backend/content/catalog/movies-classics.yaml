@@ -563,3 +563,31 @@ items:
         endSec: 45
         channelTitle: "SF Studios"
         notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (13)."
+  # === Tillagg 2026-08-14 (Peters lista) ===
+  - id: the-karate-kid-1984
+    displayName: "The Karate Kid"
+    correctYear: 1984
+    probability: 82
+    region: ["global"]
+    wikimediaSearchHints: ["The Karate Kid 1984 film Ralph Macchio Pat Morita"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "bgBy0_y-Ktw"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-08-14. Videotitel verifierad: 'The Karate Kid: Crane Kick Final Fight Scene (Ralph Macchio, William Zabka)'."
+    notes: "answerMethods = timeline (INTE actor-select) eftersom klippets YouTube-titel innehaller skadespelarnamnen 'Ralph Macchio, William Zabka' men inte aret — exakt det spoiler-undantag som gor Year till ratt svarslage. Byt inte till actor-select utan att forst byta klipp."
+  - id: the-bodyguard-1992
+    displayName: "The Bodyguard"
+    correctYear: 1992
+    probability: 84
+    region: ["global"]
+    wikimediaSearchHints: ["The Bodyguard 1992 film Kevin Costner Whitney Houston"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Kevin Costner", "Whitney Houston"]
+    distractorNames: ["Tom Cruise", "Mel Gibson", "Julia Roberts", "Demi Moore"]
+    youtubeClips:
+      - videoId: "v4qauDAr_hA"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-08-14. Videotitel verifierad: 'The Bodyguard - Theatrical Trailer' — avslojar varken skadespelare eller ar."

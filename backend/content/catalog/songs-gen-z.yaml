@@ -1237,3 +1237,40 @@ items:
     answerMethods: ["timeline"]
     spotifyTrackId: "5vQXxfGn1bjv5WESrYVVpw"
     youtubeClips: []
+  # === Tillagg 2026-08-14 (Peters lista) ===
+  - id: bloodhound-gang-the-bad-touch
+    displayName: "The Bad Touch — Bloodhound Gang"
+    correctYear: 1999
+    probability: 78
+    wikimediaSearchHints: ["Bloodhound Gang The Bad Touch 1999 Hooray for Boobies"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "-6U_QctZg94"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
+    notes: "correctYear = albumet Hooray for Boobies (okt 1999 i Europa), forsta gangen laten gick att hora. Singeln kom i nov 1999."
+  - id: kylie-minogue-spinning-around
+    displayName: "Spinning Around — Kylie Minogue"
+    correctYear: 2000
+    probability: 78
+    wikimediaSearchHints: ["Kylie Minogue Spinning Around 2000 Light Years"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "t1DWBKk5xHQ"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
+    notes: "correctYear = singeln (juni 2000), fore albumet Light Years (sept 2000)."
+  - id: kylie-minogue-cant-get-you-out-of-my-head
+    displayName: "Can't Get You Out of My Head — Kylie Minogue"
+    correctYear: 2001
+    probability: 86
+    wikimediaSearchHints: ["Kylie Minogue Cant Get You Out of My Head 2001 Fever"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "c18441Eh_WE"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
+    notes: "correctYear = singeln (sept 2001), fore albumet Fever (okt 2001)."
