@@ -5268,6 +5268,29 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "peter-gabriel-sledgehammer",
+    "displayName": "Sledgehammer — Peter Gabriel",
+    "correctYear": 1986,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "millennials",
+      "gen-x"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "OJWJE0x7T4Q",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-14. Kanal ej verifierad."
+      }
+    ]
+  },
+  {
     "id": "sandra-kim-jaime-la-vie",
     "displayName": "J'aime la vie — Sandra Kim",
     "correctYear": 1986,

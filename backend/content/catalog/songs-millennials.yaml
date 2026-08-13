@@ -1586,6 +1586,18 @@ items:
         endSec: 30
         notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
     notes: "correctYear = singeln (maj 1986), fore albumet Solitude/Solitaire (juli 1986)."
+  - id: peter-gabriel-sledgehammer
+    displayName: "Sledgehammer — Peter Gabriel"
+    correctYear: 1986
+    probability: 82
+    wikimediaSearchHints: ["Peter Gabriel Sledgehammer 1986 So"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "OJWJE0x7T4Q"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
+    notes: "correctYear = singeln (21 april 1986), knappt en manad fore albumet So (19 maj 1986) — bada vagarna ger 1986."
   - id: prince-kiss
     displayName: "Kiss — Prince and the Revolution"
     correctYear: 1986
