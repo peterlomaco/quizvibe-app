@@ -1429,6 +1429,18 @@ items:
         endSec: 30
         notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
     notes: "correctYear = singeln (okt 1983), knappt en manad fore albumet 90125 (7 nov 1983) — bada vagarna ger 1983. Laten toppade Billboard Hot 100 forst i jan 1984; chart-peak ar aldrig svaret."
+  - id: zz-top-gimme-all-your-lovin
+    displayName: "Gimme All Your Lovin' — ZZ Top"
+    correctYear: 1983
+    probability: 78
+    wikimediaSearchHints: ["ZZ Top Gimme All Your Lovin 1983 Eliminator"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "Ae829mFAGGE"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
+    notes: "correctYear = 1983 (albumet Eliminator 23 mars 1983, ledande singel samma var) — bada vagarna ger 1983. Ligger i baspoolen; Peter angav inget paket, till skillnad fran Def Leppard och Guns N' Roses som ar rock-paket-exklusiva."
   # --- 1984 ---
   - id: laura-branigan-self-control
     displayName: "Self Control — Laura Branigan"
