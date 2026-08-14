@@ -9,7 +9,6 @@ import {
   SafeAreaView,
   ScrollView,
   StyleSheet,
-  Switch,
   Text,
   TouchableOpacity,
   View,
@@ -180,24 +179,22 @@ interface Props {
   unstableLocked?: boolean;
   unstableCanRetry?: boolean;
   onUnstableRetry?: () => void;
-  /** D-iv: alla spelare i spelet (host + non-hosts). Driver audio-toggle-
-   *  listan i IndDev:s Game Settings-block. När utelämnad eller tom array
-   *  döljs audio-trigger:n (= ingen att toggla). Pass-the-Phone bryr sig
-   *  inte om detta (single device = alltid ljud på). */
-  allPlayers?: IntroPlayer[];
   /** D-iv: host:s player_id, används för default-audio-policyn (saknad
    *  key i playerAudioOverrides → host=on, övriga=off). */
   hostPlayerId?: string;
-  /** D-iv: aktuell map över host:s audio-overrides per spelar-id.
-   *  Saknad key tolkas via default-policyn (se hostPlayerId). */
+  /** D-iv: aktuell map över audio-overrides per spelar-id. Saknad key
+   *  tolkas via default-policyn (se hostPlayerId). */
   playerAudioOverrides?: Record<string, boolean>;
-  /** D-iv: callback när host togglar audio för en spelare. Parent skriver
-   *  till lobby_settings + broadcastar via syncChannel. */
+  /** D-iv: callback när host togglar sitt EGET ljud i IndDev. Parent skriver
+   *  till lobby_settings + broadcastar via syncChannel, så valet överlever
+   *  Play Again-carry-over. Per-spelare-styrning finns inte i UI:t — varje
+   *  enhet äger sitt eget ljud (se selfAudioOn nedan). */
   onPlayerAudioChange?: (playerId: string, audioOn: boolean) => void;
-  /** Remote 1v1: enhetens EGET ljud (YouTube-klipp, ambient, hjärtslag).
-   *  Remote saknar live-sync under spel, så audio kan bara ägas lokalt —
-   *  ingen per-spelare-map som i IndDev. Default på; raden renderas bara
-   *  när onSelfAudioChange är satt. */
+  /** Enhetens EGET ljud (YouTube-klipp, ambient, hjärtslag, talad nedräkning).
+   *  Device-local skrivväg, används av remote 1v1 (båda spelarna) och IndDev
+   *  non-host. IndDev host går i stället via onPlayerAudioChange ovan för att
+   *  behålla persist. Parent avgör vilka lägen som får raden genom att skicka
+   *  callbacken — gör inga mode-checkar här. */
   selfAudioOn?: boolean;
   onSelfAudioChange?: (audioOn: boolean) => void;
 }
@@ -306,7 +303,6 @@ export function GetReadyIntro({
   unstableLocked,
   unstableCanRetry,
   onUnstableRetry,
-  allPlayers,
   hostPlayerId,
   playerAudioOverrides,
   onPlayerAudioChange,
@@ -331,12 +327,6 @@ export function GetReadyIntro({
   // gömms. Blink-pulsen på "nästa fråga"-rutan gäller alla tre lägen
   // (Single, PtP, IndDev) — den lever utanför denna gating.
   const isSinglePlayer = !isIndDev && playerCount === 1;
-  // D-iv: audio-trigger visas bara för host i IndDev. Pass-the-Phone har
-  // gemensam enhet → alltid ljud på → ingen trigger.
-  const showAudioTrigger = isIndDev && isHost && !!hostPlayerId;
-  // Remote 1v1: egen Audio-rad som togglar ENHETENS eget ljud direkt (ingen
-  // modal — det finns bara en spelare per enhet att styra).
-  const showSelfAudioToggle = mode === 'remote-1v1' && !!onSelfAudioChange;
   // Helper: vad är effektiv audio-state för en spelare just nu? Saknad
   // key i overrides-mappen → default-policy: host on, övriga off.
   const audioOnForPlayer = (playerId: string): boolean => {
@@ -345,9 +335,22 @@ export function GetReadyIntro({
     }
     return playerId === hostPlayerId;
   };
-  // Host:s effektiva audio-state — driver trigger-text + HeartbeatSound-gating.
+  // Host:s effektiva audio-state i IndDev.
   const hostAudioOn = hostPlayerId ? audioOnForPlayer(hostPlayerId) : true;
-  const [audioModalOpen, setAudioModalOpen] = useState(false);
+  // "Audio this device"-raden är ALLTID en direkt toggle — ingen modal, för
+  // det finns bara EN spelare per enhet att styra. Två skrivvägar:
+  //   IndDev host → onPlayerAudioChange på hostPlayerId. Behåller persist till
+  //     lobby_settings, så host:s val överlever Play Again-carry-over.
+  //   Remote 1v1 + IndDev non-host → onSelfAudioChange, device-local.
+  // Vägarna är ömsesidigt uteslutande, så en enhet renderar aldrig två rader.
+  const hostAudioRowId =
+    isIndDev && isHost && onPlayerAudioChange ? hostPlayerId : undefined;
+  const showAudioRow = !!hostAudioRowId || !!onSelfAudioChange;
+  const audioRowOn = hostAudioRowId ? hostAudioOn : selfAudioOn;
+  const handleAudioRowToggle = () => {
+    if (hostAudioRowId) onPlayerAudioChange?.(hostAudioRowId, !hostAudioOn);
+    else onSelfAudioChange?.(!selfAudioOn);
+  };
   // Interceptar play-knappens onPress i IndDev för att varna host om
   // disconnected peers INNAN nästa fråga startar.
   const handlePlayPress = () => {
@@ -762,41 +765,24 @@ export function GetReadyIntro({
                   </TouchableOpacity>
                 )}
               </View>
-              {/* D-iv: audio-trigger — bara host i IndDev. Tap öppnar modal
-                  med per-spelare on/off-toggle. Trigger-texten visar live-
-                  summering "N on" så host kan snabbt se status utan att
-                  öppna modalen. */}
-              {showAudioTrigger && (
+              {/* Ljudet styrs per ENHET — raden togglar bara MIN uppspelning,
+                  aldrig någon annans. Tap växlar direkt (ingen modal).
+                  IndDev host: default PÅ. IndDev non-host: default AV, men
+                  spelaren kan slå på sitt eget ljud här. Remote 1v1: default
+                  PÅ på båda enheterna. */}
+              {showAudioRow && (
                 <View style={styles.responseDropdownRow}>
-                  <Text style={styles.settingsRow}>Audio:</Text>
+                  <Text style={styles.settingsRow}>Audio this device:</Text>
                   <TouchableOpacity
                     style={styles.responseDropdownTrigger}
-                    onPress={() => setAudioModalOpen(true)}
+                    onPress={handleAudioRowToggle}
                     activeOpacity={0.7}
                   >
                     <Text style={styles.responseDropdownTriggerText}>
-                      {hostAudioOn ? 'On' : 'Off'}
-                    </Text>
-                    <Text style={styles.responseDropdownChevron}>▼</Text>
-                  </TouchableOpacity>
-                </View>
-              )}
-              {/* Remote 1v1: ljudet ägs lokalt av varje enhet (ingen live-sync
-                  under spel), så raden togglar bara MIN uppspelning. Default
-                  på — tap växlar direkt utan mellanliggande modal. */}
-              {showSelfAudioToggle && (
-                <View style={styles.responseDropdownRow}>
-                  <Text style={styles.settingsRow}>Audio:</Text>
-                  <TouchableOpacity
-                    style={styles.responseDropdownTrigger}
-                    onPress={() => onSelfAudioChange?.(!selfAudioOn)}
-                    activeOpacity={0.7}
-                  >
-                    <Text style={styles.responseDropdownTriggerText}>
-                      {selfAudioOn ? 'On' : 'Off'}
+                      {audioRowOn ? 'On' : 'Off'}
                     </Text>
                     <Text style={styles.selfAudioGlyph}>
-                      {selfAudioOn ? '🔊' : '🔇'}
+                      {audioRowOn ? '🔊' : '🔇'}
                     </Text>
                   </TouchableOpacity>
                 </View>
@@ -1089,66 +1075,6 @@ export function GetReadyIntro({
           })()}
         </View>
       )}
-
-      {/* D-iv: audio-per-spelare-modal. Tap utanför panel:n stänger;
-          varje rad har en Switch som direkt anropar onPlayerAudioChange.
-          Host kan justera audio mellan ronder; mid-question är audio
-          låst (host är då i question/awaiting/reveal-fas, inte intro). */}
-      <Modal
-        visible={audioModalOpen}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setAudioModalOpen(false)}
-      >
-        <Pressable
-          style={styles.dropdownBackdrop}
-          onPress={() => setAudioModalOpen(false)}
-        >
-          <Pressable
-            style={styles.audioPanel}
-            onPress={(e) => e.stopPropagation()}
-          >
-            <Text style={styles.dropdownTitle}>Audio</Text>
-            <ScrollView style={styles.audioList} showsVerticalScrollIndicator={false}>
-              {(allPlayers ?? []).filter((p) => p.id === hostPlayerId).map((player) => {
-                const audioOn = audioOnForPlayer(player.id);
-                const isHostRow = player.id === hostPlayerId;
-                return (
-                  <View key={player.id} style={styles.audioRow}>
-                    <View style={styles.audioRowLeft}>
-                      <PlayerAvatar player={player} size={32} />
-                      <View style={styles.audioRowNameStack}>
-                        <Text style={styles.audioRowName} numberOfLines={1}>
-                          {player.name}
-                        </Text>
-                        {isHostRow && (
-                          <Text style={styles.audioRowHostTag}>Host</Text>
-                        )}
-                      </View>
-                    </View>
-                    <Switch
-                      value={audioOn}
-                      onValueChange={(v) => onPlayerAudioChange?.(player.id, v)}
-                      trackColor={{ false: Colors.borderStrong, true: Colors.success }}
-                      thumbColor="#FFFFFF"
-                      // Synca ios_backgroundColor med aktiv track-färg så
-                      // ingen grå flärd läcker igenom när toggle är ON.
-                      ios_backgroundColor={audioOn ? Colors.success : Colors.borderStrong}
-                    />
-                  </View>
-                );
-              })}
-            </ScrollView>
-            <TouchableOpacity
-              style={styles.audioDoneBtn}
-              onPress={() => setAudioModalOpen(false)}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.audioDoneBtnText}>Done</Text>
-            </TouchableOpacity>
-          </Pressable>
-        </Pressable>
-      </Modal>
 
       {/* Dropdown-modal för Answer response time-val. Tap utanför listan
           (semi-transparent backdrop) stänger; varje option-rad anropar
@@ -2252,81 +2178,6 @@ const styles = StyleSheet.create({
     fontSize: FontSize.lg,
     fontWeight: FontWeight.bold,
     color: Colors.primary,
-  },
-
-  // ── D-iv: Audio per player-modal ─────────────────────────────────────
-  // Bredare panel än response-time-dropdown:n eftersom varje rad har
-  // avatar + namn + Switch (mer horisontellt content). Delar dropdown-
-  // Backdrop + dropdownTitle med response-time-modalen för enhetlig
-  // visuell vokabulär.
-  audioPanel: {
-    width: 320,
-    maxWidth: '90%',
-    maxHeight: '70%',
-    backgroundColor: Colors.cardElevated,
-    borderRadius: Radius.lg,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    paddingVertical: Spacing.sm,
-    paddingHorizontal: Spacing.sm,
-  },
-  audioHint: {
-    fontSize: FontSize.xs,
-    color: Colors.textSecondary,
-    paddingHorizontal: Spacing.sm,
-    paddingBottom: Spacing.sm,
-    lineHeight: 16,
-  },
-  audioList: {
-    flexGrow: 0,
-  },
-  audioRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: Spacing.sm,
-    paddingVertical: Spacing.xs,
-    borderTopWidth: 1,
-    borderTopColor: Colors.border,
-  },
-  audioRowLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.sm,
-    flex: 1,
-  },
-  audioRowNameStack: {
-    flexDirection: 'column',
-    flex: 1,
-    gap: 1,
-  },
-  audioRowName: {
-    fontSize: FontSize.sm,
-    fontWeight: FontWeight.semibold,
-    color: Colors.textPrimary,
-  },
-  audioRowHostTag: {
-    fontSize: FontSize.xs,
-    color: Colors.primary,
-    fontWeight: FontWeight.semibold,
-    letterSpacing: 0.3,
-    textTransform: 'uppercase',
-  },
-  audioDoneBtn: {
-    marginTop: Spacing.sm,
-    alignSelf: 'center',
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.xs + 2,
-    borderRadius: Radius.sm,
-    backgroundColor: Colors.primaryMuted,
-    borderWidth: 1,
-    borderColor: Colors.primary,
-  },
-  audioDoneBtnText: {
-    fontSize: FontSize.sm,
-    fontWeight: FontWeight.semibold,
-    color: Colors.primary,
-    letterSpacing: 0.3,
   },
 
   // ── Turordningstabell ────────────────────────────────────────────────

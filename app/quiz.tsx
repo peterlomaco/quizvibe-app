@@ -1155,6 +1155,10 @@ export default function QuizScreen() {
   // isAudioMutedForSelf-compute:n längre ner kan läsa state utan TDZ.
   const [playerAudioOverrides, setPlayerAudioOverridesState] =
     useState<PlayerAudioOverrides>({});
+  // Har spelaren själv rört sitt ljud på DENNA enhet (IndDev non-host)?
+  // Mount-fetchen nedan ersätter hela overrides-mappen, så utan den här
+  // flaggan kan en sen resolve nolla ett val användaren just gjort.
+  const selfAudioTouchedRef = useRef(false);
   // Remote 1v1: varje spelare kör en egen solo-session på sin egen enhet, så
   // IndDev:s host-styrda overrides-map gäller inte här — ljudet ägs lokalt och
   // är PÅ som default på BÅDA enheterna. Spelaren kan stänga av det själv via
@@ -4254,6 +4258,27 @@ export default function QuizScreen() {
     [params.roomCode, gameMode],
   );
 
+  // Spelaren togglar ljudet på SIN EGEN enhet via Audio-raden i GetReady:s
+  // Game settings. Två lägen delar handler eftersom de delar premiss — en
+  // spelare per enhet, ljudet ägs lokalt:
+  //   remote 1v1  → session-lokalt state (ingen live-sync finns i läget).
+  //   IndDev non-host → skrivs in i overrides-mappen på eget id, så
+  //     isAudioMutedForSelf förblir enda källan till sanning.
+  // Medvetet INGEN persist (lobby_settings är RLS-gated till host) och
+  // INGEN broadcast — valet är device-local och angår ingen annan enhet.
+  const handleSelfAudioChange = useCallback(
+    (audioOn: boolean) => {
+      if (gameMode === 'remote-1v1') {
+        setRemoteAudioOn(audioOn);
+        return;
+      }
+      if (!selfPlayerId) return;
+      selfAudioTouchedRef.current = true;
+      setPlayerAudioOverridesState((prev) => ({ ...prev, [selfPlayerId]: audioOn }));
+    },
+    [gameMode, selfPlayerId],
+  );
+
   // D-v: host:s tap-signal. Anropas av onTouchStart-wrapper på alla
   // return-paths. Resetar host:s egen lastHostActivityRef + broadcastar
   // host_active_ping (throttlat till max 1/5s — fortsatta taps inom
@@ -6137,13 +6162,20 @@ export default function QuizScreen() {
     let cancelled = false;
     getPlayerAudioOverrides(params.roomCode)
       .then((map) => {
-        if (!cancelled) setPlayerAudioOverridesState(map);
+        if (cancelled) return;
+        // Har spelaren hunnit toggla sitt EGNA ljud innan fetchen resolvat
+        // behålls det valet — annars skulle en sen resolve tyst nolla det.
+        setPlayerAudioOverridesState((prev) =>
+          selfAudioTouchedRef.current && selfPlayerId
+            ? { ...map, [selfPlayerId]: prev[selfPlayerId] }
+            : map,
+        );
       })
       .catch(() => {});
     return () => {
       cancelled = true;
     };
-  }, [gameMode, params.roomCode]);
+  }, [gameMode, params.roomCode, selfPlayerId]);
 
   // D-iii: när lokal monitor återgår från unstable → ok, rensa peer-
   // tracking-state. Allt vi har om andra spelare från perioden vi var
@@ -6432,18 +6464,28 @@ export default function QuizScreen() {
         unstableLocked={shouldLockForUnstable}
         unstableCanRetry={!isConnectionUnstable && stickyUnstableForQuestion}
         onUnstableRetry={!isHost ? handleRetryFromUnstable : undefined}
-        // D-iv: audio-toggle-block. Renderas bara för host i IndDev
-        // (showAudioTrigger-gate i GetReadyIntro). Pass-the-Phone får
-        // tom allPlayers via gating så trigger:n döljs där.
-        allPlayers={gameMode === 'individual-devices' ? turnOrder : undefined}
+        // D-iv: host:s egen audio-toggle i IndDev. Går via onPlayerAudioChange
+        // (persist + broadcast) så host:s val överlever Play Again-carry-over.
+        // Per-spelare-styrning finns inte i UI:t — varje enhet äger sitt ljud.
         hostPlayerId={hostPlayerId}
         playerAudioOverrides={playerAudioOverrides}
         onPlayerAudioChange={handlePlayerAudioChange}
-        // Remote 1v1: enhetens eget ljud. Raden renderas bara när callbacken
-        // finns, så lokala lägen (PtP/IndDev) är orörda.
-        selfAudioOn={remoteAudioOn}
+        // Enhetens EGET ljud — remote 1v1 (båda spelarna) samt IndDev
+        // non-host, som annars vore permanent tyst. Host i IndDev använder
+        // onPlayerAudioChange ovan i stället, och PtP delar enhet så där
+        // finns inget att styra → ingen callback, ingen rad. Värdet härleds
+        // ur isAudioMutedForSelf så raden alltid speglar det som faktiskt
+        // spelas (i remote är det identiskt med remoteAudioOn).
+        selfAudioOn={!isAudioMutedForSelf}
+        // selfPlayerId krävs i IndDev — utan id har handlern ingen nyckel att
+        // skriva på, så raden skulle bli ett dött tap-mål. Saknas den (legacy-
+        // payload/direkt-nav) döljs raden hellre än att ljuga om att den gör
+        // något; isAudioMutedForSelf faller då tillbaka på ljud PÅ.
         onSelfAudioChange={
-          gameMode === 'remote-1v1' ? setRemoteAudioOn : undefined
+          gameMode === 'remote-1v1' ||
+          (gameMode === 'individual-devices' && !isHost && !!selfPlayerId)
+            ? handleSelfAudioChange
+            : undefined
         }
         // I IndDev wrappar vi onReady så host:s tap också broadcastar
         // play_command till non-host:s enheter. Pass-the-Phone behöver
@@ -6478,8 +6520,12 @@ export default function QuizScreen() {
         <InactivityCountdownBanner secondsLeft={inactivityCountdownSec} />
       )}
       {/* Ambient-slinga fortsätter sömlöst från Lobby-ljud under GetReady — ingen pulsering.
-          Remote 1v1: ljud lokalt på varje enhet (solo-session) — inte host-gated. */}
-      {(isHost || gameMode === 'remote-1v1') && !isAudioMutedForSelf && <MorseAmbientSound />}
+          Grindas ENBART på isAudioMutedForSelf, precis som appens tre övriga
+          ljudkällor: den memon kodar redan hela policyn per läge (PtP alltid
+          på, remote lokalt, IndDev via override med host=on/non-host=off som
+          default). Ett extra isHost-villkor här skulle göra en non-host som
+          slagit på sitt ljud halvt tyst. */}
+      {!isAudioMutedForSelf && <MorseAmbientSound />}
       </View>
     );
   }
@@ -6500,7 +6546,9 @@ export default function QuizScreen() {
         category={effectiveCategoryByQuestion[questionIndex] ?? null}
         onComplete={() => setPhase('question')}
         finalWord={isImageQuestion || isActorSelectQuestion || isSpotifyNameQuestion ? 'Who' : isTimelineQuestion ? 'When' : undefined}
-        silent={!(isHost || gameMode === 'remote-1v1') || isAudioMutedForSelf}
+        // Talad nedräkning följer samma grind som övriga ljudkällor — se
+        // MorseAmbientSound ovan för varför isHost inte hör hemma här.
+        silent={isAudioMutedForSelf}
       />
       {/* Pre-decode-trick borttaget 2026-05-27 (text-rendering = no decode). */}
       {inactivityCountdownSec !== null && (
@@ -6815,8 +6863,9 @@ export default function QuizScreen() {
           answer-block + reveal-feedback] + [sticky-bottom: Confirm-bar]. */}
       <View style={styles.fixedTopZone}>
         {/* Hjärtslag enbart för Hints-frågor under aktiv svarstid.
-            YT- och Spotify-frågor är tysta i quiz-vyn. */}
-        {(isHost || gameMode === 'remote-1v1') && !isAudioMutedForSelf && isImageQuestion && (phase === 'question' || phase === 'awaiting') && (
+            YT- och Spotify-frågor är tysta i quiz-vyn. Grindas ENBART på
+            isAudioMutedForSelf — se MorseAmbientSound i intro-vyn. */}
+        {!isAudioMutedForSelf && isImageQuestion && (phase === 'question' || phase === 'awaiting') && (
           <HeartbeatSound bpm={80} />
         )}
           {/* phase är här narrowed till 'question' | 'awaiting' | 'reveal'
