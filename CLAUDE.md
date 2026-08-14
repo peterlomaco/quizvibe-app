@@ -1192,6 +1192,14 @@ Tre separata pools: `spotifyPool` (YT-items med `spotifyTrackId` när `spotifyEn
 - **Hints storleksbestäms FÖRST och golvas**, tvärtom mot tidigare där Hints tog halva spelet OCH absorberade all avrundningsrest (kunde ge 67%). Rationalen: **Hints finns för att spelet inte ska stå och falla med Spotify och YouTube — det är utfyllnad, inte en dragare** (Peter 2026-08-14). Se `memory/project_hints_is_filler.md`.
 - Följd av golvningen, avsiktlig: vid 2–3 rundor får Hints **noll**, och andelen hamnar strax UNDER 25% (17–20% vid 5, 6, 10 rundor) i stället för över.
 
+**Spotify-antalet MÅSTE vara ett helt antal DJ-varv (Peter 2026-08-14).** `djRotationPlan` ([quiz.tsx](app/quiz.tsx)) delar ut DJ round-robin (`spotifyQuestionIndices.length % djPlayers.length`), så ett antal som inte är jämnt delbart med spelarantalet gör att någon DJ:ar oftare än andra. Med 2 rundor + 2 spelare gav den råa 37,5%-kvoten 1 Spotify-fråga → bara spelare 1 fick DJ:a. Regeln fanns dokumenterad i `computeDJRotationPlan` ([spotifyDJ.ts](src/utils/spotifyDJ.ts)) — "en DJ-tur per spelare, exakt" — men den funktionen är **död kod**, quiz.tsx bygger sin egen plan.
+- `spotifyBlockCount` golvas till helt antal varv, men **aldrig under ETT varv**: en påslagen Spotify-toggle ska synas i spelet. 4 rundor/2 spelare → 2 Spotify (inte 0), 2 rundor/2 spelare → båda frågorna Spotify.
+- Ett påtvingat varv som är större än resten efter Hints tar från Hints-kvoten.
+- **Färre rundor än spelare → Spotify utgår helt** (inget halvt varv). Undantag: är Spotify ENDA källan fylls rundorna ändå, för noll skulle lämna spelet utan frågor — där accepteras ojämna DJ-turer.
+- Utfyllnad av otilldelade block går **YT → Hints → Spotify** (Spotify sist) så utfyllnaden inte lägger till lösa Spotify-frågor och bryter varvet.
+- ⚠ Golvningen gör att Spotify **under**levererar mot 37,5% vid många spelare: 20 rundor/4 spelare ger 4 (20%) i stället för ~7, eftersom `floor(7/4) = 1` varv. Avsiktligt val (rättvisa före ratio); byt till avrundning till närmaste varv om ratio ska prioriteras.
+- Spotify är hårt gated till IndDev där `questionsPerBlock = 1`, så block = frågor och varv-matematiken går rakt på blocken.
+
 **Block-storlek**: `turnOrder.length` (PtP) eller 1 (IndDev/Single Player).
 
 **Epok-viktad urval (YouTube-fas + Image-fas, 2026-06-08)**: ersätter `prioritiseUnseen()`-flat-shuffle för Fas 2 och Fas 3. Implementeras i [`src/utils/epochAllocation.ts`](src/utils/epochAllocation.ts).

@@ -1707,20 +1707,49 @@ export default function QuizScreen() {
     // Följden av golvningen: vid 2-3 rundor får Hints noll, och resten hamnar
     // strax UNDER 25% istället för över. Bådadera avsiktligt.
     let imageBlockCount = hasImage ? Math.floor(totalRounds / 4) : 0;
-    const restBlocks = totalRounds - imageBlockCount;
-    // Cap mot spotifyPool.length: ingen låt ska kunna dyka upp hos två olika DJs.
-    let spotifyBlockCount = hasSpotify
-      ? Math.min(Math.floor(restBlocks / 2), spotifyPool.length)
-      : 0;
+    let restBlocks = totalRounds - imageBlockCount;
+
+    // ── Spotify: antalet MÅSTE vara ett helt antal DJ-varv ────────────────
+    // DJ:n tilldelas round-robin över Spotify-frågorna (djRotationPlan:
+    // `spotifyQuestionIndices.length % djPlayers.length`), så om antalet inte
+    // är jämnt delbart med spelarantalet blir någon DJ oftare än andra. Med
+    // 2 rundor + 2 spelare gav den råa 37,5%-kvoten 1 Spotify-fråga → bara
+    // spelare 1 fick DJ:a. Golvas därför till helt antal varv, men aldrig
+    // under ETT varv: en påslagen Spotify-toggle ska synas i spelet.
+    //
+    // Spotify är hårt gated till IndDev där questionsPerBlock = 1, så block
+    // = frågor här och varv-matematiken går rakt på blocken.
+    const canRotateDJ = hasSpotify && playerCount > 0 && totalRounds >= playerCount;
+    let spotifyBlockCount = 0;
+    if (canRotateDJ) {
+      // Cap mot spotifyPool.length: ingen låt ska kunna dyka upp hos två olika DJs.
+      const rawSpotify = Math.min(Math.floor(restBlocks / 2), spotifyPool.length);
+      const rotations = Math.max(1, Math.floor(rawSpotify / playerCount));
+      const capped = Math.min(rotations * playerCount, spotifyPool.length, totalRounds);
+      // Re-golva efter cappningen — pool- eller rundtaket kan ha kapat mitt i ett varv.
+      spotifyBlockCount = Math.floor(capped / playerCount) * playerCount;
+      // Ett påtvingat varv kan vara större än resten efter Hints — ta då från Hints.
+      if (spotifyBlockCount > restBlocks) {
+        imageBlockCount = totalRounds - spotifyBlockCount;
+        restBlocks = spotifyBlockCount;
+      }
+    }
+    // Färre rundor än spelare → inget helt varv ryms. Spotify utgår hellre än
+    // att bara en delmängd av spelarna får DJ:a (Peter 2026-08-14). Undantaget
+    // är Spotify-only nedan, där noll skulle lämna spelet helt utan frågor.
+
     let ytBlockCount = hasPureYoutube ? restBlocks - spotifyBlockCount : 0;
 
     // Degenererade lägen: en otillgänglig källas block går till de andra så
-    // spelet aldrig blir kortare än begärt antal rundor.
+    // spelet aldrig blir kortare än begärt antal rundor. Hints går FÖRE Spotify
+    // i turordningen — annars skulle utfyllnaden lägga till lösa Spotify-frågor
+    // och bryta DJ-varvet. Spotify tar resten bara när ingen annan källa finns,
+    // och då är ojämna DJ-turer det enda alternativet till ett tomt spel.
     const unallocated = totalRounds - spotifyBlockCount - ytBlockCount - imageBlockCount;
     if (unallocated > 0) {
       if (hasPureYoutube) ytBlockCount += unallocated;
-      else if (hasSpotify) spotifyBlockCount = Math.min(spotifyBlockCount + unallocated, spotifyPool.length);
       else if (hasImage) imageBlockCount += unallocated;
+      else if (hasSpotify) spotifyBlockCount = Math.min(spotifyBlockCount + unallocated, spotifyPool.length);
     }
 
     // Fas 1: Spotify — hård uteslutning av senaste 20 sessionernas låtar,

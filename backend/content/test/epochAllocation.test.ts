@@ -163,6 +163,96 @@ describe('sequenceToQuotas', () => {
   });
 });
 
+// Spegel av fas-storleks-uträkningen i app/quiz.tsx (gameQuestions). Kopieras
+// hit av samma skäl som shuffleBlocks ovan; håll dem i synk.
+function sourceSplit(
+  totalRounds: number,
+  playerCount: number,
+  opts: { hasImage?: boolean; hasSpotify?: boolean; hasPureYoutube?: boolean; poolLen?: number } = {},
+) {
+  const { hasImage = true, hasSpotify = true, hasPureYoutube = true, poolLen = 99 } = opts;
+  let img = hasImage ? Math.floor(totalRounds / 4) : 0;
+  let rest = totalRounds - img;
+  const canRotateDJ = hasSpotify && playerCount > 0 && totalRounds >= playerCount;
+  let sp = 0;
+  if (canRotateDJ) {
+    const raw = Math.min(Math.floor(rest / 2), poolLen);
+    const rotations = Math.max(1, Math.floor(raw / playerCount));
+    const capped = Math.min(rotations * playerCount, poolLen, totalRounds);
+    sp = Math.floor(capped / playerCount) * playerCount;
+    if (sp > rest) { img = totalRounds - sp; rest = sp; }
+  }
+  let yt = hasPureYoutube ? rest - sp : 0;
+  const un = totalRounds - sp - yt - img;
+  if (un > 0) {
+    if (hasPureYoutube) yt += un;
+    else if (hasImage) img += un;
+    else if (hasSpotify) sp = Math.min(sp + un, poolLen);
+  }
+  return { sp, yt, img };
+}
+
+describe('source split — DJ rotation', () => {
+  const ROUNDS = [2, 3, 4, 5, 6, 8, 10, 12, 16, 20];
+  const PLAYERS = [2, 3, 4, 6, 12];
+
+  it('always allocates exactly totalRounds', () => {
+    for (const R of ROUNDS) {
+      for (const P of PLAYERS) {
+        const s = sourceSplit(R, P);
+        expect(s.sp + s.yt + s.img).toBe(R);
+      }
+    }
+  });
+
+  it('gives every player the same number of DJ turns', () => {
+    // Kärnregeln: djRotationPlan delar ut DJ round-robin, så ett antal som
+    // inte är jämnt delbart med spelarantalet gor att nagon DJ:ar oftare.
+    for (const R of ROUNDS) {
+      for (const P of PLAYERS) {
+        expect(sourceSplit(R, P).sp % P).toBe(0);
+      }
+    }
+  });
+
+  it('makes both questions Spotify at 2 rounds with 2 players', () => {
+    // Peters rapporterade fall — förut 1 sp / 1 yt, dvs bara spelare 1 DJ:ade.
+    expect(sourceSplit(2, 2)).toEqual({ sp: 2, yt: 0, img: 0 });
+  });
+
+  it('keeps Spotify present at the default 4 rounds', () => {
+    expect(sourceSplit(4, 2).sp).toBe(2);
+    expect(sourceSplit(4, 3).sp).toBe(3);
+  });
+
+  it('drops Spotify when no full rotation fits', () => {
+    // Färre rundor än spelare → hellre ingen Spotify än att bara en delmängd
+    // av spelarna får DJ:a.
+    expect(sourceSplit(2, 4).sp).toBe(0);
+    expect(sourceSplit(3, 6).sp).toBe(0);
+  });
+
+  it('still fills a Spotify-only game when no rotation fits', () => {
+    // Undantaget: noll skulle lämna spelet helt utan frågor, så ojämna
+    // DJ-turer accepteras när Spotify är enda källan.
+    const s = sourceSplit(2, 4, { hasImage: false, hasPureYoutube: false });
+    expect(s.sp).toBe(2);
+    expect(s.sp + s.yt + s.img).toBe(2);
+  });
+
+  it('never allocates half a rotation when the pool is too small', () => {
+    expect(sourceSplit(8, 2, { poolLen: 1 }).sp).toBe(0);
+    expect(sourceSplit(8, 2, { poolLen: 3 }).sp).toBe(2);
+  });
+
+  it('sends leftover blocks to Hints rather than breaking the rotation', () => {
+    // Utfyllnad går YT → Hints → Spotify; Spotify sist så varvet inte bryts.
+    const s = sourceSplit(8, 3, { hasPureYoutube: false });
+    expect(s.sp % 3).toBe(0);
+    expect(s.sp + s.yt + s.img).toBe(8);
+  });
+});
+
 describe('shuffleBlocks', () => {
   it('shuffles individual questions when questionsPerBlock is 1', () => {
     const seq = [1, 2, 3, 4, 5, 6, 7, 8];
