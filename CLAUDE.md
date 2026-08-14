@@ -2044,7 +2044,33 @@ const stopwatchColor = phase === 'question' ? timerColor : '#8CC1FF';
 
 Detta ersatte tidigare enda-ScrollView-strukturen där spelaren kunde scrolla bort media+timer när de letade bland prefix-knappar. Nu fokuserar scroll-gestures enbart på svarsalternativen.
 
-**Kort-skärms-kompaktering (2026-08-11, TestFlight-rapport från iPhone SE)** — fixed-top-zonen har naturlig höjd och **krymper inte** (RN:s `flexShrink` defaultar till 0) medan scroll-zonen har `flex: 1` (= `flexBasis: 0` + shrink). Överstiger summan skärmhöjden är det därför ALLTID scroll-zonen som kollapsar — på en SE1 (568 pt) till ~45 px, dvs. en halv svarsrad utan någon yta att svepa på. Spelaren tolkade det som "skärmen går inte att scrolla". Fix: `QUIZ_COMPACT` (`SCREEN_H < 700` — SE2/SE3/8) och `QUIZ_VERY_COMPACT` (`< 600` — SE1) i [app/quiz.tsx](app/quiz.tsx), samma trösklar som `QUIZ_PLAYER_HEIGHT` och CodeKeyboard. Skalar: hints-/bildkortet (`QUIZ_IMAGE_CARD_H` 158/124 px i stället för 16:9 ≈ 211), `fixedTopZone.gap`, timer-ringen (56→46), stopwatch-boxen (ikon 32→26, siffra 38→30, padding sm→xs), frågekortets `paddingVertical` + textstorlekar (30/18 → 24/16), sticky-barens padding + knapphöjd (56→48), Spotify-kortens `minHeight: 220` → `QUIZ_PLAYER_HEIGHT`. Frigör ~120 px → scroll-zonen får ≥165 px på SE1 och ≥230 px på SE2. **Sista-utvägs-ventil**: `fixedTopZone` har `flexShrink: 1` och `imageMediaCard` `flexShrink: 1` + `minHeight: 110`, så om zonen ändå blir för hög (ovanligt högt frågekort) ger mediakortet efter i stället för att scroll-zonen nollas. **Regel: lägg aldrig till ett nytt element med fast höjd i fixed-top-zonen utan att räkna om budgeten för 568 pt.**
+**Kort-skärms-kompaktering (2026-08-11, TestFlight-rapport från iPhone SE)** — fixed-top-zonen har naturlig höjd och **krymper inte** (RN:s `flexShrink` defaultar till 0) medan scroll-zonen har `flex: 1` (= `flexBasis: 0` + shrink). Överstiger summan skärmhöjden är det därför ALLTID scroll-zonen som kollapsar — på en SE1 (568 pt) till ~45 px, dvs. en halv svarsrad utan någon yta att svepa på. Spelaren tolkade det som "skärmen går inte att scrolla". Fixen skalar: hints-/bildkortet, `fixedTopZone.gap`, timer-ringen, stopwatch-boxen, frågekortets `paddingVertical` + textstorlekar, sticky-barens padding + knapphöjd, Spotify-kortens `minHeight`. **Sista-utvägs-ventil**: `fixedTopZone` har `flexShrink: 1` och `imageMediaCard` `flexShrink: 1` + `minHeight: 110`, så om zonen ändå blir för hög (ovanligt högt frågekort) ger mediakortet efter i stället för att scroll-zonen nollas. **Regel: lägg aldrig till ett nytt element med fast höjd i fixed-top-zonen utan att räkna om budgeten för 568 pt.** De diskreta hinkarna (`QUIZ_COMPACT` / `QUIZ_VERY_COMPACT` / `SCREEN_H < 700`) är ERSATTA 2026-08-14 — se nedan.
+
+### Måttdriven quiz-layout — [src/utils/quizLayout.ts](src/utils/quizLayout.ts) (2026-08-14)
+
+TestFlight-rapport från **iPhone 11**: "yt-spelaren kapar botten på vissa enheter". Två oberoende problem, båda lösta i en egen måttmodul som quiz.tsx OCH MediaPlayer-providern importerar. **Lägg aldrig en lokal kopia av dessa formler i en komponent** — hade YouTube-kortet och iframen olika tal klipps spelaren.
+
+⚠ **1. YouTube-spelaren är ALLTID 16:9 av sin BREDD — `height`-propen styr den inte.** `react-native-youtube-iframe` renderar wrapper-HTML med `.container { width: 100%; height: 0; padding-bottom: 56.25% }` + `iframe { height: 100% }`. `height`-propen sizear bara RN-View:n runt omkring. Ett fast **220 pt**-kort med `overflow: hidden` kapade därför spelarens nederkant på varje enhet från **393 pt bredd** och uppåt:
+
+| Bredd | 16:9-höjd | Klipptes | Enheter |
+|---|---|---|---|
+| 320–390 | 180–219 | nej | SE1, SE2/SE3/8, X/XS/11 Pro, 12–13 mini, 12/13/14 |
+| 393 | 221 | 1 pt | 14 Pro / 15 / 16 |
+| **414** | **233** | **13 pt** | **XR, 11, 11 Pro Max, 8/7/6s Plus** |
+| 430 | 242 | 22 pt | 12–16 Pro Max |
+
+Att smala enheter råkade klara sig är hela förklaringen till "bara vissa enheter" — buggen är **bredd**-driven, inte höjd-driven, så leta inte i höjdbudgeten. `QUIZ_MEDIA_H`/`QUIZ_MEDIA_W` härleds nu ur bredden och skickas som BÅDE `height` och `width` till lib:n. Räcker inte höjdbudgeten krymps **bredden** också så 16:9 hålls → spelaren letterboxas horisontellt i kortets bakgrundsfärg i stället för att kapas.
+
+⚠ **2. Kompakteringen grindar på ANVÄNDBAR höjd och är kontinuerlig.** Ursprungsfixens `SCREEN_H < 700` sa inget om hur mycket notch + home indicator äter, och delade in enheter i tre grova hinkar. Nu: `QUIZ_USABLE_H = fönsterhöjd − riktiga insets`, där insets läses ur **`initialWindowMetrics`** (native-konstant från `react-native-safe-area-context`, läsbar synkront redan vid import — `useSafeAreaInsets` går inte, StyleSheet är inte en komponent; era-estimat som fallback). Därifrån två skalor mot referenshöjden 760 pt:
+
+- **`qh(v)`** — höjder, padding, gaps. Golv 0.66.
+- **`qf(v)`** — typsnitt. Golv 0.82, medvetet högre; läsbarhet väger tyngre än yta.
+
+**Skriv `qh(56)`, inte `SCREEN_H < 700 ? 46 : 56`.** Varje enhet får sin egen interpolerade storlek i stället för att tvingas välja mellan "SE-liten" och "för stor" — en 716 pt-enhet landar på 0.94, en 734 pt på 0.97.
+
+**`QUIZ_IMAGE_CARD_H` (hints-/bild-kortet + Spotify-kortens `minHeight`) är MEDVETET lägre än `QUIZ_MEDIA_H`** (`qh(QUIZ_MEDIA_H)`): det är vår egen komponent utan iframe, 16:9 är ingen tvingande regel där, och hint-listan har egen intern scroll — så den höjden får hellre gå till svarsalternativen. Utfall: svarsytan blir 141–282 pt beroende på enhet, mediarutan exakt 16:9 överallt.
+
+⚠ Måtten läses **en gång vid import**. Appen är portrait-låst (`app.json`); låses den upp måste modulen bli en hook.
 
 1. **Mediakort** — för `question.type === 'timeline'` (musik/film/sport/etc) renderas `MediaPlayer` (YouTube/none) — höjd `PLAYER_HEIGHT = 220`, video synlig hela tiden, QuizVibe-logo-overlay efter `state === 'ended'`. Detaljer i "YouTube playback & curation"-sektionen ovan. För `question.type === 'image'` renderas `imageMediaCard` (16:9 wrap, `aspectRatio: 16/9`, `overflow: 'hidden'`) med `<Image source={getQuizImage(question.id)!} resizeMode="cover">` + `<ProgressiveCover>` overlay (se "Image questions (MVP)" nedan).
 2. **Timer-section** (row): timer-bar (flex 1) + **pulserande ring runt sekund-räknaren**. Ringen är 56×56 cirkel med dynamisk `borderColor: timerColor`, halo-View bakom (samma färg, `opacity` pulserar 0.3 → 0.7 över 700 ms native), och scale-pulse 1 → 1.08. Sekund-siffran (24 px bold tabular-nums) sitter inuti ringen.

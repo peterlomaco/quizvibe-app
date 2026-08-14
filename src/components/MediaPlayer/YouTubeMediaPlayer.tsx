@@ -35,11 +35,12 @@
 
 import { Nunito_700Bold, useFonts } from '@expo-google-fonts/nunito';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Dimensions, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import YoutubePlayer from 'react-native-youtube-iframe';
 import { QuizVibeLogo } from '@/src/components/QuizVibeLogo';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '@/src/theme';
 import type { YoutubeClip } from '@/src/utils/mediaSource';
+import { QUIZ_MEDIA_H, QUIZ_MEDIA_W } from '@/src/utils/quizLayout';
 
 interface Props {
   clip: YoutubeClip;
@@ -53,14 +54,17 @@ interface Props {
   onError?: (error: Error) => void;
 }
 
-// Responsiv spelar-höjd — reduceras på korta skärmar så quiz-vyn får
-// tillräckligt med utrymme för TimelineSelector/ImageAnswerBlock i sin
-// ScrollView. Trösklarna matchar CodeKeyboard-mönstret (< 600 / < 700).
-// 220 (var 200) — YouTube-iframe:s bottenrow (share-knapp, YouTube-logo,
-// "related video"-thumbnail som dyker upp vid pause) klipptes av kortets
-// overflow:hidden vid 200.
-const { height: _SCREEN_H } = Dimensions.get('window');
-const PLAYER_HEIGHT = _SCREEN_H < 600 ? 150 : _SCREEN_H < 700 ? 185 : 220;
+// ⚠ Spelaren ÄR 16:9 av sin BREDD, punkt. react-native-youtube-iframe
+// renderar wrapper-HTML med `padding-bottom: 56.25%` + `iframe { height:
+// 100% }`, så `height`-propen sizear bara RN-View:n runt omkring — den
+// styr inte spelaren. Är kortet lägre än 9/16 × bredden kapas spelarens
+// nederkant av `overflow: hidden`. Ett fast 220 pt-kort gjorde precis det på
+// alla enheter från 393 pt bredd och uppåt (iPhone 11/XR/8 Plus: 13 pt,
+// Pro Max: 22 pt) medan 375–390 pt råkade klara sig — därav "bara vissa
+// enheter". Måtten kommer nu från quizLayout.ts och är alltid exakt 16:9.
+// Ha ALDRIG en lokal kopia av formeln här.
+const PLAYER_W = QUIZ_MEDIA_W;
+const PLAYER_H = QUIZ_MEDIA_H;
 // Hur länge vi väntar på att autoplay ska starta innan vi visar tap-prompt.
 // För kort = prompt blinkar onödigt på iOS-versioner som tillåter autoplay
 // (YouTube-state-events kommer typiskt unstarted → buffering → playing och
@@ -184,7 +188,12 @@ export function YouTubeMediaPlayer({
         // key tvingar full remount vid ny clip så `initialPlayerParams.start/end`
         // appliceras igen — annars håller iframe:n kvar förra frågans start-tid.
         key={clip.videoId}
-        height={PLAYER_HEIGHT}
+        // Både height OCH width skickas: lib:n sizear sin View med dem, och
+        // wrapper-HTML:ens 56.25%-of-width ger då exakt PLAYER_H. Utelämnas
+        // width faller lib:n tillbaka på full fönsterbredd, och på enheter
+        // där vi letterboxar (kort skärm) skulle iframen bli högre än kortet.
+        height={PLAYER_H}
+        width={PLAYER_W}
         play={isPlaying}
         // D-iv: dubbel tystnad gated på isPlayerReady så postMessage:en
         // inte tappas innan YT.Player-instansen existerar i WebView:n.
@@ -258,12 +267,18 @@ export function YouTubeMediaPlayer({
 }
 
 const styles = StyleSheet.create({
+  // Kortet är fullbrett; spelaren centreras i det. På enheter där höjd-
+  // budgeten tvingar fram en smalare 16:9-ruta blir skillnaden letterbox i
+  // kortets bakgrundsfärg — aldrig kapat innehåll (jfr kommentaren vid
+  // PLAYER_W/H ovan).
   card: {
-    height: PLAYER_HEIGHT,
+    height: PLAYER_H,
     backgroundColor: Colors.card,
     borderRadius: Radius.md,
     overflow: 'hidden',
     position: 'relative',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   // Heltäckande end-of-clip overlay som ersätter iframe-frame:n när
   // playback ended. Bakgrunds-färg matchar mediakortets card-färg så

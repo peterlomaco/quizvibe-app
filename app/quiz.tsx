@@ -40,6 +40,12 @@ import {
 } from '@/src/utils/remoteMatches';
 import { clearLeftPlayers } from '@/src/utils/leftPlayers';
 import { pickMediaSource, type YoutubeClip } from '@/src/utils/mediaSource';
+import {
+  QUIZ_IMAGE_CARD_H,
+  QUIZ_MEDIA_H,
+  qf,
+  qh,
+} from '@/src/utils/quizLayout';
 import { deactivateRoom, registerActiveRoom } from '@/src/utils/mockActiveRooms';
 import { clearLobbyPlayers, setLobbyPlayers } from '@/src/utils/mockLobbyPlayers';
 import {
@@ -640,27 +646,11 @@ function renderStepText(text: string): React.ReactNode {
 
 // ─── Mått ─────────────────────────────────────────────────────────────────────
 const SCREEN_WIDTH = Dimensions.get('window').width;
-const SCREEN_H = Dimensions.get('window').height;
-// Matchar YouTubeMediaPlayer:s responsiva PLAYER_HEIGHT (samma trösklar).
-const QUIZ_PLAYER_HEIGHT = SCREEN_H < 600 ? 150 : SCREEN_H < 700 ? 185 : 220;
-// Kort-skärms-kompaktering av fråge-vyns fixed-top-zon (media + timer +
-// stopwatch + frågekort). Samma trösklar som ovan: 700 = iPhone SE2/SE3/8
-// (667), 600 = iPhone SE1 (568).
-//
-// Varför: layouten är [fixed-top] + [ScrollView: svarsalternativ] +
-// [sticky Confirm-bar]. fixed-top har naturlig höjd och krymper inte
-// (flexShrink default 0 i RN) medan ScrollView:n har flex:1 (= flexBasis 0
-// + shrink), så när summan överstiger skärmhöjden är det ALLTID scroll-
-// zonen som kollapsar — till ~30 px på en SE. Spelaren såg då en enda
-// halv svarsrad och kunde inte scrolla (det fanns ingen scroll-yta att ta
-// tag i). Kompakteringen frigör ~120 px så scroll-zonen får en användbar
-// höjd; flexShrink på hints-/bild-kortet är sista-utvägs-ventilen.
-const QUIZ_COMPACT = SCREEN_H < 700;
-const QUIZ_VERY_COMPACT = SCREEN_H < 600;
-// Höjd på hints-/bild-kortet. Normalt 16:9 av skärmbredden (≈211 px på
-// 375 pt) — cappas på korta skärmar. Kortets innehåll (hint-lista) har egen
-// intern scroll, så en lägre höjd tappar inget innehåll.
-const QUIZ_IMAGE_CARD_H = QUIZ_VERY_COMPACT ? 124 : QUIZ_COMPACT ? 158 : null;
+// Responsiva mått bor i src/utils/quizLayout.ts så MediaPlayer-providern
+// räknar med exakt samma mediamått som kortet runt den. `qh()` skalar
+// höjder/padding och `qf()` typsnitt mot hur mycket höjd som faktiskt är kvar
+// efter safe area — kontinuerligt, inte i diskreta skärmhinkar. Skriv därför
+// `qh(56)`, inte `SCREEN_H < 700 ? 46 : 56`.
 
 // ITEM_WIDTH (avstånd mellan ticks) sätts dynamiskt per assistance-nivå inuti komponenten:
 // Full: tät (≥10 år synliga), Standard: medium (≥8), Minimal: gles (4–5 syns)
@@ -7218,7 +7208,7 @@ export default function QuizScreen() {
                 {/* Wrap-View med integer-höjd centrerar SVG:n vertikalt
                     relativt den stora sekund-siffran (38 px lineHeight). */}
                 <View style={styles.decimalTimerIconWrap}>
-                  <StopwatchIcon size={QUIZ_COMPACT ? 26 : 32} color={stopwatchColor} />
+                  <StopwatchIcon size={qh(32)} color={stopwatchColor} />
                 </View>
                 <Text style={[styles.decimalTimerInt, { color: stopwatchColor }]}>
                   {String(Math.floor(decimalElapsedMs / 1000)).padStart(2, '0')}
@@ -7859,7 +7849,7 @@ const styles = StyleSheet.create({
   // (utanför ScrollView). gap: md ger samma luftiga avstånd mellan elementen
   // som tidigare ScrollView.contentContainerStyle.content.
   fixedTopZone: {
-    gap: QUIZ_COMPACT ? Spacing.sm : Spacing.md,
+    gap: qh(Spacing.md),
     // Får krympa som sista utväg (mot minHeight på imageMediaCard) så
     // scroll-zonen nedanför aldrig hamnar på 0 px höjd.
     flexShrink: 1,
@@ -8018,7 +8008,7 @@ const styles = StyleSheet.create({
     // QUIZ_IMAGE_CARD_H. flexShrink + minHeight är ventilen om fixed-top-
     // zonen ändå blir för hög (t.ex. ett ovanligt högt frågekort): kortet
     // ger då efter i stället för att svars-scrollzonen kollapsar till 0.
-    ...(QUIZ_IMAGE_CARD_H ? { height: QUIZ_IMAGE_CARD_H } : { aspectRatio: 16 / 9 }),
+    height: QUIZ_IMAGE_CARD_H,
     flexShrink: 1,
     minHeight: 110,
     backgroundColor: Colors.card,
@@ -8028,7 +8018,7 @@ const styles = StyleSheet.create({
   },
   // ── Spotify DJ-kortet (DJ:ns vy, innan start) ─────────────────────────
   spotifyDJCard: {
-    minHeight: QUIZ_PLAYER_HEIGHT,
+    minHeight: QUIZ_MEDIA_H,
     backgroundColor: '#0D2010',
     alignItems: 'center',
     justifyContent: 'center',
@@ -8206,7 +8196,7 @@ const styles = StyleSheet.create({
   },
   // ── Q-logo-kortet (gissare + DJ efter start) ──────────────────────────
   spotifyQLogoCard: {
-    minHeight: QUIZ_PLAYER_HEIGHT,
+    minHeight: QUIZ_MEDIA_H,
     backgroundColor: Colors.card,
     alignItems: 'center',
     justifyContent: 'flex-start',
@@ -8323,9 +8313,9 @@ const styles = StyleSheet.create({
     letterSpacing: 0.4,
   },
   // Visas när YouTubeMediaPlayer rapporterar embed-fel — ersätter spelaren
-  // med en diskret felindikator i samma höjd som QUIZ_PLAYER_HEIGHT.
+  // med en diskret felindikator i samma höjd som mediarutan.
   youtubeErrorCard: {
-    height: QUIZ_PLAYER_HEIGHT,
+    height: QUIZ_MEDIA_H,
     backgroundColor: Colors.card,
     alignItems: 'center',
     justifyContent: 'center',
@@ -8433,8 +8423,8 @@ const styles = StyleSheet.create({
   // opacity för cross-platform glow.
   timerRingWrap: {
     position: 'relative',
-    width: 56,
-    height: 56,
+    width: qh(56),
+    height: qh(56),
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -8447,16 +8437,16 @@ const styles = StyleSheet.create({
     borderRadius: 32,
   },
   timerRing: {
-    width: QUIZ_COMPACT ? 46 : 56,
-    height: QUIZ_COMPACT ? 46 : 56,
-    borderRadius: QUIZ_COMPACT ? 23 : 28,
+    width: qh(56),
+    height: qh(56),
+    borderRadius: qh(56) / 2,
     borderWidth: 2,
     backgroundColor: Colors.cardElevated,
     alignItems: 'center',
     justifyContent: 'center',
   },
   timerRingNum: {
-    fontSize: QUIZ_COMPACT ? 20 : 24,
+    fontSize: qf(24),
     fontWeight: FontWeight.bold,
     fontVariant: ['tabular-nums'],
     letterSpacing: 0.2,
@@ -8490,7 +8480,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
     paddingHorizontal: Spacing.lg,
-    paddingVertical: QUIZ_COMPACT ? Spacing.xs : Spacing.sm,
+    paddingVertical: qh(Spacing.sm),
     borderRadius: Radius.lg,
     borderWidth: 2,
     backgroundColor: Colors.cardElevated,
@@ -8498,20 +8488,20 @@ const styles = StyleSheet.create({
   // Wrap runt SVG-ikonen — höjden matchar integer-textens lineHeight
   // så ikonens visuella mitt linjerar exakt med siffrans visuella mitt.
   decimalTimerIconWrap: {
-    width: QUIZ_COMPACT ? 26 : 32,
-    height: QUIZ_COMPACT ? 32 : 40,
+    width: qh(32),
+    height: qf(40),
     alignItems: 'center',
     justifyContent: 'center',
   },
   decimalTimerInt: {
-    fontSize: QUIZ_COMPACT ? 30 : 38,
+    fontSize: qf(38),
     fontWeight: FontWeight.bold,
     fontVariant: ['tabular-nums'],
     letterSpacing: -0.5,
-    lineHeight: QUIZ_COMPACT ? 32 : 40,
+    lineHeight: qf(40),
   },
   decimalTimerDec: {
-    fontSize: QUIZ_COMPACT ? 18 : 22,
+    fontSize: qf(22),
     fontWeight: FontWeight.semibold,
     fontVariant: ['tabular-nums'],
     letterSpacing: -0.3,
@@ -8521,7 +8511,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.card, borderRadius: Radius.lg,
     borderWidth: 1, borderColor: Colors.border,
     paddingHorizontal: Spacing.lg,
-    paddingVertical: QUIZ_COMPACT ? Spacing.sm : Spacing.md,
+    paddingVertical: qh(Spacing.md),
     gap: Spacing.xs,
     marginHorizontal: Spacing.lg,
     // minHeight borttagen — keyword-highlight ger naturlig 1-2-rads-höjd
@@ -8572,16 +8562,16 @@ const styles = StyleSheet.create({
   // Country). Renderas via <Text> nested i parent <Text>, så text-flowet
   // håller orden tillsammans på samma rad/wrap-ningsformat.
   questionTextHeadline: {
-    fontSize: QUIZ_COMPACT ? 24 : 30,
+    fontSize: qf(30),
     fontWeight: FontWeight.bold,
     color: Colors.textPrimary,
     letterSpacing: 0.3,
   },
   questionText: {
-    fontSize: QUIZ_COMPACT ? 16 : 18,
+    fontSize: qf(18),
     fontWeight: FontWeight.semibold,
     color: Colors.textPrimary,
-    lineHeight: QUIZ_COMPACT ? 26 : 30,
+    lineHeight: qf(30),
     textAlign: 'center',
   },
 
@@ -8597,13 +8587,13 @@ const styles = StyleSheet.create({
   // ger luft runt knappen så den inte limmar mot border-top:en.
   stickyConfirmBar: {
     paddingHorizontal: Spacing.lg,
-    paddingVertical: QUIZ_COMPACT ? Spacing.sm : Spacing.md,
+    paddingVertical: qh(Spacing.md),
     backgroundColor: Colors.background,
     borderTopWidth: 1,
     borderTopColor: Colors.border,
   },
   actionBtn: {
-    height: QUIZ_COMPACT ? 48 : 56,
+    height: qh(56),
     borderRadius: Radius.md,
     alignItems: 'center',
     justifyContent: 'center',
@@ -8856,7 +8846,7 @@ const scrollHintStyles = StyleSheet.create({
     // paddingVertical + border; ~65px i kompakt läge). Tidigare Spacing.lg
     // räckte när Confirm var inuti ScrollView, men nu skulle pilen krocka
     // med sticky-bar:n.
-    bottom: QUIZ_COMPACT ? 78 : 96,
+    bottom: qh(96),
     left: 0,
     right: 0,
     alignItems: 'center',
