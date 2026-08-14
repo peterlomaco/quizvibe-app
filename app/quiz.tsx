@@ -2720,10 +2720,16 @@ export default function QuizScreen() {
   // Spotify-frågor. Aktiv medan knappen är synlig (pre-timer + DJ öppnat
   // Spotify). Stoppas direkt när timer startat (knappen försvinner).
   const activateTimerPulse = useRef(new Animated.Value(1)).current;
-  // Next-tab:ens scale-pulse på reveal-vyn. Speglar startskärmens primary-
+  // Scale-pulse för DJ-flödets reveal-CTA:er. Speglar startskärmens primary-
   // CTA-pulse (1 ↔ 1.03 over 900ms). Körs kontinuerligt — vid mount och
-  // framåt — eftersom tab:en bara renderas i reveal-fasen ändå.
+  // framåt — eftersom knapparna bara renderas i reveal-fasen ändå.
   const nextTabPulse = useRef(new Animated.Value(1)).current;
+  // Next-tab:ens EGNA pulse — medvetet kraftigare än nextTabPulse (1 ↔ 1.08
+  // på 650 ms + halo som andas 0.15 ↔ 0.55) eftersom den är reveal-vyns enda
+  // vägen-vidare-CTA och måste läsas som pulserande på en blick (Peter
+  // 2026-08-14). Egna Animated.Values så DJ-knapparna ovan förblir dämpade.
+  const nextCtaPulse = useRef(new Animated.Value(1)).current;
+  const nextCtaGlow = useRef(new Animated.Value(0.2)).current;
   // Glow + scale-pulse på DJ:ns "Start track in Spotify"-CTA — Spotify-grön
   // halo bakom knappen (animated opacity) + 1 ↔ 1.05 scale. Loopen körs
   // kontinuerligt; knappen är ändå bara monterad vid djStep=0 (samma
@@ -3512,6 +3518,40 @@ export default function QuizScreen() {
     loop.start();
     return () => loop.stop();
   }, [nextTabPulse]);
+
+  // Stabil transform-style för DJ-flödets reveal-CTA:er. Ett inline-objekt
+  // hade skapats på nytt vid varje re-render av quiz-skärmen (och reveal-
+  // fasen re-rendrar ofta — SequentialDots, Realtime-events), vilket får
+  // Animated att koppla om sin native-props-nod mitt i pulsen → synliga hack.
+  const nextTabPulseStyle = useMemo(
+    () => ({ transform: [{ scale: nextTabPulse }] }),
+    [nextTabPulse],
+  );
+
+  // Next-tab:ens kraftigare pulse: scale + halo-opacity i parallell så
+  // knappen både växer och "andas" ljus. Samma stabila-style-krav som ovan.
+  useEffect(() => {
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.parallel([
+          Animated.timing(nextCtaPulse, { toValue: 1.08, duration: 650, useNativeDriver: true }),
+          Animated.timing(nextCtaGlow, { toValue: 0.55, duration: 650, useNativeDriver: true }),
+        ]),
+        Animated.parallel([
+          Animated.timing(nextCtaPulse, { toValue: 1, duration: 650, useNativeDriver: true }),
+          Animated.timing(nextCtaGlow, { toValue: 0.15, duration: 650, useNativeDriver: true }),
+        ]),
+      ]),
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [nextCtaPulse, nextCtaGlow]);
+
+  const nextCtaPulseStyle = useMemo(
+    () => ({ transform: [{ scale: nextCtaPulse }] }),
+    [nextCtaPulse],
+  );
+  const nextCtaGlowStyle = useMemo(() => ({ opacity: nextCtaGlow }), [nextCtaGlow]);
 
   // DJ-start-CTA:ns glow + pulse (se deklarationskommentaren vid djStartPulse).
   useEffect(() => {
@@ -7224,7 +7264,7 @@ export default function QuizScreen() {
                 {phase === 'reveal' ? (
                   // Reveal-fas för DJ: Open Spotify (fortsätt uppspelning) + OR + bekräfta stopp
                   <>
-                    <Animated.View style={{ transform: [{ scale: nextTabPulse }] }}>
+                    <Animated.View style={nextTabPulseStyle}>
                       <Pressable
                         style={[styles.spotifyDJActionBtn, { flex: 0, paddingHorizontal: Spacing.xl }]}
                         onPress={() => openSpotifyApp()}
@@ -7234,7 +7274,7 @@ export default function QuizScreen() {
                       </Pressable>
                     </Animated.View>
                     <Text style={styles.djOrSeparatorText}>OR</Text>
-                    <Animated.View style={{ transform: [{ scale: nextTabPulse }] }}>
+                    <Animated.View style={nextTabPulseStyle}>
                       <TouchableOpacity
                         style={styles.djStopConfirmInlineBtn}
                         onPress={() => {
@@ -7617,7 +7657,7 @@ export default function QuizScreen() {
           {isSpotifyQuestion && !djHandedOver ? (
             isCurrentPlayerDJ ? (
               djDismissedOverlay ? (
-                <Animated.View style={{ transform: [{ scale: nextTabPulse }] }}>
+                <Animated.View style={nextTabPulseStyle}>
                   <TouchableOpacity style={rv.djHandoverBtn} onPress={handleDJHandover} activeOpacity={0.85}>
                     <Text style={rv.djHandoverBtnText}>End DJ — handover to Host</Text>
                   </TouchableOpacity>
@@ -7635,7 +7675,8 @@ export default function QuizScreen() {
               <SequentialDots color={Colors.textSecondary} />
             </View>
           ) : (
-            <Animated.View style={{ transform: [{ scale: nextTabPulse }] }}>
+            <Animated.View style={[rv.nextTabWrap, nextCtaPulseStyle]}>
+              <Animated.View style={[rv.nextTabHalo, nextCtaGlowStyle]} pointerEvents="none" />
               <TouchableOpacity
                 style={[rv.nextTab, shouldLockForUnstable && { opacity: 0.4 }]}
                 onPress={
@@ -8667,24 +8708,45 @@ const rv = StyleSheet.create({
     elevation: 60,
     alignItems: 'flex-end',
   },
-  // Next-tab — speglar startskärmens pulserande Join/Create-CTA:er (`gameBtn`
-  // i app/index.tsx) i visuell vokabulär: höjd 56, Colors.cardElevated bg,
-  // 1px Colors.primary border, Radius.md. Reveal-kortets border + badge bär
-  // status-färgen (grön/röd), tab:en är en neutral "fortsätt"-CTA.
+  // Next-tab — delar färgspråk med TimelineSelector:s årsruta (Peter
+  // 2026-08-14): guld 3px-kant + mörk navy fyllning + guld glow, samma
+  // BOX_COLOR/BOX_BG-konstanter så de aldrig glider isär. Reveal-kortets
+  // border + badge bär status-färgen (grön/röd); tab:en är "fortsätt"-CTA:n.
+  //
+  // ⚠ INGEN shadow* här — knappen scale-pulsar, och en iOS-skugga utan
+  // shadowPath tvingar CoreAnimation att räkna om skuggkonturen varje frame
+  // vilket gjorde pulsen hackig. Glow:en bärs av nextTabHalo bakom istället
+  // (samma mönster som confirmHalo/djStartHalo).
   nextTab: {
     height: 56,
     paddingHorizontal: Spacing.lg,
-    borderRadius: Radius.md,
-    borderWidth: 1,
-    borderColor: Colors.primary,
-    backgroundColor: Colors.cardElevated,
+    borderRadius: 10,
+    borderWidth: 3,
+    borderColor: BOX_COLOR,
+    backgroundColor: BOX_BG,
     alignItems: 'center',
     justifyContent: 'center',
   },
+  // Wrap runt Next-tab för scale-pulse + halo-ankring (position: relative så
+  // halo:n absolut-positioneras mot knappen, inte mot skärmen).
+  nextTabWrap: {
+    position: 'relative',
+  },
+  // Guld-halo bakom Next-tab:en. Opacity sätts av nextCtaGlow (0.15 ↔ 0.55)
+  // — sätt ingen statisk opacity här, den skulle ändå överskuggas.
+  nextTabHalo: {
+    position: 'absolute',
+    top: -9,
+    left: -9,
+    right: -9,
+    bottom: -9,
+    borderRadius: 19,
+    backgroundColor: BOX_COLOR,
+  },
   nextTabText: {
     fontSize: 17,
-    fontWeight: '600',
-    color: Colors.textPrimary,
+    fontWeight: '700',
+    color: BOX_COLOR,
     letterSpacing: 0.3,
   },
   // Non-host:s "Waiting for host…"-pill i IndDev — sitter i samma position
