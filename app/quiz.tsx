@@ -6457,6 +6457,7 @@ export default function QuizScreen() {
         playerEmoji={countdownPlayer?.emoji}
         mediaSource={effectiveMediaSourceByQuestion[questionIndex] ?? null}
         answerType={effectiveAnswerTypeByQuestion[questionIndex] ?? null}
+        category={effectiveCategoryByQuestion[questionIndex] ?? null}
         onComplete={() => setPhase('question')}
         finalWord={isImageQuestion || isActorSelectQuestion || isSpotifyNameQuestion ? 'Who' : isTimelineQuestion ? 'When' : undefined}
         silent={!(isHost || gameMode === 'remote-1v1') || isAudioMutedForSelf}

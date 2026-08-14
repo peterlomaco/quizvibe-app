@@ -2530,10 +2530,13 @@ const styles = StyleSheet.create({
   // V1-kategorier (Music/Film/Sport) delar samma guld bg + svart text för
   // visuell konsistens — per-kategori-färgning testades men gav splittrad
   // känsla; enhetlig "info-badge" läser tydligare.
+  // VÄNSTER kant: matchar CountdownIntro där kategori-kolumnen (guld) sitter
+  // till vänster om media-boxen och svarstyp (blå) till höger. Samma
+  // vänster=kategori/höger=svarstyp-vokabulär på båda skärmarna.
   categoryBadge: {
     position: 'absolute',
     top: -9,
-    right: Spacing.md,
+    left: Spacing.md,
     backgroundColor: Colors.warning,
     paddingHorizontal: 8,
     paddingVertical: 2,
@@ -2549,13 +2552,14 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
 
-  // Svarstyp-badge på VÄNSTER övre kant — speglar categoryBadge:s kant-
-  // skärande mönster (top:-9) men sitter till vänster och är blå istället
+  // Svarstyp-badge på HÖGER övre kant — speglar categoryBadge:s kant-
+  // skärande mönster (top:-9) men sitter till höger och är blå istället
   // för guld så de två badges läser som separata datapunkter.
+  // Höger=svarstyp/blå matchar CountdownIntro:s Year/Name-kolumn.
   answerTypeBadge: {
     position: 'absolute',
     top: -9,
-    left: Spacing.md,
+    right: Spacing.md,
     backgroundColor: Colors.primary,
     paddingHorizontal: 8,
     paddingVertical: 2,

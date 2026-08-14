@@ -11,7 +11,9 @@ import {
 } from 'react-native';
 import Svg, { Circle, Path, Rect } from 'react-native-svg';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
+import { MAIN_CATEGORIES, type MainCategory } from '../utils/mainCategory';
 import { MediaSourceIcon, MediaSourceType } from './MediaSourceIcon';
+import { SPOTIFY_GREEN } from './SpotifyBrandIcon';
 
 interface Props {
   /** Anropas när nedräkningen passerat 1 → 0 OCH "?" har visats. */
@@ -44,9 +46,14 @@ interface Props {
   /** Mediakälla för frågan som strax ska ställas — visas som ikon mellan
    *  playerBlock och Q-loggan. Spotify/YouTube/image/none. */
   mediaSource?: MediaSourceType | null;
-  /** Svarstyp för frågan — 'Year' eller 'Name'. Renderas som kant-skärande
-   *  badge i övre högra hörnet på mediaSource-boxen. null → ingen badge. */
+  /** Svarstyp för frågan — 'Year' eller 'Name'. Styr vilken av de två
+   *  rutorna i högerkolumnen bredvid mediaSource-boxen som highlightas.
+   *  null → båda rutorna grå. */
   answerType?: 'Year' | 'Name' | null;
+  /** V1-huvudkategori för frågan — Music/Film/Sport. Styr vilken av de tre
+   *  rutorna i vänsterkolumnen bredvid mediaSource-boxen som highlightas.
+   *  null → alla tre rutorna grå. */
+  category?: MainCategory | null;
 }
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -60,6 +67,72 @@ const LOGO_SIZE = Math.min(360, SCREEN_WIDTH - 40);
 // klar passform med liten luft mellan glyf och ring-stroke.
 const GLYPH_FONT_SIZE = LOGO_SIZE * 0.28;
 
+// ── Färger kring media-boxen ────────────────────────────────────────────
+// Boxens RAM färgas av media-källan (röd/grön/blå), medan sido-kolumnerna
+// visar kategori (vänster) och svarstyp (höger). Källan syns alltså i ramen
+// + ikonen, inte som en egen kolumn.
+//
+// YouTube:s brand-röd. YouTubeBrandIcon hårdkodar '#FF0000' internt och
+// exporterar den inte — vi speglar värdet här i stället för att ändra den
+// brand-låsta komponenten.
+const YOUTUBE_RED = '#FF0000';
+
+/** Ramfärg per media-källa. 'image' = Hints → blå, samma som MediaSourceIcon
+ *  ritar sin Q-figur i (Colors.primary), så kant och ikon matchar. Okänd
+ *  källa ('none'/null) faller tillbaka på neutral primary-blå. */
+function sourceBorderColor(source: MediaSourceType | null | undefined): string {
+  switch (source) {
+    case 'spotify': return SPOTIFY_GREEN;
+    case 'youtube': return YOUTUBE_RED;
+    case 'image': return Colors.primary;
+    default: return Colors.primary;
+  }
+}
+
+interface TagAccent {
+  border: string;
+  text: string;
+}
+
+/** Kategori (Music/Film/Sport) — guld, samma vokabulär som GetReadyIntro:s
+ *  categoryBadge. Alla tre kategorier delar MEDVETET en enda färg;
+ *  per-kategori-färgning har testats tidigare och gav splittrad känsla. */
+const CATEGORY_ACCENT: TagAccent = { border: Colors.warning, text: Colors.warning };
+/** Svarstyp (Year/Name) — blå, samma blå som den ersatta badge:n. */
+const ANSWER_ACCENT: TagAccent = { border: Colors.primary, text: Colors.primary };
+/** Inaktiv sido-ruta. */
+const MUTED_ACCENT: TagAccent = { border: Colors.borderStrong, text: Colors.textDisabled };
+
+/**
+ * Liten sido-ruta kring media-boxen. Aktiv = kategorins (eller svarstypens)
+ * färg på kant + text; inaktiv = borderStrong-kant + textDisabled-text.
+ * Refererar `styles` som deklareras längre ned i filen — samma mönster som
+ * CountdownQLogo.
+ */
+function SideTag({
+  label,
+  active,
+  accent,
+}: {
+  label: string;
+  active: boolean;
+  accent: TagAccent;
+}) {
+  const a = active ? accent : MUTED_ACCENT;
+  return (
+    <View style={[styles.sideTag, { borderColor: a.border }]}>
+      <Text
+        style={[styles.sideTagText, { color: a.text }]}
+        numberOfLines={1}
+        adjustsFontSizeToFit
+        minimumFontScale={0.8}
+      >
+        {label}
+      </Text>
+    </View>
+  );
+}
+
 /**
  * 3-2-1-nedräkning som visas mellan tap på Play-knappen i GetReadyIntro och
  * att fråge-vyn dyker upp. En stor Q-logga står centrerad — under räkningen
@@ -68,21 +141,32 @@ const GLYPH_FONT_SIZE = LOGO_SIZE * 0.28;
  * att "?" visats i ~1 s fyras `onComplete` så parent kan växla fas till
  * `'question'`.
  */
-export function CountdownIntro({ onComplete, startFrom = 5, voiceFrom = 3, mode = 'pass-the-phone', playerName, playerEmoji, mediaSource, answerType = null, finalWord, silent = false }: Props) {
+export function CountdownIntro({ onComplete, startFrom = 5, voiceFrom = 3, mode = 'pass-the-phone', playerName, playerEmoji, mediaSource, answerType = null, category = null, finalWord, silent = false }: Props) {
   // Remote 1v1 delar IndDev:s headline ("Get Ready to QuizVibe") — varje
   // spelare sitter på egen enhet, ingen specifik spelare att namnge.
   const isIndDev = mode === 'individual-devices' || mode === 'remote-1v1';
-  // Bordered box runt media-ikonen med kant-skärande Year/Name-badge.
+  // Media-raden: [Music/Film/Sport] [ikon-box] [Year/Name].
+  // Boxens ram färgas av media-källan (röd/grön/blå) och ikonen visar samma
+  // sak; sido-kolumnerna visar kategori resp. svarstyp med det aktuella
+  // alternativet highlightat och övriga grå. Den tidigare kant-skärande
+  // Year/Name-badge:n är ersatt av högerkolumnen.
   // Extraherat som variabel eftersom den renderas i båda playerBlock-grenarna.
   const mediaSourceBlock = mediaSource != null ? (
     <View style={styles.mediaSourceWrap}>
-      <View style={styles.mediaSourceBox}>
+      <View style={styles.sideCol}>
+        {MAIN_CATEGORIES.map((c) => (
+          <SideTag key={c} label={c} active={category === c} accent={CATEGORY_ACCENT} />
+        ))}
+      </View>
+
+      <View style={[styles.mediaSourceBox, { borderColor: sourceBorderColor(mediaSource) }]}>
         <MediaSourceIcon source={mediaSource} size={80} />
-        {answerType != null && (
-          <View style={styles.answerTypeBadge} pointerEvents="none">
-            <Text style={styles.answerTypeBadgeText}>{answerType}</Text>
-          </View>
-        )}
+      </View>
+
+      <View style={styles.sideColRight}>
+        {(['Year', 'Name'] as const).map((t) => (
+          <SideTag key={t} label={t} active={answerType === t} accent={ANSWER_ACCENT} />
+        ))}
       </View>
     </View>
   ) : null;
@@ -452,39 +536,63 @@ const styles = StyleSheet.create({
     color: Colors.textPrimary,
     letterSpacing: 0.4,
   },
-  // Mediakälla-ikon under playerBlock (PtP: under playerBox; IndDev: under
-  // QuizVibe-rubriken). Centrerad med liten vertikal separation från sin label.
+  // Mediakälla-raden under playerBlock (PtP: under playerBox; IndDev: under
+  // QuizVibe-rubriken). Tre kolumner: källval, ikon-box, svarstyp.
   mediaSourceWrap: {
+    flexDirection: 'row',
+    // KRITISKT: 'center' (inte 'stretch'/'flex-start') — sido-kolumnerna är
+    // kortare än boxen (71pt resp. 46pt mot boxens 99pt) och ska centreras
+    // vertikalt mot den, så alla tre blockens mittlinjer ligger på samma höjd.
     alignItems: 'center',
+    gap: Spacing.md,
     marginTop: Spacing.sm,
   },
-  // Bordered box runt medie-ikonen — position:relative så Year/Name-badge
-  // kan sticka ut över kantlinjen med position:absolute. overflow INTE hidden.
+  // Bordered box runt medie-ikonen. borderColor sätts inline av
+  // sourceBorderColor() (röd = YouTube, grön = Spotify, blå = Hints) —
+  // värdet här är fallback.
   mediaSourceBox: {
-    position: 'relative',
     borderWidth: 1.5,
     borderColor: Colors.primary,
     borderRadius: Radius.md,
     padding: Spacing.sm,
   },
-  // Kant-skärande Year/Name-badge — speglar GetReadyIntro:s answerTypeBadge.
-  answerTypeBadge: {
-    position: 'absolute',
-    top: -8,
-    right: Spacing.sm,
-    backgroundColor: Colors.primary,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 4,
-    zIndex: 10,
-    elevation: 4,
+  // ── Sido-kolumner kring media-boxen ──────────────────────────────────
+  // Vänster = kategori (Music/Film/Sport), höger = svarstyp (Year/Name).
+  // Samma fasta bredd på båda: längsta labeln är "Music"/"Sport" ≈ 32pt vid
+  // 10pt bold, så 48pt räcker med marginal och kolumnerna blir symmetriska
+  // kring boxen. Boxen är ~99pt (80 ikon + padding + kant) → hela raden
+  // ≈ 219pt, vilket ryms med god marginal även på 320pt-skärmar (iPhone SE1 /
+  // Display Zoom). Kolumnerna är kortare än boxen (71pt resp. 46pt) så
+  // radhöjden är oförändrad.
+  // Ge dem ALDRIG height/flex/justifyContent — de ska hugga sina taggar och
+  // låta radens alignItems:'center' sköta centreringen, annars sträcks de ut
+  // och taggarna glider isär.
+  sideCol: {
+    width: 48,
+    gap: 4,
   },
-  answerTypeBadgeText: {
+  sideColRight: {
+    width: 48,
+    gap: 4,
+  },
+  // borderColor + textfärg sätts inline av SideTag — värdena här är den
+  // inaktiva (grå) grundformen.
+  sideTag: {
+    paddingVertical: 3,
+    paddingHorizontal: 3,
+    borderWidth: 1,
+    borderRadius: Radius.xs,
+    borderColor: Colors.borderStrong,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sideTagText: {
     fontSize: 10,
+    lineHeight: 13,
     fontWeight: '700',
-    letterSpacing: 0.6,
-    color: '#fff',
-    textTransform: 'uppercase',
+    letterSpacing: 0.2,
+    color: Colors.textDisabled,
+    textAlign: 'center',
   },
   logoStack: {
     width: LOGO_SIZE,
