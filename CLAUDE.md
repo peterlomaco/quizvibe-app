@@ -1185,11 +1185,12 @@ Driver två konsumenter idag:
 
 Tre separata pools: `spotifyPool` (YT-items med `spotifyTrackId` när `spotifyEnabled`), `pureYoutubePool` (övrig YT), `imagePool`. Fasordning: **Spotify → YouTube → Hints/Image** (sekventiell, inte cyklisk).
 
-**Ratio per spelläge:**
-- **IndDev med Spotify**: 25% Spotify / 25% YouTube / 50% Hints
-- **PtP / Single Player** (Spotify alltid av): 50% YouTube / 50% Hints — Spotify-kvotan absorberas av YouTube om YT är aktiverat, annars av Hints.
-- Formel: `spotifyBlockCount = hasSpotify ? floor(N/4) : 0`, `ytDivisor = hasSpotify ? 4 : 2`, `ytBlockCount = hasPureYT ? floor(N/ytDivisor) : 0`, `imageBlockCount = N - spotify - yt`.
-- Hints-fallback: `!hasImage → spotify += imageCount` (eller yt om spotify saknas).
+**Ratio per spelläge (omarbetad 2026-08-14 — Hints halverad):**
+- **IndDev med Spotify**: 37,5% Spotify / 37,5% YouTube / 25% Hints
+- **PtP / Single Player** (Spotify alltid av): 75% YouTube / 25% Hints
+- Formel: `imageBlockCount = hasImage ? floor(N/4) : 0`, `rest = N - image`, `spotifyBlockCount = hasSpotify ? min(floor(rest/2), spotifyPool.length) : 0`, `ytBlockCount = hasPureYT ? rest - spotify : 0`. En otilldelad rest (otillgänglig källa) går till YT → Spotify → Hints i den ordningen.
+- **Hints storleksbestäms FÖRST och golvas**, tvärtom mot tidigare där Hints tog halva spelet OCH absorberade all avrundningsrest (kunde ge 67%). Rationalen: **Hints finns för att spelet inte ska stå och falla med Spotify och YouTube — det är utfyllnad, inte en dragare** (Peter 2026-08-14). Se `memory/project_hints_is_filler.md`.
+- Följd av golvningen, avsiktlig: vid 2–3 rundor får Hints **noll**, och andelen hamnar strax UNDER 25% (17–20% vid 5, 6, 10 rundor) i stället för över.
 
 **Block-storlek**: `turnOrder.length` (PtP) eller 1 (IndDev/Single Player).
 
@@ -1206,7 +1207,21 @@ Tre separata pools: `spotifyPool` (YT-items med `spotifyTrackId` när `spotifyEn
 
 **`getActiveEpochs(eraFrom, eraTo)`** — år-proportionell viktning: `effectiveWeight = overlappingYears × perYearWeight`, sedan normalisering. Epoker utan överlapp exkluderas. Exempel: eraFrom=1976, eraTo=1999 → E2 5år×0.225=1.125, E3 16år×0.25=4.0, E4 3år×0.22=0.66 → normWeights 0.194/0.691/0.114 → N=10 ger 2/7/1 frågor.
 
-**`allocateByEpoch(N, activeEpochs)`** — Largest Remainder Method (Hamilton-metoden): garanterar `sum === N` exakt. Avrundningsproblem löses via decimal-rest-sortering.
+**`allocateByEpoch(N, activeEpochs)`** — Largest Remainder Method (Hamilton-metoden): garanterar `sum === N` exakt. Avrundningsproblem löses via decimal-rest-sortering. **Används numera bara som fallback** — se skuldboken nedan.
+
+**Epok-skuldbok per Host — målandelen gäller ÖVER spel, inte inom ett spel (2026-08-14).** LRM nollställs vid varje anrop och kan därför aldrig leverera en andel under 1/N. Med 4 rundor är E1:s 11% = 0,44 frågor → alltid avrundat till 0. Värre: `buildCategoryAlignedPhase` splittar fasen per Music/Film/Sport FÖRE epok-allokeringen, så varje anrop fick `totalQuestions = 1`, och LRM med N=1 ger alltid epoken med störst normWeight. **Följd: ett 4-rundorsspel bestod av enbart E3 (1981–96), och E1 var oåtkomligt vid ALLA rundantal** (krävde N≥5 i ett anrop = 26+ rundor, cap är 20). Peter reproducerade det: född 1981, era 1950–2026, fyra spel i rad — bara svarsår 1981+.
+
+Lösningen är en **löpande fördelning** i stället för per-anrops-avrundning:
+- [`planEpochSequence(n, activeEpochs, debt)`](src/utils/epochAllocation.ts) — varje frågeslot ökar skulden för alla AKTIVA epoker med deras `normWeight`; epoken med störst skuld får platsen och betalar 1. Ren funktion, returnerar `{ sequence, nextDebt }`.
+- [`src/utils/epochLedger.ts`](src/utils/epochLedger.ts) — persistens per Host, `@quizvibe/epochLedger/v1/<playerName.toLowerCase()>` (samma namespacing som `hostQuestionHistory`). Guests får en sessions-lokal skuldbok.
+- **EN skuldbok räcker för alla eror.** Epoker utanför aktuell Game Era är inte aktiva → de varken ackumulerar eller väljs, utan **fryses** och återupptas när en era som täcker dem spelas igen. Ackumuleringen sker med den AKTUELLA erans normaliserade vikter, så varje era konvergerar mot sin egen målandel oberoende av de andra. Ingen era-nyckling behövs.
+- Planen görs EN gång per spel i `gameQuestions` och skivas mellan YouTube- och Hints-faserna (Spotify-fasen är epok-lös); `buildEpochPhase` tar den via nya `quotas`-parametern i stället för att anropa `allocateByEpoch`. Det är just den delade planen som gör att kategori-splittens N=1 slutar spela roll.
+- Skuldboken persisteras på samma ställen som seen-historiken (leaderboard / Quit / Leave) via `persistEpochLedger()` — ett avbrutet spel bokför alltså ingen skuld. **Allokerade** epoker bokförs, inte serverade: målandelen är definierad över vad som efterfrågades, och lån vid tom hink ska inte snedvrida den.
+- Verifierat mot riktiga katalogen: E1 levereras 10,8% mot 11,1% mål över 200 spel à 4 rundor. Kvarvarande skevhet (E2 under, E3 över) är **innehållsluckan** Music-E2 = 0 items för millennials, inte allokeringen — varje Music-slot planerad för E2 måste låna, och lånet går till högsta normWeight med lager = E3.
+
+**`shuffleBlocks(seq, questionsPerBlock)`** (i [app/quiz.tsx](app/quiz.tsx), bredvid `shuffleArray`): `buildEpochPhase` levererar frågor i kronologisk epok-ordning E1→E5, och skuldboken väljer dessutom deterministiskt "störst skuld först" — utan shuffle skulle varje spel öppna på samma epok. Shufflen körs **per fas** (ytSeq och imgSeq var för sig) så källordningen Spotify → YouTube → Hints bevaras. **Blockgranulariteten är kritisk i PtP**: där är `questionsPerBlock` = antalet spelare och `buildPtPSequence` gör varje block till exakt ett turvarv `[P1..Pn]`, så att blanda hela block behåller både turordning och kategori-alignering. I Single Player/IndDev är `questionsPerBlock` = 1 → vanlig frågeshuffle. Ett avslutande ofullständigt block pinnas sist (enkategori-grenen i `buildCategoryAlignedPhase` trimmar inte till blockmultipel).
+
+Tester: [backend/content/test/epochAllocation.test.ts](backend/content/test/epochAllocation.test.ts) (15 st) låser summering, konvergens mot mål, frysning/återupptagning över era-byten, skuld-clamp samt shuffleBlocks turordning + partiellt block.
 
 **Era-filtrering av poolerna** (HÅRD, görs FÖRE `buildEpochPhase`):
 - YouTube-frågor: `correctYear ∈ [eraFrom, eraTo]` — strikt. Inga YouTube-frågor utanför spannet.

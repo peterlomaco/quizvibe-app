@@ -93,7 +93,8 @@ import { MorseAmbientSound } from '@/src/components/MorseAmbientSound';
 import { generateRoomCode } from '@/src/utils/roomCode';
 import { addSeenQuestionIds, addSessionRecord, addSessionRecordForNames, loadSeenQuestionIds, loadLastSessionIds } from '@/src/utils/hostQuestionHistory';
 import { consumePendingPeerSeenIds } from '@/src/utils/pendingSeenQuestions';
-import { buildEpochPhase, getActiveEpochs, type EpochPlayer, type EpochQuestion } from '@/src/utils/epochAllocation';
+import { buildEpochPhase, emptyEpochDebt, getActiveEpochs, planEpochSequence, sequenceToQuotas, type EpochDebt, type EpochId, type EpochPlayer, type EpochQuestion } from '@/src/utils/epochAllocation';
+import { loadEpochLedger, saveEpochLedger } from '@/src/utils/epochLedger';
 import { getGenerationKeyFromBirthYear } from '@/src/utils/mockPurchasedPackages';
 import { hasPremiumSubscription } from '@/src/utils/subscriptionStorage';
 import { supabase } from '@/src/utils/supabase';
@@ -345,6 +346,31 @@ function shuffleArray<T>(arr: T[]): T[] {
   return out;
 }
 
+// Slumpar ordningen på BLOCK, inte enskilda frågor. buildEpochPhase levererar
+// frågor i kronologisk epok-ordning (E1→E5), vilket gör att varje spel spelas
+// som en vandring genom tiden — och med epochLedger:s skuld-ordning skulle
+// varje spel dessutom öppna på samma epok. Den här shufflen bryter båda.
+//
+// Blockgranulariteten är kritisk i Pass-the-Phone: där är questionsPerBlock =
+// antalet spelare, och buildPtPSequence gör varje block till exakt ett varv i
+// turordningen [P1, P2, ..., Pn]. Att blanda hela block behåller alltså både
+// turordningen och kategori-aligneringen (ett block = en kategori). I Single
+// Player och IndDev är questionsPerBlock = 1 → vanlig frågeshuffle.
+//
+// Ett avslutande ofullständigt block lämnas kvar sist: kategori-splittens
+// enkategori-gren trimmar inte till blockmultipel, så ett halvt block kan
+// förekomma och får inte hamna mitt i sekvensen och klyva ett turvarv.
+function shuffleBlocks<T>(seq: T[], questionsPerBlock: number): T[] {
+  if (questionsPerBlock <= 1) return shuffleArray(seq);
+  const blocks: T[][] = [];
+  let i = 0;
+  for (; i + questionsPerBlock <= seq.length; i += questionsPerBlock) {
+    blocks.push(seq.slice(i, i + questionsPerBlock));
+  }
+  const tail = seq.slice(i);
+  return [...shuffleArray(blocks).flat(), ...tail];
+}
+
 function getIntervalForAssistance(assistance: AssistanceLevel): number {
   if (assistance === 'minimal') return 0;
   if (assistance === 'standard') return 3;
@@ -514,10 +540,16 @@ function buildCategoryAlignedPhase<T extends QuizQuestion>(opts: {
   players: EpochPlayer[];
   turnOrderIds: string[];
   getEpochYear: (q: EpochQuestion) => number | null;
+  /** Planerad epok per frågeslot för HELA fasen (från epochLedger), i samma
+   *  längd som totalBlocks × questionsPerBlock. Skivas per kategori nedan så
+   *  alla kategori-anrop delar en enda plan istället för att var och en räkna
+   *  om LRM från noll — det är just den omräkningen som gjorde att låga
+   *  rundantal alltid landade i samma epok. */
+  epochSequence?: EpochId[];
 }): T[] {
   const {
     pool, totalBlocks, questionsPerBlock, activeEpochs,
-    recentIds, lastSessionIds, isPtP, players, turnOrderIds, getEpochYear,
+    recentIds, lastSessionIds, isPtP, players, turnOrderIds, getEpochYear, epochSequence,
   } = opts;
   const totalQuestions = totalBlocks * questionsPerBlock;
   if (totalQuestions === 0 || pool.length === 0) return [];
@@ -541,6 +573,7 @@ function buildCategoryAlignedPhase<T extends QuizQuestion>(opts: {
   if (cats.length <= 1) {
     return buildEpochPhase<T>({
       pool, totalQuestions, activeEpochs, recentIds, lastSessionIds, isPtP, players, turnOrderIds, getEpochYear,
+      quotas: epochSequence ? sequenceToQuotas(epochSequence.slice(0, totalQuestions)) : undefined,
     });
   }
 
@@ -562,13 +595,17 @@ function buildCategoryAlignedPhase<T extends QuizQuestion>(opts: {
   // färre frågor än begärt (pool-exhaustion) skulle ett partiellt block annars
   // blanda kategorier vid nästa kategoris start.
   const result: T[] = [];
+  let seqCursor = 0; // löpande position i den delade epok-planen
   for (let i = 0; i < cats.length; i++) {
     const catBlocks = floors[i];
     if (catBlocks === 0) continue;
     const catPool = catMap.get(cats[i])!;
+    const catQuestions = catBlocks * questionsPerBlock;
+    const catSlice = epochSequence?.slice(seqCursor, seqCursor + catQuestions);
+    seqCursor += catQuestions;
     const catSeq = buildEpochPhase<T>({
       pool: catPool,
-      totalQuestions: catBlocks * questionsPerBlock,
+      totalQuestions: catQuestions,
       activeEpochs,
       recentIds,
       lastSessionIds,
@@ -576,6 +613,7 @@ function buildCategoryAlignedPhase<T extends QuizQuestion>(opts: {
       players,
       turnOrderIds,
       getEpochYear,
+      quotas: catSlice && catSlice.length > 0 ? sequenceToQuotas(catSlice) : undefined,
     });
     const aligned = catSeq.slice(0, Math.floor(catSeq.length / questionsPerBlock) * questionsPerBlock);
     result.push(...aligned);
@@ -1311,6 +1349,21 @@ export default function QuizScreen() {
   // MÅSTE deklareras FÖRE gameQuestions-useMemo (TDZ-fel annars).
   const [seenQuestionIds, setSeenQuestionIds] = useState<Set<string>>(new Set());
   const [lastSessionIds, setLastSessionIds] = useState<Set<string>>(new Set());
+  // Host:ens epok-skuldbok. Laddas asynkront tillsammans med seen-historiken;
+  // tom skuld ger exakt samma fördelning som förut tills den hunnit in.
+  const [epochDebt, setEpochDebt] = useState<EpochDebt>(() => emptyEpochDebt());
+  // Skuldboken EFTER att aktuellt spel planerats — skrivs av gameQuestions och
+  // persisteras först när spelet faktiskt räknas som spelat.
+  const plannedEpochDebtRef = useRef<EpochDebt | null>(null);
+  // Bokför epok-skulden. Anropas på samma ställen som seen-historiken skrivs
+  // (leaderboard / Quit / Leave) så ett avbrutet spel inte bokför skuld för
+  // frågor spelaren aldrig såg. Nollar ref:en så samma spel bara bokförs en gång.
+  const persistEpochLedger = useCallback(() => {
+    const debt = plannedEpochDebtRef.current;
+    if (!debt) return;
+    plannedEpochDebtRef.current = null;
+    saveEpochLedger(debt).catch(() => {});
+  }, []);
   const savedSeenRef = useRef(false);
 
   // Cross-player-historik: frågor som NÅGON deltagare sett i sina senaste
@@ -1642,20 +1695,32 @@ export default function QuizScreen() {
     };
 
     // ── Fas-storlekar (Spotify / YouTube / Image) ──
-    // Ratio med Spotify (IndDev):  25% Spotify / 25% YouTube / 50% Hints.
-    // Ratio utan Spotify (PtP/SP): 50% YouTube / 50% Hints.
+    // Ratio med Spotify (IndDev):  37,5% Spotify / 37,5% YouTube / 25% Hints.
+    // Ratio utan Spotify (PtP/SP): 75% YouTube / 25% Hints.
+    //
+    // Hints finns för att spelet inte ska stå och falla med Spotify och
+    // YouTube — det är utfyllnad, inte en dragare. Därför storleksbestäms
+    // Hints FÖRST och golvas till en fjärdedel; resten går till de källor
+    // spelarna faktiskt engageras av. (Tidigare tog Hints halva spelet OCH
+    // absorberade all avrundningsrest, vilket kunde ge 67%.)
+    //
+    // Följden av golvningen: vid 2-3 rundor får Hints noll, och resten hamnar
+    // strax UNDER 25% istället för över. Bådadera avsiktligt.
+    let imageBlockCount = hasImage ? Math.floor(totalRounds / 4) : 0;
+    const restBlocks = totalRounds - imageBlockCount;
     // Cap mot spotifyPool.length: ingen låt ska kunna dyka upp hos två olika DJs.
     let spotifyBlockCount = hasSpotify
-      ? Math.min(Math.floor(totalRounds / 4), spotifyPool.length)
+      ? Math.min(Math.floor(restBlocks / 2), spotifyPool.length)
       : 0;
-    const ytDivisor = hasSpotify ? 4 : 2;
-    let ytBlockCount = hasPureYoutube ? Math.floor(totalRounds / ytDivisor) : 0;
-    let imageBlockCount = totalRounds - spotifyBlockCount - ytBlockCount;
+    let ytBlockCount = hasPureYoutube ? restBlocks - spotifyBlockCount : 0;
 
-    if (!hasImage && imageBlockCount > 0) {
-      if (hasSpotify) spotifyBlockCount += imageBlockCount;
-      else if (hasPureYoutube) ytBlockCount += imageBlockCount;
-      imageBlockCount = 0;
+    // Degenererade lägen: en otillgänglig källas block går till de andra så
+    // spelet aldrig blir kortare än begärt antal rundor.
+    const unallocated = totalRounds - spotifyBlockCount - ytBlockCount - imageBlockCount;
+    if (unallocated > 0) {
+      if (hasPureYoutube) ytBlockCount += unallocated;
+      else if (hasSpotify) spotifyBlockCount = Math.min(spotifyBlockCount + unallocated, spotifyPool.length);
+      else if (hasImage) imageBlockCount += unallocated;
     }
 
     // Fas 1: Spotify — hård uteslutning av senaste 20 sessionernas låtar,
@@ -1683,39 +1748,67 @@ export default function QuizScreen() {
       return [...fresh, ...seenNotLast, ...lastSession].slice(0, spotifyTotal);
     })();
 
+    // ── Epok-plan för hela spelet ur Host:ens skuldbok ────────────────────
+    // Planeras EN gång och skivas mellan YouTube- och Hints-faserna (Spotify-
+    // fasen är epok-lös). Utan detta räknade varje kategori-anrop om LRM från
+    // noll, och med kategori-splittens N=1 vid låga rundantal gav det alltid
+    // samma epok — E1:s 11% avrundades bort i vartenda spel.
+    const ytTotal = ytBlockCount * questionsPerBlock;
+    const imgTotal = imageBlockCount * questionsPerBlock;
+    const { sequence: plannedEpochs, nextDebt } = planEpochSequence(
+      ytTotal + imgTotal,
+      activeEpochs,
+      epochDebt,
+    );
+    // Sidoeffekt i useMemo: skuldboken skrivs inte till disk här, bara
+    // parkeras. Den persisteras vid samma punkter som seen-historiken
+    // (leaderboard / Quit / Leave) så ett avbrutet spel inte bokför skuld
+    // för frågor spelaren aldrig såg.
+    plannedEpochDebtRef.current = nextDebt;
+
     // Fas 2: YouTube — kategori-alignerade block (PtP: alla spelare i ett
     // block får samma mainCategory, t.ex. alla YouTube/Music i samma runda).
+    // shuffleBlocks bryter den kronologiska epok-ordningen från
+    // buildEpochPhase; per fas så källordningen nedan bevaras.
     const ytSeq: QuizQuestion[] =
       hasPureYoutube && ytBlockCount > 0
-        ? buildCategoryAlignedPhase<QuizQuestion>({
-            pool: pureYoutubePool,
-            totalBlocks: ytBlockCount,
+        ? shuffleBlocks(
+            buildCategoryAlignedPhase<QuizQuestion>({
+              pool: pureYoutubePool,
+              totalBlocks: ytBlockCount,
+              questionsPerBlock,
+              activeEpochs,
+              recentIds: combinedSeenIds,
+              lastSessionIds: combinedLastIds,
+              isPtP,
+              players: epochPlayers,
+              turnOrderIds,
+              getEpochYear: youtubeEpochYear,
+              epochSequence: plannedEpochs.slice(0, ytTotal),
+            }),
             questionsPerBlock,
-            activeEpochs,
-            recentIds: combinedSeenIds,
-            lastSessionIds: combinedLastIds,
-            isPtP,
-            players: epochPlayers,
-            turnOrderIds,
-            getEpochYear: youtubeEpochYear,
-          })
+          )
         : [];
 
     // Fas 3: Image/Hints — kategori-alignerade block.
     const imgSeq: QuizQuestion[] =
       hasImage && imageBlockCount > 0
-        ? buildCategoryAlignedPhase<QuizQuestion>({
-            pool: imagePool,
-            totalBlocks: imageBlockCount,
+        ? shuffleBlocks(
+            buildCategoryAlignedPhase<QuizQuestion>({
+              pool: imagePool,
+              totalBlocks: imageBlockCount,
+              questionsPerBlock,
+              activeEpochs,
+              recentIds: combinedSeenIds,
+              lastSessionIds: combinedLastIds,
+              isPtP,
+              players: epochPlayers,
+              turnOrderIds,
+              getEpochYear: imageEpochYear,
+              epochSequence: plannedEpochs.slice(ytTotal),
+            }),
             questionsPerBlock,
-            activeEpochs,
-            recentIds: combinedSeenIds,
-            lastSessionIds: combinedLastIds,
-            isPtP,
-            players: epochPlayers,
-            turnOrderIds,
-            getEpochYear: imageEpochYear,
-          })
+          )
         : [];
 
     const mixed: QuizQuestion[] = [...spotifySeq, ...ytSeq, ...imgSeq];
@@ -1734,7 +1827,7 @@ export default function QuizScreen() {
       return shuffleArray(SEED_QUESTIONS);
     }
     return mixed;
-  }, [eraFrom, eraTo, turnOrder, totalRounds, youtubeEnabled, imagesEnabled, gameMode, youtubeEnabledCategories, imagesEnabledCategories, combinedSeenIds, combinedLastIds, spotifyEnabled, isGuestHostGame, remoteQuestionIds]);
+  }, [eraFrom, eraTo, turnOrder, totalRounds, youtubeEnabled, imagesEnabled, gameMode, youtubeEnabledCategories, imagesEnabledCategories, combinedSeenIds, combinedLastIds, spotifyEnabled, isGuestHostGame, remoteQuestionIds, epochDebt]);
 
   // Synkron ref som alltid pekar på aktuell gameQuestions — används av
   // game_sequence_init-broadcasten utan att göra subscription-effekten
@@ -2431,6 +2524,7 @@ export default function QuizScreen() {
       }
     }
     let seenBroadcastTimers: ReturnType<typeof setTimeout>[] = [];
+    loadEpochLedger().then(setEpochDebt).catch(() => {});
     Promise.all([loadSeenQuestionIds(), loadLastSessionIds()]).then(([seen, last]) => {
       setSeenQuestionIds(seen);
       setLastSessionIds(last);
@@ -3534,6 +3628,7 @@ export default function QuizScreen() {
       // omedelbart exkluderar den nyss spelade omgångens frågor.
       setLastSessionIds(new Set(playedIds));
     });
+    persistEpochLedger();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase]);
 
@@ -5439,6 +5534,7 @@ export default function QuizScreen() {
                   addSessionRecordForNames(registeredNames, playedIds).catch(() => {});
                 }
               }
+              persistEpochLedger();
             }
             const code = params.roomCode;
             if (code) {
@@ -5484,6 +5580,7 @@ export default function QuizScreen() {
                   : gameQuestions.map((q) => q.id);
               const shownIds = [...new Set(sourceIds.slice(0, questionIndex))];
               addSessionRecord(shownIds).catch(() => {});
+              persistEpochLedger();
             }
             if (
               gameMode === 'individual-devices' &&
@@ -5620,6 +5717,7 @@ export default function QuizScreen() {
       ...new Set(gameQuestions.slice(0, questionIndex).map((q) => q.id)),
     ];
     await addSessionRecord(shownIds).catch(() => {});
+    persistEpochLedger();
   };
 
   // Quit match: ge upp. forfeit_remote_match sätter status 'forfeited' +

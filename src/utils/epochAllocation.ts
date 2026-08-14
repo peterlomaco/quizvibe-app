@@ -69,6 +69,14 @@ export interface BuildEpochPhaseParams<T extends EpochQuestion> {
   /** Returns the "epoch year" for a question — used for bucket assignment and affinity.
    *  null = era-agnostic (put in overflow pool). */
   getEpochYear: (q: T) => number | null;
+  /** Färdiga epok-kvoter (från epochLedger). När satt ersätter de det interna
+   *  `allocateByEpoch`-anropet.
+   *
+   *  Krävs eftersom LRM räknas om från noll vid VARJE anrop: kategori-splitten
+   *  i buildCategoryAlignedPhase ger `totalQuestions = 1` per anrop vid låga
+   *  rundantal, och LRM med N=1 ger alltid epoken med störst normWeight. Med
+   *  kvoter planerade från EN skuldbok för hela spelet spelar splitten ingen roll. */
+  quotas?: Array<{ epochId: EpochId; quota: number }>;
 }
 
 // ─── Internal helpers ──────────────────────────────────────────────────────
@@ -156,6 +164,88 @@ export function allocateByEpoch(
   return [...activeEpochs]
     .sort((a, b) => a.id - b.id)
     .map((e) => ({ epochId: e.id, quota: allocated[String(e.id)] ?? 0 }));
+}
+
+// ─── Löpande epok-fördelning över spel (epochLedger:s räknekärna) ─────────
+//
+// `allocateByEpoch` nollställs vid varje anrop och kan därför aldrig leverera
+// en andel som understiger 1/N. Med 4 rundor är E1:s 11% = 0,44 frågor → alltid
+// avrundat till 0, alltså aldrig visad. Funktionerna nedan sparar i stället
+// resten mellan spel: varje slot ökar skulden för alla AKTIVA epoker med deras
+// normWeight, epoken med störst skuld får platsen och betalar 1. Epoker utanför
+// aktuell Game Era fryses — därför räcker EN skuldbok för alla eror.
+
+/** Bråkdels-skuld per epok. Positiv = epoken har fått för lite. */
+export type EpochDebt = Record<EpochId, number>;
+
+export const EPOCH_IDS: EpochId[] = [1, 2, 3, 4, 5];
+
+// Skyddsräcke mot att en korrupt eller inaktuell skuldbok svälter ut en epok
+// för alltid. Normal drift håller sig långt inom ±1; ±10 rör aldrig äkta data.
+export const DEBT_CLAMP = 10;
+
+export function emptyEpochDebt(): EpochDebt {
+  return { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+}
+
+/** Kopierar och saniterar en skuldbok — ogiltiga/saknade tal blir 0. */
+export function clampEpochDebt(raw: unknown): EpochDebt {
+  const out = emptyEpochDebt();
+  if (!raw || typeof raw !== 'object') return out;
+  const rec = raw as Record<string, unknown>;
+  for (const id of EPOCH_IDS) {
+    const v = rec[String(id)];
+    if (typeof v === 'number' && Number.isFinite(v)) {
+      out[id] = Math.max(-DEBT_CLAMP, Math.min(DEBT_CLAMP, v));
+    }
+  }
+  return out;
+}
+
+/**
+ * Planerar vilken epok varje frågeslot ska hämtas ur och returnerar den
+ * uppdaterade skuldboken. Ren funktion — `debt` muteras inte.
+ */
+export function planEpochSequence(
+  n: number,
+  activeEpochs: ActiveEpoch[],
+  debt: EpochDebt,
+): { sequence: EpochId[]; nextDebt: EpochDebt } {
+  const nextDebt = clampEpochDebt(debt);
+  const sequence: EpochId[] = [];
+  if (n <= 0 || activeEpochs.length === 0) return { sequence, nextDebt };
+
+  for (let i = 0; i < n; i++) {
+    // Endast AKTIVA epoker ackumulerar — övriga fryses vid sitt nuvarande värde.
+    for (const e of activeEpochs) nextDebt[e.id] += e.normWeight;
+
+    let best = activeEpochs[0];
+    for (const e of activeEpochs) {
+      if (nextDebt[e.id] > nextDebt[best.id]) best = e;
+    }
+    nextDebt[best.id] -= 1;
+    sequence.push(best.id);
+  }
+
+  for (const id of EPOCH_IDS) {
+    nextDebt[id] = Math.max(-DEBT_CLAMP, Math.min(DEBT_CLAMP, nextDebt[id]));
+  }
+  return { sequence, nextDebt };
+}
+
+/**
+ * Vänder en planerad epok-sekvens till kvot-formen `buildEpochPhase` konsumerar.
+ * Id-stigande ordning gör utfallet lätt att jämföra med `allocateByEpoch` i
+ * tester; uppspelningsordningen sätts ändå av shuffleBlocks i quiz.tsx.
+ */
+export function sequenceToQuotas(
+  sequence: EpochId[],
+): Array<{ epochId: EpochId; quota: number }> {
+  const counts = new Map<EpochId, number>();
+  for (const id of sequence) counts.set(id, (counts.get(id) ?? 0) + 1);
+  return [...counts.entries()]
+    .sort((a, b) => a[0] - b[0])
+    .map(([epochId, quota]) => ({ epochId, quota }));
 }
 
 /**
@@ -270,7 +360,7 @@ export function buildPtPSequence<T extends EpochQuestion>(
 export function buildEpochPhase<T extends EpochQuestion>(
   params: BuildEpochPhaseParams<T>,
 ): T[] {
-  const { pool, totalQuestions, activeEpochs, recentIds, lastSessionIds, isPtP, players, turnOrderIds, getEpochYear } = params;
+  const { pool, totalQuestions, activeEpochs, recentIds, lastSessionIds, isPtP, players, turnOrderIds, getEpochYear, quotas } = params;
 
   if (totalQuestions <= 0 || pool.length === 0 || activeEpochs.length === 0) return [];
 
@@ -312,8 +402,10 @@ export function buildEpochPhase<T extends EpochQuestion>(
   ];
   agnosticPool.splice(0, agnosticPool.length, ...orderedAgnostic);
 
-  // ── Step 3: Allocate total questions across epochs (LRM) ───────────────
-  const allocation = allocateByEpoch(totalQuestions, activeEpochs);
+  // ── Step 3: Allocate total questions across epochs ─────────────────────
+  // Föredra kvoter planerade av epochLedger (löpande fördelning över spel);
+  // falla tillbaka på LRM när inga skickas in (tester, direkt-anrop).
+  const allocation = quotas ?? allocateByEpoch(totalQuestions, activeEpochs);
   const epochNormWeights = new Map(activeEpochs.map((e) => [e.id, e.normWeight]));
 
   // Pop one question from an epoch pool (fresh → older-seen → last-session)
