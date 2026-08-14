@@ -2962,15 +2962,24 @@ export default function QuizScreen() {
 
   // D-iv: host:s player_id är alltid turnOrder[0] (Lobby-handleStartGame
   // bygger arrayen med host först). Används för default-audio-policyn
-  // (host = on när override saknas) + GetReadyIntro:s "Host"-tagg på
-  // audio-modal-raden.
+  // (host = on när override saknas).
   const hostPlayerId = turnOrder[0]?.id;
-  // D-iv: ska denna enhet vara mute:ad under uppspelning? Pass-the-Phone
-  // delar device → alltid ljud på. Vid direkt-nav utan selfPlayerId →
-  // fallback till audio på så ljudet hörs i mock-mode. I IndDev läses
-  // overrides-mappen; default-policyn kickar in vid saknad key.
+  // Lokalt solo-spel (Single Player) — EN spelare på EN enhet, precis som
+  // Pass-the-Phone. Appen ska då inte styra ljudet alls: det spelas, och
+  // vill spelaren dämpa det använder de enhetens egen volymkontroll.
+  // ⚠ Kan INTE härledas ur gameMode: Lobby:s handleSelectSingle sätter bara
+  // singlePlayerDefault och rör aldrig gameMode, så ett solo-spel startat
+  // från en IndDev-lobby anländer hit med gameMode='individual-devices'.
+  // turnOrder.length är den pålitliga signalen (samma test som goToNewLobby).
+  // Remote 1v1 är undantaget — där är solo-sessionen per design och raden
+  // ska finnas, så läget exkluderas explicit.
+  const isLocalSoloGame = gameMode !== 'remote-1v1' && turnOrder.length <= 1;
+  // D-iv: ska denna enhet vara mute:ad under uppspelning? Pass-the-Phone och
+  // Single Player delar device → alltid ljud på. Vid direkt-nav utan
+  // selfPlayerId → fallback till audio på så ljudet hörs i mock-mode. I
+  // IndDev läses overrides-mappen; default-policyn kickar in vid saknad key.
   const isAudioMutedForSelf = useMemo(() => {
-    if (gameMode === 'pass-the-phone') return false;
+    if (gameMode === 'pass-the-phone' || isLocalSoloGame) return false;
     // Remote 1v1: solo-session på egen enhet — ljudet spelas lokalt på BÅDA
     // enheterna (ingen host-only-audio-policy; IndDev:s override-map gäller
     // inte här). Default på; spelaren äger sin egen mute via remoteAudioOn.
@@ -2980,7 +2989,7 @@ export default function QuizScreen() {
       return !playerAudioOverrides[selfPlayerId];
     }
     return !isHost;
-  }, [gameMode, selfPlayerId, playerAudioOverrides, isHost, remoteAudioOn]);
+  }, [gameMode, selfPlayerId, playerAudioOverrides, isHost, remoteAudioOn, isLocalSoloGame]);
   // Aktuell spelares namn i Pass-the-Phone-rotationen — visas subtilt i fråge-
   // kortet ("Answering: {namn}"). Skip:as för Individual Devices (varje
   // spelare är på sin egen enhet och vet redan vem de är).
@@ -6467,9 +6476,11 @@ export default function QuizScreen() {
         // D-iv: host:s egen audio-toggle i IndDev. Går via onPlayerAudioChange
         // (persist + broadcast) så host:s val överlever Play Again-carry-over.
         // Per-spelare-styrning finns inte i UI:t — varje enhet äger sitt ljud.
+        // Lokalt solo-spel får INGEN callback → ingen rad: en spelare på en
+        // enhet behöver ingen app-kontroll, enhetens volymknappar räcker.
         hostPlayerId={hostPlayerId}
         playerAudioOverrides={playerAudioOverrides}
-        onPlayerAudioChange={handlePlayerAudioChange}
+        onPlayerAudioChange={isLocalSoloGame ? undefined : handlePlayerAudioChange}
         // Enhetens EGET ljud — remote 1v1 (båda spelarna) samt IndDev
         // non-host, som annars vore permanent tyst. Host i IndDev använder
         // onPlayerAudioChange ovan i stället, och PtP delar enhet så där
