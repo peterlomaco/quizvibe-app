@@ -2383,7 +2383,7 @@ export default function ProfileScreen() {
             <Pressable
               onPress={() =>
                 WebBrowser.openBrowserAsync(
-                  'https://legal.quizvibe.se/legal/privacy/',
+                  'https://quizvibe.se/legal/privacy/',
                 )
               }
               style={({ pressed }) => [
@@ -2398,7 +2398,7 @@ export default function ProfileScreen() {
             <Pressable
               onPress={() =>
                 WebBrowser.openBrowserAsync(
-                  'https://legal.quizvibe.se/legal/terms/',
+                  'https://quizvibe.se/legal/terms/',
                 )
               }
               style={({ pressed }) => [
