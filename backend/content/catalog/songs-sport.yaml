@@ -7,7 +7,7 @@
 # audience: ["all"] eftersom sport-hymner känns igen tvärs generationer.
 # Item-level audience-override för väldigt nya låtar (t.ex. Duplantis "Bop").
 # correctYear = release-år. region sweden = svensk igenkänning (V1).
-audience: ["all"]
+audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
 region: ["sweden"]
 category: songs
 contentForm: youtube
@@ -15,6 +15,7 @@ contentSubject: song
 items:
   # ── Svenska fotbolls-låtar ──
   - id: ges-graver-guld-usa
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "När vi gräver guld i USA — GES"
     correctYear: 1994
     probability: 88
@@ -29,6 +30,7 @@ items:
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
     genrePackages: ["sport", "football"]
   - id: nick-borgen-den-glider-in
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Den glider in — Nick Borgen"
     correctYear: 1995
     probability: 88
@@ -42,6 +44,7 @@ items:
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
     genrePackages: ["sport"]
   - id: markoolio-mera-mal
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Mera mål — Markoolio"
     correctYear: 2000
     probability: 80
@@ -55,6 +58,7 @@ items:
         channelTitle: "Markoolio"
     genrePackages: ["sport", "football"]
   - id: markoolio-in-med-bollen
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "In med bollen — Markoolio"
     correctYear: 2004
     probability: 80
@@ -68,6 +72,7 @@ items:
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
     genrePackages: ["sport"]
   - id: tomas-ledin-vi-ar-pa-gang
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Vi är på gång — Tomas Ledin"
     correctYear: 1983
     probability: 78
@@ -80,6 +85,7 @@ items:
         channelTitle: "uutiiset"
     genrePackages: ["sport"]
   - id: friends-in-need-alla-vi
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Alla vi — Friends In Need"
     correctYear: 1999
     probability: 80
@@ -87,6 +93,7 @@ items:
     answerMethods: ["timeline"]
     genrePackages: ["sport"]
   - id: svenne-rubins-langa-bollar-pa-bengt
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Långa Bollar På Bengt — Svenne Rubins"
     correctYear: 1992
     probability: 82
@@ -100,6 +107,7 @@ items:
         channelTitle: "Svenne Rubins - Topic"
     genrePackages: ["sport", "football"]
   - id: dj-otzi-sweet-caroline
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Sweet Caroline — DJ Ötzi"
     correctYear: 2019
     probability: 84
@@ -113,6 +121,7 @@ items:
         endSec: 30
         channelTitle: "DJ Ötzi"
   - id: edivibz-gul-och-bla
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Gul och blå — Edivibz"
     correctYear: 2026
     probability: 76
@@ -126,6 +135,7 @@ items:
         endSec: 30
         channelTitle: "Edivibz"
   - id: anis-don-demina-flaggan-i-topp
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Flaggan i topp — Anis Don Demina"
     correctYear: 2021
     probability: 78
@@ -141,6 +151,7 @@ items:
         endSec: 30
         channelTitle: "Anis Don Demina"
   - id: miss-li-varan-sang
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Våran sång — Miss Li"
     correctYear: 2018
     probability: 76
@@ -150,6 +161,7 @@ items:
     spotifyTrackId: "1p0RjMued7Tmm0o7CjzoHY"
     youtubeClips: []
   - id: bolaget-det-ligger-nat-i-luften
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Det ligger nåt i luften — Bolaget"
     # correctYear rättat 1994 -> 2026 (2026-08-10): TV4:s officiella VM-låt,
     # släppt 2026-06-03 (Warner Music). 1994 var en felaktig gissning vid tillägget.
@@ -165,6 +177,7 @@ items:
         endSec: 30
         channelTitle: "Bolaget"
   - id: brandsta-all-in-for-sverige
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "All in för Sverige — Brandsta"
     correctYear: 2026
     probability: 74
@@ -177,6 +190,7 @@ items:
     youtubeClips: []
   # ── Svenska hockey-låtar ──
   - id: hakan-sodergren-nu-tar-vi-dom
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Nu tar vi dom — Håkan Södergren & Ishockeylandslaget"
     correctYear: 1989
     probability: 84
@@ -191,6 +205,7 @@ items:
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
     genrePackages: ["sport"]
   - id: poodles-en-for-alla-for-en
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "En för alla, för en — Tre Kronor & The Poodles"
     correctYear: 2013
     probability: 78
@@ -200,6 +215,7 @@ items:
   # ── Övrig svensk sport-musik ──
   # ── Internationella fotbolls-VM/EM-låtar ──
   - id: lightning-seeds-three-lions
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Three Lions — Baddiel, Skinner & The Lightning Seeds"
     correctYear: 1996
     probability: 80
@@ -214,6 +230,7 @@ items:
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
     genrePackages: ["sport"]
   - id: new-order-world-in-motion
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "World in Motion — New Order"
     correctYear: 1990
     probability: 76
@@ -227,6 +244,7 @@ items:
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
     genrePackages: ["sport"]
   - id: knaan-wavin-flag
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Wavin' Flag — K'naan"
     correctYear: 2010
     probability: 82
@@ -242,6 +260,7 @@ items:
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
     genrePackages: ["sport", "football"]
   - id: whitney-one-moment-in-time
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "One Moment in Time — Whitney Houston"
     correctYear: 1988
     probability: 80
@@ -255,6 +274,7 @@ items:
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
     genrePackages: ["sport"]
   - id: guetta-this-ones-for-you
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "This One's for You — David Guetta ft. Zara Larsson"
     correctYear: 2016
     probability: 82
@@ -268,6 +288,7 @@ items:
         notes: "Officiell MV från David Guettas kanal. UEFA EURO 2016 Official Song. Ersätter Topic-versionen."
     genrePackages: ["sport"]
   - id: bono-we-are-the-people
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "We Are the People — Martin Garrix ft. Bono & The Edge"
     correctYear: 2021
     probability: 80
@@ -278,15 +299,16 @@ items:
     youtubeClips: []
   # ── Idrottare som gjort musik ──
   - id: duplantis-bop
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Bop — Armand Duplantis"
     correctYear: 2025
     probability: 74
-    audience: ["gen-z", "gen-alpha"]
     wikimediaSearchHints: ["Mondo Armand Duplantis Bop 2025"]
     answerMethods: ["timeline"]
     genrePackages: ["pkg-sport"]
   # ── Fotbollsatmosfär ──
   - id: blur-song-2
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Song 2 — Blur"
     correctYear: 1997
     probability: 88
@@ -300,6 +322,7 @@ items:
         channelTitle: "Blur"
         notes: "Official music video."
   - id: zombie-nation-kernkraft-400
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Kernkraft 400 — Zombie Nation"
     correctYear: 1999
     probability: 86
@@ -313,6 +336,7 @@ items:
         channelTitle: "Zombie Nation"
         notes: "Official video 1999."
   - id: dario-g-carnaval-de-paris
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Carnaval de Paris — Dario G"
     correctYear: 1998
     probability: 84
@@ -327,6 +351,7 @@ items:
         channelTitle: "Dario G"
         notes: "Official music video. FIFA World Cup France 1998 anthem."
   - id: planet-funk-chase-the-sun
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Chase the Sun — Planet Funk"
     correctYear: 2001
     probability: 82

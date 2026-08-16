@@ -1,11 +1,12 @@
 # Svenska skådespelare/komiker kända för Millennials + Gen Z. Tillagda 2026-06-01.
-audience: ["millennials", "gen-z"]
+audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
 region: ["sweden"]
 category: actors
 contentForm: image
 contentSubject: actor
 items:
   - id: valter-skarsgard
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Valter Skarsgård"
     probability: 58
     peakFrom: 2015
@@ -13,6 +14,7 @@ items:
     wikimediaSearchHints: ["Valter Skarsgård"]
     answerMethods: ["name-letters"]
   - id: fares-fares
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Fares Fares"
     probability: 76
     peakFrom: 2008
@@ -20,6 +22,7 @@ items:
     wikimediaSearchHints: ["Fares Fares actor"]
     answerMethods: ["name-letters"]
   - id: henrik-dorsin
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Henrik Dorsin"
     probability: 76
     peakFrom: 2010
@@ -27,6 +30,7 @@ items:
     wikimediaSearchHints: ["Henrik Dorsin"]
     answerMethods: ["name-letters"]
   - id: rachel-mohlin
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Rachel Mohlin"
     probability: 60
     peakFrom: 2010
@@ -34,6 +38,7 @@ items:
     wikimediaSearchHints: ["Rachel Mohlin"]
     answerMethods: ["name-letters"]
   - id: johan-glans
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Johan Glans"
     probability: 78
     peakFrom: 2008
@@ -41,6 +46,7 @@ items:
     wikimediaSearchHints: ["Johan Glans komiker"]
     answerMethods: ["name-letters"]
   - id: david-hellenius
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "David Hellenius"
     probability: 76
     peakFrom: 2008
@@ -48,6 +54,7 @@ items:
     wikimediaSearchHints: ["David Hellenius"]
     answerMethods: ["name-letters"]
   - id: felix-herngren
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Felix Herngren"
     probability: 72
     peakFrom: 2005
@@ -55,6 +62,7 @@ items:
     wikimediaSearchHints: ["Felix Herngren"]
     answerMethods: ["name-letters"]
   - id: peter-settman
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Peter Settman"
     probability: 66
     peakFrom: 1998
@@ -62,6 +70,7 @@ items:
     wikimediaSearchHints: ["Peter Settman"]
     answerMethods: ["name-letters"]
   - id: bjorn-gustafsson
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Björn Gustafsson"
     probability: 70
     peakFrom: 2009
@@ -69,6 +78,7 @@ items:
     wikimediaSearchHints: ["Björn Gustafsson komiker"]
     answerMethods: ["name-letters"]
   - id: edvin-ryding
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Edvin Ryding"
     probability: 66
     peakFrom: 2021
@@ -76,6 +86,7 @@ items:
     wikimediaSearchHints: ["Edvin Ryding"]
     answerMethods: ["name-letters"]
   - id: omar-rudberg
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Omar Rudberg"
     probability: 64
     peakFrom: 2021
@@ -83,6 +94,7 @@ items:
     wikimediaSearchHints: ["Omar Rudberg"]
     answerMethods: ["name-letters"]
   - id: adam-lundgren
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Adam Lundgren"
     probability: 62
     peakFrom: 2008
@@ -90,6 +102,7 @@ items:
     wikimediaSearchHints: ["Adam Lundgren actor"]
     answerMethods: ["name-letters"]
   - id: happy-jankell
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Happy Jankell"
     probability: 56
     peakFrom: 2015
@@ -97,6 +110,7 @@ items:
     wikimediaSearchHints: ["Happy Jankell"]
     answerMethods: ["name-letters"]
   - id: alba-august
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Alba August"
     probability: 62
     peakFrom: 2017
@@ -104,6 +118,7 @@ items:
     wikimediaSearchHints: ["Alba August"]
     answerMethods: ["name-letters"]
   - id: evin-ahmad
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     region: ["unknown-region"]
     displayName: "Evin Ahmad"
     probability: 60
@@ -112,6 +127,7 @@ items:
     wikimediaSearchHints: ["Evin Ahmad"]
     answerMethods: ["name-letters"]
   - id: gizem-erdogan
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Gizem Erdogan"
     probability: 60
     peakFrom: 2018
@@ -119,6 +135,7 @@ items:
     wikimediaSearchHints: ["Gizem Erdogan"]
     answerMethods: ["name-letters"]
   - id: malin-akerman
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Malin Åkerman"
     probability: 70
     peakFrom: 2007
@@ -126,6 +143,7 @@ items:
     wikimediaSearchHints: ["Malin Åkerman"]
     answerMethods: ["name-letters"]
   - id: erik-johansson-actor
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Erik Johansson"
     probability: 58
     peakFrom: 2010
@@ -133,6 +151,7 @@ items:
     wikimediaSearchHints: ["Erik Johansson skådespelare"]
     answerMethods: ["name-letters"]
   - id: moa-gammel
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     region: ["unknown-region"]
     displayName: "Moa Gammel"
     probability: 58
@@ -141,6 +160,7 @@ items:
     wikimediaSearchHints: ["Moa Gammel"]
     answerMethods: ["name-letters"]
   - id: liv-mjones
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Liv Mjönes"
     probability: 56
     peakFrom: 2008
@@ -148,6 +168,7 @@ items:
     wikimediaSearchHints: ["Liv Mjönes"]
     answerMethods: ["name-letters"]
   - id: eva-melander
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Eva Melander"
     probability: 56
     peakFrom: 2018
@@ -155,6 +176,7 @@ items:
     wikimediaSearchHints: ["Eva Melander actress"]
     answerMethods: ["name-letters"]
   - id: rakel-warmlander
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Rakel Wärmländer"
     correctYear: 1986
     peakFrom: 2010
@@ -163,6 +185,7 @@ items:
     wikimediaSearchHints: ["Rakel Wärmländer Swedish actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: vilhelm-blomgren
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Vilhelm Blomgren"
     correctYear: 1995
     peakFrom: 2018
@@ -171,6 +194,7 @@ items:
     wikimediaSearchHints: ["Vilhelm Blomgren Swedish actor Midsommar"]
     answerMethods: ["timeline", "name-letters"]
   - id: bianca-kronlof
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Bianca Kronlöf"
     correctYear: 1984
     peakFrom: 2010
@@ -179,6 +203,7 @@ items:
     wikimediaSearchHints: ["Bianca Kronlöf Swedish actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: josephine-bornebusch
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Josephine Bornebusch"
     correctYear: 1981
     peakFrom: 2006
@@ -187,6 +212,7 @@ items:
     wikimediaSearchHints: ["Josephine Bornebusch Swedish actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: alexandra-rapaport
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Alexandra Rapaport"
     correctYear: 1974
     peakFrom: 2003
@@ -195,6 +221,7 @@ items:
     wikimediaSearchHints: ["Alexandra Rapaport Swedish actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: nour-el-refai
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Nour El Refai"
     correctYear: 1980
     peakFrom: 2005

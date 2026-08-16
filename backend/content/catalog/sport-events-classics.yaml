@@ -9,13 +9,14 @@
 #
 # Notera: 'songs'-category som approximation eftersom CategorySchema saknar
 # 'sport'. Distractor-pool är irrelevant för timeline-frågor.
-audience: ["all"]
+audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
 region: ["sweden"]
 category: songs
 contentForm: youtube
 contentSubject: sport-event
 items:
   - id: pele-1958-world-cup
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Pelé 17-årig vinner sin första VM"
     correctYear: 1958
     probability: 88
@@ -24,6 +25,7 @@ items:
     # Klipp borttaget 2026-05-29 — FIFA-kanalen blockerar embedded playback
     # ("Videon ej tillgänglig"). Re-curera från icke-FIFA highlights-källa.
   - id: johansson-patterson-title-1959
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Ingemar Johansson besegrar Floyd Patterson — VM-titeln i tungvikt"
     correctYear: 1959
     probability: 85
@@ -36,6 +38,7 @@ items:
         channelTitle: "FRIZALZ"
         notes: "Peter-curerat + validerat i in-app-spelaren 2026-08-05. YouTube Short (vertikalt format, svarta kanter i 16:9-spelaren OK). Ingen årtals-spoiler i titeln."
   - id: spitz-1972-munich-olympics
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Mark Spitz tar 7 OS-guld i München"
     correctYear: 1972
     probability: 85
@@ -48,6 +51,7 @@ items:
         channelTitle: "Olympics"
         notes: "Olympics official channel — Spitz 7 OS-guld München 1972."
   - id: salming-canada-cup-ovation-1976
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Stående ovationer till Börje Salming — Canada Cup"
     correctYear: 1976
     probability: 85
@@ -60,6 +64,7 @@ items:
         channelTitle: "Nostalgi"
         notes: "Peter-curerat + validerat i in-app-spelaren 2026-08-05 — årtalet i videotiteln syns EJ i appens spelare, godkänt trots år-i-titel."
   - id: miracle-on-ice-1980
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Miracle on Ice — USA besegrar Sovjet"
     correctYear: 1980
     probability: 85
@@ -76,6 +81,7 @@ items:
   # ("syns EJ i appens spelare") — lägg inte tillbaka itemet utan ett klipp
   # vars titel saknar årtal.
   - id: dream-team-1992-barcelona
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Dream Team — Barcelona OS basket"
     correctYear: 1992
     probability: 90
@@ -88,6 +94,7 @@ items:
         channelTitle: "Olympics"
         notes: "Olympics official channel — Best of Dream Team Barcelona 1992. Jordan/Magic/Bird."
   - id: borg-mcenroe-wimbledon-1980
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Borg-McEnroe Wimbledon-final"
     correctYear: 1980
     probability: 92
@@ -100,6 +107,7 @@ items:
         channelTitle: "Wimbledon"
         notes: "Wimbledon official channel — 1980 tie-break i fjärde set (18-16 till McEnroe). Mid-tiebreak."
   - id: federer-nadal-wimbledon-2008
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Federer-Nadal Wimbledon-final ('greatest match')"
     correctYear: 2008
     probability: 88
@@ -112,6 +120,7 @@ items:
         channelTitle: "Wimbledon"
         notes: "Wimbledon official channel — 2008 'greatest match'-finalen Best Rallies."
   - id: iniesta-world-cup-final-goal-2010
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Iniesta gör VM-finalmålet"
     correctYear: 2010
     probability: 88
@@ -120,6 +129,7 @@ items:
     # Klipp borttaget 2026-05-29 — FIFA-kanalen blockerar embedded playback.
     # Re-curera från icke-FIFA highlights-källa.
   - id: bolt-100m-world-record-2009
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Usain Bolt slår 100m-VR (9.58s)"
     correctYear: 2009
     probability: 92
@@ -135,6 +145,7 @@ items:
   # Decennie-viktad: 60% post-1990, tunnare ju längre tillbaka.
   # Fokus: fotboll, hockey, skidor, OS-friidrott + simning, tennis/golf.
   - id: sweden-1958-world-cup-final
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Sverige-Brasilien VM-finalen i Solna"
     correctYear: 1958
     probability: 78
@@ -147,12 +158,14 @@ items:
         channelTitle: "freekick3596"
         notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
   - id: borg-wimbledon-1976
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Björn Borg vinner sin första Wimbledon"
     correctYear: 1976
     probability: 82
     wikimediaSearchHints: ["Bjorn Borg 1976 Wimbledon final first title"]
     answerMethods: ["timeline"]
   - id: nadia-comaneci-montreal-1976
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Nadia Comăneci perfekta 10:or i Montreal"
     correctYear: 1976
     probability: 82
@@ -166,6 +179,7 @@ items:
         channelTitle: "Olympics"
         notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
   - id: stenmark-os-guld-slalom-1980
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Stenmark OS-guld slalom Lake Placid"
     correctYear: 1980
     probability: 92
@@ -178,6 +192,7 @@ items:
         channelTitle: "Nostalgi"
         notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
   - id: stenmark-os-guld-storslalom-1980
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Stenmark OS-guld storslalom Lake Placid"
     correctYear: 1980
     probability: 88
@@ -190,6 +205,7 @@ items:
         channelTitle: "Nostalgi"
         notes: "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (10)."
   - id: gunde-svan-os-guld-1984
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Gunde Svan OS-guld 15 km Sarajevo"
     correctYear: 1984
     probability: 82
@@ -202,6 +218,7 @@ items:
         channelTitle: "GundeWassberg"
         notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
   - id: carl-lewis-los-angeles-1984
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Carl Lewis tar 4 OS-guld Los Angeles"
     correctYear: 1984
     probability: 82
@@ -215,6 +232,7 @@ items:
         channelTitle: "How To Run Faster - By Performance Lab"
         notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
   - id: tre-kronor-vm-1987-vien
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Tre Kronor VM-guld Wien"
     correctYear: 1987
     probability: 75
@@ -227,24 +245,28 @@ items:
         channelTitle: "HockeySverige"
         notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
   - id: ben-johnson-disqualification-1988
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Ben Johnson diskvalificerad efter 100m Seoul"
     correctYear: 1988
     probability: 85
     wikimediaSearchHints: ["Ben Johnson 1988 Seoul Olympics 100m disqualification"]
     answerMethods: ["timeline"]
   - id: flo-jo-100m-1988
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Flo-Jo sätter 100m-VR Seoul"
     correctYear: 1988
     probability: 78
     wikimediaSearchHints: ["Florence Griffith Joyner 1988 Seoul Olympics 100m world record"]
     answerMethods: ["timeline"]
   - id: greg-louganis-1988
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Greg Louganis slår huvudet i Seoul"
     correctYear: 1988
     probability: 76
     wikimediaSearchHints: ["Greg Louganis 1988 Seoul Olympics diving head hit"]
     answerMethods: ["timeline"]
   - id: tre-kronor-vm-1991-turku
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Tre Kronor VM-guld Turku"
     correctYear: 1991
     probability: 72
@@ -257,6 +279,7 @@ items:
         channelTitle: "Daniel Risarp"
         notes: "Refined query 2026-05-27 — 'Mats Sundin avgör när Tre Kronor tar VM guld 1991'."
   - id: sverige-em-1992-semifinal
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Sverige semifinal hemma-EM mot Tyskland"
     correctYear: 1992
     probability: 80
@@ -269,6 +292,7 @@ items:
         channelTitle: "hejatysklanduuups"
         notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
   - id: forsberg-foppa-flick-lillehammer-1994
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Peter Forsbergs straff-flick Lillehammer"
     correctYear: 1994
     probability: 96
@@ -281,6 +305,7 @@ items:
         channelTitle: "stansmith98"
         notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
   - id: sverige-vm-94-brons-bulgarien
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Sverige VM-brons mot Bulgarien"
     correctYear: 1994
     probability: 86
@@ -288,6 +313,7 @@ items:
     answerMethods: ["timeline"]
     # youtubeClips borttagna 2026-06-22: titeln på EcE842FxpQk visade "199…" — spoilade decennium. Ersättningsklipp krävs.
   - id: tomas-brolin-vm-1994
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Tomas Brolins mål VM-94"
     correctYear: 1994
     probability: 78
@@ -296,6 +322,7 @@ items:
     # youtubeClips borttagna 2026-08-10: GMpUuXe9uzM (MatigolVidz, re-upload) är
     # raderad/privat → "Video unavailable" i spelaren. Ersättningsklipp krävs.
   - id: ravelli-vm-94-rumanien
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Ravelli stoppar Rumäniens straffar VM-94"
     correctYear: 1994
     probability: 82
@@ -308,12 +335,14 @@ items:
         channelTitle: "Nostalgi"
         notes: "Refined query 2026-05-27 — Ravellis 1:a straffräddning Sverige-Rumänien VM 1994."
   - id: kerri-strug-atlanta-1996
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Kerri Strug hoppar skadad i Atlanta"
     correctYear: 1996
     probability: 76
     wikimediaSearchHints: ["Kerri Strug 1996 Atlanta Olympics vault injured ankle"]
     answerMethods: ["timeline"]
   - id: sorenstam-kraft-nabisco-2002
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Annika Sörenstam vinner Kraft Nabisco"
     correctYear: 2002
     probability: 72
@@ -321,6 +350,7 @@ items:
     answerMethods: ["timeline"]
     # youtubeClips borttagna 2026-06-22: titeln på vjB0zk5P2SA visade "2002" — spoilade rätt svar. Dedikerat highlight-klipp utan år i titeln krävs.
   - id: stefan-holm-os-guld-2004
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Stefan Holm OS-guld höjdhopp Aten"
     correctYear: 2004
     probability: 85
@@ -333,6 +363,7 @@ items:
         channelTitle: "MaramaGitz"
         notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
   - id: christian-olsson-em-tresteg-2006
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Christian Olsson EM-guld tresteg Göteborg"
     correctYear: 2006
     probability: 82
@@ -340,12 +371,14 @@ items:
     answerMethods: ["timeline"]
     # youtubeClips saknas: alla HD-klipp har "2006" i titeln. Ersättningsklipp utan år i titeln krävs.
   - id: zlatan-heel-italy-em-2004
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Zlatans häl-mål mot Italien EM-04"
     correctYear: 2004
     probability: 88
     wikimediaSearchHints: ["Zlatan Ibrahimovic 2004 Euro Italy backheel goal"]
     answerMethods: ["timeline"]
   - id: tre-kronor-os-turin-2006
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Tre Kronor OS-guld Turin"
     correctYear: 2006
     probability: 88
@@ -358,6 +391,7 @@ items:
         channelTitle: "Radiosporten"
         notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
   - id: anja-parson-vm-slalom-are-2007
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Anja Pärson VM-guld slalom Åre"
     correctYear: 2007
     probability: 82
@@ -365,6 +399,7 @@ items:
     answerMethods: ["timeline"]
     # youtubeClips saknas: alla HD-klipp har "2007" i titeln. Ersättningsklipp utan år i titeln krävs.
   - id: phelps-beijing-8-guld-2008
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Michael Phelps 8 OS-guld Peking"
     correctYear: 2008
     probability: 92
@@ -378,6 +413,7 @@ items:
         channelTitle: "Bao Highlights"
         notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
   - id: zlatan-bicycle-kick-england-2012
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Zlatans bicycle kick mot England"
     correctYear: 2012
     probability: 95
@@ -390,6 +426,7 @@ items:
         channelTitle: "GOAL"
         notes: "GOAL-kanal. Zlatans bicycle kick mot England 14/11-2012. Ersatte blockerat klipp."
   - id: johan-olsson-vm-50km-2013
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Johan Olsson VM-guld 50 km Val di Fiemme"
     correctYear: 2013
     probability: 70
@@ -397,6 +434,7 @@ items:
     answerMethods: ["timeline"]
     # youtubeClips borttagna 2026-06-22: cX3k5BdCc6k från kanalen "VMValdifiemme2013" — titeln löd "...Val di Fiemme 2013". Kanalnamnet och titeln visade båda 2013. Ersättningsklipp krävs.
   - id: kalla-os-guld-stafett-2014
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Charlotte Kalla OS-guld stafett Sochi"
     correctYear: 2014
     probability: 84
@@ -409,6 +447,7 @@ items:
         channelTitle: "Pheyman"
         notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
   - id: tre-kronor-os-silver-sochi-2014
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Tre Kronor OS-silver Sochi (mot Kanada)"
     correctYear: 2014
     probability: 76
@@ -417,6 +456,7 @@ items:
     # youtubeClips borttagna 2026-08-10: 3e7FyDCxxL4 (Expressen) visade Frida Karlsson
     # (längdskidor), inte hockeyfinalen Sverige–Kanada. Fel event. Ersättningsklipp krävs.
   - id: simone-biles-rio-2016
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Simone Biles 4 OS-guld i Rio"
     correctYear: 2016
     probability: 85
@@ -430,6 +470,7 @@ items:
         channelTitle: "TNT Sports"
         notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
   - id: tre-kronor-vm-2017-koln
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Tre Kronor VM-guld Köln"
     correctYear: 2017
     probability: 75
@@ -442,6 +483,7 @@ items:
         channelTitle: "IIHF"
         notes: "IIHF official channel — Canada-Sweden 2017 World Championship final highlights. Curerad 2026-05-27 via refined query."
   - id: federer-australian-open-2017
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Federers comeback-vinst Australian Open"
     correctYear: 2017
     probability: 78
@@ -454,6 +496,7 @@ items:
         channelTitle: "Australian Open"
         notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
   - id: emil-forsberg-vs-schweiz-vm-2018
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Emil Forsbergs mål mot Schweiz åttondelsfinal"
     correctYear: 2018
     probability: 84
@@ -466,6 +509,7 @@ items:
         channelTitle: "Sports Heroes"
         notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
   - id: duplantis-stavhopp-vr-2020
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Armand Duplantis sätter stavhopps-VR (6.17m)"
     correctYear: 2020
     probability: 88
@@ -478,6 +522,7 @@ items:
         channelTitle: "World Athletics"
         notes: "World Athletics official channel — Duplantis 6.17m world record Toruń 2020. Curerad 2026-05-27 via refined query."
   - id: frida-karlsson-vm-planica-2023
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Frida Karlsson VM-medalj Planica"
     correctYear: 2023
     probability: 70
@@ -487,6 +532,7 @@ items:
     # hade pålagd musik som störde uppspelningen. Ersättningsklipp krävs.
   # === Content-expansion 2026-05-29: fler cross-gen-ikoniska sport-händelser ===
   - id: ali-rumble-jungle-1974
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Muhammad Ali 'Rumble in the Jungle' mot Foreman"
     correctYear: 1974
     probability: 82
@@ -499,6 +545,7 @@ items:
         channelTitle: "ElTerribleProduction"
         notes: "Curerad 2026-05-29 — Ali vs Foreman highlights HD (1974)."
   - id: maradona-goal-of-century-1986
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Maradonas 'Goal of the Century' mot England"
     correctYear: 1986
     probability: 88
@@ -507,6 +554,7 @@ items:
     # Klipp borttaget 2026-05-29 — FIFA-kanalen blockerar embedded playback.
     # Re-curera från icke-FIFA highlights-källa.
   - id: jordan-last-shot-1998
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Michael Jordans 'Last Shot' i NBA-finalen"
     correctYear: 1998
     probability: 80
@@ -520,6 +568,7 @@ items:
         channelTitle: "Coach Clank"
         notes: "Curerad 2026-05-29 — Jordans iconic last shot, 1998 NBA Finals (NBA-officiella var region-blockerade)."
   - id: leicester-premier-league-2016
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Leicester City vinner Premier League"
     correctYear: 2016
     probability: 80
@@ -532,6 +581,7 @@ items:
         channelTitle: "Sky Sports Retro"
         notes: "Curerad 2026-05-29 — ögonblicket Leicester blev mästare 2016 (Sky Sports)."
   - id: vinnie-jones-gascoigne-grab
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Vinnie Jones griper Gascoigne — det berömda greppet"
     correctYear: 1988
     probability: 76
@@ -545,6 +595,7 @@ items:
         channelTitle: "Deadball Diaries"
         notes: "Ikonisk fotbollsmoment — Vinnie Jones (Wimbledon) griper Gascoigne (Newcastle) 1988. Sport-kategori via contentSubject: sport-event."
   - id: hamrin-semi-vm-1958
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Kurt Hamrin Sverige–Västtyskland VM-halvfinal"
     correctYear: 1958
     probability: 76
@@ -557,6 +608,7 @@ items:
         channelTitle: "KEITH BARON"
         notes: "HD documentary om Sverige i VM 1958 — Hamrin-höjdpunkter. Ersatte SD-klipp (2sQQ1FovLAs)."
   - id: wassberg-os-guld-1980
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Thomas Wassberg OS-guld 15 km (0.01 sekund!) Lake Placid"
     correctYear: 1980
     probability: 82
@@ -569,6 +621,7 @@ items:
         channelTitle: "Jari Isometsä"
         notes: "HD documentary om Wassberg — inkl. OS-guld 1980 med 0.01s marginal. Ersatte SD-klipp (qj-CaxQ6bMM)."
   - id: ali-olympic-torch-atlanta-1996
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Muhammad Ali tänder OS-elden i Atlanta"
     correctYear: 1996
     probability: 86
@@ -581,6 +634,7 @@ items:
         channelTitle: "The Game Day"
         notes: "HD — Ali tänder OS-elden Atlanta 1996. Ersatte SD Olympics-klipp (80wMMFAcweQ)."
   - id: moregard-os-brons-paris-2024
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Truls Möregård OS-brons bordtennis Paris"
     correctYear: 2024
     probability: 72
@@ -593,6 +647,7 @@ items:
         channelTitle: "Kanal 5 Sverige"
         notes: "Kanal 5 Sverige — Truls Möregårds OS-brons i bordtennis Paris 2024."
   - id: cantona-kungfu-kick-1995
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Cantonas kung-fu-spark mot Crystal Palace-fan"
     correctYear: 1995
     probability: 82

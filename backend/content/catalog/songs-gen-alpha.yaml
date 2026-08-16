@@ -33,7 +33,7 @@
 # Taylor Swift + Billie Eilish via Topic-channel uploads (auto-uploaded
 # studio-master från label — annan region-policy än music-videon). ROSÉ
 # APT via official MV (ekr2nIex040, blocked endast i BY+RU, OK i SE).
-audience: ["gen-alpha", "gen-z"]
+audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
 region: ["sweden"]
 category: songs
 contentForm: youtube
@@ -42,6 +42,7 @@ items:
   # 2013
   # Wake Me Up flyttad till songs-all.yaml (cross-gen-iconic) 2026-05-22.
   - id: daft-punk-get-lucky
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Get Lucky — Daft Punk"
     correctYear: 2013
     probability: 90
@@ -54,6 +55,7 @@ items:
         channelTitle: "7clouds"
   # 2014
   - id: pharrell-williams-happy
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Happy — Pharrell Williams"
     correctYear: 2013
     probability: 92
@@ -65,6 +67,7 @@ items:
         endSec: 238
         channelTitle: "AnimeOracle"
   - id: taylor-swift-shake-it-off
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Shake It Off — Taylor Swift"
     correctYear: 2014
     probability: 92
@@ -77,6 +80,7 @@ items:
         channelTitle: "Taylor Swift"
   # 2015
   - id: adele-hello
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Hello — Adele"
     correctYear: 2015
     probability: 95
@@ -88,6 +92,7 @@ items:
         endSec: 85
         channelTitle: "Adele"
   - id: wiz-khalifa-charlie-puth-see-you-again
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "See You Again — Wiz Khalifa & Charlie Puth"
     correctYear: 2015
     probability: 90
@@ -100,6 +105,7 @@ items:
         channelTitle: "Wiz Khalifa Music"
   # 2016
   - id: drake-one-dance
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "One Dance — Drake"
     correctYear: 2016
     probability: 90
@@ -111,6 +117,7 @@ items:
         endSec: 175
         channelTitle: "Billion Stars"
   - id: chainsmokers-closer
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Closer — The Chainsmokers"
     correctYear: 2016
     probability: 88
@@ -123,6 +130,7 @@ items:
         channelTitle: "7clouds Rock"
   # 2017
   - id: luis-fonsi-despacito
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Despacito — Luis Fonsi & Daddy Yankee"
     correctYear: 2017
     probability: 95
@@ -134,6 +142,7 @@ items:
         endSec: 231
         channelTitle: "7clouds"
   - id: post-malone-rockstar
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Rockstar — Post Malone"
     correctYear: 2017
     probability: 88
@@ -146,6 +155,7 @@ items:
         channelTitle: "Republic Records"
   # 2018
   - id: lady-gaga-bradley-cooper-shallow
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Shallow — Lady Gaga & Bradley Cooper"
     correctYear: 2018
     probability: 92
@@ -157,6 +167,7 @@ items:
         endSec: 216
         channelTitle: "7clouds"
   - id: drake-gods-plan
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "God's Plan — Drake"
     correctYear: 2018
     probability: 88
@@ -168,6 +179,7 @@ items:
         endSec: 199
         channelTitle: "Drake - Topic"
   - id: lil-nas-x-old-town-road
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Old Town Road — Lil Nas X"
     correctYear: 2018
     probability: 90
@@ -181,6 +193,7 @@ items:
         channelTitle: "Golden Network"
   # 2019
   - id: billie-eilish-bad-guy
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Bad Guy — Billie Eilish"
     correctYear: 2019
     probability: 92
@@ -194,6 +207,7 @@ items:
   # Blinding Lights flyttad till songs-all.yaml (cross-gen-iconic) 2026-05-22.
   # 2020
   - id: harry-styles-watermelon-sugar
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Watermelon Sugar — Harry Styles"
     correctYear: 2019
     probability: 88
@@ -206,6 +220,7 @@ items:
         endSec: 178
         channelTitle: "Dan Music"
   - id: bts-dynamite
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Dynamite — BTS"
     correctYear: 2020
     probability: 88
@@ -218,6 +233,7 @@ items:
         channelTitle: "7clouds K-pop"
   # 2021
   - id: kid-laroi-justin-bieber-stay
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Stay — The Kid LAROI & Justin Bieber"
     correctYear: 2021
     probability: 90
@@ -229,6 +245,7 @@ items:
         endSec: 140
         channelTitle: "7clouds"
   - id: olivia-rodrigo-drivers-license
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Drivers License — Olivia Rodrigo"
     correctYear: 2021
     probability: 90
@@ -241,6 +258,7 @@ items:
         channelTitle: "Rap Samurai"
   # 2022
   - id: harry-styles-as-it-was
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "As It Was — Harry Styles"
     correctYear: 2022
     probability: 92
@@ -252,6 +270,7 @@ items:
         endSec: 165
         channelTitle: "7clouds"
   - id: taylor-swift-anti-hero
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Anti-Hero — Taylor Swift"
     correctYear: 2022
     probability: 90
@@ -266,6 +285,7 @@ items:
     notes: "UTAN MEDIA: alla 10 YouTube-träffar UMG-blocked i SE/EU. Parkerat tills alternativ källa hittas."
   # 2023
   - id: miley-cyrus-flowers
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Flowers — Miley Cyrus"
     correctYear: 2023
     probability: 92
@@ -277,6 +297,7 @@ items:
         endSec: 198
         channelTitle: "7clouds"
   - id: doja-cat-paint-the-town-red
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Paint the Town Red — Doja Cat"
     correctYear: 2023
     probability: 85
@@ -289,6 +310,7 @@ items:
         channelTitle: "7clouds"
   # 2024
   - id: sabrina-carpenter-espresso
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Espresso — Sabrina Carpenter"
     correctYear: 2024
     probability: 90
@@ -300,6 +322,7 @@ items:
         endSec: 171
         channelTitle: "7cloudsnation"
   - id: billie-eilish-birds-of-a-feather
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Birds of a Feather — Billie Eilish"
     correctYear: 2024
     probability: 88
@@ -313,6 +336,7 @@ items:
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
     notes: "UTAN MEDIA: alla studio-versioner UMG-blocked i SE/EU. Live-versioner ratade per policy. Parkerat tills alternativ källa hittas."
   - id: lady-gaga-bruno-mars-die-with-a-smile
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Die With a Smile — Lady Gaga & Bruno Mars"
     correctYear: 2024
     probability: 88
@@ -326,6 +350,7 @@ items:
         endSec: 248
         channelTitle: "7cloudsnation"
   - id: rose-bruno-mars-apt
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "APT. — ROSÉ & Bruno Mars"
     correctYear: 2024
     probability: 88
@@ -340,6 +365,7 @@ items:
     notes: "UTAN MEDIA: alla studio-versioner UMG-blocked i SE/EU. Singel-release 18 okt 2024; toppade chartsen 2025. Parkerat tills alternativ källa hittas."
   # === Content-expansion 2026-05-29: fler ikoniska 10-20-tals-låtar ===
   - id: mark-ronson-uptown-funk
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Uptown Funk — Mark Ronson ft. Bruno Mars"
     correctYear: 2014
     probability: 89
@@ -352,6 +378,7 @@ items:
         channelTitle: "Mark Ronson - Topic"
         notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: ed-sheeran-thinking-out-loud
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Thinking Out Loud — Ed Sheeran"
     correctYear: 2014
     probability: 86
@@ -364,6 +391,7 @@ items:
         channelTitle: "Ed Sheeran"
         notes: "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
   - id: sia-cheap-thrills
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Cheap Thrills — Sia"
     correctYear: 2015
     probability: 83
@@ -376,6 +404,7 @@ items:
         channelTitle: "Sia - Topic"
     spotifyTrackId: "3S4px9f4lceWdKf0gWciFu"
   - id: imagine-dragons-believer
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Believer — Imagine Dragons"
     correctYear: 2017
     probability: 85
@@ -383,6 +412,7 @@ items:
     answerMethods: ["timeline"]
     spotifyTrackId: "0pqnGHJpmpxLKifKRmU6WP"
   - id: tones-and-i-dance-monkey
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Dance Monkey — Tones and I"
     correctYear: 2019
     probability: 84
@@ -395,6 +425,7 @@ items:
         channelTitle: "Tones And I"
         notes: "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
   - id: dua-lipa-levitating
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Levitating — Dua Lipa"
     correctYear: 2020
     probability: 85
@@ -407,6 +438,7 @@ items:
         channelTitle: "Dua Lipa"
         notes: "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
   - id: tove-lo-habits
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Habits (Stay High) — Tove Lo"
     correctYear: 2013
     probability: 80
@@ -419,6 +451,7 @@ items:
         channelTitle: "Tove Lo"
         notes: "Officiell OG Independent Video från Tove Lo:s egen kanal. Ersätter Topic-versionen."
   - id: zara-larsson-lush-life
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Lush Life — Zara Larsson"
     correctYear: 2015
     probability: 80
@@ -431,6 +464,7 @@ items:
         channelTitle: "Zara Larsson - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: mans-zelmerlow-heroes
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Heroes — Måns Zelmerlöw"
     correctYear: 2015
     probability: 80
@@ -444,6 +478,7 @@ items:
         channelTitle: "Warner Music Sweden"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (18)."
   - id: weeknd-starboy
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Starboy — The Weeknd"
     correctYear: 2016
     probability: 84
@@ -456,6 +491,7 @@ items:
         channelTitle: "The Weeknd - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: ed-sheeran-perfect
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Perfect — Ed Sheeran"
     correctYear: 2017
     probability: 86
@@ -468,6 +504,7 @@ items:
         channelTitle: "Ed Sheeran"
     spotifyTrackId: "0tgVpDi06FyKpA1z0VMD4v"
   - id: dua-lipa-dont-start-now
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Don't Start Now — Dua Lipa"
     correctYear: 2019
     probability: 84
@@ -480,6 +517,7 @@ items:
         channelTitle: "Dua Lipa"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (18)."
   - id: lewis-capaldi-someone-you-loved
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Someone You Loved — Lewis Capaldi"
     correctYear: 2018
     probability: 82
@@ -492,6 +530,7 @@ items:
         channelTitle: "Lewis Capaldi - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: glass-animals-heat-waves
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Heat Waves — Glass Animals"
     correctYear: 2020
     probability: 82
@@ -499,6 +538,7 @@ items:
     answerMethods: ["timeline"]
     spotifyTrackId: "3USxtqRwSYz57Ewm6wWRMp"
   - id: olivia-rodrigo-good-4-u
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Good 4 U — Olivia Rodrigo"
     correctYear: 2021
     probability: 84
@@ -511,6 +551,7 @@ items:
         channelTitle: "Olivia Rodrigo - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: avicii-hey-brother
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Hey Brother — Avicii"
     correctYear: 2013
     probability: 82
@@ -524,6 +565,7 @@ items:
         channelTitle: "Avicii - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: hakan-hellstrom-aldrig-over
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Det kommer aldrig va över för mig — Håkan Hellström"
     correctYear: 2013
     probability: 76
@@ -536,6 +578,7 @@ items:
         channelTitle: "Håkan Hellström - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: benjamin-ingrosso-dance-you-off
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Dance You Off — Benjamin Ingrosso"
     correctYear: 2018
     probability: 74
@@ -543,6 +586,7 @@ items:
     answerMethods: ["timeline"]
     spotifyTrackId: "0s3P5PImfDZYWIseR3b39D"
   - id: robin-stjernberg-you
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "You — Robin Stjernberg"
     correctYear: 2013
     probability: 70
@@ -555,6 +599,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 2013 vinnare. ESC 2013 performance."
   - id: sanna-nielsen-undo
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Undo — Sanna Nielsen"
     correctYear: 2014
     probability: 80
@@ -567,6 +612,7 @@ items:
         channelTitle: "Sanna Nielsen"
         notes: "Melodifestivalen 2014 vinnare. Officiell music video."
   - id: frans-if-i-were-sorry
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "If I Were Sorry — Frans"
     correctYear: 2016
     probability: 78
@@ -579,6 +625,7 @@ items:
         channelTitle: "Frans"
         notes: "Melodifestivalen 2016 vinnare. Officiell music video."
   - id: robin-bengtsson-i-cant-go-on
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "I Can't Go On — Robin Bengtsson"
     correctYear: 2017
     probability: 80
@@ -592,6 +639,7 @@ items:
         notes: "Melodifestivalen 2017 vinnare. ESC 2017 official music video."
     genrePackages: ["Eurovision"]
   - id: john-lundvik-too-late-for-love
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Too Late for Love — John Lundvik"
     correctYear: 2019
     probability: 78
@@ -605,6 +653,7 @@ items:
         notes: "Melodifestivalen 2019 vinnare. ESC 2019 official video."
     genrePackages: ["Eurovision"]
   - id: the-mamas-move
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Move — The Mamas"
     correctYear: 2020
     probability: 78
@@ -620,6 +669,7 @@ items:
     genrePackages: ["Eurovision", "Melodifestivalen"]
     inBaseCatalog: false
   - id: tusse-voices
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Voices — Tusse"
     correctYear: 2021
     probability: 76
@@ -633,6 +683,7 @@ items:
         notes: "Melodifestivalen 2021 vinnare. ESC 2021 official video."
     genrePackages: ["Eurovision"]
   - id: cornelia-jakobs-hold-me-closer
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Hold Me Closer — Cornelia Jakobs"
     correctYear: 2022
     probability: 82
@@ -646,6 +697,7 @@ items:
         notes: "Melodifestivalen 2022 vinnare. ESC 2022 official music video."
     genrePackages: ["Eurovision"]
   - id: loreen-tattoo
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Tattoo — Loreen"
     correctYear: 2023
     probability: 90
@@ -660,6 +712,7 @@ items:
         notes: "Melodifestivalen 2023 vinnare, ESC-vinnare 2023. ESC 2023 official music video."
     genrePackages: ["Eurovision"]
   - id: marcus-martinus-unforgettable
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Unforgettable — Marcus & Martinus"
     correctYear: 2024
     probability: 86
@@ -672,6 +725,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 2024 vinnare. ESC 2024 official music video."
   - id: kaj-bara-bada-bastu
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Bara bada bastu — KAJ"
     correctYear: 2025
     probability: 84
@@ -685,6 +739,7 @@ items:
         notes: "Melodifestivalen 2025 vinnare. ESC 2025 official music video."
     genrePackages: ["Eurovision"]
   - id: felicia-my-system
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "My System — Felicia"
     correctYear: 2026
     probability: 80
@@ -699,6 +754,7 @@ items:
     genrePackages: ["Eurovision"]
   # ===== Eurovision Song Contest vinnare =====
   - id: emmelie-de-forest-only-teardrops
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Only Teardrops — Emmelie de Forest"
     correctYear: 2013
     probability: 76
@@ -712,6 +768,7 @@ items:
         notes: "ESC 2013 vinnare — Danmark. Officiell music video."
     genrePackages: ["Eurovision"]
   - id: conchita-wurst-rise-like-a-phoenix
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Rise Like a Phoenix — Conchita Wurst"
     correctYear: 2014
     probability: 84
@@ -725,6 +782,7 @@ items:
         notes: "ESC 2014 vinnare — Österrike. Officiell music video."
     genrePackages: ["Eurovision"]
   - id: jamala-1944
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "1944 — Jamala"
     correctYear: 2016
     probability: 78
@@ -738,6 +796,7 @@ items:
         notes: "ESC 2016 vinnare — Ukraina. Officiell music video."
     genrePackages: ["Eurovision"]
   - id: netta-toy
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Toy — Netta"
     correctYear: 2018
     probability: 84
@@ -751,6 +810,7 @@ items:
         notes: "ESC 2018 vinnare — Israel. Officiell music video."
     genrePackages: ["Eurovision"]
   - id: duncan-laurence-arcade
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Arcade — Duncan Laurence"
     correctYear: 2019
     probability: 84
@@ -764,6 +824,7 @@ items:
         notes: "ESC 2019 vinnare — Nederländerna. Officiell music video."
     genrePackages: ["Eurovision"]
   - id: maneskin-zitti-e-buoni
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Zitti e buoni — Måneskin"
     correctYear: 2021
     probability: 86
@@ -777,6 +838,7 @@ items:
         notes: "ESC 2021 vinnare — Italien."
     genrePackages: ["Eurovision"]
   - id: kalush-orchestra-stefania
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Stefania — Kalush Orchestra"
     correctYear: 2022
     probability: 84
@@ -790,6 +852,7 @@ items:
         notes: "ESC 2022 vinnare — Ukraina. Officiell music video."
     genrePackages: ["Eurovision"]
   - id: nemo-the-code
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "The Code — Nemo"
     correctYear: 2024
     probability: 82
@@ -803,6 +866,7 @@ items:
         notes: "ESC 2024 vinnare — Schweiz. Officiell music video."
     genrePackages: ["Eurovision"]
   - id: jj-wasted-love
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Wasted Love — JJ"
     correctYear: 2025
     probability: 80
@@ -816,6 +880,7 @@ items:
         notes: "ESC 2025 vinnare — Österrike. Officiell music video."
     genrePackages: ["Eurovision"]
   - id: dara-bangaranga
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Bangaranga — DARA"
     correctYear: 2026
     probability: 78
@@ -829,6 +894,7 @@ items:
         notes: "ESC 2026 vinnare — Bulgarien. Officiell music video."
     genrePackages: ["Eurovision"]
   - id: nyper-mig-i-armen
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Nyper mig i armen — Albin Lee Meldau & Per Gessle"
     correctYear: 2019
     probability: 72
@@ -842,6 +908,7 @@ items:
         channelTitle: "WM Sweden"
         notes: "Officiell WM Sweden. Per Gessle & Albin Lee Meldau."
   - id: arvingarna-i-do
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "I Do — Arvingarna"
     correctYear: 2019
     probability: 72
@@ -855,6 +922,7 @@ items:
         channelTitle: "Arvingarna"
         notes: "Officiell video från Arvingarna-kanalen 2019."
   - id: lucianoz-det-ar-ju-dej
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Det är ju dej jag går och väntar på — Lucianoz"
     correctYear: 2022
     probability: 70
@@ -868,6 +936,7 @@ items:
         channelTitle: "Sony Music Sweden"
         notes: "Officiell Sony Music Sweden 2022."
   - id: fuego-eleni-foureira
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Fuego — Eleni Foureira"
     correctYear: 2018
     probability: 80
@@ -878,6 +947,7 @@ items:
     genrePackages: ["Eurovision"]
     spotifyTrackId: "22ppznuzVF9LKamaaqMMqu"
   - id: spirit-in-the-sky-keiino
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Spirit in the Sky — KEiiNO"
     correctYear: 2019
     probability: 78
@@ -894,6 +964,7 @@ items:
         channelTitle: "KEiiNO"
         notes: "Official music video. ESC 2019 Norway entry."
   - id: dotter-bulletproof
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Bulletproof — Dotter"
     correctYear: 2020
     probability: 76
@@ -902,6 +973,7 @@ items:
     genrePackages: ["Eurovision"]
     spotifyTrackId: "4RcEx6TvICENelSh3O7gvu"
   - id: el-diablo-elena-tsagkrinou
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "El Diablo — Elena Tsagkrinou"
     correctYear: 2021
     probability: 80
@@ -918,6 +990,7 @@ items:
         channelTitle: "Elena Tsagkrinou"
         notes: "Official music video. ESC 2021 Cyprus entry."
   - id: europapa-joost-klein
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Europapa — Joost Klein"
     correctYear: 2024
     probability: 82
@@ -928,6 +1001,7 @@ items:
     genrePackages: ["Eurovision"]
     spotifyTrackId: "0uHrMbMv3c78398pIANDqR"
   - id: laleh-bara-fa-va-mig-sjalv
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Bara Få Va Mig Själv — Laleh"
     correctYear: 2016
     probability: 88
@@ -942,6 +1016,7 @@ items:
         channelTitle: "Laleh"
         notes: "Official music video. 85M+ streams."
   - id: ylvis-the-fox
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "The Fox (What Does the Fox Say?) — Ylvis"
     correctYear: 2013
     probability: 88
@@ -955,6 +1030,7 @@ items:
         channelTitle: "Ylvis"
         notes: "Official music video. Viral hit 2013."
   - id: ronny-ragge-baby-shark
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Baby Shark — Ronny & Ragge"
     correctYear: 2018
     probability: 72

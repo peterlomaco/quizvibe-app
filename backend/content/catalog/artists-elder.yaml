@@ -2,13 +2,14 @@
 # correctYear = födelseår. Grupp-musiker (ABBA, Beatles m.fl.) finns i
 # bands-classics.yaml med audience: ['all'] istället — så solo-artister
 # och band hålls separata med distinkta frågetext ("artist" vs "band").
-audience: ["elder"]
+audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
 region: ["sweden"]
 category: artists
 contentForm: image
 contentSubject: artist
 items:
   - id: elvis-presley
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Elvis Presley"
     correctYear: 1935
     peakFrom: 1956
@@ -18,6 +19,7 @@ items:
     wikimediaSearchHints: ["Elvis Presley"]
     answerMethods: ["timeline", "name-letters"]
   - id: frank-sinatra
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Frank Sinatra"
     correctYear: 1915
     peakFrom: 1940
@@ -27,6 +29,7 @@ items:
     wikimediaSearchHints: ["Frank Sinatra singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: nat-king-cole
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Nat King Cole"
     correctYear: 1919
     peakFrom: 1945
@@ -36,6 +39,7 @@ items:
     wikimediaSearchHints: ["Nat King Cole singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: louis-armstrong
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Louis Armstrong"
     correctYear: 1901
     peakFrom: 1925
@@ -45,6 +49,7 @@ items:
     wikimediaSearchHints: ["Louis Armstrong jazz trumpet"]
     answerMethods: ["timeline", "name-letters"]
   - id: ray-charles
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Ray Charles"
     correctYear: 1930
     peakFrom: 1955
@@ -54,6 +59,7 @@ items:
     wikimediaSearchHints: ["Ray Charles musician"]
     answerMethods: ["timeline", "name-letters"]
   - id: bob-dylan
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Bob Dylan"
     correctYear: 1941
     peakFrom: 1962
@@ -63,6 +69,7 @@ items:
     wikimediaSearchHints: ["Bob Dylan singer songwriter"]
     answerMethods: ["timeline", "name-letters"]
   - id: james-brown
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "James Brown"
     correctYear: 1933
     peakFrom: 1956
@@ -72,6 +79,7 @@ items:
     wikimediaSearchHints: ["James Brown singer Godfather of Soul"]
     answerMethods: ["timeline", "name-letters"]
   - id: stevie-wonder
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Stevie Wonder"
     correctYear: 1950
     peakFrom: 1963
@@ -81,6 +89,7 @@ items:
     wikimediaSearchHints: ["Stevie Wonder"]
     answerMethods: ["timeline", "name-letters"]
   - id: tina-turner
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Tina Turner"
     correctYear: 1939
     peakFrom: 1960
@@ -90,6 +99,7 @@ items:
     wikimediaSearchHints: ["Tina Turner singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: diana-ross
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Diana Ross"
     correctYear: 1944
     peakFrom: 1965
@@ -99,6 +109,7 @@ items:
     wikimediaSearchHints: ["Diana Ross singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: marvin-gaye
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Marvin Gaye"
     correctYear: 1939
     peakFrom: 1961
@@ -108,6 +119,7 @@ items:
     wikimediaSearchHints: ["Marvin Gaye singer Motown"]
     answerMethods: ["timeline", "name-letters"]
   - id: otis-redding
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Otis Redding"
     correctYear: 1941
     peakFrom: 1962
@@ -117,6 +129,7 @@ items:
     wikimediaSearchHints: ["Otis Redding soul singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: dolly-parton
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Dolly Parton"
     correctYear: 1946
     peakFrom: 1967
@@ -126,6 +139,7 @@ items:
     wikimediaSearchHints: ["Dolly Parton singer country"]
     answerMethods: ["timeline", "name-letters"]
   - id: carole-king
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     region: ["unknown-region"]
     displayName: "Carole King"
     correctYear: 1942
@@ -135,6 +149,7 @@ items:
     wikimediaSearchHints: ["Carole King singer songwriter"]
     answerMethods: ["timeline", "name-letters"]
   - id: leonard-cohen
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Leonard Cohen"
     correctYear: 1934
     peakFrom: 1967
@@ -144,6 +159,7 @@ items:
     wikimediaSearchHints: ["Leonard Cohen singer songwriter"]
     answerMethods: ["timeline", "name-letters"]
   - id: roy-orbison
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Roy Orbison"
     correctYear: 1936
     peakFrom: 1956
@@ -153,6 +169,7 @@ items:
     wikimediaSearchHints: ["Roy Orbison singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: aretha-franklin
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Aretha Franklin"
     correctYear: 1942
     peakFrom: 1961
@@ -162,6 +179,7 @@ items:
     wikimediaSearchHints: ["Aretha Franklin singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: little-richard
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Little Richard"
     correctYear: 1932
     peakFrom: 1955
@@ -171,6 +189,7 @@ items:
     wikimediaSearchHints: ["Little Richard musician"]
     answerMethods: ["timeline", "name-letters"]
   - id: dean-martin
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Dean Martin"
     correctYear: 1917
     peakFrom: 1946
@@ -180,6 +199,7 @@ items:
     wikimediaSearchHints: ["Dean Martin singer actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: sammy-davis-jr
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Sammy Davis Jr."
     correctYear: 1925
     peakFrom: 1949
@@ -189,6 +209,7 @@ items:
     wikimediaSearchHints: ["Sammy Davis Jr singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: tom-jones
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Tom Jones"
     correctYear: 1940
     peakFrom: 1964
@@ -198,6 +219,7 @@ items:
     wikimediaSearchHints: ["Tom Jones singer Welsh"]
     answerMethods: ["timeline", "name-letters"]
   - id: patsy-cline
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     region: ["unknown-region"]
     displayName: "Patsy Cline"
     correctYear: 1932
@@ -207,6 +229,7 @@ items:
     wikimediaSearchHints: ["Patsy Cline singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: buddy-holly
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Buddy Holly"
     correctYear: 1936
     peakFrom: 1957
@@ -216,6 +239,7 @@ items:
     wikimediaSearchHints: ["Buddy Holly singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: sam-cooke
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Sam Cooke"
     correctYear: 1931
     peakFrom: 1957
@@ -225,6 +249,7 @@ items:
     wikimediaSearchHints: ["Sam Cooke singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: chuck-berry
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Chuck Berry"
     correctYear: 1926
     peakFrom: 1955
@@ -234,6 +259,7 @@ items:
     wikimediaSearchHints: ["Chuck Berry musician"]
     answerMethods: ["timeline", "name-letters"]
   - id: ella-fitzgerald
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Ella Fitzgerald"
     correctYear: 1917
     peakFrom: 1935
@@ -243,6 +269,7 @@ items:
     wikimediaSearchHints: ["Ella Fitzgerald singer jazz"]
     answerMethods: ["timeline", "name-letters"]
   - id: harry-belafonte
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Harry Belafonte"
     correctYear: 1927
     peakFrom: 1953
@@ -252,6 +279,7 @@ items:
     wikimediaSearchHints: ["Harry Belafonte singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: donna-summer
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Donna Summer"
     correctYear: 1948
     peakFrom: 1974
@@ -261,6 +289,7 @@ items:
     wikimediaSearchHints: ["Donna Summer disco singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: lionel-richie
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Lionel Richie"
     correctYear: 1949
     peakFrom: 1968
@@ -270,6 +299,7 @@ items:
     wikimediaSearchHints: ["Lionel Richie singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: barbra-streisand
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Barbra Streisand"
     correctYear: 1942
     peakFrom: 1963
@@ -280,36 +310,42 @@ items:
     answerMethods: ["timeline", "name-letters"]
   # === Svenska expansion 2026-05-27 ===
   - id: lill-babs
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Lill-Babs"
     correctYear: 1938
     probability: 80
     wikimediaSearchHints: ["Lill-Babs Swedish singer Barbro Svensson"]
     answerMethods: ["timeline", "name-letters"]
   - id: lill-lindfors
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Lill Lindfors"
     correctYear: 1940
     probability: 78
     wikimediaSearchHints: ["Lill Lindfors Swedish singer Eurovision host"]
     answerMethods: ["timeline", "name-letters"]
   - id: monica-zetterlund
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Monica Zetterlund"
     correctYear: 1937
     probability: 75
     wikimediaSearchHints: ["Monica Zetterlund Swedish jazz singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: tomas-ledin
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Tomas Ledin"
     correctYear: 1952
     probability: 82
     wikimediaSearchHints: ["Tomas Ledin Swedish singer Sommaren är kort"]
     answerMethods: ["timeline", "name-letters"]
   - id: magnus-uggla
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Magnus Uggla"
     correctYear: 1954
     probability: 80
     wikimediaSearchHints: ["Magnus Uggla Swedish singer rock"]
     answerMethods: ["timeline", "name-letters"]
   - id: lasse-berghagen
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Lasse Berghagen"
     correctYear: 1945
     probability: 76
@@ -317,6 +353,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
   # === Cross-nordic expansion 2026-05-27 ===
   - id: kim-larsen
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Kim Larsen"
     correctYear: 1945
     probability: 78
@@ -324,36 +361,42 @@ items:
     answerMethods: ["timeline", "name-letters"]
   # === Vemod-batch 2026-05-27 — svenska klassiker ===
   - id: cornelis-vreeswijk
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Cornelis Vreeswijk"
     correctYear: 1937
     probability: 86
     wikimediaSearchHints: ["Cornelis Vreeswijk Swedish singer songwriter Ballader"]
     answerMethods: ["timeline", "name-letters"]
   - id: olle-adolphson
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Olle Adolphson"
     correctYear: 1934
     probability: 78
     wikimediaSearchHints: ["Olle Adolphson Swedish singer songwriter Trubadur"]
     answerMethods: ["timeline", "name-letters"]
   - id: pugh-rogefeldt
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Pugh Rogefeldt"
     correctYear: 1947
     probability: 76
     wikimediaSearchHints: ["Pugh Rogefeldt Swedish rock singer Ja dä ä dä"]
     answerMethods: ["timeline", "name-letters"]
   - id: sven-bertil-taube
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Sven-Bertil Taube"
     correctYear: 1934
     probability: 76
     wikimediaSearchHints: ["Sven-Bertil Taube Swedish singer actor Calle Schewen"]
     answerMethods: ["timeline", "name-letters"]
   - id: evert-taube
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Evert Taube"
     correctYear: 1890
     probability: 84
     wikimediaSearchHints: ["Evert Taube Swedish poet singer Sjösala vals"]
     answerMethods: ["timeline", "name-letters"]
   - id: barbro-horberg
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Barbro Hörberg"
     correctYear: 1932
     probability: 70
@@ -361,24 +404,28 @@ items:
     answerMethods: ["timeline", "name-letters"]
   # === Bred batch 2026-05-27 — dansband-elder/cross-nordic/vemod ===
   - id: christer-sjogren
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Christer Sjögren"
     correctYear: 1950
     probability: 78
     wikimediaSearchHints: ["Christer Sjögren Swedish dansband Vikingarna singer Eurovision"]
     answerMethods: ["timeline", "name-letters"]
   - id: allan-edwall
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Allan Edwall"
     correctYear: 1924
     probability: 80
     wikimediaSearchHints: ["Allan Edwall Swedish actor singer Astrid Lindgren"]
     answerMethods: ["timeline", "name-letters"]
   - id: arja-saijonmaa
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Arja Saijonmaa"
     correctYear: 1944
     probability: 78
     wikimediaSearchHints: ["Arja Saijonmaa Finnish singer Jag vill tacka livet"]
     answerMethods: ["timeline", "name-letters"]
   - id: sanne-salomonsen
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Sanne Salomonsen"
     correctYear: 1955
     probability: 74
@@ -386,12 +433,14 @@ items:
     answerMethods: ["timeline", "name-letters"]
   # === Batch B 2026-05-27 — Björn Skifs ===
   - id: bjorn-skifs
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Björn Skifs"
     correctYear: 1947
     probability: 84
     wikimediaSearchHints: ["Björn Skifs Swedish singer Hooked on a Feeling Eurovision"]
     answerMethods: ["timeline", "name-letters"]
   - id: mick-jagger
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Mick Jagger"
     correctYear: 1943
     peakFrom: 1962
@@ -401,6 +450,7 @@ items:
     wikimediaSearchHints: ["Mick Jagger Rolling Stones singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: steven-tyler
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Steven Tyler"
     correctYear: 1948
     peakFrom: 1973

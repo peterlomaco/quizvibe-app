@@ -4,7 +4,7 @@
 # (Thriller 1982, Smells Like Teen Spirit 1991 ligger där och rörs ej).
 # media-fältet lämnas off-katalog tills `npm run youtube-search <item-id>`
 # har körts och en specifik videoId + start/endSec är vald.
-audience: ["millennials", "gen-x"]
+audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
 region: ["sweden"]
 category: songs
 contentForm: youtube
@@ -12,6 +12,7 @@ contentSubject: song
 items:
   # 1981
   - id: kim-carnes-bette-davis-eyes
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Bette Davis Eyes — Kim Carnes"
     correctYear: 1981
     probability: 80
@@ -24,6 +25,7 @@ items:
         channelTitle: "Enhanced Music Videos"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (18)."
   - id: hasse-andersson-guld-och-groena-skogar
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Guld och gröna skogar — Hasse Andersson"
     correctYear: 1981
     probability: 88
@@ -34,6 +36,7 @@ items:
   # 1982
   # Billie Jean flyttad till songs-all.yaml (cross-gen-iconic) 2026-05-22.
   - id: survivor-eye-of-the-tiger
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Eye of the Tiger — Survivor"
     correctYear: 1982
     probability: 92
@@ -47,6 +50,7 @@ items:
         notes: "Officiell album-audio via YouTube Topic. Iconic Rocky-tema intro."
   # 1983
   - id: police-every-breath-you-take
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Every Breath You Take — The Police"
     correctYear: 1983
     probability: 92
@@ -59,6 +63,7 @@ items:
         channelTitle: "ThePoliceVEVO"
         notes: "Peter-kurerad 2026-08-14. Officiella musikvideon — ersatte Topic-audion (statisk albumkonst)."
   - id: irene-cara-flashdance-what-a-feeling
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Flashdance... What a Feeling — Irene Cara"
     correctYear: 1983
     probability: 82
@@ -72,6 +77,7 @@ items:
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (18)."
   # 1984
   - id: madonna-like-a-virgin
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Like a Virgin — Madonna"
     correctYear: 1984
     probability: 92
@@ -84,18 +90,21 @@ items:
         channelTitle: "Enhanced Music Videos"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (18)."
   - id: wham-wake-me-up-before-you-go-go
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Wake Me Up Before You Go-Go — Wham!"
     correctYear: 1984
     probability: 88
+    region: ["global"]
     wikimediaSearchHints: ["Wham Wake Me Up Before You Go-Go"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "YfAF92Z3iFw"
-        startSec: 30
-        endSec: 45
-        channelTitle: "LatinHype"
-        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
+      - videoId: "Uj2K3rerzT4"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Bad Boy Edd"
+        notes: "Peter-kurerad 2026-08-14. Videotitel verifierad: 'Wham! - Wake Me Up Before You Go-Go [Official Music Video]' — inget ar i titeln. Ersatte LatinHype-uppladdningen (score 10)."
   - id: van-halen-jump
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Jump — Van Halen"
     correctYear: 1984
     probability: 84
@@ -112,6 +121,7 @@ items:
         notes: "Peter-kurerad 2026-08-12. Officiella musikvideon på bandets egen kanal."
     notes: "DOKUMENTERAT UNDANTAG fran ar-policyn: Peter beslutade 1984 (2026-08-13). Singeln kom 21 dec 1983, tolv dagar fore albumet 1984 (9 jan 1984), sa policyn 'tidigaste release av artistens egen inspelning' ger strikt 1983 — men laten ar allmant forknippad med albumet 1984 och spelaren skulle uppfatta 1983 som fel. Andra INTE till 1983 vid framtida ar-audit."
   - id: billy-idol-rebel-yell
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Rebel Yell — Billy Idol"
     correctYear: 1983
     probability: 78
@@ -129,6 +139,7 @@ items:
     notes: "correctYear = albumet Rebel Yell (nov 1983); singeln kom jan 1984."
   # 1985
   - id: a-ha-take-on-me
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Take on Me — a-ha"
     correctYear: 1985
     probability: 92
@@ -141,6 +152,7 @@ items:
         channelTitle: "a-ha"
         notes: "Peter-kurerad 2026-08-14. Officiella rotoscope-musikvideon på bandets egen kanal — ersatte Topic-audion (statisk albumkonst)."
   - id: whitney-houston-how-will-i-know
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "How Will I Know — Whitney Houston"
     correctYear: 1985
     probability: 82
@@ -155,6 +167,7 @@ items:
         notes: "Peter-kurerad 2026-08-12. Lyric-video på privat kanal — ej rättsinnehavare. Spelbar i SE 2026-08-12; takedown-risk kvarstår."
     notes: "correctYear = debutalbumet Whitney Houston (feb 1985); singeln kom nov 1985."
   - id: usa-for-africa-we-are-the-world
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "We Are the World — USA for Africa"
     correctYear: 1985
     probability: 88
@@ -168,6 +181,7 @@ items:
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (18)."
   # 1986
   - id: europe-the-final-countdown
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "The Final Countdown — Europe"
     correctYear: 1986
     probability: 92
@@ -180,6 +194,7 @@ items:
         channelTitle: "EUROPE - Topic"
         notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: bon-jovi-livin-on-a-prayer
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Livin' on a Prayer — Bon Jovi"
     correctYear: 1986
     probability: 90
@@ -194,6 +209,7 @@ items:
         notes: "Peter-kurerad 2026-08-12 — ersatte Topic-audion (YBdyc1WDlBQ) med officiella musikvideon på BonJoviVEVO."
   # 1987
   - id: rick-astley-never-gonna-give-you-up
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Never Gonna Give You Up — Rick Astley"
     correctYear: 1987
     probability: 90
@@ -208,6 +224,7 @@ items:
         notes: "Peter-kurerad 2026-08-12 — ersatte Topic-audion (3BFTio5296w) med officiella musikvideon (4K Remaster) på artistens egen kanal."
   # 1988
   - id: bobby-mcferrin-dont-worry-be-happy
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Don't Worry, Be Happy — Bobby McFerrin"
     correctYear: 1988
     probability: 88
@@ -220,6 +237,7 @@ items:
         channelTitle: "Bobby McFerrin - Topic"
         notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: tracy-chapman-fast-car
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Fast Car — Tracy Chapman"
     correctYear: 1988
     probability: 82
@@ -233,6 +251,7 @@ items:
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (18)."
   # 1989
   - id: madonna-like-a-prayer
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Like a Prayer — Madonna"
     correctYear: 1989
     probability: 92
@@ -245,6 +264,7 @@ items:
         channelTitle: "Madonna"
         notes: "Peter-kurerad 2026-08-14 med explicit startSec 12 — ersatte den privata re-uploaden 'Enhanced Music Videos'. AVVÄGNING: detta officiella klipp är SD och region-blockat i 2 länder (dock EJ Sverige), vilket var skälet att det valdes bort 2026-08-11. Peter begärde det igen 2026-08-14; rättsinnehavarens kanal väger tyngre än takedown-risken i en privat re-upload."
   - id: phil-collins-another-day-in-paradise
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Another Day in Paradise — Phil Collins"
     correctYear: 1989
     probability: 82
@@ -258,6 +278,7 @@ items:
         notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (3)."
   # 1990
   - id: sinead-oconnor-nothing-compares-2-u
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Nothing Compares 2 U — Sinéad O'Connor"
     correctYear: 1990
     probability: 90
@@ -270,6 +291,7 @@ items:
         channelTitle: "Sinéad O'Connor - Topic"
         notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: mc-hammer-u-cant-touch-this
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "U Can't Touch This — MC Hammer"
     correctYear: 1990
     probability: 84
@@ -286,6 +308,7 @@ items:
         notes: "Peter-kurerad 2026-08-12. Privat re-upload av musikvideon — ej rättsinnehavare. Spelbar i SE 2026-08-12; takedown-risk kvarstår."
     notes: "correctYear = singeln (jan 1990), strax fore albumet Please Hammer Don't Hurt 'Em (feb 1990)."
   - id: madonna-vogue
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Vogue — Madonna"
     correctYear: 1990
     probability: 88
@@ -299,6 +322,7 @@ items:
         notes: "Peter-kurerad 2026-08-14. Officiella musikvideon på artistens egen kanal — ersatte den privata re-uploaden 'MVIDEO4K' (takedown-risk)."
   # 1991
   - id: bryan-adams-everything-i-do
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "(Everything I Do) I Do It for You — Bryan Adams"
     correctYear: 1991
     probability: 88
@@ -311,6 +335,7 @@ items:
         channelTitle: "Bryan Adams"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: michael-jackson-black-or-white
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Black or White — Michael Jackson"
     correctYear: 1991
     probability: 90
@@ -323,6 +348,7 @@ items:
         channelTitle: "Michael Jackson - Topic"
         notes: "Officiell album-audio via YouTube Topic. Iconic guitar-riff."
   - id: seal-crazy
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Crazy — Seal"
     correctYear: 1991
     probability: 85
@@ -336,6 +362,7 @@ items:
         notes: "Officiellt musikvideo via Warner Records Vault. HD. Tillagd 2026-06-04."
   # 1992
   - id: snap-rhythm-is-a-dancer
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Rhythm Is a Dancer — Snap!"
     correctYear: 1992
     probability: 85
@@ -348,6 +375,7 @@ items:
         channelTitle: "SNAP!"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (18)."
   - id: boyz-ii-men-end-of-the-road
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "End of the Road — Boyz II Men"
     correctYear: 1992
     probability: 82
@@ -362,6 +390,7 @@ items:
   # 1993
   # I Will Always Love You flyttad till songs-all.yaml (cross-gen-iconic) 2026-05-22.
   - id: 4-non-blondes-whats-up
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "What's Up? — 4 Non Blondes"
     correctYear: 1992
     probability: 85
@@ -375,6 +404,7 @@ items:
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
   # 1994
   - id: ace-of-base-the-sign
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "The Sign — Ace of Base"
     correctYear: 1993
     probability: 92
@@ -388,6 +418,7 @@ items:
         channelTitle: "Ace of Base"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (18)."
   - id: cranberries-zombie
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Zombie — The Cranberries"
     correctYear: 1994
     probability: 88
@@ -401,6 +432,7 @@ items:
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   # 1995
   - id: oasis-wonderwall
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Wonderwall — Oasis"
     correctYear: 1995
     probability: 92
@@ -413,6 +445,7 @@ items:
         channelTitle: "Oasis - Topic"
         notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: coolio-gangstas-paradise
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Gangsta's Paradise — Coolio"
     correctYear: 1995
     probability: 88
@@ -426,6 +459,7 @@ items:
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
   # 1996
   - id: spice-girls-wannabe
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Wannabe — Spice Girls"
     correctYear: 1996
     probability: 90
@@ -435,6 +469,7 @@ items:
     # region-blockerad i 249 länder inkl. SE → "Video unavailable" i spelaren.
     # Ersättningsklipp krävs.
   - id: los-del-rio-macarena
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Macarena — Los del Río"
     correctYear: 1996
     probability: 88
@@ -449,6 +484,7 @@ items:
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100). BEHÅLLET 2026-08-12: Peters förslag gwWRjvwlLKg är en privat re-upload; Topic är rättsinnehavarens kanal."
   # === Content-expansion 2026-05-29: fler ikoniska 80-90-tals-låtar ===
   - id: journey-dont-stop-believin
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Don't Stop Believin' — Journey"
     correctYear: 1981
     probability: 88
@@ -461,6 +497,7 @@ items:
         channelTitle: "Journey - Topic"
         notes: "Curerad 2026-05-29 — officiell album-audio via YouTube Topic (1981 studio)."
   - id: toto-africa
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Africa — Toto"
     correctYear: 1982
     probability: 89
@@ -473,6 +510,7 @@ items:
         channelTitle: "7clouds"
         notes: "Curerad 2026-05-29 — 7clouds lyric-video (katalogens standard-lyric-kanal); ingen officiell Toto-upload tillgänglig i SE."
   - id: cyndi-lauper-girls-just-want-to-have-fun
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Girls Just Want to Have Fun — Cyndi Lauper"
     correctYear: 1983
     probability: 86
@@ -486,6 +524,7 @@ items:
         channelTitle: "Cyndi Lauper - Topic"
         notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100). BEHÅLLET 2026-08-12: Peters förslag Q2ahfQoB9EY är en privat re-upload; Topic är rättsinnehavarens kanal."
   - id: eurythmics-sweet-dreams
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Sweet Dreams (Are Made of This) — Eurythmics"
     correctYear: 1983
     probability: 85
@@ -498,6 +537,7 @@ items:
         channelTitle: "Enhanced Music Videos"
         notes: "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
   - id: whitney-houston-i-wanna-dance-with-somebody
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "I Wanna Dance with Somebody — Whitney Houston"
     correctYear: 1987
     probability: 87
@@ -511,6 +551,7 @@ items:
         channelTitle: "Whitney Houston - Topic"
         notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100). BEHÅLLET 2026-08-12: Peters förslag QzZ-mtE1EHc är en privat re-upload; Topic är rättsinnehavarens kanal."
   - id: rem-losing-my-religion
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Losing My Religion — R.E.M."
     correctYear: 1991
     probability: 81
@@ -523,6 +564,7 @@ items:
         channelTitle: "remhq"
         notes: "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (15)."
   - id: metallica-enter-sandman
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Enter Sandman — Metallica"
     correctYear: 1991
     probability: 84
@@ -535,6 +577,7 @@ items:
         channelTitle: "Metallica - Topic"
         notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: scorpions-wind-of-change
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Wind of Change — Scorpions"
     correctYear: 1990
     probability: 83
@@ -547,6 +590,7 @@ items:
         channelTitle: "Scorpions - Topic"
         notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: michael-jackson-beat-it
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Beat It — Michael Jackson"
     correctYear: 1982
     probability: 88
@@ -559,18 +603,21 @@ items:
         channelTitle: "Michael Jackson - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: bowie-lets-dance
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Let's Dance — David Bowie"
     correctYear: 1983
     probability: 82
+    region: ["global"]
     wikimediaSearchHints: ["David Bowie Let's Dance 1983"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "ZoC9_udLNeU"
-        startSec: 30
-        endSec: 45
-        channelTitle: "David Bowie - Topic"
-        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      - videoId: "VbD_kBJc_gI"
+        startSec: 0
+        endSec: 30
+        channelTitle: "David Bowie"
+        notes: "Peter-kurerad 2026-08-14. Videotitel verifierad: 'David Bowie - Let's Dance (Official Video) [HD]' pa artistens egen kanal — inget ar i titeln. Ersatte Topic-audion (statisk albumkonst)."
   - id: prince-purple-rain
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Purple Rain — Prince"
     correctYear: 1984
     probability: 86
@@ -583,6 +630,7 @@ items:
         channelTitle: "Prince"
         notes: "Peter-kurerad 2026-08-14 med explicit startSec 70. Videotitel verifierad: 'Prince - Purple Rain (Official Video)' — ersatte Topic-audion (statisk albumkonst)."
   - id: wham-last-christmas
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Last Christmas — Wham!"
     correctYear: 1984
     probability: 90
@@ -595,6 +643,7 @@ items:
         channelTitle: "Wham! - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: springsteen-dancing-in-the-dark
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Dancing in the Dark — Bruce Springsteen"
     correctYear: 1984
     probability: 82
@@ -607,6 +656,7 @@ items:
         channelTitle: "Bruce Springsteen - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: acdc-thunderstruck
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Thunderstruck — AC/DC"
     correctYear: 1990
     probability: 86
@@ -614,6 +664,7 @@ items:
     answerMethods: ["timeline"]
     spotifyTrackId: "57bgtoPSgt236HzfBOd8kj"
   - id: guns-n-roses-november-rain
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "November Rain — Guns N' Roses"
     correctYear: 1992
     probability: 84
@@ -626,6 +677,7 @@ items:
         channelTitle: "Guns N' Roses - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: nirvana-come-as-you-are
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Come as You Are — Nirvana"
     correctYear: 1991
     probability: 84
@@ -638,6 +690,7 @@ items:
         channelTitle: "Nirvana - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: lili-sussie-oh-mama
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Oh Mama — Lili & Sussie"
     correctYear: 1987
     probability: 78
@@ -645,6 +698,7 @@ items:
     answerMethods: ["timeline"]
     spotifyTrackId: "4orJQkF2exPD4xSFmMY00U"
   - id: roxette-the-look
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "The Look — Roxette"
     correctYear: 1988
     probability: 86
@@ -658,6 +712,7 @@ items:
         channelTitle: "Enhanced Music Videos"
         notes: "Remastered Full HD musikvideo. Officiell MV-innehåll, ersätter Topic-versionen (statisk albumkonst)."
   - id: roxette-listen-to-your-heart
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Listen to Your Heart — Roxette"
     correctYear: 1988
     probability: 86
@@ -671,6 +726,7 @@ items:
         channelTitle: "Roxette - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: ace-of-base-all-that-she-wants
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "All That She Wants — Ace of Base"
     correctYear: 1992
     probability: 86
@@ -684,19 +740,23 @@ items:
         channelTitle: "Ace of Base - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: dr-alban-its-my-life
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "It's My Life — Dr. Alban"
     correctYear: 1992
     probability: 82
+    region: ["europe"]
     wikimediaSearchHints: ["Dr Alban It's My Life 1992"]
     answerMethods: ["timeline"]
     spotifyTrackId: "6bjl81yfCztuBXLC9Mqs2N"
     youtubeClips:
-      - videoId: "aBJZsHDJvf0"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Dr. Alban - Topic"
-        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      - videoId: "oW0VovnyjPY"
+        startSec: 50
+        endSec: 80
+        channelTitle: "Dr. Alban"
+        notes: "Peter-kurerad 2026-08-14 med explicit startSec 50. Videotitel verifierad: 'Dr.Alban - It's My Life (Official 4K Video)' pa artistens egen kanal — inget ar i titeln. Ersatte Topic-audion (statisk albumkonst)."
+    notes: "correctYear = albumet One Love (23 nov 1992) och singeln (1992) — samma ar oavsett vilken som kom forst."
   - id: rednex-cotton-eye-joe
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Cotton Eye Joe — Rednex"
     correctYear: 1994
     probability: 84
@@ -710,6 +770,7 @@ items:
         channelTitle: "Rednex Videos"
         notes: "Officiell musikvideo, Rednex Videos-kanalen. HD. Ersätter Topic-versionen."
   - id: cardigans-lovefool
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Lovefool — The Cardigans"
     correctYear: 1996
     probability: 84
@@ -723,6 +784,7 @@ items:
         channelTitle: "The Cardigans - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: marvin-gaye-sexual-healing
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Sexual Healing — Marvin Gaye"
     correctYear: 1982
     probability: 82
@@ -735,6 +797,7 @@ items:
         channelTitle: "Marvin Gaye - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: springsteen-born-in-the-usa
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Born in the U.S.A. — Bruce Springsteen"
     correctYear: 1984
     probability: 84
@@ -747,6 +810,7 @@ items:
         channelTitle: "Bruce Springsteen - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: tina-turner-whats-love
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "What's Love Got to Do with It — Tina Turner"
     correctYear: 1984
     probability: 84
@@ -759,6 +823,7 @@ items:
         channelTitle: "Tina Turner"
         notes: "Peter-kurerad 2026-08-14. Officiella musikvideon — ersatte Topic-audion (statisk albumkonst)."
   - id: george-michael-careless-whisper
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Careless Whisper — George Michael"
     correctYear: 1984
     probability: 86
@@ -771,6 +836,7 @@ items:
         channelTitle: "George Michael - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: stevie-wonder-i-just-called
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "I Just Called to Say I Love You — Stevie Wonder"
     correctYear: 1984
     probability: 86
@@ -783,6 +849,7 @@ items:
         endSec: 55
         channelTitle: "Stevie Wonder - Topic"
   - id: bryan-adams-summer-of-69
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Summer of '69 — Bryan Adams"
     correctYear: 1984
     probability: 86
@@ -795,6 +862,7 @@ items:
         channelTitle: "Bryan Adams"
     spotifyTrackId: "0GONea6G2XdnHWjNZd6zt3"
   - id: u2-with-or-without-you
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "With or Without You — U2"
     correctYear: 1987
     probability: 84
@@ -807,6 +875,7 @@ items:
         channelTitle: "U2 - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: oasis-dont-look-back-in-anger
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Don't Look Back in Anger — Oasis"
     correctYear: 1996
     probability: 84
@@ -819,6 +888,7 @@ items:
         channelTitle: "Oasis - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: nas-if-i-ruled-the-world
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "If I Ruled the World — Nas ft. Lauryn Hill"
     correctYear: 1996
     probability: 85
@@ -832,6 +902,7 @@ items:
         endSec: 30
         channelTitle: "Nas"
   - id: bjorn-skifs-fangad-i-en-drom
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Fångad i en dröm — Björn Skifs"
     correctYear: 1981
     probability: 68
@@ -845,6 +916,7 @@ items:
         notes: "Melodifestivalen 1981 vinnare."
     genrePackages: ["Eurovision"]
   - id: chips-dag-efter-dag
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Dag efter dag — Chips"
     correctYear: 1982
     probability: 70
@@ -857,6 +929,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 1982 vinnare. ESC 1982 performance."
   - id: herreys-diggiloo-diggiley
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Diggi-Loo Diggi-Ley — Herreys"
     correctYear: 1984
     probability: 74
@@ -870,6 +943,7 @@ items:
         notes: "Melodifestivalen 1984 vinnare, ESC-vinnare 1984."
     genrePackages: ["Eurovision"]
   - id: kikki-danielsson-bra-vibrationer
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Bra vibrationer — Kikki Danielsson"
     correctYear: 1985
     probability: 78
@@ -884,6 +958,7 @@ items:
         notes: "Melodifestivalen 1985 vinnare. ESC 1985 performance."
     genrePackages: ["Eurovision"]
   - id: lotta-engberg-fyra-bugg
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Fyra bugg och en Coca Cola — Lotta Engberg"
     correctYear: 1987
     probability: 72
@@ -897,6 +972,7 @@ items:
         notes: "Melodifestivalen 1987 vinnare."
     genrePackages: ["Eurovision"]
   - id: tommy-korberg-stad-i-ljus
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Stad i ljus — Tommy Körberg"
     correctYear: 1988
     probability: 70
@@ -910,6 +986,7 @@ items:
         notes: "Melodifestivalen 1988 vinnare. ESC 1988 performance."
     genrePackages: ["Eurovision"]
   - id: carola-fangad-av-en-stormvind
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Fångad av en stormvind — Carola"
     correctYear: 1991
     probability: 78
@@ -922,6 +999,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 1991 vinnare, ESC-vinnare 1991."
   - id: arvingarna-eloise
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Eloise — Arvingarna"
     correctYear: 1993
     probability: 72
@@ -936,6 +1014,7 @@ items:
     genrePackages: ["Eurovision"]
   # ===== Eurovision Song Contest vinnare =====
   - id: bucks-fizz-making-your-mind-up
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Making Your Mind Up — Bucks Fizz"
     correctYear: 1981
     probability: 72
@@ -948,6 +1027,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1981 vinnare — Storbritannien."
   - id: nicole-ein-bisschen-frieden
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Ein bißchen Frieden — Nicole"
     correctYear: 1982
     probability: 70
@@ -960,6 +1040,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1982 vinnare — Tyskland."
   - id: corinne-hermes-si-la-vie-est-cadeau
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Si la vie est cadeau — Corinne Hermès"
     correctYear: 1983
     probability: 64
@@ -973,6 +1054,7 @@ items:
         notes: "ESC 1983 vinnare — Luxemburg."
     genrePackages: ["Eurovision"]
   - id: bobbysocks-la-det-swinge
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "La det swinge — Bobbysocks!"
     correctYear: 1985
     probability: 70
@@ -985,6 +1067,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1985 vinnare — Norge."
   - id: sandra-kim-jaime-la-vie
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "J'aime la vie — Sandra Kim"
     correctYear: 1986
     probability: 68
@@ -998,6 +1081,7 @@ items:
         notes: "ESC 1986 vinnare — Belgien."
     genrePackages: ["Eurovision"]
   - id: johnny-logan-hold-me-now
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Hold Me Now — Johnny Logan"
     correctYear: 1987
     probability: 72
@@ -1011,6 +1095,7 @@ items:
         notes: "ESC 1987 vinnare — Irland."
     genrePackages: ["Eurovision"]
   - id: celine-dion-ne-partez-pas
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Ne partez pas sans moi — Céline Dion"
     correctYear: 1988
     probability: 86
@@ -1024,6 +1109,7 @@ items:
         notes: "ESC 1988 vinnare — Schweiz."
     genrePackages: ["Eurovision"]
   - id: riva-rock-me
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Rock Me — Riva"
     correctYear: 1989
     probability: 68
@@ -1039,6 +1125,7 @@ items:
     region: ["europe"]
     inBaseCatalog: false
   - id: toto-cutugno-insieme
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Insieme: 1992 — Toto Cutugno"
     correctYear: 1990
     probability: 70
@@ -1052,6 +1139,7 @@ items:
         notes: "ESC 1990 vinnare — Italien."
     genrePackages: ["Eurovision"]
   - id: linda-martin-why-me
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Why Me? — Linda Martin"
     correctYear: 1992
     probability: 68
@@ -1065,6 +1153,7 @@ items:
         notes: "ESC 1992 vinnare — Irland."
     genrePackages: ["Eurovision"]
   - id: niamh-kavanagh-in-your-eyes
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "In Your Eyes — Niamh Kavanagh"
     correctYear: 1993
     probability: 68
@@ -1080,6 +1169,7 @@ items:
         notes: "ESC 1993 vinnare — Irland."
     genrePackages: ["Eurovision"]
   - id: paul-harrington-rock-n-roll-kids
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Rock 'n' Roll Kids — Paul Harrington & Charlie McGettigan"
     correctYear: 1994
     probability: 66
@@ -1093,6 +1183,7 @@ items:
         notes: "ESC 1994 vinnare — Irland."
     genrePackages: ["Eurovision"]
   - id: secret-garden-nocturne
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Nocturne — Secret Garden"
     correctYear: 1995
     probability: 74
@@ -1106,6 +1197,7 @@ items:
         notes: "ESC 1995 vinnare — Norge."
     genrePackages: ["Eurovision"]
   - id: eimear-quinn-the-voice
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "The Voice — Eimear Quinn"
     correctYear: 1996
     probability: 66
@@ -1119,6 +1211,7 @@ items:
         notes: "ESC 1996 vinnare — Irland."
     genrePackages: ["Eurovision"]
   - id: lotta-engberg-successchottis
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Succéschottis — Lotta Engberg"
     correctYear: 1987
     probability: 80
@@ -1132,6 +1225,7 @@ items:
         channelTitle: "Fan upload"
         notes: "Fan-uppladdning av studio-inspelning 1987. Inget officiellt Topic-klipp."
   - id: niklas-stromstedt-oslagbara
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Oslagbara — Niklas Strömstedt"
     correctYear: 1992
     probability: 76
@@ -1145,6 +1239,7 @@ items:
         channelTitle: "WM Sweden"
         notes: "Officiell WM Sweden. Album Halvvägs till framtiden (1992)."
   - id: sven-ingvars-sommar-i-sverige
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Sommar i Sverige — Sven-Ingvars"
     correctYear: 1994
     probability: 80
@@ -1159,6 +1254,7 @@ items:
         notes: "Officiell Parlophone/WM Group. Album Byns enda blondin (1994)."
 
   - id: gyllene-tider-juni-juli-augusti
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Juni, juli, augusti — Gyllene Tider"
     correctYear: 1981
     probability: 90
@@ -1174,6 +1270,7 @@ items:
         notes: "Studio-audio från officiell Topic-kanal."
 
   - id: kaoma-lambada
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Lambada — Kaoma"
     correctYear: 1989
     probability: 88
@@ -1188,6 +1285,7 @@ items:
         channelTitle: "Club Music 80"
         notes: "Officiell musikvideo-re-upload — stabil sedan 2014."
   - id: elton-john-im-still-standing
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "I'm Still Standing — Elton John"
     correctYear: 1983
     probability: 83
@@ -1200,6 +1298,7 @@ items:
         channelTitle: "Elton John"
         notes: "Official music video."
   - id: thomas-di-leva-vi-har-bara-varandra
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Vi har bara varandra — Thomas Di Leva"
     correctYear: 1988
     probability: 80
@@ -1213,6 +1312,7 @@ items:
         channelTitle: "Thomas Di Leva"
         notes: "Official video."
   - id: ronny-ragge-de-e-sommar
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "De e sommar — Ronny & Ragge"
     correctYear: 1989
     probability: 82
@@ -1227,6 +1327,7 @@ items:
         channelTitle: "Ronny & Ragge"
         notes: "Official video."
   - id: scatman-john-scatman
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Scatman (Ski-Ba-Bop-Ba-Dop-Bop) — Scatman John"
     correctYear: 1994
     probability: 86
@@ -1240,6 +1341,7 @@ items:
         notes: "Official music video."
   # === Tillägg 2026-08-11 (Peters lista) ===
   - id: lionel-richie-all-night-long
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "All Night Long (All Night) — Lionel Richie"
     correctYear: 1983
     probability: 84
@@ -1248,6 +1350,7 @@ items:
     spotifyTrackId: "4czNORk5MjW5WOn98bki32"
     youtubeClips: []
   - id: bonnie-tyler-total-eclipse-of-the-heart
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Total Eclipse of the Heart — Bonnie Tyler"
     correctYear: 1983
     probability: 88
@@ -1256,6 +1359,7 @@ items:
     spotifyTrackId: "63nyotHMEI8PrEZB2FL4DZ"
     youtubeClips: []
   - id: bryan-adams-heaven
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Heaven — Bryan Adams"
     correctYear: 1984
     probability: 84
@@ -1270,6 +1374,7 @@ items:
         notes: "Officiell musikvideo, artistens egen kanal. Peter-kurerad 2026-08-11."
     notes: "correctYear = albumet Reckless (1984), valt av Peter 2026-08-11. Laten fanns tekniskt sett redan pa soundtracket till A Night in Heaven (1983) men den releasen ar for obskyr for att vara ett rimligt quizsvar. Singeln kom forst i april 1985 (da den blev en hit)."
   - id: cyndi-lauper-true-colors
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "True Colors — Cyndi Lauper"
     correctYear: 1986
     probability: 84
@@ -1278,6 +1383,7 @@ items:
     youtubeClips: []
     notes: "SAKNAR MEDIA - Peter angav ingen lank (YT-lanken i listan gick till Girls Just Want to Have Fun, som redan finns i katalogen). Alla Spotify-traffar jag hittade ar samlingsskivor (2017/2019). Behover kurerat track-ID eller YT-klipp innan export."
   - id: def-leppard-pour-some-sugar-on-me
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Pour Some Sugar on Me — Def Leppard"
     correctYear: 1987
     probability: 84
@@ -1294,6 +1400,7 @@ items:
         notes: "Peter-kurerad 2026-08-12. Officiella musikvideon på bandets egen kanal."
     notes: "correctYear = albumet Hysteria (3 aug 1987), forsta gangen laten gick att hora. UK-singeln kom sept 1987, US-singeln forst april 1988."
   - id: guns-n-roses-sweet-child-o-mine
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Sweet Child o' Mine — Guns N' Roses"
     correctYear: 1987
     probability: 90
@@ -1310,6 +1417,7 @@ items:
         notes: "Lyric-video, katalogens standard-lyric-kanal. Peter-kurerad 2026-08-11."
     notes: "correctYear = albumet Appetite for Destruction (21 juli 1987), forsta gangen laten gick att hora. Singeln kom forst 3 juni 1988."
   - id: orup-da-star-pojkarna-pa-rad
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Då står pojkarna på rad — Orup"
     correctYear: 1989
     probability: 82
@@ -1321,6 +1429,7 @@ items:
     spotifyTrackId: "0fN96hLpE08LmXFfS5VmdE"
     youtubeClips: []
   - id: orup-magaluf
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Magaluf — Orup"
     correctYear: 1992
     probability: 82
@@ -1332,6 +1441,7 @@ items:
     spotifyTrackId: "39ADGrzCrbWwTFlhDcsf9P"
     youtubeClips: []
   - id: shakespears-sister-stay
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Stay — Shakespears Sister"
     correctYear: 1992
     probability: 78
@@ -1344,6 +1454,7 @@ items:
         channelTitle: "London Records"
         notes: "Officiell musikvideo, label-kanal. Peter-kurerad 2026-08-11."
   - id: orup-flickan-ovanpa
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Flickan ovanpå — Orup"
     correctYear: 1996
     probability: 78
@@ -1357,6 +1468,7 @@ items:
   # === Tillagg 2026-08-14 (Peters 80-talslista) ===
   # --- 1981 ---
   - id: phil-collins-in-the-air-tonight
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "In the Air Tonight — Phil Collins"
     correctYear: 1981
     probability: 88
@@ -1369,6 +1481,7 @@ items:
         notes: "Peter-kurerad 2026-08-14, startSec angiven av Peter. Kanal ej verifierad."
     notes: "correctYear = singeln (5 jan 1981), strax fore albumet Face Value (13 feb 1981)."
   - id: human-league-dont-you-want-me
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Don't You Want Me — The Human League"
     correctYear: 1981
     probability: 84
@@ -1382,6 +1495,7 @@ items:
     notes: "correctYear = albumet Dare (okt 1981), forsta gangen laten gick att hora. Singeln kom i nov 1981."
   # --- 1982 ---
   - id: prince-1999
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "1999 — Prince"
     correctYear: 1982
     probability: 84
@@ -1394,6 +1508,7 @@ items:
         notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
     notes: "correctYear = singeln (sept 1982), strax fore albumet 1999 (okt 1982). OBS: latens titel ar sjalv ett artal men INTE svaret — svaret ar 1982."
   - id: prince-little-red-corvette
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Little Red Corvette — Prince"
     correctYear: 1982
     probability: 80
@@ -1407,6 +1522,7 @@ items:
     notes: "correctYear = albumet 1999 (okt 1982), forsta gangen laten gick att hora. Singeln kom forst i feb 1983."
   # --- 1983 ---
   - id: rufus-chaka-khan-aint-nobody
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Ain't Nobody — Rufus and Chaka Khan"
     correctYear: 1983
     probability: 80
@@ -1418,6 +1534,7 @@ items:
         endSec: 30
         notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
   - id: yes-owner-of-a-lonely-heart
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Owner of a Lonely Heart — Yes"
     correctYear: 1983
     probability: 80
@@ -1430,6 +1547,7 @@ items:
         notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
     notes: "correctYear = singeln (okt 1983), knappt en manad fore albumet 90125 (7 nov 1983) — bada vagarna ger 1983. Laten toppade Billboard Hot 100 forst i jan 1984; chart-peak ar aldrig svaret."
   - id: zz-top-gimme-all-your-lovin
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Gimme All Your Lovin' — ZZ Top"
     correctYear: 1983
     probability: 78
@@ -1446,6 +1564,7 @@ items:
     notes: "correctYear = 1983 (albumet Eliminator 23 mars 1983, ledande singel samma var) — bada vagarna ger 1983. Paket-exklusiv per Peters beslut 2026-08-14, samma monster som def-leppard-pour-some-sugar-on-me och guns-n-roses-sweet-child-o-mine (genrePackages + inBaseCatalog: false)."
   # --- 1984 ---
   - id: laura-branigan-self-control
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Self Control — Laura Branigan"
     correctYear: 1984
     probability: 82
@@ -1457,6 +1576,7 @@ items:
         endSec: 60
         notes: "Peter-kurerad 2026-08-14, startSec angiven av Peter. Kanal ej verifierad."
   - id: foreigner-i-want-to-know-what-love-is
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "I Want to Know What Love Is — Foreigner"
     correctYear: 1984
     probability: 84
@@ -1469,6 +1589,7 @@ items:
         notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
     notes: "correctYear = singeln (19 nov 1984), strax fore albumet Agent Provocateur (6 dec 1984)."
   - id: queen-i-want-to-break-free
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "I Want to Break Free — Queen"
     correctYear: 1984
     probability: 88
@@ -1481,6 +1602,7 @@ items:
         notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
     notes: "correctYear = albumet The Works (feb 1984), forsta gangen laten gick att hora. Singeln kom i april 1984."
   - id: talk-talk-its-my-life
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "It's My Life — Talk Talk"
     correctYear: 1984
     probability: 76
@@ -1493,6 +1615,7 @@ items:
         notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
     notes: "correctYear = singeln (jan 1984), strax fore albumet It's My Life (4 feb 1984). OBS: katalogen har aven It's My Life av Bon Jovi (2000) och Dr. Alban (1992) — separata later, ej dubbletter."
   - id: prince-when-doves-cry
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "When Doves Cry — Prince and the Revolution"
     correctYear: 1984
     probability: 84
@@ -1506,6 +1629,7 @@ items:
     notes: "correctYear = singeln (16 maj 1984), fore albumet Purple Rain (25 juni 1984)."
   # --- 1985 ---
   - id: madonna-into-the-groove
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Into the Groove — Madonna"
     correctYear: 1985
     probability: 86
@@ -1518,6 +1642,7 @@ items:
         notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
     notes: "correctYear = 1985 (filmen Desperately Seeking Susan + singeln, bada 1985)."
   - id: bowie-jagger-dancing-in-the-street
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Dancing in the Street — David Bowie & Mick Jagger"
     correctYear: 1985
     probability: 80
@@ -1530,6 +1655,7 @@ items:
         notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
     notes: "correctYear = 1985 (valgorenhetssingel for Live Aid, aug 1985). Ar-policy: en tidigare inspelning av en ANNAN artist raknas inte — Martha and the Vandellas original (1964) ar alltsa INTE svaret."
   - id: kate-bush-running-up-that-hill
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Running Up That Hill — Kate Bush"
     correctYear: 1985
     probability: 84
@@ -1542,6 +1668,7 @@ items:
         notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
     notes: "correctYear = singeln (aug 1985), strax fore albumet Hounds of Love (sept 1985). Stranger Things-aterkomsten 2022 ar inte relevant for arsvaret."
   - id: eddie-murphy-party-all-the-time
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Party All the Time — Eddie Murphy"
     correctYear: 1985
     probability: 74
@@ -1553,6 +1680,7 @@ items:
         endSec: 75
         notes: "Peter-kurerad 2026-08-14, startSec angiven av Peter. Kanal ej verifierad."
   - id: david-lee-roth-california-girls
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "California Girls — David Lee Roth"
     correctYear: 1985
     probability: 72
@@ -1565,6 +1693,7 @@ items:
         notes: "Peter-kurerad 2026-08-14, startSec angiven av Peter. Kanal ej verifierad."
     notes: "correctYear = EP:n Crazy from the Heat (jan 1985). Ar-policy: Beach Boys original (1965) ar en ANNAN artist och raknas inte."
   - id: dire-straits-walk-of-life
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Walk of Life — Dire Straits"
     correctYear: 1985
     probability: 82
@@ -1577,6 +1706,7 @@ items:
         notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
     notes: "correctYear = albumet Brothers in Arms (13 maj 1985), forsta gangen laten gick att hora. Singeln kom i nov 1985."
   - id: pet-shop-boys-west-end-girls
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "West End Girls — Pet Shop Boys"
     correctYear: 1985
     probability: 80
@@ -1590,6 +1720,7 @@ items:
     notes: "correctYear = 1985 ars ominspelning (singel okt 1985), den som blev hit och den vi spelar. Bandets egen Bobby-O-version fran april 1984 floppade — samma undantagsresonemang som a-ha Take on Me. Albumet Please kom 1986."
   # --- 1986 ---
   - id: madonna-la-isla-bonita
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "La Isla Bonita — Madonna"
     correctYear: 1986
     probability: 84
@@ -1602,6 +1733,7 @@ items:
         notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
     notes: "correctYear = albumet True Blue (juni 1986), forsta gangen laten gick att hora. Singeln kom forst i feb 1987."
   - id: peter-cetera-glory-of-love
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Glory of Love — Peter Cetera"
     correctYear: 1986
     probability: 76
@@ -1614,6 +1746,7 @@ items:
         notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
     notes: "correctYear = singeln (maj 1986), fore albumet Solitude/Solitaire (juli 1986)."
   - id: peter-gabriel-sledgehammer
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Sledgehammer — Peter Gabriel"
     correctYear: 1986
     probability: 82
@@ -1626,6 +1759,7 @@ items:
         notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
     notes: "correctYear = singeln (21 april 1986), knappt en manad fore albumet So (19 maj 1986) — bada vagarna ger 1986."
   - id: prince-kiss
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Kiss — Prince and the Revolution"
     correctYear: 1986
     probability: 84
@@ -1642,6 +1776,7 @@ items:
     notes: "correctYear = singeln (5 feb 1986), fore albumet Parade (31 mars 1986). Paket-exklusiv per Peters 'Package: Love & Peace' — samma monster som rock-paketet (genrePackages + inBaseCatalog: false)."
   # --- 1987 ---
   - id: starship-nothings-gonna-stop-us-now
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Nothing's Gonna Stop Us Now — Starship"
     correctYear: 1987
     probability: 84
@@ -1654,6 +1789,7 @@ items:
         notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
     notes: "correctYear = singeln (feb 1987, temalat till filmen Mannequin), fore albumet No Protection (aug 1987)."
   - id: fleetwood-mac-everywhere
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Everywhere — Fleetwood Mac"
     correctYear: 1987
     probability: 80
@@ -1666,6 +1802,7 @@ items:
         notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
     notes: "correctYear = albumet Tango in the Night (april 1987), forsta gangen laten gick att hora. Singeln kom i nov 1987."
   - id: fleetwood-mac-seven-wonders
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Seven Wonders — Fleetwood Mac"
     correctYear: 1987
     probability: 74
@@ -1678,6 +1815,7 @@ items:
         notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
     notes: "correctYear = albumet Tango in the Night (april 1987); singeln kom i maj 1987."
   - id: george-michael-faith
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Faith — George Michael"
     correctYear: 1987
     probability: 84
@@ -1690,6 +1828,7 @@ items:
         notes: "Peter-kurerad 2026-08-14, startSec angiven av Peter. Kanal ej verifierad."
     notes: "correctYear = singeln (12 okt 1987), strax fore albumet Faith (30 okt 1987)."
   - id: george-harrison-got-my-mind-set-on-you
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Got My Mind Set on You — George Harrison"
     correctYear: 1987
     probability: 78
@@ -1702,6 +1841,7 @@ items:
         notes: "Peter-kurerad 2026-08-14. Videotitel verifierad: '\"Got My Mind Set On You\" Version 2 (From the album \"Cloud 9\")' — Peter angav ingen lattitel, harledd ur klippet. Titeln rojer albumnamnet men inte aret."
     notes: "correctYear = singeln (12 okt 1987), fore albumet Cloud Nine (2 nov 1987). Ar-policy: laten ar en cover — James Ray spelade in originalet 1962 — men en tidigare inspelning av en ANNAN artist raknas inte, sa svaret ar Harrisons egen inspelning 1987."
   - id: whitesnake-here-i-go-again
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Here I Go Again — Whitesnake"
     correctYear: 1987
     probability: 80
@@ -1711,6 +1851,7 @@ items:
     notes: "SAKNAR MEDIA — Peter angav ingen lank (bara 'startsec60'). Behover kurerat YT-klipp innan den kan exporteras; satt startSec: 60 nar klippet laggs in. correctYear = 1987 ars ominspelning, den som blev hit och den vi spelar; bandets egen original fran albumet Saints & Sinners (1982) ar betydligt mindre kand — samma undantagsresonemang som a-ha Take on Me."
   # --- 1988 ---
   - id: kylie-minogue-the-loco-motion
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "The Loco-Motion — Kylie Minogue"
     correctYear: 1988
     probability: 82
@@ -1724,6 +1865,7 @@ items:
     notes: "correctYear = 1988 ars internationella ominspelning (The Loco-Motion), den som slog i Sverige och den klippet visar. Hennes australiska original 'Locomotion' kom juli 1987 — samma undantagsresonemang som a-ha Take on Me. Ar-policy: Little Eva (1962) och Grand Funk (1974) ar ANDRA artister och raknas inte."
   # --- 1989 ---
   - id: b52s-love-shack
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Love Shack — The B-52's"
     correctYear: 1989
     probability: 82
@@ -1736,6 +1878,7 @@ items:
         notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
     notes: "correctYear = singeln (20 juni 1989), veckan fore albumet Cosmic Thing (27 juni 1989) — bada 1989 oavsett vilken som raknas."
   - id: madonna-express-yourself
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Express Yourself — Madonna"
     correctYear: 1989
     probability: 82
@@ -1748,6 +1891,7 @@ items:
         notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
     notes: "correctYear = albumet Like a Prayer (21 mars 1989), forsta gangen laten gick att hora. Singeln kom 9 maj 1989. Samma album som itemet madonna-like-a-prayer, aven det 1989."
   - id: tina-turner-the-best
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "The Best — Tina Turner"
     correctYear: 1989
     probability: 84
@@ -1759,3 +1903,97 @@ items:
         endSec: 30
         notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
     notes: "correctYear = singeln (aug 1989), fore albumet Foreign Affair (13 sept 1989). Ar-policy: laten ar en cover — Bonnie Tyler spelade in originalet 1988 pa Hide Your Heart — men en tidigare inspelning av en ANNAN artist raknas inte, sa svaret ar Tinas egen inspelning 1989."
+  # === Tillagg 2026-08-14 (Peters Dr. Alban- + global-lista) ===
+  # Dr. Alban: samtliga items region ["europe"] per Peter — svensk-nigeriansk
+  # eurodance med bred europeisk igenkanning, men ingen global rackvidd.
+  # Alla klipp fran artistens egen YouTube-kanal (@OfficialDrAlban).
+  - id: dr-alban-no-coke
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "No Coke — Dr. Alban"
+    correctYear: 1990
+    probability: 74
+    region: ["europe"]
+    wikimediaSearchHints: ["Dr Alban No Coke Hello Afrika"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "4uPDfuC3Jck"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Dr. Alban"
+        notes: "Peter-kurerad 2026-08-14. Videotitel verifierad: 'Dr. Alban - No Coke (Official 4K Video)' — inget ar i titeln."
+    notes: "correctYear = 1990. Bade debutalbumet Hello Afrika och singeln (3 nov 1990) kom samma ar."
+  - id: dr-alban-sing-hallelujah
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Sing Hallelujah! — Dr. Alban"
+    correctYear: 1992
+    probability: 78
+    region: ["europe"]
+    wikimediaSearchHints: ["Dr Alban Sing Hallelujah One Love"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "pKxJca7LLNM"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Dr. Alban"
+        notes: "Peter-kurerad 2026-08-14. Videotitel verifierad: 'Dr. Alban - Sing Hallelujah (Official 4K Video)' — inget ar i titeln."
+    notes: "correctYear = albumet One Love (23 nov 1992), dar laten ligger som spar 3 pa ORIGINALutgavan. Singeln kom forst 1 feb 1993 — ar-policyn tar den tidigaste av album/singel, alltsa 1992. Andra INTE till 1993."
+  - id: dr-alban-let-the-beat-go-on
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Let the Beat Go On — Dr. Alban"
+    correctYear: 1994
+    probability: 74
+    region: ["europe"]
+    wikimediaSearchHints: ["Dr Alban Let the Beat Go On Look Whos Talking"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "oKs25yuV3_A"
+        startSec: 20
+        endSec: 50
+        channelTitle: "Dr. Alban"
+        notes: "Peter-kurerad 2026-08-14 med explicit startSec 20. Videotitel verifierad: 'Dr Alban - Let The Beat Go On (Official HD Video)' — inget ar i titeln."
+    notes: "correctYear = albumet Look Who's Talking! (25 mars 1994), fore singeln (aug 1994)."
+  - id: dr-alban-look-whos-talking
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Look Who's Talking! — Dr. Alban"
+    correctYear: 1994
+    probability: 70
+    region: ["europe"]
+    wikimediaSearchHints: ["Dr Alban Look Whos Talking 1994"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "n1dk78L0XzI"
+        startSec: 5
+        endSec: 35
+        channelTitle: "Dr. Alban"
+        notes: "Peter-kurerad 2026-08-14 med explicit startSec 5. Videotitel verifierad: 'Dr. Alban - Look Who's Talking (Official 4K Video)' — inget ar i titeln."
+    notes: "correctYear = albumet Look Who's Talking! (25 mars 1994) och titelsingeln samma ar. Samma album som dr-alban-let-the-beat-go-on."
+  - id: snap-the-power
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "The Power — SNAP!"
+    correctYear: 1990
+    probability: 84
+    region: ["global"]
+    wikimediaSearchHints: ["Snap The Power 1990 World Power"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "nm6DO_7px1I"
+        startSec: 10
+        endSec: 40
+        channelTitle: "SNAP!"
+        notes: "Peter-kurerad 2026-08-14 med explicit startSec 10. Videotitel verifierad: 'SNAP! - The Power (Official 4K Music Video)' pa gruppens egen kanal — inget ar i titeln."
+    notes: "correctYear = singeln (jan 1990), fore albumet World Power (mars 1990). Katalogen har aven snap-rhythm-is-a-dancer (1992) — separat lat, ej dubblett."
+  - id: modern-talking-youre-my-heart-youre-my-soul
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "You're My Heart, You're My Soul — Modern Talking"
+    correctYear: 1984
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Modern Talking Youre My Heart Youre My Soul 1984"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "4kHl4FoK1Ys"
+        startSec: 0
+        endSec: 30
+        channelTitle: "ModernTalkingVEVO"
+        notes: "Ersatte Peters lank 8ikFTY8fbwo 2026-08-14: den var '98-nyinspelningen (Ft. Eric Singleton) med \"'98\" i titeln — fel inspelning for ett 1984-svar. Detta ar originalvideon fran artistens VEVO-kanal, ingen arsangivelse i titeln."
+    notes: "correctYear = singeln (okt 1984), fore The 1st Album (1985). OBS: spela ALDRIG '98-versionen har — den gor svaret 1984 obegripligt."

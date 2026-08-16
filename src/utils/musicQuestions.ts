@@ -46,7 +46,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "movie",
     "questionText": "Which Year was this Movie launched?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -69,7 +73,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -84,7 +92,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -107,7 +119,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -130,7 +146,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -153,7 +173,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "movie",
     "questionText": "Which Year was this Movie launched?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -176,7 +200,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -199,7 +227,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -214,7 +246,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -247,7 +283,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -280,7 +320,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "movie",
     "questionText": "Which Year was this Movie launched?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -303,7 +347,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -337,7 +385,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -360,7 +412,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -383,7 +439,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -406,7 +466,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -429,7 +493,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -452,7 +520,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -475,7 +547,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -490,7 +566,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -524,7 +604,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -547,7 +631,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "movie",
     "questionText": "Which Year was this Movie launched?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -570,7 +658,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -593,7 +685,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -616,7 +712,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -639,7 +739,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -662,7 +766,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -685,7 +793,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -708,7 +820,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -731,7 +847,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -754,7 +874,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -777,7 +901,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -800,7 +928,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -823,7 +955,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -846,7 +982,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -869,7 +1009,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -892,7 +1036,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -915,7 +1063,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -938,7 +1090,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -962,7 +1118,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -985,7 +1145,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1008,7 +1172,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1032,7 +1200,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1055,7 +1227,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1078,8 +1254,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1102,8 +1281,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1126,8 +1308,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1150,8 +1335,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1174,8 +1362,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1198,8 +1389,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1222,8 +1416,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1246,7 +1443,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -1279,8 +1480,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1303,8 +1507,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1327,8 +1534,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1352,8 +1562,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1368,8 +1581,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1393,8 +1609,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1418,8 +1637,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1442,8 +1664,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1466,8 +1691,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1490,8 +1718,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1514,8 +1745,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1538,8 +1772,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1562,8 +1799,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1586,8 +1826,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1610,8 +1853,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1634,8 +1880,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1658,8 +1907,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1682,8 +1934,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1706,8 +1961,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1730,8 +1988,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1754,8 +2015,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1778,8 +2042,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1802,8 +2069,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1826,8 +2096,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1853,8 +2126,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1877,8 +2153,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1901,7 +2180,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1924,8 +2207,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1948,7 +2234,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1982,8 +2272,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2009,8 +2302,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2034,8 +2330,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2061,8 +2360,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2085,8 +2387,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2109,8 +2414,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2134,8 +2442,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2158,7 +2469,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "movie",
     "questionText": "Which Year was this Movie launched?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2181,8 +2496,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2205,8 +2523,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2233,8 +2554,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2261,8 +2585,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2289,7 +2616,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2312,8 +2643,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2336,8 +2670,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2360,8 +2697,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2385,8 +2725,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2410,8 +2753,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2434,7 +2780,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -2462,14 +2812,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "kc-sunshine-band-thats-the-way-i-like-it",
+    "displayName": "That's the Way (I Like It) — KC and the Sunshine Band",
+    "correctYear": 1975,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "2UB8P0UImzw",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "KC and the Sunshine Band - Topic",
+        "license": "standard",
+        "notes": "Ersatte Peters lank O0_H3F84Yjk 2026-08-14: den hade '1975' i videotiteln (= svaret), var SD och embed-blockerad i 2 regioner utan servad region. Detta ar officiell Topic-audio, HD, ren titel utan arsangivelse. OBS statisk albumkonst — byt garna till en officiell video om en oblockerad hittas."
+      }
+    ]
+  },
+  {
     "id": "lasse-berghagen-en-kvall-i-juni",
     "displayName": "En kväll i juni — Lasse Berghagen",
     "correctYear": 1975,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2496,8 +2876,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2520,8 +2903,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2547,8 +2933,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2574,7 +2963,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2589,7 +2982,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2604,8 +3001,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2628,7 +3028,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -2651,7 +3055,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2687,7 +3095,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2710,8 +3122,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2735,8 +3150,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -2759,8 +3177,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2775,8 +3196,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2799,8 +3223,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2826,8 +3253,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2853,8 +3283,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -2880,7 +3313,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2914,8 +3351,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2937,8 +3377,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2961,8 +3404,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -2985,8 +3431,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -3009,7 +3458,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -3043,8 +3496,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -3070,8 +3526,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -3088,14 +3547,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "travolta-newton-john-youre-the-one-that-i-want",
+    "displayName": "You're the One That I Want — John Travolta & Olivia Newton-John",
+    "correctYear": 1978,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "vcseNcBgH5I",
+        "startSec": 20,
+        "endSec": 50,
+        "channelTitle": "Miguel Aching",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-14 med explicit startSec 20. Videotitel verifierad: 'You're The One That I Want (From \"Grease\") · John Travolta · Olivia Newton (REAL 4K)' — inget ar i titeln. Filmscenen dar artisterna framfor sin EGEN lat, godkant per R1-policyn for pre-MTV-era."
+      }
+    ]
+  },
+  {
     "id": "village-people-ymca",
     "displayName": "Y.M.C.A. — Village People",
     "correctYear": 1978,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -3118,8 +3607,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -3145,8 +3637,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -3164,8 +3659,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -3189,7 +3687,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -3212,8 +3714,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -3235,8 +3740,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -3262,7 +3770,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -3285,8 +3797,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -3310,7 +3825,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -3348,7 +3867,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "audiences": [
       "elder",
       "gen-x",
-      "millennials"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -3382,7 +3903,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -3416,7 +3941,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -3439,7 +3968,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -3462,8 +3995,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -3486,8 +4022,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -3514,7 +4053,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -3537,8 +4080,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -3564,8 +4110,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -3590,7 +4139,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "audiences": [
       "elder",
       "gen-x",
-      "millennials"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -3623,8 +4174,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -3651,8 +4205,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -3670,8 +4227,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -3693,7 +4253,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -3726,8 +4290,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -3750,8 +4317,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -3774,8 +4344,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -3797,8 +4370,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -3821,7 +4397,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -3855,8 +4435,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -3879,8 +4462,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -3903,7 +4489,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -3926,8 +4516,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -3950,8 +4543,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -3973,8 +4569,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -3996,8 +4595,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4020,7 +4622,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4043,8 +4649,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4067,8 +4676,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4083,20 +4695,23 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
-        "videoId": "ZoC9_udLNeU",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "David Bowie - Topic",
+        "videoId": "VbD_kBJc_gI",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "David Bowie",
         "license": "standard",
-        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+        "notes": "Peter-kurerad 2026-08-14. Videotitel verifierad: 'David Bowie - Let's Dance (Official Video) [HD]' pa artistens egen kanal — inget ar i titeln. Ersatte Topic-audion (statisk albumkonst)."
       }
     ]
   },
@@ -4107,8 +4722,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4134,8 +4752,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -4158,8 +4779,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4182,8 +4806,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4206,8 +4833,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4230,8 +4860,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4246,8 +4879,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4270,8 +4906,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4293,7 +4932,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4318,8 +4961,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4341,8 +4987,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4366,8 +5015,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4390,7 +5042,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -4413,8 +5069,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4436,8 +5095,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4460,7 +5122,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4483,8 +5149,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4512,7 +5181,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "audiences": [
       "elder",
       "gen-x",
-      "millennials"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4545,8 +5216,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4568,8 +5242,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4586,14 +5263,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "modern-talking-youre-my-heart-youre-my-soul",
+    "displayName": "You're My Heart, You're My Soul — Modern Talking",
+    "correctYear": 1984,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "4kHl4FoK1Ys",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "ModernTalkingVEVO",
+        "license": "standard",
+        "notes": "Ersatte Peters lank 8ikFTY8fbwo 2026-08-14: den var '98-nyinspelningen (Ft. Eric Singleton) med \"'98\" i titeln — fel inspelning for ett 1984-svar. Detta ar originalvideon fran artistens VEVO-kanal, ingen arsangivelse i titeln."
+      }
+    ]
+  },
+  {
     "id": "prince-purple-rain",
     "displayName": "Purple Rain — Prince",
     "correctYear": 1984,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4616,8 +5323,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4639,8 +5349,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4662,8 +5375,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4686,8 +5402,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4710,8 +5429,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4734,8 +5456,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4757,7 +5482,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "movie",
     "questionText": "Which Year was this Movie launched?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -4779,7 +5508,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4813,8 +5546,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4837,8 +5573,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4861,20 +5600,23 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
-        "videoId": "YfAF92Z3iFw",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "LatinHype",
+        "videoId": "Uj2K3rerzT4",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Bad Boy Edd",
         "license": "standard",
-        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
+        "notes": "Peter-kurerad 2026-08-14. Videotitel verifierad: 'Wham! - Wake Me Up Before You Go-Go [Official Music Video]' — inget ar i titeln. Ersatte LatinHype-uppladdningen (score 10)."
       }
     ]
   },
@@ -4885,8 +5627,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4909,7 +5654,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -4942,8 +5691,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4966,8 +5718,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4989,8 +5744,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5012,8 +5770,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5035,8 +5796,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5058,8 +5822,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5081,8 +5848,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5109,8 +5879,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5132,8 +5905,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5155,8 +5931,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5179,8 +5958,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -5203,8 +5985,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -5227,8 +6012,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5251,8 +6039,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5274,8 +6065,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5297,8 +6091,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5320,8 +6117,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5347,7 +6147,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5381,8 +6185,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5404,8 +6211,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5427,8 +6237,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5450,8 +6263,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5473,8 +6289,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5500,8 +6319,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5516,8 +6338,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5543,8 +6368,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5568,8 +6396,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -5592,8 +6423,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5615,7 +6449,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5638,8 +6476,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5662,8 +6503,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -5686,8 +6530,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5710,8 +6557,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5737,8 +6587,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5760,8 +6613,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5785,8 +6641,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5810,8 +6669,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5837,8 +6699,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5864,8 +6729,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5888,7 +6756,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -5911,7 +6783,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5937,8 +6813,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5960,7 +6839,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5993,7 +6876,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6019,8 +6906,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6047,8 +6937,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6070,8 +6963,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6094,8 +6990,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6118,8 +7017,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6146,8 +7048,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6169,8 +7074,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6179,13 +7087,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": []
   },
   {
+    "id": "dr-alban-no-coke",
+    "displayName": "No Coke — Dr. Alban",
+    "correctYear": 1990,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "europe"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "4uPDfuC3Jck",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Dr. Alban",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-14. Videotitel verifierad: 'Dr. Alban - No Coke (Official 4K Video)' — inget ar i titeln."
+      }
+    ]
+  },
+  {
     "id": "home-alone",
     "displayName": "Home Alone",
     "correctYear": 1990,
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6218,8 +7157,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6242,7 +7184,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6268,8 +7214,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6292,8 +7241,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6310,14 +7262,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "snap-the-power",
+    "displayName": "The Power — SNAP!",
+    "correctYear": 1990,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "nm6DO_7px1I",
+        "startSec": 10,
+        "endSec": 40,
+        "channelTitle": "SNAP!",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-14 med explicit startSec 10. Videotitel verifierad: 'SNAP! - The Power (Official 4K Music Video)' pa gruppens egen kanal — inget ar i titeln."
+      }
+    ]
+  },
+  {
     "id": "toto-cutugno-insieme",
     "displayName": "Insieme: 1992 — Toto Cutugno",
     "correctYear": 1990,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6343,8 +7325,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6367,8 +7352,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6391,8 +7379,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6415,8 +7406,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6439,8 +7433,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6463,8 +7460,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6487,8 +7487,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6511,7 +7514,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6534,7 +7541,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6557,8 +7568,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6581,8 +7595,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6606,7 +7623,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "movie",
     "questionText": "Which Year was this Movie launched?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6629,8 +7650,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6653,21 +7677,51 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "spotifyTrackId": "6bjl81yfCztuBXLC9Mqs2N",
     "youtubeClips": [
       {
-        "videoId": "aBJZsHDJvf0",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Dr. Alban - Topic",
+        "videoId": "oW0VovnyjPY",
+        "startSec": 50,
+        "endSec": 80,
+        "channelTitle": "Dr. Alban",
         "license": "standard",
-        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+        "notes": "Peter-kurerad 2026-08-14 med explicit startSec 50. Videotitel verifierad: 'Dr.Alban - It's My Life (Official 4K Video)' pa artistens egen kanal — inget ar i titeln. Ersatte Topic-audion (statisk albumkonst)."
+      }
+    ]
+  },
+  {
+    "id": "dr-alban-sing-hallelujah",
+    "displayName": "Sing Hallelujah! — Dr. Alban",
+    "correctYear": 1992,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "europe"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "pKxJca7LLNM",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Dr. Alban",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-14. Videotitel verifierad: 'Dr. Alban - Sing Hallelujah (Official 4K Video)' — inget ar i titeln."
       }
     ]
   },
@@ -6678,7 +7732,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6701,8 +7759,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6725,8 +7786,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6752,8 +7816,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6777,8 +7844,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6801,8 +7871,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6825,7 +7898,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6852,7 +7929,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6875,7 +7956,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -6908,7 +7993,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6931,8 +8020,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6956,8 +8048,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6983,7 +8078,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7019,7 +8118,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7055,7 +8158,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "audiences": [
       "elder",
       "gen-x",
-      "millennials"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7088,8 +8193,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7106,13 +8214,71 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "dr-alban-let-the-beat-go-on",
+    "displayName": "Let the Beat Go On — Dr. Alban",
+    "correctYear": 1994,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "europe"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "oKs25yuV3_A",
+        "startSec": 20,
+        "endSec": 50,
+        "channelTitle": "Dr. Alban",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-14 med explicit startSec 20. Videotitel verifierad: 'Dr Alban - Let The Beat Go On (Official HD Video)' — inget ar i titeln."
+      }
+    ]
+  },
+  {
+    "id": "dr-alban-look-whos-talking",
+    "displayName": "Look Who's Talking! — Dr. Alban",
+    "correctYear": 1994,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "europe"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "n1dk78L0XzI",
+        "startSec": 5,
+        "endSec": 35,
+        "channelTitle": "Dr. Alban",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-14 med explicit startSec 5. Videotitel verifierad: 'Dr. Alban - Look Who's Talking (Official 4K Video)' — inget ar i titeln."
+      }
+    ]
+  },
+  {
     "id": "forrest-gump",
     "displayName": "Forrest Gump",
     "correctYear": 1994,
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7145,7 +8311,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7168,7 +8338,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7196,8 +8370,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7223,7 +8400,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -7257,7 +8438,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7280,8 +8465,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7305,8 +8493,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7329,8 +8520,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7354,7 +8548,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "movie",
     "questionText": "What is the name of the main character in this film?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7387,7 +8585,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -7410,8 +8612,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7434,7 +8639,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7460,8 +8669,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7484,8 +8696,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7511,7 +8726,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7534,8 +8753,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7559,8 +8781,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7586,7 +8811,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "europe"
@@ -7612,8 +8841,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -7636,8 +8868,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7663,8 +8898,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7687,8 +8925,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7710,8 +8951,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -7734,8 +8978,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7762,7 +9009,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7789,7 +9040,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7812,8 +9067,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7839,8 +9097,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7863,8 +9124,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7887,7 +9151,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7921,7 +9189,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7944,8 +9216,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7960,8 +9235,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7983,8 +9261,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8010,7 +9291,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8038,8 +9323,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8065,7 +9353,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -8088,8 +9380,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8111,8 +9406,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8139,7 +9437,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "movie",
     "questionText": "Which Year was this Movie launched?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8162,8 +9464,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8178,8 +9483,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8203,8 +9511,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8226,8 +9537,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8253,8 +9567,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8280,8 +9597,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8303,8 +9623,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8322,8 +9645,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8346,19 +9672,50 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
-        "videoId": "is6AYSCWwKM",
+        "videoId": "bZlwFBnog7Q",
         "startSec": 0,
-        "endSec": 221,
-        "channelTitle": "Lou Bega Official",
-        "license": "standard"
+        "endSec": 30,
+        "channelTitle": "MVIDEO4K",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-14. Videotitel verifierad: '[4K] Lou Bega - Mambo No. 5 (A Little Bit Of...) (Music Video)' — inget ar i titeln."
+      }
+    ]
+  },
+  {
+    "id": "ricky-martin-livin-la-vida-loca",
+    "displayName": "Livin' la Vida Loca — Ricky Martin",
+    "correctYear": 1999,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "ikDPvDInr00",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "MVIDEO4K",
+        "license": "standard",
+        "notes": "Ersatte Peters lank UxQ7PAerVdE 2026-08-14: samma officiella video men SD (HD-gaten flaggade den). Detta ar 4K-uppladdningen, titel '[4K] Ricky Martin - Livin' La Vida Loca (Music Video)' — inget ar i titeln. Samma kanal som lou-bega-mambo-no-5."
       }
     ]
   },
@@ -8369,7 +9726,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8403,7 +9764,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8430,8 +9795,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8455,8 +9823,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8479,8 +9850,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8502,8 +9876,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8525,7 +9902,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8558,8 +9939,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8581,7 +9965,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8608,8 +9996,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8635,8 +10026,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8662,8 +10056,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8689,7 +10086,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8726,8 +10127,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8742,8 +10146,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8765,8 +10172,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8792,8 +10202,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8811,7 +10224,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8845,8 +10262,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8868,8 +10288,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8892,7 +10315,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -8926,7 +10353,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8953,7 +10384,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "movie",
     "questionText": "Which Year was this Movie launched?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8976,8 +10411,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9003,8 +10441,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9026,8 +10467,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9050,8 +10494,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9073,8 +10520,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9100,8 +10550,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9127,7 +10580,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "movie",
     "questionText": "Which Year was this Movie launched?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9150,8 +10607,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9174,8 +10634,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9202,8 +10665,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9229,8 +10695,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9253,8 +10722,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9277,8 +10749,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9302,7 +10777,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -9336,8 +10815,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9352,8 +10834,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9376,7 +10861,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9402,7 +10891,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9439,8 +10932,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9462,8 +10958,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9489,9 +10988,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
     "audiences": [
+      "elder",
       "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9524,7 +11025,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9547,8 +11052,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9570,8 +11078,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9593,8 +11104,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9620,8 +11134,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9643,8 +11160,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9667,8 +11187,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9691,8 +11214,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9715,8 +11241,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9738,8 +11267,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9765,8 +11297,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9788,7 +11323,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9811,8 +11350,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9838,8 +11380,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9861,8 +11406,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9877,8 +11425,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9901,8 +11452,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9924,8 +11478,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9948,8 +11505,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9975,8 +11535,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9998,8 +11561,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10025,7 +11591,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10048,8 +11618,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10071,8 +11644,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10087,8 +11663,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10111,7 +11690,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -10134,7 +11717,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10168,8 +11755,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10192,7 +11782,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10226,8 +11820,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10249,7 +11846,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10272,8 +11873,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10297,8 +11901,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10320,8 +11927,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10347,8 +11957,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10372,8 +11985,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10396,8 +12012,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10423,8 +12042,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10447,8 +12069,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10470,8 +12095,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10497,8 +12125,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10522,8 +12153,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
       "gen-x",
-      "millennials"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10541,8 +12175,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10564,7 +12201,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -10598,8 +12239,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10625,7 +12269,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10648,8 +12296,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10672,8 +12323,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10699,8 +12353,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10726,8 +12383,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10750,8 +12410,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10774,7 +12437,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10810,8 +12477,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10835,8 +12505,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10858,8 +12531,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10883,8 +12559,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10908,8 +12587,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10933,8 +12615,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10961,8 +12646,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10984,8 +12672,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11008,8 +12699,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11033,7 +12727,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11056,8 +12754,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11081,7 +12782,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11105,8 +12810,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11128,8 +12836,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11155,8 +12866,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11179,8 +12893,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11213,8 +12930,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11236,8 +12956,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11260,8 +12983,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11284,8 +13010,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11309,8 +13038,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11336,8 +13068,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11360,7 +13095,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11383,8 +13122,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11407,8 +13149,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11431,8 +13176,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11454,8 +13202,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11477,8 +13228,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11511,8 +13265,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11538,8 +13295,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11562,8 +13322,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11585,8 +13348,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11609,7 +13375,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "movie",
     "questionText": "Which Year was this Movie launched?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11632,8 +13402,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11655,8 +13428,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11678,8 +13454,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11702,7 +13481,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11728,8 +13511,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11755,8 +13541,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11783,7 +13572,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11806,7 +13599,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -11829,8 +13626,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11853,7 +13653,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "movie",
     "questionText": "What is the name of the main character in this film?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11886,7 +13690,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11923,8 +13731,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11947,7 +13758,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11970,8 +13785,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11986,8 +13804,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12009,8 +13830,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12032,8 +13856,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12059,7 +13886,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12082,7 +13913,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12105,8 +13940,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12121,8 +13959,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12144,7 +13985,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12167,8 +14012,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12190,8 +14038,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12214,8 +14065,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12237,7 +14091,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12256,8 +14114,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12283,8 +14144,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12307,8 +14171,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12332,8 +14199,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12355,7 +14225,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12382,8 +14256,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12406,8 +14283,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12433,8 +14313,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12456,8 +14339,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12483,8 +14369,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12508,8 +14397,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12532,7 +14424,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12556,8 +14452,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12579,8 +14478,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12598,8 +14500,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12622,7 +14527,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12645,8 +14554,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12661,7 +14573,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12680,8 +14596,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12703,8 +14622,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12730,8 +14652,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12753,8 +14678,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12777,8 +14705,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12804,8 +14735,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12831,8 +14765,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12854,8 +14791,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12881,8 +14821,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12906,8 +14849,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12930,8 +14876,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12953,8 +14902,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12981,8 +14933,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -13004,8 +14959,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -13028,8 +14986,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -13052,8 +15013,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -13076,7 +15040,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -13099,8 +15067,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -13126,8 +15097,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -13150,8 +15124,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -13173,8 +15150,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -13200,8 +15180,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -13227,7 +15210,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -13254,8 +15241,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -13281,7 +15271,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -13308,8 +15302,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
     "audiences": [
-      "gen-alpha",
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"

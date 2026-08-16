@@ -9,13 +9,14 @@
 # correctYear = originalrelease-år (INTE Spotify-samlingsskivans år —
 # Sommarkort ligger t.ex. på "Cornelis Bästa" 2004 på Spotify men
 # originalreleasen är 1987 på "Eldorado – äventyret fortsätter...").
-audience: ["all"]
+audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
 region: ["global"]
 category: songs
 contentForm: youtube
 contentSubject: song
 items:
   - id: cornelis-vreeswijk-sommarkort
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Sommarkort (En stund på jorden) — Cornelis Vreeswijk"
     correctYear: 1987
     probability: 80
@@ -27,6 +28,7 @@ items:
     spotifyTrackId: "5lRvBRQJFVWZGRqDm7YkL4"
     youtubeClips: []
   - id: ace-of-base-cruel-summer
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Cruel Summer — Ace of Base"
     correctYear: 1998
     probability: 82
@@ -38,6 +40,7 @@ items:
     spotifyTrackId: "4AxVXHgv0clBuS4dl4S7Gw"
     youtubeClips: []
   - id: mungo-jerry-in-the-summertime
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "In the Summertime — Mungo Jerry"
     correctYear: 1970
     probability: 84
@@ -49,6 +52,7 @@ items:
     spotifyTrackId: "2uzlv8PjqsVvF1DhEahyhy"
     youtubeClips: []
   - id: fresh-prince-summertime
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Summertime — DJ Jazzy Jeff & The Fresh Prince"
     correctYear: 1991
     probability: 82
@@ -60,6 +64,7 @@ items:
     spotifyTrackId: "20XdEFyaUR9C7aDIdq2OAd"
     youtubeClips: []
   - id: inner-circle-sweat
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Sweat (A La La La Long) — Inner Circle"
     correctYear: 1992
     probability: 84
@@ -71,6 +76,7 @@ items:
     spotifyTrackId: "24Si0Kw3pu2RxX1jrbBg5A"
     youtubeClips: []
   - id: rio-shine-on
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Shine On — R.I.O."
     correctYear: 2008
     probability: 76
@@ -87,6 +93,7 @@ items:
         channelTitle: "Kontor.TV"
         notes: "Officiell label-kanal. Peter-kurerad 2026-08-11."
   - id: bananarama-cruel-summer
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Cruel Summer — Bananarama"
     correctYear: 1983
     probability: 82

@@ -1,12 +1,13 @@
 # Skådespelare kända för Gen X.
 # correctYear = födelseår.
-audience: ["gen-x"]
+audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
 region: ["sweden"]
 category: actors
 contentForm: image
 contentSubject: actor
 items:
   - id: arnold-schwarzenegger
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Arnold Schwarzenegger"
     correctYear: 1947
     peakFrom: 1970
@@ -16,6 +17,7 @@ items:
     wikimediaSearchHints: ["Arnold Schwarzenegger"]
     answerMethods: ["timeline", "name-letters"]
   - id: lasse-aberg
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Lasse Åberg"
     correctYear: 1940
     peakFrom: 1963
@@ -24,6 +26,7 @@ items:
     wikimediaSearchHints: ["Lasse Åberg"]
     answerMethods: ["timeline", "name-letters"]
   - id: julia-roberts
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Julia Roberts"
     correctYear: 1967
     peakFrom: 1990
@@ -33,6 +36,7 @@ items:
     wikimediaSearchHints: ["Julia Roberts actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: leonardo-dicaprio
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Leonardo DiCaprio"
     correctYear: 1974
     peakFrom: 1997
@@ -42,6 +46,7 @@ items:
     wikimediaSearchHints: ["Leonardo DiCaprio"]
     answerMethods: ["timeline", "name-letters"]
   - id: tom-cruise
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Tom Cruise"
     correctYear: 1962
     peakFrom: 1985
@@ -51,6 +56,7 @@ items:
     wikimediaSearchHints: ["Tom Cruise actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: meryl-streep
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Meryl Streep"
     correctYear: 1949
     peakFrom: 1972
@@ -60,6 +66,7 @@ items:
     wikimediaSearchHints: ["Meryl Streep actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: robin-williams
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Robin Williams"
     correctYear: 1951
     peakFrom: 1974
@@ -69,6 +76,7 @@ items:
     wikimediaSearchHints: ["Robin Williams actor comedian"]
     answerMethods: ["timeline", "name-letters"]
   - id: robert-de-niro
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Robert De Niro"
     correctYear: 1943
     peakFrom: 1966
@@ -78,6 +86,7 @@ items:
     wikimediaSearchHints: ["Robert De Niro actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: jim-carrey
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Jim Carrey"
     correctYear: 1962
     peakFrom: 1985
@@ -87,6 +96,7 @@ items:
     wikimediaSearchHints: ["Jim Carrey actor comedian"]
     answerMethods: ["timeline", "name-letters"]
   - id: bruce-willis
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Bruce Willis"
     correctYear: 1955
     peakFrom: 1978
@@ -96,6 +106,7 @@ items:
     wikimediaSearchHints: ["Bruce Willis actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: sigourney-weaver
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Sigourney Weaver"
     correctYear: 1949
     peakFrom: 1972
@@ -105,6 +116,7 @@ items:
     wikimediaSearchHints: ["Sigourney Weaver actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: jack-nicholson
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Jack Nicholson"
     correctYear: 1937
     peakFrom: 1960
@@ -114,6 +126,7 @@ items:
     wikimediaSearchHints: ["Jack Nicholson actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: al-pacino
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Al Pacino"
     correctYear: 1940
     peakFrom: 1963
@@ -123,6 +136,7 @@ items:
     wikimediaSearchHints: ["Al Pacino actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: anthony-hopkins
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Anthony Hopkins"
     correctYear: 1937
     peakFrom: 1960
@@ -132,6 +146,7 @@ items:
     wikimediaSearchHints: ["Anthony Hopkins actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: robert-redford
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Robert Redford"
     correctYear: 1936
     peakFrom: 1959
@@ -141,6 +156,7 @@ items:
     wikimediaSearchHints: ["Robert Redford actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: paul-newman
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Paul Newman"
     correctYear: 1925
     peakFrom: 1948
@@ -150,6 +166,7 @@ items:
     wikimediaSearchHints: ["Paul Newman actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: gene-hackman
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Gene Hackman"
     correctYear: 1930
     peakFrom: 1953
@@ -159,6 +176,7 @@ items:
     wikimediaSearchHints: ["Gene Hackman actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: dustin-hoffman
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Dustin Hoffman"
     correctYear: 1937
     peakFrom: 1960
@@ -168,6 +186,7 @@ items:
     wikimediaSearchHints: ["Dustin Hoffman actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: diane-keaton
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Diane Keaton"
     correctYear: 1946
     peakFrom: 1969
@@ -177,6 +196,7 @@ items:
     wikimediaSearchHints: ["Diane Keaton actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: susan-sarandon
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Susan Sarandon"
     correctYear: 1946
     peakFrom: 1969
@@ -186,6 +206,7 @@ items:
     wikimediaSearchHints: ["Susan Sarandon actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: goldie-hawn
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Goldie Hawn"
     correctYear: 1945
     peakFrom: 1968
@@ -195,6 +216,7 @@ items:
     wikimediaSearchHints: ["Goldie Hawn actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: liam-neeson
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Liam Neeson"
     correctYear: 1952
     peakFrom: 1975
@@ -204,6 +226,7 @@ items:
     wikimediaSearchHints: ["Liam Neeson actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: tom-selleck
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Tom Selleck"
     correctYear: 1945
     peakFrom: 1968
@@ -213,6 +236,7 @@ items:
     wikimediaSearchHints: ["Tom Selleck actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: whoopi-goldberg
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Whoopi Goldberg"
     correctYear: 1955
     peakFrom: 1978
@@ -222,6 +246,7 @@ items:
     wikimediaSearchHints: ["Whoopi Goldberg actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: eddie-murphy
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Eddie Murphy"
     correctYear: 1961
     peakFrom: 1984
@@ -231,6 +256,7 @@ items:
     wikimediaSearchHints: ["Eddie Murphy actor comedian"]
     answerMethods: ["timeline", "name-letters"]
   - id: denzel-washington
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Denzel Washington"
     correctYear: 1954
     peakFrom: 1977
@@ -240,6 +266,7 @@ items:
     wikimediaSearchHints: ["Denzel Washington actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: samuel-l-jackson
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Samuel L. Jackson"
     correctYear: 1948
     peakFrom: 1971
@@ -249,6 +276,7 @@ items:
     wikimediaSearchHints: ["Samuel L Jackson actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: kevin-costner
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Kevin Costner"
     correctYear: 1955
     peakFrom: 1978
@@ -258,6 +286,7 @@ items:
     wikimediaSearchHints: ["Kevin Costner actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: john-travolta
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "John Travolta"
     correctYear: 1954
     peakFrom: 1977
@@ -267,6 +296,7 @@ items:
     wikimediaSearchHints: ["John Travolta actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: patrick-swayze
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Patrick Swayze"
     correctYear: 1952
     peakFrom: 1975
@@ -276,6 +306,7 @@ items:
     wikimediaSearchHints: ["Patrick Swayze actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: pierce-brosnan
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Pierce Brosnan"
     correctYear: 1953
     peakFrom: 1976
@@ -285,6 +316,7 @@ items:
     wikimediaSearchHints: ["Pierce Brosnan actor James Bond"]
     answerMethods: ["timeline", "name-letters"]
   - id: rowan-atkinson
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Rowan Atkinson"
     correctYear: 1955
     peakFrom: 1978
@@ -294,6 +326,7 @@ items:
     wikimediaSearchHints: ["Rowan Atkinson Mr Bean"]
     answerMethods: ["timeline", "name-letters"]
   - id: hugh-grant
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Hugh Grant"
     correctYear: 1960
     peakFrom: 1983
@@ -303,6 +336,7 @@ items:
     wikimediaSearchHints: ["Hugh Grant actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: daniel-craig
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Daniel Craig"
     correctYear: 1968
     peakFrom: 1991
@@ -312,6 +346,7 @@ items:
     wikimediaSearchHints: ["Daniel Craig actor James Bond"]
     answerMethods: ["timeline", "name-letters"]
   - id: jeff-goldblum
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Jeff Goldblum"
     correctYear: 1952
     peakFrom: 1975
@@ -321,6 +356,7 @@ items:
     wikimediaSearchHints: ["Jeff Goldblum actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: joe-pesci
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Joe Pesci"
     correctYear: 1943
     peakFrom: 1966
@@ -330,6 +366,7 @@ items:
     wikimediaSearchHints: ["Joe Pesci actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: bill-murray
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Bill Murray"
     correctYear: 1950
     peakFrom: 1973
@@ -339,6 +376,7 @@ items:
     wikimediaSearchHints: ["Bill Murray actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: michael-douglas
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Michael Douglas"
     correctYear: 1944
     peakFrom: 1967
@@ -348,6 +386,7 @@ items:
     wikimediaSearchHints: ["Michael Douglas actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: michael-keaton
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Michael Keaton"
     correctYear: 1951
     peakFrom: 1974
@@ -357,6 +396,7 @@ items:
     wikimediaSearchHints: ["Michael Keaton actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: gary-oldman
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     region: ["unknown-region"]
     displayName: "Gary Oldman"
     correctYear: 1958
@@ -366,6 +406,7 @@ items:
     wikimediaSearchHints: ["Gary Oldman actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: burt-reynolds
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Burt Reynolds"
     correctYear: 1936
     peakFrom: 1959
@@ -375,6 +416,7 @@ items:
     wikimediaSearchHints: ["Burt Reynolds actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: sharon-stone
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Sharon Stone"
     correctYear: 1958
     peakFrom: 1981
@@ -384,6 +426,7 @@ items:
     wikimediaSearchHints: ["Sharon Stone actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: demi-moore
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Demi Moore"
     correctYear: 1962
     peakFrom: 1985
@@ -393,6 +436,7 @@ items:
     wikimediaSearchHints: ["Demi Moore actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: halle-berry
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Halle Berry"
     correctYear: 1966
     peakFrom: 1989
@@ -402,6 +446,7 @@ items:
     wikimediaSearchHints: ["Halle Berry actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: salma-hayek
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Salma Hayek"
     correctYear: 1966
     peakFrom: 1989
@@ -411,6 +456,7 @@ items:
     wikimediaSearchHints: ["Salma Hayek actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: owen-wilson
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Owen Wilson"
     correctYear: 1968
     peakFrom: 1991
@@ -420,6 +466,7 @@ items:
     wikimediaSearchHints: ["Owen Wilson actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: vince-vaughn
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Vince Vaughn"
     correctYear: 1970
     peakFrom: 1993
@@ -429,6 +476,7 @@ items:
     wikimediaSearchHints: ["Vince Vaughn actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: robert-duvall
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Robert Duvall"
     correctYear: 1931
     peakFrom: 1954
@@ -438,6 +486,7 @@ items:
     wikimediaSearchHints: ["Robert Duvall actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: faye-dunaway
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     region: ["unknown-region"]
     displayName: "Faye Dunaway"
     correctYear: 1941
@@ -447,6 +496,7 @@ items:
     wikimediaSearchHints: ["Faye Dunaway actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: kevin-bacon
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Kevin Bacon"
     correctYear: 1958
     peakFrom: 1981
@@ -456,6 +506,7 @@ items:
     wikimediaSearchHints: ["Kevin Bacon actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: nicolas-cage
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Nicolas Cage"
     correctYear: 1964
     peakFrom: 1987
@@ -465,6 +516,7 @@ items:
     wikimediaSearchHints: ["Nicolas Cage actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: john-cleese
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "John Cleese"
     correctYear: 1939
     peakFrom: 1962
@@ -474,6 +526,7 @@ items:
     wikimediaSearchHints: ["John Cleese actor Monty Python"]
     answerMethods: ["timeline", "name-letters"]
   - id: jodie-foster
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Jodie Foster"
     correctYear: 1962
     peakFrom: 1985
@@ -483,6 +536,7 @@ items:
     wikimediaSearchHints: ["Jodie Foster actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: stellan-skarsgard
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Stellan Skarsgård"
     correctYear: 1951
     peakFrom: 1974
@@ -491,6 +545,7 @@ items:
     wikimediaSearchHints: ["Stellan Skarsgard Swedish actor Mamma Mia Chernobyl"]
     answerMethods: ["timeline", "name-letters"]
   - id: peter-stormare
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Peter Stormare"
     correctYear: 1953
     peakFrom: 1976
@@ -499,6 +554,7 @@ items:
     wikimediaSearchHints: ["Peter Stormare Swedish actor Fargo Big Lebowski"]
     answerMethods: ["timeline", "name-letters"]
   - id: mikael-persbrandt
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Mikael Persbrandt"
     correctYear: 1963
     peakFrom: 1986
@@ -507,6 +563,7 @@ items:
     wikimediaSearchHints: ["Mikael Persbrandt Swedish actor Beck The Hobbit"]
     answerMethods: ["timeline", "name-letters"]
   - id: rolf-lassgard
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Rolf Lassgård"
     correctYear: 1955
     peakFrom: 1978
@@ -515,6 +572,7 @@ items:
     wikimediaSearchHints: ["Rolf Lassgard Swedish actor Wallander A Man Called Ove"]
     answerMethods: ["timeline", "name-letters"]
   - id: lena-olin
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Lena Olin"
     correctYear: 1955
     peakFrom: 1978
@@ -523,6 +581,7 @@ items:
     wikimediaSearchHints: ["Lena Olin Swedish actress Chocolat Unbearable Lightness"]
     answerMethods: ["timeline", "name-letters"]
   - id: dolph-lundgren
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Dolph Lundgren"
     correctYear: 1957
     peakFrom: 1980
@@ -531,6 +590,7 @@ items:
     wikimediaSearchHints: ["Dolph Lundgren Swedish actor Rocky IV Expendables"]
     answerMethods: ["timeline", "name-letters"]
   - id: pernilla-august
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Pernilla August"
     correctYear: 1958
     peakFrom: 1981
@@ -539,6 +599,7 @@ items:
     wikimediaSearchHints: ["Pernilla August Swedish actress Best Intentions Star Wars Shmi"]
     answerMethods: ["timeline", "name-letters"]
   - id: helena-bergstrom
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Helena Bergström"
     correctYear: 1964
     peakFrom: 1987
@@ -548,6 +609,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
   # === Sport-crossover actors 2026-05-27 (idrottare → skådespelare) ===
   - id: vinnie-jones
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Vinnie Jones"
     correctYear: 1965
     peakFrom: 1988
@@ -556,6 +618,7 @@ items:
     wikimediaSearchHints: ["Vinnie Jones English footballer actor Lock Stock Snatch"]
     answerMethods: ["timeline", "name-letters"]
   - id: brian-bosworth
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     region: ["unknown-region"]
     displayName: "Brian Bosworth"
     correctYear: 1965
@@ -565,6 +628,7 @@ items:
     wikimediaSearchHints: ["Brian Bosworth NFL linebacker actor Stone Cold"]
     answerMethods: ["timeline", "name-letters"]
   - id: lasse-brandeby
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Lasse Brandeby"
     correctYear: 1945
     peakFrom: 1968
@@ -573,6 +637,7 @@ items:
     wikimediaSearchHints: ["Lasse Brandeby Swedish actor Kurt Olsson"]
     answerMethods: ["timeline", "name-letters"]
   - id: anders-lundin
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Anders Lundin"
     correctYear: 1963
     peakFrom: 1986
@@ -581,6 +646,7 @@ items:
     wikimediaSearchHints: ["Anders Lundin Swedish TV host Robinson Expedition"]
     answerMethods: ["timeline", "name-letters"]
   - id: eva-remaeus
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Eva Remaeus"
     correctYear: 1962
     peakFrom: 1985
@@ -592,6 +658,7 @@ items:
   # === Batch C 2026-05-27 — international gen-x skådespelare ===
   # (russell-crowe borttagen — fanns redan i actors-millennials)
   - id: ben-stiller
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Ben Stiller"
     correctYear: 1965
     peakFrom: 1988
@@ -601,6 +668,7 @@ items:
     wikimediaSearchHints: ["Ben Stiller actor Zoolander Meet the Parents Night at the Museum"]
     answerMethods: ["timeline", "name-letters"]
   - id: paul-rudd
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Paul Rudd"
     correctYear: 1969
     peakFrom: 1992

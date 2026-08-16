@@ -3,13 +3,14 @@
 # 2018, ABBA Voyage 2022, Spotify-streaming, etc.). audience: ['all']
 # reflekterar denna cross-gen-recognition i V1-svensk-målgrupp.
 # correctYear = bildnings-år (formation year).
-audience: ["all"]
+audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
 region: ["sweden"]
 category: artists
 contentForm: image
 contentSubject: band
 items:
   - id: abba
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "ABBA"
     correctYear: 1972
     probability: 98
@@ -17,6 +18,7 @@ items:
     wikimediaSearchHints: ["ABBA band Sweden"]
     answerMethods: ["timeline", "name-letters"]
   - id: beatles
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "The Beatles"
     correctYear: 1960
     probability: 98
@@ -24,6 +26,7 @@ items:
     wikimediaSearchHints: ["The Beatles band"]
     answerMethods: ["timeline", "name-letters"]
   - id: queen
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Queen"
     correctYear: 1970
     probability: 96
@@ -31,18 +34,21 @@ items:
     wikimediaSearchHints: ["Queen rock band Freddie Mercury"]
     answerMethods: ["timeline", "name-letters"]
   - id: pink-floyd
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Pink Floyd"
     correctYear: 1965
     probability: 90
     wikimediaSearchHints: ["Pink Floyd band"]
     answerMethods: ["timeline", "name-letters"]
   - id: led-zeppelin
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Led Zeppelin"
     correctYear: 1968
     probability: 85
     wikimediaSearchHints: ["Led Zeppelin band"]
     answerMethods: ["timeline", "name-letters"]
   - id: acdc
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "AC/DC"
     correctYear: 1973
     probability: 90
@@ -50,132 +56,154 @@ items:
     wikimediaSearchHints: ["AC/DC band rock"]
     answerMethods: ["timeline", "name-letters"]
   - id: u2
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "U2"
     correctYear: 1976
     probability: 88
     wikimediaSearchHints: ["U2 band Bono"]
     answerMethods: ["timeline", "name-letters"]
   - id: metallica
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Metallica"
     correctYear: 1981
     probability: 90
     wikimediaSearchHints: ["Metallica band metal"]
     answerMethods: ["timeline", "name-letters"]
   - id: eagles
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Eagles"
     correctYear: 1971
     probability: 85
     wikimediaSearchHints: ["Eagles band Hotel California"]
     answerMethods: ["timeline", "name-letters"]
   - id: fleetwood-mac
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Fleetwood Mac"
     correctYear: 1967
     probability: 82
     wikimediaSearchHints: ["Fleetwood Mac band"]
     answerMethods: ["timeline", "name-letters"]
   - id: black-sabbath
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Black Sabbath"
     correctYear: 1968
     probability: 82
     wikimediaSearchHints: ["Black Sabbath band Ozzy"]
     answerMethods: ["timeline", "name-letters"]
   - id: guns-n-roses
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Guns N' Roses"
     correctYear: 1985
     probability: 88
     wikimediaSearchHints: ["Guns N Roses band Axl Rose"]
     answerMethods: ["timeline", "name-letters"]
   - id: coldplay
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Coldplay"
     correctYear: 1996
     probability: 90
     wikimediaSearchHints: ["Coldplay band Chris Martin"]
     answerMethods: ["timeline", "name-letters"]
   - id: the-doors
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "The Doors"
     correctYear: 1965
     probability: 85
     wikimediaSearchHints: ["The Doors band Jim Morrison"]
     answerMethods: ["timeline", "name-letters"]
   - id: arctic-monkeys
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Arctic Monkeys"
     correctYear: 2002
     probability: 82
     wikimediaSearchHints: ["Arctic Monkeys band Alex Turner"]
     answerMethods: ["timeline", "name-letters"]
   - id: green-day
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Green Day"
     correctYear: 1986
     probability: 85
     wikimediaSearchHints: ["Green Day band punk"]
     answerMethods: ["timeline", "name-letters"]
   - id: the-police
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "The Police"
     correctYear: 1977
     probability: 85
     wikimediaSearchHints: ["The Police band Sting"]
     answerMethods: ["timeline", "name-letters"]
   - id: kiss
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Kiss"
     correctYear: 1973
     probability: 82
     wikimediaSearchHints: ["Kiss band rock"]
     answerMethods: ["timeline", "name-letters"]
   - id: genesis
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Genesis"
     correctYear: 1967
     probability: 82
     wikimediaSearchHints: ["Genesis Phil Collins band"]
     answerMethods: ["timeline", "name-letters"]
   - id: the-smiths
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "The Smiths"
     correctYear: 1982
     probability: 78
     wikimediaSearchHints: ["The Smiths"]
     answerMethods: ["timeline", "name-letters"]
   - id: daft-punk
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Daft Punk"
     correctYear: 1993
     probability: 88
     wikimediaSearchHints: ["Daft Punk electronic duo"]
     answerMethods: ["timeline", "name-letters"]
   - id: maroon-5
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Maroon 5"
     correctYear: 1994
     probability: 88
     wikimediaSearchHints: ["Maroon 5"]
     answerMethods: ["timeline", "name-letters"]
   - id: backstreet-boys
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Backstreet Boys"
     correctYear: 1993
     probability: 88
     wikimediaSearchHints: ["Backstreet Boys band"]
     answerMethods: ["timeline", "name-letters"]
   - id: spice-girls
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Spice Girls"
     correctYear: 1994
     probability: 92
     wikimediaSearchHints: ["Spice Girls band"]
     answerMethods: ["timeline", "name-letters"]
   - id: bee-gees
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Bee Gees"
     correctYear: 1958
     probability: 88
     wikimediaSearchHints: ["Bee Gees band brothers"]
     answerMethods: ["timeline", "name-letters"]
   - id: aha
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "a-ha"
     correctYear: 1982
     probability: 90
     wikimediaSearchHints: ["a-ha"]
     answerMethods: ["timeline", "name-letters"]
   - id: eurythmics
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Eurythmics"
     correctYear: 1980
     probability: 85
     wikimediaSearchHints: ["Eurythmics band Annie Lennox"]
     answerMethods: ["timeline", "name-letters"]
   - id: roxette
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Roxette"
     correctYear: 1986
     probability: 92
@@ -183,54 +211,63 @@ items:
     wikimediaSearchHints: ["Roxette band Sweden"]
     answerMethods: ["timeline", "name-letters"]
   - id: kent
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Kent"
     correctYear: 1990
     probability: 86
     wikimediaSearchHints: ["Kent Swedish rock band Eskilstuna Joakim Berg"]
     answerMethods: ["timeline", "name-letters"]
   - id: mando-diao
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Mando Diao"
     correctYear: 1999
     probability: 78
     wikimediaSearchHints: ["Mando Diao Swedish rock band Borlänge"]
     answerMethods: ["timeline", "name-letters"]
   - id: the-hives
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "The Hives"
     correctYear: 1993
     probability: 80
     wikimediaSearchHints: ["The Hives Swedish garage rock band Pelle Almqvist"]
     answerMethods: ["timeline", "name-letters"]
   - id: bo-kaspers-orkester
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Bo Kaspers Orkester"
     correctYear: 1991
     probability: 78
     wikimediaSearchHints: ["Bo Kaspers Orkester Swedish band Vi kommer aldrig att dö"]
     answerMethods: ["timeline", "name-letters"]
   - id: the-ark
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "The Ark"
     correctYear: 2000
     probability: 74
     wikimediaSearchHints: ["The Ark Swedish glam rock Ola Salo"]
     answerMethods: ["timeline", "name-letters"]
   - id: a-teens
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "A*Teens"
     correctYear: 1998
     probability: 78
     wikimediaSearchHints: ["A*Teens Swedish pop band Mamma Mia ABBA"]
     answerMethods: ["timeline", "name-letters"]
   - id: vikingarna
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Vikingarna"
     correctYear: 1958
     probability: 76
     wikimediaSearchHints: ["Vikingarna Swedish dansband Christer Sjögren"]
     answerMethods: ["timeline", "name-letters"]
   - id: hep-stars
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Hep Stars"
     correctYear: 1964
     probability: 72
     wikimediaSearchHints: ["Hep Stars Swedish band Benny Andersson Sunny Girl"]
     answerMethods: ["timeline", "name-letters"]
   - id: tages
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Tages"
     correctYear: 1963
     probability: 70
@@ -238,54 +275,63 @@ items:
     answerMethods: ["timeline", "name-letters"]
   # === Genre/dansband/cross-nordic expansion 2026-05-27 ===
   - id: swedish-house-mafia
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Swedish House Mafia"
     correctYear: 2008
     probability: 86
     wikimediaSearchHints: ["Swedish House Mafia Axwell Ingrosso Angello Don't You Worry Child"]
     answerMethods: ["timeline", "name-letters"]
   - id: lasse-stefanz
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Lasse Stefanz"
     correctYear: 1967
     probability: 76
     wikimediaSearchHints: ["Lasse Stefanz Swedish dansband Cabaret"]
     answerMethods: ["timeline", "name-letters"]
   - id: first-aid-kit
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "First Aid Kit"
     correctYear: 2007
     probability: 84
     wikimediaSearchHints: ["First Aid Kit Swedish folk band Söderberg sisters Emmylou"]
     answerMethods: ["timeline", "name-letters"]
   - id: familjen
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Familjen"
     correctYear: 2002
     probability: 74
     wikimediaSearchHints: ["Familjen Swedish electro band Johan T Karlsson Det snurrar"]
     answerMethods: ["timeline", "name-letters"]
   - id: nationalteatern
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Nationalteatern"
     correctYear: 1968
     probability: 76
     wikimediaSearchHints: ["Nationalteatern Swedish progressive rock band Bängen trålar"]
     answerMethods: ["timeline", "name-letters"]
   - id: freestyle
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Freestyle"
     correctYear: 1976
     probability: 70
     wikimediaSearchHints: ["Freestyle Swedish pop band Adam Glenn 1980s"]
     answerMethods: ["timeline", "name-letters"]
   - id: ratata
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Ratata"
     correctYear: 1980
     probability: 78
     wikimediaSearchHints: ["Ratata Swedish synth pop band Mauro Scocco"]
     answerMethods: ["timeline", "name-letters"]
   - id: lolita-pop
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Lolita Pop"
     correctYear: 1980
     probability: 70
     wikimediaSearchHints: ["Lolita Pop Swedish rock band Karin Wistrand"]
     answerMethods: ["timeline", "name-letters"]
   - id: the-soundtrack-of-our-lives
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "The Soundtrack of Our Lives"
     correctYear: 1995
     probability: 76
@@ -293,67 +339,77 @@ items:
     answerMethods: ["timeline", "name-letters"]
   # === Bred batch 2026-05-27 — dansband/house/hiphop/epa-dunk/svensk-finsk-norsk-dansk ===
   - id: sten-and-stanley
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Sten & Stanley"
     correctYear: 1962
     probability: 76
     wikimediaSearchHints: ["Sten Stanley Swedish dansband"]
     answerMethods: ["timeline", "name-letters"]
   - id: larz-kristerz
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Larz-Kristerz"
     correctYear: 1990
     probability: 78
     wikimediaSearchHints: ["Larz-Kristerz Swedish dansband Hultsfred"]
     answerMethods: ["timeline", "name-letters"]
   - id: galantis
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Galantis"
     correctYear: 2007
     probability: 82
     wikimediaSearchHints: ["Galantis Swedish electronic duo Runaway Christian Karlsson"]
     answerMethods: ["timeline", "name-letters"]
   - id: tjuvjakt
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Tjuvjakt"
     correctYear: 2012
     probability: 76
     wikimediaSearchHints: ["Tjuvjakt Swedish pop band Tellus Pengar"]
     answerMethods: ["timeline", "name-letters"]
   - id: lordi
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Lordi"
     correctYear: 1992
     probability: 84
     wikimediaSearchHints: ["Lordi Finnish hard rock monsters Eurovision 2006 Hard Rock Hallelujah"]
     answerMethods: ["timeline", "name-letters"]
   - id: nightwish
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Nightwish"
     correctYear: 1996
     probability: 78
     wikimediaSearchHints: ["Nightwish Finnish symphonic metal Tarja Turunen"]
     answerMethods: ["timeline", "name-letters"]
   - id: ylvis
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Ylvis"
     correctYear: 2000
     probability: 82
     wikimediaSearchHints: ["Ylvis Norwegian duo What Does the Fox Say"]
     answerMethods: ["timeline", "name-letters"]
   - id: wham
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Wham!"
     correctYear: 1981
     probability: 88
     wikimediaSearchHints: ["Wham band George Michael Andrew Ridgeley Last Christmas"]
     answerMethods: ["timeline", "name-letters"]
   - id: gyllene-tider
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Gyllene Tider"
     correctYear: 1977
     probability: 92
     wikimediaSearchHints: ["Gyllene Tider Swedish pop rock band Per Gessle"]
     answerMethods: ["timeline", "name-letters"]
   - id: journey
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Journey"
     correctYear: 1973
     probability: 82
     wikimediaSearchHints: ["Journey American rock band Steve Perry Don't Stop Believin"]
     answerMethods: ["timeline", "name-letters"]
-    audience: ["gen-x", "millennials", "gen-z"]
   - id: maneskin
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Måneskin"
     correctYear: 2016
     probability: 84
@@ -361,4 +417,3 @@ items:
     peakTo: 2026
     wikimediaSearchHints: ["Måneskin Italian rock band Eurovision 2021"]
     answerMethods: ["name-letters"]
-    audience: ["gen-z", "millennials", "gen-alpha"]

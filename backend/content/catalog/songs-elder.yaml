@@ -5,19 +5,21 @@
 # har körts och en specifik videoId + start/endSec är vald.
 # probability: 95 = ikoniskt (Over the Rainbow, Heartbreak Hotel),
 #              85 = välkänt över decennier, 75-80 = era-specifikt.
-audience: ["elder"]
+audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
 region: ["sweden"]
 category: songs
 contentForm: youtube
 contentSubject: song
 items:
   - id: louis-armstrong-body-and-soul
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Body and Soul — Louis Armstrong"
     correctYear: 1930
     probability: 75
     wikimediaSearchHints: ["Louis Armstrong Body and Soul"]
     answerMethods: ["timeline"]
   - id: cab-calloway-minnie-the-moocher
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Minnie the Moocher — Cab Calloway"
     correctYear: 1931
     probability: 80
@@ -25,6 +27,7 @@ items:
     answerMethods: ["timeline"]
     spotifyTrackId: "7GASUbWzEnJKfgg4lz65qY"
   - id: fred-astaire-night-and-day
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Night and Day — Fred Astaire"
     correctYear: 1932
     probability: 78
@@ -38,6 +41,7 @@ items:
         channelTitle: "Music Video Vault"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: ethel-waters-stormy-weather
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Stormy Weather — Ethel Waters"
     correctYear: 1933
     probability: 78
@@ -51,6 +55,7 @@ items:
         channelTitle: "American Musical Theater Archives"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: cole-porter-anything-goes
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Anything Goes — Cole Porter"
     correctYear: 1934
     probability: 75
@@ -63,24 +68,28 @@ items:
         channelTitle: "Cole Porter - Topic"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (2)."
   - id: fred-astaire-cheek-to-cheek
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Cheek to Cheek — Fred Astaire"
     correctYear: 1935
     probability: 82
     wikimediaSearchHints: ["Fred Astaire Cheek to Cheek Top Hat"]
     answerMethods: ["timeline"]
   - id: bing-crosby-pennies-from-heaven
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Pennies from Heaven — Bing Crosby"
     correctYear: 1936
     probability: 78
     wikimediaSearchHints: ["Bing Crosby Pennies from Heaven 1936"]
     answerMethods: ["timeline"]
   - id: duke-ellington-caravan
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Caravan — Duke Ellington"
     correctYear: 1937
     probability: 80
     wikimediaSearchHints: ["Duke Ellington Caravan 1937"]
     answerMethods: ["timeline"]
   - id: ella-fitzgerald-a-tisket-a-tasket
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "A-Tisket, A-Tasket — Ella Fitzgerald"
     correctYear: 1938
     probability: 80
@@ -88,6 +97,7 @@ items:
     answerMethods: ["timeline"]
   # Over the Rainbow flyttad till songs-all.yaml (cross-gen-iconic) 2026-05-22.
   - id: glenn-miller-in-the-mood
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "In the Mood — Glenn Miller"
     correctYear: 1939
     probability: 90
@@ -100,12 +110,14 @@ items:
         channelTitle: "Glenn Miller Orchestra - Topic"
         notes: "Officiell album-audio via YouTube Topic. Iconic swing-intro."
   - id: glenn-miller-chattanooga-choo-choo
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Chattanooga Choo Choo — Glenn Miller"
     correctYear: 1941
     probability: 82
     wikimediaSearchHints: ["Glenn Miller Chattanooga Choo Choo"]
     answerMethods: ["timeline"]
   - id: bing-crosby-white-christmas
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "White Christmas — Bing Crosby"
     correctYear: 1942
     probability: 95
@@ -120,12 +132,14 @@ items:
         channelTitle: "Bing Crosby - Topic"
         notes: "Officiell album-audio via YouTube Topic. Refrängområde."
   - id: dooley-wilson-as-time-goes-by
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "As Time Goes By — Dooley Wilson"
     correctYear: 1943
     probability: 85
     wikimediaSearchHints: ["As Time Goes By Casablanca Dooley Wilson"]
     answerMethods: ["timeline"]
   - id: bing-crosby-swinging-on-a-star
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Swinging on a Star — Bing Crosby"
     correctYear: 1944
     probability: 78
@@ -139,6 +153,7 @@ items:
         channelTitle: "Classic Mood Experience"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: doris-day-sentimental-journey
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Sentimental Journey — Doris Day"
     correctYear: 1945
     probability: 80
@@ -152,6 +167,7 @@ items:
         channelTitle: "Doris Day - Topic"
         notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: nat-king-cole-the-christmas-song
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "The Christmas Song — Nat King Cole"
     correctYear: 1946
     probability: 90
@@ -164,6 +180,7 @@ items:
         channelTitle: "Nat King Cole - Topic"
         notes: "Officiell album-audio via YouTube Topic. 'Chestnuts roasting'-vers."
   - id: frank-sinatra-almost-like-being-in-love
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Almost Like Being in Love — Frank Sinatra"
     correctYear: 1947
     probability: 75
@@ -177,6 +194,7 @@ items:
         channelTitle: "Micah Gwinn"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: nat-king-cole-nature-boy
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Nature Boy — Nat King Cole"
     correctYear: 1948
     probability: 82
@@ -189,6 +207,7 @@ items:
         channelTitle: "시공초월노래 번역자 기뮤"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: perry-como-some-enchanted-evening
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Some Enchanted Evening — Perry Como"
     correctYear: 1949
     probability: 78
@@ -202,6 +221,7 @@ items:
         channelTitle: "Perry Como - Topic"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (2)."
   - id: nat-king-cole-mona-lisa
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Mona Lisa — Nat King Cole"
     correctYear: 1950
     probability: 88
@@ -209,24 +229,28 @@ items:
     spotifyTrackId: "5dae01pKNjRQtgOeAkFzPY"
     answerMethods: ["timeline"]
   - id: johnnie-ray-cry
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Cry — Johnnie Ray"
     correctYear: 1951
     probability: 75
     wikimediaSearchHints: ["Johnnie Ray Cry 1951"]
     answerMethods: ["timeline"]
   - id: jo-stafford-you-belong-to-me
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "You Belong to Me — Jo Stafford"
     correctYear: 1952
     probability: 78
     wikimediaSearchHints: ["Jo Stafford You Belong to Me 1952"]
     answerMethods: ["timeline"]
   - id: patti-page-doggie-in-the-window
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "(How Much Is) That Doggie in the Window — Patti Page"
     correctYear: 1953
     probability: 82
     wikimediaSearchHints: ["Patti Page Doggie in the Window 1953"]
     answerMethods: ["timeline"]
   - id: bill-haley-rock-around-the-clock
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Rock Around the Clock — Bill Haley & His Comets"
     correctYear: 1954
     probability: 92
@@ -239,6 +263,7 @@ items:
         channelTitle: "OLD TAPES"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: chuck-berry-maybellene
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Maybellene — Chuck Berry"
     correctYear: 1955
     probability: 82
@@ -246,6 +271,7 @@ items:
     answerMethods: ["timeline"]
   # Heartbreak Hotel flyttad till songs-all.yaml (cross-gen-iconic) 2026-05-22.
   - id: elvis-presley-jailhouse-rock
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Jailhouse Rock — Elvis Presley"
     correctYear: 1957
     probability: 95
@@ -258,6 +284,7 @@ items:
         channelTitle: "Elvis Presley - Topic"
         notes: "Officiell album-audio via YouTube Topic. Refrängområde."
   - id: chuck-berry-johnny-b-goode
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Johnny B. Goode — Chuck Berry"
     correctYear: 1958
     probability: 92
@@ -270,6 +297,7 @@ items:
         channelTitle: "VisageClub80s"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: ray-charles-whatd-i-say
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "What'd I Say — Ray Charles"
     correctYear: 1959
     probability: 88
@@ -282,6 +310,7 @@ items:
         channelTitle: "Classic Mood Experience"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: everly-brothers-cathys-clown
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Cathy's Clown — The Everly Brothers"
     correctYear: 1960
     probability: 80
@@ -294,6 +323,7 @@ items:
         channelTitle: "The Everly Brothers - Topic"
         notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: ben-e-king-stand-by-me
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Stand by Me — Ben E. King"
     correctYear: 1961
     probability: 92
@@ -306,6 +336,7 @@ items:
         channelTitle: "PRIMITIV RECORD"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: beach-boys-surfin-safari
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Surfin' Safari — The Beach Boys"
     correctYear: 1962
     probability: 80
@@ -318,6 +349,7 @@ items:
         channelTitle: "The Beach Boys - Topic"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (2)."
   - id: beatles-she-loves-you
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "She Loves You — The Beatles"
     correctYear: 1963
     probability: 92
@@ -330,6 +362,7 @@ items:
         channelTitle: "The Beatles - Topic"
         notes: "Officiell album-audio via YouTube Topic (Remastered 2009). 'Yeah yeah yeah'-hook."
   - id: beatles-a-hard-days-night
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "A Hard Day's Night — The Beatles"
     correctYear: 1964
     probability: 92
@@ -343,6 +376,7 @@ items:
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
   # === Content-expansion 2026-05-29: fler ikoniska 50-60-tals-låtar ===
   - id: little-richard-tutti-frutti
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Tutti Frutti — Little Richard"
     correctYear: 1955
     probability: 82
@@ -355,6 +389,7 @@ items:
         channelTitle: "OLD TAPES"
         notes: "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (10)."
   - id: buddy-holly-thatll-be-the-day
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "That'll Be the Day — Buddy Holly"
     correctYear: 1957
     probability: 78
@@ -367,6 +402,7 @@ items:
         channelTitle: "Buddy Holly - Topic"
         notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: ritchie-valens-la-bamba
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "La Bamba — Ritchie Valens"
     correctYear: 1958
     probability: 80
@@ -379,6 +415,7 @@ items:
         channelTitle: "Ritchie Valens - Topic"
         notes: "Curerad 2026-05-29 — officiell single-version via YouTube Topic (1958 original, ej Los Lobos/film)."
   - id: sam-cooke-a-change-is-gonna-come
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "A Change Is Gonna Come — Sam Cooke"
     correctYear: 1964
     probability: 76
@@ -391,6 +428,7 @@ items:
         channelTitle: "Sam Cooke - Topic"
         notes: "Curerad 2026-05-29 — officiell album-audio via YouTube Topic (Sam Cooke-originalet, ej Brian Owens-cover)."
   - id: etta-james-at-last
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "At Last — Etta James"
     correctYear: 1960
     probability: 80
@@ -403,6 +441,7 @@ items:
         channelTitle: "Etta James - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: ray-charles-georgia-on-my-mind
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Georgia on My Mind — Ray Charles"
     correctYear: 1960
     probability: 80
@@ -415,6 +454,7 @@ items:
         channelTitle: "Ray Charles - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: roy-orbison-oh-pretty-woman
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Oh, Pretty Woman — Roy Orbison"
     correctYear: 1964
     probability: 82
@@ -427,6 +467,7 @@ items:
         channelTitle: "Roy Orbison - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: frank-sinatra-fly-me-to-the-moon
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Fly Me to the Moon — Frank Sinatra"
     correctYear: 1964
     probability: 84
@@ -439,6 +480,7 @@ items:
         channelTitle: "Frank Sinatra - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: lill-babs-leva-livet
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Leva livet — Lill-Babs"
     correctYear: 1963
     probability: 76
@@ -452,6 +494,7 @@ items:
         channelTitle: "Universal Music Group"
         notes: "Officiell UMG-uppladdning. Studio 1963. Svensk version av It's My Party."
   - id: lill-babs-letkis-jenka
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Letkis-Jenka — Lill-Babs"
     correctYear: 1964
     probability: 74

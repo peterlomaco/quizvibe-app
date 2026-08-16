@@ -91,7 +91,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "band",
     "correctYear": 1998,
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -105,7 +109,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "band",
     "correctYear": 1972,
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -119,7 +127,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "band",
     "correctYear": 1973,
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -134,8 +146,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2008,
     "peakTo": 2020,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -151,8 +166,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2011,
     "peakTo": 2026,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -168,8 +186,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1989,
     "peakTo": 2019,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -183,7 +204,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1983,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -199,7 +224,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2008,
     "peakTo": 2024,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -213,7 +242,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1988,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -227,7 +260,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "band",
     "correctYear": 1982,
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -243,7 +280,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1963,
     "peakTo": 1993,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -258,7 +299,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1955,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -273,7 +317,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1970,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -289,7 +336,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1995,
     "peakTo": 2024,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -304,8 +355,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2017,
     "peakTo": 2024,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -319,8 +373,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1989,
     "audiences": [
+      "elder",
       "gen-x",
-      "millennials"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -334,7 +391,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1987,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -349,7 +410,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1999,
     "peakTo": 2009,
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -364,7 +429,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1974,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -378,6 +446,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1976,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -394,7 +464,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1991,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -408,6 +482,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1989,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -424,6 +500,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1999,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -442,8 +520,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2016,
     "peakTo": 2018,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -457,7 +538,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1986,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -473,8 +558,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1999,
     "peakTo": 2026,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -490,8 +578,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2003,
     "peakTo": 2024,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -505,6 +596,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1988,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -522,7 +615,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1920,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -538,7 +634,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2001,
     "peakTo": 2024,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -554,8 +654,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2011,
     "peakTo": 2026,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -569,7 +672,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1924,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -584,8 +691,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2007,
     "peakTo": 2015,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -601,8 +711,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1997,
     "peakTo": 2026,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -618,7 +731,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2015,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -634,7 +750,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1986,
     "peakTo": 2016,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -648,8 +768,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1976,
     "audiences": [
+      "elder",
       "gen-x",
-      "millennials"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -664,7 +787,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1970,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -678,6 +804,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1979,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -694,8 +822,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1971,
     "audiences": [
+      "elder",
       "gen-x",
-      "millennials"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -709,8 +840,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1985,
     "audiences": [
+      "elder",
       "gen-x",
-      "millennials"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -724,6 +858,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1981,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -740,6 +876,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1986,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -756,6 +894,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1976,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -772,6 +912,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1987,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -788,6 +930,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1988,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -806,7 +950,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1960,
     "peakTo": 1965,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -820,6 +968,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1981,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -837,8 +987,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2010,
     "peakTo": 2022,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -854,8 +1007,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2009,
     "peakTo": 2021,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-x"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -869,7 +1025,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1976,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -883,7 +1043,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1978,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -899,8 +1063,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2005,
     "peakTo": 2026,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -914,7 +1081,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1953,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -930,7 +1101,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1980,
     "peakTo": 2024,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -944,6 +1119,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1970,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -962,7 +1139,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1960,
     "peakTo": 1990,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -976,6 +1157,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1991,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -992,7 +1175,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "band",
     "correctYear": 2002,
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1008,7 +1195,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1961,
     "peakTo": 2018,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -1022,7 +1213,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1993,
     "audiences": [
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -1036,7 +1231,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1944,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1050,6 +1249,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1999,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -1068,7 +1269,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1970,
     "peakTo": 2000,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -1082,7 +1287,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1993,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "europe"
@@ -1096,6 +1305,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1987,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -1113,7 +1324,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1993,
     "peakTo": 2023,
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1127,6 +1342,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1980,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -1145,7 +1362,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1953,
     "peakTo": 1967,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -1161,7 +1382,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2011,
     "peakTo": 2018,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -1177,7 +1402,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2002,
     "peakTo": 2024,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -1191,7 +1420,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1977,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1206,7 +1439,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1960,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -1220,7 +1456,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "band",
     "correctYear": 1993,
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1236,7 +1476,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2018,
     "peakTo": 2024,
     "audiences": [
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -1252,7 +1496,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1963,
     "peakTo": 2024,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -1266,7 +1514,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1932,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1282,7 +1534,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1973,
     "peakTo": 2003,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -1296,7 +1552,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1984,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1310,7 +1570,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "band",
     "correctYear": 1960,
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -1325,7 +1589,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1964,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -1339,7 +1606,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "band",
     "correctYear": 1958,
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1355,7 +1626,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1978,
     "peakTo": 2024,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -1371,8 +1646,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1995,
     "peakTo": 2025,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -1388,7 +1666,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1988,
     "peakTo": 2018,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -1402,7 +1684,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1997,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1417,7 +1703,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1946,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -1433,7 +1722,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1938,
     "peakTo": 1962,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -1447,7 +1740,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1981,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -1463,8 +1760,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2010,
     "peakTo": 2024,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1480,7 +1780,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1957,
     "peakTo": 1980,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1496,7 +1800,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1973,
     "peakTo": 2003,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -1512,8 +1820,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2013,
     "peakTo": 2026,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1527,7 +1838,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 2001,
     "audiences": [
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -1541,7 +1856,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1947,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1556,7 +1875,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1956,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -1571,7 +1893,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1967,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -1586,8 +1911,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2009,
     "peakTo": 2020,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1602,7 +1930,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1942,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1616,7 +1947,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1947,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1630,7 +1965,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "band",
     "correctYear": 1968,
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1644,7 +1983,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "band",
     "correctYear": 1991,
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1660,7 +2003,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1962,
     "peakTo": 2020,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -1675,7 +2022,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1937,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -1690,7 +2040,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1941,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -1706,7 +2059,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1976,
     "peakTo": 2024,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -1722,7 +2079,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2005,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1737,7 +2097,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1951,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1753,7 +2116,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1981,
     "peakTo": 2024,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -1769,8 +2136,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1986,
     "peakTo": 2016,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -1786,8 +2156,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1998,
     "peakTo": 2026,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -1803,7 +2176,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1988,
     "peakTo": 2018,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -1819,7 +2196,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1998,
     "peakTo": 2024,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -1835,7 +2216,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1965,
     "peakTo": 1980,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -1851,7 +2236,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1975,
     "peakTo": 2020,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -1867,7 +2256,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1978,
     "peakTo": 2008,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -1881,6 +2274,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1994,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -1899,7 +2294,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2010,
     "peakTo": 2024,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -1915,7 +2314,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1957,
     "peakTo": 1959,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -1929,6 +2332,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 2001,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -1947,7 +2352,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1959,
     "peakTo": 1989,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -1962,7 +2371,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1953,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -1978,8 +2390,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1995,
     "peakTo": 2025,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -1995,7 +2410,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2014,
     "peakTo": 2024,
     "audiences": [
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -2010,7 +2429,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1961,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -2025,7 +2447,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1943,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -2039,7 +2464,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1966,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2055,7 +2484,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1971,
     "peakTo": 2024,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -2069,6 +2502,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1983,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -2085,7 +2520,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1974,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2099,6 +2538,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1985,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -2117,8 +2558,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1992,
     "peakTo": 2022,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -2134,7 +2578,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1990,
     "peakTo": 2024,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -2149,7 +2597,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1932,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -2163,6 +2614,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1987,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -2181,8 +2634,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2003,
     "peakTo": 2026,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -2197,7 +2653,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1963,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -2213,7 +2672,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1918,
     "peakTo": 1940,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -2229,8 +2692,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1998,
     "peakTo": 2026,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -2244,6 +2710,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1987,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -2260,7 +2728,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1974,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2276,7 +2748,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1965,
     "peakTo": 2024,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -2290,7 +2766,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1991,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2306,8 +2786,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2004,
     "peakTo": 2026,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -2321,7 +2804,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1950,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2337,8 +2824,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1997,
     "peakTo": 2026,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -2353,7 +2843,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1980,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2367,6 +2860,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1998,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -2383,8 +2878,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1979,
     "audiences": [
+      "elder",
       "gen-x",
-      "millennials"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2400,7 +2898,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1999,
     "peakTo": 2024,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -2416,7 +2918,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1955,
     "peakTo": 2017,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -2432,7 +2938,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2012,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2448,7 +2957,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2012,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2462,6 +2974,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1976,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -2479,7 +2993,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1966,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -2493,7 +3010,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1985,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -2507,6 +3028,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1999,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -2523,7 +3046,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "band",
     "correctYear": 1996,
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2539,9 +3066,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2014,
     "peakTo": 2022,
     "audiences": [
-      "millennials",
+      "elder",
       "gen-x",
-      "gen-z"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -2555,6 +3084,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1997,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -2572,8 +3103,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2022,
     "peakTo": 2024,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2587,7 +3121,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1937,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2601,6 +3139,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1985,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -2619,7 +3159,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1983,
     "peakTo": 2024,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -2633,7 +3177,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "band",
     "correctYear": 1993,
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2647,7 +3195,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1954,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2661,6 +3213,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1983,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -2677,7 +3231,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1983,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2692,7 +3250,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1972,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2708,7 +3269,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1991,
     "peakTo": 2021,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -2722,7 +3287,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1980,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2737,7 +3306,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1953,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -2753,7 +3325,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2001,
     "peakTo": 2011,
     "audiences": [
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -2767,6 +3343,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1980,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -2784,8 +3362,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2019,
     "peakTo": 2024,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2799,6 +3380,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1983,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -2815,7 +3398,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1986,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2829,7 +3416,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1987,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2845,7 +3436,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1991,
     "peakTo": 2024,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -2860,7 +3455,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1975,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -2876,7 +3474,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1969,
     "peakTo": 2016,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -2891,8 +3493,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2008,
     "peakTo": 2022,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -2906,6 +3511,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1977,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -2922,6 +3529,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1981,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -2940,7 +3549,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1946,
     "peakTo": 1995,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -2954,6 +3567,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1999,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -2970,6 +3585,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1977,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -2986,6 +3603,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 2000,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -3003,7 +3622,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1971,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -3019,7 +3641,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2008,
     "peakTo": 2024,
     "audiences": [
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -3035,7 +3661,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1985,
     "peakTo": 2015,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -3051,7 +3681,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1977,
     "peakTo": 2007,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -3067,7 +3701,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1965,
     "peakTo": 2024,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -3083,7 +3721,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1969,
     "peakTo": 1999,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -3098,7 +3740,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1968,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -3112,6 +3757,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1978,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -3128,6 +3775,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1988,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -3144,6 +3793,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1979,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -3161,7 +3812,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1960,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -3175,9 +3829,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1970,
     "audiences": [
+      "elder",
       "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -3192,7 +3848,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1942,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -3206,6 +3865,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1980,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -3224,7 +3885,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2018,
     "peakTo": 2024,
     "audiences": [
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -3240,7 +3905,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1967,
     "peakTo": 2024,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -3256,7 +3925,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1980,
     "peakTo": 2010,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -3272,7 +3945,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1974,
     "peakTo": 2012,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -3286,7 +3963,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1986,
     "audiences": [
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -3302,7 +3983,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2015,
     "peakTo": 2024,
     "audiences": [
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -3317,7 +4002,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1963,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -3333,7 +4021,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1960,
     "peakTo": 1990,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -3349,8 +4041,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1995,
     "peakTo": 2025,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -3364,8 +4059,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1965,
     "audiences": [
+      "elder",
       "gen-x",
-      "millennials"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -3379,7 +4077,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1968,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -3393,7 +4095,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "band",
     "correctYear": 1971,
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -3409,7 +4115,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2011,
     "peakTo": 2024,
     "audiences": [
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -3425,7 +4135,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1984,
     "peakTo": 2014,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -3439,6 +4153,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1991,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -3456,7 +4172,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1973,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -3470,6 +4189,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1987,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -3488,8 +4209,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1992,
     "peakTo": 2022,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -3505,7 +4229,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1944,
     "peakTo": 1966,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -3521,7 +4249,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1935,
     "peakTo": 1993,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -3537,7 +4269,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1970,
     "peakTo": 2024,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -3553,7 +4289,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1956,
     "peakTo": 1977,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -3567,8 +4307,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1991,
     "audiences": [
+      "elder",
       "gen-x",
-      "millennials"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -3582,8 +4325,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1994,
     "audiences": [
+      "elder",
       "gen-x",
-      "millennials"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -3598,7 +4344,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1963,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -3612,7 +4361,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1972,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -3627,8 +4380,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2005,
     "peakTo": 2014,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -3644,8 +4400,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2011,
     "peakTo": 2026,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -3661,7 +4420,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2001,
     "peakTo": 2017,
     "audiences": [
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -3675,6 +4438,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1984,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -3693,7 +4458,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1995,
     "peakTo": 2024,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -3708,7 +4477,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1966,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -3724,7 +4496,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1963,
     "peakTo": 2024,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -3740,7 +4516,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2003,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -3754,7 +4533,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1976,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -3768,7 +4551,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1990,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -3782,6 +4569,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1990,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -3798,7 +4587,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1985,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -3812,6 +4605,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 2000,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -3830,7 +4625,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 1998,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -3844,6 +4642,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1980,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -3860,7 +4660,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "band",
     "correctYear": 1980,
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -3875,7 +4679,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1942,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -3889,7 +4696,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1960,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -3904,8 +4715,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2018,
     "peakTo": 2022,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -3921,8 +4735,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1997,
     "peakTo": 2026,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -3938,7 +4755,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2010,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -3952,7 +4772,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1890,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -3967,8 +4791,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2017,
     "peakTo": 2024,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -3985,7 +4812,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2010,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4001,8 +4831,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1994,
     "peakTo": 2024,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -4016,7 +4849,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "band",
     "correctYear": 2002,
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4031,8 +4868,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2008,
     "peakTo": 2022,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4048,7 +4888,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1964,
     "peakTo": 1994,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -4063,8 +4907,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2005,
     "peakTo": 2018,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4079,7 +4926,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1968,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -4095,7 +4945,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2016,
     "peakTo": 2026,
     "audiences": [
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -4109,7 +4963,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "band",
     "correctYear": 2007,
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4123,7 +4981,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "band",
     "correctYear": 1967,
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4139,8 +5001,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2019,
     "peakTo": 2026,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -4154,6 +5019,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1977,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -4170,6 +5037,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1978,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -4188,7 +5057,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2012,
     "peakTo": 2024,
     "audiences": [
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -4203,7 +5076,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1962,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -4219,7 +5095,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1940,
     "peakTo": 1990,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -4234,7 +5114,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1945,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -4248,6 +5131,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1983,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -4264,6 +5149,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1977,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -4280,6 +5167,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1997,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -4296,6 +5185,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1999,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -4312,7 +5203,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "band",
     "correctYear": 2007,
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4326,6 +5221,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1989,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -4344,7 +5241,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1981,
     "peakTo": 2011,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -4360,7 +5261,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1953,
     "peakTo": 1983,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -4374,7 +5279,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "band",
     "correctYear": 1967,
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4388,6 +5297,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1978,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -4405,7 +5316,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1946,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -4420,7 +5334,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1949,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -4436,7 +5353,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1982,
     "peakTo": 2016,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -4450,6 +5371,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1987,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -4467,7 +5390,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1945,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -4482,7 +5408,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1957,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -4497,7 +5426,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1959,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4512,7 +5444,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1960,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4528,7 +5463,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1984,
     "peakTo": 2024,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -4544,7 +5483,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1968,
     "peakTo": 1998,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -4558,6 +5501,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1987,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -4575,7 +5520,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1971,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -4591,7 +5539,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2010,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4607,7 +5558,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1952,
     "peakTo": 1956,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -4621,7 +5576,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "band",
     "correctYear": 1986,
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4637,7 +5596,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1926,
     "peakTo": 1941,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -4651,6 +5614,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1985,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -4668,7 +5633,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1920,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4683,7 +5651,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1921,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4699,7 +5670,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1957,
     "peakTo": 1975,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4713,7 +5688,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "band",
     "correctYear": 1985,
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4729,7 +5708,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2015,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4745,8 +5727,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2003,
     "peakTo": 2026,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4760,8 +5745,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1987,
     "audiences": [
+      "elder",
       "gen-x",
-      "millennials"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4776,7 +5764,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1946,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -4792,7 +5783,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1990,
     "peakTo": 2024,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -4808,8 +5803,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1995,
     "peakTo": 2025,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -4823,7 +5821,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "band",
     "correctYear": 1977,
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4837,7 +5839,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1974,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4851,8 +5857,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1971,
     "audiences": [
+      "elder",
       "gen-x",
-      "millennials"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4868,7 +5877,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1989,
     "peakTo": 2019,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -4884,7 +5897,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1963,
     "peakTo": 1990,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4899,8 +5916,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2015,
     "peakTo": 2024,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4917,7 +5937,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2020,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -4933,7 +5956,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1953,
     "peakTo": 2023,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -4947,6 +5974,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1993,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -4963,6 +5992,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1978,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -4981,7 +6012,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2010,
     "peakTo": 2024,
     "audiences": [
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -4996,7 +6031,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1955,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -5012,8 +6050,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1992,
     "peakTo": 2008,
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5027,7 +6068,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1972,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5043,7 +6088,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1987,
     "peakTo": 2017,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5058,8 +6107,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2010,
     "peakTo": 2022,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5074,7 +6126,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1971,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -5088,6 +6143,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1982,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -5104,6 +6161,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1976,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -5120,6 +6179,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1980,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -5136,7 +6197,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "band",
     "correctYear": 1964,
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5150,6 +6215,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1977,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -5168,7 +6235,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1983,
     "peakTo": 2013,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -5182,6 +6253,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1986,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -5199,7 +6272,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1958,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -5215,7 +6291,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1941,
     "peakTo": 1956,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -5230,7 +6310,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1961,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -5246,7 +6329,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1969,
     "peakTo": 2024,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -5260,6 +6347,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1981,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -5279,7 +6368,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2015,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5294,7 +6386,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1956,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -5310,7 +6405,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1942,
     "peakTo": 1978,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -5326,7 +6425,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1957,
     "peakTo": 1975,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5342,7 +6445,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2015,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5356,6 +6462,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1988,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -5374,7 +6482,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1960,
     "peakTo": 1990,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -5389,7 +6501,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1944,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -5403,6 +6518,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 2000,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -5421,7 +6538,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1956,
     "peakTo": 2006,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -5437,7 +6558,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1955,
     "peakTo": 1955,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -5451,6 +6576,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1991,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -5469,7 +6596,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1939,
     "peakTo": 1965,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -5483,6 +6614,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1978,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -5500,7 +6633,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1957,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "europe"
@@ -5514,7 +6650,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1966,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5529,7 +6669,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1965,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5545,7 +6688,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 1995,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5560,7 +6706,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1972,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -5574,6 +6723,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1988,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -5590,6 +6741,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1984,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -5607,7 +6760,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1973,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -5623,7 +6779,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1996,
     "peakTo": 2024,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -5639,7 +6799,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1975,
     "peakTo": 2005,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -5655,8 +6819,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1992,
     "peakTo": 2022,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -5672,8 +6839,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2013,
     "peakTo": 2026,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -5689,7 +6859,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1999,
     "peakTo": 2024,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -5704,8 +6878,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2016,
     "peakTo": 2024,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5719,7 +6896,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1981,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5735,7 +6916,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2000,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5750,7 +6934,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1965,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5766,8 +6953,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2000,
     "peakTo": 2026,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -5781,7 +6971,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1973,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5797,7 +6991,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1985,
     "peakTo": 2015,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -5811,8 +7009,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1989,
     "audiences": [
+      "elder",
       "gen-x",
-      "millennials"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5826,8 +7027,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1971,
     "audiences": [
+      "elder",
       "gen-x",
-      "millennials"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5842,7 +7046,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1960,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "europe"
@@ -5856,7 +7063,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1970,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5870,6 +7081,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1999,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -5888,8 +7101,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1997,
     "peakTo": 2026,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -5905,7 +7121,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1985,
     "peakTo": 2015,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -5920,7 +7140,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1944,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -5936,7 +7159,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1966,
     "peakTo": 1996,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -5952,8 +7179,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2002,
     "peakTo": 2026,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5969,7 +7199,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1979,
     "peakTo": 2024,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -5984,7 +7218,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1947,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -5999,8 +7236,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2008,
     "peakTo": 2022,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6014,8 +7254,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1971,
     "audiences": [
+      "elder",
       "gen-x",
-      "millennials"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6031,7 +7274,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2018,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6047,7 +7293,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2015,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6064,7 +7313,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2020,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6080,7 +7332,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1962,
     "peakTo": 1992,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -6096,7 +7352,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2004,
     "peakTo": 2024,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -6111,7 +7371,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1959,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -6125,6 +7388,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1980,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -6143,7 +7408,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1977,
     "peakTo": 2007,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -6159,7 +7428,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1939,
     "peakTo": 1976,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -6175,8 +7448,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1986,
     "peakTo": 2016,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -6192,7 +7468,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2018,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6206,8 +7485,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1967,
     "audiences": [
+      "elder",
       "gen-x",
-      "millennials"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6221,8 +7503,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1997,
     "audiences": [
+      "elder",
       "gen-x",
-      "millennials"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6237,7 +7522,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1966,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6253,8 +7541,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2006,
     "peakTo": 2024,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6268,9 +7559,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "band",
     "correctYear": 1973,
     "audiences": [
+      "elder",
       "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6284,6 +7577,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1988,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -6300,6 +7595,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 2003,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -6318,7 +7615,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1995,
     "peakTo": 2013,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -6334,7 +7635,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1990,
     "peakTo": 2020,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -6348,6 +7653,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1979,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -6365,7 +7672,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1964,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -6380,7 +7690,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1933,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -6396,7 +7709,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2009,
     "peakTo": 2024,
     "audiences": [
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -6412,7 +7729,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2002,
     "peakTo": 2020,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -6427,8 +7748,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2002,
     "peakTo": 2006,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6442,6 +7766,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1982,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -6458,8 +7784,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1977,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -6474,7 +7803,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1955,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -6488,6 +7820,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1996,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -6505,7 +7839,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1965,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -6521,7 +7858,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1978,
     "peakTo": 2024,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -6537,8 +7878,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2002,
     "peakTo": 2026,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -6554,8 +7898,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1998,
     "peakTo": 2026,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -6571,7 +7918,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1933,
     "peakTo": 1981,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -6587,8 +7938,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2008,
     "peakTo": 2026,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -6604,7 +7958,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2011,
     "peakTo": 2024,
     "audiences": [
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -6620,7 +7978,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 1998,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6635,7 +7996,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1951,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -6649,7 +8013,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "band",
     "correctYear": 1990,
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6665,7 +8033,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1981,
     "peakTo": 2011,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -6681,7 +8053,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1978,
     "peakTo": 2008,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -6695,6 +8071,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1991,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -6711,7 +8089,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1952,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6725,6 +8107,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1982,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -6741,7 +8125,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1988,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6756,8 +8144,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2005,
     "peakTo": 2016,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6771,7 +8162,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1945,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6785,7 +8180,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "band",
     "correctYear": 1973,
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6801,7 +8200,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2015,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6815,6 +8217,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1978,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -6832,8 +8236,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2012,
     "peakTo": 2024,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6849,7 +8256,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2013,
     "peakTo": 2026,
     "audiences": [
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -6865,7 +8276,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1995,
     "peakTo": 2015,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6879,7 +8294,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1967,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -6895,7 +8314,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 1967,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6909,7 +8331,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1991,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6923,6 +8349,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1998,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -6941,7 +8369,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1987,
     "peakTo": 2024,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -6957,7 +8389,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2008,
     "peakTo": 2024,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -6971,7 +8407,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1982,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -6986,7 +8426,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1948,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7000,7 +8443,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1975,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7014,7 +8461,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "band",
     "correctYear": 1990,
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7030,7 +8481,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1963,
     "peakTo": 1993,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7044,7 +8499,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1945,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7060,7 +8519,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1968,
     "peakTo": 1998,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7074,7 +8537,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "band",
     "correctYear": 1967,
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7088,7 +8555,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1948,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -7104,7 +8575,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1993,
     "peakTo": 2024,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -7118,7 +8593,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "band",
     "correctYear": 1968,
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7134,7 +8613,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2012,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7150,7 +8632,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1978,
     "peakTo": 2008,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7164,7 +8650,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1966,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7179,7 +8669,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1965,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -7195,7 +8688,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1989,
     "peakTo": 2024,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -7211,7 +8708,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1967,
     "peakTo": 2016,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -7227,7 +8728,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1997,
     "peakTo": 2026,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -7243,7 +8748,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2017,
     "peakTo": 2024,
     "audiences": [
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -7257,6 +8766,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1985,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -7275,7 +8786,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1975,
     "peakTo": 2005,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -7291,7 +8806,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2018,
     "peakTo": 2024,
     "audiences": [
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -7305,7 +8824,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1938,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7319,7 +8842,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1940,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7334,8 +8861,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2005,
     "peakTo": 2015,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7349,7 +8879,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1985,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7363,7 +8897,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1981,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7379,8 +8917,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2022,
     "peakTo": 2025,
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7394,7 +8935,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1987,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7408,6 +8953,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1987,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -7426,7 +8973,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1968,
     "peakTo": 2024,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -7440,7 +8991,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1971,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7454,7 +9009,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1975,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7468,7 +9027,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1970,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7484,8 +9047,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1988,
     "peakTo": 1998,
     "audiences": [
+      "elder",
       "gen-x",
-      "elder"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7501,7 +9067,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1955,
     "peakTo": 2020,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -7516,8 +9086,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2008,
     "peakTo": 2018,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7534,7 +9107,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2010,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7548,8 +9124,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1973,
     "audiences": [
+      "elder",
       "gen-x",
-      "millennials"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7565,7 +9144,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1985,
     "peakTo": 2024,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -7581,7 +9164,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1985,
     "peakTo": 2010,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7595,7 +9182,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "band",
     "correctYear": 1992,
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7611,7 +9202,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2012,
     "peakTo": 2024,
     "audiences": [
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -7626,7 +9221,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1961,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -7640,7 +9238,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1963,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7655,8 +9257,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2008,
     "peakTo": 2016,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7672,7 +9277,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1925,
     "peakTo": 1971,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -7687,7 +9296,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1951,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -7701,8 +9313,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 2006,
     "audiences": [
+      "elder",
       "gen-x",
-      "millennials"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7716,6 +9331,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1999,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -7733,7 +9350,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1972,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -7747,6 +9367,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1987,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -7763,6 +9385,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1985,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -7779,7 +9403,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1986,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7795,7 +9423,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1984,
     "peakTo": 2007,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -7810,7 +9442,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1967,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7825,7 +9460,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1959,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -7841,7 +9479,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1975,
     "peakTo": 2000,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7855,7 +9497,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1954,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7870,7 +9516,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1965,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7885,8 +9534,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2009,
     "peakTo": 2019,
     "audiences": [
+      "elder",
       "gen-x",
-      "millennials"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7901,8 +9553,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2007,
     "peakTo": 2020,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7916,7 +9571,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "band",
     "correctYear": 1999,
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7932,8 +9591,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2021,
     "peakTo": 2026,
     "audiences": [
-      "gen-z",
+      "elder",
+      "gen-x",
       "millennials",
+      "gen-z",
       "gen-alpha"
     ],
     "region": [
@@ -7948,7 +9609,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1986,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -7962,6 +9627,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1986,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -7980,7 +9647,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1991,
     "peakTo": 2024,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -7995,7 +9666,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1948,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -8009,6 +9683,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1988,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -8026,7 +9702,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1964,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -8040,8 +9719,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1973,
     "audiences": [
+      "elder",
       "gen-x",
-      "millennials"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8055,8 +9737,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1986,
     "audiences": [
+      "elder",
       "gen-x",
-      "millennials"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8070,6 +9755,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1985,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -8087,9 +9774,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2016,
     "peakTo": 2026,
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "gen-alpha",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8106,7 +9795,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2001,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8122,8 +9814,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2013,
     "peakTo": 2026,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -8139,7 +9834,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2015,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8155,7 +9853,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1990,
     "peakTo": 2024,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -8169,7 +9871,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1950,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8183,7 +9889,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1958,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8197,7 +9907,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1983,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8211,7 +9925,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1983,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8227,7 +9945,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1950,
     "peakTo": 1962,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -8243,8 +9965,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1994,
     "peakTo": 2024,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -8258,7 +9983,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1975,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8272,7 +10001,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1980,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8287,7 +10020,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1973,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8303,7 +10039,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1951,
     "peakTo": 1979,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -8317,7 +10057,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "band",
     "correctYear": 1994,
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8332,7 +10076,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1968,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8346,6 +10093,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1998,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -8363,7 +10112,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1956,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -8379,7 +10131,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1961,
     "peakTo": 1984,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -8395,7 +10151,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1992,
     "peakTo": 2024,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -8410,7 +10170,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1959,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8425,7 +10188,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1971,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -8440,7 +10206,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1964,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -8456,8 +10225,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1993,
     "peakTo": 2023,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -8471,6 +10243,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1978,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -8489,7 +10263,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2000,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8505,7 +10282,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1957,
     "peakTo": 2011,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -8521,7 +10302,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2018,
     "peakTo": 2024,
     "audiences": [
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -8535,7 +10320,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1987,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8549,6 +10338,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1994,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -8567,7 +10358,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1972,
     "peakTo": 2002,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -8581,7 +10376,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "band",
     "correctYear": 1981,
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8597,7 +10396,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1967,
     "peakTo": 1997,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -8613,7 +10416,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1979,
     "peakTo": 2009,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -8628,7 +10435,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1963,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -8644,7 +10454,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1974,
     "peakTo": 2004,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -8658,6 +10472,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1979,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -8675,7 +10491,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1969,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -8690,8 +10509,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2012,
     "peakTo": 2016,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8707,7 +10529,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1962,
     "peakTo": 2024,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -8721,8 +10547,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1986,
     "audiences": [
+      "elder",
       "gen-x",
-      "millennials"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8738,8 +10567,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1983,
     "peakTo": 2013,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8755,7 +10587,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1986,
     "peakTo": 2016,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8770,8 +10606,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2010,
     "peakTo": 2018,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8785,6 +10624,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1995,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -8803,7 +10644,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2006,
     "peakTo": 2024,
     "audiences": [
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -8819,7 +10664,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2016,
     "peakTo": 2026,
     "audiences": [
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -8833,7 +10682,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1991,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8847,6 +10700,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1978,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -8863,7 +10718,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1982,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8878,8 +10737,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2008,
     "peakTo": 2018,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -8893,6 +10755,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1992,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -8909,7 +10773,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1992,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8923,7 +10791,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1937,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -8938,7 +10810,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1949,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -8953,7 +10828,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1942,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -8967,6 +10845,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1986,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -8985,7 +10865,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1945,
     "peakTo": 1965,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -8999,7 +10883,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "band",
     "correctYear": 1968,
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9015,7 +10903,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2006,
     "peakTo": 2024,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -9031,7 +10923,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2000,
     "peakTo": 2024,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -9047,7 +10943,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1988,
     "peakTo": 2024,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9063,7 +10963,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2018,
     "peakTo": 2023,
     "audiences": [
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -9077,6 +10981,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1992,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -9093,6 +10999,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1991,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -9111,7 +11019,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2010,
     "peakTo": 2024,
     "audiences": [
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -9126,7 +11038,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1970,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -9140,8 +11055,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1971,
     "audiences": [
+      "elder",
       "gen-x",
-      "millennials"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9157,7 +11075,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1987,
     "peakTo": 2017,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -9173,8 +11095,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1990,
     "peakTo": 2020,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -9188,7 +11113,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "band",
     "correctYear": 1996,
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9202,7 +11131,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1958,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9217,7 +11150,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1922,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9234,7 +11170,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 1990,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9249,8 +11188,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2021,
     "peakTo": 2022,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9266,7 +11208,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2016,
     "peakTo": 2026,
     "audiences": [
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -9282,8 +11228,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2002,
     "peakTo": 2026,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9299,7 +11248,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2002,
     "peakTo": 2024,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -9315,8 +11268,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2005,
     "peakTo": 2024,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9330,6 +11286,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1987,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -9347,8 +11305,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2000,
     "peakTo": 2011,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9362,8 +11323,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1986,
     "audiences": [
+      "elder",
       "gen-x",
-      "millennials"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9378,7 +11342,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1955,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -9393,7 +11360,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1969,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -9409,7 +11379,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2021,
     "peakTo": 2024,
     "audiences": [
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -9423,7 +11397,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1934,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9438,8 +11416,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2001,
     "peakTo": 2012,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9454,8 +11435,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2021,
     "peakTo": 2024,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9469,7 +11453,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1958,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9483,6 +11471,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1991,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -9499,8 +11489,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1985,
     "audiences": [
+      "elder",
       "gen-x",
-      "millennials"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9514,7 +11507,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1983,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9530,7 +11527,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1962,
     "peakTo": 1967,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -9544,7 +11545,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1989,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9559,7 +11564,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1938,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -9575,7 +11583,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1991,
     "peakTo": 2021,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -9591,7 +11603,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1968,
     "peakTo": 2024,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -9606,7 +11622,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1968,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -9621,7 +11640,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1956,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "europe"
@@ -9635,6 +11657,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1976,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -9653,7 +11677,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1975,
     "peakTo": 2005,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -9667,6 +11695,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1976,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -9683,8 +11713,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1971,
     "audiences": [
+      "elder",
       "gen-x",
-      "millennials"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9698,7 +11731,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1971,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9713,7 +11750,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1965,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9729,7 +11769,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1957,
     "peakTo": 1963,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -9745,7 +11789,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1975,
     "peakTo": 2024,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -9761,7 +11809,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1948,
     "peakTo": 1978,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -9775,6 +11827,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1993,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -9793,7 +11847,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1992,
     "peakTo": 2022,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -9807,6 +11865,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1987,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -9824,7 +11884,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1940,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -9840,8 +11903,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1997,
     "peakTo": 2026,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -9855,6 +11921,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1983,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -9871,7 +11939,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1959,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9885,7 +11957,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1979,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9901,7 +11977,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1981,
     "peakTo": 2011,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9915,7 +11995,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1967,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9930,7 +12014,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1970,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9945,7 +12032,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1971,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -9962,7 +12052,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2020,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -9977,7 +12070,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1973,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -9993,7 +12089,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2015,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10007,7 +12106,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1953,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10022,8 +12125,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1998,
     "peakTo": 2015,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10039,7 +12145,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1976,
     "peakTo": 2006,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10053,6 +12163,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1982,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -10069,7 +12181,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1984,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10083,7 +12199,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1974,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10099,7 +12219,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1992,
     "peakTo": 2024,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -10115,7 +12239,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1981,
     "peakTo": 2020,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -10129,6 +12257,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 2000,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -10147,7 +12277,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1976,
     "peakTo": 2006,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -10163,7 +12297,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2000,
     "peakTo": 2024,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -10177,7 +12315,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "band",
     "correctYear": 1965,
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10191,7 +12333,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1951,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10207,7 +12353,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2015,
     "peakTo": 2024,
     "audiences": [
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -10223,7 +12373,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1979,
     "peakTo": 2016,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -10237,7 +12391,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1947,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10251,7 +12409,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1947,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10265,7 +12427,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "band",
     "correctYear": 1970,
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -10280,8 +12446,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2010,
     "peakTo": 2022,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10295,6 +12464,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1986,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -10312,7 +12483,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1952,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10326,6 +12500,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1993,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -10342,6 +12518,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1977,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -10360,7 +12538,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1955,
     "peakTo": 2004,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -10375,7 +12557,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1952,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -10391,8 +12576,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2006,
     "peakTo": 2026,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -10408,8 +12596,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1999,
     "peakTo": 2026,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -10425,7 +12616,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2010,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10439,6 +12633,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1983,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -10457,7 +12653,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1987,
     "peakTo": 2024,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -10473,7 +12673,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1991,
     "peakTo": 2024,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -10487,7 +12691,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1988,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -10504,7 +12712,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2007,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10518,6 +12729,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1978,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -10535,7 +12748,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1972,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -10549,6 +12765,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1980,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -10567,7 +12785,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1995,
     "peakTo": 2024,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -10583,7 +12805,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1966,
     "peakTo": 1996,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -10599,8 +12825,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1988,
     "peakTo": 2018,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -10616,7 +12845,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1954,
     "peakTo": 1984,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -10632,7 +12865,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2018,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10648,8 +12884,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2006,
     "peakTo": 2010,
     "audiences": [
+      "elder",
       "gen-x",
-      "millennials"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10663,6 +12902,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1988,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -10681,7 +12922,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2009,
     "peakTo": 2026,
     "audiences": [
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -10697,7 +12942,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1959,
     "peakTo": 1989,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -10712,7 +12961,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1967,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -10727,7 +12979,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1963,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -10741,7 +12996,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1990,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10756,8 +13015,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2018,
     "peakTo": 2024,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10772,8 +13034,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2009,
     "peakTo": 2011,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10788,8 +13053,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2013,
     "peakTo": 2018,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10803,6 +13071,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1983,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -10821,7 +13091,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1974,
     "peakTo": 2004,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -10837,7 +13111,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1995,
     "peakTo": 2018,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -10853,7 +13131,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1969,
     "peakTo": 2024,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -10867,6 +13149,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1981,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -10883,8 +13167,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1963,
     "audiences": [
+      "elder",
       "gen-x",
-      "millennials"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10900,7 +13187,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1978,
     "peakTo": 2008,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10917,7 +13208,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2010,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -10931,6 +13225,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1993,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -10965,6 +13261,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1976,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -10983,7 +13281,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1978,
     "peakTo": 2008,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -10997,7 +13299,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "band",
     "correctYear": 1986,
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -11013,7 +13319,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1956,
     "peakTo": 1988,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -11028,7 +13338,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1962,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -11043,7 +13356,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1973,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -11059,8 +13375,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2003,
     "peakTo": 2026,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -11074,7 +13393,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1994,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11090,7 +13413,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2014,
     "peakTo": 2024,
     "audiences": [
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -11106,7 +13433,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1989,
     "peakTo": 2019,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -11122,7 +13453,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1957,
     "peakTo": 1964,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -11138,7 +13473,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2012,
     "peakTo": 2024,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -11154,7 +13493,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1949,
     "peakTo": 1990,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -11170,7 +13513,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1971,
     "peakTo": 2001,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -11186,8 +13533,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1987,
     "peakTo": 2017,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -11201,7 +13551,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1984,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11215,7 +13569,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1955,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11229,6 +13587,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1993,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -11245,7 +13605,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1981,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11261,8 +13625,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2007,
     "peakTo": 2026,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -11278,7 +13645,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1990,
     "peakTo": 2024,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -11294,7 +13665,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1962,
     "peakTo": 1990,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -11308,7 +13683,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1983,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11323,8 +13702,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2008,
     "peakTo": 2020,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11339,8 +13721,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2014,
     "peakTo": 2020,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11356,7 +13741,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2009,
     "peakTo": 2024,
     "audiences": [
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -11371,7 +13760,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1944,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -11385,6 +13777,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1981,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -11401,6 +13795,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1988,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -11417,6 +13813,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1988,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -11435,7 +13833,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1995,
     "peakTo": 2024,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -11451,7 +13853,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1981,
     "peakTo": 2011,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -11467,7 +13873,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2014,
     "peakTo": 2024,
     "audiences": [
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -11481,7 +13891,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1973,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11497,7 +13911,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1934,
     "peakTo": 1940,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -11513,7 +13931,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2000,
     "peakTo": 2024,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -11527,6 +13949,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1987,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -11545,7 +13969,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1972,
     "peakTo": 2002,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -11559,7 +13987,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1969,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11575,7 +14007,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2015,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11591,7 +14026,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1992,
     "peakTo": 2024,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -11605,7 +14044,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1972,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11621,7 +14064,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1937,
     "peakTo": 1967,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -11635,7 +14082,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "band",
     "correctYear": 1994,
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11650,7 +14101,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1966,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -11665,7 +14119,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1976,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11680,7 +14137,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1970,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11696,7 +14156,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1974,
     "peakTo": 2004,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11710,7 +14174,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "band",
     "correctYear": 1962,
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11724,7 +14192,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1982,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11738,6 +14210,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1980,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -11756,7 +14230,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1973,
     "peakTo": 2024,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -11772,7 +14250,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1963,
     "peakTo": 2020,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -11786,6 +14268,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1993,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -11804,7 +14288,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1977,
     "peakTo": 2024,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -11820,7 +14308,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1969,
     "peakTo": 1999,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -11835,8 +14327,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2006,
     "peakTo": 2008,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11852,7 +14347,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2015,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11866,7 +14364,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1934,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11881,7 +14383,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1948,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11897,7 +14402,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1975,
     "peakTo": 2005,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11911,7 +14420,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "band",
     "correctYear": 2008,
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11927,7 +14440,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2017,
     "peakTo": 2024,
     "audiences": [
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -11943,7 +14460,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1965,
     "peakTo": 1985,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11957,7 +14478,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "band",
     "correctYear": 1963,
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -11973,7 +14498,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2008,
     "peakTo": 2026,
     "audiences": [
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -11987,7 +14516,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1956,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12001,8 +14534,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1977,
     "audiences": [
+      "elder",
       "gen-x",
-      "millennials"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12016,7 +14552,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1957,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12030,7 +14570,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "band",
     "correctYear": 2000,
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12044,7 +14588,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "band",
     "correctYear": 1965,
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12058,7 +14606,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "band",
     "correctYear": 1993,
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12072,7 +14624,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "band",
     "correctYear": 1977,
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12086,7 +14642,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "band",
     "correctYear": 1982,
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12100,7 +14660,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "band",
     "correctYear": 1995,
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12116,7 +14680,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2012,
     "peakTo": 2024,
     "audiences": [
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -12130,6 +14698,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1984,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -12146,6 +14716,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1977,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -12163,8 +14735,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2002,
     "peakTo": 2005,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12178,6 +14753,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1989,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -12195,7 +14772,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1959,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12209,6 +14789,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1979,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -12225,6 +14807,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1979,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -12241,7 +14825,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1975,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12257,7 +14845,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1960,
     "peakTo": 2023,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -12271,7 +14863,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1967,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12286,8 +14882,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2008,
     "peakTo": 2020,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12301,8 +14900,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1979,
     "audiences": [
+      "elder",
       "gen-x",
-      "millennials"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12316,6 +14918,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1977,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -12334,7 +14938,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1985,
     "peakTo": 2015,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -12350,7 +14958,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1988,
     "peakTo": 2020,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -12366,8 +14978,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2004,
     "peakTo": 2026,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -12383,7 +14998,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1964,
     "peakTo": 2024,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -12399,7 +15018,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1976,
     "peakTo": 2017,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -12415,7 +15038,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1968,
     "peakTo": 1998,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -12429,8 +15056,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1969,
     "audiences": [
+      "elder",
       "gen-x",
-      "millennials"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12444,7 +15074,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1952,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12460,7 +15094,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1985,
     "peakTo": 2000,
     "audiences": [
-      "elder"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12474,7 +15112,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1948,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12490,7 +15132,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1993,
     "peakTo": 2024,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -12504,6 +15150,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1990,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -12521,7 +15169,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1960,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12537,7 +15188,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2015,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12551,7 +15205,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1987,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12567,7 +15225,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1988,
     "peakTo": 2024,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -12581,7 +15243,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1991,
     "audiences": [
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -12595,6 +15261,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 2002,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -12612,8 +15280,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2021,
     "peakTo": 2025,
     "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
       "gen-z",
-      "millennials"
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12627,7 +15298,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "band",
     "correctYear": 1976,
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12641,7 +15316,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1949,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12657,7 +15336,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakTo": 2010,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12673,8 +15355,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1993,
     "peakTo": 2023,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -12688,6 +15373,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1986,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -12706,7 +15393,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1994,
     "peakTo": 2024,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -12720,6 +15411,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1980,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -12736,7 +15429,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1981,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12751,7 +15448,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1950,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -12765,6 +15465,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1990,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -12781,7 +15483,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1996,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12795,8 +15501,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1994,
     "audiences": [
+      "elder",
       "gen-x",
-      "millennials"
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12810,7 +15519,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "band",
     "correctYear": 1958,
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12825,8 +15538,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2022,
     "peakTo": 2024,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "europe"
@@ -12842,7 +15558,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1993,
     "peakTo": 2023,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -12856,7 +15576,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1987,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12872,7 +15596,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1988,
     "peakTo": 2018,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12886,6 +15614,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1991,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -12903,7 +15633,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1961,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -12917,6 +15650,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1985,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -12933,7 +15668,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1947,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12947,6 +15686,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1984,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -12963,7 +15704,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "band",
     "correctYear": 1981,
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -12979,7 +15724,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1985,
     "peakTo": 2012,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -12995,7 +15744,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1978,
     "peakTo": 2008,
     "audiences": [
-      "gen-x"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -13011,8 +15764,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1990,
     "peakTo": 2020,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -13028,8 +15784,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 1991,
     "peakTo": 2021,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -13043,6 +15802,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1981,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -13059,6 +15820,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1980,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -13075,6 +15838,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1980,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"
@@ -13091,7 +15856,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "band",
     "correctYear": 2000,
     "audiences": [
-      "all"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -13106,8 +15875,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2013,
     "peakTo": 2016,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
-      "gen-z"
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "sweden"
@@ -13121,7 +15893,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "artist",
     "correctYear": 1997,
     "audiences": [
-      "millennials"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -13137,7 +15913,11 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "peakFrom": 2016,
     "peakTo": 2026,
     "audiences": [
-      "gen-z"
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "unknown-region"
@@ -13152,7 +15932,10 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "correctYear": 1972,
     "audiences": [
       "elder",
-      "gen-x"
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
     ],
     "region": [
       "global"
@@ -13166,6 +15949,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "contentSubject": "athlete",
     "correctYear": 1981,
     "audiences": [
+      "elder",
+      "gen-x",
       "millennials",
       "gen-z",
       "gen-alpha"

@@ -9,13 +9,14 @@
 # - Genre-paket-id:n MÅSTE matcha src/utils/mockPurchasedPackages.ts
 #   (pkg-hiphop, pkg-rock idag). Andra strängar gör att items aldrig surfar
 #   eftersom inget paket aktiverar dem.
-audience: ["millennials"]
+audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
 region: ["sweden"]
 category: artists
 contentForm: image
 contentSubject: artist
 items:
   - id: avicii
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Avicii"
     correctYear: 1989
     peakFrom: 2011
@@ -25,6 +26,7 @@ items:
     wikimediaSearchHints: ["Avicii", "Tim Bergling"]
     answerMethods: ["timeline", "name-letters"]
   - id: rihanna
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Rihanna"
     correctYear: 1988
     probability: 95
@@ -32,6 +34,7 @@ items:
     wikimediaSearchHints: ["Rihanna"]
     answerMethods: ["timeline", "name-letters"]
   - id: eminem
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Eminem"
     correctYear: 1972
     probability: 94
@@ -41,6 +44,7 @@ items:
     inBaseCatalog: true
     genrePackages: ["pkg-hiphop"]
   - id: beyonce
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Beyoncé"
     correctYear: 1981
     probability: 90
@@ -48,6 +52,7 @@ items:
     wikimediaSearchHints: ["Beyoncé"]
     answerMethods: ["timeline", "name-letters"]
   - id: bruno-mars
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Bruno Mars"
     correctYear: 1985
     peakFrom: 2010
@@ -57,6 +62,7 @@ items:
     wikimediaSearchHints: ["Bruno Mars singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: adele
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Adele"
     correctYear: 1988
     peakFrom: 2008
@@ -66,6 +72,7 @@ items:
     wikimediaSearchHints: ["Adele singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: lady-gaga
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Lady Gaga"
     correctYear: 1986
     peakFrom: 2008
@@ -75,6 +82,7 @@ items:
     wikimediaSearchHints: ["Lady Gaga singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: justin-timberlake
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Justin Timberlake"
     correctYear: 1981
     peakFrom: 2002
@@ -84,6 +92,7 @@ items:
     wikimediaSearchHints: ["Justin Timberlake singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: pink
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Pink"
     correctYear: 1979
     peakFrom: 2000
@@ -93,6 +102,7 @@ items:
     wikimediaSearchHints: ["Pink singer P!nk Alecia Moore"]
     answerMethods: ["timeline", "name-letters"]
   - id: mariah-carey
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Mariah Carey"
     correctYear: 1969
     peakFrom: 1990
@@ -102,6 +112,7 @@ items:
     wikimediaSearchHints: ["Mariah Carey singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: robyn
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Robyn"
     correctYear: 1979
     peakFrom: 1995
@@ -111,6 +122,7 @@ items:
     wikimediaSearchHints: ["Robyn singer Sweden", "Robin Carlsson"]
     answerMethods: ["timeline", "name-letters"]
   - id: celine-dion
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Céline Dion"
     correctYear: 1968
     peakFrom: 1990
@@ -120,6 +132,7 @@ items:
     wikimediaSearchHints: ["Celine Dion singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: christina-aguilera
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Christina Aguilera"
     correctYear: 1980
     peakFrom: 1999
@@ -129,6 +142,7 @@ items:
     wikimediaSearchHints: ["Christina Aguilera"]
     answerMethods: ["timeline", "name-letters"]
   - id: britney-spears
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Britney Spears"
     correctYear: 1981
     peakFrom: 1998
@@ -138,6 +152,7 @@ items:
     wikimediaSearchHints: ["Britney Spears singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: shakira
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Shakira"
     correctYear: 1977
     peakFrom: 1995
@@ -147,6 +162,7 @@ items:
     wikimediaSearchHints: ["Shakira singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: alicia-keys
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Alicia Keys"
     correctYear: 1981
     peakFrom: 2001
@@ -156,6 +172,7 @@ items:
     wikimediaSearchHints: ["Alicia Keys singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: norah-jones
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Norah Jones"
     correctYear: 1979
     peakFrom: 2002
@@ -165,6 +182,7 @@ items:
     wikimediaSearchHints: ["Norah Jones singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: robbie-williams
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Robbie Williams"
     correctYear: 1974
     peakFrom: 1995
@@ -174,6 +192,7 @@ items:
     wikimediaSearchHints: ["Robbie Williams singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: jay-z
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Jay-Z"
     correctYear: 1969
     peakFrom: 1996
@@ -183,6 +202,7 @@ items:
     wikimediaSearchHints: ["Jay-Z rapper", "Shawn Carter rapper"]
     answerMethods: ["timeline", "name-letters"]
   - id: nelly-furtado
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Nelly Furtado"
     correctYear: 1978
     peakFrom: 2000
@@ -192,6 +212,7 @@ items:
     wikimediaSearchHints: ["Nelly Furtado singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: jennifer-lopez
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Jennifer Lopez"
     correctYear: 1969
     peakFrom: 1999
@@ -201,6 +222,7 @@ items:
     wikimediaSearchHints: ["Jennifer Lopez singer actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: mary-j-blige
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Mary J. Blige"
     correctYear: 1971
     peakFrom: 1992
@@ -210,6 +232,7 @@ items:
     wikimediaSearchHints: ["Mary J Blige singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: john-legend
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "John Legend"
     correctYear: 1978
     peakFrom: 2004
@@ -219,6 +242,7 @@ items:
     wikimediaSearchHints: ["John Legend singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: sam-smith
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Sam Smith"
     correctYear: 1992
     peakFrom: 2012
@@ -228,6 +252,7 @@ items:
     wikimediaSearchHints: ["Sam Smith singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: sia
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Sia"
     correctYear: 1975
     peakFrom: 2000
@@ -237,6 +262,7 @@ items:
     wikimediaSearchHints: ["Sia singer Furler"]
     answerMethods: ["timeline", "name-letters"]
   - id: avril-lavigne
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Avril Lavigne"
     correctYear: 1984
     peakFrom: 2002
@@ -246,6 +272,7 @@ items:
     wikimediaSearchHints: ["Avril Lavigne singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: pharrell-williams
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Pharrell Williams"
     correctYear: 1973
     peakFrom: 1992
@@ -255,6 +282,7 @@ items:
     wikimediaSearchHints: ["Pharrell Williams producer"]
     answerMethods: ["timeline", "name-letters"]
   - id: toni-braxton
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Toni Braxton"
     correctYear: 1967
     peakFrom: 1993
@@ -264,6 +292,7 @@ items:
     wikimediaSearchHints: ["Toni Braxton singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: ne-yo
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Ne-Yo"
     correctYear: 1979
     peakFrom: 2006
@@ -273,6 +302,7 @@ items:
     wikimediaSearchHints: ["Ne-Yo singer", "Shaffer Smith singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: usher
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Usher"
     correctYear: 1978
     peakFrom: 1994
@@ -282,6 +312,7 @@ items:
     wikimediaSearchHints: ["Usher singer", "Usher Raymond"]
     answerMethods: ["timeline", "name-letters"]
   - id: snoop-dogg
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Snoop Dogg"
     correctYear: 1971
     peakFrom: 1992
@@ -291,6 +322,7 @@ items:
     wikimediaSearchHints: ["Snoop Dogg rapper"]
     answerMethods: ["timeline", "name-letters"]
   - id: ll-cool-j
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     region: ["global"]
     displayName: "LL Cool J"
     correctYear: 1968
@@ -300,6 +332,7 @@ items:
     wikimediaSearchHints: ["LL Cool J rapper"]
     answerMethods: ["timeline", "name-letters"]
   - id: lauryn-hill
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Lauryn Hill"
     correctYear: 1975
     peakFrom: 1993
@@ -309,6 +342,7 @@ items:
     wikimediaSearchHints: ["Lauryn Hill singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: enrique-iglesias
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Enrique Iglesias"
     correctYear: 1975
     peakFrom: 1995
@@ -318,6 +352,7 @@ items:
     wikimediaSearchHints: ["Enrique Iglesias singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: gwen-stefani
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Gwen Stefani"
     correctYear: 1969
     peakFrom: 1990
@@ -327,6 +362,7 @@ items:
     wikimediaSearchHints: ["Gwen Stefani"]
     answerMethods: ["timeline", "name-letters"]
   - id: marc-anthony
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Marc Anthony"
     correctYear: 1968
     peakFrom: 1991
@@ -336,6 +372,7 @@ items:
     wikimediaSearchHints: ["Marc Anthony singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: tracy-chapman
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Tracy Chapman"
     correctYear: 1964
     peakFrom: 1988
@@ -346,18 +383,21 @@ items:
     answerMethods: ["timeline", "name-letters"]
   # === Svenska expansion 2026-05-27 ===
   - id: tove-lo
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Tove Lo"
     correctYear: 1987
     probability: 82
     wikimediaSearchHints: ["Tove Lo Swedish singer Habits Stay High"]
     answerMethods: ["timeline", "name-letters"]
   - id: lykke-li
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Lykke Li"
     correctYear: 1986
     probability: 78
     wikimediaSearchHints: ["Lykke Li Swedish singer I Follow Rivers"]
     answerMethods: ["timeline", "name-letters"]
   - id: zara-larsson
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Zara Larsson"
     correctYear: 1997
     probability: 82
@@ -365,30 +405,35 @@ items:
     wikimediaSearchHints: ["Zara Larsson Swedish singer Lush Life Never Forget You"]
     answerMethods: ["timeline", "name-letters"]
   - id: veronica-maggio
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Veronica Maggio"
     correctYear: 1981
     probability: 80
     wikimediaSearchHints: ["Veronica Maggio Swedish singer Jag kommer"]
     answerMethods: ["timeline", "name-letters"]
   - id: hakan-hellstrom
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Håkan Hellström"
     correctYear: 1974
     probability: 82
     wikimediaSearchHints: ["Håkan Hellström Swedish singer Känn ingen sorg"]
     answerMethods: ["timeline", "name-letters"]
   - id: petter
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Petter"
     correctYear: 1974
     probability: 76
     wikimediaSearchHints: ["Petter Swedish rapper hip hop Mitt sjätte sinne"]
     answerMethods: ["timeline", "name-letters"]
   - id: adam-tensta
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Adam Tensta"
     correctYear: 1983
     probability: 70
     wikimediaSearchHints: ["Adam Tensta Swedish rapper"]
     answerMethods: ["timeline", "name-letters"]
   - id: eagle-eye-cherry
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Eagle-Eye Cherry"
     correctYear: 1968
     probability: 78
@@ -396,30 +441,35 @@ items:
     answerMethods: ["timeline", "name-letters"]
   # === Svenska genrer expansion 2026-05-27 — House/Hip Hop/Pop/Vemod ===
   - id: steve-angello
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Steve Angello"
     correctYear: 1982
     probability: 78
     wikimediaSearchHints: ["Steve Angello Swedish house DJ producer"]
     answerMethods: ["timeline", "name-letters"]
   - id: axwell
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Axwell"
     correctYear: 1977
     probability: 78
     wikimediaSearchHints: ["Axwell Swedish house DJ producer Axel Hedfors"]
     answerMethods: ["timeline", "name-letters"]
   - id: eric-prydz
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Eric Prydz"
     correctYear: 1976
     probability: 78
     wikimediaSearchHints: ["Eric Prydz Swedish DJ producer Call on Me Pjanoo"]
     answerMethods: ["timeline", "name-letters"]
   - id: timbuktu
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Timbuktu"
     correctYear: 1975
     probability: 82
     wikimediaSearchHints: ["Timbuktu Swedish rapper Jason Diakité Alla vill till himmelen"]
     answerMethods: ["timeline", "name-letters"]
   - id: cleo
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     region: ["unknown-region"]
     displayName: "Cleo"
     correctYear: 1985
@@ -427,42 +477,49 @@ items:
     wikimediaSearchHints: ["Cleo Swedish rapper hip hop Cleopatra Christianty"]
     answerMethods: ["timeline", "name-letters"]
   - id: petra-marklund
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Petra Marklund"
     correctYear: 1984
     probability: 78
     wikimediaSearchHints: ["Petra Marklund Swedish singer September Cry for You"]
     answerMethods: ["timeline", "name-letters"]
   - id: lars-winnerback
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Lars Winnerbäck"
     correctYear: 1975
     probability: 82
     wikimediaSearchHints: ["Lars Winnerbäck Swedish singer Hosianna Söndermarken"]
     answerMethods: ["timeline", "name-letters"]
   - id: patrik-isaksson
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Patrik Isaksson"
     correctYear: 1971
     probability: 76
     wikimediaSearchHints: ["Patrik Isaksson Swedish singer Hon kommer med solsken"]
     answerMethods: ["timeline", "name-letters"]
   - id: markoolio
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Markoolio"
     correctYear: 1975
     probability: 80
     wikimediaSearchHints: ["Markoolio Swedish singer rap Vi drar till fjällen"]
     answerMethods: ["timeline", "name-letters"]
   - id: basshunter
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Basshunter"
     correctYear: 1984
     probability: 82
     wikimediaSearchHints: ["Basshunter Swedish DJ Boten Anna Jonas Altberg"]
     answerMethods: ["timeline", "name-letters"]
   - id: mans-zelmerlow
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Måns Zelmerlöw"
     correctYear: 1986
     probability: 84
     wikimediaSearchHints: ["Måns Zelmerlöw Swedish singer Eurovision Heroes 2015"]
     answerMethods: ["timeline", "name-letters"]
   - id: darin
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Darin"
     correctYear: 1987
     probability: 80
@@ -470,66 +527,77 @@ items:
     answerMethods: ["timeline", "name-letters"]
   # === Vemod-batch 2026-05-27 — svenska millennials melankoli/indie/pop ===
   - id: melissa-horn
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Melissa Horn"
     correctYear: 1987
     probability: 82
     wikimediaSearchHints: ["Melissa Horn Swedish singer Lät den rätte komma in"]
     answerMethods: ["timeline", "name-letters"]
   - id: molly-sanden
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Molly Sandén"
     correctYear: 1992
     probability: 84
     wikimediaSearchHints: ["Molly Sandén Swedish singer Eurovision Husavik"]
     answerMethods: ["timeline", "name-letters"]
   - id: albin-lee-meldau
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Albin Lee Meldau"
     correctYear: 1987
     probability: 76
     wikimediaSearchHints: ["Albin Lee Meldau Swedish singer Lou Lou"]
     answerMethods: ["timeline", "name-letters"]
   - id: laleh
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Laleh"
     correctYear: 1982
     probability: 84
     wikimediaSearchHints: ["Laleh Pourkarim Swedish singer Some Die Young Goliat"]
     answerMethods: ["timeline", "name-letters"]
   - id: oskar-linnros
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Oskar Linnros"
     correctYear: 1983
     probability: 80
     wikimediaSearchHints: ["Oskar Linnros Swedish singer Från och med du"]
     answerMethods: ["timeline", "name-letters"]
   - id: markus-krunegard
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Markus Krunegård"
     correctYear: 1980
     probability: 74
     wikimediaSearchHints: ["Markus Krunegård Swedish singer Laakso"]
     answerMethods: ["timeline", "name-letters"]
   - id: anna-ternheim
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Anna Ternheim"
     correctYear: 1978
     probability: 76
     wikimediaSearchHints: ["Anna Ternheim Swedish singer indie folk"]
     answerMethods: ["timeline", "name-letters"]
   - id: jens-lekman
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Jens Lekman"
     correctYear: 1981
     probability: 76
     wikimediaSearchHints: ["Jens Lekman Swedish singer indie Gothenburg"]
     answerMethods: ["timeline", "name-letters"]
   - id: miriam-bryant
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Miriam Bryant"
     correctYear: 1991
     probability: 82
     wikimediaSearchHints: ["Miriam Bryant Swedish singer Push Play"]
     answerMethods: ["timeline", "name-letters"]
   - id: benjamin-ingrosso
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Benjamin Ingrosso"
     correctYear: 1997
     probability: 82
     wikimediaSearchHints: ["Benjamin Ingrosso Swedish singer Eurovision Dance You Off"]
     answerMethods: ["timeline", "name-letters"]
   - id: hurula
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Hurula"
     correctYear: 1979
     probability: 72
@@ -537,42 +605,49 @@ items:
     wikimediaSearchHints: ["Hurula Swedish singer punk Robert Pettersson"]
     answerMethods: ["timeline", "name-letters"]
   - id: cherrie
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Cherrie"
     correctYear: 1991
     probability: 76
     wikimediaSearchHints: ["Cherrie Swedish singer R&B Sherihan Hersi"]
     answerMethods: ["timeline", "name-letters"]
   - id: sophie-zelmani
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Sophie Zelmani"
     correctYear: 1972
     probability: 76
     wikimediaSearchHints: ["Sophie Zelmani Swedish singer folk Always You"]
     answerMethods: ["timeline", "name-letters"]
   - id: linnea-henriksson
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Linnéa Henriksson"
     correctYear: 1987
     probability: 74
     wikimediaSearchHints: ["Linnéa Henriksson Swedish singer Lyckligare nu"]
     answerMethods: ["timeline", "name-letters"]
   - id: victor-leksell
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Victor Leksell"
     correctYear: 1996
     probability: 80
     wikimediaSearchHints: ["Victor Leksell Swedish singer Svag Molly Sandén"]
     answerMethods: ["timeline", "name-letters"]
   - id: miss-li
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Miss Li"
     correctYear: 1982
     probability: 76
     wikimediaSearchHints: ["Miss Li Linna Larsson Swedish singer Bourgeois Shangri-La"]
     answerMethods: ["timeline", "name-letters"]
   - id: joakim-berg
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Joakim Berg"
     correctYear: 1970
     probability: 72
     wikimediaSearchHints: ["Joakim Berg Swedish singer Kent solo"]
     answerMethods: ["timeline", "name-letters"]
   - id: daniel-adams-ray
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Daniel Adams-Ray"
     correctYear: 1983
     probability: 76
@@ -580,48 +655,56 @@ items:
     answerMethods: ["timeline", "name-letters"]
   # === Bred batch 2026-05-27 — tonårsidoler/house/hiphop/epa-dunk/cross-nordic ===
   - id: daniel-lindstrom
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Daniel Lindström"
     correctYear: 1980
     probability: 76
     wikimediaSearchHints: ["Daniel Lindström Swedish singer Idol 2004 winner"]
     answerMethods: ["timeline", "name-letters"]
   - id: agnes-carlsson
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Agnes Carlsson"
     correctYear: 1988
     probability: 80
     wikimediaSearchHints: ["Agnes Carlsson Swedish singer Idol 2005 Release Me"]
     answerMethods: ["timeline", "name-letters"]
   - id: sanna-nielsen
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Sanna Nielsen"
     correctYear: 1984
     probability: 80
     wikimediaSearchHints: ["Sanna Nielsen Swedish singer Eurovision 2014 Undo"]
     answerMethods: ["timeline", "name-letters"]
   - id: robin-bengtsson
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Robin Bengtsson"
     correctYear: 1990
     probability: 76
     wikimediaSearchHints: ["Robin Bengtsson Swedish singer Eurovision 2017 I Cant Go On"]
     answerMethods: ["timeline", "name-letters"]
   - id: eric-saade
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Eric Saade"
     correctYear: 1990
     probability: 82
     wikimediaSearchHints: ["Eric Saade Swedish singer Eurovision Popular Melfest"]
     answerMethods: ["timeline", "name-letters"]
   - id: kim-cesarion
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Kim Cesarion"
     correctYear: 1988
     probability: 72
     wikimediaSearchHints: ["Kim Cesarion Swedish singer Undressed"]
     answerMethods: ["timeline", "name-letters"]
   - id: alesso
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Alesso"
     correctYear: 1991
     probability: 84
     wikimediaSearchHints: ["Alesso Alessandro Lindblad Swedish DJ producer Heroes"]
     answerMethods: ["timeline", "name-letters"]
   - id: john-dahlback
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "John Dahlbäck"
     correctYear: 1985
     probability: 72
@@ -629,18 +712,21 @@ items:
     wikimediaSearchHints: ["John Dahlback Swedish house DJ producer"]
     answerMethods: ["timeline", "name-letters"]
   - id: otto-knows
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Otto Knows"
     correctYear: 1989
     probability: 72
     wikimediaSearchHints: ["Otto Knows Otto Jettmann Swedish DJ Million Voices"]
     answerMethods: ["timeline", "name-letters"]
   - id: sebastian-ingrosso
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Sebastian Ingrosso"
     correctYear: 1983
     probability: 80
     wikimediaSearchHints: ["Sebastian Ingrosso Swedish house DJ Swedish House Mafia"]
     answerMethods: ["timeline", "name-letters"]
   - id: erik-lundin
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Erik Lundin"
     correctYear: 1985
     probability: 76
@@ -648,12 +734,14 @@ items:
     wikimediaSearchHints: ["Erik Lundin Swedish rapper hip hop Suedi"]
     answerMethods: ["timeline", "name-letters"]
   - id: linda-pira
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Linda Pira"
     correctYear: 1985
     probability: 74
     wikimediaSearchHints: ["Linda Pira Swedish rapper Knäpper mina fingrar"]
     answerMethods: ["timeline", "name-letters"]
   - id: aronchupa
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     region: ["europe"]
     displayName: "AronChupa"
     correctYear: 1993
@@ -661,54 +749,63 @@ items:
     wikimediaSearchHints: ["AronChupa Aron Ekberg Swedish DJ Im an Albatraoz"]
     answerMethods: ["timeline", "name-letters"]
   - id: kygo
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Kygo"
     correctYear: 1991
     probability: 84
     wikimediaSearchHints: ["Kygo Kyrre Gørvell-Dahll Norwegian DJ tropical house"]
     answerMethods: ["timeline", "name-letters"]
   - id: alexander-rybak
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Alexander Rybak"
     correctYear: 1986
     probability: 82
     wikimediaSearchHints: ["Alexander Rybak Norwegian singer Eurovision 2009 Fairytale"]
     answerMethods: ["timeline", "name-letters"]
   - id: marie-serneholt
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Marie Serneholt"
     correctYear: 1983
     probability: 76
     wikimediaSearchHints: ["Marie Serneholt Swedish singer A*Teens That's the Way My Heart Goes"]
     answerMethods: ["timeline", "name-letters"]
   - id: anna-sahlene
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Anna Sahlene"
     correctYear: 1976
     probability: 72
     wikimediaSearchHints: ["Anna Sahlene Swedish singer Eurovision 2002 Estonia"]
     answerMethods: ["timeline", "name-letters"]
   - id: sarah-dawn-finer
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Sarah Dawn Finer"
     correctYear: 1981
     probability: 78
     wikimediaSearchHints: ["Sarah Dawn Finer Swedish singer Moving On Eurovision"]
     answerMethods: ["timeline", "name-letters"]
   - id: lisa-miskovsky
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Lisa Miskovsky"
     correctYear: 1975
     probability: 76
     wikimediaSearchHints: ["Lisa Miskovsky Swedish singer Driving One of Your Cars Mirror's Edge"]
     answerMethods: ["timeline", "name-letters"]
   - id: pernilla-andersson
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Pernilla Andersson"
     correctYear: 1979
     probability: 72
     wikimediaSearchHints: ["Pernilla Andersson Swedish singer indie folk"]
     answerMethods: ["timeline", "name-letters"]
   - id: linda-sundblad
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Linda Sundblad"
     correctYear: 1981
     probability: 74
     wikimediaSearchHints: ["Linda Sundblad Swedish singer Lambretta Oh Father"]
     answerMethods: ["timeline", "name-letters"]
   - id: mariette
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Mariette"
     correctYear: 1983
     probability: 76
@@ -716,12 +813,14 @@ items:
     answerMethods: ["timeline", "name-letters"]
   # === Batch C 2026-05-27 — svenska millennials artister ===
   - id: sabina-ddumba
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Sabina Ddumba"
     correctYear: 1994
     probability: 74
     wikimediaSearchHints: ["Sabina Ddumba Swedish singer Effortless"]
     answerMethods: ["timeline", "name-letters"]
   - id: vincent-pontare
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Vincent"
     correctYear: 1987
     probability: 72
@@ -729,27 +828,29 @@ items:
     answerMethods: ["timeline", "name-letters"]
   # === Komplettering 2026-05-27 — Mello/Eurodance/Global hip-hop ===
   - id: danny-saucedo
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Danny Saucedo"
     correctYear: 1986
     probability: 88
     wikimediaSearchHints: ["Danny Saucedo Swedish singer Melodifestivalen In the Club"]
     answerMethods: ["timeline", "name-letters"]
   - id: e-type
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "E-Type"
     correctYear: 1965
     probability: 92
     wikimediaSearchHints: ["E-Type Swedish eurodance Martin Eriksson Set the World on Fire"]
     answerMethods: ["timeline", "name-letters"]
-    audience: ["gen-x", "millennials"]
   - id: kanye-west
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Kanye West"
     correctYear: 1977
     probability: 95
     region: ["global"]
     wikimediaSearchHints: ["Kanye West American rapper Ye producer Stronger"]
     answerMethods: ["timeline", "name-letters"]
-    audience: ["millennials", "gen-z"]
   - id: conchita-wurst
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Conchita Wurst"
     correctYear: 1988
     probability: 80
@@ -758,4 +859,3 @@ items:
     peakTo: 2022
     wikimediaSearchHints: ["Conchita Wurst Austrian singer Eurovision 2014"]
     answerMethods: ["name-letters"]
-    audience: ["millennials", "gen-x", "gen-z"]

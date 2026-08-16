@@ -14,7 +14,7 @@
 # 1 item utan media — inga OK studio-versioner i YouTube-sök:
 #   - beyonce-crazy-in-love (top-1 BLOCKED, top-2 är live, top-3 är Fifty
 #     Shades-remix). Parkerat tills alternativ källa hittas.
-audience: ["gen-z", "millennials"]
+audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
 region: ["sweden"]
 category: songs
 contentForm: youtube
@@ -22,6 +22,7 @@ contentSubject: song
 items:
   # 1997
   - id: aqua-barbie-girl
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Barbie Girl — Aqua"
     correctYear: 1997
     probability: 92
@@ -35,6 +36,7 @@ items:
   # My Heart Will Go On flyttad till songs-all.yaml (cross-gen-iconic) 2026-05-22.
   # 1998
   - id: cher-believe
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Believe — Cher"
     correctYear: 1998
     probability: 90
@@ -46,6 +48,7 @@ items:
         endSec: 237
         channelTitle: "Cher"
   - id: madonna-frozen
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Frozen — Madonna"
     correctYear: 1998
     probability: 78
@@ -57,6 +60,7 @@ items:
         endSec: 329
         channelTitle: "Madonna"
   - id: petter-vinden-har-vant
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Vinden har vänt — Petter"
     correctYear: 1998
     probability: 88
@@ -65,17 +69,21 @@ items:
     spotifyTrackId: "2XkMVyMLZhrUivl7XuhidO"
   # 1999
   - id: lou-bega-mambo-no-5
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Mambo No. 5 — Lou Bega"
     correctYear: 1999
     probability: 85
+    region: ["global"]
     wikimediaSearchHints: ["Lou Bega Mambo No 5"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "is6AYSCWwKM"
+      - videoId: "bZlwFBnog7Q"
         startSec: 0
-        endSec: 221
-        channelTitle: "Lou Bega Official"
+        endSec: 30
+        channelTitle: "MVIDEO4K"
+        notes: "Peter-kurerad 2026-08-14. Videotitel verifierad: '[4K] Lou Bega - Mambo No. 5 (A Little Bit Of...) (Music Video)' — inget ar i titeln."
   - id: eiffel-65-blue
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Blue (Da Ba Dee) — Eiffel 65"
     correctYear: 1999
     probability: 85
@@ -88,6 +96,7 @@ items:
         channelTitle: "Eiffel 65 - Topic"
   # 2000
   - id: britney-spears-oops-i-did-it-again
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Oops!... I Did It Again — Britney Spears"
     correctYear: 2000
     probability: 92
@@ -99,6 +108,7 @@ items:
         endSec: 211
         channelTitle: "Unique Sound"
   - id: coldplay-yellow
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Yellow — Coldplay"
     correctYear: 2000
     probability: 88
@@ -110,6 +120,7 @@ items:
         endSec: 273
         channelTitle: "Coldplay"
   - id: dr-dre-the-next-episode
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "The Next Episode — Dr. Dre ft. Snoop Dogg"
     correctYear: 1999
     probability: 88
@@ -124,6 +135,7 @@ items:
         channelTitle: "Dr. Dre"
   # 2001
   - id: lady-marmalade-2001
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Lady Marmalade — Christina Aguilera, Lil' Kim, Mýa & Pink"
     correctYear: 2001
     probability: 85
@@ -136,6 +148,7 @@ items:
         channelTitle: "MUSIC EVOLUTION"
         notes: "Official Video 4K 60fps remaster — HD-fix av tidigare SD-klipp 2026-05-22. Refrängområde."
   - id: alicia-keys-fallin
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Fallin' — Alicia Keys"
     correctYear: 2001
     probability: 82
@@ -148,6 +161,7 @@ items:
         channelTitle: "Bussin"
   # 2002
   - id: eminem-without-me
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Without Me — Eminem"
     correctYear: 2002
     probability: 92
@@ -159,6 +173,7 @@ items:
         endSec: 291
         channelTitle: "Solitude Songs"
   - id: avril-lavigne-complicated
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Complicated — Avril Lavigne"
     correctYear: 2002
     probability: 88
@@ -171,6 +186,7 @@ items:
         channelTitle: "7clouds"
   # 2003
   - id: 50-cent-in-da-club
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "In da Club — 50 Cent"
     correctYear: 2003
     probability: 90
@@ -184,6 +200,7 @@ items:
         endSec: 194
         channelTitle: "50 Cent - Topic"
   - id: sarek-genom-eld-och-vatten
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Genom eld och vatten — Sarek"
     correctYear: 2003
     probability: 85
@@ -199,6 +216,7 @@ items:
         notes: "Finalen Melodifestivalen 2003. Inget officiellt MV finns. Tillagd 2026-06-04."
   # 2004
   - id: usher-yeah
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Yeah! — Usher"
     correctYear: 2004
     probability: 90
@@ -210,6 +228,7 @@ items:
         endSec: 251
         channelTitle: "7clouds"
   - id: o-zone-dragostea-din-tei
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Dragostea Din Tei — O-Zone"
     correctYear: 2004
     probability: 85
@@ -222,6 +241,7 @@ items:
         channelTitle: "Lyrixa"
   # 2005
   - id: madonna-hung-up
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Hung Up — Madonna"
     correctYear: 2005
     probability: 85
@@ -233,6 +253,7 @@ items:
         endSec: 334
         channelTitle: "Madonna"
   - id: gorillaz-feel-good-inc
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Feel Good Inc. — Gorillaz"
     correctYear: 2005
     probability: 88
@@ -245,6 +266,7 @@ items:
         channelTitle: "Gorillaz"
   # 2006
   - id: gnarls-barkley-crazy
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Crazy — Gnarls Barkley"
     correctYear: 2006
     probability: 85
@@ -256,6 +278,7 @@ items:
         endSec: 181
         channelTitle: "Gnarls Barkley Official"
   - id: shakira-hips-dont-lie
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Hips Don't Lie — Shakira"
     correctYear: 2006
     probability: 92
@@ -268,6 +291,7 @@ items:
         channelTitle: "7clouds"
   # 2007
   - id: rihanna-umbrella
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Umbrella — Rihanna"
     correctYear: 2007
     probability: 92
@@ -279,6 +303,7 @@ items:
         endSec: 267
         channelTitle: "Pillow"
   - id: timbaland-onerepublic-apologize
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Apologize — Timbaland & OneRepublic"
     correctYear: 2007
     probability: 88
@@ -291,6 +316,7 @@ items:
         channelTitle: "Lost Panda"
   # 2008
   - id: coldplay-viva-la-vida
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Viva la Vida — Coldplay"
     correctYear: 2008
     probability: 92
@@ -302,6 +328,7 @@ items:
         endSec: 243
         channelTitle: "Coldplay"
   - id: katy-perry-i-kissed-a-girl
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "I Kissed a Girl — Katy Perry"
     correctYear: 2008
     probability: 88
@@ -314,6 +341,7 @@ items:
         channelTitle: "Katy Perry - Topic"
   # 2009
   - id: lady-gaga-bad-romance
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Bad Romance — Lady Gaga"
     correctYear: 2009
     probability: 92
@@ -325,6 +353,7 @@ items:
         endSec: 293
         channelTitle: "7clouds"
   - id: black-eyed-peas-i-gotta-feeling
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "I Gotta Feeling — The Black Eyed Peas"
     correctYear: 2009
     probability: 88
@@ -337,6 +366,7 @@ items:
         channelTitle: "Black Eyed Peas - Topic"
   # 2010
   - id: shakira-waka-waka
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Waka Waka (This Time for Africa) — Shakira"
     correctYear: 2010
     probability: 92
@@ -348,6 +378,7 @@ items:
         endSec: 202
         channelTitle: "7clouds"
   - id: eminem-rihanna-love-the-way-you-lie
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Love the Way You Lie — Eminem & Rihanna"
     correctYear: 2010
     probability: 90
@@ -359,6 +390,7 @@ items:
         endSec: 264
         channelTitle: "Eminem - Topic"
   - id: timoteij-kom
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Kom — Timoteij"
     correctYear: 2010
     probability: 82
@@ -374,6 +406,7 @@ items:
   # 2011
 # Someone Like You flyttad till songs-all.yaml (cross-gen-iconic) 2026-05-22.
   - id: avicii-levels
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Levels — Avicii"
     correctYear: 2011
     probability: 92
@@ -387,6 +420,7 @@ items:
         channelTitle: "Kontor.TV"
   # 2012
   - id: psy-gangnam-style
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Gangnam Style — PSY"
     correctYear: 2012
     probability: 95
@@ -398,6 +432,7 @@ items:
         endSec: 253
         channelTitle: "officialpsy"
   - id: carly-rae-jepsen-call-me-maybe
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Call Me Maybe — Carly Rae Jepsen"
     correctYear: 2012
     probability: 92
@@ -410,6 +445,7 @@ items:
         channelTitle: "Unique Vibes"
   # === Content-expansion 2026-05-29: fler ikoniska 00-10-tals-låtar ===
   - id: white-stripes-seven-nation-army
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Seven Nation Army — The White Stripes"
     correctYear: 2003
     probability: 88
@@ -422,6 +458,7 @@ items:
         channelTitle: "The White Stripes"
         notes: "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
   - id: outkast-hey-ya
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Hey Ya! — OutKast"
     correctYear: 2003
     probability: 85
@@ -434,6 +471,7 @@ items:
         channelTitle: "MASTER RJ"
         notes: "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
   - id: the-killers-mr-brightside
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Mr. Brightside — The Killers"
     correctYear: 2003
     probability: 86
@@ -446,6 +484,7 @@ items:
         channelTitle: "Rock Preservation Society"
         notes: "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
   - id: adele-rolling-in-the-deep
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Rolling in the Deep — Adele"
     correctYear: 2010
     probability: 89
@@ -458,6 +497,7 @@ items:
         channelTitle: "Adele"
         notes: "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
   - id: lmfao-party-rock-anthem
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Party Rock Anthem — LMFAO"
     correctYear: 2011
     probability: 85
@@ -470,6 +510,7 @@ items:
         channelTitle: "Musikmix Germany"
         notes: "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
   - id: gotye-somebody-that-i-used-to-know
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Somebody That I Used to Know — Gotye"
     correctYear: 2011
     probability: 84
@@ -482,6 +523,7 @@ items:
         channelTitle: "Gotye"
         notes: "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
   - id: coldplay-the-scientist
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "The Scientist — Coldplay"
     correctYear: 2002
     probability: 84
@@ -494,6 +536,7 @@ items:
         channelTitle: "Coldplay"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (13)."
   - id: robyn-dancing-on-my-own
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Dancing on My Own — Robyn"
     correctYear: 2010
     probability: 84
@@ -507,6 +550,7 @@ items:
         channelTitle: "Embassy One"
         notes: "Officiell MV via Embassy One (Robyns label). Ersätter Topic-versionen (statisk albumkonst)."
   - id: swedish-house-mafia-dont-you-worry-child
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Don't You Worry Child — Swedish House Mafia"
     correctYear: 2012
     probability: 86
@@ -520,6 +564,7 @@ items:
         channelTitle: "Swedish House Mafia - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: eric-prydz-call-on-me
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Call on Me — Eric Prydz"
     correctYear: 2004
     probability: 80
@@ -533,6 +578,7 @@ items:
         channelTitle: "Eric Prydz - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: loreen-euphoria
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Euphoria — Loreen"
     correctYear: 2012
     probability: 86
@@ -547,6 +593,7 @@ items:
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
     genrePackages: ["Eurovision"]
   - id: beyonce-single-ladies
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Single Ladies (Put a Ring on It) — Beyoncé"
     correctYear: 2008
     probability: 86
@@ -559,6 +606,7 @@ items:
         channelTitle: "Beyoncé - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: bruno-mars-just-the-way-you-are
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Just the Way You Are — Bruno Mars"
     correctYear: 2010
     probability: 84
@@ -571,6 +619,7 @@ items:
         channelTitle: "Bruno Mars"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (18)."
   - id: bon-jovi-its-my-life
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "It's My Life — Bon Jovi"
     correctYear: 2000
     probability: 84
@@ -583,6 +632,7 @@ items:
         channelTitle: "Jon Bon Jovi - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: veronica-maggio-jag-kommer
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Jag kommer — Veronica Maggio"
     correctYear: 2011
     probability: 80
@@ -596,6 +646,7 @@ items:
         channelTitle: "Veronica Maggio - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: the-hives-hate-to-say
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Hate to Say I Told You So — The Hives"
     correctYear: 2000
     probability: 78
@@ -603,6 +654,7 @@ items:
     answerMethods: ["timeline"]
     spotifyTrackId: "6xxXrNJnnsQNLdgNk8S4y8" # bytt 2026-07-18 — gamla ID:t 404:ade (track borttagen/relinkad av Spotify)
   - id: timbuktu-alla-vill-till-himlen
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Alla vill till himlen — Timbuktu"
     correctYear: 2005
     probability: 76
@@ -615,6 +667,7 @@ items:
         channelTitle: "Timbuktu - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: robyn-with-every-heartbeat
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "With Every Heartbeat — Robyn"
     correctYear: 2007
     probability: 78
@@ -622,6 +675,7 @@ items:
     answerMethods: ["timeline"]
     spotifyTrackId: "0NEw29HKkDkt1yDyBJOgXe"
   - id: lady-gaga-poker-face
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Poker Face — Lady Gaga"
     correctYear: 2008
     probability: 86
@@ -634,6 +688,7 @@ items:
         channelTitle: "Lady Gaga - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: mando-diao-dance-with-somebody
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Dance with Somebody — Mando Diao"
     correctYear: 2009
     probability: 76
@@ -647,6 +702,7 @@ items:
         channelTitle: "Mando Diao - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: rihanna-diamonds
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Diamonds — Rihanna"
     correctYear: 2012
     probability: 84
@@ -659,6 +715,7 @@ items:
         channelTitle: "PremiunMusicHD"
     spotifyTrackId: "1z9kQ14XBSN0r2v6fx4IdG"
   - id: first-aid-kit-emmylou
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Emmylou — First Aid Kit"
     correctYear: 2012
     probability: 76
@@ -672,6 +729,7 @@ items:
         channelTitle: "First Aid Kit"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (18)."
   - id: icona-pop-i-love-it
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "I Love It — Icona Pop"
     correctYear: 2012
     probability: 80
@@ -685,6 +743,7 @@ items:
         channelTitle: "Icona Pop - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: jill-johnson-karleken-ar
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Kärleken är — Jill Johnson"
     correctYear: 1998
     probability: 72
@@ -698,6 +757,7 @@ items:
         notes: "Melodifestivalen 1998 vinnare."
     genrePackages: ["Eurovision"]
   - id: charlotte-nilsson-tusen-och-en-natt
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Tusen och en natt — Charlotte Nilsson"
     correctYear: 1999
     probability: 74
@@ -711,6 +771,7 @@ items:
         notes: "Melodifestivalen 1999 vinnare, ESC-vinnare 1999. ESC-version på engelska (Take Me To Your Heaven)."
     genrePackages: ["Eurovision"]
   - id: roger-pontare-vindarna-viskar
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "När vindarna viskar mitt namn — Roger Pontare"
     correctYear: 2000
     probability: 70
@@ -724,6 +785,7 @@ items:
         notes: "Melodifestivalen 2000 vinnare."
     genrePackages: ["Eurovision"]
   - id: lena-philipsson-det-gor-ont
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Det gör ont — Lena Philipsson"
     correctYear: 2004
     probability: 74
@@ -736,6 +798,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 2004 vinnare. ESC-version It Hurts."
   - id: martin-stenmarck-las-vegas
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Las Vegas — Martin Stenmarck"
     correctYear: 2005
     probability: 70
@@ -748,6 +811,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 2005 vinnare. ESC 2005 performance."
   - id: carola-evighet
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Evighet — Carola"
     correctYear: 2006
     probability: 72
@@ -760,6 +824,7 @@ items:
         channelTitle: "Melodifestivalen"
         notes: "Melodifestivalen 2006 vinnare."
   - id: the-ark-the-worrying-kind
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "The Worrying Kind — The Ark"
     correctYear: 2007
     probability: 74
@@ -772,6 +837,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 2007 vinnare. ESC 2007 performance."
   - id: charlotte-perrelli-hero
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Hero — Charlotte Perrelli"
     correctYear: 2008
     probability: 72
@@ -785,6 +851,7 @@ items:
         notes: "Melodifestivalen 2008 vinnare. ESC 2008 performance."
     genrePackages: ["Eurovision"]
   - id: malena-ernman-la-voix
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "La Voix — Malena Ernman"
     correctYear: 2009
     probability: 70
@@ -798,6 +865,7 @@ items:
         notes: "Melodifestivalen 2009 vinnare. ESC 2009 performance."
     genrePackages: ["Eurovision"]
   - id: anna-bergendahl-this-is-my-life
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "This Is My Life — Anna Bergendahl"
     correctYear: 2010
     probability: 72
@@ -811,6 +879,7 @@ items:
         notes: "Melodifestivalen 2010 vinnare."
     genrePackages: ["Eurovision"]
   - id: eric-saade-popular
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Popular — Eric Saade"
     correctYear: 2011
     probability: 80
@@ -825,6 +894,7 @@ items:
     genrePackages: ["Eurovision"]
   # ===== Eurovision Song Contest vinnare =====
   - id: katrina-waves-love-shine-a-light
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Love Shine a Light — Katrina and the Waves"
     correctYear: 1997
     probability: 72
@@ -838,6 +908,7 @@ items:
         notes: "ESC 1997 vinnare — Storbritannien."
     genrePackages: ["Eurovision"]
   - id: dana-international-diva
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Diva — Dana International"
     correctYear: 1998
     probability: 76
@@ -851,6 +922,7 @@ items:
         notes: "ESC 1998 vinnare — Israel."
     genrePackages: ["Eurovision"]
   - id: olsen-brothers-fly-on-wings-of-love
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Fly on the Wings of Love — Olsen Brothers"
     correctYear: 2000
     probability: 74
@@ -864,6 +936,7 @@ items:
         notes: "ESC 2000 vinnare — Danmark."
     genrePackages: ["Eurovision"]
   - id: tanel-padar-everybody
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Everybody — Tanel Padar, Dave Benton & 2XL"
     correctYear: 2001
     probability: 70
@@ -877,6 +950,7 @@ items:
         notes: "ESC 2001 vinnare — Estland."
     genrePackages: ["Eurovision"]
   - id: marie-n-i-wanna
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "I Wanna — Marie N"
     correctYear: 2002
     probability: 70
@@ -890,6 +964,7 @@ items:
         notes: "ESC 2002 vinnare — Lettland."
     genrePackages: ["Eurovision"]
   - id: sertab-erener-everyway-that-i-can
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Everyway That I Can — Sertab Erener"
     correctYear: 2003
     probability: 72
@@ -903,6 +978,7 @@ items:
         notes: "ESC 2003 vinnare — Turkiet."
     genrePackages: ["Eurovision"]
   - id: ruslana-wild-dances
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Wild Dances — Ruslana"
     correctYear: 2004
     probability: 78
@@ -916,6 +992,7 @@ items:
         notes: "ESC 2004 vinnare — Ukraina. Officiell remastered MV."
     genrePackages: ["Eurovision"]
   - id: helena-paparizou-my-number-one
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "My Number One — Helena Paparizou"
     correctYear: 2005
     probability: 76
@@ -929,6 +1006,7 @@ items:
         notes: "ESC 2005 vinnare — Grekland."
     genrePackages: ["Eurovision"]
   - id: lordi-hard-rock-hallelujah
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Hard Rock Hallelujah — Lordi"
     correctYear: 2006
     probability: 84
@@ -942,6 +1020,7 @@ items:
         notes: "ESC 2006 vinnare — Finland."
     genrePackages: ["Eurovision"]
   - id: marija-serifovic-molitva
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Molitva — Marija Šerifović"
     correctYear: 2007
     probability: 74
@@ -955,6 +1034,7 @@ items:
         notes: "ESC 2007 vinnare — Serbien. Officiell music video."
     genrePackages: ["Eurovision"]
   - id: dima-bilan-believe
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Believe — Dima Bilan"
     correctYear: 2008
     probability: 74
@@ -968,6 +1048,7 @@ items:
         notes: "ESC 2008 vinnare — Ryssland."
     genrePackages: ["Eurovision"]
   - id: alexander-rybak-fairytale
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Fairytale — Alexander Rybak"
     correctYear: 2009
     probability: 84
@@ -980,6 +1061,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2009 vinnare — Norge."
   - id: lena-satellite
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Satellite — Lena"
     correctYear: 2010
     probability: 78
@@ -993,6 +1075,7 @@ items:
         notes: "ESC 2010 vinnare — Tyskland. Officiell music video."
     genrePackages: ["Eurovision"]
   - id: ell-nikki-running-scared
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Running Scared — Ell & Nikki"
     correctYear: 2011
     probability: 72
@@ -1006,6 +1089,7 @@ items:
         notes: "ESC 2011 vinnare — Azerbajdzjan. Officiell music video."
     genrePackages: ["Eurovision"]
   - id: barbados-kom-hem
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Kom hem — Barbados"
     correctYear: 2000
     probability: 72
@@ -1019,6 +1103,7 @@ items:
         channelTitle: "Barbados - Topic"
         notes: "Officiell Topic-kanal. Studio 2000. Ersatte fan-uppladdning (7ZYGyCPVwo4)."
   - id: kapten-rod-nar-solen-gar-ner
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "När solen går ner — Kapten Röd"
     correctYear: 2012
     probability: 70
@@ -1033,6 +1118,7 @@ items:
         notes: "Officiell video. AKI feat. Kapten Röd (hip-hop/reggae)."
 
   - id: markoolio-sommar-och-sol
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Sommar och sol — Markoolio"
     correctYear: 1998
     probability: 85
@@ -1048,6 +1134,7 @@ items:
         notes: "Musikvideo-re-upload av originalet (1999)."
 
   - id: backstreet-boys-everybody
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Everybody (Backstreet's Back) — Backstreet Boys"
     correctYear: 1997
     probability: 86
@@ -1062,6 +1149,7 @@ items:
         notes: "Peter-kurerad 2026-08-12. ⚠ MASTER RJ är SAMMA re-upload-kanal vars klipp (TJLAJWSEd6U, Thriller) blev region-blockerat i 249 länder inkl. SE 2026-08-10. Spelbar i SE 2026-08-12, men kanalen har redan fallerat en gång — prioritera officiellt ersättningsklipp."
     notes: "correctYear = albumet Backstreet's Back / singeln, bada aug 1997."
   - id: bellini-samba-de-janeiro
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Samba de Janeiro — Bellini"
     correctYear: 1997
     probability: 85
@@ -1076,15 +1164,16 @@ items:
         channelTitle: "Bellini_Music_Official"
         notes: "Officiell artist-kanal Bellini_Music_Official."
   - id: rolandz-jajamen
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Jajamen — Rolandz"
     correctYear: 2010
     probability: 80
-    audience: ["gen-x", "millennials"]
     wikimediaSearchHints: ["Rolandz Jajamen 2010 Swedish dansband"]
     answerMethods: ["timeline"]
     genrePackages: ["dansband"]
     spotifyTrackId: "6kKJbnWfmVUKnhqa8n17xT"
   - id: hadise-dum-tek-tek
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Dum Tek Tek — Hadise"
     correctYear: 2009
     probability: 76
@@ -1101,6 +1190,7 @@ items:
         channelTitle: "Hadise"
         notes: "Official music video. ESC 2009 Turkey entry."
   - id: southside-spinners-luvstruck
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Luvstruck — Southside Spinners"
     correctYear: 1998
     probability: 78
@@ -1114,6 +1204,7 @@ items:
         channelTitle: "Southside Spinners"
         notes: "Official video 2000."
   - id: antique-die-for-you
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "(I Would) Die for You — Antique"
     correctYear: 2001
     probability: 76
@@ -1127,6 +1218,7 @@ items:
         channelTitle: "Antique"
         notes: "Official music video. ESC 2001 Greece entry (3rd place)."
   - id: eminem-my-name-is
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "My Name Is — Eminem"
     correctYear: 1999
     probability: 86
@@ -1138,6 +1230,7 @@ items:
     # embedding avstängd → "Video unavailable" i spelaren. Lever vidare som
     # Spotify-only DJ-runda. Ersättningsklipp krävs.
   - id: outkast-ms-jackson
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Ms. Jackson — OutKast"
     correctYear: 2000
     probability: 84
@@ -1151,6 +1244,7 @@ items:
         channelTitle: "OutKast"
         notes: "Official music video."
   - id: cajsa-stina-akerstrom-fragorna-om-nar
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Frågorna om när — Cajsa Stina Åkerström"
     correctYear: 2001
     probability: 75
@@ -1159,6 +1253,7 @@ items:
     genrePackages: ["100% svenska"]
     spotifyTrackId: "1QJcdzMUidsBaMTHoZZRGn"
   - id: gunther-ding-ding-dong
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Ding Ding Dong — Günther"
     correctYear: 2004
     probability: 78
@@ -1169,6 +1264,7 @@ items:
     # "Video unavailable" i spelaren. Lever vidare som Spotify-only DJ-runda.
     # Ersättningsklipp krävs.
   - id: jay-z-empire-state-of-mind
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Empire State of Mind — Jay-Z ft. Alicia Keys"
     correctYear: 2009
     probability: 85
@@ -1186,6 +1282,7 @@ items:
   # 1996 → 1999 (låten fanns först på singeln "Musik non stop" 15 nov 1999
   # / albumet Hagnesta Hill 6 dec 1999), vilket flyttar den till gen-z-eran.
   - id: kent-music-non-stop
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Music Non Stop — Kent"
     correctYear: 1999
     probability: 78
@@ -1198,6 +1295,7 @@ items:
         channelTitle: "Kent - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: kent-om-du-var-har
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Om du var här — Kent"
     correctYear: 1997
     probability: 80
@@ -1210,6 +1308,7 @@ items:
         channelTitle: "kentchannel"
         notes: "Bandets egen kanal. Peter-kurerad 2026-08-11."
   - id: the-verve-bitter-sweet-symphony
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Bitter Sweet Symphony — The Verve"
     correctYear: 1997
     probability: 84
@@ -1222,6 +1321,7 @@ items:
         channelTitle: "Frank Rovers"
         notes: "Peter-kurerad 2026-08-11. OBS: re-upload, inte officiell VEVO-kanal - hogre takedown-risk, nightly autofix-cron plockar upp om den forsvinner."
   - id: bryan-adams-when-youre-gone
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "When You're Gone — Bryan Adams & Melanie C"
     correctYear: 1998
     probability: 80
@@ -1230,6 +1330,7 @@ items:
     spotifyTrackId: "7p9dd71JR2ucoAuO1Sy0VZ"
     youtubeClips: []
   - id: lady-gaga-just-dance
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Just Dance — Lady Gaga"
     correctYear: 2008
     probability: 88
@@ -1239,6 +1340,7 @@ items:
     youtubeClips: []
   # === Tillagg 2026-08-14 (Peters lista) ===
   - id: bloodhound-gang-the-bad-touch
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "The Bad Touch — Bloodhound Gang"
     correctYear: 1999
     probability: 78
@@ -1251,6 +1353,7 @@ items:
         notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
     notes: "correctYear = albumet Hooray for Boobies (okt 1999 i Europa), forsta gangen laten gick att hora. Singeln kom i nov 1999."
   - id: kylie-minogue-spinning-around
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Spinning Around — Kylie Minogue"
     correctYear: 2000
     probability: 78
@@ -1263,6 +1366,7 @@ items:
         notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
     notes: "correctYear = singeln (juni 2000), fore albumet Light Years (sept 2000)."
   - id: kylie-minogue-cant-get-you-out-of-my-head
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Can't Get You Out of My Head — Kylie Minogue"
     correctYear: 2001
     probability: 86
@@ -1274,3 +1378,19 @@ items:
         endSec: 30
         notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
     notes: "correctYear = singeln (sept 2001), fore albumet Fever (okt 2001)."
+  # === Tillagg 2026-08-14 (Peters global-lista) ===
+  - id: ricky-martin-livin-la-vida-loca
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Livin' la Vida Loca — Ricky Martin"
+    correctYear: 1999
+    probability: 86
+    region: ["global"]
+    wikimediaSearchHints: ["Ricky Martin Livin la Vida Loca 1999"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "ikDPvDInr00"
+        startSec: 0
+        endSec: 30
+        channelTitle: "MVIDEO4K"
+        notes: "Ersatte Peters lank UxQ7PAerVdE 2026-08-14: samma officiella video men SD (HD-gaten flaggade den). Detta ar 4K-uppladdningen, titel '[4K] Ricky Martin - Livin' La Vida Loca (Music Video)' — inget ar i titeln. Samma kanal som lou-bega-mambo-no-5."
+    notes: "correctYear = singeln (mars 1999), fore albumet Ricky Martin (maj 1999)."

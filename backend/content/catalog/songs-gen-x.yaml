@@ -4,13 +4,14 @@
 # Mix av rock, pop, soul, disco. Beatles cap:as till max 4 år för variation.
 # media-fältet lämnas off-katalog tills `npm run youtube-search <item-id>`
 # har körts och en specifik videoId + start/endSec är vald.
-audience: ["gen-x", "elder"]
+audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
 region: ["sweden"]
 category: songs
 contentForm: youtube
 contentSubject: song
 items:
   - id: rolling-stones-satisfaction
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "(I Can't Get No) Satisfaction — The Rolling Stones"
     correctYear: 1965
     probability: 92
@@ -23,6 +24,7 @@ items:
         channelTitle: "The Rolling Stones - Topic"
         notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: beach-boys-good-vibrations
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Good Vibrations — The Beach Boys"
     correctYear: 1966
     probability: 88
@@ -35,6 +37,7 @@ items:
         channelTitle: "PhilGoodFactor1"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
   - id: beatles-all-you-need-is-love
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "All You Need Is Love — The Beatles"
     correctYear: 1967
     probability: 90
@@ -43,6 +46,7 @@ items:
     # youtubeClips borttagna 2026-08-10: Lm9Uy7_EqNc (MusicClub80s, re-upload) är
     # raderad/privat → "Video unavailable" i spelaren. Ersättningsklipp krävs.
   - id: beatles-hey-jude
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Hey Jude — The Beatles"
     correctYear: 1968
     probability: 95
@@ -55,6 +59,7 @@ items:
         channelTitle: "The Beatles - Topic"
         notes: "Officiell album-audio via YouTube Topic (Remastered 2015). Opening 'Hey Jude'-hook."
   - id: elvis-presley-suspicious-minds
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Suspicious Minds — Elvis Presley"
     correctYear: 1969
     probability: 88
@@ -67,6 +72,7 @@ items:
         channelTitle: "Elvis Presley - Topic"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
   - id: simon-garfunkel-bridge-over-troubled-water
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Bridge Over Troubled Water — Simon & Garfunkel"
     correctYear: 1970
     probability: 90
@@ -79,6 +85,7 @@ items:
         channelTitle: "Simon & Garfunkel - Topic"
         notes: "Officiell album-audio via YouTube Topic. Chorus area."
   - id: john-lennon-imagine
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Imagine — John Lennon"
     correctYear: 1971
     probability: 95
@@ -91,6 +98,7 @@ items:
         channelTitle: "John Lennon - Topic"
         notes: "Officiell album-audio via YouTube Topic (Ultimate Mix). Mid-song."
   - id: bill-withers-lean-on-me
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Lean on Me — Bill Withers"
     correctYear: 1972
     probability: 85
@@ -103,6 +111,7 @@ items:
         channelTitle: "Bill Withers - Topic"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
   - id: roberta-flack-killing-me-softly
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Killing Me Softly with His Song — Roberta Flack"
     correctYear: 1973
     probability: 85
@@ -115,6 +124,7 @@ items:
         channelTitle: "RHINO"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (3)."
   - id: abba-waterloo
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Waterloo — ABBA"
     correctYear: 1974
     probability: 92
@@ -131,6 +141,7 @@ items:
   # Bohemian Rhapsody flyttad till songs-all.yaml (cross-gen-iconic) 2026-05-22.
   # Hotel California flyttad till songs-all.yaml (cross-gen-iconic) 2026-05-22.
   - id: bee-gees-stayin-alive
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Stayin' Alive — Bee Gees"
     correctYear: 1977
     probability: 92
@@ -144,6 +155,7 @@ items:
         channelTitle: "beegees"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (18)."
   - id: chic-le-freak
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Le Freak — Chic"
     correctYear: 1978
     probability: 80
@@ -156,6 +168,7 @@ items:
         channelTitle: "Chic - Topic"
         notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: queen-another-one-bites-the-dust
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Another One Bites the Dust — Queen"
     correctYear: 1980
     probability: 90
@@ -174,6 +187,7 @@ items:
   # 2/år (matchar songs-millennials/gen-z/gen-alpha). Bohemian Rhapsody +
   # Hotel California + Dancing Queen utelämnade — finns i songs-all.yaml.
   - id: the-who-my-generation
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "My Generation — The Who"
     correctYear: 1965
     probability: 82
@@ -186,6 +200,7 @@ items:
         channelTitle: "The Who - Topic"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
   - id: rolling-stones-paint-it-black
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Paint It Black — The Rolling Stones"
     correctYear: 1966
     probability: 85
@@ -202,6 +217,7 @@ items:
         channelTitle: "The Rolling Stones - Topic"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
   - id: jimi-hendrix-purple-haze
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Purple Haze — Jimi Hendrix"
     correctYear: 1967
     probability: 85
@@ -214,6 +230,7 @@ items:
         channelTitle: "Jimi Hendrix - Topic"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
   - id: aretha-franklin-respect
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Respect — Aretha Franklin"
     correctYear: 1967
     probability: 88
@@ -226,6 +243,7 @@ items:
         channelTitle: "Aretha Franklin - Topic"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
   - id: steppenwolf-born-to-be-wild
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Born to Be Wild — Steppenwolf"
     correctYear: 1968
     probability: 82
@@ -238,6 +256,7 @@ items:
         channelTitle: "Steppenwolf - Topic"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
   - id: simon-garfunkel-mrs-robinson
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Mrs. Robinson — Simon & Garfunkel"
     correctYear: 1968
     probability: 80
@@ -250,6 +269,7 @@ items:
         channelTitle: "Simon & Garfunkel - Topic"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
   - id: archies-sugar-sugar
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Sugar, Sugar — The Archies"
     correctYear: 1969
     probability: 75
@@ -262,6 +282,7 @@ items:
         channelTitle: "The Archies - Topic"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
   - id: beatles-let-it-be
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Let It Be — The Beatles"
     correctYear: 1970
     probability: 92
@@ -274,6 +295,7 @@ items:
         channelTitle: "The Beatles - Topic"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
   - id: led-zeppelin-stairway-to-heaven
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Stairway to Heaven — Led Zeppelin"
     correctYear: 1971
     probability: 95
@@ -286,6 +308,7 @@ items:
         channelTitle: "Led Zeppelin - Topic"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
   - id: don-mclean-american-pie
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "American Pie — Don McLean"
     correctYear: 1971
     probability: 88
@@ -298,6 +321,7 @@ items:
         channelTitle: "Don McLean - Topic"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
   - id: elton-john-crocodile-rock
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Crocodile Rock — Elton John"
     correctYear: 1973
     probability: 82
@@ -310,6 +334,7 @@ items:
         channelTitle: "Elton John - Topic"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
   - id: lynyrd-skynyrd-sweet-home-alabama
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Sweet Home Alabama — Lynyrd Skynyrd"
     correctYear: 1974
     probability: 88
@@ -322,6 +347,7 @@ items:
         channelTitle: "Lynyrd Skynyrd - Topic"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
   - id: bruce-springsteen-born-to-run
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Born to Run — Bruce Springsteen"
     correctYear: 1975
     probability: 82
@@ -334,6 +360,7 @@ items:
         channelTitle: "Bruce Springsteen - Topic"
         notes: "Curerad 2026-05-29 — officiell album-audio via YouTube Topic (1975 studio-version)."
   - id: abba-mamma-mia
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Mamma Mia — ABBA"
     correctYear: 1975
     probability: 82
@@ -347,6 +374,7 @@ items:
         channelTitle: "ABBA - Topic"
         notes: "Curerad 2026-05-29 — officiell album-audio via YouTube Topic (ABBA studio-version, ej film-soundtrack)."
   - id: queen-we-will-rock-you
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "We Will Rock You — Queen"
     correctYear: 1977
     probability: 88
@@ -365,6 +393,7 @@ items:
           (rätt svar är 1977)."
     genrePackages: ["sport"]
   - id: village-people-ymca
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Y.M.C.A. — Village People"
     correctYear: 1978
     probability: 90
@@ -378,6 +407,7 @@ items:
         notes: "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (10)."
   # === Content-expansion 2026-05-29: fler ikoniska 60-70-tals-låtar ===
   - id: the-doors-light-my-fire
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Light My Fire — The Doors"
     correctYear: 1967
     probability: 85
@@ -390,6 +420,7 @@ items:
         channelTitle: "The Doors - Topic"
         notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: marvin-gaye-whats-going-on
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "What's Going On — Marvin Gaye"
     correctYear: 1971
     probability: 83
@@ -402,6 +433,7 @@ items:
         channelTitle: "Marvin Gaye - Topic"
         notes: "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (2)."
   - id: stevie-wonder-superstition
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Superstition — Stevie Wonder"
     correctYear: 1972
     probability: 86
@@ -414,6 +446,7 @@ items:
         channelTitle: "Weedy Weed Smoker"
         notes: "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
   - id: deep-purple-smoke-on-the-water
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Smoke on the Water — Deep Purple"
     correctYear: 1972
     probability: 87
@@ -426,6 +459,7 @@ items:
         channelTitle: "Deep Purple - Topic"
         notes: "Curerad 2026-05-29 — officiell album-audio via YouTube Topic (2024 remaster av 1972-originalet, ej Rock Aid Armenia-versionen)."
   - id: fleetwood-mac-go-your-own-way
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Go Your Own Way — Fleetwood Mac"
     correctYear: 1976
     probability: 82
@@ -438,6 +472,7 @@ items:
         channelTitle: "Fleetwood Mac"
         notes: "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (3)."
   - id: gloria-gaynor-i-will-survive
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "I Will Survive — Gloria Gaynor"
     correctYear: 1978
     probability: 88
@@ -450,6 +485,7 @@ items:
         channelTitle: "Gloria Gaynor - Topic"
         notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: beatles-yesterday
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Yesterday — The Beatles"
     correctYear: 1965
     probability: 90
@@ -462,6 +498,7 @@ items:
         channelTitle: "The Beatles - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: beatles-come-together
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Come Together — The Beatles"
     correctYear: 1969
     probability: 86
@@ -474,6 +511,7 @@ items:
         channelTitle: "The Beatles - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: bowie-space-oddity
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Space Oddity — David Bowie"
     correctYear: 1969
     probability: 84
@@ -486,6 +524,7 @@ items:
         channelTitle: "David Bowie - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: led-zeppelin-whole-lotta-love
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Whole Lotta Love — Led Zeppelin"
     correctYear: 1969
     probability: 84
@@ -498,6 +537,7 @@ items:
         channelTitle: "Led Zeppelin - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: elton-john-your-song
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Your Song — Elton John"
     correctYear: 1970
     probability: 84
@@ -510,6 +550,7 @@ items:
         channelTitle: "Elton John - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: john-denver-country-roads
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Take Me Home, Country Roads — John Denver"
     correctYear: 1971
     probability: 84
@@ -522,6 +563,7 @@ items:
         channelTitle: "John Denver - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: bob-marley-no-woman-no-cry
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "No Woman, No Cry — Bob Marley & The Wailers"
     correctYear: 1974
     probability: 84
@@ -534,6 +576,7 @@ items:
         channelTitle: "Bob Marley"
     spotifyTrackId: "3PQLYVskjUeRmRIfECsL0X"
   - id: fleetwood-mac-dreams
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Dreams — Fleetwood Mac"
     correctYear: 1977
     probability: 84
@@ -546,6 +589,7 @@ items:
         channelTitle: "FLEETWOOD MAC - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: queen-we-are-the-champions
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "We Are the Champions — Queen"
     correctYear: 1977
     probability: 90
@@ -561,6 +605,7 @@ items:
           från rättsinnehavarens kanal, HD, blockerad enbart i RU."
     genrePackages: ["sport"]
   - id: boney-m-ma-baker
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Ma Baker — Boney M."
     correctYear: 1977
     probability: 80
@@ -575,6 +620,7 @@ items:
         notes: "Peter-kurerad 2026-08-12. OBS: privat re-upload av musikvideon — ej rättsinnehavare. Spelbar i SE 2026-08-12; takedown-risk kvarstår."
     notes: "correctYear = singeln (juni 1977), fore albumet Love for Sale (aug 1977)."
   - id: earth-wind-and-fire-september
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "September — Earth, Wind & Fire"
     correctYear: 1978
     probability: 88
@@ -588,6 +634,7 @@ items:
         channelTitle: "7clouds"
         notes: "Peter-kurerad 2026-08-12. 7clouds lyric-video — katalogens standard-lyric-kanal (samma som Toto/Africa och GNR)."
   - id: police-roxanne
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Roxanne — The Police"
     correctYear: 1978
     probability: 82
@@ -600,6 +647,7 @@ items:
         channelTitle: "The Police - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: acdc-highway-to-hell
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Highway to Hell — AC/DC"
     correctYear: 1979
     probability: 86
@@ -616,6 +664,7 @@ items:
         channelTitle: "AC/DC - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: dolly-parton-jolene
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Jolene — Dolly Parton"
     correctYear: 1973
     probability: 82
@@ -628,6 +677,7 @@ items:
         channelTitle: "Dolly Parton - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: bob-dylan-like-a-rolling-stone
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Like a Rolling Stone — Bob Dylan"
     correctYear: 1965
     probability: 84
@@ -640,6 +690,7 @@ items:
         channelTitle: "Bob Dylan - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: beatles-help
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Help! — The Beatles"
     correctYear: 1965
     probability: 86
@@ -652,6 +703,7 @@ items:
         channelTitle: "The Beatles - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: simon-garfunkel-sound-of-silence
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "The Sound of Silence — Simon & Garfunkel"
     correctYear: 1965
     probability: 84
@@ -664,6 +716,7 @@ items:
         channelTitle: "Simon & Garfunkel - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: rolling-stones-angie
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Angie — The Rolling Stones"
     correctYear: 1973
     probability: 82
@@ -676,6 +729,7 @@ items:
         channelTitle: "The Rolling Stones - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: led-zeppelin-kashmir
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Kashmir — Led Zeppelin"
     correctYear: 1975
     probability: 82
@@ -688,6 +742,7 @@ items:
         channelTitle: "Led Zeppelin - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: tomas-ledin-just-nu
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Just nu! — Tomas Ledin"
     correctYear: 1980
     probability: 70
@@ -702,6 +757,7 @@ items:
         notes: "Melodifestivalen 1980 vinnare."
     genrePackages: ["Eurovision"]
   - id: tomas-ledin-hon-gor-allt
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Hon gör allt för att göra mig lycklig — Tomas Ledin"
     correctYear: 1980
     probability: 68
@@ -715,6 +771,7 @@ items:
         channelTitle: "Tomas Ledin - Topic"
   # ===== Eurovision Song Contest vinnare =====
   - id: dana-all-kinds-of-everything
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "All Kinds of Everything — Dana"
     correctYear: 1970
     probability: 64
@@ -730,6 +787,7 @@ items:
     region: ["europe"]
     inBaseCatalog: false
   - id: severine-un-banc-un-arbre
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Un banc, un arbre, une rue — Séverine"
     correctYear: 1971
     probability: 62
@@ -743,6 +801,7 @@ items:
         notes: "ESC 1971 vinnare — Monaco."
     genrePackages: ["Eurovision"]
   - id: vicky-leandros-apres-toi
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Après toi — Vicky Leandros"
     correctYear: 1972
     probability: 64
@@ -756,6 +815,7 @@ items:
         notes: "ESC 1972 vinnare — Luxemburg."
     genrePackages: ["Eurovision"]
   - id: anne-marie-david-tu-te-reconnaitras
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Tu te reconnaîtras — Anne-Marie David"
     correctYear: 1973
     probability: 62
@@ -769,6 +829,7 @@ items:
         notes: "ESC 1973 vinnare — Luxemburg."
     genrePackages: ["Eurovision"]
   - id: teach-in-ding-a-dong
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Ding-a-dong — Teach-In"
     correctYear: 1975
     probability: 65
@@ -782,6 +843,7 @@ items:
         notes: "ESC 1975 vinnare — Nederländerna."
     genrePackages: ["Eurovision"]
   - id: brotherhood-of-man-save-your-kisses
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Save Your Kisses for Me — Brotherhood of Man"
     correctYear: 1976
     probability: 72
@@ -795,6 +857,7 @@ items:
         notes: "ESC 1976 vinnare — Storbritannien."
     genrePackages: ["Eurovision"]
   - id: marie-myriam-loiseau-et-lenfant
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "L'Oiseau et l'Enfant — Marie Myriam"
     correctYear: 1977
     probability: 62
@@ -808,6 +871,7 @@ items:
         notes: "ESC 1977 vinnare — Frankrike."
     genrePackages: ["Eurovision"]
   - id: izhar-cohen-a-ba-ni-bi
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "A-Ba-Ni-Bi — Izhar Cohen & The Alphabeta"
     correctYear: 1978
     probability: 66
@@ -821,6 +885,7 @@ items:
         notes: "ESC 1978 vinnare — Israel."
     genrePackages: ["Eurovision"]
   - id: milk-and-honey-hallelujah
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Hallelujah — Milk & Honey"
     correctYear: 1979
     probability: 68
@@ -834,6 +899,7 @@ items:
         notes: "ESC 1979 vinnare — Israel."
     genrePackages: ["Eurovision"]
   - id: johnny-logan-whats-another-year
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "What's Another Year — Johnny Logan"
     correctYear: 1980
     probability: 70
@@ -847,6 +913,7 @@ items:
         notes: "ESC 1980 vinnare — Irland."
     genrePackages: ["Eurovision"]
   - id: lill-lindfors-en-san-karl
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "En sån karl — Lill Lindfors"
     correctYear: 1967
     probability: 74
@@ -860,6 +927,7 @@ items:
         channelTitle: "Lennart Ljung Music"
         notes: "Studio-inspelning 1967. Ersatte dead UMG-klipp (T1FKf-JZ-eM)."
   - id: sven-ingvars-jag-ringer-pa-fredag
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Jag ringer på fredag — Sven-Ingvars"
     correctYear: 1967
     probability: 78
@@ -873,6 +941,7 @@ items:
         channelTitle: "Sven Ingvars - Topic"
         notes: "Officiell Topic-kanal. Studio 1967. Ersatte fan-uppladdning (z0CDj6vwQ5s)."
   - id: abba-ring-ring
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Ring Ring — ABBA"
     correctYear: 1973
     probability: 85
@@ -886,6 +955,7 @@ items:
         channelTitle: "ABBA"
         notes: "Officiell music video ℗ 1973 Polar Music International AB."
   - id: lasse-berghagen-ding-dong
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Ding Dong — Lasse Berghagen"
     correctYear: 1973
     probability: 76
@@ -899,6 +969,7 @@ items:
         channelTitle: "Universal Music Sweden"
         notes: "Officiell UMG Sweden. Melodifestivalen 1973 (7:a plats)."
   - id: streaplers-vad-har-du-under-blusen-rut
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Vad har du under blusen Rut — Streaplers"
     correctYear: 1973
     probability: 74
@@ -913,6 +984,7 @@ items:
         channelTitle: "WM Sweden"
         notes: "Officiell Warner Music Sweden ℗ 1973."
   - id: bjorn-skifs-michelangelo
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Michelangelo — Björn Skifs"
     correctYear: 1975
     probability: 76
@@ -926,6 +998,7 @@ items:
         channelTitle: "Björn Skifs - Topic"
         notes: "Officiell Topic-kanal. Studio 1975. Ersatte TV-klipp (EOhBIaOt1oU)."
   - id: vikingarna-djingis-kan
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Djingis Kan — Vikingarna"
     correctYear: 1979
     probability: 78
@@ -940,6 +1013,7 @@ items:
         notes: "Officiell Topic-kanal. Studio 1979. Ersatte blockerat klipp (HRn0KKd03uk)."
 
   - id: ted-gardestad-vilken-harlig-dag
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Oh, vilken härlig dag — Ted Gärdestad"
     correctYear: 1973
     probability: 88
@@ -954,6 +1028,7 @@ items:
         channelTitle: "Ted Gärdestad - Topic"
         notes: "Studio-audio från officiell Topic-kanal."
   - id: neil-diamond-girl-youll-be-a-woman-soon
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Girl, You'll Be a Woman Soon — Neil Diamond"
     correctYear: 1967
     probability: 82
@@ -967,6 +1042,7 @@ items:
         channelTitle: "Neil Diamond"
         notes: "Neil Diamond - Girl You'll Be a Woman Soon (1967)."
   - id: lasse-berghagen-en-kvall-i-juni
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "En kväll i juni — Lasse Berghagen"
     correctYear: 1975
     probability: 80
@@ -981,6 +1057,7 @@ items:
         channelTitle: "Lasse Berghagen - Topic"
         notes: "Studio-inspelning. WM Sweden (Warner Music Sweden) officiell upload."
   - id: sugarhill-gang-rappers-delight
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Rapper's Delight — Sugarhill Gang"
     correctYear: 1979
     probability: 85
@@ -990,6 +1067,7 @@ items:
     spotifyTrackId: "2XbwFs07dfm2MGQuYmRMZT"
   # === Tillägg 2026-08-11 (Peters lista) ===
   - id: marvin-gaye-tammi-terrell-aint-no-mountain-high-enough
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Ain't No Mountain High Enough — Marvin Gaye & Tammi Terrell"
     correctYear: 1967
     probability: 84
@@ -998,6 +1076,7 @@ items:
     spotifyTrackId: "7tqhbajSfrz2F7E1Z75ASX"
     youtubeClips: []
   - id: the-who-behind-blue-eyes
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Behind Blue Eyes — The Who"
     correctYear: 1971
     probability: 80
@@ -1009,6 +1088,7 @@ items:
     spotifyTrackId: "0cKk8BKEi7zXbdrYdyqBP5"
     youtubeClips: []
   - id: bonnie-tyler-its-a-heartache
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "It's a Heartache — Bonnie Tyler"
     correctYear: 1977
     probability: 82
@@ -1017,6 +1097,7 @@ items:
     spotifyTrackId: "1Y7VG310Lf5IYP7sVOob4X"
     youtubeClips: []
   - id: bette-midler-the-rose
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "The Rose — Bette Midler"
     correctYear: 1979
     probability: 80
@@ -1026,6 +1107,7 @@ items:
     notes: "SAKNAR MEDIA - Peter angav ingen lank. Alla Spotify-traffar jag hittade ar samlingsskivor (2008/2009/2015), vilket bryter mot single-release-regeln for deep-link-kontext. Behover kurerat track-ID eller YT-klipp innan den exporteras."
   # === Tillagg 2026-08-14 (Peters 80-talslista, titlar fore 1981) ===
   - id: blondie-heart-of-glass
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Heart of Glass — Blondie"
     correctYear: 1978
     probability: 84
@@ -1038,6 +1120,7 @@ items:
         notes: "Peter-kurerad 2026-08-14 ur hans 80-talsspellista. Kanal ej verifierad."
     notes: "correctYear = albumet Parallel Lines (23 sept 1978), forsta gangen laten gick att hora. Singeln kom forst i jan 1979."
   - id: george-benson-give-me-the-night
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Give Me the Night — George Benson"
     correctYear: 1980
     probability: 76
@@ -1048,3 +1131,34 @@ items:
         startSec: 0
         endSec: 30
         notes: "Peter-kurerad 2026-08-14 ur hans 80-talsspellista. Kanal ej verifierad."
+  # === Tillagg 2026-08-14 (Peters global-lista) ===
+  - id: travolta-newton-john-youre-the-one-that-i-want
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "You're the One That I Want — John Travolta & Olivia Newton-John"
+    correctYear: 1978
+    probability: 86
+    region: ["global"]
+    wikimediaSearchHints: ["Youre the One That I Want Grease 1978 Travolta Newton-John"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "vcseNcBgH5I"
+        startSec: 20
+        endSec: 50
+        channelTitle: "Miguel Aching"
+        notes: "Peter-kurerad 2026-08-14 med explicit startSec 20. Videotitel verifierad: 'You're The One That I Want (From \"Grease\") · John Travolta · Olivia Newton (REAL 4K)' — inget ar i titeln. Filmscenen dar artisterna framfor sin EGEN lat, godkant per R1-policyn for pre-MTV-era."
+    notes: "correctYear = 1978 (singeln mars 1978 + Grease-soundtracket april 1978). Katalogen har aven filmitemet grease-1978 i movies-classics.yaml — separat item, ej dubblett."
+  - id: kc-sunshine-band-thats-the-way-i-like-it
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "That's the Way (I Like It) — KC and the Sunshine Band"
+    correctYear: 1975
+    probability: 82
+    region: ["global"]
+    wikimediaSearchHints: ["KC and the Sunshine Band Thats the Way I Like It 1975"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "2UB8P0UImzw"
+        startSec: 0
+        endSec: 30
+        channelTitle: "KC and the Sunshine Band - Topic"
+        notes: "Ersatte Peters lank O0_H3F84Yjk 2026-08-14: den hade '1975' i videotiteln (= svaret), var SD och embed-blockerad i 2 regioner utan servad region. Detta ar officiell Topic-audio, HD, ren titel utan arsangivelse. OBS statisk albumkonst — byt garna till en officiell video om en oblockerad hittas."
+    notes: "correctYear = 1975 (bade det sjalvbetitlade albumet och singeln)."

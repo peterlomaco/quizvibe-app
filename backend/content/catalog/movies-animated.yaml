@@ -6,7 +6,7 @@
 #
 # Kalle Anka = Mickey's Trailer (1938), Musse Pigg = Steamboat Willie (1928).
 # Båda är korta filmer (~8 min) som ingår i det svenska julaftonsutbudet.
-audience: ["all"]
+audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
 region: ["sweden"]
 category: songs
 contentForm: youtube
@@ -15,6 +15,7 @@ items:
   # === Peters 7 + Lejonkungen (hanteras i movies-classics.yaml) ===
 
   - id: angry-birds
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "The Angry Birds Movie"
     correctYear: 2016
     probability: 82
@@ -28,6 +29,7 @@ items:
         notes: "Sony Pictures UK — officiell 2016-trailer. Red + Bomb + Chuck i fokus. Ej embed-blockerad."
 
   - id: steamboat-willie-1928
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Steamboat Willie"
     correctYear: 1928
     probability: 80
@@ -41,6 +43,7 @@ items:
         notes: "4K-remaster av Steamboat Willie (public domain sedan jan 2024). Ikononisk öppning med Mickey som visslar på ångbåten."
 
   - id: mickeys-trailer-1938
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Mickey's Trailer"
     correctYear: 1938
     probability: 82
@@ -54,6 +57,7 @@ items:
         notes: "Kalle Anka på husvagnssemester — Mickey, Donald och Langben i husvagnen (julaftonsklassiker). Hela korta filmen (7:43)."
 
   - id: robin-hood-1973
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Robin Hood"
     correctYear: 1973
     probability: 84
@@ -67,6 +71,7 @@ items:
         notes: "Original 1973 teatral trailer (1:00) — Robin Hood + Maid Marian etableras."
 
   - id: lady-and-the-tramp
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Lady and the Tramp"
     correctYear: 1955
     probability: 82
@@ -80,6 +85,7 @@ items:
         notes: "Disney UK officiell Blu-ray-trailer — spagetti-scen + hundar etablerade."
 
   - id: shrek-2001
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Shrek"
     correctYear: 2001
     probability: 90
@@ -95,6 +101,7 @@ items:
   # === 5 extra animerade filmer ===
 
   - id: bambi-1942
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Bambi"
     correctYear: 1942
     probability: 86
@@ -108,6 +115,7 @@ items:
         notes: "Disney UK officiell Diamond Edition-trailer — Bambi i skogen, klassisk Disney-estetik."
 
   - id: finding-nemo
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Finding Nemo"
     correctYear: 2003
     probability: 90
@@ -121,6 +129,7 @@ items:
         notes: "Teatral 2003-trailer — Nemo + Marlin + undervattensvärlden etableras."
 
   - id: aladdin-1992
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Aladdin"
     correctYear: 1992
     probability: 88
@@ -134,6 +143,7 @@ items:
         notes: "Original teatral 1992-trailer — Aladdin + Agrabah + Genie (Robin Williams) etableras."
 
   - id: mulan-1998
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Mulan"
     correctYear: 1998
     probability: 84
@@ -147,6 +157,7 @@ items:
         notes: "Original 1998 teatral trailer — Mulan som krigare + Make a Man Out of You-känsla."
 
   - id: tarzan-1999
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Tarzan"
     correctYear: 1999
     probability: 82
@@ -154,6 +165,7 @@ items:
     answerMethods: ["timeline"]
 
   - id: zootopia-2016
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Zootopia"
     correctYear: 2016
     probability: 86

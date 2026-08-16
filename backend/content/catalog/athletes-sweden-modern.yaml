@@ -1,11 +1,12 @@
 # Svenska idrottare kända för Millennials + Gen Z. Tillagda 2026-06-01.
-audience: ["millennials", "gen-z"]
+audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
 region: ["sweden"]
 category: sport
 contentForm: image
 contentSubject: athlete
 items:
   - id: nils-van-der-poel
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Nils van der Poel"
     probability: 74
     peakFrom: 2021
@@ -13,6 +14,7 @@ items:
     wikimediaSearchHints: ["Nils van der Poel"]
     answerMethods: ["name-letters"]
   - id: daniel-stahl
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Daniel Ståhl"
     probability: 74
     peakFrom: 2019
@@ -20,6 +22,7 @@ items:
     wikimediaSearchHints: ["Daniel Ståhl discus"]
     answerMethods: ["name-letters"]
   - id: jenny-rissveds
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Jenny Rissveds"
     probability: 58
     peakFrom: 2016
@@ -27,6 +30,7 @@ items:
     wikimediaSearchHints: ["Jenny Rissveds"]
     answerMethods: ["name-letters"]
   - id: kajsa-bergqvist
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Kajsa Bergqvist"
     probability: 74
     peakFrom: 2002
@@ -34,6 +38,7 @@ items:
     wikimediaSearchHints: ["Kajsa Bergqvist high jump"]
     answerMethods: ["name-letters"]
   - id: susanna-kallur
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Susanna Kallur"
     probability: 70
     peakFrom: 2006
@@ -41,6 +46,7 @@ items:
     wikimediaSearchHints: ["Susanna Kallur"]
     answerMethods: ["name-letters"]
   - id: lotta-schelin
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Lotta Schelin"
     probability: 72
     peakFrom: 2008
@@ -48,6 +54,7 @@ items:
     wikimediaSearchHints: ["Lotta Schelin"]
     answerMethods: ["name-letters"]
   - id: kosovare-asllani
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Kosovare Asllani"
     probability: 74
     peakFrom: 2012
@@ -55,6 +62,7 @@ items:
     wikimediaSearchHints: ["Kosovare Asllani"]
     answerMethods: ["name-letters"]
   - id: viktor-gyokeres
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Viktor Gyökeres"
     region: ["europe"]
     probability: 78
@@ -63,6 +71,7 @@ items:
     wikimediaSearchHints: ["Viktor Gyökeres"]
     answerMethods: ["name-letters"]
   - id: kim-kallstrom
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Kim Källström"
     probability: 72
     peakFrom: 2005
@@ -70,6 +79,7 @@ items:
     wikimediaSearchHints: ["Kim Källström footballer"]
     answerMethods: ["name-letters"]
   - id: olof-mellberg
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Olof Mellberg"
     probability: 70
     peakFrom: 2001
@@ -77,6 +87,7 @@ items:
     wikimediaSearchHints: ["Olof Mellberg"]
     answerMethods: ["name-letters"]
   - id: sebastian-larsson
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Sebastian Larsson"
     probability: 70
     peakFrom: 2008
@@ -84,6 +95,7 @@ items:
     wikimediaSearchHints: ["Sebastian Larsson footballer"]
     answerMethods: ["name-letters"]
   - id: robin-olsen
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Robin Olsen"
     probability: 68
     peakFrom: 2018
@@ -91,6 +103,7 @@ items:
     wikimediaSearchHints: ["Robin Olsen footballer goalkeeper"]
     answerMethods: ["name-letters"]
   - id: robin-soderling
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Robin Söderling"
     probability: 72
     peakFrom: 2009
@@ -98,6 +111,7 @@ items:
     wikimediaSearchHints: ["Robin Söderling tennis"]
     answerMethods: ["name-letters"]
   - id: thomas-johansson-tennis
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Thomas Johansson"
     probability: 62
     peakFrom: 2002
@@ -105,6 +119,7 @@ items:
     wikimediaSearchHints: ["Thomas Johansson tennis Australian Open"]
     answerMethods: ["name-letters"]
   - id: mikaela-lauren
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Mikaela Laurén"
     probability: 58
     peakFrom: 2010
@@ -112,6 +127,7 @@ items:
     wikimediaSearchHints: ["Mikaela Lauren boxer"]
     answerMethods: ["name-letters"]
   - id: michel-torneus
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Michel Tornéus"
     probability: 54
     peakFrom: 2012
@@ -119,6 +135,7 @@ items:
     wikimediaSearchHints: ["Michel Tornéus long jump"]
     answerMethods: ["name-letters"]
   - id: emma-green
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Emma Green"
     probability: 58
     peakFrom: 2005
@@ -126,6 +143,7 @@ items:
     wikimediaSearchHints: ["Emma Green Tregaro high jump"]
     answerMethods: ["name-letters"]
   - id: tobias-karlsson-handball
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Tobias Karlsson"
     probability: 58
     peakFrom: 2008

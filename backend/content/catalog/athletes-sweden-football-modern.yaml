@@ -1,11 +1,12 @@
 # Svenska fotbollsspelare — modern era
-audience: ["gen-x", "millennials"]
+audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
 region: ["sweden"]
 category: sport
 contentForm: image
 contentSubject: athlete
 items:
   - id: tomas-brolin
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: Tomas Brolin
     correctYear: 1969
     probability: 85
@@ -15,6 +16,7 @@ items:
     genrePackages: ["football"]
 
   - id: marcus-allback
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: Marcus Allbäck
     correctYear: 1973
     probability: 76
@@ -24,6 +26,7 @@ items:
     genrePackages: ["football"]
 
   - id: marcus-berg
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: Marcus Berg
     correctYear: 1986
     probability: 74
@@ -33,6 +36,7 @@ items:
     genrePackages: ["football"]
 
   - id: niclas-alexandersson
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: Niclas Alexandersson
     correctYear: 1971
     probability: 76
@@ -42,6 +46,7 @@ items:
     genrePackages: ["football"]
 
   - id: mikael-lustig
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: Mikael Lustig
     correctYear: 1986
     probability: 76
@@ -51,6 +56,7 @@ items:
     genrePackages: ["football"]
 
   - id: andreas-granqvist
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: Andreas Granqvist
     correctYear: 1985
     probability: 78
@@ -60,6 +66,7 @@ items:
     genrePackages: ["football"]
 
   - id: hakan-mild
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: Håkan Mild
     correctYear: 1971
     probability: 75
@@ -69,6 +76,7 @@ items:
     genrePackages: ["football"]
 
   - id: joachim-bjorklund
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: Joachim Björklund
     correctYear: 1971
     probability: 74
@@ -78,6 +86,7 @@ items:
     genrePackages: ["football"]
 
   - id: teddy-lucic
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: Teddy Lučić
     correctYear: 1977
     probability: 74
@@ -87,6 +96,7 @@ items:
     genrePackages: ["football"]
 
   - id: christian-wilhelmsson
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: Christian Wilhelmsson
     correctYear: 1979
     probability: 75
@@ -96,6 +106,7 @@ items:
     genrePackages: ["football"]
 
   - id: tobias-linderoth
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: Tobias Linderoth
     correctYear: 1979
     probability: 74
@@ -105,6 +116,7 @@ items:
     genrePackages: ["football"]
 
   - id: daniel-andersson
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: Daniel Andersson
     correctYear: 1977
     probability: 72
@@ -114,6 +126,7 @@ items:
     genrePackages: ["football"]
 
   - id: ola-toivonen
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: Ola Toivonen
     correctYear: 1986
     probability: 75
@@ -123,6 +136,7 @@ items:
     genrePackages: ["football"]
 
   - id: albin-ekdal
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: Albin Ekdal
     correctYear: 1989
     probability: 74
@@ -132,6 +146,7 @@ items:
     genrePackages: ["football"]
 
   - id: jimmy-durmaz
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: Jimmy Durmaz
     correctYear: 1989
     probability: 75
@@ -141,6 +156,7 @@ items:
     genrePackages: ["football"]
 
   - id: andreas-andersson
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: Andreas Andersson
     correctYear: 1971
     probability: 72
@@ -150,6 +166,7 @@ items:
     genrePackages: ["football"]
 
   - id: oscar-wendt
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: Oscar Wendt
     correctYear: 1985
     probability: 74
@@ -159,6 +176,7 @@ items:
     genrePackages: ["football"]
 
   - id: lucas-bergvall
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: Lucas Bergvall
     correctYear: 2006
     probability: 76
@@ -168,6 +186,7 @@ items:
     genrePackages: ["football"]
 
   - id: isak-hien
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: Isak Hien
     correctYear: 1999
     probability: 74
@@ -177,6 +196,7 @@ items:
     genrePackages: ["football"]
 
   - id: jordan-larsson
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: Jordan Larsson
     correctYear: 1997
     probability: 75
@@ -186,6 +206,7 @@ items:
     genrePackages: ["football"]
 
   - id: emil-krafth
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: Emil Krafth
     correctYear: 1994
     probability: 73
@@ -195,6 +216,7 @@ items:
     genrePackages: ["football"]
 
   - id: gustav-svensson
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: Gustav Svensson
     correctYear: 1987
     probability: 72
@@ -204,6 +226,7 @@ items:
     genrePackages: ["football"]
 
   - id: patrik-andersson
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: Patrik Andersson
     correctYear: 1971
     probability: 78
@@ -213,6 +236,7 @@ items:
     genrePackages: ["football"]
 
   - id: roland-nilsson
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: Roland Nilsson
     correctYear: 1963
     probability: 78
@@ -222,6 +246,7 @@ items:
     genrePackages: ["football"]
 
   - id: anders-svensson
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: Anders Svensson
     correctYear: 1976
     probability: 80
@@ -231,6 +256,7 @@ items:
     genrePackages: ["football"]
 
   - id: jonas-thern
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: Jonas Thern
     correctYear: 1967
     probability: 80
@@ -240,6 +266,7 @@ items:
     genrePackages: ["football"]
 
   - id: johan-mjallby
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: Johan Mjällby
     correctYear: 1971
     probability: 76
@@ -249,6 +276,7 @@ items:
     genrePackages: ["football"]
 
   - id: emil-forsberg
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: Emil Forsberg
     correctYear: 1991
     probability: 83
@@ -258,6 +286,7 @@ items:
     genrePackages: ["football"]
 
   - id: victor-lindelof
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: Victor Lindelöf
     correctYear: 1994
     probability: 84

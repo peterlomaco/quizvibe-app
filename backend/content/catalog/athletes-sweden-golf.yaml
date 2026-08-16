@@ -5,7 +5,7 @@
 # mest omtalad. Tre golfare ligger redan i andra filer (jesper-parnevik i
 # athletes-elder-gen-x.yaml, henrik-stenson + ludvig-aberg i
 # athletes-modern.yaml) och upprepas INTE här.
-audience: ["gen-x", "millennials"]
+audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
 region: ["sweden"]
 category: sport
 contentForm: image
@@ -13,36 +13,36 @@ contentSubject: athlete
 items:
   # ── Damer ────────────────────────────────────────────────────────────────
   - id: liselotte-neumann
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Liselotte Neumann"
     correctYear: 1966
-    audience: ["gen-x", "elder"]
     probability: 62
     peakFrom: 1988
     peakTo: 1998
     wikimediaSearchHints: ["Liselotte Neumann golfer LPGA"]
     answerMethods: ["name-letters"]
   - id: helen-alfredsson
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Helen Alfredsson"
     correctYear: 1965
-    audience: ["gen-x", "elder"]
     probability: 60
     peakFrom: 1992
     peakTo: 2008
     wikimediaSearchHints: ["Helen Alfredsson golfer LPGA"]
     answerMethods: ["name-letters"]
   - id: anna-nordqvist
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Anna Nordqvist"
     correctYear: 1987
-    audience: ["millennials", "gen-x"]
     probability: 66
     peakFrom: 2009
     peakTo: 2021
     wikimediaSearchHints: ["Anna Nordqvist golfer LPGA"]
     answerMethods: ["name-letters"]
   - id: linn-grant
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Linn Grant"
     correctYear: 1999
-    audience: ["gen-z", "millennials"]
     probability: 58
     peakFrom: 2022
     peakTo: 2025
@@ -51,18 +51,18 @@ items:
 
   # ── Herrar ───────────────────────────────────────────────────────────────
   - id: robert-karlsson
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Robert Karlsson"
     correctYear: 1969
-    audience: ["gen-x", "millennials"]
     probability: 58
     peakFrom: 2006
     peakTo: 2010
     wikimediaSearchHints: ["Robert Karlsson golfer European Tour"]
     answerMethods: ["name-letters"]
   - id: alexander-noren
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Alexander Norén"
     correctYear: 1982
-    audience: ["millennials", "gen-x"]
     probability: 64
     peakFrom: 2016
     peakTo: 2018

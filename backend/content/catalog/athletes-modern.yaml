@@ -2,13 +2,14 @@
 # ikoner från fotboll, tennis, friidrott och stavhopp. Alla har stark
 # igenkänningsfaktor i Sverige + global reach (V1-katalogens principlinje).
 # correctYear = födelseår.
-audience: ["millennials", "gen-z", "gen-alpha"]
+audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
 region: ["sweden"]
 category: sport
 contentForm: image
 contentSubject: athlete
 items:
   - id: zlatan-ibrahimovic
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Zlatan Ibrahimović"
     region: ["global"]
     correctYear: 1981
@@ -17,6 +18,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: cristiano-ronaldo
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Cristiano Ronaldo"
     region: ["global"]
     correctYear: 1985
@@ -25,6 +27,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: lionel-messi
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Lionel Messi"
     region: ["global"]
     correctYear: 1987
@@ -33,6 +36,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: serena-williams
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Serena Williams"
     correctYear: 1981
     probability: 96
@@ -40,6 +44,7 @@ items:
     wikimediaSearchHints: ["Serena Williams tennis"]
     answerMethods: ["timeline", "name-letters"]
   - id: usain-bolt
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Usain Bolt"
     region: ["global"]
     correctYear: 1986
@@ -47,6 +52,7 @@ items:
     wikimediaSearchHints: ["Usain Bolt sprinter"]
     answerMethods: ["timeline", "name-letters"]
   - id: roger-federer
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Roger Federer"
     correctYear: 1981
     probability: 96
@@ -54,6 +60,7 @@ items:
     wikimediaSearchHints: ["Roger Federer tennis"]
     answerMethods: ["timeline", "name-letters"]
   - id: armand-duplantis
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Armand Duplantis"
     correctYear: 1999
     probability: 88
@@ -61,6 +68,7 @@ items:
     wikimediaSearchHints: ["Armand Duplantis pole vault"]
     answerMethods: ["timeline", "name-letters"]
   - id: tom-brady
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Tom Brady"
     correctYear: 1977
     probability: 88
@@ -68,6 +76,7 @@ items:
     wikimediaSearchHints: ["Tom Brady NFL quarterback"]
     answerMethods: ["timeline", "name-letters"]
   - id: lewis-hamilton
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Lewis Hamilton"
     region: ["global"]
     correctYear: 1985
@@ -75,6 +84,7 @@ items:
     wikimediaSearchHints: ["Lewis Hamilton Formula 1 driver"]
     answerMethods: ["timeline", "name-letters"]
   - id: rafael-nadal
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Rafael Nadal"
     region: ["global"]
     correctYear: 1986
@@ -82,6 +92,7 @@ items:
     wikimediaSearchHints: ["Rafael Nadal tennis"]
     answerMethods: ["timeline", "name-letters"]
   - id: novak-djokovic
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Novak Djokovic"
     correctYear: 1987
     probability: 92
@@ -89,6 +100,7 @@ items:
     wikimediaSearchHints: ["Novak Djokovic tennis"]
     answerMethods: ["timeline", "name-letters"]
   - id: kylian-mbappe
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Kylian Mbappé"
     correctYear: 1998
     probability: 92
@@ -97,6 +109,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: annika-sorenstam
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Annika Sörenstam"
     correctYear: 1970
     probability: 85
@@ -104,18 +117,21 @@ items:
     wikimediaSearchHints: ["Annika Sörenstam golf Sweden"]
     answerMethods: ["timeline", "name-letters"]
   - id: charlotte-kalla
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Charlotte Kalla"
     correctYear: 1987
     probability: 85
     wikimediaSearchHints: ["Charlotte Kalla cross country skiing Sweden"]
     answerMethods: ["timeline", "name-letters"]
   - id: henrik-stenson
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Henrik Stenson"
     correctYear: 1976
     probability: 82
     wikimediaSearchHints: ["Henrik Stenson golf Sweden"]
     answerMethods: ["timeline", "name-letters"]
   - id: kobe-bryant
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Kobe Bryant"
     region: ["global"]
     correctYear: 1978
@@ -123,6 +139,7 @@ items:
     wikimediaSearchHints: ["Kobe Bryant basketball Lakers"]
     answerMethods: ["timeline", "name-letters"]
   - id: erling-haaland
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Erling Haaland"
     region: ["global"]
     correctYear: 2000
@@ -131,6 +148,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: harry-kane
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Harry Kane"
     region: ["global"]
     correctYear: 1993
@@ -139,6 +157,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: robert-lewandowski
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Robert Lewandowski"
     region: ["global"]
     correctYear: 1988
@@ -147,6 +166,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: luka-modric
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Luka Modrić"
     region: ["global"]
     correctYear: 1985
@@ -155,6 +175,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: andy-murray
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Andy Murray"
     correctYear: 1987
     probability: 90
@@ -162,6 +183,7 @@ items:
     wikimediaSearchHints: ["Andy Murray tennis"]
     answerMethods: ["timeline", "name-letters"]
   - id: mikaela-shiffrin
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Mikaela Shiffrin"
     correctYear: 1995
     probability: 88
@@ -169,18 +191,21 @@ items:
     wikimediaSearchHints: ["Mikaela Shiffrin skier"]
     answerMethods: ["timeline", "name-letters"]
   - id: sara-sjostrom
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Sarah Sjöström"
     correctYear: 1993
     probability: 92
     wikimediaSearchHints: ["Sarah Sjöström swimmer Sweden"]
     answerMethods: ["timeline", "name-letters"]
   - id: carolina-kluft
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Carolina Klüft"
     correctYear: 1983
     probability: 90
     wikimediaSearchHints: ["Carolina Klüft heptathlon Sweden"]
     answerMethods: ["timeline", "name-letters"]
   - id: alex-morgan
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Alex Morgan"
     correctYear: 1989
     probability: 82
@@ -188,6 +213,7 @@ items:
     wikimediaSearchHints: ["Alex Morgan soccer"]
     answerMethods: ["timeline", "name-letters"]
   - id: karsten-warholm
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Karsten Warholm"
     region: ["nordic"]
     correctYear: 1996
@@ -195,6 +221,7 @@ items:
     wikimediaSearchHints: ["Karsten Warholm hurdler Norway"]
     answerMethods: ["timeline", "name-letters"]
   - id: jakob-ingebrigtsen
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Jakob Ingebrigtsen"
     region: ["nordic"]
     correctYear: 2000
@@ -202,6 +229,7 @@ items:
     wikimediaSearchHints: ["Jakob Ingebrigtsen runner Norway"]
     answerMethods: ["timeline", "name-letters"]
   - id: xavi
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Xavi"
     correctYear: 1980
     probability: 85
@@ -209,6 +237,7 @@ items:
     wikimediaSearchHints: ["Xavi footballer Barcelona", "Xavi Hernandez"]
     answerMethods: ["timeline", "name-letters"]
   - id: yao-ming
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Yao Ming"
     correctYear: 1980
     probability: 82
@@ -216,6 +245,7 @@ items:
     wikimediaSearchHints: ["Yao Ming basketball China"]
     answerMethods: ["timeline", "name-letters"]
   - id: venus-williams
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Venus Williams"
     region: ["global"]
     correctYear: 1980
@@ -223,54 +253,63 @@ items:
     wikimediaSearchHints: ["Venus Williams tennis"]
     answerMethods: ["timeline", "name-letters"]
   - id: henrik-lundqvist
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Henrik Lundqvist"
     correctYear: 1982
     probability: 86
     wikimediaSearchHints: ["Henrik Lundqvist New York Rangers goaltender Sweden"]
     answerMethods: ["timeline", "name-letters"]
   - id: daniel-sedin
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Daniel Sedin"
     correctYear: 1980
     probability: 82
     wikimediaSearchHints: ["Daniel Sedin Vancouver Canucks hockey Sweden twin"]
     answerMethods: ["timeline", "name-letters"]
   - id: erik-karlsson
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Erik Karlsson"
     correctYear: 1990
     probability: 80
     wikimediaSearchHints: ["Erik Karlsson hockey Sweden defenseman Senators"]
     answerMethods: ["timeline", "name-letters"]
   - id: victor-hedman
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Victor Hedman"
     correctYear: 1990
     probability: 78
     wikimediaSearchHints: ["Victor Hedman Tampa Bay Lightning defenseman Sweden"]
     answerMethods: ["timeline", "name-letters"]
   - id: caroline-seger
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Caroline Seger"
     correctYear: 1985
     probability: 76
     wikimediaSearchHints: ["Caroline Seger football Sweden captain"]
     answerMethods: ["timeline", "name-letters"]
   - id: anja-parson
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Anja Pärson"
     correctYear: 1981
     probability: 82
     wikimediaSearchHints: ["Anja Parson alpine skiing Sweden Olympic gold"]
     answerMethods: ["timeline", "name-letters"]
   - id: marcus-hellner
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Marcus Hellner"
     correctYear: 1985
     probability: 78
     wikimediaSearchHints: ["Marcus Hellner cross country skiing Sweden Olympic"]
     answerMethods: ["timeline", "name-letters"]
   - id: frida-karlsson
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Frida Karlsson"
     correctYear: 1999
     probability: 76
     wikimediaSearchHints: ["Frida Karlsson cross country skiing Sweden"]
     answerMethods: ["timeline", "name-letters"]
   - id: stina-nilsson
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Stina Nilsson"
     correctYear: 1993
     probability: 76
@@ -278,6 +317,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
   # === Batch C 2026-05-27 — international modern athletes ===
   - id: sidney-crosby
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Sidney Crosby"
     region: ["global"]
     correctYear: 1987
@@ -285,6 +325,7 @@ items:
     wikimediaSearchHints: ["Sidney Crosby Pittsburgh Penguins captain hockey"]
     answerMethods: ["timeline", "name-letters"]
   - id: connor-mcdavid
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Connor McDavid"
     correctYear: 1997
     probability: 80
@@ -292,6 +333,7 @@ items:
     wikimediaSearchHints: ["Connor McDavid Edmonton Oilers captain hockey"]
     answerMethods: ["timeline", "name-letters"]
   - id: neymar
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Neymar"
     correctYear: 1992
     probability: 90
@@ -300,6 +342,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: iker-casillas
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Iker Casillas"
     correctYear: 1981
     probability: 82
@@ -308,6 +351,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: toni-kroos
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Toni Kroos"
     correctYear: 1990
     probability: 82
@@ -316,6 +360,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: manuel-neuer
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Manuel Neuer"
     correctYear: 1986
     probability: 82
@@ -324,6 +369,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: floyd-mayweather
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Floyd Mayweather"
     correctYear: 1977
     probability: 86
@@ -331,24 +377,28 @@ items:
     wikimediaSearchHints: ["Floyd Mayweather American boxer undefeated Pacquiao"]
     answerMethods: ["timeline", "name-letters"]
   - id: truls-moregardh
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Truls Möregårdh"
     correctYear: 2002
     probability: 82
     wikimediaSearchHints: ["Truls Möregårdh Swedish table tennis Olympic silver Paris 2024"]
     answerMethods: ["timeline", "name-letters"]
   - id: ludvig-aberg
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Ludvig Åberg"
     correctYear: 1999
     probability: 84
     wikimediaSearchHints: ["Ludvig Åberg Swedish golfer Ryder Cup PGA Tour"]
     answerMethods: ["timeline", "name-letters"]
   - id: henrik-zetterberg
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Henrik Zetterberg"
     correctYear: 1980
     probability: 86
     wikimediaSearchHints: ["Henrik Zetterberg Detroit Red Wings captain Swedish hockey"]
     answerMethods: ["timeline", "name-letters"]
   - id: wayne-rooney
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Wayne Rooney"
     region: ["global"]
     correctYear: 1985
@@ -357,18 +407,21 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: mattias-andersson
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Mattias Andersson"
     correctYear: 1978
     probability: 80
     wikimediaSearchHints: ["Mattias Andersson Swedish handball goalkeeper world champion"]
     answerMethods: ["timeline", "name-letters"]
   - id: andreas-palicka
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Andreas Palicka"
     correctYear: 1986
     probability: 76
     wikimediaSearchHints: ["Andreas Palicka Swedish handball goalkeeper Paris Saint-Germain"]
     answerMethods: ["timeline", "name-letters"]
   - id: kim-andersson
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Kim Andersson"
     correctYear: 1982
     probability: 76
@@ -376,6 +429,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
   # === FIFA World Cup-paketet 2026-05-27 — fotbollsspelare i landslagskläder ===
   - id: ronaldinho
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Ronaldinho"
     region: ["global"]
     correctYear: 1980
@@ -384,6 +438,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: kaka
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Kaká"
     correctYear: 1982
     probability: 88
@@ -391,6 +446,7 @@ items:
     wikimediaSearchHints: ["Kaká Brazilian footballer AC Milan Real Madrid 2002 World Cup"]
     answerMethods: ["timeline", "name-letters"]
   - id: andrea-pirlo
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Andrea Pirlo"
     correctYear: 1979
     probability: 86
@@ -400,6 +456,7 @@ items:
     genrePackages: ["pkg-fifa-wc"]
   # === FIFA WC Pass 2 2026-05-27 — modern era VM-spelare ===
   - id: thierry-henry
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Thierry Henry"
     correctYear: 1977
     probability: 90
@@ -408,6 +465,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: david-villa
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "David Villa"
     correctYear: 1981
     probability: 82
@@ -416,6 +474,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: didier-drogba
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Didier Drogba"
     correctYear: 1978
     probability: 86
@@ -424,6 +483,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
   # === FIFA WC Pass 3 mid-tier 2026-05-27 — modern ===
   - id: gerard-pique
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Gerard Piqué"
     correctYear: 1987
     probability: 84
@@ -432,6 +492,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: angel-di-maria
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Ángel Di María"
     correctYear: 1988
     probability: 84
@@ -440,6 +501,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: thiago-silva
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Thiago Silva"
     correctYear: 1984
     probability: 82
@@ -448,6 +510,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: kevin-de-bruyne
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Kevin De Bruyne"
     region: ["global"]
     correctYear: 1991
@@ -456,6 +519,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: christian-pulisic
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Christian Pulisic"
     correctYear: 1998
     probability: 80
@@ -464,6 +528,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: antoine-griezmann
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Antoine Griezmann"
     correctYear: 1991
     probability: 90
@@ -472,6 +537,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: virgil-van-dijk
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Virgil van Dijk"
     region: ["global"]
     correctYear: 1991
@@ -481,6 +547,7 @@ items:
     genrePackages: ["pkg-fifa-wc"]
   # === FIFA WC Pass 4 2026-05-27 — modern era ===
   - id: fred
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Fred"
     correctYear: 1983
     probability: 76
@@ -489,6 +556,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: oscar
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Oscar"
     correctYear: 1991
     probability: 76
@@ -497,6 +565,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: dani-alves
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Dani Alves"
     correctYear: 1983
     probability: 82
@@ -505,6 +574,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: gareth-bale
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Gareth Bale"
     correctYear: 1989
     probability: 88
@@ -513,6 +583,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: dejan-kulusevski
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Dejan Kulusevski"
     correctYear: 2000
     probability: 80
@@ -520,6 +591,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: alexander-isak
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Alexander Isak"
     correctYear: 1999
     probability: 82
@@ -527,6 +599,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: joao-felix
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "João Félix"
     correctYear: 1999
     probability: 80
@@ -535,6 +608,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: martin-odegaard
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Martin Ødegaard"
     region: ["global"]
     correctYear: 1998
@@ -543,6 +617,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: andreas-isaksson
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Andreas Isaksson"
     correctYear: 1981
     probability: 76
@@ -550,6 +625,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
   # === FIFA WC Pass 5 — modern landslagstränare 2026-05-27 ===
   - id: diego-simeone
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Diego Simeone"
     correctYear: 1970
     probability: 86
@@ -557,8 +633,8 @@ items:
     wikimediaSearchHints: ["Diego Simeone Argentine coach Atletico Madrid player 1998 2002 World Cup"]
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
-    audience: ["gen-x", "millennials", "gen-z"]
   - id: ronaldo-nazario
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Ronaldo Nazário"
     region: ["global"]
     correctYear: 1976
@@ -567,6 +643,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: marcelo
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Marcelo"
     correctYear: 1988
     probability: 82
@@ -575,6 +652,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: miroslav-klose
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Miroslav Klose"
     correctYear: 1978
     probability: 78
@@ -583,6 +661,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: thomas-muller
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Thomas Muller"
     correctYear: 1989
     probability: 78
@@ -591,6 +670,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: steven-gerrard
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Steven Gerrard"
     correctYear: 1980
     probability: 78
@@ -599,6 +679,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: frank-lampard
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Frank Lampard"
     correctYear: 1978
     probability: 78
@@ -607,6 +688,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: sergio-busquets
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Sergio Busquets"
     correctYear: 1988
     probability: 78
@@ -615,6 +697,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: xabi-alonso
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Xabi Alonso"
     correctYear: 1981
     probability: 78
@@ -623,6 +706,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: raul
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Raul"
     correctYear: 1977
     probability: 78
@@ -631,6 +715,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: luis-suarez
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Luis Suarez"
     correctYear: 1987
     probability: 78
@@ -639,6 +724,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: edinson-cavani
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Edinson Cavani"
     correctYear: 1987
     probability: 78
@@ -647,6 +733,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: diego-forlan
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Diego Forlan"
     correctYear: 1979
     probability: 78
@@ -655,6 +742,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: romelu-lukaku
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Romelu Lukaku"
     correctYear: 1993
     probability: 78
@@ -663,6 +751,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: eden-hazard
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Eden Hazard"
     correctYear: 1991
     probability: 78
@@ -671,6 +760,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: hidetoshi-nakata
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     region: ["global"]
     displayName: "Hidetoshi Nakata"
     correctYear: 1977
@@ -679,6 +769,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: tim-cahill
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Tim Cahill"
     correctYear: 1979
     probability: 78
@@ -687,6 +778,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: harry-kewell
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Harry Kewell"
     correctYear: 1978
     probability: 78
@@ -695,6 +787,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: james-rodriguez
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "James Rodriguez"
     correctYear: 1991
     probability: 78
@@ -703,6 +796,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: alexis-sanchez
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Alexis Sanchez"
     correctYear: 1988
     probability: 78
@@ -711,6 +805,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: arturo-vidal
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Arturo Vidal"
     correctYear: 1987
     probability: 78
@@ -719,6 +814,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: ivan-rakitic
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Ivan Rakitic"
     correctYear: 1988
     probability: 78
@@ -727,6 +823,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: patrick-vieira
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Patrick Vieira"
     correctYear: 1976
     probability: 78
@@ -735,6 +832,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: andriy-shevchenko
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Andriy Shevchenko"
     correctYear: 1976
     probability: 78
@@ -743,6 +841,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: petr-cech
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Petr Cech"
     region: ["global"]
     correctYear: 1982
@@ -751,6 +850,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: wesley-sneijder
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Wesley Sneijder"
     correctYear: 1984
     probability: 78
@@ -759,6 +859,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: robin-van-persie
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Robin Van Persie"
     correctYear: 1983
     probability: 78
@@ -767,6 +868,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: clarence-seedorf
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Clarence Seedorf"
     correctYear: 1976
     probability: 78
@@ -775,6 +877,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: patrick-kluivert
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Patrick Kluivert"
     region: ["global"]
     correctYear: 1976
@@ -782,6 +885,7 @@ items:
     wikimediaSearchHints: ["Patrick Kluivert footballer national team"]
     answerMethods: ["timeline", "name-letters"]
   - id: dirk-kuyt
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Dirk Kuyt"
     correctYear: 1980
     probability: 78
@@ -790,6 +894,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: gennaro-gattuso
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Gennaro Gattuso"
     correctYear: 1978
     probability: 78
@@ -798,6 +903,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: alessandro-nesta
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Alessandro Nesta"
     correctYear: 1976
     probability: 78
@@ -806,6 +912,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: john-terry
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "John Terry"
     correctYear: 1980
     probability: 78
@@ -814,6 +921,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: rio-ferdinand
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Rio Ferdinand"
     correctYear: 1978
     probability: 78
@@ -822,6 +930,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: ashley-cole
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Ashley Cole"
     correctYear: 1980
     probability: 78
@@ -830,6 +939,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: michael-owen
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Michael Owen"
     correctYear: 1979
     probability: 78
@@ -838,6 +948,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: robbie-keane
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Robbie Keane"
     correctYear: 1980
     probability: 78
@@ -846,6 +957,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: freddie-ljungberg
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Freddie Ljungberg"
     correctYear: 1977
     probability: 78
@@ -853,6 +965,7 @@ items:
     wikimediaSearchHints: ["Freddie Ljungberg footballer national team"]
     answerMethods: ["timeline", "name-letters"]
   - id: david-trezeguet
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "David Trezeguet"
     correctYear: 1977
     probability: 78
@@ -861,6 +974,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: ricardo-quaresma
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     region: ["global"]
     displayName: "Ricardo Quaresma"
     correctYear: 1983
@@ -869,6 +983,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: pepe
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Pepe"
     correctYear: 1983
     probability: 78
@@ -877,6 +992,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: deco
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Deco"
     correctYear: 1977
     probability: 78
@@ -886,6 +1002,7 @@ items:
     genrePackages: ["pkg-fifa-wc"]
   # === FIFA WC Pass 8 — mass-add (Peter accepterar civilian) 2026-05-27 ===
   - id: daniele-de-rossi
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Daniele De Rossi"
     correctYear: 1983
     probability: 78
@@ -894,6 +1011,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: cesc-fabregas
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Cesc Fabregas"
     correctYear: 1987
     probability: 78
@@ -902,6 +1020,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: pedro-rodriguez
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Pedro Rodriguez"
     correctYear: 1987
     probability: 78
@@ -910,6 +1029,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: juan-mata
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Juan Mata"
     correctYear: 1988
     probability: 78
@@ -918,6 +1038,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: diego-costa
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Diego Costa"
     correctYear: 1988
     probability: 78
@@ -926,6 +1047,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: frenkie-de-jong
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Frenkie De Jong"
     correctYear: 1997
     probability: 78
@@ -933,6 +1055,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: memphis-depay
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Memphis Depay"
     correctYear: 1994
     probability: 78
@@ -941,6 +1064,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: cody-gakpo
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Cody Gakpo"
     correctYear: 1999
     probability: 78
@@ -949,6 +1073,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: hugo-lloris
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Hugo Lloris"
     correctYear: 1986
     probability: 78
@@ -957,6 +1082,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: ngolo-kante
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Ngolo Kante"
     correctYear: 1991
     probability: 78
@@ -965,6 +1091,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: paul-pogba
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Paul Pogba"
     region: ["global"]
     correctYear: 1993
@@ -973,6 +1100,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: raphael-varane
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Raphael Varane"
     correctYear: 1993
     probability: 78
@@ -981,6 +1109,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: esteban-cambiasso
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Esteban Cambiasso"
     correctYear: 1980
     probability: 78
@@ -989,6 +1118,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: sergio-aguero
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Sergio Aguero"
     correctYear: 1988
     probability: 78
@@ -997,6 +1127,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: gonzalo-higuain
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Gonzalo Higuain"
     correctYear: 1987
     probability: 78
@@ -1005,6 +1136,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: javier-mascherano
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Javier Mascherano"
     correctYear: 1984
     probability: 78
@@ -1013,6 +1145,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: jamie-carragher
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Jamie Carragher"
     correctYear: 1978
     probability: 78
@@ -1020,6 +1153,7 @@ items:
     wikimediaSearchHints: ["Jamie Carragher footballer national team"]
     answerMethods: ["timeline", "name-letters"]
   - id: jude-bellingham
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Jude Bellingham"
     correctYear: 2003
     probability: 78
@@ -1028,6 +1162,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     # pkg-fifa-wc-tag removed 2026-05-27 — only Laureus civilian on Commons
   - id: phil-foden
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Phil Foden"
     correctYear: 2000
     probability: 78
@@ -1036,6 +1171,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: bukayo-saka
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Bukayo Saka"
     correctYear: 2001
     probability: 78
@@ -1044,6 +1180,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: declan-rice
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Declan Rice"
     correctYear: 1999
     probability: 78
@@ -1052,6 +1189,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: bruno-fernandes
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Bruno Fernandes"
     correctYear: 1994
     probability: 78
@@ -1060,6 +1198,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: nani
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Nani"
     correctYear: 1986
     probability: 78
@@ -1068,6 +1207,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: julio-cesar
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Julio Cesar"
     correctYear: 1979
     probability: 78
@@ -1076,6 +1216,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: emmanuel-adebayor
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Emmanuel Adebayor"
     correctYear: 1984
     probability: 78
@@ -1084,6 +1225,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: mohamed-salah
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Mohamed Salah"
     region: ["global"]
     correctYear: 1992
@@ -1092,6 +1234,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: guillermo-ochoa
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Guillermo Ochoa"
     correctYear: 1985
     probability: 78
@@ -1100,6 +1243,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: javier-hernandez
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Javier Hernandez"
     correctYear: 1988
     probability: 78
@@ -1108,6 +1252,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
     genrePackages: ["pkg-fifa-wc"]
   - id: tim-howard
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Tim Howard"
     correctYear: 1979
     probability: 78

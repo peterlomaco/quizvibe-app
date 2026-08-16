@@ -1,12 +1,13 @@
 # Svenska band — cross-gen-igenkända i Sverige (V1 svensk-fokus).
 # Tillagda 2026-06-01 (kända-svenskar-utbyggnad). peak = aktiv/recognition-fönster.
-audience: ["all"]
+audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
 region: ["sweden"]
 category: artists
 contentForm: image
 contentSubject: band
 items:
   - id: arvingarna
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Arvingarna"
     probability: 78
     peakFrom: 1993
@@ -14,6 +15,7 @@ items:
     wikimediaSearchHints: ["Arvingarna dansband"]
     answerMethods: ["name-letters"]
   - id: alcazar
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Alcazar"
     probability: 78
     peakFrom: 1999
@@ -21,9 +23,9 @@ items:
     wikimediaSearchHints: ["Alcazar band Sweden"]
     answerMethods: ["name-letters"]
   - id: marcus-martinus
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Marcus & Martinus"
     probability: 84
-    audience: ["gen-z", "gen-alpha", "millennials"]
     peakFrom: 2016
     peakTo: 2026
     wikimediaSearchHints: ["Marcus Martinus Norwegian pop duo"]

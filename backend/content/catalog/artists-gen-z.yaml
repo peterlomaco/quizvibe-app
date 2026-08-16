@@ -1,11 +1,12 @@
 # Musikartister kända för Gen Z.
-audience: ["gen-z"]
+audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
 region: ["sweden"]
 category: artists
 contentForm: image
 contentSubject: artist
 items:
   - id: billie-eilish
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Billie Eilish"
     correctYear: 2001
     probability: 95
@@ -13,6 +14,7 @@ items:
     wikimediaSearchHints: ["Billie Eilish"]
     answerMethods: ["timeline", "name-letters"]
   - id: taylor-swift
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Taylor Swift"
     correctYear: 1989
     peakFrom: 2008
@@ -22,6 +24,7 @@ items:
     wikimediaSearchHints: ["Taylor Swift"]
     answerMethods: ["timeline", "name-letters"]
   - id: drake
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Drake"
     correctYear: 1986
     probability: 94
@@ -29,6 +32,7 @@ items:
     wikimediaSearchHints: ["Drake rapper"]
     answerMethods: ["timeline", "name-letters"]
   - id: ariana-grande
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Ariana Grande"
     correctYear: 1993
     probability: 92
@@ -36,6 +40,7 @@ items:
     wikimediaSearchHints: ["Ariana Grande"]
     answerMethods: ["timeline", "name-letters"]
   - id: travis-scott
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     region: ["unknown-region"]
     displayName: "Travis Scott"
     correctYear: 1991
@@ -43,6 +48,7 @@ items:
     wikimediaSearchHints: ["Travis Scott rapper"]
     answerMethods: ["timeline", "name-letters"]
   - id: ed-sheeran
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Ed Sheeran"
     correctYear: 1991
     peakFrom: 2011
@@ -52,6 +58,7 @@ items:
     wikimediaSearchHints: ["Ed Sheeran singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: the-weeknd
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "The Weeknd"
     correctYear: 1990
     peakFrom: 2012
@@ -61,6 +68,7 @@ items:
     wikimediaSearchHints: ["The Weeknd singer", "Abel Tesfaye"]
     answerMethods: ["timeline", "name-letters"]
   - id: olivia-rodrigo
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Olivia Rodrigo"
     correctYear: 2003
     peakFrom: 2021
@@ -70,6 +78,7 @@ items:
     wikimediaSearchHints: ["Olivia Rodrigo singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: bad-bunny
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Bad Bunny"
     correctYear: 1994
     peakFrom: 2018
@@ -79,6 +88,7 @@ items:
     wikimediaSearchHints: ["Bad Bunny rapper", "Benito Martinez Ocasio"]
     answerMethods: ["timeline", "name-letters"]
   - id: dua-lipa
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Dua Lipa"
     correctYear: 1995
     peakFrom: 2015
@@ -88,6 +98,7 @@ items:
     wikimediaSearchHints: ["Dua Lipa singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: harry-styles
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Harry Styles"
     correctYear: 1994
     peakFrom: 2010
@@ -97,6 +108,7 @@ items:
     wikimediaSearchHints: ["Harry Styles singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: post-malone
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Post Malone"
     correctYear: 1995
     peakFrom: 2015
@@ -106,6 +118,7 @@ items:
     wikimediaSearchHints: ["Post Malone rapper"]
     answerMethods: ["timeline", "name-letters"]
   - id: loreen
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Loreen"
     correctYear: 1983
     peakFrom: 2012
@@ -115,6 +128,7 @@ items:
     wikimediaSearchHints: ["Loreen singer Sweden Eurovision"]
     answerMethods: ["timeline", "name-letters"]
   - id: justin-bieber
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Justin Bieber"
     correctYear: 1994
     peakFrom: 2009
@@ -124,6 +138,7 @@ items:
     wikimediaSearchHints: ["Justin Bieber singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: selena-gomez
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Selena Gomez"
     correctYear: 1992
     peakFrom: 2009
@@ -133,6 +148,7 @@ items:
     wikimediaSearchHints: ["Selena Gomez singer actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: miley-cyrus
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Miley Cyrus"
     correctYear: 1992
     peakFrom: 2006
@@ -142,6 +158,7 @@ items:
     wikimediaSearchHints: ["Miley Cyrus singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: demi-lovato
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Demi Lovato"
     correctYear: 1992
     peakFrom: 2008
@@ -151,6 +168,7 @@ items:
     wikimediaSearchHints: ["Demi Lovato singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: kendrick-lamar
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Kendrick Lamar"
     correctYear: 1987
     peakFrom: 2011
@@ -160,6 +178,7 @@ items:
     wikimediaSearchHints: ["Kendrick Lamar rapper"]
     answerMethods: ["timeline", "name-letters"]
   - id: doja-cat
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Doja Cat"
     correctYear: 1995
     peakFrom: 2018
@@ -169,6 +188,7 @@ items:
     wikimediaSearchHints: ["Doja Cat singer rapper"]
     answerMethods: ["timeline", "name-letters"]
   - id: sza
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "SZA"
     correctYear: 1989
     peakFrom: 2017
@@ -178,6 +198,7 @@ items:
     wikimediaSearchHints: ["SZA singer Solana Rowe"]
     answerMethods: ["timeline", "name-letters"]
   - id: nicki-minaj
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Nicki Minaj"
     correctYear: 1982
     peakFrom: 2010
@@ -187,6 +208,7 @@ items:
     wikimediaSearchHints: ["Nicki Minaj rapper"]
     answerMethods: ["timeline", "name-letters"]
   - id: frank-ocean
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Frank Ocean"
     correctYear: 1987
     peakFrom: 2012
@@ -196,6 +218,7 @@ items:
     wikimediaSearchHints: ["Frank Ocean singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: shawn-mendes
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Shawn Mendes"
     correctYear: 1998
     peakFrom: 2014
@@ -205,6 +228,7 @@ items:
     wikimediaSearchHints: ["Shawn Mendes singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: camila-cabello
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Camila Cabello"
     correctYear: 1997
     peakFrom: 2014
@@ -214,6 +238,7 @@ items:
     wikimediaSearchHints: ["Camila Cabello singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: megan-thee-stallion
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Megan Thee Stallion"
     correctYear: 1995
     peakFrom: 2018
@@ -223,6 +248,7 @@ items:
     wikimediaSearchHints: ["Megan Thee Stallion rapper"]
     answerMethods: ["timeline", "name-letters"]
   - id: sabrina-carpenter
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Sabrina Carpenter"
     correctYear: 1999
     peakFrom: 2014
@@ -232,6 +258,7 @@ items:
     wikimediaSearchHints: ["Sabrina Carpenter singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: lewis-capaldi
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Lewis Capaldi"
     correctYear: 1996
     peakFrom: 2017
@@ -241,6 +268,7 @@ items:
     wikimediaSearchHints: ["Lewis Capaldi singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: lil-nas-x
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Lil Nas X"
     correctYear: 1999
     peakFrom: 2018
@@ -250,6 +278,7 @@ items:
     wikimediaSearchHints: ["Lil Nas X rapper"]
     answerMethods: ["timeline", "name-letters"]
   - id: netta-barzilai
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Netta Barzilai"
     correctYear: 1993
     probability: 74

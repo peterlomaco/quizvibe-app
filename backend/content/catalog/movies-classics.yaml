@@ -10,13 +10,14 @@
 #
 # Kategori 'songs' används som approximation eftersom CategorySchema saknar
 # 'movies'-värde.
-audience: ["all"]
+audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
 region: ["sweden"]
 category: songs
 contentForm: youtube
 contentSubject: movie
 items:
   - id: the-wizard-of-oz-1939
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "The Wizard of Oz"
     correctYear: 1939
     probability: 85
@@ -32,6 +33,7 @@ items:
         channelTitle: "Warner On Demand"
         notes: "Peter-kurerad 2026-08-12. Officiell WB-trailer, titeln avslöjar varken skådespelare eller år."
   - id: citizen-kane-1941
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Citizen Kane"
     correctYear: 1941
     probability: 74
@@ -47,6 +49,7 @@ items:
         channelTitle: "Mackenzie Parker"
         notes: "Peter-kurerad 2026-08-12. OBS: fan-gjord 'modern trailer' på privat kanal — ej rättsinnehavare. Takedown-risk, byt till officiellt klipp när sådant hittas."
   - id: casablanca-1942
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Casablanca"
     correctYear: 1942
     probability: 82
@@ -62,6 +65,7 @@ items:
         channelTitle: "thecoolidge"
         notes: "Peter-kurerad 2026-08-12. Original-trailer i HD, titeln avslöjar varken skådespelare eller år."
   - id: singin-in-the-rain-1952
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Singin' in the Rain"
     correctYear: 1952
     probability: 78
@@ -77,6 +81,7 @@ items:
         channelTitle: "Park Circus"
         notes: "Peter-kurerad 2026-08-12. Officiell Park Circus-trailer (rättighetsdistributör), ren titel."
   - id: the-good-the-bad-and-the-ugly-1966
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "The Good, the Bad and the Ugly"
     correctYear: 1966
     probability: 80
@@ -92,6 +97,7 @@ items:
         channelTitle: "Rotten Tomatoes Classic Trailers"
         notes: "Peter-kurerad 2026-08-12. Videotiteln lyder '... Official Trailer #1 - Clint Eastwood Movie (1966) HD'. Peter bedömde 2026-08-13 att slutet av titelraden inte hinner läsas i spelaren och BEHÖLL klippet medvetet — flagga inte om som spoiler. OBS att det som står där är rätt SKÅDESPELARE (frågan är actor-select, svaret = Clint Eastwood), inte bara årtalet. Vill man ta bort risken utan att byta klipp: sätt correctNames till Eli Wallach / Lee Van Cleef (också huvudroller, står inte i titeln)."
   - id: jaws
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Jaws"
     correctYear: 1975
     probability: 90
@@ -107,6 +113,7 @@ items:
         channelTitle: "Universal Pictures"
         notes: "Official Universal Pictures-klipp — 'Bigger Boat'-scenen i 4K HDR."
   - id: star-wars-new-hope
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Star Wars: A New Hope"
     correctYear: 1977
     probability: 95
@@ -121,6 +128,7 @@ items:
         channelTitle: "Star Wars"
         notes: "Official Star Wars channel — A New Hope trailer. John Williams theme."
   - id: the-godfather
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "The Godfather"
     correctYear: 1972
     probability: 92
@@ -135,6 +143,7 @@ items:
         channelTitle: "Paramount Pictures"
         notes: "Paramount Pictures 50th Anniversary trailer — Nino Rota theme + iconic scener."
   - id: rocky
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Rocky"
     correctYear: 1976
     probability: 92
@@ -150,6 +159,7 @@ items:
         channelTitle: "Amazon MGM Studios"
         notes: "MGM Official trailer — Bill Conti's Gonna Fly Now-tema + training-montage."
   - id: grease-1978
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Grease"
     correctYear: 1978
     probability: 88
@@ -164,6 +174,7 @@ items:
         channelTitle: "Kurt Harmsworth"
         notes: "Summer Nights-scen med Travolta + Newton-John — ikonisk strandbild."
   - id: star-wars-empire-strikes-back-1980
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Star Wars: The Empire Strikes Back"
     correctYear: 1980
     probability: 90
@@ -179,6 +190,7 @@ items:
         channelTitle: "Star Wars"
         notes: "Peter-kurerad 2026-08-12. Officiella Star Wars-kanalen, ren titel utan skådespelar- eller års-spoiler."
   - id: raging-bull-1980
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Raging Bull"
     correctYear: 1980
     probability: 84
@@ -194,6 +206,7 @@ items:
         channelTitle: "Amazon MGM Studios"
         notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (13)."
   - id: indiana-jones-raiders
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Indiana Jones: Raiders of the Lost Ark"
     correctYear: 1981
     probability: 92
@@ -208,6 +221,7 @@ items:
         channelTitle: "Paramount Movies"
         notes: "Official Paramount Movies trailer. Raiders March-theme + boulder-scen."
   - id: e-t-the-extra-terrestrial
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "E.T. the Extra-Terrestrial"
     correctYear: 1982
     probability: 92
@@ -222,6 +236,7 @@ items:
         channelTitle: "IMAX"
         notes: "IMAX official trailer — John Williams theme + iconic bicycle/moon-scen."
   - id: the-terminator-1984
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "The Terminator"
     correctYear: 1984
     probability: 88
@@ -236,6 +251,7 @@ items:
         channelTitle: "Amazon MGM Studios"
         notes: "Curerad 2026-05-29 — officiell 1984-trailer (MGM)."
   - id: back-to-the-future
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Back to the Future"
     correctYear: 1985
     probability: 95
@@ -251,6 +267,7 @@ items:
         channelTitle: "Universal Pictures"
         notes: "Official Universal Pictures-klipp — Johnny B. Goode-scenen. BEHÅLLET 2026-08-12: Peters förslag 2LnShmQ_hLc är en privat re-upload av teaser-trailern; rättsinnehavarens klipp är stabilare."
   - id: top-gun
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Top Gun"
     correctYear: 1986
     probability: 90
@@ -265,6 +282,7 @@ items:
         channelTitle: "Rotten Tomatoes Classic Trailers"
         notes: "Official 1986-trailer — Danger Zone-tema + jet-action."
   - id: field-of-dreams-1989
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Field of Dreams"
     correctYear: 1989
     probability: 82
@@ -279,6 +297,7 @@ items:
         channelTitle: "Movieclips"
         notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (13)."
   - id: home-alone
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Home Alone"
     correctYear: 1990
     probability: 93
@@ -293,6 +312,7 @@ items:
         channelTitle: "NOW PLAYING"
         notes: "Home Alone (1990) officiell trailer — Kevin McCallister + booby traps etableras."
   - id: cool-runnings-1993
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Cool Runnings"
     correctYear: 1993
     probability: 85
@@ -308,6 +328,7 @@ items:
         channelTitle: "DVDizzydotcom"
         notes: "Curerad 2026-05-29 — original 1993-trailer (1080p HD-upscale)."
   - id: jurassic-park
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Jurassic Park"
     correctYear: 1993
     probability: 95
@@ -322,6 +343,7 @@ items:
         channelTitle: "Universal Pictures At Home"
         notes: "Official Universal Pictures-klipp 4K — iconic theme + dinosaur-reveal."
   - id: forrest-gump
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Forrest Gump"
     correctYear: 1994
     probability: 93
@@ -336,6 +358,7 @@ items:
         channelTitle: "Movieclips"
         notes: "Movieclips 'Run, Forrest, Run!'-scenen — iconic moment + theme."
   - id: the-lion-king-1994
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "The Lion King"
     correctYear: 1994
     probability: 93
@@ -351,6 +374,7 @@ items:
         channelTitle: "Aarush Boi"
         notes: "Circle of Life-öppningsscenen (HD, 1994). Alla officiella Disney-trailers är made-for-kids-blockerade. Ersätt vid inbäddningsfel."
   - id: pulp-fiction
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Pulp Fiction"
     correctYear: 1994
     probability: 88
@@ -366,6 +390,7 @@ items:
         channelTitle: "Movieclips"
         notes: "Official trailer (Movieclips) — iconic surf-rock soundtrack + ensemble-shots. BEHÅLLET 2026-08-12: Peters förslag tGpTpVyI_OQ (Miramax) har titeln 'John Travolta, Uma Thurman, Samuel L. Jackson' = direkt spoiler för actor-select."
   - id: titanic
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Titanic"
     correctYear: 1997
     probability: 95
@@ -380,6 +405,7 @@ items:
         channelTitle: "20th Century Studios"
         notes: "Official 25th Anniversary trailer — Celine Dion theme + iconic scenes."
   - id: the-matrix
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "The Matrix"
     correctYear: 1999
     probability: 93
@@ -394,6 +420,7 @@ items:
         channelTitle: "Rotten Tomatoes Classic Trailers"
         notes: "Official 1999-trailer — bullet-time + Neo/Trinity-scener."
   - id: gladiator-2000
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Gladiator"
     correctYear: 2000
     probability: 90
@@ -408,6 +435,7 @@ items:
         channelTitle: "Paramount Movies"
         notes: "Curerad 2026-05-29 — officiell Paramount-klipp 'My name is Maximus' (2000-filmen, ej Gladiator II)."
   - id: snatch-2000
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Snatch"
     correctYear: 2000
     probability: 82
@@ -423,6 +451,7 @@ items:
         channelTitle: "Movieclips Classic Trailers"
         notes: "Snatch (2000) — officiell trailer. Vinnie Jones (f.d. Wimbledon FC) som Bullet Tooth Tony. genrePackages:sport → surfar under Athletes/Sport-filtret trots Film-nativ-kategori."
   - id: lotr-fellowship-2001
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "The Lord of the Rings: The Fellowship of the Ring"
     correctYear: 2001
     probability: 89
@@ -438,6 +467,7 @@ items:
         channelTitle: "Warner Bros. Entertainment"
         notes: "Peter-kurerad 2026-08-12 — ersatte Movieclips-trailern (V75dMMIW2B4) med rättsinnehavarens 4K Ultra HD-klipp."
   - id: harry-potter-philosophers-stone-2001
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Harry Potter and the Philosopher's Stone"
     correctYear: 2001
     probability: 91
@@ -452,6 +482,7 @@ items:
         channelTitle: "ClipZone: Heroes & Villains"
         notes: "Curerad 2026-05-29 — scen ur 2001-filmen (ej 2026 HBO-reboot-teaser)."
   - id: million-dollar-baby-2004
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Million Dollar Baby"
     correctYear: 2004
     probability: 82
@@ -467,6 +498,7 @@ items:
         channelTitle: "Rotten Tomatoes Classic Trailers"
         notes: "Curerad 2026-05-29 — officiell 2004-trailer (Swank/Eastwood). Ej Ava Max-låten."
   - id: eternal-sunshine-of-the-spotless-mind-2004
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Eternal Sunshine of the Spotless Mind"
     correctYear: 2004
     probability: 76
@@ -482,6 +514,7 @@ items:
         channelTitle: "Max Caulfield"
         notes: "Peter-kurerad 2026-08-12. OBS: privat kanal-uppladdning av trailern — ej rättsinnehavare. Takedown-risk, byt till officiellt klipp när sådant hittas."
   - id: the-dark-knight-2008
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "The Dark Knight"
     correctYear: 2008
     probability: 90
@@ -496,6 +529,7 @@ items:
         channelTitle: "Rotten Tomatoes Classic Trailers"
         notes: "Curerad 2026-05-29 — officiell 2008-trailer #1 (Nolan)."
   - id: avatar
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Avatar"
     correctYear: 2009
     probability: 93
@@ -510,6 +544,7 @@ items:
         channelTitle: "20th Century Studios"
         notes: "20th Century Studios official 2009-trailer — Pandora-värld, Na'vi-action."
   - id: the-social-network-2010
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "The Social Network"
     correctYear: 2010
     probability: 80
@@ -525,6 +560,7 @@ items:
         channelTitle: "Sony Pictures Releasing UK"
         notes: "Peter-kurerad 2026-08-12. Officiell Sony-trailer. Titeln innehåller '15 October 2010' men frågan är actor-select, så året är inte svaret — får INTE bytas till timeline utan nytt klipp."
   - id: moneyball-2011
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Moneyball"
     correctYear: 2011
     probability: 80
@@ -540,6 +576,7 @@ items:
         channelTitle: "Rotten Tomatoes Trailers"
         notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
   - id: frozen-2013
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Frozen"
     correctYear: 2013
     probability: 91
@@ -549,6 +586,7 @@ items:
     correctNames: ["Elsa", "Anna"]
     distractorNames: ["Olaf", "Kristoff", "Hans", "Sven"]
   - id: borg-vs-mcenroe-2017
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Borg vs McEnroe"
     correctYear: 2017
     probability: 78
@@ -565,6 +603,7 @@ items:
         notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (13)."
   # === Tillagg 2026-08-14 (Peters lista) ===
   - id: the-karate-kid-1984
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "The Karate Kid"
     correctYear: 1984
     probability: 82
@@ -578,6 +617,7 @@ items:
         notes: "Peter-kurerad 2026-08-14. Videotitel verifierad: 'The Karate Kid: Crane Kick Final Fight Scene (Ralph Macchio, William Zabka)'."
     notes: "answerMethods = timeline (INTE actor-select) eftersom klippets YouTube-titel innehaller skadespelarnamnen 'Ralph Macchio, William Zabka' men inte aret — exakt det spoiler-undantag som gor Year till ratt svarslage. Byt inte till actor-select utan att forst byta klipp."
   - id: the-bodyguard-1992
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "The Bodyguard"
     correctYear: 1992
     probability: 84

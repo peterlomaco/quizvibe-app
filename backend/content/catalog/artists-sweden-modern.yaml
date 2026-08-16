@@ -1,11 +1,12 @@
 # Svenska solo-artister kända för Millennials + Gen Z. Tillagda 2026-06-01.
-audience: ["millennials", "gen-z"]
+audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
 region: ["sweden"]
 category: artists
 contentForm: image
 contentSubject: artist
 items:
   - id: ola-salo
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Ola Salo"
     probability: 78
     peakFrom: 2000
@@ -13,6 +14,7 @@ items:
     wikimediaSearchHints: ["Ola Salo singer The Ark"]
     answerMethods: ["name-letters"]
   - id: linda-bengtzing
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Linda Bengtzing"
     probability: 74
     peakFrom: 2005
@@ -20,6 +22,7 @@ items:
     wikimediaSearchHints: ["Linda Bengtzing"]
     answerMethods: ["name-letters"]
   - id: anna-bergendahl
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Anna Bergendahl"
     probability: 74
     peakFrom: 2010
@@ -27,6 +30,7 @@ items:
     wikimediaSearchHints: ["Anna Bergendahl"]
     answerMethods: ["name-letters"]
   - id: cornelia-jakobs
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Cornelia Jakobs"
     probability: 72
     peakFrom: 2022
@@ -34,6 +38,7 @@ items:
     wikimediaSearchHints: ["Cornelia Jakobs"]
     answerMethods: ["name-letters"]
   - id: amanda-jenssen
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Amanda Jenssen"
     probability: 74
     peakFrom: 2007
@@ -41,6 +46,7 @@ items:
     wikimediaSearchHints: ["Amanda Jenssen"]
     answerMethods: ["name-letters"]
   - id: yohio
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Yohio"
     probability: 66
     peakFrom: 2013
@@ -48,6 +54,7 @@ items:
     wikimediaSearchHints: ["Yohio singer"]
     answerMethods: ["name-letters"]
   - id: fronda
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Fronda"
     probability: 62
     peakFrom: 2010
@@ -55,6 +62,7 @@ items:
     wikimediaSearchHints: ["Fronda rapper"]
     answerMethods: ["name-letters"]
   - id: seinabo-sey
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Seinabo Sey"
     probability: 70
     peakFrom: 2014
@@ -62,14 +70,15 @@ items:
     wikimediaSearchHints: ["Seinabo Sey"]
     answerMethods: ["name-letters"]
   - id: malena-ernman
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Malena Ernman"
     probability: 74
-    audience: ["gen-x", "millennials"]
     peakFrom: 2009
     peakTo: 2019
     wikimediaSearchHints: ["Malena Ernman opera singer"]
     answerMethods: ["name-letters"]
   - id: robin-stjernberg
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Robin Stjernberg"
     probability: 72
     peakFrom: 2013
@@ -77,9 +86,9 @@ items:
     wikimediaSearchHints: ["Robin Stjernberg Melodifestivalen 2013"]
     answerMethods: ["name-letters"]
   - id: tusse
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Tusse"
     probability: 76
-    audience: ["gen-z", "millennials"]
     peakFrom: 2021
     peakTo: 2025
     wikimediaSearchHints: ["Tusse Chiza singer Eurovision 2021"]

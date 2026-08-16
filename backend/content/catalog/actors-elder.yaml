@@ -1,12 +1,13 @@
 # Skådespelare kända för elder-generationen (Silent + Baby Boomers).
 # correctYear = födelseår.
-audience: ["elder"]
+audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
 region: ["sweden"]
 category: actors
 contentForm: image
 contentSubject: actor
 items:
   - id: ingrid-bergman
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Ingrid Bergman"
     correctYear: 1915
     peakFrom: 1942
@@ -16,6 +17,7 @@ items:
     wikimediaSearchHints: ["Ingrid Bergman actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: marilyn-monroe
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Marilyn Monroe"
     correctYear: 1926
     peakFrom: 1950
@@ -25,6 +27,7 @@ items:
     wikimediaSearchHints: ["Marilyn Monroe"]
     answerMethods: ["timeline", "name-letters"]
   - id: tom-hanks
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Tom Hanks"
     correctYear: 1956
     peakFrom: 1988
@@ -34,6 +37,7 @@ items:
     wikimediaSearchHints: ["Tom Hanks actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: audrey-hepburn
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Audrey Hepburn"
     correctYear: 1929
     peakFrom: 1953
@@ -43,6 +47,7 @@ items:
     wikimediaSearchHints: ["Audrey Hepburn"]
     answerMethods: ["timeline", "name-letters"]
   - id: katharine-hepburn
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Katharine Hepburn"
     correctYear: 1907
     peakFrom: 1933
@@ -52,6 +57,7 @@ items:
     wikimediaSearchHints: ["Katharine Hepburn actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: sean-connery
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Sean Connery"
     correctYear: 1930
     peakFrom: 1962
@@ -61,6 +67,7 @@ items:
     wikimediaSearchHints: ["Sean Connery actor James Bond"]
     answerMethods: ["timeline", "name-letters"]
   - id: humphrey-bogart
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Humphrey Bogart"
     correctYear: 1899
     peakFrom: 1941
@@ -70,6 +77,7 @@ items:
     wikimediaSearchHints: ["Humphrey Bogart actor Casablanca"]
     answerMethods: ["timeline", "name-letters"]
   - id: james-dean
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "James Dean"
     correctYear: 1931
     peakFrom: 1955
@@ -79,6 +87,7 @@ items:
     wikimediaSearchHints: ["James Dean actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: james-stewart
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     region: ["unknown-region"]
     displayName: "James Stewart"
     correctYear: 1908
@@ -88,6 +97,7 @@ items:
     wikimediaSearchHints: ["James Stewart actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: bette-davis
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Bette Davis"
     correctYear: 1908
     peakFrom: 1938
@@ -97,6 +107,7 @@ items:
     wikimediaSearchHints: ["Bette Davis actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: charlie-chaplin
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Charlie Chaplin"
     correctYear: 1889
     peakFrom: 1918
@@ -106,6 +117,7 @@ items:
     wikimediaSearchHints: ["Charlie Chaplin actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: spencer-tracy
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     region: ["unknown-region"]
     displayName: "Spencer Tracy"
     correctYear: 1900
@@ -115,6 +127,7 @@ items:
     wikimediaSearchHints: ["Spencer Tracy actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: marlon-brando
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Marlon Brando"
     correctYear: 1924
     peakFrom: 1951
@@ -124,6 +137,7 @@ items:
     wikimediaSearchHints: ["Marlon Brando actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: grace-kelly
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Grace Kelly"
     correctYear: 1929
     peakFrom: 1952
@@ -133,6 +147,7 @@ items:
     wikimediaSearchHints: ["Grace Kelly actress princess"]
     answerMethods: ["timeline", "name-letters"]
   - id: elizabeth-taylor
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Elizabeth Taylor"
     correctYear: 1932
     peakFrom: 1944
@@ -142,6 +157,7 @@ items:
     wikimediaSearchHints: ["Elizabeth Taylor actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: john-wayne
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "John Wayne"
     correctYear: 1907
     peakFrom: 1939
@@ -151,6 +167,7 @@ items:
     wikimediaSearchHints: ["John Wayne actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: greta-garbo
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Greta Garbo"
     correctYear: 1905
     peakFrom: 1926
@@ -160,6 +177,7 @@ items:
     wikimediaSearchHints: ["Greta Garbo actress Sweden"]
     answerMethods: ["timeline", "name-letters"]
   - id: shirley-temple
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Shirley Temple"
     correctYear: 1928
     peakFrom: 1934
@@ -169,6 +187,7 @@ items:
     wikimediaSearchHints: ["Shirley Temple child actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: judi-dench
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Judi Dench"
     correctYear: 1934
     peakFrom: 1995
@@ -179,6 +198,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
   # === Svenska expansion 2026-05-27 ===
   - id: max-von-sydow
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Max von Sydow"
     correctYear: 1929
     peakFrom: 1957
@@ -188,6 +208,7 @@ items:
     wikimediaSearchHints: ["Max von Sydow Swedish actor Bergman Exorcist"]
     answerMethods: ["timeline", "name-letters"]
   - id: anita-ekberg
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Anita Ekberg"
     correctYear: 1931
     peakFrom: 1960
@@ -196,6 +217,7 @@ items:
     wikimediaSearchHints: ["Anita Ekberg Swedish actress La Dolce Vita Trevi"]
     answerMethods: ["timeline", "name-letters"]
   - id: britt-ekland
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Britt Ekland"
     correctYear: 1942
     peakFrom: 1965
@@ -204,6 +226,7 @@ items:
     wikimediaSearchHints: ["Britt Ekland Swedish actress Man with the Golden Gun Bond"]
     answerMethods: ["timeline", "name-letters"]
   - id: ingrid-thulin
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Ingrid Thulin"
     correctYear: 1926
     peakFrom: 1957
@@ -212,6 +235,7 @@ items:
     wikimediaSearchHints: ["Ingrid Thulin Swedish actress Bergman Wild Strawberries"]
     answerMethods: ["timeline", "name-letters"]
   - id: bibi-andersson
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Bibi Andersson"
     correctYear: 1935
     peakFrom: 1957
@@ -220,6 +244,7 @@ items:
     wikimediaSearchHints: ["Bibi Andersson Swedish actress Bergman Persona"]
     answerMethods: ["timeline", "name-letters"]
   - id: gunnel-lindblom
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Gunnel Lindblom"
     correctYear: 1931
     peakFrom: 1957
@@ -230,6 +255,7 @@ items:
   # === Sport-crossover actors 2026-05-27 ===
   # === Batch B 2026-05-27 — svenska jullov/SVT-barn-tv-klassiker ===
   - id: magnus-harenstam
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Magnus Härenstam"
     correctYear: 1941
     peakFrom: 1975
@@ -238,6 +264,7 @@ items:
     wikimediaSearchHints: ["Magnus Härenstam Swedish TV host Fem myror Vill du bli miljonär"]
     answerMethods: ["timeline", "name-letters"]
   - id: tomas-von-bromssen
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Tomas von Brömssen"
     correctYear: 1943
     peakFrom: 1985
@@ -246,6 +273,7 @@ items:
     wikimediaSearchHints: ["Tomas von Brömssen Swedish actor Sune Söderkåkar"]
     answerMethods: ["timeline", "name-letters"]
   - id: hans-alfredson
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Hans Alfredson"
     correctYear: 1931
     peakFrom: 1963
@@ -254,6 +282,7 @@ items:
     wikimediaSearchHints: ["Hans Alfredson Swedish actor comedian Hasseåtage"]
     answerMethods: ["timeline", "name-letters"]
   - id: tage-danielsson
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Tage Danielsson"
     correctYear: 1928
     peakFrom: 1965
@@ -262,6 +291,7 @@ items:
     wikimediaSearchHints: ["Tage Danielsson Swedish actor director Hasseåtage"]
     answerMethods: ["timeline", "name-letters"]
   - id: sven-wollter
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Sven Wollter"
     correctYear: 1934
     peakFrom: 1975
@@ -270,6 +300,7 @@ items:
     wikimediaSearchHints: ["Sven Wollter Swedish actor Sacrifice Tarkovsky"]
     answerMethods: ["timeline", "name-letters"]
   - id: loa-falkman
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Loa Falkman"
     correctYear: 1947
     peakFrom: 1985
@@ -279,6 +310,7 @@ items:
     answerMethods: ["timeline", "name-letters"]
   # === Batch C 2026-05-27 — svensk skådespelar-elder ===
   - id: krister-henriksson
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Krister Henriksson"
     correctYear: 1946
     peakFrom: 1995

@@ -1,11 +1,12 @@
 # Svenska fotbollsspelare — klassisk era
-audience: ["elder", "gen-x"]
+audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
 region: ["sweden"]
 category: sport
 contentForm: image
 contentSubject: athlete
 items:
   - id: gunnar-gren
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: Gunnar Gren
     correctYear: 1920
     probability: 80
@@ -15,6 +16,7 @@ items:
     genrePackages: ["football"]
 
   - id: bjorn-nordqvist
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: Björn Nordqvist
     correctYear: 1942
     probability: 78
@@ -24,6 +26,7 @@ items:
     genrePackages: ["football"]
 
   - id: conny-torstensson
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: Conny Torstensson
     correctYear: 1947
     probability: 74
@@ -33,6 +36,7 @@ items:
     genrePackages: ["football"]
 
   - id: ralf-edstrom
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: Ralf Edström
     correctYear: 1952
     probability: 76
@@ -42,6 +46,7 @@ items:
     genrePackages: ["football"]
 
   - id: torbjorn-nilsson
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: Torbjörn Nilsson
     correctYear: 1960
     probability: 74
@@ -51,6 +56,7 @@ items:
     genrePackages: ["football"]
 
   - id: glenn-stromberg
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: Glenn Strömberg
     correctYear: 1960
     probability: 76

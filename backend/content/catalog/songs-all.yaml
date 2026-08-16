@@ -20,13 +20,14 @@
 # TikTok-effekter (Wake Me Up + Blinding Lights), och konstant radio-rotation.
 # Era-filter respekterar fortsatt correctYear så ett 70-tal-spel inte får
 # 2019-låtar.
-audience: ["all"]
+audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
 region: ["sweden"]
 category: songs
 contentForm: youtube
 contentSubject: song
 items:
   - id: judy-garland-over-the-rainbow
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Over the Rainbow — Judy Garland"
     correctYear: 1939
     probability: 95
@@ -34,6 +35,7 @@ items:
     spotifyTrackId: "1zzJOF5gOMXzqoUCbOg4JE"
     answerMethods: ["timeline"]
   - id: elvis-presley-heartbreak-hotel
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Heartbreak Hotel — Elvis Presley"
     correctYear: 1956
     probability: 95
@@ -46,6 +48,7 @@ items:
         channelTitle: "Elvis Presley - Topic"
         notes: "Officiell album-audio via YouTube Topic. Refrängområde."
   - id: eagles-hotel-california
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Hotel California — Eagles"
     correctYear: 1976
     probability: 95
@@ -53,6 +56,7 @@ items:
     spotifyTrackId: "4GkOfUKUqDDgoeiov8Uqyi"
     answerMethods: ["timeline"]
   - id: dancing-queen
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Dancing Queen — ABBA"
     correctYear: 1976
     probability: 92
@@ -66,6 +70,7 @@ items:
     # region-blockerad i 249 länder inkl. SE → "Video unavailable" i spelaren.
     # Lever vidare som Spotify-only DJ-runda. Ersättningsklipp krävs.
   - id: michael-jackson-billie-jean
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Billie Jean — Michael Jackson"
     correctYear: 1982
     probability: 95
@@ -79,6 +84,7 @@ items:
         channelTitle: "Michael Jackson - Topic"
         notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: thriller
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Thriller — Michael Jackson"
     correctYear: 1982
     probability: 90
@@ -91,6 +97,7 @@ items:
         channelTitle: "prod. ovr"
         notes: "Official Shortened 4K Video — rörlig MV (zombiedans). Mid-song."
   - id: smells-like-teen-spirit
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Smells Like Teen Spirit — Nirvana"
     correctYear: 1991
     probability: 85
@@ -103,6 +110,7 @@ items:
         channelTitle: "SLAYERO MUSIC"
         notes: "4K Remastered 60FPS — rörlig MV (cheerleaders/gymnastiksal). Ikonisk riff-intro."
   - id: whitney-houston-i-will-always-love-you
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "I Will Always Love You — Whitney Houston"
     correctYear: 1992
     probability: 95
@@ -115,6 +123,7 @@ items:
         channelTitle: "Whitney Houston - Topic"
         notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: celine-dion-my-heart-will-go-on
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "My Heart Will Go On — Celine Dion"
     correctYear: 1997
     probability: 95
@@ -127,6 +136,7 @@ items:
         channelTitle: "CelineDionOfficialTV"
         notes: "Official Music Video — Titanic-soundtrack. Chorus area."
   - id: baby-one-more-time
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "...Baby One More Time — Britney Spears"
     correctYear: 1998
     probability: 88
@@ -139,6 +149,7 @@ items:
         channelTitle: "thelanoz video Comeback"
         notes: "Official 4K 60FPS Video — rörlig MV (skoluniform-scen). 'Oh baby baby' + första vers."
   - id: adele-someone-like-you
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Someone Like You — Adele"
     correctYear: 2011
     probability: 95
@@ -151,6 +162,7 @@ items:
         channelTitle: "Adele"
         notes: "Official Music Video — signature ballad. Chorus area."
   - id: avicii-wake-me-up
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Wake Me Up — Avicii"
     correctYear: 2013
     probability: 95
@@ -164,6 +176,7 @@ items:
         channelTitle: "Avicii - Topic"
         notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
   - id: shape-of-you
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Shape of You — Ed Sheeran"
     correctYear: 2017
     probability: 95
@@ -176,6 +189,7 @@ items:
         channelTitle: "Ed Sheeran"
         notes: "Dropp vid refräng"
   - id: weeknd-blinding-lights
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Blinding Lights — The Weeknd"
     correctYear: 2019
     probability: 95

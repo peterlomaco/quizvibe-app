@@ -2,13 +2,14 @@
 # slog igenom via Netflix/Disney+. Skapad 2026-05-22 för att fylla
 # gen-z-actor-luckan i poolen (var 0 items innan).
 # correctYear = födelseår.
-audience: ["gen-z"]
+audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
 region: ["sweden"]
 category: actors
 contentForm: image
 contentSubject: actor
 items:
   - id: millie-bobby-brown
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Millie Bobby Brown"
     correctYear: 2004
     peakFrom: 2016
@@ -18,6 +19,7 @@ items:
     wikimediaSearchHints: ["Millie Bobby Brown actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: zendaya
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Zendaya"
     correctYear: 1996
     peakFrom: 2016
@@ -27,6 +29,7 @@ items:
     wikimediaSearchHints: ["Zendaya actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: daniel-radcliffe
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Daniel Radcliffe"
     correctYear: 1989
     peakFrom: 2001
@@ -36,6 +39,7 @@ items:
     wikimediaSearchHints: ["Daniel Radcliffe actor Harry Potter"]
     answerMethods: ["timeline", "name-letters"]
   - id: emma-watson
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Emma Watson"
     correctYear: 1990
     peakFrom: 2001
@@ -45,6 +49,7 @@ items:
     wikimediaSearchHints: ["Emma Watson actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: robert-pattinson
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Robert Pattinson"
     correctYear: 1986
     peakFrom: 2009
@@ -54,6 +59,7 @@ items:
     wikimediaSearchHints: ["Robert Pattinson actor Twilight"]
     answerMethods: ["timeline", "name-letters"]
   - id: kristen-stewart
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     region: ["unknown-region"]
     displayName: "Kristen Stewart"
     correctYear: 1990
@@ -63,6 +69,7 @@ items:
     wikimediaSearchHints: ["Kristen Stewart actress"]
     answerMethods: ["timeline", "name-letters"]
   - id: finn-wolfhard
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     region: ["unknown-region"]
     displayName: "Finn Wolfhard"
     correctYear: 2002
@@ -72,6 +79,7 @@ items:
     wikimediaSearchHints: ["Finn Wolfhard actor Stranger Things"]
     answerMethods: ["timeline", "name-letters"]
   - id: noah-schnapp
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     region: ["unknown-region"]
     displayName: "Noah Schnapp"
     correctYear: 2004
