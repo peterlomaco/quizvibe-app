@@ -1,6 +1,6 @@
 ---
 title: About Us — QuizVibe
-description: QuizVibe is developed and operated by Lomaco AB, a limited company registered in Sweden.
+description: QuizVibe is developed and operated by LoMaCo AB, a limited company registered in Sweden.
 ---
 
 # About Us
@@ -22,17 +22,17 @@ The app is free to play, with an optional QuizVibe Premium subscription that unl
 
 ## The company
 
-QuizVibe is developed and operated by **Lomaco AB**, a limited company (aktiebolag) registered in Sweden.
+QuizVibe is developed and operated by **LoMaCo AB**, a limited company (aktiebolag) registered in Sweden.
 
 | | |
 |---|---|
-| **Legal name** | Lomaco AB |
+| **Legal name** | LoMaCo AB |
 | **Company registration number** | 559388-9511 |
 | **Registered address** | Grankullegatan 3<br>441 46 Alingsås<br>Sweden |
 | **Email** | [info@quizvibe.se](mailto:info@quizvibe.se) |
 | **Telephone** | [+46 73 531 55 59](tel:+46735315559) |
 
-Lomaco AB is the data controller for personal data processed through the QuizVibe app, as described in our [Privacy Policy](legal/privacy/).
+LoMaCo AB is the data controller for personal data processed through the QuizVibe app, as described in our [Privacy Policy](legal/privacy/).
 
 ## Our approach to your data
 
