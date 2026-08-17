@@ -101,7 +101,7 @@ import { MorseAmbientSound } from '@/src/components/MorseAmbientSound';
 import { generateRoomCode } from '@/src/utils/roomCode';
 import { addSeenQuestionIds, addSessionRecord, addSessionRecordForNames, loadSeenQuestionIds, loadLastSessionIds } from '@/src/utils/hostQuestionHistory';
 import { consumePendingPeerSeenIds } from '@/src/utils/pendingSeenQuestions';
-import { buildEpochPhase, emptyEpochDebt, getActiveEpochs, planEpochSequence, sequenceToQuotas, type EpochDebt, type EpochId, type EpochPlayer, type EpochQuestion } from '@/src/utils/epochAllocation';
+import { allocateCategoryBlocks, buildEpochPhase, emptyEpochDebt, getActiveEpochs, pickTiered, planEpochSequence, sequenceToQuotas, type CategoryCapacity, type EpochDebt, type EpochId, type EpochPlayer, type EpochQuestion } from '@/src/utils/epochAllocation';
 import { loadEpochLedger, saveEpochLedger } from '@/src/utils/epochLedger';
 import { getGenerationKeyFromBirthYear } from '@/src/utils/mockPurchasedPackages';
 import { hasPremiumSubscription } from '@/src/utils/subscriptionStorage';
@@ -585,18 +585,27 @@ function buildCategoryAlignedPhase<T extends QuizQuestion>(opts: {
     });
   }
 
-  // Lika vikt per kategori (Largest Remainder Method).
+  // Lika vikt per kategori — men aldrig fler block än kategorin kan fylla.
   // Viktigt: INTE pool-storleks-proportionell — annars vinner alltid den
   // större kategorin vid lågt antal rundor (t.ex. 2 rundor YT/Music + YT/Sport
   // → Music-poolen är 10× större → båda frågorna blir Music). Lika vikt
   // säkerställer att varje vald kategori representeras oavsett pool-storlek.
-  const rawAllocs = cats.map(() => totalBlocks / cats.length);
-  const floors = rawAllocs.map(Math.floor);
-  const remainder = totalBlocks - floors.reduce((a, b) => a + b, 0);
-  const byDecimal = rawAllocs
-    .map((v, i) => ({ i, d: v - floors[i] }))
-    .sort((a, b) => b.d - a.d);
-  for (let k = 0; k < remainder; k++) floors[byDecimal[k].i]++;
+  //
+  // Kapacitets-taket ovanpå: en kategori med EN enda fråga fick tidigare samma
+  // andel av spelet som en med hundra, och då MÅSTE den frågan återkomma varje
+  // spel. allocateCategoryBlocks kapar först mot antalet block som går att
+  // fylla med OSEDDA frågor och flyttar överskottet till kategorier som har
+  // färskt innehåll kvar. Summan är fortfarande exakt totalBlocks.
+  const isFresh = (q: T) => !recentIds.has(q.id) && !(lastSessionIds?.has(q.id) ?? false);
+  const capacity: Record<string, CategoryCapacity> = {};
+  for (const c of cats) {
+    const catPool = catMap.get(c)!;
+    capacity[c] = {
+      fresh: Math.floor(catPool.filter(isFresh).length / questionsPerBlock),
+      total: Math.floor(catPool.length / questionsPerBlock),
+    };
+  }
+  const blocksByCat = allocateCategoryBlocks(totalBlocks, cats, capacity);
 
   // Bygg sekvens per kategori och konkatenera.
   // Trim till närmaste multipel av questionsPerBlock: om buildEpochPhase returnerar
@@ -605,7 +614,7 @@ function buildCategoryAlignedPhase<T extends QuizQuestion>(opts: {
   const result: T[] = [];
   let seqCursor = 0; // löpande position i den delade epok-planen
   for (let i = 0; i < cats.length; i++) {
-    const catBlocks = floors[i];
+    const catBlocks = blocksByCat[cats[i]];
     if (catBlocks === 0) continue;
     const catPool = catMap.get(cats[i])!;
     const catQuestions = catBlocks * questionsPerBlock;
@@ -1290,7 +1299,10 @@ export default function QuizScreen() {
   //     (app-version-skew mellan host och motståndare).
   // Math.max(1, ...) skyddar fallback-fallet då turnOrder är tom (direkt-nav
   // till /quiz utan Lobby).
-  const totalQuestions =
+  //
+  // OBS: detta är det BEGÄRDA antalet. Det faktiska (`totalQuestions`) clampas
+  // mot gameQuestions.length nedanför memon — se kommentaren där.
+  const requestedQuestions =
     gameMode === 'remote-1v1' && remoteQuestionIds
       ? Math.max(1, Math.min(totalRounds, remoteQuestionIds.length))
       : gameMode === 'individual-devices'
@@ -1399,6 +1411,16 @@ export default function QuizScreen() {
     //   2. Era (correctYear ∈ [eraFrom, eraTo]) — HÅRD. Host:s val.
     //   3. Audience (union av spelares generationer) — PREFERENS. Relaxbar
     //      när era+audience är tom; era stannar alltid.
+    //
+    // ⚠ Audience är en NO-OP sedan 2026-08-16: alla katalog-items bär alla fem
+    // generationer (backend/scripts/tag-all-audiences.ts), så steg 3 släpper
+    // igenom allt. Mekaniken står kvar och återaktiveras så fort exkluderingar
+    // cherry-pickas in. Notera då att relaxen nedan bara fyrar på en EXAKT TOM
+    // pool, och att beslutet tas FÖRE kategori-filtret och FÖRE Spotify-
+    // splitten — det var precis den kombinationen som gjorde att era 1950-1980
+    // för en gen-z-spelare landade på ETT spelbart Music-item (Elvis) i varje
+    // spel, trots 25 items kvar totalt. Se "Ingen repris inom 20 spel" i
+    // CLAUDE.md.
     //
     // Rationale: era är en explicit host-väljning ("spel om 80-talet"). En
     // 80-talsspel ska ALDRIG visa låtar/items från 2020 även om alla spelare
@@ -1576,8 +1598,17 @@ export default function QuizScreen() {
       if ((fullSpotifyEligible || partialSpotifyEligible) && Math.random() < 0.5) {
         guestSpotifyCount = fullSpotifyEligible ? totalRounds : 2;
       }
+      // Färskhets-ordnad Spotify-pool (osedda → sedda → senaste sessionen),
+      // samma 3-nivå-mönster som den ordinarie Spotify-fasen nedan. Utan den
+      // drog guest-spelen rakt ur en shufflad pool och kunde upprepa exakt
+      // samma låtar två spel i rad.
+      const spotifyByFreshness = [
+        ...shuffleArray(spotifyPool.filter((q) => !combinedSeenIds.has(q.id) && !combinedLastIds.has(q.id))),
+        ...shuffleArray(spotifyPool.filter((q) => combinedSeenIds.has(q.id) && !combinedLastIds.has(q.id))),
+        ...shuffleArray(spotifyPool.filter((q) => combinedLastIds.has(q.id))),
+      ];
       if (fullSpotifyEligible && guestSpotifyCount === totalRounds) {
-        return shuffleArray(spotifyPool).slice(0, totalRounds);
+        return spotifyByFreshness.slice(0, totalRounds);
       }
       // Viktad OBEROENDE dragning per fråga över 6 källa×kategori-celler.
       // Hints-tungt (75 %) med YouTube-inslag (25 %) — maximerar upplevd
@@ -1630,7 +1661,12 @@ export default function QuizScreen() {
           }
           pickPool = chosen.pool;
         }
-        const q = pickPool[Math.floor(Math.random() * pickPool.length)];
+        // Färskhets-prioriterat val inom cellen (osedd → sedd → senaste
+        // sessionen). Tidigare drogs det helt uniformt, så guest-hostade spel
+        // ignorerade 20-spelars-historiken helt — `picked` deduperade bara
+        // INOM samma spel, aldrig mellan två spel i rad.
+        const q = pickTiered(pickPool, combinedSeenIds, combinedLastIds, (x) => x.id);
+        if (!q) break;
         picked.add(q.id);
         drawn.push(q);
       }
@@ -1640,7 +1676,7 @@ export default function QuizScreen() {
       // positionerna spelar ingen roll för att båda spelarna ska få
       // varsin DJ-tur.
       if (guestSpotifyCount > 0) {
-        const spotifyPicks = shuffleArray(spotifyPool).slice(0, guestSpotifyCount);
+        const spotifyPicks = spotifyByFreshness.slice(0, guestSpotifyCount);
         for (const sq of spotifyPicks) {
           const pos = Math.floor(Math.random() * (drawn.length + 1));
           drawn.splice(pos, 0, sq);
@@ -1853,6 +1889,15 @@ export default function QuizScreen() {
     }
     return mixed;
   }, [eraFrom, eraTo, turnOrder, totalRounds, youtubeEnabled, imagesEnabled, gameMode, youtubeEnabledCategories, imagesEnabledCategories, combinedSeenIds, combinedLastIds, spotifyEnabled, isGuestHostGame, remoteQuestionIds, epochDebt]);
+
+  // Det FAKTISKA antalet frågor: aldrig fler än poolen faktiskt levererade.
+  //
+  // Tidigare var totalQuestions enbart rundor-härlett medan frågan hämtades som
+  // `gameQuestions[questionIndex % gameQuestions.length]` — en tunn pool wrappade
+  // alltså runt och visade samma fråga två gånger i SAMMA spel. Ett något kortare
+  // spel är ärligare än en repris. Remote 1v1 clampade redan mot sin sekvens;
+  // det här ger övriga lägen samma skydd.
+  const totalQuestions = Math.max(1, Math.min(requestedQuestions, gameQuestions.length));
 
   // Synkron ref som alltid pekar på aktuell gameQuestions — används av
   // game_sequence_init-broadcasten utan att göra subscription-effekten
@@ -2753,7 +2798,13 @@ export default function QuizScreen() {
   // Initialiseras till 0 — visas som "00.00" innan timer:n startar.
   const [decimalElapsedMs, setDecimalElapsedMs] = useState<number>(0);
 
-  const question: QuizQuestion = _broadcastOverride ?? gameQuestions[questionIndex % gameQuestions.length];
+  // Ingen modulo: en tunn pool ska INTE wrappa runt och visa om samma fråga
+  // inom spelet — totalQuestions clampas mot gameQuestions.length ovan, så
+  // indexet håller sig innanför. Klampas ändå defensivt så ett stale
+  // questionIndex under resume/heal ger sista frågan i stället för undefined
+  // (`question` är non-nullable och läses direkt på nästa rad).
+  const question: QuizQuestion =
+    _broadcastOverride ?? gameQuestions[Math.min(questionIndex, gameQuestions.length - 1)];
   const isImageQuestion = question.type === 'image';
   const isActorSelectQuestion = question.type === 'actor-select';
   const isTimelineQuestion = question.type === 'timeline';

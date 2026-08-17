@@ -422,9 +422,19 @@ export function buildEpochPhase<T extends EpochQuestion>(
   // Föredrar epoker med fresh/older-seen items (undviker last-session).
   // Tie-break: highest normWeight (epoch "deserves" more questions).
   const fallbackQuestion = (excludeId: EpochId): T | undefined => {
+    // Färskhet går FÖRE epok-balans. Tidigare sorterades kandidaterna enbart på
+    // extraDraws/normWeight, så en epok vars enda kvarvarande items sågs i FÖRRA
+    // spelet kunde vinna lånet över en epok med osedda items — tvärtemot vad
+    // kommentaren påstod, och tvärtemot 20-spelars-löftet. Tier-nyckeln nedan
+    // (0 = har osedda, 1 = har äldre-sedda, 2 = bara senaste sessionen)
+    // dominerar därför sorteringen; extraDraws/normWeight bryter lika.
+    const freshnessTier = (ep: { unseen: T[]; seen: T[] }): number =>
+      ep.unseen.length > 0 ? 0 : ep.seen.length > 0 ? 1 : 2;
     const candidates = [...epochPools.entries()]
       .filter(([id, ep]) => id !== excludeId && (ep.unseen.length + ep.seen.length + ep.lastSession.length) > 0)
       .sort(([aId, aEp], [bId, bEp]) => {
+        const tierDiff = freshnessTier(aEp) - freshnessTier(bEp);
+        if (tierDiff !== 0) return tierDiff;
         const normA = epochNormWeights.get(aId) ?? 0;
         const normB = epochNormWeights.get(bId) ?? 0;
         const scoreA = aEp.extraDraws * 10000 - normA;
@@ -464,4 +474,110 @@ export function buildEpochPhase<T extends EpochQuestion>(
 
   // IndDev / Single Player: return in epoch order, no player assignment
   return collected;
+}
+
+/**
+ * Drar EN fråga ur `pool` med samma färskhets-prioritet som buildEpochPhase:
+ * osedd → sedd-men-inte-senast → senaste sessionen. Slumpar inom den högsta
+ * icke-tomma nivån.
+ *
+ * Finns för anropare som INTE går genom epok-allokeringen — i dag guest-hostade
+ * spels viktade käll-dragning (app/quiz.tsx), som tidigare drog helt uniformt
+ * över hela cellen och därmed ignorerade 20-spelars-historiken.
+ *
+ * `rand` är injicerbar så testerna slipper vara beroende av Math.random.
+ */
+export function pickTiered<T>(
+  pool: T[],
+  recentIds: Set<string>,
+  lastIds: Set<string>,
+  getId: (q: T) => string,
+  rand: () => number = Math.random,
+): T | undefined {
+  if (pool.length === 0) return undefined;
+  const fresh: T[] = [];
+  const seenNotLast: T[] = [];
+  const lastSession: T[] = [];
+  for (const q of pool) {
+    const id = getId(q);
+    if (lastIds.has(id)) lastSession.push(q);
+    else if (recentIds.has(id)) seenNotLast.push(q);
+    else fresh.push(q);
+  }
+  const tier = fresh.length > 0 ? fresh : seenNotLast.length > 0 ? seenNotLast : lastSession;
+  return tier[Math.floor(rand() * tier.length)];
+}
+
+/** Hur många block en kategori kan fylla — i BLOCK, inte frågor. */
+export interface CategoryCapacity {
+  /** Block som kan fyllas med enbart osedda frågor. */
+  fresh: number;
+  /** Block som kan fyllas överhuvudtaget (osedda + sedda). */
+  total: number;
+}
+
+/**
+ * Fördelar `totalBlocks` över `cats` med LIKA vikt per kategori (som förut),
+ * men aldrig fler block än kategorin faktiskt kan fylla. Överskottet
+ * vattenfylls till kategorier som har kapacitet kvar.
+ *
+ * Varför: lika vikt per kategori är rätt när poolerna är normalstora (annars
+ * vinner den största kategorin alltid vid låga rundantal), men den gav en
+ * kategori med EN enda fråga samma andel av spelet som en med hundra — och
+ * då måste den frågan återkomma varje spel. Genom att kapa mot `fresh` först
+ * flyttas blocken till kategorier som fortfarande har osett innehåll, i
+ * stället för att tvinga fram en repris.
+ *
+ * Garanti: summan är alltid exakt `totalBlocks` (sista passet lägger en
+ * eventuell rest på kategorin med störst total-kapacitet), så anroparen kan
+ * fortsätta räkna med att spelet får rätt längd.
+ */
+export function allocateCategoryBlocks(
+  totalBlocks: number,
+  cats: string[],
+  capacity: Record<string, CategoryCapacity>,
+): Record<string, number> {
+  const out: Record<string, number> = {};
+  for (const c of cats) out[c] = 0;
+  if (totalBlocks <= 0 || cats.length === 0) return out;
+
+  const capOf = (c: string): CategoryCapacity => capacity[c] ?? { fresh: 0, total: 0 };
+
+  // Pass 1: lika vikt (LRM), kapat mot FRESH-kapacitet.
+  const base = Math.floor(totalBlocks / cats.length);
+  const remainder = totalBlocks - base * cats.length;
+  let placed = 0;
+  cats.forEach((c, i) => {
+    const want = base + (i < remainder ? 1 : 0);
+    const give = Math.min(want, capOf(c).fresh);
+    out[c] = give;
+    placed += give;
+  });
+
+  // Pass 2: kvarvarande block till kategorier med fresh-kapacitet över.
+  let left = totalBlocks - placed;
+  while (left > 0) {
+    const target = cats.find((c) => out[c] < capOf(c).fresh);
+    if (!target) break;
+    out[target]++;
+    left--;
+  }
+
+  // Pass 3: fortfarande kvar → tillåt sedda frågor (upp till total-kapacitet).
+  while (left > 0) {
+    const target = cats.find((c) => out[c] < capOf(c).total);
+    if (!target) break;
+    out[target]++;
+    left--;
+  }
+
+  // Pass 4: katalogen räcker inte ens totalt. Lägg resten på kategorin med
+  // störst total-kapacitet så summan stämmer — buildEpochPhase levererar då
+  // färre frågor än begärt, vilket anroparen redan hanterar.
+  if (left > 0) {
+    const target = [...cats].sort((a, b) => capOf(b).total - capOf(a).total)[0];
+    out[target] += left;
+  }
+
+  return out;
 }

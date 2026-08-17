@@ -67,10 +67,17 @@ async function loadHistoryForKeys(
   }
 }
 
-// Läs v2-historik för inloggade profilen.
+// Gäster saknar sparat playerName → resolveKey ger null och ingen nyckel finns
+// att läsa eller skriva. De får därför en sessions-lokal historik i stället för
+// ingen alls, så att t.ex. Play Again i ett gäst-hostat spel inte serverar om
+// exakt samma frågor. Samma mönster som sessionDebt i epochLedger.ts.
+// Försvinner vid app-omstart — avsiktligt, gästdata ska inte persisteras.
+let sessionHistory: SessionHistory = { sessions: [] };
+
+// Läs v2-historik för inloggade profilen (eller sessions-historiken för gäster).
 async function loadSessionHistory(): Promise<SessionHistory> {
   const v2Key = await resolveKey(SESSION_KEY_PREFIX);
-  if (!v2Key) return { sessions: [] };
+  if (!v2Key) return { sessions: sessionHistory.sessions };
   const v1Key = await resolveKey(SEEN_KEY_PREFIX);
   return loadHistoryForKeys(v2Key, v1Key);
 }
@@ -125,7 +132,12 @@ export async function addSessionRecord(qIds: string[]): Promise<void> {
   if (!qIds.length) return;
   try {
     const v2Key = await resolveKey(SESSION_KEY_PREFIX);
-    if (!v2Key) return;
+    if (!v2Key) {
+      // Gäst: håll historiken i minnet för resten av sessionen.
+      const sessions = [...sessionHistory.sessions, { id: String(Date.now()), qIds: [...new Set(qIds)] }];
+      sessionHistory = { sessions: sessions.slice(-MAX_SESSIONS) };
+      return;
+    }
     const v1Key = await resolveKey(SEEN_KEY_PREFIX);
     await appendSessionForKey(v2Key, v1Key, qIds);
   } catch {}
@@ -172,6 +184,7 @@ export async function addSeenQuestionIds(ids: string[]): Promise<void> {
 
 // Rensar BÅDE v1 och v2 för inloggad användare.
 export async function clearSeenQuestionIds(): Promise<void> {
+  sessionHistory = { sessions: [] };
   try {
     const [v1Key, v2Key] = await Promise.all([
       resolveKey(SEEN_KEY_PREFIX),

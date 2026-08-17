@@ -178,7 +178,15 @@ Varför: Home nås ALLTID via `router.replace('/')` (BottomBanner, Profile, Stor
 
 **File-level scope för form/subject**: V1-katalogen är homogen per fil (alla items i `songs-*.yaml` är `form=youtube subject=song`, alla i `artists-*.yaml` är `form=image subject=artist` osv.). Om en framtida fil behöver mixa subjects (t.ex. cultural-person + celebrity i samma persons-fil) flyttas fälten till item-nivå. För deferred-katalogen är `persons-*.yaml` redan en mixad bucket — file-level subject är där en placeholder (`celebrity` eller `cultural-person` baserat på vad poolen lutar mot) som splittas vid V2-aktivering.
 
-**Filnamn = release-era, audience-tag = recognition** (konventionsklargörande 2026-05-26): YT/music-filer `songs-<gen>.yaml` grupperar items baserat på `correctYear` (= låtens release-år), INTE baserat på vilka generationer som känner igen items. Items i `songs-gen-x.yaml` har release-år inom gen-x:s **födelseår-fönster** (1965-1980), inte items som "är till för" gen-x. Cross-generational recognition hanteras via cascading `audience`-tag på fil-headern:
+**⚠ ALLA items är taggade med ALLA generationer sedan 2026-08-16 — audience-filtret är en no-op i dag.** Varje item i hela katalogen bär `audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]` (även fil-headrarna), satt av `backend/scripts/tag-all-audiences.ts`. Exkluderingar cherry-pickas per item i efterhand — **item-taggen är default, exkludering är undantaget** (tvärtom mot hur det var tidigare).
+
+Varför: kaskaden nedan gick bara yngre→äldre, så en gen-z-spelare hade **ingen väg alls** till äldre innehåll. Med Game Era 1950–1980 föll 125 region-synliga musik-items till 25 efter audience-filtret, varav 3 var låtar och exakt EN var spelbar utan Spotify (`elvis-presley-heartbreak-hotel`) — Elvis serverades därför i varje spel, oavsett 20-spelars-historiken. Noll items i den eran var taggade `gen-z` (100 var `elder`-only, 80 `gen-x`). Hints-poolen kollapsade likadant: 51 items, 100 % `athlete`, så `mainCategory` blev enbart Sport.
+
+Vid cherry-pick: `backend/output/audience-overrides-before-retag.md` listar de 21 items som hade handtrimmade item-overrides före retaggningen — börja där. Kör `npm run export-music-questions` + `npm run export-image-questions` efter varje ändring.
+
+Konventionen nedan beskriver den ursprungliga modellen. Den är **historik** så länge alla items bär alla generationer, men mekaniken (`item.audience ?? file.audience` → `filterByAudience`) är oförändrad och återaktiveras så fort en exkludering skrivs.
+
+**Filnamn = release-era, audience-tag = recognition** (konventionsklargörande 2026-05-26): YT/music-filer `songs-<gen>.yaml` grupperar items baserat på `correctYear` (= låtens release-år), INTE baserat på vilka generationer som känner igen items. Items i `songs-gen-x.yaml` har release-år inom gen-x:s **födelseår-fönster** (1965-1980), inte items som "är till för" gen-x. Cross-generational recognition hanterades via cascading `audience`-tag på fil-headern:
 - `songs-elder.yaml` → `audience: ["elder"]` (saknar tidigare gen att cascade till)
 - `songs-gen-x.yaml` → `audience: ["gen-x", "elder"]`
 - `songs-millennials.yaml` → `audience: ["millennials", "gen-x"]`
@@ -1268,6 +1276,20 @@ Tester: [backend/content/test/epochAllocation.test.ts](backend/content/test/epoc
 - `loadSeenQuestionIds()` returnerar `Set<string>` av alla IDs från de 20 senaste sessionerna.
 - Migration från v1 (flat `Set<string>`) — importeras som en syntetisk session vid första v2-load.
 - Per-spelare-nyckel: `@quizvibe/seenQuestionIds/v2/<playerName.toLowerCase()>`.
+- **Gäster får en sessions-lokal historik** (module-level `sessionHistory`, 2026-08-16). `resolveKey` returnerar `null` utan sparat playerName, så tidigare no-op:ade BÅDE läsning och skrivning — ett gäst-hostat Play Again kunde servera exakt samma frågor igen. Samma mönster som `sessionDebt` i [epochLedger.ts](src/utils/epochLedger.ts); försvinner vid app-omstart, avsiktligt (gästdata persisteras inte).
+
+**"Ingen repris inom 20 spel" — vad som faktiskt garanterar det (2026-08-16)**
+
+Historiken ovan är bara halva löftet: den kan bara välja bort frågor om det finns något annat att välja. Fyra mekanismer bär garantin tillsammans, och ett Elvis-i-varje-spel-fall (era 1950–1980, gen-z) uppstod trots att historiken fungerade perfekt:
+
+1. **Poolen måste vara djup nog.** Audience-filtret kollapsade poolen till EN spelbar Music-fråga — se ⚠-noten i audience-avsnittet. Detta var HUVUDorsaken; övriga tre är skärpningar i samma pass.
+2. **`allocateCategoryBlocks`** ([epochAllocation.ts](src/utils/epochAllocation.ts)) — kategori-allokeringen är fortfarande lika vikt per kategori, men kapas nu mot hur många block kategorin kan fylla med OSEDDA frågor; överskottet vattenfylls till kategorier som har färskt kvar. Utan taket ägde en 1-frågas-kategori sin fulla tredjedel av spelet och MÅSTE då repriseras. Summan är fortfarande exakt `totalBlocks`.
+3. **`fallbackQuestion` sorterar på färskhet först.** Kommentaren påstod det redan, men koden sorterade bara på `extraDraws`/`normWeight` — en epok vars enda kvarvarande items sågs i FÖRRA spelet kunde vinna lånet över en epok med osedda. Tier-nyckeln (0 = har osedda, 1 = äldre-sedda, 2 = bara senaste sessionen) dominerar nu.
+4. **`pickTiered`** — guest-hostade spels viktade käll-dragning drog tidigare helt uniformt och ignorerade historiken totalt (`picked`-Set deduperade bara INOM samma spel). Nu samma färskhets-nivåer som resten. Gäller även guest-spelens Spotify-urval.
+
+⚠ **`totalQuestions` clampas mot `gameQuestions.length`** och frågan hämtas UTAN modulo (`quiz.tsx`). Tidigare gav en tunn pool `gameQuestions[questionIndex % length]` = repris inom SAMMA spel. Ett något kortare spel är ärligare än en repris.
+
+Låst av [backend/content/test/questionRepetition.test.ts](backend/content/test/questionRepetition.test.ts) (16 tester) — inklusive en 20-spelssimulering med noll dubbletter, en era-invariant, och en **invers-kontroll** som reproducerar Elvis-buggen med den gamla poolen så testet låser fixen och inte bara rördragningen.
 
 **Cross-player seen-historik i IndDev (fix 2026-08-04)** — samma låt kunde återkomma direkt när en ANNAN deltagare hostade nästa spel. Två rotorsaker + fix:
 1. **Non-host sparade fel historik**: leaderboard-effekten sparade `gameQuestions` (= enhetens LOKALA slumpordning), inte de faktiskt spelade frågorna (host:s sekvens). Fix: `effectivePlayedIds = !isHost && broadcastAllQuestionIds?.length ? broadcastAllQuestionIds : gameQuestions.map(id)`. Samma logik i non-host:s Leave Game (`slice(0, questionIndex)`, ny recording — fanns inte alls tidigare); host:s Quit Game var redan korrekt.
@@ -1344,7 +1366,8 @@ Namnet som visas (`pickNameForPrefix`): det rätta namnet om prefix matchar `cor
   1. era + audience → preferred path
   2. era-only (audience relaxas, era HÅRD) → fallback om (1) tom
   3. tom (= source-toggle off eller era-fönster utan items)
-- **Inget fallback strippar era** — host:s era-intent respekteras alltid. Tidigare implementation (innan 2026-05-22-fixet) hade fallback som tillät audience-only utan era, vilket var en bug.
+- ⚠ **Relaxen i steg 2 fyrar bara på en EXAKT TOM pool** — och beslutet tas dessutom FÖRE kategori-filtret och FÖRE Spotify-splitten. Det var medgrundorsaken till Elvis-buggen 2026-08-16: 25 items > 0 så relaxen körde aldrig, trots att den pool som faktiskt spelades (Music ∩ YouTube-spelbar) var 1. Sedan alla items bär alla generationer är detta ofarligt, men **börjar du cherry-picka exkluderingar igen är det här stället att titta på först** — en djup-baserad relax (kräver `needed × 20` färska items i den effektiva poolen) designades men lades åt sidan eftersom audience just nu är en no-op.
+- **Inget fallback strippar era** — host:s era-intent respekteras alltid. Tidigare implementation (innan 2026-05-22-fixet) hade fallback som tillät audience-only utan era, vilket var en bug. Låst av ett test i `backend/content/test/questionRepetition.test.ts`.
 - **Edge cases**: tom audience-set (alla spelare saknar age-info) bypassar filtret helt. Spelare utan age bidrar inte men blockerar inte heller.
 - **`audienceSet` byggs en gång** per useMemo-körning och delas mellan music + image — gemensam generations-union.
 - **Emergency fallback** kvarstår på `if (!hasYoutube && !hasImage) return SEED_QUESTIONS` (rad 816 nedan) — fires endast när BÅDA pools är utterly tomma (typ source-toggle off på båda, men Lobby:s "min 1 source"-gate förhindrar normalt). Strippar era som sista utväg så spelet kan starta.
