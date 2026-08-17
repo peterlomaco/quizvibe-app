@@ -7,13 +7,13 @@ description: Get help with QuizVibe. Contact, FAQ, account management, refunds, 
 
 Need help with QuizVibe? You've come to the right place.
 
-QuizVibe is operated by **Lomaco AB** (org. no. 559388-9511), a limited company registered in Sweden. For all support questions, email **infoquizvibe@gmail.com**.
+QuizVibe is operated by **LoMaCo AB** (org. no. 559388-9511), a limited company registered in Sweden. For all support questions, email **info@quizvibe.se**.
 
 ---
 
 ## Contact us
 
-**Email:** [infoquizvibe@gmail.com](mailto:infoquizvibe@gmail.com)
+**Email:** [info@quizvibe.se](mailto:info@quizvibe.se)
 
 We aim to respond within 2 business days.
 

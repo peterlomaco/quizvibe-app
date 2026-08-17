@@ -434,7 +434,7 @@ export default function StoreScreen() {
     } else {
       Alert.alert(
         'Nothing to restore',
-        'No active purchases found for this Apple ID. If you believe this is an error, email infoquizvibe@gmail.com.',
+        'No active purchases found for this Apple ID. If you believe this is an error, email info@quizvibe.se.',
       );
     }
   };

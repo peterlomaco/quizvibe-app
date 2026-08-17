@@ -10,13 +10,13 @@ description: The rules for using QuizVibe.
 
 These Terms of Service ("Terms") govern your use of the **QuizVibe** mobile application ("the app", "we", "us"). By downloading, installing, or using the app, you agree to these Terms. If you don't agree, please don't use the app.
 
-QuizVibe is operated by **Lomaco AB** (org. no. 559388-9511), a limited company (aktiebolag) registered in Sweden. For questions about these Terms, contact us at: **infoquizvibe@gmail.com**.
+QuizVibe is operated by **LoMaCo AB** (org. no. 559388-9511), a limited company (aktiebolag) registered in Sweden. For questions about these Terms, contact us at: **info@quizvibe.se**.
 
 ---
 
 ## TL;DR (the short version)
 
-- **You must be 13 or older** to use the app.
+- **You must be 15 or older** to use the app.
 - **Play fair** — no cheating, harassment, profanity, or trying to break the game.
 - **Purchases are final** unless the law in your country gives you a right to refund (we follow Apple's refund process).
 - **Subscriptions auto-renew** until you cancel them in your Apple App Store account.
@@ -32,12 +32,12 @@ The rest of this document is the full version.
 
 | | |
 |---|---|
-| **Operator** | Lomaco AB (org. no. 559388-9511), registered in Sweden |
-| **Contact email** | infoquizvibe@gmail.com |
+| **Operator** | LoMaCo AB (org. no. 559388-9511), registered in Sweden |
+| **Contact email** | info@quizvibe.se |
 | **App name** | QuizVibe |
 | **Platforms** | Apple App Store (iOS) |
 
-QuizVibe is provided by Lomaco AB, a Swedish limited company (aktiebolag). If our company information changes, we will update these Terms and notify users via the app.
+QuizVibe is provided by LoMaCo AB, a Swedish limited company (aktiebolag). If our company information changes, we will update these Terms and notify users via the app.
 
 ---
 
@@ -47,10 +47,10 @@ By creating an account, joining a game as a guest, or otherwise using the app, y
 
 - You have read and agree to these Terms.
 - You have read and agree to our [Privacy Policy](../privacy/).
-- You are at least 13 years old (see Section 4).
+- You are at least 15 years old (see Section 4).
 - You have the legal capacity to enter into this agreement under the laws of your country.
 
-If you are using the app on behalf of someone else (e.g., a parent setting up a device for a 13+ teenager), you confirm you have authority to accept these Terms on their behalf.
+If you are using the app on behalf of someone else (e.g., a parent setting up a device for a 15+ teenager), you confirm you have authority to accept these Terms on their behalf.
 
 ---
 
@@ -64,11 +64,11 @@ Where these Terms and Apple's Standard EULA conflict, **Apple's Standard EULA co
 
 ## 4. Eligibility and age restrictions
 
-**You must be 13 years of age or older to use QuizVibe.**
+**You must be 15 years of age or older to use QuizVibe.**
 
-The app enforces this by limiting the birth-year picker in registration so that no user younger than 13 can complete signup or guest entry. If we discover that a user under 13 has registered (e.g., by misrepresenting their age), we will terminate the account and delete associated data — see our [Privacy Policy, Section 7](../privacy/#7-age-restrictions-and-childrens-privacy).
+The app enforces this by limiting the birth-year picker in registration so that no user younger than 15 can complete signup or guest entry. If we discover that a user under 15 has registered (e.g., by misrepresenting their age), we will terminate the account and delete associated data — see our [Privacy Policy, Section 7](../privacy/#7-age-restrictions-and-childrens-privacy).
 
-If you are between 13 and 18 (or the age of majority in your country), you confirm that a parent or legal guardian is aware of and approves your use of the app.
+If you are between 15 and 18 (or the age of majority in your country), you confirm that a parent or legal guardian is aware of and approves your use of the app.
 
 ---
 
@@ -82,7 +82,7 @@ When you register, you provide a player name, email, password, birth year, and a
 - Keeping your password confidential.
 - All activity that happens under your account.
 
-Notify us immediately at infoquizvibe@gmail.com if you suspect unauthorized access.
+Notify us immediately at info@quizvibe.se if you suspect unauthorized access.
 
 ### 5.2 Guest accounts
 
@@ -138,7 +138,7 @@ You may not download, save, screen-record, or extract quiz content from the app 
 
 ### 7.3 Reporting copyright concerns
 
-If you believe content in the app infringes your copyright, contact us at **infoquizvibe@gmail.com** with the subject "Copyright:" and include:
+If you believe content in the app infringes your copyright, contact us at **info@quizvibe.se** with the subject "Copyright:" and include:
 
 - A description of the copyrighted work you claim has been infringed.
 - The specific item in the app (item ID or question text if possible).
@@ -221,7 +221,7 @@ Quiz content includes references to people, songs, films, places, and events tha
 
 ### 9.3 Open-source components
 
-QuizVibe includes open-source libraries (React Native, Expo, Supabase client, etc.) that are licensed under their respective open-source licenses. A list of these libraries and their licenses is available on request via infoquizvibe@gmail.com.
+QuizVibe includes open-source libraries (React Native, Expo, Supabase client, etc.) that are licensed under their respective open-source licenses. A list of these libraries and their licenses is available on request via info@quizvibe.se.
 
 The QuizVibe app's own source code is hosted on GitHub at https://github.com/peterlomaco/quizvibe-app and is visible publicly, but its visibility does **not** constitute an open-source license — see Section 9.1.
 
@@ -284,7 +284,7 @@ When your account is terminated:
 
 ### 12.3 You can terminate at any time
 
-You can stop using the app and delete your account at any time, directly in-app: open **Profile → tap your name in the top-right → Delete Account**. Server-side data is removed automatically. If you need help, email **infoquizvibe@gmail.com** with the subject "Account deletion request". See our [Privacy Policy, Section 6](../privacy/#6-your-rights-under-gdpr) for what gets deleted.
+You can stop using the app and delete your account at any time, directly in-app: open **Profile → tap your name in the top-right → Delete Account**. Server-side data is removed automatically. If you need help, email **info@quizvibe.se** with the subject "Account deletion request". See our [Privacy Policy, Section 6](../privacy/#6-your-rights-under-gdpr) for what gets deleted.
 
 ---
 
@@ -312,7 +312,7 @@ Any dispute arising from these Terms or your use of the app will be brought befo
 
 ### 14.3 Try email first
 
-Before filing a legal claim, please try to resolve disputes by emailing **infoquizvibe@gmail.com**. We aim to respond within 30 days and resolve most issues informally.
+Before filing a legal claim, please try to resolve disputes by emailing **info@quizvibe.se**. We aim to respond within 30 days and resolve most issues informally.
 
 ### 14.4 EU online dispute resolution
 
@@ -352,7 +352,7 @@ We are not liable for failure to perform under these Terms due to events beyond 
 
 For all questions about these Terms:
 
-**Email:** infoquizvibe@gmail.com
+**Email:** info@quizvibe.se
 **Subject line:** Please prefix with "Terms:" for faster routing (e.g., "Terms: refund question")
 
 For privacy-related inquiries, see our [Privacy Policy](../privacy/).

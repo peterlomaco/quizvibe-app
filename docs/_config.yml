@@ -2,13 +2,25 @@
 # Aktiveras via repo Settings → Pages → Source: master branch, /docs folder.
 
 title: QuizVibe
-description: Mobile quiz app — privacy, terms, and app review documentation.
+description: A mobile app for social music, film and sport quizzes. Operated by LoMaCo AB, Sweden.
 theme: jekyll-theme-minimal
 
 # Använd "pretty" URL:er (/legal/privacy/ istället för /legal/privacy.html).
 permalink: pretty
 
-# Exkludera filer som inte ska publiceras (de finns i docs/ för annan användning).
+# Exkludera filer som inte ska publiceras (de finns i docs/ för intern användning).
+# OBS: allt i docs/ som INTE står här blir publikt nåbart på sajten.
 exclude:
+  # Interna specar och app review-underlag
   - APP_REVIEW_RESPONSES.md
   - individual-devices-spec.md
+  # Interna innehålls- och licensrevisioner (arbetsdokument, ej för publik visning)
+  - commons-categories-candidates.md
+  - fifa-wc-flagged-smart.md
+  - fifa-wc-flagged.md
+  - fifa-wc-license-audit.md
+  - fifa-wc-validation.csv
+  - fifa-wc-validation.md
+  - full-license-audit-verified.md
+  - full-license-audit.md
+  - new-swedes-attribution.md

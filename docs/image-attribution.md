@@ -1,7 +1,16 @@
-# Image attribution / credits
+---
+title: Image credits — QuizVibe
+description: Photographers and licences for images in the QuizVibe content library.
+---
 
-Auto-genererad av license-audit-verify.ts. Bilder under CC-BY/CC-BY-SA/GFDL kräver upphovsperson-kredit.
-PD/CC0 kräver ingen kredit men listas för transparens.
+# Image credits
+
+QuizVibe builds its content library from freely licensed images sourced from Wikimedia Commons and Wikipedia. This page credits the photographers and lists the licence for each image.
+
+Images licensed under CC BY, CC BY-SA or GFDL require attribution to the photographer. Public domain and CC0 images require no credit, but are listed here for transparency.
+
+If you are the rights holder of an image listed here and believe it is being used incorrectly, please contact us at [info@quizvibe.se](mailto:info@quizvibe.se).
+
 
 | id | display | author | license | source |
 | --- | --- | --- | --- | --- |
