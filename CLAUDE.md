@@ -117,15 +117,15 @@ Se `memory/project_roadmap_phases.md` för bredare fas-status (Fas 4 backlog →
 - `app/index.tsx` — Home screen + JoinModal + Logo (2k+ lines, needs splitting). Innehåller även en temporär "🧪 Try Name Quiz Demo"-knapp efter footer som navigerar till demo-routen.
 - `app/{lobby,profile,leaderboards,store}.tsx` — thin re-exports of `src/screens/*Screen.tsx`.
 - `app/quiz.tsx` — gameplay screen.
-- `app/name-quiz-demo.tsx` — fristående skiss-demo för Namn-svarsmodellen (Letter Grid + Final Selection + ProgressiveCover-mosaik). Använder hardcoded data från `src/utils/nameQuizDemo.ts` (auto-genererad via `cd backend && npm run export-demo`). Inte integrerad med befintlig quiz-flow ännu.
 - **Leaderboards-entry**: efter D-0 saknas en explicit ingång till `/leaderboards` (tidigare via tab-bar). Avvaktas — Home-shortcut + ev. Profile-link designas senare.
+  - ⚠ **`LeaderboardsScreen.tsx` ser ut som död kod men ÄR DET INTE — radera den inte.** Routen är registrerad, inget `router.push` pekar dit, och skärmen är orörd sedan initial commit, så varje dead-code-scan flaggar den. Den är en FÄRDIG skärm (Today / This Week / All Time + topp-3-podium på `MOCK_PLAYERS`) som bara förlorade sin ingång när tab-baren togs bort 2026-05-12. Den väntar på ett navigations-beslut, inte på radering. Bekräftat vid städpasset 2026-08-17 där `/name-quiz-demo` togs bort men denna medvetet lämnades.
 
 ## Source layout (`src/`)
 
 - `screens/` — large screen files (Lobby, Profile, Leaderboards, Store, HCPSettings). HCPSettings har ingen route i `app/` än (planeras kopplas in framöver).
 - `components/` — shared UI (Button, Card, PlayerRow, RoundLeaderboard, etc.).
 - `theme/` — `Colors`, `Spacing`, `Radius`, `Typography`, `FontSize`, `FontWeight`. Import via `@/src/theme`.
-- `utils/` — AsyncStorage helpers (`profileStorage`, `friendsStorage`, `pendingLobby`, `waitingInvites`, `gameResults`, `leftPlayers`), plus `avatars`, `hcp`, `roomCode`, `playerName`, `analytics`, `profanity`, `mockActiveRooms`, `revealCurve` (Namn-svarsmodellens reveal-kurva), `nameQuizDemo` (auto-genererad demo-data, gitignore:as inte men regenereras via `backend/scripts/export-demo.ts`).
+- `utils/` — AsyncStorage helpers (`profileStorage`, `friendsStorage`, `pendingLobby`, `waitingInvites`, `gameResults`, `leftPlayers`), plus `avatars`, `hcp`, `roomCode`, `playerName`, `analytics`, `profanity`, `mockActiveRooms`, `revealCurve` (Namn-svarsmodellens reveal-kurva, används av `ProgressiveCover`).
 
 Path alias: `@/*` → repo root (e.g. `@/src/theme`, `@/src/components/Button`).
 
@@ -281,7 +281,6 @@ Se `memory/project_v1_v2_region_strategy.md` (skriven under den gamla modellen �
 - `backend/content/distractors.ts` — `getPrefixForItem` (extraherar prefix, behåller diakriter, skipparar non-letters), `buildLetterGrid`, `buildNameOptions`, `buildFullNamesList` (Full-mode-helper: returnerar N namn utan prefix-filter — 1 rätt + (N-1) distractors från katalog/pool, blandade). Pool-strategi: kategori+audience → kategori-fallback → `distractor-pool.yaml` med ~50 plausibla namn per kategori. `NameOption.source` = `'catalog'` eller `'pool'`.
 - `backend/wikimedia/client.ts` — Wikipedia pageimage-lookup (primär källa, kuraterade huvudbilder) + Commons text-search (fallback) + license/artist från Commons imageinfo. CLI: `npm run wikimedia-search <item-id>`.
 - `backend/wikimedia/processor.ts` + `process.ts` — `fetchImage` + sharp-pipeline (resize max 1920×1080 med aspect ratio bevarat + WebP @ q85). CLI: `npm run wikimedia-process <item-id>`. Output till `backend/output/` (gitignore:ad).
-- `backend/scripts/export-demo.ts` — genererar `src/utils/nameQuizDemo.ts` med 3 förgenererade frågor (Astrid, Stockholm, Cristiano) inkl. Letter Grid + name-options per prefix. CLI: `npm run export-demo`.
 - `backend/scripts/export-image-questions.ts` — genererar `src/utils/quizImageQuestions.ts` med tre varianter per item: `prefix-1` (Minimal), `prefix-2` (Standard), `full-names` (Full = vertikal namn-lista utan prefix). Discriminerad union `ImageQuestionVariant = ImagePrefixVariant | ImageFullNamesVariant` på `mode`-fältet. Pre-bakas med Millennials som baseline-generation för distractor-pool. CLI: `npm run export-image-questions`. Regenerera efter att nya bilder lagts till.
 
 **Sharp-gotcha**: `sharp(input).resize(...).resize(...)` — den första `resize()` ignoreras tyst när två chainas. Måste köra som två separata `sharp()`-instanser med mellan-buffer:
@@ -2293,15 +2292,11 @@ Region/land skickas INTE i events — alla större vendors auto-fyller `country_
 
 Call-sites finns redan i: `handleRegisterSubmit`, `handleLogin`, `handleLogout`, `handleCreateGame`, `handleJoinAsGuest` ([app/index.tsx](app/index.tsx)) och `QuizScreen` (mount + final leaderboard) ([app/quiz.tsx](app/quiz.tsx)). `purchase_completed` saknar fortfarande call-site — instrumentera när Store-integrationen kopplas in.
 
-## Name-answer model — demo route
+## Name-answer model
 
-`app/name-quiz-demo.tsx` är en fristående demo som visar två-stegs-svaret:
+Två-stegs-svaret (Letter Grid → Final Selection) lever i [ImageAnswerBlock.tsx](src/components/ImageAnswerBlock.tsx) och används av live-quizet — se "Quiz — frågetyper" och "Image questions".
 
-1. **Letter Grid**: 10 prefix-knappar i 5×2-grid, alfabetiskt sorterade (`localeCompare(b, 'sv')` så Å/Ä/Ö hamnar rätt). Single-select.
-2. **Final Selection**: lista av fulla namn med matching prefix, alfabetiskt sorterade. Visar `catalog`/`pool`-tag per rad. "← Back" under "Selected: XX"-pillen.
-3. **Confirm-steg**: klick på namn highlightar (primary-blå border), Confirm-knappen syns. Klick på Confirm låser → grön "✓ Correct Answer" / röd "✗ Wrong Answer"-feedback med rätt svar.
-
-Demo-data (`src/utils/nameQuizDemo.ts`) genererad för Millennials (1990) + standard assistance = 2-bokstavs prefix.
+~~`app/name-quiz-demo.tsx`~~ var en fristående prototyp av samma modell. **Raderad 2026-08-17** tillsammans med `src/utils/nameQuizDemo.ts` och `backend/scripts/export-demo.ts` (npm-scriptet `export-demo`): den hade ingen ingång i appen, och modellen den skissade är sedan länge integrerad i ImageAnswerBlock. `npm run demo` i backend är något ANNAT och finns kvar — den skriver ut Letter Grid-output i konsolen från katalogen.
 
 **ProgressiveCover** ([src/components/ProgressiveCover.tsx](src/components/ProgressiveCover.tsx)) — mosaik-overlay som avslöjar bilden/flaggan under sig:
 - 32×18 = 576 svarta block, 4 block tas bort per tick. Total reveal-tid styrs av `assistance`-propen: `full=0.25 × totalSeconds`, `standard=0.5 × totalSeconds`, `minimal=0.75 × totalSeconds`.
@@ -2443,6 +2438,6 @@ Säkerhetsgranskning (RLS, Edge Functions, klient-trust, input-validering) → �
 
 `npm start` (Expo dev), `npm run ios` / `android` / `web`, `npm run lint` (`expo lint`). No tests, no CI.
 
-`backend/`-projektet har egna scripts: `npm test` (vitest, 131 tester), `npm run validate` (parsea katalog), `npm run export-demo` (regenerera demo-data för Name-quiz), `npm run export-music-questions` (regenererar [src/utils/musicQuestions.ts](src/utils/musicQuestions.ts) från `songs-*.yaml`), `npm run export-image-questions`, `npm run wikimedia-search <id>`, `npm run wikimedia-process <id>`, `npm run youtube-search <id>` / `-- --query "..."` (curator-suggest med scoring), `npm run youtube-validate` (validerar alla `youtubeClips` mot Data API — kör även nightly via GitHub Actions), `npm run demo` (skriver ut Letter Grid-output i konsolen).
+`backend/`-projektet har egna scripts: `npm test` (vitest, 224 gröna + 3 skipped), `npm run validate` (parsea katalog), `npm run export-music-questions` (regenererar [src/utils/musicQuestions.ts](src/utils/musicQuestions.ts) från `songs-*.yaml`), `npm run export-image-questions`, `npm run wikimedia-search <id>`, `npm run wikimedia-process <id>`, `npm run youtube-search <id>` / `-- --query "..."` (curator-suggest med scoring), `npm run youtube-validate` (validerar alla `youtubeClips` mot Data API — kör även nightly via GitHub Actions), `npm run demo` (skriver ut Letter Grid-output i konsolen).
 
 Image-validerings-scripten är **raderade 2026-08-17** tillsammans med bild-assetsen — se "⚠ Bild-assets är RADERADE" ovan. Kvar av katalog-tooling: `npx tsx scripts/batch-park-items.ts` (remove/park items i YAML) och `node scripts/_fix-mojibake.js` (reparera dubbelkodad text).

@@ -8805,8 +8805,8 @@ const styles = StyleSheet.create({
 });
 
 // Inline reveal-feedback — green/red-bordered card med ✓/✗ badge i övre
-// vänstra hörnet, "You chose: X" och (vid fel) "Correct answer: Y". Speglar
-// name-quiz-demo:s feedback-mönster så reveal-vyn ser likadan ut oavsett
+// vänstra hörnet, "You chose: X" och (vid fel) "Correct answer: Y". Samma
+// feedback-mönster som ImageAnswerBlock så reveal-vyn ser likadan ut oavsett
 // fråge-typ. Pts-räknaren sitter i övre högra hörnet på samma rad som badgen.
 const rv = StyleSheet.create({
   container: { paddingHorizontal: Spacing.lg },
