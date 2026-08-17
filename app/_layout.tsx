@@ -99,12 +99,6 @@ export default function RootLayout() {
         <Stack.Screen name="quiz" />
         <Stack.Screen name="my-matches" />
         <Stack.Screen name="name-quiz-demo" />
-        <Stack.Screen name="sketch-demo" />
-        <Stack.Screen name="guess-who-demo" />
-        {/* Curator-verktyg utan knapp i UI:t — nås via deep link
-            `/--/clip-check`. Spelar ett valt YouTube-klipp genom samma
-            inbäddade spelare som quizet, för att verifiera nybytta klipp. */}
-        <Stack.Screen name="clip-check" />
       </Stack>
       <BottomBanner />
     </GestureHandlerRootView>

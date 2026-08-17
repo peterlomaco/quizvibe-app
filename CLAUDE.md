@@ -45,9 +45,7 @@ Status mot den 4-stegs-plan vi följer för content-bygge inför launch:
 
 ## ⚠ Bild-assets är RADERADE (2026-08-17) — bilder finns inte längre någonstans
 
-`assets/quiz-images/` (1008 webp, 83 MB) och `src/utils/quizImages.ts` är **borta ur repot**. Person-bilderna parkerades juridiskt 2026-06-04 och `getQuizImage` var redan bortkopplad; filerna låg kvar och drog 83 MB utan att någon kod läste dem.
-
-⚠ **De låg ALDRIG i app-bundeln.** Eftersom `quizImages.ts` saknade importör följde Metro aldrig dess 1008 `require()`. Verifierat med `expo export --platform ios`: noll `.webp` i bundeln, 8.35 MB totalt. Den gamla noteringen "assets på 73 MB i bundle" var alltså felaktig. Vinsten är repo-/klonstorlek, INTE appstorlek.
+`assets/quiz-images/` (1008 webp, 83 MB), `src/utils/quizImages.ts`, hela sketch-/doodle-pipelinen (`assets/quiz-sketches/`, `backend/sketch/`, `quizSketches.ts`, `SketchCanvas.tsx`, `NameRevealCard.tsx`, `GuessWhoSplitView.tsx`, `guessWhoDemo.ts`) och demo-routerna `/sketch-demo`, `/guess-who-demo`, `/clip-check` är **borta ur repot**. Person-bilderna parkerades juridiskt 2026-06-04 och `getQuizImage` var redan bortkopplad; filerna låg kvar och drog 83 MB utan att någon kod läste dem.
 
 **Katalogen lever — det är bara BILDFILERNA som är borta.** `backend/content/catalog/**/*.yaml`, `export-image-questions.ts`, `quizImageQuestions.ts` och `imageQuestionBuilder.ts` är oförändrat LIVE: de är Hints-poolen. En "image"-fråga renderar flagga + ledtrådar via `HintsQuizCard` och rör aldrig en bildfil.
 
@@ -55,7 +53,9 @@ Status mot den 4-stegs-plan vi följer för content-bygge inför launch:
 
 **Vill du återinföra bilder** (t.ex. om det juridiska läget ändras): hämta dem via `wikimedia-process` till `backend/output/`, återskapa `assets/quiz-images/` + en `quizImages.ts`, och koppla in `getQuizImage` i quiz.tsx igen. Gamla filerna finns i git-historiken fram t.o.m. commit `faa8dca`.
 
-**Image-validering 2026-05-31** (Peter-genomgång, historik): 94 oönskade bild-items togs bort HELT — webp + katalog-poster + require-map + fråge-data (1100 → 1006). Verktygen som drev valideringen (`review-quiz-images.ts`, `review-non-swedish-images.ts`, `measure-images.ts` + deras npm-scripts) är **raderade 2026-08-17** tillsammans med bilderna de granskade. Kvarvarande verktyg i `backend/scripts/`:
+**Kvarvarande bild-tooling i `backend/scripts/` är BRUTEN** — ~22 kurerings-script (`batch-wikimedia-process`, `batch-wikimedia-by-url`, `find-missing-webps`, `find-alt-images`, `license-audit-*`, `category-probe`, `validate-fifa-*`, `_`-prefixade engångsscript) pekar fortfarande på den raderade katalogen. De har inga npm-entries kvar och är kandidater för nästa städpass.
+
+**Image-validering 2026-05-31** (Peter-genomgång, historik): 94 oönskade bild-items togs bort HELT — webp + katalog-poster + require-map + fråge-data (1100 → 1006). Verktyg som drev valideringen (`review-quiz-images.ts`, `review-non-swedish-images.ts`, `measure-images.ts` + deras npm-scripts) är **raderade 2026-08-17** tillsammans med bilderna de granskade. Kvarvarande verktyg i `backend/scripts/`:
 - **`batch-park-items.ts`** (`npx tsx scripts/batch-park-items.ts`) — Bulk-redigerare för katalogfiler: `REMOVE_IDS` tar bort item + (separat) webp; `PARK_IDS` flyttar till `deferred/parked-*-global.yaml`. Rad-baserad parser bevarar exakt formatering. Append-logik om deferred-fil redan finns. Uppdatera `SOURCE_FILES` och `REMOVE_IDS`/`PARK_IDS` varje curations-pass.
 - **`license-audit-verify.ts`** — verifierar licens + upphovsperson för ALLA image-items (registrerad batch-input-URL → Commons imageinfo, annars re-probe Wikipedia pageimage på displayName). Resultat 2026-05-31: **0 non-commercial, 0 fair-use/non-free** — allt är PD/CC0 eller CC-BY/SA (alla käll-URLer går till `/wikipedia/commons/`, det fria arkivet). De flesta "unknown" i audit:en är transienta Commons-API-throttle-fel, inte saknade licenser (spot-check bekräftade CC). Output: `docs/full-license-audit-verified.md` + `docs/image-attribution.md` (credits-manifest: id · namn · fotograf · licens · Commons-länk — blir attribution-sida; CC-BY/SA KRÄVER fotograf-kredit, enda compliance-kravet). `validate-fifa-images.ts` är FIFA-only-föregångaren.
 - **`find-alt-images.ts`** (input: `scripts/alt-images-input.json`) — för en lista namn, hämtar Commons text-search + Wikipedia pageimage (en/sv) kandidat-bilder med licens + upplösning, bygger visuell HTML (`backend/output/alt-images.html`) sorterad per licens (grön PD/CC0 → blå CC-BY/SA) för att välja ersättningsbilder. Commons hostar bara fritt material så alla träffar är lagliga.
@@ -1527,17 +1527,15 @@ Verifierat: **836/836 bild-frågor hade identisk synlighet före/efter.**
 
 **Svarsmetod** (oförändrad): `<ImageAnswerBlock>` — Letter Grid → Final Selection. `isRevealed` skickas till HintsQuizCard (visar namn + snappar ProgressiveCover).
 
-## Signature Doodle + Guess Who (split-view)
+## ~~Signature Doodle + Guess Who (split-view)~~ — RADERAD 2026-08-17
 
-PIVOT 2026-05-29: fristående "Guess Who"-fråge-koncept — en stiliserad **AI-doodle** (fal.ai text-till-bild, INGEN foto-input → legalt ren) + **4 progressiva ledtrådar** bär igenkänningen. Ersätter foto-derivat-vägen (edges/canny). **Bara prototyp ännu** — inte wired till live-quiz. Full historik/rationale i [memory/project_sketch_pipeline_direction.md](../.claude/projects/C--Users-46725-quizvibe-app/memory/project_sketch_pipeline_direction.md).
+Hela sketch-/doodle-pipelinen är **borttagen ur repot**. Den var en prototyp (PIVOT 2026-05-29: fal.ai text-till-bild-doodle utan foto-input + progressiva ledtrådar) som aldrig wire:ades till live-quiz, och **Hints ersatte den funktionellt** — `HintsQuizCard` gör redan jobbet med flagga + upp till 15 ledtrådar.
 
-**Hårda regler** (i `buildDoodlePrompt`, [backend/sketch/doodle.ts](backend/sketch/doodle.ts)): (1) **ALDRIG ansikte** — pose face-away (bakifrån/bortvänt); AI-ansikte ≠ personen → vilseledande. (2) **Strikt logo-fritt** (ingen swoosh/ränder/crest). (3) **Spot color** — platt färg på ENDAST det mest ikoniska attributet (frisyr/kit/accessoar), resten svart line-art; max 1-2 färger. (4) Premium flat vektor-blueprint ("high-end minimalist vector illustration ... corporate game art asset ... 8k ... no hand-drawn slop"). Flux dev slog SDXL. Städning bevarar färg (INGEN greyscale).
+Raderat: `backend/sketch/` (doodle.ts, doodle-briefs.ts, batch-doodle.ts, generate.ts, source.ts, vectorize.ts, blueprint.ts), `assets/quiz-sketches/` (31 filer), `src/utils/quizSketches.ts`, `src/utils/guessWhoDemo.ts`, `src/components/SketchCanvas.tsx`, `src/components/NameRevealCard.tsx`, `src/components/GuessWhoSplitView.tsx`, routerna `/sketch-demo` + `/guess-who-demo`, samt npm-scripten `sketch-generate`, `doodle-generate`, `doodle-batch`, `sketch-source`, `sketch-vectorize`, `sync-quiz-sketches`.
 
-**Brief-schema** ([backend/sketch/doodle-briefs.ts](backend/sketch/doodle-briefs.ts), `DoodleBrief`): `concept` (face-away pose), `spotColor` (+`spotColorSecondary`), `jerseyNumber`+`numberColor`, `details` (bindel/instrument), `backgroundHint` (skådespelare → subtila bakgrunds-clues; idrottare tomt), `spinArrow` (deterministisk horisontell snurr-pil ritad av sharp, EJ Flux), `clues` (typ·era·land·igenkännings-ord). 3 låsta: carlos-valderrama, zlatan-ibrahimovic, tomas-brolin.
+Kvar: `sketchEnabled`-flaggan + `lobby_settings.sketch_enabled` (migration 0013) är fortfarande död plumbing i LobbyScreen/mockLobbySettings, default AV — se "Lobby — Game Settings card".
 
-**Skalnings-fabrik** (3 steg): (1) **Fact-checking** = Workflow `doodle-brief-factcheck` (fan-ar ut författar+gransknings-agent per namn → schema-validerade briefs; OBS StructuredOutput-compliance flaky 2026-05-29 — kan behöva retry/fix). (2) **Batch best-of-N** = `npm run doodle-batch -- --ids a,b,c | --all [--variants 3]` → N parallella Flux-pass → temp i `backend/output/doodle/review/` + HTML contact-sheet → `--approve <id> <v>` → assets → `npm run sync-quiz-sketches`. Bygger på exporterad `renderDoodleWebp` (render-only). (3) **Per-namn-workflow** (manuell): `npm run doodle-generate -- --id <id> --suffix nN` ×3-4 → Read → plocka → cp kanonisk. `--control <path>` finns för canny-recolor men parkerad (tappar likhet + ©-risk).
-
-**Frontend-prototyp**: [GuessWhoSplitView.tsx](src/components/GuessWhoSplitView.tsx) + [src/utils/guessWhoDemo.ts](src/utils/guessWhoDemo.ts) finns kvar som referens. **OBS**: route `/guess-who-demo` är numera Hints-demo (se "Hints questions" ovan) — GuessWhoSplitView är inte längre wired till demo eller live-quiz.
+Historik/rationale finns i git fram t.o.m. commit `faa8dca` och i [memory/project_sketch_pipeline_direction.md](../.claude/projects/C--Users-46725-quizvibe-app/memory/project_sketch_pipeline_direction.md). `@fal-ai/client` + `potrace` i `backend/package.json` användes bara här och kan avinstalleras.
 
 ## Spotify DJ-läge (uppdaterad 2026-07-22 — PLAN B: ren URL, ingen OAuth)
 
