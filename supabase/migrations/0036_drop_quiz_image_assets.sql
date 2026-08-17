@@ -1,0 +1,23 @@
+-- ─────────────────────────────────────────────────────────────────────
+-- 0036_drop_quiz_image_assets — städa bort CDN-tabellen för person-bilder
+--
+-- 0018 förberedde en flytt av assets/quiz-images/ (83 MB, 1008 webp) från
+-- app-bundeln till Supabase Storage + CDN. Den flytten blev aldrig av:
+-- person-bilderna parkerades juridiskt 2026-06-04 och "image"-frågan
+-- renderar sedan dess bara flagga + ledtrådar (HintsQuizCard). Bildfilerna
+-- och src/utils/quizImages.ts raderades 2026-08-17.
+--
+-- Tabellen har ALDRIG haft en läsare i klienten (noll referenser till
+-- 'quiz_image_assets' i app/ och src/). Den beskriver filer som inte längre
+-- finns, så den droppas hellre än att stå kvar och se ut som en aktiv
+-- integrationspunkt.
+--
+-- if exists: 0018 kan vara oapplicerad i vissa miljöer (jfr 0016).
+-- cascade: tar triggern quiz_image_assets_updated_at, de fyra indexen och
+-- RLS-policyn med sig. Den DELADE funktionen public.touch_updated_at()
+-- rörs INTE — flera andra tabeller använder den.
+--
+-- Återställning: kör 0018 igen. Den är oförändrad i repot.
+-- ─────────────────────────────────────────────────────────────────────
+
+drop table if exists public.quiz_image_assets cascade;

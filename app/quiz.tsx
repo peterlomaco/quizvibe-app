@@ -94,10 +94,9 @@ import { isItemInRegionScope, PLAYER_COUNTRY } from '@/src/utils/regionScope';
 import { HintsQuizCard } from '@/src/components/HintsQuizCard';
 import { HeartbeatSound } from '@/src/components/HeartbeatSound';
 import { MorseAmbientSound } from '@/src/components/MorseAmbientSound';
-// import { getQuizImage } from '@/src/utils/quizImages';
-// ↑ Borttagen 2026-05-27 — text-rendering ersätter foto-rendering. Återintroducera
-// när sketches kommer (då med getQuizSketch() från assets/quiz-sketches/).
-// NameRevealCard, SketchCanvas, hasSketch, getQuizSketch ersatta av HintsQuizCard.
+// Person-bilderna är juridiskt parkerade sedan 2026-06-04 — en "image"-fråga
+// renderar bara flagga + ledtrådar via HintsQuizCard. assets/quiz-images/,
+// quizImages.ts och hela sketch-pipelinen raderades 2026-08-17.
 import { generateRoomCode } from '@/src/utils/roomCode';
 import { addSeenQuestionIds, addSessionRecord, addSessionRecordForNames, loadSeenQuestionIds, loadLastSessionIds } from '@/src/utils/hostQuestionHistory';
 import { consumePendingPeerSeenIds } from '@/src/utils/pendingSeenQuestions';

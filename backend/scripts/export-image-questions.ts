@@ -26,7 +26,6 @@ import {
 import { loadDistractorPool } from '../content/distractor-pool';
 import { HINTS_LIBRARY } from '../../src/utils/hintsData';
 
-const ASSETS_DIR = path.join(__dirname, '..', '..', 'assets', 'quiz-images');
 const OUTPUT_PATH = path.join(
   __dirname,
   '..',
@@ -52,16 +51,6 @@ interface ExportedQuestion {
   questionText: string;
 }
 
-function listLocalImageIds(): string[] {
-  if (!fs.existsSync(ASSETS_DIR)) {
-    throw new Error(`assets/quiz-images/ does not exist: ${ASSETS_DIR}`);
-  }
-  return fs
-    .readdirSync(ASSETS_DIR)
-    .filter((f) => f.endsWith('.webp'))
-    .map((f) => f.replace(/\.webp$/, ''))
-    .sort();
-}
 
 function buildExportedQuestion(
   itemId: string,
@@ -219,25 +208,26 @@ export function getImageQuestionsForGeneration(
 `;
 }
 
+/** Speglar MIN_HINTS_REQUIRED i quiz.tsx — items under tröskeln filtreras
+ *  ändå bort på klienten och har inget att göra i exporten. */
+const MIN_HINTS_REQUIRED = 10;
+
 /**
- * Katalog-items som har ett tillräckligt stort hints-bibliotek men saknar
- * webp. De ska ändå exporteras: sedan person-bilderna parkerades juridiskt
- * renderar en "image"-fråga bara flagga + ledtrådar (HintsQuizCard) och rör
- * aldrig bildfilen — `getQuizImage` är utkommenterad i quiz.tsx. Webp-listan
- * ensam är alltså en kvarleva som tyst höll nytt hints-innehåll utanför
- * poolen (6 golfare + 2 fotbollsspelare när det här skrevs 2026-08-12).
+ * Katalog-items som har ett tillräckligt stort hints-bibliotek.
  *
- * Tröskeln speglar MIN_HINTS_REQUIRED i quiz.tsx — items under den filtreras
- * ändå bort på klienten.
+ * ⚠ Urvalet gick t.o.m. 2026-08-17 på "har en webp i assets/quiz-images/".
+ * Det var en kvarleva: sedan person-bilderna parkerades juridiskt renderar en
+ * "image"-fråga bara flagga + ledtrådar (HintsQuizCard) och rör aldrig
+ * bildfilen. Webp-listan höll därför tyst nytt hints-innehåll utanför poolen
+ * (6 golfare + 2 fotbollsspelare 2026-08-12) OCH släppte samtidigt in ~560
+ * bildlösa items som klienten ändå kastade. Hints-biblioteket ÄR urvalet nu —
+ * assets/quiz-images/ är raderad. Lägg inte tillbaka ett filsystem-beroende.
  */
-function listHintOnlyIds(catalog: ReturnType<typeof loadCatalog>, withImages: string[]): string[] {
-  const MIN_HINTS_REQUIRED = 10;
-  const haveImage = new Set(withImages);
+function listHintItemIds(catalog: ReturnType<typeof loadCatalog>): string[] {
   const ids = new Set<string>();
   for (const file of catalog.files.values()) {
     if (file.contentForm !== 'image') continue;
     for (const item of file.items) {
-      if (haveImage.has(item.id)) continue;
       if ((HINTS_LIBRARY[item.id]?.hints.length ?? 0) >= MIN_HINTS_REQUIRED) ids.add(item.id);
     }
   }
@@ -246,13 +236,8 @@ function listHintOnlyIds(catalog: ReturnType<typeof loadCatalog>, withImages: st
 
 async function main(): Promise<void> {
   const catalog = loadCatalog();
-  const imageIds = listLocalImageIds();
-  const hintOnlyIds = listHintOnlyIds(catalog, imageIds);
-  const ids = [...imageIds, ...hintOnlyIds].sort();
-  console.log(`Found ${imageIds.length} local images in assets/quiz-images/`);
-  if (hintOnlyIds.length > 0) {
-    console.log(`+ ${hintOnlyIds.length} hints-only items utan webp: ${hintOnlyIds.join(', ')}`);
-  }
+  const ids = listHintItemIds(catalog);
+  console.log(`Found ${ids.length} image items with >= ${MIN_HINTS_REQUIRED} hints`);
 
   const questions: ExportedQuestion[] = [];
   for (const id of ids) {
