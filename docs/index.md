@@ -33,7 +33,6 @@ QuizVibe is free to download and play. An optional **QuizVibe Premium** subscrip
 - [Contact](contact/) — how to reach us
 - [Privacy Policy](legal/privacy/) — how we handle your data
 - [Terms of Service](legal/terms/) — the rules for using QuizVibe
-- [Image credits](image-attribution/) — photographers and licences for images in our content library
 
 ---
 
