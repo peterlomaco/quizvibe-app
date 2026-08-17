@@ -5,7 +5,7 @@ description: The rules for using QuizVibe.
 
 # Terms of Service
 
-**Last updated:** 2026-08-07
+**Last updated:** 2026-08-17
 **Effective date:** Upon app launch on the Apple App Store
 
 These Terms of Service ("Terms") govern your use of the **QuizVibe** mobile application ("the app", "we", "us"). By downloading, installing, or using the app, you agree to these Terms. If you don't agree, please don't use the app.
@@ -111,7 +111,7 @@ When using QuizVibe, you agree **not to**:
 - **Cheat** — use automated tools, modify the app, exploit bugs, or otherwise gain an unfair advantage.
 - **Harass or abuse** other players — including via player names, in-game behavior, or any other channel within the app.
 - **Reverse-engineer, decompile, or extract** the app's source code, except where explicitly allowed by applicable law.
-- **Scrape, copy, or republish** quiz content, image assets, or other materials from the app.
+- **Scrape, copy, or republish** quiz content, hints, or other materials from the app.
 - **Use the app for illegal purposes** or to violate the rights of others.
 - **Interfere with the service** — DDoS attacks, attempts to overload the backend, probing for security vulnerabilities without authorization.
 - **Resell or commercialize** access to the app, host games for money, or otherwise monetize the service in ways we haven't authorized.
@@ -122,19 +122,19 @@ Violation of these rules may result in account suspension or termination (Sectio
 
 ## 7. Content in the app
 
-### 7.1 Quiz content (questions, clips, images)
+### 7.1 Quiz content (questions, clips, hints)
 
 QuizVibe presents quiz questions that include:
 
 - **YouTube video clips** — these are streamed directly from YouTube via their official IFrame Player. **The clips themselves are owned by their respective rights holders** (artists, labels, studios, sports leagues). We do not own this content; we link to it under YouTube's terms.
-- **Images of public figures, landmarks, etc.** — sourced primarily from Wikipedia/Wikimedia Commons under their respective licenses (typically Creative Commons or public domain), with attribution preserved where required.
+- **Text hints** — short factual clues (for example profession, era, notable works, or career milestones) compiled from open knowledge sources such as Wikidata and Wikipedia, which publish under open licenses (typically CC0 or Creative Commons), and edited by us.
 - **Question text and gameplay structure** — written and designed by us. These are our intellectual property.
 
 Your use of YouTube content within QuizVibe is also governed by **YouTube's Terms of Service**: https://www.youtube.com/t/terms. If you don't agree to YouTube's terms, you cannot use the parts of QuizVibe that play YouTube clips.
 
 ### 7.2 No download or extraction
 
-You may not download, save, screen-record, or extract quiz content from the app for use outside QuizVibe. This includes YouTube clips, images, and question text.
+You may not download, save, screen-record, or extract quiz content from the app for use outside QuizVibe. This includes YouTube clips, hints, and question text.
 
 ### 7.3 Reporting copyright concerns
 
