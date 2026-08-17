@@ -321,15 +321,9 @@ function main() {
 
   console.log(`\nSammanfattning: ${totalRemoved} borttagna · ${totalParked} parkerade · ${totalKept} kvar`);
 
-  // Lista webps att radera för REMOVE-items (görs separat)
-  console.log('\n── Webps att radera manuellt (REMOVE-items) ────────────────');
-  for (const id of REMOVE_IDS) {
-    console.log(`  assets/quiz-images/${id}.webp`);
-  }
-  // Lista require()-rader att ta bort från quizImages.ts (REMOVE + PARK)
-  const allGone = new Set([...REMOVE_IDS, ...PARK_IDS]);
-  console.log('\n── IDs att ta bort ur quizImages.ts (REMOVE + PARK) ────────');
-  for (const id of allGone) console.log(`  ${id}`);
+  // Bild-assetsen är raderade 2026-08-17 — det finns ingen webp eller
+  // quizImages.ts kvar att städa efter en parkering. Kör bara exporten om.
+  console.log('\nKör `npm run export-image-questions` för att uppdatera poolen.');
 }
 
 main();

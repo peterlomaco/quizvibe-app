@@ -53,12 +53,16 @@ Status mot den 4-stegs-plan vi följer för content-bygge inför launch:
 
 **Vill du återinföra bilder** (t.ex. om det juridiska läget ändras): hämta dem via `wikimedia-process` till `backend/output/`, återskapa `assets/quiz-images/` + en `quizImages.ts`, och koppla in `getQuizImage` i quiz.tsx igen. Gamla filerna finns i git-historiken fram t.o.m. commit `faa8dca`.
 
-**Kvarvarande bild-tooling i `backend/scripts/` är BRUTEN** — ~22 kurerings-script (`batch-wikimedia-process`, `batch-wikimedia-by-url`, `find-missing-webps`, `find-alt-images`, `license-audit-*`, `category-probe`, `validate-fifa-*`, `_`-prefixade engångsscript) pekar fortfarande på den raderade katalogen. De har inga npm-entries kvar och är kandidater för nästa städpass.
+**All bild-tooling i `backend/scripts/` är RADERAD** (30 script + 39 staging-filer, 2026-08-17) — de läste eller skrev den katalog som nu är borta: `batch-wikimedia-process`, `batch-wikimedia-by-url`, `find-missing-webps`, `find-alt-images`, `license-audit-full`, `license-audit-verify`, `category-probe`, `generate-fifa-validation`, `validate-fifa-images`, `validate-fifa-smart` + 20 `_`-prefixade engångsscript från 2026-05/06-kurationspassen (`_fetch-wikidata`, `_apply-t1`, `_find-alt`, `_rescue-apply`, m.fl.) och deras `batch-input-*.json` / `_*-manifest.json`-indata.
+
+Två script ÖVERLEVDE medvetet:
+- **`batch-park-items.ts`** — redigerar katalog-YAML (remove/park), inte bilder. Dess webp-städlista är borttagen.
+- **`_fix-mojibake.js`** — reparerar dubbelkodad text i katalogfiler. Inget med bilder att göra.
+
+⚠ **`docs/image-attribution.md` + `docs/full-license-audit-verified.md` ligger kvar och är PUBLICERADE på quizvibe.se** (länkade från `docs/index.md` och `docs/legal/index.md`). De krediterar fotografer för CC-BY-bilder som appen inte längre distribuerar. Sidorna är statiska och fungerar, men generatorerna är borta — de kan inte längre byggas om. **Peters beslut om de ska tas ned** (CC-BY kräver kredit bara vid distribution, och vi distribuerar inte längre bilderna).
 
 **Image-validering 2026-05-31** (Peter-genomgång, historik): 94 oönskade bild-items togs bort HELT — webp + katalog-poster + require-map + fråge-data (1100 → 1006). Verktyg som drev valideringen (`review-quiz-images.ts`, `review-non-swedish-images.ts`, `measure-images.ts` + deras npm-scripts) är **raderade 2026-08-17** tillsammans med bilderna de granskade. Kvarvarande verktyg i `backend/scripts/`:
 - **`batch-park-items.ts`** (`npx tsx scripts/batch-park-items.ts`) — Bulk-redigerare för katalogfiler: `REMOVE_IDS` tar bort item + (separat) webp; `PARK_IDS` flyttar till `deferred/parked-*-global.yaml`. Rad-baserad parser bevarar exakt formatering. Append-logik om deferred-fil redan finns. Uppdatera `SOURCE_FILES` och `REMOVE_IDS`/`PARK_IDS` varje curations-pass.
-- **`license-audit-verify.ts`** — verifierar licens + upphovsperson för ALLA image-items (registrerad batch-input-URL → Commons imageinfo, annars re-probe Wikipedia pageimage på displayName). Resultat 2026-05-31: **0 non-commercial, 0 fair-use/non-free** — allt är PD/CC0 eller CC-BY/SA (alla käll-URLer går till `/wikipedia/commons/`, det fria arkivet). De flesta "unknown" i audit:en är transienta Commons-API-throttle-fel, inte saknade licenser (spot-check bekräftade CC). Output: `docs/full-license-audit-verified.md` + `docs/image-attribution.md` (credits-manifest: id · namn · fotograf · licens · Commons-länk — blir attribution-sida; CC-BY/SA KRÄVER fotograf-kredit, enda compliance-kravet). `validate-fifa-images.ts` är FIFA-only-föregångaren.
-- **`find-alt-images.ts`** (input: `scripts/alt-images-input.json`) — för en lista namn, hämtar Commons text-search + Wikipedia pageimage (en/sv) kandidat-bilder med licens + upplösning, bygger visuell HTML (`backend/output/alt-images.html`) sorterad per licens (grön PD/CC0 → blå CC-BY/SA) för att välja ersättningsbilder. Commons hostar bara fritt material så alla träffar är lagliga.
 
 **Audit-pass-status** (per bucket):
 - ✅ **Athletes-elder-gen-x** (audited 2026-05-27): 18/22 webp uppgraderade till sport-action. 2 keep current (Stenmark, Wiberg — peak-era ej tillgängligt på Commons). 2 blocked (Muhammad Ali, Patrik Sjöberg — © Leifer/IAAF, se `memory/project_image_audit_blocked.md`). Useful sources upptäckta: Lipofsky NBA-bilder, Anefo "in aktie"-serie, AFP/Scanpix PD, Freiburg LABW archive.
@@ -97,10 +101,6 @@ Status mot den 4-stegs-plan vi följer för content-bygge inför launch:
    - `scripts/batch-pick-clips.ts` — YT-search per item, picka top-scored kandidat, output markdown-tabell + JSON. `--top N` eller explicit IDs. 10s throttle för YT API rate-limit (10/min).
    - `scripts/topic-pick-clips.ts` — refined search för items där default-search hittar fel content. Query-bias mot Topic-channels.
    - `scripts/apply-batch-picks.ts` — YAML-insertion från batch-picks.json. CRLF/LF-detection bevarar Windows line-endings.
-   - `scripts/batch-wikimedia-process.ts` — batch Wikipedia pageimage → sharp → assets/quiz-images/. Engelska först, svenska fallback.
-   - `scripts/batch-wikimedia-by-url.ts` (2026-05-27) — batch-process via explicit URL-per-item (`--json <path>`). Använd när default-hints triggar fel pageimage.
-   - `scripts/find-missing-webps.ts` (2026-05-27) — listar alla image-items i katalog som saknar `assets/quiz-images/<id>.webp`, grupperade per YAML-fil.
-   - ~~`scripts/sync-quiz-images.ts`~~ — RADERAD 2026-08-17 tillsammans med `quizImages.ts` och bild-assetsen.
 
 Se `memory/project_roadmap_phases.md` för bredare fas-status (Fas 4 backlog → Pre-launch → Launch).
 
@@ -2441,4 +2441,4 @@ Säkerhetsgranskning (RLS, Edge Functions, klient-trust, input-validering) → �
 
 `backend/`-projektet har egna scripts: `npm test` (vitest, 131 tester), `npm run validate` (parsea katalog), `npm run export-demo` (regenerera demo-data för Name-quiz), `npm run export-music-questions` (regenererar [src/utils/musicQuestions.ts](src/utils/musicQuestions.ts) från `songs-*.yaml`), `npm run export-image-questions`, `npm run wikimedia-search <id>`, `npm run wikimedia-process <id>`, `npm run youtube-search <id>` / `-- --query "..."` (curator-suggest med scoring), `npm run youtube-validate` (validerar alla `youtubeClips` mot Data API — kör även nightly via GitHub Actions), `npm run demo` (skriver ut Letter Grid-output i konsolen).
 
-Image-validerings-scripts (körs via `tsx`, ej npm-script utom review): `npm run review-quiz-images` (HTML contact-sheet), `npx tsx scripts/license-audit-verify.ts` (licens + attribution-audit → `docs/full-license-audit-verified.md` + `docs/image-attribution.md`), `npx tsx scripts/find-alt-images.ts` (alternativa Commons/PD-bilder för namn i `scripts/alt-images-input.json` → `backend/output/alt-images.html`). Se "Pool-status idag" + "Image-validering 2026-05-31" ovan.
+Image-validerings-scripten är **raderade 2026-08-17** tillsammans med bild-assetsen — se "⚠ Bild-assets är RADERADE" ovan. Kvar av katalog-tooling: `npx tsx scripts/batch-park-items.ts` (remove/park items i YAML) och `node scripts/_fix-mojibake.js` (reparera dubbelkodad text).
