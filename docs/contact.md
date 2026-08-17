@@ -1,17 +1,17 @@
 ---
 title: Contact — QuizVibe
-description: Contact details for Lomaco AB, the company behind QuizVibe.
+description: Contact details for LoMaCo AB, the company behind QuizVibe.
 ---
 
 # Contact
 
-QuizVibe is developed and operated by **Lomaco AB**, a limited company (aktiebolag) registered in Sweden.
+QuizVibe is developed and operated by **LoMaCo AB**, a limited company (aktiebolag) registered in Sweden.
 
 ## Company details
 
 | | |
 |---|---|
-| **Legal name** | Lomaco AB |
+| **Legal name** | LoMaCo AB |
 | **Company registration number** | 559388-9511 |
 | **VAT number** | SE559388951101 |
 | **Registered address** | Grankullegatan 3<br>441 46 Alingsås<br>Sweden |
@@ -30,7 +30,7 @@ For help with the app specifically — account deletion, subscriptions, refunds,
 
 For GDPR requests (access, correction, erasure, portability, objection), email [info@quizvibe.se](mailto:info@quizvibe.se) with the subject "GDPR Request". We respond within 30 days, as required by GDPR Article 12.
 
-Lomaco AB is the data controller for personal data processed through QuizVibe. See our [Privacy Policy](legal/privacy/) for the full detail.
+LoMaCo AB is the data controller for personal data processed through QuizVibe. See our [Privacy Policy](legal/privacy/) for the full detail.
 
 If you are not satisfied with how we handle your data, you have the right to lodge a complaint with the Swedish Authority for Privacy Protection (Integritetsskyddsmyndigheten, IMY), [imy.se](https://www.imy.se).
 

@@ -10,7 +10,7 @@ description: How QuizVibe collects, uses, and protects your information.
 
 This Privacy Policy explains how **QuizVibe** ("we", "us", "the app") collects, uses, and protects your information when you use our mobile application. We've tried to write it in plain English with the legal anchor points clearly marked.
 
-QuizVibe is operated by **Lomaco AB** (org. no. 559388-9511), a limited company (aktiebolag) registered in Sweden. For any privacy-related questions or requests, contact us at: **info@quizvibe.se**.
+QuizVibe is operated by **LoMaCo AB** (org. no. 559388-9511), a limited company (aktiebolag) registered in Sweden. For any privacy-related questions or requests, contact us at: **info@quizvibe.se**.
 
 ---
 
@@ -30,12 +30,12 @@ The rest of this document is the full version.
 
 | | |
 |---|---|
-| **Operator** | Lomaco AB (org. no. 559388-9511), registered in Sweden |
+| **Operator** | LoMaCo AB (org. no. 559388-9511), registered in Sweden |
 | **Contact email** | info@quizvibe.se |
 | **App name** | QuizVibe |
 | **Platforms** | Apple App Store (iOS) |
 
-Lomaco AB is the data controller for the personal data described in this policy. If our company information changes, we will update this policy and notify users via the app.
+LoMaCo AB is the data controller for the personal data described in this policy. If our company information changes, we will update this policy and notify users via the app.
 
 For data protection requests, complaints, or questions about how we handle your information, email us at info@quizvibe.se. We aim to respond within 30 days as required by GDPR Article 12.
 

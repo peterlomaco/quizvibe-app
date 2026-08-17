@@ -211,7 +211,7 @@ const FAQ_CATEGORIES: FaqCategory[] = [
       },
       {
         q: 'Who is behind QuizVibe?',
-        a: 'QuizVibe is operated by Lomaco AB (org. no. 559388-9511), a company registered in Sweden. Contact: infoquizvibe@gmail.com. Full details are in the Privacy Policy and Terms of Service under Legal.',
+        a: 'QuizVibe is operated by LoMaCo AB (org. no. 559388-9511), a company registered in Sweden. Contact: info@quizvibe.se. Full details are in the Privacy Policy and Terms of Service under Legal.',
       },
     ],
   },
@@ -344,7 +344,7 @@ export default function FAQScreen() {
         })}
 
         <Text style={styles.footnote}>
-          Missing an answer? Email infoquizvibe@gmail.com and we'll add
+          Missing an answer? Email info@quizvibe.se and we'll add
           the question here if it's of general value.
         </Text>
 

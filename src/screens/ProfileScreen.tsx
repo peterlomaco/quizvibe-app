@@ -1146,7 +1146,7 @@ export default function ProfileScreen() {
     if (!result.ok) {
       Alert.alert(
         'Could not delete account',
-        `Something went wrong (${result.reason}). Please try again, or email infoquizvibe@gmail.com if the problem persists.`,
+        `Something went wrong (${result.reason}). Please try again, or email info@quizvibe.se if the problem persists.`,
       );
       return;
     }

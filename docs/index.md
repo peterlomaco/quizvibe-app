@@ -37,6 +37,6 @@ QuizVibe is free to download and play. An optional **QuizVibe Premium** subscrip
 
 ---
 
-QuizVibe is developed and operated by **Lomaco AB**, company registration number **559388-9511**, registered in Sweden.
+QuizVibe is developed and operated by **LoMaCo AB**, company registration number **559388-9511**, registered in Sweden.
 
 Contact: [info@quizvibe.se](mailto:info@quizvibe.se)
