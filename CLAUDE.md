@@ -1716,7 +1716,8 @@ YouTube-klippen är NOTERAT INTE bara musik — kan vara filmscener, sporthände
 - **Individual Devices** (turnOrder satt): `playerId = selfPlayerId` på varje enhet. `currentPlayerIndex` stannar på 0 i IndDev (ingen rotation), så om vi använde `turnOrder[currentPlayerIndex].id` skulle ALLA scores på non-host:s enhet attribueras till host (turnOrder[0]) — non-host:s egen rad visade då 0 i played rounds/correct/avg/pts genom hela spelet. selfPlayerId säkerställer att varje enhet attribuerar till sin lokala spelare.
 - **Direkt-nav** (tom turnOrder): bibehållit mock-opponent-flöde för gameplay-testning med MOCK_OPPONENTS.
 - `currentRoundScores` + `allRoundScoresHistory` uppdateras med exakt en post per fråga — så leaderboarden bara räknar upp Q-kolumnen för spelaren som faktiskt svarat.
-- **Cross-device score-aggregering är INTE implementerad** för IndDev. Varje enhets `allRoundScoresHistory` innehåller endast lokala spelarens scores; andra spelares rader visar 0 över hela linjen. `broadcastPlayerAnswerConfirmed` syncar bara avatar-markörer på timer-bar:en (`playerConfirms`-mapping), inte poäng/svarstid till leaderboard-aggregering. Känt gap; kräver separat broadcast-sync av RoundScore.
+- **Cross-device score-aggregering ÄR implementerad** för IndDev (denna punkt påstod motsatsen fram till 2026-08-14 — den var stale). Varje klient broadcastar `player_score_recorded` direkt efter `recordRoundScore`, och mottagarna mergar in posten i sin lokala `allRoundScoresHistory` så leaderboarden är komplett på alla enheter. `broadcast.self: false` + dedup på `${player_id}_${question_index}` gör det idempotent mot reconnect-replay; pending-kön drainas vid `player_rejoined`/`host_rejoined`. `broadcastPlayerAnswerConfirmed` är något annat — den syncar bara avatar-markörer på timer-baren (`playerConfirms`).
+  - ⚠ **Mottagna peer-scores appendas som NYA yttre poster i ankomstordning**, inte i frågeindex-position. `allRoundScoresHistory[i]` är alltså **inte** fråga `i` så fort fler än en enhet spelar. Behöver du veta vilken fråga ett svar gällde: läs `RoundScore.questionIndex` (se prisutdelnings-sektionen).
 
 ## Quiz — Get Ready to Vibe intro screen
 
@@ -1855,7 +1856,7 @@ Sport-tabell-layout som driver både GetReadyIntro:s utfällbara leaderboard OCH
 
 **Final leaderboard-knappar** (när `isLastRound`, i sticky footer):
 
-> ⚠ **Host:s Play Again är BORTA sedan 2026-08-08** — i ALLA slutskärmar (lokalt spel, guest-hostat och remote) ersätts den av den gula "Start New Game"-knappen (se "Start New Game på Final Leaderboard" nedan). `PlayAgainButton` lever kvar ENBART för non-hosts ("Approve / re-match"); host-varianten (blå single-line "Play again") är därmed **dormant kod** — liksom `handlePlayAgain` och `playAgainModalVisible`-modalen i [app/quiz.tsx](app/quiz.tsx). Beskrivningen av host-varianten nedan är historik.
+> ⚠ **Host:s Play Again är BORTA sedan 2026-08-08** — i ALLA slutskärmar (lokalt spel, guest-hostat och remote) ersätts den av den gula "Start New Game"-knappen (se "Start New Game på Final Leaderboard" nedan). `PlayAgainButton` lever kvar ENBART för non-hosts ("Approve / Replay"); host-varianten (blå single-line "Play again") är därmed **dormant kod** — liksom `handlePlayAgain` och `playAgainModalVisible`-modalen i [app/quiz.tsx](app/quiz.tsx). Beskrivningen av host-varianten nedan är historik.
 
 - **Home** (vänster, `flex: 1`): `<QuizVibeQAvatar size={32} />` + "Home"-text i `flexDirection: 'row'` + `gap: Spacing.sm`. Bg `Colors.card`, border `Colors.border` (1.5 px), `Colors.primary`-text. Speglar TopUserBanner:s "Home"-backlink men på en row-layout istället för column.
 - **Play Again** (höger, `flex: 1`): renderas av `PlayAgainButton` (intern komponent i [RoundLeaderboard.tsx](src/components/RoundLeaderboard.tsx)). Pressable:n är transparent — den synliga formen är 100% SVG (`PlayAgainLoopBorder`):
@@ -1864,9 +1865,9 @@ Sport-tabell-layout som driver både GetReadyIntro:s utfällbara leaderboard OCH
   - **Chevron** (`chevronPath`): stängd ◁-triangel som hänger ner från bottenkanten — top-hörnet på bottenkant-nivå, vertikal höger-sida, diagonal upper-left arm till spetsen (16 px till vänster, på halv höjd), diagonal upper-right arm tillbaka till top via `Z`. Filled + strokad i samma `color` så formen läses som solid vänster-pekande pil. Spetsen sitter på `triangleTipY = bottom` (= mitten av triangelns vertikala span); triangelns BOTTOM-corner landar på `y = height` (= button-bottom).
 - **Tre färg-/state-varianter** för Play Again-knappen via `color`-prop:
   1. **Host** (eller Pass-the-Phone): `Colors.primary` (blå) — alltid aktiv, lines = `['Play again']` (single-line). **DORMANT sedan 2026-08-08** (se varningen ovan).
-  2. **Non-host efter host:s tap** (`hostInitiatedPlayAgain === true`): `Colors.warning` (guld) — aktiv "Approve / re-match", lyser upp för att signalera "actionable" och skilja från host:s blå.
+  2. **Non-host efter host:s tap** (`hostInitiatedPlayAgain === true`): `Colors.warning` (guld) — aktiv "Approve / Replay", lyser upp för att signalera "actionable" och skilja från host:s blå.
   3. **Non-host innan host tappat**: `Colors.textSecondary` (dämpat grå) — disabled, ingen `onPress`, plus kant-skärande **"ACTIVATED BY HOST"-badge** i top-position (`playAgainBadge`, guld bg + svart text).
-- **Two-line text för non-host** (`finalPlayAgainTextSmall`): FontSize.sm + lineHeight 16, letterSpacing 0.2, textAlign center. Stackar "Approve" / "re-match" vertikalt så de ryms inom button-bredden utan trunkering (hette "Approve / Play again" t.o.m. 2026-08-08). Host:s single-line "Play again" använder större `finalPlayAgainText` (FontSize.md). Text är title-case (P + A i versal, "again" gemener) — INGEN `textTransform: 'uppercase'`.
+- **Two-line text för non-host** (`finalPlayAgainTextSmall`): FontSize.sm + lineHeight 16, letterSpacing 0.2, textAlign center. Stackar "Approve" / "Replay" vertikalt så de ryms inom button-bredden utan trunkering (hette "Approve / Play again" t.o.m. 2026-08-08 och "Approve / re-match" t.o.m. 2026-08-14). Host:s single-line "Play again" använder större `finalPlayAgainText` (FontSize.md). Text är title-case — INGEN `textTransform: 'uppercase'`.
 - **Dynamiska höjder** (alignering med Home):
   - HOST: `PLAY_AGAIN_BUTTON_HEIGHT_COMPACT = 56`. Båda knapparna 56 px. Rektangelns bottenkant + chevron-spets på `y = 56` (= button-bottom = Home-bottom). Chevron extends 7 px UNDER Pressable:n; SVG-höjden bumpas till `max(buttonHeight, bottomY + TRIANGLE_HALF_H + 1)` = 64 så strokeLinejoin-round ryms. SVG positioneras med `{ position: 'absolute', top: 0, left: 0 }` (INTE absoluteFillObject) så den kan extends utanför Pressable-bounds (parent har `overflow: 'visible'`).
   - NON-HOST: `PLAY_AGAIN_BUTTON_HEIGHT_EXPANDED = 64`. Play Again Pressable 64 px (rymmer two-line text + chevron), Home 57 px (= `bottomY` = `playAgainHeight - TRIANGLE_HALF_H`). Båda top-aligned via `alignItems: 'flex-start'` på `finalActions` — Home:s underkant linjerar med rektangel-outlinens bottenkant + chevron-spetsen, INTE med chevron:s bottom-corner.
@@ -1881,14 +1882,71 @@ Båda knappar `flex: 1` så footer-raden fylls 50/50 med Spacing.sm gap mellan; 
 - **Z-order: ÖVER tabellen, UNDER sticky footer**: wrap:n är renderad EFTER ScrollView i JSX men FÖRE `stickyFooter` — så Q+pokal fungerar som transparent vattenstämpel ovanpå spelar-rader (`opacity={0.22}` håller text/siffror läsbara genom) men Home/Play Again-knapparna ligger ovanpå vattenstämpeln. `pointerEvents="none"` på wrap:n så taps på underliggande rader/Pressables inte blockas.
 - Renderas för **alla** spel-lägen (single-player, PtP, IndDev) — gating är på `isLastRound`-prop, inte gameMode.
 
+## Prisutdelnings-sekvens före Final Leaderboard (2026-08-14)
+
+Mellan sista frågans reveal och slutskärmen spelas en kort prisutdelning: guld-Q + pokal fjädrar in med konfetti, följt av automatiskt bläddrande **match highlights**-kort, som sedan tonar bort och avslöjar den befintliga slutskärmen. [FinalCelebration.tsx](src/components/FinalCelebration.tsx) + [Confetti.tsx](src/components/Confetti.tsx) + [matchHighlights.ts](src/utils/matchHighlights.ts).
+
+**Overlay, inte ersättande vy.** `<FinalCelebration>` renderas som syskon EFTER `<RoundLeaderboard>` i `phase === 'leaderboard'`-returen och tonar bort för att avslöja den. Skälet: slutskärmens effekter (`saveFinalGame`, `finalizePlayer` mot servern, `track('game_completed')`) körs redan när fasen blir `'leaderboard'` och får **inte** fördröjas av en animation. Bygg aldrig om detta till en vy som ersätter leaderboarden.
+
+**Märket blir vattenstämpeln.** Celebration-märket använder EXAKT samma geometri, storlek och position som `bgFinalWrap`/`bgFinalTrophy`/`bgFinalBrand` ovan, och tonas vid "settle" ned till samma `opacity 0.22`. När slöjan försvinner ligger den riktiga vattenstämpeln redan där, identisk — bytet är osynligt och läses som ETT märke som dimmas. ⚠ **Ändras `BG_Q_SIZE` eller `bgFinalBrand` i RoundLeaderboard måste `Q_SIZE`/`brand` i FinalCelebration ändras med.**
+
+**Gating**: `isLastQuestion && !summaryDone`. `phase` kan bli `'leaderboard'` även MELLAN ronder via footerns `Next Round →`-gren — där ska ingen prisutdelning fyra.
+
+**Korten** (prioritetsordning, max `MAX_HIGHLIGHT_CARDS = 6`):
+
+| # | Kort | Villkor |
+|---|---|---|
+| 1 | Flest rätt totalt | alltid |
+| 2 | Snabbast att låsa svar (snittid) | alltid |
+| 3 | Snabbaste enskilda rätta svar | minst ett rätt svar finns |
+| 4-6 | Bäst på YouTube / Spotify / Hints | källan har ≥2 frågor |
+| 7-9 | Bäst på Musik / Film / Sport | kategorin har ≥2 frågor |
+
+**Kort 2 mäter snittiden att låsa ett svar oavsett rätt/fel** — samma tal som tabellens `AVG`-kolumn och samma som redan avgör vid poänglika i sorteringen. Sekvensen förstärker alltså poängmodellen spelarna redan spelar efter. **Timeouts räknas MED** (registreras med full svarstid — man låste aldrig ett svar), **`connectionError` räknas BORT** (nätverkets fel; tabellen särredovisar dem redan). Ändra inte det utan att också ändra `AVG`, annars motsäger kortet tabellen under.
+
+**`MIN_QUESTIONS_PER_BUCKET = 2`** är avsiktlig: standardspelet är 4 rundor, och utan tröskeln dyker "Bäst på Sport — Anna, 1 av 1" upp och läses som ihåligt. Hinkar utan data hoppas över automatiskt — spelades ingen Spotify finns inget Spotify-kort, utan extra flagga.
+
+**`mode`**: `competitive` namnger vinnaren; `personal` utelämnar namnet och skriver "Music — 3 of 4" i stället. Personal används vid **enspelarläge och remote 1v1**.
+
+⚠ **"Bild"-frågor och "Hints" är SAMMA hink.** Personbilderna är juridiskt parkerade — det som spelas är flagga + ledtrådar. Kortet heter `Hints` (appens eget namn i Source Mixerboard). Lägg inte till ett separat bildkort.
+
+**`RoundScore.questionIndex`** (nytt, optional) är det som gör kategorikorten möjliga. ⚠ **Man kan INTE använda `allRoundScoresHistory`:s yttre index** — i IndDev appendas mottagna peer-scores som nya yttre poster i ankomstordning (`playerScoreRecordedHandlerRef`), så yttre index ≠ frågeindex så fort fler än en enhet spelar. Fältet sätts från `questionIndexRef.current` lokalt och från `payload.question_index` för peers (som tidigare bara användes till dedup-nyckeln). Joinas mot `effectiveCategoryByQuestion` / `effectiveMediaSourceByQuestion` — båda indexerade mot host:s auktoritativa sekvens och korrekta på alla enheter.
+
+**Kort-slidern** — korten ligger i en horisontell `ScrollView` med `pagingEnabled` (en sida = full skärmbredd, krav för paging). Spelaren sveper själv; prick-indikatorn under visar vilket kort av hur många (döljs vid ett enda kort). **Auto-bläddringen stannar PERMANENT vid första egna svepet** (`userTookOver`) — annars slåss auto-framåt mot den som just svepte bakåt. **"Leave summary"** sitter under prickarna, utanför kortet, och renderas ÄVEN när det inte finns några kort — den är enda vägen ut.
+
+**Varje enhet äger sin EGEN sekvens (Peter 2026-08-14).** Ingen host-styrning, ingen broadcast — `skip_summary`-eventet som fanns i ett tidigt utkast är borttaget ur syncChannel; återinför det inte. Alla spelare, i alla lägen, lämnar när de själva vill.
+- ⚠ **Sekvensen avslutas ALDRIG av sig själv.** Når auto-bläddringen sista kortet stannar den där och väntar på tappet. Ett tidigare utkast tonade ut automatiskt efter sista kortet — men eftersom alla enheter har samma antal kort och samma timing gick de i mål nästan samtidigt, vilket såg ut som att hostens tapp kastade ut de andra. `setSummaryDone` nås numera bara via det lokala tappet; det finns ingen kod-väg mellan enheterna.
+- ⚠ **En host som går till Home avbryter INTE en non-host som fortfarande bläddrar.** `lobby_deleted`-handlern köar i stället popupen: träffar eventet medan `celebrationVisibleRef.current` är true sätts `pendingLobbyDeletedRef` och `showLobbyDeletedAlert()` körs först i `handleSummaryDone`. `lobbyDeletedAlertedRef` sätts direkt (som förut) så eventet aldrig dubbelfyrar.
+
+**Sekvensen har sin EGEN rubrik: "Game Summary"** (Peter 2026-08-14), placerad ovanför korten inuti overlayen — den försvinner alltså tillsammans med korten när spelaren trycker "Leave summary", varpå slutskärmens egen "Final Leaderboard"-rubrik tar över. Samma vikt och storlek (24 / 700 vit) så de två läser som samma nivå i hierarkin.
+- ⚠ **Försök INTE låta RoundLeaderboards rubrik lysa igenom slöjan.** Två utkast provade det: först en pixel-identisk kopia ritad i overlayen (gav en dubblett på fel plats), sedan en mätt `headerInset` via `onHeaderLayout` som slöjan började under (rubriken blev ändå aldrig tydligt vit). Båda är borttagna — `onHeaderLayout` finns inte längre på RoundLeaderboard. En egen rubrik som ägs av sekvensen är både enklare och tydligare.
+
+⚠ **Uttoningen animerar BARA `veil` (overlayens rot) — lägg aldrig till fler värden i den.** Ett tidigare utkast animerade även `blockOpacity` i en `Animated.parallel`, men kort-slidern avmonterades i samma ögonblick som `stage` blev `'fading'`; en native-driven animation mot den avmonterade noden gjorde att parallellen (`stopTogether: true`) aldrig rapporterade `finished`, så `onDone` aldrig fyrade och den touch-blockerande slöjan låg kvar — skärmen frös. Slidern hålls numera monterad under `'fading'`, och en watchdog-timeout (`veilOut + 400 ms`) anropar `fireDone` oavsett, eftersom en kvarliggande slöja blockerar all input.
+
+⚠ **Slöjan startar OPAK (`veil` initieras till 1), aldrig med en fade-in.** Fade-in lät leaderboard-tabellen synas först — och värre: `AccessibilityInfo.isReduceMotionEnabled()` await:as innan animationen ens startar, så glappet blev längre än de 400 ms man kodade. Det lästes som en blixt vid inträdet. Bara uttoningen i slutet animerar värdet.
+
+**Remote 1v1**: inget särfall längre för att lämna sekvensen (alla äger sin egen). Celebration visas alltid, men **highlights bara när matchen är avgjord** (`remoteSummaryReady`) — motståndarens rad kommer som färdigaggregerad `summaryStats` utan per-frågedata. Kort 1 och 2 fungerar ändå som riktiga dueller (`summaryStats` bär `correctAnswers` + `avgResponseSeconds`); kategori-/källkorten faller tillbaka på personlig form.
+
+**Konfettin är handrullad** — repot har varken konfetti- eller Lottie-modul, och resten av appens animationer använder RN:s `Animated` (Reanimated finns installerat men används ingenstans). **EN** `Animated.Value` driver alla bitar via per-bit-interpolation → en animation i stället för N. 40 bitar, 28 på skärmar under 700 px.
+
+**Reduce Motion** (`AccessibilityInfo.isReduceMotionEnabled()`) hoppar över konfetti och fjädring och kortar håll-tiderna, men kör sekvensen fullständigt.
+
+⚠ **Slöjan är en `Pressable` med no-op `onPress`, inte en `View`.** Overlayen är `box-none` och en View utan touch-handler blir aldrig responder — taps skulle falla igenom till Home/Play Again i sticky-footern under, som spelaren inte kan se. Skip-pillret renderas efter slöjan och ligger därför ovanpå den.
+
+**Känd begränsning**: i IndDev räknar varje enhet fram korten ur sin egen sammanslagna kopia. Tappas en `player_score_recorded`-broadcast kan två enheter visa olika vinnare på ett kort — samma egenskap som tabellen redan har, och retry/drain vid reconnect gör det ovanligt.
+
+**Delning till sociala medier är INTE byggd** (steg 2). Kräver `react-native-view-shot` + `expo-sharing` + `expo-file-system` som direkt dep → nytt dev-/TestFlight-bygge. Se planen för delningskortets spec.
+
+Tester: [backend/content/test/matchHighlights.test.ts](backend/content/test/matchHighlights.test.ts) (16 st) låser kortordning, ≥2-regeln, maxtaket, autoskippade hinkar, personal/competitive och snittidens timeout-/connectionError-semantik.
+
 ## Start New Game på Final Leaderboard (lokalt spel + guest-hostat) — 2026-08-08
 
 Host:s **Play Again** är borttagen ur slutskärmen och ersatt av samma gula **"Start New Game"** som på Home (`startNewGameBtn` — 56 px, `Colors.warning` bg+kant, svart text), med en **invite-fråga inskjuten mellan tappet och lägesvalet**. Footer-raden blir Home-only.
 
-**Flöde (host):** tap → credit-gate → `Alert "Invite Players from previous Game?"`
+**Flöde (host):** tap → credit-gate → `Alert "Replay and Aggregate Leaderboard"`
 - **Cancel** → tillbaka till Final Leaderboard (inget broadcastas).
 - **No, start fresh** → utfällningen visas normalt (Local + Remote). Local Play → `goToNewLobby(false)`; Remote Play → `handleStartNewGameFromFinal('1v1')`.
-- **Yes, invite them** → `rematchInvite=true`; **Remote Play göms** (lokala spelare kan inte bäras in i en duell) och i IndDev broadcastas `play_again_initiated` så non-hosts "Approve / re-match"-knapp tänds. **Local Play renderas grå** (`localLocked`) tills alla non-hosts godkänt; en statusrad under panelen visar "Waiting for N of M players to approve" + `SequentialDots` → "✓ All players have approved". Upplåst tap → `askKeepSettingsThenGo()` → `goToNewLobby(true, keep)` (oförändrad carry-over-maskineri inkl. `play_again_lobby_ready`-broadcasten).
+- **Yes, same players again** → `rematchInvite=true`; **Remote Play göms** (lokala spelare kan inte bäras in i en duell) och i IndDev broadcastas `play_again_initiated` så non-hosts "Approve / Replay"-knapp tänds. **Local Play renderas grå** (`localLocked`) tills alla non-hosts godkänt; en statusrad under panelen visar "Waiting for N of M players to approve" + `SequentialDots` → "✓ All players have approved". Upplåst tap → `askKeepSettingsThenGo()` → `goToNewLobby(true, keep)` (oförändrad carry-over-maskineri inkl. `play_again_lobby_ready`-broadcasten).
 
 Andra tappet på "Start New Game" stänger panelen igen (toggle) — host:s andra utväg tillbaka till leaderboarden.
 
@@ -1904,19 +1962,19 @@ Andra tappet på "Start New Game" stänger panelen igen (toggle) — host:s andr
 - [app/quiz.tsx](app/quiz.tsx): `handleLocalStartNewGamePress` + `handleLocalStartNewGameSelect` + state `startNewGameExpanded`/`rematchInvite`. Credit-gaten är utbruten till **`ensureHostCreditsForNewGame()`** (guest host → alltid true, Premium → true, annars tre-vägs-popupen med Purchase subscription / Restart as Guest / Exit).
 
 **Credit-gaten körs på TVÅ ställen** (fix 2026-08-08 — Peter landade i en ny lobby som var "out of Host Game Credits", dvs. host kunde inte starta något spel i den):
-1. **Fail-fast vid tappet** (`handleLocalStartNewGamePress`, före invite-frågan) så vi aldrig broadcastar en re-match-inbjudan host inte kan fullfölja.
+1. **Fail-fast vid tappet** (`handleLocalStartNewGamePress`, före replay-frågan) så vi aldrig broadcastar en replay-inbjudan host inte kan fullfölja.
 2. **AUKTORITATIVT i `goToNewLobby`**, direkt efter `asGuestHost` beräknats och FÖRE `registerActiveRoom` — alla lokala lobby-skapanden från Final Leaderboard passerar där (Start New Game → invite-prompt → Local Play → ev. Keep/Reset-alert → `goToNewLobby`, plus de dormanta Play Again-vägarna). Blockeras den skapas inget rum och ingen navigation sker. Gaten hänger på **`asGuestHost`**, INTE `isGuestHostGame`: det är den NYA lobbyns värdskap som avgör om credits behövs, vilket också gör att credit-gatens egen "Restart as Guest"-utväg (`guestOverride`) släpps igenom utan att loopa tillbaka in i samma Alert.
 
 Lägg alla framtida host-lobby-skapanden från quiz-skärmen bakom samma funnel — punkt 1 ensam räcker inte, eftersom det kan gå lång tid (approval-väntan, Alert-steg) mellan tappet och det faktiska skapandet. `handleStartNewGameFromFinal` (remote + "No, start fresh" → Remote Play) har sin EGEN gate med Cancel / Go to Store — medvetet en annan utväg än "Restart as Guest", som inte finns för remote (users-only).
 
 ## Play Again approval flow (Individual Devices)
 
-> ⚠ Sedan 2026-08-08 nås detta flöde från **"Start New Game" → "Yes, invite them"** (gäller BÅDE registrerade och guest-hostade spel). **Host-side-modalen nedan är därmed dormant** — approval-statusen visas i stället som grå Local Play + statusrad i utfällningen. Sync-events, `playAgainApprovals`-räkningen och non-host-halvan (`handleApprovePlayAgain`, "Approve / re-match") är oförändrade och LIVE.
+> ⚠ Sedan 2026-08-08 nås detta flöde från **"Start New Game" → "Yes, same players again"** (gäller BÅDE registrerade och guest-hostade spel). **Host-side-modalen nedan är därmed dormant** — approval-statusen visas i stället som grå Local Play + statusrad i utfällningen. Sync-events, `playAgainApprovals`-räkningen och non-host-halvan (`handleApprovePlayAgain`, "Approve / Replay") är oförändrade och LIVE.
 
 **(Historik — så här såg host-sidan ut före 2026-08-08.)** **Pass-the-Phone** använde direkt `Alert.alert("Re-use all players?", …)`-flödet med Cancel/Start fresh/Yes, keep them (alla på samma enhet — inget att vänta in). **Individual Devices** körde en custom modal istället så host:s "Yes, keep them"-knapp kunde vara visuellt utgråad tills alla non-hosts broadcastat sin Approve-signal.
 
 **Sync-events** ([syncChannel.ts](src/lib/realtime/syncChannel.ts)):
-- `play_again_initiated` (host → alla): broadcastas när host tappar Play Again-knappen, omedelbart innan modalen öppnas (guest-spel) — respektive när host svarar **"Yes, invite them"** på invite-frågan (lokalt Start New Game-flöde). Non-host:s "Approve / re-match"-knapp flippar från dämpad till aktiv guld-styling (`hostInitiatedPlayAgain=true`).
+- `play_again_initiated` (host → alla): broadcastas när host tappar Play Again-knappen, omedelbart innan modalen öppnas (guest-spel) — respektive när host svarar **"Yes, same players again"** på replay-frågan (lokalt Start New Game-flöde). Non-host:s "Approve / Replay"-knapp flippar från dämpad till aktiv guld-styling (`hostInitiatedPlayAgain=true`).
 - `player_approved_play_again` (non-host → host): broadcastas när non-host tappar sin Approve-knapp. Host adder `player_id` till `playAgainApprovals: Set<string>` (idempotent).
 - `play_again_lobby_ready` (host → alla): broadcastas DIREKT efter `registerActiveRoom` + `setLobbyPlayers` + `setLobbySettings` men INNAN `router.replace`. Bär nya rumkoden.
 - `lobby_deleted` (host → alla): broadcastas när host tappar Home från Final Leaderboard via `handleGoHome` ([app/quiz.tsx](app/quiz.tsx)). Skickas FÖRE `deactivateRoom`+cleanup-bunten så non-host:s syncChannel hinner ta emot innan host:s channel rivs vid component-unmount. Non-host:s handler visar Alert "Host has deleted this lobby" + auto-nav till Home, oavsett om de står på Final Leaderboard direkt eller är fast på "Please Wait..."-overlay efter Approve. Guard via `lobbyDeletedAlertedRef` mot dubbelfyrning. Releaserar även `awaitingNewLobby=false` för att stänga lock-overlay.

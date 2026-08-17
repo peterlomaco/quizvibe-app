@@ -16,6 +16,7 @@ import {
   type RoundScore,
 } from '@/src/components/RoundLeaderboard';
 import { SequentialDots } from '@/src/components/SequentialDots';
+import FinalCelebration from '@/src/components/FinalCelebration';
 import { RemoteMatchResultPanel } from '@/src/components/RemoteMatchResultPanel';
 import { StopwatchIcon } from '@/src/components/StopwatchIcon';
 import { useConnectionStatus } from '@/src/lib/network/connectionMonitor';
@@ -58,6 +59,7 @@ import {
 } from '@/src/utils/mockLobbySettings';
 import { buildAudienceSet, filterByAudience } from '@/src/utils/audienceFilter';
 import { isMainCategory, subjectToMainCategory, itemMatchesEnabledCategories, type MainCategory } from '@/src/utils/mainCategory';
+import { buildMatchHighlights } from '@/src/utils/matchHighlights';
 import { clearGameStarted } from '@/src/utils/mockStartedGames';
 import { MUSIC_QUESTIONS } from '@/src/utils/musicQuestions';
 import {
@@ -3307,11 +3309,17 @@ export default function QuizScreen() {
       (gameMode === 'individual-devices' || gameMode === 'remote-1v1') && selfPlayerId
         ? selfPlayerId
         : (turnOrder[currentPlayerIndex]?.id ?? 'you');
+    // questionIndex bärs med så match highlights kan joina score → fråga
+    // (kategori/mediakälla). Läses ur ref:en, inte state, eftersom
+    // recordRoundScore anropas från timer-callbacks vars closure kan vara
+    // en render gammal.
+    const scoredQuestionIndex = questionIndexRef.current;
     const yourScore: RoundScore = {
       playerId: activePlayerId,
       points: yourPoints,
       correct: yourCorrect,
       timeUsed: yourTimeUsed,
+      questionIndex: scoredQuestionIndex,
       ...(connectionError ? { connectionError: true } : {}),
     };
     let allScores: RoundScore[] = [yourScore];
@@ -3324,6 +3332,7 @@ export default function QuizScreen() {
           points: gen.points,
           correct: gen.correct,
           timeUsed: generateOpponentTimeUsed(),
+          questionIndex: scoredQuestionIndex,
         };
       });
       allScores = [yourScore, ...opponentScores];
@@ -4519,6 +4528,11 @@ export default function QuizScreen() {
           points: payload.points,
           correct: payload.correct,
           timeUsed: payload.time_used,
+          // Bevaras (användes tidigare bara till dedup-nyckeln ovan) så
+          // match highlights kan joina peer-svar mot rätt fråga. Posten
+          // appendas i ankomstordning, så detta är ENDA kopplingen till
+          // vilken fråga svaret gällde.
+          questionIndex: payload.question_index,
         }],
       ]);
     };
@@ -5014,7 +5028,7 @@ export default function QuizScreen() {
   // slutskärmar (lokalt spel + guest-hostat kör "Start New Game"-flödet,
   // remote har aldrig haft Play Again), så den här handlern — och
   // `playAgainModalVisible`-modalen den öppnar — nås inte längre. Behålls
-  // som referens/åter-aktiveringspunkt; non-host-halvan (Approve re-match →
+  // som referens/åter-aktiveringspunkt; non-host-halvan (Approve Replay →
   // `handleApprovePlayAgain` + broadcast-maskineriet) är däremot LIVE.
   const handlePlayAgain = async () => {
     // Guest host har max 1 replay — knappen är redan dold vid >= 1 (Round-
@@ -5254,10 +5268,12 @@ export default function QuizScreen() {
   // Play Again-knapp — i stället samma gula "Start New Game" som Home, med
   // en invite-fråga inskjuten före lägesvalet:
   //
-  //   Start New Game → "Invite Players from previous Game?"
-  //     • Yes → utfällningen visar BARA Local Play, grå tills alla non-hosts
-  //             godkänt re-matchen (deras knapp: "Approve re-match").
-  //     • No  → normal utfällning (Local + Remote), färsk lobby utan spelare.
+  //   Start New Game → "Replay and Aggregate Leaderboard"
+  //     • Yes, same players again → utfällningen visar BARA Local Play, grå
+  //             tills alla non-hosts godkänt reprisen (deras knapp:
+  //             "Approve Replay").
+  //     • No, start fresh → normal utfällning (Local + Remote), färsk lobby
+  //             utan spelare.
   //     • Cancel → tillbaka till Final Leaderboard.
   //
   // Guest-hostade spel kör SAMMA flöde (2026-08-08) med två skillnader:
@@ -5266,8 +5282,8 @@ export default function QuizScreen() {
   // låsta). Deras 1-replay-cap ligger kvar: vid guestReplaysUsed >= 1
   // renderas ingen "Start New Game" alls — bara Home, precis som förr.
   const [startNewGameExpanded, setStartNewGameExpanded] = useState(false);
-  // Host valde "Yes, invite them" → carry-over av föregående spelare (och,
-  // i IndDev, väntan på deras godkännande innan lobbyn får skapas).
+  // Host valde "Yes, same players again" → carry-over av föregående spelare
+  // (och, i IndDev, väntan på deras godkännande innan lobbyn får skapas).
   const [rematchInvite, setRematchInvite] = useState(false);
 
   const handleLocalStartNewGamePress = async () => {
@@ -5292,23 +5308,15 @@ export default function QuizScreen() {
       return;
     }
     Alert.alert(
-      'Invite Players from previous Game?',
+      'Replay and Aggregate Leaderboard',
       'Bring the players from this game into the new lobby, or start with an empty lobby?',
       [
-        { text: 'Cancel', style: 'cancel' },
         {
-          text: 'No, start fresh',
-          onPress: () => {
-            setRematchInvite(false);
-            setStartNewGameExpanded(true);
-          },
-        },
-        {
-          text: 'Yes, invite them',
+          text: 'Yes, same players again',
           onPress: () => {
             setRematchInvite(true);
             setStartNewGameExpanded(true);
-            // Non-hosts "Approve re-match"-knapp lyser upp direkt. Avbryter
+            // Non-hosts "Approve Replay"-knapp lyser upp direkt. Avbryter
             // host efteråt står knappen kvar aktiv (samma dokumenterade
             // beteende som gamla Play Again-broadcasten).
             if (gameMode === 'individual-devices' && syncChannelRef.current) {
@@ -5318,6 +5326,14 @@ export default function QuizScreen() {
             }
           },
         },
+        {
+          text: 'No, start fresh',
+          onPress: () => {
+            setRematchInvite(false);
+            setStartNewGameExpanded(true);
+          },
+        },
+        { text: 'Cancel', style: 'cancel' },
       ],
     );
   };
@@ -5407,6 +5423,20 @@ export default function QuizScreen() {
   const lobbyDeletedAlertedRef = useRef(false);
   // Ref för broadcast-handler av lobby-deleted-event.
   const lobbyDeletedHandlerRef = useRef<() => void>(() => {});
+  // Host raderade lobbyn MEDAN vi fortfarande bläddrar i prisutdelnings-
+  // sekvensen. Sekvensen ska inte avbrytas — popupen köas i stället och
+  // visas när spelaren själv lämnar summary:n.
+  const pendingLobbyDeletedRef = useRef(false);
+  const celebrationVisibleRef = useRef(false);
+  const showLobbyDeletedAlert = useCallback(() => {
+    setAwaitingNewLobby(false);
+    Alert.alert(
+      'Host has deleted this lobby',
+      '',
+      [{ text: 'OK', onPress: () => router.replace('/') }],
+      { cancelable: false },
+    );
+  }, []);
   useEffect(() => {
     playAgainInitiatedHandlerRef.current = () => {
       if (!isHost) setHostInitiatedPlayAgain(true);
@@ -5465,13 +5495,13 @@ export default function QuizScreen() {
       if (isHost) return;
       if (lobbyDeletedAlertedRef.current) return;
       lobbyDeletedAlertedRef.current = true;
-      setAwaitingNewLobby(false);
-      Alert.alert(
-        'Host has deleted this lobby',
-        '',
-        [{ text: 'OK', onPress: () => router.replace('/') }],
-        { cancelable: false },
-      );
+      // Bläddrar spelaren fortfarande i prisutdelnings-sekvensen? Avbryt den
+      // INTE — köa popupen tills de själva lämnar via "Leave summary".
+      if (celebrationVisibleRef.current) {
+        pendingLobbyDeletedRef.current = true;
+        return;
+      }
+      showLobbyDeletedAlert();
     };
     hostActivePingHandlerRef.current = (
       hostQuestionIndex: number,
@@ -5799,6 +5829,63 @@ export default function QuizScreen() {
       },
     ];
   }, [gamePlayers, remoteOpponentSummary, totalQuestions]);
+
+  // ── Prisutdelnings-sekvens (celebration + match highlights) ──────────────
+  // Overlay ovanpå Final Leaderboard. Se FinalCelebration.tsx för varför det
+  // är en overlay och inte en ersättande vy (kort version: slutskärmens
+  // server-effekter ska inte fördröjas av en animation).
+  // Varje enhet äger sin EGEN sekvens: spelaren lämnar den när de vill via
+  // "Leave summary". Ingen broadcast, ingen host-styrning — en host som går
+  // till Home avbryter alltså inte en non-host som fortfarande bläddrar.
+  const [summaryDone, setSummaryDone] = useState(false);
+
+  // Highlights kräver per-fråge-underlag från BÅDA spelarna. I remote finns
+  // ingen sync-channel — motståndarens rad kommer som färdigaggregerad
+  // summaryStats — så vi väntar tills matchen är avgjord. Är den inte det
+  // visas bara celebration och sedan slutskärmen ("Waiting for opponent").
+  const remoteSummaryReady = !isRemote || !!remoteOpponentSummary || remoteMatchEnded;
+
+  // Personal-läge när det inte finns någon att jämföra med: ensam spelare,
+  // eller remote där kategori-/källjämförelser saknar underlag.
+  const highlightMode =
+    isRemote || leaderboardPlayers.length < 2 ? 'personal' : 'competitive';
+
+  const matchHighlights = useMemo(() => {
+    if (phase !== 'leaderboard' || !isLastQuestion || !remoteSummaryReady) return [];
+    return buildMatchHighlights({
+      scores: allRoundScoresHistory,
+      players: leaderboardPlayers,
+      categoryByQuestion: effectiveCategoryByQuestion,
+      mediaSourceByQuestion: effectiveMediaSourceByQuestion,
+      mode: highlightMode,
+    });
+  }, [
+    phase,
+    isLastQuestion,
+    remoteSummaryReady,
+    allRoundScoresHistory,
+    leaderboardPlayers,
+    effectiveCategoryByQuestion,
+    effectiveMediaSourceByQuestion,
+    highlightMode,
+  ]);
+
+  // Speglar om prisutdelnings-overlayen faktiskt är uppe. Läses av
+  // lobby_deleted-handlern (registrerad EN gång vid mount) för att skjuta
+  // upp "Host has deleted this lobby"-popupen tills spelaren lämnat
+  // sekvensen — den ska aldrig avbrytas mitt i.
+  celebrationVisibleRef.current =
+    phase === 'leaderboard' && isLastQuestion && !summaryDone;
+
+  // Spelaren lämnade sekvensen. Har host hunnit radera lobbyn under tiden
+  // visas den uppskjutna popupen nu i stället.
+  const handleSummaryDone = useCallback(() => {
+    setSummaryDone(true);
+    if (pendingLobbyDeletedRef.current) {
+      pendingLobbyDeletedRef.current = false;
+      showLobbyDeletedAlert();
+    }
+  }, [showLobbyDeletedAlert]);
 
   // Frågor som hunnit visas i den här sessionen — skrivs till seen-
   // historiken så de inte återkommer direkt i NÄSTA spel. I remote är
@@ -6641,7 +6728,7 @@ export default function QuizScreen() {
           onLocalPlayLockedPress={() =>
             Alert.alert(
               'Waiting for players',
-              'The new lobby opens as soon as every player has approved the re-match.',
+              'The new lobby opens as soon as every player has approved the replay.',
             )
           }
           // Guest host: Remote Play visas ALDRIG — remote 1vs1 spelas enbart
@@ -6696,6 +6783,16 @@ export default function QuizScreen() {
             ) : undefined
           }
         />
+        {/* Prisutdelnings-sekvensen. Ligger OVANPÅ den redan monterade
+            slutskärmen och tonar bort för att avslöja den — så alla
+            leaderboard-effekter (saveFinalGame, finalizePlayer, analytics)
+            hinner köra medan sekvensen spelar.
+            Gating på isLastQuestion är viktigt: phase kan bli 'leaderboard'
+            även MELLAN ronder via footerns "Next Round →"-gren, och där ska
+            ingen prisutdelning fyra. */}
+        {isLastQuestion && !summaryDone && (
+          <FinalCelebration highlights={matchHighlights} onDone={handleSummaryDone} />
+        )}
         {/* Lock-overlay för non-host som tappat Approve Play Again men där
             host ännu inte hunnit skapa nya lobbyn. cancelable: false →
             ingen tap utanför card:en kan stänga; non-host väntar tills

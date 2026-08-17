@@ -313,6 +313,21 @@ export interface RoundScore {
   timeUsed: number; // sekunder
   /** true när frågan missades pga dålig uppkoppling (non-host unstableLocked). */
   connectionError?: boolean;
+  /**
+   * 0-baserat absolut frågeindex. Krävs för match highlights (bäst på
+   * Musik/YouTube/…) som joinar mot effectiveCategoryByQuestion /
+   * effectiveMediaSourceByQuestion — båda indexerade mot host:s
+   * auktoritativa sekvens.
+   *
+   * Man kan INTE använda allRoundScoresHistory:s yttre index istället: i
+   * Individual Devices appendas mottagna peer-scores som nya yttre poster i
+   * ankomstordning (se playerScoreRecordedHandlerRef i quiz.tsx), så yttre
+   * index ≠ frågeindex så fort fler än en enhet spelar.
+   *
+   * Optional för bakåtkompatibilitet — poster utan index filtreras bort ur
+   * kategori-/källkorten men räknas fortfarande i totaler och snittider.
+   */
+  questionIndex?: number;
 }
 
 export interface HcpChange {
@@ -836,8 +851,8 @@ export function RoundLeaderboard({
                 onStartNewGameLockedPress?.();
                 return;
               }
-              // Lokala re-match-flödet: call-siten frågar först "Invite
-              // Players from previous Game?" och öppnar panelen därefter.
+              // Lokala re-match-flödet: call-siten frågar först "Replay and
+              // Aggregate Leaderboard" och öppnar panelen därefter.
               if (onStartNewGamePress) {
                 onStartNewGamePress();
                 return;
@@ -965,13 +980,13 @@ export function RoundLeaderboard({
                   bottomY={bottomY}
                 />
               ) : hostInitiatedPlayAgain ? (
-                /* Non-host efter host:s tap: "Approve" / "Play again" på två
+                /* Non-host efter host:s tap: "Approve" / "Replay" på två
                    rader så texten ryms inom button-bredden. Aktiv styling i
                    GULD — host har "öppnat upp" knappen, så den lyser i
                    warning/premium-färgen för att signalera "actionable" och
                    skilja från host:s vanliga blå Play again. */
                 <PlayAgainButton
-                  lines={['Approve', 're-match']}
+                  lines={['Approve', 'Replay']}
                   color={Colors.warning}
                   onPress={onApprovePlayAgain}
                   disabled={false}
@@ -982,7 +997,7 @@ export function RoundLeaderboard({
                 /* Non-host innan host tappat: dämpad two-line + "Activated by
                     Host"-badge kant-skärande i top-position. */
                 <PlayAgainButton
-                  lines={['Approve', 're-match']}
+                  lines={['Approve', 'Replay']}
                   color={Colors.textSecondary}
                   onPress={undefined}
                   disabled={true}
