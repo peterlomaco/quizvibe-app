@@ -185,12 +185,7 @@ items:
     probability: 92
     wikimediaSearchHints: ["Ingemar Stenmark 1980 Lake Placid Olympics slalom gold"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "zFy1OYa7Qm4"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Nostalgi"
-        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+    # youtubeClips borttagna 2026-08-19: zFy1OYa7Qm4 raderad/privatgjord på YouTube (nightly validate). Sökning gav bara klipp med "1980" i titeln = spoiler för Year-frågan. Ersättningsklipp krävs.
   - id: stenmark-os-guld-storslalom-1980
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Stenmark OS-guld storslalom Lake Placid"
@@ -198,12 +193,7 @@ items:
     probability: 88
     wikimediaSearchHints: ["Ingemar Stenmark 1980 Lake Placid Olympics giant slalom"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "zFy1OYa7Qm4"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Nostalgi"
-        notes: "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (10)."
+    # youtubeClips borttagna 2026-08-19: zFy1OYa7Qm4 raderad/privatgjord på YouTube (nightly validate). Sökning gav bara klipp med "1980" i titeln = spoiler för Year-frågan. Ersättningsklipp krävs.
   - id: gunde-svan-os-guld-1984
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Gunde Svan OS-guld 15 km Sarajevo"
@@ -328,12 +318,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Thomas Ravelli 1994 World Cup Romania penalty shootout"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "Yul90ZNSRFM"
-        startSec: 5
-        endSec: 20
-        channelTitle: "Nostalgi"
-        notes: "Refined query 2026-05-27 — Ravellis 1:a straffräddning Sverige-Rumänien VM 1994."
+    # youtubeClips borttagna 2026-08-19: Yul90ZNSRFM raderad/privatgjord på YouTube (nightly validate). Ersättningsklipp krävs — titeln får inte innehålla årtalet.
   - id: kerri-strug-atlanta-1996
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Kerri Strug hoppar skadad i Atlanta"

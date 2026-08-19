@@ -167,33 +167,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "mickeys-trailer-1938",
-    "displayName": "Mickey's Trailer",
-    "correctYear": 1938,
-    "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "aL7KlP0UcyA",
-        "startSec": 30,
-        "endSec": 60,
-        "channelTitle": "JP The Pro",
-        "license": "standard",
-        "notes": "Kalle Anka på husvagnssemester — Mickey, Donald och Langben i husvagnen (julaftonsklassiker). Hela korta filmen (7:43)."
-      }
-    ]
-  },
-  {
     "id": "glenn-miller-in-the-mood",
     "displayName": "In the Mood — Glenn Miller",
     "correctYear": 1939,
@@ -3931,60 +3904,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Star Wars",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-12. Officiella Star Wars-kanalen, ren titel utan skådespelar- eller års-spoiler."
-      }
-    ]
-  },
-  {
-    "id": "stenmark-os-guld-slalom-1980",
-    "displayName": "Stenmark OS-guld slalom Lake Placid",
-    "correctYear": 1980,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "zFy1OYa7Qm4",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Nostalgi",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
-      }
-    ]
-  },
-  {
-    "id": "stenmark-os-guld-storslalom-1980",
-    "displayName": "Stenmark OS-guld storslalom Lake Placid",
-    "correctYear": 1980,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "zFy1OYa7Qm4",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Nostalgi",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (10)."
       }
     ]
   },
@@ -8428,33 +8347,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Movieclips",
         "license": "standard",
         "notes": "Official trailer (Movieclips) — iconic surf-rock soundtrack + ensemble-shots. BEHÅLLET 2026-08-12: Peters förslag tGpTpVyI_OQ (Miramax) har titeln 'John Travolta, Uma Thurman, Samuel L. Jackson' = direkt spoiler för actor-select."
-      }
-    ]
-  },
-  {
-    "id": "ravelli-vm-94-rumanien",
-    "displayName": "Ravelli stoppar Rumäniens straffar VM-94",
-    "correctYear": 1994,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "Yul90ZNSRFM",
-        "startSec": 5,
-        "endSec": 20,
-        "channelTitle": "Nostalgi",
-        "license": "standard",
-        "notes": "Refined query 2026-05-27 — Ravellis 1:a straffräddning Sverige-Rumänien VM 1994."
       }
     ]
   },

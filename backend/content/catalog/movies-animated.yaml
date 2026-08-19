@@ -49,12 +49,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Mickey's Trailer 1938 Disney Donald Duck Goofy camping caravan"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "aL7KlP0UcyA"
-        startSec: 30
-        endSec: 60
-        channelTitle: "JP The Pro"
-        notes: "Kalle Anka på husvagnssemester — Mickey, Donald och Langben i husvagnen (julaftonsklassiker). Hela korta filmen (7:43)."
+    # youtubeClips borttagna 2026-08-19: aL7KlP0UcyA är embed-blockerad + region-blockerad i SE (nightly validate). Sökning gav bara klipp med "1938" i titeln (spoiler) eller reaction-videos. Ersättningsklipp krävs.
 
   - id: robin-hood-1973
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
