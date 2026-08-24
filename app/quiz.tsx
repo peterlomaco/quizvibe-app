@@ -2794,6 +2794,12 @@ export default function QuizScreen() {
   // svarar aldrig, och en peer vars broadcast ännu inte ankommit ska inte
   // felaktigt hamna under "Wrong answers". Listorna fylls därför på live
   // allteftersom svaren tas emot.
+  // "All Players"-facit i reveal-fasen är hopfällt tills host/spelaren
+  // trycker "+". Staten lever över frågebyten (samma component-instans) —
+  // har man en gång bett om facit vill man sällan tappa fram det varje
+  // runda. Samma +/− vokabulär som lobbyns kollapsbara sektioner.
+  const [answersExpanded, setAnswersExpanded] = useState(false);
+
   const revealAnswerSummary = useMemo(() => {
     if (gameMode !== 'individual-devices') return null;
     // Minst TVÅ spelare krävs — kortet jämför spelare med varandra.
@@ -7861,9 +7867,33 @@ export default function QuizScreen() {
                 remote scores som ankommer via sync uppdaterar listan live
                 allteftersom andra spelares svar tas emot. */}
             {phase === 'reveal' && revealAnswerSummary && (
-              <View style={[rv.container, rv.answersWrap]}>
+              <View
+                style={[
+                  rv.container,
+                  rv.answersWrap,
+                  answersExpanded && rv.answersWrapExpanded,
+                ]}
+              >
                 <View style={rv.answersCard}>
-                  <Text style={rv.answersTitle}>All Players</Text>
+                  {/* Kollapsbar rubrik — samma +/− toggle-box som lobbyns
+                      "Game Settings"/"Quiz Tuning" (26×26, borderStrong).
+                      Default hopfälld: facit ska inte trängas in i reveal-
+                      vyn oombedd (Peter 2026-08-24). */}
+                  <TouchableOpacity
+                    onPress={() => setAnswersExpanded((v) => !v)}
+                    activeOpacity={0.7}
+                    style={rv.answersHeaderRow}
+                    hitSlop={8}
+                  >
+                    <Text style={rv.answersTitle}>All Players</Text>
+                    <View style={rv.answersToggleBox}>
+                      <Text style={rv.answersToggleGlyph}>
+                        {answersExpanded ? '−' : '+'}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                  {answersExpanded && (
+                  <>
                   <View>
                     <Text style={[rv.answersHeading, rv.answersHeadingCorrect]}>
                       Correct
@@ -7900,6 +7930,8 @@ export default function QuizScreen() {
                       ))
                     )}
                   </View>
+                  </>
+                  )}
                 </View>
               </View>
             )}
@@ -9088,9 +9120,13 @@ const rv = StyleSheet.create({
   // svarsalternativen på korta skärmar.
   answersWrap: {
     marginTop: Spacing.md,
-    // Next-tab:en är absolut-positionerad i nedre högra hörnet (56 px hög
-    // + Spacing.lg botten-marginal) och ligger ovanpå scroll-zonen. Utan
-    // detta hamnar sista raden i listan under den.
+  },
+  // Next-tab:en är absolut-positionerad i nedre högra hörnet (56 px hög
+  // + Spacing.lg botten-marginal) och ligger ovanpå scroll-zonen. Utan
+  // detta hamnar sista raden i listan under den. Bara i utfällt läge —
+  // hopfälld är rutan så låg att den aldrig når tab:en, och padding:en
+  // hade bara lagt en död lucka i scroll-zonen.
+  answersWrapExpanded: {
     paddingBottom: 56 + Spacing.xl,
   },
   // Ruta runt hela facit-blocket. Ärver reveal-kortets färgspråk (Colors.card
@@ -9106,11 +9142,33 @@ const rv = StyleSheet.create({
     paddingHorizontal: Spacing.md,
     gap: Spacing.sm,
   },
+  // Rubrikrad: titel + 26×26 +/−-box, samma mönster som LobbyScreen:s
+  // sectionHeaderRow/sectionToggleBox/sectionChevron.
+  answersHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
   answersTitle: {
     fontSize: FontSize.md,
     fontWeight: FontWeight.bold,
     color: Colors.textPrimary,
     letterSpacing: 0.3,
+  },
+  answersToggleBox: {
+    width: 26,
+    height: 26,
+    borderRadius: Radius.sm,
+    borderWidth: 1,
+    borderColor: Colors.borderStrong,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  answersToggleGlyph: {
+    fontSize: 18,
+    fontWeight: FontWeight.bold,
+    color: Colors.textSecondary,
+    lineHeight: 20,
   },
   answersHeading: {
     fontSize: FontSize.sm,
