@@ -15,6 +15,7 @@ import {
   type LeaderboardPlayer,
   type RoundScore,
 } from '@/src/components/RoundLeaderboard';
+import type { HostLobbyType, LocalLobbyType } from '@/src/components/HostTypeOptions';
 import { SequentialDots } from '@/src/components/SequentialDots';
 import FinalCelebration from '@/src/components/FinalCelebration';
 import { RemoteMatchResultPanel } from '@/src/components/RemoteMatchResultPanel';
@@ -3016,6 +3017,10 @@ export default function QuizScreen() {
   // Remote 1v1 är undantaget — där är solo-sessionen per design och raden
   // ska finnas, så läget exkluderas explicit.
   const isLocalSoloGame = gameMode !== 'remote-1v1' && turnOrder.length <= 1;
+  // Vilket lokalt läge som JUST spelades. Final Leaderboard:s "Start New
+  // Game" ställer bara keep-players/keep-settings-frågorna när host väljer
+  // SAMMA läge igen; väljer de det andra startar allt från scratch.
+  const previousLocalMode: LocalLobbyType = isLocalSoloGame ? 'single' : 'multiplayer';
   // D-iv: ska denna enhet vara mute:ad under uppspelning? Pass-the-Phone och
   // Single Player delar device → alltid ljud på. Vid direkt-nav utan
   // selfPlayerId → fallback till audio på så ljudet hörs i mock-mode. I
@@ -4712,6 +4717,10 @@ export default function QuizScreen() {
     reusePlayers: boolean,
     keepSettings: boolean = true,
     guestOverride?: { guestName: string; guestBirthYear: number },
+    // Vilket läge nya lobbyn ska öppna i. Seedar singlePlayerDefault i
+    // LobbyScreen och vinner över carry-over-settings — host:s val i
+    // "Start New Game"-panelen är alltid det senaste ordet.
+    lobbyType: LocalLobbyType = 'multiplayer',
   ) => {
     // `guestOverride` (credit-gate:ns "Restart as Guest"): tvingar NYA
     // lobbyn till guest-host-läge även när DETTA spel hostades av en
@@ -4954,11 +4963,15 @@ export default function QuizScreen() {
           guestAssistance:
             carryOverPlayers.find((p) => p.isHost)?.assistance ?? 'full',
           guestReplays: guestOverride ? '0' : String(guestReplaysUsed + 1),
+          lobbyType,
         },
       });
       return;
     }
-    router.replace(`/lobby?code=${newCode}&isHost=true`);
+    router.replace({
+      pathname: '/lobby',
+      params: { code: newCode, isHost: 'true', lobbyType },
+    });
   };
 
   // Sekventiell Alert-flow: först fråga om spelarna ska följa med, sedan
@@ -4972,7 +4985,10 @@ export default function QuizScreen() {
   // — host måste då ha en utväg utan att tvingas välja Reset eller Keep.
   // Vid multi-player anrop:as den utan flagga (= 2 knappar) eftersom den
   // föregående "Yes, keep them"-tap:en redan motsvarade en Cancel-möjlighet.
-  const askKeepSettingsThenGo = (withCancel = false) => {
+  const askKeepSettingsThenGo = (
+    withCancel = false,
+    lobbyType: LocalLobbyType = 'multiplayer',
+  ) => {
     // Title växlar beroende på single-player (withCancel=true) vs multi-
     // player: single-player har bara en spelare = host så "per player"-
     // formuleringen är missvisande; använd "for lobby" istället för att
@@ -4986,12 +5002,12 @@ export default function QuizScreen() {
       withCancel
         ? [
             { text: 'Cancel', style: 'cancel' },
-            { text: 'Reset', onPress: () => goToNewLobby(true, false) },
-            { text: 'Keep settings', onPress: () => goToNewLobby(true, true) },
+            { text: 'Reset', onPress: () => goToNewLobby(true, false, undefined, lobbyType) },
+            { text: 'Keep settings', onPress: () => goToNewLobby(true, true, undefined, lobbyType) },
           ]
         : [
-            { text: 'Reset', onPress: () => goToNewLobby(true, false) },
-            { text: 'Keep settings', onPress: () => goToNewLobby(true, true) },
+            { text: 'Reset', onPress: () => goToNewLobby(true, false, undefined, lobbyType) },
+            { text: 'Keep settings', onPress: () => goToNewLobby(true, true, undefined, lobbyType) },
           ],
     );
   };
@@ -5120,9 +5136,9 @@ export default function QuizScreen() {
       // alltid (keepSettings=true).
       if (isSinglePlayer) {
         if (isGuestHostGame) {
-          goToNewLobby(true, true);
+          goToNewLobby(true, true, undefined, previousLocalMode);
         } else {
-          askKeepSettingsThenGo(true);
+          askKeepSettingsThenGo(true, previousLocalMode);
         }
       } else {
         Alert.alert(
@@ -5130,11 +5146,13 @@ export default function QuizScreen() {
           'Start the next room with the same players, or begin fresh?',
           [
             { text: 'Cancel', style: 'cancel' },
-            { text: 'Start fresh', onPress: () => goToNewLobby(false) },
+            { text: 'Start fresh', onPress: () => goToNewLobby(false, true, undefined, previousLocalMode) },
             {
               text: 'Yes, keep them',
               onPress: () =>
-                isGuestHostGame ? goToNewLobby(true, true) : askKeepSettingsThenGo(),
+                isGuestHostGame
+                  ? goToNewLobby(true, true, undefined, previousLocalMode)
+                  : askKeepSettingsThenGo(false, previousLocalMode),
             },
           ],
         );
@@ -5208,7 +5226,7 @@ export default function QuizScreen() {
   // OBS: den PÅGÅENDE matchens rum lämnas orört (samma resonemang som i
   // handleGoHome ovan) — motståndaren har 48h på sig och rooms-raden
   // städas av 24h-expiry, så vi får inte deactivate:a den här.
-  const handleStartNewGameFromFinal = async (lobbyType: 'standard' | '1v1') => {
+  const handleStartNewGameFromFinal = async (lobbyType: HostLobbyType) => {
     const [freshProfile, premium] = await Promise.all([
       loadProfile(),
       hasPremiumSubscription(),
@@ -5261,7 +5279,9 @@ export default function QuizScreen() {
       params: {
         code,
         isHost: 'true',
-        ...(newIsRemote1v1 ? { lobbyType: '1v1' } : {}),
+        // Skickas ALLTID sedan 2026-08-24 — 'single'/'multiplayer' seedar
+        // lobbyns Game Mode precis som '1v1' seedar remote-läget.
+        lobbyType,
       },
     });
   };
@@ -5315,22 +5335,33 @@ export default function QuizScreen() {
 
   // ── Lokalt "Start New Game"-flöde (ersätter host:s Play Again) ──────────
   // Peter 2026-08-08: Final Leaderboard efter LOKALT spel har inte längre en
-  // Play Again-knapp — i stället samma gula "Start New Game" som Home, med
-  // en invite-fråga inskjuten före lägesvalet:
+  // Play Again-knapp — i stället samma gula "Start New Game" som Home.
   //
-  //   Start New Game → "Replay and Aggregate Leaderboard"
-  //     • Yes, same players again → utfällningen visar BARA Local Play, grå
-  //             tills alla non-hosts godkänt reprisen (deras knapp:
-  //             "Approve Replay").
-  //     • No, start fresh → normal utfällning (Local + Remote), färsk lobby
-  //             utan spelare.
-  //     • Cancel → tillbaka till Final Leaderboard.
+  // Peter 2026-08-24: utfällningen har tre rader (Single Game / Multiplayer
+  // Game / Remote Play) och LÄGET väljs FÖRST. Invite-frågan ställs bara när
+  // host väljer samma läge som just spelades — då är det meningsfullt att
+  // ta med spelarna och deras settings:
   //
-  // Guest-hostade spel kör SAMMA flöde (2026-08-08) med två skillnader:
-  // Remote Play visas aldrig (remote 1vs1 är QuizVibe-users-only) och
-  // Keep/Reset-settings-prompten hoppas över (guest-lobbyns settings är
-  // låsta). Deras 1-replay-cap ligger kvar: vid guestReplaysUsed >= 1
-  // renderas ingen "Start New Game" alls — bara Home, precis som förr.
+  //   Start New Game → credit-gate → utfällningen
+  //     • rad = previousLocalMode → "Replay and Aggregate Leaderboard"
+  //         · Yes, same players again → IndDev: panelen står kvar med den
+  //                 valda raden grå tills alla non-hosts godkänt (deras
+  //                 knapp: "Approve / Replay"); host tappar raden igen när
+  //                 den tänds. PtP/single: inget att vänta in → direkt till
+  //                 Keep/Reset-prompten.
+  //         · No, start fresh → färsk lobby i det valda läget, utan spelare.
+  //         · Cancel → panelen står kvar, inget state ändras.
+  //     • rad ≠ previousLocalMode → färsk lobby direkt, ingen popup. Spelarna
+  //             hör inte hemma i det andra läget och settings kommer från
+  //             profilen (Peters beslut 2026-08-24).
+  //     • Remote Play → egen lobby från scratch (lokala spelare kan aldrig
+  //             bäras in i en duell).
+  //
+  // Guest-hostade spel kör SAMMA flöde med två skillnader: Remote Play visas
+  // aldrig (remote 1vs1 är QuizVibe-users-only) och Keep/Reset-settings-
+  // prompten hoppas över (guest-lobbyns settings är låsta). Deras 1-replay-
+  // cap ligger kvar: vid guestReplaysUsed >= 1 renderas ingen "Start New
+  // Game" alls — bara Home, precis som förr.
   const [startNewGameExpanded, setStartNewGameExpanded] = useState(false);
   // Host valde "Yes, same players again" → carry-over av föregående spelare
   // (och, i IndDev, väntan på deras godkännande innan lobbyn får skapas).
@@ -5346,15 +5377,56 @@ export default function QuizScreen() {
       return;
     }
     // Credit-gaten först — meningslöst (och förvirrande för non-hosts) att
-    // broadcasta en re-match-inbjudan som host inte kan fullfölja.
+    // öppna ett val som host ändå inte kan fullfölja.
     if (!(await ensureHostCreditsForNewGame())) return;
+    // Färsk panel: ingen inbjudan är utfärdad förrän host valt sitt läge.
+    setRematchInvite(false);
+    setStartNewGameExpanded(true);
+  };
+
+  /** Sista steget när spelarna bärs över: Keep/Reset-settings-prompten (och
+   *  för guest hosts: hoppa den — guest-lobbyns settings är ändå låsta). */
+  const proceedWithRematch = (lobbyType: LocalLobbyType) => {
+    if (isGuestHostGame) {
+      void goToNewLobby(true, true, undefined, lobbyType);
+      return;
+    }
+    askKeepSettingsThenGo(turnOrder.length === 1, lobbyType);
+  };
+
+  /** Steg 2 av re-match-flödet: host valde ett läge i utfällningen. */
+  const handleLocalStartNewGameSelect = (lobbyType: HostLobbyType) => {
+    // Remote 1vs1 kan aldrig ärva lokala spelare — egen lobby från scratch
+    // (samma handler som remote-slutskärmens knapp).
+    if (lobbyType === '1v1') {
+      setStartNewGameExpanded(false);
+      void handleStartNewGameFromFinal('1v1');
+      return;
+    }
+    // Annat läge än det som spelades → allt från scratch, ingen popup:
+    // varken spelarna eller lobby-inställningarna hör hemma i det nya läget,
+    // så keepSettings=false och LobbyScreen seedar från host-profilen
+    // (Peters beslut 2026-08-24).
+    if (lobbyType !== previousLocalMode) {
+      setStartNewGameExpanded(false);
+      void goToNewLobby(false, false, undefined, lobbyType);
+      return;
+    }
+    // Samma läge igen. Har host redan svarat "Yes, same players again" är
+    // detta det andra tappet (efter att godkännandena kommit in) → fortsätt
+    // till settings-frågan.
+    if (rematchInvite) {
+      setStartNewGameExpanded(false);
+      proceedWithRematch(lobbyType);
+      return;
+    }
     const totalNonHosts = Math.max(0, turnOrder.length - 1);
     if (totalNonHosts === 0) {
       // Single player: ingen att bjuda in. Behandlas som "invite" så det
-      // egna kortet + lobby-settings bärs över precis som förr (Play Again
-      // gick direkt till Keep/Reset-prompten i det här läget).
+      // egna kortet + lobby-settings bärs över precis som förr.
       setRematchInvite(true);
-      setStartNewGameExpanded(true);
+      setStartNewGameExpanded(false);
+      proceedWithRematch(lobbyType);
       return;
     }
     Alert.alert(
@@ -5365,50 +5437,38 @@ export default function QuizScreen() {
           text: 'Yes, same players again',
           onPress: () => {
             setRematchInvite(true);
-            setStartNewGameExpanded(true);
-            // Non-hosts "Approve Replay"-knapp lyser upp direkt. Avbryter
-            // host efteråt står knappen kvar aktiv (samma dokumenterade
-            // beteende som gamla Play Again-broadcasten).
+            // Individual Devices: varje spelare måste godkänna på sin egen
+            // enhet. Panelen står kvar öppen med den valda raden grå
+            // (lockedLocalTypes) + väntestatusen under, och host tappar
+            // raden igen när alla godkänt. Avbryter host efteråt står
+            // non-hosts knapp kvar aktiv (samma dokumenterade beteende som
+            // gamla Play Again-broadcasten).
             if (gameMode === 'individual-devices' && syncChannelRef.current) {
               syncChannelRef.current
                 .broadcastPlayAgainInitiated({ sender_id: selfPlayerId })
                 .catch(() => {});
+              return;
             }
+            // Pass-the-Phone: alla sitter på samma enhet — inget att vänta
+            // in, så gå direkt vidare.
+            setStartNewGameExpanded(false);
+            proceedWithRematch(lobbyType);
           },
         },
         {
           text: 'No, start fresh',
           onPress: () => {
             setRematchInvite(false);
-            setStartNewGameExpanded(true);
+            setStartNewGameExpanded(false);
+            // keepSettings=true (default): "fresh" gäller SPELARNA, inte
+            // lobby-inställningarna — samma läge spelas igen, så era/rundor/
+            // källor är fortsatt relevanta. Oförändrat sedan 2026-08-08.
+            void goToNewLobby(false, true, undefined, lobbyType);
           },
         },
         { text: 'Cancel', style: 'cancel' },
       ],
     );
-  };
-
-  const handleLocalStartNewGameSelect = (lobbyType: 'standard' | '1v1') => {
-    setStartNewGameExpanded(false);
-    // Remote 1vs1 kan aldrig ärva lokala spelare — egen lobby från scratch
-    // (samma handler som remote-slutskärmens knapp).
-    if (lobbyType === '1v1') {
-      handleStartNewGameFromFinal('1v1');
-      return;
-    }
-    if (!rematchInvite) {
-      goToNewLobby(false);
-      return;
-    }
-    // Guest host: hoppa Keep/Reset-prompten — guest-lobbyn har få valbara
-    // settings, så frågan tillför lite; carry:a alltid (= behåll dem).
-    // Samma gren som gamla Play Again-flödet hade.
-    if (isGuestHostGame) {
-      goToNewLobby(true, true);
-      return;
-    }
-    // Single player: samma Keep/Reset-prompt med Cancel-utväg som förr.
-    askKeepSettingsThenGo(turnOrder.length === 1);
   };
 
   // När båda non-host:s approval OCH host:s nya-lobby-event ankommit:
@@ -6762,30 +6822,35 @@ export default function QuizScreen() {
                 ? handleLocalStartNewGameSelect
                 : undefined
           }
-          // Lokalt flöde: tappet öppnar invite-frågan i stället för att
-          // fälla ut lägesvalet direkt, så panelens öppet-läge ägs här.
+          // Lokalt flöde: tappet kör credit-gaten och öppnar lägesvalet;
+          // invite-frågan ställs först EFTER valet, så panelens öppet-läge
+          // ägs här.
           onStartNewGamePress={
             localRematchFlow ? handleLocalStartNewGamePress : undefined
           }
           startNewGameExpanded={
             localRematchFlow ? startNewGameExpanded : undefined
           }
-          // Re-match: Local Play grå tills alla non-hosts godkänt, och
-          // Remote Play dolt (lokala spelare kan inte bäras in i en duell).
-          localPlayLocked={
+          // Re-match: BARA raden för läget som spelades blir grå medan
+          // non-hosts godkänner — den andra förblir valbar (att byta läge
+          // startar ändå från scratch och kräver inget godkännande).
+          lockedLocalTypes={
             localRematchFlow && rematchNeedsApproval && !rematchAllApproved
+              ? [previousLocalMode]
+              : undefined
           }
           onLocalPlayLockedPress={() =>
             Alert.alert(
               'Waiting for players',
-              'The new lobby opens as soon as every player has approved the replay.',
+              'The new lobby opens as soon as every player has approved the replay. Tap this mode again when they have — or pick the other mode to start fresh.',
             )
           }
           // Guest host: Remote Play visas ALDRIG — remote 1vs1 spelas enbart
           // mellan QuizVibe-users. Annars döljs den bara när föregående
-          // spelare bärs över (de kan inte följa med in i en duell); single
-          // player räknas som "invite" för att bära över egna settings men
-          // har inget carry-over som krockar, så där står Remote kvar.
+          // spelare faktiskt bärs över (de kan inte följa med in i en
+          // duell). Vid panelens öppnande är rematchInvite alltid false, så
+          // Remote står kvar synlig medan host väljer läge och försvinner
+          // först om de svarar "Yes, same players again".
           hideRemotePlay={
             localRematchFlow &&
             (isGuestHostGame || (rematchInvite && rematchTotalNonHosts > 0))
@@ -6927,7 +6992,7 @@ export default function QuizScreen() {
                     <Pressable
                       onPress={() => {
                         setPlayAgainModalVisible(false);
-                        goToNewLobby(false);
+                        goToNewLobby(false, true, undefined, previousLocalMode);
                       }}
                       style={({ pressed }) => [
                         styles.playAgainModalBtn,
@@ -6947,9 +7012,9 @@ export default function QuizScreen() {
                               // Guest host: hoppa Keep/Reset-prompten —
                               // settings är låsta, carry:a alltid.
                               if (isGuestHostGame) {
-                                goToNewLobby(true, true);
+                                goToNewLobby(true, true, undefined, previousLocalMode);
                               } else {
-                                askKeepSettingsThenGo();
+                                askKeepSettingsThenGo(false, previousLocalMode);
                               }
                             }
                           : undefined
@@ -7511,31 +7576,29 @@ export default function QuizScreen() {
                       </Pressable>
                     </Animated.View>
                   </DJTrackCard>
-                ) : !spotifyDJStarted ? (
-                  // djStep=1: DJ har öppnat Spotify men timern är INTE aktiverad
-                  // än. Re-öppna TRACK-länken (inte bara appen): om autoplay
-                  // misslyckades — typiskt varm Spotify-session direkt efter
-                  // Play Again där förra spelets låt ligger kvar pausad i mini-
-                  // playern — behöver DJ:n en väg tillbaka till rätt låt-sida.
-                  // Omstart från början är ofarlig innan timern aktiverats
-                  // (gissarnas klocka har inte börjat ticka).
-                  <DJTrackCard hint={currentQ?.type === 'timeline' ? currentQ.hint : null} trackId={currentSpotifyTrackId}>
-                    <Pressable
-                      style={[styles.spotifyDJActionBtn, { flex: 0, paddingHorizontal: Spacing.xl }]}
-                      onPress={() => {
-                        if (currentSpotifyTrackId) openSpotifyTrack(currentSpotifyTrackId);
-                      }}
-                    >
-                      <SpotifyBrandIcon size={20} variant="white" />
-                      <Text style={styles.spotifyDJActionBtnText}>Open track in Spotify</Text>
-                    </Pressable>
-                  </DJTrackCard>
                 ) : (
-                  // djStep=2: timern rullar — använd openSpotifyApp (inte
-                  // openSpotifyTrack) så låten INTE startar om från början
-                  // utan fortsätter spelas. Samma track-kort-ram med artist +
-                  // titel som steg 0/1 så DJ:n hela tiden ser vilken låt som
-                  // ska spelas.
+                  // djStep 1 OCH 2 (DJ har öppnat Spotify): PRIMÄR åtgärd är
+                  // ALLTID openSpotifyApp — bara ta Spotify till förgrunden.
+                  // Deep-linka ALDRIG om track:en här; `spotify:track:<id>`
+                  // startar om låten från början mitt i gissarnas nedräkning.
+                  //
+                  // ⚠ Grena INTE på spotifyDJStarted (= "timern rullar") för
+                  // att välja mellan säker och omstartande knapp. DJ:ns enhet
+                  // ligger per definition i BAKGRUNDEN när timern aktiveras
+                  // (DJ:n är inne i Spotify), iOS fryser JS och Realtime-
+                  // socketen kan dö — spotify_dj_track_started missas då helt
+                  // och healas först av aktiverarens 5 s-heartbeat. I det
+                  // fönstret TROR DJ-enheten att timern inte startat. Den
+                  // gamla villkorade omstarten gjorde därför exakt fel sak i
+                  // exakt det läge den skulle skydda: en DJ som tittade in i
+                  // QuizVibe och gick tillbaka fick låten omstartad medan
+                  // klockan tickade (Peters test 2026-08-19).
+                  //
+                  // Omstart är i stället en EXPLICIT sekundär åtgärd. Den är
+                  // korrekt i BÅDA lägena — DJ:n väljer den bara när inget
+                  // spelas (misslyckad autoplay, typiskt varm Spotify-session
+                  // efter Play Again där förra låten ligger pausad i mini-
+                  // playern) — och farlig i inget.
                   <DJTrackCard hint={currentQ?.type === 'timeline' ? currentQ.hint : null} trackId={currentSpotifyTrackId}>
                     <Pressable
                       style={[styles.spotifyDJActionBtn, { flex: 0, paddingHorizontal: Spacing.xl }]}
@@ -7543,6 +7606,16 @@ export default function QuizScreen() {
                     >
                       <SpotifyBrandIcon size={20} variant="white" />
                       <Text style={styles.spotifyDJActionBtnText}>Open Spotify</Text>
+                    </Pressable>
+                    <Pressable
+                      style={styles.djRestartTrackBtn}
+                      onPress={() => {
+                        if (currentSpotifyTrackId) openSpotifyTrack(currentSpotifyTrackId);
+                      }}
+                    >
+                      <Text style={styles.djRestartTrackBtnText}>
+                        Nothing playing? Restart track from the beginning
+                      </Text>
                     </Pressable>
                   </DJTrackCard>
                 )}
@@ -8334,6 +8407,25 @@ const styles = StyleSheet.create({
     fontSize: FontSize.md,
     fontWeight: FontWeight.semibold,
     color: '#FFFFFF',
+    textAlign: 'center',
+  },
+  // Sekundär, medvetet nedtonad åtgärd under den gröna "Open Spotify":
+  // omstart av spåret. Låg visuell vikt (ingen fyllnad, dämpad kant) så den
+  // aldrig förväxlas med primärknappen — ett felaktigt tap startar om låten
+  // mitt i gissarnas nedräkning.
+  djRestartTrackBtn: {
+    marginTop: Spacing.sm,
+    alignSelf: 'center',
+    paddingVertical: Spacing.xs,
+    paddingHorizontal: Spacing.md,
+    borderRadius: Radius.sm,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.25)',
+  },
+  djRestartTrackBtnText: {
+    fontSize: FontSize.xs,
+    fontWeight: FontWeight.medium,
+    color: 'rgba(255,255,255,0.65)',
     textAlign: 'center',
   },
   spotifyDJHint: {

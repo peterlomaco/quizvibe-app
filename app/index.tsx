@@ -10,7 +10,7 @@ import { getAvatarEmojiById } from '@/src/utils/avatars';
 import { clearLeftPlayers } from '@/src/utils/leftPlayers';
 import { clearEjected } from '@/src/utils/ejectedPlayers';
 import { clearLobbyPlayers, getLobbyPlayers } from '@/src/utils/mockLobbyPlayers';
-import { clearLobbySettings } from '@/src/utils/mockLobbySettings';
+import { clearLobbySettings, getLobbySettings } from '@/src/utils/mockLobbySettings';
 import { clearGameStarted } from '@/src/utils/mockStartedGames';
 import { getRoomMeta, isActiveRoom, isLobbyFull, isOwnLobby, registerActiveRoom } from '@/src/utils/mockActiveRooms';
 import { buildRemoteQuizParams, getMatchByRoomCode, getOwnUserId, splitMatchForUser } from '@/src/utils/remoteMatches';
@@ -278,7 +278,29 @@ async function checkLobbyCapacity(code: string): Promise<boolean> {
   return true;
 }
 
-function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false, currentPlayerName, guestHostLobbyType = 'standard', onRemoteAccountRequired, initialGuestDraft }: JoinModalProps) {
+// Single-player-lobby: host spelar ensam, så det finns ingen plats att joina
+// (spegelbilden av "+ Add Player"-mellansteget i lobbyn, Peter 2026-08-24).
+// Samma kontrakt som checkLobbyCapacity: true = popup visades = caller ska
+// abortera.
+//
+// Källan är `lobby_settings.single_player_default` — MEDVETET inte en kolumn
+// på rooms-raden som `is_remote_1v1`. Remote-läget är låst vid skapandet och
+// kunde därför göras atomiskt; single vs multiplayer är en LEVANDE toggle
+// host kan slå om när som helst, så ett värde fruset vid rums-skapandet hade
+// blivit stale. Fail-open när settings-raden ännu inte skrivits (host:s
+// 300 ms-debounce) — samma konvention som isLobbyFull/isOwnLobby, och i
+// praktiken onåbart eftersom koden måste läsas av och delas manuellt först.
+async function checkSinglePlayerLobby(code: string): Promise<boolean> {
+  const settings = await getLobbySettings(code);
+  if (!settings?.singlePlayerDefault) return false;
+  Alert.alert(
+    'Single player lobby',
+    'This Room Code belongs to a single player lobby. Ask the Host to switch to a Multiplayer mode, then try again.',
+  );
+  return true;
+}
+
+function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false, currentPlayerName, guestHostLobbyType = 'multiplayer', onRemoteAccountRequired, initialGuestDraft }: JoinModalProps) {
   const [step, setStep] = useState<JoinStep>(initialStep);
   const [code, setCode] = useState('');
   const [guestName, setGuestName] = useState('');
@@ -510,6 +532,10 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
       );
       return;
     }
+    // Single-player-lobby: host kan ha skickat inbjudan och sedan bytt till
+    // single. Inviten ligger KVAR i listan (som capacity-fallet) — host kan
+    // byta tillbaka, och då ska den fortfarande gå att tacka ja till.
+    if (await checkSinglePlayerLobby(invite.roomCode)) return;
     // Capacity-check FÖRE removeInvite: om lobby:n är full ska usern få
     // popup och inviten ligga kvar i listan, så de kan försöka igen om
     // någon lämnar. Speglar samma check som handleJoinWithCode kör.
@@ -563,6 +589,8 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
       Alert.alert('Already in lobby', 'User already exists in the lobby');
       return;
     }
+    // Single-player-lobby: ingen plats att joina förrän host byter läge.
+    if (await checkSinglePlayerLobby(code)) return;
     // Capacity-check: om host:s lobby redan är full visar vi popup med text
     // som beror på Free vs Premium-host. Användaren stannar i join-formuläret.
     if (await checkLobbyCapacity(code)) return;
@@ -802,6 +830,8 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
       Alert.alert('Already in lobby', 'User already exists in the lobby');
       return;
     }
+    // Single-player-lobby: speglar handleJoinWithCode.
+    if (await checkSinglePlayerLobby(code)) return;
     // Capacity-check: speglar handleJoinWithCode — full lobby visar popup
     // istället för att skicka in gästen som ändå skulle få "lobby is full"
     // när de hamnade i Lobby-vyn.
@@ -901,9 +931,10 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
         // Guest host väljer assistance på formen sedan 2026-08-08 (var
         // hårdkodad Full) — seedar host-kortet i LobbyScreen.
         guestAssistance,
-        // Ingen lobbyType-param: guest-hosting når aldrig Remote 1vs1 (läget
-        // är QuizVibe-users-only sedan 2026-08-08 och guarden ovan
-        // returnerar för '1v1'), så en guest-host-lobby är alltid standard.
+        // Vald lobbytyp ('single' | 'multiplayer') seedar lobbyns Game Mode.
+        // Aldrig '1v1' — guarden ovan returnerar för det (remote 1vs1 är
+        // QuizVibe-users-only sedan 2026-08-08).
+        lobbyType: guestHostLobbyType,
       },
     });
   };
@@ -1570,7 +1601,7 @@ export default function HomeScreen() {
   // handleCreateGame (registrerad) resp. guest-host-formen med
   // guestLobbyType satt (konsumeras av handleStartGameAsGuestHost via prop).
   const [hostTypeExpanded, setHostTypeExpanded] = useState<'none' | 'registered' | 'guest'>('none');
-  const [guestLobbyType, setGuestLobbyType] = useState<HostLobbyType>('standard');
+  const [guestLobbyType, setGuestLobbyType] = useState<HostLobbyType>('multiplayer');
   // Info-modalen bakom "i"-ikonerna intill BÅDA sektionsrubrikerna
   // ("QuizVibe user" + "Guest login / Non-registered") — jämförelse
   // user vs guest (USER_VS_GUEST_ROWS + PREMIUM_FEATURES).
@@ -1902,7 +1933,7 @@ export default function HomeScreen() {
       if (joinVisible) {
         setJoinVisible(false);
         // Spegla JoinModal:s onClose — annars läcker ett '1v1'-val vidare.
-        setGuestLobbyType('standard');
+        setGuestLobbyType('multiplayer');
         setTimeout(() => setProfileMenuVisible(true), MODAL_SWAP_DELAY_MS);
         return;
       }
@@ -2034,7 +2065,7 @@ export default function HomeScreen() {
     return { freshProfile, hasPremium };
   };
 
-  const handleCreateGame = async (lobbyType: HostLobbyType = 'standard') => {
+  const handleCreateGame = async (lobbyType: HostLobbyType = 'multiplayer') => {
     const credits = await checkHostCredits();
     if (!credits) return;
     const { freshProfile, hasPremium } = credits;
@@ -2085,7 +2116,9 @@ export default function HomeScreen() {
       params: {
         code,
         isHost: 'true',
-        ...(lobbyType === '1v1' ? { lobbyType: '1v1' } : {}),
+        // Skickas ALLTID sedan 2026-08-24 — 'single'/'multiplayer' styr
+        // lobbyns förvalda Game Mode precis som '1v1' styr remote-läget.
+        lobbyType,
       },
     });
   };
@@ -2899,7 +2932,7 @@ export default function HomeScreen() {
           // Nollställ lobbytypen när guest-host-formen stängs — annars
           // lever ett tidigare '1v1'-val kvar i sessions-state och kan
           // följa med in i ett senare guest-host-flöde.
-          setGuestLobbyType('standard');
+          setGuestLobbyType('multiplayer');
           // Draften är förbrukad när formen väl öppnats med den; utan detta
           // skulle ett senare, orelaterat Join-as-Guest återuppliva gamla
           // fält.

@@ -3,7 +3,7 @@ import React, { useMemo, useState } from 'react';
 import { Animated, Dimensions, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, G, Path } from 'react-native-svg';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
-import { HostTypeOptions, type HostLobbyType } from './HostTypeOptions';
+import { HostTypeOptions, type HostLobbyType, type LocalLobbyType } from './HostTypeOptions';
 import { QuizVibeQAvatar } from './QuizVibeQAvatar';
 import { VersusIcon } from './VersusIcon';
 import { WifiOffIcon } from './WifiOffIcon';
@@ -403,7 +403,7 @@ export function RoundLeaderboard({
   onStartNewGameLockedPress,
   onStartNewGamePress,
   startNewGameExpanded: startNewGameExpandedProp,
-  localPlayLocked = false,
+  lockedLocalTypes,
   onLocalPlayLockedPress,
   hideRemotePlay = false,
   startNewGameNote,
@@ -469,9 +469,8 @@ export function RoundLeaderboard({
   startNewGameLocked?: boolean;
   onStartNewGameLockedPress?: () => void;
   /**
-   * Sätts av lokala re-match-flödet: tappet fäller INTE ut lägesvalet
-   * direkt utan lämnas till call-siten, som först frågar "Invite Players
-   * from previous Game?" och sedan öppnar panelen via
+   * Sätts av lokala re-match-flödet: tappet lämnas till call-siten (som
+   * kör credit-gaten) och panelens öppet-läge ägs där via
    * `startNewGameExpanded`. Utelämnas (remote-fallet) → komponenten togglar
    * panelen själv.
    */
@@ -479,10 +478,11 @@ export function RoundLeaderboard({
   /** Kontrollerat läge för utfällningen. Utelämnas → internt state. */
   startNewGameExpanded?: boolean;
   /**
-   * Local Play-raden grå + otappbar-som-val: host har bjudit in föregående
-   * spelare och alla har ännu inte godkänt re-matchen.
+   * De lokala raderna som ska vara grå + otappbara-som-val: host har bjudit
+   * in föregående spelare och alla har ännu inte godkänt re-matchen. Bara
+   * raden för läget som spelades låses — den andra förblir valbar.
    */
-  localPlayLocked?: boolean;
+  lockedLocalTypes?: readonly LocalLobbyType[];
   onLocalPlayLockedPress?: () => void;
   /** Dölj Remote Play i utfällningen (re-match:en är per definition lokal —
    *  carry-over av lokala spelare hör inte hemma i en 1vs1-duell). */
@@ -851,8 +851,9 @@ export function RoundLeaderboard({
                 onStartNewGameLockedPress?.();
                 return;
               }
-              // Lokala re-match-flödet: call-siten frågar först "Replay and
-              // Aggregate Leaderboard" och öppnar panelen därefter.
+              // Lokala re-match-flödet: call-siten kör credit-gaten och
+              // öppnar panelen. Invite-frågan ställs först EFTER att host
+              // valt läge (och bara när det matchar det som just spelades).
               if (onStartNewGamePress) {
                 onStartNewGamePress();
                 return;
@@ -879,7 +880,7 @@ export function RoundLeaderboard({
               <HostTypeOptions
                 accentColor={Colors.warning}
                 remoteMode={hideRemotePlay ? 'hidden' : 'available'}
-                localLocked={localPlayLocked}
+                lockedLocalTypes={lockedLocalTypes}
                 onLocalLockedPress={onLocalPlayLockedPress}
                 onSelect={(lobbyType) => {
                   if (!isStartNewGameControlled) {

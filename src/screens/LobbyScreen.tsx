@@ -391,6 +391,36 @@ const regionSheet = StyleSheet.create({
   cancelText: { fontSize: FontSize.md, color: Colors.textSecondary },
 });
 
+// Att presentera en RN <Modal> direkt i en Alert-callback kan sväljas tyst
+// på iOS — alertens dismiss-animation pågår fortfarande när handlern kör, och
+// en presentation mitt i en transition no-op:ar. Samma defensiva delay som
+// MODAL_SWAP_DELAY_MS i app/index.tsx (där Modal→Modal gav exakt den buggen).
+const ALERT_TO_MODAL_DELAY_MS = 350;
+
+// Delad copy för single-player-approve-spärren så ALLA approve-vägar
+// (ApproveToggle, "Approve All"-mastern, join-popupens Approve och
+// Approve + Add to Friend list) säger exakt samma sak.
+const SINGLE_PLAYER_APPROVE_BLOCK: [string, string] = [
+  'Single player mode',
+  'Can not be approved due to Single player mode. Please change to Multiplayer before approval.',
+];
+
+/** Prio för `singlePlayerDefault`-seeden: `lobbyType`-paramet (= host:s
+ *  explicita val i "Start New Game"-panelen på Home / Final Leaderboard) >
+ *  `fallback` (carry-over lobby_settings > profilens host-default). Utan
+ *  param (äldre navigation) gäller fallback:en oförändrat.
+ *
+ *  Module-level och ren — så den aldrig blir en dependency i seed-effekten
+ *  (`lobbyType` ligger redan där och är allt funktionen läser).
+ *  '1v1' MÅSTE ge false: alla remote-guards är gated på
+ *  `gameMode === 'remote-1v1' && !singlePlayerDefault`. */
+function resolveSeedSinglePlayer(lobbyType: string | undefined, fallback: boolean) {
+  if (lobbyType === '1v1') return false;
+  if (lobbyType === 'single') return true;
+  if (lobbyType === 'multiplayer') return false;
+  return fallback;
+}
+
 // ─── Add Player Modal ─────────────────────────────────────────────────────────
 
 type AddPlayerAssistance = 'minimal' | 'standard' | 'full';
@@ -1166,6 +1196,12 @@ export default function LobbyScreen() {
   // sker däremot på gameMode === 'remote-1v1' (state) så non-host — som får
   // gameMode via settings-syncen — döljer samma sektioner utan egen param.
   const is1v1Lobby = lobbyType === '1v1';
+  // 'single' / 'multiplayer' är de två andra lobbyType-värdena (2026-08-24):
+  // Single vs Multiplayer väljs numera redan på Home / Final Leaderboard i
+  // stället för via Game Mode-rutorna här inne. De läses av
+  // resolveSeedSinglePlayer (module-level ovan) och styr ENBART
+  // singlePlayerDefault-seeden — Game Mode-sektionen renderas som vanligt i
+  // båda fallen, så host kan fritt byta läge inne i lobbyn.
 
   // Initial = tom; mount-useEffect på [code, guestMode, ..., hostMode] sätter
   // till [SEED_PLAYERS[0]] för host eller [] för non-host. SEED_PLAYERS som
@@ -1333,7 +1369,8 @@ export default function LobbyScreen() {
         // 1v1: singlePlayerDefault MÅSTE vara false — alla remote-guards
         // (start-knapp-swap, handleStartGame, maxPlayers-effekten) är
         // gated på `gameMode === 'remote-1v1' && !singlePlayerDefault`.
-        setSinglePlayerDefault(is1v1Lobby ? false : stored?.singlePlayerDefault ?? false);
+        // single/multiplayer: Home-valet vinner över carry-over.
+        setSinglePlayerDefault(resolveSeedSinglePlayer(lobbyType, stored?.singlePlayerDefault ?? false));
         setMaxPlayers(is1v1Lobby ? 2 : 4);
         setRegion('Sweden');
         // Clampa mot utbudet {30, 45, 60} — defensivt mot oväntade värden
@@ -1398,13 +1435,14 @@ export default function LobbyScreen() {
           }
           // 1v1: singlePlayerDefault MÅSTE vara false — alla remote-guards
           // är gated på `gameMode === 'remote-1v1' && !singlePlayerDefault`.
-          setSinglePlayerDefault(
-            is1v1Lobby
-              ? false
-              : stored?.singlePlayerDefault ??
-                profile?.singlePlayerDefault ??
-                false,
+          // single/multiplayer: Home-valet vinner över carry-over + profil.
+          // Resolveras EN gång — rounds-clampen nedan MÅSTE läsa samma
+          // värde, annars cappas en "Single Game"-lobby mot fel läge.
+          const seedSinglePlayer = resolveSeedSinglePlayer(
+            lobbyType,
+            stored?.singlePlayerDefault ?? profile?.singlePlayerDefault ?? false,
           );
+          setSinglePlayerDefault(seedSinglePlayer);
           // V1: bara Sweden — eventuella stored/profile-värden som inte är
           // Sweden ignoreras (legacy från Nordics/Europe/Global-tiden).
           setRegion('Sweden');
@@ -1426,8 +1464,6 @@ export default function LobbyScreen() {
           // inte sätts > 4 när premium saknas.
           const savedRounds =
             stored?.roundsCount ?? profile?.roundsDefault ?? ROUNDS_DEFAULT;
-          const seedSinglePlayer =
-            stored?.singlePlayerDefault ?? profile?.singlePlayerDefault ?? false;
           const isIndivPremium =
             premium && seedGameMode === 'individual-devices' && !seedSinglePlayer;
           const initialMax = isIndivPremium ? ROUNDS_MAX_INDIV : ROUNDS_MAX_PASS;
@@ -1700,7 +1736,7 @@ export default function LobbyScreen() {
       if (seedHost) ownPlayerIdRef.current = seedHost.id;
     });
     return () => { cancelled = true; };
-  }, [code, guestMode, guestName, guestBirthYear, guestAssistance, hostMode, isGuestHost, carryOverPlayerId]);
+  }, [code, guestMode, guestName, guestBirthYear, guestAssistance, hostMode, isGuestHost, carryOverPlayerId, lobbyType]);
 
   // Varje gång Lobby får fokus (t.ex. man kommer tillbaka från Profile-tabben):
   // ladda sparad profil och uppdatera host-spelarkortet med profilens värden.
@@ -1975,6 +2011,21 @@ export default function LobbyScreen() {
   // fallet genom att re-approva friends som INTE finns i setet). Rensas när
   // spelaren blir approved (valfri väg) eller lämnar.
   const hostUnapprovedIdsRef = useRef<Set<string>>(new Set());
+  // Host:s approve-beslut som ännu INTE bekräftats av DB:n — id → önskat
+  // värde. Löser flimret mellan "Approved" och "To be Approved" (Peter
+  // 2026-08-24): host:s bulk-write (setLobbyPlayers på [players]) är
+  // fire-and-forget OCH ekar tillbaka som Realtime-UPDATE på VARJE rad, så
+  // syncNonHostFields kan läsa raden innan approve-commiten är synlig, sätta
+  // approved=false lokalt, trigga en ny bulk-write, trigga fler UPDATE-
+  // events … = oscillation.
+  //
+  // Kontrakt: så länge en id ligger här ignorerar syncNonHostFields DB:s
+  // `approved` för den spelaren (övriga fält syncas som vanligt). När DB
+  // äntligen rapporterar samma värde är skrivningen bekräftad och posten
+  // tas bort → normal sync återupptas, så en RE-JOIN:s approved=false
+  // fortfarande propagerar (vilket är hela skälet till att approved
+  // överhuvudtaget syncas hit — se kommentaren vid syncNonHostFields).
+  const pendingApprovalRef = useRef<Map<string, boolean>>(new Map());
   // True när non-host har upptäckt att rummet blivit deaktiverat (host
   // har raderat lobby:n). Triggar Alert:en "This Game Lobby has been
   // deleted by Host" → OK-knappen tar dem till Home.
@@ -3149,6 +3200,12 @@ export default function LobbyScreen() {
       const p = players.find((x) => x.id === id);
       if (!p || p.hasLeft || p.approved) hostUnapprovedIdsRef.current.delete(id);
     });
+    // Pending approve-beslut för spelare som försvunnit ur lobbyn städas —
+    // annars läcker de och skulle blockera approved-syncen om samma id
+    // dyker upp igen (carry-over bevarar id:n mellan lobbies).
+    pendingApprovalRef.current.forEach((_v, id) => {
+      if (!activeIds.has(id)) pendingApprovalRef.current.delete(id);
+    });
     setJoinPopupQueue((prev) => {
       const next = prev.filter((id) => {
         const p = players.find((x) => x.id === id);
@@ -3167,6 +3224,7 @@ export default function LobbyScreen() {
       // Samma guards som handleSetApproved — blockeras tyst approve faller
       // spelaren tillbaka till popupen där Approve-tappen visar guard-Alerten.
       const passesSilentGuards =
+        !singlePlayerDefault &&
         lobbyPeerHealth[p.id] !== 'unstable' &&
         (!spotifyEnabled || !!p.spotifyConnected);
       if (isFriend && passesSilentGuards && !hostUnapprovedIdsRef.current.has(p.id)) {
@@ -3178,6 +3236,7 @@ export default function LobbyScreen() {
         // hostUnapprovedIdsRef-checken ovan. DB-skrivning sker via host:s
         // bulk-write-effekt på [players] (setLobbyPlayers).
         promptedIdsRef.current.add(p.id);
+        pendingApprovalRef.current.set(p.id, true);
         setPlayers((prev) =>
           prev.map((x) => (x.id === p.id ? { ...x, approved: true } : x)),
         );
@@ -3191,7 +3250,7 @@ export default function LobbyScreen() {
     // mount-load:en sätter ref + setFriends ihop, så deps-membern garanterar
     // att watchern körs om när listan blir laddad även om players[] inte
     // ändrats sedan dess (joiner som hann in före loadFriends-resolven).
-  }, [players, hostMode, spotifyEnabled, lobbyPeerHealth, friends]);
+  }, [players, hostMode, spotifyEnabled, singlePlayerDefault, lobbyPeerHealth, friends]);
 
   // Driver "Waiting for approval"-mellansteget för non-host. När host inte
   // har godkänt mig än ska jag inte se lobby:n överhuvudtaget — bara en
@@ -3223,6 +3282,40 @@ export default function LobbyScreen() {
   // Tryck på "+ Add Player" — blockera redan här om lobbyn är full så
   // host inte slösar tid på att fylla i formuläret.
   const handleOpenAddPlayer = () => {
+    // Single player: lobbyn har per definition ingen plats för fler spelare.
+    // Att tyst öppna formuläret gav en lobby med två kort men ett spel som
+    // ändå startade som single player (Peter 2026-08-24) — fråga i stället
+    // vilket multiplayer-läge host vill byta till. Cancel lämnar allt orört.
+    if (singlePlayerDefault) {
+      Alert.alert(
+        'Change to Multiplayer mode?',
+        'Adding a player requires a multiplayer mode. Which one do you want to play?',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            // Individual device tar bort möjligheten att lägga till spelare
+            // manuellt (varje spelare behöver en egen enhet), så vi byter
+            // läge och förklarar vägen in i stället för att öppna formuläret.
+            text: 'Individual device',
+            onPress: () => {
+              handleSelectMode('individual-devices');
+              Alert.alert(
+                'Individual device',
+                "Game mode changed. Players can't be added manually in this mode — every player needs their own device. Share the room code and let them join from it.",
+              );
+            },
+          },
+          {
+            text: 'Pass-the-Phone',
+            onPress: () => {
+              handleSelectMode('pass-the-phone');
+              setTimeout(() => setAddModalVisible(true), ALERT_TO_MODAL_DELAY_MS);
+            },
+          },
+        ],
+      );
+      return;
+    }
     // Individual device + Remote 1v1 kräver egen enhet — host kan inte lägga
     // till guests manuellt. De måste joina med egen enhet via room code.
     if ((gameMode === 'individual-devices' || gameMode === 'remote-1v1') && !singlePlayerDefault) {
@@ -3264,6 +3357,16 @@ export default function LobbyScreen() {
   // blockerade (Alert visad). Join-popup-handlers använder returvärdet för
   // att hålla popupen öppen vid guard-block; ApproveToggle-sites ignorerar det.
   const handleSetApproved = (id: string, approved: boolean): boolean => {
+    // Check 0: single player — lobbyn har ingen plats för fler spelare, så
+    // ingen non-host får approvas (Peter 2026-08-24). Home:s join-gate
+    // (checkSinglePlayerLobby) kan fail-open:a i host:s 300 ms-debounce-
+    // fönster, och en spelare som tagit sig in DÅ ska ändå aldrig kunna bli
+    // godkänd. Detta är den auktoritativa spärren: den läser host:s EGEN
+    // live-state, inte en DB-rad som kan vara i otakt.
+    if (approved && singlePlayerDefault) {
+      Alert.alert(...SINGLE_PLAYER_APPROVE_BLOCK);
+      return false;
+    }
     if (approved && lobbyPeerHealth[id] === 'unstable') {
       Alert.alert(
         'Connection unstable',
@@ -3286,6 +3389,7 @@ export default function LobbyScreen() {
     // re-approvar en friend som host medvetet togglat till waiting.
     if (approved) hostUnapprovedIdsRef.current.delete(id);
     else hostUnapprovedIdsRef.current.add(id);
+    pendingApprovalRef.current.set(id, approved);
     setPlayers((prev) => prev.map((p) => p.id === id ? { ...p, approved } : p));
     return true;
   };
@@ -3306,6 +3410,7 @@ export default function LobbyScreen() {
       // detta skulle friend-auto-approve-watchern tyst re-approva friends
       // så fort peerHealth blir stable.
       hostUnapprovedIdsRef.current.add(playerId);
+      pendingApprovalRef.current.set(playerId, false);
       // Idempotent: setPlayers no-op:ar när raden redan är unapproved.
       setPlayers((prev) =>
         prev.map((p) => (p.id === playerId ? { ...p, approved: false } : p)),
@@ -3391,6 +3496,15 @@ export default function LobbyScreen() {
   // ingen re-prompt-loop uppstår.
   const handleJoinPopupLater = () => advanceJoinPopup();
   const handleApproveAll = () => {
+    // Check 0: single player — samma spärr som handleSetApproved.
+    // ⚠ Denna master-toggle skriver setPlayers DIREKT och går ALDRIG via
+    // handleSetApproved, så varje ny approve-guard måste speglas hit.
+    // (Det var precis den luckan som lät en non-host bli approved i en
+    // single-player-lobby, Peter 2026-08-24.)
+    if (singlePlayerDefault) {
+      Alert.alert(...SINGLE_PLAYER_APPROVE_BLOCK);
+      return;
+    }
     // Check 4: Spotify är aktiverat och några waiting-spelare saknar Spotify-attest.
     if (spotifyEnabled) {
       const waiting = players.filter((p) => !p.isHost && !p.hasLeft && !p.approved && p.hcpComplete);
@@ -3403,6 +3517,9 @@ export default function LobbyScreen() {
         return;
       }
     }
+    players.forEach((p) => {
+      if (p.hcpComplete && !p.isHost) pendingApprovalRef.current.set(p.id, true);
+    });
     setPlayers((prev) => prev.map((p) => p.hcpComplete ? { ...p, approved: true } : p));
   };
 
@@ -4062,7 +4179,18 @@ export default function LobbyScreen() {
           const updated = stored.find((s) => s.id === p.id);
           if (!updated) return p;
           const nextHasLeft = !!updated.hasLeft;
-          const nextApproved = !!updated.approved;
+          const dbApproved = !!updated.approved;
+          // Host:s egna, ännu obekräftade approve-beslut vinner över DB:n.
+          // När DB rapporterar samma värde är skrivningen bekräftad →
+          // släpp posten så normal sync (t.ex. re-join → approved=false)
+          // fungerar igen. Utan detta flimrar kortet mellan "Approved" och
+          // "To be Approved" medan bulk-write:en är i flykt.
+          const pending = pendingApprovalRef.current.get(p.id);
+          if (pending !== undefined && dbApproved === pending) {
+            pendingApprovalRef.current.delete(p.id);
+          }
+          const nextApproved =
+            pending !== undefined && dbApproved !== pending ? pending : dbApproved;
           const nextSpotifyConnected = !!updated.spotifyConnected;
           // Guest alias publiceras av spelaren själv en kort stund EFTER
           // deras upsert, så fetchNewJoiners hinner ofta läsa raden innan
@@ -4736,8 +4864,13 @@ export default function LobbyScreen() {
     // (host alltid på index 0). Filtrera bort spelare som lämnat lobbyn —
     // de kan inte vara på tur. Skicka en minimal player-payload så quiz.tsx
     // kan rendera "Up next: <namn>" och rotera mellan rundor.
+    //
+    // Single player: BARA host spelar, oavsett vad som råkar ligga approved i
+    // listan (Peter 2026-08-24). Sista spärren — approve-vägarna är redan
+    // gated, men en rad som blivit approved innan host växlade till single
+    // hade annars dragits in i ett "solo"-spel med två spelare.
     const turnOrder = approvedPlayers
-      .filter((p) => !p.hasLeft)
+      .filter((p) => !p.hasLeft && (!singlePlayerDefault || p.isHost))
       .map((p) => ({
         id: p.id,
         name: p.name,

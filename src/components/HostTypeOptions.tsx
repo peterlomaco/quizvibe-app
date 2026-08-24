@@ -1,7 +1,7 @@
 import { Colors, Radius, Spacing } from '@/src/theme';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import Svg, { Text as SvgText } from 'react-native-svg';
+import Svg, { Circle, Rect as SvgRect, Text as SvgText } from 'react-native-svg';
 import { VersusIcon } from '@/src/components/VersusIcon';
 
 // ─── Lobbytyp-väljare (Start New Game / Start Game as Guest) ─────────────────
@@ -11,7 +11,11 @@ import { VersusIcon } from '@/src/components/VersusIcon';
 // ChoiceRow-vokabulär som JoinModal:s choose-steg. Bor i src/components
 // sedan 2026-08-08 eftersom Final Leaderboard (1vs1) har en egen
 // "Start New Game"-knapp med samma utfällning.
-export type HostLobbyType = 'standard' | '1v1';
+export type HostLobbyType = 'single' | 'multiplayer' | '1v1';
+/** De två lokala lobbytyperna — allt utom Remote 1vs1. */
+export type LocalLobbyType = Exclude<HostLobbyType, '1v1'>;
+// Module-level så default-värdet är referensstabilt mellan renders.
+const EMPTY_LOCKED: readonly LocalLobbyType[] = [];
 
 // VersusIcon (två silhuetter + guld-"vs") bor i src/components/VersusIcon.tsx
 // sedan 2026-08-07 — delas med "1vs1"-knappen på Home (MyMatchesSection)
@@ -66,24 +70,41 @@ function HereNowIcon({ height = 60 }: { height?: number }) {
   );
 }
 
+/** Ikon för "Single Game": EN blå profil-silhuett. Samma proportioner som
+ *  VersusIcon:s två figurer (huvud r 6 + kropp 17×14, rx 6) så de tre
+ *  raderna i panelen läses som en familj — en figur = solo, två = duell. */
+function SoloIcon({ height = 50 }: { height?: number }) {
+  // Samma viewBox-kvot som HereNowIcon (56×46) — iconWrap centrerar båda.
+  const width = height * (56 / 46);
+  return (
+    <Svg width={width} height={height} viewBox="0 0 56 46">
+      {/* Figurens span är 8.5–37.5 → vertikalt centrerad i 46. */}
+      <Circle cx={28} cy={14.5} r={6} fill={Colors.primary} />
+      <SvgRect x={19.5} y={23.5} width={17} height={14} rx={6} fill={Colors.primary} />
+    </Svg>
+  );
+}
+
 /** Inline-utfällning under Start-knappen (Peter 2026-08-07 rev 2: ingen
  *  separat modal — alternativen är en del av knappen och fälls ut under
  *  den). `accentColor` ärvs från knappen ovanför (guld för inloggad,
  *  grå för guest) så panelen läses som knappens förlängning. */
 export function HostTypeOptions({
   accentColor, onSelect, remoteMode = 'available', onRemoteLockedPress, localBadge,
-  localLocked = false, onLocalLockedPress,
+  lockedLocalTypes = EMPTY_LOCKED, onLocalLockedPress,
 }: {
   accentColor: string;
   onSelect: (lobbyType: HostLobbyType) => void;
   /**
-   * Local Play-raden dimmad + otappbar-som-val. Används av Final
-   * Leaderboard:s re-match-flöde: host har bjudit in föregående spelare och
-   * måste vänta tills alla godkänt innan lobbyn får skapas. Raden förblir
-   * tappbar så trycket kan förklara väntan (`onLocalLockedPress`) i stället
-   * för att vara en död yta — samma mönster som den låsta Remote-raden.
+   * De lokala rader som ska vara dimmade + otappbara-som-val. Används av
+   * Final Leaderboard:s re-match-flöde: host har bjudit in föregående
+   * spelare och måste vänta tills alla godkänt innan lobbyn får skapas —
+   * bara raden för det läge som spelades låses, den andra förblir valbar.
+   * Låsta rader är fortsatt tappbara så trycket kan förklara väntan
+   * (`onLocalLockedPress`) i stället för att vara en död yta — samma
+   * mönster som den låsta Remote-raden.
    */
-  localLocked?: boolean;
+  lockedLocalTypes?: readonly LocalLobbyType[];
   onLocalLockedPress?: () => void;
   /**
    * Remote 1vs1 spelas ENBART av QuizVibe-users mot varandra (Peter
@@ -110,33 +131,55 @@ export function HostTypeOptions({
    * registrerade call-siten — där kostar hosting credits och spelen
    * sparas, så ingendera badge stämmer.
    *
-   * Sätts bara på Local Play — Remote Play-raden bär antingen sin egen
-   * "QuizVibe user"-badge ('locked') eller renderas inte alls ('hidden').
+   * Sätts på BÅDA lokala raderna — gratis-/ingen-historik-villkoret gäller
+   * lika för Single och Multiplayer. Remote Play-raden bär antingen sin
+   * egen "QuizVibe user"-badge ('locked') eller renderas inte alls
+   * ('hidden').
    */
   localBadge?: { text: string; muted?: boolean };
 }) {
   return (
     <View style={hostTypeStyles.panel}>
+      {/* Single/Multiplayer väljs sedan 2026-08-24 HÄR i stället för via
+          Game Mode-rutorna inne i lobbyn — lobbyn öppnas med rätt läge
+          förvalt, men båda lobbytyperna visar fortfarande hela Game Mode-
+          sektionen så host kan byta utan att lämna. */}
       <HostTypeOptionRow
         accentColor={accentColor}
-        icon={<HereNowIcon height={60} />}
-        label="Local Play"
-        subtitle="Single & Multiplayer mode"
+        icon={<SoloIcon height={50} />}
+        label="Single Game"
+        subtitle="Play solo on this device"
         badgeText={localBadge?.text}
         badgeMuted={localBadge?.muted}
-        locked={localLocked}
+        locked={lockedLocalTypes.includes('single')}
         onPress={() => {
-          if (localLocked) {
+          if (lockedLocalTypes.includes('single')) {
             onLocalLockedPress?.();
             return;
           }
-          onSelect('standard');
+          onSelect('single');
+        }}
+      />
+      <HostTypeOptionRow
+        accentColor={accentColor}
+        icon={<HereNowIcon height={50} />}
+        label="Multiplayer Game"
+        subtitle="Pass-the-Phone or Individual devices"
+        badgeText={localBadge?.text}
+        badgeMuted={localBadge?.muted}
+        locked={lockedLocalTypes.includes('multiplayer')}
+        onPress={() => {
+          if (lockedLocalTypes.includes('multiplayer')) {
+            onLocalLockedPress?.();
+            return;
+          }
+          onSelect('multiplayer');
         }}
       />
       {remoteMode !== 'hidden' && (
         <HostTypeOptionRow
           accentColor={accentColor}
-          icon={<VersusIcon height={60} />}
+          icon={<VersusIcon height={50} />}
           label="Remote Play"
           // Samma subtitel oavsett låst/olåst — "QuizVibe user"-badgen bär
           // kontokravet, subtiteln får beskriva vad läget ÄR.
@@ -227,7 +270,10 @@ const hostTypeStyles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.md,
-    minHeight: 92,
+    // 78 (var 92) sedan panelen gick från två till tre rader — den bor i
+    // Final Leaderboard:s ICKE-scrollande stickyFooter, så varje extra
+    // pixel äts från poängtabellen ovanför.
+    minHeight: 78,
     borderWidth: 1.5,
     borderRadius: Radius.md,
     backgroundColor: Colors.cardElevated,
@@ -267,8 +313,10 @@ const hostTypeStyles = StyleSheet.create({
     color: '#FFF',
   },
   iconWrap: {
-    // 88 rymmer VersusIcon:s bredd vid height 60 (60 × 64/46 ≈ 84).
-    width: 88,
+    // 74 rymmer VersusIcon:s bredd vid height 50 (50 × 64/46 ≈ 70). Sänkt
+    // från 88 när ikonerna krympte — den frigjorda bredden går till de
+    // längre undertexterna ("Pass-the-Phone or Individual devices").
+    width: 74,
     alignItems: 'center',
     justifyContent: 'center',
   },
