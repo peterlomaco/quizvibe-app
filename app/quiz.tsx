@@ -1017,6 +1017,48 @@ type TurnOrderPlayer = {
   type?: 'registered' | 'guest';
 };
 
+// En rad i reveal-fasens "Correct/Wrong answers"-listor (Individual
+// Devices). Avatar + namn + svarstid, med samma avatar-fallback-mönster som
+// timer-bar:ens markörer (avatarUri → bild, annars emoji i cirkel).
+function AnswerSummaryRow({
+  player,
+  score,
+  isSelf,
+  correct,
+}: {
+  player: TurnOrderPlayer;
+  score: RoundScore;
+  isSelf: boolean;
+  correct: boolean;
+}) {
+  return (
+    <View style={rv.answerRow}>
+      {player.avatarUri ? (
+        <Image source={{ uri: player.avatarUri }} style={rv.answerAvatar} />
+      ) : (
+        <View style={[rv.answerAvatar, rv.answerAvatarFallback]}>
+          <Text style={rv.answerAvatarEmoji}>{player.emoji ?? '👤'}</Text>
+        </View>
+      )}
+      <Text style={rv.answerName} numberOfLines={1} ellipsizeMode="tail">
+        {player.name}
+        {isSelf ? ' (You)' : ''}
+      </Text>
+      {/* connectionError = frågan missades pga dålig uppkoppling, inte ett
+          faktiskt felsvar — visa det istället för en svarstid som aldrig
+          representerade ett svar. */}
+      <Text
+        style={[
+          rv.answerTime,
+          correct ? rv.answerTimeCorrect : rv.answerTimeWrong,
+        ]}
+      >
+        {score.connectionError ? 'no connection' : `${score.timeUsed.toFixed(2)}s`}
+      </Text>
+    </View>
+  );
+}
+
 export default function QuizScreen() {
   const params = useLocalSearchParams<{
     assistance?: string;
@@ -2742,6 +2784,43 @@ export default function QuizScreen() {
       return a.avgResponseSeconds - b.avgResponseSeconds;
     });
   }, [gamePlayers, gameTotals, allRoundScoresHistory, leftPlayerIds]);
+
+  // Per-spelare-facit för PÅGÅENDE fråga (Individual Devices). Deriveras ur
+  // allRoundScoresHistory joinat på `questionIndex` — peer-svar ankommer via
+  // `player_score_recorded` och appendas som NYA yttre poster i ankomstordning,
+  // så det yttre index:et säger INGET om vilken fråga svaret gällde.
+  //
+  // Spelare utan post för frågan listas inte alls: DJ:n på en Spotify-fråga
+  // svarar aldrig, och en peer vars broadcast ännu inte ankommit ska inte
+  // felaktigt hamna under "Wrong answers". Listorna fylls därför på live
+  // allteftersom svaren tas emot.
+  const revealAnswerSummary = useMemo(() => {
+    if (gameMode !== 'individual-devices') return null;
+    if (turnOrder.length === 0) return null;
+    const byPlayer = new Map<string, RoundScore>();
+    allRoundScoresHistory.forEach((round) => {
+      round.forEach((s) => {
+        if (s.questionIndex !== questionIndex) return;
+        if (byPlayer.has(s.playerId)) return;
+        byPlayer.set(s.playerId, s);
+      });
+    });
+    if (byPlayer.size === 0) return null;
+    const correct: { player: TurnOrderPlayer; score: RoundScore }[] = [];
+    const wrong: { player: TurnOrderPlayer; score: RoundScore }[] = [];
+    turnOrder.forEach((p) => {
+      if (leftPlayerIds.has(p.id)) return;
+      const score = byPlayer.get(p.id);
+      if (!score) return;
+      (score.correct ? correct : wrong).push({ player: p, score });
+    });
+    // Snabbast först inom varje lista — samma tie-break-logik som
+    // leaderboardens avg-kolumn använder.
+    correct.sort((a, b) => a.score.timeUsed - b.score.timeUsed);
+    wrong.sort((a, b) => a.score.timeUsed - b.score.timeUsed);
+    if (correct.length === 0 && wrong.length === 0) return null;
+    return { correct, wrong };
+  }, [gameMode, turnOrder, allRoundScoresHistory, questionIndex, leftPlayerIds]);
 
   const timerRef = useRef<any>(null);
   // pulseAnim driver opacity:n på timer-progress-baren när tiden
@@ -7790,11 +7869,53 @@ export default function QuizScreen() {
               );
             })()}
 
-            {/* Per-spelare reveal-summary med unfold-logik.
-                Deriveras från allRoundScoresHistory (inte currentRoundScores) så:
-                  • IndDev: remote scores ankommer via sync och uppdaterar history → listan
-                    uppdateras live allteftersom andra spelares svar tas emot.
-                  • PtP: visar varje spelares senaste svar oavsett vilken fråga de svarade. */}
+            {/* Per-spelare reveal-summary (Individual Devices).
+                Deriveras från allRoundScoresHistory (inte currentRoundScores) så
+                remote scores som ankommer via sync uppdaterar listan live
+                allteftersom andra spelares svar tas emot. */}
+            {phase === 'reveal' && revealAnswerSummary && (
+              <View style={[rv.container, rv.answersWrap]}>
+                <View style={rv.answersCard}>
+                  <Text style={rv.answersTitle}>All Players</Text>
+                  <View>
+                    <Text style={[rv.answersHeading, rv.answersHeadingCorrect]}>
+                      Correct
+                    </Text>
+                    {revealAnswerSummary.correct.length === 0 ? (
+                      <Text style={rv.answersEmpty}>No one</Text>
+                    ) : (
+                      revealAnswerSummary.correct.map(({ player, score }) => (
+                        <AnswerSummaryRow
+                          key={`c-${player.id}`}
+                          player={player}
+                          score={score}
+                          isSelf={player.id === selfPlayerId}
+                          correct
+                        />
+                      ))
+                    )}
+                  </View>
+                  <View>
+                    <Text style={[rv.answersHeading, rv.answersHeadingWrong]}>
+                      Wrong
+                    </Text>
+                    {revealAnswerSummary.wrong.length === 0 ? (
+                      <Text style={rv.answersEmpty}>No one</Text>
+                    ) : (
+                      revealAnswerSummary.wrong.map(({ player, score }) => (
+                        <AnswerSummaryRow
+                          key={`w-${player.id}`}
+                          player={player}
+                          score={score}
+                          isSelf={player.id === selfPlayerId}
+                          correct={false}
+                        />
+                      ))
+                    )}
+                  </View>
+                </View>
+              </View>
+            )}
 
       </ScrollView>
       {/* Sticky Confirm/Awaiting-bar — ligger UTANFÖR ScrollView så Confirm-
@@ -8975,6 +9096,90 @@ const rv = StyleSheet.create({
     fontVariant: ['tabular-nums'],
     letterSpacing: -0.3,
   },
+  // "Correct answers:" / "Wrong answers:"-listorna i reveal-fasen (IndDev).
+  // Kompakta rader så blocket får plats i scroll-zonen tillsammans med
+  // svarsalternativen på korta skärmar.
+  answersWrap: {
+    marginTop: Spacing.md,
+    // Next-tab:en är absolut-positionerad i nedre högra hörnet (56 px hög
+    // + Spacing.lg botten-marginal) och ligger ovanpå scroll-zonen. Utan
+    // detta hamnar sista raden i listan under den.
+    paddingBottom: 56 + Spacing.xl,
+  },
+  // Ruta runt hela facit-blocket. Ärver reveal-kortets färgspråk (Colors.card
+  // fyllning + 2px kant + Radius.lg) så de två läser som samma familj. Kanten
+  // är den neutrala Colors.border — rutan rymmer BÅDE rätt och fel, så en
+  // grön/röd statuskant hade motsagt halva innehållet.
+  answersCard: {
+    backgroundColor: Colors.card,
+    borderWidth: 2,
+    borderColor: Colors.border,
+    borderRadius: Radius.lg,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.md,
+    gap: Spacing.sm,
+  },
+  answersTitle: {
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.bold,
+    color: Colors.textPrimary,
+    letterSpacing: 0.3,
+  },
+  answersHeading: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.bold,
+    letterSpacing: 0.5,
+    marginBottom: 4,
+  },
+  answersHeadingCorrect: {
+    color: Colors.success,
+  },
+  answersHeadingWrong: {
+    color: QUIZ_ERROR_RED,
+  },
+  answersEmpty: {
+    fontSize: FontSize.xs,
+    fontWeight: FontWeight.medium,
+    color: Colors.textDisabled,
+    letterSpacing: 0.2,
+  },
+  answerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    paddingVertical: 3,
+  },
+  answerAvatar: {
+    width: qh(24),
+    height: qh(24),
+    borderRadius: qh(24) / 2,
+  },
+  answerAvatarFallback: {
+    backgroundColor: Colors.cardElevated,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  answerAvatarEmoji: {
+    fontSize: qf(13),
+  },
+  answerName: {
+    flex: 1,
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.medium,
+    color: Colors.textPrimary,
+  },
+  answerTime: {
+    fontSize: FontSize.xs,
+    fontWeight: FontWeight.semibold,
+    fontVariant: ['tabular-nums'],
+    letterSpacing: 0.2,
+  },
+  answerTimeCorrect: {
+    color: Colors.success,
+  },
+  answerTimeWrong: {
+    color: Colors.textSecondary,
+  },
   // Wrapper för Next-tab UTANFÖR feedback-kortet — sträcker sig full bredd
   // i container:n (paddingHorizontal: Spacing.lg från rv.container ger
   // konsekvent högra/vänstra marginal mot skärmkanten). marginTop ger luft
@@ -8992,7 +9197,18 @@ const rv = StyleSheet.create({
   revealNextAbsolute: {
     position: 'absolute',
     bottom: Spacing.lg,
-    right: Spacing.lg,
+    // `left` sätts MEDVETET tillsammans med `right`: utan den hugger den
+    // absolut-positionerade containern sitt innehåll och kan hamna delvis
+    // utanför skärmkanten på smala enheter (Peter 2026-08-24 — "🏆 Final
+    // Leaderboard"-knappen kapades i högerkanten). Med båda kanterna satta
+    // spänner containern över bredden och alignItems: 'flex-end' höger-
+    // ställer knappen INOM de marginalerna, så den aldrig kan svämma över.
+    // pointerEvents='box-none' på call-siten gör att den nu fullbreda
+    // containern inte fångar taps i sin tomma vänsterhalva.
+    left: Spacing.lg,
+    // Halo:n sticker ut 9 px utanför knappen, så lg (16) gav bara 7 px
+    // verklig luft mot skärmkanten. xxl (32) → 23 px luft.
+    right: Spacing.xxl,
     zIndex: 60,
     elevation: 60,
     alignItems: 'flex-end',
