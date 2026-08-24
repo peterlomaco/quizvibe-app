@@ -329,6 +329,7 @@ items:
     probability: 92
     wikimediaSearchHints: ["Ben E King Stand by Me 1961"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3SdTKo2uVsxFblQjpScoHy"
     youtubeClips:
       - videoId: "dTd2ylacYNU"
         startSec: 30
@@ -507,3 +508,29 @@ items:
         endSec: 30
         channelTitle: "Lill-Babs - Topic"
         notes: "Officiell Topic-kanal. Studio 1964. Ersatte fan-upladdning (79kFl6Fe2fc)."
+  # === Tillagg 2026-08-25 (Peters "YT och Spotify lista") ===
+  - id: muddy-waters-mannish-boy
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Mannish Boy — Muddy Waters"
+    correctYear: 1955
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Muddy Waters Mannish Boy"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "58PSYdY0GFg0LFb2PxYk4T"
+    youtubeClips: []
+  - id: dusty-springfield-i-only-want-to-be-with-you
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "I Only Want to Be with You — Dusty Springfield"
+    correctYear: 1963
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Dusty Springfield I Only Want to Be with You"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "31A3oqQxDLdG9HRx45z62d"
+    youtubeClips:
+      - videoId: "CL7t22rypew"
+        startSec: 15
+        endSec: 45
+        channelTitle: "themotownboy1"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."

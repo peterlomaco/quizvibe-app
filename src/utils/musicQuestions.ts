@@ -652,6 +652,25 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "muddy-waters-mannish-boy",
+    "displayName": "Mannish Boy — Muddy Waters",
+    "correctYear": 1955,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "spotifyTrackId": "58PSYdY0GFg0LFb2PxYk4T",
+    "youtubeClips": []
+  },
+  {
     "id": "elvis-presley-heartbreak-hotel",
     "displayName": "Heartbreak Hotel — Elvis Presley",
     "correctYear": 1956,
@@ -991,6 +1010,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "sweden"
     ],
+    "spotifyTrackId": "3SdTKo2uVsxFblQjpScoHy",
     "youtubeClips": [
       {
         "videoId": "dTd2ylacYNU",
@@ -1053,6 +1073,34 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "The Beatles - Topic",
         "license": "standard",
         "notes": "Officiell album-audio via YouTube Topic (Remastered 2009). 'Yeah yeah yeah'-hook."
+      }
+    ]
+  },
+  {
+    "id": "dusty-springfield-i-only-want-to-be-with-you",
+    "displayName": "I Only Want to Be with You — Dusty Springfield",
+    "correctYear": 1963,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "spotifyTrackId": "31A3oqQxDLdG9HRx45z62d",
+    "youtubeClips": [
+      {
+        "videoId": "CL7t22rypew",
+        "startSec": 15,
+        "endSec": 45,
+        "channelTitle": "themotownboy1",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
       }
     ]
   },
@@ -1545,7 +1593,16 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "spotifyTrackId": "7tqhbajSfrz2F7E1Z75ASX",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "IC5PL0XImjw",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Doc Rudy | Soul Studios",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-25 ur Peters YT- och Spotify-lista."
+      }
+    ]
   },
   {
     "id": "neil-diamond-girl-youll-be-a-woman-soon",
@@ -1654,6 +1711,34 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "The Beatles - Topic",
         "license": "standard",
         "notes": "Officiell album-audio via YouTube Topic (Remastered 2015). Opening 'Hey Jude'-hook."
+      }
+    ]
+  },
+  {
+    "id": "dusty-springfield-son-of-a-preacher-man",
+    "displayName": "Son of a Preacher Man — Dusty Springfield",
+    "correctYear": 1968,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "spotifyTrackId": "7odHgoLFi3GQ90E9PeraI3",
+    "youtubeClips": [
+      {
+        "videoId": "b4pYANUAJAI",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "The Ed Sullivan Show",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
       }
     ]
   },
@@ -1928,6 +2013,28 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "bill-withers-aint-no-sunshine",
+    "displayName": "Ain't No Sunshine — Bill Withers",
+    "correctYear": 1971,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Love & Peace"
+    ],
+    "spotifyTrackId": "1k1Bqnv2R0uJXQN4u6LKYt",
+    "youtubeClips": []
+  },
+  {
     "id": "don-mclean-american-pie",
     "displayName": "American Pie — Don McLean",
     "correctYear": 1971,
@@ -1970,14 +2077,15 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "sweden"
     ],
+    "spotifyTrackId": "1QbOvACeYanja5pbnJbAmk",
     "youtubeClips": [
       {
-        "videoId": "6N2b14J-5tA",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "John Denver - Topic",
+        "videoId": "uu7j_xljCRY",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "7clouds",
         "license": "standard",
-        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+        "notes": "Peter-kurerad 2026-08-25 ur Peters YT- och Spotify-lista."
       }
     ]
   },
@@ -3104,7 +3212,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "sweden"
     ],
-    "spotifyTrackId": "5cP52DlDN9yryuZVQDg3iq",
+    "spotifyTrackId": "4UDmDIqJIbrW0hMBQMFOsM",
     "youtubeClips": [
       {
         "videoId": "I_izvAbhExY",
@@ -3562,6 +3670,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "sweden"
     ],
+    "spotifyTrackId": "54OR1VDpfkBuOY5zZjhZAY",
     "youtubeClips": [
       {
         "videoId": "fvzs2ozG-mc",
@@ -3679,6 +3788,25 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "notes": "Wimbledon official channel — 1980 tie-break i fjärde set (18-16 till McEnroe). Mid-tiebreak."
       }
     ]
+  },
+  {
+    "id": "bruce-springsteen-the-river",
+    "displayName": "The River — Bruce Springsteen",
+    "correctYear": 1980,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "spotifyTrackId": "7HrzErXq3TsKOY1gmdIShB",
+    "youtubeClips": []
   },
   {
     "id": "george-benson-give-me-the-night",
@@ -5092,6 +5220,28 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "jennifer-rush-the-power-of-love",
+    "displayName": "The Power of Love — Jennifer Rush",
+    "correctYear": 1984,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Power Ballads"
+    ],
+    "spotifyTrackId": "18DfMhEx4ddoreHrvZDF6Q",
+    "youtubeClips": []
+  },
+  {
     "id": "jonssonligan-far-guldfeber",
     "displayName": "Jönssonligan får guldfeber",
     "correctYear": 1984,
@@ -5474,6 +5624,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "sweden"
     ],
+    "spotifyTrackId": "3ErsOxqe2RmXkR65wkygDz",
     "youtubeClips": [
       {
         "videoId": "oGpFcHTxjZs",
@@ -5844,6 +5995,34 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "tina-turner-we-dont-need-another-hero",
+    "displayName": "We Don't Need Another Hero (Thunderdome) — Tina Turner",
+    "correctYear": 1985,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "spotifyTrackId": "50XXRUFNjs85P0MjCZ1c9X",
+    "youtubeClips": [
+      {
+        "videoId": "HLBXAs2LO8k",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "#NVU Music",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+      }
+    ]
+  },
+  {
     "id": "usa-for-africa-we-are-the-world",
     "displayName": "We Are the World — USA for Africa",
     "correctYear": 1985,
@@ -5859,14 +6038,15 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "sweden"
     ],
+    "spotifyTrackId": "3Z2tPWiNiIpg8UMMoowHIk",
     "youtubeClips": [
       {
-        "videoId": "s3wNuru4U0I",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Oxygene 80",
+        "videoId": "_cDNhqNv2HY",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "CaptainCarlossi",
         "license": "standard",
-        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (18)."
+        "notes": "Peter-kurerad 2026-08-25 ur Peters YT- och Spotify-lista."
       }
     ]
   },
@@ -5952,6 +6132,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "jan-hammer-crocketts-theme",
+    "displayName": "Crockett's Theme — Jan Hammer",
+    "correctYear": 1986,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Film"
+    ],
+    "spotifyTrackId": "3TnJ7M6in8Pb5EyGBUK02Y",
+    "youtubeClips": [
+      {
+        "videoId": "Lfgf9HatIHI",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Miami Vice",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+      }
+    ]
+  },
+  {
     "id": "madonna-la-isla-bonita",
     "displayName": "La Isla Bonita — Madonna",
     "correctYear": 1986,
@@ -6028,6 +6239,29 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "notes": "Peter-kurerad 2026-08-14. Kanal ej verifierad."
       }
     ]
+  },
+  {
+    "id": "peter-lundblad-ta-mig-till-havet",
+    "displayName": "Ta mig till havet — Peter Lundblad",
+    "correctYear": 1986,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Summer",
+      "100% svenska"
+    ],
+    "spotifyTrackId": "01LWBjJwFdRSCeovqipb3D",
+    "youtubeClips": []
   },
   {
     "id": "sandra-kim-jaime-la-vie",
@@ -6526,6 +6760,60 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "milli-vanilli-girl-you-know-its-true",
+    "displayName": "Girl You Know It's True — Milli Vanilli",
+    "correctYear": 1988,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "0ZV9FyngchQ",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "musicvideorestorations",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+      }
+    ]
+  },
+  {
+    "id": "paula-abdul-straight-up",
+    "displayName": "Straight Up — Paula Abdul",
+    "correctYear": 1988,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "8yFwvifjuf4",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "MVIDEO4K",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+      }
+    ]
+  },
+  {
     "id": "roxette-listen-to-your-heart",
     "displayName": "Listen to Your Heart — Roxette",
     "correctYear": 1988,
@@ -6630,6 +6918,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Eurovision"
     ],
+    "spotifyTrackId": "7bVwUOySQGO2afJ0LArAMi",
     "youtubeClips": [
       {
         "videoId": "u4-gEpNI6CI",
@@ -6976,6 +7265,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "sweden"
     ],
+    "spotifyTrackId": "6pPWRBubXOBAHnjl5ZIujB",
     "youtubeClips": [
       {
         "videoId": "GC5E8ie2pdM",
@@ -6985,6 +7275,29 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "notes": "Peter-kurerad 2026-08-14. Kanal ej verifierad."
       }
     ]
+  },
+  {
+    "id": "tommy-nilsson-en-dag",
+    "displayName": "En dag — Tommy Nilsson",
+    "correctYear": 1989,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Eurovision",
+      "Melodifestivalen"
+    ],
+    "spotifyTrackId": "4y81ov9ojdBPu5eLhDKxS9",
+    "youtubeClips": []
   },
   {
     "id": "acdc-thunderstruck",
@@ -7070,6 +7383,34 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "londonbeat-ive-been-thinking-about-you",
+    "displayName": "I've Been Thinking About You — Londonbeat",
+    "correctYear": 1990,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "spotifyTrackId": "50PeqUz1BjMw9ayNTk5O4d",
+    "youtubeClips": [
+      {
+        "videoId": "06k-lO4vuic",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Enhanced Music Videos",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+      }
+    ]
+  },
+  {
     "id": "madonna-vogue",
     "displayName": "Vogue — Madonna",
     "correctYear": 1990,
@@ -7123,6 +7464,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "New Order - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
+    "id": "roxette-it-must-have-been-love",
+    "displayName": "It Must Have Been Love — Roxette",
+    "correctYear": 1990,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Love & Peace"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "k2C5TjS2sh4",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Roxette",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
       }
     ]
   },
@@ -7346,6 +7717,68 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "michael-jackson-remember-the-time",
+    "displayName": "Remember the Time — Michael Jackson",
+    "correctYear": 1991,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Love & Peace"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "LeiFF0gvqcc",
+        "startSec": 210,
+        "endSec": 240,
+        "channelTitle": "michaeljacksonVEVO",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+      }
+    ]
+  },
+  {
+    "id": "mr-big-to-be-with-you",
+    "displayName": "To Be with You — Mr. Big",
+    "correctYear": 1991,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Love & Peace",
+      "Power Ballads"
+    ],
+    "spotifyTrackId": "3bP47tw8MOgtrwdO1iahVl",
+    "youtubeClips": [
+      {
+        "videoId": "3ksOBNd0SWo",
+        "startSec": 8,
+        "endSec": 38,
+        "channelTitle": "2MinusTVHD",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+      }
+    ]
+  },
+  {
     "id": "nirvana-come-as-you-are",
     "displayName": "Come as You Are — Nirvana",
     "correctYear": 1991,
@@ -7373,6 +7806,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "queen-the-show-must-go-on",
+    "displayName": "The Show Must Go On — Queen",
+    "correctYear": 1991,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "sport"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "t99KH0TR-J4",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Queen Official",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+      }
+    ]
+  },
+  {
     "id": "rem-losing-my-religion",
     "displayName": "Losing My Religion — R.E.M.",
     "correctYear": 1991,
@@ -7396,6 +7859,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "remhq",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (15)."
+      }
+    ]
+  },
+  {
+    "id": "rem-shiny-happy-people",
+    "displayName": "Shiny Happy People — R.E.M.",
+    "correctYear": 1991,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "YYOKMUTTDdA",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "remhq",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
       }
     ]
   },
@@ -7454,6 +7944,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "spin-doctors-two-princes",
+    "displayName": "Two Princes — Spin Doctors",
+    "correctYear": 1991,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "wsdy_rct6uo",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "SpinDoctorsVEVO",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+      }
+    ]
+  },
+  {
     "id": "tre-kronor-vm-1991-turku",
     "displayName": "Tre Kronor VM-guld Turku",
     "correctYear": 1991,
@@ -7477,6 +7994,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Daniel Risarp",
         "license": "standard",
         "notes": "Refined query 2026-05-27 — 'Mats Sundin avgör när Tre Kronor tar VM guld 1991'."
+      }
+    ]
+  },
+  {
+    "id": "zucchero-paul-young-senza-una-donna",
+    "displayName": "Senza una donna — Zucchero & Paul Young",
+    "correctYear": 1991,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Love & Peace"
+    ],
+    "spotifyTrackId": "1wzggqX4y7amR0xdJIekwE",
+    "youtubeClips": [
+      {
+        "videoId": "V69vs8JmXYM",
+        "startSec": 5,
+        "endSec": 35,
+        "channelTitle": "Zucchero",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
       }
     ]
   },
@@ -7559,6 +8107,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "FT Depot",
         "license": "standard",
         "notes": "Original teatral 1992-trailer — Aladdin + Agrabah + Genie (Robin Williams) etableras."
+      }
+    ]
+  },
+  {
+    "id": "bon-jovi-bed-of-roses",
+    "displayName": "Bed of Roses — Bon Jovi",
+    "correctYear": 1992,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Love & Peace",
+      "Power Ballads"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "NvR60Wg9R7Q",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "BonJoviVEVO",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
       }
     ]
   },
@@ -7699,6 +8278,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "jon-secada-just-another-day",
+    "displayName": "Just Another Day — Jon Secada",
+    "correctYear": 1992,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Love & Peace"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "G0pDyyooUJE",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "moonfloated",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+      }
+    ]
+  },
+  {
     "id": "linda-martin-why-me",
     "displayName": "Why Me? — Linda Martin",
     "correctYear": 1992,
@@ -7757,6 +8366,25 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "roxette-queen-of-rain",
+    "displayName": "Queen of Rain — Roxette",
+    "correctYear": 1992,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "spotifyTrackId": "5lnz9DbNfzJWiiUudfG6IW",
+    "youtubeClips": []
+  },
+  {
     "id": "shakespears-sister-stay",
     "displayName": "Stay — Shakespears Sister",
     "correctYear": 1992,
@@ -7807,6 +8435,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "SNAP!",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (18)."
+      }
+    ]
+  },
+  {
+    "id": "snow-informer",
+    "displayName": "Informer — Snow",
+    "correctYear": 1992,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "TSffz_bl6zo",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "RHINO",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
       }
     ]
   },
@@ -8031,6 +8686,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "cypress-hill-insane-in-the-brain",
+    "displayName": "Insane in the Brain — Cypress Hill",
+    "correctYear": 1993,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "hiphop"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "RijB8wnJCN0",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "CypressHillVEVO",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+      }
+    ]
+  },
+  {
     "id": "jurassic-park",
     "displayName": "Jurassic Park",
     "correctYear": 1993,
@@ -8065,6 +8750,63 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Universal Pictures At Home",
         "license": "standard",
         "notes": "Official Universal Pictures-klipp 4K — iconic theme + dinosaur-reveal."
+      }
+    ]
+  },
+  {
+    "id": "lenny-kravitz-are-you-gonna-go-my-way",
+    "displayName": "Are You Gonna Go My Way — Lenny Kravitz",
+    "correctYear": 1993,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "i5PZQMwL7iE",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Lenny Kravitz",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+      }
+    ]
+  },
+  {
+    "id": "snoop-dogg-whats-my-name",
+    "displayName": "Who Am I (What's My Name)? — Snoop Doggy Dogg",
+    "correctYear": 1993,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "hiphop"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "2soGJXQAQec",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "SnoopDoggVEVO",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
       }
     ]
   },
@@ -8205,6 +8947,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Dr. Alban",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-14 med explicit startSec 5. Videotitel verifierad: 'Dr. Alban - Look Who's Talking (Official 4K Video)' — inget ar i titeln."
+      }
+    ]
+  },
+  {
+    "id": "everything-but-the-girl-missing",
+    "displayName": "Missing — Everything but the Girl",
+    "correctYear": 1994,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "europe"
+    ],
+    "genrePackages": [
+      "Love & Peace"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "U56Ns66Qrb8",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "EBTGVEVO",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
       }
     ]
   },
@@ -8401,6 +9173,28 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "roxette-run-to-you",
+    "displayName": "Run to You — Roxette",
+    "correctYear": 1994,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "europe"
+    ],
+    "genrePackages": [
+      "Love & Peace"
+    ],
+    "spotifyTrackId": "1zeqAF6Hf1lPJoNkkmNA9j",
+    "youtubeClips": []
+  },
+  {
     "id": "scatman-john-scatman",
     "displayName": "Scatman (Ski-Ba-Bop-Ba-Dop-Bop) — Scatman John",
     "correctYear": 1994,
@@ -8493,6 +9287,25 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "andrea-bocelli-con-te-partiro",
+    "displayName": "Con te partirò — Andrea Bocelli",
+    "correctYear": 1995,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "spotifyTrackId": "7zrpoAJte9o12TzawqgdD0",
+    "youtubeClips": []
+  },
+  {
     "id": "cantona-kungfu-kick-1995",
     "displayName": "Cantonas kung-fu-spark mot Crystal Palace-fan",
     "correctYear": 1995,
@@ -8577,6 +9390,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "no-mercy-missing",
+    "displayName": "Missing — No Mercy",
+    "correctYear": 1995,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "europe"
+    ],
+    "genrePackages": [
+      "Love & Peace"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "73NY_bSbgqE",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "NoMercyVEVO",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+      }
+    ]
+  },
+  {
     "id": "oasis-wonderwall",
     "displayName": "Wonderwall — Oasis",
     "correctYear": 1995,
@@ -8600,6 +9443,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Oasis - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
+    "id": "robyn-show-me-love",
+    "displayName": "Show Me Love — Robyn",
+    "correctYear": 1995,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Love & Peace"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "bhWEI6-_w9E",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "RobynVEVO",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
       }
     ]
   },
@@ -8719,6 +9592,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "eros-ramazzotti-la-cosa-mas-bella",
+    "displayName": "La Cosa Más Bella (Più bella cosa) — Eros Ramazzotti",
+    "correctYear": 1996,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "europe"
+    ],
+    "genrePackages": [
+      "Love & Peace"
+    ],
+    "spotifyTrackId": "1EZypwk0xcj64ZLAglhLs2",
+    "youtubeClips": [
+      {
+        "videoId": "UojBaKX5Vz4",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "ErosRamazzottiVEVO",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+      }
+    ]
+  },
+  {
     "id": "lightning-seeds-three-lions",
     "displayName": "Three Lions — Baddiel, Skinner & The Lightning Seeds",
     "correctYear": 1996,
@@ -8776,6 +9680,63 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "mark-morrison-return-of-the-mack",
+    "displayName": "Return of the Mack — Mark Morrison",
+    "correctYear": 1996,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "europe"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "uB1D9wWxd2w",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Mark Morrison",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+      }
+    ]
+  },
+  {
+    "id": "mr-president-coco-jamboo",
+    "displayName": "Coco Jamboo — Mr. President",
+    "correctYear": 1996,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "europe"
+    ],
+    "genrePackages": [
+      "Summer"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "EScLmWJs82I",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "MELOMAN DANCE",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+      }
+    ]
+  },
+  {
     "id": "nas-if-i-ruled-the-world",
     "displayName": "If I Ruled the World — Nas ft. Lauryn Hill",
     "correctYear": 1996,
@@ -8802,6 +9763,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 30,
         "channelTitle": "Nas",
         "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "no-mercy-where-do-you-go",
+    "displayName": "Where Do You Go — No Mercy",
+    "correctYear": 1996,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "europe"
+    ],
+    "genrePackages": [
+      "Summer"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "ElAFJopotgw",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Greatest Hits",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
       }
     ]
   },
@@ -8833,6 +9824,86 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "spice-girls-wannabe",
+    "displayName": "Wannabe — Spice Girls",
+    "correctYear": 1996,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "Orz_bA80Ut0",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Spice Girls Mania",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-25 ur Peters YT- och Spotify-lista."
+      }
+    ]
+  },
+  {
+    "id": "tommy-nilsson-dina-farger-var-bla",
+    "displayName": "Dina färger var blå — Tommy Nilsson",
+    "correctYear": 1996,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "100% svenska"
+    ],
+    "spotifyTrackId": "2eIe720mhOM77Gfa6I4Url",
+    "youtubeClips": []
+  },
+  {
+    "id": "alexia-uh-la-la-la",
+    "displayName": "Uh La La La — Alexia",
+    "correctYear": 1997,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "europe"
+    ],
+    "genrePackages": [
+      "Summer"
+    ],
+    "spotifyTrackId": "39UwRe2NJbWtMxw5q3EIUI",
+    "youtubeClips": [
+      {
+        "videoId": "alFj9cBDWH0",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "SuperGhostkiller",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+      }
+    ]
+  },
+  {
     "id": "aqua-barbie-girl",
     "displayName": "Barbie Girl — Aqua",
     "correctYear": 1997,
@@ -8850,11 +9921,12 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "youtubeClips": [
       {
-        "videoId": "77zog6Up_Yg",
+        "videoId": "twW5slEK8wY",
         "startSec": 0,
-        "endSec": 198,
-        "channelTitle": "Aqua - Topic",
-        "license": "standard"
+        "endSec": 30,
+        "channelTitle": "MusicVideoHero",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-25 ur Peters YT- och Spotify-lista."
       }
     ]
   },
@@ -9028,6 +10100,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "kentchannel",
         "license": "standard",
         "notes": "Bandets egen kanal. Peter-kurerad 2026-08-11."
+      }
+    ]
+  },
+  {
+    "id": "kent-utan-dina-andetag",
+    "displayName": "Utan dina andetag — Kent",
+    "correctYear": 1997,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Love & Peace"
+    ],
+    "spotifyTrackId": "5eJ314ozT4CTPlyjdsGq78",
+    "youtubeClips": [
+      {
+        "videoId": "Q-qnIk9Oxlg",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "7clouds Sweden",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
       }
     ]
   },
@@ -9288,6 +10391,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "lenny-kravitz-fly-away",
+    "displayName": "Fly Away — Lenny Kravitz",
+    "correctYear": 1998,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "EvuL5jyCHOw",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "LennyKravitzVEVO",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+      }
+    ]
+  },
+  {
     "id": "madonna-frozen",
     "displayName": "Frozen — Madonna",
     "correctYear": 1998,
@@ -9415,6 +10545,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Southside Spinners",
         "license": "standard",
         "notes": "Official video 2000."
+      }
+    ]
+  },
+  {
+    "id": "vengaboys-boom-boom-boom-boom",
+    "displayName": "Boom, Boom, Boom, Boom!! — Vengaboys",
+    "correctYear": 1998,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "europe"
+    ],
+    "genrePackages": [
+      "Club & Dance Hits"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "llyiQ4I-mcQ",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Vengaboys",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
       }
     ]
   },
@@ -9551,6 +10711,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "spotifyTrackId": "75IN3CtuZwTHTnZvYM4qnJ",
     "youtubeClips": []
+  },
+  {
+    "id": "enrique-iglesias-bailamos",
+    "displayName": "Bailamos — Enrique Iglesias",
+    "correctYear": 1999,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Film"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "bJE308E1gTk",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Enrique Iglesias",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+      }
+    ]
   },
   {
     "id": "kent-music-non-stop",
@@ -10353,6 +11543,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "benny-benassi-satisfaction",
+    "displayName": "Satisfaction — Benny Benassi",
+    "correctYear": 2002,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "europe"
+    ],
+    "genrePackages": [
+      "Club & Dance Hits"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "y4gm5MdWg3M",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "ollmake",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+      }
+    ]
+  },
+  {
     "id": "coldplay-the-scientist",
     "displayName": "The Scientist — Coldplay",
     "correctYear": 2002,
@@ -10402,6 +11622,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 291,
         "channelTitle": "Solitude Songs",
         "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "kate-ryan-desenchantee",
+    "displayName": "Désenchantée — Kate Ryan",
+    "correctYear": 2002,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "europe"
+    ],
+    "genrePackages": [
+      "Club & Dance Hits"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "f_vyYpNDXkI",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Tuga93",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
       }
     ]
   },
@@ -11100,6 +12350,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "alex-gaudino-destination-calabria",
+    "displayName": "Destination Calabria — Alex Gaudino feat. Crystal Waters",
+    "correctYear": 2006,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "europe"
+    ],
+    "genrePackages": [
+      "Club & Dance Hits"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "Kq4OtRsdXls",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Time Records",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+      }
+    ]
+  },
+  {
     "id": "carola-evighet",
     "displayName": "Evighet — Carola",
     "correctYear": 2006,
@@ -11123,6 +12403,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Melodifestivalen",
         "license": "standard",
         "notes": "Melodifestivalen 2006 vinnare."
+      }
+    ]
+  },
+  {
+    "id": "david-tavare-summerlove",
+    "displayName": "Summerlove — David Tavaré",
+    "correctYear": 2006,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "europe"
+    ],
+    "genrePackages": [
+      "Summer"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "hs2M85CqZVQ",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "rdsmusiclabel",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
       }
     ]
   },
@@ -11200,11 +12510,12 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "youtubeClips": [
       {
-        "videoId": "fNRXD393cfs",
+        "videoId": "X8k1FVqtojU",
         "startSec": 0,
-        "endSec": 219,
-        "channelTitle": "7clouds",
-        "license": "standard"
+        "endSec": 30,
+        "channelTitle": "Mix Sabrosura",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-25 ur Peters YT- och Spotify-lista."
       }
     ]
   },
@@ -11232,6 +12543,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Radiosporten",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
+    "id": "kate-ryan-voyage-voyage",
+    "displayName": "Voyage, voyage — Kate Ryan",
+    "correctYear": 2007,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "europe"
+    ],
+    "genrePackages": [
+      "Club & Dance Hits"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "XT9IDo-vF5k",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Kate Ryan",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
       }
     ]
   },
@@ -11360,6 +12701,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 45,
         "channelTitle": "Lost Panda",
         "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "yves-larock-rise-up",
+    "displayName": "Rise Up — Yves Larock feat. Jaba",
+    "correctYear": 2007,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "europe"
+    ],
+    "genrePackages": [
+      "Club & Dance Hits"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "zwcmZ0mGQno",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Energy TV",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
       }
     ]
   },
@@ -11500,6 +12871,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Wimbledon",
         "license": "standard",
         "notes": "Wimbledon official channel — 2008 'greatest match'-finalen Best Rallies."
+      }
+    ]
+  },
+  {
+    "id": "kate-ryan-ella-elle-la",
+    "displayName": "Ella, elle l'a — Kate Ryan",
+    "correctYear": 2008,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "europe"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "hdJN0ss7jA0",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Kate Ryan",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
       }
     ]
   },
@@ -11955,6 +13353,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "david-guetta-gettin-over-you",
+    "displayName": "Gettin' Over You — David Guetta & Chris Willis feat. Fergie & LMFAO",
+    "correctYear": 2010,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "europe"
+    ],
+    "genrePackages": [
+      "Club & Dance Hits"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "hWjrMTWXH28",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "David Guetta",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+      }
+    ]
+  },
+  {
     "id": "eminem-rihanna-love-the-way-you-lie",
     "displayName": "Love the Way You Lie — Eminem & Rihanna",
     "correctYear": 2010,
@@ -12083,6 +13511,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 202,
         "channelTitle": "7clouds",
         "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "swedish-house-mafia-one",
+    "displayName": "One (Your Name) — Swedish House Mafia",
+    "correctYear": 2010,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Club & Dance Hits"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "RVnsoTsG1Rg",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "MrWeiird",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
       }
     ]
   },
@@ -12473,6 +13931,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "justin-bieber-beauty-and-a-beat",
+    "displayName": "Beauty and a Beat — Justin Bieber feat. Nicki Minaj",
+    "correctYear": 2012,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "l8hIx9AceOw",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "TopMusicVidsWeekly",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+      }
+    ]
+  },
+  {
     "id": "kapten-rod-nar-solen-gar-ner",
     "displayName": "När solen går ner — Kapten Röd",
     "correctYear": 2012,
@@ -12603,12 +14088,12 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "spotifyTrackId": "3zu2CuVTJwaZn2m4rBzaUO",
     "youtubeClips": [
       {
-        "videoId": "3mWbRB3Y4R8",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Swedish House Mafia - Topic",
+        "videoId": "02Qa5PH0tZY",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Aernoron",
         "license": "standard",
-        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+        "notes": "Peter-kurerad 2026-08-25 ur Peters YT- och Spotify-lista."
       }
     ]
   },
@@ -12816,6 +14301,28 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "john-newman-love-me-again",
+    "displayName": "Love Me Again — John Newman",
+    "correctYear": 2013,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "europe"
+    ],
+    "genrePackages": [
+      "Club & Dance Hits"
+    ],
+    "spotifyTrackId": "5TbzAWWc5eJaANpA9kfGCd",
+    "youtubeClips": []
+  },
+  {
     "id": "pharrell-williams-happy",
     "displayName": "Happy — Pharrell Williams",
     "correctYear": 2013,
@@ -12922,6 +14429,56 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "notes": "Official music video. Viral hit 2013."
       }
     ]
+  },
+  {
+    "id": "ariana-grande-break-free",
+    "displayName": "Break Free — Ariana Grande feat. Zedd",
+    "correctYear": 2014,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "spotifyTrackId": "2lOgTEwxmRPBtjp60opyRN",
+    "youtubeClips": [
+      {
+        "videoId": "YOgIEc8y7-Y",
+        "startSec": 28,
+        "endSec": 58,
+        "channelTitle": "Krystian GARY B",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+      }
+    ]
+  },
+  {
+    "id": "ariana-grande-love-me-harder",
+    "displayName": "Love Me Harder — Ariana Grande & The Weeknd",
+    "correctYear": 2014,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Love & Peace"
+    ],
+    "spotifyTrackId": "7HE1FnMtSsRotzIAQPXpr5",
+    "youtubeClips": []
   },
   {
     "id": "conchita-wurst-rise-like-a-phoenix",
@@ -13690,6 +15247,34 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": []
   },
   {
+    "id": "kygo-for-life",
+    "displayName": "For Life — Kygo, Zak Abel & Nile Rodgers",
+    "correctYear": 2017,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "nordic"
+    ],
+    "spotifyTrackId": "6YutTqJz3jGfLMfzIHpSTf",
+    "youtubeClips": [
+      {
+        "videoId": "L_BU-xUPnXU",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "bemu",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+      }
+    ]
+  },
+  {
     "id": "luis-fonsi-despacito",
     "displayName": "Despacito — Luis Fonsi & Daddy Yankee",
     "correctYear": 2017,
@@ -13915,11 +15500,12 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "youtubeClips": [
       {
-        "videoId": "aU_bj9SxvdU",
+        "videoId": "7hiVIixor_Q",
         "startSec": 0,
-        "endSec": 216,
-        "channelTitle": "7clouds",
-        "license": "standard"
+        "endSec": 30,
+        "channelTitle": "A Star Is Born 2018",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-25 ur Peters YT- och Spotify-lista."
       }
     ]
   },
@@ -15032,6 +16618,60 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 171,
         "channelTitle": "7cloudsnation",
         "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "alex-warren-eternity",
+    "displayName": "Eternity — Alex Warren",
+    "correctYear": 2025,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "jXqf3uqLkkU",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Alex Warren",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+      }
+    ]
+  },
+  {
+    "id": "alex-warren-ordinary",
+    "displayName": "Ordinary — Alex Warren",
+    "correctYear": 2025,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "u2ah9tWTkmk",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Alex Warren",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
       }
     ]
   },

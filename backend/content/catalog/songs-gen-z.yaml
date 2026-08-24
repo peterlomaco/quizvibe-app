@@ -29,10 +29,11 @@ items:
     wikimediaSearchHints: ["Aqua Barbie Girl 1997"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "77zog6Up_Yg"
+      - videoId: "twW5slEK8wY"
         startSec: 0
-        endSec: 198
-        channelTitle: "Aqua - Topic"
+        endSec: 30
+        channelTitle: "MusicVideoHero"
+        notes: "Peter-kurerad 2026-08-25 ur Peters YT- och Spotify-lista."
   # My Heart Will Go On flyttad till songs-all.yaml (cross-gen-iconic) 2026-05-22.
   # 1998
   - id: cher-believe
@@ -285,10 +286,11 @@ items:
     wikimediaSearchHints: ["Shakira Hips Don't Lie Wyclef Jean"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "fNRXD393cfs"
+      - videoId: "X8k1FVqtojU"
         startSec: 0
-        endSec: 219
-        channelTitle: "7clouds"
+        endSec: 30
+        channelTitle: "Mix Sabrosura"
+        notes: "Peter-kurerad 2026-08-25 ur Peters YT- och Spotify-lista."
   # 2007
   - id: rihanna-umbrella
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -558,11 +560,11 @@ items:
     answerMethods: ["timeline"]
     spotifyTrackId: "3zu2CuVTJwaZn2m4rBzaUO"
     youtubeClips:
-      - videoId: "3mWbRB3Y4R8"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Swedish House Mafia - Topic"
-        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      - videoId: "02Qa5PH0tZY"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Aernoron"
+        notes: "Peter-kurerad 2026-08-25 ur Peters YT- och Spotify-lista."
   - id: eric-prydz-call-on-me
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Call on Me — Eric Prydz"
@@ -1405,3 +1407,228 @@ items:
         channelTitle: "MVIDEO4K"
         notes: "Ersatte Peters lank UxQ7PAerVdE 2026-08-14: samma officiella video men SD (HD-gaten flaggade den). Detta ar 4K-uppladdningen, titel '[4K] Ricky Martin - Livin' La Vida Loca (Music Video)' — inget ar i titeln. Samma kanal som lou-bega-mambo-no-5."
     notes: "correctYear = singeln (mars 1999), fore albumet Ricky Martin (maj 1999)."
+  # === Tillagg 2026-08-25 (Peters "YT och Spotify lista") ===
+  - id: swedish-house-mafia-one
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "One (Your Name) — Swedish House Mafia"
+    correctYear: 2010
+    probability: 80
+    region: ["sweden"]
+    wikimediaSearchHints: ["Swedish House Mafia One Your Name Pharrell"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Club & Dance Hits"]
+    youtubeClips:
+      - videoId: "RVnsoTsG1Rg"
+        startSec: 0
+        endSec: 30
+        channelTitle: "MrWeiird"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+  - id: david-guetta-gettin-over-you
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Gettin' Over You — David Guetta & Chris Willis feat. Fergie & LMFAO"
+    correctYear: 2010
+    probability: 80
+    region: ["europe"]
+    wikimediaSearchHints: ["David Guetta Gettin Over You"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Club & Dance Hits"]
+    youtubeClips:
+      - videoId: "hWjrMTWXH28"
+        startSec: 0
+        endSec: 30
+        channelTitle: "David Guetta"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+  - id: kent-utan-dina-andetag
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Utan dina andetag — Kent"
+    correctYear: 1997
+    probability: 80
+    region: ["sweden"]
+    wikimediaSearchHints: ["Kent Utan dina andetag Isola"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Love & Peace"]
+    spotifyTrackId: "5eJ314ozT4CTPlyjdsGq78"
+    youtubeClips:
+      - videoId: "Q-qnIk9Oxlg"
+        startSec: 0
+        endSec: 30
+        channelTitle: "7clouds Sweden"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+  - id: alexia-uh-la-la-la
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Uh La La La — Alexia"
+    correctYear: 1997
+    probability: 80
+    region: ["europe"]
+    wikimediaSearchHints: ["Alexia Uh La La La Fan Club"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Summer"]
+    spotifyTrackId: "39UwRe2NJbWtMxw5q3EIUI"
+    youtubeClips:
+      - videoId: "alFj9cBDWH0"
+        startSec: 0
+        endSec: 30
+        channelTitle: "SuperGhostkiller"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+  - id: alex-gaudino-destination-calabria
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Destination Calabria — Alex Gaudino feat. Crystal Waters"
+    correctYear: 2006
+    probability: 80
+    region: ["europe"]
+    wikimediaSearchHints: ["Alex Gaudino Destination Calabria Crystal Waters"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Club & Dance Hits"]
+    youtubeClips:
+      - videoId: "Kq4OtRsdXls"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Time Records"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+  - id: benny-benassi-satisfaction
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Satisfaction — Benny Benassi"
+    correctYear: 2002
+    probability: 80
+    region: ["europe"]
+    wikimediaSearchHints: ["Benny Benassi Satisfaction Hypnotica"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Club & Dance Hits"]
+    youtubeClips:
+      - videoId: "y4gm5MdWg3M"
+        startSec: 0
+        endSec: 30
+        channelTitle: "ollmake"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+  - id: vengaboys-boom-boom-boom-boom
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Boom, Boom, Boom, Boom!! — Vengaboys"
+    correctYear: 1998
+    probability: 80
+    region: ["europe"]
+    wikimediaSearchHints: ["Vengaboys Boom Boom Boom Boom"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Club & Dance Hits"]
+    youtubeClips:
+      - videoId: "llyiQ4I-mcQ"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Vengaboys"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+  - id: lenny-kravitz-fly-away
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Fly Away — Lenny Kravitz"
+    correctYear: 1998
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Lenny Kravitz Fly Away"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "EvuL5jyCHOw"
+        startSec: 0
+        endSec: 30
+        channelTitle: "LennyKravitzVEVO"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+  - id: enrique-iglesias-bailamos
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Bailamos — Enrique Iglesias"
+    correctYear: 1999
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Enrique Iglesias Bailamos Wild Wild West"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Film"]
+    youtubeClips:
+      - videoId: "bJE308E1gTk"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Enrique Iglesias"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+  - id: david-tavare-summerlove
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Summerlove — David Tavaré"
+    correctYear: 2006
+    probability: 80
+    region: ["europe"]
+    wikimediaSearchHints: ["David Tavare Summerlove"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Summer"]
+    youtubeClips:
+      - videoId: "hs2M85CqZVQ"
+        startSec: 0
+        endSec: 30
+        channelTitle: "rdsmusiclabel"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+  - id: justin-bieber-beauty-and-a-beat
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Beauty and a Beat — Justin Bieber feat. Nicki Minaj"
+    correctYear: 2012
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Justin Bieber Beauty and a Beat Believe"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "l8hIx9AceOw"
+        startSec: 0
+        endSec: 30
+        channelTitle: "TopMusicVidsWeekly"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+  - id: yves-larock-rise-up
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Rise Up — Yves Larock feat. Jaba"
+    correctYear: 2007
+    probability: 80
+    region: ["europe"]
+    wikimediaSearchHints: ["Yves Larock Rise Up Jaba"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Club & Dance Hits"]
+    youtubeClips:
+      - videoId: "zwcmZ0mGQno"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Energy TV"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+  - id: kate-ryan-ella-elle-la
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Ella, elle l'a — Kate Ryan"
+    correctYear: 2008
+    probability: 80
+    region: ["europe"]
+    wikimediaSearchHints: ["Kate Ryan Ella elle la Free album"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "hdJN0ss7jA0"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Kate Ryan"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+  - id: kate-ryan-desenchantee
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Désenchantée — Kate Ryan"
+    correctYear: 2002
+    probability: 80
+    region: ["europe"]
+    wikimediaSearchHints: ["Kate Ryan Desenchantee"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Club & Dance Hits"]
+    youtubeClips:
+      - videoId: "f_vyYpNDXkI"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Tuga93"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+  - id: kate-ryan-voyage-voyage
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Voyage, voyage — Kate Ryan"
+    correctYear: 2007
+    probability: 80
+    region: ["europe"]
+    wikimediaSearchHints: ["Kate Ryan Voyage Voyage"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Club & Dance Hits"]
+    youtubeClips:
+      - videoId: "XT9IDo-vF5k"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Kate Ryan"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."

@@ -147,7 +147,7 @@ items:
     probability: 92
     wikimediaSearchHints: ["Bee Gees Stayin Alive Saturday Night Fever"]
     answerMethods: ["timeline"]
-    spotifyTrackId: "5cP52DlDN9yryuZVQDg3iq"
+    spotifyTrackId: "4UDmDIqJIbrW0hMBQMFOsM"
     youtubeClips:
       - videoId: "I_izvAbhExY"
         startSec: 30
@@ -399,6 +399,7 @@ items:
     probability: 90
     wikimediaSearchHints: ["Village People YMCA 1978"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "54OR1VDpfkBuOY5zZjhZAY"
     youtubeClips:
       - videoId: "fvzs2ozG-mc"
         startSec: 30
@@ -556,12 +557,13 @@ items:
     probability: 84
     wikimediaSearchHints: ["John Denver Take Me Home Country Roads 1971"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1QbOvACeYanja5pbnJbAmk"
     youtubeClips:
-      - videoId: "6N2b14J-5tA"
-        startSec: 30
-        endSec: 45
-        channelTitle: "John Denver - Topic"
-        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      - videoId: "uu7j_xljCRY"
+        startSec: 0
+        endSec: 30
+        channelTitle: "7clouds"
+        notes: "Peter-kurerad 2026-08-25 ur Peters YT- och Spotify-lista."
   - id: bob-marley-no-woman-no-cry
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "No Woman, No Cry — Bob Marley & The Wailers"
@@ -1074,7 +1076,12 @@ items:
     wikimediaSearchHints: ["Marvin Gaye Tammi Terrell Ain't No Mountain High Enough 1967"]
     answerMethods: ["timeline"]
     spotifyTrackId: "7tqhbajSfrz2F7E1Z75ASX"
-    youtubeClips: []
+    youtubeClips:
+      - videoId: "IC5PL0XImjw"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Doc Rudy | Soul Studios"
+        notes: "Peter-kurerad 2026-08-25 ur Peters YT- och Spotify-lista."
   - id: the-who-behind-blue-eyes
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Behind Blue Eyes — The Who"
@@ -1162,3 +1169,40 @@ items:
         channelTitle: "KC and the Sunshine Band - Topic"
         notes: "Ersatte Peters lank O0_H3F84Yjk 2026-08-14: den hade '1975' i videotiteln (= svaret), var SD och embed-blockerad i 2 regioner utan servad region. Detta ar officiell Topic-audio, HD, ren titel utan arsangivelse. OBS statisk albumkonst — byt garna till en officiell video om en oblockerad hittas."
     notes: "correctYear = 1975 (bade det sjalvbetitlade albumet och singeln)."
+  # === Tillagg 2026-08-25 (Peters "YT och Spotify lista") ===
+  - id: dusty-springfield-son-of-a-preacher-man
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Son of a Preacher Man — Dusty Springfield"
+    correctYear: 1968
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Dusty Springfield Son of a Preacher Man"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "7odHgoLFi3GQ90E9PeraI3"
+    youtubeClips:
+      - videoId: "b4pYANUAJAI"
+        startSec: 0
+        endSec: 30
+        channelTitle: "The Ed Sullivan Show"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+  - id: bill-withers-aint-no-sunshine
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Ain't No Sunshine — Bill Withers"
+    correctYear: 1971
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Bill Withers Aint No Sunshine Just As I Am"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Love & Peace"]
+    spotifyTrackId: "1k1Bqnv2R0uJXQN4u6LKYt"
+    youtubeClips: []
+  - id: bruce-springsteen-the-river
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "The River — Bruce Springsteen"
+    correctYear: 1980
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Bruce Springsteen The River"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "7HrzErXq3TsKOY1gmdIShB"
+    youtubeClips: []

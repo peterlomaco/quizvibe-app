@@ -162,10 +162,11 @@ items:
     wikimediaSearchHints: ["Lady Gaga Bradley Cooper Shallow A Star Is Born"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "aU_bj9SxvdU"
+      - videoId: "7hiVIixor_Q"
         startSec: 0
-        endSec: 216
-        channelTitle: "7clouds"
+        endSec: 30
+        channelTitle: "A Star Is Born 2018"
+        notes: "Peter-kurerad 2026-08-25 ur Peters YT- och Spotify-lista."
   - id: drake-gods-plan
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "God's Plan — Drake"
@@ -1042,3 +1043,84 @@ items:
         endSec: 30
         channelTitle: "Ronny & Ragge"
         notes: "Swedish version."
+  # === Tillagg 2026-08-25 (Peters "YT och Spotify lista") ===
+  - id: ariana-grande-love-me-harder
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Love Me Harder — Ariana Grande & The Weeknd"
+    correctYear: 2014
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Ariana Grande The Weeknd Love Me Harder"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Love & Peace"]
+    spotifyTrackId: "7HE1FnMtSsRotzIAQPXpr5"
+    youtubeClips: []
+  - id: ariana-grande-break-free
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Break Free — Ariana Grande feat. Zedd"
+    correctYear: 2014
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Ariana Grande Zedd Break Free"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "2lOgTEwxmRPBtjp60opyRN"
+    youtubeClips:
+      - videoId: "YOgIEc8y7-Y"
+        startSec: 28
+        endSec: 58
+        channelTitle: "Krystian GARY B"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+  - id: kygo-for-life
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "For Life — Kygo, Zak Abel & Nile Rodgers"
+    correctYear: 2017
+    probability: 80
+    region: ["nordic"]
+    wikimediaSearchHints: ["Kygo Zak Abel For Life Nile Rodgers"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "6YutTqJz3jGfLMfzIHpSTf"
+    youtubeClips:
+      - videoId: "L_BU-xUPnXU"
+        startSec: 0
+        endSec: 30
+        channelTitle: "bemu"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+  - id: alex-warren-ordinary
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Ordinary — Alex Warren"
+    correctYear: 2025
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Alex Warren Ordinary"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "u2ah9tWTkmk"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Alex Warren"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+  - id: alex-warren-eternity
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Eternity — Alex Warren"
+    correctYear: 2025
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Alex Warren Eternity"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "jXqf3uqLkkU"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Alex Warren"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+  - id: john-newman-love-me-again
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Love Me Again — John Newman"
+    correctYear: 2013
+    probability: 80
+    region: ["europe"]
+    wikimediaSearchHints: ["John Newman Love Me Again Tribute"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Club & Dance Hits"]
+    spotifyTrackId: "5TbzAWWc5eJaANpA9kfGCd"
+    youtubeClips: []
