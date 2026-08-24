@@ -2570,7 +2570,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Eurovision"
     ],
-    "spotifyTrackId": "1TfqLAPs4K3s2rJMoCokcS",
+    "spotifyTrackId": "3Dy4REq8O09IlgiwuHQ3sk",
     "youtubeClips": [
       {
         "videoId": "9y-8ZiAJiQo",
@@ -3104,7 +3104,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "sweden"
     ],
-    "spotifyTrackId": "7tFiyTwD0nx5a1eklYtX2J",
+    "spotifyTrackId": "5cP52DlDN9yryuZVQDg3iq",
     "youtubeClips": [
       {
         "videoId": "I_izvAbhExY",
@@ -8106,6 +8106,28 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "cajsa-stina-akerstrom-fraga-stjarnorna",
+    "displayName": "Fråga stjärnorna — Cajsa Stina Åkerström",
+    "correctYear": 1994,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "100% svenska"
+    ],
+    "spotifyTrackId": "1QJcdzMUidsBaMTHoZZRGn",
+    "youtubeClips": []
+  },
+  {
     "id": "cranberries-zombie",
     "displayName": "Zombie — The Cranberries",
     "correctYear": 1994,
@@ -10088,28 +10110,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "cajsa-stina-akerstrom-fragorna-om-nar",
-    "displayName": "Frågorna om när — Cajsa Stina Åkerström",
-    "correctYear": 2001,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "100% svenska"
-    ],
-    "spotifyTrackId": "1QJcdzMUidsBaMTHoZZRGn",
-    "youtubeClips": []
-  },
-  {
     "id": "harry-potter-philosophers-stone-2001",
     "displayName": "Harry Potter and the Philosopher's Stone",
     "correctYear": 2001,
@@ -10701,8 +10701,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "gunther-ding-ding-dong",
-    "displayName": "Ding Ding Dong — Günther",
+    "id": "gunther-ding-dong-song",
+    "displayName": "Ding Dong Song — Günther",
     "correctYear": 2004,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",

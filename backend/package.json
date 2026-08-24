@@ -13,6 +13,7 @@
     "youtube-search": "tsx --env-file=.env.local youtube/suggest.ts",
     "youtube-validate": "tsx --env-file=.env.local youtube/validate.ts",
     "youtube-autofix": "tsx --env-file=.env.local youtube/autofix.ts",
+    "spotify-identity-audit": "tsx scripts/audit-spotify-track-identity.ts",
     "spotify-validate": "tsx scripts/validate-spotify-tracks.ts",
     "spotify-album-audit": "tsx scripts/audit-spotify-album-context.ts",    "export-music-questions": "tsx scripts/export-music-questions.ts",
     "export-image-questions": "tsx scripts/export-image-questions.ts",

@@ -98,6 +98,33 @@ jobs:
         working-directory: backend
         run: npm run spotify-validate
 
+      - name: Run spotify-identity-audit (rätt ID, men rätt LÅT?)
+        # spotify-validate ovan kollar bara att ID:t LEVER. 2026-08-19 visade
+        # sig abba-waterloo bära Eurythmics "Sweet Dreams" och bee-gees-stayin-
+        # alive bära Queens "Bohemian Rhapsody" — båda ID:n svarade 200, så
+        # oEmbed-valideringen var grön hela tiden medan DJ:n fick fel låt.
+        # Detta steg jämför katalogens displayName mot track-sidans og:title +
+        # music:musician_description.
+        #
+        # RÖTT ENBART VID MISMATCH (varken titel eller artist matchar = säkert
+        # fel låt). TITLE/ARTIST-flaggor är oftast godartade (stavning,
+        # "- Radio Edit", feat-credits i artistlistan) och listas bara i
+        # rapporten — samma "trasigt vs inte perfekt"-uppdelning som
+        # youtube-steget ovan. Rör inte den utan att tänka igenom vad ett rött
+        # mejl ska betyda.
+        if: always()
+        working-directory: backend
+        run: npm run spotify-identity-audit
+
+      - name: Ladda upp spotify-identity-rapporten som CI-artefakt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: spotify-track-identity
+          path: backend/output/spotify-track-identity.md
+          if-no-files-found: ignore
+          retention-days: 30
+
       - name: Ladda upp rapport som CI-artefakt
         # Körs alltid — rapporten är värdefull både vid success (tom = alla OK)
         # och failure (innehåller lista brutna klipp + föreslagna ersättningar).

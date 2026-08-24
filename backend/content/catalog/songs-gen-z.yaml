@@ -1243,21 +1243,32 @@ items:
         endSec: 30
         channelTitle: "OutKast"
         notes: "Official music video."
-  - id: cajsa-stina-akerstrom-fragorna-om-nar
+  # Rättad 2026-08-19 (spotify-identity-audit): itemet hette "Frågorna om när"
+  # (2001) — en låt som inte finns. spotifyTrackId:t pekade hela tiden på hennes
+  # faktiska hit "Fråga stjärnorna", så kortet sa ett och Spotify spelade ett
+  # annat. correctYear 1994 = debutalbumet Cajsa Stina + singeln samma år.
+  # OBS: filen är songs-gen-z men release-året är 1994 (millennials-eran) —
+  # flytt lämnad åt en curation-pass; audience är ändå item-taggad.
+  - id: cajsa-stina-akerstrom-fraga-stjarnorna
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
-    displayName: "Frågorna om när — Cajsa Stina Åkerström"
-    correctYear: 2001
+    displayName: "Fråga stjärnorna — Cajsa Stina Åkerström"
+    correctYear: 1994
     probability: 75
-    wikimediaSearchHints: ["Cajsa Stina Åkerström Frågorna om när 2001 Swedish"]
+    wikimediaSearchHints: ["Cajsa Stina Åkerström Fråga stjärnorna 1994 Swedish"]
     answerMethods: ["timeline"]
     genrePackages: ["100% svenska"]
     spotifyTrackId: "1QJcdzMUidsBaMTHoZZRGn"
-  - id: gunther-ding-ding-dong
+  # Titeln rättad 2026-08-19 (spotify-identity-audit): itemet hette
+  # "Ding Ding Dong" — låten heter "Ding Dong Song" (Günther & The Sunshine
+  # Girls, a.k.a. "Tu es foutu"). Rätt spår hela tiden, bara reveal-kortets
+  # titel var fel. Spotify-ID:t bär suffixet "- Radio Edit" som auditens
+  # normalisering skalar bort.
+  - id: gunther-ding-dong-song
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
-    displayName: "Ding Ding Dong — Günther"
+    displayName: "Ding Dong Song — Günther"
     correctYear: 2004
     probability: 78
-    wikimediaSearchHints: ["Günther Ding Ding Dong 2004 Swedish eurodance"]
+    wikimediaSearchHints: ["Günther Ding Dong Song 2004 Swedish eurodance"]
     answerMethods: ["timeline"]
     spotifyTrackId: "2LELFaNglE9B5xlcmd4qtQ"
     # youtubeClips borttagna 2026-08-10: uUYplyWPKGk (Günther) är raderad/privat →
