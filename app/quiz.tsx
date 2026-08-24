@@ -682,6 +682,12 @@ const SELECTOR_TOP = 22;      // 10px under tick-toppen
 const SELECTOR_BOTTOM = 64;   // 10px över tick-botten
 const SELECTOR_H = SELECTOR_BOTTOM - SELECTOR_TOP; // = 42px
 
+// Reveal-fasens Next-knapp är låst i N sekunder efter att svarstiden tagit
+// slut — knappen räknar ned N → 1 och blir först därefter tryckbar med
+// "Next"-texten. Ger alla spelare tid att läsa facit innan host kan klicka
+// vidare (Peter 2026-08-24).
+const REVEAL_NEXT_LOCK_SECONDS = 5;
+
 // Energisk färg för svarsrutan (används oavsett assistance-nivå)
 const BOX_COLOR = '#F5A623';       // gyllene
 const BOX_BG = 'rgba(26,48,80,0.92)'; // mörkare navy – tydligt distinkt mot bakgrund #0B1220
@@ -2861,6 +2867,10 @@ export default function QuizScreen() {
   // 2026-08-14). Egna Animated.Values så DJ-knapparna ovan förblir dämpade.
   const nextCtaPulse = useRef(new Animated.Value(1)).current;
   const nextCtaGlow = useRef(new Animated.Value(0.2)).current;
+  // Sekunder kvar av Next-knappens lås i reveal-fasen. 0 = upplåst (knappen
+  // visar "Next"/"Final Leaderboard" och går att trycka); > 0 renderas som
+  // siffra i knappen och blockerar tap. Se REVEAL_NEXT_LOCK_SECONDS.
+  const [revealNextCountdown, setRevealNextCountdown] = useState(0);
   // Glow + scale-pulse på DJ:ns "Start track in Spotify"-CTA — Spotify-grön
   // halo bakom knappen (animated opacity) + 1 ↔ 1.05 scale. Loopen körs
   // kontinuerligt; knappen är ändå bara monterad vid djStep=0 (samma
@@ -3687,7 +3697,18 @@ export default function QuizScreen() {
 
   // Next-tab:ens kraftigare pulse: scale + halo-opacity i parallell så
   // knappen både växer och "andas" ljus. Samma stabila-style-krav som ovan.
+  //
+  // Pausad medan 5-sekunderslåset räknar ned — en pulserande knapp läses som
+  // "tryck här", och det är precis vad den INTE går att göra då. Värdena
+  // nollställs så knappen står stilla i sitt vilo-läge tills den låses upp.
   useEffect(() => {
+    if (revealNextCountdown > 0) {
+      nextCtaPulse.stopAnimation();
+      nextCtaPulse.setValue(1);
+      nextCtaGlow.stopAnimation();
+      nextCtaGlow.setValue(0);
+      return;
+    }
     const loop = Animated.loop(
       Animated.sequence([
         Animated.parallel([
@@ -3702,13 +3723,38 @@ export default function QuizScreen() {
     );
     loop.start();
     return () => loop.stop();
-  }, [nextCtaPulse, nextCtaGlow]);
+  }, [nextCtaPulse, nextCtaGlow, revealNextCountdown]);
 
   const nextCtaPulseStyle = useMemo(
     () => ({ transform: [{ scale: nextCtaPulse }] }),
     [nextCtaPulse],
   );
   const nextCtaGlowStyle = useMemo(() => ({ opacity: nextCtaGlow }), [nextCtaGlow]);
+
+  // Next-knappens 5-sekunderslås. Startar om vid varje reveal-entry (deps
+  // inkluderar questionIndex så en ny fråga alltid ger ett färskt lås även
+  // om phase-strängen råkar vara samma vid en heal/re-render). Intervallet
+  // self-clearar på 0; cleanup river det vid fasbyte/unmount.
+  useEffect(() => {
+    if (phase !== 'reveal') {
+      setRevealNextCountdown(0);
+      return;
+    }
+    setRevealNextCountdown(REVEAL_NEXT_LOCK_SECONDS);
+    const id = setInterval(() => {
+      setRevealNextCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(id);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(id);
+  }, [phase, questionIndex]);
+
+  // True medan låset räknar ned — stänger av både tap och pulsen nedan.
+  const isNextCtaLocked = revealNextCountdown > 0;
 
   // DJ-start-CTA:ns glow + pulse (se deklarationskommentaren vid djStartPulse).
   useEffect(() => {
@@ -8022,6 +8068,11 @@ export default function QuizScreen() {
                       bågens rotation-bbox. SVG-dimensionerna bumpade till
                       24 för att kompensera så Q-glyfens visuella storlek
                       är ungefär densamma som tidigare. */}
+                  {/* "Select + " framför brand-Q:t — knappen bär båda
+                      stegen (välj svar, bekräfta) så spelaren inte tror att
+                      Qonfirm ensamt räcker. Samma gold-stil som "onfirm" så
+                      hela etiketten läses som en enhet. */}
+                  <Text style={styles.actionBtnPrefix}>Select +</Text>
                   <Svg width={24} height={24} viewBox="23 18 34 37">
                     <Circle cx="40" cy="38" r="13" fill="none" stroke={Colors.warning} strokeWidth="6.5" />
                     <Path d="M49 47 L53 51" stroke={Colors.warning} strokeWidth="6.5" strokeLinecap="round" />
@@ -8088,18 +8139,34 @@ export default function QuizScreen() {
             <Animated.View style={[rv.nextTabWrap, nextCtaPulseStyle]}>
               <Animated.View style={[rv.nextTabHalo, nextCtaGlowStyle]} pointerEvents="none" />
               <TouchableOpacity
-                style={[rv.nextTab, shouldLockForUnstable && { opacity: 0.4 }]}
+                style={[
+                  rv.nextTab,
+                  shouldLockForUnstable && { opacity: 0.4 },
+                  isNextCtaLocked && rv.nextTabCountingDown,
+                ]}
                 onPress={
                   isLastQuestion
                     ? handleHostShowLeaderboard
                     : handleHostAdvanceFromReveal
                 }
                 activeOpacity={0.85}
-                disabled={shouldLockForUnstable}
+                disabled={shouldLockForUnstable || isNextCtaLocked}
               >
-                <Text style={rv.nextTabText}>
-                  {isLastQuestion ? '🏆  Final Leaderboard' : 'Next  →'}
-                </Text>
+                {/* Den riktiga etiketten renderas ALLTID (bara osynlig under
+                    nedräkningen) så knappens bredd är identisk före och efter
+                    upplåsningen — annars hoppar den från siffer-bredd till
+                    "Next  →"/"🏆  Final Leaderboard" i samma sekund som
+                    spelaren ska sikta på den. Siffran ligger absolut ovanpå. */}
+                <View style={rv.nextTabLabelWrap}>
+                  <Text style={[rv.nextTabText, isNextCtaLocked && rv.nextTabTextHidden]}>
+                    {isLastQuestion ? '🏆  Final Leaderboard' : 'Next  →'}
+                  </Text>
+                  {isNextCtaLocked && (
+                    <Text style={[rv.nextTabText, rv.nextTabCountdownText]}>
+                      {revealNextCountdown}
+                    </Text>
+                  )}
+                </View>
               </TouchableOpacity>
             </Animated.View>
           )}
@@ -9034,6 +9101,16 @@ const styles = StyleSheet.create({
     color: Colors.warning,
     letterSpacing: 0.5,
   },
+  // "Select +"-prefixet före Q-glyfen. Samma typografi som actionBtnText;
+  // marginRight ger extra luft mot Q:t så "+ Q" inte klibbar ihop (rowens
+  // gap: 3 är avsiktligt tight för att hålla "Qonfirm" som ett ord).
+  actionBtnPrefix: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: Colors.warning,
+    letterSpacing: 0.5,
+    marginRight: 3,
+  },
 });
 
 // Inline reveal-feedback — green/red-bordered card med ✓/✗ badge i övre
@@ -9298,6 +9375,27 @@ const rv = StyleSheet.create({
     fontWeight: '700',
     color: BOX_COLOR,
     letterSpacing: 0.3,
+  },
+  // Etikett-stack: riktig text i flow (sätter bredden) + countdown-siffran
+  // absolut ovanpå. position: 'relative' så siffran ankras hit.
+  nextTabLabelWrap: {
+    position: 'relative',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  // Riktiga etiketten under nedräkningen — osynlig men behåller sin plats.
+  nextTabTextHidden: {
+    opacity: 0,
+  },
+  // Countdown-siffran. tabular-nums så 5 → 1 inte wobblar i sidled.
+  nextTabCountdownText: {
+    position: 'absolute',
+    fontVariant: ['tabular-nums'],
+  },
+  // Dämpad knapp medan låset räknar ned — signalerar "inte tryckbar än"
+  // utan att göra siffran svårläst (därav 0.55, inte unstable-lägets 0.4).
+  nextTabCountingDown: {
+    opacity: 0.55,
   },
   // Non-host:s "Waiting for host…"-pill i IndDev — sitter i samma position
   // som Next-tab skulle. Dämpad styling (textSecondary + borderStrong)
