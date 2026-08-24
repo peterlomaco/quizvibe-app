@@ -2796,7 +2796,12 @@ export default function QuizScreen() {
   // allteftersom svaren tas emot.
   const revealAnswerSummary = useMemo(() => {
     if (gameMode !== 'individual-devices') return null;
-    if (turnOrder.length === 0) return null;
+    // Minst TVÅ spelare krävs — kortet jämför spelare med varandra.
+    // `<= 1` (var `=== 0`): single player sätter bara singlePlayerDefault,
+    // gameMode kan ligga kvar på 'individual-devices' (profil-default eller
+    // Spotify-default), så ett solo-spel passerade IndDev-gaten ovan och
+    // visade "All Players" med en enda rad (Peter 2026-08-24).
+    if (turnOrder.length <= 1) return null;
     const byPlayer = new Map<string, RoundScore>();
     allRoundScoresHistory.forEach((round) => {
       round.forEach((s) => {
@@ -5416,25 +5421,26 @@ export default function QuizScreen() {
   // Peter 2026-08-08: Final Leaderboard efter LOKALT spel har inte längre en
   // Play Again-knapp — i stället samma gula "Start New Game" som Home.
   //
-  // Peter 2026-08-24: utfällningen har tre rader (Single Game / Multiplayer
-  // Game / Remote Play) och LÄGET väljs FÖRST. Invite-frågan ställs bara när
-  // host väljer samma läge som just spelades — då är det meningsfullt att
-  // ta med spelarna och deras settings:
+  // Peter 2026-08-24 (rev 3): slutskärmen ställer EN fråga i taget.
   //
-  //   Start New Game → credit-gate → utfällningen
-  //     • rad = previousLocalMode → "Replay and Aggregate Leaderboard"
-  //         · Yes, same players again → IndDev: panelen står kvar med den
-  //                 valda raden grå tills alla non-hosts godkänt (deras
-  //                 knapp: "Approve / Replay"); host tappar raden igen när
-  //                 den tänds. PtP/single: inget att vänta in → direkt till
-  //                 Keep/Reset-prompten.
-  //         · No, start fresh → färsk lobby i det valda läget, utan spelare.
-  //         · Cancel → panelen står kvar, inget state ändras.
-  //     • rad ≠ previousLocalMode → färsk lobby direkt, ingen popup. Spelarna
-  //             hör inte hemma i det andra läget och settings kommer från
-  //             profilen (Peters beslut 2026-08-24).
-  //     • Remote Play → egen lobby från scratch (lokala spelare kan aldrig
-  //             bäras in i en duell).
+  //   Steg 1 — `replayChoice === 'ask'`: bara rubriken "Re-match with
+  //     Aggregate Leaderboard?" + inline Yes/No syns. Start New Game
+  //     renderas INTE (vi skickar inte in onStartNewGame). Home-raden
+  //     ligger kvar längst ned som vanligt.
+  //       · Yes → carry-over-flödet. IndDev: Yes gråas ut med "Waiting for
+  //               N of M players to approve" under sig tills alla non-hosts
+  //               tryckt "Approve / Re-match"; host tappar Yes igen när den
+  //               tänds → Keep/Reset-prompten. PtP/single: inget att vänta
+  //               in → direkt till Keep/Reset. Läget är alltid
+  //               `previousLocalMode` — en re-match byter aldrig läge.
+  //               Ingen ångra-väg: inbjudan är redan utskickad.
+  //       · No  → `replayChoice = 'no'`, re-match-blocket försvinner och
+  //               "Start New Game" tar dess plats.
+  //
+  //   Steg 2 — `replayChoice === 'no'`: "Start New Game" beter sig EXAKT
+  //     som Home:s knapp: credit-gate → lägesvalet (Single Game /
+  //     Multiplayer Game / Remote Play) → färsk lobby i valt läge. INGA
+  //     carry-over-frågor, inga spelare, settings från profilen.
   //
   // Guest-hostade spel kör SAMMA flöde med två skillnader: Remote Play visas
   // aldrig (remote 1vs1 är QuizVibe-users-only) och Keep/Reset-settings-
@@ -5445,6 +5451,9 @@ export default function QuizScreen() {
   // Host valde "Yes, same players again" → carry-over av föregående spelare
   // (och, i IndDev, väntan på deras godkännande innan lobbyn får skapas).
   const [rematchInvite, setRematchInvite] = useState(false);
+  // Host:s svar på re-match-frågan. 'ask' = frågan står uppe (Start New
+  // Game är dold), 'no' = host tackade nej → Start New Game tar över.
+  const [replayChoice, setReplayChoice] = useState<'ask' | 'no'>('ask');
 
   const handleLocalStartNewGamePress = async () => {
     // Guest host har max 1 nytt spel härifrån — knappen renderas inte alls
@@ -5455,11 +5464,9 @@ export default function QuizScreen() {
       setStartNewGameExpanded(false);
       return;
     }
-    // Credit-gaten först — meningslöst (och förvirrande för non-hosts) att
-    // öppna ett val som host ändå inte kan fullfölja.
+    // Credit-gaten först — meningslöst att öppna ett val host inte kan
+    // fullfölja.
     if (!(await ensureHostCreditsForNewGame())) return;
-    // Färsk panel: ingen inbjudan är utfärdad förrän host valt sitt läge.
-    setRematchInvite(false);
     setStartNewGameExpanded(true);
   };
 
@@ -5473,82 +5480,54 @@ export default function QuizScreen() {
     askKeepSettingsThenGo(turnOrder.length === 1, lobbyType);
   };
 
-  /** Steg 2 av re-match-flödet: host valde ett läge i utfällningen. */
+  /** "Start New Game": host valde ett läge. Alltid en FÄRSK lobby — inga
+   *  spelare, inga carry-over-settings (keepSettings=false → LobbyScreen
+   *  seedar från host-profilen, precis som Home:s clearLobbySettings). */
   const handleLocalStartNewGameSelect = (lobbyType: HostLobbyType) => {
-    // Remote 1vs1 kan aldrig ärva lokala spelare — egen lobby från scratch
-    // (samma handler som remote-slutskärmens knapp).
+    setStartNewGameExpanded(false);
     if (lobbyType === '1v1') {
-      setStartNewGameExpanded(false);
       void handleStartNewGameFromFinal('1v1');
       return;
     }
-    // Annat läge än det som spelades → allt från scratch, ingen popup:
-    // varken spelarna eller lobby-inställningarna hör hemma i det nya läget,
-    // så keepSettings=false och LobbyScreen seedar från host-profilen
-    // (Peters beslut 2026-08-24).
-    if (lobbyType !== previousLocalMode) {
-      setStartNewGameExpanded(false);
-      void goToNewLobby(false, false, undefined, lobbyType);
-      return;
-    }
-    // Samma läge igen. Har host redan svarat "Yes, same players again" är
-    // detta det andra tappet (efter att godkännandena kommit in) → fortsätt
-    // till settings-frågan.
-    if (rematchInvite) {
-      setStartNewGameExpanded(false);
-      proceedWithRematch(lobbyType);
-      return;
-    }
-    const totalNonHosts = Math.max(0, turnOrder.length - 1);
-    if (totalNonHosts === 0) {
-      // Single player: ingen att bjuda in. Behandlas som "invite" så det
-      // egna kortet + lobby-settings bärs över precis som förr.
-      setRematchInvite(true);
-      setStartNewGameExpanded(false);
-      proceedWithRematch(lobbyType);
-      return;
-    }
-    Alert.alert(
-      'Replay and Aggregate Leaderboard',
-      'Bring the players from this game into the new lobby, or start with an empty lobby?',
-      [
-        {
-          text: 'Yes, same players again',
-          onPress: () => {
-            setRematchInvite(true);
-            // Individual Devices: varje spelare måste godkänna på sin egen
-            // enhet. Panelen står kvar öppen med den valda raden grå
-            // (lockedLocalTypes) + väntestatusen under, och host tappar
-            // raden igen när alla godkänt. Avbryter host efteråt står
-            // non-hosts knapp kvar aktiv (samma dokumenterade beteende som
-            // gamla Play Again-broadcasten).
-            if (gameMode === 'individual-devices' && syncChannelRef.current) {
-              syncChannelRef.current
-                .broadcastPlayAgainInitiated({ sender_id: selfPlayerId })
-                .catch(() => {});
-              return;
-            }
-            // Pass-the-Phone: alla sitter på samma enhet — inget att vänta
-            // in, så gå direkt vidare.
-            setStartNewGameExpanded(false);
-            proceedWithRematch(lobbyType);
-          },
-        },
-        {
-          text: 'No, start fresh',
-          onPress: () => {
-            setRematchInvite(false);
-            setStartNewGameExpanded(false);
-            // keepSettings=true (default): "fresh" gäller SPELARNA, inte
-            // lobby-inställningarna — samma läge spelas igen, så era/rundor/
-            // källor är fortsatt relevanta. Oförändrat sedan 2026-08-08.
-            void goToNewLobby(false, true, undefined, lobbyType);
-          },
-        },
-        { text: 'Cancel', style: 'cancel' },
-      ],
-    );
+    void goToNewLobby(false, false, undefined, lobbyType);
   };
+
+  /** Host svarade **Yes** på re-match-frågan — eller tappade Yes igen när
+   *  den tänts efter att alla non-hosts godkänt. Läget är alltid
+   *  `previousLocalMode`; en re-match byter aldrig läge. */
+  const handleReplayYes = async () => {
+    // Guest host har max 1 re-match — blocket renderas inte alls vid >= 1;
+    // detta är belt-and-suspenders mot oväntade call-paths.
+    if (isGuestHostGame && guestReplaysUsed >= 1) return;
+    // Andra tappet: inbjudan är redan utfärdad och godkänd (knappen är grå
+    // och otappbar medan väntan pågår) → fortsätt till Keep/Reset.
+    if (rematchInvite) {
+      proceedWithRematch(previousLocalMode);
+      return;
+    }
+    if (!(await ensureHostCreditsForNewGame())) return;
+    const totalNonHosts = Math.max(0, turnOrder.length - 1);
+    // Individual Devices: varje spelare måste godkänna på sin egen enhet.
+    // Yes gråas ut med väntestatusen under sig och host tappar den igen när
+    // alla godkänt. `rematchInvite` sätts BARA här — det är den enda vägen
+    // som faktiskt skickar ut en inbjudan, och flaggan göms No-knappen.
+    if (totalNonHosts > 0 && gameMode === 'individual-devices' && syncChannelRef.current) {
+      setRematchInvite(true);
+      syncChannelRef.current
+        .broadcastPlayAgainInitiated({ sender_id: selfPlayerId })
+        .catch(() => {});
+      return;
+    }
+    // Single player + Pass-the-Phone: ingen att vänta in (alla sitter på
+    // samma enhet) → direkt vidare. Sätter MEDVETET inte rematchInvite:
+    // avbryter host Keep/Reset-prompten ska Yes/No-raden stå kvar oförändrad
+    // så No fortfarande går att välja.
+    proceedWithRematch(previousLocalMode);
+  };
+
+  /** Host svarade **No** — re-match-frågan försvinner och "Start New Game"
+   *  tar dess plats. Inget annat state ändras. */
+  const handleReplayNo = () => setReplayChoice('no');
 
   // När båda non-host:s approval OCH host:s nya-lobby-event ankommit:
   // navigera till nya lobbyn. router.replace ersätter /quiz på Stack:n så
@@ -6894,10 +6873,13 @@ export default function QuizScreen() {
           // sista frågans slutskärm och aldrig för guest hosts — remote
           // spelas enbart av QuizVibe-users, och lokal guest-host får
           // fortsatt sin egen "bara Home"-footer.
+          // Lokalt: Start New Game renderas FÖRST när host svarat No på
+          // re-match-frågan (rev 3) — dess frånvaro är det som döljer
+          // knappen. Remote har ingen re-match och får den direkt.
           onStartNewGame={
             isRemote && isLastQuestion && !isGuestHostGame
               ? handleStartNewGameFromFinal
-              : localRematchFlow
+              : localRematchFlow && replayChoice === 'no'
                 ? handleLocalStartNewGameSelect
                 : undefined
           }
@@ -6905,36 +6887,41 @@ export default function QuizScreen() {
           // invite-frågan ställs först EFTER valet, så panelens öppet-läge
           // ägs här.
           onStartNewGamePress={
-            localRematchFlow ? handleLocalStartNewGamePress : undefined
-          }
-          startNewGameExpanded={
-            localRematchFlow ? startNewGameExpanded : undefined
-          }
-          // Re-match: BARA raden för läget som spelades blir grå medan
-          // non-hosts godkänner — den andra förblir valbar (att byta läge
-          // startar ändå från scratch och kräver inget godkännande).
-          lockedLocalTypes={
-            localRematchFlow && rematchNeedsApproval && !rematchAllApproved
-              ? [previousLocalMode]
+            localRematchFlow && replayChoice === 'no'
+              ? handleLocalStartNewGamePress
               : undefined
           }
-          onLocalPlayLockedPress={() =>
+          startNewGameExpanded={
+            localRematchFlow && replayChoice === 'no'
+              ? startNewGameExpanded
+              : undefined
+          }
+          // Re-match-frågan (rubrik + Yes/No) — slutskärmens FÖRSTA steg.
+          // Försvinner så fort host svarat No; localRematchFlow bär redan
+          // guest-hostens 1-re-match-cap, så på omgång 2 visas varken den
+          // eller Start New Game — bara Home.
+          onReplayYes={
+            localRematchFlow && replayChoice === 'ask'
+              ? handleReplayYes
+              : undefined
+          }
+          onReplayNo={handleReplayNo}
+          replayAnswered={rematchInvite}
+          replayLocked={
+            localRematchFlow && rematchNeedsApproval && !rematchAllApproved
+          }
+          onReplayLockedPress={() =>
             Alert.alert(
               'Waiting for players',
-              'The new lobby opens as soon as every player has approved the replay. Tap this mode again when they have — or pick the other mode to start fresh.',
+              'The new lobby opens as soon as every player has approved the re-match. Tap Yes again when they have.',
             )
           }
           // Guest host: Remote Play visas ALDRIG — remote 1vs1 spelas enbart
-          // mellan QuizVibe-users. Annars döljs den bara när föregående
-          // spelare faktiskt bärs över (de kan inte följa med in i en
-          // duell). Vid panelens öppnande är rematchInvite alltid false, så
-          // Remote står kvar synlig medan host väljer läge och försvinner
-          // först om de svarar "Yes, same players again".
-          hideRemotePlay={
-            localRematchFlow &&
-            (isGuestHostGame || (rematchInvite && rematchTotalNonHosts > 0))
-          }
-          startNewGameNote={
+          // mellan QuizVibe-users. För registrerade hosts står den ALLTID
+          // kvar: "Start New Game" bär sedan 2026-08-24 aldrig över spelare,
+          // så det finns inget carry-over som krockar med en duell.
+          hideRemotePlay={localRematchFlow && isGuestHostGame}
+          replayNote={
             localRematchFlow && rematchNeedsApproval ? (
               rematchAllApproved ? (
                 <Text style={styles.playAgainModalStatusReadyText}>

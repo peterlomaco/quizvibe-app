@@ -14,8 +14,6 @@ import { VersusIcon } from '@/src/components/VersusIcon';
 export type HostLobbyType = 'single' | 'multiplayer' | '1v1';
 /** De två lokala lobbytyperna — allt utom Remote 1vs1. */
 export type LocalLobbyType = Exclude<HostLobbyType, '1v1'>;
-// Module-level så default-värdet är referensstabilt mellan renders.
-const EMPTY_LOCKED: readonly LocalLobbyType[] = [];
 
 // VersusIcon (två silhuetter + guld-"vs") bor i src/components/VersusIcon.tsx
 // sedan 2026-08-07 — delas med "1vs1"-knappen på Home (MyMatchesSection)
@@ -91,21 +89,9 @@ function SoloIcon({ height = 50 }: { height?: number }) {
  *  grå för guest) så panelen läses som knappens förlängning. */
 export function HostTypeOptions({
   accentColor, onSelect, remoteMode = 'available', onRemoteLockedPress, localBadge,
-  lockedLocalTypes = EMPTY_LOCKED, onLocalLockedPress,
 }: {
   accentColor: string;
   onSelect: (lobbyType: HostLobbyType) => void;
-  /**
-   * De lokala rader som ska vara dimmade + otappbara-som-val. Används av
-   * Final Leaderboard:s re-match-flöde: host har bjudit in föregående
-   * spelare och måste vänta tills alla godkänt innan lobbyn får skapas —
-   * bara raden för det läge som spelades låses, den andra förblir valbar.
-   * Låsta rader är fortsatt tappbara så trycket kan förklara väntan
-   * (`onLocalLockedPress`) i stället för att vara en död yta — samma
-   * mönster som den låsta Remote-raden.
-   */
-  lockedLocalTypes?: readonly LocalLobbyType[];
-  onLocalLockedPress?: () => void;
   /**
    * Remote 1vs1 spelas ENBART av QuizVibe-users mot varandra (Peter
    * 2026-08-08) — det finns ingen guest-variant av läget. Raden har
@@ -151,14 +137,7 @@ export function HostTypeOptions({
         subtitle="Play solo on this device"
         badgeText={localBadge?.text}
         badgeMuted={localBadge?.muted}
-        locked={lockedLocalTypes.includes('single')}
-        onPress={() => {
-          if (lockedLocalTypes.includes('single')) {
-            onLocalLockedPress?.();
-            return;
-          }
-          onSelect('single');
-        }}
+        onPress={() => onSelect('single')}
       />
       <HostTypeOptionRow
         accentColor={accentColor}
@@ -167,14 +146,7 @@ export function HostTypeOptions({
         subtitle="Pass-the-Phone or Individual devices"
         badgeText={localBadge?.text}
         badgeMuted={localBadge?.muted}
-        locked={lockedLocalTypes.includes('multiplayer')}
-        onPress={() => {
-          if (lockedLocalTypes.includes('multiplayer')) {
-            onLocalLockedPress?.();
-            return;
-          }
-          onSelect('multiplayer');
-        }}
+        onPress={() => onSelect('multiplayer')}
       />
       {remoteMode !== 'hidden' && (
         <HostTypeOptionRow

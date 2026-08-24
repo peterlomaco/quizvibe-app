@@ -3,7 +3,7 @@ import React, { useMemo, useState } from 'react';
 import { Animated, Dimensions, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, G, Path } from 'react-native-svg';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
-import { HostTypeOptions, type HostLobbyType, type LocalLobbyType } from './HostTypeOptions';
+import { HostTypeOptions, type HostLobbyType } from './HostTypeOptions';
 import { QuizVibeQAvatar } from './QuizVibeQAvatar';
 import { VersusIcon } from './VersusIcon';
 import { WifiOffIcon } from './WifiOffIcon';
@@ -169,6 +169,28 @@ function PlayAgainLoopBorder({
 //   så den skulle överlappa chevron i en 56-px-button. Vi använder 74 px
 //   istället — bottenkanten + chevron skiftas ner ~18 px, vilket ger
 //   ~4-5 px luft mellan text-botten och chevron-toppen.
+/** Scale-puls 1 ↔ 1.04 över 700 ms — samma cadens som PlayAgainButton och
+ *  Home:s gameBtn, så alla CTA:er på slutskärmen andas i takt. Pausas när
+ *  `paused` (låst/grå knapp ska stå still) och nollas till 1. */
+function useCtaPulse(paused: boolean) {
+  const pulse = React.useRef(new Animated.Value(1)).current;
+  React.useEffect(() => {
+    if (paused) {
+      pulse.setValue(1);
+      return;
+    }
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulse, { toValue: 1.04, duration: 700, useNativeDriver: true }),
+        Animated.timing(pulse, { toValue: 1,    duration: 700, useNativeDriver: true }),
+      ]),
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [paused, pulse]);
+  return pulse;
+}
+
 const PLAY_AGAIN_BUTTON_HEIGHT_COMPACT = 56;
 const PLAY_AGAIN_BUTTON_HEIGHT_EXPANDED = 64;
 
@@ -403,10 +425,13 @@ export function RoundLeaderboard({
   onStartNewGameLockedPress,
   onStartNewGamePress,
   startNewGameExpanded: startNewGameExpandedProp,
-  lockedLocalTypes,
-  onLocalPlayLockedPress,
   hideRemotePlay = false,
-  startNewGameNote,
+  onReplayYes,
+  onReplayNo,
+  replayAnswered = false,
+  replayLocked = false,
+  onReplayLockedPress,
+  replayNote,
 }: {
   players: LeaderboardPlayer[];
   /** Behållen för API-bakåtkompabilitet — tabellen aggregerar allt från
@@ -477,19 +502,32 @@ export function RoundLeaderboard({
   onStartNewGamePress?: () => void;
   /** Kontrollerat läge för utfällningen. Utelämnas → internt state. */
   startNewGameExpanded?: boolean;
-  /**
-   * De lokala raderna som ska vara grå + otappbara-som-val: host har bjudit
-   * in föregående spelare och alla har ännu inte godkänt re-matchen. Bara
-   * raden för läget som spelades låses — den andra förblir valbar.
-   */
-  lockedLocalTypes?: readonly LocalLobbyType[];
-  onLocalPlayLockedPress?: () => void;
-  /** Dölj Remote Play i utfällningen (re-match:en är per definition lokal —
-   *  carry-over av lokala spelare hör inte hemma i en 1vs1-duell). */
+  /** Dölj Remote Play i utfällningen. Guest hosts når aldrig remote 1vs1
+   *  (läget är QuizVibe-users-only). */
   hideRemotePlay?: boolean;
-  /** Statusrad under utfällningen ("Waiting for 1 of 2 players to approve"
+  /**
+   * "Re-match with Aggregate Leaderboard?" — slutskärmens FÖRSTA fråga till
+   * host (Peter 2026-08-24 rev 3). Rubrik + inline Yes/No; Start New Game
+   * visas INTE i detta läge (call-siten utelämnar `onStartNewGame` tills
+   * host svarat No). Utelämnas `onReplayYes` → hela blocket renderas inte
+   * (remote 1v1, non-host, guest host som förbrukat sin enda replay).
+   *
+   * Yes → carry-over-flödet (invite + Keep settings). No → call-siten
+   * skickar in `onStartNewGame` i stället och blocket försvinner.
+   */
+  onReplayYes?: () => void;
+  onReplayNo?: () => void;
+  /** Host har svarat Yes: No-knappen göms och `replayNote` visar väntan.
+   *  Host kan inte ångra sig — inbjudan är redan utskickad (Peter). */
+  replayAnswered?: boolean;
+  /** Yes-knappen grå + otappbar medan non-hosts godkänner (IndDev). Tapp:en
+   *  är kvar och förklarar väntan i stället för att vara död yta; när alla
+   *  godkänt tänds den och host tappar den igen för att gå vidare. */
+  replayLocked?: boolean;
+  onReplayLockedPress?: () => void;
+  /** Statusrad under Yes/No ("Waiting for 1 of 2 players to approve"
    *  / "✓ All players have approved"). */
-  startNewGameNote?: React.ReactNode;
+  replayNote?: React.ReactNode;
 }) {
   // Nunito 700 Bold för Final Leaderboard:s "QuizVibe"-vattenstämpel-text
   // under Q+pokal-loggan. Matchar startskärmens appName-textformat 1:1.
@@ -506,6 +544,11 @@ export function RoundLeaderboard({
   const startNewGameExpanded = isStartNewGameControlled
     ? startNewGameExpandedProp
     : internalStartNewGameExpanded;
+  // Puls på slutskärmens två gula CTA:er. Låst/grå knapp står still, och
+  // Start New Game slutar pulsa när panelen är utfälld — pulsen betyder
+  // "tappbar just nu", och då är valet redan gjort.
+  const replayPulse = useCtaPulse(replayLocked);
+  const startNewGamePulse = useCtaPulse(startNewGameLocked || startNewGameExpanded);
   // Aggregera per-spelare-statistik (samma struktur som GetReadyIntro:s
   // live-leaderboard så det är lätt att jämföra). Sortering: poäng desc →
   // avg response asc (ties brutna av snabbaste genomsnitt).
@@ -833,6 +876,63 @@ export function RoundLeaderboard({
           Replay only possible 1 time for Guest Hosts
         </Text>
       )}
+      {/* Slutskärmens FÖRSTA fråga till host: rubrik + inline Yes/No
+          (Peter 2026-08-24 rev 3 — ingen popup, valet syns direkt). Medan
+          den står uppe skickar call-siten INTE in onStartNewGame, så den
+          knappen finns inte i DOM:en alls. Home-raden ligger kvar nedanför
+          som vanligt. */}
+      {isLastRound && onReplayYes && (
+        <View style={styles.replayWrap}>
+          <Text style={styles.replayTitle}>
+            Re-match with Aggregate Leaderboard?
+          </Text>
+          <View style={styles.replayActions}>
+            <Animated.View
+              style={{ flex: 1, transform: [{ scale: replayPulse }] }}
+            >
+              <Pressable
+                onPress={() => {
+                  if (replayLocked) {
+                    onReplayLockedPress?.();
+                    return;
+                  }
+                  onReplayYes();
+                }}
+                style={({ pressed }) => [
+                  styles.replayYesBtn,
+                  replayLocked && styles.startNewGameBtnLocked,
+                  pressed && { opacity: 0.85 },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.replayYesBtnText,
+                    replayLocked && styles.startNewGameBtnTextLocked,
+                  ]}
+                >
+                  Yes
+                </Text>
+              </Pressable>
+            </Animated.View>
+            {/* No göms sa fort host svarat Yes — inbjudan ar redan utskickad
+                till non-hosts, sa det finns inget att angra (Peters val). */}
+            {!replayAnswered && (
+              <Pressable
+                onPress={onReplayNo}
+                style={({ pressed }) => [
+                  styles.replayNoBtn,
+                  pressed && { opacity: 0.7 },
+                ]}
+              >
+                <Text style={styles.replayNoBtnText}>No</Text>
+              </Pressable>
+            )}
+          </View>
+          {!!replayNote && (
+            <View style={styles.startNewGameNote}>{replayNote}</View>
+          )}
+        </View>
+      )}
       {/* Gold "Start New Game" med samma inline-utfällning som Home:s knapp
           (Local Play / Remote Play). Renderas när call-siten skickar
           onStartNewGame: remote 1v1-slutskärmen (som saknar Play Again) och
@@ -845,15 +945,17 @@ export function RoundLeaderboard({
           {/* Låst läge (remote: motståndaren spelar fortfarande) — grå
               knapp, ingen utfällning. Tapp:en är kvar och förklarar varför
               i stället för att vara en död yta. */}
+          <Animated.View style={{ transform: [{ scale: startNewGamePulse }] }}>
           <Pressable
             onPress={() => {
               if (startNewGameLocked) {
                 onStartNewGameLockedPress?.();
                 return;
               }
-              // Lokala re-match-flödet: call-siten kör credit-gaten och
-              // öppnar panelen. Invite-frågan ställs först EFTER att host
-              // valt läge (och bara när det matchar det som just spelades).
+              // Lokala flödet: call-siten kör credit-gaten och öppnar
+              // panelen. Sedan 2026-08-24 ställs INGA carry-over-frågor här
+              // — knappen beter sig exakt som Home:s. Vill host ta med
+              // spelarna finns "Re-match with Aggregate Leaderboard?" ovanför.
               if (onStartNewGamePress) {
                 onStartNewGamePress();
                 return;
@@ -875,24 +977,18 @@ export function RoundLeaderboard({
               Start New Game
             </Text>
           </Pressable>
+          </Animated.View>
           {startNewGameExpanded && !startNewGameLocked && (
-            <>
-              <HostTypeOptions
+            <HostTypeOptions
                 accentColor={Colors.warning}
                 remoteMode={hideRemotePlay ? 'hidden' : 'available'}
-                lockedLocalTypes={lockedLocalTypes}
-                onLocalLockedPress={onLocalPlayLockedPress}
                 onSelect={(lobbyType) => {
                   if (!isStartNewGameControlled) {
                     setInternalStartNewGameExpanded(false);
                   }
                   onStartNewGame(lobbyType);
                 }}
-              />
-              {!!startNewGameNote && (
-                <View style={styles.startNewGameNote}>{startNewGameNote}</View>
-              )}
-            </>
+            />
           )}
         </View>
       )}
@@ -927,11 +1023,13 @@ export function RoundLeaderboard({
           //     att non-host behöver känna till replay-räknaren).
           //   • Host, omgång 1: faller igenom till normal blå Play Again +
           //     "Replay only possible 1 time..."-not (renderas nedan).
-          // "Start New Game" ERSÄTTER Play Again för host:en när call-siten
-          // skickar onStartNewGame (remote 1v1 + lokala re-match-flödet) —
-          // footer-raden blir då Home-only och det gula knappen ovanför är
-          // vägen vidare.
-          const hostUsesStartNewGame = isHost && !!onStartNewGame;
+          // Nya slutskärms-flödet ERSÄTTER Play Again för host:en — footer-
+          // raden blir Home-only och den gula knappen ovanför är vägen
+          // vidare. ⚠ Måste testa BÅDA callbacksen: i rev 3 skickas
+          // `onStartNewGame` först när host svarat No på re-match-frågan, så
+          // enbart `!!onStartNewGame` lät den dormanta blå "Play again"
+          // dyka upp under Yes-knappen i steg 1 (Peter 2026-08-24).
+          const hostUsesStartNewGame = isHost && (!!onStartNewGame || !!onReplayYes);
           if (
             hostUsesStartNewGame ||
             (guestHost && (isHost ? guestReplaysUsed >= 1 : !hostInitiatedPlayAgain))
@@ -981,13 +1079,13 @@ export function RoundLeaderboard({
                   bottomY={bottomY}
                 />
               ) : hostInitiatedPlayAgain ? (
-                /* Non-host efter host:s tap: "Approve" / "Replay" på två
+                /* Non-host efter host:s tap: "Approve" / "Re-match" på två
                    rader så texten ryms inom button-bredden. Aktiv styling i
                    GULD — host har "öppnat upp" knappen, så den lyser i
                    warning/premium-färgen för att signalera "actionable" och
                    skilja från host:s vanliga blå Play again. */
                 <PlayAgainButton
-                  lines={['Approve', 'Replay']}
+                  lines={['Approve', 'Re-match']}
                   color={Colors.warning}
                   onPress={onApprovePlayAgain}
                   disabled={false}
@@ -998,7 +1096,7 @@ export function RoundLeaderboard({
                 /* Non-host innan host tappat: dämpad two-line + "Activated by
                     Host"-badge kant-skärande i top-position. */
                 <PlayAgainButton
-                  lines={['Approve', 'Replay']}
+                  lines={['Approve', 'Re-match']}
                   color={Colors.textSecondary}
                   onPress={undefined}
                   disabled={true}
@@ -1322,6 +1420,56 @@ const styles = StyleSheet.create({
   },
   // Speglar Home:s gameBtn + gameBtnUser 1:1 (höjd 56, gold bg + gold kant,
   // svart text) så knappen läses som exakt samma CTA som på startskärmen.
+  // Re-match-frågan: gold rubrik + Yes/No på en 50/50-rad under. Rubriken
+  // är text (inte knapp) — den ställer frågan, knapparna svarar.
+  replayWrap: {
+    marginBottom: Spacing.sm,
+  },
+  replayTitle: {
+    fontSize: FontSize.md,
+    fontWeight: '700',
+    color: Colors.warning,
+    textAlign: 'center',
+    lineHeight: 22,
+    marginBottom: Spacing.sm,
+    paddingHorizontal: Spacing.sm,
+  },
+  replayActions: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+  },
+  // Yes = primär: samma gold-fyllda vokabulär som Start New Game.
+  replayYesBtn: {
+    height: 52,
+    borderRadius: Radius.md,
+    backgroundColor: Colors.warning,
+    borderWidth: 1,
+    borderColor: Colors.warning,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  replayYesBtnText: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: '#000000',
+  },
+  // No = sekundär: neutral outline, ingen puls. Att tacka nej ska inte
+  // konkurrera visuellt med Yes.
+  replayNoBtn: {
+    flex: 1,
+    height: 52,
+    borderRadius: Radius.md,
+    backgroundColor: 'transparent',
+    borderWidth: 1.5,
+    borderColor: Colors.borderStrong,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  replayNoBtnText: {
+    fontSize: 17,
+    fontWeight: '600',
+    color: Colors.textSecondary,
+  },
   startNewGameBtn: {
     height: 56,
     borderRadius: Radius.md,
