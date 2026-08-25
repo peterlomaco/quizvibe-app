@@ -146,19 +146,29 @@ function buildHtml(durationSec: number): string {
     // ── Fyrverkeriet: smäll när svansen är färdig ───────────────────────
     var boom = at(DRAW);
 
-    // Ljus explosion.
+    // Explosionen. Mörkheten kommer främst härifrån: ett LOWPASS som
+    // sveper nedåt (2400 → 380 Hz) i stället för det gamla highpasset vid
+    // 900. En mobilhögtalare kan ändå inte återge riktig bas, så djupet
+    // måste skapas genom att rulla av TOPPEN — inte genom att lägga till
+    // botten. Highpasset vid 90 Hz finns bara för att hålla bort mudder.
     var bs = ctx.createBufferSource();
     bs.buffer = noise;
-    bs.playbackRate.value = 0.7;
-    var bf = ctx.createBiquadFilter();
-    bf.type = 'highpass';
-    bf.frequency.value = 900;
+    bs.playbackRate.value = 0.5;
+    var bhp = ctx.createBiquadFilter();
+    bhp.type = 'highpass';
+    bhp.frequency.value = 90;
+    var blp = ctx.createBiquadFilter();
+    blp.type = 'lowpass';
+    blp.Q.value = 0.9;
+    blp.frequency.setValueAtTime(2400, boom);
+    blp.frequency.exponentialRampToValueAtTime(380, boom + 0.4);
     var bgn = ctx.createGain();
-    bs.connect(bf); bf.connect(bgn); bgn.connect(master);
+    bs.connect(bhp); bhp.connect(blp); blp.connect(bgn); bgn.connect(master);
     bgn.gain.setValueAtTime(0.0001, boom);
-    bgn.gain.linearRampToValueAtTime(0.34, boom + 0.006);
-    bgn.gain.exponentialRampToValueAtTime(0.0001, boom + 0.42);
-    bs.start(boom, 0, 0.5);
+    bgn.gain.linearRampToValueAtTime(0.32, boom + 0.008);
+    // Längre utklingning än förr — en mörk smäll måste få mullra klart.
+    bgn.gain.exponentialRampToValueAtTime(0.0001, boom + 0.62);
+    bs.start(boom, 0, 0.8);
 
     // Tryckvågen under — sinus som sveper ned. Utan den låter smällen
     // tunn och sitter inte i bröstet.
@@ -166,13 +176,33 @@ function buildHtml(durationSec: number): string {
     thump.type = 'sine';
     var tg = ctx.createGain();
     thump.connect(tg); tg.connect(master);
-    thump.frequency.setValueAtTime(140, boom);
-    thump.frequency.exponentialRampToValueAtTime(42, boom + 0.28);
+    thump.frequency.setValueAtTime(110, boom);
+    thump.frequency.exponentialRampToValueAtTime(30, boom + 0.34);
     tg.gain.setValueAtTime(0.0001, boom);
-    tg.gain.linearRampToValueAtTime(0.30, boom + 0.012);
-    tg.gain.exponentialRampToValueAtTime(0.0001, boom + 0.34);
+    tg.gain.linearRampToValueAtTime(0.34, boom + 0.014);
+    tg.gain.exponentialRampToValueAtTime(0.0001, boom + 0.5);
     thump.start(boom);
-    thump.stop(boom + 0.4);
+    thump.stop(boom + 0.58);
+
+    // ⚠ Grundtonen ovan sveper ned mot 30 Hz, vilket ingen mobilhögtalare
+    // återger. Den här triangeln ligger en oktav över och bär övertoner —
+    // det är DEN man faktiskt hör, och örat tolkar den som den låga
+    // grundtonen. Utan den blir sveppet tyst på telefon och smällen
+    // försvinner i stället för att bli mörk.
+    var body = ctx.createOscillator();
+    body.type = 'triangle';
+    var blpf = ctx.createBiquadFilter();
+    blpf.type = 'lowpass';
+    blpf.frequency.value = 520;
+    var bodyG = ctx.createGain();
+    body.connect(blpf); blpf.connect(bodyG); bodyG.connect(master);
+    body.frequency.setValueAtTime(220, boom);
+    body.frequency.exponentialRampToValueAtTime(60, boom + 0.34);
+    bodyG.gain.setValueAtTime(0.0001, boom);
+    bodyG.gain.linearRampToValueAtTime(0.16, boom + 0.014);
+    bodyG.gain.exponentialRampToValueAtTime(0.0001, boom + 0.46);
+    body.start(boom);
+    body.stop(boom + 0.54);
 
     // Efterknastret — de sista gnistorna som faller.
     var k = 0.05;
