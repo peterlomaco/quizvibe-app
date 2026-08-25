@@ -162,7 +162,7 @@ Varför: Home nås ALLTID via `router.replace('/')` (BottomBanner, Profile, Stor
 - `src/utils/mockLobbyPlayers.ts` — **in-memory `Map<string, LobbyPlayer[]>`** för host:s authoritative player-lista per rumkod. Host:s `useEffect` på `players[]` skriver hela arrayen via `setLobbyPlayers(code, players)`; non-host:s polling läser via `getLobbyPlayers(code)` och rebuilds lokal state. `clearLobbyPlayers(code)` rensar tillsammans med `deactivateRoom`/`clearLeftPlayers` på alla lifecycle-sites. Importerar `LobbyPlayer` som `import type` för att undvika runtime-circulär dep (LobbyScreen → utils → LobbyScreen).
 - `src/utils/mockLobbySettings.ts` — **in-memory `Map<string, LobbySettings>`** för host:s authoritative game-settings (gameMode, singlePlayerDefault, region, answerResponseSeconds, eraFrom/To, roundsCount, selectedExtraPackages, youtubeEnabled, imagesEnabled). Driver non-host:s vy av Game Mode-toggle, Region Scope, Game Era, Number of Rounds, Answer response time, Customized Host packages och Game Connections-pillar. `setLobbySettings`/`getLobbySettings`/`clearLobbySettings`. Skiljd från `mockLobbyPlayers` så ändringar i en sub-domän inte triggar onödig sync av den andra.
 - `src/utils/ejectedPlayers.ts` — **in-memory `Map<string, Set<string>>`** över spelare host har radat (trash) eller indirekt utkastat (single-player-default-toggle ON för alla non-hosts). `markEjected(code, playerId)`, `isEjected(code, playerId)`, `clearEjected(code)`. Non-host:s polling-effekt körs PRE-flight (innan settings/players-läsning) — om self är markerad → "User have been removed from this lobby"-popup + Home navigation, och resten av sync hoppas över.
-- `src/utils/mockStartedGames.ts` — **in-memory `Set<string>`** över rumkoder där host tryckt Start Game och navigerat till `/quiz`. `markGameStarted(code)` anropas i `handleStartGame` precis före `router.push('/quiz')`. Non-host:s polling-effekt kollar `isGameStarted(code)` PRE-flight efter eject-checken — träff + self är **inte** approved → "Game already started — Host started game without this user"-popup + Home navigation. Approved non-hosts hanteras INTE här ännu (separat gap: ingen real-time sync flyttar dem till /quiz mock-tiden ut). `clearGameStarted(code)` ingår i cleanup-bunten.
+- `src/utils/mockStartedGames.ts` — **in-memory `Set<string>`** över rumkoder där host tryckt Start Game och navigerat till `/quiz`. `markGameStarted(code)` anropas i `handleStartGame` precis före `router.push('/quiz')`. Non-host:s polling-effekt kollar `isGameStarted(code)` PRE-flight efter eject-checken — träff + self är **inte** approved → "Game already started — Host started game without this user"-popup + Home navigation. Approved non-hosts navigeras vidare till `/quiz` (IndDev direkt, PtP efter en Yes/No-prompt — se "Pass-the-Phone — non-host som live-spectator"). `clearGameStarted(code)` ingår i cleanup-bunten.
 
 **Per-user-namespacing** för friends + waitingInvites (för att undvika att User A:s data syns för User B vid logout/login på samma device):
 - AsyncStorage-nyckeln innehåller inloggade user:s playerName lowercase: `@quizvibe/friends/v1/<playerName>`, `@quizvibe/waitingInvites/v1/<recipient-playerName>`. Identifieras via `loadProfile()` inuti varje load/save i `friendsStorage.ts` resp. `waitingInvites.ts`. När backend kommer in byts detta mot user-id från auth-token.
@@ -1193,7 +1193,19 @@ Glöm inte lägga till nya stores här när de skapas — annars läcker stale d
 
 **Eject-detection PRE-sync** — `syncFromStore` i non-host:s player-poll kollar `isEjected(roomCode, ownPlayerIdRef.current)` ALLRA FÖRST. Träff → setPlayerEjectedDetected(true) + early-return. Resten av sync hoppas över så user inte ser approval-listan uppdateras strax innan popup.
 
-**Game-started-detection PRE-sync** — direkt efter eject-checken körs `isGameStarted(roomCode)` + check om self är approved (via `getLobbyPlayers`). Träff + self är **inte** approved → `setStartedWithoutMeDetected(true)` + early-return + popup "Game already started — Host started game without this user" → OK → Home. Approved non-hosts hanteras inte här (separat gap dokumenterad i koden).
+**Game-started-detection PRE-sync** — direkt efter eject-checken körs `isGameStarted(roomCode)` + check om self är approved (via `getLobbyPlayers`). Träff + self är **inte** approved → `setStartedWithoutMeDetected(true)` + early-return + popup "Game already started — Host started game without this user" → OK → Home.
+
+Är self **approved** greenas det i stället på `effectiveGameMode` (från `lobby_settings`, inte lokal state):
+
+| Läge | Vad som händer |
+|---|---|
+| `individual-devices` | `goToQuizAsNonHost()` direkt |
+| `pass-the-phone` | Alert **"Host has started the Game / Please use Host device. Do you want to follow the Leaderboard on this device?"** → **Yes** = `goToQuizAsNonHost()`, **No** = Home |
+| `remote-1v1` | Now/Later-modal (48h-fönstret) |
+
+`goToQuizAsNonHost()` är en lokal helper i `syncFromStore` som **delas av PtP-promptens Yes och IndDev-grenen** — båda behöver identiska `/quiz`-params (host:s settings ur `lobby_settings` + hela turnOrder ur `lobby_players` + `selfPlayerId`). Lägg nya params där, inte på ett av anropen.
+
+⚠ `navigatedToQuizRef.current = true` sätts **innan** PtP-Alerten visas. 2 s-pollen plus realtime-tick:en skulle annars stapla en ny popup varannan sekund. Samma once-guard som remote-grenen.
 
 **Scroll-to-top vid lobby-entry** — `mainScrollRef` på lobby:s primär-ScrollView. URL-params-effekten (samma som hanterar fresh entry från host/guest/registered-flow) anropar `mainScrollRef.current?.scrollTo({ y: 0, animated: false })` i en `requestAnimationFrame`-wrapper vid varje fresh entry. Krävs eftersom Stack-navigatorn kan återanvända samma route-instans och ärva tidigare scroll-position — utan denna landar guest-användare som joinar via Join Game mitt på sidan istället för vid headern.
 
@@ -1343,12 +1355,12 @@ Låst av [backend/content/test/questionRepetition.test.ts](backend/content/test/
 1. **Non-host sparade fel historik**: leaderboard-effekten sparade `gameQuestions` (= enhetens LOKALA slumpordning), inte de faktiskt spelade frågorna (host:s sekvens). Fix: `effectivePlayedIds = !isHost && broadcastAllQuestionIds?.length ? broadcastAllQuestionIds : gameQuestions.map(id)`. Samma logik i non-host:s Leave Game (`slice(0, questionIndex)`, ny recording — fanns inte alls tidigare); host:s Quit Game var redan korrekt.
 2. **Ingen cross-player-union**: host exkluderade bara sin EGEN historik. Fix: nytt broadcast-event **`player_seen_questions`** ([syncChannel.ts](src/lib/realtime/syncChannel.ts)) — non-host skickar `{ player_id, seen_q_ids (20-sessions-set, slice(-500)), last_q_ids (senaste sessionen) }` vid quiz-mount (3 sändningar: 300/1800/4500 ms, retry-mönster som game_sequence_init; host är redan subscribed eftersom host mountar quiz först). Host merge:ar in i `peerSeenIds`/`peerLastIds`-state — ENDAST medan `phaseRef==='intro' && questionIndexRef===0` (senare ankomst ignoreras så gameQuestions-useMemo:n aldrig bygger om poolen mitt i spelet). Pool-bygget använder `combinedSeenIds`/`combinedLastIds` (egen ∪ peers) i Spotify-fasens hårda exkludering + `buildCategoryAlignedPhase`:s `recentIds`/`lastSessionIds`. Payload-validator `vPlayerSeenQuestions` + membership-guard (player-id-bärande event). Resultat: en fråga som NÅGON deltagare sett i sina senaste 20 spel exkluderas (mjuk för YT/Hints via unseen-prioritering, hård för Spotify tills poolen tar slut).
 
-**Cross-player-historik i Pass-the-Phone (samma pass)** — PtP saknar quiz_sync-channel, så exkluderingen går via DB istället:
+**Cross-player-historik i Pass-the-Phone (samma pass)** — PtP saknade då quiz_sync-channel, så exkluderingen går via DB i stället. ⚠ Sedan 2026-08-25 HAR PtP en kanal (spectator-vyn), men `player_seen_questions` broadcastas MEDVETET fortfarande bara i IndDev — DB-vägen nedan är redan komplett för PtP, och en spectator som skickar sin historik skulle riskera att bygga om host:s pool mitt i flödet. DB-vägen:
 - **Migration `0026_lobby_players_seen_questions.sql`**: `lobby_players.seen_question_ids jsonb` (`{ "seen": [...], "last": [...] }`). Kolumnen ingår MEDVETET INTE i `playerToRow`/upsert-payloads — skrivs enbart via targeted UPDATE (`updateOwnSeenQuestionIds` i [mockLobbyPlayers.ts](src/utils/mockLobbyPlayers.ts), eq room_code+player_id+user_id som markOwnPlayerLeft) så host:s bulk-UPSERT aldrig clobbar den OCH så en icke-applicerad migration bara ger console.warn utan att bryta lobby-join. **Migrationen appliceras manuellt via SQL Editor som vanligt.**
 - **Join-sidan**: `publishOwnSeenHistory(roomCode, playerId)` (module-level i [LobbyScreen.tsx](src/screens/LobbyScreen.tsx)) anropas efter BÅDA join-upserts (guest-form + code-only/carry-over) — läser lokala 20-sessions-historiken och skriver till egen rad. Tom historik (guest utan profil) → no-op.
 - **Host-sidan**: `handleStartGame` läser union:en via `getLobbySeenQuestionIds(roomCode)` (efter `await setLobbyPlayers`, före markGameStarted) och stash:ar i in-memory-storen [pendingSeenQuestions.ts](src/utils/pendingSeenQuestions.ts) (`setPendingPeerSeenIds`). quiz.tsx konsumerar vid mount (`consumePendingPeerSeenIds`) och merge:ar in i samma `peerSeenIds`/`peerLastIds`. Fungerar för BÅDA lägen — i IndDev belt-and-suspenders bredvid broadcasten.
-- **PtP-recording under alla deltagare**: vid leaderboard + host:s Quit Game skrivs sessionen även under varje registrerad deltagares playerName-nyckel via `addSessionRecordForNames(names, qIds)` ([hostQuestionHistory.ts](src/utils/hostQuestionHistory.ts) — skippar inloggade profilens eget namn internt så det inte dubbel-skrivs; guests filtreras bort). Så deltagarnas historik finns på PtP-enheten om de senare loggar in/hostar där.
-- **Känd begränsning**: en registrerad spelare som deltog i ett PtP-spel på NÅGON ANNANS enhet får inte det spelet i sin egen enhets historik (AsyncStorage är per-device). Täcks indirekt: (a) värdens egen historik exkluderar spelet i alla spel värden är med i; (b) per-name-recordingen täcker återkommande spel på samma enhet. Full täckning kräver server-side per-user-historik (ej i V1-scope).
+- **PtP-recording under alla deltagare** (⚠ numera gatad på `isHost` — en spectator ska inte skriva andra spelares historik till sin egen enhet): vid leaderboard + host:s Quit Game skrivs sessionen även under varje registrerad deltagares playerName-nyckel via `addSessionRecordForNames(names, qIds)` ([hostQuestionHistory.ts](src/utils/hostQuestionHistory.ts) — skippar inloggade profilens eget namn internt så det inte dubbel-skrivs; guests filtreras bort). Så deltagarnas historik finns på PtP-enheten om de senare loggar in/hostar där.
+- **Känd begränsning**: en registrerad spelare som deltog i ett PtP-spel på NÅGON ANNANS enhet får inte det spelet i sin egen enhets historik (AsyncStorage är per-device). Täcks indirekt: (a) värdens egen historik exkluderar spelet i alla spel värden är med i; (b) per-name-recordingen täcker återkommande spel på samma enhet; (c) **sedan 2026-08-25**: en PtP-deltagare som svarar Yes på spectator-prompten och stannar till slutskärmen kör seen-history-effekten på SIN enhet med host:s `broadcastAllQuestionIds` som källa — då landar spelet i deras egen seen-historik. Väljer de No, eller lämnar i förtid, gäller begränsningen fortfarande. Full täckning kräver server-side per-user-historik (ej i V1-scope).
 
 Edge cases:
 - `spotifyEnabled = false` (alltid i PtP/Single Player) → `spotifyPool = []`, `pureYoutubePool = youtubePool`.
@@ -1763,6 +1775,96 @@ YouTube-klippen är NOTERAT INTE bara musik — kan vara filmscener, sporthände
 
 **Katalog-schema-diskrepans (löst 2026-05-22)**: tidigare använde [songs-gen-z.yaml](backend/content/catalog/songs-gen-z.yaml) + [songs-gen-alpha.yaml](backend/content/catalog/songs-gen-alpha.yaml) `media: {kind: youtube, ...}`-format medan resten av songs-files använder `youtubeClips: [...]`-array. Schema validerade båda men [export-music-questions.ts](backend/scripts/export-music-questions.ts) läser BARA `youtubeClips:` → 51 items var "död data". **Bulk-conversion-script** [backend/scripts/convert-media-to-youtubeclips.ts](backend/scripts/convert-media-to-youtubeclips.ts) konverterade allt 2026-05-22 (29 items i gen-z + 22 i gen-alpha) via text-baserad rad-walk som bevarar kommentarer och indentation. Music v1-curation samma dag lade dessutom till `youtubeClips:` på 10 nya items i songs-elder/gen-x/millennials (sedan flyttade alla 10 till songs-all.yaml som cross-gen-iconic). Slutresultat: 66 music-questions playable. Den `media:`-discriminerade unionen finns kvar i schema för framtida non-youtube-typer (`ai-image` är schema-definierad men inte i bruk).
 
+## Pass-the-Phone — non-host som live-spectator (2026-08-25)
+
+En godkänd non-host i en PtP-lobby var tidigare en återvändsgränd: host tryckte Start Game, non-host fick popupen *"Host has started the game — Please use the Host device"* och kastades Home. Deras enhet var svart resten av spelet trots att de satt i samma rum och spelade på host:ens telefon.
+
+Nu får de i stället frågan **"Host has started the Game / Please use Host device. Do you want to follow the Leaderboard on this device?"** → **No** = Home som förr, **Yes** = `/quiz` i en **spectator-vy** som visar leaderboarden uppdaterad i realtid, och efter sista frågan Final Leaderboard med prisutdelnings-sekvensen.
+
+**⚠ Re-match finns INTE i PtP — varken för host eller non-host** (Peter 2026-08-25). Skälet: host kan lägga till gäster via "+ Add Player" som saknar egen enhet, så ett IndDev-liknande approval-flöde hade låst host:ens Yes-knapp för alltid. **Bygg inte approvals för PtP** utan nytt produktbeslut.
+- **Host:s slutskärm hoppar över hela Yes/No-frågan** — `rematchQuestionEnabled = localRematchFlow && gameMode !== 'pass-the-phone'` gatar `onReplayYes`, och `localStartNewGameReady = localRematchFlow && (!rematchQuestionEnabled || replayChoice === 'no')` gör att **"Start New Game" + Home visas direkt**. Individual Devices behåller frågan + approval-flödet oförändrat.
+- **Spectatorns slutskärm har bara Home** (`homeOnlyFooter`).
+
+### Kanalen: fem event, inget mer
+
+`quiz_sync`-kanalen öppnas nu även i PtP via `syncActive` ([quiz.tsx](app/quiz.tsx)). Utöver de fem eventen används `player_rejoined` som anslutnings-handskakning — se "Åskådaren måste HÄLSA" nedan.
+
+```ts
+const isPtPSpectator = gameMode === 'pass-the-phone' && !isHost;
+const ptpMultiDevice = gameMode === 'pass-the-phone' && turnOrder.length > 1;
+const syncActive = gameMode === 'individual-devices' || ptpMultiDevice;
+```
+
+⚠ **`syncActive` får ALDRIG blint ersätta de ~60 `gameMode === 'individual-devices'`-checkarna i filen.** Exakt dessa sju sändningssiter är widenade: `recordRoundScore`, `handleHostSkipSpotifyQuestion`, `handleHostAdvanceFromReveal`, `handleHostShowLeaderboard`, `signalHostActivity`, `handleGoHome`→`lobby_deleted` och `goToNewLobby`→`play_again_lobby_ready` (+ ett NYTT `lobby_deleted` i `handleQuitGame`). Allt annat — timers, `isConnectionUnstable`/unstable-overlay, Spotify/DJ, inactivity-shutdown, host-disconnect-grace, `play_command`, `player_seen_questions` — är fortsatt strikt IndDev.
+
+**`play_command` widenas MEDVETET INTE.** Handlern sätter `phase → 'countdown'` och bär tung heal-logik; spectatorns fasmaskin ska förbli trivialt inert (den står i `'intro'` hela spelet). `question_advance` + `host_active_ping` räcker.
+
+### ⚠ Åskådaren måste HÄLSA — annars dröjer badgarna en hel fråga
+
+Kategori-ikonerna i Rounds-baren och badgarna på "Next to answer"-rutan bygger alla på `broadcastAllQuestionIds`. Den kommer via `game_sequence_init`, som host skickar vid **+800/2500/5000 ms efter HOST:s egen subscribe** — ett fönster som i PtP nästan alltid är passerat när åskådaren mountar, eftersom deras enhet väntar på att spelaren svarar "Yes" i lobbyns prompt. Utan hälsning blev nästa bärare `question_advance`, alltså upp till en hel fråga senare (~30 s i Peters test 2026-08-25).
+
+Handskakningen använder BEFINTLIGA event — inga nya typer:
+1. Åskådaren broadcastar **`player_rejoined`** vid +300/1500/3500 ms efter sin subscribe (tre försök av samma skäl som `player_seen_questions`: egna kanalen kan behöva ett ögonblick på sig att joina).
+2. Host:s `onPlayerRejoined` svarar **omedelbart med `game_sequence_init`**. Idempotent för alla mottagare, så IndDev påverkas inte.
+3. Host:s befintliga re-broadcast av `play_command` i samma handler (när host står i countdown/question) är en andra, lika snabb bärare — därför har `playCommandHandlerRef` numera en spectator-gren HÖGST UPP som plockar `all_question_ids` + `question_index` och `return`:ar. Resten av handlern (fas → `'countdown'`, timer-stämplar, wipe av svars-state) hör till IndDev-spelare och vore skadlig här.
+
+`player_rejoined` ÄR "jag är här"-signalen i protokollet — återuppfinn den inte, och lägg inte till fler `sendSequence`-timers hos host i stället: handskakningen är deterministisk, extra timers är bara brus.
+
+Övriga handlers behöver ingen gate — deras AVSÄNDARE är redan IndDev-gatade, så eventen anländer aldrig i PtP. **Undantaget är `onPlayerConnectionChange`**, som MÅSTE ha `if (gameMode !== 'individual-devices') return;` i kroppen: heartbeat + 15 s-watchdog startar inuti `subscribeSyncChannel` oavsett läge, så utan gaten fylls `playerConnectionStatus` i PtP och GetReadyIntro:s `handlePlayPress` blockerar host med *"Some players seem to have unstable network"* så fort en spectator bakgrundar sin telefon.
+
+`ptpMultiDevice` är en över-approximation — host-tillagda gäster utan enhet räknas in, så en PtP-host kan prenumerera på en kanal ingen lyssnar på. Kostnaden är en Realtime-kanal + 10 s heartbeat; att detektera vilka spelare som faktiskt har en enhet är inte värt komplexiteten.
+
+### Poängen hålls tillbaka tills host går vidare
+
+⚠ **Spectatorns tabell får INTE uppdateras när svaret registreras.** Host broadcastar `player_score_recorded` direkt vid Confirm/timeout — alltså mitt i reveal-fasen på host:ens telefon. Skulle spectatorn applicera den då avslöjade den utfallet innan spelarna i rummet hunnit se det på host-enheten (Peter 2026-08-25).
+
+Posterna buffras därför i `pendingSpectatorScoresRef` och töms av `flushSpectatorScores()` när host trycker **Next** (`question_advance`) — och på sista frågan när host trycker **Final Leaderboard** (`question_advance` med `next_question_index: null`), precis innan slutskärmen renderas.
+
+**Buffringen sitter på MOTTAGAR-sidan, inte som fördröjd sändning hos host** — med flit: host:s pending-/retry-maskineri för tappade broadcasts förblir orört, och inget kan gå förlorat om kanalen hickar mellan svar och Next. `host_active_ping`-grenen tömmer också bufferten när den upptäcker att host redan gått vidare (tappat `question_advance`), annars hade posterna fastnat för alltid.
+
+### Tre fällor i spectator-datan
+
+1. ⚠ **Självfiltret i `playerScoreRecordedHandlerRef` måste stängas av.** `if (payload.player_id === selfPlayerId) return;` är rätt i IndDev (man har sin egen poäng lokalt) men i PtP svarade spelaren på HOST:ens telefon, så host broadcastar posten under **spectatorns** player_id. Filtret hade kastat bort spelarens egen rad och lämnat dem på 0 poäng i sin egen tabell. Villkoret är därför `!isPtPSpectator && payload.player_id === selfPlayerId`.
+2. ⚠ **`totalQuestions` får inte clampas mot lokala `gameQuestions`.** Spectatorns pool är en helt annan slumpad lista (den spelar aldrig ur den), så clampen gav ett godtyckligt kortare spel. Spectatorn läser i stället `broadcastAllQuestionIds?.length` (från `game_sequence_init` / `question_advance`). Därför är `broadcastAllQuestionIds`-state:n **flyttad upp** till strax efter `turnOrder`-memon — `totalQuestions` deklareras före dess gamla plats.
+3. ⚠ **`isLastQuestion` behöver `spectatorGameOver`.** Spectatorns egen `questionIndex` kan inte avgöra att spelet tog slut. Flaggan sätts av avslutande `question_advance` (`next_question_index === null`) och av `host_active_ping` med `phase === 'leaderboard'`. Utan den renderas Final Leaderboard som en INTERIM-vy: död "Next Round →"-knapp och ingen prisutdelning.
+
+`recordRoundScore` har dessutom ett `if (isPtPSpectator) return;` överst — belt-and-suspenders, eftersom enhetens phase aldrig når `'question'`.
+
+**`host_active_ping` har en egen spectator-gren HÖGST UPP** i handlern som bara syncar frågesekvens + questionIndex + "spelet slut" och sedan `return`:ar. IndDev:s heal-logik (fas-catch-up till `'countdown'`, timer-/scoring-ref-nollställningar) får INTE köras — den skulle kasta spectatorn ur sin vy. Grenen är skyddsnätet mot ett tappat avslutande `question_advance`; utan den fastnar spectatorn på en frusen tabell för alltid.
+
+### Vyn — återanvänder host:ens GetReady-block
+
+Early-return i render **efter** remote-prep-gaten och **före** `if (phase === 'intro')`, villkorad `isPtPSpectator && phase !== 'leaderboard'` — så `'leaderboard'` faller igenom till den befintliga grenen och Final Leaderboard + `FinalCelebration` renderas som för alla andra.
+
+Innehåll uppifrån: en tunn rad (rubrik + **Leave**-knapp som kör befintliga `handleLeaveGame`), sedan **`<GetReadyIntro spectator />`**, sedan `<RoundLeaderboard isLastRound={false} />`.
+
+**`GetReadyIntro` fick ett `spectator`-läge** ([GetReadyIntro.tsx](src/components/GetReadyIntro.tsx)): PtP-blocket — dot-bars för Rounds + Question, rubrikraden, "nästa spelare"-rutan med kategori- och svarstyps-badges, samt den hopfällbara spelarkön — är utbrutet till konstanten **`ptpProgressBlock`**, och `if (spectator) return <View>{ptpProgressBlock}</View>;` renderar ENBART det: ingen top-bar, ingen Q-logga, inget Game settings-block, ingen play-knapp, ingen hopfällbar leaderboard (parent har den alltid synliga tabellen i stället). Ingen `flex: 1` på wrappern, så tabellen under får resten av skärmen.
+
+⚠ **Kopiera aldrig blocket till quiz.tsx.** Poängen med utbrytningen är att host och åskådare inte kan glida isär. Det enda som skiljer är rubriken: `spectator ? 'Next to answer:' : 'Pass-the-Phone to:'` — spelarkön är default **hopfälld** i båda lägena (Peter 2026-08-25: en kort stund var den utfälld för åskådaren, men då tryckte den ned leaderboard-tabellen som är hela poängen med skärmen).
+
+Kö-datan (`introQueueData`: players + roundNumbers + questionNumbers) är **hoistad ur intro-grenen till en `useMemo`** så båda vyerna skickar identisk kö.
+
+`currentPlayerIndex` **heal:as** i `host_active_ping`-grenen: `hostQuestionIndex % turnOrder.length`. Turordningen är deterministisk i PtP (fråga N besvaras av spelare N % antal), så healen räknar fram den i stället för att lita på att varje `question_advance` kom fram och roterade indexet — annars pekar både "Next to answer" och kön fel efter ett tappat event.
+
+### Två nya props på `RoundLeaderboard`
+
+- **`homeOnlyFooter?: boolean`** — kortsluter slutskärmens footer till bara Home. Utan den får spectatorn den dimmade "Approve / Re-match"-knappen med badgen "Activated by Host", som aldrig kan tändas (`play_again_initiated` broadcastas inte i PtP).
+- **`interimFooter?: React.ReactNode`** — ersätter "Next Round →"-knappen på INTERIM-vyn. ⚠ Den knappen renderas annars **identiskt tänd även utan `onNextRound`** (`onPress` blir bara `undefined`, ingen disabled-styling), så en läsare utan rätt att gå vidare hade sett en fullt levande CTA som inte gör något.
+
+### Host lämnar → spectators Home
+
+- **Start New Game / re-match**: `goToNewLobby` broadcastar `play_again_lobby_ready` men tvingar **`auto_join: undefined` i PtP**. Mottagaren visar då sin befintliga *"Host has already started a new Game"* → Home i stället för att navigera in i nya lobbyn. Noll nya event, noll ny copy.
+- **Home från slutskärmen**: `handleGoHome`:s `lobby_deleted` är widenad till `syncActive`.
+- **Quit mid-game**: `handleQuitGame` broadcastade tidigare INGENTING — en host som avbröt lämnade non-hosts hängande i `/quiz` (rums-pollingen finns bara i Lobby). Den skickar nu `lobby_deleted`, vilket fixar samma hål i IndDev på köpet.
+
+### Player history för spectatorn
+
+`saveFinalGame` har en spectator-gren: `rounds` är tom där (fylls bara av `handleConfirm*`) och `totalPoints` läser `gameTotals[hostId]` = **host:ens** summa. Båda ersätts av `effectiveRounds` / `effectiveTotalPoints` byggda ur `allRoundScoresHistory` filtrerad på `selfPlayerId`; assistance tas från `turnOrder.find(p => p.id === selfPlayerId)` eftersom LobbyScreens non-host-nav hårdkodar `assistance:'standard'` / `age:'32'`. Årtalen är 0/0 (samma konvention som bildfrågor) — `HistoryEntry` läser bara `correct`, `timeUsed` och antalet.
+
+Det stänger **Player history**-luckan för PtP-deltagare som följer med i spectator-vyn — tidigare fick de aldrig spelet på sin egen enhet. Samma sak gäller seen-historiken (se "Känd begränsning" under Cross-player-historik). Väljer de **No** på prompten skrivs som förut ingenting. `!isGuestHostGame`-gaten står kvar: guest-hostade spel skriver fortsatt ingen historik.
+
+I samma veva: seen-history-effektens `addSessionRecordForNames(registeredNames, …)` är nu gatad på **`isHost`** — rationalen ("alla spelade på DENNA enhet") gäller bara host:ens telefon, inte spectatorns. Och `gamePlayers.isYou` följer numera `selfPlayerId` i stället för `i === 0`, som markerade HOST som "du" på varje icke-host-enhet (gällde även IndDev).
+
 ## Quiz — phase machinery
 
 `quiz.tsx`-skärmen kör en linjär state-maskin per fråga:
@@ -2035,7 +2137,7 @@ Host:s **Play Again** är borttagen ur slutskärmen. I stället ställs **EN fr�
 **`previousLocalMode`** (`app/quiz.tsx`) = `isLocalSoloGame ? 'single' : 'multiplayer'`.
 
 **Gäller/gäller inte:**
-- **Pass-the-Phone**: Yes går direkt vidare — ingen väntan/låsning (`rematchNeedsApproval` kräver `gameMode === 'individual-devices'`).
+- **Pass-the-Phone**: ⚠ **hela re-match-frågan är BORTTAGEN sedan 2026-08-25** (Peter). Host:s slutskärm visar direkt "Start New Game" + Home — `rematchQuestionEnabled` gatar bort `onReplayYes` i PtP och `localStartNewGameReady` skickar in `onStartNewGame` från början. Non-hosts sitter kvar i `/quiz` på Final Leaderboard men deltar inte: deras footer är Home-only (`homeOnlyFooter`) och `goToNewLobby` tvingar `auto_join: undefined` i PtP, så de får "Host has already started a new Game" → Home. **Bygg inte approvals för PtP** — host kan ha lagt till gäster utan egen enhet, som aldrig kan godkänna. Se "Pass-the-Phone — non-host som live-spectator".
 - **Single player** (`turnOrder.length === 1`): Yes → `askKeepSettingsThenGo(true, 'single')` direkt (Keep/Reset med Cancel-utväg, = gamla single-player-Play-Again-beteendet).
 - **Guest-hostade spel**: samma två steg, med tre skillnader. (a) **Remote Play visas aldrig** i Start New Game-panelen — remote 1vs1 är QuizVibe-users-only. (b) **Keep/Reset hoppas över** — guest-lobbyns settings är låsta, så `proceedWithRematch` går direkt till `goToNewLobby(true, true, …)`. (c) **1-re-match-cappen**: `localRematchFlow` kräver `guestReplaysUsed < 1` och gatar BÅDA stegen, så omgång 2 visar bara Home. Noten "Replay only possible 1 time for Guest Hosts" ligger överst i sticky-footern.
 - **Remote 1v1**: har ENBART "Start New Game" (ingen re-match — en asynkron duell har ingen replay-koppling) med sin egen `startNewGameLocked`-logik, se remote-sektionen.

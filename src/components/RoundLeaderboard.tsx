@@ -432,6 +432,8 @@ export function RoundLeaderboard({
   replayLocked = false,
   onReplayLockedPress,
   replayNote,
+  homeOnlyFooter = false,
+  interimFooter,
 }: {
   players: LeaderboardPlayer[];
   /** Behållen för API-bakåtkompabilitet — tabellen aggregerar allt från
@@ -528,6 +530,17 @@ export function RoundLeaderboard({
   /** Statusrad under Yes/No ("Waiting for 1 of 2 players to approve"
    *  / "✓ All players have approved"). */
   replayNote?: React.ReactNode;
+  /** Slutskärmens footer blir Home-only. Används av Pass-the-Phone-
+   *  spectatorn: re-match finns inte i PtP (Peter 2026-08-25), och utan
+   *  flaggan får de den dimmade "Approve / Re-match"-knappen med badgen
+   *  "Activated by Host" — en knapp som aldrig kan tändas. */
+  homeOnlyFooter?: boolean;
+  /** Ersätter "Next Round →"-knappen på INTERIM-leaderboarden.
+   *  ⚠ Den knappen renderas annars identiskt tänd även utan `onNextRound`
+   *  (onPress blir bara undefined, ingen disabled-styling) — en läsare utan
+   *  rätt att gå vidare ser alltså en fullt levande CTA som inte gör något.
+   *  PtP-spectatorn skickar hit en passiv "Waiting for host"-pill. */
+  interimFooter?: React.ReactNode;
 }) {
   // Nunito 700 Bold för Final Leaderboard:s "QuizVibe"-vattenstämpel-text
   // under Q+pokal-loggan. Matchar startskärmens appName-textformat 1:1.
@@ -1031,6 +1044,7 @@ export function RoundLeaderboard({
           // dyka upp under Yes-knappen i steg 1 (Peter 2026-08-24).
           const hostUsesStartNewGame = isHost && (!!onStartNewGame || !!onReplayYes);
           if (
+            homeOnlyFooter ||
             hostUsesStartNewGame ||
             (guestHost && (isHost ? guestReplaysUsed >= 1 : !hostInitiatedPlayAgain))
           ) {
@@ -1109,6 +1123,8 @@ export function RoundLeaderboard({
             </>
           );
         })()
+      ) : interimFooter ? (
+        interimFooter
       ) : (
         <Pressable
           onPress={onNextRound}

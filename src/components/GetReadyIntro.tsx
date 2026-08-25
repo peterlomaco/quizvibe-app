@@ -197,6 +197,14 @@ interface Props {
    *  callbacken — gör inga mode-checkar här. */
   selfAudioOn?: boolean;
   onSelfAudioChange?: (audioOn: boolean) => void;
+  /** Pass-the-Phone-åskådarläge (non-host som följer leaderboarden på sin
+   *  egen enhet). Komponenten renderar då ENBART progress-blocket — dot-bars
+   *  för Rounds + Question, rubriken "Next to answer:", spelarrutan med
+   *  kategori-/svarstyps-badges och den hopfällbara spelarkön. Allt annat
+   *  (top-bar, Q-logga, Game settings, play-knapp, hopfällbar leaderboard)
+   *  utelämnas; parent renderar den alltid synliga leaderboard-tabellen
+   *  under blocket. */
+  spectator?: boolean;
 }
 
 /** Liten avatar-cell som visas före spelarnamnet — uri-bild om finns, annars
@@ -308,6 +316,7 @@ export function GetReadyIntro({
   onPlayerAudioChange,
   selfAudioOn = true,
   onSelfAudioChange,
+  spectator = false,
 }: Props) {
   const isIndDev = mode === 'individual-devices';
   // Remote 1v1 (= onSaveExit satt): top-baren följer lobbyns mönster —
@@ -495,6 +504,10 @@ export function GetReadyIntro({
   // — det är önskat: leaderboarden börjar collapsed varje gång intro:n visas.
   const [leaderboardOpen, setLeaderboardOpen] = useState(false);
   const [settingsExpanded, setSettingsExpanded] = useState(false);
+  // Default hopfälld i BÅDA lägena (Peter 2026-08-25). En kort stund var
+  // spectator-läget default utfällt, men då öppnades åskådarvyn med kön
+  // uppslagen och tryckte ned leaderboard-tabellen som är hela poängen med
+  // skärmen. Spelaren fäller ut kön själv vid behov.
   const [queueExpanded, setQueueExpanded] = useState(false);
   // Trigger:n hanterar locked vs unlocked separat — locked → info-Alert,
   // unlocked → öppna dropdown.
@@ -550,6 +563,158 @@ export function GetReadyIntro({
       blinkLoop.stop();
     };
   }, [playPulse, playGlow, nextBlink]);
+
+  // ── Pass-the-Phone: dot-bars (Rounds + Question) + spelarkö ──────────
+  // R- och Q-kolumnerna är borttagna; progress visas i stället som två
+  // dot-bars ovanför kö-tabellen. Kö-tabellen är single-column och visar
+  // bara avatar + namn. Round-separator-raden i kön behålls eftersom det
+  // är enda visuella signalen för round-byten i listan nu.
+  //
+  // Utbrutet som konstant 2026-08-25 så spectator-läget kan rendera EXAKT
+  // samma block utan att duplicera JSX eller styles — host och åskådare
+  // får aldrig glida isär. Rubriken är det enda som skiljer:
+  // "Pass-the-Phone to:" hos host, "Next to answer:" hos åskådaren.
+  const ptpProgressBlock = (
+    <View style={styles.tableBlock}>
+      {!isSinglePlayer && renderDotBar(
+        totalRounds,
+        currentRound,
+        'Rounds',
+        mediaSourceByQuestion
+          ? (() => {
+              const turnIdx = (currentQuestion - 1) % Math.max(1, playerCount);
+              return Array.from({ length: totalRounds }, (_, r) =>
+                mediaSourceByQuestion[r * playerCount + turnIdx] ?? null,
+              );
+            })()
+          : undefined,
+      )}
+      {renderDotBar(totalQuestions, currentQuestion, 'Question')}
+
+      <View style={[styles.tableRow, styles.tableHeaderRow]}>
+        <View style={[styles.colPlayer, styles.cellHeader]}>
+          <Text style={styles.headerCellText}>
+            {spectator ? 'Next to answer:' : 'Pass-the-Phone to:'}
+          </Text>
+        </View>
+      </View>
+
+      {/* Current player-rad — Player-cellen får en primary-bordered
+          box runt avatar+namn så det är tydligt vem som är näst på tur.
+          Kant-skärande kategori-badge ovanpå boxen visar V1-kategori
+          (Music/Film/Sport) för nästa fråga så spelaren vet vad som
+          kommer. */}
+      <View style={styles.tableRow}>
+        <View style={[styles.colPlayer, styles.colPlayerCurrentWrap]}>
+          <View style={styles.currentPlayerBox}>
+            <Text style={styles.currentMediaNumber}>{currentQuestion}</Text>
+            <PlayerAvatar player={currentPlayer} size={QUEUE_AVATAR_SIZE} />
+            <Text style={styles.currentPlayerName} numberOfLines={1}>
+              {playerName}
+            </Text>
+            {currentAnswerType && (
+              <View style={styles.answerTypeBadge} pointerEvents="none">
+                <Text style={styles.answerTypeBadgeText}>{currentAnswerType}</Text>
+              </View>
+            )}
+            {currentCategory && (
+              <View style={styles.categoryBadge} pointerEvents="none">
+                <Text style={styles.categoryBadgeText}>{currentCategory}</Text>
+              </View>
+            )}
+          </View>
+        </View>
+      </View>
+
+      {/* Kö-rader (scrollar internt om kön är lång). "Round X"-separator
+          infogas mellan kö-rader när rondnumret förändras — visuell
+          signal för round-byten i listan när R-kolumnen är borta. */}
+      {/* Kö-chips (upp till 9 kommande spelare) — vänster-packade med
+          flexWrap, samma layout som IndDev:s media-kö. Cap är 9 så att
+          Next-rutan + chip-kön tillsammans visar max 10 frågor. Inga
+          Round-dividers i chip-raden — ev. rond-byten framgår av
+          frågenumren. End of Game inline efter sista chip när kön
+          slutar exakt vid totalQuestions; annars + more questions
+          centrerat på egen rad. */}
+      {queue.length > 0 && (() => {
+        const visibleQueue = queue.slice(0, 9);
+        const lastChipQ =
+          queueQuestionNumbers[visibleQueue.length - 1] ?? currentQuestion;
+        const isEndOfGame = totalQuestions - lastChipQ <= 0;
+        return (
+          <>
+            <TouchableOpacity
+              style={styles.queueToggleRow}
+              onPress={() => setQueueExpanded((v) => !v)}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.queueToggleLabel}>Playing queue</Text>
+              <View style={styles.settingsToggleBox}>
+                <Text style={styles.settingsToggleGlyph}>
+                  {queueExpanded ? '−' : '+'}
+                </Text>
+              </View>
+            </TouchableOpacity>
+            {queueExpanded && (
+              <>
+                <View style={styles.mediaQueueChipsRow}>
+                  {visibleQueue.map((p, i) => (
+                    <View key={`chip-${i}`} style={styles.queueChip}>
+                      <Text style={styles.queueChipNumber}>
+                        {queueQuestionNumbers[i]}
+                      </Text>
+                      <Text
+                        style={styles.queueChipName}
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                      >
+                        {p.name}
+                      </Text>
+                    </View>
+                  ))}
+                  {isEndOfGame && (
+                    <Text
+                      style={styles.endOfGameInline}
+                      numberOfLines={1}
+                      adjustsFontSizeToFit
+                      minimumFontScale={0.8}
+                    >
+                      🏁  End of Game
+                    </Text>
+                  )}
+                </View>
+                {!isEndOfGame && (
+                  <View style={styles.endOfGameRow}>
+                    <Text style={styles.endOfGameText}>+ more questions</Text>
+                  </View>
+                )}
+              </>
+            )}
+          </>
+        );
+      })()}
+
+      {/* Empty-queue-fallback — sista spelarens vy där kön är tom. */}
+      {queue.length === 0 && (
+        <View style={styles.endOfGameRow}>
+          <Text style={styles.endOfGameText}>🏁  End of Game</Text>
+        </View>
+      )}
+
+    </View>
+  );
+
+  // ── Spectator-läge: rendera BARA progress-blocket ────────────────────
+  // Pass-the-Phone-åskådaren (non-host som valt att följa leaderboarden)
+  // återanvänder host:ens Rounds/Question-grafik + spelarrutan + kön, men
+  // inget annat: ingen top-bar, ingen Q-logga, inget settings-block, ingen
+  // play-knapp och ingen hopfällbar leaderboard — parent (quiz.tsx) sätter
+  // den ALLTID synliga leaderboard-tabellen under blocket i stället.
+  // Ingen flex:1 här: blocket ska ta sin naturliga höjd så tabellen får
+  // resten av skärmen.
+  if (spectator) {
+    return <View style={styles.spectatorBlockWrap}>{ptpProgressBlock}</View>;
+  }
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -1358,137 +1523,9 @@ export function GetReadyIntro({
             )}
           </View>
         ) : (
-          // ── Pass-the-Phone: dot-bars (Rounds + Question) + spelarkö ──
-          // R- och Q-kolumnerna är borttagna; progress visas istället som
-          // två dot-bars ovanför kö-tabellen. Kö-tabellen är single-column
-          // (Pass-the-Phone to:) och visar bara avatar + namn. Round-
-          // separator-raden i kön behålls eftersom det är enda visuella
-          // signal för round-byten i listan nu.
-          <View style={styles.tableBlock}>
-            {!isSinglePlayer && renderDotBar(
-              totalRounds,
-              currentRound,
-              'Rounds',
-              mediaSourceByQuestion
-                ? (() => {
-                    const turnIdx = (currentQuestion - 1) % Math.max(1, playerCount);
-                    return Array.from({ length: totalRounds }, (_, r) =>
-                      mediaSourceByQuestion[r * playerCount + turnIdx] ?? null,
-                    );
-                  })()
-                : undefined,
-            )}
-            {renderDotBar(totalQuestions, currentQuestion, 'Question')}
-
-            <View style={[styles.tableRow, styles.tableHeaderRow]}>
-              <View style={[styles.colPlayer, styles.cellHeader]}>
-                <Text style={styles.headerCellText}>Pass-the-Phone to:</Text>
-              </View>
-            </View>
-
-            {/* Current player-rad — Player-cellen får en primary-bordered
-                box runt avatar+namn så det är tydligt vem som är näst på tur.
-                Kant-skärande kategori-badge ovanpå boxen visar V1-kategori
-                (Music/Film/Sport) för nästa fråga så spelaren vet vad som
-                kommer. */}
-            <View style={styles.tableRow}>
-              <View style={[styles.colPlayer, styles.colPlayerCurrentWrap]}>
-                <View style={styles.currentPlayerBox}>
-                  <Text style={styles.currentMediaNumber}>{currentQuestion}</Text>
-                  <PlayerAvatar player={currentPlayer} size={QUEUE_AVATAR_SIZE} />
-                  <Text style={styles.currentPlayerName} numberOfLines={1}>
-                    {playerName}
-                  </Text>
-                  {currentAnswerType && (
-                    <View style={styles.answerTypeBadge} pointerEvents="none">
-                      <Text style={styles.answerTypeBadgeText}>{currentAnswerType}</Text>
-                    </View>
-                  )}
-                  {currentCategory && (
-                    <View style={styles.categoryBadge} pointerEvents="none">
-                      <Text style={styles.categoryBadgeText}>{currentCategory}</Text>
-                    </View>
-                  )}
-                </View>
-              </View>
-            </View>
-
-            {/* Kö-rader (scrollar internt om kön är lång). "Round X"-separator
-                infogas mellan kö-rader när rondnumret förändras — visuell
-                signal för round-byten i listan när R-kolumnen är borta. */}
-            {/* Kö-chips (upp till 9 kommande spelare) — vänster-packade med
-                flexWrap, samma layout som IndDev:s media-kö. Cap är 9 så att
-                Next-rutan + chip-kön tillsammans visar max 10 frågor. Inga
-                Round-dividers i chip-raden — ev. rond-byten framgår av
-                frågenumren. End of Game inline efter sista chip när kön
-                slutar exakt vid totalQuestions; annars + more questions
-                centrerat på egen rad. */}
-            {queue.length > 0 && (() => {
-              const visibleQueue = queue.slice(0, 9);
-              const lastChipQ =
-                queueQuestionNumbers[visibleQueue.length - 1] ?? currentQuestion;
-              const isEndOfGame = totalQuestions - lastChipQ <= 0;
-              return (
-                <>
-                  <TouchableOpacity
-                    style={styles.queueToggleRow}
-                    onPress={() => setQueueExpanded((v) => !v)}
-                    activeOpacity={0.7}
-                  >
-                    <Text style={styles.queueToggleLabel}>Playing queue</Text>
-                    <View style={styles.settingsToggleBox}>
-                      <Text style={styles.settingsToggleGlyph}>
-                        {queueExpanded ? '−' : '+'}
-                      </Text>
-                    </View>
-                  </TouchableOpacity>
-                  {queueExpanded && (
-                    <>
-                      <View style={styles.mediaQueueChipsRow}>
-                        {visibleQueue.map((p, i) => (
-                          <View key={`chip-${i}`} style={styles.queueChip}>
-                            <Text style={styles.queueChipNumber}>
-                              {queueQuestionNumbers[i]}
-                            </Text>
-                            <Text
-                              style={styles.queueChipName}
-                              numberOfLines={1}
-                              ellipsizeMode="tail"
-                            >
-                              {p.name}
-                            </Text>
-                          </View>
-                        ))}
-                        {isEndOfGame && (
-                          <Text
-                            style={styles.endOfGameInline}
-                            numberOfLines={1}
-                            adjustsFontSizeToFit
-                            minimumFontScale={0.8}
-                          >
-                            🏁  End of Game
-                          </Text>
-                        )}
-                      </View>
-                      {!isEndOfGame && (
-                        <View style={styles.endOfGameRow}>
-                          <Text style={styles.endOfGameText}>+ more questions</Text>
-                        </View>
-                      )}
-                    </>
-                  )}
-                </>
-              );
-            })()}
-
-            {/* Empty-queue-fallback — sista spelarens vy där kön är tom. */}
-            {queue.length === 0 && (
-              <View style={styles.endOfGameRow}>
-                <Text style={styles.endOfGameText}>🏁  End of Game</Text>
-              </View>
-            )}
-
-          </View>
+          // Pass-the-Phone: dot-bars (Rounds + Question) + spelarkö.
+          // Deklarerad ovanför så spectator-läget kan rendera samma block.
+          ptpProgressBlock
         )}
       </View>
       </ScrollView>
@@ -1517,6 +1554,12 @@ function mediaSourceLabel(source: QuestionMediaType | undefined): string {
 }
 
 const styles = StyleSheet.create({
+  // Spectator-läge: blocket står för sig självt utan SafeAreaView/flex:1
+  // så leaderboard-tabellen under det får resten av skärmen.
+  spectatorBlockWrap: {
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.sm,
+  },
   safe: {
     flex: 1,
     backgroundColor: Colors.background,

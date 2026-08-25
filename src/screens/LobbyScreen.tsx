@@ -2050,11 +2050,6 @@ export default function LobbyScreen() {
   // One-shot-guard: host publicerar sitt Guest alias en gång per lobby
   // (players-sync-effekten körs vid varje ändring).
   const hostAliasPublishedRef = useRef(false);
-  // Approved non-host i Pass-the-Phone-lobby: host startar → bara host
-  // spelar på sin telefon. Non-host får informativ popup ("använd host-
-  // device:n"). Skiljs från startedWithoutMeDetected (oapprovaderad)
-  // eftersom messaging:en är olika.
-  const [passThePhoneStartedDetected, setPassThePhoneStartedDetected] = useState(false);
   // True under den korta processing-fasen mellan host:s Yes-konfirmation
   // och navigation till Home. Visar en loading-overlay med "Please Wait —
   // Deleting this Lobby..." + animerade våg-prickar så host:en känner att
@@ -4359,16 +4354,90 @@ export default function LobbyScreen() {
           settingsStored?.youtubeEnabledCategories ?? youtubeEnabledCategories;
         const effectiveImgCats =
           settingsStored?.imagesEnabledCategories ?? imagesEnabledCategories;
+        // Non-host:s väg in i /quiz. Delas av Pass-the-Phone-promptens
+        // "Yes" och Individual Devices-fallthrough:en längst ned — båda
+        // lägena behöver EXAKT samma params (host:s settings + hela
+        // turnOrder), skillnaden är bara att PtP frågar först.
+        const goToQuizAsNonHost = () => {
+          const turnOrder = (playersStored ?? [])
+            .filter((p) => !!p.approved || !!p.isHost)
+            .map((p) => ({
+              id: p.id,
+              name: p.name,
+              emoji: p.emoji,
+              avatarUri: p.avatarUri,
+              assistance: p.assistance ?? 'standard',
+              age: p.age,
+              spotifyConnected: p.spotifyConnected ?? false,
+              type: p.type,
+            }));
+          // Guest-hostat spel detekteras via host-radens type i lobby_players
+          // (guest host seedar sitt kort med type 'guest'; registrerade hosts
+          // får alltid 'registered' via mergeProfileIntoHost). Ingen DB-
+          // migration behövs — gamla lobbies resolvar false. quiz.tsx döljer
+          // Play Again på final leaderboard när flaggan är satt.
+          const storedHostIsGuest = (playersStored ?? []).some(
+            (p) => p.isHost && p.type === 'guest',
+          );
+          router.replace({
+            pathname: '/quiz',
+            params: {
+              assistance: 'standard',
+              age: '32',
+              gameMode: effectiveGameMode,
+              guestHost: String(storedHostIsGuest),
+              // Non-host-vägen från Realtime-driven game-started-detection.
+              // quiz.tsx använder isHost för att rendera Leave Game-knapp
+              // istället för Quit Game-knapp i GetReadyIntro/CountdownIntro.
+              isHost: 'false',
+              // Non-host:s egna player_id — används av Leave-flödet för att
+              // broadcasta `player_left` så host:s skärm får popup + markerar
+              // spelaren som hasLeft i leaderboarden. I Pass-the-Phone är det
+              // dessutom nyckeln som matchar host:s score-broadcasts mot rätt
+              // rad i spectator-tabellen.
+              selfPlayerId: ownId ?? '',
+              players: JSON.stringify(turnOrder),
+              roundsCount: String(effectiveRoundsCount),
+              answerResponseSeconds: String(effectiveAnswerResponseSeconds),
+              eraFrom: String(effectiveEraFrom),
+              eraTo: String(effectiveEraTo),
+              youtubeEnabledCategories: JSON.stringify(effectiveYtCats),
+              imagesEnabledCategories: JSON.stringify(effectiveImgCats),
+              // Theme packages aktiva i lobby:n vid speltillfället (non-host
+              // path — efter Realtime-detection av game-started). Speglar
+              // host-path:en så HistoryEntry får samma data oavsett vilken
+              // enhet som triggade navigation till /quiz.
+              selectedExtraPackages: JSON.stringify(settingsStored?.selectedExtraPackages ?? []),
+              // Spotify DJ-läge måste matchas med host:s värde så non-host
+              // behandlar Spotify-frågor korrekt (timer gating, mediaSource).
+              spotifyEnabled: String(settingsStored?.spotifyEnabled ?? false),
+              roomCode,
+            },
+          });
+        };
         // Approved spelare: nästa steg beror på gameMode.
-        // - Pass-the-Phone: bara host spelar på sin telefon → vänligare
-        //   popup "Host has started... use the Host device".
+        // - Pass-the-Phone: alla svarar på HOST:ens telefon, men non-host:s
+        //   egen enhet kan följa leaderboarden live (score-broadcasts). Fråga
+        //   först — vill spelaren inte titta med går de Home som förut.
         // - Remote 1v1: asynkron duell — motståndaren väljer själv Play now
         //   (solo-quiz direkt) eller Play later (Home → 1vs1 Matches,
         //   48h-fönster).
         // - Individual Devices: alla approved spelare spelar på sin egen
         //   enhet → navigera till /quiz med derived turnOrder.
         if (effectiveGameMode === 'pass-the-phone') {
-          if (!cancelled) setPassThePhoneStartedDetected(true);
+          // navigatedToQuizRef sätts FÖRE Alerten — 2s-pollen (+ realtime-
+          // tick:en) skulle annars stapla en ny popup varannan sekund.
+          if (navigatedToQuizRef.current || cancelled) return;
+          navigatedToQuizRef.current = true;
+          Alert.alert(
+            'Host has started the Game',
+            'Please use Host device. Do you want to follow the Leaderboard on this device?',
+            [
+              { text: 'No', style: 'cancel', onPress: () => router.replace('/') },
+              { text: 'Yes', onPress: () => goToQuizAsNonHost() },
+            ],
+            { cancelable: false },
+          );
           return;
         }
         if (effectiveGameMode === 'remote-1v1') {
@@ -4431,59 +4500,7 @@ export default function LobbyScreen() {
         }
         if (!navigatedToQuizRef.current && !cancelled) {
           navigatedToQuizRef.current = true;
-          const turnOrder = (playersStored ?? [])
-            .filter((p) => !!p.approved || !!p.isHost)
-            .map((p) => ({
-              id: p.id,
-              name: p.name,
-              emoji: p.emoji,
-              avatarUri: p.avatarUri,
-              assistance: p.assistance ?? 'standard',
-              age: p.age,
-              spotifyConnected: p.spotifyConnected ?? false,
-              type: p.type,
-            }));
-          // Guest-hostat spel detekteras via host-radens type i lobby_players
-          // (guest host seedar sitt kort med type 'guest'; registrerade hosts
-          // får alltid 'registered' via mergeProfileIntoHost). Ingen DB-
-          // migration behövs — gamla lobbies resolvar false. quiz.tsx döljer
-          // Play Again på final leaderboard när flaggan är satt.
-          const storedHostIsGuest = (playersStored ?? []).some(
-            (p) => p.isHost && p.type === 'guest',
-          );
-          router.replace({
-            pathname: '/quiz',
-            params: {
-              assistance: 'standard',
-              age: '32',
-              gameMode: effectiveGameMode,
-              guestHost: String(storedHostIsGuest),
-              // Non-host-vägen från Realtime-driven game-started-detection.
-              // quiz.tsx använder isHost för att rendera Leave Game-knapp
-              // istället för Quit Game-knapp i GetReadyIntro/CountdownIntro.
-              isHost: 'false',
-              // Non-host:s egna player_id — används av Leave-flödet för att
-              // broadcasta `player_left` så host:s skärm får popup + markerar
-              // spelaren som hasLeft i leaderboarden.
-              selfPlayerId: ownId ?? '',
-              players: JSON.stringify(turnOrder),
-              roundsCount: String(effectiveRoundsCount),
-              answerResponseSeconds: String(effectiveAnswerResponseSeconds),
-              eraFrom: String(effectiveEraFrom),
-              eraTo: String(effectiveEraTo),
-              youtubeEnabledCategories: JSON.stringify(effectiveYtCats),
-              imagesEnabledCategories: JSON.stringify(effectiveImgCats),
-              // Theme packages aktiva i lobby:n vid speltillfället (non-host
-              // path — efter Realtime-detection av game-started). Speglar
-              // host-path:en så HistoryEntry får samma data oavsett vilken
-              // enhet som triggade navigation till /quiz.
-              selectedExtraPackages: JSON.stringify(settingsStored?.selectedExtraPackages ?? []),
-              // Spotify DJ-läge måste matchas med host:s värde så non-host
-              // behandlar Spotify-frågor korrekt (timer gating, mediaSource).
-              spotifyEnabled: String(settingsStored?.spotifyEnabled ?? false),
-              roomCode,
-            },
-          });
+          goToQuizAsNonHost();
         }
         return;
       }
@@ -4710,19 +4727,6 @@ export default function LobbyScreen() {
       { cancelable: false },
     );
   }, [startedWithoutMeDetected]);
-
-  // Pass-the-Phone-popup: approved non-host i en Pass-the-Phone-lobby kan
-  // inte själv navigera till /quiz — host:s telefon är den enda enhet som
-  // spelar. Visa informativ popup med Back to Home-knapp.
-  useEffect(() => {
-    if (!passThePhoneStartedDetected) return;
-    Alert.alert(
-      'Host has started the game',
-      'Please use the Host device (Pass-the-Phone game mode).',
-      [{ text: 'Back to Home', onPress: () => router.replace('/') }],
-      { cancelable: false },
-    );
-  }, [passThePhoneStartedDetected]);
 
   // Skickar invite in-app till en vän — sparas i mottagarens per-user-
   // namespacade Waiting Invites-inbox (friend.playerName som nyckel).
