@@ -5682,10 +5682,10 @@ export default function QuizScreen() {
   //
   // Peter 2026-08-24 (rev 3): slutskärmen ställer EN fråga i taget.
   //
-  // ⚠ Pass-the-Phone hoppar över HELA det här flödet sedan 2026-08-25
-  //   (Peter): host får direkt "Start New Game" + Home. Se
+  // ⚠ Pass-the-Phone OCH single player hoppar över HELA det här flödet
+  //   sedan 2026-08-25 (Peter): host får direkt "Start New Game" + Home. Se
   //   `rematchQuestionEnabled` / `localStartNewGameReady` i leaderboard-
-  //   grenen. Beskrivningen nedan gäller Individual Devices + single player.
+  //   grenen. Beskrivningen nedan gäller ENBART Individual Devices.
   //
   //   Steg 1 — `replayChoice === 'ask'`: bara rubriken "Re-match with
   //     Aggregate Leaderboard?" + inline Yes/No syns. Start New Game
@@ -5694,8 +5694,8 @@ export default function QuizScreen() {
   //       · Yes → carry-over-flödet. IndDev: Yes gråas ut med "Waiting for
   //               N of M players to approve" under sig tills alla non-hosts
   //               tryckt "Approve / Re-match"; host tappar Yes igen när den
-  //               tänds → Keep/Reset-prompten. PtP/single: inget att vänta
-  //               in → direkt till Keep/Reset. Läget är alltid
+  //               tänds → Keep/Reset-prompten. Saknas non-hosts helt går
+  //               den direkt till Keep/Reset. Läget är alltid
   //               `previousLocalMode` — en re-match byter aldrig läge.
   //               Ingen ångra-väg: inbjudan är redan utskickad.
   //       · No  → `replayChoice = 'no'`, re-match-blocket försvinner och
@@ -5782,10 +5782,11 @@ export default function QuizScreen() {
         .catch(() => {});
       return;
     }
-    // Single player + Pass-the-Phone: ingen att vänta in (alla sitter på
-    // samma enhet) → direkt vidare. Sätter MEDVETET inte rematchInvite:
-    // avbryter host Keep/Reset-prompten ska Yes/No-raden stå kvar oförändrad
-    // så No fortfarande går att välja.
+    // Ingen att vänta in → direkt vidare. Nås i praktiken bara av IndDev
+    // utan kvarvarande non-hosts (eller utan sync-kanal) — Pass-the-Phone
+    // och single player renderar aldrig re-match-frågan alls. Sätter
+    // MEDVETET inte rematchInvite: avbryter host Keep/Reset-prompten ska
+    // Yes/No-raden stå kvar oförändrad så No fortfarande går att välja.
     proceedWithRematch(previousLocalMode);
   };
 
@@ -7267,16 +7268,19 @@ export default function QuizScreen() {
       rematchTotalNonHosts > 0;
     const rematchWaitingCount =
       rematchTotalNonHosts - playAgainApprovals.size;
-    // ⚠ Pass-the-Phone hoppar över HELA re-match-frågan (Peter 2026-08-25).
-    // Host får direkt "Start New Game" + Home; Yes/No-blocket renderas
-    // aldrig. Skälet är detsamma som att spectatorn inte kan godkänna:
-    // host kan ha lagt till gäster utan egen enhet, och en re-match i PtP
-    // är ändå bara "starta ett nytt spel med samma folk i samma rum".
+    // ⚠ Pass-the-Phone OCH single player hoppar över HELA re-match-frågan
+    // (PtP: Peter 2026-08-25, single: Peter 2026-08-25). Host får direkt
+    // "Start New Game" + Home; Yes/No-blocket renderas aldrig.
+    // PtP: skälet är detsamma som att spectatorn inte kan godkänna — host
+    // kan ha lagt till gäster utan egen enhet, och en re-match där är ändå
+    // bara "starta ett nytt spel med samma folk i samma rum".
+    // Single player: det finns ingen motpart att aggregera en leaderboard
+    // mot, så frågan är meningslös — "Start New Game" gör exakt samma sak.
     // Individual Devices behåller frågan + approval-flödet oförändrat.
     const rematchQuestionEnabled =
-      localRematchFlow && gameMode !== 'pass-the-phone';
-    // Start New Game visas direkt i PtP, och i övriga lokala lägen först
-    // när host svarat No på re-match-frågan.
+      localRematchFlow && gameMode !== 'pass-the-phone' && !isLocalSoloGame;
+    // Start New Game visas direkt i PtP + single player, och i övriga
+    // lokala lägen först när host svarat No på re-match-frågan.
     const localStartNewGameReady =
       localRematchFlow && (!rematchQuestionEnabled || replayChoice === 'no');
     return (
