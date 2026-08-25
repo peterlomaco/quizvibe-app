@@ -7419,7 +7419,13 @@ export default function QuizScreen() {
             även MELLAN ronder via footerns "Next Round →"-gren, och där ska
             ingen prisutdelning fyra. */}
         {isLastQuestion && !summaryDone && (
-          <FinalCelebration highlights={matchHighlights} onDone={handleSummaryDone} />
+          <FinalCelebration
+            highlights={matchHighlights}
+            onDone={handleSummaryDone}
+            // Sprakljudet under Q-ritningen. Grindas ENBART på
+            // isAudioMutedForSelf, precis som appens övriga ljudkällor.
+            muted={isAudioMutedForSelf}
+          />
         )}
         {/* Lock-overlay för non-host som tappat Approve Play Again men där
             host ännu inte hunnit skapa nya lobbyn. cancelable: false →

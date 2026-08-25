@@ -12,10 +12,11 @@ import {
   Text,
   View,
 } from 'react-native';
-import Svg, { Circle, G, Path } from 'react-native-svg';
 import { useFonts, Nunito_700Bold } from '@expo-google-fonts/nunito';
 import { Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';
 import Confetti from './Confetti';
+import SparkleDrawQ, { DRAW_MS } from './SparkleDrawQ';
+import SparklerSound from './SparklerSound';
 import { MediaSourceIcon } from './MediaSourceIcon';
 import type { HighlightCard } from '../utils/matchHighlights';
 
@@ -34,6 +35,12 @@ import type { HighlightCard } from '../utils/matchHighlights';
  * avbryter alltså INTE en non-host som fortfarande tittar — den uppskjutna
  * "Host has deleted this lobby"-popupen visas först när de lämnar (se
  * pendingLobbyDeletedRef i quiz.tsx).
+ *
+ * ── Entrén: Q:t RITAS fram ──────────────────────────────────────────────
+ * Q:t poppar inte in färdigt utan ritas med en gnistrande penna (se
+ * SparkleDrawQ). Först när ringen och svansen är klara landar pokalen och
+ * "QuizVibe" i märket — konfettin fyras av i samma ögonblick, så
+ * uppmärksamheten går ritning → avslöjande → hyllning i den ordningen.
  *
  * ── Den mjuka övergången ────────────────────────────────────────────────
  * Märket här (guld Q + pokal + "QuizVibe") använder EXAKT samma geometri och
@@ -71,8 +78,10 @@ interface Timing {
 }
 
 const FULL_TIMING: Timing = {
-  markIn: 600,
-  hold: 1800,
+  markIn: 220,
+  // Kortare än förr: rit-sekvensen (DRAW_MS) ligger nu före hållet, så den
+  // totala celebration-tiden hamnar ändå på ungefär samma ~3,5 s.
+  hold: 1100,
   settle: 900,
   blockIn: 350,
   cardHold: 2500,
@@ -97,9 +106,19 @@ interface FinalCelebrationProps {
   highlights: HighlightCard[];
   /** Anropas EN gång när uttoningen är klar. Parent döljer då overlayen. */
   onDone: () => void;
+  /**
+   * Enhetens ljudgrind. Skickas som `isAudioMutedForSelf` från quiz.tsx —
+   * appens ENDA källa till sanning för om den här enheten ska låta. Lägg
+   * aldrig en egen ljud-check här.
+   */
+  muted?: boolean;
 }
 
-export default function FinalCelebration({ highlights, onDone }: FinalCelebrationProps) {
+export default function FinalCelebration({
+  highlights,
+  onDone,
+  muted = false,
+}: FinalCelebrationProps) {
   const [fontsLoaded] = useFonts({ Nunito_700Bold });
   const brandFont = fontsLoaded ? 'Nunito_700Bold' : undefined;
 
@@ -123,10 +142,23 @@ export default function FinalCelebration({ highlights, onDone }: FinalCelebratio
   // det lästes som en blixt när man kom in på slutskärmen. Bara uttoningen
   // i slutet animerar det här värdet.
   const veil = useRef(new Animated.Value(1)).current;
-  const markScale = useRef(new Animated.Value(0.6)).current;
+  const markScale = useRef(new Animated.Value(0.94)).current;
   const markOpacity = useRef(new Animated.Value(0)).current;
-  const haloOpacity = useRef(new Animated.Value(0.35)).current;
+  // Startar på 0 och byggs upp MEDAN Q:t ritas — en glöd som ligger färdig
+  // från första framen skulle avslöja märket innan pennan hunnit dit.
+  const haloOpacity = useRef(new Animated.Value(0)).current;
   const blockOpacity = useRef(new Animated.Value(0)).current;
+
+  // Pokalen + "QuizVibe" landar först NÄR Q:t är färdigritat.
+  const contentOpacity = useRef(new Animated.Value(0)).current;
+  const contentScale = useRef(new Animated.Value(0.55)).current;
+  const [sparkle, setSparkle] = useState(true);
+  // Ljudet monteras först när vi VET att ritningen ska köras — annars hade
+  // WebView:n monterats och rivits direkt för Reduce Motion-användare.
+  const [playSound, setPlaySound] = useState(false);
+  // Mount-tid = ungefär när SparkleDrawQ:s rit-effekt startar. Ljudet
+  // använder den för att kompensera för WebView:ns laddningstid.
+  const startedAtRef = useRef(Date.now());
 
   const fireDone = useCallback(() => {
     if (doneFiredRef.current) return;
@@ -139,6 +171,8 @@ export default function FinalCelebration({ highlights, onDone }: FinalCelebratio
     let cancelled = false;
     let anim: Animated.CompositeAnimation | null = null;
     let halo: Animated.CompositeAnimation | null = null;
+    let confetti: ReturnType<typeof setTimeout> | null = null;
+    let watchdog: ReturnType<typeof setTimeout> | null = null;
 
     (async () => {
       let reduce = false;
@@ -153,21 +187,38 @@ export default function FinalCelebration({ highlights, onDone }: FinalCelebratio
       const t = reduce ? REDUCED_TIMING : FULL_TIMING;
       timingRef.current = t;
 
+      // Reduce Motion: ingen ritning och inga gnistor — Q:t står färdigt
+      // från första framen och tonar bara in med resten av märket. Då
+      // finns inget att sprakande ljudsätta heller.
+      if (reduce) setSparkle(false);
+      else if (!muted) setPlaySound(true);
+
       if (!reduce) {
-        halo = Animated.loop(
-          Animated.sequence([
-            Animated.timing(haloOpacity, {
-              toValue: 0.8,
-              duration: 800,
-              useNativeDriver: true,
-            }),
-            Animated.timing(haloOpacity, {
-              toValue: 0.35,
-              duration: 800,
-              useNativeDriver: true,
-            }),
-          ]),
-        );
+        halo = Animated.sequence([
+          // Glöden tänds i takt med ritningen och börjar pulsera först när
+          // ringen slutits.
+          Animated.delay(t.markIn),
+          Animated.timing(haloOpacity, {
+            toValue: 0.35,
+            duration: Math.max(1, DRAW_MS - t.markIn),
+            easing: Easing.in(Easing.quad),
+            useNativeDriver: true,
+          }),
+          Animated.loop(
+            Animated.sequence([
+              Animated.timing(haloOpacity, {
+                toValue: 0.8,
+                duration: 800,
+                useNativeDriver: true,
+              }),
+              Animated.timing(haloOpacity, {
+                toValue: 0.35,
+                duration: 800,
+                useNativeDriver: true,
+              }),
+            ]),
+          ),
+        ]);
         halo.start();
       }
 
@@ -179,16 +230,40 @@ export default function FinalCelebration({ highlights, onDone }: FinalCelebratio
             duration: t.markIn,
             useNativeDriver: true,
           }),
+          Animated.timing(markScale, {
+            toValue: 1,
+            duration: t.markIn,
+            useNativeDriver: true,
+          }),
+        ]),
+        // ⚠ Bara en VÄNTAN, inte rit-animationen. SparkleDrawQ äger sin
+        // egen ritning och rapporterar ingenting tillbaka — sekvensen här
+        // får aldrig kunna fastna på den. En tidigare version hade
+        // ritningen som ett steg i kedjan, och när dess callback uteblev
+        // stannade allt i 'celebration': ingen pokal, ingen summary, ingen
+        // väg ut ur den touch-blockerande slöjan.
+        // ⚠ DRAW_MS räknas från MOUNT, inte härifrån: SparkleDrawQ startar
+        // sin ritning i sin egen mount-effekt, parallellt med markIn ovan.
+        // Utan avdraget landar pokalen 220 ms efter att Q:t blivit klart —
+        // och efter fyrverkerismällen, som också ligger på mount+DRAW_MS.
+        Animated.delay(reduce ? 0 : Math.max(0, DRAW_MS - t.markIn)),
+        // Pokalen + ordmärket landar i det färdigritade Q:t.
+        Animated.parallel([
+          Animated.timing(contentOpacity, {
+            toValue: 1,
+            duration: reduce ? 1 : 260,
+            useNativeDriver: true,
+          }),
           reduce
-            ? Animated.timing(markScale, {
+            ? Animated.timing(contentScale, {
                 toValue: 1,
-                duration: t.markIn,
+                duration: 1,
                 useNativeDriver: true,
               })
-            : Animated.spring(markScale, {
+            : Animated.spring(contentScale, {
                 toValue: 1,
-                friction: 6,
-                tension: 70,
+                friction: 5,
+                tension: 80,
                 useNativeDriver: true,
               }),
         ]),
@@ -210,18 +285,40 @@ export default function FinalCelebration({ highlights, onDone }: FinalCelebratio
       });
 
       if (!reduce) {
-        // Konfettin startar strax efter slöjan så den inte fyras av mot
-        // en fortfarande genomskinlig bakgrund.
-        setTimeout(() => {
+        // Konfettin fyras av när pennan når slutet av svansen — alltså i
+        // samma ögonblick som pokalen landar. Startar den tidigare tävlar
+        // den om blicken med ritningen.
+        confetti = setTimeout(() => {
           if (!cancelled) setConfettiOn(true);
-        }, 200);
+        }, Math.max(0, DRAW_MS - 60));
       }
+
+      // Skyddsnät. Att bli kvar i 'celebration' betyder att spelaren är
+      // INLÅST bakom slöjan — ingen summary, ingen "Leave summary", inga
+      // knappar som går att träffa. Skulle sekvensen mot förmodan inte
+      // rapportera klart tar den här timern över.
+      // 900 ms åt pokalens fjädring (den har ingen fast duration) och 1200
+      // ms marginal ovanpå, så skyddsnätet aldrig hinner före ett normalt
+      // avslut.
+      const total =
+        (reduce ? t.markIn : DRAW_MS) + 900 + t.hold + t.settle + 1200;
+      watchdog = setTimeout(() => {
+        if (cancelled || stageRef.current !== 'celebration') return;
+        anim?.stop();
+        halo?.stop();
+        markOpacity.setValue(WATERMARK_OPACITY);
+        contentOpacity.setValue(1);
+        contentScale.setValue(1);
+        setStage('highlights');
+      }, total);
     })();
 
     return () => {
       cancelled = true;
       anim?.stop();
       halo?.stop();
+      if (confetti) clearTimeout(confetti);
+      if (watchdog) clearTimeout(watchdog);
     };
     // Körs en gång vid mount — sekvensen äger sin egen livscykel.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -333,6 +430,13 @@ export default function FinalCelebration({ highlights, onDone }: FinalCelebratio
 
       {confettiOn && <Confetti active />}
 
+      {/* Sprakljudet. Monterat bara under celebration-fasen — WebView:n
+          rivs när korten tar över, vilket också är all städning som
+          behövs. Efterknastret hinner klinga ut långt innan dess. */}
+      {playSound && stage === 'celebration' && (
+        <SparklerSound startedAt={startedAtRef.current} durationMs={DRAW_MS} />
+      )}
+
       {/* Märket — samma geometri som RoundLeaderboards vattenstämpel. */}
       <Animated.View
         style={[
@@ -344,33 +448,26 @@ export default function FinalCelebration({ highlights, onDone }: FinalCelebratio
         <Animated.View
           style={[styles.halo, { opacity: stage === 'celebration' ? haloOpacity : 0 }]}
         />
-        <Svg width={Q_SIZE} height={Q_SIZE} viewBox="19 19 36 36">
-          <G>
-            <Circle
-              cx={37}
-              cy={37}
-              r={13}
-              fill="none"
-              stroke={Colors.warning}
-              strokeWidth={3}
-            />
-            <Path
-              d="M46 46 L52 52"
-              stroke={Colors.warning}
-              strokeWidth={3}
-              strokeLinecap="round"
-            />
-          </G>
-        </Svg>
-        <Text style={styles.trophy} numberOfLines={1}>
+        <SparkleDrawQ size={Q_SIZE} active sparkle={sparkle} compact={COMPACT} />
+        <Animated.Text
+          style={[
+            styles.trophy,
+            { opacity: contentOpacity, transform: [{ scale: contentScale }] },
+          ]}
+          numberOfLines={1}
+        >
           🏆
-        </Text>
-        <Text
-          style={[styles.brand, brandFont ? { fontFamily: brandFont } : null]}
+        </Animated.Text>
+        <Animated.Text
+          style={[
+            styles.brand,
+            brandFont ? { fontFamily: brandFont } : null,
+            { opacity: contentOpacity, transform: [{ scale: contentScale }] },
+          ]}
           numberOfLines={1}
         >
           QuizVibe
-        </Text>
+        </Animated.Text>
       </Animated.View>
 
       {showHighlights && (
