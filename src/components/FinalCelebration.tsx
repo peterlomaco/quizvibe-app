@@ -31,7 +31,7 @@ import type { HighlightCard } from '../utils/matchHighlights';
  *
  * ── Varje enhet äger sin egen sekvens ───────────────────────────────────
  * Ingen host-styrning och ingen broadcast: spelaren bläddrar själv och
- * lämnar när de vill via "Leave summary". En host som går till Home
+ * lämnar när de vill via "Go to Final leaderboard". En host som går till Home
  * avbryter alltså INTE en non-host som fortfarande tittar — den uppskjutna
  * "Host has deleted this lobby"-popupen visas först när de lämnar (se
  * pendingLobbyDeletedRef i quiz.tsx).
@@ -67,6 +67,20 @@ const COMPACT = SCREEN_H < 700;
 
 /** En "sida" i kort-slidern är hela skärmbredden — krävs för pagingEnabled. */
 const PAGE_W = SCREEN_W;
+
+/**
+ * Tak för placeringslistans höjd. Ett 12-spelarspel (premium IndDev) ryms
+ * inte på en kort skärm, så listan scrollar internt i stället för att
+ * trycka ut "Go to Final leaderboard" ur bild. Vid ~6 spelare eller färre
+ * binder taket aldrig.
+ */
+const RANK_LIST_MAX_H = Math.round(SCREEN_H * 0.34);
+
+/**
+ * Extra hålltid per rad i ett placeringskort. En lista med tio namn hinner
+ * inte läsas på samma tid som ett kort med ett enda tal.
+ */
+const RANK_ROW_HOLD_MS = 260;
 
 interface Timing {
   markIn: number;
@@ -126,7 +140,8 @@ export default function FinalCelebration({
   const [pageIndex, setPageIndex] = useState(0);
   // Så fort spelaren själv sveper slutar korten bläddra automatiskt — annars
   // slåss auto-framåt mot den som just svepte bakåt. De lämnar då via
-  // "Leave summary" i stället för att sekvensen tar slut av sig själv.
+  // "Go to Final leaderboard" i stället för att sekvensen tar slut av sig
+  // själv.
   const [userTookOver, setUserTookOver] = useState(false);
   const [confettiOn, setConfettiOn] = useState(false);
   const timingRef = useRef<Timing>(FULL_TIMING);
@@ -148,6 +163,7 @@ export default function FinalCelebration({
   // från första framen skulle avslöja märket innan pennan hunnit dit.
   const haloOpacity = useRef(new Animated.Value(0)).current;
   const blockOpacity = useRef(new Animated.Value(0)).current;
+  const leavePulse = useRef(new Animated.Value(1)).current;
 
   // Pokalen + "QuizVibe" landar först NÄR Q:t är färdigritat.
   const contentOpacity = useRef(new Animated.Value(0)).current;
@@ -294,7 +310,7 @@ export default function FinalCelebration({
       }
 
       // Skyddsnät. Att bli kvar i 'celebration' betyder att spelaren är
-      // INLÅST bakom slöjan — ingen summary, ingen "Leave summary", inga
+      // INLÅST bakom slöjan — ingen summary, ingen "Go to Final leaderboard", inga
       // knappar som går att träffa. Skulle sekvensen mot förmodan inte
       // rapportera klart tar den här timern över.
       // 900 ms åt pokalens fjädring (den har ingen fast duration) och 1200
@@ -339,7 +355,7 @@ export default function FinalCelebration({
   // Auto-bläddring — stannar permanent så fort spelaren svept själv.
   //
   // ⚠ Sekvensen avslutas ALDRIG av sig själv: når auto-bläddringen sista
-  // kortet stannar den där och väntar på "Leave summary". Varje enhet ska
+  // kortet stannar den där och väntar på "Go to Final leaderboard". Varje enhet ska
   // styra sin egen vy tills spelaren själv trycker — slutade den automatiskt
   // hamnade två enheter med samma antal kort och samma timing i mål nästan
   // exakt samtidigt, vilket såg ut som att hostens tapp kastade ut de andra.
@@ -347,6 +363,9 @@ export default function FinalCelebration({
     if (stage !== 'highlights' || userTookOver) return;
     if (highlights.length === 0) return;
     if (pageIndex >= highlights.length - 1) return;
+    // Placeringskort får längre hålltid — de bär en hel lista, inte ett tal.
+    const rowCount = highlights[pageIndex]?.rows?.length ?? 0;
+    const hold = timingRef.current.cardHold + rowCount * RANK_ROW_HOLD_MS;
     const id = setTimeout(() => {
       const next = pageIndex + 1;
       scrollRef.current?.scrollTo({
@@ -354,9 +373,37 @@ export default function FinalCelebration({
         animated: !reduceMotionRef.current,
       });
       setPageIndex(next);
-    }, timingRef.current.cardHold);
+    }, hold);
     return () => clearTimeout(id);
-  }, [stage, pageIndex, userTookOver, highlights.length]);
+  }, [stage, pageIndex, userTookOver, highlights]);
+
+  // Puls på "Go to Final leaderboard". Scale 1 ↔ 1.04 över 700 ms — samma
+  // cadens som useCtaPulse i RoundLeaderboard och Home:s gameBtn, så alla
+  // CTA:er på slutskärmen andas i takt. Lokal kopia i stället för import:
+  // FinalCelebration ska inte dra in hela RoundLeaderboard-modulen för en
+  // fyrradig loop. Stoppas under uttoningen — knappen är då redan tryckt.
+  useEffect(() => {
+    if (stage !== 'highlights') {
+      leavePulse.setValue(1);
+      return;
+    }
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(leavePulse, {
+          toValue: 1.04,
+          duration: 700,
+          useNativeDriver: true,
+        }),
+        Animated.timing(leavePulse, {
+          toValue: 1,
+          duration: 700,
+          useNativeDriver: true,
+        }),
+      ]),
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [stage, leavePulse]);
 
   // ── Uttoning → onDone ──────────────────────────────────────────────────
   useEffect(() => {
@@ -408,7 +455,7 @@ export default function FinalCelebration({
     [highlights.length],
   );
 
-  // Även utan kort ska blocket visas — "Leave summary" är enda vägen ut.
+  // Även utan kort ska blocket visas — "Go to Final leaderboard" är enda vägen ut.
   // Blir kvar under 'fading' så det tonar bort MED overlayen i stället för
   // att poppa ur, och så ingen animation råkar peka på en avmonterad nod.
   const showHighlights = stage === 'highlights' || stage === 'fading';
@@ -510,17 +557,47 @@ export default function FinalCelebration({
                       <Text style={styles.cardIcon}>{card.icon}</Text>
                     ) : null}
                     <Text style={styles.cardTitle}>{card.title}</Text>
-                    {card.playerName && (
-                      <View style={styles.cardPlayerRow}>
-                        {card.playerEmoji ? (
-                          <Text style={styles.cardPlayerEmoji}>{card.playerEmoji}</Text>
-                        ) : null}
-                        <Text style={styles.cardPlayerName} numberOfLines={1}>
-                          {card.playerName}
-                        </Text>
-                      </View>
-                    )}
-                    <Text style={styles.cardValue}>{card.value}</Text>
+                    {card.rows ? (
+                      /* Placeringslista — samma layout på ALLA korttyper.
+                         Listkorten tar med alla spelare, källkorten bara
+                         förstaplatsen (som kan delas av flera).
+
+                         Vertikal ScrollView inuti den horisontella pagern:
+                         ett 12-spelarspel ryms inte på en kort skärm, och
+                         att korta listan hade motsagt "alla spelare listas".
+                         Motsatt scroll-riktning gör att paging fortfarande
+                         fungerar. */
+                      <ScrollView
+                        style={styles.rankList}
+                        contentContainerStyle={styles.rankListContent}
+                        nestedScrollEnabled
+                        showsVerticalScrollIndicator={false}
+                      >
+                        {card.rows.map((row) => (
+                          <View key={row.playerId} style={styles.rankRow}>
+                            <Text
+                              style={[
+                                styles.rankPlace,
+                                row.place === 1 && styles.rankPlaceTop,
+                              ]}
+                            >
+                              {row.place}.
+                            </Text>
+                            {row.emoji ? (
+                              <Text style={styles.rankEmoji}>{row.emoji}</Text>
+                            ) : null}
+                            <Text style={styles.rankName} numberOfLines={1}>
+                              {row.name}
+                            </Text>
+                            <Text style={styles.rankValue}>{row.value}</Text>
+                          </View>
+                        ))}
+                      </ScrollView>
+                    ) : card.value ? (
+                      /* Solospel/personal — ingen att placera sig mot, så
+                         talet bär hela kortet. */
+                      <Text style={styles.cardValue}>{card.value}</Text>
+                    ) : null}
                     {card.detail ? (
                       <Text style={styles.cardDetail}>{card.detail}</Text>
                     ) : null}
@@ -545,13 +622,15 @@ export default function FinalCelebration({
           {/* Direkt nedanför och UTANFÖR kortet. Renderas ÄVEN utan kort —
               det är enda vägen ur sekvensen, som aldrig avslutas av sig
               själv (se auto-bläddringen ovan). */}
-          <Pressable
-            onPress={handleLeave}
-            style={({ pressed }) => [styles.leaveBtn, pressed && { opacity: 0.7 }]}
-            hitSlop={10}
-          >
-            <Text style={styles.leaveText}>Leave summary</Text>
-          </Pressable>
+          <Animated.View style={{ transform: [{ scale: leavePulse }] }}>
+            <Pressable
+              onPress={handleLeave}
+              style={({ pressed }) => [styles.leaveBtn, pressed && { opacity: 0.7 }]}
+              hitSlop={10}
+            >
+              <Text style={styles.leaveText}>Go to Final leaderboard</Text>
+            </Pressable>
+          </Animated.View>
         </Animated.View>
       )}
     </Animated.View>
@@ -646,8 +725,13 @@ const styles = StyleSheet.create({
     alignSelf: 'stretch',
     backgroundColor: Colors.card,
     borderRadius: Radius.lg,
-    borderWidth: 1.5,
-    borderColor: Colors.warningBorder,
+    // Tjock kant i SOLID guld (Peter 2026-08-25) — kortet ska läsas som ett
+    // eget lager ovanpå slöjan, inte som en svag ruta. `Colors.warningBorder`
+    // är guld på 25 % opacitet och blev grådaskigt vid 3 px; det är
+    // `Colors.warning` som är brand-guldet, samma ton som märket och
+    // "Go to Final leaderboard"-knappen.
+    borderWidth: 3,
+    borderColor: Colors.warning,
     paddingVertical: COMPACT ? Spacing.lg : Spacing.xl,
     paddingHorizontal: Spacing.lg,
     alignItems: 'center',
@@ -689,21 +773,51 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     textAlign: 'center',
   },
-  cardPlayerRow: {
+  // ── Placeringslista — ALLA korttyper som namnger spelare ──────────────
+  rankList: {
+    alignSelf: 'stretch',
+    maxHeight: RANK_LIST_MAX_H,
+    marginTop: Spacing.xs,
+    // flexGrow: 0 så listan tar sitt innehålls höjd i stället för att
+    // sträcka ut kortet när det är få spelare.
+    flexGrow: 0,
+  },
+  rankListContent: {
+    gap: COMPACT ? 4 : 6,
+  },
+  rankRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.sm,
-    marginTop: Spacing.xs,
   },
-  cardPlayerEmoji: {
-    fontSize: 22,
-    lineHeight: 26,
-  },
-  cardPlayerName: {
-    fontSize: COMPACT ? FontSize.lg : FontSize.xl,
+  rankPlace: {
+    width: 22,
+    textAlign: 'right',
+    fontSize: COMPACT ? FontSize.sm : FontSize.md,
     fontWeight: FontWeight.bold,
+    color: Colors.textSecondary,
+    fontVariant: ['tabular-nums'],
+  },
+  // Delad förstaplats syns genom att guld-siffran "1" upprepas på flera
+  // rader — detail-raden under förklarar regeln.
+  rankPlaceTop: {
+    color: Colors.warning,
+  },
+  rankEmoji: {
+    fontSize: COMPACT ? 16 : 18,
+    lineHeight: COMPACT ? 20 : 22,
+  },
+  rankName: {
+    flex: 1,
+    fontSize: COMPACT ? FontSize.sm : FontSize.md,
+    fontWeight: FontWeight.semibold,
     color: Colors.textPrimary,
-    flexShrink: 1,
+  },
+  rankValue: {
+    fontSize: COMPACT ? FontSize.md : FontSize.lg,
+    fontWeight: FontWeight.bold,
+    color: Colors.warning,
+    fontVariant: ['tabular-nums'],
   },
   cardValue: {
     fontSize: COMPACT ? 28 : 34,
@@ -732,18 +846,20 @@ const styles = StyleSheet.create({
   dotActive: {
     backgroundColor: Colors.warning,
   },
-  // Grå fyllning med vit text. '#6B7280' är samma grå som appens övriga
-  // neutrala/låsta element (PREMIUM-badgen utan prenumeration, RoundsRulers
-  // klammer, HostTypeOptions muted badge) — inget nytt värde införs.
+  // Gold fyllning med SVART text (Peter 2026-08-25) — appens vokabulär för
+  // en aktiv, upplåst CTA (samma par som PREMIUM-badgen med prenumeration
+  // och Home:s "Start New Game"). Pulserar via leavePulse; grå-med-vitt var
+  // fel signal för enda vägen vidare.
   leaveBtn: {
     marginTop: Spacing.lg,
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.xl,
+    paddingVertical: Spacing.sm + 2,
     borderRadius: Radius.full,
-    backgroundColor: '#6B7280',
+    backgroundColor: Colors.warning,
   },
   leaveText: {
     ...Typography.label,
-    color: Colors.textPrimary,
+    fontWeight: FontWeight.bold,
+    color: '#000',
   },
 });

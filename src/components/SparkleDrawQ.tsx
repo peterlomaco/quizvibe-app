@@ -20,7 +20,7 @@ import { Colors } from '../theme';
  * Animated.Value (JS-drivaren — dash finns inte i native-drivarens
  * vitlista). Det LÅSTE skärmen: rit-animationen rapporterade aldrig klart,
  * så sekvensen i FinalCelebration stannade i 'celebration' och varken
- * pokal, summary-kort eller "Leave summary" dök upp. Spelaren blev
+ * pokal, summary-kort eller "Go to Final leaderboard" dök upp. Spelaren blev
  * inlåst bakom en touch-blockerande slöja.
  *
  * Nu ritas bågen i stället om från vanlig React-state (rAF-loop), och

@@ -5929,7 +5929,7 @@ export default function QuizScreen() {
       if (lobbyDeletedAlertedRef.current) return;
       lobbyDeletedAlertedRef.current = true;
       // Bläddrar spelaren fortfarande i prisutdelnings-sekvensen? Avbryt den
-      // INTE — köa popupen tills de själva lämnar via "Leave summary".
+      // INTE — köa popupen tills de själva lämnar via "Go to Final leaderboard".
       if (celebrationVisibleRef.current) {
         pendingLobbyDeletedRef.current = true;
         return;
@@ -6312,7 +6312,7 @@ export default function QuizScreen() {
   // är en overlay och inte en ersättande vy (kort version: slutskärmens
   // server-effekter ska inte fördröjas av en animation).
   // Varje enhet äger sin EGEN sekvens: spelaren lämnar den när de vill via
-  // "Leave summary". Ingen broadcast, ingen host-styrning — en host som går
+  // "Go to Final leaderboard". Ingen broadcast, ingen host-styrning — en host som går
   // till Home avbryter alltså inte en non-host som fortfarande bläddrar.
   const [summaryDone, setSummaryDone] = useState(false);
 
