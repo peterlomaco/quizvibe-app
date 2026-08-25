@@ -6,8 +6,9 @@ import { WebView } from 'react-native-webview';
 //
 // Ersatte 2026-08-24 den låga moll-padden (Am→F→C→G, 98–220 Hz) som Peter
 // upplevde som tung/dyster. Nu: mjuka music-box-plingar i C-dur över den
-// glada pop-kadensen C → G → Am → F, i ett HÖGT register (349–1047 Hz) så
-// tonerna läser som "liv i appen" i stället för en drone.
+// glada pop-kadensen C → G → Am → F, som korta plingar i stället för en
+// drone — det är anslaget, inte registret, som gör att den läser som "liv i
+// appen".
 //
 // ETT lager: pluck — triangelvåg + en oktav ovanpå (sinus, låg gain) genom
 // ett lowpass. Snabb attack (8 ms) + exponentiell decay ger klockkaraktär
@@ -22,9 +23,27 @@ import { WebView } from 'react-native-webview';
 // som ligger på. Kör den utan paus och den blir bakgrundsmusik igen.
 //
 // TVÅ KLANGVARV (Peter 2026-08-24, ersatte takt-rampen): fraserna växlar
-// mellan en LJUS och en MÖRK röst — samma toner, samma 4-takt, men den mörka
-// ligger en oktav ned med dovare lowpass och nästan ingen oktav-shimmer.
-// Kontrasten ligger alltså i KLANG, inte i tempo.
+// mellan en DÄMPAD och en MÖRK röst — samma toner, samma 4-takt, men den
+// mörka ligger en oktav ned med dovare lowpass och nästan ingen oktav-
+// shimmer. Kontrasten ligger alltså i KLANG, inte i tempo.
+//
+// MÖRKNINGEN skedde i tre pass 2026-08-24 (Peter). Först dämpades varv 1:s
+// filter (lpf 2600 → 1700 → 1450, shine 0.22 → 0.11). När filtren väl låg
+// nära varandra bar oktaven hela kontrasten, så sista passet sänkte i
+// stället BÅDA varven ett helt oktavsteg: 1.0/0.5 → 0.5/0.25. Grundtonerna
+// ligger nu på 175–523 Hz (varv 1) och 87–262 Hz (varv 2).
+//
+// ⚠ Varv 2:s grundton ligger UNDER vad en mobilhögtalare återger. Den hörs
+// via oktaven ovanför (175–523 Hz), varför 'shine' är uppskruvad där
+// (0.09 → 0.20) och gain lyft till 1.60. Låter varv 2 tunt eller frånvarande
+// snarare än mörkt på riktig enhet är felet registret, inte volymen — ta då
+// tillbaka det till octave 0.5 och låt filtret bära skillnaden i stället.
+//
+// ⚠ 'octave' är BARA 1.0 eller 0.5 — aldrig något däremellan. Enbart
+// oktavtransponering bevarar harmoniken; en kvint eller kvart ned skulle
+// transponera frasen och låta som att progressionen modulerar mitt i
+// slingan. Vill man ha ett mellanläge i ljusstyrka är det lpf/shine/decay
+// som är rattarna, inte registret.
 //
 // ⚠ Takten är FAST (STEP, 550 ms) i båda varven — det är hela poängen med
 // ändringen. Den tidigare takt-rampen (3 fraser som stegrades) dämpades i tre
@@ -62,11 +81,16 @@ const HTML = `<!DOCTYPE html>
   ];
 
   // Två klangvarv. Samma toner och samma takt — bara register och filter
-  // skiljer. 'gain' kompenserar att den mörka oktaven uppfattas svagare i
-  // mobilhögtalare; 'decay' är längre där så den mörka frasen får ringa ut.
+  // skiljer. 'gain' kompenserar att mörkare klang uppfattas svagare i
+  // mobilhögtalare; 'decay' är längre i den mörka så frasen får ringa ut.
+  // Filtren är skalade med registret — halveras tonhöjden måste cutoff
+  // följa med, annars försvinner dämpningen (den skulle bara sitta ovanför
+  // det som faktiskt låter). 'shine' är däremot HÖJD i det låga läget: det
+  // är oktaven ovanför grundtonen som bär ljudet i en mobilhögtalare, se
+  // varningen överst.
   var VOICES = [
-    { octave: 1.0,  lpf: 2600, shine: 0.22, decay: 1.45, gain: 1.00 }, // ljus
-    { octave: 0.5,  lpf: 1200, shine: 0.09, decay: 1.80, gain: 1.20 }, // mörk
+    { octave: 0.50, lpf:  900, shine: 0.14, decay: 1.70, gain: 1.30 }, // dämpad
+    { octave: 0.25, lpf:  750, shine: 0.20, decay: 1.90, gain: 1.60 }, // mörk
   ];
 
   var STEP      = 0.55;                    // sekunder mellan plingarna — FAST
@@ -177,7 +201,7 @@ const HTML = `<!DOCTYPE html>
 /**
  * Osynlig WebView som spelar en ljus, gles närvaro-slinga via Web Audio API.
  * C→G→Am→F som music-box-plingar i fraser om fyra toner med tystnad emellan.
- * Fraserna växlar mellan en ljus och en mörk röst i samma fasta takt.
+ * Fraserna växlar mellan en dämpad och en mörk röst i samma fasta takt.
  * Inget bakgrundslager — bara plingarna.
  * Monteras i LobbyScreen (host) och i quiz.tsx under GetReady-fasen.
  * Ingen audio-fil behövs; stoppas automatiskt vid unmount.
