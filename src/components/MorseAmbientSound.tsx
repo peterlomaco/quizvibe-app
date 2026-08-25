@@ -10,8 +10,8 @@ import { WebView } from 'react-native-webview';
 // tonerna läser som "liv i appen" i stället för en drone.
 //
 // ETT lager: pluck — triangelvåg + en oktav ovanpå (sinus, låg gain) genom
-// ett lowpass vid 2.6 kHz. Snabb attack (8 ms) + exponentiell decay ger
-// klockkaraktär utan hårda övertoner.
+// ett lowpass. Snabb attack (8 ms) + exponentiell decay ger klockkaraktär
+// utan hårda övertoner.
 //
 // INGEN pad. Ett viskande sinus-lager under plingarna testades 2026-08-24 och
 // togs bort direkt (Peter): det gjorde slingan till en oavbruten bakgrundston,
@@ -21,19 +21,20 @@ import { WebView } from 'react-native-webview';
 // nästa ackord. Det är en närvaro-signal som pickar till då och då, inte musik
 // som ligger på. Kör den utan paus och den blir bakgrundsmusik igen.
 //
-// TAKT-RAMP (Peter 2026-08-24): takten stegras över tre fraser (550 → 510 →
-// 470 ms mellan plingarna) och börjar sedan om på den långsamma. Fyra toner
-// per fras ligger fast; STEPS (takt) och REST (paus) är rattarna.
+// TVÅ KLANGVARV (Peter 2026-08-24, ersatte takt-rampen): fraserna växlar
+// mellan en LJUS och en MÖRK röst — samma toner, samma 4-takt, men den mörka
+// ligger en oktav ned med dovare lowpass och nästan ingen oktav-shimmer.
+// Kontrasten ligger alltså i KLANG, inte i tempo.
 //
-// Stegringen är MEDVETET nätt och jämnt märkbar (~8 % per fras, 15 % totalt)
-// och dämpades i två omgångar: 550→420→320 (42 %) lät forcerat, 550→480→420
-// (24 %) fortfarande för snabbt. Rampen ska ANAS, inte höras som att något
-// håller på att hända i spelet. Branta ramper hör hemma i nedräkningen
-// (CountdownIntro), inte här.
+// ⚠ Takten är FAST (STEP, 550 ms) i båda varven — det är hela poängen med
+// ändringen. Den tidigare takt-rampen (3 fraser som stegrades) dämpades i tre
+// omgångar (42 % → 24 % → 15 %) innan den ströks helt: varje hörbar stegring
+// läste som att något höll på att hända i spelet. Sådant hör hemma i
+// nedräkningen (CountdownIntro), inte här. Återinför inte en ramp.
 //
-// Takt-rampen (3 lång) och ackordföljden (4 lång) löper OBEROENDE, så det tar
-// 12 fraser innan exakt samma kombination återkommer — avsiktligt, det håller
-// slingan från att låta uppenbart loopad.
+// Klangvarven (2 långa) och ackordföljden (4 lång) löper OBEROENDE, så varje
+// ackord får konsekvent samma röst: C ljus, G mörk, Am ljus, F mörk → repris
+// var fjärde fras. Progressionen andas därmed ljus/mörk fram och tillbaka.
 //
 // Look-ahead-schemaläggare (25 ms-intervall, 0.4 s framförhållning) i stället
 // för setTimeout-per-ackord: setTimeout driftar och gav hörbar glapp/överlapp
@@ -49,7 +50,7 @@ const HTML = `<!DOCTYPE html>
   var master = null;
   var delaySend = null;
   var chordIndex = 0;
-  var tempoIndex = 0;
+  var voiceIndex = 0;
   var nextChordTime = 0;
 
   // C → G → Am → F (I–V–vi–IV). Arpeggio-toner, lågt index spelas först.
@@ -60,18 +61,24 @@ const HTML = `<!DOCTYPE html>
     [349.23, 440.00, 523.25,  698.46], // F  : F4 A4 C5 F5
   ];
 
-  // Takt-ramp: tre fraser där takten stegras, sedan tillbaka till fras 1:s
-  // takt. Ger en liten "det händer något"-stegring utan att bli musik.
-  var STEPS     = [0.55, 0.51, 0.47];      // sekunder mellan plingarna per omgång
-  var REST      = 2.0;                     // tystnad mellan fraserna (konstant)
+  // Två klangvarv. Samma toner och samma takt — bara register och filter
+  // skiljer. 'gain' kompenserar att den mörka oktaven uppfattas svagare i
+  // mobilhögtalare; 'decay' är längre där så den mörka frasen får ringa ut.
+  var VOICES = [
+    { octave: 1.0,  lpf: 2600, shine: 0.22, decay: 1.45, gain: 1.00 }, // ljus
+    { octave: 0.5,  lpf: 1200, shine: 0.09, decay: 1.80, gain: 1.20 }, // mörk
+  ];
+
+  var STEP      = 0.55;                    // sekunder mellan plingarna — FAST
+  var REST      = 2.0;                     // tystnad mellan fraserna
   var LOOKAHEAD = 0.40;                    // schemalägg så här långt fram
 
   function buildDelay() {
     var del  = ctx.createDelay(1.0);
     var fb   = ctx.createGain();
     var send = ctx.createGain();
-    // Fast tid — delayTime får INTE ändras per fras (abrupt byte ger
-    // pitch-warble i delay-linjen). 0.275 ligger mellan takt-rampens steg.
+    // Fast tid — delayTime får INTE moduleras per fras (abrupt byte ger
+    // pitch-warble i delay-linjen). 0.275 = halvt steg mot 550 ms-takten.
     del.delayTime.value = 0.275;
     fb.gain.value       = 0.22;
     send.gain.value     = 0.22;
@@ -83,10 +90,12 @@ const HTML = `<!DOCTYPE html>
   }
 
   // Klocklik pluck: grundton + oktav, lowpass, snabb attack / lång decay.
-  function playPluck(freq, time, vol) {
+  function playPluck(freq, time, vol, voice) {
+    var f = freq * voice.octave;
+
     var lpf = ctx.createBiquadFilter();
     lpf.type = 'lowpass';
-    lpf.frequency.value = 2600;
+    lpf.frequency.value = voice.lpf;
     lpf.Q.value = 0.7;
 
     var g = ctx.createGain();
@@ -96,43 +105,43 @@ const HTML = `<!DOCTYPE html>
 
     var body = ctx.createOscillator();
     body.type = 'triangle';
-    body.frequency.value = freq;
+    body.frequency.value = f;
     body.connect(lpf);
 
     var shine = ctx.createGain();
-    shine.gain.value = 0.22;
+    shine.gain.value = voice.shine;
     var upper = ctx.createOscillator();
     upper.type = 'sine';
-    upper.frequency.value = freq * 2;
+    upper.frequency.value = f * 2;
     upper.connect(shine);
     shine.connect(lpf);
 
     g.gain.setValueAtTime(0.0001, time);
-    g.gain.linearRampToValueAtTime(vol, time + 0.008);
-    g.gain.exponentialRampToValueAtTime(0.0001, time + 1.45);
+    g.gain.linearRampToValueAtTime(vol * voice.gain, time + 0.008);
+    g.gain.exponentialRampToValueAtTime(0.0001, time + voice.decay);
 
-    body.start(time);  body.stop(time + 1.55);
-    upper.start(time); upper.stop(time + 1.55);
+    var stopAt = time + voice.decay + 0.1;
+    body.start(time);  body.stop(stopAt);
+    upper.start(time); upper.stop(stopAt);
   }
 
-  function schedulePhrase(idx, startTime, step) {
+  function schedulePhrase(idx, startTime, voice) {
     var notes = CHORDS[idx % CHORDS.length];
     // Volymkontur: andra tonen lyfts lite så frasen får en puls framåt,
     // sista tonen dör bort så tystnaden efteråt känns avsiktlig.
     var VOLS = [0.10, 0.13, 0.11, 0.08];
     for (var i = 0; i < notes.length; i++) {
-      playPluck(notes[i], startTime + i * step, VOLS[i]);
+      playPluck(notes[i], startTime + i * STEP, VOLS[i], voice);
     }
   }
 
   function scheduler() {
     if (!ctx) return;
     while (nextChordTime < ctx.currentTime + LOOKAHEAD) {
-      var step = STEPS[tempoIndex];
-      schedulePhrase(chordIndex, nextChordTime, step);
+      schedulePhrase(chordIndex, nextChordTime, VOICES[voiceIndex]);
       chordIndex = (chordIndex + 1) % CHORDS.length;
-      tempoIndex = (tempoIndex + 1) % STEPS.length;
-      nextChordTime += step * 4 + REST;   // fras + tystnad
+      voiceIndex = (voiceIndex + 1) % VOICES.length;
+      nextChordTime += STEP * 4 + REST;   // fras + tystnad
     }
   }
 
@@ -167,8 +176,8 @@ const HTML = `<!DOCTYPE html>
 
 /**
  * Osynlig WebView som spelar en ljus, gles närvaro-slinga via Web Audio API.
- * C→G→Am→F som music-box-plingar (349–1047 Hz) i fraser om fyra toner med
- * tystnad emellan, där takten stegras över tre fraser och sedan börjar om.
+ * C→G→Am→F som music-box-plingar i fraser om fyra toner med tystnad emellan.
+ * Fraserna växlar mellan en ljus och en mörk röst i samma fasta takt.
  * Inget bakgrundslager — bara plingarna.
  * Monteras i LobbyScreen (host) och i quiz.tsx under GetReady-fasen.
  * Ingen audio-fil behövs; stoppas automatiskt vid unmount.
