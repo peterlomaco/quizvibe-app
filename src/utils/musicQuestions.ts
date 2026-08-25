@@ -15153,6 +15153,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "pinkfong-baby-shark",
+    "displayName": "Baby Shark — Pinkfong",
+    "correctYear": 2016,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "XqZsoesa55w",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Baby Shark - Pinkfong Kids' Songs & Stories",
+        "license": "standard",
+        "notes": "Baby Shark Dance - Pinkfongs officiella klipp."
+      }
+    ]
+  },
+  {
     "id": "simone-biles-rio-2016",
     "displayName": "Simone Biles 4 OS-guld i Rio",
     "correctYear": 2016,
@@ -15723,33 +15750,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 2018 vinnare — Israel. Officiell music video."
-      }
-    ]
-  },
-  {
-    "id": "ronny-ragge-baby-shark",
-    "displayName": "Baby Shark — Ronny & Ragge",
-    "correctYear": 2018,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "R93ce4FZGbc",
-        "startSec": 0,
-        "endSec": 30,
-        "channelTitle": "Ronny & Ragge",
-        "license": "standard",
-        "notes": "Swedish version."
       }
     ]
   },

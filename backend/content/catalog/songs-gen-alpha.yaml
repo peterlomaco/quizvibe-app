@@ -1030,19 +1030,22 @@ items:
         endSec: 30
         channelTitle: "Ylvis"
         notes: "Official music video. Viral hit 2013."
-  - id: ronny-ragge-baby-shark
+  - id: pinkfong-baby-shark
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
-    displayName: "Baby Shark — Ronny & Ragge"
-    correctYear: 2018
+    displayName: "Baby Shark — Pinkfong"
+    # Pinkfongs engelska "Baby Shark Dance" slappte juni 2016 (koreanskt original nov 2015).
+    # 2018 var aret laten blev global hit - chart-peak ar aldrig svaret.
+    correctYear: 2016
     probability: 72
-    wikimediaSearchHints: ["Ronny Ragge Baby Shark Swedish version 2018"]
+    region: ["global"]
+    wikimediaSearchHints: ["Pinkfong Baby Shark Dance"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "R93ce4FZGbc"
+      - videoId: "XqZsoesa55w"
         startSec: 0
         endSec: 30
-        channelTitle: "Ronny & Ragge"
-        notes: "Swedish version."
+        channelTitle: "Baby Shark - Pinkfong Kids' Songs & Stories"
+        notes: "Baby Shark Dance - Pinkfongs officiella klipp."
   # === Tillagg 2026-08-25 (Peters "YT och Spotify lista") ===
   - id: ariana-grande-love-me-harder
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
