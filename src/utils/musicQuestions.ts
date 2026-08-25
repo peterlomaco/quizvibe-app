@@ -7334,6 +7334,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "europe"
     ],
+    "genrePackages": [
+      "Eurodance & pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "4uPDfuC3Jck",
@@ -8184,6 +8187,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "europe"
     ],
+    "genrePackages": [
+      "Eurodance & pop"
+    ],
     "spotifyTrackId": "6bjl81yfCztuBXLC9Mqs2N",
     "youtubeClips": [
       {
@@ -8211,6 +8217,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "europe"
+    ],
+    "genrePackages": [
+      "Eurodance & pop"
     ],
     "youtubeClips": [
       {
@@ -8716,6 +8725,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "haddaway-what-is-love",
+    "displayName": "What Is Love — Haddaway",
+    "correctYear": 1993,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "europe"
+    ],
+    "genrePackages": [
+      "Eurodance & pop"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "HEXWRTEbj1I",
+        "startSec": 3,
+        "endSec": 33,
+        "channelTitle": "DECADR",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\" med explicit startSec 3. Videotitel verifierad: 'Haddaway - What Is Love (Official 4K Video)' — inget ar i titeln."
+      }
+    ]
+  },
+  {
     "id": "jurassic-park",
     "displayName": "Jurassic Park",
     "correctYear": 1993,
@@ -8912,6 +8951,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "europe"
     ],
+    "genrePackages": [
+      "Eurodance & pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "oKs25yuV3_A",
@@ -8939,6 +8981,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "europe"
     ],
+    "genrePackages": [
+      "Eurodance & pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "n1dk78L0XzI",
@@ -8947,6 +8992,66 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Dr. Alban",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-14 med explicit startSec 5. Videotitel verifierad: 'Dr. Alban - Look Who's Talking (Official 4K Video)' — inget ar i titeln."
+      }
+    ]
+  },
+  {
+    "id": "e-type-set-the-world-on-fire",
+    "displayName": "Set the World on Fire — E-Type",
+    "correctYear": 1994,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "nordic"
+    ],
+    "genrePackages": [
+      "Eurodance & pop"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "K9Tw8baMPpM",
+        "startSec": 10,
+        "endSec": 40,
+        "channelTitle": "ETypeVEVO",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\" med explicit startSec 10. Videotitel verifierad: 'E-Type - Set The World On Fire' — inget ar i titeln."
+      }
+    ]
+  },
+  {
+    "id": "e-type-this-is-the-way",
+    "displayName": "This Is the Way — E-Type",
+    "correctYear": 1994,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "nordic"
+    ],
+    "genrePackages": [
+      "Eurodance & pop"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "7w1HeDqYCU4",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "ETypeVEVO",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". Videotitel verifierad: 'E-Type - This Is The Way' — inget ar i titeln."
       }
     ]
   },
@@ -9837,7 +9942,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
+    ],
+    "genrePackages": [
+      "Eurodance & pop"
     ],
     "youtubeClips": [
       {
@@ -9917,7 +10025,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
+    ],
+    "genrePackages": [
+      "Eurodance & pop"
     ],
     "youtubeClips": [
       {

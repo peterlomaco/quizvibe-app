@@ -464,8 +464,10 @@ items:
     displayName: "Wannabe — Spice Girls"
     correctYear: 1996
     probability: 90
+    region: ["global"]
     wikimediaSearchHints: ["Spice Girls Wannabe"]
     answerMethods: ["timeline"]
+    genrePackages: ["Eurodance & pop"]
     # Tidigare klipp tscL_I2v7pU (Spice Girls - Topic) togs bort 2026-08-10: blev
     # region-blockerad i 249 länder inkl. SE → "Video unavailable" i spelaren.
     # Ersatt 2026-08-25 ur Peters lista (validerat oblockerat i SE, HD).
@@ -754,6 +756,7 @@ items:
     region: ["europe"]
     wikimediaSearchHints: ["Dr Alban It's My Life 1992"]
     answerMethods: ["timeline"]
+    genrePackages: ["Eurodance & pop"]
     spotifyTrackId: "6bjl81yfCztuBXLC9Mqs2N"
     youtubeClips:
       - videoId: "oW0VovnyjPY"
@@ -1925,6 +1928,7 @@ items:
     region: ["europe"]
     wikimediaSearchHints: ["Dr Alban No Coke Hello Afrika"]
     answerMethods: ["timeline"]
+    genrePackages: ["Eurodance & pop"]
     youtubeClips:
       - videoId: "4uPDfuC3Jck"
         startSec: 0
@@ -1940,6 +1944,7 @@ items:
     region: ["europe"]
     wikimediaSearchHints: ["Dr Alban Sing Hallelujah One Love"]
     answerMethods: ["timeline"]
+    genrePackages: ["Eurodance & pop"]
     youtubeClips:
       - videoId: "pKxJca7LLNM"
         startSec: 0
@@ -1955,6 +1960,7 @@ items:
     region: ["europe"]
     wikimediaSearchHints: ["Dr Alban Let the Beat Go On Look Whos Talking"]
     answerMethods: ["timeline"]
+    genrePackages: ["Eurodance & pop"]
     youtubeClips:
       - videoId: "oKs25yuV3_A"
         startSec: 20
@@ -1970,6 +1976,7 @@ items:
     region: ["europe"]
     wikimediaSearchHints: ["Dr Alban Look Whos Talking 1994"]
     answerMethods: ["timeline"]
+    genrePackages: ["Eurodance & pop"]
     youtubeClips:
       - videoId: "n1dk78L0XzI"
         startSec: 5
@@ -2461,3 +2468,52 @@ items:
         endSec: 30
         channelTitle: "remhq"
         notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+  # === Tillagg 2026-08-25 (Eurodance & pop ur Peters "YT och Spotify lista") ===
+  - id: haddaway-what-is-love
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "What Is Love — Haddaway"
+    correctYear: 1993
+    probability: 86
+    region: ["europe"]
+    wikimediaSearchHints: ["Haddaway What Is Love The Album"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Eurodance & pop"]
+    youtubeClips:
+      - videoId: "HEXWRTEbj1I"
+        startSec: 3
+        endSec: 33
+        channelTitle: "DECADR"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\" med explicit startSec 3. Videotitel verifierad: 'Haddaway - What Is Love (Official 4K Video)' — inget ar i titeln."
+    notes: "correctYear = debutsingeln (januari 1993, Coconut Records) och debutalbumet The Album (1993) — samma ar oavsett vilken som kom forst."
+  - id: e-type-set-the-world-on-fire
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Set the World on Fire — E-Type"
+    correctYear: 1994
+    probability: 84
+    region: ["nordic"]
+    wikimediaSearchHints: ["E-Type Set the World on Fire Made in Sweden"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Eurodance & pop"]
+    youtubeClips:
+      - videoId: "K9Tw8baMPpM"
+        startSec: 10
+        endSec: 40
+        channelTitle: "ETypeVEVO"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\" med explicit startSec 10. Videotitel verifierad: 'E-Type - Set The World On Fire' — inget ar i titeln."
+    notes: "correctYear = forsta singeln fran debutalbumet Made in Sweden, bada 1994. OBS: MusicBrainz listar 1995-utgavor — det ar internationella releaser, inte E-Types forsta."
+  - id: e-type-this-is-the-way
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "This Is the Way — E-Type"
+    correctYear: 1994
+    probability: 82
+    region: ["nordic"]
+    wikimediaSearchHints: ["E-Type This Is the Way Made in Sweden"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Eurodance & pop"]
+    youtubeClips:
+      - videoId: "7w1HeDqYCU4"
+        startSec: 0
+        endSec: 30
+        channelTitle: "ETypeVEVO"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". Videotitel verifierad: 'E-Type - This Is The Way' — inget ar i titeln."
+    notes: "correctYear = andra singeln fran debutalbumet Made in Sweden, bada 1994. Samma album som e-type-set-the-world-on-fire."

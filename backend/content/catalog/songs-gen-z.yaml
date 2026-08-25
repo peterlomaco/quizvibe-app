@@ -26,8 +26,10 @@ items:
     displayName: "Barbie Girl — Aqua"
     correctYear: 1997
     probability: 92
+    region: ["global"]
     wikimediaSearchHints: ["Aqua Barbie Girl 1997"]
     answerMethods: ["timeline"]
+    genrePackages: ["Eurodance & pop"]
     youtubeClips:
       - videoId: "twW5slEK8wY"
         startSec: 0
