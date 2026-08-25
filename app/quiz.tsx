@@ -1344,6 +1344,11 @@ export default function QuizScreen() {
   // enhet räknas in, så en PtP-host kan prenumerera på en kanal ingen
   // lyssnar på. Kostnaden är en Realtime-kanal + 10s heartbeat.
   const isPtPSpectator = gameMode === 'pass-the-phone' && !isHost;
+  // Wifi-kolumnen i leaderboarden härleds ur "hur många frågor ligger
+  // spelaren efter ledaren" — en giltig proxy för tappad uppkoppling ENDAST
+  // när alla spelare förväntas svara på varje fråga. Det gäller bara
+  // Individual Devices; se liveLeaderboard nedan.
+  const connectionErrorsApplicable = gameMode === 'individual-devices';
   const ptpMultiDevice = gameMode === 'pass-the-phone' && turnOrder.length > 1;
   const syncActive = gameMode === 'individual-devices' || ptpMultiDevice;
   // Sätts av det avslutande question_advance (next_question_index === null)
@@ -2838,10 +2843,20 @@ export default function QuizScreen() {
     });
     // connectionErrors = antal frågor spelaren missat jämfört med den som
     // spelat flest. Om A spelat 3 och B spelat 2 → B får 1 i wifi-kolumnen.
+    //
+    // ⚠ Heuristiken förutsätter att ALLA spelare svarar på VARJE fråga, vilket
+    // bara gäller Individual Devices. I Pass-the-Phone turas spelarna om, så
+    // den som ännu inte haft sin tur ligger per definition efter ledaren och
+    // fick felaktigt en wifi-siffra som dessutom kom och gick mellan frågorna
+    // (Peter 2026-08-25). Single player och remote 1v1 saknar samma garanti.
+    // Utanför IndDev är kolumnen därför alltid 0 — bara den spelare som
+    // faktiskt svarar påverkar sin egen rad.
     const maxRounds = entries.reduce((m, e) => Math.max(m, e.playedRounds), 0);
     const entriesWithErrors = entries.map((e) => ({
       ...e,
-      connectionErrors: Math.max(0, maxRounds - e.playedRounds),
+      connectionErrors: connectionErrorsApplicable
+        ? Math.max(0, maxRounds - e.playedRounds)
+        : 0,
     }));
     return entriesWithErrors.sort((a, b) => {
       // 1. Pts desc — flest poäng vinner
@@ -2856,7 +2871,7 @@ export default function QuizScreen() {
       //    svara (även fel) har lägre avg och ska därför ranka högre.
       return a.avgResponseSeconds - b.avgResponseSeconds;
     });
-  }, [gamePlayers, gameTotals, allRoundScoresHistory, leftPlayerIds]);
+  }, [gamePlayers, gameTotals, allRoundScoresHistory, leftPlayerIds, connectionErrorsApplicable]);
 
   // Per-spelare-facit för PÅGÅENDE fråga (Individual Devices). Deriveras ur
   // allRoundScoresHistory joinat på `questionIndex` — peer-svar ankommer via
@@ -7295,6 +7310,9 @@ export default function QuizScreen() {
           // play_again_initiated inte broadcastas i PtP.
           homeOnlyFooter={isPtPSpectator}
           allRoundScoresHistory={allRoundScoresHistory}
+          // Wifi-kolumnen är bara meningsfull i Individual Devices, där alla
+          // svarar på varje fråga. PtP/single/remote → alltid "—".
+          trackConnectionErrors={connectionErrorsApplicable}
           hcpChanges={isLastQuestion ? playerHcpChanges : undefined}
           remote1v1={isRemote}
           // Remote 1v1: gold "Start New Game" + Local/Remote-utfällning

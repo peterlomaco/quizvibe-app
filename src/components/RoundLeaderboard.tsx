@@ -434,6 +434,7 @@ export function RoundLeaderboard({
   replayNote,
   homeOnlyFooter = false,
   interimFooter,
+  trackConnectionErrors = false,
 }: {
   players: LeaderboardPlayer[];
   /** Behållen för API-bakåtkompabilitet — tabellen aggregerar allt från
@@ -541,6 +542,12 @@ export function RoundLeaderboard({
    *  rätt att gå vidare ser alltså en fullt levande CTA som inte gör något.
    *  PtP-spectatorn skickar hit en passiv "Waiting for host"-pill. */
   interimFooter?: React.ReactNode;
+  /** Wifi-kolumnen härleds ur "antal frågor bakom ledaren", vilket bara är
+   *  en giltig proxy för tappad uppkoppling när ALLA spelare förväntas svara
+   *  på VARJE fråga (= Individual Devices). I Pass-the-Phone turas spelarna
+   *  om, så en spelare som inte haft sin tur skulle annars få en falsk
+   *  wifi-siffra. Default false — call-siten måste aktivt intyga läget. */
+  trackConnectionErrors?: boolean;
 }) {
   // Nunito 700 Bold för Final Leaderboard:s "QuizVibe"-vattenstämpel-text
   // under Q+pokal-loggan. Matchar startskärmens appName-textformat 1:1.
@@ -619,10 +626,13 @@ export function RoundLeaderboard({
     });
     // connectionErrors = antal frågor spelaren missat jämfört med den som
     // spelat flest. Om A spelat 3 och B spelat 2 → B får 1 i wifi-kolumnen.
+    // Gäller bara när trackConnectionErrors är satt — se prop-kommentaren.
     const maxRounds = entries.reduce((m, e) => Math.max(m, e.playedRounds), 0);
     const entriesWithErrors = entries.map((e) => ({
       ...e,
-      connectionErrors: Math.max(0, maxRounds - e.playedRounds),
+      connectionErrors: trackConnectionErrors
+        ? Math.max(0, maxRounds - e.playedRounds)
+        : 0,
     }));
     return entriesWithErrors.sort((a, b) => {
       // 1. Pts desc — flest poäng vinner
@@ -637,7 +647,7 @@ export function RoundLeaderboard({
       //    svara (även fel) har lägre avg och ska därför ranka högre.
       return a.avgResponseSeconds - b.avgResponseSeconds;
     });
-  }, [players, allRoundScoresHistory, totalsByPlayerId]);
+  }, [players, allRoundScoresHistory, totalsByPlayerId, trackConnectionErrors]);
 
   return (
     <View style={styles.outer}>
