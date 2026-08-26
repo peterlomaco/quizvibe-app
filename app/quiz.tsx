@@ -7901,7 +7901,7 @@ export default function QuizScreen() {
           på, remote lokalt, IndDev via override med host=on/non-host=off som
           default). Ett extra isHost-villkor här skulle göra en non-host som
           slagit på sitt ljud halvt tyst. */}
-      {!isAudioMutedForSelf && <MorseAmbientSound />}
+      {!isAudioMutedForSelf && <MorseAmbientSound active />}
       </View>
     );
   }
@@ -7930,6 +7930,12 @@ export default function QuizScreen() {
       {inactivityCountdownSec !== null && (
         <InactivityCountdownBanner secondsLeft={inactivityCountdownSec} />
       )}
+      {/* ⚠ Samma barn-POSITION som i intro-grenen ovan (index 2 under samma
+          touchWrap-View), så React återanvänder instansen i stället för att
+          riva den vid fasbytet. `active={false}` tonar då ut slingan mjukt.
+          Renderas den inte här — eller på annan position — är vi tillbaka i
+          den hårda WebView-teardownen som klickade i högtalaren. */}
+      {!isAudioMutedForSelf && <MorseAmbientSound active={false} />}
       </View>
     );
   }

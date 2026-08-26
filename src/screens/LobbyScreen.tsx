@@ -5535,10 +5535,14 @@ export default function LobbyScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
-      {/* Morse-ambient-ljud — bara när skärmen är aktiv (avmonteras vid
-          Stack-navigation till t.ex. Quiz, annars fortsätter WebView spela
-          trots att LobbyScreen ligger kvar ouppmonterad i stacken). */}
-      {screenFocused && hostMode && showAmbient && <MorseAmbientSound />}
+      {/* Morse-ambient-ljud — tystas när skärmen tappar fokus (Stack-
+          navigation till t.ex. Quiz), annars fortsätter WebView:n spela trots
+          att LobbyScreen ligger kvar monterad i stacken.
+          ⚠ Elementet AVMONTERAS INTE vid blur — `active={screenFocused}`
+          tonar ut ljudet i stället. Att riva WebView:n mitt i en ringande ton
+          gav ett hörbart klick när host tryckte Start Game (Peter 2026-08-26);
+          se ⚠-noten i MorseAmbientSound.tsx. */}
+      {hostMode && showAmbient && <MorseAmbientSound active={screenFocused} />}
       {/* Top board (login status) — sticky utanför ScrollView så den följer
           med när användaren scrollar i lobbyn. Tap-beteendet är roll-
           beroende:

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { View } from 'react-native';
 import { WebView } from 'react-native-webview';
 
@@ -59,6 +59,22 @@ import { WebView } from 'react-native-webview';
 // för setTimeout-per-ackord: setTimeout driftar och gav hörbar glapp/överlapp
 // mellan varven i den gamla versionen.
 
+// ⚠ UTTONING I STÄLLET FÖR TEARDOWN (2026-08-26, Peter: "det klickar eller
+// piper till ibland när man trycker start game"). Att avmontera WebView:n
+// river AudioContext:en synkront — ligger en pluck och ringer (decay 1.7–1.9 s
+// av en 4.2 s-cykel, dvs. ~80 % av tiden) kapas vågformen mitt i och ger ett
+// hörbart klick i högtalaren. Därför tar komponenten en `active`-prop:
+// föräldern LÅTER DEN VARA MONTERAD och flippar `active` i stället, varpå
+// master-gain rampas till noll på 300 ms och contexten suspendas först när
+// alla toner klingat ut. Det ~20 %-fönster där ingenting lät är hela
+// förklaringen till att klicket bara hördes "ibland".
+//
+// ⚠ Avmontera ALDRIG komponenten medan `active` är true — då är vi tillbaka
+// i den hårda teardownen. Ska ljudet sluta: sätt `active={false}` och låt
+// elementet ligga kvar på samma plats i trädet. I quiz.tsx betyder det att
+// intro- och countdown-grenarna renderar den i SAMMA barn-position, så
+// React behåller instansen över fasbytet i stället för att riva den.
+
 const HTML = `<!DOCTYPE html>
 <html>
 <head><meta name="viewport" content="width=device-width,initial-scale=1"/></head>
@@ -71,6 +87,11 @@ const HTML = `<!DOCTYPE html>
   var chordIndex = 0;
   var voiceIndex = 0;
   var nextChordTime = 0;
+  var started = false;
+  var suspendTimer = null;
+  // Startläget injiceras före sid-laddning (window.__qvActive). Är den false
+  // skapas ingen AudioContext alls — en tyst enhet ska inte betala för en.
+  var active = (window.__qvActive !== false);
 
   // C → G → Am → F (I–V–vi–IV). Arpeggio-toner, lågt index spelas först.
   var CHORDS = [
@@ -96,6 +117,13 @@ const HTML = `<!DOCTYPE html>
   var STEP      = 0.55;                    // sekunder mellan plingarna — FAST
   var REST      = 2.0;                     // tystnad mellan fraserna
   var LOOKAHEAD = 0.40;                    // schemalägg så här långt fram
+  var MASTER    = 0.30;                    // full volym
+  var FADE_OUT  = 0.30;                    // uttoning vid active=false
+  var FADE_IN   = 0.15;                    // intoning vid active=true
+  // Längsta decay (1.9 s) + delay-svans, med marginal: först när allt tystnat
+  // suspendas contexten. Suspend tidigare fryser toner mitt i utklingningen
+  // och de skulle då återuppstå vid nästa resume.
+  var TAIL_MS   = 2600;
 
   function buildDelay() {
     var del  = ctx.createDelay(1.0);
@@ -160,7 +188,7 @@ const HTML = `<!DOCTYPE html>
   }
 
   function scheduler() {
-    if (!ctx) return;
+    if (!ctx || !active) return;
     while (nextChordTime < ctx.currentTime + LOOKAHEAD) {
       schedulePhrase(chordIndex, nextChordTime, VOICES[voiceIndex]);
       chordIndex = (chordIndex + 1) % CHORDS.length;
@@ -169,34 +197,73 @@ const HTML = `<!DOCTYPE html>
     }
   }
 
-  function start() {
-    if (ctx) return;
-    ctx = new (window.AudioContext || window.webkitAudioContext)();
-    master = ctx.createGain();
-    master.gain.value = 0.30;
-    master.connect(ctx.destination);
-    delaySend = buildDelay();
-
-    function run() {
-      nextChordTime = ctx.currentTime + 0.08;
-      scheduler();
-      // Ingen clearInterval behövs — WebView:n rivs vid unmount.
-      setInterval(scheduler, 25);
-    }
-
-    if (ctx.state === 'suspended') {
-      ctx.resume().then(run);
-    } else {
-      run();
-    }
+  // Rampa master-gain mjukt. cancelScheduledValues + setValueAtTime(current)
+  // gör att en ramp som avbryts mitt i fortsätter från sitt FAKTISKA värde i
+  // stället för att hoppa — ett hopp i gain är precis det klick vi undviker.
+  function rampTo(value, seconds) {
+    var now = ctx.currentTime;
+    master.gain.cancelScheduledValues(now);
+    master.gain.setValueAtTime(master.gain.value, now);
+    master.gain.linearRampToValueAtTime(value, now + seconds);
   }
 
-  setTimeout(start, 150);
-  document.addEventListener('touchstart', start, { once: true });
+  function resumeAudio() {
+    if (suspendTimer) { clearTimeout(suspendTimer); suspendTimer = null; }
+    function run() {
+      if (!active) return;
+      // Ny fras direkt. nextChordTime från förra sessionen ligger i det gamla
+      // tidsfönstret och skulle annars ge en skur av köade fraser på en gång.
+      nextChordTime = ctx.currentTime + 0.08;
+      rampTo(MASTER, FADE_IN);
+      scheduler();
+    }
+    if (ctx.state === 'suspended') { ctx.resume().then(run); } else { run(); }
+  }
+
+  function start() {
+    if (started) { resumeAudio(); return; }
+    started = true;
+    ctx = new (window.AudioContext || window.webkitAudioContext)();
+    master = ctx.createGain();
+    master.gain.value = 0.0001;   // tonas in av resumeAudio
+    master.connect(ctx.destination);
+    delaySend = buildDelay();
+    // Ingen clearInterval behövs — WebView:n rivs vid unmount.
+    setInterval(scheduler, 25);
+    resumeAudio();
+  }
+
+  function setActive(next) {
+    next = !!next;
+    if (next === active && started) { if (next) { resumeAudio(); } return; }
+    active = next;
+    if (active) { start(); return; }
+    if (!ctx) return;
+    rampTo(0.0001, FADE_OUT);
+    if (suspendTimer) clearTimeout(suspendTimer);
+    suspendTimer = setTimeout(function () {
+      suspendTimer = null;
+      if (!active && ctx.state === 'running') { ctx.suspend(); }
+    }, TAIL_MS);
+  }
+
+  window.qvAmbient = { setActive: setActive };
+
+  // !started-guarden: onLoadEnd-flushen kan hinna före den här timern och
+  // har då redan startat. Utan guarden skulle start() → resumeAudio() rulla
+  // om frasen från början 150 ms in.
+  setTimeout(function () { if (active && !started) start(); }, 150);
+  // Fallback om autoplay-policyn blockerade den tysta starten ovan.
+  document.addEventListener('touchstart', function () {
+    if (active) start();
+  }, { once: true });
 })();
 </script>
 </body>
 </html>`;
+
+const setActiveJS = (on: boolean) =>
+  `window.qvAmbient && window.qvAmbient.setActive(${on ? 'true' : 'false'}); true;`;
 
 /**
  * Osynlig WebView som spelar en ljus, gles närvaro-slinga via Web Audio API.
@@ -204,9 +271,25 @@ const HTML = `<!DOCTYPE html>
  * Fraserna växlar mellan en dämpad och en mörk röst i samma fasta takt.
  * Inget bakgrundslager — bara plingarna.
  * Monteras i LobbyScreen (host) och i quiz.tsx under GetReady-fasen.
- * Ingen audio-fil behövs; stoppas automatiskt vid unmount.
+ * Ingen audio-fil behövs.
+ *
+ * `active` styr uppspelningen — se ⚠-noten överst i filen. Låt komponenten
+ * vara monterad och flippa proppen; att avmontera den medan den låter ger ett
+ * hörbart klick när WebView:n (och därmed AudioContext:en) rivs synkront.
  */
-export function MorseAmbientSound() {
+export function MorseAmbientSound({ active = true }: { active?: boolean }) {
+  const webRef = useRef<WebView>(null);
+  // Sidan är inte laddad direkt vid mount; injectJavaScript före onLoadEnd
+  // tappas tyst. Vi speglar därför önskat läge och flushar det vid load.
+  const loadedRef = useRef(false);
+  const activeRef = useRef(active);
+  activeRef.current = active;
+
+  useEffect(() => {
+    if (!loadedRef.current) return;
+    webRef.current?.injectJavaScript(setActiveJS(active));
+  }, [active]);
+
   return (
     <View
       style={{
@@ -220,7 +303,15 @@ export function MorseAmbientSound() {
       pointerEvents="none"
     >
       <WebView
+        ref={webRef}
         source={{ html: HTML }}
+        // Startläget måste finnas INNAN sidans script kör, annars hinner en
+        // enhet som monteras inaktiv skapa en AudioContext i onödan.
+        injectedJavaScriptBeforeContentLoaded={`window.__qvActive = ${active ? 'true' : 'false'}; true;`}
+        onLoadEnd={() => {
+          loadedRef.current = true;
+          webRef.current?.injectJavaScript(setActiveJS(activeRef.current));
+        }}
         allowsInlineMediaPlayback
         mediaPlaybackRequiresUserAction={false}
         scrollEnabled={false}
