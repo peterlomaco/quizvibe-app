@@ -2559,3 +2559,33 @@ items:
         endSec: 30
         channelTitle: "MenAtWorkVEVO"
         notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". correctYear 1981 = Columbia-inspelningen (albumet Business as Usual). RATTA INTE till 1980: bandet sjalvslappte en ANNAN inspelning 1980 som B-sida (langsammare tempo, annat arr) - klippet ar 1981-versionen, och itemet ar inspelningen."
+  - id: toni-braxton-un-break-my-heart
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Un-Break My Heart — Toni Braxton"
+    correctYear: 1996
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Toni Braxton Un-Break My Heart"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "p2Rch6WvPJE"
+        startSec: 0
+        endSec: 30
+        channelTitle: "ToniBraxtonVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Love & Peace"]
+  - id: ted-gardestad-lat-karleken-sla-rot
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Låt kärleken slå rot — Ted Gärdestad"
+    correctYear: 1981
+    probability: 78
+    region: ["sweden"]
+    wikimediaSearchHints: ["Ted Gärdestad Låt kärleken slå rot"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "u4ucz96rbMA"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Ted Gärdestad - Topic"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx). xlsx saknade YT-lank; officiell Topic-audio uppsokt. correctYear 1981 enligt MusicBrainz."
+    genrePackages: ["Love & Peace"]

@@ -1458,3 +1458,206 @@ items:
         endSec: 30
         channelTitle: "Clean Bandit"
         notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+  - id: benjamin-ingrosso-kite
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Kite — Benjamin Ingrosso"
+    correctYear: 2024
+    probability: 80
+    region: ["nordic"]
+    wikimediaSearchHints: ["Benjamin Ingrosso Kite"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "Fq1zL29jg9U"
+        startSec: 16
+        endSec: 46
+        channelTitle: "BenjaminIngrossoVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+  - id: benjamin-ingrosso-look-whos-laughing-now
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Look Who’s Laughing Now — Benjamin Ingrosso"
+    correctYear: 2024
+    probability: 80
+    region: ["nordic"]
+    wikimediaSearchHints: ["Benjamin Ingrosso Look Who’s Laughing Now"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "I35BbuZgDb0"
+        startSec: 16
+        endSec: 46
+        channelTitle: "BenjaminIngrossoVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+  - id: dua-lipa-love-again
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Love Again — Dua Lipa"
+    correctYear: 2020
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Dua Lipa Love Again"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "BC19kwABFwc"
+        startSec: 30
+        endSec: 60
+        channelTitle: "Dua Lipa"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Love & Peace"]
+  - id: clean-bandit-symphony
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Symphony — Clean Bandit feat. Zara Larsson"
+    correctYear: 2017
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Clean Bandit Symphony"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "aatr_2MstrI"
+        startSec: 32
+        endSec: 62
+        channelTitle: "Clean Bandit"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+  - id: sombr-12-to-12
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "12 to 12 — sombr"
+    correctYear: 2025
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["sombr 12 to 12"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "cZgUiR31m-Y"
+        startSec: 0
+        endSec: 30
+        channelTitle: "sombr"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+  - id: onerepublic-i-aint-worried
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "I Ain’t Worried — OneRepublic"
+    correctYear: 2022
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["OneRepublic I Ain’t Worried"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "mNEUkkoUoIA"
+        startSec: 0
+        endSec: 30
+        channelTitle: "OneRepublicVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Film"]
+  - id: dnce-cake-by-the-ocean
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Cake by the Ocean — DNCE"
+    correctYear: 2015
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["DNCE Cake by the Ocean"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "vWaRiD5ym74"
+        startSec: 37
+        endSec: 67
+        channelTitle: "DNCEVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+  - id: jason-derulo-take-you-dancing
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Take You Dancing — Jason Derulo"
+    correctYear: 2020
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Jason Derulo Take You Dancing"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "vC8qJfVYxZY"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Jason Derulo"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+  - id: david-guetta-im-good-blue
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "I’m Good (Blue) — David Guetta & Bebe Rexha"
+    correctYear: 2022
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["David Guetta I’m Good (Blue)"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "kXhBKjDKF84"
+        startSec: 14
+        endSec: 44
+        channelTitle: "David Guetta"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx). MEDVETET UNDANTAG fran studio-only-policyn: detta ar Live Performance-versionen. Peter valde den 2026-08-26 for kvalitet + stamningshojare. BYT INTE till musikvideon 90RLzVUuXe4."
+    genrePackages: ["Club & Dance Hits"]
+  - id: the-weeknd-take-my-breath
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Take My Breath — The Weeknd"
+    correctYear: 2021
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["The Weeknd Take My Breath"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "rhTl_OyehF8"
+        startSec: 29
+        endSec: 59
+        channelTitle: "TheWeekndVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+  - id: pitbull-timber
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Timber — Pitbull feat. Kesha"
+    correctYear: 2013
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Pitbull Timber"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "hHUbLv4ThOo"
+        startSec: 1
+        endSec: 31
+        channelTitle: "PitbullVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Club & Dance Hits"]
+  - id: ava-max-kings-and-queens
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Kings & Queens — Ava Max"
+    correctYear: 2020
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Ava Max Kings & Queens"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "jH1RNk8954Q"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Ava Max"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Club & Dance Hits"]
+  - id: katy-perry-this-is-how-we-do
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "This Is How We Do — Katy Perry"
+    correctYear: 2013
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Katy Perry This Is How We Do"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "7RMQksXpQSk"
+        startSec: 0
+        endSec: 30
+        channelTitle: "KatyPerryVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Pop"]
+  - id: shakira-dai-dai
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Dai Dai — Shakira & Burna Boy"
+    correctYear: 2026
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Shakira Dai Dai"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "fcnDmrtj6Sk"
+        startSec: 0
+        endSec: 30
+        channelTitle: "shakiraVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["sport"]

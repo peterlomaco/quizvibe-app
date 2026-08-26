@@ -1903,3 +1903,257 @@ items:
         endSec: 30
         channelTitle: "The Rasmus"
         notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". correctYear 2003 = albumet Dead Letters (mars 2003)."
+  - id: rihanna-only-girl
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Only Girl (In the World) — Rihanna"
+    correctYear: 2010
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Rihanna Only Girl (In the World)"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "pa14VNsdSYM"
+        startSec: 16
+        endSec: 46
+        channelTitle: "RihannaVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Club & Dance Hits"]
+  - id: katy-perry-california-gurls
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "California Gurls — Katy Perry feat. Snoop Dogg"
+    correctYear: 2010
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Katy Perry California Gurls"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "F57P9C4SAW4"
+        startSec: 2
+        endSec: 32
+        channelTitle: "KatyPerryVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Club & Dance Hits"]
+  - id: rihanna-dont-stop-the-music
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Don’t Stop the Music — Rihanna"
+    correctYear: 2007
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Rihanna Don’t Stop the Music"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "yd8jh9QYfEs"
+        startSec: 11
+        endSec: 41
+        channelTitle: "RihannaVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Club & Dance Hits"]
+  - id: jessie-j-price-tag
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Price Tag — Jessie J feat. B.o.B"
+    correctYear: 2011
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Jessie J Price Tag"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "qMxX-QOV9tI"
+        startSec: 17
+        endSec: 47
+        channelTitle: "JessieJVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+  - id: nelly-furtado-promiscuous
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Promiscuous — Nelly Furtado feat. Timbaland"
+    correctYear: 2006
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Nelly Furtado Promiscuous"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "0J3vgcE5i2o"
+        startSec: 3
+        endSec: 33
+        channelTitle: "NellyFurtadoVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Club & Dance Hits"]
+  - id: kesha-tik-tok
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "TiK ToK — Kesha"
+    correctYear: 2009
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Kesha TiK ToK"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "iP6XpLQM2Cs"
+        startSec: 9
+        endSec: 39
+        channelTitle: "keshaVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Club & Dance Hits"]
+  - id: selena-gomez-love-you-like-a-love-song
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Love You Like a Love Song — Selena Gomez & the Scene"
+    correctYear: 2011
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Selena Gomez Love You Like a Love Song"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "EgT_us6AsDg"
+        startSec: 20
+        endSec: 50
+        channelTitle: "SelenaGomezVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Love & Peace"]
+  - id: whitney-houston-when-you-believe
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "When You Believe — Whitney Houston & Mariah Carey"
+    correctYear: 1998
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Whitney Houston When You Believe"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "LKaXY4IdZ40"
+        startSec: 30
+        endSec: 60
+        channelTitle: "whitneyhoustonVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Love & Peace"]
+  - id: ne-yo-because-of-you
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Because of You — Ne-Yo"
+    correctYear: 2007
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Ne-Yo Because of You"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "atz_aZA3rf0"
+        startSec: 10
+        endSec: 40
+        channelTitle: "NeYoVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Love & Peace"]
+  - id: chris-brown-with-you
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "With You — Chris Brown"
+    correctYear: 2007
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Chris Brown With You"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "nmjdaBaZe8Y"
+        startSec: 0
+        endSec: 30
+        channelTitle: "ChrisBrownVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Love & Peace"]
+  - id: k-ci-and-jojo-all-my-life
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "All My Life — K-Ci & JoJo"
+    correctYear: 1997
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["K-Ci All My Life"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "DXvMT_mVbqw"
+        startSec: 7
+        endSec: 37
+        channelTitle: "KCiAndJoJoVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Love & Peace"]
+  - id: rihanna-hate-that-i-love-you
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Hate That I Love You — Rihanna feat. Ne-Yo"
+    correctYear: 2007
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Rihanna Hate That I Love You"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "KMOOr7GEkj8"
+        startSec: 30
+        endSec: 60
+        channelTitle: "RihannaVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Love & Peace"]
+  - id: beyonce-love-on-top
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Love On Top — Beyoncé"
+    correctYear: 2011
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Beyoncé Love On Top"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "Ob7vObnFUJc"
+        startSec: 0
+        endSec: 30
+        channelTitle: "BeyoncéVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Love & Peace"]
+  - id: nelly-dilemma
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Dilemma — Nelly feat. Kelly Rowland"
+    correctYear: 2002
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Nelly Dilemma"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "8WYHDfJDPDc"
+        startSec: 23
+        endSec: 53
+        channelTitle: "NellyVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Love & Peace"]
+  - id: timbaland-the-way-i-are
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "The Way I Are — Timbaland feat. Keri Hilson"
+    correctYear: 2007
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Timbaland The Way I Are"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "U5rLz5AZBIA"
+        startSec: 8
+        endSec: 38
+        channelTitle: "TimbalandVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Club & Dance Hits"]
+  - id: nelly-furtado-maneater
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Maneater — Nelly Furtado"
+    correctYear: 2006
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Nelly Furtado Maneater"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "PLolag3YSYU"
+        startSec: 87
+        endSec: 117
+        channelTitle: "NellyFurtadoVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Club & Dance Hits"]
+  - id: rihanna-we-found-love
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "We Found Love — Rihanna feat. Calvin Harris"
+    correctYear: 2011
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Rihanna We Found Love"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "tg00YEETFzg"
+        startSec: 52
+        endSec: 82
+        channelTitle: "RihannaVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Club & Dance Hits"]
