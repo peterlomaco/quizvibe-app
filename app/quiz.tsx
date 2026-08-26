@@ -6069,7 +6069,7 @@ export default function QuizScreen() {
       Alert.alert(
         `Add to existing ${label}?`,
         soloSeries
-          ? 'You already have a saved Aggregate Score. Add these games to it, or start a fresh one?'
+          ? 'You already have a saved Competition Score. Add these games to it, or start a fresh one?'
           : `You have played together before. Add these games to a saved ${label}, or start a fresh one?`,
         [
           { text: 'No, start fresh', style: 'cancel', onPress: () => resolve('new') },
@@ -7680,8 +7680,8 @@ export default function QuizScreen() {
     // Frågans rubrik: solo aggregerar en SCORE (en spelare), flerspelar en
     // LEADERBOARD. Kan inte använda aggregateLabel() — serien finns inte än.
     const replayTitle = isLocalSoloGame
-      ? 'Replay & Aggregate score?'
-      : 'Re-match with Aggregate Leaderboard?';
+      ? 'Replay & Competition score?'
+      : 'Re-match with Competition Leaderboard?';
     // Start New Game visas direkt i PtP, och i övriga lokala lägen först när
     // host svarat No på re-match-frågan.
     const localStartNewGameReady =

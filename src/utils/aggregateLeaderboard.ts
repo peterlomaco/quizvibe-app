@@ -90,16 +90,19 @@ export interface AggregateStanding {
 }
 
 /**
- * En serie med EN deltagare heter "Aggregate Score" (single player-varianten
- * "Replay & Aggregate score"), med flera "Aggregate Leaderboard". Peters
+ * En serie med EN deltagare heter "Competition Score" (single player-varianten
+ * "Replay & Competition score"), med flera "Competition Leaderboard". Peters
  * ordval — datamodellen är identisk.
+ *
+ * ⚠ Detta är UI-COPY. Tabeller, RPC:er och kod-identifierare heter
+ *   fortsatt `aggregate*` (migration 0037 är körd) — döp inte om dem.
  *
  * Uppsättningen är låst genom hela serien (re-match-lobbyn tillåter varken
  * tillägg eller borttag), så antalet är stabilt och etiketten kan aldrig
  * hoppa mitt i en serie.
  */
 export function aggregateLabel(participantCount: number): string {
-  return participantCount <= 1 ? 'Aggregate Score' : 'Aggregate Leaderboard';
+  return participantCount <= 1 ? 'Competition Score' : 'Competition Leaderboard';
 }
 
 /**
@@ -113,7 +116,7 @@ export function aggregateLabel(participantCount: number): string {
  * Cappas till 40 tecken — samma gräns som DB-constraintet på `name`.
  */
 export function defaultAggregateName(playerNames: string[]): string {
-  if (playerNames.length === 0) return 'Aggregate';
+  if (playerNames.length === 0) return 'Competition';
   if (playerNames.length === 1) return `${playerNames[0]} — solo`;
   const joined = playerNames.join(' & ');
   if (joined.length <= 40) return joined;

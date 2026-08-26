@@ -166,17 +166,17 @@ describe('summering', () => {
 });
 
 describe('aggregateLabel — solo heter Score, flerspelar Leaderboard', () => {
-  it('en deltagare ger "Aggregate Score"', () => {
-    expect(aggregateLabel(1)).toBe('Aggregate Score');
+  it('en deltagare ger "Competition Score"', () => {
+    expect(aggregateLabel(1)).toBe('Competition Score');
   });
 
-  it('flera deltagare ger "Aggregate Leaderboard"', () => {
-    expect(aggregateLabel(2)).toBe('Aggregate Leaderboard');
-    expect(aggregateLabel(12)).toBe('Aggregate Leaderboard');
+  it('flera deltagare ger "Competition Leaderboard"', () => {
+    expect(aggregateLabel(2)).toBe('Competition Leaderboard');
+    expect(aggregateLabel(12)).toBe('Competition Leaderboard');
   });
 
   it('tom serie faller tillbaka på Score (en spelare är minimum)', () => {
-    expect(aggregateLabel(0)).toBe('Aggregate Score');
+    expect(aggregateLabel(0)).toBe('Competition Score');
   });
 });
 

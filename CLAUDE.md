@@ -2199,6 +2199,8 @@ Lägg alla framtida host-lobby-skapanden från quiz-skärmen bakom samma funnel 
 
 ## Aggregate Leaderboard — andra sidan på slutskärmen (2026-08-25)
 
+⚠ **UI-copyn heter "Competition Leaderboard" / "Competition Score"** (Peter 2026-08-26). Koden, filnamnen och HELA databasen (`aggregate_leaderboards`, `create_aggregate_leaderboard`, `aggregateLabel`, `SavedAggregatesCard` …) heter fortsatt `aggregate*` — migration 0037 är körd, och ett namnbyte där hade krävt en ny migration utan att ge användaren något. Sektionerna nedan använder kod-namnet. **Byt inte kod-identifierare för att "matcha" copyn**, och lägg inte till nya användarsynliga strängar med ordet "Aggregate" — etiketten byggs av `aggregateLabel()`.
+
 Har host kört **"Re-match with Aggregate Leaderboard?" → Yes** blir Final Leaderboard en **två-sidig pager**: sida 1 är ALLTID spelet som just spelats, sida 2 är **hela serien sammanslagen** — samma kolumner, samma sortering, alla spel adderade. Rubriken byter till "Aggregate Leaderboard" på sida 2.
 
 **Samma kriterier är hela poängen.** Båda vyerna går genom **`finalizeRows()`** i [RoundLeaderboard.tsx](src/components/RoundLeaderboard.tsx) (wifi-härledning + pts desc → 0-ronder sist → avg asc) och renderas av **samma `<LeaderboardTable>`**. Bygg aldrig en parallell tabell eller en egen sortering för aggregatet — då kan vyerna glida isär.
@@ -2224,7 +2226,7 @@ Har host kört **"Re-match with Aggregate Leaderboard?" → Yes** blir Final Lea
 
 ### Namngivning: Score vs Leaderboard
 
-`aggregateLabel(participantCount)` i [aggregateLeaderboard.ts](src/utils/aggregateLeaderboard.ts): **en** deltagare → `"Aggregate Score"` (single player), flera → `"Aggregate Leaderboard"`. Uppsättningen är låst genom hela serien, så etiketten kan aldrig hoppa mitt i.
+`aggregateLabel(participantCount)` i [aggregateLeaderboard.ts](src/utils/aggregateLeaderboard.ts): **en** deltagare → `"Competition Score"` (single player), flera → `"Competition Leaderboard"`. Uppsättningen är låst genom hela serien, så etiketten kan aldrig hoppa mitt i.
 ⚠ Slutskärmens FRÅGA kan inte använda den — serien finns inte än — och växlar därför på `isLocalSoloGame` via `RoundLeaderboard`s `replayTitle`-prop.
 
 ### Sparade serier på kontot (migration 0037)
