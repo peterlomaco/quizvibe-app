@@ -60,7 +60,13 @@ import {
   upsertAnswer,
 } from '@/src/utils/remoteMatches';
 import { clearLeftPlayers } from '@/src/utils/leftPlayers';
-import { pickMediaSource, type YoutubeClip } from '@/src/utils/mediaSource';
+import {
+  collectPlayedSources,
+  pickMediaSource,
+  PLAYED_MEDIA_SOURCE_ORDER,
+  type PlayedMediaSource,
+  type YoutubeClip,
+} from '@/src/utils/mediaSource';
 import {
   QUIZ_IMAGE_CARD_H,
   QUIZ_MEDIA_H,
@@ -1329,9 +1335,12 @@ export default function QuizScreen() {
       return ['Music', 'Film', 'Sport'];
     }
   }, [params.imagesEnabledCategories]);
-  // Deriverade source-flags: YouTube aktiv om min 1 kategori vald, Images alltid aktiv.
+  // Deriverade source-flags: en källa är aktiv när minst en kategori valts.
+  // (imagesEnabled var tidigare hårdkodad `true` — det var vad som gjorde
+  // Player history:s Sources-etikett fel. Poolgaten nedan var oberörd:
+  // kategori-filtret ger redan [] för en tom imagesEnabledCategories.)
   const youtubeEnabled = youtubeEnabledCategories.length > 0;
-  const imagesEnabled = true;
+  const imagesEnabled = imagesEnabledCategories.length > 0;
   // Theme packages aktiva vid spelstart (host:s lobby-val, JSON-stringifierad
   // array av paket-IDs). Tom array = Generic. Default tom vid direkt-nav
   // utan Lobby. Behövs i HistoryEntry vid game-completion så Player history
@@ -5006,6 +5015,42 @@ export default function QuizScreen() {
         typeof birthYear === 'number'
           ? new Date().getFullYear() - birthYear
           : 0;
+      // ── Källor som FAKTISKT serverades ────────────────────────────────
+      // Lobby-togglarna duger INTE som underlag: Hints-kvoten är
+      // floor(totalRounds / 4), så ett 2-3-rundors spel med Hints påslaget
+      // serverar noll Hints-frågor. Vi läser samma sanningskälla som Game
+      // Summary:s källkort och tar bara de index spelaren faktiskt spelade —
+      // i PtP-spectator-läget är effectiveRounds en DELMÄNGD av matchens
+      // frågor (varje spelare får olika frågor i PtP).
+      //
+      // ⚠ effectiveMediaSourceByQuestion läses ur render-closuren
+      // (saveFinalGame är ingen useCallback). Det är AVSIKTLIGT: seen-ids-
+      // effekten sätter seenQuestionIds i samma commit, vilket re-memoar
+      // gameQuestions med en NY shuffle. Closure-värdet är sekvensen som
+      // faktiskt spelades. Gör inte om detta till en ref-läsning.
+      const playedIndices = effectiveRounds.map((r) => r.questionNumber - 1);
+      const servedSources: PlayedMediaSource[] = (() => {
+        const fromHost = collectPlayedSources(effectiveMediaSourceByQuestion, playedIndices);
+        if (fromHost.length > 0) return fromHost;
+        // Fallback 1 — host:s sekvens hann aldrig fram (broadcastAllQuestionIds
+        // null). Vid leaderboard-tid SKA den vara satt, så detta är rent
+        // skyddsnät. Lokal sekvens har ANNAN ordning → per-index-mappning är
+        // meningslös, men samma toggles + pooler ger samma käll-MIX.
+        const local = mediaSourceByQuestion.slice(0, totalQuestions);
+        const fromLocal = collectPlayedSources(
+          local,
+          local.map((_, i) => i),
+        );
+        if (fromLocal.length > 0) return fromLocal;
+        // Fallback 2 — inget mediaunderlag alls. Toggle-läget är sämre data
+        // men raden ska aldrig degradera till "None".
+        return PLAYED_MEDIA_SOURCE_ORDER.filter(
+          (src) =>
+            (src === 'spotify' && spotifyEnabled) ||
+            (src === 'youtube' && youtubeEnabled) ||
+            (src === 'image' && imagesEnabled),
+        );
+      })();
       const entry: HistoryEntry = {
         id: result.id,
         date: result.date,
@@ -5017,8 +5062,7 @@ export default function QuizScreen() {
         eraFrom,
         eraTo,
         selectedExtraPackages,
-        youtubeEnabled,
-        imagesEnabled,
+        sources: servedSources,
       };
       try {
         await appendGameHistoryEntry(entry);

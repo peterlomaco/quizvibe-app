@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { loadProfile } from './profileStorage';
+import type { PlayedMediaSource } from './mediaSource';
 
 /**
  * Lokal lagring av spelresultat.
@@ -45,6 +46,11 @@ const HISTORY_V3_RESET_KEY = '@quizvibe/migration/historyV3Reset/v1';
 // shape-utökningen 2026-05-25 (selectedExtraPackages + youtubeEnabled +
 // imagesEnabled). Distinkt flagga så migrationen kan rullas oberoende.
 const HISTORY_V4_RESET_KEY = '@quizvibe/migration/historyV4Reset/v1';
+// V5-reset: wipe:ar entries vars source-etikett byggdes ur host:s TOGGLE-
+// läge (youtubeEnabled/imagesEnabled) vid shape-bytet 2026-08-26 → `sources`
+// (källor som FAKTISKT serverades). Gamla rader kan INTE migreras — toggle-
+// läget säger inget om vad som spelades — därför wipe i stället för dual-read.
+const HISTORY_V5_RESET_KEY = '@quizvibe/migration/historyV5Reset/v1';
 
 export type AssistanceLevel = 'minimal' | 'standard' | 'full';
 
@@ -130,6 +136,12 @@ export async function clearLatestResult(): Promise<void> {
  *   så Player history visar vilket paket (Generic eller themed) spelet
  *   kördes med + vilka mediekällor (YouTube/Images) som var aktiva.
  *   `HISTORY_V4_RESET_KEY` wipe:ar pre-shape-entries.
+ * 2026-08-26 v5: ersatte youtubeEnabled/imagesEnabled → `sources` (källor som
+ *   FAKTISKT serverades). Booleanerna speglade host:s toggle-läge, och
+ *   `imagesEnabled` var dessutom hårdkodad `true` i quiz.tsx — varje rad
+ *   påstod "Images". Toggle-läget duger inte som underlag: Hints-kvoten är
+ *   floor(N/4), så 2-3 rundor med Hints påslaget serverar noll Hints-frågor.
+ *   `HISTORY_V5_RESET_KEY` wipe:ar pre-shape-entries.
  */
 export interface HistoryEntry {
   id: string;
@@ -145,10 +157,12 @@ export interface HistoryEntry {
    *  array = Generic (inga extra paket). När themed packages aktiveras i
    *  v1.1+ kommer detta innehålla ID:n från PURCHASED_PACKAGES. */
   selectedExtraPackages: string[];
-  /** YouTube-källan aktiv vid speltillfället (host:s Game Connections-val). */
-  youtubeEnabled: boolean;
-  /** Images-källan aktiv vid speltillfället (host:s Game Connections-val). */
-  imagesEnabled: boolean;
+  /** Källor som FAKTISKT serverades i spelet, i kanonisk ordning
+   *  (Spotify → YouTube → Hints). Härleds ur mediesekvensen vid game-
+   *  completion — INTE ur lobby-togglarna: Hints-kvoten är floor(N/4), så
+   *  ett 2-3-rundors spel med Hints påslaget serverar noll Hints-frågor och
+   *  ska inte märkas "Hints". Tom array = ingen media alls (bör inte hända). */
+  sources: PlayedMediaSource[];
 }
 
 /**
@@ -175,14 +189,22 @@ async function resolveHistoryKey(): Promise<string | null> {
  */
 async function ensureHistoryReset(): Promise<void> {
   try {
-    // ALLA reset-flaggor (per-user, v2, v3, v4) måste vara satta — annars
+    // ALLA reset-flaggor (per-user, v2, v3, v4, v5) måste vara satta — annars
     // wipe:a och sätt samtliga. Multi-flag-check så successiva shape-
     // ändringar var sin triggar wipe utan att räkningarna kollideras.
     const perUserFlag = await AsyncStorage.getItem(HISTORY_PER_USER_RESET_KEY);
     const v2Flag = await AsyncStorage.getItem(HISTORY_V2_RESET_KEY);
     const v3Flag = await AsyncStorage.getItem(HISTORY_V3_RESET_KEY);
     const v4Flag = await AsyncStorage.getItem(HISTORY_V4_RESET_KEY);
-    if (perUserFlag === '1' && v2Flag === '1' && v3Flag === '1' && v4Flag === '1') return;
+    const v5Flag = await AsyncStorage.getItem(HISTORY_V5_RESET_KEY);
+    if (
+      perUserFlag === '1' &&
+      v2Flag === '1' &&
+      v3Flag === '1' &&
+      v4Flag === '1' &&
+      v5Flag === '1'
+    )
+      return;
     const allKeys = await AsyncStorage.getAllKeys();
     const historyKeys = allKeys.filter(
       (k) =>
@@ -196,6 +218,7 @@ async function ensureHistoryReset(): Promise<void> {
     await AsyncStorage.setItem(HISTORY_V2_RESET_KEY, '1');
     await AsyncStorage.setItem(HISTORY_V3_RESET_KEY, '1');
     await AsyncStorage.setItem(HISTORY_V4_RESET_KEY, '1');
+    await AsyncStorage.setItem(HISTORY_V5_RESET_KEY, '1');
     // Sätt även den äldre reset-flaggan så ensureHistoryReset i den
     // tidigare pre-namespacing-versionen aldrig fyrar igen om koden
     // skulle rullas tillbaka.

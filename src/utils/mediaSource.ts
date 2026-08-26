@@ -55,3 +55,44 @@ export function pickMediaSource(
   // utan curerade klipp. Ska bli mindre vanligt när katalogen fylls på.
   return { kind: 'none', reason: 'No media available for this question.' };
 }
+
+// ── Spelade källor (Player history + prisutdelningens källkort) ──────────
+
+/**
+ * Källor som faktiskt kan SPELAS — till skillnad från `QuestionMediaType`
+ * (GetReadyIntro), vars extra `'none'` betyder "ingen media för den frågan".
+ */
+export type PlayedMediaSource = 'spotify' | 'youtube' | 'image';
+
+/**
+ * Kanonisk VISNINGSORDNING: Spotify → YouTube → Hints. Samma ordning som
+ * källkorten i prisutdelnings-sekvensen (matchHighlights.ts SOURCE_CARDS).
+ * Ändra inte utan nytt beslut.
+ */
+export const PLAYED_MEDIA_SOURCE_ORDER: PlayedMediaSource[] = ['spotify', 'youtube', 'image'];
+
+/**
+ * 'image' heter **Hints** i appen — personbilderna är juridiskt parkerade och
+ * det som faktiskt spelas är flagga + progressiva ledtrådar.
+ */
+export const PLAYED_MEDIA_SOURCE_LABEL: Record<PlayedMediaSource, string> = {
+  spotify: 'Spotify',
+  youtube: 'YouTube',
+  image: 'Hints',
+};
+
+/**
+ * Distinkta källor som faktiskt serverades, i kanonisk ordning.
+ * `'none'` och index utanför sekvensen ignoreras.
+ */
+export function collectPlayedSources(
+  sequence: readonly (PlayedMediaSource | 'none')[],
+  playedIndices: readonly number[],
+): PlayedMediaSource[] {
+  const seen = new Set<string>();
+  for (const i of playedIndices) {
+    const src = sequence[i];
+    if (src && src !== 'none') seen.add(src);
+  }
+  return PLAYED_MEDIA_SOURCE_ORDER.filter((s) => seen.has(s));
+}

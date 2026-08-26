@@ -15,6 +15,7 @@ import {
 } from 'react-native';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
 import { MainCategory } from '../utils/mainCategory';
+import type { PlayedMediaSource } from '../utils/mediaSource';
 import Svg, { Path } from 'react-native-svg';
 import { MediaSourceIcon } from './MediaSourceIcon';
 import { SpotifyBrandIcon } from './SpotifyBrandIcon';
@@ -75,7 +76,7 @@ const ASSISTANCE_LABEL: Record<'minimal' | 'standard' | 'full', string> = {
 
 /** Media-källa per fråga, för IndDev:s media-source-kö. 'none' renderas som
  *  ❓ när YouTube inte är aktiv för frågan. */
-export type QuestionMediaType = 'youtube' | 'spotify' | 'image' | 'none';
+export type QuestionMediaType = PlayedMediaSource | 'none';
 
 interface Props {
   /** Game mode — styr vilken vy av kö-tabellen som renderas + ev. UI-text.

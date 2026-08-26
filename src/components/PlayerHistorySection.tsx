@@ -4,6 +4,7 @@ import Svg, { Path } from 'react-native-svg';
 import { useFocusEffect } from 'expo-router';
 import { Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';
 import { loadGameHistory, type HistoryEntry } from '../utils/gameResults';
+import { PLAYED_MEDIA_SOURCE_LABEL, PLAYED_MEDIA_SOURCE_ORDER } from '../utils/mediaSource';
 import { MyMatchesSection } from './MyMatchesSection';
 import { SavedAggregatesCard } from './SavedAggregatesCard';
 
@@ -240,13 +241,16 @@ function GameHistoryRow({ entry }: { entry: HistoryEntry }) {
     !entry.selectedExtraPackages || entry.selectedExtraPackages.length === 0
       ? 'Generic'
       : entry.selectedExtraPackages.join(', ');
-  // Sources-etikett: visar vilka mediekällor som var aktiva. Lobby:n
-  // garanterar att minst en alltid är på, men defensive "None"-fallback
-  // håller raden konsistent om data är skev.
-  const sources: string[] = [];
-  if (entry.youtubeEnabled) sources.push('YouTube');
-  if (entry.imagesEnabled) sources.push('Images');
-  const sourcesLabel = sources.length === 0 ? 'None' : sources.join(' + ');
+  // Sources-etikett: källorna som FAKTISKT serverades i spelet (inte host:s
+  // toggle-läge), i appens kanoniska ordning Spotify → YouTube → Hints —
+  // samma ordning som källkorten i prisutdelnings-sekvensen. `entry.sources?.`
+  // skyddar rader skrivna innan v5-resetet hunnit köra (samma defensiva
+  // hållning som packages-raden ovan); "None" ska aldrig synas i praktiken.
+  const sourceKeys = PLAYED_MEDIA_SOURCE_ORDER.filter((s) => entry.sources?.includes(s));
+  const sourcesLabel =
+    sourceKeys.length === 0
+      ? 'None'
+      : sourceKeys.map((s) => PLAYED_MEDIA_SOURCE_LABEL[s]).join(' + ');
   return (
     <View style={styles.gameRow}>
       <View style={styles.gameTopRow}>
