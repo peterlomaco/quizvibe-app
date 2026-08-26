@@ -443,10 +443,11 @@ items:
     wikimediaSearchHints: ["Carly Rae Jepsen Call Me Maybe"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "47EG91_XHic"
+      - videoId: "fWNaR-rxAic"
         startSec: 0
-        endSec: 210
-        channelTitle: "Unique Vibes"
+        endSec: 30
+        channelTitle: "CarlyRaeJepsenVEVO"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". Ersatte reuploaden 47EG91_XHic (Unique Vibes) med officiella Vevo-klippet."
   # === Content-expansion 2026-05-29: fler ikoniska 00-10-tals-låtar ===
   - id: white-stripes-seven-nation-army
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -686,11 +687,11 @@ items:
     wikimediaSearchHints: ["Lady Gaga Poker Face 2008"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "oG-4Uvhm4lI"
+      - videoId: "bESGLojNYSo"
         startSec: 30
-        endSec: 45
-        channelTitle: "Lady Gaga - Topic"
-        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+        endSec: 60
+        channelTitle: "LadyGagaVEVO"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". Ersatte Topic-audion oG-4Uvhm4lI med officiella musikvideon."
   - id: mando-diao-dance-with-somebody
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Dance with Somebody — Mando Diao"
@@ -1634,3 +1635,271 @@ items:
         endSec: 30
         channelTitle: "Kate Ryan"
         notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+  # === Tillagg 2026-08-25 (Peters YT-lista, omgang 2) ===
+  - id: bruno-mars-the-lazy-song
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "The Lazy Song — Bruno Mars"
+    correctYear: 2010
+    probability: 82
+    region: ["global"]
+    wikimediaSearchHints: ["Bruno Mars The Lazy Song Doo-Wops Hooligans"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "fLexgOxsZu0"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Bruno Mars"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". correctYear = albumet Doo-Wops & Hooligans (okt 2010), inte singeln feb 2011."
+  - id: maroon-5-moves-like-jagger
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Moves Like Jagger — Maroon 5 feat. Christina Aguilera"
+    correctYear: 2011
+    probability: 86
+    region: ["global"]
+    wikimediaSearchHints: ["Maroon 5 Moves Like Jagger Christina Aguilera"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "iEPTlhBmwRg"
+        startSec: 60
+        endSec: 90
+        channelTitle: "Maroon5VEVO"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". startSec 60 angiven av Peter - videon ar 4:39 mot latens 3:21 och oppnar med intervjuklipp."
+  - id: katy-perry-firework
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Firework — Katy Perry"
+    correctYear: 2010
+    probability: 88
+    region: ["global"]
+    wikimediaSearchHints: ["Katy Perry Firework Teenage Dream"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "QGJuMBdaqIw"
+        startSec: 10
+        endSec: 40
+        channelTitle: "KatyPerryVEVO"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". startSec 10 angiven av Peter."
+  - id: jessie-j-domino
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Domino — Jessie J"
+    correctYear: 2011
+    probability: 82
+    region: ["global"]
+    wikimediaSearchHints: ["Jessie J Domino Who You Are"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "UJtB55MaoD0"
+        startSec: 0
+        endSec: 30
+        channelTitle: "JessieJVEVO"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+  - id: david-guetta-when-love-takes-over
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "When Love Takes Over — David Guetta feat. Kelly Rowland"
+    correctYear: 2009
+    probability: 84
+    region: ["global"]
+    wikimediaSearchHints: ["David Guetta When Love Takes Over Kelly Rowland One Love"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "w74lkrIWebs"
+        startSec: 0
+        endSec: 30
+        channelTitle: "virginrecords"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". Peters ID zudbz4hOcbc (Guettas egen 2009-upload) ar SD; bytt till skivbolagets HD-upload."
+  - id: daft-punk-around-the-world
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Around the World — Daft Punk"
+    correctYear: 1997
+    probability: 84
+    region: ["global"]
+    wikimediaSearchHints: ["Daft Punk Around the World Homework"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "K0HSD_i2DvA"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Daft Punk"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". Remastrad officiell musikvideo."
+  - id: scooter-how-much-is-the-fish
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "How Much Is the Fish? — Scooter"
+    correctYear: 1998
+    probability: 80
+    region: ["europe"]
+    wikimediaSearchHints: ["Scooter How Much Is the Fish No Time to Chill"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "0IDOUiQj5hY"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Scooter - Topic"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". Peters cbB3iGRHtqA (Scooters egen upload) ar SD; bytt till Topic-kanalens HD-audio."
+    genrePackages: ["sport"]
+  - id: anastacia-left-outside-alone
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Left Outside Alone — Anastacia"
+    correctYear: 2004
+    probability: 80
+    region: ["europe"]
+    wikimediaSearchHints: ["Anastacia Left Outside Alone"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "C-M_ufrvbro"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Anastacia - Topic"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". Peters uzR5jM9UeJA (AnastaciaVEVO) ar SD; ingen officiell HD-video finns. Topic-radioversionen anvand. OBS: undvik Symphonic Revolution-klippet - det ar en 2023 nyinspelning, fel version for en arsfraga."
+  - id: backstreet-boys-i-want-it-that-way
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "I Want It That Way — Backstreet Boys"
+    correctYear: 1999
+    probability: 88
+    region: ["global"]
+    wikimediaSearchHints: ["Backstreet Boys I Want It That Way Millennium"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "4fndeDfaWCg"
+        startSec: 0
+        endSec: 30
+        channelTitle: "BackstreetBoysVEVO"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+  - id: shania-twain-man-i-feel-like-a-woman
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Man! I Feel Like a Woman! — Shania Twain"
+    correctYear: 1997
+    probability: 84
+    region: ["global"]
+    wikimediaSearchHints: ["Shania Twain Man I Feel Like a Woman Come On Over"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "ZJL4UGSbeFg"
+        startSec: 0
+        endSec: 30
+        channelTitle: "ShaniaTwainVEVO"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". correctYear 1997 = albumet Come On Over (nov 1997). GRANSFALL: singeln kom forst mars 1999, sa manga spelare gissar 1999."
+  - id: pussycat-dolls-buttons
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Buttons — The Pussycat Dolls feat. Snoop Dogg"
+    correctYear: 2005
+    probability: 82
+    region: ["global"]
+    wikimediaSearchHints: ["Pussycat Dolls Buttons PCD Snoop Dogg"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "VCLxJd1d84s"
+        startSec: 0
+        endSec: 30
+        channelTitle: "ThePussycatDollsVEVO"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". correctYear 2005 = debutalbumet PCD (sep 2005), verifierat via Wikipedia. GRANSFALL: singeln kom mars 2006."
+  - id: natalie-imbruglia-torn
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Torn — Natalie Imbruglia"
+    correctYear: 1997
+    probability: 84
+    region: ["global"]
+    wikimediaSearchHints: ["Natalie Imbruglia Torn Left of the Middle"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "VV1XWJN3nJo"
+        startSec: 0
+        endSec: 30
+        channelTitle: "natalieimbrugliaVEVO"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". correctYear 1997 = Imbruglias egen release. Ednaswap/Lis Sorensen spelade in laten 1993 men annan artists inspelning raknas INTE per ar-policyn."
+  - id: destinys-child-survivor
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Survivor — Destiny's Child"
+    correctYear: 2001
+    probability: 84
+    region: ["global"]
+    wikimediaSearchHints: ["Destiny's Child Survivor album"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "Wmc8bQoL-J0"
+        startSec: 0
+        endSec: 30
+        channelTitle: "DestinysChildVEVO"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+  - id: jennifer-lopez-on-the-floor
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "On the Floor — Jennifer Lopez feat. Pitbull"
+    correctYear: 2011
+    probability: 84
+    region: ["global"]
+    wikimediaSearchHints: ["Jennifer Lopez On the Floor Pitbull Love"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "t4H_Zoh7G5A"
+        startSec: 5
+        endSec: 35
+        channelTitle: "JenniferLopezVEVO"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". startSec 5 angiven av Peter."
+  - id: nelly-furtado-say-it-right
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Say It Right — Nelly Furtado"
+    correctYear: 2006
+    probability: 82
+    region: ["global"]
+    wikimediaSearchHints: ["Nelly Furtado Say It Right Loose"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "6JnGBs88sL0"
+        startSec: 10
+        endSec: 40
+        channelTitle: "NellyFurtadoVEVO"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". startSec 10 angiven av Peter. correctYear 2006 = albumet Loose (juni 2006); singeln kom nov 2006."
+  - id: nickelback-how-you-remind-me
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "How You Remind Me — Nickelback"
+    correctYear: 2001
+    probability: 84
+    region: ["global"]
+    wikimediaSearchHints: ["Nickelback How You Remind Me Silver Side Up"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "1cQh1ccqu8M"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Nickelback"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". OBS: Peters lank pekade pa Sophie Ellis-Bextor - Murder On The Dancefloor (fel rad i radiospellistan); officiella Nickelback-klippet uppsokt istallet."
+  - id: beyonce-crazy-in-love
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Crazy in Love — Beyoncé feat. Jay-Z"
+    correctYear: 2003
+    probability: 88
+    region: ["global"]
+    wikimediaSearchHints: ["Beyonce Crazy in Love Dangerously in Love Jay-Z"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "ViwtNLUqkMY"
+        startSec: 0
+        endSec: 30
+        channelTitle: "BeyoncéVEVO"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+  - id: mary-j-blige-family-affair
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Family Affair — Mary J. Blige"
+    correctYear: 2001
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Mary J. Blige Family Affair No More Drama"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "znlFu_lemsU"
+        startSec: 0
+        endSec: 30
+        channelTitle: "MaryJBligeVEVO"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+  - id: the-rasmus-in-the-shadows
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "In the Shadows — The Rasmus"
+    correctYear: 2003
+    probability: 82
+    region: ["europe"]
+    wikimediaSearchHints: ["The Rasmus In the Shadows Dead Letters"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "7gwO8-oqwFw"
+        startSec: 0
+        endSec: 30
+        channelTitle: "The Rasmus"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". correctYear 2003 = albumet Dead Letters (mars 2003)."

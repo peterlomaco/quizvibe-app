@@ -45,11 +45,11 @@ items:
     wikimediaSearchHints: ["Mark Spitz 1972 Munich Olympics seven gold"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "TyXhi5I-TWs"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Olympics"
-        notes: "Olympics official channel — Spitz 7 OS-guld München 1972."
+      - videoId: "1Q-tBLGGSkc"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Olympic Games"
+        notes: "Bytt 2026-08-26 (spoiler-pass): gamla titeln hade '1972' vid tecken 34. Officiella IOC-kanalen, ren titel."
   - id: salming-canada-cup-ovation-1976
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Stående ovationer till Börje Salming — Canada Cup"
@@ -58,11 +58,11 @@ items:
     wikimediaSearchHints: ["Borje Salming Canada Cup 1976 standing ovation"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "AQiLxrw2twA"
+      - videoId: "lKIVRfCN9jA"
         startSec: 0
         endSec: 30
-        channelTitle: "Nostalgi"
-        notes: "Peter-curerat + validerat i in-app-spelaren 2026-08-05 — årtalet i videotiteln syns EJ i appens spelare, godkänt trots år-i-titel."
+        channelTitle: "Jeff The Leafs Fan"
+        notes: "Bytt 2026-08-26 (spoiler-pass): gamla titeln hade '1976' vid tecken 49. VERIFIERA I SPELAREN: har star '1976' vid tecken 63 av 95 - bor kapas bort."
   - id: miracle-on-ice-1980
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Miracle on Ice — USA besegrar Sovjet"
@@ -71,11 +71,11 @@ items:
     wikimediaSearchHints: ["Miracle on Ice 1980 Lake Placid USA USSR hockey"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "1ylQX7H_W_Q"
-        startSec: 60
-        endSec: 75
-        channelTitle: "MCB Highlights"
-        notes: "Miracle on Ice 1980 — USA-USSR hockey highlights. Mid-game action."
+      - videoId: "aJ6itnbs7Yg"
+        startSec: 0
+        endSec: 30
+        channelTitle: "ESPN Throwback"
+        notes: "Bytt 2026-08-26 (spoiler-pass): gamla titeln inleddes med '1980'. ESPN, sista minuten av matchen, ren titel. SD = bara note."
   # maradona-hand-of-god BORTTAGET 2026-08-13 (Peter): årtalet i videotiteln
   # spoilar Year-svaret. Detta RIVER det tidigare godkännandet 2026-08-05
   # ("syns EJ i appens spelare") — lägg inte tillbaka itemet utan ett klipp
@@ -88,11 +88,11 @@ items:
     wikimediaSearchHints: ["Dream Team 1992 Barcelona Olympics basketball"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "JTNIWbGmzGU"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Olympics"
-        notes: "Olympics official channel — Best of Dream Team Barcelona 1992. Jordan/Magic/Bird."
+      - videoId: "ZE4FIP5kNK8"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Olympic Games"
+        notes: "Bytt 2026-08-26 (spoiler-pass): gamla titeln hade '92' vid tecken 44. Officiella IOC-kanalen, ren titel."
   - id: borg-mcenroe-wimbledon-1980
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Borg-McEnroe Wimbledon-final"
@@ -101,11 +101,11 @@ items:
     wikimediaSearchHints: ["Borg McEnroe 1980 Wimbledon final tiebreak"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "UnwYdF8a5ws"
-        startSec: 300
-        endSec: 315
+      - videoId: "nFeLpTjH2pk"
+        startSec: 0
+        endSec: 30
         channelTitle: "Wimbledon"
-        notes: "Wimbledon official channel — 1980 tie-break i fjärde set (18-16 till McEnroe). Mid-tiebreak."
+        notes: "Bytt 2026-08-26 (spoiler-pass): gamla titeln hade '1980' vid tecken 33. Officiella Wimbledon-kanalen, ren titel."
   - id: federer-nadal-wimbledon-2008
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Federer-Nadal Wimbledon-final ('greatest match')"
@@ -114,11 +114,11 @@ items:
     wikimediaSearchHints: ["Federer Nadal 2008 Wimbledon final"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "U5Af1jGgYqA"
-        startSec: 60
-        endSec: 75
-        channelTitle: "Wimbledon"
-        notes: "Wimbledon official channel — 2008 'greatest match'-finalen Best Rallies."
+      - videoId: "k6k3TDXbmGM"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Secret Base"
+        notes: "Bytt 2026-08-26 (spoiler-pass): gamla titeln hade '2008' vid tecken 42. VERIFIERA I SPELAREN: har star '2008' vid tecken 72 av 76 - bor kapas bort. Enda ratt-event-klippet utan tidigt artal."
   - id: iniesta-world-cup-final-goal-2010
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Iniesta gör VM-finalmålet"
@@ -151,12 +151,8 @@ items:
     probability: 78
     wikimediaSearchHints: ["Sweden Brazil 1958 World Cup final Solna"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "3vUpZgzj-3I"
-        startSec: 30
-        endSec: 45
-        channelTitle: "freekick3596"
-        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+    # youtubeClips borttagna 2026-08-26 (spoiler-pass): titeln rojde svarsaret
+    # och inget rent ersattningsklipp finns pa YouTube. Gammalt klipp: 3vUpZgzj-3I
   - id: borg-wimbledon-1976
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Björn Borg vinner sin första Wimbledon"
@@ -173,11 +169,11 @@ items:
     wikimediaSearchHints: ["Nadia Comaneci 1976 Montreal Olympics perfect 10"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "Yi_5xbd5xdE"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Olympics"
-        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+      - videoId: "5OCVWRFQbss"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Olympics Gymnastics"
+        notes: "Bytt 2026-08-26 (spoiler-pass): gamla titeln hade '1976' vid tecken 45. Officiella IOC-kanalen, ren titel."
   - id: stenmark-os-guld-slalom-1980
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Stenmark OS-guld slalom Lake Placid"
@@ -262,12 +258,8 @@ items:
     probability: 72
     wikimediaSearchHints: ["Sweden 1991 IIHF World Championship Turku gold"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "roFDtX3CNG4"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Daniel Risarp"
-        notes: "Refined query 2026-05-27 — 'Mats Sundin avgör när Tre Kronor tar VM guld 1991'."
+    # youtubeClips borttagna 2026-08-26 (spoiler-pass): titeln rojde svarsaret
+    # och inget rent ersattningsklipp finns pa YouTube. Gammalt klipp: roFDtX3CNG4
   - id: sverige-em-1992-semifinal
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Sverige semifinal hemma-EM mot Tyskland"
@@ -289,11 +281,11 @@ items:
     wikimediaSearchHints: ["Peter Forsberg 1994 Lillehammer Olympics shootout penalty Canada"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "QISjlZgP4vA"
-        startSec: 5
-        endSec: 20
-        channelTitle: "stansmith98"
-        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+      - videoId: "Fsc7CqCG8Jc"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Spittin' Chiclets"
+        notes: "Bytt 2026-08-26 (spoiler-pass): gamla titeln hade '1994' vid tecken 17. Ren titel, visar sjalva straffen."
   - id: sverige-vm-94-brons-bulgarien
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Sverige VM-brons mot Bulgarien"
@@ -342,11 +334,11 @@ items:
     wikimediaSearchHints: ["Stefan Holm 2004 Athens Olympics high jump gold"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "aBh3nDidTQ0"
-        startSec: 30
-        endSec: 45
-        channelTitle: "MaramaGitz"
-        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+      - videoId: "2ubAsMWGoBI"
+        startSec: 0
+        endSec: 14
+        channelTitle: "Olympic Games"
+        notes: "Bytt 2026-08-26 (spoiler-pass): gamla titeln hade '2004' vid tecken 33. Officiella IOC-kanalen; '#Athens2004' star vid tecken 96 av 100 = kapas bort."
   - id: christian-olsson-em-tresteg-2006
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Christian Olsson EM-guld tresteg Göteborg"
@@ -362,6 +354,12 @@ items:
     probability: 88
     wikimediaSearchHints: ["Zlatan Ibrahimovic 2004 Euro Italy backheel goal"]
     answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "Z8iQiYSMXi4"
+        startSec: 0
+        endSec: 30
+        channelTitle: "TV4 Sport"
+        notes: "Peter-kurerad 2026-08-25. Rattsinnehavarens egen kanal. SD (bara en note i youtube-validate). Titeln ar 69 tecken med '2004' vid tecken 53 - bor kapas bort i spelaren; Peters egen matning 2026-08-13 visade att tecken 54 inte syns."
   - id: tre-kronor-os-turin-2006
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Tre Kronor OS-guld Turin"
@@ -370,11 +368,11 @@ items:
     wikimediaSearchHints: ["Sweden 2006 Turin Olympics ice hockey gold medal Finland"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "3vdtHuuhtCU"
-        startSec: 5
-        endSec: 20
-        channelTitle: "Radiosporten"
-        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+      - videoId: "StClSX9cNVY"
+        startSec: 0
+        endSec: 30
+        channelTitle: "simmerpuck"
+        notes: "Bytt 2026-08-26 (spoiler-pass): gamla titeln hade '2006' vid tecken 41. Ren titel."
   - id: anja-parson-vm-slalom-are-2007
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Anja Pärson VM-guld slalom Åre"
@@ -426,11 +424,11 @@ items:
     wikimediaSearchHints: ["Charlotte Kalla 2014 Sochi Olympics relay gold cross country"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "kdxbknklbAU"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Pheyman"
-        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+      - videoId: "mlLqT65ADys"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Olympic Games"
+        notes: "Bytt 2026-08-26 (spoiler-pass): gamla titeln hade '2014' vid tecken 32. Officiella IOC-kanalen, ren titel - Kallas comeback pa sista strackan."
   - id: tre-kronor-os-silver-sochi-2014
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Tre Kronor OS-silver Sochi (mot Kanada)"
@@ -547,11 +545,11 @@ items:
     wikimediaSearchHints: ["Michael Jordan Last Shot 1998 NBA Finals Bulls Jazz"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "AKgDmNrFDow"
-        startSec: 5
-        endSec: 20
-        channelTitle: "Coach Clank"
-        notes: "Curerad 2026-05-29 — Jordans iconic last shot, 1998 NBA Finals (NBA-officiella var region-blockerade)."
+      - videoId: "MlzL6bT1C2U"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Coach Brock"
+        notes: "Bytt 2026-08-26 (spoiler-pass): gamla titeln hade '1998' vid tecken 41. Ren titel."
   - id: leicester-premier-league-2016
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Leicester City vinner Premier League"
@@ -586,12 +584,8 @@ items:
     probability: 76
     wikimediaSearchHints: ["Kurt Hamrin 1958 World Cup semifinal Sweden West Germany goal"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "lVZ9PFAfav8"
-        startSec: 30
-        endSec: 60
-        channelTitle: "KEITH BARON"
-        notes: "HD documentary om Sverige i VM 1958 — Hamrin-höjdpunkter. Ersatte SD-klipp (2sQQ1FovLAs)."
+    # youtubeClips borttagna 2026-08-26 (spoiler-pass): titeln rojde svarsaret
+    # och inget rent ersattningsklipp finns pa YouTube. Gammalt klipp: lVZ9PFAfav8
   - id: wassberg-os-guld-1980
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Thomas Wassberg OS-guld 15 km (0.01 sekund!) Lake Placid"
@@ -613,11 +607,11 @@ items:
     wikimediaSearchHints: ["Muhammad Ali 1996 Atlanta Olympics torch lighting ceremony"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "WIj3t6i3Hpo"
-        startSec: 5
-        endSec: 50
-        channelTitle: "The Game Day"
-        notes: "HD — Ali tänder OS-elden Atlanta 1996. Ersatte SD Olympics-klipp (80wMMFAcweQ)."
+      - videoId: "JOYJA3B4_TA"
+        startSec: 0
+        endSec: 19
+        channelTitle: "Fight Greats"
+        notes: "Bytt 2026-08-26 (spoiler-pass): gamla titeln hade '1996' vid tecken 45. Ren titel."
   - id: moregard-os-brons-paris-2024
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Truls Möregård OS-brons bordtennis Paris"
@@ -640,8 +634,34 @@ items:
     wikimediaSearchHints: ["Eric Cantona 1995 kung fu kick Crystal Palace fan Selhurst Park"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "6eOCxIPkvb8"
-        startSec: 15
-        endSec: 50
-        channelTitle: "Classic Footy Videos & Clips"
-        notes: "HD — Cantonas kung-fu-spark Selhurst Park 1995. Ersatte SD-klipp (C7PSY7KYThk)."
+      - videoId: "C7PSY7KYThk"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Cinematheque Universelle"
+        notes: "Bytt 2026-08-26 (spoiler-pass): gamla titeln hade '1995' vid tecken 42. Ren titel. Detta ar samma klipp som byttes BORT 2026-05 for att vara SD - SD ar bara en note i youtube-validate, en spoilad titel gor fragan trasig. HD-alternativet -qV6bp5cZMU ar aldersbegransat (blockerat)."
+  - id: edstrom-vm-74-vasttyskland
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Ralf Edströms volley mot Västtyskland i VM"
+    correctYear: 1974
+    probability: 78
+    wikimediaSearchHints: ["Ralf Edstrom 1974 World Cup Sweden West Germany volley goal"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "53PhRbbH1QY"
+        startSec: 2
+        endSec: 22
+        channelTitle: "NickDangah"
+        notes: "Peter-kurerad 2026-08-25. startSec 2 angiven av Peter. SD men REN TITEL - Peters egna LgEmL37z6H0 har '1974' vid tecken 31 av 35 = fullt synligt i spelaren. SD ar bara en note i youtube-validate, en spoilad titel gor fragan trasig; 1974-material ar SD i kallan anda."
+  - id: brolin-vm-94-rumanien
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Tomas Brolins frisparksmål mot Rumänien i VM"
+    correctYear: 1994
+    probability: 78
+    wikimediaSearchHints: ["Tomas Brolin 1994 World Cup Sweden Romania free kick goal"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "M5QLO0z0K0A"
+        startSec: 8
+        endSec: 38
+        channelTitle: "Retro Calcio"
+        notes: "Peter-kurerad 2026-08-25. HD. VERIFIERA I SPELAREN: titeln ar 77 tecken och '94' star vid tecken 65 - bor kapas bort, men kolla. Peters egna 48x5dX-x7r4 har '1994' vid tecken 25 av 29 = garanterat synligt."

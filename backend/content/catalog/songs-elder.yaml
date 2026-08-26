@@ -534,3 +534,17 @@ items:
         endSec: 45
         channelTitle: "themotownboy1"
         notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+  - id: edith-piaf-la-vie-en-rose
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "La Vie en rose — Édith Piaf"
+    correctYear: 1947
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Edith Piaf La Vie en rose"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "-0KvBnIvTFs"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Edith Piaf Officiel"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". Peters rzeLynj1GYM ar SD OCH live; bytt till officiella studio-audion (HD) fran samma kanal. correctYear 1947 = singel-release (skriven 1945, inspelad 1946) per Wikipedia."

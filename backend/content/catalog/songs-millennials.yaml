@@ -2517,3 +2517,45 @@ items:
         channelTitle: "ETypeVEVO"
         notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". Videotitel verifierad: 'E-Type - This Is The Way' — inget ar i titeln."
     notes: "correctYear = andra singeln fran debutalbumet Made in Sweden, bada 1994. Samma album som e-type-set-the-world-on-fire."
+  - id: no-doubt-dont-speak
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Don't Speak — No Doubt"
+    correctYear: 1995
+    probability: 86
+    region: ["global"]
+    wikimediaSearchHints: ["No Doubt Don't Speak Tragic Kingdom"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "TR3Vdo5etCQ"
+        startSec: 30
+        endSec: 60
+        channelTitle: "NoDoubtVEVO"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". startSec 30 angiven av Peter. correctYear 1995 = albumet Tragic Kingdom (okt 1995). GRANSFALL: singeln kom april 1996 och laten minns oftast som 1996."
+  - id: fugees-killing-me-softly
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Killing Me Softly — Fugees"
+    correctYear: 1996
+    probability: 86
+    region: ["global"]
+    wikimediaSearchHints: ["Fugees Killing Me Softly The Score"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "oKOtzIo-uYw"
+        startSec: 0
+        endSec: 30
+        channelTitle: "TheFugeesVEVO"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". Egen inspelning - separat item fran roberta-flack-killing-me-softly (1973) per ar-policyn: itemet ar artistens inspelning, inte kompositionen."
+  - id: men-at-work-down-under
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Down Under — Men at Work"
+    correctYear: 1981
+    probability: 84
+    region: ["global"]
+    wikimediaSearchHints: ["Men at Work Down Under Business as Usual"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "XfR9iY5y94s"
+        startSec: 0
+        endSec: 30
+        channelTitle: "MenAtWorkVEVO"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". correctYear 1981 = Columbia-inspelningen (albumet Business as Usual). RATTA INTE till 1980: bandet sjalvslappte en ANNAN inspelning 1980 som B-sida (langsammare tempo, annat arr) - klippet ar 1981-versionen, och itemet ar inspelningen."

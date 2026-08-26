@@ -132,11 +132,11 @@ items:
     answerMethods: ["timeline"]
     spotifyTrackId: "3Dy4REq8O09IlgiwuHQ3sk"
     youtubeClips:
-      - videoId: "9y-8ZiAJiQo"
-        startSec: 15
+      - videoId: "Sj_9CiNkkn4"
+        startSec: 0
         endSec: 30
-        channelTitle: "ABBA - Topic"
-        notes: "Officiell album-audio via YouTube Topic. Eurovision-låten."
+        channelTitle: "AbbaVEVO"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". Officiell musikvideo; ersatte Topic-audion 9y-8ZiAJiQo. Titeln namner inte Eurovision/artal."
     genrePackages: ["Eurovision"]
   # Bohemian Rhapsody flyttad till songs-all.yaml (cross-gen-iconic) 2026-05-22.
   # Hotel California flyttad till songs-all.yaml (cross-gen-iconic) 2026-05-22.
@@ -373,6 +373,34 @@ items:
         endSec: 45
         channelTitle: "ABBA - Topic"
         notes: "Curerad 2026-05-29 — officiell album-audio via YouTube Topic (ABBA studio-version, ej film-soundtrack)."
+  - id: abba-gimme-gimme-gimme
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Gimme! Gimme! Gimme! (A Man After Midnight) — ABBA"
+    correctYear: 1979
+    probability: 84
+    region: ["global"]
+    wikimediaSearchHints: ["ABBA Gimme Gimme Gimme A Man After Midnight"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "XEjLoHdbVeE"
+        startSec: 0
+        endSec: 30
+        channelTitle: "AbbaVEVO"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+  - id: abba-take-a-chance-on-me
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Take a Chance on Me — ABBA"
+    correctYear: 1977
+    probability: 84
+    region: ["global"]
+    wikimediaSearchHints: ["ABBA Take a Chance on Me The Album"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "-crgQGdpZR0"
+        startSec: 0
+        endSec: 30
+        channelTitle: "AbbaVEVO"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". correctYear 1977 = albumet ABBA: The Album (12 dec 1977), verifierat mot MusicBrainz. Singeln kom 14 jan 1978 - GRANSFALL, manga spelare gissar 1978."
   - id: queen-we-will-rock-you
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "We Will Rock You — Queen"
@@ -1206,3 +1234,17 @@ items:
     answerMethods: ["timeline"]
     spotifyTrackId: "7HrzErXq3TsKOY1gmdIShB"
     youtubeClips: []
+  - id: nancy-sinatra-these-boots-are-made-for-walkin
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "These Boots Are Made for Walkin' — Nancy Sinatra"
+    correctYear: 1966
+    probability: 82
+    region: ["global"]
+    wikimediaSearchHints: ["Nancy Sinatra These Boots Are Made for Walkin"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "9Qp_SrTgBBs"
+        startSec: 0
+        endSec: 30
+        channelTitle: "NancySinatraVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\". correctYear 1966 enligt MusicBrainz tidigaste release + albumet Boots (mars 1966)."
