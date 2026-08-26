@@ -66,8 +66,8 @@ interface PlayerRowProps {
   peerHealth?: PeerHealth | 'self';
   // Spotify-koppling för spelaren — true = kopplat konto (grön), false/undefined = ej kopplat (grå).
   spotifyConnected?: boolean;
-  // Visa Spotify-attest-badgen? Default true. 1vs1-lobbyn skickar false —
-  // remote-läget har inga Spotify-frågor.
+  // Visa Spotify-attest-badgen? Default true. 1vs1- OCH single player-lobbyn
+  // skickar false — inget av lägena kan servera Spotify-frågor.
   showSpotifyBadge?: boolean;
 }
 
@@ -398,9 +398,10 @@ export function PlayerRow({
 
       {/* ── Spotify-attest-badge — uppe till höger på kortets kantlinje.
           Plan B (2026-07-22): visar spelarens self-attest ("jag har Spotify-
-          appen"), inte en OAuth-koppling. Döljs helt i 1vs1-lobbyn
-          (showSpotifyBadge=false) — Spotify-frågor finns inte i remote-
-          läget, så badgen vore brus. ── */}
+          appen"), inte en OAuth-koppling. Döljs helt (showSpotifyBadge=false)
+          i 1vs1-lobbyn (remote har inga Spotify-frågor) och i single player-
+          lobbyn (Spotify DJ kräver minst en motspelare) — badgen vore brus
+          där, och båda lobbytyperna är låsta så läget kan inte bytas. ── */}
       {showSpotifyBadge && (
         <View style={[styles.spotifyBorderTag, { borderColor: spotifyConnected ? '#1DB954' : Colors.borderStrong }]} pointerEvents="none">
           <SpotifyBrandIcon size={10} variant="white" />

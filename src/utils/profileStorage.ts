@@ -60,17 +60,22 @@ export interface ProfileData {
   // (sätts av Lobby-seedningen, sparas normalt inte som profil-default).
   // Optional för bakåtkompatibilitet — defaultas till 4 i UI.
   maxPlayers?: 2 | 4 | 12;
-  // Default game mode (host-default). 'pass-the-phone' = en delad enhet
-  // (gratis), 'individual-devices' = parallellt spel (kräver Premium).
-  // Optional för bakåtkompatibilitet — defaultas till 'pass-the-phone' i UI.
+  // Default game mode för MULTIPLAYER-spel (host-default). 'pass-the-phone'
+  // = en delad enhet, 'individual-devices' = parallellt spel. Single player
+  // och Remote 1vs1 är INTE host-defaults — de väljs per spel via
+  // "Start New Game" på Home. Optional för bakåtkompatibilitet — defaultas
+  // till 'pass-the-phone' i UI.
   gameMode?: GameMode;
-  // Om checkad låser host-default till Individual Devices och Pass-the-Phone
-  // visas dämpad/grå i Profile:s Game Mode-toggle. Optional för
-  // bakåtkompatibilitet — defaultas till false i UI.
+  // ⚠ LEGACY sedan 2026-08-26: Single player är inte längre en host-default.
+  // Profile skriver alltid false (och coercar ett stale true vid load), men
+  // fältet är kvar eftersom DB-kolumnen finns och Lobby:s seed läser
+  // motsvarande värde ur lobby_settings vid carry-over (Replay).
   singlePlayerDefault?: boolean;
-  // Default antal rundor per spel (host-default). Stegrar i 2 (jämn lap-tal),
+  // Default antal rundor per MULTIPLAYER-spel (host-default). Stegrar i 2,
   // capas av gameMode i Lobby (Pass-the-Phone max 4, Individual Devices max
-  // 20). Optional för bakåtkompatibilitet — defaultas till ROUNDS_DEFAULT i UI.
+  // 20 med Premium). En Single player-lobby ignorerar detta och startar
+  // alltid på 4. Optional för bakåtkompatibilitet — defaultas till
+  // ROUNDS_DEFAULT i UI.
   roundsDefault?: number;
   // Lista över paket-id:n som användaren har aktiverat i sin Profile för
   // att vara valbara i Lobby (host-vyn). Paket som inte finns i denna lista

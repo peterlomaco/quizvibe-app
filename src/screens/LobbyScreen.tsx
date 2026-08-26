@@ -392,12 +392,6 @@ const regionSheet = StyleSheet.create({
   cancelText: { fontSize: FontSize.md, color: Colors.textSecondary },
 });
 
-// Att presentera en RN <Modal> direkt i en Alert-callback kan sväljas tyst
-// på iOS — alertens dismiss-animation pågår fortfarande när handlern kör, och
-// en presentation mitt i en transition no-op:ar. Samma defensiva delay som
-// MODAL_SWAP_DELAY_MS i app/index.tsx (där Modal→Modal gav exakt den buggen).
-const ALERT_TO_MODAL_DELAY_MS = 350;
-
 // Hur länge en ny, ännu icke-godkänd non-host hålls dold innan hen får
 // rendera den röda "Players Waiting"-blinken. Ska täcka tiden det tar för
 // join-radens fält att konvergera (fetchNewJoiners → syncNonHostFields) så
@@ -433,8 +427,12 @@ const SINGLE_PLAYER_APPROVE_BLOCK: [string, string] = [
 
 /** Prio för `singlePlayerDefault`-seeden: `lobbyType`-paramet (= host:s
  *  explicita val i "Start New Game"-panelen på Home / Final Leaderboard) >
- *  `fallback` (carry-over lobby_settings > profilens host-default). Utan
- *  param (äldre navigation) gäller fallback:en oförändrat.
+ *  `fallback` (carry-over lobby_settings). Utan param (äldre navigation)
+ *  gäller fallback:en oförändrat.
+ *
+ *  ⚠ Profilen ingår INTE i fallback-kedjan sedan 2026-08-26 — Single player
+ *  är inte längre en host-default, så en stale sparad `true` får inte låsa
+ *  en Multiplayer-lobby. Se ProfileData.singlePlayerDefault.
  *
  *  Module-level och ren — så den aldrig blir en dependency i seed-effekten
  *  (`lobbyType` ligger redan där och är allt funktionen läser).
@@ -1195,10 +1193,11 @@ export default function LobbyScreen() {
      *  Sätts av quiz.tsx vid navigation → LobbyScreen hoppar DB-beroende
      *  dup-detection och ärver rätt id direkt. */
     carryOverPlayerId?: string;
-    /** '1v1' när lobbyn skapades via HostTypeModal-valet "1vs1 Matches" på
-     *  Home (registrerad ELLER guest host). Seedar gameMode='remote-1v1'
-     *  hårt — den renodlade 1vs1-lobbyn visar ingen Game Mode-sektion så
-     *  läget kan aldrig bytas inne i lobbyn. */
+    /** Lobbytypen, vald i "Start New Game"-panelen på Home / Final
+     *  Leaderboard: 'single' | 'multiplayer' | '1v1'. LÅSER lobbyn — alla
+     *  tre seedas hårt och kan inte bytas inne i lobbyn (sedan 2026-08-26
+     *  gäller det även single/multiplayer, inte bara 1v1).
+     *  '1v1' kan aldrig komma från en guest host (users-only). */
     lobbyType?: string;
     /** 'true' när lobbyn skapades via Re-match/Replay från Final Leaderboard.
      *  Spelaruppsättningen är då LÅST till exakt spelarna från förra spelet.
@@ -1236,12 +1235,16 @@ export default function LobbyScreen() {
   // på Home släpper bara in spelare som redan finns i lobbyn.
   // Host har fortfarande "Delete this Game Lobby" som utväg.
   const isRematchLobby = rematchLocked === 'true';
-  // 'single' / 'multiplayer' är de två andra lobbyType-värdena (2026-08-24):
-  // Single vs Multiplayer väljs numera redan på Home / Final Leaderboard i
-  // stället för via Game Mode-rutorna här inne. De läses av
-  // resolveSeedSinglePlayer (module-level ovan) och styr ENBART
-  // singlePlayerDefault-seeden — Game Mode-sektionen renderas som vanligt i
-  // båda fallen, så host kan fritt byta läge inne i lobbyn.
+  // 'single' / 'multiplayer' är de två andra lobbyType-värdena. Sedan
+  // 2026-08-26 LÅSER de lobbyn på samma sätt som '1v1' gör:
+  //   • 'single'      → statisk "Single player"-indikator, ingen Players-
+  //                     sektion, ingen "+ Add Guest", kapacitet 1 ruta,
+  //                     rundor som 2/4-val (max 4 oavsett premium).
+  //   • 'multiplayer' → bara Pass-the-Phone + Individual device i Game Mode.
+  // Vill host byta: radera lobbyn och välj på nytt via Start New Game.
+  // Se isSingleLobby (deklarerad vid singlePlayerDefault-state:n) — UI-
+  // gatingen sker på STATE, inte på paramet, så non-host får samma vy via
+  // settings-syncen.
 
   // Initial = tom; mount-useEffect på [code, guestMode, ..., hostMode] sätter
   // till [SEED_PLAYERS[0]] för host eller [] för non-host. SEED_PLAYERS som
@@ -1396,21 +1399,30 @@ export default function LobbyScreen() {
       // answerResponseSeconds är guest-VARIABEL sedan 2026-08-08 (30/45/60).
       getLobbySettings(roomCode).then((stored) => {
         if (cancelled) return;
-        // Renodlad 1vs1-lobby: mode forceras av Home-valet — stored/default
-        // ignoreras. Standard-lobby: stale 'remote-1v1' coercas till PtP
-        // (remote kan inte längre väljas inne i lobbyn).
-        setGameMode(
-          is1v1Lobby
-            ? 'remote-1v1'
-            : (stored?.gameMode ?? 'pass-the-phone') === 'remote-1v1'
-              ? 'pass-the-phone'
-              : stored?.gameMode ?? 'pass-the-phone',
-        );
         // 1v1: singlePlayerDefault MÅSTE vara false — alla remote-guards
         // (start-knapp-swap, handleStartGame, maxPlayers-effekten) är
         // gated på `gameMode === 'remote-1v1' && !singlePlayerDefault`.
-        // single/multiplayer: Home-valet vinner över carry-over.
-        setSinglePlayerDefault(resolveSeedSinglePlayer(lobbyType, stored?.singlePlayerDefault ?? false));
+        // single/multiplayer: Home-valet vinner över carry-over. Resolveras
+        // FÖRE gameMode nedan — en single-lobby forcerar PtP under huven.
+        const seedSinglePlayer = resolveSeedSinglePlayer(
+          lobbyType,
+          stored?.singlePlayerDefault ?? false,
+        );
+        // Renodlad 1vs1-lobby: mode forceras av Home-valet — stored/default
+        // ignoreras. Single-lobby: PtP under huven (solo behöver inget
+        // IndDev-maskineri — det skulle bara öppna en onödig quiz_sync-kanal).
+        // Standard-lobby: stale 'remote-1v1' coercas till PtP (remote kan
+        // inte längre väljas inne i lobbyn).
+        setGameMode(
+          is1v1Lobby
+            ? 'remote-1v1'
+            : seedSinglePlayer
+              ? 'pass-the-phone'
+              : (stored?.gameMode ?? 'pass-the-phone') === 'remote-1v1'
+                ? 'pass-the-phone'
+                : stored?.gameMode ?? 'pass-the-phone',
+        );
+        setSinglePlayerDefault(seedSinglePlayer);
         setMaxPlayers(is1v1Lobby ? 2 : 4);
         setRegion('Sweden');
         // Clampa mot utbudet {30, 45, 60} — defensivt mot oväntade värden
@@ -1433,7 +1445,8 @@ export default function LobbyScreen() {
         setSketchEnabled(false);
         // Spotify-carry: attesten re-verifieras av "Spotify not confirmed"-
         // guarden i handleStartGame — ingen egen koll behövs här.
-        setSpotifyEnabled(stored?.spotifyEnabled ?? false);
+        // Single: alltid av (Spotify-kortet göms — DJ kräver en motspelare).
+        setSpotifyEnabled(seedSinglePlayer ? false : stored?.spotifyEnabled ?? false);
         setEnabledHostPackages([]);
         setYoutubeEnabledCategories(defaultEnabledMainCategories());
         setImagesEnabledCategories(defaultEnabledMainCategories());
@@ -1451,16 +1464,32 @@ export default function LobbyScreen() {
           // forceras till remote-1v1 — stored/profil ignoreras. Standard-
           // lobby: stale 'remote-1v1' (t.ex. gammal profil-default från
           // innan Remote-rutan togs bort) coercas till Pass-the-Phone.
+          // 1v1: singlePlayerDefault MÅSTE vara false — alla remote-guards
+          // är gated på `gameMode === 'remote-1v1' && !singlePlayerDefault`.
+          // single/multiplayer: Home-valet vinner över carry-over. Profilen
+          // ingår MEDVETET INTE i fallback-kedjan sedan 2026-08-26 — Single
+          // väljs per spel på Home, så en stale sparad `true` får inte låsa
+          // en Multiplayer-lobby.
+          // Resolveras FÖRST — både seedGameMode och rounds-clampen nedan
+          // MÅSTE läsa samma värde, annars cappas lobbyn mot fel läge.
+          const seedSinglePlayer = resolveSeedSinglePlayer(
+            lobbyType,
+            stored?.singlePlayerDefault ?? false,
+          );
           const rawSeedGameMode =
             stored?.gameMode ??
             (profile?.spotifyDefaultEnabled ? 'individual-devices' : undefined) ??
             profile?.gameMode ??
             'pass-the-phone';
+          // Single-lobby: PtP under huven. Solo behöver inget IndDev-
+          // maskineri (onödig quiz_sync-kanal + skev maxPlayers-effekt).
           const seedGameMode: GameMode = is1v1Lobby
             ? 'remote-1v1'
-            : rawSeedGameMode === 'remote-1v1'
+            : seedSinglePlayer
               ? 'pass-the-phone'
-              : rawSeedGameMode;
+              : rawSeedGameMode === 'remote-1v1'
+                ? 'pass-the-phone'
+                : rawSeedGameMode;
           setGameMode(seedGameMode);
           // Clamp mot premium-status: profilen kan ha ett stale maxPlayers=12
           // från en tidigare session med aktiv prenumeration — utan denna
@@ -1473,15 +1502,6 @@ export default function LobbyScreen() {
             const rawMax = profile?.maxPlayers ?? 4;
             setMaxPlayers(!premium && rawMax > 4 ? 4 : rawMax === 2 ? 4 : (rawMax as 4 | 12));
           }
-          // 1v1: singlePlayerDefault MÅSTE vara false — alla remote-guards
-          // är gated på `gameMode === 'remote-1v1' && !singlePlayerDefault`.
-          // single/multiplayer: Home-valet vinner över carry-over + profil.
-          // Resolveras EN gång — rounds-clampen nedan MÅSTE läsa samma
-          // värde, annars cappas en "Single Game"-lobby mot fel läge.
-          const seedSinglePlayer = resolveSeedSinglePlayer(
-            lobbyType,
-            stored?.singlePlayerDefault ?? profile?.singlePlayerDefault ?? false,
-          );
           setSinglePlayerDefault(seedSinglePlayer);
           // V1: bara Sweden — eventuella stored/profile-värden som inte är
           // Sweden ignoreras (legacy från Nordics/Europe/Global-tiden).
@@ -1502,8 +1522,12 @@ export default function LobbyScreen() {
           // stepperMax-logiken (premium krävs för >4 i IndDev) speglas här
           // vid load så ett gammalt sparat värde från en premium-session
           // inte sätts > 4 när premium saknas.
-          const savedRounds =
-            stored?.roundsCount ?? profile?.roundsDefault ?? ROUNDS_DEFAULT;
+          // Single player får ALLTID 4 rundor i en fresh lobby (Peter
+          // 2026-08-26) — profilens Number of Rounds gäller enbart
+          // Multiplayer. Carry-over (Replay) vinner fortfarande.
+          const savedRounds = seedSinglePlayer
+            ? stored?.roundsCount ?? ROUNDS_DEFAULT
+            : stored?.roundsCount ?? profile?.roundsDefault ?? ROUNDS_DEFAULT;
           const isIndivPremium =
             premium && seedGameMode === 'individual-devices' && !seedSinglePlayer;
           const initialMax = isIndivPremium ? ROUNDS_MAX_INDIV : ROUNDS_MAX_PASS;
@@ -1529,8 +1553,9 @@ export default function LobbyScreen() {
                 : [],
             );
             setSketchEnabled(stored.sketchEnabled);
-            // 1v1: Spotify är aldrig tillgängligt (kortet göms) — forcera av.
-            setSpotifyEnabled(is1v1Lobby ? false : stored.spotifyEnabled);
+            // 1v1 + single: Spotify är aldrig tillgängligt (kortet göms i
+            // båda lobbytyperna) — forcera av så inget carry-over läcker in.
+            setSpotifyEnabled(is1v1Lobby || seedSinglePlayer ? false : stored.spotifyEnabled);
           } else if (premium) {
             setSelectedExtraPackages(enabledIds);
           }
@@ -1554,9 +1579,11 @@ export default function LobbyScreen() {
           setImagesEnabledCategories(seedImgCats);
           // Spotify default — prio: stored > profil. Sätts här så toggeln
           // är rätt seedat oavsett om Spotify-callbacken hinner före render.
-          // 1v1: alltid av (Spotify-kortet göms i renodlade 1vs1-lobbyn).
+          // 1v1 + single: alltid av (Spotify-kortet göms i båda).
           if (!stored) {
-            setSpotifyEnabled(is1v1Lobby ? false : profile?.spotifyDefaultEnabled ?? false);
+            setSpotifyEnabled(
+              is1v1Lobby || seedSinglePlayer ? false : profile?.spotifyDefaultEnabled ?? false,
+            );
           }
           // Remote 1v1: gemensam hjälpnivå. Carry-over (Play Again) vinner,
           // annars produktdefaulten Full — MEDVETET inte hostens personliga
@@ -1825,8 +1852,15 @@ export default function LobbyScreen() {
               // Prefer carry-over value if lobby_settings redan finns (Play Again
               // + Keep Settings skriver spotifyEnabled till nya rumkoden via
               // goToNewLobby). Faller tillbaka till profil-default för fresh lobbies.
-              const shouldEnable =
-                lobbySt?.spotifyEnabled ?? prof?.spotifyDefaultEnabled ?? false;
+              // Single player-lobby: Spotify-kortet är gömt, så profil-
+              // defaulten får inte läcka in här heller. Läser den
+              // auktoritativa stored-raden med lobbyType-paramet som
+              // fallback (settings-skrivningen är debounce:ad, så raden kan
+              // saknas i det första fönstret efter lobby-skapandet).
+              const isSingle = lobbySt?.singlePlayerDefault ?? lobbyType === 'single';
+              const shouldEnable = isSingle
+                ? false
+                : lobbySt?.spotifyEnabled ?? prof?.spotifyDefaultEnabled ?? false;
               setSpotifyEnabled(shouldEnable);
               setSpotifyAnswerYear(lobbySt?.spotifyAnswerYear ?? prof?.spotifyAnswerYear ?? true);
               setSpotifyAnswerName(lobbySt?.spotifyAnswerName ?? prof?.spotifyAnswerName ?? true);
@@ -2189,10 +2223,43 @@ export default function LobbyScreen() {
     ownPlayerIdRef.current ?? '',
     gameMode === 'individual-devices',
   );
-  // "Use single player mode as default" — när checkad dämpas Pass-the-Phone-
-  // rutan i toggle:n. Speglar Profile:s motsvarande checkbox; lokal lobby-
-  // state utan profil-pre-load (konsekvent med gameMode som också är lokal).
-  const [singlePlayerDefault, setSinglePlayerDefault] = useState(false);
+  // Single player-läget. Sätts EN gång av seed-effekten utifrån Home:s
+  // "Start New Game"-val (lobbyType-paramet) — det finns ingen setter kvar
+  // i UI:t sedan 2026-08-26, lobbytypen är låst vid skapandet.
+  //
+  // ⚠ SYNKRON seed ur paramet, inte `useState(false)`. Seed-effekten är
+  // async (getLobbySettings/loadProfile), så med `false` som initialvärde
+  // renderades multiplayer-vyn i ~1 s innan låset slog till: Players in
+  // Lobby visade 4 kapacitetsrutor som sedan kollapsade till 1, och Game
+  // Mode-sektionen hann visa PtP/IndDev-rutorna. Syntes tydligast vid
+  // Replay från Final Leaderboard (Peter 2026-08-26). Samma skäl som
+  // `rematchLocked` skickas som param vid sidan av rums-radens kolumn.
+  //
+  // Värdet är identiskt med vad resolveSeedSinglePlayer räknar fram för
+  // 'single' (paramet vinner ALLTID över fallback), så det kan inte
+  // divergera från den auktoritativa seeden. Övriga lobbyType-värden — och
+  // non-host, som aldrig har paramet — startar false och får sitt värde av
+  // seed-effekten respektive settings-syncen.
+  const [singlePlayerDefault, setSinglePlayerDefault] = useState(
+    () => lobbyType === 'single',
+  );
+  /** Lobbytypen är LÅST vid skapandet (Home → Start New Game).
+   *
+   *  Samma resolver som seed-effekten använder, men med LIVE STATE som
+   *  fallback — så värdet är per konstruktion identiskt med det seeden
+   *  räknar fram, och kan aldrig divergera från det.
+   *  • Host har alltid paramet → synkront rätt redan första framen.
+   *  • Non-host har det aldrig → faller på state:n, som settings-syncen
+   *    sätter (samma mönster som remote-1v1:s gating på gameMode-state).
+   *
+   *  ⚠ Att läsa paramet — inte bara state:n — är det som gör vyn immun mot
+   *  att Stack-navigatorn ÅTERANVÄNDER component-instansen över en
+   *  router.replace (då kör useState-initialiseraren inte om, och state
+   *  bär förra lobbyns värde tills den async seeden landar).
+   *
+   *  Deklareras direkt efter state:n så även effekter ovanför render
+   *  (dep-arrayer evalueras under render) kan läsa den utan TDZ. */
+  const isSingleLobby = resolveSeedSinglePlayer(lobbyType, singlePlayerDefault);
 
   // Max antal spelare per spel — 4 = Basic (gratis), 12 = Premium.
   // Lobby-local state; speglar Profile:s host-default-toggle.
@@ -2270,10 +2337,15 @@ export default function LobbyScreen() {
   // Premium → auto-välj Max 12 och lås (Max 4 utgråas).
   // Ej premium → tvinga tillbaka till Max 4.
   // Remote 1v1 → ALLTID 2 (host + 1 motståndare) oavsett premium.
+  // Single player → 4 (lägsta giltiga värdet; DB-CHECK tillåter bara
+  // 2/4/12). Utan grenen hade en premium-host skrivit max_players=12 till
+  // rums-raden för ett solospel. Kapacitetsmätaren visar ändå EN ruta.
   useEffect(() => {
     if (!hostMode) return;
-    setMaxPlayers(gameMode === 'remote-1v1' ? 2 : hasPremium ? 12 : 4);
-  }, [hostMode, hasPremium, gameMode]);
+    setMaxPlayers(
+      gameMode === 'remote-1v1' ? 2 : singlePlayerDefault ? 4 : hasPremium ? 12 : 4,
+    );
+  }, [hostMode, hasPremium, gameMode, singlePlayerDefault]);
 
   // Max rundor beror på spelläge: IndDev → 20, PtP/Single → 4.
   // Premium ger INTE fler rundor i PtP — premium-host i PtP hänvisas till
@@ -3071,44 +3143,9 @@ export default function LobbyScreen() {
     setSpotifyEnabled(false);
   };
 
-  // Single player-val: ejecta ev. non-host-spelare (de kan inte vara med i
-  // single-player). Samma logik som tidigare singlePlayerDefault-checkbox ON.
-  const handleSelectSingle = () => {
-    if (singlePlayerDefault) return;
-    const ejectables = players.filter((p) => !p.isHost && !p.hasLeft);
-    if (ejectables.length === 0) {
-      setSinglePlayerDefault(true);
-      setSpotifyEnabled(false);
-      return;
-    }
-    Alert.alert(
-      'Switch to single-player mode?',
-      'Play single player mode will delete players in lobby. Still want to play single player?',
-      [
-        { text: 'No', style: 'cancel' },
-        {
-          text: 'Yes',
-          style: 'destructive',
-          onPress: () => {
-            ejectables.forEach((p) => {
-              markEjected(roomCode, p.id);
-              supabase
-                .from('lobby_players')
-                .delete()
-                .eq('room_code', roomCode)
-                .eq('player_id', p.id)
-                .then(({ error }) => {
-                  if (error) console.warn('[lobbyPlayers] single-player eject failed:', error.message);
-                });
-            });
-            setPlayers((prev) => prev.filter((p) => p.isHost));
-            setSinglePlayerDefault(true);
-            setSpotifyEnabled(false);
-          },
-        },
-      ],
-    );
-  };
+  // handleSelectSingle är BORTTAGEN 2026-08-26 — Single player väljs numera
+  // via "Start New Game" på Home (lobbyType-paramet) och är låst för lobbyns
+  // livstid. Det finns ingen väg till single-läget inifrån lobbyn.
 
   // Players-val: Max 4 (gratis) / Max 12 (Premium).
   // Max 12 kräver IndDev-läge (PtP/Single → info-alert) OCH Premium
@@ -3144,24 +3181,20 @@ export default function LobbyScreen() {
   // FREE-badge grön när aktiv, grå när inaktiv. disabled för non-host.
   // redIndiv: om true färgas "Individual device"-rutan röd när inaktiv (används
   // bara i Number of Rounds quick-select, INTE i Game Settings/Game Mode).
-  const renderModeBox = (key: 'single' | 'ptp' | 'remote' | 'indiv', label: string, smallText?: boolean, redIndiv?: boolean) => {
+  const renderModeBox = (key: 'ptp' | 'remote' | 'indiv', label: string, smallText?: boolean, redIndiv?: boolean) => {
     const isActive =
-      key === 'single'
-        ? singlePlayerDefault
-        : key === 'ptp'
-          ? !singlePlayerDefault && gameMode === 'pass-the-phone'
-          : key === 'remote'
-            ? !singlePlayerDefault && gameMode === 'remote-1v1'
-            : !singlePlayerDefault && gameMode === 'individual-devices';
+      key === 'ptp'
+        ? !singlePlayerDefault && gameMode === 'pass-the-phone'
+        : key === 'remote'
+          ? !singlePlayerDefault && gameMode === 'remote-1v1'
+          : !singlePlayerDefault && gameMode === 'individual-devices';
     return (
       <TouchableOpacity
         style={[styles.modeOption, isActive ? styles.modeOptionPassActive : styles.modeOptionInactive]}
         onPress={() =>
-          key === 'single'
-            ? handleSelectSingle()
-            : handleSelectMode(
-                key === 'ptp' ? 'pass-the-phone' : key === 'remote' ? 'remote-1v1' : 'individual-devices',
-              )
+          handleSelectMode(
+            key === 'ptp' ? 'pass-the-phone' : key === 'remote' ? 'remote-1v1' : 'individual-devices',
+          )
         }
         disabled={!hostMode}
         activeOpacity={0.7}
@@ -3460,37 +3493,13 @@ export default function LobbyScreen() {
       );
       return;
     }
-    // Single player: lobbyn har per definition ingen plats för fler spelare.
-    // Att tyst öppna formuläret gav en lobby med två kort men ett spel som
-    // ändå startade som single player (Peter 2026-08-24) — fråga i stället
-    // vilket multiplayer-läge host vill byta till. Cancel lämnar allt orört.
-    if (singlePlayerDefault) {
+    // Single player: lobbyn är låst till EN spelare sedan 2026-08-26 — läget
+    // väljs via "Start New Game" på Home och kan inte bytas härifrån. Knappen
+    // renderas inte i single-lobbyn, så detta är bara ett skyddsnät.
+    if (isSingleLobby) {
       Alert.alert(
-        'Change to Multiplayer mode?',
-        'Adding a player requires a multiplayer mode. Which one do you want to play?',
-        [
-          { text: 'Cancel', style: 'cancel' },
-          {
-            // Individual device tar bort möjligheten att lägga till spelare
-            // manuellt (varje spelare behöver en egen enhet), så vi byter
-            // läge och förklarar vägen in i stället för att öppna formuläret.
-            text: 'Individual device',
-            onPress: () => {
-              handleSelectMode('individual-devices');
-              Alert.alert(
-                'Individual device',
-                "Game mode changed. Players can't be added manually in this mode — every player needs their own device. Share the room code and let them join from it.",
-              );
-            },
-          },
-          {
-            text: 'Pass-the-Phone',
-            onPress: () => {
-              handleSelectMode('pass-the-phone');
-              setTimeout(() => setAddModalVisible(true), ALERT_TO_MODAL_DELAY_MS);
-            },
-          },
-        ],
+        'Single player lobby',
+        'This lobby is locked to one player. Start a Multiplayer Game from Home to play with others.',
       );
       return;
     }
@@ -5939,12 +5948,17 @@ export default function LobbyScreen() {
                 // 4 rutor i bredd → 4 spelare = 1 rad, 12 spelare = 3 rader
                 // (ruta 5 hamnar under ruta 1, ruta 6 under ruta 2 osv.).
                 const COLS = 4;
+                // Single player: EN ruta. maxPlayers står kvar på 4 i state
+                // (DB-CHECK tillåter bara 2/4/12) — taket 1 är rent visuellt.
+                const capacity = isSingleLobby ? 1 : maxPlayers;
                 const renderBox = (i: number) => {
                   const isFilled = i < approvedCount;
                   const isBlinking = !isFilled && i < approvedCount + waitingCount;
                   // Sista rutan får "max N"-stacken — utom i 1vs1-lobbyn där
-                  // taket alltid är 2 och rutan bara visar siffran "2".
-                  const isLast = i === maxPlayers - 1 && gameMode !== 'remote-1v1';
+                  // taket alltid är 2 och rutan bara visar siffran "2", och i
+                  // single-lobbyn där "max 1" bara är brus.
+                  const isLast =
+                    i === capacity - 1 && gameMode !== 'remote-1v1' && !isSingleLobby;
                   const boxStyle = [
                     styles.approvedBox,
                     (isFilled || isBlinking) && styles.approvedBoxFilled,
@@ -5953,7 +5967,7 @@ export default function LobbyScreen() {
                   const content = isLast ? (
                     <View style={styles.approvedBoxMaxStack}>
                       <Text style={styles.approvedBoxMaxLabel} numberOfLines={1}>max</Text>
-                      <Text style={styles.approvedBoxMaxNum} numberOfLines={1}>{maxPlayers}</Text>
+                      <Text style={styles.approvedBoxMaxNum} numberOfLines={1}>{capacity}</Text>
                     </View>
                   ) : (
                     <Text
@@ -5973,14 +5987,14 @@ export default function LobbyScreen() {
                     </ApprovedBox>
                   );
                 };
-                const rowCount = Math.ceil(maxPlayers / COLS);
+                const rowCount = Math.ceil(capacity / COLS);
                 return Array.from({ length: rowCount }).map((_, r) => (
                   <View key={r} style={styles.approvedBoxesGridRow}>
                     {Array.from({ length: COLS }).map((_, c) => {
                       const i = r * COLS + c;
                       // Osynlig spacer på ev. ofull sista rad så kolumnerna
-                      // linjerar (maxPlayers=4/12 = alltid full, men robust).
-                      return i < maxPlayers ? renderBox(i) : (
+                      // linjerar (4/12 = alltid full, single = 1 + 3 spacers).
+                      return i < capacity ? renderBox(i) : (
                         <View key={`sp-${c}`} style={styles.approvedBoxSpacer} />
                       );
                     })}
@@ -5988,14 +6002,17 @@ export default function LobbyScreen() {
                 ));
               })()}
             </View>
-            {hostMode && gameMode === 'pass-the-phone' && !isRematchLobby && (
+            {hostMode && gameMode === 'pass-the-phone' && !isRematchLobby && !isSingleLobby && (
               <TouchableOpacity style={styles.addBtn} onPress={handleOpenAddPlayer}>
                 <Text style={styles.addBtnText}>+ Add Guest</Text>
               </TouchableOpacity>
             )}
           </View>
 
-          {gameMode === 'pass-the-phone' && approvedPlayers.length > 0 && (
+          {/* Turordnings-hinten är meningslös i single player-lobbyn — det
+              finns en enda spelare och ingen ordning att ändra. (Lobbyn kör
+              PtP under huven, så gameMode-checken ensam räcker inte.) */}
+          {gameMode === 'pass-the-phone' && !isSingleLobby && approvedPlayers.length > 0 && (
             <Text style={styles.turnOrderHint}>
               {hostMode
                 ? 'Turn order — top plays first. Use ↑↓ to reorder.'
@@ -6021,7 +6038,13 @@ export default function LobbyScreen() {
                 isHostPlayer={player.isHost}
                 isGuest={player.type === 'guest'}
                 accountPlayerName={player.accountPlayerName}
-                turnNumber={gameMode === 'pass-the-phone' ? index + 1 : undefined}
+                turnNumber={
+                  // Turnummer bara i PtP-MULTIPLAYER. Single kör PtP under
+                  // huven, så gameMode-checken ensam räcker inte — en "1" på
+                  // enda spelarens kort är brus (samma skäl som att
+                  // turordnings-hinten ovan döljs).
+                  gameMode === 'pass-the-phone' && !isSingleLobby ? index + 1 : undefined
+                }
                 showApproveToggle={hostMode && !isRematchLobby && !player.isHost && !player.hasLeft}
                 approved={true}
                 onApproveChange={(next) => handleSetApproved(player.id, next)}
@@ -6035,7 +6058,7 @@ export default function LobbyScreen() {
                     : undefined
                 }
                 spotifyConnected={player.spotifyConnected}
-                showSpotifyBadge={gameMode !== 'remote-1v1'}
+                showSpotifyBadge={gameMode !== 'remote-1v1' && !isSingleLobby}
               />
             ))}
 
@@ -6095,7 +6118,7 @@ export default function LobbyScreen() {
                         : undefined
                     }
                     spotifyConnected={player.spotifyConnected}
-                    showSpotifyBadge={gameMode !== 'remote-1v1'}
+                    showSpotifyBadge={gameMode !== 'remote-1v1' && !isSingleLobby}
                   />
                 ))}
               </View>
@@ -6293,6 +6316,31 @@ export default function LobbyScreen() {
               to play with others.
             </Text>
           </View>
+        ) : isSingleLobby ? (
+          /* Single player-lobby (Peter 2026-08-26): läget väljs på Home via
+             "Start New Game" → Single Game och är LÅST för lobbyns livstid.
+             Därför inga Game Mode-val och ingen Players-sektion — statisk
+             indikator i samma vokabulär som 1vs1- och re-match-lobbyn ovan.
+             Vill host spela multiplayer: radera lobbyn och välj Multiplayer
+             Game på Home. Allt annat (rundor, era, Mixerboard) är kvar. */
+          <View style={[styles.section, { marginTop: Spacing.xs }]}>
+            <Text style={styles.sectionLabel}>Game Mode</Text>
+            <View style={[styles.modeRow, { marginTop: Spacing.sm }]}>
+              <View style={[styles.modeOption, styles.modeOptionPassActive]}>
+                <Text style={[styles.modeLabel, { textAlign: 'center' }, styles.modeLabelActiveFree]}>
+                  Single player — 1 player
+                </Text>
+                <View style={styles.freeBadge} pointerEvents="none">
+                  <Text style={styles.freeBadgeText}>FREE</Text>
+                </View>
+              </View>
+              <View style={{ flex: 1 }} />
+            </View>
+            <Text style={styles.guestHostNote}>
+              Multiplayer and Remote games are started from Start New Game on
+              Home.
+            </Text>
+          </View>
         ) : (
         <View style={[styles.section, { marginTop: Spacing.xs }]}>
           {/* Non-host: skriv "GAME MODE - MULTIPLAYER" inline istället för
@@ -6303,37 +6351,20 @@ export default function LobbyScreen() {
             Game Mode
           </Text>
 
-          {/* Tre rutor i EN rad + bracket-etiketter undertill. Layouten
-              splittades tillfälligt i två rader när Remote (1vs1) låg här;
-              återställd 2026-08-12 när Remote flyttades till Home-valet. */}
+          {/* Två rutor i EN rad + bracket-etikett undertill. Single player
+              och Remote (1vs1) väljs på Home via "Start New Game" och
+              renderas därför inte här — den här grenen är multiplayer-only
+              sedan 2026-08-26. ⚠ Flex-talen på bracket-raden MÅSTE spegla
+              antalet rutor ovanför; det är just den kopplingen som gick
+              sönder när Remote-rutan lades till/togs bort. */}
           <View style={[styles.modeRow, { marginTop: Spacing.sm }]}>
-            {renderModeBox('single', 'Single player', true)}
             {renderModeBox('ptp', 'Pass-the-Phone', true)}
             {renderModeBox('indiv', 'Individual device', true)}
           </View>
           <View style={{ flexDirection: 'row', gap: Spacing.sm, marginTop: 2 }}>
-            {/* Bracket under "Single player" */}
-            <View style={{ flex: 1, alignItems: 'center' }}>
-              <View style={styles.multiplayerBracket} />
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 6 }}>
-                <Text style={styles.multiplayerBracketLabel}>Single mode</Text>
-                <Pressable
-                  style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                  onPress={() =>
-                    Alert.alert(
-                      'Single player mode',
-                      'One player only — challenge yourself.\n\nMax 4 rounds, even with a Premium subscription. Spotify not applicable for Single player mode.',
-                    )
-                  }
-                  hitSlop={8}
-                >
-                  <Text style={styles.infoIconText}>i</Text>
-                </Pressable>
-              </View>
-            </View>
             {/* Bracket under "Pass-the-Phone" + "Individual device" —
-                flex:2 så den spänner över båda rutorna. */}
-            <View style={{ flex: 2, alignItems: 'center' }}>
+                flex:1 så den spänner över hela raden (båda rutorna). */}
+            <View style={{ flex: 1, alignItems: 'center' }}>
               <View style={styles.multiplayerBracket} />
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 6 }}>
                 <Text style={styles.multiplayerBracketLabel}>Multiplayer</Text>
@@ -6342,7 +6373,7 @@ export default function LobbyScreen() {
                   onPress={() =>
                     Alert.alert(
                       'Multiplayer mode',
-                      'Pass-the-Phone: All players share one device. Max 4 players, even with Premium. Spotify not applicable for PtP mode.\n\nIndividual device: Each player uses their own device. Max 4 players on Basic, max 12 players with Premium.\n\nLooking for 1vs1? Remote duels are started from the Home screen — tap Start New Game and pick "Remote Play".',
+                      'Pass-the-Phone: All players share one device. Max 4 players, even with Premium. Spotify not applicable for PtP mode.\n\nIndividual device: Each player uses their own device. Max 4 players on Basic, max 12 players with Premium.\n\nLooking for Single player or 1vs1? Both are started from the Home screen — tap Start New Game and pick "Single Game" or "Remote Play".',
                     )
                   }
                   hitSlop={8}
@@ -6466,12 +6497,17 @@ export default function LobbyScreen() {
           <Text style={styles.sectionLabel}>SOURCE MIXERBOARD</Text>
           <View style={styles.connectionsList}>
             {/* ── Spotify DJ-läge ─────────────────────────────────────────
-                Synlig i alla lägen UTOM renodlade 1vs1-lobbyn (Spotify är
-                aldrig tillämpligt i asynkrona dueller — kortet göms helt,
-                inkl. attest-raden). Availability-pillen visar om Spotify DJ
-                stöds i aktuellt game mode (IndDev = grön "Enabled",
-                PtP/Single = grå "Disabled" + toggle utgråad). */}
-            {gameMode !== 'remote-1v1' && (
+                Göms HELT (inkl. attest-raden) i två lobbytyper där Spotify
+                aldrig kan bli tillämpligt:
+                  • renodlade 1vs1-lobbyn (asynkron duell)
+                  • single player-lobbyn (Spotify DJ kräver minst en
+                    motspelare — se handleStartGame:s DJ-guard)
+                Båda är LÅSTA vid skapandet, så läget kan inte bytas till ett
+                där Spotify blir relevant. I en multiplayer-lobby visas kortet
+                alltid; availability-pillen säger om DJ stöds i aktuellt läge
+                (IndDev = grön "Enabled", PtP = grå "Disabled" + toggle
+                utgråad) eftersom host fritt kan byta mellan dem. */}
+            {gameMode !== 'remote-1v1' && !isSingleLobby && (
             <View style={{ backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: Radius.sm, marginBottom: Spacing.xs, paddingBottom: spotifyEnabled ? 6 : 0 }}>
             {/* Attest-kontroll ("I have Spotify app..." + switch) — egen rad
                 ÖVERST i boxen, ovanför ikon/rubrik-raden, synlig i BÅDA
@@ -7323,9 +7359,11 @@ export default function LobbyScreen() {
               {/* Siffran ramas in i samma blå-bordred ruta för både host och
                   non-host. Host får -/+ knappar på sidorna och RoundsRuler
                   under för att stega och se intervallet.
-                  Guest host: ENDAST två val-rutor (2/4) — stepper, ruler och
-                  game-mode quick-select renderas inte alls. */}
-              {isGuestHost ? (
+                  Guest host OCH single player-lobby: ENDAST två val-rutor
+                  (2/4) — stepper, ruler och game-mode quick-select renderas
+                  inte alls. Single är cappad på 4 rundor oavsett premium
+                  (roundsMax), så stepper + ruler vore bara brus. */}
+              {isGuestHost || isSingleLobby ? (
                 <>
                   <View style={[styles.modeRow, { marginTop: Spacing.sm }]}>
                     {([2, 4] as const).map((n) => {
@@ -7354,7 +7392,9 @@ export default function LobbyScreen() {
                     })}
                   </View>
                   <Text style={styles.guestHostNote}>
-                    Upto 20 rounds option for registered Quizvibe users with Premium
+                    {isSingleLobby
+                      ? 'Max 4 rounds in Single player mode'
+                      : 'Upto 20 rounds option for registered Quizvibe users with Premium'}
                   </Text>
                 </>
               ) : hostMode ? (
@@ -7443,7 +7483,6 @@ export default function LobbyScreen() {
                   {gameMode !== 'remote-1v1' && !isRematchLobby && (
                     <>
                       <View style={[styles.modeRow, { marginTop: Spacing.lg }]}>
-                        {renderModeBox('single', 'Single player', true)}
                         {renderModeBox('ptp', 'Pass-the-Phone', true)}
                         {renderModeBox('indiv', 'Individual device', true, true)}
                       </View>

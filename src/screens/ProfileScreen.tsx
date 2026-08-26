@@ -289,9 +289,11 @@ export default function ProfileScreen() {
   // Default game mode (host-default) — 'pass-the-phone' (gratis) eller
   // 'individual-devices' (Premium).
   const [gameMode, setGameMode] = useState<GameMode>('pass-the-phone');
-  // "Use single player mode as default" — när checkad låses host-default till
-  // Individual Devices och Pass-the-Phone-rutan visas dämpad/grå i toggle:n.
-  const [singlePlayerDefault, setSinglePlayerDefault] = useState(false);
+  // Single player är BORTTAGET som host-default 2026-08-26 — läget väljs per
+  // spel via "Start New Game" på Home, inte i profilen. ProfileData-fältet
+  // `singlePlayerDefault` finns kvar (DB-kolumn + Lobby:s carry-over läser
+  // den) men skrivs härifrån alltid som false; se stale-coercen i load-
+  // effekten och den explicita false-skrivningen i handleSave.
   // Premium-status — styr om PREMIUM-badge på Max 12-toggle visas i guld
   // (köpt) eller grått (inte köpt än), om Individual Devices är unlocked,
   // om Rounds-rulern visar gold-bracket + blå-tickade siffror, och om
@@ -311,11 +313,10 @@ export default function ProfileScreen() {
   // ner om det skulle hamna utanför nya max:t.
   const [roundsCount, setRoundsCount] = useState<number>(ROUNDS_DEFAULT);
   // 20 rundor kräver Premium OCH Individual Devices — speglar Lobby-logiken
-  // exakt. PtP och Single Player är alltid max 4 oavsett subscription.
+  // exakt. PtP är alltid max 4 oavsett subscription. (Single player hanteras
+  // inte här alls — det är ett per-spel-val på Home och alltid max 4.)
   const roundsMax =
-    hasPremium && gameMode === 'individual-devices' && !singlePlayerDefault
-      ? ROUNDS_MAX_INDIV
-      : ROUNDS_MAX_PASS;
+    hasPremium && gameMode === 'individual-devices' ? ROUNDS_MAX_INDIV : ROUNDS_MAX_PASS;
   // Ej premium → klampas alltid till Max 4. Effekten körs både när hasPremium
   // ändras (t.ex. sub löper ut) OCH när maxPlayers sätts till 12 från sparad
   // profil (race-safe: efffekten fyrar vid maxPlayers-ändringen → sätter 4 →
@@ -324,7 +325,7 @@ export default function ProfileScreen() {
     if (!hasPremium && maxPlayers > 4) setMaxPlayers(4);
   }, [hasPremium, maxPlayers]);
   const handleSelectMaxPlayers = (n: 4 | 12) => {
-    if (n === 12 && (singlePlayerDefault || gameMode !== 'individual-devices')) {
+    if (n === 12 && gameMode !== 'individual-devices') {
       Alert.alert(
         'Individual device required',
         'Please activate Individual device mode to be able to select Max 12 players.',
@@ -355,7 +356,7 @@ export default function ProfileScreen() {
   };
   const handleIncrementRounds = () => {
     if (roundsCount >= roundsMax) {
-      if (singlePlayerDefault || gameMode === 'pass-the-phone' || gameMode === 'remote-1v1') {
+      if (gameMode === 'pass-the-phone' || gameMode === 'remote-1v1') {
         Alert.alert('More rounds not available', 'More than 4 rounds is only available with both Individual device and Premium activated.');
       }
       return;
@@ -377,15 +378,10 @@ export default function ProfileScreen() {
     }
   }, [roundsCount, roundsMax]);
 
-  // Tre fria game mode-val (host-default). Inget premium-gate på lägesvalet —
-  // subscription gatar caps (rundor/spelare) separat. Single player sätter
-  // bara flaggan (inga lobby-spelare att eject:a i Profile-vyn).
-  const handleSelectSingle = () => {
-    setSinglePlayerDefault(true);
-    setMaxPlayers(4);
-  };
+  // Två fria multiplayer-val (host-default). Inget premium-gate på lägesvalet
+  // — subscription gatar caps (rundor/spelare) separat. Single player och
+  // Remote 1vs1 väljs per spel på Home, inte här.
   const handleSelectGameMode = (mode: GameMode) => {
-    setSinglePlayerDefault(false);
     setGameMode(mode);
     if (mode !== 'individual-devices') {
       setMaxPlayers(4);
@@ -397,15 +393,13 @@ export default function ProfileScreen() {
   // FREE-badge grön när aktiv, grå när inaktiv. Speglar Lobby.
   // redIndiv: om true färgas "Individual device"-rutan röd när inaktiv (används
   // bara i Number of Rounds quick-select, INTE i Game Settings/Game Mode).
-  const renderModeBox = (key: 'single' | 'ptp' | 'remote' | 'indiv', label: string, smallText?: boolean, redIndiv?: boolean) => {
+  const renderModeBox = (key: 'ptp' | 'remote' | 'indiv', label: string, smallText?: boolean, redIndiv?: boolean) => {
     const isActive =
-      key === 'single'
-        ? singlePlayerDefault
-        : key === 'ptp'
-          ? !singlePlayerDefault && gameMode === 'pass-the-phone'
-          : key === 'remote'
-            ? !singlePlayerDefault && gameMode === 'remote-1v1'
-            : !singlePlayerDefault && gameMode === 'individual-devices';
+      key === 'ptp'
+        ? gameMode === 'pass-the-phone'
+        : key === 'remote'
+          ? gameMode === 'remote-1v1'
+          : gameMode === 'individual-devices';
     return (
       <Pressable
         style={({ pressed }) => [
@@ -414,11 +408,9 @@ export default function ProfileScreen() {
           pressed && { opacity: 0.7 },
         ]}
         onPress={() =>
-          key === 'single'
-            ? handleSelectSingle()
-            : handleSelectGameMode(
-                key === 'ptp' ? 'pass-the-phone' : key === 'remote' ? 'remote-1v1' : 'individual-devices',
-              )
+          handleSelectGameMode(
+            key === 'ptp' ? 'pass-the-phone' : key === 'remote' ? 'remote-1v1' : 'individual-devices',
+          )
         }
       >
         <Text
@@ -799,7 +791,10 @@ export default function ProfileScreen() {
           gameEraTo: data.gameEraTo ?? _defaultEraTo,
           maxPlayers: data.maxPlayers ?? 4,
           gameMode: data.gameMode ?? 'pass-the-phone',
-          singlePlayerDefault: data.singlePlayerDefault ?? false,
+          // Stale-coerce: Single player togs bort som host-default
+          // 2026-08-26. Ett gammalt sparat `true` skulle annars smyga in i
+          // Lobby:s seed-fallback och låsa en Multiplayer-lobby.
+          singlePlayerDefault: false,
           roundsDefault: data.roundsDefault ?? ROUNDS_DEFAULT,
           answerResponseSeconds: data.answerResponseSeconds ?? 30,
           // Default — alla köpta paket aktiverade så nyköpta dyker upp i
@@ -838,7 +833,7 @@ export default function ProfileScreen() {
           data.gameEraTo == null ||
           data.maxPlayers == null ||
           data.gameMode == null ||
-          data.singlePlayerDefault == null ||
+          data.singlePlayerDefault !== false ||
           data.roundsDefault == null ||
           data.answerResponseSeconds == null ||
           packagesChanged ||
@@ -878,7 +873,6 @@ export default function ProfileScreen() {
             ? 'pass-the-phone'
             : augmented.gameMode ?? 'pass-the-phone';
         setGameMode(loadedGameMode);
-        setSinglePlayerDefault(augmented.singlePlayerDefault ?? false);
         // Clamp så ett gammalt värde > nuvarande max (t.ex. om host har 12
         // rundor sparat från Individual Devices + Premium men nu saknar Premium)
         // inte hamnar utanför range:n. initialMax tar hänsyn till BÅDE läge OCH
@@ -887,8 +881,7 @@ export default function ProfileScreen() {
         const savedRounds = augmented.roundsDefault ?? ROUNDS_DEFAULT;
         const isIndivPremium =
           hasPremium &&
-          (augmented.gameMode ?? 'pass-the-phone') === 'individual-devices' &&
-          !(augmented.singlePlayerDefault ?? false);
+          (augmented.gameMode ?? 'pass-the-phone') === 'individual-devices';
         const initialMax = isIndivPremium ? ROUNDS_MAX_INDIV : ROUNDS_MAX_PASS;
         setRoundsCount(Math.max(ROUNDS_MIN, Math.min(initialMax, savedRounds)));
         setEnabledHostPackages(augmented.enabledHostPackages ?? PURCHASED_PACKAGES.map((p) => p.id));
@@ -906,7 +899,6 @@ export default function ProfileScreen() {
           gameEraFrom: augmented.gameEraFrom ?? 1981,
           gameEraTo: augmented.gameEraTo ?? ERA_MAX,
           gameMode: loadedGameMode,
-          singlePlayerDefault: augmented.singlePlayerDefault ?? false,
           maxPlayers: augmented.maxPlayers ?? 4,
           roundsCount: Math.max(ROUNDS_MIN, Math.min(
             // Bara IndDev får 20-cappen — PtP OCH Remote 1v1 är max 4.
@@ -984,8 +976,8 @@ export default function ProfileScreen() {
 
   const handleSave = async (section: 'defaults' | 'host' | 'packages') => {
     // Spotify DJ kräver Individual Devices-läge — blockera om Spotify är på
-    // men mode-valet inte är IndDev (PtP, Single Player eller IndDev off).
-    if (spotifyEnabled && (gameMode !== 'individual-devices' || singlePlayerDefault)) {
+    // men mode-valet inte är IndDev.
+    if (spotifyEnabled && gameMode !== 'individual-devices') {
       Alert.alert(
         'Spotify requires Individual Devices',
         'Spotify DJ mode is only available in Individual Devices mode. Please change the Game Mode or turn off Spotify.',
@@ -1010,7 +1002,10 @@ export default function ProfileScreen() {
         gameEraTo: eraValues[1],
         maxPlayers,
         gameMode,
-        singlePlayerDefault,
+        // Explicit false — Single player är inte längre en host-default, och
+        // utan skrivningen ligger ett stale `true` kvar i loadProfile:s
+        // cache-merge (profileStorage.ts).
+        singlePlayerDefault: false,
         roundsDefault: roundsCount,
         enabledHostPackages,
         youtubeEnabledCategories,
@@ -1023,7 +1018,7 @@ export default function ProfileScreen() {
       savedSnapshotRef.current = JSON.stringify({
         birthYear, assistance,
         gameEraFrom: eraValues[0], gameEraTo: eraValues[1],
-        gameMode, singlePlayerDefault, maxPlayers, roundsCount,
+        gameMode, maxPlayers, roundsCount,
         answerResponseSeconds, youtubeEnabledCategories,
         imagesEnabledCategories, enabledHostPackages,
       });
@@ -1039,7 +1034,7 @@ export default function ProfileScreen() {
     const current = JSON.stringify({
       birthYear, assistance,
       gameEraFrom: eraValues[0], gameEraTo: eraValues[1],
-      gameMode, singlePlayerDefault, maxPlayers, roundsCount,
+      gameMode, maxPlayers, roundsCount,
       answerResponseSeconds, youtubeEnabledCategories,
       imagesEnabledCategories, enabledHostPackages,
     });
@@ -1479,38 +1474,19 @@ export default function ProfileScreen() {
               (premium-läge). Försök att välja Individual Devices utan
               Premium triggar Store-omdirigering. */}
           <View style={styles.field}>
-            <Text style={styles.sectionLabel}>Game Mode</Text>
-            {/* Tre rutor i EN rad + bracket-etiketter undertill — speglar
-                Lobby. Layouten splittades tillfälligt i två rader när Remote
-                (1vs1) låg här; återställd 2026-08-12. */}
+            <Text style={styles.sectionLabel}>Multiplayer Game Mode</Text>
+            {/* Två rutor i EN rad + bracket-etikett undertill — speglar Lobby.
+                Single player och Remote (1vs1) är INTE host-defaults: de väljs
+                per spel via "Start New Game" på Home (2026-08-26). ⚠ Flex-talet
+                på bracket-raden MÅSTE spegla antalet rutor ovanför. */}
             <View style={[styles.modeRow, { marginTop: Spacing.sm }]}>
-              {renderModeBox('single', 'Single player', true)}
               {renderModeBox('ptp', 'Pass-the-Phone', true)}
               {renderModeBox('indiv', 'Individual device', true)}
             </View>
             <View style={{ flexDirection: 'row', gap: Spacing.sm, marginTop: 2 }}>
-              {/* Bracket under "Single player" */}
-              <View style={{ flex: 1, alignItems: 'center' }}>
-                <View style={styles.multiplayerBracket} />
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 6 }}>
-                  <Text style={styles.multiplayerBracketLabel}>Single mode</Text>
-                  <Pressable
-                    style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                    onPress={() =>
-                      Alert.alert(
-                        'Single player mode',
-                        'One player only — challenge yourself.\n\nMax 4 rounds, even with a Premium subscription. Spotify not applicable for Single player mode.',
-                      )
-                    }
-                    hitSlop={8}
-                  >
-                    <Text style={styles.infoIconText}>i</Text>
-                  </Pressable>
-                </View>
-              </View>
               {/* Bracket under "Pass-the-Phone" + "Individual device" —
-                  flex:2 så den spänner över båda rutorna. */}
-              <View style={{ flex: 2, alignItems: 'center' }}>
+                  flex:1 så den spänner över hela raden (båda rutorna). */}
+              <View style={{ flex: 1, alignItems: 'center' }}>
                 <View style={styles.multiplayerBracket} />
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 6 }}>
                   <Text style={styles.multiplayerBracketLabel}>Multiplayer</Text>
@@ -1519,7 +1495,7 @@ export default function ProfileScreen() {
                     onPress={() =>
                       Alert.alert(
                         'Multiplayer mode',
-                        'Pass-the-Phone: All players share one device. Max 4 players, even with Premium. Spotify not applicable for PtP mode.\n\nIndividual device: Each player uses their own device. Max 4 players on Basic, max 12 players with Premium.\n\nLooking for 1vs1? Remote duels are started from the Home screen — tap Start New Game and pick "Remote Play".',
+                        'This is your default for Multiplayer games.\n\nPass-the-Phone: All players share one device. Max 4 players, even with Premium. Spotify not applicable for PtP mode.\n\nIndividual device: Each player uses their own device. Max 4 players on Basic, max 12 players with Premium.\n\nSingle player and Remote 1vs1 are picked per game on the Home screen — tap Start New Game and choose "Single Game" or "Remote Play".',
                       )
                     }
                     hitSlop={8}
@@ -1552,10 +1528,10 @@ export default function ProfileScreen() {
                   styles.modeOption,
                   maxPlayers === 4 ? styles.modeOptionPassActive : styles.modeOptionInactive,
                   pressed && { opacity: 0.7 },
-                  hasPremium && gameMode === 'individual-devices' && !singlePlayerDefault && { opacity: 0.45 },
+                  hasPremium && gameMode === 'individual-devices' && { opacity: 0.45 },
                 ]}
                 onPress={() => handleSelectMaxPlayers(4)}
-                disabled={hasPremium && gameMode === 'individual-devices' && !singlePlayerDefault}
+                disabled={hasPremium && gameMode === 'individual-devices'}
               >
                 <Text style={[styles.modeLabel, { textAlign: 'center' }, maxPlayers === 4 && styles.modeLabelActiveFree]}>
                   Max 4 players
@@ -2000,16 +1976,18 @@ export default function ProfileScreen() {
                   ],
                 )}
                 hasSubscription={hasPremium}
-                indivActive={!singlePlayerDefault && gameMode === 'individual-devices'}
+                indivActive={gameMode === 'individual-devices'}
               />
             </View>
+            <Text style={styles.roundsScopeNote}>
+              Applies to Multiplayer games. Single player is always 4 rounds.
+            </Text>
           </View>
 
           {/* Game mode quick-select — under RoundsRuler för snabb mode-byte.
-              EN rad med tre rutor, som huvud-Game Mode-sektionen. */}
+              EN rad med två rutor, som huvud-Game Mode-sektionen. */}
           <View style={styles.field}>
             <View style={styles.modeRow}>
-              {renderModeBox('single', 'Single player', true)}
               {renderModeBox('ptp', 'Pass-the-Phone', true)}
               {renderModeBox('indiv', 'Individual device', true, true)}
             </View>
@@ -4324,6 +4302,15 @@ const styles = StyleSheet.create({
   },
   // Number of Rounds — speglar Lobby:s roundsGuestBox + roundsStepper*-
   // styles 1:1 så Profile- och Lobby-vyn ser identisk ut.
+  // Klargör att Number of Rounds är en MULTIPLAYER-default — Single player
+  // väljs per spel på Home och är alltid 4 rundor. Speglar Lobby:s
+  // guestHostNote (samma vokabulär för "det här går inte att ändra här").
+  roundsScopeNote: {
+    fontSize: FontSize.xs,
+    color: Colors.textSecondary,
+    marginTop: Spacing.xs,
+    textAlign: 'center',
+  },
   roundsGuestBox: {
     paddingHorizontal: Spacing.xl,
     paddingVertical: Spacing.md,
