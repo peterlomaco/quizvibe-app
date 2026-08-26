@@ -398,6 +398,31 @@ const regionSheet = StyleSheet.create({
 // MODAL_SWAP_DELAY_MS i app/index.tsx (där Modal→Modal gav exakt den buggen).
 const ALERT_TO_MODAL_DELAY_MS = 350;
 
+// Hur länge en ny, ännu icke-godkänd non-host hålls dold innan hen får
+// rendera den röda "Players Waiting"-blinken. Ska täcka tiden det tar för
+// join-radens fält att konvergera (fetchNewJoiners → syncNonHostFields) så
+// friend-auto-approven hinner landa först — en QuizVibe friend ska ALDRIG
+// blinka rött. 3000 ms är valt mot BlinkingLabel-cykeln (1200 ms): Peter såg
+// 1-2 hela blinkningar, alltså upp till ~2,4 s.
+const JOIN_GRACE_MS = 3000;
+
+// Samma fönster på NON-HOST-enheten, där spelaren ser sin EGEN ännu icke-
+// godkända rad. Längre eftersom kedjan är längre: host auto-approvar →
+// bulk-write till lobby_players → non-host:s 2s-poll → render. Worst case
+// landar approven ~3 s in, så 3000 ms har ingen marginal. Non-host kan
+// ändå inte agera på den röda signalen (godkännande är host:s jobb), så
+// ett långt fönster kostar ingenting — Peter: hellre försenad grön blink
+// än 1-2 röda före den (2026-08-26).
+const JOIN_GRACE_NON_HOST_MS = 5000;
+
+// Hur länge "det finns väntande spelare" måste ha varit oavbrutet SANT innan
+// den röda blinken faktiskt renderas. Grace-fönstren ovan flyttar problemet
+// men kan aldrig eliminera det: landar approven strax EFTER fönstret får man
+// en kort röd flash. Den här debouncen tar bort hela klassen av korta flashar
+// oavsett orsak — signalen visas bara när den är stabil. 1200 ms = en hel
+// BlinkingLabel-cykel, så en blink som visas hinner alltid läsas som avsedd.
+const WAITING_LABEL_DEBOUNCE_MS = 1200;
+
 // Delad copy för single-player-approve-spärren så ALLA approve-vägar
 // (ApproveToggle, "Approve All"-mastern, join-popupens Approve och
 // Approve + Add to Friend list) säger exakt samma sak.
@@ -1954,6 +1979,20 @@ export default function LobbyScreen() {
   // popupen pga en load-race. Guest host (ingen profil) → loadFriends
   // returnerar [] → auto-approve matchar aldrig.
   const hostFriendsRef = useRef<Friend[] | null>(null);
+  // Render-synlig spegel av "har friends-listan laddats?". hostFriendsRef är
+  // en ref och kan därför inte gata render-logiken — men join-kortets
+  // synlighet MÅSTE veta om vi ännu kan avgöra att en joiner är friend (se
+  // isJoinDecisionPending). Sätts true även om load:en failar (tom lista) så
+  // en joiner aldrig kan bli permanent osynlig.
+  const [hostFriendsLoaded, setHostFriendsLoaded] = useState(false);
+  // Ids som är inne i sitt join-grace-fönster (se isJoinDecisionPending).
+  // State (inte ref) — synligheten måste re-rendera när fönstret löper ut.
+  const [joinGraceIds, setJoinGraceIds] = useState<Set<string>>(new Set());
+  // Ids som redan HAR fått sitt fönster, så det aldrig startas om av en
+  // players-uppdatering. Prunas när spelaren lämnar/försvinner → en genuin
+  // rejoin får ett nytt fönster.
+  const joinGraceSeenRef = useRef<Set<string>>(new Set());
+  const joinGraceTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   const [invitedFriendIds, setInvitedFriendIds] = useState<Set<string>>(new Set());
   // Input för "Add by Player Name"-raden i Share invite — speglar Profile:s
   // friends-modal så host kan lägga till en QuizVibe friend direkt från lobby
@@ -3163,7 +3202,129 @@ export default function LobbyScreen() {
     () => extractTakenGuestLetters(players.filter((p) => !p.hasLeft).map((p) => p.name)),
     [players],
   );
-  const waitingForApproval = players.filter((p) => !isPlayerApproved(p) && !p.hasLeft);
+  // ── Auto-approve-predikat (delas av render + join-watchern) ───────────
+  // Samma guards som handleSetApproved. Bryts de ut hit för att render och
+  // watchern ALDRIG ska kunna glida isär — render måste kunna förutsäga
+  // exakt vad watchern kommer göra en tick senare (se isJoinDecisionPending).
+  const passesSilentApproveGuards = (p: LobbyPlayer) =>
+    !singlePlayerDefault &&
+    lobbyPeerHealth[p.id] !== 'unstable' &&
+    (!spotifyEnabled || !!p.spotifyConnected);
+  const willAutoApproveOnJoin = (p: LobbyPlayer) =>
+    p.type === 'registered' &&
+    (hostFriendsRef.current ?? []).some(
+      (fr) => fr.playerName.toLowerCase() === p.name.trim().toLowerCase(),
+    ) &&
+    passesSilentApproveGuards(p) &&
+    // Host:s explicita un-approve vinner alltid — en friend host flyttat
+    // till waiting ska synas där direkt.
+    !hostUnapprovedIdsRef.current.has(p.id);
+
+  // ⚠ Håll tillbaka joiners vars godkännande-beslut ännu inte är fattat.
+  // Watchern nedan kör FÖRST efter render-commit, så en QuizVibe friend
+  // hann annars renderas som "väntande" i minst en frame (i praktiken en
+  // knapp sekund när joinern kom in via 2s-pollen eller när en DB-sync
+  // kastade om ordningen) → röd "Players Waiting" blinkade till för att
+  // sekunden senare bli grön "New Player joined" (Peter 2026-08-26).
+  // Röd blink får ALDRIG visas för någon som kommer auto-approvas.
+  // Lösningen är medvetet "avvakta med att visa spelaren" i stället för att
+  // dämpa signalen: kortet dyker upp i rätt sektion direkt i stället för att
+  // hoppa mellan två.
+  //
+  // Tre fall hålls tillbaka:
+  //   (a) friends-listan är inte laddad än — vi VET inte, så vi avvaktar;
+  //   (b) spelaren uppfyller auto-approve-villkoren och kommer vara approved
+  //       nästa tick;
+  //   (c) spelaren är inne i sitt JOIN_GRACE_MS-fönster.
+  //
+  // ⚠ (c) finns för att (b) INTE räckte. Första fixen antog att glappet var
+  // en frame (watchern är en effekt) — men Peter såg 1-2 hela blinkningar
+  // (BlinkingLabel-cykeln är 1200 ms), dvs auto-approven landade 1-2 SEKUNDER
+  // senare. Orsaken ligger i konvergensen: en joiner-rad når host innan alla
+  // fält är satta (type/spotifyConnected/namn skrivs och syncas i flera steg
+  // via fetchNewJoiners → syncNonHostFields), så willAutoApproveOnJoin kan
+  // vara false vid första renders och sann först ett par sekunder senare.
+  // Ett tidsfönster är immunt mot exakt VILKET fält som konvergerar sist —
+  // ett predikat måste förutse dem alla.
+  //
+  // Priset: en joiner som INTE auto-approvas syns som väntande först efter
+  // fönstret. Acceptabelt — host får join-popupen omedelbart (den är den
+  // primära signalen), och den röda blinken är en påminnelse, inte ett larm.
+  // ⚠ Grace-fönstret (c) gäller BÅDA roller — non-host såg samma röda blink
+  // för sin egen rad innan host:s auto-approve hann syncas hit (Peter
+  // 2026-08-26). (a) och (b) är däremot host-only: non-host har varken
+  // friends-lista eller watcher, och `hostFriendsLoaded` är där permanent
+  // false — utan hostMode-gaten hade varje icke-godkänd spelare dolts för
+  // alltid på non-host-enheten.
+  const isJoinDecisionPending = (p: LobbyPlayer) =>
+    !p.isHost &&
+    (joinGraceIds.has(p.id) ||
+      (hostMode && (!hostFriendsLoaded || willAutoApproveOnJoin(p))));
+  const waitingForApproval = players.filter(
+    (p) => !isPlayerApproved(p) && !p.hasLeft && !isJoinDecisionPending(p),
+  );
+
+  // ⚠ Renderings-gate för den röda blinken. `waitingForApproval.length > 0`
+  // räcker INTE som villkor: en approve som landar strax efter grace-fönstret
+  // gav en mycket kort röd flash innan den gröna (Peter 2026-08-26, fjärde
+  // passet). Signalen måste vara STABIL för att visas — den är en påminnelse
+  // om att host behöver agera, och en påminnelse som försvinner inom en
+  // sekund är bara brus. Släpps direkt (utan fördröjning) när ingen väntar,
+  // så den gröna "New Player joined" aldrig hålls tillbaka.
+  const [showWaitingLabel, setShowWaitingLabel] = useState(false);
+  const waitingCount = waitingForApproval.length;
+  useEffect(() => {
+    if (waitingCount === 0) {
+      setShowWaitingLabel(false);
+      return;
+    }
+    const t = setTimeout(() => setShowWaitingLabel(true), WAITING_LABEL_DEBOUNCE_MS);
+    return () => clearTimeout(t);
+  }, [waitingCount]);
+
+  // Startar join-grace-fönstret för varje NY unapproved non-host. Timers
+  // ligger i en ref (inte i effektens cleanup) — cleanup körs vid varje
+  // players-ändring och skulle annars avbryta fönstret gång på gång.
+  useEffect(() => {
+    const active = new Set(players.filter((p) => !p.hasLeft).map((p) => p.id));
+    joinGraceSeenRef.current.forEach((id) => {
+      if (!active.has(id)) joinGraceSeenRef.current.delete(id);
+    });
+    const fresh = players
+      .filter(
+        (p) =>
+          !p.isHost &&
+          !p.hasLeft &&
+          !p.approved &&
+          !joinGraceSeenRef.current.has(p.id),
+      )
+      .map((p) => p.id);
+    if (fresh.length === 0) return;
+    fresh.forEach((id) => joinGraceSeenRef.current.add(id));
+    setJoinGraceIds((prev) => {
+      const next = new Set(prev);
+      fresh.forEach((id) => next.add(id));
+      return next;
+    });
+    const timer = setTimeout(() => {
+      setJoinGraceIds((prev) => {
+        if (!fresh.some((id) => prev.has(id))) return prev;
+        const next = new Set(prev);
+        fresh.forEach((id) => next.delete(id));
+        return next;
+      });
+    }, hostMode ? JOIN_GRACE_MS : JOIN_GRACE_NON_HOST_MS);
+    joinGraceTimersRef.current.push(timer);
+  }, [players, hostMode]);
+
+  // Rensa kvarvarande grace-timers vid unmount.
+  useEffect(
+    () => () => {
+      joinGraceTimersRef.current.forEach(clearTimeout);
+      joinGraceTimersRef.current = [];
+    },
+    [],
+  );
 
   // Notify host när Players in Lobby är hopfällt och en ny spelare ansluter.
   const prevNonHostApprovedRef = useRef(-1);
@@ -3194,8 +3355,7 @@ export default function LobbyScreen() {
     if (!hostMode) return;
     // Vänta tills friends-listan laddats — annars kan en friend hinna få
     // popupen pga en load-race.
-    const hostFriends = hostFriendsRef.current;
-    if (hostFriends === null) return;
+    if (hostFriendsRef.current === null) return;
     // Pruna: ids vars spelare försvunnit eller lämnat (hasLeft) tas bort ur
     // prompted-setet så en genuin rejoin promptar igen. Kön rensas från
     // stale ids (borta, lämnade eller approvade via annan väg — t.ex.
@@ -3226,18 +3386,12 @@ export default function LobbyScreen() {
     // Auto-approve friends eller enqueue nya unapproved joiners.
     players.forEach((p) => {
       if (p.isHost || p.hasLeft || p.approved) return;
-      const isFriend =
-        p.type === 'registered' &&
-        hostFriends.some(
-          (f) => f.playerName.toLowerCase() === p.name.trim().toLowerCase(),
-        );
-      // Samma guards som handleSetApproved — blockeras tyst approve faller
-      // spelaren tillbaka till popupen där Approve-tappen visar guard-Alerten.
-      const passesSilentGuards =
-        !singlePlayerDefault &&
-        lobbyPeerHealth[p.id] !== 'unstable' &&
-        (!spotifyEnabled || !!p.spotifyConnected);
-      if (isFriend && passesSilentGuards && !hostUnapprovedIdsRef.current.has(p.id)) {
+      // willAutoApproveOnJoin bär friend-matchen + samma guards som
+      // handleSetApproved (blockeras tyst approve faller spelaren tillbaka
+      // till popupen där Approve-tappen visar guard-Alerten) + host:s
+      // explicita un-approve. Delas med render så isJoinDecisionPending kan
+      // förutsäga exakt detta beslut — ändra ALDRIG villkoret bara här.
+      if (willAutoApproveOnJoin(p)) {
         // Tyst auto-approve. MEDVETET inte gated på promptedIdsRef — om en
         // stale DB→local-sync (syncNonHostFields hann läsa joiner-radens
         // approved=false innan hostens bulk-write committat) downgradear en
@@ -3260,6 +3414,10 @@ export default function LobbyScreen() {
     // mount-load:en sätter ref + setFriends ihop, så deps-membern garanterar
     // att watchern körs om när listan blir laddad även om players[] inte
     // ändrats sedan dess (joiner som hann in före loadFriends-resolven).
+    // willAutoApproveOnJoin är MEDVETET inte i deps — den återskapas varje
+    // render och skulle få effekten att köra på varenda render. Allt den
+    // läser (players, guards, friends) ligger redan i arrayen.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [players, hostMode, spotifyEnabled, singlePlayerDefault, lobbyPeerHealth, friends]);
 
   // Driver "Waiting for approval"-mellansteget för non-host. När host inte
@@ -3693,6 +3851,7 @@ export default function LobbyScreen() {
     const list = await loadFriends();
     setFriends(list);
     hostFriendsRef.current = list;
+    setHostFriendsLoaded(true);
   };
 
   // Lägg till en QuizVibe friend direkt från Share invite-modalen. Speglar
@@ -4145,11 +4304,20 @@ export default function LobbyScreen() {
   useEffect(() => {
     if (!hostMode) return;
     let cancelled = false;
-    loadFriends().then((list) => {
-      if (cancelled) return;
-      hostFriendsRef.current = list;
-      setFriends(list);
-    });
+    loadFriends()
+      .then((list) => {
+        if (cancelled) return;
+        hostFriendsRef.current = list;
+        setFriends(list);
+        setHostFriendsLoaded(true);
+      })
+      .catch(() => {
+        // Fail-open: utan listan kan vi inte avgöra friend-status, och
+        // isJoinDecisionPending skulle annars dölja joiners för alltid.
+        if (cancelled) return;
+        hostFriendsRef.current = [];
+        setHostFriendsLoaded(true);
+      });
     return () => {
       cancelled = true;
     };
@@ -5743,7 +5911,7 @@ export default function LobbyScreen() {
             </View>
             {/* Röd "Players Waiting"-signal till höger om +/− när det finns
                 spelare som väntar på godkännande. Försvinner när alla är godkända. */}
-            {waitingForApproval.length > 0 && (
+            {showWaitingLabel && (
               <BlinkingLabel style={styles.playersWaitingLabel}>
                 Players Waiting
               </BlinkingLabel>
@@ -5768,7 +5936,6 @@ export default function LobbyScreen() {
             <View style={styles.approvedBoxesGrid}>
               {(() => {
                 const approvedCount = approvedPlayers.filter((p) => !p.hasLeft).length;
-                const waitingCount = waitingForApproval.length;
                 // 4 rutor i bredd → 4 spelare = 1 rad, 12 spelare = 3 rader
                 // (ruta 5 hamnar under ruta 1, ruta 6 under ruta 2 osv.).
                 const COLS = 4;
