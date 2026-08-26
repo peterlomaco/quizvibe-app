@@ -7726,14 +7726,33 @@ export default function QuizScreen() {
           totalRounds={totalRounds}
           isLastRound={false}
           isHost={false}
+          // Tabellen fylls på medan värden spelar vidare på sin telefon —
+          // guld LIVE-badge intill rubriken säger att den uppdateras i
+          // realtid och inte är ett slutresultat.
+          liveBadge
           allRoundScoresHistory={allRoundScoresHistory}
           interimFooter={
-            <View style={styles.spectatorWaitPill}>
-              <Text style={styles.spectatorWaitPillText}>
-                Answers are given on the Host device
-              </Text>
-              <SequentialDots color={Colors.textSecondary} />
-            </View>
+            // På sista frågan byter pillen till guld: nästa gång host går
+            // vidare är det till Final Leaderboard, inte till ännu en fråga.
+            // Guld = appens "aktiv/upplåst"-vokabulär, så statusen läser som
+            // "något är på väg att hända" i stället för passiv väntan.
+            isLastQuestion ? (
+              <View style={[styles.spectatorWaitPill, styles.spectatorWaitPillFinal]}>
+                <Text
+                  style={[styles.spectatorWaitPillText, styles.spectatorWaitPillTextFinal]}
+                >
+                  Last question - Final leaderboard
+                </Text>
+                <SequentialDots color={Colors.warning} />
+              </View>
+            ) : (
+              <View style={styles.spectatorWaitPill}>
+                <Text style={styles.spectatorWaitPillText}>
+                  Answers are given on the Host device
+                </Text>
+                <SequentialDots color={Colors.textSecondary} />
+              </View>
+            )
           }
         />
       </SafeAreaView>
@@ -9520,6 +9539,15 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: Colors.textSecondary,
     letterSpacing: 0.3,
+  },
+  // Sista frågan: guld ram + guld text (samma "aktiv/upplåst"-guld som
+  // LIVE-badgen och Home:s gyllene CTA:er). Bara färgen byts — geometrin
+  // ärvs från spectatorWaitPill så pillen inte hoppar när den skiftar.
+  spectatorWaitPillFinal: {
+    borderColor: Colors.warning,
+  },
+  spectatorWaitPillTextFinal: {
+    color: Colors.warning,
   },
   // D-v: outer wrapper för fragment-baserade return-paths (intro/countdown)
   // så onTouchStart kan registrera host:s activity utan att claim:a

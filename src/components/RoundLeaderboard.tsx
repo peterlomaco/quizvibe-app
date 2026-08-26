@@ -208,6 +208,32 @@ function useCtaPulse(paused: boolean) {
   return pulse;
 }
 
+/** Blinkande guld "LIVE"-markör bredvid rubriken. Äger sin EGEN loop (startas
+ *  i egen effekt vid mount) av samma skäl som Lobby:s BlinkingLabel — en nod
+ *  som binds till ett delat, redan löpande native-värde fastnar annars på en
+ *  svag opacity utan att animera när den monteras om. Samma 600 ms-cadens
+ *  (1 ↔ 0.3) som "Players Waiting"/"New Player joined" i lobbyn, så alla
+ *  blinkande statusar i appen andas i takt. Hela badgen blinkar (ram + text)
+ *  så pulsen läses som en enhet. */
+function LiveBadge() {
+  const opacity = React.useRef(new Animated.Value(1)).current;
+  React.useEffect(() => {
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(opacity, { toValue: 0.3, duration: 600, useNativeDriver: true }),
+        Animated.timing(opacity, { toValue: 1,   duration: 600, useNativeDriver: true }),
+      ]),
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [opacity]);
+  return (
+    <Animated.View style={[styles.liveBadge, { opacity }]}>
+      <Text style={styles.liveBadgeText}>LIVE</Text>
+    </Animated.View>
+  );
+}
+
 /** Samma cap som andra användarsynliga fritext-namn i appen. */
 const RENAME_MAX_LENGTH = 40;
 
@@ -451,6 +477,7 @@ export function RoundLeaderboard({
   replayNote,
   homeOnlyFooter = false,
   interimFooter,
+  liveBadge = false,
   trackConnectionErrors = false,
   aggregate,
 }: {
@@ -564,6 +591,10 @@ export function RoundLeaderboard({
    *  rätt att gå vidare ser alltså en fullt levande CTA som inte gör något.
    *  PtP-spectatorn skickar hit en passiv "Waiting for host"-pill. */
   interimFooter?: React.ReactNode;
+  /** Guld "LIVE"-badge bredvid rubriken. PtP-spectatorns tabell fylls på
+   *  medan värden spelar vidare på sin telefon — badgen säger att det man
+   *  tittar på uppdateras i realtid och inte är ett slutresultat. */
+  liveBadge?: boolean;
   /** Wifi-kolumnen härleds ur "antal frågor bakom ledaren", vilket bara är
    *  en giltig proxy för tappad uppkoppling när ALLA spelare förväntas svara
    *  på VARJE fråga (= Individual Devices). I Pass-the-Phone turas spelarna
@@ -736,6 +767,7 @@ export function RoundLeaderboard({
               {remote1v1 ? ' - 1vs1' : ''}
             </Text>
             {remote1v1 && <VersusIcon height={26} />}
+            {liveBadge && <LiveBadge />}
             {/* Pennan bara på aggregat-sidan, och bara för host. Tappet på
                 FLIKEN byter redan sida, så rename får inte hänga där. */}
             {showAggregate && slide === 1 && !!onRenameAggregate && (
@@ -1341,6 +1373,22 @@ const styles = StyleSheet.create({
     fontSize: FontSize.sm,
     color: Colors.textSecondary,
     fontWeight: FontWeight.medium,
+  },
+  // Guld text i guld ram (INTE guld fyllning) — samma "aktiv/upplåst"-guld
+  // som PREMIUM-badgen, men som outline så den läser som en status intill
+  // rubriken i stället för som en tappbar knapp.
+  liveBadge: {
+    borderWidth: 1,
+    borderColor: Colors.warning,
+    borderRadius: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+  },
+  liveBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 0.6,
+    color: Colors.warning,
   },
 
   // ── Final ⟷ Aggregate-pager ───────────────────────────────────────────
