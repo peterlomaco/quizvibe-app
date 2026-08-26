@@ -713,6 +713,17 @@ const SELECTOR_H = SELECTOR_BOTTOM - SELECTOR_TOP; // = 42px
 // vidare (Peter 2026-08-24).
 const REVEAL_NEXT_LOCK_SECONDS = 5;
 
+// ── IndDev: readiness-gate på host:s Play-knapp (fråga 0) ──────────────────
+// MIN_GREY är ren UX — den garanterar en läsbar grå→guld-beat även när alla
+// peers redan hunnit hälsa, i stället för en flimrande omfärgning.
+// TIMEOUT är korrekthets-escapen: en spelare som joinade lobbyn men sedan
+// bakgrundade appen får ALDRIG låsa host permanent.
+// ⚠ Korrektheten ligger i peer-hälsningarna (allPeersAnnounced), INTE i
+// MIN_GREY. Tar man bort readiness-villkoret och behåller bara klockan är
+// man tillbaka på en blind fördröjning som inte vet något om någon.
+const START_GATE_MIN_GREY_MS = 1000;
+const START_GATE_TIMEOUT_MS = 8000;
+
 // Energisk färg för svarsrutan (används oavsett assistance-nivå)
 const BOX_COLOR = '#F5A623';       // gyllene
 const BOX_BG = 'rgba(26,48,80,0.92)'; // mörkare navy – tydligt distinkt mot bakgrund #0B1220
@@ -2725,6 +2736,22 @@ export default function QuizScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // ── "Settled"-flaggor för readiness-handskakningen (se player_ready) ─────
+  // Non-host:s tunga mount-arbete är asynkront och landar oförutsägbart. Varje
+  // resolve triggar dessutom en omräkning av gameQuestions-memon (~970 items,
+  // flera filter/shuffle-pass) plus en re-render av hela quiz-trädet. Landar
+  // de MITT I nedräkningen drar CountdownIntro:s kedjade setTimeout:ar iväg
+  // additivt (den re-ankrar varje tick till när föregående callback faktiskt
+  // kördes — lateness återhämtas aldrig), och enheten går in i question-fasen
+  // sent. Först DÄR mountas YouTube-spelaren, så förseningen läggs ovanpå
+  // WebView-boot + tre nätverksrundor innan första ljudet hörs.
+  //
+  // Flaggorna gör arbetet observerbart så host kan vänta in det. `false` som
+  // start är rätt fail-läge: host:s escape-timeout släpper knappen ändå.
+  const [seenDataLoaded, setSeenDataLoaded] = useState(false);
+  const [epochLedgerLoaded, setEpochLedgerLoaded] = useState(false);
+  const [audioOverridesLoaded, setAudioOverridesLoaded] = useState(false);
+
   // Ladda egna tidigare sedda fråge-IDs från AsyncStorage. Sker asynkront
   // men klart innan spelaren hinner trycka Play i GetReadyIntro (~50 ms).
   // Uppdaterar seenQuestionIds vilket triggerar gameQuestions-useMemo att
@@ -2752,8 +2779,15 @@ export default function QuizScreen() {
       }
     }
     let seenBroadcastTimers: ReturnType<typeof setTimeout>[] = [];
-    loadEpochLedger().then(setEpochDebt).catch(() => {});
-    Promise.all([loadSeenQuestionIds(), loadLastSessionIds()]).then(([seen, last]) => {
+    loadEpochLedger()
+      .then(setEpochDebt)
+      .catch(() => {})
+      // Flaggan sätts även vid fel — den betyder "vi väntar inte längre på
+      // den här läsningen", inte "den lyckades". Annars kan ett AsyncStorage-
+      // fel låsa host bakom escape-timeouten i onödan.
+      .finally(() => setEpochLedgerLoaded(true));
+    Promise.all([loadSeenQuestionIds(), loadLastSessionIds()])
+      .then(([seen, last]) => {
       setSeenQuestionIds(seen);
       setLastSessionIds(last);
       if (
@@ -2776,7 +2810,9 @@ export default function QuizScreen() {
           setTimeout(send, 4500),
         ];
       }
-    });
+      })
+      .catch(() => {})
+      .finally(() => setSeenDataLoaded(true));
     return () => seenBroadcastTimers.forEach(clearTimeout);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -4524,6 +4560,28 @@ export default function QuizScreen() {
     }
   };
 
+  // Skicka question_advance tre gånger (direkt / +600 / +1800 ms) med IDENTISK
+  // payload. Samma skäl som play_command: Supabase Realtime replayar aldrig,
+  // så en enda sändning är förlorad för gott om mottagarens kanal hickar just
+  // då — och en missad advance lämnar enheten i FÖRRA frågans fas.
+  //
+  // ⚠ Säkert ENBART tack vare dedupe-guarden överst i questionAdvanceHandler-
+  // Ref. Handlern är inte idempotent av sig själv (roterar currentPlayerIndex
+  // i PtP, tvingar phase→'intro'). Ta aldrig bort guarden och lämna kvar de
+  // här retries.
+  const broadcastQuestionAdvanceWithRetries = (payload: QuestionAdvancePayload) => {
+    if (!syncActive || !syncChannelRef.current) return;
+    const send = () => {
+      syncChannelRef.current?.broadcastQuestionAdvance(payload).catch(() => {});
+    };
+    send();
+    questionAdvanceRetryTimersRef.current.forEach(clearTimeout);
+    questionAdvanceRetryTimersRef.current = [
+      setTimeout(send, 600),
+      setTimeout(send, 1800),
+    ];
+  };
+
   // Host hoppar över en Spotify-fråga (DJ startar ej, eller host väljer Skip).
   // Skickar alla spelare till GetReady-intro + nästa fråga i kön.
   const handleHostSkipSpotifyQuestion = () => {
@@ -4532,16 +4590,12 @@ export default function QuizScreen() {
     setSpotifyWaitPhase('skipped');
     if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
     // Broadcast till non-hosts så även de går till nästa fråga.
-    if (syncActive && syncChannelRef.current) {
-      syncChannelRef.current
-        .broadcastQuestionAdvance({
-          next_question_index: questionIndex + 1,
-          all_question_ids: gameQuestionsRef.current.map((q) => q.id),
-          spotify_answer_year: spotifyAnswerYear,
-          spotify_answer_name: spotifyAnswerName,
-        })
-        .catch(() => {});
-    }
+    broadcastQuestionAdvanceWithRetries({
+      next_question_index: questionIndex + 1,
+      all_question_ids: gameQuestionsRef.current.map((q) => q.id),
+      spotify_answer_year: spotifyAnswerYear,
+      spotify_answer_name: spotifyAnswerName,
+    });
     setTimeout(() => { handleAdvanceToNextRoundRef.current?.(); }, 800);
   };
 
@@ -4550,23 +4604,48 @@ export default function QuizScreen() {
   // Broadcast skickas efter samma fördröjning så host + non-host synkar.
   const handleHostStartFromGetReady = () => {
     // Beräkna exakt när non-host:s timer kommer att starta:
-    // countdown: 700 ms initial paus + 5 × 1300 ms tick (5→4→3→2→1→0) +
-    // 1000 ms "?"-display = 7200 ms. Plus timerActive-delay 2000 ms = 10200 ms.
-    // +300 ms marginal för JS-timer-drift → 10500 ms.
+    // countdown: 700 ms initial paus + 5 × 1300 ms tick (5→4→3→2→1→0) = 7200 ms
+    // när "?" VISAS, + 1000 ms "?"-display → onComplete vid **8200 ms**.
+    // Plus timerActive-delay 2000 ms = 10200 ms, +300 ms marginal → 10500 ms.
+    // ⚠ 7200 är när "?" dyker upp, INTE när nedräkningen är klar — den gamla
+    // kommentaren räknade 7200+2000=10200 och råkade landa rätt av fel skäl.
+    // Ändra inte 10500 utan att räkna om mot CountdownIntro:s offset-tabell.
     const timerStartAt = Date.now() + 10500;
     setPhase('countdown');
     if (gameMode === 'individual-devices' && syncChannelRef.current) {
-      syncChannelRef.current
-        .broadcastPlayCommand({
-          question_index: questionIndex,
-          question_id: currentQ?.id ?? '',
-          all_question_ids: gameQuestions.map((q) => q.id),
-          timer_start_at: timerStartAt,
-          spotify_answer_year: spotifyAnswerYear,
-          spotify_answer_name: spotifyAnswerName,
-          dj_player_id: currentDJPlayer?.id,
-        })
-        .catch(() => {});
+      // Skicka IDENTISK payload tre gånger: direkt + 600 ms + 1800 ms.
+      // Supabase Realtime replayar aldrig till en sen subscriber, så en enda
+      // sändning går förlorad för gott om mottagarens kanal hickar just då.
+      // Speglar game_sequence_init:s 800/2500/5000-mönster, men tätare —
+      // play_command är tidskritisk medan sekvensen inte är det.
+      //
+      // ⚠ timer_start_at får ALDRIG räknas om per sändning. Den är en ABSOLUT
+      // wall-clock-stämpel som non-host läser in i hostTimerStartAtRef; ett
+      // omräknat värde skulle skjuta en sen mottagares timer 600/1800 ms
+      // framåt och desynka den från host.
+      //
+      // Dubbletter är idempotenta hos mottagaren: isNewQuestion blir false
+      // för samma question_index → det destruktiva blocket hoppas, svars-
+      // state-resetten är gatad på phase==='intro', och setPhase returnerar
+      // current utanför intro (React bailar → CountdownIntro remountas inte).
+      const payload = {
+        question_index: questionIndex,
+        question_id: currentQ?.id ?? '',
+        all_question_ids: gameQuestions.map((q) => q.id),
+        timer_start_at: timerStartAt,
+        spotify_answer_year: spotifyAnswerYear,
+        spotify_answer_name: spotifyAnswerName,
+        dj_player_id: currentDJPlayer?.id,
+      };
+      const send = () => {
+        syncChannelRef.current?.broadcastPlayCommand(payload).catch(() => {});
+      };
+      send();
+      playCommandRetryTimersRef.current.forEach(clearTimeout);
+      playCommandRetryTimersRef.current = [
+        setTimeout(send, 600),
+        setTimeout(send, 1800),
+      ];
     }
   };
   // Host:s Next-tap i reveal: trigga lokal handleAdvance + broadcast.
@@ -4577,16 +4656,12 @@ export default function QuizScreen() {
     handleAdvanceToNextRound();
     // syncActive (inte bara IndDev): PtP-spectatorn följer sin progress —
     // och därmed "Now answering" + Question N of M — enbart via detta event.
-    if (syncActive && syncChannelRef.current) {
-      syncChannelRef.current
-        .broadcastQuestionAdvance({
-          next_question_index: questionIndex + 1,
-          all_question_ids: gameQuestionsRef.current.map((q) => q.id),
-          spotify_answer_year: spotifyAnswerYear,
-          spotify_answer_name: spotifyAnswerName,
-        })
-        .catch(() => {});
-    }
+    broadcastQuestionAdvanceWithRetries({
+      next_question_index: questionIndex + 1,
+      all_question_ids: gameQuestionsRef.current.map((q) => q.id),
+      spotify_answer_year: spotifyAnswerYear,
+      spotify_answer_name: spotifyAnswerName,
+    });
   };
   // Host:s Final Leaderboard-tap.
   const handleHostShowLeaderboard = () => {
@@ -4594,16 +4669,12 @@ export default function QuizScreen() {
     // next_question_index: null = "spelet är slut". Det är ENDA signalen som
     // tar PtP-spectatorn till Final Leaderboard (host_active_ping är bara
     // skyddsnät), så den måste gå ut även i PtP.
-    if (syncActive && syncChannelRef.current) {
-      syncChannelRef.current
-        .broadcastQuestionAdvance({
-          next_question_index: null,
-          all_question_ids: gameQuestionsRef.current.map((q) => q.id),
-          spotify_answer_year: spotifyAnswerYear,
-          spotify_answer_name: spotifyAnswerName,
-        })
-        .catch(() => {});
-    }
+    broadcastQuestionAdvanceWithRetries({
+      next_question_index: null,
+      all_question_ids: gameQuestionsRef.current.map((q) => q.id),
+      spotify_answer_year: spotifyAnswerYear,
+      spotify_answer_name: spotifyAnswerName,
+    });
   };
   // D-iv: host togglar audio för en spelare via GetReady-modalen.
   // Trippelt parallellt: optimistisk lokal state (UI uppdateras direkt),
@@ -4653,6 +4724,16 @@ export default function QuizScreen() {
   // host_active_ping (throttlat till max 1/5s — fortsatta taps inom
   // fönstret skippar broadcast men resetar fortfarande egna ref:en så
   // host:s lokala countdown inte triggar oönskat).
+  //
+  // ⚠ Den här pingen kan INTE ersätta readiness-gaten/mount-hälsningen som
+  // fix för "non-host följer inte med till fråga 1", trots att mottagarens
+  // hostActivePing-handler har en intro→countdown-catch-up. Två skäl:
+  //   (1) onTouchStart fyrar på touch-DOWN, medan `phase` (läst ur render-
+  //       closuren nedan) fortfarande är 'intro' — pingen bär alltså
+  //       phase:'intro' och healar ingenting.
+  //   (2) samma tap konsumerar 5000 ms-throttlen, så ingen ping går ut under
+  //       countdown heller. Den fastnade spelaren healas först när host råkar
+  //       peka på skärmen under 'question' — mitt i frågan.
   const signalHostActivity = useCallback(() => {
     // syncActive (inte bara IndDev): i PtP är pingen spectatorns skyddsnät
     // mot ett tappat question_advance — den bär både questionIndex och phase.
@@ -4844,6 +4925,23 @@ export default function QuizScreen() {
         spotify_answer_year: say,
         spotify_answer_name: san,
       } = payload;
+      // ⚠ DEDUPE — KRÄVS av trippelsändningen (0/600/1800 ms) och måste ligga
+      // FÖRST. Till skillnad från play_command är den här handlern INTE
+      // idempotent: `handleAdvanceToNextRound` roterar `currentPlayerIndex`
+      // med en updater-funktion i Pass-the-Phone (spectatorn skulle hoppa
+      // över en spelare per dubblett) och avslutar med `setPhase('intro')`.
+      // Trycker host Play inom 1800 ms efter Next hinner en sen retry alltså
+      // kasta ut en non-host ur countdown tillbaka till GetReady — exakt den
+      // bugg presence-handskakningen just löste. Den nollställer dessutom
+      // `hasRecordedScoreForCurrentQuestionRef` (åter-armerar scoring-latchen)
+      // och wipe:ar svars-state.
+      //
+      // Nyckeln sätts SYNKRONT här, inte via questionIndexRef (som är en
+      // render-spegel och kan vara stale om två sändningar hinner ankomma
+      // före nästa render).
+      const advanceKey = nextIdx === null ? 'end' : nextIdx;
+      if (lastHandledAdvanceRef.current === advanceKey) return;
+      lastHandledAdvanceRef.current = advanceKey;
       // Uppdatera auktoritativ frågesekvens om host skickade med den.
       if (allIds && allIds.length > 0) setBroadcastAllQuestionIds(allIds);
       if (say !== undefined) setBroadcastHostSpotifyAnswerYear(say);
@@ -6897,6 +6995,32 @@ export default function QuizScreen() {
   // Broadcasten körs omedelbart + sparas här; vid reconnect skickas alla om.
   // Mottagarsidan deduplicerar via player_id+question_index — omskick är säkert.
   const pendingScoreBroadcastsRef = useRef<PlayerScoreRecordedPayload[]>([]);
+  // Retry-timers för play_command-omsändningarna (se handleHostStartFromGetReady).
+  // Rensas vid ny Play-tap och vid unmount så en host som quittar mitt i
+  // countdown inte sänder in i en riven kanal.
+  const playCommandRetryTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  // Dito för question_advance. Egen ref (inte delad med play_command) så en
+  // Play-tap aldrig avbryter en pågående advance-omsändning eller tvärtom —
+  // de två kan legitimt överlappa när host trycker Next och sedan Play snabbt.
+  const questionAdvanceRetryTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  // Senast processade advance på MOTTAGAR-sidan ('end' = spelet slut).
+  // Nollställs aldrig manuellt: ett spel per quiz.tsx-mount, och Play Again
+  // går via ny lobby → ny mount → ny ref.
+  const lastHandledAdvanceRef = useRef<number | 'end' | null>(null);
+  useEffect(
+    () => () => {
+      playCommandRetryTimersRef.current.forEach(clearTimeout);
+      playCommandRetryTimersRef.current = [];
+      questionAdvanceRetryTimersRef.current.forEach(clearTimeout);
+      questionAdvanceRetryTimersRef.current = [];
+    },
+    [],
+  );
+  // Throttle för game_sequence_init-svaret på player_rejoined. Sedan IndDev
+  // non-hosts också hälsar (3 hälsningar × N peers inom ~4 s) skulle en
+  // osträngad handler skicka N×3 identiska sändningar av upp till 500
+  // fråge-id:n och slå i Supabase Realtimes rate-limit.
+  const lastSequenceInitSentRef = useRef(0);
   // D-iii: per-peer connection-status. Drivs av två separata signaler:
   //   - watchdog (15s silence från remote sender) → 'disconnected'
   //   - player_rejoined-event (sender:s explicit Retry-tap) → 'connected'
@@ -6915,6 +7039,126 @@ export default function QuizScreen() {
   useEffect(() => {
     turnOrderIdSetRef.current = new Set(turnOrder.map((p) => p.id));
   }, [turnOrder]);
+
+  // Peers som rapporterat `player_ready` (settled + har frågesekvensen).
+  // Set, inte Record — vi behöver bara medlemskap, och Set-identitet byter
+  // först när någon faktiskt tillkommer (handlern bail:ar på dubbletter).
+  const [playerReadyIds, setPlayerReadyIds] = useState<Set<string>>(new Set());
+
+  // Non-host: allt tungt mount-arbete klart OCH host:s frågesekvens mottagen.
+  // Sekvensen ingår med flit — utan den visar GetReady "Waiting for question
+  // data…" och enheten kan inte ens veta vilken fråga som kommer först.
+  const selfReadyToPlay =
+    seenDataLoaded &&
+    epochLedgerLoaded &&
+    audioOverridesLoaded &&
+    (broadcastAllQuestionIds?.length ?? 0) > 0;
+
+  // Skicka `player_ready` när villkoret först uppfylls. Tre sändningar av
+  // samma skäl som hälsningen (Realtime replayar aldrig); `sentRef` gör att
+  // vi inte startar om kedjan vid varje re-render.
+  const playerReadySentRef = useRef(false);
+  useEffect(() => {
+    if (isHost || gameMode !== 'individual-devices' || !selfPlayerId) return;
+    if (!selfReadyToPlay || playerReadySentRef.current) return;
+    playerReadySentRef.current = true;
+    const send = () => {
+      syncChannelRef.current?.broadcastPlayerReady({ player_id: selfPlayerId }).catch(() => {});
+    };
+    send();
+    const timers = [setTimeout(send, 1200), setTimeout(send, 3000)];
+    return () => timers.forEach(clearTimeout);
+  }, [isHost, gameMode, selfPlayerId, selfReadyToPlay]);
+
+  // ── IndDev: peer-readiness-gate på host:s Play-knapp (fråga 0) ───────────
+  // Supabase Realtime broadcast replayas ALDRIG till sena subscribers. Host:s
+  // enda play_command går därför förlorad om en non-host inte hunnit subscriba.
+  // Fönstret är reellt: host navigerar till /quiz direkt vid Start Game (utan
+  // att invänta markRoomGameStarted) medan non-host först måste upptäcka
+  // game-started via rooms-postgres_changes eller 2000 ms-poll och sedan göra
+  // flera awaitade round-trips före router.replace('/quiz') — typiskt 1-3 s
+  // efter host, medan host:s Play-knapp är guld och tappbar direkt vid mount.
+  //
+  // Gaten återanvänder befintlig maskineri: non-host hälsar med player_rejoined
+  // vid mount (se shouldAnnouncePresence nedan), host:s onPlayerRejoined-handler
+  // flippar dem till 'connected'. Ingen ny event-typ.
+  //
+  // BARA fråga 0 (Peter 2026-08-26). Från fråga 1 och framåt är status-mapen
+  // redan fylld, och drop-outs mitt i spelet täcks av host:s befintliga
+  // disconnect-Alert i GetReadyIntro.handlePlayPress. Att gate:a varje fråga
+  // skulle låta en spelare som stängt appen blockera resten av gruppen bakom
+  // en 8s-timeout per fråga.
+  //
+  // Förväntade peers = turnOrder minus host-raden. I IndDev har VARJE rad en
+  // egen enhet: host kan inte lägga till gäster manuellt i läget (Lobby alertar
+  // "Own device required"), och type:'guest' betyder anonymt konto — inte
+  // "delar host:s telefon". Filtrera därför INTE på type. Både selfPlayerId och
+  // hostPlayerId filtreras så en legacy-payload utan selfPlayerId inte ger en
+  // fantom-peer som aldrig hälsar.
+  const expectedPeerIds = useMemo(() => {
+    if (gameMode !== 'individual-devices' || !isHost) return [];
+    return turnOrder
+      .map((p) => p.id)
+      .filter((id) => !!id && id !== selfPlayerId && id !== hostPlayerId);
+  }, [gameMode, isHost, turnOrder, selfPlayerId, hostPlayerId]);
+
+  // ⚠ Grinden räknar på `playerReadyIds`, INTE `playerConnectionStatus`.
+  // `player_rejoined` betyder bara "jag är på kanalen" och skickas 300 ms
+  // efter subscribe — mitt i enhetens tyngsta mount-arbete. Släpps Play-
+  // knappen då hamnar AsyncStorage-resolves + gameQuestions-omräkningar mitt
+  // i nedräkningen, som driver iväg additivt, och enheten går in i question-
+  // fasen sent → YouTube-WebView:n börjar boota sent → hörbar eftersläpning.
+  // `player_ready` skickas först när enheten är settled. (Peter 2026-08-26.)
+  //
+  // ⚠ Räkna ALDRIG Object.keys(...).length på någon av map:arna som
+  // readiness-mått. `player_rejoined` registreras via rå channel.on i
+  // syncChannel och går förbi isKnownSender — ett påhittat id kan injicera en
+  // nyckel. Uppslag per FÖRVÄNTAT id läser aldrig främmande nycklar.
+  // (`player_ready` går via onEvent + known(), men håll samma vana.)
+  const unconfirmedPeerCount = expectedPeerIds.filter(
+    (id) => !playerReadyIds.has(id),
+  ).length;
+
+  // Tom expectedPeerIds täcker automatiskt Single Player (turnOrder.length <= 1),
+  // remote-1v1 (turnOrder = bara self) och Pass-the-Phone (gameMode-guarden)
+  // → ingen grind, ingen beteendeändring i de lägena.
+  const startGateApplies =
+    expectedPeerIds.length > 0 && phase === 'intro' && questionIndex === 0;
+
+  // Min-grey + timeout-escape. Speglar Next-knappens 5-sekunderslås: state +
+  // timers i EN effekt vars cleanup river dem. Dep är en BOOLEAN, inte
+  // expectedPeerIds — den arrayen byter identitet när turnOrder parsas om och
+  // skulle starta om min-perioden mitt i väntan.
+  // Ingen manuell reset behövs vid Play Again: carry-over går via ny lobby med
+  // ny rumkod → quiz.tsx mountas om helt och all state nedan är färsk.
+  const [startGateMinGreyDone, setStartGateMinGreyDone] = useState(false);
+  const [startGateTimedOut, setStartGateTimedOut] = useState(false);
+  useEffect(() => {
+    if (!startGateApplies) return;
+    setStartGateMinGreyDone(false);
+    setStartGateTimedOut(false);
+    const minGreyId = setTimeout(
+      () => setStartGateMinGreyDone(true),
+      START_GATE_MIN_GREY_MS,
+    );
+    const escapeId = setTimeout(
+      () => setStartGateTimedOut(true),
+      START_GATE_TIMEOUT_MS,
+    );
+    return () => {
+      clearTimeout(minGreyId);
+      clearTimeout(escapeId);
+    };
+  }, [startGateApplies]);
+
+  // startGateTimedOut är avsiktligt KLIBBIG: när escapen väl fyrat kan D-iii:s
+  // setPlayerConnectionStatus({})-wipe vid lokal unstable→ok-återhämtning inte
+  // låsa knappen igen.
+  const startLocked =
+    startGateApplies &&
+    !startGateTimedOut &&
+    (!startGateMinGreyDone || unconfirmedPeerCount > 0);
+
   useEffect(() => {
     // syncActive = IndDev ELLER Pass-the-Phone med fler än en spelare. I PtP
     // används bara fem event (score, question_advance, game_sequence_init,
@@ -6971,23 +7215,40 @@ export default function QuizScreen() {
         setPlayerConnectionStatus((prev) => ({ ...prev, [playerId]: status }));
       },
       onPlayerRejoined: (playerId) => {
-        // Explicit Retry-tap från remote spelare → flippa till 'connected'.
-        // Detta är ENDA vägen tillbaka (heartbeat-receipt räcker inte).
-        setPlayerConnectionStatus((prev) => ({ ...prev, [playerId]: 'connected' }));
+        // Hälsning från remote spelare → flippa till 'connected'. Detta är
+        // ENDA vägen dit (heartbeat-receipt räcker medvetet inte). Avsändare:
+        // explicit Retry-tap, unstable→ok-återhämtning, ELLER mount-hälsningen
+        // (se shouldAnnouncePresence nedan) som driver readiness-gaten.
+        // Bail:a när värdet är oförändrat — mount-hälsningen skickas 3 ggr per
+        // peer, och ett nytt objekt per hälsning gav upp till 33 host-renders
+        // på 4 s i ett 11-spelarspel (varje render kör om liveLeaderboard).
+        setPlayerConnectionStatus((prev) =>
+          prev[playerId] === 'connected' ? prev : { ...prev, [playerId]: 'connected' },
+        );
         // Svara direkt med frågesekvensen. game_sequence_init skickas annars
         // BARA vid +800/2500/5000 ms efter host:s egen subscribe — en enhet
         // som anslöt efter det fönstret (PtP-åskådaren mountar först när
         // spelaren tryckt "Yes" i lobbyns prompt) får då inga kategori-
         // ikoner eller badges förrän nästa question_advance, vilket kan
         // dröja en hel fråga. Idempotent för alla mottagare.
+        //
+        // Throttlad: game_sequence_init är en BROADCAST till alla, så EN
+        // sändning betjänar varje peer. Sedan IndDev non-hosts också hälsar
+        // (3 ggr per peer inom ~4 s) blev det annars N×3 identiska sändningar
+        // av upp till 500 fråge-id:n → Realtime rate-limit. 400 ms är kort nog
+        // att varje peers 300/1500/3500-hälsning får minst en färsk sekvens.
         if (isHost && syncChannelRef.current) {
-          syncChannelRef.current
-            .broadcastGameSequenceInit({
-              all_question_ids: gameQuestionsRef.current.map((q) => q.id),
-              spotify_answer_year: spotifyAnswerYear,
-              spotify_answer_name: spotifyAnswerName,
-            })
-            .catch(() => {});
+          const nowMs = Date.now();
+          if (nowMs - lastSequenceInitSentRef.current > 400) {
+            lastSequenceInitSentRef.current = nowMs;
+            syncChannelRef.current
+              .broadcastGameSequenceInit({
+                all_question_ids: gameQuestionsRef.current.map((q) => q.id),
+                spotify_answer_year: spotifyAnswerYear,
+                spotify_answer_name: spotifyAnswerName,
+              })
+              .catch(() => {});
+          }
         }
         // Del 1-fix: om host redan är i countdown/question re-broadcastar vi
         // play_command med 500 ms fördröjning. Fördröjningen krävs för att
@@ -7081,6 +7342,15 @@ export default function QuizScreen() {
       // på fråga 0) — senare ankomst (t.ex. reconnect-re-broadcast) ignoreras
       // så gameQuestions-useMemo:n aldrig bygger om poolen mitt i ett spel
       // (rebuild skulle byta den aktiva frågan under fötterna på spelarna).
+      // Peer är settled och redo att spela upp frågematerial → släpper host:s
+      // Play-knapp (startLocked). Idempotent: tre sändningar per peer, och
+      // bail:ar på oförändrat Set så host inte re-renderar i onödan.
+      onPlayerReady: (payload) => {
+        if (!isHost) return;
+        setPlayerReadyIds((prev) =>
+          prev.has(payload.player_id) ? prev : new Set(prev).add(payload.player_id),
+        );
+      },
       onPlayerSeenQuestions: (payload) => {
         if (!isHost) return;
         if (phaseRef.current !== 'intro' || questionIndexRef.current !== 0) return;
@@ -7107,8 +7377,10 @@ export default function QuizScreen() {
     // Host: broadcasta hela fråge-sekvensen vid 800ms, 2500ms och 5000ms
     // efter subscribe. Tre sändningar täcker (a) normalt race-fönster,
     // (b) sen subscription, (c) non-host som reloader och subscribar sent.
-    // non-hosts hinner subscriba i sin tur och ta emot eventet.
     // play_command skickar också all_question_ids så dubbelts är ofarligt.
+    // ⚠ Fönstret är INTE en garanti för att non-host hunnit subscriba — det
+    // var just det antagandet som gjorde att host:s enda play_command kunde
+    // gå förlorad. Mount-hälsningen nedan + startLocked är det som täcker det.
     const initBroadcastTimers: ReturnType<typeof setTimeout>[] = [];
     if (isHost) {
       const sendSequence = () => {
@@ -7124,17 +7396,31 @@ export default function QuizScreen() {
       initBroadcastTimers.push(setTimeout(sendSequence, 2500));
       initBroadcastTimers.push(setTimeout(sendSequence, 5000));
     }
-    // PtP-åskådaren mountar EFTER host (spelaren måste först svara "Yes" i
-    // lobbyns prompt), så host:s tre sendSequence-fönster ovan är i regel
-    // redan passerade när vi subscribar. Utan en hälsning fick vi vänta på
-    // nästa question_advance — dvs upp till en hel fråga innan kategori-
-    // ikonerna i Rounds-baren och badgarna på "Next to answer"-rutan dök upp.
-    //
     // player_rejoined ÄR "jag är här"-signalen i det här protokollet; host:s
     // handler svarar med game_sequence_init direkt. Tre försök av samma skäl
     // som player_seen_questions: den egna kanalen kan behöva ett ögonblick
     // på sig att joina innan send går fram.
-    if (isPtPSpectator && selfPlayerId) {
+    //
+    // TVÅ avsändare, samma grundproblem — en enhet som subscribar efter att
+    // host redan sänt får aldrig se det som sändes (Realtime replayar inte):
+    //
+    //   PtP-åskådaren mountar EFTER host (spelaren måste först svara "Yes" i
+    //     lobbyns prompt), så host:s tre sendSequence-fönster ovan är i regel
+    //     redan passerade. Utan hälsning fick vi vänta på nästa
+    //     question_advance — upp till en hel fråga innan kategori-ikonerna i
+    //     Rounds-baren och badgarna på "Next to answer"-rutan dök upp.
+    //
+    //   IndDev non-host (2026-08-26) mountar 1-3 s efter host och kan därmed
+    //     missa host:s enda play_command HELT → blev kvar i GetReady medan
+    //     host spelade vidare, främst på fråga 1. Hälsningen ger host (a)
+    //     'connected' i playerConnectionStatus, vilket driver readiness-gaten
+    //     på Play-knappen (startLocked), och (b) en återhämtningsväg: är host
+    //     redan i countdown/question re-broadcastas play_command efter 500 ms
+    //     i handlern ovan, så en sent anländande spelare dras in ändå.
+    const shouldAnnouncePresence =
+      !!selfPlayerId &&
+      (isPtPSpectator || (gameMode === 'individual-devices' && !isHost));
+    if (shouldAnnouncePresence) {
       const sayHello = () => {
         sync.broadcastPlayerRejoined({ sender_id: selfPlayerId }).catch(() => {});
       };
@@ -7156,7 +7442,12 @@ export default function QuizScreen() {
   // late-join. Host kör samma fetch (idempotent) så pre-existing
   // overrides från carry-over (Play Again) återställs i lokal state.
   useEffect(() => {
-    if (gameMode !== 'individual-devices' || !params.roomCode) return;
+    if (gameMode !== 'individual-devices' || !params.roomCode) {
+      // Inget att vänta in i övriga lägen — flaggan får inte hänga kvar false
+      // och blockera readiness-handskakningen.
+      setAudioOverridesLoaded(true);
+      return;
+    }
     let cancelled = false;
     getPlayerAudioOverrides(params.roomCode)
       .then((map) => {
@@ -7169,7 +7460,11 @@ export default function QuizScreen() {
             : map,
         );
       })
-      .catch(() => {});
+      .catch(() => {})
+      // Även vid nätverksfel: vi väntar inte längre på den här fetchen.
+      .finally(() => {
+        if (!cancelled) setAudioOverridesLoaded(true);
+      });
     return () => {
       cancelled = true;
     };
@@ -7464,8 +7759,12 @@ export default function QuizScreen() {
     // Answer response time får BARA ändras vid round-boundary i Pass-the-
     // Phone-läget — dvs när nästa spelare = första i turordningen
     // (currentPlayerIndex === 0 = alla har svarat lika många gånger).
-    // Individual Devices skippar intro mellan ronder så där är det alltid
-    // adjustable när intro visas (typiskt bara vid game start).
+    // Individual Devices har INGEN spelarrotation (currentPlayerIndex står
+    // still på 0), så villkoret är alltid falskt där → alltid adjustable.
+    // ⚠ IndDev visar intro mellan VARJE fråga precis som PtP —
+    // handleAdvanceToNextRound sätter phase='intro' ovillkorligt; bara
+    // currentPlayerIndex-rotationen är PtP-gatad. Host trycker alltså Play
+    // en gång per fråga i båda lägena.
     const responseSecondsLocked =
       gameMode === 'pass-the-phone' && currentPlayerIndex !== 0;
     // Pre-decode kommande image-fråga genom att mounta osynlig <Image>
@@ -7575,6 +7874,10 @@ export default function QuizScreen() {
             : undefined
         }
         isHost={isHost}
+        // IndDev fråga 0: håll Play-knappen grå tills varje förväntad peer
+        // bekräftat att de är i quizet (se startGateApplies-blocket).
+        startLocked={startLocked}
+        startGateUnconfirmedCount={startGateApplies ? unconfirmedPeerCount : 0}
         // LOKALA lägen: host får Quit Game (river rummet); non-host får
         // Leave Game (lämnar bara egen plats). Båda går ALDRIG via samma
         // codepath för cleanup eftersom non-host inte ska avsluta spelet
