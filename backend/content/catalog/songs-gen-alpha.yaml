@@ -625,11 +625,11 @@ items:
     wikimediaSearchHints: ["Frans If I Were Sorry Eurovision 2016"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "nANXQA9JEMY"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Frans"
-        notes: "Melodifestivalen 2016 vinnare. Officiell music video."
+      - videoId: "jLkHNqQS1fw"
+        startSec: 5
+        endSec: 35
+        channelTitle: "Frans - Topic"
+        notes: "Peter-kurerad 2026-08-26. startSec 5 satt av Peter. Bytt fran nANXQA9JEMY: den lag pa reupload-kanalen Bad Boy Edd trots att noten pastod officiell video. Detta ar Frans egen Topic-kanal (officiell studio-audio)."
   - id: robin-bengtsson-i-cant-go-on
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "I Can't Go On — Robin Bengtsson"
@@ -1661,3 +1661,183 @@ items:
         channelTitle: "shakiraVEVO"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
     genrePackages: ["sport"]
+  - id: backstreet-boys-chances
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Chances — Backstreet Boys"
+    correctYear: 2018
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Backstreet Boys Chances"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "W5kM5wAwRug"
+        startSec: 18
+        endSec: 48
+        channelTitle: "BackstreetBoysVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx). correctYear 2018 = singeln (9 nov 2018); albumet DNA kom jan 2019."
+    genrePackages: ["Soft Hits"]
+  - id: dua-lipa-break-my-heart
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Break My Heart — Dua Lipa"
+    correctYear: 2020
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Dua Lipa Break My Heart"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "Nj2U6rhnucI"
+        startSec: 10
+        endSec: 40
+        channelTitle: "Dua Lipa"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Hits"]
+  - id: dua-lipa-houdini
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Houdini — Dua Lipa"
+    correctYear: 2023
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Dua Lipa Houdini"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "suAR1PYFNYA"
+        startSec: 20
+        endSec: 50
+        channelTitle: "Dua Lipa"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Hits"]
+  - id: dua-lipa-illusion
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Illusion — Dua Lipa"
+    correctYear: 2024
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Dua Lipa Illusion"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "a9cyG_yfh1k"
+        startSec: 3
+        endSec: 33
+        channelTitle: "Dua Lipa"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Hits"]
+  - id: mabel-dont-call-me-up
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Don’t Call Me Up — Mabel"
+    correctYear: 2019
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Mabel Don't Call Me Up"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "9TQKyDD9Yig"
+        startSec: 8
+        endSec: 38
+        channelTitle: "MabelVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Hits"]
+  - id: zara-larsson-aint-my-fault
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Ain’t My Fault — Zara Larsson"
+    correctYear: 2016
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Zara Larsson Ain't My Fault"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "eC-F_VZ2T1c"
+        startSec: 2
+        endSec: 32
+        channelTitle: "ZaraLarssonMusicVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Hits"]
+  - id: ariana-grande-one-last-time
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "One Last Time — Ariana Grande"
+    correctYear: 2014
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Ariana Grande One Last Time"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "BPgEgaPk62M"
+        startSec: 46
+        endSec: 76
+        channelTitle: "ArianaGrandeVevo"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Hits"]
+  - id: clean-bandit-rockabye
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Rockabye — Clean Bandit feat. Sean Paul & Anne-Marie"
+    correctYear: 2016
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Clean Bandit Rockabye"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "papuvlVeZg8"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Clean Bandit"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Hits"]
+  - id: sean-paul-no-lie
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "No Lie — Sean Paul feat. Dua Lipa"
+    correctYear: 2016
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Sean Paul No Lie"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "GzU8KqOY8YA"
+        startSec: 0
+        endSec: 30
+        channelTitle: "SeanPaulVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Hits"]
+  - id: shawn-mendes-if-i-cant-have-you
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "If I Can’t Have You — Shawn Mendes"
+    correctYear: 2019
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Shawn Mendes If I Can't Have You"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "oTJ-oqwxdZY"
+        startSec: 3
+        endSec: 33
+        channelTitle: "ShawnMendesVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx). correctYear 2019 verifierat mot Wikipedia (MusicBrainz gav 2006 = annan artist)."
+    genrePackages: ["Hits"]
+  - id: zayn-pillowtalk
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Pillowtalk — ZAYN"
+    correctYear: 2016
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["ZAYN Pillowtalk"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "C_3d6GntKbk"
+        startSec: 0
+        endSec: 30
+        channelTitle: "ZaynVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Soft Hits"]
+  - id: taylor-swift-the-fate-of-ophelia
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "The Fate of Ophelia — Taylor Swift"
+    correctYear: 2025
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Taylor Swift The Fate of Ophelia"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "ko70cExuzZM"
+        startSec: 8
+        endSec: 38
+        channelTitle: "Taylor Swift"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Hits"]

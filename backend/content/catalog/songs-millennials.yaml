@@ -440,11 +440,11 @@ items:
     wikimediaSearchHints: ["Oasis Wonderwall"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "FVdjZYfDuLE"
-        startSec: 0
-        endSec: 15
-        channelTitle: "Oasis - Topic"
-        notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
+      - videoId: "bx1Bh8ZvH84"
+        startSec: 15
+        endSec: 45
+        channelTitle: "OasisVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx). startSec 15 angiven av Peter. Officiella musikvideon; ersatte Topic-audion FVdjZYfDuLE. SD ar bara en note i youtube-validate."
   - id: coolio-gangstas-paradise
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Gangsta's Paradise — Coolio"

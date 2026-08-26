@@ -961,12 +961,8 @@ items:
     probability: 70
     wikimediaSearchHints: ["Marie N I Wanna Eurovision 2002 Latvia"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "_M-w89U8TEU"
-        startSec: 5
-        endSec: 20
-        channelTitle: "Eurovision Song Contest"
-        notes: "ESC 2002 vinnare — Lettland."
+    # youtubeClips borttagna 2026-08-26 pa Peters begaran (_M-w89U8TEU).
+    # Itemet ar utan media tills ersattning finns.
     genrePackages: ["Eurovision"]
   - id: sertab-erener-everyway-that-i-can
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -1045,12 +1041,8 @@ items:
     probability: 74
     wikimediaSearchHints: ["Dima Bilan Believe Eurovision 2008 Russia"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "-72s4WzUcKI"
-        startSec: 5
-        endSec: 20
-        channelTitle: "Eurovision Song Contest"
-        notes: "ESC 2008 vinnare — Ryssland."
+    # youtubeClips borttagna 2026-08-26 pa Peters begaran (-72s4WzUcKI).
+    # Itemet ar utan media tills ersattning finns.
     genrePackages: ["Eurovision"]
   - id: alexander-rybak-fairytale
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -2157,3 +2149,78 @@ items:
         channelTitle: "RihannaVEVO"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
     genrePackages: ["Club & Dance Hits"]
+  - id: britney-spears-me-against-the-music
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Me Against the Music — Britney Spears feat. Madonna"
+    correctYear: 2003
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Britney Spears Me Against the Music"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "clwLKJ294u4"
+        startSec: 15
+        endSec: 45
+        channelTitle: "BritneySpearsVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Hits"]
+  - id: destinys-child-bootylicious
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Bootylicious — Destiny’s Child"
+    correctYear: 2001
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Destiny's Child Bootylicious"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "IyYnnUcgeMc"
+        startSec: 0
+        endSec: 30
+        channelTitle: "DestinysChildVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Hits"]
+  - id: pussycat-dolls-dont-cha
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Don’t Cha — The Pussycat Dolls feat. Busta Rhymes"
+    correctYear: 2005
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["The Pussycat Dolls Don't Cha"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "YNSxNsr4wmA"
+        startSec: 3
+        endSec: 33
+        channelTitle: "ThePussycatDollsVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Hits"]
+  - id: destinys-child-say-my-name
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Say My Name — Destiny’s Child"
+    correctYear: 1999
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Destiny's Child Say My Name"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "sQgd6MccwZc"
+        startSec: 0
+        endSec: 30
+        channelTitle: "DestinysChildVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx). correctYear 1999 = albumet The Writing's on the Wall (MusicBrainz gav felaktigt 1998)."
+    genrePackages: ["Hits"]
+  - id: brandy-monica-the-boy-is-mine
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "The Boy Is Mine — Brandy & Monica"
+    correctYear: 1998
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Brandy The Boy Is Mine"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "qSIOp_K5GMw"
+        startSec: 19
+        endSec: 49
+        channelTitle: "Brandy Videos"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Soft Hits"]
