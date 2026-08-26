@@ -4227,7 +4227,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '700',
     fontStyle: 'italic',
-    color: Colors.warning,
+    color: Colors.textSecondary,
     lineHeight: 15,
   },
   // Speglar Lobby:s purchasedPackageBox + purchasedPackageBoxActive 1:1
