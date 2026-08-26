@@ -102,6 +102,12 @@ export interface PlayAgainLobbyReadyPayload {
    *  rad finns redan i nya lobbyn. Utan flaggan (Start fresh) visas
    *  "Host has already started a new Game"-popupen → Home som tidigare. */
   auto_join?: boolean;
+  /** Id på den SERVER-sparade Aggregate Leaderboard/Score (migration 0037)
+   *  som serien är kopplad till. Non-host stämplar det på sin LOKALA serie
+   *  tillsammans med rumkoden och seedar sedan sin aggregat-vy från servern
+   *  — de är deltagare, så RLS tillåter läsningen. Utelämnas när spelet inte
+   *  sparas (gäst i uppsättningen) eller vid äldre klienter. */
+  aggregate_leaderboard_id?: string;
 }
 
 /**
@@ -625,6 +631,9 @@ function vPlayAgainLobbyReady(raw: unknown): PlayAgainLobbyReadyPayload | null {
     // Optional bool — allt annat än exakt true tolkas som frånvarande så
     // äldre payloads utan fältet beter sig som tidigare.
     auto_join: raw.auto_join === true ? true : undefined,
+    aggregate_leaderboard_id: str(raw.aggregate_leaderboard_id)
+      ? raw.aggregate_leaderboard_id
+      : undefined,
   };
 }
 function vPlayerApprovedPlayAgain(raw: unknown): PlayerApprovedPlayAgainPayload | null {

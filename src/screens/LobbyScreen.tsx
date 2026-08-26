@@ -61,6 +61,7 @@ import { addFriend, loadFriends, type Friend } from '../utils/friendsStorage';
 import { MIN_HCP, calculateInitialHCP } from '../utils/hcp';
 import { addLeftPlayer, getLeftPlayers, removeLeftPlayer } from '../utils/leftPlayers';
 import { deactivateRoom, getRoomMeta, markRoomGameStarted, roomExists, setRoomMaxPlayers, setRoomPlayerCount } from '../utils/mockActiveRooms';
+import { describeMissingPlayers, findMissingRematchPlayers } from '../utils/rematchLineup';
 import { clearEjected, isEjected, markEjected } from '../utils/ejectedPlayers';
 import { claimCarryOverLobbyPlayer, clearLobbyPlayers, getLobbyPlayers, getLobbySeenQuestionIds, markOwnPlayerLeft, publishOwnAccountName, setLobbyPlayers, updateOwnSeenQuestionIds, upsertOwnLobbyPlayer } from '../utils/mockLobbyPlayers';
 import { loadLastSessionIds, loadSeenQuestionIds } from '../utils/hostQuestionHistory';
@@ -1148,6 +1149,7 @@ export default function LobbyScreen() {
     guestReplays,
     carryOverPlayerId,
     lobbyType,
+    rematchLocked,
   } = useLocalSearchParams<{
     code: string;
     isHost: string;
@@ -1173,6 +1175,11 @@ export default function LobbyScreen() {
      *  hårt — den renodlade 1vs1-lobbyn visar ingen Game Mode-sektion så
      *  läget kan aldrig bytas inne i lobbyn. */
     lobbyType?: string;
+    /** 'true' när lobbyn skapades via Re-match/Replay från Final Leaderboard.
+     *  Spelaruppsättningen är då LÅST till exakt spelarna från förra spelet.
+     *  Skickas som param (utöver rums-radens rematch_locked) så låst läge
+     *  renderas redan på första framen, utan att vänta på en DB-läsning. */
+    rematchLocked?: string;
   }>();
   // Om ingen kod skickas (t.ex. om man öppnar lobby-tabben direkt) genereras en.
   // useMemo ser till att koden är stabil över re-renders.
@@ -1196,6 +1203,14 @@ export default function LobbyScreen() {
   // sker däremot på gameMode === 'remote-1v1' (state) så non-host — som får
   // gameMode via settings-syncen — döljer samma sektioner utan egen param.
   const is1v1Lobby = lobbyType === '1v1';
+  // Re-match/Replay-lobby (Peter 2026-08-25): uppsättningen är låst till
+  // spelarna från föregående spel, så aggregatet förblir en rättvis serie.
+  // Konsekvenser: "+ Add Player" döljs, papperskorg + Approve-toggle döljs,
+  // Game Mode + Players blir en statisk indikator (VARJE lägesbyte ejectar
+  // spelare), Start Game blockeras tills alla är tillbaka, och join-gaten
+  // på Home släpper bara in spelare som redan finns i lobbyn.
+  // Host har fortfarande "Delete this Game Lobby" som utväg.
+  const isRematchLobby = rematchLocked === 'true';
   // 'single' / 'multiplayer' är de två andra lobbyType-värdena (2026-08-24):
   // Single vs Multiplayer väljs numera redan på Home / Final Leaderboard i
   // stället för via Game Mode-rutorna här inne. De läses av
@@ -3277,6 +3292,16 @@ export default function LobbyScreen() {
   // Tryck på "+ Add Player" — blockera redan här om lobbyn är full så
   // host inte slösar tid på att fylla i formuläret.
   const handleOpenAddPlayer = () => {
+    // Re-match: uppsättningen är låst till förra spelets spelare. Knappen
+    // renderas inte i det läget — detta är belt-and-suspenders mot oväntade
+    // call-paths (och gör regeln läsbar där den faktiskt gäller).
+    if (isRematchLobby) {
+      Alert.alert(
+        'Line-up locked',
+        'A re-match keeps the exact same players as the previous game. Use Start New Game to play with someone else.',
+      );
+      return;
+    }
     // Single player: lobbyn har per definition ingen plats för fler spelare.
     // Att tyst öppna formuläret gav en lobby med två kort men ett spel som
     // ändå startade som single player (Peter 2026-08-24) — fråga i stället
@@ -3688,6 +3713,29 @@ export default function LobbyScreen() {
   // Remote 1v1-lobby (inte single player). Gatar "Save 1vs1 – Play later"
   // i BÅDA TopUserBanner-sheetsen — läget är det enda där lobbyn är värd
   // att spara: rummet lever 24h och matchen är asynkron ändå.
+  // Förväntad uppsättning i en låst re-match-lobby: lobby_players.player_id
+  // för spelarna från föregående spel, skrivna atomiskt på rums-raden av
+  // registerActiveRoom (migration 0037). Driver både antalet i den statiska
+  // indikatorn och "alla på plats"-guarden i handleStartGame.
+  const [rematchExpectedIds, setRematchExpectedIds] = useState<string[]>([]);
+  useEffect(() => {
+    if (!isRematchLobby) return;
+    let cancelled = false;
+    void getRoomMeta(roomCode).then((meta) => {
+      const ids = meta?.rematchPlayerIds ?? [];
+      if (!cancelled && ids.length > 0) setRematchExpectedIds(ids);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [isRematchLobby, roomCode]);
+  // Fallback till de faktiskt pre-seedade raderna när rums-raden saknar
+  // listan (0037 inte körd → registerActiveRoom:s fallback skrev rummet
+  // utan fälten). Lobbyn låses ändå visuellt; bara "alla på plats"-guarden
+  // degraderar till en no-op, vilket är rätt riktning att fela åt.
+  const lockedLineupCount =
+    rematchExpectedIds.length || players.filter((p) => !p.hasLeft).length;
+
   const isRemoteLobby = gameMode === 'remote-1v1' && !singlePlayerDefault;
   // Gemensam hjälpnivå gäller bara när BÅDE lobbyn är remote OCH host slagit
   // på switchen. Är den av beter sig assistance precis som i lokala lägen
@@ -5071,6 +5119,24 @@ export default function LobbyScreen() {
       }
     }
 
+    // Re-match: hela uppsättningen från förra spelet måste vara tillbaka.
+    // Ligger FÖRE credit-blocket — en avbruten start får aldrig kosta en
+    // credit (samma regel som Spotify-attest-guarden ovan).
+    //
+    // Saknas listan (rums-raden skrevs utan 0037-fälten) är detta en no-op;
+    // låsningen i UI:t gäller ändå. Host har alltid "Delete this Game Lobby"
+    // som utväg om någon aldrig kommer tillbaka.
+    if (isRematchLobby) {
+      const missing = findMissingRematchPlayers(rematchExpectedIds, players);
+      if (missing.length > 0) {
+        Alert.alert(
+          'Waiting for players',
+          `${describeMissingPlayers(missing)} from the previous game hasn't re-joined yet. A re-match keeps the exact same line-up, so everyone has to be back before it can start.`,
+        );
+        return;
+      }
+    }
+
     // Konsumera 1 Free Host Game-credit per påbörjat spel (2 gratis/dag,
     // top-up vid midnatt CET). Blockerar start om Free är 0 och host saknar
     // Premium (visar Store-redirect-Alert mot subscription). Engångsköpta
@@ -5751,7 +5817,7 @@ export default function LobbyScreen() {
                 ));
               })()}
             </View>
-            {hostMode && gameMode === 'pass-the-phone' && (
+            {hostMode && gameMode === 'pass-the-phone' && !isRematchLobby && (
               <TouchableOpacity style={styles.addBtn} onPress={handleOpenAddPlayer}>
                 <Text style={styles.addBtnText}>+ Add Guest</Text>
               </TouchableOpacity>
@@ -5785,7 +5851,7 @@ export default function LobbyScreen() {
                 isGuest={player.type === 'guest'}
                 accountPlayerName={player.accountPlayerName}
                 turnNumber={gameMode === 'pass-the-phone' ? index + 1 : undefined}
-                showApproveToggle={hostMode && !player.isHost && !player.hasLeft}
+                showApproveToggle={hostMode && !isRematchLobby && !player.isHost && !player.hasLeft}
                 approved={true}
                 onApproveChange={(next) => handleSetApproved(player.id, next)}
                 hasLeft={player.hasLeft}
@@ -5811,7 +5877,7 @@ export default function LobbyScreen() {
 
                 {/* Master "Approve All"-toggle — bara host ser/använder den.
                     Drar host till Yes godkänns alla aktuellt väntande spelare. */}
-                {hostMode && waitingForApproval.length > 0 && (
+                {hostMode && !isRematchLobby && waitingForApproval.length > 0 && (
                   <View style={styles.approveAllRow}>
                     <ApproveToggle
                       label="Approve All"
@@ -5840,11 +5906,15 @@ export default function LobbyScreen() {
                     isHostPlayer={false}
                     isGuest={player.type === 'guest'}
                     accountPlayerName={player.accountPlayerName}
-                    showApproveToggle={hostMode && !player.hasLeft}
+                    showApproveToggle={hostMode && !isRematchLobby && !player.hasLeft}
                     approved={false}
                     onApproveChange={(next) => handleSetApproved(player.id, next)}
                     hasLeft={player.hasLeft}
-                    onDelete={hostMode ? () => handleDeletePlayer(player.id) : undefined}
+                    onDelete={
+                      hostMode && !isRematchLobby
+                        ? () => handleDeletePlayer(player.id)
+                        : undefined
+                    }
                     onEditPlayer={hostMode && !player.hasLeft ? () => openPlayerEdit(player.id) : undefined}
                     peerHealth={
                       gameMode === 'individual-devices'
@@ -6022,6 +6092,35 @@ export default function LobbyScreen() {
                 Each player plays with their own assistance level.
               </Text>
             )}
+          </View>
+        ) : isRematchLobby ? (
+          /* Re-match/Replay-lobby (Peter 2026-08-25): spelaruppsättningen är
+             låst till exakt spelarna från förra spelet, så aggregatet förblir
+             en rättvis serie. Därför INGA Game Mode-val och ingen
+             Players-sektion — VARJE lägesbyte ejectar spelare (Single player
+             kastar ut alla non-hosts, Individual device tar bort host-tillagda
+             gäster, Pass-the-Phone nollar maxPlayers till 4). Statisk
+             indikator i samma vokabulär som den renodlade 1vs1-lobbyn ovan.
+             Allt ANNAT (rundor, era, Source Mixerboard, paket, svarstid) är
+             kvar redigerbart — det rör inte uppsättningen. */
+          <View style={[styles.section, { marginTop: Spacing.xs }]}>
+            <Text style={styles.sectionLabel}>Game Mode</Text>
+            <View style={[styles.modeRow, { marginTop: Spacing.sm }]}>
+              <View style={[styles.modeOption, styles.modeOptionPassActive]}>
+                <Text style={[styles.modeLabel, { textAlign: 'center' }, styles.modeLabelActiveFree]}>
+                  {singlePlayerDefault
+                    ? 'Replay — Single player (locked)'
+                    : `Re-match — ${lockedLineupCount} players (line-up locked)`}
+                </Text>
+                <View style={styles.freeBadge} pointerEvents="none">
+                  <Text style={styles.freeBadgeText}>FREE</Text>
+                </View>
+              </View>
+            </View>
+            <Text style={styles.guestHostNote}>
+              These are the players from the previous game. Use Start New Game
+              to play with others.
+            </Text>
           </View>
         ) : (
         <View style={[styles.section, { marginTop: Spacing.xs }]}>
@@ -7166,8 +7265,11 @@ export default function LobbyScreen() {
                       EN rad med tre rutor, som huvud-Game Mode-sektionen.
                       Göms HELT i renodlade 1vs1-lobbyn (mode är låst där);
                       Remote-rutan borttagen 2026-08-07 (1vs1 nås via
-                      Home-valet). */}
-                  {gameMode !== 'remote-1v1' && (
+                      Home-valet).
+                      ⚠ Göms ÄVEN i re-match/replay-lobbyn — annars hade den
+                      varit en bakväg förbi låsningen i Game Mode-sektionen
+                      längre upp, och VARJE lägesbyte ejectar spelare. */}
+                  {gameMode !== 'remote-1v1' && !isRematchLobby && (
                     <>
                       <View style={[styles.modeRow, { marginTop: Spacing.lg }]}>
                         {renderModeBox('single', 'Single player', true)}
@@ -9804,7 +9906,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '700',
     fontStyle: 'italic',
-    color: Colors.warning,
+    color: Colors.textSecondary,
     lineHeight: 15,
   },
   connectionLabel: {

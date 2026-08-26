@@ -1782,7 +1782,7 @@ En godkänd non-host i en PtP-lobby var tidigare en återvändsgränd: host tryc
 Nu får de i stället frågan **"Host has started the Game / Please use Host device. Do you want to follow the Leaderboard on this device?"** → **No** = Home som förr, **Yes** = `/quiz` i en **spectator-vy** som visar leaderboarden uppdaterad i realtid, och efter sista frågan Final Leaderboard med prisutdelnings-sekvensen.
 
 **⚠ Re-match finns INTE i PtP — varken för host eller non-host** (Peter 2026-08-25). Skälet: host kan lägga till gäster via "+ Add Player" som saknar egen enhet, så ett IndDev-liknande approval-flöde hade låst host:ens Yes-knapp för alltid. **Bygg inte approvals för PtP** utan nytt produktbeslut.
-- **Host:s slutskärm hoppar över hela Yes/No-frågan** — `rematchQuestionEnabled = localRematchFlow && gameMode !== 'pass-the-phone' && !isLocalSoloGame` gatar `onReplayYes`, och `localStartNewGameReady = localRematchFlow && (!rematchQuestionEnabled || replayChoice === 'no')` gör att **"Start New Game" + Home visas direkt**. Individual Devices behåller frågan + approval-flödet oförändrat.
+- **Host:s slutskärm hoppar över hela Yes/No-frågan** — `rematchQuestionEnabled = localRematchFlow && (isLocalSoloGame || gameMode !== 'pass-the-phone')` gatar `onReplayYes`, och `localStartNewGameReady = localRematchFlow && (!rematchQuestionEnabled || replayChoice === 'no')` gör att **"Start New Game" + Home visas direkt**. Individual Devices behåller frågan + approval-flödet oförändrat.
 - **Spectatorns slutskärm har bara Home** (`homeOnlyFooter`).
 
 ### Kanalen: fem event, inget mer
@@ -2171,7 +2171,8 @@ Host:s **Play Again** är borttagen ur slutskärmen. I stället ställs **EN fr�
 
 **Gäller/gäller inte:**
 - **Pass-the-Phone**: ⚠ **hela re-match-frågan är BORTTAGEN sedan 2026-08-25** (Peter). Host:s slutskärm visar direkt "Start New Game" + Home — `rematchQuestionEnabled` gatar bort `onReplayYes` i PtP och `localStartNewGameReady` skickar in `onStartNewGame` från början. Non-hosts sitter kvar i `/quiz` på Final Leaderboard men deltar inte: deras footer är Home-only (`homeOnlyFooter`) och `goToNewLobby` tvingar `auto_join: undefined` i PtP, så de får "Host has already started a new Game" → Home. **Bygg inte approvals för PtP** — host kan ha lagt till gäster utan egen enhet, som aldrig kan godkänna. Se "Pass-the-Phone — non-host som live-spectator".
-- **Single player** (`isLocalSoloGame`, dvs. `turnOrder.length <= 1`): ⚠ **hela re-match-frågan är BORTTAGEN sedan 2026-08-25** (Peter) — slutskärmen visar ENBART "Start New Game" + Home. Det finns ingen motpart att aggregera en leaderboard mot, så frågan var meningslös: "Start New Game" gör redan exakt samma sak. Beskrivningar av att single player skulle nå `askKeepSettingsThenGo(true, 'single')` via ett Yes är stale.
+- **Single player** (`isLocalSoloGame`, dvs. `turnOrder.length <= 1`): ⚠ **HAR ÅTER EN FRÅGA sedan 2026-08-25 (senare samma dag) — men med ANNAN text: "Replay & Aggregate score?"** Frågan togs bort tidigare med motiveringen "ingen motpart att aggregera mot"; motparten är spelarens EGNA tidigare spel. **No** → Start New Game som förr. **Yes** → ny Single player-lobby med låst uppsättning (en spelare) som fyller på en **Aggregate Score**. Ingen approval-väntan (inga non-hosts) och **ingen Keep/Reset-prompt** — `proceedWithRematch` hoppar den för solo av samma skäl som för guest hosts: enda spelaren ÄR host, så "Reset" hade nollställt deras egen age/assistance. Vänd inte tillbaka utan nytt beslut.
+  - ⚠ **Gaten måste testa `isLocalSoloGame` FÖRST.** Single player är `singlePlayerDefault: true` ovanpå ett vanligt `gameMode`, inte ett eget läge — ett solospel bär alltså oftast `gameMode: 'pass-the-phone'` (profil-defaulten). En naken `gameMode !== 'pass-the-phone'` slår därför ut solo tillsammans med PtP-multiplayer, och frågan syns aldrig (bugg 2026-08-26). PtP-undantaget gäller PtP-MULTIPLAYER.
 - **Guest-hostade spel**: samma två steg, med tre skillnader. (a) **Remote Play visas aldrig** i Start New Game-panelen — remote 1vs1 är QuizVibe-users-only. (b) **Keep/Reset hoppas över** — guest-lobbyns settings är låsta, så `proceedWithRematch` går direkt till `goToNewLobby(true, true, …)`. (c) **1-re-match-cappen**: `localRematchFlow` kräver `guestReplaysUsed < 1` och gatar BÅDA stegen, så omgång 2 visar bara Home. Noten "Replay only possible 1 time for Guest Hosts" ligger överst i sticky-footern.
 - **Remote 1v1**: har ENBART "Start New Game" (ingen re-match — en asynkron duell har ingen replay-koppling) med sin egen `startNewGameLocked`-logik, se remote-sektionen.
 
@@ -2190,6 +2191,69 @@ Host:s **Play Again** är borttagen ur slutskärmen. I stället ställs **EN fr�
 
 Lägg alla framtida host-lobby-skapanden från quiz-skärmen bakom samma funnel — punkt 1 ensam räcker inte, eftersom det kan gå lång tid (approval-väntan, Alert-steg) mellan tappet och det faktiska skapandet. `handleStartNewGameFromFinal` (remote + Remote Play-raden) har sin EGEN gate med Cancel / Go to Store — medvetet en annan utväg än "Restart as Guest", som inte finns för remote (users-only).
 
+## Aggregate Leaderboard — andra sidan på slutskärmen (2026-08-25)
+
+Har host kört **"Re-match with Aggregate Leaderboard?" → Yes** blir Final Leaderboard en **två-sidig pager**: sida 1 är ALLTID spelet som just spelats, sida 2 är **hela serien sammanslagen** — samma kolumner, samma sortering, alla spel adderade. Rubriken byter till "Aggregate Leaderboard" på sida 2.
+
+**Samma kriterier är hela poängen.** Båda vyerna går genom **`finalizeRows()`** i [RoundLeaderboard.tsx](src/components/RoundLeaderboard.tsx) (wifi-härledning + pts desc → 0-ronder sist → avg asc) och renderas av **samma `<LeaderboardTable>`**. Bygg aldrig en parallell tabell eller en egen sortering för aggregatet — då kan vyerna glida isär.
+
+**Kedjan hålls ihop av RUMKODEN, inte av ett synkat series-id** ([src/utils/aggregateLeaderboard.ts](src/utils/aggregateLeaderboard.ts), AsyncStorage `@quizvibe/aggregateSeries/v1`). Varje enhet håller sin EGEN kopia och visar bara sin egen vy; siffrorna blir ändå identiska eftersom alla enheter har hela `allRoundScoresHistory` via `player_score_recorded`. Därför behövs **ingen DB-migration, inget nytt broadcast-event** och ingen överenskommelse mellan enheterna:
+- När en re-match startas stämplas den KOMMANDE rumkoden i `nextRoomCode` — host i `goToNewLobby` (`reusePlayers === true`), non-host när `play_again_lobby_ready` faktiskt tar dem vidare.
+- Nästa spel som slutar i just det rummet fortsätter serien. Allt annat (inkl. "Start New Game", som aldrig bär över spelare) startar en ny serie med bara det spelet.
+
+**Spel lagras som per-spel-snapshots nycklade på rumkod och ERSÄTTS vid omskrivning**; summeringen sker vid LÄSNING i `buildAggregateStandings`. Slutskärmens effekt står därför på `allRoundScoresHistory` och skriver om sig när sena peer-scores droppar in — utan att dubbelräkna spelet.
+- ⚠ **En omskrivning får INTE nolla `nextRoomCode`.** Host hinner starta re-matchen och en efterslängande score skulle annars radera stämpeln, varpå nästa spel tappar serien. `recordGameInSeries` bevarar därför stämpeln när samma rumkod skrivs om, och förbrukar den bara när ett NYTT spel går in i serien.
+
+**Aggregatet räknas per `playerId`**, som carry-over bevarar genom hela serien (host via `id: '1'`, non-host via `carryOverPlayerId`). Namn/avatar/meta tas från det SENASTE spelet spelaren deltog i — host kan ha döpt om dem mellan omgångarna. Snittiden viktas mot antal SVAR (inte antal spel) och "Last 5" löper över spelgränsen. En spelare som bara var med i första spelet ligger kvar med sina siffror.
+
+**Sida 2 renderas bara vid `gamesPlayed >= 2`** — ett fristående spel är ingen serie, och då är slutskärmen bit-identisk med förut (`aggregate`-propen utelämnas → ingen pager, inga flikar). Remote 1v1 har ingen re-match och skickar aldrig in propen.
+
+⚠ **`aggregate`-propen hör hemma på slutskärmens `<RoundLeaderboard>` — den med `isLastRound={isLastQuestion}`.** [quiz.tsx](app/quiz.tsx) renderar TVÅ `<RoundLeaderboard>`, och propen hamnade först på PtP-spectatorns *interim*-vy, som har `isLastRound={false}` hårdkodat och därför aldrig kan visa aggregatet — resultatet blev att fliken inte syntes för någon (bugg 2026-08-25). **Ankra framtida edits på `isLastRound`, inte på `allRoundScoresHistory`** — den propen finns på BÅDA anropen.
+
+**Vald flik har guld RAM + vit text på BLÅ bakgrund** (`Colors.warning` som `borderColor`, `Colors.primaryMuted` som bakgrund). Guld-fyllningen provades och togs bort — den gav hela fliken en gul ton; ramen bär "vald"-signalen. Svep-hinten sitter DIREKT under flikarna, inte under tabellen (Peter 2026-08-26).
+
+⚠ **Flikarna ("This game" / "All N games") är inte dekoration — de är den enda garanterade vägen mellan sidorna.** Tabellens mittkolumn är en egen horisontell ScrollView som äter svepet där; svep fungerar över Player- och PTS-kolumnerna (som inte scrollar) men kan inte vara enda kontrollen. Ta inte bort flikarna "eftersom man kan svepa".
+
+**Tabellen bor i [src/components/LeaderboardTable.tsx](src/components/LeaderboardTable.tsx)** sedan 2026-08-25 — utbruten ur RoundLeaderboard så att slutskärmen, aggregat-sidan OCH Profile-modalen delar exakt samma rendering + `finalizeRows`-sortering.
+
+### Namngivning: Score vs Leaderboard
+
+`aggregateLabel(participantCount)` i [aggregateLeaderboard.ts](src/utils/aggregateLeaderboard.ts): **en** deltagare → `"Aggregate Score"` (single player), flera → `"Aggregate Leaderboard"`. Uppsättningen är låst genom hela serien, så etiketten kan aldrig hoppa mitt i.
+⚠ Slutskärmens FRÅGA kan inte använda den — serien finns inte än — och växlar därför på `isLocalSoloGame` via `RoundLeaderboard`s `replayTitle`-prop.
+
+### Sparade serier på kontot (migration 0037)
+
+Består spelet av **100 % QuizVibe-users** sparas serien dessutom NAMNGIVEN server-side, så den överlever telefonbyte, syns under Player history hos **alla** deltagare, och kan återupptas en annan kväll.
+
+- **Tabeller**: `aggregate_leaderboards` (namn + `participants_key`) / `aggregate_leaderboard_players` (uppsättningen, immutabel, med `player_name` som SNAPSHOT — `profiles` är own-row-only) / `aggregate_leaderboard_games` (`primary key (leaderboard_id, room_code)` → **idempotent**, samma princip som den lokala storen). Summeringen görs vid LÄSNING av **samma** `buildAggregateStandings`.
+- **Writes är RPC-only**, deny-by-default; SELECT går via definer-helpern `is_aggregate_leaderboard_participant` (utan den blir participants-policyn RLS-rekursiv, exakt som `is_remote_match_participant`).
+- ⚠ **`participants_key` beräknas i RPC:n**, aldrig av klienten. Och **servern avgör vem som är registrerad** genom att kräva en `profiles`-rad per uid — klientens `type` är spoofbar och ignoreras (samma resonemang som `create_remote_match`).
+- ⚠ **user_id finns INTE i quiz-vyn.** `rowToPlayer` läser `lobby_players.user_id` men exponerar det aldrig på `LobbyPlayer`, så det når varken `turnOrder` eller quiz. Vid Re-match är gamla rummet ännu inte rivet, så host läser raderna direkt via **`getLobbyPlayerUserIds`** ([mockLobbyPlayers.ts](src/utils/mockLobbyPlayers.ts)). **`playerName` duger inte** som nyckel — lobby-namn är host-redigerbara och gäst-alias genereras lokalt.
+- **Flödet** ligger i `ensureAggregateLeaderboardAttached` ([quiz.tsx](app/quiz.tsx)), körs vid FÖRSTA re-matchen i en serie: hämta uid-set → finns sparade serier med exakt den uppsättningen? → i så fall **"Add to existing Aggregate Leaderboard/Score?"** (Yes → lista, No → ny). Inga träffar → skapas tyst.
+  - ⚠ **Listan visas ALLTID när det finns minst en träff** — även vid exakt en. Tidigare auto-kopplades den enda träffen tyst, och host fick då aldrig se vilken serie spelet hamnade i (Peter 2026-08-26).
+  - Listan är ett **tvåstegsval** (Peter 2026-08-26): ett tapp på en rad MARKERAR den (blå kant + `primaryMuted`), och först då tänds **Confirm** (gold; grå/otappbar utan markering). Att koppla direkt på rad-tappet gjorde ett feltryck omedelbart bindande.
+  - Listan har tre utfall (`AggregatePickChoice`): Confirm på en markerad rad / **Start a fresh one** / **Cancel**. ⚠ Cancel är MEDVETET skilt från fresh: den skapar ingenting och tar host tillbaka till slutskärmen med Yes/No kvar. Funktionen returnerar då `false` och `handleReplayYes` avbryter **före** `broadcastPlayAgainInitiated` — annars hade inbjudan gått ut till non-hosts trots att host backade ur.
+  - ⚠ **Bara Aggregate-serier sparas server-side.** Enstaka spel lagras ALDRIG som egna poster (Peter 2026-08-26). Skälet är inte lagringsstorlek (~1-2 KB/spel) utan UX-skräp i Profile-listan, kostnaden för `list_aggregate_leaderboards_for_participants` (`group by` + `having` efter aggregering) och att en 1-spelspost inte är en leaderboard. Vill vi ha "alla spel" cross-device är rätt vehikel den skrivna men aldrig applicerade `0016_game_sessions.sql`.
+  - ⚠ **Spelet som just avslutades måste skjutas upp vid attach** (`pushLocalGames`) — det bokfördes lokalt INNAN serien fanns på servern, så utan det saknar den sparade serien sin första omgång för alltid.
+  - ⚠ `aggregateLeaderboardIdRef` är en **synkron spegel**: i solo kör `goToNewLobby` i samma tick som attach, och React-state hade då fortfarande varit null i closuren.
+- **Bara HOST skriver spel** (`recordAggregateGame`). En non-host som lämnat mitt i spelet har ofullständig `allRoundScoresHistory` och skulle skriva trunkerad statistik över hostens korrekta rad. RPC:n guardar bara på "deltagare" — host-only-regeln bor i klienten.
+- **Non-hosts får id:t** via `play_again_lobby_ready.aggregate_leaderboard_id` (befintlig transport — **inget nytt event**) och seedar sin lokala serie från servern.
+- **Omdöpning**: penna bredvid rubriken på aggregat-sidan, **bara för host** (`isHost && !!leaderboardId`). Öppnar en bottom-sheet — appen har ingen inline-edit-precedens. Namnet syns för alla deltagare, så det går genom `containsProfanity` (friends-modalen hoppar över den kollen; upprepa inte det). ⚠ Lägg **inte** rename på fliketiketten: tappet där byter redan sida.
+- **Profile**: [SavedAggregatesCard](src/components/SavedAggregatesCard.tsx) renderas inuti Player history, ovanför månadsgrupperna. Självgatande — inget sparat eller anon-session → `null`.
+- Är någon deltagare gäst (eller servern otillgänglig) sparas **ingenting** — den lokala serien och lobby-låsningen fungerar ändå. Fail-open hela vägen.
+
+## Låst spelaruppsättning i re-match-lobbyn (2026-08-25)
+
+Väljer host Re-match/Replay innehåller den nya lobbyn **exakt spelarna från förra spelet** — varken fler eller färre. Annars vore aggregatet inte längre en rättvis serie. Detta **ersätter** en tidigare tänkt efterhandskontroll: uppsättningen kan inte längre ändras, så den kan inte spräcka serien.
+
+**Signalen är atomisk** — `registerActiveRoom` skriver `rooms.rematch_locked` + `rooms.rematch_player_ids` (0037) samtidigt med rums-raden, innan koden ens är joinbar. ⚠ Samma val som `is_remote_1v1` (0031) tvingades göra: `lobby_settings` går genom hostens 300 ms-debounce och hade gjort join-gaten fail-open i ~1 s. Flaggan skickas DESSUTOM som `rematchLocked`-param till `/lobby` så låst läge renderas på första framen utan DB-läsning.
+- ⚠ `registerActiveRoom` har en **missing-column-fallback**: en upsert som nämner en okörd kolumn failar HELA skrivningen, så utan den hade en oapplicerad 0037 gjort det omöjligt att skapa rum alls. Vid det felet skrivs raden om utan 0037-fälten och låsningen degraderar tyst.
+
+**I lobbyn** (`isRematchLobby`): "+ Add Player" döljs, papperskorg + Approve-toggle + "Approve All" döljs, **game-mode quick-selecten under Number of Rounds göms** (annars vore den en bakväg förbi låsningen), och Game Mode + Players blir en **statisk indikator** ("Re-match — N players (line-up locked)" / "Replay — Single player (locked)"). Hela sektionen låses för att **varje** lägesbyte ejectar spelare — Single player kastar ut alla non-hosts, IndDev tar bort host-tillagda gäster, PtP nollar `maxPlayers` till 4. Allt annat (rundor, era, Source Mixerboard, paket, svarstid) är kvar redigerbart. Host har fortfarande "Delete this Game Lobby" som utväg.
+
+**Start Game blockeras** tills varje id i `rematch_player_ids` finns i `lobby_players` utan `hasLeft` — `findMissingRematchPlayers` i [rematchLineup.ts](src/utils/rematchLineup.ts) (ren funktion, enhetstestad). Guarden ligger **före** credit-blocket så en avbruten start aldrig kostar en credit. Tom lista (0037 inte körd) blockerar aldrig.
+
+**Join-gate**: `checkRematchLockedLobby` i [app/index.tsx](app/index.tsx), i alla tre join-vägarna. En spelare som VAR med släpps in (matchas case-insensitivt mot pre-seedade `lobby_players`-rader och ärver sitt gamla `player_id`); alla andra får "Re-match lobby"-popupen.
 ## Play Again approval flow (Individual Devices)
 
 > ⚠ Sedan 2026-08-24 (rev 3) nås detta flöde från slutskärmens **"Re-match with Aggregate Leaderboard?" → Yes** (gäller BÅDE registrerade och guest-hostade spel). **Host-side-modalen nedan är därmed dormant** — approval-statusen visas i stället som grå Yes-knapp (`replayLocked`) + `replayNote` under den. Sync-events, `playAgainApprovals`-räkningen och non-host-halvan (`handleApprovePlayAgain`, "Approve / Re-match") är oförändrade och LIVE.

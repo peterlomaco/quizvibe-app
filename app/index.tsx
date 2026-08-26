@@ -300,6 +300,39 @@ async function checkSinglePlayerLobby(code: string): Promise<boolean> {
   return true;
 }
 
+// Re-match-lobby: uppsättningen är låst till spelarna från föregående spel,
+// så bara de får komma in (Peter 2026-08-25). Samma kontrakt som
+// checkLobbyCapacity: true = popup visades = caller ska abortera.
+//
+// Källan är `rooms.rematch_locked` (0037) — INTE lobby_settings — av samma
+// skäl som `is_remote_1v1`: rums-raden skrivs atomiskt vid skapandet, medan
+// lobby_settings går genom hostens 300 ms-debounce och hade gjort gaten
+// fail-open i ~1s efter att lobbyn skapats.
+//
+// En spelare som VAR med i förra spelet har redan en pre-seedad rad i
+// lobby_players (carry-over) och släpps igenom — de ärver sitt gamla
+// player_id via code-only-joinens befintliga dup-detection. Matchningen är
+// case-insensitiv på playerName, samma nyckel som den grenen använder.
+//
+// Fail-open när metan saknas, samma konvention som isLobbyFull/isOwnLobby.
+async function checkRematchLockedLobby(
+  code: string,
+  playerName: string | null | undefined,
+): Promise<boolean> {
+  const meta = await getRoomMeta(code);
+  if (!meta?.rematchLocked) return false;
+  const name = playerName?.trim().toLowerCase();
+  if (name) {
+    const seeded = await getLobbyPlayers(code);
+    if (seeded?.some((p) => p.name.trim().toLowerCase() === name)) return false;
+  }
+  Alert.alert(
+    'Re-match lobby',
+    'This Room Code belongs to a re-match. Only the players from the previous game can join.',
+  );
+  return true;
+}
+
 function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false, currentPlayerName, guestHostLobbyType = 'multiplayer', onRemoteAccountRequired, initialGuestDraft }: JoinModalProps) {
   const [step, setStep] = useState<JoinStep>(initialStep);
   const [code, setCode] = useState('');
@@ -536,6 +569,9 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     // single. Inviten ligger KVAR i listan (som capacity-fallet) — host kan
     // byta tillbaka, och då ska den fortfarande gå att tacka ja till.
     if (await checkSinglePlayerLobby(invite.roomCode)) return;
+    // Host kan ha startat en re-match efter att inbjudan skickades — då är
+    // uppsättningen låst och bara förra spelets spelare kommer in.
+    if (await checkRematchLockedLobby(invite.roomCode, currentPlayerName)) return;
     // Capacity-check FÖRE removeInvite: om lobby:n är full ska usern få
     // popup och inviten ligga kvar i listan, så de kan försöka igen om
     // någon lämnar. Speglar samma check som handleJoinWithCode kör.
@@ -591,6 +627,8 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     }
     // Single-player-lobby: ingen plats att joina förrän host byter läge.
     if (await checkSinglePlayerLobby(code)) return;
+    // Re-match-lobby: låst uppsättning — bara förra spelets spelare släpps in.
+    if (await checkRematchLockedLobby(code, currentPlayerName)) return;
     // Capacity-check: om host:s lobby redan är full visar vi popup med text
     // som beror på Free vs Premium-host. Användaren stannar i join-formuläret.
     if (await checkLobbyCapacity(code)) return;
@@ -832,6 +870,9 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     }
     // Single-player-lobby: speglar handleJoinWithCode.
     if (await checkSinglePlayerLobby(code)) return;
+    // Re-match-lobby: speglar handleJoinWithCode. En gäst som VAR med i
+    // förra spelet har en pre-seedad rad och matchar på sitt guest-namn.
+    if (await checkRematchLockedLobby(code, guestIdentity || currentPlayerName)) return;
     // Capacity-check: speglar handleJoinWithCode — full lobby visar popup
     // istället för att skicka in gästen som ändå skulle få "lobby is full"
     // när de hamnade i Lobby-vyn.
@@ -4157,7 +4198,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '700',
     fontStyle: 'italic',
-    color: Colors.warning,
+    color: Colors.textSecondary,
     lineHeight: 15,
   },
   // ── user vs guest-jämförelsen (info-modalen) ─────────────────────

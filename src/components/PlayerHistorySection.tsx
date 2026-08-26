@@ -5,6 +5,7 @@ import { useFocusEffect } from 'expo-router';
 import { Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';
 import { loadGameHistory, type HistoryEntry } from '../utils/gameResults';
 import { MyMatchesSection } from './MyMatchesSection';
+import { SavedAggregatesCard } from './SavedAggregatesCard';
 
 // Player history-sektionen visar en minimal lista över alla spel
 // användaren har spelat. Per spel: datum / totalpoäng / snittpoäng per
@@ -129,6 +130,9 @@ export function PlayerHistorySection() {
         <>
           {/* HCP-skölden togs bort 2026-05-18 (introduceras i v2 när
               HCP-progression byggs ut med riktig data). */}
+          {/* Sparade Aggregate Leaderboards/Scores (0037). Självgatande —
+              inget sparat eller anonym session → renderar null. */}
+          <SavedAggregatesCard />
           <View style={styles.card}>
             <Text style={styles.cardTitle}>
               Games played: {history.length}

@@ -1,12 +1,29 @@
 import { Nunito_700Bold, useFonts } from '@expo-google-fonts/nunito';
 import React, { useMemo, useState } from 'react';
-import { Animated, Dimensions, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import {
+  Animated,
+  Dimensions,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
 import Svg, { Circle, G, Path } from 'react-native-svg';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
 import { HostTypeOptions, type HostLobbyType } from './HostTypeOptions';
 import { QuizVibeQAvatar } from './QuizVibeQAvatar';
 import { VersusIcon } from './VersusIcon';
-import { WifiOffIcon } from './WifiOffIcon';
+import { aggregateLabel, type AggregateLeaderboardData } from '../utils/aggregateLeaderboard';
+import { containsProfanity } from '../utils/profanity';
+import {
+  finalizeRows,
+  LeaderboardTable,
+} from './LeaderboardTable';
 
 // Final Leaderboard bakgrunds-Q + pokal. Q-SVG:n är ~90% av skärmbredden så
 // figuren dominerar mid-screen-arean utan att överlappa Home/Play Again-
@@ -190,6 +207,9 @@ function useCtaPulse(paused: boolean) {
   }, [paused, pulse]);
   return pulse;
 }
+
+/** Samma cap som andra användarsynliga fritext-namn i appen. */
+const RENAME_MAX_LENGTH = 40;
 
 const PLAY_AGAIN_BUTTON_HEIGHT_COMPACT = 56;
 const PLAY_AGAIN_BUTTON_HEIGHT_EXPANDED = 64;
@@ -395,12 +415,6 @@ export function generateOpponentTimeUsed(): number {
   return Math.round((5 + Math.random() * 20) * 100) / 100;
 }
 
-const ASSISTANCE_LABEL: Record<AssistanceLevel, string> = {
-  minimal: 'Minimal',
-  standard: 'Standard',
-  full: 'Full',
-};
-
 // ─── Main leaderboard component ───────────────────────────────────────────────
 
 export function RoundLeaderboard({
@@ -428,6 +442,9 @@ export function RoundLeaderboard({
   hideRemotePlay = false,
   onReplayYes,
   onReplayNo,
+  replayTitle = 'Re-match with Aggregate Leaderboard?',
+  aggregateName,
+  onRenameAggregate,
   replayAnswered = false,
   replayLocked = false,
   onReplayLockedPress,
@@ -435,6 +452,7 @@ export function RoundLeaderboard({
   homeOnlyFooter = false,
   interimFooter,
   trackConnectionErrors = false,
+  aggregate,
 }: {
   players: LeaderboardPlayer[];
   /** Behållen för API-bakåtkompabilitet — tabellen aggregerar allt från
@@ -520,6 +538,10 @@ export function RoundLeaderboard({
    */
   onReplayYes?: () => void;
   onReplayNo?: () => void;
+  /** Rubriken över Yes/No. Single player aggregerar en SCORE (en spelare),
+   *  flerspelar en LEADERBOARD — call-siten äger ordvalet så komponenten
+   *  slipper känna till spellägen. */
+  replayTitle?: string;
   /** Host har svarat Yes: No-knappen göms och `replayNote` visar väntan.
    *  Host kan inte ångra sig — inbjudan är redan utskickad (Peter). */
   replayAnswered?: boolean;
@@ -548,6 +570,22 @@ export function RoundLeaderboard({
    *  om, så en spelare som inte haft sin tur skulle annars få en falsk
    *  wifi-siffra. Default false — call-siten måste aktivt intyga läget. */
   trackConnectionErrors?: boolean;
+  /**
+   * Seriens sammanslagna standings ("Re-match with Aggregate Leaderboard").
+   * Satt → slutskärmen blir en två-sidig pager: spelet som just spelats
+   * först, seriens totalsumma på slide 2. Utelämnas (eller `gamesPlayed < 2`)
+   * → oförändrad enkel-vy, så alla andra call-sites är orörda.
+   *
+   * Raderna går genom SAMMA finalizeRows som spelets egna — "utifrån samma
+   * kriterier som Final Leaderboard" är hela poängen.
+   */
+  aggregate?: AggregateLeaderboardData;
+  /** Namnet på den SERVER-sparade serien. Satt → visas som rubrik på
+   *  aggregat-sidan i stället för den generiska etiketten. */
+  aggregateName?: string | null;
+  /** Host får byta namn. Utelämnas → ingen penna, ingen modal. Namnet syns
+   *  för alla deltagare på deras Profile, så det ska bara vara host:s val. */
+  onRenameAggregate?: (name: string) => void;
 }) {
   // Nunito 700 Bold för Final Leaderboard:s "QuizVibe"-vattenstämpel-text
   // under Q+pokal-loggan. Matchar startskärmens appName-textformat 1:1.
@@ -624,30 +662,58 @@ export function RoundLeaderboard({
         hasLeft: !!p.hasLeft,
       };
     });
-    // connectionErrors = antal frågor spelaren missat jämfört med den som
-    // spelat flest. Om A spelat 3 och B spelat 2 → B får 1 i wifi-kolumnen.
-    // Gäller bara när trackConnectionErrors är satt — se prop-kommentaren.
-    const maxRounds = entries.reduce((m, e) => Math.max(m, e.playedRounds), 0);
-    const entriesWithErrors = entries.map((e) => ({
-      ...e,
-      connectionErrors: trackConnectionErrors
-        ? Math.max(0, maxRounds - e.playedRounds)
-        : 0,
-    }));
-    return entriesWithErrors.sort((a, b) => {
-      // 1. Pts desc — flest poäng vinner
-      if (b.points !== a.points) return b.points - a.points;
-      // 2. Spelare med 0 spelade ronder får avgResponseSeconds=0 vilket
-      //    annars skulle leapfrogga ALLA spelare med faktisk data (0 < deras
-      //    avg). Garantera att tom-data alltid sorteras sist.
-      if (a.playedRounds === 0 && b.playedRounds > 0) return 1;
-      if (b.playedRounds === 0 && a.playedRounds > 0) return -1;
-      // 3. Avg response time asc — snabbare avg vinner vid pts-tie. Spelare
-      //    som timeoutat alla frågor har avg=max-tiden; en spelare som hann
-      //    svara (även fel) har lägre avg och ska därför ranka högre.
-      return a.avgResponseSeconds - b.avgResponseSeconds;
-    });
+    return finalizeRows(entries, trackConnectionErrors);
   }, [players, allRoundScoresHistory, totalsByPlayerId, trackConnectionErrors]);
+
+  // Slutskärmens två sidor: 0 = spelet som just spelats (ALLTID default —
+  // det är resultatet spelarna precis skapade), 1 = seriens totalsumma.
+  const [slide, setSlide] = useState(0);
+  // Omdöpning: appen har ingen inline-edit-precedens — all fritext ligger i
+  // modaler — så pennan öppnar en bottom-sheet i samma vokabulär som
+  // Profile:s friends-modal.
+  const [renameOpen, setRenameOpen] = useState(false);
+  const [renameText, setRenameText] = useState('');
+  const [renameError, setRenameError] = useState<string | null>(null);
+  // Sidbredden mäts i stället för att antas: pagern ligger innanför
+  // scroll-innehållets padding, och `pagingEnabled` behöver exakt bredd för
+  // att snäppa rätt.
+  const [pageWidth, setPageWidth] = useState(0);
+  const pagerRef = React.useRef<ScrollView>(null);
+
+  // Aggregate-vyn: seriens sammanslagna standings genom SAMMA
+  // finalizeRows-pipeline som spelet ovan, så kolumner och sortering är
+  // identiska. `hasLeft` finns inte i serien — en spelare som lämnade ett av
+  // spelen har ändå riktiga siffror från de andra.
+  const aggregateEntries = useMemo(() => {
+    if (!aggregate) return null;
+    return finalizeRows(
+      aggregate.standings.map((s) => ({
+        playerId: s.playerId,
+        name: s.name,
+        emoji: s.emoji,
+        age: s.age,
+        assistance: s.assistance,
+        points: s.points,
+        playedRounds: s.playedRounds,
+        correctAnswers: s.correctAnswers,
+        incorrectAnswers: Math.max(0, s.playedRounds - s.correctAnswers),
+        avgResponseSeconds: s.avgResponseSeconds,
+        lastResponseSeconds: s.lastResponseSeconds,
+        lastFiveResults: s.lastFiveResults,
+        hasLeft: false,
+      })),
+      trackConnectionErrors,
+    );
+  }, [aggregate, trackConnectionErrors]);
+
+  // Ett enda spel är ingen serie — då renderas den vanliga enkel-vyn och
+  // ingen pager, inga flikar.
+  const showAggregate =
+    isLastRound && !!aggregateEntries && (aggregate?.gamesPlayed ?? 0) >= 2;
+  const goToSlide = (index: number) => {
+    setSlide(index);
+    pagerRef.current?.scrollTo({ x: index * pageWidth, y: 0, animated: true });
+  };
 
   return (
     <View style={styles.outer}>
@@ -660,11 +726,35 @@ export function RoundLeaderboard({
           {/* Remote 1v1 får duell-ikonen bredvid rubriken så slutskärmen
               matchar Home:s "Remote Play" + 1vs1 Matches-vokabulär. */}
           <View style={styles.headerTitleRow}>
-            <Text style={styles.headerTitle}>
-              {isLastRound ? 'Final Leaderboard' : 'Leaderboard'}
+            <Text style={styles.headerTitle} numberOfLines={1}>
+              {showAggregate && slide === 1
+                ? aggregateName?.trim() ||
+                  aggregateLabel(aggregate?.standings.length ?? 0)
+                : isLastRound
+                  ? 'Final Leaderboard'
+                  : 'Leaderboard'}
               {remote1v1 ? ' - 1vs1' : ''}
             </Text>
             {remote1v1 && <VersusIcon height={26} />}
+            {/* Pennan bara på aggregat-sidan, och bara för host. Tappet på
+                FLIKEN byter redan sida, så rename får inte hänga där. */}
+            {showAggregate && slide === 1 && !!onRenameAggregate && (
+              <Pressable
+                onPress={() => {
+                  setRenameText(aggregateName ?? '');
+                  setRenameError(null);
+                  setRenameOpen(true);
+                }}
+                hitSlop={10}
+                style={({ pressed }) => [
+                  styles.renameBtn,
+                  pressed && { opacity: 0.7 },
+                ]}
+                accessibilityLabel="Rename"
+              >
+                <Text style={styles.renameBtnGlyph}>✎</Text>
+              </Pressable>
+            )}
           </View>
           {/* Round X of Y-undertitel renderas bara vid icke-sista ronder.
               Final-vyn döljer den helt så bara huvudrubriken syns längst upp. */}
@@ -678,149 +768,77 @@ export function RoundLeaderboard({
         {/* Sport-tabell-layout — speglar GetReadyIntro:s leaderboard:
             fixed Player-kolumn vänster, scroll:bar middle med detail-stats,
             fixed PTS-kolumn höger. */}
-        <View style={styles.lbTable}>
-        {/* Vänster fixed kolumn: Position + Namn */}
-        <View style={styles.lbLeftCol}>
-          <View style={[styles.lbCell, styles.lbHeaderCell, styles.lbLeftCell]}>
-            <Text style={styles.lbHeaderText}>Player</Text>
-          </View>
-          {tableEntries.map((entry, index) => {
-            const meta = [
-              entry.assistance ? ASSISTANCE_LABEL[entry.assistance] : null,
-              typeof entry.age === 'number' ? `Age ${entry.age}` : null,
-            ].filter(Boolean).join(' · ');
-            return (
-              <View
-                key={entry.playerId}
-                style={[styles.lbCell, styles.lbLeftCell]}
-              >
-                <Text style={styles.lbPos}>{index + 1}</Text>
-                <View style={styles.lbNameStack}>
-                  <Text style={styles.lbName} numberOfLines={1}>
-                    {entry.emoji ? `${entry.emoji} ` : ''}
-                    {entry.name}
-                  </Text>
-                  {meta.length > 0 && (
-                    <Text style={styles.lbNameMeta} numberOfLines={1}>
-                      {meta}
+        {showAggregate ? (
+          <View
+            style={styles.pagerWrap}
+            onLayout={(e) => setPageWidth(e.nativeEvent.layout.width)}
+          >
+            {/* Flikarna är BÅDE indikator och kontroll. Svep fungerar över
+                Player- och PTS-kolumnerna (de scrollar inte), men mitt-
+                kolumnen är en egen horisontell ScrollView som äter gesten
+                där — därför måste vyn alltid gå att nå med ett tapp. */}
+            <View style={styles.slideTabs}>
+              {['This game', `All ${aggregate?.gamesPlayed ?? 0} games`].map(
+                (label, index) => (
+                  <Pressable
+                    key={label}
+                    onPress={() => goToSlide(index)}
+                    style={({ pressed }) => [
+                      styles.slideTab,
+                      slide === index && styles.slideTabActive,
+                      pressed && { opacity: 0.8 },
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.slideTabText,
+                        slide === index && styles.slideTabTextActive,
+                      ]}
+                      numberOfLines={1}
+                    >
+                      {label}
                     </Text>
-                  )}
-                </View>
-              </View>
-            );
-          })}
-        </View>
-
-        {/* Mitt scroll:bar kolumn — alla detail-celler */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.lbMidScroll}
-        >
-          <View>
-            <View style={[styles.lbMidRow, styles.lbHeaderCell]}>
-              <Text style={[styles.lbMidHeader, styles.lbColR]}>Q</Text>
-              <Text style={[styles.lbMidHeader, styles.lbColCheck]}>✓</Text>
-              <Text style={[styles.lbMidHeader, styles.lbColCheck]}>✗</Text>
-              <View style={[styles.lbColConnErr, { alignItems: 'center', justifyContent: 'center' }]}>
-                <WifiOffIcon size={17} />
-              </View>
-              <Text style={[styles.lbMidHeader, styles.lbColTime]}>AVG</Text>
-              <Text style={[styles.lbMidHeader, styles.lbColTime]}>LAST</Text>
-              <Text style={[styles.lbMidHeader, styles.lbColLast5]}>Last 5</Text>
+                  </Pressable>
+                ),
+              )}
             </View>
-            {tableEntries.map((entry) =>
-              entry.hasLeft ? (
-                <View
-                  key={entry.playerId}
-                  style={[styles.lbMidRow, styles.lbHasLeftRow]}
-                >
-                  <Text style={styles.lbHasLeftText} numberOfLines={1}>
-                    Has left the game
-                  </Text>
+            {/* Svep-hinten sitter DIREKT under flikarna (Peter 2026-08-26) —
+                det är där blicken är när man just läst etiketterna. */}
+            <Text style={styles.slideHint}>
+              {slide === 1
+                ? '←  Swipe back to this game'
+                : `Swipe for the ${aggregateLabel(
+                    aggregate?.standings.length ?? 0,
+                  )}  →`}
+            </Text>
+            {/* Före första onLayout vet vi ingen bredd — rendera spelets
+                tabell rakt av så slutskärmen aldrig blinkar tom. */}
+            {pageWidth > 0 ? (
+              <ScrollView
+                ref={pagerRef}
+                horizontal
+                pagingEnabled
+                showsHorizontalScrollIndicator={false}
+                onMomentumScrollEnd={(e) =>
+                  setSlide(
+                    Math.round(e.nativeEvent.contentOffset.x / pageWidth),
+                  )
+                }
+              >
+                <View style={{ width: pageWidth }}>
+                  <LeaderboardTable entries={tableEntries} />
                 </View>
-              ) : (
-                <View key={entry.playerId} style={styles.lbMidRow}>
-                  <Text style={[styles.lbMidCell, styles.lbColR]}>
-                    {entry.playedRounds}
-                  </Text>
-                  <Text
-                    style={[
-                      styles.lbMidCell,
-                      styles.lbColCheck,
-                      styles.lbCorrectText,
-                    ]}
-                  >
-                    {entry.correctAnswers}
-                  </Text>
-                  <Text
-                    style={[
-                      styles.lbMidCell,
-                      styles.lbColCheck,
-                      styles.lbWrongText,
-                    ]}
-                  >
-                    {entry.incorrectAnswers}
-                  </Text>
-                  <Text style={[styles.lbMidCell, styles.lbColConnErr, entry.connectionErrors > 0 ? styles.lbWrongText : styles.lbConnErrZero]}>
-                    {entry.connectionErrors > 0 ? String(entry.connectionErrors) : '—'}
-                  </Text>
-                  <Text style={[styles.lbMidCell, styles.lbColTime]}>
-                    {entry.playedRounds > 0 && entry.avgResponseSeconds > 0
-                      ? `${entry.avgResponseSeconds.toFixed(2)}s`
-                      : '—'}
-                  </Text>
-                  <Text style={[styles.lbMidCell, styles.lbColTime]}>
-                    {entry.lastResponseSeconds !== null
-                      ? `${entry.lastResponseSeconds.toFixed(2)}s`
-                      : '—'}
-                  </Text>
-                  <View style={[styles.lbColLast5, styles.lbLast5Wrap]}>
-                    {Array.from({ length: 5 }).map((_, i) => {
-                      const offset = entry.lastFiveResults.length - 5 + i;
-                      const result =
-                        offset >= 0 ? entry.lastFiveResults[offset] : undefined;
-                      if (result === undefined) {
-                        return <View key={i} style={styles.lbDotEmpty} />;
-                      }
-                      return (
-                        <View
-                          key={i}
-                          style={[
-                            styles.lbDot,
-                            result ? styles.lbDotCorrect : styles.lbDotWrong,
-                          ]}
-                        >
-                          <Text style={styles.lbDotGlyph}>
-                            {result ? '✓' : '✗'}
-                          </Text>
-                        </View>
-                      );
-                    })}
-                  </View>
+                <View style={{ width: pageWidth }}>
+                  <LeaderboardTable entries={aggregateEntries!} />
                 </View>
-              ),
+              </ScrollView>
+            ) : (
+              <LeaderboardTable entries={tableEntries} />
             )}
           </View>
-        </ScrollView>
-
-        {/* Höger fixed kolumn: PTS */}
-        <View style={styles.lbRightCol}>
-          <View style={[styles.lbCell, styles.lbHeaderCell, styles.lbRightCell]}>
-            <Text style={styles.lbHeaderText}>PTS</Text>
-          </View>
-          {tableEntries.map((entry) => (
-            <View
-              key={entry.playerId}
-              style={[styles.lbCell, styles.lbRightCell]}
-            >
-              <Text style={styles.lbPoints}>
-                {entry.hasLeft ? '—' : entry.points}
-              </Text>
-            </View>
-          ))}
-        </View>
-      </View>
+        ) : (
+          <LeaderboardTable entries={tableEntries} />
+        )}
 
       {/* Extra sektion under tabellen (Remote 1v1-duellpanelen). Ligger inuti
           scroll-innehållet så den hamnar mellan leaderboarden och sticky-
@@ -906,9 +924,7 @@ export function RoundLeaderboard({
           som vanligt. */}
       {isLastRound && onReplayYes && (
         <View style={styles.replayWrap}>
-          <Text style={styles.replayTitle}>
-            Re-match with Aggregate Leaderboard?
-          </Text>
+          <Text style={styles.replayTitle}>{replayTitle}</Text>
           <View style={styles.replayActions}>
             <Animated.View
               style={{ flex: 1, transform: [{ scale: replayPulse }] }}
@@ -1144,6 +1160,79 @@ export function RoundLeaderboard({
         </Pressable>
       )}
       </View>
+
+      {/* Omdöpning. Speglar Profile:s friends-modal (bottom-sheet +
+          KeyboardAvoidingView) — appen har ingen inline-edit-precedens.
+          Namnet syns för alla deltagare på deras Profile, så det går genom
+          containsProfanity precis som andra användarsynliga namn. */}
+      <Modal
+        visible={renameOpen}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setRenameOpen(false)}
+      >
+        <KeyboardAvoidingView
+          style={styles.renameOverlay}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        >
+          <Pressable
+            style={styles.renameBackdrop}
+            onPress={() => setRenameOpen(false)}
+          />
+          <View style={styles.renameSheet}>
+            <View style={styles.renameHandle} />
+            <Text style={styles.renameTitle}>
+              Rename {aggregateLabel(aggregate?.standings.length ?? 0)}
+            </Text>
+            <TextInput
+              style={styles.renameInput}
+              value={renameText}
+              onChangeText={(t) => {
+                setRenameText(t);
+                if (renameError) setRenameError(null);
+              }}
+              placeholder="e.g. Friday Quiz"
+              placeholderTextColor={Colors.textDisabled}
+              maxLength={RENAME_MAX_LENGTH}
+              returnKeyType="done"
+              autoFocus
+            />
+            {!!renameError && (
+              <Text style={styles.renameError}>{renameError}</Text>
+            )}
+            <Pressable
+              onPress={() => {
+                const next = renameText.trim();
+                if (!next) {
+                  setRenameError('Give it a name first.');
+                  return;
+                }
+                if (containsProfanity(next)) {
+                  setRenameError('Please choose a different name.');
+                  return;
+                }
+                setRenameOpen(false);
+                onRenameAggregate?.(next);
+              }}
+              style={({ pressed }) => [
+                styles.renameSaveBtn,
+                pressed && { opacity: 0.85 },
+              ]}
+            >
+              <Text style={styles.renameSaveBtnText}>Save</Text>
+            </Pressable>
+            <Pressable
+              onPress={() => setRenameOpen(false)}
+              style={({ pressed }) => [
+                styles.renameCancelBtn,
+                pressed && { opacity: 0.7 },
+              ]}
+            >
+              <Text style={styles.renameCancelBtnText}>Cancel</Text>
+            </Pressable>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
     </View>
   );
 }
@@ -1254,163 +1343,133 @@ const styles = StyleSheet.create({
     fontWeight: FontWeight.medium,
   },
 
-  // ── Sport-tabell-layout (speglar GetReadyIntro:s leaderboard) ──────────
-  lbTable: {
+  // ── Final ⟷ Aggregate-pager ───────────────────────────────────────────
+  pagerWrap: {
+    gap: Spacing.sm,
+  },
+  slideTabs: {
     flexDirection: 'row',
+    gap: Spacing.xs,
     backgroundColor: Colors.card,
     borderWidth: 1,
     borderColor: Colors.border,
     borderRadius: Radius.md,
-    overflow: 'hidden',
+    padding: 3,
   },
-  lbCell: {
-    height: 56,
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
-  },
-  lbHeaderCell: {
-    backgroundColor: Colors.cardElevated,
-  },
-  lbHeaderText: {
-    fontSize: FontSize.xs,
-    fontWeight: FontWeight.bold,
-    color: Colors.textSecondary,
-    letterSpacing: 0.6,
-    textTransform: 'uppercase',
-  },
-  // Bredare än tidigare (180 → 220) så meta-raden ("Standard · Age 32") får
-  // plats på en rad utan att truncatas till bara "Age...". Tar utrymme från
-  // mid-scroll-kolumnen som redan scrollar horisontellt vid behov.
-  lbLeftCol: {
-    minWidth: 170,
-    maxWidth: 220,
-  },
-  lbLeftCell: {
-    paddingLeft: Spacing.sm,
-    paddingRight: 4,
-    gap: 4,
-  },
-  lbPos: {
-    fontSize: FontSize.sm,
-    fontWeight: FontWeight.bold,
-    color: Colors.primary,
-    fontVariant: ['tabular-nums'],
-    width: 16,
-  },
-  // Stack:ar namn ovanpå meta-rad (assistance + ålder) under sig så namnet
-  // står i top-anchored position mens metadata sitter i textSecondary under.
-  lbNameStack: {
+  slideTab: {
     flex: 1,
-    flexDirection: 'column',
+    height: 32,
+    borderRadius: Radius.sm,
+    alignItems: 'center',
     justifyContent: 'center',
-    gap: 2,
   },
-  lbName: {
-    fontSize: FontSize.sm,
+  // Vald flik: guld RAM + vit text, men BLÅ bakgrund (Peter 2026-08-26).
+  // Guld-fyllningen togs bort — den gav hela fliken en gul ton. Ramen bär
+  // "vald"-signalen, bakgrunden hör till appens vanliga blå vokabulär.
+  slideTabActive: {
+    backgroundColor: Colors.primaryMuted,
+    borderWidth: 1,
+    borderColor: Colors.warning,
+  },
+  slideTabText: {
+    fontSize: FontSize.xs,
     fontWeight: FontWeight.semibold,
-    color: Colors.textPrimary,
-  },
-  lbNameMeta: {
-    fontSize: FontSize.xs,
-    fontWeight: FontWeight.medium,
-    color: Colors.textSecondary,
-    letterSpacing: 0,
-  },
-  lbMidScroll: {
-    flex: 1,
-  },
-  lbMidRow: {
-    height: 56,
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
-  },
-  lbMidCell: {
-    fontSize: FontSize.sm,
-    color: Colors.textPrimary,
-    textAlign: 'center',
-    fontVariant: ['tabular-nums'],
-  },
-  lbMidHeader: {
-    fontSize: FontSize.xs,
-    fontWeight: FontWeight.bold,
-    color: Colors.textSecondary,
-    letterSpacing: 0.6,
-    textTransform: 'uppercase',
-    textAlign: 'center',
-  },
-  // Q + ✓ + ✗ komprimerade till 22 px vardera (var 32) så AVG-kolumnen
-  // ryms inom initial mid-scroll-vyn utan horisontell scroll. Synkat
-  // med GetReadyIntro:s lb-tabell — håll dem identiska.
-  lbColR: { width: 22 },
-  lbColCheck: { width: 22 },
-  lbColTime: { width: 60 },
-  lbColLast5: { width: 96 },
-  lbColConnErr: { width: 36 },
-  lbConnErrZero: { color: Colors.textSecondary },
-  lbCorrectText: { color: Colors.success, fontWeight: FontWeight.semibold },
-  lbWrongText: { color: Colors.error, fontWeight: FontWeight.semibold },
-  // "Has left the game"-rad ersätter Q/✓/✗/AVG/LAST/Last-5 för spelare som
-  // gjort Leave Game. Spänner mid-row-bredden istället för att fördela
-  // cellerna; PTS-kolumnen visar streck i samma rad.
-  lbHasLeftRow: {
-    paddingHorizontal: Spacing.sm,
-    justifyContent: 'flex-start',
-  },
-  lbHasLeftText: {
-    fontSize: FontSize.sm,
-    fontStyle: 'italic',
-    fontWeight: FontWeight.medium,
     color: Colors.textSecondary,
     letterSpacing: 0.3,
   },
-  lbLast5Wrap: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    gap: 3,
-    paddingHorizontal: 4,
+  slideTabTextActive: {
+    color: Colors.textPrimary,
+    fontWeight: FontWeight.bold,
   },
-  lbDot: {
-    width: 16,
-    height: 16,
-    borderRadius: 8,
+  slideHint: {
+    fontSize: FontSize.xs,
+    color: Colors.textSecondary,
+    textAlign: 'center',
+    letterSpacing: 0.3,
+  },
+  renameBtn: {
+    width: 28,
+    height: 28,
+    borderRadius: Radius.sm,
+    borderWidth: 1,
+    borderColor: Colors.primaryBorder,
+    backgroundColor: Colors.primaryMuted,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  lbDotCorrect: { backgroundColor: Colors.success },
-  lbDotWrong: { backgroundColor: Colors.error },
-  lbDotEmpty: {
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    backgroundColor: Colors.border,
-    opacity: 0.4,
+  renameBtnGlyph: {
+    fontSize: 14,
+    color: Colors.primary,
   },
-  lbDotGlyph: {
-    fontSize: 10,
-    fontWeight: '900',
-    color: '#fff',
-    lineHeight: 12,
-  },
-  lbRightCol: {
-    minWidth: 56,
-  },
-  lbRightCell: {
-    paddingHorizontal: Spacing.md,
+  // Bottom-sheet — speglar ProfileScreen:s friendsModal 1:1.
+  renameOverlay: {
+    flex: 1,
     justifyContent: 'flex-end',
   },
-  lbPoints: {
-    flex: 1,
+  renameBackdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  renameSheet: {
+    backgroundColor: Colors.card,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingHorizontal: Spacing.xl,
+    paddingTop: Spacing.md,
+    paddingBottom: Spacing.xxl,
+    gap: Spacing.md,
+  },
+  renameHandle: {
+    width: 36,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: Colors.borderStrong,
+    alignSelf: 'center',
+  },
+  renameTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: Colors.textPrimary,
+  },
+  renameInput: {
+    height: 48,
+    borderRadius: Radius.md,
+    backgroundColor: Colors.background,
+    borderWidth: 1,
+    borderColor: Colors.borderStrong,
+    paddingHorizontal: Spacing.lg,
+    fontSize: 15,
+    color: Colors.textPrimary,
+  },
+  renameError: {
+    fontSize: FontSize.sm,
+    color: Colors.error,
+  },
+  renameSaveBtn: {
+    height: 48,
+    borderRadius: Radius.md,
+    backgroundColor: Colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  renameSaveBtnText: {
     fontSize: FontSize.md,
     fontWeight: FontWeight.bold,
-    color: Colors.primary,
-    fontVariant: ['tabular-nums'],
-    textAlign: 'right',
+    color: '#fff',
   },
+  renameCancelBtn: {
+    height: 48,
+    borderRadius: Radius.md,
+    backgroundColor: Colors.cardElevated,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  renameCancelBtnText: {
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.medium,
+    color: Colors.textSecondary,
+  },
+
 
   // ── Action-knappar ───────────────────────────────────────────────────
   nextBtn: {

@@ -25,6 +25,25 @@ import { subscribeSyncChannel, type SyncChannel, type PlayerScoreRecordedPayload
 import type { LobbyPlayer } from '@/src/screens/LobbyScreen';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '@/src/theme';
 import { track } from '@/src/utils/analytics';
+import {
+  aggregateLabel,
+  attachSeriesToLeaderboard,
+  buildAggregateStandings,
+  defaultAggregateName,
+  loadAggregateSeries,
+  markSeriesContinues,
+  recordGameInSeries,
+  type AggregateGamePlayer,
+  type AggregateLeaderboardData,
+} from '@/src/utils/aggregateLeaderboard';
+import {
+  createAggregateLeaderboard,
+  findAggregateLeaderboardsFor,
+  getAggregateLeaderboard,
+  recordAggregateGame,
+  renameAggregateLeaderboard,
+  type SavedAggregateSummary,
+} from '@/src/utils/aggregateLeaderboards';
 import { getAvatarEmojiById } from '@/src/utils/avatars';
 import { clearEjected } from '@/src/utils/ejectedPlayers';
 import { appendGameHistoryEntry, saveLatestResult, type GameResult, type HistoryEntry, type RoundResult } from '@/src/utils/gameResults';
@@ -49,7 +68,7 @@ import {
   qh,
 } from '@/src/utils/quizLayout';
 import { deactivateRoom, registerActiveRoom } from '@/src/utils/mockActiveRooms';
-import { clearLobbyPlayers, setLobbyPlayers } from '@/src/utils/mockLobbyPlayers';
+import { clearLobbyPlayers, getLobbyPlayerUserIds, setLobbyPlayers } from '@/src/utils/mockLobbyPlayers';
 import {
   clearLobbySettings,
   getLobbySettings,
@@ -1006,6 +1025,19 @@ const tl = StyleSheet.create({
 });
 
 // ─── Main Quiz Screen ─────────────────────────────────────────────────────────
+
+/**
+ * Utfallet av "Add to existing Aggregate Leaderboard/Score"-listan.
+ *
+ * `cancel` är MEDVETET skilt från `fresh`: Cancel tar host tillbaka till
+ * slutskärmen med Yes/No-frågan kvar utan att skapa något, medan `fresh`
+ * startar re-matchen som en frisstående serie. Utan båda hade listan saknat
+ * en väg framåt (Peter 2026-08-26).
+ */
+type AggregatePickChoice =
+  | { kind: 'attach'; id: string }
+  | { kind: 'fresh' }
+  | { kind: 'cancel' };
 
 type TurnOrderPlayer = {
   id: string;
@@ -5042,6 +5074,129 @@ export default function QuizScreen() {
     }
   }, [phase, isLastQuestion]);
 
+  // ── Aggregate Leaderboard ───────────────────────────────────────────────
+  // Slutskärmen visar ALLTID spelet som just spelats. Har host kört
+  // "Re-match with Aggregate Leaderboard?" finns dessutom en andra sida med
+  // hela serien sammanslagen — se src/utils/aggregateLeaderboard.ts för hur
+  // kedjan hålls ihop (rumkod, inte ett synkat series-id).
+  //
+  // Remote 1v1 har ingen re-match och alltså aldrig en serie; utan rumkod
+  // (direkt-nav i dev) finns inget att nyckla på.
+  const aggregateApplicable = isLastQuestion && !isRemote && !!params.roomCode;
+  const [aggregate, setAggregate] = useState<AggregateLeaderboardData | null>(
+    null,
+  );
+  // Id på den SERVER-sparade serien (0037), när alla spelare är QuizVibe-
+  // users. null = serien lever bara lokalt; flikarna fungerar ändå.
+  const [aggregateLeaderboardId, setAggregateLeaderboardId] = useState<string | null>(
+    null,
+  );
+  // ⚠ Synkron spegel. `ensureAggregateLeaderboardAttached` sätter id:t och
+  //   goToNewLobby kan köra i SAMMA tick (solo / inga non-hosts att vänta
+  //   in) — React-state hade då fortfarande varit null i closuren.
+  const aggregateLeaderboardIdRef = useRef<string | null>(null);
+  aggregateLeaderboardIdRef.current = aggregateLeaderboardId;
+  const [aggregateName, setAggregateName] = useState<string | null>(null);
+  // Backstop mot ändrad uppsättning. Re-match-lobbyn är låst (0037) så detta
+  // ska aldrig slå — men en serie som fyllts på med fel antal spelare vore
+  // tyst korrupt, och en jämförelse kostar ingenting.
+  const [aggregateParticipantCount, setAggregateParticipantCount] = useState<number | null>(
+    null,
+  );
+  // "Add to existing"-listan när det finns FLERA sparade serier med exakt
+  // denna uppsättning. Promise-resolvern gör att handleReplayYes kan await:a
+  // valet innan inbjudan broadcastas.
+  const [pendingAggregatePick, setPendingAggregatePick] = useState<
+    SavedAggregateSummary[] | null
+  >(null);
+  const aggregatePickResolveRef = useRef<
+    ((choice: AggregatePickChoice) => void) | null
+  >(null);
+  // Tvåstegsval (Peter 2026-08-26): ett tapp på en rad MARKERAR den, och
+  // först då tänds Confirm. Att koppla serien direkt på rad-tappet gjorde
+  // ett feltryck omedelbart bindande.
+  const [selectedAggregateId, setSelectedAggregateId] = useState<string | null>(
+    null,
+  );
+  // Seeda från den lokala serien vid mount — en re-match ärver kopplingen,
+  // så slutskärmen vet direkt att den ska skriva till servern och visa namn.
+  useEffect(() => {
+    let cancelled = false;
+    void loadAggregateSeries().then((series) => {
+      const id = series?.leaderboardId ?? null;
+      if (cancelled || !id) return;
+      setAggregateLeaderboardId(id);
+      void getAggregateLeaderboard(id).then((saved) => {
+        if (cancelled || !saved) return;
+        setAggregateName(saved.name);
+        setAggregateParticipantCount(saved.participants.length);
+      });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+  useEffect(() => {
+    if (phase !== 'leaderboard' || !aggregateApplicable) return;
+    const roomCode = params.roomCode as string;
+    const contribution: AggregateGamePlayer[] = gamePlayers.map((p) => {
+      const scores = allRoundScoresHistory.flatMap((round) =>
+        round.filter((sc) => sc.playerId === p.id),
+      );
+      return {
+        playerId: p.id,
+        name: p.name,
+        emoji: p.emoji,
+        assistance: p.assistance,
+        age: p.age,
+        points: gameTotals[p.id] ?? 0,
+        playedRounds: scores.length,
+        correctAnswers: scores.filter((sc) => sc.correct).length,
+        totalResponseSeconds: scores.reduce((sum, sc) => sum + sc.timeUsed, 0),
+        results: scores.map((sc) => sc.correct),
+        lastResponseSeconds:
+          scores.length > 0 ? scores[scores.length - 1].timeUsed : null,
+      };
+    });
+    let cancelled = false;
+    // Skrivningen är idempotent per rumkod (ERSÄTTER spelets snapshot), så
+    // sena peer-scores i Individual Devices uppdaterar serien i stället för
+    // att dubbelräkna spelet — därför står allRoundScoresHistory i deps.
+    void recordGameInSeries(roomCode, contribution).then((series) => {
+      if (cancelled) return;
+      setAggregate(buildAggregateStandings(series));
+      // Spegla spelet till den sparade serien på kontot.
+      // ⚠ BARA host skriver: en non-host som lämnat mitt i spelet har en
+      //   ofullständig allRoundScoresHistory och skulle skriva trunkerad
+      //   statistik över hostens korrekta rad.
+      const leaderboardId = series.leaderboardId;
+      if (!leaderboardId || !isHost) return;
+      if (
+        aggregateParticipantCount !== null &&
+        contribution.length !== aggregateParticipantCount
+      ) {
+        console.warn(
+          '[quiz] aggregate line-up changed — skipping server write for',
+          roomCode,
+        );
+        return;
+      }
+      void recordAggregateGame(leaderboardId, roomCode, contribution);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    phase,
+    aggregateApplicable,
+    allRoundScoresHistory,
+    gamePlayers,
+    gameTotals,
+    params.roomCode,
+    isHost,
+    aggregateParticipantCount,
+  ]);
+
   // Sista rundans actions: starta nytt rum i Lobby (ev. med samma spelare) eller gå hem.
   // `keepSettings` styr om per-spelare-settings (age/assistance) bärs över från
   // detta spel — settings kan ha redigerats av host i Lobby:n. När false:
@@ -5186,6 +5341,12 @@ export default function QuizScreen() {
       // "bara Home" via guestHost={isRemote}), så goToNewLobby nås aldrig
       // från en remote-match — den nya lobbyn är alltid standard.
       isRemote1v1: false,
+      // Re-match: spelaruppsättningen låses till exakt de som var med i
+      // spelet som just avslutades (Peter 2026-08-25). Skrivs atomiskt med
+      // rums-raden så join-gaten aldrig är fail-open. "Start New Game"
+      // (reusePlayers=false) bär inte över spelare och låser därför inget.
+      rematchLocked: reusePlayers,
+      rematchPlayerIds: reusePlayers ? carryOverPlayers.map((p) => p.id) : [],
     });
     if (!roomRegistered) {
       Alert.alert(
@@ -5213,6 +5374,12 @@ export default function QuizScreen() {
     // ankommer och läser `getLobbyPlayers` för dup-detection — non-host
     // skulle då inte hitta sin pre-seeded rad och skapa ett nytt joiner-id,
     // vilket resulterar i två rader med samma playerName.
+    // Re-match: stämpla nya rumkoden som seriens fortsättning så nästa
+    // slutskärm kan visa Aggregate Leaderboard. Görs bara när spelarna bärs
+    // över — "Start New Game" är per definition en NY serie.
+    if (reusePlayers) {
+      void markSeriesContinues(newCode);
+    }
     if (reusePlayers && params.roomCode && carryOverPlayers.length > 0) {
       // Re-mappa id:t med rumkoden i prefixet så lobby_players-rader inte
       // krockar med det gamla rummet (vi behåller bara namn/age/assistance/
@@ -5274,6 +5441,9 @@ export default function QuizScreen() {
       await syncChannelRef.current
         .broadcastPlayAgainLobbyReady({
           room_code: newCode,
+          // Kopplingen till den sparade serien följer med så non-host kan
+          // stämpla den på sin lokala serie och seeda sin aggregat-vy.
+          aggregate_leaderboard_id: aggregateLeaderboardIdRef.current ?? undefined,
           auto_join:
             gameMode === 'pass-the-phone'
               ? undefined
@@ -5311,13 +5481,21 @@ export default function QuizScreen() {
             carryOverPlayers.find((p) => p.isHost)?.assistance ?? 'full',
           guestReplays: guestOverride ? '0' : String(guestReplaysUsed + 1),
           lobbyType,
+          // Låst uppsättning redan på LobbyScreens FÖRSTA frame, utan att
+          // vänta på en DB-läsning av rums-raden.
+          rematchLocked: String(reusePlayers),
         },
       });
       return;
     }
     router.replace({
       pathname: '/lobby',
-      params: { code: newCode, isHost: 'true', lobbyType },
+      params: {
+        code: newCode,
+        isHost: 'true',
+        lobbyType,
+        rematchLocked: String(reusePlayers),
+      },
     });
   };
 
@@ -5737,11 +5915,16 @@ export default function QuizScreen() {
   /** Sista steget när spelarna bärs över: Keep/Reset-settings-prompten (och
    *  för guest hosts: hoppa den — guest-lobbyns settings är ändå låsta). */
   const proceedWithRematch = (lobbyType: LocalLobbyType) => {
-    if (isGuestHostGame) {
+    // Guest host: guest-lobbyns settings är ändå låsta → ingen prompt.
+    // Single player: enda spelaren ÄR host, så "Reset" hade nollställt
+    // hostens egen age/assistance till defaults — meningslöst, och ett extra
+    // steg i ett flöde som ska vara snabbt ("Replay & Aggregate score" ska
+    // kännas som ett tapp). Samma genväg som guest hosts redan har.
+    if (isGuestHostGame || isLocalSoloGame) {
       void goToNewLobby(true, true, undefined, lobbyType);
       return;
     }
-    askKeepSettingsThenGo(turnOrder.length === 1, lobbyType);
+    askKeepSettingsThenGo(false, lobbyType);
   };
 
   /** "Start New Game": host valde ett läge. Alltid en FÄRSK lobby — inga
@@ -5754,6 +5937,140 @@ export default function QuizScreen() {
       return;
     }
     void goToNewLobby(false, false, undefined, lobbyType);
+  };
+
+  /**
+   * Första re-matchen i en serie: knyt den till ett SPARAT aggregat på
+   * kontot (migration 0037), så den syns under Player history hos alla
+   * deltagare och kan återupptas en annan kväll.
+   *
+   * Körs bara när serien saknar `leaderboardId`. Identisk för solo och
+   * flerspelar — bara ordvalet skiljer ("Aggregate Score" vs "Aggregate
+   * Leaderboard"). Är någon deltagare gäst (eller servern otillgänglig) blir
+   * det INGEN server-lagring; den lokala serien och lobby-låsningen fungerar
+   * ändå. Fail-open hela vägen — det här får aldrig blockera en re-match.
+   *
+   * Returnerar **false BARA när host aktivt avbröt** (Cancel i listan). Då
+   * ska hela Yes-flödet stoppas — ingen inbjudan skickas ut. Alla andra
+   * utfall returnerar true = fortsätt.
+   */
+  const ensureAggregateLeaderboardAttached = async (): Promise<boolean> => {
+    if (!isHost || isGuestHostGame) return true;
+    const roomCode = params.roomCode?.trim();
+    if (!roomCode) return true;
+    const stored = await loadAggregateSeries();
+    if (stored?.leaderboardId) return true; // redan kopplad — inget att göra
+
+    // ⚠ user_id finns INTE i turnOrder: rowToPlayer läser kolumnen men
+    //   exponerar den aldrig på LobbyPlayer. Vid re-match är gamla rummet
+    //   ännu inte rivet, så vi läser raderna direkt (RLS tillåter det).
+    //   playerName duger inte som nyckel — lobby-namn är host-redigerbara.
+    const rows = await getLobbyPlayerUserIds(roomCode);
+    const byPlayerId = new Map(rows.map((r) => [r.playerId, r]));
+    const userIds: string[] = [];
+    for (const p of turnOrder) {
+      const uid = byPlayerId.get(p.id)?.userId;
+      // Saknat uid = host-tillagd gäst → ingen serverlagring alls.
+      if (!uid) return true;
+      userIds.push(uid);
+    }
+    if (userIds.length === 0) return true;
+
+    const names = turnOrder.map((p) => p.name);
+    const soloSeries = userIds.length <= 1;
+    const label = aggregateLabel(userIds.length);
+
+    // Krav 3: frågan ställs BARA när alla i spelet redan har en sparad serie
+    // ihop. Finns ingen skapas den tyst.
+    const existing = await findAggregateLeaderboardsFor(userIds);
+    // ⚠ Spelet som just avslutades bokfördes lokalt INNAN serien fanns på
+    //   servern (slutskärmens effekt körde före den här funktionen), så det
+    //   måste skjutas upp här — annars saknar den sparade serien sin första
+    //   omgång för alltid. Skrivningen är idempotent per rumkod, så att ta
+    //   hela den lokala serien är både enklast och säkrast.
+    const pushLocalGames = async (id: string, series: { games: { roomCode: string; players: AggregateGamePlayer[] }[] }) => {
+      for (const g of series.games) {
+        await recordAggregateGame(id, g.roomCode, g.players);
+      }
+    };
+    const attach = async (id: string) => {
+      const saved = await getAggregateLeaderboard(id);
+      const merged = await attachSeriesToLeaderboard(id, saved?.games ?? []);
+      setAggregateLeaderboardId(id);
+      aggregateLeaderboardIdRef.current = id;
+      setAggregateName(saved?.name ?? null);
+      setAggregateParticipantCount(saved?.participants.length ?? userIds.length);
+      await pushLocalGames(id, merged);
+    };
+    const createFresh = async () => {
+      const name = defaultAggregateName(names);
+      const id = await createAggregateLeaderboard(name, userIds);
+      if (!id) return;
+      const merged = await attachSeriesToLeaderboard(id, []);
+      setAggregateLeaderboardId(id);
+      aggregateLeaderboardIdRef.current = id;
+      setAggregateName(name);
+      setAggregateParticipantCount(userIds.length);
+      await pushLocalGames(id, merged);
+    };
+
+    // Inget sparat med exakt den här uppsättningen → skapa tyst, ingen fråga.
+    if (existing.length === 0) {
+      await createFresh();
+      return true;
+    }
+    // Alert är callback-baserad — await:a valet så id:t hinner sättas innan
+    // inbjudan broadcastas.
+    const picked = await new Promise<'new' | 'existing'>((resolve) => {
+      Alert.alert(
+        `Add to existing ${label}?`,
+        soloSeries
+          ? 'You already have a saved Aggregate Score. Add these games to it, or start a fresh one?'
+          : `You have played together before. Add these games to a saved ${label}, or start a fresh one?`,
+        [
+          { text: 'No, start fresh', style: 'cancel', onPress: () => resolve('new') },
+          { text: 'Yes', onPress: () => resolve('existing') },
+        ],
+        { cancelable: false },
+      );
+    });
+    if (picked === 'new') {
+      await createFresh();
+      return true;
+    }
+    // ⚠ Listan visas ALLTID, även vid exakt en träff (Peter 2026-08-26).
+    //   Tidigare auto-kopplades den enda träffen tyst — host fick då aldrig
+    //   se VILKEN serie spelet hamnade i, och hade ingen väg att ångra sig.
+    setSelectedAggregateId(null);
+    setPendingAggregatePick(existing);
+    const choice = await new Promise<AggregatePickChoice>((resolve) => {
+      aggregatePickResolveRef.current = resolve;
+    });
+    setPendingAggregatePick(null);
+    aggregatePickResolveRef.current = null;
+    if (choice.kind === 'attach') {
+      await attach(choice.id);
+      return true;
+    }
+    if (choice.kind === 'fresh') {
+      await createFresh();
+      return true;
+    }
+    // Cancel: ingenting skapat, ingenting kopplat. Host är tillbaka på
+    // slutskärmen med Yes/No-frågan kvar och kan välja om.
+    return false;
+  };
+
+  /** Byter namn på den sparade serien. Optimistisk lokal uppdatering så
+   *  rubriken svarar direkt; misslyckas RPC:n rullas namnet tillbaka. */
+  const handleRenameAggregate = (name: string) => {
+    const id = aggregateLeaderboardId;
+    if (!id) return;
+    const previous = aggregateName;
+    setAggregateName(name);
+    void renameAggregateLeaderboard(id, name).then((ok) => {
+      if (!ok) setAggregateName(previous);
+    });
   };
 
   /** Host svarade **Yes** på re-match-frågan — eller tappade Yes igen när
@@ -5770,6 +6087,11 @@ export default function QuizScreen() {
       return;
     }
     if (!(await ensureHostCreditsForNewGame())) return;
+    // Koppla serien till ett SPARAT aggregat innan inbjudan går ut, så id:t
+    // hinner med i play_again_lobby_ready till non-hosts.
+    // ⚠ MÅSTE ligga före broadcastPlayAgainInitiated — backar host ur i
+    //   listan får ingen inbjudan gå ut till non-hosts.
+    if (!(await ensureAggregateLeaderboardAttached())) return;
     const totalNonHosts = Math.max(0, turnOrder.length - 1);
     // Individual Devices: varje spelare måste godkänna på sin egen enhet.
     // Yes gråas ut med väntestatusen under sig och host tappar den igen när
@@ -5805,14 +6127,19 @@ export default function QuizScreen() {
       // Supabase-replikering ännu inte synkat när non-host:s getLobbyPlayers
       // anropas, vilket annars ger ett ny joiner-DATE-id och två DB-rader.
       const carryOverParam = selfPlayerId ? `&carryOverPlayerId=${encodeURIComponent(selfPlayerId)}` : '';
-      router.replace(`/lobby?code=${nextLobbyCode}&isHost=false${carryOverParam}`);
+      // rematchLocked: non-host når den här vägen ENBART via host:s
+      // play_again_lobby_ready, dvs. alltid en re-match — så låst läge
+      // renderas direkt på första framen i stället för efter en DB-läsning.
+      router.replace(
+        `/lobby?code=${nextLobbyCode}&isHost=false${carryOverParam}&rematchLocked=true`,
+      );
     }
   }, [awaitingNewLobby, nextLobbyCode]);
 
   // Refs för broadcast-handlers — captureras av syncChannel-subscribe:n.
   const playAgainInitiatedHandlerRef = useRef<() => void>(() => {});
   const playAgainLobbyReadyHandlerRef = useRef<
-    (code: string, autoJoin?: boolean) => void
+    (code: string, autoJoin?: boolean, aggregateId?: string) => void
   >(() => {});
   const playerApprovedPlayAgainHandlerRef = useRef<(playerId: string) => void>(
     () => {},
@@ -5874,7 +6201,11 @@ export default function QuizScreen() {
     playAgainInitiatedHandlerRef.current = () => {
       if (!isHost) setHostInitiatedPlayAgain(true);
     };
-    playAgainLobbyReadyHandlerRef.current = (code: string, autoJoin?: boolean) => {
+    playAgainLobbyReadyHandlerRef.current = (
+      code: string,
+      autoJoin?: boolean,
+      aggregateId?: string,
+    ) => {
       if (isHost) return;
       if (awaitingNewLobbyRef.current || autoJoin) {
         // Non-host har tappat Approve och väntar med lock-overlay —
@@ -5884,6 +6215,16 @@ export default function QuizScreen() {
         // seedad i nya lobbyn så vi följer med UTAN Approve-tap. Sätt
         // awaitingNewLobby=true så navigations-effekten (som kräver båda
         // state-bits) fyrar; no-op om redan satt.
+        // Samma kedje-stämpel som host gör i goToNewLobby — non-host bygger
+        // sin egen Aggregate-serie lokalt ur sina egna score-broadcasts.
+        // Är serien kopplad till ett sparat aggregat följer id:t med, och vi
+        // seedar den lokala serien från servern (RLS släpper in deltagare).
+        void markSeriesContinues(code, aggregateId ?? null);
+        if (aggregateId) {
+          void getAggregateLeaderboard(aggregateId).then((saved) => {
+            if (saved) void attachSeriesToLeaderboard(aggregateId, saved.games);
+          });
+        }
         setAwaitingNewLobby(true);
         setNextLobbyCode(code);
       } else if (!hostStartedWithoutMeAlertedRef.current) {
@@ -6562,7 +6903,11 @@ export default function QuizScreen() {
         responseSecondsChangedHandlerRef.current(payload.seconds),
       onPlayAgainInitiated: () => playAgainInitiatedHandlerRef.current(),
       onPlayAgainLobbyReady: (payload) =>
-        playAgainLobbyReadyHandlerRef.current(payload.room_code, payload.auto_join),
+        playAgainLobbyReadyHandlerRef.current(
+          payload.room_code,
+          payload.auto_join,
+          payload.aggregate_leaderboard_id,
+        ),
       onPlayerApprovedPlayAgain: (payload) =>
         playerApprovedPlayAgainHandlerRef.current(payload.player_id),
       onLobbyDeleted: () => lobbyDeletedHandlerRef.current(),
@@ -7268,19 +7613,33 @@ export default function QuizScreen() {
       rematchTotalNonHosts > 0;
     const rematchWaitingCount =
       rematchTotalNonHosts - playAgainApprovals.size;
-    // ⚠ Pass-the-Phone OCH single player hoppar över HELA re-match-frågan
-    // (PtP: Peter 2026-08-25, single: Peter 2026-08-25). Host får direkt
-    // "Start New Game" + Home; Yes/No-blocket renderas aldrig.
-    // PtP: skälet är detsamma som att spectatorn inte kan godkänna — host
-    // kan ha lagt till gäster utan egen enhet, och en re-match där är ändå
-    // bara "starta ett nytt spel med samma folk i samma rum".
-    // Single player: det finns ingen motpart att aggregera en leaderboard
-    // mot, så frågan är meningslös — "Start New Game" gör exakt samma sak.
-    // Individual Devices behåller frågan + approval-flödet oförändrat.
+    // ⚠ Pass-the-Phone hoppar över HELA re-match-frågan (Peter 2026-08-25).
+    // Host får direkt "Start New Game" + Home; Yes/No-blocket renderas aldrig.
+    // Skälet är detsamma som att spectatorn inte kan godkänna — host kan ha
+    // lagt till gäster utan egen enhet, och en re-match där är ändå bara
+    // "starta ett nytt spel med samma folk i samma rum".
+    //
+    // ⚠ SINGLE PLAYER HAR ÅTER EN FRÅGA (Peter 2026-08-25, senare samma dag)
+    // — den togs bort tidigare med motiveringen "ingen motpart att aggregera
+    // mot", men motparten är spelarens EGNA tidigare spel: "Replay &
+    // Aggregate score" samlar poäng över flera solo-omgångar i en Aggregate
+    // Score. Ordvalet skiljer sig från flerspelar-varianten; mekaniken är
+    // identisk. Vänd inte tillbaka utan nytt beslut.
+    //
+    // ⚠ Undantaget gäller PtP-MULTIPLAYER, inte gameMode i sig. Single player
+    //   är `singlePlayerDefault: true` OVANPÅ ett vanligt läge — ett solospel
+    //   bär alltså oftast gameMode='pass-the-phone' (profil-defaulten), så en
+    //   naken `gameMode !== 'pass-the-phone'` slog ut solo också och frågan
+    //   syntes aldrig (bugg 2026-08-26). isLocalSoloGame måste stå först.
     const rematchQuestionEnabled =
-      localRematchFlow && gameMode !== 'pass-the-phone' && !isLocalSoloGame;
-    // Start New Game visas direkt i PtP + single player, och i övriga
-    // lokala lägen först när host svarat No på re-match-frågan.
+      localRematchFlow && (isLocalSoloGame || gameMode !== 'pass-the-phone');
+    // Frågans rubrik: solo aggregerar en SCORE (en spelare), flerspelar en
+    // LEADERBOARD. Kan inte använda aggregateLabel() — serien finns inte än.
+    const replayTitle = isLocalSoloGame
+      ? 'Replay & Aggregate score?'
+      : 'Re-match with Aggregate Leaderboard?';
+    // Start New Game visas direkt i PtP, och i övriga lokala lägen först när
+    // host svarat No på re-match-frågan.
     const localStartNewGameReady =
       localRematchFlow && (!rematchQuestionEnabled || replayChoice === 'no');
     return (
@@ -7314,6 +7673,22 @@ export default function QuizScreen() {
           // play_again_initiated inte broadcastas i PtP.
           homeOnlyFooter={isPtPSpectator}
           allRoundScoresHistory={allRoundScoresHistory}
+          // Andra sidan på slutskärmen: hela re-match-serien sammanslagen.
+          // Renderas bara när serien har mer än ett spel — annars är
+          // slutskärmen oförändrad.
+          // ⚠ Propen hör hemma HÄR, på blocket med isLastRound={isLastQuestion}
+          //   — inte på PtP-spectatorns interim-vy ovan, som har
+          //   isLastRound={false} hårdkodat och därför aldrig kan visa
+          //   aggregatet. Ankra framtida edits på isLastRound, inte på
+          //   allRoundScoresHistory (som finns på BÅDA anropen).
+          aggregate={aggregate ?? undefined}
+          aggregateName={aggregateName}
+          // Pennan bara för host: namnet syns för ALLA deltagare på deras
+          // Profile, så det ska vara host:s val. RPC:n guardar bara på
+          // "deltagare" — servern kan inte veta vem som är host just nu.
+          onRenameAggregate={
+            isHost && aggregateLeaderboardId ? handleRenameAggregate : undefined
+          }
           // Wifi-kolumnen är bara meningsfull i Individual Devices, där alla
           // svarar på varje fråga. PtP/single/remote → alltid "—".
           trackConnectionErrors={connectionErrorsApplicable}
@@ -7352,6 +7727,7 @@ export default function QuizScreen() {
               ? handleReplayYes
               : undefined
           }
+          replayTitle={replayTitle}
           onReplayNo={handleReplayNo}
           replayAnswered={rematchInvite}
           replayLocked={
@@ -7446,6 +7822,114 @@ export default function QuizScreen() {
                 </Text>
                 <SequentialDots />
               </View>
+            </View>
+          </View>
+        </Modal>
+
+        {/* "Add to existing"-listan när det finns FLERA sparade serier med
+            exakt denna spelaruppsättning. Host väljer vilken som ska fyllas
+            på; Cancel skapar en ny i stället. Promisen i
+            ensureAggregateLeaderboardAttached väntar på valet, så id:t hinner
+            med i inbjudan till non-hosts. */}
+        <Modal
+          visible={pendingAggregatePick !== null}
+          transparent
+          animationType="fade"
+          onRequestClose={() =>
+            aggregatePickResolveRef.current?.({ kind: 'cancel' })
+          }
+        >
+          <View style={styles.playAgainModalOverlay}>
+            <View style={styles.playAgainModalCard}>
+              <Text style={styles.playAgainModalTitle}>
+                Pick {aggregateLabel(turnOrder.length)}
+              </Text>
+              <Text style={styles.playAgainModalBody}>
+                These games will be added to the one you choose.
+              </Text>
+              <ScrollView style={{ maxHeight: 260, alignSelf: 'stretch' }}>
+                {(pendingAggregatePick ?? []).map((item) => {
+                  const selected = selectedAggregateId === item.id;
+                  return (
+                    <Pressable
+                      key={item.id}
+                      onPress={() => setSelectedAggregateId(item.id)}
+                      style={({ pressed }) => [
+                        styles.aggregatePickRow,
+                        selected && styles.aggregatePickRowSelected,
+                        pressed && { opacity: 0.8 },
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.aggregatePickName,
+                          selected && styles.aggregatePickNameSelected,
+                        ]}
+                        numberOfLines={1}
+                      >
+                        {item.name}
+                      </Text>
+                      <Text style={styles.aggregatePickMeta}>
+                        {item.gamesCount}{' '}
+                        {item.gamesCount === 1 ? 'game' : 'games'}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </ScrollView>
+              {/* Steg 2: Confirm tänds först när en rad är markerad. Grått
+                  läge = appens "inte tillgängligt ännu"-vokabulär (samma som
+                  låst Start New Game), inte "fel". */}
+              <Pressable
+                onPress={() => {
+                  if (!selectedAggregateId) return;
+                  aggregatePickResolveRef.current?.({
+                    kind: 'attach',
+                    id: selectedAggregateId,
+                  });
+                }}
+                style={({ pressed }) => [
+                  styles.aggregateConfirmBtn,
+                  !selectedAggregateId && styles.aggregateConfirmBtnLocked,
+                  selectedAggregateId && pressed && { opacity: 0.85 },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.aggregateConfirmBtnText,
+                    !selectedAggregateId && styles.aggregateConfirmBtnTextLocked,
+                  ]}
+                >
+                  Confirm
+                </Text>
+              </Pressable>
+              <Pressable
+                onPress={() =>
+                  aggregatePickResolveRef.current?.({ kind: 'fresh' })
+                }
+                style={({ pressed }) => [
+                  styles.playAgainModalCancel,
+                  pressed && { opacity: 0.8 },
+                ]}
+              >
+                <Text style={styles.playAgainModalCancelText}>
+                  Start a fresh one
+                </Text>
+              </Pressable>
+              {/* Cancel är INTE samma sak som "fresh": här skapas ingenting
+                  och host är tillbaka på slutskärmen med Yes/No kvar. */}
+              <Pressable
+                onPress={() =>
+                  aggregatePickResolveRef.current?.({ kind: 'cancel' })
+                }
+                style={({ pressed }) => [
+                  styles.playAgainModalCancel,
+                  { borderColor: 'transparent' },
+                  pressed && { opacity: 0.7 },
+                ]}
+              >
+                <Text style={styles.playAgainModalCancelText}>Cancel</Text>
+              </Pressable>
             </View>
           </View>
         </Modal>
@@ -8830,6 +9314,75 @@ const styles = StyleSheet.create({
     fontSize: FontSize.sm,
     fontWeight: FontWeight.semibold,
     color: Colors.success,
+  },
+  // "Add to existing"-listans rader. Samma row-vokabulär som MyMatchesScreen
+  // (bordered cardElevated-kort) så listan känns igen.
+  aggregatePickRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    backgroundColor: Colors.cardElevated,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: Radius.md,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    marginBottom: Spacing.sm,
+  },
+  // Markerad rad — samma blå "vald"-vokabulär som resten av appen.
+  aggregatePickRowSelected: {
+    borderColor: Colors.primary,
+    backgroundColor: Colors.primaryMuted,
+  },
+  aggregatePickName: {
+    flex: 1,
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.semibold,
+    color: Colors.textPrimary,
+  },
+  aggregatePickNameSelected: {
+    color: Colors.primary,
+    fontWeight: FontWeight.bold,
+  },
+  // Confirm — gold när den är tänd (appens "actionable"-färg på
+  // slutskärmen), grå när ingen rad är markerad.
+  aggregateConfirmBtn: {
+    height: 48,
+    borderRadius: Radius.sm,
+    borderWidth: 1.5,
+    borderColor: Colors.warning,
+    backgroundColor: Colors.warning,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  aggregateConfirmBtnLocked: {
+    backgroundColor: Colors.cardElevated,
+    borderColor: Colors.borderStrong,
+  },
+  aggregateConfirmBtnText: {
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.bold,
+    color: '#000000',
+  },
+  aggregateConfirmBtnTextLocked: {
+    color: Colors.textDisabled,
+  },
+  aggregatePickMeta: {
+    fontSize: FontSize.xs,
+    color: Colors.textSecondary,
+  },
+  playAgainModalCancel: {
+    height: 48,
+    borderRadius: Radius.sm,
+    borderWidth: 1.5,
+    borderColor: Colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  playAgainModalCancelText: {
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.medium,
+    color: Colors.textSecondary,
   },
   playAgainModalActions: {
     flexDirection: 'column',

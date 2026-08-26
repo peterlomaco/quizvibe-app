@@ -50,6 +50,16 @@ export interface RoomMeta {
   // 1vs1-lobbies i Remote Play History. Optional: test-seedsen nedan har
   // ingen expiry och lämnar fältet undefined.
   expiresAt?: string;
+  // True när lobbyn skapades via Re-match/Replay från Final Leaderboard
+  // (migration 0037). Sätts vid registerActiveRoom — alltså ATOMISKT vid
+  // skapandet, innan någon join är möjlig — av exakt samma skäl som
+  // isRemote1v1: lobby_settings skrivs genom en 300ms-debounce och hade
+  // gjort join-gaten fail-open i ~1s. Optional: rum skapade före 0037
+  // saknar kolumnen och resolvar till false.
+  rematchLocked?: boolean;
+  // lobby_players.player_id för spelarna från föregående spel. Host:s
+  // Start Game blockeras tills varje id finns i lobbyn utan hasLeft.
+  rematchPlayerIds?: string[];
 }
 
 // Dev/test-seeds som lagras lokalt i minnet (inte i DB) så de alltid är
@@ -76,6 +86,9 @@ interface RoomRow {
   expires_at: string;
   // Optional: kolumnen kom i migration 0031 — äldre rader saknar den.
   is_remote_1v1?: boolean | null;
+  // Optional: kolumnerna kom i migration 0037 — äldre rader saknar dem.
+  rematch_locked?: boolean | null;
+  rematch_player_ids?: string[] | null;
 }
 
 function rowToMeta(row: RoomRow): RoomMeta {
@@ -87,6 +100,8 @@ function rowToMeta(row: RoomRow): RoomMeta {
     gameStarted: row.game_started,
     isRemote1v1: row.is_remote_1v1 ?? false,
     expiresAt: row.expires_at,
+    rematchLocked: row.rematch_locked ?? false,
+    rematchPlayerIds: row.rematch_player_ids ?? [],
   };
 }
 
@@ -116,7 +131,7 @@ export async function registerActiveRoom(code: string, meta: RoomMeta): Promise<
     console.warn('[activeRooms] registerActiveRoom called without session — host must be signed in.');
     return false;
   }
-  const { error } = await supabase.from('rooms').upsert({
+  const base = {
     code: normalized,
     host_user_id: user.id,
     host_player_name: meta.hostPlayerName,
@@ -128,12 +143,40 @@ export async function registerActiveRoom(code: string, meta: RoomMeta): Promise<
     // vänta på hostens debounce:ade lobby_settings-skrivning (migration 0031).
     is_remote_1v1: meta.isRemote1v1 ?? false,
     expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+  };
+  const { error } = await supabase.from('rooms').upsert({
+    ...base,
+    // Re-match-låsningen (0037) skrivs på samma atomiska rad, av samma skäl
+    // som is_remote_1v1: en gate som i stället läser lobby_settings är
+    // fail-open i ~1s pga hostens 300ms-debounce.
+    rematch_locked: meta.rematchLocked ?? false,
+    rematch_player_ids: meta.rematchPlayerIds ?? [],
   });
-  if (error) {
-    console.warn('[activeRooms] registerActiveRoom failed:', error.message);
-    return false;
+  if (!error) return true;
+  // ⚠ En upsert som NÄMNER en okörd kolumn failar HELA skrivningen — utan
+  // fallbacken hade en oapplicerad 0037 gjort det omöjligt att skapa rum
+  // överhuvudtaget. Skriv om raden utan 0037-fälten och fortsätt: allt utom
+  // re-match-låsningen fungerar då som förut (låsningen degraderar tyst,
+  // och lobbyn beter sig som en vanlig lobby).
+  if (isMissingColumnError(error.message)) {
+    console.warn(
+      '[activeRooms] rooms is missing the 0037 re-match columns — run migration 0037. Falling back to an unlocked room.',
+    );
+    const retry = await supabase.from('rooms').upsert(base);
+    if (retry.error) {
+      console.warn('[activeRooms] registerActiveRoom failed:', retry.error.message);
+      return false;
+    }
+    return true;
   }
-  return true;
+  console.warn('[activeRooms] registerActiveRoom failed:', error.message);
+  return false;
+}
+
+/** Postgres/PostgREST-signatur för "kolumnen finns inte" (okörd migration). */
+function isMissingColumnError(message: string): boolean {
+  const m = message.toLowerCase();
+  return m.includes('column') && (m.includes('does not exist') || m.includes('schema cache'));
 }
 
 /**

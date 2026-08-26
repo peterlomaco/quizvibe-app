@@ -336,6 +336,38 @@ export async function getLobbyPlayers(code: string): Promise<LobbyPlayer[] | und
 }
 
 /**
+ * Rå `user_id` per spelare i rummet.
+ *
+ * ⚠ `rowToPlayer` läser `user_id` men exponerar det ALDRIG på `LobbyPlayer`,
+ *   så det når varken turnOrder eller quiz-vyn. Sparade Aggregate
+ *   Leaderboards nycklas på Supabase-uid (playerName duger inte — lobby-namn
+ *   är host-redigerbara och gäst-alias genereras lokalt), och host behöver
+ *   därför läsa raderna direkt. RLS tillåter det: `"anyone can read lobby
+ *   players" … using (true)` (migration 0003). Samma mönster som remote-1v1
+ *   redan använder för att slå upp motståndarens uid i LobbyScreen.
+ *
+ * ⚠ `user_id != null` betyder INTE registrerad — gäster får anonyma auth-uid
+ *   och host-tillagda rader har `user_id IS NULL`. Registrerad-testet görs
+ *   server-side (profiles-rad finns), aldrig här.
+ */
+export async function getLobbyPlayerUserIds(
+  code: string,
+): Promise<{ playerId: string; userId: string | null; type: string }[]> {
+  if (!code) return [];
+  const { data, error } = await supabase
+    .from('lobby_players')
+    .select('player_id, user_id, type')
+    .eq('room_code', normalizeCode(code));
+  if (error) {
+    console.warn('[lobbyPlayers] getLobbyPlayerUserIds failed:', error.message);
+    return [];
+  }
+  return ((data as { player_id: string; user_id: string | null; type: string }[]) ?? []).map(
+    (r) => ({ playerId: r.player_id, userId: r.user_id, type: r.type }),
+  );
+}
+
+/**
  * Cross-player seen-historik (migration 0026). Formen som lagras i
  * lobby_players.seen_question_ids (jsonb) och som host-sidan unionerar.
  */
