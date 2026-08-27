@@ -1643,6 +1643,12 @@ export default function HomeScreen() {
   // guestLobbyType satt (konsumeras av handleStartGameAsGuestHost via prop).
   const [hostTypeExpanded, setHostTypeExpanded] = useState<'none' | 'registered' | 'guest'>('none');
   const [guestLobbyType, setGuestLobbyType] = useState<HostLobbyType>('multiplayer');
+  // Guest-sektionens fold-state — bara relevant för inloggade users (Peter
+  // 2026-08-27). Default false (ihopfälld) så "Start New Game"-guest-
+  // knappen inte konkurrerar visuellt med de gyllene user-knapparna;
+  // en tap på "+" fäller ut den. Utloggade users påverkas inte — deras
+  // guest-sektion visas alltid oförändrad.
+  const [guestSectionExpanded, setGuestSectionExpanded] = useState(false);
   // Info-modalen bakom "i"-ikonerna intill BÅDA sektionsrubrikerna
   // ("QuizVibe user" + "Guest login / Non-registered") — jämförelse
   // user vs guest (USER_VS_GUEST_ROWS + PREMIUM_FEATURES).
@@ -1935,6 +1941,13 @@ export default function HomeScreen() {
   );
 
   const isLoggedIn = !!profile;
+
+  // Fäll ihop guest-sektionen automatiskt när spelaren loggar in — annars
+  // kunde den stå kvar utfälld från en session där man tittade på den som
+  // utloggad guest och sedan loggade in utan att skärmen remountat.
+  useEffect(() => {
+    if (isLoggedIn) setGuestSectionExpanded(false);
+  }, [isLoggedIn]);
 
   const openJoin = (step: JoinStep = 'choose', options?: { hideGuest?: boolean }) => {
     setJoinInitialStep(step);
@@ -2843,12 +2856,31 @@ export default function HomeScreen() {
                 marginBottom matchar actionsSection:s gap så rytmen blir
                 identisk med utloggat läge. */}
             {isLoggedIn && hostTypeExpanded === 'none' && (
-              <View style={[styles.sectionHeaderRow, { marginBottom: Spacing.md }]}>
-                <Text
-                  style={[styles.guestSectionHeader, { fontFamily: appNameFont, marginTop: 0 }]}
+              // Fold-header — bara inloggade users har något att fälla ihop
+              // (utloggade guests ser rubriken ovan, utan toggle, som förut).
+              // Toggle-boxen ("+"/"−") ligger FÖRST i raden så den hamnar
+              // längst till vänster på skärmen (Peter 2026-08-27), speglar
+              // Profile-skärmens kollapsbara sektioner men med rubriken
+              // vänsterjusterad istället för centrerad.
+              <View style={[styles.guestFoldHeaderRow, { marginBottom: Spacing.md }]}>
+                <Pressable
+                  onPress={() => setGuestSectionExpanded((prev) => !prev)}
+                  style={({ pressed }) => [styles.guestFoldToggleRow, pressed && { opacity: 0.7 }]}
+                  hitSlop={8}
+                  accessibilityRole="button"
+                  accessibilityLabel={guestSectionExpanded ? 'Collapse guest options' : 'Expand guest options'}
                 >
-                  Guest login / Non-registered
-                </Text>
+                  <View style={styles.guestFoldToggleBox}>
+                    <Text style={styles.guestFoldToggleText}>
+                      {guestSectionExpanded ? '−' : '+'}
+                    </Text>
+                  </View>
+                  <Text
+                    style={[styles.guestSectionHeader, { fontFamily: appNameFont, marginTop: 0 }]}
+                  >
+                    Guest login / Non-registered
+                  </Text>
+                </Pressable>
                 <Pressable
                   onPress={() => setCompareInfoVisible(true)}
                   hitSlop={10}
@@ -2860,63 +2892,67 @@ export default function HomeScreen() {
                 </Pressable>
               </View>
             )}
-            {/* Pulsen ligger BARA på knappen — utfälld panel står still. */}
-            <Animated.View
-              style={{ transform: [{ scale: hostTypeExpanded === 'guest' ? 1 : pulse }] }}
-            >
-              <TouchableOpacity
-                style={[styles.gameBtn, styles.gameBtnGuest]}
-                activeOpacity={0.85}
-                onPress={() =>
-                  setHostTypeExpanded((prev) => (prev === 'guest' ? 'none' : 'guest'))
-                }
-              >
-                <Text
-                  style={[
-                    styles.gameBtnText,
-                    { fontFamily: fontsLoaded ? 'Nunito_600SemiBold' : undefined },
-                  ]}
-                  numberOfLines={1}
-                  adjustsFontSizeToFit
+            {(!isLoggedIn || guestSectionExpanded) && (
+              <>
+                {/* Pulsen ligger BARA på knappen — utfälld panel står still. */}
+                <Animated.View
+                  style={{ transform: [{ scale: hostTypeExpanded === 'guest' ? 1 : pulse }] }}
                 >
-                  Start New Game
-                </Text>
-                {/* Badge per login-läge: inloggad → "No Data Saved"
-                    i grått (samma homeUserBadge-stil som user-knapparna);
-                    utloggad → FREE i grönt (matchar övriga guest-/register-
-                    knappar).
+                  <TouchableOpacity
+                    style={[styles.gameBtn, styles.gameBtnGuest]}
+                    activeOpacity={0.85}
+                    onPress={() =>
+                      setHostTypeExpanded((prev) => (prev === 'guest' ? 'none' : 'guest'))
+                    }
+                  >
+                    <Text
+                      style={[
+                        styles.gameBtnText,
+                        { fontFamily: fontsLoaded ? 'Nunito_600SemiBold' : undefined },
+                      ]}
+                      numberOfLines={1}
+                      adjustsFontSizeToFit
+                    >
+                      Start New Game
+                    </Text>
+                    {/* Badge per login-läge: inloggad → "No Data Saved"
+                        i grått (samma homeUserBadge-stil som user-knapparna);
+                        utloggad → FREE i grönt (matchar övriga guest-/register-
+                        knappar).
 
-                    Göms när utfällningen är öppen: då bär Local Play/Remote
-                    Play sina egna badges och en badge på föräldern blir
-                    dubbelinformation. */}
-                {hostTypeExpanded !== 'guest' && (
-                <View
-                  style={[styles.homeFreeBadge, isLoggedIn && styles.homeUserBadge]}
-                  pointerEvents="none"
-                >
-                  <Text style={styles.homeFreeBadgeText}>
-                    {isLoggedIn ? 'No Data Saved' : 'FREE'}
-                  </Text>
-                </View>
+                        Göms när utfällningen är öppen: då bär Local Play/Remote
+                        Play sina egna badges och en badge på föräldern blir
+                        dubbelinformation. */}
+                    {hostTypeExpanded !== 'guest' && (
+                    <View
+                      style={[styles.homeFreeBadge, isLoggedIn && styles.homeUserBadge]}
+                      pointerEvents="none"
+                    >
+                      <Text style={styles.homeFreeBadgeText}>
+                        {isLoggedIn ? 'No Data Saved' : 'FREE'}
+                      </Text>
+                    </View>
+                    )}
+                  </TouchableOpacity>
+                </Animated.View>
+                {hostTypeExpanded === 'guest' && (
+                  <HostTypeOptions
+                    accentColor="#6B7280"
+                    remoteMode={isLoggedIn ? 'hidden' : 'locked'}
+                    onRemoteLockedPress={() => handleRemoteAccountRequired('host')}
+                    localBadge={
+                      isLoggedIn
+                        ? { text: 'No Data Saved', muted: true }
+                        : { text: 'FREE' }
+                    }
+                    onSelect={(lobbyType) => {
+                      setHostTypeExpanded('none');
+                      setGuestLobbyType(lobbyType);
+                      openJoin('guest-host');
+                    }}
+                  />
                 )}
-              </TouchableOpacity>
-            </Animated.View>
-            {hostTypeExpanded === 'guest' && (
-              <HostTypeOptions
-                accentColor="#6B7280"
-                remoteMode={isLoggedIn ? 'hidden' : 'locked'}
-                onRemoteLockedPress={() => handleRemoteAccountRequired('host')}
-                localBadge={
-                  isLoggedIn
-                    ? { text: 'No Data Saved', muted: true }
-                    : { text: 'FREE' }
-                }
-                onSelect={(lobbyType) => {
-                  setHostTypeExpanded('none');
-                  setGuestLobbyType(lobbyType);
-                  openJoin('guest-host');
-                }}
-              />
+              </>
             )}
           </View>
           )}
@@ -4315,6 +4351,35 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     textAlign: 'center',
     marginTop: Spacing.xl,
+  },
+  // Fold-header för inloggade users' guest-sektion — speglar Profile-
+  // skärmens kollapsbara sektioner (+/− toggle-box) men vänsterjusterad
+  // istället för centrerad, så toggle-boxen hamnar längst till vänster
+  // på skärmen (Peter 2026-08-27).
+  guestFoldHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
+  guestFoldToggleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
+  guestFoldToggleBox: {
+    width: 26,
+    height: 26,
+    borderRadius: Radius.sm,
+    borderWidth: 1,
+    borderColor: '#6B7280',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  guestFoldToggleText: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#6B7280',
+    lineHeight: 20,
   },
   footer: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: Spacing.sm, paddingTop: Spacing.sm },
   footerText: { fontSize: 12, color: Colors.textSecondary },
