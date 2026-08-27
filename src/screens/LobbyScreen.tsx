@@ -1153,10 +1153,12 @@ function BlinkingLabel({
   style,
   children,
   duration = 600,
+  numberOfLines = 1,
 }: {
   style: StyleProp<TextStyle>;
   children: React.ReactNode;
   duration?: number;
+  numberOfLines?: number;
 }) {
   const opacity = useRef(new Animated.Value(1)).current;
   useEffect(() => {
@@ -1170,7 +1172,7 @@ function BlinkingLabel({
     return () => loop.stop();
   }, [opacity, duration]);
   return (
-    <Animated.Text style={[style, { opacity }]} numberOfLines={1}>
+    <Animated.Text style={[style, { opacity }]} numberOfLines={numberOfLines}>
       {children}
     </Animated.Text>
   );
@@ -7746,7 +7748,16 @@ export default function LobbyScreen() {
               onPress={() => handleStartGame()}
               style={styles.startGameCompactRow}
             >
-              <BlinkingLabel style={styles.startGameCompactLabel}>Start Game</BlinkingLabel>
+              <BlinkingLabel
+                style={isRematchLobby ? styles.startGameCompactLabelTwoLine : styles.startGameCompactLabel}
+                numberOfLines={isRematchLobby ? 2 : 1}
+              >
+                {isRematchLobby
+                  ? singlePlayerDefault
+                    ? 'Start\nReplay'
+                    : 'Start\nRe-match'
+                  : 'Start Game'}
+              </BlinkingLabel>
               <View style={styles.startGameCompactLogoWrap}>
                 <Animated.View
                   style={[styles.startGameCompactHalo, { opacity: startGlow }]}
@@ -10616,6 +10627,19 @@ const styles = StyleSheet.create({
     fontWeight: FontWeight.bold,
     color: Colors.warning,
     letterSpacing: 0.5,
+  },
+  // Re-match/Replay-varianten av startGameCompactLabel — samma text bara
+  // brutet över två rader ("Start" / "Re-match" resp. "Start" / "Replay"),
+  // så CTA:n fortfarande läser "Start Game" i andemening men signalerar
+  // att uppställningen är återanvänd. Mindre fontStorlek än enrads-varianten
+  // så två rader ryms inom samma sticky-bar-höjd.
+  startGameCompactLabelTwoLine: {
+    fontSize: 15,
+    fontWeight: FontWeight.bold,
+    color: Colors.warning,
+    letterSpacing: 0.3,
+    textAlign: 'center',
+    lineHeight: 17,
   },
   // Halo bara bakom logon (inte texten) så labeln förblir läsbar när
   // glow-opaciteten pulsar upp mot 0.85.
