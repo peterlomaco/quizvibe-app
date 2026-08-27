@@ -70,6 +70,13 @@ export function finalizeRows(
         : 0,
     }))
     .sort((a, b) => {
+      // 0. Den som lämnade MITT i spelet hamnar sist, oavsett poäng.
+      //    De slutade svara, så deras delsumma är ingen giltig placering —
+      //    utan den här regeln kunde någon som gick efter två rätta svar
+      //    vinna över en som spelade hela matchen och svarade fel på allt.
+      //    (`hasLeft` sätts bara för avhopp under pågående spel; se
+      //    `leftDuringGameIds` i quiz.tsx. Aggregatvyn sätter alltid false.)
+      if (a.hasLeft !== b.hasLeft) return a.hasLeft ? 1 : -1;
       // 1. Pts desc — flest poäng vinner
       if (b.points !== a.points) return b.points - a.points;
       // 2. Spelare med 0 spelade ronder får avgResponseSeconds=0 vilket
@@ -102,7 +109,14 @@ export function LeaderboardTable({ entries }: { entries: LeaderboardRow[] }) {
                 key={entry.playerId}
                 style={[styles.lbCell, styles.lbLeftCell]}
               >
-                <Text style={styles.lbPos}>{index + 1}</Text>
+                {/* Avhoppare får ingen placeringssiffra — de deltog inte
+                    i hela matchen och rankas därför inte. Texten renderas
+                    ändå (tom) så `lbPos`:ens fasta bredd håller kolumnen
+                    i linje. Sorteringen lägger dem sist, så `index + 1`
+                    förblir korrekt för de spelare som FÅR en siffra. */}
+                <Text style={styles.lbPos}>
+                  {entry.hasLeft ? '' : index + 1}
+                </Text>
                 <View style={styles.lbNameStack}>
                   <Text style={styles.lbName} numberOfLines={1}>
                     {entry.emoji ? `${entry.emoji} ` : ''}
@@ -144,7 +158,7 @@ export function LeaderboardTable({ entries }: { entries: LeaderboardRow[] }) {
                   style={[styles.lbMidRow, styles.lbHasLeftRow]}
                 >
                   <Text style={styles.lbHasLeftText} numberOfLines={1}>
-                    Has left the game
+                    Left the game
                   </Text>
                 </View>
               ) : (

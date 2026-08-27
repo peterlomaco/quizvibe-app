@@ -575,13 +575,17 @@ export default function FinalCelebration({
                       >
                         {card.rows.map((row) => (
                           <View key={row.playerId} style={styles.rankRow}>
+                            {/* place === null: spelaren lämnade mitt i
+                                matchen och rankas inte. Texten renderas ändå
+                                (tom) så `rankPlace`:ens fasta bredd håller
+                                namnkolumnen i linje. */}
                             <Text
                               style={[
                                 styles.rankPlace,
                                 row.place === 1 && styles.rankPlaceTop,
                               ]}
                             >
-                              {row.place}.
+                              {row.place === null ? '' : `${row.place}.`}
                             </Text>
                             {row.emoji ? (
                               <Text style={styles.rankEmoji}>{row.emoji}</Text>
@@ -589,7 +593,14 @@ export default function FinalCelebration({
                             <Text style={styles.rankName} numberOfLines={1}>
                               {row.name}
                             </Text>
-                            <Text style={styles.rankValue}>{row.value}</Text>
+                            <Text
+                              style={[
+                                styles.rankValue,
+                                row.place === null && styles.rankValueLeft,
+                              ]}
+                            >
+                              {row.value}
+                            </Text>
                           </View>
                         ))}
                       </ScrollView>
@@ -818,6 +829,11 @@ const styles = StyleSheet.create({
     fontWeight: FontWeight.bold,
     color: Colors.warning,
     fontVariant: ['tabular-nums'],
+  },
+  // "Left" i stället för ett resultat — grått, så raden läses som
+  // information och inte som en prestation att jämföra med de gyllene.
+  rankValueLeft: {
+    color: Colors.textSecondary,
   },
   cardValue: {
     fontSize: COMPACT ? 28 : 34,

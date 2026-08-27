@@ -462,3 +462,80 @@ describe('remote 1v1 — motståndaren som summaryStats', () => {
     expect(avg.rows![0].value).toBe('3.50s');
   });
 });
+
+// —— Avhoppare rankas inte ——————————————————————————————————
+//
+// Den som lämnade MITT i matchen slutade svara, så deras delsumma är ingen
+// giltig placering. Utan filtret kunde de toppa "Correct answers" sekunder
+// innan slutskärmen visar dem längst ner utan placeringssiffra.
+describe('spelare som lämnat mitt i matchen', () => {
+  const BEN_LEFT: LeaderboardPlayer = { ...BEN, hasLeft: true };
+
+  it('visas inte alls när bara EN spelare är kvar (ingen lista att stå i)', () => {
+    const cards = build({
+      // Ben hann två rätt innan han gick; Anna spelade hela matchen
+      // och svarade fel på allt.
+      scores: [
+        [score('p1', 0, false, 20), score('p2', 0, true, 2)],
+        [score('p1', 1, false, 20), score('p2', 1, true, 2)],
+        [score('p1', 2, false, 20)],
+        [score('p1', 3, false, 20)],
+      ],
+      players: [ANNA, BEN_LEFT],
+    });
+    // Bara EN kvarvarande spelare → ingen placeringslista, utan kortet
+    // faller tillbaka på value-layouten (samma gate som ett solospel).
+    const mostCorrect = cards.find((c) => c.id === 'most-correct')!;
+    expect(mostCorrect.rows).toBeUndefined();
+    // Och Ben får inte dyka upp på NÅGOT kort.
+    expect(JSON.stringify(cards)).not.toContain('Ben');
+  });
+
+  it('räknas bort ur listan men lämnar övriga placeringar intakta', () => {
+    const cards = build({
+      scores: [
+        [score('p1', 0, true, 5), score('p2', 0, true, 1), score('p3', 0, false, 9)],
+        [score('p1', 1, true, 5), score('p2', 1, true, 1), score('p3', 1, true, 9)],
+      ],
+      players: [ANNA, BEN_LEFT, CIA],
+    });
+    const mostCorrect = cards.find((c) => c.id === 'most-correct')!;
+    // Ben leder på både rätt och tid men är borta: Anna och Cia rankas mot
+    // varandra som om han aldrig funnits, och Ben hängs på sist UTAN
+    // placeringssiffra och med "Left" i stället för resultat.
+    expect(places(mostCorrect)).toEqual(['1:Anna', '2:Cia', 'null:Ben']);
+    const benRow = mostCorrect.rows!.find((r) => r.name === 'Ben')!;
+    expect(benRow.place).toBeNull();
+    expect(benRow.value).toBe('Left');
+
+    const avg = cards.find((c) => c.id === 'fastest-average')!;
+    expect(places(avg)).toEqual(['1:Anna', '2:Cia', 'null:Ben']);
+    expect(avg.rows!.find((r) => r.name === 'Ben')!.value).toBe('Left');
+  });
+
+  it('vinner ALDRIG ett källkort — de visar bara förstaplatsen', () => {
+    const cards = build({
+      // Ben har flest rätt på YouTube men lämnade; Cia ska ta kortet.
+      scores: [
+        [score('p1', 0, false, 5), score('p2', 0, true, 1), score('p3', 0, true, 9)],
+        [score('p1', 1, false, 5), score('p2', 1, true, 1), score('p3', 1, false, 9)],
+      ],
+      players: [ANNA, BEN_LEFT, CIA],
+      mediaSourceByQuestion: ['youtube', 'youtube'],
+    });
+    const yt = cards.find((c) => c.id === 'source-youtube')!;
+    expect(places(yt)).toEqual(['1:Cia']);
+  });
+
+  it('rör INTE den som lämnade efter slutsignalen (hasLeft sätts aldrig då)', () => {
+    const cards = build({
+      scores: [
+        [score('p1', 0, false, 20), score('p2', 0, true, 2)],
+        [score('p1', 1, false, 20), score('p2', 1, true, 2)],
+      ],
+      players: [ANNA, BEN],
+    });
+    const mostCorrect = cards.find((c) => c.id === 'most-correct')!;
+    expect(places(mostCorrect)).toEqual(['1:Ben', '2:Anna']);
+  });
+});

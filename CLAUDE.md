@@ -577,7 +577,18 @@ Vill host byta läge: **radera lobbyn och välj på nytt via Start New Game** (P
 
 **Individual device blockerar ENDAST host-tillagda guests** (policy-ändring 2026-08-06, ersätter 2026-06-01-regeln som blockade alla guests) — rationale: host-tillagda guests saknar egen enhet (ingen mobil kan visa frågor/skicka svar), medan självanslutna guests HAR egen enhet + anon-session och får spela IndDev + attesta Spotify. Distinktion via `LobbyPlayer.addedByHost` (survives DB-roundtrip: `rowToPlayer` rekonstruerar som `type === 'guest' && user_id === null`). Enforced på 3 ställen: (a) byte till IndDev → `confirmAndRemoveGuests` tar bort BARA `addedByHost`-spelare (markEjected + DB-DELETE); (b) "+ Add Player" blockeras i IndDev ("Own device required"-Alert); (c) `handleStartGame`-guard blockerar start om någon approved `addedByHost`-spelare finns i IndDev. Home `handleJoinAsGuest`:s IndDev-block är BORTTAGET — guests joinar IndDev-lobbies fritt. Spotify-attest-UI:t i Lobby-raden visas för alla inkl. självanslutna guests (attest persisteras bara till profil för registrerade — guests är lobby-lokala via `spotify_verified`).
 
-**Players-sektionen** (Max 4 / Max 12) sätter `maxPlayers` **explicit** — `maxPlayers` härleds INTE från gameMode. `handleSelectMaxPlayers(n)` har **tre-grenad logik** (ordning är kritisk):
+⚠ **Taket härleds ur läge + premium — `resolveMaxPlayers(gameMode, singlePlayer, premium)` (2026-08-26).** Module-level och ren, delas av seed-effekten och auto-sync-effekten så de aldrig sätter olika värden en frame isär:
+
+| Läge | Tak |
+|---|---|
+| Pass-the-Phone | **ALLTID 4, även med Premium** |
+| Individual device | 12 med Premium, annars 4 |
+| Remote 1v1 | 2 |
+| Single player | 4 (lägsta giltiga; DB-CHECK tillåter bara 2/4/12 — mätaren visar ändå EN ruta) |
+
+PtP-cappen stod i auto-sync-effektens kommentar men fanns **aldrig** i koden: den satte `hasPremium ? 12 : 4` utan lägeskoll, så en premium-host fick 12 kapacitetsrutor i en PtP-lobby (Peter 2026-08-26). Seeden läste dessutom `profile.maxPlayers`, vilket kunde släppa in ett stale 12 en frame innan effekten rättade det. Båda går nu genom resolvern.
+
+Följd: **Players-toggeln är i praktiken bara meningsfull i IndDev** — i PtP/Single/1v1 är taket låst av läget, och i IndDev + Premium låser 12 (Max 4 utgråas). `handleSelectMaxPlayers(n)` behålls som spärr + förklaring och har **tre-grenad logik** (ordning är kritisk):
 1. **Mode-check** (Max 12 i PtP/Single): Alert "Individual device required — Please activate Individual device to be able to select Max 12 players." Ingen state-ändring. Mode måste bytas till IndDev först.
 2. **Premium-check** (Max 12 i IndDev utan premium): Alert "Premium feature" + Store-deeplink (`/store?focus=subscription`). Ingen state-ändring.
 3. **Applicera** (Max 12 i IndDev med premium, eller Max 4 alltid): `setMaxPlayers(n)`.
@@ -585,6 +596,7 @@ Vill host byta läge: **radera lobbyn och välj på nytt via Start New Game** (P
 **Mode-switch-konsekvenser för maxPlayers**:
 - **IndDev → PtP**: `setMaxPlayers(4)` alltid. Om > 3 godkända non-hosts i lobbyn visas Alert "Change to Pass-the-Phone / Change from Individual Devices will remove all players from lobby. Do you want to continue?" — Continue ejectar ALLA non-hosts (`markEjected` + Supabase DELETE), sedan `setPlayers(prev => prev.filter(p => p.isHost))`.
 - **PtP → IndDev** (premium host): `setMaxPlayers(12)` automatiskt inuti `confirmAndRemoveGuests`-callbacken. Återställer vad PtP-bytet satte till 4.
+- Båda handler-anropen är numera redundanta mot auto-sync-effekten (resolvern ger samma svar), men behålls: de kör **synkront** och undviker en frame med det gamla taket.
 - Max 4-rutans **aktiv-villkor**: `maxPlayers === 4` (oberoende av premium-status). **Disabled** enbart för premium host i IndDev: `!hostMode || (hasPremium && gameMode === 'individual-devices' && !singlePlayerDefault)`.
 
 Max 4-rutan har FREE-badge (grön aktiv), Max 12-rutan PREMIUM-badge (`premiumBadge` guld med subscription / `premiumBadgeGrey` grå utan). `maxPlayers` styr lobby-cappen + hur många host kan godkänna i "Players in lobby".
@@ -816,7 +828,7 @@ Snapshot-baserad jämförelse (`savedSnapshotRef` = JSON vid load/save). `hasUns
 
 ## Host Game Credits (pill + daily refresh + deduktion)
 
-**OMARBETAT 2026-07-07 — Extras (engångsköpta credits) HELT BORTTAGNA.** V1-modellen: inloggad user har 4 gratis host-spel/dag (Free, daily refresh — `FREE_CREDITS_DAILY_CAP`, höjt 2 → 4 2026-08-07); Premium-abonnemang = unlimited (ingen gate, ingen deduktion); guest host = obegränsat gratis men inga sparade historikdata + max 1 Play Again-replay (se "Start Game as Guest"). Store säljer INTE credit-packs längre (`CREDIT_TIERS = []`, sektion dold — samma parkerings-mönster som PACKAGE_TIERS). `ProfileData.gameCredits` är legacy-fält (persistens-passthrough i ProfileScreen så gamla saldon inte nollas; läses aldrig av UI/gates). `CREDIT_PRODUCT_AMOUNTS` i iap.ts + `handleBuyCredits` i StoreScreen är död kod för ev. re-aktivering. **OBS: pausa/ta bort pkg_credits_5/10/20 i App Store Connect + RC Dashboard.**
+**OMARBETAT 2026-07-07 — Extras (engångsköpta credits) HELT BORTTAGNA.** V1-modellen: inloggad user har 4 gratis host-spel/dag (Free, daily refresh — `FREE_CREDITS_DAILY_CAP`, höjt 2 → 4 2026-08-07); Premium-abonnemang = unlimited (ingen gate, ingen deduktion); guest host = obegränsat gratis men inga sparade historikdata och **varken re-match eller replay** (se "Start Game as Guest"). Store säljer INTE credit-packs längre (`CREDIT_TIERS = []`, sektion dold — samma parkerings-mönster som PACKAGE_TIERS). `ProfileData.gameCredits` är legacy-fält (persistens-passthrough i ProfileScreen så gamla saldon inte nollas; läses aldrig av UI/gates). `CREDIT_PRODUCT_AMOUNTS` i iap.ts + `handleBuyCredits` i StoreScreen är död kod för ev. re-aktivering. **OBS: pausa/ta bort pkg_credits_5/10/20 i App Store Connect + RC Dashboard.**
 
 **Pill i headern** på både Profile (övre höger, "Profile"-titel vänster) och Lobby (övre höger, "Game Lobby"-titel vänster). Identisk styling i båda:
 
@@ -1231,7 +1243,7 @@ Glöm inte lägga till nya stores här när de skapas — annars läcker stale d
 | Läge | Vad som händer |
 |---|---|
 | `individual-devices` | `goToQuizAsNonHost()` direkt |
-| `pass-the-phone` | Alert **"Host has started the Game / Please use Host device. Do you want to follow the Leaderboard on this device?"** → **Yes** = `goToQuizAsNonHost()`, **No** = Home |
+| `pass-the-phone` | Alert **"Host has started the Game / Play on the Host device. Keep the live leaderboard on this phone so you can join a re-match afterwards."** → **Follow leaderboard** = `goToQuizAsNonHost()`, **Not now** = Home. ⚠ Follow är FÖRVALT — se noten vid prompten. |
 | `remote-1v1` | Now/Later-modal (48h-fönstret) |
 
 `goToQuizAsNonHost()` är en lokal helper i `syncFromStore` som **delas av PtP-promptens Yes och IndDev-grenen** — båda behöver identiska `/quiz`-params (host:s settings ur `lobby_settings` + hela turnOrder ur `lobby_players` + `selfPlayerId`). Lägg nya params där, inte på ett av anropen.
@@ -1821,11 +1833,13 @@ YouTube-klippen är NOTERAT INTE bara musik — kan vara filmscener, sporthände
 
 En godkänd non-host i en PtP-lobby var tidigare en återvändsgränd: host tryckte Start Game, non-host fick popupen *"Host has started the game — Please use the Host device"* och kastades Home. Deras enhet var svart resten av spelet trots att de satt i samma rum och spelade på host:ens telefon.
 
-Nu får de i stället frågan **"Host has started the Game / Please use Host device. Do you want to follow the Leaderboard on this device?"** → **No** = Home som förr, **Yes** = `/quiz` i en **spectator-vy** som visar leaderboarden uppdaterad i realtid, och efter sista frågan Final Leaderboard med prisutdelnings-sekvensen.
+Nu får de i stället frågan **"Host has started the Game / Play on the Host device. Keep the live leaderboard on this phone so you can join a re-match afterwards."** → **Not now** = Home som förr, **Follow leaderboard** = `/quiz` i en **spectator-vy** som visar leaderboarden uppdaterad i realtid, och efter sista frågan Final Leaderboard med prisutdelnings-sekvensen.
 
-**⚠ Re-match finns INTE i PtP — varken för host eller non-host** (Peter 2026-08-25). Skälet: host kan lägga till gäster via "+ Add Player" som saknar egen enhet, så ett IndDev-liknande approval-flöde hade låst host:ens Yes-knapp för alltid. **Bygg inte approvals för PtP** utan nytt produktbeslut.
+⚠ **"Follow leaderboard" är FÖRVALT** (Peter 2026-08-26) och bär `style: 'cancel'`. Det är enda sättet att få knappen fetstilt/förvald på iOS — RN:s Alert exponerar inget `preferredAction`, och UIAlertController renderar just `.cancel` i halvfet. **Flytta den inte "tillbaka" till Not now** för att den ser felplacerad ut; då blir avböj-knappen standardvalet igen. Att följa med är inte längre bara en trevlighet: bara den som har en enhet i spelet kan acceptera en PtP-re-match, så svarar alla "Not now" erbjuds ingen re-match alls.
+
+**⚠ Re-match FINNS i PtP sedan 2026-08-26 — men bara i ett rent QuizVibe-user-spel.** Den tidigare regeln ("re-match finns inte i PtP; bygg inte approvals — host kan lägga till gäster utan egen enhet, som aldrig kan godkänna") är UPPHÄVD, och invändningen löstes genom att göra sådana spel obehöriga i stället för att bygga runt dem: finns EN gäst i uppställningen — värd-tillagd eller självansluten anon — visas ingen re-match-fråga alls. Se "Final Leaderboard: Re-match…" nedan för behörighetsgaten och approver-modellen.
 - **Host:s slutskärm hoppar över hela Yes/No-frågan** — `rematchQuestionEnabled = localRematchFlow && (isLocalSoloGame || gameMode !== 'pass-the-phone')` gatar `onReplayYes`, och `localStartNewGameReady = localRematchFlow && (!rematchQuestionEnabled || replayChoice === 'no')` gör att **"Start New Game" + Home visas direkt**. Individual Devices behåller frågan + approval-flödet oförändrat.
-- **Spectatorns slutskärm har bara Home** (`homeOnlyFooter`).
+- **Spectatorns slutskärm** visar samma footer som en IndDev-non-host: dimmad "Accept / Re-match" med badgen "Activated by Host", som tänds guld när host bjuder in. `homeOnlyFooter`-propen är BORTTAGEN (den var dess enda call-site).
 
 ### Kanalen: fem event, inget mer
 
@@ -1890,7 +1904,7 @@ Kö-datan (`introQueueData`: players + roundNumbers + questionNumbers) är **hoi
 
 ### Två nya props på `RoundLeaderboard`
 
-- **`homeOnlyFooter?: boolean`** — kortsluter slutskärmens footer till bara Home. Utan den får spectatorn den dimmade "Approve / Re-match"-knappen med badgen "Activated by Host", som aldrig kan tändas (`play_again_initiated` broadcastas inte i PtP).
+- ~~**`homeOnlyFooter?: boolean`**~~ — **BORTTAGEN 2026-08-26** när PtP fick re-match. Den kortslöt spectatorns footer till bara Home eftersom `play_again_initiated` aldrig broadcastades i PtP; nu gör den det, så spectatorn ska ha den dimmade knappen som tänds. Ett guest-hostat spel faller ändå till Home-only via `guestHost`-klausulen.
 - **`interimFooter?: React.ReactNode`** — ersätter "Next Round →"-knappen på INTERIM-vyn. ⚠ Den knappen renderas annars **identiskt tänd även utan `onNextRound`** (`onPress` blir bara `undefined`, ingen disabled-styling), så en läsare utan rätt att gå vidare hade sett en fullt levande CTA som inte gör något.
 
 ### Host lämnar → spectators Home
@@ -2132,7 +2146,7 @@ Sport-tabell-layout som driver både GetReadyIntro:s utfällbara leaderboard OCH
 
 **Final leaderboard-knappar** (när `isLastRound`, i sticky footer):
 
-> ⚠ **Host:s Play Again är BORTA sedan 2026-08-08** — i ALLA slutskärmar (lokalt spel, guest-hostat och remote) ersätts den av slutskärmens gula flöde (re-match-frågan → Start New Game; se sektionen nedan). `PlayAgainButton` lever kvar ENBART för non-hosts ("Approve / Re-match"); host-varianten (blå single-line "Play again") är därmed **dormant kod** — liksom `handlePlayAgain` och `playAgainModalVisible`-modalen i [app/quiz.tsx](app/quiz.tsx). Beskrivningen av host-varianten nedan är historik.
+> ⚠ **Host:s Play Again är BORTA sedan 2026-08-08** — i ALLA slutskärmar (lokalt spel, guest-hostat och remote) ersätts den av slutskärmens gula flöde (re-match-frågan → Start New Game; se sektionen nedan). `PlayAgainButton` lever kvar ENBART för non-hosts ("Accept / Re-match"); host-varianten (blå single-line "Play again") är därmed **dormant kod** — liksom `handlePlayAgain` och `playAgainModalVisible`-modalen i [app/quiz.tsx](app/quiz.tsx). Beskrivningen av host-varianten nedan är historik.
 
 - **Home** (vänster, `flex: 1`): `<QuizVibeQAvatar size={32} />` + "Home"-text i `flexDirection: 'row'` + `gap: Spacing.sm`. Bg `Colors.card`, border `Colors.border` (1.5 px), `Colors.primary`-text. Speglar TopUserBanner:s "Home"-backlink men på en row-layout istället för column.
 - **Play Again** (höger, `flex: 1`): renderas av `PlayAgainButton` (intern komponent i [RoundLeaderboard.tsx](src/components/RoundLeaderboard.tsx)). Pressable:n är transparent — den synliga formen är 100% SVG (`PlayAgainLoopBorder`):
@@ -2141,7 +2155,7 @@ Sport-tabell-layout som driver både GetReadyIntro:s utfällbara leaderboard OCH
   - **Chevron** (`chevronPath`): stängd ◁-triangel som hänger ner från bottenkanten — top-hörnet på bottenkant-nivå, vertikal höger-sida, diagonal upper-left arm till spetsen (16 px till vänster, på halv höjd), diagonal upper-right arm tillbaka till top via `Z`. Filled + strokad i samma `color` så formen läses som solid vänster-pekande pil. Spetsen sitter på `triangleTipY = bottom` (= mitten av triangelns vertikala span); triangelns BOTTOM-corner landar på `y = height` (= button-bottom).
 - **Tre färg-/state-varianter** för Play Again-knappen via `color`-prop:
   1. **Host** (eller Pass-the-Phone): `Colors.primary` (blå) — alltid aktiv, lines = `['Play again']` (single-line). **DORMANT sedan 2026-08-08** (se varningen ovan).
-  2. **Non-host efter host:s tap** (`hostInitiatedPlayAgain === true`): `Colors.warning` (guld) — aktiv "Approve / Re-match", lyser upp för att signalera "actionable" och skilja från host:s blå.
+  2. **Non-host efter host:s tap** (`hostInitiatedPlayAgain === true`): `Colors.warning` (guld) — aktiv "Accept / Re-match", lyser upp för att signalera "actionable" och skilja från host:s blå.
   3. **Non-host innan host tappat**: `Colors.textSecondary` (dämpat grå) — disabled, ingen `onPress`, plus kant-skärande **"ACTIVATED BY HOST"-badge** i top-position (`playAgainBadge`, guld bg + svart text).
 - **Two-line text för non-host** (`finalPlayAgainTextSmall`): FontSize.sm + lineHeight 16, letterSpacing 0.2, textAlign center. Stackar "Approve" / "Re-match" vertikalt så de ryms inom button-bredden utan trunkering (hette "Approve / Play again" t.o.m. 2026-08-08 och "Approve / re-match" t.o.m. 2026-08-14). Host:s single-line "Play again" använder större `finalPlayAgainText` (FontSize.md). Text är title-case — INGEN `textTransform: 'uppercase'`.
 - **Dynamiska höjder** (alignering med Home):
@@ -2254,8 +2268,8 @@ Host:s **Play Again** är borttagen ur slutskärmen. I stället ställs **EN fr�
 
 **Steg 1 — `replayChoice === 'ask'` (default):** bara rubriken **"Re-match with Aggregate Leaderboard?"** + inline **Yes / No** syns. **"Start New Game" renderas INTE** — call-siten skickar helt enkelt inte in `onStartNewGame`, och dess frånvaro är det som döljer knappen.
 - **Yes** → carry-over-flödet i `previousLocalMode` (en re-match byter ALDRIG läge, därför inget lägesval här).
-  - **IndDev med non-hosts**: `rematchInvite=true` + `play_again_initiated` broadcastas så non-hosts **"Approve / Re-match"** tänds (guld, pulsande). Yes gråas ut (`replayLocked`), **No göms** (`replayAnswered`) och `replayNote` visar "Waiting for N of M players to approve" + `SequentialDots` → "✓ All players have approved". Host tappar Yes igen när den tänds → `proceedWithRematch` → Keep/Reset. **Ingen ångra-väg** (Peter 2026-08-24): inbjudan är redan utskickad.
-  - **Single player / Pass-the-Phone**: inget att vänta in → direkt till Keep/Reset. ⚠ Dessa vägar sätter MEDVETET **inte** `rematchInvite` — avbryter host Keep/Reset-prompten ska Yes/No-raden stå kvar oförändrad så **No fortfarande går att välja**.
+  - **Med förväntade approvers** (IndDev-non-hosts, eller PtP-åskådare — se `rematchExpectedApproverIds`): `rematchInvite=true` + `play_again_initiated` broadcastas så deras **"Accept / Re-match"** tänds (guld, pulsande). Yes gråas ut (`replayLocked`), **No göms** (`replayAnswered`) och `replayNote` visar "Waiting for N of M players to accept" + `SequentialDots` → "✓ All players have approved". Host tappar Yes igen när den tänds → `proceedWithRematch`. **Ingen ångra-väg** (Peter 2026-08-24): inbjudan är redan utskickad.
+  - **Utan förväntade approvers** (single player; IndDev utan kvarvarande non-hosts; PtP där ingen följer leaderboarden på egen enhet): inget att vänta in → direkt till ny lobby. ⚠ Dessa vägar sätter MEDVETET **inte** `rematchInvite`, så **No fortfarande går att välja** om host backar ur längre fram.
 - **No** → `replayChoice = 'no'`, re-match-blocket försvinner och "Start New Game" tar dess plats.
 
 **Steg 2 — `replayChoice === 'no'`:** "Start New Game" beter sig EXAKT som Home:s knapp: credit-gate → lägesvalet (Single Game / Multiplayer Game / Remote Play) → `goToNewLobby(false, **false**, undefined, lobbyType)`. `keepSettings=false` speglar Home:s `clearLobbySettings(code)` — LobbyScreen seedar från host-profilen. Inga carry-over-frågor, inga spelare. Medan panelen är utfälld göms Home-raden (samma mönster som Home döljer sina övriga knappar).
@@ -2265,26 +2279,111 @@ Host:s **Play Again** är borttagen ur slutskärmen. I stället ställs **EN fr�
 **`previousLocalMode`** (`app/quiz.tsx`) = `isLocalSoloGame ? 'single' : 'multiplayer'`.
 
 **Gäller/gäller inte:**
-- **Pass-the-Phone**: ⚠ **hela re-match-frågan är BORTTAGEN sedan 2026-08-25** (Peter). Host:s slutskärm visar direkt "Start New Game" + Home — `rematchQuestionEnabled` gatar bort `onReplayYes` i PtP och `localStartNewGameReady` skickar in `onStartNewGame` från början. Non-hosts sitter kvar i `/quiz` på Final Leaderboard men deltar inte: deras footer är Home-only (`homeOnlyFooter`) och `goToNewLobby` tvingar `auto_join: undefined` i PtP, så de får "Host has already started a new Game" → Home. **Bygg inte approvals för PtP** — host kan ha lagt till gäster utan egen enhet, som aldrig kan godkänna. Se "Pass-the-Phone — non-host som live-spectator".
-- **Single player** (`isLocalSoloGame`, dvs. `turnOrder.length <= 1`): ⚠ **HAR ÅTER EN FRÅGA sedan 2026-08-25 (senare samma dag) — men med ANNAN text: "Replay & Aggregate score?"** Frågan togs bort tidigare med motiveringen "ingen motpart att aggregera mot"; motparten är spelarens EGNA tidigare spel. **No** → Start New Game som förr. **Yes** → ny Single player-lobby med låst uppsättning (en spelare) som fyller på en **Aggregate Score**. Ingen approval-väntan (inga non-hosts) och **ingen Keep/Reset-prompt** — `proceedWithRematch` hoppar den för solo av samma skäl som för guest hosts: enda spelaren ÄR host, så "Reset" hade nollställt deras egen age/assistance. Vänd inte tillbaka utan nytt beslut.
+- **Pass-the-Phone**: ⚠ **HAR re-match sedan 2026-08-26** (Peter) — undantaget 2026-08-25 är upphävt. Två regler bär det:
+
+  **(a) Behörighet.** `ptpRematchBlocked` kräver att ALLA deltagare är registrerade QuizVibe-users: `!isLocalSoloGame && gameMode === 'pass-the-phone' && turnOrder.some(p => p.type === 'guest')`. En enda gäst — värd-tillagd via "+ Add Player" ELLER självansluten anon — och frågan visas inte alls (slutskärmen ser ut som före 2026-08-26). Det är detta som upphäver den gamla invändningen: spel med gäster är helt enkelt inte behöriga, i stället för att approvals byggs runt dem. Bonus: alla deltagare har då `user_id`, så Competition-serien blir **server-sparad** i stället för lokal-bara.
+  ⚠ Fail-open på `type === undefined` (`=== 'guest'`, inte `!== 'registered'`) — fältet är optional, och en tyst borttappad `type` ska hellre släppa igenom en gäst än tyst döda re-match för ett legitimt spel.
+  ⚠ `isLocalSoloGame` MÅSTE stå först — solo bär oftast `gameMode: 'pass-the-phone'` (profil-defaulten). Samma fälla som buggen 2026-08-26.
+
+  **(b) Approvers = ENHETSNÄRVARO, inte roster.** Se `ptpSpectatorIds` nedan. `auto_join` förblir MEDVETET `undefined` i PtP: den accepterande åskådaren sätter `awaitingNewLobbyRef` lokalt före sin broadcast, så bara accepterare navigerar; övriga får "Host has already started a new Game" → Home.
+
+  **(c) ALLA spelare från förra spelet måste bekräfta** (Peter 2026-08-26) — inte bara de som råkar vara uppkopplade. `rematchExpectedApproverIds` är därför **hela rostern i båda lägen** (`turnOrder.slice(1)`); läges-splitten som fanns här en kort stund är borta.
+  ⚠ **Saknar någon en levande enhet är en re-match OMÖJLIG**, inte bara fördröjd — de kan aldrig godkänna. `ptpAllPreviousPlayersActive` (varje roster-id finns i `ptpSpectatorIds`) stänger då frågan helt och host får den grå raden *"No re-match possible — / Not all players from the previous game are active any longer"* (två rader, `
+` i strängen) ovanför Start New Game. Att i stället låta hostens Yes stå grå för alltid vore ohederligt. **Följd:** kopplar någon ner mitt i väntan retras frågan.
+  ⚠ **Har inbjudan redan gått ut räknas ett Home-tapp som ett aktivt NEJ**, och host får en Alert: *"Re-match not possible / At least one player has denied the re-match."* Utan den skulle blocket bara försvinna under host:s fingrar. Villkoret är `rematchInviteRef.current` — en synkron spegel, eftersom `player_left`-handlern registreras med deps `[phase, isLastQuestion]` och annars läser `rematchInvite` som det såg ut när fasen blev `'leaderboard'` (= alltid false). `rematchDeniedAlertedRef` gör den till en engångshändelse när flera lämnar. Ingen extra state krävs för själva bytet: när host tryckt OK har render:n redan svängt om till grå rad + Start New Game.
+  ⚠ **IndDev följer SAMMA regel** (Peter 2026-08-26) — tidigare låste en non-host som lämnade efter inbjudan host:s Yes för alltid. Lägena mäter dock samma sak från olika håll, av nödvändighet:
+
+| Läge | Aktiv-test | Varför |
+|---|---|---|
+| Pass-the-Phone | **positivt bevis** — id:t finns i `ptpSpectatorIds` | De flesta spelar på host:s telefon utan egen app uppe; bara den som valde "Follow leaderboard" har en enhet i kanalen |
+| Individual Devices | **negativt bevis** — id:t finns INTE i `leftPlayerIds` | Alla non-hosts spelar per definition på egen enhet, så utgångsläget är "aktiv"; bara ett explicit `player_left` diskvalificerar |
+
+  ⚠ **Watchdogen används INTE i någotdera läget.** Den kan inte skilja "gick därifrån" från "låste skärmen", och iOS fryser JS-tråden vid varje skärmlås — en watchdog-baserad diskvalificering hade tyst dödat re-matchen för någon som satt kvar med telefonen i fickan.
+  ⚠ **"X has left"-Alerten undertrycks när inbjudan är ute** (`deniedRematch`) — två staplade Alerts på iOS kan svälja den ena, och på slutskärmen är avhoppets KONSEKVENS (ingen re-match) det som faktiskt är händelsen. Under själva spelet visas den som förr.
+  ⚠ **Regeln hänger på att follow-prompten har "Follow leaderboard" som FÖRVALT svar** (samma beslut, samma dag) — varje "Not now" gör en PtP-re-match omöjlig. Görs prompten om till att avråda igen slutar funktionen i praktiken att gå att nå. En variant som bara uteslöt bevisade avhopp (`ptpDepartedIds`) byggdes och förkastades; den vilade på en mätning gjord före beslutet.
+  ⚠ **`rematchRoster` i `goToNewLobby` är numera TAUTOLOGISKT** (host kan bara nå dit när alla är aktiva OCH har accepterat) men behålls som backstop: `contribution` mappar över hela `turnOrder`, så en regression i gaten degraderar då till "färre spelare i re-matchen" i stället för "främmande poäng i någons Competition-historik".
+- **Single player** (`isLocalSoloGame`, dvs. `turnOrder.length <= 1`): ⚠ **HAR ÅTER EN FRÅGA sedan 2026-08-25 (senare samma dag) — men med ANNAN text: "Replay & Aggregate score?"** Frågan togs bort tidigare med motiveringen "ingen motpart att aggregera mot"; motparten är spelarens EGNA tidigare spel. **No** → Start New Game som förr. **Yes** → ny Single player-lobby med låst uppsättning (en spelare) som fyller på en **Aggregate Score**. Ingen approval-väntan (inga non-hosts) och ingen Keep/Reset-prompt — den finns inte längre för någon, se "Keep/Reset borttagen" nedan. Vänd inte tillbaka utan nytt beslut.
   - ⚠ **Gaten måste testa `isLocalSoloGame` FÖRST.** Single player är `singlePlayerDefault: true` ovanpå ett vanligt `gameMode`, inte ett eget läge — ett solospel bär alltså oftast `gameMode: 'pass-the-phone'` (profil-defaulten). En naken `gameMode !== 'pass-the-phone'` slår därför ut solo tillsammans med PtP-multiplayer, och frågan syns aldrig (bugg 2026-08-26). PtP-undantaget gäller PtP-MULTIPLAYER.
-- **Guest-hostade spel**: samma två steg, med tre skillnader. (a) **Remote Play visas aldrig** i Start New Game-panelen — remote 1vs1 är QuizVibe-users-only. (b) **Keep/Reset hoppas över** — guest-lobbyns settings är låsta, så `proceedWithRematch` går direkt till `goToNewLobby(true, true, …)`. (c) **1-re-match-cappen**: `localRematchFlow` kräver `guestReplaysUsed < 1` och gatar BÅDA stegen, så omgång 2 visar bara Home. Noten "Replay only possible 1 time for Guest Hosts" ligger överst i sticky-footern.
+- **Guest-hostade spel**: ⚠ **INGEN re-match och INGEN replay — i något läge** (Peter 2026-08-26). Det ersätter det tidigare 1-replay-taket helt; noten "Replay only possible 1 time for Guest Hosts" är borttagen och `guestReplaysUsed` är vestigial för lokala spel (remote använder den fortfarande som literal för att tvinga Home-only). `localRematchFlow` utesluter `isGuestHostGame`, och slutskärmen blir:
+
+| Guest host | Slutskärmen visar |
+|---|---|
+| **inloggad** QuizVibe-user (`hostIsRegisteredUser`) | enbart **Start New Game** |
+| **ej inloggad** | enbart **Home** |
+
+  Båda får dessutom den grå raden *"No re-match possible for Guest Host"* överst i footern.
+
+**De tre grå raderna ovanför "Start New Game"** (`rematchUnavailableNote` i [app/quiz.tsx](app/quiz.tsx)) förklarar varför re-match uteblev — utan dem ser det bara ut som att funktionen saknas:
+
+| Villkor | Text |
+|---|---|
+| `isGuestHostGame` | *No re-match possible for Guest Host* |
+| PtP med minst en `type: 'guest'` | *No re-match possible —* / *Game includes a Guest player* |
+| Någon i rostern saknar levande enhet | *No re-match possible —* / *Not all players from the previous game are active any longer* |
+
+⚠ **Åskådaren behöver också veta att ingen inbjudan kommer.** `rematchImpossibleForGame` (guest host ELLER PtP med minst en gäst) beräknas ur data ALLA enheter har (`turnOrder` + params) och skickas som `rematchImpossible` till `RoundLeaderboard`, som då ger non-host bara Home. Utan den fick åskådaren den dimmade *"Accept / Re-match"* med badgen "Activated by Host" — en knapp som aldrig kan tändas, eftersom host:s gäst-gate aldrig släpper fram frågan. Den gamla `homeOnlyFooter` gjorde samma jobb men var för trubbig (gällde ALLA PtP-åskådare).
+⚠ Flaggan inkluderar MEDVETET inte `allPreviousPlayersActive` — den bygger på `ptpSpectatorIds`, som bara host har. En åskådare kan inte veta att någon ANNAN saknar enhet och ska då fortsätta visa den dimmade knappen; host kan mycket väl skicka inbjudan.
+
+⚠ **Ordningen är betydelsebärande.** Gäst-fallet testas FÖRE aktiv-fallet: ett PtP-spel med gäster faller på BÅDA (en gäst kopplar aldrig upp sig och kan därför aldrig bli "aktiv"), och då är gäst-skälet det sanna — "not all players are active" hade fått det att låta som att någon gick därifrån. Alla texter har explicit `
+` så rubrikraden står för sig; `guestReplayNote` är centrerad.
+
+  ⚠ **Start New Game LÄMNAR guest-läget** för en inloggad guest host (`startNewGameLeavesGuestMode`): nya lobbyn blir en VANLIG user-lobby — credit dras, profilens namn/avatar används, Player history skrivs, Remote Play syns i lägesvalet. `goToNewLobby` tar en femte parameter `leaveGuestMode` som nollar `asGuestHost`; allt annat följer med automatiskt eftersom det redan hänger på den flaggan. Vill de spela som gäst igen gör de det från Home.
 - **Remote 1v1**: har ENBART "Start New Game" (ingen re-match — en asynkron duell har ingen replay-koppling) med sin egen `startNewGameLocked`-logik, se remote-sektionen.
+
+### Approvers = ENHETSNÄRVARO, inte roster (`ptpSpectatorIds`, 2026-08-26)
+
+`rematchExpectedApproverIds` (komponent-scope i [app/quiz.tsx](app/quiz.tsx), hoistad så `handleReplayYes` når den) splittar på läge — och splitten är avsiktlig:
+
+| Läge | Förväntade approvers |
+|---|---|
+| Individual Devices | **rostern** (`turnOrder.slice(1)`) — alla non-hosts har egen enhet per definition, och en som aldrig hälsat får inte tappas ur grinden |
+| Pass-the-Phone | **`ptpSpectatorIds`** — rostern säger ingenting om vem som har en egen enhet; bara den som svarade "Yes" på lobbyns "följ leaderboarden?"-prompt kan trycka |
+
+`rematchAllApproved` använder `every(id => playAgainApprovals.has(id))`, inte `size >= n`: grinden släpper då av sig själv om en åskådare trycker Home efter att räkningen börjat, utan att `playAgainApprovals` behöver nollställas.
+
+⚠ **`ptpSpectatorIds` är en HIGH-WATER-MARK, inte live-närvaro.** In: `onPlayerRejoined` (åskådare hälsar 3× vid mount). Ut: **ENBART ett explicit `player_left`** = medvetet Home-/Leave-tapp. Kravet är att var och en som är kvar trycker Accept SJÄLV; tystnad får aldrig räknas som ja (Peter 2026-08-26).
+
+- ⚠ **Watchdogen får ALDRIG röra setet.** `onPlayerConnectionChange` är orörd och förblir IndDev-only. 15 s-watchdogen kan inte skilja "gick därifrån" från "låste skärmen", och iOS fryser JS-tråden vid varje skärmlås — en watchdog-borttagning hade tyst släppt host vidare medan spelaren satt kvar vid bordet. En grace-timer-variant byggdes och förkastades av samma skäl.
+- ⚠ **Filtrera hälsningen mot `turnOrderIdSetRef`.** `player_rejoined` registreras via rå `channel.on` i syncChannel och går **förbi** `isKnownSender` — ett påhittat id hade injicerat en approver som aldrig kan godkänna och låst host:s Yes för alltid. Filtret utesluter dessutom värd-tillagda gäster gratis.
+- **Host skickar om inbjudan var ~5 s** medan den väntar (`rematchInvite && !rematchAllApproved`). Realtime spelar aldrig upp missade broadcasts, och eftersom en åskådare nu ligger kvar i setet oavsett vad skulle EN tappad `play_again_initiated` betyda evig väntan. Omsändningen gör leveransen självläkande — knappen dyker upp inom ~5 s efter att enheten är tillbaka.
+- **Åskådaren håller upprop**: `playAgainInitiatedHandlerRef` re-broadcastar `player_rejoined` när inbjudan kommer, vilket stänger hålet "alla tre mount-hälsningarna tappades".
+- ⚠ **`player_left` måste ha en PtP-gren i `playerLeftHandlerRef`** som tar bort ur setet och `return`:ar FÖRE `setLeftPlayerIds` och host-Alerten. I PtP spelar personen vidare på host:s telefon — `leftPlayerIds` driver `gamePlayers[].hasLeft`, `liveLeaderboard` och turnOrder-filtret för timer-barens avatarer, så utan grenen blir ett åskådar-Home en levande gameplay-regression mitt i spelet.
+- ⚠ **Non-hostens Home-tapp AWAIT:ar broadcasten** (`handleGoHome`, kort timeout) till skillnad från övriga `player_left`-sändningar. `router.replace` river syncChannel:en vid unmount, och utan watchdog-backstop finns ingen andra chans att komma ur host:s väntan.
+
+**Priset, medvetet accepterat:** en åskådare som force-quit:ar appen eller vars telefon dör skickar aldrig `player_left` och blockerar host **permanent**. Hostens enda utväg är Home (som broadcastar `lobby_deleted`, släpper allas överlägg och raderar lobbyn). Det följer direkt av garantin — ingen automatisk frigivning kan finnas utan att bryta den. Det finns därför heller **ingen "Start anyway"** i `onReplayLockedPress`.
+
+**Residual risk:** tappas alla tre mount-hälsningarna OCH host trycker Yes innan första omsändningen är setet tomt och host går rakt igenom. Fönstret är litet (host ansluter före åskådaren, hälsningarna sprids över 3,5 s, Yes-tappet är människo-långsamt) men det är enda vägen förbi garantin.
+
+### Keep/Reset-prompten är BORTTAGEN (2026-08-26)
+
+En re-match och en replay behåller **ALLTID** settings, i alla lägen. `proceedWithRematch` går direkt till `goToNewLobby(true, true, …)`; `askKeepSettingsThenGo` är kvar men **dormant** (dess enda kvarvarande anropare ligger i den likaså dormanta `handlePlayAgain`/`playAgainModalVisible`-modalen).
+
+Skälet är inte bara ett steg mindre: "Reset" gav `keepSettings=false`, vilket lämnade nya rummet **utan settings-rad**, varpå LobbyScreen seedade `gameMode` från host-PROFILEN (inkl. `spotifyDefaultEnabled → individual-devices`). En PtP-re-match kunde alltså tyst återuppstå som Individual device — i en lobby där Game Mode-väljaren är låst och inte kan rättas. I PtP-riktningen försvann dessutom hela åskådar-flödet, eftersom `LobbyScreen`:s "följ leaderboarden?"-prompt bara fyrar när läget faktiskt är Pass-the-Phone.
+
+⚠ `goToNewLobby` bär därför invarianten **`if ((keepSettings || reusePlayers) && params.roomCode)`** runt settings-kopieringen: en carry-over bär alltid över settings, även om någon framtida väg skickar `keepSettings=false`.
+
+**Följd:** per-spelares age/assistance nollställs inte längre vid re-match (`age: keepSettings || p.isYou ? …` är effektivt död för levande vägar), och rundor/era/paket/Spotify bärs alltid över.
 
 **Implementation:**
 - `RoundLeaderboard`-props: **`onReplayYes` / `onReplayNo` / `replayAnswered` / `replayLocked` / `onReplayLockedPress` / `replayNote`** (rev 3 — ersatte rev 2:s `onReplay`, som i sin tur ersatte rev 1:s `lockedLocalTypes` / `startNewGameNote`). `onReplayYes` utelämnas → hela re-match-blocket renderas inte. `onStartNewGamePress` + `startNewGameExpanded` (**kontrollerat** öppet-läge; utelämnas → internt state, remote-fallet) och `hideRemotePlay` skickas bara när `replayChoice === 'no'`.
 - ⚠ **Att dölja "Start New Game" görs genom att INTE skicka `onStartNewGame`** — komponenten har ingen egen flagga för det. Skickas den in dyker knappen upp igen.
 - ⚠ **`hostUsesStartNewGame` måste testa BÅDA callbacksen**: `isHost && (!!onStartNewGame || !!onReplayYes)`. Den flaggan är det som gör footer-raden Home-only för host. I rev 3 skickas `onStartNewGame` först när host svarat No, så enbart `!!onStartNewGame` lät den DORMANTA blå "Play again" dyka upp under Yes-knappen i steg 1 (Peter 2026-08-24).
 - `HostTypeOptions` har ingen lås-mekanism (togs bort i rev 2 när väntan flyttade till re-match-blocket). `LocalLobbyType` finns kvar (används av `goToNewLobby`).
-- `goToNewLobby` och `askKeepSettingsThenGo` tar båda ett avslutande `lobbyType: LocalLobbyType = 'multiplayer'` som forwardas som `/lobby`-param.
+- `goToNewLobby` och `askKeepSettingsThenGo` tar båda ett `lobbyType: LocalLobbyType = 'multiplayer'` som forwardas som `/lobby`-param. `goToNewLobby` har dessutom en femte parameter **`leaveGuestMode`** — se guest-host-bullet:en ovan.
 - **Pulsering**: `useCtaPulse` (scale 1 ↔ 1.04 / 700 ms, samma cadens som `PlayAgainButton` och Home:s `gameBtn`) driver Yes-knappen och Start New Game. Pausas när knappen är låst/grå eller när lägesvalet är utfällt. ⚠ Hook-anropen MÅSTE ligga efter `startNewGameExpanded`-derivationen och utanför alla villkorsgrenar. **No** pulsar aldrig — att tacka nej ska inte konkurrera visuellt med Yes.
-- Non-host:s **"Approve / Re-match"** pulsar via `PlayAgainButton`:s egen `disabled`-styrda loop — dämpad "Activated by Host"-variant står still, den gyllene aktiva pulsar.
+- Non-host:s **"Accept / Re-match"** pulsar via `PlayAgainButton`:s egen `disabled`-styrda loop — dämpad "Activated by Host"-variant står still, den gyllene aktiva pulsar.
 
 **Credit-gaten körs på TVÅ ställen** (fix 2026-08-08 — Peter landade i en ny lobby som var "out of Host Game Credits", dvs. host kunde inte starta något spel i den):
 1. **Fail-fast vid tappet** — `handleLocalStartNewGamePress` (innan panelen öppnas) och `handleReplayYes` (innan inbjudan broadcastas) så vi aldrig visar ett val eller skickar en re-match-inbjudan som host inte kan fullfölja.
-2. **AUKTORITATIVT i `goToNewLobby`**, direkt efter `asGuestHost` beräknats och FÖRE `registerActiveRoom` — alla lokala lobby-skapanden från Final Leaderboard passerar där (re-match Yes → ev. approval-väntan → ev. Keep/Reset-alert → `goToNewLobby`; No → Start New Game → lägesval → `goToNewLobby`, plus de dormanta Play Again-vägarna). Blockeras den skapas inget rum och ingen navigation sker. Gaten hänger på **`asGuestHost`**, INTE `isGuestHostGame`: det är den NYA lobbyns värdskap som avgör om credits behövs, vilket också gör att credit-gatens egen "Restart as Guest"-utväg (`guestOverride`) släpps igenom utan att loopa tillbaka in i samma Alert.
+2. **AUKTORITATIVT i `goToNewLobby`**, direkt efter `asGuestHost` beräknats och FÖRE `registerActiveRoom` — alla lokala lobby-skapanden från Final Leaderboard passerar där. Blockeras den skapas inget rum och ingen navigation sker. Gaten hänger på **`asGuestHost`**, INTE `isGuestHostGame`: det är den NYA lobbyns värdskap som avgör om credits behövs.
 
-Lägg alla framtida host-lobby-skapanden från quiz-skärmen bakom samma funnel — punkt 1 ensam räcker inte, eftersom det kan gå lång tid (approval-väntan, Alert-steg) mellan tappet och det faktiska skapandet. `handleStartNewGameFromFinal` (remote + Remote Play-raden) har sin EGEN gate med Cancel / Go to Store — medvetet en annan utväg än "Restart as Guest", som inte finns för remote (users-only).
+Lägg alla framtida host-lobby-skapanden från quiz-skärmen bakom samma funnel — punkt 1 ensam räcker inte, eftersom det kan gå lång tid (approval-väntan, Alert-steg) mellan tappet och det faktiska skapandet. `handleStartNewGameFromFinal` (remote + Remote Play-raden) har sin EGEN gate.
+
+**`ensureHostCreditsForNewGame(options?)` (omarbetad 2026-08-26)** — popupen är numera **ordagrant Home:s** (`checkHostCredits` i [app/index.tsx](app/index.tsx)): titeln *"Out of Host Game Credits"*, texten om daglig refresh vid midnatt CET + Premium, och knapparna `Cancel` / `Go to Store`. Den gamla *"Purchase subscription / Restart as Guest / Exit"* är borta, så spelaren möter en enda formulering överallt i appen.
+- ⚠ **ENDA avvikelsen från Home är destinationen**: härifrån pushas `/store?focus=subscription` **UTAN `from=`**. Utan paramet faller Store:s Back tillbaka via `router.back()` och `/quiz` ligger kvar på stacken med Final Leaderboard-state intakt, så host kan trycka Yes igen direkt efter köpet. Med `from=/` hade Store:s Back `replace`:at bort Quiz-komponenten.
+- **`allowGuestRestart`** (default true) styr om "Restart as Guest" erbjuds. `handleReplayYes` skickar `false`: en guest-hostad re-match-lobby får inte existera, och en knapp som mitt i en re-match tyst kastar bort både uppställningen och Competition-kedjan vore vilseledande. `goToNewLobby` skickar `!reusePlayers` av samma skäl.
+- **`newLobbyIsGuestHosted`** ersätter den gamla `if (isGuestHostGame) return true;`-bypassen. Det är den NYA lobbyns värdskap som avgör om saldot ska belastas — en inloggad guest host som trycker Start New Game skapar numera en vanlig user-lobby och ska betala för den.
+- ⚠ **`restartAsGuestHost` skapar en FRÄSCH lobby** (`goToNewLobby(false, false, …)`, tidigare `true, true`). Den hårdkodade carry-overn gjorde att utvägen alltid producerade en guest-hostad lobby med föregående spels uppställning — dvs. exakt den guest-hostade re-match-lobby som inte får finnas — och det gällde även från "Start New Game", vars semantik annars är *fräsch lobby, inga spelare*. Knappen är nu semantiskt identisk med Home:s "Start Game as Guest".
 
 ## Aggregate Leaderboard — andra sidan på slutskärmen (2026-08-25)
 
@@ -2310,6 +2409,29 @@ Har host kört **"Re-match with Aggregate Leaderboard?" → Yes** blir Final Lea
 **Vald flik har guld RAM + vit text på BLÅ bakgrund** (`Colors.warning` som `borderColor`, `Colors.primaryMuted` som bakgrund). Guld-fyllningen provades och togs bort — den gav hela fliken en gul ton; ramen bär "vald"-signalen. Svep-hinten sitter DIREKT under flikarna, inte under tabellen (Peter 2026-08-26).
 
 ⚠ **Flikarna ("This game" / "All N games") är inte dekoration — de är den enda garanterade vägen mellan sidorna.** Tabellens mittkolumn är en egen horisontell ScrollView som äter svepet där; svep fungerar över Player- och PTS-kolumnerna (som inte scrollar) men kan inte vara enda kontrollen. Ta inte bort flikarna "eftersom man kan svepa".
+
+⚠ **TIDPUNKTEN för avhoppet avgör markören** (Peter 2026-08-26). Därför finns TVÅ set i quiz.tsx:
+
+| Set | Innehåller | Driver |
+|---|---|---|
+| `leftPlayerIds` | vem som helst som lämnat, **när som helst** | re-match-gaten (`allPreviousPlayersActive`) — den som gått kan inte godkänna oavsett när |
+| `leftDuringGameIds` | bara de som lämnade **medan spelet pågick** | `hasLeft` → raden *"Left the game"* i stället för statistik, och `—` i stället för poäng |
+
+Lämnar man MITT i spelet är delresultatet ingen giltig slutställning — man svarade aldrig på resten — så markören följer med ända till **slutskärmen**. Lämnar man EFTER slutsignalen (`phase === 'leaderboard' && isLastQuestion`) är siffrorna redan färdiga och raden står kvar orörd; utan den skillnaden raderades en IndDev-spelares hela resultat i samma sekund som de tryckte Home efter matchen. `RoundLeaderboard` läser bara `p.hasLeft` — tidpunkten avgörs i quiz.tsx, inte där. `aggregateEntries` sätter alltid `hasLeft: false` (den som lämnade ETT spel behåller sina riktiga siffror från de andra).
+
+⚠ **Avhoppare rankas INTE** (Peter 2026-08-26). `finalizeRows` sorterar `hasLeft` sist före alla andra kriterier, och `LeaderboardTable` renderar ingen placeringssiffra för dem (tom `lbPos`-text — elementet behålls så den fasta bredden håller kolumnen i linje). Utan det kunde någon som gick efter två rätta svar sluta **först** över en som spelade hela matchen och svarade fel på allt. Eftersom de sorteras sist förblir `index + 1` korrekt för dem som FÅR en siffra.
+
+⚠ **Prisutdelnings-sekvensen följer samma regel men VISAR dem ändå** (Peter 2026-08-26). `buildMatchHighlights` delar `input.players` i `players` (aktiva) och `departed`:
+- **Listkorten** (*Correct answers*, *Fastest fingers*) namnger ALLA spelare, så avhopparna hängs på sist via `appendDepartedRows` — `place: null` (ingen siffra) och `value: 'Left'` i grått (`rankValueLeft`). `HighlightRankRow.place` är därför `number | null`.
+- **Källkorten** (*Best on Spotify* osv.) visar bara förstaplatsen — där ska en avhoppare inte kunna vinna, så de är borta ur `aggs` helt.
+- **`ranked`-gaten räknar bara aktiva.** Är bara EN kvar finns ingen lista att stå i, och korten faller tillbaka på value-layouten precis som i ett solospel — då syns avhopparen inte alls.
+
+Låst av fyra tester i [backend/content/test/matchHighlights.test.ts](backend/content/test/matchHighlights.test.ts).
+
+⚠ **Avhopp mitt i spelet diskvalificerar HELA spelet ur Competition-serien** (Peter 2026-08-26) — varken lokalt eller server-side. `recordGameInSeries`-effekten early-returnar om någon i `gamePlayers` har `hasLeft`; då förblir `aggregate` `null`, och eftersom BARA den effekten sätter `aggregate` finns därmed ingen "Competition Leaderboard"-slide att välja på slutskärmen. Samma villkor styr båda, så de kan inte glida isär: står "Left the game" på någon rad — slidern finns inte.
+- **Popupen förklarar det direkt.** `${playerName} has left`-Alerten får en andra rad, *"Competition Leaderboard will not be updated with this game result."*, när avhoppet sker MITT i spelet OCH spelet faktiskt är en fortsättning på en serie (`partOfCompetitionSeriesRef` — träff när seriens `nextRoomCode === params.roomCode`, satt vid mount ur `loadAggregateSeries()`). Ett fristende spel (ingen serie än) får bara den vanliga raden — texten vore obegriplig annars. Avhopp EFTER slutsignalen påverkar inte serien och får ingen extra rad.
+- **Serien i sig lever vidare.** `nextRoomCode` konsumeras inte av det diskvalificerade spelet — nästa re-match skriver över den som vanligt via `markSeriesContinues`. Det är bara DET HÄR spelets bidrag som uteblir.
+- **Gäller PtP-spectatorn INTE** — `hasLeft` sätts aldrig i PtP (spelaren spelar vidare på host:s telefon, se playerLeftHandlerRef:s PtP-gren). Regeln är alltså i praktiken IndDev-only, trots att den är skriven lägesagnostiskt.
 
 **Tabellen bor i [src/components/LeaderboardTable.tsx](src/components/LeaderboardTable.tsx)** sedan 2026-08-25 — utbruten ur RoundLeaderboard så att slutskärmen, aggregat-sidan OCH Profile-modalen delar exakt samma rendering + `finalizeRows`-sortering.
 
@@ -2353,12 +2475,12 @@ Väljer host Re-match/Replay innehåller den nya lobbyn **exakt spelarna från f
 **Join-gate**: `checkRematchLockedLobby` i [app/index.tsx](app/index.tsx), i alla tre join-vägarna. En spelare som VAR med släpps in (matchas case-insensitivt mot pre-seedade `lobby_players`-rader och ärver sitt gamla `player_id`); alla andra får "Re-match lobby"-popupen.
 ## Play Again approval flow (Individual Devices)
 
-> ⚠ Sedan 2026-08-24 (rev 3) nås detta flöde från slutskärmens **"Re-match with Aggregate Leaderboard?" → Yes** (gäller BÅDE registrerade och guest-hostade spel). **Host-side-modalen nedan är därmed dormant** — approval-statusen visas i stället som grå Yes-knapp (`replayLocked`) + `replayNote` under den. Sync-events, `playAgainApprovals`-räkningen och non-host-halvan (`handleApprovePlayAgain`, "Approve / Re-match") är oförändrade och LIVE.
+> ⚠ Sedan 2026-08-24 (rev 3) nås detta flöde från slutskärmens **"Re-match with Aggregate Leaderboard?" → Yes** (gäller BÅDE registrerade och guest-hostade spel). **Host-side-modalen nedan är därmed dormant** — approval-statusen visas i stället som grå Yes-knapp (`replayLocked`) + `replayNote` under den. Sync-events, `playAgainApprovals`-räkningen och non-host-halvan (`handleApprovePlayAgain`, "Accept / Re-match") är oförändrade och LIVE. `handleApprovePlayAgain` broadcastar sedan 2026-08-26 på `syncActive` (inte bara IndDev) så PtP-åskådaren accepterar över samma kanal, och sätter `awaitingNewLobbyRef.current` synkront vid tappet.
 
 **(Historik — så här såg host-sidan ut före 2026-08-08.)** **Pass-the-Phone** använde direkt `Alert.alert("Re-use all players?", …)`-flödet med Cancel/Start fresh/Yes, keep them (alla på samma enhet — inget att vänta in). **Individual Devices** körde en custom modal istället så host:s "Yes, keep them"-knapp kunde vara visuellt utgråad tills alla non-hosts broadcastat sin Approve-signal.
 
 **Sync-events** ([syncChannel.ts](src/lib/realtime/syncChannel.ts)):
-- `play_again_initiated` (host → alla): broadcastas när host tappar Play Again-knappen, omedelbart innan modalen öppnas (guest-spel) — respektive när host svarar **Yes** på re-match-frågan (lokalt flöde). Non-host:s "Approve / Re-match"-knapp flippar från dämpad till aktiv guld-styling (`hostInitiatedPlayAgain=true`).
+- `play_again_initiated` (host → alla): broadcastas när host svarar **Yes** på re-match-frågan, och därefter **var ~5:e sekund** medan host väntar (se omsändningen i approver-avsnittet). Non-host:s "Accept / Re-match"-knapp flippar från dämpad till aktiv guld-styling (`hostInitiatedPlayAgain=true`). En PtP-åskådare svarar dessutom med en `player_rejoined`-hälsning (upprop).
 - `player_approved_play_again` (non-host → host): broadcastas när non-host tappar sin Approve-knapp. Host adder `player_id` till `playAgainApprovals: Set<string>` (idempotent).
 - `play_again_lobby_ready` (host → alla): broadcastas DIREKT efter `registerActiveRoom` + `setLobbyPlayers` + `setLobbySettings` men INNAN `router.replace`. Bär nya rumkoden.
 - `lobby_deleted` (host → alla): broadcastas när host tappar Home från Final Leaderboard via `handleGoHome` ([app/quiz.tsx](app/quiz.tsx)). Skickas FÖRE `deactivateRoom`+cleanup-bunten så non-host:s syncChannel hinner ta emot innan host:s channel rivs vid component-unmount. Non-host:s handler visar Alert "Host has deleted this lobby" + auto-nav till Home, oavsett om de står på Final Leaderboard direkt eller är fast på "Please Wait..."-overlay efter Approve. Guard via `lobbyDeletedAlertedRef` mot dubbelfyrning. Releaserar även `awaitingNewLobby=false` för att stänga lock-overlay.
@@ -2699,7 +2821,7 @@ Startskärmens actions-sektion i [app/index.tsx](app/index.tsx) renderas olika p
 
 **Utloggad** (uppifrån):
 - **Ingen TopUserBanner** (gated på `isLoggedIn` — "Register or Login"-pillen var redundant mot knappen nedan) och **ingen BottomBanner** (se BottomBanner-sektionen).
-- Grön **"QUIZVIBE USER"**-rubrik (`userSectionHeader`, `Colors.success`, overline-stil utan ruta/bakgrund) med **info-ikon** intill (rubrik + ikon i `userSectionHeaderRow`; ikonen är samma `infoIconBtn`/`infoIconText`-vokabulär som Lobby-skärmens info-knappar). Tap öppnar en bottom-sheet-modal med jämförelsen **user vs guest** — raderna bor i module-level-konstanten `USER_VS_GUEST_ROWS` i [app/index.tsx](app/index.tsx) (`user`/`guest` är `true` → grön ✓, `false` → grå ✗, eller en kort värde-sträng: "2 free" vs "Trial"). Rendering via den lokala `CompareCell`-komponenten. **Tabellen gäller MEDVETET bara det GRATIS kontot mot Guest** (Peter 2026-08-09) — allt betalt ligger i en separat gold-rubricerad punktlista under tabellen (`PREMIUM_FEATURES`) och nås via tabellraden "Premium option". Inga asterisker/fotnoter i värde-kolumnerna; spegla StoreScreen:s `SUBSCRIPTION_FEATURES` när Premium-listan ändras. **Curator-regel: håll raderna synkade med faktiska gates** — Remote 1vs1 är users-only, guest-hostade spel skriver ingen Player history, guest host är låst till fast Game era / inga Extra packages / max 1 Play Again. + **Register or Login** — helgrön knapp (`gameBtnRegister`: bg + border `Colors.success`), pulserande, kant-skärande FREE-badge med **vit kantlinje** (`homeFreeBadgeRegister`) så badgen syns mot knappens gröna bakgrund.
+- Grön **"QUIZVIBE USER"**-rubrik (`userSectionHeader`, `Colors.success`, overline-stil utan ruta/bakgrund) med **info-ikon** intill (rubrik + ikon i `userSectionHeaderRow`; ikonen är samma `infoIconBtn`/`infoIconText`-vokabulär som Lobby-skärmens info-knappar). Tap öppnar en bottom-sheet-modal med jämförelsen **user vs guest** — raderna bor i module-level-konstanten `USER_VS_GUEST_ROWS` i [app/index.tsx](app/index.tsx) (`user`/`guest` är `true` → grön ✓, `false` → grå ✗, eller en kort värde-sträng: "2 free" vs "Trial"). Rendering via den lokala `CompareCell`-komponenten. **Tabellen gäller MEDVETET bara det GRATIS kontot mot Guest** (Peter 2026-08-09) — allt betalt ligger i en separat gold-rubricerad punktlista under tabellen (`PREMIUM_FEATURES`) och nås via tabellraden "Premium option". Inga asterisker/fotnoter i värde-kolumnerna; spegla StoreScreen:s `SUBSCRIPTION_FEATURES` när Premium-listan ändras. **Curator-regel: håll raderna synkade med faktiska gates** — Remote 1vs1 är users-only, guest-hostade spel skriver ingen Player history, guest host är låst till fast Game era / inga Extra packages / varken re-match eller replay. + **Register or Login** — helgrön knapp (`gameBtnRegister`: bg + border `Colors.success`), pulserande, kant-skärande FREE-badge med **vit kantlinje** (`homeFreeBadgeRegister`) så badgen syns mot knappens gröna bakgrund.
 - Grå **"GUEST / NON-REGISTERED USER"**-rubrik (`guestSectionHeader`, `#6B7280`, `marginTop: Spacing.xl` för sektions-separation) + **Join with Room Code — guest** + **Start Game as Guest** — båda helgrå (`gameBtnGuest`: bg + border `#6B7280` = PREMIUM-grey), pulserande. Join-guest-knappen har FREE-badge, Start Game as Guest har **"TRIAL version"-badge** (båda via `homeFreeBadge`-stilen: grön bg + **vit kant** + vit text, kant-skärande `top: -8, right: Spacing.lg`). Sedan 2026-07-03 har ALLA Home-badges vit kantlinje (satt i `homeFreeBadge`-basen; `homeFreeBadgeRegister`-overriden är redundant men kvar). **Guest-knappens `HostTypeOptions`-utfällning**: Remote Play är LÅST i utloggat läge (dimmad rad + grön "QuizVibe user"-badge + register-upsell; raden göms INTE) och HELT DOLD i inloggat läge — `remoteMode={isLoggedIn ? 'hidden' : 'locked'}`. Se "Remote 1v1 är QuizVibe-users-only".
 - **Start New Game + Join with Room Code — user är HELT dolda** — de tidigare 🔒-låsta varianterna och "Register and Log in to unlock..."-hinten är borttagna (`createGameHint`-stylen kvar som död CSS).
 
@@ -2733,8 +2855,8 @@ Vem som helst — utloggad ELLER inloggad — kan hosta ett spel under en anonym
 
 **Play Again för Guest Host — max 1 replay (v2, 2026-07-04)**:
 - **Räknare**: `guestReplays`-param ('0' default) kedjas Home-form → lobby → quiz (`guestReplaysUsed`) → vid Play Again skriver `goToNewLobby` `guestReplays: String(guestReplaysUsed + 1)` till nya lobbyn. BARA host-enheten känner räknaren.
-- **Final-footer** (`RoundLeaderboard.guestReplaysUsed`-prop): host omgång 1 → normal blå Play Again + not "Replay only possible 1 time for Guest Hosts" (`guestReplayNote`-stil, ovanför finalActions); host omgång 2 (>=1) → bara Home. **Non-host i guest-spel**: bara Home TILLS `hostInitiatedPlayAgain`-broadcasten anländer → då gold Approve; den dimmade "Activated by Host"-placeholdern renderas ALDRIG i guest-spel (på omgång 2 broadcastar host aldrig → Home-only blir naturligt slutläge utan att non-host behöver räknaren).
-- **handlePlayAgain**: belt-and-suspenders-return vid `guestReplaysUsed >= 1`; credit-gaten skippas helt (inloggad users saldo rörs aldrig av guest-spel); Keep/Reset-settings-prompten skippas (settings låsta — alltid `goToNewLobby(x, true)`); IndDev-approval-flödet (play_again_initiated/approvals/awaitingNewLobby) återanvänds oförändrat.
+- **Final-footer (omarbetad 2026-08-26 — guest host har VARKEN re-match eller replay)**: host får aldrig re-match-frågan och aldrig en Play Again-knapp. Är enheten inloggad (`hostIsRegisteredUser`) visas enbart **Start New Game**, som dessutom LÄMNAR guest-läget och skapar en vanlig user-lobby; annars enbart **Home**. Noten "Replay only possible 1 time for Guest Hosts" är borttagen och 1-replay-taket finns inte längre. **Non-host i guest-spel**: bara Home — `hostInitiatedPlayAgain` sätts aldrig eftersom hosten inte kan bjuda in, så varken den gyllene eller den dimmade knappen renderas.
+- **handlePlayAgain**: dormant sedan 2026-08-08 (se "Play Again approval flow"). Den bar tidigare guest-hostens 1-replay-guard.
 - **goToNewLobby guest-gren**: skippar `loadProfile` — hostName från `params.guestName` (fallback turnOrder[0].name), emoji 👤; `registerActiveRoom` med maxPlayers 4/hostIsPremium false/hostPlayerName=guest-namnet; navigation med `guestHost:'true'` + guestName/guestBirthYear (fallback `CURRENT_YEAR − turnOrder[0].age`) + räknaren. **KRITISKT**: carry-over-raderna bär `type` från turnOrder (nytt fält i `TurnOrderPlayer` + båda LobbyScreen-turnOrder-byggena) och host-raden FORCERAS `type:'guest'` — annars bryts non-host-enheternas `storedHostIsGuest`-detektering i omgång 2 (goToNewLobby tvingade tidigare 'registered' på alla rader).
 
 **Slumpade källor i guest-spel (v2, 2026-07-04)** — guest-gren i `gameQuestions`-useMemo (quiz.tsx, före epok-allokeringen):

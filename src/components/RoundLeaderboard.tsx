@@ -475,7 +475,8 @@ export function RoundLeaderboard({
   replayLocked = false,
   onReplayLockedPress,
   replayNote,
-  homeOnlyFooter = false,
+  rematchUnavailableNote,
+  rematchImpossible = false,
   interimFooter,
   liveBadge = false,
   trackConnectionErrors = false,
@@ -503,7 +504,11 @@ export function RoundLeaderboard({
    *  + bakåt-kompat för befintliga call-sites). */
   isHost?: boolean;
   /** True när spelets host är en guest ("Start Game as Guest"-lobby).
-   *  Guest hosts har max 1 Play Again-replay: omgång 1 (guestReplaysUsed=0)
+   *  ⚠ VESTIGIAL för lokala spel sedan 2026-08-26 — guest hosts har varken
+   *  re-match eller replay, och host-sidan av footer-grenen är numera
+   *  ovillkorlig. REMOTE använder den fortfarande: slutskärmen skickar
+   *  guestHost={true} + guestReplaysUsed={1} för att tvinga Home-only.
+   *  Historik: guest hosts hade max 1 Play Again-replay: omgång 1 (=0)
    *  visar Play Again + not; omgång 2 (>=1) visar bara Home. Non-host i
    *  guest-spel ser Home tills hostInitiatedPlayAgain — då gold Approve
    *  (aldrig den dimmade "Activated by Host"-placeholdern). */
@@ -580,11 +585,14 @@ export function RoundLeaderboard({
   /** Statusrad under Yes/No ("Waiting for 1 of 2 players to approve"
    *  / "✓ All players have approved"). */
   replayNote?: React.ReactNode;
-  /** Slutskärmens footer blir Home-only. Används av Pass-the-Phone-
-   *  spectatorn: re-match finns inte i PtP (Peter 2026-08-25), och utan
-   *  flaggan får de den dimmade "Approve / Re-match"-knappen med badgen
-   *  "Activated by Host" — en knapp som aldrig kan tändas. */
-  homeOnlyFooter?: boolean;
+  /** Grå rad överst i sticky-footern, dvs. direkt ovanför "Start New Game".
+   *  Förklarar varför re-match-frågan uteblev. Utelämnas → ingen rad. */
+  rematchUnavailableNote?: string;
+  /** Spelet kan ALDRIG producera en re-match-inbjudan (guest host, eller ett
+   *  PtP-spel med minst en gäst). Non-host får då bara Home i stället för
+   *  den dimmade "Accept / Re-match"-platshållaren, som annars vore ett
+   *  löfte om något som aldrig kommer. */
+  rematchImpossible?: boolean;
   /** Ersätter "Next Round →"-knappen på INTERIM-leaderboarden.
    *  ⚠ Den knappen renderas annars identiskt tänd även utan `onNextRound`
    *  (onPress blir bara undefined, ingen disabled-styling) — en läsare utan
@@ -690,6 +698,12 @@ export function RoundLeaderboard({
         avgResponseSeconds,
         lastResponseSeconds,
         lastFiveResults,
+        // ⚠ `hasLeft` sätts av quiz.tsx ur `leftDuringGameIds` — alltså BARA
+        // för den som lämnade medan spelet pågick, och då gäller markören
+        // ända till slutskärmen (delresultatet är ingen giltig
+        // slutställning; de svarade aldrig på resten). Den som lämnar EFTER
+        // slutsignalen får ingen markör alls och behåller sina siffror.
+        // Tidpunkten avgörs där, inte här.
         hasLeft: !!p.hasLeft,
       };
     });
@@ -939,15 +953,19 @@ export function RoundLeaderboard({
           knapparna alltid syns även när tabellen scrollar. justifyContent:
           'flex-end' höger-ställer Home + Play Again i ändan av raden. */}
       <View style={styles.stickyFooter}>
-      {/* Guest host, omgång 1: replay-begränsningen kommuniceras överst i
-          footern (Peters copy). Bara host-enheten — non-host känner inte
-          till räknaren. Låg sedan 2026-08-08 inuti Play Again-grenen, men
-          guest hosts kör numera "Start New Game"-flödet och tar därför
-          Home-only-grenen; noten hör till knappen, inte till grenen. */}
-      {isLastRound && guestHost && isHost && guestReplaysUsed === 0 && (
-        <Text style={styles.guestReplayNote}>
-          Replay only possible 1 time for Guest Hosts
-        </Text>
+      {/* Grå förklaringsrad överst i footern, direkt ovanför "Start New
+          Game". I dag används den när en PtP-omgång slutar utan en enda
+          uppkopplad åskådare: då finns ingen som kan godkänna en re-match,
+          frågan uteblir, och utan den här raden ser det bara ut som att
+          funktionen saknas.
+
+          ⚠ Noten "Replay only possible 1 time for Guest Hosts" som låg här
+          är BORTTAGEN (Peter 2026-08-26) — guest hosts har varken re-match
+          eller replay längre, så taket den beskrev finns inte. Stil-nyckeln
+          heter kvar `guestReplayNote` (privat CSS-vokabulär, byt inte namn
+          reflexmässigt) men är numera generisk footer-not. */}
+      {isLastRound && !!rematchUnavailableNote && (
+        <Text style={styles.guestReplayNote}>{rematchUnavailableNote}</Text>
       )}
       {/* Slutskärmens FÖRSTA fråga till host: rubrik + inline Yes/No
           (Peter 2026-08-24 rev 3 — ingen popup, valet syns direkt). Medan
@@ -1084,16 +1102,16 @@ export function RoundLeaderboard({
             ? playAgainHeight
             : playAgainHeight - TRIANGLE_HALF_H;
           const homeHeight = bottomY;
-          // Guest-hostat spel — max 1 replay:
-          //   • Host, omgång 2 (guestReplaysUsed >= 1): bara Home.
+          // Guest-hostat spel (Peter 2026-08-26 — varken re-match eller
+          // replay finns för dem):
+          //   • Host: ALLTID bara Home i footer-raden. Är enheten inloggad
+          //     ligger den gula "Start New Game" ovanför som väg vidare;
+          //     annars är Home enda utvägen.
           //   • Non-host: bara Home TILLS hostInitiatedPlayAgain-broadcasten
-          //     anländer — då faller vi igenom till gold Approve-grenen.
-          //     Den dimmade "Activated by Host"-placeholdern renderas ALDRIG
-          //     i guest-spel (den bär ingen information här: på omgång 2
-          //     broadcastar host aldrig, så Home-only är rätt slutläge utan
-          //     att non-host behöver känna till replay-räknaren).
-          //   • Host, omgång 1: faller igenom till normal blå Play Again +
-          //     "Replay only possible 1 time..."-not (renderas nedan).
+          //     anländer — då faller vi igenom till gold Accept-grenen. Den
+          //     dimmade "Activated by Host"-placeholdern renderas ALDRIG i
+          //     guest-spel: hosten där kan inte bjuda in, så en knapp som
+          //     antyder att något är på väg vore fel.
           // Nya slutskärms-flödet ERSÄTTER Play Again för host:en — footer-
           // raden blir Home-only och den gula knappen ovanför är vägen
           // vidare. ⚠ Måste testa BÅDA callbacksen: i rev 3 skickas
@@ -1101,10 +1119,21 @@ export function RoundLeaderboard({
           // enbart `!!onStartNewGame` lät den dormanta blå "Play again"
           // dyka upp under Yes-knappen i steg 1 (Peter 2026-08-24).
           const hostUsesStartNewGame = isHost && (!!onStartNewGame || !!onReplayYes);
+          // Guest host: ALDRIG en Play Again-knapp (Peter 2026-08-26) —
+          // varken re-match eller replay finns för dem, så host-sidan är
+          // ovillkorlig i stället för att räkna guestReplaysUsed. En ej
+          // inloggad guest host får varken onStartNewGame eller onReplayYes
+          // och landar därför här: bara Home. Non-host-sidan är oförändrad —
+          // de väntar på hostens inbjudan.
+          // (`homeOnlyFooter`-propen är borttagen: PtP-åskådaren ska numera
+          // få den dimmade "Accept / Re-match" som tänds när host bjuder in.)
           if (
-            homeOnlyFooter ||
             hostUsesStartNewGame ||
-            (guestHost && (isHost ? guestReplaysUsed >= 1 : !hostInitiatedPlayAgain))
+            (guestHost && (isHost || !hostInitiatedPlayAgain)) ||
+            // Non-host i ett spel där re-match är omöjlig: bara Home. Den
+            // dimmade platshållaren skulle annars antyda att host kan bjuda
+            // in, vilket de inte kan.
+            (!isHost && rematchImpossible)
           ) {
             return (
               <View style={styles.finalActions}>
@@ -1157,7 +1186,7 @@ export function RoundLeaderboard({
                    warning/premium-färgen för att signalera "actionable" och
                    skilja från host:s vanliga blå Play again. */
                 <PlayAgainButton
-                  lines={['Approve', 'Re-match']}
+                  lines={['Accept', 'Re-match']}
                   color={Colors.warning}
                   onPress={onApprovePlayAgain}
                   disabled={false}
@@ -1168,7 +1197,7 @@ export function RoundLeaderboard({
                 /* Non-host innan host tappat: dämpad two-line + "Activated by
                     Host"-badge kant-skärande i top-position. */
                 <PlayAgainButton
-                  lines={['Approve', 'Re-match']}
+                  lines={['Accept', 'Re-match']}
                   color={Colors.textSecondary}
                   onPress={undefined}
                   disabled={true}

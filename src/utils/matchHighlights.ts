@@ -85,8 +85,13 @@ export interface HighlightPlayerRef {
 
 /** En rad i ett placeringskort. `place` är delad vid lika (1, 1, 3). */
 export interface HighlightRankRow extends HighlightPlayerRef {
-  place: number;
-  /** Radens tal, t.ex. "3/4" eller "8.42s". */
+  /**
+   * `null` = spelaren rankas inte. Gäller den som lämnade mitt i matchen:
+   * de listas fortfarande (placeringslistorna namnger ALLA spelare) men utan
+   * siffra, och `value` är "Left" i stället för ett resultat.
+   */
+  place: number | null;
+  /** Radens tal, t.ex. "3/4" eller "8.42s" — eller "Left". */
   value: string;
   /** true när minst en annan rad delar samma placering. */
   shared: boolean;
@@ -247,6 +252,32 @@ function buildRankRows(entries: RankEntry[], higherIsBetter: boolean): Highlight
 }
 
 /**
+ * Placeringslistorna namnger ALLA spelare, så den som lämnade mitt i matchen
+ * ska synas — men utan resultat (Peter 2026-08-26). De läggs sist, utan
+ * placeringssiffra, med "Left" i stället för sitt tal. Deras delsumma är
+ * ingen giltig placering: de slutade svara.
+ *
+ * ⚠ Gäller BARA listkorten. Källkorten ("Best on Spotify" osv.) visar bara
+ * förstaplatsen — där ska en avhoppare inte kunna vinna, så de filtreras
+ * bort ur `aggs` innan korten byggs.
+ */
+function appendDepartedRows(
+  rows: HighlightRankRow[],
+  departed: LeaderboardPlayer[],
+): HighlightRankRow[] {
+  if (departed.length === 0) return rows;
+  return [
+    ...rows,
+    ...departed.map((player) => ({
+      ...toRef(player),
+      place: null,
+      value: 'Left',
+      shared: false,
+    })),
+  ];
+}
+
+/**
  * Bygger korten för en avslutad match. Returnerar max MAX_HIGHLIGHT_CARDS
  * kort; källor utan underlag hoppas över helt (spelades ingen Spotify finns
  * inget Spotify-kort — ingen extra flagga behövs).
@@ -254,7 +285,22 @@ function buildRankRows(entries: RankEntry[], higherIsBetter: boolean): Highlight
 export function buildMatchHighlights(
   input: BuildMatchHighlightsInput,
 ): HighlightCard[] {
-  const { scores, players, mediaSourceByQuestion, mode } = input;
+  const { scores, mediaSourceByQuestion, mode } = input;
+  // ⚠ Den som lämnade MITT i matchen RANKAS inte (Peter 2026-08-26) — de
+  // slutade svara, så deras delsumma är ingen giltig placering. Utan det
+  // kunde någon som gick efter två rätta svar toppa "Correct answers"
+  // sekunder innan slutskärmen visar dem längst ner utan placeringssiffra.
+  // Samma regel som `finalizeRows` i LeaderboardTable.
+  //
+  // De VISAS ändå i listkorten, sist och utan siffra, med "Left" i stället
+  // för ett resultat — listorna namnger alla spelare. Se `appendDepartedRows`.
+  // Ur allt annat (aggregering, källkort, ranked-gaten) är de borta.
+  //
+  // `hasLeft` sätts bara för avhopp under pågående spel (`leftDuringGameIds`
+  // i quiz.tsx); den som lämnar EFTER slutsignalen spelade hela matchen och
+  // är kvar här som vanligt.
+  const players = input.players.filter((p) => !p.hasLeft);
+  const departed = input.players.filter((p) => p.hasLeft);
   if (players.length === 0) return [];
 
   const flat = scores.flat();
@@ -282,14 +328,17 @@ export function buildMatchHighlights(
       id: 'most-correct',
       kind: 'most-correct',
       title: 'Correct answers',
-      rows: buildRankRows(
-        aggs.map((a) => ({
-          player: a.player,
-          sortValue: a.correct,
-          value: `${a.correct}/${a.answered}`,
-          tieKey: String(a.correct),
-        })),
-        true,
+      rows: appendDepartedRows(
+        buildRankRows(
+          aggs.map((a) => ({
+            player: a.player,
+            sortValue: a.correct,
+            value: `${a.correct}/${a.answered}`,
+            tieKey: String(a.correct),
+          })),
+          true,
+        ),
+        departed,
       ),
       detail: 'Same number of correct answers shares a place',
       icon: '🎯',
@@ -405,15 +454,18 @@ export function buildMatchHighlights(
         id: 'fastest-average',
         kind: 'fastest-average',
         title: 'Fastest fingers',
-        rows: buildRankRows(
-          timedAggs.map((a) => ({
-            player: a.player,
-            sortValue: a.avgSeconds,
-            value: formatSeconds(a.avgSeconds),
-            // Delad placering på det VISADE talet — se filhuvudet.
-            tieKey: formatSeconds(a.avgSeconds),
-          })),
-          false,
+        rows: appendDepartedRows(
+          buildRankRows(
+            timedAggs.map((a) => ({
+              player: a.player,
+              sortValue: a.avgSeconds,
+              value: formatSeconds(a.avgSeconds),
+              // Delad placering på det VISADE talet — se filhuvudet.
+              tieKey: formatSeconds(a.avgSeconds),
+            })),
+            false,
+          ),
+          departed,
         ),
         detail: 'Average time to lock in an answer',
         icon: '⚡',

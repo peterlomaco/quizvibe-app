@@ -102,7 +102,11 @@ import { getSpotifyArtistMeta, type SpotifyArtistMeta } from '@/src/utils/spotif
 import { SPOTIFY_ALBUM_CONTEXT } from '@/src/utils/spotifyAlbumContext';
 import { savePendingLobbyPlayers } from '@/src/utils/pendingLobby';
 import { generatePlayerName } from '@/src/utils/playerName';
-import { loadProfile, type ProfileData } from '@/src/utils/profileStorage';
+import {
+  getCachedProfile,
+  loadProfile,
+  type ProfileData,
+} from '@/src/utils/profileStorage';
 import { recordQuestionAnswer } from '@/src/utils/questionStats';
 import {
   IMAGE_QUIZ_QUESTIONS,
@@ -1171,12 +1175,15 @@ export default function QuizScreen() {
   const isHost = (params.isHost ?? 'true') === 'true';
   // True när spelets HOST är en guest (oavsett vilken enhet detta är —
   // på non-host-enheter betyder flaggan "spelets host är guest", inte
-  // "jag är host"). Guest-hostade spel skriver ingen Player history och
-  // har max 1 Play Again-replay (räknas via guestReplaysUsed nedan).
+  // "jag är host"). Guest-hostade spel skriver ingen Player history och har
+  // sedan 2026-08-26 VARKEN re-match eller replay: slutskärmen visar bara
+  // "Start New Game" (om enheten är inloggad), annars bara Home.
   const isGuestHostGame = params.guestHost === 'true';
-  // Förbrukade replays (0 = första spelet → Play Again visas; >=1 = detta
-  // ÄR replayn → Final Leaderboard visar bara Home). Bara satt på host-
-  // enheten; non-host styrs istället av hostInitiatedPlayAgain-broadcasten.
+  // ⚠ VESTIGIAL för lokala spel sedan 1-replay-taket togs bort (2026-08-26).
+  // Kedjan Home-form → lobby → quiz → goToNewLobby bärs fortfarande, och
+  // REMOTE använder propen aktivt: slutskärmen skickar guestHost={true} +
+  // guestReplaysUsed={1} som literaler för att tvinga fram Home-only-footern.
+  // Riv den inte utan att först flytta remote till en egen flagga.
   const guestReplaysUsed = parseInt(params.guestReplays ?? '0', 10) || 0;
   // Remote 1v1: server-side match-id (remote_matches). Solo-session —
   // frågesekvensen är auktoritativ i DB (question_ids), varje svar skrivs
@@ -2722,6 +2729,22 @@ export default function QuizScreen() {
   // GetReadyIntro och final i RoundLeaderboard). Alla approved klienter
   // (inkl. host) håller samma state — sync via `player_left`-broadcast.
   const [leftPlayerIds, setLeftPlayerIds] = useState<Set<string>>(new Set());
+  // ⚠ Två set, för att TIDPUNKTEN för avhoppet spelar roll (Peter 2026-08-26):
+  //
+  //   leftPlayerIds      → VEM SOM HELST som lämnat, när som helst. Driver
+  //                        re-match-gaten (`allPreviousPlayersActive`): den
+  //                        som gått kan inte godkänna, oavsett när de gick.
+  //   leftDuringGameIds  → bara de som lämnade MEDAN spelet pågick. Driver
+  //                        den visuella markören ("Left the game" i stället
+  //                        för statistikraden).
+  //
+  // Skillnaden: lämnar man mitt i spelet är delresultatet ingen giltig
+  // slutställning — man svarade aldrig på resten — så markören ska följa med
+  // ända till slutskärmen. Lämnar man EFTER att spelet tagit slut är
+  // siffrorna redan färdiga och ska stå kvar som vanligt.
+  const [leftDuringGameIds, setLeftDuringGameIds] = useState<Set<string>>(
+    new Set(),
+  );
   // Per-spelare confirm-time för PÅGÅENDE fråga. Nyckel = lobby_players.player_id,
   // värde = sekunder från fråge-start till confirm. Driver avatar-markörer på
   // timer-bar:en i Individual Devices — confirmade spelares avatar fryses vid
@@ -2852,11 +2875,18 @@ export default function QuizScreen() {
         // PtP-spectator) markerade i === 0 annars HOST som "du".
         isYou: selfPlayerId ? p.id === selfPlayerId : i === 0,
         isHost: i === 0,
-        hasLeft: leftPlayerIds.has(p.id),
+        hasLeft: leftDuringGameIds.has(p.id),
       }));
     }
     return [youPlayer, ...MOCK_OPPONENTS];
-  }, [turnOrder, youPlayer, fallbackAssistance, age, leftPlayerIds, selfPlayerId]);
+  }, [
+    turnOrder,
+    youPlayer,
+    fallbackAssistance,
+    age,
+    leftDuringGameIds,
+    selfPlayerId,
+  ]);
 
   // Aggregera per-spelare-totals direkt från allRoundScoresHistory så
   // leaderboarden alltid speglar exakt vilka som faktiskt har scoreats —
@@ -2915,7 +2945,7 @@ export default function QuizScreen() {
         avgResponseSeconds,
         lastResponseSeconds,
         lastFiveResults,
-        hasLeft: leftPlayerIds.has(p.id),
+        hasLeft: leftDuringGameIds.has(p.id),
       };
     });
     // connectionErrors = antal frågor spelaren missat jämfört med den som
@@ -2948,7 +2978,13 @@ export default function QuizScreen() {
       //    svara (även fel) har lägre avg och ska därför ranka högre.
       return a.avgResponseSeconds - b.avgResponseSeconds;
     });
-  }, [gamePlayers, gameTotals, allRoundScoresHistory, leftPlayerIds, connectionErrorsApplicable]);
+  }, [
+    gamePlayers,
+    gameTotals,
+    allRoundScoresHistory,
+    leftDuringGameIds,
+    connectionErrorsApplicable,
+  ]);
 
   // Per-spelare-facit för PÅGÅENDE fråga (Individual Devices). Deriveras ur
   // allRoundScoresHistory joinat på `questionIndex` — peer-svar ankommer via
@@ -4968,14 +5004,82 @@ export default function QuizScreen() {
     // själv har redan navigerat till '/' innan broadcast skickas, så de
     // ser aldrig sin egen "Has left"-rad.
     playerLeftHandlerRef.current = (playerId, playerName) => {
+      // Gemensamt för båda lägen: hade re-match-inbjudan redan gått ut har
+      // spelaren SETT den gyllene Accept-knappen och valt Home i stället —
+      // det är ett aktivt nej. Utan popupen skulle re-match-blocket bara
+      // försvinna under host:s fingrar (borttagningen nedan gör
+      // `allPreviousPlayersActive` falsk → frågan retras) och host stå kvar
+      // utan förklaring.
+      //
+      // Ingen state-hantering krävs för själva bytet: när host tryckt OK har
+      // render:n redan svängt om till den grå raden + "Start New Game".
+      // Alerten ligger modalt ovanpå under tiden.
+      const deniedRematch = isHost && rematchInviteRef.current;
+      if (deniedRematch && !rematchDeniedAlertedRef.current) {
+        rematchDeniedAlertedRef.current = true;
+        Alert.alert(
+          'Re-match not possible',
+          'At least one player has denied the re-match.',
+          [{ text: 'OK' }],
+        );
+      }
+      // Pass-the-Phone: eventet betyder att en ÅSKÅDAR-ENHET lämnade, inte
+      // att spelaren slutade spela — de sitter kvar vid bordet och spelar
+      // vidare på host:s telefon. Ta därför BARA bort dem ur approver-setet
+      // och returnera:
+      //   • setLeftPlayerIds driver gamePlayers[].hasLeft, liveLeaderboard
+      //     och turnOrder-filtret för timer-barens avatarer — hade markerat
+      //     en spelare mitt i spelet som borta.
+      //   • Alerten "X has left" hade varit direkt felaktig.
+      // Det här är dessutom ENDA vägen ut ur ptpSpectatorIds: watchdogen får
+      // aldrig röra setet (tystnad ≠ ja), så bara ett medvetet Home-/Leave-
+      // tapp släpper host vidare.
+      if (gameMode === 'pass-the-phone') {
+        setPtpSpectatorIds((prev) => {
+          if (!prev.has(playerId)) return prev;
+          const next = new Set(prev);
+          next.delete(playerId);
+          return next;
+        });
+        return;
+      }
       setLeftPlayerIds((prev) => {
         if (prev.has(playerId)) return prev;
         const next = new Set(prev);
         next.add(playerId);
         return next;
       });
-      if (isHost) {
-        Alert.alert(`${playerName} has left`, undefined, [{ text: 'OK' }]);
+      // Bara ett avhopp MEDAN spelet pågick ger den visuella markören. Efter
+      // slutsignalen är siffrorna färdiga och raden ska stå kvar orörd.
+      // `phase`/`isLastQuestion` är aktuella här — de ligger i effektens
+      // dep-array, så handlern registreras om när de ändras.
+      const gameOver = phase === 'leaderboard' && isLastQuestion;
+      if (!gameOver) {
+        setLeftDuringGameIds((prev) => {
+          if (prev.has(playerId)) return prev;
+          const next = new Set(prev);
+          next.add(playerId);
+          return next;
+        });
+      }
+      // ⚠ Inte NÄR re-match-inbjudan är ute — då har vi redan visat
+      // "Re-match not possible" ovan, och två staplade Alerts på iOS gör att
+      // den ena kan sväljas. "X has left" hör dessutom hemma MITT i spelet;
+      // på slutskärmen är avhoppets konsekvens (ingen re-match) det som
+      // faktiskt är händelsen.
+      if (isHost && !deniedRematch) {
+        // Avhopp under pågående spel diskvalificerar spelet från
+        // Competition-serien (se recording-effekten) — säg det direkt, i
+        // stället för att host upptäcker en saknad slide på slutskärmen.
+        // Bara när spelet FAKTISKT ingår i en serie; annars vore raden
+        // obegriplig.
+        Alert.alert(
+          `${playerName} has left`,
+          !gameOver && partOfCompetitionSeriesRef.current
+            ? 'Competition Leaderboard will not be updated with this game result.'
+            : undefined,
+          [{ text: 'OK' }],
+        );
       }
     };
     // Mottagare av player_answer_confirmed: uppdatera per-spelare-confirm-
@@ -5260,13 +5364,22 @@ export default function QuizScreen() {
   const [selectedAggregateId, setSelectedAggregateId] = useState<string | null>(
     null,
   );
+  // Är DET HÄR spelet en fortsättning på en Competition-serie? Serien pekar
+  // ut nästa rumkod när en re-match startas (`markSeriesContinues`), så en
+  // träff här betyder "spelet kommer att räknas in i aggregatet". Används
+  // bara för att avgöra om avhopps-popupen ska nämna Competition-tabellen —
+  // utan serien vore den raden obegriplig.
+  const partOfCompetitionSeriesRef = useRef(false);
   // Seeda från den lokala serien vid mount — en re-match ärver kopplingen,
   // så slutskärmen vet direkt att den ska skriva till servern och visa namn.
   useEffect(() => {
     let cancelled = false;
     void loadAggregateSeries().then((series) => {
+      if (cancelled) return;
+      partOfCompetitionSeriesRef.current =
+        !!series?.nextRoomCode && series.nextRoomCode === params.roomCode;
       const id = series?.leaderboardId ?? null;
-      if (cancelled || !id) return;
+      if (!id) return;
       setAggregateLeaderboardId(id);
       void getAggregateLeaderboard(id).then((saved) => {
         if (cancelled || !saved) return;
@@ -5280,6 +5393,17 @@ export default function QuizScreen() {
   }, []);
   useEffect(() => {
     if (phase !== 'leaderboard' || !aggregateApplicable) return;
+    // ⚠ Lämnade NÅGON mitt i spelet räknas spelet INTE in i Competition-
+    // serien — varken lokalt eller server-side (Peter 2026-08-26). Deras rad
+    // saknar resultat ("Left the game"), så en aggregerad ställning byggd på
+    // den vore missvisande för alla övriga. Eftersom `setAggregate` bara
+    // anropas här förblir `aggregate` null, och då renderas ingen
+    // "Competition Leaderboard"-slide på slutskärmen — samma villkor styr
+    // båda, så de kan inte glida isär.
+    //
+    // Serien i sig lever vidare: `nextRoomCode` konsumeras inte, och nästa
+    // re-match skriver över den via `markSeriesContinues`.
+    if (gamePlayers.some((p) => p.hasLeft)) return;
     const roomCode = params.roomCode as string;
     const contribution: AggregateGamePlayer[] = gamePlayers.map((p) => {
       const scores = allRoundScoresHistory.flatMap((round) =>
@@ -5354,13 +5478,18 @@ export default function QuizScreen() {
     // LobbyScreen och vinner över carry-over-settings — host:s val i
     // "Start New Game"-panelen är alltid det senaste ordet.
     lobbyType: LocalLobbyType = 'multiplayer',
+    // Sätts av "Start New Game" när en INLOGGAD guest host ska tillbaka till
+    // sin egen identitet (Peter 2026-08-26). Nya lobbyn blir då en vanlig
+    // user-lobby: credit dras, profilens namn/avatar används, Game History
+    // skrivs och Remote Play är tillgängligt.
+    leaveGuestMode: boolean = false,
   ) => {
     // `guestOverride` (credit-gate:ns "Restart as Guest"): tvingar NYA
     // lobbyn till guest-host-läge även när DETTA spel hostades av en
-    // registrerad user. Spelarna bärs över som vanligt — bara värd-
-    // identiteten byts till den auto-genererade Guest-identiteten så
-    // spelet blir gratis (inga credits) och ingen Game History skrivs.
-    const asGuestHost = isGuestHostGame || guestOverride != null;
+    // registrerad user. Den skapar numera en FRÄSCH lobby (reusePlayers
+    // false) — en guest-hostad re-match-lobby får inte existera.
+    const asGuestHost =
+      guestOverride != null || (isGuestHostGame && !leaveGuestMode);
     // ── AUKTORITATIV credit-gate ────────────────────────────────────────
     // Sista kollen INNAN rummet registreras. Anropar:na har egna
     // fail-fast-gates (Start New Game-tappet, dormanta handlePlayAgain),
@@ -5374,7 +5503,16 @@ export default function QuizScreen() {
     // som avgör om credits behövs — så credit-gatens egen "Restart as
     // Guest"-utväg (guestOverride) släpps igenom utan att loopa tillbaka
     // in i samma Alert.
-    if (!asGuestHost && !(await ensureHostCreditsForNewGame())) return;
+    if (
+      !asGuestHost &&
+      !(await ensureHostCreditsForNewGame({
+        // En re-match får aldrig kunna växla över till guest — då hade vi
+        // fått exakt den guest-hostade re-match-lobby som inte får finnas.
+        allowGuestRestart: !reusePlayers,
+        newLobbyIsGuestHosted: false,
+      }))
+    )
+      return;
     // Ladda host-profilen FÖRE players-listan byggs så host:s riktiga
     // playerName + avatar bär in i carry-over (annars hade host:s rad i
     // nya lobby:n stått som 'You'/🎮 tills mergeProfileIntoHost hann fyra).
@@ -5383,7 +5521,7 @@ export default function QuizScreen() {
     const profile = asGuestHost ? null : await loadProfile();
     const hostName = guestOverride
       ? guestOverride.guestName
-      : isGuestHostGame
+      : asGuestHost
         ? (params.guestName?.trim() || turnOrder[0]?.name || 'Guest')
         : profile?.playerName?.trim() || 'You';
     const hostEmoji = asGuestHost
@@ -5398,13 +5536,34 @@ export default function QuizScreen() {
     // ev. pre-seeded matchande rad → race ger duplicate-row.
     let carryOverPlayers: LobbyPlayer[];
     if (reusePlayers) {
-      // Behåll alla spelare från detta spel. ALLA carry-over-spelare
-      // (friends eller ej) auto-approvas i nya lobbyn — de var redan
-      // godkända i spelet som just avslutades, så ingen re-approval
-      // behövs (Peter-beslut 2026-08-06). LobbyScreen:s code-only-join
-      // matchar med approved=true på carry-over-branchen så joiner:s
-      // egen upsert inte clobbar.
-      carryOverPlayers = allPlayers.map((p) => {
+      // ── Vilka bärs över? ────────────────────────────────────────────────
+      // Hela uppställningen — filtret nedan är TAUTOLOGISKT under nuvarande
+      // regler och finns som backstop.
+      //
+      // Varför det ändå står kvar: `contribution` på slutskärmen mappar över
+      // HELA `turnOrder`, så en spelare som INTE var med skulle få en rad i
+      // den delade Competition-tabellen (lokalt och server-side via
+      // `recordAggregateGame`) för ett spel de aldrig spelade — och de är
+      // redan deltagare i den sparade leaderboarden, så de SER poängen under
+      // Player history. Filtret gör att en regression i gaten degraderar till
+      // "färre spelare i re-matchen" i stället för "främmande poäng i någons
+      // historik".
+      //
+      // Att det är tautologiskt: host kan bara nå hit när VARJE spelare från
+      // förra spelet både är aktiv (`ptpAllPreviousPlayersActive`) och har
+      // accepterat (`rematchAllApproved`) — annars visas ingen re-match-fråga
+      // alls, respektive förblir Yes grå. Samma sak i IndDev, där hela
+      // rostern är det förväntade setet.
+      //
+      // ALLA carry-over-spelare auto-approvas i nya lobbyn — de var redan
+      // godkända i spelet som just avslutades, så ingen re-approval behövs
+      // (Peter-beslut 2026-08-06). LobbyScreen:s code-only-join matchar med
+      // approved=true på carry-over-branchen så joiner:s egen upsert inte
+      // clobbar.
+      const rematchRoster = allPlayers.filter(
+        (p) => p.isHost || playAgainApprovals.has(p.id),
+      );
+      carryOverPlayers = rematchRoster.map((p) => {
         const turnEntry = turnOrder.find((t) => t.id === p.id);
         // type carry:as från turnOrder (LobbyScreen skickar med den sedan
         // 2026-07-04). Host-raden i guest-hostade spel FORCERAS 'guest' —
@@ -5537,16 +5696,23 @@ export default function QuizScreen() {
         console.warn('[goToNewLobby] setLobbyPlayers carry-over failed:', err);
       });
     }
-    // Carry-over av game-settings när host valt "Yes, keep them" + "Keep
-    // settings". Läser föregående rums lobby_settings-rad och upsert:ar
-    // den på nya rumkoden — bevarar gameMode (PtP/IndDev),
+    // Carry-over av game-settings. Läser föregående rums lobby_settings-rad
+    // och upsert:ar den på nya rumkoden — bevarar gameMode (PtP/IndDev),
     // singlePlayerDefault (= single-player-läget), roundsCount, eraFrom,
     // eraTo, region, samt media-toggles. answerResponseSeconds override:as
     // med host:s AKTUELLA quiz-state (kan ha justerats mid-game via
-    // GetReadyIntro:s dropdown). Vid keepSettings=false (Start fresh)
-    // lämnar vi nya rummet utan settings-rad så LobbyScreen:s host-seed
-    // -effekt fyller den från profilens host-defaults.
-    if (keepSettings && params.roomCode) {
+    // GetReadyIntro:s dropdown). Vid "Start New Game" (varken keepSettings
+    // eller reusePlayers) lämnas nya rummet utan settings-rad så
+    // LobbyScreen:s host-seed-effekt fyller den från profilens host-defaults.
+    //
+    // ⚠ `keepSettings || reusePlayers`: en RE-MATCH bär ALLTID över settings.
+    // Utan settings-raden seedar LobbyScreen gameMode från host-PROFILEN, så
+    // en PtP-re-match kunde tyst återuppstå som Individual device (eller
+    // tvärtom) i en lobby där Game Mode-väljaren är låst och inte kan
+    // rättas. Levande vägar skickar numera alltid keepSettings=true vid
+    // carry-over (Keep/Reset-prompten är borttagen); termen kodar regeln och
+    // täcker den dormanta Play Again-vägen om den återupplivas.
+    if ((keepSettings || reusePlayers) && params.roomCode) {
       const oldSettings = await getLobbySettings(params.roomCode);
       if (oldSettings) {
         await setLobbySettings(newCode, {
@@ -5695,29 +5861,41 @@ export default function QuizScreen() {
       profile?.birthYear ?? new Date().getFullYear() - 30;
     track('guest_name_created', { autofilled: true, assistance: 'full' });
     track('room_code_created', { guestHost: true, fromCreditGate: true });
-    // keepSettings=true: guest-seed:en i LobbyScreen klampar ändå till de
-    // guest-låsta värdena (full era/rounds {2,4}) och tar bara de
-    // guest-VARIABLA fälten (gameMode, singlePlayerDefault, roundsCount,
-    // spotifyEnabled, answerResponseSeconds) från carry-over:n. goToNewLobby:s IndDev-broadcast
-    // (play_again_lobby_ready) routar non-hosts som tappat Approve direkt
-    // till nya lobbyn; övriga får "Host has already started a new Game"-
-    // popupen → Home och kan joina igen via nya koden (dup-detection
-    // matchar deras pre-seedade rad).
-    await goToNewLobby(true, true, {
+    // ⚠ FRÄSCH lobby (reusePlayers=false), inte en carry-over. En
+    // guest-hostad RE-MATCH-lobby får inte existera (Peter 2026-08-26):
+    // guest hosts har varken re-match eller replay, så en lobby med
+    // föregående spels låsta uppställning och en guest-värd är en
+    // motsägelse. Knappen är därmed semantiskt identisk med Home:s
+    // "Start Game as Guest". Ev. non-hosts får "Host has already started a
+    // new Game" → Home, vilket är rätt för en fräsch lobby.
+    await goToNewLobby(false, false, {
       guestName: guestHostName,
       guestBirthYear,
     });
   };
 
   // Host Game Credits-gate för alla "starta nytt spel"-vägar från Final
-  // Leaderboard (Play Again + lokala re-match-flödets "Start New Game").
-  // Returnerar true när host får fortsätta. loadProfile() refreshar Free-
-  // saldot vid första load efter midnatt CET så vi jämför mot aktuellt
-  // värde. Guest host: gaten skippas HELT — guest-spel förbrukar aldrig
-  // credits, och en inloggad user som spelar som guest ska varken blockeras
-  // av eller belasta sitt eget saldo.
-  const ensureHostCreditsForNewGame = async (): Promise<boolean> => {
-    if (isGuestHostGame) return true;
+  // Leaderboard (re-match + "Start New Game"). Returnerar true när host får
+  // fortsätta. loadProfile() refreshar Free-saldot vid första load efter
+  // midnatt CET så vi jämför mot aktuellt värde.
+  //
+  // ⚠ Gaten skippas när den NYA lobbyn blir guest-hostad — inte när den
+  // föregående var det. Skillnaden blev viktig 2026-08-26: en inloggad guest
+  // host som trycker Start New Game skapar numera en vanlig user-lobby och
+  // ska belasta sitt eget saldo som vem som helst. Anroparen anger det via
+  // `newLobbyIsGuestHosted`; utan option:en gäller det gamla beteendet.
+  const ensureHostCreditsForNewGame = async (options?: {
+    /** Får popupen erbjuda "Restart as Guest"? Falskt i re-match-flödet —
+     *  se handleReplayYes. Default true. */
+    allowGuestRestart?: boolean;
+    /** Blir den NYA lobbyn guest-hostad? Det, inte om det FÖREGÅENDE spelet
+     *  var det, avgör om saldot ska belastas: en inloggad guest host som
+     *  trycker Start New Game skapar numera en vanlig user-lobby och ska
+     *  betala för den. Default: samma som det föregående spelet. */
+    newLobbyIsGuestHosted?: boolean;
+  }): Promise<boolean> => {
+    const allowGuestRestart = options?.allowGuestRestart ?? true;
+    if (options?.newLobbyIsGuestHosted ?? isGuestHostGame) return true;
     const [freshProfile, hasPremium] = await Promise.all([
       loadProfile(),
       hasPremiumSubscription(),
@@ -5726,33 +5904,43 @@ export default function QuizScreen() {
     // skippar också deduktionen så Free-saldot förblir orört.
     if (hasPremium) return true;
     if ((freshProfile?.freeGameCredits ?? 0) > 0) return true;
-    // Tre-vägs-popup (iOS Alert max 3 knappar):
-    // 1. Purchase subscription → Store (unlimited host games + Game
-    //    History fortsätter sparas på profilen).
-    // 2. Restart as Guest → guest-hostad lobby med ALLA spelare
-    //    carry:ade från detta spel; gratis men ingen Game History
-    //    skrivs och max 1 replay därefter.
-    // 3. Exit → stäng popupen, stanna på Final Leaderboard (Home-
-    //    knappen finns kvar där som utväg).
+    // Samma popup som Home:s "Start New Game"-gate (app/index.tsx,
+    // checkHostCredits) — ordagrant samma titel, text och knappar, så
+    // spelaren möter en enda formulering överallt i appen.
+    //
+    // ⚠ ENDA avvikelsen från Home är destinationen: Home pushar
+    // `/store?focus=subscription&from=/`, härifrån går den UTAN `from=`.
+    // Utan paramet faller Store:s Back tillbaka via `router.back()` och
+    // /quiz ligger kvar på stacken med Final Leaderboard-state intakt, så
+    // host kan trycka Yes igen direkt efter köpet. Med `from=/` hade
+    // Store:s Back `replace`:at bort Quiz-komponenten och spelet vore borta.
+    //
+    // "Restart as Guest" erbjuds bara när anroparen tillåter det. Den
+    // utgår i re-match-flödet: en guest-hostad re-match-lobby får inte
+    // existera, och en knapp som tyst kastar bort både uppställningen och
+    // Competition-kedjan mitt i en re-match vore vilseledande.
     Alert.alert(
       'Out of Host Game Credits',
-      'You have used your free host games for today. Add unlimited Host games and keep storing Game History on your profile with QuizVibe Premium — or restart as Guest (no Game History stored).',
-      [
-        // Pushar Store UTAN `from=...`-paramet så Store:s Back-knapp fall:er
-        // till `router.back()` istället för `router.replace(from)`. Det
-        // bevarar /quiz på root Stack:en med Final Leaderboard-state intakt
-        // — annars hade replace:n unmountat Quiz-komponenten och spelaren
-        // skulle landa på en tom /quiz-vy efter köpet.
-        {
-          text: 'Purchase subscription',
-          onPress: () => router.push('/store?focus=subscription'),
-        },
-        {
-          text: 'Restart as Guest',
-          onPress: () => restartAsGuestHost(freshProfile),
-        },
-        { text: 'Exit', style: 'cancel' },
-      ],
+      'You have used your free host games for today. Wait for the daily refresh at midnight CET, or upgrade to QuizVibe Premium for unlimited host games.',
+      allowGuestRestart
+        ? [
+            { text: 'Cancel', style: 'cancel' },
+            {
+              text: 'Restart as Guest',
+              onPress: () => restartAsGuestHost(freshProfile),
+            },
+            {
+              text: 'Go to Store',
+              onPress: () => router.push('/store?focus=subscription'),
+            },
+          ]
+        : [
+            { text: 'Cancel', style: 'cancel' },
+            {
+              text: 'Go to Store',
+              onPress: () => router.push('/store?focus=subscription'),
+            },
+          ],
     );
     return false;
   };
@@ -5875,6 +6063,27 @@ export default function QuizScreen() {
       clearEjected(params.roomCode);
       clearGameStarted(params.roomCode);
     }
+    // Non-host lämnar: annonsera det INNAN vi navigerar. I PtP är det här
+    // enda vägen ut ur host:s approver-set — utan den skulle en åskådare som
+    // gått hem blockera re-matchen för alltid (watchdogen rör inte setet).
+    //
+    // ⚠ Await:as, till skillnad från övriga player_left-sändningar: router
+    // .replace unmountar komponenten och river syncChannel:en, så en ren
+    // fire-and-forget kan hinna kastas bort innan den gått ut. Kort timeout
+    // så navigationen aldrig hänger på ett dött nät.
+    if (!isHost && syncActive && selfPlayerId && syncChannelRef.current) {
+      const selfName =
+        turnOrder.find((p) => p.id === selfPlayerId)?.name ?? 'Player';
+      await Promise.race([
+        syncChannelRef.current
+          .broadcastPlayerLeft({
+            player_id: selfPlayerId,
+            player_name: selfName,
+          })
+          .catch(() => {}),
+        new Promise((resolve) => setTimeout(resolve, 1200)),
+      ]);
+    }
     router.replace('/');
   };
 
@@ -5967,11 +6176,21 @@ export default function QuizScreen() {
   const [hostInitiatedPlayAgain, setHostInitiatedPlayAgain] = useState(false);
   const [nextLobbyCode, setNextLobbyCode] = useState<string | null>(null);
   const [awaitingNewLobby, setAwaitingNewLobby] = useState(false);
+  // Synkron spegel av awaitingNewLobby så lobby-ready-handler:n kan läsa
+  // det AKTUELLA värdet vid event-ankomst utan att vara beroende av att
+  // useEffect:en hunnit uppdatera handler-closure:n. Skyddar mot ett
+  // millisekund-race där non-host tappar Accept "samtidigt" som host:s
+  // lobby-ready-event ankommer.
+  //
+  // ⚠ Deklarerad HÄR, inte nere bland de övriga handler-ref:arna, eftersom
+  // handleApprovePlayAgain nedan sätter .current direkt vid tappet — en
+  // ref som deklareras senare i filen är inte i scope där.
+  const awaitingNewLobbyRef = useRef(awaitingNewLobby);
+  awaitingNewLobbyRef.current = awaitingNewLobby;
 
   // Host-side state: vilka non-hosts har broadcastat sin Approve-tap.
-  // `playAgainApprovals` är en Set av player_id:n. När size === antal
-  // non-hosts i turnOrder, är "Yes, keep them"-knappen i modal:en
-  // upplyst (innan dess är den utgråad).
+  // `playAgainApprovals` är en Set av player_id:n; grinden nedan kräver att
+  // VARJE förväntad approver finns i den (se rematchExpectedApproverIds).
   const [playAgainApprovals, setPlayAgainApprovals] = useState<Set<string>>(
     () => new Set(),
   );
@@ -5979,17 +6198,56 @@ export default function QuizScreen() {
   // Play Again-tap så vi kan rendera disabled state visuellt.
   const [playAgainModalVisible, setPlayAgainModalVisible] = useState(false);
 
+  // ── Pass-the-Phone: vilka ÅSKÅDAR-ENHETER finns i spelet? ───────────────
+  // Host-side set över non-hosts som faktiskt anslutit till quiz_sync och
+  // hälsat (player_rejoined). I PtP spelar de flesta på host:s telefon —
+  // bara den som svarade "Yes" på lobbyns "följ leaderboarden?"-prompt har
+  // en egen enhet — så rostern (turnOrder) säger ingenting om vem som kan
+  // godkänna en re-match. Det här setet gör det.
+  //
+  // ⚠ HIGH-WATER-MARK, inte live-närvaro (Peter 2026-08-26). En spelare
+  // läggs in när deras enhet hälsar och tas bort ENBART av ett explicit
+  // player_left (= medvetet Home-/Leave-tapp). Watchdogen får ALDRIG röra
+  // setet: den kan inte skilja "gick därifrån" från "låste skärmen", och
+  // iOS fryser JS-tråden vid varje skärmlås — en watchdog-borttagning hade
+  // alltså tyst släppt host vidare medan spelaren satt kvar vid bordet.
+  // Kravet är att var och en som är kvar trycker Accept SJÄLV; tystnad får
+  // aldrig räknas som ja. Priset är att en force-quit:ad enhet blockerar
+  // host tills host trycker Home. Det är avsiktligt.
+  const [ptpSpectatorIds, setPtpSpectatorIds] = useState<Set<string>>(
+    () => new Set(),
+  );
+
+  // Har enheten en inloggad QuizVibe-profil? Avgör guest-hostens slutskärm:
+  // inloggad → "Start New Game" (som skapar en VANLIG user-lobby), ej
+  // inloggad → bara Home. Seedas synkront ur profil-spegeln så vi aldrig
+  // renderar fel knapp en frame; `undefined` betyder ohydrerad (inte
+  // utloggad) och faller därför till false tills loadProfile() svarat.
+  const [hostIsRegisteredUser, setHostIsRegisteredUser] = useState(
+    () => !!getCachedProfile(),
+  );
+  useEffect(() => {
+    let cancelled = false;
+    void loadProfile().then((p) => {
+      if (!cancelled) setHostIsRegisteredUser(!!p);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const handleApprovePlayAgain = () => {
     if (!hostInitiatedPlayAgain) return; // belt-and-suspenders mot disabled tap
     setAwaitingNewLobby(true);
-    // Broadcasta approval-signal till host:s syncChannel så host:s
-    // counter triggas och "Yes, keep them"-knappen kan låsas upp när
-    // alla non-hosts godkänt.
-    if (
-      gameMode === 'individual-devices' &&
-      syncChannelRef.current &&
-      selfPlayerId
-    ) {
+    // Sätt ref:en synkront också — setState-spegeln uppdateras först vid
+    // nästa render, och host:s play_again_lobby_ready kan (teoretiskt) hinna
+    // fram innan dess. Utan detta hade en accepterare kunnat få "Host has
+    // already started a new Game" i stället för att dras med till lobbyn.
+    awaitingNewLobbyRef.current = true;
+    // Broadcasta approval-signal till host:s syncChannel så host:s counter
+    // triggas och Yes-knappen kan låsas upp när alla godkänt. syncActive
+    // (inte bara IndDev): PtP-åskådaren accepterar över samma kanal.
+    if (syncActive && syncChannelRef.current && selfPlayerId) {
       syncChannelRef.current
         .broadcastPlayerApprovedPlayAgain({ player_id: selfPlayerId })
         .catch(() => {});
@@ -6026,47 +6284,123 @@ export default function QuizScreen() {
   //     Multiplayer Game / Remote Play) → färsk lobby i valt läge. INGA
   //     carry-over-frågor, inga spelare, settings från profilen.
   //
-  // Guest-hostade spel kör SAMMA flöde med två skillnader: Remote Play visas
-  // aldrig (remote 1vs1 är QuizVibe-users-only) och Keep/Reset-settings-
-  // prompten hoppas över (guest-lobbyns settings är låsta). Deras 1-replay-
-  // cap ligger kvar: vid guestReplaysUsed >= 1 renderas ingen "Start New
-  // Game" alls — bara Home, precis som förr.
+  // Guest-hostade spel hoppar över steg 1 helt (de har varken re-match
+  // eller replay) och landar direkt i steg 2 — men bara om enheten är
+  // inloggad; annars visas bara Home. Är de inloggade lämnar Start New Game
+  // dessutom guest-läget: nya lobbyn blir en VANLIG user-lobby, så Remote
+  // Play är med i lägesvalet och credit-gaten gäller.
   const [startNewGameExpanded, setStartNewGameExpanded] = useState(false);
   // Host valde "Yes, same players again" → carry-over av föregående spelare
   // (och, i IndDev, väntan på deras godkännande innan lobbyn får skapas).
   const [rematchInvite, setRematchInvite] = useState(false);
+  // Synkron spegel: player_left-handlern registreras i en effekt med
+  // deps [phase, isLastQuestion] och skulle annars läsa `rematchInvite` som
+  // det såg ut när fasen blev 'leaderboard' — dvs. alltid false.
+  const rematchInviteRef = useRef(rematchInvite);
+  rematchInviteRef.current = rematchInvite;
+  // Engångs-guard så popupen inte staplas när flera spelare lämnar. Behöver
+  // aldrig nollställas: ett spel per quiz.tsx-mount.
+  const rematchDeniedAlertedRef = useRef(false);
   // Host:s svar på re-match-frågan. 'ask' = frågan står uppe (Start New
   // Game är dold), 'no' = host tackade nej → Start New Game tar över.
   const [replayChoice, setReplayChoice] = useState<'ask' | 'no'>('ask');
 
+  // ── Vem måste godkänna re-matchen? ─────────────────────────────────────
+  // HELA rostern, i BÅDA lägen (Peter 2026-08-26). Varje spelare som var med
+  // i det just avslutade spelet måste bekräfta på sin egen enhet — inte bara
+  // de som råkar vara uppkopplade. Är någon inte längre aktiv går det inte
+  // att göra en re-match alls; se `ptpAllPreviousPlayersActive` nedan, som
+  // stänger frågan i stället för att låta host vänta på någon som omöjligt
+  // kan svara.
+  //
+  // Härleds på KOMPONENT-scope (inte i leaderboard-render-blocket) eftersom
+  // handleReplayYes nedan behöver den.
+  const rematchExpectedApproverIds = useMemo(
+    () => turnOrder.slice(1).map((p) => p.id),
+    [turnOrder],
+  );
+  // Har VARJE spelare från förra spelet en levande enhet? Är svaret nej kan
+  // de aldrig godkänna, och då finns ingen re-match att erbjuda — frågan
+  // stängs i stället för att låta host vänta på någon som omöjligt kan svara.
+  //
+  // Lägena mäter samma sak från olika håll, av nödvändighet:
+  //  • PtP    → POSITIVT bevis. De flesta spelar på host:s telefon utan egen
+  //             app uppe, så bara den som valde "Follow leaderboard" finns i
+  //             `ptpSpectatorIds`. Frånvaro därifrån = kan inte godkänna.
+  //  • IndDev → NEGATIVT bevis. Alla non-hosts spelar per definition på egen
+  //             enhet, så utgångsläget är "aktiv"; bara ett explicit
+  //             `player_left` diskvalificerar.
+  //
+  // ⚠ Watchdogen används INTE i någotdera läget. Den kan inte skilja "gick
+  // därifrån" från "låste skärmen", och iOS fryser JS-tråden vid varje
+  // skärmlås — en watchdog-baserad diskvalificering hade tyst dödat
+  // re-matchen för någon som satt kvar med telefonen i fickan.
+  const allPreviousPlayersActive =
+    gameMode === 'pass-the-phone'
+      ? rematchExpectedApproverIds.every((id) => ptpSpectatorIds.has(id))
+      : rematchExpectedApproverIds.every((id) => !leftPlayerIds.has(id));
+  // `every` (inte size >= n): grinden släpper av sig själv om en åskådare
+  // trycker Home efter att räkningen börjat — deras id försvinner ur det
+  // förväntade setet — utan att vi behöver nollställa playAgainApprovals.
+  const rematchAllApproved = rematchExpectedApproverIds.every((id) =>
+    playAgainApprovals.has(id),
+  );
+  const rematchPendingApproverCount = rematchExpectedApproverIds.filter(
+    (id) => !playAgainApprovals.has(id),
+  ).length;
+
+  // Host skickar om inbjudan medan den väntar. Realtime spelar ALDRIG upp
+  // missade broadcasts, och sedan en åskådare ligger kvar i setet oavsett
+  // vad (high-water-mark) skulle en enda tappad play_again_initiated betyda
+  // evig väntan: knappen dyker aldrig upp på deras enhet, och host kan inte
+  // släppas vidare. Omsändningen gör leveransen självläkande — var telefonen
+  // låst, appen bakgrundad eller socketen död när inbjudan först gick ut så
+  // kommer knappen ändå inom ~5 s efter att enheten är tillbaka.
+  useEffect(() => {
+    if (!isHost || !rematchInvite || rematchAllApproved) return;
+    const id = setInterval(() => {
+      syncChannelRef.current
+        ?.broadcastPlayAgainInitiated({ sender_id: selfPlayerId })
+        .catch(() => {});
+    }, 5000);
+    return () => clearInterval(id);
+  }, [isHost, rematchInvite, rematchAllApproved, selfPlayerId]);
+
+  // En INLOGGAD guest host startar en VANLIG user-lobby härifrån (Peter
+  // 2026-08-26) — de återgår till sin egen identitet. Vill de spela som
+  // gäst igen gör de det från Home. Följden är att credit-gaten gäller.
+  const startNewGameLeavesGuestMode = isGuestHostGame && hostIsRegisteredUser;
+
   const handleLocalStartNewGamePress = async () => {
-    // Guest host har max 1 nytt spel härifrån — knappen renderas inte alls
-    // vid >= 1; detta är belt-and-suspenders mot oväntade call-paths.
-    if (isGuestHostGame && guestReplaysUsed >= 1) return;
     // Andra tappet stänger panelen igen (samma toggle-känsla som Home).
     if (startNewGameExpanded) {
       setStartNewGameExpanded(false);
       return;
     }
     // Credit-gaten först — meningslöst att öppna ett val host inte kan
-    // fullfölja.
-    if (!(await ensureHostCreditsForNewGame())) return;
+    // fullfölja. Nya lobbyn är guest-hostad bara om vi INTE lämnar
+    // guest-läget; annars ska saldot belastas som för vilken user som helst.
+    if (
+      !(await ensureHostCreditsForNewGame({
+        newLobbyIsGuestHosted: isGuestHostGame && !startNewGameLeavesGuestMode,
+      }))
+    )
+      return;
     setStartNewGameExpanded(true);
   };
 
-  /** Sista steget när spelarna bärs över: Keep/Reset-settings-prompten (och
-   *  för guest hosts: hoppa den — guest-lobbyns settings är ändå låsta). */
+  /** Sista steget när spelarna bärs över.
+   *
+   *  ⚠ Keep/Reset-prompten är BORTTAGEN (Peter 2026-08-26): en re-match och
+   *  en replay behåller ALLTID settings, i alla lägen. "Reset" lämnade nya
+   *  rummet utan settings-rad, varpå LobbyScreen seedade gameMode från
+   *  host-PROFILEN — en PtP-re-match kunde alltså tyst återuppstå som
+   *  Individual device (eller tvärtom) i en lobby där Game Mode-väljaren är
+   *  låst och inte kan rättas. I PtP-riktningen försvann dessutom hela
+   *  åskådar-flödet, eftersom LobbyScreens "följ leaderboarden?"-prompt bara
+   *  fyrar när läget faktiskt är Pass-the-Phone. */
   const proceedWithRematch = (lobbyType: LocalLobbyType) => {
-    // Guest host: guest-lobbyns settings är ändå låsta → ingen prompt.
-    // Single player: enda spelaren ÄR host, så "Reset" hade nollställt
-    // hostens egen age/assistance till defaults — meningslöst, och ett extra
-    // steg i ett flöde som ska vara snabbt ("Replay & Aggregate score" ska
-    // kännas som ett tapp). Samma genväg som guest hosts redan har.
-    if (isGuestHostGame || isLocalSoloGame) {
-      void goToNewLobby(true, true, undefined, lobbyType);
-      return;
-    }
-    askKeepSettingsThenGo(false, lobbyType);
+    void goToNewLobby(true, true, undefined, lobbyType);
   };
 
   /** "Start New Game": host valde ett läge. Alltid en FÄRSK lobby — inga
@@ -6078,7 +6412,13 @@ export default function QuizScreen() {
       void handleStartNewGameFromFinal('1v1');
       return;
     }
-    void goToNewLobby(false, false, undefined, lobbyType);
+    void goToNewLobby(
+      false,
+      false,
+      undefined,
+      lobbyType,
+      startNewGameLeavesGuestMode,
+    );
   };
 
   /**
@@ -6219,38 +6559,42 @@ export default function QuizScreen() {
    *  den tänts efter att alla non-hosts godkänt. Läget är alltid
    *  `previousLocalMode`; en re-match byter aldrig läge. */
   const handleReplayYes = async () => {
-    // Guest host har max 1 re-match — blocket renderas inte alls vid >= 1;
-    // detta är belt-and-suspenders mot oväntade call-paths.
-    if (isGuestHostGame && guestReplaysUsed >= 1) return;
+    // Guest host har varken re-match eller replay (Peter 2026-08-26) —
+    // blocket renderas inte alls för dem; belt-and-suspenders mot
+    // oväntade call-paths.
+    if (isGuestHostGame) return;
     // Andra tappet: inbjudan är redan utfärdad och godkänd (knappen är grå
-    // och otappbar medan väntan pågår) → fortsätt till Keep/Reset.
+    // och otappbar medan väntan pågår) → skapa lobbyn.
     if (rematchInvite) {
       proceedWithRematch(previousLocalMode);
       return;
     }
-    if (!(await ensureHostCreditsForNewGame())) return;
+    // ⚠ Ingen "Restart as Guest" här: en guest-hostad re-match-lobby får
+    //   inte existera, och att mitt i en re-match erbjuda en knapp som tyst
+    //   kastar bort både uppställningen och Competition-kedjan vore
+    //   vilseledande. Host får samma Store-fråga som på Home i stället.
+    if (!(await ensureHostCreditsForNewGame({ allowGuestRestart: false })))
+      return;
     // Koppla serien till ett SPARAT aggregat innan inbjudan går ut, så id:t
     // hinner med i play_again_lobby_ready till non-hosts.
     // ⚠ MÅSTE ligga före broadcastPlayAgainInitiated — backar host ur i
     //   listan får ingen inbjudan gå ut till non-hosts.
     if (!(await ensureAggregateLeaderboardAttached())) return;
-    const totalNonHosts = Math.max(0, turnOrder.length - 1);
-    // Individual Devices: varje spelare måste godkänna på sin egen enhet.
-    // Yes gråas ut med väntestatusen under sig och host tappar den igen när
-    // alla godkänt. `rematchInvite` sätts BARA här — det är den enda vägen
-    // som faktiskt skickar ut en inbjudan, och flaggan göms No-knappen.
-    if (totalNonHosts > 0 && gameMode === 'individual-devices' && syncChannelRef.current) {
+    // Varje förväntad approver måste godkänna på sin egen enhet. Yes gråas
+    // ut med väntestatusen under sig och host tappar den igen när alla
+    // godkänt. `rematchInvite` sätts BARA här — det är den enda vägen som
+    // faktiskt skickar ut en inbjudan, och flaggan gömmer No-knappen.
+    if (rematchExpectedApproverIds.length > 0 && syncChannelRef.current) {
       setRematchInvite(true);
       syncChannelRef.current
         .broadcastPlayAgainInitiated({ sender_id: selfPlayerId })
         .catch(() => {});
       return;
     }
-    // Ingen att vänta in → direkt vidare. Nås i praktiken bara av IndDev
-    // utan kvarvarande non-hosts (eller utan sync-kanal) — Pass-the-Phone
-    // och single player renderar aldrig re-match-frågan alls. Sätter
-    // MEDVETET inte rematchInvite: avbryter host Keep/Reset-prompten ska
-    // Yes/No-raden stå kvar oförändrad så No fortfarande går att välja.
+    // Ingen att vänta in → direkt vidare: single player, IndDev utan
+    // kvarvarande non-hosts, eller PtP där ingen följer leaderboarden på en
+    // egen enhet. Sätter MEDVETET inte rematchInvite, så No fortfarande går
+    // att välja om host backar ur längre fram i flödet.
     proceedWithRematch(previousLocalMode);
   };
 
@@ -6309,13 +6653,8 @@ export default function QuizScreen() {
   // Host: broadcastar host_rejoined → non-host drainer scores.
   // Non-host: drainer scores direkt + broadcastar player_rejoined.
   const peerReconnectedHandlerRef = useRef<(senderId: string) => void>(() => {});
-  // Synkron mirror av awaitingNewLobby så lobby-ready-handler:n kan
-  // läsa den AKTUELLA värden vid event-ankomst utan att vara beroende
-  // av att useEffect:en hunnit uppdatera handler-closure:n. Skyddar mot
-  // millisekund-race där non-host tappar Approve "samtidigt" som host:s
-  // lobby-ready-event ankommer.
-  const awaitingNewLobbyRef = useRef(awaitingNewLobby);
-  awaitingNewLobbyRef.current = awaitingNewLobby;
+  // (awaitingNewLobbyRef deklareras tillsammans med sitt state längre upp —
+  // handleApprovePlayAgain sätter den synkront och behöver den i scope.)
   // Guard så popup:en "Host has already started"-inte fyrar flera
   // gånger om host av någon anledning broadcastar lobby_ready upprepade
   // gånger.
@@ -6341,7 +6680,18 @@ export default function QuizScreen() {
   }, []);
   useEffect(() => {
     playAgainInitiatedHandlerRef.current = () => {
-      if (!isHost) setHostInitiatedPlayAgain(true);
+      if (isHost) return;
+      setHostInitiatedPlayAgain(true);
+      // Upprop (PtP): hälsa igen så host garanterat har oss i sitt
+      // approver-set. Stänger hålet "alla tre mount-hälsningarna tappades",
+      // där host annars inte vet att vi finns och skulle gå vidare utan att
+      // vänta in vårt Accept. Idempotent hos host — en hälsning som redan
+      // är registrerad ändrar ingenting.
+      if (isPtPSpectator && selfPlayerId) {
+        syncChannelRef.current
+          ?.broadcastPlayerRejoined({ sender_id: selfPlayerId })
+          .catch(() => {});
+      }
     };
     playAgainLobbyReadyHandlerRef.current = (
       code: string,
@@ -6665,11 +7015,10 @@ export default function QuizScreen() {
               addSessionRecord(shownIds).catch(() => {});
               persistEpochLedger();
             }
-            if (
-              gameMode === 'individual-devices' &&
-              syncChannelRef.current &&
-              selfPlayerId
-            ) {
+            // syncActive (inte bara IndDev): i PtP är detta den enda
+            // signalen som tar bort åskådaren ur host:s approver-set, så en
+            // re-match inte blockeras av någon som redan gått därifrån.
+            if (syncActive && syncChannelRef.current && selfPlayerId) {
               const selfName =
                 turnOrder.find((p) => p.id === selfPlayerId)?.name ?? 'Player';
               syncChannelRef.current
@@ -7215,6 +7564,25 @@ export default function QuizScreen() {
         setPlayerConnectionStatus((prev) => ({ ...prev, [playerId]: status }));
       },
       onPlayerRejoined: (playerId) => {
+        // Pass-the-Phone: hälsningen är hur host får veta att den här
+        // spelaren har en EGEN enhet och därmed kan (och måste) godkänna en
+        // re-match. Enda vägen IN i setet.
+        //
+        // ⚠ Filtrera mot rostern. player_rejoined registreras via rå
+        // channel.on i syncChannel och går förbi isKnownSender — ett påhittat
+        // id hade annars injicerat en approver som aldrig kan godkänna, och
+        // host:s Yes-knapp låst sig för alltid. Filtret utesluter dessutom
+        // värd-tillagda gäster gratis (de sänder aldrig något).
+        if (
+          isHost &&
+          gameMode === 'pass-the-phone' &&
+          playerId !== selfPlayerId &&
+          turnOrderIdSetRef.current.has(playerId)
+        ) {
+          setPtpSpectatorIds((prev) =>
+            prev.has(playerId) ? prev : new Set(prev).add(playerId),
+          );
+        }
         // Hälsning från remote spelare → flippa till 'connected'. Detta är
         // ENDA vägen dit (heartbeat-receipt räcker medvetet inte). Avsändare:
         // explicit Retry-tap, unstable→ok-återhämtning, ELLER mount-hälsningen
@@ -7651,7 +8019,7 @@ export default function QuizScreen() {
   }
 
   // ── Pass-the-Phone: non-host:s live-spectator-vy ─────────────────────
-  // Spelaren svarade "Yes" på Lobby:ns "Do you want to follow the Leaderboard
+  // Spelaren valde "Follow leaderboard" i Lobby:ns "Do you want to follow the Leaderboard
   // on this device?". Enheten spelar INTE — den visar host:ens progress-block
   // plus leaderboarden, som uppdateras när host går vidare till nästa fråga
   // (se flushSpectatorScores för varför den väntar).
@@ -7964,56 +8332,120 @@ export default function QuizScreen() {
   // läggs den inuti parent-scroll:n följer footer:n med upp när användaren
   // scrollar och blir inte längre alltid synlig.
   if (phase === 'leaderboard') {
-    // Lokalt spel (ej remote): host:s Play Again ersätts av Home:s gula
-    // "Start New Game" med invite-frågan före lägesvalet. Guest hosts ingår,
-    // men bara på sin enda tillåtna omgång — vid guestReplaysUsed >= 1
-    // faller de igenom till RoundLeaderboard:s "bara Home"-gren som förr.
+    // Lokalt spel (ej remote) där host kan erbjuda en re-match.
+    //
+    // ⚠ GUEST HOST HAR VARKEN RE-MATCH ELLER REPLAY (Peter 2026-08-26) — i
+    // något läge, oavsett om enheten är inloggad. Det ersätter det tidigare
+    // 1-replay-taket (guestReplaysUsed), som byggde på motsatt antagande.
+    // Deras slutskärm blir i stället: inloggad → bara "Start New Game",
+    // ej inloggad → bara Home. Se localStartNewGameReady nedan.
     const localRematchFlow =
-      isLastQuestion &&
-      isHost &&
-      !isRemote &&
-      !(isGuestHostGame && guestReplaysUsed >= 1);
-    const rematchTotalNonHosts = Math.max(0, turnOrder.length - 1);
-    const rematchAllApproved =
-      rematchTotalNonHosts === 0 ||
-      playAgainApprovals.size >= rematchTotalNonHosts;
-    // Bara Individual Devices behöver godkännande — i Pass-the-Phone sitter
-    // alla på samma enhet och det finns ingen att vänta in.
+      isLastQuestion && isHost && !isRemote && !isGuestHostGame;
+    // Bara den som faktiskt har en egen enhet kan godkänna. I IndDev är det
+    // hela rostern, i PtP de åskådare som anslutit. Härleds på komponent-
+    // scope (rematchExpectedApproverIds) eftersom handleReplayYes behöver den.
     const rematchNeedsApproval =
-      rematchInvite &&
-      gameMode === 'individual-devices' &&
-      rematchTotalNonHosts > 0;
-    const rematchWaitingCount =
-      rematchTotalNonHosts - playAgainApprovals.size;
-    // ⚠ Pass-the-Phone hoppar över HELA re-match-frågan (Peter 2026-08-25).
-    // Host får direkt "Start New Game" + Home; Yes/No-blocket renderas aldrig.
-    // Skälet är detsamma som att spectatorn inte kan godkänna — host kan ha
-    // lagt till gäster utan egen enhet, och en re-match där är ändå bara
-    // "starta ett nytt spel med samma folk i samma rum".
+      rematchInvite && syncActive && rematchExpectedApproverIds.length > 0;
+    // ⚠ PtP-MULTIPLAYER kräver att ALLA deltagare är registrerade QuizVibe-
+    // users (Peter 2026-08-26). Finns en enda gäst — värd-tillagd via
+    // "+ Add Player" eller självansluten anon — visas ingen re-match-fråga.
+    // Det är det som upphäver den gamla invändningen "host kan lägga till
+    // gäster utan egen enhet, som aldrig kan godkänna": sådana spel är helt
+    // enkelt inte behöriga. Bonus: alla deltagare har då user_id, så
+    // Competition-serien blir server-sparad i stället för lokal-bara.
     //
-    // ⚠ SINGLE PLAYER HAR ÅTER EN FRÅGA (Peter 2026-08-25, senare samma dag)
-    // — den togs bort tidigare med motiveringen "ingen motpart att aggregera
-    // mot", men motparten är spelarens EGNA tidigare spel: "Replay &
-    // Aggregate score" samlar poäng över flera solo-omgångar i en Aggregate
-    // Score. Ordvalet skiljer sig från flerspelar-varianten; mekaniken är
-    // identisk. Vänd inte tillbaka utan nytt beslut.
+    // Fail-open på `type === undefined` (`=== 'guest'`, inte
+    // `!== 'registered'`): fältet är optional, och en tyst borttappad type
+    // ska hellre släppa igenom en gäst — där degraderar bara server-
+    // lagringen — än tyst döda re-match för ett legitimt spel.
     //
-    // ⚠ Undantaget gäller PtP-MULTIPLAYER, inte gameMode i sig. Single player
-    //   är `singlePlayerDefault: true` OVANPÅ ett vanligt läge — ett solospel
-    //   bär alltså oftast gameMode='pass-the-phone' (profil-defaulten), så en
-    //   naken `gameMode !== 'pass-the-phone'` slog ut solo också och frågan
-    //   syntes aldrig (bugg 2026-08-26). isLocalSoloGame måste stå först.
-    const rematchQuestionEnabled =
-      localRematchFlow && (isLocalSoloGame || gameMode !== 'pass-the-phone');
+    // ⚠ isLocalSoloGame MÅSTE stå först. Single player är
+    // `singlePlayerDefault: true` OVANPÅ ett vanligt läge, så ett solospel
+    // bär oftast gameMode='pass-the-phone' (profil-defaulten) — en naken
+    // gameMode-check slog ut solo också och frågan syntes aldrig (bugg
+    // 2026-08-26). Undantaget gäller PtP-MULTIPLAYER, inte gameMode i sig.
+    //
+    // ⚠ ANDRA villkoret gäller BÅDA lägen (Peter 2026-08-26): varje spelare
+    // från förra spelet måste ha en levande enhet. Saknas en enda kan hen
+    // aldrig godkänna, och då är en re-match omöjlig — frågan visas inte
+    // alls och host får i stället en grå förklaringsrad ovanför "Start New
+    // Game". Följd, avsedd: lämnar någon medan host väntar retras frågan
+    // mitt i flödet. Det är ärligare än att låta hostens Yes stå grå för
+    // alltid, vilket är exakt vad IndDev gjorde innan den här regeln.
+    //
+    // Gäst-villkoret är däremot PtP-only — IndDev tillåter inte
+    // värd-tillagda gäster i spelet över huvud taget.
+    const rematchBlocked =
+      !isLocalSoloGame &&
+      ((gameMode === 'pass-the-phone' &&
+        turnOrder.some((p) => p.type === 'guest')) ||
+        !allPreviousPlayersActive);
+    const rematchQuestionEnabled = localRematchFlow && !rematchBlocked;
+    // Kan det här spelet ÖVER HUVUD TAGET producera en re-match-inbjudan?
+    //
+    // Beräknas ur data som ALLA enheter har (`turnOrder` + params), så en
+    // åskådare kan veta att ingen inbjudan kommer. Utan den fick de den
+    // dimmade "Accept / Re-match"-platshållaren med badgen "Activated by
+    // Host" — en knapp som aldrig kan tändas, eftersom host:s gäst-gate
+    // aldrig släpper fram frågan. `homeOnlyFooter` gjorde det jobbet förr
+    // men var för trubbig (den gällde ALLA PtP-åskådare); det här är samma
+    // skydd, men bara i de spel där re-match faktiskt är omöjlig.
+    //
+    // ⚠ Inkluderar MEDVETET inte `allPreviousPlayersActive` — den bygger på
+    // `ptpSpectatorIds`, som bara host har. En åskådare kan alltså inte veta
+    // att någon ANNAN saknar enhet, och ska då fortsätta visa den dimmade
+    // knappen: host kan mycket väl skicka inbjudan.
+    const rematchImpossibleForGame =
+      isGuestHostGame ||
+      (!isLocalSoloGame &&
+        gameMode === 'pass-the-phone' &&
+        turnOrder.some((p) => p.type === 'guest'));
+    // Grå förklaringsrad ovanför "Start New Game" när re-match inte går att
+    // erbjuda. Utan den ser det bara ut som att funktionen saknas.
+    //
+    // ⚠ ORDNINGEN är betydelsebärande: gäst-fallet testas FÖRE aktiv-fallet.
+    // Ett PtP-spel med gäster faller nämligen på BÅDA (en gäst kopplar aldrig
+    // upp sig och kan därför aldrig bli "aktiv"), och då är gäst-skälet det
+    // sanna och begripliga — "not all players are active" hade fått det att
+    // låta som att någon gick därifrån.
+    //
+    // Explicit radbrytning i alla texter (Peter 2026-08-26): rubrikraden för
+    // sig, förklaringen under. `guestReplayNote` är centrerad, så båda
+    // raderna centreras.
+    const rematchUnavailableNote = ((): string | undefined => {
+      if (!isLastQuestion || !isHost || isRemote) return undefined;
+      // Guest host: varken re-match eller replay finns för dem, i något läge.
+      if (isGuestHostGame) return 'No re-match possible for Guest Host';
+      if (isLocalSoloGame) return undefined;
+      if (
+        gameMode === 'pass-the-phone' &&
+        turnOrder.some((p) => p.type === 'guest')
+      )
+        return 'No re-match possible —\nGame includes a Guest player';
+      if (!allPreviousPlayersActive)
+        return (
+          'No re-match possible —\n' +
+          'Not all players from the previous game are active any longer'
+        );
+      return undefined;
+    })();
     // Frågans rubrik: solo aggregerar en SCORE (en spelare), flerspelar en
     // LEADERBOARD. Kan inte använda aggregateLabel() — serien finns inte än.
     const replayTitle = isLocalSoloGame
       ? 'Replay & Competition score?'
       : 'Re-match with Competition Leaderboard?';
-    // Start New Game visas direkt i PtP, och i övriga lokala lägen först när
-    // host svarat No på re-match-frågan.
+    // "Start New Game" visas när det inte finns någon re-match-fråga att
+    // besvara (guest host, eller ett obehörigt PtP-spel), och annars först
+    // när host svarat No. Guest host får den BARA om enheten är inloggad —
+    // en ej inloggad guest host faller igenom till RoundLeaderboards
+    // "bara Home"-gren.
     const localStartNewGameReady =
-      localRematchFlow && (!rematchQuestionEnabled || replayChoice === 'no');
+      isLastQuestion &&
+      isHost &&
+      !isRemote &&
+      (isGuestHostGame
+        ? hostIsRegisteredUser
+        : !rematchQuestionEnabled || replayChoice === 'no');
     return (
       <SafeAreaView style={styles.safe} onTouchStart={signalHostActivity}>
         {inactivityCountdownSec !== null && (
@@ -8039,11 +8471,12 @@ export default function QuizScreen() {
           guestHost={isGuestHostGame || isRemote}
           guestReplaysUsed={isRemote ? 1 : guestReplaysUsed}
           hostInitiatedPlayAgain={hostInitiatedPlayAgain}
-          // PtP-spectatorn får bara Home. Re-match används inte efter PtP-spel
-          // (Peter 2026-08-25) — utan flaggan hade de fått den dimmade
-          // "Approve / Re-match"-knappen som aldrig kan tändas, eftersom
-          // play_again_initiated inte broadcastas i PtP.
-          homeOnlyFooter={isPtPSpectator}
+          // PtP-åskådaren får samma footer som en IndDev-non-host: den
+          // dimmade "Accept / Re-match" med badgen "Activated by Host", som
+          // tänds guld när host bjuder in (Peter 2026-08-26). Den gamla
+          // homeOnlyFooter-propen är borta — ett guest-hostat spel faller
+          // ändå till Home-only via guestHost-klausulen, eftersom hosten där
+          // aldrig kan bjuda in.
           allRoundScoresHistory={allRoundScoresHistory}
           // Andra sidan på slutskärmen: hela re-match-serien sammanslagen.
           // Renderas bara när serien har mer än ett spel — annars är
@@ -8091,9 +8524,9 @@ export default function QuizScreen() {
             localStartNewGameReady ? startNewGameExpanded : undefined
           }
           // Re-match-frågan (rubrik + Yes/No) — slutskärmens FÖRSTA steg.
-          // Försvinner så fort host svarat No; localRematchFlow bär redan
-          // guest-hostens 1-re-match-cap, så på omgång 2 visas varken den
-          // eller Start New Game — bara Home.
+          // Försvinner så fort host svarat No. Guest hosts får den aldrig
+          // (localRematchFlow utesluter dem), och inte heller ett PtP-spel
+          // med minst en gäst i uppställningen (ptpRematchBlocked).
           onReplayYes={
             rematchQuestionEnabled && replayChoice === 'ask'
               ? handleReplayYes
@@ -8105,17 +8538,22 @@ export default function QuizScreen() {
           replayLocked={
             localRematchFlow && rematchNeedsApproval && !rematchAllApproved
           }
+          // ⚠ Ingen "Start anyway" här (Peter 2026-08-26): var och en som är
+          // kvar måste acceptera själv. Hostens utväg om någon aldrig
+          // svarar är Home, som raderar lobbyn och skickar alla hem.
           onReplayLockedPress={() =>
             Alert.alert(
               'Waiting for players',
-              'The new lobby opens as soon as every player has approved the re-match. Tap Yes again when they have.',
+              'The new lobby opens as soon as every player has accepted the re-match. Tap Yes again when they have.',
             )
           }
-          // Guest host: Remote Play visas ALDRIG — remote 1vs1 spelas enbart
-          // mellan QuizVibe-users. För registrerade hosts står den ALLTID
-          // kvar: "Start New Game" bär sedan 2026-08-24 aldrig över spelare,
-          // så det finns inget carry-over som krockar med en duell.
-          hideRemotePlay={localRematchFlow && isGuestHostGame}
+          // Remote Play visas ALDRIG för en guest host — remote 1vs1 spelas
+          // enbart mellan QuizVibe-users. Men en INLOGGAD guest host lämnar
+          // guest-läget när de trycker Start New Game (nya lobbyn blir en
+          // vanlig user-lobby), så då ska raden vara med.
+          hideRemotePlay={isGuestHostGame && !startNewGameLeavesGuestMode}
+          rematchUnavailableNote={rematchUnavailableNote}
+          rematchImpossible={rematchImpossibleForGame}
           replayNote={
             localRematchFlow && rematchNeedsApproval ? (
               rematchAllApproved ? (
@@ -8125,9 +8563,12 @@ export default function QuizScreen() {
               ) : (
                 <View style={styles.playAgainModalStatusWaitingRow}>
                   <Text style={styles.playAgainModalStatusWaitingText}>
-                    Waiting for {rematchWaitingCount} of {rematchTotalNonHosts}{' '}
-                    {rematchTotalNonHosts === 1 ? 'player' : 'players'} to
-                    approve
+                    Waiting for {rematchPendingApproverCount} of{' '}
+                    {rematchExpectedApproverIds.length}{' '}
+                    {rematchExpectedApproverIds.length === 1
+                      ? 'player'
+                      : 'players'}{' '}
+                    to accept
                   </Text>
                   <SequentialDots color={Colors.textSecondary} />
                 </View>

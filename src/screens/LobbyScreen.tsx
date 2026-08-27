@@ -445,6 +445,28 @@ function resolveSeedSinglePlayer(lobbyType: string | undefined, fallback: boolea
   return fallback;
 }
 
+/** Spelartaket härleds HELT ur läge + premium — det finns inget fritt val
+ *  utanför Players-toggeln (Max 4 / Max 12), och den är bara meningsfull i
+ *  Individual device.
+ *
+ *  ⚠ **Pass-the-Phone är ALLTID 4, även med Premium.** Alla delar EN enhet;
+ *  12 spelare × 20 rundor blir ett orimligt långt spel. Det stod i
+ *  auto-sync-effektens kommentar men fanns aldrig i koden — en premium-host
+ *  fick 12 kapacitetsrutor i en PtP-lobby (Peter 2026-08-26).
+ *
+ *  Module-level och ren så seed-effekten och auto-sync-effekten läser exakt
+ *  samma regel; divergerar de flimrar taket vid mount (seeden sätter ett
+ *  värde, effekten ett annat en frame senare). */
+function resolveMaxPlayers(
+  gameMode: GameMode,
+  singlePlayer: boolean,
+  premium: boolean,
+): 2 | 4 | 12 {
+  if (gameMode === 'remote-1v1') return 2;
+  if (singlePlayer) return 4;
+  return gameMode === 'individual-devices' && premium ? 12 : 4;
+}
+
 // ─── Add Player Modal ─────────────────────────────────────────────────────────
 
 type AddPlayerAssistance = 'minimal' | 'standard' | 'full';
@@ -1491,17 +1513,13 @@ export default function LobbyScreen() {
                 ? 'pass-the-phone'
                 : rawSeedGameMode;
           setGameMode(seedGameMode);
-          // Clamp mot premium-status: profilen kan ha ett stale maxPlayers=12
-          // från en tidigare session med aktiv prenumeration — utan denna
-          // clamping sätts 12 EFTER att hasPremium-clamp-effekten kört 4,
-          // och effekten re-fyrar inte eftersom hasPremium inte ändrats.
-          // Remote 1v1: alltid låst till 2 (host + 1 motståndare).
-          if (seedGameMode === 'remote-1v1') {
-            setMaxPlayers(2);
-          } else {
-            const rawMax = profile?.maxPlayers ?? 4;
-            setMaxPlayers(!premium && rawMax > 4 ? 4 : rawMax === 2 ? 4 : (rawMax as 4 | 12));
-          }
+          // Taket härleds ur läge + premium, INTE ur profilens sparade
+          // maxPlayers: Players-toggeln finns bara i IndDev, och där låser
+          // premium ändå till 12 (Max 4 utgråas). Ett stale profil-värde
+          // (t.ex. 12 från en session med aktiv prenumeration) får därför
+          // aldrig läcka in. Samma resolver som auto-sync-effekten nedan, så
+          // seeden och effekten inte sätter olika värden en frame isär.
+          setMaxPlayers(resolveMaxPlayers(seedGameMode, seedSinglePlayer, premium));
           setSinglePlayerDefault(seedSinglePlayer);
           // V1: bara Sweden — eventuella stored/profile-värden som inte är
           // Sweden ignoreras (legacy från Nordics/Europe/Global-tiden).
@@ -2329,22 +2347,19 @@ export default function LobbyScreen() {
     setRoomMaxPlayers(roomCode, maxPlayers).catch(() => { /* loggas i mockActiveRooms */ });
   }, [maxPlayers, roomCode, hostMode]);
 
-  // Auto-sync maxPlayers ↔ gameMode (host-only): Pass-the-Phone capas alltid
-  // vid 4 spelare (PtP med 12 spelare × 20 rundor = orimligt långt spel),
-  // Individual Devices defaulta:r till 12 så host får full multiplayer-cap
-  // direkt utan extra knapptryck. Non-host syncar maxPlayers via room-meta-
-  // maxPlayers sätts nu explicit via Players-toggeln (Max 4 / Max 12).
-  // Premium → auto-välj Max 12 och lås (Max 4 utgråas).
-  // Ej premium → tvinga tillbaka till Max 4.
-  // Remote 1v1 → ALLTID 2 (host + 1 motståndare) oavsett premium.
-  // Single player → 4 (lägsta giltiga värdet; DB-CHECK tillåter bara
-  // 2/4/12). Utan grenen hade en premium-host skrivit max_players=12 till
-  // rums-raden för ett solospel. Kapacitetsmätaren visar ändå EN ruta.
+  // Auto-sync maxPlayers ↔ gameMode (host-only) — hela regeln bor i
+  // resolveMaxPlayers (module-level, delas med seed-effekten):
+  //   Pass-the-Phone → ALLTID 4, även med Premium (alla delar en enhet).
+  //   Individual device → 12 med Premium, annars 4.
+  //   Remote 1v1 → ALLTID 2 (host + 1 motståndare).
+  //   Single player → 4 (lägsta giltiga; DB-CHECK tillåter bara 2/4/12).
+  //     Kapacitetsmätaren visar ändå EN ruta.
+  // Players-toggeln (Max 4 / Max 12) är därmed bara meningsfull i IndDev,
+  // och där låser premium till 12 (Max 4 utgråas). Non-host syncar
+  // maxPlayers via room-meta i stället.
   useEffect(() => {
     if (!hostMode) return;
-    setMaxPlayers(
-      gameMode === 'remote-1v1' ? 2 : singlePlayerDefault ? 4 : hasPremium ? 12 : 4,
-    );
+    setMaxPlayers(resolveMaxPlayers(gameMode, singlePlayerDefault, hasPremium));
   }, [hostMode, hasPremium, gameMode, singlePlayerDefault]);
 
   // Max rundor beror på spelläge: IndDev → 20, PtP/Single → 4.
@@ -4654,12 +4669,30 @@ export default function LobbyScreen() {
           // tick:en) skulle annars stapla en ny popup varannan sekund.
           if (navigatedToQuizRef.current || cancelled) return;
           navigatedToQuizRef.current = true;
+          // ⚠ "Follow" är FÖRVALT (Peter 2026-08-26). Skälet är inte bara
+          // trevnad: en PtP-re-match kan sedan samma dag bara ta med host +
+          // de som accepterat på sin EGEN enhet, och bara den som följer
+          // leaderboarden HAR en enhet i spelet. Svarar alla "No" finns det
+          // ingen som kan acceptera, och då erbjuds ingen re-match alls.
+          // Copyn säger därför uttryckligen varför man vill följa med.
+          //
+          // ⚠ `style: 'cancel'` ligger MEDVETET på Follow-knappen, inte på
+          // "Not now". Det är enda sättet att få den fetstilt/förvald på
+          // iOS: RN:s Alert exponerar inget `preferredAction`, och
+          // UIAlertController renderar just .cancel-knappen i halvfet. Flytta
+          // den inte "tillbaka" för att den ser felplacerad ut — då blir
+          // "Not now" den som ser ut som standardvalet igen. På Android
+          // ignoreras style och ordningen avgör; Follow ligger först.
           Alert.alert(
             'Host has started the Game',
-            'Please use Host device. Do you want to follow the Leaderboard on this device?',
+            'Play on the Host device. Keep the live leaderboard on this phone so you can join a re-match afterwards.',
             [
-              { text: 'No', style: 'cancel', onPress: () => router.replace('/') },
-              { text: 'Yes', onPress: () => goToQuizAsNonHost() },
+              {
+                text: 'Follow leaderboard',
+                style: 'cancel',
+                onPress: () => goToQuizAsNonHost(),
+              },
+              { text: 'Not now', onPress: () => router.replace('/') },
             ],
             { cancelable: false },
           );
@@ -6304,7 +6337,17 @@ export default function LobbyScreen() {
                 <Text style={[styles.modeLabel, { textAlign: 'center' }, styles.modeLabelActiveFree]}>
                   {singlePlayerDefault
                     ? 'Replay — Single player (locked)'
-                    : `Re-match — ${lockedLineupCount} players (line-up locked)`}
+                    : /* Namnge LÄGET, inte bara antalet (Peter 2026-08-26):
+                         sedan Pass-the-Phone också kan re-matchas kan en
+                         återvändande spelare annars inte se om de ska vänta
+                         sig "följ leaderboarden?"-prompten eller en egen tur.
+                         Raden är dessutom en synlig kanariefågel för att
+                         läget faktiskt bars över från förra spelet. */
+                      `Re-match — ${
+                        gameMode === 'individual-devices'
+                          ? 'Individual device'
+                          : 'Pass-the-Phone'
+                      }, ${lockedLineupCount} players (line-up locked)`}
                 </Text>
                 <View style={styles.freeBadge} pointerEvents="none">
                   <Text style={styles.freeBadgeText}>FREE</Text>

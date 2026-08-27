@@ -160,7 +160,7 @@ const USER_VS_GUEST_ROWS: { label: string; user: boolean | string; guest: boolea
   { label: 'Friends list & in-app invites', user: true, guest: false },
   { label: 'Choose Game era', user: true, guest: false },
   { label: 'Host games per day', user: '4 free', guest: 'Trial' },
-  { label: 'Replay & Competition Leaderboard', user: true, guest: '1 time' },
+  { label: 'Replay & Competition Leaderboard', user: true, guest: false },
   { label: 'Premium option', user: true, guest: false },
 ];
 
