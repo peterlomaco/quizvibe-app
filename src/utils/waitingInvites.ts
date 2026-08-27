@@ -44,6 +44,11 @@ export interface WaitingInvite {
   fromAvatarId?: string;
   // ms timestamp — används för att sortera nyaste först och visa "1m ago" etc.
   sentAt: number;
+  // Sattes av avsändaren vid send-time (Peter 2026-08-27): true om
+  // mottagaren redan var en sparad friend på hostens sida när inviten
+  // skickades. Styr om recipient-klienten visar consent-popupen
+  // ("...adds you to his/her QuizVibe friend list") innan Accept.
+  alreadyFriend: boolean;
 }
 
 // DB row-shape (snake_case). Mappar till WaitingInvite via rowToInvite.
@@ -55,6 +60,7 @@ interface WaitingInviteRow {
   from_player_name: string;
   from_avatar_id: string | null;
   sent_at: string; // ISO-timestamp från Supabase
+  already_friend: boolean;
 }
 
 function rowToInvite(row: WaitingInviteRow): WaitingInvite {
@@ -64,6 +70,7 @@ function rowToInvite(row: WaitingInviteRow): WaitingInvite {
     fromPlayerName: row.from_player_name,
     fromAvatarId: row.from_avatar_id ?? undefined,
     sentAt: new Date(row.sent_at).getTime(),
+    alreadyFriend: row.already_friend,
   };
 }
 
@@ -91,6 +98,10 @@ function parseInvites(json: string): WaitingInvite[] {
     fromPlayerName: i.fromPlayerName ?? i.fromNickname ?? '',
     fromAvatarId: i.fromAvatarId,
     sentAt: i.sentAt ?? Date.now(),
+    // Legacy cached invites (pre-migration) don't have this field — default
+    // to true (assume already-friend / no popup) since we genuinely don't
+    // know, and showing a spurious consent popup is worse than skipping one.
+    alreadyFriend: i.alreadyFriend ?? true,
   }));
 }
 
@@ -240,6 +251,7 @@ export async function addInvite(
       room_code: invite.roomCode,
       from_player_name: invite.fromPlayerName,
       from_avatar_id: invite.fromAvatarId ?? null,
+      already_friend: invite.alreadyFriend,
     });
     if (error && error.code !== '23505') {
       console.warn('[waitingInvites] Supabase insert failed:', error.message);

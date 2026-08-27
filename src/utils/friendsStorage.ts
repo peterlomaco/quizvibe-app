@@ -78,13 +78,24 @@ async function ensureFriendsReset(): Promise<void> {
   }
 }
 
+// Alfabetisk sortering (Peter 2026-08-27) — case-insensitive + numeric
+// (samma localeCompare-konvention som t.ex. Lobby:s purchasedPackageRow-
+// sortering). Körs centralt här så ALLA konsumenter (Profile:s inline-lista,
+// Profile:s Friends-modal, Lobby:s Share invite) automatiskt får sorterad
+// data utan att varje render-site behöver sortera själv.
+function sortFriends(list: Friend[]): Friend[] {
+  return [...list].sort((a, b) =>
+    a.playerName.localeCompare(b.playerName, undefined, { sensitivity: 'base', numeric: true }),
+  );
+}
+
 export async function loadFriends(): Promise<Friend[]> {
   try {
     await ensureFriendsReset();
     const key = await resolveFriendsKey();
     if (!key) return [];
     const json = await AsyncStorage.getItem(key);
-    if (json) return parseFriends(json);
+    if (json) return sortFriends(parseFriends(json));
     return [];
   } catch (err) {
     console.warn('[friendsStorage] Failed to load friends:', err);
@@ -118,12 +129,12 @@ export async function addFriend(playerName: string, avatarId?: string): Promise<
   const next: Friend = { id: `f-${Date.now()}`, playerName: trimmed, avatarId };
   const updated = [...current, next];
   await saveFriends(updated);
-  return updated;
+  return sortFriends(updated);
 }
 
 export async function removeFriend(id: string): Promise<Friend[]> {
   const current = await loadFriends();
   const updated = current.filter((f) => f.id !== id);
   await saveFriends(updated);
-  return updated;
+  return sortFriends(updated);
 }

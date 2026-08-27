@@ -38,6 +38,7 @@ import { clearPremiumSubscription, hasPremiumSubscription } from '@/src/utils/su
 import { supabase } from '@/src/utils/supabase';
 import { formatRoomCode, generateRoomCode, isBlockedLetterPair, isLetterCellIndex, ROOM_CODE_DIGITS, ROOM_CODE_LEADING_LETTERS, ROOM_CODE_LENGTH, ROOM_CODE_TRAILING_LETTERS } from '@/src/utils/roomCode';
 import { loadInvites, removeInvite, type WaitingInvite } from '@/src/utils/waitingInvites';
+import { addFriend } from '@/src/utils/friendsStorage';
 import { Nunito_400Regular, Nunito_600SemiBold, Nunito_700Bold, useFonts } from '@expo-google-fonts/nunito';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
@@ -549,7 +550,10 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     };
   }, [visible]);
 
-  const handleAcceptInvite = async (invite: WaitingInvite) => {
+  // Faktiskt utför accept-flödet — guards + navigation oförändrade. Bruten
+  // ut ur handleAcceptInvite (2026-08-27) så både "redan friend"-fallet och
+  // consent-popupens OK-knapp kan dela EXAKT samma logik.
+  const proceedAcceptInvite = async (invite: WaitingInvite) => {
     // Active-room-check: host kan ha raderat lobby:n mellan att invite
     // skickades och usern hann confirma. Visa tydlig "Lobby no longer
     // available"-popup och rensa bort den stale inviten ur listan så user
@@ -576,12 +580,45 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     // popup och inviten ligga kvar i listan, så de kan försöka igen om
     // någon lämnar. Speglar samma check som handleJoinWithCode kör.
     if (await checkLobbyCapacity(invite.roomCode)) return;
+    // Ömsesidig friend-add (Peter 2026-08-27): att acceptera lägger till
+    // HOST:en på RECIPIENT:ens egna friends-lista också — host-sidans add
+    // sker separat via LobbyScreen:s pending→confirmed-watcher när den här
+    // spelaren dyker upp i lobbyns players[]. addFriend dedupar case-
+    // insensitivt så det är säkert att anropa ovillkorligt.
+    await addFriend(invite.fromPlayerName, invite.fromAvatarId);
     await removeInvite(invite.id);
     onClose();
     router.push({
       pathname: '/lobby',
       params: { code: invite.roomCode, isHost: 'false' },
     });
+  };
+
+  // "Deny" (Peter 2026-08-27) — tyst avböjning, ingen host-notifiering.
+  // Raden tas bara bort ur mottagarens inbox.
+  const handleDenyInvite = async (invite: WaitingInvite) => {
+    const updated = await removeInvite(invite.id);
+    setInvites(updated);
+  };
+
+  // Accept-knappen (Peter 2026-08-27, ersatte hela-radens implicita accept).
+  // Om host:s invite redan har mottagaren som friend (invite.alreadyFriend)
+  // går det direkt igenom; annars visas ett consent-steg FÖRST eftersom
+  // accepterandet lägger till en NY, ömsesidig friend-relation.
+  const handleAcceptInvite = async (invite: WaitingInvite) => {
+    if (invite.alreadyFriend) {
+      await proceedAcceptInvite(invite);
+      return;
+    }
+    Alert.alert(
+      'Accept invitation?',
+      'By accepting this invitation you will both 1. join the lobby and 2. accept that both of you will be added to each others QuizVibe friend list.',
+      [
+        { text: 'OK', onPress: () => proceedAcceptInvite(invite) },
+        { text: 'Deny', style: 'destructive', onPress: () => handleDenyInvite(invite) },
+        { text: 'Cancel', style: 'cancel' },
+      ],
+    );
   };
 
   const handleJoinWithCode = async () => {
@@ -1133,12 +1170,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                 </View>
               ) : (
                 invites.map((inv) => (
-                  <TouchableOpacity
-                    key={inv.id}
-                    style={modal.inviteRow}
-                    activeOpacity={0.7}
-                    onPress={() => handleAcceptInvite(inv)}
-                  >
+                  <View key={inv.id} style={modal.inviteRow}>
                     <Text style={modal.inviteEmoji}>
                       {getAvatarEmojiById(inv.fromAvatarId)}
                     </Text>
@@ -1146,8 +1178,23 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                       <Text style={modal.inviteFrom}>{inv.fromPlayerName}</Text>
                       <Text style={modal.inviteCode}>Room {formatRoomCode(inv.roomCode)}</Text>
                     </View>
-                    <Text style={modal.inviteJoinText}>Join ›</Text>
-                  </TouchableOpacity>
+                    <View style={modal.inviteActions}>
+                      <TouchableOpacity
+                        style={modal.inviteDenyBtn}
+                        activeOpacity={0.7}
+                        onPress={() => handleDenyInvite(inv)}
+                      >
+                        <Text style={modal.inviteDenyText}>Deny</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={modal.inviteAcceptBtn}
+                        activeOpacity={0.7}
+                        onPress={() => handleAcceptInvite(inv)}
+                      >
+                        <Text style={modal.inviteAcceptText}>Accept</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
                 ))
               )}
             </>
@@ -4837,10 +4884,35 @@ const modal = StyleSheet.create({
     letterSpacing: 1,
     marginTop: 2,
   },
-  inviteJoinText: {
-    fontSize: 14,
+  // Deny/Accept-knapparna (Peter 2026-08-27, ersatte hela-radens implicita
+  // accept + "Join ›"-texten).
+  inviteActions: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+  },
+  inviteDenyBtn: {
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    borderRadius: Radius.full,
+    borderWidth: 1,
+    borderColor: Colors.borderStrong,
+    backgroundColor: 'transparent',
+  },
+  inviteDenyText: {
+    fontSize: 13,
     fontWeight: '700',
-    color: Colors.primary,
+    color: Colors.textSecondary,
+  },
+  inviteAcceptBtn: {
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    borderRadius: Radius.full,
+    backgroundColor: Colors.primary,
+  },
+  inviteAcceptText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#fff',
   },
 });
 

@@ -30,6 +30,7 @@ import { PlayerHistorySection } from '../components/PlayerHistorySection';
 import { QuizVibeFriendsLogo } from '../components/QuizVibeFriendsLogo';
 import { QuizVibeQAvatar } from '../components/QuizVibeQAvatar';
 import { ShoppingCartIcon } from '../components/ShoppingCartIcon';
+import { CodeKeyboard } from '../components/CodeKeyboard';
 import {
     ROUNDS_DEFAULT,
     ROUNDS_MAX_INDIV,
@@ -55,6 +56,7 @@ import {
     clearProfile,
     getCachedProfile,
     loadProfile,
+    playerNameExists,
     saveProfile,
     type AssistanceLevel,
     type AvatarSource,
@@ -62,6 +64,17 @@ import {
     type ProfileData,
     type Region,
 } from '../utils/profileStorage';
+import {
+    appendPlayerNameDigit,
+    appendPlayerNameLetter,
+    backspacePlayerNameDigits,
+    backspacePlayerNameLetters,
+    getPlayerNameDigits,
+    getPlayerNameLetters,
+    normalizePlayerName,
+    PLAYER_NAME_MAX_DIGITS,
+    PLAYER_NAME_MAX_LETTERS,
+} from '../utils/playerName';
 // Spotify OAuth-imports borttagna (Plan B 2026-07-22) — self-attest via
 // ProfileData.spotifyAppConfirmed ersätter connectSpotify/getSpotifyConnectionStatus.
 import { getCachedPremium, hasPremiumSubscription } from '../utils/subscriptionStorage';
@@ -273,7 +286,24 @@ export default function ProfileScreen() {
   const [lastFreeCreditsRefreshDate, setLastFreeCreditsRefreshDate] = useState<string | undefined>(undefined);
   const [friends, setFriends] = useState<Friend[]>([]);
   const [friendsModalOpen, setFriendsModalOpen] = useState(false);
+  // Checkbox-urval för bulk-delete i "+ Add QuizVibe Friends"-modalen
+  // (Peter 2026-08-27, ersatte den tidigare per-rad "×"-knappen).
+  const [selectedFriendIds, setSelectedFriendIds] = useState<Set<string>>(new Set());
+  // Add-by-Player-Name-fältet (2026-08-27, omarbetat till samma split-field-
+  // struktur — bokstäver + siffror via QuizVibe:s egna CodeKeyboard — som
+  // PlayerName skapas överallt annars i appen. Speglar Lobby:s Share invite-
+  // modal 1:1 (se LobbyScreen.tsx) så de två "Add QuizVibe friend"-formulären
+  // beter sig identiskt.
   const [newFriendPlayerName, setNewFriendPlayerName] = useState('');
+  const [addFriendKbMode, setAddFriendKbMode] = useState<'letter' | 'digit'>('letter');
+  const [addFriendFocused, setAddFriendFocused] = useState(false);
+  const addFriendLettersRef = useRef<TextInput>(null);
+  const addFriendDigitsRef = useRef<TextInput>(null);
+  // Async existence-check (playerNameExists) — bara riktiga registrerade
+  // QuizVibe-users kan sparas som friend. `addFriendChecking` disable:ar
+  // Add-knappen under roundtrip:en, `addFriendError` visas inline vid miss.
+  const [addFriendChecking, setAddFriendChecking] = useState(false);
+  const [addFriendError, setAddFriendError] = useState<string | null>(null);
   const [answerResponseSeconds, setAnswerResponseSeconds] = useState<AnswerResponse>(30);
   // Initial-värde matchar generic-fallback-spec (1981 → innevarande år
   // via ERA_MAX) — Profile:s loadProfile-effect overridar med profilens
@@ -954,16 +984,100 @@ export default function ProfileScreen() {
     }, [localParams.scrollToTop]),
   );
 
+  // Speglar Lobby:s handleAddFriendFromShare — `playerNameExists` verifierar
+  // FÖRST att namnet tillhör en registrerad QuizVibe-user innan det sparas.
   const handleAddFriend = async () => {
-    if (!newFriendPlayerName.trim()) return;
-    const updated = await addFriend(newFriendPlayerName);
-    setFriends(updated);
+    const trimmed = normalizePlayerName(newFriendPlayerName.trim());
+    if (!trimmed || addFriendChecking) return;
+    setAddFriendError(null);
+    setAddFriendChecking(true);
+    try {
+      const exists = await playerNameExists(trimmed);
+      if (!exists) {
+        setAddFriendError('No QuizVibe user found with that Player Name');
+        return;
+      }
+      const updated = await addFriend(trimmed);
+      setFriends(updated);
+      setNewFriendPlayerName('');
+      setAddFriendKbMode('letter');
+    } finally {
+      setAddFriendChecking(false);
+    }
+  };
+
+  // CodeKeyboard-handlers för Add-by-Player-Name-fältet — identiska med
+  // Lobby:s handleAddFriendKeyPress/Backspace/toggleAddFriendKbMode.
+  const handleAddFriendKeyPress = (char: string) => {
+    setNewFriendPlayerName((prev) =>
+      addFriendKbMode === 'letter' ? appendPlayerNameLetter(prev, char) : appendPlayerNameDigit(prev, char),
+    );
+    if (addFriendError) setAddFriendError(null);
+  };
+
+  const handleAddFriendBackspace = () => {
+    setNewFriendPlayerName((prev) =>
+      addFriendKbMode === 'letter' ? backspacePlayerNameLetters(prev) : backspacePlayerNameDigits(prev),
+    );
+    if (addFriendError) setAddFriendError(null);
+  };
+
+  const toggleAddFriendKbMode = () => {
+    if (newFriendPlayerName.length === 0 && addFriendKbMode === 'letter') return;
+    if (addFriendKbMode === 'letter') {
+      setAddFriendKbMode('digit');
+      addFriendDigitsRef.current?.focus();
+    } else {
+      setAddFriendKbMode('letter');
+      addFriendLettersRef.current?.focus();
+    }
+  };
+
+  // "Cancel" på CodeKeyboard:et (2026-08-27) — speglar Lobby:s
+  // handleAddFriendCancel. "Done" längst ner i modalen stänger HELA Friends-
+  // vyn (mer än vad man vill vid en avbruten inmatning); Cancel tömmer bara
+  // det pågående namnet och stänger tangentbordet, modalen är kvar öppen.
+  const handleAddFriendCancel = () => {
     setNewFriendPlayerName('');
+    setAddFriendKbMode('letter');
+    setAddFriendError(null);
+    addFriendLettersRef.current?.blur();
+    addFriendDigitsRef.current?.blur();
+    setAddFriendFocused(false);
   };
 
   const handleRemoveFriend = async (id: string) => {
     const updated = await removeFriend(id);
     setFriends(updated);
+  };
+
+  // Bulk-delete (2026-08-27) — ersätter den tidigare instant-"×" i "+ Add
+  // QuizVibe Friends"-modalen. Confirm-Alert speglar Lobby:s
+  // handleDeletePlayer-mönster (Cancel + destructive Delete). Sekventiella
+  // removeFriend-anrop är säkra — varje call slutför sitt egna
+  // loadFriends→filter→saveFriends-varv innan nästa startar.
+  const handleDeleteSelectedFriends = () => {
+    const count = selectedFriendIds.size;
+    if (count === 0) return;
+    Alert.alert(
+      count === 1 ? 'Remove friend' : 'Remove friends',
+      `Are you sure you want to delete ${count} friend${count > 1 ? 's' : ''} from your QuizVibe friends list?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            let updated = friends;
+            for (const id of selectedFriendIds) {
+              updated = await removeFriend(id);
+            }
+            setFriends(updated);
+            setSelectedFriendIds(new Set());
+          },
+        },
+      ],
+    );
   };
 
   const selectedAvatar = AVATARS.find((a) => a.id === selectedAvatarId);
@@ -2287,7 +2401,16 @@ export default function ProfileScreen() {
           </View>
 
           <Pressable
-            onPress={() => setFriendsModalOpen(true)}
+            onPress={() => {
+              // Fräscha fält varje gång modalen öppnas — speglar Lobby:s
+              // handleOpenShareModal.
+              setNewFriendPlayerName('');
+              setAddFriendKbMode('letter');
+              setAddFriendFocused(false);
+              setAddFriendError(null);
+              setSelectedFriendIds(new Set());
+              setFriendsModalOpen(true);
+            }}
             style={({ pressed }) => [
               styles.friendsBtn,
               pressed && { opacity: 0.85 },
@@ -2451,33 +2574,110 @@ export default function ProfileScreen() {
               Save Player Names to invite friends with one tap from Lobby.
             </Text>
 
-            {/* Add friend row */}
+            {/* Add friend row — samma split-field-struktur (bokstäver +
+                siffror, QuizVibe:s egna CodeKeyboard) som PlayerName skapas
+                överallt annars i appen, speglar Lobby:s Share invite-modal
+                1:1 (Peter 2026-08-27). `appendPlayerNameLetter` sköter
+                versal-först/gemener-resten-formatet per tangenttryck.
+                `playerNameExists` verifierar att namnet tillhör en
+                registrerad QuizVibe-user innan det sparas. */}
+            <Text style={friendsModal.addFieldLabel}>Add by Player Name</Text>
             <View style={friendsModal.addRow}>
               <TextInput
-                style={friendsModal.addInput}
-                placeholder="Add by Player Name"
+                ref={addFriendLettersRef}
+                style={[
+                  friendsModal.addInput,
+                  friendsModal.addPlayerNameLettersInput,
+                  addFriendKbMode === 'letter' && friendsModal.addPlayerNameInputActive,
+                ]}
+                placeholder="Anna"
                 placeholderTextColor={Colors.textDisabled}
-                value={newFriendPlayerName}
-                onChangeText={setNewFriendPlayerName}
-                maxLength={20}
-                returnKeyType="done"
-                onSubmitEditing={handleAddFriend}
+                value={getPlayerNameLetters(newFriendPlayerName)}
+                maxLength={PLAYER_NAME_MAX_LETTERS}
+                editable={!addFriendChecking}
+                showSoftInputOnFocus={false}
+                selection={{
+                  start: getPlayerNameLetters(newFriendPlayerName).length,
+                  end: getPlayerNameLetters(newFriendPlayerName).length,
+                }}
+                selectTextOnFocus={false}
+                contextMenuHidden={true}
+                onFocus={() => {
+                  setAddFriendKbMode('letter');
+                  setAddFriendFocused(true);
+                }}
+                onBlur={() => setAddFriendFocused(false)}
+              />
+              <Text style={friendsModal.addPlayerNameSeparator}>–</Text>
+              <TextInput
+                ref={addFriendDigitsRef}
+                style={[
+                  friendsModal.addInput,
+                  friendsModal.addPlayerNameDigitsInput,
+                  addFriendKbMode === 'digit' && friendsModal.addPlayerNameInputActive,
+                  getPlayerNameLetters(newFriendPlayerName).length === 0 && friendsModal.addPlayerNameInputDisabled,
+                ]}
+                placeholder="1234"
+                placeholderTextColor={Colors.textDisabled}
+                value={getPlayerNameDigits(newFriendPlayerName)}
+                maxLength={PLAYER_NAME_MAX_DIGITS}
+                editable={!addFriendChecking && getPlayerNameLetters(newFriendPlayerName).length > 0}
+                showSoftInputOnFocus={false}
+                selection={{
+                  start: getPlayerNameDigits(newFriendPlayerName).length,
+                  end: getPlayerNameDigits(newFriendPlayerName).length,
+                }}
+                selectTextOnFocus={false}
+                contextMenuHidden={true}
+                onFocus={() => {
+                  if (getPlayerNameLetters(newFriendPlayerName).length === 0) {
+                    addFriendLettersRef.current?.focus();
+                    return;
+                  }
+                  setAddFriendKbMode('digit');
+                  setAddFriendFocused(true);
+                }}
+                onBlur={() => setAddFriendFocused(false)}
               />
               <Pressable
                 onPress={handleAddFriend}
-                disabled={!newFriendPlayerName.trim()}
+                disabled={!newFriendPlayerName.trim() || addFriendChecking}
                 style={({ pressed }) => [
                   friendsModal.addBtn,
-                  !newFriendPlayerName.trim() && friendsModal.addBtnDisabled,
+                  (!newFriendPlayerName.trim() || addFriendChecking) && friendsModal.addBtnDisabled,
                   pressed && { opacity: 0.85 },
                 ]}
               >
-                <Text style={friendsModal.addBtnText}>Add</Text>
+                <Text style={friendsModal.addBtnText}>
+                  {addFriendChecking ? '…' : 'Add'}
+                </Text>
               </Pressable>
             </View>
+            {addFriendError && (
+              <Text style={friendsModal.addErrorText}>{addFriendError}</Text>
+            )}
+            {addFriendFocused && (
+              <CodeKeyboard
+                mode={addFriendKbMode}
+                letterCharset="ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                onPress={handleAddFriendKeyPress}
+                onBackspace={handleAddFriendBackspace}
+                onModeToggle={toggleAddFriendKbMode}
+                // Digit-mode kräver minst 1 letter — toggle dimmas i letter-
+                // mode tills letter-sektionen har innehåll.
+                modeToggleDisabled={addFriendKbMode === 'letter' && newFriendPlayerName.length === 0}
+                // Cancel avbryter bara den pågående namn-inmatningen och
+                // stänger tangentbordet — "Done" längst ner stänger hela
+                // Friends-modalen, ett större steg än man vill ta mitt i en
+                // felskrivning. Mode-toggle flyttar in i grid:en (efter Z).
+                onCancel={handleAddFriendCancel}
+              />
+            )}
 
-            {/* List */}
-            <ScrollView style={{ maxHeight: 320 }}>
+            {/* List — maxHeight krymps medan CodeKeyboard:et är uppe (Add
+                by Player Name fokuserad) så hela sheet:en ryms inom
+                sheet:s 90%-tak på kortare skärmar. */}
+            <ScrollView style={{ maxHeight: addFriendFocused ? 160 : 320 }}>
               {friends.length === 0 ? (
                 <View style={friendsModal.emptyState}>
                   <Text style={friendsModal.emptyIcon}>🫥</Text>
@@ -2487,33 +2687,66 @@ export default function ProfileScreen() {
                   </Text>
                 </View>
               ) : (
-                friends.map((friend, i) => (
-                  <View key={friend.id}>
-                    <View style={friendsModal.friendRow}>
-                      <Text style={friendsModal.friendEmoji}>
-                        {getAvatarEmojiById(friend.avatarId)}
-                      </Text>
-                      <Text style={friendsModal.friendName}>{friend.playerName}</Text>
-                      <Pressable
-                        onPress={() => handleRemoveFriend(friend.id)}
-                        hitSlop={10}
-                        style={friendsModal.removeBtn}
-                      >
-                        <Text style={friendsModal.removeBtnText}>×</Text>
-                      </Pressable>
+                friends.map((friend, i) => {
+                  const checked = selectedFriendIds.has(friend.id);
+                  return (
+                    <View key={friend.id}>
+                      <View style={friendsModal.friendRow}>
+                        <Text style={friendsModal.friendEmoji}>
+                          {getAvatarEmojiById(friend.avatarId)}
+                        </Text>
+                        <Text style={friendsModal.friendName}>{friend.playerName}</Text>
+                        {/* Kryssruta (2026-08-27, ersatte per-rad "×") —
+                            speglar Lobby:s shareSheet.checkbox-mönster så
+                            host bockar för flera friends och tar bort dem
+                            allihop via Delete-knappen längst ner. */}
+                        <Pressable
+                          onPress={() => {
+                            setSelectedFriendIds((prev) => {
+                              const next = new Set(prev);
+                              if (next.has(friend.id)) next.delete(friend.id);
+                              else next.add(friend.id);
+                              return next;
+                            });
+                          }}
+                          hitSlop={8}
+                          style={[friendsModal.checkbox, checked && friendsModal.checkboxChecked]}
+                          accessibilityRole="checkbox"
+                          accessibilityState={{ checked }}
+                          accessibilityLabel={`Select ${friend.playerName}`}
+                        >
+                          {checked && <Text style={friendsModal.checkmark}>✓</Text>}
+                        </Pressable>
+                      </View>
+                      {i < friends.length - 1 && <View style={friendsModal.divider} />}
                     </View>
-                    {i < friends.length - 1 && <View style={friendsModal.divider} />}
-                  </View>
-                ))
+                  );
+                })
               )}
             </ScrollView>
 
-            <Pressable
-              onPress={() => setFriendsModalOpen(false)}
-              style={friendsModal.closeBtn}
-            >
-              <Text style={friendsModal.closeBtnText}>Done</Text>
-            </Pressable>
+            <View style={friendsModal.footerRow}>
+              <Pressable
+                onPress={handleDeleteSelectedFriends}
+                disabled={selectedFriendIds.size === 0}
+                style={[friendsModal.deleteBtn, selectedFriendIds.size === 0 && friendsModal.deleteBtnDisabled]}
+              >
+                <Text
+                  style={[
+                    friendsModal.deleteBtnText,
+                    selectedFriendIds.size === 0 && friendsModal.deleteBtnTextDisabled,
+                  ]}
+                >
+                  {selectedFriendIds.size > 0 ? `Delete (${selectedFriendIds.size})` : 'Delete'}
+                </Text>
+              </Pressable>
+              <Pressable
+                onPress={() => setFriendsModalOpen(false)}
+                style={friendsModal.closeBtn}
+              >
+                <Text style={friendsModal.closeBtnText}>Done</Text>
+              </Pressable>
+            </View>
           </View>
         </KeyboardAvoidingView>
       </Modal>
@@ -4747,6 +4980,10 @@ const friendsModal = StyleSheet.create({
     gap: Spacing.md,
     borderWidth: 1,
     borderColor: Colors.border,
+    // Bounder sheet:en till viewport så toppen aldrig spiller över skärmen
+    // när CodeKeyboard:et (Add by Player Name) tar plats — samma mönster
+    // som Lobby:s Share invite-modal.
+    maxHeight: '90%',
   },
   handle: {
     width: 36,
@@ -4768,7 +5005,21 @@ const friendsModal = StyleSheet.create({
     textAlign: 'center',
     marginBottom: Spacing.sm,
   },
+  // Add-by-Player-Name-label + split-field-rad (2026-08-27) — samma
+  // struktur (bokstäver + siffror via CodeKeyboard) som PlayerName skapas
+  // överallt annars i appen. Speglar Lobby:s shareSheet-motsvarigheter
+  // (LobbyScreen.tsx) exakt.
+  addFieldLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: Colors.textSecondary,
+    letterSpacing: 0.4,
+    textTransform: 'uppercase',
+    paddingHorizontal: Spacing.xs,
+  },
   addRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: Spacing.sm,
   },
   addInput: {
@@ -4781,12 +5032,33 @@ const friendsModal = StyleSheet.create({
     fontSize: 15,
     color: Colors.textPrimary,
   },
+  addPlayerNameLettersInput: {
+    flex: 7,
+    minWidth: 0,
+    paddingHorizontal: Spacing.sm,
+    textAlign: 'center',
+  },
+  addPlayerNameDigitsInput: {
+    flex: 6,
+    minWidth: 0,
+    paddingHorizontal: Spacing.sm,
+    textAlign: 'center',
+  },
+  addPlayerNameSeparator: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: Colors.textSecondary,
+    paddingHorizontal: 2,
+  },
+  addPlayerNameInputActive: { borderColor: Colors.primary },
+  addPlayerNameInputDisabled: { opacity: 0.45 },
   addBtn: {
     height: 44,
     borderRadius: Radius.md,
     backgroundColor: Colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
+    paddingHorizontal: Spacing.md,
   },
   addBtnDisabled: {
     backgroundColor: 'rgba(255,255,255,0.06)',
@@ -4796,6 +5068,13 @@ const friendsModal = StyleSheet.create({
     fontWeight: FontWeight.bold,
     color: '#fff',
     letterSpacing: 0.3,
+  },
+  // Inline felmeddelande under Add-raden — visas när playerNameExists()
+  // inte hittar någon registrerad user med det inskrivna Player Name.
+  addErrorText: {
+    fontSize: FontSize.xs,
+    color: Colors.error,
+    paddingHorizontal: Spacing.xs,
   },
   emptyState: {
     alignItems: 'center',
@@ -4830,24 +5109,60 @@ const friendsModal = StyleSheet.create({
     fontWeight: FontWeight.medium,
     color: Colors.textPrimary,
   },
-  removeBtn: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: Colors.cardElevated,
+  // Kryssruta (2026-08-27, ersatte removeBtn/"×") — speglar Lobby:s
+  // shareSheet.checkbox/checkboxChecked/checkmark-mönster exakt.
+  checkbox: {
+    width: 24,
+    height: 24,
+    borderRadius: 5,
+    borderWidth: 1.5,
+    borderColor: Colors.borderStrong,
+    backgroundColor: 'transparent',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  removeBtnText: {
-    fontSize: 18,
-    color: Colors.textSecondary,
-    lineHeight: 20,
+  checkboxChecked: {
+    backgroundColor: Colors.success,
+    borderColor: Colors.success,
+  },
+  checkmark: {
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: '700',
+    lineHeight: 15,
   },
   divider: {
     height: 1,
     backgroundColor: Colors.separator,
   },
+  // Footer-raden (2026-08-27) — Delete + Done sida vid sida, ersatte den
+  // ensamma "Done"-knappen.
+  footerRow: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+    marginTop: Spacing.sm,
+  },
+  deleteBtn: {
+    flex: 1,
+    height: 48,
+    borderRadius: Radius.md,
+    backgroundColor: Colors.error,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  deleteBtnDisabled: {
+    backgroundColor: 'rgba(255,255,255,0.06)',
+  },
+  deleteBtnText: {
+    fontSize: 15,
+    fontWeight: FontWeight.semibold,
+    color: '#fff',
+  },
+  deleteBtnTextDisabled: {
+    color: Colors.textSecondary,
+  },
   closeBtn: {
+    flex: 1,
     height: 48,
     borderRadius: Radius.md,
     backgroundColor: Colors.cardElevated,
@@ -4855,7 +5170,6 @@ const friendsModal = StyleSheet.create({
     borderColor: Colors.border,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: Spacing.sm,
   },
   closeBtnText: {
     fontSize: 15,
