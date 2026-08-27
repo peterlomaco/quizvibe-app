@@ -2906,6 +2906,43 @@ Säkerhetsgranskning (RLS, Edge Functions, klient-trust, input-validering) → �
 
 **Kvarstående säkerhetsbacklog** (ej åtgärdat): Realtime broadcast-authorization (server-side sender-auth); `game_sessions` SELECT `using(true)` → strama till deltagare; `lobby_players` INSERT `with check(true)` → blockera cross-user-injection; CAPTCHA på join/signup (rumkod-brute-force ~25-bit); per-(avsändare,mottagare) invite-tak + rum-skapande-rate-limit; server-side scoring/credits/premium-authority (idag klient-auktoritativt — svar ligger i bundlen, credits i AsyncStorage, premium togglingsbart).
 
+## EAS Update (OTA) — content-fixar utan App Store (2026-08-27)
+
+`expo-updates` installerat (`~29.0.20`) så innehålls-rättningar (YouTube-klipp som tagits ner, `startSec`/`correctYear`-fixar, paket-taggar — allt som redan går genom `npm run export-music-questions`/`export-image-questions` till ren JS i `src/utils/*Questions.ts`) kan pushas **utan** ny App Store-build. Fram till nu var varje sådan fix låst till nästa native-release eftersom katalogen bakas in i bundlen vid byggtid.
+
+**Config** ([app.json](app.json)): `updates.url` pekar på `https://u.expo.dev/<projectId>`. `runtimeVersion.policy = "fingerprint"`.
+
+**Policy-valet är `fingerprint`, INTE `appVersion` — motiverat val, ändra inte utan att läsa detta.** `appVersion` hade knutit runtimeVersion till det manuella `version`-fältet i `app.json` (`1.0.0`, oförändrat av `autoIncrement` — den bumpar bara iOS build number). Risken: någon lägger till/uppdaterar ett native-paket (RevenueCat, WebView, YouTube-iframe-lib, SVG, Haptics, Speech, AsyncStorage — se listan i `package.json`) utan att komma ihåg att manuellt höja `version`, och en OTA-update med den nya JS:en skickas ut till gamla native-builds som saknar den nya native-koden → krasch. `fingerprint` eliminerar den mänskliga glömska-risken helt: EAS Build hashar det faktiska native-projektet (dependencies med native kod + config plugins) automatiskt vid varje build, så ett native-paket-byte ger AUTOMATISKT en ny runtimeVersion utan att någon behöver komma ihåg något. Verifierat 2026-08-27: `npx expo-updates fingerprint:generate --platform ios` gav lokalt hash `885fa42f7f6e502aa6a67d8e3ee5a9da20db4136`, och en riktig EAS-build (`18c16984-bf54-492a-be90-dcfecc275943`, preview-profil) rapporterade **exakt samma** Runtime Version — bekräftar att policyn round-trippar korrekt.
+
+**Channels** ([eas.json](eas.json)): `build.preview.channel = "preview"`, `build.production.channel = "production"`. `development`-profilen har medvetet ingen channel — dev-client-builds läser JS live från Metro, inte från ett EAS Update-branch. En `eas update`-publicering måste peka på samma channel/branch som builden konsumerar (`--branch preview` eller `--branch production`).
+
+**Publiceringsflödet för en innehållsrättning** (t.ex. ett YouTube-klipp som `youtube-validate`-cronen flaggat som borttaget):
+```bash
+# 1. Redigera YAML-katalogen
+#    backend/content/catalog/*.yaml
+
+# 2. Regenerera klient-JS
+npm run export-music-questions     # eller export-image-questions
+
+# 3. Sanity-testa lokalt (Metro, ingen EAS behövs)
+npm start
+
+# 4. Publicera OTA till den channel byggena lyssnar på
+npx eas update --branch production --message "Fix: ersatt dött YouTube-klipp for <item-id>"
+```
+Ingen `eas build`, ingen App Store-granskning. Träffar installerade appar inom minuter (appen pollar för updates vid start).
+
+**⚠ Vad som KRÄVER ny native build i stället för OTA** — allt som ändrar det native-projektets fingerprint eller Apple-granskade beteende:
+- Nytt/uppdaterat native-paket (`react-native-purchases`, `react-native-webview`, `react-native-youtube-iframe`, `react-native-svg`, `expo-haptics`, `expo-speech`, `@react-native-async-storage/async-storage`, eller något annat paket med native kod).
+- Ändringar i `app.json`s native-relevanta fält (`ios.*`, `android.*`, `plugins`, bundle identifier, permissions/Info.plist-nycklar).
+- Native config-filer, Xcode-projektinställningar, om `ios`/`android`-mapparna någonsin genereras via `expo prebuild` (managed workflow idag — prebuild sker bara i CI).
+- Ändringar av appens FUNKTION/SYFTE i Apples mening (nya betalflöden, nya huvudfunktioner) — Apple tillåter OTA för buggfixar och innehåll, INTE för att kringgå App Store-granskning av ny funktionalitet. Ren katalog-/textinnehåll (frågor, klipp-ID:n, taggar) är alltid säkert; UI-logikändringar som förändrar spelmekanik bör gå via ny build tills vidare (gråzon, inte testad mot Apples policy).
+- Med `fingerprint`-policyn behöver du INTE manuellt hålla reda på detta — ett native-paketbyte genererar automatiskt en ny runtimeVersion vid nästa `eas build`, och den builden slutar automatiskt ta emot OTA-updates avsedda för den gamla fingerprinten. Risken som återstår är att glömma köra en ny build alls (appen fastnar på gammal native-kod) — inte att en felaktig OTA skickas till fel build.
+
+**⚠ TestFlight-builds har historiskt haft JS inbäddad från byggtid** (se `CLAUDE.md`s äldre noter om Spotify/RevenueCat-Expo Go-flöden) — med `expo-updates` installerat och `updates.url` konfigurerat ändras det: en TestFlight/App Store-build hämtar numera OTA-updates från sin channel vid appstart (och periodiskt), precis som en produktions-app. **Verifiera detta explicit efter nästa TestFlight-upload**: installera builden, publicera en trivial OTA-update (t.ex. en kommentar-ändring som triggar en export), döda och starta om appen, och bekräfta i `eas update:view` att builden faktiskt hämtat den nya updaten (`runtimeVersion`-match + update-ID i klientens loggar). Är det inte verifierat är hela uppsättningen overifierad i praktiken.
+
+**Första native-bygget måste ändå gå via App Store.** OTA fungerar bara för builds som redan har `expo-updates` inbyggt och pekar på rätt channel — det finns inget att uppdatera förrän en build med den här konfigurationen finns i TestFlight/App Store. Planera in den här releasen som en vanlig native-build, INTE som något som kan skippas.
+
 ## Scripts
 
 `npm start` (Expo dev), `npm run ios` / `android` / `web`, `npm run lint` (`expo lint`). No tests, no CI.
