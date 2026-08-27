@@ -5230,33 +5230,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "carl-lewis-los-angeles-1984",
-    "displayName": "Carl Lewis tar 4 OS-guld Los Angeles",
-    "correctYear": 1984,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "global"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "xNafT5HK_Ro",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "How To Run Faster - By Performance Lab",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
-      }
-    ]
-  },
-  {
     "id": "foreigner-i-want-to-know-what-love-is",
     "displayName": "I Want to Know What Love Is — Foreigner",
     "correctYear": 1984,
@@ -7986,6 +7959,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "red-hot-chili-peppers-under-the-bridge",
+    "displayName": "Under the Bridge — Red Hot Chili Peppers",
+    "correctYear": 1991,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Punk & Rock",
+      "Mega Hits"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "GLvohMXgcBo",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Red Hot Chili Peppers",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+      }
+    ]
+  },
+  {
     "id": "rem-losing-my-religion",
     "displayName": "Losing My Religion — R.E.M.",
     "correctYear": 1991,
@@ -8690,6 +8694,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "whitney-houston-i-have-nothing",
+    "displayName": "I Have Nothing — Whitney Houston",
+    "correctYear": 1992,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Soft & Ballads",
+      "Film"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "FxYw0XPEoKE",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "whitneyhoustonVEVO",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+      }
+    ]
+  },
+  {
     "id": "whitney-houston-i-will-always-love-you",
     "displayName": "I Will Always Love You — Whitney Houston",
     "correctYear": 1992,
@@ -8713,6 +8748,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Whitney Houston - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
+    "id": "2-unlimited-no-limit",
+    "displayName": "No Limit — 2 Unlimited",
+    "correctYear": 1993,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Hits"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "7kmEEkECFQw",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "2 Unlimited Official",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
       }
     ]
   },
@@ -8771,6 +8836,67 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "Melodifestivalen 1993 vinnare. ESC 1993 performance."
+      }
+    ]
+  },
+  {
+    "id": "bryan-adams-please-forgive-me",
+    "displayName": "Please Forgive Me — Bryan Adams",
+    "correctYear": 1993,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Love & Peace",
+      "Soft & Ballads"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "Qy4zFJmE-1E",
+        "startSec": 30,
+        "endSec": 60,
+        "channelTitle": "Bryan Adams - Topic",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx). Peters lank (Bryan Adams egen kanal) gick inte att badda in; officiell Topic-audio anvand."
+      }
+    ]
+  },
+  {
+    "id": "celine-dion-the-power-of-love",
+    "displayName": "The Power of Love — Céline Dion",
+    "correctYear": 1993,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Soft & Ballads"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "Y8HOfcYWZoo",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "CelineDionVEVO",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
       }
     ]
   },
@@ -8871,6 +8997,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "DECADR",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\" med explicit startSec 3. Videotitel verifierad: 'Haddaway - What Is Love (Official 4K Video)' — inget ar i titeln."
+      }
+    ]
+  },
+  {
+    "id": "janet-jackson-thats-the-way-love-goes",
+    "displayName": "That’s the Way Love Goes — Janet Jackson",
+    "correctYear": 1993,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Love & Peace"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "2b_KfAGiglc",
+        "startSec": 120,
+        "endSec": 150,
+        "channelTitle": "JanetJacksonVEVO",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
       }
     ]
   },
@@ -9054,6 +9210,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "spotifyTrackId": "1QJcdzMUidsBaMTHoZZRGn",
     "youtubeClips": []
+  },
+  {
+    "id": "corona-the-rhythm-of-the-night",
+    "displayName": "The Rhythm of the Night — Corona",
+    "correctYear": 1994,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Eurodance & pop"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "OnT58cIJSpw",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "RHINO",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+      }
+    ]
   },
   {
     "id": "cranberries-zombie",
@@ -9329,6 +9515,66 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "green-day-basket-case",
+    "displayName": "Basket Case — Green Day",
+    "correctYear": 1994,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Punk & Rock"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "NUTGr5t3MoY",
+        "startSec": 16,
+        "endSec": 46,
+        "channelTitle": "Green Day",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+      }
+    ]
+  },
+  {
+    "id": "la-bouche-be-my-lover",
+    "displayName": "Be My Lover — La Bouche",
+    "correctYear": 1994,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Eurodance & pop"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "ViP87WipSm0",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "LaBoucheVEVO",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+      }
+    ]
+  },
+  {
     "id": "paul-harrington-rock-n-roll-kids",
     "displayName": "Rock 'n' Roll Kids — Paul Harrington & Charlie McGettigan",
     "correctYear": 1994,
@@ -9474,6 +9720,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "seal-kiss-from-a-rose",
+    "displayName": "Kiss from a Rose — Seal",
+    "correctYear": 1994,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Love & Peace",
+      "Film"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "hDd2G_V1rzc",
+        "startSec": 6,
+        "endSec": 36,
+        "channelTitle": "Seal",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+      }
+    ]
+  },
+  {
     "id": "sven-ingvars-sommar-i-sverige",
     "displayName": "Sommar i Sverige — Sven-Ingvars",
     "correctYear": 1994,
@@ -9535,6 +9812,66 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Aarush Boi",
         "license": "standard",
         "notes": "Circle of Life-öppningsscenen (HD, 1994). Alla officiella Disney-trailers är made-for-kids-blockerade. Ersätt vid inbäddningsfel."
+      }
+    ]
+  },
+  {
+    "id": "tlc-waterfalls",
+    "displayName": "Waterfalls — TLC",
+    "correctYear": 1994,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Soft & Ballads"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "8WEtxJ4-sh4",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "TLCVEVO",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+      }
+    ]
+  },
+  {
+    "id": "alanis-morissette-ironic",
+    "displayName": "Ironic — Alanis Morissette",
+    "correctYear": 1995,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Hits"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "Jne9t8sHpUc",
+        "startSec": 15,
+        "endSec": 45,
+        "channelTitle": "Alanis Morissette",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx). correctYear 1995 = albumet Jagged Little Pill; singeln kom feb 1996."
       }
     ]
   },
@@ -9608,6 +9945,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Coolio - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
+    "id": "michael-jackson-you-are-not-alone",
+    "displayName": "You Are Not Alone — Michael Jackson",
+    "correctYear": 1995,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Love & Peace",
+      "Soft & Ballads"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "pAyKJAtDNCw",
+        "startSec": 10,
+        "endSec": 40,
+        "channelTitle": "michaeljacksonVEVO",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
       }
     ]
   },
@@ -9726,6 +10094,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "robert-miles-children",
+    "displayName": "Children — Robert Miles",
+    "correctYear": 1995,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Mega Hits"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "rxjOH8ykvh4",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Robert Miles",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx). correctYear 1995 = EP:n Soundtracks (jan 1995, Italien); slog igenom internationellt 1996. Peters lank pekade pa en 90-tals-topplista, ratt klipp uppsokt."
+      }
+    ]
+  },
+  {
     "id": "robyn-show-me-love",
     "displayName": "Show Me Love — Robyn",
     "correctYear": 1995,
@@ -9809,6 +10207,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Fight Greats",
         "license": "standard",
         "notes": "Bytt 2026-08-26 (spoiler-pass): gamla titeln hade '1996' vid tecken 45. Ren titel."
+      }
+    ]
+  },
+  {
+    "id": "blackstreet-no-diggity",
+    "displayName": "No Diggity — Blackstreet feat. Dr. Dre",
+    "correctYear": 1996,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "hiphop"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "3KL9mRus19o",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "BlackstreetVEVO",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx). correctYear 1996 = albumet Another Level (MusicBrainz gav 1997)."
       }
     ]
   },
@@ -9925,6 +10353,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "TheFugeesVEVO",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". Egen inspelning - separat item fran roberta-flack-killing-me-softly (1973) per ar-policyn: itemet ar artistens inspelning, inte kompositionen."
+      }
+    ]
+  },
+  {
+    "id": "fugees-ready-or-not",
+    "displayName": "Ready or Not — Fugees",
+    "correctYear": 1996,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Hits",
+      "Soft & Ballads"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "aIXyKmElvv8",
+        "startSec": 36,
+        "endSec": 66,
+        "channelTitle": "TheFugeesVEVO",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
       }
     ]
   },
@@ -10416,6 +10875,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "hanson-mmmbop",
+    "displayName": "MMMBop — Hanson",
+    "correctYear": 1997,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Hits"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "NHozn0YXAeE",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "HansonVEVO",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx). correctYear 1997 = Mercury-singeln/Middle of Nowhere. RATTA INTE till 1996: bandet sjalvslappte en ANNAN inspelning pa indie-albumet MMMBop 1996 - itemet ar 1997-inspelningen."
+      }
+    ]
+  },
+  {
     "id": "k-ci-and-jojo-all-my-life",
     "displayName": "All My Life — K-Ci & JoJo",
     "correctYear": 1997,
@@ -10817,6 +11306,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "goo-goo-dolls-iris",
+    "displayName": "Iris — Goo Goo Dolls",
+    "correctYear": 1998,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Hits"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "NdYWuo9OFAw",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Goo Goo Dolls",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+      }
+    ]
+  },
+  {
     "id": "jill-johnson-karleken-ar",
     "displayName": "Kärleken är — Jill Johnson",
     "correctYear": 1998,
@@ -10985,6 +11504,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "offspring-pretty-fly",
+    "displayName": "Pretty Fly (For a White Guy) — The Offspring",
+    "correctYear": 1998,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Punk & Rock"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "QtTR-_Klcq8",
+        "startSec": 3,
+        "endSec": 33,
+        "channelTitle": "OffspringVEVO",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+      }
+    ]
+  },
+  {
     "id": "petter-vinden-har-vant",
     "displayName": "Vinden har vänt — Petter",
     "correctYear": 1998,
@@ -11145,6 +11694,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "BackstreetBoysVEVO",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+      }
+    ]
+  },
+  {
+    "id": "blink-182-all-the-small-things",
+    "displayName": "All the Small Things — blink-182",
+    "correctYear": 1999,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Hits"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "9Ht5RZpzPqw",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "blink182VEVO",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
       }
     ]
   },
@@ -11633,6 +12212,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Paramount Movies",
         "license": "standard",
         "notes": "Curerad 2026-05-29 — officiell Paramount-klipp 'My name is Maximus' (2000-filmen, ej Gladiator II)."
+      }
+    ]
+  },
+  {
+    "id": "jennifer-lopez-love-dont-cost-a-thing",
+    "displayName": "Love Don’t Cost a Thing — Jennifer Lopez",
+    "correctYear": 2000,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Love & Peace",
+      "Soft & Ballads"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "4kGvlESGvbs",
+        "startSec": 35,
+        "endSec": 65,
+        "channelTitle": "JenniferLopezVEVO",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
       }
     ]
   },
@@ -14820,8 +15430,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "RVnsoTsG1Rg",
-        "startSec": 0,
-        "endSec": 30,
+        "startSec": 30,
+        "endSec": 60,
         "channelTitle": "MrWeiird",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
@@ -15545,8 +16155,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "LyKYV_7vs6k",
-        "startSec": 10,
-        "endSec": 55,
+        "startSec": 37,
+        "endSec": 67,
         "channelTitle": "PremiunMusicHD",
         "license": "standard"
       }
@@ -15938,8 +16548,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "vtjdTPnCcu0",
-        "startSec": 5,
-        "endSec": 20,
+        "startSec": 8,
+        "endSec": 38,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "Melodifestivalen 2013 vinnare. ESC 2013 performance."

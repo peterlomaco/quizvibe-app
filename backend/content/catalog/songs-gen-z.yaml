@@ -715,8 +715,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "LyKYV_7vs6k"
-        startSec: 10
-        endSec: 55
+        startSec: 37
+        endSec: 67
         channelTitle: "PremiunMusicHD"
     spotifyTrackId: "1z9kQ14XBSN0r2v6fx4IdG"
   - id: first-aid-kit-emmylou
@@ -1414,8 +1414,8 @@ items:
     genrePackages: ["Club & Dance Hits"]
     youtubeClips:
       - videoId: "RVnsoTsG1Rg"
-        startSec: 0
-        endSec: 30
+        startSec: 30
+        endSec: 60
         channelTitle: "MrWeiird"
         notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
   - id: david-guetta-gettin-over-you
@@ -2224,3 +2224,158 @@ items:
         channelTitle: "Brandy Videos"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
     genrePackages: ["Soft Hits"]
+  - id: blink-182-all-the-small-things
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "All the Small Things — blink-182"
+    correctYear: 1999
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["blink-182 All the Small Things"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "9Ht5RZpzPqw"
+        startSec: 0
+        endSec: 30
+        channelTitle: "blink182VEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Hits"]
+  - id: offspring-pretty-fly
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Pretty Fly (For a White Guy) — The Offspring"
+    correctYear: 1998
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["The Offspring Pretty Fly (For a White Guy)"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "QtTR-_Klcq8"
+        startSec: 3
+        endSec: 33
+        channelTitle: "OffspringVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Punk & Rock"]
+  - id: jennifer-lopez-love-dont-cost-a-thing
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Love Don’t Cost a Thing — Jennifer Lopez"
+    correctYear: 2000
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Jennifer Lopez Love Don't Cost a Thing"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "4kGvlESGvbs"
+        startSec: 35
+        endSec: 65
+        channelTitle: "JenniferLopezVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Love & Peace", "Soft & Ballads"]
+  - id: jennifer-lopez-if-you-had-my-love
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "If You Had My Love — Jennifer Lopez"
+    correctYear: 1999
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Jennifer Lopez If You Had My Love"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "lYfkl-HXfuU"
+        startSec: 30
+        endSec: 60
+        channelTitle: "JenniferLopezVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Love & Peace", "Soft & Ballads"]
+    inBaseCatalog: false
+  - id: goo-goo-dolls-iris
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Iris — Goo Goo Dolls"
+    correctYear: 1998
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Goo Goo Dolls Iris"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "NdYWuo9OFAw"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Goo Goo Dolls"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Hits"]
+  - id: savage-garden-truly-madly-deeply
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Truly Madly Deeply — Savage Garden"
+    correctYear: 1997
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Savage Garden Truly Madly Deeply"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "WQnAxOQxQIU"
+        startSec: 4
+        endSec: 34
+        channelTitle: "SavageGardenVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Soft & Ballads"]
+    inBaseCatalog: false
+  - id: eagle-eye-cherry-save-tonight
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Save Tonight — Eagle-Eye Cherry"
+    correctYear: 1997
+    probability: 80
+    region: ["nordic"]
+    wikimediaSearchHints: ["Eagle-Eye Cherry Save Tonight"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "Nntd2fgMUYw"
+        startSec: 3
+        endSec: 33
+        channelTitle: "EagleEyeCherryVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx). xlsx hade artist och lat i omvand ordning."
+    genrePackages: ["Soft & Ballads"]
+    inBaseCatalog: false
+  - id: shania-twain-youre-still-the-one
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "You’re Still the One — Shania Twain"
+    correctYear: 1997
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Shania Twain You're Still the One"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "KNZH-emehxA"
+        startSec: 5
+        endSec: 35
+        channelTitle: "ShaniaTwainVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx). correctYear 1997 = albumet Come On Over (nov 1997); singeln kom 1998."
+    genrePackages: ["Soft & Ballads", "Love & Peace"]
+    inBaseCatalog: false
+  - id: smash-mouth-all-star
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "All Star — Smash Mouth"
+    correctYear: 1999
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Smash Mouth All Star"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "L_jWHffIx5E"
+        startSec: 37
+        endSec: 67
+        channelTitle: "SmashMouthVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx). correctYear 1999 = albumet Astro Lounge (MusicBrainz gav felaktigt 1997)."
+    genrePackages: ["Punk & Rock"]
+    inBaseCatalog: false
+  - id: hanson-mmmbop
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "MMMBop — Hanson"
+    correctYear: 1997
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Hanson MMMBop"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "NHozn0YXAeE"
+        startSec: 0
+        endSec: 30
+        channelTitle: "HansonVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx). correctYear 1997 = Mercury-singeln/Middle of Nowhere. RATTA INTE till 1996: bandet sjalvslappte en ANNAN inspelning pa indie-albumet MMMBop 1996 - itemet ar 1997-inspelningen."
+    genrePackages: ["Hits"]
