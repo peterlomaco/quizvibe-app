@@ -86,14 +86,14 @@ items:
     probability: 82
     wikimediaSearchHints: ["Så som i himmelen 2004 film"]
     answerMethods: ["actor-select"]
-    correctNames: ["Michael Nyqvist"]
+    correctNames: ["Mikael Nyqvist"]
     distractorNames: ["Rolf Lassgård", "Björn Skifs", "Mikael Persbrandt", "Peter Haber"]
     youtubeClips:
       - videoId: "FT5A0rYUSVE"
         startSec: 10
         endSec: 45
         channelTitle: "NuovoCinemaGiornico"
-        notes: "Originaltrailer. Oscar-nominerad svensk film. Michael Nyqvist."
+        notes: "Originaltrailer. Oscar-nominerad svensk film. Mikael Nyqvist."
 
   - id: hundraringen-klev-ut
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -103,7 +103,7 @@ items:
     wikimediaSearchHints: ["Hundraåringen som klev ut 2013"]
     answerMethods: ["actor-select"]
     correctNames: ["Robert Gustafsson"]
-    distractorNames: ["Rolf Lassgård", "Michael Nyqvist", "Peter Haber", "Mikael Persbrandt"]
+    distractorNames: ["Rolf Lassgård", "Mikael Nyqvist", "Peter Haber", "Mikael Persbrandt"]
     youtubeClips:
       - videoId: "pjiJ1cL3Uss"
         startSec: 10
@@ -119,7 +119,7 @@ items:
     wikimediaSearchHints: ["En man som heter Ove 2015 film"]
     answerMethods: ["actor-select"]
     correctNames: ["Rolf Lassgård"]
-    distractorNames: ["Robert Gustafsson", "Michael Nyqvist", "Mikael Persbrandt", "Peter Haber"]
+    distractorNames: ["Robert Gustafsson", "Mikael Nyqvist", "Mikael Persbrandt", "Peter Haber"]
     youtubeClips:
       - videoId: "q84plEEyGZY"
         startSec: 12
