@@ -594,3 +594,24 @@ export async function playerNameExists(playerName: string): Promise<boolean> {
   }
   return data === true;
 }
+
+/**
+ * Kollar om en email redan är registrerad — driver email-uniqueness-checken
+ * i Register-formens Check-knapp. Returnerar bara en boolean; ingen profil-
+ * data läcker. Case-insensitiv (RPC lower():ar auth.users.email).
+ *
+ * ⚠ Detta är en email-enumereringsvektor (se migration 0040 för rationale +
+ * Peters beslut). Fail-open (false = "ledigt") vid nätverksfel så lokal
+ * format-validering + Register-submitens signUp avgör — matchar
+ * playerNameExists-beteendet.
+ */
+export async function emailExists(email: string): Promise<boolean> {
+  const { data, error } = await supabase.rpc('email_exists', {
+    p_email: email,
+  });
+  if (error) {
+    console.warn('[profileStorage] email_exists failed:', error.message);
+    return false;
+  }
+  return data === true;
+}

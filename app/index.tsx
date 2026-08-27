@@ -33,7 +33,7 @@ import {
 } from '@/src/utils/playerName';
 import { ensureAuthSession, signInWithPlayerName } from '@/src/utils/auth';
 import { containsProfanity } from '@/src/utils/profanity';
-import { clearProfile, getCachedProfile, loadProfile, playerNameExists, saveProfile, type ProfileData } from '@/src/utils/profileStorage';
+import { clearProfile, emailExists, getCachedProfile, loadProfile, playerNameExists, saveProfile, type ProfileData } from '@/src/utils/profileStorage';
 import { clearPremiumSubscription, hasPremiumSubscription } from '@/src/utils/subscriptionStorage';
 import { supabase } from '@/src/utils/supabase';
 import { formatRoomCode, generateRoomCode, isBlockedLetterPair, isLetterCellIndex, ROOM_CODE_DIGITS, ROOM_CODE_LEADING_LETTERS, ROOM_CODE_LENGTH, ROOM_CODE_TRAILING_LETTERS } from '@/src/utils/roomCode';
@@ -1703,6 +1703,9 @@ export default function HomeScreen() {
 
   // ── Register-form state (sekventiell upplåsning som guest-flödet) ──
   const [regEmail, setRegEmail] = useState('');
+  // Email valideras vid email-steget: format + "finns redan?" (Check-knapp).
+  // Delar status-type med PlayerName (idle/checking/available/taken/invalid).
+  const [regEmailStatus, setRegEmailStatus] = useState<PlayerNameStatus>('idle');
   const [regPlayerName, setRegPlayerName] = useState('');
   const [regPlayerNameStatus, setRegPlayerNameStatus] = useState<PlayerNameStatus>('idle');
   const [regPassword, setRegPassword] = useState('');
@@ -1806,6 +1809,7 @@ export default function HomeScreen() {
         setForgotNewPassword('');
         setForgotSending(false);
         setRegEmail('');
+        setRegEmailStatus('idle');
         setRegPlayerName('');
         setRegPlayerNameStatus('idle');
         setRegPassword('');
@@ -1882,6 +1886,7 @@ export default function HomeScreen() {
       setForgotNewPassword('');
       setForgotSending(false);
       setRegEmail('');
+      setRegEmailStatus('idle');
       setRegPlayerName('');
       setRegPlayerNameStatus('idle');
       setRegPassword('');
@@ -1906,6 +1911,7 @@ export default function HomeScreen() {
   useEffect(() => {
     if (profileMenuStep === 'register') {
       setRegEmail('');
+      setRegEmailStatus('idle');
       setRegPlayerName('');
       setRegPlayerNameStatus('idle');
       setRegPassword('');
@@ -2341,18 +2347,47 @@ export default function HomeScreen() {
   const REG_PASSWORD_MIN_LENGTH = 6;
   const REG_PASSWORD_MAX_LENGTH = 32;
   const regPasswordValid = regPassword.length >= REG_PASSWORD_MIN_LENGTH;
-  // Sekventiella gates: email → playerName → password → year → assistance → region
-  const regPlayerNameUnlocked = regEmailValid;
+  // Sekventiella gates: email → playerName → password → year → assistance → region.
+  // Email måste nu Check:as (format + uniqueness) — inte bara ha giltigt format —
+  // innan PlayerName låses upp.
+  const regPlayerNameUnlocked = regEmailStatus === 'available';
   const regPasswordUnlocked = regPlayerNameUnlocked && regPlayerNameStatus === 'available';
   const regYearUnlocked = regPasswordUnlocked && regPasswordConfirmed;
   const regAssistanceUnlocked = regYearUnlocked && regParsedBirthYear !== null;
   // Assistance och Region är default-ifyllda, så region-låset följer assistance-låset.
   const regRegionUnlocked = regAssistanceUnlocked;
   const isRegisterFormValid =
-    regEmailValid &&
+    regEmailStatus === 'available' &&
     regPlayerNameStatus === 'available' &&
     regPasswordConfirmed &&
     regParsedBirthYear !== null;
+
+  // Email: ändra text → status faller till 'idle' så användaren måste Check:a
+  // igen efter varje redigering (samma mönster som PlayerName).
+  const handleRegEmailChange = (t: string) => {
+    setRegEmail(t);
+    if (regEmailStatus !== 'idle') setRegEmailStatus('idle');
+  };
+
+  // Check-knapp på email: (1) format via REG_EMAIL_REGEX, (2) uniqueness via
+  // email_exists-RPC. Fail-open till 'available' vid nätverksfel — Register-
+  // submitens signUp är sista auktoriteten (samma som playerName-checken).
+  const handleRegCheckEmail = async () => {
+    const trimmed = regEmail.trim();
+    if (!trimmed) return;
+    Keyboard.dismiss();
+    if (!REG_EMAIL_REGEX.test(trimmed)) {
+      setRegEmailStatus('invalid');
+      return;
+    }
+    setRegEmailStatus('checking');
+    try {
+      const exists = await emailExists(trimmed);
+      setRegEmailStatus(exists ? 'taken' : 'available');
+    } catch {
+      setRegEmailStatus('available');
+    }
+  };
 
   const handleRegCheckPlayerName = async () => {
     const trimmed = regPlayerName.trim();
@@ -3514,28 +3549,75 @@ export default function HomeScreen() {
                   style={{ flexShrink: 1, maxHeight: SCREEN_HEIGHT < 600 ? 200 : 320 }}
                   contentContainerStyle={{ gap: Spacing.md }}
                 >
-                  {/* Email — först ut. Aktiveringslänk skickas hit efter Register. */}
+                  {/* Email — först ut. Måste Check:as (format + "finns redan?")
+                      innan PlayerName låses upp. Aktiveringslänk skickas hit
+                      efter Register. */}
                   <View style={modal.fieldGroup}>
                     <Text style={modal.fieldLabel}>Email</Text>
-                    <TextInput
-                      style={[
-                        modal.inputText,
-                        // Highlight medan email är aktivt steg (ej giltigt än)
-                        !regEmailValid && modal.playerNameInputActive,
-                      ]}
-                      placeholder="you@example.com"
-                      placeholderTextColor={Colors.textDisabled}
-                      value={regEmail}
-                      onChangeText={setRegEmail}
-                      keyboardType="email-address"
-                      autoCapitalize="none"
-                      autoCorrect={false}
-                      maxLength={60}
-                      returnKeyType="next"
-                    />
-                    <Text style={modal.statusHint}>
-                      We&apos;ll send an activation link here to verify your address.
-                    </Text>
+                    <View style={modal.playerNameRow}>
+                      <TextInput
+                        style={[
+                          modal.inputText,
+                          modal.playerNameInput,
+                          // Highlight medan email är aktivt steg (ej Check:ad än)
+                          regEmailStatus !== 'available' && modal.playerNameInputActive,
+                        ]}
+                        placeholder="you@example.com"
+                        placeholderTextColor={Colors.textDisabled}
+                        value={regEmail}
+                        onChangeText={handleRegEmailChange}
+                        keyboardType="email-address"
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                        maxLength={60}
+                        editable={regEmailStatus !== 'checking'}
+                        returnKeyType="next"
+                        onSubmitEditing={handleRegCheckEmail}
+                      />
+                      <TouchableOpacity
+                        onPress={handleRegCheckEmail}
+                        disabled={!regEmailValid || regEmailStatus === 'checking' || regEmailStatus === 'available'}
+                        style={[
+                          modal.checkBtn,
+                          (!regEmailValid || regEmailStatus === 'checking') && modal.checkBtnDisabled,
+                          regEmailStatus === 'available' && modal.checkBtnDone,
+                        ]}
+                      >
+                        <Text
+                          style={[
+                            modal.checkBtnText,
+                            regEmailStatus === 'available' && modal.checkBtnTextDone,
+                          ]}
+                        >
+                          {regEmailStatus === 'checking' ? '…'
+                            : regEmailStatus === 'available' ? '✓'
+                            : 'Check'}
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                    {regEmailStatus === 'idle' && (
+                      <Text style={modal.statusHint}>
+                        We&apos;ll send an activation link here to verify your address.
+                      </Text>
+                    )}
+                    {regEmailStatus === 'checking' && (
+                      <Text style={modal.statusHint}>Checking email…</Text>
+                    )}
+                    {regEmailStatus === 'available' && (
+                      <Text style={[modal.statusHint, modal.statusHintOk]}>
+                        ✓ Email is available
+                      </Text>
+                    )}
+                    {regEmailStatus === 'taken' && (
+                      <Text style={[modal.statusHint, modal.statusHintError]}>
+                        ✗ Email already registered — log in instead or use another
+                      </Text>
+                    )}
+                    {regEmailStatus === 'invalid' && (
+                      <Text style={[modal.statusHint, modal.statusHintError]}>
+                        ✗ Invalid email format
+                      </Text>
+                    )}
                   </View>
 
                   {/* PlayerName (låst tills email är giltig). onLayout
