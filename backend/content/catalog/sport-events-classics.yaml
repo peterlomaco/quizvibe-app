@@ -203,20 +203,6 @@ items:
         endSec: 45
         channelTitle: "GundeWassberg"
         notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
-  - id: carl-lewis-los-angeles-1984
-    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
-    displayName: "Carl Lewis tar 4 OS-guld Los Angeles"
-    correctYear: 1984
-    probability: 82
-    region: ["global"]
-    wikimediaSearchHints: ["Carl Lewis 1984 Los Angeles Olympics four gold medals"]
-    answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "xNafT5HK_Ro"
-        startSec: 30
-        endSec: 45
-        channelTitle: "How To Run Faster - By Performance Lab"
-        notes: "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
   - id: tre-kronor-vm-1987-vien
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Tre Kronor VM-guld Wien"
