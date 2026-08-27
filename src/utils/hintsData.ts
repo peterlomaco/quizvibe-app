@@ -3240,6 +3240,1138 @@ const HINTS_LIBRARY_MANUAL: Record<string, HintLibrary> = {
     ],
   },
 
+  // === Batch 2026-08-27 — kompletterar film-gapet (correctNames i movies-
+  // katalogen saknade en egen Hints-person-entry; alla under 10 auto-
+  // genererade hints, manuellt kompletterade till spelbara). ===
+
+  'clint-eastwood': {
+    categoryLabel: 'Actor',
+    nationality: 'usa',
+    hints: [
+      h('prof',  'profession',     'Profession',    'Actor & director',                          1),
+      h('bd',    'birth_date',     'Date of birth', 'May 31, 1930',                               2),
+      h('bp',    'birth_place',    'Place of birth','San Francisco, California',                  2),
+      h('pk',    'peak_year',      'Career peak',   '1964 – 2004',                                2),
+      h('mv1',   'movie',          'Film',          '"A Fistful of Dollars" (1964)',              3),
+      h('mv2',   'movie',          'Film',          '"Dirty Harry" (1971)',                       3),
+      h('mv3',   'movie',          'Film',          '"Unforgiven" (1992)',                        3),
+      h('mv4',   'movie',          'Film',          '"Million Dollar Baby" (2004)',               3),
+      h('fact1', 'characteristic', 'Fact',          'Also a two-time Best Director Oscar winner', 4),
+      h('fact2', 'characteristic', 'Fact',          'Served as Mayor of Carmel-by-the-Sea',       4),
+      h('mv5',   'movie',          'Film',          '"Gran Torino" (2008)',                       5),
+    ],
+  },
+
+  'gene-kelly': {
+    categoryLabel: 'Actor',
+    nationality: 'usa',
+    hints: [
+      h('prof',  'profession',     'Profession',    'Actor, dancer & choreographer',            1),
+      h('bd',    'birth_date',     'Date of birth', 'August 23, 1912',                           2),
+      h('bp',    'birth_place',    'Place of birth','Pittsburgh, Pennsylvania',                  2),
+      h('pk',    'peak_year',      'Career peak',   '1943 – 1957',                               2),
+      h('mv1',   'movie',          'Film',          '"Brigadoon" (1954)',                        3),
+      h('mv2',   'movie',          'Film',          '"On the Town" (1949)',                      3),
+      h('fact1', 'characteristic', 'Signature',     'Famous lamp-post dance in the rain',        3),
+      h('mv3',   'movie',          'Film',          '"Anchors Aweigh" (1945)',                   4),
+      h('merit', 'merit',          'Achievement',   'National Medal of Arts',                    4),
+      h('mv4',   'movie',          'Film',          '"Singin\' in the Rain" (1952)',             5),
+    ],
+  },
+
+  'judy-garland': {
+    categoryLabel: 'Actor',
+    nationality: 'usa',
+    hints: [
+      h('prof',  'profession',     'Profession',    'Actor & singer',                     1),
+      h('bd',    'birth_date',     'Date of birth', 'June 10, 1922',                      2),
+      h('bp',    'birth_place',    'Place of birth','Grand Rapids, Minnesota',            2),
+      h('pk',    'peak_year',      'Career peak',   '1939 – 1954',                        2),
+      h('mv1',   'movie',          'Film',          '"A Star Is Born" (1954)',            3),
+      h('mv2',   'movie',          'Film',          '"Meet Me in St. Louis" (1944)',      3),
+      h('s1',    'song',           'Signature song','"Over the Rainbow"',                3),
+      h('merit', 'merit',          'Achievement',   'Academy Juvenile Award',             4),
+      h('fact1', 'characteristic', 'Fact',          'Started performing as a child in vaudeville', 4),
+      h('mv3',   'movie',          'Film',          '"The Wizard of Oz" (1939)',          5),
+    ],
+  },
+
+  'orson-welles': {
+    categoryLabel: 'Actor',
+    nationality: 'usa',
+    hints: [
+      h('prof',  'profession',     'Profession',    'Actor, director & writer',                 1),
+      h('bd',    'birth_date',     'Date of birth', 'May 6, 1915',                              2),
+      h('bp',    'birth_place',    'Place of birth','Kenosha, Wisconsin',                       2),
+      h('pk',    'peak_year',      'Career peak',   '1941 – 1958',                              2),
+      h('mv1',   'movie',          'Film',          '"The Third Man" (1949)',                   3),
+      h('mv2',   'movie',          'Film',          '"Touch of Evil" (1958)',                   3),
+      h('fact1', 'characteristic', 'Fact',          'Radio drama "The War of the Worlds" (1938) caused nationwide panic', 3),
+      h('merit', 'merit',          'Achievement',   'Academy Honorary Award',                   4),
+      h('fact2', 'characteristic', 'Fact',          'Wrote, directed and starred in his debut film', 4),
+      h('mv3',   'movie',          'Film',          '"Citizen Kane" (1941)',                    5),
+    ],
+  },
+
+  'debbie-reynolds': {
+    categoryLabel: 'Actor',
+    nationality: 'usa',
+    hints: [
+      h('prof',  'profession',     'Profession',    'Actor & singer',                          1),
+      h('bd',    'birth_date',     'Date of birth', 'April 1, 1932',                           2),
+      h('bp',    'birth_place',    'Place of birth','El Paso, Texas',                          2),
+      h('pk',    'peak_year',      'Career peak',   '1950 – 1964',                             2),
+      h('mv1',   'movie',          'Film',          '"The Unsinkable Molly Brown" (1964)',     3),
+      h('mv2',   'movie',          'Film',          '"How the West Was Won" (1962)',           3),
+      h('fact1', 'characteristic', 'Fact',          'Was only 19 when she filmed her most famous role', 3),
+      h('merit', 'merit',          'Achievement',   'Screen Actors Guild Life Achievement Award', 4),
+      h('fact2', 'characteristic', 'Family',        'Mother of actress and writer Carrie Fisher', 4),
+      h('mv3',   'movie',          'Film',          '"Singin\' in the Rain" (1952)',           5),
+    ],
+  },
+
+  'harrison-ford': {
+    categoryLabel: 'Actor',
+    nationality: 'usa',
+    hints: [
+      h('prof',  'profession',     'Profession',    'Actor',                                    1),
+      h('bd',    'birth_date',     'Date of birth', 'July 13, 1942',                            2),
+      h('bp',    'birth_place',    'Place of birth','Chicago, Illinois',                        2),
+      h('pk',    'peak_year',      'Career peak',   '1977 – 2008',                              2),
+      h('mv1',   'movie',          'Film',          '"Raiders of the Lost Ark" (1981)',         3),
+      h('mv2',   'movie',          'Film',          '"Blade Runner" (1982)',                    3),
+      h('mv3',   'movie',          'Film',          '"The Fugitive" (1993)',                    3),
+      h('fact1', 'characteristic', 'Fact',          'Worked as a carpenter before his big break', 4),
+      h('fact2', 'characteristic', 'Fun fact',      'Licensed pilot who has flown his own rescue missions', 4),
+      h('mv4',   'movie',          'Film',          '"Star Wars" — as Han Solo (1977)',         5),
+    ],
+  },
+
+  'mark-hamill': {
+    categoryLabel: 'Actor',
+    nationality: 'usa',
+    hints: [
+      h('prof',  'profession',     'Profession',    'Actor & voice actor',                     1),
+      h('bd',    'birth_date',     'Date of birth', 'September 25, 1951',                      2),
+      h('bp',    'birth_place',    'Place of birth','Oakland, California',                     2),
+      h('pk',    'peak_year',      'Career peak',   '1977 – 2019',                             2),
+      h('fact1', 'characteristic', 'Fact',          'Long-time voice of the Joker in animation', 3),
+      h('tv1',   'tv_show',        'TV role',       '"Batman: The Animated Series" — the Joker', 3),
+      h('merit', 'merit',          'Achievement',   'Inkpot Award',                            4),
+      h('fact2', 'characteristic', 'Later career',  'Returned to the role decades later in new sequels', 4),
+      h('fact3', 'characteristic', 'Fact',          'Extensive voice-acting career in animation and video games', 4),
+      h('tv2',   'tv_show',        'Guest role',    '"The Flash" — as the Trickster',          3),
+      h('mv1',   'movie',          'Film',          '"Star Wars" — as Luke Skywalker (1977)',  5),
+    ],
+  },
+
+  'sylvester-stallone': {
+    categoryLabel: 'Actor',
+    nationality: 'usa',
+    hints: [
+      h('prof',  'profession',     'Profession',    'Actor & director',                        1),
+      h('bd',    'birth_date',     'Date of birth', 'July 6, 1946',                            2),
+      h('bp',    'birth_place',    'Place of birth','New York City',                           2),
+      h('pk',    'peak_year',      'Career peak',   '1976 – 2010',                             2),
+      h('mv1',   'movie',          'Film',          '"Rambo: First Blood" (1982)',             3),
+      h('mv2',   'movie',          'Film',          '"The Expendables" (2010)',                3),
+      h('fact1', 'characteristic', 'Fact',          'Wrote the screenplay for his breakout role himself', 3),
+      h('merit', 'merit',          'Achievement',   'Golden Globe Award winner',               4),
+      h('mv3',   'movie',          'Film',          '"Creed" (2015)',                          4),
+      h('mv4',   'movie',          'Film',          '"Rocky" — as Rocky Balboa (1976)',        5),
+    ],
+  },
+
+  'val-kilmer': {
+    categoryLabel: 'Actor',
+    nationality: 'usa',
+    hints: [
+      h('prof',  'profession',     'Profession',    'Actor',                                   1),
+      h('bd',    'birth_date',     'Date of birth', 'December 31, 1959',                       2),
+      h('bp',    'birth_place',    'Place of birth','Los Angeles, California',                 2),
+      h('pk',    'peak_year',      'Career peak',   '1986 – 2005',                             2),
+      h('mv1',   'movie',          'Film',          '"Batman Forever" (1995)',                 3),
+      h('mv2',   'movie',          'Film',          '"Tombstone" (1993)',                      3),
+      h('mv3',   'movie',          'Film',          '"The Doors" — as Jim Morrison (1991)',    3),
+      h('fact1', 'characteristic', 'Fact',          'Trained at Juilliard\'s drama division',  4),
+      h('mv5',   'movie',          'Film',          '"Heat" (1995)',                           4),
+      h('fact2', 'characteristic', 'Fact',          'One of the youngest students admitted to his drama school', 3),
+      h('mv4',   'movie',          'Film',          '"Top Gun" — as Iceman (1986)',            5),
+    ],
+  },
+
+  'john-candy': {
+    categoryLabel: 'Actor',
+    nationality: 'canada',
+    hints: [
+      h('prof',  'profession',     'Profession',    'Actor & comedian',                        1),
+      h('bd',    'birth_date',     'Date of birth', 'October 31, 1950',                        2),
+      h('bp',    'birth_place',    'Place of birth','Toronto, Ontario',                        2),
+      h('pk',    'peak_year',      'Career peak',   '1983 – 1993',                             2),
+      h('tv1',   'tv_show',        'Sketch show',   '"SCTV"',                                  3),
+      h('mv1',   'movie',          'Film',          '"Uncle Buck" (1989)',                     3),
+      h('mv2',   'movie',          'Film',          '"Planes, Trains and Automobiles" (1987)', 3),
+      h('merit', 'merit',          'Achievement',   'Canada\'s Walk of Fame',                  4),
+      h('mv4',   'movie',          'Film',          '"Splash" (1984)',                         3),
+      h('fact1', 'characteristic', 'Fact',          'Known for his warm, larger-than-life comedic roles', 4),
+      h('mv3',   'movie',          'Film',          '"Cool Runnings" — as the coach (1993)',   5),
+    ],
+  },
+
+  'richard-dreyfuss': {
+    categoryLabel: 'Actor',
+    nationality: 'usa',
+    hints: [
+      h('prof',  'profession',     'Profession',    'Actor',                                   1),
+      h('bd',    'birth_date',     'Date of birth', 'October 29, 1947',                        2),
+      h('bp',    'birth_place',    'Place of birth','Brooklyn, New York',                      2),
+      h('pk',    'peak_year',      'Career peak',   '1975 – 1985',                             2),
+      h('mv1',   'movie',          'Film',          '"Close Encounters of the Third Kind" (1977)', 3),
+      h('mv2',   'movie',          'Film',          '"Mr. Holland\'s Opus" (1995)',            3),
+      h('merit', 'merit',          'Achievement',   'Academy Award for Best Actor',            4),
+      h('fact1', 'characteristic', 'Fact',          'One of the youngest Best Actor winners of his era', 4),
+      h('mv4',   'movie',          'Film',          '"Down and Out in Beverly Hills" (1986)',  3),
+      h('fact2', 'characteristic', 'Fact',          'Also active as an advocate for civics education', 4),
+      h('mv3',   'movie',          'Film',          '"Jaws" — as Matt Hooper (1975)',          5),
+    ],
+  },
+
+  'roy-scheider': {
+    categoryLabel: 'Actor',
+    nationality: 'usa',
+    hints: [
+      h('prof',  'profession',     'Profession',    'Actor',                                   1),
+      h('bd',    'birth_date',     'Date of birth', 'November 10, 1932',                       2),
+      h('bp',    'birth_place',    'Place of birth','Orange, New Jersey',                      2),
+      h('pk',    'peak_year',      'Career peak',   '1971 – 1979',                             2),
+      h('mv1',   'movie',          'Film',          '"Blue Thunder" (1983)',                   3),
+      h('mv2',   'movie',          'Film',          '"All That Jazz" (1979)',                  3),
+      h('fact1', 'characteristic', 'Famous line',   '"We\'re gonna need a bigger boat"',       4),
+      h('mv4',   'movie',          'Film',          '"Sorcerer" (1977)',                       3),
+      h('fact2', 'characteristic', 'Fact',          'Trained as an amateur boxer in his youth', 3),
+      h('merit', 'merit',          'Achievement',   'Two Academy Award nominations',           4),
+      h('mv3',   'movie',          'Film',          '"Jaws" — as Chief Brody (1975)',          5),
+    ],
+  },
+
+  'sam-neill': {
+    categoryLabel: 'Actor',
+    nationality: 'new-zealand',
+    hints: [
+      h('prof',  'profession',     'Profession',    'Actor & winegrower',                     1),
+      h('bd',    'birth_date',     'Date of birth', 'September 14, 1947',                     2),
+      h('bp',    'birth_place',    'Place of birth','Northern Ireland',                       2),
+      h('pk',    'peak_year',      'Career peak',   '1993 – 2005',                            2),
+      h('mv1',   'movie',          'Film',          '"My Brilliant Career" (1979)',           3),
+      h('tv1',   'tv_show',        'TV role',       '"Peaky Blinders"',                       3),
+      h('fact1', 'characteristic', 'Fun fact',      'Runs his own vineyard',                  4),
+      h('mv3',   'movie',          'Film',          '"The Piano" (1993)',                     3),
+      h('merit', 'merit',          'Achievement',   'Distinguished New Zealand Order of Merit', 4),
+      h('mv2',   'movie',          'Film',          '"Jurassic Park" — as Dr. Alan Grant (1993)', 5),
+    ],
+  },
+
+  'linda-hamilton': {
+    categoryLabel: 'Actor',
+    nationality: 'usa',
+    hints: [
+      h('prof',  'profession',     'Profession',    'Actor',                                   1),
+      h('bd',    'birth_date',     'Date of birth', 'September 26, 1956',                      2),
+      h('bp',    'birth_place',    'Place of birth','Salisbury, Maryland',                     2),
+      h('pk',    'peak_year',      'Career peak',   '1984 – 2019',                             2),
+      h('tv1',   'tv_show',        'TV role',       '"Beauty and the Beast" (1987–90)',        3),
+      h('fact1', 'characteristic', 'Fact',          'Trained extensively to play a soldier-like role', 3),
+      h('mv2',   'movie',          'Film',          '"King Kong Lives" (1986)',                3),
+      h('fact2', 'characteristic', 'Fact',          'Underwent intense physical training for her most iconic role', 4),
+      h('merit', 'merit',          'Achievement',   'Saturn Award winner',                     4),
+      h('mv1',   'movie',          'Film',          '"Terminator 2: Judgment Day" — as Sarah Connor (1991)', 5),
+    ],
+  },
+
+  'michael-j-fox': {
+    categoryLabel: 'Actor',
+    nationality: 'canada',
+    hints: [
+      h('prof',  'profession',     'Profession',    'Actor',                                   1),
+      h('bd',    'birth_date',     'Date of birth', 'June 9, 1961',                            2),
+      h('bp',    'birth_place',    'Place of birth','Edmonton, Alberta',                       2),
+      h('pk',    'peak_year',      'Career peak',   '1985 – 1991',                             2),
+      h('tv1',   'tv_show',        'TV role',       '"Family Ties"',                           3),
+      h('tv2',   'tv_show',        'TV role',       '"Spin City"',                             3),
+      h('merit', 'merit',          'Achievement',   'Officer of the Order of Canada',          4),
+      h('mv2',   'movie',          'Film',          '"Teen Wolf" (1985)',                      3),
+      h('fact1', 'characteristic', 'Fact',          'Also the author of several memoirs',      4),
+      h('mv1',   'movie',          'Film',          '"Back to the Future" — as Marty McFly (1985)', 5),
+    ],
+  },
+
+  'olivia-newton-john': {
+    categoryLabel: 'Actor',
+    nationality: 'australia',
+    hints: [
+      h('prof',  'profession',     'Profession',    'Singer & actor',                         1),
+      h('bd',    'birth_date',     'Date of birth', 'September 26, 1948',                     2),
+      h('bp',    'birth_place',    'Place of birth','Cambridge, England',                     2),
+      h('pk',    'peak_year',      'Career peak',   '1971 – 1994',                            2),
+      h('s1',    'song',           'Hit song',      '"Physical" (1981)',                      3),
+      h('mv1',   'movie',          'Film',          '"Xanadu" (1980)',                        3),
+      h('merit', 'merit',          'Achievement',   'Grammy Award winner',                    4),
+      h('fact1', 'characteristic', 'Fact',          'Moved to Australia as a child',          4),
+      h('fact2', 'characteristic', 'Fact',          'Had multiple Billboard number-one hit songs', 4),
+      h('mv2',   'movie',          'Film',          '"Grease" — as Sandy (1978)',              5),
+    ],
+  },
+
+  'henry-thomas': {
+    categoryLabel: 'Actor',
+    nationality: 'usa',
+    hints: [
+      h('prof',  'profession',     'Profession',    'Actor',                                   1),
+      h('bd',    'birth_date',     'Date of birth', 'September 9, 1971',                       2),
+      h('bp',    'birth_place',    'Place of birth','San Antonio, Texas',                      2),
+      h('pk',    'peak_year',      'Career peak',   '1982 – 2002',                             2),
+      h('mv1',   'movie',          'Film',          '"Legends of the Fall" (1994)',            3),
+      h('mv2',   'movie',          'Film',          '"Gangs of New York" (2002)',              3),
+      h('fact1', 'characteristic', 'Fact',          'Was 10 years old when cast in his most famous role', 4),
+      h('mv4',   'movie',          'Film',          '"All the Pretty Horses" (2000)',          4),
+      h('fact2', 'characteristic', 'Fact',          'Also composes and performs music',        4),
+      h('mv3',   'movie',          'Film',          '"E.T. the Extra-Terrestrial" — as Elliott (1982)', 5),
+    ],
+  },
+
+  'jason-statham': {
+    categoryLabel: 'Actor',
+    nationality: 'uk',
+    hints: [
+      h('prof',  'profession',     'Profession',    'Actor',                                   1),
+      h('bd',    'birth_date',     'Date of birth', 'July 26, 1967',                           2),
+      h('bp',    'birth_place',    'Place of birth','Shirebrook, England',                     2),
+      h('pk',    'peak_year',      'Career peak',   '1998 – 2020',                             2),
+      h('mv1',   'movie',          'Film',          '"Lock, Stock and Two Smoking Barrels" (1998)', 3),
+      h('fact1', 'characteristic', 'Fun fact',      'Was a member of a national diving team before acting', 3),
+      h('mv2',   'movie',          'Film',          '"The Transporter" (2002)',                4),
+      h('mv3',   'movie',          'Film',          '"Fast & Furious" franchise',              4),
+      h('mv5',   'movie',          'Film',          '"The Expendables" (2010)',                4),
+      h('mv4',   'movie',          'Film',          '"Snatch" (2000)',                         5),
+    ],
+  },
+
+  'laurence-fishburne': {
+    categoryLabel: 'Actor',
+    nationality: 'usa',
+    hints: [
+      h('prof',  'profession',     'Profession',    'Actor',                                   1),
+      h('bd',    'birth_date',     'Date of birth', 'July 30, 1961',                           2),
+      h('bp',    'birth_place',    'Place of birth','Augusta, Georgia',                        2),
+      h('pk',    'peak_year',      'Career peak',   '1993 – 2003',                             2),
+      h('mv1',   'movie',          'Film',          '"Boyz n the Hood" (1991)',                3),
+      h('mv2',   'movie',          'Film',          '"Apocalypse Now" (1979)',                 3),
+      h('merit', 'merit',          'Achievement',   'Tony Award winner',                       4),
+      h('fact1', 'characteristic', 'Fact',          'Cast as Apocalypse Now\'s youngest crew member at 14', 4),
+      h('tv1',   'tv_show',        'TV role',       '"CSI: Crime Scene Investigation"',        3),
+      h('mv3',   'movie',          'Film',          '"The Matrix" — as Morpheus (1999)',       5),
+    ],
+  },
+
+  'heath-ledger': {
+    categoryLabel: 'Actor',
+    nationality: 'australia',
+    hints: [
+      h('prof',  'profession',     'Profession',    'Actor',                                   1),
+      h('bd',    'birth_date',     'Date of birth', 'April 4, 1979',                           2),
+      h('bp',    'birth_place',    'Place of birth','Perth, Western Australia',                2),
+      h('pk',    'peak_year',      'Career peak',   '1999 – 2008',                             2),
+      h('mv1',   'movie',          'Film',          '"10 Things I Hate About You" (1999)',     3),
+      h('mv2',   'movie',          'Film',          '"Brokeback Mountain" (2005)',              3),
+      h('mv3',   'movie',          'Film',          '"A Knight\'s Tale" (2001)',               3),
+      h('merit', 'merit',          'Achievement',   'Academy Award for Best Supporting Actor', 4),
+      h('mv5',   'movie',          'Film',          '"The Patriot" (2000)',                    4),
+      h('mv4',   'movie',          'Film',          '"The Dark Knight" — as the Joker (2008)', 5),
+    ],
+  },
+
+  'andrew-garfield': {
+    categoryLabel: 'Actor',
+    nationality: 'uk',
+    hints: [
+      h('prof',  'profession',     'Profession',    'Actor',                                   1),
+      h('bd',    'birth_date',     'Date of birth', 'August 20, 1983',                         2),
+      h('bp',    'birth_place',    'Place of birth','Los Angeles, California',                 2),
+      h('pk',    'peak_year',      'Career peak',   '2006 – 2026',                             2),
+      h('mv1',   'movie',          'Film',          '"Hacksaw Ridge" (2016)',                  3),
+      h('mv2',   'movie',          'Film',          '"tick, tick... BOOM!" (2021)',            3),
+      h('mv3',   'movie',          'Film',          '"The Amazing Spider-Man" (2012)',         4),
+      h('merit', 'merit',          'Achievement',   'Golden Globe Award winner',               4),
+      h('mv5',   'movie',          'Film',          '"Silence" (2016)',                        4),
+      h('mv4',   'movie',          'Film',          '"The Social Network" (2010)',             5),
+    ],
+  },
+
+  'jesse-eisenberg': {
+    categoryLabel: 'Actor',
+    nationality: 'usa',
+    hints: [
+      h('prof',  'profession',     'Profession',    'Actor & playwright',                      1),
+      h('bd',    'birth_date',     'Date of birth', 'October 5, 1983',                         2),
+      h('bp',    'birth_place',    'Place of birth','Queens, New York',                        2),
+      h('pk',    'peak_year',      'Career peak',   '2009 – 2026',                             2),
+      h('mv1',   'movie',          'Film',          '"Zombieland" (2009)',                     3),
+      h('mv2',   'movie',          'Film',          '"Now You See Me" (2013)',                 3),
+      h('fact1', 'characteristic', 'Fact',          'Also writes plays for the stage',         4),
+      h('mv4',   'movie',          'Film',          '"Rio" — voice role (2011)',               4),
+      h('merit', 'merit',          'Achievement',   'Academy Award nominee',                   4),
+      h('mv3',   'movie',          'Film',          '"The Social Network" — as Mark Zuckerberg (2010)', 5),
+    ],
+  },
+
+  'elijah-wood': {
+    categoryLabel: 'Actor',
+    nationality: 'usa',
+    hints: [
+      h('prof',  'profession',     'Profession',    'Actor',                                   1),
+      h('bd',    'birth_date',     'Date of birth', 'January 28, 1981',                        2),
+      h('bp',    'birth_place',    'Place of birth','Cedar Rapids, Iowa',                       2),
+      h('pk',    'peak_year',      'Career peak',   '2001 – 2005',                             2),
+      h('mv1',   'movie',          'Film',          '"Eternal Sunshine of the Spotless Mind" (2004)', 3),
+      h('mv2',   'movie',          'Film',          '"Happy Feet" — voice role (2006)',        3),
+      h('fact1', 'characteristic', 'Fact',          'Started acting as a child in the late 1980s', 4),
+      h('mv4',   'movie',          'Film',          '"Deep Impact" (1998)',                    3),
+      h('fact2', 'characteristic', 'Fact',          'Also runs an independent record label',   4),
+      h('mv3',   'movie',          'Film',          '"The Lord of the Rings" — as Frodo (2001)', 5),
+    ],
+  },
+
+  'ian-mckellen': {
+    categoryLabel: 'Actor',
+    nationality: 'uk',
+    hints: [
+      h('prof',  'profession',     'Profession',    'Actor',                                   1),
+      h('bd',    'birth_date',     'Date of birth', 'May 25, 1939',                            2),
+      h('bp',    'birth_place',    'Place of birth','Burnley, England',                        2),
+      h('pk',    'peak_year',      'Career peak',   '2000 – 2014',                             2),
+      h('fact1', 'characteristic', 'Fact',          'Decades-long career as a Shakespearean stage actor', 3),
+      h('mv1',   'movie',          'Film',          '"X-Men" — as Magneto (2000)',             3),
+      h('merit', 'merit',          'Achievement',   'Laurence Olivier Award winner',           4),
+      h('mv3',   'movie',          'Film',          '"Gods and Monsters" (1998)',              3),
+      h('fact2', 'characteristic', 'Fact',          'One of the most celebrated stage actors of his generation', 4),
+      h('mv2',   'movie',          'Film',          '"The Lord of the Rings" — as Gandalf (2001)', 5),
+    ],
+  },
+
+  'hilary-swank': {
+    categoryLabel: 'Actor',
+    nationality: 'usa',
+    hints: [
+      h('prof',  'profession',     'Profession',    'Actor',                                   1),
+      h('bd',    'birth_date',     'Date of birth', 'July 30, 1974',                           2),
+      h('bp',    'birth_place',    'Place of birth','Lincoln, Nebraska',                       2),
+      h('pk',    'peak_year',      'Career peak',   '1999 – 2010',                             2),
+      h('mv1',   'movie',          'Film',          '"Boys Don\'t Cry" (1999)',                3),
+      h('mv2',   'movie',          'Film',          '"P.S. I Love You" (2007)',                3),
+      h('fact1', 'characteristic', 'Fact',          'Won Best Actress twice in six years',      4),
+      h('mv4',   'movie',          'Film',          '"Freedom Writers" (2007)',                4),
+      h('fact2', 'characteristic', 'Fact',          'Grew up in a trailer park before her breakthrough', 3),
+      h('mv3',   'movie',          'Film',          '"Million Dollar Baby" (2004)',            5),
+    ],
+  },
+
+  'macaulay-culkin': {
+    categoryLabel: 'Actor',
+    nationality: 'usa',
+    hints: [
+      h('prof',  'profession',     'Profession',    'Actor',                                   1),
+      h('bd',    'birth_date',     'Date of birth', 'August 26, 1980',                         2),
+      h('bp',    'birth_place',    'Place of birth','New York City',                           2),
+      h('pk',    'peak_year',      'Career peak',   '1990 – 1994',                             2),
+      h('mv1',   'movie',          'Film',          '"My Girl" (1991)',                        3),
+      h('mv2',   'movie',          'Film',          '"Richie Rich" (1994)',                    3),
+      h('fact1', 'characteristic', 'Fact',          'One of the highest-paid child actors of the 1990s', 4),
+      h('mv4',   'movie',          'Film',          '"Uncle Buck" (1989)',                     3),
+      h('fact2', 'characteristic', 'Fact',          'Returned to acting as an adult in the 2000s', 4),
+      h('mv3',   'movie',          'Film',          '"Home Alone" — as Kevin McCallister (1990)', 5),
+    ],
+  },
+
+  'drew-barrymore': {
+    categoryLabel: 'Actor',
+    nationality: 'usa',
+    hints: [
+      h('prof',  'profession',     'Profession',    'Actor & talk show host',                  1),
+      h('bd',    'birth_date',     'Date of birth', 'February 22, 1975',                       2),
+      h('bp',    'birth_place',    'Place of birth','Culver City, California',                 2),
+      h('pk',    'peak_year',      'Career peak',   '1996 – 2006',                             2),
+      h('mv1',   'movie',          'Film',          '"Never Been Kissed" (1999)',              3),
+      h('mv2',   'movie',          'Film',          '"50 First Dates" (2004)',                 3),
+      h('mv3',   'movie',          'Film',          '"Charlie\'s Angels" (2000)',              4),
+      h('fact1', 'characteristic', 'Fact',          'Started acting as a young child',         4),
+      h('fact2', 'characteristic', 'Fact',          'Also a film producer and businesswoman',  4),
+      h('mv4',   'movie',          'Film',          '"E.T. the Extra-Terrestrial" (1982)',     5),
+    ],
+  },
+
+  'russell-crowe': {
+    categoryLabel: 'Actor',
+    nationality: 'australia',
+    hints: [
+      h('prof',  'profession',     'Profession',    'Actor',                                   1),
+      h('bd',    'birth_date',     'Date of birth', 'April 7, 1964',                           2),
+      h('bp',    'birth_place',    'Place of birth','Wellington',                              2),
+      h('pk',    'peak_year',      'Career peak',   '1997 – 2007',                             2),
+      h('mv1',   'movie',          'Film',          '"L.A. Confidential" (1997)',              3),
+      h('mv2',   'movie',          'Film',          '"A Beautiful Mind" (2001)',               3),
+      h('mv3',   'movie',          'Film',          '"Robin Hood" (2010)',                     3),
+      h('fact1', 'characteristic', 'Fun fact',      'Also fronts his own rock band',           4),
+      h('mv5',   'movie',          'Film',          '"Cinderella Man" (2005)',                 4),
+      h('mv4',   'movie',          'Film',          '"Gladiator" — as Maximus (2000)',         5),
+    ],
+  },
+
+  'sam-worthington': {
+    categoryLabel: 'Actor',
+    nationality: 'australia',
+    hints: [
+      h('prof',  'profession',     'Profession',    'Actor',                                   1),
+      h('bd',    'birth_date',     'Date of birth', 'August 2, 1976',                          2),
+      h('bp',    'birth_place',    'Place of birth','Godalming, England',                      2),
+      h('pk',    'peak_year',      'Career peak',   '2009 – 2019',                             2),
+      h('mv1',   'movie',          'Film',          '"Clash of the Titans" (2010)',            3),
+      h('mv2',   'movie',          'Film',          '"Terminator Salvation" (2009)',           3),
+      h('fact1', 'characteristic', 'Fact',          'Worked as a bricklayer before acting',    4),
+      h('mv4',   'movie',          'Film',          '"Man on a Ledge" (2012)',                 4),
+      h('fact2', 'characteristic', 'Fact',          'Was largely unknown before his breakout role', 3),
+      h('mv3',   'movie',          'Film',          '"Avatar" — as Jake Sully (2009)',         5),
+    ],
+  },
+
+  'zoe-saldana': {
+    categoryLabel: 'Actor',
+    nationality: 'usa',
+    hints: [
+      h('prof',  'profession',     'Profession',    'Actor',                                   1),
+      h('bd',    'birth_date',     'Date of birth', 'June 19, 1978',                           2),
+      h('bp',    'birth_place',    'Place of birth','Passaic, New Jersey',                     2),
+      h('pk',    'peak_year',      'Career peak',   '2009 – 2026',                             2),
+      h('mv1',   'movie',          'Film',          '"Guardians of the Galaxy" — as Gamora (2014)', 3),
+      h('mv2',   'movie',          'Film',          '"Star Trek" — as Uhura (2009)',           3),
+      h('fact1', 'characteristic', 'Fact',          'Appeared in three of the highest-grossing franchises ever', 4),
+      h('mv4',   'movie',          'Film',          '"Center Stage" (2000)',                   4),
+      h('fact2', 'characteristic', 'Fact',          'Trained as a dancer before acting',        3),
+      h('mv3',   'movie',          'Film',          '"Avatar" — as Neytiri (2009)',            5),
+    ],
+  },
+
+  'shia-labeouf': {
+    categoryLabel: 'Actor',
+    nationality: 'usa',
+    hints: [
+      h('prof',  'profession',     'Profession',    'Actor & writer',                          1),
+      h('bd',    'birth_date',     'Date of birth', 'June 11, 1986',                           2),
+      h('bp',    'birth_place',    'Place of birth','Los Angeles, California',                 2),
+      h('pk',    'peak_year',      'Career peak',   '2007 – 2014',                             2),
+      h('tv1',   'tv_show',        'Childhood role','"Even Stevens" (Disney Channel)',         3),
+      h('mv1',   'movie',          'Film',          '"Indiana Jones and the Crystal Skull" (2008)', 3),
+      h('fact1', 'characteristic', 'Fact',          'Wrote the screenplay for a later autobiographical film', 4),
+      h('mv3',   'movie',          'Film',          '"Fury" (2014)',                           4),
+      h('fact2', 'characteristic', 'Fact',          'Started performing stand-up comedy as a teenager', 3),
+      h('mv2',   'movie',          'Film',          '"Transformers" — as Sam Witwicky (2007)', 5),
+    ],
+  },
+
+  'janne-carlsson': {
+    categoryLabel: 'Actor',
+    nationality: 'sweden',
+    hints: [
+      h('prof',  'profession',     'Profession',    'Drummer & actor',                          1),
+      h('bd',    'birth_date',     'Date of birth', 'March 12, 1937',                          2),
+      h('bp',    'birth_place',    'Place of birth','Stockholm',                                2),
+      h('pk',    'peak_year',      'Career peak',   '1965 – 1990',                             2),
+      h('fact1', 'characteristic', 'Fact',          'Leading drummer in the 1950s–60s Swedish jazz scene', 3),
+      h('fact2', 'characteristic', 'Venue',         'Regularly performed at Nalen in Stockholm', 3),
+      h('tv1',   'tv_show',        'TV role',       '"Svenska Bilder"',                        4),
+      h('fact3', 'characteristic', 'Fact',          'Also worked as a TV presenter and visual artist', 4),
+      h('fact4', 'characteristic', 'Fact',          'Later became a well-loved comedic screen presence', 4),
+      h('mv1',   'movie',          'Film',          '"Göta kanal eller Vem drog ur proppen?" (1981)', 5),
+    ],
+  },
+
+  'peter-haber': {
+    categoryLabel: 'Actor',
+    nationality: 'sweden',
+    hints: [
+      h('prof',  'profession',     'Profession',    'Actor',                                   1),
+      h('bd',    'birth_date',     'Date of birth', 'December 12, 1952',                       2),
+      h('bp',    'birth_place',    'Place of birth','Stockholm',                                2),
+      h('pk',    'peak_year',      'Career peak',   '1993 – 2013',                             2),
+      h('tv1',   'tv_show',        'TV role',       '"Martin Beck" detective series',          3),
+      h('fact1', 'characteristic', 'Fact',          'Also does voice acting',                  4),
+      h('fact2', 'characteristic', 'Fact',          'One of Sweden\'s most recognized television actors', 4),
+      h('fact3', 'characteristic', 'Fact',          'Known for both comedic and dramatic roles', 4),
+      h('fact4', 'characteristic', 'Fact',          'Has had a decades-long career in film and TV', 3),
+      h('mv1',   'movie',          'Film',          '"Sunes sommar" (1993)',                    5),
+    ],
+  },
+
+  'sverrir-gudnason': {
+    categoryLabel: 'Actor',
+    nationality: 'sweden',
+    hints: [
+      h('prof',  'profession',     'Profession',    'Actor',                                   1),
+      h('bd',    'birth_date',     'Date of birth', 'September 12, 1978',                      2),
+      h('bp',    'birth_place',    'Place of birth','Lund',                                     2),
+      h('pk',    'peak_year',      'Career peak',   '2001 – 2026',                             2),
+      h('mv1',   'movie',          'Film',          '"House of Cards" (2018)',                 3),
+      h('mv2',   'movie',          'Film',          '"The Girl in the Spider\'s Web" (2018)',  3),
+      h('merit', 'merit',          'Achievement',   'Guldbagge Award winner',                  4),
+      h('fact1', 'characteristic', 'Fact',          'Also an accomplished stage actor',        4),
+      h('fact2', 'characteristic', 'Fact',          'Has starred in both Swedish and international productions', 4),
+      h('mv3',   'movie',          'Film',          '"Borg vs McEnroe" — as Björn Borg (2017)', 5),
+    ],
+  },
+
+  // ── SCENNAMN — kort/tvetydigt namn klarade inte auto-sök (2026-08-27) ──────
+  // Wikidatas sökfunktion hittar rätt entitet långt ner i träfflistan för
+  // dessa enordsnamn (Snow, Lena, Frans, ZAYN m.fl.) — auto-gen-scriptet gav
+  // upp. QID:n verifierade manuellt (wbgetentities direkt på känt-korrekt id).
+
+  'psy': {
+    categoryLabel: 'Musikartist',
+    nationality: 'south-korea',
+    hints: [
+      h('bd',    'birth_date',     'Date of birth', 'December 31, 1977',                       2),
+      h('bp',    'birth_place',    'Place of birth','Gangnam District, Seoul',                  2),
+      h('fact1', 'characteristic', 'Real name',     'Park Jae-sang',                            2),
+      h('s1',    'song',           'Hit song',      '"Gangnam Style" (2012)',                   4),
+      h('s2',    'song',           'Hit song',      '"Gentleman" (2013)',                       4),
+      h('fact2', 'characteristic', 'Fact',          'First video to reach 1 billion YouTube views', 5),
+    ],
+  },
+
+  'ruslana': {
+    categoryLabel: 'Musikartist',
+    nationality: 'ukraine',
+    hints: [
+      h('bd',    'birth_date',     'Date of birth', 'May 24, 1973',                             2),
+      h('bp',    'birth_place',    'Place of birth','Lviv',                                      2),
+      h('genre', 'characteristic', 'Genre',         'Ethno-dance / folk-rock',                   2),
+      h('fact1', 'characteristic', 'Fact',          'Also works as a composer and conductor',    3),
+      h('s1',    'song',           'Hit song',      '"Wild Dances" (2004)',                      3),
+      h('merit', 'merit',          'Merit/Award',   'Eurovision Song Contest winner (2004)',     5),
+    ],
+  },
+
+  'snow': {
+    categoryLabel: 'Musikartist',
+    nationality: 'canada',
+    hints: [
+      h('bd',    'birth_date',     'Date of birth', 'October 30, 1969',                         2),
+      h('bp',    'birth_place',    'Place of birth','North York',                                2),
+      h('fact1', 'characteristic', 'Genre',         'Dancehall reggae',                          3),
+      h('fact2', 'characteristic', 'Real name',     'Darrin O\'Brien',                           2),
+      h('s1',    'song',           'Hit song',      '"Informer" (1992)',                         5),
+      h('fact3', 'characteristic', 'Fact',          '"Informer" topped the US Billboard Hot 100', 4),
+    ],
+  },
+
+  'nemo': {
+    categoryLabel: 'Musikartist',
+    nationality: 'switzerland',
+    hints: [
+      h('bd',    'birth_date',     'Date of birth', 'August 3, 1999',                           2),
+      h('bp',    'birth_place',    'Place of birth','Biel/Bienne',                                2),
+      h('genre', 'characteristic', 'Genre',         'Pop / rap / opera fusion',                  2),
+      h('s1',    'song',           'Hit song',      '"The Code" (2024)',                          3),
+      h('fact1', 'characteristic', 'Fact',          'First non-binary Eurovision winner',        4),
+      h('merit', 'merit',          'Merit/Award',   'Eurovision Song Contest winner (2024)',      5),
+    ],
+  },
+
+  'lena': {
+    categoryLabel: 'Musikartist',
+    nationality: 'germany',
+    hints: [
+      h('bd',    'birth_date',     'Date of birth', 'May 23, 1991',                             2),
+      h('bp',    'birth_place',    'Place of birth','Hanover',                                    2),
+      h('genre', 'characteristic', 'Genre',         'Pop',                                       2),
+      h('s1',    'song',           'Hit song',      '"Satellite" (2010)',                         3),
+      h('s2',    'song',           'Hit song',      '"Taken by a Stranger" (2011)',                3),
+      h('merit', 'merit',          'Merit/Award',   'Eurovision Song Contest winner (2010)',      5),
+    ],
+  },
+
+  'zayn': {
+    categoryLabel: 'Musikartist',
+    nationality: 'uk',
+    hints: [
+      h('bd',    'birth_date',     'Date of birth', 'January 12, 1993',                         2),
+      h('bp',    'birth_place',    'Place of birth','Bradford, England',                          2),
+      h('fact1', 'characteristic', 'Real name',     'Zain Javadd Malik',                         2),
+      h('genre', 'characteristic', 'Genre',         'R&B / Pop',                                 2),
+      h('fact2', 'characteristic', 'Early career',  'Former member of One Direction',            3),
+      h('s1',    'song',           'Hit song',      '"Pillowtalk" (2016)',                        4),
+    ],
+  },
+
+  'frans': {
+    categoryLabel: 'Musikartist',
+    nationality: 'sweden',
+    hints: [
+      h('bd',    'birth_date',     'Date of birth', 'December 19, 1998',                        2),
+      h('bp',    'birth_place',    'Place of birth','Ystad',                                      2),
+      h('genre', 'characteristic', 'Genre',         'Pop',                                       2),
+      h('s1',    'song',           'Hit song',      '"If I Were Sorry" (2016)',                   3),
+      h('s2',    'song',           'Hit song',      '"Perfect Life" (2017)',                      3),
+      h('merit', 'merit',          'Merit/Award',   'Melodifestivalen winner (2016)',             5),
+    ],
+  },
+
+  'bobbysocks': {
+    categoryLabel: 'Band',
+    nationality: 'norway',
+    hints: [
+      h('fact1', 'creation_year',  'Formed',        '1983',                                      2),
+      h('genre', 'characteristic', 'Genre',         'Pop / schlager',                            2),
+      h('member','band_member',   'Members',       'Hanne Krogh & Elisabeth Andreassen',         3),
+      h('s1',    'song',           'Hit song',      '"La det swinge" (1985)',                     4),
+      h('merit', 'merit',          'Merit/Award',   'Eurovision Song Contest winner (1985)',      5),
+    ],
+  },
+
+  'sugarhill-gang': {
+    categoryLabel: 'Band',
+    nationality: 'usa',
+    hints: [
+      h('fact1', 'creation_year',  'Formed',        '1973',                                      2),
+      h('reclabel', 'characteristic', 'Record label', 'Sugar Hill Records',                      2),
+      h('member','band_member',   'Members',       'Wonder Mike, Big Bank Hank, Master Gee',     3),
+      h('fact2', 'characteristic', 'Fact',          'One of the first hip hop acts to gain mainstream popularity', 3),
+      h('s1',    'song',           'Hit song',      '"Rapper\'s Delight" (1979)',                 5),
+    ],
+  },
+
+  // ── Auto-sök gav FEL entitet (2026-08-27) — Wikidata-sökningen matchade
+  // en helt annan, orelaterad entitet (en akademiker, en filippinsk provins,
+  // en TV-kanal, ett förnamn, en Wikimedia-diskografisida) trots limit=20 +
+  // scoring. Manuellt kuraterat i stället för att fortsätta jaga söktermer.
+
+  'antique': {
+    categoryLabel: 'Band',
+    nationality: 'greece',
+    hints: [
+      h('fact1', 'creation_year',  'Formed',        '1999',                                      2),
+      h('member','band_member',   'Members',       'Helena Paparizou & Nicholas Arvanitis',      3),
+      h('genre', 'characteristic', 'Genre',         'Pop / dance-pop',                           2),
+      h('s1',    'song',           'Hit song',      '"(I Would) Die for You" (2001)',             4),
+      h('merit', 'merit',          'Merit/Award',   'Eurovision Song Contest, 3rd place (2001)',  4),
+    ],
+  },
+
+  'riva': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+      h('fact1', 'creation_year',  'Formed',        '1988',                                      2),
+      h('genre', 'characteristic', 'Genre',         'Pop',                                       2),
+      h('fact2', 'characteristic', 'Fact',          'Formed specifically to compete at Eurovision', 3),
+      h('s1',    'song',           'Hit song',      '"Rock Me" (1989)',                           4),
+      h('merit', 'merit',          'Merit/Award',   'Eurovision Song Contest winner (1989)',      5),
+    ],
+  },
+
+  'the-black-eyed-peas': {
+    categoryLabel: 'Band',
+    nationality: 'usa',
+    hints: [
+      h('fact1', 'creation_year',  'Formed',        '1995',                                      2),
+      h('member','band_member',   'Members',       'will.i.am, apl.de.ap, Taboo, Fergie',        3),
+      h('genre', 'characteristic', 'Genre',         'Hip hop / pop',                             2),
+      h('s1',    'song',           'Hit song',      '"I Gotta Feeling" (2009)',                   4),
+      h('merit', 'merit',          'Merit/Award',   'Multiple Grammy Awards',                     4),
+    ],
+  },
+
+  'tlc': {
+    categoryLabel: 'Band',
+    nationality: 'usa',
+    hints: [
+      h('fact1', 'creation_year',  'Formed',        '1990',                                      2),
+      h('member','band_member',   'Members',       'T-Boz, Left Eye, Chilli',                    3),
+      h('genre', 'characteristic', 'Genre',         'R&B / hip hop',                             2),
+      h('s1',    'song',           'Hit song',      '"Waterfalls" (1995)',                        4),
+      h('s2',    'song',           'Hit song',      '"No Scrubs" (1999)',                         4),
+    ],
+  },
+
+  // ── Auto-genererat men för tunt för tröskeln (2026-08-27) — behåller
+  // Wikidata-hämtade fakta (genre/medlemmar/bildningsår/etikett) och lägger
+  // till 1-3 verifierade extra-fakta så varje item når minst 5 render-entries.
+  // Nationalitetsord är MEDVETET utelämnade i alla värden (flaggan bär redan
+  // den infon) — se "About"-fälten i katalogen för de ord som annars
+  // filtrerades bort av isNationalityHint.
+
+  'benny-benassi': {
+    categoryLabel: 'Musikartist',
+    nationality: 'italy',
+    hints: [
+      h('bd',    'birth_date',     'Date of birth', 'July 13, 1967',                            2),
+      h('bp',    'birth_place',    'Place of birth','Reggio Emilia',                              2),
+      h('genre', 'characteristic', 'Genre',         'Electro house',                             2),
+      h('desc',  'characteristic', 'About',         'DJ, record producer and remixer',            1),
+      h('s1',    'song',           'Hit song',      '"Satisfaction" (2002)',                      4),
+      h('fact1', 'characteristic', 'Fact',          'The music video features dancing robots',    3),
+    ],
+  },
+
+  'dooley-wilson': {
+    categoryLabel: 'Musikartist',
+    nationality: 'usa',
+    hints: [
+      h('bd',    'birth_date',     'Date of birth', 'April 3, 1886',                            2),
+      h('bp',    'birth_place',    'Place of birth','Tyler',                                      2),
+      h('genre', 'characteristic', 'Genre',         'Popular music',                             2),
+      h('fact1', 'characteristic', 'Fact',          'Played Sam, the piano player, in Casablanca (1942)', 3),
+      h('s1',    'song',           'Hit song',      '"As Time Goes By" (performed in Casablanca)', 4),
+      h('instr', 'characteristic', 'Instrument',    'Drum kit',                                   2),
+    ],
+  },
+
+  'haddaway': {
+    categoryLabel: 'Musikartist',
+    nationality: 'germany',
+    hints: [
+      h('bd',    'birth_date',     'Date of birth', 'January 9, 1965',                          2),
+      h('bp',    'birth_place',    'Place of birth','Port of Spain',                              2),
+      h('genre', 'characteristic', 'Genre',         'Eurodance / electronic dance music',        2),
+      h('merit', 'merit',          'Merit/Award',   'Echo Pop Award for the Hit of the Year',    5),
+      h('s1',    'song',           'Hit song',      '"What Is Love" (1993)',                      5),
+      h('fact1', 'characteristic', 'Fact',          'The song became a well-known internet meme decades later', 2),
+    ],
+  },
+
+  'hadise': {
+    categoryLabel: 'Musikartist',
+    nationality: 'belgium',
+    hints: [
+      h('bd',    'birth_date',     'Date of birth', 'October 22, 1985',                        2),
+      h('bp',    'birth_place',    'Place of birth','Mol',                                        2),
+      h('genre', 'characteristic', 'Genre',         'Rhythm and blues',                          2),
+      h('s1',    'song',           'Hit song',      '"Düm Tek Tek" (2009)',                       3),
+      h('merit', 'merit',          'Merit/Award',   'Eurovision Song Contest, 4th place (2009)', 4),
+      h('instr', 'characteristic', 'Instrument',    'Voice',                                     2),
+    ],
+  },
+
+  'knaan': {
+    categoryLabel: 'Musikartist',
+    nationality: 'canada',
+    hints: [
+      h('bd',    'birth_date',     'Date of birth', 'May 30, 1978',                            2),
+      h('bp',    'birth_place',    'Place of birth','Mogadishu',                                 2),
+      h('genre', 'characteristic', 'Genre',         'Alternative hip-hop',                       2),
+      h('fact1', 'characteristic', 'Fact',          'Official anthem of the 2010 FIFA World Cup', 4),
+      h('s1',    'song',           'Hit song',      '"Wavin\' Flag" (2009)',                      5),
+      h('instr', 'characteristic', 'Instrument',    'Guitar',                                    2),
+    ],
+  },
+
+  'londonbeat': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+      h('genre', 'characteristic', 'Genre',         'Rhythm and blues',                          2),
+      h('member','band_member',   'Members',       'Jimmy Helms, Jimmy Chambers, George Chandler, William Henshall', 3),
+      h('formed','creation_year',  'Formed',        '1988',                                      2),
+      h('s1',    'song',           'Hit song',      '"I\'ve Been Thinking About You" (1990)',     4),
+      h('fact1', 'characteristic', 'Fact',          'Part of the late-1980s dance-pop scene',      3),
+    ],
+  },
+
+  'mabel': {
+    categoryLabel: 'Musikartist',
+    nationality: 'sweden',
+    hints: [
+      h('bd',    'birth_date',     'Date of birth', 'February 19, 1996',                       2),
+      h('bp',    'birth_place',    'Place of birth','Alhaurín el Grande',                        2),
+      h('genre', 'characteristic', 'Genre',         'Pop',                                       2),
+      h('fact1', 'characteristic', 'Fact',          'Daughter of singer Neneh Cherry',            3),
+      h('s1',    'song',           'Hit song',      '"Don\'t Call Me Up" (2019)',                 4),
+      h('instr', 'characteristic', 'Instrument',    'Voice',                                     2),
+    ],
+  },
+
+  'marie-myriam': {
+    categoryLabel: 'Musikartist',
+    nationality: 'france',
+    hints: [
+      h('bd',    'birth_date',     'Date of birth', 'May 8, 1957',                              2),
+      h('bp',    'birth_place',    'Place of birth','Kananga',                                    2),
+      h('s1',    'song',           'Hit song',      '"L\'oiseau et l\'enfant" (1977)',            4),
+      h('merit', 'merit',          'Merit/Award',   'Eurovision Song Contest winner (1977)',      5),
+      h('fact1', 'characteristic', 'Fact',          'Was just 19 years old when she won',         2),
+      h('instr', 'characteristic', 'Instrument',    'Voice',                                     2),
+    ],
+  },
+
+  'mark-morrison': {
+    categoryLabel: 'Musikartist',
+    nationality: 'uk',
+    hints: [
+      h('bd',    'birth_date',     'Date of birth', 'May 3, 1972',                              2),
+      h('bp',    'birth_place',    'Place of birth','Hanover',                                    2),
+      h('genre', 'characteristic', 'Genre',         'Contemporary R&B',                          2),
+      h('s1',    'song',           'Hit song',      '"Return of the Mack" (1996)',                5),
+      h('fact1', 'characteristic', 'Fact',          'The song topped the singles chart',          3),
+      h('instr', 'characteristic', 'Instrument',    'Voice',                                     2),
+    ],
+  },
+
+  'kaoma': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+      h('genre',    'characteristic', 'Genre',         'Lambada',                                 2),
+      h('reclabel', 'characteristic', 'Record label',  'Epic Records',                            2),
+      h('member',   'band_member',    'Lead singer',   'Loalwa Braz',                             3),
+      h('fact1',    'characteristic', 'Fact',          'Sparked a global lambada dance craze',     3),
+      h('s1',       'song',           'Hit song',      '"Lambada" (1989)',                        5),
+    ],
+  },
+
+  'planet-funk': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+      h('genre',    'characteristic', 'Genre',         'Electronica',                             2),
+      h('member',   'band_member',    'Members',       'Alex Neri, Marco Baroni, Alessandro Sommella, Alex Uhlmann', 3),
+      h('reclabel', 'characteristic', 'Record label',  'Virgin Records',                          2),
+      h('s1',       'song',           'Hit song',      '"Chase the Sun" (2001)',                   4),
+      h('fact1',    'characteristic', 'Fact',          'A staple track on chillout compilation albums', 2),
+    ],
+  },
+
+  'secret-garden': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+      h('genre',    'characteristic', 'Genre',         'New age music',                           2),
+      h('member',   'band_member',    'Members',       'Fionnuala Sherry, Rolf Løvland',          3),
+      h('reclabel', 'characteristic', 'Record label',  'Universal Records',                       2),
+      h('s1',       'song',           'Hit song',      '"Nocturne" (1995)',                       4),
+      h('merit',    'merit',          'Merit/Award',   'Eurovision Song Contest winner (1995)',   5),
+    ],
+  },
+
+  'the-archies': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+      h('fact1',    'creation_year',  'Formed',        '1968',                                    2),
+      h('genre',    'characteristic', 'Genre',         'Bubblegum music',                         2),
+      h('member',   'band_member',    'Members',       'Archie Andrews, Jughead Jones, Reggie Mantle, Veronica Lodge', 3),
+      h('s1',       'song',           'Hit song',      '"Sugar, Sugar" (1969)',                    5),
+      h('reclabel', 'characteristic', 'Record label',  'RCA',                                     2),
+    ],
+  },
+
+  'roger-pontare': {
+    categoryLabel: 'Musikartist',
+    nationality: 'sweden',
+    hints: [
+      h('bd',    'birth_date',     'Date of birth', 'October 17, 1951',                        2),
+      h('bp',    'birth_place',    'Place of birth','Örnsköldsvik',                              2),
+      h('genre', 'characteristic', 'Genre',         'Folk rock',                                 2),
+      h('s1',    'song',           'Hit song',      '"Sommarnatt" (1994)',                       3),
+      h('merit', 'merit',          'Merit/Award',   'Melodifestivalen winner (1994)',            5),
+      h('instr', 'characteristic', 'Instrument',    'Voice',                                     2),
+    ],
+  },
+
+  'martin-stenmarck': {
+    categoryLabel: 'Musikartist',
+    nationality: 'sweden',
+    hints: [
+      h('bd',    'birth_date',     'Date of birth', 'October 3, 1972',                         2),
+      h('bp',    'birth_place',    'Place of birth','Stockholm',                                 2),
+      h('genre', 'characteristic', 'Genre',         'Pop',                                       2),
+      h('s1',    'song',           'Hit song',      '"Las Vegas" (2005)',                        4),
+      h('merit', 'merit',          'Merit/Award',   'Melodifestivalen winner (2005)',            5),
+      h('instr', 'characteristic', 'Instrument',    'Guitar',                                    2),
+    ],
+  },
+
+  'elena-tsagkrinou': {
+    categoryLabel: 'Musikartist',
+    nationality: 'greece',
+    hints: [
+      h('bd',    'birth_date',     'Date of birth', 'November 16, 1994',                       2),
+      h('bp',    'birth_place',    'Place of birth','Athens',                                    2),
+      h('genre', 'characteristic', 'Genre',         'Pop',                                       2),
+      h('s1',    'song',           'Hit song',      '"El Diablo" (2021)',                        4),
+      h('instr', 'characteristic', 'Instrument',    'Voice',                                     2),
+      h('merit', 'merit',          'Merit/Award',   'Eurovision Song Contest entrant (2021)',    4),
+    ],
+  },
+
+  'charlotte-nilsson': {
+    categoryLabel: 'Musikartist',
+    nationality: 'sweden',
+    hints: [
+      h('bd',    'birth_date',     'Date of birth', 'January 25, 1974',                        2),
+      h('bp',    'birth_place',    'Place of birth','Skövde',                                    2),
+      h('fact1', 'characteristic', 'Fact',          'Later known professionally as Charlotte Perrelli', 3),
+      h('s1',    'song',           'Hit song',      '"Take Me to Your Heaven" (1999)',           4),
+      h('s2',    'song',           'Hit song',      '"The Girl" (2008)',                          3),
+      h('merit', 'merit',          'Merit/Award',   'Eurovision Song Contest winner (1999)',     5),
+    ],
+  },
+
+  'ges': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+      h('member',  'band_member',    'Members',       'Anders Glenmark, Orup, Niklas Strömstedt', 3),
+      h('formed',  'creation_year',  'Formed',        '1994',                                    2),
+      h('genre',   'characteristic', 'Genre',         'Popular music',                           2),
+      h('fact1',   'characteristic', 'Fact',          'Each member also had an established solo career', 3),
+      h('fact2',   'characteristic', 'Fact',          'Band name is an acronym of the members\' surnames', 3),
+    ],
+  },
+
+  'barbados': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+      h('genre',  'characteristic', 'Genre',         'Dansbandspop',                            2),
+      h('member', 'band_member',    'Members',       'Magnus Carlsson',                          3),
+      h('formed', 'creation_year',  'Formed',        '1992',                                    2),
+      h('fact1',  'characteristic', 'Fact',          'Frontman later became a solo Melodifestivalen artist', 3),
+      h('fact2',  'characteristic', 'Fact',          'Regular performers on the dance-hall festival circuit', 2),
+    ],
+  },
+
+  'sarek': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+      h('member',   'band_member',    'Members',       'Kristofer Pettersson, Zara Kronwall, Stina Engelbrecht, Göran Månsson', 3),
+      h('formed',   'creation_year',  'Formed',        '2002',                                  2),
+      h('genre',    'characteristic', 'Genre',         'Dansband',                              2),
+      h('reclabel', 'characteristic', 'Record label',  'Start Klart Records',                   2),
+      h('fact1',    'characteristic', 'Fact',          'A regular act on the dansband touring circuit', 2),
+    ],
+  },
+
+  'dario-g': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+      h('genre',  'characteristic', 'Genre',         'Dance music',                             2),
+      h('member', 'band_member',    'Members',       'Paul Spencer',                             3),
+      h('s1',     'song',           'Hit song',      '"Sunchyme" (1997)',                        4),
+      h('s2',     'song',           'Hit song',      '"Carnaval de Paris" (1998)',                4),
+      h('fact1',  'characteristic', 'Fact',          'Known for football/World Cup-themed dance anthems', 2),
+    ],
+  },
+
+  'brandsta': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+      h('fact1', 'characteristic', 'Full name',     'Ends in "City Släckers"',                    2),
+      h('genre', 'characteristic', 'Genre',         'Comedy rap',                                2),
+      h('formed','creation_year',  'Formed',        '1994',                                      2),
+      h('fact2', 'characteristic', 'Fact',          'Known for humorous, satirical lyrics',      3),
+      h('fact3', 'characteristic', 'Fact',          'Blends regional dialect humor with hip hop', 3),
+    ],
+  },
+
+  'nick-borgen': {
+    categoryLabel: 'Musikartist',
+    nationality: 'norway',
+    hints: [
+      h('bd',    'birth_date',     'Date of birth', 'January 5, 1952',                         2),
+      h('bp',    'birth_place',    'Place of birth','Andenes',                                   2),
+      h('genre', 'characteristic', 'Genre',         'Dansband',                                 2),
+      h('instr', 'characteristic', 'Instrument',    'Acoustic guitar',                          2),
+      h('fact1', 'characteristic', 'Fact',          'Career spanning several decades in the dansband scene', 2),
+      h('fact2', 'characteristic', 'Fact',          'Also active as a songwriter for other artists', 2),
+    ],
+  },
+
+  'kaj': {
+    categoryLabel: 'Band',
+    nationality: 'finland',
+    hints: [
+      h('fact1', 'creation_year',  'Formed',        '2009',                                      2),
+      h('fact2', 'characteristic', 'Fact',          'Performs comedy and music in a rural dialect', 3),
+      h('genre', 'characteristic', 'Genre',         'Comedy / schlager',                         2),
+      h('s1',    'song',           'Hit song',      '"Bara Bada Bastu" (2025)',                   4),
+      h('merit', 'merit',          'Merit/Award',   'Eurovision Song Contest entrant (2025)',     4),
+    ],
+  },
+
+  'anis-don-demina': {
+    categoryLabel: 'Musikartist',
+    nationality: 'sweden',
+    hints: [
+      h('bd',    'birth_date',     'Date of birth', 'April 25, 1993',                          2),
+      h('bp',    'birth_place',    'Place of birth','Sundsvall',                                 2),
+      h('genre', 'characteristic', 'Genre',         'Pop',                                       2),
+      h('fact1', 'characteristic', 'Fact',          'Also works as a music producer for other artists', 3),
+      h('fact2', 'characteristic', 'Fact',          'Known for blending pop with hip hop influences', 3),
+      h('instr', 'characteristic', 'Instrument',    'Voice',                                     2),
+    ],
+  },
+
+  'bolaget': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+      h('genre',    'characteristic', 'Genre',         'Pop',                                     2),
+      h('formed',   'creation_year',  'Formed',        '2019',                                    2),
+      h('reclabel', 'characteristic', 'Record label',  'Metronome Records A/B',                   2),
+      h('fact1',    'characteristic', 'Fact',          'Members were already established in the pop scene', 3),
+      h('fact2',    'characteristic', 'Fact',          'Signed to a long-established Nordic record label', 2),
+    ],
+  },
+
+  'rolandz': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+      h('genre', 'characteristic', 'Genre',         'Dansband',                                  2),
+      h('formed','creation_year',  'Formed',        '2008',                                      2),
+      h('formloc','characteristic','Formed in',     'Värmland',                                  2),
+      h('fact1', 'characteristic', 'Fact',          'Known for lively, crowd-pleasing live shows', 2),
+      h('fact2', 'characteristic', 'Fact',          'A staple on the dance-hall circuit',         2),
+    ],
+  },
+
+  'kapten-rod': {
+    categoryLabel: 'Musikartist',
+    nationality: 'sweden',
+    hints: [
+      h('bd',    'birth_date',     'Date of birth', 'July 7, 1983',                            2),
+      h('bp',    'birth_place',    'Place of birth','Gothenburg',                                2),
+      h('genre', 'characteristic', 'Genre',         'Reggae',                                    2),
+      h('fact1', 'characteristic', 'Fact',          'Part of Gothenburg\'s reggae and dancehall scene', 3),
+      h('fact2', 'characteristic', 'Fact',          'Also active as a record producer',          2),
+      h('instr', 'characteristic', 'Instrument',    'Voice',                                     2),
+    ],
+  },
+
+  'lucianoz': {
+    categoryLabel: 'Musikartist',
+    nationality: 'sweden',
+    hints: [
+      h('bd',    'birth_date',     'Date of birth', 'May 13, 1993',                            2),
+      h('bp',    'birth_place',    'Place of birth','Solna',                                     2),
+      h('genre', 'characteristic', 'Genre',         'Pop',                                       2),
+      h('merit', 'merit',          'Merit/Award',   'Guldklaven',                                5),
+      h('fact1', 'characteristic', 'Fact',          'Part of the modern Nordic pop scene',       2),
+      h('instr', 'characteristic', 'Instrument',    'Voice',                                     2),
+    ],
+  },
+
 }; // end HINTS_LIBRARY_MANUAL
 
 // Nationality-override för items där auto-gen (Wikidata P27) returnerade 'unknown'.

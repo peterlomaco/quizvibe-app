@@ -16,7 +16,7 @@ import {
   selectHints,
 } from '../../../src/utils/hintsGenerator';
 import { HINTS_LIBRARY } from '../../../src/utils/hintsData';
-import { resolveHints } from '../../../src/utils/hintsText';
+import { censorForAnswer, censorSensitive, meetsHintsThreshold, resolveHints } from '../../../src/utils/hintsText';
 import { getPersonGender } from '../../../src/utils/personGender';
 import {
   GENDERED_SUBJECTS,
@@ -27,7 +27,6 @@ import { buildImageVariant } from '../../../src/utils/imageQuestionBuilder';
 import { IMAGE_QUIZ_QUESTIONS } from '../../../src/utils/quizImageQuestions';
 import { isItemInRegionScope, PLAYER_COUNTRY } from '../../../src/utils/regionScope';
 
-const MIN_HINTS_REQUIRED = 10; // speglar quiz.tsx:s pool-filter
 const OPTIONS_PER_QUESTION = 5;
 const ALL_AUDIENCES = new Set(['elder', 'gen-x', 'millennials', 'gen-z', 'gen-alpha', 'all'] as const);
 
@@ -38,7 +37,7 @@ const resolveGender = (id: string) => resolveItemGender(id, HINTS_LIBRARY[id]);
 const playable = IMAGE_QUIZ_QUESTIONS.filter(
   (q) =>
     isItemInRegionScope(q.region, PLAYER_COUNTRY) &&
-    (HINTS_LIBRARY[q.id]?.hints.length ?? 0) >= MIN_HINTS_REQUIRED,
+    meetsHintsThreshold(HINTS_LIBRARY[q.id], q.displayName),
 );
 const playablePersons = playable.filter((q) => GENDERED_SUBJECTS.has(q.contentSubject));
 
@@ -48,10 +47,12 @@ describe('kön på svarsalternativ', () => {
   });
 
   it('täcker person-items i den spelbara poolen', () => {
-    const unknown = playablePersons.filter((q) => resolveGender(q.id) === null);
+    // Icke-binära P21-värden ska MEDVETET sakna kön (se personGender.ts) —
+    // frågan faller då tillbaka på subject-poolen istället för att låsas.
+    const KNOWN_NON_BINARY = new Set(['demi-lovato', 'miley-cyrus', 'dana-international']);
+    const unknown = playablePersons.filter((q) => resolveGender(q.id) === null && !KNOWN_NON_BINARY.has(q.id));
     // Utan kön faller frågan tillbaka på subject-poolen (blandade alternativ),
     // så täckningen måste vara i stort sett total för att regeln ska bita.
-    // Kvarvarande luckor är icke-binära P21-värden — de SKA sakna kön.
     expect(unknown.map((q) => q.id)).toEqual([]);
   });
 
@@ -181,6 +182,30 @@ describe('inga dubblerade bullets', () => {
     ];
     const resolved = resolveHints(collide, 'Någon Annan');
     expect(resolved).toHaveLength(1);
+  });
+});
+
+describe('inga innehållslösa rader', () => {
+  it('lämnar aldrig en rad som bara är skiljetecken/citattecken', () => {
+    const hollow: string[] = [];
+    const hasSubstance = (t: string) => /[A-Za-zÀ-ÖØ-öø-ÿ0-9]/.test(t);
+    for (const [id, lib] of Object.entries(HINTS_LIBRARY)) {
+      const answer = IMAGE_QUIZ_QUESTIONS.find((q) => q.id === id)?.displayName ?? id;
+      for (let run = 0; run < 3; run++) {
+        const texts = resolveHints(selectHints(lib, 15), answer).map((r) => r.text);
+        for (const t of texts) {
+          if (!hasSubstance(t)) hollow.push(`${id}: "${t}"`);
+        }
+      }
+    }
+    expect([...new Set(hollow)]).toEqual([]);
+  });
+
+  it('censorSensitive/censorForAnswer returnerar null istället för en ensam citat-rest', () => {
+    // Svaret/det känsliga ordet börjar precis efter ett inledande citattecken
+    // — "before" blir bara `"`, vilket tidigare visades som en tom bullet.
+    expect(censorForAnswer('"Waterloo" by ABBA', 'Waterloo')).toBeNull();
+    expect(censorSensitive('"died at home in 2019')).toBeNull();
   });
 });
 

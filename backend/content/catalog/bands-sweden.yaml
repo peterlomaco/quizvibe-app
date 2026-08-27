@@ -30,3 +30,149 @@ items:
     peakTo: 2026
     wikimediaSearchHints: ["Marcus Martinus Norwegian pop duo"]
     answerMethods: ["name-letters"]
+  - id: ace-of-base
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Ace of Base"
+    correctYear: 1990
+    probability: 65
+    region: ["sweden"]
+    wikimediaSearchHints: ["Ace of Base"]
+    answerMethods: ["name-letters"]
+  - id: barbados
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Barbados"
+    correctYear: 1992
+    probability: 65
+    region: ["sweden"]
+    wikimediaSearchHints: ["Barbados"]
+    answerMethods: ["name-letters"]
+  - id: bolaget
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Bolaget"
+    correctYear: 2019
+    probability: 65
+    region: ["sweden"]
+    genrePackages: ["sport", "football"]
+    wikimediaSearchHints: ["Bolaget"]
+    answerMethods: ["name-letters"]
+  - id: brandsta
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Brandsta"
+    correctYear: 1994
+    probability: 65
+    region: ["sweden"]
+    inBaseCatalog: false
+    genrePackages: ["sport", "football"]
+    wikimediaSearchHints: ["Brandsta"]
+    answerMethods: ["name-letters"]
+  - id: chips
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Chips"
+    correctYear: 1979
+    probability: 65
+    region: ["sweden"]
+    wikimediaSearchHints: ["Chips"]
+    answerMethods: ["name-letters"]
+  - id: europe
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Europe"
+    correctYear: 1978
+    probability: 65
+    region: ["sweden"]
+    wikimediaSearchHints: ["Europe"]
+    answerMethods: ["name-letters"]
+  - id: ges
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "GES"
+    correctYear: 1994
+    probability: 65
+    region: ["sweden"]
+    genrePackages: ["sport", "football"]
+    wikimediaSearchHints: ["GES"]
+    answerMethods: ["name-letters"]
+  - id: herreys
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Herreys"
+    correctYear: 1984
+    probability: 65
+    region: ["sweden"]
+    genrePackages: ["Eurovision"]
+    wikimediaSearchHints: ["Herreys"]
+    answerMethods: ["name-letters"]
+  - id: icona-pop
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Icona Pop"
+    correctYear: 2009
+    probability: 65
+    region: ["sweden"]
+    genrePackages: ["Hits"]
+    wikimediaSearchHints: ["Icona Pop"]
+    answerMethods: ["name-letters"]
+  - id: rednex
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Rednex"
+    correctYear: 1994
+    probability: 65
+    region: ["sweden"]
+    wikimediaSearchHints: ["Rednex"]
+    answerMethods: ["name-letters"]
+  - id: rolandz
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Rolandz"
+    correctYear: 2008
+    probability: 65
+    region: ["sweden"]
+    genrePackages: ["dansband"]
+    wikimediaSearchHints: ["Rolandz"]
+    answerMethods: ["name-letters"]
+  - id: sarek
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Sarek"
+    correctYear: 2002
+    probability: 65
+    region: ["sweden"]
+    genrePackages: ["Melodifestivalen"]
+    wikimediaSearchHints: ["Sarek"]
+    answerMethods: ["name-letters"]
+  - id: streaplers
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Streaplers"
+    correctYear: 1959
+    probability: 65
+    region: ["sweden"]
+    genrePackages: ["dansband"]
+    wikimediaSearchHints: ["Streaplers"]
+    answerMethods: ["name-letters"]
+  - id: sven-ingvars
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Sven-Ingvars"
+    correctYear: 1956
+    probability: 65
+    region: ["sweden"]
+    wikimediaSearchHints: ["Sven-Ingvars"]
+    answerMethods: ["name-letters"]
+  - id: the-cardigans
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "The Cardigans"
+    correctYear: 1992
+    probability: 65
+    region: ["sweden"]
+    wikimediaSearchHints: ["The Cardigans"]
+    answerMethods: ["name-letters"]
+  - id: the-mamas
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "The Mamas"
+    probability: 65
+    region: ["sweden"]
+    genrePackages: ["Eurovision", "Melodifestivalen"]
+    wikimediaSearchHints: ["The Mamas"]
+    answerMethods: ["name-letters"]
+  - id: timoteij
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Timoteij"
+    correctYear: 2008
+    probability: 65
+    region: ["sweden"]
+    genrePackages: ["Melodifestivalen"]
+    wikimediaSearchHints: ["Timoteij"]
+    answerMethods: ["name-letters"]

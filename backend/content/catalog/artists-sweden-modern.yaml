@@ -93,3 +93,74 @@ items:
     peakTo: 2025
     wikimediaSearchHints: ["Tusse Chiza singer Eurovision 2021"]
     answerMethods: ["name-letters"]
+  - id: anis-don-demina
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Anis Don Demina"
+    correctYear: 1993
+    probability: 65
+    region: ["sweden"]
+    inBaseCatalog: false
+    genrePackages: ["sport", "football"]
+    wikimediaSearchHints: ["Anis Don Demina"]
+    answerMethods: ["name-letters"]
+  - id: dotter
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Dotter"
+    correctYear: 1987
+    probability: 65
+    region: ["sweden"]
+    genrePackages: ["Eurovision"]
+    wikimediaSearchHints: ["Dotter"]
+    answerMethods: ["name-letters"]
+  - id: frans
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Frans"
+    correctYear: 1998
+    probability: 65
+    region: ["sweden"]
+    wikimediaSearchHints: ["Frans Jeppsson Wall"]
+    answerMethods: ["name-letters"]
+  - id: helena-paparizou
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Helena Paparizou"
+    correctYear: 1982
+    probability: 65
+    region: ["sweden"]
+    inBaseCatalog: false
+    genrePackages: ["Eurovision"]
+    wikimediaSearchHints: ["Helena Paparizou"]
+    answerMethods: ["name-letters"]
+  - id: john-lundvik
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "John Lundvik"
+    correctYear: 1983
+    probability: 65
+    region: ["sweden"]
+    genrePackages: ["Eurovision"]
+    wikimediaSearchHints: ["John Lundvik"]
+    answerMethods: ["name-letters"]
+  - id: kapten-rod
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Kapten Röd"
+    correctYear: 1983
+    probability: 65
+    region: ["sweden"]
+    wikimediaSearchHints: ["Kapten Röd"]
+    answerMethods: ["name-letters"]
+  - id: lucianoz
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Lucianoz"
+    correctYear: 1993
+    probability: 65
+    region: ["sweden"]
+    wikimediaSearchHints: ["Lucianoz"]
+    answerMethods: ["name-letters"]
+  - id: mabel
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Mabel"
+    correctYear: 1996
+    probability: 65
+    region: ["sweden"]
+    genrePackages: ["Hits"]
+    wikimediaSearchHints: ["Mabel"]
+    answerMethods: ["name-letters"]

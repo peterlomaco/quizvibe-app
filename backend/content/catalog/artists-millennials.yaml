@@ -859,3 +859,192 @@ items:
     peakTo: 2022
     wikimediaSearchHints: ["Conchita Wurst Austrian singer Eurovision 2014"]
     answerMethods: ["name-letters"]
+  - id: ava-max
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Ava Max"
+    correctYear: 1994
+    probability: 65
+    region: ["global"]
+    genrePackages: ["Club & Dance Hits"]
+    wikimediaSearchHints: ["Ava Max"]
+    answerMethods: ["name-letters"]
+  - id: carly-rae-jepsen
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Carly Rae Jepsen"
+    correctYear: 1985
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Carly Rae Jepsen"]
+    answerMethods: ["name-letters"]
+  - id: chris-brown
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Chris Brown"
+    correctYear: 1989
+    probability: 65
+    region: ["global"]
+    genrePackages: ["Love & Peace"]
+    wikimediaSearchHints: ["Chris Brown"]
+    answerMethods: ["name-letters"]
+  - id: david-tavare
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "David Tavaré"
+    correctYear: 1984
+    probability: 65
+    region: ["global"]
+    genrePackages: ["Summer"]
+    wikimediaSearchHints: ["David Tavaré"]
+    answerMethods: ["name-letters"]
+  - id: duncan-laurence
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Duncan Laurence"
+    correctYear: 1994
+    probability: 65
+    region: ["global"]
+    inBaseCatalog: false
+    genrePackages: ["Eurovision"]
+    wikimediaSearchHints: ["Duncan Laurence"]
+    answerMethods: ["name-letters"]
+  - id: elena-tsagkrinou
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Elena Tsagkrinou"
+    correctYear: 1994
+    probability: 65
+    region: ["global"]
+    inBaseCatalog: false
+    genrePackages: ["Eurovision"]
+    wikimediaSearchHints: ["Elena Tsagkrinou"]
+    answerMethods: ["name-letters"]
+  - id: eleni-foureira
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Eleni Foureira"
+    correctYear: 1987
+    probability: 65
+    region: ["global"]
+    inBaseCatalog: false
+    genrePackages: ["Eurovision"]
+    wikimediaSearchHints: ["Eleni Foureira"]
+    answerMethods: ["name-letters"]
+  - id: ellie-goulding
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Ellie Goulding"
+    correctYear: 1986
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Ellie Goulding"]
+    answerMethods: ["name-letters"]
+  - id: emmelie-de-forest
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Emmelie de Forest"
+    correctYear: 1993
+    probability: 65
+    region: ["global"]
+    genrePackages: ["Eurovision"]
+    wikimediaSearchHints: ["Emmelie de Forest"]
+    answerMethods: ["name-letters"]
+  - id: hadise
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Hadise"
+    correctYear: 1985
+    probability: 65
+    region: ["global"]
+    inBaseCatalog: false
+    genrePackages: ["Eurovision"]
+    wikimediaSearchHints: ["Hadise"]
+    answerMethods: ["name-letters"]
+  - id: jamala
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Jamala"
+    correctYear: 1983
+    probability: 65
+    region: ["global"]
+    inBaseCatalog: false
+    genrePackages: ["Eurovision"]
+    wikimediaSearchHints: ["Jamala"]
+    answerMethods: ["name-letters"]
+  - id: jason-derulo
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Jason Derulo"
+    correctYear: 1989
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Jason Derulo"]
+    answerMethods: ["name-letters"]
+  - id: jessie-j
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Jessie J"
+    correctYear: 1988
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Jessie J"]
+    answerMethods: ["name-letters"]
+  - id: john-newman
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "John Newman"
+    correctYear: 1990
+    probability: 65
+    region: ["global"]
+    genrePackages: ["Club & Dance Hits"]
+    wikimediaSearchHints: ["John Newman"]
+    answerMethods: ["name-letters"]
+  - id: katy-perry
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Katy Perry"
+    correctYear: 1984
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Katy Perry"]
+    answerMethods: ["name-letters"]
+  - id: kesha
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Kesha"
+    correctYear: 1987
+    probability: 65
+    region: ["global"]
+    genrePackages: ["Club & Dance Hits"]
+    wikimediaSearchHints: ["Kesha"]
+    answerMethods: ["name-letters"]
+  - id: lena
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Lena"
+    correctYear: 1991
+    probability: 65
+    region: ["global"]
+    inBaseCatalog: false
+    genrePackages: ["Eurovision"]
+    wikimediaSearchHints: ["Lena"]
+    answerMethods: ["name-letters"]
+  - id: marija-serifovic
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Marija Šerifović"
+    correctYear: 1984
+    probability: 65
+    region: ["global"]
+    inBaseCatalog: false
+    genrePackages: ["Eurovision"]
+    wikimediaSearchHints: ["Marija Šerifović"]
+    answerMethods: ["name-letters"]
+  - id: meghan-trainor
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Meghan Trainor"
+    correctYear: 1993
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Meghan Trainor"]
+    answerMethods: ["name-letters"]
+  - id: ragnbone-man
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Rag'n'Bone Man"
+    correctYear: 1985
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Rag'n'Bone Man"]
+    answerMethods: ["name-letters"]
+  - id: zayn
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "ZAYN"
+    correctYear: 1993
+    probability: 65
+    region: ["global"]
+    genrePackages: ["Love & Peace"]
+    wikimediaSearchHints: ["ZAYN"]
+    answerMethods: ["name-letters"]

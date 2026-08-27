@@ -12,14 +12,21 @@
 // Därefter deduplicerar `resolveHints` på den FÄRDIGA texten — se dess
 // kommentar för varför det måste ske sist och inte på råvärdet.
 
-import type { HintItem } from './hintsData';
-import { fitClubText, fitHintText, formatHintText } from './hintsGenerator';
+import type { HintCategoryLabel, HintItem, HintLibrary } from './hintsData';
+import {
+  buildRenderEntries,
+  fitClubText,
+  fitFilmText,
+  fitHintText,
+  formatHintText,
+  selectHints,
+  type ResolvedHint,
+} from './hintsGenerator';
 
-/** En ledtråd med sin färdiga, radanpassade text. */
-export interface ResolvedHint {
-  hint: HintItem;
-  text: string;
-}
+// ResolvedHint-typen bor i hintsGenerator.ts (den behövs där för render-
+// grupperingen) — återexporteras härifrån så befintliga imports av
+// `import { resolveHints, type ResolvedHint } from './hintsText'` är oförändrade.
+export type { ResolvedHint };
 
 // Termer som redan framgår av rubriken (Genre · Profession) och ska filtreras bort.
 export const REDUNDANT_HINT_TERMS = [
@@ -27,6 +34,59 @@ export const REDUNDANT_HINT_TERMS = [
   'musician',
   'recording artist',
 ];
+
+// ── Profession-redundans mot rubriken (Peter 2026-08-27) ────────────────────
+//
+// Rubriken visar redan Genre · Profession ("Music · Artist", "Film · Actor",
+// "Sport · Athlete"). En profession-ledtråd ska ALDRIG bara upprepa det —
+// men OM den även pekar på en annan bransch (t.ex. "Drummer & actor" när
+// rubriken redan säger Actor) ska den EXTRA delen visas som crossover:
+// "Also: drummer".
+//
+// Synonym-listorna innehåller BARA rena upprepningar av rubrik-ordet — en
+// specifik gren (t.ex. "Professional golfer" för Athlete, "Nordic pop group"
+// för Band, "Country singer" för Musikartist) matchar INGET av dem och visas
+// därför oförändrad: den informationen finns inte redan i rubriken.
+const PROFESSION_SYNONYMS: Record<HintCategoryLabel, string[]> = {
+  Musikartist: [
+    'music artist', 'recording artist', 'musician', 'singer', 'vocalist',
+    'performer', 'entertainer', 'artist',
+  ],
+  Band: ['band', 'music group', 'musical group', 'group', 'duo', 'trio'],
+  Actor: [
+    'actor', 'actress', 'film actor', 'film actress', 'television actor',
+    'tv actor', 'voice actor', 'dub actor', 'stage actor',
+  ],
+  Athlete: ['athlete', 'sportsperson', 'sports personality', 'professional athlete', 'sportsman', 'sportswoman'],
+  Coach: ['coach', 'sports coach', 'manager', 'head coach'],
+  Character: ['character', 'fictional character', 'animated character'],
+};
+
+/**
+ * Delar en profession-sträng på skiljetecken/"and" och sorterar delarna i
+ * (redan-i-rubriken) vs (ny info). Tre utfall:
+ *   - Allt redundant  → null (dölj hela ledtråden)
+ *   - Inget redundant → värdet oförändrat (ny info, t.ex. en specifik gren)
+ *   - Blandat         → bara den nya delen, som crossover-fras
+ */
+function resolveProfessionValue(value: string, label: HintCategoryLabel): string | null {
+  const synonyms = PROFESSION_SYNONYMS[label] ?? [];
+  const parts = value.split(/\s*(?:&|,|\/|\band\b)\s*/i).map((p) => p.trim()).filter(Boolean);
+  if (parts.length === 0) return null;
+
+  const isRedundant = (p: string) => synonyms.includes(p.toLowerCase());
+  const redundant = parts.filter(isRedundant);
+  const extra = parts.filter((p) => !isRedundant(p));
+
+  if (redundant.length === 0) return value;         // helt ny info — visa som den är
+  if (extra.length === 0) return null;               // ren upprepning — dölj
+  // KORT prefix medvetet: "Also well-known as a " ensamt är redan 21 tecken
+  // av HINT_MAX_CHARS budget (25) — nästan varje verkligt crossover-ord
+  // ("drummer", "winegrower", "director") hade truncateWords bort HELA
+  // ordet och lämnat "Also well-known as a…" utan payload. "Also: " (6 tkn)
+  // lämnar rum för ordet, som är hela poängen med hinten.
+  return `Also: ${extra.join(' & ')}`;
+}
 
 // Hint-typer som alltid filtreras bort — flaggan visar redan nationalitet/land.
 // OBS: birth_place filtreras INTE här — city-only värden ska visas.
@@ -79,6 +139,16 @@ export function isRedundantHint(text: string): boolean {
 }
 
 /**
+ * En rad räknas som innehållslös om den bara består av skiljetecken/citat-
+ * tecken/tumtecken utan en enda bokstav eller siffra — t.ex. en ensam `"`
+ * som blir kvar när `censorSensitive`/`censorForAnswer` skär av texten
+ * precis efter ett inledande citattecken. En sådan rad ska aldrig visas.
+ */
+function hasSubstance(text: string): boolean {
+  return /[A-Za-zÀ-ÖØ-öø-ÿ0-9]/.test(text);
+}
+
+/**
  * Trunkerar texten vid det första känsliga ordet och returnerar texten dessförinnan
  * (trimmad och utan avslutande skiljetecken/parenteser). Om inget återstår → null.
  * Texten visas alltså UTAN den känsliga delen, inte borttagen helt.
@@ -92,7 +162,7 @@ export function censorSensitive(text: string): string | null {
   }
   if (earliest === -1) return text;
   const before = text.slice(0, earliest).trim().replace(/[(,:;-]+$/, '').trim();
-  return before.length > 0 ? before : null;
+  return hasSubstance(before) ? before : null;
 }
 
 /**
@@ -117,25 +187,43 @@ export function censorForAnswer(text: string, answer: string): string | null {
   }
   if (earliest === -1) return text; // inget svar i texten — visa som vanligt
   const before = text.slice(0, earliest).trim().replace(/[,:;-]+$/, '').trim();
-  return before.length > 0 ? before : null;
+  return hasSubstance(before) ? before : null;
 }
 
 /**
  * Kör HELA text-pipelinen för en ledtråd och returnerar den färdiga raden,
  * eller null om ledtråden ska hoppas över. Bor här (inte i BulletHint) så
  * dubbletter kan sållas bort innan något renderas — se `resolveHints`.
+ *
+ * `professionLabel` = rubrikens FAKTISKA Genre·Profession-etikett (kan skilja
+ * sig från library.categoryLabel vid crossover, se HintsQuizCard:s
+ * `primaryLabel`). Krävs bara för `type === 'profession'`; utelämnad → ingen
+ * redundans-strippning körs (profession-hinten visas som den är).
  */
-export function resolveHintText(hint: HintItem, answer: string): string | null {
-  if (hint.type === 'club') {
+export function resolveHintText(
+  hint: HintItem,
+  answer: string,
+  professionLabel?: HintCategoryLabel,
+): string | null {
+  if (hint.type === 'club' || hint.type === 'movie') {
     const noSensitive = censorSensitive(hint.value);
     if (noSensitive === null) return null;
     const censored = censorForAnswer(noSensitive, answer);
     if (censored === null) return null;
-    // Klubbnamnet kortas men årtalen behålls — de bär kronologin.
-    return fitClubText(censored);
+    // Klubbnamnet/filmtiteln kortas men årtalen behålls — de bär kronologin
+    // i Career History / Film History-grupperingen (se hintsGenerator.ts).
+    const fitted = hint.type === 'club' ? fitClubText(censored) : fitFilmText(censored);
+    return hasSubstance(fitted) ? fitted : null;
   }
 
-  const raw = formatHintText(hint);
+  let raw: string;
+  if (hint.type === 'profession') {
+    const resolved = professionLabel ? resolveProfessionValue(hint.value, professionLabel) : hint.value;
+    if (resolved === null) return null; // ren upprepning av rubriken
+    raw = resolved;
+  } else {
+    raw = formatHintText(hint);
+  }
   if (isRedundantHint(raw)) return null;
   if (isNationalityHint(hint, raw)) return null;
   const noSensitive = censorSensitive(raw);
@@ -143,7 +231,10 @@ export function resolveHintText(hint: HintItem, answer: string): string | null {
   const censored = censorForAnswer(noSensitive, answer);
   if (censored === null) return null;
   // Radanpassning SIST — censureringen ovan kan redan ha kortat texten.
-  return fitHintText(censored);
+  // Sista, defensiva substanskoll: fitHintText/truncateWords kan i extrema
+  // edge-cases (mycket kort HINT_MAX_CHARS) landa på en ren skiljetecken-rad.
+  const fitted = fitHintText(censored);
+  return hasSubstance(fitted) ? fitted : null;
 }
 
 /**
@@ -164,11 +255,15 @@ export function resolveHintText(hint: HintItem, answer: string): string | null {
  * returnerade BulletHint null medan indexet ändå räknades, så det uppstod
  * tysta luckor i takten.
  */
-export function resolveHints(hints: HintItem[], answer: string): ResolvedHint[] {
+export function resolveHints(
+  hints: HintItem[],
+  answer: string,
+  professionLabel?: HintCategoryLabel,
+): ResolvedHint[] {
   const seen = new Set<string>();
   const out: ResolvedHint[] = [];
   for (const hint of hints) {
-    const text = resolveHintText(hint, answer);
+    const text = resolveHintText(hint, answer, professionLabel);
     if (text === null) continue;
     const key = text.toLowerCase().trim();
     if (seen.has(key)) continue;
@@ -176,4 +271,41 @@ export function resolveHints(hints: HintItem[], answer: string): ResolvedHint[] 
     out.push({ hint, text });
   }
   return out;
+}
+
+// ── Spelbarhets-gate (Peter 2026-08-27) ──────────────────────────────────────
+//
+// Tidigare gate: rått antal HintItem ≥ 10 (quiz.tsx / export-image-
+// questions.ts). Nu grupperas ledtrådar under rubriker (Birth/Career History/
+// Film History/Titles/Trophies, se buildRenderEntries i hintsGenerator.ts),
+// så ett item med FÅ råa fakta som ändå grupperar snyggt — t.ex. Birth (2) +
+// Career History (3) + Trophies (2) = bara 3 TOPP-nivå-bullets av 7 råa
+// fakta — kan vara lika läsbart/spelbart som ett med 10 lösa enskilda bullets.
+// Den råa 10-gränsen behålls som ALTERNATIV väg in (ett item med 10+ lösa
+// fakta behöver inte gruppera för att kvala in).
+export const MIN_RAW_HINTS = 10;
+export const MIN_RENDER_ENTRIES = 5;
+
+/**
+ * Antal TOPP-nivå-bullets (enskilda + grupp-rubriker) en fråga skulle visa,
+ * givet ALLA ledtrådar i biblioteket (inget urval/slump — vi vill veta
+ * bästa-fall-antalet, inte en enskild runda). `displayName` används bara som
+ * censur-referens (samma som runtime) och `library.categoryLabel` som
+ * profession-kontext.
+ */
+export function countPlayableEntries(library: HintLibrary, displayName: string): number {
+  const all = selectHints(library, library.hints.length);
+  const resolved = resolveHints(all, displayName, library.categoryLabel);
+  return buildRenderEntries(resolved).length;
+}
+
+/**
+ * Spelbarhets-gaten själv — används av BÅDE export-image-questions.ts
+ * (vad som bakas in i bundlen) och quiz.tsx:s egen runtime-filter (belt-and-
+ * suspenders mot en icke-omkörd export). Håll de tre i synk om regeln ändras.
+ */
+export function meetsHintsThreshold(library: HintLibrary | undefined, displayName: string): boolean {
+  if (!library) return false;
+  if (library.hints.length >= MIN_RAW_HINTS) return true;
+  return countPlayableEntries(library, displayName) >= MIN_RENDER_ENTRIES;
 }

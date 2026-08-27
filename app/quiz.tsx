@@ -119,6 +119,7 @@ import {
 import { buildImageVariant } from '@/src/utils/imageQuestionBuilder';
 import { createSeededRng } from '@/src/utils/seededRandom';
 import { HINTS_LIBRARY, inferGender, inferNationality, inferSport, type HintLibrary } from '@/src/utils/hintsData';
+import { meetsHintsThreshold } from '@/src/utils/hintsText';
 import { buildHintsDistractorPool } from '@/src/utils/hintsDistractorPool';
 import { isItemInRegionScope, PLAYER_COUNTRY } from '@/src/utils/regionScope';
 import { HintsQuizCard } from '@/src/components/HintsQuizCard';
@@ -313,13 +314,14 @@ function professionFromSubject(subject: string | undefined): string {
 // Items med hints-data i HINTS_LIBRARY får library attachad vid konvertering.
 // Region-filter via EXAKT samma regel och samma datakälla som SEED_QUESTIONS:
 // katalogens `region`, numera exporterad även för bild-items (migration
-// 2026-08-11). Items med färre än 10 hints visas ej — de saknar tillräckliga
-// ledtrådar för en meningsfull fråga.
-const MIN_HINTS_REQUIRED = 10;
+// 2026-08-11). Spelbarhets-gaten (meetsHintsThreshold, hintsText.ts) kräver
+// antingen ≥10 råa ledtrådar ELLER ≥5 grupperade topp-nivå-bullets — samma
+// regel som export-image-questions.ts, belt-and-suspenders mot en icke-
+// omkörd export.
 const IMAGE_SEED_QUESTIONS: ImageQuestion[] = IMAGE_QUIZ_QUESTIONS
   .filter((q) =>
     isItemInRegionScope(q.region, PLAYER_COUNTRY) &&
-    (HINTS_LIBRARY[q.id]?.hints.length ?? 0) >= MIN_HINTS_REQUIRED,
+    meetsHintsThreshold(HINTS_LIBRARY[q.id], q.displayName),
   )
   .map((q, i, arr) => ({
     type: 'image',

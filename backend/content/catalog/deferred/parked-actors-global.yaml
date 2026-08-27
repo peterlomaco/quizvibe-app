@@ -1,6 +1,11 @@
 # Parkerade skådespelare — väntar på global-scope (v1.x)
 # Återaktivera: flytta item(s) till rätt audience-fil,
 # kör export-image-questions + uppdatera quizImages.ts
+#
+# 2026-08-27: andrew-garfield, jason-statham, sverrir-gudnason flyttade härifrån
+# till actors-millennials/actors-gen-x/actors-sweden-modern — de refereras som
+# correctNames i movies-katalogen (The Social Network, Snatch, Borg vs McEnroe)
+# och behövde en egen Hints-person-entry.
 audience: ["all"]
 region: ["global"]
 category: actors
@@ -266,14 +271,6 @@ items:
     probability: 85
     wikimediaSearchHints: ["Colin Firth actor"]
     answerMethods: ["timeline", "name-letters"]
-  - id: jason-statham
-    displayName: "Jason Statham"
-    correctYear: 1967
-    peakFrom: 1990
-    peakTo: 2020
-    probability: 88
-    wikimediaSearchHints: ["Jason Statham actor"]
-    answerMethods: ["timeline", "name-letters"]
   - id: benedict-cumberbatch
     displayName: "Benedict Cumberbatch"
     correctYear: 1976
@@ -308,14 +305,6 @@ items:
     wikimediaSearchHints: ["David Dencik Swedish actor Tinker Tailor Soldier Spy"]
     answerMethods: ["timeline", "name-letters"]
   # === Batch C 2026-05-27 — svenska modern skådespelare ===
-  - id: sverrir-gudnason
-    displayName: "Sverrir Gudnason"
-    correctYear: 1978
-    peakFrom: 2001
-    peakTo: 2026
-    probability: 76
-    wikimediaSearchHints: ["Sverrir Gudnason Swedish actor Borg vs McEnroe"]
-    answerMethods: ["timeline", "name-letters"]
   - id: jenna-ortega
     displayName: "Jenna Ortega"
     correctYear: 2002
@@ -347,14 +336,6 @@ items:
     peakTo: 2026
     probability: 82
     wikimediaSearchHints: ["Saoirse Ronan actress"]
-    answerMethods: ["timeline", "name-letters"]
-  - id: andrew-garfield
-    displayName: "Andrew Garfield"
-    correctYear: 1983
-    peakFrom: 2006
-    peakTo: 2026
-    probability: 82
-    wikimediaSearchHints: ["Andrew Garfield actor"]
     answerMethods: ["timeline", "name-letters"]
   - id: sydney-sweeney
     displayName: "Sydney Sweeney"
