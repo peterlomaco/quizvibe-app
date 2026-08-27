@@ -377,6 +377,11 @@ items:
     wikimediaSearchHints: ["Shakira Waka Waka FIFA World Cup 2010"]
     answerMethods: ["timeline"]
     youtubeClips:
+      - videoId: "Ntn1-SocNiY"
+        startSec: 5
+        endSec: 35
+        channelTitle: "shakiraVEVO"
+        notes: "Peter-kurerad 2026-08-27. Officiella Vevo-videon, startSec 5 angiven av Peter. Ligger FORST for att pickMediaSource alltid valjer youtubeClips[0]; lyrics-klippet czWcyZRAMtk behalls som andra post pa Peters begaran men spelas inte."
       - videoId: "czWcyZRAMtk"
         startSec: 0
         endSec: 202

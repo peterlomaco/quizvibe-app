@@ -119,7 +119,7 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "DEbi_YjpA-Y"
-        startSec: 30
+        startSec: 15
         endSec: 45
         channelTitle: "RHINO"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (3)."

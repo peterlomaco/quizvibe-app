@@ -1190,6 +1190,12 @@ export default function QuizScreen() {
   // till remote_match_answers och slutresultatet finaliseras via RPC.
   const remoteMatchId = params.remoteMatchId ?? null;
   const isRemote = gameMode === 'remote-1v1' && !!remoteMatchId;
+  // Bas för clipSeed (se pickMediaSource): styr vilket klipp som väljs på items
+  // med flera. MÅSTE vara delad av alla enheter i spelet och skilja sig mellan
+  // spel. remoteMatchId respektive roomCode uppfyller båda — roomCode nygenereras
+  // vid varje Create Game/Play Again. Saknas de (direktnavigering i dev) blir
+  // seeden undefined och pickMediaSource faller på Math.random.
+  const clipSeedBase = remoteMatchId ?? params.roomCode ?? null;
   // Remote 1v1: BÅDA deltagarnas åldrar (ur match-snapshotten). Behövs eftersom
   // `turnOrder` i remote bara innehåller spelaren själv — utan detta bygger de
   // två enheterna olika audience-set (= olika distraktor-pool) och därmed olika
@@ -3297,9 +3303,18 @@ export default function QuizScreen() {
               ? question.youtubeClips
               : undefined,
         },
-        { youtubeEnabled, gameMode },
+        {
+          youtubeEnabled,
+          gameMode,
+          // Items med FLERA klipp (officiell video + lyrics) väljs slumpmässigt,
+          // men valet måste bli identiskt på alla enheter i samma spel: i IndDev
+          // renderar varje enhet sin egen media, och remote har ingen sync-kanal.
+          // remoteMatchId/roomCode delas av alla i spelet och byts mellan spel —
+          // alltså samma klipp för alla nu, annat klipp nästa gång.
+          clipSeed: clipSeedBase ? `${clipSeedBase}:${question.id}` : undefined,
+        },
       ),
-    [question, youtubeEnabled, gameMode],
+    [question, youtubeEnabled, gameMode, clipSeedBase],
   );
 
   // D-iv: host:s player_id är alltid turnOrder[0] (Lobby-handleStartGame

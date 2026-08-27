@@ -2445,7 +2445,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "DEbi_YjpA-Y",
-        "startSec": 30,
+        "startSec": 15,
         "endSec": 45,
         "channelTitle": "RHINO",
         "license": "standard",
@@ -10100,8 +10100,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "Orz_bA80Ut0",
-        "startSec": 0,
-        "endSec": 30,
+        "startSec": 48,
+        "endSec": 78,
         "channelTitle": "Spice Girls Mania",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-25 ur Peters YT- och Spotify-lista."
@@ -14619,6 +14619,14 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "youtubeClips": [
+      {
+        "videoId": "Ntn1-SocNiY",
+        "startSec": 5,
+        "endSec": 35,
+        "channelTitle": "shakiraVEVO",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-27. Officiella Vevo-videon, startSec 5 angiven av Peter. Ligger FORST for att pickMediaSource alltid valjer youtubeClips[0]; lyrics-klippet czWcyZRAMtk behalls som andra post pa Peters begaran men spelas inte."
+      },
       {
         "videoId": "czWcyZRAMtk",
         "startSec": 0,

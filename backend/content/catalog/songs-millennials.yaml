@@ -473,8 +473,8 @@ items:
     # Ersatt 2026-08-25 ur Peters lista (validerat oblockerat i SE, HD).
     youtubeClips:
       - videoId: "Orz_bA80Ut0"
-        startSec: 0
-        endSec: 30
+        startSec: 48
+        endSec: 78
         channelTitle: "Spice Girls Mania"
         notes: "Peter-kurerad 2026-08-25 ur Peters YT- och Spotify-lista."
   - id: los-del-rio-macarena
