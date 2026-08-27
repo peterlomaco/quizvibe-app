@@ -830,6 +830,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1971 vinnare — Monaco."
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: vicky-leandros-apres-toi
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Après toi — Vicky Leandros"
@@ -844,6 +845,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1972 vinnare — Luxemburg."
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: anne-marie-david-tu-te-reconnaitras
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Tu te reconnaîtras — Anne-Marie David"
@@ -858,6 +860,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1973 vinnare — Luxemburg."
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: teach-in-ding-a-dong
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Ding-a-dong — Teach-In"
@@ -872,6 +875,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1975 vinnare — Nederländerna."
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: brotherhood-of-man-save-your-kisses
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Save Your Kisses for Me — Brotherhood of Man"
@@ -886,6 +890,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1976 vinnare — Storbritannien."
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: marie-myriam-loiseau-et-lenfant
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "L'Oiseau et l'Enfant — Marie Myriam"
@@ -900,6 +905,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1977 vinnare — Frankrike."
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: izhar-cohen-a-ba-ni-bi
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "A-Ba-Ni-Bi — Izhar Cohen & The Alphabeta"
@@ -914,6 +920,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1978 vinnare — Israel."
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: milk-and-honey-hallelujah
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Hallelujah — Milk & Honey"
@@ -928,6 +935,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1979 vinnare — Israel."
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: johnny-logan-whats-another-year
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "What's Another Year — Johnny Logan"
@@ -942,6 +950,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1980 vinnare — Irland."
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: lill-lindfors-en-san-karl
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "En sån karl — Lill Lindfors"

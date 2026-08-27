@@ -1065,6 +1065,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1983 vinnare — Luxemburg."
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: bobbysocks-la-det-swinge
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "La det swinge — Bobbysocks!"
@@ -1092,6 +1093,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1986 vinnare — Belgien."
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: johnny-logan-hold-me-now
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Hold Me Now — Johnny Logan"
@@ -1106,6 +1108,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1987 vinnare — Irland."
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: celine-dion-ne-partez-pas
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Ne partez pas sans moi — Céline Dion"
@@ -1120,6 +1123,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1988 vinnare — Schweiz."
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: riva-rock-me
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Rock Me — Riva"
@@ -1150,6 +1154,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1990 vinnare — Italien."
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: linda-martin-why-me
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Why Me? — Linda Martin"
@@ -1164,6 +1169,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1992 vinnare — Irland."
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: niamh-kavanagh-in-your-eyes
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "In Your Eyes — Niamh Kavanagh"
@@ -1194,6 +1200,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1994 vinnare — Irland."
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: secret-garden-nocturne
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Nocturne — Secret Garden"
@@ -1222,6 +1229,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1996 vinnare — Irland."
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: lotta-engberg-successchottis
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Succéschottis — Lotta Engberg"
@@ -1809,8 +1817,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "YF1R0hc5Q2I"
-        startSec: 0
-        endSec: 30
+        startSec: 17
+        endSec: 47
         notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
     notes: "correctYear = albumet Tango in the Night (april 1987), forsta gangen laten gick att hora. Singeln kom i nov 1987."
   - id: fleetwood-mac-seven-wonders
@@ -2903,9 +2911,9 @@ items:
     wikimediaSearchHints: ["Robert Miles Children"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "rxjOH8ykvh4"
+      - videoId: "DvyCbevQbtI"
         startSec: 0
         endSec: 30
-        channelTitle: "Robert Miles"
-        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx). correctYear 1995 = EP:n Soundtracks (jan 1995, Italien); slog igenom internationellt 1996. Peters lank pekade pa en 90-tals-topplista, ratt klipp uppsokt."
+        channelTitle: "RobertMilesVEVO"
+        notes: "Peter-kurerad 2026-08-27. Officiella Vevo-videon (SD, bara en note). Ersatte RIGOq8MEyH0 ur xlsx som var en 14 min lang 90-tals-topplista. correctYear 1995 = EP:n Soundtracks (jan 1995, Italien); slog igenom internationellt 1996."
     genrePackages: ["Mega Hits"]

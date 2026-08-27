@@ -2171,36 +2171,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "severine-un-banc-un-arbre",
-    "displayName": "Un banc, un arbre, une rue — Séverine",
-    "correctYear": 1971,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "Eurovision"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "JQUC9TycGWU",
-        "startSec": 5,
-        "endSec": 20,
-        "channelTitle": "Eurovision Song Contest",
-        "license": "standard",
-        "notes": "ESC 1971 vinnare — Monaco."
-      }
-    ]
-  },
-  {
     "id": "bill-withers-lean-on-me",
     "displayName": "Lean on Me — Bill Withers",
     "correctYear": 1972,
@@ -2347,36 +2317,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "vicky-leandros-apres-toi",
-    "displayName": "Après toi — Vicky Leandros",
-    "correctYear": 1972,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "Eurovision"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "52W1665yI1Y",
-        "startSec": 5,
-        "endSec": 20,
-        "channelTitle": "Eurovision Song Contest",
-        "license": "standard",
-        "notes": "ESC 1972 vinnare — Luxemburg."
-      }
-    ]
-  },
-  {
     "id": "abba-ring-ring",
     "displayName": "Ring Ring — ABBA",
     "correctYear": 1973,
@@ -2401,36 +2341,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "ABBA",
         "license": "standard",
         "notes": "Officiell music video ℗ 1973 Polar Music International AB."
-      }
-    ]
-  },
-  {
-    "id": "anne-marie-david-tu-te-reconnaitras",
-    "displayName": "Tu te reconnaîtras — Anne-Marie David",
-    "correctYear": 1973,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "Eurovision"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "vfgR0sXxVWA",
-        "startSec": 5,
-        "endSec": 20,
-        "channelTitle": "Eurovision Song Contest",
-        "license": "standard",
-        "notes": "ESC 1973 vinnare — Luxemburg."
       }
     ]
   },
@@ -3005,66 +2915,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "teach-in-ding-a-dong",
-    "displayName": "Ding-a-dong — Teach-In",
-    "correctYear": 1975,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "Eurovision"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "jqqJvMTNeq4",
-        "startSec": 5,
-        "endSec": 20,
-        "channelTitle": "Eurovision Song Contest",
-        "license": "standard",
-        "notes": "ESC 1975 vinnare — Nederländerna."
-      }
-    ]
-  },
-  {
-    "id": "brotherhood-of-man-save-your-kisses",
-    "displayName": "Save Your Kisses for Me — Brotherhood of Man",
-    "correctYear": 1976,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "Eurovision"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "5yJUi6ke71I",
-        "startSec": 5,
-        "endSec": 20,
-        "channelTitle": "Eurovision Song Contest",
-        "license": "standard",
-        "notes": "ESC 1976 vinnare — Storbritannien."
-      }
-    ]
-  },
-  {
     "id": "dancing-queen",
     "displayName": "Dancing Queen — ABBA",
     "correctYear": 1976,
@@ -3361,36 +3211,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "marie-myriam-loiseau-et-lenfant",
-    "displayName": "L'Oiseau et l'Enfant — Marie Myriam",
-    "correctYear": 1977,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "Eurovision"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "bybdhTg_g20",
-        "startSec": 5,
-        "endSec": 20,
-        "channelTitle": "Eurovision Song Contest",
-        "license": "standard",
-        "notes": "ESC 1977 vinnare — Frankrike."
-      }
-    ]
-  },
-  {
     "id": "queen-we-are-the-champions",
     "displayName": "We Are the Champions — Queen",
     "correctYear": 1977,
@@ -3634,36 +3454,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "izhar-cohen-a-ba-ni-bi",
-    "displayName": "A-Ba-Ni-Bi — Izhar Cohen & The Alphabeta",
-    "correctYear": 1978,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "Eurovision"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "uFd5nk2sXow",
-        "startSec": 5,
-        "endSec": 20,
-        "channelTitle": "Eurovision Song Contest",
-        "license": "standard",
-        "notes": "ESC 1978 vinnare — Israel."
-      }
-    ]
-  },
-  {
     "id": "police-roxanne",
     "displayName": "Roxanne — The Police",
     "correctYear": 1978,
@@ -3769,36 +3559,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "AbbaVEVO",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
-      }
-    ]
-  },
-  {
-    "id": "milk-and-honey-hallelujah",
-    "displayName": "Hallelujah — Milk & Honey",
-    "correctYear": 1979,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "Eurovision"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "vvmHIhhlzOA",
-        "startSec": 5,
-        "endSec": 20,
-        "channelTitle": "Eurovision Song Contest",
-        "license": "standard",
-        "notes": "ESC 1979 vinnare — Israel."
       }
     ]
   },
@@ -3921,36 +3681,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 30,
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-14 ur hans 80-talsspellista. Kanal ej verifierad."
-      }
-    ]
-  },
-  {
-    "id": "johnny-logan-whats-another-year",
-    "displayName": "What's Another Year — Johnny Logan",
-    "correctYear": 1980,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "Eurovision"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "R7k1DH71bO8",
-        "startSec": 5,
-        "endSec": 20,
-        "channelTitle": "Eurovision Song Contest",
-        "license": "standard",
-        "notes": "ESC 1980 vinnare — Irland."
       }
     ]
   },
@@ -4906,36 +4636,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "David Bowie",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-14. Videotitel verifierad: 'David Bowie - Let's Dance (Official Video) [HD]' pa artistens egen kanal — inget ar i titeln. Ersatte Topic-audion (statisk albumkonst)."
-      }
-    ]
-  },
-  {
-    "id": "corinne-hermes-si-la-vie-est-cadeau",
-    "displayName": "Si la vie est cadeau — Corinne Hermès",
-    "correctYear": 1983,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "Eurovision"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "F8y5xc8UodE",
-        "startSec": 5,
-        "endSec": 20,
-        "channelTitle": "Eurovision Song Contest",
-        "license": "standard",
-        "notes": "ESC 1983 vinnare — Luxemburg."
       }
     ]
   },
@@ -6384,36 +6084,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": []
   },
   {
-    "id": "sandra-kim-jaime-la-vie",
-    "displayName": "J'aime la vie — Sandra Kim",
-    "correctYear": 1986,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "Eurovision"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "AT3c41gi3B4",
-        "startSec": 5,
-        "endSec": 20,
-        "channelTitle": "Eurovision Song Contest",
-        "license": "standard",
-        "notes": "ESC 1986 vinnare — Belgien."
-      }
-    ]
-  },
-  {
     "id": "top-gun",
     "displayName": "Top Gun",
     "correctYear": 1986,
@@ -6470,8 +6140,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "YF1R0hc5Q2I",
-        "startSec": 0,
-        "endSec": 30,
+        "startSec": 17,
+        "endSec": 47,
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-14. Kanal ej verifierad."
       }
@@ -6552,36 +6222,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 60,
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-14, startSec angiven av Peter. Kanal ej verifierad."
-      }
-    ]
-  },
-  {
-    "id": "johnny-logan-hold-me-now",
-    "displayName": "Hold Me Now — Johnny Logan",
-    "correctYear": 1987,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "Eurovision"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "gl2yKH5zbyo",
-        "startSec": 5,
-        "endSec": 20,
-        "channelTitle": "Eurovision Song Contest",
-        "license": "standard",
-        "notes": "ESC 1987 vinnare — Irland."
       }
     ]
   },
@@ -6820,36 +6460,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Bobby McFerrin - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
-      }
-    ]
-  },
-  {
-    "id": "celine-dion-ne-partez-pas",
-    "displayName": "Ne partez pas sans moi — Céline Dion",
-    "correctYear": 1988,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "Eurovision"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "VXLWfXmlXPc",
-        "startSec": 5,
-        "endSec": 20,
-        "channelTitle": "Eurovision Song Contest",
-        "license": "standard",
-        "notes": "ESC 1988 vinnare — Schweiz."
       }
     ]
   },
@@ -7702,36 +7312,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "toto-cutugno-insieme",
-    "displayName": "Insieme: 1992 — Toto Cutugno",
-    "correctYear": 1990,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "Eurovision"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "JiRppGSF-tI",
-        "startSec": 5,
-        "endSec": 20,
-        "channelTitle": "Eurovision Song Contest",
-        "license": "standard",
-        "notes": "ESC 1990 vinnare — Italien."
-      }
-    ]
-  },
-  {
     "id": "bryan-adams-everything-i-do",
     "displayName": "(Everything I Do) I Do It for You — Bryan Adams",
     "correctYear": 1991,
@@ -8437,36 +8017,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "moonfloated",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
-      }
-    ]
-  },
-  {
-    "id": "linda-martin-why-me",
-    "displayName": "Why Me? — Linda Martin",
-    "correctYear": 1992,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "Eurovision"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "DKd50924Qxs",
-        "startSec": 5,
-        "endSec": 20,
-        "channelTitle": "Eurovision Song Contest",
-        "license": "standard",
-        "notes": "ESC 1992 vinnare — Irland."
       }
     ]
   },
@@ -9575,36 +9125,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "paul-harrington-rock-n-roll-kids",
-    "displayName": "Rock 'n' Roll Kids — Paul Harrington & Charlie McGettigan",
-    "correctYear": 1994,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "Eurovision"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "ohBO8OxQbv8",
-        "startSec": 5,
-        "endSec": 20,
-        "channelTitle": "Eurovision Song Contest",
-        "license": "standard",
-        "notes": "ESC 1994 vinnare — Irland."
-      }
-    ]
-  },
-  {
     "id": "pulp-fiction",
     "displayName": "Pulp Fiction",
     "correctYear": 1994,
@@ -10114,12 +9634,12 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "youtubeClips": [
       {
-        "videoId": "rxjOH8ykvh4",
+        "videoId": "DvyCbevQbtI",
         "startSec": 0,
         "endSec": 30,
-        "channelTitle": "Robert Miles",
+        "channelTitle": "RobertMilesVEVO",
         "license": "standard",
-        "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx). correctYear 1995 = EP:n Soundtracks (jan 1995, Italien); slog igenom internationellt 1996. Peters lank pekade pa en 90-tals-topplista, ratt klipp uppsokt."
+        "notes": "Peter-kurerad 2026-08-27. Officiella Vevo-videon (SD, bara en note). Ersatte RIGOq8MEyH0 ur xlsx som var en 14 min lang 90-tals-topplista. correctYear 1995 = EP:n Soundtracks (jan 1995, Italien); slog igenom internationellt 1996."
       }
     ]
   },
@@ -10265,36 +9785,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "The Cardigans - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
-      }
-    ]
-  },
-  {
-    "id": "eimear-quinn-the-voice",
-    "displayName": "The Voice — Eimear Quinn",
-    "correctYear": 1996,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "Eurovision"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "0KiE1byYXtA",
-        "startSec": 5,
-        "endSec": 20,
-        "channelTitle": "Eurovision Song Contest",
-        "license": "standard",
-        "notes": "ESC 1996 vinnare — Irland."
       }
     ]
   },
@@ -10935,36 +10425,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "katrina-waves-love-shine-a-light",
-    "displayName": "Love Shine a Light — Katrina and the Waves",
-    "correctYear": 1997,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "Eurovision"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "KwLBCKA5-ls",
-        "startSec": 5,
-        "endSec": 20,
-        "channelTitle": "Eurovision Song Contest",
-        "license": "standard",
-        "notes": "ESC 1997 vinnare — Storbritannien."
-      }
-    ]
-  },
-  {
     "id": "kent-om-du-var-har",
     "displayName": "Om du var här — Kent",
     "correctYear": 1997,
@@ -11240,36 +10700,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 237,
         "channelTitle": "Cher",
         "license": "standard"
-      }
-    ]
-  },
-  {
-    "id": "dana-international-diva",
-    "displayName": "Diva — Dana International",
-    "correctYear": 1998,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "Eurovision"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "4No1oClTp_E",
-        "startSec": 5,
-        "endSec": 20,
-        "channelTitle": "Eurovision Song Contest",
-        "license": "standard",
-        "notes": "ESC 1998 vinnare — Israel."
       }
     ]
   },
@@ -11913,8 +11343,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "bJE308E1gTk",
-        "startSec": 0,
-        "endSec": 30,
+        "startSec": 15,
+        "endSec": 45,
         "channelTitle": "Enrique Iglesias",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
@@ -12480,36 +11910,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "antique-die-for-you",
-    "displayName": "(I Would) Die for You — Antique",
-    "correctYear": 2001,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "Eurovision"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "VVLfuW3KiLY",
-        "startSec": 0,
-        "endSec": 30,
-        "channelTitle": "Antique",
-        "license": "standard",
-        "notes": "Official music video. ESC 2001 Greece entry (3rd place)."
-      }
-    ]
-  },
-  {
     "id": "destinys-child-bootylicious",
     "displayName": "Bootylicious — Destiny’s Child",
     "correctYear": 2001,
@@ -12804,36 +12204,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Dreamworks",
         "license": "standard",
         "notes": "DreamWorks officiell trailer (1:48) — Shrek + Åsnon i träsket. Allsvars DreamWorks-kanal."
-      }
-    ]
-  },
-  {
-    "id": "tanel-padar-everybody",
-    "displayName": "Everybody — Tanel Padar, Dave Benton & 2XL",
-    "correctYear": 2001,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "Eurovision"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "92TSUlqzFi8",
-        "startSec": 5,
-        "endSec": 20,
-        "channelTitle": "Eurovision Song Contest",
-        "license": "standard",
-        "notes": "ESC 2001 vinnare — Estland."
       }
     ]
   },
@@ -13179,36 +12549,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "sertab-erener-everyway-that-i-can",
-    "displayName": "Everyway That I Can — Sertab Erener",
-    "correctYear": 2003,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "Eurovision"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "j0_QrKnqd5E",
-        "startSec": 5,
-        "endSec": 20,
-        "channelTitle": "Eurovision Song Contest",
-        "license": "standard",
-        "notes": "ESC 2003 vinnare — Turkiet."
-      }
-    ]
-  },
-  {
     "id": "the-killers-mr-brightside",
     "displayName": "Mr. Brightside — The Killers",
     "correctYear": 2003,
@@ -13526,36 +12866,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "ruslana-wild-dances",
-    "displayName": "Wild Dances — Ruslana",
-    "correctYear": 2004,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "Eurovision"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "MTLmoV0E_6c",
-        "startSec": 50,
-        "endSec": 65,
-        "channelTitle": "Ruslana",
-        "license": "standard",
-        "notes": "ESC 2004 vinnare — Ukraina. Officiell remastered MV."
-      }
-    ]
-  },
-  {
     "id": "sa-som-i-himmelen",
     "displayName": "Så som i himmelen",
     "correctYear": 2004,
@@ -13695,36 +13005,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 255,
         "channelTitle": "Gorillaz",
         "license": "standard"
-      }
-    ]
-  },
-  {
-    "id": "helena-paparizou-my-number-one",
-    "displayName": "My Number One — Helena Paparizou",
-    "correctYear": 2005,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "Eurovision"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "rcOwvZ26KFQ",
-        "startSec": 5,
-        "endSec": 20,
-        "channelTitle": "Eurovision Song Contest",
-        "license": "standard",
-        "notes": "ESC 2005 vinnare — Grekland."
       }
     ]
   },
@@ -14210,36 +13490,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "marija-serifovic-molitva",
-    "displayName": "Molitva — Marija Šerifović",
-    "correctYear": 2007,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "Eurovision"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "Kbi08wfT7mA",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Marija Šerifović",
-        "license": "standard",
-        "notes": "ESC 2007 vinnare — Serbien. Officiell music video."
-      }
-    ]
-  },
-  {
     "id": "ne-yo-because-of-you",
     "displayName": "Because of You — Ne-Yo",
     "correctYear": 2007,
@@ -14536,8 +13786,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "x_iSoluR53U",
-        "startSec": 5,
-        "endSec": 20,
+        "startSec": 3,
+        "endSec": 33,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "Melodifestivalen 2008 vinnare. ESC 2008 performance."
@@ -15273,36 +14523,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "lena-satellite",
-    "displayName": "Satellite — Lena",
-    "correctYear": 2010,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "Eurovision"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "8QSgNM9yNjo",
-        "startSec": 5,
-        "endSec": 20,
-        "channelTitle": "Eurovision Song Contest",
-        "license": "standard",
-        "notes": "ESC 2010 vinnare — Tyskland. Officiell music video."
-      }
-    ]
-  },
-  {
     "id": "rihanna-only-girl",
     "displayName": "Only Girl (In the World) — Rihanna",
     "correctYear": 2010,
@@ -15587,36 +14807,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "BeyoncéVEVO",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
-      }
-    ]
-  },
-  {
-    "id": "ell-nikki-running-scared",
-    "displayName": "Running Scared — Ell & Nikki",
-    "correctYear": 2011,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "Eurovision"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "3Vk4HYUatv8",
-        "startSec": 5,
-        "endSec": 20,
-        "channelTitle": "Eurovision Song Contest",
-        "license": "standard",
-        "notes": "ESC 2011 vinnare — Azerbajdzjan. Officiell music video."
       }
     ]
   },
@@ -16701,36 +15891,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "conchita-wurst-rise-like-a-phoenix",
-    "displayName": "Rise Like a Phoenix — Conchita Wurst",
-    "correctYear": 2014,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "Eurovision"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "ToqNa0rqUtY",
-        "startSec": 5,
-        "endSec": 20,
-        "channelTitle": "Eurovision Song Contest",
-        "license": "standard",
-        "notes": "ESC 2014 vinnare — Österrike. Officiell music video."
-      }
-    ]
-  },
-  {
     "id": "ed-sheeran-thinking-out-loud",
     "displayName": "Thinking Out Loud — Ed Sheeran",
     "correctYear": 2014,
@@ -17498,36 +16658,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "David Guetta",
         "license": "standard",
         "notes": "Officiell MV från David Guettas kanal. UEFA EURO 2016 Official Song. Ersätter Topic-versionen."
-      }
-    ]
-  },
-  {
-    "id": "jamala-1944",
-    "displayName": "1944 — Jamala",
-    "correctYear": 2016,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "Eurovision"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "wNECV2h-y58",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Jamala",
-        "license": "standard",
-        "notes": "ESC 2016 vinnare — Ukraina. Officiell music video."
       }
     ]
   },
@@ -18527,36 +17657,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": []
   },
   {
-    "id": "netta-toy",
-    "displayName": "Toy — Netta",
-    "correctYear": 2018,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "Eurovision"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "CziHrYYSyPc",
-        "startSec": 5,
-        "endSec": 20,
-        "channelTitle": "Eurovision Song Contest",
-        "license": "standard",
-        "notes": "ESC 2018 vinnare — Israel. Officiell music video."
-      }
-    ]
-  },
-  {
     "id": "arvingarna-i-do",
     "displayName": "I Do — Arvingarna",
     "correctYear": 2019,
@@ -18665,36 +17765,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Dua Lipa",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (18)."
-      }
-    ]
-  },
-  {
-    "id": "duncan-laurence-arcade",
-    "displayName": "Arcade — Duncan Laurence",
-    "correctYear": 2019,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "Eurovision"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "Eztx7Wr8PtE",
-        "startSec": 5,
-        "endSec": 20,
-        "channelTitle": "Eurovision Song Contest",
-        "license": "standard",
-        "notes": "ESC 2019 vinnare — Nederländerna. Officiell music video."
       }
     ]
   },
@@ -18866,6 +17936,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "ShawnMendesVEVO",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx). correctYear 2019 verifierat mot Wikipedia (MusicBrainz gav 2006 = annan artist)."
+      }
+    ]
+  },
+  {
+    "id": "spirit-in-the-sky-keiino",
+    "displayName": "Spirit in the Sky — KEiiNO",
+    "correctYear": 2019,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "europe"
+    ],
+    "genrePackages": [
+      "Eurovision"
+    ],
+    "spotifyTrackId": "7B7O5jgFpWfc9orZw6FN4K",
+    "youtubeClips": [
+      {
+        "videoId": "Ovt7YGHAj8I",
+        "startSec": 40,
+        "endSec": 55,
+        "channelTitle": "KEiiNO",
+        "license": "standard",
+        "notes": "Official music video. ESC 2019 Norway entry."
       }
     ]
   },
@@ -19163,6 +18264,38 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "the-mamas-move",
+    "displayName": "Move — The Mamas",
+    "correctYear": 2020,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Eurovision",
+      "Melodifestivalen"
+    ],
+    "spotifyTrackId": "19LiotxKSVs7FeVMEdHz63",
+    "youtubeClips": [
+      {
+        "videoId": "7EpSBDPlZn4",
+        "startSec": 5,
+        "endSec": 20,
+        "channelTitle": "Eurovision Song Contest",
+        "license": "standard",
+        "notes": "Melodifestivalen 2020 vinnare. ESC 2020 official video."
+      }
+    ]
+  },
+  {
     "id": "bono-we-are-the-people",
     "displayName": "We Are the People — Martin Garrix ft. Bono & The Edge",
     "correctYear": 2021,
@@ -19208,36 +18341,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 140,
         "channelTitle": "7clouds",
         "license": "standard"
-      }
-    ]
-  },
-  {
-    "id": "maneskin-zitti-e-buoni",
-    "displayName": "Zitti e buoni — Måneskin",
-    "correctYear": 2021,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "Eurovision"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "RVH5dn1cxAQ",
-        "startSec": 5,
-        "endSec": 20,
-        "channelTitle": "Eurovision Song Contest",
-        "license": "standard",
-        "notes": "ESC 2021 vinnare — Italien."
       }
     ]
   },
@@ -19461,36 +18564,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 165,
         "channelTitle": "7clouds",
         "license": "standard"
-      }
-    ]
-  },
-  {
-    "id": "kalush-orchestra-stefania",
-    "displayName": "Stefania — Kalush Orchestra",
-    "correctYear": 2022,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "Eurovision"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "UiEGVYOruLk",
-        "startSec": 5,
-        "endSec": 20,
-        "channelTitle": "Eurovision Song Contest",
-        "license": "standard",
-        "notes": "ESC 2022 vinnare — Ukraina. Officiell music video."
       }
     ]
   },
@@ -19885,36 +18958,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "nemo-the-code",
-    "displayName": "The Code — Nemo",
-    "correctYear": 2024,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "Eurovision"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "kiGDvM14Kwg",
-        "startSec": 5,
-        "endSec": 20,
-        "channelTitle": "Eurovision Song Contest",
-        "license": "standard",
-        "notes": "ESC 2024 vinnare — Schweiz. Officiell music video."
-      }
-    ]
-  },
-  {
     "id": "rose-bruno-mars-apt",
     "displayName": "APT. — ROSÉ & Bruno Mars",
     "correctYear": 2024,
@@ -20018,36 +19061,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Alex Warren",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
-      }
-    ]
-  },
-  {
-    "id": "jj-wasted-love",
-    "displayName": "Wasted Love — JJ",
-    "correctYear": 2025,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "Eurovision"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "-ieSTNpxvio",
-        "startSec": 5,
-        "endSec": 20,
-        "channelTitle": "Eurovision Song Contest",
-        "license": "standard",
-        "notes": "ESC 2025 vinnare — Österrike. Officiell music video."
       }
     ]
   },
@@ -20193,36 +19206,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 30,
         "channelTitle": "Bolaget",
         "license": "standard"
-      }
-    ]
-  },
-  {
-    "id": "dara-bangaranga",
-    "displayName": "Bangaranga — DARA",
-    "correctYear": 2026,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "Eurovision"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "J3oGYo_mekw",
-        "startSec": 5,
-        "endSec": 20,
-        "channelTitle": "Eurovision Song Contest",
-        "license": "standard",
-        "notes": "ESC 2026 vinnare — Bulgarien. Officiell music video."
       }
     ]
   },

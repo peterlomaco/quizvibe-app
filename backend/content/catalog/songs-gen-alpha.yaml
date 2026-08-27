@@ -673,7 +673,6 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 2020 vinnare. ESC 2020 official video."
     genrePackages: ["Eurovision", "Melodifestivalen"]
-    inBaseCatalog: false
   - id: tusse-voices
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Voices — Tusse"
@@ -787,6 +786,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2014 vinnare — Österrike. Officiell music video."
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: jamala-1944
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "1944 — Jamala"
@@ -801,6 +801,7 @@ items:
         channelTitle: "Jamala"
         notes: "ESC 2016 vinnare — Ukraina. Officiell music video."
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: netta-toy
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Toy — Netta"
@@ -815,6 +816,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2018 vinnare — Israel. Officiell music video."
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: duncan-laurence-arcade
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Arcade — Duncan Laurence"
@@ -829,6 +831,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2019 vinnare — Nederländerna. Officiell music video."
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: maneskin-zitti-e-buoni
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Zitti e buoni — Måneskin"
@@ -843,6 +846,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2021 vinnare — Italien."
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: kalush-orchestra-stefania
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Stefania — Kalush Orchestra"
@@ -857,6 +861,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2022 vinnare — Ukraina. Officiell music video."
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: nemo-the-code
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "The Code — Nemo"
@@ -871,6 +876,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2024 vinnare — Schweiz. Officiell music video."
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: jj-wasted-love
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Wasted Love — JJ"
@@ -885,6 +891,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2025 vinnare — Österrike. Officiell music video."
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: dara-bangaranga
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Bangaranga — DARA"
@@ -899,6 +906,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2026 vinnare — Bulgarien. Officiell music video."
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: nyper-mig-i-armen
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Nyper mig i armen — Albin Lee Meldau & Per Gessle"
@@ -958,7 +966,6 @@ items:
     correctYear: 2019
     probability: 78
     region: ["europe"]
-    inBaseCatalog: false
     wikimediaSearchHints: ["KEiiNO Spirit in the Sky Norway Eurovision 2019"]
     answerMethods: ["timeline"]
     genrePackages: ["Eurovision"]

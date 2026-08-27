@@ -850,8 +850,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "x_iSoluR53U"
-        startSec: 5
-        endSec: 20
+        startSec: 3
+        endSec: 33
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 2008 vinnare. ESC 2008 performance."
     genrePackages: ["Eurovision"]
@@ -912,6 +912,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1997 vinnare — Storbritannien."
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: dana-international-diva
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Diva — Dana International"
@@ -926,6 +927,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1998 vinnare — Israel."
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: olsen-brothers-fly-on-wings-of-love
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Fly on the Wings of Love — Olsen Brothers"
@@ -954,6 +956,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2001 vinnare — Estland."
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: marie-n-i-wanna
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "I Wanna — Marie N"
@@ -964,6 +967,7 @@ items:
     # youtubeClips borttagna 2026-08-26 pa Peters begaran (_M-w89U8TEU).
     # Itemet ar utan media tills ersattning finns.
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: sertab-erener-everyway-that-i-can
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Everyway That I Can — Sertab Erener"
@@ -978,6 +982,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2003 vinnare — Turkiet."
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: ruslana-wild-dances
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Wild Dances — Ruslana"
@@ -992,6 +997,7 @@ items:
         channelTitle: "Ruslana"
         notes: "ESC 2004 vinnare — Ukraina. Officiell remastered MV."
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: helena-paparizou-my-number-one
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "My Number One — Helena Paparizou"
@@ -1006,6 +1012,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2005 vinnare — Grekland."
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: lordi-hard-rock-hallelujah
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Hard Rock Hallelujah — Lordi"
@@ -1034,6 +1041,7 @@ items:
         channelTitle: "Marija Šerifović"
         notes: "ESC 2007 vinnare — Serbien. Officiell music video."
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: dima-bilan-believe
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Believe — Dima Bilan"
@@ -1044,6 +1052,7 @@ items:
     # youtubeClips borttagna 2026-08-26 pa Peters begaran (-72s4WzUcKI).
     # Itemet ar utan media tills ersattning finns.
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: alexander-rybak-fairytale
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Fairytale — Alexander Rybak"
@@ -1071,6 +1080,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2010 vinnare — Tyskland. Officiell music video."
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: ell-nikki-running-scared
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Running Scared — Ell & Nikki"
@@ -1085,6 +1095,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2011 vinnare — Azerbajdzjan. Officiell music video."
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: barbados-kom-hem
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Kom hem — Barbados"
@@ -1214,6 +1225,7 @@ items:
         endSec: 30
         channelTitle: "Antique"
         notes: "Official music video. ESC 2001 Greece entry (3rd place)."
+    inBaseCatalog: false
   - id: eminem-my-name-is
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "My Name Is — Eminem"
@@ -1535,8 +1547,8 @@ items:
     genrePackages: ["Film"]
     youtubeClips:
       - videoId: "bJE308E1gTk"
-        startSec: 0
-        endSec: 30
+        startSec: 15
+        endSec: 45
         channelTitle: "Enrique Iglesias"
         notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
   - id: david-tavare-summerlove
