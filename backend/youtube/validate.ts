@@ -5,13 +5,20 @@
 //   eller: npm run youtube-validate -- --file persons-millennials.yaml
 //   eller: npm run youtube-validate -- <item-id>
 //
-// Exit 1 BARA vid hårda fel (klippet spelas inte för våra spelare). Mjuka
-// anmärkningar — SD-upplösning, block i regioner vi inte levererar till —
-// rapporteras under NOTES men fäller inte körningen. Se getClipIssues i
-// ./client för severity-reglerna och varför uppdelningen finns.
+// Klassificeringen sker per ITEM, inte per klipp. Ett item kan bära flera
+// klipp (officiell video + lyrics-version) och spelas så länge minst ett
+// fungerar — se pickMediaSource i src/utils/mediaSource.ts.
+//
+//   DEAD     = inget spelbart klipp kvar        -> exit 1, larma
+//   DEGRADED = ett klipp borta, minst ett kvar  -> rapporteras, exit 0
+//
+// Exit 1 BARA på DEAD. Mjuka anmärkningar — SD-upplösning, block i regioner
+// vi inte levererar till — rapporteras under NOTES men fäller inte körningen.
+// Se getClipIssues i ./client för severity-reglerna.
 //
 // CI: körs nightly via .github/workflows/youtube-validate-nightly.yml.
 
+import { pathToFileURL } from 'node:url';
 import { loadCatalog, findItemsById } from '../content/registry';
 import { ContentItem, YoutubeClip } from '../content/schema';
 import {
@@ -38,6 +45,66 @@ interface ClipReport {
   hardReasons: string[];
   softReasons: string[];
   details?: YoutubeVideoDetails;
+}
+
+/**
+ * Item-nivå-status. Ett item kan bära FLERA klipp (officiell video +
+ * lyrics-version) och spelas så länge minst ett fungerar — se
+ * `pickMediaSource` i src/utils/mediaSource.ts.
+ *
+ * Klassificeringen är per ITEM och inte per klipp, för det är itemet som
+ * spelaren möter. Med per-klipp-larm hade cronen blivit röd varje natt så
+ * fort ett av två klipp föll bort, trots att frågan fortfarande går att
+ * spela — och ett larm som alltid är rött slutar man läsa.
+ */
+export type ItemStatus = 'ok' | 'degraded' | 'dead';
+
+export interface ItemReport {
+  filename: string;
+  itemId: string;
+  displayName: string;
+  status: ItemStatus;
+  /** Klipp som inte kan spelas för våra spelare. */
+  failed: ClipReport[];
+  /** Klipp som fortfarande fungerar (inkl. sådana med mjuka anmärkningar). */
+  healthy: ClipReport[];
+}
+
+/**
+ * Gruppera klipp-rapporter per item och sätt item-status.
+ *
+ * 'dead'     = INGET klipp går att spela → blockerar (exit 1)
+ * 'degraded' = minst ett klipp borta, minst ett kvar → rapporteras, exit 0
+ * 'ok'       = alla klipp spelbara
+ *
+ * Nyckeln är filnamn + item-id: registry tolererar samma id i flera filer.
+ * Ett item med ETT klipp som gått sönder blir 'dead', alltså samma
+ * blockerande beteende som före item-grupperingen.
+ */
+export function classifyItems(reports: ClipReport[]): ItemReport[] {
+  const byItem = new Map<string, ItemReport>();
+  for (const r of reports) {
+    const key = `${r.ref.filename}::${r.ref.itemId}`;
+    let entry = byItem.get(key);
+    if (!entry) {
+      entry = {
+        filename: r.ref.filename,
+        itemId: r.ref.itemId,
+        displayName: r.ref.displayName,
+        status: 'ok',
+        failed: [],
+        healthy: [],
+      };
+      byItem.set(key, entry);
+    }
+    const hardFail = r.status === 'broken' || r.status === 'missing';
+    (hardFail ? entry.failed : entry.healthy).push(r);
+  }
+  for (const entry of byItem.values()) {
+    entry.status =
+      entry.failed.length === 0 ? 'ok' : entry.healthy.length === 0 ? 'dead' : 'degraded';
+  }
+  return Array.from(byItem.values());
 }
 
 const VIDEOS_LIST_BATCH_SIZE = 50;
@@ -117,23 +184,52 @@ function printReport(reports: ClipReport[]): void {
   const broken = reports.filter((r) => r.status === 'broken');
   const missing = reports.filter((r) => r.status === 'missing');
 
+  const items = classifyItems(reports);
+  const dead = items.filter((i) => i.status === 'dead');
+  const degraded = items.filter((i) => i.status === 'degraded');
+
   console.log(
-    `\nValidated ${reports.length} clip(s): ` +
+    `\nValidated ${reports.length} clip(s) across ${items.length} item(s): ` +
       `${ok.length} OK, ${warn.length} notes, ` +
       `${broken.length} broken, ${missing.length} missing.`,
   );
+  console.log(
+    `Items: ${items.length - dead.length - degraded.length} playable, ` +
+      `${degraded.length} degraded, ${dead.length} DEAD.`,
+  );
 
-  // Hårda fel först — det är dessa som fäller körningen och kräver åtgärd.
-  if (broken.length || missing.length) {
+  // DEAD först — inget spelbart klipp kvar. Det är dessa som fäller
+  // körningen och kräver åtgärd.
+  if (dead.length) {
     console.log(
-      '\n──────────────────────── BROKEN (blocking) ─────────────────────',
+      '\n──────────────── DEAD ITEMS (blocking) ─────────────────────────',
     );
-    for (const r of [...missing, ...broken]) {
-      const tag = r.status === 'missing' ? 'MISSING' : 'BROKEN';
+    for (const i of dead) {
+      console.log(`  [DEAD] ${i.itemId} (${i.filename}) — ${i.displayName}`);
+      for (const r of i.failed) {
+        const tag = r.status === 'missing' ? 'MISSING' : 'BROKEN';
+        console.log(`    ${tag} ${r.ref.clip.videoId}: ${r.hardReasons.join(', ')}`);
+      }
+    }
+  }
+
+  // DEGRADED fäller INTE jobbet: itemet har kvar minst ett spelbart klipp,
+  // så frågan fungerar. Plocka bort det trasiga klippet ur YAML:en när du
+  // hinner — annars kan slumpen i pickMediaSource landa på det.
+  if (degraded.length) {
+    console.log(
+      '\n──────── DEGRADED ITEMS (still playable, non-blocking) ─────────',
+    );
+    for (const i of degraded) {
       console.log(
-        `  [${tag}] ${r.ref.itemId} (${r.ref.filename}) → ${r.ref.clip.videoId}`,
+        `  [DEGRADED] ${i.itemId} (${i.filename}) — ` +
+          `${i.failed.length} av ${i.failed.length + i.healthy.length} klipp borta`,
       );
-      console.log(`    reasons: ${r.hardReasons.join(', ')}`);
+      for (const r of i.failed) {
+        const tag = r.status === 'missing' ? 'MISSING' : 'BROKEN';
+        console.log(`    ${tag} ${r.ref.clip.videoId}: ${r.hardReasons.join(', ')}`);
+      }
+      console.log(`    kvar: ${i.healthy.map((r) => r.ref.clip.videoId).join(', ')}`);
     }
   }
 
@@ -227,16 +323,26 @@ async function main(): Promise<void> {
   const reports = await validateBatch(refs);
   printReport(reports);
 
-  // Exit 1 BARA på hårda fel. Mjuka anmärkningar (SD, block i regioner vi
-  // inte levererar till) är permanenta för delar av katalogen och fällde
-  // tidigare jobbet varje natt — vilket gjorde nightly-mejlet värdelöst.
-  const failed = reports.filter(
-    (r) => r.status === 'broken' || r.status === 'missing',
-  ).length;
-  if (failed > 0) process.exit(1);
+  // Exit 1 BARA när ett ITEM är dött, dvs. saknar spelbart klipp helt.
+  //
+  // Två tidigare varianter av den här raden gjorde nightly-mejlet värdelöst:
+  // först fällde mjuka anmärkningar (SD, block i regioner vi inte levererar
+  // till) jobbet varje natt, sedan fällde ett brutet klipp på ett item som
+  // hade ett fungerande alternativ. Larmet ska gå när en FRÅGA slutar
+  // fungera — inte när ett klipp gör det.
+  const deadItems = classifyItems(reports).filter((i) => i.status === 'dead');
+  if (deadItems.length > 0) process.exit(1);
 }
 
-main().catch((err) => {
-  console.error('Fatal:', err);
-  process.exit(1);
-});
+// Kör main() BARA som CLI. Utan guarden startade en `import { classifyItems }`
+// från testerna hela valideringen — som anropar YouTube-API:t och sedan
+// process.exit(1).
+const invokedDirectly =
+  !!process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
+
+if (invokedDirectly) {
+  main().catch((err) => {
+    console.error('Fatal:', err);
+    process.exit(1);
+  });
+}
