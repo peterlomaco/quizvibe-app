@@ -167,10 +167,15 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "7hiVIixor_Q"
-        startSec: 0
-        endSec: 30
+        startSec: 30
+        endSec: 60
         channelTitle: "A Star Is Born 2018"
         notes: "Peter-kurerad 2026-08-25 ur Peters YT- och Spotify-lista."
+      - videoId: "aU_bj9SxvdU"
+        startSec: 4
+        endSec: 34
+        channelTitle: "7clouds"
+        notes: "Lyric video over officiell inspelning, tillagd 2026-08-27."
   - id: drake-gods-plan
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "God's Plan — Drake"
@@ -179,10 +184,18 @@ items:
     wikimediaSearchHints: ["Drake God's Plan Scorpion"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "m1a_GqJf02M"
-        startSec: 0
-        endSec: 199
-        channelTitle: "Drake - Topic"
+      - videoId: "xpVfcZ0ZcFM"
+        startSec: 48
+        endSec: 78
+        channelTitle: "DrakeVEVO"
+        notes: "Peter-kurerad 2026-08-27. Officiella musikvideon. startSec 48 angiven av Peter."
+      - videoId: "bChS476h-T8"
+        startSec: 3
+        endSec: 33
+        channelTitle: "BEST ARTIST ALIVE OVO"
+        notes: "Peter-kurerad 2026-08-27. Lyric video. startSec 3 angiven av Peter."
+    genrePackages: ["hiphop"]
+    inBaseCatalog: false
   - id: lil-nas-x-old-town-road
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Old Town Road — Lil Nas X"
@@ -334,12 +347,11 @@ items:
     wikimediaSearchHints: ["Billie Eilish Birds of a Feather Hit Me Hard and Soft"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "WKZO-CWeOVA"
+      - videoId: "cz_lZAPlEAE"
         startSec: 30
         endSec: 45
-        channelTitle: "Billie Eilish - Topic"
-        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
-    notes: "UTAN MEDIA: alla studio-versioner UMG-blocked i SE/EU. Live-versioner ratade per policy. Parkerat tills alternativ källa hittas."
+        channelTitle: "Vibe Music"
+        notes: "Lyric video over officiell inspelning, Peter-kurerad 2026-08-27. Ersatte tidigare klipp WKZO-CWeOVA (blockerat i SE/EU)."
   - id: lady-gaga-bruno-mars-die-with-a-smile
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Die With a Smile — Lady Gaga & Bruno Mars"
@@ -474,15 +486,16 @@ items:
     displayName: "Heroes — Måns Zelmerlöw"
     correctYear: 2015
     probability: 80
+    region: ["europe"]
+    inBaseCatalog: false
     wikimediaSearchHints: ["Måns Zelmerlöw Heroes Eurovision 2015"]
     answerMethods: ["timeline"]
     genrePackages: ["Eurovision"]
     youtubeClips:
-      - videoId: "-nbq6Ur103Q"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Warner Music Sweden"
-        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (18)."
+      - videoId: "oAQKr5aJJjQ"
+        startSec: 2
+        endSec: 32
+        notes: "Peter-kurerad 2026-08-27, ersatte tidigare klipp -nbq6Ur103Q."
   - id: weeknd-starboy
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Starboy — The Weeknd"
@@ -530,11 +543,18 @@ items:
     wikimediaSearchHints: ["Lewis Capaldi Someone You Loved 2019"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "pRIZohFFOMo"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Lewis Capaldi - Topic"
-        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      - videoId: "zABLecsR5UE"
+        startSec: 2
+        endSec: 32
+        channelTitle: "LewisCapaldiVEVO"
+        notes: "Peter-kurerad 2026-08-27. Ersatte Topic-stillbilden pRIZohFFOMo. Officiella musikvideon. startSec 2 angiven av Peter."
+      - videoId: "JotQ4LtmkuU"
+        startSec: 3
+        endSec: 33
+        channelTitle: "7clouds"
+        notes: "Peter-kurerad 2026-08-27. Ersatte Topic-stillbilden pRIZohFFOMo. Lyrics-version. startSec 3 angiven av Peter."
+    genrePackages: ["Love & Peace", "Soft & Ballads"]
+    inBaseCatalog: false
   - id: glass-animals-heat-waves
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Heat Waves — Glass Animals"

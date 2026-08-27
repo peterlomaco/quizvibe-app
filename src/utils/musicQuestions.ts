@@ -2417,12 +2417,12 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "spotifyTrackId": "1oS8V9VCSuF0fgLQGMKXQY",
     "youtubeClips": [
       {
-        "videoId": "uhYOEoQyqT4",
-        "startSec": 0,
-        "endSec": 30,
-        "channelTitle": "Universal Music Sweden",
+        "videoId": "nSRoORVsr-Q",
+        "startSec": 6,
+        "endSec": 36,
+        "channelTitle": "Lasse Berghagen - Topic",
         "license": "standard",
-        "notes": "Officiell UMG Sweden. Melodifestivalen 1973 (7:a plats)."
+        "notes": "Peter-kurerad 2026-08-27. startSec 6 angiven av Peter. Ersatte uhYOEoQyqT4 vars titel 'Lasse Berghagen - Ding Dong (1973)' ar 34 tecken med aret vid 29 = spoiler."
       }
     ]
   },
@@ -3352,12 +3352,20 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "youtubeClips": [
       {
-        "videoId": "7PC-AcrHEKU",
-        "startSec": 0,
-        "endSec": 15,
-        "channelTitle": "Chic - Topic",
+        "videoId": "aXgSHL7efKg",
+        "startSec": 2,
+        "endSec": 32,
+        "channelTitle": "RHINO",
         "license": "standard",
-        "notes": "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
+        "notes": "Peter-kurerad 2026-08-27. Officiella musikvideon (RHINO = rattsinnehavare). startSec 2 angiven av Peter."
+      },
+      {
+        "videoId": "4jEgM53SRbI",
+        "startSec": 4,
+        "endSec": 34,
+        "channelTitle": "Justified Melody",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-27. Lyrics. startSec 4 angiven av Peter. Peters egna 3Mdh3IrLV0c gick INTE att badda in (embeddable=false)."
       }
     ]
   },
@@ -4305,12 +4313,12 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "youtubeClips": [
       {
-        "videoId": "2GAaOyfMLfA",
-        "startSec": 5,
-        "endSec": 20,
-        "channelTitle": "Eurovision Song Contest",
+        "videoId": "d-ghe23_uwI",
+        "startSec": 2,
+        "endSec": 32,
+        "channelTitle": "Magnus Wennberg",
         "license": "standard",
-        "notes": "Melodifestivalen 1982 vinnare. ESC 1982 performance."
+        "notes": "Peter-kurerad 2026-08-27. startSec 2 angiven av Peter. Ersatte 2GAaOyfMLfA (1982 vid tecken 11 = spoiler). Titeln har 1982 vid tecken 73 av 99 - bor kapas bort, men VERIFIERA."
       }
     ]
   },
@@ -4563,6 +4571,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "prod. ovr",
         "license": "standard",
         "notes": "Official Shortened 4K Video — rörlig MV (zombiedans). Mid-song."
+      }
+    ]
+  },
+  {
+    "id": "tomas-ledin-sommaren-ar-kort",
+    "displayName": "Sommaren är kort — Tomas Ledin",
+    "correctYear": 1982,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "100% svenska",
+      "Summer"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "wlhY1WEAH8U",
+        "startSec": 3,
+        "endSec": 33,
+        "channelTitle": "apelsiiinen12",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-27. startSec 3 angiven av Peter. correctYear 1982 enligt MusicBrainz."
       }
     ]
   },
@@ -6009,32 +6048,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "peter-cetera-glory-of-love",
-    "displayName": "Glory of Love — Peter Cetera",
-    "correctYear": 1986,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "yQHhqDRn4_c",
-        "startSec": 0,
-        "endSec": 30,
-        "license": "standard",
-        "notes": "Peter-kurerad 2026-08-14. Kanal ej verifierad."
-      }
-    ]
-  },
-  {
     "id": "peter-gabriel-sledgehammer",
     "displayName": "Sledgehammer — Peter Gabriel",
     "correctYear": 1986,
@@ -6053,8 +6066,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "OJWJE0x7T4Q",
-        "startSec": 0,
-        "endSec": 30,
+        "startSec": 30,
+        "endSec": 60,
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-14. Kanal ej verifierad."
       }
@@ -6646,17 +6659,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "Eurovision"
+      "Melodifestivalen",
+      "100% svenska"
     ],
     "spotifyTrackId": "7bVwUOySQGO2afJ0LArAMi",
     "youtubeClips": [
       {
-        "videoId": "u4-gEpNI6CI",
-        "startSec": 5,
-        "endSec": 20,
-        "channelTitle": "Eurovision Song Contest",
+        "videoId": "GO9VUhn1TXk",
+        "startSec": 1,
+        "endSec": 31,
+        "channelTitle": "Tommy Körberg - Topic",
         "license": "standard",
-        "notes": "Melodifestivalen 1988 vinnare. ESC 1988 performance."
+        "notes": "Peter-kurerad 2026-08-27. startSec 1 angiven av Peter. Peters egna G9iUTMXF0tw SPOILAR (1988 vid tecken 46 av 51); officiell Topic-audio anvand istallet."
+      },
+      {
+        "videoId": "DxLlgLY2xEo",
+        "startSec": 2,
+        "endSec": 32,
+        "channelTitle": "Py Bäckman",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-27. Lyric video. startSec 2 angiven av Peter."
       }
     ]
   },
@@ -7808,12 +7830,12 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "youtubeClips": [
       {
-        "videoId": "XBrfbWtmvWs",
+        "videoId": "GacgWYqL-Bc",
         "startSec": 10,
-        "endSec": 25,
-        "channelTitle": "FT Depot",
+        "endSec": 40,
+        "channelTitle": "Marcus R",
         "license": "standard",
-        "notes": "Original teatral 1992-trailer — Aladdin + Agrabah + Genie (Robin Williams) etableras."
+        "notes": "Peter-kurerad 2026-08-27. Ersatte XBrfbWtmvWs vars titel hade 1992 vid tecken 9 av 53 = spoiler. Svenskt tal."
       }
     ]
   },
@@ -9357,8 +9379,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "8WEtxJ4-sh4",
-        "startSec": 0,
-        "endSec": 30,
+        "startSec": 5,
+        "endSec": 35,
         "channelTitle": "TLCVEVO",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
@@ -12883,7 +12905,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "isAnimated": false,
     "correctNames": [
-      "Michael Nyqvist"
+      "Mikael Nyqvist"
     ],
     "distractorNames": [
       "Rolf Lassgård",
@@ -12898,7 +12920,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 45,
         "channelTitle": "NuovoCinemaGiornico",
         "license": "standard",
-        "notes": "Originaltrailer. Oscar-nominerad svensk film. Michael Nyqvist."
+        "notes": "Originaltrailer. Oscar-nominerad svensk film. Mikael Nyqvist."
       }
     ]
   },
@@ -13027,8 +13049,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "EDwb9jOVRtU",
-        "startSec": 0,
-        "endSec": 334,
+        "startSec": 63,
+        "endSec": 93,
         "channelTitle": "Madonna",
         "license": "standard"
       }
@@ -13142,6 +13164,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Timbuktu - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
+    "id": "timbuktu-alla-vill-till-himmelen",
+    "displayName": "Alla vill till himmelen men ingen vill dö — Timbuktu",
+    "correctYear": 2005,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "100% svenska"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "NDHlDb9AOsU",
+        "startSec": 4,
+        "endSec": 34,
+        "channelTitle": "Timbuktu",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-27. startSec 4 angiven av Peter. NYTT item - katalogen hade bara artist-itemet timbuktu (hints), ingen lat. correctYear 2005 = albumet med samma namn (23 feb 2005)."
       }
     ]
   },
@@ -13753,14 +13805,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "sweden"
     ],
+    "genrePackages": [
+      "Hits",
+      "Love & Peace"
+    ],
     "youtubeClips": [
       {
-        "videoId": "4z-bOdAdias",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Beyoncé - Topic",
+        "videoId": "4m1EFMoRFvY",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "BeyoncéVEVO",
         "license": "standard",
-        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+        "notes": "Peter-kurerad 2026-08-27. Officiella videon. Ingen startSec angiven av Peter."
+      },
+      {
+        "videoId": "9WBCFGJM6no",
+        "startSec": 5,
+        "endSec": 35,
+        "channelTitle": "GlyphoricVibes",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-27. Lyrics. startSec 5 angiven av Peter."
       }
     ]
   },
@@ -14094,11 +14158,20 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "youtubeClips": [
       {
-        "videoId": "OIPmhkzN2ug",
-        "startSec": 0,
-        "endSec": 290,
-        "channelTitle": "Black Eyed Peas - Topic",
-        "license": "standard"
+        "videoId": "uSD4vsh1zDA",
+        "startSec": 30,
+        "endSec": 60,
+        "channelTitle": "BlackEyedPeasVEVO",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-27. Ersatte Topic-klippet OIPmhkzN2ug. Officiella musikvideon. startSec 30 angiven av Peter."
+      },
+      {
+        "videoId": "ipii7KbbJLY",
+        "startSec": 15,
+        "endSec": 45,
+        "channelTitle": "Popular Music",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-27. Ersatte Topic-klippet OIPmhkzN2ug. Lyrics-version. startSec 15 angiven av Peter."
       }
     ]
   },
@@ -14431,8 +14504,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "hWjrMTWXH28",
-        "startSec": 0,
-        "endSec": 30,
+        "startSec": 8,
+        "endSec": 38,
         "channelTitle": "David Guetta",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
@@ -15207,17 +15280,28 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
+    ],
+    "genrePackages": [
+      "Hits"
     ],
     "spotifyTrackId": "3VZQshi4COChhXaz7cLP02",
     "youtubeClips": [
       {
-        "videoId": "ayX4RhsLyUo",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Icona Pop - Topic",
+        "videoId": "UxxajLWwzqY",
+        "startSec": 19,
+        "endSec": 49,
+        "channelTitle": "Icona Pop",
         "license": "standard",
-        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+        "notes": "Peter-kurerad 2026-08-27. Officiella videon. startSec 19 angiven av Peter."
+      },
+      {
+        "videoId": "RGlo-GuCKFg",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "GIRLS FOR MUSIC",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-27. Lyrics. startSec 0 angiven av Peter. Ersatte JKko13wVxE8 (min ersattning for Peters MZm-vC9CBe4 som inte gick att badda in)."
       }
     ]
   },
@@ -15240,8 +15324,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "l8hIx9AceOw",
-        "startSec": 0,
-        "endSec": 30,
+        "startSec": 40,
+        "endSec": 70,
         "channelTitle": "TopMusicVidsWeekly",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
@@ -15290,20 +15374,29 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "genrePackages": [
-      "Eurovision"
+      "Eurovision",
+      "Melodifestivalen"
     ],
     "spotifyTrackId": "1xN7BpTAWnZkuSLOtRP6Qc",
     "youtubeClips": [
       {
-        "videoId": "chK8XTtqEJI",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Loreen - Topic",
+        "videoId": "Pfo-8z86x80",
+        "startSec": 7,
+        "endSec": 37,
+        "channelTitle": "Eurovision Song Contest",
         "license": "standard",
-        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+        "notes": "Peter-kurerad 2026-08-27. Ersatte Topic-klippet chK8XTtqEJI. ESC-finalen. startSec 7 angiven av Peter. Titeln har '2012' vid tecken 76 av 80 - bor kapas bort i spelaren, men VERIFIERA."
+      },
+      {
+        "videoId": "bGVldEkd06o",
+        "startSec": 2,
+        "endSec": 32,
+        "channelTitle": "Lovemusic187",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-27. Ersatte Topic-klippet chK8XTtqEJI. Lyrics-version. startSec 2 angiven av Peter. Peters egna _v9iT4SZPT8 SPOILAR: titeln ar 49 tecken med '2012' vid tecken 45 = fullt synligt. Detta klipp har ren titel."
       }
     ]
   },
@@ -15576,7 +15669,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "distractorNames": [
       "Rolf Lassgård",
-      "Michael Nyqvist",
+      "Mikael Nyqvist",
       "Peter Haber",
       "Mikael Persbrandt"
     ],
@@ -16215,7 +16308,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "distractorNames": [
       "Robert Gustafsson",
-      "Michael Nyqvist",
+      "Mikael Nyqvist",
       "Mikael Persbrandt",
       "Peter Haber"
     ],
@@ -16254,36 +16347,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Major Lazer Official",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
-      }
-    ]
-  },
-  {
-    "id": "mans-zelmerlow-heroes",
-    "displayName": "Heroes — Måns Zelmerlöw",
-    "correctYear": 2015,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "Eurovision"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "-nbq6Ur103Q",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Warner Music Sweden",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (18)."
       }
     ]
   },
@@ -17509,32 +17572,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "drake-gods-plan",
-    "displayName": "God's Plan — Drake",
-    "correctYear": 2018,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "m1a_GqJf02M",
-        "startSec": 0,
-        "endSec": 199,
-        "channelTitle": "Drake - Topic",
-        "license": "standard"
-      }
-    ]
-  },
-  {
     "id": "emil-forsberg-vs-schweiz-vm-2018",
     "displayName": "Emil Forsbergs mål mot Schweiz åttondelsfinal",
     "correctYear": 2018,
@@ -17580,38 +17617,19 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "7hiVIixor_Q",
-        "startSec": 0,
-        "endSec": 30,
+        "startSec": 30,
+        "endSec": 60,
         "channelTitle": "A Star Is Born 2018",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-25 ur Peters YT- och Spotify-lista."
-      }
-    ]
-  },
-  {
-    "id": "lewis-capaldi-someone-you-loved",
-    "displayName": "Someone You Loved — Lewis Capaldi",
-    "correctYear": 2018,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
+      },
       {
-        "videoId": "pRIZohFFOMo",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Lewis Capaldi - Topic",
+        "videoId": "aU_bj9SxvdU",
+        "startSec": 4,
+        "endSec": 34,
+        "channelTitle": "7clouds",
         "license": "standard",
-        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+        "notes": "Lyric video over officiell inspelning, tillagd 2026-08-27."
       }
     ]
   },
@@ -18845,12 +18863,12 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "youtubeClips": [
       {
-        "videoId": "WKZO-CWeOVA",
+        "videoId": "cz_lZAPlEAE",
         "startSec": 30,
         "endSec": 45,
-        "channelTitle": "Billie Eilish - Topic",
+        "channelTitle": "Vibe Music",
         "license": "standard",
-        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+        "notes": "Lyric video over officiell inspelning, Peter-kurerad 2026-08-27. Ersatte tidigare klipp WKZO-CWeOVA (blockerat i SE/EU)."
       }
     ]
   },

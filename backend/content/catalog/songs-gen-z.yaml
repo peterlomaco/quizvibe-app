@@ -252,8 +252,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "EDwb9jOVRtU"
-        startSec: 0
-        endSec: 334
+        startSec: 63
+        endSec: 93
         channelTitle: "Madonna"
   - id: gorillaz-feel-good-inc
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -364,10 +364,16 @@ items:
     wikimediaSearchHints: ["Black Eyed Peas I Gotta Feeling The E.N.D."]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "OIPmhkzN2ug"
-        startSec: 0
-        endSec: 290
-        channelTitle: "Black Eyed Peas - Topic"
+      - videoId: "uSD4vsh1zDA"
+        startSec: 30
+        endSec: 60
+        channelTitle: "BlackEyedPeasVEVO"
+        notes: "Peter-kurerad 2026-08-27. Ersatte Topic-klippet OIPmhkzN2ug. Officiella musikvideon. startSec 30 angiven av Peter."
+      - videoId: "ipii7KbbJLY"
+        startSec: 15
+        endSec: 45
+        channelTitle: "Popular Music"
+        notes: "Peter-kurerad 2026-08-27. Ersatte Topic-klippet OIPmhkzN2ug. Lyrics-version. startSec 15 angiven av Peter."
   # 2010
   - id: shakira-waka-waka
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -595,13 +601,19 @@ items:
     wikimediaSearchHints: ["Loreen Euphoria Eurovision 2012"]
     answerMethods: ["timeline"]
     spotifyTrackId: "1xN7BpTAWnZkuSLOtRP6Qc"
+    region: ["europe"]
     youtubeClips:
-      - videoId: "chK8XTtqEJI"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Loreen - Topic"
-        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
-    genrePackages: ["Eurovision"]
+      - videoId: "Pfo-8z86x80"
+        startSec: 7
+        endSec: 37
+        channelTitle: "Eurovision Song Contest"
+        notes: "Peter-kurerad 2026-08-27. Ersatte Topic-klippet chK8XTtqEJI. ESC-finalen. startSec 7 angiven av Peter. Titeln har '2012' vid tecken 76 av 80 - bor kapas bort i spelaren, men VERIFIERA."
+      - videoId: "bGVldEkd06o"
+        startSec: 2
+        endSec: 32
+        channelTitle: "Lovemusic187"
+        notes: "Peter-kurerad 2026-08-27. Ersatte Topic-klippet chK8XTtqEJI. Lyrics-version. startSec 2 angiven av Peter. Peters egna _v9iT4SZPT8 SPOILAR: titeln ar 49 tecken med '2012' vid tecken 45 = fullt synligt. Detta klipp har ren titel."
+    genrePackages: ["Eurovision", "Melodifestivalen"]
   - id: beyonce-single-ladies
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Single Ladies (Put a Ring on It) — Beyoncé"
@@ -610,11 +622,17 @@ items:
     wikimediaSearchHints: ["Beyoncé Single Ladies 2008"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "4z-bOdAdias"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Beyoncé - Topic"
-        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      - videoId: "4m1EFMoRFvY"
+        startSec: 0
+        endSec: 30
+        channelTitle: "BeyoncéVEVO"
+        notes: "Peter-kurerad 2026-08-27. Officiella videon. Ingen startSec angiven av Peter."
+      - videoId: "9WBCFGJM6no"
+        startSec: 5
+        endSec: 35
+        channelTitle: "GlyphoricVibes"
+        notes: "Peter-kurerad 2026-08-27. Lyrics. startSec 5 angiven av Peter."
+    genrePackages: ["Hits", "Love & Peace"]
   - id: bruno-mars-just-the-way-you-are
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Just the Way You Are — Bruno Mars"
@@ -747,11 +765,18 @@ items:
     answerMethods: ["timeline"]
     spotifyTrackId: "3VZQshi4COChhXaz7cLP02"
     youtubeClips:
-      - videoId: "ayX4RhsLyUo"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Icona Pop - Topic"
-        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      - videoId: "UxxajLWwzqY"
+        startSec: 19
+        endSec: 49
+        channelTitle: "Icona Pop"
+        notes: "Peter-kurerad 2026-08-27. Officiella videon. startSec 19 angiven av Peter."
+      - videoId: "RGlo-GuCKFg"
+        startSec: 0
+        endSec: 30
+        channelTitle: "GIRLS FOR MUSIC"
+        notes: "Peter-kurerad 2026-08-27. Lyrics. startSec 0 angiven av Peter. Ersatte JKko13wVxE8 (min ersattning for Peters MZm-vC9CBe4 som inte gick att badda in)."
+    region: ["global"]
+    genrePackages: ["Hits"]
   - id: jill-johnson-karleken-ar
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Kärleken är — Jill Johnson"
@@ -1038,6 +1063,7 @@ items:
     correctYear: 2007
     probability: 74
     wikimediaSearchHints: ["Marija Šerifović Molitva Eurovision 2007 Serbia"]
+    region: ["europe"]
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "Kbi08wfT7mA"
@@ -1045,17 +1071,6 @@ items:
         endSec: 45
         channelTitle: "Marija Šerifović"
         notes: "ESC 2007 vinnare — Serbien. Officiell music video."
-    genrePackages: ["Eurovision"]
-    inBaseCatalog: false
-  - id: dima-bilan-believe
-    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
-    displayName: "Believe — Dima Bilan"
-    correctYear: 2008
-    probability: 74
-    wikimediaSearchHints: ["Dima Bilan Believe Eurovision 2008 Russia"]
-    answerMethods: ["timeline"]
-    # youtubeClips borttagna 2026-08-26 pa Peters begaran (-72s4WzUcKI).
-    # Itemet ar utan media tills ersattning finns.
     genrePackages: ["Eurovision"]
     inBaseCatalog: false
   - id: alexander-rybak-fairytale
@@ -1446,8 +1461,8 @@ items:
     genrePackages: ["Club & Dance Hits"]
     youtubeClips:
       - videoId: "hWjrMTWXH28"
-        startSec: 0
-        endSec: 30
+        startSec: 8
+        endSec: 38
         channelTitle: "David Guetta"
         notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
   - id: kent-utan-dina-andetag
@@ -1581,8 +1596,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "l8hIx9AceOw"
-        startSec: 0
-        endSec: 30
+        startSec: 40
+        endSec: 70
         channelTitle: "TopMusicVidsWeekly"
         notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
   - id: yves-larock-rise-up
@@ -2396,3 +2411,18 @@ items:
         channelTitle: "HansonVEVO"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx). correctYear 1997 = Mercury-singeln/Middle of Nowhere. RATTA INTE till 1996: bandet sjalvslappte en ANNAN inspelning pa indie-albumet MMMBop 1996 - itemet ar 1997-inspelningen."
     genrePackages: ["Hits"]
+  - id: timbuktu-alla-vill-till-himmelen
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Alla vill till himmelen men ingen vill dö — Timbuktu"
+    correctYear: 2005
+    probability: 78
+    region: ["sweden"]
+    wikimediaSearchHints: ["Timbuktu Alla vill till himmelen men ingen vill dö"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "NDHlDb9AOsU"
+        startSec: 4
+        endSec: 34
+        channelTitle: "Timbuktu"
+        notes: "Peter-kurerad 2026-08-27. startSec 4 angiven av Peter. NYTT item - katalogen hade bara artist-itemet timbuktu (hints), ingen lat. correctYear 2005 = albumet med samma namn (23 feb 2005)."
+    genrePackages: ["100% svenska"]

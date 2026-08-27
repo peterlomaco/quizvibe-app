@@ -934,11 +934,11 @@ items:
     wikimediaSearchHints: ["Chips Dag efter dag Eurovision 1982"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "2GAaOyfMLfA"
-        startSec: 5
-        endSec: 20
-        channelTitle: "Eurovision Song Contest"
-        notes: "Melodifestivalen 1982 vinnare. ESC 1982 performance."
+      - videoId: "d-ghe23_uwI"
+        startSec: 2
+        endSec: 32
+        channelTitle: "Magnus Wennberg"
+        notes: "Peter-kurerad 2026-08-27. startSec 2 angiven av Peter. Ersatte 2GAaOyfMLfA (1982 vid tecken 11 = spoiler). Titeln har 1982 vid tecken 73 av 99 - bor kapas bort, men VERIFIERA."
   - id: herreys-diggiloo-diggiley
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Diggi-Loo Diggi-Ley — Herreys"
@@ -991,12 +991,18 @@ items:
     answerMethods: ["timeline"]
     spotifyTrackId: "7bVwUOySQGO2afJ0LArAMi"
     youtubeClips:
-      - videoId: "u4-gEpNI6CI"
-        startSec: 5
-        endSec: 20
-        channelTitle: "Eurovision Song Contest"
-        notes: "Melodifestivalen 1988 vinnare. ESC 1988 performance."
-    genrePackages: ["Eurovision"]
+      - videoId: "GO9VUhn1TXk"
+        startSec: 1
+        endSec: 31
+        channelTitle: "Tommy Körberg - Topic"
+        notes: "Peter-kurerad 2026-08-27. startSec 1 angiven av Peter. Peters egna G9iUTMXF0tw SPOILAR (1988 vid tecken 46 av 51); officiell Topic-audio anvand istallet."
+      - videoId: "DxLlgLY2xEo"
+        startSec: 2
+        endSec: 32
+        channelTitle: "Py Bäckman"
+        notes: "Peter-kurerad 2026-08-27. Lyric video. startSec 2 angiven av Peter."
+    region: ["sweden"]
+    genrePackages: ["Melodifestivalen", "100% svenska"]
   - id: carola-fangad-av-en-stormvind
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Fångad av en stormvind — Carola"
@@ -1760,11 +1766,15 @@ items:
     wikimediaSearchHints: ["Peter Cetera Glory of Love 1986 Karate Kid Part II"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "yQHhqDRn4_c"
+      - videoId: "wktJg27TXx4"
         startSec: 0
         endSec: 30
-        notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
+        channelTitle: "Truett Turk"
+        notes: "Peter-kurerad 2026-08-27. Ersatte yQHhqDRn4_c. VERIFIERA I SPELAREN: titeln ar 78 tecken med 1986 vid tecken 57 - bor kapas bort, men aret ar svaret."
     notes: "correctYear = singeln (maj 1986), fore albumet Solitude/Solitaire (juli 1986)."
+    region: ["global"]
+    genrePackages: ["Film", "Soft & Ballads"]
+    inBaseCatalog: false
   - id: peter-gabriel-sledgehammer
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Sledgehammer — Peter Gabriel"
@@ -1774,8 +1784,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "OJWJE0x7T4Q"
-        startSec: 0
-        endSec: 30
+        startSec: 30
+        endSec: 60
         notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
     notes: "correctYear = singeln (21 april 1986), knappt en manad fore albumet So (19 maj 1986) — bada vagarna ger 1986."
   - id: prince-kiss
@@ -2897,8 +2907,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "8WEtxJ4-sh4"
-        startSec: 0
-        endSec: 30
+        startSec: 5
+        endSec: 35
         channelTitle: "TLCVEVO"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
     genrePackages: ["Soft & Ballads"]
@@ -2917,3 +2927,18 @@ items:
         channelTitle: "RobertMilesVEVO"
         notes: "Peter-kurerad 2026-08-27. Officiella Vevo-videon (SD, bara en note). Ersatte RIGOq8MEyH0 ur xlsx som var en 14 min lang 90-tals-topplista. correctYear 1995 = EP:n Soundtracks (jan 1995, Italien); slog igenom internationellt 1996."
     genrePackages: ["Mega Hits"]
+  - id: tomas-ledin-sommaren-ar-kort
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Sommaren är kort — Tomas Ledin"
+    correctYear: 1982
+    probability: 82
+    region: ["sweden"]
+    wikimediaSearchHints: ["Tomas Ledin Sommaren är kort"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "wlhY1WEAH8U"
+        startSec: 3
+        endSec: 33
+        channelTitle: "apelsiiinen12"
+        notes: "Peter-kurerad 2026-08-27. startSec 3 angiven av Peter. correctYear 1982 enligt MusicBrainz."
+    genrePackages: ["100% svenska", "Summer"]

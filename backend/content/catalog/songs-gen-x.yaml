@@ -162,11 +162,16 @@ items:
     wikimediaSearchHints: ["Chic Le Freak 1978"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "7PC-AcrHEKU"
-        startSec: 0
-        endSec: 15
-        channelTitle: "Chic - Topic"
-        notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
+      - videoId: "aXgSHL7efKg"
+        startSec: 2
+        endSec: 32
+        channelTitle: "RHINO"
+        notes: "Peter-kurerad 2026-08-27. Officiella musikvideon (RHINO = rattsinnehavare). startSec 2 angiven av Peter."
+      - videoId: "4jEgM53SRbI"
+        startSec: 4
+        endSec: 34
+        channelTitle: "Justified Melody"
+        notes: "Peter-kurerad 2026-08-27. Lyrics. startSec 4 angiven av Peter. Peters egna 3Mdh3IrLV0c gick INTE att badda in (embeddable=false)."
   - id: queen-another-one-bites-the-dust
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Another One Bites the Dust — Queen"
@@ -1002,11 +1007,11 @@ items:
     answerMethods: ["timeline"]
     spotifyTrackId: "1oS8V9VCSuF0fgLQGMKXQY"
     youtubeClips:
-      - videoId: "uhYOEoQyqT4"
-        startSec: 0
-        endSec: 30
-        channelTitle: "Universal Music Sweden"
-        notes: "Officiell UMG Sweden. Melodifestivalen 1973 (7:a plats)."
+      - videoId: "nSRoORVsr-Q"
+        startSec: 6
+        endSec: 36
+        channelTitle: "Lasse Berghagen - Topic"
+        notes: "Peter-kurerad 2026-08-27. startSec 6 angiven av Peter. Ersatte uhYOEoQyqT4 vars titel 'Lasse Berghagen - Ding Dong (1973)' ar 34 tecken med aret vid 29 = spoiler."
   - id: streaplers-vad-har-du-under-blusen-rut
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Vad har du under blusen Rut — Streaplers"
